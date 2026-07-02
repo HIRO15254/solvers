@@ -431,9 +431,24 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
 }
 
 impl Builder<'_> {
-    fn extend_history(&self, history: &str, token: &str) -> String {
+    /// Appends a history token, formatted lazily: when `track_node_info` is
+    /// off `token` is never called, so callers passing a `format!`-based
+    /// closure (bet sizes, chance-deal card labels) pay no allocation or
+    /// `Display` work for it — the flag must skip building the strings
+    /// themselves, not just their storage in `node_info`.
+    fn extend_history(&self, history: &str, token: impl FnOnce() -> String) -> String {
         if self.config.track_node_info {
-            format!("{history}{token}")
+            format!("{history}{}", token())
+        } else {
+            String::new()
+        }
+    }
+
+    /// Same laziness as [`Self::extend_history`] for a node's per-action
+    /// labels (only ever read back out of `node_info`, never off `history`).
+    fn action_label(&self, make: impl FnOnce() -> String) -> String {
+        if self.config.track_node_info {
+            make()
         } else {
             String::new()
         }
@@ -446,26 +461,26 @@ impl Builder<'_> {
         if state.outstanding == Chips::ZERO {
             if state.first_checked {
                 let next = LineState {
-                    history: self.extend_history(&state.history, "x"),
+                    history: self.extend_history(&state.history, || "x".into()),
                     ..state.clone()
                 };
-                actions.push(("check".into(), self.street_end(next)));
+                actions.push((self.action_label(|| "check".into()), self.street_end(next)));
             } else {
                 let next = LineState {
                     to_act: actor.opponent(),
                     first_checked: true,
-                    history: self.extend_history(&state.history, "x"),
+                    history: self.extend_history(&state.history, || "x".into()),
                     ..state.clone()
                 };
-                actions.push(("check".into(), self.betting(next)));
+                actions.push((self.action_label(|| "check".into()), self.betting(next)));
             }
         } else {
             let fold_state = LineState {
-                history: self.extend_history(&state.history, "f"),
+                history: self.extend_history(&state.history, || "f".into()),
                 ..state.clone()
             };
             actions.push((
-                "fold".into(),
+                self.action_label(|| "fold".into()),
                 self.terminal(&fold_state, TerminalKind::Fold { folder: actor }),
             ));
             let mut contrib = state.contrib;
@@ -473,10 +488,13 @@ impl Builder<'_> {
             let call_state = LineState {
                 contrib,
                 outstanding: Chips::ZERO,
-                history: self.extend_history(&state.history, "c"),
+                history: self.extend_history(&state.history, || "c".into()),
                 ..state.clone()
             };
-            actions.push(("call".into(), self.street_end(call_state)));
+            actions.push((
+                self.action_label(|| "call".into()),
+                self.street_end(call_state),
+            ));
         }
 
         // Bets and raises share sizing logic: `f * pot after call`.
@@ -484,17 +502,19 @@ impl Builder<'_> {
             let mut contrib = state.contrib;
             contrib[actor] += additional;
             let to = contrib[actor];
-            let verb = if state.outstanding == Chips::ZERO {
-                format!("bet {to}")
-            } else {
-                format!("raise to {to}")
-            };
+            let verb = self.action_label(|| {
+                if state.outstanding == Chips::ZERO {
+                    format!("bet {to}")
+                } else {
+                    format!("raise to {to}")
+                }
+            });
             let next = LineState {
                 to_act: actor.opponent(),
                 contrib,
                 outstanding: additional - state.outstanding,
                 raises_used: state.raises_used + 1,
-                history: self.extend_history(&state.history, &format!("b{to}")),
+                history: self.extend_history(&state.history, || format!("b{to}")),
                 ..state.clone()
             };
             actions.push((verb, self.betting(next)));
@@ -556,7 +576,7 @@ impl Builder<'_> {
             let mut board = state.board.clone();
             board.push(group.representative);
             let history =
-                self.extend_history(&state.history, &format!("[{}]", group.representative));
+                self.extend_history(&state.history, || format!("[{}]", group.representative));
 
             let child_state = LineState {
                 street: next,

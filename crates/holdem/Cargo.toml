@@ -11,3 +11,6 @@ cards = { workspace = true }
 engine = { workspace = true }
 game = { workspace = true }
 hand-index = { workspace = true }
+
+[dev-dependencies]
+rayon = { workspace = true }

@@ -247,6 +247,7 @@ dependencies = [
  "engine",
  "game",
  "hand-index",
+ "rayon",
 ]
 
 [[package]]
