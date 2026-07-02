@@ -17,7 +17,7 @@ mod tree;
 
 pub use schedule::{CfrPlus, Dcfr, DiscountSchedule, Discounts, HsDcfr, Vanilla, linear_cfr};
 pub use solver::{CompiledGame, Solver, TerminalEvaluator};
-pub use storage::{F32Storage, Storage, StorageRef};
+pub use storage::{F32Storage, F32View, Storage, StorageOps, StorageRef, StorageSpan, StorageView};
 pub use tree::{
     Deal, Node, NodeId, NodeKind, PublicTree, ReachMap, SparseTransition, TempNode, TreeSpec,
 };

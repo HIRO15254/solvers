@@ -1,7 +1,7 @@
 use cards::{PerPlayer, Player};
 
 use crate::schedule::{DiscountSchedule, Discounts};
-use crate::storage::{Storage, StorageRef};
+use crate::storage::{Storage, StorageRef, StorageView};
 use crate::tree::{NodeId, NodeKind, PublicTree};
 
 /// Variant-owned terminal evaluation — the only variant code on the hot
@@ -83,10 +83,11 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         for p in Player::BOTH {
             let my_range = self.game.root_ranges[p].clone();
             let opp_range = self.game.root_ranges[p.opponent()].clone();
+            let mut view = self.storage.view_mut();
             cfr_pass(
                 &self.game.tree,
                 &self.game.evaluator,
-                &mut self.storage,
+                &mut view,
                 0,
                 p,
                 &my_range,
@@ -177,10 +178,10 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
 /// parallelism over chance branches land with the holdem tree (M2), whose
 /// storage layout they constrain.
 #[allow(clippy::too_many_arguments)]
-fn cfr_pass<E: TerminalEvaluator, S: Storage>(
+fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
     tree: &PublicTree,
     evaluator: &E,
-    storage: &mut S,
+    storage: &mut V,
     node_id: NodeId,
     p: Player,
     my_reach: &[f32],

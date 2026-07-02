@@ -1,6 +1,6 @@
 use cards::{PerPlayer, Player};
 
-use crate::storage::StorageRef;
+use crate::storage::{StorageRef, StorageSpan};
 
 pub type NodeId = u32;
 
@@ -100,6 +100,11 @@ pub struct PublicTree {
     pub storage_len: usize,
     /// Builder-owned tag per node (see [`TempNode`]).
     pub tags: Vec<u32>,
+    /// Per-node subtree storage footprint, indexed by [`NodeId`]. DFS
+    /// preorder allocation means every subtree's storage is a single
+    /// contiguous range, so a node's span always covers the union of its
+    /// children's spans.
+    pub storage_spans: Vec<StorageSpan>,
 }
 
 /// Build-time tree description, converted by [`PublicTree::compile`].
@@ -140,9 +145,11 @@ impl PublicTree {
             root_dims: spec.root_dims,
             storage_len: 0,
             tags: Vec::new(),
+            storage_spans: Vec::new(),
         };
         tree.nodes.push(placeholder_node());
         tree.tags.push(0);
+        tree.storage_spans.push(StorageSpan::default());
         let root_dims = tree.root_dims;
         tree.fill(0, &spec.root, root_dims);
         tree
@@ -151,6 +158,8 @@ impl PublicTree {
     /// Recursively fills `slot` from `temp`, reserving contiguous child
     /// blocks. `dims` is the per-player private-state dimension on the path.
     fn fill(&mut self, slot: usize, temp: &TempNode, dims: PerPlayer<u32>) {
+        let start = self.storage_len;
+        let sref_start = self.storage_refs.len() as u32;
         match temp {
             TempNode::Terminal { id, tag } => {
                 self.tags[slot] = *tag;
@@ -171,13 +180,14 @@ impl PublicTree {
                 let num_actions = children.len();
                 assert!(num_actions >= 1, "action node must have children");
                 let num_hands = dims[*player] as usize;
+                let aux = self.storage_refs.len() as u32;
                 let storage_ref = StorageRef {
                     offset: self.storage_len,
                     num_actions: num_actions as u16,
                     num_hands: num_hands as u32,
+                    index: aux,
                 };
                 self.storage_len += num_actions * num_hands;
-                let aux = self.storage_refs.len() as u32;
                 self.storage_refs.push(storage_ref);
 
                 let first_child = self.reserve_children(num_actions);
@@ -219,12 +229,20 @@ impl PublicTree {
                 }
             }
         }
+        self.storage_spans[slot] = StorageSpan {
+            start,
+            end: self.storage_len,
+            sref_start,
+            sref_end: self.storage_refs.len() as u32,
+        };
     }
 
     fn reserve_children(&mut self, n: usize) -> u32 {
         let first = self.nodes.len() as u32;
         self.nodes.extend((0..n).map(|_| placeholder_node()));
         self.tags.extend((0..n).map(|_| 0));
+        self.storage_spans
+            .extend((0..n).map(|_| StorageSpan::default()));
         first
     }
 
@@ -318,5 +336,79 @@ fn placeholder_node() -> Node {
         num_children: 0,
         first_child: 0,
         aux: u32::MAX,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn terminal(id: u32) -> TempNode {
+        TempNode::Terminal { id, tag: 0 }
+    }
+
+    fn action(player: Player, children: Vec<TempNode>) -> TempNode {
+        TempNode::Action {
+            player,
+            children,
+            tag: 0,
+        }
+    }
+
+    /// Root is a chance node with two deals, each into a 2-action node.
+    /// Spans must tile: root's span covers the whole arena, and its
+    /// children's (the two action nodes') spans are disjoint and union to
+    /// exactly the root's span.
+    #[test]
+    fn spans_tile_across_chance_subtree() {
+        let branch =
+            |base_id: u32| action(Player::P0, vec![terminal(base_id), terminal(base_id + 1)]);
+        let identity_maps = PerPlayer::new(ReachMap::Identity, ReachMap::Identity);
+        let root = TempNode::Chance {
+            deals: vec![
+                (0.5, identity_maps, branch(0)),
+                (0.5, identity_maps, branch(2)),
+            ],
+            tag: 0,
+        };
+        let tree = PublicTree::compile(TreeSpec {
+            root,
+            masks: Vec::new(),
+            transitions: Vec::new(),
+            root_dims: PerPlayer::new(2, 2),
+        });
+
+        let root_node = tree.node(0);
+        assert_eq!(root_node.kind, NodeKind::Chance);
+
+        let root_span = tree.storage_spans[0];
+        assert_eq!(root_span.start, 0);
+        assert_eq!(root_span.end, tree.storage_len);
+
+        let child_ids: Vec<NodeId> = tree.children(0).collect();
+        assert_eq!(child_ids.len(), 2);
+        let child_spans: Vec<StorageSpan> = child_ids
+            .iter()
+            .map(|&id| tree.storage_spans[id as usize])
+            .collect();
+
+        // Each child span is non-empty (both branches are 2-action nodes
+        // with 2 hands each).
+        assert!(child_spans[0].start < child_spans[0].end);
+        assert!(child_spans[1].start < child_spans[1].end);
+
+        // Disjoint and ascending.
+        assert!(child_spans[0].end <= child_spans[1].start);
+
+        // Union covers the chance subtree's own span exactly.
+        assert_eq!(child_spans[0].start, root_span.start);
+        assert_eq!(child_spans[1].end, root_span.end);
+
+        // Same tiling holds for the storage_refs index ranges.
+        assert_eq!(root_span.sref_start, 0);
+        assert_eq!(root_span.sref_end, tree.storage_refs.len() as u32);
+        assert!(child_spans[0].sref_end <= child_spans[1].sref_start);
+        assert_eq!(child_spans[0].sref_start, root_span.sref_start);
+        assert_eq!(child_spans[1].sref_end, root_span.sref_end);
     }
 }
