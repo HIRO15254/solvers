@@ -1,0 +1,21 @@
+# Demonstrates the payoff pipeline: Leduc with a raked pot under an ICM
+# payout structure. General-sum: per-player exploitabilities are asymmetric.
+[game]
+kind = "leduc"
+
+[rake]
+kind = "percent-cap"
+rate = 0.05
+cap = 1.0
+no_flop_no_drop = true
+
+[utility]
+kind = "icm"
+payouts = [100.0, 60.0]
+
+[algorithm]
+schedule = "cfr-plus"
+
+[run]
+iterations = 2000
+check_every = 250

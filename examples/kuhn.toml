@@ -1,0 +1,11 @@
+# Kuhn poker to near-exact convergence. Expected value for P0: -1/18.
+[game]
+kind = "kuhn"
+
+[algorithm]
+schedule = "dcfr"
+
+[run]
+iterations = 10000
+check_every = 500
+target_nash_conv = 1e-5
