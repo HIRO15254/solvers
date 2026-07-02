@@ -9,3 +9,6 @@ description = "Variant-independent game layer: terminal payoff pipeline (rake, I
 [dependencies]
 cards = { workspace = true }
 engine = { workspace = true }
+
+[dev-dependencies]
+cfr-ref = { workspace = true }
