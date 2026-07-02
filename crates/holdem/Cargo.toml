@@ -1,0 +1,12 @@
+[package]
+name = "holdem"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Mode A: exact postflop HU-NLHE solving (river-only slice so far)"
+
+[dependencies]
+cards = { workspace = true }
+engine = { workspace = true }
+game = { workspace = true }

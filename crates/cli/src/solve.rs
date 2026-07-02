@@ -6,8 +6,7 @@ use engine::{
     CfrPlus, Dcfr, DiscountSchedule, F32Storage, HsDcfr, NodeKind, Solver, Vanilla, linear_cfr,
 };
 use game::{
-    ChipEv, GgPreflopRake, Icm, NoRake, PayoffPipeline, PercentCapRake, RakeModel, ToyGame,
-    UtilityModel,
+    ChipEv, GgPreflopRake, Icm, NoRake, PayoffPipeline, PercentCapRake, RakeModel, UtilityModel,
 };
 use serde::Serialize;
 

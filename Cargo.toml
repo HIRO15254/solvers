@@ -6,6 +6,7 @@ members = [
     "crates/cfr-ref",
     "crates/engine",
     "crates/game",
+    "crates/holdem",
     "crates/cli",
 ]
 
@@ -21,6 +22,7 @@ hand-index = { path = "crates/hand-index" }
 cfr-ref = { path = "crates/cfr-ref" }
 engine = { path = "crates/engine" }
 game = { path = "crates/game" }
+holdem = { path = "crates/holdem" }
 
 # NOTE: aya_poker's "std" feature is broken in 0.1.0 (aya_base gates no_std on
 # `cfg(std)` instead of `feature = "std"`), so we use the default no_std build.
