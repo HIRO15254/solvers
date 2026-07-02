@@ -105,6 +105,16 @@ pub struct PublicTree {
     /// contiguous range, so a node's span always covers the union of its
     /// children's spans.
     pub storage_spans: Vec<StorageSpan>,
+    /// Whether this node is a [`NodeKind::Chance`] node or has one anywhere
+    /// in its subtree, indexed by [`NodeId`]. A chance node with enough
+    /// children may run its children in parallel (see [`crate::ParConfig`]),
+    /// which `StorageView::split`s whatever view it's handed — including,
+    /// via the ordinary Rust reborrow an unsplit ancestor passes down, the
+    /// *ancestor's own* view. `false` here is the solver's guarantee that no
+    /// descendant can ever do that, so an action node can keep reusing its
+    /// ambient storage view across its children (and after them, for its
+    /// own regret/strategy update) with no protective split of its own.
+    pub subtree_has_chance: Vec<bool>,
 }
 
 /// Build-time tree description, converted by [`PublicTree::compile`].
@@ -146,10 +156,12 @@ impl PublicTree {
             storage_len: 0,
             tags: Vec::new(),
             storage_spans: Vec::new(),
+            subtree_has_chance: Vec::new(),
         };
         tree.nodes.push(placeholder_node());
         tree.tags.push(0);
         tree.storage_spans.push(StorageSpan::default());
+        tree.subtree_has_chance.push(false);
         let root_dims = tree.root_dims;
         tree.fill(0, &spec.root, root_dims);
         tree
@@ -160,6 +172,7 @@ impl PublicTree {
     fn fill(&mut self, slot: usize, temp: &TempNode, dims: PerPlayer<u32>) {
         let start = self.storage_len;
         let sref_start = self.storage_refs.len() as u32;
+        let mut has_chance = matches!(temp, TempNode::Chance { .. });
         match temp {
             TempNode::Terminal { id, tag } => {
                 self.tags[slot] = *tag;
@@ -200,6 +213,7 @@ impl PublicTree {
                 };
                 for (i, child) in children.iter().enumerate() {
                     self.fill(first_child as usize + i, child, dims);
+                    has_chance |= self.subtree_has_chance[first_child as usize + i];
                 }
             }
             TempNode::Chance { deals, tag } => {
@@ -235,6 +249,7 @@ impl PublicTree {
             sref_start,
             sref_end: self.storage_refs.len() as u32,
         };
+        self.subtree_has_chance[slot] = has_chance;
     }
 
     fn reserve_children(&mut self, n: usize) -> u32 {
@@ -243,6 +258,7 @@ impl PublicTree {
         self.tags.extend((0..n).map(|_| 0));
         self.storage_spans
             .extend((0..n).map(|_| StorageSpan::default()));
+        self.subtree_has_chance.extend((0..n).map(|_| false));
         first
     }
 

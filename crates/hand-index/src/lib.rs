@@ -113,8 +113,24 @@ pub struct DealGroup {
 
 /// Groups the cards not on `board` (nor in `dead`) into isomorphism classes
 /// under the stabilizer of `board`.
+///
+/// Only valid when everything else in the game is suit-symmetric. When it
+/// is not — poker ranges rarely are — use [`deal_groups_with`] and pass the
+/// permutations that preserve the asymmetric structure.
 pub fn deal_groups(board: &Board, dead: &[Card]) -> Vec<DealGroup> {
-    let stab = stabilizer(board);
+    deal_groups_with(board, dead, &all_suit_perms())
+}
+
+/// Like [`deal_groups`], but the symmetry group is the intersection of
+/// `board`'s stabilizer with the caller-supplied `allowed` permutations
+/// (e.g. those preserving both players' ranges). Merging two deals is only
+/// sound under a permutation that fixes the *whole* game, not just the
+/// board.
+pub fn deal_groups_with(board: &Board, dead: &[Card], allowed: &[SuitPerm]) -> Vec<DealGroup> {
+    let stab: Vec<SuitPerm> = stabilizer(board)
+        .into_iter()
+        .filter(|perm| allowed.contains(perm))
+        .collect();
     let used: Vec<Card> = board.cards().chain(dead.iter().copied()).collect();
     let mut groups: Vec<DealGroup> = Vec::new();
     let mut assigned = [false; 52];

@@ -10,3 +10,4 @@ description = "Mode A: exact postflop HU-NLHE solving (river-only slice so far)"
 cards = { workspace = true }
 engine = { workspace = true }
 game = { workspace = true }
+hand-index = { workspace = true }

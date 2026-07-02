@@ -255,6 +255,73 @@ struct PassCtx<'w, E> {
     par: ParConfig,
 }
 
+/// Storage access for an action node's own storage ref (when split with
+/// one) and each of its children, while it processes them.
+///
+/// A chance node with enough children may run its children in parallel,
+/// which calls `StorageView::split` on whatever view it's handed. Ordinary
+/// Rust reborrowing means that, left unprotected, that view is the *same
+/// object* every action-node ancestor up to the root is also holding —
+/// `split` permanently empties it (see its doc comment), so an ancestor
+/// that reuses its ambient view afterward (every "my player" node, for its
+/// own regret/strategy update; every sibling after the first, for its own
+/// subtree) would find it gone.
+///
+/// [`PublicTree::subtree_has_chance`] tells us exactly which nodes can
+/// avoid worrying about this: `Ambient` is the original, allocation-free
+/// path (one view reborrowed across every access), taken whenever nothing
+/// below can possibly split; `Split` carves out one independent view per
+/// child (plus, when constructed with an own span, this node's own
+/// storage-ref slice as `views[0]`) so a deep split can only ever consume
+/// a child's own piece.
+enum ActionViews<'v, V> {
+    Ambient(&'v mut V),
+    Split { views: Vec<V>, has_own: bool },
+}
+
+impl<'v, V: StorageView> ActionViews<'v, V> {
+    fn split_for(
+        storage: &'v mut V,
+        tree: &PublicTree,
+        node_id: NodeId,
+        own_span: Option<StorageSpan>,
+        par_budget: u32,
+    ) -> Self {
+        if par_budget == 0 || !tree.subtree_has_chance[node_id as usize] {
+            return ActionViews::Ambient(storage);
+        }
+        let has_own = own_span.is_some();
+        let num_children = tree.node(node_id).num_children as usize;
+        let mut spans: Vec<StorageSpan> = Vec::with_capacity(has_own as usize + num_children);
+        spans.extend(own_span);
+        spans.extend(
+            tree.children(node_id)
+                .map(|id| tree.storage_spans[id as usize]),
+        );
+        ActionViews::Split {
+            views: storage.split(&spans),
+            has_own,
+        }
+    }
+
+    /// This node's own view. Only valid when constructed with `own_span:
+    /// Some(_)`.
+    fn own(&mut self) -> &mut V {
+        match self {
+            ActionViews::Ambient(v) => v,
+            ActionViews::Split { views, .. } => &mut views[0],
+        }
+    }
+
+    /// The `index`-th child's view.
+    fn child(&mut self, index: usize) -> &mut V {
+        match self {
+            ActionViews::Ambient(v) => v,
+            ActionViews::Split { views, has_own } => &mut views[index + *has_own as usize],
+        }
+    }
+}
+
 /// CFR update pass for player `p`, writing p's counterfactual values (one
 /// per hand in p's current private-state space) into `out`.
 ///
@@ -349,6 +416,13 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                 let mut my_next = scratch.take(my_reach.len());
                 let mut opp_next = scratch.take(opp_reach.len());
                 let mut child_out = scratch.take(my_reach.len());
+                // See `ActionViews`: a deeper chance node still eligible to
+                // parallelize (`child_budget > 0`) could split whatever
+                // view a sibling deal is holding, so siblings need
+                // independent views too, not just the parallel branch's
+                // own children.
+                let mut views =
+                    ActionViews::split_for(storage, ctx.tree, node_id, None, child_budget);
                 for (pos, child) in ctx.tree.children(node_id).enumerate() {
                     let deal = *ctx.tree.deal(&node, pos);
                     ctx.tree
@@ -363,7 +437,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                     child_out.fill(0.0);
                     cfr_pass(
                         ctx,
-                        storage,
+                        views.child(pos),
                         scratch,
                         child,
                         &my_next,
@@ -384,8 +458,20 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
             let (num_actions, num_hands) = (sref.num_actions as usize, sref.num_hands as usize);
             debug_assert_eq!(num_hands, my_reach.len());
 
+            // See `ActionViews`: this node's own regret/strategy update
+            // happens after every child returns, so it needs a span
+            // protected from any descendant chance node's parallel split.
+            let own_span = StorageSpan {
+                start: sref.offset,
+                end: sref.offset + sref.len(),
+                sref_start: 0,
+                sref_end: 0,
+            };
+            let mut views =
+                ActionViews::split_for(storage, ctx.tree, node_id, Some(own_span), par_budget);
+
             let mut sigma = scratch.take(sref.len());
-            storage.regret_matching(sref, &mut sigma);
+            views.own().regret_matching(sref, &mut sigma);
 
             // One flat action-major buffer: action `a`'s row is that
             // action's own `out` parameter, so its recursion writes
@@ -404,7 +490,14 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                 }
                 let out_row = &mut cfvs[a * num_hands..(a + 1) * num_hands];
                 cfr_pass(
-                    ctx, storage, scratch, child, &my_next, opp_reach, out_row, par_budget,
+                    ctx,
+                    views.child(a),
+                    scratch,
+                    child,
+                    &my_next,
+                    opp_reach,
+                    out_row,
+                    par_budget,
                 );
             }
 
@@ -421,7 +514,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                     cfvs[a * num_hands + h] -= node_cfv[h];
                 }
             }
-            storage.update_regrets(sref, &cfvs, ctx.discounts);
+            views.own().update_regrets(sref, &cfvs, ctx.discounts);
 
             // Overwrite `cfvs` again as the reach-weighted strategy buffer.
             for a in 0..num_actions {
@@ -429,7 +522,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                     cfvs[a * num_hands + h] = my_reach[h] * sigma[a * num_hands + h];
                 }
             }
-            storage.accumulate_strategy(sref, &cfvs, ctx.discounts);
+            views.own().accumulate_strategy(sref, &cfvs, ctx.discounts);
 
             out.copy_from_slice(&node_cfv);
 
@@ -440,12 +533,18 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
         }
         NodeKind::Action => {
             // Opponent's node: current strategy scales the opponent reach;
-            // counterfactual values sum over their actions.
+            // counterfactual values sum over their actions. `storage` is
+            // read (never updated) before any child is touched, so the
+            // read itself never needs protecting from a descendant's
+            // split — only the per-child recursion below does, against a
+            // *sibling's* descendant split (see `ActionViews`).
             let sref = ctx.tree.storage_ref(&node);
             let num_hands = sref.num_hands as usize;
             debug_assert_eq!(num_hands, opp_reach.len());
             let mut sigma = scratch.take(sref.len());
             storage.regret_matching(sref, &mut sigma);
+
+            let mut views = ActionViews::split_for(storage, ctx.tree, node_id, None, par_budget);
 
             let mut opp_next = scratch.take(num_hands);
             let mut child_out = scratch.take(my_reach.len());
@@ -459,7 +558,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                 child_out.fill(0.0);
                 cfr_pass(
                     ctx,
-                    storage,
+                    views.child(a),
                     scratch,
                     child,
                     my_reach,

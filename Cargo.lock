@@ -246,6 +246,7 @@ dependencies = [
  "cards",
  "engine",
  "game",
+ "hand-index",
 ]
 
 [[package]]
