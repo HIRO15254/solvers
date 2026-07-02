@@ -285,17 +285,30 @@ impl PublicTree {
     /// Applies one player's reach map for a deal. Returns the child-space
     /// reach vector (dimension may change under a transition).
     pub fn map_reach(&self, map: ReachMap, reach: &[f32]) -> Vec<f32> {
+        let len = match map {
+            ReachMap::Identity | ReachMap::Mask(_) => reach.len(),
+            ReachMap::Transition(t) => self.transitions[t as usize].out_dim as usize,
+        };
+        let mut out = vec![0.0; len];
+        self.map_reach_into(map, reach, &mut out);
+        out
+    }
+
+    /// Applies one player's reach map for a deal into a caller-provided
+    /// buffer (non-allocating). `out`'s length must already match the
+    /// mapped dimension (unchanged from `reach.len()` for `Identity`/`Mask`;
+    /// the transition's `out_dim` for `Transition`).
+    pub fn map_reach_into(&self, map: ReachMap, reach: &[f32], out: &mut [f32]) {
         match map {
-            ReachMap::Identity => reach.to_vec(),
+            ReachMap::Identity => out.copy_from_slice(reach),
             ReachMap::Mask(m) => {
                 let mask = &self.masks[m as usize];
-                reach.iter().zip(mask).map(|(&r, &m)| r * m).collect()
+                for ((o, &r), &m) in out.iter_mut().zip(reach).zip(mask) {
+                    *o = r * m;
+                }
             }
             ReachMap::Transition(t) => {
-                let tr = &self.transitions[t as usize];
-                let mut out = vec![0.0; tr.out_dim as usize];
-                tr.apply_forward(reach, &mut out);
-                out
+                self.transitions[t as usize].apply_forward(reach, out);
             }
         }
     }
