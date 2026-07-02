@@ -1,8 +1,9 @@
 use cards::{PerPlayer, Player};
+use rayon::prelude::*;
 
 use crate::schedule::{DiscountSchedule, Discounts};
 use crate::scratch::Scratch;
-use crate::storage::{Storage, StorageRef, StorageView};
+use crate::storage::{Storage, StorageRef, StorageSpan, StorageView};
 use crate::tree::{NodeId, NodeKind, PublicTree};
 
 /// Variant-owned terminal evaluation — the only variant code on the hot
@@ -28,6 +29,31 @@ pub struct CompiledGame<E> {
     pub normalizer: f64,
 }
 
+/// Thresholds controlling rayon fan-out over chance-node children.
+///
+/// `chance_depth` bounds how many chance-node crossings (from the root)
+/// remain eligible for parallel fan-out; it decrements at every chance node
+/// regardless of whether that node actually parallelizes, so it reads as
+/// "top N chance levels". `min_children` is the per-node fan-out threshold
+/// (games with few chance children per node, like Kuhn's none or Leduc's six,
+/// stay sequential even inside the budgeted depth).
+#[derive(Clone, Copy, Debug)]
+pub struct ParConfig {
+    pub chance_depth: u32,
+    pub min_children: usize,
+}
+
+impl Default for ParConfig {
+    /// Turn+river levels; Kuhn (no chance node) and Leduc (6-way deal) stay
+    /// sequential via `min_children`.
+    fn default() -> Self {
+        ParConfig {
+            chance_depth: 2,
+            min_children: 12,
+        }
+    }
+}
+
 /// Vector-form CFR solver with alternating updates.
 pub struct Solver<E, S> {
     game: CompiledGame<E>,
@@ -39,6 +65,7 @@ pub struct Solver<E, S> {
     schedule: Box<dyn DiscountSchedule>,
     planned_iters: Option<u64>,
     iteration: u64,
+    par: ParConfig,
 }
 
 impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
@@ -70,7 +97,15 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             schedule,
             planned_iters,
             iteration: 0,
+            par: ParConfig::default(),
         }
+    }
+
+    /// Overrides the chance-node parallelism thresholds (default:
+    /// [`ParConfig::default`]). Additive on top of [`Solver::new`] so every
+    /// existing call site keeps working unchanged.
+    pub fn set_par(&mut self, par: ParConfig) {
+        self.par = par;
     }
 
     pub fn iteration(&self) -> u64 {
@@ -79,6 +114,12 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
 
     pub fn game(&self) -> &CompiledGame<E> {
         &self.game
+    }
+
+    /// Read-only access to the raw storage backend, e.g. to snapshot
+    /// regrets/strategy sums for a determinism check.
+    pub fn storage(&self) -> &S {
+        &self.storage
     }
 
     /// One alternating iteration: a regret/strategy update pass for each
@@ -95,6 +136,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
                 evaluator: &self.game.evaluator,
                 p,
                 discounts: &discounts,
+                par: self.par,
             };
             let mut out = self.scratch.take(self.game.tree.root_dims[p] as usize);
             cfr_pass(
@@ -105,6 +147,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
                 &my_range,
                 &opp_range,
                 &mut out,
+                self.par.chance_depth,
             );
             self.scratch.put(out);
         }
@@ -124,6 +167,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             evaluator: &self.game.evaluator,
             storage: &self.storage,
             p,
+            par: self.par,
         };
         let mut scratch = Scratch::new();
         let mut out = scratch.take(self.game.tree.root_dims[p] as usize);
@@ -133,6 +177,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             0,
             &self.game.root_ranges[p.opponent()],
             &mut out,
+            self.par.chance_depth,
         );
         self.root_aggregate(p, &out)
     }
@@ -144,6 +189,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             evaluator: &self.game.evaluator,
             storage: &self.storage,
             p,
+            par: self.par,
         };
         let mut scratch = Scratch::new();
         let mut out = scratch.take(self.game.tree.root_dims[p] as usize);
@@ -153,6 +199,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             0,
             &self.game.root_ranges[p.opponent()],
             &mut out,
+            self.par.chance_depth,
         );
         self.root_aggregate(p, &out)
     }
@@ -205,6 +252,7 @@ struct PassCtx<'w, E> {
     evaluator: &'w E,
     p: Player,
     discounts: &'w Discounts,
+    par: ParConfig,
 }
 
 /// CFR update pass for player `p`, writing p's counterfactual values (one
@@ -214,6 +262,7 @@ struct PassCtx<'w, E> {
 /// (stack) order so steady-state solving allocates nothing: every buffer a
 /// call takes is released (in reverse order) before that call returns,
 /// which is exactly the LIFO discipline [`Scratch`] relies on.
+#[allow(clippy::too_many_arguments)]
 fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
     ctx: &PassCtx<'_, E>,
     storage: &mut V,
@@ -222,6 +271,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
     my_reach: &[f32],
     opp_reach: &[f32],
     out: &mut [f32],
+    par_budget: u32,
 ) {
     let node = *ctx.tree.node(node_id);
     match node.kind {
@@ -229,41 +279,105 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
             ctx.evaluator.eval(node.aux, ctx.p, opp_reach, out);
         }
         NodeKind::Chance => {
-            // All deals off one chance node map into the same per-player
-            // dimension (masks always preserve it; transitions are assumed
-            // to by construction), so `my_next`/`opp_next`/`child_out` are
-            // sized once and reused across deals instead of round-tripping
-            // through the free list every iteration.
-            let mut my_next = scratch.take(my_reach.len());
-            let mut opp_next = scratch.take(opp_reach.len());
-            let mut child_out = scratch.take(my_reach.len());
-            for (pos, child) in ctx.tree.children(node_id).enumerate() {
-                let deal = *ctx.tree.deal(&node, pos);
-                ctx.tree
-                    .map_reach_into(deal.maps[ctx.p], my_reach, &mut my_next);
-                ctx.tree
-                    .map_reach_into(deal.maps[ctx.p.opponent()], opp_reach, &mut opp_next);
-                // `child_out` is an out-param accumulator target for the
-                // recursive call: Chance/opponent-Action children only add
-                // into it (they rely on the caller starting them at zero),
-                // so a reused buffer must be reset every iteration, not
-                // just at the initial `take`.
-                child_out.fill(0.0);
-                cfr_pass(
-                    ctx,
-                    storage,
-                    scratch,
-                    child,
-                    &my_next,
-                    &opp_next,
-                    &mut child_out,
-                );
-                ctx.tree
-                    .accumulate_values(deal.maps[ctx.p], deal.weight, &child_out, out);
+            // `chance_depth` bounds how many chance-node crossings remain
+            // eligible for fan-out, so it decrements here regardless of
+            // whether this particular node ends up parallelizing.
+            let child_budget = par_budget.saturating_sub(1);
+            if par_budget > 0 && node.num_children as usize >= ctx.par.min_children {
+                // Chance nodes own no storage themselves: split `storage`
+                // into one disjoint view per child up front and fan out.
+                // After the split the parent `storage` view is empty (see
+                // `StorageView::split`) and must not be touched again in
+                // this stack frame — every remaining access below goes
+                // through the per-child views instead.
+                let child_ids: Vec<NodeId> = ctx.tree.children(node_id).collect();
+                let spans: Vec<StorageSpan> = child_ids
+                    .iter()
+                    .map(|&id| ctx.tree.storage_spans[id as usize])
+                    .collect();
+                let views = storage.split(&spans);
+                // Indexed (ordered) collect, then in-child-order fold below:
+                // together with the disjoint per-child storage views and an
+                // unchanged per-child op sequence, this keeps the parallel
+                // pass bitwise identical to the sequential one. Do not
+                // switch this to `reduce`, which does not guarantee order.
+                let results: Vec<Vec<f32>> = child_ids
+                    .into_par_iter()
+                    .zip(views)
+                    .enumerate()
+                    .map_init(Scratch::new, |scratch, (pos, (child, mut view))| {
+                        let deal = *ctx.tree.deal(&node, pos);
+                        let mut my_next = scratch.take(my_reach.len());
+                        let mut opp_next = scratch.take(opp_reach.len());
+                        ctx.tree
+                            .map_reach_into(deal.maps[ctx.p], my_reach, &mut my_next);
+                        ctx.tree.map_reach_into(
+                            deal.maps[ctx.p.opponent()],
+                            opp_reach,
+                            &mut opp_next,
+                        );
+                        // Sized to the mapped (child) dimension, which
+                        // by construction equals `my_reach.len()` (see
+                        // the sequential branch below).
+                        let mut child_out = scratch.take(my_reach.len());
+                        cfr_pass(
+                            ctx,
+                            &mut view,
+                            scratch,
+                            child,
+                            &my_next,
+                            &opp_next,
+                            &mut child_out,
+                            child_budget,
+                        );
+                        scratch.put(opp_next);
+                        scratch.put(my_next);
+                        child_out
+                    })
+                    .collect();
+                for (pos, child_out) in results.into_iter().enumerate() {
+                    let deal = *ctx.tree.deal(&node, pos);
+                    ctx.tree
+                        .accumulate_values(deal.maps[ctx.p], deal.weight, &child_out, out);
+                }
+            } else {
+                // All deals off one chance node map into the same per-player
+                // dimension (masks always preserve it; transitions are
+                // assumed to by construction), so `my_next`/`opp_next`/
+                // `child_out` are sized once and reused across deals instead
+                // of round-tripping through the free list every iteration.
+                let mut my_next = scratch.take(my_reach.len());
+                let mut opp_next = scratch.take(opp_reach.len());
+                let mut child_out = scratch.take(my_reach.len());
+                for (pos, child) in ctx.tree.children(node_id).enumerate() {
+                    let deal = *ctx.tree.deal(&node, pos);
+                    ctx.tree
+                        .map_reach_into(deal.maps[ctx.p], my_reach, &mut my_next);
+                    ctx.tree
+                        .map_reach_into(deal.maps[ctx.p.opponent()], opp_reach, &mut opp_next);
+                    // `child_out` is an out-param accumulator target for the
+                    // recursive call: Chance/opponent-Action children only add
+                    // into it (they rely on the caller starting them at zero),
+                    // so a reused buffer must be reset every iteration, not
+                    // just at the initial `take`.
+                    child_out.fill(0.0);
+                    cfr_pass(
+                        ctx,
+                        storage,
+                        scratch,
+                        child,
+                        &my_next,
+                        &opp_next,
+                        &mut child_out,
+                        child_budget,
+                    );
+                    ctx.tree
+                        .accumulate_values(deal.maps[ctx.p], deal.weight, &child_out, out);
+                }
+                scratch.put(child_out);
+                scratch.put(opp_next);
+                scratch.put(my_next);
             }
-            scratch.put(child_out);
-            scratch.put(opp_next);
-            scratch.put(my_next);
         }
         NodeKind::Action if node.player == ctx.p => {
             let sref = ctx.tree.storage_ref(&node);
@@ -289,7 +403,9 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                     my_next[h] = my_reach[h] * row[h];
                 }
                 let out_row = &mut cfvs[a * num_hands..(a + 1) * num_hands];
-                cfr_pass(ctx, storage, scratch, child, &my_next, opp_reach, out_row);
+                cfr_pass(
+                    ctx, storage, scratch, child, &my_next, opp_reach, out_row, par_budget,
+                );
             }
 
             for a in 0..num_actions {
@@ -349,6 +465,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                     my_reach,
                     &opp_next,
                     &mut child_out,
+                    par_budget,
                 );
                 for h in 0..out.len() {
                     out[h] += child_out[h];
@@ -367,20 +484,25 @@ struct ValueCtx<'w, E, S> {
     evaluator: &'w E,
     storage: &'w S,
     p: Player,
+    par: ParConfig,
 }
 
 /// Shared walk for expected-value and best-response computation: `p`'s own
 /// nodes combine child values with `combine`; opponent nodes always follow
 /// the opponent's average strategy. Writes `p`'s values at this node into
 /// `out` (dimension implied by `out.len()`).
-fn value_pass<E: TerminalEvaluator, S: Storage>(
+#[allow(clippy::too_many_arguments)]
+fn value_pass<E: TerminalEvaluator, S: Storage, C>(
     ctx: &ValueCtx<'_, E, S>,
     scratch: &mut Scratch,
     node_id: NodeId,
     opp_reach: &[f32],
     out: &mut [f32],
-    combine: &impl Fn(StorageRef, &[f32], &mut [f32]),
-) {
+    combine: &C,
+    par_budget: u32,
+) where
+    C: Fn(StorageRef, &[f32], &mut [f32]) + Sync,
+{
     let node = *ctx.tree.node(node_id);
     match node.kind {
         NodeKind::Terminal => {
@@ -388,21 +510,70 @@ fn value_pass<E: TerminalEvaluator, S: Storage>(
         }
         NodeKind::Chance => {
             let my_dim = out.len();
-            let mut opp_next = scratch.take(opp_reach.len());
-            let mut child_out = scratch.take(my_dim);
-            for (pos, child) in ctx.tree.children(node_id).enumerate() {
-                let deal = *ctx.tree.deal(&node, pos);
-                ctx.tree
-                    .map_reach_into(deal.maps[ctx.p.opponent()], opp_reach, &mut opp_next);
-                // Reused accumulator target: reset before every use (see
-                // the matching comment in `cfr_pass`).
-                child_out.fill(0.0);
-                value_pass(ctx, scratch, child, &opp_next, &mut child_out, combine);
-                ctx.tree
-                    .accumulate_values(deal.maps[ctx.p], deal.weight, &child_out, out);
+            // See the matching comment in `cfr_pass`: the budget decrements
+            // at every chance node regardless of whether it parallelizes.
+            let child_budget = par_budget.saturating_sub(1);
+            if par_budget > 0 && node.num_children as usize >= ctx.par.min_children {
+                // Storage here is a shared `&S` (Sync), so unlike `cfr_pass`
+                // there's nothing to split — every task just reads through
+                // the same reference. Ordered collect + in-order fold below
+                // keeps this bitwise identical to the sequential fold.
+                let child_ids: Vec<NodeId> = ctx.tree.children(node_id).collect();
+                let results: Vec<Vec<f32>> = child_ids
+                    .into_par_iter()
+                    .enumerate()
+                    .map_init(Scratch::new, |scratch, (pos, child)| {
+                        let deal = *ctx.tree.deal(&node, pos);
+                        let mut opp_next = scratch.take(opp_reach.len());
+                        ctx.tree.map_reach_into(
+                            deal.maps[ctx.p.opponent()],
+                            opp_reach,
+                            &mut opp_next,
+                        );
+                        let mut child_out = scratch.take(my_dim);
+                        value_pass(
+                            ctx,
+                            scratch,
+                            child,
+                            &opp_next,
+                            &mut child_out,
+                            combine,
+                            child_budget,
+                        );
+                        scratch.put(opp_next);
+                        child_out
+                    })
+                    .collect();
+                for (pos, child_out) in results.into_iter().enumerate() {
+                    let deal = *ctx.tree.deal(&node, pos);
+                    ctx.tree
+                        .accumulate_values(deal.maps[ctx.p], deal.weight, &child_out, out);
+                }
+            } else {
+                let mut opp_next = scratch.take(opp_reach.len());
+                let mut child_out = scratch.take(my_dim);
+                for (pos, child) in ctx.tree.children(node_id).enumerate() {
+                    let deal = *ctx.tree.deal(&node, pos);
+                    ctx.tree
+                        .map_reach_into(deal.maps[ctx.p.opponent()], opp_reach, &mut opp_next);
+                    // Reused accumulator target: reset before every use (see
+                    // the matching comment in `cfr_pass`).
+                    child_out.fill(0.0);
+                    value_pass(
+                        ctx,
+                        scratch,
+                        child,
+                        &opp_next,
+                        &mut child_out,
+                        combine,
+                        child_budget,
+                    );
+                    ctx.tree
+                        .accumulate_values(deal.maps[ctx.p], deal.weight, &child_out, out);
+                }
+                scratch.put(child_out);
+                scratch.put(opp_next);
             }
-            scratch.put(child_out);
-            scratch.put(opp_next);
         }
         NodeKind::Action if node.player == ctx.p => {
             let sref = ctx.tree.storage_ref(&node);
@@ -411,7 +582,7 @@ fn value_pass<E: TerminalEvaluator, S: Storage>(
             let mut children_flat = scratch.take(num_actions * my_dim);
             for (a, child) in ctx.tree.children(node_id).enumerate() {
                 let row = &mut children_flat[a * my_dim..(a + 1) * my_dim];
-                value_pass(ctx, scratch, child, opp_reach, row, combine);
+                value_pass(ctx, scratch, child, opp_reach, row, combine, par_budget);
             }
             combine(sref, &children_flat, out);
             scratch.put(children_flat);
@@ -432,7 +603,15 @@ fn value_pass<E: TerminalEvaluator, S: Storage>(
                 // Reused accumulator target: reset before every use (see
                 // the matching comment in `cfr_pass`).
                 child_out.fill(0.0);
-                value_pass(ctx, scratch, child, &opp_next, &mut child_out, combine);
+                value_pass(
+                    ctx,
+                    scratch,
+                    child,
+                    &opp_next,
+                    &mut child_out,
+                    combine,
+                    par_budget,
+                );
                 for h in 0..my_dim {
                     out[h] += child_out[h];
                 }
@@ -451,6 +630,7 @@ fn ev_pass<E: TerminalEvaluator, S: Storage>(
     node_id: NodeId,
     opp_reach: &[f32],
     out: &mut [f32],
+    par_budget: u32,
 ) {
     let combine = |sref: StorageRef, children_flat: &[f32], out: &mut [f32]| {
         let num_hands = sref.num_hands as usize;
@@ -464,7 +644,7 @@ fn ev_pass<E: TerminalEvaluator, S: Storage>(
             }
         }
     };
-    value_pass(ctx, scratch, node_id, opp_reach, out, &combine);
+    value_pass(ctx, scratch, node_id, opp_reach, out, &combine, par_budget);
 }
 
 /// Best-response values for `p` against the opponent's average strategy:
@@ -476,6 +656,7 @@ fn br_pass<E: TerminalEvaluator, S: Storage>(
     node_id: NodeId,
     opp_reach: &[f32],
     out: &mut [f32],
+    par_budget: u32,
 ) {
     let combine = |sref: StorageRef, children_flat: &[f32], out: &mut [f32]| {
         let num_hands = sref.num_hands as usize;
@@ -485,5 +666,5 @@ fn br_pass<E: TerminalEvaluator, S: Storage>(
                 .fold(f32::NEG_INFINITY, f32::max);
         }
     };
-    value_pass(ctx, scratch, node_id, opp_reach, out, &combine);
+    value_pass(ctx, scratch, node_id, opp_reach, out, &combine, par_budget);
 }
