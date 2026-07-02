@@ -38,7 +38,15 @@ mod tests {
         let pair = rank("Ac Ad Kc Qd Jh");
         let high_card = rank("Ac Kd Qh Js 9c");
         let hands = [
-            high_card, pair, two_pair, trips, straight, flush, full_house, quads, royal_flush,
+            high_card,
+            pair,
+            two_pair,
+            trips,
+            straight,
+            flush,
+            full_house,
+            quads,
+            royal_flush,
         ];
         for w in hands.windows(2) {
             assert!(w[0] < w[1], "{:?} should rank below {:?}", w[0], w[1]);

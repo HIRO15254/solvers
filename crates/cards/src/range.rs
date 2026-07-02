@@ -145,7 +145,8 @@ impl FromStr for Range {
                 }
                 None => (entry, 1.0),
             };
-            apply_spec(&mut range, spec, weight).ok_or_else(|| ParseRangeError(entry.to_string()))?;
+            apply_spec(&mut range, spec, weight)
+                .ok_or_else(|| ParseRangeError(entry.to_string()))?;
         }
         Ok(range)
     }
@@ -279,10 +280,11 @@ mod tests {
     fn full_range() {
         assert_eq!(Range::full().num_combos(), NUM_COMBOS);
         // A "any two" written out: pairs + all suited + all offsuit.
-        let r: Range = "22+, 32s+, 42s+, 52s+, 62s+, 72s+, 82s+, 92s+, T2s+, J2s+, Q2s+, K2s+, A2s+, \
+        let r: Range =
+            "22+, 32s+, 42s+, 52s+, 62s+, 72s+, 82s+, 92s+, T2s+, J2s+, Q2s+, K2s+, A2s+, \
                         32o+, 42o+, 52o+, 62o+, 72o+, 82o+, 92o+, T2o+, J2o+, Q2o+, K2o+, A2o+"
-            .parse()
-            .unwrap();
+                .parse()
+                .unwrap();
         assert_eq!(r.num_combos(), NUM_COMBOS);
     }
 
