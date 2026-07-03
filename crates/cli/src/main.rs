@@ -27,12 +27,20 @@ enum Command {
         /// Write the average strategy as JSON to this path.
         #[arg(long)]
         output: Option<std::path::PathBuf>,
+        /// Betting-line history to export (postflop only; repeatable).
+        /// Defaults to the root node only.
+        #[arg(long = "history", default_value = "")]
+        history: Vec<String>,
     },
 }
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
     match cli.command {
-        Command::Solve { config, output } => solve::run(&config, output.as_deref()),
+        Command::Solve {
+            config,
+            output,
+            history,
+        } => solve::run(&config, output.as_deref(), &history),
     }
 }

@@ -149,6 +149,8 @@ dependencies = [
  "clap",
  "engine",
  "game",
+ "holdem",
+ "rayon",
  "serde",
  "serde_json",
  "toml",

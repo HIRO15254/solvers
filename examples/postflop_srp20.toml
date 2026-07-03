@@ -1,0 +1,32 @@
+# Single-raised-pot flop, full 1,326-combo ranges, three streets, two raises
+# per street. Release-scale: do not run this to completion in a debug build.
+[game]
+kind = "postflop"
+board = "Ks 7h 2d"
+oop_range = "22+,A2s+,K9s+,Q9s+,J9s+,T8s+,97s+,87s,76s,A8o+,KTo+,QTo+,JTo"
+ip_range = "22+,A2s+,K7s+,Q8s+,J8s+,T7s+,96s+,86s+,75s+,65s,54s,A5o+,K9o+,Q9o+,J9o+,T9o"
+pot = 50
+effective_stack = 200
+
+[game.bets.flop]
+oop = [1.0]
+ip = [1.0]
+max_raises = 2
+
+[game.bets.turn]
+oop = [1.0]
+ip = [1.0]
+max_raises = 2
+
+[game.bets.river]
+oop = [1.0]
+ip = [1.0]
+max_raises = 2
+
+[algorithm]
+schedule = "dcfr"
+
+[run]
+iterations = 1000
+check_every = 25
+target_nash_conv = 0.15

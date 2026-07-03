@@ -7,11 +7,20 @@
 //! terminal in the tree; [`postflop`] adds chance nodes between streets
 //! with suit-isomorphism merging on top. [`river`] is a thin shim over
 //! [`postflop`] kept for its narrower, river-only config shape.
+//!
+//! [`aggregate`] and [`equity`] are reporting helpers: mapping combos to
+//! their 13x13 preflop class and computing range-vs-range showdown equity
+//! averaged over remaining runouts, respectively. Neither sits on the solve
+//! path.
 
+mod aggregate;
+mod equity;
 mod kernel;
 mod postflop;
 mod river;
 
+pub use aggregate::{class_average, class_of_combo, class_weights};
+pub use equity::range_equity;
 pub use postflop::{
     MemoryEstimate, PerStreet, PostflopConfig, PostflopEvaluator, PostflopGame, PostflopNodeInfo,
     build_postflop_game, memory_usage,
