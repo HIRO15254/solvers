@@ -26,7 +26,8 @@ crates/
 ├── cfr-ref     # frozen scalar CFR oracle for differential testing
 ├── engine      # hot core: public tree, storage, discount schedules, vector CFR, best response
 ├── game        # terminal payoff pipeline (rake/ICM), tree builder scaffolding, toy games
-└── cli         # `solvers` binary
+├── holdem      # Mode A: exact multi-street postflop solving, aggregation/equity helpers
+└── cli         # `solvers` binary: solve / inspect / report
 ```
 
 ## Quick start
@@ -34,6 +35,17 @@ crates/
 ```sh
 cargo test --workspace            # correctness harness (Kuhn/Leduc known solutions, oracle diff)
 cargo run -p cli --release -- solve examples/kuhn.toml
+
+# Exact postflop solve (prints a memory estimate before building the tree):
+cargo run -p cli --release -- solve examples/postflop_srp20.toml
+
+# Interactive strategy browser: solve, then explore nodes with 13x13
+# ANSI grids (`show`, `go <action>`, `grid <action>`, `eq`, `combos AKs`, ...):
+cargo run -p cli --release -- inspect examples/river_small.toml
+
+# Aggregate CSV across boards (frequencies, EVs, equity per board):
+cargo run -p cli --release -- report examples/river_small.toml \
+    --boards "2c 7d 9h Js Qs,2c 7d 9h Js Ks" --output report.csv
 ```
 
 ## License

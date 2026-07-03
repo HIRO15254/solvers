@@ -28,6 +28,8 @@ virtual workspace 化、CI(fmt/clippy/test)、`LICENSE-POLICY.md`。`cards`(型�
 `.sol` artifact(i16、NoRivers lazy re-solve);`inspect` UPI-subset REPL + ANSI 13×13 grid;`report` aggregate CSV(flop subset);`export`(per-node JSON、ガード付き)。
 **Exit:** M2 ベンチ solve の artifact が checkpoint の <10% サイズで browse 可能、river 再 solve レイテンシ <2 s;UPI スクリプト(build_tree/go/show_strategy/calc_ev)がテキストファイルから end-to-end 動作;既存 MIT UPI wrapper が対応 subset を無改造で駆動。
 
+> **前倒し完了分(2026-07、M3 より先行)**: CLI の postflop 配線(TOML config・build 前メモリ見積り表示・`--history` 限定 JSON export)、`inspect` REPL(node ナビゲーション、13×13 ANSI カラーグリッドでの戦略頻度・レンジ・equity 表示、combo 詳細)、`report` 複数ボード CSV(頻度/EV/equity/NashConv)、`holdem::aggregate`(169 クラス集計)+ `holdem::range_equity`。`.sol` artifact と lazy re-solve は M3(formats/checkpoint)後に実施。
+
 ## M6 — Mode B: preflop・公開品質まで(週 20–30)
 `preflop`: 169-hand trunk;`EquityShowdown`(数分で全 preflop solve — 配管検証)→ `SolvedFlopSubset`(重み付き 25/49/**95/184** flop subset、per-flop disk cache、warm start、flop 間並列、resumable 長時間ラン運用);ICM utility を end-to-end 接続;MCCFR driver(external sampling + Linear 重み + batched 早期 discount + negative-regret pruning)+ `abstraction` の EHS² baseline。
 **Exit:** MCCFR ≡ full-traversal(Leduc);100bb HU preflop レンジが公開チャートと**定量一致(open/3bet/4bet 頻度が数 % 以内)**;25→49→95 flop で EV が単調収束;95+ flop solve が 16-core 機で一晩ランを完走し per-flop 進捗が resumable;チェックポイント連鎖で複数晩の継続ランが運用できる。

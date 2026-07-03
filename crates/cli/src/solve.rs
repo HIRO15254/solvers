@@ -1,75 +1,31 @@
 use std::path::Path;
 use std::time::{Duration, Instant};
 
-use anyhow::{Context, Result, anyhow};
-use cards::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range, combo_cards};
+use anyhow::{Context, Result};
+use cards::{NUM_COMBOS, Player, combo_cards};
 use engine::{
-    CfrPlus, Dcfr, DiscountSchedule, F32Storage, HsDcfr, NodeId, NodeKind, ParConfig, Solver,
-    TerminalEvaluator, Vanilla, linear_cfr,
+    DiscountSchedule, F32Storage, NodeId, NodeKind, ParConfig, Solver, TerminalEvaluator,
 };
-use game::{
-    ChipEv, GgPreflopRake, Icm, NoRake, PayoffPipeline, PercentCapRake, RakeModel, UtilityModel,
-};
-use holdem::{PerStreet, PostflopConfig, PostflopEvaluator, build_postflop_game, memory_usage};
+use game::PayoffPipeline;
+use holdem::{PostflopEvaluator, build_postflop_game};
 use serde::Serialize;
 
-use crate::config::{
-    AlgorithmSection, BetsSection, GameSection, RakeSection, RunSection, SolveConfig,
-    UtilitySection,
-};
+use crate::config::{BetsSection, GameSection, RunSection, SolveConfig};
+use crate::postflop_setup;
 
 pub fn run(config_path: &Path, output: Option<&Path>, histories: &[String]) -> Result<()> {
     let raw = std::fs::read_to_string(config_path)
         .with_context(|| format!("reading {}", config_path.display()))?;
     let config: SolveConfig = toml::from_str(&raw).context("parsing config")?;
 
-    let rake: Box<dyn RakeModel> = match config.rake {
-        RakeSection::None => Box::new(NoRake),
-        RakeSection::PercentCap {
-            rate,
-            cap,
-            no_flop_no_drop,
-        } => Box::new(PercentCapRake {
-            rate,
-            cap,
-            no_flop_no_drop,
-        }),
-        RakeSection::GgPreflop {
-            rate,
-            cap,
-            exempt_pot,
-        } => Box::new(GgPreflopRake {
-            rate,
-            cap,
-            exempt_pot: Chips(exempt_pot),
-        }),
-    };
-    let utility: Box<dyn UtilityModel> = match config.utility {
-        UtilitySection::ChipEv => Box::new(ChipEv),
-        UtilitySection::Icm { payouts } => Box::new(Icm { payouts }),
-    };
+    let rake = postflop_setup::build_rake(&config.rake);
+    let utility = postflop_setup::build_utility(&config.utility);
     let pipeline = PayoffPipeline {
         rake: rake.as_ref(),
         utility: utility.as_ref(),
     };
 
-    let schedule: Box<dyn DiscountSchedule> = match config.algorithm {
-        AlgorithmSection::Vanilla => Box::new(Vanilla),
-        AlgorithmSection::CfrPlus => Box::new(CfrPlus),
-        AlgorithmSection::Dcfr {
-            alpha,
-            beta,
-            gamma,
-            pow4_reset,
-        } => Box::new(Dcfr {
-            alpha,
-            beta,
-            gamma,
-            pow4_reset,
-        }),
-        AlgorithmSection::LinearCfr => Box::new(linear_cfr()),
-        AlgorithmSection::HsDcfr { gamma0 } => Box::new(HsDcfr { gamma0 }),
-    };
+    let schedule = postflop_setup::build_schedule(&config.algorithm);
     let schedule_name = schedule.name();
 
     match config.game {
@@ -119,7 +75,7 @@ pub fn run(config_path: &Path, output: Option<&Path>, histories: &[String]) -> R
 /// exploitability, and stop early once `target_nash_conv` is hit. Generic
 /// over the terminal evaluator so both toy games and postflop subgames reuse
 /// it unchanged.
-fn run_loop<E: TerminalEvaluator>(solver: &mut Solver<E, F32Storage>, run: &RunSection) {
+pub(crate) fn run_loop<E: TerminalEvaluator>(solver: &mut Solver<E, F32Storage>, run: &RunSection) {
     let mut remaining = run.iterations;
     while remaining > 0 {
         let chunk = run.check_every.min(remaining);
@@ -144,7 +100,7 @@ fn run_loop<E: TerminalEvaluator>(solver: &mut Solver<E, F32Storage>, run: &RunS
 }
 
 /// Final convergence summary, shared by every game.
-fn print_done<E: TerminalEvaluator>(solver: &Solver<E, F32Storage>, elapsed: Duration) {
+pub(crate) fn print_done<E: TerminalEvaluator>(solver: &Solver<E, F32Storage>, elapsed: Duration) {
     let expl = solver.exploitability();
     let nash_conv = expl[Player::P0] + expl[Player::P1];
     let value = solver.expected_value(Player::P0);
@@ -202,56 +158,21 @@ fn solve_postflop(
     output: Option<&Path>,
     histories: &[String],
 ) -> Result<()> {
-    let board: Vec<Card> = board
-        .split_whitespace()
-        .map(|token| {
-            token
-                .parse::<Card>()
-                .map_err(|_| anyhow!("invalid card {token:?} in board (expected e.g. \"Ks\")"))
-        })
-        .collect::<Result<Vec<Card>>>()?;
-    let oop = oop_range
-        .parse::<Range>()
-        .map_err(|e| anyhow!("parsing oop_range {oop_range:?}: {e}"))?;
-    let ip = ip_range
-        .parse::<Range>()
-        .map_err(|e| anyhow!("parsing ip_range {ip_range:?}: {e}"))?;
-    let ranges = PerPlayer::new(oop, ip);
-
-    let bet_fractions = PerStreet {
-        flop: PerPlayer::new(bets.flop.oop, bets.flop.ip),
-        turn: PerPlayer::new(bets.turn.oop, bets.turn.ip),
-        river: PerPlayer::new(bets.river.oop, bets.river.ip),
-    };
-    let max_raises = PerStreet {
-        flop: bets.flop.max_raises,
-        turn: bets.turn.max_raises,
-        river: bets.river.max_raises,
-    };
-
-    let config = PostflopConfig {
+    let config = postflop_setup::build_postflop_config(
         board,
-        ranges,
-        pot: Chips(pot),
-        effective_stack: Chips(effective_stack),
-        bet_fractions,
-        max_raises,
+        oop_range,
+        ip_range,
+        pot,
+        effective_stack,
         iso_merging,
-        track_node_info: true,
-    };
+        bets,
+    )?;
 
     // Cheap dry run before committing to the (possibly very large) real
     // build, so an oversized config fails fast with a size estimate instead
     // of silently eating memory.
-    let estimate = memory_usage(&config);
-    println!(
-        "tree: nodes={} terminals={} rank_tables={} storage={:.1} MiB (f32) / {:.1} MiB (i16)",
-        estimate.nodes,
-        estimate.terminals,
-        estimate.rank_tables,
-        estimate.f32_bytes as f64 / (1024.0 * 1024.0),
-        estimate.i16_bytes as f64 / (1024.0 * 1024.0),
-    );
+    let estimate = holdem::memory_usage(&config);
+    postflop_setup::print_memory_estimate(estimate);
 
     let pf_game = build_postflop_game(&config, pipeline);
 

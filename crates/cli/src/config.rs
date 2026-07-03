@@ -42,7 +42,7 @@ pub enum GameSection {
     },
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct BetsSection {
     #[serde(default)]
@@ -53,7 +53,7 @@ pub struct BetsSection {
     pub river: StreetBets,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct StreetBets {
     /// Out-of-position bet/raise sizes, as fractions of the pot after a call.
