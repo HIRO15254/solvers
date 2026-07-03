@@ -246,6 +246,7 @@ name = "holdem"
 version = "0.1.0"
 dependencies = [
  "cards",
+ "cfr-ref",
  "engine",
  "game",
  "hand-index",

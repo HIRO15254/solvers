@@ -13,4 +13,5 @@ game = { workspace = true }
 hand-index = { workspace = true }
 
 [dev-dependencies]
+cfr-ref = { workspace = true }
 rayon = { workspace = true }

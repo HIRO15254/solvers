@@ -3,11 +3,13 @@
 //! Generalizes the river-only slice: a subgame now starts on any street (a
 //! 3, 4, or 5-card board), runs its own bet grammar per street, and deals
 //! chance nodes between streets. Chance branches are merged into
-//! suit-isomorphism classes (`iso_merging`) so structurally identical
-//! turn/river cards share one tree branch, with the class size folded into
-//! the branch's chance weight — the same technique [`hand_index`] uses for
-//! canonical flops, applied here to a live game tree instead of an
-//! abstraction cache.
+//! suit-isomorphism classes (`iso_merging`): structurally identical
+//! turn/river cards share one tree branch as an exact quotient — a merged
+//! class becomes a [`ReachMap::Transition`] averaging the members'
+//! relabeled reaches, with the class multiplicity in the deal weight —
+//! so per-hand reaches, CFVs, and therefore strategies match the unmerged
+//! tree exactly (not just range-aggregate values). Merging only happens
+//! under suit permutations that fix both players' ranges.
 //!
 //! The terminal kernels (sorted-rank showdown sweep, inclusion-exclusion
 //! fold) live in [`crate::kernel`] and are shared verbatim with the
@@ -20,9 +22,15 @@ use cards::{
     ALL_CARDS, Card, CardSet, Chips, HandRank, NUM_COMBOS, PerPlayer, Player, Range, Street,
     combo_cards, combo_index, rank_of,
 };
-use engine::{CompiledGame, NodeId, PublicTree, ReachMap, TempNode, TerminalEvaluator, TreeSpec};
+use engine::{
+    CompiledGame, NodeId, PublicTree, ReachMap, SparseTransition, TempNode, TerminalEvaluator,
+    TreeSpec,
+};
 use game::{BakedPayoffs, PayoffPipeline, TerminalDescriptor, TerminalKind};
-use hand_index::{Board, DealGroup, SuitPerm, all_suit_perms, deal_groups_with};
+use hand_index::{
+    Board, DealGroup, SuitPerm, all_suit_perms, deal_groups_with, orbit_perms, permute_combo,
+    stabilizer,
+};
 
 use crate::kernel;
 
@@ -306,6 +314,10 @@ struct Builder<'a> {
     /// Per-card reach mask, built lazily and cached by card index (at most
     /// 52 masks total regardless of how many chance nodes share a card).
     card_masks: [Option<u32>; 52],
+    /// Quotient transitions for merged deal classes, interned by
+    /// (board, members).
+    transitions: Vec<SparseTransition>,
+    transition_ids: BTreeMap<(Vec<Card>, Vec<Card>), u32>,
     node_info: Vec<PostflopNodeInfo>,
 }
 
@@ -335,6 +347,8 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         rank_table_ids: BTreeMap::new(),
         masks: Vec::new(),
         card_masks: [None; 52],
+        transitions: Vec::new(),
+        transition_ids: BTreeMap::new(),
         node_info: vec![PostflopNodeInfo {
             history: "<untagged>".into(),
             actions: Vec::new(),
@@ -385,6 +399,7 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         terminals,
         rank_tables,
         masks,
+        transitions,
         node_info,
         ..
     } = builder;
@@ -415,7 +430,7 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
     let tree = PublicTree::compile(TreeSpec {
         root,
         masks,
-        transitions: Vec::new(),
+        transitions,
         root_dims: PerPlayer::new(NUM_COMBOS as u32, NUM_COMBOS as u32),
     });
 
@@ -570,8 +585,24 @@ impl Builder<'_> {
         let mut deals: Vec<(f32, PerPlayer<ReachMap>, TempNode)> = Vec::with_capacity(groups.len());
         for group in &groups {
             let weight = group.members.len() as f32 / denom;
-            let mask_id = self.card_mask(group.representative);
-            let maps = PerPlayer::new(ReachMap::Mask(mask_id), ReachMap::Mask(mask_id));
+            // Singleton classes stay on the cheap shared card-removal mask.
+            // Merged classes must NOT be approximated as `k x rep-masked
+            // branch`: each member removes different combos and values
+            // relabel across members, so per-hand reaches and CFVs would be
+            // distorted (only range-aggregate values survive by symmetry).
+            // Instead a quotient transition averages the members' relabeled
+            // reaches (entry weight 1/k) — the rep branch then sees exactly
+            // one member's reach and solves identically to any original
+            // member branch — while the class multiplicity k stays in the
+            // deal weight, so the backward map reproduces `sum_i v_ci`
+            // exactly, per hand.
+            let maps = if group.members.len() == 1 {
+                let mask_id = self.card_mask(group.representative);
+                PerPlayer::new(ReachMap::Mask(mask_id), ReachMap::Mask(mask_id))
+            } else {
+                let id = self.quotient_transition(&state.board, group);
+                PerPlayer::new(ReachMap::Transition(id), ReachMap::Transition(id))
+            };
 
             let mut board = state.board.clone();
             board.push(group.representative);
@@ -609,6 +640,41 @@ impl Builder<'_> {
         } else {
             self.deal_chance(state)
         }
+    }
+
+    /// Quotient transition for a merged deal class (see the comment at the
+    /// use site in [`Self::deal_chance`]). Interned by (board, members):
+    /// identical classes recur across betting lines of the same street.
+    fn quotient_transition(&mut self, board: &[Card], group: &DealGroup) -> u32 {
+        let key = (board.to_vec(), group.members.clone());
+        if let Some(&id) = self.transition_ids.get(&key) {
+            return id;
+        }
+        let stab: Vec<SuitPerm> = stabilizer(&Board::new(&board[..3], &board[3..]))
+            .into_iter()
+            .filter(|perm| self.sym.contains(perm))
+            .collect();
+        let rep = group.representative;
+        let perms = orbit_perms(&stab, rep, &group.members);
+        let member_avg = 1.0 / perms.len() as f32;
+        let mut entries: Vec<(u32, u32, f32)> = Vec::with_capacity(perms.len() * (NUM_COMBOS - 51));
+        for perm in &perms {
+            for h in 0..NUM_COMBOS {
+                let (c1, c2) = combo_cards(h);
+                if c1 == rep || c2 == rep {
+                    continue; // dead in rep coordinates
+                }
+                entries.push((permute_combo(perm, h) as u32, h as u32, member_avg));
+            }
+        }
+        let id = self.transitions.len() as u32;
+        self.transitions.push(SparseTransition {
+            in_dim: NUM_COMBOS as u32,
+            out_dim: NUM_COMBOS as u32,
+            entries,
+        });
+        self.transition_ids.insert(key, id);
+        id
     }
 
     fn card_mask(&mut self, card: Card) -> u32 {

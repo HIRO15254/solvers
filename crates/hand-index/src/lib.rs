@@ -126,6 +126,33 @@ pub fn deal_groups(board: &Board, dead: &[Card]) -> Vec<DealGroup> {
 /// (e.g. those preserving both players' ranges). Merging two deals is only
 /// sound under a permutation that fixes the *whole* game, not just the
 /// board.
+/// Applies a suit permutation to a single card.
+pub fn permute_card(perm: &SuitPerm, card: Card) -> Card {
+    apply_perm(perm, card)
+}
+
+/// Applies a suit permutation to a two-card combo index.
+pub fn permute_combo(perm: &SuitPerm, combo: usize) -> usize {
+    let (a, b) = cards::combo_cards(combo);
+    cards::combo_index(apply_perm(perm, a), apply_perm(perm, b))
+}
+
+/// For each member of a deal group, one permutation from `stab` mapping the
+/// representative onto it — the witnesses the quotient-isomorphism builder
+/// needs. Panics if `stab` cannot produce a member; callers must pass the
+/// same subgroup the group was built under.
+pub fn orbit_perms(stab: &[SuitPerm], rep: Card, members: &[Card]) -> Vec<SuitPerm> {
+    members
+        .iter()
+        .map(|&m| {
+            *stab
+                .iter()
+                .find(|perm| apply_perm(perm, rep) == m)
+                .expect("member not reachable from representative under stab")
+        })
+        .collect()
+}
+
 pub fn deal_groups_with(board: &Board, dead: &[Card], allowed: &[SuitPerm]) -> Vec<DealGroup> {
     let stab: Vec<SuitPerm> = stabilizer(board)
         .into_iter()

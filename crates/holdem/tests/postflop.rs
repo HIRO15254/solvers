@@ -302,14 +302,13 @@ fn iso_on_off_converge_to_same_value() {
     // Flop is monotone spades (2s 7s Ks); the turn card 2h fixes hearts.
     // The board's stabilizer is then exactly {identity, swap(clubs,
     // diamonds)}, and the pair ranges below are symmetric under every suit
-    // permutation, so the merged tree is a faithful quotient of the full
-    // tree. Note this is a statement about the *game*, not about CFR
-    // trajectories: finite iterates differ pointwise between the two trees
-    // (the quotient replaces a sum over isomorphic branches with
-    // multiplicity x representative, which symmetrizes differently), so the
-    // right test is agreement of the converged value within the sum of both
-    // solves' exploitability bounds — for a zero-sum game, any
-    // eps-equilibrium's value is within eps of the game value.
+    // permutation, so the merged tree is an exact per-hand quotient of the
+    // full tree (see `Builder::quotient_transition`); the sharper per-hand
+    // agreement is pinned by `iso_quotient_matches_full_tree_per_hand`.
+    // This test keeps the coarser end-to-end check on a longer solve:
+    // converged values agree within the sum of both solves' exploitability
+    // bounds — for a zero-sum game, any eps-equilibrium's value is within
+    // eps of the game value.
     let board = parse_cards("2s 7s Ks 2h");
     let ranges = PerPlayer::new(
         "44,55".parse::<Range>().unwrap(),
@@ -682,4 +681,144 @@ fn untracked_node_info_stays_empty() {
     solver.run(10);
     let ev = solver.expected_value(Player::P0);
     assert!(ev.is_finite(), "expected value must be finite: {ev}");
+}
+
+/// The quotient construction is exact per hand, not just in aggregate:
+/// solving the merged tree and the full tree must produce (near-)identical
+/// root strategies combo by combo. Trajectories agree up to f32 summation
+/// order (the transition's backward sum vs sequential branch accumulation),
+/// so the tolerance is a float-noise bound, not an exploitability bound.
+#[test]
+fn iso_quotient_matches_full_tree_per_hand() {
+    let board = parse_cards("2s 7s Ks 2h");
+    let ranges = PerPlayer::new(
+        "44,55".parse::<Range>().unwrap(),
+        "33,66".parse::<Range>().unwrap(),
+    );
+    let base = PostflopConfig {
+        board,
+        ranges: ranges.clone(),
+        pot: Chips(2),
+        effective_stack: Chips(20),
+        bet_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![0.75], vec![0.75]),
+            river: PerPlayer::new(vec![1.0], vec![1.0]),
+        },
+        max_raises: PerStreet {
+            flop: 0,
+            turn: 1,
+            river: 1,
+        },
+        ..Default::default()
+    };
+    let sequential = ParConfig {
+        chance_depth: 0,
+        min_children: usize::MAX,
+    };
+    let run = |iso_merging: bool| {
+        let config = PostflopConfig {
+            iso_merging,
+            ..base.clone()
+        };
+        let game = build_postflop_game(&config, chip_ev());
+        let mut solver = Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(64));
+        solver.set_par(sequential);
+        solver.run(64);
+        (
+            solver.expected_value(Player::P0),
+            solver.average_strategy_at(0),
+        )
+    };
+    let (ev_on, sig_on) = run(true);
+    let (ev_off, sig_off) = run(false);
+    assert!(
+        (ev_on - ev_off).abs() < 1e-4,
+        "iso EV mismatch: {ev_on} vs {ev_off}"
+    );
+    assert_eq!(sig_on.len(), sig_off.len());
+    let num_actions = sig_on.len() / NUM_COMBOS;
+    for a in 0..num_actions {
+        for combo in 0..NUM_COMBOS {
+            if ranges[Player::P0].weight(combo) == 0.0 {
+                continue;
+            }
+            let (x, y) = (
+                sig_on[a * NUM_COMBOS + combo],
+                sig_off[a * NUM_COMBOS + combo],
+            );
+            assert!(
+                (x - y).abs() < 1e-4,
+                "root strategy diverged: action {a} combo {combo}: merged {x} vs full {y}"
+            );
+        }
+    }
+}
+
+/// In the *unmerged* tree, two isomorphic river branches must converge to
+/// suit-permuted copies of one strategy — the symmetry the quotient encodes
+/// structurally. Uses the clubs<->diamonds swap that stabilizes the board.
+#[test]
+fn member_branch_matches_suit_permuted_rep_branch() {
+    let board = parse_cards("2s 7s Ks 2h");
+    let ranges = PerPlayer::new(
+        "44,55".parse::<Range>().unwrap(),
+        "33,66".parse::<Range>().unwrap(),
+    );
+    let config = PostflopConfig {
+        board,
+        ranges: ranges.clone(),
+        pot: Chips(2),
+        effective_stack: Chips(20),
+        bet_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![], vec![]),
+            river: PerPlayer::new(vec![1.0], vec![1.0]),
+        },
+        max_raises: PerStreet {
+            flop: 0,
+            turn: 0,
+            river: 1,
+        },
+        iso_merging: false,
+        ..Default::default()
+    };
+    let game = build_postflop_game(&config, chip_ev());
+    let node_info = game.node_info.clone();
+    let tags = game.game.tree.tags.clone();
+    let mut solver = Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(64));
+    solver.set_par(ParConfig {
+        chance_depth: 0,
+        min_children: usize::MAX,
+    });
+    solver.run(64);
+
+    let find = |history: &str| -> engine::NodeId {
+        let tag = node_info
+            .iter()
+            .position(|i| i.history == history)
+            .unwrap_or_else(|| panic!("history {history:?} not found")) as u32;
+        tags.iter().position(|&t| t == tag).unwrap() as u32
+    };
+    // Turn checks through; compare the 8c and 8d river branches under the
+    // clubs<->diamonds swap ([1, 0, 2, 3] in suit order c, d, h, s).
+    let perm: hand_index::SuitPerm = [1, 0, 2, 3];
+    let node_c = find("xx[8c]");
+    let node_d = find("xx[8d]");
+    let sig_c = solver.average_strategy_at(node_c);
+    let sig_d = solver.average_strategy_at(node_d);
+    let num_actions = sig_c.len() / NUM_COMBOS;
+    for a in 0..num_actions {
+        for combo in 0..NUM_COMBOS {
+            if ranges[Player::P0].weight(combo) == 0.0 {
+                continue;
+            }
+            let x = sig_c[a * NUM_COMBOS + combo];
+            let y = sig_d[a * NUM_COMBOS + hand_index::permute_combo(&perm, combo)];
+            assert!(
+                (x - y).abs() < 1e-3,
+                "branches not suit-symmetric: action {a} combo {combo}: {x} vs {y}"
+            );
+        }
+    }
 }
