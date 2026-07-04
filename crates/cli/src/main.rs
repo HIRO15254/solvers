@@ -18,6 +18,7 @@ mod inspect;
 mod postflop_setup;
 mod report;
 mod resume;
+mod sol;
 mod solve;
 
 use anyhow::Result;
@@ -55,6 +56,17 @@ enum Command {
         /// from the raw config file bytes.
         #[arg(long)]
         iterations: Option<u64>,
+        /// Export a compact `.sol` viewer artifact after the run completes
+        /// (postflop configs only; browse it later with `inspect --sol`).
+        #[arg(long)]
+        sol: Option<std::path::PathBuf>,
+        /// Which streets get stored strategy blocks in the `.sol` export.
+        /// `no-rivers` (default) omits river action nodes -- the viewer
+        /// re-solves them lazily on demand; `full` stores every action node
+        /// (and is forced regardless of this flag when the config itself
+        /// starts on the river).
+        #[arg(long = "sol-streets", value_enum, default_value = "no-rivers")]
+        sol_streets: sol::SolStreets,
     },
     /// Continue a checkpointed solve to `run.iterations` total iterations.
     Resume {
@@ -94,16 +106,32 @@ enum Command {
         metrics_dir: Option<std::path::PathBuf>,
     },
     /// Solve a postflop config, then explore the resulting strategy
-    /// interactively (a small UPI-subset REPL).
+    /// interactively (a small UPI-subset REPL). Exactly one of `config` or
+    /// `--sol` is required.
     Inspect {
-        /// Path to the config file (must be `kind = "postflop"`).
-        config: std::path::PathBuf,
-        /// Overrides `run.iterations` from the config.
+        /// Path to the config file (must be `kind = "postflop"`). Mutually
+        /// exclusive with `--sol`.
+        #[arg(conflicts_with = "sol")]
+        config: Option<std::path::PathBuf>,
+        /// Overrides `run.iterations` from the config (live solve only).
         #[arg(long)]
         iterations: Option<u64>,
-        /// Overrides `run.target_nash_conv` from the config.
+        /// Overrides `run.target_nash_conv` from the config (live solve
+        /// only).
         #[arg(long)]
         target_nash_conv: Option<f64>,
+        /// Load a pre-solved `.sol` viewer artifact instead of solving a
+        /// live config. Mutually exclusive with `config`.
+        #[arg(long, conflicts_with = "config")]
+        sol: Option<std::path::PathBuf>,
+        /// Planned iteration budget for a river subgame's lazy re-solve
+        /// (`--sol` only).
+        #[arg(long = "river-iterations", default_value_t = 500)]
+        river_iterations: u64,
+        /// Stop a river re-solve early once its subgame's `nash_conv` drops
+        /// below this (`--sol` only).
+        #[arg(long = "river-target")]
+        river_target: Option<f64>,
     },
     /// Solve the same postflop config across multiple boards and write a
     /// CSV report (one row per board).
@@ -135,6 +163,8 @@ fn main() -> Result<()> {
             metrics,
             checkpoint,
             iterations,
+            sol,
+            sol_streets,
         } => solve::run(
             &config,
             output.as_deref(),
@@ -142,6 +172,8 @@ fn main() -> Result<()> {
             metrics.as_deref(),
             checkpoint.as_deref(),
             iterations,
+            sol.as_deref(),
+            sol_streets,
         ),
         Command::Resume {
             config,
@@ -166,7 +198,17 @@ fn main() -> Result<()> {
             config,
             iterations,
             target_nash_conv,
-        } => inspect::run(&config, iterations, target_nash_conv),
+            sol,
+            river_iterations,
+            river_target,
+        } => match (config, sol) {
+            (Some(config), None) => inspect::run(&config, iterations, target_nash_conv),
+            (None, Some(sol)) => inspect::run_sol(&sol, river_iterations, river_target),
+            (None, None) => Err(anyhow::anyhow!("inspect requires either <config> or --sol")),
+            (Some(_), Some(_)) => {
+                unreachable!("clap's conflicts_with prevents both being set")
+            }
+        },
         Command::Report {
             config,
             boards,

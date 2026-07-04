@@ -308,6 +308,107 @@ fn bench_kuhn_two_schedules() {
     assert!(dcfr_metrics.lines().count() > 0);
 }
 
+// --- `.sol` viewer artifact: `solve --sol` / `inspect --sol` ---------------
+
+/// Tiny turn-start config (single chance node turn->river, tiny ranges, one
+/// bet size per street, one raise cap) -- same shape as
+/// `crates/holdem/tests/viewer.rs`'s `small_turn_config` and
+/// `crates/cli/src/sol.rs`'s own unit-test fixture, duplicated here (rather
+/// than shared) since this is a separate test binary with no access to
+/// `cli`'s internal `sol` module.
+const TINY_TURN_TOML: &str = r#"
+[game]
+kind = "postflop"
+board = "2s 7s Ks 2h"
+oop_range = "44,55"
+ip_range = "33,66"
+pot = 2
+effective_stack = 20
+
+[game.bets.turn]
+oop = [0.75]
+ip = [0.75]
+max_raises = 1
+
+[game.bets.river]
+oop = [1.0]
+ip = [1.0]
+max_raises = 1
+
+[run]
+iterations = 32
+check_every = 32
+"#;
+
+#[test]
+fn sol_export_and_inspect_smoke() {
+    let dir = temp_dir("sol-smoke");
+    let config = dir.join("turn.toml");
+    std::fs::write(&config, TINY_TURN_TOML).unwrap();
+    let sol_path = dir.join("out.sol");
+    let checkpoint = dir.join("out.ckpt");
+
+    let output = run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--sol",
+        sol_path.to_str().unwrap(),
+        "--checkpoint",
+        checkpoint.to_str().unwrap(),
+    ]);
+    let stdout = String::from_utf8_lossy(&output.stdout);
+
+    assert!(sol_path.exists(), "sol file must be written");
+    assert!(checkpoint.exists(), "checkpoint file must be written");
+
+    // `.sol` omits river strategy blocks (NoRivers is the default mode) and
+    // stores 16-bit quantized probabilities instead of full-precision
+    // regrets + strategy sums, so it must be substantially smaller than the
+    // checkpoint of the same solve.
+    let sol_size = std::fs::metadata(&sol_path).unwrap().len();
+    let ckpt_size = std::fs::metadata(&checkpoint).unwrap().len();
+    assert!(
+        sol_size < ckpt_size / 4,
+        "sol ({sol_size} bytes) should be well under 1/4 of the checkpoint ({ckpt_size} bytes)"
+    );
+
+    // `solve`'s stdout must mention the exported block count.
+    let sol_line = stdout
+        .lines()
+        .find(|l| l.starts_with("sol:"))
+        .unwrap_or_else(|| panic!("no 'sol:' summary line in stdout: {stdout:?}"));
+    assert!(
+        sol_line.contains("block"),
+        "sol summary line should mention the block count: {sol_line:?}"
+    );
+
+    // `inspect --sol` loads the artifact back and can serve the root node.
+    let mut child = std::process::Command::new(env!("CARGO_BIN_EXE_solvers"))
+        .arg("inspect")
+        .arg("--sol")
+        .arg(&sol_path)
+        .env("NO_COLOR", "1")
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .expect("spawn solvers inspect --sol");
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(b"show\nquit\n")
+        .unwrap();
+    let output = child.wait_with_output().expect("wait for inspect --sol");
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("kind: action"), "stdout: {stdout:?}");
+}
+
 #[test]
 fn i16_storage_solve_converges_and_checkpoint_round_trips() {
     let dir = temp_dir("i16");

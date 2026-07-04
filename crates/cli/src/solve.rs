@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::time::{Duration, Instant};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, anyhow};
 use cards::{NUM_COMBOS, Player, combo_cards};
 use engine::{
     DiscountSchedule, F32Storage, I16Storage, NodeId, NodeKind, ParConfig, Solver, SolverState,
@@ -13,7 +13,9 @@ use serde::Serialize;
 
 use crate::config::{BetsSection, GameSection, RunSection, SolveConfig, StorageKind};
 use crate::postflop_setup;
+use crate::sol::{SolExportSpec, SolStreets};
 
+#[allow(clippy::too_many_arguments)]
 pub fn run(
     config_path: &Path,
     output: Option<&Path>,
@@ -21,6 +23,8 @@ pub fn run(
     metrics: Option<&Path>,
     checkpoint: Option<&Path>,
     iterations: Option<u64>,
+    sol: Option<&Path>,
+    sol_streets: SolStreets,
 ) -> Result<()> {
     let raw_bytes =
         std::fs::read(config_path).with_context(|| format!("reading {}", config_path.display()))?;
@@ -35,22 +39,46 @@ pub fn run(
     let config_hash = formats::config_hash(&raw_bytes);
     let checkpoint_sink = checkpoint.map(|path| (path, config_hash));
 
+    let sol_spec = match sol {
+        Some(path) => {
+            if !matches!(config.game, GameSection::Postflop { .. }) {
+                return Err(anyhow!(
+                    "--sol export only supports kind = \"postflop\" configs \
+                     (kuhn/leduc have no board/street structure to quantize)"
+                ));
+            }
+            let storage_name = match config.run.storage {
+                StorageKind::F32 => "f32",
+                StorageKind::I16 => "i16",
+            };
+            Some(SolExportSpec {
+                path: path.to_path_buf(),
+                mode: sol_streets,
+                config_toml: raw.to_string(),
+                storage_name: storage_name.to_string(),
+            })
+        }
+        None => None,
+    };
+
     match config.run.storage {
-        StorageKind::F32 => run_with_storage::<F32Storage>(
+        StorageKind::F32 => run_with_storage_sol::<F32Storage>(
             config,
             output,
             histories,
             metrics,
             checkpoint_sink,
             None,
+            sol_spec,
         ),
-        StorageKind::I16 => run_with_storage::<I16Storage>(
+        StorageKind::I16 => run_with_storage_sol::<I16Storage>(
             config,
             output,
             histories,
             metrics,
             checkpoint_sink,
             None,
+            sol_spec,
         ),
     }
     .map(|_summary| ())
@@ -83,6 +111,12 @@ impl RunHooks<'static> {
 /// Solves (or resumes) `config` with storage backend `S`, dispatching on
 /// the game kind. Shared by `solve`, `resume`, and `bench` so there is
 /// exactly one convergence loop and one export path in the codebase.
+///
+/// Never exports a `.sol` artifact -- see [`run_with_storage_sol`], the
+/// entry point `solve::run` uses instead, which does. Keeping this
+/// signature unchanged means `resume` and `bench` (which never export
+/// `.sol` files) don't need to touch their call sites for the `.sol`
+/// feature at all.
 pub(crate) fn run_with_storage<S: Storage>(
     config: SolveConfig,
     output: Option<&Path>,
@@ -90,6 +124,50 @@ pub(crate) fn run_with_storage<S: Storage>(
     metrics: Option<&Path>,
     checkpoint: Option<(&Path, [u8; 32])>,
     resume_state: Option<SolverState>,
+) -> Result<RunSummary> {
+    run_with_storage_impl::<S>(
+        config,
+        output,
+        histories,
+        metrics,
+        checkpoint,
+        resume_state,
+        None,
+    )
+}
+
+/// Same as [`run_with_storage`], but additionally exports a `.sol` viewer
+/// artifact once the run completes (postflop configs only) when `sol` is
+/// `Some`.
+pub(crate) fn run_with_storage_sol<S: Storage>(
+    config: SolveConfig,
+    output: Option<&Path>,
+    histories: &[String],
+    metrics: Option<&Path>,
+    checkpoint: Option<(&Path, [u8; 32])>,
+    resume_state: Option<SolverState>,
+    sol: Option<SolExportSpec>,
+) -> Result<RunSummary> {
+    run_with_storage_impl::<S>(
+        config,
+        output,
+        histories,
+        metrics,
+        checkpoint,
+        resume_state,
+        sol,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_with_storage_impl<S: Storage>(
+    config: SolveConfig,
+    output: Option<&Path>,
+    histories: &[String],
+    metrics: Option<&Path>,
+    checkpoint: Option<(&Path, [u8; 32])>,
+    resume_state: Option<SolverState>,
+    sol: Option<SolExportSpec>,
 ) -> Result<RunSummary> {
     let rake = postflop_setup::build_rake(&config.rake);
     let utility = postflop_setup::build_utility(&config.utility);
@@ -154,6 +232,7 @@ pub(crate) fn run_with_storage<S: Storage>(
             output,
             histories,
             resume_state,
+            sol,
             &mut hooks,
         ),
     }
@@ -315,6 +394,7 @@ fn solve_postflop<S: Storage>(
     output: Option<&Path>,
     histories: &[String],
     resume_state: Option<SolverState>,
+    sol: Option<SolExportSpec>,
     hooks: &mut RunHooks<'_>,
 ) -> Result<RunSummary> {
     let config = postflop_setup::build_postflop_config(
@@ -393,6 +473,12 @@ fn solve_postflop<S: Storage>(
             .with_context(|| format!("writing {}", path.display()))?;
         println!("strategy written to {}", path.display());
     }
+
+    if let Some(spec) = &sol {
+        let start_street = crate::sol::start_street_from_board_len(config.board.len());
+        crate::sol::export_sol(spec, &solver, start_street, &summary)?;
+    }
+
     Ok(summary)
 }
 

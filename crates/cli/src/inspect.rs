@@ -8,12 +8,13 @@ use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow};
 use cards::{Card, NUM_COMBOS, PerPlayer, Player, combo_cards};
-use engine::{F32Storage, NodeId, NodeKind, PublicTree, ReachMap, Solver};
+use engine::{CompiledGame, F32Storage, NodeId, NodeKind, PublicTree, ReachMap, Solver};
 use game::PayoffPipeline;
 use holdem::{PostflopEvaluator, PostflopNodeInfo, class_average, class_weights, range_equity};
 
 use crate::config::{GameSection, SolveConfig};
 use crate::postflop_setup;
+use crate::sol::{LiveProvider, SolProvider, StrategyProvider};
 
 const RANKS: [char; 13] = [
     'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2',
@@ -86,8 +87,10 @@ pub fn run(
     crate::solve::print_done(&solver, elapsed);
 
     let no_color = std::env::var_os("NO_COLOR").is_some();
+    let mut provider = LiveProvider(&solver);
     let mut repl = Repl {
-        solver: &solver,
+        game: solver.game(),
+        provider: &mut provider,
         node_info: &node_info,
         board: board_cards,
         stack: Vec::new(),
@@ -99,8 +102,42 @@ pub fn run(
     repl.interact()
 }
 
+/// Loads a `.sol` viewer artifact and explores it interactively -- the same
+/// REPL as [`run`], but sourcing strategies from
+/// [`crate::sol::SolProvider`] (dequantized stored blocks, with river
+/// subgames re-solved lazily) instead of a live [`Solver`].
+pub fn run_sol(sol_path: &Path, river_iterations: u64, river_target: Option<f64>) -> Result<()> {
+    let loaded = crate::sol::load_sol(sol_path, river_iterations, river_target)?;
+    println!(
+        "loaded {} (mode={:?}, iterations={}, nash_conv={:.3e})",
+        sol_path.display(),
+        loaded.mode,
+        loaded.meta.iterations,
+        loaded.meta.nash_conv,
+    );
+
+    let no_color = std::env::var_os("NO_COLOR").is_some();
+    let board = loaded.board.clone();
+    let node_info = &loaded.pf_game.node_info;
+    let game = &loaded.pf_game.game;
+    let mut provider = SolProvider::new(&loaded);
+    let mut repl = Repl {
+        game,
+        provider: &mut provider,
+        node_info,
+        board,
+        stack: Vec::new(),
+        current: 0,
+        history: String::new(),
+        equity_cache: None,
+        no_color,
+    };
+    repl.interact()
+}
+
 struct Repl<'a> {
-    solver: &'a Solver<PostflopEvaluator, F32Storage>,
+    game: &'a CompiledGame<PostflopEvaluator>,
+    provider: &'a mut dyn StrategyProvider,
     node_info: &'a [PostflopNodeInfo],
     board: Vec<Card>,
     /// Ancestors: (node id, that node's history string).
@@ -191,6 +228,10 @@ impl<'a> Repl<'a> {
         println!("  ev                   - expected values, exploitability, nash_conv");
         println!("  help                 - this message");
         println!("  quit / exit          - leave the REPL");
+        println!(
+            "note: iso-merged trunks list representative cards only for a merged deal \
+             (marked with a trailing '*', e.g. 'Td*'); member remapping is deferred."
+        );
     }
 
     fn cmd_show(&mut self) {
@@ -202,9 +243,8 @@ impl<'a> Repl<'a> {
                 self.history.as_str()
             }
         );
-        let solver = self.solver;
         let node_info = self.node_info;
-        let tree = &solver.game().tree;
+        let tree = &self.game.tree;
         let node = *tree.node(self.current);
         match node.kind {
             NodeKind::Terminal => println!("kind: terminal"),
@@ -212,7 +252,7 @@ impl<'a> Repl<'a> {
                 let children: Vec<NodeId> = tree.children(self.current).collect();
                 println!("kind: chance ({} deals)", children.len());
                 for pos in 0..children.len() {
-                    let label = chance_child_label(tree, self.current, pos);
+                    let label = chance_child_label(tree, node_info, self.current, pos);
                     println!("  [{pos}] {label}");
                 }
             }
@@ -226,8 +266,14 @@ impl<'a> Repl<'a> {
                 let tag = tree.tags[self.current as usize] as usize;
                 let info = &node_info[tag];
                 let sref = tree.storage_ref(&node);
-                let avg = solver.average_strategy_at(self.current);
-                let root_range = &solver.game().root_ranges[node.player];
+                let avg = match self.provider.average_strategy(self.current) {
+                    Ok(avg) => avg,
+                    Err(e) => {
+                        println!("error: {e}");
+                        return;
+                    }
+                };
+                let root_range = &self.game.root_ranges[node.player];
                 let freqs = postflop_setup::action_frequencies(
                     &avg,
                     root_range,
@@ -242,9 +288,8 @@ impl<'a> Repl<'a> {
     }
 
     fn cmd_go(&mut self, arg: &str) {
-        let solver = self.solver;
         let node_info = self.node_info;
-        let tree = &solver.game().tree;
+        let tree = &self.game.tree;
         let node = *tree.node(self.current);
         match node.kind {
             NodeKind::Terminal => {
@@ -280,8 +325,14 @@ impl<'a> Repl<'a> {
                 let children: Vec<NodeId> = tree.children(self.current).collect();
                 let mut chosen: Option<(usize, String)> = None;
                 for pos in 0..children.len() {
-                    let label = chance_child_label(tree, self.current, pos);
-                    if label.eq_ignore_ascii_case(arg) {
+                    let label = chance_child_label(tree, node_info, self.current, pos);
+                    // Accept the label with or without its trailing `*`
+                    // (see `chance_child_label`'s doc comment): an
+                    // iso-merged deal's representative card is still a
+                    // sensible thing to type without the marker.
+                    if label.eq_ignore_ascii_case(arg)
+                        || label.trim_end_matches('*').eq_ignore_ascii_case(arg)
+                    {
                         chosen = Some((pos, label));
                         break;
                     }
@@ -290,7 +341,7 @@ impl<'a> Repl<'a> {
                     Some(c) => c,
                     None => match arg.parse::<usize>() {
                         Ok(idx) if idx < children.len() => {
-                            (idx, chance_child_label(tree, self.current, idx))
+                            (idx, chance_child_label(tree, node_info, self.current, idx))
                         }
                         Ok(idx) => {
                             println!(
@@ -311,7 +362,7 @@ impl<'a> Repl<'a> {
                         .history
                         .clone()
                 } else {
-                    format!("{}[{label}]", self.history)
+                    format!("{}[{}]", self.history, label.trim_end_matches('*'))
                 };
                 self.stack.push((self.current, self.history.clone()));
                 self.current = child_id;
@@ -337,9 +388,8 @@ impl<'a> Repl<'a> {
     }
 
     fn cmd_grid(&mut self, arg: &str) {
-        let solver = self.solver;
         let node_info = self.node_info;
-        let tree = &solver.game().tree;
+        let tree = &self.game.tree;
         let node = *tree.node(self.current);
         if node.kind != NodeKind::Action {
             println!("error: grid only works at an action node");
@@ -356,8 +406,14 @@ impl<'a> Repl<'a> {
         };
         let sref = tree.storage_ref(&node);
         let num_hands = sref.num_hands as usize;
-        let avg = solver.average_strategy_at(self.current);
-        let root_range = &solver.game().root_ranges[node.player];
+        let avg = match self.provider.average_strategy(self.current) {
+            Ok(avg) => avg,
+            Err(e) => {
+                println!("error: {e}");
+                return;
+            }
+        };
+        let root_range = &self.game.root_ranges[node.player];
         let freqs = postflop_setup::action_frequencies(
             &avg,
             root_range,
@@ -376,7 +432,6 @@ impl<'a> Repl<'a> {
     }
 
     fn cmd_range(&mut self, arg: &str) {
-        let solver = self.solver;
         let player = match arg {
             "oop" => Player::P0,
             "ip" => Player::P1,
@@ -385,7 +440,7 @@ impl<'a> Repl<'a> {
                 return;
             }
         };
-        let root_range = &solver.game().root_ranges[player];
+        let root_range = &self.game.root_ranges[player];
         let w = class_weights(root_range);
         let max = w.iter().cloned().fold(0.0, f64::max);
         let mut values = [0.0f64; 169];
@@ -401,12 +456,11 @@ impl<'a> Repl<'a> {
     }
 
     fn cmd_eq(&mut self) {
-        let solver = self.solver;
         if self.equity_cache.is_none() {
-            let eq = range_equity(&self.board, &solver.game().root_ranges);
+            let eq = range_equity(&self.board, &self.game.root_ranges);
             self.equity_cache = Some(eq);
         }
-        let root_range = &solver.game().root_ranges[Player::P0];
+        let root_range = &self.game.root_ranges[Player::P0];
         let equity = &self.equity_cache.as_ref().unwrap()[Player::P0];
         let weights = class_weights(root_range);
         let raw = class_average(root_range, equity);
@@ -419,9 +473,8 @@ impl<'a> Repl<'a> {
     }
 
     fn cmd_combos(&mut self, arg: &str) {
-        let solver = self.solver;
         let node_info = self.node_info;
-        let tree = &solver.game().tree;
+        let tree = &self.game.tree;
         let node = *tree.node(self.current);
         if node.kind != NodeKind::Action {
             println!("error: combos only works at an action node");
@@ -439,7 +492,13 @@ impl<'a> Repl<'a> {
         let sref = tree.storage_ref(&node);
         let num_hands = sref.num_hands as usize;
         debug_assert_eq!(num_hands, NUM_COMBOS);
-        let avg = solver.average_strategy_at(self.current);
+        let avg = match self.provider.average_strategy(self.current) {
+            Ok(avg) => avg,
+            Err(e) => {
+                println!("error: {e}");
+                return;
+            }
+        };
         println!("combos {arg}:");
         for combo in 0..num_hands {
             if class_range.weight(combo) <= 0.0 {
@@ -457,17 +516,7 @@ impl<'a> Repl<'a> {
     }
 
     fn cmd_ev(&mut self) {
-        let solver = self.solver;
-        let ev_oop = solver.expected_value(Player::P0);
-        let ev_ip = solver.expected_value(Player::P1);
-        let expl = solver.exploitability();
-        let nash_conv = expl[Player::P0] + expl[Player::P1];
-        println!(
-            "ev_oop={ev_oop:.6} ev_ip={ev_ip:.6} expl_oop={:.3e} expl_ip={:.3e} nash_conv={nash_conv:.3e} iterations={}",
-            expl[Player::P0],
-            expl[Player::P1],
-            solver.iteration(),
-        );
+        println!("{}", self.provider.ev_line());
     }
 
     fn render_grid(&self, weights: &[f64; 169], values: &[f64; 169]) {
@@ -554,16 +603,47 @@ fn identify_card(mask: &[f32]) -> Option<Card> {
     None
 }
 
-/// Label for a chance node's `pos`-th child: the dealt card, derived from
-/// its reach mask (chance children are untagged in `node_info`, so this is
-/// the only way to name them).
-fn chance_child_label(tree: &PublicTree, node_id: NodeId, pos: usize) -> String {
+/// Label for a chance node's `pos`-th child: the dealt card. For a `Mask`
+/// deal (the common unmerged case) this comes straight from the card-removal
+/// mask via [`identify_card`]. For a `Transition` deal (an iso-merged class:
+/// several structurally-equivalent cards folded into one branch) there is no
+/// single mask to read a card from, so instead this reads the representative
+/// card straight out of the child action node's own recorded history -- its
+/// last bracketed `[Xy]` token is exactly the card the builder dealt to
+/// reach it -- and appends `*` to mark that the branch stands in for a whole
+/// merged class (see `cmd_help`'s iso-merging note). Falls back to a bare
+/// `dealN` when neither source applies (e.g. an `Identity` map, which this
+/// builder never uses at a chance node, or an untagged/non-action child).
+fn chance_child_label(
+    tree: &PublicTree,
+    node_info: &[PostflopNodeInfo],
+    node_id: NodeId,
+    pos: usize,
+) -> String {
     let node = tree.node(node_id);
     let deal = tree.deal(node, pos);
     match deal.maps[Player::P0] {
         ReachMap::Mask(m) => identify_card(&tree.masks[m as usize])
             .map(|c| c.to_string())
             .unwrap_or_else(|| format!("deal{pos}")),
-        _ => format!("deal{pos}"),
+        ReachMap::Transition(_) => tree
+            .children(node_id)
+            .nth(pos)
+            .filter(|&child_id| tree.node(child_id).kind == NodeKind::Action)
+            .and_then(|child_id| {
+                let tag = tree.tags[child_id as usize] as usize;
+                last_bracketed_card(&node_info[tag].history)
+            })
+            .map(|card| format!("{card}*"))
+            .unwrap_or_else(|| format!("deal{pos}")),
+        ReachMap::Identity => format!("deal{pos}"),
     }
+}
+
+/// Extracts the card inside the last `[Xy]` token in a history string (e.g.
+/// `"xx[9d]"` -> `Some("9d")`), or `None` if there is no bracketed token.
+fn last_bracketed_card(history: &str) -> Option<&str> {
+    let start = history.rfind('[')?;
+    let end = history[start..].find(']')? + start;
+    Some(&history[start + 1..end])
 }
