@@ -10,12 +10,16 @@
 //! The engine is intentionally heads-up only (`PerPlayer<T>` is a pair);
 //! generalizing to N players is an explicit non-goal.
 
+mod reach;
 mod schedule;
 mod scratch;
 mod solver;
 mod storage;
 mod tree;
 
+pub use reach::{
+    MismatchReason, SubtreeMismatch, pair_subtrees, parent_array, path_from_root, reach_at,
+};
 pub use schedule::{CfrPlus, Dcfr, DiscountSchedule, Discounts, HsDcfr, Vanilla, linear_cfr};
 pub use scratch::Scratch;
 pub use solver::{CompiledGame, ParConfig, Solver, SolverState, TerminalEvaluator};

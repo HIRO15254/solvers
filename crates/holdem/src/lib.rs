@@ -11,13 +11,16 @@
 //! [`aggregate`] and [`equity`] are reporting helpers: mapping combos to
 //! their 13x13 preflop class and computing range-vs-range showdown equity
 //! averaged over remaining runouts, respectively. Neither sits on the solve
-//! path.
+//! path. [`viewer`] is the read-only query layer for an already-built tree:
+//! street tagging, history replay, and river-subgame reconstruction for a
+//! reach-weighted re-solve — see its module doc for the design contract.
 
 mod aggregate;
 mod equity;
 mod kernel;
 mod postflop;
 mod river;
+mod viewer;
 
 pub use aggregate::{class_average, class_of_combo, class_weights};
 pub use equity::range_equity;
@@ -26,3 +29,6 @@ pub use postflop::{
     build_postflop_game, memory_usage,
 };
 pub use river::{RiverConfig, RiverGame, RiverNodeInfo, build_river_game};
+pub use viewer::{
+    ReplayError, RiverEntryState, node_streets, river_entry_state, river_resolve_config,
+};
