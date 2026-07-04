@@ -8,7 +8,7 @@ use std::time::Instant;
 use cards::{
     ALL_CARDS, Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of,
 };
-use engine::{Dcfr, F32Storage, ParConfig, Solver};
+use engine::{Dcfr, F32Storage, I16Storage, ParConfig, Solver};
 use game::{ChipEv, NoRake, PayoffPipeline};
 use holdem::{PerStreet, PostflopConfig, build_postflop_game, memory_usage};
 use rayon::prelude::*;
@@ -821,4 +821,70 @@ fn member_branch_matches_suit_permuted_rep_branch() {
             );
         }
     }
+}
+
+/// The quantized `I16Storage` backend must solve a real postflop tree (not
+/// just toy games) to essentially the same equilibrium as `F32Storage`: a
+/// small turn-start spot (same board/ranges/turn-only betting shape as
+/// `iso_on_off_converge_to_same_value` above, run for far fewer iterations)
+/// solved sequentially with each backend must agree on both the expected
+/// value and NashConv.
+#[test]
+#[ignore = "slow unoptimized; CI runs it in release with --include-ignored"]
+fn i16_storage_matches_f32_on_small_turn_spot() {
+    let board = parse_cards("2s 7s Ks 2h");
+    let ranges = PerPlayer::new(
+        "44,55".parse::<Range>().unwrap(),
+        "33,66".parse::<Range>().unwrap(),
+    );
+    let config = PostflopConfig {
+        board,
+        ranges,
+        pot: Chips(2),
+        effective_stack: Chips(20),
+        bet_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![0.75], vec![0.75]),
+            river: PerPlayer::new(vec![], vec![]),
+        },
+        max_raises: PerStreet {
+            flop: 0,
+            turn: 1,
+            river: 0,
+        },
+        ..Default::default()
+    };
+    let sequential = ParConfig {
+        chance_depth: 0,
+        min_children: usize::MAX,
+    };
+    let iters = 100;
+
+    let game_f32 = build_postflop_game(&config, chip_ev());
+    let mut solver_f32 =
+        Solver::<_, F32Storage>::new(game_f32.game, Box::<Dcfr>::default(), Some(iters));
+    solver_f32.set_par(sequential);
+    solver_f32.run(iters);
+
+    let game_i16 = build_postflop_game(&config, chip_ev());
+    let mut solver_i16 =
+        Solver::<_, I16Storage>::new(game_i16.game, Box::<Dcfr>::default(), Some(iters));
+    solver_i16.set_par(sequential);
+    solver_i16.run(iters);
+
+    let ev_f32 = solver_f32.expected_value(Player::P0);
+    let ev_i16 = solver_i16.expected_value(Player::P0);
+    assert!(
+        (ev_f32 - ev_i16).abs() < 2e-3,
+        "expected_value diverged: f32={ev_f32} i16={ev_i16}"
+    );
+
+    let expl_f32 = solver_f32.exploitability();
+    let expl_i16 = solver_i16.exploitability();
+    let nash_conv_f32 = expl_f32[Player::P0] + expl_f32[Player::P1];
+    let nash_conv_i16 = expl_i16[Player::P0] + expl_i16[Player::P1];
+    assert!(
+        (nash_conv_f32 - nash_conv_i16).abs() < 2e-3,
+        "NashConv diverged: f32={nash_conv_f32} i16={nash_conv_i16}"
+    );
 }

@@ -3,7 +3,7 @@ use rayon::prelude::*;
 
 use crate::schedule::{DiscountSchedule, Discounts};
 use crate::scratch::Scratch;
-use crate::storage::{Storage, StorageRef, StorageSpan, StorageView};
+use crate::storage::{StateMismatch, Storage, StorageRef, StorageSpan, StorageState, StorageView};
 use crate::tree::{NodeId, NodeKind, PublicTree};
 
 /// Variant-owned terminal evaluation — the only variant code on the hot
@@ -54,6 +54,16 @@ impl Default for ParConfig {
     }
 }
 
+/// Checkpointable solver state: the iteration count plus the storage
+/// backend's contents, sufficient to resume a solve bit-for-bit (the
+/// solver has no RNG or other hidden state).
+#[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct SolverState {
+    pub iteration: u64,
+    pub storage: StorageState,
+}
+
 /// Vector-form CFR solver with alternating updates.
 pub struct Solver<E, S> {
     game: CompiledGame<E>,
@@ -89,7 +99,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
                 "root range length must match root dims"
             );
         }
-        let storage = S::new(game.tree.storage_len);
+        let storage = S::new(game.tree.storage_len, game.tree.storage_refs.len());
         Solver {
             game,
             storage,
@@ -120,6 +130,24 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     /// regrets/strategy sums for a determinism check.
     pub fn storage(&self) -> &S {
         &self.storage
+    }
+
+    /// Snapshots the iteration count and storage backend contents for a
+    /// checkpoint.
+    pub fn state(&self) -> SolverState {
+        SolverState {
+            iteration: self.iteration,
+            storage: self.storage.state(),
+        }
+    }
+
+    /// Restores a previously-snapshotted iteration count and storage
+    /// backend contents. Fails (leaving `self` unchanged) if `state.storage`
+    /// doesn't match this solver's storage backend.
+    pub fn restore_state(&mut self, state: SolverState) -> Result<(), StateMismatch> {
+        self.storage.restore_state(state.storage)?;
+        self.iteration = state.iteration;
+        Ok(())
     }
 
     /// One alternating iteration: a regret/strategy update pass for each
@@ -217,12 +245,16 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
 
     /// Normalized average strategy at an action node (`A*H`, action-major).
     pub fn average_strategy_at(&self, node: NodeId) -> Vec<f32> {
-        self.node_strategy(node, |sref, out| self.storage.average_strategy(sref, out))
+        self.node_strategy(node, |sref, out| {
+            self.storage.average_strategy(sref, sref.index, out)
+        })
     }
 
     /// Current (regret-matching) strategy at an action node.
     pub fn current_strategy_at(&self, node: NodeId) -> Vec<f32> {
-        self.node_strategy(node, |sref, out| self.storage.regret_matching(sref, out))
+        self.node_strategy(node, |sref, out| {
+            self.storage.regret_matching(sref, sref.index, out)
+        })
     }
 
     fn node_strategy(&self, node: NodeId, f: impl Fn(StorageRef, &mut [f32])) -> Vec<f32> {
@@ -461,17 +493,21 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
             // See `ActionViews`: this node's own regret/strategy update
             // happens after every child returns, so it needs a span
             // protected from any descendant chance node's parallel split.
+            // `sref_start`/`sref_end` cover exactly this node's own ref
+            // (`sref.index`, equal to `node.aux`) so a quantized backend's
+            // `StorageView::split` can carve out this node's single scale
+            // slot along with its element range.
             let own_span = StorageSpan {
                 start: sref.offset,
                 end: sref.offset + sref.len(),
-                sref_start: 0,
-                sref_end: 0,
+                sref_start: sref.index,
+                sref_end: sref.index + 1,
             };
             let mut views =
                 ActionViews::split_for(storage, ctx.tree, node_id, Some(own_span), par_budget);
 
             let mut sigma = scratch.take(sref.len());
-            views.own().regret_matching(sref, &mut sigma);
+            views.own().regret_matching(sref, sref.index, &mut sigma);
 
             // One flat action-major buffer: action `a`'s row is that
             // action's own `out` parameter, so its recursion writes
@@ -514,7 +550,9 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                     cfvs[a * num_hands + h] -= node_cfv[h];
                 }
             }
-            views.own().update_regrets(sref, &cfvs, ctx.discounts);
+            views
+                .own()
+                .update_regrets(sref, sref.index, &cfvs, ctx.discounts);
 
             // Overwrite `cfvs` again as the reach-weighted strategy buffer.
             for a in 0..num_actions {
@@ -522,7 +560,9 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                     cfvs[a * num_hands + h] = my_reach[h] * sigma[a * num_hands + h];
                 }
             }
-            views.own().accumulate_strategy(sref, &cfvs, ctx.discounts);
+            views
+                .own()
+                .accumulate_strategy(sref, sref.index, &cfvs, ctx.discounts);
 
             out.copy_from_slice(&node_cfv);
 
@@ -542,7 +582,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
             let num_hands = sref.num_hands as usize;
             debug_assert_eq!(num_hands, opp_reach.len());
             let mut sigma = scratch.take(sref.len());
-            storage.regret_matching(sref, &mut sigma);
+            storage.regret_matching(sref, sref.index, &mut sigma);
 
             let mut views = ActionViews::split_for(storage, ctx.tree, node_id, None, par_budget);
 
@@ -690,7 +730,7 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C>(
             let sref = ctx.tree.storage_ref(&node);
             let num_hands = sref.num_hands as usize;
             let mut sigma = scratch.take(sref.len());
-            ctx.storage.average_strategy(sref, &mut sigma);
+            ctx.storage.average_strategy(sref, sref.index, &mut sigma);
             let my_dim = out.len();
             let mut opp_next = scratch.take(num_hands);
             let mut child_out = scratch.take(my_dim);
@@ -734,7 +774,7 @@ fn ev_pass<E: TerminalEvaluator, S: Storage>(
     let combine = |sref: StorageRef, children_flat: &[f32], out: &mut [f32]| {
         let num_hands = sref.num_hands as usize;
         let mut sigma = vec![0.0f32; sref.len()];
-        ctx.storage.average_strategy(sref, &mut sigma);
+        ctx.storage.average_strategy(sref, sref.index, &mut sigma);
         for a in 0..sref.num_actions as usize {
             let row = &sigma[a * num_hands..(a + 1) * num_hands];
             let child = &children_flat[a * num_hands..(a + 1) * num_hands];

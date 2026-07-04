@@ -18,8 +18,11 @@ mod tree;
 
 pub use schedule::{CfrPlus, Dcfr, DiscountSchedule, Discounts, HsDcfr, Vanilla, linear_cfr};
 pub use scratch::Scratch;
-pub use solver::{CompiledGame, ParConfig, Solver, TerminalEvaluator};
-pub use storage::{F32Storage, F32View, Storage, StorageOps, StorageRef, StorageSpan, StorageView};
+pub use solver::{CompiledGame, ParConfig, Solver, SolverState, TerminalEvaluator};
+pub use storage::{
+    F32Storage, F32View, I16Storage, I16View, StateMismatch, Storage, StorageOps, StorageRef,
+    StorageSpan, StorageState, StorageView,
+};
 pub use tree::{
     Deal, Node, NodeId, NodeKind, PublicTree, ReachMap, SparseTransition, TempNode, TreeSpec,
 };

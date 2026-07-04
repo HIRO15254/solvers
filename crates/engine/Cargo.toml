@@ -9,3 +9,7 @@ description = "Hot core: public game tree, regret/strategy storage, discount sch
 [dependencies]
 cards = { workspace = true }
 rayon = { workspace = true }
+serde = { workspace = true, optional = true }
+
+[features]
+serde = ["dep:serde"]
