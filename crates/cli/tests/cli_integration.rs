@@ -409,6 +409,124 @@ fn sol_export_and_inspect_smoke() {
     assert!(stdout.contains("kind: action"), "stdout: {stdout:?}");
 }
 
+/// Same shape as `TINY_TURN_TOML` above, but `iso_merging = false` (so the
+/// turn->river chance node's child labels are plain, unmerged cards --
+/// `inspect.rs`'s `chance_child_label` only appends a representative-card
+/// `*` marker for an iso-*merged* `Transition` deal) and ~200 iterations
+/// (loose enough for `nash_conv` to be unremarkable -- this test is an
+/// end-to-end navigation smoke, not an accuracy check, see `sol.rs`'s
+/// `river_resolve_accuracy` unit test for that).
+const TINY_TURN_TOML_NO_ISO: &str = r#"
+[game]
+kind = "postflop"
+board = "2s 7s Ks 2h"
+oop_range = "44,55"
+ip_range = "33,66"
+pot = 2
+effective_stack = 20
+iso_merging = false
+
+[game.bets.turn]
+oop = [0.75]
+ip = [0.75]
+max_raises = 1
+
+[game.bets.river]
+oop = [1.0]
+ip = [1.0]
+max_raises = 1
+
+[run]
+iterations = 200
+check_every = 200
+"#;
+
+/// End-to-end smoke test for `inspect --sol`'s river navigation: export a
+/// `NoRivers` `.sol`, then drive the REPL down to a river-entry node and
+/// back, checking that the lazy re-solve actually fires and serves a
+/// strategy (rather than, say, silently falling back to garbage on a
+/// missing block).
+///
+/// The navigation script is `show` / `go check` / `go check` / `go Ah` /
+/// `show` / `ev` / `quit`, not the literal `go x` shorthand one might guess
+/// from the history-string convention (`x` = check in `PostflopNodeInfo`'s
+/// *history*, e.g. `"xx[Ah]"`): `Repl::cmd_go`'s `resolve_action` matches an
+/// action node's child by its *display label* ("check", "fold", "call",
+/// "bet {to}"/"raise to {to}") or a positional index, never a raw history
+/// token, so `go check` is the REPL command that actually takes the check
+/// branch (confirmed by running this exact script against a debug build
+/// before writing the assertions below). Two checks in a row end the turn
+/// (`postflop::Builder::betting`'s `first_checked` bookkeeping) and reach
+/// the turn->river chance node; `go Ah` descends into the specific river
+/// card "Ah" -- live given this fixture's board "2s 7s Ks 2h" (no ace on
+/// board) and ranges 44,55 / 33,66 (no ace in either range to block it
+/// further) -- landing on a river-entry `Action` node with no stored block
+/// (`NoRivers` mode), so the following `show` triggers `SolProvider`'s lazy
+/// re-solve.
+#[test]
+#[ignore = "solves twice; CI runs it in release with --include-ignored"]
+fn inspect_sol_river_navigation_smoke() {
+    let dir = temp_dir("sol-river-nav");
+    let config = dir.join("turn.toml");
+    std::fs::write(&config, TINY_TURN_TOML_NO_ISO).unwrap();
+    let sol_path = dir.join("out.sol");
+
+    run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--sol",
+        sol_path.to_str().unwrap(),
+    ]);
+    assert!(sol_path.exists(), "sol file must be written");
+
+    let mut child = std::process::Command::new(env!("CARGO_BIN_EXE_solvers"))
+        .arg("inspect")
+        .arg("--sol")
+        .arg(&sol_path)
+        .arg("--river-iterations")
+        .arg("300")
+        .env("NO_COLOR", "1")
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .expect("spawn solvers inspect --sol");
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(b"show\ngo check\ngo check\ngo Ah\nshow\nev\nquit\n")
+        .unwrap();
+    let output = child.wait_with_output().expect("wait for inspect --sol");
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8_lossy(&output.stdout);
+
+    // The river-entry node's `show` must have triggered a lazy re-solve
+    // (not silently served nothing) and reported it converging.
+    assert!(
+        stdout.contains("re-solving river subgame"),
+        "stdout: {stdout:?}"
+    );
+    let (_before_done, after_done) = stdout.split_once("done: iterations=").unwrap_or_else(|| {
+        panic!("no 'done: iterations=' re-solve summary line, stdout: {stdout:?}")
+    });
+    // Immediately after the re-solve's summary line comes this test's
+    // second `show`, printing the served (re-solved) strategy's per-action
+    // frequencies -- this fixture's river action labels are "check"/"bet 2"
+    // (same bet-sizing config as the turn).
+    assert!(
+        after_done.contains("check:") && after_done.contains("bet 2:"),
+        "stdout after the re-solve summary: {after_done:?}"
+    );
+    // `ev` sources from the `.sol` artifact's cached metadata
+    // (`SolProvider::ev_line`), not a live solve.
+    assert!(stdout.contains("at export:"), "stdout: {stdout:?}");
+}
+
 #[test]
 fn i16_storage_solve_converges_and_checkpoint_round_trips() {
     let dir = temp_dir("i16");

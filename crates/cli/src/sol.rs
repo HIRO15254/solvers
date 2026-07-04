@@ -440,6 +440,25 @@ impl<'a> SolProvider<'a> {
             out.copy_from_slice(&probs);
         });
 
+        // A line the solved trunk (essentially) never takes gives one player
+        // an all-zero reach vector; the fresh subgame builder would then
+        // panic on "ranges share no compatible combos". Refuse up front with
+        // an explanation instead — the REPL surfaces provider errors as a
+        // plain "error: ..." line, so navigation itself survives. (A reach
+        // that is positive only on board-conflicting combos can still slip
+        // past this check into the builder assert; that requires a corrupt
+        // artifact rather than a merely-unreached line, so the loud panic is
+        // the right response there.)
+        for p in Player::BOTH {
+            if !reach[p].iter().any(|&r| r > 1e-9) {
+                bail!(
+                    "cannot re-solve river at {history:?}: the solved strategy never \
+                     reaches this line for {} (reach is zero for every hand)",
+                    if p == Player::P0 { "oop" } else { "ip" },
+                );
+            }
+        }
+
         let state = river_entry_state(&loaded.config, &history)
             .with_context(|| format!("replaying history {history:?} for river entry {entry}"))?;
         let sub_cfg = river_resolve_config(&loaded.config, &state, &reach);
@@ -839,6 +858,225 @@ check_every = 16
             }
         }
         assert!(checked_any);
+        let _ = std::fs::remove_file(&path);
+    }
+
+    /// Validates the lazy river re-solve's *accuracy*, not just its shape:
+    /// solves `TINY_TURN_TOML` tightly (3000 iterations, well past the point
+    /// this tiny fixture's own `nash_conv` bottoms out) so the trunk's own
+    /// average strategy at each river-entry node is a meaningful ground
+    /// truth, exports `NoRivers`, then re-solves several river-entry
+    /// subgames (via `SolProvider`, `river_iterations = 2000`,
+    /// `river_target = Some(0.002)` -- a tight budget relative to this
+    /// fixture's entry pots) and compares the result against the trunk's own
+    /// `average_strategy_at` at the *same* node id (no trunk<->subtree
+    /// mapping needed on the trunk side -- `SolProvider::average_strategy`
+    /// already translates its answer back to trunk coordinates).
+    ///
+    /// As `holdem::viewer`'s module doc spells out, a reach-weighted fresh
+    /// subgame solve reproduces the trunk's river strategy only
+    /// approximately: the trunk solved the whole game jointly, so its river
+    /// strategy is correlated with every other river-entry node through the
+    /// shared regret-matching/averaging dynamics, whereas the re-solve seeds
+    /// each subgame independently from a snapshotted reach and solves it in
+    /// isolation. The two agree in the limit of exact convergence (both are
+    /// best responses to the same fixed opponent range) but not bit-for-bit
+    /// at any finite iteration count -- and near-indifferent hands (multiple
+    /// actions roughly tied in EV) can land on different points of the same
+    /// equilibrium set between the two solves. So per-hand tolerance here is
+    /// deliberately loose (0.15 absolute, and only for the acting player's
+    /// hands with non-negligible reach at the node) while the tight,
+    /// load-bearing assertion is the reach-weighted aggregate per action
+    /// (0.03): a real bug (wrong reach reconstruction, a wrong trunk<->
+    /// subtree node mapping) shows up as a large *aggregate* disagreement,
+    /// not just a few wandering indifferent hands.
+    ///
+    /// Candidates are restricted to river-entry nodes whose acting-player
+    /// reach vector has genuine per-hand **spread** (see the `candidates`
+    /// loop below for the precise definition) -- a filter earned the hard
+    /// way while tuning this test against the real fixture. This tiny
+    /// config's root decision (turn check vs. bet) converges to an
+    /// essentially pure "always check" for *every* hand after 3000
+    /// iterations, so every river-entry node under the check-check line
+    /// inherits identical reach for every hand regardless of which specific
+    /// river card falls -- and that turns out to correlate with a genuine
+    /// equilibrium tie at the river action itself (confirmed empirically:
+    /// an isolated re-solve there reaches `nash_conv` on the order of
+    /// `1e-8`, an essentially exact equilibrium of the *isolated* subgame,
+    /// while still landing on a non-corner mixed strategy identical across
+    /// every hand in the range -- only possible when the two actions are
+    /// nearly exactly tied in EV). That is not "some hands wander," it's
+    /// the whole node's decision being indeterminate: an artifact of this
+    /// fixture's tiny two-rank-per-side ranges having no natural way to
+    /// differentiate once the upstream decision doesn't depend on hand
+    /// strength either, not a re-solve defect. Symmetrically, a node the
+    /// trunk's average strategy essentially never reaches (e.g. anything
+    /// under the root's `bet` line) has an all-but-empty reach vector (no
+    /// two survivors to compute a spread from, so it's filtered out too)
+    /// and is both meaningless to compare and reproducibly crashes
+    /// `SolProvider::solve_river` (`river_resolve_config` builds a `Range`
+    /// with every weight clamped to ~0, and `build_postflop_game` panics
+    /// with "ranges share no compatible combos") -- a pre-existing
+    /// limitation of the re-solve path when asked to navigate to an
+    /// effectively-unreachable node, out of scope for this test to fix, but
+    /// worth steering around here rather than tripping over by accident.
+    /// The one spread-passing line this fixture has (facing a turn bet,
+    /// where OOP's call/fold split genuinely depends on hand strength)
+    /// checks out beautifully (aggregate diffs several orders of magnitude
+    /// under tolerance) -- exactly the well-identified case this test is
+    /// meant to validate.
+    #[test]
+    #[ignore = "slow unoptimized; CI runs it in release with --include-ignored"]
+    fn river_resolve_accuracy() {
+        let (solver, start_street, summary) = build_and_solve::<F32Storage>(TINY_TURN_TOML, 3000);
+        let path = temp_path("river-accuracy.sol");
+        let spec = SolExportSpec {
+            path: path.clone(),
+            mode: SolStreets::NoRivers,
+            config_toml: TINY_TURN_TOML.to_string(),
+            storage_name: "f32".to_string(),
+        };
+        export_sol(&spec, &solver, start_street, &summary).expect("export");
+
+        let loaded = load_sol(&path, 2000, Some(0.002)).expect("load");
+        let mut provider = SolProvider::new(&loaded);
+
+        let tree = &solver.game().tree;
+        let streets = node_streets(tree, start_street);
+        let parents = parent_array(tree);
+        let root_ranges = &solver.game().root_ranges;
+        let root_slices = PerPlayer::new(
+            root_ranges[Player::P0].as_slice(),
+            root_ranges[Player::P1].as_slice(),
+        );
+        // River-entry nodes: Action nodes on the river street whose parent
+        // is a Chance node -- the same definition `SolProvider::river_entry_for`
+        // walks toward, applied directly here since we already have the
+        // trunk's own `streets`/`parents` in hand. For each, compute the
+        // acting player's reach up front (cheap: `reach_at` is one pass over
+        // the short path to the node), then keep only nodes whose reach
+        // vector has genuine per-hand *spread* among the hands that are
+        // both originally in range and still card-compatible with this
+        // node's board (i.e. `min`/`max` computed only over survivors of
+        // card removal, so a river card that happens to block a few combos
+        // doesn't get mistaken for real strategic differentiation): this is
+        // this test's own doc comment's filter, discovered empirically to
+        // cleanly separate this fixture's two lines -- every "check-check"
+        // river entry has *zero* spread (every surviving hand reaches with
+        // identical probability, root's own check decision being pure) vs.
+        // the "bet-call" line's ~0.013 spread (a genuinely hand-dependent
+        // call/fold split upstream).
+        let mut candidates: Vec<(NodeId, Vec<f32>, f64)> = Vec::new();
+        for id in 0..tree.nodes.len() as NodeId {
+            let node = *tree.node(id);
+            if node.kind != NodeKind::Action || streets[id as usize] != Street::River {
+                continue;
+            }
+            let parent = parents[id as usize];
+            if parent == NodeId::MAX || tree.node(parent).kind != NodeKind::Chance {
+                continue;
+            }
+            let reach = reach_at(tree, root_slices, id, |aid, _sref, out| {
+                out.copy_from_slice(&solver.average_strategy_at(aid));
+            });
+            let acting_reach = reach[node.player].clone();
+            let reach_sum: f64 = acting_reach.iter().map(|&r| f64::from(r)).sum();
+            let root_full = root_slices[node.player];
+            let mut min = f64::INFINITY;
+            let mut max = f64::NEG_INFINITY;
+            for h in 0..acting_reach.len() {
+                if root_full[h] <= 0.5 || acting_reach[h] <= 1e-6 {
+                    continue;
+                }
+                let v = f64::from(acting_reach[h]);
+                min = min.min(v);
+                max = max.max(v);
+            }
+            if max - min <= 0.005 {
+                continue;
+            }
+            candidates.push((id, acting_reach, reach_sum));
+        }
+        assert!(
+            candidates.len() >= 3,
+            "expected at least 3 river-entry nodes with genuine per-hand reach spread, found {}",
+            candidates.len()
+        );
+
+        // Sample a spread across the filtered candidates (first, last, and
+        // evenly spaced in between) rather than only whichever nodes happen
+        // to sort first by id.
+        let sample_count = 4.min(candidates.len());
+        let mut sample_idx: Vec<usize> = Vec::new();
+        for i in 0..sample_count {
+            sample_idx.push(i * (candidates.len() - 1) / (sample_count - 1).max(1));
+        }
+        sample_idx.dedup();
+
+        let mut max_per_action_diff = 0.0f32;
+        let mut max_aggregate_diff = 0.0f32;
+
+        for &idx in &sample_idx {
+            let (entry, ref acting_reach, reach_sum) = candidates[idx];
+            let node = *tree.node(entry);
+            let sref = tree.storage_ref(&node);
+            let num_actions = sref.num_actions as usize;
+            let num_hands = sref.num_hands as usize;
+            assert_eq!(acting_reach.len(), num_hands);
+
+            let sol_avg = provider
+                .average_strategy(entry)
+                .expect("provider river re-solve query");
+            let trunk_avg = solver.average_strategy_at(entry);
+            assert_eq!(sol_avg.len(), trunk_avg.len());
+
+            // The re-solve's own strategy must be a valid per-hand
+            // distribution -- a cheap stand-in for "the cached RiverSolve
+            // actually converged" without exposing any new public API to
+            // re-derive its `nash_conv` from outside this module.
+            for h in 0..num_hands {
+                let sum: f32 = (0..num_actions).map(|a| sol_avg[a * num_hands + h]).sum();
+                assert!(
+                    (sum - 1.0).abs() < 1e-3,
+                    "entry {entry} hand {h}: re-solved column sums to {sum}, expected 1.0"
+                );
+            }
+
+            let mut agg_diff = vec![0.0f64; num_actions];
+            for h in 0..num_hands {
+                let r = f64::from(acting_reach[h]);
+                for a in 0..num_actions {
+                    let sol_p = sol_avg[a * num_hands + h];
+                    let trunk_p = trunk_avg[a * num_hands + h];
+                    agg_diff[a] += r * f64::from(sol_p - trunk_p);
+                    if r >= 1e-3 {
+                        let diff = (sol_p - trunk_p).abs();
+                        max_per_action_diff = max_per_action_diff.max(diff);
+                        assert!(
+                            diff <= 0.15,
+                            "entry {entry} hand {h} action {a}: reach={r:.4} sol={sol_p:.4} \
+                             trunk={trunk_p:.4} diff={diff:.4} exceeds 0.15"
+                        );
+                    }
+                }
+            }
+            for (a, diff_sum) in agg_diff.iter().enumerate() {
+                let diff = (diff_sum / reach_sum).abs() as f32;
+                max_aggregate_diff = max_aggregate_diff.max(diff);
+                assert!(
+                    diff <= 0.03,
+                    "entry {entry} action {a}: reach-weighted diff {diff:.4} exceeds 0.03"
+                );
+            }
+        }
+
+        eprintln!(
+            "river_resolve_accuracy: sampled {} of {} candidate entries, \
+             max_per_action_diff={max_per_action_diff:.8}, max_aggregate_diff={max_aggregate_diff:.8}",
+            sample_idx.len(),
+            candidates.len(),
+        );
+
         let _ = std::fs::remove_file(&path);
     }
 }
