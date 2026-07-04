@@ -15,3 +15,12 @@ hand-index = { workspace = true }
 [dev-dependencies]
 cfr-ref = { workspace = true }
 rayon = { workspace = true }
+criterion = { workspace = true }
+
+[[bench]]
+name = "kernels"
+harness = false
+
+[[bench]]
+name = "solve"
+harness = false
