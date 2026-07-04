@@ -152,6 +152,56 @@ fn raked_game_is_not_zero_sum_and_asymmetric() {
 }
 
 #[test]
+fn zero_sum_flag_tracks_pipeline() {
+    // Builders must set CompiledGame::zero_sum from
+    // PayoffPipeline::is_zero_sum: unraked chip EV and unraked HU ICM are
+    // exactly zero-sum after baking (baseline-relative payoffs), any
+    // value-taking rake is not.
+    assert!(game::kuhn(chip_ev(&NoRake)).game.zero_sum);
+    let rake = PercentCapRake {
+        rate: 0.10,
+        cap: 1.0,
+        no_flop_no_drop: false,
+    };
+    assert!(!game::kuhn(chip_ev(&rake)).game.zero_sum);
+    let icm = Icm {
+        payouts: [100.0, 60.0],
+    };
+    assert!(
+        game::kuhn(PayoffPipeline {
+            rake: &NoRake,
+            utility: &icm,
+        })
+        .game
+        .zero_sum
+    );
+}
+
+#[test]
+fn zero_sum_fast_path_matches_general_sum_accounting() {
+    // With zero_sum set, exploitability() derives P1's expected value as
+    // -EV(P0) instead of a second tree walk. That shortcut must agree with
+    // the full general-sum accounting (direct EV for both players) to
+    // within the same float noise the zero-sum invariant tests allow.
+    let solver = solve(
+        game::leduc(chip_ev(&NoRake)),
+        Box::new(Dcfr::default()),
+        500,
+    );
+    assert!(solver.game().zero_sum);
+    let expl = solver.exploitability();
+    for p in [Player::P0, Player::P1] {
+        let direct = solver.best_response_value(p) - solver.expected_value(p);
+        assert!(
+            (expl[p] - direct).abs() < 1e-6,
+            "fast-path exploitability diverged from direct accounting for {p:?}: \
+             {} vs {direct}",
+            expl[p]
+        );
+    }
+}
+
+#[test]
 fn pure_hu_icm_solve_matches_chip_ev_solve() {
     // Malmuth-Harville ICM with two players is affine in stacks, so the
     // solved strategy must match the chip-EV strategy. This validates the

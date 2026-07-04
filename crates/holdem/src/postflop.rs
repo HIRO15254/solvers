@@ -338,6 +338,7 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         _ => unreachable!(),
     };
 
+    let zero_sum = pipeline.is_zero_sum();
     let mut builder = Builder {
         config,
         pipeline,
@@ -440,6 +441,7 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
             evaluator,
             root_ranges: ranges,
             normalizer,
+            zero_sum,
         },
         node_info,
     }

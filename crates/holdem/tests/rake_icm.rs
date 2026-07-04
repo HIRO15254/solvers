@@ -172,6 +172,36 @@ fn small_river_config() -> PostflopConfig {
     }
 }
 
+/// The postflop builder must propagate `PayoffPipeline::is_zero_sum` into
+/// `CompiledGame::zero_sum`, which gates the engine's exploitability fast
+/// path (deriving P1's EV as -P0's). Unraked chip EV and unraked HU ICM
+/// qualify; any value-taking rake must not.
+#[test]
+fn postflop_builder_sets_zero_sum_flag() {
+    let config = small_river_config();
+    assert!(build_postflop_game(&config, chip_ev()).game.zero_sum);
+
+    let icm = Icm {
+        payouts: [100.0, 60.0],
+    };
+    let icm_pipeline = PayoffPipeline {
+        rake: &NoRake,
+        utility: &icm,
+    };
+    assert!(build_postflop_game(&config, icm_pipeline).game.zero_sum);
+
+    let raked = PercentCapRake {
+        rate: 0.05,
+        cap: 1e9,
+        no_flop_no_drop: false,
+    };
+    let raked_pipeline = PayoffPipeline {
+        rake: &raked,
+        utility: &ChipEv,
+    };
+    assert!(!build_postflop_game(&config, raked_pipeline).game.zero_sum);
+}
+
 /// A percentage rake taken at every terminal (uncapped in practice: `cap` is
 /// far above any pot this config can reach) must leak value in aggregate:
 /// `ev_p0 + ev_p1` is the negative of the range-weighted average rake taken,

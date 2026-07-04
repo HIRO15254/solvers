@@ -20,6 +20,8 @@ virtual workspace 化、CI(fmt/clippy/test)、`LICENSE-POLICY.md`。`cards`(型�
 `I16Storage`;hot kernel の asm 監査と必要箇所のみ `wide` SIMD(multi-accumulator reduction);criterion 3betpotFAST ハーネス。`formats` v1(SolveConfig TOML + blake3 hash、`.ckpt` autosave/resume、schema_version);JSONL メトリクス + plot script;`bench` A/B ハーネス(初顧客として HsDcfr 追加);**PyO3 最初のスライス**(`.sol` → NodeReport → numpy)。
 **Exit:** bar 達成 — 0.1%-pot で ≤45 s @6T、≤1.3 GB f32 / ≤700 MB i16;i16 ≡ f32(許容内);kill -9 → resume が中断なしランを再現(損失 ≤5 分);config+seed で完全再現;1 コマンドで DCFR vs CFR+ vs HS-DCFR 収束プロット;notebook で 13×13 heatmap 描画。
 
+> **M3 進捗メモ(2026-07)**: `I16Storage`(node 毎 f32 scale、i16 ≡ f32 一致テスト・状態 round-trip 込み)と checkpoint 基盤(`SolverState`/`StorageState`、serde feature)は完了。`formats` crate(blake3 config hash、`.ckpt` codec、JSONL メトリクス)+ CLI `resume`/`bench`/metrics + plot script は本スライスで実施中。**明示的に後送り**: PyO3 スライス(`.sol` 確定後の M5 側で実施)、criterion 3betpotFAST ハーネスと hot kernel の asm 監査 + `wide` SIMD(ベンチ bar 計測とセットで別スライス)。
+
 ## M4 — Rake / ICM / general-sum 検証(週 14–17)
 `PercentCap`(no-flop-no-drop)+ `GgPreflopRake`;`Icm`(memoized Malmuth–Harville ≤15 人);zero-sum fast path(`is_zero_sum_affine`)。
 **Exit:** 不変量 — 純 HU-ICM ≡ cEV(アフィン等価);ICM 総和 = prize pool;raked solve で既知の定性変化(defender のコール減、trash bet 頻度増、per-player exploitability の非対称化);NL50(5%/4bb)vs NL500(5%/0.6bb)で有意に異なる戦略。

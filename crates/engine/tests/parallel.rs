@@ -117,6 +117,9 @@ fn build_game() -> CompiledGame<FixedEvaluator> {
         evaluator: FixedEvaluator { terminals },
         root_ranges: PerPlayer::new(vec![1.0; DIM], vec![1.0; DIM]),
         normalizer: (DIM * (DIM - 1)) as f64,
+        // Arbitrary fixed payoffs, no zero-sum guarantee: keep the full
+        // general-sum accounting.
+        zero_sum: false,
     }
 }
 

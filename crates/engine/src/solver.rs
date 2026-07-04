@@ -27,6 +27,12 @@ pub struct CompiledGame<E> {
     pub root_ranges: PerPlayer<Vec<f32>>,
     /// Total joint reach weight of compatible root hand pairs.
     pub normalizer: f64,
+    /// True when baked terminal utilities are exactly zero-sum (set by
+    /// builders from `PayoffPipeline::is_zero_sum`). Enables deriving P1's
+    /// expected value as -P0's instead of a second walk — an optimization,
+    /// never an assumption: raked games leave it false and get the full
+    /// general-sum accounting.
+    pub zero_sum: bool,
 }
 
 /// Thresholds controlling rayon fan-out over chance-node children.
@@ -237,9 +243,15 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     /// asymmetric; for zero-sum games the sum is NashConv and half the sum
     /// is the conventional exploitability.
     pub fn exploitability(&self) -> PerPlayer<f64> {
+        let ev0 = self.expected_value(Player::P0);
+        let ev1 = if self.game.zero_sum {
+            -ev0
+        } else {
+            self.expected_value(Player::P1)
+        };
         PerPlayer::new(
-            self.best_response_value(Player::P0) - self.expected_value(Player::P0),
-            self.best_response_value(Player::P1) - self.expected_value(Player::P1),
+            self.best_response_value(Player::P0) - ev0,
+            self.best_response_value(Player::P1) - ev1,
         )
     }
 

@@ -152,6 +152,7 @@ pub fn build_toy_game(spec: &ToyGameSpec, pipeline: PayoffPipeline<'_>) -> ToyGa
             },
             root_ranges: PerPlayer::new(vec![1.0; spec.deck], vec![1.0; spec.deck]),
             normalizer: street_norm,
+            zero_sum: builder.pipeline.is_zero_sum(),
         },
         node_info: builder.node_info,
     }
