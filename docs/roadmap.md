@@ -31,6 +31,8 @@ virtual workspace 化、CI(fmt/clippy/test)、`LICENSE-POLICY.md`。`cards`(型�
 **Exit:** M2 ベンチ solve の artifact が checkpoint の <10% サイズで browse 可能、river 再 solve レイテンシ <2 s;UPI スクリプト(build_tree/go/show_strategy/calc_ev)がテキストファイルから end-to-end 動作;既存 MIT UPI wrapper が対応 subset を無改造で駆動。
 
 > **前倒し完了分(2026-07、M3 より先行)**: CLI の postflop 配線(TOML config・build 前メモリ見積り表示・`--history` 限定 JSON export)、`inspect` REPL(node ナビゲーション、13×13 ANSI カラーグリッドでの戦略頻度・レンジ・equity 表示、combo 詳細)、`report` 複数ボード CSV(頻度/EV/equity/NashConv)、`holdem::aggregate`(169 クラス集計)+ `holdem::range_equity`。`.sol` artifact と lazy re-solve は M3(formats/checkpoint)後に実施。
+>
+> **M5 進捗(2026-07)**: `.sol` artifact 完了 — `formats::sol` codec(u16 固定小数点戦略ブロック + 埋め込み config TOML + キャッシュ済みメタデータ、hash 検証)、`engine::reach`(parent 配列 / reach_at / pair_subtrees)、`holdem::viewer`(node_streets / 履歴リプレイ / river config 再構成 + **常時実行の構造同一性ガードテスト**)、CLI `solve --sol` / `inspect --sol`(NoRivers lazy river re-solve、entry 毎キャッシュ、iso 併合クラスは代表カード `Td*` 表記)。**注意**: reach 加重 fresh subgame re-solve は trunk の river 戦略の近似(標準的な viewer artifact 手法、`holdem::viewer` モジュール doc 参照)。UPI 互換 subset の拡充と aggregate CSV の flop-subset 対応は残タスク。
 
 ## M6 — Mode B: preflop・公開品質まで(週 20–30)
 `preflop`: 169-hand trunk;`EquityShowdown`(数分で全 preflop solve — 配管検証)→ `SolvedFlopSubset`(重み付き 25/49/**95/184** flop subset、per-flop disk cache、warm start、flop 間並列、resumable 長時間ラン運用);ICM utility を end-to-end 接続;MCCFR driver(external sampling + Linear 重み + batched 早期 discount + negative-regret pruning)+ `abstraction` の EHS² baseline。
