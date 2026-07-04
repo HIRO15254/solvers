@@ -33,6 +33,12 @@ pub trait RakeModel: Send + Sync {
     /// Rake in fractional chips (cap rules produce fractions of a chip when
     /// pots are expressed in small units).
     fn rake(&self, t: &TerminalDescriptor) -> f64;
+
+    /// True when this model never takes anything (enables the zero-sum
+    /// fast path together with UtilityModel::is_zero_sum_affine).
+    fn is_free(&self) -> bool {
+        false
+    }
 }
 
 pub struct NoRake;
@@ -40,6 +46,10 @@ pub struct NoRake;
 impl RakeModel for NoRake {
     fn rake(&self, _t: &TerminalDescriptor) -> f64 {
         0.0
+    }
+
+    fn is_free(&self) -> bool {
+        true
     }
 }
 
@@ -153,6 +163,12 @@ pub struct PayoffPipeline<'a> {
 }
 
 impl PayoffPipeline<'_> {
+    /// True when baked terminal utilities are exactly zero-sum: a free rake
+    /// model and an affine (equal-slope) utility.
+    pub fn is_zero_sum(&self) -> bool {
+        self.rake.is_free() && self.utility.is_zero_sum_affine()
+    }
+
     pub fn bake(&self, t: &TerminalDescriptor) -> BakedPayoffs {
         let baseline = self.utility.utility(&t.stacks_before.map(|c| c.as_f64()));
         let outcome_utility = |share: PerPlayer<f64>| -> PerPlayer<f64> {
@@ -254,5 +270,96 @@ mod tests {
         let slope = (100.0 - 60.0) / 200.0;
         assert!((baked.win_p0[Player::P0] - 10.0 * slope).abs() < 1e-12);
         assert!((baked.win_p1[Player::P0] + 10.0 * slope).abs() < 1e-12);
+    }
+
+    #[test]
+    fn is_zero_sum_matches_free_rake_and_affine_utility() {
+        let icm = Icm {
+            payouts: [100.0, 60.0],
+        };
+        let gg = GgPreflopRake {
+            rate: 0.05,
+            cap: 3.0,
+            exempt_pot: Chips(4),
+        };
+        let percent_cap = PercentCapRake {
+            rate: 0.05,
+            cap: 3.0,
+            no_flop_no_drop: false,
+        };
+
+        assert!(
+            PayoffPipeline {
+                rake: &NoRake,
+                utility: &ChipEv,
+            }
+            .is_zero_sum(),
+            "no rake + chip EV must be zero-sum"
+        );
+        assert!(
+            !PayoffPipeline {
+                rake: &percent_cap,
+                utility: &ChipEv,
+            }
+            .is_zero_sum(),
+            "a rake that takes chips breaks zero-sum"
+        );
+        assert!(
+            PayoffPipeline {
+                rake: &NoRake,
+                utility: &icm,
+            }
+            .is_zero_sum(),
+            "HU ICM is affine, so an unraked ICM game is still zero-sum"
+        );
+        assert!(
+            !PayoffPipeline {
+                rake: &gg,
+                utility: &ChipEv,
+            }
+            .is_zero_sum(),
+            "GG-style preflop rake is not free"
+        );
+    }
+
+    #[test]
+    fn gg_preflop_rake_semantics() {
+        let gg = GgPreflopRake {
+            rate: 0.1,
+            cap: 2.0,
+            exempt_pot: Chips(4),
+        };
+        // At or below the exempt pot (e.g. a walk): no rake, even though the
+        // hand ended preflop.
+        assert_eq!(gg.rake(&showdown_terminal(4, (2, 2))), 0.0);
+        // Above the exempt pot: min(rate * pot, cap).
+        let below_cap = showdown_terminal(10, (5, 5));
+        assert!((gg.rake(&below_cap) - 1.0).abs() < 1e-12); // 0.1 * 10 = 1.0
+        let above_cap = showdown_terminal(100, (50, 50));
+        assert_eq!(gg.rake(&above_cap), 2.0); // 0.1 * 100 = 10, capped at 2.0
+    }
+
+    #[test]
+    fn icm_conserves_prize_pool_across_stack_splits() {
+        // For any stack split, the two ICM utilities must sum to
+        // payouts[0] + payouts[1]: the prize pool is fully distributed
+        // between exactly two remaining players.
+        let icm = Icm {
+            payouts: [100.0, 60.0],
+        };
+        for (s0, s1) in [
+            (1.0, 199.0),
+            (50.0, 150.0),
+            (100.0, 100.0),
+            (150.0, 50.0),
+            (199.0, 1.0),
+        ] {
+            let u = icm.utility(&PerPlayer::new(s0, s1));
+            let total = u[Player::P0] + u[Player::P1];
+            assert!(
+                (total - 160.0).abs() < 1e-9,
+                "stacks ({s0}, {s1}): utilities summed to {total}, want 160.0"
+            );
+        }
     }
 }

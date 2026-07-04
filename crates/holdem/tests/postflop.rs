@@ -689,6 +689,7 @@ fn untracked_node_info_stays_empty() {
 /// order (the transition's backward sum vs sequential branch accumulation),
 /// so the tolerance is a float-noise bound, not an exploitability bound.
 #[test]
+#[ignore = "slow unoptimized; CI runs it in release with --include-ignored"]
 fn iso_quotient_matches_full_tree_per_hand() {
     let board = parse_cards("2s 7s Ks 2h");
     let ranges = PerPlayer::new(
@@ -759,6 +760,7 @@ fn iso_quotient_matches_full_tree_per_hand() {
 /// suit-permuted copies of one strategy — the symmetry the quotient encodes
 /// structurally. Uses the clubs<->diamonds swap that stabilizes the board.
 #[test]
+#[ignore = "slow unoptimized; CI runs it in release with --include-ignored"]
 fn member_branch_matches_suit_permuted_rep_branch() {
     let board = parse_cards("2s 7s Ks 2h");
     let ranges = PerPlayer::new(
