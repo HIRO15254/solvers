@@ -147,7 +147,9 @@ fn default_alpha() -> f64 {
 fn default_gamma() -> f64 {
     3.0
 }
-fn default_gamma0() -> f64 {
+/// `pub(crate)` (rather than private) so `bench` can build an `HsDcfr`
+/// section with the same default `gamma0` the config schema would use.
+pub(crate) fn default_gamma0() -> f64 {
     30.0
 }
 fn default_true() -> bool {
@@ -161,6 +163,11 @@ pub struct RunSection {
     /// Exploitability check cadence, in iterations.
     #[serde(default = "default_check_every")]
     pub check_every: u64,
+    /// Storage backend for regrets/strategy sums. `f32` is the plain
+    /// backend; `i16` is the quantized backend (see `engine::I16Storage`),
+    /// trading precision for ~4x less memory on large postflop trees.
+    #[serde(default)]
+    pub storage: StorageKind,
     /// Stop once NashConv (sum of per-player exploitabilities, in chips per
     /// deal) drops below this.
     pub target_nash_conv: Option<f64>,
@@ -175,4 +182,16 @@ pub struct RunSection {
 
 fn default_check_every() -> u64 {
     25
+}
+
+/// Which `engine::Storage` backend a solve uses. Chosen once from the
+/// config (`[run] storage = "f32" | "i16"`) and threaded through as a
+/// generic parameter, so the solve path never pays for a `dyn` indirection
+/// on the hot per-hand loop just to support both backends.
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[serde(rename_all = "kebab-case")]
+pub enum StorageKind {
+    #[default]
+    F32,
+    I16,
 }

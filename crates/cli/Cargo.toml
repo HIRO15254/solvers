@@ -12,7 +12,8 @@ path = "src/main.rs"
 
 [dependencies]
 cards = { workspace = true }
-engine = { workspace = true }
+engine = { workspace = true, features = ["serde"] }
+formats = { workspace = true }
 game = { workspace = true }
 holdem = { workspace = true }
 anyhow = { workspace = true }

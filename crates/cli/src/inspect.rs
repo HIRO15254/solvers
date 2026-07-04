@@ -81,7 +81,7 @@ pub fn run(
         schedule_name, run_cfg.iterations
     );
     let start = Instant::now();
-    crate::solve::run_loop(&mut solver, &run_cfg);
+    crate::solve::run_loop(&mut solver, &run_cfg, &mut crate::solve::RunHooks::none())?;
     let elapsed = start.elapsed();
     crate::solve::print_done(&solver, elapsed);
 

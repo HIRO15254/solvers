@@ -7,6 +7,7 @@ members = [
     "crates/engine",
     "crates/game",
     "crates/holdem",
+    "crates/formats",
     "crates/cli",
 ]
 
@@ -23,6 +24,7 @@ cfr-ref = { path = "crates/cfr-ref" }
 engine = { path = "crates/engine" }
 game = { path = "crates/game" }
 holdem = { path = "crates/holdem" }
+formats = { path = "crates/formats" }
 
 # NOTE: aya_poker's "std" feature is broken in 0.1.0 (aya_base gates no_std on
 # `cfg(std)` instead of `feature = "std"`), so we use the default no_std build.
@@ -37,6 +39,9 @@ clap = { version = "4", features = ["derive"] }
 rand = "0.8"
 rand_chacha = "0.3"
 criterion = "0.5"
+blake3 = "1"
+postcard = { version = "1", features = ["alloc"] }
+zstd = "0.13"
 
 [profile.release]
 lto = "thin"

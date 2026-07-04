@@ -1,0 +1,16 @@
+[package]
+name = "formats"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Checkpoint (.ckpt) and metrics (JSONL) file formats for solver runs, plus config-file hashing"
+
+[dependencies]
+engine = { workspace = true, features = ["serde"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+blake3 = { workspace = true }
+postcard = { workspace = true }
+zstd = { workspace = true }
