@@ -63,6 +63,11 @@ fn turn_config() -> PostflopConfig {
             turn: PerPlayer::new(vec![0.75], vec![0.75]),
             river: PerPlayer::new(vec![1.0], vec![1.0]),
         },
+        raise_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![0.75], vec![0.75]),
+            river: PerPlayer::new(vec![1.0], vec![1.0]),
+        },
         max_raises: PerStreet {
             flop: 0,
             turn: 1,

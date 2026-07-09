@@ -68,9 +68,13 @@ pub struct PostflopConfig {
     pub pot: Chips,
     /// Chips behind for each player, at the start of the subgame.
     pub effective_stack: Chips,
-    /// Bet/raise sizes as fractions of the current pot, per street per
-    /// player.
+    /// Bet sizes (no outstanding bet to face) as fractions of the current
+    /// pot, per street per player.
     pub bet_fractions: PerStreet<PerPlayer<Vec<f64>>>,
+    /// Raise sizes (facing an outstanding bet) as fractions of the pot after
+    /// a call, per street per player. Always populated; callers that want the
+    /// classic shared-size behaviour copy `bet_fractions` here.
+    pub raise_fractions: PerStreet<PerPlayer<Vec<f64>>>,
     /// Maximum number of bets+raises per street.
     pub max_raises: PerStreet<u32>,
     /// Merge turn/river deals into suit-isomorphism classes. The default
@@ -91,6 +95,7 @@ impl Default for PostflopConfig {
             pot: Chips::ZERO,
             effective_stack: Chips::ZERO,
             bet_fractions: PerStreet::default(),
+            raise_fractions: PerStreet::default(),
             max_raises: PerStreet::default(),
             iso_merging: true,
             track_node_info: true,
@@ -288,8 +293,13 @@ fn raise_targets(state: &LineState, config: &PostflopConfig) -> Vec<Chips> {
     if behind <= state.outstanding {
         return Vec::new();
     }
+    let fractions = if state.outstanding == Chips::ZERO {
+        &config.bet_fractions[state.street][actor]
+    } else {
+        &config.raise_fractions[state.street][actor]
+    };
     let mut seen: Vec<Chips> = Vec::new();
-    for &fraction in &config.bet_fractions[state.street][actor] {
+    for &fraction in fractions {
         let pot_after_call = pot_now + state.outstanding;
         let raw = (fraction * pot_after_call.as_f64()).round() as u32;
         let extra = Chips(raw.max(1)).min(behind - state.outstanding);

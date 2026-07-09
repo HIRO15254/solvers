@@ -324,6 +324,11 @@ fn iso_on_off_converge_to_same_value() {
             turn: PerPlayer::new(vec![0.75], vec![0.75]),
             river: PerPlayer::new(vec![], vec![]),
         },
+        raise_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![0.75], vec![0.75]),
+            river: PerPlayer::new(vec![], vec![]),
+        },
         max_raises: PerStreet {
             flop: 0,
             turn: 1,
@@ -385,6 +390,11 @@ fn asymmetric_ranges_suppress_iso_merging() {
         pot: Chips(2),
         effective_stack: Chips(20),
         bet_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![0.75], vec![0.75]),
+            river: PerPlayer::new(vec![], vec![]),
+        },
+        raise_fractions: PerStreet {
             flop: PerPlayer::new(vec![], vec![]),
             turn: PerPlayer::new(vec![0.75], vec![0.75]),
             river: PerPlayer::new(vec![], vec![]),
@@ -459,6 +469,11 @@ fn flop_solve_is_zero_sum() {
             turn: PerPlayer::new(vec![], vec![]),
             river: PerPlayer::new(vec![0.5], vec![0.5]),
         },
+        raise_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![], vec![]),
+            river: PerPlayer::new(vec![0.5], vec![0.5]),
+        },
         max_raises: PerStreet {
             flop: 0,
             turn: 0,
@@ -500,6 +515,11 @@ fn allin_runout_matches_direct_equity() {
             // the 1-chip stack, i.e. any bet is an all-in bet.
             river: PerPlayer::new(vec![5.0], vec![5.0]),
         },
+        raise_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![], vec![]),
+            river: PerPlayer::new(vec![5.0], vec![5.0]),
+        },
         max_raises: PerStreet {
             flop: 0,
             turn: 0,
@@ -531,6 +551,11 @@ fn memory_usage_matches_allocated() {
         pot: Chips(4),
         effective_stack: Chips(20),
         bet_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![], vec![]),
+            river: PerPlayer::new(vec![0.5], vec![0.5]),
+        },
+        raise_fractions: PerStreet {
             flop: PerPlayer::new(vec![], vec![]),
             turn: PerPlayer::new(vec![], vec![]),
             river: PerPlayer::new(vec![0.5], vec![0.5]),
@@ -576,6 +601,11 @@ fn smoke_solve_3bet_pot() {
         pot: Chips(200),
         effective_stack: Chips(725),
         bet_fractions: PerStreet {
+            flop: bet_55(),
+            turn: bet_55(),
+            river: bet_55(),
+        },
+        raise_fractions: PerStreet {
             flop: bet_55(),
             turn: bet_55(),
             river: bet_55(),
@@ -658,6 +688,11 @@ fn untracked_node_info_stays_empty() {
             turn: PerPlayer::new(vec![0.75], vec![0.75]),
             river: PerPlayer::new(vec![], vec![]),
         },
+        raise_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![0.75], vec![0.75]),
+            river: PerPlayer::new(vec![], vec![]),
+        },
         max_raises: PerStreet {
             flop: 0,
             turn: 1,
@@ -702,6 +737,11 @@ fn iso_quotient_matches_full_tree_per_hand() {
         pot: Chips(2),
         effective_stack: Chips(20),
         bet_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![0.75], vec![0.75]),
+            river: PerPlayer::new(vec![1.0], vec![1.0]),
+        },
+        raise_fractions: PerStreet {
             flop: PerPlayer::new(vec![], vec![]),
             turn: PerPlayer::new(vec![0.75], vec![0.75]),
             river: PerPlayer::new(vec![1.0], vec![1.0]),
@@ -773,6 +813,11 @@ fn member_branch_matches_suit_permuted_rep_branch() {
         pot: Chips(2),
         effective_stack: Chips(20),
         bet_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![], vec![]),
+            river: PerPlayer::new(vec![1.0], vec![1.0]),
+        },
+        raise_fractions: PerStreet {
             flop: PerPlayer::new(vec![], vec![]),
             turn: PerPlayer::new(vec![], vec![]),
             river: PerPlayer::new(vec![1.0], vec![1.0]),
@@ -849,6 +894,11 @@ fn i16_storage_matches_f32_on_small_turn_spot() {
             turn: PerPlayer::new(vec![0.75], vec![0.75]),
             river: PerPlayer::new(vec![], vec![]),
         },
+        raise_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![0.75], vec![0.75]),
+            river: PerPlayer::new(vec![], vec![]),
+        },
         max_raises: PerStreet {
             flop: 0,
             turn: 1,
@@ -888,5 +938,139 @@ fn i16_storage_matches_f32_on_small_turn_spot() {
     assert!(
         (nash_conv_f32 - nash_conv_i16).abs() < 2e-3,
         "NashConv diverged: f32={nash_conv_f32} i16={nash_conv_i16}"
+    );
+}
+
+/// `raise_fractions` sizes a raise off the pot after a call, independently
+/// of `bet_fractions` (which only sizes a bet with no outstanding bet to
+/// face) -- reads the action amounts straight off `node_info`, the same
+/// history/action-label pattern `clairvoyance_game_matches_closed_form` in
+/// `river.rs` uses. Pot 4, `bet_fractions = [0.5]` sizes the root bet to
+/// `0.5 * 4 = 2`; facing that bet, `raise_fractions = [1.0]` sizes the
+/// raise's additional amount to `1.0 * (pot + 2*bet) = 1.0 * (4 + 4) = 8`,
+/// landing the total commitment at `2 + 8 = 10`.
+#[test]
+fn raise_fractions_size_independently_of_bet_fractions() {
+    let board = parse_cards("2c 7d 9h Js Qs");
+    let ranges = PerPlayer::new(
+        "AA".parse::<Range>().unwrap(),
+        "KK".parse::<Range>().unwrap(),
+    );
+    let config = PostflopConfig {
+        board,
+        ranges,
+        pot: Chips(4),
+        effective_stack: Chips(100),
+        bet_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![], vec![]),
+            river: PerPlayer::new(vec![0.5], vec![0.5]),
+        },
+        raise_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![], vec![]),
+            river: PerPlayer::new(vec![1.0], vec![1.0]),
+        },
+        max_raises: PerStreet {
+            flop: 0,
+            turn: 0,
+            river: 2,
+        },
+        iso_merging: true,
+        track_node_info: true,
+    };
+    let game = build_postflop_game(&config, chip_ev());
+
+    let root = game.node_by_history("").expect("root history");
+    let root_tag = game.game.tree.tags[root as usize] as usize;
+    assert!(
+        game.node_info[root_tag]
+            .actions
+            .contains(&"bet 2".to_string()),
+        "root actions: {:?}",
+        game.node_info[root_tag].actions
+    );
+
+    let facing_bet = game.node_by_history("b2").expect("facing-bet history");
+    let facing_tag = game.game.tree.tags[facing_bet as usize] as usize;
+    assert!(
+        game.node_info[facing_tag]
+            .actions
+            .contains(&"raise to 10".to_string()),
+        "facing-bet actions: {:?}",
+        game.node_info[facing_tag].actions
+    );
+}
+
+/// When `raise_fractions` equals `bet_fractions`, the tree is identical
+/// (same node count, same action amounts) to the pre-split single-list
+/// behaviour, since the raise then reuses the bet's own fraction: additional
+/// = `0.5 * (pot + 2*bet) = 0.5 * (4 + 4) = 4`, landing the total commitment
+/// at `2 + 4 = 6`. A distinct raise fraction (`1.0`, as in the test above)
+/// changes that amount but not the tree's shape -- node count depends only
+/// on how many distinct fractions each list holds, not their values.
+#[test]
+fn matching_raise_and_bet_fractions_reproduce_shared_size_tree() {
+    let board = parse_cards("2c 7d 9h Js Qs");
+    let ranges = PerPlayer::new(
+        "AA".parse::<Range>().unwrap(),
+        "KK".parse::<Range>().unwrap(),
+    );
+    let bet_fractions = PerStreet {
+        flop: PerPlayer::new(vec![], vec![]),
+        turn: PerPlayer::new(vec![], vec![]),
+        river: PerPlayer::new(vec![0.5], vec![0.5]),
+    };
+    let max_raises = PerStreet {
+        flop: 0,
+        turn: 0,
+        river: 2,
+    };
+    let shared_config = PostflopConfig {
+        board: board.clone(),
+        ranges: ranges.clone(),
+        pot: Chips(4),
+        effective_stack: Chips(100),
+        bet_fractions: bet_fractions.clone(),
+        raise_fractions: bet_fractions.clone(),
+        max_raises: max_raises.clone(),
+        iso_merging: true,
+        track_node_info: true,
+    };
+    let shared_game = build_postflop_game(&shared_config, chip_ev());
+
+    let distinct_config = PostflopConfig {
+        board,
+        ranges,
+        pot: Chips(4),
+        effective_stack: Chips(100),
+        bet_fractions: bet_fractions.clone(),
+        raise_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![], vec![]),
+            river: PerPlayer::new(vec![1.0], vec![1.0]),
+        },
+        max_raises,
+        iso_merging: true,
+        track_node_info: true,
+    };
+    let distinct_game = build_postflop_game(&distinct_config, chip_ev());
+
+    assert_eq!(
+        shared_game.game.tree.nodes.len(),
+        distinct_game.game.tree.nodes.len(),
+        "raise fraction value must not change tree shape"
+    );
+
+    let facing_bet = shared_game
+        .node_by_history("b2")
+        .expect("facing-bet history");
+    let facing_tag = shared_game.game.tree.tags[facing_bet as usize] as usize;
+    assert!(
+        shared_game.node_info[facing_tag]
+            .actions
+            .contains(&"raise to 6".to_string()),
+        "facing-bet actions: {:?}",
+        shared_game.node_info[facing_tag].actions
     );
 }

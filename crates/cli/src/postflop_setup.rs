@@ -46,6 +46,41 @@ pub fn build_postflop_config(
     let ip = parse_range("ip_range", ip_range)?;
     let ranges = PerPlayer::new(oop, ip);
 
+    // Raise sizes fall back to the matching bet sizes when the TOML omits
+    // `oop_raise`/`ip_raise`, so pre-existing configs keep the classic
+    // shared-size tree unchanged.
+    let raise_fractions = PerStreet {
+        flop: PerPlayer::new(
+            bets.flop
+                .oop_raise
+                .clone()
+                .unwrap_or_else(|| bets.flop.oop.clone()),
+            bets.flop
+                .ip_raise
+                .clone()
+                .unwrap_or_else(|| bets.flop.ip.clone()),
+        ),
+        turn: PerPlayer::new(
+            bets.turn
+                .oop_raise
+                .clone()
+                .unwrap_or_else(|| bets.turn.oop.clone()),
+            bets.turn
+                .ip_raise
+                .clone()
+                .unwrap_or_else(|| bets.turn.ip.clone()),
+        ),
+        river: PerPlayer::new(
+            bets.river
+                .oop_raise
+                .clone()
+                .unwrap_or_else(|| bets.river.oop.clone()),
+            bets.river
+                .ip_raise
+                .clone()
+                .unwrap_or_else(|| bets.river.ip.clone()),
+        ),
+    };
     let bet_fractions = PerStreet {
         flop: PerPlayer::new(bets.flop.oop, bets.flop.ip),
         turn: PerPlayer::new(bets.turn.oop, bets.turn.ip),
@@ -63,6 +98,7 @@ pub fn build_postflop_config(
         pot: Chips(pot),
         effective_stack: Chips(effective_stack),
         bet_fractions,
+        raise_fractions,
         max_raises,
         iso_merging,
         track_node_info: true,

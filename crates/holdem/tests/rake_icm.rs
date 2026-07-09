@@ -51,6 +51,11 @@ fn small_turn_config() -> PostflopConfig {
             turn: PerPlayer::new(vec![0.75], vec![0.75]),
             river: PerPlayer::new(vec![1.0], vec![1.0]),
         },
+        raise_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![0.75], vec![0.75]),
+            river: PerPlayer::new(vec![1.0], vec![1.0]),
+        },
         max_raises: PerStreet {
             flop: 0,
             turn: 1,
@@ -163,6 +168,11 @@ fn small_river_config() -> PostflopConfig {
             turn: PerPlayer::new(vec![], vec![]),
             river: PerPlayer::new(vec![0.5], vec![0.5]),
         },
+        raise_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![], vec![]),
+            river: PerPlayer::new(vec![0.5], vec![0.5]),
+        },
         max_raises: PerStreet {
             flop: 0,
             turn: 0,
@@ -263,6 +273,11 @@ fn clairvoyance_config() -> PostflopConfig {
         pot: Chips(2),
         effective_stack: Chips(2),
         bet_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![], vec![]),
+            river: PerPlayer::new(vec![1.0], vec![]),
+        },
+        raise_fractions: PerStreet {
             flop: PerPlayer::new(vec![], vec![]),
             turn: PerPlayer::new(vec![], vec![]),
             river: PerPlayer::new(vec![1.0], vec![]),

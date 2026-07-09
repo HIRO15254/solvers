@@ -317,7 +317,7 @@ pub fn river_entry_state(
 /// 1]` factors, per [`engine::reach_at`]'s contract: strategy-column
 /// probabilities and `Mask`/`Transition` weights, none of which ever push a
 /// product outside `[0, 1]`; clamped defensively against float rounding at
-/// the boundary regardless), river bet menu and raise cap copied from
+/// the boundary regardless), river bet/raise menus and raise cap copied from
 /// `trunk` (the only street the fresh subgame ever plays), flop/turn menus
 /// left empty (moot: a river-start board has no chance nodes), `iso_merging:
 /// false` (also moot, for the same reason — nothing left to merge with no
@@ -345,6 +345,11 @@ pub fn river_resolve_config(
             flop: PerPlayer::new(Vec::new(), Vec::new()),
             turn: PerPlayer::new(Vec::new(), Vec::new()),
             river: trunk.bet_fractions.river.clone(),
+        },
+        raise_fractions: PerStreet {
+            flop: PerPlayer::new(Vec::new(), Vec::new()),
+            turn: PerPlayer::new(Vec::new(), Vec::new()),
+            river: trunk.raise_fractions.river.clone(),
         },
         max_raises: PerStreet {
             flop: 0,
