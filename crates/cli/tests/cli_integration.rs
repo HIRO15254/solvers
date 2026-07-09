@@ -646,3 +646,44 @@ fn preflop_pushfold_solve_smoke() {
     );
     assert!(stdout2.contains("root:"), "stdout: {stdout2}");
 }
+
+// --- [game.postflop] bucketed model: error path only ------------------------
+//
+// A cold bucketed solve builds a full-street EHS² abstraction (~10 minutes
+// in release mode), which is far past what should run automatically here --
+// see `examples/preflop_hu_100bb_bucketed.toml`'s own note; the orchestrator
+// validates that config end-to-end manually. This test only exercises the
+// fast, no-build error path: `model` validation runs before any equity
+// table, abstraction, or artifact work starts, so it fails immediately.
+#[test]
+fn preflop_bucketed_unsupported_model_errors() {
+    let dir = temp_dir("preflop-bucketed-bad-model");
+    let config_text = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 10.0
+open_sizes_bb = []
+raise_factors = []
+max_raises = 1
+allow_limp = false
+
+[game.postflop]
+model = "unsupported-model"
+
+[run]
+iterations = 1
+"#;
+    let config = dir.join("bad_model.toml");
+    std::fs::write(&config, config_text).unwrap();
+
+    let output = run_solvers(&["solve", config.to_str().unwrap()]);
+    assert!(
+        !output.status.success(),
+        "an unsupported game.postflop.model must fail the solve"
+    );
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("unsupported-model") && stderr.contains("bucketed"),
+        "expected an error naming the bad value and the supported one, got: {stderr}"
+    );
+}

@@ -11,6 +11,7 @@ name = "solvers"
 path = "src/main.rs"
 
 [dependencies]
+abstraction = { workspace = true }
 cards = { workspace = true }
 engine = { workspace = true, features = ["serde"] }
 formats = { workspace = true }

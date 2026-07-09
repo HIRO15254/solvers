@@ -77,7 +77,68 @@ pub enum GameSection {
         /// recomputes it in memory every run.
         #[serde(default)]
         equity_cache: Option<PathBuf>,
+        /// Optional bucketed blueprint postflop model. Absence of the whole
+        /// section keeps today's behavior: the 169-class trunk's
+        /// continuations resolve via `preflop::EquityShowdown`, with no
+        /// postflop betting tree at all.
+        #[serde(default)]
+        postflop: Option<PostflopSection>,
     },
+}
+
+/// `[game.postflop]`: extends the preflop trunk with a bucketed blueprint
+/// postflop model (`abstraction::Ehs2Abstraction` + `BlueprintArtifacts`,
+/// wired through `preflop::build_blueprint_game`).
+///
+/// Bucket-count defaults (50/20/8) are deliberately coarser on later
+/// streets: the deliverable of this model is preflop ranges, so turn/river
+/// fidelity is traded for tree storage and artifact build time.
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields, rename_all = "kebab-case")]
+pub struct PostflopSection {
+    /// Postflop model kind. Validated at solve time (not parse time) so the
+    /// error message can name the one supported value; only `"bucketed"` is
+    /// implemented.
+    pub model: String,
+    #[serde(default = "default_flop_buckets")]
+    pub flop_buckets: u32,
+    #[serde(default = "default_turn_buckets")]
+    pub turn_buckets: u32,
+    #[serde(default = "default_river_buckets")]
+    pub river_buckets: u32,
+    /// Pot-fraction bet/raise sizes on the flop, same for both players.
+    #[serde(default)]
+    pub bets_flop: Vec<f64>,
+    /// Pot-fraction bet/raise sizes on the turn, same for both players.
+    #[serde(default)]
+    pub bets_turn: Vec<f64>,
+    /// Pot-fraction bet/raise sizes on the river, same for both players.
+    #[serde(default)]
+    pub bets_river: Vec<f64>,
+    #[serde(default = "default_postflop_max_raises")]
+    pub max_raises: u32,
+    #[serde(default = "default_true")]
+    pub include_allin: bool,
+    /// Disk cache path for the EHS² bucket abstraction.
+    #[serde(default)]
+    pub abstraction_cache: Option<PathBuf>,
+    /// Disk cache path for the derived blueprint artifacts (T1/T2/T3
+    /// transitions plus river bucket-vs-bucket equity).
+    #[serde(default)]
+    pub artifacts_cache: Option<PathBuf>,
+}
+
+fn default_flop_buckets() -> u32 {
+    50
+}
+fn default_turn_buckets() -> u32 {
+    20
+}
+fn default_river_buckets() -> u32 {
+    8
+}
+fn default_postflop_max_raises() -> u32 {
+    2
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -278,6 +339,7 @@ iterations = 10
                 bb_range,
                 equity_realization,
                 equity_cache,
+                postflop,
             } => {
                 assert_eq!(effective_stack_bb, 100.0);
                 assert_eq!(sb_bb, 0.5);
@@ -290,6 +352,7 @@ iterations = 10
                 assert_eq!(bb_range, None);
                 assert_eq!(equity_realization, [1.0, 1.0]);
                 assert_eq!(equity_cache, None);
+                assert!(postflop.is_none());
             }
             other => panic!("expected GameSection::Preflop, got {other:?}"),
         }
@@ -330,6 +393,7 @@ iterations = 10
                 bb_range,
                 equity_realization,
                 equity_cache,
+                postflop,
             } => {
                 assert_eq!(effective_stack_bb, 10.0);
                 assert_eq!(sb_bb, 0.5);
@@ -345,6 +409,7 @@ iterations = 10
                     equity_cache,
                     Some(PathBuf::from(".cache/preflop_equity.bin"))
                 );
+                assert!(postflop.is_none());
             }
             other => panic!("expected GameSection::Preflop, got {other:?}"),
         }
@@ -365,6 +430,132 @@ iterations = 10
         assert!(
             result.is_err(),
             "an unknown field in a preflop config must fail to parse"
+        );
+    }
+
+    // --- [game.postflop] (bucketed blueprint model) -------------------------
+
+    #[test]
+    fn postflop_section_absent_by_default() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+
+[run]
+iterations = 10
+"#;
+        let config: SolveConfig =
+            toml::from_str(raw).expect("parse preflop config without [game.postflop]");
+        match config.game {
+            GameSection::Preflop { postflop, .. } => {
+                assert!(postflop.is_none());
+            }
+            other => panic!("expected GameSection::Preflop, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn postflop_section_parses_fully_specified() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+
+[game.postflop]
+model = "bucketed"
+flop-buckets = 40
+turn-buckets = 15
+river-buckets = 6
+bets-flop = [0.5]
+bets-turn = [0.75]
+bets-river = [0.75, 1.0]
+max-raises = 3
+include-allin = false
+abstraction-cache = ".cache/ehs2.bin"
+artifacts-cache = ".cache/blueprint.bin"
+
+[run]
+iterations = 10
+"#;
+        let config: SolveConfig =
+            toml::from_str(raw).expect("parse fully-specified [game.postflop]");
+        match config.game {
+            GameSection::Preflop { postflop, .. } => {
+                let section = postflop.expect("postflop section must be present");
+                assert_eq!(section.model, "bucketed");
+                assert_eq!(section.flop_buckets, 40);
+                assert_eq!(section.turn_buckets, 15);
+                assert_eq!(section.river_buckets, 6);
+                assert_eq!(section.bets_flop, vec![0.5]);
+                assert_eq!(section.bets_turn, vec![0.75]);
+                assert_eq!(section.bets_river, vec![0.75, 1.0]);
+                assert_eq!(section.max_raises, 3);
+                assert!(!section.include_allin);
+                assert_eq!(
+                    section.abstraction_cache,
+                    Some(PathBuf::from(".cache/ehs2.bin"))
+                );
+                assert_eq!(
+                    section.artifacts_cache,
+                    Some(PathBuf::from(".cache/blueprint.bin"))
+                );
+            }
+            other => panic!("expected GameSection::Preflop, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn postflop_section_defaults() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+
+[game.postflop]
+model = "bucketed"
+
+[run]
+iterations = 10
+"#;
+        let config: SolveConfig = toml::from_str(raw).expect("parse minimal [game.postflop]");
+        match config.game {
+            GameSection::Preflop { postflop, .. } => {
+                let section = postflop.expect("postflop section must be present");
+                assert_eq!(section.model, "bucketed");
+                assert_eq!(section.flop_buckets, 50);
+                assert_eq!(section.turn_buckets, 20);
+                assert_eq!(section.river_buckets, 8);
+                assert!(section.bets_flop.is_empty());
+                assert!(section.bets_turn.is_empty());
+                assert!(section.bets_river.is_empty());
+                assert_eq!(section.max_raises, 2);
+                assert!(section.include_allin);
+                assert_eq!(section.abstraction_cache, None);
+                assert_eq!(section.artifacts_cache, None);
+            }
+            other => panic!("expected GameSection::Preflop, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn postflop_section_rejects_unknown_field() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+
+[game.postflop]
+model = "bucketed"
+typo_field = 1
+
+[run]
+iterations = 10
+"#;
+        let result: Result<SolveConfig, _> = toml::from_str(raw);
+        assert!(
+            result.is_err(),
+            "an unknown field in [game.postflop] must fail to parse"
         );
     }
 }

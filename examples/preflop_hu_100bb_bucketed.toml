@@ -1,0 +1,44 @@
+# Heads-up 100bb preflop, extended with the bucketed blueprint postflop
+# model: the 169-class trunk (2.5x open, 3x/2.5x reraises, up to 4 raises,
+# limp allowed) continues into EHS² bucket-space postflop betting instead of
+# the plain equity-showdown continuation model.
+#
+# Bucket counts (50/20/8) are deliberately coarser on later streets: the
+# deliverable here is PREFLOP ranges, so turn/river fidelity is traded for
+# tree storage and artifact build time (see `docs/blueprint-design.md`).
+#
+# NOTE: a cold run builds the EHS² abstraction and blueprint artifacts from
+# scratch, which takes on the order of 10 minutes in release mode (the
+# `abstraction-cache`/`artifacts-cache` paths make reruns instant). This is
+# why there is no automated end-to-end CLI test over this config -- CI runs
+# every `#[ignore]`d test in release via `--include-ignored`, and a 10-minute
+# cold build would blow that budget. The orchestrator validates this config
+# end-to-end manually instead.
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+open_sizes_bb = [2.5]
+raise_factors = [[3.0], [2.5]]
+max_raises = 4
+allow_limp = true
+equity_cache = ".cache/preflop_equity.bin"
+
+[game.postflop]
+model = "bucketed"
+flop-buckets = 50
+turn-buckets = 20
+river-buckets = 8
+bets-flop = [0.5]
+bets-turn = [0.75]
+bets-river = [0.75]
+max-raises = 2
+include-allin = true
+abstraction-cache = ".cache/ehs2_50_20_8.bin"
+artifacts-cache = ".cache/blueprint_50_20_8.bin"
+
+[algorithm]
+schedule = "dcfr"
+
+[run]
+iterations = 2000
+check_every = 100
