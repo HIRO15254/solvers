@@ -1,0 +1,20 @@
+[package]
+name = "preflop"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+cards.workspace = true
+engine.workspace = true
+game.workspace = true
+hand-index.workspace = true
+rayon.workspace = true
+serde.workspace = true
+postcard.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+rand.workspace = true
+rand_chacha.workspace = true

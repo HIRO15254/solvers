@@ -7,6 +7,7 @@ members = [
     "crates/engine",
     "crates/game",
     "crates/holdem",
+    "crates/preflop",
     "crates/formats",
     "crates/cli",
 ]
@@ -24,6 +25,7 @@ cfr-ref = { path = "crates/cfr-ref" }
 engine = { path = "crates/engine" }
 game = { path = "crates/game" }
 holdem = { path = "crates/holdem" }
+preflop = { path = "crates/preflop" }
 formats = { path = "crates/formats" }
 
 # NOTE: aya_poker's "std" feature is broken in 0.1.0 (aya_base gates no_std on
