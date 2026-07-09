@@ -1,0 +1,22 @@
+[package]
+name = "engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Hot core: public game tree, regret/strategy storage, discount schedules, vector-form CFR, accelerated best response"
+
+[dependencies]
+cards = { workspace = true }
+rayon = { workspace = true }
+serde = { workspace = true, optional = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[features]
+serde = ["dep:serde"]
+
+[[bench]]
+name = "storage"
+harness = false

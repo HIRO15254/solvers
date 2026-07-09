@@ -1,0 +1,11 @@
+[package]
+name = "cards"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Card, chip, and range primitives shared by all solver crates"
+
+[dependencies]
+aya_poker = { workspace = true }
+thiserror = { workspace = true }

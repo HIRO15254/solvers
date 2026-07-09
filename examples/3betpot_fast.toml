@@ -1,0 +1,47 @@
+# 100bb 3-bet-pot flop spot (chips-x10 units), sized for the M5 bench-bar
+# recipe in docs/bench.md: single-raised action on the flop (one bet size,
+# one re-raise), a single bet size and no re-raise on turn/river. Calibrated
+# with `holdem::memory_usage` to land the f32 storage estimate between 1.0
+# and 1.4 GB (the bench bar's window at this scale) -- see docs/bench.md's
+# "Bench bar" section for the calibration recipe and what to record when
+# re-running this after a solver change.
+#
+# Deviation from a "two flop sizes" 3-bet-pot menu: [0.33, 1.0] x max_raises
+# 2 on the flop alone overshoots to ~3.1 GB f32 (and a single size at
+# max_raises 1 undershoots below 1.0 GB); one flop size at max_raises 2 is
+# the smallest tweak that lands in the window while keeping real bet+raise
+# escalation on every street. Range choice does not move the estimate at
+# this board (chance-node fan-out and node/element counts are governed by
+# the board length and bet grammar, not by which combos carry weight), so
+# both ranges are picked for realism, not to hit the target.
+[game]
+kind = "postflop"
+board = "Qs Jh 2h"
+oop_range = "TT+,AQs+,AQo+,A5s-A4s,KQs"
+ip_range = "JJ-22,AQs-A2s,KQs-KTs,QJs-QTs,JTs,T9s,98s,AQo-ATo,KQo"
+pot = 200
+effective_stack = 900
+
+[game.bets.flop]
+oop = [0.75]
+ip = [0.75]
+max_raises = 2
+
+[game.bets.turn]
+oop = [0.75]
+ip = [0.75]
+max_raises = 1
+
+[game.bets.river]
+oop = [0.75]
+ip = [0.75]
+max_raises = 1
+
+[algorithm]
+schedule = "dcfr"
+
+[run]
+iterations = 1000
+check_every = 100
+target_nash_conv = 0.2
+threads = 6

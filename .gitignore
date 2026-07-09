@@ -1,2 +1,6 @@
 /target
 /.idea
+*.ckpt
+*.sol
+/runs
+__pycache__/

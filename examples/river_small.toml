@@ -1,0 +1,19 @@
+# River-only subgame: 1,326-combo full-width solve but a single street, so it
+# converges in ~seconds even in a debug build. Used by the CLI's inspect/report
+# integration tests, which must stay fast.
+[game]
+kind = "postflop"
+board = "2c 7d 9h Js Qs"
+oop_range = "22+,A2s+,KTo+"
+ip_range = "55-22,QJs,A5s-A2s,KQo,T9s"
+pot = 10
+effective_stack = 50
+
+[game.bets.river]
+oop = [0.5]
+ip = [0.5]
+max_raises = 2
+
+[run]
+iterations = 200
+check_every = 50

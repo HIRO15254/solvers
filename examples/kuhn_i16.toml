@@ -1,0 +1,13 @@
+# Kuhn poker with the quantized i16 storage backend (see engine::I16Storage):
+# checks that the quantized backend still converges and that its
+# StorageState::I16 checkpoint variant round-trips.
+[game]
+kind = "kuhn"
+
+[algorithm]
+schedule = "dcfr"
+
+[run]
+iterations = 20000
+check_every = 2000
+storage = "i16"

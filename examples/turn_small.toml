@@ -1,0 +1,26 @@
+# Small turn subgame: tiny ranges, one bet size per street, single raise cap.
+# Solves in seconds even in a debug build.
+[game]
+kind = "postflop"
+board = "2c 7d 9h Js"
+oop_range = "AA,QQ,JJ,AKs"
+ip_range = "KK,TT,AQs,KQs"
+pot = 20
+effective_stack = 80
+
+[game.bets.turn]
+oop = [1.0]
+ip = [1.0]
+max_raises = 1
+
+[game.bets.river]
+oop = [1.0]
+ip = [1.0]
+max_raises = 1
+
+[algorithm]
+schedule = "dcfr"
+
+[run]
+iterations = 400
+check_every = 100
