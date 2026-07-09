@@ -630,12 +630,16 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
 }
 
 /// Read-only context threaded through [`value_pass`].
-struct ValueCtx<'w, E, S> {
-    tree: &'w PublicTree,
-    evaluator: &'w E,
-    storage: &'w S,
-    p: Player,
-    par: ParConfig,
+///
+/// `pub(crate)` so [`crate::mccfr::McSolver`] can reuse `ev_pass`/`br_pass`
+/// for exact evaluation of its average strategy instead of duplicating the
+/// walk.
+pub(crate) struct ValueCtx<'w, E, S> {
+    pub(crate) tree: &'w PublicTree,
+    pub(crate) evaluator: &'w E,
+    pub(crate) storage: &'w S,
+    pub(crate) p: Player,
+    pub(crate) par: ParConfig,
 }
 
 /// Shared walk for expected-value and best-response computation: `p`'s own
@@ -775,7 +779,7 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C>(
 }
 
 /// Expected values for `p` when both players play their average strategy.
-fn ev_pass<E: TerminalEvaluator, S: Storage>(
+pub(crate) fn ev_pass<E: TerminalEvaluator, S: Storage>(
     ctx: &ValueCtx<'_, E, S>,
     scratch: &mut Scratch,
     node_id: NodeId,
@@ -801,7 +805,7 @@ fn ev_pass<E: TerminalEvaluator, S: Storage>(
 /// Best-response values for `p` against the opponent's average strategy:
 /// per-hand max over actions (Johanson-style accelerated best response —
 /// every hero hand is maximized simultaneously in one walk).
-fn br_pass<E: TerminalEvaluator, S: Storage>(
+pub(crate) fn br_pass<E: TerminalEvaluator, S: Storage>(
     ctx: &ValueCtx<'_, E, S>,
     scratch: &mut Scratch,
     node_id: NodeId,
