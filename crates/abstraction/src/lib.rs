@@ -19,9 +19,11 @@
 //! does the Waugh perfect-hash index for compact cache keys — until then,
 //! canonical boards (suit-isomorphism representatives) key everything.
 
+mod blueprint;
 mod buckets;
 mod ehs;
 
+pub use blueprint::{BlueprintArtifacts, BlueprintCacheError, BucketEquity, TransitionTable};
 pub use buckets::{BucketCacheError, Ehs2Abstraction, Ehs2Params};
 pub use ehs::{ehs2, hand_strength};
 
