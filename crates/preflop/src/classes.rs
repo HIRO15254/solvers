@@ -112,7 +112,7 @@ mod tests {
     fn combo_counts_are_6_4_12() {
         let counts = class_combo_counts();
         assert_eq!(counts.iter().map(|&c| c as u64).sum::<u64>(), 1326);
-        for class in 0..NUM_CLASSES {
+        for (class, &count) in counts.iter().enumerate() {
             let row = class / 13;
             let col = class % 13;
             let expected = if row == col {
@@ -122,7 +122,7 @@ mod tests {
             } else {
                 12
             };
-            assert_eq!(counts[class], expected, "class {}", class_label(class));
+            assert_eq!(count, expected, "class {}", class_label(class));
         }
     }
 
