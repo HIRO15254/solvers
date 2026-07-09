@@ -243,18 +243,22 @@ pub fn build_preflop_game(
 /// betting recursion spec). `contrib` starts at the blinds, `last_raise_to`
 /// at `bb` (so the first raise's minimum is `2 * bb`), `prev_raise_to` at
 /// zero.
+///
+/// `pub(crate)`: reused verbatim by `crate::bucketed`, which builds its own
+/// `Builder` over the same enumeration (trunk convention — see that module's
+/// docs).
 #[derive(Clone)]
-struct LineState {
-    to_act: Player,
-    contrib: PerPlayer<Chips>,
-    raises_used: u32,
-    last_raise_to: Chips,
-    prev_raise_to: Chips,
-    bb_option: bool,
-    history: String,
+pub(crate) struct LineState {
+    pub(crate) to_act: Player,
+    pub(crate) contrib: PerPlayer<Chips>,
+    pub(crate) raises_used: u32,
+    pub(crate) last_raise_to: Chips,
+    pub(crate) prev_raise_to: Chips,
+    pub(crate) bb_option: bool,
+    pub(crate) history: String,
 }
 
-fn root_line_state(config: &PreflopConfig) -> LineState {
+pub(crate) fn root_line_state(config: &PreflopConfig) -> LineState {
     LineState {
         to_act: Player::P0,
         contrib: PerPlayer::new(config.sb, config.bb),
@@ -269,7 +273,9 @@ fn root_line_state(config: &PreflopConfig) -> LineState {
 /// The shape of the non-raise actions offered at `state`: shared between the
 /// real builder and the memory-usage dry run so they cannot disagree about
 /// which of {Check, Fold+Limp, Fold+Call} applies.
-enum BaseActions {
+///
+/// `pub(crate)`: see [`LineState`].
+pub(crate) enum BaseActions {
     /// Nothing outstanding (only the BB-option node after a limp): Check.
     Check,
     /// Facing a bet as the SB's opening action with the blind not yet
@@ -279,7 +285,7 @@ enum BaseActions {
     FoldThenCall,
 }
 
-fn base_actions(state: &LineState, config: &PreflopConfig) -> BaseActions {
+pub(crate) fn base_actions(state: &LineState, config: &PreflopConfig) -> BaseActions {
     let opp = state.to_act.opponent();
     let outstanding = state.contrib[opp] - state.contrib[state.to_act];
     if outstanding == Chips::ZERO {
@@ -300,7 +306,9 @@ fn base_actions(state: &LineState, config: &PreflopConfig) -> BaseActions {
 /// between the real builder and the memory-usage dry run (see the type
 /// docs' betting recursion spec for the derivation of `min_to` and the
 /// per-level sizing).
-fn raise_targets(state: &LineState, config: &PreflopConfig) -> Vec<Chips> {
+///
+/// `pub(crate)`: see [`LineState`].
+pub(crate) fn raise_targets(state: &LineState, config: &PreflopConfig) -> Vec<Chips> {
     let opp = state.to_act.opponent();
     if state.raises_used >= config.max_raises || state.contrib[opp] >= config.effective_stack {
         return Vec::new();
@@ -333,7 +341,10 @@ fn raise_targets(state: &LineState, config: &PreflopConfig) -> Vec<Chips> {
 /// `Σ_{h,o} R0(h) * R1(o) * compat(h, o)`, computed in f64 straight from
 /// `compat_counts`/`class_combo_counts` (full ranges must give exactly
 /// `1,624,350`, see `classes::total_disjoint_pairs`).
-fn normalizer(root_ranges: &PerPlayer<[f32; NUM_CLASSES]>) -> f64 {
+///
+/// `pub(crate)`: reused by `crate::bucketed`, whose root is the same 169
+/// class space (see [`LineState`]).
+pub(crate) fn normalizer(root_ranges: &PerPlayer<[f32; NUM_CLASSES]>) -> f64 {
     let counts = classes::compat_counts();
     let combo_counts = classes::class_combo_counts();
     let mut total = 0f64;

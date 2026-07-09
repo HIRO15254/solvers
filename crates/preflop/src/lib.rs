@@ -52,11 +52,15 @@
 //! factor). `SolvedFlopSubset` and bucketed MCCFR models will extend the
 //! seam in later M6 slices.
 
+mod bucketed;
 mod classes;
 mod equity;
 mod evaluator;
 mod model;
 mod trunk;
+
+pub use bucketed::memory_usage as blueprint_memory_usage;
+pub use bucketed::{BlueprintEvaluator, BlueprintGame, PostflopBets, build_blueprint_game};
 
 pub use classes::{
     class_combo_counts, class_combos, class_label, class_mass, compat_counts, total_disjoint_pairs,
