@@ -362,13 +362,24 @@ fn mccfr_pass<E: TerminalEvaluator, S: Storage>(
             let deal = *ctx.tree.deal(&node, chosen);
             let child = node.first_child + chosen as u32;
 
-            let mut my_next = scratch.take(my_reach.len());
-            let mut opp_next = scratch.take(opp_reach.len());
+            // The sampled deal's own maps decide the child dimensions (a
+            // `Transition` may change them — see `PublicTree::mapped_dim`
+            // and `ReachMap`'s doc comment), so these must come from `deal`,
+            // not from `my_reach`/`opp_reach`'s own (parent) lengths.
+            let my_dim = ctx.tree.mapped_dim(deal.maps[ctx.p], my_reach.len() as u32) as usize;
+            let opp_dim = ctx
+                .tree
+                .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
+                as usize;
+            let mut my_next = scratch.take(my_dim);
+            let mut opp_next = scratch.take(opp_dim);
             ctx.tree
                 .map_reach_into(deal.maps[ctx.p], my_reach, &mut my_next);
             ctx.tree
                 .map_reach_into(deal.maps[ctx.p.opponent()], opp_reach, &mut opp_next);
-            let mut child_out = scratch.take(my_reach.len());
+            // Child values live in the mapped my-space: same length as
+            // `my_next`.
+            let mut child_out = scratch.take(my_dim);
             mccfr_pass(
                 ctx,
                 storage,

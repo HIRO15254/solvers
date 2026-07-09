@@ -418,8 +418,21 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                     .enumerate()
                     .map_init(Scratch::new, |scratch, (pos, (child, mut view))| {
                         let deal = *ctx.tree.deal(&node, pos);
-                        let mut my_next = scratch.take(my_reach.len());
-                        let mut opp_next = scratch.take(opp_reach.len());
+                        // Each child's own deal maps decide its dimensions:
+                        // a `Transition` may change them, and different
+                        // deals off the same chance node may map into
+                        // different dimensions (see `PublicTree::mapped_dim`
+                        // and `ReachMap`'s doc comment), so these must come
+                        // from this child's `deal`, not from `my_reach`/
+                        // `opp_reach`'s own (parent) lengths.
+                        let my_dim =
+                            ctx.tree.mapped_dim(deal.maps[ctx.p], my_reach.len() as u32) as usize;
+                        let opp_dim = ctx
+                            .tree
+                            .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
+                            as usize;
+                        let mut my_next = scratch.take(my_dim);
+                        let mut opp_next = scratch.take(opp_dim);
                         ctx.tree
                             .map_reach_into(deal.maps[ctx.p], my_reach, &mut my_next);
                         ctx.tree.map_reach_into(
@@ -427,10 +440,9 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                             opp_reach,
                             &mut opp_next,
                         );
-                        // Sized to the mapped (child) dimension, which
-                        // by construction equals `my_reach.len()` (see
-                        // the sequential branch below).
-                        let mut child_out = scratch.take(my_reach.len());
+                        // Child values live in the mapped my-space: same
+                        // length as `my_next`.
+                        let mut child_out = scratch.take(my_dim);
                         cfr_pass(
                             ctx,
                             &mut view,
@@ -452,14 +464,13 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                         .accumulate_values(deal.maps[ctx.p], deal.weight, &child_out, out);
                 }
             } else {
-                // All deals off one chance node map into the same per-player
-                // dimension (masks always preserve it; transitions are
-                // assumed to by construction), so `my_next`/`opp_next`/
-                // `child_out` are sized once and reused across deals instead
-                // of round-tripping through the free list every iteration.
-                let mut my_next = scratch.take(my_reach.len());
-                let mut opp_next = scratch.take(opp_reach.len());
-                let mut child_out = scratch.take(my_reach.len());
+                // Different deals off the same chance node may map into
+                // different per-player dimensions (a `Transition` need not
+                // preserve dimension, and each deal carries its own maps —
+                // see `PublicTree::mapped_dim`), so `my_next`/`opp_next`/
+                // `child_out` are sized per deal and taken/put inside the
+                // loop instead of hoisted above it.
+                //
                 // See `ActionViews`: a deeper chance node still eligible to
                 // parallelize (`child_budget > 0`) could split whatever
                 // view a sibling deal is holding, so siblings need
@@ -469,16 +480,24 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                     ActionViews::split_for(storage, ctx.tree, node_id, None, child_budget);
                 for (pos, child) in ctx.tree.children(node_id).enumerate() {
                     let deal = *ctx.tree.deal(&node, pos);
+                    let my_dim =
+                        ctx.tree.mapped_dim(deal.maps[ctx.p], my_reach.len() as u32) as usize;
+                    let opp_dim = ctx
+                        .tree
+                        .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
+                        as usize;
+                    let mut my_next = scratch.take(my_dim);
+                    let mut opp_next = scratch.take(opp_dim);
                     ctx.tree
                         .map_reach_into(deal.maps[ctx.p], my_reach, &mut my_next);
                     ctx.tree
                         .map_reach_into(deal.maps[ctx.p.opponent()], opp_reach, &mut opp_next);
-                    // `child_out` is an out-param accumulator target for the
-                    // recursive call: Chance/opponent-Action children only add
-                    // into it (they rely on the caller starting them at zero),
-                    // so a reused buffer must be reset every iteration, not
-                    // just at the initial `take`.
-                    child_out.fill(0.0);
+                    // `child_out` is a fresh (already-zeroed by `take`)
+                    // out-param accumulator target for the recursive call:
+                    // Chance/opponent-Action children only add into it (they
+                    // rely on the caller starting them at zero). Same length
+                    // as `my_next`: child values live in the mapped my-space.
+                    let mut child_out = scratch.take(my_dim);
                     cfr_pass(
                         ctx,
                         views.child(pos),
@@ -491,10 +510,10 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                     );
                     ctx.tree
                         .accumulate_values(deal.maps[ctx.p], deal.weight, &child_out, out);
+                    scratch.put(child_out);
+                    scratch.put(opp_next);
+                    scratch.put(my_next);
                 }
-                scratch.put(child_out);
-                scratch.put(opp_next);
-                scratch.put(my_next);
             }
         }
         NodeKind::Action if node.player == ctx.p => {
@@ -664,7 +683,13 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C>(
             ctx.evaluator.eval(node.aux, ctx.p, opp_reach, out);
         }
         NodeKind::Chance => {
-            let my_dim = out.len();
+            // `out`'s dimension is this node's own (parent) p-space; each
+            // deal's own maps decide the *child* dimensions below (a
+            // `Transition` may change them, and different deals off the
+            // same chance node may map into different dimensions — see
+            // `PublicTree::mapped_dim` and `ReachMap`'s doc comment), so
+            // `out.len()` must not be reused to size `child_out`.
+            let parent_dim = out.len() as u32;
             // See the matching comment in `cfr_pass`: the budget decrements
             // at every chance node regardless of whether it parallelizes.
             let child_budget = par_budget.saturating_sub(1);
@@ -679,7 +704,12 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C>(
                     .enumerate()
                     .map_init(Scratch::new, |scratch, (pos, child)| {
                         let deal = *ctx.tree.deal(&node, pos);
-                        let mut opp_next = scratch.take(opp_reach.len());
+                        let opp_dim = ctx
+                            .tree
+                            .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
+                            as usize;
+                        let my_dim = ctx.tree.mapped_dim(deal.maps[ctx.p], parent_dim) as usize;
+                        let mut opp_next = scratch.take(opp_dim);
                         ctx.tree.map_reach_into(
                             deal.maps[ctx.p.opponent()],
                             opp_reach,
@@ -705,15 +735,21 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C>(
                         .accumulate_values(deal.maps[ctx.p], deal.weight, &child_out, out);
                 }
             } else {
-                let mut opp_next = scratch.take(opp_reach.len());
-                let mut child_out = scratch.take(my_dim);
+                // Sized per deal (see the comment above `parent_dim`), not
+                // hoisted, so `my_next`/`child_out` are taken and put inside
+                // the loop instead of once for the whole node.
                 for (pos, child) in ctx.tree.children(node_id).enumerate() {
                     let deal = *ctx.tree.deal(&node, pos);
+                    let opp_dim = ctx
+                        .tree
+                        .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
+                        as usize;
+                    let my_dim = ctx.tree.mapped_dim(deal.maps[ctx.p], parent_dim) as usize;
+                    let mut opp_next = scratch.take(opp_dim);
                     ctx.tree
                         .map_reach_into(deal.maps[ctx.p.opponent()], opp_reach, &mut opp_next);
-                    // Reused accumulator target: reset before every use (see
-                    // the matching comment in `cfr_pass`).
-                    child_out.fill(0.0);
+                    // Freshly taken (already zeroed by `take`) each deal.
+                    let mut child_out = scratch.take(my_dim);
                     value_pass(
                         ctx,
                         scratch,
@@ -725,9 +761,9 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C>(
                     );
                     ctx.tree
                         .accumulate_values(deal.maps[ctx.p], deal.weight, &child_out, out);
+                    scratch.put(child_out);
+                    scratch.put(opp_next);
                 }
-                scratch.put(child_out);
-                scratch.put(opp_next);
             }
         }
         NodeKind::Action if node.player == ctx.p => {
