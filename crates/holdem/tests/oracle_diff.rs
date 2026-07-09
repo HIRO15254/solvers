@@ -268,6 +268,11 @@ fn engine_game() -> holdem::PostflopGame {
                 turn: PerPlayer::new(vec![1.0], vec![1.0]),
                 river: PerPlayer::new(vec![1.0], vec![1.0]),
             },
+            raise_fractions: PerStreet {
+                flop: PerPlayer::new(vec![], vec![]),
+                turn: PerPlayer::new(vec![1.0], vec![1.0]),
+                river: PerPlayer::new(vec![1.0], vec![1.0]),
+            },
             max_raises: PerStreet {
                 flop: 0,
                 turn: 1,

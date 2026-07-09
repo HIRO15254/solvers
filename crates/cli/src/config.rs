@@ -155,12 +155,22 @@ pub struct BetsSection {
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct StreetBets {
-    /// Out-of-position bet/raise sizes, as fractions of the pot after a call.
+    /// Out-of-position bet sizes (no outstanding bet to face), as fractions
+    /// of the pot after a call.
     #[serde(default)]
     pub oop: Vec<f64>,
-    /// In-position bet/raise sizes, as fractions of the pot after a call.
+    /// In-position bet sizes (no outstanding bet to face), as fractions of
+    /// the pot after a call.
     #[serde(default)]
     pub ip: Vec<f64>,
+    /// Out-of-position raise sizes when facing a bet. Falls back to `oop`
+    /// when omitted.
+    #[serde(default)]
+    pub oop_raise: Option<Vec<f64>>,
+    /// In-position raise sizes when facing a bet. Falls back to `ip` when
+    /// omitted.
+    #[serde(default)]
+    pub ip_raise: Option<Vec<f64>>,
     #[serde(default = "default_max_raises")]
     pub max_raises: u32,
 }
@@ -170,6 +180,8 @@ impl Default for StreetBets {
         StreetBets {
             oop: Vec::new(),
             ip: Vec::new(),
+            oop_raise: None,
+            ip_raise: None,
             max_raises: default_max_raises(),
         }
     }
@@ -557,5 +569,42 @@ iterations = 10
             result.is_err(),
             "an unknown field in [game.postflop] must fail to parse"
         );
+    }
+
+    fn parse_bets(toml: &str) -> BetsSection {
+        #[derive(Deserialize)]
+        #[serde(deny_unknown_fields)]
+        struct Wrapper {
+            bets: BetsSection,
+        }
+        toml::from_str::<Wrapper>(toml).unwrap().bets
+    }
+
+    #[test]
+    fn oop_raise_and_ip_raise_parse() {
+        let bets = parse_bets(
+            r#"
+            [bets.flop]
+            oop = [0.5]
+            ip = [0.5]
+            oop_raise = [1.0]
+            ip_raise = [0.75]
+            "#,
+        );
+        assert_eq!(bets.flop.oop_raise, Some(vec![1.0]));
+        assert_eq!(bets.flop.ip_raise, Some(vec![0.75]));
+    }
+
+    #[test]
+    fn omitted_oop_raise_and_ip_raise_default_to_none() {
+        let bets = parse_bets(
+            r#"
+            [bets.flop]
+            oop = [0.5]
+            ip = [0.5]
+            "#,
+        );
+        assert_eq!(bets.flop.oop_raise, None);
+        assert_eq!(bets.flop.ip_raise, None);
     }
 }

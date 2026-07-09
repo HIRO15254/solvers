@@ -60,6 +60,11 @@ fn small_turn_config() -> PostflopConfig {
             turn: PerPlayer::new(vec![0.75], vec![0.75]),
             river: PerPlayer::new(vec![1.0], vec![1.0]),
         },
+        raise_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![0.75], vec![0.75]),
+            river: PerPlayer::new(vec![1.0], vec![1.0]),
+        },
         max_raises: PerStreet {
             flop: 0,
             turn: 1,
@@ -85,6 +90,11 @@ fn small_flop_config() -> PostflopConfig {
         pot: Chips(2),
         effective_stack: Chips(20),
         bet_fractions: PerStreet {
+            flop: PerPlayer::new(vec![0.5], vec![0.5]),
+            turn: PerPlayer::new(vec![0.5], vec![0.5]),
+            river: PerPlayer::new(vec![1.0], vec![1.0]),
+        },
+        raise_fractions: PerStreet {
             flop: PerPlayer::new(vec![0.5], vec![0.5]),
             turn: PerPlayer::new(vec![0.5], vec![0.5]),
             river: PerPlayer::new(vec![1.0], vec![1.0]),
@@ -330,6 +340,11 @@ fn fast_turn_config_for_solve() -> PostflopConfig {
         pot: Chips(2),
         effective_stack: Chips(20),
         bet_fractions: PerStreet {
+            flop: PerPlayer::new(vec![], vec![]),
+            turn: PerPlayer::new(vec![0.75], vec![0.75]),
+            river: PerPlayer::new(vec![], vec![]),
+        },
+        raise_fractions: PerStreet {
             flop: PerPlayer::new(vec![], vec![]),
             turn: PerPlayer::new(vec![0.75], vec![0.75]),
             river: PerPlayer::new(vec![], vec![]),

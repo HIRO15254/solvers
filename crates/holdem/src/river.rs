@@ -68,6 +68,13 @@ pub fn build_river_game(config: &RiverConfig, pipeline: PayoffPipeline<'_>) -> R
             turn: PerPlayer::new(Vec::new(), Vec::new()),
             river: config.bet_fractions.clone(),
         },
+        // `RiverConfig` predates the bet/raise split and only exposes one
+        // size list; keep the classic shared-size behaviour.
+        raise_fractions: PerStreet {
+            flop: PerPlayer::new(Vec::new(), Vec::new()),
+            turn: PerPlayer::new(Vec::new(), Vec::new()),
+            river: config.bet_fractions.clone(),
+        },
         max_raises: PerStreet {
             flop: 0,
             turn: 0,
