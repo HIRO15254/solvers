@@ -14,6 +14,22 @@
 //! are never counted); hand-vs-hand removal inside the bucketed streets is
 //! deliberately dropped — the standard blueprint approximation.
 //!
+//! Enumeration measures: T1 runs over the 1,755 canonical flops, T2 over
+//! the 63,193 canonical turns, T3 over the *lazy product* (canonical turn x
+//! 48 river cards) — the same joint counts as enumerating street-structured
+//! canonical rivers (each raw river appears exactly once, weighted by its
+//! turn's multiplicity) without materializing that ~2.17M-board list — and
+//! `river_equity` over the 134,459 canonical unordered 5-card sets (bucket
+//! assignment on a complete board is split-invariant; the river street
+//! table is keyed by that same quotient, see `buckets.rs`).
+//!
+//! NOTE: CI never runs the full-street [`BlueprintArtifacts::build`] — the
+//! turn-street EHS² scoring behind it alone takes minutes and the full
+//! tables run to hundreds of MB, past the CI budget. The ignored release
+//! test builds abstraction + artifacts from a moderate board *subset*
+//! instead and checks every invariant there; the full build is the
+//! documented user-invoked [`BlueprintArtifacts::load_or_build`] path.
+//!
 //! `kappa(h)` is defined as the full-range-weighted average compat mass
 //! (see [`kappa_per_class`]). Deviation from the original design sketch,
 //! confirmed by direct enumeration (`kappa_is_a_universal_constant` below):
@@ -30,7 +46,6 @@
 //! easy to get subtly wrong and the design explicitly asks for it to be
 //! derived from the `N(h, o)` table rather than assumed.
 
-use std::collections::HashMap;
 use std::io::Write;
 use std::path::Path;
 
@@ -38,15 +53,14 @@ use cards::{
     ALL_CARDS, Card, CardSet, HandRank, NUM_CLASSES, NUM_COMBOS, class_index, combo_cards, rank_of,
 };
 use hand_index::{
-    Board, SuitPerm, all_suit_perms, canonical_flops, canonicalize_board, permute_card,
-    permute_combo,
+    Board, SuitPerm, all_suit_perms, canonical_flops, canonicalize_board, permute_combo,
 };
 use rayon::prelude::*;
 
 use cards::Street;
 
 use crate::CardAbstraction;
-use crate::buckets::{Ehs2Abstraction, Ehs2Params, canonical_rivers, canonical_turns};
+use crate::buckets::{Ehs2Abstraction, Ehs2Params, canonical_river_sets, canonical_turns};
 
 /// Sparse row-major transition: `entries` are `(in_index, out_index,
 /// weight)` triples, at most one per pair, sorted by `(in, out)`.
@@ -154,56 +168,49 @@ fn kappa_per_class() -> [f64; NUM_CLASSES] {
     kappa
 }
 
-// --- unordered canonical 5-card river boards (reimplemented locally:
-// mirrors `preflop::equity::canonical_key`/`canonical_boards`, which
-// `abstraction` cannot import — layering) -------------------------------
+// --- hot-loop lookup tables ---------------------------------------------
 
-/// Canonical (suit-minimal) representative of an unordered 5-card set: the
-/// minimum, over all 24 suit permutations, of the sorted permuted card
-/// indices. Distinct from `hand_index::canonicalize_board`, which is
-/// street-structured (flop-as-set + ordered later cards) — here the whole
-/// board is one unordered 5-set, all `river_equity` needs since bucket
-/// assignment on a complete board is a function of the unordered 5-card set
-/// alone (verified by `river_bucket_invariant_to_street_split` below).
-fn river5_canonical_key(cards5: [Card; 5]) -> [u8; 5] {
-    let mut best = [u8::MAX; 5];
-    for perm in all_suit_perms() {
-        let mut mapped = [0u8; 5];
-        for (i, &c) in cards5.iter().enumerate() {
-            mapped[i] = permute_card(&perm, c).index() as u8;
-        }
-        mapped.sort_unstable();
-        if mapped < best {
-            best = mapped;
-        }
-    }
-    best
+/// Precomputed combo-index images of all 24 suit permutations, flat
+/// `[perm_index * NUM_COMBOS + combo]`. The T2/T3/river-equity inner loops
+/// map billions of combo indices through suit permutations; calling
+/// `permute_combo` there (two `combo_cards` decodes + re-encode per call)
+/// dominates the runtime, while this table turns each mapping into one
+/// array read. 24 x 1,326 u16 = 64KB, built once per counts pass.
+struct ComboPermTables {
+    perms: [SuitPerm; 24],
+    tables: Vec<u16>,
 }
 
-/// All 134,459 canonical unordered 5-card boards with raw multiplicities
-/// (summing to `C(52, 5) = 2,598,960`). Expensive (2.6M boards x 24 perms);
-/// only called from the full [`BlueprintArtifacts::build`] path.
-fn river5_boards() -> Vec<([Card; 5], u32)> {
-    let all: Vec<Card> = ALL_CARDS.into_iter().collect();
-    let mut counts: HashMap<[u8; 5], u32> = HashMap::with_capacity(140_000);
-    for i in 0..52 {
-        for j in (i + 1)..52 {
-            for k in (j + 1)..52 {
-                for l in (k + 1)..52 {
-                    for m in (l + 1)..52 {
-                        let board = [all[i], all[j], all[k], all[l], all[m]];
-                        let key = river5_canonical_key(board);
-                        *counts.entry(key).or_insert(0) += 1;
-                    }
-                }
+impl ComboPermTables {
+    fn new() -> Self {
+        let perms = all_suit_perms();
+        let mut tables = vec![0u16; 24 * NUM_COMBOS];
+        for (pi, perm) in perms.iter().enumerate() {
+            for combo in 0..NUM_COMBOS {
+                tables[pi * NUM_COMBOS + combo] = permute_combo(perm, combo) as u16;
             }
         }
+        ComboPermTables { perms, tables }
     }
-    counts
-        .into_iter()
-        .map(|(key, weight)| {
-            let board = std::array::from_fn(|idx| Card::from_index(key[idx]));
-            (board, weight)
+
+    /// The combo -> permuted-combo map of `perm`, indexed by combo.
+    fn map(&self, perm: &SuitPerm) -> &[u16] {
+        let pi = self
+            .perms
+            .iter()
+            .position(|p| p == perm)
+            .expect("not one of the 24 suit permutations");
+        &self.tables[pi * NUM_COMBOS..(pi + 1) * NUM_COMBOS]
+    }
+}
+
+/// Every combo's two cards as a `CardSet`, indexed by combo — one bitwise
+/// AND per liveness check instead of a `combo_cards` decode.
+fn combo_card_sets() -> Vec<CardSet> {
+    (0..NUM_COMBOS)
+        .map(|combo| {
+            let (a, b) = combo_cards(combo);
+            [a, b].into_iter().collect()
         })
         .collect()
 }
@@ -312,6 +319,8 @@ fn flop_row_for_turn_prefix<'a>(
 fn flop_to_turn_counts(abs: &Ehs2Abstraction, turns: &[(Board, u32)]) -> (Vec<u64>, usize, usize) {
     let kf = abs.num_buckets(Street::Flop) as usize;
     let kt = abs.num_buckets(Street::Turn) as usize;
+    let perm_tables = ComboPermTables::new();
+    let combo_sets = combo_card_sets();
     let counts = turns
         .par_iter()
         .fold(
@@ -321,13 +330,13 @@ fn flop_to_turn_counts(abs: &Ehs2Abstraction, turns: &[(Board, u32)]) -> (Vec<u6
                 // Full board is already canonical: direct row, no permute.
                 let turn_row = abs.turn_row(turn_board);
                 let (flop_row, perm) = flop_row_for_turn_prefix(abs, turn_board);
+                let pmap = perm_tables.map(&perm);
                 for (combo, &b_t) in turn_row.iter().enumerate() {
-                    let (c1, c2) = combo_cards(combo);
-                    if board_set.contains(c1) || board_set.contains(c2) {
+                    if !board_set.is_disjoint(combo_sets[combo]) {
                         continue;
                     }
                     debug_assert!(b_t != u16::MAX);
-                    let b_f = flop_row[permute_combo(&perm, combo)];
+                    let b_f = flop_row[pmap[combo] as usize];
                     debug_assert!(b_f != u16::MAX);
                     acc[b_f as usize * kt + b_t as usize] += *weight as u64;
                 }
@@ -353,44 +362,50 @@ fn flop_to_turn_table(abs: &Ehs2Abstraction, turns: &[(Board, u32)]) -> Transiti
 
 // --- T3: turn_to_river ---------------------------------------------------
 
-/// River-board analogue of [`flop_row_for_turn_prefix`]: canonicalizes
-/// `river_board`'s 4-card turn prefix separately and returns its bucket row
-/// plus the composing suit permutation.
-fn turn_row_for_river_prefix<'a>(
-    abs: &'a Ehs2Abstraction,
-    river_board: &Board,
-) -> (&'a [u16], SuitPerm) {
-    let prefix = Board::new(&river_board.flop, &river_board.later[..1]);
-    let (canon, perm) = canonicalize_board(&prefix);
-    (abs.turn_row(&canon), perm)
-}
-
 /// Raw weighted `(turn bucket, river bucket)` joint counts (row-major
-/// `b_t * kr + b_r`) plus `(kt, kr)`. `rivers` must already be canonical (as
-/// from `canonical_rivers`).
-fn turn_to_river_counts(
-    abs: &Ehs2Abstraction,
-    rivers: &[(Board, u32)],
-) -> (Vec<u64>, usize, usize) {
+/// `b_t * kr + b_r`) plus `(kt, kr)`. `turns` must already be canonical (as
+/// from `canonical_turns`).
+///
+/// Enumerates the lazy product (canonical turn x 48 live river cards)
+/// instead of materialized canonical river boards: extending each canonical
+/// turn representative by every live card, weighted by the turn's own
+/// multiplicity, covers each raw river exactly once by the same orbit
+/// argument `canonical_turns` itself rests on — without the ~2.17M-entry
+/// street-structured river board list (see the module docs). The turn row
+/// needs no permutation (the turn board IS the table key); the river row is
+/// fetched through the unordered-set quotient, whose canonicalizing
+/// permutation maps combo indices into that row's frame.
+fn turn_to_river_counts(abs: &Ehs2Abstraction, turns: &[(Board, u32)]) -> (Vec<u64>, usize, usize) {
     let kt = abs.num_buckets(Street::Turn) as usize;
     let kr = abs.num_buckets(Street::River) as usize;
-    let counts = rivers
+    let perm_tables = ComboPermTables::new();
+    let combo_sets = combo_card_sets();
+    let counts = turns
         .par_iter()
         .fold(
             || vec![0u64; kt * kr],
-            |mut acc, (river_board, weight)| {
-                let board_set: CardSet = river_board.cards().collect();
-                let river_row = abs.river_row(river_board);
-                let (turn_row, perm) = turn_row_for_river_prefix(abs, river_board);
-                for (combo, &b_r) in river_row.iter().enumerate() {
-                    let (c1, c2) = combo_cards(combo);
-                    if board_set.contains(c1) || board_set.contains(c2) {
+            |mut acc, (turn_board, weight)| {
+                let turn_set: CardSet = turn_board.cards().collect();
+                let turn_row = abs.turn_row(turn_board);
+                let four: Vec<Card> = turn_board.cards().collect();
+                for r in ALL_CARDS {
+                    if turn_set.contains(r) {
                         continue;
                     }
-                    debug_assert!(b_r != u16::MAX);
-                    let b_t = turn_row[permute_combo(&perm, combo)];
-                    debug_assert!(b_t != u16::MAX);
-                    acc[b_t as usize * kr + b_r as usize] += *weight as u64;
+                    let five = [four[0], four[1], four[2], four[3], r];
+                    let mut board_set = turn_set;
+                    board_set.insert(r);
+                    let (river_row, perm) = abs.river_row_for_set(five);
+                    let pmap = perm_tables.map(&perm);
+                    for (combo, &b_t) in turn_row.iter().enumerate() {
+                        if !board_set.is_disjoint(combo_sets[combo]) {
+                            continue; // dead on the turn or holding the river card
+                        }
+                        debug_assert!(b_t != u16::MAX);
+                        let b_r = river_row[pmap[combo] as usize];
+                        debug_assert!(b_r != u16::MAX);
+                        acc[b_t as usize * kr + b_r as usize] += *weight as u64;
+                    }
                 }
                 acc
             },
@@ -407,8 +422,8 @@ fn turn_to_river_counts(
     (counts, kt, kr)
 }
 
-fn turn_to_river_table(abs: &Ehs2Abstraction, rivers: &[(Board, u32)]) -> TransitionTable {
-    let (counts, kt, kr) = turn_to_river_counts(abs, rivers);
+fn turn_to_river_table(abs: &Ehs2Abstraction, turns: &[(Board, u32)]) -> TransitionTable {
+    let (counts, kt, kr) = turn_to_river_counts(abs, turns);
     counts_to_table(&counts, kt, kr, |_| 1.0)
 }
 
@@ -446,17 +461,6 @@ impl RiverScratch {
     }
 }
 
-/// Canonicalizes an unordered 5-card `board` via a single (arbitrary)
-/// street-structured split — first 3 cards as flop, last 2 as (turn,
-/// river) — and returns the river bucket row plus the composing suit
-/// permutation. Called once per board; combos are then read via
-/// `permute_combo`, never re-canonicalized.
-fn river_row_for_board(abs: &Ehs2Abstraction, five: [Card; 5]) -> (&[u16], SuitPerm) {
-    let query = Board::new(&five[..3], &five[3..5]);
-    let (canon, perm) = canonicalize_board(&query);
-    (abs.river_row(&canon), perm)
-}
-
 /// Accumulates one board's contribution into `win_acc`/`tie_acc`/`pair_acc`
 /// (row-major `bucket_hero * kr + bucket_opp`, length `kr * kr`).
 ///
@@ -480,6 +484,7 @@ fn river_row_for_board(abs: &Ehs2Abstraction, five: [Card; 5]) -> (&[u16], SuitP
 // more than it clarifies here.
 fn accumulate_river_board(
     abs: &Ehs2Abstraction,
+    perm_tables: &ComboPermTables,
     board: [Card; 5],
     weight: u64,
     kr: usize,
@@ -489,7 +494,8 @@ fn accumulate_river_board(
     scratch: &mut RiverScratch,
 ) {
     let board_set: CardSet = board.into_iter().collect();
-    let (river_row, perm) = river_row_for_board(abs, board);
+    let (river_row, perm) = abs.river_row_for_set(board);
+    let pmap = perm_tables.map(&perm);
 
     scratch.live.clear();
     for combo in 0..NUM_COMBOS {
@@ -497,7 +503,7 @@ fn accumulate_river_board(
         if board_set.contains(c1) || board_set.contains(c2) {
             continue;
         }
-        let bucket = river_row[permute_combo(&perm, combo)];
+        let bucket = river_row[pmap[combo] as usize];
         debug_assert!(bucket != u16::MAX);
         let rank = rank_of(board.into_iter().chain([c1, c2]));
         scratch.live.push((rank, combo, bucket));
@@ -584,6 +590,7 @@ fn river_equity_counts(
     boards: &[([Card; 5], u64)],
 ) -> (Vec<u64>, Vec<u64>, Vec<u64>, usize) {
     let kr = abs.num_buckets(Street::River) as usize;
+    let perm_tables = ComboPermTables::new();
     let zeros = || vec![0u64; kr * kr];
     let (win, tie, pair) = boards
         .par_iter()
@@ -592,6 +599,7 @@ fn river_equity_counts(
             |(mut win, mut tie, mut pair, mut scratch), &(board, weight)| {
                 accumulate_river_board(
                     abs,
+                    &perm_tables,
                     board,
                     weight,
                     kr,
@@ -674,35 +682,36 @@ fn artifacts_params(artifacts: &BlueprintArtifacts) -> Ehs2Params {
 
 impl BlueprintArtifacts {
     /// Builds all four tables by exact enumeration (rayon-parallel; minutes
-    /// in release for full streets). The abstraction must have been built
-    /// for flop, turn, and river.
+    /// in release for full streets — see the module docs' CI note). The
+    /// abstraction must have been built for flop, turn, and river.
     pub fn build(abs: &Ehs2Abstraction) -> Self {
         let flops = canonical_flops();
         let turns = canonical_turns();
-        let rivers = canonical_rivers();
-        let river5: Vec<([Card; 5], u64)> = river5_boards()
+        let river5: Vec<([Card; 5], u64)> = canonical_river_sets()
             .into_iter()
             .map(|(board, w)| (board, w as u64))
             .collect();
-        Self::build_over(abs, &flops, &turns, &rivers, &river5)
+        Self::build_over(abs, &flops, &turns, &river5)
     }
 
     /// Builds artifacts over caller-supplied board lists instead of the
-    /// full canonical enumerations. [`Self::build`] passes the full
-    /// streets; tests pass a handful of boards matching a small
-    /// `Ehs2Abstraction::build_for_boards` abstraction, so the fast test
-    /// suite doesn't pay full-street enumeration cost.
+    /// full canonical enumerations: T1 over `flops`, T2 *and* T3 over
+    /// `turns` (T3 extends each by all 48 live river cards), river equity
+    /// over `river5`. The abstraction must cover every board involved —
+    /// including every river completion of every entry in `turns`.
+    /// [`Self::build`] passes the full streets; tests pass a subset
+    /// matching an `Ehs2Abstraction::build_for_boards` abstraction, so the
+    /// test suite doesn't pay full-street enumeration cost.
     pub(crate) fn build_over(
         abs: &Ehs2Abstraction,
         flops: &[(Board, u32)],
         turns: &[(Board, u32)],
-        rivers: &[(Board, u32)],
         river5: &[([Card; 5], u64)],
     ) -> Self {
         BlueprintArtifacts {
             class_to_flop: class_to_flop_table(abs, flops),
             flop_to_turn: flop_to_turn_table(abs, turns),
-            turn_to_river: turn_to_river_table(abs, rivers),
+            turn_to_river: turn_to_river_table(abs, turns),
             river_equity: river_equity_over(abs, river5),
         }
     }
@@ -787,6 +796,9 @@ mod tests {
     /// A small abstraction plus matching (flop, turn, river) canonical
     /// board lists built from the *same* literal boards, so the artifact
     /// builders exercise exactly the boards the abstraction has data for.
+    /// Every turn board's 48 river completions are included — the T3
+    /// builder extends each turn by every live card, so the river street
+    /// must cover all of them.
     struct SmallFixture {
         abs: Ehs2Abstraction,
         flops: Vec<(Board, u32)>,
@@ -794,23 +806,41 @@ mod tests {
         rivers: Vec<(Board, u32)>,
     }
 
-    fn small_fixture(k: u32) -> SmallFixture {
-        let flop_strs = ["2c 7d Kh", "As Ks Qs", "9c 9d 2h"];
-        let mut literal_boards: Vec<Vec<Card>> = Vec::new();
-        for f in flop_strs {
-            let flop = parse(f);
-            literal_boards.push(flop.clone());
-            for t in ["3h", "4s", "5d"] {
+    /// Literal (non-canonicalized) boards: `flops`, plus each flop extended
+    /// by every card in `turns_per_flop`, plus each such turn's 48 river
+    /// completions.
+    fn closed_literal_boards(flops: &[Vec<Card>], turns_per_flop: &[Card]) -> Vec<Vec<Card>> {
+        let mut literal: Vec<Vec<Card>> = Vec::new();
+        for flop in flops {
+            literal.push(flop.clone());
+            for &t in turns_per_flop {
                 let mut turn = flop.clone();
-                turn.push(t.parse().unwrap());
-                literal_boards.push(turn.clone());
-                for r in ["6c", "8s"] {
+                turn.push(t);
+                literal.push(turn.clone());
+                let used: CardSet = turn.iter().copied().collect();
+                for r in ALL_CARDS {
+                    if used.contains(r) {
+                        continue;
+                    }
                     let mut river = turn.clone();
-                    river.push(r.parse().unwrap());
-                    literal_boards.push(river);
+                    river.push(r);
+                    literal.push(river);
                 }
             }
         }
+        literal
+    }
+
+    fn small_fixture(k: u32) -> SmallFixture {
+        let flops: Vec<Vec<Card>> = ["2c 7d Kh", "As Ks Qs", "9c 9d 2h"]
+            .iter()
+            .map(|s| parse(s))
+            .collect();
+        let turns: Vec<Card> = ["3h", "4s", "5d"]
+            .iter()
+            .map(|s| s.parse().unwrap())
+            .collect();
+        let literal_boards = closed_literal_boards(&flops, &turns);
         let params = Ehs2Params {
             flop_buckets: k,
             turn_buckets: k,
@@ -936,9 +966,7 @@ mod tests {
 
     #[test]
     fn t2_and_t3_total_raw_mass_and_row_sums() {
-        let SmallFixture {
-            abs, turns, rivers, ..
-        } = small_fixture(4);
+        let SmallFixture { abs, turns, .. } = small_fixture(4);
 
         let (t2_counts, kf, kt) = flop_to_turn_counts(&abs, &turns);
         let t2_total: u64 = t2_counts.iter().sum();
@@ -955,11 +983,11 @@ mod tests {
             assert!((reconstructed - 1.0).abs() < 1e-9);
         }
 
-        let (t3_counts, kt2, kr) = turn_to_river_counts(&abs, &rivers);
+        let (t3_counts, kt2, kr) = turn_to_river_counts(&abs, &turns);
         assert_eq!(kt2, kt);
         let t3_total: u64 = t3_counts.iter().sum();
-        // Every 5-card board has C(47, 2) = 1081 live combos.
-        let t3_expected: u64 = rivers.iter().map(|&(_, w)| w as u64 * 1_081).sum();
+        // Per turn board: 48 river cards x C(47, 2) = 1081 live combos each.
+        let t3_expected: u64 = turns.iter().map(|&(_, w)| w as u64 * 48 * 1_081).sum();
         assert_eq!(t3_total, t3_expected);
         for bt in 0..kt {
             let row = &t3_counts[bt * kr..(bt + 1) * kr];
@@ -972,74 +1000,78 @@ mod tests {
         }
     }
 
-    // --- T2 (and T3) prefix-canonicalization agreement --------------------
+    // --- batched-lookup vs naive bucket() agreement ------------------------
 
     #[test]
     fn t2_prefix_matches_naive_bucket_lookup() {
         let SmallFixture { abs, turns, .. } = small_fixture(4);
         let mut checked = 0;
-        'outer: for (turn_board, _w) in &turns {
+        for (turn_board, _w) in &turns {
             let board_set: CardSet = turn_board.cards().collect();
             let (flop_row, perm) = flop_row_for_turn_prefix(&abs, turn_board);
-            for combo in 0..NUM_COMBOS {
+            // Stride through combos so every turn board contributes samples
+            // instead of the first board exhausting the check budget.
+            for combo in (0..NUM_COMBOS).step_by(29) {
                 let (c1, c2) = combo_cards(combo);
                 if board_set.contains(c1) || board_set.contains(c2) {
                     continue;
                 }
                 let b_f = flop_row[permute_combo(&perm, combo)];
-                if b_f == u16::MAX {
-                    continue;
-                }
                 let expected = abs.bucket(&turn_board.flop, combo);
                 assert_eq!(
                     b_f as u32, expected,
                     "turn board {turn_board:?} combo {combo}"
                 );
                 checked += 1;
-                if checked >= 300 {
-                    break 'outer;
-                }
             }
         }
-        assert!(checked > 0, "test exercised no samples");
+        assert!(checked >= 300, "test exercised too few samples: {checked}");
     }
 
     #[test]
-    fn t3_prefix_matches_naive_bucket_lookup() {
-        let SmallFixture { abs, rivers, .. } = small_fixture(4);
+    fn t3_river_set_lookup_matches_naive_bucket() {
+        // The batched unordered-set row lookup T3 and river equity rely on
+        // must agree with the public per-query bucket() path, across the
+        // exact (turn x river card) product T3 iterates. Stride through
+        // boards and combos so samples spread over many (board, combo)
+        // pairs rather than exhausting the budget on the first board.
+        let SmallFixture { abs, turns, .. } = small_fixture(4);
         let mut checked = 0;
-        'outer: for (river_board, _w) in &rivers {
-            let board_set: CardSet = river_board.cards().collect();
-            let (turn_row, perm) = turn_row_for_river_prefix(&abs, river_board);
-            let mut turn_query = river_board.flop.clone();
-            turn_query.push(river_board.later[0]);
-            for combo in 0..NUM_COMBOS {
-                let (c1, c2) = combo_cards(combo);
-                if board_set.contains(c1) || board_set.contains(c2) {
+        for (turn_board, _w) in &turns {
+            let four: Vec<Card> = turn_board.cards().collect();
+            let turn_set: CardSet = four.iter().copied().collect();
+            for r in ALL_CARDS.into_iter().step_by(7) {
+                if turn_set.contains(r) {
                     continue;
                 }
-                let b_t = turn_row[permute_combo(&perm, combo)];
-                if b_t == u16::MAX {
-                    continue;
-                }
-                let expected = abs.bucket(&turn_query, combo);
-                assert_eq!(
-                    b_t as u32, expected,
-                    "river board {river_board:?} combo {combo}"
-                );
-                checked += 1;
-                if checked >= 300 {
-                    break 'outer;
+                let five = [four[0], four[1], four[2], four[3], r];
+                let mut board_set = turn_set;
+                board_set.insert(r);
+                let (river_row, perm) = abs.river_row_for_set(five);
+                for combo in (0..NUM_COMBOS).step_by(151) {
+                    let (c1, c2) = combo_cards(combo);
+                    if board_set.contains(c1) || board_set.contains(c2) {
+                        continue;
+                    }
+                    let b_r = river_row[permute_combo(&perm, combo)];
+                    let expected = abs.bucket(&five, combo);
+                    assert_eq!(b_r as u32, expected, "board {five:?} combo {combo}");
+                    checked += 1;
                 }
             }
         }
-        assert!(checked > 0, "test exercised no samples");
+        assert!(checked >= 300, "test exercised too few samples: {checked}");
     }
 
     // --- river bucket invariance to street-role split ---------------------
 
     #[test]
     fn river_bucket_invariant_to_street_split() {
+        // Regression guard on the lookup path: with the river street keyed
+        // by the unordered 5-set quotient this is nearly tautological, but
+        // it pins the contract that made that quotient sound in the first
+        // place (river scores depend only on the unordered set + hole), so
+        // a future re-keying that breaks it fails here.
         let five = parse("2c 7d Kh 3h 6c");
         // Three different (flop-set, later-order) role assignments of the
         // same underlying 5 physical cards.
@@ -1082,7 +1114,7 @@ mod tests {
         pair_acc: &mut [u64],
     ) {
         let board_set: CardSet = board.into_iter().collect();
-        let (river_row, perm) = river_row_for_board(abs, board);
+        let (river_row, perm) = abs.river_row_for_set(board);
         let live: Vec<(usize, u16, HandRank)> = (0..NUM_COMBOS)
             .filter_map(|combo| {
                 let (c1, c2) = combo_cards(combo);
@@ -1129,8 +1161,10 @@ mod tests {
             let zeros = || vec![0u64; kr * kr];
             let (mut win_fast, mut tie_fast, mut pair_fast) = (zeros(), zeros(), zeros());
             let mut scratch = RiverScratch::new(kr);
+            let perm_tables = ComboPermTables::new();
             accumulate_river_board(
                 &abs,
+                &perm_tables,
                 five,
                 1,
                 kr,
@@ -1186,8 +1220,14 @@ mod tests {
             rivers,
         } = small_fixture(4);
         let river5 = river5_from(&rivers);
-        let artifacts = BlueprintArtifacts::build_over(&abs, &flops, &turns, &rivers, &river5);
+        let artifacts = BlueprintArtifacts::build_over(&abs, &flops, &turns, &river5);
         (abs, artifacts)
+    }
+
+    /// The cheapest possible abstraction (one river board = one rank
+    /// sweep) for cache tests that only need params to compare against.
+    fn one_board_abs(params: Ehs2Params) -> Ehs2Abstraction {
+        Ehs2Abstraction::build_for_boards(params, &[parse("2c 7d Kh 3h 6c")])
     }
 
     #[test]
@@ -1209,7 +1249,11 @@ mod tests {
 
     #[test]
     fn load_rejects_bad_magic() {
-        let (abs, _artifacts) = tiny_artifacts();
+        let abs = one_board_abs(Ehs2Params {
+            flop_buckets: 4,
+            turn_buckets: 4,
+            river_buckets: 4,
+        });
         let path = std::env::temp_dir().join(format!(
             "blueprint-cache-badmagic-{}.postcard",
             std::process::id()
@@ -1224,7 +1268,11 @@ mod tests {
 
     #[test]
     fn load_rejects_bad_version() {
-        let (abs, _artifacts) = tiny_artifacts();
+        let abs = one_board_abs(Ehs2Params {
+            flop_buckets: 4,
+            turn_buckets: 4,
+            river_buckets: 4,
+        });
         let path = std::env::temp_dir().join(format!(
             "blueprint-cache-badversion-{}.postcard",
             std::process::id()
@@ -1254,12 +1302,11 @@ mod tests {
         artifacts.save(&path).unwrap();
 
         // A different abstraction (different K) should be rejected.
-        let other_params = Ehs2Params {
+        let other_abs = one_board_abs(Ehs2Params {
             flop_buckets: 8,
             turn_buckets: 4,
             river_buckets: 4,
-        };
-        let other_abs = Ehs2Abstraction::build_for_boards(other_params, &[parse("2c 7d Kh")]);
+        });
         assert!(matches!(
             BlueprintArtifacts::load(&path, &other_abs),
             Err(BlueprintCacheError::ParamsMismatch)
@@ -1267,27 +1314,69 @@ mod tests {
         let _ = std::fs::remove_file(&path);
     }
 
-    // --- full-street build (ignored: expensive) ---------------------------
+    // --- board-subset build at scale (ignored: release CI) -----------------
 
     #[test]
-    #[ignore = "full-street EHS² abstraction + artifact build; CI runs it in release with --include-ignored"]
-    fn full_artifact_build_small_k() {
+    #[ignore = "board-subset abstraction + artifact build (~1-2 min release, well under 2GB); \
+                CI runs it in release with --include-ignored; the FULL-street build stays \
+                user-invoked via load_or_build (turn-street scoring alone is minutes and the \
+                tables run to hundreds of MB — past the CI budget)"]
+    fn subset_artifact_build_invariants() {
+        // A spread of canonical flops (every 50th of the 1,755, mixing
+        // textures), closed under: all 49 turn extensions per flop, all 48
+        // river completions per turn — the closure the T3 (turn x river
+        // card) product needs. ~86k literal boards; ~36 flops / ~1.7k
+        // canonical turns / ~35k canonical river sets after dedup.
+        let sampled: Vec<Vec<Card>> = canonical_flops()
+            .into_iter()
+            .step_by(50)
+            .map(|(b, _)| b.flop.clone())
+            .collect();
+        // closed_literal_boards assumes its turn cards don't collide with
+        // the flop, so filter the 52 candidates per flop.
+        let mut literal: Vec<Vec<Card>> = Vec::new();
+        for flop in &sampled {
+            let flop_set: CardSet = flop.iter().copied().collect();
+            let live_turns: Vec<Card> = ALL_CARDS
+                .into_iter()
+                .filter(|&t| !flop_set.contains(t))
+                .collect();
+            literal.extend(closed_literal_boards(
+                std::slice::from_ref(flop),
+                &live_turns,
+            ));
+        }
+
         let params = Ehs2Params {
             flop_buckets: 8,
             turn_buckets: 8,
             river_buckets: 8,
         };
-
         let abs_start = std::time::Instant::now();
-        let abs = Ehs2Abstraction::build(params, &[Street::Flop, Street::Turn, Street::River]);
-        let abs_elapsed = abs_start.elapsed();
-        eprintln!("Ehs2Abstraction::build(Flop+Turn+River, k=8) took {abs_elapsed:?}");
+        let abs = Ehs2Abstraction::build_for_boards(params, &literal);
+        eprintln!(
+            "subset Ehs2Abstraction::build_for_boards ({} literals) took {:?}",
+            literal.len(),
+            abs_start.elapsed()
+        );
+
+        let (flops, turns, rivers) = canonicalize_board_subset(&literal);
+        eprintln!(
+            "subset canonical boards: {} flops, {} turns, {} river sets",
+            flops.len(),
+            turns.len(),
+            rivers.len()
+        );
+        let river5 = river5_from(&rivers);
 
         let artifacts_start = std::time::Instant::now();
-        let artifacts = BlueprintArtifacts::build(&abs);
-        let artifacts_elapsed = artifacts_start.elapsed();
-        eprintln!("BlueprintArtifacts::build took {artifacts_elapsed:?}");
+        let artifacts = BlueprintArtifacts::build_over(&abs, &flops, &turns, &river5);
+        eprintln!(
+            "subset BlueprintArtifacts::build_over took {:?}",
+            artifacts_start.elapsed()
+        );
 
+        // T1 rows sum to kappa(h).
         let kappa = kappa_per_class();
         let mut class_sums = vec![0f64; NUM_CLASSES];
         for &(h, _, w) in &artifacts.class_to_flop.entries {
@@ -1305,6 +1394,7 @@ mod tests {
             );
         }
 
+        // T2/T3 rows sum to 1.
         let kf = params.flop_buckets as usize;
         let kt = params.turn_buckets as usize;
         let mut t2_sums = vec![0f64; kf];
@@ -1326,30 +1416,38 @@ mod tests {
             }
         }
 
-        let kr = artifacts.river_equity.dim as usize;
+        // Crown-jewel exactness invariant on raw river counts, plus
+        // symmetry, plus the normalized probability identity.
+        let (win, tie, pair, kr) = river_equity_counts(&abs, &river5);
         for b1 in 0..kr {
             for b2 in 0..kr {
-                let win12 = artifacts.river_equity.win[b1 * kr + b2];
-                let tie12 = artifacts.river_equity.tie[b1 * kr + b2];
-                let win21 = artifacts.river_equity.win[b2 * kr + b1];
-                if win12 == 0.0 && tie12 == 0.0 && win21 == 0.0 {
-                    continue; // no observed co-occurrence; documented, not asserted
-                }
-                let sum = win12 + tie12 + win21;
+                let (i, j) = (b1 * kr + b2, b2 * kr + b1);
+                assert_eq!(
+                    win[i] + tie[i] + win[j],
+                    pair[i],
+                    "exactness failed for ({b1}, {b2})"
+                );
+                assert_eq!(pair[i], pair[j], "pair_cnt not symmetric ({b1}, {b2})");
+                assert_eq!(tie[i], tie[j], "tie_cnt not symmetric ({b1}, {b2})");
+                assert!(pair[i] > 0, "bucket pair ({b1}, {b2}) never co-occurs");
+                let sum = artifacts.river_equity.win[i]
+                    + artifacts.river_equity.tie[i]
+                    + artifacts.river_equity.win[j];
                 assert!(
-                    (sum - 1.0).abs() < 1e-6,
-                    "river_equity ({b1}, {b2}): win {win12} + tie {tie12} + win^T {win21} = {sum}"
+                    (sum - 1.0).abs() < 1e-9,
+                    "river_equity ({b1}, {b2}): win + tie + win^T = {sum}"
                 );
             }
         }
-    }
 
-    #[test]
-    #[ignore = "expensive (2.6M boards x 24 perms); CI runs it in release with --include-ignored"]
-    fn river5_boards_count_pin() {
-        let boards = river5_boards();
-        assert_eq!(boards.len(), 134_459);
-        let total: u64 = boards.iter().map(|&(_, w)| w as u64).sum();
-        assert_eq!(total, 2_598_960);
+        // Cache round trip at scale.
+        let path = std::env::temp_dir().join(format!(
+            "blueprint-cache-subset-{}.postcard",
+            std::process::id()
+        ));
+        artifacts.save(&path).unwrap();
+        let loaded = BlueprintArtifacts::load(&path, &abs).unwrap();
+        assert_eq!(loaded, artifacts);
+        let _ = std::fs::remove_file(&path);
     }
 }

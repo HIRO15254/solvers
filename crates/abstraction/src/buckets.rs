@@ -3,16 +3,29 @@
 //!
 //! Internal representation avoids `hand_index::Board`/`cards::Card` in the
 //! serialized form (neither implements `serde`): canonical boards are keyed
-//! by raw card-index arrays (`[u8; 3]` flop, `[u8; 4]` turn, `[u8; 5]`
-//! river), each mapping to a `Vec<u16>` indexed by `cards::combo_index`
-//! (dead combos, i.e. sharing a card with the board, are `u16::MAX`).
+//! by raw card-index arrays (`[u8; 3]` flop, `[u8; 4]` turn), each mapping
+//! to a `Vec<u16>` indexed by `cards::combo_index` (dead combos, i.e.
+//! sharing a card with the board, are `u16::MAX`).
+//!
+//! Flop and turn use `hand_index::canonicalize_board`'s street-structured
+//! quotient (1,755 flops, 63,193 turns). The river uses the coarser
+//! *unordered 5-card-set* quotient (134,459 boards, keyed by the sorted
+//! min-over-24-suit-perms card indices): river E[HS²] is a function of the
+//! unordered 5-set + hole only — the flop/turn/river role split is
+//! strategically irrelevant once the board is complete — and the
+//! street-structured river quotient is ~16x larger (~2.17M boards), which
+//! blows both build time and memory (its per-board `Vec<u16>` tables alone
+//! are several GB).
 
 use std::collections::BTreeMap;
 use std::io::Write;
 use std::path::Path;
 
 use cards::{ALL_CARDS, Card, CardSet, HandRank, NUM_COMBOS, combo_cards, rank_of};
-use hand_index::{Board, SuitPerm, canonical_flops, canonicalize_board, permute_combo};
+use hand_index::{
+    Board, SuitPerm, all_suit_perms, canonical_flops, canonicalize_board, permute_card,
+    permute_combo,
+};
 use rayon::prelude::*;
 
 use cards::Street;
@@ -43,17 +56,20 @@ pub enum BucketCacheError {
 }
 
 const CACHE_MAGIC: &[u8; 8] = b"SLVRBKTS";
-const CACHE_VERSION: u16 = 1;
+/// Version 2: the river street switched from street-structured canonical
+/// boards to the unordered 5-set quotient, changing river table keys —
+/// version-1 caches would silently miss every river lookup.
+const CACHE_VERSION: u16 = 2;
 const CACHE_HEADER_LEN: usize = 8 + 2;
 
 /// One street's percentile table: global cut thresholds (ascending, length
 /// `num_buckets - 1`) plus per-canonical-board bucket assignments.
 ///
-/// Board keys are `Vec<u8>` (card indices: 3 for flop, 4 for turn, 5 for
-/// river) rather than a fixed-size array — `serde`'s array impls aren't
-/// generic over a const `N`, so a `[u8; N]` key can't be derived once for
-/// all three streets; a small `Vec` avoids that without triplicating the
-/// table type.
+/// Board keys are `Vec<u8>` (card indices: 3 for flop, 4 for turn, 5 —
+/// sorted, the unordered-set key — for river) rather than a fixed-size
+/// array — `serde`'s array impls aren't generic over a const `N`, so a
+/// `[u8; N]` key can't be derived once for all three streets; a small `Vec`
+/// avoids that without triplicating the table type.
 #[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 struct StreetTable {
     thresholds: Vec<f64>,
@@ -94,14 +110,14 @@ fn turn_key(board: &Board) -> Vec<u8> {
     ]
 }
 
-fn river_key(board: &Board) -> Vec<u8> {
-    vec![
-        board.flop[0].index() as u8,
-        board.flop[1].index() as u8,
-        board.flop[2].index() as u8,
-        board.later[0].index() as u8,
-        board.later[1].index() as u8,
-    ]
+/// River table key: the board's 5 card indices sorted ascending — the
+/// unordered-set representation. Boards handed to the river street builder
+/// are already canonical-set representatives (see [`canonical_river_set`]),
+/// so their sorted indices ARE the canonical key.
+fn river_set_key(board: &Board) -> Vec<u8> {
+    let mut key: Vec<u8> = board.cards().map(|c| c.index() as u8).collect();
+    key.sort_unstable();
+    key
 }
 
 // --- canonical board enumeration for turn/river ----------------------------
@@ -134,31 +150,63 @@ pub(crate) fn canonical_turns() -> Vec<(Board, u32)> {
     counts.into_iter().collect()
 }
 
-/// All canonical river boards (flop as a set + turn, river later cards) with
-/// multiplicities, derived from [`canonical_turns`] by the same argument.
+/// Canonical (suit-minimal) representative of an unordered 5-card set — the
+/// minimum, over all 24 suit permutations, of the sorted permuted card
+/// indices — plus the permutation achieving it (needed to map combo indices
+/// into the canonical frame). Distinct from `canonicalize_board`, which
+/// preserves the flop/turn/river role structure; see the module docs for
+/// why the river uses this coarser quotient.
 ///
-/// `pub(crate)`: the `blueprint` module enumerates the same 134,459
-/// street-structured canonical river boards to build `T3`.
-pub(crate) fn canonical_rivers() -> Vec<(Board, u32)> {
-    let turns = canonical_turns();
-    let mut counts: BTreeMap<Board, u32> = BTreeMap::new();
-    for (turn_board, weight) in &turns {
-        let used: CardSet = turn_board
-            .flop
-            .iter()
-            .chain(turn_board.later.iter())
-            .copied()
-            .collect();
-        for r in ALL_CARDS {
-            if used.contains(r) {
-                continue;
-            }
-            let raw = Board::new(&turn_board.flop, &[turn_board.later[0], r]);
-            let (canon, _) = canonicalize_board(&raw);
-            *counts.entry(canon).or_insert(0) += weight;
+/// When multiple permutations achieve the minimum (the set has a nontrivial
+/// stabilizer) any of them is correct: bucket rows on the canonical board
+/// are stabilizer-invariant, since E[HS²] scores are suit-symmetric.
+pub(crate) fn canonical_river_set(five: [Card; 5]) -> ([u8; 5], SuitPerm) {
+    let mut best = [u8::MAX; 5];
+    let mut best_perm: SuitPerm = [0, 1, 2, 3];
+    for perm in all_suit_perms() {
+        let mut mapped = [0u8; 5];
+        for (i, &c) in five.iter().enumerate() {
+            mapped[i] = permute_card(&perm, c).index() as u8;
+        }
+        mapped.sort_unstable();
+        if mapped < best {
+            best = mapped;
+            best_perm = perm;
         }
     }
-    counts.into_iter().collect()
+    (best, best_perm)
+}
+
+/// All 134,459 canonical unordered 5-card sets with raw multiplicities
+/// (summing to `C(52, 5) = 2,598,960`), each as its sorted representative.
+/// Expensive (2.6M sets x 24 perms) — only the full-street build path calls
+/// it. `pub(crate)`: the `blueprint` module enumerates the same sets for
+/// its bucket-vs-bucket river equity.
+pub(crate) fn canonical_river_sets() -> Vec<([Card; 5], u32)> {
+    let all: Vec<Card> = ALL_CARDS.into_iter().collect();
+    let mut counts: BTreeMap<[u8; 5], u32> = BTreeMap::new();
+    for i in 0..52 {
+        for j in (i + 1)..52 {
+            for k in (j + 1)..52 {
+                for l in (k + 1)..52 {
+                    for m in (l + 1)..52 {
+                        let five = [all[i], all[j], all[k], all[l], all[m]];
+                        let (key, _) = canonical_river_set(five);
+                        *counts.entry(key).or_insert(0) += 1;
+                    }
+                }
+            }
+        }
+    }
+    counts
+        .into_iter()
+        .map(|(key, weight)| {
+            (
+                std::array::from_fn(|idx| Card::from_index(key[idx])),
+                weight,
+            )
+        })
+        .collect()
 }
 
 // --- the amortized per-board rank sweep ------------------------------------
@@ -470,22 +518,15 @@ fn build_table(
     }
 }
 
-fn push_dedup(v: &mut Vec<(Board, u32)>, canon: Board) {
-    for entry in v.iter_mut() {
-        if entry.0 == canon {
-            entry.1 += 1;
-            return;
-        }
-    }
-    v.push((canon, 1));
-}
-
 /// A canonical board with its raw enumeration multiplicity.
 pub(crate) type WeightedBoards = Vec<(Board, u32)>;
 
 /// Canonicalizes a list of literal boards (3, 4, or 5 cards each) into
 /// deduplicated per-street `(Board, weight)` lists, weight being how many
-/// input boards canonicalized to the same representative.
+/// input boards canonicalized to the same representative. 5-card boards use
+/// the unordered-set quotient ([`canonical_river_set`]), matching the river
+/// street's table keys; the returned river `Board`s are the sorted
+/// representatives (arbitrary 3/2 role split — irrelevant for scoring).
 ///
 /// Factored out of [`Ehs2Abstraction::build_for_boards`] (which just builds
 /// tables from the result) so the `blueprint` module's tests can construct
@@ -495,27 +536,37 @@ pub(crate) type WeightedBoards = Vec<(Board, u32)>;
 pub(crate) fn canonicalize_board_subset(
     boards: &[Vec<Card>],
 ) -> (WeightedBoards, WeightedBoards, WeightedBoards) {
-    let mut flop_boards: WeightedBoards = Vec::new();
-    let mut turn_boards: WeightedBoards = Vec::new();
-    let mut river_boards: WeightedBoards = Vec::new();
+    let mut flop_boards: BTreeMap<Board, u32> = BTreeMap::new();
+    let mut turn_boards: BTreeMap<Board, u32> = BTreeMap::new();
+    let mut river_boards: BTreeMap<Board, u32> = BTreeMap::new();
 
     for board_cards in boards {
-        let (flop, later) = match board_cards.len() {
-            3 => (&board_cards[..3], &board_cards[3..3]),
-            4 => (&board_cards[..3], &board_cards[3..4]),
-            5 => (&board_cards[..3], &board_cards[3..5]),
-            n => panic!("canonicalize_board_subset: board must be 3, 4, or 5 cards, got {n}"),
-        };
-        let query = Board::new(flop, later);
-        let (canon, _) = canonicalize_board(&query);
         match board_cards.len() {
-            3 => push_dedup(&mut flop_boards, canon),
-            4 => push_dedup(&mut turn_boards, canon),
-            5 => push_dedup(&mut river_boards, canon),
-            _ => unreachable!(),
+            3 | 4 => {
+                let query = Board::new(&board_cards[..3], &board_cards[3..]);
+                let (canon, _) = canonicalize_board(&query);
+                let map = if board_cards.len() == 3 {
+                    &mut flop_boards
+                } else {
+                    &mut turn_boards
+                };
+                *map.entry(canon).or_insert(0) += 1;
+            }
+            5 => {
+                let five: [Card; 5] = board_cards.as_slice().try_into().unwrap();
+                let (key, _) = canonical_river_set(five);
+                let canon_cards: Vec<Card> = key.iter().map(|&i| Card::from_index(i)).collect();
+                let canon = Board::new(&canon_cards[..3], &canon_cards[3..]);
+                *river_boards.entry(canon).or_insert(0) += 1;
+            }
+            n => panic!("canonicalize_board_subset: board must be 3, 4, or 5 cards, got {n}"),
         }
     }
-    (flop_boards, turn_boards, river_boards)
+    (
+        flop_boards.into_iter().collect(),
+        turn_boards.into_iter().collect(),
+        river_boards.into_iter().collect(),
+    )
 }
 
 impl Ehs2Abstraction {
@@ -554,11 +605,14 @@ impl Ehs2Abstraction {
                     ));
                 }
                 Street::River => {
-                    let boards = canonical_rivers();
+                    let boards: Vec<(Board, u32)> = canonical_river_sets()
+                        .into_iter()
+                        .map(|(five, w)| (Board::new(&five[..3], &five[3..]), w))
+                        .collect();
                     out.river = Some(build_table(
                         &boards,
                         params.river_buckets,
-                        river_key,
+                        river_set_key,
                         river_score_fn,
                     ));
                 }
@@ -599,7 +653,7 @@ impl Ehs2Abstraction {
             out.river = Some(build_table(
                 &river_boards,
                 params.river_buckets,
-                river_key,
+                river_set_key,
                 river_score_fn,
             ));
         }
@@ -691,8 +745,8 @@ impl Ehs2Abstraction {
     }
 
     /// Combo-bucket row for a board already known to be canonical for its
-    /// street (e.g. a member of `canonical_flops()`/[`canonical_turns`]/
-    /// [`canonical_rivers`], or the output of `canonicalize_board`).
+    /// street (e.g. a member of `canonical_flops()`/[`canonical_turns`], or
+    /// the output of `canonicalize_board`).
     ///
     /// This is the batched counterpart of the public per-query `bucket()`:
     /// no canonicalization happens here, so callers doing millions of
@@ -721,34 +775,48 @@ impl Ehs2Abstraction {
         })
     }
 
-    /// River counterpart of [`Ehs2Abstraction::flop_row`].
-    pub(crate) fn river_row(&self, canon_river: &Board) -> &[u16] {
-        let table = self
-            .river
-            .as_ref()
-            .unwrap_or_else(|| panic!("Ehs2Abstraction::river_row: river street not built"));
-        table
-            .boards
-            .get(&river_key(canon_river))
-            .unwrap_or_else(|| {
-                panic!("Ehs2Abstraction::river_row: canonical board {canon_river:?} not present")
-            })
+    /// River bucket row for an *arbitrary* (not necessarily canonical)
+    /// unordered 5-card set, plus the suit permutation mapping the caller's
+    /// combo indices into the row's canonical frame
+    /// (`row[permute_combo(&perm, combo)]`). One min-over-24-perms
+    /// canonicalization per call — cheaper than street-structured
+    /// `canonicalize_board`, and the only canonicalization the batched
+    /// river consumers pay per board.
+    pub(crate) fn river_row_for_set(&self, five: [Card; 5]) -> (&[u16], SuitPerm) {
+        let (key, perm) = canonical_river_set(five);
+        let table = self.river.as_ref().unwrap_or_else(|| {
+            panic!("Ehs2Abstraction::river_row_for_set: river street not built")
+        });
+        let row = table.boards.get(key.as_slice()).unwrap_or_else(|| {
+            panic!("Ehs2Abstraction::river_row_for_set: board {five:?} not present")
+        });
+        (row, perm)
     }
 }
 
-/// Canonicalizes a query board (3/4/5 cards, first three treated as the
-/// unordered flop per crate convention) and returns the street it belongs
-/// to along with the canonical board and the suit permutation used.
-fn canonicalize_query(board: &[Card]) -> (Street, Board, SuitPerm) {
-    let street = match board.len() {
-        3 => Street::Flop,
-        4 => Street::Turn,
-        5 => Street::River,
+/// Canonicalizes a query board (3/4/5 cards; for 3/4 the first three are
+/// the unordered flop per crate convention, a 5-card board is treated as
+/// one unordered set) and returns its street, the table key of the
+/// canonical form, and the suit permutation that produced it (for mapping
+/// combo indices into the canonical frame).
+fn canonicalize_query(board: &[Card]) -> (Street, Vec<u8>, SuitPerm) {
+    match board.len() {
+        3 | 4 => {
+            let query = Board::new(&board[..3], &board[3..]);
+            let (canon, perm) = canonicalize_board(&query);
+            if board.len() == 3 {
+                (Street::Flop, flop_key(&canon), perm)
+            } else {
+                (Street::Turn, turn_key(&canon), perm)
+            }
+        }
+        5 => {
+            let five: [Card; 5] = board.try_into().unwrap();
+            let (key, perm) = canonical_river_set(five);
+            (Street::River, key.to_vec(), perm)
+        }
         n => panic!("Ehs2Abstraction::bucket: board must be 3, 4, or 5 cards, got {n}"),
-    };
-    let query = Board::new(&board[..3], &board[3..]);
-    let (canon, perm) = canonicalize_board(&query);
-    (street, canon, perm)
+    }
 }
 
 fn lookup(table: &StreetTable, key: &[u8], combo: usize, board: &[Card], orig_combo: usize) -> u32 {
@@ -779,32 +847,16 @@ impl CardAbstraction for Ehs2Abstraction {
     }
 
     fn bucket(&self, board: &[Card], combo: usize) -> u32 {
-        let (street, canon, perm) = canonicalize_query(board);
+        let (street, key, perm) = canonicalize_query(board);
         let permuted_combo = permute_combo(&perm, combo);
-        match street {
-            Street::Flop => {
-                let table = self
-                    .flop
-                    .as_ref()
-                    .unwrap_or_else(|| panic!("Ehs2Abstraction::bucket: flop street not built"));
-                lookup(table, &flop_key(&canon), permuted_combo, board, combo)
-            }
-            Street::Turn => {
-                let table = self
-                    .turn
-                    .as_ref()
-                    .unwrap_or_else(|| panic!("Ehs2Abstraction::bucket: turn street not built"));
-                lookup(table, &turn_key(&canon), permuted_combo, board, combo)
-            }
-            Street::River => {
-                let table = self
-                    .river
-                    .as_ref()
-                    .unwrap_or_else(|| panic!("Ehs2Abstraction::bucket: river street not built"));
-                lookup(table, &river_key(&canon), permuted_combo, board, combo)
-            }
+        let table = match street {
+            Street::Flop => self.flop.as_ref(),
+            Street::Turn => self.turn.as_ref(),
+            Street::River => self.river.as_ref(),
             Street::Preflop => unreachable!("canonicalize_query never returns Preflop"),
         }
+        .unwrap_or_else(|| panic!("Ehs2Abstraction::bucket: {street:?} street not built"));
+        lookup(table, &key, permuted_combo, board, combo)
     }
 }
 
@@ -839,6 +891,18 @@ mod tests {
         let total: u64 = turns.iter().map(|&(_, w)| w as u64).sum();
         // Raw (flop-set, turn) pairs: C(52, 3) * 49.
         assert_eq!(total, 22_100 * 49);
+    }
+
+    #[test]
+    #[ignore = "expensive (2.6M sets x 24 perms); CI runs it in release with --include-ignored"]
+    fn canonical_river_sets_count_pin() {
+        // The unordered 5-set quotient the river street is keyed by; count
+        // matches hand_index::canonical_unordered_board_count(5) and
+        // preflop's independent enumeration.
+        let sets = canonical_river_sets();
+        assert_eq!(sets.len(), 134_459);
+        let total: u64 = sets.iter().map(|&(_, w)| w as u64).sum();
+        assert_eq!(total, 2_598_960, "C(52, 5)");
     }
 
     #[test]
