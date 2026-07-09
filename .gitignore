@@ -3,4 +3,5 @@
 *.ckpt
 *.sol
 /runs
+/.cache
 __pycache__/

@@ -43,6 +43,11 @@ pub fn run(
             eprintln!("note: config board {board:?} ignored; using --boards");
             (oop_range, ip_range, pot, effective_stack, iso_merging, bets)
         }
+        GameSection::Preflop { .. } => {
+            return Err(anyhow!(
+                "report does not support preflop configs yet (kind = \"preflop\")"
+            ));
+        }
         _ => return Err(anyhow!("report only supports kind = \"postflop\" configs")),
     };
 

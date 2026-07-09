@@ -270,6 +270,7 @@ dependencies = [
  "formats",
  "game",
  "holdem",
+ "preflop",
  "rayon",
  "serde",
  "serde_json",

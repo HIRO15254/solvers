@@ -16,6 +16,7 @@ engine = { workspace = true, features = ["serde"] }
 formats = { workspace = true }
 game = { workspace = true }
 holdem = { workspace = true }
+preflop = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
 rayon = { workspace = true }

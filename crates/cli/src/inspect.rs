@@ -29,6 +29,17 @@ pub fn run(
         .with_context(|| format!("reading {}", config_path.display()))?;
     let config: SolveConfig = toml::from_str(&raw).context("parsing config")?;
 
+    match &config.game {
+        GameSection::Postflop { .. } => {}
+        GameSection::Preflop { .. } => {
+            return Err(anyhow!(
+                "inspect does not support preflop configs yet (kind = \"preflop\")"
+            ));
+        }
+        _ => {
+            return Err(anyhow!("inspect only supports kind = \"postflop\" configs"));
+        }
+    }
     let GameSection::Postflop {
         board,
         oop_range,
@@ -39,7 +50,7 @@ pub fn run(
         bets,
     } = config.game
     else {
-        return Err(anyhow!("inspect only supports kind = \"postflop\" configs"));
+        unreachable!("checked above");
     };
 
     let pf_config = postflop_setup::build_postflop_config(

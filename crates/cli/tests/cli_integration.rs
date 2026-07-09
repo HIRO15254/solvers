@@ -554,3 +554,95 @@ fn i16_storage_solve_converges_and_checkpoint_round_trips() {
         engine::StorageState::I16 { .. }
     ));
 }
+
+// --- preflop (Mode B) -------------------------------------------------------
+
+/// 10bb push/fold: SB may only jam or fold, BB may only call or fold (root
+/// has exactly 2 actions). `{cache}` is filled in with a tempdir-local path
+/// so the exact equity table's compute-then-cache-hit round trip is
+/// self-contained and never touches a shared/repo-level cache.
+const PREFLOP_PUSHFOLD_TOML_TEMPLATE: &str = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 10.0
+open_sizes_bb = []
+raise_factors = []
+max_raises = 1
+allow_limp = false
+equity_cache = "{cache}"
+
+[algorithm]
+schedule = "dcfr"
+
+[run]
+iterations = 400
+check_every = 100
+"#;
+
+#[test]
+#[ignore = "computes the exact preflop equity table; CI runs it in release with --include-ignored"]
+fn preflop_pushfold_solve_smoke() {
+    let dir = temp_dir("preflop-pushfold");
+    let cache = dir.join("equity.bin");
+    // TOML string escaping: a Windows-style path could contain backslashes,
+    // but tempdir() on the platforms this runs on never does, so a plain
+    // substitution is safe here.
+    let config_text = PREFLOP_PUSHFOLD_TOML_TEMPLATE.replace("{cache}", &cache.to_string_lossy());
+    let config = dir.join("pushfold.toml");
+    std::fs::write(&config, config_text).unwrap();
+    let output_path = dir.join("out.json");
+
+    let output = run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--output",
+        output_path.to_str().unwrap(),
+    ]);
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(
+        stdout.contains("equity: computing"),
+        "first run should compute the table: {stdout}"
+    );
+    assert!(stdout.contains("root:"), "stdout: {stdout}");
+    assert!(stdout.contains("nash_conv"), "stdout: {stdout}");
+    assert!(stdout.contains("done:"), "stdout: {stdout}");
+    assert!(cache.exists(), "equity cache file must be created");
+
+    let json: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(&output_path).unwrap())
+            .expect("--output file must parse as JSON");
+    let class_labels = json["class_labels"].as_array().expect("class_labels array");
+    assert_eq!(class_labels.len(), 169);
+
+    let entries = json["entries"].as_array().expect("entries array");
+    let root = entries
+        .iter()
+        .find(|e| e["history"] == "")
+        .expect("root entry (history == \"\")");
+    let actions = root["actions"].as_array().expect("actions array");
+    assert_eq!(actions.len(), 2, "push/fold root must have 2 actions");
+    let strategy = root["strategy"].as_array().expect("strategy array");
+    assert_eq!(strategy.len(), 2, "one strategy row per action");
+    for row in strategy {
+        assert_eq!(
+            row.as_array().unwrap().len(),
+            169,
+            "each action's strategy row must cover all 169 classes"
+        );
+    }
+
+    // Second run: the equity table should now load from the cache instead of
+    // recomputing, and the run must still succeed.
+    let output2 = run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--output",
+        output_path.to_str().unwrap(),
+    ]);
+    let stdout2 = String::from_utf8_lossy(&output2.stdout);
+    assert!(
+        stdout2.contains("equity: loaded cached table"),
+        "second run should hit the cache: {stdout2}"
+    );
+    assert!(stdout2.contains("root:"), "stdout: {stdout2}");
+}

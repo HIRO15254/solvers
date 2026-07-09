@@ -16,6 +16,7 @@ mod bench;
 mod config;
 mod inspect;
 mod postflop_setup;
+mod preflop_setup;
 mod report;
 mod resume;
 mod sol;
@@ -40,7 +41,7 @@ enum Command {
         /// Write the average strategy as JSON to this path.
         #[arg(long)]
         output: Option<std::path::PathBuf>,
-        /// Betting-line history to export (postflop only; repeatable).
+        /// Betting-line history to export (postflop/preflop; repeatable).
         /// Defaults to the root node only.
         #[arg(long = "history", default_value = "")]
         history: Vec<String>,
@@ -79,7 +80,7 @@ enum Command {
         /// Write the average strategy as JSON to this path.
         #[arg(long)]
         output: Option<std::path::PathBuf>,
-        /// Betting-line history to export (postflop only; repeatable).
+        /// Betting-line history to export (postflop/preflop; repeatable).
         #[arg(long = "history", default_value = "")]
         history: Vec<String>,
         /// Append a metrics row (JSONL) at every exploitability check.

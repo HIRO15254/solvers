@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use serde::Deserialize;
 
 /// One experiment = one TOML file. Unknown fields are rejected so typos
@@ -39,6 +41,42 @@ pub enum GameSection {
         #[serde(default = "default_true")]
         iso_merging: bool,
         bets: BetsSection,
+    },
+    Preflop {
+        /// Per-player starting stack, in big blinds.
+        effective_stack_bb: f64,
+        /// Small blind size, in big blinds (SB = `Player::P0`).
+        #[serde(default = "default_sb_bb")]
+        sb_bb: f64,
+        /// SB's (or BB's iso-raise) first-raise raise-to sizes, in big
+        /// blinds.
+        #[serde(default = "default_open_sizes_bb")]
+        open_sizes_bb: Vec<f64>,
+        /// Reraise-to factors per raise level (see `preflop::PreflopConfig`
+        /// docs); an empty outer list means sized reraises are never offered
+        /// (all-in only).
+        #[serde(default = "default_raise_factors")]
+        raise_factors: Vec<Vec<f64>>,
+        #[serde(default = "default_preflop_max_raises")]
+        max_raises: u32,
+        #[serde(default = "default_true")]
+        include_allin: bool,
+        #[serde(default = "default_true")]
+        allow_limp: bool,
+        /// SB's range spec (e.g. "22+,A2s+"); `None` is the full range.
+        #[serde(default)]
+        sb_range: Option<String>,
+        /// BB's range spec; `None` is the full range.
+        #[serde(default)]
+        bb_range: Option<String>,
+        /// Per-player equity-realization factors for non-all-in
+        /// continuations (see `preflop::EquityShowdown`).
+        #[serde(default = "default_equity_realization")]
+        equity_realization: [f64; 2],
+        /// Disk cache path for the exact 169x169 equity table; `None`
+        /// recomputes it in memory every run.
+        #[serde(default)]
+        equity_cache: Option<PathBuf>,
     },
 }
 
@@ -156,6 +194,22 @@ fn default_true() -> bool {
     true
 }
 
+fn default_sb_bb() -> f64 {
+    0.5
+}
+fn default_open_sizes_bb() -> Vec<f64> {
+    vec![2.5]
+}
+fn default_raise_factors() -> Vec<Vec<f64>> {
+    vec![vec![3.0]]
+}
+fn default_preflop_max_raises() -> u32 {
+    4
+}
+fn default_equity_realization() -> [f64; 2] {
+    [1.0, 1.0]
+}
+
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct RunSection {
@@ -194,4 +248,123 @@ pub enum StorageKind {
     #[default]
     F32,
     I16,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn preflop_config_minimal_applies_defaults() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+
+[run]
+iterations = 10
+"#;
+        let config: SolveConfig = toml::from_str(raw).expect("parse minimal preflop config");
+        match config.game {
+            GameSection::Preflop {
+                effective_stack_bb,
+                sb_bb,
+                open_sizes_bb,
+                raise_factors,
+                max_raises,
+                include_allin,
+                allow_limp,
+                sb_range,
+                bb_range,
+                equity_realization,
+                equity_cache,
+            } => {
+                assert_eq!(effective_stack_bb, 100.0);
+                assert_eq!(sb_bb, 0.5);
+                assert_eq!(open_sizes_bb, vec![2.5]);
+                assert_eq!(raise_factors, vec![vec![3.0]]);
+                assert_eq!(max_raises, 4);
+                assert!(include_allin);
+                assert!(allow_limp);
+                assert_eq!(sb_range, None);
+                assert_eq!(bb_range, None);
+                assert_eq!(equity_realization, [1.0, 1.0]);
+                assert_eq!(equity_cache, None);
+            }
+            other => panic!("expected GameSection::Preflop, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn preflop_config_fully_specified_overrides_every_default() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 10.0
+sb_bb = 0.5
+open_sizes_bb = []
+raise_factors = []
+max_raises = 1
+include_allin = true
+allow_limp = false
+sb_range = "22+,A2s+"
+bb_range = "QQ+"
+equity_realization = [0.9, 1.1]
+equity_cache = ".cache/preflop_equity.bin"
+
+[run]
+iterations = 10
+"#;
+        let config: SolveConfig =
+            toml::from_str(raw).expect("parse fully-specified preflop config");
+        match config.game {
+            GameSection::Preflop {
+                effective_stack_bb,
+                sb_bb,
+                open_sizes_bb,
+                raise_factors,
+                max_raises,
+                include_allin,
+                allow_limp,
+                sb_range,
+                bb_range,
+                equity_realization,
+                equity_cache,
+            } => {
+                assert_eq!(effective_stack_bb, 10.0);
+                assert_eq!(sb_bb, 0.5);
+                assert_eq!(open_sizes_bb, Vec::<f64>::new());
+                assert_eq!(raise_factors, Vec::<Vec<f64>>::new());
+                assert_eq!(max_raises, 1);
+                assert!(include_allin);
+                assert!(!allow_limp);
+                assert_eq!(sb_range.as_deref(), Some("22+,A2s+"));
+                assert_eq!(bb_range.as_deref(), Some("QQ+"));
+                assert_eq!(equity_realization, [0.9, 1.1]);
+                assert_eq!(
+                    equity_cache,
+                    Some(PathBuf::from(".cache/preflop_equity.bin"))
+                );
+            }
+            other => panic!("expected GameSection::Preflop, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn preflop_config_rejects_unknown_field() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+typo_field = 1
+
+[run]
+iterations = 10
+"#;
+        let result: Result<SolveConfig, _> = toml::from_str(raw);
+        assert!(
+            result.is_err(),
+            "an unknown field in a preflop config must fail to parse"
+        );
+    }
 }
