@@ -7,6 +7,7 @@ members = [
     "crates/engine",
     "crates/game",
     "crates/holdem",
+    "crates/abstraction",
     "crates/preflop",
     "crates/formats",
     "crates/cli",
@@ -25,6 +26,7 @@ cfr-ref = { path = "crates/cfr-ref" }
 engine = { path = "crates/engine" }
 game = { path = "crates/game" }
 holdem = { path = "crates/holdem" }
+abstraction = { path = "crates/abstraction" }
 preflop = { path = "crates/preflop" }
 formats = { path = "crates/formats" }
 
