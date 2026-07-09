@@ -114,7 +114,10 @@ fn river_key(board: &Board) -> Vec<u8> {
 /// what summing over every raw flop in its orbit would give, since suit
 /// permutations act bijectively on "cards not on the flop" and
 /// canonicalization is invariant under them.
-fn canonical_turns() -> Vec<(Board, u32)> {
+///
+/// `pub(crate)`: the `blueprint` module enumerates the same 63,193 canonical
+/// turn boards to build `T2`.
+pub(crate) fn canonical_turns() -> Vec<(Board, u32)> {
     let flops = canonical_flops();
     let mut counts: BTreeMap<Board, u32> = BTreeMap::new();
     for (flop_board, weight) in &flops {
@@ -133,7 +136,10 @@ fn canonical_turns() -> Vec<(Board, u32)> {
 
 /// All canonical river boards (flop as a set + turn, river later cards) with
 /// multiplicities, derived from [`canonical_turns`] by the same argument.
-fn canonical_rivers() -> Vec<(Board, u32)> {
+///
+/// `pub(crate)`: the `blueprint` module enumerates the same 134,459
+/// street-structured canonical river boards to build `T3`.
+pub(crate) fn canonical_rivers() -> Vec<(Board, u32)> {
     let turns = canonical_turns();
     let mut counts: BTreeMap<Board, u32> = BTreeMap::new();
     for (turn_board, weight) in &turns {
@@ -474,6 +480,44 @@ fn push_dedup(v: &mut Vec<(Board, u32)>, canon: Board) {
     v.push((canon, 1));
 }
 
+/// A canonical board with its raw enumeration multiplicity.
+pub(crate) type WeightedBoards = Vec<(Board, u32)>;
+
+/// Canonicalizes a list of literal boards (3, 4, or 5 cards each) into
+/// deduplicated per-street `(Board, weight)` lists, weight being how many
+/// input boards canonicalized to the same representative.
+///
+/// Factored out of [`Ehs2Abstraction::build_for_boards`] (which just builds
+/// tables from the result) so the `blueprint` module's tests can construct
+/// a small artifact set over exactly the same board subset a small test
+/// abstraction was built for — `build_for_boards` doesn't otherwise expose
+/// which canonical boards it ended up covering.
+pub(crate) fn canonicalize_board_subset(
+    boards: &[Vec<Card>],
+) -> (WeightedBoards, WeightedBoards, WeightedBoards) {
+    let mut flop_boards: WeightedBoards = Vec::new();
+    let mut turn_boards: WeightedBoards = Vec::new();
+    let mut river_boards: WeightedBoards = Vec::new();
+
+    for board_cards in boards {
+        let (flop, later) = match board_cards.len() {
+            3 => (&board_cards[..3], &board_cards[3..3]),
+            4 => (&board_cards[..3], &board_cards[3..4]),
+            5 => (&board_cards[..3], &board_cards[3..5]),
+            n => panic!("canonicalize_board_subset: board must be 3, 4, or 5 cards, got {n}"),
+        };
+        let query = Board::new(flop, later);
+        let (canon, _) = canonicalize_board(&query);
+        match board_cards.len() {
+            3 => push_dedup(&mut flop_boards, canon),
+            4 => push_dedup(&mut turn_boards, canon),
+            5 => push_dedup(&mut river_boards, canon),
+            _ => unreachable!(),
+        }
+    }
+    (flop_boards, turn_boards, river_boards)
+}
+
 impl Ehs2Abstraction {
     /// Builds the abstraction for the given streets over ALL canonical
     /// boards of each street. Expensive (minutes in release for the full
@@ -527,26 +571,7 @@ impl Ehs2Abstraction {
     /// Percentile thresholds then cover just these boards — intended for
     /// tests and experiments, not production tables.
     pub fn build_for_boards(params: Ehs2Params, boards: &[Vec<Card>]) -> Self {
-        let mut flop_boards: Vec<(Board, u32)> = Vec::new();
-        let mut turn_boards: Vec<(Board, u32)> = Vec::new();
-        let mut river_boards: Vec<(Board, u32)> = Vec::new();
-
-        for board_cards in boards {
-            let (flop, later) = match board_cards.len() {
-                3 => (&board_cards[..3], &board_cards[3..3]),
-                4 => (&board_cards[..3], &board_cards[3..4]),
-                5 => (&board_cards[..3], &board_cards[3..5]),
-                n => panic!("build_for_boards: board must be 3, 4, or 5 cards, got {n}"),
-            };
-            let query = Board::new(flop, later);
-            let (canon, _) = canonicalize_board(&query);
-            match board_cards.len() {
-                3 => push_dedup(&mut flop_boards, canon),
-                4 => push_dedup(&mut turn_boards, canon),
-                5 => push_dedup(&mut river_boards, canon),
-                _ => unreachable!(),
-            }
-        }
+        let (flop_boards, turn_boards, river_boards) = canonicalize_board_subset(boards);
 
         let mut out = Ehs2Abstraction {
             params,
@@ -663,6 +688,51 @@ impl Ehs2Abstraction {
             let _ = table.save(path);
         }
         table
+    }
+
+    /// Combo-bucket row for a board already known to be canonical for its
+    /// street (e.g. a member of `canonical_flops()`/[`canonical_turns`]/
+    /// [`canonical_rivers`], or the output of `canonicalize_board`).
+    ///
+    /// This is the batched counterpart of the public per-query `bucket()`:
+    /// no canonicalization happens here, so callers doing millions of
+    /// lookups over the same small set of boards (`blueprint`'s T1/T2/T3/
+    /// river-equity builders) canonicalize once per board and then read the
+    /// whole row via combo-index slicing, instead of paying `bucket()`'s
+    /// per-call canonicalization cost per combo.
+    pub(crate) fn flop_row(&self, canon_flop: &Board) -> &[u16] {
+        let table = self
+            .flop
+            .as_ref()
+            .unwrap_or_else(|| panic!("Ehs2Abstraction::flop_row: flop street not built"));
+        table.boards.get(&flop_key(canon_flop)).unwrap_or_else(|| {
+            panic!("Ehs2Abstraction::flop_row: canonical board {canon_flop:?} not present")
+        })
+    }
+
+    /// Turn counterpart of [`Ehs2Abstraction::flop_row`].
+    pub(crate) fn turn_row(&self, canon_turn: &Board) -> &[u16] {
+        let table = self
+            .turn
+            .as_ref()
+            .unwrap_or_else(|| panic!("Ehs2Abstraction::turn_row: turn street not built"));
+        table.boards.get(&turn_key(canon_turn)).unwrap_or_else(|| {
+            panic!("Ehs2Abstraction::turn_row: canonical board {canon_turn:?} not present")
+        })
+    }
+
+    /// River counterpart of [`Ehs2Abstraction::flop_row`].
+    pub(crate) fn river_row(&self, canon_river: &Board) -> &[u16] {
+        let table = self
+            .river
+            .as_ref()
+            .unwrap_or_else(|| panic!("Ehs2Abstraction::river_row: river street not built"));
+        table
+            .boards
+            .get(&river_key(canon_river))
+            .unwrap_or_else(|| {
+                panic!("Ehs2Abstraction::river_row: canonical board {canon_river:?} not present")
+            })
     }
 }
 
