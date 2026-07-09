@@ -85,14 +85,20 @@ pub enum EquityCacheError {
 }
 
 /// Reusable per-board scratch buffers, kept out of the rayon hot loop.
+///
+/// `lower_card` is heap-backed (flat `Vec`, indexed `card * NUM_CLASSES +
+/// class`) rather than a `[[u32; 169]; 52]` field: that fixed-size array is
+/// 35KB, and giving it stack storage blows the (comparatively small) rayon
+/// worker thread stacks once `accumulate_board` gets inlined into the
+/// recursive `join`-based work-stealing split/reduce tree.
 pub(crate) struct Scratch {
     /// (rank, combo) of every combo not colliding with the current board.
     live: Vec<(HandRank, usize)>,
     /// Count of already-swept combos per class.
     lower: [u32; NUM_CLASSES],
-    /// Count of already-swept combos per class that contain a given card
-    /// (flat `[card][class]`).
-    lower_card: [[u32; NUM_CLASSES]; 52],
+    /// Count of already-swept combos per class that contain a given card,
+    /// flat `[card * NUM_CLASSES + class]`.
+    lower_card: Vec<u32>,
 }
 
 impl Scratch {
@@ -100,7 +106,7 @@ impl Scratch {
         Scratch {
             live: Vec::with_capacity(1_081),
             lower: [0; NUM_CLASSES],
-            lower_card: [[0; NUM_CLASSES]; 52],
+            lower_card: vec![0u32; 52 * NUM_CLASSES],
         }
     }
 }
@@ -194,9 +200,7 @@ pub(crate) fn accumulate_board(
     scratch.live.sort_unstable_by_key(|&(rank, _)| rank);
 
     scratch.lower = [0; NUM_CLASSES];
-    for row in scratch.lower_card.iter_mut() {
-        *row = [0; NUM_CLASSES];
-    }
+    scratch.lower_card.iter_mut().for_each(|x| *x = 0);
 
     let n = scratch.live.len();
     let mut i = 0;
@@ -215,8 +219,8 @@ pub(crate) fn accumulate_board(
             let h = class_of_combo(combo);
             for o in 0..NUM_CLASSES {
                 let win_pairs = scratch.lower[o] as i64
-                    - scratch.lower_card[c1.index()][o] as i64
-                    - scratch.lower_card[c2.index()][o] as i64;
+                    - scratch.lower_card[c1.index() * NUM_CLASSES + o] as i64
+                    - scratch.lower_card[c2.index() * NUM_CLASSES + o] as i64;
                 debug_assert!(win_pairs >= 0, "win_pairs underflow");
                 win_acc[h * NUM_CLASSES + o] += weight * win_pairs as u64;
             }
@@ -237,8 +241,8 @@ pub(crate) fn accumulate_board(
             let h = class_of_combo(combo);
             let (c1, c2) = combo_cards(combo);
             scratch.lower[h] += 1;
-            scratch.lower_card[c1.index()][h] += 1;
-            scratch.lower_card[c2.index()][h] += 1;
+            scratch.lower_card[c1.index() * NUM_CLASSES + h] += 1;
+            scratch.lower_card[c2.index() * NUM_CLASSES + h] += 1;
         }
 
         i = j;
@@ -345,6 +349,14 @@ impl EquityTable {
     /// Full exact enumeration (rayon-parallel over canonical boards).
     pub fn compute() -> Self {
         let (win_counts, tie_counts) = compute_counts();
+        Self::from_counts(&win_counts, &tie_counts)
+    }
+
+    /// Normalizes raw weighted counts (from [`compute_counts`]) into
+    /// probabilities. Split out so tests can normalize the same counts they
+    /// checked exactness invariants on, instead of paying for a second
+    /// `compute_counts` pass.
+    pub(crate) fn from_counts(win_counts: &[u64], tie_counts: &[u64]) -> Self {
         let n = compat_counts();
         let mut win = vec![0f64; NUM_CLASSES * NUM_CLASSES];
         let mut tie = vec![0f64; NUM_CLASSES * NUM_CLASSES];
@@ -497,8 +509,9 @@ mod tests {
     #[test]
     #[ignore = "full 2.6M-board enumeration; CI runs it in release with --include-ignored"]
     fn full_table_invariants_and_anchors() {
-        let start = std::time::Instant::now();
-
+        // Canonical board count/multiplicity check first: cheap relative to
+        // the sweep below (no HandRank evaluation), so this doesn't
+        // meaningfully affect the reported compute() time.
         let boards = canonical_boards();
         assert_eq!(boards.len(), 134_459, "canonical board count");
         assert_eq!(
@@ -507,10 +520,14 @@ mod tests {
             "canonical board multiplicities"
         );
 
-        let table = EquityTable::compute();
-        eprintln!("EquityTable::compute() took {:?}", start.elapsed());
-
+        // Compute the raw counts exactly once (the expensive part) and
+        // derive both the invariant checks and the normalized table from
+        // them, rather than recomputing.
+        let start = std::time::Instant::now();
         let (win_counts, tie_counts) = compute_counts();
+        eprintln!("EquityTable::compute() took {:?}", start.elapsed());
+        let table = EquityTable::from_counts(&win_counts, &tie_counts);
+
         let n = compat_counts();
 
         for h in 0..NUM_CLASSES {
