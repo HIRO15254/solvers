@@ -231,7 +231,12 @@ test("keeps dialogs, progress, approximation, and result exploration accessible"
   assert.match(styles, /\.strategy-cell\[aria-selected="true"\]/);
   assert.match(styles, /\.(?:cancel-button|danger-button)/);
   assert.match(styles, /@media \(max-width: 620px\)/);
+  assert.match(styles, /overflow-x:\s*clip/);
   assert.match(styles, /@media \(forced-colors: active\)/);
+  assert.match(styles, /\.settings-stack\s*\{[^}]*min-width:\s*0/);
+  assert.match(styles, /\.settings-card\s*\{[^}]*min-width:\s*0/);
+  assert.match(styles, /\.multiway-spot,[^}]*min-width:\s*0/);
+  assert.match(styles, /\.table-scroll\s*\{[^}]*max-width:\s*100%/);
 });
 
 test("keeps every multiway preset byte-identical to its canonical TOML snapshot", async () => {
