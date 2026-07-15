@@ -13,6 +13,7 @@
 //! config in one pass.
 
 mod bench;
+mod bridge;
 mod config;
 mod inspect;
 mod postflop_setup;
@@ -34,6 +35,18 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Run the authenticated loopback bridge used by the local web UI.
+    Serve {
+        /// Exact browser Origin allowed by CORS (scheme, host, and port).
+        #[arg(long, default_value = "http://localhost:3000")]
+        origin: String,
+        /// Loopback TCP port. Use 0 to select an ephemeral free port.
+        #[arg(long, default_value_t = 38127)]
+        port: u16,
+        /// Rayon worker threads owned by the bridge process.
+        #[arg(long)]
+        threads: Option<usize>,
+    },
     /// Solve the game described by a TOML config file.
     Solve {
         /// Path to the config file (see examples/kuhn.toml).
@@ -157,6 +170,11 @@ enum Command {
 fn main() -> Result<()> {
     let cli = Cli::parse();
     match cli.command {
+        Command::Serve {
+            origin,
+            port,
+            threads,
+        } => bridge::run(&origin, port, threads),
         Command::Solve {
             config,
             output,

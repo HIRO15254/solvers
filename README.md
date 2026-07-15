@@ -30,11 +30,21 @@ crates/
 └── cli         # `solvers` binary: solve / inspect / report
 ```
 
+The `web/` directory contains the preflop workbench: a responsive 169-class
+range/config editor with TOML export and an authenticated local-solver bridge.
+
+
 ## Quick start
 
 ```sh
 cargo test --workspace            # correctness harness (Kuhn/Leduc known solutions, oracle diff)
 cargo run -p cli --release -- solve examples/kuhn.toml
+
+# Preflop UI (run these in separate terminals):
+cargo run -p cli --release -- serve --origin http://localhost:3000
+cd web
+npm install
+npm run dev
 
 # Exact postflop solve (prints a memory estimate before building the tree):
 cargo run -p cli --release -- solve examples/postflop_srp20.toml

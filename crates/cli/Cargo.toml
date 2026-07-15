@@ -21,6 +21,9 @@ preflop = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
 rayon = { workspace = true }
+rand = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+tempfile = { workspace = true }
+tiny_http = { workspace = true }
 toml = { workspace = true }
