@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type AriaAttributes,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   DEFAULT_SETTINGS,
   PRESETS,
@@ -11,16 +18,19 @@ import {
   estimateSolve,
   generateToml,
   validateSettings,
+  type MultiwayStreetBetting,
   type PreflopSettings,
   type RakeMode,
   type ScheduleKind,
   type StorageKind,
+  type StreetValues,
 } from "./preflop-config";
 import {
   type MultiwayResultV2,
   type MultiwayStrategyBlock,
   type StrategyPage,
 } from "./multiway-result";
+import CommaListInput from "./CommaListInput";
 import MultiwayResultExplorer from "./MultiwayResultExplorer";
 import MultiwaySeatOverrides from "./MultiwaySeatOverrides";
 import MultiwaySeatTabs from "./MultiwaySeatTabs";
@@ -36,6 +46,8 @@ const HANDS = RANKS.flatMap((rowRank, row) =>
 );
 
 const DEFAULT_BRIDGE_URL = "http://127.0.0.1:38127";
+const VALIDATION_SUMMARY_ID = "validation-summary";
+const VALIDATION_MESSAGES_ID = "validation-messages";
 
 type RangeSeat = "sb" | "bb";
 type EngineState = "offline" | "checking" | "online";
@@ -54,10 +66,14 @@ interface BridgeProgress {
   infosets?: number;
   memoryBytes?: number;
   seats?: Array<{
-    name?: string;
-    position?: string;
-    reach?: number;
-    exploitability?: number;
+    seat: number;
+    profileEv?: {
+      mean: number;
+      stderr: number;
+      ci95: [number, number];
+    } | null;
+    averagePositiveRegret: number;
+    strategyDriftL1: number;
   }>;
 }
 
@@ -75,6 +91,12 @@ interface BridgeJob {
   resultUrl?: string | null;
   checkpointUrl?: string | null;
   error?: { code: string; message: string } | null;
+}
+
+interface SubmittedJobSnapshot {
+  mode: PreflopSettings["mode"];
+  progressTarget: number;
+  positions: string[];
 }
 
 interface BridgeHealth {
@@ -100,10 +122,26 @@ const STEPS = [
   { id: "run", number: "05", title: "実行精度", note: "Accuracy & run" },
 ];
 
+function cloneMultiwayPostflop(
+  postflop: StreetValues<MultiwayStreetBetting>,
+): StreetValues<MultiwayStreetBetting> {
+  return Object.fromEntries(
+    (["flop", "turn", "river"] as const).map((street) => [
+      street,
+      {
+        ...postflop[street],
+        betSizes: [...postflop[street].betSizes],
+        raiseSizes: [...postflop[street].raiseSizes],
+      },
+    ]),
+  ) as unknown as StreetValues<MultiwayStreetBetting>;
+}
+
 function cloneSettings(settings: PreflopSettings): PreflopSettings {
   return {
     ...settings,
     openSizesBb: [...settings.openSizesBb],
+    isolateSizesBb: [...settings.isolateSizesBb],
     raiseFactors: settings.raiseFactors.map((level) => [...level]),
     equityRealization: { ...settings.equityRealization },
     buckets: { ...settings.buckets },
@@ -112,12 +150,9 @@ function cloneSettings(settings: PreflopSettings): PreflopSettings {
       betting: seat.betting
         ? {
             openSizesBb: [...seat.betting.openSizesBb],
+            isolateSizesBb: [...seat.betting.isolateSizesBb],
             raiseFactors: [...seat.betting.raiseFactors],
-            postflopBetSizes: {
-              flop: [...seat.betting.postflopBetSizes.flop],
-              turn: [...seat.betting.postflopBetSizes.turn],
-              river: [...seat.betting.postflopBetSizes.river],
-            },
+            postflop: cloneMultiwayPostflop(seat.betting.postflop),
           }
         : undefined,
     })),
@@ -127,6 +162,7 @@ function cloneSettings(settings: PreflopSettings): PreflopSettings {
       turn: [...settings.postflopBetSizes.turn],
       river: [...settings.postflopBetSizes.river],
     },
+    multiwayPostflopBetting: cloneMultiwayPostflop(settings.multiwayPostflopBetting),
   };
 }
 
@@ -158,17 +194,13 @@ function numberValue(raw: string): number {
   return Number(raw);
 }
 
-function numberListValue(raw: string): number[] {
-  if (raw.trim() === "") return [];
-  return raw
-    .split(/[\s,]+/)
-    .map(Number)
-    .filter((value) => Number.isFinite(value));
-}
-
 function translateValidation(error: string): string {
   if (error.includes("Effective stack")) return "実効スタックは 1bb より大きくしてください。";
-  if (error.includes("Small blind")) return "SB は 0.1〜0.9bb の範囲で指定してください。";
+  if (error.includes("Small blind")) {
+    return error.includes("0.001")
+      ? "SB は 0.001〜0.999bb の範囲で指定してください。"
+      : "SB は 0.1〜0.9bb の範囲で指定してください。";
+  }
   if (error.includes("Open size")) return "オープンサイズは 2bb 以上で指定してください。";
   if (error.includes("Raise level")) return "リレイズ倍率は 1.0 より大きくしてください。";
   if (error.includes("Maximum raises")) return "最大レイズ回数を見直してください。";
@@ -178,6 +210,83 @@ function translateValidation(error: string): string {
   if (error.includes("range")) return "レンジに有効な169クラスを1つ以上含めてください。";
   if (error.includes("Rake")) return "レーキ率と上限を見直してください。";
   return error;
+}
+
+type ValidationProps = Pick<
+  AriaAttributes,
+  "aria-invalid" | "aria-errormessage"
+>;
+
+function validationFieldsForError(
+  error: string,
+  settings: PreflopSettings,
+): string[] {
+  const lower = error.toLowerCase();
+
+  for (const [index, seat] of settings.seats.entries()) {
+    const label = (seat.position || `Seat #${index + 1}`).toLowerCase();
+    if (!lower.startsWith(`${label} `)) continue;
+    if (!lower.includes("override")) {
+      if (lower.includes(" stack")) return [`seat-${index}-stack`];
+      if (lower.includes(" range")) return [`seat-${index}-range`];
+    }
+    if (lower.includes("override")) {
+      for (const street of ["flop", "turn", "river"] as const) {
+        if (!lower.includes(` ${street} `)) continue;
+        if (lower.includes(" bet size")) {
+          return [`seat-${index}-override-${street}-betSizes`];
+        }
+        if (lower.includes(" raise size")) {
+          return [`seat-${index}-override-${street}-raiseSizes`];
+        }
+        if (lower.includes("aggressive-action cap")) {
+          return [`seat-${index}-override-${street}-cap`];
+        }
+      }
+      if (lower.includes(" open size")) {
+        return [`seat-${index}-override-openSizesBb`];
+      }
+      if (lower.includes(" isolate size")) {
+        return [`seat-${index}-override-isolateSizesBb`];
+      }
+      if (lower.includes(" raise factor")) {
+        return [`seat-${index}-override-raiseFactors`];
+      }
+    }
+  }
+
+  const bucketMatch = error.match(/^(\d+)-player (preflop|flop|turn|river) buckets/i);
+  if (bucketMatch) {
+    const profileIndex = settings.bucketProfiles.findIndex(
+      (profile) => profile.activePlayers === Number(bucketMatch[1]),
+    );
+    if (profileIndex >= 0) return [`bucket-${profileIndex}-${bucketMatch[2].toLowerCase()}`];
+  }
+  for (const street of ["flop", "turn", "river"] as const) {
+    if (lower.startsWith(`${street} bet size`)) return [`street-${street}-betSizes`];
+    if (lower.startsWith(`${street} raise size`)) return [`street-${street}-raiseSizes`];
+    if (lower.startsWith(`${street} aggressive-action cap`)) return [`street-${street}-cap`];
+  }
+
+  if (lower.includes("table size") || lower.includes("seat count") || lower.includes("bucket profiles")) return ["table-size"];
+  if (lower.includes("small blind")) return ["small-blind"];
+  if (lower.startsWith("ante") || lower.includes("ante mode")) return ["ante"];
+  if (lower.startsWith("open size")) return ["preflop-open"];
+  if (lower.startsWith("isolate size")) return ["preflop-isolate"];
+  if (lower.startsWith("raise level") || lower.startsWith("raise factors")) return ["preflop-raise"];
+  if (lower.startsWith("maximum raises")) return ["preflop-cap"];
+  if (lower.includes("external-sampling sweeps")) return ["run-sweeps"];
+  if (lower.includes("external-sampling seed")) return ["run-seed"];
+  if (lower.includes("checkpoint cadence")) return ["run-checkpoint"];
+  if (lower.includes("evaluation cadence")) return ["run-evaluation-cadence"];
+  if (lower.includes("evaluation samples")) return ["run-evaluation-samples"];
+  if (lower.includes("memory limit")) return ["run-memory"];
+  if (lower.includes("resume checkpoint")) return ["run-resume"];
+  if (lower.includes("outside stack")) return ["icm-outside"];
+  if (lower.includes("icm seed")) return ["icm-seed"];
+  if (lower.includes("sampled icm")) return ["icm-samples"];
+  if (lower.includes("payout") || lower.includes("tournament icm")) return ["icm-payouts"];
+  return [];
 }
 
 function SectionHeading({
@@ -279,6 +388,7 @@ export default function Home() {
   const [engineBusy, setEngineBusy] = useState(false);
   const [engineVersion, setEngineVersion] = useState("");
   const [job, setJob] = useState<BridgeJob | null>(null);
+  const [submittedJob, setSubmittedJob] = useState<SubmittedJobSnapshot | null>(null);
   const [resultJson, setResultJson] = useState("");
   const [multiwayResult, setMultiwayResult] = useState<MultiwayResultV2 | null>(null);
   const [strategyBlocks, setStrategyBlocks] = useState<MultiwayStrategyBlock[]>([]);
@@ -293,24 +403,62 @@ export default function Home() {
 
 
   const validationErrors = useMemo(() => validateSettings(settings), [settings]);
+  const validationByField = useMemo(() => {
+    const byField = new Map<string, string[]>();
+    for (const error of validationErrors) {
+      for (const field of validationFieldsForError(error, settings)) {
+        byField.set(field, [...(byField.get(field) ?? []), error]);
+      }
+    }
+    return byField;
+  }, [settings, validationErrors]);
+  const fieldValidationProps = useCallback(
+    (field: string): ValidationProps =>
+      validationByField.has(field)
+        ? {
+            "aria-invalid": true,
+            "aria-errormessage": `validation-${field}`,
+          }
+        : {},
+    [validationByField],
+  );
   const estimate = useMemo(() => estimateSolve(settings), [settings]);
   const toml = useMemo(() => generateToml(settings), [settings]);
-  const outsidePlayerCount = useMemo(
-    () => parseNumberPaste(settings.outsideStacksText).length,
+  const parsedOutsideStacks = useMemo(
+    () => parseNumberPaste(settings.outsideStacksText),
     [settings.outsideStacksText],
   );
-  const payoutCount = useMemo(
-    () => parseNumberPaste(settings.payoutsText).length,
+  const parsedPayouts = useMemo(
+    () => parseNumberPaste(settings.payoutsText),
     [settings.payoutsText],
   );
+  const outsidePlayerCount = parsedOutsideStacks.length;
+  const payoutCount = parsedPayouts.length;
+  const icmFieldSize = settings.tableSize + outsidePlayerCount;
+  const payoutReadback = useMemo(
+    () =>
+      Array.from(
+        { length: Math.max(icmFieldSize, parsedPayouts.length) },
+        (_, index) => ({
+          place: index + 1,
+          amount: parsedPayouts[index] ?? 0,
+          padded: index >= parsedPayouts.length,
+        }),
+      ),
+    [icmFieldSize, parsedPayouts],
+  );
+  const jobMode = submittedJob?.mode ?? settings.mode;
+  const jobPositions =
+    submittedJob?.positions ?? settings.seats.map((seat) => seat.position);
   const progressCurrent =
-    settings.mode === "multiway"
+    jobMode === "multiway"
       ? (job?.progress?.sweeps ?? 0)
       : (job?.progress?.iteration ?? 0);
   const progressTarget =
-    settings.mode === "multiway"
+    submittedJob?.progressTarget ??
+    (settings.mode === "multiway"
       ? settings.externalSamplingSweeps
-      : settings.iterations;
+      : settings.iterations);
   const progressPercent =
     progressTarget > 0
       ? Math.min(100, (progressCurrent / progressTarget) * 100)
@@ -465,7 +613,11 @@ export default function Home() {
 
   const cancelSolve = useCallback(
     async () => {
-      if (!job || bridgeApiVersion !== 2 || (job.status !== "running" && job.status !== "cancelling")) return;
+      const apiVersion = job?.apiVersion ?? bridgeApiVersion;
+      if (
+        !job || apiVersion !== 2 ||
+        (job.status !== "running" && job.status !== "cancelling")
+      ) return;
       try {
         const response = await authenticatedFetch(
           `/v2/jobs/${encodeURIComponent(job.id)}/cancel`,
@@ -559,7 +711,6 @@ export default function Home() {
   function setWorkbenchMode(mode: PreflopSettings["mode"]) {
     const preset = PRESETS.find((item) => item.settings.mode === mode);
     if (preset) applyPreset(preset.id);
-    setJob(null);
   }
 
   function setMultiwayTableSize(tableSize: number) {
@@ -618,11 +769,49 @@ export default function Home() {
           ...seat,
           betting: {
             openSizesBb: [...settings.openSizesBb],
+            isolateSizesBb: [...settings.isolateSizesBb],
             raiseFactors: [...settings.raiseFactors.flat()],
-            postflopBetSizes: {
-              flop: [...settings.postflopBetSizes.flop],
-              turn: [...settings.postflopBetSizes.turn],
-              river: [...settings.postflopBetSizes.river],
+            postflop: cloneMultiwayPostflop(settings.multiwayPostflopBetting),
+          },
+        };
+      }),
+    );
+  }
+
+  function updateSeatPreflopSizes(
+    index: number,
+    key: "openSizesBb" | "isolateSizesBb" | "raiseFactors",
+    values: number[],
+  ) {
+    update(
+      "seats",
+      settings.seats.map((seat, seatIndex) => {
+        if (seatIndex !== index || !seat.betting) return seat;
+        return { ...seat, betting: { ...seat.betting, [key]: values } };
+      }),
+    );
+  }
+
+  function updateSeatPostflopSizes(
+    index: number,
+    street: "flop" | "turn" | "river",
+    key: "betSizes" | "raiseSizes",
+    values: number[],
+  ) {
+    update(
+      "seats",
+      settings.seats.map((seat, seatIndex) => {
+        if (seatIndex !== index || !seat.betting) return seat;
+        return {
+          ...seat,
+          betting: {
+            ...seat.betting,
+            postflop: {
+              ...seat.betting.postflop,
+              [street]: {
+                ...seat.betting.postflop[street],
+                [key]: values,
+              },
             },
           },
         };
@@ -630,25 +819,23 @@ export default function Home() {
     );
   }
 
-  function updateSeatBettingSizes(
+  function updateSeatPostflopOption(
     index: number,
-    key: "openSizesBb" | "raiseFactors" | "flop" | "turn" | "river",
-    values: number[],
+    street: "flop" | "turn" | "river",
+    key: "maxAggressiveActions" | "includeAllin",
+    value: number | boolean,
   ) {
     update(
       "seats",
       settings.seats.map((seat, seatIndex) => {
         if (seatIndex !== index || !seat.betting) return seat;
-        if (key === "openSizesBb" || key === "raiseFactors") {
-          return { ...seat, betting: { ...seat.betting, [key]: values } };
-        }
         return {
           ...seat,
           betting: {
             ...seat.betting,
-            postflopBetSizes: {
-              ...seat.betting.postflopBetSizes,
-              [key]: values,
+            postflop: {
+              ...seat.betting.postflop,
+              [street]: { ...seat.betting.postflop[street], [key]: value },
             },
           },
         };
@@ -669,12 +856,9 @@ export default function Home() {
           betting: source.betting
             ? {
                 openSizesBb: [...source.betting.openSizesBb],
+                isolateSizesBb: [...source.betting.isolateSizesBb],
                 raiseFactors: [...source.betting.raiseFactors],
-                postflopBetSizes: {
-                  flop: [...source.betting.postflopBetSizes.flop],
-                  turn: [...source.betting.postflopBetSizes.turn],
-                  river: [...source.betting.postflopBetSizes.river],
-                },
+                postflop: cloneMultiwayPostflop(source.betting.postflop),
               }
             : undefined,
         })),
@@ -806,11 +990,6 @@ export default function Home() {
       showToast("BucketedはTOMLを書き出し、CLIから実行できます。");
       return;
     }
-    if (settings.mode === "multiway" && settings.resumeCheckpoint.trim()) {
-      setModal("review");
-      showToast("再開IDはCLI/APIのresume引数としてTOMLと一緒に渡してください。");
-      return;
-    }
     if (engineState !== "online") {
       setModal("connection");
       return;
@@ -820,10 +999,18 @@ export default function Home() {
       showToast("Multiway実行にはv2対応のローカルソルバーが必要です。");
       return;
     }
+    const submittedSnapshot: SubmittedJobSnapshot = {
+      mode: settings.mode,
+      progressTarget:
+        settings.mode === "multiway"
+          ? settings.externalSamplingSweeps
+          : settings.iterations,
+      positions: settings.mode === "multiway" ? settings.seats.map((seat) => seat.position) : ["SB", "BB"],
+    };
     try {
       setEngineBusy(true);
       const apiVersion: BridgeApiVersion =
-        settings.mode === "multiway" ? 2 : 1;
+        submittedSnapshot.mode === "multiway" ? 2 : 1;
       if (apiVersion === 2) {
         await responseJson<{ valid: boolean; schemaVersion: number }>(
           await authenticatedFetch("/v2/validate", {
@@ -832,9 +1019,16 @@ export default function Home() {
           }),
         );
       }
+      const createPayload =
+        apiVersion === 2 && settings.resumeCheckpoint.trim()
+          ? {
+              configToml: toml,
+              resumeCheckpointUrl: settings.resumeCheckpoint.trim(),
+            }
+          : { configToml: toml };
       const jobRequest: RequestInit = {
         method: "POST",
-        body: JSON.stringify({ configToml: toml }),
+        body: JSON.stringify(createPayload),
       };
       const response = await (
         apiVersion === 2
@@ -843,8 +1037,9 @@ export default function Home() {
       );
       const nextJob = await responseJson<BridgeJob>(response);
       setJob({ ...nextJob, apiVersion });
+      setSubmittedJob(submittedSnapshot);
       showToast(
-        settings.mode === "multiway"
+        submittedSnapshot.mode === "multiway"
           ? "Multiway外部サンプリングを開始しました。"
           : "PF解析を開始しました。",
       );
@@ -858,7 +1053,7 @@ export default function Home() {
     job?.status === "running" || job?.status === "cancelling"
       ? "解析中…"
       : settings.mode === "multiway" && settings.resumeCheckpoint.trim()
-        ? "再開設定を確認"
+        ? "Checkpointから解析を再開"
         : settings.mode === "hu" && settings.postflopModel === "bucketed"
         ? "設定を確認"
         : engineState === "online"
@@ -869,6 +1064,13 @@ export default function Home() {
 
   return (
     <main className="app-shell">
+      <div className="sr-only">
+        {Array.from(validationByField.entries()).map(([field, errors]) => (
+          <span id={`validation-${field}`} key={field}>
+            {errors.map(translateValidation).join(" ")}
+          </span>
+        ))}
+      </div>
       <header className="topbar">
         <a className="brand" href="#spot" aria-label="Solvers Lab ホーム">
           <span className="brand-mark" aria-hidden="true">SL</span>
@@ -975,7 +1177,7 @@ export default function Home() {
             {settings.mode === "multiway" ? (
               <div className="approximation-notice" role="note">
                 <strong>Approximate multiway profile</strong>
-                <p>External-samplingの近似profileです。Nash / GTO収束、exploitability、最良応答の保証はありません。</p>
+                <p>External-samplingの近似profileです。Nash / GTO収束や最良応答の保証はありません。</p>
               </div>
             ) : null}
             <div className="preset-row" aria-label="プリフロッププリセット">
@@ -1111,6 +1313,7 @@ export default function Home() {
                       <select
                         className="select"
                         value={settings.tableSize}
+                        {...fieldValidationProps("table-size")}
                         onChange={(event) =>
                           setMultiwayTableSize(Number(event.target.value))
                         }
@@ -1133,9 +1336,10 @@ export default function Home() {
                         <input
                           className="input has-unit"
                           type="number"
-                          min="0.1"
-                          max="0.9"
-                          step="0.1"
+                          min="0.001"
+                          max="0.999"
+                          step="0.001"
+                          {...fieldValidationProps("small-blind")}
                           value={settings.sbBb}
                           onChange={(event) =>
                             update("sbBb", numberValue(event.target.value))
@@ -1149,6 +1353,7 @@ export default function Home() {
                       <select
                         className="select"
                         value={settings.anteMode}
+                        {...fieldValidationProps("ante")}
                         onChange={(event) =>
                           update(
                             "anteMode",
@@ -1170,7 +1375,9 @@ export default function Home() {
                           className="input has-unit"
                           type="number"
                           min="0"
+                          max="1000"
                           step="0.025"
+                          {...fieldValidationProps("ante")}
                           value={settings.anteBb}
                           onChange={(event) =>
                             update("anteBb", numberValue(event.target.value))
@@ -1210,8 +1417,10 @@ export default function Home() {
                                     className="input has-unit"
                                     type="number"
                                     min="0.1"
+                                    max="1000"
                                     step="0.1"
                                     value={seat.stackBb}
+                                    {...fieldValidationProps(`seat-${index}-stack`)}
                                     onChange={(event) =>
                                       updateMultiwaySeat(
                                         index,
@@ -1232,6 +1441,7 @@ export default function Home() {
                                 <input
                                   className="input range-input"
                                   value={seat.range}
+                                  {...fieldValidationProps(`seat-${index}-range`)}
                                   placeholder="空欄 = full range"
                                   spellCheck="false"
                                   onChange={(event) =>
@@ -1278,7 +1488,10 @@ export default function Home() {
                   </div>
                   <MultiwaySeatOverrides
                     seats={settings.seats}
-                    onChange={updateSeatBettingSizes}
+                    onPreflopChange={updateSeatPreflopSizes}
+                    validationProps={fieldValidationProps}
+                    onPostflopSizesChange={updateSeatPostflopSizes}
+                    onPostflopOptionChange={updateSeatPostflopOption}
                     onRemove={toggleSeatBetting}
                   />
 
@@ -1321,6 +1534,7 @@ export default function Home() {
                       min="2"
                       step="0.1"
                       value={newOpenSize}
+                      {...fieldValidationProps("preflop-open")}
                       onChange={(event) => setNewOpenSize(event.target.value)}
                       onKeyDown={(event) => {
                         if (event.key === "Enter") addOpenSize();
@@ -1362,7 +1576,7 @@ export default function Home() {
               <div className="field-grid" style={{ marginTop: 18 }}>
                 <div className="field">
                   <span className="field-label">{settings.mode === "multiway" ? "Preflop aggressive action cap" : "最大レイズ回数"}</span>
-                  <div className="segment-control" aria-label="最大レイズ回数">
+                  <div className="segment-control" aria-label="最大レイズ回数" {...fieldValidationProps("preflop-cap")}>
                     {[1, 2, 3, 4, 5].map((value) => (
                       <button
                         type="button"
@@ -1395,50 +1609,108 @@ export default function Home() {
                     <strong>All-street bet / raise sizes</strong>
                     <span>comma separated</span>
                   </div>
-                  <label className="field">
-                    <span className="field-label">
-                      PREFLOP re-raise
-                      <span className="field-label-note">
-                        previous-bet multiple
+                  <div className="field-grid">
+                    <label className="field">
+                      <span className="field-label">
+                        PREFLOP isolate
+                        <span className="field-label-note">raise-to BB after limp</span>
                       </span>
-                    </span>
-                    <input
-                      className="input"
-                      value={settings.raiseFactors.flat().join(", ")}
-                      placeholder="3, 2.5"
-                      onChange={(event) =>
-                        update("raiseFactors", [
-                          numberListValue(event.target.value),
-                        ])
-                      }
-                    />
-                  </label>
-                  <div className="bucket-grid street-size-grid">
-                    {(["flop", "turn", "river"] as const).map((street) => (
-                      <label className="field" key={street}>
-                        <span className="field-label">
-                          {street.toUpperCase()} bet / raise
-                          <span className="field-label-note">
-                            pot-after-call
-                          </span>
-                        </span>
-                        <input
-                          className="input"
-                          value={settings.postflopBetSizes[street].join(", ")}
-                          placeholder="0.5, 0.75"
-                          onChange={(event) =>
-                            update("postflopBetSizes", {
-                              ...settings.postflopBetSizes,
-                              [street]: numberListValue(event.target.value),
-                            })
-                          }
-                        />
-                      </label>
-                    ))}
+                      <CommaListInput
+                        className="input"
+                        values={settings.isolateSizesBb}
+                        placeholder="3.5, 4"
+                        {...fieldValidationProps("preflop-isolate")}
+                        onCommit={(values) => update("isolateSizesBb", values)}
+                      />
+                    </label>
+                    <label className="field">
+                      <span className="field-label">
+                        PREFLOP re-raise
+                        <span className="field-label-note">previous-bet multiple</span>
+                      </span>
+                      <CommaListInput
+                        className="input"
+                        values={settings.raiseFactors.flat()}
+                        placeholder="3, 2.5"
+                        {...fieldValidationProps("preflop-raise")}
+                        onCommit={(values) => update("raiseFactors", [values])}
+                      />
+                    </label>
+                  </div>
+                  <div className="street-size-grid">
+                    {(["flop", "turn", "river"] as const).map((street) => {
+                      const streetBetting = settings.multiwayPostflopBetting[street];
+                      return (
+                        <fieldset className="reveal-panel" key={street}>
+                          <legend className="field-label">
+                            {street.toUpperCase()}
+                          </legend>
+                          <div className="bucket-grid">
+                            {(["betSizes", "raiseSizes"] as const).map((key) => (
+                              <label className="field" key={key}>
+                                <span className="field-label">
+                                  {key === "betSizes" ? "Bet sizes" : "Raise sizes"}
+                                  <span className="field-label-note">pot-after-call</span>
+                                </span>
+                                <CommaListInput
+                                  className="input"
+                                  values={streetBetting[key]}
+                                  placeholder="0.5, 0.75"
+                                  {...fieldValidationProps(`street-${street}-${key}`)}
+                                  onCommit={(values) =>
+                                    update("multiwayPostflopBetting", {
+                                      ...settings.multiwayPostflopBetting,
+                                      [street]: {
+                                        ...streetBetting,
+                                        [key]: values,
+                                      },
+                                    })
+                                  }
+                                />
+                              </label>
+                            ))}
+                            <label className="field">
+                              <span className="field-label">Aggressive-action cap</span>
+                              <input
+                                className="input"
+                                type="number"
+                                min="0"
+                                max="16"
+                                step="1"
+                                {...fieldValidationProps(`street-${street}-cap`)}
+                                value={streetBetting.maxAggressiveActions}
+                                onChange={(event) =>
+                                  update("multiwayPostflopBetting", {
+                                    ...settings.multiwayPostflopBetting,
+                                    [street]: {
+                                      ...streetBetting,
+                                      maxAggressiveActions: Math.trunc(
+                                        numberValue(event.target.value),
+                                      ),
+                                    },
+                                  })
+                                }
+                              />
+                            </label>
+                            <Toggle
+                              pressed={streetBetting.includeAllin}
+                              onPressedChange={(includeAllin) =>
+                                update("multiwayPostflopBetting", {
+                                  ...settings.multiwayPostflopBetting,
+                                  [street]: { ...streetBetting, includeAllin },
+                                })
+                              }
+                              label="All-inを追加"
+                              description={`${street.toUpperCase()}の別分岐`}
+                            />
+                          </div>
+                        </fieldset>
+                      );
+                    })}
                   </div>
                   <p className="inline-callout">
-                    Multiway CLIは各ストリートで同じ候補をbetとraiseへ適用し、
-                    <code>include_allin</code> を別分岐として保持します。
+                    open / isolate / re-raiseと、各streetのbet / raise候補・上限・
+                    <code>include_allin</code> を独立して保存します。
                   </p>
                 </div>
               ) : null}
@@ -1607,6 +1879,7 @@ export default function Home() {
                                       disabled={street === "preflop"}
                                       step="1"
                                       value={profile[street]}
+                                      {...fieldValidationProps(`bucket-${index}-${street}`)}
                                       onChange={(event) =>
                                         updateBucketProfile(
                                           index,
@@ -1673,6 +1946,7 @@ export default function Home() {
                             className="textarea"
                             rows={7}
                             value={settings.payoutsText}
+                            {...fieldValidationProps("icm-payouts")}
                             onChange={(event) => update("payoutsText", event.target.value)}
                             placeholder={"100\n70\n50\n30"}
                           />
@@ -1686,6 +1960,7 @@ export default function Home() {
                             className="textarea"
                             rows={7}
                             value={settings.outsideStacksText}
+                            {...fieldValidationProps("icm-outside")}
                             onChange={(event) => update("outsideStacksText", event.target.value)}
                             placeholder={"24\n31\n48"}
                           />
@@ -1703,6 +1978,60 @@ export default function Home() {
                           </strong>
                           auto path
                         </span>
+                      </div>
+                      <div className="icm-readback-grid" aria-live="polite">
+                        <section className="icm-readback-panel" aria-labelledby="outside-readback-title">
+                          <h3 id="outside-readback-title">Outside field readback</h3>
+                          <div className="table-scroll">
+                            <table className="icm-readback-table">
+                              <caption className="sr-only">Parsed outside-player stacks</caption>
+                              <thead>
+                                <tr>
+                                  <th scope="col">Player</th>
+                                  <th scope="col">Stack</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {parsedOutsideStacks.length ? (
+                                  parsedOutsideStacks.map((stack, index) => (
+                                    <tr key={`outside-${index}`}>
+                                      <th scope="row">Field {index + 1}</th>
+                                      <td>{stack.toLocaleString()}bb</td>
+                                    </tr>
+                                  ))
+                                ) : (
+                                  <tr>
+                                    <td colSpan={2}>卓外プレイヤーなし</td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </section>
+                        <section className="icm-readback-panel" aria-labelledby="payout-readback-title">
+                          <h3 id="payout-readback-title">Payout readback</h3>
+                          <div className="table-scroll">
+                            <table className="icm-readback-table">
+                              <caption className="sr-only">Parsed and zero-padded payouts</caption>
+                              <thead>
+                                <tr>
+                                  <th scope="col">Place</th>
+                                  <th scope="col">Payout</th>
+                                  <th scope="col">Source</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {payoutReadback.map((payout) => (
+                                  <tr key={`payout-${payout.place}`}>
+                                    <th scope="row">{payout.place}</th>
+                                    <td>{payout.amount.toLocaleString()}</td>
+                                    <td>{payout.padded ? "0 padded" : "pasted"}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </section>
                       </div>
                       <div className="field-grid three">
                         <label className="field">
@@ -1723,6 +2052,7 @@ export default function Home() {
                             max="1000000"
                             step="100"
                             value={settings.icmSamples}
+                            {...fieldValidationProps("icm-samples")}
                             onChange={(event) =>
                               update("icmSamples", Math.trunc(numberValue(event.target.value)))
                             }
@@ -1736,6 +2066,7 @@ export default function Home() {
                             min="0"
                             step="1"
                             value={settings.icmSeed}
+                            {...fieldValidationProps("icm-seed")}
                             onChange={(event) =>
                               update("icmSeed", Math.trunc(numberValue(event.target.value)))
                             }
@@ -1846,6 +2177,7 @@ export default function Home() {
                         min="1"
                         step="10000"
                         value={settings.externalSamplingSweeps}
+                        {...fieldValidationProps("run-sweeps")}
                         onChange={(event) =>
                           update(
                             "externalSamplingSweeps",
@@ -1865,6 +2197,7 @@ export default function Home() {
                         min="0"
                         step="1"
                         value={settings.externalSamplingSeed}
+                        {...fieldValidationProps("run-seed")}
                         onChange={(event) =>
                           update(
                             "externalSamplingSeed",
@@ -1883,6 +2216,7 @@ export default function Home() {
                           min="0"
                           step="1000"
                           value={settings.checkpointEvery}
+                          {...fieldValidationProps("run-checkpoint")}
                           onChange={(event) =>
                             update(
                               "checkpointEvery",
@@ -1895,6 +2229,72 @@ export default function Home() {
                       <p className="helper">0で自動checkpointを無効化。</p>
                     </label>
                     <label className="field">
+                      <span className="field-label">Evaluation cadence</span>
+                      <span className="input-wrap">
+                        <input
+                          className="input has-unit"
+                          type="number"
+                          min="1"
+                          step="1000"
+                          value={settings.evaluationCadence}
+                          {...fieldValidationProps("run-evaluation-cadence")}
+                          onChange={(event) =>
+                            update(
+                              "evaluationCadence",
+                              Math.trunc(numberValue(event.target.value)),
+                            )
+                          }
+                        />
+                        <span className="unit">SWEEPS</span>
+                      </span>
+                      <p className="helper">
+                        Checkpointを0にしても独立して評価します。
+                      </p>
+                    </label>
+                    <label className="field">
+                      <span className="field-label">Evaluation samples</span>
+                      <input
+                        className="input"
+                        type="number"
+                        min="1"
+                        max="1000000"
+                        step="32"
+                        value={settings.evaluationSamples}
+                        {...fieldValidationProps("run-evaluation-samples")}
+                        onChange={(event) =>
+                          update(
+                            "evaluationSamples",
+                            Math.trunc(numberValue(event.target.value)),
+                          )
+                        }
+                      />
+                      <p className="helper">Seat別EV/CIと近似指標のheld-out評価。</p>
+                    </label>
+                    <label className="field">
+                      <span className="field-label">Policy memory limit</span>
+                      <span className="input-wrap">
+                        <input
+                          className="input has-unit"
+                          type="number"
+                          min="1"
+                          max="2048"
+                          step="128"
+                          value={Math.round(settings.maxMemoryBytes / 1048576)}
+                          {...fieldValidationProps("run-memory")}
+                          onChange={(event) =>
+                            update(
+                              "maxMemoryBytes",
+                              Math.trunc(numberValue(event.target.value) * 1048576),
+                            )
+                          }
+                        />
+                        <span className="unit">MiB</span>
+                      </span>
+                      <p className="helper">
+                        到達時はpolicyをevictせずresource_limitでcheckpoint保存。
+                      </p>
+                    </label>
+                    <label className="field">
                       <span className="field-label">Storage</span>
                       <select className="select" value="f32" disabled>
                         <option value="f32">f32 · fidelity</option>
@@ -1905,19 +2305,21 @@ export default function Home() {
                   <label className="field">
                     <span className="field-label">
                       Resume checkpoint
-                      <span className="field-label-note">optional path or managed ID</span>
+                      <span className="field-label-note">optional managed Bridge URL</span>
                     </span>
                     <input
                       className="input"
                       value={settings.resumeCheckpoint}
-                      placeholder="run-2026-07-15/checkpoint-250000.mwckpt"
+                      {...fieldValidationProps("run-resume")}
+                      placeholder="/v2/jobs/{id}/checkpoint"
                       spellCheck="false"
                       onChange={(event) =>
                         update("resumeCheckpoint", event.target.value)
                       }
                     />
                     <p className="helper">
-                      resumeはTOMLキーではなく、CLI/APIの再開引数として渡します。
+                      同一Bridge sessionが発行したmanaged URLを指定し、
+                      <code>resumeCheckpointUrl</code>としてjob作成時に送信します。
                     </p>
                   </label>
                   <p className="inline-callout">
@@ -2040,14 +2442,14 @@ export default function Home() {
 
               {job?.status === "running" || job?.status === "cancelling" ? (
                 <div className="summary-section" aria-live="polite">
-                  <p className="summary-section-title">SOLVE PROGRESS <span>{job.status === "cancelling" ? "CANCELLING" : job.progress ? progressCurrent.toLocaleString() + (settings.mode === "multiway" ? " sweeps" : " iter") : "PREPARING"}</span></p>
+                  <p className="summary-section-title">SOLVE PROGRESS <span>{job.status === "cancelling" ? "CANCELLING" : job.progress ? progressCurrent.toLocaleString() + (jobMode === "multiway" ? " sweeps" : " iter") : "PREPARING"}</span></p>
                   <div className="range-bar" role="progressbar" aria-label="Solve progress" aria-valuemin={0} aria-valuemax={progressTarget} aria-valuenow={progressCurrent}>
                     <span style={{ width: progressPercent + "%" }} />
                   </div>
                   <p className="helper">
                     {!job.progress
                       ? "ゲームツリーとsampling worldを準備しています。"
-                      : settings.mode === "multiway"
+                      : jobMode === "multiway"
                         ? (job.progress.phase ?? "sampling") +
                           " · " +
                           (job.progress.infosets ?? 0).toLocaleString() +
@@ -2059,7 +2461,7 @@ export default function Home() {
                           " · " +
                           (job.progress.elapsedSecs ?? 0).toFixed(1) + "s"}
                   </p>
-                  {settings.mode === "multiway" && bridgeApiVersion === 2 ? (
+                  {jobMode === "multiway" && (job.apiVersion ?? bridgeApiVersion) === 2 ? (
                     <button
                       type="button"
                       className="danger-button cancel-button"
@@ -2072,28 +2474,41 @@ export default function Home() {
                   {job.checkpointUrl ? <button type="button" className="text-button" onClick={() => void navigator.clipboard.writeText(job.checkpointUrl ?? "")}>Checkpoint URLをコピー</button> : null}
                 </div>
               ) : null}
-                  {settings.mode === "multiway" &&
-                  job.progress?.seats?.length ? (
+                  {jobMode === "multiway" &&
+                  job?.progress?.seats?.length ? (
                     <ul className="seat-progress" aria-label="Seat progress">
-                      {job.progress.seats.map((seat, index) => (
-                        <li key={(seat.position ?? seat.name ?? "seat") + index}>
-                          <strong>
-                            {seat.position ?? seat.name ?? "Seat " + (index + 1)}
-                          </strong>
-                          <span>
-                            {seat.exploitability === undefined
-                              ? "sampling"
-                              : "expl " + seat.exploitability.toFixed(4)}
-                          </span>
-                        </li>
-                      ))}
+                      {job?.progress?.seats?.map((seat) => {
+                        const position =
+                          jobPositions[seat.seat] ??
+                          `Seat ${seat.seat + 1}`;
+                        return (
+                          <li key={seat.seat}>
+                            <strong>{position}</strong>
+                            <span>
+                              {seat.profileEv
+                                ? `EV ${seat.profileEv.mean.toFixed(4)} · `
+                                : "EV pending · "}
+                              regret {seat.averagePositiveRegret.toFixed(5)} · drift{" "}
+                              {seat.strategyDriftL1.toFixed(5)}
+                            </span>
+                          </li>
+                        );
+                      })}
                     </ul>
                   ) : null}
 
 
-              <div className="summary-section">
+              <div
+                className="summary-section"
+                id={VALIDATION_SUMMARY_ID}
+                role={validationErrors.length ? "alert" : "status"}
+                aria-live="polite"
+              >
                 <p className="summary-section-title">CHECKS <span>{validationErrors.length ? `${validationErrors.length} ISSUES` : "READY"}</span></p>
-                <ul className={`validation-list ${validationErrors.length ? "error" : ""}`}>
+                <ul
+                  id={VALIDATION_MESSAGES_ID}
+                  className={`validation-list ${validationErrors.length ? "error" : ""}`}
+                >
                   {validationErrors.length ? (
                     validationErrors.slice(0, 3).map((error) => (
                       <li key={error}><span className="validation-mark">!</span><span>{translateValidation(error)}</span></li>
@@ -2112,6 +2527,7 @@ export default function Home() {
                 <button
                   type="button"
                   className="primary-button"
+                  aria-describedby={VALIDATION_SUMMARY_ID}
                   disabled={validationErrors.length > 0 || job?.status === "running" || job?.status === "cancelling" || engineBusy}
                   onClick={() => void startSolve()}
                 >{primaryLabel}</button>
@@ -2254,7 +2670,7 @@ export default function Home() {
                 <MultiwayResultExplorer
                   result={multiwayResult}
                   strategies={strategyBlocks}
-                  positions={settings.seats.map((seat) => seat.position)}
+                  positions={jobPositions}
                   hasMore={Boolean(strategyCursor)}
                   loading={strategyBusy}
                   onLoadMore={() => { if (job && strategyCursor) void loadStrategyPage(job.id, strategyCursor); }}

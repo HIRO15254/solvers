@@ -40,6 +40,7 @@ pub fn run(
             config_hash,
             None,
             None,
+            true,
         );
     }
 

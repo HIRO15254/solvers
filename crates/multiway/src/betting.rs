@@ -303,10 +303,19 @@ impl BettingState {
         }
 
         let minimum = self.minimum_full_target();
-        let sizes = if self.aggressive_actions == 0 {
-            &street_config.bet_sizes
-        } else {
+        let sizes = if self.aggressive_actions != 0 {
             &street_config.raise_sizes
+        } else if self.street == Street::Preflop
+            && self.history.iter().any(|record| {
+                record.street == Street::Preflop && matches!(record.action, Action::Call { .. })
+            })
+        {
+            street_config
+                .isolate_sizes
+                .as_ref()
+                .unwrap_or(&street_config.bet_sizes)
+        } else {
+            &street_config.bet_sizes
         };
         let pot = self.pot_size();
         let pot_after_call = pot + to_call.min(stack);
@@ -669,6 +678,50 @@ mod tests {
                 .iter()
                 .any(Action::is_aggressive)
         );
+    }
+
+    #[test]
+    fn preflop_open_and_isolation_sizes_are_distinct() {
+        let (mut state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
+        betting.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 2.5 }];
+        betting.preflop.isolate_sizes = Some(vec![crate::config::SizeSpec::ToBb { value: 4.0 }]);
+        betting.preflop.include_allin = false;
+
+        let opening_actions = state.legal_actions(&betting).unwrap();
+        assert!(opening_actions.iter().any(|action| {
+            matches!(
+                action,
+                Action::RaiseTo {
+                    to: MwChips(2_500),
+                    ..
+                }
+            )
+        }));
+        assert!(!opening_actions.iter().any(|action| {
+            matches!(
+                action,
+                Action::RaiseTo {
+                    to: MwChips(4_000),
+                    ..
+                }
+            )
+        }));
+
+        let limp = opening_actions
+            .into_iter()
+            .find(|action| matches!(action, Action::Call { .. }))
+            .unwrap();
+        state.apply(limp, &betting).unwrap();
+        let isolation_actions = state.legal_actions(&betting).unwrap();
+        assert!(isolation_actions.iter().any(|action| {
+            matches!(
+                action,
+                Action::RaiseTo {
+                    to: MwChips(4_000),
+                    ..
+                }
+            )
+        }));
     }
 
     #[test]

@@ -26,6 +26,7 @@ pub enum IcmMode {
 pub struct IcmEstimate {
     pub values: Vec<f64>,
     pub standard_errors: Vec<f64>,
+    pub ci95: Vec<[f64; 2]>,
     pub mode: IcmMode,
 }
 
@@ -33,6 +34,7 @@ pub struct IcmEstimate {
 pub struct IcmDeltaEstimate {
     pub deltas: SeatVec<f64>,
     pub standard_errors: SeatVec<f64>,
+    pub ci95: SeatVec<[f64; 2]>,
     pub baseline_values: SeatVec<f64>,
     pub terminal_values: SeatVec<f64>,
 }
@@ -47,14 +49,17 @@ pub fn estimate_icm(
 ) -> Result<IcmEstimate, IcmError> {
     validate_inputs(stacks, payouts)?;
     if stacks.len() <= EXACT_ICM_MAX_PLAYERS {
+        let values = exact_icm(stacks, payouts);
+        let ci95 = values.iter().map(|&value| [value, value]).collect();
         Ok(IcmEstimate {
-            values: exact_icm(stacks, payouts),
+            values,
             standard_errors: vec![0.0; stacks.len()],
+            ci95,
             mode: IcmMode::Exact,
         })
     } else {
-        if samples == 0 {
-            return Err(IcmError::ZeroSamples);
+        if samples < 2 {
+            return Err(IcmError::TooFewSamples(samples));
         }
         sampled_icm(stacks, payouts, samples, seed)
     }
@@ -154,9 +159,15 @@ fn sampled_icm(
     } else {
         vec![0.0; n]
     };
+    let ci95 = means
+        .iter()
+        .zip(&standard_errors)
+        .map(|(&mean, &stderr)| [mean - 1.96 * stderr, mean + 1.96 * stderr])
+        .collect();
     Ok(IcmEstimate {
         values: means,
         standard_errors,
+        ci95,
         mode: IcmMode::Sampled { samples, seed },
     })
 }
@@ -173,13 +184,45 @@ pub fn terminal_icm_delta(
     samples: u64,
     seed: u64,
 ) -> Result<IcmDeltaEstimate, IcmError> {
+    let mut baseline_stacks = starting_table.as_slice().to_vec();
+    baseline_stacks.extend_from_slice(outside_field);
+    let baseline = estimate_icm(&baseline_stacks, payouts, samples, seed)?;
+    terminal_icm_delta_with_baseline(
+        starting_table,
+        final_table,
+        outside_field,
+        payouts,
+        samples,
+        seed,
+        &baseline,
+    )
+}
+
+/// Terminal ICM delta using a start-of-hand estimate computed once by the
+/// caller. This keeps the baseline out of the MCCFR terminal hot path.
+pub(crate) fn terminal_icm_delta_with_baseline(
+    starting_table: &SeatVec<MwChips>,
+    final_table: &SeatVec<MwChips>,
+    outside_field: &[MwChips],
+    payouts: &[f64],
+    samples: u64,
+    seed: u64,
+    baseline: &IcmEstimate,
+) -> Result<IcmDeltaEstimate, IcmError> {
     if starting_table.len() != final_table.len() {
         return Err(IcmError::SeatCount);
     }
     let table_len = starting_table.len();
-    let mut baseline_stacks = starting_table.as_slice().to_vec();
-    baseline_stacks.extend_from_slice(outside_field);
-    let baseline = estimate_icm(&baseline_stacks, payouts, samples, seed)?;
+    let field_len = table_len + outside_field.len();
+    if baseline.values.len() != field_len
+        || baseline.standard_errors.len() != field_len
+        || baseline.ci95.len() != field_len
+    {
+        return Err(IcmError::BaselineCount {
+            expected: field_len,
+            actual: baseline.values.len(),
+        });
+    }
 
     let mut terminal_values = vec![0.0f64; table_len];
     let mut terminal_errors = vec![0.0f64; table_len];
@@ -199,7 +242,7 @@ pub fn terminal_icm_delta(
         }
         let group = end - index;
         let first_prize = bottom.checked_sub(group).ok_or(IcmError::PayoutCount {
-            expected: baseline_stacks.len(),
+            expected: field_len,
             actual: payouts.len(),
         })?;
         let split = payouts[first_prize..bottom].iter().sum::<f64>() / group as f64;
@@ -234,15 +277,21 @@ pub fn terminal_icm_delta(
         }
     }
     let baseline_values = baseline.values[..table_len].to_vec();
-    let deltas = (0..table_len)
+    let deltas: Vec<f64> = (0..table_len)
         .map(|player| terminal_values[player] - baseline_values[player])
         .collect();
-    let errors = (0..table_len)
+    let errors: Vec<f64> = (0..table_len)
         .map(|player| baseline.standard_errors[player].hypot(terminal_errors[player]))
+        .collect();
+    let ci95: Vec<[f64; 2]> = deltas
+        .iter()
+        .zip(&errors)
+        .map(|(&delta, &stderr)| [delta - 1.96 * stderr, delta + 1.96 * stderr])
         .collect();
     Ok(IcmDeltaEstimate {
         deltas: SeatVec::new_unchecked(deltas),
         standard_errors: SeatVec::new_unchecked(errors),
+        ci95: SeatVec::new_unchecked(ci95),
         baseline_values: SeatVec::new_unchecked(baseline_values),
         terminal_values: SeatVec::new_unchecked(terminal_values),
     })
@@ -348,10 +397,12 @@ pub enum IcmError {
     InvalidPayout(usize),
     #[error("payouts must be ordered highest to lowest")]
     PayoutOrder,
-    #[error("sampled ICM requires at least one sample")]
-    ZeroSamples,
+    #[error("sampled ICM requires at least two samples, got {0}")]
+    TooFewSamples(u64),
     #[error("table stack vectors have different seat counts")]
     SeatCount,
+    #[error("ICM baseline length must be {expected}, got {actual}")]
+    BaselineCount { expected: usize, actual: usize },
 }
 
 #[cfg(test)]
@@ -364,6 +415,7 @@ mod tests {
         assert_eq!(estimate.mode, IcmMode::Exact);
         assert!((estimate.values[0] - 25.0).abs() < 1e-12);
         assert!((estimate.values[1] - 75.0).abs() < 1e-12);
+        assert_eq!(estimate.ci95, vec![[25.0, 25.0], [75.0, 75.0]]);
     }
 
     #[test]
@@ -389,6 +441,104 @@ mod tests {
         assert!(matches!(first.mode, IcmMode::Sampled { .. }));
         assert!(first.standard_errors.iter().any(|error| *error > 0.0));
         assert!((first.values.iter().sum::<f64>() - 100.0).abs() < 1e-9);
+        for ((&mean, interval), &stderr) in first
+            .values
+            .iter()
+            .zip(&first.ci95)
+            .zip(&first.standard_errors)
+        {
+            assert!(interval[0] <= mean && mean <= interval[1]);
+            assert!((interval[1] - interval[0] - 3.92 * stderr).abs() < 1e-10);
+        }
+    }
+
+    fn enumerate_finish_orders(stacks: &[MwChips], payouts: &[f64]) -> Vec<f64> {
+        fn walk(
+            stacks: &[MwChips],
+            payouts: &[f64],
+            remaining: &mut Vec<usize>,
+            place: usize,
+            probability: f64,
+            values: &mut [f64],
+        ) {
+            if remaining.is_empty() {
+                return;
+            }
+            let total: u64 = remaining.iter().map(|&player| stacks[player].raw()).sum();
+            if total == 0 {
+                let average = payouts[place..].iter().sum::<f64>() / remaining.len() as f64;
+                for &player in remaining.iter() {
+                    values[player] += probability * average;
+                }
+                return;
+            }
+            for index in (0..remaining.len()).rev() {
+                let player = remaining.remove(index);
+                let choice = stacks[player].raw() as f64 / total as f64;
+                values[player] += probability * choice * payouts[place];
+                walk(
+                    stacks,
+                    payouts,
+                    remaining,
+                    place + 1,
+                    probability * choice,
+                    values,
+                );
+                remaining.insert(index, player);
+            }
+        }
+
+        let mut values = vec![0.0; stacks.len()];
+        let mut remaining: Vec<_> = (0..stacks.len()).collect();
+        walk(stacks, payouts, &mut remaining, 0, 1.0, &mut values);
+        values
+    }
+
+    #[test]
+    fn exact_three_through_seven_match_finish_order_enumeration() {
+        for players in 3..=7 {
+            let stacks: Vec<_> = (0..players)
+                .map(|player| MwChips((player as u64 + 1) * 137))
+                .collect();
+            let payouts: Vec<_> = (0..players)
+                .map(|place| ((players - place) * 10) as f64)
+                .collect();
+            let expected = enumerate_finish_orders(&stacks, &payouts);
+            let actual = estimate_icm(&stacks, &payouts, 1, 0).unwrap();
+            assert_eq!(actual.mode, IcmMode::Exact);
+            for (left, right) in actual.values.iter().zip(expected) {
+                assert!((left - right).abs() < 1e-9, "players={players}");
+            }
+        }
+    }
+
+    #[test]
+    fn exact_boundary_is_fifteen_players() {
+        let payouts_15: Vec<_> = (0..15).rev().map(|place| place as f64).collect();
+        let exact = estimate_icm(&[MwChips(100); 15], &payouts_15, 8, 5).unwrap();
+        assert_eq!(exact.mode, IcmMode::Exact);
+        let payouts_16: Vec<_> = (0..16).rev().map(|place| place as f64).collect();
+        let sampled = estimate_icm(&[MwChips(100); 16], &payouts_16, 8, 5).unwrap();
+        assert!(matches!(sampled.mode, IcmMode::Sampled { .. }));
+    }
+
+    #[test]
+    fn sampled_mode_rejects_fewer_than_two_samples() {
+        let stacks = [MwChips(100); 16];
+        let payouts: Vec<_> = (0..16).rev().map(|place| place as f64).collect();
+        for samples in [0, 1] {
+            assert!(matches!(
+                estimate_icm(&stacks, &payouts, samples, 5),
+                Err(IcmError::TooFewSamples(actual)) if actual == samples
+            ));
+        }
+    }
+
+    #[test]
+    fn exact_mode_does_not_require_monte_carlo_samples() {
+        let estimate = estimate_icm(&[MwChips(100), MwChips(300)], &[100.0, 0.0], 0, 5).unwrap();
+        assert_eq!(estimate.mode, IcmMode::Exact);
+        assert_eq!(estimate.ci95, vec![[25.0, 25.0], [75.0, 75.0]]);
     }
 
     #[test]
@@ -416,6 +566,35 @@ mod tests {
         assert_eq!(delta.terminal_values[SeatId(0)], 10.0);
         assert_eq!(delta.terminal_values[SeatId(1)], 10.0);
         assert!(delta.terminal_values[SeatId(2)] > 50.0);
+    }
+
+    #[test]
+    fn cached_baseline_matches_direct_delta_and_outside_stack_matters() {
+        let starting = SeatVec::try_new(vec![MwChips(100), MwChips(200)]).unwrap();
+        let final_stacks = SeatVec::try_new(vec![MwChips(250), MwChips(50)]).unwrap();
+        let payouts = [100.0, 60.0, 0.0];
+        let outside = [MwChips(300)];
+        let mut baseline_stacks = starting.as_slice().to_vec();
+        baseline_stacks.extend_from_slice(&outside);
+        let baseline = estimate_icm(&baseline_stacks, &payouts, 1, 11).unwrap();
+        let cached = terminal_icm_delta_with_baseline(
+            &starting,
+            &final_stacks,
+            &outside,
+            &payouts,
+            1,
+            11,
+            &baseline,
+        )
+        .unwrap();
+        let direct =
+            terminal_icm_delta(&starting, &final_stacks, &outside, &payouts, 1, 11).unwrap();
+        assert_eq!(cached, direct);
+
+        let deep_outside = [MwChips(3_000)];
+        let deep =
+            terminal_icm_delta(&starting, &final_stacks, &deep_outside, &payouts, 1, 11).unwrap();
+        assert_ne!(direct.deltas, deep.deltas);
     }
 
     #[test]

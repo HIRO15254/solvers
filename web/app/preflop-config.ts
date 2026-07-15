@@ -18,10 +18,18 @@ export interface StreetValues<T> {
   river: T;
 }
 
+export interface MultiwayStreetBetting {
+  betSizes: number[];
+  raiseSizes: number[];
+  maxAggressiveActions: number;
+  includeAllin: boolean;
+}
+
 export interface MultiwaySeatBetting {
   openSizesBb: number[];
+  isolateSizesBb: number[];
   raiseFactors: number[];
-  postflopBetSizes: StreetValues<number[]>;
+  postflop: StreetValues<MultiwayStreetBetting>;
 }
 
 export interface MultiwaySeat {
@@ -45,6 +53,7 @@ export interface PreflopSettings {
   effectiveStackBb: number;
   sbBb: number;
   openSizesBb: number[];
+  isolateSizesBb: number[];
   raiseFactors: number[][];
   maxRaises: number;
   includeAllin: boolean;
@@ -58,6 +67,7 @@ export interface PreflopSettings {
   postflopModel: PostflopModel;
   buckets: StreetValues<number>;
   postflopBetSizes: StreetValues<number[]>;
+  multiwayPostflopBetting: StreetValues<MultiwayStreetBetting>;
   iterations: number;
   checkEvery: number;
   storage: StorageKind;
@@ -81,6 +91,9 @@ export interface PreflopSettings {
   externalSamplingSweeps: number;
   externalSamplingSeed: number;
   checkpointEvery: number;
+  evaluationCadence: number;
+  evaluationSamples: number;
+  maxMemoryBytes: number;
   resumeCheckpoint: string;
 }
 
@@ -128,11 +141,33 @@ export function createBucketProfiles(
   }));
 }
 
+function createMultiwayPostflopBetting(
+  betSizes: StreetValues<number[]>,
+  raiseSizes: StreetValues<number[]> = betSizes,
+  maxAggressiveActions = 2,
+  includeAllin = true,
+): StreetValues<MultiwayStreetBetting> {
+  return Object.fromEntries(
+    (["flop", "turn", "river"] as const).map((street) => [
+      street,
+      {
+        betSizes: [...betSizes[street]],
+        raiseSizes: [...raiseSizes[street]],
+        maxAggressiveActions,
+        includeAllin,
+      },
+    ]),
+  ) as unknown as StreetValues<MultiwayStreetBetting>;
+}
+
+const DEFAULT_MULTIWAY_MEMORY_BYTES = 2 * 1024 * 1024 * 1024;
+
 const standard100Bb = (): PreflopSettings => ({
   mode: "hu",
   effectiveStackBb: 100,
   sbBb: 0.5,
   openSizesBb: [2.5],
+  isolateSizesBb: [3.5],
   raiseFactors: [[3], [2.5]],
   maxRaises: 4,
   includeAllin: true,
@@ -143,6 +178,11 @@ const standard100Bb = (): PreflopSettings => ({
   postflopModel: "equity",
   buckets: { flop: 50, turn: 20, river: 8 },
   postflopBetSizes: { flop: [0.5], turn: [0.75], river: [0.75] },
+  multiwayPostflopBetting: createMultiwayPostflopBetting({
+    flop: [0.5],
+    turn: [0.75],
+    river: [0.75],
+  }),
   iterations: 5_000,
   checkEvery: 250,
   storage: "f32",
@@ -166,6 +206,9 @@ const standard100Bb = (): PreflopSettings => ({
   externalSamplingSweeps: 250_000,
   externalSamplingSeed: 7,
   checkpointEvery: 25_000,
+  evaluationCadence: 25_000,
+  evaluationSamples: 32,
+  maxMemoryBytes: DEFAULT_MULTIWAY_MEMORY_BYTES,
   resumeCheckpoint: "",
 });
 
@@ -198,23 +241,31 @@ function multiwayBase(tableSize: number, stackBb: number): PreflopSettings {
     buckets: { flop: 64, turn: 64, river: 64 },
     bucketProfiles: createBucketProfiles(tableSize, 64),
     postflopBetSizes: { flop: [0.5], turn: [0.75], river: [0.75] },
+    multiwayPostflopBetting: createMultiwayPostflopBetting({
+      flop: [0.5],
+      turn: [0.75],
+      river: [0.75],
+    }),
     maxRaises: 2,
     raiseFactors: [[3], [2.5]],
     utilityMode: "cash",
     rakeMode: "none",
     externalSamplingSweeps: 250_000,
     checkpointEvery: 25_000,
+    evaluationCadence: 25_000,
   };
 }
 
 const pushFold9Max = (): PreflopSettings => ({
   ...multiwayBase(9, 10),
   openSizesBb: [],
+  isolateSizesBb: [],
   raiseFactors: [],
   maxRaises: 1,
   allowLimp: false,
   externalSamplingSweeps: 100_000,
   checkpointEvery: 10_000,
+  evaluationCadence: 10_000,
   bucketProfiles: createBucketProfiles(9, 32),
 });
 
@@ -234,6 +285,7 @@ const mtt9Max = (): PreflopSettings => {
     icmMethod: "auto",
     externalSamplingSweeps: 1_000_000,
     checkpointEvery: 50_000,
+    evaluationCadence: 50_000,
     bucketProfiles: createBucketProfiles(9, 64),
   };
 };
@@ -244,6 +296,7 @@ const cash6Max = (): PreflopSettings => {
     ...settings,
     externalSamplingSweeps: 1_000_000,
     checkpointEvery: 50_000,
+    evaluationCadence: 50_000,
     bucketProfiles: createBucketProfiles(6, 64),
   };
 };
@@ -258,9 +311,23 @@ const research9Max = (): PreflopSettings => {
       turn: [0.5, 0.75, 1.25],
       river: [0.5, 0.75, 1.5],
     },
+    multiwayPostflopBetting: createMultiwayPostflopBetting(
+      {
+        flop: [0.33, 0.5, 0.75],
+        turn: [0.5, 0.75, 1.25],
+        river: [0.5, 0.75, 1.5],
+      },
+      {
+        flop: [0.5, 0.75, 1.25],
+        turn: [0.75, 1.25],
+        river: [0.75, 1.5],
+      },
+      3,
+    ),
     maxRaises: 3,
     externalSamplingSweeps: 5_000_000,
     checkpointEvery: 100_000,
+    evaluationCadence: 100_000,
     bucketProfiles: createBucketProfiles(9, 200),
   };
 };
@@ -309,7 +376,7 @@ export const PRESETS: PreflopPreset[] = [
   {
     id: "multiway-9max-research",
     name: "9-max · 100bb research",
-    description: "Large sizing menu, 96-bucket profiles, and a five-million-sweep run.",
+    description: "Large sizing menu, 200-bucket profiles, and a five-million-sweep run.",
     settings: research9Max(),
   },
 ];
@@ -321,6 +388,14 @@ const CHIPS_PER_BB = 10;
 const MULTIWAY_CHIPS_PER_BB = 1_000;
 const POSTFLOP_MAX_RAISES = 2;
 const GG_EXEMPT_POT = 15;
+const MAX_MULTIWAY_SWEEPS = 10_000_000;
+const MAX_MULTIWAY_EVALUATION_SAMPLES = 1_000_000;
+const MAX_MULTIWAY_MEMORY_BYTES = 2 * 1024 * 1024 * 1024;
+const MAX_MULTIWAY_STACK_BB = 1_000;
+const MAX_MULTIWAY_RANGE_BYTES = 4_096;
+const MAX_MULTIWAY_SIZES_PER_LEVEL = 16;
+const MAX_MULTIWAY_AGGRESSIVE_ACTIONS = 16;
+const MAX_MULTIWAY_BUCKETS = 4_096;
 
 const schedules: readonly ScheduleKind[] = [
   "vanilla",
@@ -373,6 +448,16 @@ function validateFloatList(
       errors.push(`${label} #${index + 1} must be greater than ${minimumExclusive}.`);
     }
   });
+}
+
+function validateListLength(errors: string[], label: string, values: number[]): void {
+  if (values.length > MAX_MULTIWAY_SIZES_PER_LEVEL) {
+    errors.push(`${label} supports at most ${MAX_MULTIWAY_SIZES_PER_LEVEL} sizes.`);
+  }
+}
+
+function utf8Length(value: string): number {
+  return new TextEncoder().encode(value).length;
 }
 
 const RANKS = "23456789TJQKA";
@@ -481,6 +566,15 @@ export function parseNumberPaste(input: string): number[] {
   return matches.map((value) => Number(value.replaceAll(",", "")));
 }
 
+export function parseSizingListDraft(input: string): number[] {
+  return input
+    .split(",")
+    .map((value) => value.trim())
+    .filter((value) => value !== "")
+    .map(Number)
+    .filter(Number.isFinite);
+}
+
 function validateMultiwaySettings(settings: PreflopSettings): string[] {
   const errors: string[] = [];
   if (!Number.isSafeInteger(settings.tableSize) || settings.tableSize < 3 || settings.tableSize > 9) {
@@ -495,19 +589,68 @@ function validateMultiwaySettings(settings: PreflopSettings): string[] {
     if (seat.position !== expectedPositions[index]) {
       errors.push(`Seat #${index + 1} must use the standard position label.`);
     }
-    validateFloat(errors, `${seat.position || `Seat #${index + 1}`} stack`, seat.stackBb);
-    validateRange(errors, `${seat.position || `Seat #${index + 1}`} range`, seat.range);
+    const seatLabel = seat.position || `Seat #${index + 1}`;
+    validateFloat(errors, `${seatLabel} stack`, seat.stackBb);
+    if (isFiniteNumber(seat.stackBb) && seat.stackBb > MAX_MULTIWAY_STACK_BB) {
+      errors.push(`${seatLabel} stack may not exceed ${MAX_MULTIWAY_STACK_BB}bb.`);
+    }
+    validateRange(errors, `${seatLabel} range`, seat.range);
+    if (utf8Length(seat.range) > MAX_MULTIWAY_RANGE_BYTES) {
+      errors.push(`${seatLabel} range exceeds the ${MAX_MULTIWAY_RANGE_BYTES}-byte limit.`);
+    }
     if (seat.betting) {
-      const label = `${seat.position || `Seat #${index + 1}`} override`;
+      const label = `${seatLabel} override`;
       validateFloatList(errors, `${label} open size`, seat.betting.openSizesBb, 0);
+      validateListLength(errors, `${label} open size`, seat.betting.openSizesBb);
       seat.betting.openSizesBb.forEach((size, sizeIndex) => {
         if (isFiniteNumber(size) && size < 2) {
           errors.push(`${label} open size #${sizeIndex + 1} must be at least 2bb.`);
         }
       });
+      validateFloatList(errors, `${label} isolate size`, seat.betting.isolateSizesBb, 0);
+      validateListLength(errors, `${label} isolate size`, seat.betting.isolateSizesBb);
+      seat.betting.isolateSizesBb.forEach((size, sizeIndex) => {
+        if (isFiniteNumber(size) && size < 2) {
+          errors.push(`${label} isolate size #${sizeIndex + 1} must be at least 2bb.`);
+        }
+      });
       validateFloatList(errors, `${label} raise factor`, seat.betting.raiseFactors, 1);
+      validateListLength(errors, `${label} raise factor`, seat.betting.raiseFactors);
       (["flop", "turn", "river"] as const).forEach((street) => {
-        validateFloatList(errors, `${label} ${street} size`, seat.betting?.postflopBetSizes[street] ?? [], 0);
+        const streetBetting = seat.betting?.postflop[street];
+        validateFloatList(
+          errors,
+          `${label} ${street} bet size`,
+          streetBetting?.betSizes ?? [],
+          0,
+        );
+        validateListLength(
+          errors,
+          `${label} ${street} bet size`,
+          streetBetting?.betSizes ?? [],
+        );
+        validateFloatList(
+          errors,
+          `${label} ${street} raise size`,
+          streetBetting?.raiseSizes ?? [],
+          0,
+        );
+        validateListLength(
+          errors,
+          `${label} ${street} raise size`,
+          streetBetting?.raiseSizes ?? [],
+        );
+        validateU32(
+          errors,
+          `${label} ${street} aggressive-action cap`,
+          streetBetting?.maxAggressiveActions ?? -1,
+          0,
+        );
+        if ((streetBetting?.maxAggressiveActions ?? 0) > MAX_MULTIWAY_AGGRESSIVE_ACTIONS) {
+          errors.push(
+            `${label} ${street} aggressive-action cap may not exceed ${MAX_MULTIWAY_AGGRESSIVE_ACTIONS}.`,
+          );
+        }
       });
     }
   });
@@ -515,10 +658,10 @@ function validateMultiwaySettings(settings: PreflopSettings): string[] {
   validateFloat(errors, "Small blind", settings.sbBb);
   if (
     isFiniteNumber(settings.sbBb) &&
-    (Math.round(settings.sbBb * CHIPS_PER_BB) <= 0 ||
-      Math.round(settings.sbBb * CHIPS_PER_BB) >= CHIPS_PER_BB)
+    (Math.round(settings.sbBb * MULTIWAY_CHIPS_PER_BB) <= 0 ||
+      Math.round(settings.sbBb * MULTIWAY_CHIPS_PER_BB) >= MULTIWAY_CHIPS_PER_BB)
   ) {
-    errors.push("Small blind must round to between 0.1bb and 0.9bb.");
+    errors.push("Small blind must round to between 0.001bb and 0.999bb.");
   }
   if (!["none", "ante", "big-blind-ante"].includes(settings.anteMode)) {
     errors.push("Select a supported ante mode.");
@@ -526,20 +669,53 @@ function validateMultiwaySettings(settings: PreflopSettings): string[] {
   if (!isFiniteNumber(settings.anteBb) || settings.anteBb < 0) {
     errors.push("Ante must be zero or greater.");
   }
+  if (isFiniteNumber(settings.anteBb) && settings.anteBb > MAX_MULTIWAY_STACK_BB) {
+    errors.push(`Ante may not exceed ${MAX_MULTIWAY_STACK_BB}bb.`);
+  }
 
   validateFloatList(errors, "Open size", settings.openSizesBb, 0);
+  validateListLength(errors, "Open size", settings.openSizesBb);
   settings.openSizesBb.forEach((size, index) => {
     if (isFiniteNumber(size) && size < 2) {
       errors.push(`Open size #${index + 1} must be at least the 2bb minimum raise.`);
     }
   });
+  validateFloatList(errors, "Isolate size", settings.isolateSizesBb, 0);
+  validateListLength(errors, "Isolate size", settings.isolateSizesBb);
+  settings.isolateSizesBb.forEach((size, index) => {
+    if (isFiniteNumber(size) && size < 2) {
+      errors.push(`Isolate size #${index + 1} must be at least the 2bb minimum raise.`);
+    }
+  });
+  if (settings.raiseFactors.length > MAX_MULTIWAY_SIZES_PER_LEVEL) {
+    errors.push(`Raise factors support at most ${MAX_MULTIWAY_SIZES_PER_LEVEL} levels.`);
+  }
   settings.raiseFactors.forEach((level, index) => {
     validateFloatList(errors, `Raise level ${index + 1}`, level, 1);
+    validateListLength(errors, `Raise level ${index + 1}`, level);
   });
   validateU32(errors, "Maximum raises", settings.maxRaises, 0);
-  validateFloatList(errors, "Flop bet size", settings.postflopBetSizes.flop, 0);
-  validateFloatList(errors, "Turn bet size", settings.postflopBetSizes.turn, 0);
-  validateFloatList(errors, "River bet size", settings.postflopBetSizes.river, 0);
+  if (settings.maxRaises > MAX_MULTIWAY_AGGRESSIVE_ACTIONS) {
+    errors.push(`Maximum raises may not exceed ${MAX_MULTIWAY_AGGRESSIVE_ACTIONS}.`);
+  }
+  (["flop", "turn", "river"] as const).forEach((street) => {
+    const streetBetting = settings.multiwayPostflopBetting[street];
+    validateFloatList(errors, `${street} bet size`, streetBetting.betSizes, 0);
+    validateListLength(errors, `${street} bet size`, streetBetting.betSizes);
+    validateFloatList(errors, `${street} raise size`, streetBetting.raiseSizes, 0);
+    validateListLength(errors, `${street} raise size`, streetBetting.raiseSizes);
+    validateU32(
+      errors,
+      `${street} aggressive-action cap`,
+      streetBetting.maxAggressiveActions,
+      0,
+    );
+    if (streetBetting.maxAggressiveActions > MAX_MULTIWAY_AGGRESSIVE_ACTIONS) {
+      errors.push(
+        `${street} aggressive-action cap may not exceed ${MAX_MULTIWAY_AGGRESSIVE_ACTIONS}.`,
+      );
+    }
+  });
 
   const expectedProfiles = Math.max(0, settings.tableSize - 1);
   if (
@@ -557,13 +733,22 @@ function validateMultiwaySettings(settings: PreflopSettings): string[] {
         1,
       );
     });
+    for (const street of ["flop", "turn", "river"] as const) {
+      if (profile[street] > MAX_MULTIWAY_BUCKETS) {
+        errors.push(`${profile.activePlayers}-player ${street} buckets may not exceed ${MAX_MULTIWAY_BUCKETS}.`);
+      }
+    }
     if (profile.preflop > 169) {
       errors.push(`${profile.activePlayers}-player preflop buckets cannot exceed 169.`);
     }
   });
 
-  if (!Number.isSafeInteger(settings.externalSamplingSweeps) || settings.externalSamplingSweeps <= 0) {
-    errors.push("External-sampling sweeps must be a positive safe integer.");
+  if (
+    !Number.isSafeInteger(settings.externalSamplingSweeps) ||
+    settings.externalSamplingSweeps <= 0 ||
+    settings.externalSamplingSweeps > MAX_MULTIWAY_SWEEPS
+  ) {
+    errors.push(`External-sampling sweeps must be an integer from 1 to ${MAX_MULTIWAY_SWEEPS}.`);
   }
   validateU32(errors, "External-sampling seed", settings.externalSamplingSeed, 0);
   validateU32(errors, "Checkpoint cadence", settings.checkpointEvery, 0);
@@ -573,8 +758,39 @@ function validateMultiwaySettings(settings: PreflopSettings): string[] {
   ) {
     errors.push("Checkpoint cadence cannot exceed the sweep count.");
   }
+  if (
+    !Number.isSafeInteger(settings.evaluationCadence) ||
+    settings.evaluationCadence <= 0 ||
+    settings.evaluationCadence > settings.externalSamplingSweeps
+  ) {
+    errors.push("Evaluation cadence must be a positive integer no greater than the sweep count.");
+  }
+  if (
+    !Number.isSafeInteger(settings.evaluationSamples) ||
+    settings.evaluationSamples <= 0 ||
+    settings.evaluationSamples > MAX_MULTIWAY_EVALUATION_SAMPLES
+  ) {
+    errors.push(
+      `Evaluation samples must be an integer from 1 to ${MAX_MULTIWAY_EVALUATION_SAMPLES}.`,
+    );
+  }
+  if (
+    !Number.isSafeInteger(settings.maxMemoryBytes) ||
+    settings.maxMemoryBytes <= 0 ||
+    settings.maxMemoryBytes > MAX_MULTIWAY_MEMORY_BYTES
+  ) {
+    errors.push(
+      `Memory limit must be an integer from 1 to ${MAX_MULTIWAY_MEMORY_BYTES} bytes.`,
+    );
+  }
+  const resumeCheckpoint = settings.resumeCheckpoint.trim();
   if (/\r|\n|\0/.test(settings.resumeCheckpoint)) {
-    errors.push("Resume checkpoint must be a single path or managed checkpoint ID.");
+    errors.push("Resume checkpoint must be a single managed URL.");
+  } else if (
+    resumeCheckpoint &&
+    !/^\/v2\/jobs\/[0-9a-fA-F]{32}\/checkpoint$/.test(resumeCheckpoint)
+  ) {
+    errors.push("Resume checkpoint must be a managed /v2/jobs/{id}/checkpoint URL.");
   }
 
   if (!["cash", "icm"].includes(settings.utilityMode)) {
@@ -597,10 +813,21 @@ function validateMultiwaySettings(settings: PreflopSettings): string[] {
       if (!isFiniteNumber(stack) || stack <= 0) {
         errors.push(`Outside stack #${index + 1} must be greater than zero.`);
       }
+      if (isFiniteNumber(stack) && stack > MAX_MULTIWAY_STACK_BB) {
+        errors.push(`Outside stack #${index + 1} may not exceed ${MAX_MULTIWAY_STACK_BB}bb.`);
+      }
     });
     if (totalPlayers > 100) errors.push("ICM supports at most 100 remaining players.");
     if (payouts.length > totalPlayers) {
       errors.push("Payout count cannot exceed the remaining-player count.");
+    }
+    if (payouts.length > 0 && payouts.length <= totalPlayers) {
+      const paddedPayouts = [...payouts, ...Array(totalPlayers - payouts.length).fill(0)];
+      if (paddedPayouts.every((payout) => payout === paddedPayouts[0])) {
+        errors.push(
+          "ICM payouts must contain at least two distinct amounts after unpaid places are padded with zero.",
+        );
+      }
     }
     if (settings.icmMethod === "exact" && totalPlayers > 15) {
       errors.push("Exact ICM supports at most 15 remaining players; use auto or sampled.");
@@ -797,20 +1024,21 @@ function appendMultiwayBettingToml(
     "",
     `[${prefix}.preflop]`,
     `bet_sizes = ${tomlObjectList("to-bb", "value", sizes.openSizesBb)}`,
+    `isolate_sizes = ${tomlObjectList("to-bb", "value", sizes.isolateSizesBb)}`,
     `raise_sizes = ${tomlObjectList("previous-bet-multiple", "factor", raises)}`,
     `max_aggressive_actions = ${tomlInteger(maxRaises)}`,
     `include_allin = ${includeAllin}`,
   );
 
   (["flop", "turn", "river"] as const).forEach((street) => {
-    const streetSizes = sizes.postflopBetSizes[street];
+    const streetBetting = sizes.postflop[street];
     lines.push(
       "",
       `[${prefix}.${street}]`,
-      `bet_sizes = ${tomlObjectList("pot-after-call", "fraction", streetSizes)}`,
-      `raise_sizes = ${tomlObjectList("pot-after-call", "fraction", streetSizes)}`,
-      `max_aggressive_actions = ${POSTFLOP_MAX_RAISES}`,
-      "include_allin = true",
+      `bet_sizes = ${tomlObjectList("pot-after-call", "fraction", streetBetting.betSizes)}`,
+      `raise_sizes = ${tomlObjectList("pot-after-call", "fraction", streetBetting.raiseSizes)}`,
+      `max_aggressive_actions = ${tomlInteger(streetBetting.maxAggressiveActions)}`,
+      `include_allin = ${streetBetting.includeAllin}`,
     );
   });
 }
@@ -882,8 +1110,9 @@ function generateMultiwayToml(settings: PreflopSettings): string {
     "game.betting",
     {
       openSizesBb: settings.openSizesBb,
+      isolateSizesBb: settings.isolateSizesBb,
       raiseFactors: settings.raiseFactors.flat(),
-      postflopBetSizes: settings.postflopBetSizes,
+      postflop: settings.multiwayPostflopBetting,
     },
     settings.allowLimp,
     settings.maxRaises,
@@ -964,14 +1193,15 @@ function generateMultiwayToml(settings: PreflopSettings): string {
     "[run]",
     `sweeps = ${tomlInteger(settings.externalSamplingSweeps)}`,
     `seed = ${tomlInteger(settings.externalSamplingSeed)}`,
-    `check_every = ${tomlInteger(Math.max(1, settings.checkpointEvery || 25))}`,
+    `check_every = ${tomlInteger(settings.evaluationCadence)}`,
     'storage = "f32"',
-    "evaluation_samples = 32",
+    `max_memory_bytes = ${tomlInteger(settings.maxMemoryBytes)}`,
+    `evaluation_samples = ${tomlInteger(settings.evaluationSamples)}`,
+    `evaluation_cadence = ${tomlInteger(settings.evaluationCadence)}`,
   );
   if (settings.checkpointEvery > 0) {
     lines.push(
       `checkpoint_every = ${tomlInteger(settings.checkpointEvery)}`,
-      `evaluation_cadence = ${tomlInteger(settings.checkpointEvery)}`,
     );
   }
 
@@ -1354,13 +1584,19 @@ function estimateMultiwaySolve(settings: PreflopSettings): {
   nodes: string;
   quality: string;
 } {
+  const postflopSizingBranches = (["flop", "turn", "river"] as const).reduce(
+    (total, street) =>
+      total +
+      settings.multiwayPostflopBetting[street].betSizes.length +
+      settings.multiwayPostflopBetting[street].raiseSizes.length,
+    0,
+  );
   const sizingBranches =
     2 +
     settings.openSizesBb.length +
+    settings.isolateSizesBb.length +
     settings.raiseFactors.flat().length +
-    settings.postflopBetSizes.flop.length +
-    settings.postflopBetSizes.turn.length +
-    settings.postflopBetSizes.river.length;
+    postflopSizingBranches;
   const bucketMass = settings.bucketProfiles.reduce(
     (total, profile) =>
       saturatedAdd(

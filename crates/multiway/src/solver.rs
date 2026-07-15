@@ -6,11 +6,12 @@
 //! exposes sampled regret diagnostics and average policies without claiming
 //! a two-player zero-sum guarantee.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, hash_map::Entry};
 use std::mem::size_of;
 
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::abstraction::{BucketId, BucketPath};
@@ -318,6 +319,44 @@ pub struct ProfileEvaluation {
     pub deviation_gain_lower_bound: Option<Vec<ProfileEstimate>>,
 }
 
+#[derive(Clone, Debug)]
+enum TraversalEvent {
+    EnsurePolicy {
+        key: InfoKey,
+        action_labels: Vec<String>,
+    },
+    EnsureHistory(HistoryEntry),
+    AddRegret {
+        key: InfoKey,
+        values: Vec<f64>,
+    },
+    AddStrategy {
+        key: InfoKey,
+        values: Vec<f64>,
+    },
+}
+
+#[derive(Clone, Debug)]
+struct TraversalDelta {
+    sample_id: u64,
+    traverser: usize,
+    deal_attempts: u64,
+    terminal_evaluations: u64,
+    events: Vec<TraversalEvent>,
+}
+
+struct TraversalWorker<'a, G: ExternalSamplingGame> {
+    game: &'a G,
+    policies: &'a HashMap<InfoKey, PolicyColumn>,
+    histories: &'a HashMap<HistoryKey, HistoryEntry>,
+    config: SolverConfig,
+    linear_weight: f64,
+    events: Vec<TraversalEvent>,
+    local_policies: HashMap<InfoKey, Vec<String>>,
+    local_histories: HashMap<HistoryKey, HistoryEntry>,
+    terminal_evaluations: u64,
+}
+
 /// Sparse external-sampling MCCFR state.  A policy column exists only after
 /// `(public history, player, bucket)` is visited by a sampled traversal.
 pub struct MultiwaySolver<G: ExternalSamplingGame> {
@@ -361,13 +400,30 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         sampler: DealSampler,
         state: SolverState,
     ) -> Result<Self, SolverError> {
-        validate_setup(&game, &sampler, state.config)?;
+        let current_config = state.config;
+        Self::from_state_with_config(game, sampler, state, current_config)
+    }
+
+    /// Restores algorithm state while adopting the caller's current
+    /// operational memory budget. All settings that affect sampling or
+    /// updates must still match the checkpoint exactly.
+    pub fn from_state_with_config(
+        game: G,
+        sampler: DealSampler,
+        mut state: SolverState,
+        current_config: SolverConfig,
+    ) -> Result<Self, SolverError> {
+        validate_setup(&game, &sampler, current_config)?;
         if state.schema_version != SOLVER_STATE_VERSION {
             return Err(SolverError::StateVersion {
                 found: state.schema_version,
                 expected: SOLVER_STATE_VERSION,
             });
         }
+        if !resume_configs_match(state.config, current_config) {
+            return Err(SolverError::ResumeConfigurationMismatch);
+        }
+        state.config.max_memory_bytes = current_config.max_memory_bytes;
         let expected_sweeps = state.traversals / game.num_players() as u64;
         if state.completed_sweeps != expected_sweeps {
             return Err(SolverError::InvalidState(
@@ -447,9 +503,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// Fingerprint covering solver knobs, ranges, and public game rules.
     pub fn configuration_fingerprint(&self) -> [u8; 32] {
         let mut hasher = blake3::Hasher::new();
-        hasher.update(b"solvers.multiway.solver-config.v1");
+        hasher.update(b"solvers.multiway.solver-config.v2");
         hasher.update(&self.config.seed.to_le_bytes());
-        hasher.update(&self.config.max_memory_bytes.to_le_bytes());
         hasher.update(&self.config.max_traversal_depth.to_le_bytes());
         hasher.update(&self.config.exploration_epsilon.to_bits().to_le_bytes());
         hasher.update(&self.config.discount_every.to_le_bytes());
@@ -463,16 +518,279 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         self.game.abstraction_fingerprint()
     }
 
+    /// Runs complete sweeps using a deterministic ordered-delta batch.
+    ///
+    /// Every seat traversal in a sweep reads the same strategy snapshot.
+    /// Workers only produce local update events; those events are merged by
+    /// sample id (equivalently seat order within the sweep). Consequently,
+    /// changing `threads` cannot change f32 accumulation order or checkpoint
+    /// bytes.
     pub fn run_sweeps(&mut self, sweeps: u64) -> Result<(), SolverError> {
-        let traversals = sweeps
+        self.run_sweeps_with_threads(sweeps, 1)
+    }
+
+    /// Runs deterministic parallel sweeps until the requested count is
+    /// reached or `should_continue` returns false at a sweep boundary.
+    ///
+    /// The Rayon pool is built once for the whole call. The return value is
+    /// the number of complete, transactionally merged sweeps from this call.
+    pub fn run_sweeps_with_threads(
+        &mut self,
+        sweeps: u64,
+        threads: usize,
+    ) -> Result<(), SolverError> {
+        self.run_sweeps_with_threads_until(sweeps, threads, || true)
+            .map(|_| ())
+    }
+
+    pub fn run_sweeps_with_threads_until<F>(
+        &mut self,
+        sweeps: u64,
+        threads: usize,
+        mut should_continue: F,
+    ) -> Result<u64, SolverError>
+    where
+        F: FnMut() -> bool,
+    {
+        if threads == 0 {
+            return Err(SolverError::ZeroThreads);
+        }
+        if !self
+            .traversals
+            .is_multiple_of(self.game.num_players() as u64)
+        {
+            return Err(SolverError::IncompleteSweepState);
+        }
+        let additional_traversals = sweeps
             .checked_mul(self.game.num_players() as u64)
             .ok_or(SolverError::TraversalCountOverflow)?;
-        self.run_traversals(traversals)
+        self.traversals
+            .checked_add(additional_traversals)
+            .ok_or(SolverError::TraversalCountOverflow)?;
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .map_err(|error| SolverError::ThreadPoolBuild(error.to_string()))?;
+        let num_players = self.game.num_players();
+        let mut completed = 0u64;
+
+        for _ in 0..sweeps {
+            if !should_continue() {
+                break;
+            }
+            let first_sample_id = self.next_sample_id;
+            let results = pool.install(|| {
+                (0..num_players)
+                    .into_par_iter()
+                    .map(|traverser| {
+                        let sample_id = first_sample_id
+                            .checked_add(traverser as u64)
+                            .ok_or(SolverError::CounterOverflow)?;
+                        self.generate_traversal_delta(sample_id, traverser)
+                    })
+                    .collect::<Vec<_>>()
+            });
+            // IndexedParallelIterator::collect preserves seat order. Resolve
+            // errors in that same order as well, rather than whichever worker
+            // happened to finish first.
+            let mut deltas = Vec::with_capacity(num_players);
+            for result in results {
+                deltas.push(result?);
+            }
+            self.merge_sweep(deltas)?;
+            completed = completed
+                .checked_add(1)
+                .ok_or(SolverError::CounterOverflow)?;
+        }
+        Ok(completed)
+    }
+
+    fn generate_traversal_delta(
+        &self,
+        sample_id: u64,
+        traverser: usize,
+    ) -> Result<TraversalDelta, SolverError> {
+        let mut deal_rng = traversal_deal_rng(self.config.seed, sample_id, traverser);
+        let sample = self.sampler.sample_counted(&mut deal_rng)?;
+        let mut action_rng = traversal_action_rng(self.config.seed, sample_id, traverser);
+        let mut worker = TraversalWorker::new(self);
+        let mut reach = vec![1.0; self.game.num_players()];
+        worker.traverse(
+            self.game.root_state(),
+            &sample.world,
+            traverser,
+            HistoryKey::ROOT,
+            &mut reach,
+            1.0,
+            &mut action_rng,
+            0,
+        )?;
+        Ok(worker.finish(sample_id, traverser, u64::from(sample.attempts)))
+    }
+
+    /// Replays a complete sweep into scratch columns first. This makes the
+    /// merge transactional: a memory or numeric limit never leaves a partial
+    /// sweep whose workers would have to be regenerated from a lost snapshot.
+    fn merge_sweep(&mut self, deltas: Vec<TraversalDelta>) -> Result<(), SolverError> {
+        let num_players = self.game.num_players();
+        if deltas.len() != num_players {
+            return Err(SolverError::InvalidState(
+                "parallel sweep did not produce one delta per seat",
+            ));
+        }
+
+        let mut scratch_policies: HashMap<InfoKey, PolicyColumn> = HashMap::new();
+        let mut scratch_histories: HashMap<HistoryKey, HistoryEntry> = HashMap::new();
+        let mut memory_bytes = self.approx_memory_bytes;
+        let mut total_deal_attempts = self.total_deal_attempts;
+        let mut terminal_evaluations = self.terminal_evaluations;
+
+        for (seat, delta) in deltas.into_iter().enumerate() {
+            let expected_sample_id = self
+                .next_sample_id
+                .checked_add(seat as u64)
+                .ok_or(SolverError::CounterOverflow)?;
+            if delta.sample_id != expected_sample_id || delta.traverser != seat {
+                return Err(SolverError::InvalidState(
+                    "parallel traversal deltas are not in sample-id order",
+                ));
+            }
+            total_deal_attempts = total_deal_attempts
+                .checked_add(delta.deal_attempts)
+                .ok_or(SolverError::CounterOverflow)?;
+            terminal_evaluations = terminal_evaluations
+                .checked_add(delta.terminal_evaluations)
+                .ok_or(SolverError::CounterOverflow)?;
+
+            for event in delta.events {
+                match event {
+                    TraversalEvent::EnsurePolicy { key, action_labels } => {
+                        let stored = scratch_policies
+                            .get(&key)
+                            .or_else(|| self.policies.get(&key));
+                        if let Some(column) = stored {
+                            if column.num_actions() != action_labels.len() {
+                                return Err(SolverError::ActionCountChanged {
+                                    key,
+                                    stored: column.num_actions(),
+                                    current: action_labels.len(),
+                                });
+                            }
+                            if column.action_labels != action_labels {
+                                return Err(SolverError::ActionLabelsChanged { key });
+                            }
+                        } else {
+                            memory_bytes = memory_bytes
+                                .checked_add(entry_memory_bytes(&action_labels)?)
+                                .ok_or(SolverError::MemoryAccountingOverflow)?;
+                            if memory_bytes > self.config.max_memory_bytes {
+                                return Err(SolverError::MemoryLimit {
+                                    limit: self.config.max_memory_bytes,
+                                    needed: memory_bytes,
+                                });
+                            }
+                            scratch_policies.insert(key, PolicyColumn::zeroed(action_labels));
+                        }
+                    }
+                    TraversalEvent::EnsureHistory(entry) => {
+                        let stored = scratch_histories
+                            .get(&entry.key)
+                            .or_else(|| self.histories.get(&entry.key));
+                        if let Some(stored) = stored {
+                            if stored != &entry {
+                                return Err(SolverError::HistoryCollision(entry.key));
+                            }
+                        } else {
+                            memory_bytes = memory_bytes
+                                .checked_add(history_memory_bytes(&entry.action_label)?)
+                                .ok_or(SolverError::MemoryAccountingOverflow)?;
+                            if memory_bytes > self.config.max_memory_bytes {
+                                return Err(SolverError::MemoryLimit {
+                                    limit: self.config.max_memory_bytes,
+                                    needed: memory_bytes,
+                                });
+                            }
+                            scratch_histories.insert(entry.key, entry);
+                        }
+                    }
+                    TraversalEvent::AddRegret { key, values } => {
+                        if let Entry::Vacant(entry) = scratch_policies.entry(key) {
+                            let column =
+                                self.policies.get(&key).ok_or(SolverError::InvalidState(
+                                    "regret delta refers to an uninitialized policy",
+                                ))?;
+                            entry.insert(column.clone());
+                        }
+                        let column = scratch_policies
+                            .get_mut(&key)
+                            .expect("inserted or copied above");
+                        if column.regrets.len() != values.len() {
+                            return Err(SolverError::ActionCountChanged {
+                                key,
+                                stored: column.regrets.len(),
+                                current: values.len(),
+                            });
+                        }
+                        for (target, value) in column.regrets.iter_mut().zip(values) {
+                            checked_add_f32(target, value)?;
+                        }
+                    }
+                    TraversalEvent::AddStrategy { key, values } => {
+                        if let Entry::Vacant(entry) = scratch_policies.entry(key) {
+                            let column =
+                                self.policies.get(&key).ok_or(SolverError::InvalidState(
+                                    "strategy delta refers to an uninitialized policy",
+                                ))?;
+                            entry.insert(column.clone());
+                        }
+                        let column = scratch_policies
+                            .get_mut(&key)
+                            .expect("inserted or copied above");
+                        if column.strategy_sum.len() != values.len() {
+                            return Err(SolverError::ActionCountChanged {
+                                key,
+                                stored: column.strategy_sum.len(),
+                                current: values.len(),
+                            });
+                        }
+                        for (target, value) in column.strategy_sum.iter_mut().zip(values) {
+                            checked_add_f32(target, value)?;
+                        }
+                    }
+                }
+            }
+        }
+
+        let added = num_players as u64;
+        let traversals = self
+            .traversals
+            .checked_add(added)
+            .ok_or(SolverError::CounterOverflow)?;
+        let next_sample_id = self
+            .next_sample_id
+            .checked_add(added)
+            .ok_or(SolverError::CounterOverflow)?;
+        let completed_sweeps = self
+            .completed_sweeps
+            .checked_add(1)
+            .ok_or(SolverError::CounterOverflow)?;
+
+        self.policies.extend(scratch_policies);
+        self.histories.extend(scratch_histories);
+        self.approx_memory_bytes = memory_bytes;
+        self.total_deal_attempts = total_deal_attempts;
+        self.terminal_evaluations = terminal_evaluations;
+        self.traversals = traversals;
+        self.next_sample_id = next_sample_id;
+        self.completed_sweeps = completed_sweeps;
+        self.apply_early_discount();
+        Ok(())
     }
 
     /// Runs a resumable number of individual player traversals.  Traversers
     /// rotate in seat order; one complete rotation is a sweep.
-    pub fn run_traversals(&mut self, count: u64) -> Result<(), SolverError> {
+    #[cfg(test)]
+    fn run_traversals(&mut self, count: u64) -> Result<(), SolverError> {
         let num_players = self.game.num_players();
         for _ in 0..count {
             let traverser = (self.traversals % num_players as u64) as usize;
@@ -582,7 +900,10 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     pub fn metrics(&self) -> SolverMetrics {
         let num_players = self.game.num_players();
         let mut positive_regret = vec![0.0; num_players];
-        for (key, column) in &self.policies {
+        let mut keys: Vec<_> = self.policies.keys().copied().collect();
+        keys.sort_unstable();
+        for key in keys {
+            let column = self.policies.get(&key).expect("key came from policy map");
             positive_regret[key.player as usize] += column
                 .regrets
                 .iter()
@@ -752,6 +1073,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         unreachable!("depth loop returns at its upper bound")
     }
 
+    #[cfg(test)]
     #[allow(clippy::too_many_arguments)]
     fn traverse(
         &mut self,
@@ -887,6 +1209,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         }
     }
 
+    #[cfg(test)]
     fn strategy_for(
         &mut self,
         key: InfoKey,
@@ -924,6 +1247,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         Ok(vec![1.0 / num_actions as f64; num_actions])
     }
 
+    #[cfg(test)]
     fn record_history(
         &mut self,
         parent: HistoryKey,
@@ -989,6 +1313,239 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             }
         }
     }
+}
+
+impl<'a, G: ExternalSamplingGame> TraversalWorker<'a, G> {
+    fn new(solver: &'a MultiwaySolver<G>) -> Self {
+        Self {
+            game: &solver.game,
+            policies: &solver.policies,
+            histories: &solver.histories,
+            config: solver.config,
+            linear_weight: (solver.completed_sweeps + 1) as f64,
+            events: Vec::new(),
+            local_policies: HashMap::new(),
+            local_histories: HashMap::new(),
+            terminal_evaluations: 0,
+        }
+    }
+
+    fn finish(self, sample_id: u64, traverser: usize, deal_attempts: u64) -> TraversalDelta {
+        TraversalDelta {
+            sample_id,
+            traverser,
+            deal_attempts,
+            terminal_evaluations: self.terminal_evaluations,
+            events: self.events,
+        }
+    }
+
+    fn strategy_for(
+        &mut self,
+        key: InfoKey,
+        action_labels: Vec<String>,
+    ) -> Result<Vec<f64>, SolverError> {
+        let num_actions = action_labels.len();
+        if let Some(column) = self.policies.get(&key) {
+            if column.num_actions() != num_actions {
+                return Err(SolverError::ActionCountChanged {
+                    key,
+                    stored: column.num_actions(),
+                    current: num_actions,
+                });
+            }
+            if column.action_labels != action_labels {
+                return Err(SolverError::ActionLabelsChanged { key });
+            }
+            return Ok(regret_matching(&column.regrets));
+        }
+        if let Some(labels) = self.local_policies.get(&key) {
+            if labels != &action_labels {
+                return Err(SolverError::ActionLabelsChanged { key });
+            }
+        } else {
+            self.local_policies.insert(key, action_labels.clone());
+            self.events
+                .push(TraversalEvent::EnsurePolicy { key, action_labels });
+        }
+        // A policy first encountered during this sweep is intentionally
+        // uniform for every worker. Deltas from another seat are not visible
+        // until the ordered merge after all traversals finish.
+        Ok(vec![1.0 / num_actions as f64; num_actions])
+    }
+
+    fn record_history(
+        &mut self,
+        parent: HistoryKey,
+        actor: usize,
+        action_index: usize,
+        action_label: &str,
+    ) -> Result<HistoryKey, SolverError> {
+        let key = parent.child(actor, action_index);
+        let actor = u8::try_from(actor).map_err(|_| SolverError::HistoryIndexOverflow)?;
+        let action_index =
+            u32::try_from(action_index).map_err(|_| SolverError::HistoryIndexOverflow)?;
+        let entry = HistoryEntry {
+            key,
+            parent,
+            actor,
+            action_index,
+            action_label: action_label.to_string(),
+        };
+        if let Some(existing) = self.histories.get(&key) {
+            if existing != &entry {
+                return Err(SolverError::HistoryCollision(key));
+            }
+            return Ok(key);
+        }
+        if let Some(existing) = self.local_histories.get(&key) {
+            if existing != &entry {
+                return Err(SolverError::HistoryCollision(key));
+            }
+            return Ok(key);
+        }
+        self.local_histories.insert(key, entry.clone());
+        self.events.push(TraversalEvent::EnsureHistory(entry));
+        Ok(key)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn traverse(
+        &mut self,
+        state: G::State,
+        world: &SampledWorld,
+        traverser: usize,
+        history: HistoryKey,
+        reach: &mut [f64],
+        sample_importance: f64,
+        rng: &mut ChaCha20Rng,
+        depth: u32,
+    ) -> Result<f64, SolverError> {
+        if depth > self.config.max_traversal_depth {
+            return Err(SolverError::DepthLimit {
+                limit: self.config.max_traversal_depth,
+            });
+        }
+
+        let Some(actor) = self.game.actor(&state) else {
+            let mut utilities = vec![0.0; self.game.num_players()];
+            self.game.terminal_utilities(&state, world, &mut utilities);
+            if let Some((seat, &utility)) = utilities
+                .iter()
+                .enumerate()
+                .find(|(_, utility)| !utility.is_finite())
+            {
+                return Err(SolverError::NonFiniteUtility { seat, utility });
+            }
+            self.terminal_evaluations = self
+                .terminal_evaluations
+                .checked_add(1)
+                .ok_or(SolverError::CounterOverflow)?;
+            return Ok(utilities[traverser]);
+        };
+
+        let num_players = self.game.num_players();
+        if actor >= num_players {
+            return Err(SolverError::InvalidActor { actor, num_players });
+        }
+        let num_actions = self.game.num_actions(&state);
+        if num_actions == 0 {
+            return Err(SolverError::NoActions { actor });
+        }
+        let private = self.game.bucket(&state, world, actor);
+        validate_private_info(private, num_players)?;
+        let key = InfoKey {
+            history,
+            player: actor as u8,
+            street: private.street,
+            active_opponents: private.active_opponents,
+            bucket_path: private.bucket_path,
+        };
+        let action_labels = (0..num_actions)
+            .map(|action| self.game.action_label(&state, action))
+            .collect::<Vec<_>>();
+        validate_action_labels(&action_labels)?;
+        let strategy = self.strategy_for(key, action_labels.clone())?;
+
+        if actor == traverser {
+            let mut action_values = vec![0.0; num_actions];
+            for (action, value) in action_values.iter_mut().enumerate() {
+                let old_reach = reach[actor];
+                reach[actor] *= strategy[action];
+                let child_history =
+                    self.record_history(history, actor, action, &action_labels[action])?;
+                let next = self.game.next_state(&state, action);
+                *value = self.traverse(
+                    next,
+                    world,
+                    traverser,
+                    child_history,
+                    reach,
+                    sample_importance,
+                    rng,
+                    depth + 1,
+                )?;
+                reach[actor] = old_reach;
+            }
+            let node_value = strategy
+                .iter()
+                .zip(&action_values)
+                .map(|(&probability, &value)| probability * value)
+                .sum::<f64>();
+            if !node_value.is_finite() {
+                return Err(SolverError::NumericOverflow);
+            }
+            let values = action_values
+                .into_iter()
+                .map(|value| sample_importance * (value - node_value))
+                .collect();
+            self.events.push(TraversalEvent::AddRegret { key, values });
+            Ok(node_value)
+        } else {
+            let values = strategy
+                .iter()
+                .map(|&probability| self.linear_weight * reach[actor] * probability)
+                .collect();
+            self.events
+                .push(TraversalEvent::AddStrategy { key, values });
+            let (action, sampling_probability) =
+                sample_exploratory_action(&strategy, self.config.exploration_epsilon, rng);
+            let importance = strategy[action] / sampling_probability;
+            let child_importance = sample_importance * importance;
+            if !child_importance.is_finite() {
+                return Err(SolverError::NumericOverflow);
+            }
+            let old_reach = reach[actor];
+            reach[actor] *= strategy[action];
+            let child_history =
+                self.record_history(history, actor, action, &action_labels[action])?;
+            let next = self.game.next_state(&state, action);
+            let result = self.traverse(
+                next,
+                world,
+                traverser,
+                child_history,
+                reach,
+                child_importance,
+                rng,
+                depth + 1,
+            );
+            reach[actor] = old_reach;
+            let weighted_value = result? * importance;
+            if !weighted_value.is_finite() {
+                return Err(SolverError::NumericOverflow);
+            }
+            Ok(weighted_value)
+        }
+    }
+}
+
+fn resume_configs_match(mut stored: SolverConfig, mut current: SolverConfig) -> bool {
+    // This is a process resource guard, not part of the sampled algorithm.
+    // Raising it after a resource-limit checkpoint must not alter results.
+    stored.max_memory_bytes = 0;
+    current.max_memory_bytes = 0;
+    stored == current
 }
 
 fn validate_setup<G: ExternalSamplingGame>(
@@ -1324,6 +1881,14 @@ pub enum SolverError {
     MemoryLimit { limit: u64, needed: u64 },
     #[error("discount cadence must be positive")]
     ZeroDiscountCadence,
+    #[error("multiway parallel worker count must be positive")]
+    ZeroThreads,
+    #[error("failed to build deterministic multiway worker pool: {0}")]
+    ThreadPoolBuild(String),
+    #[error("checkpoint algorithm configuration does not match the current solver configuration")]
+    ResumeConfigurationMismatch,
+    #[error("complete parallel sweeps cannot start from a partial-sweep solver state")]
+    IncompleteSweepState,
     #[error("profile evaluation sample count must be positive")]
     ZeroEvaluationSamples,
     #[error("numeric accumulation exceeded f32 storage")]
@@ -1372,6 +1937,23 @@ mod tests {
 
     #[derive(Clone, Copy)]
     struct PrefixImportanceGame;
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    enum ThreePlayerOracleState {
+        Opponent,
+        Hero {
+            opponent_action: usize,
+        },
+        Terminal {
+            opponent_action: usize,
+            hero_action: usize,
+        },
+    }
+
+    #[derive(Clone, Copy)]
+    struct ThreePlayerOracleGame;
+
+    const ORACLE_HERO_PAYOFFS: [[f64; 2]; 2] = [[4.0, 0.0], [-2.0, 2.0]];
 
     impl ExternalSamplingGame for PrefixImportanceGame {
         type State = PrefixState;
@@ -1438,6 +2020,111 @@ mod tests {
             utilities[0] = f64::from(action == 0);
             utilities[1] = -utilities[0];
         }
+    }
+
+    impl ExternalSamplingGame for ThreePlayerOracleGame {
+        type State = ThreePlayerOracleState;
+
+        fn num_players(&self) -> usize {
+            3
+        }
+
+        fn root_state(&self) -> Self::State {
+            ThreePlayerOracleState::Opponent
+        }
+
+        fn actor(&self, state: &Self::State) -> Option<usize> {
+            match state {
+                ThreePlayerOracleState::Opponent => Some(1),
+                ThreePlayerOracleState::Hero { .. } => Some(0),
+                ThreePlayerOracleState::Terminal { .. } => None,
+            }
+        }
+
+        fn num_actions(&self, state: &Self::State) -> usize {
+            usize::from(!matches!(state, ThreePlayerOracleState::Terminal { .. })) * 2
+        }
+
+        fn next_state(&self, state: &Self::State, action_index: usize) -> Self::State {
+            match *state {
+                ThreePlayerOracleState::Opponent => ThreePlayerOracleState::Hero {
+                    opponent_action: action_index,
+                },
+                ThreePlayerOracleState::Hero { opponent_action } => {
+                    ThreePlayerOracleState::Terminal {
+                        opponent_action,
+                        hero_action: action_index,
+                    }
+                }
+                ThreePlayerOracleState::Terminal { .. } => {
+                    panic!("terminal state has no child")
+                }
+            }
+        }
+
+        fn action_label(&self, state: &Self::State, action_index: usize) -> String {
+            let labels = match state {
+                ThreePlayerOracleState::Opponent => ["left", "right"],
+                ThreePlayerOracleState::Hero { .. } => ["take", "pass"],
+                ThreePlayerOracleState::Terminal { .. } => {
+                    panic!("terminal state has no actions")
+                }
+            };
+            labels[action_index].to_string()
+        }
+
+        fn bucket(
+            &self,
+            _state: &Self::State,
+            _world: &SampledWorld,
+            _actor: usize,
+        ) -> PrivateInfo {
+            PrivateInfo {
+                street: 0,
+                active_opponents: 2,
+                bucket_path: [0, UNREACHED_BUCKET, UNREACHED_BUCKET, UNREACHED_BUCKET],
+            }
+        }
+
+        fn terminal_utilities(
+            &self,
+            state: &Self::State,
+            _world: &SampledWorld,
+            utilities: &mut [f64],
+        ) {
+            let ThreePlayerOracleState::Terminal {
+                opponent_action,
+                hero_action,
+            } = *state
+            else {
+                panic!("not terminal")
+            };
+            utilities[0] = ORACLE_HERO_PAYOFFS[opponent_action][hero_action];
+            // Deliberately general-sum: neither opponent payoff is the
+            // negative of the traverser's payoff.
+            utilities[1] = [[1.0, 3.0], [5.0, -1.0]][opponent_action][hero_action];
+            utilities[2] = [[2.0, -1.0], [1.0, 4.0]][opponent_action][hero_action];
+        }
+    }
+
+    fn full_enumeration_oracle_regret(
+        opponent_strategy: [f64; 2],
+        hero_strategy: [f64; 2],
+    ) -> [f64; 2] {
+        let mut regrets = [0.0; 2];
+        for opponent_action in 0..2 {
+            let values = ORACLE_HERO_PAYOFFS[opponent_action];
+            let node_value = hero_strategy
+                .iter()
+                .zip(values)
+                .map(|(&probability, value)| probability * value)
+                .sum::<f64>();
+            for action in 0..2 {
+                regrets[action] +=
+                    opponent_strategy[opponent_action] * (values[action] - node_value);
+            }
+        }
+        regrets
     }
 
     impl ExternalSamplingGame for DominatedChoice {
@@ -1556,7 +2243,7 @@ mod tests {
         solver.run_sweeps(1).unwrap();
         let column = solver.policy(root_key()).unwrap();
         assert_eq!(column.regrets, vec![0.5, -1.5]);
-        assert_eq!(column.strategy_sum, vec![1.5, 0.0]);
+        assert_eq!(column.strategy_sum, vec![1.25, 0.25]);
     }
 
     #[test]
@@ -1588,12 +2275,19 @@ mod tests {
     }
 
     #[test]
-    fn deterministic_substreams_make_fresh_and_resumed_runs_identical() {
+    fn ordered_deltas_make_thread_counts_and_resume_bit_identical() {
         let mut uninterrupted = solver(777, 1 << 20);
-        uninterrupted.run_sweeps(40).unwrap();
+        uninterrupted.run_sweeps_with_threads(40, 4).unwrap();
+
+        let mut single_threaded = solver(777, 1 << 20);
+        single_threaded.run_sweeps_with_threads(40, 1).unwrap();
+        assert_eq!(
+            uninterrupted.snapshot_state(),
+            single_threaded.snapshot_state()
+        );
 
         let mut first_half = solver(777, 1 << 20);
-        first_half.run_sweeps(17).unwrap();
+        first_half.run_sweeps_with_threads(17, 1).unwrap();
         let state = first_half.snapshot_state();
         let mut resumed = MultiwaySolver::from_state(
             DominatedChoice,
@@ -1601,10 +2295,73 @@ mod tests {
             state,
         )
         .unwrap();
-        resumed.run_sweeps(23).unwrap();
+        resumed.run_sweeps_with_threads(23, 4).unwrap();
 
         assert_eq!(uninterrupted.snapshot_state(), resumed.snapshot_state());
         assert_eq!(uninterrupted.metrics(), resumed.metrics());
+    }
+
+    #[test]
+    fn interruptible_parallel_run_polls_boundaries_and_preserves_determinism() {
+        let mut interrupted = solver(0x1234, 1 << 20);
+        let mut polls = 0u64;
+        let completed = interrupted
+            .run_sweeps_with_threads_until(40, 4, || {
+                polls += 1;
+                polls <= 7
+            })
+            .unwrap();
+        assert_eq!(completed, 7);
+        assert_eq!(polls, 8);
+
+        let mut reference = solver(0x1234, 1 << 20);
+        reference.run_sweeps_with_threads(7, 1).unwrap();
+        assert_eq!(interrupted.snapshot_state(), reference.snapshot_state());
+    }
+
+    #[test]
+    fn resource_limit_state_resumes_with_a_larger_operational_limit() {
+        let mut limited = solver(55, 1);
+        assert!(matches!(
+            limited.run_sweeps_with_threads(1, 2),
+            Err(SolverError::MemoryLimit { limit: 1, .. })
+        ));
+        let fingerprint = limited.configuration_fingerprint();
+        let state = limited.snapshot_state();
+        let mut expanded_config = state.config;
+        expanded_config.max_memory_bytes = 1 << 20;
+
+        let mut resumed = MultiwaySolver::from_state_with_config(
+            DominatedChoice,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            state,
+            expanded_config,
+        )
+        .unwrap();
+        assert_eq!(resumed.config().max_memory_bytes, 1 << 20);
+        assert_eq!(resumed.configuration_fingerprint(), fingerprint);
+        resumed.run_sweeps_with_threads(10, 4).unwrap();
+
+        let mut reference = solver(55, 1 << 20);
+        reference.run_sweeps_with_threads(10, 1).unwrap();
+        assert_eq!(resumed.snapshot_state(), reference.snapshot_state());
+    }
+
+    #[test]
+    fn restore_rejects_algorithm_changes_even_when_memory_limit_changes() {
+        let state = solver(9, 1 << 10).snapshot_state();
+        let mut changed = state.config;
+        changed.max_memory_bytes = 1 << 20;
+        changed.exploration_epsilon = 0.5;
+        assert!(matches!(
+            MultiwaySolver::from_state_with_config(
+                DominatedChoice,
+                DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+                state,
+                changed,
+            ),
+            Err(SolverError::ResumeConfigurationMismatch)
+        ));
     }
 
     #[test]
@@ -1643,10 +2400,12 @@ mod tests {
     #[test]
     fn memory_cap_stops_before_allocating_first_column() {
         let mut solver = solver(0, 1);
+        let before = solver.snapshot_state();
         assert!(matches!(
-            solver.run_traversals(1),
+            solver.run_sweeps_with_threads(1, 4),
             Err(SolverError::MemoryLimit { limit: 1, .. })
         ));
+        assert_eq!(solver.snapshot_state(), before);
         assert_eq!(solver.metrics().infosets, 0);
         assert_eq!(solver.metrics().traversals, 0);
     }
@@ -1694,6 +2453,84 @@ mod tests {
         let importance = target_probability / 0.5;
         assert!((f64::from(hero_column.regrets[0]) - 0.5 * importance).abs() < 1e-6);
         assert!((f64::from(hero_column.regrets[1]) + 0.5 * importance).abs() < 1e-6);
+    }
+
+    #[test]
+    fn three_player_one_step_estimator_matches_full_enumeration_oracle() {
+        let mut solver = MultiwaySolver::new(
+            ThreePlayerOracleGame,
+            DealSampler::new(vec![Range::full(), Range::full(), Range::full()]).unwrap(),
+            SolverConfig {
+                seed: 0x5eed,
+                max_memory_bytes: 1 << 20,
+                max_traversal_depth: 16,
+                // Sampling q is uniform while the target opponent strategy
+                // below is [0.75, 0.25], exercising importance correction.
+                exploration_epsilon: 1.0,
+                discount_every: 1,
+                discount_until: 0,
+            },
+        )
+        .unwrap();
+        let opponent_key = InfoKey {
+            history: HistoryKey::ROOT,
+            player: 1,
+            street: 0,
+            active_opponents: 2,
+            bucket_path: [0, UNREACHED_BUCKET, UNREACHED_BUCKET, UNREACHED_BUCKET],
+        };
+        solver
+            .strategy_for(opponent_key, vec!["left".to_string(), "right".to_string()])
+            .unwrap();
+        solver.policies.get_mut(&opponent_key).unwrap().regrets = vec![3.0, 1.0];
+
+        let oracle = full_enumeration_oracle_regret([0.75, 0.25], [0.5, 0.5]);
+        assert_eq!(oracle, [1.0, -1.0]);
+        let mut terminal = [0.0; 3];
+        ThreePlayerOracleGame.terminal_utilities(
+            &ThreePlayerOracleState::Terminal {
+                opponent_action: 0,
+                hero_action: 0,
+            },
+            &solver
+                .sampler
+                .sample(&mut traversal_deal_rng(9, 0, 0))
+                .unwrap(),
+            &mut terminal,
+        );
+        assert_ne!(terminal.iter().sum::<f64>(), 0.0);
+
+        const SAMPLES: u64 = 20_000;
+        let mut means = [0.0; 2];
+        let mut m2 = [0.0; 2];
+        for sample_id in 0..SAMPLES {
+            let delta = solver.generate_traversal_delta(sample_id, 0).unwrap();
+            let values = delta
+                .events
+                .into_iter()
+                .find_map(|event| match event {
+                    TraversalEvent::AddRegret { key, values } if key.player == 0 => Some(values),
+                    _ => None,
+                })
+                .expect("traverser update must be present");
+            assert_eq!(values.len(), 2);
+            let count = (sample_id + 1) as f64;
+            for action in 0..2 {
+                let difference = values[action] - means[action];
+                means[action] += difference / count;
+                m2[action] += difference * (values[action] - means[action]);
+            }
+        }
+        for action in 0..2 {
+            let variance = m2[action] / (SAMPLES - 1) as f64;
+            let stderr = (variance / SAMPLES as f64).sqrt();
+            assert!(
+                (means[action] - oracle[action]).abs() <= 5.0 * stderr,
+                "action {action}: sample mean {}, oracle {}, stderr {stderr}",
+                means[action],
+                oracle[action]
+            );
+        }
     }
 
     #[test]

@@ -1,6 +1,9 @@
 //! Production adapter joining the betting, deal, settlement, utility, and
 //! abstraction layers into one generative no-limit Hold'em game.
 
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+
 use cards::combo_cards;
 
 use crate::abstraction::{BucketContext, BucketPath, MultiwayAbstraction};
@@ -8,20 +11,25 @@ use crate::betting::{Action, BettingState, HandPhase};
 use crate::config::{
     CompiledRake, MultiwayConfig, RakeConfig, UtilityConfig, ValidatedMultiwayConfig,
 };
-use crate::icm::terminal_icm_delta;
+use crate::icm::{IcmEstimate, estimate_icm, terminal_icm_delta_with_baseline};
 use crate::sampler::{DealSampler, SampleError, SampledWorld};
 use crate::settlement::{Settlement, SettlementError, settle_showdown, settle_uncontested};
 use crate::solver::{ExternalSamplingGame, PrivateInfo};
 use crate::types::{MwChips, SeatId, SeatVec, Street};
 
+const ICM_TERMINAL_CACHE_ENTRIES: usize = 65_536;
+
 #[derive(Clone)]
 enum UtilityRuntime {
     ChipEv,
     TournamentIcm {
+        starting: SeatVec<MwChips>,
         outside_field: Vec<MwChips>,
         payouts: Vec<f64>,
         samples: u64,
         seed: u64,
+        baseline: IcmEstimate,
+        terminal_cache: Arc<Mutex<HashMap<Vec<u64>, SeatVec<f64>>>>,
     },
 }
 
@@ -54,15 +62,32 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                 payouts,
                 samples,
                 seed,
-            } => UtilityRuntime::TournamentIcm {
-                outside_field: outside_field
+            } => {
+                let outside_field = outside_field
                     .iter()
                     .map(|player| MwChips::try_from_bb(player.stack_bb))
-                    .collect::<Result<Vec<_>, _>>()?,
-                payouts: payouts.clone(),
-                samples: *samples,
-                seed: *seed,
-            },
+                    .collect::<Result<Vec<_>, _>>()?;
+                let starting = SeatVec::try_new(
+                    validated
+                        .seats
+                        .iter()
+                        .map(|seat| seat.starting_stack)
+                        .collect(),
+                )
+                .expect("validated seat count is supported");
+                let mut baseline_stacks = starting.as_slice().to_vec();
+                baseline_stacks.extend_from_slice(&outside_field);
+                let baseline = estimate_icm(&baseline_stacks, payouts, *samples, *seed)?;
+                UtilityRuntime::TournamentIcm {
+                    starting,
+                    outside_field,
+                    payouts: payouts.clone(),
+                    samples: *samples,
+                    seed: *seed,
+                    baseline,
+                    terminal_cache: Arc::new(Mutex::new(HashMap::new())),
+                }
+            }
         };
 
         let mut hasher = blake3::Hasher::new();
@@ -198,28 +223,44 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
             )
             .expect("configured seat count is valid")),
             UtilityRuntime::TournamentIcm {
+                starting,
                 outside_field,
                 payouts,
                 samples,
                 seed,
+                baseline,
+                terminal_cache,
             } => {
-                let starting = SeatVec::try_new(
-                    self.config
-                        .seats
-                        .iter()
-                        .map(|seat| seat.starting_stack)
-                        .collect(),
-                )
-                .expect("configured seat count is valid");
-                Ok(terminal_icm_delta(
-                    &starting,
+                let key: Vec<u64> = settlement
+                    .final_stacks
+                    .iter()
+                    .map(|stack| stack.raw())
+                    .collect();
+                if let Some(cached) = terminal_cache
+                    .lock()
+                    .map_err(|_| HoldemGameError::IcmCachePoisoned)?
+                    .get(&key)
+                    .cloned()
+                {
+                    return Ok(cached);
+                }
+                let deltas = terminal_icm_delta_with_baseline(
+                    starting,
                     &settlement.final_stacks,
                     outside_field,
                     payouts,
                     *samples,
                     *seed,
+                    baseline,
                 )?
-                .deltas)
+                .deltas;
+                let mut cache = terminal_cache
+                    .lock()
+                    .map_err(|_| HoldemGameError::IcmCachePoisoned)?;
+                if cache.len() < ICM_TERMINAL_CACHE_ENTRIES {
+                    cache.entry(key).or_insert_with(|| deltas.clone());
+                }
+                Ok(deltas)
             }
         }
     }
@@ -312,6 +353,8 @@ pub enum HoldemGameError {
     Settlement(#[from] SettlementError),
     #[error(transparent)]
     Icm(#[from] crate::icm::IcmError),
+    #[error("ICM terminal utility cache lock was poisoned")]
+    IcmCachePoisoned,
     #[error(transparent)]
     Json(#[from] serde_json::Error),
 }

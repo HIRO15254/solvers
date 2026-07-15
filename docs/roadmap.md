@@ -57,6 +57,8 @@ formats スキーマ v1 凍結 → `wasm` viewer-only 静的サイト(`.sol` 読
 
 **Exit:** 2/3/6/9 人の betting/settlement property、exact ICM ≤15・sampled ICM ≤100、deterministic checkpoint resume、9-max smoke、HU v1 golden 不変、Web test/build。3 人以上は `exploitability` / `NashConv` / GTO と呼ばず、seat EV/CI・positive-regret proxy・strategy drift・held-out deviation gain を報告する。
 
+**Delivered:** deterministic sample-id merge（thread数変更・再開を含む）、4 MiB chunked `.mwckpt` v3、indexed `.mwsol` v2、Bridge v2 managed resume、4 canonical Web presets、9-max 8/8/8 smoke・64/64/64 desktop benchmark・3-player full-enumeration oracleを受入契約として固定。
+
 > 根拠: external-sampling MCCFR は Lanctot et al. (NeurIPS 2009)。多人数・一般和で HU zero-sum と同じ Nash 保証がない境界は Gibson et al. (2013) に従う。straddle、missed/dead blind、multiple runouts、bounty、FGS、re-entry、PLO はこの milestone の対象外。
 
 ## 横断事項(M0 から)

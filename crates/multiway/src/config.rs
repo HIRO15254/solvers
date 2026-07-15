@@ -135,10 +135,15 @@ fn default_true() -> bool {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct StreetBettingConfig {
-    /// Opening sizes.  Preflop these are open/iso sizes; postflop they are
-    /// bets into an unopened street.
+    /// Opening sizes. Preflop these apply before a voluntary limp; postflop
+    /// they are bets into an unopened street.
     #[serde(default)]
     pub bet_sizes: Vec<SizeSpec>,
+    /// Preflop raise-to sizes after one or more limps. None preserves the
+    /// historical behavior of reusing bet_sizes; Some(empty) disables sized
+    /// isolations while still allowing an all-in when configured.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub isolate_sizes: Option<Vec<SizeSpec>>,
     #[serde(default)]
     pub raise_sizes: Vec<SizeSpec>,
     #[serde(default = "default_max_aggressive_actions")]
@@ -154,6 +159,7 @@ fn default_max_aggressive_actions() -> u8 {
 fn default_preflop_betting() -> StreetBettingConfig {
     StreetBettingConfig {
         bet_sizes: vec![SizeSpec::ToBb { value: 2.5 }],
+        isolate_sizes: None,
         raise_sizes: vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
         max_aggressive_actions: 4,
         include_allin: true,
@@ -163,6 +169,7 @@ fn default_preflop_betting() -> StreetBettingConfig {
 fn default_postflop_betting() -> StreetBettingConfig {
     StreetBettingConfig {
         bet_sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
+        isolate_sizes: None,
         raise_sizes: vec![SizeSpec::PotAfterCall { fraction: 0.75 }],
         max_aggressive_actions: 3,
         include_allin: true,
@@ -515,7 +522,7 @@ impl UtilityConfig {
                         actual: payouts.len(),
                     });
                 }
-                if *samples == 0 {
+                if field > crate::icm::EXACT_ICM_MAX_PLAYERS && *samples < 2 {
                     return Err(ConfigError::IcmSamples);
                 }
                 for (index, player) in outside_field.iter().enumerate() {
@@ -580,12 +587,37 @@ impl RakeConfig {
 fn validate_betting(config: &BettingConfig) -> Result<(), ConfigError> {
     for street in Street::ALL {
         let section = config.for_street(street);
+        if street != Street::Preflop && section.isolate_sizes.is_some() {
+            return Err(ConfigError::PostflopIsolateSizes(street));
+        }
         for (kind, sizes) in [
             ("bet_sizes", &section.bet_sizes),
             ("raise_sizes", &section.raise_sizes),
         ] {
             if sizes.len() > 32 {
                 return Err(ConfigError::TooManySizes { street, kind });
+            }
+            for size in sizes {
+                match *size {
+                    SizeSpec::ToBb { value } => positive_finite("size.to-bb", value)?,
+                    SizeSpec::PotAfterCall { fraction } => {
+                        positive_finite("size.pot-after-call", fraction)?
+                    }
+                    SizeSpec::PreviousBetMultiple { factor } => {
+                        positive_finite("size.previous-bet-multiple", factor)?;
+                        if factor <= 1.0 {
+                            return Err(ConfigError::RaiseFactor);
+                        }
+                    }
+                }
+            }
+        }
+        if let Some(sizes) = section.isolate_sizes.as_ref() {
+            if sizes.len() > 32 {
+                return Err(ConfigError::TooManySizes {
+                    street,
+                    kind: "isolate_sizes",
+                });
             }
             for size in sizes {
                 match *size {
@@ -659,6 +691,8 @@ pub enum ConfigError {
     EmptyRange(usize),
     #[error("{street:?}.{kind} may contain at most 32 entries")]
     TooManySizes { street: Street, kind: &'static str },
+    #[error("{0:?}.isolate_sizes is valid only for preflop")]
+    PostflopIsolateSizes(Street),
     #[error("previous-bet-multiple must be greater than one")]
     RaiseFactor,
     #[error("all postflop bucket counts must be positive")]
@@ -671,7 +705,7 @@ pub enum ConfigError {
     IcmField(usize),
     #[error("ICM payouts length must be {expected}, got {actual}")]
     PayoutCount { expected: usize, actual: usize },
-    #[error("ICM samples must be positive")]
+    #[error("sampled ICM requires at least two samples")]
     IcmSamples,
     #[error("outside-field player {0} has an empty name")]
     OutsideName(usize),
@@ -792,6 +826,36 @@ stack_bb = 12
                 }
             ),
             Err(ConfigError::IcmWithRake)
+        ));
+    }
+
+    #[test]
+    fn icm_sample_minimum_applies_only_to_sampled_fields() {
+        let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        let exact_players = config.seats.len();
+        let exact = UtilityConfig::TournamentIcm {
+            outside_field: Vec::new(),
+            payouts: (0..exact_players).rev().map(|place| place as f64).collect(),
+            samples: 0,
+            seed: 1,
+        };
+        exact.validate(config.seats.len()).unwrap();
+
+        let outside_count = 16 - config.seats.len();
+        let sampled = UtilityConfig::TournamentIcm {
+            outside_field: (0..outside_count)
+                .map(|index| FieldPlayerConfig {
+                    name: format!("outside-{index}"),
+                    stack_bb: 100.0,
+                })
+                .collect(),
+            payouts: (0..16).rev().map(|place| place as f64).collect(),
+            samples: 1,
+            seed: 1,
+        };
+        assert!(matches!(
+            sampled.validate(config.seats.len()),
+            Err(ConfigError::IcmSamples)
         ));
     }
 }

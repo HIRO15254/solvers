@@ -59,6 +59,7 @@ pub fn run(
             config_hash,
             sol,
             None,
+            true,
         );
     }
 

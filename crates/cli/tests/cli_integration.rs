@@ -252,7 +252,16 @@ fn resume_equivalence_kuhn() {
 #[ignore = "trains the multiway rollout artifact three times; CI runs it in release"]
 fn multiway_resume_is_bit_identical_to_a_straight_run() {
     let dir = temp_dir("multiway-resume-equiv");
-    let config = workspace_root().join("examples/preflop_multiway_3max_smoke.toml");
+    let base_config =
+        std::fs::read_to_string(workspace_root().join("examples/preflop_multiway_3max_smoke.toml"))
+            .unwrap();
+    let config_one = dir.join("one-thread.toml");
+    let config_four = dir.join("four-threads.toml");
+    let smaller_memory =
+        base_config.replace("max_memory_bytes = 67108864", "max_memory_bytes = 33554432");
+    assert_ne!(smaller_memory, base_config, "smoke memory fixture changed");
+    std::fs::write(&config_one, format!("{smaller_memory}\nthreads = 1\n")).unwrap();
+    std::fs::write(&config_four, format!("{base_config}\nthreads = 4\n")).unwrap();
     let straight_checkpoint = dir.join("straight.mwckpt");
     let resumed_checkpoint = dir.join("resumed.mwckpt");
     let straight_result = dir.join("straight.json");
@@ -260,7 +269,7 @@ fn multiway_resume_is_bit_identical_to_a_straight_run() {
 
     run_solvers_ok(&[
         "solve",
-        config.to_str().unwrap(),
+        config_four.to_str().unwrap(),
         "--checkpoint",
         straight_checkpoint.to_str().unwrap(),
         "--output",
@@ -268,7 +277,7 @@ fn multiway_resume_is_bit_identical_to_a_straight_run() {
     ]);
     run_solvers_ok(&[
         "solve",
-        config.to_str().unwrap(),
+        config_one.to_str().unwrap(),
         "--iterations",
         "1",
         "--checkpoint",
@@ -276,7 +285,7 @@ fn multiway_resume_is_bit_identical_to_a_straight_run() {
     ]);
     run_solvers_ok(&[
         "resume",
-        config.to_str().unwrap(),
+        config_four.to_str().unwrap(),
         "--checkpoint",
         resumed_checkpoint.to_str().unwrap(),
         "--output",
@@ -287,6 +296,10 @@ fn multiway_resume_is_bit_identical_to_a_straight_run() {
     let resumed = multiway::MultiwayCheckpoint::load_unchecked(&resumed_checkpoint).unwrap();
     assert_eq!(straight.header.next_sample_id, 6);
     assert_eq!(straight.state, resumed.state);
+    assert_eq!(
+        std::fs::read(&straight_checkpoint).unwrap(),
+        std::fs::read(&resumed_checkpoint).unwrap()
+    );
     assert_eq!(
         straight.header.configuration_fingerprint,
         resumed.header.configuration_fingerprint
@@ -313,6 +326,40 @@ fn multiway_resume_is_bit_identical_to_a_straight_run() {
     ] {
         assert_eq!(straight_json[field], resumed_json[field], "field {field}");
     }
+}
+
+#[test]
+fn multiway_resource_limit_writes_an_implicit_checkpoint() {
+    let dir = temp_dir("multiway-resource-limit");
+    let raw =
+        std::fs::read_to_string(workspace_root().join("examples/preflop_multiway_3max_smoke.toml"))
+            .unwrap();
+    let limited = raw.replace("max_memory_bytes = 67108864", "max_memory_bytes = 1");
+    assert_ne!(raw, limited, "smoke config memory limit fixture changed");
+    let config = dir.join("limited.toml");
+    std::fs::write(&config, limited).unwrap();
+    let output_path = dir.join("result.json");
+    let checkpoint_path = dir.join("result.mwckpt");
+
+    let command = run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--output",
+        output_path.to_str().unwrap(),
+    ]);
+    let stdout = String::from_utf8_lossy(&command.stdout);
+    assert!(
+        stdout.contains(&checkpoint_path.display().to_string()),
+        "stdout must identify the recovery checkpoint: {stdout}"
+    );
+    assert!(checkpoint_path.is_file());
+    let checkpoint = multiway::MultiwayCheckpoint::load_unchecked(&checkpoint_path).unwrap();
+    assert_eq!(checkpoint.header.next_sample_id, 0);
+    assert_eq!(checkpoint.state.completed_sweeps, 0);
+
+    let result: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(output_path).unwrap()).unwrap();
+    assert_eq!(result["status"], "resource_limit");
 }
 
 #[test]

@@ -5,6 +5,7 @@
 
 use std::collections::HashMap;
 use std::fmt::Write as _;
+use std::fs::File;
 use std::io::{Cursor, Read, Write as _};
 use std::net::{Ipv4Addr, SocketAddrV4, TcpListener};
 use std::path::{Path, PathBuf};
@@ -26,6 +27,7 @@ const API_VERSION: u32 = 1;
 const API_VERSION_V2: u32 = 2;
 const BODY_LIMIT: usize = 64 * 1024;
 const MAX_ITERATIONS: u64 = 1_000_000;
+const MAX_MULTIWAY_SWEEPS: u64 = 10_000_000;
 const MAX_STACK_BB: f64 = 1_000.0;
 const MAX_RAISES: u32 = 16;
 const MAX_SIZES_PER_LEVEL: usize = 16;
@@ -137,6 +139,7 @@ impl JobState {
 }
 
 struct JobRecord {
+    kind: JobKind,
     state: JobState,
     metrics_path: PathBuf,
     result_path: PathBuf,
@@ -210,6 +213,8 @@ struct ValidationResponse {
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct CreateJobRequest {
     config_toml: String,
+    #[serde(default)]
+    resume_checkpoint_url: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -420,8 +425,8 @@ fn handle_request(
         (Method::Post, Route::ValidateV2) => handle_validate(request, state, origin),
         (Method::Get, Route::Job(id)) => handle_job_status(request, state, origin, &id, 1),
         (Method::Get, Route::JobV2(id)) => handle_job_status(request, state, origin, &id, 2),
-        (Method::Get, Route::Result(id)) => handle_job_result(request, state, origin, &id),
-        (Method::Get, Route::ResultV2(id)) => handle_job_result(request, state, origin, &id),
+        (Method::Get, Route::Result(id)) => handle_job_result(request, state, origin, &id, 1),
+        (Method::Get, Route::ResultV2(id)) => handle_job_result(request, state, origin, &id, 2),
         (Method::Post, Route::CancelV2(id)) => handle_cancel_job(request, state, origin, &id),
         (Method::Get, Route::StrategiesV2(id, query)) => {
             handle_strategies(request, state, origin, &id, &query)
@@ -655,6 +660,25 @@ fn handle_create_job(
         }
     };
 
+    if api < 2 && payload.resume_checkpoint_url.is_some() {
+        return respond_error(
+            request,
+            400,
+            "invalid_resume_checkpoint",
+            "Checkpoint resume is available only through the v2 jobs endpoint.",
+            Some(origin),
+        );
+    }
+    if payload.resume_checkpoint_url.is_some() && sanitized.kind != JobKind::Multiway {
+        return respond_error(
+            request,
+            400,
+            "invalid_resume_checkpoint",
+            "Only multiway jobs can resume a .mwckpt checkpoint.",
+            Some(origin),
+        );
+    }
+
     if jobs(state).values().any(|job| job.state.is_active()) {
         return respond_error(
             request,
@@ -665,6 +689,63 @@ fn handle_create_job(
         );
     }
 
+    let resume_checkpoint_path = match payload.resume_checkpoint_url.as_deref() {
+        None => None,
+        Some(url) => {
+            let Route::CheckpointV2(source_id) = parse_route(url) else {
+                return respond_error(
+                    request,
+                    400,
+                    "invalid_resume_checkpoint",
+                    "resumeCheckpointUrl must be a managed /v2/jobs/{id}/checkpoint URL.",
+                    Some(origin),
+                );
+            };
+            let guard = jobs(state);
+            let Some(source) = guard.get(&source_id) else {
+                drop(guard);
+                return respond_error(
+                    request,
+                    404,
+                    "resume_checkpoint_not_found",
+                    "The source checkpoint job does not exist in this Bridge session.",
+                    Some(origin),
+                );
+            };
+            if source.state.is_active() {
+                drop(guard);
+                return respond_error(
+                    request,
+                    409,
+                    "resume_checkpoint_not_ready",
+                    "The source checkpoint job has not finished yet.",
+                    Some(origin),
+                );
+            }
+            let Some(path) = source.checkpoint_path.clone() else {
+                drop(guard);
+                return respond_error(
+                    request,
+                    409,
+                    "resume_checkpoint_unavailable",
+                    "The source job has no managed multiway checkpoint.",
+                    Some(origin),
+                );
+            };
+            drop(guard);
+            if !path.is_file() {
+                return respond_error(
+                    request,
+                    409,
+                    "resume_checkpoint_unavailable",
+                    "The managed source checkpoint is no longer available.",
+                    Some(origin),
+                );
+            }
+            Some(path)
+        }
+    };
+
     let id = random_hex(JOB_ID_BYTES);
     let config_path = state.jobs_dir.path().join(format!("{id}.toml"));
     let metrics_path = state.jobs_dir.path().join(format!("{id}.jsonl"));
@@ -673,6 +754,23 @@ fn handle_create_job(
     let mwsol_path = is_multiway.then(|| state.jobs_dir.path().join(format!("{id}.mwsol")));
     let cancel = is_multiway.then(|| Arc::new(AtomicBool::new(false)));
     let checkpoint_path = is_multiway.then(|| state.jobs_dir.path().join(format!("{id}.mwckpt")));
+    let is_resume = resume_checkpoint_path.is_some();
+    if let (Some(source), Some(destination)) = (
+        resume_checkpoint_path.as_deref(),
+        checkpoint_path.as_deref(),
+    ) && let Err(error) = std::fs::copy(source, destination)
+    {
+        return respond_error(
+            request,
+            500,
+            "resume_checkpoint_copy_failed",
+            &format!(
+                "Could not copy the managed checkpoint {}: {error}",
+                source.display()
+            ),
+            Some(origin),
+        );
+    }
     let config_toml = sanitized.toml;
     std::fs::write(&config_path, &config_toml)
         .with_context(|| format!("writing managed config {}", config_path.display()))?;
@@ -680,6 +778,7 @@ fn handle_create_job(
     jobs(state).insert(
         id.clone(),
         JobRecord {
+            kind: sanitized.kind,
             state: JobState::Running,
             metrics_path: metrics_path.clone(),
             result_path: result_path.clone(),
@@ -701,16 +800,33 @@ fn handle_create_job(
                         let config: SolveConfig = toml::from_str(&config_toml)
                             .context("parsing managed multiway config")?;
                         let config_hash = formats::config_hash(config_toml.as_bytes());
-                        crate::multiway_solve::run(
-                            &config_toml,
-                            config,
-                            Some(&result_path),
-                            Some(&metrics_path),
-                            checkpoint_path.as_deref(),
-                            config_hash,
-                            mwsol_path.as_deref(),
-                            cancel.as_deref(),
-                        )
+                        if is_resume {
+                            crate::multiway_solve::resume(
+                                &config_toml,
+                                config,
+                                Some(&result_path),
+                                Some(&metrics_path),
+                                checkpoint_path
+                                    .as_deref()
+                                    .expect("multiway resume has a managed checkpoint"),
+                                config_hash,
+                                mwsol_path.as_deref(),
+                                cancel.as_deref(),
+                                false,
+                            )
+                        } else {
+                            crate::multiway_solve::run(
+                                &config_toml,
+                                config,
+                                Some(&result_path),
+                                Some(&metrics_path),
+                                checkpoint_path.as_deref(),
+                                config_hash,
+                                mwsol_path.as_deref(),
+                                cancel.as_deref(),
+                                false,
+                            )
+                        }
                     } else {
                         crate::solve::run(
                             &config_path,
@@ -787,7 +903,7 @@ fn handle_job_status(
     api: u8,
 ) -> Result<()> {
     let guard = jobs(state);
-    let Some(job) = guard.get(id) else {
+    let Some(job) = guard.get(id).filter(|job| job_visible_to_api(job, api)) else {
         return respond_error(
             request,
             404,
@@ -806,16 +922,26 @@ fn handle_job_status(
             .has_result()
             .then(|| format!("/v{api}/jobs/{id}/result")),
         error: job.error.clone(),
-        checkpoint_url: (api >= 2 && job.state.has_result() && job.checkpoint_path.is_some())
-            .then(|| format!("/v2/jobs/{id}/checkpoint")),
+        checkpoint_url: (api >= 2
+            && job
+                .checkpoint_path
+                .as_ref()
+                .is_some_and(|path| path.is_file()))
+        .then(|| format!("/v2/jobs/{id}/checkpoint")),
     };
     drop(guard);
     respond_json(request, 200, &response, Some(origin))
 }
 
-fn handle_job_result(request: Request, state: &BridgeState, origin: &str, id: &str) -> Result<()> {
+fn handle_job_result(
+    request: Request,
+    state: &BridgeState,
+    origin: &str,
+    id: &str,
+    api: u8,
+) -> Result<()> {
     let guard = jobs(state);
-    let Some(job) = guard.get(id) else {
+    let Some(job) = guard.get(id).filter(|job| job_visible_to_api(job, api)) else {
         return respond_error(
             request,
             404,
@@ -867,25 +993,6 @@ fn handle_checkpoint(request: Request, state: &BridgeState, origin: &str, id: &s
             Some(origin),
         );
     };
-    if job.state.is_active() {
-        drop(guard);
-        return respond_error(
-            request,
-            409,
-            "not_ready",
-            "The job has not finished yet.",
-            Some(origin),
-        );
-    }
-    if job.state == JobState::Failed {
-        let message = job
-            .error
-            .as_ref()
-            .map(|error| error.message.clone())
-            .unwrap_or_else(|| "The solve failed.".to_string());
-        drop(guard);
-        return respond_error(request, 409, "solve_failed", &message, Some(origin));
-    }
     let Some(path) = job.checkpoint_path.clone() else {
         drop(guard);
         return respond_error(
@@ -896,10 +1003,31 @@ fn handle_checkpoint(request: Request, state: &BridgeState, origin: &str, id: &s
             Some(origin),
         );
     };
+    let state_at_read = job.state;
+    let failure_message = job.error.as_ref().map(|error| error.message.clone());
     drop(guard);
 
-    let body = match std::fs::read(&path) {
-        Ok(body) => body,
+    if !path.is_file() {
+        if state_at_read == JobState::Failed {
+            return respond_error(
+                request,
+                409,
+                "solve_failed",
+                failure_message.as_deref().unwrap_or("The solve failed."),
+                Some(origin),
+            );
+        }
+        return respond_error(
+            request,
+            409,
+            "not_ready",
+            "No complete periodic checkpoint is available yet.",
+            Some(origin),
+        );
+    }
+
+    let file = match File::open(&path) {
+        Ok(file) => file,
         Err(error) => {
             return respond_error(
                 request,
@@ -911,9 +1039,9 @@ fn handle_checkpoint(request: Request, state: &BridgeState, origin: &str, id: &s
         }
     };
     request
-        .respond(byte_response(
+        .respond(file_response(
             200,
-            body,
+            file,
             "application/octet-stream",
             Some(origin),
         ))
@@ -1048,8 +1176,8 @@ fn handle_strategies(
     };
     drop(guard);
 
-    let solution = match formats::read_mwsol(&path) {
-        Ok(solution) => solution,
+    let mut reader = match formats::MwSolReader::open(&path) {
+        Ok(reader) => reader,
         Err(error) => {
             return respond_error(
                 request,
@@ -1060,7 +1188,7 @@ fn handle_strategies(
             );
         }
     };
-    if cursor > solution.strategies.len() {
+    if cursor > reader.strategy_count() {
         return respond_error(
             request,
             400,
@@ -1069,13 +1197,26 @@ fn handle_strategies(
             Some(origin),
         );
     }
-    let end = cursor.saturating_add(limit).min(solution.strategies.len());
-    let next_cursor = (end < solution.strategies.len()).then(|| end.to_string());
-    let items = solution.strategies[cursor..end]
+    let page = match reader.read_strategy_page(cursor, limit) {
+        Ok(page) => page,
+        Err(error) => {
+            return respond_error(
+                request,
+                500,
+                "artifact_read_failed",
+                &format!("The managed strategy page could not be read: {error}"),
+                Some(origin),
+            );
+        }
+    };
+    let next_cursor = page.next_cursor.map(|next| next.to_string());
+    let metadata = reader.metadata();
+    let items = page
+        .strategies
         .iter()
         .map(|block| StrategyPageItem {
             key: &block.key,
-            public_history: solution
+            public_history: metadata
                 .resolve_history(block.key.history)
                 .expect("validated artifact contains every strategy history"),
             actions: &block.actions,
@@ -1161,6 +1302,10 @@ fn jobs(state: &BridgeState) -> MutexGuard<'_, HashMap<String, JobRecord>> {
         .jobs
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner)
+}
+
+fn job_visible_to_api(job: &JobRecord, api: u8) -> bool {
+    api >= 2 || job.kind == JobKind::HeadsUp
 }
 
 fn sanitize_config(
@@ -1487,6 +1632,9 @@ fn sanitize_multiway_config(
                 "game.seats[{index}].range exceeds the {MAX_RANGE_BYTES}-byte limit."
             ));
         }
+        if let Some(betting) = seat.betting.as_ref() {
+            validate_managed_multiway_betting(&format!("game.seats[{index}].betting"), betting)?;
+        }
     }
     for (label, value) in [
         ("game.blinds.small_bb", game.blinds.small_bb),
@@ -1507,25 +1655,7 @@ fn sanitize_multiway_config(
         ));
     }
 
-    for (street, betting) in [
-        ("preflop", &game.betting.preflop),
-        ("flop", &game.betting.flop),
-        ("turn", &game.betting.turn),
-        ("river", &game.betting.river),
-    ] {
-        if betting.bet_sizes.len() > MAX_SIZES_PER_LEVEL
-            || betting.raise_sizes.len() > MAX_SIZES_PER_LEVEL
-        {
-            return Err(format!(
-                "game.betting.{street} may contain at most {MAX_SIZES_PER_LEVEL} bet and raise sizes."
-            ));
-        }
-        if u32::from(betting.max_aggressive_actions) > MAX_RAISES {
-            return Err(format!(
-                "game.betting.{street}.max_aggressive_actions may not exceed {MAX_RAISES}."
-            ));
-        }
-    }
+    validate_managed_multiway_betting("game.betting", &game.betting)?;
     if game.abstraction.flop_buckets > MAX_MULTIWAY_BUCKETS
         || game.abstraction.turn_buckets > MAX_MULTIWAY_BUCKETS
         || game.abstraction.river_buckets > MAX_MULTIWAY_BUCKETS
@@ -1533,6 +1663,16 @@ fn sanitize_multiway_config(
         return Err(format!(
             "Multiway abstraction bucket counts may not exceed {MAX_MULTIWAY_BUCKETS}."
         ));
+    }
+    for (index, profile) in game.abstraction.active_opponent_buckets.iter().enumerate() {
+        if profile.flop_buckets > MAX_MULTIWAY_BUCKETS
+            || profile.turn_buckets > MAX_MULTIWAY_BUCKETS
+            || profile.river_buckets > MAX_MULTIWAY_BUCKETS
+        {
+            return Err(format!(
+                "game.abstraction.active_opponent_buckets[{index}] bucket counts may not exceed {MAX_MULTIWAY_BUCKETS}."
+            ));
+        }
     }
     if game.abstraction.rollout_samples > MAX_MULTIWAY_ROLLOUT_SAMPLES {
         return Err(format!(
@@ -1558,27 +1698,27 @@ fn sanitize_multiway_config(
         );
     }
     let sweeps = config.run.sweeps.unwrap_or(config.run.iterations);
-    if sweeps == 0 || sweeps > MAX_ITERATIONS {
+    if sweeps == 0 || sweeps > MAX_MULTIWAY_SWEEPS {
         return Err(format!(
-            "run.sweeps (or run.iterations) must be from 1 through {MAX_ITERATIONS}."
+            "run.sweeps (or run.iterations) must be from 1 through {MAX_MULTIWAY_SWEEPS}."
         ));
     }
     let evaluation_cadence = config
         .run
         .evaluation_cadence
         .unwrap_or(config.run.check_every);
-    if evaluation_cadence == 0 || evaluation_cadence > MAX_ITERATIONS {
+    if evaluation_cadence == 0 || evaluation_cadence > MAX_MULTIWAY_SWEEPS {
         return Err(format!(
-            "run.evaluation_cadence (or run.check_every) must be from 1 through {MAX_ITERATIONS}."
+            "run.evaluation_cadence (or run.check_every) must be from 1 through {MAX_MULTIWAY_SWEEPS}."
         ));
     }
     if config
         .run
         .checkpoint_every
-        .is_some_and(|cadence| cadence == 0 || cadence > MAX_ITERATIONS)
+        .is_some_and(|cadence| cadence == 0 || cadence > MAX_MULTIWAY_SWEEPS)
     {
         return Err(format!(
-            "run.checkpoint_every must be from 1 through {MAX_ITERATIONS} when supplied."
+            "run.checkpoint_every must be from 1 through {MAX_MULTIWAY_SWEEPS} when supplied."
         ));
     }
     if config
@@ -1643,6 +1783,36 @@ fn sanitize_multiway_config(
         schema_version: formats::MULTIWAY_SCHEMA_VERSION,
         kind: JobKind::Multiway,
     })
+}
+
+fn validate_managed_multiway_betting(
+    prefix: &str,
+    betting: &multiway::config::BettingConfig,
+) -> std::result::Result<(), String> {
+    for (street, section) in [
+        ("preflop", &betting.preflop),
+        ("flop", &betting.flop),
+        ("turn", &betting.turn),
+        ("river", &betting.river),
+    ] {
+        if section.bet_sizes.len() > MAX_SIZES_PER_LEVEL
+            || section
+                .isolate_sizes
+                .as_ref()
+                .is_some_and(|sizes| sizes.len() > MAX_SIZES_PER_LEVEL)
+            || section.raise_sizes.len() > MAX_SIZES_PER_LEVEL
+        {
+            return Err(format!(
+                "{prefix}.{street} may contain at most {MAX_SIZES_PER_LEVEL} bet, isolate, and raise sizes."
+            ));
+        }
+        if u32::from(section.max_aggressive_actions) > MAX_RAISES {
+            return Err(format!(
+                "{prefix}.{street}.max_aggressive_actions may not exceed {MAX_RAISES}."
+            ));
+        }
+    }
+    Ok(())
 }
 
 fn multiway_rake_config(rake: &RakeSection) -> multiway::config::RakeConfig {
@@ -1865,6 +2035,22 @@ fn byte_response(
     response
 }
 
+fn file_response(
+    status: u16,
+    file: File,
+    content_type: &str,
+    cors_origin: Option<&str>,
+) -> Response<File> {
+    let mut response = Response::from_file(file).with_status_code(StatusCode(status));
+    response.add_header(header("Content-Type", content_type));
+    response.add_header(header("Cache-Control", "no-store"));
+    if let Some(origin) = cors_origin {
+        response.add_header(header("Access-Control-Allow-Origin", origin));
+        response.add_header(header("Vary", "Origin"));
+    }
+    response
+}
+
 fn header(name: &str, value: &str) -> Header {
     Header::from_bytes(name.as_bytes(), value.as_bytes())
         .expect("constant HTTP header names and validated values are legal")
@@ -1873,6 +2059,53 @@ fn header(name: &str, value: &str) -> Header {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn streamed_file_response_keeps_artifact_headers_and_length() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("checkpoint.mwckpt");
+        std::fs::write(&path, b"checkpoint").unwrap();
+        let response = file_response(
+            200,
+            File::open(path).unwrap(),
+            "application/octet-stream",
+            Some("https://solver.example"),
+        );
+        let value = |name| {
+            response
+                .headers()
+                .iter()
+                .find(|entry| entry.field.equiv(name))
+                .map(|entry| entry.value.as_str())
+        };
+        assert_eq!(response.status_code(), StatusCode(200));
+        assert_eq!(response.data_length(), Some(b"checkpoint".len()));
+        assert_eq!(value("Content-Type"), Some("application/octet-stream"));
+        assert_eq!(value("Cache-Control"), Some("no-store"));
+        assert_eq!(
+            value("Access-Control-Allow-Origin"),
+            Some("https://solver.example")
+        );
+        assert_eq!(value("Vary"), Some("Origin"));
+    }
+
+    #[test]
+    fn v1_hides_multiway_jobs_while_v2_can_access_both_schemas() {
+        let record = |kind| JobRecord {
+            kind,
+            state: JobState::Succeeded,
+            metrics_path: PathBuf::new(),
+            result_path: PathBuf::new(),
+            mwsol_path: None,
+            checkpoint_path: None,
+            cancel: None,
+            error: None,
+        };
+        assert!(job_visible_to_api(&record(JobKind::HeadsUp), 1));
+        assert!(!job_visible_to_api(&record(JobKind::Multiway), 1));
+        assert!(job_visible_to_api(&record(JobKind::HeadsUp), 2));
+        assert!(job_visible_to_api(&record(JobKind::Multiway), 2));
+    }
 
     #[test]
     fn grammar_limit_saturates_before_expensive_tree_enumeration() {
@@ -1986,6 +2219,129 @@ check_every = 1
             "max_memory_bytes = 2147483649",
         );
         assert!(sanitize_config(&oversized, Path::new("unused"), None, true).is_err());
+
+        let research = raw.replace("sweeps = 1000", "sweeps = 5000000");
+        assert!(sanitize_config(&research, Path::new("unused"), Some(3), true).is_ok());
+        let excessive = raw.replace(
+            "sweeps = 1000",
+            &format!("sweeps = {}", MAX_MULTIWAY_SWEEPS + 1),
+        );
+        assert!(sanitize_config(&excessive, Path::new("unused"), Some(3), true).is_err());
+    }
+
+    #[test]
+    fn multiway_sanitization_caps_nested_seat_betting_profiles() {
+        let raw = include_str!("../../../examples/preflop_multiway_9max.toml");
+        let marker = "range = \"\"\n\n[game.blinds]";
+        assert!(raw.contains(marker));
+
+        let sizes = (0..=MAX_SIZES_PER_LEVEL)
+            .map(|index| format!("{{ kind = \"to-bb\", value = {}.0 }}", index + 2))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let oversized_sizes = raw.replacen(
+            marker,
+            &format!(
+                "range = \"\"\n\n[game.seats.betting]\nallow_limp = true\n\
+                 \n[game.seats.betting.preflop]\nbet_sizes = [{sizes}]\n\
+                 max_aggressive_actions = 3\ninclude_allin = true\n\n[game.blinds]"
+            ),
+            1,
+        );
+        let Err(size_error) = sanitize_config(&oversized_sizes, Path::new("unused"), None, true)
+        else {
+            panic!("an oversized per-seat size list must be rejected");
+        };
+        assert!(size_error.contains("game.seats[8].betting.preflop"));
+        assert!(size_error.contains(&MAX_SIZES_PER_LEVEL.to_string()));
+
+        let excessive_actions = raw.replacen(
+            marker,
+            &format!(
+                "range = \"\"\n\n[game.seats.betting]\nallow_limp = true\n\
+                 \n[game.seats.betting.preflop]\nmax_aggressive_actions = {}\n\
+                 include_allin = true\n\n[game.blinds]",
+                MAX_RAISES + 1
+            ),
+            1,
+        );
+        let Err(action_error) =
+            sanitize_config(&excessive_actions, Path::new("unused"), None, true)
+        else {
+            panic!("an excessive per-seat aggression cap must be rejected");
+        };
+        assert!(action_error.contains("game.seats[8].betting.preflop.max_aggressive_actions"));
+        assert!(action_error.contains(&MAX_RAISES.to_string()));
+    }
+
+    #[test]
+    fn multiway_sanitization_caps_active_opponent_bucket_overrides() {
+        let raw = include_str!("../../../examples/preflop_multiway_9max.toml");
+        let with_override = |buckets| {
+            format!(
+                "{raw}\n[[game.abstraction.active_opponent_buckets]]\n\
+                 active_opponents = 1\nflop_buckets = {buckets}\n\
+                 turn_buckets = {buckets}\nriver_buckets = {buckets}\n"
+            )
+        };
+
+        assert!(
+            sanitize_config(
+                &with_override(MAX_MULTIWAY_BUCKETS),
+                Path::new("unused"),
+                None,
+                true,
+            )
+            .is_ok()
+        );
+        let Err(error) = sanitize_config(
+            &with_override(MAX_MULTIWAY_BUCKETS + 1),
+            Path::new("unused"),
+            None,
+            true,
+        ) else {
+            panic!("an oversized active-opponent bucket override must be rejected");
+        };
+        assert!(error.contains("game.abstraction.active_opponent_buckets[0]"));
+        assert!(error.contains(&MAX_MULTIWAY_BUCKETS.to_string()));
+    }
+
+    #[test]
+    fn web_multiway_preset_snapshots_pass_rust_validation() {
+        const PRESETS: [(&str, &str, usize); 4] = [
+            (
+                "multiway-9max-pushfold",
+                include_str!("../../../web/presets/multiway-9max-pushfold.toml"),
+                9,
+            ),
+            (
+                "multiway-9max-mtt-icm",
+                include_str!("../../../web/presets/multiway-9max-mtt-icm.toml"),
+                9,
+            ),
+            (
+                "multiway-6max-cash",
+                include_str!("../../../web/presets/multiway-6max-cash.toml"),
+                6,
+            ),
+            (
+                "multiway-9max-research",
+                include_str!("../../../web/presets/multiway-9max-research.toml"),
+                9,
+            ),
+        ];
+
+        for (name, raw, expected_seats) in PRESETS {
+            let sanitized = sanitize_config(raw, Path::new("managed"), Some(4), true)
+                .unwrap_or_else(|error| panic!("{name} failed Bridge validation: {error}"));
+            assert!(matches!(sanitized.kind, JobKind::Multiway));
+            assert_eq!(sanitized.schema_version, formats::MULTIWAY_SCHEMA_VERSION);
+            let parsed: SolveConfig = toml::from_str(&sanitized.toml).unwrap();
+            let GameSection::PreflopMultiway(game) = parsed.game else {
+                panic!("{name} did not remain a multiway game");
+            };
+            assert_eq!(game.seats.len(), expected_seats, "{name}");
+        }
     }
 
     #[test]

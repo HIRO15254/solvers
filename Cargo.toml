@@ -48,7 +48,7 @@ tiny_http = "0.12"
 tempfile = "3"
 criterion = "0.5"
 blake3 = "1"
-postcard = { version = "1", features = ["alloc"] }
+postcard = { version = "1", features = ["alloc", "use-std"] }
 zstd = "0.13"
 
 [profile.release]

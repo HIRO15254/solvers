@@ -1,5 +1,6 @@
+use std::borrow::Cow;
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::{Component, Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Instant;
 
@@ -64,6 +65,7 @@ pub fn run(
     config_hash: [u8; 32],
     mwsol_path: Option<&Path>,
     cancel: Option<&AtomicBool>,
+    emit_progress: bool,
 ) -> Result<()> {
     run_inner(
         raw_config,
@@ -75,6 +77,7 @@ pub fn run(
         mwsol_path,
         cancel,
         None,
+        emit_progress,
     )
 }
 
@@ -88,6 +91,7 @@ pub fn resume(
     config_hash: [u8; 32],
     mwsol_path: Option<&Path>,
     cancel: Option<&AtomicBool>,
+    emit_progress: bool,
 ) -> Result<()> {
     run_inner(
         raw_config,
@@ -99,6 +103,7 @@ pub fn resume(
         mwsol_path,
         cancel,
         Some(checkpoint_path),
+        emit_progress,
     )
 }
 
@@ -113,7 +118,9 @@ fn run_inner(
     mwsol_path: Option<&Path>,
     cancel: Option<&AtomicBool>,
     resume_checkpoint: Option<&Path>,
+    emit_progress: bool,
 ) -> Result<()> {
+    validate_artifact_paths(output, metrics_path, checkpoint_path, mwsol_path)?;
     let SolveConfig {
         game,
         rake,
@@ -168,6 +175,10 @@ fn run_inner(
         return Err(anyhow!(
             "run.checkpoint_every must be positive when supplied"
         ));
+    }
+    let threads = run.threads.unwrap_or_else(rayon::current_num_threads);
+    if threads == 0 {
+        return Err(anyhow!("run.threads must be positive"));
     }
     if run.evaluation_samples == Some(0) {
         return Err(anyhow!(
@@ -238,13 +249,9 @@ fn run_inner(
     let mut solver = if let Some(path) = resume_checkpoint {
         let checkpoint = MultiwayCheckpoint::load_unchecked(path)
             .with_context(|| format!("reading multiway checkpoint {}", path.display()))?;
-        if checkpoint.state.config != solver_config {
-            return Err(anyhow!(
-                "checkpoint solver configuration does not match the current config"
-            ));
-        }
-        let solver = MultiwaySolver::from_state(game, sampler, checkpoint.state)
-            .context("restoring multiway MCCFR state")?;
+        let solver =
+            MultiwaySolver::from_state_with_config(game, sampler, checkpoint.state, solver_config)
+                .context("restoring multiway MCCFR state")?;
         if solver.configuration_fingerprint() != checkpoint.header.configuration_fingerprint {
             return Err(anyhow!(
                 "checkpoint belongs to different table rules or ranges"
@@ -299,13 +306,24 @@ fn run_inner(
             .min(evaluation_delta)
             .min(checkpoint_delta)
             .max(1);
-        match solver.run_sweeps(chunk) {
-            Ok(()) => {}
+        match solver.run_sweeps_with_threads_until(chunk, threads, || {
+            !cancel.is_some_and(|token| token.load(Ordering::Relaxed))
+        }) {
+            Ok(completed) => {
+                if completed < chunk {
+                    status = CompletionStatus::Cancelled;
+                    break;
+                }
+            }
             Err(SolverError::MemoryLimit { .. }) => {
                 status = CompletionStatus::ResourceLimit;
                 break;
             }
             Err(error) => return Err(error).context("running multiway MCCFR"),
+        }
+        if cancel.is_some_and(|token| token.load(Ordering::Relaxed)) {
+            status = CompletionStatus::Cancelled;
+            break;
         }
 
         let now = solver.metrics();
@@ -332,14 +350,16 @@ fn run_inner(
                     .append(&last_row)
                     .context("writing multiway metrics")?;
             }
-            println!(
-                "sweeps={:>8} traversals={:>10} infosets={:>9} regret_proxy={:.3e} memory={}MiB",
-                now.sweeps,
-                now.traversals,
-                now.infosets,
-                mean(&now.average_positive_regret),
-                now.memory_bytes / (1024 * 1024),
-            );
+            if emit_progress {
+                println!(
+                    "sweeps={:>8} traversals={:>10} infosets={:>9} regret_proxy={:.3e} memory={}MiB",
+                    now.sweeps,
+                    now.traversals,
+                    now.infosets,
+                    mean(&now.average_positive_regret),
+                    now.memory_bytes / (1024 * 1024),
+                );
+            }
         }
         if checkpoint_path.is_some()
             && run
@@ -350,21 +370,31 @@ fn run_inner(
         }
     }
 
-    if let Some(path) = checkpoint_path {
+    let final_checkpoint = final_checkpoint_path(status, checkpoint_path, output);
+    if let Some(path) = final_checkpoint.as_deref() {
         write_checkpoint(&solver, path)?;
+        if emit_progress && status == CompletionStatus::ResourceLimit {
+            println!("resource_limit checkpoint: {}", path.display());
+        }
     }
     let final_metrics = solver.metrics();
     if !has_evaluation || last_row.sweeps != final_metrics.sweeps {
         let snapshot = solver.snapshot_state();
-        let evaluation = solver
-            .evaluate_average_profile(evaluation_samples, evaluation_seed)
-            .context("evaluating final held-out multiway profile")?;
+        let evaluation = if status == CompletionStatus::Cancelled {
+            None
+        } else {
+            Some(
+                solver
+                    .evaluate_average_profile(evaluation_samples, evaluation_seed)
+                    .context("evaluating final held-out multiway profile")?,
+            )
+        };
         let drift = strategy_drift(&snapshot.policies, &prior, game_config.seats.len());
         last_row = metrics_row(
             &final_metrics,
             drift,
             started.elapsed().as_secs_f64(),
-            Some(&evaluation),
+            evaluation.as_ref(),
         );
     }
     last_row.phase = match status {
@@ -473,6 +503,108 @@ fn convert_rake(rake: RakeSection) -> MultiwayRake {
             exempt_pot_bb: exempt_pot as f64 / 1_000.0,
         },
     }
+}
+
+fn validate_artifact_paths(
+    output: Option<&Path>,
+    metrics: Option<&Path>,
+    checkpoint: Option<&Path>,
+    mwsol: Option<&Path>,
+) -> Result<()> {
+    let implicit_checkpoint = checkpoint
+        .is_none()
+        .then(|| implicit_resource_checkpoint_path(output));
+    let checkpoint = checkpoint.or(implicit_checkpoint.as_deref());
+    let destinations = [
+        ("result output", output),
+        ("metrics", metrics),
+        ("checkpoint", checkpoint),
+        ("multiway solution", mwsol),
+    ];
+    let mut seen: Vec<(&str, PathBuf)> = Vec::new();
+    for (label, path) in destinations {
+        let Some(path) = path else {
+            continue;
+        };
+        let identity = artifact_path_identity(path)?;
+        if let Some((previous, _)) = seen
+            .iter()
+            .find(|(_, existing)| artifact_paths_equal(existing, &identity))
+        {
+            return Err(anyhow!(
+                "artifact destinations must be distinct: {previous} and {label} both resolve to {}",
+                identity.display()
+            ));
+        }
+        seen.push((label, identity));
+    }
+    Ok(())
+}
+
+fn implicit_resource_checkpoint_path(output: Option<&Path>) -> PathBuf {
+    output.map_or_else(
+        || PathBuf::from("multiway-resource-limit.mwckpt"),
+        |path| path.with_extension("mwckpt"),
+    )
+}
+
+fn artifact_path_identity(path: &Path) -> Result<PathBuf> {
+    let absolute = if path.is_absolute() {
+        path.to_path_buf()
+    } else {
+        std::env::current_dir()
+            .context("resolving the current directory for artifact paths")?
+            .join(path)
+    };
+    let normalized = lexical_normalize(&absolute);
+    if normalized.exists() {
+        return std::fs::canonicalize(&normalized)
+            .with_context(|| format!("resolving artifact path {}", normalized.display()));
+    }
+    if let (Some(parent), Some(file_name)) = (normalized.parent(), normalized.file_name())
+        && let Ok(parent) = std::fs::canonicalize(parent)
+    {
+        return Ok(parent.join(file_name));
+    }
+    Ok(normalized)
+}
+
+fn lexical_normalize(path: &Path) -> PathBuf {
+    let mut normalized = PathBuf::new();
+    for component in path.components() {
+        match component {
+            Component::CurDir => {}
+            Component::ParentDir => {
+                normalized.pop();
+            }
+            component => normalized.push(component.as_os_str()),
+        }
+    }
+    normalized
+}
+
+fn artifact_paths_equal(left: &Path, right: &Path) -> bool {
+    #[cfg(windows)]
+    {
+        left.to_string_lossy()
+            .eq_ignore_ascii_case(&right.to_string_lossy())
+    }
+    #[cfg(not(windows))]
+    {
+        left == right
+    }
+}
+
+fn final_checkpoint_path<'a>(
+    status: CompletionStatus,
+    explicit: Option<&'a Path>,
+    output: Option<&Path>,
+) -> Option<Cow<'a, Path>> {
+    if let Some(path) = explicit {
+        return Some(Cow::Borrowed(path));
+    }
+    (status == CompletionStatus::ResourceLimit)
+        .then(|| Cow::Owned(implicit_resource_checkpoint_path(output)))
 }
 
 fn write_checkpoint<A: multiway::MultiwayAbstraction>(
@@ -679,5 +811,91 @@ mod tests {
         })
         .unwrap_err();
         assert!(error.to_string().contains("tournament-icm"));
+    }
+
+    #[test]
+    fn implicit_checkpoint_is_reserved_for_resource_limits() {
+        let dir = tempfile::tempdir().unwrap();
+        let output = dir.path().join("profile.json");
+        let expected = dir.path().join("profile.mwckpt");
+
+        assert_eq!(
+            final_checkpoint_path(CompletionStatus::ResourceLimit, None, Some(&output)).as_deref(),
+            Some(expected.as_path())
+        );
+        assert_eq!(
+            final_checkpoint_path(CompletionStatus::ResourceLimit, None, None).as_deref(),
+            Some(Path::new("multiway-resource-limit.mwckpt"))
+        );
+        assert!(final_checkpoint_path(CompletionStatus::Completed, None, Some(&output)).is_none());
+        assert!(final_checkpoint_path(CompletionStatus::Cancelled, None, Some(&output)).is_none());
+        let explicit = dir.path().join("explicit.mwckpt");
+        assert_eq!(
+            final_checkpoint_path(CompletionStatus::Completed, Some(&explicit), Some(&output))
+                .as_deref(),
+            Some(explicit.as_path())
+        );
+    }
+
+    #[test]
+    fn artifact_destinations_must_be_pairwise_distinct() {
+        let dir = tempfile::tempdir().unwrap();
+        let paths = [
+            dir.path().join("result.json"),
+            dir.path().join("metrics.jsonl"),
+            dir.path().join("state.mwckpt"),
+            dir.path().join("strategy.mwsol"),
+        ];
+        validate_artifact_paths(
+            Some(&paths[0]),
+            Some(&paths[1]),
+            Some(&paths[2]),
+            Some(&paths[3]),
+        )
+        .unwrap();
+
+        for left in 0..paths.len() {
+            for right in (left + 1)..paths.len() {
+                let mut selected = [
+                    paths[0].as_path(),
+                    paths[1].as_path(),
+                    paths[2].as_path(),
+                    paths[3].as_path(),
+                ];
+                selected[right] = selected[left];
+                let error = validate_artifact_paths(
+                    Some(selected[0]),
+                    Some(selected[1]),
+                    Some(selected[2]),
+                    Some(selected[3]),
+                )
+                .unwrap_err();
+                assert!(
+                    error
+                        .to_string()
+                        .contains("artifact destinations must be distinct"),
+                    "pair {left}/{right}: {error:#}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn artifact_destination_aliases_and_implicit_checkpoint_collisions_are_rejected() {
+        let dir = tempfile::tempdir().unwrap();
+        let output = dir.path().join("nested").join("..").join("result.json");
+        let metrics = dir.path().join("result.json");
+        let checkpoint = dir.path().join("state.mwckpt");
+        assert!(
+            validate_artifact_paths(Some(&output), Some(&metrics), Some(&checkpoint), None)
+                .is_err()
+        );
+
+        let output = dir.path().join("result.json");
+        let implicit = dir.path().join("result.mwckpt");
+        assert!(validate_artifact_paths(Some(&output), Some(&implicit), None, None).is_err());
+
+        let output = dir.path().join("result.mwckpt");
+        assert!(validate_artifact_paths(Some(&output), None, None, None).is_err());
     }
 }

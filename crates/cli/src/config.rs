@@ -343,8 +343,9 @@ pub struct RunSection {
     /// Stop once NashConv (sum of per-player exploitabilities, in chips per
     /// deal) drops below this.
     pub target_nash_conv: Option<f64>,
-    /// Rayon global thread pool size (postflop only). Defaults to rayon's
-    /// own choice (all cores) when unset.
+    /// Worker count for deterministic parallel solve batches. Multiway uses
+    /// one local traversal delta per seat and merges in sample-id order;
+    /// defaults to rayon's available worker count when unset.
     pub threads: Option<usize>,
     /// Overrides `ParConfig::chance_depth` (postflop only; default 2).
     pub par_chance_depth: Option<u32>,

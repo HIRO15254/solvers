@@ -44,7 +44,7 @@ export default function MultiwaySeatTabs({ seats }: Props) {
   return (
     <div
       className="range-tabs seat-quick-nav"
-      role="tablist"
+      role="toolbar"
       aria-label="Seat quick navigation"
       aria-orientation="horizontal"
       onKeyDown={onKeyDown}
@@ -54,9 +54,8 @@ export default function MultiwaySeatTabs({ seats }: Props) {
           id={`multiway-seat-tab-${index}`}
           key={seat.id}
           type="button"
-          role="tab"
           className="range-tab"
-          aria-selected={selected === index}
+          aria-pressed={selected === index}
           aria-controls={`multiway-seat-row-${index}`}
           tabIndex={selected === index ? 0 : -1}
           data-seat-index={index}

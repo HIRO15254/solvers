@@ -35,6 +35,14 @@ bet level required to reopen raising.  This supports the big blind's option,
 short all-ins that do not reopen, and several short all-ins whose cumulative
 increase does reopen action for an affected seat.
 
+Preflop configuration distinguishes an unopened raise-to menu
+(`bet_sizes`), the raise-to menu after one or more limps
+(`isolate_sizes`), and re-raise factors (`raise_sizes`).  Flop, turn, and
+river each have independent bet sizes, raise sizes, aggressive-action caps,
+and all-in switches.  A seat may replace the complete table betting profile.
+If an older config omits `isolate_sizes`, the table reuses `bet_sizes` for
+backward compatibility.
+
 At a terminal the implementation:
 
 1. refunds unmatched top contribution;
@@ -72,12 +80,42 @@ base seed, deterministic sample ID, traverser, and sample purpose. Checkpoints
 resume without serializing an opaque process RNG. Changing `run.threads` does
 not change the ordered sample stream or checkpoint result.
 
+Parallel sweeps give every traverser the same immutable policy snapshot, then
+merge local deltas in sample-ID/seat order.  A failed memory-limited sweep is
+rolled back as a unit, so no partial sweep can enter a checkpoint.
+The cancel token is checked at every complete-sweep boundary without rebuilding
+the Rayon pool. `run.max_memory_bytes` is an operational limit rather than game
+identity, so a resource-limited checkpoint can resume under a larger budget.
+
 ## Output semantics
 
 Multiway progress uses per-seat profile EV estimates, confidence intervals,
 average positive-regret diagnostics, strategy drift, and a held-out unilateral
 deviation-gain lower bound.  It deliberately does not reuse the heads-up
 `exploitability` or `nash_conv` field names.
+
+The multiway artifact contracts are separate from frozen HU v1:
+
+- `.mwckpt` uses independently compressed 4 MiB frames with a checked chunk
+  table and per-frame, table, and aggregate BLAKE3 integrity checks. Postcard
+  serialization is streamed through a temporary file instead of duplicating
+  the full raw state in memory.
+- `.mwsol` stores metadata/public-history recall separately from a sorted
+  strategy index.  Each strategy block is an independent checked frame, so a
+  Bridge page query reads only the requested blocks.
+- When the policy memory cap is reached, the solver does not evict policy.  It
+  ends with `resource_limit` and writes the requested checkpoint; CLI runs
+  without an explicit checkpoint derive a `.mwckpt` beside the result (or
+  `multiway-resource-limit.mwckpt` when no result path was supplied).
+
+Bridge v2 exposes health/capabilities, validation, create/status/cancel,
+result, checkpoint, and paginated strategy endpoints alongside unchanged v1.
+Checkpoint responses are streamed from the managed file, and overlapping
+result/metrics/checkpoint/solution destinations are rejected before a run.
+A browser resume accepts only a managed
+`/v2/jobs/{id}/checkpoint` URL from the same Bridge session; arbitrary local
+paths are never accepted from web input.  Once an atomic periodic checkpoint
+exists, its URL is available even while the solve continues.
 
 ## References
 
