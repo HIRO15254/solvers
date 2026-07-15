@@ -52,6 +52,13 @@ IR-KE-KO(flop/turn: k-means+EMD histogram、river: OCHS)を bucket 数ノブ付�
 formats スキーマ v1 凍結 → `wasm` viewer-only 静的サイト(`.sol` 読み込み、threads/COOP/COEP 不要、UI 新規実装)→ 任意で Tauri wrap。ストレッチ(各々既存の継ぎ目に接続): HS-DCFR/DDCFR スケジュール実験(DiscountSchedule)、short-deck(Rules + builder)、FGS UtilityModel、**拡張性検証として fixed-limit HU Stud(厳密解)または Draw 系 toy game の variant crate 実装**(`ChanceKind::PrivateTransition` 経路と hi-lo 対応 payoff の実地検証)。プレイングエージェント系(Slumbot 対戦・unsafe re-solve gadget・action translation)は非目標として除外。
 **Exit:** 100bb SRP の solve を 50 MB NoRivers artifact からブラウザで閲覧、river はオンデマンド再 solve。
 
+## M9 — 2–9 seat Multiway プリフロップ/全 street (2026-07)
+既存 HU engine を凍結したまま `multiway` crate と `kind = "preflop-multiway"` を追加。共有実カード world の joint range sampling、lazy betting history、全 street NLHE、refund/side pot/rake、BBA、卓外 field を含む hybrid ICM、active-opponent 別 rollout bucket、external-sampling MCCFR、v2 metrics、`.mwckpt` / `.mwsol`、Bridge v2 と Web workbench を一体で提供する。
+
+**Exit:** 2/3/6/9 人の betting/settlement property、exact ICM ≤15・sampled ICM ≤100、deterministic checkpoint resume、9-max smoke、HU v1 golden 不変、Web test/build。3 人以上は `exploitability` / `NashConv` / GTO と呼ばず、seat EV/CI・positive-regret proxy・strategy drift・held-out deviation gain を報告する。
+
+> 根拠: external-sampling MCCFR は Lanctot et al. (NeurIPS 2009)。多人数・一般和で HU zero-sum と同じ Nash 保証がない境界は Gibson et al. (2013) に従う。straddle、missed/dead blind、multiple runouts、bounty、FGS、re-entry、PLO はこの milestone の対象外。
+
 ## 横断事項(M0 から)
 - CI: Kuhn/Leduc 既知解テスト + isomorphism カウント固定を毎コミット実行;M3 以降 criterion ベンチ追跡。
 - クリーンルーム方針の遵守(AGPL ソルバーは設計参照のみ)。

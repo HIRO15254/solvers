@@ -16,6 +16,7 @@ mod bench;
 mod bridge;
 mod config;
 mod inspect;
+mod multiway_solve;
 mod postflop_setup;
 mod preflop_setup;
 mod report;

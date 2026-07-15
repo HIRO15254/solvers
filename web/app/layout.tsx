@@ -16,31 +16,31 @@ export async function generateMetadata(): Promise<Metadata> {
   } catch {
     metadataBase = new URL("http://localhost:3000");
   }
-  const imageUrl = new URL("/og.png", metadataBase);
+  const imageUrl = new URL("/og-multiway.png", metadataBase);
 
   return {
     metadataBase,
-    title: "Solvers Lab — プリフロップ設定",
+    title: "Solvers Lab — HU / Multiway プリフロップソルバー",
     description:
-      "Heads-up No-Limit Hold’em のプリフロップ解析設定を、迷わず組み立てられるワークスペース。",
+      "HUから最大9-maxまで、No-Limit Hold’emのプリフロップ解析を設計・実行するワークスペース。",
     openGraph: {
-      title: "Solvers Lab — プリフロップ設定",
-      description: "スポット、ベットツリー、精度をひとつの画面で設計。",
+      title: "Solvers Lab — HU / Multiway プリフロップソルバー",
+      description: "最大9-maxのスポット、全streetベットツリー、ChipEV / ICMをひとつの画面で設計。",
       type: "website",
       url: metadataBase,
       images: [
         {
           url: imageUrl,
-          width: 1733,
-          height: 908,
-          alt: "Solvers Lab Preflop Workbench",
+          width: 1730,
+          height: 909,
+          alt: "Solvers Lab 9-max Multiway Preflop Solver",
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: "Solvers Lab — プリフロップ設定",
-      description: "スポット、ベットツリー、精度をひとつの画面で設計。",
+      title: "Solvers Lab — HU / Multiway プリフロップソルバー",
+      description: "最大9-maxのプリフロップ解析を設計・実行。",
       images: [imageUrl],
     },
   };

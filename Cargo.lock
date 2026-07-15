@@ -301,6 +301,7 @@ dependencies = [
  "formats",
  "game",
  "holdem",
+ "multiway",
  "preflop",
  "rand",
  "rayon",
@@ -481,6 +482,7 @@ dependencies = [
  "postcard",
  "serde",
  "serde_json",
+ "tempfile",
  "thiserror",
  "zstd",
 ]
@@ -722,6 +724,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2e264bd1a231edea70ebef68f70127a0d4ed21f0e5edaf0de3bf8fb482f85040"
 dependencies = [
  "quickdiv",
+]
+
+[[package]]
+name = "multiway"
+version = "0.1.0"
+dependencies = [
+ "abstraction",
+ "anyhow",
+ "blake3",
+ "cards",
+ "hand-index",
+ "postcard",
+ "rand",
+ "rand_chacha",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror",
+ "toml",
+ "zstd",
 ]
 
 [[package]]

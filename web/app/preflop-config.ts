@@ -1,5 +1,9 @@
 export type PostflopModel = "equity" | "bucketed";
 export type StorageKind = "f32" | "i16";
+export type WorkbenchMode = "hu" | "multiway";
+export type AnteMode = "none" | "ante" | "big-blind-ante";
+export type UtilityMode = "cash" | "icm";
+export type IcmMethod = "auto" | "exact" | "sampled";
 export type ScheduleKind =
   | "vanilla"
   | "cfr-plus"
@@ -14,7 +18,30 @@ export interface StreetValues<T> {
   river: T;
 }
 
+export interface MultiwaySeatBetting {
+  openSizesBb: number[];
+  raiseFactors: number[];
+  postflopBetSizes: StreetValues<number[]>;
+}
+
+export interface MultiwaySeat {
+  id: string;
+  position: string;
+  stackBb: number;
+  range: string;
+  betting?: MultiwaySeatBetting;
+}
+
+export interface MultiwayBucketProfile {
+  activePlayers: number;
+  preflop: number;
+  flop: number;
+  turn: number;
+  river: number;
+}
+
 export interface PreflopSettings {
+  mode: WorkbenchMode;
   effectiveStackBb: number;
   sbBb: number;
   openSizesBb: number[];
@@ -40,6 +67,21 @@ export interface PreflopSettings {
   rakeRate: number;
   rakeCap: number;
   noFlopNoDrop: boolean;
+  tableSize: number;
+  seats: MultiwaySeat[];
+  anteMode: AnteMode;
+  anteBb: number;
+  utilityMode: UtilityMode;
+  payoutsText: string;
+  outsideStacksText: string;
+  icmMethod: IcmMethod;
+  icmSamples: number;
+  icmSeed: number;
+  bucketProfiles: MultiwayBucketProfile[];
+  externalSamplingSweeps: number;
+  externalSamplingSeed: number;
+  checkpointEvery: number;
+  resumeCheckpoint: string;
 }
 
 export interface PreflopPreset {
@@ -49,7 +91,45 @@ export interface PreflopPreset {
   settings: PreflopSettings;
 }
 
+const POSITION_TABLE: Record<number, string[]> = {
+  3: ["BTN", "SB", "BB"],
+  4: ["CO", "BTN", "SB", "BB"],
+  5: ["HJ", "CO", "BTN", "SB", "BB"],
+  6: ["UTG", "HJ", "CO", "BTN", "SB", "BB"],
+  7: ["UTG", "LJ", "HJ", "CO", "BTN", "SB", "BB"],
+  8: ["UTG", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB"],
+  9: ["UTG", "UTG+1", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB"],
+};
+
+export function positionsForTableSize(tableSize: number): string[] {
+  return [...(POSITION_TABLE[tableSize] ?? POSITION_TABLE[9])];
+}
+
+export function createMultiwaySeats(tableSize: number, stackBb = 30): MultiwaySeat[] {
+  return positionsForTableSize(tableSize).map((position, index) => ({
+    id: `seat-${index}`,
+    position,
+    stackBb,
+    range: "",
+    betting: undefined,
+  }));
+}
+
+export function createBucketProfiles(
+  tableSize: number,
+  postflopBuckets = 64,
+): MultiwayBucketProfile[] {
+  return Array.from({ length: tableSize - 1 }, (_, index) => ({
+    activePlayers: index + 2,
+    preflop: 169,
+    flop: postflopBuckets,
+    turn: postflopBuckets,
+    river: postflopBuckets,
+  }));
+}
+
 const standard100Bb = (): PreflopSettings => ({
+  mode: "hu",
   effectiveStackBb: 100,
   sbBb: 0.5,
   openSizesBb: [2.5],
@@ -72,6 +152,21 @@ const standard100Bb = (): PreflopSettings => ({
   rakeRate: 0.05,
   rakeCap: 3,
   noFlopNoDrop: true,
+  tableSize: 3,
+  seats: createMultiwaySeats(3),
+  anteMode: "none",
+  anteBb: 0.125,
+  utilityMode: "cash",
+  payoutsText: "50\n30\n20",
+  outsideStacksText: "",
+  icmMethod: "auto",
+  icmSamples: 10_000,
+  icmSeed: 7,
+  bucketProfiles: createBucketProfiles(3),
+  externalSamplingSweeps: 250_000,
+  externalSamplingSeed: 7,
+  checkpointEvery: 25_000,
+  resumeCheckpoint: "",
 });
 
 const bucketed100Bb = (): PreflopSettings => ({
@@ -91,6 +186,84 @@ const pushFold10Bb = (): PreflopSettings => ({
   iterations: 2_000,
   checkEvery: 200,
 });
+
+function multiwayBase(tableSize: number, stackBb: number): PreflopSettings {
+  return {
+    ...bucketed100Bb(),
+    mode: "multiway",
+    effectiveStackBb: stackBb,
+    tableSize,
+    seats: createMultiwaySeats(tableSize, stackBb),
+    postflopModel: "bucketed",
+    buckets: { flop: 64, turn: 64, river: 64 },
+    bucketProfiles: createBucketProfiles(tableSize, 64),
+    postflopBetSizes: { flop: [0.5], turn: [0.75], river: [0.75] },
+    maxRaises: 2,
+    raiseFactors: [[3], [2.5]],
+    utilityMode: "cash",
+    rakeMode: "none",
+    externalSamplingSweeps: 250_000,
+    checkpointEvery: 25_000,
+  };
+}
+
+const pushFold9Max = (): PreflopSettings => ({
+  ...multiwayBase(9, 10),
+  openSizesBb: [],
+  raiseFactors: [],
+  maxRaises: 1,
+  allowLimp: false,
+  externalSamplingSweeps: 100_000,
+  checkpointEvery: 10_000,
+  bucketProfiles: createBucketProfiles(9, 32),
+});
+
+const mtt9Max = (): PreflopSettings => {
+  const settings = multiwayBase(9, 20);
+  return {
+    ...settings,
+    seats: settings.seats.map((seat, index) => ({
+      ...seat,
+      stackBb: [14, 16, 18, 20, 22, 24, 27, 31, 36][index],
+    })),
+    anteMode: "big-blind-ante",
+    anteBb: 1,
+    utilityMode: "icm",
+    payoutsText: "100\n70\n50\n35\n25\n18\n12\n8\n5",
+    outsideStacksText: "18\n26\n34\n42\n55\n70",
+    icmMethod: "auto",
+    externalSamplingSweeps: 1_000_000,
+    checkpointEvery: 50_000,
+    bucketProfiles: createBucketProfiles(9, 64),
+  };
+};
+
+const cash6Max = (): PreflopSettings => {
+  const settings = multiwayBase(6, 100);
+  return {
+    ...settings,
+    externalSamplingSweeps: 1_000_000,
+    checkpointEvery: 50_000,
+    bucketProfiles: createBucketProfiles(6, 64),
+  };
+};
+
+const research9Max = (): PreflopSettings => {
+  const settings = multiwayBase(9, 100);
+  return {
+    ...settings,
+    openSizesBb: [2, 2.25, 2.5],
+    postflopBetSizes: {
+      flop: [0.33, 0.5, 0.75],
+      turn: [0.5, 0.75, 1.25],
+      river: [0.5, 0.75, 1.5],
+    },
+    maxRaises: 3,
+    externalSamplingSweeps: 5_000_000,
+    checkpointEvery: 100_000,
+    bucketProfiles: createBucketProfiles(9, 200),
+  };
+};
 
 /** The CLI's `examples/preflop_hu_100bb.toml`, expressed as UI state. */
 export const DEFAULT_SETTINGS: PreflopSettings = standard100Bb();
@@ -115,12 +288,37 @@ export const PRESETS: PreflopPreset[] = [
     description: "Exact two-action short-stack game: the SB can jam or fold.",
     settings: pushFold10Bb(),
   },
+  {
+    id: "multiway-9max-pushfold",
+    name: "9-max · 10bb push / fold",
+    description: "Short-stack nine-handed jam-or-fold research tree.",
+    settings: pushFold9Max(),
+  },
+  {
+    id: "multiway-9max-mtt-icm",
+    name: "9-max · 20bb MTT + BBA + ICM",
+    description: "Unequal stacks, big-blind ante, and a 15-player exact/auto ICM field.",
+    settings: mtt9Max(),
+  },
+  {
+    id: "multiway-6max-cash",
+    name: "6-max · 100bb cash",
+    description: "Six-handed deep cash blueprint with all-street abstraction.",
+    settings: cash6Max(),
+  },
+  {
+    id: "multiway-9max-research",
+    name: "9-max · 100bb research",
+    description: "Large sizing menu, 96-bucket profiles, and a five-million-sweep run.",
+    settings: research9Max(),
+  },
 ];
 
 const U32_MAX = 4_294_967_295;
 const MAX_ESTIMATE = Number.MAX_SAFE_INTEGER;
 const PREFLOP_DIMENSION = 169;
 const CHIPS_PER_BB = 10;
+const MULTIWAY_CHIPS_PER_BB = 1_000;
 const POSTFLOP_MAX_RAISES = 2;
 const GG_EXEMPT_POT = 15;
 
@@ -278,7 +476,156 @@ function validateRange(errors: string[], label: string, range: string): void {
   }
 }
 
+export function parseNumberPaste(input: string): number[] {
+  const matches = input.match(/[-+]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?/g) ?? [];
+  return matches.map((value) => Number(value.replaceAll(",", "")));
+}
+
+function validateMultiwaySettings(settings: PreflopSettings): string[] {
+  const errors: string[] = [];
+  if (!Number.isSafeInteger(settings.tableSize) || settings.tableSize < 3 || settings.tableSize > 9) {
+    errors.push("Table size must be an integer from 3 to 9.");
+  }
+
+  const expectedPositions = positionsForTableSize(settings.tableSize);
+  if (settings.seats.length !== settings.tableSize) {
+    errors.push("Seat count must match table size.");
+  }
+  settings.seats.forEach((seat, index) => {
+    if (seat.position !== expectedPositions[index]) {
+      errors.push(`Seat #${index + 1} must use the standard position label.`);
+    }
+    validateFloat(errors, `${seat.position || `Seat #${index + 1}`} stack`, seat.stackBb);
+    validateRange(errors, `${seat.position || `Seat #${index + 1}`} range`, seat.range);
+    if (seat.betting) {
+      const label = `${seat.position || `Seat #${index + 1}`} override`;
+      validateFloatList(errors, `${label} open size`, seat.betting.openSizesBb, 0);
+      seat.betting.openSizesBb.forEach((size, sizeIndex) => {
+        if (isFiniteNumber(size) && size < 2) {
+          errors.push(`${label} open size #${sizeIndex + 1} must be at least 2bb.`);
+        }
+      });
+      validateFloatList(errors, `${label} raise factor`, seat.betting.raiseFactors, 1);
+      (["flop", "turn", "river"] as const).forEach((street) => {
+        validateFloatList(errors, `${label} ${street} size`, seat.betting?.postflopBetSizes[street] ?? [], 0);
+      });
+    }
+  });
+
+  validateFloat(errors, "Small blind", settings.sbBb);
+  if (
+    isFiniteNumber(settings.sbBb) &&
+    (Math.round(settings.sbBb * CHIPS_PER_BB) <= 0 ||
+      Math.round(settings.sbBb * CHIPS_PER_BB) >= CHIPS_PER_BB)
+  ) {
+    errors.push("Small blind must round to between 0.1bb and 0.9bb.");
+  }
+  if (!["none", "ante", "big-blind-ante"].includes(settings.anteMode)) {
+    errors.push("Select a supported ante mode.");
+  }
+  if (!isFiniteNumber(settings.anteBb) || settings.anteBb < 0) {
+    errors.push("Ante must be zero or greater.");
+  }
+
+  validateFloatList(errors, "Open size", settings.openSizesBb, 0);
+  settings.openSizesBb.forEach((size, index) => {
+    if (isFiniteNumber(size) && size < 2) {
+      errors.push(`Open size #${index + 1} must be at least the 2bb minimum raise.`);
+    }
+  });
+  settings.raiseFactors.forEach((level, index) => {
+    validateFloatList(errors, `Raise level ${index + 1}`, level, 1);
+  });
+  validateU32(errors, "Maximum raises", settings.maxRaises, 0);
+  validateFloatList(errors, "Flop bet size", settings.postflopBetSizes.flop, 0);
+  validateFloatList(errors, "Turn bet size", settings.postflopBetSizes.turn, 0);
+  validateFloatList(errors, "River bet size", settings.postflopBetSizes.river, 0);
+
+  const expectedProfiles = Math.max(0, settings.tableSize - 1);
+  if (
+    settings.bucketProfiles.length !== expectedProfiles ||
+    settings.bucketProfiles.some((profile, index) => profile.activePlayers !== index + 2)
+  ) {
+    errors.push("Bucket profiles must cover every active-player count from 2 through table size.");
+  }
+  settings.bucketProfiles.forEach((profile) => {
+    (["preflop", "flop", "turn", "river"] as const).forEach((street) => {
+      validateU32(
+        errors,
+        `${profile.activePlayers}-player ${street} buckets`,
+        profile[street],
+        1,
+      );
+    });
+    if (profile.preflop > 169) {
+      errors.push(`${profile.activePlayers}-player preflop buckets cannot exceed 169.`);
+    }
+  });
+
+  if (!Number.isSafeInteger(settings.externalSamplingSweeps) || settings.externalSamplingSweeps <= 0) {
+    errors.push("External-sampling sweeps must be a positive safe integer.");
+  }
+  validateU32(errors, "External-sampling seed", settings.externalSamplingSeed, 0);
+  validateU32(errors, "Checkpoint cadence", settings.checkpointEvery, 0);
+  if (
+    settings.checkpointEvery > 0 &&
+    settings.checkpointEvery > settings.externalSamplingSweeps
+  ) {
+    errors.push("Checkpoint cadence cannot exceed the sweep count.");
+  }
+  if (/\r|\n|\0/.test(settings.resumeCheckpoint)) {
+    errors.push("Resume checkpoint must be a single path or managed checkpoint ID.");
+  }
+
+  if (!["cash", "icm"].includes(settings.utilityMode)) {
+    errors.push("Utility must be cash or ICM.");
+  }
+  if (settings.utilityMode === "icm") {
+    const payouts = parseNumberPaste(settings.payoutsText);
+    const outsideStacks = parseNumberPaste(settings.outsideStacksText);
+    const totalPlayers = settings.tableSize + outsideStacks.length;
+    if (payouts.length === 0) errors.push("ICM payouts must contain at least one amount.");
+    payouts.forEach((payout, index) => {
+      if (!isFiniteNumber(payout) || payout < 0) {
+        errors.push(`Payout #${index + 1} must be zero or greater.`);
+      }
+      if (index > 0 && payout > payouts[index - 1]) {
+        errors.push("ICM payouts must be ordered from highest to lowest.");
+      }
+    });
+    outsideStacks.forEach((stack, index) => {
+      if (!isFiniteNumber(stack) || stack <= 0) {
+        errors.push(`Outside stack #${index + 1} must be greater than zero.`);
+      }
+    });
+    if (totalPlayers > 100) errors.push("ICM supports at most 100 remaining players.");
+    if (payouts.length > totalPlayers) {
+      errors.push("Payout count cannot exceed the remaining-player count.");
+    }
+    if (settings.icmMethod === "exact" && totalPlayers > 15) {
+      errors.push("Exact ICM supports at most 15 remaining players; use auto or sampled.");
+    }
+    if (
+      !Number.isSafeInteger(settings.icmSamples) ||
+      settings.icmSamples < 100 ||
+      settings.icmSamples > 1_000_000
+    ) {
+      errors.push("Sampled ICM runs must be an integer from 100 to 1000000.");
+    }
+    validateU32(errors, "ICM seed", settings.icmSeed, 0);
+    if (settings.rakeMode !== "none") {
+      errors.push("Tournament ICM cannot be combined with cash-game rake.");
+    }
+  }
+
+  if (!storageKinds.includes(settings.storage)) errors.push("Storage must be f32 or i16.");
+  if (!rakeModes.includes(settings.rakeMode)) errors.push("Select a supported rake mode.");
+  return errors;
+}
+
 export function validateSettings(settings: PreflopSettings): string[] {
+  if (settings.mode === "multiway") return validateMultiwaySettings(settings);
+
   const errors: string[] = [];
 
   validateFloat(errors, "Effective stack", settings.effectiveStackBb, 1);
@@ -421,9 +768,222 @@ function tomlFloatList(values: number[]): string {
 function tomlNestedFloatList(values: number[][]): string {
   return `[${values.map(tomlFloatList).join(", ")}]`;
 }
+function tomlObjectList(
+  kind: "to-bb" | "pot-after-call" | "previous-bet-multiple",
+  key: "value" | "fraction" | "factor",
+  values: number[],
+): string {
+  return `[${values
+    .map(
+      (value) =>
+        `{ kind = ${tomlString(kind)}, ${key} = ${tomlFloat(value)} }`,
+    )
+    .join(", ")}]`;
+}
+
+function appendMultiwayBettingToml(
+  lines: string[],
+  prefix: string,
+  sizes: MultiwaySeatBetting,
+  allowLimp: boolean,
+  maxRaises: number,
+  includeAllin: boolean,
+): void {
+  const raises = [...new Set(sizes.raiseFactors)];
+  lines.push(
+    "",
+    `[${prefix}]`,
+    `allow_limp = ${allowLimp}`,
+    "",
+    `[${prefix}.preflop]`,
+    `bet_sizes = ${tomlObjectList("to-bb", "value", sizes.openSizesBb)}`,
+    `raise_sizes = ${tomlObjectList("previous-bet-multiple", "factor", raises)}`,
+    `max_aggressive_actions = ${tomlInteger(maxRaises)}`,
+    `include_allin = ${includeAllin}`,
+  );
+
+  (["flop", "turn", "river"] as const).forEach((street) => {
+    const streetSizes = sizes.postflopBetSizes[street];
+    lines.push(
+      "",
+      `[${prefix}.${street}]`,
+      `bet_sizes = ${tomlObjectList("pot-after-call", "fraction", streetSizes)}`,
+      `raise_sizes = ${tomlObjectList("pot-after-call", "fraction", streetSizes)}`,
+      `max_aggressive_actions = ${POSTFLOP_MAX_RAISES}`,
+      "include_allin = true",
+    );
+  });
+}
+
+function generateMultiwayToml(settings: PreflopSettings): string {
+  const button = Math.max(
+    0,
+    settings.seats.findIndex((seat) => seat.position === "BTN"),
+  );
+  const fullTableProfile =
+    settings.bucketProfiles.find(
+      (profile) => profile.activePlayers === settings.tableSize,
+    ) ??
+    settings.bucketProfiles[settings.bucketProfiles.length - 1] ?? {
+      activePlayers: settings.tableSize,
+      preflop: 169,
+      flop: 32,
+      turn: 32,
+      river: 32,
+    };
+  const lines: string[] = [
+    "# Multiway preflop configuration generated by Solvers",
+    "[game]",
+    'kind = "preflop-multiway"',
+    `button = ${tomlInteger(button)}`,
+  ];
+
+  settings.seats.forEach((seat) => {
+    lines.push(
+      "",
+      "[[game.seats]]",
+      `name = ${tomlString(seat.position)}`,
+      `stack_bb = ${tomlFloat(seat.stackBb)}`,
+      `range = ${tomlString(seat.range.trim())}`,
+    );
+    if (seat.betting) {
+      appendMultiwayBettingToml(
+        lines,
+        "game.seats.betting",
+        seat.betting,
+        settings.allowLimp,
+        settings.maxRaises,
+        settings.includeAllin,
+      );
+    }
+  });
+
+  lines.push(
+    "",
+    "[game.blinds]",
+    `small_bb = ${tomlFloat(settings.sbBb)}`,
+    "big_bb = 1.0",
+    "",
+    "[game.ante]",
+  );
+  if (settings.anteMode === "none") {
+    lines.push('kind = "none"');
+  } else {
+    lines.push(
+      `kind = ${tomlString(
+        settings.anteMode === "ante" ? "each" : "big-blind",
+      )}`,
+      `amount_bb = ${tomlFloat(settings.anteBb)}`,
+    );
+  }
+
+  appendMultiwayBettingToml(
+    lines,
+    "game.betting",
+    {
+      openSizesBb: settings.openSizesBb,
+      raiseFactors: settings.raiseFactors.flat(),
+      postflopBetSizes: settings.postflopBetSizes,
+    },
+    settings.allowLimp,
+    settings.maxRaises,
+    settings.includeAllin,
+  );
+
+  lines.push(
+    "",
+    "# Full-table defaults, followed by budgets for each live-opponent count.",
+    "[game.abstraction]",
+    `flop_buckets = ${tomlInteger(fullTableProfile.flop)}`,
+    `turn_buckets = ${tomlInteger(fullTableProfile.turn)}`,
+    `river_buckets = ${tomlInteger(fullTableProfile.river)}`,
+    "rollout_samples = 256",
+    `seed = ${tomlInteger(settings.externalSamplingSeed)}`,
+  );
+  settings.bucketProfiles.forEach((profile) => {
+    lines.push(
+      "",
+      "[[game.abstraction.active_opponent_buckets]]",
+      `active_opponents = ${tomlInteger(profile.activePlayers - 1)}`,
+      `flop_buckets = ${tomlInteger(profile.flop)}`,
+      `turn_buckets = ${tomlInteger(profile.turn)}`,
+      `river_buckets = ${tomlInteger(profile.river)}`,
+    );
+  });
+
+  lines.push(
+    "",
+    "[rake]",
+    `kind = ${tomlString(settings.rakeMode)}`,
+  );
+  if (settings.rakeMode !== "none") {
+    lines.push(
+      `rate = ${tomlFloat(settings.rakeRate)}`,
+      `cap = ${tomlFloat(settings.rakeCap * MULTIWAY_CHIPS_PER_BB)}`,
+    );
+    if (settings.rakeMode === "percent-cap") {
+      lines.push(`no_flop_no_drop = ${settings.noFlopNoDrop}`);
+    } else {
+      lines.push(`exempt_pot = ${tomlInteger(GG_EXEMPT_POT * MULTIWAY_CHIPS_PER_BB)}`);
+    }
+  }
+
+  lines.push("", "[utility]");
+  if (settings.utilityMode === "cash") {
+    lines.push('kind = "chip-ev"');
+  } else {
+    const outsideStacks = parseNumberPaste(settings.outsideStacksText);
+    const payouts = parseNumberPaste(settings.payoutsText);
+    const fieldSize = settings.tableSize + outsideStacks.length;
+    while (payouts.length < fieldSize) payouts.push(0);
+    lines.push(
+      'kind = "tournament-icm"',
+      `payouts = ${tomlFloatList(payouts)}`,
+      `samples = ${tomlInteger(settings.icmSamples)}`,
+      `seed = ${tomlInteger(settings.icmSeed)}`,
+    );
+    outsideStacks.forEach((stack, index) => {
+      lines.push(
+        "",
+        "[[utility.outside_field]]",
+        `name = ${tomlString(`Field ${index + 1}`)}`,
+        `stack_bb = ${tomlFloat(stack)}`,
+      );
+    });
+  }
+
+  lines.push(
+    "",
+    "[algorithm]",
+    'schedule = "external-sampling-mccfr"',
+    `seed = ${tomlInteger(settings.externalSamplingSeed)}`,
+    "exploration_epsilon = 0.06",
+    "discount_every = 100000",
+    "discount_until = 10000000",
+    "",
+    "[run]",
+    `sweeps = ${tomlInteger(settings.externalSamplingSweeps)}`,
+    `seed = ${tomlInteger(settings.externalSamplingSeed)}`,
+    `check_every = ${tomlInteger(Math.max(1, settings.checkpointEvery || 25))}`,
+    'storage = "f32"',
+    "evaluation_samples = 32",
+  );
+  if (settings.checkpointEvery > 0) {
+    lines.push(
+      `checkpoint_every = ${tomlInteger(settings.checkpointEvery)}`,
+      `evaluation_cadence = ${tomlInteger(settings.checkpointEvery)}`,
+    );
+  }
+
+  return `${lines.join("\n")}\n`;
+}
+
+
 
 /** Generate a `SolveConfig` accepted by `crates/cli/src/config.rs`. */
 export function generateToml(settings: PreflopSettings): string {
+  if (settings.mode === "multiway") return generateMultiwayToml(settings);
+
   const lines = [
     "# Heads-up preflop configuration generated by Solvers",
     "[game]",
@@ -788,6 +1348,67 @@ function formatDuration(seconds: number): string {
   const hours = seconds / 3_600;
   return `~${hours >= 10 ? hours.toFixed(0) : hours.toFixed(1)} hr`;
 }
+function estimateMultiwaySolve(settings: PreflopSettings): {
+  memory: string;
+  time: string;
+  nodes: string;
+  quality: string;
+} {
+  const sizingBranches =
+    2 +
+    settings.openSizesBb.length +
+    settings.raiseFactors.flat().length +
+    settings.postflopBetSizes.flop.length +
+    settings.postflopBetSizes.turn.length +
+    settings.postflopBetSizes.river.length;
+  const bucketMass = settings.bucketProfiles.reduce(
+    (total, profile) =>
+      saturatedAdd(
+        total,
+        saturatedMultiply(
+          profile.activePlayers,
+          profile.preflop + profile.flop + profile.turn + profile.river,
+        ),
+      ),
+    0,
+  );
+  const infosets = saturatedMultiply(
+    Math.max(1, bucketMass),
+    saturatedMultiply(settings.tableSize, sizingBranches),
+  );
+  const bytesPerInfoset = settings.storage === "i16" ? 12 : 24;
+  const memoryBytes = saturatedMultiply(infosets, bytesPerInfoset);
+  const traversals = saturatedMultiply(
+    settings.externalSamplingSweeps,
+    settings.tableSize,
+  );
+  const seconds =
+    saturatedMultiply(traversals, Math.max(1, sizingBranches)) / 1_500_000;
+  const fidelity =
+    Math.sqrt(settings.externalSamplingSweeps / 250_000) *
+    Math.cbrt(Math.max(1, bucketMass) / Math.max(1, settings.tableSize * 256));
+  const utility =
+    settings.utilityMode === "icm"
+      ? parseNumberPaste(settings.outsideStacksText).length > 6
+        ? " · sampled ICM"
+        : " · exact/auto ICM"
+      : " · chip EV";
+
+  return {
+    memory: formatBytes(memoryBytes),
+    time: formatDuration(seconds),
+    nodes: formatCount(infosets),
+    quality: `${
+      fidelity >= 6
+        ? "Research-grade external sampling"
+        : fidelity >= 2
+          ? "Balanced external-sampling blueprint"
+          : "Draft external-sampling blueprint"
+    }${utility}`,
+  };
+}
+
+
 
 function estimateQuality(settings: PreflopSettings): string {
   if (settings.postflopModel === "equity") return "Fast equity approximation";
@@ -814,6 +1435,8 @@ export function estimateSolve(settings: PreflopSettings): {
   nodes: string;
   quality: string;
 } {
+  if (settings.mode === "multiway") return estimateMultiwaySolve(settings);
+
   const count = structuralEstimate(settings);
   const storageBytes =
     settings.storage === "f32"

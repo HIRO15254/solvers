@@ -1,7 +1,7 @@
 <!-- 統合設計書: 調査ワークフロー(6調査→3設計案→統合)の成果物。
      実装状況により随時更新する。実装順は roadmap.md を参照。 -->
 
-# 統合アーキテクチャ: `solvers` — 研究用 HU-NLHE ポーカーソルバー (Rust, edition 2024)
+# 統合アーキテクチャ: `solvers` — 研究用 HU + Multiway NLHE ポーカーソルバー (Rust, edition 2024)
 
 3 案(extensibility / performance / research-usability)は研究的基盤を共有しており大枠で収束している。本設計はその共通部分を土台に、相違点を明示的に裁定して 1 つの実行可能な設計に統合したものである。
 
@@ -16,6 +16,7 @@
 5. **1 エンジン 2 モード。** Mode A(exact postflop): 固定 flop、1,326-combo フルレンジ、カード抽象化なし、turn/river suit isomorphism 併合、DCFR。Mode B(preflop): lossless 169-hand trunk + 差し替え可能な `PostflopModel`(HRC 級高速モデル 〜 Pio 級 flop-subset 厳密モデル 〜 Monker 級 bucketed MCCFR)。
 6. **研究ワークフローは第一級の成果物。** 再現可能な TOML config(blake3 ハッシュを全成果物に刻印)、resumable checkpoint と compact viewer artifact の分離、JSONL 収束メトリクス、A/B `bench` ハーネス。
 7. **ライセンス方針(今決めて永続執行): 本体は MIT OR Apache-2.0、クリーンルーム。** b-inary/postflop-solver・wasm-postflop・TexasSolver(AGPL-3.0)と無ライセンスの opensolver/cfr-edge は「読むだけ」。再利用可: `aya_poker`(Zlib OR Apache-2.0 OR MIT, 依存 — `holdem-hand-evaluator` は crates.io 未公開のため、OMPEval 系で lowball/Badugi/short-deck 等の変種評価も備える aya_poker を採用)、Waugh hand-isomorphism(BSD, attribution 付き移植)、OpenSpiel(Apache-2.0, 正当性オラクル)、noambrown/poker_solver(MIT, 参照)。`LICENSE-POLICY.md` をリポジトリ直下に置く。
+8. **N>2 は専用の生成型経路。** 既存 HU public-tree/vector engine と `Player` / `PerPlayer<T>` は凍結し、`multiway` crate が共有実カード world、lazy action-history trie、2–9 seat の side pot/ICM、external-sampling MCCFR を担う。3 人以上の一般和 profile には HU 同様の Nash 保証を付けず、regret-minimized approximation として指標を分離する。
 
 ---
 
@@ -41,6 +42,7 @@
 ```
 frontends:  cli (TOML batch + UPI subset REPL + CSV reports + ANSI 13×13 grid)
             py (PyO3, M3〜) · wasm (viewer-only, M8)
+multiway:    multiway — generative NLHE / joint deal / side pots / rollout buckets / MCCFR
 schemas:    formats — SolveConfig / NodeQuery→NodeReport / Checkpoint(.ckpt) / Artifact(.sol)
 sessions:   holdem::PostflopGame · preflop::PreflopGame
 mode B:     preflop — PostflopModel(EquityShowdown / SolvedFlopSubset / Bucketed)
@@ -74,12 +76,13 @@ solvers/
     ├── abstraction/    # bucketing pipeline + disk cache。deps: cards, hand-index, rayon
     ├── preflop/        # Mode B。deps: holdem, abstraction, engine, game, formats(cache)
     ├── formats/        # serde DTO のみ + codec。deps: serde, toml, postcard, zstd, blake3
+    ├── multiway/       # 2–9 seat generative path。HU engine から独立
     ├── cli/            # bin "solvers": solve/resume/bench/inspect/report/export
     ├── py/             # (M3〜) PyO3/maturin。formats 上の薄い adapter
     └── wasm/           # (M8) wasm-bindgen viewer-only adapter
 ```
 
-依存方向(厳格): `cards → hand-index → {engine ∥ cfr-ref} → game → holdem → {abstraction → preflop}` → formats 消費側(cli/py/wasm)。**engine は poker 固有 crate に依存しない。formats は engine の raw-state 型以外に依存しない。**
+依存方向(厳格): HU は `cards → hand-index → {engine ∥ cfr-ref} → game → holdem → {abstraction → preflop}`、multiway は `cards → multiway` の独立経路で、双方を formats 消費側(cli/py/wasm)が束ねる。**engine は poker 固有 crate に依存しない。formats は solver 実装へ依存しない。**
 
 ---
 
@@ -242,7 +245,7 @@ Bunching は HU では厳密に無効なので実装しないが、range を「�
 |---|---|
 | GPU CFR | 公表 speedup は遅い OpenSpiel 比。OSS の NLHE 前例なし。再訪条件: 1,755 flop 一括 solve か NN-leaf 研究トラック |
 | Deep CFR / ReBeL / NN leaf | tree が RAM に収まる限り tabular DCFR が優位。継ぎ目 = `PostflopModel` |
-| エンジンの N>2 対応 | HU 目標。`PerPlayer<T>` で N=2 を明示・grep 可能に |
+| HU エンジン自体の N>2 化 | 行わない。N>2 は `multiway` の生成型 MCCFR 経路で実装し、`PerPlayer<T>` は HU 専用のまま維持 |
 | Nodelocking・action translation・safe subgame gadget | playing-agent 機能。range-vector CFR があれば unsafe re-solve は後日自明 |
 | per-history State / 汎用 EFG framework | OpenSpiel の罠(実測 100–400x) |
 | 自作 hand evaluator | `aya_poker`(Zlib/Apache-2.0/MIT, OMPEval 系)で十分、しかもホットパス外。変種評価(lowball/Badugi/short-deck)も同 crate で賄える |

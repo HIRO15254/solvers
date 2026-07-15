@@ -1,0 +1,116 @@
+[game]
+kind = "preflop-multiway"
+button = 6
+
+[[game.seats]]
+name = "UTG"
+stack_bb = 20.0
+range = ""
+
+[[game.seats]]
+name = "UTG+1"
+stack_bb = 20.0
+range = ""
+
+[[game.seats]]
+name = "MP"
+stack_bb = 20.0
+range = ""
+
+[[game.seats]]
+name = "LJ"
+stack_bb = 20.0
+range = ""
+
+[[game.seats]]
+name = "HJ"
+stack_bb = 20.0
+range = ""
+
+[[game.seats]]
+name = "CO"
+stack_bb = 20.0
+range = ""
+
+[[game.seats]]
+name = "BTN"
+stack_bb = 20.0
+range = ""
+
+[[game.seats]]
+name = "SB"
+stack_bb = 20.0
+range = ""
+
+[[game.seats]]
+name = "BB"
+stack_bb = 20.0
+range = ""
+
+[game.blinds]
+small_bb = 0.5
+big_bb = 1.0
+
+[game.ante]
+kind = "big-blind"
+amount_bb = 1.0
+
+[game.betting]
+allow_limp = true
+
+[game.betting.preflop]
+bet_sizes = [{ kind = "to-bb", value = 2.2 }]
+raise_sizes = [{ kind = "previous-bet-multiple", factor = 3.0 }]
+max_aggressive_actions = 3
+include_allin = true
+
+[game.betting.flop]
+bet_sizes = [{ kind = "pot-after-call", fraction = 0.5 }]
+raise_sizes = [{ kind = "pot-after-call", fraction = 0.75 }]
+max_aggressive_actions = 2
+include_allin = true
+
+[game.betting.turn]
+bet_sizes = [{ kind = "pot-after-call", fraction = 0.75 }]
+raise_sizes = [{ kind = "pot-after-call", fraction = 0.75 }]
+max_aggressive_actions = 2
+include_allin = true
+
+[game.betting.river]
+bet_sizes = [{ kind = "pot-after-call", fraction = 0.75 }]
+raise_sizes = [{ kind = "pot-after-call", fraction = 0.75 }]
+max_aggressive_actions = 2
+include_allin = true
+
+[game.abstraction]
+flop_buckets = 32
+turn_buckets = 32
+river_buckets = 32
+rollout_samples = 256
+seed = 7
+
+[rake]
+kind = "none"
+
+[utility]
+kind = "tournament-icm"
+payouts = [1000.0, 650.0, 450.0, 300.0, 200.0, 125.0, 75.0, 50.0, 0.0]
+samples = 100000
+seed = 11
+
+[algorithm]
+schedule = "external-sampling-mccfr"
+seed = 7
+exploration_epsilon = 0.06
+discount_every = 100000
+discount_until = 10000000
+
+[run]
+sweeps = 1000
+seed = 7
+check_every = 100
+storage = "f32"
+max_memory_bytes = 2147483648
+checkpoint_every = 500
+evaluation_samples = 32
+evaluation_cadence = 100

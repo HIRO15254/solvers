@@ -135,6 +135,9 @@ pub fn build_utility(utility: &UtilitySection) -> Box<dyn UtilityModel> {
     match utility {
         UtilitySection::ChipEv => Box::new(ChipEv),
         UtilitySection::Icm { payouts } => Box::new(Icm { payouts: *payouts }),
+        UtilitySection::TournamentIcm { .. } => {
+            unreachable!("tournament ICM is handled by the multiway solve path")
+        }
     }
 }
 
@@ -158,6 +161,9 @@ pub fn build_schedule(algorithm: &AlgorithmSection) -> Box<dyn DiscountSchedule>
         }),
         AlgorithmSection::LinearCfr => Box::new(linear_cfr()),
         AlgorithmSection::HsDcfr { gamma0 } => Box::new(HsDcfr { gamma0: *gamma0 }),
+        AlgorithmSection::ExternalSamplingMccfr { .. } => {
+            unreachable!("external-sampling MCCFR is handled by the multiway solve path")
+        }
     }
 }
 

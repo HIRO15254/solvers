@@ -14,3 +14,4 @@ thiserror = { workspace = true }
 blake3 = { workspace = true }
 postcard = { workspace = true }
 zstd = { workspace = true }
+tempfile = { workspace = true }

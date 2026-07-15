@@ -39,12 +39,29 @@ pub fn run(
     let raw = std::str::from_utf8(&raw_bytes).context("config file is not valid UTF-8")?;
     let mut config: SolveConfig = toml::from_str(raw).context("parsing config")?;
     if let Some(it) = iterations {
-        config.run.iterations = it;
+        if matches!(config.game, GameSection::PreflopMultiway(_)) {
+            config.run.sweeps = Some(it);
+        } else {
+            config.run.iterations = it;
+        }
     }
     // Hashed from the raw file bytes, not the parsed/overridden struct: a
     // `--iterations` override must not change what a checkpoint is stamped
     // with, since `resume` re-derives the same hash from the same file.
     let config_hash = formats::config_hash(&raw_bytes);
+    if matches!(config.game, GameSection::PreflopMultiway(_)) {
+        return crate::multiway_solve::run(
+            raw,
+            config,
+            output,
+            metrics,
+            checkpoint,
+            config_hash,
+            sol,
+            None,
+        );
+    }
+
     let checkpoint_sink = checkpoint.map(|path| (path, config_hash));
 
     let sol_spec = match sol {
@@ -286,6 +303,9 @@ fn run_with_storage_impl<S: Storage>(
             resume_state,
             &mut hooks,
         ),
+        GameSection::PreflopMultiway(_) => {
+            unreachable!("multiway games dispatch before the HU storage path")
+        }
     }
 }
 

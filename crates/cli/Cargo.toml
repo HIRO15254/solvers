@@ -18,6 +18,7 @@ formats = { workspace = true }
 game = { workspace = true }
 holdem = { workspace = true }
 preflop = { workspace = true }
+multiway = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
 rayon = { workspace = true }

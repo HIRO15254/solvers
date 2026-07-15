@@ -84,6 +84,7 @@ pub enum GameSection {
         #[serde(default)]
         postflop: Option<PostflopSection>,
     },
+    PreflopMultiway(multiway::MultiwayConfig),
 }
 
 /// `[game.postflop]`: extends the preflop trunk with a bucketed blueprint
@@ -209,6 +210,13 @@ pub enum RakeSection {
     },
 }
 
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct OutsidePlayerSection {
+    pub name: String,
+    pub stack_bb: f64,
+}
+
 #[derive(Deserialize, Debug, Default)]
 #[serde(deny_unknown_fields, tag = "kind", rename_all = "kebab-case")]
 pub enum UtilitySection {
@@ -216,6 +224,15 @@ pub enum UtilitySection {
     ChipEv,
     Icm {
         payouts: [f64; 2],
+    },
+    TournamentIcm {
+        #[serde(default)]
+        outside_field: Vec<OutsidePlayerSection>,
+        payouts: Vec<f64>,
+        #[serde(default = "default_icm_samples")]
+        samples: u64,
+        #[serde(default)]
+        seed: u64,
     },
 }
 
@@ -239,6 +256,16 @@ pub enum AlgorithmSection {
         #[serde(default = "default_gamma0")]
         gamma0: f64,
     },
+    ExternalSamplingMccfr {
+        #[serde(default)]
+        seed: u64,
+        #[serde(default = "default_exploration_epsilon")]
+        exploration_epsilon: f64,
+        #[serde(default = "default_discount_every")]
+        discount_every: u64,
+        #[serde(default = "default_discount_until")]
+        discount_until: u64,
+    },
 }
 
 impl Default for AlgorithmSection {
@@ -257,6 +284,18 @@ fn default_alpha() -> f64 {
 }
 fn default_gamma() -> f64 {
     3.0
+}
+fn default_exploration_epsilon() -> f64 {
+    0.06
+}
+fn default_discount_every() -> u64 {
+    100_000
+}
+fn default_discount_until() -> u64 {
+    10_000_000
+}
+fn default_icm_samples() -> u64 {
+    100_000
 }
 /// `pub(crate)` (rather than private) so `bench` can build an `HsDcfr`
 /// section with the same default `gamma0` the config schema would use.
@@ -286,7 +325,13 @@ fn default_equity_realization() -> [f64; 2] {
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct RunSection {
+    /// HU iteration budget. Multiway configs may omit this and set
+    /// `sweeps`; one sweep traverses once for every table seat.
+    #[serde(default)]
     pub iterations: u64,
+    pub sweeps: Option<u64>,
+    /// Multiway root seed; overrides the algorithm seed when present.
+    pub seed: Option<u64>,
     /// Exploitability check cadence, in iterations.
     #[serde(default = "default_check_every")]
     pub check_every: u64,
@@ -305,6 +350,14 @@ pub struct RunSection {
     pub par_chance_depth: Option<u32>,
     /// Overrides `ParConfig::min_children` (postflop only; default 12).
     pub par_min_children: Option<usize>,
+    /// Hard cap for lazily visited multiway policy storage.
+    pub max_memory_bytes: Option<u64>,
+    /// Multiway checkpoint cadence in completed sweeps.
+    pub checkpoint_every: Option<u64>,
+    /// Held-out worlds used for multiway profile evaluation.
+    pub evaluation_samples: Option<u64>,
+    /// Evaluation cadence in completed multiway sweeps.
+    pub evaluation_cadence: Option<u64>,
 }
 
 fn default_check_every() -> u64 {

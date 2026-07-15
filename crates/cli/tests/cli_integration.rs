@@ -249,6 +249,73 @@ fn resume_equivalence_kuhn() {
 }
 
 #[test]
+#[ignore = "trains the multiway rollout artifact three times; CI runs it in release"]
+fn multiway_resume_is_bit_identical_to_a_straight_run() {
+    let dir = temp_dir("multiway-resume-equiv");
+    let config = workspace_root().join("examples/preflop_multiway_3max_smoke.toml");
+    let straight_checkpoint = dir.join("straight.mwckpt");
+    let resumed_checkpoint = dir.join("resumed.mwckpt");
+    let straight_result = dir.join("straight.json");
+    let resumed_result = dir.join("resumed.json");
+
+    run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--checkpoint",
+        straight_checkpoint.to_str().unwrap(),
+        "--output",
+        straight_result.to_str().unwrap(),
+    ]);
+    run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--iterations",
+        "1",
+        "--checkpoint",
+        resumed_checkpoint.to_str().unwrap(),
+    ]);
+    run_solvers_ok(&[
+        "resume",
+        config.to_str().unwrap(),
+        "--checkpoint",
+        resumed_checkpoint.to_str().unwrap(),
+        "--output",
+        resumed_result.to_str().unwrap(),
+    ]);
+
+    let straight = multiway::MultiwayCheckpoint::load_unchecked(&straight_checkpoint).unwrap();
+    let resumed = multiway::MultiwayCheckpoint::load_unchecked(&resumed_checkpoint).unwrap();
+    assert_eq!(straight.header.next_sample_id, 6);
+    assert_eq!(straight.state, resumed.state);
+    assert_eq!(
+        straight.header.configuration_fingerprint,
+        resumed.header.configuration_fingerprint
+    );
+    assert_eq!(
+        straight.header.abstraction_fingerprint,
+        resumed.header.abstraction_fingerprint
+    );
+
+    let straight_json: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(straight_result).unwrap()).unwrap();
+    let resumed_json: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(resumed_result).unwrap()).unwrap();
+    for field in [
+        "sweeps",
+        "traversals",
+        "infosets",
+        "memoryBytes",
+        "totalDealAttempts",
+        "meanDealAttempts",
+        "seats",
+        "strategyBlocks",
+        "configHash",
+    ] {
+        assert_eq!(straight_json[field], resumed_json[field], "field {field}");
+    }
+}
+
+#[test]
 fn resume_tampered_config_errors() {
     let dir = temp_dir("resume-tamper");
     let config = dir.join("kuhn.toml");
