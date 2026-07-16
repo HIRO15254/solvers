@@ -2,7 +2,8 @@
 
 For a conceptual overview of what this solver computes and why (in
 Japanese), see `docs/preflop-solver-overview.md`; this document is the
-precise reference.
+precise reference. A Japanese translation of this reference is maintained
+at `docs/multiway-preflop.jp.md`.
 
 A runnable 9-max BBA/ICM configuration is in
 `examples/preflop_multiway_9max.toml`:

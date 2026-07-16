@@ -154,6 +154,6 @@ cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
 
 ## 8. 関連ドキュメント
 
-- `docs/multiway-preflop.md` — 精算規則・ICM・抽象化・成果物フォーマットの厳密仕様
+- `docs/multiway-preflop.md` — 精算規則・ICM・抽象化・成果物フォーマットの厳密仕様(日本語版: `docs/multiway-preflop.jp.md`)
 - `docs/architecture.md` — ワークスペース全体の設計(HU 厳密エンジンとの関係)
 - `docs/native-gui-plan.md` — ネイティブ GUI の設計メモ
