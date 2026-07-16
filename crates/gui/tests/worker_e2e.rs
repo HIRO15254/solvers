@@ -6,7 +6,7 @@
 
 use std::time::{Duration, Instant};
 
-use gui::worker::{self, RunTarget, WorkerEvent};
+use gui::worker::{self, RunTarget, WorkerCmd, WorkerEvent};
 
 #[test]
 #[ignore = "trains the multiway rollout artifact; CI runs it in release"]
@@ -31,6 +31,8 @@ fn worker_runs_the_smoke_config_to_a_finished_solution() {
     let mut saw_building = false;
     let mut saw_progress = false;
     let mut saw_evaluation = false;
+    let mut watch_sent = false;
+    let mut saw_node_strategies = false;
     let finished = loop {
         assert!(Instant::now() < deadline, "worker did not finish in time");
         match handle.events.recv_timeout(Duration::from_secs(600)) {
@@ -38,6 +40,32 @@ fn worker_runs_the_smoke_config_to_a_finished_solution() {
             Ok(WorkerEvent::Progress(snapshot)) => {
                 assert!(snapshot.sweeps <= snapshot.target);
                 saw_progress = true;
+                // Start watching ROOT (ties in with `App::start_solve`
+                // sending this right after spawn) once the worker is past
+                // the build phase, and check the live node view protocol:
+                // the worker must answer with a `NodeStrategies` snapshot
+                // for the watched node before the run finishes.
+                if !watch_sent {
+                    handle.send(WorkerCmd::WatchNode(Some([0; 16])));
+                    watch_sent = true;
+                }
+            }
+            Ok(WorkerEvent::NodeStrategies(snapshot)) => {
+                assert_eq!(snapshot.history, [0; 16]);
+                assert!(snapshot.path.is_empty(), "ROOT's path must be empty");
+                assert!(
+                    !snapshot.children.is_empty() || !snapshot.blocks.is_empty(),
+                    "expected ROOT to have children or strategy blocks"
+                );
+                for block in &snapshot.blocks {
+                    let sum: f32 = block.probabilities.iter().sum();
+                    assert!(
+                        (sum - 1.0).abs() < 1e-2,
+                        "block probabilities summed to {sum}"
+                    );
+                    assert_eq!(block.actions.len(), block.probabilities.len());
+                }
+                saw_node_strategies = true;
             }
             Ok(WorkerEvent::Evaluated(_)) => saw_evaluation = true,
             Ok(WorkerEvent::Finished(finished)) => break finished,
@@ -48,6 +76,10 @@ fn worker_runs_the_smoke_config_to_a_finished_solution() {
     };
 
     assert!(saw_building && saw_progress && saw_evaluation);
+    assert!(
+        saw_node_strategies,
+        "expected at least one NodeStrategies event before Finished"
+    );
     assert_eq!(finished.mwsol_path, output_path);
     assert!(checkpoint_path.is_file());
     let solution = formats::read_mwsol(&output_path).unwrap();

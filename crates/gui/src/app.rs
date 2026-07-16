@@ -3,7 +3,7 @@
 
 use eframe::egui;
 
-use crate::worker::{self, WorkerEvent, WorkerHandle};
+use crate::worker::{self, WorkerCmd, WorkerEvent, WorkerHandle};
 use crate::{presets, results, setup, solve_view, theme};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -55,8 +55,12 @@ impl App {
                 WorkerEvent::Evaluated(evaluation) => {
                     self.solve.latest_evaluation = Some(evaluation);
                 }
+                WorkerEvent::NodeStrategies(snapshot) => {
+                    self.solve.live.snapshot = Some(snapshot);
+                }
                 WorkerEvent::Finished(finished) => {
                     self.solve.status = solve_view::RunStatus::Finished;
+                    self.solve.live = solve_view::LiveNodeState::default();
                     self.results = Some(results::ResultsState::new(
                         finished.solution,
                         Some(finished.mwsol_path),
@@ -66,10 +70,12 @@ impl App {
                 }
                 WorkerEvent::Cancelled => {
                     self.solve.status = solve_view::RunStatus::Cancelled;
+                    self.solve.live = solve_view::LiveNodeState::default();
                     drop_worker = true;
                 }
                 WorkerEvent::Failed(error) => {
                     self.solve.status = solve_view::RunStatus::Failed(error);
+                    self.solve.live = solve_view::LiveNodeState::default();
                     drop_worker = true;
                 }
             }
@@ -160,6 +166,11 @@ impl App {
             checkpoint_path: request.checkpoint_path,
             check_every: request.check_every,
         };
-        self.worker = Some(worker::spawn(target, ctx));
+        let worker = worker::spawn(target, ctx);
+        // Live node view starts at ROOT; the worker answers with a fresh
+        // `NodeSnapshot` after the current chunk (or immediately, if it is
+        // still building or paused).
+        worker.send(WorkerCmd::WatchNode(Some([0; 16])));
+        self.worker = Some(worker);
     }
 }

@@ -971,6 +971,34 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         self.histories.get(&key)
     }
 
+    /// All visited history entries whose parent is `parent`, sorted by
+    /// `(actor, action_index)` for a stable UI order. `O(histories)` scan;
+    /// meant for a UI polling live progress, not the hot traversal loop.
+    pub fn node_children(&self, parent: HistoryKey) -> Vec<HistoryEntry> {
+        let mut children: Vec<HistoryEntry> = self
+            .histories
+            .values()
+            .filter(|entry| entry.parent == parent)
+            .cloned()
+            .collect();
+        children.sort_unstable_by_key(|entry| (entry.actor, entry.action_index));
+        children
+    }
+
+    /// Current average strategy of every policy column at `history`, sorted
+    /// by key. `O(policies)` scan; meant for a UI polling live progress, not
+    /// the hot traversal loop.
+    pub fn strategies_at(&self, history: HistoryKey) -> Vec<(InfoKey, Vec<String>, Vec<f32>)> {
+        let mut rows: Vec<(InfoKey, Vec<String>, Vec<f32>)> = self
+            .policies
+            .iter()
+            .filter(|(key, _)| key.history == history)
+            .map(|(&key, column)| (key, column.action_labels.clone(), column.average_strategy()))
+            .collect();
+        rows.sort_unstable_by_key(|(key, _, _)| *key);
+        rows
+    }
+
     /// Resolves a public-history hash to its root-to-node action-label path.
     pub fn resolve_history(&self, mut key: HistoryKey) -> Option<Vec<String>> {
         let mut reversed = Vec::new();
@@ -2989,5 +3017,31 @@ mod tests {
                 .windows(2)
                 .all(|pair| pair[0].key < pair[1].key)
         );
+    }
+
+    #[test]
+    fn node_children_and_strategies_at_expose_a_live_average_profile() {
+        let mut solver = solver(7, 1 << 20);
+        solver.run_sweeps(20).unwrap();
+
+        let children = solver.node_children(HistoryKey::ROOT);
+        assert!(!children.is_empty(), "expected root's children to exist");
+        let mut labels: Vec<&str> = children
+            .iter()
+            .map(|entry| entry.action_label.as_str())
+            .collect();
+        labels.sort_unstable();
+        assert_eq!(labels, vec!["best", "dominated"]);
+        assert!(children.windows(2).all(|pair| {
+            (pair[0].actor, pair[0].action_index) <= (pair[1].actor, pair[1].action_index)
+        }));
+
+        let rows = solver.strategies_at(HistoryKey::ROOT);
+        assert!(!rows.is_empty(), "expected a live policy at root");
+        for (_, action_labels, probabilities) in &rows {
+            assert_eq!(action_labels.len(), probabilities.len());
+            let sum: f32 = probabilities.iter().sum();
+            assert!((sum - 1.0).abs() < 1e-3, "probabilities summed to {sum}");
+        }
     }
 }

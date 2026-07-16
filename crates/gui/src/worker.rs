@@ -13,7 +13,7 @@ use cli::session::{self, MultiwaySession};
 use eframe::egui;
 use formats::{MultiwaySolution, MwsolStorage};
 use multiway::checkpoint::MultiwayCheckpoint;
-use multiway::solver::{InfoKey, ProfileEvaluation};
+use multiway::solver::{HistoryKey, InfoKey, ProfileEvaluation};
 
 #[derive(Debug, Clone, Copy)]
 pub enum WorkerCmd {
@@ -23,6 +23,11 @@ pub enum WorkerCmd {
     Finish,
     /// Stop and discard; no artifact is written.
     Cancel,
+    /// Start (or, with `None`, stop) watching one public-history node for
+    /// live average-strategy snapshots. Carries the raw history key rather
+    /// than `HistoryKey` so the command stays `Copy`. Does not affect
+    /// [`RunState`]: the worker keeps running/paused exactly as before.
+    WatchNode(Option<[u8; 16]>),
 }
 
 #[derive(Debug, Clone)]
@@ -43,11 +48,47 @@ pub struct FinishedRun {
     pub mwsol_path: PathBuf,
 }
 
+/// One child edge out of a watched node, for the "Live node view" button row.
+#[derive(Debug, Clone)]
+pub struct NodeChild {
+    pub key: [u8; 16],
+    pub actor: u8,
+    pub action: String,
+}
+
+/// One live policy column at the watched node: a `(actor, street,
+/// active_opponents, bucket_path)` block with its current average strategy.
+#[derive(Debug, Clone)]
+pub struct NodeBlock {
+    pub actor: u8,
+    pub street: u8,
+    pub active_opponents: u8,
+    pub bucket_path: [u32; 4],
+    pub actions: Vec<String>,
+    pub probabilities: Vec<f32>,
+}
+
+/// Live snapshot of one watched public-history node, rebuilt from the
+/// solver's cold query accessors (`node_children`/`strategies_at`) at UI
+/// refresh rate.
+#[derive(Debug, Clone)]
+pub struct NodeSnapshot {
+    pub history: [u8; 16],
+    pub sweeps: u64,
+    /// Root-to-node path, one "SEATNAME action" entry per edge; empty at
+    /// ROOT.
+    pub path: Vec<String>,
+    pub children: Vec<NodeChild>,
+    pub blocks: Vec<NodeBlock>,
+}
+
 pub enum WorkerEvent {
     /// Sent once, before the (potentially slow) card abstraction/game build.
     Building,
     Progress(ProgressSnapshot),
     Evaluated(ProfileEvaluation),
+    /// Live average strategy at a watched node; see [`WorkerCmd::WatchNode`].
+    NodeStrategies(Box<NodeSnapshot>),
     Finished(Box<FinishedRun>),
     Cancelled,
     Failed(String),
@@ -118,6 +159,9 @@ fn apply_cmd(cmd: WorkerCmd, state: RunState) -> RunState {
         }
         WorkerCmd::Finish => RunState::Finishing,
         WorkerCmd::Cancel => RunState::Cancelled,
+        // Handled directly by `drain_commands`/the Paused loop below, which
+        // need the target itself; never changes `RunState`.
+        WorkerCmd::WatchNode(_) => state,
     }
 }
 
@@ -157,19 +201,51 @@ fn run(
     // second and reuse the last reading for in-between progress frames.
     let mut last_metrics = mw_session.solver.metrics();
     let mut last_metrics_at = Instant::now();
+    // Live node-strategy view (see `WorkerCmd::WatchNode`): `watch_dirty`
+    // accumulates across every `drain_commands` call since the last
+    // `NodeSnapshot` send, so a target change is never silently absorbed by
+    // the 250ms throttle below.
+    let mut watched: Option<[u8; 16]> = None;
+    let mut watch_dirty = false;
+    let mut last_node_sent_at = Instant::now();
 
     'drive: loop {
-        state = drain_commands(&commands, state);
+        let drained = drain_commands(&commands, state, &mut watched);
+        state = drained.state;
+        watch_dirty |= drained.watch_changed;
         match state {
             RunState::Cancelled => break 'drive,
             RunState::Finishing => break 'drive,
-            RunState::Paused => match commands.recv() {
-                Ok(cmd) => {
-                    state = apply_cmd(cmd, state);
-                    continue 'drive;
+            RunState::Paused => {
+                // Block for the next command, but a `WatchNode` must answer
+                // immediately (with a fresh snapshot) and keep blocking --
+                // it does not count as "the next command" that ends the
+                // pause.
+                loop {
+                    match commands.recv() {
+                        Ok(WorkerCmd::WatchNode(target)) => {
+                            watched = target;
+                            if let Some(key) = watched {
+                                send(WorkerEvent::NodeStrategies(Box::new(node_snapshot(
+                                    &mw_session,
+                                    key,
+                                ))));
+                                last_node_sent_at = Instant::now();
+                                watch_dirty = false;
+                            }
+                        }
+                        Ok(cmd) => {
+                            state = apply_cmd(cmd, state);
+                            break;
+                        }
+                        Err(_) => {
+                            state = RunState::Cancelled;
+                            break;
+                        }
+                    }
                 }
-                Err(_) => break 'drive,
-            },
+                continue 'drive;
+            }
             RunState::Running => {}
         }
 
@@ -198,7 +274,9 @@ fn run(
             mw_session
                 .solver
                 .run_sweeps_with_threads_until(chunk, mw_session.threads, || {
-                    state = drain_commands(&commands, state);
+                    let drained = drain_commands(&commands, state, &mut watched);
+                    state = drained.state;
+                    watch_dirty |= drained.watch_changed;
                     state == RunState::Running
                 });
         if let Err(error) = result {
@@ -259,7 +337,20 @@ fn run(
             seat_drift_l1: last_drift.clone(),
         }));
 
-        state = drain_commands(&commands, state);
+        if let Some(key) = watched
+            && (watch_dirty || last_node_sent_at.elapsed().as_millis() >= 250)
+        {
+            send(WorkerEvent::NodeStrategies(Box::new(node_snapshot(
+                &mw_session,
+                key,
+            ))));
+            last_node_sent_at = Instant::now();
+            watch_dirty = false;
+        }
+
+        let drained = drain_commands(&commands, state, &mut watched);
+        state = drained.state;
+        watch_dirty |= drained.watch_changed;
         if state == RunState::Cancelled {
             break 'drive;
         }
@@ -340,9 +431,30 @@ fn run(
     })));
 }
 
-fn drain_commands(commands: &Receiver<WorkerCmd>, mut state: RunState) -> RunState {
+/// Result of one [`drain_commands`] call. `watch_changed` is `true` iff a
+/// `WatchNode` command updated `*watched` during this call; callers that
+/// drain repeatedly before acting on it should accumulate with `|=` rather
+/// than overwrite.
+struct DrainedCommands {
+    state: RunState,
+    watch_changed: bool,
+}
+
+/// Drains every pending command without blocking. `WatchNode` is applied
+/// directly to `*watched` here (never through `apply_cmd`) so it can never
+/// perturb `RunState`.
+fn drain_commands(
+    commands: &Receiver<WorkerCmd>,
+    mut state: RunState,
+    watched: &mut Option<[u8; 16]>,
+) -> DrainedCommands {
+    let mut watch_changed = false;
     loop {
         match commands.try_recv() {
+            Ok(WorkerCmd::WatchNode(target)) => {
+                *watched = target;
+                watch_changed = true;
+            }
             Ok(cmd) => state = apply_cmd(cmd, state),
             Err(TryRecvError::Empty) => break,
             Err(TryRecvError::Disconnected) => {
@@ -351,7 +463,78 @@ fn drain_commands(commands: &Receiver<WorkerCmd>, mut state: RunState) -> RunSta
             }
         }
     }
-    state
+    DrainedCommands {
+        state,
+        watch_changed,
+    }
+}
+
+/// Builds a [`NodeSnapshot`] for `history` from the solver's cold query
+/// accessors. Called at most a few times per second (see the 250ms throttle
+/// in `run`), so the `O(histories)`/`O(policies)` scans in `node_children`/
+/// `strategies_at` are cheap relative to a whole chunk of sweeps.
+fn node_snapshot(session: &MultiwaySession, history: [u8; 16]) -> NodeSnapshot {
+    let key = HistoryKey(history);
+    let children = session
+        .solver
+        .node_children(key)
+        .into_iter()
+        .map(|entry| NodeChild {
+            key: entry.key.0,
+            actor: entry.actor,
+            action: entry.action_label,
+        })
+        .collect();
+    let blocks = session
+        .solver
+        .strategies_at(key)
+        .into_iter()
+        .map(|(info_key, actions, probabilities)| NodeBlock {
+            actor: info_key.player,
+            street: info_key.street,
+            active_opponents: info_key.active_opponents,
+            bucket_path: info_key.bucket_path,
+            actions,
+            probabilities,
+        })
+        .collect();
+    NodeSnapshot {
+        history,
+        sweeps: session.solver.completed_sweeps(),
+        path: resolve_watch_path(session, key),
+        children,
+        blocks,
+    }
+}
+
+/// Root-to-`history` path as "SEATNAME action" labels; empty at ROOT. Walks
+/// `history_entry` parent links directly (rather than `resolve_history`,
+/// which only carries action labels) so each edge can be prefixed with its
+/// seat name.
+fn resolve_watch_path(session: &MultiwaySession, mut history: HistoryKey) -> Vec<String> {
+    let mut reversed = Vec::new();
+    while history != HistoryKey::ROOT {
+        let Some(entry) = session.solver.history_entry(history) else {
+            break;
+        };
+        reversed.push(format!(
+            "{} {}",
+            seat_label(session, entry.actor),
+            entry.action_label
+        ));
+        history = entry.parent;
+    }
+    reversed.reverse();
+    reversed
+}
+
+fn seat_label(session: &MultiwaySession, actor: u8) -> String {
+    session
+        .game_config
+        .seats
+        .get(actor as usize)
+        .and_then(|seat| seat.name.clone())
+        .unwrap_or_else(|| format!("Seat {actor}"))
 }
 
 fn write_checkpoint(session: &MultiwaySession, path: &std::path::Path) -> anyhow::Result<()> {
