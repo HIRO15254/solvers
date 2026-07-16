@@ -150,6 +150,16 @@ pub struct StreetBettingConfig {
     pub max_aggressive_actions: u8,
     #[serde(default = "default_true")]
     pub include_allin: bool,
+    /// Raise-cap merge threshold (HRC-style). After a target is resolved
+    /// (including the minimum-full-raise bump and the maximum-stack cap), a
+    /// target `>= scale(maximum, allin_threshold)` is replaced by `maximum`
+    /// and marked all-in. This is a *merge*, not an addition: it applies even
+    /// when `include_allin` is `false`, since it collapses an
+    /// already-proposed sized target into the all-in rather than adding a new
+    /// action. `None` disables the merge entirely (default, unchanged
+    /// behavior). Must be finite and in `(0.0, 1.0]` when present.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub allin_threshold: Option<f64>,
 }
 
 fn default_max_aggressive_actions() -> u8 {
@@ -163,6 +173,7 @@ fn default_preflop_betting() -> StreetBettingConfig {
         raise_sizes: vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
         max_aggressive_actions: 4,
         include_allin: true,
+        allin_threshold: None,
     }
 }
 
@@ -173,15 +184,35 @@ fn default_postflop_betting() -> StreetBettingConfig {
         raise_sizes: vec![SizeSpec::PotAfterCall { fraction: 0.75 }],
         max_aggressive_actions: 3,
         include_allin: true,
+        allin_threshold: None,
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum SizeSpec {
-    ToBb { value: f64 },
-    PotAfterCall { fraction: f64 },
-    PreviousBetMultiple { factor: f64 },
+    ToBb {
+        value: f64,
+    },
+    PotAfterCall {
+        fraction: f64,
+    },
+    PreviousBetMultiple {
+        factor: f64,
+    },
+    /// Always resolves to the minimum legal full raise/bet target for the
+    /// current node (`BettingState::minimum_full_target`). Appended after the
+    /// original three variants: both TOML (`kind` tag) and the JSON game
+    /// fingerprint identify variants by name, so this ordering is purely
+    /// cosmetic and does not break existing configs or fingerprints.
+    MinRaise,
+    /// Resolves to `fraction` of the acting seat's maximum possible target
+    /// (`actor_wager + remaining stack`), i.e. a fraction of an effective
+    /// all-in. Appended after the original three variants for the same
+    /// name-tagged-serialization reason as `MinRaise`.
+    StackFraction {
+        fraction: f64,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -249,9 +280,10 @@ fn default_rollout_samples() -> u32 {
 }
 
 /// Standalone `[utility]` payload used by both CLI and direct library users.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum UtilityConfig {
+    #[default]
     ChipEv,
     TournamentIcm {
         #[serde(default)]
@@ -264,12 +296,6 @@ pub enum UtilityConfig {
         #[serde(default)]
         seed: u64,
     },
-}
-
-impl Default for UtilityConfig {
-    fn default() -> Self {
-        Self::ChipEv
-    }
 }
 
 fn default_icm_samples() -> u64 {
@@ -584,6 +610,22 @@ impl RakeConfig {
     }
 }
 
+fn validate_size_spec(size: &SizeSpec) -> Result<(), ConfigError> {
+    match *size {
+        SizeSpec::ToBb { value } => positive_finite("size.to-bb", value),
+        SizeSpec::PotAfterCall { fraction } => positive_finite("size.pot-after-call", fraction),
+        SizeSpec::PreviousBetMultiple { factor } => {
+            positive_finite("size.previous-bet-multiple", factor)?;
+            if factor <= 1.0 {
+                return Err(ConfigError::RaiseFactor);
+            }
+            Ok(())
+        }
+        SizeSpec::MinRaise => Ok(()),
+        SizeSpec::StackFraction { fraction } => positive_finite("size.stack-fraction", fraction),
+    }
+}
+
 fn validate_betting(config: &BettingConfig) -> Result<(), ConfigError> {
     for street in Street::ALL {
         let section = config.for_street(street);
@@ -598,18 +640,7 @@ fn validate_betting(config: &BettingConfig) -> Result<(), ConfigError> {
                 return Err(ConfigError::TooManySizes { street, kind });
             }
             for size in sizes {
-                match *size {
-                    SizeSpec::ToBb { value } => positive_finite("size.to-bb", value)?,
-                    SizeSpec::PotAfterCall { fraction } => {
-                        positive_finite("size.pot-after-call", fraction)?
-                    }
-                    SizeSpec::PreviousBetMultiple { factor } => {
-                        positive_finite("size.previous-bet-multiple", factor)?;
-                        if factor <= 1.0 {
-                            return Err(ConfigError::RaiseFactor);
-                        }
-                    }
-                }
+                validate_size_spec(size)?;
             }
         }
         if let Some(sizes) = section.isolate_sizes.as_ref() {
@@ -620,18 +651,13 @@ fn validate_betting(config: &BettingConfig) -> Result<(), ConfigError> {
                 });
             }
             for size in sizes {
-                match *size {
-                    SizeSpec::ToBb { value } => positive_finite("size.to-bb", value)?,
-                    SizeSpec::PotAfterCall { fraction } => {
-                        positive_finite("size.pot-after-call", fraction)?
-                    }
-                    SizeSpec::PreviousBetMultiple { factor } => {
-                        positive_finite("size.previous-bet-multiple", factor)?;
-                        if factor <= 1.0 {
-                            return Err(ConfigError::RaiseFactor);
-                        }
-                    }
-                }
+                validate_size_spec(size)?;
+            }
+        }
+        if let Some(threshold) = section.allin_threshold {
+            finite("allin_threshold", threshold)?;
+            if !(threshold > 0.0 && threshold <= 1.0) {
+                return Err(ConfigError::AllinThreshold(threshold));
             }
         }
     }
@@ -717,6 +743,8 @@ pub enum ConfigError {
     RakeRate,
     #[error("per-hand rake and tournament ICM cannot be combined")]
     IcmWithRake,
+    #[error("allin_threshold must be finite and within (0.0, 1.0], got {0}")]
+    AllinThreshold(f64),
 }
 
 #[cfg(test)]
@@ -857,5 +885,70 @@ stack_bb = 12
             sampled.validate(config.seats.len()),
             Err(ConfigError::IcmSamples)
         ));
+    }
+
+    #[test]
+    fn min_raise_and_stack_fraction_sizes_validate_and_round_trip() {
+        let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        config.betting.preflop.bet_sizes = vec![SizeSpec::MinRaise];
+        config.betting.preflop.raise_sizes = vec![
+            SizeSpec::MinRaise,
+            SizeSpec::StackFraction { fraction: 0.25 },
+            SizeSpec::StackFraction { fraction: 0.5 },
+        ];
+        config.betting.preflop.allin_threshold = Some(0.85);
+        config.validate().unwrap();
+
+        let encoded = toml::to_string(&config).unwrap();
+        assert!(encoded.contains("min-raise"));
+        assert!(encoded.contains("stack-fraction"));
+        assert!(encoded.contains("allin_threshold"));
+        let decoded: MultiwayConfig = toml::from_str(&encoded).unwrap();
+        decoded.validate().unwrap();
+        assert_eq!(decoded.betting.preflop.bet_sizes, vec![SizeSpec::MinRaise]);
+        assert_eq!(
+            decoded.betting.preflop.allin_threshold,
+            config.betting.preflop.allin_threshold
+        );
+    }
+
+    #[test]
+    fn stack_fraction_rejects_nonpositive_or_nonfinite_values() {
+        let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        for bad in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+            config.betting.preflop.bet_sizes = vec![SizeSpec::StackFraction { fraction: bad }];
+            assert!(
+                matches!(config.validate(), Err(ConfigError::Number(_))),
+                "fraction {bad} should be rejected"
+            );
+        }
+    }
+
+    #[test]
+    fn allin_threshold_validation_rejects_zero_above_one_and_nan() {
+        let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        for bad in [0.0, 1.5, f64::NAN] {
+            config.betting.preflop.allin_threshold = Some(bad);
+            let result = config.validate();
+            assert!(result.is_err(), "threshold {bad} should be rejected");
+        }
+        config.betting.preflop.allin_threshold = Some(1.0);
+        config.validate().unwrap();
+        config.betting.preflop.allin_threshold = Some(0.85);
+        config.validate().unwrap();
+    }
+
+    #[test]
+    fn default_config_toml_and_behavior_are_unchanged_by_new_size_variants() {
+        // Regression guard: a config predating MinRaise/StackFraction/
+        // allin_threshold must still validate, and its serialized form must
+        // not gain the new field since it is None by default.
+        let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        config.validate().unwrap();
+        assert!(config.betting.preflop.allin_threshold.is_none());
+        let encoded = toml::to_string(&config).unwrap();
+        assert!(!encoded.contains("allin_threshold"));
+        assert!(!encoded.contains("min-raise"));
+        assert!(!encoded.contains("stack-fraction"));
     }
 }

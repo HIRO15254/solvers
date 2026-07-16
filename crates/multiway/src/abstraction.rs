@@ -24,7 +24,11 @@ use crate::types::Street;
 pub type BucketId = u32;
 
 const ROLLOUT_ARTIFACT_MAGIC: &[u8; 8] = b"SLVRMWAB";
-pub const ROLLOUT_ARTIFACT_VERSION: u16 = 1;
+/// The original on-disk format: centroids only, no assignment cache.
+const ROLLOUT_ARTIFACT_VERSION_V1: u16 = 1;
+/// Adds the memoized `(RolloutKey -> BucketId)` assignment cache so a
+/// subsequent process starts warm instead of re-paying every cache miss.
+pub const ROLLOUT_ARTIFACT_VERSION: u16 = 2;
 const ROLLOUT_ARTIFACT_HEADER_LEN: usize = 8 + 2 + 8 + 32;
 const MAX_ROLLOUT_ARTIFACT_BYTES: u64 = 64 * 1024 * 1024;
 
@@ -38,12 +42,26 @@ pub struct BucketContext<'a> {
 }
 
 #[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
-struct RolloutArtifactPayload {
+struct RolloutArtifactPayloadV1 {
     params: RolloutKMeansParams,
     training: RolloutTrainingParams,
     bucket_counts: [StreetBucketCounts; 8],
     sets: Vec<CentroidSet>,
     fingerprint: [u8; 32],
+}
+
+/// Version 2 adds the memoized assignment cache, serialized as a
+/// key-sorted `Vec` so the artifact bytes stay deterministic. Assignments
+/// are a pure function of `(centroids, key)`, so the cache can never change
+/// a result -- it is only ever a warm start for [`RolloutKMeansAbstraction::bucket`].
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+struct RolloutArtifactPayloadV2 {
+    params: RolloutKMeansParams,
+    training: RolloutTrainingParams,
+    bucket_counts: [StreetBucketCounts; 8],
+    sets: Vec<CentroidSet>,
+    fingerprint: [u8; 32],
+    assignment_cache: Vec<(RolloutKey, BucketId)>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -577,16 +595,28 @@ impl RolloutKMeansAbstraction {
             .clear();
     }
 
-    /// Atomically writes the trained centroid sets. The assignment cache is
-    /// deliberately omitted because every assignment is deterministic from
-    /// the validated centroids and rollout parameters.
+    /// Atomically writes the trained centroid sets, plus every concrete
+    /// `(key -> bucket)` assignment memoized so far. Assignments are a pure
+    /// function of the validated centroids and rollout parameters, so
+    /// including the cache can never change what a load-then-solve produces
+    /// -- it only lets a later process skip cache misses this run already
+    /// paid for.
     pub fn write_artifact(&self, path: &Path) -> Result<(), RolloutArtifactError> {
-        let artifact = RolloutArtifactPayload {
+        let mut assignment_cache: Vec<(RolloutKey, BucketId)> = self
+            .assignment_cache
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .iter()
+            .map(|(&key, &bucket)| (key, bucket))
+            .collect();
+        assignment_cache.sort_unstable_by_key(|&(key, _)| key);
+        let artifact = RolloutArtifactPayloadV2 {
             params: self.params,
             training: self.training,
             bucket_counts: self.bucket_counts,
             sets: self.sets.clone(),
             fingerprint: self.fingerprint,
+            assignment_cache,
         };
         let payload = postcard::to_allocvec(&artifact)?;
         let payload_len = u64::try_from(payload.len()).map_err(|_| RolloutArtifactError::Length)?;
@@ -618,8 +648,20 @@ impl RolloutKMeansAbstraction {
         Ok(())
     }
 
+    /// Re-writes the artifact at `path` with the assignment cache as it
+    /// stands right now. Intended to be called after a solve so a later
+    /// process (same config, same artifact path) starts with every
+    /// assignment this run already paid for. Since assignments are pure
+    /// memoization, this is purely a warm-start optimization and never
+    /// changes the artifact's fingerprint or any downstream solve result.
+    pub fn persist_assignment_cache(&self, path: &Path) -> Result<(), RolloutArtifactError> {
+        self.write_artifact(path)
+    }
+
     /// Reads and fully validates a trained centroid artifact before making
-    /// it available for bucket lookup.
+    /// it available for bucket lookup. Accepts both the original format
+    /// (version 1, no assignment cache) and the current format (version 2,
+    /// with a pre-warmed assignment cache).
     pub fn read_artifact(path: &Path) -> Result<Self, RolloutArtifactError> {
         let mut file = std::fs::File::open(path)?;
         let file_len = file.metadata()?.len();
@@ -632,7 +674,7 @@ impl RolloutKMeansAbstraction {
             return Err(RolloutArtifactError::BadMagic);
         }
         let version = u16::from_le_bytes(header[8..10].try_into().expect("two bytes"));
-        if version != ROLLOUT_ARTIFACT_VERSION {
+        if version != ROLLOUT_ARTIFACT_VERSION_V1 && version != ROLLOUT_ARTIFACT_VERSION {
             return Err(RolloutArtifactError::UnsupportedVersion {
                 found: version,
                 expected: ROLLOUT_ARTIFACT_VERSION,
@@ -659,28 +701,44 @@ impl RolloutKMeansAbstraction {
             return Err(RolloutArtifactError::ChecksumMismatch);
         }
 
-        let artifact: RolloutArtifactPayload = postcard::from_bytes(&payload)?;
-        validate_rollout_params(artifact.params, artifact.training)?;
-        for counts in artifact.bucket_counts {
+        let (params, training, bucket_counts, sets, declared_fingerprint, assignment_cache) =
+            if version == ROLLOUT_ARTIFACT_VERSION_V1 {
+                let artifact: RolloutArtifactPayloadV1 = postcard::from_bytes(&payload)?;
+                (
+                    artifact.params,
+                    artifact.training,
+                    artifact.bucket_counts,
+                    artifact.sets,
+                    artifact.fingerprint,
+                    Vec::new(),
+                )
+            } else {
+                let artifact: RolloutArtifactPayloadV2 = postcard::from_bytes(&payload)?;
+                (
+                    artifact.params,
+                    artifact.training,
+                    artifact.bucket_counts,
+                    artifact.sets,
+                    artifact.fingerprint,
+                    artifact.assignment_cache,
+                )
+            };
+        validate_rollout_params(params, training)?;
+        for counts in bucket_counts {
             validate_street_bucket_counts(counts)?;
         }
-        validate_centroid_sets(&artifact.bucket_counts, &artifact.sets)?;
-        let fingerprint = rollout_fingerprint(
-            artifact.params,
-            artifact.training,
-            &artifact.bucket_counts,
-            &artifact.sets,
-        );
-        if fingerprint != artifact.fingerprint {
+        validate_centroid_sets(&bucket_counts, &sets)?;
+        let fingerprint = rollout_fingerprint(params, training, &bucket_counts, &sets);
+        if fingerprint != declared_fingerprint {
             return Err(RolloutArtifactError::FingerprintMismatch);
         }
         Ok(Self {
-            params: artifact.params,
-            training: artifact.training,
-            bucket_counts: artifact.bucket_counts,
-            sets: artifact.sets,
+            params,
+            training,
+            bucket_counts,
+            sets,
             fingerprint,
-            assignment_cache: Mutex::new(HashMap::new()),
+            assignment_cache: Mutex::new(assignment_cache.into_iter().collect()),
         })
     }
 
@@ -733,7 +791,9 @@ impl MultiwayAbstraction for RolloutKMeansAbstraction {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(
+    Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, serde::Serialize, serde::Deserialize,
+)]
 struct RolloutKey {
     street: u8,
     active_opponents: u8,
@@ -825,14 +885,17 @@ fn canonical_rollout_key(context: BucketContext<'_>) -> RolloutKey {
                         permute_suit(b, permutation).index() as u8,
                     ];
                     hole.sort_unstable();
-                    let mut mapped_board: Vec<u8> = context
-                        .board
-                        .iter()
-                        .map(|&card| permute_suit(card, permutation).index() as u8)
-                        .collect();
-                    mapped_board.sort_unstable();
+                    // Fill the mapped board into a fixed `[u8; 5]`, padding
+                    // unused trailing slots with `u8::MAX`. Because every
+                    // real card index is < 52, sorting the whole 5-slot
+                    // array yields the same result as sorting only the
+                    // valid prefix and leaving the padding in place, with
+                    // no per-permutation `Vec` allocation.
                     let mut board = [u8::MAX; 5];
-                    board[..mapped_board.len()].copy_from_slice(&mapped_board);
+                    for (slot, &card) in board.iter_mut().zip(context.board) {
+                        *slot = permute_suit(card, permutation).index() as u8;
+                    }
+                    board.sort_unstable();
                     let candidate = RolloutKey {
                         street: context.street.index() as u8,
                         active_opponents: context.active_opponents,
@@ -855,29 +918,41 @@ fn permute_suit(card: Card, permutation: [u8; 4]) -> Card {
 
 fn rollout_features_for_key(params: RolloutKMeansParams, key: RolloutKey) -> RolloutFeatures {
     let hole = [Card::from_index(key.hole[0]), Card::from_index(key.hole[1])];
-    let board: Vec<Card> = key
+    let board_len = key
         .board
         .iter()
-        .copied()
-        .take_while(|&index| index != u8::MAX)
-        .map(Card::from_index)
+        .take_while(|&&index| index != u8::MAX)
+        .count();
+    let dead: CardSet = key.board[..board_len]
+        .iter()
+        .map(|&index| Card::from_index(index))
+        .chain(hole)
         .collect();
-    let mut dead: CardSet = board.iter().copied().chain(hole).collect();
     let base_deck: Vec<Card> = ALL_CARDS
         .into_iter()
         .filter(|&card| !dead.contains(card))
         .collect();
     let mut rng = rollout_rng(params, key);
     let mut sums = [0.0; 4];
+    let missing_board = 5 - board_len;
+
+    // `deck` and `board_five` are reused scratch buffers rather than being
+    // reallocated per sample: `deck` is reset from `base_deck` (a memcpy,
+    // no allocation) before every shuffle, and `board_five`'s known board
+    // prefix is written once up front, with only the trailing
+    // `missing_board` slots overwritten per sample. This removes ~2 heap
+    // allocations per Monte Carlo sample while leaving the RNG draw order
+    // (one `shuffle` over a `base_deck.len()`-length slice per sample) and
+    // every `rank_of` call byte-for-byte identical to before.
+    let mut deck = base_deck.clone();
+    let mut board_five = [Card::from_index(0); 5];
+    for (slot, &index) in board_five.iter_mut().zip(&key.board[..board_len]) {
+        *slot = Card::from_index(index);
+    }
     for _ in 0..params.rollout_samples {
-        let mut deck = base_deck.clone();
+        deck.copy_from_slice(&base_deck);
         deck.shuffle(&mut rng);
-        let missing_board = 5 - board.len();
-        let mut board_five = board.clone();
-        board_five.extend_from_slice(&deck[..missing_board]);
-        for &card in &deck[..missing_board] {
-            dead.insert(card);
-        }
+        board_five[board_len..].copy_from_slice(&deck[..missing_board]);
         let hero_rank = rank_of(board_five.iter().copied().chain(hole));
         let mut best_rank = hero_rank;
         let mut winner_count = 1u32;

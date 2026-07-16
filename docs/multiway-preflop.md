@@ -43,6 +43,36 @@ and all-in switches.  A seat may replace the complete table betting profile.
 If an older config omits `isolate_sizes`, the table reuses `bet_sizes` for
 backward compatibility.
 
+### Size vocabulary
+
+Every `bet_sizes` / `isolate_sizes` / `raise_sizes` entry is a `SizeSpec`:
+
+- `to-bb` (`value`): an absolute bet/raise-to size in big blinds.
+- `pot-after-call` (`fraction`): `fraction` of the pot as it would stand right
+  after the acting seat calls, added on top of that call.
+- `previous-bet-multiple` (`factor`, must be `> 1.0`): `factor` times the
+  current bet to match (a re-raise multiplier).
+- `min-raise`: always resolves to the minimum legal full raise/bet target for
+  the node, i.e. the smallest sizing that is not itself capped short by the
+  stack.
+- `stack-fraction` (`fraction`, must be positive): `fraction` of the acting
+  seat's effective all-in (`current street wager + remaining stack`),
+  independent of the pot or the current bet to match.
+
+Every proposed target is still bumped up to the minimum full raise (or
+dropped, for a voluntary sub-minimum size) and capped down to the seat's
+all-in, exactly as before these two sizes were added.
+
+`StreetBettingConfig.allin_threshold` (optional, `(0.0, 1.0]`) adds an
+HRC-style raise-cap merge on top of that: once a size resolves to a target
+`>= allin_threshold * maximum` (`maximum` = the seat's effective all-in), the
+target is replaced by the all-in itself and flagged `all_in = true`. This is a
+merge, not an addition — it still fires even when `include_allin = false`,
+because it is folding an already-proposed sized target into the all-in
+rather than proposing a new action. Duplicate targets (e.g. a merged size and
+the native `include_allin` entry) are deduplicated, so the seat sees exactly
+one all-in action. Configs that omit `allin_threshold` are unaffected.
+
 At a terminal the implementation:
 
 1. refunds unmatched top contribution;
@@ -87,6 +117,28 @@ The cancel token is checked at every complete-sweep boundary without rebuilding
 the Rayon pool. `run.max_memory_bytes` is an operational limit rather than game
 identity, so a resource-limited checkpoint can resume under a larger budget.
 
+### Sweep batching (`run.sweep_batch`)
+
+A single sweep only offers `num_players` (at most 9) parallel traversal tasks
+against one strategy snapshot, which underuses a machine with many more
+cores — and table seats are rarely balanced in per-seat traversal cost, so
+even that fan-out is uneven. `run.sweep_batch = N` (default `1`) instead runs
+`N` complete sweeps against the *same* snapshot as one `N * num_players`-wide
+parallel batch, restoring parallel efficiency at the cost of later sweeps in
+the batch reading a policy that is up to `N - 1` sweeps staler than the
+sequential algorithm would have used — the standard mini-batch MCCFR
+trade-off. Every task still gets its own sweep's linear CFR weight
+(`completed_sweeps_at_batch_start + sweep_offset + 1`), and deltas are merged
+one sweep at a time in strict sweep order, so `sweep_batch = 1` is exactly
+the pre-batching schedule: bit-identical checkpoints and thread-count
+invariance are unaffected. `sweep_batch > 1` is a deliberate,
+algorithm-visible change — it produces a different but equally valid
+sampled profile than `sweep_batch = 1` over the same sweep count — and is
+recorded in `SolverConfig`, so it is part of a checkpoint's resume identity:
+resuming with a different `sweep_batch` is rejected the same way changing
+`exploration_epsilon` is. Cancellation is polled once per batch rather than
+once per sweep, so `should_continue` granularity coarsens to whole batches.
+
 ## Output semantics
 
 Multiway progress uses per-seat profile EV estimates, confidence intervals,
@@ -100,13 +152,31 @@ The multiway artifact contracts are separate from frozen HU v1:
   table and per-frame, table, and aggregate BLAKE3 integrity checks. Postcard
   serialization is streamed through a temporary file instead of duplicating
   the full raw state in memory.
+- `.mwckpt` container version 4 adds `sweep_batch` to the serialized
+  `SolverConfig`. Loading transparently accepts version 3 checkpoints
+  (written before sweep batching existed), filling `sweep_batch = 1`; every
+  checkpoint this process writes is always the current version.
 - `.mwsol` stores metadata/public-history recall separately from a sorted
   strategy index.  Each strategy block is an independent checked frame, so a
   Bridge page query reads only the requested blocks.
+- `.mwsol` format v3 adds an optional i16 fixed-point strategy encoding
+  (`run.storage = "i16"`; denominator `i16::MAX` with largest-remainder
+  rounding, so each block's quantized probabilities sum exactly to one).
+  Readers accept v2 and v3 and always return f32 probabilities; the live
+  MCCFR state and `.mwckpt` checkpoints stay f32 regardless of this knob.
 - When the policy memory cap is reached, the solver does not evict policy.  It
   ends with `resource_limit` and writes the requested checkpoint; CLI runs
   without an explicit checkpoint derive a `.mwckpt` beside the result (or
   `multiway-resource-limit.mwckpt` when no result path was supplied).
+
+The native GUI (`cargo run -p gui --release`, bin `solvers-gui`) embeds this
+solver in-process: Setup (full config editing with live validation and
+TOML preset save/load/import/export interchangeable with `solvers solve`
+configs), Solve (live convergence charts: per-seat average positive regret
+and strategy drift vs sweeps, per-seat EV ± CI at the evaluation cadence,
+pause/resume/finish/cancel), and Results (GTO-Wizard-style 13×13 preflop
+strategy matrix with per-action stacked frequency bars, public-history
+navigation, and `.mwsol` file browsing).
 
 Bridge v2 exposes health/capabilities, validation, create/status/cancel,
 result, checkpoint, and paginated strategy endpoints alongside unchanged v1.

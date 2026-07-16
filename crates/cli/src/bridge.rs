@@ -39,6 +39,7 @@ const MAX_MULTIWAY_BUCKETS: u16 = 4_096;
 const MAX_MULTIWAY_ROLLOUT_SAMPLES: u32 = 1_000_000;
 const MAX_MULTIWAY_EVALUATION_SAMPLES: u64 = 1_000_000;
 const MAX_MULTIWAY_ICM_SAMPLES: u64 = 1_000_000;
+const MAX_MULTIWAY_SWEEP_BATCH: u64 = 64;
 const DEFAULT_STRATEGY_PAGE_SIZE: usize = 50;
 const MAX_STRATEGY_PAGE_SIZE: usize = 100;
 const TOKEN_BYTES: usize = 32;
@@ -1476,6 +1477,7 @@ fn sanitize_config(
         || config.run.checkpoint_every.is_some()
         || config.run.evaluation_samples.is_some()
         || config.run.evaluation_cadence.is_some()
+        || config.run.sweep_batch.is_some()
     {
         return Err("Multiway-only [run] fields are not valid for heads-up jobs.".to_string());
     }
@@ -1689,9 +1691,6 @@ fn sanitize_multiway_config(
             "preflop-multiway requires schedule = \"external-sampling-mccfr\".".to_string(),
         );
     }
-    if config.run.storage != StorageKind::F32 {
-        return Err("preflop-multiway requires run.storage = \"f32\".".to_string());
-    }
     if config.run.target_nash_conv.is_some() {
         return Err(
             "preflop-multiway does not expose NashConv; remove run.target_nash_conv.".to_string(),
@@ -1734,6 +1733,15 @@ fn sanitize_multiway_config(
     if memory_limit == 0 || memory_limit > MAX_STORAGE_BYTES {
         return Err(format!(
             "run.max_memory_bytes must be from 1 through {MAX_STORAGE_BYTES}."
+        ));
+    }
+    if config
+        .run
+        .sweep_batch
+        .is_some_and(|batch| batch == 0 || batch > MAX_MULTIWAY_SWEEP_BATCH)
+    {
+        return Err(format!(
+            "run.sweep_batch must be from 1 through {MAX_MULTIWAY_SWEEP_BATCH} when supplied."
         ));
     }
 
@@ -2227,6 +2235,22 @@ check_every = 1
             &format!("sweeps = {}", MAX_MULTIWAY_SWEEPS + 1),
         );
         assert!(sanitize_config(&excessive, Path::new("unused"), Some(3), true).is_err());
+    }
+
+    #[test]
+    fn multiway_sanitization_caps_sweep_batch() {
+        let raw = include_str!("../../../examples/preflop_multiway_9max.toml").to_string();
+
+        let batched = format!("{raw}\nsweep_batch = {MAX_MULTIWAY_SWEEP_BATCH}\n");
+        let sanitized = sanitize_config(&batched, Path::new("unused"), None, true).unwrap();
+        let parsed: SolveConfig = toml::from_str(&sanitized.toml).unwrap();
+        assert_eq!(parsed.run.sweep_batch, Some(MAX_MULTIWAY_SWEEP_BATCH));
+
+        let zero = format!("{raw}\nsweep_batch = 0\n");
+        assert!(sanitize_config(&zero, Path::new("unused"), None, true).is_err());
+
+        let excessive = format!("{raw}\nsweep_batch = {}\n", MAX_MULTIWAY_SWEEP_BATCH + 1);
+        assert!(sanitize_config(&excessive, Path::new("unused"), None, true).is_err());
     }
 
     #[test]

@@ -363,6 +363,42 @@ fn multiway_resource_limit_writes_an_implicit_checkpoint() {
 }
 
 #[test]
+#[ignore = "trains the multiway rollout artifact; CI runs it in release"]
+fn multiway_i16_storage_writes_a_quantized_mwsol() {
+    let dir = temp_dir("multiway-i16");
+    let raw =
+        std::fs::read_to_string(workspace_root().join("examples/preflop_multiway_3max_smoke.toml"))
+            .unwrap();
+    let quantized = raw.replace("storage = \"f32\"", "storage = \"i16\"");
+    assert_ne!(raw, quantized, "smoke config storage fixture changed");
+    let config = dir.join("i16.toml");
+    std::fs::write(&config, quantized).unwrap();
+    let solution_path = dir.join("result.mwsol");
+
+    run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--sol",
+        solution_path.to_str().unwrap(),
+    ]);
+
+    let solution = formats::read_mwsol(&solution_path).unwrap();
+    assert!(!solution.strategies.is_empty());
+    let grid = f64::from(i16::MAX);
+    for block in &solution.strategies {
+        let sum: f32 = block.probabilities.iter().sum();
+        assert!((sum - 1.0).abs() <= 1e-4, "quantized sum drifted: {sum}");
+        for &probability in &block.probabilities {
+            let units = f64::from(probability) * grid;
+            assert!(
+                (units - units.round()).abs() < 1e-3,
+                "probability {probability} is not on the i16 grid"
+            );
+        }
+    }
+}
+
+#[test]
 fn resume_tampered_config_errors() {
     let dir = temp_dir("resume-tamper");
     let config = dir.join("kuhn.toml");

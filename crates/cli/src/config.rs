@@ -1,10 +1,10 @@
 use std::path::PathBuf;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// One experiment = one TOML file. Unknown fields are rejected so typos
 /// fail loudly instead of silently running a different experiment.
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct SolveConfig {
     pub game: GameSection,
@@ -17,7 +17,7 @@ pub struct SolveConfig {
     pub run: RunSection,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields, tag = "kind", rename_all = "kebab-case")]
 // This is a config struct deserialized once per run and then destructured
 // away; the size difference between variants never sits on a hot path, so
@@ -64,10 +64,10 @@ pub enum GameSection {
         #[serde(default = "default_true")]
         allow_limp: bool,
         /// SB's range spec (e.g. "22+,A2s+"); `None` is the full range.
-        #[serde(default)]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         sb_range: Option<String>,
         /// BB's range spec; `None` is the full range.
-        #[serde(default)]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         bb_range: Option<String>,
         /// Per-player equity-realization factors for non-all-in
         /// continuations (see `preflop::EquityShowdown`).
@@ -75,13 +75,13 @@ pub enum GameSection {
         equity_realization: [f64; 2],
         /// Disk cache path for the exact 169x169 equity table; `None`
         /// recomputes it in memory every run.
-        #[serde(default)]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         equity_cache: Option<PathBuf>,
         /// Optional bucketed blueprint postflop model. Absence of the whole
         /// section keeps today's behavior: the 169-class trunk's
         /// continuations resolve via `preflop::EquityShowdown`, with no
         /// postflop betting tree at all.
-        #[serde(default)]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         postflop: Option<PostflopSection>,
     },
     PreflopMultiway(multiway::MultiwayConfig),
@@ -94,7 +94,7 @@ pub enum GameSection {
 /// Bucket-count defaults (50/20/8) are deliberately coarser on later
 /// streets: the deliverable of this model is preflop ranges, so turn/river
 /// fidelity is traded for tree storage and artifact build time.
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields, rename_all = "kebab-case")]
 pub struct PostflopSection {
     /// Postflop model kind. Validated at solve time (not parse time) so the
@@ -121,11 +121,11 @@ pub struct PostflopSection {
     #[serde(default = "default_true")]
     pub include_allin: bool,
     /// Disk cache path for the EHS² bucket abstraction.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub abstraction_cache: Option<PathBuf>,
     /// Disk cache path for the derived blueprint artifacts (T1/T2/T3
     /// transitions plus river bucket-vs-bucket equity).
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub artifacts_cache: Option<PathBuf>,
 }
 
@@ -142,7 +142,7 @@ fn default_postflop_max_raises() -> u32 {
     2
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct BetsSection {
     #[serde(default)]
@@ -153,7 +153,7 @@ pub struct BetsSection {
     pub river: StreetBets,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct StreetBets {
     /// Out-of-position bet sizes (no outstanding bet to face), as fractions
@@ -166,11 +166,11 @@ pub struct StreetBets {
     pub ip: Vec<f64>,
     /// Out-of-position raise sizes when facing a bet. Falls back to `oop`
     /// when omitted.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub oop_raise: Option<Vec<f64>>,
     /// In-position raise sizes when facing a bet. Falls back to `ip` when
     /// omitted.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ip_raise: Option<Vec<f64>>,
     #[serde(default = "default_max_raises")]
     pub max_raises: u32,
@@ -192,7 +192,7 @@ fn default_max_raises() -> u32 {
     2
 }
 
-#[derive(Deserialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Default)]
 #[serde(deny_unknown_fields, tag = "kind", rename_all = "kebab-case")]
 pub enum RakeSection {
     #[default]
@@ -210,14 +210,14 @@ pub enum RakeSection {
     },
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct OutsidePlayerSection {
     pub name: String,
     pub stack_bb: f64,
 }
 
-#[derive(Deserialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Default)]
 #[serde(deny_unknown_fields, tag = "kind", rename_all = "kebab-case")]
 pub enum UtilitySection {
     #[default]
@@ -236,7 +236,7 @@ pub enum UtilitySection {
     },
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields, tag = "schedule", rename_all = "kebab-case")]
 pub enum AlgorithmSection {
     Vanilla,
@@ -322,15 +322,17 @@ fn default_equity_realization() -> [f64; 2] {
     [1.0, 1.0]
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct RunSection {
     /// HU iteration budget. Multiway configs may omit this and set
     /// `sweeps`; one sweep traverses once for every table seat.
     #[serde(default)]
     pub iterations: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub sweeps: Option<u64>,
     /// Multiway root seed; overrides the algorithm seed when present.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub seed: Option<u64>,
     /// Exploitability check cadence, in iterations.
     #[serde(default = "default_check_every")]
@@ -342,23 +344,39 @@ pub struct RunSection {
     pub storage: StorageKind,
     /// Stop once NashConv (sum of per-player exploitabilities, in chips per
     /// deal) drops below this.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub target_nash_conv: Option<f64>,
     /// Worker count for deterministic parallel solve batches. Multiway uses
     /// one local traversal delta per seat and merges in sample-id order;
     /// defaults to rayon's available worker count when unset.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub threads: Option<usize>,
     /// Overrides `ParConfig::chance_depth` (postflop only; default 2).
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub par_chance_depth: Option<u32>,
     /// Overrides `ParConfig::min_children` (postflop only; default 12).
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub par_min_children: Option<usize>,
     /// Hard cap for lazily visited multiway policy storage.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_memory_bytes: Option<u64>,
     /// Multiway checkpoint cadence in completed sweeps.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub checkpoint_every: Option<u64>,
     /// Held-out worlds used for multiway profile evaluation.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub evaluation_samples: Option<u64>,
     /// Evaluation cadence in completed multiway sweeps.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub evaluation_cadence: Option<u64>,
+    /// Complete sweeps run per parallel drive iteration against the same
+    /// strategy snapshot (see `multiway::solver::SolverConfig::sweep_batch`).
+    /// `None` (the default) is `1`, bit-identical to a solver built before
+    /// this knob existed. Values above `1` trade slightly staler
+    /// within-batch updates for restored parallel efficiency on tables whose
+    /// per-seat traversal cost is imbalanced.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sweep_batch: Option<u64>,
 }
 
 fn default_check_every() -> u64 {
@@ -369,7 +387,7 @@ fn default_check_every() -> u64 {
 /// config (`[run] storage = "f32" | "i16"`) and threaded through as a
 /// generic parameter, so the solve path never pays for a `dyn` indirection
 /// on the hot per-hand loop just to support both backends.
-#[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
 #[serde(rename_all = "kebab-case")]
 pub enum StorageKind {
     #[default]
@@ -380,6 +398,37 @@ pub enum StorageKind {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// `SolveConfig` (and all its section types) must round-trip through
+    /// `toml::to_string`, so a GUI can load a config, edit it, and export it
+    /// as a preset using the exact same schema the CLI parses (see
+    /// docs/native-gui-plan.md, section C/E).
+    #[test]
+    fn multiway_config_round_trips_through_toml_serialization() {
+        let raw = include_str!("../../../examples/preflop_multiway_9max.toml");
+        let original: SolveConfig = toml::from_str(raw).expect("parse original multiway config");
+        let serialized = toml::to_string(&original).expect("serialize SolveConfig back to TOML");
+        let reparsed: SolveConfig =
+            toml::from_str(&serialized).expect("re-parse the serialized config");
+
+        let SolveConfig {
+            game,
+            rake,
+            utility,
+            run,
+            ..
+        } = reparsed;
+        let GameSection::PreflopMultiway(game_config) = game else {
+            panic!("expected GameSection::PreflopMultiway after round-tripping");
+        };
+        let utility = crate::session::convert_utility(utility)
+            .expect("re-parsed utility section converts cleanly");
+        let rake = crate::session::convert_rake(rake);
+        game_config
+            .validate_economics(&utility, &rake)
+            .expect("re-parsed multiway config must still validate");
+        assert!(run.sweeps.is_some() || run.iterations > 0);
+    }
 
     #[test]
     fn preflop_config_minimal_applies_defaults() {

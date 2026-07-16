@@ -40,7 +40,9 @@
 ## 2. レイヤ構成と workspace
 
 ```
-frontends:  cli (TOML batch + UPI subset REPL + CSV reports + ANSI 13×13 grid)
+frontends:  cli (TOML batch + UPI subset REPL + CSV reports + ANSI 13×13 grid、bin+lib)
+            gui (egui/eframe ネイティブ。multiway preflop 専用: Setup/Solve/Results、
+                 収束ライブチャート、13×13 戦略マトリクス、プリセット管理)
             py (PyO3, M3〜) · wasm (viewer-only, M8)
 multiway:    multiway — generative NLHE / joint deal / side pots / rollout buckets / MCCFR
 schemas:    formats — SolveConfig / NodeQuery→NodeReport / Checkpoint(.ckpt) / Artifact(.sol)
@@ -77,7 +79,10 @@ solvers/
     ├── preflop/        # Mode B。deps: holdem, abstraction, engine, game, formats(cache)
     ├── formats/        # serde DTO のみ + codec。deps: serde, toml, postcard, zstd, blake3
     ├── multiway/       # 2–9 seat generative path。HU engine から独立
-    ├── cli/            # bin "solvers": solve/resume/bench/inspect/report/export
+    ├── cli/            # bin "solvers" + lib: solve/resume/bench/inspect/report/export、
+    │                   # config スキーマと multiway セッション構築 (session.rs) を gui と共有
+    ├── gui/            # bin "solvers-gui": egui/eframe ネイティブ GUI (multiway preflop、
+    │                   # docs/native-gui-plan.md 参照)
     ├── py/             # (M3〜) PyO3/maturin。formats 上の薄い adapter
     └── wasm/           # (M8) wasm-bindgen viewer-only adapter
 ```

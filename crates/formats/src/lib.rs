@@ -21,10 +21,11 @@ pub use multiway::{
     MultiwaySeatMetrics,
 };
 pub use mwsol::{
-    MWSOL_FORMAT_VERSION, MWSOL_HEADER_LEN, MWSOL_MAX_PAGE_LIMIT, MultiwayHistoryAction,
-    MultiwayHistoryNode, MultiwaySeatResult, MultiwaySolution, MultiwaySolutionMetadata,
-    MultiwayStrategyBlock, MultiwayStrategyKey, MwSolError, MwSolHeader, MwSolReader,
-    MwSolStrategyPage, peek_mwsol_header, read_mwsol, write_mwsol,
+    MWSOL_FORMAT_VERSION, MWSOL_HEADER_LEN, MWSOL_MAX_PAGE_LIMIT, MWSOL_MIN_FORMAT_VERSION,
+    MultiwayHistoryAction, MultiwayHistoryNode, MultiwaySeatResult, MultiwaySolution,
+    MultiwaySolutionMetadata, MultiwayStrategyBlock, MultiwayStrategyKey, MwSolError, MwSolHeader,
+    MwSolReader, MwSolStrategyPage, MwsolStorage, peek_mwsol_header, read_mwsol, write_mwsol,
+    write_mwsol_with,
 };
 pub use sol::{
     HEADER_LEN as SOL_HEADER_LEN, SolError, SolHeader, SolMeta, SolPayload, StrategyBlock,

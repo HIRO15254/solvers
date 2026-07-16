@@ -112,6 +112,14 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
         &self.config
     }
 
+    /// The card abstraction backing this game. Exposed so callers (e.g. the
+    /// CLI, after a solve finishes) can persist any assignment-cache growth
+    /// accumulated during the run without threading a second handle through
+    /// `MultiwaySolver`.
+    pub fn abstraction(&self) -> &A {
+        &self.abstraction
+    }
+
     pub fn deal_sampler(&self) -> Result<DealSampler, SampleError> {
         DealSampler::new(
             self.config
@@ -136,29 +144,36 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
     }
 
     pub fn action_label(action: &Action) -> String {
+        let mut label = String::new();
+        Self::write_label(action, &mut label);
+        label
+    }
+
+    /// Appends `action`'s label to `out` instead of allocating a fresh
+    /// `String`, so hot-path callers can reuse one scratch buffer across an
+    /// entire node's action list.
+    fn write_label(action: &Action, out: &mut String) {
+        use std::fmt::Write as _;
         match action {
-            Action::Fold => "fold".to_string(),
-            Action::Check => "check".to_string(),
+            Action::Fold => out.push_str("fold"),
+            Action::Check => out.push_str("check"),
             Action::Call { amount, all_in } => {
-                format!(
-                    "call:{}{}",
-                    amount.raw(),
-                    if *all_in { ":all-in" } else { "" }
-                )
+                let _ = write!(out, "call:{}", amount.raw());
+                if *all_in {
+                    out.push_str(":all-in");
+                }
             }
             Action::BetTo { to, all_in, .. } => {
-                format!(
-                    "bet-to:{}{}",
-                    to.raw(),
-                    if *all_in { ":all-in" } else { "" }
-                )
+                let _ = write!(out, "bet-to:{}", to.raw());
+                if *all_in {
+                    out.push_str(":all-in");
+                }
             }
             Action::RaiseTo { to, all_in, .. } => {
-                format!(
-                    "raise-to:{}{}",
-                    to.raw(),
-                    if *all_in { ":all-in" } else { "" }
-                )
+                let _ = write!(out, "raise-to:{}", to.raw());
+                if *all_in {
+                    out.push_str(":all-in");
+                }
             }
         }
     }
@@ -268,6 +283,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
 
 impl<A: MultiwayAbstraction> ExternalSamplingGame for HoldemGame<A> {
     type State = BettingState;
+    type Actions = Vec<Action>;
 
     fn num_players(&self) -> usize {
         self.config.seats.len()
@@ -281,12 +297,22 @@ impl<A: MultiwayAbstraction> ExternalSamplingGame for HoldemGame<A> {
         state.to_act.map(SeatId::index)
     }
 
-    fn num_actions(&self, state: &Self::State) -> usize {
-        self.legal_actions(state).len()
+    /// Expands the node's legal actions exactly once; every other method
+    /// below is handed this value instead of recomputing it.
+    fn node_actions(&self, state: &Self::State) -> Self::Actions {
+        self.legal_actions(state)
     }
 
-    fn next_state(&self, state: &Self::State, action_index: usize) -> Self::State {
-        let actions = self.legal_actions(state);
+    fn num_actions_of(&self, actions: &Self::Actions) -> usize {
+        actions.len()
+    }
+
+    fn next_state_with(
+        &self,
+        state: &Self::State,
+        actions: &Self::Actions,
+        action_index: usize,
+    ) -> Self::State {
         let action = actions
             .get(action_index)
             .unwrap_or_else(|| {
@@ -297,17 +323,19 @@ impl<A: MultiwayAbstraction> ExternalSamplingGame for HoldemGame<A> {
             })
             .clone();
         let mut next = state.clone();
-        next.apply(action, self.betting_for_state(state))
+        next.apply_from_actions(action, actions)
             .expect("legal action must apply");
         next
     }
 
-    fn action_label(&self, state: &Self::State, action_index: usize) -> String {
-        let actions = self.legal_actions(state);
-        actions
-            .get(action_index)
-            .map(HoldemGame::<A>::action_label)
-            .unwrap_or_else(|| format!("invalid-action:{action_index}"))
+    fn write_action_label(&self, actions: &Self::Actions, action_index: usize, out: &mut String) {
+        match actions.get(action_index) {
+            Some(action) => HoldemGame::<A>::write_label(action, out),
+            None => {
+                use std::fmt::Write as _;
+                let _ = write!(out, "invalid-action:{action_index}");
+            }
+        }
     }
 
     fn bucket(&self, state: &Self::State, world: &SampledWorld, actor: usize) -> PrivateInfo {
@@ -409,8 +437,9 @@ mod tests {
             .collect();
         assert!(labels.iter().any(|label| label == "fold"));
         assert!(labels.iter().any(|label| label.starts_with("raise-to:")));
-        let trait_labels: Vec<_> = (0..game.num_actions(&root))
-            .map(|action| game.action_label(&root, action))
+        let actions = game.node_actions(&root);
+        let trait_labels: Vec<_> = (0..game.num_actions_of(&actions))
+            .map(|action| game.action_label_of(&actions, action))
             .collect();
         assert_eq!(labels, trait_labels);
         let mut unique = labels.clone();
@@ -484,7 +513,7 @@ mod tests {
                 .iter()
                 .position(|action| matches!(action, Action::Check | Action::Call { .. }))
                 .expect("call/check line reaches the flop");
-            flop = game.next_state(&flop, passive);
+            flop = game.next_state_with(&flop, &actions, passive);
         }
         assert_eq!(flop.street, Street::Flop);
         let flop_actor = game.actor(&flop).unwrap();

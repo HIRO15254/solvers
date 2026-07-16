@@ -6,10 +6,22 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-use crate::solver::{ExternalSamplingGame, MultiwaySolver, SOLVER_STATE_VERSION, SolverState};
+use crate::solver::{
+    ExternalSamplingGame, HistoryEntry, MultiwaySolver, PolicyEntry, SOLVER_STATE_VERSION,
+    SolverConfig, SolverState,
+};
 
 const CHECKPOINT_MAGIC: &[u8; 8] = b"SLVRMWCP";
-pub const CHECKPOINT_VERSION: u16 = 3;
+/// Bumped 3 -> 4 when [`SolverConfig`] grew a `sweep_batch` field. `load`
+/// transparently accepts both this version and [`MIN_SUPPORTED_CHECKPOINT_VERSION`]
+/// (decoding the older on-disk `SolverConfig` shape and filling
+/// `sweep_batch = 1`, its behavior-preserving default); every checkpoint this
+/// process *writes* is always the current version.
+pub const CHECKPOINT_VERSION: u16 = 4;
+/// Oldest checkpoint container version [`MultiwayCheckpoint::load_unchecked`]
+/// still reads. Bump only alongside a matching legacy mirror struct and
+/// `From` conversion into the current [`SolverState`] shape.
+const MIN_SUPPORTED_CHECKPOINT_VERSION: u16 = 3;
 const HEADER_LEN: usize = 8 + 2 + 32 + 32 + 8 + 8 + 8 + 32 + 4 + 32;
 const CHUNK_ENTRY_LEN: usize = 8 + 8 + 8 + 32;
 const CHUNK_UNCOMPRESSED_BYTES: usize = 4 * 1024 * 1024;
@@ -40,6 +52,63 @@ struct ChunkEntry {
 pub struct MultiwayCheckpoint {
     pub header: MultiwayCheckpointHeader,
     pub state: SolverState,
+}
+
+/// Mirrors [`SolverConfig`]'s on-disk shape for checkpoint container version 3,
+/// i.e. every field it had before `sweep_batch` was appended. Field order
+/// must exactly match the historical struct: postcard has no field names on
+/// the wire, so a mismatched order silently decodes garbage instead of
+/// failing.
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+struct SolverConfigV3 {
+    seed: u64,
+    max_memory_bytes: u64,
+    max_traversal_depth: u32,
+    exploration_epsilon: f64,
+    discount_every: u64,
+    discount_until: u64,
+}
+
+/// Mirrors [`SolverState`]'s on-disk shape for checkpoint container version 3
+/// (every field unchanged except `config`, which is the version-3 shape).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct SolverStateV3 {
+    schema_version: u16,
+    config: SolverConfigV3,
+    traversals: u64,
+    completed_sweeps: u64,
+    next_sample_id: u64,
+    total_deal_attempts: u64,
+    terminal_evaluations: u64,
+    histories: Vec<HistoryEntry>,
+    policies: Vec<PolicyEntry>,
+}
+
+impl From<SolverStateV3> for SolverState {
+    fn from(legacy: SolverStateV3) -> Self {
+        SolverState {
+            schema_version: legacy.schema_version,
+            config: SolverConfig {
+                seed: legacy.config.seed,
+                max_memory_bytes: legacy.config.max_memory_bytes,
+                max_traversal_depth: legacy.config.max_traversal_depth,
+                exploration_epsilon: legacy.config.exploration_epsilon,
+                discount_every: legacy.config.discount_every,
+                discount_until: legacy.config.discount_until,
+                // Version 3 checkpoints predate sweep batching; `1` is the
+                // batch size that behaves exactly like the solver they were
+                // written by.
+                sweep_batch: 1,
+            },
+            traversals: legacy.traversals,
+            completed_sweeps: legacy.completed_sweeps,
+            next_sample_id: legacy.next_sample_id,
+            total_deal_attempts: legacy.total_deal_attempts,
+            terminal_evaluations: legacy.terminal_evaluations,
+            histories: legacy.histories,
+            policies: legacy.policies,
+        }
+    }
 }
 
 impl MultiwayCheckpoint {
@@ -341,7 +410,19 @@ impl MultiwayCheckpoint {
             });
         }
 
-        let state: SolverState = postcard::from_bytes(&raw)?;
+        let state: SolverState = match header.version {
+            4 => postcard::from_bytes(&raw)?,
+            3 => {
+                let legacy: SolverStateV3 = postcard::from_bytes(&raw)?;
+                legacy.into()
+            }
+            other => {
+                // `decode_header` already rejected anything outside
+                // `MIN_SUPPORTED_CHECKPOINT_VERSION..=CHECKPOINT_VERSION`,
+                // and every version in that range is handled above.
+                unreachable!("unhandled supported checkpoint version {other}")
+            }
+        };
         if state.schema_version != SOLVER_STATE_VERSION {
             return Err(CheckpointError::SolverStateVersion {
                 found: state.schema_version,
@@ -388,7 +469,7 @@ fn decode_header(bytes: &[u8; HEADER_LEN]) -> Result<MultiwayCheckpointHeader, C
         return Err(CheckpointError::BadMagic);
     }
     let version = u16::from_le_bytes(bytes[8..10].try_into().expect("two bytes"));
-    if version != CHECKPOINT_VERSION {
+    if !(MIN_SUPPORTED_CHECKPOINT_VERSION..=CHECKPOINT_VERSION).contains(&version) {
         return Err(CheckpointError::UnsupportedVersion {
             found: version,
             expected: CHECKPOINT_VERSION,
@@ -556,9 +637,7 @@ mod tests {
     use super::*;
     use std::io::{Seek, SeekFrom};
 
-    use crate::solver::{
-        HistoryEntry, HistoryKey, InfoKey, PolicyColumn, PolicyEntry, SolverConfig,
-    };
+    use crate::solver::{HistoryKey, InfoKey, PolicyColumn};
 
     fn state() -> SolverState {
         SolverState {
@@ -570,6 +649,7 @@ mod tests {
                 exploration_epsilon: crate::solver::DEFAULT_EXPLORATION_EPSILON,
                 discount_every: crate::solver::DEFAULT_DISCOUNT_EVERY,
                 discount_until: crate::solver::DEFAULT_DISCOUNT_UNTIL,
+                sweep_batch: 1,
             },
             traversals: 6,
             completed_sweeps: 2,
@@ -791,6 +871,146 @@ mod tests {
         assert!(matches!(
             MultiwayCheckpoint::load(&path, [1; 32], [9; 32]),
             Err(CheckpointError::AbstractionMismatch)
+        ));
+    }
+
+    /// The version-3 mirror of [`state`]: same values, `SolverConfigV3` shape
+    /// (no `sweep_batch`).
+    fn legacy_v3_state() -> SolverStateV3 {
+        SolverStateV3 {
+            schema_version: SOLVER_STATE_VERSION,
+            config: SolverConfigV3 {
+                seed: 9,
+                max_memory_bytes: 1 << 20,
+                max_traversal_depth: 64,
+                exploration_epsilon: crate::solver::DEFAULT_EXPLORATION_EPSILON,
+                discount_every: crate::solver::DEFAULT_DISCOUNT_EVERY,
+                discount_until: crate::solver::DEFAULT_DISCOUNT_UNTIL,
+            },
+            traversals: 6,
+            completed_sweeps: 2,
+            next_sample_id: 6,
+            total_deal_attempts: 8,
+            terminal_evaluations: 20,
+            histories: vec![HistoryEntry {
+                key: HistoryKey::ROOT.child(1, 2),
+                parent: HistoryKey::ROOT,
+                actor: 1,
+                action_index: 2,
+                action_label: "raise".into(),
+            }],
+            policies: vec![PolicyEntry {
+                key: InfoKey {
+                    history: HistoryKey::ROOT.child(1, 2),
+                    player: 2,
+                    street: 1,
+                    active_opponents: 2,
+                    bucket_path: [
+                        4,
+                        17,
+                        crate::solver::UNREACHED_BUCKET,
+                        crate::solver::UNREACHED_BUCKET,
+                    ],
+                },
+                column: PolicyColumn {
+                    action_labels: vec!["fold".into(), "call".into()],
+                    regrets: vec![-1.0, 2.5],
+                    strategy_sum: vec![3.0, 7.0],
+                },
+            }],
+        }
+    }
+
+    /// Writes a checkpoint file whose container header declares `version`
+    /// and whose payload is `raw` (already postcard-encoded, of whatever
+    /// schema `version` implies), using the same chunked/checksummed framing
+    /// [`MultiwayCheckpoint::write_atomic`] produces. This lets tests
+    /// synthesize an on-disk version-3 checkpoint directly, since production
+    /// code always writes the current [`CHECKPOINT_VERSION`].
+    fn write_checkpoint_with_version(
+        raw: &[u8],
+        version: u16,
+        configuration_fingerprint: [u8; 32],
+        abstraction_fingerprint: [u8; 32],
+        next_sample_id: u64,
+        path: &Path,
+    ) {
+        let uncompressed_len = raw.len() as u64;
+        let chunk_count = chunk_count_for_len(uncompressed_len);
+        let mut chunks = Vec::new();
+        let mut payload = Vec::new();
+        let mut payload_hasher = blake3::Hasher::new();
+        let mut offset = 0usize;
+        for index in 0..chunk_count {
+            let raw_len = expected_chunk_len(uncompressed_len, index, chunk_count) as usize;
+            let slice = &raw[offset..offset + raw_len];
+            let compressed = zstd::stream::encode_all(slice, 3).unwrap();
+            let checksum = *blake3::hash(&compressed).as_bytes();
+            chunks.push(ChunkEntry {
+                compressed_offset: payload.len() as u64,
+                compressed_len: compressed.len() as u64,
+                uncompressed_len: raw_len as u64,
+                checksum,
+            });
+            payload_hasher.update(&compressed);
+            payload.extend_from_slice(&compressed);
+            offset += raw_len;
+        }
+        let chunk_table = encode_chunk_table(&chunks);
+        let header = MultiwayCheckpointHeader {
+            version,
+            configuration_fingerprint,
+            abstraction_fingerprint,
+            next_sample_id,
+            payload_len: payload.len() as u64,
+            uncompressed_len,
+            payload_checksum: *payload_hasher.finalize().as_bytes(),
+            chunk_count,
+            chunk_table_checksum: *blake3::hash(&chunk_table).as_bytes(),
+        };
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&encode_header(&header));
+        bytes.extend_from_slice(&chunk_table);
+        bytes.extend_from_slice(&payload);
+        std::fs::write(path, bytes).unwrap();
+    }
+
+    #[test]
+    fn checkpoint_version_3_loads_with_sweep_batch_defaulted_to_one() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("legacy.mwckpt");
+        let legacy = legacy_v3_state();
+        let raw = postcard::to_allocvec(&legacy).unwrap();
+        write_checkpoint_with_version(&raw, 3, [3; 32], [7; 32], legacy.next_sample_id, &path);
+
+        let loaded = MultiwayCheckpoint::load(&path, [3; 32], [7; 32]).unwrap();
+        assert_eq!(loaded.header.version, 3);
+        assert_eq!(loaded.state.config.sweep_batch, 1);
+        assert_eq!(loaded.state, SolverState::from(legacy));
+
+        // Re-saving an upgraded-in-memory checkpoint always writes the
+        // current container version and the current `SolverState` shape.
+        let upgraded_path = directory.path().join("upgraded.mwckpt");
+        loaded.write_atomic(&upgraded_path).unwrap();
+        let reloaded = MultiwayCheckpoint::load(&upgraded_path, [3; 32], [7; 32]).unwrap();
+        assert_eq!(reloaded.header.version, CHECKPOINT_VERSION);
+        assert_eq!(reloaded.state, loaded.state);
+    }
+
+    #[test]
+    fn checkpoint_version_below_minimum_supported_is_rejected() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("too-old.mwckpt");
+        let legacy = legacy_v3_state();
+        let raw = postcard::to_allocvec(&legacy).unwrap();
+        write_checkpoint_with_version(&raw, 2, [3; 32], [7; 32], legacy.next_sample_id, &path);
+
+        assert!(matches!(
+            MultiwayCheckpoint::load_unchecked(&path),
+            Err(CheckpointError::UnsupportedVersion {
+                found: 2,
+                expected: CHECKPOINT_VERSION
+            })
         ));
     }
 }

@@ -110,15 +110,6 @@ impl SeatState {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ActionRecord {
-    pub street: Street,
-    pub seat: SeatId,
-    pub action: Action,
-    pub pot_before: MwChips,
-    pub wager_before: MwChips,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BettingState {
     pub seats: SeatVec<SeatState>,
     pub button: SeatId,
@@ -138,7 +129,13 @@ pub struct BettingState {
     pub aggressive_actions: u8,
     pub flop_dealt: bool,
     pub phase: HandPhase,
-    pub history: Vec<ActionRecord>,
+    /// Whether any seat has voluntarily called (as opposed to a forced blind
+    /// post) while `street == Preflop`. This is the only thing betting
+    /// history is read for: it decides whether preflop `isolate_sizes`
+    /// (rather than `bet_sizes`) govern a raise. Blinds are posted directly
+    /// in [`BettingState::new`] via `post`, never through [`Self::apply`], so
+    /// they never set this flag.
+    pub preflop_voluntary_call_seen: bool,
 }
 
 impl BettingState {
@@ -206,7 +203,7 @@ impl BettingState {
             aggressive_actions: 0,
             flop_dealt: false,
             phase: HandPhase::Betting,
-            history: Vec::new(),
+            preflop_voluntary_call_seen: false,
         };
         state.pending = state.active_mask();
         state.finish_or_select(big_blind_seat);
@@ -305,11 +302,7 @@ impl BettingState {
         let minimum = self.minimum_full_target();
         let sizes = if self.aggressive_actions != 0 {
             &street_config.raise_sizes
-        } else if self.street == Street::Preflop
-            && self.history.iter().any(|record| {
-                record.street == Street::Preflop && matches!(record.action, Action::Call { .. })
-            })
-        {
+        } else if self.street == Street::Preflop && self.preflop_voluntary_call_seen {
             street_config
                 .isolate_sizes
                 .as_ref()
@@ -326,12 +319,26 @@ impl BettingState {
                 SizeSpec::ToBb { value } => scale(self.big_blind, value),
                 SizeSpec::PotAfterCall { fraction } => called_to + scale(pot_after_call, fraction),
                 SizeSpec::PreviousBetMultiple { factor } => scale(self.bet_to_match, factor),
+                SizeSpec::MinRaise => minimum,
+                SizeSpec::StackFraction { fraction } => scale(maximum, fraction),
             };
-            let target = if proposed < minimum && maximum >= minimum {
+            let mut target = if proposed < minimum && maximum >= minimum {
                 minimum
             } else {
                 proposed.min(maximum)
             };
+            // Raise-cap merge (HRC-style): a target that already reaches the
+            // configured fraction of the effective stack collapses into the
+            // all-in target instead of standing as its own sized action. This
+            // merge applies even when `include_allin` is false, since it is
+            // folding an already-proposed size into all-in rather than adding
+            // a brand-new all-in action.
+            if street_config
+                .allin_threshold
+                .is_some_and(|threshold| target >= scale(maximum, threshold))
+            {
+                target = maximum;
+            }
             if target > self.bet_to_match {
                 targets.push(target);
             }
@@ -372,17 +379,26 @@ impl BettingState {
     }
 
     pub fn apply(&mut self, action: Action, config: &BettingConfig) -> Result<(), BettingError> {
+        let actions = self.legal_actions(config)?;
+        self.apply_from_actions(action, &actions)
+    }
+
+    /// Applies `action`, checking legality against an already-expanded
+    /// action list instead of recomputing [`Self::legal_actions`].
+    ///
+    /// `actions` must be exactly what `legal_actions` would return for this
+    /// state (e.g. the value the MCCFR traverser already expanded once per
+    /// node); passing a stale or unrelated list can accept an action that
+    /// would otherwise be rejected.
+    pub fn apply_from_actions(
+        &mut self,
+        action: Action,
+        actions: &[Action],
+    ) -> Result<(), BettingError> {
         let actor = self.to_act.ok_or(BettingError::MissingActor)?;
-        if !self.legal_actions(config)?.contains(&action) {
+        if !actions.contains(&action) {
             return Err(BettingError::IllegalAction { actor, action });
         }
-        let record = ActionRecord {
-            street: self.street,
-            seat: actor,
-            action: action.clone(),
-            pot_before: self.pot_size(),
-            wager_before: self.bet_to_match,
-        };
         match action {
             Action::Fold => {
                 self.seats[actor].status = SeatStatus::Folded;
@@ -394,6 +410,9 @@ impl BettingState {
                 self.pending.remove(actor);
             }
             Action::Call { amount, .. } => {
+                if self.street == Street::Preflop {
+                    self.preflop_voluntary_call_seen = true;
+                }
                 self.pay_street(actor, amount)?;
                 self.seats[actor].raise_reopen_at =
                     Some(saturating_add(self.bet_to_match, self.last_full_raise));
@@ -422,7 +441,6 @@ impl BettingState {
             }
         }
         self.street_active_players[self.street.index()] = self.non_folded_mask().len() as u8;
-        self.history.push(record);
         self.finish_or_select(actor);
         Ok(())
     }
@@ -767,5 +785,168 @@ mod tests {
         assert_eq!(state.phase, HandPhase::Runout);
         assert_eq!(state.to_act, None);
         assert!(state.flop_dealt);
+    }
+
+    /// Builds a 3-seat, 100bb table with button=0 (so button is preflop UTG),
+    /// then advances to a node where seat 2 (the big blind) faces a raise:
+    /// button opens to 3bb, SB calls, BB is to act with `aggressive_actions
+    /// == 1` so `raise_sizes` (not `bet_sizes`) governs its menu.
+    fn state_with_bb_facing_a_raise(betting: &mut BettingConfig) -> BettingState {
+        betting.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 3.0 }];
+        let (mut bb_state, _) = state(&[100.0, 100.0, 100.0], 0, AnteConfig::None);
+        let open_raise = bb_state
+            .legal_actions(betting)
+            .unwrap()
+            .into_iter()
+            .find(|action| {
+                matches!(
+                    action,
+                    Action::RaiseTo {
+                        to: MwChips(3_000),
+                        ..
+                    }
+                )
+            })
+            .unwrap();
+        bb_state.apply(open_raise, betting).unwrap();
+        let call = bb_state
+            .legal_actions(betting)
+            .unwrap()
+            .into_iter()
+            .find(|action| matches!(action, Action::Call { .. }))
+            .unwrap();
+        bb_state.apply(call, betting).unwrap();
+        assert_eq!(bb_state.to_act, Some(SeatId(2)));
+        bb_state
+    }
+
+    #[test]
+    fn min_raise_size_emits_exactly_the_minimum_full_raise_target() {
+        let (_, mut betting) = state(&[100.0, 100.0, 100.0], 0, AnteConfig::None);
+        betting.preflop.raise_sizes = vec![
+            crate::config::SizeSpec::MinRaise,
+            crate::config::SizeSpec::PreviousBetMultiple { factor: 3.0 },
+        ];
+        betting.preflop.include_allin = false;
+        let bb_state = state_with_bb_facing_a_raise(&mut betting);
+
+        // bet_to_match = 3bb, last_full_raise = 2bb, so the minimum full
+        // raise target is 5bb; the 3x-previous-bet size is 9bb, distinct
+        // from the minimum.
+        let actions = bb_state.legal_actions(&betting).unwrap();
+        assert!(actions.iter().any(|action| matches!(
+            action,
+            Action::RaiseTo {
+                to: MwChips(5_000),
+                full_raise: true,
+                all_in: false,
+            }
+        )));
+        assert!(actions.iter().any(|action| matches!(
+            action,
+            Action::RaiseTo {
+                to: MwChips(9_000),
+                ..
+            }
+        )));
+    }
+
+    #[test]
+    fn stack_fraction_ladder_scales_off_the_actors_maximum() {
+        let (_, mut betting) = state(&[100.0, 100.0, 100.0], 0, AnteConfig::None);
+        betting.preflop.raise_sizes = vec![
+            crate::config::SizeSpec::StackFraction { fraction: 0.25 },
+            crate::config::SizeSpec::StackFraction { fraction: 0.5 },
+        ];
+        betting.preflop.include_allin = false;
+        let bb_state = state_with_bb_facing_a_raise(&mut betting);
+
+        // BB's maximum = actor_wager (1bb already posted) + remaining stack
+        // (99bb) = 100bb = 100_000 chips. Neither fraction is clipped by the
+        // minimum (5bb) or the maximum (100bb).
+        let actions = bb_state.legal_actions(&betting).unwrap();
+        assert!(actions.iter().any(|action| matches!(
+            action,
+            Action::RaiseTo {
+                to: MwChips(25_000),
+                ..
+            }
+        )));
+        assert!(actions.iter().any(|action| matches!(
+            action,
+            Action::RaiseTo {
+                to: MwChips(50_000),
+                ..
+            }
+        )));
+    }
+
+    #[test]
+    fn allin_threshold_merges_a_qualifying_size_into_a_deduplicated_all_in() {
+        let (_, mut betting) = state(&[100.0, 100.0, 100.0], 0, AnteConfig::None);
+        betting.preflop.raise_sizes =
+            vec![crate::config::SizeSpec::StackFraction { fraction: 0.9 }];
+        betting.preflop.include_allin = true;
+        betting.preflop.allin_threshold = Some(0.85);
+        let bb_state = state_with_bb_facing_a_raise(&mut betting);
+
+        // 0.9 * maximum (100_000) = 90_000 >= 0.85 * 100_000 = 85_000, so the
+        // stack-fraction size merges into the all-in target instead of
+        // standing on its own; `include_allin` would also propose the same
+        // all-in target, so the merged and native all-in entries must dedup
+        // to exactly one action.
+        let actions = bb_state.legal_actions(&betting).unwrap();
+        let all_in_raises: Vec<_> = actions
+            .iter()
+            .filter(|action| {
+                matches!(
+                    action,
+                    Action::RaiseTo {
+                        to: MwChips(100_000),
+                        all_in: true,
+                        ..
+                    }
+                )
+            })
+            .collect();
+        assert_eq!(all_in_raises.len(), 1);
+        assert!(!actions.iter().any(|action| matches!(
+            action,
+            Action::RaiseTo {
+                to: MwChips(90_000),
+                ..
+            }
+        )));
+    }
+
+    #[test]
+    fn allin_threshold_absent_leaves_default_legal_actions_unchanged() {
+        // Regression guard: an unmodified default preflop config (no
+        // MinRaise/StackFraction sizes, no allin_threshold) must still
+        // produce exactly the historical action set at the opening node.
+        let (state, betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
+        assert!(betting.preflop.allin_threshold.is_none());
+        let mut actions = state.legal_actions(&betting).unwrap();
+        actions.sort_by_key(|action| action.amount().map(MwChips::raw));
+        assert_eq!(
+            actions,
+            vec![
+                Action::Fold,
+                Action::Call {
+                    amount: MwChips(1_000),
+                    all_in: false,
+                },
+                Action::RaiseTo {
+                    to: MwChips(2_500),
+                    all_in: false,
+                    full_raise: true,
+                },
+                Action::RaiseTo {
+                    to: MwChips(20_000),
+                    all_in: true,
+                    full_raise: true,
+                },
+            ]
+        );
     }
 }

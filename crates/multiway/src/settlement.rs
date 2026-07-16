@@ -415,7 +415,7 @@ pub enum SettlementError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::betting::{ActionRecord, SeatState};
+    use crate::betting::SeatState;
     use crate::types::Street;
 
     fn manual(individual: &[u64], common: &[u64], statuses: &[SeatStatus]) -> BettingState {
@@ -458,7 +458,7 @@ mod tests {
             aggressive_actions: 0,
             flop_dealt: true,
             phase: HandPhase::Showdown,
-            history: Vec::<ActionRecord>::new(),
+            preflop_voluntary_call_seen: false,
         }
     }
 

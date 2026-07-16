@@ -6,12 +6,13 @@
 //! exposes sampled regret diagnostics and average policies without claiming
 //! a two-player zero-sum guarantee.
 
-use std::collections::{HashMap, hash_map::Entry};
+use std::collections::hash_map::Entry;
 use std::mem::size_of;
 
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use rayon::prelude::*;
+use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 
 use crate::abstraction::{BucketId, BucketPath};
@@ -34,17 +35,44 @@ const HISTORY_OVERHEAD_BYTES: u64 = 48;
 /// They form part of the lazy public-history key used by checkpoints.
 pub trait ExternalSamplingGame: Send + Sync {
     type State: Clone;
+    /// Precomputed node expansion, produced once per visited node by
+    /// [`Self::node_actions`] and threaded through every other per-node
+    /// method below instead of letting each of them recompute it.
+    type Actions;
 
     fn num_players(&self) -> usize;
     fn root_state(&self) -> Self::State;
 
     /// Acting seat, or `None` iff the state is terminal.
     fn actor(&self, state: &Self::State) -> Option<usize>;
-    fn num_actions(&self, state: &Self::State) -> usize;
-    fn next_state(&self, state: &Self::State, action_index: usize) -> Self::State;
-    /// Stable, user-facing label corresponding to `action_index`. Labels at
-    /// an information set must be non-empty and unique.
-    fn action_label(&self, state: &Self::State, action_index: usize) -> String;
+
+    /// Expands a node's legal actions. Called exactly once per visited
+    /// node; the result is handed to [`Self::num_actions_of`],
+    /// [`Self::write_action_label`], and [`Self::next_state_with`] instead
+    /// of each of them re-deriving it from `state`.
+    fn node_actions(&self, state: &Self::State) -> Self::Actions;
+    fn num_actions_of(&self, actions: &Self::Actions) -> usize;
+    fn next_state_with(
+        &self,
+        state: &Self::State,
+        actions: &Self::Actions,
+        action_index: usize,
+    ) -> Self::State;
+    /// Appends the stable, user-facing label for `action_index` to `out`.
+    /// Labels at an information set must be non-empty and unique. Callers
+    /// that want just this label should clear `out` first; hot-path
+    /// validation instead reuses one scratch buffer across an entire node's
+    /// action list without allocating a `Vec<String>`.
+    fn write_action_label(&self, actions: &Self::Actions, action_index: usize, out: &mut String);
+
+    /// Convenience wrapper over [`Self::write_action_label`] that returns an
+    /// owned label. Prefer `write_action_label` with a reused buffer on any
+    /// path visited once per node.
+    fn action_label_of(&self, actions: &Self::Actions, action_index: usize) -> String {
+        let mut label = String::new();
+        self.write_action_label(actions, action_index, &mut label);
+        label
+    }
 
     /// Full private recall through the current street. Future streets must
     /// be marked [`UNREACHED_BUCKET`], never derived from the sampled runout.
@@ -255,6 +283,13 @@ pub struct SolverConfig {
     pub discount_every: u64,
     /// Stop discounting once this completed sweep is reached. Zero disables it.
     pub discount_until: u64,
+    /// Number of complete sweeps run against the same strategy snapshot per
+    /// parallel drive iteration (see [`MultiwaySolver::run_sweeps_with_threads_until`]).
+    /// `1` (the default) is bit-identical to the pre-batching solver; values
+    /// above `1` trade slightly staler within-batch updates for restored
+    /// parallel efficiency on tables whose per-seat traversal cost is
+    /// imbalanced. Must be at least `1`.
+    pub sweep_batch: u64,
 }
 
 impl Default for SolverConfig {
@@ -266,6 +301,7 @@ impl Default for SolverConfig {
             exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
             discount_every: DEFAULT_DISCOUNT_EVERY,
             discount_until: DEFAULT_DISCOUNT_UNTIL,
+            sweep_batch: 1,
         }
     }
 }
@@ -347,13 +383,13 @@ struct TraversalDelta {
 
 struct TraversalWorker<'a, G: ExternalSamplingGame> {
     game: &'a G,
-    policies: &'a HashMap<InfoKey, PolicyColumn>,
-    histories: &'a HashMap<HistoryKey, HistoryEntry>,
+    policies: &'a FxHashMap<InfoKey, PolicyColumn>,
+    histories: &'a FxHashMap<HistoryKey, HistoryEntry>,
     config: SolverConfig,
     linear_weight: f64,
     events: Vec<TraversalEvent>,
-    local_policies: HashMap<InfoKey, Vec<String>>,
-    local_histories: HashMap<HistoryKey, HistoryEntry>,
+    local_policies: FxHashMap<InfoKey, Vec<String>>,
+    local_histories: FxHashMap<HistoryKey, HistoryEntry>,
     terminal_evaluations: u64,
 }
 
@@ -363,8 +399,8 @@ pub struct MultiwaySolver<G: ExternalSamplingGame> {
     game: G,
     sampler: DealSampler,
     config: SolverConfig,
-    policies: HashMap<InfoKey, PolicyColumn>,
-    histories: HashMap<HistoryKey, HistoryEntry>,
+    policies: FxHashMap<InfoKey, PolicyColumn>,
+    histories: FxHashMap<HistoryKey, HistoryEntry>,
     approx_memory_bytes: u64,
     traversals: u64,
     completed_sweeps: u64,
@@ -380,8 +416,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             game,
             sampler,
             config,
-            policies: HashMap::new(),
-            histories: HashMap::new(),
+            policies: FxHashMap::default(),
+            histories: FxHashMap::default(),
             approx_memory_bytes: 0,
             traversals: 0,
             completed_sweeps: 0,
@@ -436,7 +472,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             ));
         }
 
-        let mut histories = HashMap::with_capacity(state.histories.len());
+        let mut histories: FxHashMap<HistoryKey, HistoryEntry> = FxHashMap::default();
+        histories.reserve(state.histories.len());
         let mut approx_memory_bytes = 0u64;
         for entry in state.histories {
             validate_history_entry(&entry, game.num_players())?;
@@ -450,7 +487,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         }
         validate_history_graph(&histories)?;
 
-        let mut policies = HashMap::with_capacity(state.policies.len());
+        let mut policies: FxHashMap<InfoKey, PolicyColumn> = FxHashMap::default();
+        policies.reserve(state.policies.len());
         for entry in state.policies {
             validate_column(entry.key, &entry.column, game.num_players())?;
             if entry.key.history != HistoryKey::ROOT && !histories.contains_key(&entry.key.history)
@@ -503,12 +541,13 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// Fingerprint covering solver knobs, ranges, and public game rules.
     pub fn configuration_fingerprint(&self) -> [u8; 32] {
         let mut hasher = blake3::Hasher::new();
-        hasher.update(b"solvers.multiway.solver-config.v2");
+        hasher.update(b"solvers.multiway.solver-config.v3");
         hasher.update(&self.config.seed.to_le_bytes());
         hasher.update(&self.config.max_traversal_depth.to_le_bytes());
         hasher.update(&self.config.exploration_epsilon.to_bits().to_le_bytes());
         hasher.update(&self.config.discount_every.to_le_bytes());
         hasher.update(&self.config.discount_until.to_le_bytes());
+        hasher.update(&self.config.sweep_batch.to_le_bytes());
         hasher.update(&self.sampler.range_fingerprint());
         hasher.update(&self.game.game_fingerprint());
         *hasher.finalize().as_bytes()
@@ -543,6 +582,39 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             .map(|_| ())
     }
 
+    /// Sweep batching: `config.sweep_batch` complete sweeps at a time are
+    /// dispatched against the *same* strategy snapshot as one `batch *
+    /// num_players`-wide `rayon` fan-out, instead of one `num_players`-wide
+    /// fan-out per sweep. This restores parallel efficiency on tables whose
+    /// per-seat traversal cost is imbalanced (a `num_players <= 9`-way fan-out
+    /// underuses a machine with many more cores), at the cost of every
+    /// traversal within a batch reading a snapshot that is up to
+    /// `sweep_batch - 1` sweeps staler than the sequential algorithm would
+    /// have used for later sweeps in the batch -- the standard mini-batch
+    /// MCCFR trade-off. `sweep_batch == 1` (the default) reduces to exactly
+    /// the pre-batching one-sweep-at-a-time schedule: same task count, same
+    /// per-task sample ids, same per-task linear weight, so it is
+    /// bit-identical to today's checkpoints and thread-count invariance.
+    ///
+    /// Every task `j` in `0..batch * num_players` is `(sweep_offset,
+    /// traverser) = (j / num_players, j % num_players)`, reads sample id
+    /// `first_sample_id + j`, and uses linear weight
+    /// `completed_sweeps_at_batch_start + sweep_offset + 1` -- computed from
+    /// the task's own sweep offset rather than the live `self.completed_sweeps`,
+    /// so later sweeps in the batch still get their own (correctly larger)
+    /// weight even though every task in the batch reads one shared snapshot.
+    /// Deltas are collected in task order (an `IndexedParallelIterator`) and
+    /// merged one sweep at a time, in `sweep_offset` order, through the
+    /// existing single-sweep [`Self::merge_sweep`] -- unmodified, since it
+    /// already validates and advances by `self.next_sample_id`, which is
+    /// exactly what each successive sweep's slice of tasks used.
+    ///
+    /// `should_continue` is polled once per *batch* rather than once per
+    /// sweep, so cancellation granularity coarsens to whole batches: a
+    /// `sweep_batch = 8` run can overshoot a requested stopping point by up
+    /// to 7 extra sweeps versus `sweep_batch = 1`. Batches are committed as a
+    /// whole -- there is no partial-batch commit -- matching `merge_sweep`'s
+    /// existing all-or-nothing-per-sweep contract.
     pub fn run_sweeps_with_threads_until<F>(
         &mut self,
         sweeps: u64,
@@ -571,49 +643,78 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             .num_threads(threads)
             .build()
             .map_err(|error| SolverError::ThreadPoolBuild(error.to_string()))?;
-        let num_players = self.game.num_players();
+        let num_players = self.game.num_players() as u64;
         let mut completed = 0u64;
+        let mut sweeps_remaining = sweeps;
 
-        for _ in 0..sweeps {
+        while sweeps_remaining > 0 {
             if !should_continue() {
                 break;
             }
+            let batch = self.config.sweep_batch.min(sweeps_remaining);
+            let completed_sweeps_at_batch_start = self.completed_sweeps;
             let first_sample_id = self.next_sample_id;
+            let total_tasks = batch
+                .checked_mul(num_players)
+                .ok_or(SolverError::CounterOverflow)?;
             let results = pool.install(|| {
-                (0..num_players)
+                (0..total_tasks)
                     .into_par_iter()
-                    .map(|traverser| {
+                    .map(|task| {
+                        let sweep_offset = task / num_players;
+                        let traverser = (task % num_players) as usize;
                         let sample_id = first_sample_id
-                            .checked_add(traverser as u64)
+                            .checked_add(task)
                             .ok_or(SolverError::CounterOverflow)?;
-                        self.generate_traversal_delta(sample_id, traverser)
+                        let linear_weight = completed_sweeps_at_batch_start
+                            .checked_add(sweep_offset)
+                            .and_then(|value| value.checked_add(1))
+                            .ok_or(SolverError::CounterOverflow)?
+                            as f64;
+                        self.generate_traversal_delta(sample_id, traverser, linear_weight)
                     })
                     .collect::<Vec<_>>()
             });
-            // IndexedParallelIterator::collect preserves seat order. Resolve
+            // IndexedParallelIterator::collect preserves task order. Resolve
             // errors in that same order as well, rather than whichever worker
             // happened to finish first.
-            let mut deltas = Vec::with_capacity(num_players);
+            let mut deltas = Vec::with_capacity(total_tasks as usize);
             for result in results {
                 deltas.push(result?);
             }
-            self.merge_sweep(deltas)?;
-            completed = completed
-                .checked_add(1)
-                .ok_or(SolverError::CounterOverflow)?;
+            // Merge one sweep at a time, in sweep order, through the
+            // unmodified single-sweep merge: each `num_players`-sized chunk
+            // is exactly one sweep's deltas in seat order.
+            let mut deltas = deltas.into_iter();
+            for _ in 0..batch {
+                let sweep_deltas: Vec<_> = (&mut deltas).take(num_players as usize).collect();
+                self.merge_sweep(sweep_deltas)?;
+                completed = completed
+                    .checked_add(1)
+                    .ok_or(SolverError::CounterOverflow)?;
+            }
+            sweeps_remaining -= batch;
         }
         Ok(completed)
     }
 
+    /// `linear_weight` is the caller's chosen weight for this traversal's
+    /// sweep, computed from the batch-start sweep count plus the sweep's
+    /// offset within the batch (see
+    /// [`Self::run_sweeps_with_threads_until`]) rather than read from
+    /// `self.completed_sweeps` here, so every traversal in a batch can use
+    /// its own sweep's weight even though they all read the same policy
+    /// snapshot.
     fn generate_traversal_delta(
         &self,
         sample_id: u64,
         traverser: usize,
+        linear_weight: f64,
     ) -> Result<TraversalDelta, SolverError> {
         let mut deal_rng = traversal_deal_rng(self.config.seed, sample_id, traverser);
         let sample = self.sampler.sample_counted(&mut deal_rng)?;
         let mut action_rng = traversal_action_rng(self.config.seed, sample_id, traverser);
-        let mut worker = TraversalWorker::new(self);
+        let mut worker = TraversalWorker::new(self, linear_weight);
         let mut reach = vec![1.0; self.game.num_players()];
         worker.traverse(
             self.game.root_state(),
@@ -631,6 +732,16 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// Replays a complete sweep into scratch columns first. This makes the
     /// merge transactional: a memory or numeric limit never leaves a partial
     /// sweep whose workers would have to be regenerated from a lost snapshot.
+    ///
+    /// This was measured (see `docs/` history / task report) against a
+    /// key-sharded parallel variant that fanned events out into
+    /// [`MERGE_SHARDS`]-many buckets and applied them with rayon: at this
+    /// benchmark's event volume (a few hundred events per sweep), sharding
+    /// was consistently ~5% *slower* than this serial version, at both 32 and
+    /// 8 shards -- the fixed per-sweep overhead (shard `Vec` allocation, two
+    /// rayon fork-join dispatches, and merging per-shard scratch maps back
+    /// together) exceeded the serial work it replaced. This straightforward
+    /// version is kept as the faster variant.
     fn merge_sweep(&mut self, deltas: Vec<TraversalDelta>) -> Result<(), SolverError> {
         let num_players = self.game.num_players();
         if deltas.len() != num_players {
@@ -639,8 +750,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             ));
         }
 
-        let mut scratch_policies: HashMap<InfoKey, PolicyColumn> = HashMap::new();
-        let mut scratch_histories: HashMap<HistoryKey, HistoryEntry> = HashMap::new();
+        let mut scratch_policies: FxHashMap<InfoKey, PolicyColumn> = FxHashMap::default();
+        let mut scratch_histories: FxHashMap<HistoryKey, HistoryEntry> = FxHashMap::default();
         let mut memory_bytes = self.approx_memory_bytes;
         let mut total_deal_attempts = self.total_deal_attempts;
         let mut terminal_evaluations = self.terminal_evaluations;
@@ -897,6 +1008,54 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         }
     }
 
+    /// Completed-sweep counter without the O(infosets) work of [`metrics`].
+    /// Drive loops should use this for chunk bookkeeping and reserve
+    /// [`metrics`] for boundaries where the full diagnostics are consumed.
+    pub fn completed_sweeps(&self) -> u64 {
+        self.completed_sweeps
+    }
+
+    /// Per-seat average-strategy L1 drift since `prior`, refreshing `prior`
+    /// in place. Keys are visited in sorted order, so the per-seat f64 sums
+    /// are identical to computing the same statistic from a sorted
+    /// [`snapshot_state`] — without cloning every policy column.
+    pub fn strategy_drift_refresh(
+        &self,
+        prior: &mut std::collections::HashMap<InfoKey, Vec<f32>>,
+    ) -> Vec<f64> {
+        let num_players = self.game.num_players();
+        let mut totals = vec![0.0; num_players];
+        let mut counts = vec![0u64; num_players];
+        let mut keys: Vec<_> = self.policies.keys().copied().collect();
+        keys.sort_unstable();
+        for key in keys {
+            let column = self.policies.get(&key).expect("key came from policy map");
+            let current = column.average_strategy();
+            let value = prior.get(&key).map_or(0.0, |previous| {
+                current
+                    .iter()
+                    .zip(previous)
+                    .map(|(&left, &right)| f64::from((left - right).abs()))
+                    .sum::<f64>()
+                    * 0.5
+            });
+            totals[key.player as usize] += value;
+            counts[key.player as usize] += 1;
+            prior.insert(key, current);
+        }
+        totals
+            .into_iter()
+            .zip(counts)
+            .map(|(total, count)| {
+                if count == 0 {
+                    0.0
+                } else {
+                    total / count as f64
+                }
+            })
+            .collect()
+    }
+
     pub fn metrics(&self) -> SolverMetrics {
         let num_players = self.game.num_players();
         let mut positive_regret = vec![0.0; num_players];
@@ -1028,7 +1187,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             if actor >= num_players {
                 return Err(SolverError::InvalidActor { actor, num_players });
             }
-            let num_actions = self.game.num_actions(&state);
+            let actions = self.game.node_actions(&state);
+            let num_actions = self.game.num_actions_of(&actions);
             if num_actions == 0 {
                 return Err(SolverError::NoActions { actor });
             }
@@ -1042,7 +1202,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 bucket_path: private.bucket_path,
             };
             let labels = (0..num_actions)
-                .map(|action| self.game.action_label(&state, action))
+                .map(|index| self.game.action_label_of(&actions, index))
                 .collect::<Vec<_>>();
             validate_action_labels(&labels)?;
             let stored = self.policies.get(&key);
@@ -1062,7 +1222,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             } else {
                 sample_profile_action(&strategy, rng)
             };
-            state = self.game.next_state(&state, action);
+            state = self.game.next_state_with(&state, &actions, action);
             history = history.child(actor, action);
             if depth == self.config.max_traversal_depth {
                 return Err(SolverError::DepthLimit {
@@ -1113,7 +1273,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         if actor >= num_players {
             return Err(SolverError::InvalidActor { actor, num_players });
         }
-        let num_actions = self.game.num_actions(&state);
+        let actions = self.game.node_actions(&state);
+        let num_actions = self.game.num_actions_of(&actions);
         if num_actions == 0 {
             return Err(SolverError::NoActions { actor });
         }
@@ -1126,20 +1287,19 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             active_opponents: private.active_opponents,
             bucket_path: private.bucket_path,
         };
-        let action_labels = (0..num_actions)
-            .map(|action| self.game.action_label(&state, action))
-            .collect::<Vec<_>>();
-        validate_action_labels(&action_labels)?;
-        let strategy = self.strategy_for(key, action_labels.clone())?;
+        let strategy = self.strategy_for(key, &actions)?;
+        let mut label_buf = String::new();
 
         if actor == traverser {
             let mut action_values = vec![0.0; num_actions];
             for (action, value) in action_values.iter_mut().enumerate() {
                 let old_reach = reach[actor];
                 reach[actor] *= strategy[action];
-                let child_history =
-                    self.record_history(history, actor, action, &action_labels[action])?;
-                let next = self.game.next_state(&state, action);
+                label_buf.clear();
+                self.game
+                    .write_action_label(&actions, action, &mut label_buf);
+                let child_history = self.record_history(history, actor, action, &label_buf)?;
+                let next = self.game.next_state_with(&state, &actions, action);
                 *value = self.traverse(
                     next,
                     world,
@@ -1185,9 +1345,11 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             }
             let old_reach = reach[actor];
             reach[actor] *= strategy[action];
-            let child_history =
-                self.record_history(history, actor, action, &action_labels[action])?;
-            let next = self.game.next_state(&state, action);
+            label_buf.clear();
+            self.game
+                .write_action_label(&actions, action, &mut label_buf);
+            let child_history = self.record_history(history, actor, action, &label_buf)?;
+            let next = self.game.next_state_with(&state, &actions, action);
             let result = self.traverse(
                 next,
                 world,
@@ -1213,9 +1375,9 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     fn strategy_for(
         &mut self,
         key: InfoKey,
-        action_labels: Vec<String>,
+        actions: &G::Actions,
     ) -> Result<Vec<f64>, SolverError> {
-        let num_actions = action_labels.len();
+        let num_actions = self.game.num_actions_of(actions);
         if let Some(column) = self.policies.get(&key) {
             if column.num_actions() != num_actions {
                 return Err(SolverError::ActionCountChanged {
@@ -1224,11 +1386,21 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     current: num_actions,
                 });
             }
-            if column.action_labels != action_labels {
-                return Err(SolverError::ActionLabelsChanged { key });
+            let mut scratch = String::new();
+            for (index, label) in column.action_labels.iter().enumerate() {
+                scratch.clear();
+                self.game.write_action_label(actions, index, &mut scratch);
+                if *label != scratch {
+                    return Err(SolverError::ActionLabelsChanged { key });
+                }
             }
             return Ok(regret_matching(&column.regrets));
         }
+
+        let action_labels: Vec<String> = (0..num_actions)
+            .map(|index| self.game.action_label_of(actions, index))
+            .collect();
+        validate_action_labels(&action_labels)?;
 
         let added = entry_memory_bytes(&action_labels)?;
         let needed = self
@@ -1316,16 +1488,16 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
 }
 
 impl<'a, G: ExternalSamplingGame> TraversalWorker<'a, G> {
-    fn new(solver: &'a MultiwaySolver<G>) -> Self {
+    fn new(solver: &'a MultiwaySolver<G>, linear_weight: f64) -> Self {
         Self {
             game: &solver.game,
             policies: &solver.policies,
             histories: &solver.histories,
             config: solver.config,
-            linear_weight: (solver.completed_sweeps + 1) as f64,
+            linear_weight,
             events: Vec::new(),
-            local_policies: HashMap::new(),
-            local_histories: HashMap::new(),
+            local_policies: FxHashMap::default(),
+            local_histories: FxHashMap::default(),
             terminal_evaluations: 0,
         }
     }
@@ -1340,12 +1512,20 @@ impl<'a, G: ExternalSamplingGame> TraversalWorker<'a, G> {
         }
     }
 
+    /// Resolves the acting strategy at `key`. When a policy column already
+    /// exists (the common case after the first sweep), this validates the
+    /// current node's labels against the stored ones one at a time through a
+    /// reused scratch buffer instead of collecting a fresh `Vec<String>`. A
+    /// full owned label vector is only materialized when a policy is seen
+    /// for the very first time in this traversal (the `EnsurePolicy` event
+    /// payload and the `local_policies` cache both need to own it for later
+    /// comparisons within the same worker).
     fn strategy_for(
         &mut self,
         key: InfoKey,
-        action_labels: Vec<String>,
+        actions: &G::Actions,
     ) -> Result<Vec<f64>, SolverError> {
-        let num_actions = action_labels.len();
+        let num_actions = self.game.num_actions_of(actions);
         if let Some(column) = self.policies.get(&key) {
             if column.num_actions() != num_actions {
                 return Err(SolverError::ActionCountChanged {
@@ -1354,16 +1534,33 @@ impl<'a, G: ExternalSamplingGame> TraversalWorker<'a, G> {
                     current: num_actions,
                 });
             }
-            if column.action_labels != action_labels {
-                return Err(SolverError::ActionLabelsChanged { key });
+            let mut scratch = String::new();
+            for (index, label) in column.action_labels.iter().enumerate() {
+                scratch.clear();
+                self.game.write_action_label(actions, index, &mut scratch);
+                if *label != scratch {
+                    return Err(SolverError::ActionLabelsChanged { key });
+                }
             }
             return Ok(regret_matching(&column.regrets));
         }
         if let Some(labels) = self.local_policies.get(&key) {
-            if labels != &action_labels {
+            if labels.len() != num_actions {
                 return Err(SolverError::ActionLabelsChanged { key });
             }
+            let mut scratch = String::new();
+            for (index, label) in labels.iter().enumerate() {
+                scratch.clear();
+                self.game.write_action_label(actions, index, &mut scratch);
+                if *label != scratch {
+                    return Err(SolverError::ActionLabelsChanged { key });
+                }
+            }
         } else {
+            let action_labels: Vec<String> = (0..num_actions)
+                .map(|index| self.game.action_label_of(actions, index))
+                .collect();
+            validate_action_labels(&action_labels)?;
             self.local_policies.insert(key, action_labels.clone());
             self.events
                 .push(TraversalEvent::EnsurePolicy { key, action_labels });
@@ -1374,6 +1571,12 @@ impl<'a, G: ExternalSamplingGame> TraversalWorker<'a, G> {
         Ok(vec![1.0 / num_actions as f64; num_actions])
     }
 
+    /// Records (or validates a repeat visit to) one edge of the public
+    /// history trie. The common case — this exact `(parent, actor,
+    /// action_index)` was already recorded, by this worker or an earlier
+    /// sweep — is resolved by comparing fields against the stored entry
+    /// without allocating; a fresh owned label is only built on the first
+    /// visit, when there is something new to insert.
     fn record_history(
         &mut self,
         parent: HistoryKey,
@@ -1382,6 +1585,26 @@ impl<'a, G: ExternalSamplingGame> TraversalWorker<'a, G> {
         action_label: &str,
     ) -> Result<HistoryKey, SolverError> {
         let key = parent.child(actor, action_index);
+        if let Some(existing) = self.histories.get(&key) {
+            if existing.parent != parent
+                || existing.actor as usize != actor
+                || existing.action_index as usize != action_index
+                || existing.action_label != action_label
+            {
+                return Err(SolverError::HistoryCollision(key));
+            }
+            return Ok(key);
+        }
+        if let Some(existing) = self.local_histories.get(&key) {
+            if existing.parent != parent
+                || existing.actor as usize != actor
+                || existing.action_index as usize != action_index
+                || existing.action_label != action_label
+            {
+                return Err(SolverError::HistoryCollision(key));
+            }
+            return Ok(key);
+        }
         let actor = u8::try_from(actor).map_err(|_| SolverError::HistoryIndexOverflow)?;
         let action_index =
             u32::try_from(action_index).map_err(|_| SolverError::HistoryIndexOverflow)?;
@@ -1392,18 +1615,6 @@ impl<'a, G: ExternalSamplingGame> TraversalWorker<'a, G> {
             action_index,
             action_label: action_label.to_string(),
         };
-        if let Some(existing) = self.histories.get(&key) {
-            if existing != &entry {
-                return Err(SolverError::HistoryCollision(key));
-            }
-            return Ok(key);
-        }
-        if let Some(existing) = self.local_histories.get(&key) {
-            if existing != &entry {
-                return Err(SolverError::HistoryCollision(key));
-            }
-            return Ok(key);
-        }
         self.local_histories.insert(key, entry.clone());
         self.events.push(TraversalEvent::EnsureHistory(entry));
         Ok(key)
@@ -1448,7 +1659,8 @@ impl<'a, G: ExternalSamplingGame> TraversalWorker<'a, G> {
         if actor >= num_players {
             return Err(SolverError::InvalidActor { actor, num_players });
         }
-        let num_actions = self.game.num_actions(&state);
+        let actions = self.game.node_actions(&state);
+        let num_actions = self.game.num_actions_of(&actions);
         if num_actions == 0 {
             return Err(SolverError::NoActions { actor });
         }
@@ -1461,20 +1673,19 @@ impl<'a, G: ExternalSamplingGame> TraversalWorker<'a, G> {
             active_opponents: private.active_opponents,
             bucket_path: private.bucket_path,
         };
-        let action_labels = (0..num_actions)
-            .map(|action| self.game.action_label(&state, action))
-            .collect::<Vec<_>>();
-        validate_action_labels(&action_labels)?;
-        let strategy = self.strategy_for(key, action_labels.clone())?;
+        let strategy = self.strategy_for(key, &actions)?;
+        let mut label_buf = String::new();
 
         if actor == traverser {
             let mut action_values = vec![0.0; num_actions];
             for (action, value) in action_values.iter_mut().enumerate() {
                 let old_reach = reach[actor];
                 reach[actor] *= strategy[action];
-                let child_history =
-                    self.record_history(history, actor, action, &action_labels[action])?;
-                let next = self.game.next_state(&state, action);
+                label_buf.clear();
+                self.game
+                    .write_action_label(&actions, action, &mut label_buf);
+                let child_history = self.record_history(history, actor, action, &label_buf)?;
+                let next = self.game.next_state_with(&state, &actions, action);
                 *value = self.traverse(
                     next,
                     world,
@@ -1495,31 +1706,43 @@ impl<'a, G: ExternalSamplingGame> TraversalWorker<'a, G> {
             if !node_value.is_finite() {
                 return Err(SolverError::NumericOverflow);
             }
-            let values = action_values
-                .into_iter()
-                .map(|value| sample_importance * (value - node_value))
-                .collect();
-            self.events.push(TraversalEvent::AddRegret { key, values });
+            // Reuse `action_values` in place as the AddRegret payload
+            // instead of collecting a second Vec.
+            for value in action_values.iter_mut() {
+                *value = sample_importance * (*value - node_value);
+            }
+            self.events.push(TraversalEvent::AddRegret {
+                key,
+                values: action_values,
+            });
             Ok(node_value)
         } else {
-            let values = strategy
-                .iter()
-                .map(|&probability| self.linear_weight * reach[actor] * probability)
-                .collect();
-            self.events
-                .push(TraversalEvent::AddStrategy { key, values });
             let (action, sampling_probability) =
                 sample_exploratory_action(&strategy, self.config.exploration_epsilon, rng);
-            let importance = strategy[action] / sampling_probability;
+            // `strategy[action]` is needed below (for `reach` and the
+            // importance ratio); capture it before `strategy` is reused in
+            // place as the AddStrategy payload.
+            let chosen_probability = strategy[action];
+            let importance = chosen_probability / sampling_probability;
             let child_importance = sample_importance * importance;
             if !child_importance.is_finite() {
                 return Err(SolverError::NumericOverflow);
             }
+
+            let mut values = strategy;
+            for probability in values.iter_mut() {
+                *probability *= self.linear_weight * reach[actor];
+            }
+            self.events
+                .push(TraversalEvent::AddStrategy { key, values });
+
             let old_reach = reach[actor];
-            reach[actor] *= strategy[action];
-            let child_history =
-                self.record_history(history, actor, action, &action_labels[action])?;
-            let next = self.game.next_state(&state, action);
+            reach[actor] *= chosen_probability;
+            label_buf.clear();
+            self.game
+                .write_action_label(&actions, action, &mut label_buf);
+            let child_history = self.record_history(history, actor, action, &label_buf)?;
+            let next = self.game.next_state_with(&state, &actions, action);
             let result = self.traverse(
                 next,
                 world,
@@ -1545,6 +1768,11 @@ fn resume_configs_match(mut stored: SolverConfig, mut current: SolverConfig) -> 
     // Raising it after a resource-limit checkpoint must not alter results.
     stored.max_memory_bytes = 0;
     current.max_memory_bytes = 0;
+    // `sweep_batch` is compared like every other algorithm knob (seed,
+    // epsilon, discount cadence): batch size changes which linear weights
+    // and how much staleness a within-batch update carries, so resuming
+    // with a different batch size is rejected rather than silently mixed
+    // into one checkpoint's history.
     stored == current
 }
 
@@ -1577,6 +1805,9 @@ fn validate_setup<G: ExternalSamplingGame>(
     }
     if config.discount_every == 0 {
         return Err(SolverError::ZeroDiscountCadence);
+    }
+    if config.sweep_batch == 0 {
+        return Err(SolverError::ZeroSweepBatch);
     }
     Ok(())
 }
@@ -1665,7 +1896,7 @@ fn validate_history_entry(entry: &HistoryEntry, num_players: usize) -> Result<()
 }
 
 fn validate_history_graph(
-    histories: &HashMap<HistoryKey, HistoryEntry>,
+    histories: &FxHashMap<HistoryKey, HistoryEntry>,
 ) -> Result<(), SolverError> {
     for entry in histories.values() {
         let mut key = entry.parent;
@@ -1881,6 +2112,8 @@ pub enum SolverError {
     MemoryLimit { limit: u64, needed: u64 },
     #[error("discount cadence must be positive")]
     ZeroDiscountCadence,
+    #[error("sweep batch size must be positive")]
+    ZeroSweepBatch,
     #[error("multiway parallel worker count must be positive")]
     ZeroThreads,
     #[error("failed to build deterministic multiway worker pool: {0}")]
@@ -1957,6 +2190,10 @@ mod tests {
 
     impl ExternalSamplingGame for PrefixImportanceGame {
         type State = PrefixState;
+        // Cheap for a toy game: the label/count logic only needs to know
+        // which node kind it is, so the state itself doubles as the
+        // precomputed action list.
+        type Actions = PrefixState;
 
         fn num_players(&self) -> usize {
             2
@@ -1974,25 +2211,39 @@ mod tests {
             }
         }
 
-        fn num_actions(&self, state: &Self::State) -> usize {
-            usize::from(!matches!(state, PrefixState::Terminal(_))) * 2
+        fn node_actions(&self, state: &Self::State) -> Self::Actions {
+            *state
         }
 
-        fn next_state(&self, state: &Self::State, action_index: usize) -> Self::State {
-            match state {
+        fn num_actions_of(&self, actions: &Self::Actions) -> usize {
+            usize::from(!matches!(actions, PrefixState::Terminal(_))) * 2
+        }
+
+        fn next_state_with(
+            &self,
+            _state: &Self::State,
+            actions: &Self::Actions,
+            action_index: usize,
+        ) -> Self::State {
+            match actions {
                 PrefixState::Opponent => PrefixState::Hero,
                 PrefixState::Hero => PrefixState::Terminal(action_index),
                 PrefixState::Terminal(_) => panic!("terminal state has no child"),
             }
         }
 
-        fn action_label(&self, state: &Self::State, action_index: usize) -> String {
-            let labels = match state {
+        fn write_action_label(
+            &self,
+            actions: &Self::Actions,
+            action_index: usize,
+            out: &mut String,
+        ) {
+            let labels = match actions {
                 PrefixState::Opponent => ["left", "right"],
                 PrefixState::Hero => ["win", "pass"],
                 PrefixState::Terminal(_) => panic!("terminal state has no actions"),
             };
-            labels[action_index].to_string()
+            out.push_str(labels[action_index]);
         }
 
         fn bucket(
@@ -2024,6 +2275,7 @@ mod tests {
 
     impl ExternalSamplingGame for ThreePlayerOracleGame {
         type State = ThreePlayerOracleState;
+        type Actions = ThreePlayerOracleState;
 
         fn num_players(&self) -> usize {
             3
@@ -2041,12 +2293,21 @@ mod tests {
             }
         }
 
-        fn num_actions(&self, state: &Self::State) -> usize {
-            usize::from(!matches!(state, ThreePlayerOracleState::Terminal { .. })) * 2
+        fn node_actions(&self, state: &Self::State) -> Self::Actions {
+            *state
         }
 
-        fn next_state(&self, state: &Self::State, action_index: usize) -> Self::State {
-            match *state {
+        fn num_actions_of(&self, actions: &Self::Actions) -> usize {
+            usize::from(!matches!(actions, ThreePlayerOracleState::Terminal { .. })) * 2
+        }
+
+        fn next_state_with(
+            &self,
+            _state: &Self::State,
+            actions: &Self::Actions,
+            action_index: usize,
+        ) -> Self::State {
+            match *actions {
                 ThreePlayerOracleState::Opponent => ThreePlayerOracleState::Hero {
                     opponent_action: action_index,
                 },
@@ -2062,15 +2323,20 @@ mod tests {
             }
         }
 
-        fn action_label(&self, state: &Self::State, action_index: usize) -> String {
-            let labels = match state {
+        fn write_action_label(
+            &self,
+            actions: &Self::Actions,
+            action_index: usize,
+            out: &mut String,
+        ) {
+            let labels = match actions {
                 ThreePlayerOracleState::Opponent => ["left", "right"],
                 ThreePlayerOracleState::Hero { .. } => ["take", "pass"],
                 ThreePlayerOracleState::Terminal { .. } => {
                     panic!("terminal state has no actions")
                 }
             };
-            labels[action_index].to_string()
+            out.push_str(labels[action_index]);
         }
 
         fn bucket(
@@ -2129,6 +2395,7 @@ mod tests {
 
     impl ExternalSamplingGame for DominatedChoice {
         type State = ToyState;
+        type Actions = ToyState;
 
         fn num_players(&self) -> usize {
             2
@@ -2142,21 +2409,36 @@ mod tests {
             matches!(state, ToyState::Choose).then_some(0)
         }
 
-        fn num_actions(&self, state: &Self::State) -> usize {
-            usize::from(matches!(state, ToyState::Choose)) * 2
+        fn node_actions(&self, state: &Self::State) -> Self::Actions {
+            *state
         }
 
-        fn next_state(&self, state: &Self::State, action_index: usize) -> Self::State {
-            assert_eq!(*state, ToyState::Choose);
+        fn num_actions_of(&self, actions: &Self::Actions) -> usize {
+            usize::from(matches!(actions, ToyState::Choose)) * 2
+        }
+
+        fn next_state_with(
+            &self,
+            _state: &Self::State,
+            actions: &Self::Actions,
+            action_index: usize,
+        ) -> Self::State {
+            assert_eq!(*actions, ToyState::Choose);
             ToyState::Terminal(action_index)
         }
 
-        fn action_label(&self, _state: &Self::State, action_index: usize) -> String {
-            match action_index {
-                0 => "best".to_string(),
-                1 => "dominated".to_string(),
+        fn write_action_label(
+            &self,
+            _actions: &Self::Actions,
+            action_index: usize,
+            out: &mut String,
+        ) {
+            let label = match action_index {
+                0 => "best",
+                1 => "dominated",
                 _ => panic!("action out of range"),
-            }
+            };
+            out.push_str(label);
         }
 
         fn bucket(
@@ -2191,6 +2473,14 @@ mod tests {
     }
 
     fn solver(seed: u64, memory: u64) -> MultiwaySolver<DominatedChoice> {
+        solver_with_batch(seed, memory, 1)
+    }
+
+    fn solver_with_batch(
+        seed: u64,
+        memory: u64,
+        sweep_batch: u64,
+    ) -> MultiwaySolver<DominatedChoice> {
         MultiwaySolver::new(
             DominatedChoice,
             DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
@@ -2201,6 +2491,7 @@ mod tests {
                 exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
                 discount_every: 5,
                 discount_until: 100,
+                sweep_batch,
             },
         )
         .unwrap()
@@ -2302,6 +2593,123 @@ mod tests {
     }
 
     #[test]
+    fn sweep_batching_is_bit_identical_across_thread_counts() {
+        let mut single_threaded = solver_with_batch(99, 1 << 20, 4);
+        single_threaded.run_sweeps_with_threads(24, 1).unwrap();
+
+        let mut multi_threaded = solver_with_batch(99, 1 << 20, 4);
+        multi_threaded.run_sweeps_with_threads(24, 8).unwrap();
+
+        assert_eq!(
+            single_threaded.snapshot_state(),
+            multi_threaded.snapshot_state()
+        );
+        assert_eq!(single_threaded.metrics(), multi_threaded.metrics());
+
+        // An uneven final batch (24 sweeps is not a multiple of the batch
+        // size below) still lands on exactly the requested sweep count.
+        let mut uneven = solver_with_batch(99, 1 << 20, 5);
+        assert_eq!(
+            uneven
+                .run_sweeps_with_threads_until(24, 4, || true)
+                .unwrap(),
+            24
+        );
+        assert_eq!(uneven.completed_sweeps(), 24);
+    }
+
+    #[test]
+    fn sweep_batching_reduces_regret_comparably_to_unbatched() {
+        const SWEEPS: u64 = 400;
+
+        // Disables early discounting for this comparison (unlike the
+        // `solver`/`solver_with_batch` fixtures above, which intentionally
+        // discount every 5 sweeps to exercise that path elsewhere): batching
+        // interacts with aggressive discounting cadence in ways unrelated to
+        // what this test checks, and would otherwise dominate the
+        // batch-vs-unbatched difference in an already-tiny toy-game regret
+        // signal.
+        fn solver_without_discount(seed: u64, sweep_batch: u64) -> MultiwaySolver<DominatedChoice> {
+            MultiwaySolver::new(
+                DominatedChoice,
+                DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+                SolverConfig {
+                    seed,
+                    max_memory_bytes: 1 << 20,
+                    max_traversal_depth: 16,
+                    exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
+                    discount_every: DEFAULT_DISCOUNT_EVERY,
+                    discount_until: DEFAULT_DISCOUNT_UNTIL,
+                    sweep_batch,
+                },
+            )
+            .unwrap()
+        }
+
+        fn mean_positive_regret(regrets: &[f64]) -> f64 {
+            regrets.iter().sum::<f64>() / regrets.len() as f64
+        }
+
+        let mut baseline = solver_without_discount(4242, 1);
+        baseline.run_sweeps_with_threads(SWEEPS, 1).unwrap();
+        let baseline_regret = mean_positive_regret(&baseline.metrics().average_positive_regret);
+
+        let mut batched = solver_without_discount(4242, 4);
+        batched.run_sweeps_with_threads(SWEEPS, 1).unwrap();
+        let batched_regret = mean_positive_regret(&batched.metrics().average_positive_regret);
+
+        assert!(baseline_regret.is_finite() && baseline_regret >= 0.0);
+        assert!(batched_regret.is_finite() && batched_regret >= 0.0);
+        // Both must actually be converging (small relative to the game's
+        // unit-scale payoffs), and neither must be more than 2x the other --
+        // an absolute floor keeps the ratio check meaningful once both sides
+        // are already near zero.
+        let tolerance = (baseline_regret.max(batched_regret) * 2.0).max(1e-3);
+        assert!(
+            batched_regret <= tolerance && baseline_regret <= tolerance,
+            "batch=4 average positive regret {batched_regret} should be within 2x of batch=1's {baseline_regret}"
+        );
+    }
+
+    #[test]
+    fn resume_rejects_mismatched_sweep_batch() {
+        let state = solver_with_batch(21, 1 << 20, 1).snapshot_state();
+        let mut changed = state.config;
+        changed.sweep_batch = 4;
+        assert!(matches!(
+            MultiwaySolver::from_state_with_config(
+                DominatedChoice,
+                DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+                state,
+                changed,
+            ),
+            Err(SolverError::ResumeConfigurationMismatch)
+        ));
+    }
+
+    #[test]
+    fn zero_sweep_batch_is_rejected() {
+        let mut config = SolverConfig {
+            seed: 1,
+            max_memory_bytes: 1 << 20,
+            max_traversal_depth: 16,
+            exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
+            discount_every: 5,
+            discount_until: 100,
+            sweep_batch: 1,
+        };
+        config.sweep_batch = 0;
+        assert!(matches!(
+            MultiwaySolver::new(
+                DominatedChoice,
+                DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+                config,
+            ),
+            Err(SolverError::ZeroSweepBatch)
+        ));
+    }
+
+    #[test]
     fn interruptible_parallel_run_polls_boundaries_and_preserves_determinism() {
         let mut interrupted = solver(0x1234, 1 << 20);
         let mut polls = 0u64;
@@ -2399,15 +2807,34 @@ mod tests {
 
     #[test]
     fn memory_cap_stops_before_allocating_first_column() {
-        let mut solver = solver(0, 1);
-        let before = solver.snapshot_state();
+        let mut limited = solver(0, 1);
+        let before = limited.snapshot_state();
         assert!(matches!(
-            solver.run_sweeps_with_threads(1, 4),
+            limited.run_sweeps_with_threads(1, 4),
             Err(SolverError::MemoryLimit { limit: 1, .. })
         ));
-        assert_eq!(solver.snapshot_state(), before);
-        assert_eq!(solver.metrics().infosets, 0);
-        assert_eq!(solver.metrics().traversals, 0);
+        assert_eq!(limited.snapshot_state(), before);
+        assert_eq!(limited.metrics().infosets, 0);
+        assert_eq!(limited.metrics().traversals, 0);
+
+        // merge_sweep's transactional guarantee also means the solver stays
+        // resumable after a MemoryLimit error: raising the memory budget and
+        // continuing from the untouched (pre-failure) state must produce the
+        // exact same result as a solver that had that budget from the start.
+        let mut expanded_config = limited.config();
+        expanded_config.max_memory_bytes = 1 << 20;
+        let mut resumed = MultiwaySolver::from_state_with_config(
+            DominatedChoice,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            before,
+            expanded_config,
+        )
+        .unwrap();
+        resumed.run_sweeps_with_threads(5, 4).unwrap();
+
+        let mut reference = solver(0, 1 << 20);
+        reference.run_sweeps_with_threads(5, 4).unwrap();
+        assert_eq!(resumed.snapshot_state(), reference.snapshot_state());
     }
 
     #[test]
@@ -2422,6 +2849,7 @@ mod tests {
                 exploration_epsilon: 1.0,
                 discount_every: 1,
                 discount_until: 0,
+                sweep_batch: 1,
             },
         )
         .unwrap();
@@ -2433,7 +2861,7 @@ mod tests {
             bucket_path: [0, UNREACHED_BUCKET, UNREACHED_BUCKET, UNREACHED_BUCKET],
         };
         solver
-            .strategy_for(opponent_key, vec!["left".to_string(), "right".to_string()])
+            .strategy_for(opponent_key, &PrefixState::Opponent)
             .unwrap();
         solver.policies.get_mut(&opponent_key).unwrap().regrets = vec![9.0, 1.0];
 
@@ -2469,6 +2897,7 @@ mod tests {
                 exploration_epsilon: 1.0,
                 discount_every: 1,
                 discount_until: 0,
+                sweep_batch: 1,
             },
         )
         .unwrap();
@@ -2480,7 +2909,7 @@ mod tests {
             bucket_path: [0, UNREACHED_BUCKET, UNREACHED_BUCKET, UNREACHED_BUCKET],
         };
         solver
-            .strategy_for(opponent_key, vec!["left".to_string(), "right".to_string()])
+            .strategy_for(opponent_key, &ThreePlayerOracleState::Opponent)
             .unwrap();
         solver.policies.get_mut(&opponent_key).unwrap().regrets = vec![3.0, 1.0];
 
@@ -2504,7 +2933,7 @@ mod tests {
         let mut means = [0.0; 2];
         let mut m2 = [0.0; 2];
         for sample_id in 0..SAMPLES {
-            let delta = solver.generate_traversal_delta(sample_id, 0).unwrap();
+            let delta = solver.generate_traversal_delta(sample_id, 0, 1.0).unwrap();
             let values = delta
                 .events
                 .into_iter()

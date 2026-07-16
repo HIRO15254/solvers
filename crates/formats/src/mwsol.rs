@@ -13,8 +13,16 @@ use serde::{Deserialize, Serialize};
 use crate::{Estimate, MULTIWAY_SCHEMA_VERSION, config_hash, config_hash_hex};
 
 pub const MWSOL_HEADER_LEN: usize = 8 + 2 + 32 + 32 + 8 + 8 + 8 + 8 + 8 + 32 + 32;
-pub const MWSOL_FORMAT_VERSION: u16 = 2;
+pub const MWSOL_FORMAT_VERSION: u16 = 3;
+/// Oldest on-disk version this reader still accepts. Version 2 frames are
+/// plain postcard-encoded `MultiwayStrategyBlock`s (no quantization
+/// support); version 3 wraps each frame in `FrameBlock` so it can carry
+/// either an `F32` or `I16`-quantized payload.
+pub const MWSOL_MIN_FORMAT_VERSION: u16 = 2;
 pub const MWSOL_MAX_PAGE_LIMIT: usize = 4096;
+/// Denominator used by i16 quantization (`i16::MAX`): quantized entries for
+/// a block always sum to exactly this value.
+const MWSOL_I16_DENOMINATOR: i16 = i16::MAX;
 const MWSOL_INDEX_ENTRY_LEN: usize = 16 + 1 + 1 + 1 + 4 * 4 + 8 + 8 + 8 + 32;
 const MAGIC: &[u8; 8] = b"SLVRMWSL";
 const MAX_METADATA_UNCOMPRESSED_BYTES: u64 = 4 * 1024 * 1024 * 1024;
@@ -28,7 +36,8 @@ pub struct MultiwayStrategyKey {
     pub actor: u8,
     pub street: u8,
     pub active_opponents: u8,
-    /// Full private recall. Entries after the current street are zero.
+    /// Full private recall. Entries after the current street hold the
+    /// solver's unreached-bucket sentinel (`u32::MAX`), never zero.
     pub bucket_path: [u32; 4],
 }
 
@@ -55,6 +64,120 @@ pub struct MultiwayStrategyBlock {
     /// Structured labels such as `fold`, `call`, and `raise-to:2500`.
     pub actions: Vec<String>,
     pub probabilities: Vec<f32>,
+}
+
+/// Per-frame on-disk representation, selected by [`write_mwsol_with`].
+/// `MultiwayStrategyBlock` (the in-memory, always-`f32` type) never changes;
+/// this is purely a codec detail of the `.mwsol` version-3 frame payload.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum MwsolStorage {
+    /// Store probabilities verbatim as `f32`.
+    F32,
+    /// Quantize probabilities to `i16` fixed point (denominator
+    /// `i16::MAX`), roughly halving strategy payload size.
+    I16,
+}
+
+/// Version-3 frame payload. Version-2 files instead store a plain
+/// postcard-encoded `MultiwayStrategyBlock` per frame with no wrapping enum;
+/// `MwSolReader` branches on `format_version()` to pick the right decode.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+enum FrameBlock {
+    F32 {
+        key: MultiwayStrategyKey,
+        actions: Vec<String>,
+        probabilities: Vec<f32>,
+    },
+    I16 {
+        key: MultiwayStrategyKey,
+        actions: Vec<String>,
+        quantized: Vec<i16>,
+    },
+}
+
+impl FrameBlock {
+    fn from_block(block: &MultiwayStrategyBlock, storage: MwsolStorage) -> Self {
+        match storage {
+            MwsolStorage::F32 => FrameBlock::F32 {
+                key: block.key,
+                actions: block.actions.clone(),
+                probabilities: block.probabilities.clone(),
+            },
+            MwsolStorage::I16 => FrameBlock::I16 {
+                key: block.key,
+                actions: block.actions.clone(),
+                quantized: quantize_i16(&block.probabilities),
+            },
+        }
+    }
+
+    fn into_block(self) -> MultiwayStrategyBlock {
+        match self {
+            FrameBlock::F32 {
+                key,
+                actions,
+                probabilities,
+            } => MultiwayStrategyBlock {
+                key,
+                actions,
+                probabilities,
+            },
+            FrameBlock::I16 {
+                key,
+                actions,
+                quantized,
+            } => {
+                let probabilities = quantized
+                    .iter()
+                    .map(|&q| f32::from(q) / f32::from(MWSOL_I16_DENOMINATOR))
+                    .collect();
+                MultiwayStrategyBlock {
+                    key,
+                    actions,
+                    probabilities,
+                }
+            }
+        }
+    }
+}
+
+/// Quantizes probabilities to `i16` fixed point with denominator
+/// `i16::MAX` (32767) using the largest-remainder method, so
+/// `sum(quantized) == 32767` exactly and every entry is `>= 0`. Input need
+/// not sum exactly to `1.0`; it is normalized by its own sum first, so this
+/// tolerates the same `1e-4` slack `validate_strategy_block` allows.
+fn quantize_i16(probabilities: &[f32]) -> Vec<i16> {
+    let denominator = f64::from(MWSOL_I16_DENOMINATOR);
+    let sum: f64 = probabilities.iter().map(|&p| f64::from(p)).sum();
+    if probabilities.is_empty() || sum <= 0.0 || !sum.is_finite() {
+        return vec![0; probabilities.len()];
+    }
+
+    let scaled: Vec<f64> = probabilities
+        .iter()
+        .map(|&p| f64::from(p) / sum * denominator)
+        .collect();
+    let mut floors: Vec<i64> = scaled.iter().map(|&value| value.floor() as i64).collect();
+    let floor_sum: i64 = floors.iter().sum();
+    let remainder = (MWSOL_I16_DENOMINATOR as i64 - floor_sum).clamp(0, floors.len() as i64);
+
+    let mut order: Vec<usize> = (0..probabilities.len()).collect();
+    order.sort_by(|&a, &b| {
+        let fraction_a = scaled[a] - floors[a] as f64;
+        let fraction_b = scaled[b] - floors[b] as f64;
+        fraction_b
+            .partial_cmp(&fraction_a)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| a.cmp(&b))
+    });
+    for &index in order.iter().take(remainder as usize) {
+        floors[index] += 1;
+    }
+
+    floors
+        .into_iter()
+        .map(|value| value.clamp(0, i64::from(MWSOL_I16_DENOMINATOR)) as i16)
+        .collect()
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -316,9 +439,39 @@ pub struct MwSolReader {
     index_start: u64,
     frames_start: u64,
     strategy_count: usize,
+    format_version: u16,
 }
 
+/// Writes an `.mwsol` file with `f32` strategy frames (version 3). Alias
+/// for `write_mwsol_with(path, solution, MwsolStorage::F32)`.
 pub fn write_mwsol(path: &Path, solution: &MultiwaySolution) -> Result<(), MwSolError> {
+    write_mwsol_with(path, solution, MwsolStorage::F32)
+}
+
+/// Writes an `.mwsol` file (version 3), encoding each strategy frame per
+/// `storage`. `I16` quantization happens only at write time; the in-memory
+/// `MultiwaySolution` stays `f32` throughout.
+pub fn write_mwsol_with(
+    path: &Path,
+    solution: &MultiwaySolution,
+    storage: MwsolStorage,
+) -> Result<(), MwSolError> {
+    write_mwsol_frames(path, solution, MWSOL_FORMAT_VERSION, |block| {
+        let frame = FrameBlock::from_block(block, storage);
+        Ok(postcard::to_allocvec(&frame)?)
+    })
+}
+
+/// Shared writer body parameterized over the on-disk format version and a
+/// per-block frame encoder, so tests can synthesize a version-2 file (plain
+/// `MultiwayStrategyBlock` frames) through the exact same machinery that
+/// production version-3 writes use.
+fn write_mwsol_frames(
+    path: &Path,
+    solution: &MultiwaySolution,
+    format_version: u16,
+    encode_frame: impl Fn(&MultiwayStrategyBlock) -> Result<Vec<u8>, MwSolError>,
+) -> Result<(), MwSolError> {
     solution.validate()?;
 
     let metadata = MultiwaySolutionMetadata::from_solution(solution);
@@ -371,7 +524,7 @@ pub fn write_mwsol(path: &Path, solution: &MultiwaySolution) -> Result<(), MwSol
     let mut total_uncompressed_len = metadata_uncompressed_len;
     let mut index_hasher = blake3::Hasher::new();
     for (index, block) in solution.strategies.iter().enumerate() {
-        let raw = postcard::to_allocvec(block)?;
+        let raw = encode_frame(block)?;
         let uncompressed_len = u64::try_from(raw.len()).map_err(|_| MwSolError::LengthOverflow)?;
         if uncompressed_len > MAX_STRATEGY_BLOCK_UNCOMPRESSED_BYTES {
             return Err(MwSolError::StrategyBlockTooLarge {
@@ -444,7 +597,7 @@ pub fn write_mwsol(path: &Path, solution: &MultiwaySolution) -> Result<(), MwSol
         index_checksum: *index_hasher.finalize().as_bytes(),
     };
     temporary.seek(SeekFrom::Start(0))?;
-    temporary.write_all(&encode_header(header))?;
+    temporary.write_all(&encode_header(header, format_version))?;
     temporary.write_all(&metadata_compressed)?;
     temporary.flush()?;
     temporary.as_file().sync_all()?;
@@ -464,7 +617,8 @@ pub fn peek_mwsol_header(path: &Path) -> Result<MwSolHeader, MwSolError> {
             MwSolError::Io(error)
         }
     })?;
-    decode_header(&bytes)
+    let (header, _format_version) = decode_header(&bytes)?;
+    Ok(header)
 }
 
 impl MwSolReader {
@@ -477,7 +631,7 @@ impl MwSolReader {
 
         let mut encoded_header = [0u8; MWSOL_HEADER_LEN];
         file.read_exact(&mut encoded_header)?;
-        let header = decode_header(&encoded_header)?;
+        let (header, format_version) = decode_header(&encoded_header)?;
         if header.metadata_uncompressed_len == 0
             || header.metadata_uncompressed_len > MAX_METADATA_UNCOMPRESSED_BYTES
         {
@@ -620,11 +774,17 @@ impl MwSolReader {
             index_start,
             frames_start,
             strategy_count,
+            format_version,
         })
     }
 
     pub fn header(&self) -> MwSolHeader {
         self.header
+    }
+
+    /// The on-disk format version this file was read as (2 or 3).
+    pub fn format_version(&self) -> u16 {
+        self.format_version
     }
 
     pub fn metadata(&self) -> &MultiwaySolutionMetadata {
@@ -694,7 +854,12 @@ impl MwSolReader {
                 entry.uncompressed_len,
                 MAX_STRATEGY_BLOCK_UNCOMPRESSED_BYTES,
             )?;
-            let block: MultiwayStrategyBlock = postcard::from_bytes(&raw)?;
+            let block: MultiwayStrategyBlock = if self.format_version >= 3 {
+                let frame: FrameBlock = postcard::from_bytes(&raw)?;
+                frame.into_block()
+            } else {
+                postcard::from_bytes(&raw)?
+            };
             if block.key != entry.key {
                 return Err(MwSolError::StrategyKeyMismatch {
                     index,
@@ -731,10 +896,10 @@ pub fn read_mwsol(path: &Path) -> Result<MultiwaySolution, MwSolError> {
     Ok(solution)
 }
 
-fn encode_header(header: MwSolHeader) -> [u8; MWSOL_HEADER_LEN] {
+fn encode_header(header: MwSolHeader, format_version: u16) -> [u8; MWSOL_HEADER_LEN] {
     let mut bytes = [0; MWSOL_HEADER_LEN];
     bytes[..8].copy_from_slice(MAGIC);
-    bytes[8..10].copy_from_slice(&MWSOL_FORMAT_VERSION.to_le_bytes());
+    bytes[8..10].copy_from_slice(&format_version.to_le_bytes());
     bytes[10..42].copy_from_slice(&header.config_hash);
     bytes[42..74].copy_from_slice(&header.abstraction_fingerprint);
     bytes[74..82].copy_from_slice(&header.sweeps.to_le_bytes());
@@ -747,30 +912,42 @@ fn encode_header(header: MwSolHeader) -> [u8; MWSOL_HEADER_LEN] {
     bytes
 }
 
-fn decode_header(bytes: &[u8; MWSOL_HEADER_LEN]) -> Result<MwSolHeader, MwSolError> {
+/// Decodes the fixed header, returning the on-disk format version alongside
+/// it so callers that need to branch on frame layout (`MwSolReader::open`)
+/// can, while callers that only want header fields (`peek_mwsol_header`)
+/// can discard it.
+fn decode_header(bytes: &[u8; MWSOL_HEADER_LEN]) -> Result<(MwSolHeader, u16), MwSolError> {
     if &bytes[..8] != MAGIC {
         return Err(MwSolError::BadMagic);
     }
     let version = u16::from_le_bytes(bytes[8..10].try_into().expect("two bytes"));
-    if version != MWSOL_FORMAT_VERSION {
+    if !(MWSOL_MIN_FORMAT_VERSION..=MWSOL_FORMAT_VERSION).contains(&version) {
         return Err(MwSolError::BadVersion {
             found: version,
-            expected: MWSOL_FORMAT_VERSION,
+            min: MWSOL_MIN_FORMAT_VERSION,
+            max: MWSOL_FORMAT_VERSION,
         });
     }
-    Ok(MwSolHeader {
-        config_hash: bytes[10..42].try_into().expect("32 bytes"),
-        abstraction_fingerprint: bytes[42..74].try_into().expect("32 bytes"),
-        sweeps: u64::from_le_bytes(bytes[74..82].try_into().expect("eight bytes")),
-        metadata_compressed_len: u64::from_le_bytes(bytes[82..90].try_into().expect("eight bytes")),
-        metadata_uncompressed_len: u64::from_le_bytes(
-            bytes[90..98].try_into().expect("eight bytes"),
-        ),
-        strategy_count: u64::from_le_bytes(bytes[98..106].try_into().expect("eight bytes")),
-        strategy_payload_len: u64::from_le_bytes(bytes[106..114].try_into().expect("eight bytes")),
-        metadata_checksum: bytes[114..146].try_into().expect("32 bytes"),
-        index_checksum: bytes[146..178].try_into().expect("32 bytes"),
-    })
+    Ok((
+        MwSolHeader {
+            config_hash: bytes[10..42].try_into().expect("32 bytes"),
+            abstraction_fingerprint: bytes[42..74].try_into().expect("32 bytes"),
+            sweeps: u64::from_le_bytes(bytes[74..82].try_into().expect("eight bytes")),
+            metadata_compressed_len: u64::from_le_bytes(
+                bytes[82..90].try_into().expect("eight bytes"),
+            ),
+            metadata_uncompressed_len: u64::from_le_bytes(
+                bytes[90..98].try_into().expect("eight bytes"),
+            ),
+            strategy_count: u64::from_le_bytes(bytes[98..106].try_into().expect("eight bytes")),
+            strategy_payload_len: u64::from_le_bytes(
+                bytes[106..114].try_into().expect("eight bytes"),
+            ),
+            metadata_checksum: bytes[114..146].try_into().expect("32 bytes"),
+            index_checksum: bytes[146..178].try_into().expect("32 bytes"),
+        },
+        version,
+    ))
 }
 
 fn encode_index_entry(entry: MwSolStrategyIndexEntry) -> [u8; MWSOL_INDEX_ENTRY_LEN] {
@@ -863,8 +1040,8 @@ fn hash_file_region(file: &mut File, start: u64, len: u64) -> Result<[u8; 32], M
 pub enum MwSolError {
     #[error("not a multiway solution (bad magic)")]
     BadMagic,
-    #[error("unsupported .mwsol version {found} (expected {expected})")]
-    BadVersion { found: u16, expected: u16 },
+    #[error("unsupported .mwsol version {found} (expected {min}..={max})")]
+    BadVersion { found: u16, min: u16, max: u16 },
     #[error("truncated .mwsol file")]
     Truncated,
     #[error(".mwsol length arithmetic overflow")]
@@ -1006,7 +1183,8 @@ mod tests {
         header.index_checksum =
             hash_file_region(&mut file, index_start(header), index_len).unwrap();
         file.seek(SeekFrom::Start(0)).unwrap();
-        file.write_all(&encode_header(header)).unwrap();
+        file.write_all(&encode_header(header, MWSOL_FORMAT_VERSION))
+            .unwrap();
         file.sync_all().unwrap();
     }
 
@@ -1040,6 +1218,7 @@ mod tests {
 
         let mut reader = MwSolReader::open(&path).unwrap();
         assert_eq!(reader.header(), header);
+        assert_eq!(reader.format_version(), MWSOL_FORMAT_VERSION);
         assert_eq!(reader.strategy_count(), expected.strategies.len());
         assert_eq!(reader.metadata().sweeps, 99);
         let page = reader.read_strategy_page(1, 2).unwrap();
@@ -1153,7 +1332,8 @@ mod tests {
         header.metadata_uncompressed_len = MAX_METADATA_UNCOMPRESSED_BYTES + 1;
         let mut file = OpenOptions::new().write(true).open(&path).unwrap();
         file.seek(SeekFrom::Start(0)).unwrap();
-        file.write_all(&encode_header(header)).unwrap();
+        file.write_all(&encode_header(header, MWSOL_FORMAT_VERSION))
+            .unwrap();
         file.sync_all().unwrap();
         drop(file);
         assert!(matches!(
@@ -1216,7 +1396,8 @@ mod tests {
             peek_mwsol_header(&path),
             Err(MwSolError::BadVersion {
                 found: 1,
-                expected: MWSOL_FORMAT_VERSION
+                min: MWSOL_MIN_FORMAT_VERSION,
+                max: MWSOL_FORMAT_VERSION,
             })
         ));
     }
@@ -1263,5 +1444,107 @@ mod tests {
             value.validate(),
             Err(MwSolError::InvalidHistoryTrie)
         ));
+    }
+
+    /// Synthesizes a version-2 `.mwsol` file: same layout as production
+    /// writes, but frames are plain postcard-encoded `MultiwayStrategyBlock`s
+    /// (no `FrameBlock` wrapper) and the header declares version 2, exactly
+    /// replicating the pre-i16 on-disk format.
+    fn write_legacy_v2(path: &Path, solution: &MultiwaySolution) -> Result<(), MwSolError> {
+        write_mwsol_frames(path, solution, 2, |block| Ok(postcard::to_allocvec(block)?))
+    }
+
+    #[test]
+    fn i16_storage_round_trips_within_quantization_tolerance() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("quantized.mwsol");
+        let mut expected = solution();
+        // Exercise awkward, non-power-of-two probabilities in addition to
+        // the default 0.25/0.75 split already present in `solution()`.
+        expected.strategies[0].actions = vec!["fold".into(), "call".into(), "raise-to:2500".into()];
+        expected.strategies[0].probabilities = vec![1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0];
+        expected.strategies[1].probabilities = vec![0.9999, 0.0001];
+
+        write_mwsol_with(&path, &expected, MwsolStorage::I16).unwrap();
+
+        let mut reader = MwSolReader::open(&path).unwrap();
+        assert_eq!(reader.format_version(), MWSOL_FORMAT_VERSION);
+        let decoded = read_mwsol(&path).unwrap();
+        assert_eq!(decoded.strategies.len(), expected.strategies.len());
+        for (got, want) in decoded.strategies.iter().zip(expected.strategies.iter()) {
+            assert_eq!(got.key, want.key);
+            assert_eq!(got.actions, want.actions);
+            let mut max_error = 0f32;
+            for (a, b) in got.probabilities.iter().zip(want.probabilities.iter()) {
+                max_error = max_error.max((a - b).abs());
+            }
+            assert!(
+                max_error < 1e-4,
+                "max error {max_error} for key {:?}",
+                got.key
+            );
+            let sum: f32 = got.probabilities.iter().sum();
+            assert!(
+                (sum - 1.0).abs() < 1e-4,
+                "decoded sum {sum} not within f32 rounding of 1.0"
+            );
+        }
+        let _ = reader.read_strategy_page(0, 1).unwrap();
+    }
+
+    #[test]
+    fn quantize_i16_sums_exactly_and_stays_non_negative() {
+        let cases: &[&[f32]] = &[
+            &[1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0],
+            &[0.9999, 0.0001],
+            &[1.0],
+            &[0.5, 0.5],
+            &[0.999_999_9, 0.000_000_1],
+            &[0.1, 0.2, 0.3, 0.4],
+            // Does not sum to 1.0; quantization must normalize by its own
+            // sum rather than assume a pre-normalized input.
+            &[2.0, 1.0, 1.0],
+        ];
+        for probabilities in cases {
+            let quantized = quantize_i16(probabilities);
+            assert_eq!(quantized.len(), probabilities.len());
+            assert!(
+                quantized.iter().all(|&q| q >= 0),
+                "negative entry in {quantized:?} for input {probabilities:?}"
+            );
+            let sum: i64 = quantized.iter().map(|&q| i64::from(q)).sum();
+            assert_eq!(
+                sum,
+                i64::from(i16::MAX),
+                "quantized {quantized:?} for input {probabilities:?} summed to {sum}, expected {}",
+                i16::MAX
+            );
+        }
+    }
+
+    #[test]
+    fn version_two_files_are_read_identically_to_version_three() {
+        let directory = tempfile::tempdir().unwrap();
+        let v2_path = directory.path().join("legacy.mwsol");
+        let v3_path = directory.path().join("current.mwsol");
+        let expected = solution();
+
+        write_legacy_v2(&v2_path, &expected).unwrap();
+        write_mwsol(&v3_path, &expected).unwrap();
+
+        let mut v2_reader = MwSolReader::open(&v2_path).unwrap();
+        assert_eq!(v2_reader.format_version(), 2);
+        let v2_decoded = read_mwsol(&v2_path).unwrap();
+
+        let mut v3_reader = MwSolReader::open(&v3_path).unwrap();
+        assert_eq!(v3_reader.format_version(), MWSOL_FORMAT_VERSION);
+        let v3_decoded = read_mwsol(&v3_path).unwrap();
+
+        assert_eq!(v2_decoded, expected);
+        assert_eq!(v2_decoded, v3_decoded);
+
+        let v2_page = v2_reader.read_strategy_page(0, 2).unwrap();
+        let v3_page = v3_reader.read_strategy_page(0, 2).unwrap();
+        assert_eq!(v2_page.strategies, v3_page.strategies);
     }
 }
