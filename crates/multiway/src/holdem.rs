@@ -6,15 +6,16 @@ use std::sync::{Arc, Mutex};
 
 use cards::combo_cards;
 
-use crate::abstraction::{BucketContext, BucketPath, MultiwayAbstraction};
+use crate::abstraction::{BucketContext, BucketId, BucketPath, MultiwayAbstraction};
 use crate::betting::{Action, BettingState, HandPhase};
 use crate::config::{
-    CompiledRake, MultiwayConfig, RakeConfig, UtilityConfig, ValidatedMultiwayConfig,
+    CompiledRake, MultiwayConfig, RakeConfig, RecallMode, UtilityConfig, ValidatedMultiwayConfig,
 };
 use crate::icm::{IcmEstimate, estimate_icm, terminal_icm_delta_with_baseline};
 use crate::sampler::{DealSampler, SampleError, SampledWorld};
 use crate::settlement::{Settlement, SettlementError, settle_showdown, settle_uncontested};
 use crate::solver::{ExternalSamplingGame, PrivateInfo};
+use crate::tree::DenseNodeContext;
 use crate::types::{MwChips, SeatId, SeatVec, Street};
 
 const ICM_TERMINAL_CACHE_ENTRIES: usize = 65_536;
@@ -201,16 +202,30 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
         }
     }
 
-    fn bucket_path(&self, state: &BettingState, world: &SampledWorld, actor: usize) -> BucketPath {
+    /// Abstraction bucket for one `street` (assumed already reached),
+    /// factored out so full-recall's [`Self::bucket_path`] and
+    /// street-recall's single-street lookup (in [`ExternalSamplingGame::bucket`])
+    /// share one implementation.
+    fn bucket_for_street(
+        &self,
+        state: &BettingState,
+        world: &SampledWorld,
+        actor: usize,
+        street: Street,
+    ) -> BucketId {
         let combo = world.hole_combo(actor);
+        self.abstraction.bucket(BucketContext {
+            street,
+            board: world.board(street),
+            combo,
+            active_opponents: state.players_on_street(street).saturating_sub(1),
+        })
+    }
+
+    fn bucket_path(&self, state: &BettingState, world: &SampledWorld, actor: usize) -> BucketPath {
         let bucket = |street: Street| {
             if street.index() <= state.street.index() {
-                self.abstraction.bucket(BucketContext {
-                    street,
-                    board: world.board(street),
-                    combo,
-                    active_opponents: state.players_on_street(street).saturating_sub(1),
-                })
+                self.bucket_for_street(state, world, actor, street)
             } else {
                 0
             }
@@ -340,11 +355,37 @@ impl<A: MultiwayAbstraction> ExternalSamplingGame for HoldemGame<A> {
 
     fn bucket(&self, state: &Self::State, world: &SampledWorld, actor: usize) -> PrivateInfo {
         let opponents = state.non_folded_mask().len().saturating_sub(1) as u8;
-        PrivateInfo::from_path(
-            state.street,
-            opponents,
-            self.bucket_path(state, world, actor),
-        )
+        match self.config.abstraction.recall {
+            RecallMode::Full => PrivateInfo::from_path(
+                state.street,
+                opponents,
+                self.bucket_path(state, world, actor),
+            ),
+            // Only the current street's bucket is ever computed: earlier
+            // streets are never revisited (this is both the imperfect-recall
+            // key and a speed bonus over full recall), and later streets stay
+            // `UNREACHED_BUCKET`.
+            RecallMode::Street => {
+                let bucket = self.bucket_for_street(state, world, actor, state.street);
+                PrivateInfo::from_current_bucket(state.street, opponents, bucket)
+            }
+        }
+    }
+
+    fn recall_mode(&self) -> RecallMode {
+        self.config.abstraction.recall
+    }
+
+    fn bucket_count(&self, street: Street, active_opponents: u8) -> u32 {
+        self.abstraction.num_buckets(street, active_opponents)
+    }
+
+    fn dense_node_context(&self, state: &Self::State) -> DenseNodeContext {
+        DenseNodeContext {
+            street: state.street,
+            active_opponents: state.non_folded_mask().len().saturating_sub(1) as u8,
+            bucket_active_opponents: state.players_on_street(state.street).saturating_sub(1),
+        }
     }
 
     fn terminal_utilities(&self, state: &Self::State, world: &SampledWorld, utilities: &mut [f64]) {

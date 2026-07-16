@@ -457,6 +457,22 @@ fn abstraction_section(ui: &mut Ui, state: &mut SetupState) {
                 abstraction.artifact_cache = path.display().to_string();
             }
         });
+        ui.label("Recall / memory model:");
+        ui.horizontal(|ui| {
+            ui.selectable_value(
+                &mut abstraction.recall,
+                model::RecallKind::Full,
+                "full (sparse, grows)",
+            );
+            ui.selectable_value(
+                &mut abstraction.recall,
+                model::RecallKind::Street,
+                "street (dense, preallocated)",
+            );
+        });
+        ui.label(
+            "Street mode preallocates the whole tree up front and fails fast with a memory estimate if it doesn't fit.",
+        );
         ui.label("Active-opponent bucket profiles:");
         let mut remove_index = None;
         for (index, profile) in abstraction.active_opponent_buckets.iter_mut().enumerate() {

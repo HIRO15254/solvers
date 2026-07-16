@@ -110,6 +110,58 @@ pot share, its second moment, and scoop/tie probabilities.  Information sets
 retain the complete bucket path.  The artifact seed, rollout parameters,
 rules, and centroids form a fingerprint checked by caches and checkpoints.
 
+### Recall mode and the policy memory model (`game.abstraction.recall`)
+
+`recall` selects how private information keys the solver's policy storage.
+It defaults to `"full"` and is omitted from a config's serialized identity
+(and therefore its game fingerprint) whenever it is `"full"`, so every config
+written before this option existed is unaffected byte-for-byte. Setting
+`recall = "street"` **does** change the game fingerprint: a Street-recall
+checkpoint/`.mwsol` is not interchangeable with the Full-recall run of the
+same table, and resuming across the two is rejected the same way a changed
+betting tree or bucket count would be.
+
+- **`"full"` (default): sparse, full recall.** A `HashMap<InfoKey,
+  PolicyColumn>` entry is created the first time a `(public history, player,
+  bucket path through every already-reached street)` triple is visited.
+  Memory therefore grows with the number of *distinct visited* information
+  sets — unbounded in principle, and in practice proportional to sweep count
+  until the abstraction/tree is exhausted (measured: ~122 MiB at 4,096
+  sweeps growing to ~3.4 GiB by 196k sweeps on a 6-max 64-bucket table). This
+  is today's behavior, unchanged.
+- **`"street"`: dense, street (imperfect) recall.** Private information is
+  keyed by *only* the current street's bucket — the Monker/Pluribus
+  convention: earlier streets are never revisited (a speed bonus, since
+  their buckets need not even be recomputed) and never appear in the key,
+  trading finer strategy conditioning for a hard memory bound. At solver
+  construction (or checkpoint resume), the *entire* public betting tree is
+  enumerated once (no card dependence: chance is already sampled once,
+  outside the public tree) and a single contiguous, node-major
+  `[node][bucket][action]` arena of `f32` regrets and strategy sums is
+  preallocated for every information set the tree can ever reach — touched
+  or not. Memory is therefore **fixed** for the run's lifetime: it is
+  computed and checked against `run.max_memory_bytes` *before* the (usually
+  multi-gigabyte) arena is allocated, so an oversized tree/abstraction fails
+  fast with a typed error naming the node/column counts and the estimated
+  byte count, instead of growing until it hits (or blows through) the
+  process's memory budget. `infosets` in the metrics stream reports the
+  *touched* column count (a running counter, cheap to read), while
+  `memory_bytes` reports the constant preflight estimate rather than a
+  running total.
+- **Tradeoff.** Street recall bounds memory and is faster per traversal (no
+  earlier-street bucket recomputation, no per-node hash-map bookkeeping), at
+  the cost of coarser, imperfect-recall strategy conditioning — the same
+  simplification production solvers like Monker/Pluribus use. Whether that
+  costs meaningfully more regret depends on the abstraction and betting tree;
+  measure it for a given table rather than assuming either mode dominates.
+  Because the arena is sized from the *full* enumerated public tree (not
+  just its typical playout), a rich betting tree (many bet/raise sizes, high
+  `max_aggressive_actions`, many seats) can make `"street"` mode's
+  preallocation infeasible even when `"full"` mode comfortably fits in the
+  same memory budget for a normal number of sweeps; the fix is the same one
+  the preflight error suggests — shrink the betting tree (fewer sizes, lower
+  aggressive-action caps) or bucket counts, or stay on `"full"`.
+
 Deal, action, and evaluation random streams are derived independently from the
 base seed, deterministic sample ID, traverser, and sample purpose. Checkpoints
 resume without serializing an opaque process RNG. Changing `run.threads` does

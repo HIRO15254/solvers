@@ -14,7 +14,7 @@ use cli::config::{
 use multiway::SeatId;
 use multiway::config::{
     AbstractionConfig, ActiveOpponentBucketConfig, AnteConfig, BettingConfig, BlindConfig,
-    MultiwayConfig, SeatConfig, StreetBettingConfig,
+    MultiwayConfig, RecallMode, SeatConfig, StreetBettingConfig,
 };
 
 use crate::size_lexer;
@@ -69,6 +69,12 @@ pub struct ActiveOpponentBucketModel {
     pub river_buckets: u16,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RecallKind {
+    Full,
+    Street,
+}
+
 #[derive(Clone, Debug)]
 pub struct AbstractionModel {
     pub flop_buckets: u16,
@@ -79,6 +85,7 @@ pub struct AbstractionModel {
     pub active_opponent_buckets: Vec<ActiveOpponentBucketModel>,
     /// Empty means "no artifact cache" (`None`).
     pub artifact_cache: String,
+    pub recall: RecallKind,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -389,6 +396,7 @@ fn abstraction_model_to_config(model: &AbstractionModel) -> AbstractionConfig {
             .collect(),
         artifact_cache: (!model.artifact_cache.trim().is_empty())
             .then(|| model.artifact_cache.clone().into()),
+        recall: recall_model_to_config(model.recall),
     }
 }
 
@@ -414,6 +422,21 @@ fn config_abstraction_to_model(config: &AbstractionConfig) -> AbstractionModel {
             .as_ref()
             .map(|path| path.display().to_string())
             .unwrap_or_default(),
+        recall: config_recall_to_model(config.recall),
+    }
+}
+
+fn recall_model_to_config(kind: RecallKind) -> RecallMode {
+    match kind {
+        RecallKind::Full => RecallMode::Full,
+        RecallKind::Street => RecallMode::Street,
+    }
+}
+
+fn config_recall_to_model(mode: RecallMode) -> RecallKind {
+    match mode {
+        RecallMode::Full => RecallKind::Full,
+        RecallMode::Street => RecallKind::Street,
     }
 }
 
@@ -790,6 +813,18 @@ mod tests {
         assert!(toml_text.contains("sweep_batch = 8"));
         let reparsed = toml_to_model(&toml_text, &model.run).unwrap();
         assert_eq!(reparsed.run.sweep_batch, 8);
+    }
+
+    #[test]
+    fn recall_kind_round_trips_through_toml() {
+        let mut model = Model::new_default(6);
+        assert_eq!(model.abstraction.recall, RecallKind::Full);
+
+        model.abstraction.recall = RecallKind::Street;
+        let toml_text = model_to_toml(&model).unwrap();
+        assert!(toml_text.contains("recall = \"street\""));
+        let reparsed = toml_to_model(&toml_text, &model.run).unwrap();
+        assert_eq!(reparsed.abstraction.recall, RecallKind::Street);
     }
 
     #[test]

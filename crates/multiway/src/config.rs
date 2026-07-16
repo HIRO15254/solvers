@@ -237,6 +237,36 @@ pub struct AbstractionConfig {
     /// by the abstraction fingerprint.
     #[serde(default)]
     pub artifact_cache: Option<PathBuf>,
+    /// Private-information recall used to key the solver's policy storage.
+    /// `Full` (the default) is unchanged sparse, full-recall behavior.
+    /// `Street` switches to a bounded-memory dense arena keyed only by the
+    /// current street's bucket (a Monker/Pluribus-style imperfect-recall
+    /// abstraction); see `docs/multiway-preflop.md`. Skipped when `Full` so
+    /// every config predating this field serializes identically and keeps
+    /// its game fingerprint.
+    #[serde(default, skip_serializing_if = "RecallMode::is_full")]
+    pub recall: RecallMode,
+}
+
+/// Private-information recall mode; see [`AbstractionConfig::recall`].
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum RecallMode {
+    /// Sparse policy storage keyed by every street's bucket visited so far
+    /// (today's behavior). Memory grows with the number of visited
+    /// information sets.
+    #[default]
+    Full,
+    /// Dense, preallocated policy storage keyed only by the current
+    /// street's bucket. Bounded memory, coarser (imperfect-recall) strategy
+    /// conditioning.
+    Street,
+}
+
+impl RecallMode {
+    pub fn is_full(&self) -> bool {
+        matches!(self, RecallMode::Full)
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -258,6 +288,7 @@ impl Default for AbstractionConfig {
             seed: 0,
             active_opponent_buckets: Vec::new(),
             artifact_cache: None,
+            recall: RecallMode::Full,
         }
     }
 }
@@ -936,6 +967,27 @@ stack_bb = 12
         config.validate().unwrap();
         config.betting.preflop.allin_threshold = Some(0.85);
         config.validate().unwrap();
+    }
+
+    #[test]
+    fn default_recall_mode_is_full_and_is_omitted_from_serialization() {
+        // Regression guard: `recall` must not appear in a default-mode
+        // config's serialized form (JSON, used for the game fingerprint, or
+        // TOML), so every config that predates this field keeps an
+        // unchanged fingerprint and round-trips unchanged.
+        let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        assert_eq!(config.abstraction.recall, RecallMode::Full);
+        let json = serde_json::to_string(&config.abstraction).unwrap();
+        assert!(!json.contains("recall"));
+        let toml_text = toml::to_string(&config).unwrap();
+        assert!(!toml_text.contains("recall"));
+
+        let mut street = config.clone();
+        street.abstraction.recall = RecallMode::Street;
+        let street_json = serde_json::to_string(&street.abstraction).unwrap();
+        assert!(street_json.contains("\"recall\":\"street\""));
+        let decoded: AbstractionConfig = serde_json::from_str(&street_json).unwrap();
+        assert_eq!(decoded.recall, RecallMode::Street);
     }
 
     #[test]
