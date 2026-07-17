@@ -24,6 +24,42 @@ pub const RAISE_RAMP: [Color32; 3] = [
 pub const ALL_IN: Color32 = Color32::from_rgb(0x8f, 0x2a, 0x2a);
 pub const UNKNOWN: Color32 = Color32::from_rgb(0x55, 0x5d, 0x66);
 
+/// Semantic status-text colors shared by `crate::status` (validation errors,
+/// worker failure/cancel messages, node-evaluation failures, dependent-field
+/// hints...). `WARNING` doubles as the raise ramp's lowest stop and `ERROR`
+/// as its highest -- both already read as "attention" colors in the
+/// GTO-Wizard-informed palette, so status text reuses them by name instead
+/// of introducing a second set of reds/ambers.
+pub const WARNING: Color32 = RAISE_RAMP[0];
+pub const ERROR: Color32 = RAISE_RAMP[2];
+/// Dimmed hint/caption text (dependent-control hints, source-path captions):
+/// same family as `TEXT` but low-contrast, matching the "information density
+/// over accessibility" brief -- hints should read as secondary, not hidden.
+pub const HINT: Color32 = Color32::from_rgb(0x8a, 0x93, 0x9c);
+
+/// Stable per-seat color for the Solve tab's convergence charts (regret and
+/// drift), so the same seat draws the same color on both plots and matches
+/// its entry in the shared legend. Cycles past the palette length rather
+/// than panicking (9-max is the largest supported table, so this never
+/// actually wraps).
+const SEAT_PALETTE: [Color32; 9] = [
+    Color32::from_rgb(0x2b, 0xb5, 0x97),
+    Color32::from_rgb(0xe8, 0xb2, 0x3e),
+    Color32::from_rgb(0x3f, 0x7a, 0xc9),
+    Color32::from_rgb(0xd9, 0x4a, 0x3a),
+    Color32::from_rgb(0xa0, 0x7c, 0xd9),
+    Color32::from_rgb(0xe0, 0x81, 0x3a),
+    Color32::from_rgb(0x6f, 0xc9, 0x5a),
+    Color32::from_rgb(0xd9, 0x6f, 0xb0),
+    Color32::from_rgb(0x8f, 0xa8, 0xb8),
+];
+
+/// Color for seat `seat` in a convergence chart; stable across both the
+/// regret and drift plots (see [`SEAT_PALETTE`]).
+pub fn seat_color(seat: usize) -> Color32 {
+    SEAT_PALETTE[seat % SEAT_PALETTE.len()]
+}
+
 pub fn apply(ctx: &egui::Context) {
     install_cjk_fallback_font(ctx);
     ctx.set_theme(egui::ThemePreference::Dark);

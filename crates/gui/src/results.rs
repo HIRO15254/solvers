@@ -14,7 +14,7 @@ use multiway::solver::{NodeActionEvaluation, UNREACHED_BUCKET};
 
 use crate::frequency::{self, FrequencyBlock};
 use crate::matrix::{self, CellData};
-use crate::theme;
+use crate::status;
 
 const ROOT: [u8; 16] = [0; 16];
 
@@ -492,12 +492,14 @@ pub fn ui(ui: &mut Ui, state: &mut ResultsState) {
     });
 
     ui.separator();
-    eval_controls_ui(ui, state, street);
+    eval_controls_ui(ui, state, street, unopened);
 }
 
 /// "Evaluate EVs" button, sample-count field, and (once a reply arrives for
 /// the node currently shown) the shared per-hand/per-action EV table.
-fn eval_controls_ui(ui: &mut Ui, state: &mut ResultsState, street: u8) {
+/// `unopened` is threaded through to [`crate::eval_table::ui`] so its action
+/// column headers use the same fold/limp/raise-ramp colors as the matrix.
+fn eval_controls_ui(ui: &mut Ui, state: &mut ResultsState, street: u8, unopened: bool) {
     ui.horizontal(|ui| {
         ui.label("EV samples:");
         ui.add(egui::DragValue::new(&mut state.eval_samples).range(1..=1_000_000));
@@ -511,7 +513,11 @@ fn eval_controls_ui(ui: &mut Ui, state: &mut ResultsState, street: u8) {
                 ui.label("evaluating (may retrain a rollout abstraction on a cold cache)...");
             }
             ResultsEvalState::Failed { error, .. } => {
-                ui.colored_label(theme::ACCENT, format!("evaluation failed: {error}"));
+                crate::status::show(
+                    ui,
+                    crate::status::Level::Error,
+                    format!("evaluation failed: {error}"),
+                );
             }
         }
     });
@@ -519,7 +525,7 @@ fn eval_controls_ui(ui: &mut Ui, state: &mut ResultsState, street: u8) {
         && *path == state.action_path()
     {
         let actor_label = state.seat_label(evaluation.actor as u8);
-        crate::eval_table::ui(ui, evaluation, street == 0, &actor_label);
+        crate::eval_table::ui(ui, evaluation, street == 0, &actor_label, unopened);
     }
 }
 
@@ -560,6 +566,7 @@ fn preflop_matrix(ui: &mut Ui, state: &mut ResultsState, actor: u8, active_oppon
             actions: &block.actions,
             probabilities: &block.probabilities,
             unopened,
+            combo_count: Some(matrix::class_combo_count(class)),
         });
         let cell_response = matrix::cell(ui, rect, data.as_ref());
         if let Some(pointer) = pointer
@@ -621,6 +628,7 @@ fn bucket_grid(ui: &mut Ui, state: &mut ResultsState, actor: u8, street: u8, act
             actions: &block.actions,
             probabilities: &block.probabilities,
             unopened: false,
+            combo_count: None,
         });
         let cell_response = matrix::cell(ui, rect, data.as_ref());
         if let Some(pointer) = pointer
@@ -653,16 +661,7 @@ fn detail_panel(ui: &mut Ui, state: &ResultsState, _actor: u8, street: u8, activ
             ui.label(egui::RichText::new(label).monospace().strong());
             let unopened = key.street == 0 && state.is_unopened();
             let colors = matrix::action_colors(&block.actions, unopened);
-            for ((action, probability), color) in
-                block.actions.iter().zip(&block.probabilities).zip(&colors)
-            {
-                ui.horizontal(|ui| {
-                    let (rect, _response) =
-                        ui.allocate_exact_size(Vec2::new(10.0, 10.0), egui::Sense::hover());
-                    ui.painter().rect_filled(rect, 0.0, *color);
-                    ui.monospace(format!("{action:<16} {:>5.1}%", probability * 100.0));
-                });
-            }
+            matrix::action_breakdown_rows(ui, &block.actions, &block.probabilities, &colors);
         } else {
             ui.label("(no strategy block for this cell)");
         }
@@ -684,16 +683,25 @@ fn detail_panel(ui: &mut Ui, state: &ResultsState, _actor: u8, street: u8, activ
         ));
         if let Some(ev) = &seat.profile_ev {
             ui.monospace(format!(
-                "  EV {:.3} [{:.3}, {:.3}]",
-                ev.mean, ev.ci95[0], ev.ci95[1]
+                "  EV {} [{}, {}]",
+                crate::format::ev_bb(ev.mean),
+                crate::format::ev_bb(ev.ci95[0]),
+                crate::format::ev_bb(ev.ci95[1])
             ));
         }
         if let Some(gain) = &seat.deviation_gain_lower_bound {
-            ui.monospace(format!("  deviation-gain>= {:.4}", gain.mean));
+            ui.monospace(format!(
+                "  deviation-gain>= {}",
+                crate::format::ev_bb(gain.mean)
+            ));
         }
     }
     ui.separator();
-    ui.colored_label(theme::ACCENT, "approximate profile — Nash/GTO保証なし");
+    status::show(
+        ui,
+        status::Level::Info,
+        "approximate profile — Nash/GTO保証なし",
+    );
 }
 
 fn hex(bytes: &[u8; 16]) -> String {

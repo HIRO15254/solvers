@@ -10,6 +10,8 @@ use std::cmp::Ordering;
 use eframe::egui;
 use egui::{Color32, Rect, Sense, Ui, Vec2};
 
+use crate::action_style;
+use crate::format;
 use crate::theme;
 
 pub const RANK_LETTERS: [char; 13] = [
@@ -29,122 +31,13 @@ pub fn class_label(index: usize) -> String {
     }
 }
 
-/// Semantic bucket an action label falls into, before ramp-position
-/// resolution (which needs every action at the same node).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum ActionKind {
-    Fold,
-    Check,
-    Call,
-    AllIn,
-    Aggressive(u64),
-    Unknown,
-}
-
-/// Parses the exact labels `HoldemGame::action_label` produces: `"fold"`,
-/// `"check"`, `"call:<amount>[:all-in]"`, `"bet-to:<amount>[:all-in]"`,
-/// `"raise-to:<amount>[:all-in]"`.
-fn classify(label: &str) -> ActionKind {
-    if label == "fold" {
-        return ActionKind::Fold;
-    }
-    if label == "check" {
-        return ActionKind::Check;
-    }
-    let all_in = label.ends_with(":all-in");
-    if label.starts_with("call:") {
-        return if all_in {
-            ActionKind::AllIn
-        } else {
-            ActionKind::Call
-        };
-    }
-    for prefix in ["bet-to:", "raise-to:"] {
-        if let Some(rest) = label.strip_prefix(prefix) {
-            if all_in {
-                return ActionKind::AllIn;
-            }
-            return match leading_amount(rest) {
-                Some(amount) => ActionKind::Aggressive(amount),
-                None => ActionKind::Unknown,
-            };
-        }
-    }
-    ActionKind::Unknown
-}
-
-fn leading_amount(rest: &str) -> Option<u64> {
-    rest.split(':').next()?.parse::<u64>().ok()
-}
-
-/// Resolves display colors for every action label at one node, coloring
-/// `bet-to`/`raise-to` actions along the amber-to-red ramp in ascending
-/// order of their raise-to amount (ties share a color).
-///
-/// `unopened` marks a preflop node nobody has raised yet (blinds/limps
-/// only): a `call:` action there is a limp (colored distinctly from a call
-/// facing a raise), matching the semantic mapping in
-/// `docs/native-gui-plan.md` section F. Pass `false` postflop or once a
-/// raise has occurred in this node's history.
+/// Resolves display colors for every action label at one node; see
+/// [`action_style::action_colors`] for the fold/check/call/limp/raise-ramp/
+/// all-in semantics. Re-exported here so existing callers (and this module's
+/// own cell/aggregate-row rendering) keep a stable `matrix::action_colors`
+/// path.
 pub fn action_colors(labels: &[String], unopened: bool) -> Vec<Color32> {
-    let kinds: Vec<ActionKind> = labels.iter().map(|label| classify(label)).collect();
-    let mut amounts: Vec<u64> = kinds
-        .iter()
-        .filter_map(|kind| match kind {
-            ActionKind::Aggressive(amount) => Some(*amount),
-            _ => None,
-        })
-        .collect();
-    amounts.sort_unstable();
-    amounts.dedup();
-
-    kinds
-        .into_iter()
-        .map(|kind| match kind {
-            ActionKind::Fold => theme::FOLD,
-            ActionKind::Check => theme::CALL,
-            ActionKind::Call => {
-                if unopened {
-                    theme::LIMP
-                } else {
-                    theme::CALL
-                }
-            }
-            ActionKind::AllIn => theme::ALL_IN,
-            ActionKind::Aggressive(amount) => {
-                let rank = amounts
-                    .iter()
-                    .position(|&value| value == amount)
-                    .unwrap_or(0);
-                ramp_color(rank, amounts.len())
-            }
-            ActionKind::Unknown => theme::UNKNOWN,
-        })
-        .collect()
-}
-
-fn ramp_color(rank: usize, total: usize) -> Color32 {
-    let stops = theme::RAISE_RAMP;
-    if total <= 1 {
-        return stops[0];
-    }
-    let segments = stops.len() - 1;
-    let t = rank as f32 / (total - 1) as f32;
-    let scaled = t * segments as f32;
-    let seg = (scaled.floor() as usize).min(segments - 1);
-    let local_t = scaled - seg as f32;
-    lerp_color(stops[seg], stops[seg + 1], local_t)
-}
-
-fn lerp_color(a: Color32, b: Color32, t: f32) -> Color32 {
-    let lerp_channel = |from: u8, to: u8| -> u8 {
-        (f32::from(from) + (f32::from(to) - f32::from(from)) * t).round() as u8
-    };
-    Color32::from_rgb(
-        lerp_channel(a.r(), b.r()),
-        lerp_channel(a.g(), b.g()),
-        lerp_channel(a.b(), b.b()),
-    )
+    action_style::action_colors(labels, unopened)
 }
 
 /// Draws the range-wide action-frequency aggregate row shared by the Solve
@@ -172,7 +65,7 @@ pub fn aggregate_row(ui: &mut Ui, aggregate: Option<&(Vec<String>, Vec<f64>)>, u
     }
     ui.horizontal_wrapped(|ui| {
         for (label, &frequency) in action_labels.iter().zip(frequencies) {
-            ui.monospace(format!("{label}: {:>5.1}%", frequency * 100.0));
+            ui.monospace(format!("{label}: {}", format::percent(frequency)));
         }
     });
 }
@@ -180,18 +73,37 @@ pub fn aggregate_row(ui: &mut Ui, aggregate: Option<&(Vec<String>, Vec<f64>)>, u
 /// One matrix cell's data: action labels/probabilities for either a 13x13
 /// hand class or a postflop bucket. `unopened` should be `true` only for a
 /// preflop (street 0) node nobody has raised yet, so `call:` actions render
-/// as limps (see [`action_colors`]).
+/// as limps (see [`action_colors`]). `combo_count` is the cell's fixed combo
+/// count (see [`class_combo_count`]) for a preflop cell's hover tooltip;
+/// `None` for a postflop bucket cell (no such fixed count applies).
 pub struct CellData<'a> {
     pub label: String,
     pub actions: &'a [String],
     pub probabilities: &'a [f32],
     pub unopened: bool,
+    pub combo_count: Option<u32>,
+}
+
+/// Fixed number of concrete combos in a `cards::range::class_index` class,
+/// independent of any range weighting: 6 for a pocket pair, 4 for suited, 12
+/// for offsuit.
+pub fn class_combo_count(index: usize) -> u32 {
+    assert!(index < 169, "class index out of range: {index}");
+    let row = index / 13;
+    let col = index % 13;
+    match row.cmp(&col) {
+        Ordering::Equal => 6,
+        Ordering::Less => 4,
+        Ordering::Greater => 12,
+    }
 }
 
 /// Draws one hard-edged stacked horizontal bar cell plus its tiny label
-/// overlay. Returns the response so callers can wire hover/click.
+/// overlay, and (on hover) a tooltip with the class/bucket label, combo
+/// count (preflop only), and each action's colored probability. Returns the
+/// response so callers can wire hover/click.
 pub fn cell(ui: &mut Ui, rect: Rect, data: Option<&CellData<'_>>) -> egui::Response {
-    let response = ui.interact(
+    let mut response = ui.interact(
         rect,
         ui.id()
             .with(("mw-cell", rect.min.x as i32, rect.min.y as i32)),
@@ -220,6 +132,7 @@ pub fn cell(ui: &mut Ui, rect: Rect, data: Option<&CellData<'_>>) -> egui::Respo
                 theme::matrix_label_font(),
                 Color32::from_black_alpha(200),
             );
+            response = response.on_hover_ui(|ui| cell_tooltip(ui, data, &colors));
         }
     }
     painter.rect_stroke(
@@ -237,6 +150,43 @@ pub fn cell(ui: &mut Ui, rect: Rect, data: Option<&CellData<'_>>) -> egui::Respo
         );
     }
     response
+}
+
+/// Hover-tooltip body for one matrix cell: class/bucket label, combo count
+/// (if any), and each action's colored probability -- the same
+/// label/color/percent styling as the live-node/results detail panels (see
+/// [`action_breakdown_rows`]).
+fn cell_tooltip(ui: &mut Ui, data: &CellData<'_>, colors: &[Color32]) {
+    ui.strong(&data.label);
+    if let Some(combo_count) = data.combo_count {
+        ui.label(format!(
+            "{combo_count} combo{}",
+            if combo_count == 1 { "" } else { "s" }
+        ));
+    }
+    action_breakdown_rows(ui, data.actions, data.probabilities, colors);
+}
+
+/// Draws one "colored square + `action  NN.N%`" row per action -- the detail
+/// breakdown shared by a matrix cell's hover tooltip and the live-node/
+/// Results tabs' detail panels. `colors` must be the same length as
+/// `actions`/`probabilities` (typically `action_colors(actions, unopened)`).
+pub fn action_breakdown_rows(
+    ui: &mut Ui,
+    actions: &[String],
+    probabilities: &[f32],
+    colors: &[Color32],
+) {
+    for ((action, &probability), color) in actions.iter().zip(probabilities).zip(colors) {
+        ui.horizontal(|ui| {
+            let (rect, _response) = ui.allocate_exact_size(Vec2::new(10.0, 10.0), Sense::hover());
+            ui.painter().rect_filled(rect, 0.0, *color);
+            ui.monospace(format!(
+                "{action:<16} {}",
+                format::percent(f64::from(probability))
+            ));
+        });
+    }
 }
 
 #[cfg(test)]
@@ -262,43 +212,15 @@ mod tests {
         }
     }
 
+    /// `matrix::action_colors` is a thin re-export of
+    /// `action_style::action_colors`; the full fold/limp/ramp/all-in/unknown
+    /// coverage lives in `action_style`'s own tests.
     #[test]
-    fn fold_and_call_take_fixed_colors() {
+    fn action_colors_delegates_to_action_style() {
         let labels = vec!["fold".to_string(), "call:1000".to_string()];
-        let colors = action_colors(&labels, false);
-        assert_eq!(colors[0], theme::FOLD);
-        assert_eq!(colors[1], theme::CALL);
-    }
-
-    #[test]
-    fn an_unopened_call_is_a_limp() {
-        let labels = vec!["fold".to_string(), "call:1000".to_string()];
-        let colors = action_colors(&labels, true);
-        assert_eq!(colors[1], theme::LIMP);
-    }
-
-    #[test]
-    fn raises_are_ordered_by_ascending_amount_along_the_ramp() {
-        let labels = vec![
-            "fold".to_string(),
-            "call:1000".to_string(),
-            "raise-to:2500".to_string(),
-            "raise-to:5000".to_string(),
-            "raise-to:10000:all-in".to_string(),
-        ];
-        let colors = action_colors(&labels, false);
-        assert_eq!(colors[0], theme::FOLD);
-        assert_eq!(colors[1], theme::CALL);
-        assert_eq!(colors[2], theme::RAISE_RAMP[0]);
-        assert_eq!(colors[3], theme::RAISE_RAMP[2]);
-        assert_eq!(colors[4], theme::ALL_IN);
-    }
-
-    #[test]
-    fn unknown_labels_fall_back_to_grey() {
         assert_eq!(
-            action_colors(&["mystery".to_string()], false)[0],
-            theme::UNKNOWN
+            action_colors(&labels, false),
+            action_style::action_colors(&labels, false)
         );
     }
 }

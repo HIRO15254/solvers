@@ -6,18 +6,23 @@ use std::path::PathBuf;
 use std::str::FromStr;
 
 use eframe::egui;
-use egui::{Color32, Ui};
+use egui::Ui;
 
 use crate::model::{self, Model};
 use crate::presets::{self, PresetEntry};
 use crate::size_lexer;
+use crate::status::{self, Level};
 
 pub struct SetupState {
     pub model: Model,
     pub user_preset_dir: PathBuf,
     pub presets: Vec<PresetEntry>,
     pub new_preset_name: String,
-    pub status_message: Option<String>,
+    /// Last preset-panel outcome (load/save/import/export/delete), if any --
+    /// paired with its severity so a real failure reads as an error and a
+    /// confirmation ("saved", "deleted") reads as informational, rather than
+    /// both sharing one ad-hoc color (see `crate::status`).
+    pub status_message: Option<(Level, String)>,
     pub confirm_delete: Option<PathBuf>,
     pub copy_source: usize,
     pub validation_errors: Vec<String>,
@@ -52,15 +57,26 @@ impl SetupState {
         self.presets = presets::list(&self.user_preset_dir);
     }
 
+    fn set_status(&mut self, level: Level, message: impl Into<String>) {
+        self.status_message = Some((level, message.into()));
+    }
+
     fn load_toml(&mut self, text: &str) {
         match model::toml_to_model(text, &self.model.run) {
             Ok(model) => {
                 self.model = model;
                 self.status_message = None;
             }
-            Err(error) => self.status_message = Some(format!("load failed: {error}")),
+            Err(error) => self.set_status(Level::Error, format!("load failed: {error}")),
         }
     }
+}
+
+/// Small, dimmed dependent-control hint (traverser_vector <-> street-recall,
+/// EHS² greying, checkdown fields, ...): the same phrasing/weight everywhere
+/// instead of each section picking its own plain-label style.
+fn hint(ui: &mut Ui, text: &str) {
+    ui.label(egui::RichText::new(text).small().color(crate::theme::HINT));
 }
 
 pub fn ui(ui: &mut Ui, state: &mut SetupState) -> Option<StartRequest> {
@@ -125,22 +141,22 @@ fn preset_panel(ui: &mut Ui, state: &mut SetupState) {
     if let Some(index) = to_load {
         match state.presets[index].load() {
             Ok(text) => state.load_toml(&text),
-            Err(error) => state.status_message = Some(format!("load failed: {error}")),
+            Err(error) => state.set_status(Level::Error, format!("load failed: {error}")),
         }
     }
     if let Some(path) = to_delete {
         state.confirm_delete = Some(path);
     }
     if let Some(path) = state.confirm_delete.clone() {
-        ui.colored_label(Color32::from_rgb(0xd9, 0x4a, 0x3a), "Delete this preset?");
+        status::show(ui, Level::Warning, "Delete this preset?");
         ui.horizontal(|ui| {
             if ui.button("Yes, delete").clicked() {
                 match presets::delete(&path) {
                     Ok(()) => {
                         state.refresh_presets();
-                        state.status_message = Some("deleted".to_string());
+                        state.set_status(Level::Info, "deleted");
                     }
-                    Err(error) => state.status_message = Some(format!("delete failed: {error}")),
+                    Err(error) => state.set_status(Level::Error, format!("delete failed: {error}")),
                 }
                 state.confirm_delete = None;
             }
@@ -159,12 +175,14 @@ fn preset_panel(ui: &mut Ui, state: &mut SetupState) {
                     match presets::save(&state.user_preset_dir, &state.new_preset_name, &text) {
                         Ok(_) => {
                             state.refresh_presets();
-                            state.status_message = Some("saved".to_string());
+                            state.set_status(Level::Info, "saved");
                         }
-                        Err(error) => state.status_message = Some(format!("save failed: {error}")),
+                        Err(error) => {
+                            state.set_status(Level::Error, format!("save failed: {error}"))
+                        }
                     }
                 }
-                Err(error) => state.status_message = Some(format!("save failed: {error}")),
+                Err(error) => state.set_status(Level::Error, format!("save failed: {error}")),
             }
         }
     });
@@ -175,7 +193,7 @@ fn preset_panel(ui: &mut Ui, state: &mut SetupState) {
     {
         match std::fs::read_to_string(&path) {
             Ok(text) => state.load_toml(&text),
-            Err(error) => state.status_message = Some(format!("import failed: {error}")),
+            Err(error) => state.set_status(Level::Error, format!("import failed: {error}")),
         }
     }
     if ui.button("Export TOML...").clicked()
@@ -186,29 +204,30 @@ fn preset_panel(ui: &mut Ui, state: &mut SetupState) {
         match model::model_to_toml(&state.model) {
             Ok(text) => {
                 if let Err(error) = std::fs::write(&path, text) {
-                    state.status_message = Some(format!("export failed: {error}"));
+                    state.set_status(Level::Error, format!("export failed: {error}"));
                 }
             }
-            Err(error) => state.status_message = Some(format!("export failed: {error}")),
+            Err(error) => state.set_status(Level::Error, format!("export failed: {error}")),
         }
     }
-    if let Some(message) = state.status_message.clone() {
-        ui.colored_label(Color32::YELLOW, message);
+    if let Some((level, message)) = state.status_message.clone() {
+        status::show(ui, level, message);
     }
 }
 
 fn validation_panel(ui: &mut Ui, state: &SetupState) -> Option<StartRequest> {
     ui.heading("Validation");
     if state.validation_errors.is_empty() {
-        ui.colored_label(crate::theme::ACCENT, "OK — ready to solve");
+        status::show(ui, Level::Info, "OK — ready to solve");
     } else {
         for error in state.validation_errors.iter().take(20) {
-            ui.colored_label(Color32::from_rgb(0xd9, 0x4a, 0x3a), error);
+            status::show(ui, Level::Error, error);
         }
     }
     ui.separator();
-    ui.colored_label(
-        crate::theme::ACCENT,
+    status::show(
+        ui,
+        Level::Info,
         "approximate profile \u{2014} Nash/GTO\u{4fdd}\u{8a3c}\u{306a}\u{3057}",
     );
     ui.separator();
@@ -341,7 +360,7 @@ fn seats_section(ui: &mut Ui, state: &mut SetupState) {
                     if !seat.range.trim().is_empty()
                         && let Err(error) = cards::Range::from_str(&seat.range)
                     {
-                        ui.colored_label(Color32::from_rgb(0xd9, 0x4a, 0x3a), error.to_string());
+                        status::show(ui, Level::Error, error.to_string());
                     }
                     let mut overridden = seat.betting_override.is_some();
                     if ui.checkbox(&mut overridden, "custom betting").changed() {
@@ -395,7 +414,7 @@ fn street_editor(
                         ui.text_edit_singleline(text);
                     });
                     if let Err(error) = size_lexer::parse_sizes(text) {
-                        ui.colored_label(Color32::from_rgb(0xd9, 0x4a, 0x3a), error);
+                        status::show(ui, Level::Error, error);
                     }
                 }
             }
@@ -428,9 +447,11 @@ fn street_editor(
                     }
                     if let Some(value) = street.max_betting_players.as_mut() {
                         ui.add(egui::DragValue::new(value).range(1..=9));
-                        ui.label("max players with betting; empty = unlimited");
                     }
                 });
+                if street.max_betting_players.is_some() {
+                    hint(ui, "max players with betting; empty = unlimited");
+                }
             }
         });
     });
@@ -442,7 +463,7 @@ fn sized_field(ui: &mut Ui, label: &str, text: &mut String) {
         ui.text_edit_singleline(text);
     });
     if let Err(error) = size_lexer::parse_sizes(text) {
-        ui.colored_label(Color32::from_rgb(0xd9, 0x4a, 0x3a), error);
+        status::show(ui, Level::Error, error);
     }
 }
 
@@ -464,7 +485,8 @@ fn abstraction_section(ui: &mut Ui, state: &mut SetupState) {
         });
         let ehs2_selected = abstraction.kind == model::AbstractionBackendKind::Ehs2Table;
         if ehs2_selected {
-            ui.label(
+            hint(
+                ui,
                 "EHS\u{b2} table: precomputed exact percentile buckets, O(1) lookup, no solve-time \
                  Monte Carlo. Rollout samples, abstraction seed, and per-opponent bucket profiles \
                  below do not apply and are ignored (per-opponent profiles are also rejected).",
@@ -510,13 +532,15 @@ fn abstraction_section(ui: &mut Ui, state: &mut SetupState) {
                 "street (dense, preallocated)",
             );
         });
-        ui.label(
+        hint(
+            ui,
             "Street mode preallocates the whole tree up front and fails fast with a memory estimate if it doesn't fit.",
         );
         ui.label("Active-opponent bucket profiles:");
         if ehs2_selected {
-            ui.colored_label(
-                Color32::from_rgb(0xd9, 0x4a, 0x3a),
+            status::show(
+                ui,
+                Level::Warning,
                 "Not supported by the EHS\u{b2} table backend; remove any profiles below before solving.",
             );
         }
@@ -610,8 +634,9 @@ fn economics_section(ui: &mut Ui, state: &mut SetupState) {
         });
         if rake.kind != model::RakeKind::None {
             if utility.kind == model::UtilityKind::TournamentIcm {
-                ui.colored_label(
-                    Color32::from_rgb(0xd9, 0x4a, 0x3a),
+                status::show(
+                    ui,
+                    Level::Warning,
                     "Tournament ICM and rake cannot be combined.",
                 );
             }
@@ -670,8 +695,9 @@ fn algorithm_section(ui: &mut Ui, state: &mut SetupState) {
             "vector traverser (fast, street-recall only)",
         );
         if algorithm.traverser_vector && !recall_is_street {
-            ui.colored_label(
-                Color32::from_rgb(0xd9, 0x4a, 0x3a),
+            status::show(
+                ui,
+                Level::Warning,
                 "Vector traverser requires Recall / memory model = \"street\" above.",
             );
         }

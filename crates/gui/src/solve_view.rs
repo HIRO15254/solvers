@@ -12,6 +12,7 @@ use multiway::solver::{NodeActionEvaluation, ProfileEvaluation};
 use crate::format;
 use crate::frequency::{self, FrequencyBlock};
 use crate::matrix::{self, CellData};
+use crate::theme;
 use crate::worker::{NodeBlock, NodeSnapshot, ProgressSnapshot, WorkerCmd, WorkerHandle};
 
 /// Cap plotted points per line; history beyond this is decimated (recent
@@ -144,6 +145,17 @@ impl RunStatus {
             RunStatus::Failed(error) => format!("failed: {error}"),
         }
     }
+
+    /// Status-line severity: a worker failure is an error, a cancel is a
+    /// (user-requested, non-fatal) warning, everything else is informational
+    /// -- see `crate::status`.
+    fn level(&self) -> crate::status::Level {
+        match self {
+            RunStatus::Failed(_) => crate::status::Level::Error,
+            RunStatus::Cancelled => crate::status::Level::Warning,
+            _ => crate::status::Level::Info,
+        }
+    }
 }
 
 pub struct SolveTabState {
@@ -167,40 +179,43 @@ impl SolveTabState {
 }
 
 pub fn ui(ui: &mut Ui, state: &mut SolveTabState, worker: Option<&WorkerHandle>) {
-    ui.horizontal(|ui| {
-        ui.label(format!("status: {}", state.status.label()));
-        if let Some(latest) = state.history.last() {
-            ui.add(
-                egui::ProgressBar::new(
-                    (latest.sweeps as f32 / latest.target.max(1) as f32).min(1.0),
-                )
+    crate::status::show(
+        ui,
+        state.status.level(),
+        format!("status: {}", state.status.label()),
+    );
+    if let Some(latest) = state.history.last() {
+        ui.add(
+            egui::ProgressBar::new((latest.sweeps as f32 / latest.target.max(1) as f32).min(1.0))
                 .text(format!("{}/{}", latest.sweeps, latest.target)),
-            );
-            ui.label(format!(
-                "sweeps {}",
-                format::human_rate(latest.sweeps_per_sec)
-            ));
-            ui.label(format!(
-                "traversals {}",
-                format::human_rate(latest.traversals_per_sec)
-            ));
-            // Hand-updates/s is the headline throughput metric (the number
-            // to compare against a range-based solver's "hands/s").
-            ui.label(
-                egui::RichText::new(format!(
-                    "hands {}",
-                    format::human_rate(latest.hand_updates_per_sec)
-                ))
-                .strong(),
-            );
-            ui.label(format!(
-                "infosets {}",
-                format::human_count(latest.infosets as f64)
-            ));
-            ui.label(format!("mem {} MiB", latest.memory_bytes / (1024 * 1024)));
-            ui.label(format!("elapsed {:.0}s", latest.elapsed_secs));
-        }
-    });
+        );
+        // Aligned label-over-value grid (monospace numbers) so the
+        // throughput strip reads as a scannable dashboard rather than a run
+        // of loosely separated labels.
+        egui::Grid::new("solve-metrics-grid")
+            .striped(false)
+            .show(ui, |ui| {
+                ui.label("sweeps/s");
+                ui.label("traversals/s");
+                // Hand-updates/s is the headline throughput metric (the
+                // number to compare against a range-based solver's
+                // "hands/s"), so its header stays bold.
+                ui.label(egui::RichText::new("hands/s").strong());
+                ui.label("infosets");
+                ui.label("mem");
+                ui.label("elapsed");
+                ui.end_row();
+                ui.monospace(format::human_rate(latest.sweeps_per_sec));
+                ui.monospace(format::human_rate(latest.traversals_per_sec));
+                ui.monospace(
+                    egui::RichText::new(format::human_rate(latest.hand_updates_per_sec)).strong(),
+                );
+                ui.monospace(format::human_count(latest.infosets as f64));
+                ui.monospace(format::memory_mib(latest.memory_bytes));
+                ui.monospace(format::elapsed(latest.elapsed_secs));
+                ui.end_row();
+            });
+    }
 
     if let Some(worker) = worker {
         ui.horizontal(|ui| {
@@ -242,6 +257,9 @@ pub fn ui(ui: &mut Ui, state: &mut SolveTabState, worker: Option<&WorkerHandle>)
         });
     ui.separator();
 
+    // Both plots use the same per-seat color (see `theme::seat_color`), so a
+    // seat's regret and drift lines are visually the same series everywhere,
+    // and `egui_plot`'s built-in legend swatch already matches it exactly.
     let seats = state.seat_names.len();
     Plot::new("regret-plot")
         .height(200.0)
@@ -254,7 +272,8 @@ pub fn ui(ui: &mut Ui, state: &mut SolveTabState, worker: Option<&WorkerHandle>)
                         [snap.sweeps as f64, regret.max(1e-12).log10()]
                     })
                     .collect();
-                plot_ui.line(Line::new(seat_name(state, seat), points));
+                plot_ui
+                    .line(Line::new(seat_name(state, seat), points).color(theme::seat_color(seat)));
             }
         });
     ui.label("per-seat log10(avg positive regret) vs sweeps");
@@ -270,7 +289,8 @@ pub fn ui(ui: &mut Ui, state: &mut SolveTabState, worker: Option<&WorkerHandle>)
                         [snap.sweeps as f64, drift]
                     })
                     .collect();
-                plot_ui.line(Line::new(seat_name(state, seat), points));
+                plot_ui
+                    .line(Line::new(seat_name(state, seat), points).color(theme::seat_color(seat)));
             }
         });
     ui.label("per-seat strategy drift (L1) vs sweeps");
@@ -288,16 +308,17 @@ pub fn ui(ui: &mut Ui, state: &mut SolveTabState, worker: Option<&WorkerHandle>)
                 ui.end_row();
                 for (seat, estimate) in evaluation.seats.iter().enumerate() {
                     ui.monospace(seat_name(state, seat));
-                    ui.monospace(format!("{:.4}", estimate.mean));
+                    ui.monospace(format::ev_bb(estimate.mean));
                     ui.monospace(format!(
-                        "[{:.4}, {:.4}]",
-                        estimate.ci95[0], estimate.ci95[1]
+                        "[{}, {}]",
+                        format::ev_bb(estimate.ci95[0]),
+                        format::ev_bb(estimate.ci95[1])
                     ));
                     let gain = evaluation
                         .deviation_gain_lower_bound
                         .as_ref()
                         .and_then(|values| values.get(seat))
-                        .map(|value| format!("{:.4}", value.mean))
+                        .map(|value| format::ev_bb(value.mean))
                         .unwrap_or_else(|| "-".to_string());
                     ui.monospace(gain);
                     ui.end_row();
@@ -308,8 +329,9 @@ pub fn ui(ui: &mut Ui, state: &mut SolveTabState, worker: Option<&WorkerHandle>)
     }
 
     ui.separator();
-    ui.colored_label(
-        crate::theme::ACCENT,
+    crate::status::show(
+        ui,
+        crate::status::Level::Info,
         "approximate profile — Nash/GTO保証なし",
     );
 }
@@ -513,7 +535,7 @@ fn live_node_ui(
             });
 
             ui.separator();
-            eval_controls_ui(ui, live, worker, seat_names, street);
+            eval_controls_ui(ui, live, worker, seat_names, street, unopened);
         }
     }
 
@@ -524,12 +546,15 @@ fn live_node_ui(
 
 /// "Evaluate EVs" button, sample-count field, and (once a reply arrives for
 /// the node currently shown) the shared per-hand/per-action EV table.
+/// `unopened` is threaded through to [`crate::eval_table::ui`] so its action
+/// column headers use the same fold/limp/raise-ramp colors as the matrix.
 fn eval_controls_ui(
     ui: &mut Ui,
     live: &mut LiveNodeState,
     worker: Option<&WorkerHandle>,
     seat_names: &[String],
     street: u8,
+    unopened: bool,
 ) {
     ui.horizontal(|ui| {
         ui.label("EV samples:");
@@ -550,7 +575,11 @@ fn eval_controls_ui(
                 ui.label("evaluating...");
             }
             NodeEvalState::Failed { error, .. } => {
-                ui.colored_label(crate::theme::ACCENT, format!("evaluation failed: {error}"));
+                crate::status::show(
+                    ui,
+                    crate::status::Level::Error,
+                    format!("evaluation failed: {error}"),
+                );
             }
         }
     });
@@ -558,7 +587,7 @@ fn eval_controls_ui(
         && *path == live.path
     {
         let actor_label = seat_label_at(seat_names, evaluation.actor as u8);
-        crate::eval_table::ui(ui, evaluation, street == 0, &actor_label);
+        crate::eval_table::ui(ui, evaluation, street == 0, &actor_label, unopened);
     }
 }
 
@@ -600,6 +629,7 @@ fn live_preflop_matrix(
             actions: &block.actions,
             probabilities: &block.probabilities,
             unopened,
+            combo_count: Some(matrix::class_combo_count(class as usize)),
         });
         let cell_response = matrix::cell(ui, rect, data.as_ref());
         if let Some(block) = block {
@@ -662,6 +692,7 @@ fn live_bucket_grid(
             actions: &block.actions,
             probabilities: &block.probabilities,
             unopened: false,
+            combo_count: None,
         };
         let cell_response = matrix::cell(ui, rect, Some(&data));
         let id = (actor, street, active_opponents, block.bucket_path);
@@ -706,16 +737,7 @@ fn live_detail_panel(
             ui.label(egui::RichText::new(label).monospace().strong());
             let unopened = street == 0 && snapshot_is_unopened(&snapshot.path);
             let colors = matrix::action_colors(&block.actions, unopened);
-            for ((action, probability), color) in
-                block.actions.iter().zip(&block.probabilities).zip(&colors)
-            {
-                ui.horizontal(|ui| {
-                    let (rect, _response) =
-                        ui.allocate_exact_size(Vec2::new(10.0, 10.0), egui::Sense::hover());
-                    ui.painter().rect_filled(rect, 0.0, *color);
-                    ui.monospace(format!("{action:<16} {:>5.1}%", probability * 100.0));
-                });
-            }
+            matrix::action_breakdown_rows(ui, &block.actions, &block.probabilities, &colors);
         } else {
             ui.label("(no strategy block for this cell)");
         }

@@ -5,6 +5,7 @@
 //! workbench stays in `web/`. Library form exists so integration tests can
 //! drive the solve worker headlessly.
 
+pub mod action_style;
 pub mod app;
 pub mod eval_table;
 pub mod format;
@@ -16,5 +17,6 @@ pub mod results;
 pub mod setup;
 pub mod size_lexer;
 pub mod solve_view;
+pub mod status;
 pub mod theme;
 pub mod worker;
