@@ -732,6 +732,40 @@ fn run_section(ui: &mut Ui, state: &mut SetupState) {
             ui.label("sweep batch (parallelism):");
             ui.add(egui::DragValue::new(&mut run.sweep_batch).range(1..=u64::MAX));
         });
+        // One sweep yields `seats` parallel traversals, so total in-flight
+        // parallelism is `seats x sweep_batch`; when that is below the
+        // thread count the extra cores idle. Machine-independence: the
+        // detected core count only feeds this HINT -- the config always
+        // carries the explicit `sweep_batch` value.
+        {
+            let seats = state.model.seats.len().max(1) as u64;
+            let threads = if run.threads > 0 {
+                run.threads as u64
+            } else {
+                std::thread::available_parallelism()
+                    .map(|value| value.get() as u64)
+                    .unwrap_or(1)
+            };
+            let parallel = seats * run.sweep_batch;
+            if parallel < threads {
+                let suggested = threads.div_ceil(seats);
+                let message = format!(
+                    "{seats} seats x sweep_batch {} = {parallel} parallel traversals \
+                     < {threads} threads; sweep_batch >= {suggested} uses every core",
+                    run.sweep_batch
+                );
+                status::show(ui, status::Level::Warning, &message);
+            } else {
+                hint(
+                    ui,
+                    &format!(
+                        "{seats} seats x sweep_batch {} = {parallel} parallel traversals \
+                         on {threads} threads",
+                        run.sweep_batch
+                    ),
+                );
+            }
+        }
         optional_u64(ui, "checkpoint every", &mut run.checkpoint_every, 50_000);
         optional_u64(
             ui,

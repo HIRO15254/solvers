@@ -308,7 +308,13 @@ impl Model {
                 checkpoint_every: None,
                 evaluation_samples: None,
                 evaluation_cadence: None,
-                sweep_batch: 1,
+                // Written explicitly into every new config (1 is the "not
+                // set" sentinel that omits the key): one sweep only yields
+                // `seats` parallel traversals, so without batching a 6-max
+                // table can never occupy more than 6 threads. 8 saturates
+                // common core counts for 2..9 seats while staying a fixed,
+                // machine-independent value inside the exported TOML.
+                sweep_batch: 8,
                 max_memory_mib: 0,
                 storage: StorageKind::F32,
                 output_path: "./runs/solution.mwsol".to_string(),
@@ -845,19 +851,23 @@ mod tests {
     }
 
     #[test]
-    fn sweep_batch_round_trips_through_toml_and_defaults_to_one() {
+    fn sweep_batch_round_trips_through_toml_and_new_setups_carry_it_explicitly() {
         let mut model = Model::new_default(6);
-        assert_eq!(model.run.sweep_batch, 1);
-        // The default (1) is omitted from the rendered TOML, same as every
-        // other run field that is bit-identical to its historical behavior.
+        // New setups default to 8 and WRITE it into the TOML: one sweep only
+        // yields `seats` parallel traversals, so the historical default of 1
+        // left most cores idle. The value must appear explicitly so results
+        // stay machine-independent and reproducible from the config alone.
+        assert_eq!(model.run.sweep_batch, 8);
         let default_toml = model_to_toml(&model).unwrap();
-        assert!(!default_toml.contains("sweep_batch"));
+        assert!(default_toml.contains("sweep_batch = 8"));
 
-        model.run.sweep_batch = 8;
+        // 1 is the "unset" sentinel and is omitted, preserving byte-identical
+        // serialization for configs that predate the field.
+        model.run.sweep_batch = 1;
         let toml_text = model_to_toml(&model).unwrap();
-        assert!(toml_text.contains("sweep_batch = 8"));
+        assert!(!toml_text.contains("sweep_batch"));
         let reparsed = toml_to_model(&toml_text, &model.run).unwrap();
-        assert_eq!(reparsed.run.sweep_batch, 8);
+        assert_eq!(reparsed.run.sweep_batch, 1);
     }
 
     #[test]

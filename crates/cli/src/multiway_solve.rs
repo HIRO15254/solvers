@@ -134,6 +134,24 @@ fn run_inner(
     mw_session.config_toml = raw_config.to_string();
     mw_session.config_hash = config_hash;
 
+    // One sweep only yields `seats` parallel traversals, so the machine is
+    // undersubscribed whenever `seats x sweep_batch < threads`. Purely a
+    // hint: changing `run.sweep_batch` changes results (see the sweep-batch
+    // docs), so it is never adjusted silently.
+    if emit_progress {
+        let seats = mw_session.game_config.seats.len().max(1) as u64;
+        let sweep_batch = mw_session.solver.config().sweep_batch.max(1);
+        let threads = mw_session.threads as u64;
+        if seats * sweep_batch < threads {
+            println!(
+                "hint: {seats} seats x run.sweep_batch {sweep_batch} = {} parallel traversals \
+                 < {threads} threads; run.sweep_batch = {} would use every core",
+                seats * sweep_batch,
+                threads.div_ceil(seats)
+            );
+        }
+    }
+
     let mut metrics_writer = metrics_path
         .map(MultiwayMetricsWriter::create_or_append)
         .transpose()
