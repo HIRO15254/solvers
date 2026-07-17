@@ -4,16 +4,41 @@
 
 use std::collections::HashMap;
 use std::path::PathBuf;
+use std::sync::mpsc::{Receiver, TryRecvError};
 
+use cards::Range;
 use eframe::egui;
 use egui::{Rect, Ui, Vec2};
-use formats::{MultiwayHistoryNode, MultiwaySolution, MultiwayStrategyKey};
-use multiway::solver::UNREACHED_BUCKET;
+use formats::{MultiwayHistoryNode, MultiwaySolution, MultiwayStrategyBlock, MultiwayStrategyKey};
+use multiway::solver::{NodeActionEvaluation, UNREACHED_BUCKET};
 
+use crate::frequency::{self, FrequencyBlock};
 use crate::matrix::{self, CellData};
 use crate::theme;
 
 const ROOT: [u8; 16] = [0; 16];
+
+/// State of the on-demand "Evaluate EVs" request for the currently displayed
+/// node, run on a background thread (`evaluate_mwsol_node_actions` rebuilds
+/// the generative game, which can be slow on an abstraction-cache miss --
+/// see `cli::node_eval`'s doc comment -- so it must never block the UI
+/// thread). Carries its own `path` so the render side can drop a reply that
+/// answers a node this view no longer shows.
+pub enum ResultsEvalState {
+    Idle,
+    Pending {
+        path: Vec<usize>,
+        receiver: Receiver<Result<NodeActionEvaluation, String>>,
+    },
+    Ready {
+        path: Vec<usize>,
+        evaluation: NodeActionEvaluation,
+    },
+    Failed {
+        path: Vec<usize>,
+        error: String,
+    },
+}
 
 pub struct ResultsState {
     pub solution: MultiwaySolution,
@@ -30,6 +55,9 @@ pub struct ResultsState {
     /// that cannot be reconstructed from a cell index alone.
     pub hovered_key: Option<MultiwayStrategyKey>,
     pub pinned_key: Option<MultiwayStrategyKey>,
+    /// Sample count for the next "Evaluate EVs" request.
+    pub eval_samples: u64,
+    pub eval: ResultsEvalState,
     children_index: HashMap<[u8; 16], Vec<usize>>,
     by_key: HashMap<[u8; 16], usize>,
 }
@@ -52,6 +80,8 @@ impl ResultsState {
             selected_variant: None,
             hovered_key: None,
             pinned_key: None,
+            eval_samples: 4_096,
+            eval: ResultsEvalState::Idle,
             children_index,
             by_key,
         }
@@ -136,6 +166,200 @@ impl ResultsState {
         chain.reverse();
         chain
     }
+
+    /// Root-to-current action-index path -- the order
+    /// `evaluate_mwsol_node_actions` expects. Walks the same parent chain as
+    /// [`Self::breadcrumb`].
+    fn action_path(&self) -> Vec<usize> {
+        let mut path = Vec::new();
+        let mut key = self.current_history;
+        while key != ROOT {
+            let Some(&index) = self.by_key.get(&key) else {
+                break;
+            };
+            let node = &self.solution.histories[index];
+            path.push(node.action_index as usize);
+            key = node.parent;
+        }
+        path.reverse();
+        path
+    }
+
+    /// `active_opponents` of `actor`'s own (preflop) strategy block at
+    /// `history`, if any -- a history node has at most one `active_opponents`
+    /// value for a given acting seat, so the first match is the answer.
+    fn active_opponents_at(&self, history: [u8; 16], actor: u8) -> Option<u8> {
+        self.solution
+            .strategies
+            .iter()
+            .find(|block| {
+                block.key.history == history && block.key.actor == actor && block.key.street == 0
+            })
+            .map(|block| block.key.active_opponents)
+    }
+
+    /// `actor`'s configured preflop range, parsed the same way the solve
+    /// itself compiled it (`MultiwayConfig::compile_ranges`): empty means
+    /// "all hands" (`Range::full()`), otherwise `cards::Range`'s grammar.
+    fn seat_range(&self, actor: u8) -> Option<Range> {
+        let config: cli::config::SolveConfig = toml::from_str(&self.solution.config_toml).ok()?;
+        let cli::config::GameSection::PreflopMultiway(game) = config.game else {
+            return None;
+        };
+        let ranges = game.compile_ranges().ok()?;
+        ranges.as_slice().get(actor as usize).cloned()
+    }
+
+    /// Per-class reach weight for `actor` at the currently displayed node:
+    /// `range_weight(class) * Π σ̄(action taken | class)` over `actor`'s own
+    /// earlier decisions along the root-to-current path (preflop only).
+    fn class_reach_weights(&self, actor: u8) -> Option<[f64; cards::NUM_CLASSES]> {
+        let range = self.seat_range(actor)?;
+        let mut reach = frequency::class_weights_from_range(&range);
+
+        let mut ancestors: Vec<(usize, [u8; 16])> = Vec::new();
+        let mut key = self.current_history;
+        while key != ROOT {
+            let Some(&index) = self.by_key.get(&key) else {
+                break;
+            };
+            let node = &self.solution.histories[index];
+            if node.actor == actor {
+                ancestors.push((node.action_index as usize, node.parent));
+            }
+            key = node.parent;
+        }
+
+        for (action_index, decision_history) in ancestors {
+            let Some(active_opponents) = self.active_opponents_at(decision_history, actor) else {
+                continue;
+            };
+            for (class, weight) in reach.iter_mut().enumerate() {
+                let key = MultiwayStrategyKey {
+                    history: decision_history,
+                    actor,
+                    street: 0,
+                    active_opponents,
+                    bucket_path: [
+                        class as u32,
+                        UNREACHED_BUCKET,
+                        UNREACHED_BUCKET,
+                        UNREACHED_BUCKET,
+                    ],
+                };
+                let probability = self
+                    .solution
+                    .strategy(key)
+                    .and_then(|block| block.probabilities.get(action_index).copied())
+                    .unwrap_or(0.0);
+                *weight *= f64::from(probability);
+            }
+        }
+        Some(reach)
+    }
+
+    /// Range-wide action-frequency aggregate for the currently displayed
+    /// preflop node: `actor`'s reach-weighted per-class mass (see
+    /// [`Self::class_reach_weights`]) fed through
+    /// `frequency::aggregate_action_frequencies`. `None` at a postflop node,
+    /// when `actor`'s range can't be resolved, or when the node has no
+    /// blocks at all.
+    fn range_wide_aggregate(
+        &self,
+        actor: u8,
+        street: u8,
+        active_opponents: u8,
+    ) -> Option<(Vec<String>, Vec<f64>)> {
+        if street != 0 {
+            return None;
+        }
+        let reach = self.class_reach_weights(actor)?;
+        let mut blocks: Vec<(&MultiwayStrategyBlock, f64)> = Vec::new();
+        for (class, &weight) in reach.iter().enumerate() {
+            let key = MultiwayStrategyKey {
+                history: self.current_history,
+                actor,
+                street: 0,
+                active_opponents,
+                bucket_path: [
+                    class as u32,
+                    UNREACHED_BUCKET,
+                    UNREACHED_BUCKET,
+                    UNREACHED_BUCKET,
+                ],
+            };
+            if let Some(block) = self.solution.strategy(key) {
+                blocks.push((block, weight));
+            }
+        }
+        let action_labels = blocks.first()?.0.actions.clone();
+        let frequency_blocks: Vec<FrequencyBlock<'_>> = blocks
+            .iter()
+            .map(|(block, mass)| FrequencyBlock {
+                action_labels: &block.actions,
+                probabilities: &block.probabilities,
+                mass: *mass,
+            })
+            .collect();
+        let frequencies =
+            frequency::aggregate_action_frequencies(&action_labels, &frequency_blocks)?;
+        Some((action_labels, frequencies))
+    }
+
+    /// Spawns the background thread servicing "Evaluate EVs" for the node
+    /// currently on screen; see [`ResultsEvalState`]'s doc comment for why
+    /// this must not run on the UI thread.
+    fn start_eval(&mut self) {
+        let path = self.action_path();
+        let solution = self.solution.clone();
+        let samples = self.eval_samples;
+        let seed = crate::worker::node_eval_seed(algorithm_seed(&self.solution.config_toml), &path);
+        let (sender, receiver) = std::sync::mpsc::channel();
+        let thread_path = path.clone();
+        std::thread::spawn(move || {
+            let result =
+                cli::node_eval::evaluate_mwsol_node_actions(&solution, &thread_path, samples, seed)
+                    .map_err(|error| error.to_string());
+            let _ = sender.send(result);
+        });
+        self.eval = ResultsEvalState::Pending { path, receiver };
+    }
+
+    /// Non-blocking poll of an in-flight background evaluation; call once
+    /// per frame before rendering.
+    fn poll_eval(&mut self) {
+        let ResultsEvalState::Pending { .. } = &self.eval else {
+            return;
+        };
+        let ResultsEvalState::Pending { path, receiver } =
+            std::mem::replace(&mut self.eval, ResultsEvalState::Idle)
+        else {
+            unreachable!("just matched Pending above");
+        };
+        self.eval = match receiver.try_recv() {
+            Ok(Ok(evaluation)) => ResultsEvalState::Ready { path, evaluation },
+            Ok(Err(error)) => ResultsEvalState::Failed { path, error },
+            Err(TryRecvError::Empty) => ResultsEvalState::Pending { path, receiver },
+            Err(TryRecvError::Disconnected) => ResultsEvalState::Failed {
+                path,
+                error: "evaluation thread disconnected without a reply".to_string(),
+            },
+        };
+    }
+}
+
+/// `[algorithm] seed` from a solution's embedded config, or `0` on a config
+/// that (unexpectedly) isn't `schedule = "external-sampling-mccfr"` -- the
+/// only schedule the multiway GUI ever writes (see
+/// `model::solve_config_to_model`).
+fn algorithm_seed(config_toml: &str) -> u64 {
+    toml::from_str::<cli::config::SolveConfig>(config_toml)
+        .ok()
+        .map(|config| match config.algorithm {
+            cli::config::AlgorithmSection::ExternalSamplingMccfr { seed, .. } => seed,
+            _ => 0,
+        })
+        .unwrap_or(0)
 }
 
 fn seat_names_from_config(config_toml: &str) -> Vec<String> {
@@ -153,6 +377,8 @@ fn seat_names_from_config(config_toml: &str) -> Vec<String> {
 }
 
 pub fn ui(ui: &mut Ui, state: &mut ResultsState) {
+    state.poll_eval();
+
     if let Some(path) = &state.source_path {
         ui.label(egui::RichText::new(format!("source: {}", path.display())).small());
     }
@@ -163,6 +389,7 @@ pub fn ui(ui: &mut Ui, state: &mut ResultsState) {
                 state.selected_actor = None;
                 state.selected_variant = None;
                 state.pinned_key = None;
+                state.eval = ResultsEvalState::Idle;
             }
             ui.label(">");
         }
@@ -177,6 +404,7 @@ pub fn ui(ui: &mut Ui, state: &mut ResultsState) {
                 state.selected_actor = None;
                 state.selected_variant = None;
                 state.pinned_key = None;
+                state.eval = ResultsEvalState::Idle;
             }
         }
     });
@@ -248,6 +476,10 @@ pub fn ui(ui: &mut Ui, state: &mut ResultsState) {
     }
     let (street, active_opponents) = state.selected_variant.expect("set above");
 
+    let unopened = street == 0 && state.is_unopened();
+    let aggregate = state.range_wide_aggregate(actor, street, active_opponents);
+    matrix::aggregate_row(ui, aggregate.as_ref(), unopened);
+
     ui.separator();
     ui.columns(2, |columns| {
         let matrix_ui = &mut columns[0];
@@ -258,6 +490,37 @@ pub fn ui(ui: &mut Ui, state: &mut ResultsState) {
         }
         detail_panel(&mut columns[1], state, actor, street, active_opponents);
     });
+
+    ui.separator();
+    eval_controls_ui(ui, state, street);
+}
+
+/// "Evaluate EVs" button, sample-count field, and (once a reply arrives for
+/// the node currently shown) the shared per-hand/per-action EV table.
+fn eval_controls_ui(ui: &mut Ui, state: &mut ResultsState, street: u8) {
+    ui.horizontal(|ui| {
+        ui.label("EV samples:");
+        ui.add(egui::DragValue::new(&mut state.eval_samples).range(1..=1_000_000));
+        if ui.button("Evaluate EVs").clicked() {
+            state.start_eval();
+        }
+        match &state.eval {
+            ResultsEvalState::Idle | ResultsEvalState::Ready { .. } => {}
+            ResultsEvalState::Pending { .. } => {
+                ui.spinner();
+                ui.label("evaluating (may retrain a rollout abstraction on a cold cache)...");
+            }
+            ResultsEvalState::Failed { error, .. } => {
+                ui.colored_label(theme::ACCENT, format!("evaluation failed: {error}"));
+            }
+        }
+    });
+    if let ResultsEvalState::Ready { path, evaluation } = &state.eval
+        && *path == state.action_path()
+    {
+        let actor_label = state.seat_label(evaluation.actor as u8);
+        crate::eval_table::ui(ui, evaluation, street == 0, &actor_label);
+    }
 }
 
 fn preflop_matrix(ui: &mut Ui, state: &mut ResultsState, actor: u8, active_opponents: u8) {
@@ -435,4 +698,183 @@ fn detail_panel(ui: &mut Ui, state: &ResultsState, _actor: u8, street: u8, activ
 
 fn hex(bytes: &[u8; 16]) -> String {
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const H1: [u8; 16] = [1; 16];
+    const H2: [u8; 16] = [2; 16];
+
+    /// A hand-built (never solved) two-seat `MultiwaySolution`: seat 0's
+    /// range is only `AA`/`72o`, seat 0 opens `raise-to:250` at ROOT (always
+    /// with `AA`, half the time with `72o`), seat 1 3bets to `raise-to:800`
+    /// (`H1`), and seat 0 faces that 3bet at `H2` with different per-class
+    /// strategies. Exercises `ResultsState::class_reach_weights`/
+    /// `range_wide_aggregate`'s reach-weight product without needing an
+    /// actual solve.
+    fn synthetic_solution() -> MultiwaySolution {
+        let mut model = crate::model::Model::new_default(2);
+        model.seats[0].range = "AA,72o".to_string();
+        let config_toml = crate::model::model_to_toml(&model).unwrap();
+
+        let histories = vec![
+            MultiwayHistoryNode {
+                key: H1,
+                parent: ROOT,
+                actor: 0,
+                action_index: 1,
+                action: "raise-to:250".to_string(),
+            },
+            MultiwayHistoryNode {
+                key: H2,
+                parent: H1,
+                actor: 1,
+                action_index: 0,
+                action: "raise-to:800".to_string(),
+            },
+        ];
+
+        let aa = cards::class_index(12, 12, false) as u32;
+        let seven_two_o = cards::class_index(5, 0, false) as u32;
+        let unreached = [UNREACHED_BUCKET; 3];
+
+        let mut strategies = vec![
+            // Seat 0's own opening decision at ROOT.
+            MultiwayStrategyBlock {
+                key: MultiwayStrategyKey {
+                    history: ROOT,
+                    actor: 0,
+                    street: 0,
+                    active_opponents: 1,
+                    bucket_path: [aa, unreached[0], unreached[1], unreached[2]],
+                },
+                actions: vec!["fold".to_string(), "raise-to:250".to_string()],
+                probabilities: vec![0.0, 1.0],
+            },
+            MultiwayStrategyBlock {
+                key: MultiwayStrategyKey {
+                    history: ROOT,
+                    actor: 0,
+                    street: 0,
+                    active_opponents: 1,
+                    bucket_path: [seven_two_o, unreached[0], unreached[1], unreached[2]],
+                },
+                actions: vec!["fold".to_string(), "raise-to:250".to_string()],
+                probabilities: vec![0.5, 0.5],
+            },
+            // Seat 0 facing the 3bet at H2.
+            MultiwayStrategyBlock {
+                key: MultiwayStrategyKey {
+                    history: H2,
+                    actor: 0,
+                    street: 0,
+                    active_opponents: 1,
+                    bucket_path: [aa, unreached[0], unreached[1], unreached[2]],
+                },
+                actions: vec![
+                    "fold".to_string(),
+                    "call:800".to_string(),
+                    "raise-to:2000".to_string(),
+                ],
+                probabilities: vec![0.0, 0.2, 0.8],
+            },
+            MultiwayStrategyBlock {
+                key: MultiwayStrategyKey {
+                    history: H2,
+                    actor: 0,
+                    street: 0,
+                    active_opponents: 1,
+                    bucket_path: [seven_two_o, unreached[0], unreached[1], unreached[2]],
+                },
+                actions: vec![
+                    "fold".to_string(),
+                    "call:800".to_string(),
+                    "raise-to:2000".to_string(),
+                ],
+                probabilities: vec![0.9, 0.1, 0.0],
+            },
+        ];
+        strategies.sort_unstable_by_key(|block| block.key);
+
+        MultiwaySolution {
+            schema_version: formats::MULTIWAY_SCHEMA_VERSION,
+            config_toml,
+            abstraction_fingerprint: [0; 32],
+            sweeps: 1,
+            approximate_profile: true,
+            seats: Vec::new(),
+            histories,
+            strategies,
+        }
+    }
+
+    #[test]
+    fn class_reach_weights_multiply_range_weight_by_the_seats_own_earlier_action_probability() {
+        let solution = synthetic_solution();
+        let mut state = ResultsState::new(solution, None);
+        state.current_history = H2;
+
+        let aa = cards::class_index(12, 12, false);
+        let seven_two_o = cards::class_index(5, 0, false);
+        let reach = state
+            .class_reach_weights(0)
+            .expect("seat 0 has a configured range");
+
+        // range_weight(AA) = 6 combos * P(raise-to:250 | AA) = 1.0 -> 6.0
+        assert!((reach[aa] - 6.0).abs() < 1e-6);
+        // range_weight(72o) = 12 combos * P(raise-to:250 | 72o) = 0.5 -> 6.0
+        assert!((reach[seven_two_o] - 6.0).abs() < 1e-6);
+        // Every other class has zero range weight (seat 0's range is only
+        // AA/72o), so its reach is zero regardless of the product.
+        assert_eq!(reach.iter().filter(|&&weight| weight > 0.0).count(), 2);
+    }
+
+    #[test]
+    fn range_wide_aggregate_weights_groups_by_reach_not_raw_combo_count() {
+        let solution = synthetic_solution();
+        let mut state = ResultsState::new(solution, None);
+        state.current_history = H2;
+
+        let (action_labels, frequencies) = state
+            .range_wide_aggregate(0, 0, 1)
+            .expect("H2 has preflop blocks for both classes and a resolvable range");
+        assert_eq!(
+            action_labels,
+            vec![
+                "fold".to_string(),
+                "call:800".to_string(),
+                "raise-to:2000".to_string()
+            ]
+        );
+        // AA and 72o both reach with weight 6.0 (see the reach-weights test
+        // above), so despite 72o having twice as many combos as AA, they
+        // contribute equally to the aggregate:
+        // fold = (0.0+0.9)/2, call = (0.2+0.1)/2, raise = (0.8+0.0)/2.
+        assert!((frequencies[0] - 0.45).abs() < 1e-6);
+        assert!((frequencies[1] - 0.15).abs() < 1e-6);
+        assert!((frequencies[2] - 0.4).abs() < 1e-6);
+        let total: f64 = frequencies.iter().sum();
+        assert!((total - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn range_wide_aggregate_is_none_postflop() {
+        let solution = synthetic_solution();
+        let mut state = ResultsState::new(solution, None);
+        state.current_history = H2;
+        assert!(state.range_wide_aggregate(0, 1, 1).is_none());
+    }
+
+    #[test]
+    fn action_path_walks_the_root_to_current_action_indices() {
+        let solution = synthetic_solution();
+        let mut state = ResultsState::new(solution, None);
+        assert!(state.action_path().is_empty());
+        state.current_history = H1;
+        assert_eq!(state.action_path(), vec![1]);
+        state.current_history = H2;
+        assert_eq!(state.action_path(), vec![1, 0]);
+    }
 }

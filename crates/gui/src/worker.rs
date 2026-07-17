@@ -1,7 +1,7 @@
 //! Background solve worker: owns a `MultiwaySession` on its own thread and
-//! drives it in small chunks so the UI thread can observe progress, pause,
-//! or cancel between chunks (see `docs/native-gui-plan.md` section F,
-//! "worker protocol").
+//! drives it in small, time-boxed chunks so the UI thread can observe
+//! progress, pause, or cancel between chunks (see `docs/native-gui-plan.md`
+//! section F, "worker protocol").
 
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -13,9 +13,34 @@ use cli::session::{self, MultiwaySession};
 use eframe::egui;
 use formats::{MultiwaySolution, MwsolStorage};
 use multiway::checkpoint::MultiwayCheckpoint;
-use multiway::solver::{HistoryKey, InfoKey, ProfileEvaluation};
+use multiway::solver::{HistoryKey, InfoKey, NodeActionEvaluation, ProfileEvaluation};
 
-#[derive(Debug, Clone, Copy)]
+/// Target wall-clock duration of one drive-loop chunk. Chunks are sized from
+/// the solver's own measured throughput (see `sweep_rate` in [`run`]) to hit
+/// this cadence, so the UI sees a fresh [`ProgressSnapshot`] a few times a
+/// second regardless of how fast or slow the solve itself runs -- subject to
+/// never crossing an evaluation/checkpoint boundary (see
+/// `session::distance_to_boundary`).
+const TARGET_CHUNK_SECS: f64 = 0.25;
+
+/// EWMA smoothing factor for the adaptive chunk-size rate estimate: closer
+/// to `1.0` reacts to a changing sweep rate faster; closer to `0.0` damps
+/// out one chunk's timing jitter more. `0.3` was picked to settle within a
+/// handful of chunks without overreacting to a single slow chunk (e.g. one
+/// that happened to land right before a checkpoint write).
+const RATE_EWMA_ALPHA: f64 = 0.3;
+
+/// Wall-clock throttle for the watched-node [`NodeSnapshot`] refresh: about
+/// 2 Hz, matching this deliverable's "live enough to feel real-time without
+/// dominating drive-loop time" target (`strategies_at_with_mass` is an
+/// `O(node's buckets)` scan, cheap but not free).
+const NODE_SNAPSHOT_THROTTLE_MILLIS: u128 = 500;
+
+/// Refresh throttle for the O(infosets) [`multiway::solver::MultiwaySolver::metrics`]
+/// call backing a [`ProgressSnapshot`]'s infoset/memory readout.
+const METRICS_THROTTLE_MILLIS: u128 = 250;
+
+#[derive(Debug, Clone)]
 pub enum WorkerCmd {
     Pause,
     Resume,
@@ -25,9 +50,22 @@ pub enum WorkerCmd {
     Cancel,
     /// Start (or, with `None`, stop) watching one public-history node for
     /// live average-strategy snapshots. Carries the raw history key rather
-    /// than `HistoryKey` so the command stays `Copy`. Does not affect
-    /// [`RunState`]: the worker keeps running/paused exactly as before.
+    /// than `HistoryKey` so the command stays independent of the multiway
+    /// crate's internal type. Does not affect [`RunState`]: the worker keeps
+    /// running/paused exactly as before.
     WatchNode(Option<[u8; 16]>),
+    /// Evaluate per-hand-group, per-action EVs at the node reached by
+    /// replaying `path` (action indices from the root) against the current
+    /// average profile. Serviced between drive-loop chunks (and immediately
+    /// while paused): the worker never runs `evaluate_node_actions`
+    /// concurrently with a sweep batch. Replies with
+    /// [`WorkerEvent::NodeEvaluation`] or [`WorkerEvent::NodeEvaluationFailed`],
+    /// each carrying `path` back so a view showing a different node by the
+    /// time the reply arrives can drop it.
+    EvaluateNode {
+        path: Vec<usize>,
+        samples: u64,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -36,6 +74,15 @@ pub struct ProgressSnapshot {
     pub target: u64,
     pub elapsed_secs: f64,
     pub sweeps_per_sec: f64,
+    /// Cumulative individual player traversals so far this run (see
+    /// `multiway::solver::MultiwaySolver::traversals`).
+    pub traversals: u64,
+    pub traversals_per_sec: f64,
+    /// Cumulative individual hand updates so far this run -- the headline
+    /// throughput number (see
+    /// `multiway::solver::MultiwaySolver::hand_updates`).
+    pub hand_updates: u64,
+    pub hand_updates_per_sec: f64,
     pub infosets: u64,
     pub memory_bytes: u64,
     pub seat_avg_pos_regret: Vec<f64>,
@@ -53,6 +100,7 @@ pub struct FinishedRun {
 pub struct NodeChild {
     pub key: [u8; 16],
     pub actor: u8,
+    pub action_index: usize,
     pub action: String,
 }
 
@@ -66,20 +114,37 @@ pub struct NodeBlock {
     pub bucket_path: [u32; 4],
     pub actions: Vec<String>,
     pub probabilities: Vec<f32>,
+    /// This column's linear-CFR reach-weighted strategy mass (see
+    /// `multiway::solver::MultiwaySolver::strategies_at_with_mass`) -- the
+    /// weight the live range-wide action-frequency aggregate uses.
+    pub mass: f64,
 }
 
 /// Live snapshot of one watched public-history node, rebuilt from the
-/// solver's cold query accessors (`node_children`/`strategies_at`) at UI
-/// refresh rate.
+/// solver's cold query accessors (`node_children`/`strategies_at_with_mass`)
+/// at UI refresh rate.
 #[derive(Debug, Clone)]
 pub struct NodeSnapshot {
     pub history: [u8; 16],
     pub sweeps: u64,
-    /// Root-to-node path, one "SEATNAME action" entry per edge; empty at
+    /// Root-to-current path, one "SEATNAME action" entry per edge; empty at
     /// ROOT.
     pub path: Vec<String>,
+    /// The same path as `path`, but as the action indices `EvaluateNode`
+    /// expects -- the GUI carries this alongside the human-readable path
+    /// instead of re-deriving it from a separately tracked breadcrumb, so
+    /// the "Evaluate EVs" button always targets exactly the node this
+    /// snapshot describes.
+    pub action_path: Vec<usize>,
     pub children: Vec<NodeChild>,
     pub blocks: Vec<NodeBlock>,
+}
+
+/// A completed [`WorkerCmd::EvaluateNode`] request.
+#[derive(Debug)]
+pub struct NodeEvaluationResult {
+    pub path: Vec<usize>,
+    pub evaluation: NodeActionEvaluation,
 }
 
 pub enum WorkerEvent {
@@ -89,6 +154,16 @@ pub enum WorkerEvent {
     Evaluated(ProfileEvaluation),
     /// Live average strategy at a watched node; see [`WorkerCmd::WatchNode`].
     NodeStrategies(Box<NodeSnapshot>),
+    /// Reply to [`WorkerCmd::EvaluateNode`].
+    NodeEvaluation(Box<NodeEvaluationResult>),
+    /// `evaluate_node_actions` itself failed for a requested path (e.g. it
+    /// pointed past the node's legal action count by the time it was
+    /// serviced). Non-fatal: unlike [`WorkerEvent::Failed`], the solve keeps
+    /// running.
+    NodeEvaluationFailed {
+        path: Vec<usize>,
+        error: String,
+    },
     Finished(Box<FinishedRun>),
     Cancelled,
     Failed(String),
@@ -160,8 +235,57 @@ fn apply_cmd(cmd: WorkerCmd, state: RunState) -> RunState {
         WorkerCmd::Finish => RunState::Finishing,
         WorkerCmd::Cancel => RunState::Cancelled,
         // Handled directly by `drain_commands`/the Paused loop below, which
-        // need the target itself; never changes `RunState`.
-        WorkerCmd::WatchNode(_) => state,
+        // need the target/session itself; never changes `RunState`.
+        WorkerCmd::WatchNode(_) | WorkerCmd::EvaluateNode { .. } => state,
+    }
+}
+
+/// Deterministic seed for one `EvaluateNode` request: a function of the
+/// solve's own algorithm seed and the requested path, so repeating the same
+/// request (the same node, re-clicked) reproduces the same estimate instead
+/// of fresh Monte Carlo noise every time. Exposed for the Results tab's
+/// background evaluation, which needs the same reproducibility property
+/// against a loaded `.mwsol`'s own `[algorithm] seed`.
+pub fn node_eval_seed(run_seed: u64, path: &[usize]) -> u64 {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"solvers.gui.node_eval.seed.v1");
+    hasher.update(&run_seed.to_le_bytes());
+    for &action_index in path {
+        hasher.update(&(action_index as u64).to_le_bytes());
+    }
+    u64::from_le_bytes(
+        hasher.finalize().as_bytes()[..8]
+            .try_into()
+            .expect("hash output is at least 8 bytes"),
+    )
+}
+
+/// Rounds `sweeps` to the nearest multiple of `sweep_batch` (never to zero),
+/// so the adaptive chunk size lines up with the solver's own internal
+/// sweep-batch granularity instead of splitting one batch across two chunks.
+/// `sweep_batch <= 1` (no batching) is a no-op past clamping to at least `1`.
+fn round_to_sweep_batch(sweeps: u64, sweep_batch: u64) -> u64 {
+    if sweep_batch <= 1 {
+        return sweeps.max(1);
+    }
+    let rounded = (sweeps + sweep_batch / 2) / sweep_batch * sweep_batch;
+    rounded.max(sweep_batch)
+}
+
+/// Runs one queued [`WorkerCmd::EvaluateNode`] request against `session`'s
+/// current average profile and turns the result into the matching
+/// [`WorkerEvent`].
+fn evaluate_node(session: &MultiwaySession, path: &[usize], samples: u64) -> WorkerEvent {
+    let seed = node_eval_seed(session.solver.config().seed, path);
+    match session.solver.evaluate_node_actions(path, samples, seed) {
+        Ok(evaluation) => WorkerEvent::NodeEvaluation(Box::new(NodeEvaluationResult {
+            path: path.to_vec(),
+            evaluation,
+        })),
+        Err(error) => WorkerEvent::NodeEvaluationFailed {
+            path: path.to_vec(),
+            error: error.to_string(),
+        },
     }
 }
 
@@ -190,9 +314,15 @@ fn run(
 
     let started = Instant::now();
     let mut state = RunState::Running;
-    // Resumed checkpoints start with a non-zero sweep count; throughput must
-    // only count sweeps produced by this run.
+    // Resumed checkpoints start with non-zero cumulative counters; every
+    // rate below must only count what this run itself produced.
     let initial_sweeps = mw_session.solver.completed_sweeps();
+    let initial_traversals = mw_session.solver.traversals();
+    let initial_hand_updates = mw_session.solver.hand_updates();
+    // EWMA estimate of sweeps/sec, used to size each chunk to roughly
+    // `TARGET_CHUNK_SECS`; `0.0` means "no measurement yet", handled by
+    // bootstrapping the first chunk at one sweep-batch.
+    let mut sweep_rate = 0.0f64;
     // Seed `prior` with the current averages (drift result discarded).
     let mut prior: HashMap<InfoKey, Vec<f32>> = HashMap::new();
     mw_session.solver.strategy_drift_refresh(&mut prior);
@@ -204,23 +334,30 @@ fn run(
     // Live node-strategy view (see `WorkerCmd::WatchNode`): `watch_dirty`
     // accumulates across every `drain_commands` call since the last
     // `NodeSnapshot` send, so a target change is never silently absorbed by
-    // the 250ms throttle below.
+    // the refresh throttle below.
     let mut watched: Option<[u8; 16]> = None;
     let mut watch_dirty = false;
     let mut last_node_sent_at = Instant::now();
+    // `EvaluateNode` requests drained while a sweep batch is in flight (the
+    // `should_continue` closure below cannot borrow `mw_session` -- it is
+    // already mutably borrowed by the call driving it) are queued here and
+    // serviced as soon as the current chunk returns.
+    let mut pending_evaluations: Vec<(Vec<usize>, u64)> = Vec::new();
 
     'drive: loop {
-        let drained = drain_commands(&commands, state, &mut watched);
+        let drained = drain_commands(&commands, state, &mut watched, &mut pending_evaluations);
         state = drained.state;
         watch_dirty |= drained.watch_changed;
         match state {
             RunState::Cancelled => break 'drive,
             RunState::Finishing => break 'drive,
             RunState::Paused => {
-                // Block for the next command, but a `WatchNode` must answer
-                // immediately (with a fresh snapshot) and keep blocking --
-                // it does not count as "the next command" that ends the
-                // pause.
+                for (path, samples) in pending_evaluations.drain(..) {
+                    send(evaluate_node(&mw_session, &path, samples));
+                }
+                // Block for the next command, but `WatchNode`/`EvaluateNode`
+                // must answer immediately and keep blocking -- neither
+                // counts as "the next command" that ends the pause.
                 loop {
                     match commands.recv() {
                         Ok(WorkerCmd::WatchNode(target)) => {
@@ -233,6 +370,9 @@ fn run(
                                 last_node_sent_at = Instant::now();
                                 watch_dirty = false;
                             }
+                        }
+                        Ok(WorkerCmd::EvaluateNode { path, samples }) => {
+                            send(evaluate_node(&mw_session, &path, samples));
                         }
                         Ok(cmd) => {
                             state = apply_cmd(cmd, state);
@@ -249,12 +389,15 @@ fn run(
             RunState::Running => {}
         }
 
+        for (path, samples) in pending_evaluations.drain(..) {
+            send(evaluate_node(&mw_session, &path, samples));
+        }
+
         let current = mw_session.solver.completed_sweeps();
         if current >= mw_session.sweeps_target {
             break 'drive;
         }
         let remaining = mw_session.sweeps_target - current;
-        let base_chunk = (mw_session.sweeps_target / 1_000).clamp(1, target.check_every.max(1));
         // Never step across an evaluation or checkpoint boundary: the
         // cadence gates below use `sweeps % cadence == 0` and would silently
         // starve on misaligned counts (e.g. after a mid-chunk pause).
@@ -264,17 +407,28 @@ fn run(
             .checkpoint_every
             .map(|cadence| session::distance_to_boundary(current, cadence))
             .unwrap_or(u64::MAX);
-        let chunk = base_chunk
-            .min(remaining)
-            .min(evaluation_delta)
-            .min(checkpoint_delta)
-            .max(1);
+        let boundary_distance = remaining.min(evaluation_delta).min(checkpoint_delta).max(1);
+        let sweep_batch = mw_session.solver.config().sweep_batch.max(1);
+        // Adaptive time-based chunk size: aim for `TARGET_CHUNK_SECS` of
+        // work at the currently measured rate, rounded to a whole number of
+        // sweep-batches, but never past the next cadence boundary. `chunk`
+        // sizing never changes any result -- any chunking aligned to
+        // `sweep_batch` is bit-identical, since `run_sweeps_with_threads_until`
+        // itself re-batches internally regardless of the `sweeps` argument.
+        let target_sweeps = if sweep_rate > 0.0 {
+            round_to_sweep_batch((sweep_rate * TARGET_CHUNK_SECS).round() as u64, sweep_batch)
+        } else {
+            sweep_batch
+        };
+        let chunk = target_sweeps.min(boundary_distance).max(1);
 
+        let chunk_started = Instant::now();
         let result =
             mw_session
                 .solver
                 .run_sweeps_with_threads_until(chunk, mw_session.threads, || {
-                    let drained = drain_commands(&commands, state, &mut watched);
+                    let drained =
+                        drain_commands(&commands, state, &mut watched, &mut pending_evaluations);
                     state = drained.state;
                     watch_dirty |= drained.watch_changed;
                     state == RunState::Running
@@ -285,10 +439,25 @@ fn run(
             )));
             return;
         }
+        let chunk_elapsed = chunk_started.elapsed().as_secs_f64();
 
         let sweeps_now = mw_session.solver.completed_sweeps();
+        let sweeps_this_chunk = sweeps_now.saturating_sub(current);
+        if chunk_elapsed > 0.0 && sweeps_this_chunk > 0 {
+            let instantaneous = sweeps_this_chunk as f64 / chunk_elapsed;
+            sweep_rate = if sweep_rate > 0.0 {
+                RATE_EWMA_ALPHA * instantaneous + (1.0 - RATE_EWMA_ALPHA) * sweep_rate
+            } else {
+                instantaneous
+            };
+        }
+
+        for (path, samples) in pending_evaluations.drain(..) {
+            send(evaluate_node(&mw_session, &path, samples));
+        }
+
         let at_evaluation = sweeps_now % mw_session.evaluation_cadence == 0;
-        if at_evaluation || last_metrics_at.elapsed().as_millis() >= 250 {
+        if at_evaluation || last_metrics_at.elapsed().as_millis() >= METRICS_THROTTLE_MILLIS {
             last_metrics = mw_session.solver.metrics();
             last_metrics_at = Instant::now();
         }
@@ -322,12 +491,26 @@ fn run(
         }
 
         let elapsed = started.elapsed().as_secs_f64();
+        let traversals_now = mw_session.solver.traversals();
+        let hand_updates_now = mw_session.solver.hand_updates();
         send(WorkerEvent::Progress(ProgressSnapshot {
             sweeps: sweeps_now,
             target: mw_session.sweeps_target,
             elapsed_secs: elapsed,
             sweeps_per_sec: if elapsed > 0.0 {
                 (sweeps_now - initial_sweeps) as f64 / elapsed
+            } else {
+                0.0
+            },
+            traversals: traversals_now,
+            traversals_per_sec: if elapsed > 0.0 {
+                (traversals_now - initial_traversals) as f64 / elapsed
+            } else {
+                0.0
+            },
+            hand_updates: hand_updates_now,
+            hand_updates_per_sec: if elapsed > 0.0 {
+                (hand_updates_now - initial_hand_updates) as f64 / elapsed
             } else {
                 0.0
             },
@@ -338,7 +521,8 @@ fn run(
         }));
 
         if let Some(key) = watched
-            && (watch_dirty || last_node_sent_at.elapsed().as_millis() >= 250)
+            && (watch_dirty
+                || last_node_sent_at.elapsed().as_millis() >= NODE_SNAPSHOT_THROTTLE_MILLIS)
         {
             send(WorkerEvent::NodeStrategies(Box::new(node_snapshot(
                 &mw_session,
@@ -348,7 +532,7 @@ fn run(
             watch_dirty = false;
         }
 
-        let drained = drain_commands(&commands, state, &mut watched);
+        let drained = drain_commands(&commands, state, &mut watched, &mut pending_evaluations);
         state = drained.state;
         watch_dirty |= drained.watch_changed;
         if state == RunState::Cancelled {
@@ -461,11 +645,14 @@ struct DrainedCommands {
 
 /// Drains every pending command without blocking. `WatchNode` is applied
 /// directly to `*watched` here (never through `apply_cmd`) so it can never
-/// perturb `RunState`.
+/// perturb `RunState`; `EvaluateNode` requests are appended to
+/// `*evaluations` (the caller services them once it is safe to borrow the
+/// session again -- see the comment on `pending_evaluations` in [`run`]).
 fn drain_commands(
     commands: &Receiver<WorkerCmd>,
     mut state: RunState,
     watched: &mut Option<[u8; 16]>,
+    evaluations: &mut Vec<(Vec<usize>, u64)>,
 ) -> DrainedCommands {
     let mut watch_changed = false;
     loop {
@@ -473,6 +660,9 @@ fn drain_commands(
             Ok(WorkerCmd::WatchNode(target)) => {
                 *watched = target;
                 watch_changed = true;
+            }
+            Ok(WorkerCmd::EvaluateNode { path, samples }) => {
+                evaluations.push((path, samples));
             }
             Ok(cmd) => state = apply_cmd(cmd, state),
             Err(TryRecvError::Empty) => break,
@@ -489,9 +679,10 @@ fn drain_commands(
 }
 
 /// Builds a [`NodeSnapshot`] for `history` from the solver's cold query
-/// accessors. Called at most a few times per second (see the 250ms throttle
-/// in `run`), so the `O(histories)`/`O(policies)` scans in `node_children`/
-/// `strategies_at` are cheap relative to a whole chunk of sweeps.
+/// accessors. Called at most a few times per second (see the refresh
+/// throttle in `run`), so the `O(histories)`/`O(node's buckets)` scans in
+/// `node_children`/`strategies_at_with_mass` are cheap relative to a whole
+/// chunk of sweeps.
 fn node_snapshot(session: &MultiwaySession, history: [u8; 16]) -> NodeSnapshot {
     let key = HistoryKey(history);
     let children = session
@@ -501,50 +692,61 @@ fn node_snapshot(session: &MultiwaySession, history: [u8; 16]) -> NodeSnapshot {
         .map(|entry| NodeChild {
             key: entry.key.0,
             actor: entry.actor,
+            action_index: entry.action_index as usize,
             action: entry.action_label,
         })
         .collect();
     let blocks = session
         .solver
-        .strategies_at(key)
+        .strategies_at_with_mass(key)
         .into_iter()
-        .map(|(info_key, actions, probabilities)| NodeBlock {
+        .map(|(info_key, actions, probabilities, mass)| NodeBlock {
             actor: info_key.player,
             street: info_key.street,
             active_opponents: info_key.active_opponents,
             bucket_path: info_key.bucket_path,
             actions,
             probabilities,
+            mass,
         })
         .collect();
+    let (path, action_path) = resolve_watch_path(session, key);
     NodeSnapshot {
         history,
         sweeps: session.solver.completed_sweeps(),
-        path: resolve_watch_path(session, key),
+        path,
+        action_path,
         children,
         blocks,
     }
 }
 
-/// Root-to-`history` path as "SEATNAME action" labels; empty at ROOT. Walks
+/// Root-to-`history` path as "SEATNAME action" labels (empty at ROOT) and
+/// the parallel action-index path `EvaluateNode` expects. Walks
 /// `history_entry` parent links directly (rather than `resolve_history`,
 /// which only carries action labels) so each edge can be prefixed with its
-/// seat name.
-fn resolve_watch_path(session: &MultiwaySession, mut history: HistoryKey) -> Vec<String> {
-    let mut reversed = Vec::new();
+/// seat name and its own action index recovered.
+fn resolve_watch_path(
+    session: &MultiwaySession,
+    mut history: HistoryKey,
+) -> (Vec<String>, Vec<usize>) {
+    let mut reversed_labels = Vec::new();
+    let mut reversed_actions = Vec::new();
     while history != HistoryKey::ROOT {
         let Some(entry) = session.solver.history_entry(history) else {
             break;
         };
-        reversed.push(format!(
+        reversed_labels.push(format!(
             "{} {}",
             seat_label(session, entry.actor),
             entry.action_label
         ));
+        reversed_actions.push(entry.action_index as usize);
         history = entry.parent;
     }
-    reversed.reverse();
-    reversed
+    reversed_labels.reverse();
+    reversed_actions.reverse();
+    (reversed_labels, reversed_actions)
 }
 
 fn seat_label(session: &MultiwaySession, actor: u8) -> String {
@@ -562,4 +764,34 @@ fn write_checkpoint(session: &MultiwaySession, path: &std::path::Path) -> anyhow
     }
     MultiwayCheckpoint::capture(&session.solver).write_atomic(path)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn round_to_sweep_batch_rounds_to_nearest_multiple_but_never_to_zero() {
+        assert_eq!(round_to_sweep_batch(0, 1), 1);
+        assert_eq!(round_to_sweep_batch(7, 1), 7);
+        assert_eq!(round_to_sweep_batch(0, 8), 8);
+        assert_eq!(round_to_sweep_batch(3, 8), 8);
+        assert_eq!(round_to_sweep_batch(5, 8), 8);
+        assert_eq!(round_to_sweep_batch(12, 8), 16);
+        // 100 is equidistant between 96 and 104; the `+ sweep_batch / 2`
+        // round-half-up rule picks 104.
+        assert_eq!(round_to_sweep_batch(100, 8), 104);
+        assert_eq!(round_to_sweep_batch(97, 8), 96);
+    }
+
+    #[test]
+    fn node_eval_seed_is_deterministic_and_path_sensitive() {
+        let a = node_eval_seed(7, &[0, 1]);
+        let b = node_eval_seed(7, &[0, 1]);
+        let c = node_eval_seed(7, &[0, 2]);
+        let d = node_eval_seed(9, &[0, 1]);
+        assert_eq!(a, b);
+        assert_ne!(a, c);
+        assert_ne!(a, d);
+    }
 }

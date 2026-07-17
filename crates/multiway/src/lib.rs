@@ -36,9 +36,11 @@ pub use icm::{IcmDeltaEstimate, IcmError, IcmEstimate, IcmMode, estimate_icm, te
 pub use sampler::{CountedSample, DealSampler, SampleError, SampledWorld, SamplingDiagnostics};
 pub use settlement::{PotLayer, Settlement};
 pub use solver::{
-    ActionProbability, DenseArenaStats, DenseNodeContext, ExternalSamplingGame, HistoryEntry,
-    HistoryKey, InfoKey, MultiwaySolver, PolicyColumn, PolicyEntry, PrivateInfo, ProfileEstimate,
-    ProfileEvaluation, SolverConfig, SolverError, SolverMetrics, SolverState,
+    ActionProbability, AverageStrategyLookup, DenseArenaStats, DenseNodeContext,
+    ExternalSamplingGame, HistoryEntry, HistoryKey, InfoKey, MultiwaySolver, NodeActionAggregate,
+    NodeActionEvaluation, NodeActionGroupEvaluation, PolicyColumn, PolicyEntry, PrivateInfo,
+    ProfileEstimate, ProfileEvaluation, SolverConfig, SolverError, SolverMetrics, SolverState,
+    evaluate_node_actions,
 };
 pub use tree::{PublicTree, TreeError};
 pub use types::{MwChips, SeatId, SeatMask, SeatVec, Street};

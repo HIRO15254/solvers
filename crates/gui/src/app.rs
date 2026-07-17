@@ -58,6 +58,22 @@ impl App {
                 WorkerEvent::NodeStrategies(snapshot) => {
                     self.solve.live.snapshot = Some(snapshot);
                 }
+                WorkerEvent::NodeEvaluation(result) => {
+                    // Stale-guard: only keep a reply for the node the Live
+                    // node view is still showing (the user may have
+                    // navigated away while the evaluation was in flight).
+                    if result.path == self.solve.live.path {
+                        self.solve.live.eval = solve_view::NodeEvalState::Ready {
+                            path: result.path,
+                            evaluation: result.evaluation,
+                        };
+                    }
+                }
+                WorkerEvent::NodeEvaluationFailed { path, error } => {
+                    if path == self.solve.live.path {
+                        self.solve.live.eval = solve_view::NodeEvalState::Failed { path, error };
+                    }
+                }
                 WorkerEvent::Finished(finished) => {
                     self.solve.status = solve_view::RunStatus::Finished;
                     self.solve.live = solve_view::LiveNodeState::default();

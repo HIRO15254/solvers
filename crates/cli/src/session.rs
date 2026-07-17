@@ -31,7 +31,7 @@ use multiway::config::{
     UtilityConfig as MultiwayUtility,
 };
 use multiway::solver::{InfoKey, PolicyEntry, ProfileEvaluation, SolverConfig};
-use multiway::{HoldemGame, MultiwaySolver};
+use multiway::{DealSampler, HoldemGame, MultiwaySolver};
 
 use crate::config::{
     AlgorithmSection, GameSection, RakeSection, SolveConfig, StorageKind, UtilitySection,
@@ -91,9 +91,7 @@ pub fn build_multiway_session(
 
     let utility = convert_utility(utility)?;
     let rake = convert_rake(rake);
-    game_config
-        .validate_economics(&utility, &rake)
-        .context("validating multiway game and utility")?;
+    let (game, sampler) = build_multiway_game_from_config(&game_config, &utility, &rake)?;
 
     let (algorithm_seed, exploration_epsilon, discount_every, discount_until, traverser_vector) =
         match algorithm {
@@ -143,17 +141,6 @@ pub fn build_multiway_session(
     }
 
     let evaluation_samples = run.evaluation_samples.unwrap_or(256);
-    let abstraction = match game_config.abstraction.kind {
-        AbstractionKind::RolloutKmeans => {
-            MultiwayAbstractionBackend::RolloutKMeans(build_rollout_abstraction(&game_config)?)
-        }
-        AbstractionKind::Ehs2Table => {
-            MultiwayAbstractionBackend::Ehs2Table(build_ehs2_table_abstraction(&game_config)?)
-        }
-    };
-    let game = HoldemGame::new(&game_config, &utility, &rake, abstraction)
-        .context("building generative multiway game")?;
-    let sampler = game.deal_sampler().context("compiling table ranges")?;
     let solver_config = SolverConfig {
         seed: run.seed.unwrap_or(algorithm_seed),
         max_memory_bytes: run.max_memory_bytes.unwrap_or(DEFAULT_MEMORY_LIMIT),
@@ -206,6 +193,57 @@ pub fn build_multiway_session(
         config_hash: formats::config_hash(raw_toml.as_bytes()),
         game_config,
     })
+}
+
+/// The `[game]`/`[rake]`/`[utility]`-only core of `build_multiway_session`:
+/// builds (or loads/retrains) the configured card abstraction and returns a
+/// ready-to-use game plus its deal sampler, without touching
+/// `[algorithm]`/`[run]` or constructing a solver.
+fn build_multiway_game_from_config(
+    game_config: &multiway::MultiwayConfig,
+    utility: &MultiwayUtility,
+    rake: &MultiwayRake,
+) -> Result<(HoldemGame<MultiwayAbstractionBackend>, DealSampler)> {
+    game_config
+        .validate_economics(utility, rake)
+        .context("validating multiway game and utility")?;
+    let abstraction = match game_config.abstraction.kind {
+        AbstractionKind::RolloutKmeans => {
+            MultiwayAbstractionBackend::RolloutKMeans(build_rollout_abstraction(game_config)?)
+        }
+        AbstractionKind::Ehs2Table => {
+            MultiwayAbstractionBackend::Ehs2Table(build_ehs2_table_abstraction(game_config)?)
+        }
+    };
+    let game = HoldemGame::new(game_config, utility, rake, abstraction)
+        .context("building generative multiway game")?;
+    let sampler = game.deal_sampler().context("compiling table ranges")?;
+    Ok((game, sampler))
+}
+
+/// `[algorithm]`/`[run]`-independent counterpart of `build_multiway_session`:
+/// parses just `raw_toml`'s `[game]`/`[rake]`/`[utility]` sections and builds
+/// a working game + deal sampler, without constructing a solver. Shared by
+/// `build_multiway_session` and any caller (e.g. node-action evaluation over
+/// a loaded `.mwsol`, see `crate::node_eval`) that only needs to replay
+/// betting lines and deal worlds from a config's embedded game rules.
+pub fn build_multiway_game(
+    raw_toml: &str,
+) -> Result<(
+    HoldemGame<MultiwayAbstractionBackend>,
+    DealSampler,
+    multiway::MultiwayConfig,
+)> {
+    let config: SolveConfig = toml::from_str(raw_toml).context("parsing config")?;
+    let GameSection::PreflopMultiway(game_config) = config.game else {
+        return Err(anyhow!(
+            "multiway solve path requires kind = \"preflop-multiway\""
+        ));
+    };
+    let utility = convert_utility(config.utility)?;
+    let rake = convert_rake(config.rake);
+    let (game, sampler) = build_multiway_game_from_config(&game_config, &utility, &rake)?;
+    Ok((game, sampler, game_config))
 }
 
 /// Builds (or loads, or retrains-and-overwrites) the trained

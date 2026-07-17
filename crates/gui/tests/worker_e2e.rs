@@ -31,15 +31,23 @@ fn worker_runs_the_smoke_config_to_a_finished_solution() {
     let mut saw_building = false;
     let mut saw_progress = false;
     let mut saw_evaluation = false;
+    let mut saw_finite_rates = false;
     let mut watch_sent = false;
     let mut saw_node_strategies = false;
+    let mut eval_sent = false;
+    let mut saw_node_evaluation = false;
+    let mut root_actions: Option<Vec<String>> = None;
     let finished = loop {
         assert!(Instant::now() < deadline, "worker did not finish in time");
         match handle.events.recv_timeout(Duration::from_secs(600)) {
             Ok(WorkerEvent::Building) => saw_building = true,
             Ok(WorkerEvent::Progress(snapshot)) => {
                 assert!(snapshot.sweeps <= snapshot.target);
+                assert!(snapshot.sweeps_per_sec.is_finite());
+                assert!(snapshot.traversals_per_sec.is_finite());
+                assert!(snapshot.hand_updates_per_sec.is_finite());
                 saw_progress = true;
+                saw_finite_rates = true;
                 // Start watching ROOT (ties in with `App::start_solve`
                 // sending this right after spawn) once the worker is past
                 // the build phase, and check the live node view protocol:
@@ -49,10 +57,23 @@ fn worker_runs_the_smoke_config_to_a_finished_solution() {
                     handle.send(WorkerCmd::WatchNode(Some([0; 16])));
                     watch_sent = true;
                 }
+                // Once we have seen at least one snapshot, exercise the
+                // on-demand EV evaluation protocol at ROOT.
+                if !eval_sent {
+                    handle.send(WorkerCmd::EvaluateNode {
+                        path: Vec::new(),
+                        samples: 64,
+                    });
+                    eval_sent = true;
+                }
             }
             Ok(WorkerEvent::NodeStrategies(snapshot)) => {
                 assert_eq!(snapshot.history, [0; 16]);
                 assert!(snapshot.path.is_empty(), "ROOT's path must be empty");
+                assert!(
+                    snapshot.action_path.is_empty(),
+                    "ROOT's action path must be empty"
+                );
                 assert!(
                     !snapshot.children.is_empty() || !snapshot.blocks.is_empty(),
                     "expected ROOT to have children or strategy blocks"
@@ -65,7 +86,34 @@ fn worker_runs_the_smoke_config_to_a_finished_solution() {
                     );
                     assert_eq!(block.actions.len(), block.probabilities.len());
                 }
+                if root_actions.is_none()
+                    && let Some(block) = snapshot.blocks.first()
+                {
+                    root_actions = Some(block.actions.clone());
+                }
                 saw_node_strategies = true;
+            }
+            Ok(WorkerEvent::NodeEvaluation(result)) => {
+                assert!(
+                    result.path.is_empty(),
+                    "expected the reply for the requested ROOT path"
+                );
+                assert!(!result.evaluation.groups.is_empty());
+                assert!(!result.evaluation.action_labels.is_empty());
+                assert_eq!(
+                    result.evaluation.aggregate.len(),
+                    result.evaluation.action_labels.len()
+                );
+                if let Some(actions) = &root_actions {
+                    assert_eq!(
+                        &result.evaluation.action_labels, actions,
+                        "NodeEvaluation's action labels must match ROOT's own strategy blocks"
+                    );
+                }
+                saw_node_evaluation = true;
+            }
+            Ok(WorkerEvent::NodeEvaluationFailed { path, error }) => {
+                panic!("unexpected NodeEvaluationFailed for path {path:?}: {error}")
             }
             Ok(WorkerEvent::Evaluated(_)) => saw_evaluation = true,
             Ok(WorkerEvent::Finished(finished)) => break finished,
@@ -75,10 +123,14 @@ fn worker_runs_the_smoke_config_to_a_finished_solution() {
         }
     };
 
-    assert!(saw_building && saw_progress && saw_evaluation);
+    assert!(saw_building && saw_progress && saw_evaluation && saw_finite_rates);
     assert!(
         saw_node_strategies,
         "expected at least one NodeStrategies event before Finished"
+    );
+    assert!(
+        saw_node_evaluation,
+        "expected a NodeEvaluation reply for the ROOT EvaluateNode request before Finished"
     );
     assert_eq!(finished.mwsol_path, output_path);
     assert!(checkpoint_path.is_file());

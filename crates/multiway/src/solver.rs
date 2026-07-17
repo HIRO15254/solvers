@@ -175,6 +175,30 @@ pub trait ExternalSamplingGame: Send + Sync {
     }
 }
 
+/// Resolves the average strategy for one information set, so
+/// [`evaluate_node_actions`] can run identically over a live
+/// [`MultiwaySolver`]'s in-memory storage (sparse or dense) or a loaded
+/// `formats::MultiwaySolution`. Both sources key their storage by exactly
+/// the fields [`InfoKey`] already carries -- the blake3-chained public
+/// history, the acting seat, its street, its active-opponent count, and its
+/// bucket path -- so `InfoKey` is the minimal common lookup signature.
+///
+/// A lookup miss -- an infoset the training run never actually visited -- is
+/// not an error: implementors return `None`, and [`evaluate_node_actions`]
+/// falls back to uniform probability over that node's legal actions.
+pub trait AverageStrategyLookup {
+    /// Average-strategy probabilities at `key`, normalized to sum to `1`.
+    /// `None` iff `key` was never visited.
+    fn lookup(&self, key: InfoKey) -> Option<Vec<f64>>;
+}
+
+impl<G: ExternalSamplingGame> AverageStrategyLookup for MultiwaySolver<G> {
+    fn lookup(&self, key: InfoKey) -> Option<Vec<f64>> {
+        self.average_strategy(key)
+            .map(|probabilities| probabilities.iter().map(|&p| f64::from(p)).collect())
+    }
+}
+
 fn profile_estimate(mean: f64, sum_squared_error: f64, samples: u64) -> ProfileEstimate {
     let stderr = standard_error(sum_squared_error, samples);
     let radius = 1.96 * stderr;
@@ -478,6 +502,60 @@ pub struct ProfileEvaluation {
     /// profile. This is a conservative candidate-policy diagnostic, not a
     /// best response, exploitability, or Nash-convergence claim.
     pub deviation_gain_lower_bound: Option<Vec<ProfileEstimate>>,
+}
+
+/// One hand-group's row of [`evaluate_node_actions`]'s per-action EV
+/// estimates. "Group" here is the acting seat's current-street bucket at the
+/// evaluated node -- for a preflop node this is exactly the 169-class.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct NodeActionGroupEvaluation {
+    /// The acting seat's current-street bucket (the group id).
+    pub group: BucketId,
+    /// This group's share of the total self-normalized importance weight
+    /// across every group that appeared in the sample. Every returned
+    /// group's `weight_share` sums to `1` across [`NodeActionEvaluation::groups`]
+    /// (subject to floating-point rounding).
+    pub weight_share: f64,
+    /// The group's own average-strategy probabilities at the evaluated node
+    /// (uniform on a lookup miss), aligned with
+    /// [`NodeActionEvaluation::action_labels`]; sums to `1`.
+    pub frequencies: Vec<f64>,
+    /// Per-action EV estimate for hands in this group, aligned with
+    /// [`NodeActionEvaluation::action_labels`]. See [`evaluate_node_actions`]
+    /// for the estimator.
+    pub actions: Vec<ProfileEstimate>,
+    /// Samples that landed in this group with nonzero path weight.
+    pub samples: u64,
+}
+
+/// One action's range-wide aggregate across every group, produced by
+/// [`evaluate_node_actions`].
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct NodeActionAggregate {
+    pub ev: ProfileEstimate,
+    /// `Σ_g weight_share(g) · frequencies(g)[action]`: the weighted-average
+    /// looked-up action frequency across the reached range. This is the
+    /// profile's own frequency (not derived from the EV samples), reported
+    /// alongside the EV for a GTO-Wizard-style per-action row.
+    pub frequency: f64,
+}
+
+/// Per-hand-group, per-action expected-utility estimate of "take this action
+/// now, then everyone (including the actor) plays the current average
+/// strategy to the end of the hand", produced by [`evaluate_node_actions`].
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct NodeActionEvaluation {
+    /// The acting seat at the evaluated node.
+    pub actor: usize,
+    /// Stable index-to-action mapping, shared by every group row and the
+    /// aggregate row.
+    pub action_labels: Vec<String>,
+    pub samples: u64,
+    pub total_deal_attempts: u64,
+    /// Sorted by [`NodeActionGroupEvaluation::group`].
+    pub groups: Vec<NodeActionGroupEvaluation>,
+    /// Aligned with `action_labels`.
+    pub aggregate: Vec<NodeActionAggregate>,
 }
 
 #[derive(Clone, Debug)]
@@ -1586,13 +1664,42 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// (sparse) or `O(node's buckets)` (dense) scan; meant for a UI polling
     /// live progress, not the hot traversal loop.
     pub fn strategies_at(&self, history: HistoryKey) -> Vec<(InfoKey, Vec<String>, Vec<f32>)> {
-        let mut rows: Vec<(InfoKey, Vec<String>, Vec<f32>)> = match &self.dense {
+        self.strategies_at_with_mass(history)
+            .into_iter()
+            .map(|(key, labels, probabilities, _mass)| (key, labels, probabilities))
+            .collect()
+    }
+
+    /// Same rows as [`Self::strategies_at`], plus each column's raw strategy
+    /// mass: `Σ_a strategy_sum[a]` (the linear-CFR reach-weighted
+    /// visitation mass -- see [`PolicyColumn::strategy_sum`]), summed in
+    /// `f64` to avoid precision loss over many `f32` accumulators. This is
+    /// the correct cheap weight for a live "range-wide action frequency"
+    /// aggregation over a node's buckets: unlike a bucket count, it is
+    /// reach-weighted, and unlike re-deriving weights from
+    /// [`Self::evaluate_node_actions`], it costs nothing beyond the scan
+    /// [`Self::strategies_at`] already performs.
+    pub fn strategies_at_with_mass(
+        &self,
+        history: HistoryKey,
+    ) -> Vec<(InfoKey, Vec<String>, Vec<f32>, f64)> {
+        let mut rows: Vec<(InfoKey, Vec<String>, Vec<f32>, f64)> = match &self.dense {
             None => self
                 .policies
                 .iter()
                 .filter(|(key, _)| key.history == history)
                 .map(|(&key, column)| {
-                    (key, column.action_labels.clone(), column.average_strategy())
+                    let mass = column
+                        .strategy_sum
+                        .iter()
+                        .map(|&value| f64::from(value))
+                        .sum();
+                    (
+                        key,
+                        column.action_labels.clone(),
+                        column.average_strategy(),
+                        mass,
+                    )
                 })
                 .collect(),
             Some(dense) => {
@@ -1614,19 +1721,21 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                         .arena
                         .slot_range(node_id, bucket)
                         .expect("bucket is within this node's range");
-                    let probabilities =
-                        normalize_nonnegative_f32(&dense.arena.strategy_sum[range.clone()])
-                            .unwrap_or_else(|| regret_matching_f32(&dense.arena.regrets[range]));
+                    let strategy_sum = &dense.arena.strategy_sum[range.clone()];
+                    let mass = strategy_sum.iter().map(|&value| f64::from(value)).sum();
+                    let probabilities = normalize_nonnegative_f32(strategy_sum)
+                        .unwrap_or_else(|| regret_matching_f32(&dense.arena.regrets[range]));
                     rows.push((
                         dense.info_key_for(node_id, bucket),
                         node.action_labels.clone(),
                         probabilities,
+                        mass,
                     ));
                 }
                 rows
             }
         };
-        rows.sort_unstable_by_key(|(key, _, _)| *key);
+        rows.sort_unstable_by_key(|(key, _, _, _)| *key);
         rows
     }
 
@@ -1750,6 +1859,21 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// [`metrics`] for boundaries where the full diagnostics are consumed.
     pub fn completed_sweeps(&self) -> u64 {
         self.completed_sweeps
+    }
+
+    /// Cumulative individual player traversals so far (see
+    /// [`SolverState::traversals`]), without the O(infosets) work of
+    /// [`metrics`]. Cheap enough for a rate computation every drive-loop
+    /// chunk.
+    pub fn traversals(&self) -> u64 {
+        self.traversals
+    }
+
+    /// Cumulative hand updates so far (see [`SolverState::hand_updates`]),
+    /// without the O(infosets) work of [`metrics`]. Cheap enough for a rate
+    /// computation every drive-loop chunk.
+    pub fn hand_updates(&self) -> u64 {
+        self.hand_updates
     }
 
     /// Dense-arena preflight numbers, or `None` in `RecallMode::Full` (there
@@ -2254,6 +2378,28 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         Ok(key)
     }
 
+    /// Per-hand-group, per-action expected-utility estimate at the decision
+    /// node reached by replaying `path` from the root, evaluated against
+    /// this solver's own average strategy (sparse or dense storage, both
+    /// dispatch through [`Self::average_strategy`]). See the free function
+    /// [`evaluate_node_actions`] for the full algorithm and estimator.
+    pub fn evaluate_node_actions(
+        &self,
+        path: &[usize],
+        samples: u64,
+        seed: u64,
+    ) -> Result<NodeActionEvaluation, SolverError> {
+        evaluate_node_actions(
+            &self.game,
+            &self.sampler,
+            self,
+            path,
+            samples,
+            seed,
+            self.config.max_traversal_depth,
+        )
+    }
+
     fn apply_early_discount(&mut self) {
         let sweep = self.completed_sweeps;
         if self.config.discount_until == 0
@@ -2292,6 +2438,404 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             }
         }
     }
+}
+
+/// Per-`(hand-group, action)` importance-sampling accumulator backing
+/// [`evaluate_node_actions`]'s [`ProfileEstimate`]s. Every sample contributes
+/// `(weight, value)`, where `weight` is the product of the average-strategy
+/// probabilities of the path actually taken en route to the evaluated node
+/// (see that function's doc comment) and `value` is the seat-of-interest's
+/// utility from playing the cell's action now and the average profile
+/// afterward.
+#[derive(Clone, Copy, Debug, Default)]
+struct NodeEvalCell {
+    sum_w: f64,
+    sum_wx: f64,
+    sum_w2: f64,
+    sum_w2x: f64,
+    sum_w2x2: f64,
+    count: u64,
+}
+
+impl NodeEvalCell {
+    fn add(&mut self, weight: f64, value: f64) {
+        let w2 = weight * weight;
+        self.sum_w += weight;
+        self.sum_wx += weight * value;
+        self.sum_w2 += w2;
+        self.sum_w2x += w2 * value;
+        self.sum_w2x2 += w2 * value * value;
+        self.count += 1;
+    }
+
+    /// Self-normalized importance-sampling estimate of the weighted mean
+    /// `Σ w·x / Σ w` and its variance `Σ w²(x - mean)² / (Σ w)²` -- the
+    /// standard ratio-estimator (delta-method) variance for a
+    /// self-normalized importance-sampling mean (see e.g. Owen, *Monte Carlo
+    /// theory, methods and examples*, ch. 9, for the general form). Zero
+    /// total weight (every contributing sample had a zero-probability path
+    /// action) reports a degenerate zero estimate rather than dividing by
+    /// zero.
+    fn estimate(&self) -> ProfileEstimate {
+        if self.sum_w <= 0.0 {
+            return ProfileEstimate {
+                mean: 0.0,
+                stderr: 0.0,
+                ci95: [0.0, 0.0],
+            };
+        }
+        let mean = self.sum_wx / self.sum_w;
+        let variance_numerator =
+            (self.sum_w2x2 - 2.0 * mean * self.sum_w2x + mean * mean * self.sum_w2).max(0.0);
+        let stderr = variance_numerator.sqrt() / self.sum_w;
+        let radius = 1.96 * stderr;
+        ProfileEstimate {
+            mean,
+            stderr,
+            ci95: [mean - radius, mean + radius],
+        }
+    }
+}
+
+/// One hand-group's accumulator while [`evaluate_node_actions`] is still
+/// sampling; converted to a [`NodeActionGroupEvaluation`] once every sample
+/// has been folded in.
+struct NodeEvalGroup {
+    weight: f64,
+    samples: u64,
+    /// The group's own average strategy at the evaluated node, recorded once
+    /// (it is a deterministic function of the group's `InfoKey`, not of any
+    /// individual sample).
+    frequencies: Vec<f64>,
+    cells: Vec<NodeEvalCell>,
+}
+
+/// Estimates, for each of the acting seat's hand-groups and each legal
+/// action at the decision node reached by replaying `path` from `game`'s
+/// root, the expected utility of "take this action now, then everyone
+/// (including the actor) plays `strategy`'s average profile to the end of
+/// the hand". This is the evaluator behind a GTO-Wizard-style per-hand/
+/// per-action EV display.
+///
+/// `path` is a sequence of action indices (see
+/// [`ExternalSamplingGame::node_actions`] /
+/// [`ExternalSamplingGame::next_state_with`]); replaying it is entirely
+/// card-independent (poker actions never depend on hole cards), so it
+/// happens exactly once, up front, rather than once per sample. It is an
+/// error for `path` to index past a node's legal action count, or to
+/// continue past a terminal state.
+///
+/// Each of `samples` draws is a fresh, deterministic, seeded physical world
+/// (independent of any live solver's training RNG streams -- this evaluator
+/// never touches those, and never mutates `strategy` or any solver/learning
+/// state; it is `&self`-only throughout, safe to call from a read-only
+/// diagnostics path while a solver keeps training). Walking from the root to
+/// the evaluated node, every path node's average strategy (via `strategy`,
+/// falling back to uniform over that node's legal actions on a lookup miss)
+/// is looked up at that node's own actor's current bucket, and the sample's
+/// weight is multiplied by the probability the path actually assigns to the
+/// action taken; a zero-probability path action zeroes the sample's weight,
+/// and the sample is skipped from there on (it would contribute nothing
+/// regardless). At the evaluated node, the acting seat ("hero")'s hand-group
+/// is hero's own current-street bucket (the 169-class itself, for a
+/// preflop node); for each legal action, hero's utility is sampled by
+/// applying that action and then playing every subsequent decision (hero's
+/// own included) from `strategy`'s average profile (again uniform on a
+/// miss) to a terminal. Every action at one sample reuses the exact same
+/// playout RNG stream (common random numbers), so action-to-action EV
+/// differences see reduced sampling variance instead of independent noise;
+/// board and hole cards are already fixed by the sample's world.
+///
+/// Per `(group, action)` cell, `Σ weight · value`, `Σ weight`, and the count
+/// are accumulated into a [`NodeActionGroupEvaluation`] row (see
+/// [`NodeEvalCell::estimate`] for the self-normalized importance-sampling
+/// mean/variance estimator); the same accumulation, pooled across every
+/// group, becomes each action's [`NodeActionAggregate`].
+pub fn evaluate_node_actions<G: ExternalSamplingGame>(
+    game: &G,
+    sampler: &DealSampler,
+    strategy: &impl AverageStrategyLookup,
+    path: &[usize],
+    samples: u64,
+    seed: u64,
+    max_depth: u32,
+) -> Result<NodeActionEvaluation, SolverError> {
+    if samples == 0 {
+        return Err(SolverError::ZeroEvaluationSamples);
+    }
+    let num_players = game.num_players();
+
+    // Replay `path` once, card-independently, recording each path node's
+    // (history, actor, state) so every sample can re-derive that node's
+    // world-dependent bucket without replaying the betting line again.
+    let mut state = game.root_state();
+    let mut history = HistoryKey::ROOT;
+    let mut path_nodes: Vec<(HistoryKey, usize, G::State)> = Vec::with_capacity(path.len());
+    for (depth, &action_index) in path.iter().enumerate() {
+        let Some(actor) = game.actor(&state) else {
+            return Err(SolverError::EvaluationPathTerminalEarly { depth });
+        };
+        if actor >= num_players {
+            return Err(SolverError::InvalidActor { actor, num_players });
+        }
+        let actions = game.node_actions(&state);
+        let num_actions = game.num_actions_of(&actions);
+        if num_actions == 0 {
+            return Err(SolverError::NoActions { actor });
+        }
+        if action_index >= num_actions {
+            return Err(SolverError::EvaluationPathIndexOutOfRange {
+                depth,
+                index: action_index,
+                actions: num_actions,
+            });
+        }
+        path_nodes.push((history, actor, state.clone()));
+        let next_state = game.next_state_with(&state, &actions, action_index);
+        history = history.child(actor, action_index);
+        state = next_state;
+    }
+    let Some(hero) = game.actor(&state) else {
+        return Err(SolverError::EvaluationPathTerminalEarly { depth: path.len() });
+    };
+    if hero >= num_players {
+        return Err(SolverError::InvalidActor {
+            actor: hero,
+            num_players,
+        });
+    }
+    let target_history = history;
+    let target_state = state;
+    let target_actions = game.node_actions(&target_state);
+    let num_target_actions = game.num_actions_of(&target_actions);
+    if num_target_actions == 0 {
+        return Err(SolverError::NoActions { actor: hero });
+    }
+    let action_labels: Vec<String> = (0..num_target_actions)
+        .map(|index| game.action_label_of(&target_actions, index))
+        .collect();
+
+    let mut groups: FxHashMap<BucketId, NodeEvalGroup> = FxHashMap::default();
+    let mut aggregate_cells = vec![NodeEvalCell::default(); num_target_actions];
+    let mut aggregate_frequency_num = vec![0.0f64; num_target_actions];
+    let mut aggregate_frequency_den = 0.0f64;
+    let mut total_weight = 0.0f64;
+    let mut total_deal_attempts = 0u64;
+
+    for sample_id in 0..samples {
+        let mut deal_rng = node_eval_deal_rng(seed, sample_id);
+        let sample = sampler.sample_counted(&mut deal_rng)?;
+        total_deal_attempts = total_deal_attempts
+            .checked_add(u64::from(sample.attempts))
+            .ok_or(SolverError::CounterOverflow)?;
+        let world = sample.world;
+
+        let mut weight = 1.0f64;
+        for (&action_index, (node_history, node_actor, node_state)) in path.iter().zip(&path_nodes)
+        {
+            let node_actions = game.node_actions(node_state);
+            let node_num_actions = game.num_actions_of(&node_actions);
+            let private = game.bucket(node_state, &world, *node_actor);
+            let key = InfoKey {
+                history: *node_history,
+                player: *node_actor as u8,
+                street: private.street,
+                active_opponents: private.active_opponents,
+                bucket_path: private.bucket_path,
+            };
+            let probabilities = strategy
+                .lookup(key)
+                .filter(|probabilities| probabilities.len() == node_num_actions)
+                .unwrap_or_else(|| vec![1.0 / node_num_actions as f64; node_num_actions]);
+            let probability = probabilities.get(action_index).copied().unwrap_or(0.0);
+            if probability <= 0.0 {
+                weight = 0.0;
+                break;
+            }
+            weight *= probability;
+        }
+        if weight <= 0.0 {
+            continue;
+        }
+
+        let hero_private = game.bucket(&target_state, &world, hero);
+        let group_id = hero_private.current_bucket();
+        let target_key = InfoKey {
+            history: target_history,
+            player: hero as u8,
+            street: hero_private.street,
+            active_opponents: hero_private.active_opponents,
+            bucket_path: hero_private.bucket_path,
+        };
+        let target_strategy = strategy
+            .lookup(target_key)
+            .filter(|probabilities| probabilities.len() == num_target_actions)
+            .unwrap_or_else(|| vec![1.0 / num_target_actions as f64; num_target_actions]);
+
+        let mut action_values = Vec::with_capacity(num_target_actions);
+        for action_index in 0..num_target_actions {
+            let next_state = game.next_state_with(&target_state, &target_actions, action_index);
+            let next_history = target_history.child(hero, action_index);
+            let mut playout_rng = node_eval_playout_rng(seed, sample_id);
+            let value = playout(
+                game,
+                strategy,
+                next_state,
+                next_history,
+                &world,
+                hero,
+                &mut playout_rng,
+                max_depth,
+            )?;
+            action_values.push(value);
+        }
+
+        let group = groups.entry(group_id).or_insert_with(|| NodeEvalGroup {
+            weight: 0.0,
+            samples: 0,
+            frequencies: target_strategy.clone(),
+            cells: vec![NodeEvalCell::default(); num_target_actions],
+        });
+        group.weight += weight;
+        group.samples += 1;
+        total_weight += weight;
+        for (action_index, &value) in action_values.iter().enumerate() {
+            group.cells[action_index].add(weight, value);
+            aggregate_cells[action_index].add(weight, value);
+            aggregate_frequency_num[action_index] += weight * target_strategy[action_index];
+        }
+        aggregate_frequency_den += weight;
+    }
+
+    let mut group_rows: Vec<NodeActionGroupEvaluation> = groups
+        .into_iter()
+        .map(|(group, accumulator)| NodeActionGroupEvaluation {
+            group,
+            weight_share: if total_weight > 0.0 {
+                accumulator.weight / total_weight
+            } else {
+                0.0
+            },
+            frequencies: accumulator.frequencies,
+            actions: accumulator
+                .cells
+                .iter()
+                .map(NodeEvalCell::estimate)
+                .collect(),
+            samples: accumulator.samples,
+        })
+        .collect();
+    group_rows.sort_unstable_by_key(|row| row.group);
+
+    let aggregate = (0..num_target_actions)
+        .map(|action_index| NodeActionAggregate {
+            ev: aggregate_cells[action_index].estimate(),
+            frequency: if aggregate_frequency_den > 0.0 {
+                aggregate_frequency_num[action_index] / aggregate_frequency_den
+            } else {
+                1.0 / num_target_actions as f64
+            },
+        })
+        .collect();
+
+    Ok(NodeActionEvaluation {
+        actor: hero,
+        action_labels,
+        samples,
+        total_deal_attempts,
+        groups: group_rows,
+        aggregate,
+    })
+}
+
+/// Plays `state` (already past the evaluated node's chosen action) forward
+/// to a terminal, sampling every decision -- including the seat-of-interest's
+/// own later decisions -- from `strategy`'s average profile (uniform on a
+/// lookup miss), and returns `hero`'s terminal utility.
+#[allow(clippy::too_many_arguments)]
+fn playout<G: ExternalSamplingGame>(
+    game: &G,
+    strategy: &impl AverageStrategyLookup,
+    mut state: G::State,
+    mut history: HistoryKey,
+    world: &SampledWorld,
+    hero: usize,
+    rng: &mut ChaCha20Rng,
+    max_depth: u32,
+) -> Result<f64, SolverError> {
+    let num_players = game.num_players();
+    for depth in 0..=max_depth {
+        let Some(actor) = game.actor(&state) else {
+            let mut utilities = vec![0.0; num_players];
+            game.terminal_utilities(&state, world, &mut utilities);
+            if let Some((seat, &utility)) = utilities
+                .iter()
+                .enumerate()
+                .find(|(_, utility)| !utility.is_finite())
+            {
+                return Err(SolverError::NonFiniteUtility { seat, utility });
+            }
+            return Ok(utilities[hero]);
+        };
+        if actor >= num_players {
+            return Err(SolverError::InvalidActor { actor, num_players });
+        }
+        let actions = game.node_actions(&state);
+        let num_actions = game.num_actions_of(&actions);
+        if num_actions == 0 {
+            return Err(SolverError::NoActions { actor });
+        }
+        let private = game.bucket(&state, world, actor);
+        let key = InfoKey {
+            history,
+            player: actor as u8,
+            street: private.street,
+            active_opponents: private.active_opponents,
+            bucket_path: private.bucket_path,
+        };
+        let probabilities = strategy
+            .lookup(key)
+            .filter(|probabilities| probabilities.len() == num_actions)
+            .unwrap_or_else(|| vec![1.0 / num_actions as f64; num_actions]);
+        let action = sample_profile_action_f64(&probabilities, rng);
+        history = history.child(actor, action);
+        state = game.next_state_with(&state, &actions, action);
+        if depth == max_depth {
+            return Err(SolverError::DepthLimit { limit: max_depth });
+        }
+    }
+    unreachable!("depth loop returns at its upper bound")
+}
+
+fn sample_profile_action_f64(strategy: &[f64], rng: &mut ChaCha20Rng) -> usize {
+    let needle = rng.gen_range(0.0..1.0);
+    let mut cumulative = 0.0;
+    for (action, &probability) in strategy.iter().enumerate() {
+        cumulative += probability;
+        if needle < cumulative {
+            return action;
+        }
+    }
+    strategy.len() - 1
+}
+
+fn node_eval_deal_rng(seed: u64, sample_id: u64) -> ChaCha20Rng {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"solvers.multiway.node-eval-deal.v1");
+    hasher.update(&seed.to_le_bytes());
+    hasher.update(&sample_id.to_le_bytes());
+    ChaCha20Rng::from_seed(*hasher.finalize().as_bytes())
+}
+
+/// Derived fresh (never mutated across an evaluated node's actions) so every
+/// action at one sample gets the exact same playout RNG stream -- common
+/// random numbers, reducing action-to-action EV variance.
+fn node_eval_playout_rng(seed: u64, sample_id: u64) -> ChaCha20Rng {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"solvers.multiway.node-eval-playout.v1");
+    hasher.update(&seed.to_le_bytes());
+    hasher.update(&sample_id.to_le_bytes());
+    ChaCha20Rng::from_seed(*hasher.finalize().as_bytes())
 }
 
 impl<'a, G: ExternalSamplingGame> TraversalWorker<'a, G> {
@@ -3504,6 +4048,20 @@ pub enum SolverError {
     IncompleteSweepState,
     #[error("profile evaluation sample count must be positive")]
     ZeroEvaluationSamples,
+    #[error(
+        "evaluate_node_actions path index {index} at depth {depth} is out of range for \
+         {actions} legal actions"
+    )]
+    EvaluationPathIndexOutOfRange {
+        depth: usize,
+        index: usize,
+        actions: usize,
+    },
+    #[error(
+        "evaluate_node_actions path hit a terminal state at depth {depth} before reaching the \
+         requested node"
+    )]
+    EvaluationPathTerminalEarly { depth: usize },
     #[error("numeric accumulation exceeded f32 storage")]
     NumericOverflow,
     #[error("counter overflow")]
@@ -5444,6 +6002,290 @@ mod tests {
         let evaluation = solver.evaluate_average_profile(64, 5).unwrap();
         for seat in &evaluation.seats {
             assert!(seat.mean.is_finite());
+        }
+    }
+
+    // --- evaluate_node_actions -----------------------------------------
+
+    /// Trivial [`AverageStrategyLookup`] that always misses, so every
+    /// decision along the replayed path and every post-action playout falls
+    /// back to [`evaluate_node_actions`]'s documented uniform default. Used
+    /// to exercise the evaluator's own machinery in isolation from any
+    /// trained profile.
+    struct AlwaysMiss;
+
+    impl AverageStrategyLookup for AlwaysMiss {
+        fn lookup(&self, _key: InfoKey) -> Option<Vec<f64>> {
+            None
+        }
+    }
+
+    /// About three quarters of `NUM_COMBOS` combos are "strong": enough of a
+    /// skew that `call`'s aggregate EV sits comfortably above `fold`'s fixed
+    /// `-1.0`, so the domination assertion below cannot be flaky.
+    fn node_eval_is_strong(combo: usize) -> bool {
+        combo < cards::NUM_COMBOS * 3 / 4
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    enum NodeEvalState {
+        HeroChoice,
+        OpponentChoice,
+        Terminal(NodeEvalTerminal),
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    enum NodeEvalTerminal {
+        Fold,
+        Showdown,
+    }
+
+    /// Two-decision-node toy game for [`evaluate_node_actions`]: hero (seat
+    /// 0) chooses `call` or `fold` at the root; folding is a fixed loss,
+    /// calling hands off to the opponent (seat 1, whose own action never
+    /// changes the outcome) and then a showdown whose winner is determined
+    /// by whether hero's own dealt combo falls in the fixed "strong"
+    /// predicate ([`node_eval_is_strong`]) -- the same predicate used for
+    /// hero's abstraction bucket, so the bucket value doubles as a
+    /// perfectly separating hand-group: the "strong" group always wins
+    /// showdown, the "weak" group always loses it.
+    #[derive(Clone, Copy)]
+    struct NodeEvalToyGame;
+
+    impl ExternalSamplingGame for NodeEvalToyGame {
+        type State = NodeEvalState;
+        type Actions = NodeEvalState;
+
+        fn num_players(&self) -> usize {
+            2
+        }
+
+        fn root_state(&self) -> Self::State {
+            NodeEvalState::HeroChoice
+        }
+
+        fn actor(&self, state: &Self::State) -> Option<usize> {
+            match state {
+                NodeEvalState::HeroChoice => Some(0),
+                NodeEvalState::OpponentChoice => Some(1),
+                NodeEvalState::Terminal(_) => None,
+            }
+        }
+
+        fn node_actions(&self, state: &Self::State) -> Self::Actions {
+            *state
+        }
+
+        fn num_actions_of(&self, actions: &Self::Actions) -> usize {
+            usize::from(!matches!(actions, NodeEvalState::Terminal(_))) * 2
+        }
+
+        fn next_state_with(
+            &self,
+            _state: &Self::State,
+            actions: &Self::Actions,
+            action_index: usize,
+        ) -> Self::State {
+            match actions {
+                NodeEvalState::HeroChoice if action_index == 0 => NodeEvalState::OpponentChoice,
+                NodeEvalState::HeroChoice => NodeEvalState::Terminal(NodeEvalTerminal::Fold),
+                NodeEvalState::OpponentChoice => {
+                    NodeEvalState::Terminal(NodeEvalTerminal::Showdown)
+                }
+                NodeEvalState::Terminal(_) => panic!("terminal state has no child"),
+            }
+        }
+
+        fn write_action_label(
+            &self,
+            actions: &Self::Actions,
+            action_index: usize,
+            out: &mut String,
+        ) {
+            let labels = match actions {
+                NodeEvalState::HeroChoice => ["call", "fold"],
+                NodeEvalState::OpponentChoice => ["check", "raise"],
+                NodeEvalState::Terminal(_) => panic!("terminal state has no actions"),
+            };
+            out.push_str(labels[action_index]);
+        }
+
+        fn bucket(&self, _state: &Self::State, world: &SampledWorld, actor: usize) -> PrivateInfo {
+            let group = u32::from(node_eval_is_strong(world.hole_combo(actor)));
+            PrivateInfo {
+                street: 0,
+                active_opponents: 1,
+                bucket_path: [group, UNREACHED_BUCKET, UNREACHED_BUCKET, UNREACHED_BUCKET],
+            }
+        }
+
+        fn terminal_utilities(
+            &self,
+            state: &Self::State,
+            world: &SampledWorld,
+            utilities: &mut [f64],
+        ) {
+            let NodeEvalState::Terminal(kind) = *state else {
+                panic!("not terminal")
+            };
+            utilities[0] = match kind {
+                NodeEvalTerminal::Fold => -1.0,
+                NodeEvalTerminal::Showdown => {
+                    if node_eval_is_strong(world.hole_combo(0)) {
+                        1.0
+                    } else {
+                        -1.0
+                    }
+                }
+            };
+            utilities[1] = -utilities[0];
+        }
+    }
+
+    fn node_eval_sampler() -> DealSampler {
+        DealSampler::new(vec![Range::full(), Range::full()]).unwrap()
+    }
+
+    #[test]
+    fn evaluate_node_actions_is_deterministic_and_prefers_the_undominated_action() {
+        let game = NodeEvalToyGame;
+        let sampler = node_eval_sampler();
+        let strategy = AlwaysMiss;
+
+        let a = evaluate_node_actions(&game, &sampler, &strategy, &[], 20_000, 1, 64).unwrap();
+        let b = evaluate_node_actions(&game, &sampler, &strategy, &[], 20_000, 1, 64).unwrap();
+        assert_eq!(a, b, "same seed must reproduce identical output");
+
+        let c = evaluate_node_actions(&game, &sampler, &strategy, &[], 20_000, 2, 64).unwrap();
+        assert_ne!(
+            a, c,
+            "a different seed must resample a different world sequence"
+        );
+
+        let call_index = a
+            .action_labels
+            .iter()
+            .position(|label| label == "call")
+            .unwrap();
+        let fold_index = a
+            .action_labels
+            .iter()
+            .position(|label| label == "fold")
+            .unwrap();
+        assert!(
+            (a.aggregate[call_index].ev.mean - c.aggregate[call_index].ev.mean).abs() < 0.2,
+            "different-seed aggregate means should stay close: {} vs {}",
+            a.aggregate[call_index].ev.mean,
+            c.aggregate[call_index].ev.mean
+        );
+
+        // (b) per-group frequencies sum to 1; (c) group weight shares sum to ~1.
+        assert!(!a.groups.is_empty());
+        let mut weight_total = 0.0;
+        for group in &a.groups {
+            let frequency_sum: f64 = group.frequencies.iter().sum();
+            assert!((frequency_sum - 1.0).abs() < 1e-9);
+            weight_total += group.weight_share;
+        }
+        assert!((weight_total - 1.0).abs() < 1e-9);
+
+        // (d) folding is obviously dominated by calling.
+        assert!(
+            a.aggregate[fold_index].ev.mean < a.aggregate[call_index].ev.mean,
+            "fold ({}) must be strictly worse than call ({})",
+            a.aggregate[fold_index].ev.mean,
+            a.aggregate[call_index].ev.mean
+        );
+        assert!((a.aggregate[fold_index].ev.mean - (-1.0)).abs() < 1e-9);
+    }
+
+    #[test]
+    fn evaluate_node_actions_rejects_bad_path_index_and_terminal_early() {
+        let game = NodeEvalToyGame;
+        let sampler = node_eval_sampler();
+        let strategy = AlwaysMiss;
+
+        let bad_index =
+            evaluate_node_actions(&game, &sampler, &strategy, &[7], 8, 1, 64).unwrap_err();
+        assert!(matches!(
+            bad_index,
+            SolverError::EvaluationPathIndexOutOfRange {
+                depth: 0,
+                index: 7,
+                actions: 2
+            }
+        ));
+
+        // "call" then "check" reaches a terminal; a third path index has
+        // nowhere left to go.
+        let terminal_early =
+            evaluate_node_actions(&game, &sampler, &strategy, &[0, 0, 0], 8, 1, 64).unwrap_err();
+        assert!(matches!(
+            terminal_early,
+            SolverError::EvaluationPathTerminalEarly { depth: 2 }
+        ));
+    }
+
+    #[test]
+    fn solver_side_evaluate_node_actions_works_for_sparse_and_dense_storage() {
+        let mut sparse = solver(11, 1 << 20);
+        sparse.run_sweeps(20).unwrap();
+        let sparse_eval = sparse.evaluate_node_actions(&[], 256, 99).unwrap();
+        assert!(
+            sparse_eval
+                .aggregate
+                .iter()
+                .all(|action| action.ev.mean.is_finite())
+        );
+        let sparse_frequency_sum: f64 = sparse_eval
+            .aggregate
+            .iter()
+            .map(|action| action.frequency)
+            .sum();
+        assert!((sparse_frequency_sum - 1.0).abs() < 1e-6);
+
+        let mut dense = dense_dominated_solver(11);
+        dense.run_sweeps(20).unwrap();
+        let dense_eval = dense.evaluate_node_actions(&[], 256, 99).unwrap();
+        assert!(
+            dense_eval
+                .aggregate
+                .iter()
+                .all(|action| action.ev.mean.is_finite())
+        );
+        let dense_frequency_sum: f64 = dense_eval
+            .aggregate
+            .iter()
+            .map(|action| action.frequency)
+            .sum();
+        assert!((dense_frequency_sum - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn strategy_mass_differs_across_buckets_after_a_short_solve() {
+        let mut solver = dense_toy_solver(123, 1);
+        solver.run_sweeps(200).unwrap();
+        let rows = solver.strategies_at_with_mass(HistoryKey::ROOT);
+        assert!(rows.len() >= 2, "expected both buckets to be touched");
+        let masses: Vec<f64> = rows.iter().map(|(_, _, _, mass)| *mass).collect();
+        assert!(masses.iter().all(|&mass| mass > 0.0));
+        assert!(
+            masses
+                .windows(2)
+                .any(|pair| (pair[0] - pair[1]).abs() > 1e-9),
+            "expected differing masses across buckets, got {masses:?}"
+        );
+
+        // `strategies_at` (the unchanged, mass-free API) must still agree
+        // exactly with the mass-carrying rows on every other field.
+        let without_mass = solver.strategies_at(HistoryKey::ROOT);
+        assert_eq!(without_mass.len(), rows.len());
+        for ((key, labels, probs), (mass_key, mass_labels, mass_probs, _)) in
+            without_mass.iter().zip(&rows)
+        {
+            assert_eq!(key, mass_key);
+            assert_eq!(labels, mass_labels);
+            assert_eq!(probs, mass_probs);
         }
     }
 }

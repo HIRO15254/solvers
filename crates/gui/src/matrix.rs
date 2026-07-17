@@ -147,6 +147,36 @@ fn lerp_color(a: Color32, b: Color32, t: f32) -> Color32 {
     )
 }
 
+/// Draws the range-wide action-frequency aggregate row shared by the Solve
+/// tab's live node view and the Results tab (see
+/// `crate::frequency::aggregate_action_frequencies`): a small stacked bar
+/// plus one "label: NN.N%" entry per action, colored the same way a matrix
+/// cell would be. Shows a placeholder instead when `aggregate` is `None`
+/// (e.g. zero total mass, or a node the caller does not aggregate at all).
+pub fn aggregate_row(ui: &mut Ui, aggregate: Option<&(Vec<String>, Vec<f64>)>, unopened: bool) {
+    ui.label("Range-wide action frequency:");
+    let Some((action_labels, frequencies)) = aggregate else {
+        ui.label("(no strategy mass yet)");
+        return;
+    };
+    let colors = action_colors(action_labels, unopened);
+    let (rect, _response) = ui.allocate_exact_size(Vec2::new(240.0, 14.0), Sense::hover());
+    let painter = ui.painter();
+    let mut x = rect.min.x;
+    for (&frequency, color) in frequencies.iter().zip(&colors) {
+        let width = rect.width() * frequency as f32;
+        let segment =
+            Rect::from_min_size(egui::pos2(x, rect.min.y), Vec2::new(width, rect.height()));
+        painter.rect_filled(segment, 0.0, *color);
+        x += width;
+    }
+    ui.horizontal_wrapped(|ui| {
+        for (label, &frequency) in action_labels.iter().zip(frequencies) {
+            ui.monospace(format!("{label}: {:>5.1}%", frequency * 100.0));
+        }
+    });
+}
+
 /// One matrix cell's data: action labels/probabilities for either a 13x13
 /// hand class or a postflop bucket. `unopened` should be `true` only for a
 /// preflop (street 0) node nobody has raised yet, so `call:` actions render

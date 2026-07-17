@@ -1,13 +1,16 @@
 //! Solve tab: status strip, Pause/Resume/Finish/Cancel controls, live
 //! convergence charts (per-seat log10 avg-positive-regret and strategy
 //! drift vs sweeps), the "Live node view" (public-history browser over the
-//! in-progress average strategy), and the evaluation table.
+//! in-progress average strategy, its range-wide action-frequency aggregate,
+//! and on-demand per-hand/per-action EVs), and the evaluation table.
 
 use eframe::egui;
 use egui::{Rect, Ui, Vec2};
 use egui_plot::{Line, Plot, PlotPoints};
-use multiway::solver::ProfileEvaluation;
+use multiway::solver::{NodeActionEvaluation, ProfileEvaluation};
 
+use crate::format;
+use crate::frequency::{self, FrequencyBlock};
 use crate::matrix::{self, CellData};
 use crate::worker::{NodeBlock, NodeSnapshot, ProgressSnapshot, WorkerCmd, WorkerHandle};
 
@@ -22,6 +25,25 @@ const ROOT: [u8; 16] = [0; 16];
 /// the block's own key fields rather than a `Vec` position).
 type BlockId = (u8, u8, u8, [u32; 4]);
 
+/// State of the on-demand "Evaluate EVs" request for the currently displayed
+/// node. Carries its own `path` copy in `Ready`/`Failed` so the render side
+/// can double-check it against `LiveNodeState::path` even though
+/// `App::poll_worker` already drops a reply for a node no longer shown.
+#[derive(Clone, Debug, Default)]
+pub enum NodeEvalState {
+    #[default]
+    Idle,
+    Pending,
+    Ready {
+        path: Vec<usize>,
+        evaluation: NodeActionEvaluation,
+    },
+    Failed {
+        path: Vec<usize>,
+        error: String,
+    },
+}
+
 /// Live public-history browser state for the Solve tab. Independent of
 /// `ResultsState` (`crate::results`): that one browses a finished
 /// `MultiwaySolution`, this one browses `NodeSnapshot`s streamed from the
@@ -33,23 +55,36 @@ pub struct LiveNodeState {
     /// snapshot's `path`) so a jump does not have to wait for a fresh
     /// snapshot to arrive first.
     pub breadcrumb: Vec<([u8; 16], String)>,
+    /// Root-to-current action-index path, parallel to `breadcrumb[1..]` --
+    /// `WorkerCmd::EvaluateNode`'s `path` argument. Tracked alongside
+    /// `breadcrumb` (pushed on descend, truncated on a breadcrumb jump)
+    /// rather than derived from `snapshot`, so "Evaluate EVs" always targets
+    /// the node currently on screen even before its first snapshot arrives.
+    pub path: Vec<usize>,
     pub snapshot: Option<Box<NodeSnapshot>>,
     pub selected_actor: Option<u8>,
     /// `(street, active_opponents)`, when a node has more than one variant.
     pub selected_variant: Option<(u8, u8)>,
     pub hovered: Option<BlockId>,
     pub pinned: Option<BlockId>,
+    /// Sample count for the next "Evaluate EVs" request; default matches the
+    /// deliverable's documented default.
+    pub eval_samples: u64,
+    pub eval: NodeEvalState,
 }
 
 impl Default for LiveNodeState {
     fn default() -> Self {
         Self {
             breadcrumb: vec![(ROOT, "ROOT".to_string())],
+            path: Vec::new(),
             snapshot: None,
             selected_actor: None,
             selected_variant: None,
             hovered: None,
             pinned: None,
+            eval_samples: 4_096,
+            eval: NodeEvalState::Idle,
         }
     }
 }
@@ -63,6 +98,26 @@ impl LiveNodeState {
         self.selected_actor = None;
         self.selected_variant = None;
         self.pinned = None;
+    }
+
+    /// Truncates the breadcrumb/path to the node at breadcrumb index
+    /// `index` (a breadcrumb click), dropping deeper entries; drops any
+    /// in-flight/completed EV evaluation, since it answers a node this view
+    /// no longer shows.
+    fn jump_to(&mut self, index: usize) {
+        self.breadcrumb.truncate(index + 1);
+        self.path.truncate(index);
+        self.reset_selection();
+        self.eval = NodeEvalState::Idle;
+    }
+
+    /// Pushes one more edge (a descend into a child node); same
+    /// invalidation as [`Self::jump_to`].
+    fn descend(&mut self, key: [u8; 16], label: String, action_index: usize) {
+        self.breadcrumb.push((key, label));
+        self.path.push(action_index);
+        self.reset_selection();
+        self.eval = NodeEvalState::Idle;
     }
 }
 
@@ -121,8 +176,27 @@ pub fn ui(ui: &mut Ui, state: &mut SolveTabState, worker: Option<&WorkerHandle>)
                 )
                 .text(format!("{}/{}", latest.sweeps, latest.target)),
             );
-            ui.label(format!("{:.1} sweeps/s", latest.sweeps_per_sec));
-            ui.label(format!("infosets {}", latest.infosets));
+            ui.label(format!(
+                "sweeps {}",
+                format::human_rate(latest.sweeps_per_sec)
+            ));
+            ui.label(format!(
+                "traversals {}",
+                format::human_rate(latest.traversals_per_sec)
+            ));
+            // Hand-updates/s is the headline throughput metric (the number
+            // to compare against a range-based solver's "hands/s").
+            ui.label(
+                egui::RichText::new(format!(
+                    "hands {}",
+                    format::human_rate(latest.hand_updates_per_sec)
+                ))
+                .strong(),
+            );
+            ui.label(format!(
+                "infosets {}",
+                format::human_count(latest.infosets as f64)
+            ));
             ui.label(format!("mem {} MiB", latest.memory_bytes / (1024 * 1024)));
             ui.label(format!("elapsed {:.0}s", latest.elapsed_secs));
         }
@@ -271,6 +345,38 @@ fn snapshot_is_unopened(path: &[String]) -> bool {
         .any(|entry| entry.contains("raise-to:") || entry.contains("bet-to:"))
 }
 
+/// Range-wide action-frequency aggregate for one `(actor, street,
+/// active_opponents)` node variant: `Σ_b mass_b · σ̄_b(action) / Σ_b mass_b`
+/// over that variant's blocks, using each block's linear-CFR strategy mass.
+/// `None` when the node has no blocks yet or none has accumulated any mass.
+fn node_aggregate(
+    snapshot: &NodeSnapshot,
+    actor: u8,
+    street: u8,
+    active_opponents: u8,
+) -> Option<(Vec<String>, Vec<f64>)> {
+    let blocks: Vec<&NodeBlock> = snapshot
+        .blocks
+        .iter()
+        .filter(|block| {
+            block.actor == actor
+                && block.street == street
+                && block.active_opponents == active_opponents
+        })
+        .collect();
+    let action_labels = blocks.first()?.actions.clone();
+    let frequency_blocks: Vec<FrequencyBlock<'_>> = blocks
+        .iter()
+        .map(|block| FrequencyBlock {
+            action_labels: &block.actions,
+            probabilities: &block.probabilities,
+            mass: block.mass,
+        })
+        .collect();
+    let frequencies = frequency::aggregate_action_frequencies(&action_labels, &frequency_blocks)?;
+    Some((action_labels, frequencies))
+}
+
 fn live_node_ui(
     ui: &mut Ui,
     seat_names: &[String],
@@ -288,8 +394,7 @@ fn live_node_ui(
             ui.label(">");
         }
         if let Some(index) = jump_to {
-            live.breadcrumb.truncate(index + 1);
-            live.reset_selection();
+            live.jump_to(index);
             watch = Some(live.current_history());
         }
     });
@@ -320,12 +425,11 @@ fn live_node_ui(
                 child.action
             );
             if ui.button(&label).clicked() {
-                descend = Some((child.key, label));
+                descend = Some((child.key, label, child.action_index));
             }
         }
-        if let Some((key, label)) = descend {
-            live.breadcrumb.push((key, label));
-            live.reset_selection();
+        if let Some((key, label, action_index)) = descend {
+            live.descend(key, label, action_index);
             watch = Some(key);
         }
     });
@@ -393,7 +497,11 @@ fn live_node_ui(
             }
             let (street, active_opponents) = live.selected_variant.expect("set above");
 
+            let unopened = street == 0 && snapshot_is_unopened(&snapshot.path);
+            let aggregate = node_aggregate(snapshot, actor, street, active_opponents);
+            matrix::aggregate_row(ui, aggregate.as_ref(), unopened);
             ui.separator();
+
             ui.columns(2, |columns| {
                 let matrix_ui = &mut columns[0];
                 if street == 0 {
@@ -403,11 +511,54 @@ fn live_node_ui(
                 }
                 live_detail_panel(&mut columns[1], live, snapshot, street, active_opponents);
             });
+
+            ui.separator();
+            eval_controls_ui(ui, live, worker, seat_names, street);
         }
     }
 
     if let (Some(worker), Some(key)) = (worker, watch) {
         worker.send(WorkerCmd::WatchNode(Some(key)));
+    }
+}
+
+/// "Evaluate EVs" button, sample-count field, and (once a reply arrives for
+/// the node currently shown) the shared per-hand/per-action EV table.
+fn eval_controls_ui(
+    ui: &mut Ui,
+    live: &mut LiveNodeState,
+    worker: Option<&WorkerHandle>,
+    seat_names: &[String],
+    street: u8,
+) {
+    ui.horizontal(|ui| {
+        ui.label("EV samples:");
+        ui.add(egui::DragValue::new(&mut live.eval_samples).range(1..=1_000_000));
+        if ui.button("Evaluate EVs").clicked()
+            && let Some(worker) = worker
+        {
+            worker.send(WorkerCmd::EvaluateNode {
+                path: live.path.clone(),
+                samples: live.eval_samples,
+            });
+            live.eval = NodeEvalState::Pending;
+        }
+        match &live.eval {
+            NodeEvalState::Idle | NodeEvalState::Ready { .. } => {}
+            NodeEvalState::Pending => {
+                ui.spinner();
+                ui.label("evaluating...");
+            }
+            NodeEvalState::Failed { error, .. } => {
+                ui.colored_label(crate::theme::ACCENT, format!("evaluation failed: {error}"));
+            }
+        }
+    });
+    if let NodeEvalState::Ready { path, evaluation } = &live.eval
+        && *path == live.path
+    {
+        let actor_label = seat_label_at(seat_names, evaluation.actor as u8);
+        crate::eval_table::ui(ui, evaluation, street == 0, &actor_label);
     }
 }
 

@@ -6,6 +6,9 @@
 //! drive the solve worker headlessly.
 
 pub mod app;
+pub mod eval_table;
+pub mod format;
+pub mod frequency;
 pub mod matrix;
 pub mod model;
 pub mod presets;
