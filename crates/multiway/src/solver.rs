@@ -1095,6 +1095,11 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             Some(dense) if self.config.traverser_vector => {
                 let feasible = self.sampler.feasible_combos(traverser, &sample.world);
                 let (combos, weights): (Vec<usize>, Vec<f64>) = feasible.into_iter().unzip();
+                // Own-reach starts at 1.0 for every feasible combo; unlike
+                // `reach` (seat-indexed, used by the scalar/dense-scalar
+                // workers), this is combo-indexed and threaded separately
+                // (see `VectorTraversalWorker::traverse`).
+                let own_reach = vec![1.0; combos.len()];
                 let mut worker = VectorTraversalWorker::new(
                     &self.game,
                     dense,
@@ -1108,7 +1113,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     0,
                     &sample.world,
                     traverser,
-                    &mut reach,
+                    &own_reach,
                     1.0,
                     &mut action_rng,
                     0,
@@ -2775,6 +2780,20 @@ impl<'a, G: ExternalSamplingGame> DenseTraversalWorker<'a, G> {
 ///   member combos' `(value(action) - node_value)`, matching the expected
 ///   per-infoset scalar-ES update in aggregate. Buckets with no feasible
 ///   member are simply never visited, so they get no update.
+/// * The average strategy (`strategy_sum`) accumulates densely at every
+///   traverser node, over every feasible combo, instead of on opponents'
+///   sampled lines: for bucket b it adds
+///   `linear_weight * (sum_{h in F, B(h)=b} weight(h) * own_reach(h)) * sigma_b`,
+///   where `own_reach(h)` is combo h's own-strategy reach product from the
+///   traverser nodes visited earlier in this same traversal (opponent nodes
+///   leave it unchanged, since another seat's sampled action doesn't bear on
+///   the traverser's own strategy reach). The opponent branch pushes no
+///   `AddStrategy` event at all. This exists because, at equal wall time,
+///   vector mode runs an order of magnitude fewer sweeps than scalar mode
+///   (each sweep is a full-width traversal rather than one sampled hand), so
+///   accumulating the average only where an opponent's single-hand line
+///   happens to sample it starves it relative to the (already dense)
+///   regret updates; the fix is to make the average dense too.
 struct VectorTraversalWorker<'a, G: ExternalSamplingGame> {
     game: &'a G,
     tree: &'a PublicTree,
@@ -2868,7 +2887,7 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
         node_id: NodeId,
         world: &SampledWorld,
         traverser: usize,
-        reach: &mut [f64],
+        own_reach: &[f64],
         sample_importance: f64,
         rng: &mut ChaCha20Rng,
         depth: u32,
@@ -2910,22 +2929,48 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                     .buckets_for_combos(&state, world, traverser, &self.combos);
                 self.bucket_cache[street_index] = Some(table);
             }
+            // Cloned (not borrowed) so the recursive `self.traverse` calls
+            // below, which need `&mut self`, don't conflict with a live
+            // borrow of `self.bucket_cache`. `BucketId` is a `u32`, so this
+            // is a cheap per-visit copy.
+            let bucket_table: Vec<BucketId> = self.bucket_cache[street_index]
+                .as_ref()
+                .expect("populated above")
+                .clone();
+
+            let mut bucket_strategy: FxHashMap<BucketId, Vec<f64>> = FxHashMap::default();
+            for &bucket in &bucket_table {
+                if let Entry::Vacant(entry) = bucket_strategy.entry(bucket) {
+                    let range = self.arena.slot_range(node_id, bucket)?;
+                    entry.insert(regret_matching(&self.arena.regrets[range]));
+                }
+            }
 
             let mut action_values: Vec<Vec<f64>> = Vec::with_capacity(num_actions);
             for action in 0..num_actions {
                 let next_state = self.game.next_state_with(&state, &actions, action);
                 let child_value = match node.children[action] {
                     Child::Terminal => self.terminal_vector(&next_state, world, traverser)?,
-                    Child::Decision(child_id) => self.traverse(
-                        next_state,
-                        child_id,
-                        world,
-                        traverser,
-                        reach,
-                        sample_importance,
-                        rng,
-                        depth + 1,
-                    )?,
+                    Child::Decision(child_id) => {
+                        // Per-combo reach for this action's subtree: each
+                        // feasible combo's own bucket picks its own
+                        // regret-matched probability of taking `action`.
+                        let mut child_reach = vec![0.0; combos_len];
+                        for idx in 0..combos_len {
+                            let strategy = &bucket_strategy[&bucket_table[idx]];
+                            child_reach[idx] = own_reach[idx] * strategy[action];
+                        }
+                        self.traverse(
+                            next_state,
+                            child_id,
+                            world,
+                            traverser,
+                            &child_reach,
+                            sample_importance,
+                            rng,
+                            depth + 1,
+                        )?
+                    }
                 };
                 if child_value.len() != combos_len {
                     return Err(SolverError::InvalidState(
@@ -2933,18 +2978,6 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                     ));
                 }
                 action_values.push(child_value);
-            }
-
-            let bucket_table = self.bucket_cache[street_index]
-                .as_ref()
-                .expect("populated above");
-
-            let mut bucket_strategy: FxHashMap<BucketId, Vec<f64>> = FxHashMap::default();
-            for &bucket in bucket_table {
-                if let Entry::Vacant(entry) = bucket_strategy.entry(bucket) {
-                    let range = self.arena.slot_range(node_id, bucket)?;
-                    entry.insert(regret_matching(&self.arena.regrets[range]));
-                }
             }
 
             let mut node_value = vec![0.0; combos_len];
@@ -2963,13 +2996,20 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
             // Weighted per-bucket regret aggregation: for bucket b, action
             // a, `sum_{h in F, B(h)=b} weight(h) * (v_a(h) - n(h))`, divided
             // by `sum_{h in F, B(h)=b} weight(h)` -- the feasible-weighted
-            // mean described on `Self`.
+            // mean described on `Self`. The same pass also accumulates
+            // `sum_{h in F, B(h)=b} weight(h) * own_reach(h)`, the dense
+            // average-strategy mass for bucket b at this node (see `Self`'s
+            // doc comment) -- deliberately a separate accumulator from
+            // `bucket_weight_sum`, which stays reach-free for the regret
+            // aggregation above.
             let mut bucket_weight_sum: FxHashMap<BucketId, f64> = FxHashMap::default();
             let mut bucket_diff_sum: FxHashMap<BucketId, Vec<f64>> = FxHashMap::default();
+            let mut bucket_reach_weight_sum: FxHashMap<BucketId, f64> = FxHashMap::default();
             for idx in 0..combos_len {
                 let bucket = bucket_table[idx];
                 let weight = self.weights[idx];
                 *bucket_weight_sum.entry(bucket).or_insert(0.0) += weight;
+                *bucket_reach_weight_sum.entry(bucket).or_insert(0.0) += weight * own_reach[idx];
                 let diffs = bucket_diff_sum
                     .entry(bucket)
                     .or_insert_with(|| vec![0.0; num_actions]);
@@ -2999,6 +3039,25 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                     column,
                     values: diffs,
                 });
+
+                // Dense average-strategy accumulation: unlike regret, this
+                // is not divided by `weight_sum` -- it mirrors the scalar
+                // and old vector opponent-branch update
+                // (`linear_weight * reach[actor] * sigma`), just summed
+                // over every feasible combo in the bucket instead of the
+                // one sampled hand. A zero mass (every member combo's line
+                // was pruned upstream by a zero-probability ancestor
+                // action) contributes nothing, so it's skipped rather than
+                // pushing a no-op event.
+                let mass = bucket_reach_weight_sum.remove(&bucket).unwrap_or(0.0);
+                if mass > 0.0 {
+                    let sigma = &bucket_strategy[&bucket];
+                    let values: Vec<f64> = sigma
+                        .iter()
+                        .map(|&probability| self.linear_weight * mass * probability)
+                        .collect();
+                    self.events.push(DenseEvent::AddStrategy { column, values });
+                }
             }
 
             Ok(node_value)
@@ -3006,7 +3065,6 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
             let private = self.game.bucket(&state, world, actor);
             validate_private_info(private, num_players, RecallMode::Street)?;
             let bucket = private.current_bucket();
-            let column = self.arena.column_id(node_id, bucket)?;
             let range = self.arena.slot_range(node_id, bucket)?;
             let strategy = regret_matching(&self.arena.regrets[range]);
             let (action, sampling_probability) =
@@ -3018,14 +3076,10 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                 return Err(SolverError::NumericOverflow);
             }
 
-            let mut values = strategy;
-            for probability in values.iter_mut() {
-                *probability *= self.linear_weight * reach[actor];
-            }
-            self.events.push(DenseEvent::AddStrategy { column, values });
-
-            let old_reach = reach[actor];
-            reach[actor] *= chosen_probability;
+            // No strategy_sum accumulation here (vector mode moved it to
+            // the dense traverser-node accumulation above): this seat's own
+            // reach is irrelevant to the traverser's `own_reach` vector, so
+            // it is passed through unchanged.
             let next_state = self.game.next_state_with(&state, &actions, action);
             let result = match node.children[action] {
                 Child::Terminal => self.terminal_vector(&next_state, world, traverser),
@@ -3034,13 +3088,12 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                     child_id,
                     world,
                     traverser,
-                    reach,
+                    own_reach,
                     child_importance,
                     rng,
                     depth + 1,
                 ),
             };
-            reach[actor] = old_reach;
             let mut result = result?;
             for value in result.iter_mut() {
                 *value *= importance;
@@ -5127,6 +5180,94 @@ mod tests {
         assert!(
             late_mean < early_mean,
             "expected average positive regret to trend down: early {early_mean}, late {late_mean}"
+        );
+    }
+
+    /// Vector mode's average strategy must accumulate densely at a
+    /// traverser node on the very first sweep it is visited, not just on
+    /// whichever single hand an opponent traversal happened to sample.
+    ///
+    /// Before this change, the vector opponent branch pushed `AddStrategy`
+    /// only for the acting seat's one dealt-hand bucket (mirroring scalar),
+    /// and the traverser branch pushed none at all. With three seats, the
+    /// root is visited as "opponent" only on the two sweeps' traversals
+    /// where a *different* seat is the traverser, each adding mass for
+    /// exactly one sampled class -- so two sweeps (six traversals) could
+    /// give the root at most a handful of classes with positive
+    /// `strategy_sum` under the old behavior. All 169 preflop classes are
+    /// feasible at the root under full ranges, and this change makes every
+    /// traverser-seat sweep touch every feasible one of them at once, so
+    /// after just two sweeps nearly all 169 should already show mass.
+    #[test]
+    fn vector_traverser_root_strategy_sum_is_dense_after_few_sweeps() {
+        use crate::abstraction::FeatureHashAbstraction;
+        use crate::config::{
+            AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RakeConfig,
+            SeatConfig, UtilityConfig,
+        };
+        use crate::holdem::HoldemGame;
+        use crate::types::SeatId;
+
+        let mut config = MultiwayConfig {
+            seats: (0..3)
+                .map(|_| SeatConfig {
+                    name: None,
+                    stack_bb: 6.0,
+                    range: String::new(),
+                    betting: None,
+                })
+                .collect(),
+            button: SeatId(0),
+            blinds: BlindConfig::default(),
+            ante: AnteConfig::None,
+            betting: BettingConfig::default(),
+            abstraction: AbstractionConfig::default(),
+        };
+        config.abstraction.flop_buckets = 2;
+        config.abstraction.turn_buckets = 2;
+        config.abstraction.river_buckets = 2;
+        config.abstraction.recall = RecallMode::Street;
+
+        let game = HoldemGame::new(
+            &config,
+            &UtilityConfig::ChipEv,
+            &RakeConfig::None,
+            FeatureHashAbstraction::new(crate::abstraction::FeatureHashParams {
+                flop_buckets: 2,
+                turn_buckets: 2,
+                river_buckets: 2,
+            })
+            .unwrap(),
+        )
+        .unwrap();
+        let sampler = game.deal_sampler().unwrap();
+        let mut solver = MultiwaySolver::new(
+            game,
+            sampler,
+            SolverConfig {
+                seed: 55,
+                max_memory_bytes: 1 << 24,
+                max_traversal_depth: 64,
+                exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
+                discount_every: DEFAULT_DISCOUNT_EVERY,
+                discount_until: DEFAULT_DISCOUNT_UNTIL,
+                sweep_batch: 1,
+                traverser_vector: true,
+            },
+        )
+        .unwrap();
+        solver.run_sweeps(2).unwrap();
+
+        let snapshot = solver.snapshot_state();
+        let root_buckets_with_mass = snapshot
+            .policies
+            .iter()
+            .filter(|entry| entry.key.history == HistoryKey::ROOT)
+            .filter(|entry| entry.column.strategy_sum.iter().any(|&value| value > 0.0))
+            .count();
+        assert!(
+            root_buckets_with_mass >= 100,
+            "expected dense root strategy_sum coverage close to all 169 classes, found {root_buckets_with_mass}"
         );
     }
 

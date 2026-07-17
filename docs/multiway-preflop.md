@@ -306,6 +306,19 @@ which worlds get sampled.
   Buckets with no feasible member simply never appear and get no update.
   This matches the ordinary scalar external-sampling update in expectation
   over which combo actually gets dealt to that bucket.
+- **Average strategy is dense too.** Unlike scalar external sampling (which
+  only adds to `strategy_sum` at opponent nodes, on the seat's single sampled
+  hand), vector mode accumulates the average strategy at *traverser* nodes,
+  over every feasible combo: bucket `b`'s column gets
+  `linear_weight * (sum_{h: B(h)=b} weight(h) * own_reach(h)) * sigma_b`,
+  where `own_reach(h)` is combo `h`'s own-strategy reach product accumulated
+  over the traverser decision nodes visited earlier in the same traversal.
+  The vector opponent branch pushes no strategy update at all. This is
+  necessary because vector mode runs far fewer sweeps than scalar mode at
+  equal wall time (each sweep walks the whole tree once instead of sampling
+  one hand); accumulating the average only on opponents' sampled lines, as
+  scalar does, would leave it badly under-sampled relative to the (already
+  dense) regret updates.
 - **Honest approximation.** Every combo's value uses the *same* sampled
   opponents and board — which were themselves sampled from a joint deal that
   originally included a real (but now-unused) traverser hand. Opponent cards
