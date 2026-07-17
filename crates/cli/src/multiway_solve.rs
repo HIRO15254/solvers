@@ -238,12 +238,13 @@ fn run_inner(
     // (deterministic f(centroids, key)), so it only grows as the solve
     // visits more concrete rollout keys. Re-save it here so a later run
     // against the same `artifact_cache` path starts warm instead of
-    // re-paying every cache miss this run already resolved.
-    if let Some(path) = mw_session.game_config.abstraction.artifact_cache.as_deref() {
-        mw_session
-            .solver
-            .game()
-            .abstraction()
+    // re-paying every cache miss this run already resolved. `.rollout()` is
+    // `None` for the ehs2-table backend, whose content is already fully
+    // determined (and disk-cached) at build time -- nothing to persist.
+    if let Some(path) = mw_session.game_config.abstraction.artifact_cache.as_deref()
+        && let Some(rollout) = mw_session.solver.game().abstraction().rollout()
+    {
+        rollout
             .persist_assignment_cache(path)
             .with_context(|| format!("persisting rollout assignment cache {}", path.display()))?;
     }

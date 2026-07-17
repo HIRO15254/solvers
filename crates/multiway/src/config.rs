@@ -224,17 +224,23 @@ pub struct AbstractionConfig {
     pub turn_buckets: u16,
     #[serde(default = "default_buckets")]
     pub river_buckets: u16,
+    /// Ignored by `kind = "ehs2-table"`, which trains no rollouts (always
+    /// has a default, so it need not be unset there).
     #[serde(default = "default_rollout_samples")]
     pub rollout_samples: u32,
+    /// Ignored by `kind = "ehs2-table"` for the same reason as
+    /// `rollout_samples`.
     #[serde(default)]
     pub seed: u64,
     /// Optional postflop budgets keyed by the number of live opponents
     /// excluding the acting player. Missing counts use the global defaults.
+    /// Not supported by `kind = "ehs2-table"` (validation error).
     #[serde(default)]
     pub active_opponent_buckets: Vec<ActiveOpponentBucketConfig>,
     /// Optional operational cache location for trained centroids. This path
     /// is not part of game identity; validated artifact content is covered
-    /// by the abstraction fingerprint.
+    /// by the abstraction fingerprint. For `kind = "ehs2-table"` this same
+    /// key holds the EHS² bucket-table cache instead of a rollout artifact.
     #[serde(default)]
     pub artifact_cache: Option<PathBuf>,
     /// Private-information recall used to key the solver's policy storage.
@@ -246,6 +252,33 @@ pub struct AbstractionConfig {
     /// its game fingerprint.
     #[serde(default, skip_serializing_if = "RecallMode::is_full")]
     pub recall: RecallMode,
+    /// Selects the postflop card-abstraction backend. `RolloutKmeans` (the
+    /// default) is the trained rollout/k-means abstraction; `Ehs2Table` uses
+    /// precomputed exact EHS^2 percentile tables (O(1) lookup, no solve-time
+    /// Monte Carlo, no per-opponent-count budgets). Skipped when
+    /// `RolloutKmeans` for the same fingerprint-stability reason as `recall`.
+    #[serde(default, skip_serializing_if = "AbstractionKind::is_rollout_kmeans")]
+    pub kind: AbstractionKind,
+}
+
+/// Selects the postflop card-abstraction backend; see
+/// [`AbstractionConfig::kind`].
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum AbstractionKind {
+    /// Trained rollout/k-means abstraction, opponent-count-aware, computed
+    /// (and memoized) at solve time.
+    #[default]
+    RolloutKmeans,
+    /// Precomputed exact EHS² percentile tables over every canonical board,
+    /// O(1) lookup, no solve-time Monte Carlo.
+    Ehs2Table,
+}
+
+impl AbstractionKind {
+    pub fn is_rollout_kmeans(&self) -> bool {
+        matches!(self, AbstractionKind::RolloutKmeans)
+    }
 }
 
 /// Private-information recall mode; see [`AbstractionConfig::recall`].
@@ -289,6 +322,7 @@ impl Default for AbstractionConfig {
             active_opponent_buckets: Vec::new(),
             artifact_cache: None,
             recall: RecallMode::Full,
+            kind: AbstractionKind::RolloutKmeans,
         }
     }
 }
@@ -463,6 +497,11 @@ impl MultiwayConfig {
         }
         if self.abstraction.rollout_samples == 0 {
             return Err(ConfigError::RolloutSamples);
+        }
+        if matches!(self.abstraction.kind, AbstractionKind::Ehs2Table)
+            && !self.abstraction.active_opponent_buckets.is_empty()
+        {
+            return Err(ConfigError::Ehs2TableOpponentBuckets);
         }
         let mut seen_opponent_counts = [false; 9];
         for profile in &self.abstraction.active_opponent_buckets {
@@ -758,6 +797,8 @@ pub enum ConfigError {
     RolloutSamples,
     #[error("active-opponent bucket profile {0} is duplicate or outside this table")]
     OpponentBucketProfile(u8),
+    #[error("ehs2-table does not support per-opponent bucket budgets")]
+    Ehs2TableOpponentBuckets,
     #[error("ICM field must contain 2 through 100 players, got {0}")]
     IcmField(usize),
     #[error("ICM payouts length must be {expected}, got {actual}")]
@@ -988,6 +1029,50 @@ stack_bb = 12
         assert!(street_json.contains("\"recall\":\"street\""));
         let decoded: AbstractionConfig = serde_json::from_str(&street_json).unwrap();
         assert_eq!(decoded.recall, RecallMode::Street);
+    }
+
+    #[test]
+    fn default_abstraction_kind_is_rollout_kmeans_and_is_omitted_from_serialization() {
+        // Regression guard: `kind` must not appear in a default-mode
+        // config's serialized form (JSON, used for the game fingerprint, or
+        // TOML), so every config that predates this field keeps an
+        // unchanged fingerprint and round-trips unchanged. The whole-config
+        // TOML already contains the word "kind" from unrelated tagged enums
+        // (`ante`'s `kind = "none"`, betting size `kind` tags), so the TOML
+        // check below looks for the serialized variant name specifically
+        // rather than the field name.
+        let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        assert_eq!(config.abstraction.kind, AbstractionKind::RolloutKmeans);
+        let json = serde_json::to_string(&config.abstraction).unwrap();
+        assert!(!json.contains("\"kind\""));
+        let toml_text = toml::to_string(&config).unwrap();
+        assert!(!toml_text.contains("rollout-kmeans"));
+
+        let mut ehs2 = config.clone();
+        ehs2.abstraction.kind = AbstractionKind::Ehs2Table;
+        let ehs2_json = serde_json::to_string(&ehs2.abstraction).unwrap();
+        assert!(ehs2_json.contains("\"kind\":\"ehs2-table\""));
+        let decoded: AbstractionConfig = serde_json::from_str(&ehs2_json).unwrap();
+        assert_eq!(decoded.kind, AbstractionKind::Ehs2Table);
+    }
+
+    #[test]
+    fn ehs2_table_rejects_active_opponent_bucket_overrides() {
+        let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        config.abstraction.kind = AbstractionKind::Ehs2Table;
+        config.abstraction.active_opponent_buckets = vec![ActiveOpponentBucketConfig {
+            active_opponents: 1,
+            flop_buckets: 16,
+            turn_buckets: 16,
+            river_buckets: 16,
+        }];
+        assert!(matches!(
+            config.validate(),
+            Err(ConfigError::Ehs2TableOpponentBuckets)
+        ));
+
+        config.abstraction.active_opponent_buckets.clear();
+        config.validate().unwrap();
     }
 
     #[test]

@@ -60,6 +60,11 @@ const CACHE_MAGIC: &[u8; 8] = b"SLVRBKTS";
 /// boards to the unordered 5-set quotient, changing river table keys —
 /// version-1 caches would silently miss every river lookup.
 const CACHE_VERSION: u16 = 2;
+/// Public alias for [`CACHE_VERSION`] so downstream content fingerprints
+/// (e.g. `multiway`'s ehs2-table abstraction backend) can fold in the
+/// table format/scoring-semantics version and change whenever it bumps,
+/// without duplicating the constant.
+pub const CACHE_FORMAT_VERSION: u16 = CACHE_VERSION;
 const CACHE_HEADER_LEN: usize = 8 + 2;
 
 /// One street's percentile table: global cut thresholds (ascending, length

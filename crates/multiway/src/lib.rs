@@ -18,17 +18,18 @@ pub mod types;
 
 pub use abstraction::{
     AbstractionError, BucketContext, BucketId, BucketPath, FeatureHashAbstraction,
-    FeatureHashParams, MultiwayAbstraction, RolloutAbstractionError, RolloutArtifactError,
-    RolloutFeatures, RolloutKMeansAbstraction, RolloutKMeansBuilder, RolloutKMeansParams,
-    RolloutTrainingParams, StreetBucketCounts, TableAbstractionAdapter,
+    FeatureHashParams, MultiwayAbstraction, MultiwayAbstractionBackend, RolloutAbstractionError,
+    RolloutArtifactError, RolloutFeatures, RolloutKMeansAbstraction, RolloutKMeansBuilder,
+    RolloutKMeansParams, RolloutTrainingParams, StreetBucketCounts, TableAbstractionAdapter,
+    ehs2_table_fingerprint,
 };
 pub use betting::{Action, BettingState, SeatStatus};
 pub use checkpoint::{
     CHECKPOINT_VERSION, CheckpointError, MultiwayCheckpoint, MultiwayCheckpointHeader,
 };
 pub use config::{
-    AbstractionConfig, ActiveOpponentBucketConfig, BettingConfig, MultiwayConfig, RecallMode,
-    SeatConfig, StreetBettingConfig, UtilityConfig,
+    AbstractionConfig, AbstractionKind, ActiveOpponentBucketConfig, BettingConfig, MultiwayConfig,
+    RecallMode, SeatConfig, StreetBettingConfig, UtilityConfig,
 };
 pub use holdem::{HoldemGame, HoldemGameError};
 pub use icm::{IcmDeltaEstimate, IcmError, IcmEstimate, IcmMode, estimate_icm, terminal_icm_delta};

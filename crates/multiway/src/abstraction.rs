@@ -10,7 +10,7 @@ use std::io::{Read, Write};
 use std::path::Path;
 use std::sync::Mutex;
 
-use abstraction::CardAbstraction;
+use abstraction::{CACHE_FORMAT_VERSION, CardAbstraction, Ehs2Abstraction, Ehs2Params};
 use cards::{
     ALL_CARDS, Card, CardSet, HandRank, NUM_CLASSES, NUM_COMBOS, class_index, combo_cards,
     combo_index, rank_of,
@@ -1775,6 +1775,43 @@ mod rollout_tests {
         assert_eq!(overridden.num_buckets(Street::River, 3), 5);
         assert_ne!(baseline.fingerprint(), overridden.fingerprint());
     }
+
+    #[test]
+    fn backend_enum_delegates_to_the_wrapped_rollout_abstraction() {
+        let bare = tiny_builder().build().unwrap();
+        let wrapped = MultiwayAbstractionBackend::RolloutKMeans(tiny_builder().build().unwrap());
+
+        assert_eq!(bare.fingerprint(), wrapped.fingerprint());
+        assert_eq!(wrapped.rollout().unwrap().fingerprint(), bare.fingerprint());
+        for active_opponents in [1u8, 4, 8] {
+            for street in [Street::Flop, Street::Turn, Street::River] {
+                assert_eq!(
+                    bare.num_buckets(street, active_opponents),
+                    wrapped.num_buckets(street, active_opponents)
+                );
+            }
+        }
+
+        let board = [card("Qh"), card("Jc"), card("2d")];
+        let combo = combo_index(card("Ah"), card("Kh"));
+        let context = BucketContext {
+            street: Street::Flop,
+            board: &board,
+            combo,
+            active_opponents: 3,
+        };
+        assert_eq!(bare.bucket(context), wrapped.bucket(context));
+
+        let combos: Vec<usize> = candidate_holes()
+            .into_iter()
+            .filter(|&(a, b)| !board.contains(&a) && !board.contains(&b))
+            .map(|(a, b)| combo_index(a, b))
+            .collect();
+        assert_eq!(
+            bare.bucket_batch(Street::Flop, &board, 3, &combos),
+            wrapped.bucket_batch(Street::Flop, &board, 3, &combos)
+        );
+    }
 }
 
 /// Adapts an existing board/combo table to the multiway interface.
@@ -1823,6 +1860,89 @@ impl<A: CardAbstraction> MultiwayAbstraction for TableAbstractionAdapter<A> {
     fn fingerprint(&self) -> [u8; 32] {
         self.fingerprint
     }
+}
+
+/// Statically-dispatched union of the multiway abstraction backends, so
+/// game/session types stay concrete and the rollout-only assignment-cache
+/// persistence can be reached by callers that hold the backend.
+pub enum MultiwayAbstractionBackend {
+    RolloutKMeans(RolloutKMeansAbstraction),
+    Ehs2Table(TableAbstractionAdapter<Ehs2Abstraction>),
+}
+
+impl MultiwayAbstractionBackend {
+    /// The rollout backend, when this is one -- used to reach
+    /// [`RolloutKMeansAbstraction::persist_assignment_cache`] after a solve.
+    /// The ehs2-table backend has no assignment cache of its own: its
+    /// content is already fully determined (and disk-cached) at build time.
+    pub fn rollout(&self) -> Option<&RolloutKMeansAbstraction> {
+        match self {
+            MultiwayAbstractionBackend::RolloutKMeans(inner) => Some(inner),
+            MultiwayAbstractionBackend::Ehs2Table(_) => None,
+        }
+    }
+}
+
+impl MultiwayAbstraction for MultiwayAbstractionBackend {
+    fn num_buckets(&self, street: Street, active_opponents: u8) -> u32 {
+        match self {
+            MultiwayAbstractionBackend::RolloutKMeans(inner) => {
+                inner.num_buckets(street, active_opponents)
+            }
+            MultiwayAbstractionBackend::Ehs2Table(inner) => {
+                inner.num_buckets(street, active_opponents)
+            }
+        }
+    }
+
+    fn bucket(&self, context: BucketContext<'_>) -> BucketId {
+        match self {
+            MultiwayAbstractionBackend::RolloutKMeans(inner) => inner.bucket(context),
+            MultiwayAbstractionBackend::Ehs2Table(inner) => inner.bucket(context),
+        }
+    }
+
+    fn bucket_batch(
+        &self,
+        street: Street,
+        board: &[Card],
+        active_opponents: u8,
+        combos: &[usize],
+    ) -> Vec<BucketId> {
+        match self {
+            MultiwayAbstractionBackend::RolloutKMeans(inner) => {
+                inner.bucket_batch(street, board, active_opponents, combos)
+            }
+            MultiwayAbstractionBackend::Ehs2Table(inner) => {
+                inner.bucket_batch(street, board, active_opponents, combos)
+            }
+        }
+    }
+
+    fn fingerprint(&self) -> [u8; 32] {
+        match self {
+            MultiwayAbstractionBackend::RolloutKMeans(inner) => inner.fingerprint(),
+            MultiwayAbstractionBackend::Ehs2Table(inner) => inner.fingerprint(),
+        }
+    }
+}
+
+/// Content fingerprint for the ehs2-table backend
+/// ([`TableAbstractionAdapter<Ehs2Abstraction>`]): a domain separator, the
+/// three bucket counts, and the abstraction crate's on-disk table-format
+/// version. `Ehs2Abstraction::build` is a pure function of `params` alone,
+/// so `params` plus the format version fully identify content -- but
+/// folding in the version means the fingerprint still changes if the table
+/// semantics ever bump, the same guarantee `rollout_fingerprint` gives the
+/// rollout backend by hashing the trained centroids directly.
+pub fn ehs2_table_fingerprint(params: Ehs2Params) -> [u8; 32] {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"solvers.multiway.ehs2-table.v1");
+    hasher.update(&params.flop_buckets.to_le_bytes());
+    hasher.update(&params.turn_buckets.to_le_bytes());
+    hasher.update(&params.river_buckets.to_le_bytes());
+    hasher.update(&CACHE_FORMAT_VERSION.to_le_bytes());
+    *hasher.finalize().as_bytes()
 }
 
 fn validate_context(context: BucketContext<'_>) {

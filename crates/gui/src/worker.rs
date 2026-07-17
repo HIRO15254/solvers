@@ -433,12 +433,11 @@ fn run(
     // (`multiway_solve.rs`), a failure here must not fail the whole run --
     // the GUI has already written the `.mwsol`/checkpoint successfully, so
     // this is only a lost warm-start optimization, not a lost result.
+    // `.rollout()` is `None` for the ehs2-table backend, whose content is
+    // already fully determined (and disk-cached) at build time.
     if let Some(path) = mw_session.game_config.abstraction.artifact_cache.as_deref()
-        && let Err(error) = mw_session
-            .solver
-            .game()
-            .abstraction()
-            .persist_assignment_cache(path)
+        && let Some(rollout) = mw_session.solver.game().abstraction().rollout()
+        && let Err(error) = rollout.persist_assignment_cache(path)
     {
         eprintln!(
             "warning: could not persist rollout assignment cache {}: {error}",

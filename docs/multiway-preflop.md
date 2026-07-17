@@ -110,6 +110,41 @@ pot share, its second moment, and scoop/tie probabilities.  Information sets
 retain the complete bucket path.  The artifact seed, rollout parameters,
 rules, and centroids form a fingerprint checked by caches and checkpoints.
 
+### Abstraction backends (`game.abstraction.kind`)
+
+`kind` selects the postflop card-abstraction backend. It defaults to
+`"rollout-kmeans"` and is omitted from a config's serialized identity (and
+therefore its game fingerprint) whenever it is `"rollout-kmeans"`, so every
+config written before this option existed is unaffected byte-for-byte.
+
+- **`"rollout-kmeans"` (default).** The trained rollout/k-means abstraction
+  described below: opponent-count-aware, with solve-time Monte Carlo bucket
+  assignment that is memoized (per canonical situation) and persisted to
+  `artifact_cache` after a solve.
+- **`"ehs2-table"`.** Precomputed exact E[HS²] percentile tables
+  (`abstraction::Ehs2Abstraction`) over *every* canonical board of each
+  postflop street, built once and disk-cached at `artifact_cache`. Bucket
+  assignment is then an O(1) table lookup with zero solve-time Monte Carlo,
+  at any solve scale. Trade-offs relative to the rollout backend:
+  - The one-time build enumerates every canonical flop/turn/river board and
+    takes on the order of minutes even in release mode; a valid cache at
+    `artifact_cache` skips it (the same "load or rebuild and overwrite on any
+    mismatch" recovery the rollout artifact uses). The built tables are
+    several hundred MB resident in memory.
+  - It **ignores** the active-opponent count (a config with `kind =
+    "ehs2-table"` and any non-empty `active_opponent_buckets` is a validation
+    error) and ignores `rollout_samples`/`seed` (they keep their defaults but
+    do nothing).
+  - Quality caveat: E[HS²] is a heads-up-vs-uniform-range hand-strength
+    statistic with no multiway-specific features (no opponent-count
+    conditioning, no scoop/tie modeling) -- it is a cheaper, zero-Monte-Carlo
+    alternative, not a strictly better abstraction.
+
+Switching `kind` changes the abstraction fingerprint (naturally -- the two
+backends produce different buckets from the same board), so a checkpoint or
+`.mwsol` built under one backend is not resumable under the other, the same
+way a changed bucket count already isn't.
+
 ### v2 rollout: one sample stream per board
 
 Every postflop bucket lookup canonicalizes `(street, active_opponents, hole,

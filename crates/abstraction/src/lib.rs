@@ -24,7 +24,7 @@ mod buckets;
 mod ehs;
 
 pub use blueprint::{BlueprintArtifacts, BlueprintCacheError, BucketEquity, TransitionTable};
-pub use buckets::{BucketCacheError, Ehs2Abstraction, Ehs2Params};
+pub use buckets::{BucketCacheError, CACHE_FORMAT_VERSION, Ehs2Abstraction, Ehs2Params};
 pub use ehs::{ehs2, hand_strength};
 
 use cards::{Card, Street};

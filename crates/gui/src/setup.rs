@@ -434,6 +434,27 @@ fn sized_field(ui: &mut Ui, label: &str, text: &mut String) {
 fn abstraction_section(ui: &mut Ui, state: &mut SetupState) {
     ui.collapsing("Abstraction", |ui| {
         let abstraction = &mut state.model.abstraction;
+        ui.label("Card-abstraction backend:");
+        ui.horizontal(|ui| {
+            ui.selectable_value(
+                &mut abstraction.kind,
+                model::AbstractionBackendKind::RolloutKmeans,
+                "rollout k-means",
+            );
+            ui.selectable_value(
+                &mut abstraction.kind,
+                model::AbstractionBackendKind::Ehs2Table,
+                "EHS\u{b2} table (precomputed)",
+            );
+        });
+        let ehs2_selected = abstraction.kind == model::AbstractionBackendKind::Ehs2Table;
+        if ehs2_selected {
+            ui.label(
+                "EHS\u{b2} table: precomputed exact percentile buckets, O(1) lookup, no solve-time \
+                 Monte Carlo. Rollout samples, abstraction seed, and per-opponent bucket profiles \
+                 below do not apply and are ignored (per-opponent profiles are also rejected).",
+            );
+        }
         ui.horizontal(|ui| {
             ui.label("flop buckets:");
             ui.add(egui::DragValue::new(&mut abstraction.flop_buckets).range(1..=4096));
@@ -442,11 +463,15 @@ fn abstraction_section(ui: &mut Ui, state: &mut SetupState) {
             ui.label("river buckets:");
             ui.add(egui::DragValue::new(&mut abstraction.river_buckets).range(1..=4096));
         });
-        ui.horizontal(|ui| {
-            ui.label("rollout samples:");
-            ui.add(egui::DragValue::new(&mut abstraction.rollout_samples).range(1..=1_000_000));
-            ui.label("seed:");
-            ui.add(egui::DragValue::new(&mut abstraction.seed));
+        ui.add_enabled_ui(!ehs2_selected, |ui| {
+            ui.horizontal(|ui| {
+                ui.label("rollout samples:");
+                ui.add(
+                    egui::DragValue::new(&mut abstraction.rollout_samples).range(1..=1_000_000),
+                );
+                ui.label("seed:");
+                ui.add(egui::DragValue::new(&mut abstraction.seed));
+            });
         });
         ui.horizontal(|ui| {
             ui.label("artifact cache:");
@@ -474,36 +499,44 @@ fn abstraction_section(ui: &mut Ui, state: &mut SetupState) {
             "Street mode preallocates the whole tree up front and fails fast with a memory estimate if it doesn't fit.",
         );
         ui.label("Active-opponent bucket profiles:");
-        let mut remove_index = None;
-        for (index, profile) in abstraction.active_opponent_buckets.iter_mut().enumerate() {
-            ui.push_id(index, |ui| {
-                ui.horizontal(|ui| {
-                    ui.label("active opp.:");
-                    ui.add(egui::DragValue::new(&mut profile.active_opponents).range(1..=8));
-                    ui.label("flop:");
-                    ui.add(egui::DragValue::new(&mut profile.flop_buckets).range(1..=4096));
-                    ui.label("turn:");
-                    ui.add(egui::DragValue::new(&mut profile.turn_buckets).range(1..=4096));
-                    ui.label("river:");
-                    ui.add(egui::DragValue::new(&mut profile.river_buckets).range(1..=4096));
-                    if ui.button("remove").clicked() {
-                        remove_index = Some(index);
-                    }
-                });
-            });
+        if ehs2_selected {
+            ui.colored_label(
+                Color32::from_rgb(0xd9, 0x4a, 0x3a),
+                "Not supported by the EHS\u{b2} table backend; remove any profiles below before solving.",
+            );
         }
+        let mut remove_index = None;
+        ui.add_enabled_ui(!ehs2_selected, |ui| {
+            for (index, profile) in abstraction.active_opponent_buckets.iter_mut().enumerate() {
+                ui.push_id(index, |ui| {
+                    ui.horizontal(|ui| {
+                        ui.label("active opp.:");
+                        ui.add(egui::DragValue::new(&mut profile.active_opponents).range(1..=8));
+                        ui.label("flop:");
+                        ui.add(egui::DragValue::new(&mut profile.flop_buckets).range(1..=4096));
+                        ui.label("turn:");
+                        ui.add(egui::DragValue::new(&mut profile.turn_buckets).range(1..=4096));
+                        ui.label("river:");
+                        ui.add(egui::DragValue::new(&mut profile.river_buckets).range(1..=4096));
+                        if ui.button("remove").clicked() {
+                            remove_index = Some(index);
+                        }
+                    });
+                });
+            }
+            if ui.button("add profile").clicked() {
+                abstraction
+                    .active_opponent_buckets
+                    .push(model::ActiveOpponentBucketModel {
+                        active_opponents: 1,
+                        flop_buckets: 32,
+                        turn_buckets: 32,
+                        river_buckets: 32,
+                    });
+            }
+        });
         if let Some(index) = remove_index {
             abstraction.active_opponent_buckets.remove(index);
-        }
-        if ui.button("add profile").clicked() {
-            abstraction
-                .active_opponent_buckets
-                .push(model::ActiveOpponentBucketModel {
-                    active_opponents: 1,
-                    flop_buckets: 32,
-                    turn_buckets: 32,
-                    river_buckets: 32,
-                });
         }
     });
 }

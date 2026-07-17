@@ -13,8 +13,8 @@ use cli::config::{
 };
 use multiway::SeatId;
 use multiway::config::{
-    AbstractionConfig, ActiveOpponentBucketConfig, AnteConfig, BettingConfig, BlindConfig,
-    MultiwayConfig, RecallMode, SeatConfig, StreetBettingConfig,
+    AbstractionConfig, AbstractionKind, ActiveOpponentBucketConfig, AnteConfig, BettingConfig,
+    BlindConfig, MultiwayConfig, RecallMode, SeatConfig, StreetBettingConfig,
 };
 
 use crate::size_lexer;
@@ -75,6 +75,14 @@ pub enum RecallKind {
     Street,
 }
 
+/// Mirrors `multiway::config::AbstractionKind`; see
+/// [`AbstractionModel::kind`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum AbstractionBackendKind {
+    RolloutKmeans,
+    Ehs2Table,
+}
+
 #[derive(Clone, Debug)]
 pub struct AbstractionModel {
     pub flop_buckets: u16,
@@ -86,6 +94,11 @@ pub struct AbstractionModel {
     /// Empty means "no artifact cache" (`None`).
     pub artifact_cache: String,
     pub recall: RecallKind,
+    /// Selects the postflop card-abstraction backend; see
+    /// `multiway::config::AbstractionConfig::kind`. `RolloutKmeans` ignores
+    /// nothing new; `Ehs2Table` ignores `rollout_samples`/`seed` and
+    /// rejects non-empty `active_opponent_buckets`.
+    pub kind: AbstractionBackendKind,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -401,6 +414,7 @@ fn abstraction_model_to_config(model: &AbstractionModel) -> AbstractionConfig {
         artifact_cache: (!model.artifact_cache.trim().is_empty())
             .then(|| model.artifact_cache.clone().into()),
         recall: recall_model_to_config(model.recall),
+        kind: abstraction_kind_model_to_config(model.kind),
     }
 }
 
@@ -427,6 +441,7 @@ fn config_abstraction_to_model(config: &AbstractionConfig) -> AbstractionModel {
             .map(|path| path.display().to_string())
             .unwrap_or_default(),
         recall: config_recall_to_model(config.recall),
+        kind: config_abstraction_kind_to_model(config.kind),
     }
 }
 
@@ -434,6 +449,20 @@ fn recall_model_to_config(kind: RecallKind) -> RecallMode {
     match kind {
         RecallKind::Full => RecallMode::Full,
         RecallKind::Street => RecallMode::Street,
+    }
+}
+
+fn abstraction_kind_model_to_config(kind: AbstractionBackendKind) -> AbstractionKind {
+    match kind {
+        AbstractionBackendKind::RolloutKmeans => AbstractionKind::RolloutKmeans,
+        AbstractionBackendKind::Ehs2Table => AbstractionKind::Ehs2Table,
+    }
+}
+
+fn config_abstraction_kind_to_model(kind: AbstractionKind) -> AbstractionBackendKind {
+    match kind {
+        AbstractionKind::RolloutKmeans => AbstractionBackendKind::RolloutKmeans,
+        AbstractionKind::Ehs2Table => AbstractionBackendKind::Ehs2Table,
     }
 }
 
@@ -837,6 +866,56 @@ mod tests {
         assert!(toml_text.contains("recall = \"street\""));
         let reparsed = toml_to_model(&toml_text, &model.run).unwrap();
         assert_eq!(reparsed.abstraction.recall, RecallKind::Street);
+    }
+
+    #[test]
+    fn abstraction_kind_round_trips_through_toml_and_defaults_to_rollout_kmeans() {
+        let mut model = Model::new_default(6);
+        assert_eq!(
+            model.abstraction.kind,
+            AbstractionBackendKind::RolloutKmeans
+        );
+        // The default is omitted from the rendered TOML, same as every other
+        // abstraction field that is bit-identical to its historical
+        // behavior (game-fingerprint stability for pre-existing configs).
+        // The full config TOML already contains the word "kind" from
+        // unrelated tagged enums (`[game] kind = "preflop-multiway"`, rake/
+        // utility `kind` tags), so check for the serialized variant name
+        // specifically rather than the field name.
+        let default_toml = model_to_toml(&model).unwrap();
+        assert!(!default_toml.contains("rollout-kmeans"));
+
+        model.abstraction.kind = AbstractionBackendKind::Ehs2Table;
+        let toml_text = model_to_toml(&model).unwrap();
+        assert!(toml_text.contains("kind = \"ehs2-table\""));
+        let reparsed = toml_to_model(&toml_text, &model.run).unwrap();
+        assert_eq!(reparsed.abstraction.kind, AbstractionBackendKind::Ehs2Table);
+    }
+
+    #[test]
+    fn ehs2_table_with_active_opponent_buckets_is_a_validation_error() {
+        let mut model = Model::new_default(6);
+        model.abstraction.kind = AbstractionBackendKind::Ehs2Table;
+        model
+            .abstraction
+            .active_opponent_buckets
+            .push(ActiveOpponentBucketModel {
+                active_opponents: 1,
+                flop_buckets: 16,
+                turn_buckets: 16,
+                river_buckets: 16,
+            });
+        let errors = validate(&model);
+        assert!(
+            errors
+                .iter()
+                .any(|error| error
+                    .contains("ehs2-table does not support per-opponent bucket budgets")),
+            "expected an ehs2-table/active_opponent_buckets validation error, got {errors:?}"
+        );
+
+        model.abstraction.active_opponent_buckets.clear();
+        assert!(validate(&model).is_empty());
     }
 
     #[test]

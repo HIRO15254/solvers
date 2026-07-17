@@ -12,7 +12,9 @@
 
 use std::collections::HashMap;
 use std::path::Path;
+use std::time::Instant;
 
+use abstraction::{Ehs2Abstraction, Ehs2Params};
 use anyhow::{Context, Result, anyhow};
 use formats::{
     Estimate, MULTIWAY_SCHEMA_VERSION, MultiwayHistoryNode, MultiwayMetricsRow,
@@ -20,11 +22,13 @@ use formats::{
     MultiwayStrategyKey,
 };
 use multiway::abstraction::{
-    RolloutKMeansAbstraction, RolloutKMeansBuilder, RolloutKMeansParams, StreetBucketCounts,
+    MultiwayAbstractionBackend, RolloutKMeansAbstraction, RolloutKMeansBuilder,
+    RolloutKMeansParams, StreetBucketCounts, TableAbstractionAdapter, ehs2_table_fingerprint,
 };
 use multiway::checkpoint::MultiwayCheckpoint;
 use multiway::config::{
-    FieldPlayerConfig, RakeConfig as MultiwayRake, UtilityConfig as MultiwayUtility,
+    AbstractionKind, FieldPlayerConfig, RakeConfig as MultiwayRake,
+    UtilityConfig as MultiwayUtility,
 };
 use multiway::solver::{InfoKey, PolicyEntry, ProfileEvaluation, SolverConfig};
 use multiway::{HoldemGame, MultiwaySolver};
@@ -38,7 +42,7 @@ const DEFAULT_MEMORY_LIMIT: u64 = 4 * 1024 * 1024 * 1024;
 /// Everything needed to run (or resume) a multiway solve: the constructed
 /// solver plus the run parameters resolved from `[run]`.
 pub struct MultiwaySession {
-    pub solver: MultiwaySolver<HoldemGame<RolloutKMeansAbstraction>>,
+    pub solver: MultiwaySolver<HoldemGame<MultiwayAbstractionBackend>>,
     pub sweeps_target: u64,
     pub threads: usize,
     pub evaluation_cadence: u64,
@@ -139,6 +143,78 @@ pub fn build_multiway_session(
     }
 
     let evaluation_samples = run.evaluation_samples.unwrap_or(256);
+    let abstraction = match game_config.abstraction.kind {
+        AbstractionKind::RolloutKmeans => {
+            MultiwayAbstractionBackend::RolloutKMeans(build_rollout_abstraction(&game_config)?)
+        }
+        AbstractionKind::Ehs2Table => {
+            MultiwayAbstractionBackend::Ehs2Table(build_ehs2_table_abstraction(&game_config)?)
+        }
+    };
+    let game = HoldemGame::new(&game_config, &utility, &rake, abstraction)
+        .context("building generative multiway game")?;
+    let sampler = game.deal_sampler().context("compiling table ranges")?;
+    let solver_config = SolverConfig {
+        seed: run.seed.unwrap_or(algorithm_seed),
+        max_memory_bytes: run.max_memory_bytes.unwrap_or(DEFAULT_MEMORY_LIMIT),
+        max_traversal_depth: 512,
+        exploration_epsilon,
+        discount_every,
+        discount_until,
+        sweep_batch: run.sweep_batch.unwrap_or(1),
+        traverser_vector,
+    };
+    let evaluation_seed = solver_config.seed ^ 0x6576_616c_7561_7465;
+    let solver = if let Some(path) = resume_checkpoint {
+        let checkpoint = MultiwayCheckpoint::load_unchecked(path)
+            .with_context(|| format!("reading multiway checkpoint {}", path.display()))?;
+        let solver =
+            MultiwaySolver::from_state_with_config(game, sampler, checkpoint.state, solver_config)
+                .context("restoring multiway MCCFR state")?;
+        if solver.configuration_fingerprint() != checkpoint.header.configuration_fingerprint {
+            return Err(anyhow!(
+                "checkpoint belongs to different table rules or ranges"
+            ));
+        }
+        if solver.abstraction_fingerprint() != checkpoint.header.abstraction_fingerprint {
+            return Err(anyhow!(
+                "checkpoint belongs to a different card abstraction"
+            ));
+        }
+        solver
+    } else {
+        MultiwaySolver::new(game, sampler, solver_config).context("initializing multiway MCCFR")?
+    };
+    if solver.metrics().sweeps > sweeps {
+        return Err(anyhow!(
+            "checkpoint already contains {} sweeps, exceeding target {}",
+            solver.metrics().sweeps,
+            sweeps
+        ));
+    }
+
+    Ok(MultiwaySession {
+        solver,
+        sweeps_target: sweeps,
+        threads,
+        evaluation_cadence,
+        evaluation_samples,
+        evaluation_seed,
+        checkpoint_every: run.checkpoint_every,
+        storage: run.storage,
+        config_toml: raw_toml.to_string(),
+        config_hash: formats::config_hash(raw_toml.as_bytes()),
+        game_config,
+    })
+}
+
+/// Builds (or loads, or retrains-and-overwrites) the trained
+/// rollout/k-means abstraction for `AbstractionKind::RolloutKmeans`.
+/// Factored out of `build_multiway_session` so the two backend kinds don't
+/// share one branchy block.
+fn build_rollout_abstraction(
+    game_config: &multiway::MultiwayConfig,
+) -> Result<RolloutKMeansAbstraction> {
     let params = RolloutKMeansParams {
         flop_buckets: u32::from(game_config.abstraction.flop_buckets),
         turn_buckets: u32::from(game_config.abstraction.turn_buckets),
@@ -198,61 +274,47 @@ pub fn build_multiway_session(
             .build()
             .context("training deterministic multiway rollout abstraction")?
     };
-    let game = HoldemGame::new(&game_config, &utility, &rake, abstraction)
-        .context("building generative multiway game")?;
-    let sampler = game.deal_sampler().context("compiling table ranges")?;
-    let solver_config = SolverConfig {
-        seed: run.seed.unwrap_or(algorithm_seed),
-        max_memory_bytes: run.max_memory_bytes.unwrap_or(DEFAULT_MEMORY_LIMIT),
-        max_traversal_depth: 512,
-        exploration_epsilon,
-        discount_every,
-        discount_until,
-        sweep_batch: run.sweep_batch.unwrap_or(1),
-        traverser_vector,
-    };
-    let evaluation_seed = solver_config.seed ^ 0x6576_616c_7561_7465;
-    let solver = if let Some(path) = resume_checkpoint {
-        let checkpoint = MultiwayCheckpoint::load_unchecked(path)
-            .with_context(|| format!("reading multiway checkpoint {}", path.display()))?;
-        let solver =
-            MultiwaySolver::from_state_with_config(game, sampler, checkpoint.state, solver_config)
-                .context("restoring multiway MCCFR state")?;
-        if solver.configuration_fingerprint() != checkpoint.header.configuration_fingerprint {
-            return Err(anyhow!(
-                "checkpoint belongs to different table rules or ranges"
-            ));
-        }
-        if solver.abstraction_fingerprint() != checkpoint.header.abstraction_fingerprint {
-            return Err(anyhow!(
-                "checkpoint belongs to a different card abstraction"
-            ));
-        }
-        solver
-    } else {
-        MultiwaySolver::new(game, sampler, solver_config).context("initializing multiway MCCFR")?
-    };
-    if solver.metrics().sweeps > sweeps {
-        return Err(anyhow!(
-            "checkpoint already contains {} sweeps, exceeding target {}",
-            solver.metrics().sweeps,
-            sweeps
-        ));
-    }
+    Ok(abstraction)
+}
 
-    Ok(MultiwaySession {
-        solver,
-        sweeps_target: sweeps,
-        threads,
-        evaluation_cadence,
-        evaluation_samples,
-        evaluation_seed,
-        checkpoint_every: run.checkpoint_every,
-        storage: run.storage,
-        config_toml: raw_toml.to_string(),
-        config_hash: formats::config_hash(raw_toml.as_bytes()),
-        game_config,
-    })
+/// Builds (or loads, or rebuilds-and-overwrites -- see
+/// `Ehs2Abstraction::load_or_build`) the precomputed EHS² percentile-table
+/// abstraction for `AbstractionKind::Ehs2Table`, reusing the same
+/// `artifact_cache` config key the rollout backend uses for its own
+/// (differently-shaped) artifact. Unlike the rollout backend, there is no
+/// separate assignment cache to persist after a solve: the table is fully
+/// determined by `params` at build time.
+fn build_ehs2_table_abstraction(
+    game_config: &multiway::MultiwayConfig,
+) -> Result<TableAbstractionAdapter<Ehs2Abstraction>> {
+    let params = Ehs2Params {
+        flop_buckets: u32::from(game_config.abstraction.flop_buckets),
+        turn_buckets: u32::from(game_config.abstraction.turn_buckets),
+        river_buckets: u32::from(game_config.abstraction.river_buckets),
+    };
+    let cache = game_config.abstraction.artifact_cache.as_deref();
+    if let Some(parent) = cache
+        .and_then(Path::parent)
+        .filter(|parent| !parent.as_os_str().is_empty())
+    {
+        std::fs::create_dir_all(parent)
+            .with_context(|| format!("creating ehs2 table cache directory {}", parent.display()))?;
+    }
+    let start = Instant::now();
+    let streets = [
+        cards::Street::Flop,
+        cards::Street::Turn,
+        cards::Street::River,
+    ];
+    let table = Ehs2Abstraction::load_or_build(params, &streets, cache);
+    println!(
+        "ehs2 tables: ready in {:.2}s",
+        start.elapsed().as_secs_f64()
+    );
+    Ok(TableAbstractionAdapter::new(
+        table,
+        ehs2_table_fingerprint(params),
+    ))
 }
 
 /// `pub` (rather than `pub(crate)`) so the native GUI can run cheap
@@ -542,6 +604,40 @@ mod tests {
         assert_eq!(
             reloaded.fingerprint(),
             session.solver.abstraction_fingerprint()
+        );
+    }
+
+    #[test]
+    #[ignore = "builds full EHS2 tables over every canonical board; CI runs it in release with --include-ignored"]
+    fn ehs2_table_backend_builds_a_session_and_caches_its_tables() {
+        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let directory = tempfile::tempdir().unwrap();
+        let cache_path = directory.path().join("ehs2.postcard");
+
+        // Splice `kind = "ehs2-table"` and `artifact_cache` into
+        // `[game.abstraction]` right after the existing `seed` key, mirroring
+        // `stale_rollout_artifact_is_retrained_and_overwritten`'s splice.
+        let literal = format!("{:?}", cache_path.display().to_string());
+        let config_with_kind = raw.replacen(
+            "seed = 17\n",
+            &format!("seed = 17\nkind = \"ehs2-table\"\nartifact_cache = {literal}\n"),
+            1,
+        );
+        assert_ne!(
+            config_with_kind, raw,
+            "kind/artifact_cache injection must have matched"
+        );
+
+        let session = build_multiway_session(&config_with_kind, None)
+            .expect("the ehs2-table backend must build a session");
+        assert_eq!(session.sweeps_target, 2);
+        assert!(
+            session.solver.game().abstraction().rollout().is_none(),
+            "the ehs2-table backend has no rollout assignment cache to persist"
+        );
+        assert!(
+            cache_path.is_file(),
+            "the ehs2 bucket-table cache must be written at build time"
         );
     }
 }
