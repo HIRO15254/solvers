@@ -39,6 +39,22 @@ use crate::config::{
 
 const DEFAULT_MEMORY_LIMIT: u64 = 4 * 1024 * 1024 * 1024;
 
+/// Resolved `run.stop_dev_gain`/`run.stop_confirmations`/
+/// `run.stop_eval_period_secs` convergence stop rule; see
+/// `crate::config::RunSection::stop_dev_gain` for the full semantics.
+/// `None` in [`MultiwaySession::stop_rule`] means the rule is disabled and
+/// `sweeps_target` is a plain target rather than a safety cap.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct StopRule {
+    /// Threshold, in the run's own utility unit, compared against the
+    /// maximum per-seat `deviation_gain_lower_bound` CI upper bound.
+    pub dev_gain_threshold: f64,
+    /// Consecutive passing evaluations required before stopping.
+    pub confirmations: u32,
+    /// Wall-clock period, in seconds, between stop-rule evaluations.
+    pub eval_period_secs: f64,
+}
+
 /// Everything needed to run (or resume) a multiway solve: the constructed
 /// solver plus the run parameters resolved from `[run]`.
 pub struct MultiwaySession {
@@ -50,6 +66,9 @@ pub struct MultiwaySession {
     pub evaluation_seed: u64,
     pub checkpoint_every: Option<u64>,
     pub storage: StorageKind,
+    /// Convergence-based stop rule; see [`StopRule`]. `None` unless
+    /// `run.stop_dev_gain` is set.
+    pub stop_rule: Option<StopRule>,
     /// The exact config text this session was built from, unmodified.
     pub config_toml: String,
     /// Blake3 hash of `config_toml`'s raw bytes (see `formats::config_hash`).
@@ -58,6 +77,11 @@ pub struct MultiwaySession {
     /// display purposes (seat names/positions, button seat).
     pub game_config: multiway::MultiwayConfig,
 }
+
+/// Default [`StopRule::confirmations`] and [`StopRule::eval_period_secs`]
+/// when `run.stop_dev_gain` is set but the corresponding key is omitted.
+const DEFAULT_STOP_CONFIRMATIONS: u32 = 2;
+const DEFAULT_STOP_EVAL_PERIOD_SECS: f64 = 30.0;
 
 /// Parses `raw_toml`, validates it as a `kind = "preflop-multiway"` config,
 /// and builds a ready-to-run (or ready-to-resume) [`MultiwaySession`].
@@ -139,6 +163,34 @@ pub fn build_multiway_session(
     if run.sweep_batch == Some(0) {
         return Err(anyhow!("run.sweep_batch must be positive when supplied"));
     }
+    if run
+        .stop_dev_gain
+        .is_some_and(|threshold| !threshold.is_finite() || threshold <= 0.0)
+    {
+        return Err(anyhow!(
+            "run.stop_dev_gain must be finite and positive when supplied"
+        ));
+    }
+    if run.stop_confirmations == Some(0) {
+        return Err(anyhow!(
+            "run.stop_confirmations must be positive when supplied"
+        ));
+    }
+    if run
+        .stop_eval_period_secs
+        .is_some_and(|period| !period.is_finite() || period <= 0.0)
+    {
+        return Err(anyhow!(
+            "run.stop_eval_period_secs must be finite and positive when supplied"
+        ));
+    }
+    let stop_rule = run.stop_dev_gain.map(|dev_gain_threshold| StopRule {
+        dev_gain_threshold,
+        confirmations: run.stop_confirmations.unwrap_or(DEFAULT_STOP_CONFIRMATIONS),
+        eval_period_secs: run
+            .stop_eval_period_secs
+            .unwrap_or(DEFAULT_STOP_EVAL_PERIOD_SECS),
+    });
 
     let evaluation_samples = run.evaluation_samples.unwrap_or(256);
     let solver_config = SolverConfig {
@@ -189,6 +241,7 @@ pub fn build_multiway_session(
         evaluation_seed,
         checkpoint_every: run.checkpoint_every,
         storage: run.storage,
+        stop_rule,
         config_toml: raw_toml.to_string(),
         config_hash: formats::config_hash(raw_toml.as_bytes()),
         game_config,
@@ -611,6 +664,83 @@ mod tests {
         let session = build_multiway_session(raw, None).expect("build multiway session");
         assert_eq!(session.sweeps_target, 2);
         assert_eq!(session.config_toml, raw);
+        assert_eq!(session.stop_rule, None);
+    }
+
+    fn with_stop_dev_gain(dev_gain: &str, extra: &str) -> String {
+        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let anchor = "evaluation_cadence = 1\n";
+        let spliced = raw.replacen(
+            anchor,
+            &format!("{anchor}stop_dev_gain = {dev_gain}\n{extra}"),
+            1,
+        );
+        assert_ne!(spliced, raw, "the splice anchor must have matched");
+        spliced
+    }
+
+    #[test]
+    fn stop_dev_gain_defaults_confirmations_and_period_when_omitted() {
+        let raw = with_stop_dev_gain("0.5", "");
+        let session = build_multiway_session(&raw, None).expect("build multiway session");
+        assert_eq!(
+            session.stop_rule,
+            Some(StopRule {
+                dev_gain_threshold: 0.5,
+                confirmations: DEFAULT_STOP_CONFIRMATIONS,
+                eval_period_secs: DEFAULT_STOP_EVAL_PERIOD_SECS,
+            })
+        );
+    }
+
+    #[test]
+    fn stop_dev_gain_honors_explicit_confirmations_and_period() {
+        let raw = with_stop_dev_gain(
+            "0.5",
+            "stop_confirmations = 5\nstop_eval_period_secs = 12.5\n",
+        );
+        let session = build_multiway_session(&raw, None).expect("build multiway session");
+        assert_eq!(
+            session.stop_rule,
+            Some(StopRule {
+                dev_gain_threshold: 0.5,
+                confirmations: 5,
+                eval_period_secs: 12.5,
+            })
+        );
+    }
+
+    /// `MultiwaySession` intentionally does not derive `Debug` (it embeds a
+    /// live `MultiwaySolver`), so validation-error tests extract the error
+    /// string by hand rather than via `Result::unwrap_err`.
+    fn build_multiway_session_err(raw: &str) -> String {
+        match build_multiway_session(raw, None) {
+            Ok(_) => panic!("expected build_multiway_session to fail"),
+            Err(error) => error.to_string(),
+        }
+    }
+
+    #[test]
+    fn stop_dev_gain_rejects_nonpositive_thresholds() {
+        for bad in ["0.0", "-1.0"] {
+            let raw = with_stop_dev_gain(bad, "");
+            let error = build_multiway_session_err(&raw);
+            assert!(error.contains("stop_dev_gain"), "{bad}: {error}");
+        }
+    }
+
+    #[test]
+    fn stop_confirmations_zero_is_rejected() {
+        let raw = with_stop_dev_gain("0.5", "stop_confirmations = 0\n");
+        let error = build_multiway_session_err(&raw);
+        assert!(error.contains("stop_confirmations"));
+    }
+
+    #[test]
+    fn stop_eval_period_secs_nonpositive_is_rejected() {
+        let raw = with_stop_dev_gain("0.5", "stop_eval_period_secs = 0.0\n");
+        let error = build_multiway_session_err(&raw);
+        assert!(error.contains("stop_eval_period_secs"));
     }
 
     #[test]

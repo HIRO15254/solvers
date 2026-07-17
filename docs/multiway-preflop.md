@@ -458,6 +458,50 @@ A browser resume accepts only a managed
 paths are never accepted from web input.  Once an atomic periodic checkpoint
 exists, its URL is available even while the solve continues.
 
+## Auto mode: convergence stop rule (phase A)
+
+`[run] stop_dev_gain` turns `run.sweeps` from a target into a safety cap: the
+CLI drive loop additionally evaluates the held-out average profile every
+`stop_eval_period_secs` of wall time (default `30.0`; independent of, and
+layered on top of, the existing `evaluation_cadence`/`checkpoint_every`
+boundaries -- it never changes when those fire, it only adds another check in
+between). Each stop-rule evaluation takes `U = max` over seats of
+`deviation_gain_lower_bound.ci95[1]`; once `U` stays below `stop_dev_gain` for
+`stop_confirmations` consecutive evaluations (default `2`), the run stops
+early with completion status `"converged"`. The evaluation sample count
+starts at `run.evaluation_samples` and doubles (capped at `65_536`) whenever
+a check's own max CI *width* still exceeds the threshold -- i.e. the check
+could not possibly pass yet regardless of the true value -- logging each
+doubling to the same progress stream as the ordinary cadence prints.
+`stop_dev_gain`'s unit is the run's own utility unit: bb for chip-EV,
+tournament-utility units (compared as-is, no conversion) for tournament ICM.
+
+Because the evaluation period is wall-clock rather than sweep-count based,
+the exact sweep a converged run stops at is machine-dependent -- a faster
+machine fits more sweeps into the same window before the first check, and
+every check after that. The stopped sweep count is always recorded in the
+run's metrics/result artifacts, so this is fully auditable after the fact,
+but it means **bit-reproducible runs must set a fixed `run.sweeps` and leave
+`stop_dev_gain` unset**; the two knobs are not meant to be combined when
+exact reproducibility matters.
+
+Two config-and-estimator-only helpers exist in support of a later GUI "auto
+mode" (neither builds a card abstraction or a deal sampler, so both are fast
+enough to call before committing to a run):
+
+- `multiway::estimate_dense_arena(&MultiwayConfig) -> DenseArenaEstimate`
+  reuses the same tree enumeration and arena-sizing math as the
+  `recall = "street"` preflight, but drives it with a bucket-count-only stand-in
+  abstraction instead of a trained one, so it can size a hypothetical dense
+  arena for *any* bucket-count choice without paying rollout/EHS² training
+  cost.
+- `cli::auto_run::derive_auto_run(&MultiwayConfig, threads, memory_budget_bytes)
+  -> AutoRunDerivation` picks `sweep_batch = threads.div_ceil(seats)` and the
+  largest uniform bucket count from `[64, 128, 256, 512, 1024, 2048, 4096]`
+  that fits `memory_budget_bytes` per `estimate_dense_arena`, given the
+  caller's own thread/memory-budget facts (no machine detection happens
+  here).
+
 ## References
 
 - [Lanctot et al., *Monte Carlo Sampling for Regret Minimization in Extensive Games* (NeurIPS 2009)](https://papers.nips.cc/paper_files/paper/2009/hash/00411460f7c92d2124a67ea0f4cb5f85-Abstract.html)

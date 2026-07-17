@@ -659,6 +659,13 @@ fn run_model_to_section(model: &RunModel) -> RunSection {
         evaluation_samples: model.evaluation_samples,
         evaluation_cadence: model.evaluation_cadence,
         sweep_batch: (model.sweep_batch != 1).then_some(model.sweep_batch),
+        // The convergence stop rule (`run.stop_dev_gain` and friends) has no
+        // GUI surface yet; a later phase wires it up. Leaving these unset
+        // keeps every GUI-produced config byte-identical to before these
+        // fields existed.
+        stop_dev_gain: None,
+        stop_confirmations: None,
+        stop_eval_period_secs: None,
     }
 }
 

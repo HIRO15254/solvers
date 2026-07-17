@@ -21,7 +21,18 @@ enum CompletionStatus {
     Completed,
     ResourceLimit,
     Cancelled,
+    /// The convergence stop rule (`run.stop_dev_gain`) fired: the maximum
+    /// per-seat held-out deviation-gain-lower-bound CI upper bound stayed
+    /// below the configured threshold for `run.stop_confirmations`
+    /// consecutive wall-clock-spaced evaluations. See
+    /// `crate::session::StopRule`.
+    Converged,
 }
+
+/// Hard cap on the adaptive stop-rule evaluation sample count (see
+/// `run_inner`'s drive loop); matches the ladder cap documented on
+/// `run.stop_dev_gain`.
+const MAX_STOP_RULE_SAMPLES: u64 = 65_536;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -165,6 +176,18 @@ fn run_inner(
     let mut last_row = MultiwayMetricsRow::sampling(mw_session.game_config.seats.len());
     let mut status = CompletionStatus::Completed;
     let mut has_evaluation = false;
+    // Convergence stop rule (`run.stop_dev_gain`) state: an adaptive
+    // evaluation sample count (starts at `evaluation_samples`, doubles up to
+    // `MAX_STOP_RULE_SAMPLES` whenever the CI is too wide to ever pass), a
+    // consecutive-pass counter, and the wall clock of the last stop-rule
+    // evaluation. See the stop-rule block inside the drive loop below for
+    // why this check is wall-clock-driven rather than cadence-driven: with
+    // `stop_dev_gain` set, `sweeps_target` is a safety cap, not a target, so
+    // the sweep count a converged run actually stops at is machine-dependent
+    // (documented on `run.stop_dev_gain`).
+    let mut stop_rule_samples = mw_session.evaluation_samples;
+    let mut stop_confirmations_met: u32 = 0;
+    let mut last_stop_eval = Instant::now();
 
     while mw_session.solver.completed_sweeps() < mw_session.sweeps_target {
         if cancel.is_some_and(|token| token.load(Ordering::Relaxed)) {
@@ -243,6 +266,79 @@ fn run_inner(
         {
             write_checkpoint(&mw_session.solver, path)?;
         }
+
+        // Convergence stop rule: an ADDITIONAL trigger layered on top of the
+        // cadence-based evaluation/checkpoint boundaries above, never a
+        // replacement for them. It fires on wall-clock time rather than a
+        // sweep boundary, so it is checked once per drive-loop chunk
+        // regardless of where `sweeps_now` falls relative to
+        // `evaluation_cadence`/`checkpoint_every`.
+        if let Some(stop_rule) = mw_session.stop_rule
+            && last_stop_eval.elapsed().as_secs_f64() >= stop_rule.eval_period_secs
+        {
+            last_stop_eval = Instant::now();
+            let evaluation = mw_session
+                .solver
+                .evaluate_average_profile(stop_rule_samples, mw_session.evaluation_seed)
+                .context("evaluating multiway profile for the convergence stop rule")?;
+            let now = mw_session.solver.metrics();
+            let drift = mw_session.solver.strategy_drift_refresh(&mut prior);
+            last_row = session::metrics_row(
+                &now,
+                drift,
+                started.elapsed().as_secs_f64(),
+                Some(&evaluation),
+            );
+            has_evaluation = true;
+            if let Some(writer) = metrics_writer.as_mut() {
+                writer
+                    .append(&last_row)
+                    .context("writing multiway metrics")?;
+            }
+
+            let bounds = evaluation
+                .deviation_gain_lower_bound
+                .as_ref()
+                .expect("evaluate_average_profile always returns deviation_gain_lower_bound");
+            let max_upper = bounds
+                .iter()
+                .map(|estimate| estimate.ci95[1])
+                .fold(f64::NEG_INFINITY, f64::max);
+            let max_width = bounds
+                .iter()
+                .map(|estimate| estimate.ci95[1] - estimate.ci95[0])
+                .fold(0.0, f64::max);
+
+            stop_confirmations_met = if max_upper < stop_rule.dev_gain_threshold {
+                stop_confirmations_met + 1
+            } else {
+                0
+            };
+
+            // The CI is wide enough that the check could never pass even if
+            // the true value already converged: double the sample count for
+            // subsequent stop-rule evaluations (capped), so noise shrinks
+            // over time instead of blocking convergence forever.
+            if max_width > stop_rule.dev_gain_threshold && stop_rule_samples < MAX_STOP_RULE_SAMPLES
+            {
+                let doubled = stop_rule_samples
+                    .saturating_mul(2)
+                    .min(MAX_STOP_RULE_SAMPLES);
+                if emit_progress && doubled != stop_rule_samples {
+                    println!(
+                        "stop-rule: max CI width {max_width:.6} exceeds threshold {:.6}; \
+                         doubling evaluation samples {stop_rule_samples} -> {doubled}",
+                        stop_rule.dev_gain_threshold
+                    );
+                }
+                stop_rule_samples = doubled;
+            }
+
+            if stop_confirmations_met >= stop_rule.confirmations {
+                status = CompletionStatus::Converged;
+                break;
+            }
+        }
     }
 
     let final_checkpoint = final_checkpoint_path(status, checkpoint_path, output);
@@ -293,6 +389,7 @@ fn run_inner(
         CompletionStatus::Completed => "completed",
         CompletionStatus::ResourceLimit => "resource_limit",
         CompletionStatus::Cancelled => "cancelled",
+        CompletionStatus::Converged => "converged",
     }
     .to_string();
     if let Some(writer) = metrics_writer.as_mut() {
@@ -485,6 +582,136 @@ mod tests {
         let raw = include_str!("../../../examples/preflop_multiway_9max.toml");
         let parsed: SolveConfig = toml::from_str(raw).unwrap();
         assert!(matches!(parsed.game, GameSection::PreflopMultiway(_)));
+    }
+
+    /// Splices `stop_dev_gain`/`stop_confirmations`/`stop_eval_period_secs`
+    /// into the 3-max smoke config's `[run]` table (right after its last
+    /// key) and overrides `sweeps` to `cap`, so the stop rule's cap acts as
+    /// a safety net rather than the actual target.
+    fn smoke_with_stop_rule(cap: u64, extra_stop_keys: &str) -> String {
+        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let with_cap = raw.replacen("sweeps = 2\n", &format!("sweeps = {cap}\n"), 1);
+        assert_ne!(with_cap, raw, "the sweeps anchor must have matched");
+        let spliced = with_cap.replacen(
+            "evaluation_cadence = 1\n",
+            &format!("evaluation_cadence = 1\n{extra_stop_keys}"),
+            1,
+        );
+        assert_ne!(
+            spliced, with_cap,
+            "the run-section anchor must have matched"
+        );
+        spliced
+    }
+
+    fn run_to_json(raw: &str, config: SolveConfig) -> serde_json::Value {
+        let config_hash = formats::config_hash(raw.as_bytes());
+        let dir = tempfile::tempdir().unwrap();
+        let output = dir.path().join("result.json");
+        run(
+            raw,
+            config,
+            Some(&output),
+            None,
+            None,
+            config_hash,
+            None,
+            None,
+            false,
+        )
+        .expect("multiway run should succeed");
+        serde_json::from_str(&std::fs::read_to_string(&output).unwrap())
+            .expect("result output must be valid JSON")
+    }
+
+    /// A very lax threshold (1000 bb, far above anything a 2bb-effective-stack
+    /// smoke table could ever produce) with a single required confirmation
+    /// and a near-zero wall-clock evaluation period must converge on the
+    /// very first stop-rule evaluation, stopping well short of the (high)
+    /// sweep cap with status `"converged"`.
+    #[test]
+    fn stop_dev_gain_converges_before_the_sweep_cap_with_a_lax_threshold() {
+        let raw = smoke_with_stop_rule(
+            100_000,
+            "stop_dev_gain = 1000.0\nstop_confirmations = 1\nstop_eval_period_secs = 0.01\n",
+        );
+        let config: SolveConfig = toml::from_str(&raw).expect("parse spliced config");
+        let result = run_to_json(&raw, config);
+        assert_eq!(result["status"], "converged");
+        let sweeps = result["sweeps"].as_u64().unwrap();
+        assert!(
+            sweeps < 100_000,
+            "expected an early stop, got {sweeps} sweeps"
+        );
+    }
+
+    /// The packaged 3-max smoke fixture, unmodified, is a degenerate
+    /// fold/shove-only preflop tree (2bb stacks, `bet_sizes`/`raise_sizes`
+    /// emptied out on every street): its regret-greedy deviation collapses
+    /// onto the average strategy almost immediately, so its real
+    /// deviation-gain estimate reaches even an astronomically tight
+    /// threshold within a handful of sweeps -- too easy a target to exercise
+    /// "the threshold is unreachable". This restores real preflop bet/raise
+    /// sizing (a bigger, 20bb stack and the crate's normal default preflop
+    /// sizes) while keeping every postflop street exactly as
+    /// check-down-only as the smoke fixture (so the tree, and therefore the
+    /// test, stays fast): a real held-out deviation-gain upper bound on this
+    /// richer preflop tree stays in the several-bb range for many sweeps
+    /// (measured 5-16 bb at 20 sweeps across 8-128 evaluation samples).
+    fn smoke_with_richer_preflop_and_stop_rule(
+        cap: u64,
+        stop_dev_gain: f64,
+        stop_confirmations: u32,
+    ) -> String {
+        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let raw = raw.replace("stack_bb = 2.0", "stack_bb = 20.0");
+        let raw = raw.replacen(
+            "[game.betting.preflop]\nbet_sizes = []\nraise_sizes = []\nmax_aggressive_actions = 1\ninclude_allin = true\n",
+            "[game.betting.preflop]\nbet_sizes = [{ kind = \"to-bb\", value = 2.5 }]\nraise_sizes = [{ kind = \"previous-bet-multiple\", factor = 3.0 }]\nmax_aggressive_actions = 4\ninclude_allin = true\n",
+            1,
+        );
+        let with_cap = raw.replacen("sweeps = 2\n", &format!("sweeps = {cap}\n"), 1);
+        assert_ne!(with_cap, raw, "the sweeps anchor must have matched");
+        let spliced = with_cap.replacen(
+            "evaluation_cadence = 1\n",
+            &format!(
+                "evaluation_cadence = 1\nstop_dev_gain = {stop_dev_gain}\nstop_confirmations = {stop_confirmations}\nstop_eval_period_secs = 0.01\n"
+            ),
+            1,
+        );
+        assert_ne!(
+            spliced, with_cap,
+            "the run-section anchor must have matched"
+        );
+        spliced
+    }
+
+    /// Validation forbids a literal zero threshold, and an astronomically
+    /// tight one (e.g. `1e-9`) is unreachable for the *wrong* reason in an
+    /// automated test: the adaptive sample-doubling rule (see the drive
+    /// loop in `run_inner`) keeps doubling the evaluation sample count
+    /// whenever the CI is too wide to ever settle below the threshold,
+    /// which for `1e-9` runs all the way to the `65_536`-sample cap and
+    /// repeats at that cost every period -- correct behavior, but far too
+    /// slow for a unit test.
+    ///
+    /// Rather than lean on a fragile numeric threshold (a 20-sweep MCCFR
+    /// run's exact deviation-gain estimate depends on sampling noise that
+    /// can occasionally dip under even a several-bb threshold), this makes
+    /// "unreachable" *structural*: `stop_confirmations` is set higher than
+    /// the sweep cap itself, so no sequence of per-sweep stop-rule
+    /// evaluations (at most one per sweep, since `evaluation_cadence = 1`)
+    /// could possibly accumulate enough *consecutive* passes to reach it,
+    /// regardless of what any individual evaluation reports. The run must
+    /// therefore exhaust its (small) sweep cap with status `"completed"`.
+    #[test]
+    fn stop_dev_gain_runs_to_the_cap_when_the_threshold_is_unreachable() {
+        let cap = 20;
+        let raw = smoke_with_richer_preflop_and_stop_rule(cap, 2.0, cap as u32 + 5);
+        let config: SolveConfig = toml::from_str(&raw).expect("parse spliced config");
+        let result = run_to_json(&raw, config);
+        assert_eq!(result["status"], "completed");
+        assert_eq!(result["sweeps"].as_u64().unwrap(), cap);
     }
 
     #[test]

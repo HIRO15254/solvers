@@ -390,6 +390,37 @@ pub struct RunSection {
     /// per-seat traversal cost is imbalanced.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sweep_batch: Option<u64>,
+    /// Convergence-based stop threshold, in the run's own utility unit (bb
+    /// for `[utility] kind = "chip-ev"`; tournament-utility units, compared
+    /// as-is, for `kind = "tournament-icm"`). When set, `run.sweeps` becomes
+    /// a *safety cap* rather than a target: the drive loop additionally
+    /// evaluates the held-out average profile every
+    /// `stop_eval_period_secs` of wall time and stops early, with completion
+    /// status `"converged"`, once the maximum per-seat
+    /// `deviation_gain_lower_bound` upper confidence bound stays below this
+    /// threshold for `stop_confirmations` consecutive evaluations in a row.
+    /// `None` (the default) never runs this check, so `run.sweeps` behaves
+    /// exactly as before this field existed.
+    ///
+    /// Determinism note: this check fires on a *wall-clock* period, so the
+    /// exact sweep count a converged run stops at is machine-dependent (a
+    /// faster machine fits more sweeps into the same `stop_eval_period_secs`
+    /// window before the first check, and every check thereafter). The
+    /// stopped sweep count is always recorded in the run's artifacts. A
+    /// bit-reproducible run must use a fixed `run.sweeps` with
+    /// `stop_dev_gain` left unset.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_dev_gain: Option<f64>,
+    /// Consecutive passing stop-rule evaluations required before stopping.
+    /// Defaults to `2` when `stop_dev_gain` is set; ignored otherwise. Must
+    /// be positive when supplied.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_confirmations: Option<u32>,
+    /// Wall-clock period, in seconds, between stop-rule evaluations.
+    /// Defaults to `30.0` when `stop_dev_gain` is set; ignored otherwise.
+    /// Must be positive when supplied.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_eval_period_secs: Option<f64>,
 }
 
 fn default_check_every() -> u64 {
@@ -743,6 +774,45 @@ iterations = 10
         );
         assert_eq!(bets.flop.oop_raise, Some(vec![1.0]));
         assert_eq!(bets.flop.ip_raise, Some(vec![0.75]));
+    }
+
+    #[test]
+    fn stop_rule_keys_round_trip_and_absent_keys_serialize_byte_identically() {
+        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let baseline: SolveConfig = toml::from_str(raw).expect("parse example multiway config");
+        assert_eq!(baseline.run.stop_dev_gain, None);
+        assert_eq!(baseline.run.stop_confirmations, None);
+        assert_eq!(baseline.run.stop_eval_period_secs, None);
+        let serialized = toml::to_string(&baseline).unwrap();
+        assert!(!serialized.contains("stop_dev_gain"));
+        assert!(!serialized.contains("stop_confirmations"));
+        assert!(!serialized.contains("stop_eval_period_secs"));
+
+        // Splice the three new keys into the example's existing `[run]`
+        // table, right after its last key.
+        let anchor = "evaluation_cadence = 1\n";
+        let spliced = raw.replacen(
+            anchor,
+            &format!(
+                "{anchor}stop_dev_gain = 0.05\nstop_confirmations = 3\nstop_eval_period_secs = 5.0\n"
+            ),
+            1,
+        );
+        assert_ne!(spliced, raw, "the splice anchor must have matched");
+
+        let config: SolveConfig = toml::from_str(&spliced).expect("parse config with stop rule");
+        assert_eq!(config.run.stop_dev_gain, Some(0.05));
+        assert_eq!(config.run.stop_confirmations, Some(3));
+        assert_eq!(config.run.stop_eval_period_secs, Some(5.0));
+
+        let reserialized = toml::to_string(&config).unwrap();
+        assert!(reserialized.contains("stop_dev_gain = 0.05"));
+        assert!(reserialized.contains("stop_confirmations = 3"));
+        assert!(reserialized.contains("stop_eval_period_secs = 5.0"));
+        let reparsed: SolveConfig = toml::from_str(&reserialized).unwrap();
+        assert_eq!(reparsed.run.stop_dev_gain, Some(0.05));
+        assert_eq!(reparsed.run.stop_confirmations, Some(3));
+        assert_eq!(reparsed.run.stop_eval_period_secs, Some(5.0));
     }
 
     #[test]
