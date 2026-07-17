@@ -17,11 +17,11 @@ use multiway::solver::{HistoryKey, InfoKey, NodeActionEvaluation, ProfileEvaluat
 
 /// Target wall-clock duration of one drive-loop chunk. Chunks are sized from
 /// the solver's own measured throughput (see `sweep_rate` in [`run`]) to hit
-/// this cadence, so the UI sees a fresh [`ProgressSnapshot`] a few times a
+/// this cadence, so the UI sees a fresh [`ProgressSnapshot`] about once a
 /// second regardless of how fast or slow the solve itself runs -- subject to
 /// never crossing an evaluation/checkpoint boundary (see
 /// `session::distance_to_boundary`).
-const TARGET_CHUNK_SECS: f64 = 0.25;
+const TARGET_CHUNK_SECS: f64 = 1.0;
 
 /// EWMA smoothing factor for the adaptive chunk-size rate estimate: closer
 /// to `1.0` reacts to a changing sweep rate faster; closer to `0.0` damps
@@ -31,22 +31,24 @@ const TARGET_CHUNK_SECS: f64 = 0.25;
 const RATE_EWMA_ALPHA: f64 = 0.3;
 
 /// Wall-clock throttle for the watched-node [`NodeSnapshot`] refresh: about
-/// 2 Hz, matching this deliverable's "live enough to feel real-time without
-/// dominating drive-loop time" target (`strategies_at_with_mass` is an
-/// `O(node's buckets)` scan, cheap but not free).
-const NODE_SNAPSHOT_THROTTLE_MILLIS: u128 = 500;
+/// 1 Hz -- live enough to watch strategies move without letting the
+/// `O(node's buckets)` `strategies_at_with_mass` scan eat into drive-loop
+/// time.
+const NODE_SNAPSHOT_THROTTLE_MILLIS: u128 = 1_000;
 
 /// Minimum interval between O(infosets) [`multiway::solver::MultiwaySolver::metrics`]
-/// refreshes backing a [`ProgressSnapshot`]'s infoset/memory readout. The
-/// effective interval is adaptive: `max` of this floor and
-/// [`METRICS_COST_MULTIPLIER`] times the last scan's own measured duration,
-/// so the scan can never consume more than ~1/[`METRICS_COST_MULTIPLIER`]
-/// of wall time no matter how large the arena is.
-const METRICS_THROTTLE_MILLIS: u64 = 250;
+/// refreshes backing a [`ProgressSnapshot`]'s infoset/memory readout: at
+/// most once every 10 seconds. The effective interval is adaptive: `max` of
+/// this floor and [`METRICS_COST_MULTIPLIER`] times the last scan's own
+/// measured duration, so the scan can never consume more than
+/// ~1/[`METRICS_COST_MULTIPLIER`] of wall time no matter how large the
+/// arena is.
+const METRICS_THROTTLE_MILLIS: u64 = 10_000;
 
 /// See [`METRICS_THROTTLE_MILLIS`]: caps the metrics scan's share of wall
-/// time at roughly `1 / METRICS_COST_MULTIPLIER` (~5%).
-const METRICS_COST_MULTIPLIER: u32 = 20;
+/// time at roughly `1 / METRICS_COST_MULTIPLIER` (at most 1% of solve
+/// time).
+const METRICS_COST_MULTIPLIER: u32 = 100;
 
 #[derive(Debug, Clone)]
 pub enum WorkerCmd {
