@@ -425,6 +425,26 @@ fn run(
         )));
         return;
     }
+    // The rollout abstraction's assignment cache is pure memoization
+    // (deterministic f(centroids, key)), so it only grows as the solve
+    // visits more concrete rollout keys. Re-save it here so a later run
+    // against the same `artifact_cache` path starts warm instead of
+    // re-paying every cache miss this run already resolved. Unlike the CLI
+    // (`multiway_solve.rs`), a failure here must not fail the whole run --
+    // the GUI has already written the `.mwsol`/checkpoint successfully, so
+    // this is only a lost warm-start optimization, not a lost result.
+    if let Some(path) = mw_session.game_config.abstraction.artifact_cache.as_deref()
+        && let Err(error) = mw_session
+            .solver
+            .game()
+            .abstraction()
+            .persist_assignment_cache(path)
+    {
+        eprintln!(
+            "warning: could not persist rollout assignment cache {}: {error}",
+            path.display()
+        );
+    }
     send(WorkerEvent::Finished(Box::new(FinishedRun {
         solution,
         mwsol_path: target.output_path,

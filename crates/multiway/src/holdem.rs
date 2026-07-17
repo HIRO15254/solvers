@@ -718,6 +718,22 @@ impl<A: MultiwayAbstraction> ExternalSamplingGame for HoldemGame<A> {
         self.bucket_for_combo_and_street(state, world, combo, state.street)
     }
 
+    fn buckets_for_combos(
+        &self,
+        state: &Self::State,
+        world: &SampledWorld,
+        _actor: usize,
+        combos: &[usize],
+    ) -> Vec<BucketId> {
+        let street = state.street;
+        self.abstraction.bucket_batch(
+            street,
+            world.board(street),
+            state.players_on_street(street).saturating_sub(1),
+            combos,
+        )
+    }
+
     fn terminal_utilities_for_combos(
         &self,
         state: &Self::State,

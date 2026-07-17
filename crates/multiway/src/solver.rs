@@ -142,6 +142,21 @@ pub trait ExternalSamplingGame: Send + Sync {
         unimplemented!("bucket_for_combo is required only for traverser_vector mode")
     }
 
+    /// Batch counterpart of [`Self::bucket_for_combo`]: one bucket per entry
+    /// of `combos`, all against the state's current street/board context.
+    fn buckets_for_combos(
+        &self,
+        state: &Self::State,
+        world: &SampledWorld,
+        actor: usize,
+        combos: &[usize],
+    ) -> Vec<BucketId> {
+        combos
+            .iter()
+            .map(|&combo| self.bucket_for_combo(state, world, actor, combo))
+            .collect()
+    }
+
     /// Vector-traverser terminal evaluation: appends one utility per entry
     /// of `combos` (in order) to `out`, holding every other seat's cards and
     /// the board fixed at whatever `world` already carries and substituting
@@ -2891,10 +2906,8 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
             let street_index = node.street.index();
             if self.bucket_cache[street_index].is_none() {
                 let table = self
-                    .combos
-                    .iter()
-                    .map(|&combo| self.game.bucket_for_combo(&state, world, traverser, combo))
-                    .collect();
+                    .game
+                    .buckets_for_combos(&state, world, traverser, &self.combos);
                 self.bucket_cache[street_index] = Some(table);
             }
 

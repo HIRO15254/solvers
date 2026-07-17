@@ -110,6 +110,48 @@ pot share, its second moment, and scoop/tie probabilities.  Information sets
 retain the complete bucket path.  The artifact seed, rollout parameters,
 rules, and centroids form a fingerprint checked by caches and checkpoints.
 
+### v2 rollout: one sample stream per board
+
+Every postflop bucket lookup canonicalizes `(street, active_opponents, hole,
+board)` to a suit-isomorphism-minimal key. That key is now **board-major**:
+`key.board` is a function of the physical board alone (the minimum over all
+24 suit permutations), independent of which hole is being queried, and
+`key.hole` is the hero's hole mapped into that same board-canonical suit
+space. This lets every hole queried against one physical board share a
+single Monte Carlo sample stream instead of drawing its own:
+
+- The stream's RNG is seeded from `(seed, rollout_samples, street,
+  active_opponents, board)` -- deliberately **not** the hole -- so it is
+  identical for every hero on the same board.
+- Samples (runout + opponent hands, drawn with one deck reset plus a
+  partial Fisher-Yates shuffle of exactly the dealt cards per sample) are
+  generated lazily, in a fixed order, and only
+  ever appended to; a hero's query walks the stream from the start and
+  extends it on demand, never regenerating or reordering earlier samples.
+  This makes generation independent of which heroes are queried, and in
+  what order, so a solo lookup and a batched lookup of many combos against
+  the same board always agree.
+- A hero's own two cards reject (skip) any sample whose dealt cards collide
+  with them. Since a hero-conditioned deal is exactly "deal from a
+  hero-excluded deck," each hero's own conditional sample distribution --
+  and therefore its estimator's statistical quality -- is unaffected by
+  sharing the stream; only cross-key correlation between different heroes'
+  estimates on the same board is introduced, never bias in any one hero's
+  estimate.
+
+This is what backs `MultiwayAbstraction::bucket_batch` (see "Rollout-
+abstraction batching" under vector-traverser sampling below): a whole
+batch of combos against one board can share one stream and pay the Monte
+Carlo cost once instead of once per combo.
+
+The on-disk rollout artifact is version 3, bumped because both the
+canonical key's layout and this rollout computation changed underneath it;
+version 3 is the only version `read_artifact` accepts. A config pointing
+`game.abstraction.artifact_cache` at an older or otherwise-unreadable
+artifact is not a hard error: the CLI (and any caller going through
+`build_multiway_session`) prints a warning to stderr, retrains from
+scratch, and overwrites the file with a fresh version-3 artifact.
+
 ### Recall mode and the policy memory model (`game.abstraction.recall`)
 
 `recall` selects how private information keys the solver's policy storage.
@@ -249,15 +291,30 @@ which worlds get sampled.
   happen to produce the same final stack vector (e.g. many combos tying or
   losing the same way) already share one ICM evaluation for free, without any
   vector-specific bookkeeping.
-- **Known interaction: rollout-abstraction assignment cache growth.** A
-  vector traversal calls the abstraction's `bucket` lookup once per feasible
-  combo instead of once, so `RolloutKMeansAbstraction`'s memoized
-  `(RolloutKey -> BucketId)` assignment cache grows much faster in wall-clock
-  terms. That cache is capped at the rollout artifact's on-disk size limit
-  (64 MiB); a long/wide vector-traverser run against `game.abstraction.artifact_cache`
-  can hit that cap and fail at the final persist step even though the solve
-  itself completed. Point `artifact_cache` at a fresh path per experiment (or
-  omit it) if this happens; raising the cap is future work.
+- **Rollout-abstraction batching.** A vector traversal needs a bucket for
+  every feasible combo instead of just one, so the vector-traverser path
+  calls `MultiwayAbstraction::bucket_batch` (via
+  `ExternalSamplingGame::buckets_for_combos`) once per node instead of
+  `bucket` once per combo. `RolloutKMeansAbstraction`'s batch path looks up
+  every combo's canonical key with one assignment-cache lock, and for
+  whatever keys miss, builds a single shared Monte Carlo sample stream for
+  the batch's one physical board instead of one stream per combo -- see "v2
+  rollout: one sample stream per board" above. This is what makes
+  `traverser_vector` mode's dominant cost (previously ~99% cold-rollout
+  Monte Carlo) amortize across the ~hundreds of feasible combos sharing a
+  board instead of re-paying it per combo.
+- **Assignment cache growth and the persist cap.** The memoized
+  `(RolloutKey -> BucketId)` assignment cache still grows with the number of
+  distinct canonical keys visited, and a wide vector-traverser run visits
+  many more of them per unit wall-clock time than scalar sampling would.
+  Persisting it (`persist_assignment_cache`, called after a solve when
+  `game.abstraction.artifact_cache` is set) is capped at 1 GiB rather than
+  failing once the cache grows past that: if the serialized artifact would
+  exceed the cap, the write drops the tail of the (key-sorted) cache
+  deterministically until it fits, and always keeps the centroids/params
+  intact. A run that grows the cache past 1 GiB therefore always finishes
+  and persists successfully; it just starts the next run with an
+  incomplete (but still consistent) warm cache instead of a fully warm one.
 
 ## Output semantics
 

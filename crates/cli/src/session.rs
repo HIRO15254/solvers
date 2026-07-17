@@ -160,26 +160,38 @@ pub fn build_multiway_session(
             .context("configuring active-opponent bucket budgets")?;
     }
     let abstraction = if let Some(path) = game_config.abstraction.artifact_cache.as_deref() {
-        if path.is_file() {
-            abstraction_builder
-                .load_artifact(path)
-                .with_context(|| format!("loading rollout artifact {}", path.display()))?
-        } else {
-            if let Some(parent) = path
-                .parent()
-                .filter(|parent| !parent.as_os_str().is_empty())
-            {
-                std::fs::create_dir_all(parent).with_context(|| {
-                    format!("creating rollout artifact directory {}", parent.display())
-                })?;
+        // A stale/incompatible artifact (wrong version, corrupt, parameter
+        // mismatch, ...) is not fatal: retrain from scratch and overwrite it,
+        // the same recovery a missing file already gets below. Only an I/O
+        // error during the *write* that follows still propagates.
+        let reusable = path
+            .is_file()
+            .then(|| abstraction_builder.load_artifact(path));
+        match reusable {
+            Some(Ok(abstraction)) => abstraction,
+            other => {
+                if let Some(Err(error)) = other {
+                    eprintln!(
+                        "warning: rollout artifact {} could not be reused ({error}); retraining and overwriting it",
+                        path.display()
+                    );
+                }
+                if let Some(parent) = path
+                    .parent()
+                    .filter(|parent| !parent.as_os_str().is_empty())
+                {
+                    std::fs::create_dir_all(parent).with_context(|| {
+                        format!("creating rollout artifact directory {}", parent.display())
+                    })?;
+                }
+                let abstraction = abstraction_builder
+                    .build()
+                    .context("training deterministic multiway rollout abstraction")?;
+                abstraction
+                    .write_artifact(path)
+                    .with_context(|| format!("writing rollout artifact {}", path.display()))?;
+                abstraction
             }
-            let abstraction = abstraction_builder
-                .build()
-                .context("training deterministic multiway rollout abstraction")?;
-            abstraction
-                .write_artifact(path)
-                .with_context(|| format!("writing rollout artifact {}", path.display()))?;
-            abstraction
         }
     } else {
         abstraction_builder
@@ -458,6 +470,7 @@ pub fn make_solution(
 mod tests {
     use super::*;
     use crate::config::RakeSection;
+    use multiway::abstraction::MultiwayAbstraction;
 
     #[test]
     fn boundaries_are_positive_and_repeat() {
@@ -498,5 +511,37 @@ mod tests {
         let session = build_multiway_session(raw, None).expect("build multiway session");
         assert_eq!(session.sweeps_target, 2);
         assert_eq!(session.config_toml, raw);
+    }
+
+    #[test]
+    fn stale_rollout_artifact_is_retrained_and_overwritten() {
+        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let directory = tempfile::tempdir().unwrap();
+        let artifact_path = directory.path().join("rollout.mwab");
+        std::fs::write(&artifact_path, b"not a valid rollout artifact").unwrap();
+
+        // Splice `artifact_cache` into `[game.abstraction]` right after the
+        // existing `seed` key.
+        let literal = format!("{:?}", artifact_path.display().to_string());
+        let config_with_cache = raw.replacen(
+            "seed = 17\n",
+            &format!("seed = 17\nartifact_cache = {literal}\n"),
+            1,
+        );
+        assert_ne!(
+            config_with_cache, raw,
+            "artifact_cache injection must have matched"
+        );
+
+        let session = build_multiway_session(&config_with_cache, None)
+            .expect("a stale/corrupt artifact must be retrained rather than hard-erroring");
+        assert_eq!(session.sweeps_target, 2);
+
+        let reloaded = RolloutKMeansAbstraction::read_artifact(&artifact_path)
+            .expect("the retrained artifact must have overwritten the file and round-trip");
+        assert_eq!(
+            reloaded.fingerprint(),
+            session.solver.abstraction_fingerprint()
+        );
     }
 }
