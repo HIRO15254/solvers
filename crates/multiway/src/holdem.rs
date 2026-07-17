@@ -14,11 +14,12 @@ use crate::config::{
 use crate::icm::{IcmEstimate, estimate_icm, terminal_icm_delta_with_baseline};
 use crate::sampler::{DealSampler, SampleError, SampledWorld};
 use crate::settlement::{
-    Settlement, SettlementError, settle_ranked, settle_showdown, settle_uncontested,
+    PotLayer, Settlement, SettlementError, build_rated_pots, settle_ranked, settle_showdown,
+    settle_uncontested,
 };
 use crate::solver::{ExternalSamplingGame, PrivateInfo};
 use crate::tree::DenseNodeContext;
-use crate::types::{MwChips, SeatId, SeatVec, Street};
+use crate::types::{CHIPS_PER_BB, MwChips, SeatId, SeatMask, SeatVec, Street};
 
 const ICM_TERMINAL_CACHE_ENTRIES: usize = 65_536;
 
@@ -318,17 +319,18 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
     /// The betting line (and therefore the pot structure: refunds, side
     /// pots, rake, eligible seats, and every *other* seat's rank) is fixed
     /// for the whole traversal regardless of which traverser combo is being
-    /// evaluated -- only `traverser`'s own two cards vary. Each combo is
-    /// therefore settled by substituting it into `traverser`'s rank and
-    /// re-running the exact same tested [`settle_ranked`]/[`settle_uncontested`]
-    /// machinery [`Self::terminal_utilities`] uses (so any single combo's
-    /// result here is *identical*, by construction, to calling
-    /// [`Self::terminal_utilities`] with a world whose only difference is
-    /// `traverser`'s dealt combo). Pot construction and rake, which do not
-    /// depend on any hole cards, are therefore recomputed once per combo
-    /// (inside `settle_ranked`) rather than hoisted out of the loop --
-    /// deliberately simpler than a bespoke per-pot cache, and cheap relative
-    /// to the unavoidable per-combo 7-card rank evaluation.
+    /// evaluated -- only `traverser`'s own two cards vary. Rather than
+    /// re-running the full [`settle_ranked`] machinery (which reconstructs
+    /// pots and clones a full seat-ranks vector) once per combo, the
+    /// showdown/runout case delegates to
+    /// [`Self::terminal_utilities_for_combos_showdown`], which hoists every
+    /// combo-independent computation (pot construction, rake, opponent
+    /// ranks, and -- for ChipEv -- the exact tie/odd-chip share the
+    /// traverser would receive from each pot) out of the per-combo loop, so
+    /// each combo pays only for its own 7-card rank evaluation plus an O(pots)
+    /// comparison. See `terminal_utilities_for_combos_reference` (test-only)
+    /// for the straightforward one-`settle_ranked`-per-combo version this is
+    /// checked against.
     fn terminal_utilities_for_combos(
         &self,
         state: &BettingState,
@@ -354,39 +356,264 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                 out.resize(combos.len(), value);
             }
             HandPhase::Runout | HandPhase::Showdown => {
-                let board = *world.runout();
-                let folded = state.seats[SeatId(traverser as u8)].status == SeatStatus::Folded;
-                let mut base_ranks: Vec<Option<u16>> = Vec::with_capacity(state.num_seats());
-                for seat in state.seats.seats() {
-                    if seat.index() == traverser {
-                        base_ranks.push(None);
-                        continue;
-                    }
-                    if state.seats[seat].status == SeatStatus::Folded {
-                        base_ranks.push(None);
-                        continue;
-                    }
-                    let (first, second) = world.hole_cards(seat.index());
-                    base_ranks.push(Some(rank_of(board.into_iter().chain([first, second])).0));
-                }
-                for &combo in combos {
-                    let mut ranks = base_ranks.clone();
-                    if !folded {
-                        let (first, second) = combo_cards(combo);
-                        ranks[traverser] =
-                            Some(rank_of(board.into_iter().chain([first, second])).0);
-                    }
-                    let value = settle_ranked(state, SeatVec::new_unchecked(ranks), self.rake)
-                        .map_err(HoldemGameError::from)
-                        .and_then(|settlement| self.utilities(&settlement))
-                        .map(|utilities| utilities[SeatId(traverser as u8)])
-                        .unwrap_or(f64::NAN);
-                    out.push(value);
-                }
+                self.terminal_utilities_for_combos_showdown(state, world, traverser, combos, out);
             }
             HandPhase::Betting => out.resize(combos.len(), f64::NAN),
         }
     }
+
+    /// Fast-path showdown/runout implementation of
+    /// [`Self::terminal_utilities_for_combos`]. See that method's doc comment
+    /// for the invariant this exploits (only `traverser`'s cards vary across
+    /// `combos`).
+    fn terminal_utilities_for_combos_showdown(
+        &self,
+        state: &BettingState,
+        world: &SampledWorld,
+        traverser: usize,
+        combos: &[usize],
+        out: &mut Vec<f64>,
+    ) {
+        let board = *world.runout();
+        let traverser_seat = SeatId(traverser as u8);
+        let folded = state.seats[traverser_seat].status == SeatStatus::Folded;
+
+        // Every other live seat's rank is independent of the traverser's
+        // combo, so it is computed exactly once here rather than once per
+        // combo.
+        let mut base_ranks: Vec<Option<u16>> = Vec::with_capacity(state.num_seats());
+        for seat in state.seats.seats() {
+            if seat.index() == traverser || state.seats[seat].status == SeatStatus::Folded {
+                base_ranks.push(None);
+                continue;
+            }
+            let (first, second) = world.hole_cards(seat.index());
+            base_ranks.push(Some(rank_of(board.into_iter().chain([first, second])).0));
+        }
+
+        if folded {
+            // The traverser's rank never enters any pot's winner
+            // computation once folded, so every combo yields the exact same
+            // settlement: pay for it once instead of once per combo.
+            let value = settle_ranked(state, SeatVec::new_unchecked(base_ranks), self.rake)
+                .map_err(HoldemGameError::from)
+                .and_then(|settlement| self.utilities(&settlement))
+                .map(|utilities| utilities[traverser_seat])
+                .unwrap_or(f64::NAN);
+            out.resize(combos.len(), value);
+            return;
+        }
+
+        // Pot construction and rake depend only on the betting line, so they
+        // too are computed once and reused across every combo.
+        let shape = match build_rated_pots(state, self.rake) {
+            Ok(shape) => shape,
+            Err(_) => {
+                out.resize(combos.len(), f64::NAN);
+                return;
+            }
+        };
+        let views = hero_pot_views(
+            &shape.pots,
+            &base_ranks,
+            traverser_seat,
+            state.num_seats(),
+            state.button,
+        );
+
+        match &self.utility {
+            UtilityRuntime::ChipEv => {
+                let hero_floor = state.seats[traverser_seat].remaining.raw()
+                    + shape.refunds[traverser_seat].raw();
+                let starting = self.config.seats[traverser_seat].starting_stack.raw();
+                out.reserve(combos.len());
+                for &combo in combos {
+                    let (first, second) = combo_cards(combo);
+                    let hero_rank = rank_of(board.into_iter().chain([first, second])).0;
+                    let mut chips = hero_floor;
+                    for view in &views {
+                        if !view.hero_eligible {
+                            continue;
+                        }
+                        match view.best_opp_rank {
+                            None => chips += view.net.raw(),
+                            Some(best) => match hero_rank.cmp(&best) {
+                                std::cmp::Ordering::Greater => chips += view.net.raw(),
+                                std::cmp::Ordering::Equal => chips += view.tie_share.raw(),
+                                std::cmp::Ordering::Less => {}
+                            },
+                        }
+                    }
+                    out.push((chips as f64 - starting as f64) / CHIPS_PER_BB as f64);
+                }
+            }
+            UtilityRuntime::TournamentIcm { .. } => {
+                // ICM needs every seat's final stack, not just the
+                // traverser's share, so a distinct per-pot win/tie/lose
+                // outcome tuple still needs one real `settle_ranked` call.
+                // But the outcome tuple only varies over the pots where the
+                // traverser is eligible *and* has a live opponent to compare
+                // against, so the number of distinct tuples is normally far
+                // below `combos.len()` (at most 3 raised to the number of
+                // such pots) -- cache one `settle_ranked` call per distinct
+                // tuple instead of paying for one per combo.
+                let variable_bounds: Vec<u16> = views
+                    .iter()
+                    .filter(|view| view.hero_eligible)
+                    .filter_map(|view| view.best_opp_rank)
+                    .collect();
+                let mut cache: HashMap<u64, f64> = HashMap::new();
+                out.reserve(combos.len());
+                for &combo in combos {
+                    let (first, second) = combo_cards(combo);
+                    let hero_rank = rank_of(board.into_iter().chain([first, second])).0;
+                    let mut key = 0u64;
+                    for (bit, &best) in variable_bounds.iter().enumerate() {
+                        let ordinal = match hero_rank.cmp(&best) {
+                            std::cmp::Ordering::Less => 0u64,
+                            std::cmp::Ordering::Equal => 1,
+                            std::cmp::Ordering::Greater => 2,
+                        };
+                        key |= ordinal << (2 * bit);
+                    }
+                    let value = *cache.entry(key).or_insert_with(|| {
+                        let mut ranks = base_ranks.clone();
+                        ranks[traverser] = Some(hero_rank);
+                        settle_ranked(state, SeatVec::new_unchecked(ranks), self.rake)
+                            .map_err(HoldemGameError::from)
+                            .and_then(|settlement| self.utilities(&settlement))
+                            .map(|utilities| utilities[traverser_seat])
+                            .unwrap_or(f64::NAN)
+                    });
+                    out.push(value);
+                }
+            }
+        }
+    }
+
+    /// Reference implementation of the showdown/runout branch of
+    /// [`Self::terminal_utilities_for_combos`]: one full [`settle_ranked`]
+    /// call per combo, with no hoisted precomputation. Kept only to check
+    /// [`Self::terminal_utilities_for_combos_showdown`] against in
+    /// `holdem::tests::vector_terminal_utilities_fast_path_matches_reference_randomized`;
+    /// production code never calls this.
+    #[cfg(test)]
+    fn terminal_utilities_for_combos_reference(
+        &self,
+        state: &BettingState,
+        world: &SampledWorld,
+        traverser: usize,
+        combos: &[usize],
+        out: &mut Vec<f64>,
+    ) {
+        out.clear();
+        let board = *world.runout();
+        let folded = state.seats[SeatId(traverser as u8)].status == SeatStatus::Folded;
+        let mut base_ranks: Vec<Option<u16>> = Vec::with_capacity(state.num_seats());
+        for seat in state.seats.seats() {
+            if seat.index() == traverser {
+                base_ranks.push(None);
+                continue;
+            }
+            if state.seats[seat].status == SeatStatus::Folded {
+                base_ranks.push(None);
+                continue;
+            }
+            let (first, second) = world.hole_cards(seat.index());
+            base_ranks.push(Some(rank_of(board.into_iter().chain([first, second])).0));
+        }
+        for &combo in combos {
+            let mut ranks = base_ranks.clone();
+            if !folded {
+                let (first, second) = combo_cards(combo);
+                ranks[traverser] = Some(rank_of(board.into_iter().chain([first, second])).0);
+            }
+            let value = settle_ranked(state, SeatVec::new_unchecked(ranks), self.rake)
+                .map_err(HoldemGameError::from)
+                .and_then(|settlement| self.utilities(&settlement))
+                .map(|utilities| utilities[SeatId(traverser as u8)])
+                .unwrap_or(f64::NAN);
+            out.push(value);
+        }
+    }
+}
+
+/// Per-pot view of what the traverser (an arbitrary hero seat, fixed for a
+/// whole [`HoldemGame::terminal_utilities_for_combos_showdown`] call) would
+/// receive from that pot, factored so every field below is independent of
+/// which traverser combo is ultimately compared against it.
+struct HeroPotView {
+    net: MwChips,
+    /// Whether the traverser is eligible for this pot at all (folded or
+    /// capped out below it otherwise). If `false`, the traverser's share is
+    /// always zero and the remaining fields are unused.
+    hero_eligible: bool,
+    /// The best rank among this pot's eligible *non-traverser* seats. `None`
+    /// means the traverser is the pot's only eligible seat (an automatic,
+    /// rank-independent win), which is distinct from "no comparison
+    /// happened" thanks to `hero_eligible`.
+    best_opp_rank: Option<u16>,
+    /// The traverser's exact share of `net` in the event the traverser ties
+    /// `best_opp_rank` (floor share plus the traverser's odd chip, if any,
+    /// following the same clockwise-from-button assignment
+    /// [`crate::settlement`]'s `award_split` uses). The winner set for a tie
+    /// is `{eligible non-traverser seats at best_opp_rank} union {traverser}`
+    /// -- fixed regardless of which combo achieves the tie -- so this is
+    /// exact, not an approximation.
+    tie_share: MwChips,
+}
+
+fn hero_pot_views(
+    pots: &[PotLayer],
+    base_ranks: &[Option<u16>],
+    traverser_seat: SeatId,
+    num_seats: usize,
+    button: SeatId,
+) -> Vec<HeroPotView> {
+    pots.iter()
+        .map(|pot| {
+            if !pot.eligible.contains(traverser_seat) {
+                return HeroPotView {
+                    net: pot.net,
+                    hero_eligible: false,
+                    best_opp_rank: None,
+                    tie_share: MwChips::ZERO,
+                };
+            }
+            let opponents = pot.eligible.difference(SeatMask::from_seat(traverser_seat));
+            let best_opp_rank = opponents
+                .iter()
+                .filter_map(|seat| base_ranks[seat.index()])
+                .max();
+            let tie_share = match best_opp_rank {
+                None => MwChips::ZERO,
+                Some(best) => {
+                    let tying = opponents.iter().fold(SeatMask::EMPTY, |mut mask, seat| {
+                        if base_ranks[seat.index()] == Some(best) {
+                            mask.insert(seat);
+                        }
+                        mask
+                    });
+                    let winners = tying.union(SeatMask::from_seat(traverser_seat));
+                    let count = winners.len() as u64;
+                    let share = pot.net.raw() / count;
+                    let odd = (pot.net.raw() % count) as usize;
+                    let hero_gets_extra = (1..=num_seats)
+                        .map(|step| button.advance(step, num_seats))
+                        .filter(|seat| winners.contains(*seat))
+                        .take(odd)
+                        .any(|seat| seat == traverser_seat);
+                    MwChips(share + u64::from(hero_gets_extra))
+                }
+            };
+            HeroPotView {
+                net: pot.net,
+                hero_eligible: true,
+                best_opp_rank,
+                tie_share,
+            }
+        })
+        .collect()
 }
 
 impl<A: MultiwayAbstraction> ExternalSamplingGame for HoldemGame<A> {
@@ -848,5 +1075,210 @@ mod tests {
         assert_eq!(out.len(), 2);
         assert_eq!(out[0], out[1]);
         assert!(out[0].is_finite());
+    }
+
+    /// General N-seat manual showdown/runout state: `individual[i]` chips
+    /// committed (== `i`'s starting stack, since every constructed seat has
+    /// already put its whole stack in), status `statuses[i]`. Generalizes
+    /// `manual_three_way_allin` to arbitrary seat counts, stacks (hence
+    /// arbitrary side-pot layering), and fold patterns.
+    fn manual_n_way(individual: &[u64], statuses: &[SeatStatus], button: u8) -> BettingState {
+        use crate::betting::SeatState;
+        use crate::types::SeatMask;
+        let num_seats = individual.len();
+        let seats = individual
+            .iter()
+            .zip(statuses)
+            .map(|(&amount, &status)| SeatState {
+                starting_stack: MwChips(amount),
+                remaining: MwChips::ZERO,
+                status,
+                dead_committed: MwChips::ZERO,
+                common_committed: MwChips::ZERO,
+                street_committed: [MwChips(amount), MwChips::ZERO, MwChips::ZERO, MwChips::ZERO],
+                raise_reopen_at: None,
+            })
+            .collect();
+        let non_folded = statuses
+            .iter()
+            .filter(|&&status| status != SeatStatus::Folded)
+            .count() as u8;
+        BettingState {
+            seats: SeatVec::try_new(seats).unwrap(),
+            button: SeatId(button),
+            small_blind_seat: SeatId((button + 1) % num_seats as u8),
+            big_blind_seat: SeatId((button + 2) % num_seats as u8),
+            big_blind: MwChips(1_000),
+            street: Street::River,
+            street_active_players: [non_folded; 4],
+            to_act: None,
+            bet_to_match: MwChips::ZERO,
+            last_full_raise: MwChips(1_000),
+            full_wager_established: false,
+            pending: SeatMask::EMPTY,
+            aggressive_actions: 0,
+            flop_dealt: true,
+            phase: HandPhase::Showdown,
+            preflop_voluntary_call_seen: false,
+        }
+    }
+
+    fn config_with_stacks(stacks_bb: &[f64]) -> MultiwayConfig {
+        MultiwayConfig {
+            seats: stacks_bb
+                .iter()
+                .map(|&stack_bb| SeatConfig {
+                    name: None,
+                    stack_bb,
+                    range: String::new(),
+                    betting: None,
+                })
+                .collect(),
+            button: SeatId(0),
+            blinds: BlindConfig::default(),
+            ante: AnteConfig::None,
+            betting: BettingConfig::default(),
+            abstraction: AbstractionConfig::default(),
+        }
+    }
+
+    fn assert_fast_matches_reference(
+        game: &HoldemGame<FeatureHashAbstraction>,
+        state: &BettingState,
+        world: &SampledWorld,
+        traverser: usize,
+        combos: &[usize],
+        trial: u32,
+    ) {
+        let mut fast = Vec::new();
+        game.terminal_utilities_for_combos(state, world, traverser, combos, &mut fast);
+        let mut reference = Vec::new();
+        game.terminal_utilities_for_combos_reference(
+            state,
+            world,
+            traverser,
+            combos,
+            &mut reference,
+        );
+        assert_eq!(fast.len(), combos.len());
+        assert_eq!(reference.len(), combos.len());
+        for (index, (&fast_value, &reference_value)) in fast.iter().zip(&reference).enumerate() {
+            let matches = (fast_value.is_nan() && reference_value.is_nan())
+                || (fast_value - reference_value).abs() < 1e-9;
+            assert!(
+                matches,
+                "trial {trial} combo index {index}: fast {fast_value} != reference {reference_value}"
+            );
+        }
+    }
+
+    /// Correctness gate for `terminal_utilities_for_combos_showdown` (the
+    /// vector-traverser fast path): across many random seat counts, stacks
+    /// (hence side-pot layerings), fold patterns, button positions, and
+    /// dealt cards -- and both `ChipEv` and tournament `Icm` utility modes,
+    /// with and without rake -- the fast path must agree with
+    /// `terminal_utilities_for_combos_reference` (one `settle_ranked` call
+    /// per combo, no hoisted precomputation) for *every* feasible traverser
+    /// combo, including combos that tie an opponent (exercising the odd-chip
+    /// tie-share precomputation) and cases where the traverser itself has
+    /// folded.
+    #[test]
+    fn vector_terminal_utilities_fast_path_matches_reference_randomized() {
+        use crate::config::FieldPlayerConfig;
+        use cards::ALL_CARDS;
+        use rand::seq::SliceRandom;
+        use rand::{Rng, SeedableRng};
+        use rand_chacha::ChaCha20Rng;
+
+        let mut rng = ChaCha20Rng::seed_from_u64(0xF00D_CAFE_u64);
+        for trial in 0..80u32 {
+            let num_seats = rng.gen_range(2..=6usize);
+            let stacks: Vec<u64> = (0..num_seats)
+                .map(|_| rng.gen_range(1u64..=20) * 1_000)
+                .collect();
+            let mut statuses: Vec<SeatStatus> = (0..num_seats)
+                .map(|_| {
+                    if rng.gen_bool(0.25) {
+                        SeatStatus::Folded
+                    } else {
+                        SeatStatus::AllIn
+                    }
+                })
+                .collect();
+            while statuses
+                .iter()
+                .filter(|&&status| status != SeatStatus::Folded)
+                .count()
+                < 2
+            {
+                let index = rng.gen_range(0..num_seats);
+                statuses[index] = SeatStatus::AllIn;
+            }
+            let button = rng.gen_range(0..num_seats) as u8;
+            let state = manual_n_way(&stacks, &statuses, button);
+
+            let mut deck: Vec<cards::Card> = ALL_CARDS.into_iter().collect();
+            deck.shuffle(&mut rng);
+            let board: [cards::Card; 5] = deck[0..5].try_into().unwrap();
+            let mut offset = 5;
+            let mut hole_combos = Vec::with_capacity(num_seats);
+            for _ in 0..num_seats {
+                hole_combos.push(combo_index(deck[offset], deck[offset + 1]));
+                offset += 2;
+            }
+            let world = SampledWorld::new(hole_combos, board).unwrap();
+
+            let mut leftover = deck[offset..].to_vec();
+            leftover.shuffle(&mut rng);
+            leftover.truncate(leftover.len().min(16));
+            let mut combos = Vec::new();
+            for i in 0..leftover.len() {
+                for j in (i + 1)..leftover.len() {
+                    combos.push(combo_index(leftover[i], leftover[j]));
+                }
+            }
+            if combos.is_empty() {
+                continue;
+            }
+
+            let stacks_bb: Vec<f64> = stacks.iter().map(|&chips| chips as f64 / 1_000.0).collect();
+            let traverser = rng.gen_range(0..num_seats);
+
+            let rake = if rng.gen_bool(0.5) {
+                RakeConfig::PercentCap {
+                    rate: 0.05,
+                    cap_bb: 3.0,
+                    no_flop_no_drop: false,
+                }
+            } else {
+                RakeConfig::None
+            };
+            let chip_ev_game = HoldemGame::new(
+                &config_with_stacks(&stacks_bb),
+                &UtilityConfig::ChipEv,
+                &rake,
+                FeatureHashAbstraction::default(),
+            )
+            .unwrap();
+            assert_fast_matches_reference(&chip_ev_game, &state, &world, traverser, &combos, trial);
+
+            let mut payouts = vec![0.0; num_seats];
+            for (place, payout) in payouts.iter_mut().enumerate() {
+                *payout = ((num_seats - place) * 10) as f64;
+            }
+            let icm_game = HoldemGame::new(
+                &config_with_stacks(&stacks_bb),
+                &UtilityConfig::TournamentIcm {
+                    outside_field: Vec::<FieldPlayerConfig>::new(),
+                    payouts,
+                    samples: 8,
+                    seed: 3,
+                },
+                &RakeConfig::None,
+                FeatureHashAbstraction::default(),
+            )
+            .unwrap();
+            assert_fast_matches_reference(&icm_game, &state, &world, traverser, &combos, trial);
+        }
     }
 }

@@ -143,6 +143,24 @@ pub fn build_pots(state: &BettingState) -> Result<PotConstruction, SettlementErr
     Ok(PotConstruction { pots, refunds })
 }
 
+/// Builds pot layers with rake applied, but computes no winners or awards.
+///
+/// This is the structural half of [`settle_with_winners`] -- the half that
+/// depends only on the betting line (contributions, eligibility caps, rake)
+/// and never on any hole card. Callers that need to settle many hypothetical
+/// hands sharing one betting line (the vector-traverser terminal fast path in
+/// `crate::holdem`) call this once and reuse the resulting pot amounts and
+/// eligible-seat masks across every hypothetical hand, instead of paying for
+/// this construction again on every call to [`settle_ranked`].
+pub(crate) fn build_rated_pots(
+    state: &BettingState,
+    rake: CompiledRake,
+) -> Result<PotConstruction, SettlementError> {
+    let mut construction = build_pots(state)?;
+    apply_rake(&mut construction.pots, rake, state.flop_dealt)?;
+    Ok(construction)
+}
+
 pub fn settle_uncontested(
     state: &BettingState,
     rake: CompiledRake,
