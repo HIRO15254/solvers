@@ -550,6 +550,48 @@ mod tests {
     }
 
     #[test]
+    fn max_betting_players_threshold_shrinks_the_enumerated_tree() {
+        // No special-casing is needed in this module: check-down thresholds
+        // are entirely a `BettingState`/`HoldemGame` concern, so the public
+        // tree simply enumerates whatever legal actions (and thus decision
+        // nodes) the engine produces. This test is the regression guard that
+        // a low threshold really does shrink the tree instead of silently
+        // no-op'ing.
+        let baseline_game = smoke_game();
+        let baseline_tree = enumerate_tree(&baseline_game).unwrap();
+
+        let mut capped_config = smoke_config();
+        capped_config.betting.flop.max_betting_players = Some(1);
+        capped_config.betting.turn.max_betting_players = Some(1);
+        capped_config.betting.river.max_betting_players = Some(1);
+        let capped_game = HoldemGame::new(
+            &capped_config,
+            &UtilityConfig::ChipEv,
+            &RakeConfig::None,
+            FeatureHashAbstraction::default(),
+        )
+        .unwrap();
+        let capped_tree = enumerate_tree(&capped_game).unwrap();
+
+        assert!(capped_tree.nodes.len() < baseline_tree.nodes.len());
+        // A threshold of 1 checks down every postflop street: at least two
+        // players always remain non-folded whenever a hand reaches the flop
+        // (fewer would already be an uncontested terminal, not a decision
+        // node), so no postflop decision node can survive.
+        assert!(
+            capped_tree
+                .nodes
+                .iter()
+                .all(|node| node.street == Street::Preflop)
+        );
+
+        let baseline_arena = build_arena(&baseline_game, &baseline_tree, u64::MAX).unwrap();
+        let capped_arena = build_arena(&capped_game, &capped_tree, u64::MAX).unwrap();
+        assert!(capped_arena.node_count() < baseline_arena.node_count());
+        assert!(capped_arena.total_columns() < baseline_arena.total_columns());
+    }
+
+    #[test]
     fn touched_bit_is_idempotent_and_counts_once() {
         let game = smoke_game();
         let tree = enumerate_tree(&game).unwrap();

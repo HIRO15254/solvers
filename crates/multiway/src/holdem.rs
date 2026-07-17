@@ -658,7 +658,7 @@ impl<A: MultiwayAbstraction> ExternalSamplingGame for HoldemGame<A> {
             })
             .clone();
         let mut next = state.clone();
-        next.apply_from_actions(action, actions)
+        next.apply_from_actions(action, actions, self.betting_for_state(state))
             .expect("legal action must apply");
         next
     }

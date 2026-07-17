@@ -160,6 +160,18 @@ pub struct StreetBettingConfig {
     /// behavior). Must be finite and in `(0.0, 1.0]` when present.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allin_threshold: Option<f64>,
+    /// HRC-style check-down threshold (flop/turn/river only). When the
+    /// non-folded seat count at this street's start (all-in seats included)
+    /// exceeds this value, the street has no betting at all: no decision
+    /// nodes, not even checks; play proceeds straight to the next street (or
+    /// showdown). `None` (default) preserves unlimited betting, so every
+    /// config predating this field serializes identically and keeps its game
+    /// fingerprint. See `docs/multiway-preflop.md`. Rejected on preflop and
+    /// must be at least `1` when present; also a public-tree property, so a
+    /// per-seat betting override must not disagree with the table's value
+    /// for the same street (see [`MultiwayConfig::validate`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_betting_players: Option<u8>,
 }
 
 fn default_max_aggressive_actions() -> u8 {
@@ -174,6 +186,7 @@ fn default_preflop_betting() -> StreetBettingConfig {
         max_aggressive_actions: 4,
         include_allin: true,
         allin_threshold: None,
+        max_betting_players: None,
     }
 }
 
@@ -185,6 +198,7 @@ fn default_postflop_betting() -> StreetBettingConfig {
         max_aggressive_actions: 3,
         include_allin: true,
         allin_threshold: None,
+        max_betting_players: None,
     }
 }
 
@@ -469,6 +483,19 @@ impl MultiwayConfig {
             }
             if let Some(betting) = &seat.betting {
                 validate_betting(betting)?;
+                // Check-down is a public-tree property: it cannot legally
+                // differ by seat, so a per-seat override may only repeat the
+                // table's value for the same street, never diverge from it.
+                for street in [Street::Flop, Street::Turn, Street::River] {
+                    let seat_value = betting.for_street(street).max_betting_players;
+                    let table_value = self.betting.for_street(street).max_betting_players;
+                    if seat_value != table_value {
+                        return Err(ConfigError::SeatMaxBettingPlayersMismatch {
+                            seat: index,
+                            street,
+                        });
+                    }
+                }
             }
         }
 
@@ -730,6 +757,13 @@ fn validate_betting(config: &BettingConfig) -> Result<(), ConfigError> {
                 return Err(ConfigError::AllinThreshold(threshold));
             }
         }
+        if street == Street::Preflop {
+            if section.max_betting_players.is_some() {
+                return Err(ConfigError::PreflopMaxBettingPlayers);
+            }
+        } else if section.max_betting_players == Some(0) {
+            return Err(ConfigError::MaxBettingPlayers);
+        }
     }
     Ok(())
 }
@@ -817,6 +851,16 @@ pub enum ConfigError {
     IcmWithRake,
     #[error("allin_threshold must be finite and within (0.0, 1.0], got {0}")]
     AllinThreshold(f64),
+    #[error(
+        "preflop.max_betting_players is not supported; check-down thresholds apply only to flop, turn, and river"
+    )]
+    PreflopMaxBettingPlayers,
+    #[error("max_betting_players must be at least 1")]
+    MaxBettingPlayers,
+    #[error(
+        "seat {seat} {street:?}.max_betting_players must match the table's value for that street"
+    )]
+    SeatMaxBettingPlayersMismatch { seat: usize, street: Street },
 }
 
 #[cfg(test)]
@@ -1087,5 +1131,69 @@ stack_bb = 12
         assert!(!encoded.contains("allin_threshold"));
         assert!(!encoded.contains("min-raise"));
         assert!(!encoded.contains("stack-fraction"));
+    }
+
+    #[test]
+    fn max_betting_players_absent_field_serializes_byte_identically() {
+        // Regression guard: fingerprint stability. A config that never sets
+        // max_betting_players must serialize (JSON, used for the game
+        // fingerprint, and TOML) exactly as it did before this field existed.
+        let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        assert!(config.betting.flop.max_betting_players.is_none());
+        let json = serde_json::to_string(&config.betting.flop).unwrap();
+        assert!(!json.contains("max_betting_players"));
+        let toml_text = toml::to_string(&config).unwrap();
+        assert!(!toml_text.contains("max_betting_players"));
+
+        let mut capped = config.clone();
+        capped.betting.flop.max_betting_players = Some(2);
+        let capped_json = serde_json::to_string(&capped.betting.flop).unwrap();
+        assert!(capped_json.contains("\"max_betting_players\":2"));
+        let decoded: StreetBettingConfig = serde_json::from_str(&capped_json).unwrap();
+        assert_eq!(decoded.max_betting_players, Some(2));
+
+        let encoded = toml::to_string(&capped).unwrap();
+        let redecoded: MultiwayConfig = toml::from_str(&encoded).unwrap();
+        redecoded.validate().unwrap();
+        assert_eq!(redecoded.betting.flop.max_betting_players, Some(2));
+    }
+
+    #[test]
+    fn max_betting_players_rejects_zero_and_preflop() {
+        let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        config.betting.flop.max_betting_players = Some(0);
+        assert!(matches!(
+            config.validate(),
+            Err(ConfigError::MaxBettingPlayers)
+        ));
+
+        config.betting.flop.max_betting_players = Some(1);
+        config.validate().unwrap();
+
+        config.betting.flop.max_betting_players = None;
+        config.betting.preflop.max_betting_players = Some(2);
+        assert!(matches!(
+            config.validate(),
+            Err(ConfigError::PreflopMaxBettingPlayers)
+        ));
+    }
+
+    #[test]
+    fn max_betting_players_seat_override_must_match_the_table() {
+        let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        config.betting.turn.max_betting_players = Some(2);
+
+        let mut mismatched_seat_betting = BettingConfig::default();
+        mismatched_seat_betting.turn.max_betting_players = Some(3);
+        config.seats[0].betting = Some(mismatched_seat_betting);
+        assert!(matches!(
+            config.validate(),
+            Err(ConfigError::SeatMaxBettingPlayersMismatch { seat: 0, street }) if street == Street::Turn
+        ));
+
+        let mut matched_seat_betting = BettingConfig::default();
+        matched_seat_betting.turn.max_betting_players = Some(2);
+        config.seats[0].betting = Some(matched_seat_betting);
+        config.validate().unwrap();
     }
 }

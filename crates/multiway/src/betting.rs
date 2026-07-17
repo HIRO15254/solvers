@@ -206,7 +206,7 @@ impl BettingState {
             preflop_voluntary_call_seen: false,
         };
         state.pending = state.active_mask();
-        state.finish_or_select(big_blind_seat);
+        state.finish_or_select(big_blind_seat, &config.betting);
         Ok(state)
     }
 
@@ -380,7 +380,7 @@ impl BettingState {
 
     pub fn apply(&mut self, action: Action, config: &BettingConfig) -> Result<(), BettingError> {
         let actions = self.legal_actions(config)?;
-        self.apply_from_actions(action, &actions)
+        self.apply_from_actions(action, &actions, config)
     }
 
     /// Applies `action`, checking legality against an already-expanded
@@ -389,11 +389,17 @@ impl BettingState {
     /// `actions` must be exactly what `legal_actions` would return for this
     /// state (e.g. the value the MCCFR traverser already expanded once per
     /// node); passing a stale or unrelated list can accept an action that
-    /// would otherwise be rejected.
+    /// would otherwise be rejected. `betting` is only consulted for
+    /// street-transition bookkeeping (the `max_betting_players` check-down
+    /// gate); it need not be the same profile that produced `actions`, since
+    /// [`crate::config::MultiwayConfig::validate`] guarantees every seat's
+    /// effective `max_betting_players` agrees with the table's for a given
+    /// street.
     pub fn apply_from_actions(
         &mut self,
         action: Action,
         actions: &[Action],
+        betting: &BettingConfig,
     ) -> Result<(), BettingError> {
         let actor = self.to_act.ok_or(BettingError::MissingActor)?;
         if !actions.contains(&action) {
@@ -441,7 +447,7 @@ impl BettingState {
             }
         }
         self.street_active_players[self.street.index()] = self.non_folded_mask().len() as u8;
-        self.finish_or_select(actor);
+        self.finish_or_select(actor, betting);
         Ok(())
     }
 
@@ -466,7 +472,7 @@ impl BettingState {
         Ok(())
     }
 
-    fn finish_or_select(&mut self, after: SeatId) {
+    fn finish_or_select(&mut self, after: SeatId, betting: &BettingConfig) {
         let non_folded = self.non_folded_mask();
         if non_folded.len() == 1 {
             self.phase = HandPhase::Uncontested {
@@ -485,18 +491,31 @@ impl BettingState {
                 .expect("one active seat exists");
             if self.amount_to_call(sole_active) == MwChips::ZERO {
                 self.pending = SeatMask::EMPTY;
-                self.end_betting_round();
+                self.end_betting_round(betting);
                 return;
             }
         }
         if self.pending.is_empty() {
-            self.end_betting_round();
+            self.end_betting_round(betting);
             return;
         }
         self.to_act = self.next_in_mask(after, self.pending);
     }
 
-    fn end_betting_round(&mut self) {
+    /// Closes the current street's betting round and opens the next one, or
+    /// settles the hand if the river just closed.
+    ///
+    /// Before putting a postflop street into `Betting`, this checks that
+    /// street's `max_betting_players` (HRC-style check-down) against the
+    /// non-folded seat count carried forward from the street that just
+    /// closed. A street whose count exceeds its threshold gets no decision
+    /// nodes at all: the loop below advances straight past it (folds are
+    /// impossible without betting, so the count is unchanged) and re-checks
+    /// the next street's own threshold, exactly as if every remaining actor
+    /// had nothing to do. This reuses the same actionless
+    /// [`HandPhase::Runout`] fast-forward already used when every seat still
+    /// in the hand is all-in, rather than emitting check actions.
+    fn end_betting_round(&mut self, betting: &BettingConfig) {
         self.to_act = None;
         if self.street == Street::River {
             self.phase = HandPhase::Showdown;
@@ -508,10 +527,23 @@ impl BettingState {
             return;
         }
         let players_entering_next_street = self.street_active_players[self.street.index()];
-        self.street = self.street.next().expect("river handled above");
-        self.street_active_players[self.street.index()] = players_entering_next_street;
-        if self.street == Street::Flop {
-            self.flop_dealt = true;
+        loop {
+            self.street = self.street.next().expect("river handled above");
+            self.street_active_players[self.street.index()] = players_entering_next_street;
+            if self.street == Street::Flop {
+                self.flop_dealt = true;
+            }
+            let checked_down = betting
+                .for_street(self.street)
+                .max_betting_players
+                .is_some_and(|max| players_entering_next_street > max);
+            if !checked_down {
+                break;
+            }
+            if self.street == Street::River {
+                self.phase = HandPhase::Runout;
+                return;
+            }
         }
         self.bet_to_match = MwChips::ZERO;
         self.last_full_raise = self.big_blind;
@@ -948,5 +980,147 @@ mod tests {
                 },
             ]
         );
+    }
+
+    #[test]
+    fn max_betting_players_collapses_every_postflop_street_when_persistently_exceeded() {
+        let (mut state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
+        // All three postflop streets cap betting at two players; three
+        // players see the flop and check-down can never fold anyone, so
+        // every later street re-checks the same losing count and collapses
+        // too, all the way to showdown.
+        betting.flop.max_betting_players = Some(2);
+        betting.turn.max_betting_players = Some(2);
+        betting.river.max_betting_players = Some(2);
+
+        for expected_actor in [SeatId(0), SeatId(1)] {
+            assert_eq!(state.to_act, Some(expected_actor));
+            let call = state
+                .legal_actions(&betting)
+                .unwrap()
+                .into_iter()
+                .find(|action| matches!(action, Action::Call { .. }))
+                .unwrap();
+            state.apply(call, &betting).unwrap();
+        }
+        assert_eq!(state.to_act, Some(SeatId(2)));
+        // The big blind's option check is the last preflop action; it must
+        // fast-forward straight to showdown with no postflop decision node
+        // ever created.
+        state.apply(Action::Check, &betting).unwrap();
+
+        assert_eq!(state.phase, HandPhase::Runout);
+        assert_eq!(state.to_act, None);
+        assert_eq!(state.street, Street::River);
+        assert_eq!(state.players_on_street(Street::Flop), 3);
+        assert_eq!(state.players_on_street(Street::Turn), 3);
+        assert_eq!(state.players_on_street(Street::River), 3);
+        assert!(state.legal_actions(&betting).unwrap().is_empty());
+    }
+
+    #[test]
+    fn folds_during_flop_betting_can_reenable_a_stricter_turn_threshold() {
+        let (mut state, mut betting) = state(&[20.0, 20.0, 20.0, 20.0], 0, AnteConfig::None);
+        // Four players is exactly the flop's cap (betting happens); the turn
+        // has a stricter cap that only two folds during the flop can satisfy.
+        betting.flop.max_betting_players = Some(4);
+        betting.turn.max_betting_players = Some(2);
+
+        // Preflop: everyone limps/checks to see a 4-way flop.
+        for _ in 0..3 {
+            let call = state
+                .legal_actions(&betting)
+                .unwrap()
+                .into_iter()
+                .find(|action| matches!(action, Action::Call { .. }))
+                .unwrap();
+            state.apply(call, &betting).unwrap();
+        }
+        state.apply(Action::Check, &betting).unwrap();
+        assert_eq!(state.street, Street::Flop);
+        assert_eq!(state.phase, HandPhase::Betting);
+        assert_eq!(state.players_on_street(Street::Flop), 4);
+
+        // Flop: first actor bets, the next two fold to it, the last calls,
+        // leaving exactly two non-folded players.
+        let bet = state
+            .legal_actions(&betting)
+            .unwrap()
+            .into_iter()
+            .find(Action::is_aggressive)
+            .unwrap();
+        state.apply(bet, &betting).unwrap();
+        state.apply(Action::Fold, &betting).unwrap();
+        state.apply(Action::Fold, &betting).unwrap();
+        let call = state
+            .legal_actions(&betting)
+            .unwrap()
+            .into_iter()
+            .find(|action| matches!(action, Action::Call { .. }))
+            .unwrap();
+        state.apply(call, &betting).unwrap();
+
+        // The turn re-evaluates its own threshold against the post-fold
+        // count (2), which no longer exceeds it, so the turn has betting.
+        assert_eq!(state.street, Street::Turn);
+        assert_eq!(state.players_on_street(Street::Turn), 2);
+        assert_eq!(state.phase, HandPhase::Betting);
+        assert!(state.to_act.is_some());
+        assert!(
+            state
+                .legal_actions(&betting)
+                .unwrap()
+                .iter()
+                .any(|action| matches!(action, Action::Check))
+        );
+    }
+
+    #[test]
+    fn max_betting_players_boundary_equal_count_still_gets_betting() {
+        let (mut state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
+        betting.flop.max_betting_players = Some(2);
+
+        // UTG folds preflop; SB calls, BB checks its option: exactly two
+        // players reach the flop, exactly matching (not exceeding) the
+        // threshold, so the flop still gets betting.
+        state.apply(Action::Fold, &betting).unwrap();
+        let call = state
+            .legal_actions(&betting)
+            .unwrap()
+            .into_iter()
+            .find(|action| matches!(action, Action::Call { .. }))
+            .unwrap();
+        state.apply(call, &betting).unwrap();
+        state.apply(Action::Check, &betting).unwrap();
+
+        assert_eq!(state.street, Street::Flop);
+        assert_eq!(state.players_on_street(Street::Flop), 2);
+        assert_eq!(state.phase, HandPhase::Betting);
+        assert!(state.to_act.is_some());
+    }
+
+    #[test]
+    fn all_in_seat_counts_toward_the_checkdown_threshold() {
+        let (mut state, mut betting) = state(&[20.0, 20.0, 0.7], 0, AnteConfig::None);
+        assert_eq!(state.seats[SeatId(2)].status, SeatStatus::AllIn);
+        betting.flop.max_betting_players = Some(2);
+        betting.turn.max_betting_players = Some(2);
+        betting.river.max_betting_players = Some(2);
+
+        // Both non-all-in seats call to see the flop: three seats remain in
+        // the hand (two active, one all-in), so the flop's threshold of two
+        // is exceeded even though only two players can still act.
+        for _ in 0..2 {
+            let call = state
+                .legal_actions(&betting)
+                .unwrap()
+                .into_iter()
+                .find(|action| matches!(action, Action::Call { .. }))
+                .unwrap();
+            state.apply(call, &betting).unwrap();
+        }
+
+        assert_eq!(state.phase, HandPhase::Runout);
+        assert_eq!(state.players_on_street(Street::Flop), 3);
     }
 }

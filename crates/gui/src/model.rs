@@ -42,6 +42,8 @@ pub struct StreetBettingModel {
     pub max_aggressive_actions: u8,
     pub include_allin: bool,
     pub allin_threshold: Option<f64>,
+    /// HRC-style check-down threshold; `None` = unlimited (postflop only).
+    pub max_betting_players: Option<u8>,
 }
 
 #[derive(Clone, Debug)]
@@ -331,6 +333,7 @@ fn street_model_to_config(model: &StreetBettingModel) -> Result<StreetBettingCon
         max_aggressive_actions: model.max_aggressive_actions,
         include_allin: model.include_allin,
         allin_threshold: model.allin_threshold,
+        max_betting_players: model.max_betting_players,
     })
 }
 
@@ -345,6 +348,7 @@ fn config_street_to_model(config: &StreetBettingConfig) -> StreetBettingModel {
         max_aggressive_actions: config.max_aggressive_actions,
         include_allin: config.include_allin,
         allin_threshold: config.allin_threshold,
+        max_betting_players: config.max_betting_players,
     }
 }
 
@@ -1023,5 +1027,36 @@ iterations = 10
         let placeholder_run = Model::new_default(2).run;
         let error = toml_to_model(raw, &placeholder_run).unwrap_err();
         assert!(error.contains("preflop-multiway"));
+    }
+
+    #[test]
+    fn max_betting_players_round_trips_through_toml_and_defaults_to_unlimited() {
+        let mut model = Model::new_default(6);
+        assert!(model.betting.flop.max_betting_players.is_none());
+        // The default (unlimited) is omitted from the rendered TOML, same as
+        // every other betting field that is bit-identical to its historical
+        // behavior (game-fingerprint stability for pre-existing configs).
+        let default_toml = model_to_toml(&model).unwrap();
+        assert!(!default_toml.contains("max_betting_players"));
+
+        model.betting.flop.max_betting_players = Some(2);
+        let toml_text = model_to_toml(&model).unwrap();
+        assert!(toml_text.contains("max_betting_players = 2"));
+        let reparsed = toml_to_model(&toml_text, &model.run).unwrap();
+        assert_eq!(reparsed.betting.flop.max_betting_players, Some(2));
+        assert!(validate(&reparsed).is_empty());
+    }
+
+    #[test]
+    fn max_betting_players_validation_errors_surface_through_model_validate() {
+        let mut model = Model::new_default(6);
+        model.betting.preflop.max_betting_players = Some(2);
+        let errors = validate(&model);
+        assert!(
+            errors
+                .iter()
+                .any(|error| error.contains("max_betting_players")),
+            "expected a preflop max_betting_players validation error, got {errors:?}"
+        );
     }
 }

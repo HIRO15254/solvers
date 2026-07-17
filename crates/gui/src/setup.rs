@@ -417,6 +417,21 @@ fn street_editor(
                     ui.add(egui::DragValue::new(value).range(0.5..=1.0).speed(0.01));
                 }
             });
+            if !show_isolate {
+                ui.horizontal(|ui| {
+                    let mut enabled = street.max_betting_players.is_some();
+                    if ui
+                        .checkbox(&mut enabled, "check down above a player count")
+                        .changed()
+                    {
+                        street.max_betting_players = enabled.then_some(2);
+                    }
+                    if let Some(value) = street.max_betting_players.as_mut() {
+                        ui.add(egui::DragValue::new(value).range(1..=9));
+                        ui.label("max players with betting; empty = unlimited");
+                    }
+                });
+            }
         });
     });
 }

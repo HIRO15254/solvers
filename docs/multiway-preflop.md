@@ -78,6 +78,49 @@ rather than proposing a new action. Duplicate targets (e.g. a merged size and
 the native `include_allin` entry) are deduplicated, so the seat sees exactly
 one all-in action. Configs that omit `allin_threshold` are unaffected.
 
+### Check-down thresholds (`max_betting_players`)
+
+Commercial preflop solvers (HRC) avoid the exponential blowup of multiway
+postflop betting trees by removing betting from streets that too many players
+reach: dense-arena memory is roughly decision nodes × buckets × actions, and
+multiway postflop betting sequences dominate the node count, so collapsing
+them frees the budget for much finer buckets at the same memory footprint.
+
+`StreetBettingConfig.max_betting_players` (optional `u8`, flop/turn/river
+only) is an opt-in per-street check-down threshold. When a postflop street
+begins and the number of non-folded seats at that moment — all-in seats
+included, matching "players in the pot" rather than "seats able to act" —
+is strictly greater than `max_betting_players`, that street has no betting
+at all: no decision nodes are created, not even check nodes. Board cards
+are still dealt and play proceeds exactly as if every remaining actor had
+nothing to do, straight to the next street (which independently
+re-evaluates its own threshold) or to showdown. This reuses the engine's
+existing actionless fast-forward path (the one already used when every
+remaining seat is all-in) rather than emitting check actions, so the
+public tree simply has fewer decision nodes; settlement and showdown are
+completely unchanged.
+
+Because a checked-down street cannot fold anyone, a later street sees the
+same non-folded count and checks down too iff its *own* threshold says so:
+a stricter later threshold keeps collapsing, and a looser (or unset) later
+threshold re-opens betting even though an earlier street collapsed.
+Conversely, if an earlier street *has* betting and folds reduce the count,
+a later street's threshold may newly apply where it previously would not
+have.
+
+Validation: `max_betting_players` is rejected on preflop (check-down never
+applies there); `Some(0)` is rejected ("max_betting_players must be at
+least 1"); `Some(1)` is legal and means "always check down whenever two or
+more players see this street." Because check-down is a public-tree
+property, it cannot legally differ by seat — a per-seat betting override
+must repeat the table's `max_betting_players` for a given street exactly
+(including agreeing that it is unset) or validation rejects the config,
+naming the offending seat and street.
+
+`max_betting_players` is `None` by default and is skipped from a config's
+serialized identity (and therefore its game fingerprint) whenever unset, so
+every config written before this option existed is unaffected byte-for-byte.
+
 At a terminal the implementation:
 
 1. refunds unmatched top contribution;
