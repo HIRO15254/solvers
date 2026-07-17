@@ -212,14 +212,62 @@ impl QualityPreset {
         }
     }
 
-    /// `stop_dev_gain` threshold (bb, or tournament-utility units under
-    /// ICM), tighter (smaller) for higher quality presets.
-    pub fn stop_dev_gain(self) -> f64 {
+    /// Convergence-threshold size as a fraction of the shortest seat's
+    /// starting stack. Relative rather than absolute (bb) because the scale
+    /// of exploitable EV differences -- and of the evaluation estimator's
+    /// variance -- both shrink with stack depth: a flat 0.25 bb is a tight
+    /// bar at 100bb but a loose one for a 15bb push/fold spot, and a
+    /// stack-relative bar keeps the required evaluation sample count roughly
+    /// depth-independent.
+    pub fn stack_fraction(self) -> f64 {
         match self {
-            QualityPreset::Fast => 0.5,
-            QualityPreset::Normal => 0.25,
-            QualityPreset::High => 0.1,
+            QualityPreset::Fast => 0.005,
+            QualityPreset::Normal => 0.0025,
+            QualityPreset::High => 0.001,
         }
+    }
+
+    /// Resolved `stop_dev_gain` threshold for `model`, in the run's utility
+    /// unit: [`Self::stack_fraction`] of the shortest starting stack for
+    /// chip-EV (so Normal at 100bb is the familiar 0.25 bb), and the same
+    /// fraction of the shortest seat's chip-proportional share of the total
+    /// payouts under tournament ICM (a deliberate chip-chip proxy for that
+    /// seat's baseline equity -- exact ICM equity is not worth computing for
+    /// a stopping threshold). Floored well above zero so a degenerate model
+    /// mid-edit can never produce an impossible threshold.
+    pub fn stop_dev_gain_for(self, model: &Model) -> f64 {
+        let min_stack = model
+            .seats
+            .iter()
+            .map(|seat| seat.stack_bb)
+            .fold(f64::INFINITY, f64::min);
+        let min_stack = if min_stack.is_finite() && min_stack > 0.0 {
+            min_stack
+        } else {
+            100.0
+        };
+        let scale = match model.utility.kind {
+            UtilityKind::ChipEv => min_stack,
+            UtilityKind::TournamentIcm => {
+                let table_chips: f64 = model.seats.iter().map(|seat| seat.stack_bb).sum();
+                let outside_chips: f64 = model
+                    .utility
+                    .outside_field
+                    .iter()
+                    .map(|player| player.stack_bb)
+                    .sum();
+                let total_chips = table_chips + outside_chips;
+                let total_payouts: f64 = parse_payouts(&model.utility.payouts_text)
+                    .map(|payouts| payouts.iter().sum())
+                    .unwrap_or(0.0);
+                if total_chips > 0.0 && total_payouts > 0.0 {
+                    min_stack / total_chips * total_payouts
+                } else {
+                    min_stack
+                }
+            }
+        };
+        (self.stack_fraction() * scale).max(1.0e-6)
     }
 
     pub fn stop_confirmations(self) -> u32 {
@@ -905,7 +953,8 @@ pub fn apply_auto_derivation(
     model.run.threads = threads;
     model.run.sweep_batch = derivation.sweep_batch;
     model.run.max_memory_mib = memory_budget_bytes / (1024 * 1024);
-    model.run.stop_dev_gain = Some(quality.stop_dev_gain());
+    let stop_dev_gain = quality.stop_dev_gain_for(model);
+    model.run.stop_dev_gain = Some(stop_dev_gain);
     model.run.stop_confirmations = Some(quality.stop_confirmations());
     model.run.stop_eval_period_secs = Some(quality.stop_eval_period_secs());
 
@@ -1240,10 +1289,28 @@ iterations = 10
     }
 
     #[test]
-    fn quality_presets_map_to_the_documented_thresholds() {
-        assert_eq!(QualityPreset::Fast.stop_dev_gain(), 0.5);
-        assert_eq!(QualityPreset::Normal.stop_dev_gain(), 0.25);
-        assert_eq!(QualityPreset::High.stop_dev_gain(), 0.1);
+    fn quality_presets_scale_the_threshold_with_the_shortest_stack() {
+        // At the default 100bb table the resolved thresholds are the
+        // familiar absolute values...
+        let mut model = Model::new_default(6);
+        assert!((QualityPreset::Fast.stop_dev_gain_for(&model) - 0.5).abs() < 1e-12);
+        assert!((QualityPreset::Normal.stop_dev_gain_for(&model) - 0.25).abs() < 1e-12);
+        assert!((QualityPreset::High.stop_dev_gain_for(&model) - 0.1).abs() < 1e-12);
+
+        // ...and a short-stacked table tightens them proportionally: the
+        // SHORTEST stack sets the scale, so one 20bb seat at an otherwise
+        // 100bb table demands 5x tighter convergence.
+        model.seats[0].stack_bb = 20.0;
+        assert!((QualityPreset::Normal.stop_dev_gain_for(&model) - 0.05).abs() < 1e-12);
+
+        // ICM: the scale becomes the shortest seat's chip-proportional share
+        // of the total payouts (chip-chip proxy for its baseline equity).
+        model.utility.kind = UtilityKind::TournamentIcm;
+        model.utility.payouts_text = "600, 300, 100".to_string();
+        let table_chips: f64 = model.seats.iter().map(|seat| seat.stack_bb).sum();
+        let expected = 0.0025 * (20.0 / table_chips) * 1000.0;
+        assert!((QualityPreset::Normal.stop_dev_gain_for(&model) - expected).abs() < 1e-9);
+
         for preset in QualityPreset::ALL {
             assert_eq!(preset.stop_confirmations(), 2);
             assert_eq!(preset.stop_eval_period_secs(), 30.0);

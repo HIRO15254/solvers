@@ -194,8 +194,9 @@ fn auto_panel_ui(ui: &mut Ui, state: &mut SetupState) {
         });
         hint(
             ui,
-            "Fast/Normal/High set the convergence stop rule's tightness (max deviation-gain \
-             0.5/0.25/0.1 bb, 2 confirmations, checked every 30s).",
+            "Fast/Normal/High set the convergence stop rule's tightness as a fraction of the \
+             SHORTEST starting stack (0.5%/0.25%/0.1%; e.g. Normal = 0.25 bb at 100bb but \
+             0.05 bb at 20bb), 2 confirmations, checked every 30s.",
         );
 
         ui.horizontal(|ui| {
@@ -267,8 +268,10 @@ fn auto_panel_ui(ui: &mut Ui, state: &mut SetupState) {
              checkdown(flop/turn/river)=2, storage=i16",
         );
         ui.monospace(format!(
-            "stop rule: max deviation-gain < {} bb, confirmations={}, checked every {}s",
-            crate::format::bb(state.quality.stop_dev_gain()),
+            "stop rule: max deviation-gain < {} ({}% of shortest stack), confirmations={}, \
+             checked every {}s",
+            crate::format::bb(state.quality.stop_dev_gain_for(&state.model)),
+            state.quality.stack_fraction() * 100.0,
             state.quality.stop_confirmations(),
             state.quality.stop_eval_period_secs()
         ));
