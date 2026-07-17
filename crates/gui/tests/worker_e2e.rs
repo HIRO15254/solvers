@@ -23,6 +23,7 @@ fn worker_runs_the_smoke_config_to_a_finished_solution() {
             output_path: output_path.clone(),
             checkpoint_path: Some(checkpoint_path.clone()),
             check_every: 1,
+            max_wall_time_secs: None,
         },
         eframe::egui::Context::default(),
     );

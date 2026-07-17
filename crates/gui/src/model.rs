@@ -169,12 +169,66 @@ pub struct RunModel {
     /// `0` means "unset" (`RunSection::max_memory_bytes = None`).
     pub max_memory_mib: u64,
     pub storage: StorageKind,
+    /// Convergence stop rule (`RunSection::stop_dev_gain` and friends); see
+    /// `QualityPreset` for the Auto-mode mapping. `None` disables the rule,
+    /// same as an omitted TOML key.
+    pub stop_dev_gain: Option<f64>,
+    pub stop_confirmations: Option<u32>,
+    pub stop_eval_period_secs: Option<f64>,
+    /// GUI-only wall-clock cap, in minutes; never written to the TOML (see
+    /// `worker::RunTarget::max_wall_time_secs`). Available in both Auto (the
+    /// derived-settings panel) and Advanced (its own optional Run field).
+    pub max_wall_time_minutes: Option<f64>,
     /// GUI-only artifact destinations; not part of `SolveConfig`/presets,
     /// same as the CLI's `solve --checkpoint`/`--sol` flags.
     pub output_path: String,
     pub checkpoint_path: String,
     /// Empty means "start a fresh solve" (no checkpoint to resume).
     pub resume_from: String,
+}
+
+/// Auto-mode solve-quality presets: how tightly the convergence stop rule
+/// (`RunModel::stop_dev_gain` and friends) is set. See
+/// `apply_auto_derivation`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum QualityPreset {
+    Fast,
+    Normal,
+    High,
+}
+
+impl QualityPreset {
+    pub const ALL: [QualityPreset; 3] = [
+        QualityPreset::Fast,
+        QualityPreset::Normal,
+        QualityPreset::High,
+    ];
+
+    pub fn label(self) -> &'static str {
+        match self {
+            QualityPreset::Fast => "Fast",
+            QualityPreset::Normal => "Normal",
+            QualityPreset::High => "High",
+        }
+    }
+
+    /// `stop_dev_gain` threshold (bb, or tournament-utility units under
+    /// ICM), tighter (smaller) for higher quality presets.
+    pub fn stop_dev_gain(self) -> f64 {
+        match self {
+            QualityPreset::Fast => 0.5,
+            QualityPreset::Normal => 0.25,
+            QualityPreset::High => 0.1,
+        }
+    }
+
+    pub fn stop_confirmations(self) -> u32 {
+        2
+    }
+
+    pub fn stop_eval_period_secs(self) -> f64 {
+        30.0
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -317,6 +371,10 @@ impl Model {
                 sweep_batch: 8,
                 max_memory_mib: 0,
                 storage: StorageKind::F32,
+                stop_dev_gain: None,
+                stop_confirmations: None,
+                stop_eval_period_secs: None,
+                max_wall_time_minutes: None,
                 output_path: "./runs/solution.mwsol".to_string(),
                 checkpoint_path: "./runs/checkpoint.mwckpt".to_string(),
                 resume_from: String::new(),
@@ -659,13 +717,9 @@ fn run_model_to_section(model: &RunModel) -> RunSection {
         evaluation_samples: model.evaluation_samples,
         evaluation_cadence: model.evaluation_cadence,
         sweep_batch: (model.sweep_batch != 1).then_some(model.sweep_batch),
-        // The convergence stop rule (`run.stop_dev_gain` and friends) has no
-        // GUI surface yet; a later phase wires it up. Leaving these unset
-        // keeps every GUI-produced config byte-identical to before these
-        // fields existed.
-        stop_dev_gain: None,
-        stop_confirmations: None,
-        stop_eval_period_secs: None,
+        stop_dev_gain: model.stop_dev_gain,
+        stop_confirmations: model.stop_confirmations,
+        stop_eval_period_secs: model.stop_eval_period_secs,
     }
 }
 
@@ -684,8 +738,12 @@ fn section_to_run_model(section: RunSection, previous: &RunModel) -> RunModel {
             .map(|bytes| bytes / (1024 * 1024))
             .unwrap_or(0),
         storage: section.storage,
+        stop_dev_gain: section.stop_dev_gain,
+        stop_confirmations: section.stop_confirmations,
+        stop_eval_period_secs: section.stop_eval_period_secs,
         // GUI-only fields carry over from whatever the user had configured;
         // a loaded preset/import never specifies them.
+        max_wall_time_minutes: previous.max_wall_time_minutes,
         output_path: previous.output_path.clone(),
         checkpoint_path: previous.checkpoint_path.clone(),
         resume_from: previous.resume_from.clone(),
@@ -782,6 +840,95 @@ pub fn toml_to_model(raw: &str, previous_run: &RunModel) -> Result<Model, String
     solve_config_to_model(config, previous_run)
 }
 
+// --- Auto mode -------------------------------------------------------------
+
+/// Stable artifact-cache path Auto mode always writes into
+/// `abstraction.artifact_cache`, so a re-solved Auto config warm-starts from
+/// the same EHS² table cache instead of a machine/session-specific path.
+pub const AUTO_ARTIFACT_CACHE: &str = "./runs/cache/ehs2.postcard";
+
+/// Safety-cap sweep count Auto mode writes into `run.sweeps` when a
+/// convergence stop rule is doing the real stopping (see
+/// `apply_auto_derivation`): large enough that the stop rule always fires
+/// first on any reasonable config, while still bounding a pathological run
+/// that never converges.
+pub const AUTO_SWEEPS_CAP: u64 = 50_000_000;
+
+/// Mutates `model` in place to Auto mode's derived settings: pure function of
+/// `model`'s current game definition (seats/betting/blinds/abstraction shape)
+/// plus the caller-supplied machine facts. Called once, when the user
+/// presses Solve in Auto mode (never silently while they type) -- see
+/// `docs`'s "Auto mode" phase B plan. Machine detection (thread count, RAM)
+/// happens in the GUI's setup view; this function only turns already-known
+/// numbers into concrete model fields, so it stays deterministic and unit
+/// testable.
+///
+/// Derives (via `cli::auto_run::derive_auto_run`) `run.sweep_batch` and a
+/// uniform flop/turn/river bucket count fitting `memory_budget_bytes`, then
+/// sets the rest of the Auto-mode preset: `abstraction.recall = "street"`,
+/// `algorithm.traverser_vector = true`, `abstraction.kind = "ehs2-table"`
+/// (clearing any `active_opponent_buckets`, which that backend rejects),
+/// `abstraction.artifact_cache = AUTO_ARTIFACT_CACHE`, check-down
+/// `max_betting_players = 2` on flop/turn/river (never preflop), `run.storage
+/// = "i16"`, `run.sweeps = AUTO_SWEEPS_CAP`, `run.threads`/`run.sweep_batch`/
+/// `run.max_memory_mib` from the derivation/budget, and the convergence stop
+/// rule from `quality`.
+pub fn apply_auto_derivation(
+    model: &mut Model,
+    threads: usize,
+    memory_budget_bytes: u64,
+    quality: QualityPreset,
+) -> Result<(), String> {
+    let config = model_to_solve_config(model)?;
+    let GameSection::PreflopMultiway(game_config) = &config.game else {
+        unreachable!("model_to_solve_config always emits PreflopMultiway")
+    };
+    let derivation = cli::auto_run::derive_auto_run(game_config, threads, memory_budget_bytes)
+        .map_err(|error| error.to_string())?;
+
+    model.abstraction.recall = RecallKind::Street;
+    model.abstraction.kind = AbstractionBackendKind::Ehs2Table;
+    model.abstraction.flop_buckets = derivation.flop_buckets;
+    model.abstraction.turn_buckets = derivation.turn_buckets;
+    model.abstraction.river_buckets = derivation.river_buckets;
+    model.abstraction.active_opponent_buckets.clear();
+    model.abstraction.artifact_cache = AUTO_ARTIFACT_CACHE.to_string();
+
+    model.algorithm.traverser_vector = true;
+
+    model.betting.flop.max_betting_players = Some(2);
+    model.betting.turn.max_betting_players = Some(2);
+    model.betting.river.max_betting_players = Some(2);
+
+    model.run.storage = StorageKind::I16;
+    model.run.sweeps = AUTO_SWEEPS_CAP;
+    model.run.threads = threads;
+    model.run.sweep_batch = derivation.sweep_batch;
+    model.run.max_memory_mib = memory_budget_bytes / (1024 * 1024);
+    model.run.stop_dev_gain = Some(quality.stop_dev_gain());
+    model.run.stop_confirmations = Some(quality.stop_confirmations());
+    model.run.stop_eval_period_secs = Some(quality.stop_eval_period_secs());
+
+    Ok(())
+}
+
+/// `true` when `model`'s run/abstraction shape already matches what
+/// [`apply_auto_derivation`] would produce (modulo the machine-dependent
+/// numbers: bucket counts, thread count, memory budget). Used to decide
+/// whether a freshly loaded preset/TOML should default the Setup tab into
+/// Auto or Advanced view: a config with any of these fields set differently
+/// was clearly hand-tuned, so it opens in Advanced.
+pub fn matches_auto_shape(model: &Model) -> bool {
+    model.abstraction.recall == RecallKind::Street
+        && model.abstraction.kind == AbstractionBackendKind::Ehs2Table
+        && model.abstraction.active_opponent_buckets.is_empty()
+        && model.algorithm.traverser_vector
+        && model.betting.flop.max_betting_players == Some(2)
+        && model.betting.turn.max_betting_players == Some(2)
+        && model.betting.river.max_betting_players == Some(2)
+        && model.run.storage == StorageKind::I16
+}
+
 /// Cheap validation: game/economics validation plus the run-section sanity
 /// checks `cli::session::build_multiway_session` performs before it trains
 /// the (potentially expensive) card abstraction. Returns human-readable
@@ -834,6 +981,21 @@ fn validate_run_section(run: &RunSection) -> Result<(), String> {
     }
     if run.sweep_batch == Some(0) {
         return Err("run.sweep_batch must be positive when set".to_string());
+    }
+    if run
+        .stop_dev_gain
+        .is_some_and(|threshold| !threshold.is_finite() || threshold <= 0.0)
+    {
+        return Err("run.stop_dev_gain must be finite and positive when set".to_string());
+    }
+    if run.stop_confirmations == Some(0) {
+        return Err("run.stop_confirmations must be positive when set".to_string());
+    }
+    if run
+        .stop_eval_period_secs
+        .is_some_and(|period| !period.is_finite() || period <= 0.0)
+    {
+        return Err("run.stop_eval_period_secs must be finite and positive when set".to_string());
     }
     Ok(())
 }
@@ -1074,6 +1236,84 @@ iterations = 10
                 .iter()
                 .any(|error| error.contains("max_betting_players")),
             "expected a preflop max_betting_players validation error, got {errors:?}"
+        );
+    }
+
+    #[test]
+    fn quality_presets_map_to_the_documented_thresholds() {
+        assert_eq!(QualityPreset::Fast.stop_dev_gain(), 0.5);
+        assert_eq!(QualityPreset::Normal.stop_dev_gain(), 0.25);
+        assert_eq!(QualityPreset::High.stop_dev_gain(), 0.1);
+        for preset in QualityPreset::ALL {
+            assert_eq!(preset.stop_confirmations(), 2);
+            assert_eq!(preset.stop_eval_period_secs(), 30.0);
+        }
+    }
+
+    #[test]
+    fn apply_auto_derivation_lands_every_derived_field_and_writes_them_explicitly() {
+        // 3 seats (rather than a bigger table) keeps the dense-arena builds
+        // this derivation runs (one per bucket-ladder rung, see
+        // `cli::auto_run::derive_auto_run`) cheap even at full default
+        // betting sizes -- the same scale `cli::auto_run`'s own tests use.
+        let mut model = Model::new_default(3);
+        assert!(!matches_auto_shape(&model));
+
+        apply_auto_derivation(&mut model, 8, 1024 * 1024 * 1024, QualityPreset::Normal)
+            .expect("a fresh default model must derive cleanly");
+
+        assert_eq!(model.abstraction.recall, RecallKind::Street);
+        assert_eq!(model.abstraction.kind, AbstractionBackendKind::Ehs2Table);
+        assert!(model.abstraction.active_opponent_buckets.is_empty());
+        assert_eq!(model.abstraction.artifact_cache, AUTO_ARTIFACT_CACHE);
+        assert!(model.algorithm.traverser_vector);
+        assert_eq!(model.betting.flop.max_betting_players, Some(2));
+        assert_eq!(model.betting.turn.max_betting_players, Some(2));
+        assert_eq!(model.betting.river.max_betting_players, Some(2));
+        assert_eq!(model.betting.preflop.max_betting_players, None);
+        assert_eq!(model.run.storage, StorageKind::I16);
+        assert_eq!(model.run.sweeps, AUTO_SWEEPS_CAP);
+        assert_eq!(model.run.threads, 8);
+        // 3 seats, 8 threads -> ceil(8/3) = 3.
+        assert_eq!(model.run.sweep_batch, 3);
+        assert_eq!(model.run.max_memory_mib, 1024);
+        assert_eq!(model.run.stop_dev_gain, Some(0.25));
+        assert_eq!(model.run.stop_confirmations, Some(2));
+        assert_eq!(model.run.stop_eval_period_secs, Some(30.0));
+        assert!(matches_auto_shape(&model));
+        assert!(validate(&model).is_empty());
+
+        let toml_text = model_to_toml(&model).unwrap();
+        for needle in [
+            "sweep_batch = 3",
+            "kind = \"ehs2-table\"",
+            "recall = \"street\"",
+            "max_betting_players = 2",
+            "storage = \"i16\"",
+            "stop_dev_gain = 0.25",
+            "stop_confirmations = 2",
+            "stop_eval_period_secs = 30.0",
+            "traverser_vector = true",
+        ] {
+            assert!(
+                toml_text.contains(needle),
+                "expected derived TOML to contain {needle:?}, got:\n{toml_text}"
+            );
+        }
+        let reparsed = toml_to_model(&toml_text, &model.run).unwrap();
+        assert!(matches_auto_shape(&reparsed));
+        assert!(validate(&reparsed).is_empty());
+    }
+
+    #[test]
+    fn apply_auto_derivation_is_pure_and_reproducible() {
+        let mut first = Model::new_default(3);
+        let mut second = first.clone();
+        apply_auto_derivation(&mut first, 8, 512 * 1024 * 1024, QualityPreset::High).unwrap();
+        apply_auto_derivation(&mut second, 8, 512 * 1024 * 1024, QualityPreset::High).unwrap();
+        assert_eq!(
+            model_to_toml(&first).unwrap(),
+            model_to_toml(&second).unwrap()
         );
     }
 }

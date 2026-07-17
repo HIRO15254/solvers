@@ -50,6 +50,11 @@ const METRICS_THROTTLE_MILLIS: u64 = 10_000;
 /// time).
 const METRICS_COST_MULTIPLIER: u32 = 100;
 
+/// Hard cap on the adaptive stop-rule evaluation sample count -- mirrors
+/// `cli::multiway_solve`'s `MAX_STOP_RULE_SAMPLES`, since both drive loops
+/// implement the same `run.stop_dev_gain` convergence rule.
+const MAX_STOP_RULE_SAMPLES: u64 = 65_536;
+
 #[derive(Debug, Clone)]
 pub enum WorkerCmd {
     Pause,
@@ -97,12 +102,77 @@ pub struct ProgressSnapshot {
     pub memory_bytes: u64,
     pub seat_avg_pos_regret: Vec<f64>,
     pub seat_drift_l1: Vec<f64>,
+    /// Live wall-clock countdown to the next convergence-stop-rule
+    /// evaluation, reported on every chunk while `run.stop_dev_gain` is set
+    /// (`None` otherwise). [`StopRuleProgress`] (carried on the rarer
+    /// [`WorkerEvent::Evaluated`]) reports the rule's actual pass/fail
+    /// state; this only drives the Solve tab's between-evaluations
+    /// countdown.
+    pub stop_rule: Option<StopRuleClock>,
+}
+
+/// Wall-clock countdown to the next stop-rule evaluation; see
+/// [`ProgressSnapshot::stop_rule`].
+#[derive(Debug, Clone)]
+pub struct StopRuleClock {
+    pub threshold: f64,
+    pub confirmations_required: u32,
+    pub next_eval_in_secs: f64,
+}
+
+/// Convergence-stop-rule progress as of the evaluation that produced this
+/// [`WorkerEvent::Evaluated`] -- `Some` only when that evaluation was itself
+/// a stop-rule check (`run.stop_dev_gain`'s own wall-clock cadence), `None`
+/// for an ordinary evaluation-cadence evaluation.
+#[derive(Debug, Clone)]
+pub struct StopRuleProgress {
+    /// Maximum per-seat `deviation_gain_lower_bound` CI upper bound this
+    /// evaluation measured.
+    pub max_ci_upper: f64,
+    pub threshold: f64,
+    pub confirmations: u32,
+    pub confirmations_required: u32,
+    /// Current adaptive sample count (doubles, capped at
+    /// [`MAX_STOP_RULE_SAMPLES`], whenever the CI is too wide to ever settle
+    /// below `threshold`).
+    pub sample_count: u64,
+}
+
+/// Payload of [`WorkerEvent::Evaluated`]: the held-out profile evaluation
+/// plus (when this evaluation was a stop-rule check) its convergence
+/// progress.
+#[derive(Debug)]
+pub struct EvaluationEvent {
+    pub evaluation: ProfileEvaluation,
+    pub stop_rule: Option<StopRuleProgress>,
+}
+
+/// How a finished run stopped taking new sweeps. See
+/// `cli::multiway_solve::CompletionStatus`, whose `Converged` variant this
+/// mirrors for the GUI drive loop.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum FinishedOutcome {
+    /// `run.sweeps` (or the Auto-mode safety-cap sweep count) was reached.
+    TargetReached,
+    /// The user clicked "Finish & Save" before either of the other outcomes.
+    UserRequested,
+    /// The convergence stop rule (`run.stop_dev_gain`) fired: the maximum
+    /// per-seat deviation-gain CI upper bound stayed below `threshold` for
+    /// `confirmations` consecutive wall-clock-spaced evaluations.
+    Converged {
+        max_ci_upper: f64,
+        threshold: f64,
+        confirmations: u32,
+    },
+    /// The Auto/Advanced max-wall-time cap elapsed.
+    WallTimeCap,
 }
 
 #[derive(Debug)]
 pub struct FinishedRun {
     pub solution: MultiwaySolution,
     pub mwsol_path: PathBuf,
+    pub outcome: FinishedOutcome,
 }
 
 /// One child edge out of a watched node, for the "Live node view" button row.
@@ -161,7 +231,7 @@ pub enum WorkerEvent {
     /// Sent once, before the (potentially slow) card abstraction/game build.
     Building,
     Progress(ProgressSnapshot),
-    Evaluated(ProfileEvaluation),
+    Evaluated(EvaluationEvent),
     /// Live average strategy at a watched node; see [`WorkerCmd::WatchNode`].
     NodeStrategies(Box<NodeSnapshot>),
     /// Reply to [`WorkerCmd::EvaluateNode`].
@@ -211,6 +281,12 @@ pub struct RunTarget {
     /// `run.check_every` from the model; used only to bound the worker's
     /// internal chunk size, not sent to the solver.
     pub check_every: u64,
+    /// GUI-only wall-clock cap (Auto mode's max-wall-time field, or
+    /// Advanced's optional Run field); never part of the config TOML. When
+    /// set, the worker finishes through the same graceful path a "Finish &
+    /// Save" click uses (solution + `.mwsol` + final checkpoint written),
+    /// stamped with `FinishedOutcome::WallTimeCap`.
+    pub max_wall_time_secs: Option<f64>,
 }
 
 pub fn spawn(target: RunTarget, ctx: egui::Context) -> WorkerHandle {
@@ -363,6 +439,18 @@ fn run(
     // already mutably borrowed by the call driving it) are queued here and
     // serviced as soon as the current chunk returns.
     let mut pending_evaluations: Vec<(Vec<usize>, u64)> = Vec::new();
+    // Convergence stop rule (`run.stop_dev_gain`, ported from
+    // `cli::multiway_solve::run_inner`'s drive loop): an adaptive evaluation
+    // sample count, a consecutive-pass counter, and the wall clock of the
+    // last stop-rule evaluation. `None` in `mw_session.stop_rule` means the
+    // rule is disabled, in which case these three never get read.
+    let mut stop_rule_samples = mw_session.evaluation_samples;
+    let mut stop_confirmations_met: u32 = 0;
+    let mut last_stop_eval = Instant::now();
+    // How this run finished; overwritten only by the three non-default
+    // outcomes below, so a plain "ran out of sweeps" completion needs no
+    // explicit assignment.
+    let mut outcome = FinishedOutcome::TargetReached;
 
     'drive: loop {
         let drained = drain_commands(&commands, state, &mut watched, &mut pending_evaluations);
@@ -370,7 +458,10 @@ fn run(
         watch_dirty |= drained.watch_changed;
         match state {
             RunState::Cancelled => break 'drive,
-            RunState::Finishing => break 'drive,
+            RunState::Finishing => {
+                outcome = FinishedOutcome::UserRequested;
+                break 'drive;
+            }
             RunState::Paused => {
                 for (path, samples) in pending_evaluations.drain(..) {
                     send(evaluate_node(&mw_session, &path, samples));
@@ -407,6 +498,13 @@ fn run(
                 continue 'drive;
             }
             RunState::Running => {}
+        }
+
+        if let Some(max_secs) = target.max_wall_time_secs
+            && started.elapsed().as_secs_f64() >= max_secs
+        {
+            outcome = FinishedOutcome::WallTimeCap;
+            break 'drive;
         }
 
         for (path, samples) in pending_evaluations.drain(..) {
@@ -491,7 +589,10 @@ fn run(
                 .solver
                 .evaluate_average_profile(mw_session.evaluation_samples, mw_session.evaluation_seed)
             {
-                Ok(evaluation) => send(WorkerEvent::Evaluated(evaluation)),
+                Ok(evaluation) => send(WorkerEvent::Evaluated(EvaluationEvent {
+                    evaluation,
+                    stop_rule: None,
+                })),
                 Err(error) => {
                     send(WorkerEvent::Failed(format!(
                         "evaluating held-out multiway profile: {error}"
@@ -511,6 +612,98 @@ fn run(
                 "writing checkpoint: {error:#}"
             )));
             return;
+        }
+
+        // Convergence stop rule: an ADDITIONAL trigger layered on top of the
+        // cadence-based evaluation/checkpoint boundaries above, never a
+        // replacement for them (ported from
+        // `cli::multiway_solve::run_inner`'s drive loop). It fires on
+        // wall-clock time rather than a sweep boundary, so it is checked once
+        // per drive-loop chunk regardless of where `sweeps_now` falls
+        // relative to `evaluation_cadence`/`checkpoint_every`.
+        let mut stop_rule_clock: Option<StopRuleClock> = None;
+        if let Some(stop_rule) = mw_session.stop_rule {
+            let elapsed_since_last = last_stop_eval.elapsed().as_secs_f64();
+            if elapsed_since_last >= stop_rule.eval_period_secs {
+                last_stop_eval = Instant::now();
+                let evaluation = match mw_session
+                    .solver
+                    .evaluate_average_profile(stop_rule_samples, mw_session.evaluation_seed)
+                {
+                    Ok(evaluation) => evaluation,
+                    Err(error) => {
+                        send(WorkerEvent::Failed(format!(
+                            "evaluating multiway profile for the convergence stop rule: {error}"
+                        )));
+                        return;
+                    }
+                };
+                // Unlike the evaluation-cadence block above, this does not
+                // refresh `last_metrics`/`last_metrics_at`: the GUI worker
+                // has no metrics-row writer for a stop-rule check to feed
+                // (see `cli::multiway_solve::run_inner`, which does), so
+                // there is nothing here that needs a fresh `SolverMetrics`
+                // scan.
+                last_drift = mw_session.solver.strategy_drift_refresh(&mut prior);
+
+                let bounds = evaluation
+                    .deviation_gain_lower_bound
+                    .as_ref()
+                    .expect("evaluate_average_profile always returns deviation_gain_lower_bound");
+                let max_upper = bounds
+                    .iter()
+                    .map(|estimate| estimate.ci95[1])
+                    .fold(f64::NEG_INFINITY, f64::max);
+                let max_width = bounds
+                    .iter()
+                    .map(|estimate| estimate.ci95[1] - estimate.ci95[0])
+                    .fold(0.0, f64::max);
+
+                stop_confirmations_met = if max_upper < stop_rule.dev_gain_threshold {
+                    stop_confirmations_met + 1
+                } else {
+                    0
+                };
+                // The CI is wide enough that the check could never pass even
+                // if the true value already converged: double the sample
+                // count for subsequent stop-rule evaluations (capped), so
+                // noise shrinks over time instead of blocking convergence
+                // forever.
+                if max_width > stop_rule.dev_gain_threshold
+                    && stop_rule_samples < MAX_STOP_RULE_SAMPLES
+                {
+                    stop_rule_samples = stop_rule_samples
+                        .saturating_mul(2)
+                        .min(MAX_STOP_RULE_SAMPLES);
+                }
+
+                send(WorkerEvent::Evaluated(EvaluationEvent {
+                    evaluation,
+                    stop_rule: Some(StopRuleProgress {
+                        max_ci_upper: max_upper,
+                        threshold: stop_rule.dev_gain_threshold,
+                        confirmations: stop_confirmations_met,
+                        confirmations_required: stop_rule.confirmations,
+                        sample_count: stop_rule_samples,
+                    }),
+                }));
+
+                if stop_confirmations_met >= stop_rule.confirmations {
+                    outcome = FinishedOutcome::Converged {
+                        max_ci_upper: max_upper,
+                        threshold: stop_rule.dev_gain_threshold,
+                        confirmations: stop_confirmations_met,
+                    };
+                    break 'drive;
+                }
+            }
+            stop_rule_clock = Some(StopRuleClock {
+                threshold: stop_rule.dev_gain_threshold,
+                confirmations_required: stop_rule.confirmations,
+                next_eval_in_secs: (stop_rule.eval_period_secs
+                    - last_stop_eval.elapsed().as_secs_f64())
+                .max(0.0),
+            });
         }
 
         let elapsed = started.elapsed().as_secs_f64();
@@ -541,6 +734,7 @@ fn run(
             memory_bytes: metrics.memory_bytes,
             seat_avg_pos_regret: metrics.average_positive_regret.clone(),
             seat_drift_l1: last_drift.clone(),
+            stop_rule: stop_rule_clock,
         }));
 
         if let Some(key) = watched
@@ -654,6 +848,7 @@ fn run(
     send(WorkerEvent::Finished(Box::new(FinishedRun {
         solution,
         mwsol_path: target.output_path,
+        outcome,
     })));
 }
 

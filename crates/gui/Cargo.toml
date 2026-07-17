@@ -19,6 +19,7 @@ anyhow = { workspace = true }
 serde = { workspace = true }
 toml = { workspace = true }
 blake3 = { workspace = true }
+sysinfo = { workspace = true }
 eframe = "0.35"
 egui_plot = "0.36"
 rfd = "0.17"

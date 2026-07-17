@@ -12,8 +12,12 @@ use multiway::solver::{NodeActionEvaluation, ProfileEvaluation};
 use crate::format;
 use crate::frequency::{self, FrequencyBlock};
 use crate::matrix::{self, CellData};
+use crate::status::Level;
 use crate::theme;
-use crate::worker::{NodeBlock, NodeSnapshot, ProgressSnapshot, WorkerCmd, WorkerHandle};
+use crate::worker::{
+    FinishedOutcome, NodeBlock, NodeSnapshot, ProgressSnapshot, StopRuleClock, StopRuleProgress,
+    WorkerCmd, WorkerHandle,
+};
 
 /// Cap plotted points per line; history beyond this is decimated (recent
 /// samples are always kept, older ones are subsampled evenly).
@@ -158,12 +162,35 @@ impl RunStatus {
     }
 }
 
+/// Live view of the convergence stop rule (`run.stop_dev_gain`), merged from
+/// two worker event streams: [`StopRuleClock`] (sent on every
+/// `WorkerEvent::Progress`, drives the between-evaluations countdown) and
+/// [`StopRuleProgress`] (sent only on the rarer `WorkerEvent::Evaluated`
+/// where the evaluation was itself a stop-rule check, drives the actual
+/// pass/fail readout). `None` on `SolveTabState` until the first `Progress`
+/// snapshot confirms a stop rule is configured for this run.
+#[derive(Clone, Debug)]
+pub struct StopRuleView {
+    pub threshold: f64,
+    pub confirmations_required: u32,
+    pub next_eval_in_secs: f64,
+    pub confirmations: u32,
+    pub sample_count: u64,
+    /// `None` until the first stop-rule evaluation has run.
+    pub max_ci_upper: Option<f64>,
+}
+
 pub struct SolveTabState {
     pub seat_names: Vec<String>,
     pub history: Vec<ProgressSnapshot>,
     pub latest_evaluation: Option<ProfileEvaluation>,
     pub status: RunStatus,
     pub live: LiveNodeState,
+    pub stop_rule: Option<StopRuleView>,
+    /// How the run stopped, once `WorkerEvent::Finished` arrives; kept
+    /// around (not cleared by a tab switch) so re-opening the Solve tab
+    /// after `App` jumps to Results still shows why the run ended.
+    pub finished_outcome: Option<FinishedOutcome>,
 }
 
 impl SolveTabState {
@@ -174,8 +201,114 @@ impl SolveTabState {
             latest_evaluation: None,
             status: RunStatus::Idle,
             live: LiveNodeState::default(),
+            stop_rule: None,
+            finished_outcome: None,
         }
     }
+
+    /// Applies a `WorkerEvent::Progress` snapshot's stop-rule clock: `None`
+    /// clears the panel (no rule configured), `Some` updates the threshold/
+    /// countdown fields while leaving any already-known confirmations/
+    /// sample-count/CI readout untouched.
+    pub fn on_progress_stop_rule(&mut self, clock: Option<StopRuleClock>) {
+        let Some(clock) = clock else {
+            self.stop_rule = None;
+            return;
+        };
+        let view = self.stop_rule.get_or_insert(StopRuleView {
+            threshold: clock.threshold,
+            confirmations_required: clock.confirmations_required,
+            next_eval_in_secs: clock.next_eval_in_secs,
+            confirmations: 0,
+            sample_count: 0,
+            max_ci_upper: None,
+        });
+        view.threshold = clock.threshold;
+        view.confirmations_required = clock.confirmations_required;
+        view.next_eval_in_secs = clock.next_eval_in_secs;
+    }
+
+    /// Applies a `WorkerEvent::Evaluated` reply's stop-rule progress, if the
+    /// evaluation that produced it was a stop-rule check.
+    pub fn on_evaluated_stop_rule(&mut self, progress: Option<StopRuleProgress>) {
+        let Some(progress) = progress else {
+            return;
+        };
+        let view = self.stop_rule.get_or_insert(StopRuleView {
+            threshold: progress.threshold,
+            confirmations_required: progress.confirmations_required,
+            next_eval_in_secs: 0.0,
+            confirmations: 0,
+            sample_count: 0,
+            max_ci_upper: None,
+        });
+        view.threshold = progress.threshold;
+        view.confirmations_required = progress.confirmations_required;
+        view.confirmations = progress.confirmations;
+        view.sample_count = progress.sample_count;
+        view.max_ci_upper = Some(progress.max_ci_upper);
+    }
+}
+
+/// Status-line text/level for a finished run's outcome (see
+/// `worker::FinishedOutcome`), shown on the Solve tab once
+/// `WorkerEvent::Finished` arrives.
+fn outcome_message(outcome: FinishedOutcome) -> (Level, String) {
+    match outcome {
+        FinishedOutcome::TargetReached => {
+            (Level::Info, "finished: sweep target reached".to_string())
+        }
+        FinishedOutcome::UserRequested => (
+            Level::Info,
+            "finished: stopped and saved by request".to_string(),
+        ),
+        FinishedOutcome::Converged {
+            max_ci_upper,
+            threshold,
+            confirmations,
+        } => (
+            Level::Info,
+            format!(
+                "converged: max devGainLB CI upper {} < {} bb, confirmed {confirmations}x",
+                format::bb(max_ci_upper),
+                format::bb(threshold)
+            ),
+        ),
+        FinishedOutcome::WallTimeCap => (Level::Warning, "wall-time cap reached".to_string()),
+    }
+}
+
+/// Renders the convergence-stop-rule panel: max CI upper vs threshold
+/// (colored by whether it currently passes), confirmations so far, the
+/// current adaptive sample count, and a countdown to the next evaluation.
+/// Shown whenever a stop rule is active (`state.stop_rule.is_some()`).
+fn stop_rule_ui(ui: &mut Ui, stop_rule: &StopRuleView) {
+    ui.separator();
+    ui.label(egui::RichText::new("Convergence stop rule").strong());
+    let level = match stop_rule.max_ci_upper {
+        Some(upper) if upper < stop_rule.threshold => Level::Info,
+        Some(_) => Level::Warning,
+        None => Level::Info,
+    };
+    let upper_text = stop_rule
+        .max_ci_upper
+        .map(format::bb)
+        .unwrap_or_else(|| "-".to_string());
+    crate::status::show(
+        ui,
+        level,
+        format!(
+            "max devGainLB CI upper {upper_text} vs threshold {}",
+            format::bb(stop_rule.threshold)
+        ),
+    );
+    ui.monospace(format!(
+        "confirmations {}/{} | samples {} | next check in {}",
+        stop_rule.confirmations,
+        stop_rule.confirmations_required,
+        format::human_count(stop_rule.sample_count as f64),
+        format::elapsed(stop_rule.next_eval_in_secs)
+    ));
 }
 
 pub fn ui(ui: &mut Ui, state: &mut SolveTabState, worker: Option<&WorkerHandle>) {
@@ -215,6 +348,13 @@ pub fn ui(ui: &mut Ui, state: &mut SolveTabState, worker: Option<&WorkerHandle>)
                 ui.monospace(format::elapsed(latest.elapsed_secs));
                 ui.end_row();
             });
+    }
+    if let Some(stop_rule) = &state.stop_rule {
+        stop_rule_ui(ui, stop_rule);
+    }
+    if let Some(outcome) = state.finished_outcome {
+        let (level, message) = outcome_message(outcome);
+        crate::status::show(ui, level, message);
     }
 
     if let Some(worker) = worker {
@@ -748,4 +888,77 @@ fn live_detail_panel(
 
 fn hex(bytes: &[u8; 16]) -> String {
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn progress_stop_rule_clears_the_panel_when_the_rule_is_not_configured() {
+        let mut state = SolveTabState::new(vec!["BTN".to_string()]);
+        state.on_progress_stop_rule(Some(StopRuleClock {
+            threshold: 0.25,
+            confirmations_required: 2,
+            next_eval_in_secs: 10.0,
+        }));
+        assert!(state.stop_rule.is_some());
+        state.on_progress_stop_rule(None);
+        assert!(state.stop_rule.is_none());
+    }
+
+    #[test]
+    fn progress_stop_rule_updates_the_countdown_without_disturbing_known_progress() {
+        let mut state = SolveTabState::new(Vec::new());
+        state.on_evaluated_stop_rule(Some(StopRuleProgress {
+            max_ci_upper: 0.5,
+            threshold: 0.25,
+            confirmations: 1,
+            confirmations_required: 2,
+            sample_count: 512,
+        }));
+        state.on_progress_stop_rule(Some(StopRuleClock {
+            threshold: 0.25,
+            confirmations_required: 2,
+            next_eval_in_secs: 12.0,
+        }));
+        let view = state.stop_rule.expect("stop rule must be tracked by now");
+        assert_eq!(view.next_eval_in_secs, 12.0);
+        // The countdown update must not clobber the confirmations/sample
+        // count/CI readout the last `Evaluated` event reported.
+        assert_eq!(view.confirmations, 1);
+        assert_eq!(view.sample_count, 512);
+        assert_eq!(view.max_ci_upper, Some(0.5));
+    }
+
+    #[test]
+    fn evaluated_stop_rule_is_a_no_op_for_an_ordinary_cadence_evaluation() {
+        let mut state = SolveTabState::new(Vec::new());
+        state.on_evaluated_stop_rule(None);
+        assert!(state.stop_rule.is_none());
+    }
+
+    #[test]
+    fn outcome_messages_cover_every_variant_with_a_sensible_level() {
+        assert_eq!(
+            outcome_message(FinishedOutcome::TargetReached).0,
+            Level::Info
+        );
+        assert_eq!(
+            outcome_message(FinishedOutcome::UserRequested).0,
+            Level::Info
+        );
+        assert_eq!(
+            outcome_message(FinishedOutcome::WallTimeCap).0,
+            Level::Warning
+        );
+        let (level, message) = outcome_message(FinishedOutcome::Converged {
+            max_ci_upper: 0.12,
+            threshold: 0.25,
+            confirmations: 2,
+        });
+        assert_eq!(level, Level::Info);
+        assert!(message.contains("converged"));
+        assert!(message.contains("confirmed 2x"));
+    }
 }

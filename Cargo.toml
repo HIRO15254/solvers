@@ -53,6 +53,7 @@ blake3 = "1"
 postcard = { version = "1", features = ["alloc", "use-std"] }
 zstd = "0.13"
 rustc-hash = "2"
+sysinfo = { version = "0.32", default-features = false, features = ["system"] }
 
 [profile.release]
 lto = "thin"

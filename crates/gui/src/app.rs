@@ -50,10 +50,12 @@ impl App {
                 WorkerEvent::Building => self.solve.status = solve_view::RunStatus::Building,
                 WorkerEvent::Progress(snapshot) => {
                     self.solve.status = solve_view::RunStatus::Running;
+                    self.solve.on_progress_stop_rule(snapshot.stop_rule.clone());
                     self.solve.history.push(snapshot);
                 }
                 WorkerEvent::Evaluated(evaluation) => {
-                    self.solve.latest_evaluation = Some(evaluation);
+                    self.solve.on_evaluated_stop_rule(evaluation.stop_rule);
+                    self.solve.latest_evaluation = Some(evaluation.evaluation);
                 }
                 WorkerEvent::NodeStrategies(snapshot) => {
                     self.solve.live.snapshot = Some(snapshot);
@@ -76,6 +78,7 @@ impl App {
                 }
                 WorkerEvent::Finished(finished) => {
                     self.solve.status = solve_view::RunStatus::Finished;
+                    self.solve.finished_outcome = Some(finished.outcome);
                     self.solve.live = solve_view::LiveNodeState::default();
                     self.results = Some(results::ResultsState::new(
                         finished.solution,
@@ -181,6 +184,7 @@ impl App {
             output_path: request.output_path,
             checkpoint_path: request.checkpoint_path,
             check_every: request.check_every,
+            max_wall_time_secs: request.max_wall_time_secs,
         };
         let worker = worker::spawn(target, ctx);
         // Live node view starts at ROOT; the worker answers with a fresh

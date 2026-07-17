@@ -8,13 +8,30 @@ use std::str::FromStr;
 use eframe::egui;
 use egui::Ui;
 
-use crate::model::{self, Model};
+use crate::estimate::{AutoPreviewState, EstimatePanelState};
+use crate::machine;
+use crate::model::{self, Model, QualityPreset};
 use crate::presets::{self, PresetEntry};
 use crate::size_lexer;
 use crate::status::{self, Level};
 
+/// Setup tab view mode: a pure GUI-state filter over an always-complete
+/// `Model` (see the Auto-mode phase B deliverable) -- switching modes never
+/// changes the model, it only changes which sections are drawn. Auto is the
+/// default for a brand-new setup; loading a preset/TOML picks whichever mode
+/// matches its shape (see `model::matches_auto_shape`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SetupMode {
+    Auto,
+    Advanced,
+}
+
 pub struct SetupState {
     pub model: Model,
+    pub mode: SetupMode,
+    /// Auto mode's convergence-quality picker; irrelevant in Advanced (which
+    /// edits `model.run.stop_dev_gain` and friends directly instead).
+    pub quality: QualityPreset,
     pub user_preset_dir: PathBuf,
     pub presets: Vec<PresetEntry>,
     pub new_preset_name: String,
@@ -26,6 +43,14 @@ pub struct SetupState {
     pub confirm_delete: Option<PathBuf>,
     pub copy_source: usize,
     pub validation_errors: Vec<String>,
+    /// Background dense-arena estimate for the current model (both modes;
+    /// Auto embeds it in the derived-settings summary, Advanced has its own
+    /// collapsible section). See `crate::estimate`.
+    pub estimate: EstimatePanelState,
+    /// Background `cli::auto_run::derive_auto_run` preview for Auto mode's
+    /// derived-settings summary (threads/sweep_batch/buckets/estimated
+    /// bytes) -- what pressing Solve will materialize into the model.
+    pub auto_preview: AutoPreviewState,
 }
 
 /// Everything the worker needs to start a solve: the config TOML plus the
@@ -36,6 +61,7 @@ pub struct StartRequest {
     pub output_path: PathBuf,
     pub checkpoint_path: Option<PathBuf>,
     pub check_every: u64,
+    pub max_wall_time_secs: Option<f64>,
 }
 
 impl SetupState {
@@ -43,6 +69,8 @@ impl SetupState {
         let presets = presets::list(&user_preset_dir);
         Self {
             model: Model::new_default(6),
+            mode: SetupMode::Auto,
+            quality: QualityPreset::Normal,
             user_preset_dir,
             presets,
             new_preset_name: String::new(),
@@ -50,6 +78,8 @@ impl SetupState {
             confirm_delete: None,
             copy_source: 0,
             validation_errors: Vec::new(),
+            estimate: EstimatePanelState::new(),
+            auto_preview: AutoPreviewState::new(),
         }
     }
 
@@ -64,6 +94,11 @@ impl SetupState {
     fn load_toml(&mut self, text: &str) {
         match model::toml_to_model(text, &self.model.run) {
             Ok(model) => {
+                self.mode = if model::matches_auto_shape(&model) {
+                    SetupMode::Auto
+                } else {
+                    SetupMode::Advanced
+                };
                 self.model = model;
                 self.status_message = None;
             }
@@ -94,18 +129,197 @@ pub fn ui(ui: &mut Ui, state: &mut SetupState) -> Option<StartRequest> {
         .inner;
 
     egui::CentralPanel::default().show(ui, |ui| {
+        mode_toggle_ui(ui, state);
+        ui.separator();
         egui::ScrollArea::vertical().show(ui, |ui| {
             table_section(ui, state);
             seats_section(ui, state);
             betting_section(ui, state);
-            abstraction_section(ui, state);
+            match state.mode {
+                SetupMode::Auto => {}
+                SetupMode::Advanced => {
+                    abstraction_section(ui, state);
+                    estimate_panel_ui(ui, state);
+                }
+            }
             economics_section(ui, state);
-            algorithm_section(ui, state);
-            run_section(ui, state);
+            match state.mode {
+                SetupMode::Auto => auto_panel_ui(ui, state),
+                SetupMode::Advanced => {
+                    algorithm_section(ui, state);
+                    run_section(ui, state);
+                }
+            }
         });
     });
 
     start
+}
+
+/// Prominent Auto/Advanced selector at the top of the Setup tab. Switching
+/// modes only changes which sections below are drawn -- the underlying
+/// `Model` is always complete (see `SetupMode`'s doc comment).
+fn mode_toggle_ui(ui: &mut Ui, state: &mut SetupState) {
+    ui.horizontal(|ui| {
+        ui.label(egui::RichText::new("Mode:").strong());
+        ui.selectable_value(&mut state.mode, SetupMode::Auto, "Auto");
+        ui.selectable_value(&mut state.mode, SetupMode::Advanced, "Advanced");
+    });
+    match state.mode {
+        SetupMode::Auto => hint(
+            ui,
+            "Auto derives the abstraction/algorithm/run settings below from your game \
+             definition and this machine when you press Solve; nothing changes while you type.",
+        ),
+        SetupMode::Advanced => hint(
+            ui,
+            "Advanced exposes every abstraction/algorithm/run control directly.",
+        ),
+    }
+}
+
+/// Auto mode's own section: the Quality preset, an optional max-wall-time
+/// cap, and the read-only derived-settings summary (item 2/3 of the
+/// Auto-mode deliverable). Everything here is a preview of what pressing
+/// "Start solve" will materialize into the model -- it never mutates
+/// `state.model` itself (see `validation_panel`, which applies
+/// `model::apply_auto_derivation` only on that click).
+fn auto_panel_ui(ui: &mut Ui, state: &mut SetupState) {
+    ui.collapsing("Auto settings", |ui| {
+        ui.horizontal(|ui| {
+            ui.label("Quality preset:");
+            for preset in QualityPreset::ALL {
+                ui.selectable_value(&mut state.quality, preset, preset.label());
+            }
+        });
+        hint(
+            ui,
+            "Fast/Normal/High set the convergence stop rule's tightness (max deviation-gain \
+             0.5/0.25/0.1 bb, 2 confirmations, checked every 30s).",
+        );
+
+        ui.horizontal(|ui| {
+            let run = &mut state.model.run;
+            let mut enabled = run.max_wall_time_minutes.is_some();
+            if ui
+                .checkbox(&mut enabled, "max wall time (minutes)")
+                .changed()
+            {
+                run.max_wall_time_minutes =
+                    enabled.then_some(run.max_wall_time_minutes.unwrap_or(60.0));
+            }
+            if let Some(minutes) = run.max_wall_time_minutes.as_mut() {
+                ui.add(egui::DragValue::new(minutes).range(1.0..=100_000.0));
+            }
+        });
+        hint(
+            ui,
+            "Optional: the worker finishes gracefully (solution + checkpoint written) once this \
+             much wall-clock time has elapsed, same as pressing Finish & Save.",
+        );
+
+        ui.separator();
+        ui.label(egui::RichText::new("Derived settings (applied on Solve)").strong());
+
+        let threads = machine::detected_threads();
+        let memory_budget = machine::half_of_total_memory_bytes();
+        state
+            .auto_preview
+            .update(&state.model, threads, memory_budget);
+
+        ui.monospace(format!("threads: {threads}"));
+        ui.monospace(format!(
+            "memory budget: {} (half of detected RAM)",
+            crate::format::memory_mib(memory_budget)
+        ));
+        match state.auto_preview.result.as_ref() {
+            Some((_, Ok(derivation))) => {
+                ui.monospace(format!("sweep_batch: {}", derivation.sweep_batch));
+                ui.monospace(format!(
+                    "buckets (flop/turn/river): {}/{}/{}",
+                    derivation.flop_buckets, derivation.turn_buckets, derivation.river_buckets
+                ));
+                ui.monospace(format!(
+                    "estimated dense-arena memory: {} / budget {}",
+                    crate::format::memory_mib(derivation.estimated_bytes),
+                    crate::format::memory_mib(memory_budget)
+                ));
+                if crate::estimate::over_budget(derivation.estimated_bytes, memory_budget) {
+                    status::show(
+                        ui,
+                        Level::Warning,
+                        "even the smallest bucket-ladder rung (64) exceeds this budget; the \
+                         derived config will still be applied, but expect a memory-limit stop.",
+                    );
+                }
+            }
+            Some((_, Err(error))) => hint(
+                ui,
+                &format!("derived-settings preview unavailable: {error}"),
+            ),
+            None => {
+                ui.spinner();
+                ui.label("computing derived settings...");
+            }
+        }
+        ui.monospace(
+            "model: recall=street, traverser_vector=true, abstraction=ehs2-table, \
+             checkdown(flop/turn/river)=2, storage=i16",
+        );
+        ui.monospace(format!(
+            "stop rule: max deviation-gain < {} bb, confirmations={}, checked every {}s",
+            crate::format::bb(state.quality.stop_dev_gain()),
+            state.quality.stop_confirmations(),
+            state.quality.stop_eval_period_secs()
+        ));
+    });
+}
+
+/// Advanced mode's tree/memory estimate section (item 3 of the Auto-mode
+/// deliverable): `estimate_dense_arena` for the current model compared
+/// against `run.max_memory_mib` (`0` resolves to the engine's own default,
+/// see `crate::estimate::resolve_budget_bytes`).
+fn estimate_panel_ui(ui: &mut Ui, state: &mut SetupState) {
+    ui.collapsing("Tree / memory estimate", |ui| {
+        state.estimate.update(&state.model);
+        if state.model.abstraction.recall == model::RecallKind::Full {
+            hint(
+                ui,
+                "full recall: the estimate below is a dense-equivalent estimate; full recall \
+                 itself is unbounded and grows with visited infosets instead.",
+            );
+        }
+        let budget = crate::estimate::resolve_budget_bytes(state.model.run.max_memory_mib);
+        match state.estimate.result.as_ref() {
+            Some((_, Ok(estimate))) => {
+                ui.monospace(format!(
+                    "nodes: {}",
+                    crate::format::human_count(estimate.node_count as f64)
+                ));
+                ui.monospace(format!(
+                    "columns: {}",
+                    crate::format::human_count(estimate.total_columns as f64)
+                ));
+                ui.monospace(format!(
+                    "estimated arena memory: {} / budget {}",
+                    crate::format::memory_mib(estimate.estimated_bytes),
+                    crate::format::memory_mib(budget)
+                ));
+                if crate::estimate::over_budget(estimate.estimated_bytes, budget) {
+                    status::show(
+                        ui,
+                        Level::Warning,
+                        "estimated arena memory exceeds run.max_memory.",
+                    );
+                }
+            }
+            Some((_, Err(error))) => hint(ui, &format!("estimate unavailable: {error}")),
+            None => {
+                ui.spinner();
+                ui.label("estimating...");
+            }
+        }
+    });
 }
 
 fn preset_panel(ui: &mut Ui, state: &mut SetupState) {
@@ -215,7 +429,7 @@ fn preset_panel(ui: &mut Ui, state: &mut SetupState) {
     }
 }
 
-fn validation_panel(ui: &mut Ui, state: &SetupState) -> Option<StartRequest> {
+fn validation_panel(ui: &mut Ui, state: &mut SetupState) -> Option<StartRequest> {
     ui.heading("Validation");
     if state.validation_errors.is_empty() {
         status::show(ui, Level::Info, "OK — ready to solve");
@@ -239,6 +453,20 @@ fn validation_panel(ui: &mut Ui, state: &SetupState) -> Option<StartRequest> {
     if !clicked {
         return None;
     }
+    // Auto mode materializes its derived settings into the model right here
+    // -- once, on this click -- never silently while the user is typing (see
+    // `model::apply_auto_derivation`'s doc comment). Advanced mode's model is
+    // already exactly what the user configured.
+    if state.mode == SetupMode::Auto {
+        let threads = machine::detected_threads();
+        let memory_budget = machine::half_of_total_memory_bytes();
+        if let Err(error) =
+            model::apply_auto_derivation(&mut state.model, threads, memory_budget, state.quality)
+        {
+            state.set_status(Level::Error, format!("auto derivation failed: {error}"));
+            return None;
+        }
+    }
     let config_toml = model::model_to_toml(&state.model).ok()?;
     let run = &state.model.run;
     Some(StartRequest {
@@ -249,6 +477,7 @@ fn validation_panel(ui: &mut Ui, state: &SetupState) -> Option<StartRequest> {
         checkpoint_path: (!run.checkpoint_path.trim().is_empty())
             .then(|| PathBuf::from(&run.checkpoint_path)),
         check_every: run.check_every,
+        max_wall_time_secs: run.max_wall_time_minutes.map(|minutes| minutes * 60.0),
     })
 }
 
@@ -480,16 +709,25 @@ fn abstraction_section(ui: &mut Ui, state: &mut SetupState) {
             ui.selectable_value(
                 &mut abstraction.kind,
                 model::AbstractionBackendKind::Ehs2Table,
-                "EHS\u{b2} table (precomputed)",
+                "EHS\u{b2} table (recommended)",
             );
         });
+        hint(
+            ui,
+            "rollout k-means: Monte Carlo hand-strength rollouts clustered into buckets at \
+             build time -- flexible bucket counts, retrained per config.",
+        );
         let ehs2_selected = abstraction.kind == model::AbstractionBackendKind::Ehs2Table;
+        hint(
+            ui,
+            "EHS\u{b2} table (recommended): precomputed exact percentile buckets, O(1) lookup, no \
+             solve-time Monte Carlo.",
+        );
         if ehs2_selected {
             hint(
                 ui,
-                "EHS\u{b2} table: precomputed exact percentile buckets, O(1) lookup, no solve-time \
-                 Monte Carlo. Rollout samples, abstraction seed, and per-opponent bucket profiles \
-                 below do not apply and are ignored (per-opponent profiles are also rejected).",
+                "Rollout samples, abstraction seed, and per-opponent bucket profiles below do not \
+                 apply and are ignored (per-opponent profiles are also rejected).",
             );
         }
         ui.horizontal(|ui| {
@@ -500,6 +738,10 @@ fn abstraction_section(ui: &mut Ui, state: &mut SetupState) {
             ui.label("river buckets:");
             ui.add(egui::DragValue::new(&mut abstraction.river_buckets).range(1..=4096));
         });
+        hint(
+            ui,
+            "memory scales with nodes x buckets -- see the tree/memory estimate below.",
+        );
         ui.add_enabled_ui(!ehs2_selected, |ui| {
             ui.horizontal(|ui| {
                 ui.label("rollout samples:");
@@ -529,12 +771,13 @@ fn abstraction_section(ui: &mut Ui, state: &mut SetupState) {
             ui.selectable_value(
                 &mut abstraction.recall,
                 model::RecallKind::Street,
-                "street (dense, preallocated)",
+                "street (recommended, bounded memory)",
             );
         });
         hint(
             ui,
-            "Street mode preallocates the whole tree up front and fails fast with a memory estimate if it doesn't fit.",
+            "Street mode preallocates the whole tree up front and fails fast with a memory estimate if it doesn't fit. \
+             Full mode never preallocates, so memory is unbounded and grows with every visited infoset instead.",
         );
         ui.label("Active-opponent bucket profiles:");
         if ehs2_selected {
@@ -797,6 +1040,64 @@ fn run_section(ui: &mut Ui, state: &mut SetupState) {
             &mut run.resume_from,
             &["mwckpt"],
             false,
+        );
+
+        ui.separator();
+        ui.label("Convergence stop rule (optional):");
+        ui.horizontal(|ui| {
+            let mut enabled = run.stop_dev_gain.is_some();
+            if ui.checkbox(&mut enabled, "stop on convergence").changed() {
+                run.stop_dev_gain = enabled.then_some(run.stop_dev_gain.unwrap_or(0.25));
+                run.stop_confirmations = enabled.then_some(run.stop_confirmations.unwrap_or(2));
+                run.stop_eval_period_secs =
+                    enabled.then_some(run.stop_eval_period_secs.unwrap_or(30.0));
+            }
+        });
+        if let Some(threshold) = run.stop_dev_gain.as_mut() {
+            ui.horizontal(|ui| {
+                ui.label("dev-gain threshold (bb):");
+                ui.add(
+                    egui::DragValue::new(threshold)
+                        .speed(0.01)
+                        .range(0.0001..=1000.0),
+                );
+            });
+            let confirmations = run.stop_confirmations.get_or_insert(2);
+            ui.horizontal(|ui| {
+                ui.label("confirmations:");
+                ui.add(egui::DragValue::new(confirmations).range(1..=u32::MAX));
+            });
+            let period = run.stop_eval_period_secs.get_or_insert(30.0);
+            ui.horizontal(|ui| {
+                ui.label("eval period (secs):");
+                ui.add(egui::DragValue::new(period).range(0.001..=100_000.0));
+            });
+            hint(
+                ui,
+                "run.sweeps becomes a safety cap: the solve stops once the max per-seat \
+                 deviation-gain CI upper bound stays below the threshold for this many \
+                 consecutive wall-clock-spaced evaluations.",
+            );
+        }
+
+        ui.separator();
+        ui.horizontal(|ui| {
+            let mut enabled = run.max_wall_time_minutes.is_some();
+            if ui
+                .checkbox(&mut enabled, "max wall time (minutes)")
+                .changed()
+            {
+                run.max_wall_time_minutes =
+                    enabled.then_some(run.max_wall_time_minutes.unwrap_or(60.0));
+            }
+            if let Some(minutes) = run.max_wall_time_minutes.as_mut() {
+                ui.add(egui::DragValue::new(minutes).range(1.0..=100_000.0));
+            }
+        });
+        hint(
+            ui,
+            "GUI-only: never written to the config TOML. The worker finishes gracefully \
+             (solution + checkpoint written) once this much wall-clock time has elapsed.",
         );
     });
 }

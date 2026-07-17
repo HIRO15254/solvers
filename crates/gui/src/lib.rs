@@ -7,9 +7,11 @@
 
 pub mod action_style;
 pub mod app;
+pub mod estimate;
 pub mod eval_table;
 pub mod format;
 pub mod frequency;
+pub mod machine;
 pub mod matrix;
 pub mod model;
 pub mod presets;
