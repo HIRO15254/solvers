@@ -124,6 +124,40 @@ pub trait ExternalSamplingGame: Send + Sync {
             "dense_node_context is required only to preallocate a RecallMode::Street dense arena"
         )
     }
+
+    /// Current-street abstraction bucket for an arbitrary hole `combo`,
+    /// ignoring whatever combo `world` actually dealt `actor`. Only
+    /// consulted by the vector-traverser dense path
+    /// ([`crate::solver::SolverConfig::traverser_vector`]), which is valid
+    /// only under [`RecallMode::Street`] and therefore only ever needs the
+    /// bucket for the state's current street.
+    fn bucket_for_combo(
+        &self,
+        state: &Self::State,
+        world: &SampledWorld,
+        actor: usize,
+        combo: usize,
+    ) -> BucketId {
+        let _ = (state, world, actor, combo);
+        unimplemented!("bucket_for_combo is required only for traverser_vector mode")
+    }
+
+    /// Vector-traverser terminal evaluation: appends one utility per entry
+    /// of `combos` (in order) to `out`, holding every other seat's cards and
+    /// the board fixed at whatever `world` already carries and substituting
+    /// each `combos[i]` for `traverser`'s own hole cards in turn. Only
+    /// consulted by [`crate::solver::SolverConfig::traverser_vector`] mode.
+    fn terminal_utilities_for_combos(
+        &self,
+        state: &Self::State,
+        world: &SampledWorld,
+        traverser: usize,
+        combos: &[usize],
+        out: &mut Vec<f64>,
+    ) {
+        let _ = (state, world, traverser, combos, out);
+        unimplemented!("terminal_utilities_for_combos is required only for traverser_vector mode")
+    }
 }
 
 fn profile_estimate(mean: f64, sum_squared_error: f64, samples: u64) -> ProfileEstimate {
@@ -337,6 +371,16 @@ pub struct SolverConfig {
     /// parallel efficiency on tables whose per-seat traversal cost is
     /// imbalanced. Must be at least `1`.
     pub sweep_batch: u64,
+    /// Enables "vector-traverser" external sampling: one traversal updates
+    /// every feasible hole combo of the sampled traverser seat at once
+    /// against the same sampled opponents/board, instead of only the one
+    /// combo the deal sampler happened to deal that seat. Only valid when
+    /// [`ExternalSamplingGame::recall_mode`] is [`RecallMode::Street`] (the
+    /// dense arena); [`validate_setup`] rejects `true` under
+    /// [`RecallMode::Full`]. `false` (the default) is the original
+    /// one-hand-per-traversal algorithm, byte-identical to before this field
+    /// existed.
+    pub traverser_vector: bool,
 }
 
 impl Default for SolverConfig {
@@ -349,6 +393,7 @@ impl Default for SolverConfig {
             discount_every: DEFAULT_DISCOUNT_EVERY,
             discount_until: DEFAULT_DISCOUNT_UNTIL,
             sweep_batch: 1,
+            traverser_vector: false,
         }
     }
 }
@@ -362,6 +407,13 @@ pub struct SolverState {
     pub next_sample_id: u64,
     pub total_deal_attempts: u64,
     pub terminal_evaluations: u64,
+    /// Sum, over every traversal so far, of the number of individual hand
+    /// updates it performed: `1` for every traversal under the original
+    /// scalar algorithm (each updates exactly one sampled traverser hand),
+    /// or `|F|` (the feasible traverser combo count) for a
+    /// [`SolverConfig::traverser_vector`] traversal. This is the number to
+    /// compare against a range-based solver's "hands/s".
+    pub hand_updates: u64,
     /// Sorted by key. Together with the implicit root this is the compact
     /// public action-history trie used by result explorers.
     pub histories: Vec<HistoryEntry>,
@@ -378,6 +430,8 @@ pub struct SolverMetrics {
     pub memory_bytes: u64,
     pub total_deal_attempts: u64,
     pub mean_deal_attempts: f64,
+    /// See [`SolverState::hand_updates`].
+    pub hand_updates: u64,
     /// Sum of positive cumulative regrets divided by completed updates for
     /// each seat.  This is a sampled diagnostic, not exploitability.
     pub average_positive_regret: Vec<f64>,
@@ -434,6 +488,7 @@ struct TraversalDelta {
     traverser: usize,
     deal_attempts: u64,
     terminal_evaluations: u64,
+    hand_updates: u64,
     events: Vec<TraversalEvent>,
 }
 
@@ -452,6 +507,7 @@ struct DenseTraversalDelta {
     traverser: usize,
     deal_attempts: u64,
     terminal_evaluations: u64,
+    hand_updates: u64,
     events: Vec<DenseEvent>,
 }
 
@@ -613,6 +669,7 @@ pub struct MultiwaySolver<G: ExternalSamplingGame> {
     next_sample_id: u64,
     total_deal_attempts: u64,
     terminal_evaluations: u64,
+    hand_updates: u64,
     dense: Option<DenseStorage>,
 }
 
@@ -635,6 +692,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             next_sample_id: 0,
             total_deal_attempts: 0,
             terminal_evaluations: 0,
+            hand_updates: 0,
             dense,
         })
     }
@@ -744,6 +802,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             next_sample_id: state.next_sample_id,
             total_deal_attempts: state.total_deal_attempts,
             terminal_evaluations: state.terminal_evaluations,
+            hand_updates: state.hand_updates,
             dense: None,
         })
     }
@@ -804,6 +863,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             next_sample_id: state.next_sample_id,
             total_deal_attempts: state.total_deal_attempts,
             terminal_evaluations: state.terminal_evaluations,
+            hand_updates: state.hand_updates,
             dense: Some(dense_storage),
         })
     }
@@ -830,6 +890,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         hasher.update(&self.config.discount_every.to_le_bytes());
         hasher.update(&self.config.discount_until.to_le_bytes());
         hasher.update(&self.config.sweep_batch.to_le_bytes());
+        hasher.update(&[u8::from(self.config.traverser_vector)]);
         hasher.update(&self.sampler.range_fingerprint());
         hasher.update(&self.game.game_fingerprint());
         *hasher.finalize().as_bytes()
@@ -1016,6 +1077,33 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     u64::from(sample.attempts),
                 )))
             }
+            Some(dense) if self.config.traverser_vector => {
+                let feasible = self.sampler.feasible_combos(traverser, &sample.world);
+                let (combos, weights): (Vec<usize>, Vec<f64>) = feasible.into_iter().unzip();
+                let mut worker = VectorTraversalWorker::new(
+                    &self.game,
+                    dense,
+                    self.config,
+                    linear_weight,
+                    combos,
+                    weights,
+                );
+                worker.traverse(
+                    self.game.root_state(),
+                    0,
+                    &sample.world,
+                    traverser,
+                    &mut reach,
+                    1.0,
+                    &mut action_rng,
+                    0,
+                )?;
+                Ok(AnyTraversalDelta::Dense(worker.finish(
+                    sample_id,
+                    traverser,
+                    u64::from(sample.attempts),
+                )))
+            }
             Some(dense) => {
                 let mut worker =
                     DenseTraversalWorker::new(&self.game, dense, self.config, linear_weight);
@@ -1086,6 +1174,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         let mut memory_bytes = self.approx_memory_bytes;
         let mut total_deal_attempts = self.total_deal_attempts;
         let mut terminal_evaluations = self.terminal_evaluations;
+        let mut hand_updates = self.hand_updates;
 
         for (seat, delta) in deltas.into_iter().enumerate() {
             let expected_sample_id = self
@@ -1102,6 +1191,9 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 .ok_or(SolverError::CounterOverflow)?;
             terminal_evaluations = terminal_evaluations
                 .checked_add(delta.terminal_evaluations)
+                .ok_or(SolverError::CounterOverflow)?;
+            hand_updates = hand_updates
+                .checked_add(delta.hand_updates)
                 .ok_or(SolverError::CounterOverflow)?;
 
             for event in delta.events {
@@ -1222,6 +1314,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         self.approx_memory_bytes = memory_bytes;
         self.total_deal_attempts = total_deal_attempts;
         self.terminal_evaluations = terminal_evaluations;
+        self.hand_updates = hand_updates;
         self.traversals = traversals;
         self.next_sample_id = next_sample_id;
         self.completed_sweeps = completed_sweeps;
@@ -1250,6 +1343,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
 
         let mut total_deal_attempts = self.total_deal_attempts;
         let mut terminal_evaluations = self.terminal_evaluations;
+        let mut hand_updates = self.hand_updates;
 
         for (seat, delta) in deltas.into_iter().enumerate() {
             let expected_sample_id = self
@@ -1266,6 +1360,9 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 .ok_or(SolverError::CounterOverflow)?;
             terminal_evaluations = terminal_evaluations
                 .checked_add(delta.terminal_evaluations)
+                .ok_or(SolverError::CounterOverflow)?;
+            hand_updates = hand_updates
+                .checked_add(delta.hand_updates)
                 .ok_or(SolverError::CounterOverflow)?;
 
             for event in delta.events {
@@ -1305,6 +1402,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             .ok_or(SolverError::CounterOverflow)?;
         self.total_deal_attempts = total_deal_attempts;
         self.terminal_evaluations = terminal_evaluations;
+        self.hand_updates = hand_updates;
         self.apply_early_discount();
         Ok(())
     }
@@ -1621,6 +1719,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             next_sample_id: self.next_sample_id,
             total_deal_attempts: self.total_deal_attempts,
             terminal_evaluations: self.terminal_evaluations,
+            hand_updates: self.hand_updates,
             histories,
             policies,
         }
@@ -1753,6 +1852,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             } else {
                 self.total_deal_attempts as f64 / self.traversals as f64
             },
+            hand_updates: self.hand_updates,
             average_positive_regret: positive_regret,
         }
     }
@@ -2195,6 +2295,9 @@ impl<'a, G: ExternalSamplingGame> TraversalWorker<'a, G> {
             traverser,
             deal_attempts,
             terminal_evaluations: self.terminal_evaluations,
+            // The scalar algorithm updates exactly one sampled hand per
+            // traversal; see `SolverState::hand_updates`.
+            hand_updates: 1,
             events: self.events,
         }
     }
@@ -2484,6 +2587,7 @@ impl<'a, G: ExternalSamplingGame> DenseTraversalWorker<'a, G> {
             traverser,
             deal_attempts,
             terminal_evaluations: self.terminal_evaluations,
+            hand_updates: 1,
             events: self.events,
         }
     }
@@ -2635,6 +2739,307 @@ impl<'a, G: ExternalSamplingGame> DenseTraversalWorker<'a, G> {
     }
 }
 
+/// "Vector-traverser" counterpart of [`DenseTraversalWorker`]: one traversal
+/// updates every feasible hole combo of the sampled `traverser` seat at
+/// once. See the module-level algorithm write-up in `docs/` (task report)
+/// for the derivation; in short:
+///
+/// * The tree is walked exactly once per traversal, same as
+///   [`DenseTraversalWorker`], except every value flowing back up the
+///   recursion is a `Vec<f64>` (one entry per feasible combo, in
+///   [`Self::combos`] order) instead of a scalar.
+/// * At an opponent node, the acting seat's own single dealt card decides
+///   its sampled action exactly as before (their line cannot depend on the
+///   traverser's hypothetical hand, which is what makes one sampled line
+///   valid for the whole vector); the returned vector is just the child
+///   vector scaled by the same scalar importance ratio used today.
+/// * At a traverser node, every action is explored (as today); each
+///   feasible combo's own per-street bucket picks which arena column's
+///   regret-matched strategy weighs its node value, and the regret add for
+///   `(bucket, action)` is the *feasible-weighted mean* of that bucket's
+///   member combos' `(value(action) - node_value)`, matching the expected
+///   per-infoset scalar-ES update in aggregate. Buckets with no feasible
+///   member are simply never visited, so they get no update.
+struct VectorTraversalWorker<'a, G: ExternalSamplingGame> {
+    game: &'a G,
+    tree: &'a PublicTree,
+    arena: &'a DenseArena,
+    config: SolverConfig,
+    linear_weight: f64,
+    events: Vec<DenseEvent>,
+    terminal_evaluations: u64,
+    /// Feasible traverser combos for this traversal's sampled world (`F` in
+    /// the design doc): positive-weight in the traverser's range and
+    /// disjoint from every other seat's sampled hole cards and the sampled
+    /// runout. Fixed for the whole traversal.
+    combos: Vec<usize>,
+    /// `weights[i]` is `combos[i]`'s range weight, aligned by index.
+    weights: Vec<f64>,
+    /// Per-street combo -> bucket table, built lazily the first time a
+    /// traverser decision node on that street is visited and reused for
+    /// every later traverser node on the same street within this traversal
+    /// (board and bucket-active-opponents are fixed for a whole street; see
+    /// `TreeNode::bucket_active_opponents`).
+    bucket_cache: [Option<Vec<BucketId>>; 4],
+}
+
+impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
+    fn new(
+        game: &'a G,
+        dense: &'a DenseStorage,
+        config: SolverConfig,
+        linear_weight: f64,
+        combos: Vec<usize>,
+        weights: Vec<f64>,
+    ) -> Self {
+        Self {
+            game,
+            tree: &dense.tree,
+            arena: &dense.arena,
+            config,
+            linear_weight,
+            events: Vec::new(),
+            terminal_evaluations: 0,
+            combos,
+            weights,
+            bucket_cache: [None, None, None, None],
+        }
+    }
+
+    fn finish(self, sample_id: u64, traverser: usize, deal_attempts: u64) -> DenseTraversalDelta {
+        DenseTraversalDelta {
+            sample_id,
+            traverser,
+            deal_attempts,
+            terminal_evaluations: self.terminal_evaluations,
+            hand_updates: self.combos.len() as u64,
+            events: self.events,
+        }
+    }
+
+    fn terminal_vector(
+        &mut self,
+        state: &G::State,
+        world: &SampledWorld,
+        traverser: usize,
+    ) -> Result<Vec<f64>, SolverError> {
+        let mut values = Vec::new();
+        self.game
+            .terminal_utilities_for_combos(state, world, traverser, &self.combos, &mut values);
+        if values.len() != self.combos.len() {
+            return Err(SolverError::InvalidState(
+                "terminal_utilities_for_combos returned the wrong number of values",
+            ));
+        }
+        for &value in &values {
+            if !value.is_finite() {
+                return Err(SolverError::NonFiniteUtility {
+                    seat: traverser,
+                    utility: value,
+                });
+            }
+        }
+        self.terminal_evaluations = self
+            .terminal_evaluations
+            .checked_add(1)
+            .ok_or(SolverError::CounterOverflow)?;
+        Ok(values)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn traverse(
+        &mut self,
+        state: G::State,
+        node_id: NodeId,
+        world: &SampledWorld,
+        traverser: usize,
+        reach: &mut [f64],
+        sample_importance: f64,
+        rng: &mut ChaCha20Rng,
+        depth: u32,
+    ) -> Result<Vec<f64>, SolverError> {
+        if depth > self.config.max_traversal_depth {
+            return Err(SolverError::DepthLimit {
+                limit: self.config.max_traversal_depth,
+            });
+        }
+
+        let Some(actor) = self.game.actor(&state) else {
+            return self.terminal_vector(&state, world, traverser);
+        };
+
+        let num_players = self.game.num_players();
+        if actor >= num_players {
+            return Err(SolverError::InvalidActor { actor, num_players });
+        }
+        let actions = self.game.node_actions(&state);
+        let num_actions = self.game.num_actions_of(&actions);
+        if num_actions == 0 {
+            return Err(SolverError::NoActions { actor });
+        }
+        let node = &self.tree.nodes[node_id as usize];
+        if node.action_labels.len() != num_actions {
+            return Err(SolverError::TreeNodeMismatch {
+                node: node_id,
+                expected: node.action_labels.len(),
+                found: num_actions,
+            });
+        }
+
+        if actor == traverser {
+            let combos_len = self.combos.len();
+            let street_index = node.street.index();
+            if self.bucket_cache[street_index].is_none() {
+                let table = self
+                    .combos
+                    .iter()
+                    .map(|&combo| self.game.bucket_for_combo(&state, world, traverser, combo))
+                    .collect();
+                self.bucket_cache[street_index] = Some(table);
+            }
+
+            let mut action_values: Vec<Vec<f64>> = Vec::with_capacity(num_actions);
+            for action in 0..num_actions {
+                let next_state = self.game.next_state_with(&state, &actions, action);
+                let child_value = match node.children[action] {
+                    Child::Terminal => self.terminal_vector(&next_state, world, traverser)?,
+                    Child::Decision(child_id) => self.traverse(
+                        next_state,
+                        child_id,
+                        world,
+                        traverser,
+                        reach,
+                        sample_importance,
+                        rng,
+                        depth + 1,
+                    )?,
+                };
+                if child_value.len() != combos_len {
+                    return Err(SolverError::InvalidState(
+                        "vector traversal child value width changed mid-traversal",
+                    ));
+                }
+                action_values.push(child_value);
+            }
+
+            let bucket_table = self.bucket_cache[street_index]
+                .as_ref()
+                .expect("populated above");
+
+            let mut bucket_strategy: FxHashMap<BucketId, Vec<f64>> = FxHashMap::default();
+            for &bucket in bucket_table {
+                if let Entry::Vacant(entry) = bucket_strategy.entry(bucket) {
+                    let range = self.arena.slot_range(node_id, bucket)?;
+                    entry.insert(regret_matching(&self.arena.regrets[range]));
+                }
+            }
+
+            let mut node_value = vec![0.0; combos_len];
+            for (idx, value) in node_value.iter_mut().enumerate() {
+                let strategy = &bucket_strategy[&bucket_table[idx]];
+                let mut total = 0.0;
+                for (action, values) in action_values.iter().enumerate() {
+                    total += strategy[action] * values[idx];
+                }
+                if !total.is_finite() {
+                    return Err(SolverError::NumericOverflow);
+                }
+                *value = total;
+            }
+
+            // Weighted per-bucket regret aggregation: for bucket b, action
+            // a, `sum_{h in F, B(h)=b} weight(h) * (v_a(h) - n(h))`, divided
+            // by `sum_{h in F, B(h)=b} weight(h)` -- the feasible-weighted
+            // mean described on `Self`.
+            let mut bucket_weight_sum: FxHashMap<BucketId, f64> = FxHashMap::default();
+            let mut bucket_diff_sum: FxHashMap<BucketId, Vec<f64>> = FxHashMap::default();
+            for idx in 0..combos_len {
+                let bucket = bucket_table[idx];
+                let weight = self.weights[idx];
+                *bucket_weight_sum.entry(bucket).or_insert(0.0) += weight;
+                let diffs = bucket_diff_sum
+                    .entry(bucket)
+                    .or_insert_with(|| vec![0.0; num_actions]);
+                for (action, values) in action_values.iter().enumerate() {
+                    diffs[action] += weight * (values[idx] - node_value[idx]);
+                }
+            }
+            for (bucket, weight_sum) in bucket_weight_sum {
+                // Every bucket present in `bucket_table` has at least one
+                // feasible member with positive range weight, so this is
+                // always strictly positive; the guard is defensive only.
+                if weight_sum <= 0.0 {
+                    continue;
+                }
+                let mut diffs = bucket_diff_sum
+                    .remove(&bucket)
+                    .expect("weight sum and diff sum are populated together above");
+                for value in diffs.iter_mut() {
+                    let scaled = sample_importance * (*value / weight_sum);
+                    if !scaled.is_finite() {
+                        return Err(SolverError::NumericOverflow);
+                    }
+                    *value = scaled;
+                }
+                let column = self.arena.column_id(node_id, bucket)?;
+                self.events.push(DenseEvent::AddRegret {
+                    column,
+                    values: diffs,
+                });
+            }
+
+            Ok(node_value)
+        } else {
+            let private = self.game.bucket(&state, world, actor);
+            validate_private_info(private, num_players, RecallMode::Street)?;
+            let bucket = private.current_bucket();
+            let column = self.arena.column_id(node_id, bucket)?;
+            let range = self.arena.slot_range(node_id, bucket)?;
+            let strategy = regret_matching(&self.arena.regrets[range]);
+            let (action, sampling_probability) =
+                sample_exploratory_action(&strategy, self.config.exploration_epsilon, rng);
+            let chosen_probability = strategy[action];
+            let importance = chosen_probability / sampling_probability;
+            let child_importance = sample_importance * importance;
+            if !child_importance.is_finite() {
+                return Err(SolverError::NumericOverflow);
+            }
+
+            let mut values = strategy;
+            for probability in values.iter_mut() {
+                *probability *= self.linear_weight * reach[actor];
+            }
+            self.events.push(DenseEvent::AddStrategy { column, values });
+
+            let old_reach = reach[actor];
+            reach[actor] *= chosen_probability;
+            let next_state = self.game.next_state_with(&state, &actions, action);
+            let result = match node.children[action] {
+                Child::Terminal => self.terminal_vector(&next_state, world, traverser),
+                Child::Decision(child_id) => self.traverse(
+                    next_state,
+                    child_id,
+                    world,
+                    traverser,
+                    reach,
+                    child_importance,
+                    rng,
+                    depth + 1,
+                ),
+            };
+            reach[actor] = old_reach;
+            let mut result = result?;
+            for value in result.iter_mut() {
+                *value *= importance;
+                if !value.is_finite() {
+                    return Err(SolverError::NumericOverflow);
+                }
+            }
+            Ok(result)
+        }
+    }
+}
+
 fn resume_configs_match(mut stored: SolverConfig, mut current: SolverConfig) -> bool {
     // This is a process resource guard, not part of the sampled algorithm.
     // Raising it after a resource-limit checkpoint must not alter results.
@@ -2680,6 +3085,9 @@ fn validate_setup<G: ExternalSamplingGame>(
     }
     if config.sweep_batch == 0 {
         return Err(SolverError::ZeroSweepBatch);
+    }
+    if config.traverser_vector && !matches!(game.recall_mode(), RecallMode::Street) {
+        return Err(SolverError::VectorTraverserRequiresStreetRecall);
     }
     Ok(())
 }
@@ -3065,6 +3473,11 @@ pub enum SolverError {
     UnmappedDenseEntry { key: InfoKey },
     #[error("dense history entry {0:?} does not match the enumerated public tree")]
     UnmappedDenseHistory(HistoryKey),
+    #[error(
+        "SolverConfig::traverser_vector requires recall = \"street\" (the dense arena); the \
+         current game uses RecallMode::Full"
+    )]
+    VectorTraverserRequiresStreetRecall,
 }
 
 #[cfg(test)]
@@ -3413,6 +3826,7 @@ mod tests {
                 discount_every: 5,
                 discount_until: 100,
                 sweep_batch,
+                traverser_vector: false,
             },
         )
         .unwrap()
@@ -3562,6 +3976,7 @@ mod tests {
                     discount_every: DEFAULT_DISCOUNT_EVERY,
                     discount_until: DEFAULT_DISCOUNT_UNTIL,
                     sweep_batch,
+                    traverser_vector: false,
                 },
             )
             .unwrap()
@@ -3618,6 +4033,7 @@ mod tests {
             discount_every: 5,
             discount_until: 100,
             sweep_batch: 1,
+            traverser_vector: false,
         };
         config.sweep_batch = 0;
         assert!(matches!(
@@ -3771,6 +4187,7 @@ mod tests {
                 discount_every: 1,
                 discount_until: 0,
                 sweep_batch: 1,
+                traverser_vector: false,
             },
         )
         .unwrap();
@@ -3819,6 +4236,7 @@ mod tests {
                 discount_every: 1,
                 discount_until: 0,
                 sweep_batch: 1,
+                traverser_vector: false,
             },
         )
         .unwrap();
@@ -4147,6 +4565,32 @@ mod tests {
                 bucket_active_opponents: 1,
             }
         }
+
+        fn bucket_for_combo(
+            &self,
+            _state: &Self::State,
+            _world: &SampledWorld,
+            _actor: usize,
+            combo: usize,
+        ) -> BucketId {
+            (combo % 2) as u32
+        }
+
+        fn terminal_utilities_for_combos(
+            &self,
+            state: &Self::State,
+            world: &SampledWorld,
+            traverser: usize,
+            combos: &[usize],
+            out: &mut Vec<f64>,
+        ) {
+            // Card-independent terminal, same as `terminal_utilities`: every
+            // combo gets the same constant.
+            let mut utilities = vec![0.0; 2];
+            self.terminal_utilities(state, world, &mut utilities);
+            out.clear();
+            out.resize(combos.len(), utilities[traverser]);
+        }
     }
 
     fn dense_dominated_solver(seed: u64) -> MultiwaySolver<DenseDominatedChoice> {
@@ -4161,6 +4605,7 @@ mod tests {
                 discount_every: 5,
                 discount_until: 100,
                 sweep_batch: 1,
+                traverser_vector: false,
             },
         )
         .unwrap()
@@ -4178,9 +4623,145 @@ mod tests {
                 discount_every: DEFAULT_DISCOUNT_EVERY,
                 discount_until: DEFAULT_DISCOUNT_UNTIL,
                 sweep_batch,
+                traverser_vector: false,
             },
         )
         .unwrap()
+    }
+
+    fn dense_vector_toy_solver(seed: u64, sweep_batch: u64) -> MultiwaySolver<DenseToyGame> {
+        MultiwaySolver::new(
+            DenseToyGame,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            SolverConfig {
+                seed,
+                max_memory_bytes: 1 << 20,
+                max_traversal_depth: 16,
+                exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
+                discount_every: DEFAULT_DISCOUNT_EVERY,
+                discount_until: DEFAULT_DISCOUNT_UNTIL,
+                sweep_batch,
+                traverser_vector: true,
+            },
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn vector_traverser_rejects_full_recall_game() {
+        let result = MultiwaySolver::new(
+            DominatedChoice,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            SolverConfig {
+                traverser_vector: true,
+                ..SolverConfig::default()
+            },
+        );
+        let error = match result {
+            Ok(_) => panic!("expected a recall-mode validation error"),
+            Err(error) => error,
+        };
+        assert!(matches!(
+            error,
+            SolverError::VectorTraverserRequiresStreetRecall
+        ));
+    }
+
+    #[test]
+    fn vector_traverser_hand_updates_exceed_one_and_matches_scalar_metrics_shape() {
+        let mut vector = dense_vector_toy_solver(77, 1);
+        vector.run_sweeps_with_threads(6, 1).unwrap();
+        let metrics = vector.metrics();
+        // Every traversal's feasible set has close to (but at most) `C(50,
+        // 2)` combos (full range minus the ~7 dead cards each world deals);
+        // six sweeps of two traversals each is comfortably more than one
+        // hand update per traversal.
+        assert!(metrics.hand_updates > metrics.traversals);
+
+        let mut scalar = dense_toy_solver(77, 1);
+        scalar.run_sweeps_with_threads(6, 1).unwrap();
+        // The scalar algorithm updates exactly one hand per traversal.
+        assert_eq!(scalar.metrics().hand_updates, scalar.metrics().traversals);
+    }
+
+    #[test]
+    fn vector_traverser_is_deterministic_across_thread_counts_and_reruns() {
+        let mut single_threaded = dense_vector_toy_solver(4104, 1);
+        single_threaded.run_sweeps_with_threads(20, 1).unwrap();
+
+        let mut multi_threaded = dense_vector_toy_solver(4104, 1);
+        multi_threaded.run_sweeps_with_threads(20, 8).unwrap();
+
+        assert_eq!(
+            single_threaded.snapshot_state(),
+            multi_threaded.snapshot_state()
+        );
+        assert_eq!(single_threaded.metrics(), multi_threaded.metrics());
+
+        let mut rerun = dense_vector_toy_solver(4104, 1);
+        rerun.run_sweeps_with_threads(20, 4).unwrap();
+        assert_eq!(single_threaded.snapshot_state(), rerun.snapshot_state());
+    }
+
+    #[test]
+    fn vector_traverser_sweep_batch_is_internally_consistent() {
+        let mut batch_four_a = dense_vector_toy_solver(606, 4);
+        batch_four_a.run_sweeps_with_threads(12, 1).unwrap();
+        let mut batch_four_b = dense_vector_toy_solver(606, 4);
+        batch_four_b.run_sweeps_with_threads(12, 6).unwrap();
+        assert_eq!(batch_four_a.snapshot_state(), batch_four_b.snapshot_state());
+    }
+
+    #[test]
+    fn resume_rejects_mismatched_traverser_vector() {
+        let state = dense_toy_solver(21, 1).snapshot_state();
+        let mut changed = state.config;
+        changed.traverser_vector = true;
+        assert!(matches!(
+            MultiwaySolver::from_state_with_config(
+                DenseToyGame,
+                DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+                state,
+                changed,
+            ),
+            Err(SolverError::ResumeConfigurationMismatch)
+        ));
+    }
+
+    #[test]
+    fn vector_traverser_checkpoint_v5_round_trip_and_resume() {
+        let mut solver = dense_vector_toy_solver(303, 1);
+        solver.run_sweeps_with_threads(10, 2).unwrap();
+
+        let checkpoint = crate::checkpoint::MultiwayCheckpoint::capture(&solver);
+        assert_eq!(
+            checkpoint.header.version,
+            crate::checkpoint::CHECKPOINT_VERSION
+        );
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("vector.mwckpt");
+        checkpoint.write_atomic(&path).unwrap();
+        let loaded = crate::checkpoint::MultiwayCheckpoint::load(
+            &path,
+            solver.configuration_fingerprint(),
+            solver.abstraction_fingerprint(),
+        )
+        .unwrap();
+        assert_eq!(loaded.state, solver.snapshot_state());
+        assert!(loaded.state.config.traverser_vector);
+        assert!(loaded.state.hand_updates > 0);
+
+        let mut resumed = MultiwaySolver::from_state(
+            DenseToyGame,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            loaded.state,
+        )
+        .unwrap();
+        resumed.run_sweeps_with_threads(5, 2).unwrap();
+
+        let mut reference = dense_vector_toy_solver(303, 1);
+        reference.run_sweeps_with_threads(15, 2).unwrap();
+        assert_eq!(resumed.snapshot_state(), reference.snapshot_state());
     }
 
     #[test]
@@ -4216,6 +4797,7 @@ mod tests {
                 discount_every: DEFAULT_DISCOUNT_EVERY,
                 discount_until: DEFAULT_DISCOUNT_UNTIL,
                 sweep_batch: 1,
+                traverser_vector: false,
             },
         );
         let error = match result {
@@ -4490,6 +5072,7 @@ mod tests {
                 discount_every: DEFAULT_DISCOUNT_EVERY,
                 discount_until: DEFAULT_DISCOUNT_UNTIL,
                 sweep_batch: 1,
+                traverser_vector: false,
             },
         )
         .unwrap();
@@ -4513,5 +5096,200 @@ mod tests {
             streets_seen.iter().all(|&seen| seen),
             "expected every street to be reached at least once: {streets_seen:?}"
         );
+    }
+
+    #[test]
+    fn vector_traverser_regret_trends_down_as_sweeps_accumulate() {
+        let mut solver = dense_vector_toy_solver(31, 1);
+        solver.run_sweeps(20).unwrap();
+        let early = solver.metrics().average_positive_regret;
+        let early_mean = early.iter().sum::<f64>() / early.len() as f64;
+
+        solver.run_sweeps(2_000).unwrap();
+        let late = solver.metrics().average_positive_regret;
+        let late_mean = late.iter().sum::<f64>() / late.len() as f64;
+
+        assert!(early_mean.is_finite() && early_mean >= 0.0);
+        assert!(late_mean.is_finite() && late_mean >= 0.0);
+        assert!(
+            late_mean < early_mean,
+            "expected average positive regret to trend down: early {early_mean}, late {late_mean}"
+        );
+    }
+
+    /// Same shape as [`street_recall_holdem_game_reaches_every_street_without_error`]
+    /// but with `traverser_vector` enabled: a real, multi-street `HoldemGame`
+    /// still reaches every street, produces only finite regrets/metrics, and
+    /// `hand_updates` accumulates faster than `traversals` (the whole point
+    /// of the mode).
+    #[test]
+    fn vector_traverser_holdem_game_reaches_every_street_without_error() {
+        use crate::abstraction::FeatureHashAbstraction;
+        use crate::config::{
+            AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RakeConfig,
+            SeatConfig, UtilityConfig,
+        };
+        use crate::holdem::HoldemGame;
+        use crate::types::SeatId;
+
+        let mut config = MultiwayConfig {
+            seats: (0..3)
+                .map(|_| SeatConfig {
+                    name: None,
+                    stack_bb: 6.0,
+                    range: String::new(),
+                    betting: None,
+                })
+                .collect(),
+            button: SeatId(0),
+            blinds: BlindConfig::default(),
+            ante: AnteConfig::None,
+            betting: BettingConfig::default(),
+            abstraction: AbstractionConfig::default(),
+        };
+        config.abstraction.flop_buckets = 4;
+        config.abstraction.turn_buckets = 4;
+        config.abstraction.river_buckets = 4;
+        config.abstraction.recall = RecallMode::Street;
+
+        let game = HoldemGame::new(
+            &config,
+            &UtilityConfig::ChipEv,
+            &RakeConfig::None,
+            FeatureHashAbstraction::new(crate::abstraction::FeatureHashParams {
+                flop_buckets: 4,
+                turn_buckets: 4,
+                river_buckets: 4,
+            })
+            .unwrap(),
+        )
+        .unwrap();
+        let sampler = game.deal_sampler().unwrap();
+        let mut solver = MultiwaySolver::new(
+            game,
+            sampler,
+            SolverConfig {
+                seed: 4,
+                max_memory_bytes: 1 << 24,
+                max_traversal_depth: 64,
+                exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
+                discount_every: DEFAULT_DISCOUNT_EVERY,
+                discount_until: DEFAULT_DISCOUNT_UNTIL,
+                sweep_batch: 1,
+                traverser_vector: true,
+            },
+        )
+        .unwrap();
+        solver.run_sweeps_with_threads(60, 4).unwrap();
+
+        let snapshot = solver.snapshot_state();
+        assert!(!snapshot.policies.is_empty());
+        let mut streets_seen = [false; 4];
+        for entry in &snapshot.policies {
+            streets_seen[entry.key.street as usize] = true;
+            let street = entry.key.street as usize;
+            for (index, &bucket) in entry.key.bucket_path.iter().enumerate() {
+                if index == street {
+                    assert_ne!(bucket, UNREACHED_BUCKET);
+                } else {
+                    assert_eq!(bucket, UNREACHED_BUCKET);
+                }
+            }
+        }
+        assert!(
+            streets_seen.iter().all(|&seen| seen),
+            "expected every street to be reached at least once: {streets_seen:?}"
+        );
+        let metrics = solver.metrics();
+        assert!(metrics.hand_updates > metrics.traversals);
+        for &regret in &metrics.average_positive_regret {
+            assert!(regret.is_finite());
+        }
+    }
+
+    /// ICM smoke test: a small vector-traverser + `RecallMode::Street` +
+    /// `TournamentIcm` solve runs without error and produces finite
+    /// utilities/regrets. Exercises the terminal ICM path (which is exact
+    /// for this seat count) inside `terminal_utilities_for_combos`, called
+    /// up to hundreds of times per traversal instead of once.
+    #[test]
+    fn vector_traverser_icm_smoke_test() {
+        use crate::abstraction::FeatureHashAbstraction;
+        use crate::config::{
+            AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, FieldPlayerConfig,
+            MultiwayConfig, RakeConfig, SeatConfig, UtilityConfig,
+        };
+        use crate::holdem::HoldemGame;
+        use crate::types::SeatId;
+
+        let mut config = MultiwayConfig {
+            seats: (0..3)
+                .map(|_| SeatConfig {
+                    name: None,
+                    stack_bb: 8.0,
+                    range: String::new(),
+                    betting: None,
+                })
+                .collect(),
+            button: SeatId(0),
+            blinds: BlindConfig::default(),
+            ante: AnteConfig::None,
+            betting: BettingConfig::default(),
+            abstraction: AbstractionConfig::default(),
+        };
+        config.abstraction.flop_buckets = 3;
+        config.abstraction.turn_buckets = 3;
+        config.abstraction.river_buckets = 3;
+        config.abstraction.recall = RecallMode::Street;
+
+        let utility = UtilityConfig::TournamentIcm {
+            outside_field: vec![FieldPlayerConfig {
+                name: "field".into(),
+                stack_bb: 40.0,
+            }],
+            payouts: vec![100.0, 60.0, 30.0, 0.0],
+            samples: 4_000,
+            seed: 11,
+        };
+
+        let game = HoldemGame::new(
+            &config,
+            &utility,
+            &RakeConfig::None,
+            FeatureHashAbstraction::new(crate::abstraction::FeatureHashParams {
+                flop_buckets: 3,
+                turn_buckets: 3,
+                river_buckets: 3,
+            })
+            .unwrap(),
+        )
+        .unwrap();
+        let sampler = game.deal_sampler().unwrap();
+        let mut solver = MultiwaySolver::new(
+            game,
+            sampler,
+            SolverConfig {
+                seed: 9,
+                max_memory_bytes: 1 << 24,
+                max_traversal_depth: 64,
+                exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
+                discount_every: DEFAULT_DISCOUNT_EVERY,
+                discount_until: DEFAULT_DISCOUNT_UNTIL,
+                sweep_batch: 1,
+                traverser_vector: true,
+            },
+        )
+        .unwrap();
+        solver.run_sweeps_with_threads(15, 2).unwrap();
+
+        let metrics = solver.metrics();
+        assert!(metrics.hand_updates >= metrics.traversals);
+        for &regret in &metrics.average_positive_regret {
+            assert!(regret.is_finite());
+        }
+        let evaluation = solver.evaluate_average_profile(64, 5).unwrap();
+        for seat in &evaluation.seats {
+            assert!(seat.mean.is_finite());
+        }
     }
 }

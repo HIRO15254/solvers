@@ -41,6 +41,12 @@ pub struct MultiwayMetricsRow {
     pub infosets: u64,
     pub memory_bytes: u64,
     pub traversals_per_second: f64,
+    /// See `multiway::solver::SolverState::hand_updates`. Rows written before
+    /// this field existed decode as `0`.
+    #[serde(default)]
+    pub hand_updates: u64,
+    #[serde(default)]
+    pub hand_updates_per_second: f64,
     pub seats: Vec<MultiwaySeatMetrics>,
 }
 
@@ -55,6 +61,8 @@ impl MultiwayMetricsRow {
             infosets: 0,
             memory_bytes: 0,
             traversals_per_second: 0.0,
+            hand_updates: 0,
+            hand_updates_per_second: 0.0,
             seats: (0..num_seats)
                 .map(|seat| MultiwaySeatMetrics {
                     seat: seat as u8,

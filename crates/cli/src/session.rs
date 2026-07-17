@@ -91,19 +91,27 @@ pub fn build_multiway_session(
         .validate_economics(&utility, &rake)
         .context("validating multiway game and utility")?;
 
-    let (algorithm_seed, exploration_epsilon, discount_every, discount_until) = match algorithm {
-        AlgorithmSection::ExternalSamplingMccfr {
-            seed,
-            exploration_epsilon,
-            discount_every,
-            discount_until,
-        } => (seed, exploration_epsilon, discount_every, discount_until),
-        _ => {
-            return Err(anyhow!(
-                "preflop-multiway requires schedule = \"external-sampling-mccfr\""
-            ));
-        }
-    };
+    let (algorithm_seed, exploration_epsilon, discount_every, discount_until, traverser_vector) =
+        match algorithm {
+            AlgorithmSection::ExternalSamplingMccfr {
+                seed,
+                exploration_epsilon,
+                discount_every,
+                discount_until,
+                traverser_vector,
+            } => (
+                seed,
+                exploration_epsilon,
+                discount_every,
+                discount_until,
+                traverser_vector,
+            ),
+            _ => {
+                return Err(anyhow!(
+                    "preflop-multiway requires schedule = \"external-sampling-mccfr\""
+                ));
+            }
+        };
     let sweeps = run.sweeps.unwrap_or(run.iterations);
     if sweeps == 0 {
         return Err(anyhow!("run.sweeps must be positive for a multiway solve"));
@@ -189,6 +197,7 @@ pub fn build_multiway_session(
         discount_every,
         discount_until,
         sweep_batch: run.sweep_batch.unwrap_or(1),
+        traverser_vector,
     };
     let evaluation_seed = solver_config.seed ^ 0x6576_616c_7561_7465;
     let solver = if let Some(path) = resume_checkpoint {
@@ -351,6 +360,12 @@ pub fn metrics_row(
         memory_bytes: metrics.memory_bytes,
         traversals_per_second: if elapsed_secs > 0.0 {
             metrics.traversals as f64 / elapsed_secs
+        } else {
+            0.0
+        },
+        hand_updates: metrics.hand_updates,
+        hand_updates_per_second: if elapsed_secs > 0.0 {
+            metrics.hand_updates as f64 / elapsed_secs
         } else {
             0.0
         },

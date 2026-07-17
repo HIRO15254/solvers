@@ -12,12 +12,14 @@ use crate::solver::{
 };
 
 const CHECKPOINT_MAGIC: &[u8; 8] = b"SLVRMWCP";
-/// Bumped 3 -> 4 when [`SolverConfig`] grew a `sweep_batch` field. `load`
-/// transparently accepts both this version and [`MIN_SUPPORTED_CHECKPOINT_VERSION`]
-/// (decoding the older on-disk `SolverConfig` shape and filling
-/// `sweep_batch = 1`, its behavior-preserving default); every checkpoint this
+/// Bumped 4 -> 5 when [`SolverConfig`] grew a `traverser_vector` field and
+/// [`SolverState`] grew a `hand_updates` counter. `load` transparently
+/// accepts version 5 (current), 4 (decoding the older on-disk `SolverConfig`
+/// shape without `traverser_vector` and filling `traverser_vector = false`,
+/// `hand_updates = 0`), and [`MIN_SUPPORTED_CHECKPOINT_VERSION`] (version 3,
+/// additionally missing `sweep_batch`, filled `1`); every checkpoint this
 /// process *writes* is always the current version.
-pub const CHECKPOINT_VERSION: u16 = 4;
+pub const CHECKPOINT_VERSION: u16 = 5;
 /// Oldest checkpoint container version [`MultiwayCheckpoint::load_unchecked`]
 /// still reads. Bump only alongside a matching legacy mirror struct and
 /// `From` conversion into the current [`SolverState`] shape.
@@ -99,12 +101,75 @@ impl From<SolverStateV3> for SolverState {
                 // batch size that behaves exactly like the solver they were
                 // written by.
                 sweep_batch: 1,
+                // Version 3 checkpoints predate the vector-traverser mode;
+                // `false` is the behavior they were written under.
+                traverser_vector: false,
             },
             traversals: legacy.traversals,
             completed_sweeps: legacy.completed_sweeps,
             next_sample_id: legacy.next_sample_id,
             total_deal_attempts: legacy.total_deal_attempts,
             terminal_evaluations: legacy.terminal_evaluations,
+            // Version 3 checkpoints predate the hand-updates counter.
+            hand_updates: 0,
+            histories: legacy.histories,
+            policies: legacy.policies,
+        }
+    }
+}
+
+/// Mirrors [`SolverConfig`]'s on-disk shape for checkpoint container version
+/// 4, i.e. every field it had before `traverser_vector` was appended.
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+struct SolverConfigV4 {
+    seed: u64,
+    max_memory_bytes: u64,
+    max_traversal_depth: u32,
+    exploration_epsilon: f64,
+    discount_every: u64,
+    discount_until: u64,
+    sweep_batch: u64,
+}
+
+/// Mirrors [`SolverState`]'s on-disk shape for checkpoint container version 4
+/// (every field unchanged except `config`, which is the version-4 shape, and
+/// the absence of `hand_updates`).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct SolverStateV4 {
+    schema_version: u16,
+    config: SolverConfigV4,
+    traversals: u64,
+    completed_sweeps: u64,
+    next_sample_id: u64,
+    total_deal_attempts: u64,
+    terminal_evaluations: u64,
+    histories: Vec<HistoryEntry>,
+    policies: Vec<PolicyEntry>,
+}
+
+impl From<SolverStateV4> for SolverState {
+    fn from(legacy: SolverStateV4) -> Self {
+        SolverState {
+            schema_version: legacy.schema_version,
+            config: SolverConfig {
+                seed: legacy.config.seed,
+                max_memory_bytes: legacy.config.max_memory_bytes,
+                max_traversal_depth: legacy.config.max_traversal_depth,
+                exploration_epsilon: legacy.config.exploration_epsilon,
+                discount_every: legacy.config.discount_every,
+                discount_until: legacy.config.discount_until,
+                sweep_batch: legacy.config.sweep_batch,
+                // Version 4 checkpoints predate the vector-traverser mode;
+                // `false` is the behavior they were written under.
+                traverser_vector: false,
+            },
+            traversals: legacy.traversals,
+            completed_sweeps: legacy.completed_sweeps,
+            next_sample_id: legacy.next_sample_id,
+            total_deal_attempts: legacy.total_deal_attempts,
+            terminal_evaluations: legacy.terminal_evaluations,
+            // Version 4 checkpoints predate the hand-updates counter.
+            hand_updates: 0,
             histories: legacy.histories,
             policies: legacy.policies,
         }
@@ -411,7 +476,11 @@ impl MultiwayCheckpoint {
         }
 
         let state: SolverState = match header.version {
-            4 => postcard::from_bytes(&raw)?,
+            5 => postcard::from_bytes(&raw)?,
+            4 => {
+                let legacy: SolverStateV4 = postcard::from_bytes(&raw)?;
+                legacy.into()
+            }
             3 => {
                 let legacy: SolverStateV3 = postcard::from_bytes(&raw)?;
                 legacy.into()
@@ -650,12 +719,14 @@ mod tests {
                 discount_every: crate::solver::DEFAULT_DISCOUNT_EVERY,
                 discount_until: crate::solver::DEFAULT_DISCOUNT_UNTIL,
                 sweep_batch: 1,
+                traverser_vector: false,
             },
             traversals: 6,
             completed_sweeps: 2,
             next_sample_id: 6,
             total_deal_attempts: 8,
             terminal_evaluations: 20,
+            hand_updates: 6,
             histories: vec![HistoryEntry {
                 key: HistoryKey::ROOT.child(1, 2),
                 parent: HistoryKey::ROOT,
@@ -991,6 +1062,77 @@ mod tests {
         // Re-saving an upgraded-in-memory checkpoint always writes the
         // current container version and the current `SolverState` shape.
         let upgraded_path = directory.path().join("upgraded.mwckpt");
+        loaded.write_atomic(&upgraded_path).unwrap();
+        let reloaded = MultiwayCheckpoint::load(&upgraded_path, [3; 32], [7; 32]).unwrap();
+        assert_eq!(reloaded.header.version, CHECKPOINT_VERSION);
+        assert_eq!(reloaded.state, loaded.state);
+    }
+
+    /// The version-4 mirror of [`state`]: same values, `SolverConfigV4`
+    /// shape (no `traverser_vector`), no `hand_updates`.
+    fn legacy_v4_state() -> SolverStateV4 {
+        SolverStateV4 {
+            schema_version: SOLVER_STATE_VERSION,
+            config: SolverConfigV4 {
+                seed: 9,
+                max_memory_bytes: 1 << 20,
+                max_traversal_depth: 64,
+                exploration_epsilon: crate::solver::DEFAULT_EXPLORATION_EPSILON,
+                discount_every: crate::solver::DEFAULT_DISCOUNT_EVERY,
+                discount_until: crate::solver::DEFAULT_DISCOUNT_UNTIL,
+                sweep_batch: 1,
+            },
+            traversals: 6,
+            completed_sweeps: 2,
+            next_sample_id: 6,
+            total_deal_attempts: 8,
+            terminal_evaluations: 20,
+            histories: vec![HistoryEntry {
+                key: HistoryKey::ROOT.child(1, 2),
+                parent: HistoryKey::ROOT,
+                actor: 1,
+                action_index: 2,
+                action_label: "raise".into(),
+            }],
+            policies: vec![PolicyEntry {
+                key: InfoKey {
+                    history: HistoryKey::ROOT.child(1, 2),
+                    player: 2,
+                    street: 1,
+                    active_opponents: 2,
+                    bucket_path: [
+                        4,
+                        17,
+                        crate::solver::UNREACHED_BUCKET,
+                        crate::solver::UNREACHED_BUCKET,
+                    ],
+                },
+                column: PolicyColumn {
+                    action_labels: vec!["fold".into(), "call".into()],
+                    regrets: vec![-1.0, 2.5],
+                    strategy_sum: vec![3.0, 7.0],
+                },
+            }],
+        }
+    }
+
+    #[test]
+    fn checkpoint_version_4_loads_with_traverser_vector_defaulted_to_false() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("legacy-v4.mwckpt");
+        let legacy = legacy_v4_state();
+        let raw = postcard::to_allocvec(&legacy).unwrap();
+        write_checkpoint_with_version(&raw, 4, [3; 32], [7; 32], legacy.next_sample_id, &path);
+
+        let loaded = MultiwayCheckpoint::load(&path, [3; 32], [7; 32]).unwrap();
+        assert_eq!(loaded.header.version, 4);
+        assert!(!loaded.state.config.traverser_vector);
+        assert_eq!(loaded.state.hand_updates, 0);
+        assert_eq!(loaded.state, SolverState::from(legacy));
+
+        // Re-saving an upgraded-in-memory checkpoint always writes the
+        // current container version and the current `SolverState` shape.
+        let upgraded_path = directory.path().join("upgraded-v4.mwckpt");
         loaded.write_atomic(&upgraded_path).unwrap();
         let reloaded = MultiwayCheckpoint::load(&upgraded_path, [3; 32], [7; 32]).unwrap();
         assert_eq!(reloaded.header.version, CHECKPOINT_VERSION);

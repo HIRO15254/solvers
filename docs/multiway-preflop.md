@@ -196,6 +196,69 @@ resuming with a different `sweep_batch` is rejected the same way changing
 `exploration_epsilon` is. Cancellation is polled once per batch rather than
 once per sweep, so `should_continue` granularity coarsens to whole batches.
 
+### Vector-traverser sampling (`algorithm.traverser_vector`)
+
+Ordinary external sampling updates exactly one hand per traversal: the
+traverser's own dealt combo. `algorithm.traverser_vector = true` (only valid
+with `recall = "street"`; rejected with a typed error under `"full"`, since it
+needs the dense arena's precomputed tree) instead updates *every feasible
+hole combo* of the sampled traverser seat in one traversal, against the same
+sampled opponents and board. "Feasible" means positive weight in the
+traverser's configured range and disjoint from every other seat's sampled
+hole cards and the sampled board — everything else about the deal stream
+(including exactly which combo the sampler happened to deal the traverser)
+is unchanged, so switching this on does not change the RNG consumption or
+which worlds get sampled.
+
+- **Why it's faster.** The tree is still walked exactly once per traversal;
+  only the traverser's own decision nodes do more work (one action
+  exploration per node, same as today, but every child value is now a vector
+  over the feasible combos instead of a scalar). Terminal evaluation for a
+  showdown reruns the same tested pot/rank/rake settlement machinery
+  (`settle_ranked`) once per feasible combo instead of building an entire
+  second traversal, so the speedup comes from amortizing the walk itself, not
+  from a cheaper per-combo evaluation.
+- **Bucket aggregation.** At a traverser decision node, each feasible combo
+  `h` maps to a per-street abstraction bucket `B(h)` (preflop: the 169-class
+  index). The regret matching strategy is looked up once per *distinct*
+  bucket reached by the vector (not once per combo). The regret added to
+  bucket `b`'s column for action `a` is the feasible-weighted mean over that
+  bucket's members: `sum_{h: B(h)=b} weight(h) * (v_a(h) - n(h)) / sum_{h:
+  B(h)=b} weight(h)`, where `v_a(h)` is combo `h`'s value under action `a`
+  and `n(h)` is its node value under the node's regret-matched strategy.
+  Buckets with no feasible member simply never appear and get no update.
+  This matches the ordinary scalar external-sampling update in expectation
+  over which combo actually gets dealt to that bucket.
+- **Honest approximation.** Every combo's value uses the *same* sampled
+  opponents and board — which were themselves sampled from a joint deal that
+  originally included a real (but now-unused) traverser hand. Opponent cards
+  are therefore drawn from a distribution not conditioned on the specific
+  hero combo being valued for other combos than the one actually dealt: a
+  small card-removal bias relative to exact scalar external sampling. This is
+  the same family of approximation range-based commercial solvers make (they
+  do not repeat opponent sampling once per hero combo either); it is not
+  claimed to be bias-free, only a documented, deliberate trade for the
+  throughput gain.
+- **`hand_updates`.** Every traversal's contribution to the new `hand_updates`
+  counter (surfaced in metrics/CLI JSON as `handUpdates` /
+  `handUpdatesPerSecond`) is `1` for the ordinary scalar algorithm and the
+  feasible combo count for a vector traversal — the number to compare against
+  a range-based solver's "hands/s".
+- **ICM.** Terminal ICM utility is cached by the existing final-stack-vector
+  keyed cache (`HoldemGame`'s ICM terminal cache): distinct combos that
+  happen to produce the same final stack vector (e.g. many combos tying or
+  losing the same way) already share one ICM evaluation for free, without any
+  vector-specific bookkeeping.
+- **Known interaction: rollout-abstraction assignment cache growth.** A
+  vector traversal calls the abstraction's `bucket` lookup once per feasible
+  combo instead of once, so `RolloutKMeansAbstraction`'s memoized
+  `(RolloutKey -> BucketId)` assignment cache grows much faster in wall-clock
+  terms. That cache is capped at the rollout artifact's on-disk size limit
+  (64 MiB); a long/wide vector-traverser run against `game.abstraction.artifact_cache`
+  can hit that cap and fail at the final persist step even though the solve
+  itself completed. Point `artifact_cache` at a fresh path per experiment (or
+  omit it) if this happens; raising the cap is future work.
+
 ## Output semantics
 
 Multiway progress uses per-seat profile EV estimates, confidence intervals,
@@ -209,10 +272,13 @@ The multiway artifact contracts are separate from frozen HU v1:
   table and per-frame, table, and aggregate BLAKE3 integrity checks. Postcard
   serialization is streamed through a temporary file instead of duplicating
   the full raw state in memory.
-- `.mwckpt` container version 4 adds `sweep_batch` to the serialized
-  `SolverConfig`. Loading transparently accepts version 3 checkpoints
-  (written before sweep batching existed), filling `sweep_batch = 1`; every
-  checkpoint this process writes is always the current version.
+- `.mwckpt` container version 5 adds `traverser_vector` to the serialized
+  `SolverConfig` and a `hand_updates` counter to `SolverState` (see
+  "Vector-traverser sampling" above). Loading transparently accepts version 4
+  (adds `sweep_batch` but not `traverser_vector`/`hand_updates`, filling
+  `traverser_vector = false`, `hand_updates = 0`) and version 3 (also missing
+  `sweep_batch`, filling `sweep_batch = 1`); every checkpoint this process
+  writes is always the current version.
 - `.mwsol` stores metadata/public-history recall separately from a sorted
   strategy index.  Each strategy block is an independent checked frame, so a
   Bridge page query reads only the requested blocks.

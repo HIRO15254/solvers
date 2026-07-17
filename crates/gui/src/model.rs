@@ -132,6 +132,9 @@ pub struct AlgorithmModel {
     pub exploration_epsilon: f64,
     pub discount_every: u64,
     pub discount_until: u64,
+    /// See `multiway::solver::SolverConfig::traverser_vector`. Only valid
+    /// when `abstraction.recall == RecallKind::Street`.
+    pub traverser_vector: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -280,6 +283,7 @@ impl Model {
                 exploration_epsilon: 0.06,
                 discount_every: 100_000,
                 discount_until: 10_000_000,
+                traverser_vector: false,
             },
             run: RunModel {
                 sweeps: 100_000,
@@ -670,6 +674,7 @@ pub fn model_to_solve_config(model: &Model) -> Result<SolveConfig, String> {
             exploration_epsilon: model.algorithm.exploration_epsilon,
             discount_every: model.algorithm.discount_every,
             discount_until: model.algorithm.discount_until,
+            traverser_vector: model.algorithm.traverser_vector,
         },
         run: run_model_to_section(&model.run),
     })
@@ -697,6 +702,7 @@ pub fn solve_config_to_model(
         exploration_epsilon,
         discount_every,
         discount_until,
+        traverser_vector,
     } = config.algorithm
     else {
         return Err(
@@ -719,6 +725,7 @@ pub fn solve_config_to_model(
             exploration_epsilon,
             discount_every,
             discount_until,
+            traverser_vector,
         },
         run: section_to_run_model(config.run, previous_run),
     })
@@ -753,6 +760,11 @@ pub fn validate(model: &Model) -> Vec<String> {
     }
     if let Err(error) = validate_run_section(&config.run) {
         errors.push(error);
+    }
+    if model.algorithm.traverser_vector && model.abstraction.recall != RecallKind::Street {
+        errors.push(
+            "algorithm.traverser_vector requires abstraction.recall = \"street\"".to_string(),
+        );
     }
     errors
 }
@@ -825,6 +837,39 @@ mod tests {
         assert!(toml_text.contains("recall = \"street\""));
         let reparsed = toml_to_model(&toml_text, &model.run).unwrap();
         assert_eq!(reparsed.abstraction.recall, RecallKind::Street);
+    }
+
+    #[test]
+    fn traverser_vector_round_trips_through_toml_and_defaults_to_false() {
+        let mut model = Model::new_default(6);
+        assert!(!model.algorithm.traverser_vector);
+        // The default (false) is omitted from the rendered TOML, same as
+        // every other algorithm field that is bit-identical to its
+        // historical behavior.
+        let default_toml = model_to_toml(&model).unwrap();
+        assert!(!default_toml.contains("traverser_vector"));
+
+        model.abstraction.recall = RecallKind::Street;
+        model.algorithm.traverser_vector = true;
+        let toml_text = model_to_toml(&model).unwrap();
+        assert!(toml_text.contains("traverser_vector = true"));
+        let reparsed = toml_to_model(&toml_text, &model.run).unwrap();
+        assert!(reparsed.algorithm.traverser_vector);
+        assert!(validate(&reparsed).is_empty());
+    }
+
+    #[test]
+    fn traverser_vector_without_street_recall_is_a_validation_error() {
+        let mut model = Model::new_default(6);
+        model.algorithm.traverser_vector = true;
+        // `abstraction.recall` is still `Full` (the default).
+        let errors = validate(&model);
+        assert!(
+            errors
+                .iter()
+                .any(|error| error.contains("traverser_vector")),
+            "expected a traverser_vector/recall validation error, got {errors:?}"
+        );
     }
 
     #[test]

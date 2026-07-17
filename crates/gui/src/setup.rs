@@ -594,6 +594,7 @@ fn economics_section(ui: &mut Ui, state: &mut SetupState) {
 }
 
 fn algorithm_section(ui: &mut Ui, state: &mut SetupState) {
+    let recall_is_street = state.model.abstraction.recall == model::RecallKind::Street;
     ui.collapsing("Algorithm", |ui| {
         let algorithm = &mut state.model.algorithm;
         ui.horizontal(|ui| {
@@ -616,6 +617,16 @@ fn algorithm_section(ui: &mut Ui, state: &mut SetupState) {
             ui.label("discount until:");
             ui.add(egui::DragValue::new(&mut algorithm.discount_until));
         });
+        ui.checkbox(
+            &mut algorithm.traverser_vector,
+            "vector traverser (fast, street-recall only)",
+        );
+        if algorithm.traverser_vector && !recall_is_street {
+            ui.colored_label(
+                Color32::from_rgb(0xd9, 0x4a, 0x3a),
+                "Vector traverser requires Recall / memory model = \"street\" above.",
+            );
+        }
     });
 }
 

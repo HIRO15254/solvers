@@ -4,16 +4,18 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-use cards::combo_cards;
+use cards::{combo_cards, rank_of};
 
 use crate::abstraction::{BucketContext, BucketId, BucketPath, MultiwayAbstraction};
-use crate::betting::{Action, BettingState, HandPhase};
+use crate::betting::{Action, BettingState, HandPhase, SeatStatus};
 use crate::config::{
     CompiledRake, MultiwayConfig, RakeConfig, RecallMode, UtilityConfig, ValidatedMultiwayConfig,
 };
 use crate::icm::{IcmEstimate, estimate_icm, terminal_icm_delta_with_baseline};
 use crate::sampler::{DealSampler, SampleError, SampledWorld};
-use crate::settlement::{Settlement, SettlementError, settle_showdown, settle_uncontested};
+use crate::settlement::{
+    Settlement, SettlementError, settle_ranked, settle_showdown, settle_uncontested,
+};
 use crate::solver::{ExternalSamplingGame, PrivateInfo};
 use crate::tree::DenseNodeContext;
 use crate::types::{MwChips, SeatId, SeatVec, Street};
@@ -213,7 +215,22 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
         actor: usize,
         street: Street,
     ) -> BucketId {
-        let combo = world.hole_combo(actor);
+        self.bucket_for_combo_and_street(state, world, world.hole_combo(actor), street)
+    }
+
+    /// Like [`Self::bucket_for_street`], but for an arbitrary hole combo
+    /// instead of the actor's own dealt one. Used by the vector-traverser
+    /// path (only valid for [`RecallMode::Street`], i.e. `street ==
+    /// state.street`, the only street `ExternalSamplingGame::bucket_for_combo`
+    /// ever queries) to bucket every feasible traverser combo against the
+    /// same fixed board/active-opponent context.
+    fn bucket_for_combo_and_street(
+        &self,
+        state: &BettingState,
+        world: &SampledWorld,
+        combo: usize,
+        street: Street,
+    ) -> BucketId {
         self.abstraction.bucket(BucketContext {
             street,
             board: world.board(street),
@@ -292,6 +309,82 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                 }
                 Ok(deltas)
             }
+        }
+    }
+
+    /// Vector-traverser terminal evaluation: the traverser's utility for
+    /// every combo in `combos`, appended to `out` in the same order.
+    ///
+    /// The betting line (and therefore the pot structure: refunds, side
+    /// pots, rake, eligible seats, and every *other* seat's rank) is fixed
+    /// for the whole traversal regardless of which traverser combo is being
+    /// evaluated -- only `traverser`'s own two cards vary. Each combo is
+    /// therefore settled by substituting it into `traverser`'s rank and
+    /// re-running the exact same tested [`settle_ranked`]/[`settle_uncontested`]
+    /// machinery [`Self::terminal_utilities`] uses (so any single combo's
+    /// result here is *identical*, by construction, to calling
+    /// [`Self::terminal_utilities`] with a world whose only difference is
+    /// `traverser`'s dealt combo). Pot construction and rake, which do not
+    /// depend on any hole cards, are therefore recomputed once per combo
+    /// (inside `settle_ranked`) rather than hoisted out of the loop --
+    /// deliberately simpler than a bespoke per-pot cache, and cheap relative
+    /// to the unavoidable per-combo 7-card rank evaluation.
+    fn terminal_utilities_for_combos(
+        &self,
+        state: &BettingState,
+        world: &SampledWorld,
+        traverser: usize,
+        combos: &[usize],
+        out: &mut Vec<f64>,
+    ) {
+        out.clear();
+        if combos.is_empty() {
+            return;
+        }
+        match state.phase {
+            HandPhase::Uncontested { .. } => {
+                // Card-independent: the traverser's stack delta is the same
+                // for every combo.
+                let value = self
+                    .settle_terminal(state, world)
+                    .map_err(HoldemGameError::from)
+                    .and_then(|settlement| self.utilities(&settlement))
+                    .map(|utilities| utilities[SeatId(traverser as u8)])
+                    .unwrap_or(f64::NAN);
+                out.resize(combos.len(), value);
+            }
+            HandPhase::Runout | HandPhase::Showdown => {
+                let board = *world.runout();
+                let folded = state.seats[SeatId(traverser as u8)].status == SeatStatus::Folded;
+                let mut base_ranks: Vec<Option<u16>> = Vec::with_capacity(state.num_seats());
+                for seat in state.seats.seats() {
+                    if seat.index() == traverser {
+                        base_ranks.push(None);
+                        continue;
+                    }
+                    if state.seats[seat].status == SeatStatus::Folded {
+                        base_ranks.push(None);
+                        continue;
+                    }
+                    let (first, second) = world.hole_cards(seat.index());
+                    base_ranks.push(Some(rank_of(board.into_iter().chain([first, second])).0));
+                }
+                for &combo in combos {
+                    let mut ranks = base_ranks.clone();
+                    if !folded {
+                        let (first, second) = combo_cards(combo);
+                        ranks[traverser] =
+                            Some(rank_of(board.into_iter().chain([first, second])).0);
+                    }
+                    let value = settle_ranked(state, SeatVec::new_unchecked(ranks), self.rake)
+                        .map_err(HoldemGameError::from)
+                        .and_then(|settlement| self.utilities(&settlement))
+                        .map(|utilities| utilities[SeatId(traverser as u8)])
+                        .unwrap_or(f64::NAN);
+                    out.push(value);
+                }
+            }
+            HandPhase::Betting => out.resize(combos.len(), f64::NAN),
         }
     }
 }
@@ -386,6 +479,27 @@ impl<A: MultiwayAbstraction> ExternalSamplingGame for HoldemGame<A> {
             active_opponents: state.non_folded_mask().len().saturating_sub(1) as u8,
             bucket_active_opponents: state.players_on_street(state.street).saturating_sub(1),
         }
+    }
+
+    fn bucket_for_combo(
+        &self,
+        state: &Self::State,
+        world: &SampledWorld,
+        _actor: usize,
+        combo: usize,
+    ) -> BucketId {
+        self.bucket_for_combo_and_street(state, world, combo, state.street)
+    }
+
+    fn terminal_utilities_for_combos(
+        &self,
+        state: &Self::State,
+        world: &SampledWorld,
+        traverser: usize,
+        combos: &[usize],
+        out: &mut Vec<f64>,
+    ) {
+        HoldemGame::terminal_utilities_for_combos(self, state, world, traverser, combos, out);
     }
 
     fn terminal_utilities(&self, state: &Self::State, world: &SampledWorld, utilities: &mut [f64]) {
@@ -591,5 +705,148 @@ mod tests {
         )
         .unwrap();
         assert_eq!(first.game_fingerprint(), second.game_fingerprint());
+    }
+
+    /// Manually built 3-seat all-in showdown, mirroring
+    /// `settlement::tests::manual` (individual commits 5000/3000/1000 chips
+    /// -- i.e. 5/3/1 bb -- with no common pot, all-in): pot layers are a
+    /// 3000-chip main pot (all three seats eligible), a 4000-chip side pot
+    /// (only seats 0 and 1 eligible), and a 2000-chip refund to seat 0.
+    fn manual_three_way_allin() -> BettingState {
+        use crate::betting::SeatState;
+        use crate::types::SeatMask;
+        let individual = [5_000u64, 3_000, 1_000];
+        let seats = individual
+            .iter()
+            .map(|&amount| SeatState {
+                starting_stack: MwChips(amount),
+                remaining: MwChips::ZERO,
+                status: SeatStatus::AllIn,
+                dead_committed: MwChips::ZERO,
+                common_committed: MwChips::ZERO,
+                street_committed: [MwChips(amount), MwChips::ZERO, MwChips::ZERO, MwChips::ZERO],
+                raise_reopen_at: None,
+            })
+            .collect();
+        BettingState {
+            seats: SeatVec::try_new(seats).unwrap(),
+            button: SeatId(0),
+            small_blind_seat: SeatId(1),
+            big_blind_seat: SeatId(2),
+            big_blind: MwChips(1_000),
+            street: Street::River,
+            street_active_players: [3; 4],
+            to_act: None,
+            bet_to_match: MwChips::ZERO,
+            last_full_raise: MwChips(1_000),
+            full_wager_established: false,
+            pending: SeatMask::EMPTY,
+            aggressive_actions: 0,
+            flop_dealt: true,
+            phase: HandPhase::Showdown,
+            preflop_voluntary_call_seen: false,
+        }
+    }
+
+    /// Correctness oracle: for a fixed side-pot showdown and fixed
+    /// opponents, [`HoldemGame::terminal_utilities_for_combos`] (the
+    /// vector-traverser terminal path) must agree, combo by combo, with the
+    /// existing scalar [`ExternalSamplingGame::terminal_utilities`] applied
+    /// to a world whose only difference is the traverser's own dealt combo.
+    /// Covers a combo that ties an opponent for both pots and a combo that
+    /// wins/loses the side pot differently from the main pot.
+    #[test]
+    fn vector_terminal_utilities_match_scalar_settlement_for_several_combos() {
+        let mut game_config = config();
+        game_config.seats[0].stack_bb = 5.0;
+        game_config.seats[1].stack_bb = 3.0;
+        game_config.seats[2].stack_bb = 1.0;
+        let game = HoldemGame::new(
+            &game_config,
+            &UtilityConfig::ChipEv,
+            &RakeConfig::None,
+            FeatureHashAbstraction::default(),
+        )
+        .unwrap();
+        let state = manual_three_way_allin();
+
+        let card = |text: &str| text.parse::<cards::Card>().unwrap();
+        let board = [card("2c"), card("7d"), card("9h"), card("Jc"), card("4s")];
+        let seat1 = combo_index(card("Ah"), card("Kd"));
+        let seat2 = combo_index(card("3h"), card("3d"));
+        // Ties seat1's ace-high exactly (same board, no flush possible).
+        let hero_tie = combo_index(card("Ad"), card("Ks"));
+        // Trip jacks: beats both opponents outright on every pot.
+        let hero_win = combo_index(card("Jd"), card("Js"));
+        // Jack-high: loses the main pot to seat2's pair and the side pot to
+        // seat1's ace-high.
+        let hero_lose = combo_index(card("5h"), card("6d"));
+
+        let base_world = SampledWorld::new(vec![hero_win, seat1, seat2], board).unwrap();
+        let combos = [hero_tie, hero_win, hero_lose];
+        let mut vector_utilities = Vec::new();
+        game.terminal_utilities_for_combos(&state, &base_world, 0, &combos, &mut vector_utilities);
+        assert_eq!(vector_utilities.len(), combos.len());
+
+        for (&combo, &vector_utility) in combos.iter().zip(&vector_utilities) {
+            let world = SampledWorld::new(vec![combo, seat1, seat2], board).unwrap();
+            let mut scalar_utilities = vec![0.0; 3];
+            game.terminal_utilities(&state, &world, &mut scalar_utilities);
+            assert!(
+                (scalar_utilities[0] - vector_utility).abs() < 1e-9,
+                "combo {combo}: vector {vector_utility} != scalar {}",
+                scalar_utilities[0]
+            );
+        }
+
+        // Sanity-check the three constructed outcomes actually exercise
+        // win/tie/lose, with hand-worked expected bb deltas:
+        // - refund (the uncalled 2000-chip / 2bb top of hero's stack) always
+        //   comes back to hero regardless of cards;
+        // - `hero_win` (trips) wins the 3000-chip main pot (all three
+        //   eligible) and the 4000-chip side pot (only hero/seat1 eligible)
+        //   outright: (2000 refund + 3000 + 4000 - 5000 start) / 1000 = 4.0.
+        // - `hero_tie` ties seat1's ace-high exactly, but seat2's pair beats
+        //   both of them in the main pot, so hero only splits the side pot
+        //   with seat1: (2000 + 0 + 2000 - 5000) / 1000 = -1.0.
+        // - `hero_lose` loses the main pot to seat2's pair and the side pot
+        //   to seat1's ace-high: (2000 + 0 + 0 - 5000) / 1000 = -3.0.
+        let [tie_utility, win_utility, lose_utility] = [
+            vector_utilities[0],
+            vector_utilities[1],
+            vector_utilities[2],
+        ];
+        assert_eq!(win_utility, 4.0);
+        assert_eq!(tie_utility, -1.0);
+        assert_eq!(lose_utility, -3.0);
+    }
+
+    #[test]
+    fn vector_terminal_utilities_are_constant_for_uncontested_pots() {
+        let game = HoldemGame::new(
+            &config(),
+            &UtilityConfig::ChipEv,
+            &RakeConfig::None,
+            FeatureHashAbstraction::default(),
+        )
+        .unwrap();
+        let mut state = manual_three_way_allin();
+        state.phase = HandPhase::Uncontested { winner: SeatId(1) };
+        state.seats[SeatId(0)].status = SeatStatus::Folded;
+        state.seats[SeatId(2)].status = SeatStatus::Folded;
+
+        let card = |text: &str| text.parse::<cards::Card>().unwrap();
+        let board = [card("2c"), card("7d"), card("9h"), card("Jc"), card("4s")];
+        let seat1 = combo_index(card("Ah"), card("Kd"));
+        let seat2 = combo_index(card("3h"), card("3d"));
+        let combo_a = combo_index(card("Ad"), card("Ks"));
+        let combo_b = combo_index(card("Jd"), card("Js"));
+        let world = SampledWorld::new(vec![combo_a, seat1, seat2], board).unwrap();
+
+        let mut out = Vec::new();
+        game.terminal_utilities_for_combos(&state, &world, 0, &[combo_a, combo_b], &mut out);
+        assert_eq!(out.len(), 2);
+        assert_eq!(out[0], out[1]);
+        assert!(out[0].is_finite());
     }
 }

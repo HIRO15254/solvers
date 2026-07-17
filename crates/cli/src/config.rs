@@ -265,6 +265,15 @@ pub enum AlgorithmSection {
         discount_every: u64,
         #[serde(default = "default_discount_until")]
         discount_until: u64,
+        /// Enables "vector-traverser" external sampling (see
+        /// `multiway::solver::SolverConfig::traverser_vector`): one
+        /// traversal updates every feasible hole combo of the sampled
+        /// traverser seat at once, instead of only the one combo the deal
+        /// sampler dealt it. Only valid with `game.abstraction.recall =
+        /// "street"`. `false` (the default) is the original algorithm,
+        /// byte-identical to before this field existed.
+        #[serde(default, skip_serializing_if = "is_false")]
+        traverser_vector: bool,
     },
 }
 
@@ -304,6 +313,10 @@ pub(crate) fn default_gamma0() -> f64 {
 }
 fn default_true() -> bool {
     true
+}
+
+fn is_false(value: &bool) -> bool {
+    !*value
 }
 
 fn default_sb_bb() -> f64 {
@@ -428,6 +441,40 @@ mod tests {
             .validate_economics(&utility, &rake)
             .expect("re-parsed multiway config must still validate");
         assert!(run.sweeps.is_some() || run.iterations > 0);
+    }
+
+    #[test]
+    fn traverser_vector_defaults_to_false_and_is_omitted_when_unset() {
+        let raw = include_str!("../../../examples/preflop_multiway_9max.toml");
+        let mut config: SolveConfig = toml::from_str(raw).expect("parse example multiway config");
+        let AlgorithmSection::ExternalSamplingMccfr {
+            traverser_vector, ..
+        } = &config.algorithm
+        else {
+            panic!("expected schedule = \"external-sampling-mccfr\"");
+        };
+        assert!(!traverser_vector);
+        let serialized = toml::to_string(&config).unwrap();
+        assert!(!serialized.contains("traverser_vector"));
+
+        let AlgorithmSection::ExternalSamplingMccfr {
+            traverser_vector, ..
+        } = &mut config.algorithm
+        else {
+            unreachable!("checked above");
+        };
+        *traverser_vector = true;
+        let serialized = toml::to_string(&config).unwrap();
+        assert!(serialized.contains("traverser_vector = true"));
+        let reparsed: SolveConfig =
+            toml::from_str(&serialized).expect("re-parse the serialized config");
+        let AlgorithmSection::ExternalSamplingMccfr {
+            traverser_vector, ..
+        } = reparsed.algorithm
+        else {
+            panic!("expected schedule = \"external-sampling-mccfr\"");
+        };
+        assert!(traverser_vector);
     }
 
     #[test]

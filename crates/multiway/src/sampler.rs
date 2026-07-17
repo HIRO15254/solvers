@@ -131,6 +131,19 @@ impl WeightedRange {
         // also skips zero-weight plateaus correctly.
         self.cumulative.partition_point(|&x| x <= needle)
     }
+
+    /// Recovers `combo`'s range weight from the cumulative table (its build
+    /// invariant: `cumulative[c] - cumulative[c-1] == weight(c)`, `0.0` for
+    /// `c == 0`), avoiding a second, separate per-combo weight table.
+    fn weight_of(&self, combo: usize) -> f64 {
+        let upper = self.cumulative[combo];
+        let lower = if combo == 0 {
+            0.0
+        } else {
+            self.cumulative[combo - 1]
+        };
+        (upper - lower).max(0.0)
+    }
 }
 
 /// A sampled world together with the rejection work required to obtain it.
@@ -279,6 +292,42 @@ impl DealSampler {
         Err(SampleError::AttemptsExhausted {
             attempts: self.max_attempts,
         })
+    }
+
+    /// Feasible hole-combo set for `seat` in `world`, used by the
+    /// vector-traverser dense path: every positive-weight combo in `seat`'s
+    /// configured range that does not intersect any other seat's sampled
+    /// hole cards nor the sampled runout. `world`'s own dealt combo for
+    /// `seat` is deliberately not special-cased (it may or may not appear in
+    /// the returned set on its own merits); the deal stream that produced
+    /// `world` is otherwise unchanged by this query. Returned in the range's
+    /// deterministic support order, as `(combo, weight)` pairs.
+    pub fn feasible_combos(&self, seat: usize, world: &SampledWorld) -> Vec<(usize, f64)> {
+        let mut dead = CardSet::EMPTY;
+        for other in 0..world.num_players() {
+            if other == seat {
+                continue;
+            }
+            let (a, b) = world.hole_cards(other);
+            dead.insert(a);
+            dead.insert(b);
+        }
+        for &card in world.runout() {
+            dead.insert(card);
+        }
+        let range = &self.ranges[seat];
+        range
+            .support
+            .iter()
+            .filter_map(|&combo| {
+                let (a, b) = combo_cards(combo);
+                if dead.contains(a) || dead.contains(b) {
+                    None
+                } else {
+                    Some((combo, range.weight_of(combo)))
+                }
+            })
+            .collect()
     }
 
     fn sample_uniform_world<R: Rng + ?Sized>(&self, rng: &mut R) -> SampledWorld {

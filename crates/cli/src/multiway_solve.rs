@@ -39,6 +39,10 @@ struct ResultV2 {
     traversals_per_second: f64,
     total_deal_attempts: u64,
     mean_deal_attempts: f64,
+    /// See `multiway::solver::SolverState::hand_updates`. Compare against a
+    /// range-based solver's "hands/s".
+    hand_updates: u64,
+    hand_updates_per_second: f64,
     seats: Vec<formats::MultiwaySeatMetrics>,
     strategy_blocks: usize,
     config_hash: String,
@@ -314,6 +318,12 @@ fn run_inner(
         },
         total_deal_attempts: final_metrics.total_deal_attempts,
         mean_deal_attempts: final_metrics.mean_deal_attempts,
+        hand_updates: final_metrics.hand_updates,
+        hand_updates_per_second: if elapsed > 0.0 {
+            final_metrics.hand_updates as f64 / elapsed
+        } else {
+            0.0
+        },
         seats: last_row.seats.clone(),
         strategy_blocks: snapshot.policies.len(),
         config_hash: formats::config_hash_hex(&mw_session.config_hash),
