@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::mpsc::{self, Receiver, Sender, TryRecvError};
 use std::thread::JoinHandle;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use cli::session::{self, MultiwaySession};
 use eframe::egui;
@@ -36,9 +36,17 @@ const RATE_EWMA_ALPHA: f64 = 0.3;
 /// `O(node's buckets)` scan, cheap but not free).
 const NODE_SNAPSHOT_THROTTLE_MILLIS: u128 = 500;
 
-/// Refresh throttle for the O(infosets) [`multiway::solver::MultiwaySolver::metrics`]
-/// call backing a [`ProgressSnapshot`]'s infoset/memory readout.
-const METRICS_THROTTLE_MILLIS: u128 = 250;
+/// Minimum interval between O(infosets) [`multiway::solver::MultiwaySolver::metrics`]
+/// refreshes backing a [`ProgressSnapshot`]'s infoset/memory readout. The
+/// effective interval is adaptive: `max` of this floor and
+/// [`METRICS_COST_MULTIPLIER`] times the last scan's own measured duration,
+/// so the scan can never consume more than ~1/[`METRICS_COST_MULTIPLIER`]
+/// of wall time no matter how large the arena is.
+const METRICS_THROTTLE_MILLIS: u64 = 250;
+
+/// See [`METRICS_THROTTLE_MILLIS`]: caps the metrics scan's share of wall
+/// time at roughly `1 / METRICS_COST_MULTIPLIER` (~5%).
+const METRICS_COST_MULTIPLIER: u32 = 20;
 
 #[derive(Debug, Clone)]
 pub enum WorkerCmd {
@@ -327,9 +335,19 @@ fn run(
     let mut prior: HashMap<InfoKey, Vec<f32>> = HashMap::new();
     mw_session.solver.strategy_drift_refresh(&mut prior);
     let mut last_drift = vec![0.0; mw_session.game_config.seats.len()];
-    // Full SolverMetrics costs O(infosets); refresh at most a few times per
-    // second and reuse the last reading for in-between progress frames.
+    // Full SolverMetrics costs O(infosets) -- on a large dense arena a
+    // single scan can take longer than a whole solve chunk, so a fixed
+    // refresh cadence would let this bookkeeping dominate wall time. The
+    // interval adapts to the measured scan cost instead: at least
+    // `METRICS_THROTTLE_MILLIS`, and never more often than
+    // `METRICS_MAX_DUTY.recip()` of wall time (20x the last scan's own
+    // duration), so the readout stays fresh on small games and caps at ~5%
+    // overhead on huge ones. In-between progress frames reuse the last
+    // reading; evaluation boundaries always refresh.
+    let metrics_started = Instant::now();
     let mut last_metrics = mw_session.solver.metrics();
+    let mut metrics_interval = (metrics_started.elapsed() * METRICS_COST_MULTIPLIER)
+        .max(Duration::from_millis(METRICS_THROTTLE_MILLIS));
     let mut last_metrics_at = Instant::now();
     // Live node-strategy view (see `WorkerCmd::WatchNode`): `watch_dirty`
     // accumulates across every `drain_commands` call since the last
@@ -457,8 +475,11 @@ fn run(
         }
 
         let at_evaluation = sweeps_now % mw_session.evaluation_cadence == 0;
-        if at_evaluation || last_metrics_at.elapsed().as_millis() >= METRICS_THROTTLE_MILLIS {
+        if at_evaluation || last_metrics_at.elapsed() >= metrics_interval {
+            let metrics_started = Instant::now();
             last_metrics = mw_session.solver.metrics();
+            metrics_interval = (metrics_started.elapsed() * METRICS_COST_MULTIPLIER)
+                .max(Duration::from_millis(METRICS_THROTTLE_MILLIS));
             last_metrics_at = Instant::now();
         }
         let metrics = &last_metrics;
