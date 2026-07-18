@@ -632,16 +632,29 @@ moderate threshold preserves real mixes while removing noise; exported
 deviators attacking it) from the linear average to the LAST-ITERATE
 regret-matched current strategy. Plain regret matching carries no
 last-iterate guarantee — the average is the object with the CCE-style
-bound — but measured on the same checkpoint the last iterate was
-consistently TIGHTER than the average across two evaluation seeds
-(maxDevUp 0.181/0.168bb vs 0.543/0.424bb; with argmax purification
-0.143/0.072bb, the tightest profile measured), plausibly because the
-calibrated linear discounting keeps regrets dominated by recent, nearly
-converged play. If this held up across configs and run lengths it would
-justify a last-iterate output mode that drops the `strategy_sum` half of
-the dense arena entirely — halving arena memory and doubling the
-affordable bucket ladder (see the MMD/QRE literature for methods with an
-actual last-iterate guarantee); for now the exported profile remains the
+bound — but a replication sweep (run lengths 50k–500k, a second solve
+seed, a 25bb config, adjacent 200k/210k checkpoints, two evaluation
+seeds each) found:
+
+- The PURIFIED last iterate (argmax) was the tightest profile at every
+  single checkpoint measured (maxDevUp 0.00–0.18bb, vs 0.14–1.70bb for
+  the raw average), including both configs and both solve seeds.
+- The RAW last iterate beat the raw average everywhere up to ~200k
+  sweeps (roughly 2–3x tighter), but at 500k the comparison became
+  mixed (0.57/0.12bb across evaluation seeds vs the average's
+  0.34/0.20bb): with enough sweeps the average catches up while the
+  current iterate keeps wobbling.
+- Adjacent checkpoints (200k vs 210k) gave similar current-iterate
+  bounds, so the iterate is not oscillating wildly at that scale.
+
+Caveat on the near-zero numbers: a deviation-gain LOWER bound of ~0.00
+against a pure (argmax) profile only says our trained-plus-greedy
+deviators found nothing — a true best response may well exploit the
+determinism harder. Still, the pattern justifies the roadmap item of a
+last-iterate output mode that drops the `strategy_sum` half of the dense
+arena entirely — halving arena memory and doubling the affordable bucket
+ladder (see the MMD/QRE literature for methods with an actual
+last-iterate guarantee); for now the exported profile remains the
 guaranteed average, and this stays a diagnostic.
 
 ### Auto-materialized sampling and discount settings
