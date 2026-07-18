@@ -1,5 +1,6 @@
-<!-- 実装計画書: multiway プリフロップソルバーのネイティブ GUI 同梱 + i16 保存 + 設定拡張。
-     実装完了後は仕様の生き残る部分を architecture.md / multiway-preflop.md に反映する。 -->
+<!-- 状態: 実装完了(2026-07)。本書は設計記録として保持する — 現行仕様は
+     architecture.md / multiway-preflop.md が正。コード内の doc コメントが
+     本書のセクション記号(C/E/F)を参照しているため削除しない。 -->
 
 # Native GUI / i16 artifact / config-extension plan
 

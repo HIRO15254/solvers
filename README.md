@@ -34,7 +34,8 @@ crates/
 ├── multiway    # generative 2–9 seat NLHE + external-sampling MCCFR
 ├── formats     # v1 HU and v2 multiway metrics/checkpoints/solution artifacts
 ├── holdem      # Mode A: exact multi-street postflop solving, aggregation/equity helpers
-└── cli         # `solvers` binary: solve / inspect / report
+├── cli         # `solvers` binary: solve / resume / inspect / report / serve / bench / mw-eval
+└── gui         # `solvers-gui` binary: native egui workbench (Setup / Solve / Results)
 ```
 
 The `web/` directory contains the preflop workbench: a responsive 169-class

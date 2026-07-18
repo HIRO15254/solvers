@@ -59,6 +59,8 @@ formats スキーマ v1 凍結 → `wasm` viewer-only 静的サイト(`.sol` 読
 
 **Delivered:** deterministic sample-id merge（thread数変更・再開を含む）、4 MiB chunked `.mwckpt` v3、indexed `.mwsol` v2、Bridge v2 managed resume、4 canonical Web presets、9-max 8/8/8 smoke・64/64/64 desktop benchmark・3-player full-enumeration oracleを受入契約として固定。
 
+> **M9 進捗(2026-07-16..18、高速化・収束・GUI 波)**: ネイティブ GUI(`crates/gui`、egui)+ i16 `.mwsol`。rollout v2(board 正準ストリーム)と EHS² テーブルバックエンドで HRC 級スループット(783k→1.4M hu/s)、HRC 型 check-down `max_betting_players`(dense arena 163 分の 1)。Auto モード(マシン検出→バケットラダー/sweep_batch/収束停止しきい値の実体化)+ 収束停止ルール(devGainLB CI 上界 × 確認回数、適応サンプル倍加)+ **BR バースト**(凍結平均相手に逸脱者を訓練し greedy との per-seat max — 停止証明の強化)。Pluribus 型 regret 枝刈り(-10×スタック校正、+3-4%)、`ε=0`+割引 10k 細粒化(同品質到達 sweep 数 ~半分)。計測系: `mw-eval`(purification/thresholding — argmax で 2.6 倍タイト、last-iterate 診断 — 実用ラン長で平均よりタイト)。**実測で棄却**: 動的枝刈りしきい値、warm-start バケットラダー(粗フェーズが 1.26 倍しか速くなく回収不能 → 撤去)、VR-MCCFR ベースライン、MMD/QRE 移行(メモリが希少でなくなり売りが消滅)、バケット 4096(200k sweep では推定ノイズ律速で悪化)。詳細な採否根拠は `docs/multiway-preflop.md` と計測ログ参照。
+
 > 根拠: external-sampling MCCFR は Lanctot et al. (NeurIPS 2009)。多人数・一般和で HU zero-sum と同じ Nash 保証がない境界は Gibson et al. (2013) に従う。straddle、missed/dead blind、multiple runouts、bounty、FGS、re-entry、PLO はこの milestone の対象外。
 
 ## 横断事項(M0 から)
