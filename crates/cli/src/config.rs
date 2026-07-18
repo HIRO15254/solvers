@@ -453,6 +453,14 @@ pub struct RunSection {
     /// Must be positive when supplied.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stop_eval_period_secs: Option<f64>,
+    /// Number of best-response training traversals per seat, run against the
+    /// frozen current average profile immediately before each stop-rule
+    /// evaluation (never before the ordinary `evaluation_cadence` rows).
+    /// `Some(0)` disables the burst (the stop rule falls back to the plain
+    /// regret-greedy heuristic, exactly as before this field existed).
+    /// Defaults to `2_000` when `stop_dev_gain` is set; ignored otherwise.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_br_traversals: Option<u64>,
     /// Enables warm-start-from-a-coarser-bucket-abstraction (see
     /// `multiway::solver::MultiwaySolver::apply_warm_start`): before building
     /// the real (fine-bucketed) solver, run a short solve at this uniform
@@ -834,18 +842,20 @@ iterations = 10
         assert_eq!(baseline.run.stop_dev_gain, None);
         assert_eq!(baseline.run.stop_confirmations, None);
         assert_eq!(baseline.run.stop_eval_period_secs, None);
+        assert_eq!(baseline.run.stop_br_traversals, None);
         let serialized = toml::to_string(&baseline).unwrap();
         assert!(!serialized.contains("stop_dev_gain"));
         assert!(!serialized.contains("stop_confirmations"));
         assert!(!serialized.contains("stop_eval_period_secs"));
+        assert!(!serialized.contains("stop_br_traversals"));
 
-        // Splice the three new keys into the example's existing `[run]`
+        // Splice the four new keys into the example's existing `[run]`
         // table, right after its last key.
         let anchor = "evaluation_cadence = 1\n";
         let spliced = raw.replacen(
             anchor,
             &format!(
-                "{anchor}stop_dev_gain = 0.05\nstop_confirmations = 3\nstop_eval_period_secs = 5.0\n"
+                "{anchor}stop_dev_gain = 0.05\nstop_confirmations = 3\nstop_eval_period_secs = 5.0\nstop_br_traversals = 500\n"
             ),
             1,
         );
@@ -855,15 +865,18 @@ iterations = 10
         assert_eq!(config.run.stop_dev_gain, Some(0.05));
         assert_eq!(config.run.stop_confirmations, Some(3));
         assert_eq!(config.run.stop_eval_period_secs, Some(5.0));
+        assert_eq!(config.run.stop_br_traversals, Some(500));
 
         let reserialized = toml::to_string(&config).unwrap();
         assert!(reserialized.contains("stop_dev_gain = 0.05"));
         assert!(reserialized.contains("stop_confirmations = 3"));
         assert!(reserialized.contains("stop_eval_period_secs = 5.0"));
+        assert!(reserialized.contains("stop_br_traversals = 500"));
         let reparsed: SolveConfig = toml::from_str(&reserialized).unwrap();
         assert_eq!(reparsed.run.stop_dev_gain, Some(0.05));
         assert_eq!(reparsed.run.stop_confirmations, Some(3));
         assert_eq!(reparsed.run.stop_eval_period_secs, Some(5.0));
+        assert_eq!(reparsed.run.stop_br_traversals, Some(500));
     }
 
     #[test]

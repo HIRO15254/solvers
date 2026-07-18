@@ -787,6 +787,7 @@ fn run_model_to_section(model: &RunModel) -> RunSection {
         stop_dev_gain: model.stop_dev_gain,
         stop_confirmations: model.stop_confirmations,
         stop_eval_period_secs: model.stop_eval_period_secs,
+        stop_br_traversals: None,
         warm_start_buckets: None,
         warm_start_sweeps: None,
     }

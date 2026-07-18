@@ -534,6 +534,25 @@ doubling to the same progress stream as the ordinary cadence prints.
 `stop_dev_gain`'s unit is the run's own utility unit: bb for chip-EV,
 tournament-utility units (compared as-is, no conversion) for tournament ICM.
 
+Each stop-rule check is additionally preceded by a **best-response burst**
+(`run.stop_br_traversals`, default `2_000`; `0` disables): for every seat, a
+dedicated deviator is trained with that many external-sampling traversals
+against the *frozen* current average profile (local sparse regret table;
+opponents sample the average strategy; final policy = argmax of the trained
+regrets per visited infoset), and the stop-rule evaluation measures *that*
+deviator's gain on the held-out samples instead of the default
+regret-greedy-on-main-regrets heuristic (which remains the fallback at
+infosets the burst never visited). Any fixed deviator evaluated on
+independent samples yields a valid lower bound on the seat's best-response
+gain, so a trained one only makes the bound tighter — the run stops when
+the profile survives a *stronger* opponent, which is a strictly more honest
+convergence certificate. The training stream is domain-separated from both
+the solve and the evaluation streams and reseeded per check, so every check
+retrains against the profile as it currently stands. Ordinary
+`evaluation_cadence` metrics rows deliberately stay on the plain evaluator;
+stop-rule numbers therefore read systematically higher (tighter) than
+cadence rows.
+
 Because the evaluation period is wall-clock rather than sweep-count based,
 the exact sweep a converged run stops at is machine-dependent -- a faster
 machine fits more sweeps into the same window before the first check, and

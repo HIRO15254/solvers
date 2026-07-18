@@ -55,6 +55,10 @@ pub struct StopRule {
     pub confirmations: u32,
     /// Wall-clock period, in seconds, between stop-rule evaluations.
     pub eval_period_secs: f64,
+    /// Best-response training traversals per seat per stop-rule evaluation
+    /// (see `crate::config::RunSection::stop_br_traversals`). `0` disables
+    /// the burst.
+    pub br_traversals: u64,
 }
 
 /// Everything needed to run (or resume) a multiway solve: the constructed
@@ -84,6 +88,9 @@ pub struct MultiwaySession {
 /// when `run.stop_dev_gain` is set but the corresponding key is omitted.
 const DEFAULT_STOP_CONFIRMATIONS: u32 = 2;
 const DEFAULT_STOP_EVAL_PERIOD_SECS: f64 = 30.0;
+/// Default [`StopRule::br_traversals`] when `run.stop_dev_gain` is set but
+/// `run.stop_br_traversals` is omitted.
+const DEFAULT_STOP_BR_TRAVERSALS: u64 = 2_000;
 
 /// Parses `raw_toml`, validates it as a `kind = "preflop-multiway"` config,
 /// and builds a ready-to-run (or ready-to-resume) [`MultiwaySession`].
@@ -224,6 +231,7 @@ pub fn build_multiway_session(
         eval_period_secs: run
             .stop_eval_period_secs
             .unwrap_or(DEFAULT_STOP_EVAL_PERIOD_SECS),
+        br_traversals: run.stop_br_traversals.unwrap_or(DEFAULT_STOP_BR_TRAVERSALS),
     });
 
     let evaluation_samples = run.evaluation_samples.unwrap_or(256);
@@ -910,6 +918,7 @@ mod tests {
                 dev_gain_threshold: 0.5,
                 confirmations: DEFAULT_STOP_CONFIRMATIONS,
                 eval_period_secs: DEFAULT_STOP_EVAL_PERIOD_SECS,
+                br_traversals: DEFAULT_STOP_BR_TRAVERSALS,
             })
         );
     }
@@ -918,7 +927,7 @@ mod tests {
     fn stop_dev_gain_honors_explicit_confirmations_and_period() {
         let raw = with_stop_dev_gain(
             "0.5",
-            "stop_confirmations = 5\nstop_eval_period_secs = 12.5\n",
+            "stop_confirmations = 5\nstop_eval_period_secs = 12.5\nstop_br_traversals = 123\n",
         );
         let session = build_multiway_session(&raw, None).expect("build multiway session");
         assert_eq!(
@@ -927,6 +936,7 @@ mod tests {
                 dev_gain_threshold: 0.5,
                 confirmations: 5,
                 eval_period_secs: 12.5,
+                br_traversals: 123,
             })
         );
     }

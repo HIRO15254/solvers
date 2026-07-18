@@ -14,6 +14,7 @@ use eframe::egui;
 use formats::{MultiwaySolution, MwsolStorage};
 use multiway::checkpoint::MultiwayCheckpoint;
 use multiway::solver::{HistoryKey, InfoKey, NodeActionEvaluation, ProfileEvaluation};
+use rayon::prelude::*;
 
 /// Target wall-clock duration of one drive-loop chunk. Chunks are sized from
 /// the solver's own measured throughput (see `sweep_rate` in [`run`]) to hit
@@ -447,6 +448,7 @@ fn run(
     let mut stop_rule_samples = mw_session.evaluation_samples;
     let mut stop_confirmations_met: u32 = 0;
     let mut last_stop_eval = Instant::now();
+    let mut stop_eval_index: u64 = 0;
     // How this run finished; overwritten only by the three non-default
     // outcomes below, so a plain "ran out of sweeps" completion needs no
     // explicit assignment.
@@ -626,10 +628,59 @@ fn run(
             let elapsed_since_last = last_stop_eval.elapsed().as_secs_f64();
             if elapsed_since_last >= stop_rule.eval_period_secs {
                 last_stop_eval = Instant::now();
-                let evaluation = match mw_session
-                    .solver
-                    .evaluate_average_profile(stop_rule_samples, mw_session.evaluation_seed)
-                {
+                // Best-response burst: stop-rule evaluations measure a per-seat deviator
+                // TRAINED against the frozen current average profile rather than the
+                // plain regret-greedy heuristic the ordinary evaluation-cadence block
+                // above uses, so the deviation-gain numbers reported here are
+                // systematically tighter (higher) than a cadence row taken at the same
+                // sweep count. That is intentional: the stop decision should use the
+                // strongest available deviator, not the cheap heuristic every metrics
+                // row gets.
+                let training_seed = mw_session.evaluation_seed ^ 0x6252_5354 ^ stop_eval_index;
+                stop_eval_index += 1;
+                let deviators = if stop_rule.br_traversals > 0 {
+                    let num_players = mw_session.game_config.seats.len();
+                    let pool = match rayon::ThreadPoolBuilder::new()
+                        .num_threads(mw_session.threads)
+                        .build()
+                    {
+                        Ok(pool) => pool,
+                        Err(error) => {
+                            send(WorkerEvent::Failed(format!(
+                                "training best-response deviators for the convergence stop rule: {error}"
+                            )));
+                            return;
+                        }
+                    };
+                    let trained = pool.install(|| {
+                        (0..num_players)
+                            .into_par_iter()
+                            .map(|seat| {
+                                mw_session.solver.train_deviator(
+                                    seat,
+                                    stop_rule.br_traversals,
+                                    training_seed,
+                                )
+                            })
+                            .collect::<Result<Vec<_>, _>>()
+                    });
+                    match trained {
+                        Ok(trained) => Some(trained),
+                        Err(error) => {
+                            send(WorkerEvent::Failed(format!(
+                                "training best-response deviators for the convergence stop rule: {error}"
+                            )));
+                            return;
+                        }
+                    }
+                } else {
+                    None
+                };
+                let evaluation = match mw_session.solver.evaluate_average_profile_with(
+                    stop_rule_samples,
+                    mw_session.evaluation_seed,
+                    deviators.as_deref(),
+                ) {
                     Ok(evaluation) => evaluation,
                     Err(error) => {
                         send(WorkerEvent::Failed(format!(

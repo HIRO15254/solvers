@@ -30,6 +30,9 @@ pub const DEFAULT_DISCOUNT_EVERY: u64 = 100_000;
 pub const DEFAULT_DISCOUNT_UNTIL: u64 = 10_000_000;
 pub const DEFAULT_PRUNE_THRESHOLD: f64 = -1.0e6;
 pub const DEFAULT_PRUNE_SKIP_PROBABILITY: f64 = 0.95;
+/// Minimum training visits before an infoset's trained action enters a
+/// [`DeviatorPolicy`]; see [`MultiwaySolver::train_deviator`].
+pub const MIN_DEVIATOR_POLICY_VISITS: u32 = 8;
 const ENTRY_OVERHEAD_BYTES: u64 = 64;
 const HISTORY_OVERHEAD_BYTES: u64 = 48;
 
@@ -525,6 +528,16 @@ pub struct ProfileEvaluation {
     /// profile. This is a conservative candidate-policy diagnostic, not a
     /// best response, exploitability, or Nash-convergence claim.
     pub deviation_gain_lower_bound: Option<Vec<ProfileEstimate>>,
+}
+
+/// A fixed per-seat deviation policy trained by [`MultiwaySolver::train_deviator`]:
+/// for each information set it visited during training, the single action index
+/// it deviates to. Infosets it never visited fall back to the caller's usual
+/// deviation behavior (see [`MultiwaySolver::evaluate_average_profile_with`]).
+#[derive(Clone, Debug, PartialEq)]
+pub struct DeviatorPolicy {
+    pub seat: usize,
+    pub actions: FxHashMap<InfoKey, u16>,
 }
 
 /// One hand-group's row of [`evaluate_node_actions`]'s per-action EV
@@ -2288,6 +2301,169 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         }
     }
 
+    /// Trains a fixed deviation policy for `seat` against this solver's CURRENT
+    /// average profile (frozen for the duration of training -- this method takes
+    /// `&self` and never touches solver state). Runs `traversals` independent
+    /// external-sampling traversals: at `seat`'s own decision nodes, every action
+    /// is recursed into and a purely local, purely unweighted regret table is
+    /// updated (standard external-sampling MCCFR restricted to a single
+    /// traverser against a frozen opponent policy); at every other seat's
+    /// decision nodes, one action is sampled from that seat's stored average
+    /// strategy (uniform fallback for an infoset the main solver never visited).
+    /// Deterministic: identical `(seat, traversals, seed)` against identical
+    /// solver state always produces a bit-identical [`DeviatorPolicy`].
+    ///
+    /// Only information sets visited at least
+    /// [`MIN_DEVIATOR_POLICY_VISITS`] times make it into the returned
+    /// policy: the argmax of a one- or two-sample local regret is close to
+    /// random, and on a large tree a short burst sprinkles exactly such
+    /// single visits across thousands of deep infosets. Measured on a 6-max
+    /// auto-shape run, including those noisy entries made the trained
+    /// deviator strictly WEAKER than the plain regret-greedy heuristic it
+    /// was meant to improve on (its measured gain collapsed to zero);
+    /// leaving them out lets the evaluation's fallback (main-regret greedy,
+    /// which is densely trained precisely at those deep nodes) handle them
+    /// instead.
+    pub fn train_deviator(
+        &self,
+        seat: usize,
+        traversals: u64,
+        seed: u64,
+    ) -> Result<DeviatorPolicy, SolverError> {
+        let num_players = self.game.num_players();
+        if seat >= num_players {
+            return Err(SolverError::InvalidActor {
+                actor: seat,
+                num_players,
+            });
+        }
+        let mut regrets: FxHashMap<InfoKey, (Vec<f32>, u32)> = FxHashMap::default();
+        for traversal in 0..traversals {
+            let mut deal_rng = deviator_training_deal_rng(seed, seat, traversal);
+            let sample = self.sampler.sample_counted(&mut deal_rng)?;
+            let mut action_rng = deviator_training_action_rng(seed, seat, traversal);
+            self.train_deviator_traverse(
+                &sample.world,
+                seat,
+                self.game.root_state(),
+                HistoryKey::ROOT,
+                &mut regrets,
+                &mut action_rng,
+                0,
+            )?;
+        }
+        let actions = regrets
+            .into_iter()
+            .filter(|(_, (_, visits))| *visits >= MIN_DEVIATOR_POLICY_VISITS)
+            .map(|(key, (r, _))| (key, regret_greedy_action(&r) as u16))
+            .collect();
+        Ok(DeviatorPolicy { seat, actions })
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn train_deviator_traverse(
+        &self,
+        world: &SampledWorld,
+        seat: usize,
+        state: G::State,
+        history: HistoryKey,
+        regrets: &mut FxHashMap<InfoKey, (Vec<f32>, u32)>,
+        rng: &mut ChaCha20Rng,
+        depth: u32,
+    ) -> Result<f64, SolverError> {
+        if depth > self.config.max_traversal_depth {
+            return Err(SolverError::DepthLimit {
+                limit: self.config.max_traversal_depth,
+            });
+        }
+        let num_players = self.game.num_players();
+        let Some(actor) = self.game.actor(&state) else {
+            let mut utilities = vec![0.0; num_players];
+            self.game.terminal_utilities(&state, world, &mut utilities);
+            let utility = utilities[seat];
+            if !utility.is_finite() {
+                return Err(SolverError::NonFiniteUtility { seat, utility });
+            }
+            return Ok(utility);
+        };
+        if actor >= num_players {
+            return Err(SolverError::InvalidActor { actor, num_players });
+        }
+        let actions = self.game.node_actions(&state);
+        let num_actions = self.game.num_actions_of(&actions);
+        if num_actions == 0 {
+            return Err(SolverError::NoActions { actor });
+        }
+        let private = self.game.bucket(&state, world, actor);
+        validate_private_info(private, num_players, self.game.recall_mode())?;
+        let key = InfoKey {
+            history,
+            player: actor as u8,
+            street: private.street,
+            active_opponents: private.active_opponents,
+            bucket_path: private.bucket_path,
+        };
+        let labels = (0..num_actions)
+            .map(|index| self.game.action_label_of(&actions, index))
+            .collect::<Vec<_>>();
+        validate_action_labels(&labels)?;
+
+        if actor == seat {
+            let entry = regrets
+                .entry(key)
+                .or_insert_with(|| (vec![0.0f32; num_actions], 0));
+            if entry.0.len() != num_actions {
+                return Err(SolverError::ActionCountChanged {
+                    key,
+                    stored: entry.0.len(),
+                    current: num_actions,
+                });
+            }
+            entry.1 = entry.1.saturating_add(1);
+            let sigma = regret_matching(&entry.0);
+            let mut action_values = vec![0.0f64; num_actions];
+            for (action, value) in action_values.iter_mut().enumerate() {
+                let next = self.game.next_state_with(&state, &actions, action);
+                let child_history = history.child(actor, action);
+                *value = self.train_deviator_traverse(
+                    world,
+                    seat,
+                    next,
+                    child_history,
+                    regrets,
+                    rng,
+                    depth + 1,
+                )?;
+            }
+            let node_value = sigma
+                .iter()
+                .zip(&action_values)
+                .map(|(&p, &v)| p * v)
+                .sum::<f64>();
+            let entry = regrets.get_mut(&key).expect("inserted above");
+            for (regret, &value) in entry.0.iter_mut().zip(&action_values) {
+                checked_add_f32(regret, value - node_value)?;
+            }
+            Ok(node_value)
+        } else {
+            let stored = self.policy(key);
+            let strategy = if let Some(column) = &stored {
+                if column.action_labels != labels {
+                    return Err(SolverError::ActionLabelsChanged { key });
+                }
+                column.average_strategy()
+            } else {
+                vec![1.0 / num_actions as f32; num_actions]
+            };
+            let action = sample_profile_action(&strategy, rng);
+            let next = self.game.next_state_with(&state, &actions, action);
+            let child_history = history.child(actor, action);
+            self.train_deviator_traverse(world, seat, next, child_history, regrets, rng, depth + 1)
+        }
+    }
+
+    /// Equivalent to `evaluate_average_profile_with(samples, seed, None)`.
+    ///
     /// Held-out Monte Carlo evaluation of the stored average profile.
     ///
     /// Every sample has its own `(seed, sample_id)` substream. The method is
@@ -2305,14 +2481,71 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         samples: u64,
         seed: u64,
     ) -> Result<ProfileEvaluation, SolverError> {
+        self.evaluate_average_profile_with(samples, seed, None)
+    }
+
+    /// Held-out Monte Carlo evaluation of the stored average profile.
+    ///
+    /// Every sample has its own `(seed, sample_id)` substream. The method is
+    /// read-only: it does not advance training counters, change policy sums,
+    /// or share the training traversal's random stream. It also evaluates a
+    /// fixed candidate deviation for every seat on the same held-out physical
+    /// worlds. The candidate chooses the largest stored cumulative regret at
+    /// each visited information set and otherwise retains average-profile
+    /// play. The reported gain is paired against the baseline profile, then
+    /// transformed with the always-available no-deviation option: mean and
+    /// confidence endpoints are clamped at zero. This is only a lower bound
+    /// for that candidate set, never a full best-response calculation.
+    ///
+    /// Each seat's held-out deviation can optionally consider a
+    /// [`DeviatorPolicy`] trained by [`Self::train_deviator`] IN ADDITION TO
+    /// the plain regret-greedy heuristic: when `deviators` is present, both
+    /// candidates are replayed on every sample (the greedy candidate on the
+    /// exact RNG stream a plain [`Self::evaluate_average_profile`] would
+    /// use, so its estimate is identical to the plain call's) and each
+    /// seat's reported bound is the candidate with the higher estimated
+    /// mean. Each candidate alone is a fixed policy evaluated on held-out
+    /// samples — a valid lower bound — and picking the larger of two such
+    /// bounds can only delay a threshold-crossing stop decision, i.e. it is
+    /// conservative in exactly the direction that matters. (The obvious
+    /// alternative of REPLACING the greedy candidate with the trained one
+    /// was measured to weaken the bound on large trees: a short burst
+    /// leaves most deep infosets barely visited, and per-infoset noise
+    /// there loses to the densely trained main-regret greedy fallback.)
+    /// `deviators`, when present, must contain exactly one policy per seat,
+    /// seat-indexed (`deviators[i].seat == i`). Passing `None` is
+    /// byte-identical to [`Self::evaluate_average_profile`].
+    pub fn evaluate_average_profile_with(
+        &self,
+        samples: u64,
+        seed: u64,
+        deviators: Option<&[DeviatorPolicy]>,
+    ) -> Result<ProfileEvaluation, SolverError> {
         if samples == 0 {
             return Err(SolverError::ZeroEvaluationSamples);
         }
         let num_players = self.game.num_players();
+        if let Some(devs) = deviators {
+            if devs.len() != num_players {
+                return Err(SolverError::InvalidState(
+                    "deviators must contain exactly one policy per seat",
+                ));
+            }
+            for (seat, dev) in devs.iter().enumerate() {
+                if dev.seat != seat {
+                    return Err(SolverError::InvalidState(
+                        "deviators must be seat-indexed (deviators[i].seat == i)",
+                    ));
+                }
+            }
+        }
         let mut means = vec![0.0; num_players];
         let mut m2 = vec![0.0; num_players];
-        let mut gain_means = vec![0.0; num_players];
-        let mut gain_m2 = vec![0.0; num_players];
+        // Candidate 0: regret-greedy heuristic (always). Candidate 1: the
+        // trained deviator (only when `deviators` is present). Accumulated
+        // separately; the per-seat winner by mean is reported.
+        let mut gain_means = vec![[0.0; 2]; num_players];
+        let mut gain_m2 = vec![[0.0; 2]; num_players];
         let mut total_deal_attempts = 0u64;
 
         for sample_id in 0..samples {
@@ -2322,7 +2555,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 .checked_add(u64::from(sample.attempts))
                 .ok_or(SolverError::CounterOverflow)?;
             let mut profile_rng = evaluation_action_rng(seed, sample_id, None);
-            let utilities = self.evaluate_world(&sample.world, &mut profile_rng, None)?;
+            let utilities = self.evaluate_world(&sample.world, &mut profile_rng, None, None)?;
             let count = (sample_id + 1) as f64;
             for seat in 0..num_players {
                 let delta = utilities[seat] - means[seat];
@@ -2331,11 +2564,25 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
 
                 let mut deviation_rng = evaluation_action_rng(seed, sample_id, Some(seat));
                 let deviation =
-                    self.evaluate_world(&sample.world, &mut deviation_rng, Some(seat))?;
+                    self.evaluate_world(&sample.world, &mut deviation_rng, Some(seat), None)?;
                 let gain = deviation[seat] - utilities[seat];
-                let gain_delta = gain - gain_means[seat];
-                gain_means[seat] += gain_delta / count;
-                gain_m2[seat] += gain_delta * (gain - gain_means[seat]);
+                let gain_delta = gain - gain_means[seat][0];
+                gain_means[seat][0] += gain_delta / count;
+                gain_m2[seat][0] += gain_delta * (gain - gain_means[seat][0]);
+
+                if deviators.is_some() {
+                    let mut trained_rng = deviator_evaluation_action_rng(seed, sample_id, seat);
+                    let trained = self.evaluate_world(
+                        &sample.world,
+                        &mut trained_rng,
+                        Some(seat),
+                        deviators,
+                    )?;
+                    let gain = trained[seat] - utilities[seat];
+                    let gain_delta = gain - gain_means[seat][1];
+                    gain_means[seat][1] += gain_delta / count;
+                    gain_m2[seat][1] += gain_delta * (gain - gain_means[seat][1]);
+                }
             }
         }
 
@@ -2347,8 +2594,13 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         let deviation_gain_lower_bound = gain_means
             .into_iter()
             .zip(gain_m2)
-            .map(|(mean, sum_squared_error)| {
-                nonnegative_gain_estimate(mean, sum_squared_error, samples)
+            .map(|(seat_means, seat_m2)| {
+                let candidate = if deviators.is_some() && seat_means[1] > seat_means[0] {
+                    1
+                } else {
+                    0
+                };
+                nonnegative_gain_estimate(seat_means[candidate], seat_m2[candidate], samples)
             })
             .collect();
         Ok(ProfileEvaluation {
@@ -2364,6 +2616,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         world: &SampledWorld,
         rng: &mut ChaCha20Rng,
         deviator: Option<usize>,
+        deviators: Option<&[DeviatorPolicy]>,
     ) -> Result<Vec<f64>, SolverError> {
         let num_players = self.game.num_players();
         let mut state = self.game.root_state();
@@ -2414,9 +2667,16 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 vec![1.0 / num_actions as f32; num_actions]
             };
             let action = if deviator == Some(actor) {
-                match &stored {
-                    Some(column) => regret_greedy_action(&column.regrets),
-                    None => sample_profile_action(&strategy, rng),
+                let trained = deviators
+                    .and_then(|devs| devs[actor].actions.get(&key))
+                    .copied()
+                    .filter(|&index| (index as usize) < num_actions);
+                match trained {
+                    Some(index) => index as usize,
+                    None => match &stored {
+                        Some(column) => regret_greedy_action(&column.regrets),
+                        None => sample_profile_action(&strategy, rng),
+                    },
                 }
             } else {
                 sample_profile_action(&strategy, rng)
@@ -4447,6 +4707,39 @@ fn evaluation_action_rng(seed: u64, sample_id: u64, deviator: Option<usize>) -> 
     ChaCha20Rng::from_seed(*hasher.finalize().as_bytes())
 }
 
+/// Action stream for the TRAINED-deviator replay inside
+/// [`MultiwaySolver::evaluate_average_profile_with`]: distinct from
+/// `evaluation_action_rng(_, _, Some(seat))`, which stays reserved for the
+/// regret-greedy candidate replay so that candidate's estimate is exactly
+/// the one a plain [`MultiwaySolver::evaluate_average_profile`] call would
+/// produce.
+fn deviator_evaluation_action_rng(seed: u64, sample_id: u64, seat: usize) -> ChaCha20Rng {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"solvers.multiway.profile-evaluation-trained-deviation.v1");
+    hasher.update(&(seat as u64).to_le_bytes());
+    hasher.update(&seed.to_le_bytes());
+    hasher.update(&sample_id.to_le_bytes());
+    ChaCha20Rng::from_seed(*hasher.finalize().as_bytes())
+}
+
+fn deviator_training_deal_rng(seed: u64, seat: usize, traversal: u64) -> ChaCha20Rng {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"solvers.multiway.deviator-training-deal.v1");
+    hasher.update(&seed.to_le_bytes());
+    hasher.update(&(seat as u64).to_le_bytes());
+    hasher.update(&traversal.to_le_bytes());
+    ChaCha20Rng::from_seed(*hasher.finalize().as_bytes())
+}
+
+fn deviator_training_action_rng(seed: u64, seat: usize, traversal: u64) -> ChaCha20Rng {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"solvers.multiway.deviator-training-action.v1");
+    hasher.update(&seed.to_le_bytes());
+    hasher.update(&(seat as u64).to_le_bytes());
+    hasher.update(&traversal.to_le_bytes());
+    ChaCha20Rng::from_seed(*hasher.finalize().as_bytes())
+}
+
 fn traversals_for_player(traversals: u64, num_players: usize, player: usize) -> u64 {
     traversals / num_players as u64 + u64::from((player as u64) < traversals % num_players as u64)
 }
@@ -5017,6 +5310,150 @@ mod tests {
             a.seats
                 .iter()
                 .all(|seat| seat.ci95[0] <= seat.mean && seat.mean <= seat.ci95[1])
+        );
+    }
+
+    fn prefix_solver(seed: u64) -> MultiwaySolver<PrefixImportanceGame> {
+        MultiwaySolver::new(
+            PrefixImportanceGame,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            SolverConfig {
+                seed,
+                max_memory_bytes: 1 << 20,
+                max_traversal_depth: 16,
+                exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
+                discount_every: 5,
+                discount_until: 100,
+                sweep_batch: 1,
+                traverser_vector: false,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
+            },
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn train_deviator_is_deterministic() {
+        let mut solver = prefix_solver(41);
+        solver.run_sweeps(3).unwrap();
+        let first = solver.train_deviator(0, 300, 555).unwrap();
+        let second = solver.train_deviator(0, 300, 555).unwrap();
+        assert_eq!(first.actions, second.actions);
+        assert_eq!(first.seat, 0);
+        // A different seat/seed/traversal count must not accidentally
+        // collide with the same trained policy.
+        let other_seat = solver.train_deviator(1, 300, 555).unwrap();
+        assert_eq!(other_seat.seat, 1);
+    }
+
+    #[test]
+    fn evaluate_with_none_matches_plain_evaluation() {
+        let mut solver = prefix_solver(7);
+        solver.run_sweeps(5).unwrap();
+        let plain = solver.evaluate_average_profile(64, 999).unwrap();
+        let explicit_none = solver.evaluate_average_profile_with(64, 999, None).unwrap();
+        assert_eq!(plain, explicit_none);
+    }
+
+    #[test]
+    fn evaluate_with_rejects_mismatched_deviator_slices() {
+        let mut solver = prefix_solver(7);
+        solver.run_sweeps(2).unwrap();
+        let wrong_seat = vec![
+            DeviatorPolicy {
+                seat: 1,
+                actions: FxHashMap::default(),
+            },
+            DeviatorPolicy {
+                seat: 0,
+                actions: FxHashMap::default(),
+            },
+        ];
+        assert!(matches!(
+            solver.evaluate_average_profile_with(8, 1, Some(&wrong_seat)),
+            Err(SolverError::InvalidState(_))
+        ));
+        let wrong_len = vec![DeviatorPolicy {
+            seat: 0,
+            actions: FxHashMap::default(),
+        }];
+        assert!(matches!(
+            solver.evaluate_average_profile_with(8, 1, Some(&wrong_len)),
+            Err(SolverError::InvalidState(_))
+        ));
+    }
+
+    #[test]
+    // Only 1-2 real CFR sweeps run before evaluating, so seat 0's average
+    // strategy over "win"/"pass" is still close to uniform even though
+    // "win" always beats "pass" regardless of the opponent's action -- a
+    // trained deviator should find (and the regret-greedy heuristic may or
+    // may not fully find) that slack. Verified stable across several
+    // seed/sample-count choices during development (see PR discussion);
+    // this exact configuration (2 sweeps, 4096 samples, 4000 training
+    // traversals) was chosen because it was not flaky across repeated
+    // `cargo test --test-threads=1` runs. Per the spec, the comparison
+    // uses the max over seats (rather than a strict per-seat comparison)
+    // because the per-seat comparison was occasionally flaky: the
+    // regret-greedy baseline can, by chance, already be near-optimal for
+    // one particular seat on a given sample set while the trained
+    // deviator's held-out estimate for that same seat has more sampling
+    // noise, even though the trained deviator is uniformly at least as
+    // strong in aggregate.
+    fn trained_deviator_finds_gain_against_a_barely_trained_profile() {
+        let mut solver = prefix_solver(13);
+        solver.run_sweeps(2).unwrap();
+
+        let samples = 4096;
+        let seed = 2024;
+        let without = solver.evaluate_average_profile(samples, seed).unwrap();
+
+        let num_players = 2;
+        let training_traversals = 4000;
+        let training_seed = 909;
+        let deviators: Vec<DeviatorPolicy> = (0..num_players)
+            .map(|seat| {
+                solver
+                    .train_deviator(seat, training_traversals, training_seed)
+                    .unwrap()
+            })
+            .collect();
+        let with = solver
+            .evaluate_average_profile_with(samples, seed, Some(&deviators))
+            .unwrap();
+
+        let with_gains = with.deviation_gain_lower_bound.as_ref().unwrap();
+        let without_gains = without.deviation_gain_lower_bound.as_ref().unwrap();
+        assert!(with_gains.iter().all(|gain| gain.mean >= 0.0));
+
+        let with_max = with_gains
+            .iter()
+            .map(|gain| gain.mean)
+            .fold(f64::NEG_INFINITY, f64::max);
+        let without_max = without_gains
+            .iter()
+            .map(|gain| gain.mean)
+            .fold(f64::NEG_INFINITY, f64::max);
+        assert!(
+            with_max > 0.0,
+            "trained deviator found no gain at all: {with_max}"
+        );
+        // Sampling-noise guard: 4096 samples of a 0/1 paired gain have
+        // stderr on the order of 1e-2, so 1e-6 would be too tight if the
+        // two profiles were genuinely close; use a small multiple of the
+        // observed stderr instead of a bare constant.
+        let epsilon = 6.0
+            * with_gains
+                .iter()
+                .chain(without_gains.iter())
+                .map(|gain| gain.stderr)
+                .fold(0.0, f64::max);
+        assert!(
+            with_max >= without_max - epsilon,
+            "trained deviator ({with_max}) should be at least as strong as the regret-greedy \
+             heuristic ({without_max}) within noise guard {epsilon}"
         );
     }
 

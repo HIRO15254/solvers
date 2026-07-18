@@ -8,6 +8,7 @@ use anyhow::{Context, Result, anyhow};
 use formats::{MULTIWAY_SCHEMA_VERSION, MultiwayMetricsRow, MultiwayMetricsWriter};
 use multiway::solver::InfoKey;
 use multiway::{HoldemGame, MultiwaySolver};
+use rayon::prelude::*;
 use serde::Serialize;
 
 use crate::config::{GameSection, SolveConfig, StorageKind};
@@ -188,6 +189,7 @@ fn run_inner(
     let mut stop_rule_samples = mw_session.evaluation_samples;
     let mut stop_confirmations_met: u32 = 0;
     let mut last_stop_eval = Instant::now();
+    let mut stop_eval_index: u64 = 0;
 
     while mw_session.solver.completed_sweeps() < mw_session.sweeps_target {
         if cancel.is_some_and(|token| token.load(Ordering::Relaxed)) {
@@ -277,9 +279,49 @@ fn run_inner(
             && last_stop_eval.elapsed().as_secs_f64() >= stop_rule.eval_period_secs
         {
             last_stop_eval = Instant::now();
+            // Best-response burst: stop-rule evaluations measure a per-seat deviator
+            // TRAINED against the frozen current average profile rather than the
+            // plain regret-greedy heuristic the ordinary evaluation_cadence rows
+            // above use, so the deviation-gain numbers reported here are
+            // systematically tighter (higher) than a cadence row taken at the same
+            // sweep count. That is intentional: the stop decision should use the
+            // strongest available deviator, not the cheap heuristic every metrics
+            // row gets.
+            let training_seed = mw_session.evaluation_seed ^ 0x6252_5354 ^ stop_eval_index;
+            stop_eval_index += 1;
+            let deviators = if stop_rule.br_traversals > 0 {
+                let num_players = mw_session.game_config.seats.len();
+                let pool = rayon::ThreadPoolBuilder::new()
+                    .num_threads(mw_session.threads)
+                    .build()
+                    .map_err(|error| anyhow!("building deviator training thread pool: {error}"))?;
+                let trained = pool.install(|| {
+                    (0..num_players)
+                        .into_par_iter()
+                        .map(|seat| {
+                            mw_session.solver.train_deviator(
+                                seat,
+                                stop_rule.br_traversals,
+                                training_seed,
+                            )
+                        })
+                        .collect::<Result<Vec<_>, _>>()
+                });
+                Some(
+                    trained.context(
+                        "training best-response deviators for the convergence stop rule",
+                    )?,
+                )
+            } else {
+                None
+            };
             let evaluation = mw_session
                 .solver
-                .evaluate_average_profile(stop_rule_samples, mw_session.evaluation_seed)
+                .evaluate_average_profile_with(
+                    stop_rule_samples,
+                    mw_session.evaluation_seed,
+                    deviators.as_deref(),
+                )
                 .context("evaluating multiway profile for the convergence stop rule")?;
             let now = mw_session.solver.metrics();
             let drift = mw_session.solver.strategy_drift_refresh(&mut prior);
@@ -631,9 +673,13 @@ mod tests {
     /// sweep cap with status `"converged"`.
     #[test]
     fn stop_dev_gain_converges_before_the_sweep_cap_with_a_lax_threshold() {
+        // 50 best-response training traversals per seat is small enough to keep
+        // the test fast while genuinely exercising the training +
+        // evaluate_average_profile_with path.
         let raw = smoke_with_stop_rule(
             100_000,
-            "stop_dev_gain = 1000.0\nstop_confirmations = 1\nstop_eval_period_secs = 0.01\n",
+            "stop_dev_gain = 1000.0\nstop_confirmations = 1\nstop_eval_period_secs = 0.01\n\
+             stop_br_traversals = 50\n",
         );
         let config: SolveConfig = toml::from_str(&raw).expect("parse spliced config");
         let result = run_to_json(&raw, config);

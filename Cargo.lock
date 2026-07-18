@@ -1778,6 +1778,7 @@ dependencies = [
  "egui_plot",
  "formats",
  "multiway",
+ "rayon",
  "rfd",
  "serde",
  "sysinfo",
