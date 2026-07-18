@@ -478,12 +478,13 @@ The multiway artifact contracts are separate from frozen HU v1:
   table and per-frame, table, and aggregate BLAKE3 integrity checks. Postcard
   serialization is streamed through a temporary file instead of duplicating
   the full raw state in memory.
-- `.mwckpt` container version 5 adds `traverser_vector` to the serialized
-  `SolverConfig` and a `hand_updates` counter to `SolverState` (see
-  "Vector-traverser sampling" above). Loading transparently accepts version 4
-  (adds `sweep_batch` but not `traverser_vector`/`hand_updates`, filling
-  `traverser_vector = false`, `hand_updates = 0`) and version 3 (also missing
-  `sweep_batch`, filling `sweep_batch = 1`); every checkpoint this process
+- `.mwckpt` container version 6 adds the regret-pruning fields (`prune`,
+  `prune_threshold`, `prune_skip_probability`) to the serialized
+  `SolverConfig`. Version 5 added `traverser_vector` and a `hand_updates`
+  counter to `SolverState` (see "Vector-traverser sampling" above); loading
+  transparently accepts version 5 (filling the prune fields with their
+  disabled defaults), while versions 3-4 are no longer loadable and fail
+  with a clear unsupported-version error. Every checkpoint this process
   writes is always the current version.
 - `.mwsol` stores metadata/public-history recall separately from a sorted
   strategy index.  Each strategy block is an independent checked frame, so a

@@ -79,7 +79,7 @@ solvers/
     ├── preflop/        # Mode B。deps: holdem, abstraction, engine, game, formats(cache)
     ├── formats/        # serde DTO のみ + codec。deps: serde, toml, postcard, zstd, blake3
     ├── multiway/       # 2–9 seat generative path。HU engine から独立
-    ├── cli/            # bin "solvers" + lib: solve/resume/bench/inspect/report/export、
+    ├── cli/            # bin "solvers" + lib: serve/solve/resume/bench/inspect/mw-eval/report、
     │                   # config スキーマと multiway セッション構築 (session.rs) を gui と共有
     ├── gui/            # bin "solvers-gui": egui/eframe ネイティブ GUI (multiway preflop、
     │                   # docs/native-gui-plan.md 参照)
