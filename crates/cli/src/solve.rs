@@ -1,18 +1,26 @@
 use std::path::Path;
 use std::time::{Duration, Instant};
 
+use abstraction::Ehs2Params;
 use anyhow::{Context, Result, anyhow};
-use cards::{NUM_COMBOS, Player, combo_cards};
+use cards::{NUM_CLASSES, NUM_COMBOS, PerPlayer, Player, combo_cards};
 use engine::{
     DiscountSchedule, F32Storage, I16Storage, NodeId, NodeKind, ParConfig, Solver, SolverState,
     Storage, TerminalEvaluator,
 };
 use game::PayoffPipeline;
 use holdem::{PostflopEvaluator, build_postflop_game};
+use preflop::{
+    EquityShowdown, PostflopBets, PreflopConfig, blueprint_memory_usage, build_blueprint_game,
+    build_preflop_game,
+};
 use serde::Serialize;
 
-use crate::config::{BetsSection, GameSection, RunSection, SolveConfig, StorageKind};
+use crate::config::{
+    BetsSection, GameSection, PostflopSection, RunSection, SolveConfig, StorageKind,
+};
 use crate::postflop_setup;
+use crate::preflop_setup;
 use crate::sol::{SolExportSpec, SolStreets};
 
 #[allow(clippy::too_many_arguments)]
@@ -31,21 +39,47 @@ pub fn run(
     let raw = std::str::from_utf8(&raw_bytes).context("config file is not valid UTF-8")?;
     let mut config: SolveConfig = toml::from_str(raw).context("parsing config")?;
     if let Some(it) = iterations {
-        config.run.iterations = it;
+        if matches!(config.game, GameSection::PreflopMultiway(_)) {
+            config.run.sweeps = Some(it);
+        } else {
+            config.run.iterations = it;
+        }
     }
     // Hashed from the raw file bytes, not the parsed/overridden struct: a
     // `--iterations` override must not change what a checkpoint is stamped
     // with, since `resume` re-derives the same hash from the same file.
     let config_hash = formats::config_hash(&raw_bytes);
+    if matches!(config.game, GameSection::PreflopMultiway(_)) {
+        return crate::multiway_solve::run(
+            raw,
+            config,
+            output,
+            metrics,
+            checkpoint,
+            config_hash,
+            sol,
+            None,
+            true,
+        );
+    }
+
     let checkpoint_sink = checkpoint.map(|path| (path, config_hash));
 
     let sol_spec = match sol {
         Some(path) => {
-            if !matches!(config.game, GameSection::Postflop { .. }) {
-                return Err(anyhow!(
-                    "--sol export only supports kind = \"postflop\" configs \
-                     (kuhn/leduc have no board/street structure to quantize)"
-                ));
+            match &config.game {
+                GameSection::Postflop { .. } => {}
+                GameSection::Preflop { .. } => {
+                    return Err(anyhow!(
+                        "--sol export is not supported for preflop configs yet"
+                    ));
+                }
+                _ => {
+                    return Err(anyhow!(
+                        "--sol export only supports kind = \"postflop\" configs \
+                         (kuhn/leduc have no board/street structure to quantize)"
+                    ));
+                }
             }
             let storage_name = match config.run.storage {
                 StorageKind::F32 => "f32",
@@ -235,6 +269,44 @@ fn run_with_storage_impl<S: Storage>(
             sol,
             &mut hooks,
         ),
+        GameSection::Preflop {
+            effective_stack_bb,
+            sb_bb,
+            open_sizes_bb,
+            raise_factors,
+            max_raises,
+            include_allin,
+            allow_limp,
+            sb_range,
+            bb_range,
+            equity_realization,
+            equity_cache,
+            postflop,
+        } => solve_preflop::<S>(
+            pipeline,
+            effective_stack_bb,
+            sb_bb,
+            open_sizes_bb,
+            raise_factors,
+            max_raises,
+            include_allin,
+            allow_limp,
+            sb_range,
+            bb_range,
+            equity_realization,
+            equity_cache,
+            postflop,
+            schedule,
+            schedule_name,
+            &config.run,
+            output,
+            histories,
+            resume_state,
+            &mut hooks,
+        ),
+        GameSection::PreflopMultiway(_) => {
+            unreachable!("multiway games dispatch before the HU storage path")
+        }
     }
 }
 
@@ -482,6 +554,341 @@ fn solve_postflop<S: Storage>(
     Ok(summary)
 }
 
+/// Builds the 169-class preflop trunk config and dispatches on whether
+/// `[game.postflop]` was configured: `None` keeps today's equity-showdown
+/// continuation model unchanged; `Some` extends the trunk into a bucketed
+/// blueprint postflop model (`solve_preflop_bucketed`).
+#[allow(clippy::too_many_arguments)]
+fn solve_preflop<S: Storage>(
+    pipeline: PayoffPipeline<'_>,
+    effective_stack_bb: f64,
+    sb_bb: f64,
+    open_sizes_bb: Vec<f64>,
+    raise_factors: Vec<Vec<f64>>,
+    max_raises: u32,
+    include_allin: bool,
+    allow_limp: bool,
+    sb_range: Option<String>,
+    bb_range: Option<String>,
+    equity_realization: [f64; 2],
+    equity_cache: Option<std::path::PathBuf>,
+    postflop: Option<PostflopSection>,
+    schedule: Box<dyn DiscountSchedule>,
+    schedule_name: &str,
+    run: &RunSection,
+    output: Option<&Path>,
+    histories: &[String],
+    resume_state: Option<SolverState>,
+    hooks: &mut RunHooks<'_>,
+) -> Result<RunSummary> {
+    let config = preflop_setup::build_preflop_config(
+        effective_stack_bb,
+        sb_bb,
+        open_sizes_bb,
+        raise_factors,
+        max_raises,
+        include_allin,
+        allow_limp,
+        sb_range.as_deref(),
+        bb_range.as_deref(),
+    )?;
+
+    // Cheap dry run before committing to the (possibly large) real build.
+    // This is the 169-class trunk's own size; the bucketed path prints a
+    // second, full-tree estimate once its postflop bets/artifacts are known.
+    let estimate = preflop::memory_usage(&config);
+    preflop_setup::print_memory_estimate(estimate);
+
+    match postflop {
+        None => solve_preflop_showdown::<S>(
+            pipeline,
+            config,
+            equity_realization,
+            equity_cache.as_deref(),
+            schedule,
+            schedule_name,
+            run,
+            output,
+            histories,
+            resume_state,
+            hooks,
+        ),
+        Some(section) => solve_preflop_bucketed::<S>(
+            pipeline,
+            config,
+            section,
+            equity_cache.as_deref(),
+            schedule,
+            schedule_name,
+            run,
+            output,
+            histories,
+            resume_state,
+            hooks,
+        ),
+    }
+}
+
+/// The original (slice-1) preflop path: continuations resolve via the
+/// equity-showdown model on the 169-class trunk directly, no postflop
+/// betting tree at all.
+#[allow(clippy::too_many_arguments)]
+fn solve_preflop_showdown<S: Storage>(
+    pipeline: PayoffPipeline<'_>,
+    config: PreflopConfig,
+    equity_realization: [f64; 2],
+    equity_cache: Option<&Path>,
+    schedule: Box<dyn DiscountSchedule>,
+    schedule_name: &str,
+    run: &RunSection,
+    output: Option<&Path>,
+    histories: &[String],
+    resume_state: Option<SolverState>,
+    hooks: &mut RunHooks<'_>,
+) -> Result<RunSummary> {
+    let table = preflop_setup::load_or_compute_equity_table(equity_cache);
+    let model = EquityShowdown {
+        realization: PerPlayer::new(equity_realization[0], equity_realization[1]),
+    };
+    let pf_game = build_preflop_game(&config, &table, &model, pipeline);
+
+    // Resolve the requested export histories to node ids (and root's own
+    // action labels for the summary line below) while the built tree and
+    // node_info are still both in hand; `pf_game.game` moves into the
+    // solver right after.
+    let mut resolved = Vec::new();
+    for history in histories {
+        match pf_game.node_by_history(history) {
+            Some(node_id) => {
+                let tag = pf_game.game.tree.tags[node_id as usize] as usize;
+                let info = &pf_game.node_info[tag];
+                let player = pf_game.game.tree.node(node_id).player.index();
+                resolved.push(ResolvedHistory {
+                    history: history.clone(),
+                    node_id,
+                    player,
+                    actions: info.actions.clone(),
+                });
+            }
+            None => {
+                eprintln!("warning: unknown history {history:?}, skipping");
+            }
+        }
+    }
+    let root_tag = pf_game.game.tree.tags[0] as usize;
+    let root_actions = pf_game.node_info[root_tag].actions.clone();
+
+    if let Some(n) = run.threads {
+        // Ignore "already initialized": tests and repeated calls within one
+        // process may have set the global pool already.
+        let _ = rayon::ThreadPoolBuilder::new()
+            .num_threads(n)
+            .build_global();
+    }
+
+    let mut solver = Solver::<_, S>::new(pf_game.game, schedule, Some(run.iterations));
+    // Preflop trunks have no chance nodes, so `ParConfig` is inert here --
+    // set unconditionally anyway to keep this code path uniform with
+    // `solve_postflop`.
+    solver.set_par(ParConfig {
+        chance_depth: run.par_chance_depth.unwrap_or(2),
+        min_children: run.par_min_children.unwrap_or(12),
+    });
+    if let Some(state) = resume_state {
+        solver.restore_state(state).context(
+            "restoring checkpoint state (does its storage backend match `run.storage`?)",
+        )?;
+    }
+
+    println!(
+        "game=preflop schedule={} iterations={}",
+        schedule_name, run.iterations
+    );
+    let start = Instant::now();
+    run_loop(&mut solver, run, hooks)?;
+    let elapsed = start.elapsed();
+    let summary = print_done(&solver, elapsed);
+    checkpoint_now(&solver, hooks)?;
+
+    print_preflop_root_summary(&solver, &root_actions);
+
+    if let Some(path) = output {
+        let report = export_preflop(&resolved, &solver);
+        std::fs::write(path, serde_json::to_string_pretty(&report)?)
+            .with_context(|| format!("writing {}", path.display()))?;
+        println!("strategy written to {}", path.display());
+    }
+
+    Ok(summary)
+}
+
+/// The bucketed blueprint path (`[game.postflop]` present): extends the
+/// 169-class trunk with an EHS² bucket abstraction's postflop betting,
+/// solved through the same `run_loop`/checkpoint/metrics/history/output
+/// machinery as every other game.
+#[allow(clippy::too_many_arguments)]
+fn solve_preflop_bucketed<S: Storage>(
+    pipeline: PayoffPipeline<'_>,
+    config: PreflopConfig,
+    section: PostflopSection,
+    equity_cache: Option<&Path>,
+    schedule: Box<dyn DiscountSchedule>,
+    schedule_name: &str,
+    run: &RunSection,
+    output: Option<&Path>,
+    histories: &[String],
+    resume_state: Option<SolverState>,
+    hooks: &mut RunHooks<'_>,
+) -> Result<RunSummary> {
+    if section.model != "bucketed" {
+        return Err(anyhow!(
+            "game.postflop.model = {:?} is not supported (the only implemented value is \"bucketed\")",
+            section.model
+        ));
+    }
+
+    println!(
+        "postflop: model=bucketed buckets(flop/turn/river)={}/{}/{} \
+         bets(flop/turn/river)={:?}/{:?}/{:?} max_raises={} include_allin={}",
+        section.flop_buckets,
+        section.turn_buckets,
+        section.river_buckets,
+        section.bets_flop,
+        section.bets_turn,
+        section.bets_river,
+        section.max_raises,
+        section.include_allin,
+    );
+    println!(
+        "WARNING: a cold EHS2 abstraction + blueprint artifact build takes on the order of \
+         10 minutes in release mode; abstraction-cache/artifacts-cache make reruns instant."
+    );
+
+    let table = preflop_setup::load_or_compute_equity_table(equity_cache);
+
+    let abs_params = Ehs2Params {
+        flop_buckets: section.flop_buckets,
+        turn_buckets: section.turn_buckets,
+        river_buckets: section.river_buckets,
+    };
+    let abs =
+        preflop_setup::load_or_build_abstraction(abs_params, section.abstraction_cache.as_deref());
+    let artifacts =
+        preflop_setup::load_or_build_artifacts(&abs, section.artifacts_cache.as_deref());
+
+    let bets = PostflopBets {
+        flop: PerPlayer::new(section.bets_flop.clone(), section.bets_flop),
+        turn: PerPlayer::new(section.bets_turn.clone(), section.bets_turn),
+        river: PerPlayer::new(section.bets_river.clone(), section.bets_river),
+        max_raises: section.max_raises,
+        include_allin: section.include_allin,
+    };
+
+    // Cheap dry run over the full (trunk + postflop) tree before committing
+    // to the real build.
+    let estimate = blueprint_memory_usage(&config, &bets, &artifacts);
+    preflop_setup::print_memory_estimate(estimate);
+
+    let bp_game = build_blueprint_game(&config, &bets, &table, &artifacts, pipeline);
+
+    // Resolve the requested export histories to node ids -- `--history`
+    // strings work across `/` postflop street boundaries automatically,
+    // since `node_by_history` just matches the full recorded history
+    // string regardless of which street it ends on.
+    let mut resolved = Vec::new();
+    for history in histories {
+        match bp_game.node_by_history(history) {
+            Some(node_id) => {
+                let tag = bp_game.game.tree.tags[node_id as usize] as usize;
+                let info = &bp_game.node_info[tag];
+                let player = bp_game.game.tree.node(node_id).player.index();
+                resolved.push(ResolvedHistory {
+                    history: history.clone(),
+                    node_id,
+                    player,
+                    actions: info.actions.clone(),
+                });
+            }
+            None => {
+                eprintln!("warning: unknown history {history:?}, skipping");
+            }
+        }
+    }
+    let root_tag = bp_game.game.tree.tags[0] as usize;
+    let root_actions = bp_game.node_info[root_tag].actions.clone();
+
+    if let Some(n) = run.threads {
+        // Ignore "already initialized": tests and repeated calls within one
+        // process may have set the global pool already.
+        let _ = rayon::ThreadPoolBuilder::new()
+            .num_threads(n)
+            .build_global();
+    }
+
+    let mut solver = Solver::<_, S>::new(bp_game.game, schedule, Some(run.iterations));
+    solver.set_par(ParConfig {
+        chance_depth: run.par_chance_depth.unwrap_or(2),
+        min_children: run.par_min_children.unwrap_or(12),
+    });
+    if let Some(state) = resume_state {
+        solver.restore_state(state).context(
+            "restoring checkpoint state (does its storage backend match `run.storage`?)",
+        )?;
+    }
+
+    println!(
+        "game=preflop-bucketed schedule={} iterations={}",
+        schedule_name, run.iterations
+    );
+    let start = Instant::now();
+    run_loop(&mut solver, run, hooks)?;
+    let elapsed = start.elapsed();
+    let summary = print_done(&solver, elapsed);
+    checkpoint_now(&solver, hooks)?;
+
+    print_preflop_root_summary(&solver, &root_actions);
+
+    if let Some(path) = output {
+        let report = export_preflop(&resolved, &solver);
+        std::fs::write(path, serde_json::to_string_pretty(&report)?)
+            .with_context(|| format!("writing {}", path.display()))?;
+        println!("strategy written to {}", path.display());
+    }
+
+    Ok(summary)
+}
+
+/// Compact root summary: for each root action, the range-mass-weighted
+/// aggregate frequency over the SB's 169 classes, e.g. `root: Fold 12.3% |
+/// All-in 87.7%`.
+///
+/// Generic over `E` (not just `PreflopEvaluator`) so the bucketed blueprint
+/// game (`BlueprintEvaluator`) reuses it unchanged: the root of a blueprint
+/// game is still the 169-class trunk root regardless of what its
+/// continuations look like postflop.
+fn print_preflop_root_summary<E: TerminalEvaluator, S: Storage>(
+    solver: &Solver<E, S>,
+    root_actions: &[String],
+) {
+    let tree = &solver.game().tree;
+    let node = tree.node(0);
+    let sref = tree.storage_ref(node);
+    let avg = solver.average_strategy_at(0);
+    let root_range = &solver.game().root_ranges[Player::P0];
+    let freqs = postflop_setup::action_frequencies(
+        &avg,
+        root_range,
+        sref.num_actions as usize,
+        sref.num_hands as usize,
+    );
+    let parts: Vec<String> = root_actions
+        .iter()
+        .zip(freqs.iter())
+        .map(|(label, freq)| format!("{label} {:.1}%", freq * 100.0))
+        .collect();
+    println!("root: {}", parts.join(" | "));
+}
+
 /// A requested `--history` resolved against the built tree, before the tree
 /// moves into the solver.
 struct ResolvedHistory {
@@ -607,6 +1014,69 @@ fn export_postflop<S: Storage>(
         iterations: solver.iteration(),
         expected_value_p0: solver.expected_value(Player::P0),
         exploitability: [expl[Player::P0], expl[Player::P1]],
+        entries: out,
+    }
+}
+
+#[derive(Serialize)]
+struct PreflopReport {
+    game: String,
+    iterations: u64,
+    expected_value_p0: f64,
+    exploitability: [f64; 2],
+    /// The 169 class labels ("AA", "AKs", "AKo", ...), in class-index order,
+    /// so notebooks can index every entry's strategy rows without depending
+    /// on `preflop::class_label` themselves.
+    class_labels: Vec<String>,
+    entries: Vec<PreflopHistoryEntry>,
+}
+
+#[derive(Serialize)]
+struct PreflopHistoryEntry {
+    history: String,
+    player: usize,
+    actions: Vec<String>,
+    /// Action-major: `strategy[a][h]` is hand `h`'s probability of action
+    /// `a`, one row per action (indexed like `actions`). `h` ranges over the
+    /// 169 preflop classes for trunk histories, or the acting street's
+    /// bucket count for a bucketed-postflop history (`--history` strings
+    /// cross `/` street boundaries transparently, see `node_by_history`).
+    strategy: Vec<Vec<f32>>,
+}
+
+/// Generic over `E` so both the equity-showdown trunk (`PreflopEvaluator`,
+/// every node is 169-class) and the bucketed blueprint game
+/// (`BlueprintEvaluator`, postflop nodes are bucket-dimensioned) share this
+/// export -- `BlueprintGame` exposes the same node_info/history shape as
+/// `PreflopGame`, so `ResolvedHistory` needs no changes either.
+fn export_preflop<E: TerminalEvaluator, S: Storage>(
+    entries: &[ResolvedHistory],
+    solver: &Solver<E, S>,
+) -> PreflopReport {
+    let tree = &solver.game().tree;
+    let mut out = Vec::with_capacity(entries.len());
+    for entry in entries {
+        let node = tree.node(entry.node_id);
+        let sref = tree.storage_ref(node);
+        let (num_actions, num_hands) = (sref.num_actions as usize, sref.num_hands as usize);
+        let sigma = solver.average_strategy_at(entry.node_id);
+        let strategy: Vec<Vec<f32>> = (0..num_actions)
+            .map(|a| sigma[a * num_hands..(a + 1) * num_hands].to_vec())
+            .collect();
+        out.push(PreflopHistoryEntry {
+            history: entry.history.clone(),
+            player: entry.player,
+            actions: entry.actions.clone(),
+            strategy,
+        });
+    }
+    let expl = solver.exploitability();
+    PreflopReport {
+        game: "preflop".to_string(),
+        iterations: solver.iteration(),
+        expected_value_p0: solver.expected_value(Player::P0),
+        exploitability: [expl[Player::P0], expl[Player::P1]],
+        class_labels: (0..NUM_CLASSES).map(preflop::class_label).collect(),
         entries: out,
     }
 }

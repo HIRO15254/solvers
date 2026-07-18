@@ -1,0 +1,19 @@
+# 10bb push/fold: the SB may only jam or fold; the BB may only call or fold.
+# The exact 169x169 equity table takes about a minute to compute in release
+# mode, so this caches it to disk after the first run.
+[game]
+kind = "preflop"
+effective_stack_bb = 10.0
+open_sizes_bb = []
+raise_factors = []
+max_raises = 1
+allow_limp = false
+equity_cache = ".cache/preflop_equity.bin"
+
+[algorithm]
+schedule = "dcfr"
+
+[run]
+iterations = 2000
+check_every = 200
+# target_nash_conv = 0.001

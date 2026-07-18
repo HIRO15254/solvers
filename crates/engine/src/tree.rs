@@ -262,7 +262,15 @@ impl PublicTree {
         first
     }
 
-    fn mapped_dim(&self, map: ReachMap, dim: u32) -> u32 {
+    /// Dimension one player's reach vector maps into across a chance deal.
+    /// `Identity`/`Mask` never change it; a `Transition` may (see
+    /// [`ReachMap`]'s doc comment) — this is the single source of truth for
+    /// that, used both at compile time (here, sizing each chance child's
+    /// subtree) and by every solver walk that recurses across a chance node
+    /// (`crate::solver::cfr_pass`/`value_pass`, `crate::mccfr::mccfr_pass`),
+    /// which must size their per-deal scratch buffers identically or trip
+    /// `SparseTransition::apply_forward`'s dimension assertions.
+    pub(crate) fn mapped_dim(&self, map: ReachMap, dim: u32) -> u32 {
         match map {
             ReachMap::Identity => dim,
             ReachMap::Mask(m) => {

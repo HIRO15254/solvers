@@ -57,6 +57,13 @@ pub trait StorageOps {
     /// Writes the normalized average strategy into `out`. Hands never
     /// reached get the uniform strategy.
     fn average_strategy(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]);
+
+    /// Writes the raw accumulated regrets (dequantized for a quantized
+    /// backend, unnormalized — unlike [`StorageOps::regret_matching`]) into
+    /// `out` (`A*H`, action-major). Used by negative-regret pruning, which
+    /// needs the actual regret magnitude (to compare against a threshold),
+    /// not the positive-part-normalized strategy.
+    fn raw_regrets(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]);
 }
 
 /// Backend holding cumulative regrets and the cumulative (average) strategy.
@@ -90,6 +97,16 @@ pub trait Storage: StorageOps + Send + Sync {
     /// by [`Storage::state`]. Fails if `state` is the wrong backend variant
     /// or its vector lengths don't match this backend's.
     fn restore_state(&mut self, state: StorageState) -> Result<(), StateMismatch>;
+
+    /// Scales every accumulated regret by `regret` and every accumulated
+    /// strategy-sum by `strategy` (batched early discounting, applied
+    /// between iterations — never during a pass, so unlike [`StorageOps`]
+    /// this lives on the full backend, not [`StorageView`]). A quantized
+    /// backend only needs to touch its O(num_refs) per-node scale arrays
+    /// (dequantized value = raw_i16 * scale, so scaling the value is
+    /// scaling the scale) rather than the O(len) element arrays — the whole
+    /// point of the per-node-scale representation.
+    fn scale_all(&mut self, regret: f32, strategy: f32);
 }
 
 /// Owned, backend-tagged copy of a storage backend's contents, for
@@ -243,6 +260,10 @@ fn average_strategy_impl(strategy_sum: &[f32], offset: usize, r: StorageRef, out
     normalize_columns(&strategy_sum[offset..offset + r.len()], r, out);
 }
 
+fn raw_regrets_impl(regrets: &[f32], offset: usize, r: StorageRef, out: &mut [f32]) {
+    out.copy_from_slice(&regrets[offset..offset + r.len()]);
+}
+
 impl StorageOps for F32Storage {
     fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
         regret_matching_impl(&self.regrets, r.offset, r, out);
@@ -264,6 +285,10 @@ impl StorageOps for F32Storage {
 
     fn average_strategy(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
         average_strategy_impl(&self.strategy_sum, r.offset, r, out);
+    }
+
+    fn raw_regrets(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        raw_regrets_impl(&self.regrets, r.offset, r, out);
     }
 }
 
@@ -309,6 +334,15 @@ impl Storage for F32Storage {
                 Ok(())
             }
             _ => Err(StateMismatch::WrongVariant),
+        }
+    }
+
+    fn scale_all(&mut self, regret: f32, strategy: f32) {
+        for v in &mut self.regrets {
+            *v *= regret;
+        }
+        for v in &mut self.strategy_sum {
+            *v *= strategy;
         }
     }
 }
@@ -358,6 +392,11 @@ impl<'a> StorageOps for F32View<'a> {
     fn average_strategy(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
         let local = self.local_offset(r);
         average_strategy_impl(&*self.strategy_sum, local, r, out);
+    }
+
+    fn raw_regrets(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        let local = self.local_offset(r);
+        raw_regrets_impl(&*self.regrets, local, r, out);
     }
 }
 
@@ -513,6 +552,16 @@ fn average_strategy_i16_impl(strategy_sum: &[i16], offset: usize, r: StorageRef,
     normalize_columns_i16(&strategy_sum[offset..offset + r.len()], r, out);
 }
 
+fn raw_regrets_i16_impl(
+    regrets: &[i16],
+    offset: usize,
+    r: StorageRef,
+    scale: f32,
+    out: &mut [f32],
+) {
+    dequantize_block(&regrets[offset..offset + r.len()], scale, out);
+}
+
 /// Quantized `i16` backend: two flat `i16` arenas plus one `f32` scale per
 /// action node (`storage_refs` entry) per arena. `value` is approximately
 /// `stored_i16 as f32` times `scale`, with `scale` re-chosen on every write
@@ -604,6 +653,16 @@ impl StorageOps for I16Storage {
     fn average_strategy(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
         average_strategy_i16_impl(&self.strategy_sum, r.offset, r, out);
     }
+
+    fn raw_regrets(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]) {
+        raw_regrets_i16_impl(
+            &self.regrets,
+            r.offset,
+            r,
+            self.regret_scales[ref_idx as usize],
+            out,
+        );
+    }
 }
 
 impl Storage for I16Storage {
@@ -663,6 +722,15 @@ impl Storage for I16Storage {
                 Ok(())
             }
             _ => Err(StateMismatch::WrongVariant),
+        }
+    }
+
+    fn scale_all(&mut self, regret: f32, strategy: f32) {
+        for v in &mut self.regret_scales {
+            *v *= regret;
+        }
+        for v in &mut self.strategy_scales {
+            *v *= strategy;
         }
     }
 }
@@ -751,6 +819,12 @@ impl<'a> StorageOps for I16View<'a> {
     fn average_strategy(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
         let local = self.local_offset(r);
         average_strategy_i16_impl(&*self.strategy_sum, local, r, out);
+    }
+
+    fn raw_regrets(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]) {
+        let local = self.local_offset(r);
+        let sidx = self.local_ref(ref_idx);
+        raw_regrets_i16_impl(&*self.regrets, local, r, self.regret_scales[sidx], out);
     }
 }
 
@@ -1031,5 +1105,70 @@ mod tests {
             (0.45..0.55).contains(&ratio),
             "expected i16 to be roughly half of f32 for large len, ratio = {ratio}"
         );
+    }
+
+    #[test]
+    fn f32_scale_all_scales_arrays() {
+        let r = make_ref(0, 2, 3, 0);
+        let d = discounts();
+        let inst: Vec<f32> = (0..r.len()).map(|i| i as f32 * 0.5 + 1.0).collect();
+
+        let mut backend = F32Storage::new(r.len(), 1);
+        backend.update_regrets(r, r.index, &inst, &d);
+        let mut sigma = vec![0.0; r.len()];
+        backend.regret_matching(r, r.index, &mut sigma);
+        backend.accumulate_strategy(r, r.index, &sigma, &d);
+
+        let mut raw_before = vec![0.0; r.len()];
+        backend.raw_regrets(r, r.index, &mut raw_before);
+        let mut avg_before = vec![0.0; r.len()];
+        backend.average_strategy(r, r.index, &mut avg_before);
+
+        backend.scale_all(0.5, 0.25);
+
+        let mut raw_after = vec![0.0; r.len()];
+        backend.raw_regrets(r, r.index, &mut raw_after);
+        for (b, a) in raw_before.iter().zip(&raw_after) {
+            assert!((a - b * 0.5).abs() < 1e-6, "{a} vs {}", b * 0.5);
+        }
+
+        // Strategy sums scaled uniformly per column, so the normalized
+        // average strategy (a ratio) is unaffected by the strategy scale.
+        let mut avg_after = vec![0.0; r.len()];
+        backend.average_strategy(r, r.index, &mut avg_after);
+        for (b, a) in avg_before.iter().zip(&avg_after) {
+            assert!((a - b).abs() < 1e-6, "{a} vs {b}");
+        }
+    }
+
+    #[test]
+    fn i16_scale_all_scales_dequantized_values() {
+        let r = make_ref(0, 2, 3, 0);
+        let d = discounts();
+        let inst: Vec<f32> = (0..r.len()).map(|i| i as f32 * 0.5 + 1.0).collect();
+
+        let mut backend = I16Storage::new(r.len(), 1);
+        backend.update_regrets(r, r.index, &inst, &d);
+        let mut sigma = vec![0.0; r.len()];
+        backend.regret_matching(r, r.index, &mut sigma);
+        backend.accumulate_strategy(r, r.index, &sigma, &d);
+
+        let mut raw_before = vec![0.0; r.len()];
+        backend.raw_regrets(r, r.index, &mut raw_before);
+
+        backend.scale_all(0.5, 0.25);
+
+        let mut raw_after = vec![0.0; r.len()];
+        backend.raw_regrets(r, r.index, &mut raw_after);
+        for (b, a) in raw_before.iter().zip(&raw_after) {
+            assert!((a - b * 0.5).abs() < 1e-3, "{a} vs {}", b * 0.5);
+        }
+
+        // regret_matching/average_strategy only read raw i16 sign/ratio, so
+        // a per-node scale change (as opposed to touching the i16 payload)
+        // must leave them unaffected.
+        let mut sigma_after = vec![0.0; r.len()];
+        backend.regret_matching(r, r.index, &mut sigma_after);
+        assert_eq!(sigma, sigma_after);
     }
 }

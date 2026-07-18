@@ -11,14 +11,20 @@ name = "solvers"
 path = "src/main.rs"
 
 [dependencies]
+abstraction = { workspace = true }
 cards = { workspace = true }
 engine = { workspace = true, features = ["serde"] }
 formats = { workspace = true }
 game = { workspace = true }
 holdem = { workspace = true }
+preflop = { workspace = true }
+multiway = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
 rayon = { workspace = true }
+rand = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+tempfile = { workspace = true }
+tiny_http = { workspace = true }
 toml = { workspace = true }

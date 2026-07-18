@@ -1,0 +1,19 @@
+# Standard heads-up 100bb preflop: 2.5x open, 3x/2.5x reraises, up to 4
+# raises with all-in offered at every level, limp allowed. Shares the same
+# equity cache as the push/fold example (same 169x169 table regardless of
+# stack depth or betting grammar).
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+open_sizes_bb = [2.5]
+raise_factors = [[3.0], [2.5]]
+max_raises = 4
+allow_limp = true
+equity_cache = ".cache/preflop_equity.bin"
+
+[algorithm]
+schedule = "dcfr"
+
+[run]
+iterations = 5000
+check_every = 250

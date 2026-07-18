@@ -1,0 +1,78 @@
+[game]
+kind = "preflop-multiway"
+button = 0
+
+[[game.seats]]
+name = "SB"
+stack_bb = 10.0
+range = ""
+
+[[game.seats]]
+name = "BB"
+stack_bb = 10.0
+range = ""
+
+[game.blinds]
+small_bb = 0.5
+big_bb = 1.0
+
+[game.ante]
+kind = "none"
+
+[game.betting]
+allow_limp = false
+
+[game.betting.preflop]
+bet_sizes = []
+isolate_sizes = []
+raise_sizes = []
+max_aggressive_actions = 1
+include_allin = true
+
+[game.betting.flop]
+bet_sizes = []
+raise_sizes = []
+max_aggressive_actions = 1
+include_allin = false
+
+[game.betting.turn]
+bet_sizes = []
+raise_sizes = []
+max_aggressive_actions = 1
+include_allin = false
+
+[game.betting.river]
+bet_sizes = []
+raise_sizes = []
+max_aggressive_actions = 1
+include_allin = false
+
+[game.abstraction]
+flop_buckets = 8
+turn_buckets = 8
+river_buckets = 8
+rollout_samples = 8
+seed = 1010
+
+[rake]
+kind = "none"
+
+[utility]
+kind = "chip-ev"
+
+[algorithm]
+schedule = "external-sampling-mccfr"
+seed = 1010
+exploration_epsilon = 0.06
+discount_every = 100000
+discount_until = 10000000
+
+[run]
+sweeps = 200000
+seed = 1010
+check_every = 200000
+storage = "f32"
+threads = 2
+max_memory_bytes = 536870912
+evaluation_samples = 256
+evaluation_cadence = 200000

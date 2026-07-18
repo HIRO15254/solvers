@@ -9,7 +9,7 @@ use std::path::Path;
 use anyhow::{Context, Result, anyhow};
 use engine::{F32Storage, I16Storage};
 
-use crate::config::{SolveConfig, StorageKind};
+use crate::config::{GameSection, SolveConfig, StorageKind};
 use crate::solve::run_with_storage;
 
 pub fn run(
@@ -24,6 +24,25 @@ pub fn run(
     let raw = std::str::from_utf8(&raw_bytes).context("config file is not valid UTF-8")?;
     let config: SolveConfig = toml::from_str(raw).context("parsing config")?;
     let config_hash = formats::config_hash(&raw_bytes);
+
+    if matches!(config.game, GameSection::PreflopMultiway(_)) {
+        if histories.iter().any(|history| !history.is_empty()) {
+            return Err(anyhow!(
+                "multiway resume does not export --history selections; use the .mwsol strategy query"
+            ));
+        }
+        return crate::multiway_solve::resume(
+            raw,
+            config,
+            output,
+            metrics,
+            checkpoint_path,
+            config_hash,
+            None,
+            None,
+            true,
+        );
+    }
 
     let checkpoint = formats::read_checkpoint(checkpoint_path)
         .with_context(|| format!("reading checkpoint {}", checkpoint_path.display()))?;

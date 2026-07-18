@@ -1,0 +1,27 @@
+[package]
+name = "multiway"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Sampled 2-9 player NLHE solving with side pots and tournament utility"
+
+[dependencies]
+abstraction = { workspace = true }
+cards = { workspace = true }
+hand-index = { workspace = true }
+anyhow = { workspace = true }
+blake3 = { workspace = true }
+postcard = { workspace = true }
+rand = { workspace = true }
+rand_chacha = { workspace = true }
+rayon = { workspace = true }
+rustc-hash = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true }
+zstd = { workspace = true }
+
+[dev-dependencies]
+toml = { workspace = true }

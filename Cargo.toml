@@ -7,8 +7,12 @@ members = [
     "crates/engine",
     "crates/game",
     "crates/holdem",
+    "crates/abstraction",
+    "crates/preflop",
+    "crates/multiway",
     "crates/formats",
     "crates/cli",
+    "crates/gui",
 ]
 
 [workspace.package]
@@ -24,7 +28,11 @@ cfr-ref = { path = "crates/cfr-ref" }
 engine = { path = "crates/engine" }
 game = { path = "crates/game" }
 holdem = { path = "crates/holdem" }
+abstraction = { path = "crates/abstraction" }
+preflop = { path = "crates/preflop" }
+multiway = { path = "crates/multiway" }
 formats = { path = "crates/formats" }
+cli = { path = "crates/cli" }
 
 # NOTE: aya_poker's "std" feature is broken in 0.1.0 (aya_base gates no_std on
 # `cfg(std)` instead of `feature = "std"`), so we use the default no_std build.
@@ -38,10 +46,14 @@ anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 rand = "0.8"
 rand_chacha = "0.3"
+tiny_http = "0.12"
+tempfile = "3"
 criterion = "0.5"
 blake3 = "1"
-postcard = { version = "1", features = ["alloc"] }
+postcard = { version = "1", features = ["alloc", "use-std"] }
 zstd = "0.13"
+rustc-hash = "2"
+sysinfo = { version = "0.32", default-features = false, features = ["system"] }
 
 [profile.release]
 lto = "thin"
