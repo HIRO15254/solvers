@@ -2330,7 +2330,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         traversals: u64,
         seed: u64,
     ) -> Result<DeviatorPolicy, SolverError> {
-        self.train_deviator_core(seat, traversals, seed, 0.0)
+        self.train_deviator_core(seat, traversals, seed, 0.0, false)
     }
 
     /// Same as [`Self::train_deviator`], except every opponent
@@ -2355,7 +2355,29 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         purify_threshold: f32,
     ) -> Result<DeviatorPolicy, SolverError> {
         validate_purify_threshold(purify_threshold)?;
-        self.train_deviator_core(seat, traversals, seed, purify_threshold)
+        self.train_deviator_core(seat, traversals, seed, purify_threshold, false)
+    }
+
+    /// Same as [`Self::train_deviator_purified`], with
+    /// `use_current_strategy` additionally swapping every opponent read
+    /// from the linear average to the last-iterate regret-matched
+    /// strategy (diagnostic; see `evaluate_profile_variant`).
+    pub fn train_deviator_variant(
+        &self,
+        seat: usize,
+        traversals: u64,
+        seed: u64,
+        purify_threshold: f32,
+        use_current_strategy: bool,
+    ) -> Result<DeviatorPolicy, SolverError> {
+        validate_purify_threshold(purify_threshold)?;
+        self.train_deviator_core(
+            seat,
+            traversals,
+            seed,
+            purify_threshold,
+            use_current_strategy,
+        )
     }
 
     fn train_deviator_core(
@@ -2364,6 +2386,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         traversals: u64,
         seed: u64,
         purify_threshold: f32,
+        use_current_strategy: bool,
     ) -> Result<DeviatorPolicy, SolverError> {
         let num_players = self.game.num_players();
         if seat >= num_players {
@@ -2386,6 +2409,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 &mut action_rng,
                 0,
                 purify_threshold,
+                use_current_strategy,
             )?;
         }
         let actions = regrets
@@ -2407,6 +2431,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         rng: &mut ChaCha20Rng,
         depth: u32,
         purify_threshold: f32,
+        use_current_strategy: bool,
     ) -> Result<f64, SolverError> {
         if depth > self.config.max_traversal_depth {
             return Err(SolverError::DepthLimit {
@@ -2471,6 +2496,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     rng,
                     depth + 1,
                     purify_threshold,
+                    use_current_strategy,
                 )?;
             }
             let node_value = sigma
@@ -2489,7 +2515,14 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 if column.action_labels != labels {
                     return Err(SolverError::ActionLabelsChanged { key });
                 }
-                let mut strategy = column.average_strategy();
+                // Same profile-source switch as `evaluate_world`: the
+                // deviator must train against the profile that will be
+                // replayed as the baseline.
+                let mut strategy = if use_current_strategy {
+                    regret_matching_f32(&column.regrets)
+                } else {
+                    column.average_strategy()
+                };
                 if purify_threshold > 0.0 {
                     purify_strategy(&mut strategy, purify_threshold);
                 }
@@ -2509,6 +2542,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 rng,
                 depth + 1,
                 purify_threshold,
+                use_current_strategy,
             )
         }
     }
@@ -2572,7 +2606,37 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         seed: u64,
         deviators: Option<&[DeviatorPolicy]>,
     ) -> Result<ProfileEvaluation, SolverError> {
-        self.evaluate_average_profile_core(samples, seed, deviators, 0.0)
+        self.evaluate_average_profile_core(samples, seed, deviators, 0.0, false)
+    }
+
+    /// Same as [`Self::evaluate_average_profile_purified`], with
+    /// `use_current_strategy` additionally swapping the profile under
+    /// evaluation (and the deviator candidates' opponents) from the linear
+    /// AVERAGE strategy to the LAST-ITERATE regret-matched current
+    /// strategy. Plain regret matching carries no last-iterate convergence
+    /// guarantee -- the average is the object with the CCE-style bound --
+    /// so this is a diagnostic: it measures how exploitable the final
+    /// iterate is on its own, which is the question that decides whether a
+    /// last-iterate method (e.g. MMD-style regularization) could ever
+    /// replace averaging and free the `strategy_sum` half of the dense
+    /// arena. Train any `deviators` with [`Self::train_deviator_variant`]
+    /// at the same `(purify_threshold, use_current_strategy)`.
+    pub fn evaluate_profile_variant(
+        &self,
+        samples: u64,
+        seed: u64,
+        deviators: Option<&[DeviatorPolicy]>,
+        purify_threshold: f32,
+        use_current_strategy: bool,
+    ) -> Result<ProfileEvaluation, SolverError> {
+        validate_purify_threshold(purify_threshold)?;
+        self.evaluate_average_profile_core(
+            samples,
+            seed,
+            deviators,
+            purify_threshold,
+            use_current_strategy,
+        )
     }
 
     /// Same as [`Self::evaluate_average_profile_with`], except every
@@ -2600,7 +2664,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         purify_threshold: f32,
     ) -> Result<ProfileEvaluation, SolverError> {
         validate_purify_threshold(purify_threshold)?;
-        self.evaluate_average_profile_core(samples, seed, deviators, purify_threshold)
+        self.evaluate_average_profile_core(samples, seed, deviators, purify_threshold, false)
     }
 
     fn evaluate_average_profile_core(
@@ -2609,6 +2673,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         seed: u64,
         deviators: Option<&[DeviatorPolicy]>,
         purify_threshold: f32,
+        use_current_strategy: bool,
     ) -> Result<ProfileEvaluation, SolverError> {
         if samples == 0 {
             return Err(SolverError::ZeroEvaluationSamples);
@@ -2650,6 +2715,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 None,
                 None,
                 purify_threshold,
+                use_current_strategy,
             )?;
             let count = (sample_id + 1) as f64;
             for seat in 0..num_players {
@@ -2664,6 +2730,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     Some(seat),
                     None,
                     purify_threshold,
+                    use_current_strategy,
                 )?;
                 let gain = deviation[seat] - utilities[seat];
                 let gain_delta = gain - gain_means[seat][0];
@@ -2678,6 +2745,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                         Some(seat),
                         deviators,
                         purify_threshold,
+                        use_current_strategy,
                     )?;
                     let gain = trained[seat] - utilities[seat];
                     let gain_delta = gain - gain_means[seat][1];
@@ -2712,6 +2780,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         })
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn evaluate_world(
         &self,
         world: &SampledWorld,
@@ -2719,6 +2788,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         deviator: Option<usize>,
         deviators: Option<&[DeviatorPolicy]>,
         purify_threshold: f32,
+        use_current_strategy: bool,
     ) -> Result<Vec<f64>, SolverError> {
         let num_players = self.game.num_players();
         let mut state = self.game.root_state();
@@ -2764,7 +2834,17 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 if column.action_labels != labels {
                     return Err(SolverError::ActionLabelsChanged { key });
                 }
-                let mut strategy = column.average_strategy();
+                // `use_current_strategy` swaps the profile under evaluation
+                // from the linear average to the LAST-ITERATE regret-matched
+                // strategy -- a diagnostic for how far the current iterate
+                // is from the average (plain regret matching has no
+                // last-iterate convergence guarantee; see the MMD/QRE
+                // literature for methods that do).
+                let mut strategy = if use_current_strategy {
+                    regret_matching_f32(&column.regrets)
+                } else {
+                    column.average_strategy()
+                };
                 if purify_threshold > 0.0 {
                     purify_strategy(&mut strategy, purify_threshold);
                 }

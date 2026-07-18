@@ -182,6 +182,12 @@ enum Command {
         /// disables deviator training (regret-greedy heuristic only).
         #[arg(long = "br-traversals", default_value_t = 2000)]
         br_traversals: u64,
+        /// Evaluate the LAST-ITERATE regret-matched current strategy
+        /// instead of the linear average (diagnostic: plain regret
+        /// matching has no last-iterate guarantee; see
+        /// `MultiwaySolver::evaluate_profile_variant`).
+        #[arg(long, default_value_t = false)]
+        current: bool,
     },
     /// Solve the same postflop config across multiple boards and write a
     /// CSV report (one row per board).
@@ -273,7 +279,16 @@ pub fn main_impl() -> Result<()> {
             seed,
             purify,
             br_traversals,
-        } => mw_eval::run(&config, &checkpoint, samples, seed, &purify, br_traversals),
+            current,
+        } => mw_eval::run(
+            &config,
+            &checkpoint,
+            samples,
+            seed,
+            &purify,
+            br_traversals,
+            current,
+        ),
         Command::Report {
             config,
             boards,

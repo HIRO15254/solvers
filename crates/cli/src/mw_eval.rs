@@ -24,6 +24,7 @@ pub fn run(
     seed: u64,
     purify: &str,
     br_traversals: u64,
+    use_current_strategy: bool,
 ) -> Result<()> {
     let raw_bytes =
         std::fs::read(config_path).with_context(|| format!("reading {}", config_path.display()))?;
@@ -51,11 +52,12 @@ pub fn run(
                 (0..num_players)
                     .into_par_iter()
                     .map(|seat| {
-                        mw_session.solver.train_deviator_purified(
+                        mw_session.solver.train_deviator_variant(
                             seat,
                             br_traversals,
                             training_seed,
                             threshold,
+                            use_current_strategy,
                         )
                     })
                     .collect::<Result<Vec<_>, _>>()
@@ -67,7 +69,13 @@ pub fn run(
 
         let evaluation = mw_session
             .solver
-            .evaluate_average_profile_purified(samples, seed, deviators.as_deref(), threshold)
+            .evaluate_profile_variant(
+                samples,
+                seed,
+                deviators.as_deref(),
+                threshold,
+                use_current_strategy,
+            )
             .context("evaluating purified multiway profile")?;
         let elapsed = started.elapsed().as_secs_f64();
 
@@ -87,9 +95,14 @@ pub fn run(
             .collect::<Vec<_>>()
             .join(",");
 
+        let profile_tag = if use_current_strategy {
+            "current"
+        } else {
+            "average"
+        };
         println!(
-            "purify={threshold:.3} maxDevUp={max_dev_up:.3} maxDevMean={max_dev_mean:.3} \
-             devUp=[{dev_up_str}] elapsed={elapsed:.1}s"
+            "profile={profile_tag} purify={threshold:.3} maxDevUp={max_dev_up:.3} \
+             maxDevMean={max_dev_mean:.3} devUp=[{dev_up_str}] elapsed={elapsed:.1}s"
         );
     }
 

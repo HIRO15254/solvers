@@ -628,6 +628,22 @@ deletes genuinely mixed equilibrium actions, so for range-study output a
 moderate threshold preserves real mixes while removing noise; exported
 `.mwsol` artifacts remain unpurified (this is a measurement tool).
 
+`--current` additionally swaps the profile under evaluation (and the
+deviators attacking it) from the linear average to the LAST-ITERATE
+regret-matched current strategy. Plain regret matching carries no
+last-iterate guarantee — the average is the object with the CCE-style
+bound — but measured on the same checkpoint the last iterate was
+consistently TIGHTER than the average across two evaluation seeds
+(maxDevUp 0.181/0.168bb vs 0.543/0.424bb; with argmax purification
+0.143/0.072bb, the tightest profile measured), plausibly because the
+calibrated linear discounting keeps regrets dominated by recent, nearly
+converged play. If this held up across configs and run lengths it would
+justify a last-iterate output mode that drops the `strategy_sum` half of
+the dense arena entirely — halving arena memory and doubling the
+affordable bucket ladder (see the MMD/QRE literature for methods with an
+actual last-iterate guarantee); for now the exported profile remains the
+guaranteed average, and this stays a diagnostic.
+
 ### Auto-materialized sampling and discount settings
 
 Besides the structural knobs above, the GUI's Auto mode also materializes
