@@ -39,11 +39,22 @@
 
 ## 2. レイヤ構成と workspace
 
+> **2026-07 アプリ再編**: フロントエンドは 2 アプリ構成(**preflop** = HU preflop +
+> multiway、**postflop** = Mode A exact postflop。各アプリ = CLI + それをラップした
+> Web UI)に再編した。アプリレベルの設計と CLI/bridge の分割は
+> `docs/app-structure.md` を参照。以下はその反映済みレイアウト。
+
 ```
-frontends:  cli (TOML batch + UPI subset REPL + CSV reports + ANSI 13×13 grid、bin+lib)
-            gui (egui/eframe ネイティブ。multiway preflop 専用: Setup/Solve/Results、
-                 収束ライブチャート、13×13 戦略マトリクス、プリセット管理)
-            py (PyO3, M3〜) · wasm (viewer-only, M8)
+apps:       preflop  — cli (bin "preflop-solver": solve/resume/bench/mw-eval/serve)
+                       web (Next.js/vinext workbench。bridge 経由でローカル実行、公開可)
+                       gui (egui/eframe ネイティブ。multiway preflop 専用: Setup/Solve/Results、
+                            収束ライブチャート、13×13 戦略マトリクス、プリセット管理)
+            postflop — cli (bin "postflop-solver": solve/resume/bench + UPI subset REPL
+                            "inspect" + CSV "report" + ANSI 13×13 grid)
+                       web (未実装 — bridge の postflop 対応とセット)
+app layer:  app-core — config スキーマ / solve・resume・bench ドライバ / bridge /
+            .sol viewer / multiway セッション構築(旧 `cli` crate の lib 部分)
+future:     py (PyO3, M3〜) · wasm (viewer-only, M8)
 multiway:    multiway — generative NLHE / joint deal / side pots / rollout buckets / MCCFR
 schemas:    formats — SolveConfig / NodeQuery→NodeReport / Checkpoint(.ckpt) / Artifact(.sol)
 sessions:   holdem::PostflopGame · preflop::PreflopGame
@@ -58,7 +69,7 @@ oracle:     cfr-ref — OpenSpiel 形 scalar CFR + BR(~500 行, 凍結, 差分�
 foundation: cards(型・range parser・evaluator wrapper) · hand-index(Waugh 移植)
 ```
 
-Cargo virtual workspace(既存の `src/main.rs` パッケージは解体、`cli` が bin 名 `solvers` を継承):
+Cargo virtual workspace:
 
 ```
 solvers/
@@ -66,6 +77,15 @@ solvers/
 ├── .cargo/config.toml    # -C target-cpu=native(研究ビルド)
 ├── LICENSE-POLICY.md     # AGPL/無ライセンス = read-only の明文化
 ├── tools/plot_convergence.py
+├── apps/
+│   ├── preflop/
+│   │   ├── cli/        # bin "preflop-solver"(package "preflop-cli")
+│   │   ├── web/        # preflop workbench(範囲/ツリー編集、multiway explorer、bridge client)
+│   │   └── gui/        # bin "preflop-gui": egui/eframe ネイティブ GUI (multiway preflop、
+│   │                   # docs/native-gui-plan.md 参照)
+│   └── postflop/
+│       ├── cli/        # bin "postflop-solver"(package "postflop-cli")
+│       └── web/        # 未実装(README に実装順)
 └── crates/
     ├── cards/          # Card/CardSet/Chips/Street/PerPlayer<T>、"22+,A2s+" range parser、
     │                   # aya_poker (Zlib/Apache-2.0/MIT) evaluator wrapper。workspace 内依存なし
@@ -79,15 +99,13 @@ solvers/
     ├── preflop/        # Mode B。deps: holdem, abstraction, engine, game, formats(cache)
     ├── formats/        # serde DTO のみ + codec。deps: serde, toml, postcard, zstd, blake3
     ├── multiway/       # 2–9 seat generative path。HU engine から独立
-    ├── cli/            # bin "solvers" + lib: serve/solve/resume/bench/inspect/mw-eval/report、
+    ├── app-core/       # lib 専用: serve(bridge)/solve/resume/bench/inspect/mw-eval/report の実装、
     │                   # config スキーマと multiway セッション構築 (session.rs) を gui と共有
-    ├── gui/            # bin "solvers-gui": egui/eframe ネイティブ GUI (multiway preflop、
-    │                   # docs/native-gui-plan.md 参照)
     ├── py/             # (M3〜) PyO3/maturin。formats 上の薄い adapter
     └── wasm/           # (M8) wasm-bindgen viewer-only adapter
 ```
 
-依存方向(厳格): HU は `cards → hand-index → {engine ∥ cfr-ref} → game → holdem → {abstraction → preflop}`、multiway は `cards → multiway` の独立経路で、双方を formats 消費側(cli/py/wasm)が束ねる。**engine は poker 固有 crate に依存しない。formats は solver 実装へ依存しない。**
+依存方向(厳格): HU は `cards → hand-index → {engine ∥ cfr-ref} → game → holdem → {abstraction → preflop}`、multiway は `cards → multiway` の独立経路で、双方を formats 消費側(app-core 経由の各アプリ CLI/py/wasm)が束ねる。**engine は poker 固有 crate に依存しない。formats は solver 実装へ依存しない。アプリ crate(`apps/*`)は `app-core` のみを直接消費し、互いに依存しない。**
 
 ---
 
@@ -232,10 +250,10 @@ Bunching は HU では厳密に無効なので実装しないが、range を「�
 ## 8. 研究ワークフロー(formats + cli)
 
 - **SolveConfig(TOML)= 1 実験**。board / ranges / tree(bet grammar)/ rake / utility / algorithm / run(target 0.3% pot, check_every 25, threads, seed, storage, checkpoint_every_secs)。canonicalize して blake3 ハッシュ、全 checkpoint・artifact・metrics に刻印。`RunSummary` に git describe / crate versions / wall time。
-- **Checkpoint `.ckpt`**(resumable): header{magic, schema_version, config_hash, iteration, RNG} + zstd(postcard(全 cum-regret + cum-strategy))。定期 autosave;`solvers resume` は config-hash 不一致で拒否(override flag あり)。
+- **Checkpoint `.ckpt`**(resumable): header{magic, schema_version, config_hash, iteration, RNG} + zstd(postcard(全 cum-regret + cum-strategy))。定期 autosave;`resume` は config-hash 不一致で拒否(override flag あり)。
 - **Viewer artifact `.sol`**(compact): 平均戦略のみ、i16+scale、`streets_stored: Full | NoRivers | NoTurns` — Pio の small-save トリック(navigation 時に river をオンデマンド再 solve、ファイル 1–3 桁縮小、再 solve は秒未満〜数秒)。**全 tree JSON dump は禁止**(TexasSolver の 20 分 dump が教訓;per-node JSON export と `--max-depth` ガード付きのみ)。
 - **メトリクス**: JSONL/CSV(`run_id, algo, iter, wall_s, expl_p0, expl_p1, expl_pct_pot`)+ `tools/plot_convergence.py`(log-log)。
-- **`solvers bench ab.toml`**: 1 tree × N `[algorithm]` block の A/B。新アルゴリズム追加 = DiscountSchedule 実装 + serde enum arm + config block のみ、ハーネス変更ゼロ。
+- **`bench ab.toml`(各アプリ CLI)**: 1 tree × N `[algorithm]` block の A/B。新アルゴリズム追加 = DiscountSchedule 実装 + serde enum arm + config block のみ、ハーネス変更ゼロ。
 
 **Viewer 境界**: 全 frontend は単一の versioned serde スキーマ `NodeQuery(Pio 式 colon path "r:0:b100:c:8h:c") → NodeReport { schema_version, actions, strategy, ev, equity, ranges, pot, board }` を消費。
 1. **CLI interactive = UPI-compatible subset**(`load_tree, show_node, show_strategy, show_range, calc_ev, calc_eq, go, stop, set_accuracy, set_rake, set_icm, dump_tree, lock_node`)+ ANSI 13×13 grid + **CSV aggregate reports**(flop subset 上の per-flop frequency/EV/EQ — 研究者が実際に消費する成果物)。

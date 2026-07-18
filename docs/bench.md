@@ -73,8 +73,8 @@ comment) at `target_nash_conv = 0.2`, i.e. 0.1% of the 200-chip-x10-unit pot:
 One command per backend, from a clean release build:
 
 ```sh
-cargo build --release -p cli
-/usr/bin/time -v target/release/solvers solve examples/3betpot_fast.toml
+cargo build --release -p postflop-cli
+/usr/bin/time -v target/release/postflop-solver solve examples/3betpot_fast.toml
 ```
 
 `examples/3betpot_fast.toml` defaults to `storage = "f32"` (the
@@ -85,7 +85,7 @@ command line -- so the i16 variant means editing the config: copy the file
 `[run]` section, then run the same command against the copy:
 
 ```sh
-/usr/bin/time -v target/release/solvers solve examples/3betpot_fast_i16.toml
+/usr/bin/time -v target/release/postflop-solver solve examples/3betpot_fast_i16.toml
 ```
 
 What to record from `/usr/bin/time -v`'s output: "Elapsed (wall clock)
@@ -101,7 +101,7 @@ a substitute for the `/usr/bin/time -v` measurement above.
 `-C target-cpu=native`. On this development sandbox that has previously
 SIGILL'd at least one release binary (the `solvers` CLI on a kuhn+checkpoint
 path); if the bench-bar command SIGILLs here, that's a sandbox artifact --
-re-run on real target hardware (or a debug build, `cargo run -p cli --`,
+re-run on real target hardware (or a debug build, `cargo run -p postflop-cli --`,
 which reproduces the preflight estimate line but not the timing) before
 treating a bar miss as a real regression.
 
@@ -112,7 +112,7 @@ equivalent `.ckpt` checkpoint's size at this scale. Export both from the same
 solve and compare:
 
 ```sh
-target/release/solvers solve examples/3betpot_fast.toml \
+target/release/postflop-solver solve examples/3betpot_fast.toml \
     --checkpoint /tmp/3betpot_fast.ckpt --sol /tmp/3betpot_fast.sol
 ls -la /tmp/3betpot_fast.ckpt /tmp/3betpot_fast.sol
 ```
@@ -135,9 +135,9 @@ with plain `rustc -O` but not with `-C lto=thin --emit asm`. The
 authoritative view is the linked artifact:
 
 ```sh
-cargo build --release -p cli
-nm target/release/solvers | grep <function>      # find the mangled symbol
-objdump -d target/release/solvers --disassemble="<mangled>" | grep -cE "vmulps|vfmadd|vaddps"
+cargo build --release -p postflop-cli
+nm target/release/postflop-solver | grep <function>      # find the mangled symbol
+objdump -d target/release/postflop-solver --disassemble="<mangled>" | grep -cE "vmulps|vfmadd|vaddps"
 ```
 
 Packed-SIMD instruction counts (`vmulps`/`vfmaddNNNps`/`vaddps`/`vmaxps`) in

@@ -1,5 +1,5 @@
 //! Prebuilds the full-street EHS2 abstraction and blueprint artifacts into
-//! disk caches, so a first `solvers solve` on a bucketed config doesn't pay
+//! disk caches, so a first `preflop-solver solve` on a bucketed config doesn't pay
 //! the ~10-minute cold build.
 //!
 //! Usage: `cargo run --release -p abstraction --example build_blueprint -- \

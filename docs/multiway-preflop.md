@@ -9,7 +9,7 @@ A runnable 9-max BBA/ICM configuration is in
 `examples/preflop_multiway_9max.toml`:
 
 ```sh
-cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
+cargo run -p preflop-cli --release -- solve examples/preflop_multiway_9max.toml \
   --output result.json --metrics metrics.jsonl \
   --checkpoint solve.mwckpt --sol solve.mwsol
 ```
@@ -499,9 +499,9 @@ The multiway artifact contracts are separate from frozen HU v1:
   without an explicit checkpoint derive a `.mwckpt` beside the result (or
   `multiway-resource-limit.mwckpt` when no result path was supplied).
 
-The native GUI (`cargo run -p gui --release`, bin `solvers-gui`) embeds this
+The native GUI (`cargo run -p preflop-gui --release`, bin `preflop-gui`) embeds this
 solver in-process: Setup (full config editing with live validation and
-TOML preset save/load/import/export interchangeable with `solvers solve`
+TOML preset save/load/import/export interchangeable with `preflop-solver solve`
 configs), Solve (live convergence charts: per-seat average positive regret
 and strategy drift vs sweeps, per-seat EV ± CI at the evaluation cadence,
 pause/resume/finish/cancel), and Results (GTO-Wizard-style 13×13 preflop
@@ -580,9 +580,9 @@ enough to call before committing to a run):
   caller's own thread/memory-budget facts (no machine detection happens
   here).
 
-### Strategy purification measurement (`solvers mw-eval --purify`)
+### Strategy purification measurement (`preflop-solver mw-eval --purify`)
 
-`solvers mw-eval <config.toml> --checkpoint <path.mwckpt> [--samples N]
+`preflop-solver mw-eval <config.toml> --checkpoint <path.mwckpt> [--samples N]
 [--seed S] [--purify 0.0,0.05,1.0] [--br-traversals 2000]` restores a
 solver from a checkpoint and, for each listed threshold `delta`, measures
 the deviation-gain lower bound of the THRESHOLDED average profile:

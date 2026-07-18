@@ -4,6 +4,12 @@
 プレイングエージェント機能(Slumbot 対戦・action translation・safe gadget)は非目標。
 アルゴリズム研究基盤は基本の A/B ベンチ + JSONL メトリクスまで。
 
+決定済みの方針(2026-07、アプリ再編): 成果物は **preflop / postflop の 2 アプリ構成**
+(各アプリ = CLI + それをラップした Web UI。ローカル実行のほか、UI を Web に公開して
+自デバイスを貸すことが可能)。旧 `solvers` 統合バイナリは `preflop-solver` /
+`postflop-solver` に分割済み(共有部は `crates/app-core`)。設計と残タスク
+(bridge の postflop 対応、postflop Web UI)は `docs/app-structure.md` を参照。
+
 ## M0 — 基盤(週 1–2)
 virtual workspace 化、CI(fmt/clippy/test)、`LICENSE-POLICY.md`。`cards`(型、range parser、`aya_poker` evaluator 統合)、`hand-index`(canonical board 列挙。Waugh 完全 index の移植は M7 の abstraction cache キーまで遅延)。
 **Exit:** canonical boards 1,755 / 16,432 / 134,459 のカウント固定;range parser golden test。(Waugh index のサイズ固定 169 / 1,286,792 / 55,190,538 / 2,428,287,420 と round-trip fuzz は M7 に移動)
