@@ -455,6 +455,32 @@ Bridge v2 は、変更されていない v1 と並んで、ヘルス/機能情�
 定期チェックポイントが一度でも存在すれば、そのソルブが継続中であっても
 その URL は利用可能である。
 
+### 粗い抽象化からの warm start(`run.warm_start_buckets`)
+
+opt-in、既定では無効。設定時(`kind = "ehs2-table"` かつ `recall =
+"street"` が必須で、値は各 fine バケット数より厳密に小さいこと)、
+`build_multiway_session` はまず粗いソルブ — 同一設定で flop/turn/river
+バケット数を `warm_start_buckets` に上書きし、`-warm{B}` サフィックス付きの
+専用 EHS² キャッシュを使う — を `run.warm_start_sweeps`(既定 `25_000`)
+sweep 実行し、その結果から fine ソルバーを初期化してから粗い arena を
+解放する(fine arena 確保前)。EHS² バケットは単一スコア分布の等質量
+パーセンタイルビンなので、fine バケット `f` は粗いバケット
+`floor(f * B_coarse / B_fine)` に正確に入れ子になる(プリフロップは両側とも
+固定 169 クラス): regret はこの写像でコピー、平均戦略はゼロから再開、
+`completed_sweeps`/`next_sample_id`(および他の進捗カウンタ)は引き継がれ、
+Linear CFR の重みと割引スケジュールが途切れなく続く — fine フェーズは
+`run.sweeps` から warm 分を引いた sweep 数を走る。コピーされた深い負の
+regret により、regret 枝刈りは fine の最初の sweep から有効。チェック
+ポイント再開時は warm フェーズ全体がスキップされる。
+
+実測(6-max 100bb Auto 形状、fine 1024 バケット、総 200k sweep)の正直な
+結果: 粗フェーズは fine 比で sweep あたり ~1.26 倍しか速くない — vector
+モードのトラバーサルコストはコンボ毎処理が支配的でバケット数に依らない —
+ため、この規模では warm フェーズの壁時間を回収できない。sweep あたり品質は
+改善する(最終 max 平均正 regret 107–109 vs cold 125)。したがって
+長期ランでの計測が正当化しない限り Auto プリセットには含めず、実験用
+ノブとして扱う。
+
 ### Auto モードが実体化するサンプリング/割引設定
 
 GUI の Auto モードは、構造的な設定に加えて、収束速度を実測校正した 2 つの

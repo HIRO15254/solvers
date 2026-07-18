@@ -114,6 +114,12 @@ pub fn build_multiway_session(
             "multiway profiles do not expose NashConv; remove run.target_nash_conv"
         ));
     }
+    // Validated here, before `build_multiway_game_from_config` below trains
+    // or loads the (potentially very expensive, for `kind = "ehs2-table"`)
+    // real fine-bucket abstraction: a misconfigured `warm_start_buckets`
+    // should fail fast, not after paying for a full EHS2 table build it was
+    // never going to use.
+    validate_warm_start_config(&game_config, &run)?;
 
     let utility = convert_utility(utility)?;
     let rake = convert_rake(rake);
@@ -242,7 +248,22 @@ pub fn build_multiway_session(
         prune_skip_probability,
     };
     let evaluation_seed = solver_config.seed ^ 0x6576_616c_7561_7465;
-    let solver = if let Some(path) = resume_checkpoint {
+
+    // Warm start's coarse-bucket phase runs to completion and is dropped here,
+    // strictly before the fine solver is constructed just below (the point
+    // where the fine dense arena -- far larger than the coarse one -- is
+    // actually allocated), so the two arenas never have to coexist in memory.
+    // A resume skips this entirely: the checkpoint already carries whatever
+    // progress a prior run (warm-started or not) made, so replaying the warm
+    // phase again would just waste time re-deriving state that's already in
+    // the checkpoint.
+    let warm_start_snapshot = if resume_checkpoint.is_none() {
+        build_warm_start_snapshot(&game_config, &utility, &rake, solver_config, threads, &run)?
+    } else {
+        None
+    };
+
+    let mut solver = if let Some(path) = resume_checkpoint {
         let checkpoint = MultiwayCheckpoint::load_unchecked(path)
             .with_context(|| format!("reading multiway checkpoint {}", path.display()))?;
         let solver =
@@ -262,6 +283,13 @@ pub fn build_multiway_session(
     } else {
         MultiwaySolver::new(game, sampler, solver_config).context("initializing multiway MCCFR")?
     };
+
+    if let Some(snapshot) = warm_start_snapshot {
+        solver
+            .apply_warm_start(&snapshot)
+            .context("applying warm-start snapshot to the fine solver")?;
+    }
+
     if solver.metrics().sweeps > sweeps {
         return Err(anyhow!(
             "checkpoint already contains {} sweeps, exceeding target {}",
@@ -478,6 +506,126 @@ fn build_ehs2_table_abstraction(
         table,
         ehs2_table_fingerprint(params),
     ))
+}
+
+/// Default `run.warm_start_sweeps` when `run.warm_start_buckets` is set but
+/// the sweep count itself is omitted.
+const DEFAULT_WARM_START_SWEEPS: u64 = 25_000;
+
+/// Cheap, config-only validation of `run.warm_start_buckets`/
+/// `run.warm_start_sweeps` -- no game/abstraction/solver is built here, so
+/// this is safe to call before the (potentially very expensive) fine
+/// abstraction. A no-op when `run.warm_start_buckets` is unset.
+fn validate_warm_start_config(
+    game_config: &multiway::MultiwayConfig,
+    run: &crate::config::RunSection,
+) -> Result<()> {
+    let Some(warm_buckets) = run.warm_start_buckets else {
+        return Ok(());
+    };
+    if !matches!(game_config.abstraction.kind, AbstractionKind::Ehs2Table) {
+        return Err(anyhow!(
+            "run.warm_start_buckets requires game.abstraction.kind = \"ehs2-table\""
+        ));
+    }
+    if !matches!(
+        game_config.abstraction.recall,
+        multiway::config::RecallMode::Street
+    ) {
+        return Err(anyhow!(
+            "run.warm_start_buckets requires game.abstraction.recall = \"street\""
+        ));
+    }
+    for (label, fine_buckets) in [
+        ("flop_buckets", game_config.abstraction.flop_buckets),
+        ("turn_buckets", game_config.abstraction.turn_buckets),
+        ("river_buckets", game_config.abstraction.river_buckets),
+    ] {
+        if warm_buckets >= fine_buckets {
+            return Err(anyhow!(
+                "run.warm_start_buckets ({warm_buckets}) must be strictly less than \
+                 game.abstraction.{label} ({fine_buckets})"
+            ));
+        }
+    }
+    if run.warm_start_sweeps == Some(0) {
+        return Err(anyhow!(
+            "run.warm_start_sweeps must be positive when supplied"
+        ));
+    }
+    Ok(())
+}
+
+/// Runs `run.warm_start_buckets`'s coarse-bucket warm-start phase, returning
+/// its `WarmStartSnapshot` for the caller to splice into the fine solver --
+/// or `None` when warm start isn't configured (`run.warm_start_buckets` is
+/// `None`). Assumes `validate_warm_start_config` already passed. See
+/// `build_multiway_session`'s call site for why this must run and finish
+/// before the fine solver is constructed.
+fn build_warm_start_snapshot(
+    game_config: &multiway::MultiwayConfig,
+    utility: &MultiwayUtility,
+    rake: &MultiwayRake,
+    solver_config: SolverConfig,
+    threads: usize,
+    run: &crate::config::RunSection,
+) -> Result<Option<multiway::solver::WarmStartSnapshot>> {
+    let Some(warm_buckets) = run.warm_start_buckets else {
+        return Ok(None);
+    };
+    let warm_sweeps = run.warm_start_sweeps.unwrap_or(DEFAULT_WARM_START_SWEEPS);
+
+    let mut coarse_game_config = game_config.clone();
+    coarse_game_config.abstraction.flop_buckets = warm_buckets;
+    coarse_game_config.abstraction.turn_buckets = warm_buckets;
+    coarse_game_config.abstraction.river_buckets = warm_buckets;
+    coarse_game_config
+        .abstraction
+        .active_opponent_buckets
+        .clear();
+    coarse_game_config.abstraction.artifact_cache = coarse_game_config
+        .abstraction
+        .artifact_cache
+        .as_deref()
+        .map(|path| warm_start_cache_path(path, warm_buckets));
+
+    let (coarse_game, coarse_sampler) =
+        build_multiway_game_from_config(&coarse_game_config, utility, rake)
+            .context("building the warm-start coarse-bucket game")?;
+    let mut coarse_solver = MultiwaySolver::new(coarse_game, coarse_sampler, solver_config)
+        .context("initializing the warm-start coarse-bucket solver")?;
+
+    let start = Instant::now();
+    coarse_solver
+        .run_sweeps_with_threads(warm_sweeps, threads)
+        .context("running the warm-start coarse-bucket phase")?;
+    eprintln!(
+        "warm start: {warm_buckets}-bucket phase, {warm_sweeps} sweeps in {:.1}s",
+        start.elapsed().as_secs_f64()
+    );
+
+    let snapshot = coarse_solver
+        .warm_start_snapshot()
+        .context("snapshotting the warm-start coarse-bucket solver")?;
+    drop(coarse_solver);
+    Ok(Some(snapshot))
+}
+
+/// Derives the coarse-phase EHS2 table cache path from the fine phase's
+/// `artifact_cache`, so the two never evict each other: inserts
+/// `-warm{warm_buckets}` right before the extension, e.g.
+/// `ehs2.postcard` -> `ehs2-warm64.postcard`.
+fn warm_start_cache_path(path: &std::path::Path, warm_buckets: u16) -> std::path::PathBuf {
+    let stem = path
+        .file_stem()
+        .map(|stem| stem.to_string_lossy().into_owned())
+        .unwrap_or_default();
+    let mut file_name = format!("{stem}-warm{warm_buckets}");
+    if let Some(extension) = path.extension() {
+        file_name.push('.');
+        file_name.push_str(&extension.to_string_lossy());
+    }
+    path.with_file_name(file_name)
 }
 
 /// `pub` (rather than `pub(crate)`) so the native GUI can run cheap
@@ -888,6 +1036,43 @@ mod tests {
         assert!(error.contains("prune_threshold"), "{error}");
     }
 
+    /// Splices `extra` right after `evaluation_cadence` in `[run]`, mirroring
+    /// `with_stop_dev_gain`'s splice-into-`[run]` helper.
+    fn with_run_extra(extra: &str) -> String {
+        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let anchor = "evaluation_cadence = 1\n";
+        let spliced = raw.replacen(anchor, &format!("{anchor}{extra}"), 1);
+        assert_ne!(spliced, raw, "the splice anchor must have matched");
+        spliced
+    }
+
+    #[test]
+    fn warm_start_with_rollout_backend_is_rejected() {
+        // The smoke config's `[game.abstraction]` has no `kind`/`recall`
+        // keys, so it defaults to rollout-kmeans/full -- incompatible with
+        // warm start, which requires the ehs2-table/street combination.
+        let raw = with_run_extra("warm_start_buckets = 4\n");
+        let error = build_multiway_session_err(&raw);
+        assert!(error.contains("ehs2-table"), "{error}");
+    }
+
+    #[test]
+    fn warm_start_buckets_at_or_above_fine_is_rejected() {
+        let raw = with_run_extra("warm_start_buckets = 8\n");
+        let anchor = "seed = 17\n";
+        let spliced = raw.replacen(
+            anchor,
+            &format!("{anchor}kind = \"ehs2-table\"\nrecall = \"street\"\n"),
+            1,
+        );
+        assert_ne!(
+            spliced, raw,
+            "the abstraction splice anchor must have matched"
+        );
+        let error = build_multiway_session_err(&spliced);
+        assert!(error.contains("warm_start_buckets"), "{error}");
+    }
+
     #[test]
     fn stale_rollout_artifact_is_retrained_and_overwritten() {
         let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
@@ -952,5 +1137,56 @@ mod tests {
             cache_path.is_file(),
             "the ehs2 bucket-table cache must be written at build time"
         );
+    }
+
+    #[test]
+    #[ignore = "builds full EHS2 tables over every canonical board, twice (once for the \
+                fine 8-bucket phase and once for warm start's coarse 4-bucket phase); CI \
+                runs it in release with --include-ignored"]
+    fn warm_start_full_path_builds_and_seeds_the_fine_solver() {
+        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let directory = tempfile::tempdir().unwrap();
+        let cache_path = directory.path().join("ehs2.postcard");
+
+        // Splice `kind = "ehs2-table"`, `recall = "street"` (warm start
+        // requires the dense street-recall arena on both the coarse and fine
+        // solvers), and `artifact_cache` into `[game.abstraction]` right
+        // after the existing `seed` key, mirroring
+        // `ehs2_table_backend_builds_a_session_and_caches_its_tables`'s
+        // splice.
+        let literal = format!("{:?}", cache_path.display().to_string());
+        let config_with_kind = raw.replacen(
+            "seed = 17\n",
+            &format!(
+                "seed = 17\nkind = \"ehs2-table\"\nrecall = \"street\"\nartifact_cache = {literal}\n"
+            ),
+            1,
+        );
+        assert_ne!(
+            config_with_kind, raw,
+            "kind/recall/artifact_cache injection must have matched"
+        );
+
+        // Splice `warm_start_buckets`/`warm_start_sweeps` into `[run]` right
+        // after the existing `evaluation_cadence` key.
+        let anchor = "evaluation_cadence = 1\n";
+        let config_with_warm_start = config_with_kind.replacen(
+            anchor,
+            &format!("{anchor}warm_start_buckets = 4\nwarm_start_sweeps = 1\n"),
+            1,
+        );
+        assert_ne!(
+            config_with_warm_start, config_with_kind,
+            "warm_start_buckets/warm_start_sweeps injection must have matched"
+        );
+
+        let session = build_multiway_session(&config_with_warm_start, None)
+            .expect("the warm-start path must build a session");
+        // Per `apply_warm_start`'s contract, right after it runs and before
+        // any of the fine solver's own sweeps, `completed_sweeps()` reads
+        // exactly the coarse phase's sweep count (`warm_start_sweeps = 1`
+        // here), not additively combined with anything from the fresh fine
+        // solver (which starts at zero).
+        assert_eq!(session.solver.completed_sweeps(), 1);
     }
 }

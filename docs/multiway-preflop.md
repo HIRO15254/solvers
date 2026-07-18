@@ -560,6 +560,33 @@ enough to call before committing to a run):
   caller's own thread/memory-budget facts (no machine detection happens
   here).
 
+### Warm start from a coarser abstraction (`run.warm_start_buckets`)
+
+Opt-in, off by default. When set (requires `kind = "ehs2-table"` and
+`recall = "street"`, and a value strictly below every fine bucket count),
+`build_multiway_session` first runs a coarse solve — the same config with
+uniform flop/turn/river bucket counts overridden to `warm_start_buckets` and
+its own `-warm{B}`-suffixed EHS² cache — for `run.warm_start_sweeps`
+(default `25_000`) sweeps, then seeds the fine solver from it and drops the
+coarse arena before the fine one is allocated. EHS² buckets are equal-mass
+percentile bins of one score distribution, so fine bucket `f` nests exactly
+inside coarse bucket `floor(f * B_coarse / B_fine)` (preflop is the fixed
+169 classes on both sides): regrets copy through that mapping, the average
+strategy restarts at zero, and `completed_sweeps`/`next_sample_id` (and the
+other progress counters) carry over so the linear-CFR weights and discount
+schedule continue seamlessly — the fine phase then runs `run.sweeps` minus
+the warm sweeps. Copied deeply-negative regrets also mean regret pruning is
+active from the first fine sweep. A checkpoint resume skips the warm phase
+entirely.
+
+Measured honestly (6-max 100bb auto shape, 1024 fine buckets, 200k total
+sweeps): the coarse phase is only ~1.26x faster per sweep than the fine one
+— vector-mode traversal cost is dominated by per-combo work, not bucket
+count — so at that scale the warm phase does not pay for itself in wall
+time; per-sweep quality does improve (final max average positive regret
+107–109 vs 125 cold). It is therefore not part of the Auto preset unless
+longer-run measurements justify it; treat it as an experiment knob.
+
 ### Auto-materialized sampling and discount settings
 
 Besides the structural knobs above, the GUI's Auto mode also materializes

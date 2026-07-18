@@ -755,6 +755,88 @@ fn for_each_touched_column<'a>(
     }
 }
 
+/// Hashes an enumerated public tree's *shape* -- everything that determines
+/// its structure, deliberately excluding per-node bucket counts (those are
+/// exactly what is allowed to legitimately differ between a warm start's
+/// coarse source and its fine target; see [`WarmStartSnapshot`]). Two games
+/// with the same public rules (actor/action-label/child structure) but
+/// different abstraction bucket counts hash identically here.
+fn dense_tree_shape_hash(tree: &PublicTree) -> [u8; 32] {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"solvers.multiway.dense-tree-shape.v1");
+    hasher.update(&(tree.nodes.len() as u64).to_le_bytes());
+    for node in &tree.nodes {
+        hasher.update(&[node.street.index() as u8]);
+        hasher.update(&[node.active_opponents]);
+        hasher.update(&[node.bucket_active_opponents]);
+        hasher.update(&[node.actor]);
+        hasher.update(&(node.action_labels.len() as u64).to_le_bytes());
+        hasher.update(&(node.children.len() as u64).to_le_bytes());
+        for child in &node.children {
+            match *child {
+                Child::Decision(target) => {
+                    hasher.update(&[1u8]);
+                    hasher.update(&target.to_le_bytes());
+                }
+                Child::Terminal => {
+                    hasher.update(&[0u8]);
+                }
+            }
+        }
+    }
+    *hasher.finalize().as_bytes()
+}
+
+/// Snapshot of a dense (street-recall) solver's arena and progress counters,
+/// captured by [`MultiwaySolver::warm_start_snapshot`] and later spliced
+/// into a freshly built, finer-bucketed solver over the same public betting
+/// tree by [`MultiwaySolver::apply_warm_start`] -- "warm-start from a
+/// coarser bucket abstraction".
+///
+/// Captures:
+/// - a hash of the source solver's enumerated public tree *shape* (node
+///   count, and per-node street/actor/active-opponent-count/action-label-count/
+///   children), so `apply_warm_start` can refuse to splice state onto a
+///   structurally different tree (a different game, public rules, or
+///   betting configuration);
+/// - the bucket count the source solver actually used at every node, in
+///   node order (this can vary node-to-node even within one street, since
+///   [`ExternalSamplingGame::bucket_count`] is keyed on
+///   `bucket_active_opponents`, not just `street`);
+/// - the source arena's raw flat regrets and every column's touched flag,
+///   in the source arena's own node-major layout;
+/// - the source solver's progress counters: `completed_sweeps`,
+///   `next_sample_id`, `traversals`, `total_deal_attempts`,
+///   `terminal_evaluations`, `hand_updates`.
+///
+/// It does *not* capture `strategy_sum`; see `apply_warm_start`'s doc for
+/// why that's fine.
+///
+/// Valid to apply, via [`MultiwaySolver::apply_warm_start`], onto any
+/// *freshly built* (no traversals run yet) `RecallMode::Street` solver whose
+/// enumerated public tree has the same shape as the one this snapshot was
+/// taken from, and whose bucket count at every node is greater than or equal
+/// to this snapshot's bucket count at that node.
+pub struct WarmStartSnapshot {
+    tree_shape_hash: [u8; 32],
+    /// Bucket count used per node, in node order, when this snapshot was
+    /// taken.
+    bucket_counts: Vec<u32>,
+    /// Raw flat `[node][bucket][action]` regrets, in the source arena's own
+    /// (coarse) column layout -- addressed using `bucket_counts` above, not
+    /// necessarily the target arena's (possibly finer) layout.
+    regrets: Vec<f32>,
+    /// Per-column touched flag, in the same node-major `(node, bucket)`
+    /// order that `bucket_counts` enumerates.
+    touched: Vec<bool>,
+    completed_sweeps: u64,
+    next_sample_id: u64,
+    traversals: u64,
+    total_deal_attempts: u64,
+    terminal_evaluations: u64,
+    hand_updates: u64,
+}
+
 fn label_probabilities(labels: &[String], probabilities: Vec<f32>) -> Vec<ActionProbability> {
     labels
         .iter()
@@ -1935,6 +2017,162 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             total_slots: dense.arena.total_slots(),
             estimated_bytes: dense.arena.estimated_bytes(),
         })
+    }
+
+    /// Captures this `RecallMode::Street` solver's dense arena and progress
+    /// counters as a [`WarmStartSnapshot`], for later splicing into a
+    /// freshly built, finer-bucketed solver over the same public betting
+    /// tree via [`Self::apply_warm_start`]. Errors unless `self` is itself a
+    /// dense (`RecallMode::Street`) solver.
+    pub fn warm_start_snapshot(&self) -> Result<WarmStartSnapshot, SolverError> {
+        let dense = self
+            .dense
+            .as_ref()
+            .ok_or(SolverError::WarmStartRequiresStreetRecallSource)?;
+        let tree_shape_hash = dense_tree_shape_hash(&dense.tree);
+        let node_count = dense.tree.nodes.len();
+        let mut bucket_counts = Vec::with_capacity(node_count);
+        let mut touched = Vec::with_capacity(dense.arena.total_columns() as usize);
+        for node_index in 0..node_count {
+            let node_id = node_index as NodeId;
+            let bucket_count = dense.arena.bucket_count_of(node_id);
+            bucket_counts.push(bucket_count);
+            for bucket in 0..bucket_count {
+                let column = dense
+                    .arena
+                    .column_id(node_id, bucket)
+                    .expect("bucket is within this node's range");
+                touched.push(dense.arena.is_touched(column));
+            }
+        }
+        Ok(WarmStartSnapshot {
+            tree_shape_hash,
+            bucket_counts,
+            regrets: dense.arena.regrets.clone(),
+            touched,
+            completed_sweeps: self.completed_sweeps,
+            next_sample_id: self.next_sample_id,
+            traversals: self.traversals,
+            total_deal_attempts: self.total_deal_attempts,
+            terminal_evaluations: self.terminal_evaluations,
+            hand_updates: self.hand_updates,
+        })
+    }
+
+    /// Splices a coarser-bucketed [`WarmStartSnapshot`] into this freshly
+    /// built, finer-bucketed `RecallMode::Street` solver, so the fine run's
+    /// MCCFR iterations continue from the coarse run's progress instead of
+    /// from scratch.
+    ///
+    /// For every node, every fine bucket `f` in `0..fine_bucket_count`
+    /// inherits the snapshot's regrets from coarse source bucket
+    /// `c = floor(f * coarse_bucket_count / fine_bucket_count)` -- the
+    /// natural many-fine-buckets-to-one-coarse-bucket refinement mapping --
+    /// but only if that source column was ever touched; otherwise the fine
+    /// column is left zeroed/untouched exactly as a fresh arena starts.
+    ///
+    /// `strategy_sum` is deliberately left at zero on every copied column:
+    /// splicing in the coarse average would mix two different abstractions'
+    /// strategies, and restarting the average from zero is cheap here
+    /// because linear-CFR discounting weights sweep `completed_sweeps + 1`
+    /// (which keeps climbing from wherever the snapshot left off), so the
+    /// post-warm-start sweeps quickly dominate the average anyway.
+    ///
+    /// [`SolverConfig::prune_threshold`] is a stake-derived constant,
+    /// independent of bucket count, in both the coarse and fine phase, so
+    /// copied deeply-negative regrets can make Pluribus-style pruning active
+    /// from the very first fine sweep. That is intentional, not a bug: those
+    /// regrets already reflect real accumulated evidence that the action is
+    /// bad.
+    ///
+    /// Errors unless: `self` is a dense (`RecallMode::Street`) solver; `self`
+    /// is freshly built (`completed_sweeps == 0 && traversals == 0`, i.e. no
+    /// traversals have run against it yet); `self`'s enumerated public tree
+    /// has the same shape as the tree the snapshot was taken from; and, for
+    /// every node, the snapshot's bucket count does not exceed `self`'s
+    /// bucket count at that node.
+    pub fn apply_warm_start(&mut self, snapshot: &WarmStartSnapshot) -> Result<(), SolverError> {
+        if self.completed_sweeps != 0 || self.traversals != 0 {
+            return Err(SolverError::WarmStartTargetNotFresh {
+                completed_sweeps: self.completed_sweeps,
+                traversals: self.traversals,
+            });
+        }
+        let node_count;
+        {
+            let dense = self
+                .dense
+                .as_ref()
+                .ok_or(SolverError::WarmStartRequiresStreetRecallTarget)?;
+            let tree_shape_hash = dense_tree_shape_hash(&dense.tree);
+            node_count = dense.tree.nodes.len();
+            if tree_shape_hash != snapshot.tree_shape_hash
+                || snapshot.bucket_counts.len() != node_count
+            {
+                return Err(SolverError::WarmStartTreeShapeMismatch);
+            }
+            for node_index in 0..node_count {
+                let node_id = node_index as NodeId;
+                let fine_count = dense.arena.bucket_count_of(node_id);
+                let coarse_count = snapshot.bucket_counts[node_index];
+                if coarse_count > fine_count {
+                    return Err(SolverError::WarmStartCoarseBucketCountExceedsFine {
+                        node: node_id,
+                        coarse: coarse_count,
+                        fine: fine_count,
+                    });
+                }
+            }
+        }
+
+        // Validated; perform the copy. `coarse_column_base`/`coarse_slot_base`
+        // track this node's offset into `snapshot.touched`/`snapshot.regrets`
+        // -- the source (coarse) arena's own node-major layout, built from
+        // `snapshot.bucket_counts` rather than `self`'s (possibly larger)
+        // per-node bucket counts, so it must be recomputed independently of
+        // `self`'s own dense arena's offsets.
+        let mut coarse_column_base: u64 = 0;
+        let mut coarse_slot_base: u64 = 0;
+        for node_index in 0..node_count {
+            let node_id = node_index as NodeId;
+            let coarse_count = u64::from(snapshot.bucket_counts[node_index]);
+            let dense = self.dense.as_mut().expect("checked dense above");
+            let fine_count = u64::from(dense.arena.bucket_count_of(node_id));
+            let num_actions = dense.tree.nodes[node_index].action_labels.len() as u64;
+
+            for fine_bucket in 0..fine_count {
+                let coarse_bucket = fine_bucket * coarse_count / fine_count;
+                let coarse_column = (coarse_column_base + coarse_bucket) as usize;
+                if !snapshot.touched[coarse_column] {
+                    continue;
+                }
+                let coarse_start = (coarse_slot_base + coarse_bucket * num_actions) as usize;
+                let coarse_range = coarse_start..coarse_start + num_actions as usize;
+                let fine_bucket_id = fine_bucket as BucketId;
+                let fine_range = dense
+                    .arena
+                    .slot_range(node_id, fine_bucket_id)
+                    .expect("fine_bucket is within this node's range");
+                dense.arena.regrets[fine_range].copy_from_slice(&snapshot.regrets[coarse_range]);
+                let fine_column = dense
+                    .arena
+                    .column_id(node_id, fine_bucket_id)
+                    .expect("fine_bucket is within this node's range");
+                dense.arena.touched_set(fine_column);
+            }
+
+            coarse_column_base += coarse_count;
+            coarse_slot_base += coarse_count * num_actions;
+        }
+
+        self.completed_sweeps = snapshot.completed_sweeps;
+        self.next_sample_id = snapshot.next_sample_id;
+        self.traversals = snapshot.traversals;
+        self.total_deal_attempts = snapshot.total_deal_attempts;
+        self.terminal_evaluations = snapshot.terminal_evaluations;
+        self.hand_updates = snapshot.hand_updates;
+
+        Ok(())
     }
 
     /// Per-seat average-strategy L1 drift since `prior`, refreshing `prior`
@@ -4323,6 +4561,40 @@ pub enum SolverError {
     PruneThresholdNotNegative(f64),
     #[error("prune skip probability must be finite and in [0, 1], found {0}")]
     PruneSkipProbabilityOutOfRange(f64),
+    #[error(
+        "warm_start_snapshot requires recall = \"street\" (the dense arena) on the source \
+         solver; the current game uses RecallMode::Full"
+    )]
+    WarmStartRequiresStreetRecallSource,
+    #[error(
+        "apply_warm_start requires recall = \"street\" (the dense arena) on the target solver; \
+         the current game uses RecallMode::Full"
+    )]
+    WarmStartRequiresStreetRecallTarget,
+    #[error(
+        "warm start target solver already has progress (completed_sweeps={completed_sweeps}, \
+         traversals={traversals}); apply_warm_start requires a freshly built solver"
+    )]
+    WarmStartTargetNotFresh {
+        completed_sweeps: u64,
+        traversals: u64,
+    },
+    #[error(
+        "warm start snapshot's betting tree shape does not match the target solver's enumerated \
+         tree; this usually means a different game, public rules, or configuration was used to \
+         build the target solver, not just a coincidental mismatch"
+    )]
+    WarmStartTreeShapeMismatch,
+    #[error(
+        "warm start snapshot's bucket count at node {node} ({coarse}) exceeds the target \
+         solver's bucket count at that node ({fine}); the coarse (source) bucket count must not \
+         exceed the fine (target) bucket count"
+    )]
+    WarmStartCoarseBucketCountExceedsFine {
+        node: NodeId,
+        coarse: u32,
+        fine: u32,
+    },
 }
 
 #[cfg(test)]
@@ -5453,6 +5725,132 @@ mod tests {
         }
     }
 
+    /// Same tree shape as [`DenseToyGame`] (player 0's "First" best/dominated
+    /// choice, then player 1's "Second" call/fold choice, then terminal) but
+    /// with a caller-chosen bucket count instead of a hardcoded `2`, so
+    /// warm-start tests can build a "coarse" and a "fine" solver over
+    /// otherwise-identical public rules.
+    #[derive(Clone, Copy)]
+    struct DenseBucketedToyGame(u32);
+
+    impl ExternalSamplingGame for DenseBucketedToyGame {
+        type State = DenseToyState;
+        type Actions = DenseToyState;
+
+        fn num_players(&self) -> usize {
+            2
+        }
+
+        fn root_state(&self) -> Self::State {
+            DenseToyState::First
+        }
+
+        fn actor(&self, state: &Self::State) -> Option<usize> {
+            match state {
+                DenseToyState::First => Some(0),
+                DenseToyState::Second { .. } => Some(1),
+                DenseToyState::Terminal { .. } => None,
+            }
+        }
+
+        fn node_actions(&self, state: &Self::State) -> Self::Actions {
+            *state
+        }
+
+        fn num_actions_of(&self, actions: &Self::Actions) -> usize {
+            usize::from(!matches!(actions, DenseToyState::Terminal { .. })) * 2
+        }
+
+        fn next_state_with(
+            &self,
+            _state: &Self::State,
+            actions: &Self::Actions,
+            action_index: usize,
+        ) -> Self::State {
+            match *actions {
+                DenseToyState::First => DenseToyState::Second {
+                    first_action: action_index,
+                },
+                DenseToyState::Second { first_action } => DenseToyState::Terminal { first_action },
+                DenseToyState::Terminal { .. } => panic!("terminal state has no child"),
+            }
+        }
+
+        fn write_action_label(
+            &self,
+            actions: &Self::Actions,
+            action_index: usize,
+            out: &mut String,
+        ) {
+            let labels = match actions {
+                DenseToyState::First => ["best", "dominated"],
+                DenseToyState::Second { .. } => ["call", "fold"],
+                DenseToyState::Terminal { .. } => panic!("terminal state has no actions"),
+            };
+            out.push_str(labels[action_index]);
+        }
+
+        fn bucket(&self, _state: &Self::State, world: &SampledWorld, actor: usize) -> PrivateInfo {
+            let bucket = (world.hole_combo(actor) % self.0 as usize) as u32;
+            PrivateInfo::from_current_bucket(Street::Preflop, 1, bucket)
+        }
+
+        fn terminal_utilities(
+            &self,
+            state: &Self::State,
+            _world: &SampledWorld,
+            utilities: &mut [f64],
+        ) {
+            let DenseToyState::Terminal { first_action } = *state else {
+                panic!("not terminal")
+            };
+            // Action 0 ("best") is dominant for player 0 regardless of
+            // player 1's action or either player's bucket.
+            utilities[0] = f64::from(first_action == 0) * 2.0 - 1.0;
+            utilities[1] = -utilities[0];
+        }
+
+        fn recall_mode(&self) -> RecallMode {
+            RecallMode::Street
+        }
+
+        fn bucket_count(&self, _street: Street, _active_opponents: u8) -> u32 {
+            self.0
+        }
+
+        fn dense_node_context(&self, _state: &Self::State) -> DenseNodeContext {
+            DenseNodeContext {
+                street: Street::Preflop,
+                active_opponents: 1,
+                bucket_active_opponents: 1,
+            }
+        }
+    }
+
+    fn dense_bucketed_toy_solver(
+        seed: u64,
+        bucket_count: u32,
+    ) -> MultiwaySolver<DenseBucketedToyGame> {
+        MultiwaySolver::new(
+            DenseBucketedToyGame(bucket_count),
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            SolverConfig {
+                seed,
+                max_memory_bytes: 1 << 20,
+                max_traversal_depth: 16,
+                exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
+                discount_every: DEFAULT_DISCOUNT_EVERY,
+                discount_until: DEFAULT_DISCOUNT_UNTIL,
+                sweep_batch: 1,
+                traverser_vector: false,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
+            },
+        )
+        .unwrap()
+    }
+
     fn dense_dominated_solver(seed: u64) -> MultiwaySolver<DenseDominatedChoice> {
         MultiwaySolver::new(
             DenseDominatedChoice,
@@ -6032,6 +6430,141 @@ mod tests {
         reference.run_sweeps_with_threads(40, 2).unwrap();
         assert_eq!(resumed.snapshot_state(), reference.snapshot_state());
         assert_eq!(resumed.metrics(), reference.metrics());
+    }
+
+    /// `player`'s column at `history`, current-street bucket `bucket`, for
+    /// the [`DenseBucketedToyGame`]/[`DenseToyGame`] tree shape (which only
+    /// ever reaches `Street::Preflop` with one active opponent).
+    fn bucketed_key(history: HistoryKey, player: u8, bucket: BucketId) -> InfoKey {
+        InfoKey {
+            history,
+            player,
+            street: 0,
+            active_opponents: 1,
+            bucket_path: [bucket, UNREACHED_BUCKET, UNREACHED_BUCKET, UNREACHED_BUCKET],
+        }
+    }
+
+    #[test]
+    fn warm_start_copies_regrets_through_the_bucket_mapping() {
+        let coarse_buckets = 2u32;
+        let fine_buckets = 4u32;
+
+        let mut coarse = dense_bucketed_toy_solver(11, coarse_buckets);
+        coarse.run_sweeps(20).unwrap();
+        let snapshot = coarse.warm_start_snapshot().unwrap();
+
+        let mut fine = dense_bucketed_toy_solver(12, fine_buckets);
+        fine.apply_warm_start(&snapshot).unwrap();
+
+        // "First" (player 0, root) and "Second" (player 1, reached via
+        // first_action = 0) nodes both get checked through the bucket
+        // mapping `c = floor(f * coarse_buckets / fine_buckets)`.
+        let second_history = HistoryKey::ROOT.child(0, 0);
+        for &(history, player) in &[(HistoryKey::ROOT, 0u8), (second_history, 1u8)] {
+            for fine_bucket in 0..fine_buckets {
+                let coarse_bucket = fine_bucket * coarse_buckets / fine_buckets;
+                let fine_key = bucketed_key(history, player, fine_bucket);
+                let coarse_key = bucketed_key(history, player, coarse_bucket);
+                let fine_column = fine.policy(fine_key);
+                let coarse_column = coarse.policy(coarse_key);
+                assert_eq!(
+                    fine_column.as_ref().map(|column| &column.regrets),
+                    coarse_column.as_ref().map(|column| &column.regrets),
+                    "history {history:?} player {player} fine bucket {fine_bucket}"
+                );
+                if let Some(column) = fine_column {
+                    assert!(
+                        column.strategy_sum.iter().all(|&value| value == 0.0),
+                        "warm-started strategy_sum must stay zero"
+                    );
+                }
+            }
+        }
+
+        let coarse_state = coarse.snapshot_state();
+        let fine_state = fine.snapshot_state();
+        assert_eq!(fine.completed_sweeps(), coarse.completed_sweeps());
+        assert_eq!(fine_state.traversals, coarse_state.traversals);
+        assert_eq!(fine_state.next_sample_id, coarse_state.next_sample_id);
+        assert_eq!(
+            fine_state.total_deal_attempts,
+            coarse_state.total_deal_attempts
+        );
+        assert_eq!(
+            fine_state.terminal_evaluations,
+            coarse_state.terminal_evaluations
+        );
+        assert_eq!(fine_state.hand_updates, coarse_state.hand_updates);
+    }
+
+    #[test]
+    fn warm_start_rejects_non_fresh_and_mismatched_targets() {
+        let mut coarse = dense_bucketed_toy_solver(1, 2);
+        coarse.run_sweeps(5).unwrap();
+        let snapshot = coarse.warm_start_snapshot().unwrap();
+
+        // Not fresh: the target already ran a sweep.
+        let mut not_fresh = dense_bucketed_toy_solver(2, 4);
+        not_fresh.run_sweeps(1).unwrap();
+        assert!(matches!(
+            not_fresh.apply_warm_start(&snapshot),
+            Err(SolverError::WarmStartTargetNotFresh { .. })
+        ));
+
+        // Tree shape mismatch: `DenseDominatedChoice` is a single-node,
+        // single-action-pair dense game, structurally different from
+        // `DenseBucketedToyGame`'s multi-node tree.
+        let mut mismatched_shape = dense_dominated_solver(3);
+        assert!(matches!(
+            mismatched_shape.apply_warm_start(&snapshot),
+            Err(SolverError::WarmStartTreeShapeMismatch)
+        ));
+
+        // Coarse bucket count exceeds fine bucket count.
+        let mut bigger_coarse = dense_bucketed_toy_solver(4, 4);
+        bigger_coarse.run_sweeps(5).unwrap();
+        let bigger_snapshot = bigger_coarse.warm_start_snapshot().unwrap();
+        let mut smaller_fine = dense_bucketed_toy_solver(5, 2);
+        assert!(matches!(
+            smaller_fine.apply_warm_start(&bigger_snapshot),
+            Err(SolverError::WarmStartCoarseBucketCountExceedsFine { .. })
+        ));
+    }
+
+    #[test]
+    fn warm_started_solver_continues_and_checkpoints() {
+        let mut coarse = dense_bucketed_toy_solver(21, 2);
+        coarse.run_sweeps(15).unwrap();
+        let snapshot = coarse.warm_start_snapshot().unwrap();
+
+        let mut solver = dense_bucketed_toy_solver(22, 4);
+        solver.apply_warm_start(&snapshot).unwrap();
+        let carried_over_sweeps = solver.completed_sweeps();
+        assert_eq!(carried_over_sweeps, coarse.completed_sweeps());
+
+        solver.run_sweeps(10).unwrap();
+        assert!(solver.completed_sweeps() > carried_over_sweeps);
+
+        let checkpoint = crate::checkpoint::MultiwayCheckpoint::capture(&solver);
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("warm_started.mwckpt");
+        checkpoint.write_atomic(&path).unwrap();
+        let loaded = crate::checkpoint::MultiwayCheckpoint::load(
+            &path,
+            solver.configuration_fingerprint(),
+            solver.abstraction_fingerprint(),
+        )
+        .unwrap();
+        assert_eq!(loaded.state, solver.snapshot_state());
+
+        let resumed = MultiwaySolver::from_state(
+            DenseBucketedToyGame(4),
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            loaded.state,
+        )
+        .unwrap();
+        assert_eq!(resumed.snapshot_state(), solver.snapshot_state());
     }
 
     #[test]
