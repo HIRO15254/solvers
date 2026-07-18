@@ -274,6 +274,32 @@ pub enum AlgorithmSection {
         /// byte-identical to before this field existed.
         #[serde(default, skip_serializing_if = "is_false")]
         traverser_vector: bool,
+        /// Enables Pluribus-style regret-based pruning (see
+        /// `multiway::solver::SolverConfig::prune`): in vector-traverser
+        /// mode, zero-probability actions whose regret sits far below
+        /// `prune_threshold` are skipped (with probability
+        /// `prune_skip_probability`) rather than descended into. `false`
+        /// (the default) is the original algorithm, byte-identical to
+        /// before this field existed. Requires `traverser_vector = true`.
+        #[serde(default, skip_serializing_if = "is_false")]
+        prune: bool,
+        /// Regret threshold below which a zero-probability action becomes
+        /// prunable; must be finite and strictly negative. `None` (the
+        /// default) derives it from the game's stakes at solve time when
+        /// `prune` is enabled; ignored otherwise. See
+        /// `crate::session::build_multiway_session` for the derivation.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        prune_threshold: Option<f64>,
+        /// Probability that a prunable action is actually skipped on a
+        /// given traversal (see
+        /// `multiway::solver::SolverConfig::prune_skip_probability`). Omitted
+        /// from serialized output at its default (the GUI never exposes this
+        /// knob, so its exported configs always hit this default).
+        #[serde(
+            default = "default_prune_skip_probability",
+            skip_serializing_if = "is_default_prune_skip_probability"
+        )]
+        prune_skip_probability: f64,
     },
 }
 
@@ -305,6 +331,12 @@ fn default_discount_until() -> u64 {
 }
 fn default_icm_samples() -> u64 {
     100_000
+}
+fn default_prune_skip_probability() -> f64 {
+    multiway::solver::DEFAULT_PRUNE_SKIP_PROBABILITY
+}
+fn is_default_prune_skip_probability(value: &f64) -> bool {
+    *value == default_prune_skip_probability()
 }
 /// `pub(crate)` (rather than private) so `bench` can build an `HsDcfr`
 /// section with the same default `gamma0` the config schema would use.

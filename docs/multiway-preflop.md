@@ -407,6 +407,64 @@ which worlds get sampled.
   and persists successfully; it just starts the next run with an
   incomplete (but still consistent) warm cache instead of a fully warm one.
 
+### Regret-based pruning (`algorithm.prune`)
+
+Pluribus-style regret-based pruning (RBP), only meaningful in
+`traverser_vector` mode: at a traverser decision node, a (bucket, action)
+pair becomes a *pruning candidate* once its regret-matched probability is
+exactly zero and its accumulated regret has fallen far below a threshold.
+Rather than descending into every prunable action's subtree on every
+traversal, a candidate is actually skipped (the combos whose bucket is
+prunable for that action are dropped from the vector before recursing) with
+probability `algorithm.prune_skip_probability` — so roughly 95% of
+traversals shrink their combo set at that node, and the remaining ~5% still
+explore it in full, keeping the estimate honest and letting a genuinely
+recovering action climb back out of pruning.
+
+Three `[algorithm]` keys control it, all optional:
+
+- `prune` (bool, default `false`): enables the feature. Only valid together
+  with `traverser_vector = true` — the CLI (`cli::session`) rejects `prune =
+  true` with `traverser_vector = false` before ever building the game, and
+  the engine (`SolverConfig::validate_setup`) rejects it too as a backstop.
+- `prune_threshold` (float, no static default): the regret floor below which
+  a zero-probability action becomes prunable. When `prune = true` and this
+  key is omitted, it is derived from the game's stakes: `-10.0 *` the sum
+  of every seat's starting stack (in bb) for `[utility] kind = "chip-ev"`, or
+  `-10.0 *` the sum of the tournament payouts for `kind = "tournament-icm"`.
+  The `-10x` scale was calibrated empirically on paired 200k-sweep 6-max
+  runs: vector-mode bucket regrets are range-weighted *means* over combos,
+  so they grow orders of magnitude slower than the raw per-hand regrets
+  behind Pluribus's famously astronomical constant — a `-1000x` variant
+  essentially never activated within realistic run lengths (and its
+  bookkeeping made runs marginally slower), while `-10x` only admits a
+  (bucket, action) after roughly 10k+ sweeps of persistent domination (the
+  ratio is stack-depth-invariant, since per-sweep regret deltas scale with
+  stack depth too) and measurably sped the paired runs up. Two safety nets
+  keep the comparatively shallow default honest: the ~5% exploration below,
+  and the batched early-discount events, which scale negative regrets back
+  toward zero and so periodically lift borderline pairs above the threshold
+  for a full re-check. Must be finite and strictly negative when set
+  explicitly.
+- `prune_skip_probability` (float, default `0.95`): probability that a
+  prunable action is actually skipped on a given traversal, as above. Not
+  exposed by the GUI.
+
+Regret floor: whenever pruning is enabled, every regret update is clamped at
+`1.05 * prune_threshold` — 5% more negative than the pruning threshold
+itself, so a floored regret still satisfies the "below threshold" test
+without growing unboundedly negative (which would otherwise both waste `f32`
+headroom and slow a pruned action's eventual recovery once its true regret
+improves).
+
+Auto mode enables pruning unconditionally (`prune = true`, threshold derived
+from stakes the same way as above) as part of materializing
+`traverser_vector = true`. Advanced mode defaults new setups to `prune =
+false` — the vector traverser is also off by default there, and the CLI
+rejects the pruning-without-vector combination — with a "(recommended)"
+checkbox for opting in; a config loaded from a TOML without the key likewise
+parses as `prune = false` (the CLI's historical default).
+
 ## Output semantics
 
 Multiway progress uses per-seat profile EV estimates, confidence intervals,

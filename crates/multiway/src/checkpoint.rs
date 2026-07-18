@@ -12,14 +12,17 @@ use crate::solver::{
 };
 
 const CHECKPOINT_MAGIC: &[u8; 8] = b"SLVRMWCP";
-/// Bumped 4 -> 5 when [`SolverConfig`] grew a `traverser_vector` field and
-/// [`SolverState`] grew a `hand_updates` counter. `load` transparently
-/// accepts version 5 (current), 4 (decoding the older on-disk `SolverConfig`
-/// shape without `traverser_vector` and filling `traverser_vector = false`,
-/// `hand_updates = 0`), and [`MIN_SUPPORTED_CHECKPOINT_VERSION`] (version 3,
-/// additionally missing `sweep_batch`, filled `1`); every checkpoint this
-/// process *writes* is always the current version.
-pub const CHECKPOINT_VERSION: u16 = 5;
+/// Bumped 5 -> 6 when [`SolverConfig`] grew `prune`, `prune_threshold`, and
+/// `prune_skip_probability` fields. `load` transparently accepts version 6
+/// (current), 5 (decoding the older on-disk `SolverConfig` shape without the
+/// prune fields and filling `prune = false`, `prune_threshold =
+/// DEFAULT_PRUNE_THRESHOLD`, `prune_skip_probability =
+/// DEFAULT_PRUNE_SKIP_PROBABILITY`), 4 (additionally missing
+/// `traverser_vector` and `hand_updates`, filled `false`/`0`), and
+/// [`MIN_SUPPORTED_CHECKPOINT_VERSION`] (version 3, additionally missing
+/// `sweep_batch`, filled `1`); every checkpoint this process *writes* is
+/// always the current version.
+pub const CHECKPOINT_VERSION: u16 = 6;
 /// Oldest checkpoint container version [`MultiwayCheckpoint::load_unchecked`]
 /// still reads. Bump only alongside a matching legacy mirror struct and
 /// `From` conversion into the current [`SolverState`] shape.
@@ -104,6 +107,10 @@ impl From<SolverStateV3> for SolverState {
                 // Version 3 checkpoints predate the vector-traverser mode;
                 // `false` is the behavior they were written under.
                 traverser_vector: false,
+                // Version 3 checkpoints predate regret-based pruning.
+                prune: false,
+                prune_threshold: crate::solver::DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: crate::solver::DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
             traversals: legacy.traversals,
             completed_sweeps: legacy.completed_sweeps,
@@ -162,6 +169,10 @@ impl From<SolverStateV4> for SolverState {
                 // Version 4 checkpoints predate the vector-traverser mode;
                 // `false` is the behavior they were written under.
                 traverser_vector: false,
+                // Version 4 checkpoints predate regret-based pruning.
+                prune: false,
+                prune_threshold: crate::solver::DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: crate::solver::DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
             traversals: legacy.traversals,
             completed_sweeps: legacy.completed_sweeps,
@@ -170,6 +181,67 @@ impl From<SolverStateV4> for SolverState {
             terminal_evaluations: legacy.terminal_evaluations,
             // Version 4 checkpoints predate the hand-updates counter.
             hand_updates: 0,
+            histories: legacy.histories,
+            policies: legacy.policies,
+        }
+    }
+}
+
+/// Mirrors [`SolverConfig`]'s on-disk shape for checkpoint container version
+/// 5, i.e. every field it had before `prune`, `prune_threshold`, and
+/// `prune_skip_probability` were appended.
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+struct SolverConfigV5 {
+    seed: u64,
+    max_memory_bytes: u64,
+    max_traversal_depth: u32,
+    exploration_epsilon: f64,
+    discount_every: u64,
+    discount_until: u64,
+    sweep_batch: u64,
+    traverser_vector: bool,
+}
+
+/// Mirrors [`SolverState`]'s on-disk shape for checkpoint container version 5
+/// (every field unchanged except `config`, which is the version-5 shape).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct SolverStateV5 {
+    schema_version: u16,
+    config: SolverConfigV5,
+    traversals: u64,
+    completed_sweeps: u64,
+    next_sample_id: u64,
+    total_deal_attempts: u64,
+    terminal_evaluations: u64,
+    hand_updates: u64,
+    histories: Vec<HistoryEntry>,
+    policies: Vec<PolicyEntry>,
+}
+
+impl From<SolverStateV5> for SolverState {
+    fn from(legacy: SolverStateV5) -> Self {
+        SolverState {
+            schema_version: legacy.schema_version,
+            config: SolverConfig {
+                seed: legacy.config.seed,
+                max_memory_bytes: legacy.config.max_memory_bytes,
+                max_traversal_depth: legacy.config.max_traversal_depth,
+                exploration_epsilon: legacy.config.exploration_epsilon,
+                discount_every: legacy.config.discount_every,
+                discount_until: legacy.config.discount_until,
+                sweep_batch: legacy.config.sweep_batch,
+                traverser_vector: legacy.config.traverser_vector,
+                // Version 5 checkpoints predate regret-based pruning.
+                prune: false,
+                prune_threshold: crate::solver::DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: crate::solver::DEFAULT_PRUNE_SKIP_PROBABILITY,
+            },
+            traversals: legacy.traversals,
+            completed_sweeps: legacy.completed_sweeps,
+            next_sample_id: legacy.next_sample_id,
+            total_deal_attempts: legacy.total_deal_attempts,
+            terminal_evaluations: legacy.terminal_evaluations,
+            hand_updates: legacy.hand_updates,
             histories: legacy.histories,
             policies: legacy.policies,
         }
@@ -476,7 +548,11 @@ impl MultiwayCheckpoint {
         }
 
         let state: SolverState = match header.version {
-            5 => postcard::from_bytes(&raw)?,
+            6 => postcard::from_bytes(&raw)?,
+            5 => {
+                let legacy: SolverStateV5 = postcard::from_bytes(&raw)?;
+                legacy.into()
+            }
             4 => {
                 let legacy: SolverStateV4 = postcard::from_bytes(&raw)?;
                 legacy.into()
@@ -720,6 +796,9 @@ mod tests {
                 discount_until: crate::solver::DEFAULT_DISCOUNT_UNTIL,
                 sweep_batch: 1,
                 traverser_vector: false,
+                prune: false,
+                prune_threshold: crate::solver::DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: crate::solver::DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
             traversals: 6,
             completed_sweeps: 2,
@@ -1137,6 +1216,106 @@ mod tests {
         let reloaded = MultiwayCheckpoint::load(&upgraded_path, [3; 32], [7; 32]).unwrap();
         assert_eq!(reloaded.header.version, CHECKPOINT_VERSION);
         assert_eq!(reloaded.state, loaded.state);
+    }
+
+    /// The version-5 mirror of [`state`]: same values, `SolverConfigV5`
+    /// shape (no `prune`, `prune_threshold`, or `prune_skip_probability`).
+    fn legacy_v5_state() -> SolverStateV5 {
+        SolverStateV5 {
+            schema_version: SOLVER_STATE_VERSION,
+            config: SolverConfigV5 {
+                seed: 9,
+                max_memory_bytes: 1 << 20,
+                max_traversal_depth: 64,
+                exploration_epsilon: crate::solver::DEFAULT_EXPLORATION_EPSILON,
+                discount_every: crate::solver::DEFAULT_DISCOUNT_EVERY,
+                discount_until: crate::solver::DEFAULT_DISCOUNT_UNTIL,
+                sweep_batch: 1,
+                traverser_vector: true,
+            },
+            traversals: 6,
+            completed_sweeps: 2,
+            next_sample_id: 6,
+            total_deal_attempts: 8,
+            terminal_evaluations: 20,
+            hand_updates: 6,
+            histories: vec![HistoryEntry {
+                key: HistoryKey::ROOT.child(1, 2),
+                parent: HistoryKey::ROOT,
+                actor: 1,
+                action_index: 2,
+                action_label: "raise".into(),
+            }],
+            policies: vec![PolicyEntry {
+                key: InfoKey {
+                    history: HistoryKey::ROOT.child(1, 2),
+                    player: 2,
+                    street: 1,
+                    active_opponents: 2,
+                    bucket_path: [
+                        4,
+                        17,
+                        crate::solver::UNREACHED_BUCKET,
+                        crate::solver::UNREACHED_BUCKET,
+                    ],
+                },
+                column: PolicyColumn {
+                    action_labels: vec!["fold".into(), "call".into()],
+                    regrets: vec![-1.0, 2.5],
+                    strategy_sum: vec![3.0, 7.0],
+                },
+            }],
+        }
+    }
+
+    #[test]
+    fn checkpoint_version_5_loads_with_prune_defaulted_to_false() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("legacy-v5.mwckpt");
+        let legacy = legacy_v5_state();
+        let raw = postcard::to_allocvec(&legacy).unwrap();
+        write_checkpoint_with_version(&raw, 5, [3; 32], [7; 32], legacy.next_sample_id, &path);
+
+        let loaded = MultiwayCheckpoint::load(&path, [3; 32], [7; 32]).unwrap();
+        assert_eq!(loaded.header.version, 5);
+        assert!(!loaded.state.config.prune);
+        assert_eq!(
+            loaded.state.config.prune_threshold,
+            crate::solver::DEFAULT_PRUNE_THRESHOLD
+        );
+        assert_eq!(
+            loaded.state.config.prune_skip_probability,
+            crate::solver::DEFAULT_PRUNE_SKIP_PROBABILITY
+        );
+        assert_eq!(loaded.state, SolverState::from(legacy));
+
+        // Re-saving an upgraded-in-memory checkpoint always writes the
+        // current container version and the current `SolverState` shape.
+        let upgraded_path = directory.path().join("upgraded-v5.mwckpt");
+        loaded.write_atomic(&upgraded_path).unwrap();
+        let reloaded = MultiwayCheckpoint::load(&upgraded_path, [3; 32], [7; 32]).unwrap();
+        assert_eq!(reloaded.header.version, CHECKPOINT_VERSION);
+        assert_eq!(reloaded.state, loaded.state);
+    }
+
+    #[test]
+    fn checkpoint_round_trips_non_default_prune_fields() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("prune-round-trip.mwckpt");
+        let mut pruned_state = state();
+        pruned_state.config.prune = true;
+        pruned_state.config.prune_threshold = -12_345.5;
+        pruned_state.config.prune_skip_probability = 0.42;
+
+        let checkpoint = MultiwayCheckpoint::new(pruned_state.clone(), [1; 32], [2; 32]);
+        checkpoint.write_atomic(&path).unwrap();
+
+        let loaded = MultiwayCheckpoint::load(&path, [1; 32], [2; 32]).unwrap();
+        assert_eq!(loaded.header.version, CHECKPOINT_VERSION);
+        assert!(loaded.state.config.prune);
+        assert_eq!(loaded.state.config.prune_threshold, -12_345.5);
+        assert_eq!(loaded.state.config.prune_skip_probability, 0.42);
+        assert_eq!(loaded.state, pruned_state);
     }
 
     #[test]

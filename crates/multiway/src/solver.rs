@@ -28,6 +28,8 @@ pub const DEFAULT_EXPLORATION_EPSILON: f64 = 0.06;
 pub const UNREACHED_BUCKET: BucketId = u32::MAX;
 pub const DEFAULT_DISCOUNT_EVERY: u64 = 100_000;
 pub const DEFAULT_DISCOUNT_UNTIL: u64 = 10_000_000;
+pub const DEFAULT_PRUNE_THRESHOLD: f64 = -1.0e6;
+pub const DEFAULT_PRUNE_SKIP_PROBABILITY: f64 = 0.95;
 const ENTRY_OVERHEAD_BYTES: u64 = 64;
 const HISTORY_OVERHEAD_BYTES: u64 = 48;
 
@@ -420,6 +422,24 @@ pub struct SolverConfig {
     /// one-hand-per-traversal algorithm, byte-identical to before this field
     /// existed.
     pub traverser_vector: bool,
+    /// Enables Pluribus-style regret-based pruning at traverser decision
+    /// nodes in vector mode: a (bucket, action) whose regret-matched
+    /// probability is exactly zero and whose accumulated regret is below
+    /// [`Self::prune_threshold`] is skipped (with probability
+    /// [`Self::prune_skip_probability`]) rather than descended into, saving
+    /// the traversal work that would only ever multiply by a zero
+    /// probability. `false` (the default) is byte-identical to before this
+    /// field existed. [`validate_setup`] rejects `true` unless
+    /// [`Self::traverser_vector`] is also `true`.
+    pub prune: bool,
+    /// Regret threshold (utility units) below which a zero-probability
+    /// (bucket, action) becomes a pruning candidate. Must be finite and
+    /// strictly negative when [`Self::prune`] is enabled; ignored otherwise.
+    pub prune_threshold: f64,
+    /// Probability of actually skipping a prunable (bucket, action) on a
+    /// given visit (Pluribus used `0.95`). Must be finite and in `[0, 1]`
+    /// when [`Self::prune`] is enabled; ignored otherwise.
+    pub prune_skip_probability: f64,
 }
 
 impl Default for SolverConfig {
@@ -433,6 +453,9 @@ impl Default for SolverConfig {
             discount_until: DEFAULT_DISCOUNT_UNTIL,
             sweep_batch: 1,
             traverser_vector: false,
+            prune: false,
+            prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+            prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
         }
     }
 }
@@ -976,7 +999,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// Fingerprint covering solver knobs, ranges, and public game rules.
     pub fn configuration_fingerprint(&self) -> [u8; 32] {
         let mut hasher = blake3::Hasher::new();
-        hasher.update(b"solvers.multiway.solver-config.v3");
+        hasher.update(b"solvers.multiway.solver-config.v4");
         hasher.update(&self.config.seed.to_le_bytes());
         hasher.update(&self.config.max_traversal_depth.to_le_bytes());
         hasher.update(&self.config.exploration_epsilon.to_bits().to_le_bytes());
@@ -984,6 +1007,9 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         hasher.update(&self.config.discount_until.to_le_bytes());
         hasher.update(&self.config.sweep_batch.to_le_bytes());
         hasher.update(&[u8::from(self.config.traverser_vector)]);
+        hasher.update(&[u8::from(self.config.prune)]);
+        hasher.update(&self.config.prune_threshold.to_bits().to_le_bytes());
+        hasher.update(&self.config.prune_skip_probability.to_bits().to_le_bytes());
         hasher.update(&self.sampler.range_fingerprint());
         hasher.update(&self.game.game_fingerprint());
         *hasher.finalize().as_bytes()
@@ -1178,6 +1204,11 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 // workers), this is combo-indexed and threaded separately
                 // (see `VectorTraversalWorker::traverse`).
                 let own_reach = vec![1.0; combos.len()];
+                // The traversal starts with every feasible combo active;
+                // pruning (see `VectorTraversalWorker::traverse`) is the
+                // only thing that ever shrinks this subset further down the
+                // tree.
+                let active: Vec<usize> = (0..combos.len()).collect();
                 let mut worker = VectorTraversalWorker::new(
                     &self.game,
                     dense,
@@ -1191,6 +1222,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     0,
                     &sample.world,
                     traverser,
+                    &active,
                     &own_reach,
                     1.0,
                     &mut action_rng,
@@ -1468,8 +1500,25 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     DenseEvent::AddRegret { column, values } => {
                         let range = dense.arena.slot_range_for_column(column, values.len())?;
                         dense.arena.touched_set(column);
+                        // Regret floor, Pluribus-style: only meaningful once
+                        // pruning is enabled (it exists to bound how long a
+                        // heavily-pruned action needs to recover once it
+                        // stops being a pruning candidate, and to keep the
+                        // ever-more-negative accumulation from overflowing
+                        // f32); 5% more negative than `prune_threshold` so a
+                        // floored regret still satisfies the "below
+                        // threshold" pruning test.
+                        let floor = self
+                            .config
+                            .prune
+                            .then_some((1.05 * self.config.prune_threshold) as f32);
                         for (target, value) in dense.arena.regrets[range].iter_mut().zip(values) {
                             checked_add_f32(target, value)?;
+                            if let Some(floor) = floor
+                                && *target < floor
+                            {
+                                *target = floor;
+                            }
                         }
                     }
                     DenseEvent::AddStrategy { column, values } => {
@@ -3395,16 +3444,23 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
         }
     }
 
+    /// Evaluates the traverser's terminal utility for the subset of the
+    /// master combo list named by `active` (indices into `self.combos`).
+    /// `active` need not be the full feasible set: pruned subtrees (see
+    /// [`Self::traverse`]) descend with a smaller subset, and this method
+    /// only ever pays for the combos actually named by it.
     fn terminal_vector(
         &mut self,
         state: &G::State,
         world: &SampledWorld,
         traverser: usize,
+        active: &[usize],
     ) -> Result<Vec<f64>, SolverError> {
         let mut values = Vec::new();
+        let subset: Vec<usize> = active.iter().map(|&idx| self.combos[idx]).collect();
         self.game
-            .terminal_utilities_for_combos(state, world, traverser, &self.combos, &mut values);
-        if values.len() != self.combos.len() {
+            .terminal_utilities_for_combos(state, world, traverser, &subset, &mut values);
+        if values.len() != active.len() {
             return Err(SolverError::InvalidState(
                 "terminal_utilities_for_combos returned the wrong number of values",
             ));
@@ -3424,6 +3480,13 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
         Ok(values)
     }
 
+    /// `active` names the traversal's currently active combo subset as
+    /// indices into the fixed master `self.combos`/`self.weights` (the root
+    /// call passes `0..self.combos.len()`); `own_reach` is aligned to
+    /// `active` the same way. When [`SolverConfig::prune`] is disabled,
+    /// `active` is always the full master range at every node (pruning is
+    /// the only thing that ever shrinks it), so this is byte-identical to
+    /// the pre-pruning algorithm.
     #[allow(clippy::too_many_arguments)]
     fn traverse(
         &mut self,
@@ -3431,6 +3494,7 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
         node_id: NodeId,
         world: &SampledWorld,
         traverser: usize,
+        active: &[usize],
         own_reach: &[f64],
         sample_importance: f64,
         rng: &mut ChaCha20Rng,
@@ -3443,7 +3507,7 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
         }
 
         let Some(actor) = self.game.actor(&state) else {
-            return self.terminal_vector(&state, world, traverser);
+            return self.terminal_vector(&state, world, traverser, active);
         };
 
         let num_players = self.game.num_players();
@@ -3465,9 +3529,13 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
         }
 
         if actor == traverser {
-            let combos_len = self.combos.len();
+            let active_len = active.len();
             let street_index = node.street.index();
             if self.bucket_cache[street_index].is_none() {
+                // Always built from the full master combo list, even when
+                // `active` is a pruned-down subset: the cache is reused by
+                // every later traverser node on this street within the
+                // traversal, some of which may see a wider active set.
                 let table = self
                     .game
                     .buckets_for_combos(&state, world, traverser, &self.combos);
@@ -3482,41 +3550,155 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                 .expect("populated above")
                 .clone();
 
+            // Per-bucket regret-matched strategy for every bucket present
+            // among the currently active combos (buckets absent from
+            // `active` were pruned out of this subtree by an ancestor
+            // action and never need a strategy here). When pruning is
+            // enabled, the same arena read also snapshots which (bucket,
+            // action) pairs are pruning candidates -- zero regret-matched
+            // probability and regret below `prune_threshold` -- so no
+            // second arena lookup is needed later.
+            let prune_threshold = self.config.prune_threshold as f32;
             let mut bucket_strategy: FxHashMap<BucketId, Vec<f64>> = FxHashMap::default();
-            for &bucket in &bucket_table {
+            // Per-bucket prunable (bucket, action) pairs as a bitmask over
+            // action indices (one `u64` per unique bucket, no per-bucket
+            // allocation -- a `Vec<bool>` variant measurably slowed
+            // deep-threshold runs where nothing is ever prunable), plus the
+            // per-action OR across every bucket so the "anything prunable
+            // for this action?" test below is O(1). Actions past index 63
+            // are simply never prunable; real trees have far fewer actions
+            // per node.
+            let mut bucket_prunable: FxHashMap<BucketId, u64> = FxHashMap::default();
+            let mut any_prunable: u64 = 0;
+            for &idx in active {
+                let bucket = bucket_table[idx];
                 if let Entry::Vacant(entry) = bucket_strategy.entry(bucket) {
                     let range = self.arena.slot_range(node_id, bucket)?;
-                    entry.insert(regret_matching(&self.arena.regrets[range]));
+                    let regrets = &self.arena.regrets[range];
+                    let sigma = regret_matching(regrets);
+                    if self.config.prune {
+                        let mut mask = 0u64;
+                        for (action, (&probability, &regret)) in
+                            sigma.iter().zip(regrets.iter()).enumerate().take(64)
+                        {
+                            if probability == 0.0 && regret < prune_threshold {
+                                mask |= 1u64 << action;
+                            }
+                        }
+                        if mask != 0 {
+                            any_prunable |= mask;
+                            bucket_prunable.insert(bucket, mask);
+                        }
+                    }
+                    entry.insert(sigma);
+                }
+            }
+
+            // Pluribus-style regret-based pruning: for each action with at
+            // least one prunable bucket among the currently active combos,
+            // draw one coin deciding whether this visit actually skips
+            // those buckets' subtrees. The coin is drawn lazily -- only
+            // when pruning is enabled and something is prunable for this
+            // action -- so a `prune = false` (or nothing-prunable)
+            // traversal never advances `rng` any differently than before
+            // this feature existed.
+            let mut action_skips_pruned: Vec<bool> = vec![false; num_actions];
+            let mut skipped_mask: u64 = 0;
+            if any_prunable != 0 {
+                for (action, skip) in action_skips_pruned.iter_mut().enumerate().take(64) {
+                    if any_prunable & (1u64 << action) != 0 {
+                        let needle = rng.gen_range(0.0..1.0);
+                        *skip = needle < self.config.prune_skip_probability;
+                        if *skip {
+                            skipped_mask |= 1u64 << action;
+                        }
+                    }
                 }
             }
 
             let mut action_values: Vec<Vec<f64>> = Vec::with_capacity(num_actions);
             for action in 0..num_actions {
                 let next_state = self.game.next_state_with(&state, &actions, action);
-                let child_value = match node.children[action] {
-                    Child::Terminal => self.terminal_vector(&next_state, world, traverser)?,
-                    Child::Decision(child_id) => {
-                        // Per-combo reach for this action's subtree: each
-                        // feasible combo's own bucket picks its own
-                        // regret-matched probability of taking `action`.
-                        let mut child_reach = vec![0.0; combos_len];
-                        for idx in 0..combos_len {
-                            let strategy = &bucket_strategy[&bucket_table[idx]];
-                            child_reach[idx] = own_reach[idx] * strategy[action];
+                let child_value = if action_skips_pruned[action] {
+                    // Combo-subset descent: drop combos whose bucket is a
+                    // pruning candidate for this action. Their
+                    // regret-matched probability is exactly zero, so they
+                    // contribute zero to `node_value` and get no regret
+                    // update below regardless of what value they'd have
+                    // received -- skipping them here only saves work.
+                    let action_bit = 1u64 << action;
+                    let mut child_active = Vec::with_capacity(active_len);
+                    let mut child_positions = Vec::with_capacity(active_len);
+                    for (pos, &idx) in active.iter().enumerate() {
+                        let pruned = bucket_prunable
+                            .get(&bucket_table[idx])
+                            .is_some_and(|&mask| mask & action_bit != 0);
+                        if !pruned {
+                            child_active.push(idx);
+                            child_positions.push(pos);
                         }
-                        self.traverse(
-                            next_state,
-                            child_id,
-                            world,
-                            traverser,
-                            &child_reach,
-                            sample_importance,
-                            rng,
-                            depth + 1,
-                        )?
+                    }
+                    let sub_values = match node.children[action] {
+                        Child::Terminal => {
+                            self.terminal_vector(&next_state, world, traverser, &child_active)?
+                        }
+                        Child::Decision(child_id) => {
+                            let child_own_reach: Vec<f64> = child_active
+                                .iter()
+                                .zip(child_positions.iter())
+                                .map(|(&idx, &pos)| {
+                                    let strategy = &bucket_strategy[&bucket_table[idx]];
+                                    own_reach[pos] * strategy[action]
+                                })
+                                .collect();
+                            self.traverse(
+                                next_state,
+                                child_id,
+                                world,
+                                traverser,
+                                &child_active,
+                                &child_own_reach,
+                                sample_importance,
+                                rng,
+                                depth + 1,
+                            )?
+                        }
+                    };
+                    let mut scattered = vec![0.0; active_len];
+                    for (sub_pos, &pos) in child_positions.iter().enumerate() {
+                        scattered[pos] = sub_values[sub_pos];
+                    }
+                    scattered
+                } else {
+                    match node.children[action] {
+                        Child::Terminal => {
+                            self.terminal_vector(&next_state, world, traverser, active)?
+                        }
+                        Child::Decision(child_id) => {
+                            // Per-combo reach for this action's subtree:
+                            // each feasible combo's own bucket picks its own
+                            // regret-matched probability of taking
+                            // `action`.
+                            let mut child_own_reach = vec![0.0; active_len];
+                            for (pos, &idx) in active.iter().enumerate() {
+                                let strategy = &bucket_strategy[&bucket_table[idx]];
+                                child_own_reach[pos] = own_reach[pos] * strategy[action];
+                            }
+                            self.traverse(
+                                next_state,
+                                child_id,
+                                world,
+                                traverser,
+                                active,
+                                &child_own_reach,
+                                sample_importance,
+                                rng,
+                                depth + 1,
+                            )?
+                        }
                     }
                 };
-                if child_value.len() != combos_len {
+                if child_value.len() != active_len {
                     return Err(SolverError::InvalidState(
                         "vector traversal child value width changed mid-traversal",
                     ));
@@ -3524,12 +3706,13 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                 action_values.push(child_value);
             }
 
-            let mut node_value = vec![0.0; combos_len];
-            for (idx, value) in node_value.iter_mut().enumerate() {
+            let mut node_value = vec![0.0; active_len];
+            for (pos, value) in node_value.iter_mut().enumerate() {
+                let idx = active[pos];
                 let strategy = &bucket_strategy[&bucket_table[idx]];
                 let mut total = 0.0;
                 for (action, values) in action_values.iter().enumerate() {
-                    total += strategy[action] * values[idx];
+                    total += strategy[action] * values[pos];
                 }
                 if !total.is_finite() {
                     return Err(SolverError::NumericOverflow);
@@ -3549,16 +3732,30 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
             let mut bucket_weight_sum: FxHashMap<BucketId, f64> = FxHashMap::default();
             let mut bucket_diff_sum: FxHashMap<BucketId, Vec<f64>> = FxHashMap::default();
             let mut bucket_reach_weight_sum: FxHashMap<BucketId, f64> = FxHashMap::default();
-            for idx in 0..combos_len {
+            for (pos, &idx) in active.iter().enumerate() {
                 let bucket = bucket_table[idx];
                 let weight = self.weights[idx];
                 *bucket_weight_sum.entry(bucket).or_insert(0.0) += weight;
-                *bucket_reach_weight_sum.entry(bucket).or_insert(0.0) += weight * own_reach[idx];
+                *bucket_reach_weight_sum.entry(bucket).or_insert(0.0) += weight * own_reach[pos];
                 let diffs = bucket_diff_sum
                     .entry(bucket)
                     .or_insert_with(|| vec![0.0; num_actions]);
+                // A (bucket, action) pair that this visit actually pruned
+                // gets exactly no regret update -- not a `weight * (0.0 -
+                // node_value)` update -- because the action was never
+                // sampled for this bucket this visit. One hash lookup per
+                // combo (not per combo x action), and zero when nothing was
+                // skipped at this node.
+                let pruned_mask = if skipped_mask != 0 {
+                    skipped_mask & bucket_prunable.get(&bucket).copied().unwrap_or(0)
+                } else {
+                    0
+                };
                 for (action, values) in action_values.iter().enumerate() {
-                    diffs[action] += weight * (values[idx] - node_value[idx]);
+                    if action < 64 && pruned_mask & (1u64 << action) != 0 {
+                        continue;
+                    }
+                    diffs[action] += weight * (values[pos] - node_value[pos]);
                 }
             }
             for (bucket, weight_sum) in bucket_weight_sum {
@@ -3626,12 +3823,13 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
             // it is passed through unchanged.
             let next_state = self.game.next_state_with(&state, &actions, action);
             let result = match node.children[action] {
-                Child::Terminal => self.terminal_vector(&next_state, world, traverser),
+                Child::Terminal => self.terminal_vector(&next_state, world, traverser, active),
                 Child::Decision(child_id) => self.traverse(
                     next_state,
                     child_id,
                     world,
                     traverser,
+                    active,
                     own_reach,
                     child_importance,
                     rng,
@@ -3698,6 +3896,23 @@ fn validate_setup<G: ExternalSamplingGame>(
     }
     if config.traverser_vector && !matches!(game.recall_mode(), RecallMode::Street) {
         return Err(SolverError::VectorTraverserRequiresStreetRecall);
+    }
+    if config.prune {
+        if !config.traverser_vector {
+            return Err(SolverError::PruneRequiresVector);
+        }
+        if !config.prune_threshold.is_finite() || config.prune_threshold >= 0.0 {
+            return Err(SolverError::PruneThresholdNotNegative(
+                config.prune_threshold,
+            ));
+        }
+        if !config.prune_skip_probability.is_finite()
+            || !(0.0..=1.0).contains(&config.prune_skip_probability)
+        {
+            return Err(SolverError::PruneSkipProbabilityOutOfRange(
+                config.prune_skip_probability,
+            ));
+        }
     }
     Ok(())
 }
@@ -4102,6 +4317,12 @@ pub enum SolverError {
          current game uses RecallMode::Full"
     )]
     VectorTraverserRequiresStreetRecall,
+    #[error("SolverConfig::prune requires SolverConfig::traverser_vector to be true")]
+    PruneRequiresVector,
+    #[error("prune threshold must be finite and strictly negative, found {0}")]
+    PruneThresholdNotNegative(f64),
+    #[error("prune skip probability must be finite and in [0, 1], found {0}")]
+    PruneSkipProbabilityOutOfRange(f64),
 }
 
 #[cfg(test)]
@@ -4451,6 +4672,9 @@ mod tests {
                 discount_until: 100,
                 sweep_batch,
                 traverser_vector: false,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
         )
         .unwrap()
@@ -4601,6 +4825,9 @@ mod tests {
                     discount_until: DEFAULT_DISCOUNT_UNTIL,
                     sweep_batch,
                     traverser_vector: false,
+                    prune: false,
+                    prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                    prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
                 },
             )
             .unwrap()
@@ -4658,6 +4885,9 @@ mod tests {
             discount_until: 100,
             sweep_batch: 1,
             traverser_vector: false,
+            prune: false,
+            prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+            prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
         };
         config.sweep_batch = 0;
         assert!(matches!(
@@ -4812,6 +5042,9 @@ mod tests {
                 discount_until: 0,
                 sweep_batch: 1,
                 traverser_vector: false,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
         )
         .unwrap();
@@ -4861,6 +5094,9 @@ mod tests {
                 discount_until: 0,
                 sweep_batch: 1,
                 traverser_vector: false,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
         )
         .unwrap();
@@ -5230,6 +5466,9 @@ mod tests {
                 discount_until: 100,
                 sweep_batch: 1,
                 traverser_vector: false,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
         )
         .unwrap()
@@ -5248,6 +5487,9 @@ mod tests {
                 discount_until: DEFAULT_DISCOUNT_UNTIL,
                 sweep_batch,
                 traverser_vector: false,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
         )
         .unwrap()
@@ -5266,9 +5508,180 @@ mod tests {
                 discount_until: DEFAULT_DISCOUNT_UNTIL,
                 sweep_batch,
                 traverser_vector: true,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
         )
         .unwrap()
+    }
+
+    /// Same shape as [`dense_vector_toy_solver`] but with every
+    /// [`SolverConfig::prune`] knob configurable, for the regret-based
+    /// pruning tests below.
+    fn dense_vector_toy_solver_with_prune(
+        seed: u64,
+        prune: bool,
+        prune_threshold: f64,
+        prune_skip_probability: f64,
+    ) -> MultiwaySolver<DenseToyGame> {
+        MultiwaySolver::new(
+            DenseToyGame,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            SolverConfig {
+                seed,
+                max_memory_bytes: 1 << 20,
+                max_traversal_depth: 16,
+                exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
+                discount_every: DEFAULT_DISCOUNT_EVERY,
+                discount_until: DEFAULT_DISCOUNT_UNTIL,
+                sweep_batch: 1,
+                traverser_vector: true,
+                prune,
+                prune_threshold,
+                prune_skip_probability,
+            },
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn prune_disabled_is_byte_identical() {
+        let via_default = SolverConfig {
+            seed: 909,
+            max_memory_bytes: 1 << 20,
+            max_traversal_depth: 16,
+            traverser_vector: true,
+            ..SolverConfig::default()
+        };
+        // Guard the plumbing: `SolverConfig::default()`'s prune knobs must
+        // equal the ones every other test spells out explicitly.
+        assert!(!via_default.prune);
+        assert_eq!(via_default.prune_threshold, DEFAULT_PRUNE_THRESHOLD);
+        assert_eq!(
+            via_default.prune_skip_probability,
+            DEFAULT_PRUNE_SKIP_PROBABILITY
+        );
+
+        let mut default_solver = MultiwaySolver::new(
+            DenseToyGame,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            via_default,
+        )
+        .unwrap();
+        let mut explicit_solver = dense_vector_toy_solver_with_prune(
+            909,
+            false,
+            DEFAULT_PRUNE_THRESHOLD,
+            DEFAULT_PRUNE_SKIP_PROBABILITY,
+        );
+        default_solver.run_sweeps(10).unwrap();
+        explicit_solver.run_sweeps(10).unwrap();
+        assert_eq!(
+            default_solver.snapshot_state(),
+            explicit_solver.snapshot_state()
+        );
+    }
+
+    #[test]
+    fn prune_with_unreachable_threshold_is_byte_identical() {
+        let seed = 4242;
+        let mut baseline =
+            dense_vector_toy_solver_with_prune(seed, false, DEFAULT_PRUNE_THRESHOLD, 0.95);
+        // `prune_threshold` is astronomically far from any regret this toy
+        // game's utilities (bounded in [-1, 1]) could ever accumulate, and
+        // `prune_skip_probability = 1.0` maximizes how often the (never
+        // taken) skip branch would fire if anything were ever prunable. If
+        // the plumbing only ever touches the RNG or takes the pruning code
+        // path when something is actually prunable, this run must be
+        // byte-identical to a `prune = false` run with the same seed.
+        let mut pruned = dense_vector_toy_solver_with_prune(seed, true, -1.0e30, 1.0);
+
+        baseline.run_sweeps(30).unwrap();
+        pruned.run_sweeps(30).unwrap();
+
+        let mut baseline_state = baseline.snapshot_state();
+        let mut pruned_state = pruned.snapshot_state();
+        // Only the prune knobs themselves are expected to differ between
+        // the two configs; strip them before comparing so the assertion is
+        // about the actual arena contents (regrets, strategy sums, etc.),
+        // not the config echo.
+        baseline_state.config.prune = false;
+        pruned_state.config.prune = false;
+        baseline_state.config.prune_threshold = 0.0;
+        pruned_state.config.prune_threshold = 0.0;
+        baseline_state.config.prune_skip_probability = 0.0;
+        pruned_state.config.prune_skip_probability = 0.0;
+        assert_eq!(baseline_state, pruned_state);
+    }
+
+    #[test]
+    fn pruned_bucket_action_gets_no_update_and_others_are_unchanged() {
+        let seed = 31337;
+        // Node 0 is the public tree root (`DenseToyGame::First`, player 0's
+        // only decision); bucket 0 is one of its two combo buckets
+        // (`world.hole_combo(actor) % 2`).
+        let node_id: NodeId = 0;
+        let poisoned_bucket: BucketId = 0;
+        // Action 0 ("best") has a regret-matched probability of exactly
+        // zero (all mass on action 1) and a regret below the `-10.0`
+        // threshold but above the `1.05 * threshold = -10.5` floor, so it is
+        // a pruning candidate that the floor clamp must not disturb.
+        let poisoned_regrets = [-10.4_f32, 5.0_f32];
+
+        let mut pruned =
+            dense_vector_toy_solver_with_prune(seed, true, -10.0, /* skip_probability */ 1.0);
+        let mut unpruned = dense_vector_toy_solver_with_prune(seed, false, -10.0, 1.0);
+
+        for solver in [&mut pruned, &mut unpruned] {
+            let dense = solver
+                .dense
+                .as_mut()
+                .expect("street recall builds a dense arena");
+            let range = dense
+                .arena
+                .slot_range(node_id, poisoned_bucket)
+                .expect("bucket 0 is touched by DenseToyGame's two-bucket abstraction");
+            dense.arena.regrets[range].copy_from_slice(&poisoned_regrets);
+        }
+
+        pruned.run_sweeps(1).unwrap();
+        unpruned.run_sweeps(1).unwrap();
+
+        let pruned_dense = pruned.dense.as_ref().unwrap();
+        let unpruned_dense = unpruned.dense.as_ref().unwrap();
+        let pruned_range = pruned_dense
+            .arena
+            .slot_range(node_id, poisoned_bucket)
+            .unwrap();
+        let unpruned_range = unpruned_dense
+            .arena
+            .slot_range(node_id, poisoned_bucket)
+            .unwrap();
+
+        // (a) The poisoned (bucket, action) regret slot changed in the
+        // unpruned run (a real sweep was played against it) but is
+        // unchanged in the pruned run (the visit that would have updated it
+        // skipped that (bucket, action) pair entirely).
+        assert_ne!(
+            unpruned_dense.arena.regrets[unpruned_range.clone()][0],
+            -10.4
+        );
+        assert_eq!(pruned_dense.arena.regrets[pruned_range][0], -10.4);
+
+        // (b) A pruning coin is drawn from the same `rng` stream used for
+        // opponent action sampling, so a pruned run consumes an extra draw
+        // and everything downstream of it (including other buckets' regret
+        // updates) is free to diverge from the unpruned run -- exact
+        // equality on other buckets would be testing RNG-stream luck, not
+        // the pruning contract. What must hold regardless is that the
+        // pruned run is still a valid, finite state.
+        for &value in &pruned_dense.arena.regrets {
+            assert!(value.is_finite());
+        }
+        for &value in &pruned_dense.arena.strategy_sum {
+            assert!(value.is_finite());
+        }
     }
 
     #[test]
@@ -5288,6 +5701,60 @@ mod tests {
         assert!(matches!(
             error,
             SolverError::VectorTraverserRequiresStreetRecall
+        ));
+    }
+
+    #[test]
+    fn prune_requires_vector_traverser() {
+        let result = MultiwaySolver::new(
+            DominatedChoice,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            SolverConfig {
+                traverser_vector: false,
+                prune: true,
+                prune_threshold: -1.0,
+                prune_skip_probability: 0.5,
+                ..SolverConfig::default()
+            },
+        );
+        assert!(matches!(result, Err(SolverError::PruneRequiresVector)));
+    }
+
+    #[test]
+    fn prune_threshold_must_be_finite_and_negative() {
+        let result = MultiwaySolver::new(
+            DenseDominatedChoice,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            SolverConfig {
+                traverser_vector: true,
+                prune: true,
+                prune_threshold: 0.0,
+                prune_skip_probability: 0.5,
+                ..SolverConfig::default()
+            },
+        );
+        assert!(matches!(
+            result,
+            Err(SolverError::PruneThresholdNotNegative(threshold)) if threshold == 0.0
+        ));
+    }
+
+    #[test]
+    fn prune_skip_probability_must_be_in_unit_range() {
+        let result = MultiwaySolver::new(
+            DenseDominatedChoice,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            SolverConfig {
+                traverser_vector: true,
+                prune: true,
+                prune_threshold: -1.0,
+                prune_skip_probability: 1.5,
+                ..SolverConfig::default()
+            },
+        );
+        assert!(matches!(
+            result,
+            Err(SolverError::PruneSkipProbabilityOutOfRange(probability)) if probability == 1.5
         ));
     }
 
@@ -5422,6 +5889,9 @@ mod tests {
                 discount_until: DEFAULT_DISCOUNT_UNTIL,
                 sweep_batch: 1,
                 traverser_vector: false,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
         );
         let error = match result {
@@ -5697,6 +6167,9 @@ mod tests {
                 discount_until: DEFAULT_DISCOUNT_UNTIL,
                 sweep_batch: 1,
                 traverser_vector: false,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
         )
         .unwrap();
@@ -5811,6 +6284,9 @@ mod tests {
                 discount_until: DEFAULT_DISCOUNT_UNTIL,
                 sweep_batch: 1,
                 traverser_vector: true,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
         )
         .unwrap();
@@ -5889,6 +6365,9 @@ mod tests {
                 discount_until: DEFAULT_DISCOUNT_UNTIL,
                 sweep_batch: 1,
                 traverser_vector: true,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
         )
         .unwrap();
@@ -5989,6 +6468,9 @@ mod tests {
                 discount_until: DEFAULT_DISCOUNT_UNTIL,
                 sweep_batch: 1,
                 traverser_vector: true,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
         )
         .unwrap();

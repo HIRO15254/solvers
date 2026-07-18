@@ -267,6 +267,9 @@ fn auto_panel_ui(ui: &mut Ui, state: &mut SetupState) {
             "model: recall=street, traverser_vector=true, abstraction=ehs2-table, \
              checkdown(flop/turn/river)=2, storage=i16",
         );
+        ui.monospace(
+            "pruning: enabled (regret-based, threshold derived automatically from stakes)",
+        );
         ui.monospace(format!(
             "stop rule: max deviation-gain < {} ({}% of shortest stack), confirmations={}, \
              checked every {}s",
@@ -945,6 +948,19 @@ fn algorithm_section(ui: &mut Ui, state: &mut SetupState) {
                 ui,
                 Level::Warning,
                 "Vector traverser requires Recall / memory model = \"street\" above.",
+            );
+        }
+        ui.checkbox(&mut algorithm.prune, "Regret pruning (recommended)")
+            .on_hover_text(
+                "Skips clearly-dominated actions in 95% of traversals (Pluribus-style \
+                 regret-based pruning), speeding up convergence. The threshold is derived \
+                 from stack sizes automatically.",
+            );
+        if algorithm.prune && !algorithm.traverser_vector {
+            status::show(
+                ui,
+                Level::Warning,
+                "Regret pruning requires the vector traverser above.",
             );
         }
     });

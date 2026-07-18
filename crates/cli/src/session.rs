@@ -30,7 +30,9 @@ use multiway::config::{
     AbstractionKind, FieldPlayerConfig, RakeConfig as MultiwayRake,
     UtilityConfig as MultiwayUtility,
 };
-use multiway::solver::{InfoKey, PolicyEntry, ProfileEvaluation, SolverConfig};
+use multiway::solver::{
+    DEFAULT_PRUNE_THRESHOLD, InfoKey, PolicyEntry, ProfileEvaluation, SolverConfig,
+};
 use multiway::{DealSampler, HoldemGame, MultiwaySolver};
 
 use crate::config::{
@@ -117,27 +119,53 @@ pub fn build_multiway_session(
     let rake = convert_rake(rake);
     let (game, sampler) = build_multiway_game_from_config(&game_config, &utility, &rake)?;
 
-    let (algorithm_seed, exploration_epsilon, discount_every, discount_until, traverser_vector) =
-        match algorithm {
-            AlgorithmSection::ExternalSamplingMccfr {
-                seed,
-                exploration_epsilon,
-                discount_every,
-                discount_until,
-                traverser_vector,
-            } => (
-                seed,
-                exploration_epsilon,
-                discount_every,
-                discount_until,
-                traverser_vector,
-            ),
-            _ => {
-                return Err(anyhow!(
-                    "preflop-multiway requires schedule = \"external-sampling-mccfr\""
-                ));
-            }
-        };
+    let (
+        algorithm_seed,
+        exploration_epsilon,
+        discount_every,
+        discount_until,
+        traverser_vector,
+        prune,
+        prune_threshold_override,
+        prune_skip_probability,
+    ) = match algorithm {
+        AlgorithmSection::ExternalSamplingMccfr {
+            seed,
+            exploration_epsilon,
+            discount_every,
+            discount_until,
+            traverser_vector,
+            prune,
+            prune_threshold,
+            prune_skip_probability,
+        } => (
+            seed,
+            exploration_epsilon,
+            discount_every,
+            discount_until,
+            traverser_vector,
+            prune,
+            prune_threshold,
+            prune_skip_probability,
+        ),
+        _ => {
+            return Err(anyhow!(
+                "preflop-multiway requires schedule = \"external-sampling-mccfr\""
+            ));
+        }
+    };
+    if prune && !traverser_vector {
+        return Err(anyhow!(
+            "algorithm.prune requires algorithm.traverser_vector = true"
+        ));
+    }
+    if let Some(threshold) = prune_threshold_override
+        && (!threshold.is_finite() || threshold >= 0.0)
+    {
+        return Err(anyhow!(
+            "algorithm.prune_threshold must be finite and strictly negative, found {threshold}"
+        ));
+    }
     let sweeps = run.sweeps.unwrap_or(run.iterations);
     if sweeps == 0 {
         return Err(anyhow!("run.sweeps must be positive for a multiway solve"));
@@ -193,6 +221,13 @@ pub fn build_multiway_session(
     });
 
     let evaluation_samples = run.evaluation_samples.unwrap_or(256);
+    let prune_threshold = if !prune {
+        // Ignored by the engine when `prune` is false; keep the documented
+        // default so a disabled-pruning solver config is still valid input.
+        DEFAULT_PRUNE_THRESHOLD
+    } else {
+        prune_threshold_override.unwrap_or_else(|| derive_prune_threshold(&utility, &game_config))
+    };
     let solver_config = SolverConfig {
         seed: run.seed.unwrap_or(algorithm_seed),
         max_memory_bytes: run.max_memory_bytes.unwrap_or(DEFAULT_MEMORY_LIMIT),
@@ -202,6 +237,9 @@ pub fn build_multiway_session(
         discount_until,
         sweep_batch: run.sweep_batch.unwrap_or(1),
         traverser_vector,
+        prune,
+        prune_threshold,
+        prune_skip_probability,
     };
     let evaluation_seed = solver_config.seed ^ 0x6576_616c_7561_7465;
     let solver = if let Some(path) = resume_checkpoint {
@@ -246,6 +284,40 @@ pub fn build_multiway_session(
         config_hash: formats::config_hash(raw_toml.as_bytes()),
         game_config,
     })
+}
+
+/// Derives `algorithm.prune_threshold` when `algorithm.prune = true` but the
+/// key itself is omitted, from the game's stakes: `-10.0 *` the total
+/// starting stacks (in bb) for `[utility] kind = "chip-ev"`, or `-10.0 *`
+/// the total payouts for `kind = "tournament-icm"`.
+///
+/// The `-10x` scale was calibrated empirically (paired 200k-sweep runs on a
+/// 6-max 100bb auto-shape config): vector-mode bucket regrets are
+/// range-weighted *means* over combos, so they grow orders of magnitude
+/// slower than the raw per-hand regrets Pluribus's famous very-negative
+/// constant was tuned for. At `-10x` total stacks a (bucket, action) only
+/// qualifies after roughly 10k+ sweeps of persistent domination (the ratio
+/// is stack-depth-invariant, since per-sweep regret deltas also scale with
+/// stack depth), which measurably sped up the paired runs, while `-1000x`
+/// essentially never activated within realistic run lengths and its
+/// bookkeeping made runs marginally slower. Two safety nets keep the
+/// comparatively shallow default honest: ~5% of visits still explore a
+/// pruned pair, and every batched early-discount event scales negative
+/// regrets back toward zero, periodically lifting borderline pairs above
+/// the threshold for a full re-check.
+fn derive_prune_threshold(
+    utility: &MultiwayUtility,
+    game_config: &multiway::MultiwayConfig,
+) -> f64 {
+    let total = match utility {
+        MultiwayUtility::ChipEv => game_config
+            .seats
+            .iter()
+            .map(|seat| seat.stack_bb)
+            .sum::<f64>(),
+        MultiwayUtility::TournamentIcm { payouts, .. } => payouts.iter().sum::<f64>(),
+    };
+    -10.0 * total
 }
 
 /// The `[game]`/`[rake]`/`[utility]`-only core of `build_multiway_session`:
@@ -624,6 +696,7 @@ mod tests {
     use super::*;
     use crate::config::RakeSection;
     use multiway::abstraction::MultiwayAbstraction;
+    use multiway::solver::DEFAULT_PRUNE_SKIP_PROBABILITY;
 
     #[test]
     fn boundaries_are_positive_and_repeat() {
@@ -741,6 +814,78 @@ mod tests {
         let raw = with_stop_dev_gain("0.5", "stop_eval_period_secs = 0.0\n");
         let error = build_multiway_session_err(&raw);
         assert!(error.contains("stop_eval_period_secs"));
+    }
+
+    /// Splices `extra` right after `discount_until` in `[algorithm]`,
+    /// mirroring `with_stop_dev_gain`'s splice-into-`[run]` helper.
+    fn with_algorithm_extra(extra: &str) -> String {
+        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let anchor = "discount_until = 10000000\n";
+        let spliced = raw.replacen(anchor, &format!("{anchor}{extra}"), 1);
+        assert_ne!(spliced, raw, "the splice anchor must have matched");
+        spliced
+    }
+
+    /// `traverser_vector` (and thus `prune`) requires the dense
+    /// street-recall arena; splices `recall = "street"` into
+    /// `[game.abstraction]` alongside `with_algorithm_extra`'s
+    /// `[algorithm]` splice.
+    fn with_algorithm_extra_and_street_recall(extra: &str) -> String {
+        let raw = with_algorithm_extra(extra);
+        let anchor = "seed = 17\n";
+        let spliced = raw.replacen(anchor, &format!("{anchor}recall = \"street\"\n"), 1);
+        assert_ne!(spliced, raw, "the recall splice anchor must have matched");
+        spliced
+    }
+
+    #[test]
+    fn prune_without_explicit_threshold_derives_from_chip_ev_stakes() {
+        let raw = with_algorithm_extra_and_street_recall("traverser_vector = true\nprune = true\n");
+        let session = build_multiway_session(&raw, None).expect("build multiway session");
+        let config = session.solver.config();
+        assert!(config.prune);
+        // The smoke config has 3 seats at 2.0 bb each: -10 * 6.0 = -60.0.
+        assert_eq!(config.prune_threshold, -60.0);
+        assert_eq!(
+            config.prune_skip_probability,
+            DEFAULT_PRUNE_SKIP_PROBABILITY
+        );
+    }
+
+    #[test]
+    fn prune_with_explicit_threshold_uses_it_verbatim() {
+        let raw = with_algorithm_extra_and_street_recall(
+            "traverser_vector = true\nprune = true\nprune_threshold = -42.0\nprune_skip_probability = 0.5\n",
+        );
+        let session = build_multiway_session(&raw, None).expect("build multiway session");
+        let config = session.solver.config();
+        assert!(config.prune);
+        assert_eq!(config.prune_threshold, -42.0);
+        assert_eq!(config.prune_skip_probability, 0.5);
+    }
+
+    #[test]
+    fn prune_disabled_by_default_and_ignores_the_derivation() {
+        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let session = build_multiway_session(raw, None).expect("build multiway session");
+        let config = session.solver.config();
+        assert!(!config.prune);
+        assert_eq!(config.prune_threshold, DEFAULT_PRUNE_THRESHOLD);
+    }
+
+    #[test]
+    fn prune_without_traverser_vector_is_rejected() {
+        let raw = with_algorithm_extra("prune = true\n");
+        let error = build_multiway_session_err(&raw);
+        assert!(error.contains("traverser_vector"), "{error}");
+    }
+
+    #[test]
+    fn prune_threshold_nonnegative_is_rejected() {
+        let raw =
+            with_algorithm_extra("traverser_vector = true\nprune = true\nprune_threshold = 0.0\n");
+        let error = build_multiway_session_err(&raw);
+        assert!(error.contains("prune_threshold"), "{error}");
     }
 
     #[test]

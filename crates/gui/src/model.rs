@@ -150,6 +150,15 @@ pub struct AlgorithmModel {
     /// See `multiway::solver::SolverConfig::traverser_vector`. Only valid
     /// when `abstraction.recall == RecallKind::Street`.
     pub traverser_vector: bool,
+    /// Enables Pluribus-style regret-based pruning; see
+    /// `multiway::solver::SolverConfig::prune`. Only valid when
+    /// `traverser_vector` is also enabled.
+    pub prune: bool,
+    /// Explicit `algorithm.prune_threshold` override; `None` derives it from
+    /// the game's stakes at solve time (see
+    /// `cli::session::build_multiway_session`'s derivation, mirrored by
+    /// [`apply_auto_derivation`] for Auto mode).
+    pub prune_threshold: Option<f64>,
 }
 
 #[derive(Clone, Debug)]
@@ -401,6 +410,16 @@ impl Model {
                 discount_every: 100_000,
                 discount_until: 10_000_000,
                 traverser_vector: false,
+                // Off by default because the CLI rejects `prune = true`
+                // without `traverser_vector = true`, and fresh Advanced
+                // setups start with the vector traverser off; a default-on
+                // checkbox would make a brand-new Advanced config fail at
+                // Solve. Auto mode (the default UI mode) materializes
+                // `prune = true` alongside `traverser_vector = true` in
+                // `apply_auto_derivation`, and Advanced users opt in via
+                // the "(recommended)" checkbox.
+                prune: false,
+                prune_threshold: None,
             },
             run: RunModel {
                 sweeps: 100_000,
@@ -827,6 +846,13 @@ pub fn model_to_solve_config(model: &Model) -> Result<SolveConfig, String> {
             discount_every: model.algorithm.discount_every,
             discount_until: model.algorithm.discount_until,
             traverser_vector: model.algorithm.traverser_vector,
+            prune: model.algorithm.prune,
+            prune_threshold: model.algorithm.prune_threshold,
+            // Not exposed by the GUI; always resolves to the CLI-side
+            // default (see `cli::config::default_prune_skip_probability`),
+            // which is also what makes the key disappear from the rendered
+            // TOML.
+            prune_skip_probability: multiway::solver::DEFAULT_PRUNE_SKIP_PROBABILITY,
         },
         run: run_model_to_section(&model.run),
     })
@@ -855,6 +881,9 @@ pub fn solve_config_to_model(
         discount_every,
         discount_until,
         traverser_vector,
+        prune,
+        prune_threshold,
+        prune_skip_probability: _,
     } = config.algorithm
     else {
         return Err(
@@ -878,6 +907,8 @@ pub fn solve_config_to_model(
             discount_every,
             discount_until,
             traverser_vector,
+            prune,
+            prune_threshold,
         },
         run: section_to_run_model(config.run, previous_run),
     })
@@ -901,6 +932,21 @@ pub const AUTO_ARTIFACT_CACHE: &str = "./runs/cache/ehs2.postcard";
 /// first on any reasonable config, while still bounding a pathological run
 /// that never converges.
 pub const AUTO_SWEEPS_CAP: u64 = 50_000_000;
+
+/// Derives `algorithm.prune_threshold` the same way
+/// `cli::session::build_multiway_session` does when `algorithm.prune = true`
+/// but the key itself is omitted: `-10.0 *` the total starting stacks (bb)
+/// for chip-EV, or `-10.0 *` the total payouts for tournament ICM. See that
+/// function's doc comment for how the `-10x` scale was calibrated.
+fn derive_prune_threshold(model: &Model) -> f64 {
+    let total = match model.utility.kind {
+        UtilityKind::ChipEv => model.seats.iter().map(|seat| seat.stack_bb).sum::<f64>(),
+        UtilityKind::TournamentIcm => parse_payouts(&model.utility.payouts_text)
+            .map(|payouts| payouts.iter().sum())
+            .unwrap_or(0.0),
+    };
+    -10.0 * total
+}
 
 /// Mutates `model` in place to Auto mode's derived settings: pure function of
 /// `model`'s current game definition (seats/betting/blinds/abstraction shape)
@@ -943,6 +989,8 @@ pub fn apply_auto_derivation(
     model.abstraction.artifact_cache = AUTO_ARTIFACT_CACHE.to_string();
 
     model.algorithm.traverser_vector = true;
+    model.algorithm.prune = true;
+    model.algorithm.prune_threshold = Some(derive_prune_threshold(model));
 
     model.betting.flop.max_betting_players = Some(2);
     model.betting.turn.max_betting_players = Some(2);
@@ -972,6 +1020,8 @@ pub fn matches_auto_shape(model: &Model) -> bool {
         && model.abstraction.kind == AbstractionBackendKind::Ehs2Table
         && model.abstraction.active_opponent_buckets.is_empty()
         && model.algorithm.traverser_vector
+        && model.algorithm.prune
+        && model.algorithm.prune_threshold == Some(derive_prune_threshold(model))
         && model.betting.flop.max_betting_players == Some(2)
         && model.betting.turn.max_betting_players == Some(2)
         && model.betting.river.max_betting_players == Some(2)
@@ -1008,6 +1058,15 @@ pub fn validate(model: &Model) -> Vec<String> {
             "algorithm.traverser_vector requires abstraction.recall = \"street\"".to_string(),
         );
     }
+    // Unlike `traverser_vector`/`recall` above, `prune` without
+    // `traverser_vector` is deliberately NOT a blocking validation error: new
+    // setups default `prune = true` while `traverser_vector` stays `false`
+    // (see `Model::new_default`), so a hard error here would disable "Start
+    // solve" on every brand-new Advanced-mode config. `session.rs`'s
+    // algorithm section shows a non-blocking warning instead, and the CLI
+    // (`cli::session::build_multiway_session`) still hard-rejects the
+    // combination at solve time -- see engine `SolverConfig::validate_setup`.
+    // (Setup tab: `crate::setup::algorithm_section` shows the warning.)
     errors
 }
 
@@ -1184,6 +1243,43 @@ mod tests {
     }
 
     #[test]
+    fn prune_round_trips_through_toml_and_new_setups_default_to_disabled() {
+        let mut model = Model::new_default(6);
+        // New Advanced setups default pruning off (see `Model::new_default`'s
+        // comment: the CLI rejects prune without the vector traverser, which
+        // is also off by default; Auto mode materializes both instead).
+        assert!(!model.algorithm.prune);
+        assert_eq!(model.algorithm.prune_threshold, None);
+        assert!(validate(&model).is_empty());
+
+        model.algorithm.traverser_vector = true;
+        model.algorithm.prune = true;
+        let toml_text = model_to_toml(&model).unwrap();
+        assert!(toml_text.contains("prune = true"));
+        assert!(!toml_text.contains("prune_threshold"));
+        assert!(!toml_text.contains("prune_skip_probability"));
+        let reparsed = toml_to_model(&toml_text, &model.run).unwrap();
+        assert!(reparsed.algorithm.prune);
+        assert_eq!(reparsed.algorithm.prune_threshold, None);
+
+        model.algorithm.prune_threshold = Some(-4_200.0);
+        let toml_text = model_to_toml(&model).unwrap();
+        assert!(toml_text.contains("prune_threshold = -4200.0"));
+        let reparsed = toml_to_model(&toml_text, &model.run).unwrap();
+        assert_eq!(reparsed.algorithm.prune_threshold, Some(-4_200.0));
+
+        // `false` is the CLI's own historical default and is omitted from
+        // the rendered TOML, same as `traverser_vector`.
+        model.algorithm.prune = false;
+        model.algorithm.prune_threshold = None;
+        let toml_text = model_to_toml(&model).unwrap();
+        assert!(!toml_text.contains("prune"));
+        let reparsed = toml_to_model(&toml_text, &model.run).unwrap();
+        assert!(!reparsed.algorithm.prune);
+        assert_eq!(reparsed.algorithm.prune_threshold, None);
+    }
+
+    #[test]
     fn built_in_presets_round_trip_model_to_toml_and_validate() {
         for &(name, toml_text) in presets::BUILT_IN {
             let placeholder_run = Model::new_default(6).run;
@@ -1334,6 +1430,9 @@ iterations = 10
         assert!(model.abstraction.active_opponent_buckets.is_empty());
         assert_eq!(model.abstraction.artifact_cache, AUTO_ARTIFACT_CACHE);
         assert!(model.algorithm.traverser_vector);
+        assert!(model.algorithm.prune);
+        // 3 seats at the default 100bb each: -10 * 300.0 = -3000.0.
+        assert_eq!(model.algorithm.prune_threshold, Some(-3_000.0));
         assert_eq!(model.betting.flop.max_betting_players, Some(2));
         assert_eq!(model.betting.turn.max_betting_players, Some(2));
         assert_eq!(model.betting.river.max_betting_players, Some(2));
@@ -1361,6 +1460,8 @@ iterations = 10
             "stop_confirmations = 2",
             "stop_eval_period_secs = 30.0",
             "traverser_vector = true",
+            "prune = true",
+            "prune_threshold = -3000.0",
         ] {
             assert!(
                 toml_text.contains(needle),
