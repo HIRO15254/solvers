@@ -11,6 +11,7 @@ use cli::config::{
     AlgorithmSection, GameSection, OutsidePlayerSection, RakeSection, RunSection, SolveConfig,
     StorageKind, UtilitySection,
 };
+use cli::session::PRUNE_THRESHOLD_STAKE_FACTOR;
 use multiway::SeatId;
 use multiway::config::{
     AbstractionConfig, AbstractionKind, ActiveOpponentBucketConfig, AnteConfig, BettingConfig,
@@ -936,9 +937,10 @@ pub const AUTO_SWEEPS_CAP: u64 = 50_000_000;
 
 /// Derives `algorithm.prune_threshold` the same way
 /// `cli::session::build_multiway_session` does when `algorithm.prune = true`
-/// but the key itself is omitted: `-10.0 *` the total starting stacks (bb)
-/// for chip-EV, or `-10.0 *` the total payouts for tournament ICM. See that
-/// function's doc comment for how the `-10x` scale was calibrated.
+/// but the key itself is omitted: [`PRUNE_THRESHOLD_STAKE_FACTOR`] times the
+/// total starting stacks (bb) for chip-EV, or times the total payouts for
+/// tournament ICM. See `cli::session::derive_prune_threshold`'s doc comment
+/// for how that scale was calibrated.
 fn derive_prune_threshold(model: &Model) -> f64 {
     let total = match model.utility.kind {
         UtilityKind::ChipEv => model.seats.iter().map(|seat| seat.stack_bb).sum::<f64>(),
@@ -946,7 +948,7 @@ fn derive_prune_threshold(model: &Model) -> f64 {
             .map(|payouts| payouts.iter().sum())
             .unwrap_or(0.0),
     };
-    -10.0 * total
+    PRUNE_THRESHOLD_STAKE_FACTOR * total
 }
 
 /// Mutates `model` in place to Auto mode's derived settings: pure function of

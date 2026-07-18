@@ -533,11 +533,30 @@ pub struct ProfileEvaluation {
 /// A fixed per-seat deviation policy trained by [`MultiwaySolver::train_deviator`]:
 /// for each information set it visited during training, the single action index
 /// it deviates to. Infosets it never visited fall back to the caller's usual
-/// deviation behavior (see [`MultiwaySolver::evaluate_average_profile_with`]).
+/// deviation behavior (see [`MultiwaySolver::evaluate_profile`]).
 #[derive(Clone, Debug, PartialEq)]
 pub struct DeviatorPolicy {
     pub seat: usize,
     pub actions: FxHashMap<InfoKey, u16>,
+}
+
+/// Which profile [`MultiwaySolver::evaluate_profile`] replays / a deviator
+/// trained by [`MultiwaySolver::train_deviator`] trains against. The
+/// default (`purify_threshold: 0.0`, `use_current_strategy: false`) is the
+/// plain linear average profile, unpurified -- byte-identical to the
+/// pre-refactor `evaluate_average_profile`/`train_deviator` behavior.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct ProfileVariant {
+    /// Purification threshold (Ganzfried & Sandholm, AAMAS 2012): entries
+    /// below the threshold are zeroed and the remainder renormalized;
+    /// `0.0` skips the purify call entirely (raw average profile). Must be
+    /// finite and in `[0.0, 1.0]`.
+    pub purify_threshold: f32,
+    /// Evaluate/train against the last-iterate regret-matched current
+    /// strategy instead of the linear average profile. Diagnostic only:
+    /// plain regret matching carries no last-iterate convergence guarantee
+    /// (the average is the object with the CCE-style bound).
+    pub use_current_strategy: bool,
 }
 
 /// One hand-group's row of [`evaluate_node_actions`]'s per-action EV
@@ -2064,16 +2083,34 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     }
 
     /// Trains a fixed deviation policy for `seat` against this solver's CURRENT
-    /// average profile (frozen for the duration of training -- this method takes
-    /// `&self` and never touches solver state). Runs `traversals` independent
-    /// external-sampling traversals: at `seat`'s own decision nodes, every action
-    /// is recursed into and a purely local, purely unweighted regret table is
-    /// updated (standard external-sampling MCCFR restricted to a single
-    /// traverser against a frozen opponent policy); at every other seat's
-    /// decision nodes, one action is sampled from that seat's stored average
-    /// strategy (uniform fallback for an infoset the main solver never visited).
-    /// Deterministic: identical `(seat, traversals, seed)` against identical
-    /// solver state always produces a bit-identical [`DeviatorPolicy`].
+    /// profile at `variant` (frozen for the duration of training -- this method
+    /// takes `&self` and never touches solver state). Runs `traversals`
+    /// independent external-sampling traversals: at `seat`'s own decision
+    /// nodes, every action is recursed into and a purely local, purely
+    /// unweighted regret table is updated (standard external-sampling MCCFR
+    /// restricted to a single traverser against a frozen opponent policy); at
+    /// every other seat's decision nodes, one action is sampled from that
+    /// seat's stored average strategy (uniform fallback for an infoset the
+    /// main solver never visited). Deterministic: identical `(seat,
+    /// traversals, seed, variant)` against identical solver state always
+    /// produces a bit-identical [`DeviatorPolicy`].
+    ///
+    /// `variant.purify_threshold` first purifies every opponent
+    /// average-strategy read taken while sampling other seats' actions with
+    /// [`purify_strategy`] (Ganzfried & Sandholm, AAMAS 2012): entries below
+    /// the threshold are zeroed and the remainder renormalized. This trains
+    /// the deviator against the SAME (possibly purified) profile
+    /// [`Self::evaluate_profile`] replays as the baseline at that variant --
+    /// pairing a deviator trained at one variant with a baseline evaluated at
+    /// a different variant would compare two different profiles and produce
+    /// an incoherent gain estimate. `variant.purify_threshold` must be finite
+    /// and in `[0.0, 1.0]`; `0.0` skips the purify call entirely rather than
+    /// performing a no-op renormalization (byte-identical to the default
+    /// variant).
+    ///
+    /// `variant.use_current_strategy` additionally swaps every opponent read
+    /// from the linear average to the last-iterate regret-matched strategy
+    /// (diagnostic; see [`Self::evaluate_profile`]).
     ///
     /// Only information sets visited at least
     /// [`MIN_DEVIATOR_POLICY_VISITS`] times make it into the returned
@@ -2091,54 +2128,15 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         seat: usize,
         traversals: u64,
         seed: u64,
+        variant: ProfileVariant,
     ) -> Result<DeviatorPolicy, SolverError> {
-        self.train_deviator_core(seat, traversals, seed, 0.0, false)
-    }
-
-    /// Same as [`Self::train_deviator`], except every opponent
-    /// average-strategy read taken while sampling other seats' actions
-    /// during training is first purified with [`purify_strategy`] at
-    /// `purify_threshold` (Ganzfried & Sandholm, AAMAS 2012): entries below
-    /// the threshold are zeroed and the remainder renormalized. This trains
-    /// the deviator against the SAME purified profile
-    /// [`Self::evaluate_average_profile_purified`] replays as the baseline
-    /// at that threshold, rather than against the raw average profile --
-    /// pairing an unpurified deviator with a purified baseline (or vice
-    /// versa) would compare two different profiles and produce an
-    /// incoherent gain estimate. `purify_threshold` must be finite and in
-    /// `[0.0, 1.0]`; `0.0` is byte-identical to [`Self::train_deviator`]
-    /// (the purify call is skipped entirely rather than performing a
-    /// no-op renormalization).
-    pub fn train_deviator_purified(
-        &self,
-        seat: usize,
-        traversals: u64,
-        seed: u64,
-        purify_threshold: f32,
-    ) -> Result<DeviatorPolicy, SolverError> {
-        validate_purify_threshold(purify_threshold)?;
-        self.train_deviator_core(seat, traversals, seed, purify_threshold, false)
-    }
-
-    /// Same as [`Self::train_deviator_purified`], with
-    /// `use_current_strategy` additionally swapping every opponent read
-    /// from the linear average to the last-iterate regret-matched
-    /// strategy (diagnostic; see `evaluate_profile_variant`).
-    pub fn train_deviator_variant(
-        &self,
-        seat: usize,
-        traversals: u64,
-        seed: u64,
-        purify_threshold: f32,
-        use_current_strategy: bool,
-    ) -> Result<DeviatorPolicy, SolverError> {
-        validate_purify_threshold(purify_threshold)?;
+        validate_purify_threshold(variant.purify_threshold)?;
         self.train_deviator_core(
             seat,
             traversals,
             seed,
-            purify_threshold,
-            use_current_strategy,
+            variant.purify_threshold,
+            variant.use_current_strategy,
         )
     }
 
@@ -2309,29 +2307,18 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         }
     }
 
-    /// Equivalent to `evaluate_average_profile_with(samples, seed, None)`.
-    ///
-    /// Held-out Monte Carlo evaluation of the stored average profile.
-    ///
-    /// Every sample has its own `(seed, sample_id)` substream. The method is
-    /// read-only: it does not advance training counters, change policy sums,
-    /// or share the training traversal's random stream. It also evaluates a
-    /// fixed candidate deviation for every seat on the same held-out physical
-    /// worlds. The candidate chooses the largest stored cumulative regret at
-    /// each visited information set and otherwise retains average-profile
-    /// play. The reported gain is paired against the baseline profile, then
-    /// transformed with the always-available no-deviation option: mean and
-    /// confidence endpoints are clamped at zero. This is only a lower bound
-    /// for that candidate set, never a full best-response calculation.
+    /// Equivalent to `evaluate_profile(samples, seed, None,
+    /// ProfileVariant::default())`. See [`Self::evaluate_profile`] for the
+    /// full description of held-out evaluation semantics.
     pub fn evaluate_average_profile(
         &self,
         samples: u64,
         seed: u64,
     ) -> Result<ProfileEvaluation, SolverError> {
-        self.evaluate_average_profile_with(samples, seed, None)
+        self.evaluate_profile(samples, seed, None, ProfileVariant::default())
     }
 
-    /// Held-out Monte Carlo evaluation of the stored average profile.
+    /// Held-out Monte Carlo evaluation of the profile at `variant`.
     ///
     /// Every sample has its own `(seed, sample_id)` substream. The method is
     /// read-only: it does not advance training counters, change policy sums,
@@ -2360,19 +2347,26 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// leaves most deep infosets barely visited, and per-infoset noise
     /// there loses to the densely trained main-regret greedy fallback.)
     /// `deviators`, when present, must contain exactly one policy per seat,
-    /// seat-indexed (`deviators[i].seat == i`). Passing `None` is
-    /// byte-identical to [`Self::evaluate_average_profile`].
-    pub fn evaluate_average_profile_with(
-        &self,
-        samples: u64,
-        seed: u64,
-        deviators: Option<&[DeviatorPolicy]>,
-    ) -> Result<ProfileEvaluation, SolverError> {
-        self.evaluate_average_profile_core(samples, seed, deviators, 0.0, false)
-    }
-
-    /// Same as [`Self::evaluate_average_profile_purified`], with
-    /// `use_current_strategy` additionally swapping the profile under
+    /// seat-indexed (`deviators[i].seat == i`). Passing `None` at the
+    /// default variant is byte-identical to [`Self::evaluate_average_profile`].
+    ///
+    /// `variant.purify_threshold` first purifies every average-strategy read
+    /// taken while replaying the baseline profile (and the regret-greedy /
+    /// trained-deviator candidates' opponents) with [`purify_strategy`]
+    /// (Ganzfried & Sandholm, AAMAS 2012): entries below the threshold are
+    /// zeroed and the remainder renormalized; if every entry is below
+    /// threshold, only the argmax survives. `variant.purify_threshold` must
+    /// be finite and in `[0.0, 1.0]` (`SolverError::InvalidState`
+    /// otherwise). `0.0` produces EXACTLY the result the default variant
+    /// would (the purify call is skipped entirely rather than performing a
+    /// no-op renormalization, so the RNG and floating-point paths are
+    /// untouched). When passing `deviators`, train them with
+    /// [`Self::train_deviator`] at this SAME `variant`: the deviator must
+    /// exploit the exact profile this evaluation replays as the baseline, or
+    /// the reported gain compares two different profiles and is not a
+    /// coherent measurement.
+    ///
+    /// `variant.use_current_strategy` additionally swaps the profile under
     /// evaluation (and the deviator candidates' opponents) from the linear
     /// AVERAGE strategy to the LAST-ITERATE regret-matched current
     /// strategy. Plain regret matching carries no last-iterate convergence
@@ -2381,52 +2375,22 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// iterate is on its own, which is the question that decides whether a
     /// last-iterate method (e.g. MMD-style regularization) could ever
     /// replace averaging and free the `strategy_sum` half of the dense
-    /// arena. Train any `deviators` with [`Self::train_deviator_variant`]
-    /// at the same `(purify_threshold, use_current_strategy)`.
-    pub fn evaluate_profile_variant(
+    /// arena.
+    pub fn evaluate_profile(
         &self,
         samples: u64,
         seed: u64,
         deviators: Option<&[DeviatorPolicy]>,
-        purify_threshold: f32,
-        use_current_strategy: bool,
+        variant: ProfileVariant,
     ) -> Result<ProfileEvaluation, SolverError> {
-        validate_purify_threshold(purify_threshold)?;
+        validate_purify_threshold(variant.purify_threshold)?;
         self.evaluate_average_profile_core(
             samples,
             seed,
             deviators,
-            purify_threshold,
-            use_current_strategy,
+            variant.purify_threshold,
+            variant.use_current_strategy,
         )
-    }
-
-    /// Same as [`Self::evaluate_average_profile_with`], except every
-    /// average-strategy read taken while replaying the baseline profile (and
-    /// the regret-greedy/trained-deviator candidates' opponents) is first
-    /// purified with [`purify_strategy`] at `purify_threshold` (Ganzfried &
-    /// Sandholm, AAMAS 2012): entries below the threshold are zeroed and the
-    /// remainder renormalized; if every entry is below threshold, only the
-    /// argmax survives. `purify_threshold` must be finite and in
-    /// `[0.0, 1.0]` (`SolverError::InvalidState` otherwise). `0.0` produces
-    /// EXACTLY the result [`Self::evaluate_average_profile_with`] would (the
-    /// purify call is skipped entirely rather than performing a no-op
-    /// renormalization, so the RNG and floating-point paths are untouched).
-    ///
-    /// When passing `deviators`, train them with
-    /// [`Self::train_deviator_purified`] at this SAME `purify_threshold`: the
-    /// deviator must exploit the exact purified profile this evaluation
-    /// replays as the baseline, or the reported gain compares two different
-    /// profiles and is not a coherent measurement.
-    pub fn evaluate_average_profile_purified(
-        &self,
-        samples: u64,
-        seed: u64,
-        deviators: Option<&[DeviatorPolicy]>,
-        purify_threshold: f32,
-    ) -> Result<ProfileEvaluation, SolverError> {
-        validate_purify_threshold(purify_threshold)?;
-        self.evaluate_average_profile_core(samples, seed, deviators, purify_threshold, false)
     }
 
     fn evaluate_average_profile_core(
@@ -4716,7 +4680,7 @@ fn evaluation_action_rng(seed: u64, sample_id: u64, deviator: Option<usize>) -> 
 }
 
 /// Action stream for the TRAINED-deviator replay inside
-/// [`MultiwaySolver::evaluate_average_profile_with`]: distinct from
+/// [`MultiwaySolver::evaluate_profile`]: distinct from
 /// `evaluation_action_rng(_, _, Some(seat))`, which stays reserved for the
 /// regret-greedy candidate replay so that candidate's estimate is exactly
 /// the one a plain [`MultiwaySolver::evaluate_average_profile`] call would
@@ -5312,13 +5276,19 @@ mod tests {
     fn train_deviator_is_deterministic() {
         let mut solver = prefix_solver(41);
         solver.run_sweeps(3).unwrap();
-        let first = solver.train_deviator(0, 300, 555).unwrap();
-        let second = solver.train_deviator(0, 300, 555).unwrap();
+        let first = solver
+            .train_deviator(0, 300, 555, ProfileVariant::default())
+            .unwrap();
+        let second = solver
+            .train_deviator(0, 300, 555, ProfileVariant::default())
+            .unwrap();
         assert_eq!(first.actions, second.actions);
         assert_eq!(first.seat, 0);
         // A different seat/seed/traversal count must not accidentally
         // collide with the same trained policy.
-        let other_seat = solver.train_deviator(1, 300, 555).unwrap();
+        let other_seat = solver
+            .train_deviator(1, 300, 555, ProfileVariant::default())
+            .unwrap();
         assert_eq!(other_seat.seat, 1);
     }
 
@@ -5327,7 +5297,9 @@ mod tests {
         let mut solver = prefix_solver(7);
         solver.run_sweeps(5).unwrap();
         let plain = solver.evaluate_average_profile(64, 999).unwrap();
-        let explicit_none = solver.evaluate_average_profile_with(64, 999, None).unwrap();
+        let explicit_none = solver
+            .evaluate_profile(64, 999, None, ProfileVariant::default())
+            .unwrap();
         assert_eq!(plain, explicit_none);
     }
 
@@ -5346,7 +5318,7 @@ mod tests {
             },
         ];
         assert!(matches!(
-            solver.evaluate_average_profile_with(8, 1, Some(&wrong_seat)),
+            solver.evaluate_profile(8, 1, Some(&wrong_seat), ProfileVariant::default()),
             Err(SolverError::InvalidState(_))
         ));
         let wrong_len = vec![DeviatorPolicy {
@@ -5354,7 +5326,7 @@ mod tests {
             actions: FxHashMap::default(),
         }];
         assert!(matches!(
-            solver.evaluate_average_profile_with(8, 1, Some(&wrong_len)),
+            solver.evaluate_profile(8, 1, Some(&wrong_len), ProfileVariant::default()),
             Err(SolverError::InvalidState(_))
         ));
     }
@@ -5398,7 +5370,15 @@ mod tests {
         solver.run_sweeps(5).unwrap();
         let plain = solver.evaluate_average_profile(64, 999).unwrap();
         let purified_zero = solver
-            .evaluate_average_profile_purified(64, 999, None, 0.0)
+            .evaluate_profile(
+                64,
+                999,
+                None,
+                ProfileVariant {
+                    purify_threshold: 0.0,
+                    use_current_strategy: false,
+                },
+            )
             .unwrap();
         assert_eq!(plain, purified_zero);
     }
@@ -5413,15 +5393,19 @@ mod tests {
         for &threshold in &[0.1f32, 1.0f32] {
             let num_players = 2;
             let training_seed = 616;
+            let variant = ProfileVariant {
+                purify_threshold: threshold,
+                use_current_strategy: false,
+            };
             let deviators: Vec<DeviatorPolicy> = (0..num_players)
                 .map(|seat| {
                     solver
-                        .train_deviator_purified(seat, 200, training_seed, threshold)
+                        .train_deviator(seat, 200, training_seed, variant)
                         .unwrap()
                 })
                 .collect();
             let evaluation = solver
-                .evaluate_average_profile_purified(samples, seed, Some(&deviators), threshold)
+                .evaluate_profile(samples, seed, Some(&deviators), variant)
                 .unwrap();
             assert_eq!(evaluation.samples, samples);
             for seat in &evaluation.seats {
@@ -5442,24 +5426,28 @@ mod tests {
     fn purify_threshold_out_of_range_is_rejected() {
         let mut solver = prefix_solver(7);
         solver.run_sweeps(2).unwrap();
+        let variant_of = |purify_threshold: f32| ProfileVariant {
+            purify_threshold,
+            use_current_strategy: false,
+        };
         assert!(matches!(
-            solver.evaluate_average_profile_purified(8, 1, None, -0.01),
+            solver.evaluate_profile(8, 1, None, variant_of(-0.01)),
             Err(SolverError::InvalidState(_))
         ));
         assert!(matches!(
-            solver.evaluate_average_profile_purified(8, 1, None, 1.5),
+            solver.evaluate_profile(8, 1, None, variant_of(1.5)),
             Err(SolverError::InvalidState(_))
         ));
         assert!(matches!(
-            solver.evaluate_average_profile_purified(8, 1, None, f32::NAN),
+            solver.evaluate_profile(8, 1, None, variant_of(f32::NAN)),
             Err(SolverError::InvalidState(_))
         ));
         assert!(matches!(
-            solver.train_deviator_purified(0, 10, 1, -0.01),
+            solver.train_deviator(0, 10, 1, variant_of(-0.01)),
             Err(SolverError::InvalidState(_))
         ));
         assert!(matches!(
-            solver.train_deviator_purified(0, 10, 1, 1.5),
+            solver.train_deviator(0, 10, 1, variant_of(1.5)),
             Err(SolverError::InvalidState(_))
         ));
     }
@@ -5495,12 +5483,17 @@ mod tests {
         let deviators: Vec<DeviatorPolicy> = (0..num_players)
             .map(|seat| {
                 solver
-                    .train_deviator(seat, training_traversals, training_seed)
+                    .train_deviator(
+                        seat,
+                        training_traversals,
+                        training_seed,
+                        ProfileVariant::default(),
+                    )
                     .unwrap()
             })
             .collect();
         let with = solver
-            .evaluate_average_profile_with(samples, seed, Some(&deviators))
+            .evaluate_profile(samples, seed, Some(&deviators), ProfileVariant::default())
             .unwrap();
 
         let with_gains = with.deviation_gain_lower_bound.as_ref().unwrap();

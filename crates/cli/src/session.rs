@@ -34,6 +34,7 @@ use multiway::solver::{
     DEFAULT_PRUNE_THRESHOLD, InfoKey, PolicyEntry, ProfileEvaluation, SolverConfig,
 };
 use multiway::{DealSampler, HoldemGame, MultiwaySolver};
+use rayon::prelude::*;
 
 use crate::config::{
     AlgorithmSection, GameSection, RakeSection, SolveConfig, StorageKind, UtilitySection,
@@ -295,6 +296,14 @@ pub fn build_multiway_session(
     })
 }
 
+/// Scale factor `derive_prune_threshold` (here and in
+/// `gui::model::derive_prune_threshold`, which mirrors this same formula
+/// over the GUI's own model type) applies to the game's total stakes to get
+/// `algorithm.prune_threshold` when the key is omitted. See
+/// `derive_prune_threshold`'s doc comment for how this scale was
+/// calibrated.
+pub const PRUNE_THRESHOLD_STAKE_FACTOR: f64 = -10.0;
+
 /// Derives `algorithm.prune_threshold` when `algorithm.prune = true` but the
 /// key itself is omitted, from the game's stakes: `-10.0 *` the total
 /// starting stacks (in bb) for `[utility] kind = "chip-ev"`, or `-10.0 *`
@@ -326,7 +335,180 @@ fn derive_prune_threshold(
             .sum::<f64>(),
         MultiwayUtility::TournamentIcm { payouts, .. } => payouts.iter().sum::<f64>(),
     };
-    -10.0 * total
+    PRUNE_THRESHOLD_STAKE_FACTOR * total
+}
+
+/// Hard cap on the adaptive stop-rule evaluation sample count: matches the
+/// ladder cap documented on `run.stop_dev_gain`. Shared by the CLI drive
+/// loop (`multiway_solve::run_inner`) and the GUI worker's drive loop, which
+/// both implement the same `run.stop_dev_gain` convergence rule via
+/// [`run_stop_rule_check`].
+pub const MAX_STOP_RULE_SAMPLES: u64 = 65_536;
+
+/// Mutable state of the wall-clock convergence stop rule (`run.stop_dev_gain`)
+/// across one run, threaded through repeated [`run_stop_rule_check`] calls.
+pub struct StopRuleState {
+    /// Adaptive evaluation sample count: starts at the session's
+    /// `evaluation_samples` and doubles (capped at [`MAX_STOP_RULE_SAMPLES`])
+    /// whenever a check's CI is too wide to ever settle below the threshold.
+    pub samples: u64,
+    /// Consecutive passing evaluations so far.
+    pub confirmations_met: u32,
+    /// Wall clock of the last stop-rule check; the caller compares this
+    /// against `StopRule::eval_period_secs` to decide whether to call
+    /// [`run_stop_rule_check`] again.
+    pub last_eval: Instant,
+    /// Monotonically increasing index of the next check, folded into the
+    /// deviator-training seed so repeated checks never retrain against the
+    /// same random stream.
+    pub eval_index: u64,
+}
+
+impl StopRuleState {
+    pub fn new(initial_samples: u64) -> Self {
+        Self {
+            samples: initial_samples,
+            confirmations_met: 0,
+            last_eval: Instant::now(),
+            eval_index: 0,
+        }
+    }
+}
+
+/// Trains one burst deviator per seat in parallel, on a deterministic worker
+/// pool sized to `threads` rather than relying on rayon's ambient global
+/// pool (whose thread count the config doesn't control). Shared by every
+/// caller that trains a per-seat best-response burst: the stop-rule check
+/// below, and `mw_eval`'s purification sweep.
+pub fn train_deviators_parallel(
+    solver: &MultiwaySolver<HoldemGame<MultiwayAbstractionBackend>>,
+    num_players: usize,
+    threads: usize,
+    traversals: u64,
+    seed: u64,
+    variant: multiway::ProfileVariant,
+) -> Result<Vec<multiway::DeviatorPolicy>> {
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(threads)
+        .build()
+        .map_err(|error| anyhow!("building deviator training thread pool: {error}"))?;
+    pool.install(|| {
+        (0..num_players)
+            .into_par_iter()
+            .map(|seat| solver.train_deviator(seat, traversals, seed, variant))
+            .collect::<std::result::Result<Vec<_>, _>>()
+    })
+    .map_err(|error| anyhow!("training deviator: {error}"))
+}
+
+/// Result of one [`run_stop_rule_check`] call: the evaluation plus what
+/// happened, so callers only do IO (printing/event-sending) and decide
+/// whether to break their drive loop.
+pub struct StopRuleCheck {
+    pub evaluation: ProfileEvaluation,
+    /// Maximum per-seat `deviation_gain_lower_bound` CI upper bound this
+    /// check measured.
+    pub max_upper: f64,
+    /// Maximum per-seat `deviation_gain_lower_bound` CI width this check
+    /// measured.
+    pub max_width: f64,
+    /// `Some(new_sample_count)` when this check's CI was too wide to ever
+    /// settle below the threshold and the adaptive sample count was
+    /// doubled (capped at [`MAX_STOP_RULE_SAMPLES`]); `None` otherwise.
+    pub samples_doubled_to: Option<u64>,
+    /// Whether `state.confirmations_met` (after this check) has reached
+    /// `stop_rule.confirmations`.
+    pub converged: bool,
+}
+
+/// One stop-rule check: an optional best-response burst, the held-out
+/// evaluation, threshold/width bookkeeping, adaptive sample doubling, and
+/// the confirmations update. Callers are expected to have already checked
+/// their own wall-clock trigger (`state.last_eval.elapsed() >=
+/// stop_rule.eval_period_secs`) before calling this; it unconditionally
+/// performs one check and resets `state.last_eval`.
+pub fn run_stop_rule_check(
+    solver: &MultiwaySolver<HoldemGame<MultiwayAbstractionBackend>>,
+    stop_rule: &StopRule,
+    state: &mut StopRuleState,
+    num_players: usize,
+    threads: usize,
+    evaluation_seed: u64,
+) -> Result<StopRuleCheck> {
+    state.last_eval = Instant::now();
+    // Best-response burst: stop-rule evaluations measure a per-seat deviator
+    // TRAINED against the frozen current average profile rather than the
+    // plain regret-greedy heuristic the ordinary evaluation-cadence rows
+    // use, so the deviation-gain numbers reported here are systematically
+    // tighter (higher) than a cadence row taken at the same sweep count.
+    // That is intentional: the stop decision should use the strongest
+    // available deviator, not the cheap heuristic every metrics row gets.
+    let training_seed = evaluation_seed ^ 0x6252_5354 ^ state.eval_index;
+    state.eval_index += 1;
+    let deviators = if stop_rule.br_traversals > 0 {
+        Some(
+            train_deviators_parallel(
+                solver,
+                num_players,
+                threads,
+                stop_rule.br_traversals,
+                training_seed,
+                multiway::ProfileVariant::default(),
+            )
+            .context("training best-response deviators for the convergence stop rule")?,
+        )
+    } else {
+        None
+    };
+    let evaluation = solver
+        .evaluate_profile(
+            state.samples,
+            evaluation_seed,
+            deviators.as_deref(),
+            multiway::ProfileVariant::default(),
+        )
+        .context("evaluating multiway profile for the convergence stop rule")?;
+
+    let bounds = evaluation
+        .deviation_gain_lower_bound
+        .as_ref()
+        .expect("evaluate_profile always returns deviation_gain_lower_bound");
+    let max_upper = bounds
+        .iter()
+        .map(|estimate| estimate.ci95[1])
+        .fold(f64::NEG_INFINITY, f64::max);
+    let max_width = bounds
+        .iter()
+        .map(|estimate| estimate.ci95[1] - estimate.ci95[0])
+        .fold(0.0, f64::max);
+
+    state.confirmations_met = if max_upper < stop_rule.dev_gain_threshold {
+        state.confirmations_met + 1
+    } else {
+        0
+    };
+
+    // The CI is wide enough that the check could never pass even if the
+    // true value already converged: double the sample count for subsequent
+    // stop-rule checks (capped), so noise shrinks over time instead of
+    // blocking convergence forever.
+    let samples_doubled_to =
+        if max_width > stop_rule.dev_gain_threshold && state.samples < MAX_STOP_RULE_SAMPLES {
+            let doubled = state.samples.saturating_mul(2).min(MAX_STOP_RULE_SAMPLES);
+            let changed = doubled != state.samples;
+            state.samples = doubled;
+            changed.then_some(doubled)
+        } else {
+            None
+        };
+
+    Ok(StopRuleCheck {
+        evaluation,
+        max_upper,
+        max_width,
+        samples_doubled_to,
+        converged: state.confirmations_met >= stop_rule.confirmations,
+    })
 }
 
 /// The `[game]`/`[rake]`/`[utility]`-only core of `build_multiway_session`:

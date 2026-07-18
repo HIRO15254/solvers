@@ -12,7 +12,6 @@ use std::path::Path;
 use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow};
-use rayon::prelude::*;
 
 use crate::session;
 
@@ -35,54 +34,39 @@ pub fn run(
         .context("restoring multiway session from checkpoint")?;
     let num_players = mw_session.game_config.seats.len();
 
-    // Sized like the stop-rule's own deviator-training pool (see
-    // `multiway_solve.rs`): one deterministic worker pool for every
-    // per-seat burst below, rather than relying on rayon's ambient global
-    // pool (whose thread count the config doesn't control).
-    let pool = rayon::ThreadPoolBuilder::new()
-        .num_threads(mw_session.threads)
-        .build()
-        .map_err(|error| anyhow!("building deviator training thread pool: {error}"))?;
-
     for threshold in thresholds {
         let started = Instant::now();
+        let variant = multiway::ProfileVariant {
+            purify_threshold: threshold,
+            use_current_strategy,
+        };
         let deviators = if br_traversals > 0 {
             let training_seed = seed ^ 0x7075_7269 ^ u64::from(threshold.to_bits());
-            let trained = pool.install(|| {
-                (0..num_players)
-                    .into_par_iter()
-                    .map(|seat| {
-                        mw_session.solver.train_deviator_variant(
-                            seat,
-                            br_traversals,
-                            training_seed,
-                            threshold,
-                            use_current_strategy,
-                        )
-                    })
-                    .collect::<Result<Vec<_>, _>>()
-            });
-            Some(trained.context("training purified best-response deviators")?)
+            Some(
+                session::train_deviators_parallel(
+                    &mw_session.solver,
+                    num_players,
+                    mw_session.threads,
+                    br_traversals,
+                    training_seed,
+                    variant,
+                )
+                .context("training purified best-response deviators")?,
+            )
         } else {
             None
         };
 
         let evaluation = mw_session
             .solver
-            .evaluate_profile_variant(
-                samples,
-                seed,
-                deviators.as_deref(),
-                threshold,
-                use_current_strategy,
-            )
+            .evaluate_profile(samples, seed, deviators.as_deref(), variant)
             .context("evaluating purified multiway profile")?;
         let elapsed = started.elapsed().as_secs_f64();
 
         let bounds = evaluation
             .deviation_gain_lower_bound
             .as_ref()
-            .expect("evaluate_average_profile_purified always returns deviation_gain_lower_bound");
+            .expect("evaluate_profile always returns deviation_gain_lower_bound");
         let dev_up: Vec<f64> = bounds.iter().map(|estimate| estimate.ci95[1]).collect();
         let max_dev_up = dev_up.iter().copied().fold(f64::NEG_INFINITY, f64::max);
         let max_dev_mean = bounds

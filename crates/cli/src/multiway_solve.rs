@@ -8,7 +8,6 @@ use anyhow::{Context, Result, anyhow};
 use formats::{MULTIWAY_SCHEMA_VERSION, MultiwayMetricsRow, MultiwayMetricsWriter};
 use multiway::solver::InfoKey;
 use multiway::{HoldemGame, MultiwaySolver};
-use rayon::prelude::*;
 use serde::Serialize;
 
 use crate::config::{GameSection, SolveConfig, StorageKind};
@@ -29,11 +28,6 @@ enum CompletionStatus {
     /// `crate::session::StopRule`.
     Converged,
 }
-
-/// Hard cap on the adaptive stop-rule evaluation sample count (see
-/// `run_inner`'s drive loop); matches the ladder cap documented on
-/// `run.stop_dev_gain`.
-const MAX_STOP_RULE_SAMPLES: u64 = 65_536;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -177,19 +171,13 @@ fn run_inner(
     let mut last_row = MultiwayMetricsRow::sampling(mw_session.game_config.seats.len());
     let mut status = CompletionStatus::Completed;
     let mut has_evaluation = false;
-    // Convergence stop rule (`run.stop_dev_gain`) state: an adaptive
-    // evaluation sample count (starts at `evaluation_samples`, doubles up to
-    // `MAX_STOP_RULE_SAMPLES` whenever the CI is too wide to ever pass), a
-    // consecutive-pass counter, and the wall clock of the last stop-rule
-    // evaluation. See the stop-rule block inside the drive loop below for
-    // why this check is wall-clock-driven rather than cadence-driven: with
-    // `stop_dev_gain` set, `sweeps_target` is a safety cap, not a target, so
-    // the sweep count a converged run actually stops at is machine-dependent
-    // (documented on `run.stop_dev_gain`).
-    let mut stop_rule_samples = mw_session.evaluation_samples;
-    let mut stop_confirmations_met: u32 = 0;
-    let mut last_stop_eval = Instant::now();
-    let mut stop_eval_index: u64 = 0;
+    // Convergence stop rule (`run.stop_dev_gain`) state; see
+    // `session::StopRuleState` and the stop-rule block inside the drive loop
+    // below for why this check is wall-clock-driven rather than
+    // cadence-driven: with `stop_dev_gain` set, `sweeps_target` is a safety
+    // cap, not a target, so the sweep count a converged run actually stops
+    // at is machine-dependent (documented on `run.stop_dev_gain`).
+    let mut stop_rule_state = session::StopRuleState::new(mw_session.evaluation_samples);
 
     while mw_session.solver.completed_sweeps() < mw_session.sweeps_target {
         if cancel.is_some_and(|token| token.load(Ordering::Relaxed)) {
@@ -276,60 +264,25 @@ fn run_inner(
         // regardless of where `sweeps_now` falls relative to
         // `evaluation_cadence`/`checkpoint_every`.
         if let Some(stop_rule) = mw_session.stop_rule
-            && last_stop_eval.elapsed().as_secs_f64() >= stop_rule.eval_period_secs
+            && stop_rule_state.last_eval.elapsed().as_secs_f64() >= stop_rule.eval_period_secs
         {
-            last_stop_eval = Instant::now();
-            // Best-response burst: stop-rule evaluations measure a per-seat deviator
-            // TRAINED against the frozen current average profile rather than the
-            // plain regret-greedy heuristic the ordinary evaluation_cadence rows
-            // above use, so the deviation-gain numbers reported here are
-            // systematically tighter (higher) than a cadence row taken at the same
-            // sweep count. That is intentional: the stop decision should use the
-            // strongest available deviator, not the cheap heuristic every metrics
-            // row gets.
-            let training_seed = mw_session.evaluation_seed ^ 0x6252_5354 ^ stop_eval_index;
-            stop_eval_index += 1;
-            let deviators = if stop_rule.br_traversals > 0 {
-                let num_players = mw_session.game_config.seats.len();
-                let pool = rayon::ThreadPoolBuilder::new()
-                    .num_threads(mw_session.threads)
-                    .build()
-                    .map_err(|error| anyhow!("building deviator training thread pool: {error}"))?;
-                let trained = pool.install(|| {
-                    (0..num_players)
-                        .into_par_iter()
-                        .map(|seat| {
-                            mw_session.solver.train_deviator(
-                                seat,
-                                stop_rule.br_traversals,
-                                training_seed,
-                            )
-                        })
-                        .collect::<Result<Vec<_>, _>>()
-                });
-                Some(
-                    trained.context(
-                        "training best-response deviators for the convergence stop rule",
-                    )?,
-                )
-            } else {
-                None
-            };
-            let evaluation = mw_session
-                .solver
-                .evaluate_average_profile_with(
-                    stop_rule_samples,
-                    mw_session.evaluation_seed,
-                    deviators.as_deref(),
-                )
-                .context("evaluating multiway profile for the convergence stop rule")?;
+            let samples_before = stop_rule_state.samples;
+            let check = session::run_stop_rule_check(
+                &mw_session.solver,
+                &stop_rule,
+                &mut stop_rule_state,
+                mw_session.game_config.seats.len(),
+                mw_session.threads,
+                mw_session.evaluation_seed,
+            )?;
+
             let now = mw_session.solver.metrics();
             let drift = mw_session.solver.strategy_drift_refresh(&mut prior);
             last_row = session::metrics_row(
                 &now,
                 drift,
                 started.elapsed().as_secs_f64(),
-                Some(&evaluation),
+                Some(&check.evaluation),
             );
             has_evaluation = true;
             if let Some(writer) = metrics_writer.as_mut() {
@@ -338,45 +291,15 @@ fn run_inner(
                     .context("writing multiway metrics")?;
             }
 
-            let bounds = evaluation
-                .deviation_gain_lower_bound
-                .as_ref()
-                .expect("evaluate_average_profile always returns deviation_gain_lower_bound");
-            let max_upper = bounds
-                .iter()
-                .map(|estimate| estimate.ci95[1])
-                .fold(f64::NEG_INFINITY, f64::max);
-            let max_width = bounds
-                .iter()
-                .map(|estimate| estimate.ci95[1] - estimate.ci95[0])
-                .fold(0.0, f64::max);
-
-            stop_confirmations_met = if max_upper < stop_rule.dev_gain_threshold {
-                stop_confirmations_met + 1
-            } else {
-                0
-            };
-
-            // The CI is wide enough that the check could never pass even if
-            // the true value already converged: double the sample count for
-            // subsequent stop-rule evaluations (capped), so noise shrinks
-            // over time instead of blocking convergence forever.
-            if max_width > stop_rule.dev_gain_threshold && stop_rule_samples < MAX_STOP_RULE_SAMPLES
-            {
-                let doubled = stop_rule_samples
-                    .saturating_mul(2)
-                    .min(MAX_STOP_RULE_SAMPLES);
-                if emit_progress && doubled != stop_rule_samples {
-                    println!(
-                        "stop-rule: max CI width {max_width:.6} exceeds threshold {:.6}; \
-                         doubling evaluation samples {stop_rule_samples} -> {doubled}",
-                        stop_rule.dev_gain_threshold
-                    );
-                }
-                stop_rule_samples = doubled;
+            if emit_progress && let Some(doubled) = check.samples_doubled_to {
+                println!(
+                    "stop-rule: max CI width {:.6} exceeds threshold {:.6}; \
+                     doubling evaluation samples {samples_before} -> {doubled}",
+                    check.max_width, stop_rule.dev_gain_threshold
+                );
             }
 
-            if stop_confirmations_met >= stop_rule.confirmations {
+            if check.converged {
                 status = CompletionStatus::Converged;
                 break;
             }
@@ -675,7 +598,7 @@ mod tests {
     fn stop_dev_gain_converges_before_the_sweep_cap_with_a_lax_threshold() {
         // 50 best-response training traversals per seat is small enough to keep
         // the test fast while genuinely exercising the training +
-        // evaluate_average_profile_with path.
+        // evaluate_profile path.
         let raw = smoke_with_stop_rule(
             100_000,
             "stop_dev_gain = 1000.0\nstop_confirmations = 1\nstop_eval_period_secs = 0.01\n\

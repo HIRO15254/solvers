@@ -14,7 +14,6 @@ use eframe::egui;
 use formats::{MultiwaySolution, MwsolStorage};
 use multiway::checkpoint::MultiwayCheckpoint;
 use multiway::solver::{HistoryKey, InfoKey, NodeActionEvaluation, ProfileEvaluation};
-use rayon::prelude::*;
 
 /// Target wall-clock duration of one drive-loop chunk. Chunks are sized from
 /// the solver's own measured throughput (see `sweep_rate` in [`run`]) to hit
@@ -50,11 +49,6 @@ const METRICS_THROTTLE_MILLIS: u64 = 10_000;
 /// time at roughly `1 / METRICS_COST_MULTIPLIER` (at most 1% of solve
 /// time).
 const METRICS_COST_MULTIPLIER: u32 = 100;
-
-/// Hard cap on the adaptive stop-rule evaluation sample count -- mirrors
-/// `cli::multiway_solve`'s `MAX_STOP_RULE_SAMPLES`, since both drive loops
-/// implement the same `run.stop_dev_gain` convergence rule.
-const MAX_STOP_RULE_SAMPLES: u64 = 65_536;
 
 #[derive(Debug, Clone)]
 pub enum WorkerCmd {
@@ -134,8 +128,8 @@ pub struct StopRuleProgress {
     pub confirmations: u32,
     pub confirmations_required: u32,
     /// Current adaptive sample count (doubles, capped at
-    /// [`MAX_STOP_RULE_SAMPLES`], whenever the CI is too wide to ever settle
-    /// below `threshold`).
+    /// [`cli::session::MAX_STOP_RULE_SAMPLES`], whenever the CI is too wide
+    /// to ever settle below `threshold`).
     pub sample_count: u64,
 }
 
@@ -440,15 +434,11 @@ fn run(
     // already mutably borrowed by the call driving it) are queued here and
     // serviced as soon as the current chunk returns.
     let mut pending_evaluations: Vec<(Vec<usize>, u64)> = Vec::new();
-    // Convergence stop rule (`run.stop_dev_gain`, ported from
-    // `cli::multiway_solve::run_inner`'s drive loop): an adaptive evaluation
-    // sample count, a consecutive-pass counter, and the wall clock of the
-    // last stop-rule evaluation. `None` in `mw_session.stop_rule` means the
-    // rule is disabled, in which case these three never get read.
-    let mut stop_rule_samples = mw_session.evaluation_samples;
-    let mut stop_confirmations_met: u32 = 0;
-    let mut last_stop_eval = Instant::now();
-    let mut stop_eval_index: u64 = 0;
+    // Convergence stop rule (`run.stop_dev_gain`), shared with the CLI drive
+    // loop via `cli::session::{StopRuleState, run_stop_rule_check}`. `None`
+    // in `mw_session.stop_rule` means the rule is disabled, in which case
+    // this never gets read.
+    let mut stop_rule_state = session::StopRuleState::new(mw_session.evaluation_samples);
     // How this run finished; overwritten only by the three non-default
     // outcomes below, so a plain "ran out of sweeps" completion needs no
     // explicit assignment.
@@ -618,74 +608,29 @@ fn run(
 
         // Convergence stop rule: an ADDITIONAL trigger layered on top of the
         // cadence-based evaluation/checkpoint boundaries above, never a
-        // replacement for them (ported from
-        // `cli::multiway_solve::run_inner`'s drive loop). It fires on
-        // wall-clock time rather than a sweep boundary, so it is checked once
-        // per drive-loop chunk regardless of where `sweeps_now` falls
-        // relative to `evaluation_cadence`/`checkpoint_every`.
+        // replacement for them. It fires on wall-clock time rather than a
+        // sweep boundary, so it is checked once per drive-loop chunk
+        // regardless of where `sweeps_now` falls relative to
+        // `evaluation_cadence`/`checkpoint_every`. The check itself (the
+        // best-response burst, the evaluation, threshold/width bookkeeping,
+        // adaptive sample doubling, and the confirmations update) is shared
+        // with the CLI drive loop via `cli::session::run_stop_rule_check`;
+        // this worker keeps only the wall-clock trigger, event-sending, and
+        // the loop-break decision.
         let mut stop_rule_clock: Option<StopRuleClock> = None;
         if let Some(stop_rule) = mw_session.stop_rule {
-            let elapsed_since_last = last_stop_eval.elapsed().as_secs_f64();
-            if elapsed_since_last >= stop_rule.eval_period_secs {
-                last_stop_eval = Instant::now();
-                // Best-response burst: stop-rule evaluations measure a per-seat deviator
-                // TRAINED against the frozen current average profile rather than the
-                // plain regret-greedy heuristic the ordinary evaluation-cadence block
-                // above uses, so the deviation-gain numbers reported here are
-                // systematically tighter (higher) than a cadence row taken at the same
-                // sweep count. That is intentional: the stop decision should use the
-                // strongest available deviator, not the cheap heuristic every metrics
-                // row gets.
-                let training_seed = mw_session.evaluation_seed ^ 0x6252_5354 ^ stop_eval_index;
-                stop_eval_index += 1;
-                let deviators = if stop_rule.br_traversals > 0 {
-                    let num_players = mw_session.game_config.seats.len();
-                    let pool = match rayon::ThreadPoolBuilder::new()
-                        .num_threads(mw_session.threads)
-                        .build()
-                    {
-                        Ok(pool) => pool,
-                        Err(error) => {
-                            send(WorkerEvent::Failed(format!(
-                                "training best-response deviators for the convergence stop rule: {error}"
-                            )));
-                            return;
-                        }
-                    };
-                    let trained = pool.install(|| {
-                        (0..num_players)
-                            .into_par_iter()
-                            .map(|seat| {
-                                mw_session.solver.train_deviator(
-                                    seat,
-                                    stop_rule.br_traversals,
-                                    training_seed,
-                                )
-                            })
-                            .collect::<Result<Vec<_>, _>>()
-                    });
-                    match trained {
-                        Ok(trained) => Some(trained),
-                        Err(error) => {
-                            send(WorkerEvent::Failed(format!(
-                                "training best-response deviators for the convergence stop rule: {error}"
-                            )));
-                            return;
-                        }
-                    }
-                } else {
-                    None
-                };
-                let evaluation = match mw_session.solver.evaluate_average_profile_with(
-                    stop_rule_samples,
+            if stop_rule_state.last_eval.elapsed().as_secs_f64() >= stop_rule.eval_period_secs {
+                let check = match session::run_stop_rule_check(
+                    &mw_session.solver,
+                    &stop_rule,
+                    &mut stop_rule_state,
+                    mw_session.game_config.seats.len(),
+                    mw_session.threads,
                     mw_session.evaluation_seed,
-                    deviators.as_deref(),
                 ) {
-                    Ok(evaluation) => evaluation,
+                    Ok(check) => check,
                     Err(error) => {
-                        send(WorkerEvent::Failed(format!(
-                            "evaluating multiway profile for the convergence stop rule: {error}"
-                        )));
+                        send(WorkerEvent::Failed(format!("{error:#}")));
                         return;
                     }
                 };
@@ -697,53 +642,22 @@ fn run(
                 // scan.
                 last_drift = mw_session.solver.strategy_drift_refresh(&mut prior);
 
-                let bounds = evaluation
-                    .deviation_gain_lower_bound
-                    .as_ref()
-                    .expect("evaluate_average_profile always returns deviation_gain_lower_bound");
-                let max_upper = bounds
-                    .iter()
-                    .map(|estimate| estimate.ci95[1])
-                    .fold(f64::NEG_INFINITY, f64::max);
-                let max_width = bounds
-                    .iter()
-                    .map(|estimate| estimate.ci95[1] - estimate.ci95[0])
-                    .fold(0.0, f64::max);
-
-                stop_confirmations_met = if max_upper < stop_rule.dev_gain_threshold {
-                    stop_confirmations_met + 1
-                } else {
-                    0
-                };
-                // The CI is wide enough that the check could never pass even
-                // if the true value already converged: double the sample
-                // count for subsequent stop-rule evaluations (capped), so
-                // noise shrinks over time instead of blocking convergence
-                // forever.
-                if max_width > stop_rule.dev_gain_threshold
-                    && stop_rule_samples < MAX_STOP_RULE_SAMPLES
-                {
-                    stop_rule_samples = stop_rule_samples
-                        .saturating_mul(2)
-                        .min(MAX_STOP_RULE_SAMPLES);
-                }
-
                 send(WorkerEvent::Evaluated(EvaluationEvent {
-                    evaluation,
+                    evaluation: check.evaluation,
                     stop_rule: Some(StopRuleProgress {
-                        max_ci_upper: max_upper,
+                        max_ci_upper: check.max_upper,
                         threshold: stop_rule.dev_gain_threshold,
-                        confirmations: stop_confirmations_met,
+                        confirmations: stop_rule_state.confirmations_met,
                         confirmations_required: stop_rule.confirmations,
-                        sample_count: stop_rule_samples,
+                        sample_count: stop_rule_state.samples,
                     }),
                 }));
 
-                if stop_confirmations_met >= stop_rule.confirmations {
+                if check.converged {
                     outcome = FinishedOutcome::Converged {
-                        max_ci_upper: max_upper,
+                        max_ci_upper: check.max_upper,
                         threshold: stop_rule.dev_gain_threshold,
-                        confirmations: stop_confirmations_met,
+                        confirmations: stop_rule_state.confirmations_met,
                     };
                     break 'drive;
                 }
@@ -752,7 +666,7 @@ fn run(
                 threshold: stop_rule.dev_gain_threshold,
                 confirmations_required: stop_rule.confirmations,
                 next_eval_in_secs: (stop_rule.eval_period_secs
-                    - last_stop_eval.elapsed().as_secs_f64())
+                    - stop_rule_state.last_eval.elapsed().as_secs_f64())
                 .max(0.0),
             });
         }

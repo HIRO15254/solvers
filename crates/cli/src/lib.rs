@@ -185,7 +185,7 @@ enum Command {
         /// Evaluate the LAST-ITERATE regret-matched current strategy
         /// instead of the linear average (diagnostic: plain regret
         /// matching has no last-iterate guarantee; see
-        /// `MultiwaySolver::evaluate_profile_variant`).
+        /// `MultiwaySolver::evaluate_profile`).
         #[arg(long, default_value_t = false)]
         current: bool,
     },
