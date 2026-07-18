@@ -560,6 +560,31 @@ enough to call before committing to a run):
   caller's own thread/memory-budget facts (no machine detection happens
   here).
 
+### Auto-materialized sampling and discount settings
+
+Besides the structural knobs above, the GUI's Auto mode also materializes
+two convergence-calibrated `[algorithm]` values that differ from the
+CLI-side serde defaults (which stay unchanged so existing hand-written TOMLs
+keep reproducing byte-identically):
+
+- `exploration_epsilon = 0.0` (CLI default `0.06`): pure on-policy opponent
+  sampling. External sampling stays unbiased at `epsilon = 0`, and removing
+  the `sigma/p` importance weights measurably reduced estimator variance in
+  paired 200k-sweep runs (best final average-positive-regret of every
+  variant tested). Trade-off: nodes reachable only through an opponent
+  action the profile assigns zero probability stop receiving updates and
+  stay uniform there; measured deviation-gain bounds kept improving anyway,
+  but this is the knob to revisit if a convergence stop ever plateaus above
+  its threshold.
+- `discount_every = 10_000` (CLI default `100_000`): the batched
+  linear-CFR discount only approximates true per-iteration linear weighting
+  at the granularity of its cadence, and at `100_000` it fires just once or
+  twice in a typical converged run -- early high-noise regrets barely decay.
+  At `10_000` the paired runs reached the coarse-cadence run's final
+  deviation-gain bound in roughly three quarters of the sweeps (about half,
+  combined with `epsilon = 0`) for ~3.5% extra wall time (each discount
+  event is a full arena scan).
+
 ## References
 
 - [Lanctot et al., *Monte Carlo Sampling for Regret Minimization in Extensive Games* (NeurIPS 2009)](https://papers.nips.cc/paper_files/paper/2009/hash/00411460f7c92d2124a67ea0f4cb5f85-Abstract.html)

@@ -455,6 +455,26 @@ Bridge v2 は、変更されていない v1 と並んで、ヘルス/機能情�
 定期チェックポイントが一度でも存在すれば、そのソルブが継続中であっても
 その URL は利用可能である。
 
+### Auto モードが実体化するサンプリング/割引設定
+
+GUI の Auto モードは、構造的な設定に加えて、収束速度を実測校正した 2 つの
+`[algorithm]` 値を明示的に書き込む(CLI 側の serde 既定値は既存 TOML の
+バイト再現性のため変更しない):
+
+- `exploration_epsilon = 0.0`(CLI 既定値 `0.06`): 相手アクションの純
+  on-policy サンプリング。external sampling は ε=0 でも不偏であり、
+  `σ/p` の importance 重みを除去することで推定分散が実測で低下した
+  (200k sweep ペア計測で全変種中最良の最終平均正 regret)。トレードオフ:
+  プロファイルが確率 0 を割り当てる相手アクションの先のノードは更新されず
+  一様のまま残る。実測の逸脱利得上界は改善し続けたが、収束停止が閾値の
+  上でプラトーした場合に最初に見直すべきノブである。
+- `discount_every = 10_000`(CLI 既定値 `100_000`): バッチ化された
+  Linear CFR 割引はカデンス粒度でしか真の反復毎線形重みを近似できず、
+  `100_000` では典型的なランで 1〜2 回しか発火しない — 序盤の高ノイズ
+  regret がほぼ減衰しない。`10_000` ではペア計測で、粗いカデンスの最終
+  逸脱利得上界におよそ 3/4 の sweep 数で到達(ε=0 との併用で約半分)、
+  追加コストは壁時間 +3.5%(割引イベント毎のアリーナ全走査)。
+
 ## References
 
 - [Lanctot et al., *Monte Carlo Sampling for Regret Minimization in Extensive Games* (NeurIPS 2009)](https://papers.nips.cc/paper_files/paper/2009/hash/00411460f7c92d2124a67ea0f4cb5f85-Abstract.html)

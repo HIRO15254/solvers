@@ -270,6 +270,10 @@ fn auto_panel_ui(ui: &mut Ui, state: &mut SetupState) {
         ui.monospace(
             "pruning: enabled (regret-based, threshold derived automatically from stakes)",
         );
+        ui.monospace(
+            "sampling: on-policy (epsilon=0), regret discount every 10k sweeps \
+             (A/B-calibrated for faster convergence)",
+        );
         ui.monospace(format!(
             "stop rule: max deviation-gain < {} ({}% of shortest stack), confirmations={}, \
              checked every {}s",

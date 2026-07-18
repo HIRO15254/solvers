@@ -963,10 +963,13 @@ fn derive_prune_threshold(model: &Model) -> f64 {
 /// `algorithm.traverser_vector = true`, `abstraction.kind = "ehs2-table"`
 /// (clearing any `active_opponent_buckets`, which that backend rejects),
 /// `abstraction.artifact_cache = AUTO_ARTIFACT_CACHE`, check-down
-/// `max_betting_players = 2` on flop/turn/river (never preflop), `run.storage
-/// = "i16"`, `run.sweeps = AUTO_SWEEPS_CAP`, `run.threads`/`run.sweep_batch`/
-/// `run.max_memory_mib` from the derivation/budget, and the convergence stop
-/// rule from `quality`.
+/// `max_betting_players = 2` on flop/turn/river (never preflop), regret
+/// pruning with a stake-derived threshold, `exploration_epsilon = 0.0` and
+/// `discount_every = 10_000` (both A/B-calibrated for faster convergence;
+/// see the inline comment), `run.storage = "i16"`, `run.sweeps =
+/// AUTO_SWEEPS_CAP`, `run.threads`/`run.sweep_batch`/`run.max_memory_mib`
+/// from the derivation/budget, and the convergence stop rule from
+/// `quality`.
 pub fn apply_auto_derivation(
     model: &mut Model,
     threads: usize,
@@ -991,6 +994,20 @@ pub fn apply_auto_derivation(
     model.algorithm.traverser_vector = true;
     model.algorithm.prune = true;
     model.algorithm.prune_threshold = Some(derive_prune_threshold(model));
+    // Paired 200k-sweep A/Bs (2026-07, 6-max auto shape, 256-sample
+    // devGainLB evaluations): a 10k-sweep discount cadence reached the
+    // anchor's 200k-sweep deviation-gain bound by ~150k sweeps for +3.5%
+    // wall time (the 100k default only fires once or twice in a typical
+    // run, so early noisy regrets barely decay), and pure on-policy
+    // opponent sampling (epsilon = 0) removed the importance-weight
+    // variance for a further clear late-run gain; combined they roughly
+    // halved the sweeps needed to reach a given bound. Trade-off note:
+    // epsilon = 0 leaves nodes behind never-sampled opponent actions
+    // untrained (uniform); measured deviation-gain bounds kept improving
+    // regardless, but this is the knob to revisit if a stop rule ever
+    // plateaus above its threshold.
+    model.algorithm.exploration_epsilon = 0.0;
+    model.algorithm.discount_every = 10_000;
 
     model.betting.flop.max_betting_players = Some(2);
     model.betting.turn.max_betting_players = Some(2);
@@ -1022,6 +1039,8 @@ pub fn matches_auto_shape(model: &Model) -> bool {
         && model.algorithm.traverser_vector
         && model.algorithm.prune
         && model.algorithm.prune_threshold == Some(derive_prune_threshold(model))
+        && model.algorithm.exploration_epsilon == 0.0
+        && model.algorithm.discount_every == 10_000
         && model.betting.flop.max_betting_players == Some(2)
         && model.betting.turn.max_betting_players == Some(2)
         && model.betting.river.max_betting_players == Some(2)
@@ -1433,6 +1452,8 @@ iterations = 10
         assert!(model.algorithm.prune);
         // 3 seats at the default 100bb each: -10 * 300.0 = -3000.0.
         assert_eq!(model.algorithm.prune_threshold, Some(-3_000.0));
+        assert_eq!(model.algorithm.exploration_epsilon, 0.0);
+        assert_eq!(model.algorithm.discount_every, 10_000);
         assert_eq!(model.betting.flop.max_betting_players, Some(2));
         assert_eq!(model.betting.turn.max_betting_players, Some(2));
         assert_eq!(model.betting.river.max_betting_players, Some(2));
@@ -1462,6 +1483,8 @@ iterations = 10
             "traverser_vector = true",
             "prune = true",
             "prune_threshold = -3000.0",
+            "exploration_epsilon = 0.0",
+            "discount_every = 10000",
         ] {
             assert!(
                 toml_text.contains(needle),
