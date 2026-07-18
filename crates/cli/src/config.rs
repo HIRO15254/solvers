@@ -461,25 +461,6 @@ pub struct RunSection {
     /// Defaults to `2_000` when `stop_dev_gain` is set; ignored otherwise.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stop_br_traversals: Option<u64>,
-    /// Enables warm-start-from-a-coarser-bucket-abstraction (see
-    /// `multiway::solver::MultiwaySolver::apply_warm_start`): before building
-    /// the real (fine-bucketed) solver, run a short solve at this uniform
-    /// flop/turn/river bucket count, then splice its regrets/counters into
-    /// the fresh fine solver so its MCCFR iterations continue the coarse
-    /// run's progress instead of starting from scratch. Requires
-    /// `game.abstraction.kind = "ehs2-table"` and `game.abstraction.recall =
-    /// "street"`, and must be strictly less than every one of
-    /// `game.abstraction.{flop,turn,river}_buckets`. `None` (the default)
-    /// disables warm start entirely, byte-identical to before this field
-    /// existed.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub warm_start_buckets: Option<u16>,
-    /// Sweep count for `warm_start_buckets`'s coarse phase. Ignored unless
-    /// `warm_start_buckets` is set. Defaults to `25_000` when
-    /// `warm_start_buckets` is set but this key is omitted; must be positive
-    /// when supplied.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub warm_start_sweeps: Option<u64>,
 }
 
 fn default_check_every() -> u64 {
