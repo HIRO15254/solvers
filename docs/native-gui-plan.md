@@ -1,4 +1,8 @@
 <!-- 状態: 実装完了(2026-07)。本書は設計記録として保持する — 現行仕様は
+
+> **2026-07 アプリ再編**: `crates/cli` → `app/cli`、`crates/gui` → `app/gui` に移動
+> (パッケージ名・bin 名は不変)。本文中の旧パスは読み替えること。現行のアプリ構成は
+> `docs/app-structure.md` を参照。
      architecture.md / multiway-preflop.md が正。コード内の doc コメントが
      本書のセクション記号(C/E/F)を参照しているため削除しない。 -->
 

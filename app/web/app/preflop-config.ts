@@ -1210,7 +1210,7 @@ function generateMultiwayToml(settings: PreflopSettings): string {
 
 
 
-/** Generate a `SolveConfig` accepted by `crates/cli/src/config.rs`. */
+/** Generate a `SolveConfig` accepted by `app/cli/src/config.rs`. */
 export function generateToml(settings: PreflopSettings): string {
   if (settings.mode === "multiway") return generateMultiwayToml(settings);
 

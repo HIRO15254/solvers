@@ -11,8 +11,8 @@ members = [
     "crates/preflop",
     "crates/multiway",
     "crates/formats",
-    "crates/cli",
-    "crates/gui",
+    "app/cli",
+    "app/gui",
 ]
 
 [workspace.package]
@@ -32,7 +32,7 @@ abstraction = { path = "crates/abstraction" }
 preflop = { path = "crates/preflop" }
 multiway = { path = "crates/multiway" }
 formats = { path = "crates/formats" }
-cli = { path = "crates/cli" }
+cli = { path = "app/cli" }
 
 # NOTE: aya_poker's "std" feature is broken in 0.1.0 (aya_base gates no_std on
 # `cfg(std)` instead of `feature = "std"`), so we use the default no_std build.

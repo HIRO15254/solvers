@@ -39,11 +39,19 @@
 
 ## 2. レイヤ構成と workspace
 
+> **2026-07 アプリ再編**: アプリケーション層(1 アプリ = Preflop + Postflop を
+> `game.kind` で切り替え。CLI + それをラップした Web UI + 補助のネイティブ GUI)を
+> `app/` ディレクトリに分離した。アプリレベルの設計(bridge による「デバイス貸し」
+> モデル含む)は `docs/app-structure.md` を参照。以下はその反映済みレイアウト。
+
 ```
-frontends:  cli (TOML batch + UPI subset REPL + CSV reports + ANSI 13×13 grid、bin+lib)
+app:        cli (bin "solvers": TOML batch + UPI subset REPL + CSV reports + ANSI 13×13 grid、
+                 bin+lib。serve = 認証付き loopback bridge)
+            web (Next.js/vinext workbench。bridge 経由でローカル実行、公開可。
+                 現状 Preflop/multiway — Postflop セクションは今後)
             gui (egui/eframe ネイティブ。multiway preflop 専用: Setup/Solve/Results、
                  収束ライブチャート、13×13 戦略マトリクス、プリセット管理)
-            py (PyO3, M3〜) · wasm (viewer-only, M8)
+future:     py (PyO3, M3〜) · wasm (viewer-only, M8)
 multiway:    multiway — generative NLHE / joint deal / side pots / rollout buckets / MCCFR
 schemas:    formats — SolveConfig / NodeQuery→NodeReport / Checkpoint(.ckpt) / Artifact(.sol)
 sessions:   holdem::PostflopGame · preflop::PreflopGame
@@ -58,7 +66,7 @@ oracle:     cfr-ref — OpenSpiel 形 scalar CFR + BR(~500 行, 凍結, 差分�
 foundation: cards(型・range parser・evaluator wrapper) · hand-index(Waugh 移植)
 ```
 
-Cargo virtual workspace(既存の `src/main.rs` パッケージは解体、`cli` が bin 名 `solvers` を継承):
+Cargo virtual workspace:
 
 ```
 solvers/
@@ -66,6 +74,13 @@ solvers/
 ├── .cargo/config.toml    # -C target-cpu=native(研究ビルド)
 ├── LICENSE-POLICY.md     # AGPL/無ライセンス = read-only の明文化
 ├── tools/plot_convergence.py
+├── app/
+│   ├── cli/            # bin "solvers"(package "cli"、bin+lib): serve/solve/resume/bench/
+│   │                   # inspect/mw-eval/report。config スキーマと multiway セッション構築
+│   │                   # (session.rs) を gui と共有
+│   ├── web/            # workbench(範囲/ツリー編集、multiway explorer、bridge client)
+│   └── gui/            # bin "solvers-gui": egui/eframe ネイティブ GUI (multiway preflop、
+│                       # docs/native-gui-plan.md 参照)
 └── crates/
     ├── cards/          # Card/CardSet/Chips/Street/PerPlayer<T>、"22+,A2s+" range parser、
     │                   # aya_poker (Zlib/Apache-2.0/MIT) evaluator wrapper。workspace 内依存なし
@@ -79,15 +94,11 @@ solvers/
     ├── preflop/        # Mode B。deps: holdem, abstraction, engine, game, formats(cache)
     ├── formats/        # serde DTO のみ + codec。deps: serde, toml, postcard, zstd, blake3
     ├── multiway/       # 2–9 seat generative path。HU engine から独立
-    ├── cli/            # bin "solvers" + lib: serve/solve/resume/bench/inspect/mw-eval/report、
-    │                   # config スキーマと multiway セッション構築 (session.rs) を gui と共有
-    ├── gui/            # bin "solvers-gui": egui/eframe ネイティブ GUI (multiway preflop、
-    │                   # docs/native-gui-plan.md 参照)
     ├── py/             # (M3〜) PyO3/maturin。formats 上の薄い adapter
     └── wasm/           # (M8) wasm-bindgen viewer-only adapter
 ```
 
-依存方向(厳格): HU は `cards → hand-index → {engine ∥ cfr-ref} → game → holdem → {abstraction → preflop}`、multiway は `cards → multiway` の独立経路で、双方を formats 消費側(cli/py/wasm)が束ねる。**engine は poker 固有 crate に依存しない。formats は solver 実装へ依存しない。**
+依存方向(厳格): HU は `cards → hand-index → {engine ∥ cfr-ref} → game → holdem → {abstraction → preflop}`、multiway は `cards → multiway` の独立経路で、双方を formats 消費側(`app/cli`・py・wasm)が束ねる。**engine は poker 固有 crate に依存しない。formats は solver 実装へ依存しない。アプリ層(`app/*`)以外はアプリの知識を持たない。**
 
 ---
 
