@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Plot solver convergence metrics from one or more JSONL metrics files.
 
-Each input file is produced by `solve/resume/bench --metrics ...` (preflop-solver/postflop-solver)
+Each input file is produced by `solvers solve/resume/bench --metrics ...`
 (see `crates/formats`): one JSON object per line, e.g.
 
     {"iteration": 500, "elapsed_secs": 0.12, "expl_p0": 1.2e-3,

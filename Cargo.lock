@@ -274,29 +274,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a4385e2e34eb35d6b3efe798b9eb88096925d87726c0798709bf56d9ed84af3"
 
 [[package]]
-name = "app-core"
-version = "0.1.0"
-dependencies = [
- "abstraction",
- "anyhow",
- "cards",
- "clap",
- "engine",
- "formats",
- "game",
- "holdem",
- "multiway",
- "preflop",
- "rand",
- "rayon",
- "serde",
- "serde_json",
- "tempfile",
- "tiny_http",
- "toml",
-]
-
-[[package]]
 name = "arboard"
 version = "3.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -858,6 +835,29 @@ name = "clap_lex"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
+
+[[package]]
+name = "cli"
+version = "0.1.0"
+dependencies = [
+ "abstraction",
+ "anyhow",
+ "cards",
+ "clap",
+ "engine",
+ "formats",
+ "game",
+ "holdem",
+ "multiway",
+ "preflop",
+ "rand",
+ "rayon",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tiny_http",
+ "toml",
+]
 
 [[package]]
 name = "clipboard-win"
@@ -1764,6 +1764,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fdf242682df893b86f33a73828fb09ca4b2d3bb6cc95249707fc684d27484b91"
 dependencies = [
  "bitflags 2.13.0",
+]
+
+[[package]]
+name = "gui"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blake3",
+ "cards",
+ "cli",
+ "eframe",
+ "egui_plot",
+ "formats",
+ "multiway",
+ "rayon",
+ "rfd",
+ "serde",
+ "sysinfo",
+ "tempfile",
+ "toml",
 ]
 
 [[package]]
@@ -3039,18 +3059,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "postflop-cli"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "app-core",
- "clap",
- "engine",
- "formats",
- "serde_json",
-]
-
-[[package]]
 name = "potential_utf"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3083,39 +3091,6 @@ dependencies = [
  "rayon",
  "serde",
  "thiserror 2.0.18",
-]
-
-[[package]]
-name = "preflop-cli"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "app-core",
- "clap",
- "formats",
- "multiway",
- "serde_json",
- "tempfile",
-]
-
-[[package]]
-name = "preflop-gui"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "app-core",
- "blake3",
- "cards",
- "eframe",
- "egui_plot",
- "formats",
- "multiway",
- "rayon",
- "rfd",
- "serde",
- "sysinfo",
- "tempfile",
- "toml",
 ]
 
 [[package]]

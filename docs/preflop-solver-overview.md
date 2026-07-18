@@ -131,7 +131,7 @@ HU エンジンが持つ exploitability / NashConv とは意図的に別名に�
   16bit 固定小数点量子化)を、ページ読み出し可能な索引付きで格納。
   GUI の Results タブや Web ブリッジがこれを表示する。
 - **`.mwckpt`**: 再開用チェックポイント(累積 regret を含む全学習状態)。
-  `preflop-solver resume` / GUI から続きを回せる。
+  `solvers resume` / GUI から続きを回せる。
 - **metrics JSONL**: 上表の指標の時系列。
 - すべての成果物に設定の blake3 ハッシュが刻印され、設定が 1 バイトでも
   違う再開は拒否される。乱数はシード+サンプル ID から導出され、
@@ -141,10 +141,10 @@ HU エンジンが持つ exploitability / NashConv とは意図的に別名に�
 
 ```sh
 # GUI(Setup → Solve(収束チャート)→ Results(13×13 マトリクス))
-cargo run -p preflop-gui --release
+cargo run -p gui --release
 
 # CLI(同じ TOML 形式。GUI のプリセット/エクスポートと互換)
-cargo run -p preflop-cli --release -- solve examples/preflop_multiway_9max.toml \
+cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
   --output result.json --metrics metrics.jsonl \
   --checkpoint solve.mwckpt --sol solve.mwsol
 ```

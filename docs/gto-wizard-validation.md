@@ -37,7 +37,7 @@ GW を「独立した外部オラクル」として使い、Mode A(exact postflo
 | 対象 | **postflop のみ**(`kind = "postflop"`)。preflop(Mode B)は未実装(roadmap M6)なので対象外。 |
 | GW プラン | **プリセット閲覧のみ**を前提(カスタムソルブ機能は使わない)。 |
 | 比較対象 | アクション頻度 / エクイティ / EV(この 3 つ。優先度は §6 参照)。 |
-| 前提物 | ① `cargo build --release -p postflop-cli` 済み(`target/release/postflop-solver`)。② GW サブスクリプション。③ Claude for Chrome。 |
+| 前提物 | ① `cargo build --release -p cli` 済み(`target/release/solvers`)。② GW サブスクリプション。③ Claude for Chrome。 |
 
 ### ⚠️ 利用規約(必ず守る)
 
@@ -56,7 +56,7 @@ GW を「独立した外部オラクル」として使い、Mode A(exact postflo
       v                                                  v
   GW の頻度/EQ/EV                              solvers 用 TOML config
    (=期待値)                                          |
-      |                                          postflop-solver solve/inspect
+      |                                          solvers solve/inspect
       |                                                  |
       +----------------- §6 で突き合わせ ----------------+
                               |
@@ -477,7 +477,7 @@ tree: nodes=... terminals=... rank_tables=... storage=XXX MiB (f32) / YYY MiB (i
 `inspect` は「解いてから対話 REPL に入る」ので、検証はこれ 1 本でよい:
 
 ```bash
-NO_COLOR=1 ./target/release/postflop-solver inspect gw-check-XXX.toml
+NO_COLOR=1 ./target/release/solvers inspect gw-check-XXX.toml
 ```
 
 - 解き終わると `done: iterations=... wall=...s value_p0=... nash_conv=...` が出て `>` プロンプトになる。
@@ -490,7 +490,7 @@ NO_COLOR=1 ./target/release/postflop-solver inspect gw-check-XXX.toml
 
 ```powershell
 $env:NO_COLOR = 1
-"ev`nshow`neq`ncombos 77`ncombos K9s`nquit" | ./target/release/postflop-solver inspect gw-check-XXX.toml
+"ev`nshow`neq`ncombos 77`ncombos K9s`nquit" | ./target/release/solvers inspect gw-check-XXX.toml
 ```
 
 solve → 全コマンドの出力 → 終了、が 1 回で取れる(2026-07-09 検証はすべてこの形で実行)。
@@ -500,7 +500,7 @@ solve → 全コマンドの出力 → 終了、が 1 回で取れる(2026-07-09
 
 ```bash
 # root と特定ラインの per-combo 戦略を JSON 出力
-./target/release/postflop-solver solve gw-check-XXX.toml \
+./target/release/solvers solve gw-check-XXX.toml \
   --history "" --history "x" --history "xb75" --output out.json
 ```
 
@@ -527,7 +527,7 @@ solve → 全コマンドの出力 → 終了、が 1 回で取れる(2026-07-09
 - **root(最初の意思決定ノード)の集計頻度は `show` で直接比較してよい**。ここでは
   集計に使うルートレンジ重み = 実際の到達レンジなので、GW の集計頻度と整合する。
 - **⚠️ 深いノードの `show`/`grid` 集計頻度は要注意**: 本ソルバーの集計はいつも**ルートレンジ重み**で
-  加重する(`crates/app-core/src/postflop_setup.rs` の `action_frequencies` の設計注記)。カード除去や
+  加重する(`crates/cli/src/postflop_setup.rs` の `action_frequencies` の設計注記)。カード除去や
   上流のフォールドで**実到達レンジが変わる深いノードでは、GW の集計頻度と重みがズレる**。
   → **深いノードでは `combos <class>` を使い、ハンド毎の確率を比較する**(これは重み非依存で常に正しい)。
 - **手順**:
@@ -653,7 +653,7 @@ solve → 全コマンドの出力 → 終了、が 1 回で取れる(2026-07-09
 まず GW なしで**手順自体**を通す練習(`examples/turn_small.toml`、数秒で解ける):
 
 ```bash
-NO_COLOR=1 ./target/release/postflop-solver inspect examples/turn_small.toml
+NO_COLOR=1 ./target/release/solvers inspect examples/turn_small.toml
 # 解けたら > プロンプトで:
 > ev
 ev_oop=10.000000 ev_ip=-10.000000 expl_oop=0.000e0 ... nash_conv=0.000e0 iterations=400

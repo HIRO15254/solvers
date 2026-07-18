@@ -9,7 +9,7 @@
 `examples/preflop_multiway_9max.toml` にある。
 
 ```sh
-cargo run -p preflop-cli --release -- solve examples/preflop_multiway_9max.toml \
+cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
   --output result.json --metrics metrics.jsonl \
   --checkpoint solve.mwckpt --sol solve.mwsol
 ```
@@ -528,9 +528,9 @@ vector traverser 自体も既定で無効であり、CLI は「vector なしの�
   結果のそばに `.mwckpt` を派生させる(結果パスが与えられなかった場合は
   `multiway-resource-limit.mwckpt`)。
 
-ネイティブ GUI(`cargo run -p preflop-gui --release`、バイナリ `preflop-gui`)は
+ネイティブ GUI(`cargo run -p gui --release`、バイナリ `solvers-gui`)は
 このソルバーをプロセス内に埋め込む。Setup(ライブバリデーション付きの
-完全な設定編集、`preflop-solver solve` の設定と相互運用可能な TOML プリセットの
+完全な設定編集、`solvers solve` の設定と相互運用可能な TOML プリセットの
 保存/読み込み/インポート/エクスポート)、Solve(sweep に対するシートごとの
 平均正 regret と戦略ドリフト、評価周期ごとのシートごとの EV ± CI を
 表示するライブ収束チャート、一時停止/再開/終了/キャンセル)、そして
@@ -607,9 +607,9 @@ sweep 数は常にランのメトリクス/結果アーティファクトに記�
   これは呼び出し側自身のスレッド数/メモリ予算の情報のみに基づく(ここでは
   マシン検出は一切行われない)。
 
-### 戦略 purification の計測(`preflop-solver mw-eval --purify`)
+### 戦略 purification の計測(`solvers mw-eval --purify`)
 
-`preflop-solver mw-eval <config.toml> --checkpoint <path.mwckpt> [--samples N]
+`solvers mw-eval <config.toml> --checkpoint <path.mwckpt> [--samples N]
 [--seed S] [--purify 0.0,0.05,1.0] [--br-traversals 2000]` はチェック
 ポイントからソルバーを復元し、指定した各閾値 `delta` について**閾値処理
 した平均プロファイル**の逸脱利得下界を測る: `delta` 未満の確率をゼロにし

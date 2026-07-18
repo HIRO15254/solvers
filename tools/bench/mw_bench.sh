@@ -7,8 +7,8 @@ set -euo pipefail
 config="$1"
 runs="${2:-3}"
 root="$(cd "$(dirname "$0")/../.." && pwd)"
-bin="$root/target/release/preflop-solver.exe"
-[ -f "$bin" ] || bin="$root/target/release/preflop-solver"
+bin="$root/target/release/solvers.exe"
+[ -f "$bin" ] || bin="$root/target/release/solvers"
 
 for i in $(seq 1 "$runs"); do
   out="$(mktemp)"

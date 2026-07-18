@@ -1,11 +1,8 @@
 <!-- 状態: 実装完了(2026-07)。本書は設計記録として保持する — 現行仕様は
 
-> **2026-07 アプリ再編での位置づけ**: 本書は実装当時の計画の記録。その後の再編で
-> `crates/gui` は `apps/preflop/gui`(package `preflop-gui`、bin `preflop-gui`)へ、
-> `crates/cli` は lib 専用の `crates/app-core` + 各アプリの薄い bin
-> (`apps/preflop/cli`, `apps/postflop/cli`)へ移動した。本文中の旧パス・旧 bin 名は
-> 読み替えること。現行の構成は `docs/app-structure.md` を参照。
-
+> **2026-07 アプリ再編**: `crates/cli` → `app/cli`、`crates/gui` → `app/gui` に移動
+> (パッケージ名・bin 名は不変)。本文中の旧パスは読み替えること。現行のアプリ構成は
+> `docs/app-structure.md` を参照。
      architecture.md / multiway-preflop.md が正。コード内の doc コメントが
      本書のセクション記号(C/E/F)を参照しているため削除しない。 -->
 
