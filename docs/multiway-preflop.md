@@ -606,6 +606,28 @@ time; per-sweep quality does improve (final max average positive regret
 107–109 vs 125 cold). It is therefore not part of the Auto preset unless
 longer-run measurements justify it; treat it as an experiment knob.
 
+### Strategy purification measurement (`solvers mw-eval --purify`)
+
+`solvers mw-eval <config.toml> --checkpoint <path.mwckpt> [--samples N]
+[--seed S] [--purify 0.0,0.05,1.0] [--br-traversals 2000]` restores a
+solver from a checkpoint and, for each listed threshold `delta`, measures
+the deviation-gain lower bound of the THRESHOLDED average profile:
+probabilities below `delta` are zeroed and the rest renormalized (`1.0`
+degenerates to argmax = full purification; `0.0` is the unmodified
+profile), applied consistently to both the evaluated profile and the
+burst-trained deviators attacking it (Ganzfried, Sandholm & Waugh, AAMAS
+2012: low-probability actions of an abstraction-derived, sampling-trained
+strategy are largely noise, and removing them reduces exploitability).
+
+Measured on a 6-max 100bb auto-shape 200k-sweep checkpoint (4096 samples,
+2000-traversal bursts): max deviation-gain CI-upper fell monotonically-ish
+from 0.543bb (raw) through 0.402bb (`delta = 0.15`) to 0.208bb at full
+purification — 2.6x tighter, mirroring the paper's ACPC result where the
+biggest improvement came from full purification. Caveat: purification also
+deletes genuinely mixed equilibrium actions, so for range-study output a
+moderate threshold preserves real mixes while removing noise; exported
+`.mwsol` artifacts remain unpurified (this is a measurement tool).
+
 ### Auto-materialized sampling and discount settings
 
 Besides the structural knobs above, the GUI's Auto mode also materializes

@@ -24,6 +24,7 @@ pub mod bridge;
 pub mod config;
 pub mod inspect;
 pub mod multiway_solve;
+pub mod mw_eval;
 pub mod node_eval;
 pub mod postflop_setup;
 pub mod preflop_setup;
@@ -157,6 +158,31 @@ enum Command {
         #[arg(long = "river-target")]
         river_target: Option<f64>,
     },
+    /// Measures strategy purification/thresholding (Ganzfried & Sandholm,
+    /// AAMAS 2012) against a multiway checkpoint's average profile. A dev
+    /// tool: restores the checkpoint, runs no further sweeps, and prints
+    /// one held-out deviation-gain line per requested threshold.
+    MwEval {
+        /// Path to the exact same config file used to produce the
+        /// checkpoint (multiway configs only).
+        config: std::path::PathBuf,
+        /// Path to the `.mwckpt` checkpoint to restore and evaluate.
+        #[arg(long)]
+        checkpoint: std::path::PathBuf,
+        /// Held-out Monte Carlo samples per threshold.
+        #[arg(long, default_value_t = 4096)]
+        samples: u64,
+        /// Evaluation RNG seed.
+        #[arg(long, default_value_t = 1)]
+        seed: u64,
+        /// Comma-separated purification thresholds in `[0.0, 1.0]`.
+        #[arg(long, default_value = "0.0")]
+        purify: String,
+        /// Best-response training traversals per seat per threshold. `0`
+        /// disables deviator training (regret-greedy heuristic only).
+        #[arg(long = "br-traversals", default_value_t = 2000)]
+        br_traversals: u64,
+    },
     /// Solve the same postflop config across multiple boards and write a
     /// CSV report (one row per board).
     Report {
@@ -240,6 +266,14 @@ pub fn main_impl() -> Result<()> {
                 unreachable!("clap's conflicts_with prevents both being set")
             }
         },
+        Command::MwEval {
+            config,
+            checkpoint,
+            samples,
+            seed,
+            purify,
+            br_traversals,
+        } => mw_eval::run(&config, &checkpoint, samples, seed, &purify, br_traversals),
         Command::Report {
             config,
             boards,

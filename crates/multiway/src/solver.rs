@@ -2330,6 +2330,41 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         traversals: u64,
         seed: u64,
     ) -> Result<DeviatorPolicy, SolverError> {
+        self.train_deviator_core(seat, traversals, seed, 0.0)
+    }
+
+    /// Same as [`Self::train_deviator`], except every opponent
+    /// average-strategy read taken while sampling other seats' actions
+    /// during training is first purified with [`purify_strategy`] at
+    /// `purify_threshold` (Ganzfried & Sandholm, AAMAS 2012): entries below
+    /// the threshold are zeroed and the remainder renormalized. This trains
+    /// the deviator against the SAME purified profile
+    /// [`Self::evaluate_average_profile_purified`] replays as the baseline
+    /// at that threshold, rather than against the raw average profile --
+    /// pairing an unpurified deviator with a purified baseline (or vice
+    /// versa) would compare two different profiles and produce an
+    /// incoherent gain estimate. `purify_threshold` must be finite and in
+    /// `[0.0, 1.0]`; `0.0` is byte-identical to [`Self::train_deviator`]
+    /// (the purify call is skipped entirely rather than performing a
+    /// no-op renormalization).
+    pub fn train_deviator_purified(
+        &self,
+        seat: usize,
+        traversals: u64,
+        seed: u64,
+        purify_threshold: f32,
+    ) -> Result<DeviatorPolicy, SolverError> {
+        validate_purify_threshold(purify_threshold)?;
+        self.train_deviator_core(seat, traversals, seed, purify_threshold)
+    }
+
+    fn train_deviator_core(
+        &self,
+        seat: usize,
+        traversals: u64,
+        seed: u64,
+        purify_threshold: f32,
+    ) -> Result<DeviatorPolicy, SolverError> {
         let num_players = self.game.num_players();
         if seat >= num_players {
             return Err(SolverError::InvalidActor {
@@ -2350,6 +2385,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 &mut regrets,
                 &mut action_rng,
                 0,
+                purify_threshold,
             )?;
         }
         let actions = regrets
@@ -2370,6 +2406,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         regrets: &mut FxHashMap<InfoKey, (Vec<f32>, u32)>,
         rng: &mut ChaCha20Rng,
         depth: u32,
+        purify_threshold: f32,
     ) -> Result<f64, SolverError> {
         if depth > self.config.max_traversal_depth {
             return Err(SolverError::DepthLimit {
@@ -2433,6 +2470,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     regrets,
                     rng,
                     depth + 1,
+                    purify_threshold,
                 )?;
             }
             let node_value = sigma
@@ -2451,14 +2489,27 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 if column.action_labels != labels {
                     return Err(SolverError::ActionLabelsChanged { key });
                 }
-                column.average_strategy()
+                let mut strategy = column.average_strategy();
+                if purify_threshold > 0.0 {
+                    purify_strategy(&mut strategy, purify_threshold);
+                }
+                strategy
             } else {
                 vec![1.0 / num_actions as f32; num_actions]
             };
             let action = sample_profile_action(&strategy, rng);
             let next = self.game.next_state_with(&state, &actions, action);
             let child_history = history.child(actor, action);
-            self.train_deviator_traverse(world, seat, next, child_history, regrets, rng, depth + 1)
+            self.train_deviator_traverse(
+                world,
+                seat,
+                next,
+                child_history,
+                regrets,
+                rng,
+                depth + 1,
+                purify_threshold,
+            )
         }
     }
 
@@ -2521,6 +2572,44 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         seed: u64,
         deviators: Option<&[DeviatorPolicy]>,
     ) -> Result<ProfileEvaluation, SolverError> {
+        self.evaluate_average_profile_core(samples, seed, deviators, 0.0)
+    }
+
+    /// Same as [`Self::evaluate_average_profile_with`], except every
+    /// average-strategy read taken while replaying the baseline profile (and
+    /// the regret-greedy/trained-deviator candidates' opponents) is first
+    /// purified with [`purify_strategy`] at `purify_threshold` (Ganzfried &
+    /// Sandholm, AAMAS 2012): entries below the threshold are zeroed and the
+    /// remainder renormalized; if every entry is below threshold, only the
+    /// argmax survives. `purify_threshold` must be finite and in
+    /// `[0.0, 1.0]` (`SolverError::InvalidState` otherwise). `0.0` produces
+    /// EXACTLY the result [`Self::evaluate_average_profile_with`] would (the
+    /// purify call is skipped entirely rather than performing a no-op
+    /// renormalization, so the RNG and floating-point paths are untouched).
+    ///
+    /// When passing `deviators`, train them with
+    /// [`Self::train_deviator_purified`] at this SAME `purify_threshold`: the
+    /// deviator must exploit the exact purified profile this evaluation
+    /// replays as the baseline, or the reported gain compares two different
+    /// profiles and is not a coherent measurement.
+    pub fn evaluate_average_profile_purified(
+        &self,
+        samples: u64,
+        seed: u64,
+        deviators: Option<&[DeviatorPolicy]>,
+        purify_threshold: f32,
+    ) -> Result<ProfileEvaluation, SolverError> {
+        validate_purify_threshold(purify_threshold)?;
+        self.evaluate_average_profile_core(samples, seed, deviators, purify_threshold)
+    }
+
+    fn evaluate_average_profile_core(
+        &self,
+        samples: u64,
+        seed: u64,
+        deviators: Option<&[DeviatorPolicy]>,
+        purify_threshold: f32,
+    ) -> Result<ProfileEvaluation, SolverError> {
         if samples == 0 {
             return Err(SolverError::ZeroEvaluationSamples);
         }
@@ -2555,7 +2644,13 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 .checked_add(u64::from(sample.attempts))
                 .ok_or(SolverError::CounterOverflow)?;
             let mut profile_rng = evaluation_action_rng(seed, sample_id, None);
-            let utilities = self.evaluate_world(&sample.world, &mut profile_rng, None, None)?;
+            let utilities = self.evaluate_world(
+                &sample.world,
+                &mut profile_rng,
+                None,
+                None,
+                purify_threshold,
+            )?;
             let count = (sample_id + 1) as f64;
             for seat in 0..num_players {
                 let delta = utilities[seat] - means[seat];
@@ -2563,8 +2658,13 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 m2[seat] += delta * (utilities[seat] - means[seat]);
 
                 let mut deviation_rng = evaluation_action_rng(seed, sample_id, Some(seat));
-                let deviation =
-                    self.evaluate_world(&sample.world, &mut deviation_rng, Some(seat), None)?;
+                let deviation = self.evaluate_world(
+                    &sample.world,
+                    &mut deviation_rng,
+                    Some(seat),
+                    None,
+                    purify_threshold,
+                )?;
                 let gain = deviation[seat] - utilities[seat];
                 let gain_delta = gain - gain_means[seat][0];
                 gain_means[seat][0] += gain_delta / count;
@@ -2577,6 +2677,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                         &mut trained_rng,
                         Some(seat),
                         deviators,
+                        purify_threshold,
                     )?;
                     let gain = trained[seat] - utilities[seat];
                     let gain_delta = gain - gain_means[seat][1];
@@ -2617,6 +2718,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         rng: &mut ChaCha20Rng,
         deviator: Option<usize>,
         deviators: Option<&[DeviatorPolicy]>,
+        purify_threshold: f32,
     ) -> Result<Vec<f64>, SolverError> {
         let num_players = self.game.num_players();
         let mut state = self.game.root_state();
@@ -2662,7 +2764,11 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 if column.action_labels != labels {
                     return Err(SolverError::ActionLabelsChanged { key });
                 }
-                column.average_strategy()
+                let mut strategy = column.average_strategy();
+                if purify_threshold > 0.0 {
+                    purify_strategy(&mut strategy, purify_threshold);
+                }
+                strategy
             } else {
                 vec![1.0 / num_actions as f32; num_actions]
             };
@@ -4624,6 +4730,66 @@ fn normalize_nonnegative_f32(values: &[f32]) -> Option<Vec<f32>> {
     (sum > 0.0).then(|| values.iter().map(|&value| value / sum).collect())
 }
 
+/// Strategy purification/thresholding (Ganzfried & Sandholm, AAMAS 2012):
+/// zeroes every entry strictly below `threshold` and renormalizes the
+/// remainder to sum to `1`. If every entry falls below `threshold`
+/// (including the degenerate `threshold >= 1.0` case, which purifies down
+/// to a pure strategy), only the single highest-probability action
+/// survives with probability `1`; ties are broken toward the lowest index.
+/// Callers wanting the untouched profile should skip calling this at
+/// `threshold == 0.0` rather than relying on it being a no-op: `< 0.0` is
+/// never true for a probability, so it always takes the "renormalize by
+/// dividing by the (already ~1) sum" branch, which is only a rounding
+/// no-op, not a bit-identical one.
+fn purify_strategy(strategy: &mut [f32], threshold: f32) {
+    // The argmax (lowest index on ties) is computed up front, over the
+    // UNMODIFIED values, because it's also needed as the fallback when
+    // every entry turns out to be below threshold -- computing it after
+    // zeroing entries in place would read back zeros instead of the
+    // original probabilities.
+    let mut argmax = 0usize;
+    let mut best = strategy[0];
+    for (index, &value) in strategy.iter().enumerate().skip(1) {
+        if value > best {
+            best = value;
+            argmax = index;
+        }
+    }
+    let sum: f32 = strategy
+        .iter()
+        .copied()
+        .filter(|&value| value >= threshold)
+        .sum();
+    if sum > 0.0 {
+        for value in strategy.iter_mut() {
+            *value = if *value < threshold {
+                0.0
+            } else {
+                *value / sum
+            };
+        }
+    } else {
+        // Every entry was below threshold: keep only the argmax with
+        // probability 1.
+        for (index, value) in strategy.iter_mut().enumerate() {
+            *value = f32::from(u8::from(index == argmax));
+        }
+    }
+}
+
+/// Shared validation for `purify_threshold` parameters: must be finite and
+/// within `[0.0, 1.0]` (`1.0` is the degenerate case where every entry
+/// short of an exact tie at `1.0` is purified away, i.e. full purification
+/// to the argmax).
+fn validate_purify_threshold(purify_threshold: f32) -> Result<(), SolverError> {
+    if !purify_threshold.is_finite() || !(0.0..=1.0).contains(&purify_threshold) {
+        return Err(SolverError::InvalidState(
+            "purify_threshold must be finite and within [0.0, 1.0]",
+        ));
+    }
+    Ok(())
+}
+
 fn checked_add_f32(target: &mut f32, delta: f64) -> Result<(), SolverError> {
     let value = f64::from(*target) + delta;
     if !value.is_finite() || value.abs() > f64::from(f32::MAX) {
@@ -5381,6 +5547,111 @@ mod tests {
         }];
         assert!(matches!(
             solver.evaluate_average_profile_with(8, 1, Some(&wrong_len)),
+            Err(SolverError::InvalidState(_))
+        ));
+    }
+
+    #[test]
+    fn purify_strategy_zeroes_and_renormalizes() {
+        // Typical case: two entries survive, renormalized to sum to 1.
+        let mut typical = vec![0.5f32, 0.3, 0.1, 0.1];
+        purify_strategy(&mut typical, 0.15);
+        assert_eq!(typical, vec![0.625, 0.375, 0.0, 0.0]);
+        assert!((typical.iter().sum::<f32>() - 1.0).abs() < 1e-6);
+
+        // Every entry below threshold: the argmax survives at probability
+        // 1, lowest index wins ties.
+        let mut all_below = vec![0.4f32, 0.4, 0.2];
+        purify_strategy(&mut all_below, 0.5);
+        assert_eq!(all_below, vec![1.0, 0.0, 0.0]);
+
+        let mut tie_at_zero = vec![0.0f32, 0.0, 0.0];
+        purify_strategy(&mut tie_at_zero, 0.5);
+        assert_eq!(tie_at_zero, vec![1.0, 0.0, 0.0]);
+
+        // Threshold 0.0 does not change any nonnegative distribution
+        // (nothing is `< 0.0`), modulo the renormalization division.
+        let mut zero_threshold = vec![0.2f32, 0.3, 0.5];
+        purify_strategy(&mut zero_threshold, 0.0);
+        assert!((zero_threshold[0] - 0.2).abs() < 1e-6);
+        assert!((zero_threshold[1] - 0.3).abs() < 1e-6);
+        assert!((zero_threshold[2] - 0.5).abs() < 1e-6);
+
+        // Threshold 1.0 (or above the max) degenerates to a pure strategy
+        // at the argmax.
+        let mut full_purify = vec![0.2f32, 0.5, 0.3];
+        purify_strategy(&mut full_purify, 1.0);
+        assert_eq!(full_purify, vec![0.0, 1.0, 0.0]);
+    }
+
+    #[test]
+    fn purified_evaluation_with_zero_threshold_is_byte_identical() {
+        let mut solver = prefix_solver(7);
+        solver.run_sweeps(5).unwrap();
+        let plain = solver.evaluate_average_profile(64, 999).unwrap();
+        let purified_zero = solver
+            .evaluate_average_profile_purified(64, 999, None, 0.0)
+            .unwrap();
+        assert_eq!(plain, purified_zero);
+    }
+
+    #[test]
+    fn purified_evaluation_runs_and_stays_finite() {
+        let mut solver = prefix_solver(23);
+        solver.run_sweeps(4).unwrap();
+        let samples = 256;
+        let seed = 4242;
+
+        for &threshold in &[0.1f32, 1.0f32] {
+            let num_players = 2;
+            let training_seed = 616;
+            let deviators: Vec<DeviatorPolicy> = (0..num_players)
+                .map(|seat| {
+                    solver
+                        .train_deviator_purified(seat, 200, training_seed, threshold)
+                        .unwrap()
+                })
+                .collect();
+            let evaluation = solver
+                .evaluate_average_profile_purified(samples, seed, Some(&deviators), threshold)
+                .unwrap();
+            assert_eq!(evaluation.samples, samples);
+            for seat in &evaluation.seats {
+                assert!(seat.mean.is_finite());
+                assert!(seat.stderr.is_finite());
+                assert!(seat.ci95[0].is_finite() && seat.ci95[1].is_finite());
+            }
+            let gains = evaluation.deviation_gain_lower_bound.as_ref().unwrap();
+            for gain in gains {
+                assert!(gain.mean.is_finite());
+                assert!(gain.mean >= 0.0, "gain must be clamped nonnegative");
+                assert!(gain.ci95[0] >= 0.0);
+            }
+        }
+    }
+
+    #[test]
+    fn purify_threshold_out_of_range_is_rejected() {
+        let mut solver = prefix_solver(7);
+        solver.run_sweeps(2).unwrap();
+        assert!(matches!(
+            solver.evaluate_average_profile_purified(8, 1, None, -0.01),
+            Err(SolverError::InvalidState(_))
+        ));
+        assert!(matches!(
+            solver.evaluate_average_profile_purified(8, 1, None, 1.5),
+            Err(SolverError::InvalidState(_))
+        ));
+        assert!(matches!(
+            solver.evaluate_average_profile_purified(8, 1, None, f32::NAN),
+            Err(SolverError::InvalidState(_))
+        ));
+        assert!(matches!(
+            solver.train_deviator_purified(0, 10, 1, -0.01),
+            Err(SolverError::InvalidState(_))
+        ));
+        assert!(matches!(
+            solver.train_deviator_purified(0, 10, 1, 1.5),
             Err(SolverError::InvalidState(_))
         ));
     }
