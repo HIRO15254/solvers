@@ -1,0 +1,63 @@
+Poker Hand #TM6181887168: Tournament #299576356, T$ Builder $2 Hold'em No Limit - Level6(100/200(25)) - 2026/07/14 18:21:23
+Table '2' 8-max Seat #7 is the button
+Seat 1: Hero (3,000 in chips)
+Seat 2: 16aaed12 (2,596 in chips)
+Seat 3: a993efa1 (5,402 in chips)
+Seat 4: eb45fcb0 (2,458 in chips)
+Seat 5: c1aac544 (3,013 in chips)
+Seat 6: 5133e886 (2,592 in chips)
+Seat 7: 754505d6 (4,807 in chips)
+Seat 8: aaf9d216 (11,618 in chips)
+eb45fcb0: posts the ante 25
+a993efa1: posts the ante 25
+754505d6: posts the ante 25
+16aaed12: posts the ante 25
+c1aac544: posts the ante 25
+Hero: posts the ante 25
+aaf9d216: posts the ante 25
+5133e886: posts the ante 25
+aaf9d216: posts small blind 100
+Hero: posts big blind 200
+*** HOLE CARDS ***
+Dealt to Hero [7c 8h]
+Dealt to 16aaed12 
+Dealt to a993efa1 
+Dealt to eb45fcb0 
+Dealt to c1aac544 
+Dealt to 5133e886 
+Dealt to 754505d6 
+Dealt to aaf9d216 
+16aaed12: folds
+a993efa1: folds
+eb45fcb0: folds
+c1aac544: folds
+5133e886: folds
+754505d6: raises 300 to 500
+aaf9d216: folds
+Hero: calls 300
+*** FLOP *** [6h 8c 2h]
+Hero: checks
+754505d6: checks
+*** TURN *** [6h 8c 2h] [3h]
+Hero: checks
+754505d6: bets 650
+Hero: raises 1,825 to 2,475 and is all-in
+754505d6: calls 1,825
+Hero: shows [7c 8h] (a pair of Eights)
+754505d6: shows [Ks Kd] (a pair of Kings)
+*** RIVER *** [6h 8c 2h 3h] [9s]
+*** SHOWDOWN ***
+754505d6 collected 6,250 from pot
+*** SUMMARY ***
+Total pot 6,250 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6h 8c 2h 3h 9s]
+Seat 1: Hero (big blind) showed [7c 8h] and lost with a pair of Eights
+Seat 2: 16aaed12 folded before Flop
+Seat 3: a993efa1 folded before Flop
+Seat 4: eb45fcb0 folded before Flop
+Seat 5: c1aac544 folded before Flop
+Seat 6: 5133e886 folded before Flop
+Seat 7: 754505d6 (button) showed [Ks Kd] and won (6,250) with a pair of Kings
+Seat 8: aaf9d216 (small blind) folded before Flop
+
+

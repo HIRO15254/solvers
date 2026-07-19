@@ -1,0 +1,228 @@
+Poker Hand #TM12920373: Tournament #285837479, Step 2 - $2 Spin & Gold Hold'em No Limit - Level2(15/30) - 2026/05/18 20:15:30
+Table '77238' 6-max Seat #6 is the button
+Seat 1: bd64ac0e (167 in chips)
+Seat 2: a3c6b097 (753 in chips)
+Seat 3: 230039ad (315 in chips)
+Seat 5: Hero (200 in chips)
+Seat 6: d908690a (365 in chips)
+bd64ac0e: posts small blind 15
+a3c6b097: posts big blind 30
+*** HOLE CARDS ***
+Dealt to bd64ac0e 
+Dealt to a3c6b097 
+Dealt to 230039ad 
+Dealt to Hero [6h 6d]
+Dealt to d908690a 
+230039ad: folds
+Hero: raises 170 to 200 and is all-in
+d908690a: folds
+bd64ac0e: folds
+a3c6b097: calls 170
+Hero: shows [6h 6d]
+a3c6b097: shows [7c 8c]
+*** FLOP *** [8h 2d As]
+*** TURN *** [8h 2d As] [Kc]
+*** RIVER *** [8h 2d As Kc] [8s]
+*** SHOWDOWN ***
+a3c6b097 collected 415 from pot
+*** SUMMARY ***
+Total pot 415 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [8h 2d As Kc 8s]
+Seat 1: bd64ac0e (small blind) folded before Flop
+Seat 2: a3c6b097 (big blind) showed [7c 8c] and won (415) with three of a kind, Eights
+Seat 3: 230039ad folded before Flop (didn't bet)
+Seat 5: Hero showed [6h 6d] and lost with two pair, Eights and Sixes
+Seat 6: d908690a (button) folded before Flop (didn't bet)
+
+
+Poker Hand #TM12920371: Tournament #285837479, Step 2 - $2 Spin & Gold Hold'em No Limit - Level2(15/30) - 2026/05/18 20:15:15
+Table '77238' 6-max Seat #5 is the button
+Seat 1: bd64ac0e (197 in chips)
+Seat 2: a3c6b097 (753 in chips)
+Seat 3: 230039ad (270 in chips)
+Seat 5: Hero (200 in chips)
+Seat 6: d908690a (380 in chips)
+d908690a: posts small blind 15
+bd64ac0e: posts big blind 30
+*** HOLE CARDS ***
+Dealt to bd64ac0e 
+Dealt to a3c6b097 
+Dealt to 230039ad 
+Dealt to Hero [8h 2s]
+Dealt to d908690a 
+a3c6b097: folds
+230039ad: raises 30 to 60
+Hero: folds
+d908690a: folds
+bd64ac0e: folds
+Uncalled bet (30) returned to 230039ad
+*** SHOWDOWN ***
+230039ad collected 75 from pot
+*** SUMMARY ***
+Total pot 75 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: bd64ac0e (big blind) folded before Flop
+Seat 2: a3c6b097 folded before Flop (didn't bet)
+Seat 3: 230039ad collected (75)
+Seat 5: Hero (button) folded before Flop (didn't bet)
+Seat 6: d908690a (small blind) folded before Flop
+
+
+Poker Hand #TM12920367: Tournament #285837479, Step 2 - $2 Spin & Gold Hold'em No Limit - Level1(10/20) - 2026/05/18 20:14:17
+Table '77238' 6-max Seat #3 is the button
+Seat 1: bd64ac0e (197 in chips)
+Seat 2: a3c6b097 (753 in chips)
+Seat 3: 230039ad (270 in chips)
+Seat 5: Hero (280 in chips)
+Seat 6: d908690a (300 in chips)
+Hero: posts small blind 10
+d908690a: posts big blind 20
+*** HOLE CARDS ***
+Dealt to bd64ac0e 
+Dealt to a3c6b097 
+Dealt to 230039ad 
+Dealt to Hero [Jc 4c]
+Dealt to d908690a 
+bd64ac0e: folds
+a3c6b097: folds
+230039ad: folds
+Hero: raises 20 to 40
+d908690a: calls 20
+*** FLOP *** [Jd 9s 3d]
+Hero: checks
+d908690a: bets 40
+Hero: calls 40
+*** TURN *** [Jd 9s 3d] [Qh]
+Hero: checks
+d908690a: bets 220 and is all-in
+Hero: folds
+Uncalled bet (220) returned to d908690a
+*** SHOWDOWN ***
+d908690a collected 160 from pot
+*** SUMMARY ***
+Total pot 160 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Jd 9s 3d Qh]
+Seat 1: bd64ac0e folded before Flop (didn't bet)
+Seat 2: a3c6b097 folded before Flop (didn't bet)
+Seat 3: 230039ad (button) folded before Flop (didn't bet)
+Seat 5: Hero (small blind) folded on the Turn
+Seat 6: d908690a (big blind) won (160)
+
+
+Poker Hand #TM12920365: Tournament #285837479, Step 2 - $2 Spin & Gold Hold'em No Limit - Level1(10/20) - 2026/05/18 20:14:01
+Table '77238' 6-max Seat #2 is the button
+Seat 1: bd64ac0e (197 in chips)
+Seat 2: a3c6b097 (723 in chips)
+Seat 3: 230039ad (280 in chips)
+Seat 5: Hero (300 in chips)
+Seat 6: d908690a (300 in chips)
+230039ad: posts small blind 10
+Hero: posts big blind 20
+*** HOLE CARDS ***
+Dealt to bd64ac0e 
+Dealt to a3c6b097 
+Dealt to 230039ad 
+Dealt to Hero [7h 2d]
+Dealt to d908690a 
+d908690a: folds
+bd64ac0e: folds
+a3c6b097: raises 40 to 60
+230039ad: folds
+Hero: folds
+Uncalled bet (40) returned to a3c6b097
+*** SHOWDOWN ***
+a3c6b097 collected 50 from pot
+*** SUMMARY ***
+Total pot 50 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: bd64ac0e folded before Flop (didn't bet)
+Seat 2: a3c6b097 (button) collected (50)
+Seat 3: 230039ad (small blind) folded before Flop
+Seat 5: Hero (big blind) folded before Flop
+Seat 6: d908690a folded before Flop (didn't bet)
+
+
+Poker Hand #TM12920360: Tournament #285837479, Step 2 - $2 Spin & Gold Hold'em No Limit - Level1(10/20) - 2026/05/18 20:13:02
+Table '77238' 6-max Seat #1 is the button
+Seat 1: bd64ac0e (290 in chips)
+Seat 2: a3c6b097 (610 in chips)
+Seat 3: 230039ad (300 in chips)
+Seat 5: Hero (300 in chips)
+Seat 6: d908690a (300 in chips)
+a3c6b097: posts small blind 10
+230039ad: posts big blind 20
+*** HOLE CARDS ***
+Dealt to bd64ac0e 
+Dealt to a3c6b097 
+Dealt to 230039ad 
+Dealt to Hero [3c Jd]
+Dealt to d908690a 
+Hero: folds
+d908690a: folds
+bd64ac0e: raises 20 to 40
+a3c6b097: calls 30
+230039ad: folds
+*** FLOP *** [Ad 5d Jh]
+a3c6b097: checks
+bd64ac0e: bets 33
+a3c6b097: calls 33
+*** TURN *** [Ad 5d Jh] [Tc]
+a3c6b097: checks
+bd64ac0e: checks
+*** RIVER *** [Ad 5d Jh Tc] [Kc]
+a3c6b097: bets 20
+bd64ac0e: calls 20
+a3c6b097: shows [Qc Th] (a straight, Ace to Ten)
+bd64ac0e: shows [6s Ac] (a pair of Aces)
+*** SHOWDOWN ***
+a3c6b097 collected 206 from pot
+*** SUMMARY ***
+Total pot 206 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Ad 5d Jh Tc Kc]
+Seat 1: bd64ac0e (button) showed [6s Ac] and lost with a pair of Aces
+Seat 2: a3c6b097 (small blind) showed [Qc Th] and won (206) with a straight, Ace to Ten
+Seat 3: 230039ad (big blind) folded before Flop
+Seat 5: Hero folded before Flop (didn't bet)
+Seat 6: d908690a folded before Flop (didn't bet)
+
+
+Poker Hand #TM12920358: Tournament #285837479, Step 2 - $2 Spin & Gold Hold'em No Limit - Level1(10/20) - 2026/05/18 20:12:26
+Table '77238' 6-max Seat #6 is the button
+Seat 1: bd64ac0e (300 in chips)
+Seat 2: a3c6b097 (300 in chips)
+Seat 3: 230039ad (300 in chips)
+Seat 4: ba096817 (300 in chips)
+Seat 5: Hero (300 in chips)
+Seat 6: d908690a (300 in chips)
+bd64ac0e: posts small blind 10
+a3c6b097: posts big blind 20
+*** HOLE CARDS ***
+Dealt to bd64ac0e 
+Dealt to a3c6b097 
+Dealt to 230039ad 
+Dealt to ba096817 
+Dealt to Hero [Jc Ah]
+Dealt to d908690a 
+230039ad: folds
+ba096817: raises 40 to 60
+Hero: folds
+d908690a: folds
+bd64ac0e: folds
+a3c6b097: raises 240 to 300 and is all-in
+ba096817: calls 240 and is all-in
+a3c6b097: shows [4c 4s]
+ba096817: shows [Ac Tc]
+*** FLOP *** [7c 5d 2c]
+*** TURN *** [7c 5d 2c] [2h]
+*** RIVER *** [7c 5d 2c 2h] [6d]
+*** SHOWDOWN ***
+a3c6b097 collected 610 from pot
+*** SUMMARY ***
+Total pot 610 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [7c 5d 2c 2h 6d]
+Seat 1: bd64ac0e (small blind) folded before Flop
+Seat 2: a3c6b097 (big blind) showed [4c 4s] and won (610) with two pair, Fours and Twos
+Seat 3: 230039ad folded before Flop (didn't bet)
+Seat 4: ba096817 showed [Ac Tc] and lost with a pair of Twos
+Seat 5: Hero folded before Flop (didn't bet)
+Seat 6: d908690a (button) folded before Flop (didn't bet)
+
+

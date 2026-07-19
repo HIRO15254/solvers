@@ -1,0 +1,118 @@
+Poker Hand #TM6182262752: Tournament #299591613, T$ Builder $2 Hold'em No Limit - Level6(100/200(25)) - 2026/07/14 20:21:50
+Table '10' 8-max Seat #7 is the button
+Seat 1: 1a6a3e09 (7,844 in chips)
+Seat 2: f932528d (3,245 in chips)
+Seat 3: f5cd0af1 (3,000 in chips)
+Seat 4: 2b540f2b (2,975 in chips)
+Seat 5: Hero (550 in chips)
+Seat 6: 1013ab2e (4,872 in chips)
+Seat 7: 352be143 (8,500 in chips)
+Seat 8: 3cbdd52d (2,682 in chips)
+Hero: posts the ante 25
+1013ab2e: posts the ante 25
+f932528d: posts the ante 25
+1a6a3e09: posts the ante 25
+352be143: posts the ante 25
+f5cd0af1: posts the ante 25
+3cbdd52d: posts the ante 25
+2b540f2b: posts the ante 25
+3cbdd52d: posts small blind 100
+1a6a3e09: posts big blind 200
+*** HOLE CARDS ***
+Dealt to 1a6a3e09 
+Dealt to f932528d 
+Dealt to f5cd0af1 
+Dealt to 2b540f2b 
+Dealt to Hero [4h 5h]
+Dealt to 1013ab2e 
+Dealt to 352be143 
+Dealt to 3cbdd52d 
+f932528d: folds
+f5cd0af1: folds
+2b540f2b: folds
+Hero: raises 325 to 525 and is all-in
+1013ab2e: folds
+352be143: folds
+3cbdd52d: raises 2,132 to 2,657 and is all-in
+1a6a3e09: calls 2,457
+3cbdd52d: shows [Ah 3h]
+1a6a3e09: shows [Js Jd]
+Hero: shows [4h 5h]
+*** FLOP *** [6h Jc Qc]
+*** TURN *** [6h Jc Qc] [Kd]
+*** RIVER *** [6h Jc Qc Kd] [4c]
+*** SHOWDOWN ***
+1a6a3e09 collected 1,775 from pot
+1a6a3e09 collected 4,264 from pot
+*** SUMMARY ***
+Total pot 6,039 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6h Jc Qc Kd 4c]
+Seat 1: 1a6a3e09 (big blind) showed [Js Jd] and won (6,039) with three of a kind, Jacks
+Seat 2: f932528d folded before Flop
+Seat 3: f5cd0af1 folded before Flop
+Seat 4: 2b540f2b folded before Flop
+Seat 5: Hero showed [4h 5h] and lost with a pair of Fours
+Seat 6: 1013ab2e folded before Flop
+Seat 7: 352be143 (button) folded before Flop
+Seat 8: 3cbdd52d (small blind) showed [Ah 3h] and lost with Ace high
+
+
+Poker Hand #TM6182262736: Tournament #299591613, T$ Builder $2 Hold'em No Limit - Level6(100/200(25)) - 2026/07/14 20:20:53
+Table '10' 8-max Seat #6 is the button
+Seat 1: 1a6a3e09 (7,869 in chips)
+Seat 2: f932528d (3,270 in chips)
+Seat 3: d507e0b5 (13,092 in chips)
+Seat 4: 2b540f2b (3,000 in chips)
+Seat 5: Hero (3,000 in chips)
+Seat 6: 1013ab2e (7,872 in chips)
+Seat 7: 352be143 (2,725 in chips)
+Seat 8: 3cbdd52d (2,907 in chips)
+Hero: posts the ante 25
+1013ab2e: posts the ante 25
+f932528d: posts the ante 25
+1a6a3e09: posts the ante 25
+d507e0b5: posts the ante 25
+352be143: posts the ante 25
+3cbdd52d: posts the ante 25
+2b540f2b: posts the ante 25
+352be143: posts small blind 100
+3cbdd52d: posts big blind 200
+*** HOLE CARDS ***
+Dealt to 1a6a3e09 
+Dealt to f932528d 
+Dealt to d507e0b5 
+Dealt to 2b540f2b 
+Dealt to Hero [Tc Ac]
+Dealt to 1013ab2e 
+Dealt to 352be143 
+Dealt to 3cbdd52d 
+1a6a3e09: folds
+f932528d: folds
+d507e0b5: folds
+2b540f2b: folds
+Hero: raises 2,775 to 2,975 and is all-in
+1013ab2e: calls 2,975
+352be143: calls 2,600 and is all-in
+3cbdd52d: folds
+Hero: shows [Tc Ac]
+1013ab2e: shows [9c 9d]
+352be143: shows [8d 8h]
+*** FLOP *** [Jd 8s 6h]
+*** TURN *** [Jd 8s 6h] [As]
+*** RIVER *** [Jd 8s 6h As] [7c]
+*** SHOWDOWN ***
+352be143 collected 8,500 from pot
+Hero collected 550 from pot
+*** SUMMARY ***
+Total pot 9,050 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Jd 8s 6h As 7c]
+Seat 1: 1a6a3e09 folded before Flop
+Seat 2: f932528d folded before Flop
+Seat 3: d507e0b5 folded before Flop
+Seat 4: 2b540f2b folded before Flop
+Seat 5: Hero showed [Tc Ac] and won (550) with a pair of Aces
+Seat 6: 1013ab2e (button) showed [9c 9d] and lost with a pair of Nines
+Seat 7: 352be143 (small blind) showed [8d 8h] and won (8,500) with three of a kind, Eights
+Seat 8: 3cbdd52d (big blind) folded before Flop
+
+

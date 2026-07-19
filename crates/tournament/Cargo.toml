@@ -1,0 +1,11 @@
+[package]
+name = "tournament"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "GGPoker tournament hand-history and summary parsing / loading"
+
+[dependencies]
+cards = { workspace = true }
+thiserror = { workspace = true }

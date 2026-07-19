@@ -1,0 +1,63 @@
+Poker Hand #TM6157812609: Tournament #298056415, $10,000 Bounty Hunters Series Cash Drop Hold'em No Limit - Level1(500/1,000(2,000,000,000)) - 2026/07/08 02:05:02
+Table '435' 8-max Seat #7 is the button
+Seat 1: 90af88c8 (7,066 in chips)
+Seat 2: d4cc4daa (10,979 in chips)
+Seat 3: 9198e7bf (11,647 in chips)
+Seat 4: f51c8374 (6,379 in chips)
+Seat 5: Hero (8,702 in chips)
+Seat 6: bfed2f05 (12,615 in chips)
+Seat 7: 8e738d61 (3,406 in chips)
+Seat 8: 9099df8e (12,979 in chips)
+8e738d61: posts the ante 3,406
+Hero: posts the ante 8,702
+d4cc4daa: posts the ante 10,979
+bfed2f05: posts the ante 12,615
+9198e7bf: posts the ante 11,647
+9099df8e: posts the ante 12,979
+f51c8374: posts the ante 6,379
+90af88c8: posts the ante 7,066
+9099df8e: posts small blind 364
+90af88c8: posts big blind 0
+*** HOLE CARDS ***
+Dealt to 90af88c8 
+Dealt to d4cc4daa 
+Dealt to 9198e7bf 
+Dealt to f51c8374 
+Dealt to Hero [8c 8d]
+Dealt to bfed2f05 
+Dealt to 8e738d61 
+Dealt to 9099df8e 
+Uncalled bet (364) returned to 9099df8e
+Uncalled bet (364) returned to 9099df8e
+9099df8e: shows [3d 7s]
+90af88c8: shows [4d 4c]
+d4cc4daa: shows [Qc Qh]
+9198e7bf: shows [Th 9d]
+f51c8374: shows [6h 9s]
+Hero: shows [8c 8d]
+bfed2f05: shows [9h 8s]
+8e738d61: shows [4h 7d]
+*** FLOP *** [Kh Td 2s]
+*** TURN *** [Kh Td 2s] [Ac]
+*** RIVER *** [Kh Td 2s Ac] [Jh]
+*** SHOWDOWN ***
+d4cc4daa collected 27,248 from pot
+d4cc4daa collected 20,811 from pot
+d4cc4daa collected 4,122 from pot
+d4cc4daa collected 8,180 from pot
+d4cc4daa collected 9,108 from pot
+9198e7bf collected 2,004 from pot
+bfed2f05 collected 1,936 from pot
+*** SUMMARY ***
+Total pot 73,409 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Kh Td 2s Ac Jh]
+Seat 1: 90af88c8 (big blind) showed [4d 4c] and lost with a pair of Fours
+Seat 2: d4cc4daa showed [Qc Qh] and won (69,469) with a straight, Ace to Ten
+Seat 3: 9198e7bf showed [Th 9d] and won (2,004) with a pair of Tens
+Seat 4: f51c8374 showed [6h 9s] and lost with Ace high
+Seat 5: Hero showed [8c 8d] and lost with a pair of Eights
+Seat 6: bfed2f05 showed [9h 8s] and won (1,936) with Ace high
+Seat 7: 8e738d61 (button) showed [4h 7d] and lost with Ace high
+Seat 8: 9099df8e (small blind) showed [3d 7s] and lost with Ace high
+
+

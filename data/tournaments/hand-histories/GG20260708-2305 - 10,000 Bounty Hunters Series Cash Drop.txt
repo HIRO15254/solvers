@@ -1,0 +1,63 @@
+Poker Hand #TM6162549186: Tournament #298316205, $10,000 Bounty Hunters Series Cash Drop Hold'em No Limit - Level1(500/1,000(2,000,000,000)) - 2026/07/09 08:05:02
+Table '534' 8-max Seat #4 is the button
+Seat 1: 1e8f7db8 (50,393 in chips)
+Seat 2: 9847968f (6,231 in chips)
+Seat 3: d4487a59 (10,558 in chips)
+Seat 4: b8b8388e (7,314 in chips)
+Seat 5: c3e92820 (16,101 in chips)
+Seat 6: ebb1350b (110,891 in chips)
+Seat 7: c64b9468 (4,213 in chips)
+Seat 8: Hero (4,468 in chips)
+1e8f7db8: posts the ante 50,393
+Hero: posts the ante 4,468
+9847968f: posts the ante 6,231
+c3e92820: posts the ante 16,101
+b8b8388e: posts the ante 7,314
+d4487a59: posts the ante 10,558
+c64b9468: posts the ante 4,213
+ebb1350b: posts the ante 110,891
+c3e92820: posts small blind 0
+ebb1350b: posts big blind 1,000
+*** HOLE CARDS ***
+Dealt to 1e8f7db8 
+Dealt to 9847968f 
+Dealt to d4487a59 
+Dealt to b8b8388e 
+Dealt to c3e92820 
+Dealt to ebb1350b 
+Dealt to c64b9468 
+Dealt to Hero [9d 8s]
+Uncalled bet (60,498) returned to ebb1350b
+Uncalled bet (1,000) returned to ebb1350b
+c3e92820: shows [2c 3c]
+ebb1350b: shows [3h Ad]
+c64b9468: shows [Js Jh]
+Hero: shows [9d 8s]
+1e8f7db8: shows [Qc 4h]
+9847968f: shows [Jc 5h]
+d4487a59: shows [6h 6d]
+b8b8388e: shows [Ts 5c]
+*** FLOP *** [Kh 9s Ah]
+*** TURN *** [Kh 9s Ah] [Qs]
+*** RIVER *** [Kh 9s Ah Qs] [As]
+*** SHOWDOWN ***
+ebb1350b collected 33,704 from pot
+ebb1350b collected 1,785 from pot
+ebb1350b collected 10,578 from pot
+ebb1350b collected 5,415 from pot
+ebb1350b collected 12,976 from pot
+ebb1350b collected 16,629 from pot
+ebb1350b collected 68,584 from pot
+*** SUMMARY ***
+Total pot 149,671 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Kh 9s Ah Qs As]
+Seat 1: 1e8f7db8 showed [Qc 4h] and lost with two pair, Aces and Queens
+Seat 2: 9847968f showed [Jc 5h] and lost with a pair of Aces
+Seat 3: d4487a59 showed [6h 6d] and lost with two pair, Aces and Sixes
+Seat 4: b8b8388e (button) showed [Ts 5c] and lost with a pair of Aces
+Seat 5: c3e92820 (small blind) showed [2c 3c] and lost with a pair of Aces
+Seat 6: ebb1350b (big blind) showed [3h Ad] and won (149,671) with three of a kind, Aces
+Seat 7: c64b9468 showed [Js Jh] and lost with two pair, Aces and Jacks
+Seat 8: Hero showed [9d 8s] and lost with two pair, Aces and Nines
+
+

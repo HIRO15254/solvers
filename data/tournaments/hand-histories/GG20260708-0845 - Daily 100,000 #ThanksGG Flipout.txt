@@ -1,0 +1,69 @@
+Poker Hand #TM6120388830: Tournament #296658188, Daily $100,000 #ThanksGG Flipout Hold'em No Limit - Level1(500/1,000(2,000,000,000)) - 2026/07/08 17:45:02
+Table '776' 9-max Seat #8 is the button
+Seat 1: a7e92f1c (343,443 in chips)
+Seat 2: ee438fb8 (1,968 in chips)
+Seat 3: 6693044d (4,000 in chips)
+Seat 4: a2edd7a1 (4,040 in chips)
+Seat 5: Hero (5,000 in chips)
+Seat 6: e5a9b416 (7,932 in chips)
+Seat 7: 3785b0d9 (14,899 in chips)
+Seat 8: b9c3d60e (8,507 in chips)
+Seat 9: 5d27e21 (3,020 in chips)
+b9c3d60e: posts the ante 8,507
+ee438fb8: posts the ante 1,968
+Hero: posts the ante 5,000
+6693044d: posts the ante 4,000
+e5a9b416: posts the ante 7,932
+3785b0d9: posts the ante 14,899
+a7e92f1c: posts the ante 343,443
+a2edd7a1: posts the ante 4,040
+5d27e21: posts the ante 3,020
+5d27e21: posts small blind 0
+a7e92f1c: posts big blind 1,000
+*** HOLE CARDS ***
+Dealt to a7e92f1c 
+Dealt to ee438fb8 
+Dealt to 6693044d 
+Dealt to a2edd7a1 
+Dealt to Hero [9s 4s]
+Dealt to e5a9b416 
+Dealt to 3785b0d9 
+Dealt to b9c3d60e 
+Dealt to 5d27e21 
+Uncalled bet (328,544) returned to a7e92f1c
+Uncalled bet (1,000) returned to a7e92f1c
+5d27e21: shows [Td Ah]
+a7e92f1c: shows [Kh 5s]
+ee438fb8: shows [Kd Kc]
+6693044d: shows [3d 7c]
+a2edd7a1: shows [As Ad]
+Hero: shows [9s 4s]
+e5a9b416: shows [5c 9c]
+3785b0d9: shows [5h Qd]
+b9c3d60e: shows [8d 4d]
+*** FLOP *** [Ac 6d Js]
+*** TURN *** [Ac 6d Js] [7h]
+*** RIVER *** [Ac 6d Js 7h] [7d]
+*** SHOWDOWN ***
+a2edd7a1 collected 17,712 from pot
+a2edd7a1 collected 8,416 from pot
+a2edd7a1 collected 6,860 from pot
+a2edd7a1 collected 240 from pot
+a7e92f1c collected 4,800 from pot
+a7e92f1c collected 11,728 from pot
+a7e92f1c collected 1,725 from pot
+a7e92f1c collected 12,784 from pot
+*** SUMMARY ***
+Total pot 64,265 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Ac 6d Js 7h 7d]
+Seat 1: a7e92f1c (big blind) showed [Kh 5s] and won (31,037) with a pair of Sevens
+Seat 2: ee438fb8 showed [Kd Kc] and lost with two pair, Kings and Sevens
+Seat 3: 6693044d showed [3d 7c] and lost with three of a kind, Sevens
+Seat 4: a2edd7a1 showed [As Ad] and won (33,228) with a full house, Aces full of Sevens
+Seat 5: Hero showed [9s 4s] and lost with a pair of Sevens
+Seat 6: e5a9b416 showed [5c 9c] and lost with a pair of Sevens
+Seat 7: 3785b0d9 showed [5h Qd] and lost with a pair of Sevens
+Seat 8: b9c3d60e (button) showed [8d 4d] and lost with a pair of Sevens
+Seat 9: 5d27e21 (small blind) showed [Td Ah] and lost with two pair, Aces and Sevens
+
+

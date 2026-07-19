@@ -1,0 +1,767 @@
+Poker Hand #TM6110450916: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level17(1,000/2,000(200)) - 2026/06/24 22:32:13
+Table '10' 6-max Seat #4 is the button
+Seat 1: 99d105b1 (17,840 in chips)
+Seat 2: abf2068c (68,499 in chips)
+Seat 3: bb075f2d (31,600 in chips)
+Seat 4: e2eee7f7 (18,940 in chips)
+Seat 5: Hero (3,940 in chips)
+Seat 6: b973a9f (42,944 in chips)
+e2eee7f7: posts the ante 200
+99d105b1: posts the ante 200
+Hero: posts the ante 200
+abf2068c: posts the ante 200
+bb075f2d: posts the ante 200
+b973a9f: posts the ante 200
+Hero: posts small blind 1,000
+b973a9f: posts big blind 2,000
+*** HOLE CARDS ***
+Dealt to 99d105b1 
+Dealt to abf2068c 
+Dealt to bb075f2d 
+Dealt to e2eee7f7 
+Dealt to Hero [As Qh]
+Dealt to b973a9f 
+99d105b1: folds
+abf2068c: folds
+bb075f2d: folds
+e2eee7f7: folds
+Hero: raises 1,740 to 3,740 and is all-in
+b973a9f: calls 1,740
+Hero: shows [As Qh]
+b973a9f: shows [6h 5s]
+*** FLOP *** [5c Th 6c]
+*** TURN *** [5c Th 6c] [8s]
+*** RIVER *** [5c Th 6c 8s] [Ad]
+*** SHOWDOWN ***
+b973a9f collected 8,680 from pot
+*** SUMMARY ***
+Total pot 8,680 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [5c Th 6c 8s Ad]
+Seat 1: 99d105b1 folded before Flop
+Seat 2: abf2068c folded before Flop
+Seat 3: bb075f2d folded before Flop
+Seat 4: e2eee7f7 (button) folded before Flop
+Seat 5: Hero (small blind) showed [As Qh] and lost with a pair of Aces
+Seat 6: b973a9f (big blind) showed [6h 5s] and won (8,680) with two pair, Sixes and Fives
+
+
+Poker Hand #TM6110450879: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level17(1,000/2,000(200)) - 2026/06/24 22:31:25
+Table '10' 6-max Seat #3 is the button
+Seat 1: 99d105b1 (13,840 in chips)
+Seat 2: abf2068c (68,699 in chips)
+Seat 3: bb075f2d (31,800 in chips)
+Seat 4: e2eee7f7 (20,140 in chips)
+Seat 5: Hero (6,140 in chips)
+Seat 6: b973a9f (43,144 in chips)
+e2eee7f7: posts the ante 200
+99d105b1: posts the ante 200
+Hero: posts the ante 200
+abf2068c: posts the ante 200
+bb075f2d: posts the ante 200
+b973a9f: posts the ante 200
+e2eee7f7: posts small blind 1,000
+Hero: posts big blind 2,000
+*** HOLE CARDS ***
+Dealt to 99d105b1 
+Dealt to abf2068c 
+Dealt to bb075f2d 
+Dealt to e2eee7f7 
+Dealt to Hero [2d 3c]
+Dealt to b973a9f 
+b973a9f: folds
+99d105b1: raises 11,640 to 13,640 and is all-in
+abf2068c: folds
+bb075f2d: folds
+e2eee7f7: folds
+Hero: folds
+Uncalled bet (11,640) returned to 99d105b1
+*** SHOWDOWN ***
+99d105b1 collected 6,200 from pot
+*** SUMMARY ***
+Total pot 6,200 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 99d105b1 collected (6,200)
+Seat 2: abf2068c folded before Flop
+Seat 3: bb075f2d (button) folded before Flop
+Seat 4: e2eee7f7 (small blind) folded before Flop
+Seat 5: Hero (big blind) folded before Flop
+Seat 6: b973a9f folded before Flop
+
+
+Poker Hand #TM6110391415: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level16(800/1,600(160)) - 2026/06/24 22:29:14
+Table '7' 6-max Seat #4 is the button
+Seat 1: 62126ed5 (38,962 in chips)
+Seat 2: dcad12d1 (9,960 in chips)
+Seat 3: 99d105b1 (14,000 in chips)
+Seat 4: Hero (6,300 in chips)
+Seat 5: 3c7df0cd (19,489 in chips)
+Seat 6: b941e174 (22,000 in chips)
+99d105b1: posts the ante 160
+dcad12d1: posts the ante 160
+Hero: posts the ante 160
+b941e174: posts the ante 160
+3c7df0cd: posts the ante 160
+62126ed5: posts the ante 160
+3c7df0cd: posts small blind 800
+b941e174: posts big blind 1,600
+*** HOLE CARDS ***
+Dealt to 62126ed5 
+Dealt to dcad12d1 
+Dealt to 99d105b1 
+Dealt to Hero [8h 9c]
+Dealt to 3c7df0cd 
+Dealt to b941e174 
+62126ed5: raises 1,600 to 3,200
+dcad12d1: folds
+99d105b1: folds
+Hero: folds
+3c7df0cd: raises 14,529 to 17,729
+b941e174: folds
+62126ed5: calls 14,529
+*** FLOP *** [2d 9s 4c]
+3c7df0cd: bets 1,600 and is all-in
+62126ed5: calls 1,600
+3c7df0cd: shows [Js Kc] (King high)
+62126ed5: shows [Qs As] (Ace high)
+*** TURN *** [2d 9s 4c] [6h]
+*** RIVER *** [2d 9s 4c 6h] [Ah]
+*** SHOWDOWN ***
+62126ed5 collected 41,218 from pot
+*** SUMMARY ***
+Total pot 41,218 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [2d 9s 4c 6h Ah]
+Seat 1: 62126ed5 showed [Qs As] and won (41,218) with a pair of Aces
+Seat 2: dcad12d1 folded before Flop
+Seat 3: 99d105b1 folded before Flop
+Seat 4: Hero (button) folded before Flop
+Seat 5: 3c7df0cd (small blind) showed [Js Kc] and lost with Ace high
+Seat 6: b941e174 (big blind) folded before Flop
+
+
+Poker Hand #TM6110391330: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level16(800/1,600(160)) - 2026/06/24 22:27:25
+Table '7' 6-max Seat #3 is the button
+Seat 1: 62126ed5 (39,122 in chips)
+Seat 2: dcad12d1 (10,120 in chips)
+Seat 3: 99d105b1 (14,160 in chips)
+Seat 4: Hero (8,060 in chips)
+Seat 5: 3c7df0cd (17,089 in chips)
+Seat 6: b941e174 (22,160 in chips)
+99d105b1: posts the ante 160
+dcad12d1: posts the ante 160
+Hero: posts the ante 160
+b941e174: posts the ante 160
+3c7df0cd: posts the ante 160
+62126ed5: posts the ante 160
+Hero: posts small blind 800
+3c7df0cd: posts big blind 1,600
+*** HOLE CARDS ***
+Dealt to 62126ed5 
+Dealt to dcad12d1 
+Dealt to 99d105b1 
+Dealt to Hero [5c 7c]
+Dealt to 3c7df0cd 
+Dealt to b941e174 
+b941e174: folds
+62126ed5: folds
+dcad12d1: folds
+99d105b1: folds
+Hero: calls 800
+3c7df0cd: checks
+*** FLOP *** [Jc Ks Kc]
+Hero: checks
+3c7df0cd: checks
+*** TURN *** [Jc Ks Kc] [Jh]
+Hero: checks
+3c7df0cd: checks
+*** RIVER *** [Jc Ks Kc Jh] [3s]
+Hero: checks
+3c7df0cd: checks
+Hero: shows [5c 7c] (two pair, Kings and Jacks)
+3c7df0cd: shows [8c Th] (two pair, Kings and Jacks)
+*** SHOWDOWN ***
+3c7df0cd collected 4,160 from pot
+*** SUMMARY ***
+Total pot 4,160 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Jc Ks Kc Jh 3s]
+Seat 1: 62126ed5 folded before Flop
+Seat 2: dcad12d1 folded before Flop
+Seat 3: 99d105b1 (button) folded before Flop
+Seat 4: Hero (small blind) showed [5c 7c] and lost with two pair, Kings and Jacks
+Seat 5: 3c7df0cd (big blind) showed [8c Th] and won (4,160) with two pair, Kings and Jacks
+Seat 6: b941e174 folded before Flop
+
+
+Poker Hand #TM6110391279: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level16(800/1,600(160)) - 2026/06/24 22:26:30
+Table '7' 6-max Seat #2 is the button
+Seat 1: 62126ed5 (39,282 in chips)
+Seat 2: dcad12d1 (10,280 in chips)
+Seat 3: 99d105b1 (11,760 in chips)
+Seat 4: Hero (9,820 in chips)
+Seat 5: 3c7df0cd (17,249 in chips)
+Seat 6: b941e174 (22,320 in chips)
+dcad12d1: posts the ante 160
+99d105b1: posts the ante 160
+Hero: posts the ante 160
+b941e174: posts the ante 160
+3c7df0cd: posts the ante 160
+62126ed5: posts the ante 160
+99d105b1: posts small blind 800
+Hero: posts big blind 1,600
+*** HOLE CARDS ***
+Dealt to 62126ed5 
+Dealt to dcad12d1 
+Dealt to 99d105b1 
+Dealt to Hero [2c 4h]
+Dealt to 3c7df0cd 
+Dealt to b941e174 
+3c7df0cd: folds
+b941e174: folds
+62126ed5: folds
+dcad12d1: folds
+99d105b1: raises 10,000 to 11,600 and is all-in
+Hero: folds
+Uncalled bet (10,000) returned to 99d105b1
+*** SHOWDOWN ***
+99d105b1 collected 4,160 from pot
+*** SUMMARY ***
+Total pot 4,160 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 62126ed5 folded before Flop
+Seat 2: dcad12d1 (button) folded before Flop
+Seat 3: 99d105b1 (small blind) collected (4,160)
+Seat 4: Hero (big blind) folded before Flop
+Seat 5: 3c7df0cd folded before Flop
+Seat 6: b941e174 folded before Flop
+
+
+Poker Hand #TM6110391243: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level16(800/1,600(160)) - 2026/06/24 22:25:47
+Table '7' 6-max Seat #1 is the button
+Seat 1: 62126ed5 (39,442 in chips)
+Seat 2: dcad12d1 (7,880 in chips)
+Seat 3: 99d105b1 (13,520 in chips)
+Seat 4: Hero (9,980 in chips)
+Seat 5: 3c7df0cd (17,409 in chips)
+Seat 6: b941e174 (22,480 in chips)
+99d105b1: posts the ante 160
+dcad12d1: posts the ante 160
+Hero: posts the ante 160
+b941e174: posts the ante 160
+3c7df0cd: posts the ante 160
+62126ed5: posts the ante 160
+dcad12d1: posts small blind 800
+99d105b1: posts big blind 1,600
+*** HOLE CARDS ***
+Dealt to 62126ed5 
+Dealt to dcad12d1 
+Dealt to 99d105b1 
+Dealt to Hero [5d 9d]
+Dealt to 3c7df0cd 
+Dealt to b941e174 
+Hero: folds
+3c7df0cd: folds
+b941e174: folds
+62126ed5: folds
+dcad12d1: raises 6,120 to 7,720 and is all-in
+99d105b1: folds
+Uncalled bet (6,120) returned to dcad12d1
+*** SHOWDOWN ***
+dcad12d1 collected 4,160 from pot
+*** SUMMARY ***
+Total pot 4,160 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 62126ed5 (button) folded before Flop
+Seat 2: dcad12d1 (small blind) collected (4,160)
+Seat 3: 99d105b1 (big blind) folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 3c7df0cd folded before Flop
+Seat 6: b941e174 folded before Flop
+
+
+Poker Hand #TM6110391195: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level16(800/1,600(160)) - 2026/06/24 22:24:41
+Table '7' 6-max Seat #6 is the button
+Seat 1: 62126ed5 (49,562 in chips)
+Seat 2: dcad12d1 (9,640 in chips)
+Seat 3: 99d105b1 (13,680 in chips)
+Seat 4: Hero (10,140 in chips)
+Seat 5: 3c7df0cd (17,569 in chips)
+Seat 6: b941e174 (10,120 in chips)
+99d105b1: posts the ante 160
+dcad12d1: posts the ante 160
+Hero: posts the ante 160
+b941e174: posts the ante 160
+3c7df0cd: posts the ante 160
+62126ed5: posts the ante 160
+62126ed5: posts small blind 800
+dcad12d1: posts big blind 1,600
+*** HOLE CARDS ***
+Dealt to 62126ed5 
+Dealt to dcad12d1 
+Dealt to 99d105b1 
+Dealt to Hero [8h 4s]
+Dealt to 3c7df0cd 
+Dealt to b941e174 
+99d105b1: folds
+Hero: folds
+3c7df0cd: folds
+b941e174: raises 8,360 to 9,960 and is all-in
+62126ed5: calls 9,160
+dcad12d1: folds
+b941e174: shows [Ks 7s]
+62126ed5: shows [7d 7h]
+*** FLOP *** [Qs 2s 8s]
+*** TURN *** [Qs 2s 8s] [6h]
+*** RIVER *** [Qs 2s 8s 6h] [6c]
+*** SHOWDOWN ***
+b941e174 collected 22,480 from pot
+*** SUMMARY ***
+Total pot 22,480 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Qs 2s 8s 6h 6c]
+Seat 1: 62126ed5 (small blind) showed [7d 7h] and lost with two pair, Sevens and Sixes
+Seat 2: dcad12d1 (big blind) folded before Flop
+Seat 3: 99d105b1 folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 3c7df0cd folded before Flop
+Seat 6: b941e174 (button) showed [Ks 7s] and won (22,480) with a flush King high
+
+
+Poker Hand #TM6110391145: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level15(600/1,200(120)) - 2026/06/24 22:23:33
+Table '7' 6-max Seat #5 is the button
+Seat 1: 62126ed5 (48,362 in chips)
+Seat 2: dcad12d1 (9,760 in chips)
+Seat 3: 99d105b1 (13,800 in chips)
+Seat 4: Hero (10,260 in chips)
+Seat 5: 3c7df0cd (17,689 in chips)
+Seat 6: b941e174 (10,840 in chips)
+b941e174: posts the ante 120
+99d105b1: posts the ante 120
+dcad12d1: posts the ante 120
+Hero: posts the ante 120
+3c7df0cd: posts the ante 120
+62126ed5: posts the ante 120
+b941e174: posts small blind 600
+62126ed5: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 62126ed5 
+Dealt to dcad12d1 
+Dealt to 99d105b1 
+Dealt to Hero [Jh 8s]
+Dealt to 3c7df0cd 
+Dealt to b941e174 
+dcad12d1: folds
+99d105b1: folds
+Hero: folds
+3c7df0cd: folds
+b941e174: folds
+Uncalled bet (600) returned to 62126ed5
+*** SHOWDOWN ***
+62126ed5 collected 1,920 from pot
+*** SUMMARY ***
+Total pot 1,920 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 62126ed5 (big blind) collected (1,920)
+Seat 2: dcad12d1 folded before Flop
+Seat 3: 99d105b1 folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 3c7df0cd (button) folded before Flop
+Seat 6: b941e174 (small blind) folded before Flop
+
+
+Poker Hand #TM6110391121: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level15(600/1,200(120)) - 2026/06/24 22:22:57
+Table '7' 6-max Seat #4 is the button
+Seat 1: 62126ed5 (48,482 in chips)
+Seat 2: dcad12d1 (9,880 in chips)
+Seat 3: 99d105b1 (13,920 in chips)
+Seat 4: Hero (10,380 in chips)
+Seat 5: 3c7df0cd (15,889 in chips)
+Seat 6: b941e174 (12,160 in chips)
+99d105b1: posts the ante 120
+dcad12d1: posts the ante 120
+Hero: posts the ante 120
+b941e174: posts the ante 120
+3c7df0cd: posts the ante 120
+62126ed5: posts the ante 120
+3c7df0cd: posts small blind 600
+b941e174: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 62126ed5 
+Dealt to dcad12d1 
+Dealt to 99d105b1 
+Dealt to Hero [5s Ts]
+Dealt to 3c7df0cd 
+Dealt to b941e174 
+62126ed5: folds
+dcad12d1: folds
+99d105b1: folds
+Hero: folds
+3c7df0cd: raises 14,569 to 15,769 and is all-in
+b941e174: folds
+Uncalled bet (14,569) returned to 3c7df0cd
+*** SHOWDOWN ***
+3c7df0cd collected 3,120 from pot
+*** SUMMARY ***
+Total pot 3,120 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 62126ed5 folded before Flop
+Seat 2: dcad12d1 folded before Flop
+Seat 3: 99d105b1 folded before Flop
+Seat 4: Hero (button) folded before Flop
+Seat 5: 3c7df0cd (small blind) collected (3,120)
+Seat 6: b941e174 (big blind) folded before Flop
+
+
+Poker Hand #TM6110391101: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level15(600/1,200(120)) - 2026/06/24 22:22:28
+Table '7' 6-max Seat #3 is the button
+Seat 2: dcad12d1 (7,600 in chips)
+Seat 3: 99d105b1 (14,040 in chips)
+Seat 4: Hero (11,100 in chips)
+Seat 5: 3c7df0cd (17,209 in chips)
+Seat 6: b941e174 (12,280 in chips)
+99d105b1: posts the ante 120
+dcad12d1: posts the ante 120
+Hero: posts the ante 120
+b941e174: posts the ante 120
+3c7df0cd: posts the ante 120
+Hero: posts small blind 600
+3c7df0cd: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to dcad12d1 
+Dealt to 99d105b1 
+Dealt to Hero [7c Kh]
+Dealt to 3c7df0cd 
+Dealt to b941e174 
+b941e174: folds
+dcad12d1: raises 6,280 to 7,480 and is all-in
+99d105b1: folds
+Hero: folds
+3c7df0cd: folds
+Uncalled bet (6,280) returned to dcad12d1
+*** SHOWDOWN ***
+dcad12d1 collected 3,600 from pot
+*** SUMMARY ***
+Total pot 3,600 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 2: dcad12d1 collected (3,600)
+Seat 3: 99d105b1 (button) folded before Flop
+Seat 4: Hero (small blind) folded before Flop
+Seat 5: 3c7df0cd (big blind) folded before Flop
+Seat 6: b941e174 folded before Flop
+
+
+Poker Hand #TM6110391080: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level15(600/1,200(120)) - 2026/06/24 22:21:53
+Table '7' 6-max Seat #2 is the button
+Seat 1: 69a991c5 (15,500 in chips)
+Seat 2: dcad12d1 (7,720 in chips)
+Seat 3: 99d105b1 (14,760 in chips)
+Seat 4: Hero (12,420 in chips)
+Seat 5: 3c7df0cd (17,329 in chips)
+Seat 6: b941e174 (9,880 in chips)
+dcad12d1: posts the ante 120
+69a991c5: posts the ante 120
+99d105b1: posts the ante 120
+Hero: posts the ante 120
+b941e174: posts the ante 120
+3c7df0cd: posts the ante 120
+99d105b1: posts small blind 600
+Hero: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 69a991c5 
+Dealt to dcad12d1 
+Dealt to 99d105b1 
+Dealt to Hero [8s 3s]
+Dealt to 3c7df0cd 
+Dealt to b941e174 
+3c7df0cd: folds
+b941e174: raises 8,560 to 9,760 and is all-in
+69a991c5: folds
+dcad12d1: folds
+99d105b1: folds
+Hero: folds
+Uncalled bet (8,560) returned to b941e174
+*** SHOWDOWN ***
+b941e174 collected 3,720 from pot
+*** SUMMARY ***
+Total pot 3,720 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 69a991c5 folded before Flop
+Seat 2: dcad12d1 (button) folded before Flop
+Seat 3: 99d105b1 (small blind) folded before Flop
+Seat 4: Hero (big blind) folded before Flop
+Seat 5: 3c7df0cd folded before Flop
+Seat 6: b941e174 collected (3,720)
+
+
+Poker Hand #TM6110391048: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level15(600/1,200(120)) - 2026/06/24 22:21:19
+Table '7' 6-max Seat #1 is the button
+Seat 1: 69a991c5 (13,100 in chips)
+Seat 2: dcad12d1 (8,440 in chips)
+Seat 3: 99d105b1 (16,080 in chips)
+Seat 4: Hero (12,540 in chips)
+Seat 5: 3c7df0cd (17,449 in chips)
+Seat 6: b941e174 (10,000 in chips)
+69a991c5: posts the ante 120
+99d105b1: posts the ante 120
+dcad12d1: posts the ante 120
+Hero: posts the ante 120
+b941e174: posts the ante 120
+3c7df0cd: posts the ante 120
+dcad12d1: posts small blind 600
+99d105b1: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 69a991c5 
+Dealt to dcad12d1 
+Dealt to 99d105b1 
+Dealt to Hero [8h Kc]
+Dealt to 3c7df0cd 
+Dealt to b941e174 
+Hero: folds
+3c7df0cd: folds
+b941e174: folds
+69a991c5: raises 11,780 to 12,980 and is all-in
+dcad12d1: folds
+99d105b1: folds
+Uncalled bet (11,780) returned to 69a991c5
+*** SHOWDOWN ***
+69a991c5 collected 3,720 from pot
+*** SUMMARY ***
+Total pot 3,720 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 69a991c5 (button) collected (3,720)
+Seat 2: dcad12d1 (small blind) folded before Flop
+Seat 3: 99d105b1 (big blind) folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 3c7df0cd folded before Flop
+Seat 6: b941e174 folded before Flop
+
+
+Poker Hand #TM6110391021: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level15(600/1,200(120)) - 2026/06/24 22:20:38
+Table '7' 6-max Seat #5 is the button
+Seat 1: 69a991c5 (13,820 in chips)
+Seat 2: dcad12d1 (9,760 in chips)
+Seat 3: 99d105b1 (16,200 in chips)
+Seat 4: Hero (10,260 in chips)
+Seat 5: 3c7df0cd (17,569 in chips)
+99d105b1: posts the ante 120
+dcad12d1: posts the ante 120
+69a991c5: posts the ante 120
+Hero: posts the ante 120
+3c7df0cd: posts the ante 120
+69a991c5: posts small blind 600
+dcad12d1: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 69a991c5 
+Dealt to dcad12d1 
+Dealt to 99d105b1 
+Dealt to Hero [Kd 8d]
+Dealt to 3c7df0cd 
+99d105b1: folds
+Hero: raises 8,940 to 10,140 and is all-in
+3c7df0cd: folds
+69a991c5: folds
+dcad12d1: folds
+Uncalled bet (8,940) returned to Hero
+*** SHOWDOWN ***
+Hero collected 3,600 from pot
+*** SUMMARY ***
+Total pot 3,600 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 69a991c5 (small blind) folded before Flop
+Seat 2: dcad12d1 (big blind) folded before Flop
+Seat 3: 99d105b1 folded before Flop
+Seat 4: Hero collected (3,600)
+Seat 5: 3c7df0cd (button) folded before Flop
+
+
+Poker Hand #TM6110390991: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level15(600/1,200(120)) - 2026/06/24 22:20:01
+Table '7' 6-max Seat #4 is the button
+Seat 1: 69a991c5 (15,140 in chips)
+Seat 2: dcad12d1 (9,880 in chips)
+Seat 3: 99d105b1 (16,320 in chips)
+Seat 4: Hero (7,980 in chips)
+Seat 5: 3c7df0cd (18,289 in chips)
+99d105b1: posts the ante 120
+dcad12d1: posts the ante 120
+69a991c5: posts the ante 120
+Hero: posts the ante 120
+3c7df0cd: posts the ante 120
+3c7df0cd: posts small blind 600
+69a991c5: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 69a991c5 
+Dealt to dcad12d1 
+Dealt to 99d105b1 
+Dealt to Hero [8d Kc]
+Dealt to 3c7df0cd 
+dcad12d1: folds
+99d105b1: folds
+Hero: raises 6,660 to 7,860 and is all-in
+3c7df0cd: folds
+69a991c5: folds
+Uncalled bet (6,660) returned to Hero
+*** SHOWDOWN ***
+Hero collected 3,600 from pot
+*** SUMMARY ***
+Total pot 3,600 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 69a991c5 (big blind) folded before Flop
+Seat 2: dcad12d1 folded before Flop
+Seat 3: 99d105b1 folded before Flop
+Seat 4: Hero (button) collected (3,600)
+Seat 5: 3c7df0cd (small blind) folded before Flop
+
+
+Poker Hand #TM6110390971: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level15(600/1,200(120)) - 2026/06/24 22:19:33
+Table '7' 6-max Seat #3 is the button
+Seat 1: 69a991c5 (12,860 in chips)
+Seat 2: dcad12d1 (10,000 in chips)
+Seat 3: 99d105b1 (16,440 in chips)
+Seat 4: Hero (8,700 in chips)
+Seat 5: 3c7df0cd (19,609 in chips)
+99d105b1: posts the ante 120
+dcad12d1: posts the ante 120
+69a991c5: posts the ante 120
+Hero: posts the ante 120
+3c7df0cd: posts the ante 120
+Hero: posts small blind 600
+3c7df0cd: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 69a991c5 
+Dealt to dcad12d1 
+Dealt to 99d105b1 
+Dealt to Hero [6c Kh]
+Dealt to 3c7df0cd 
+69a991c5: raises 11,540 to 12,740 and is all-in
+dcad12d1: folds
+99d105b1: folds
+Hero: folds
+3c7df0cd: folds
+Uncalled bet (11,540) returned to 69a991c5
+*** SHOWDOWN ***
+69a991c5 collected 3,600 from pot
+*** SUMMARY ***
+Total pot 3,600 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 69a991c5 collected (3,600)
+Seat 2: dcad12d1 folded before Flop
+Seat 3: 99d105b1 (button) folded before Flop
+Seat 4: Hero (small blind) folded before Flop
+Seat 5: 3c7df0cd (big blind) folded before Flop
+
+
+Poker Hand #TM6110390959: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level14(500/1,000(100)) - 2026/06/24 22:19:09
+Table '7' 6-max Seat #1 is the button
+Seat 1: 69a991c5 (12,960 in chips)
+Seat 3: 99d105b1 (15,040 in chips)
+Seat 4: Hero (9,800 in chips)
+Seat 5: 3c7df0cd (19,709 in chips)
+Seat 6: b973a9f (37,204 in chips)
+69a991c5: posts the ante 100
+99d105b1: posts the ante 100
+Hero: posts the ante 100
+3c7df0cd: posts the ante 100
+b973a9f: posts the ante 100
+99d105b1: posts small blind 500
+Hero: posts big blind 1,000
+*** HOLE CARDS ***
+Dealt to 69a991c5 
+Dealt to 99d105b1 
+Dealt to Hero [7s 8s]
+Dealt to 3c7df0cd 
+Dealt to b973a9f 
+3c7df0cd: folds
+b973a9f: folds
+69a991c5: folds
+99d105b1: raises 13,940 to 14,940 and is all-in
+Hero: folds
+Uncalled bet (13,940) returned to 99d105b1
+*** SHOWDOWN ***
+99d105b1 collected 2,500 from pot
+*** SUMMARY ***
+Total pot 2,500 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 69a991c5 (button) folded before Flop
+Seat 3: 99d105b1 (small blind) collected (2,500)
+Seat 4: Hero (big blind) folded before Flop
+Seat 5: 3c7df0cd folded before Flop
+Seat 6: b973a9f folded before Flop
+
+
+Poker Hand #TM6110390944: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level14(500/1,000(100)) - 2026/06/24 22:18:53
+Table '7' 6-max Seat #6 is the button
+Seat 1: 69a991c5 (11,560 in chips)
+Seat 3: 99d105b1 (16,140 in chips)
+Seat 4: Hero (9,900 in chips)
+Seat 5: 3c7df0cd (19,809 in chips)
+Seat 6: b973a9f (37,304 in chips)
+99d105b1: posts the ante 100
+69a991c5: posts the ante 100
+Hero: posts the ante 100
+3c7df0cd: posts the ante 100
+b973a9f: posts the ante 100
+69a991c5: posts small blind 500
+99d105b1: posts big blind 1,000
+*** HOLE CARDS ***
+Dealt to 69a991c5 
+Dealt to 99d105b1 
+Dealt to Hero [3d Ts]
+Dealt to 3c7df0cd 
+Dealt to b973a9f 
+Hero: folds
+3c7df0cd: folds
+b973a9f: folds
+69a991c5: raises 10,460 to 11,460 and is all-in
+99d105b1: folds
+Uncalled bet (10,460) returned to 69a991c5
+*** SHOWDOWN ***
+69a991c5 collected 2,500 from pot
+*** SUMMARY ***
+Total pot 2,500 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 69a991c5 (small blind) collected (2,500)
+Seat 3: 99d105b1 (big blind) folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 3c7df0cd folded before Flop
+Seat 6: b973a9f (button) folded before Flop
+
+
+Poker Hand #TM6110390911: Tournament #292985291, GGPoker Japan Middle school $5 tournament 6MAX Hold'em No Limit - Level14(500/1,000(100)) - 2026/06/24 22:18:01
+Table '7' 6-max Seat #5 is the button
+Seat 1: 69a991c5 (12,660 in chips)
+Seat 2: 1eaea153 (10,920 in chips)
+Seat 3: 99d105b1 (16,240 in chips)
+Seat 4: Hero (10,000 in chips)
+Seat 5: 3c7df0cd (29,909 in chips)
+Seat 6: b973a9f (25,804 in chips)
+99d105b1: posts the ante 100
+69a991c5: posts the ante 100
+Hero: posts the ante 100
+1eaea153: posts the ante 100
+3c7df0cd: posts the ante 100
+b973a9f: posts the ante 100
+b973a9f: posts small blind 500
+69a991c5: posts big blind 1,000
+*** HOLE CARDS ***
+Dealt to 69a991c5 
+Dealt to 1eaea153 
+Dealt to 99d105b1 
+Dealt to Hero [7d 3s]
+Dealt to 3c7df0cd 
+Dealt to b973a9f 
+1eaea153: folds
+99d105b1: folds
+Hero: folds
+3c7df0cd: raises 1,200 to 2,200
+b973a9f: raises 3,000 to 5,200
+69a991c5: folds
+3c7df0cd: calls 3,000
+*** FLOP *** [Ks Kd 6c]
+b973a9f: checks
+3c7df0cd: checks
+*** TURN *** [Ks Kd 6c] [Th]
+b973a9f: checks
+3c7df0cd: bets 4,800
+b973a9f: calls 4,800
+*** RIVER *** [Ks Kd 6c Th] [4c]
+b973a9f: checks
+3c7df0cd: checks
+b973a9f: shows [As Ad] (two pair, Aces and Kings)
+3c7df0cd: shows [Td Qs] (two pair, Kings and Tens)
+*** SHOWDOWN ***
+b973a9f collected 21,600 from pot
+*** SUMMARY ***
+Total pot 21,600 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Ks Kd 6c Th 4c]
+Seat 1: 69a991c5 (big blind) folded before Flop
+Seat 2: 1eaea153 folded before Flop
+Seat 3: 99d105b1 folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 3c7df0cd (button) showed [Td Qs] and lost with two pair, Kings and Tens
+Seat 6: b973a9f (small blind) showed [As Ad] and won (21,600) with two pair, Aces and Kings
+
+

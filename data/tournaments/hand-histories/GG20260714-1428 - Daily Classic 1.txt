@@ -1,0 +1,3684 @@
+Poker Hand #TM6182267303: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level19(1,500/3,000(350)) - 2026/07/15 00:43:11
+Table '76' 8-max Seat #2 is the button
+Seat 1: f18e6b12 (184,719 in chips)
+Seat 2: 37d205f5 (133,208 in chips)
+Seat 3: ce871191 (33,405 in chips)
+Seat 4: 4c1b56d (31,032 in chips)
+Seat 5: d8f456c9 (25,334 in chips)
+Seat 6: cedd55d4 (17,291 in chips)
+Seat 7: Hero (10,845 in chips)
+Seat 8: c0245c4b (9,066 in chips)
+f18e6b12: posts the ante 350
+c0245c4b: posts the ante 350
+Hero: posts the ante 350
+d8f456c9: posts the ante 350
+4c1b56d: posts the ante 350
+ce871191: posts the ante 350
+cedd55d4: posts the ante 350
+37d205f5: posts the ante 350
+ce871191: posts small blind 1,500
+4c1b56d: posts big blind 3,000
+*** HOLE CARDS ***
+Dealt to f18e6b12 
+Dealt to 37d205f5 
+Dealt to ce871191 
+Dealt to 4c1b56d 
+Dealt to d8f456c9 
+Dealt to cedd55d4 
+Dealt to Hero [Jh Qs]
+Dealt to c0245c4b 
+d8f456c9: folds
+cedd55d4: folds
+Hero: raises 7,495 to 10,495 and is all-in
+c0245c4b: calls 8,716 and is all-in
+f18e6b12: folds
+37d205f5: raises 37,006 to 47,501
+ce871191: calls 31,555 and is all-in
+4c1b56d: folds
+Uncalled bet (14,446) returned to 37d205f5
+37d205f5: shows [Js Ad]
+ce871191: shows [Kc Qc]
+Hero: shows [Jh Qs]
+c0245c4b: shows [Jc Qd]
+*** FLOP *** [4d 3c 6s]
+*** TURN *** [4d 3c 6s] [As]
+*** RIVER *** [4d 3c 6s As] [8h]
+*** SHOWDOWN ***
+37d205f5 collected 40,664 from pot
+37d205f5 collected 5,337 from pot
+37d205f5 collected 45,120 from pot
+*** SUMMARY ***
+Total pot 91,121 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [4d 3c 6s As 8h]
+Seat 1: f18e6b12 folded before Flop
+Seat 2: 37d205f5 (button) showed [Js Ad] and won (91,121) with a pair of Aces
+Seat 3: ce871191 (small blind) showed [Kc Qc] and lost with Ace high
+Seat 4: 4c1b56d (big blind) folded before Flop
+Seat 5: d8f456c9 folded before Flop
+Seat 6: cedd55d4 folded before Flop
+Seat 7: Hero showed [Jh Qs] and lost with Ace high
+Seat 8: c0245c4b showed [Jc Qd] and lost with Ace high
+
+
+Poker Hand #TM6182267291: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level19(1,500/3,000(350)) - 2026/07/15 00:42:39
+Table '76' 8-max Seat #1 is the button
+Seat 1: f18e6b12 (185,069 in chips)
+Seat 2: 37d205f5 (135,058 in chips)
+Seat 3: ce871191 (36,755 in chips)
+Seat 4: 4c1b56d (31,382 in chips)
+Seat 5: d8f456c9 (18,384 in chips)
+Seat 6: cedd55d4 (17,641 in chips)
+Seat 7: Hero (11,195 in chips)
+Seat 8: c0245c4b (9,416 in chips)
+f18e6b12: posts the ante 350
+c0245c4b: posts the ante 350
+Hero: posts the ante 350
+d8f456c9: posts the ante 350
+4c1b56d: posts the ante 350
+ce871191: posts the ante 350
+cedd55d4: posts the ante 350
+37d205f5: posts the ante 350
+37d205f5: posts small blind 1,500
+ce871191: posts big blind 3,000
+*** HOLE CARDS ***
+Dealt to f18e6b12 
+Dealt to 37d205f5 
+Dealt to ce871191 
+Dealt to 4c1b56d 
+Dealt to d8f456c9 
+Dealt to cedd55d4 
+Dealt to Hero [6d Tc]
+Dealt to c0245c4b 
+4c1b56d: folds
+d8f456c9: raises 15,034 to 18,034 and is all-in
+cedd55d4: folds
+Hero: folds
+c0245c4b: folds
+f18e6b12: folds
+37d205f5: folds
+ce871191: folds
+Uncalled bet (15,034) returned to d8f456c9
+*** SHOWDOWN ***
+d8f456c9 collected 10,300 from pot
+*** SUMMARY ***
+Total pot 10,300 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: f18e6b12 (button) folded before Flop
+Seat 2: 37d205f5 (small blind) folded before Flop
+Seat 3: ce871191 (big blind) folded before Flop
+Seat 4: 4c1b56d folded before Flop
+Seat 5: d8f456c9 collected (10,300)
+Seat 6: cedd55d4 folded before Flop
+Seat 7: Hero folded before Flop
+Seat 8: c0245c4b folded before Flop
+
+
+Poker Hand #TM6182267228: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level19(1,500/3,000(350)) - 2026/07/15 00:40:24
+Table '35' 8-max Seat #3 is the button
+Seat 1: a17b62ba (72,758 in chips)
+Seat 2: ed4ab197 (22,004 in chips)
+Seat 3: 29b19112 (127,333 in chips)
+Seat 4: Hero (13,045 in chips)
+Seat 5: 80aa38a0 (66,217 in chips)
+Seat 6: ff8ceaeb (19,450 in chips)
+Seat 8: 6d1518d5 (22,496 in chips)
+Hero: posts the ante 350
+29b19112: posts the ante 350
+a17b62ba: posts the ante 350
+80aa38a0: posts the ante 350
+6d1518d5: posts the ante 350
+ed4ab197: posts the ante 350
+ff8ceaeb: posts the ante 350
+Hero: posts small blind 1,500
+80aa38a0: posts big blind 3,000
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [7c 5h]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 6d1518d5 
+ff8ceaeb: folds
+6d1518d5: folds
+a17b62ba: folds
+ed4ab197: folds
+29b19112: raises 123,983 to 126,983 and is all-in
+Hero: folds
+80aa38a0: folds
+Uncalled bet (123,983) returned to 29b19112
+*** SHOWDOWN ***
+29b19112 collected 9,950 from pot
+*** SUMMARY ***
+Total pot 9,950 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: a17b62ba folded before Flop
+Seat 2: ed4ab197 folded before Flop
+Seat 3: 29b19112 (button) collected (9,950)
+Seat 4: Hero (small blind) folded before Flop
+Seat 5: 80aa38a0 (big blind) folded before Flop
+Seat 6: ff8ceaeb folded before Flop
+Seat 8: 6d1518d5 folded before Flop
+
+
+Poker Hand #TM6182267177: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level19(1,500/3,000(350)) - 2026/07/15 00:38:28
+Table '35' 8-max Seat #2 is the button
+Seat 1: a17b62ba (34,004 in chips)
+Seat 2: ed4ab197 (22,354 in chips)
+Seat 3: 29b19112 (161,337 in chips)
+Seat 4: Hero (16,395 in chips)
+Seat 5: 80aa38a0 (66,567 in chips)
+Seat 6: ff8ceaeb (19,800 in chips)
+Seat 8: 6d1518d5 (22,846 in chips)
+Hero: posts the ante 350
+29b19112: posts the ante 350
+a17b62ba: posts the ante 350
+80aa38a0: posts the ante 350
+6d1518d5: posts the ante 350
+ed4ab197: posts the ante 350
+ff8ceaeb: posts the ante 350
+29b19112: posts small blind 1,500
+Hero: posts big blind 3,000
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [2h 7d]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 6d1518d5 
+80aa38a0: folds
+ff8ceaeb: folds
+6d1518d5: folds
+a17b62ba: raises 30,654 to 33,654 and is all-in
+ed4ab197: folds
+29b19112: calls 32,154
+Hero: folds
+a17b62ba: shows [Qc Td]
+29b19112: shows [Ah 8s]
+*** FLOP *** [Tc Jh 3s]
+*** TURN *** [Tc Jh 3s] [Ad]
+*** RIVER *** [Tc Jh 3s Ad] [Qd]
+*** SHOWDOWN ***
+a17b62ba collected 72,758 from pot
+*** SUMMARY ***
+Total pot 72,758 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Tc Jh 3s Ad Qd]
+Seat 1: a17b62ba showed [Qc Td] and won (72,758) with two pair, Queens and Tens
+Seat 2: ed4ab197 (button) folded before Flop
+Seat 3: 29b19112 (small blind) showed [Ah 8s] and lost with a pair of Aces
+Seat 4: Hero (big blind) folded before Flop
+Seat 5: 80aa38a0 folded before Flop
+Seat 6: ff8ceaeb folded before Flop
+Seat 8: 6d1518d5 folded before Flop
+
+
+Poker Hand #TM6182267110: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level18(1,250/2,500(300)) - 2026/07/15 00:35:50
+Table '35' 8-max Seat #1 is the button
+Seat 1: a17b62ba (34,304 in chips)
+Seat 2: ed4ab197 (23,904 in chips)
+Seat 3: 29b19112 (113,415 in chips)
+Seat 4: Hero (16,695 in chips)
+Seat 5: 80aa38a0 (71,867 in chips)
+Seat 6: ff8ceaeb (20,100 in chips)
+Seat 7: 47abd8d3 (39,872 in chips)
+Seat 8: 6d1518d5 (23,146 in chips)
+Hero: posts the ante 300
+29b19112: posts the ante 300
+a17b62ba: posts the ante 300
+80aa38a0: posts the ante 300
+6d1518d5: posts the ante 300
+ed4ab197: posts the ante 300
+ff8ceaeb: posts the ante 300
+47abd8d3: posts the ante 300
+ed4ab197: posts small blind 1,250
+29b19112: posts big blind 2,500
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [4d 6d]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+Hero: folds
+80aa38a0: raises 2,500 to 5,000
+ff8ceaeb: folds
+47abd8d3: raises 34,572 to 39,572 and is all-in
+6d1518d5: folds
+a17b62ba: folds
+ed4ab197: folds
+29b19112: raises 34,572 to 74,144
+80aa38a0: folds
+Uncalled bet (34,572) returned to 29b19112
+29b19112: shows [Kh 2h]
+47abd8d3: shows [Js Jd]
+*** FLOP *** [6s 3c 8c]
+*** TURN *** [6s 3c 8c] [Kd]
+*** RIVER *** [6s 3c 8c Kd] [4s]
+*** SHOWDOWN ***
+29b19112 collected 87,794 from pot
+*** SUMMARY ***
+Total pot 87,794 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6s 3c 8c Kd 4s]
+Seat 1: a17b62ba (button) folded before Flop
+Seat 2: ed4ab197 (small blind) folded before Flop
+Seat 3: 29b19112 (big blind) showed [Kh 2h] and won (87,794) with a pair of Kings
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 folded before Flop
+Seat 6: ff8ceaeb folded before Flop
+Seat 7: 47abd8d3 showed [Js Jd] and lost with a pair of Jacks
+Seat 8: 6d1518d5 folded before Flop
+
+
+Poker Hand #TM6182267072: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level18(1,250/2,500(300)) - 2026/07/15 00:34:25
+Table '35' 8-max Seat #8 is the button
+Seat 1: a17b62ba (35,854 in chips)
+Seat 2: ed4ab197 (26,704 in chips)
+Seat 3: 29b19112 (113,715 in chips)
+Seat 4: Hero (16,995 in chips)
+Seat 5: 80aa38a0 (72,167 in chips)
+Seat 6: ff8ceaeb (14,250 in chips)
+Seat 7: 47abd8d3 (40,172 in chips)
+Seat 8: 6d1518d5 (23,446 in chips)
+Hero: posts the ante 300
+29b19112: posts the ante 300
+80aa38a0: posts the ante 300
+a17b62ba: posts the ante 300
+6d1518d5: posts the ante 300
+ed4ab197: posts the ante 300
+ff8ceaeb: posts the ante 300
+47abd8d3: posts the ante 300
+a17b62ba: posts small blind 1,250
+ed4ab197: posts big blind 2,500
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [7s 3h]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+29b19112: folds
+Hero: folds
+80aa38a0: folds
+ff8ceaeb: raises 8,650 to 11,150
+47abd8d3: folds
+6d1518d5: folds
+a17b62ba: folds
+ed4ab197: folds
+Uncalled bet (8,650) returned to ff8ceaeb
+*** SHOWDOWN ***
+ff8ceaeb collected 8,650 from pot
+*** SUMMARY ***
+Total pot 8,650 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: a17b62ba (small blind) folded before Flop
+Seat 2: ed4ab197 (big blind) folded before Flop
+Seat 3: 29b19112 folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 folded before Flop
+Seat 6: ff8ceaeb collected (8,650)
+Seat 7: 47abd8d3 folded before Flop
+Seat 8: 6d1518d5 (button) folded before Flop
+
+
+Poker Hand #TM6182267023: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level18(1,250/2,500(300)) - 2026/07/15 00:32:40
+Table '35' 8-max Seat #7 is the button
+Seat 1: a17b62ba (41,154 in chips)
+Seat 2: ed4ab197 (27,004 in chips)
+Seat 3: 29b19112 (114,015 in chips)
+Seat 4: Hero (17,295 in chips)
+Seat 5: 80aa38a0 (63,817 in chips)
+Seat 6: ff8ceaeb (14,550 in chips)
+Seat 7: 47abd8d3 (40,472 in chips)
+Seat 8: 6d1518d5 (24,996 in chips)
+Hero: posts the ante 300
+29b19112: posts the ante 300
+80aa38a0: posts the ante 300
+a17b62ba: posts the ante 300
+6d1518d5: posts the ante 300
+ed4ab197: posts the ante 300
+ff8ceaeb: posts the ante 300
+47abd8d3: posts the ante 300
+6d1518d5: posts small blind 1,250
+a17b62ba: posts big blind 2,500
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [3d Th]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+ed4ab197: folds
+29b19112: folds
+Hero: folds
+80aa38a0: raises 2,500 to 5,000
+ff8ceaeb: folds
+47abd8d3: folds
+6d1518d5: folds
+a17b62ba: calls 2,500
+*** FLOP *** [6s 2h 4c]
+a17b62ba: checks
+80aa38a0: bets 4,505
+a17b62ba: folds
+Uncalled bet (4,505) returned to 80aa38a0
+*** SHOWDOWN ***
+80aa38a0 collected 13,650 from pot
+*** SUMMARY ***
+Total pot 13,650 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6s 2h 4c]
+Seat 1: a17b62ba (big blind) folded on the Flop
+Seat 2: ed4ab197 folded before Flop
+Seat 3: 29b19112 folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 won (13,650)
+Seat 6: ff8ceaeb folded before Flop
+Seat 7: 47abd8d3 (button) folded before Flop
+Seat 8: 6d1518d5 (small blind) folded before Flop
+
+
+Poker Hand #TM6182266983: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level18(1,250/2,500(300)) - 2026/07/15 00:31:28
+Table '35' 8-max Seat #6 is the button
+Seat 1: a17b62ba (41,454 in chips)
+Seat 2: ed4ab197 (27,304 in chips)
+Seat 3: 29b19112 (108,165 in chips)
+Seat 4: Hero (17,595 in chips)
+Seat 5: 80aa38a0 (64,117 in chips)
+Seat 6: ff8ceaeb (14,850 in chips)
+Seat 7: 47abd8d3 (42,022 in chips)
+Seat 8: 6d1518d5 (27,796 in chips)
+Hero: posts the ante 300
+29b19112: posts the ante 300
+80aa38a0: posts the ante 300
+a17b62ba: posts the ante 300
+6d1518d5: posts the ante 300
+ed4ab197: posts the ante 300
+ff8ceaeb: posts the ante 300
+47abd8d3: posts the ante 300
+47abd8d3: posts small blind 1,250
+6d1518d5: posts big blind 2,500
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [Jd 7h]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+a17b62ba: folds
+ed4ab197: folds
+29b19112: raises 105,365 to 107,865 and is all-in
+Hero: folds
+80aa38a0: folds
+ff8ceaeb: folds
+47abd8d3: folds
+6d1518d5: folds
+Uncalled bet (105,365) returned to 29b19112
+*** SHOWDOWN ***
+29b19112 collected 8,650 from pot
+*** SUMMARY ***
+Total pot 8,650 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: a17b62ba folded before Flop
+Seat 2: ed4ab197 folded before Flop
+Seat 3: 29b19112 collected (8,650)
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 folded before Flop
+Seat 6: ff8ceaeb (button) folded before Flop
+Seat 7: 47abd8d3 (small blind) folded before Flop
+Seat 8: 6d1518d5 (big blind) folded before Flop
+
+
+Poker Hand #TM6182266958: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level18(1,250/2,500(300)) - 2026/07/15 00:30:32
+Table '35' 8-max Seat #5 is the button
+Seat 1: a17b62ba (41,754 in chips)
+Seat 2: ed4ab197 (27,604 in chips)
+Seat 3: 29b19112 (102,315 in chips)
+Seat 4: Hero (17,895 in chips)
+Seat 5: 80aa38a0 (64,417 in chips)
+Seat 6: ff8ceaeb (16,400 in chips)
+Seat 7: 47abd8d3 (44,822 in chips)
+Seat 8: 6d1518d5 (28,096 in chips)
+Hero: posts the ante 300
+29b19112: posts the ante 300
+80aa38a0: posts the ante 300
+a17b62ba: posts the ante 300
+6d1518d5: posts the ante 300
+ed4ab197: posts the ante 300
+ff8ceaeb: posts the ante 300
+47abd8d3: posts the ante 300
+ff8ceaeb: posts small blind 1,250
+47abd8d3: posts big blind 2,500
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [9h Kc]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+6d1518d5: folds
+a17b62ba: folds
+ed4ab197: folds
+29b19112: raises 8,500 to 11,000
+Hero: folds
+80aa38a0: folds
+ff8ceaeb: folds
+47abd8d3: folds
+Uncalled bet (8,500) returned to 29b19112
+*** SHOWDOWN ***
+29b19112 collected 8,650 from pot
+*** SUMMARY ***
+Total pot 8,650 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: a17b62ba folded before Flop
+Seat 2: ed4ab197 folded before Flop
+Seat 3: 29b19112 collected (8,650)
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 (button) folded before Flop
+Seat 6: ff8ceaeb (small blind) folded before Flop
+Seat 7: 47abd8d3 (big blind) folded before Flop
+Seat 8: 6d1518d5 folded before Flop
+
+
+Poker Hand #TM6182266925: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level18(1,250/2,500(300)) - 2026/07/15 00:29:23
+Table '35' 8-max Seat #4 is the button
+Seat 1: a17b62ba (35,904 in chips)
+Seat 2: ed4ab197 (27,904 in chips)
+Seat 3: 29b19112 (102,615 in chips)
+Seat 4: Hero (18,195 in chips)
+Seat 5: 80aa38a0 (65,967 in chips)
+Seat 6: ff8ceaeb (19,200 in chips)
+Seat 7: 47abd8d3 (45,122 in chips)
+Seat 8: 6d1518d5 (28,396 in chips)
+Hero: posts the ante 300
+29b19112: posts the ante 300
+a17b62ba: posts the ante 300
+80aa38a0: posts the ante 300
+6d1518d5: posts the ante 300
+ed4ab197: posts the ante 300
+ff8ceaeb: posts the ante 300
+47abd8d3: posts the ante 300
+80aa38a0: posts small blind 1,250
+ff8ceaeb: posts big blind 2,500
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [Th Jh]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+47abd8d3: folds
+6d1518d5: folds
+a17b62ba: raises 33,104 to 35,604 and is all-in
+ed4ab197: folds
+29b19112: folds
+Hero: folds
+80aa38a0: folds
+ff8ceaeb: folds
+Uncalled bet (33,104) returned to a17b62ba
+*** SHOWDOWN ***
+a17b62ba collected 8,650 from pot
+*** SUMMARY ***
+Total pot 8,650 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: a17b62ba collected (8,650)
+Seat 2: ed4ab197 folded before Flop
+Seat 3: 29b19112 folded before Flop
+Seat 4: Hero (button) folded before Flop
+Seat 5: 80aa38a0 (small blind) folded before Flop
+Seat 6: ff8ceaeb (big blind) folded before Flop
+Seat 7: 47abd8d3 folded before Flop
+Seat 8: 6d1518d5 folded before Flop
+
+
+Poker Hand #TM6182266892: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level17(1,000/2,000(250)) - 2026/07/15 00:27:54
+Table '35' 8-max Seat #3 is the button
+Seat 1: a17b62ba (36,154 in chips)
+Seat 2: ed4ab197 (28,154 in chips)
+Seat 3: 29b19112 (102,865 in chips)
+Seat 4: Hero (19,445 in chips)
+Seat 5: 80aa38a0 (68,217 in chips)
+Seat 6: ff8ceaeb (19,450 in chips)
+Seat 7: 47abd8d3 (47,372 in chips)
+Seat 8: 6d1518d5 (21,646 in chips)
+Hero: posts the ante 250
+29b19112: posts the ante 250
+a17b62ba: posts the ante 250
+80aa38a0: posts the ante 250
+6d1518d5: posts the ante 250
+ed4ab197: posts the ante 250
+ff8ceaeb: posts the ante 250
+47abd8d3: posts the ante 250
+Hero: posts small blind 1,000
+80aa38a0: posts big blind 2,000
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [Tc 8h]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+ff8ceaeb: folds
+47abd8d3: calls 2,000
+6d1518d5: calls 2,000
+a17b62ba: folds
+ed4ab197: folds
+29b19112: folds
+Hero: folds
+80aa38a0: checks
+*** FLOP *** [Jc Ad Ah]
+80aa38a0: checks
+47abd8d3: checks
+6d1518d5: checks
+*** TURN *** [Jc Ad Ah] [6c]
+80aa38a0: checks
+47abd8d3: checks
+6d1518d5: checks
+*** RIVER *** [Jc Ad Ah 6c] [2h]
+80aa38a0: checks
+47abd8d3: checks
+6d1518d5: checks
+80aa38a0: shows [9s 2d] (two pair, Aces and Twos)
+47abd8d3: shows [5s 5h] (two pair, Aces and Fives)
+6d1518d5: shows [7h 7d] (two pair, Aces and Sevens)
+*** SHOWDOWN ***
+6d1518d5 collected 9,000 from pot
+*** SUMMARY ***
+Total pot 9,000 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Jc Ad Ah 6c 2h]
+Seat 1: a17b62ba folded before Flop
+Seat 2: ed4ab197 folded before Flop
+Seat 3: 29b19112 (button) folded before Flop
+Seat 4: Hero (small blind) folded before Flop
+Seat 5: 80aa38a0 (big blind) showed [9s 2d] and lost with two pair, Aces and Twos
+Seat 6: ff8ceaeb folded before Flop
+Seat 7: 47abd8d3 showed [5s 5h] and lost with two pair, Aces and Fives
+Seat 8: 6d1518d5 showed [7h 7d] and won (9,000) with two pair, Aces and Sevens
+
+
+Poker Hand #TM6182266864: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level17(1,000/2,000(250)) - 2026/07/15 00:26:36
+Table '35' 8-max Seat #2 is the button
+Seat 1: a17b62ba (36,404 in chips)
+Seat 2: ed4ab197 (28,404 in chips)
+Seat 3: 29b19112 (104,115 in chips)
+Seat 4: Hero (21,695 in chips)
+Seat 5: 80aa38a0 (68,467 in chips)
+Seat 6: ff8ceaeb (19,700 in chips)
+Seat 7: 47abd8d3 (55,945 in chips)
+Seat 8: 6d1518d5 (8,573 in chips)
+Hero: posts the ante 250
+29b19112: posts the ante 250
+a17b62ba: posts the ante 250
+80aa38a0: posts the ante 250
+6d1518d5: posts the ante 250
+ed4ab197: posts the ante 250
+ff8ceaeb: posts the ante 250
+47abd8d3: posts the ante 250
+29b19112: posts small blind 1,000
+Hero: posts big blind 2,000
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [5h 2d]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+80aa38a0: folds
+ff8ceaeb: folds
+47abd8d3: calls 2,000
+6d1518d5: raises 6,323 to 8,323 and is all-in
+a17b62ba: folds
+ed4ab197: folds
+29b19112: folds
+Hero: folds
+47abd8d3: calls 6,323
+6d1518d5: shows [Jc Ah]
+47abd8d3: shows [Ad 4c]
+*** FLOP *** [5d As 6c]
+*** TURN *** [5d As 6c] [Ac]
+*** RIVER *** [5d As 6c Ac] [9d]
+*** SHOWDOWN ***
+6d1518d5 collected 21,646 from pot
+*** SUMMARY ***
+Total pot 21,646 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [5d As 6c Ac 9d]
+Seat 1: a17b62ba folded before Flop
+Seat 2: ed4ab197 (button) folded before Flop
+Seat 3: 29b19112 (small blind) folded before Flop
+Seat 4: Hero (big blind) folded before Flop
+Seat 5: 80aa38a0 folded before Flop
+Seat 6: ff8ceaeb folded before Flop
+Seat 7: 47abd8d3 showed [Ad 4c] and lost with three of a kind, Aces
+Seat 8: 6d1518d5 showed [Jc Ah] and won (21,646) with three of a kind, Aces
+
+
+Poker Hand #TM6182266841: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level17(1,000/2,000(250)) - 2026/07/15 00:25:44
+Table '35' 8-max Seat #1 is the button
+Seat 1: a17b62ba (40,854 in chips)
+Seat 2: ed4ab197 (29,654 in chips)
+Seat 3: 29b19112 (97,165 in chips)
+Seat 4: Hero (21,945 in chips)
+Seat 5: 80aa38a0 (68,717 in chips)
+Seat 6: ff8ceaeb (19,950 in chips)
+Seat 7: 47abd8d3 (56,195 in chips)
+Seat 8: 6d1518d5 (8,823 in chips)
+Hero: posts the ante 250
+29b19112: posts the ante 250
+a17b62ba: posts the ante 250
+80aa38a0: posts the ante 250
+6d1518d5: posts the ante 250
+ed4ab197: posts the ante 250
+ff8ceaeb: posts the ante 250
+47abd8d3: posts the ante 250
+ed4ab197: posts small blind 1,000
+29b19112: posts big blind 2,000
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [7s 6d]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+Hero: folds
+80aa38a0: folds
+ff8ceaeb: folds
+47abd8d3: folds
+6d1518d5: folds
+a17b62ba: raises 2,200 to 4,200
+ed4ab197: folds
+29b19112: raises 92,715 to 96,915 and is all-in
+a17b62ba: folds
+Uncalled bet (92,715) returned to 29b19112
+*** SHOWDOWN ***
+29b19112 collected 11,400 from pot
+*** SUMMARY ***
+Total pot 11,400 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: a17b62ba (button) folded before Flop
+Seat 2: ed4ab197 (small blind) folded before Flop
+Seat 3: 29b19112 (big blind) collected (11,400)
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 folded before Flop
+Seat 6: ff8ceaeb folded before Flop
+Seat 7: 47abd8d3 folded before Flop
+Seat 8: 6d1518d5 folded before Flop
+
+
+Poker Hand #TM6182266826: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level17(1,000/2,000(250)) - 2026/07/15 00:25:03
+Table '35' 8-max Seat #8 is the button
+Seat 1: a17b62ba (37,104 in chips)
+Seat 2: ed4ab197 (31,904 in chips)
+Seat 3: 29b19112 (97,415 in chips)
+Seat 4: Hero (22,195 in chips)
+Seat 5: 80aa38a0 (68,967 in chips)
+Seat 6: ff8ceaeb (20,200 in chips)
+Seat 7: 47abd8d3 (56,445 in chips)
+Seat 8: 6d1518d5 (9,073 in chips)
+Hero: posts the ante 250
+29b19112: posts the ante 250
+80aa38a0: posts the ante 250
+a17b62ba: posts the ante 250
+6d1518d5: posts the ante 250
+ed4ab197: posts the ante 250
+ff8ceaeb: posts the ante 250
+47abd8d3: posts the ante 250
+a17b62ba: posts small blind 1,000
+ed4ab197: posts big blind 2,000
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [Kh 3c]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+29b19112: folds
+Hero: folds
+80aa38a0: folds
+ff8ceaeb: folds
+47abd8d3: folds
+6d1518d5: folds
+a17b62ba: raises 34,854 to 36,854 and is all-in
+ed4ab197: folds
+Uncalled bet (34,854) returned to a17b62ba
+*** SHOWDOWN ***
+a17b62ba collected 6,000 from pot
+*** SUMMARY ***
+Total pot 6,000 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: a17b62ba (small blind) collected (6,000)
+Seat 2: ed4ab197 (big blind) folded before Flop
+Seat 3: 29b19112 folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 folded before Flop
+Seat 6: ff8ceaeb folded before Flop
+Seat 7: 47abd8d3 folded before Flop
+Seat 8: 6d1518d5 (button) folded before Flop
+
+
+Poker Hand #TM6182266809: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level17(1,000/2,000(250)) - 2026/07/15 00:24:22
+Table '35' 8-max Seat #7 is the button
+Seat 1: a17b62ba (39,354 in chips)
+Seat 2: ed4ab197 (32,154 in chips)
+Seat 3: 29b19112 (92,665 in chips)
+Seat 4: Hero (22,445 in chips)
+Seat 5: 80aa38a0 (69,217 in chips)
+Seat 6: ff8ceaeb (20,450 in chips)
+Seat 7: 47abd8d3 (56,695 in chips)
+Seat 8: 6d1518d5 (10,323 in chips)
+Hero: posts the ante 250
+29b19112: posts the ante 250
+80aa38a0: posts the ante 250
+a17b62ba: posts the ante 250
+6d1518d5: posts the ante 250
+ed4ab197: posts the ante 250
+ff8ceaeb: posts the ante 250
+47abd8d3: posts the ante 250
+6d1518d5: posts small blind 1,000
+a17b62ba: posts big blind 2,000
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [2c 4h]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+ed4ab197: folds
+29b19112: raises 2,400 to 4,400
+Hero: folds
+80aa38a0: folds
+ff8ceaeb: folds
+47abd8d3: folds
+6d1518d5: folds
+a17b62ba: folds
+Uncalled bet (2,400) returned to 29b19112
+*** SHOWDOWN ***
+29b19112 collected 7,000 from pot
+*** SUMMARY ***
+Total pot 7,000 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: a17b62ba (big blind) folded before Flop
+Seat 2: ed4ab197 folded before Flop
+Seat 3: 29b19112 collected (7,000)
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 folded before Flop
+Seat 6: ff8ceaeb folded before Flop
+Seat 7: 47abd8d3 (button) folded before Flop
+Seat 8: 6d1518d5 (small blind) folded before Flop
+
+
+Poker Hand #TM6182266794: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level17(1,000/2,000(250)) - 2026/07/15 00:23:27
+Table '35' 8-max Seat #6 is the button
+Seat 1: a17b62ba (39,604 in chips)
+Seat 2: ed4ab197 (32,404 in chips)
+Seat 3: 29b19112 (92,915 in chips)
+Seat 4: Hero (22,695 in chips)
+Seat 5: 80aa38a0 (69,467 in chips)
+Seat 6: ff8ceaeb (20,700 in chips)
+Seat 7: 47abd8d3 (55,945 in chips)
+Seat 8: 6d1518d5 (9,573 in chips)
+Hero: posts the ante 250
+29b19112: posts the ante 250
+80aa38a0: posts the ante 250
+a17b62ba: posts the ante 250
+6d1518d5: posts the ante 250
+ed4ab197: posts the ante 250
+ff8ceaeb: posts the ante 250
+47abd8d3: posts the ante 250
+47abd8d3: posts small blind 1,000
+6d1518d5: posts big blind 2,000
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to ed4ab197 
+Dealt to 29b19112 
+Dealt to Hero [9h 4h]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+a17b62ba: folds
+ed4ab197: folds
+29b19112: folds
+Hero: folds
+80aa38a0: folds
+ff8ceaeb: folds
+47abd8d3: calls 1,000
+6d1518d5: checks
+*** FLOP *** [4s 8s Js]
+47abd8d3: checks
+6d1518d5: checks
+*** TURN *** [4s 8s Js] [As]
+47abd8d3: checks
+6d1518d5: checks
+*** RIVER *** [4s 8s Js As] [2s]
+47abd8d3: checks
+6d1518d5: checks
+47abd8d3: shows [7c 8d] (a flush Ace high)
+6d1518d5: shows [9d 2c] (a flush Ace high)
+*** SHOWDOWN ***
+6d1518d5 collected 3,000 from pot
+47abd8d3 collected 3,000 from pot
+*** SUMMARY ***
+Total pot 6,000 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [4s 8s Js As 2s]
+Seat 1: a17b62ba folded before Flop
+Seat 2: ed4ab197 folded before Flop
+Seat 3: 29b19112 folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 folded before Flop
+Seat 6: ff8ceaeb (button) folded before Flop
+Seat 7: 47abd8d3 (small blind) showed [7c 8d] and won (3,000) with a flush Ace high
+Seat 8: 6d1518d5 (big blind) showed [9d 2c] and won (3,000) with a flush Ace high
+
+
+Poker Hand #TM6182266778: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level17(1,000/2,000(250)) - 2026/07/15 00:22:48
+Table '35' 8-max Seat #5 is the button
+Seat 1: a17b62ba (39,854 in chips)
+Seat 3: 29b19112 (93,165 in chips)
+Seat 4: Hero (22,945 in chips)
+Seat 5: 80aa38a0 (69,717 in chips)
+Seat 6: ff8ceaeb (21,950 in chips)
+Seat 7: 47abd8d3 (53,445 in chips)
+Seat 8: 6d1518d5 (9,823 in chips)
+Hero: posts the ante 250
+29b19112: posts the ante 250
+80aa38a0: posts the ante 250
+a17b62ba: posts the ante 250
+6d1518d5: posts the ante 250
+ff8ceaeb: posts the ante 250
+47abd8d3: posts the ante 250
+ff8ceaeb: posts small blind 1,000
+47abd8d3: posts big blind 2,000
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to 29b19112 
+Dealt to Hero [6d 3d]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+6d1518d5: folds
+a17b62ba: folds
+29b19112: folds
+Hero: folds
+80aa38a0: folds
+ff8ceaeb: folds
+Uncalled bet (1,000) returned to 47abd8d3
+*** SHOWDOWN ***
+47abd8d3 collected 3,750 from pot
+*** SUMMARY ***
+Total pot 3,750 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: a17b62ba folded before Flop
+Seat 3: 29b19112 folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 (button) folded before Flop
+Seat 6: ff8ceaeb (small blind) folded before Flop
+Seat 7: 47abd8d3 (big blind) collected (3,750)
+Seat 8: 6d1518d5 folded before Flop
+
+
+Poker Hand #TM6182266758: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level17(1,000/2,000(250)) - 2026/07/15 00:21:56
+Table '35' 8-max Seat #4 is the button
+Seat 1: a17b62ba (19,639 in chips)
+Seat 2: cb32ace8 (15,715 in chips)
+Seat 3: 29b19112 (93,415 in chips)
+Seat 4: Hero (23,195 in chips)
+Seat 5: 80aa38a0 (70,967 in chips)
+Seat 6: ff8ceaeb (24,200 in chips)
+Seat 7: 47abd8d3 (53,695 in chips)
+Seat 8: 6d1518d5 (10,073 in chips)
+Hero: posts the ante 250
+29b19112: posts the ante 250
+a17b62ba: posts the ante 250
+80aa38a0: posts the ante 250
+6d1518d5: posts the ante 250
+ff8ceaeb: posts the ante 250
+cb32ace8: posts the ante 250
+47abd8d3: posts the ante 250
+80aa38a0: posts small blind 1,000
+ff8ceaeb: posts big blind 2,000
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to cb32ace8 
+Dealt to 29b19112 
+Dealt to Hero [7d Js]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+47abd8d3: folds
+6d1518d5: folds
+a17b62ba: raises 17,389 to 19,389 and is all-in
+cb32ace8: calls 15,465 and is all-in
+29b19112: folds
+Hero: folds
+80aa38a0: folds
+ff8ceaeb: folds
+Uncalled bet (3,924) returned to a17b62ba
+a17b62ba: shows [Jd Ts]
+cb32ace8: shows [7c Td]
+*** FLOP *** [4h Jh Jc]
+*** TURN *** [4h Jh Jc] [4d]
+*** RIVER *** [4h Jh Jc 4d] [2c]
+*** SHOWDOWN ***
+a17b62ba collected 35,930 from pot
+*** SUMMARY ***
+Total pot 35,930 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [4h Jh Jc 4d 2c]
+Seat 1: a17b62ba showed [Jd Ts] and won (35,930) with a full house, Jacks full of Fours
+Seat 2: cb32ace8 showed [7c Td] and lost with two pair, Jacks and Fours
+Seat 3: 29b19112 folded before Flop
+Seat 4: Hero (button) folded before Flop
+Seat 5: 80aa38a0 (small blind) folded before Flop
+Seat 6: ff8ceaeb (big blind) folded before Flop
+Seat 7: 47abd8d3 folded before Flop
+Seat 8: 6d1518d5 folded before Flop
+
+
+Poker Hand #TM6182266733: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level16(800/1,600(200)) - 2026/07/15 00:20:41
+Table '35' 8-max Seat #3 is the button
+Seat 1: a17b62ba (19,839 in chips)
+Seat 2: cb32ace8 (32,770 in chips)
+Seat 3: 29b19112 (93,615 in chips)
+Seat 4: Hero (24,195 in chips)
+Seat 5: 80aa38a0 (51,912 in chips)
+Seat 6: ff8ceaeb (24,400 in chips)
+Seat 7: 47abd8d3 (53,895 in chips)
+Seat 8: 6d1518d5 (10,273 in chips)
+Hero: posts the ante 200
+29b19112: posts the ante 200
+a17b62ba: posts the ante 200
+80aa38a0: posts the ante 200
+6d1518d5: posts the ante 200
+ff8ceaeb: posts the ante 200
+cb32ace8: posts the ante 200
+47abd8d3: posts the ante 200
+Hero: posts small blind 800
+80aa38a0: posts big blind 1,600
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to cb32ace8 
+Dealt to 29b19112 
+Dealt to Hero [Ks 4s]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+ff8ceaeb: folds
+47abd8d3: folds
+6d1518d5: folds
+a17b62ba: folds
+cb32ace8: raises 1,920 to 3,520
+29b19112: folds
+Hero: folds
+80aa38a0: calls 1,920
+*** FLOP *** [Qc Js Ts]
+80aa38a0: checks
+cb32ace8: bets 3,116
+80aa38a0: calls 3,116
+*** TURN *** [Qc Js Ts] [6h]
+80aa38a0: bets 3,040
+cb32ace8: raises 7,179 to 10,219
+80aa38a0: raises 34,857 to 45,076 and is all-in
+cb32ace8: folds
+Uncalled bet (34,857) returned to 80aa38a0
+*** SHOWDOWN ***
+80aa38a0 collected 36,110 from pot
+*** SUMMARY ***
+Total pot 36,110 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Qc Js Ts 6h]
+Seat 1: a17b62ba folded before Flop
+Seat 2: cb32ace8 folded on the Turn
+Seat 3: 29b19112 (button) folded before Flop
+Seat 4: Hero (small blind) folded before Flop
+Seat 5: 80aa38a0 (big blind) won (36,110)
+Seat 6: ff8ceaeb folded before Flop
+Seat 7: 47abd8d3 folded before Flop
+Seat 8: 6d1518d5 folded before Flop
+
+
+Poker Hand #TM6182266715: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level16(800/1,600(200)) - 2026/07/15 00:19:50
+Table '35' 8-max Seat #2 is the button
+Seat 1: a17b62ba (20,039 in chips)
+Seat 2: cb32ace8 (32,970 in chips)
+Seat 3: 29b19112 (94,615 in chips)
+Seat 4: Hero (18,795 in chips)
+Seat 5: 80aa38a0 (55,312 in chips)
+Seat 6: ff8ceaeb (24,600 in chips)
+Seat 7: 47abd8d3 (54,095 in chips)
+Seat 8: 6d1518d5 (10,473 in chips)
+Hero: posts the ante 200
+29b19112: posts the ante 200
+a17b62ba: posts the ante 200
+80aa38a0: posts the ante 200
+6d1518d5: posts the ante 200
+ff8ceaeb: posts the ante 200
+cb32ace8: posts the ante 200
+47abd8d3: posts the ante 200
+29b19112: posts small blind 800
+Hero: posts big blind 1,600
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to cb32ace8 
+Dealt to 29b19112 
+Dealt to Hero [6c 6d]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+80aa38a0: raises 1,600 to 3,200
+ff8ceaeb: folds
+47abd8d3: folds
+6d1518d5: folds
+a17b62ba: folds
+cb32ace8: folds
+29b19112: folds
+Hero: raises 15,395 to 18,595 and is all-in
+80aa38a0: folds
+Uncalled bet (15,395) returned to Hero
+*** SHOWDOWN ***
+Hero collected 8,800 from pot
+*** SUMMARY ***
+Total pot 8,800 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: a17b62ba folded before Flop
+Seat 2: cb32ace8 (button) folded before Flop
+Seat 3: 29b19112 (small blind) folded before Flop
+Seat 4: Hero (big blind) collected (8,800)
+Seat 5: 80aa38a0 folded before Flop
+Seat 6: ff8ceaeb folded before Flop
+Seat 7: 47abd8d3 folded before Flop
+Seat 8: 6d1518d5 folded before Flop
+
+
+Poker Hand #TM6182266687: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level16(800/1,600(200)) - 2026/07/15 00:18:36
+Table '35' 8-max Seat #1 is the button
+Seat 1: a17b62ba (29,739 in chips)
+Seat 2: cb32ace8 (33,970 in chips)
+Seat 3: 29b19112 (96,415 in chips)
+Seat 4: Hero (18,995 in chips)
+Seat 5: 80aa38a0 (55,512 in chips)
+Seat 6: ff8ceaeb (9,700 in chips)
+Seat 7: 47abd8d3 (55,895 in chips)
+Seat 8: 6d1518d5 (10,673 in chips)
+Hero: posts the ante 200
+29b19112: posts the ante 200
+a17b62ba: posts the ante 200
+80aa38a0: posts the ante 200
+6d1518d5: posts the ante 200
+ff8ceaeb: posts the ante 200
+cb32ace8: posts the ante 200
+47abd8d3: posts the ante 200
+cb32ace8: posts small blind 800
+29b19112: posts big blind 1,600
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to cb32ace8 
+Dealt to 29b19112 
+Dealt to Hero [2d 8s]
+Dealt to 80aa38a0 
+Dealt to ff8ceaeb 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+Hero: folds
+80aa38a0: folds
+ff8ceaeb: calls 1,600
+47abd8d3: calls 1,600
+6d1518d5: folds
+a17b62ba: raises 27,939 to 29,539 and is all-in
+cb32ace8: folds
+29b19112: folds
+ff8ceaeb: calls 7,900 and is all-in
+47abd8d3: folds
+Uncalled bet (20,039) returned to a17b62ba
+a17b62ba: shows [Td Ac]
+ff8ceaeb: shows [As Qh]
+*** FLOP *** [2s Ks 4c]
+*** TURN *** [2s Ks 4c] [7c]
+*** RIVER *** [2s Ks 4c 7c] [6d]
+29b19112: shows [4d 3d] (a pair of Fours)
+*** SHOWDOWN ***
+ff8ceaeb collected 24,600 from pot
+*** SUMMARY ***
+Total pot 24,600 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [2s Ks 4c 7c 6d]
+Seat 1: a17b62ba (button) showed [Td Ac] and lost with Ace high
+Seat 2: cb32ace8 (small blind) folded before Flop
+Seat 3: 29b19112 (big blind) folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 folded before Flop
+Seat 6: ff8ceaeb showed [As Qh] and won (24,600) with Ace high
+Seat 7: 47abd8d3 folded before Flop
+Seat 8: 6d1518d5 folded before Flop
+
+
+Poker Hand #TM6182266664: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level16(800/1,600(200)) - 2026/07/15 00:17:26
+Table '35' 8-max Seat #8 is the button
+Seat 1: a17b62ba (37,136 in chips)
+Seat 2: cb32ace8 (25,573 in chips)
+Seat 3: 29b19112 (96,615 in chips)
+Seat 4: Hero (19,195 in chips)
+Seat 5: 80aa38a0 (55,712 in chips)
+Seat 7: 47abd8d3 (56,095 in chips)
+Seat 8: 6d1518d5 (10,873 in chips)
+Hero: posts the ante 200
+29b19112: posts the ante 200
+80aa38a0: posts the ante 200
+a17b62ba: posts the ante 200
+6d1518d5: posts the ante 200
+cb32ace8: posts the ante 200
+47abd8d3: posts the ante 200
+a17b62ba: posts small blind 800
+cb32ace8: posts big blind 1,600
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to cb32ace8 
+Dealt to 29b19112 
+Dealt to Hero [3d 6c]
+Dealt to 80aa38a0 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+29b19112: folds
+Hero: folds
+80aa38a0: folds
+47abd8d3: folds
+6d1518d5: folds
+a17b62ba: raises 2,400 to 4,000
+cb32ace8: calls 2,400
+*** FLOP *** [5h Qs 2c]
+a17b62ba: bets 3,197
+cb32ace8: raises 18,176 to 21,373 and is all-in
+a17b62ba: folds
+Uncalled bet (18,176) returned to cb32ace8
+*** SHOWDOWN ***
+cb32ace8 collected 15,794 from pot
+*** SUMMARY ***
+Total pot 15,794 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [5h Qs 2c]
+Seat 1: a17b62ba (small blind) folded on the Flop
+Seat 2: cb32ace8 (big blind) won (15,794)
+Seat 3: 29b19112 folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 folded before Flop
+Seat 7: 47abd8d3 folded before Flop
+Seat 8: 6d1518d5 (button) folded before Flop
+
+
+Poker Hand #TM6182266642: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level16(800/1,600(200)) - 2026/07/15 00:16:29
+Table '35' 8-max Seat #7 is the button
+Seat 1: a17b62ba (38,936 in chips)
+Seat 2: cb32ace8 (25,773 in chips)
+Seat 3: 29b19112 (96,815 in chips)
+Seat 4: Hero (19,395 in chips)
+Seat 5: 80aa38a0 (55,912 in chips)
+Seat 6: ed70b18f (20,488 in chips)
+Seat 7: 47abd8d3 (32,007 in chips)
+Seat 8: 6d1518d5 (11,873 in chips)
+ed70b18f: posts the ante 200
+Hero: posts the ante 200
+29b19112: posts the ante 200
+80aa38a0: posts the ante 200
+a17b62ba: posts the ante 200
+6d1518d5: posts the ante 200
+cb32ace8: posts the ante 200
+47abd8d3: posts the ante 200
+6d1518d5: posts small blind 800
+a17b62ba: posts big blind 1,600
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to cb32ace8 
+Dealt to 29b19112 
+Dealt to Hero [8d 7c]
+Dealt to 80aa38a0 
+Dealt to ed70b18f 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+cb32ace8: folds
+29b19112: folds
+Hero: folds
+80aa38a0: folds
+ed70b18f: raises 18,688 to 20,288 and is all-in
+47abd8d3: raises 11,519 to 31,807 and is all-in
+6d1518d5: folds
+a17b62ba: folds
+Uncalled bet (11,519) returned to 47abd8d3
+47abd8d3: shows [Th Td]
+ed70b18f: shows [Qd Ks]
+*** FLOP *** [7h Ts Kd]
+*** TURN *** [7h Ts Kd] [Qh]
+*** RIVER *** [7h Ts Kd Qh] [As]
+29b19112: shows [Qs Ah] (two pair, Aces and Queens)
+*** SHOWDOWN ***
+47abd8d3 collected 44,576 from pot
+*** SUMMARY ***
+Total pot 44,576 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [7h Ts Kd Qh As]
+Seat 1: a17b62ba (big blind) folded before Flop
+Seat 2: cb32ace8 folded before Flop
+Seat 3: 29b19112 folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 folded before Flop
+Seat 6: ed70b18f showed [Qd Ks] and lost with two pair, Kings and Queens
+Seat 7: 47abd8d3 (button) showed [Th Td] and won (44,576) with three of a kind, Tens
+Seat 8: 6d1518d5 (small blind) folded before Flop
+
+
+Poker Hand #TM6182266610: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level16(800/1,600(200)) - 2026/07/15 00:15:09
+Table '35' 8-max Seat #6 is the button
+Seat 1: a17b62ba (39,136 in chips)
+Seat 2: cb32ace8 (25,973 in chips)
+Seat 3: 29b19112 (97,015 in chips)
+Seat 4: Hero (19,595 in chips)
+Seat 5: 80aa38a0 (26,156 in chips)
+Seat 6: ed70b18f (46,644 in chips)
+Seat 7: 47abd8d3 (33,007 in chips)
+Seat 8: 6d1518d5 (13,673 in chips)
+ed70b18f: posts the ante 200
+Hero: posts the ante 200
+29b19112: posts the ante 200
+80aa38a0: posts the ante 200
+a17b62ba: posts the ante 200
+6d1518d5: posts the ante 200
+cb32ace8: posts the ante 200
+47abd8d3: posts the ante 200
+47abd8d3: posts small blind 800
+6d1518d5: posts big blind 1,600
+*** HOLE CARDS ***
+Dealt to a17b62ba 
+Dealt to cb32ace8 
+Dealt to 29b19112 
+Dealt to Hero [5c 3d]
+Dealt to 80aa38a0 
+Dealt to ed70b18f 
+Dealt to 47abd8d3 
+Dealt to 6d1518d5 
+a17b62ba: folds
+cb32ace8: folds
+29b19112: folds
+Hero: folds
+80aa38a0: raises 1,600 to 3,200
+ed70b18f: raises 7,800 to 11,000
+47abd8d3: folds
+6d1518d5: folds
+80aa38a0: calls 7,800
+*** FLOP *** [9h 8s 4c]
+80aa38a0: bets 14,956 and is all-in
+ed70b18f: calls 14,956
+80aa38a0: shows [Th Kh] (King high)
+ed70b18f: shows [Ac Kd] (Ace high)
+*** TURN *** [9h 8s 4c] [7h]
+*** RIVER *** [9h 8s 4c 7h] [Ah]
+*** SHOWDOWN ***
+80aa38a0 collected 55,912 from pot
+*** SUMMARY ***
+Total pot 55,912 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [9h 8s 4c 7h Ah]
+Seat 1: a17b62ba folded before Flop
+Seat 2: cb32ace8 folded before Flop
+Seat 3: 29b19112 folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: 80aa38a0 showed [Th Kh] and won (55,912) with a flush Ace high
+Seat 6: ed70b18f (button) showed [Ac Kd] and lost with a pair of Aces
+Seat 7: 47abd8d3 (small blind) folded before Flop
+Seat 8: 6d1518d5 (big blind) folded before Flop
+
+
+Poker Hand #TM6181548925: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level16(800/1,600(200)) - 2026/07/15 00:13:34
+Table '15' 8-max Seat #6 is the button
+Seat 1: 131225b7 (34,453 in chips)
+Seat 2: 850d8fea (37,482 in chips)
+Seat 3: 2591c277 (2,963 in chips)
+Seat 4: 23a37112 (40,722 in chips)
+Seat 5: Hero (19,795 in chips)
+Seat 6: dbed9fec (32,249 in chips)
+Seat 7: 9dceacc1 (83,013 in chips)
+Seat 8: 59b9414e (44,467 in chips)
+Hero: posts the ante 200
+59b9414e: posts the ante 200
+850d8fea: posts the ante 200
+2591c277: posts the ante 200
+131225b7: posts the ante 200
+23a37112: posts the ante 200
+9dceacc1: posts the ante 200
+dbed9fec: posts the ante 200
+9dceacc1: posts small blind 800
+59b9414e: posts big blind 1,600
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [2c 2s]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+131225b7: calls 1,600
+850d8fea: folds
+2591c277: raises 1,163 to 2,763 and is all-in
+23a37112: folds
+Hero: folds
+dbed9fec: folds
+9dceacc1: calls 1,963
+59b9414e: raises 5,745 to 8,508
+131225b7: folds
+9dceacc1: calls 5,745
+*** FLOP *** [6d Tc 3c]
+9dceacc1: checks
+59b9414e: bets 6,400
+9dceacc1: folds
+Uncalled bet (6,400) returned to 59b9414e
+59b9414e: shows [9h Ad] (Ace high)
+2591c277: shows [9d Kh] (King high)
+*** TURN *** [6d Tc 3c] [6c]
+*** RIVER *** [6d Tc 3c 6c] [7d]
+131225b7: shows [3h] (two pair, Sixes and Threes)
+*** SHOWDOWN ***
+59b9414e collected 11,489 from pot
+59b9414e collected 11,490 from pot
+*** SUMMARY ***
+Total pot 22,979 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6d Tc 3c 6c 7d]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 2591c277 showed [9d Kh] and lost with a pair of Sixes
+Seat 4: 23a37112 folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec (button) folded before Flop
+Seat 7: 9dceacc1 (small blind) folded on the Flop
+Seat 8: 59b9414e (big blind) showed [9h Ad] and won (22,979) with a pair of Sixes
+
+
+Poker Hand #TM6181548907: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level15(600/1,200(150)) - 2026/07/15 00:12:33
+Table '15' 8-max Seat #5 is the button
+Seat 1: 131225b7 (34,603 in chips)
+Seat 2: 850d8fea (17,391 in chips)
+Seat 3: 2591c277 (20,354 in chips)
+Seat 4: 23a37112 (40,872 in chips)
+Seat 5: Hero (19,945 in chips)
+Seat 6: dbed9fec (32,999 in chips)
+Seat 7: 9dceacc1 (84,363 in chips)
+Seat 8: 59b9414e (44,617 in chips)
+Hero: posts the ante 150
+59b9414e: posts the ante 150
+850d8fea: posts the ante 150
+2591c277: posts the ante 150
+131225b7: posts the ante 150
+23a37112: posts the ante 150
+9dceacc1: posts the ante 150
+dbed9fec: posts the ante 150
+dbed9fec: posts small blind 600
+9dceacc1: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [Qd Ts]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+59b9414e: folds
+131225b7: folds
+850d8fea: raises 16,041 to 17,241 and is all-in
+2591c277: raises 2,963 to 20,204 and is all-in
+23a37112: folds
+Hero: folds
+dbed9fec: folds
+9dceacc1: folds
+Uncalled bet (2,963) returned to 2591c277
+2591c277: shows [Ah Jh]
+850d8fea: shows [Ac Qc]
+*** FLOP *** [6d 2s 3s]
+*** TURN *** [6d 2s 3s] [9h]
+*** RIVER *** [6d 2s 3s 9h] [8h]
+131225b7: shows [5h 4s] (a straight, Six to Two)
+*** SHOWDOWN ***
+850d8fea collected 37,482 from pot
+*** SUMMARY ***
+Total pot 37,482 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6d 2s 3s 9h 8h]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea showed [Ac Qc] and won (37,482) with Ace high
+Seat 3: 2591c277 showed [Ah Jh] and lost with Ace high
+Seat 4: 23a37112 folded before Flop
+Seat 5: Hero (button) folded before Flop
+Seat 6: dbed9fec (small blind) folded before Flop
+Seat 7: 9dceacc1 (big blind) folded before Flop
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548895: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level15(600/1,200(150)) - 2026/07/15 00:12:07
+Table '15' 8-max Seat #4 is the button
+Seat 1: 131225b7 (34,753 in chips)
+Seat 2: 850d8fea (14,541 in chips)
+Seat 3: 2591c277 (20,504 in chips)
+Seat 4: 23a37112 (41,022 in chips)
+Seat 5: Hero (20,695 in chips)
+Seat 6: dbed9fec (34,349 in chips)
+Seat 7: 9dceacc1 (84,513 in chips)
+Seat 8: 59b9414e (44,767 in chips)
+59b9414e: posts the ante 150
+Hero: posts the ante 150
+850d8fea: posts the ante 150
+2591c277: posts the ante 150
+131225b7: posts the ante 150
+23a37112: posts the ante 150
+9dceacc1: posts the ante 150
+dbed9fec: posts the ante 150
+Hero: posts small blind 600
+dbed9fec: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [5s 8c]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+9dceacc1: folds
+59b9414e: folds
+131225b7: folds
+850d8fea: raises 13,191 to 14,391 and is all-in
+2591c277: folds
+23a37112: folds
+Hero: folds
+dbed9fec: folds
+Uncalled bet (13,191) returned to 850d8fea
+*** SHOWDOWN ***
+850d8fea collected 4,200 from pot
+*** SUMMARY ***
+Total pot 4,200 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea collected (4,200)
+Seat 3: 2591c277 folded before Flop
+Seat 4: 23a37112 (button) folded before Flop
+Seat 5: Hero (small blind) folded before Flop
+Seat 6: dbed9fec (big blind) folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548866: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level15(600/1,200(150)) - 2026/07/15 00:10:56
+Table '15' 8-max Seat #3 is the button
+Seat 1: 131225b7 (34,903 in chips)
+Seat 2: 850d8fea (14,691 in chips)
+Seat 3: 2591c277 (20,654 in chips)
+Seat 4: 23a37112 (41,772 in chips)
+Seat 5: Hero (27,745 in chips)
+Seat 6: dbed9fec (34,499 in chips)
+Seat 7: 9dceacc1 (84,663 in chips)
+Seat 8: 59b9414e (36,217 in chips)
+59b9414e: posts the ante 150
+Hero: posts the ante 150
+850d8fea: posts the ante 150
+2591c277: posts the ante 150
+131225b7: posts the ante 150
+23a37112: posts the ante 150
+9dceacc1: posts the ante 150
+dbed9fec: posts the ante 150
+23a37112: posts small blind 600
+Hero: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [8c 8h]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+dbed9fec: folds
+9dceacc1: folds
+59b9414e: raises 1,800 to 3,000
+131225b7: folds
+850d8fea: folds
+2591c277: folds
+23a37112: folds
+Hero: calls 1,800
+*** FLOP *** [2s Th 6s]
+Hero: checks
+59b9414e: bets 3,900
+Hero: calls 3,900
+*** TURN *** [2s Th 6s] [Jh]
+Hero: checks
+59b9414e: bets 7,800
+Hero: folds
+Uncalled bet (7,800) returned to 59b9414e
+*** SHOWDOWN ***
+59b9414e collected 15,600 from pot
+*** SUMMARY ***
+Total pot 15,600 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [2s Th 6s Jh]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 2591c277 (button) folded before Flop
+Seat 4: 23a37112 (small blind) folded before Flop
+Seat 5: Hero (big blind) folded on the Turn
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 59b9414e won (15,600)
+
+
+Poker Hand #TM6181548833: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level15(600/1,200(150)) - 2026/07/15 00:09:36
+Table '15' 8-max Seat #2 is the button
+Seat 1: 131225b7 (35,053 in chips)
+Seat 2: 850d8fea (24,993 in chips)
+Seat 3: 2591c277 (23,204 in chips)
+Seat 4: 23a37112 (28,170 in chips)
+Seat 5: Hero (27,895 in chips)
+Seat 6: dbed9fec (34,649 in chips)
+Seat 7: 9dceacc1 (84,813 in chips)
+Seat 8: 59b9414e (36,367 in chips)
+59b9414e: posts the ante 150
+Hero: posts the ante 150
+850d8fea: posts the ante 150
+2591c277: posts the ante 150
+131225b7: posts the ante 150
+23a37112: posts the ante 150
+9dceacc1: posts the ante 150
+dbed9fec: posts the ante 150
+2591c277: posts small blind 600
+23a37112: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [Td 6d]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+Hero: folds
+dbed9fec: folds
+9dceacc1: folds
+59b9414e: folds
+131225b7: folds
+850d8fea: raises 1,200 to 2,400
+2591c277: calls 1,800
+23a37112: calls 1,200
+*** FLOP *** [8h Th Tc]
+2591c277: checks
+23a37112: checks
+850d8fea: bets 3,000
+2591c277: folds
+23a37112: raises 4,752 to 7,752
+850d8fea: calls 4,752
+*** TURN *** [8h Th Tc] [9d]
+23a37112: bets 17,868 and is all-in
+850d8fea: folds
+Uncalled bet (17,868) returned to 23a37112
+*** SHOWDOWN ***
+23a37112 collected 23,904 from pot
+*** SUMMARY ***
+Total pot 23,904 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [8h Th Tc 9d]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea (button) folded on the Turn
+Seat 3: 2591c277 (small blind) folded on the Flop
+Seat 4: 23a37112 (big blind) won (23,904)
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548820: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level15(600/1,200(150)) - 2026/07/15 00:08:52
+Table '15' 8-max Seat #1 is the button
+Seat 1: 131225b7 (37,603 in chips)
+Seat 2: 850d8fea (25,743 in chips)
+Seat 3: 2591c277 (19,154 in chips)
+Seat 4: 23a37112 (28,320 in chips)
+Seat 5: Hero (28,045 in chips)
+Seat 6: dbed9fec (34,799 in chips)
+Seat 7: 9dceacc1 (84,963 in chips)
+Seat 8: 59b9414e (36,517 in chips)
+59b9414e: posts the ante 150
+Hero: posts the ante 150
+850d8fea: posts the ante 150
+2591c277: posts the ante 150
+131225b7: posts the ante 150
+23a37112: posts the ante 150
+9dceacc1: posts the ante 150
+dbed9fec: posts the ante 150
+850d8fea: posts small blind 600
+2591c277: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [7h 6d]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+23a37112: folds
+Hero: folds
+dbed9fec: folds
+9dceacc1: folds
+59b9414e: folds
+131225b7: calls 1,200
+850d8fea: folds
+2591c277: raises 1,200 to 2,400
+131225b7: calls 1,200
+*** FLOP *** [Qh 5d 3s]
+2591c277: bets 3,300
+131225b7: folds
+Uncalled bet (3,300) returned to 2591c277
+*** SHOWDOWN ***
+2591c277 collected 6,600 from pot
+*** SUMMARY ***
+Total pot 6,600 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Qh 5d 3s]
+Seat 1: 131225b7 (button) folded on the Flop
+Seat 2: 850d8fea (small blind) folded before Flop
+Seat 3: 2591c277 (big blind) won (6,600)
+Seat 4: 23a37112 folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548801: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level15(600/1,200(150)) - 2026/07/15 00:08:00
+Table '15' 8-max Seat #8 is the button
+Seat 1: 131225b7 (38,353 in chips)
+Seat 2: 850d8fea (27,093 in chips)
+Seat 3: 2591c277 (19,304 in chips)
+Seat 4: 23a37112 (28,470 in chips)
+Seat 5: Hero (28,195 in chips)
+Seat 6: dbed9fec (37,349 in chips)
+Seat 7: 9dceacc1 (85,113 in chips)
+Seat 8: 59b9414e (31,267 in chips)
+59b9414e: posts the ante 150
+Hero: posts the ante 150
+850d8fea: posts the ante 150
+2591c277: posts the ante 150
+131225b7: posts the ante 150
+23a37112: posts the ante 150
+9dceacc1: posts the ante 150
+dbed9fec: posts the ante 150
+131225b7: posts small blind 600
+850d8fea: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [7h Js]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+2591c277: folds
+23a37112: folds
+Hero: folds
+dbed9fec: raises 1,200 to 2,400
+9dceacc1: folds
+59b9414e: raises 4,200 to 6,600
+131225b7: folds
+850d8fea: folds
+dbed9fec: folds
+Uncalled bet (4,200) returned to 59b9414e
+*** SHOWDOWN ***
+59b9414e collected 7,800 from pot
+*** SUMMARY ***
+Total pot 7,800 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 131225b7 (small blind) folded before Flop
+Seat 2: 850d8fea (big blind) folded before Flop
+Seat 3: 2591c277 folded before Flop
+Seat 4: 23a37112 folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 59b9414e (button) collected (7,800)
+
+
+Poker Hand #TM6181548795: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level15(600/1,200(150)) - 2026/07/15 00:07:31
+Table '15' 8-max Seat #7 is the button
+Seat 1: 131225b7 (39,703 in chips)
+Seat 2: 850d8fea (27,243 in chips)
+Seat 3: 2591c277 (19,454 in chips)
+Seat 4: 23a37112 (28,620 in chips)
+Seat 5: Hero (25,345 in chips)
+Seat 6: dbed9fec (37,499 in chips)
+Seat 7: 9dceacc1 (85,263 in chips)
+Seat 8: 59b9414e (32,017 in chips)
+Hero: posts the ante 150
+59b9414e: posts the ante 150
+850d8fea: posts the ante 150
+2591c277: posts the ante 150
+131225b7: posts the ante 150
+23a37112: posts the ante 150
+9dceacc1: posts the ante 150
+dbed9fec: posts the ante 150
+59b9414e: posts small blind 600
+131225b7: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [Ac Ts]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+850d8fea: folds
+2591c277: folds
+23a37112: folds
+Hero: raises 1,200 to 2,400
+dbed9fec: folds
+9dceacc1: folds
+59b9414e: folds
+131225b7: folds
+Uncalled bet (1,200) returned to Hero
+*** SHOWDOWN ***
+Hero collected 4,200 from pot
+*** SUMMARY ***
+Total pot 4,200 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 131225b7 (big blind) folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 2591c277 folded before Flop
+Seat 4: 23a37112 folded before Flop
+Seat 5: Hero collected (4,200)
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 (button) folded before Flop
+Seat 8: 59b9414e (small blind) folded before Flop
+
+
+Poker Hand #TM6181548777: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level15(600/1,200(150)) - 2026/07/15 00:06:39
+Table '15' 8-max Seat #6 is the button
+Seat 1: 131225b7 (41,053 in chips)
+Seat 2: 850d8fea (27,393 in chips)
+Seat 3: 2591c277 (19,604 in chips)
+Seat 4: 23a37112 (28,770 in chips)
+Seat 5: Hero (25,495 in chips)
+Seat 6: dbed9fec (33,449 in chips)
+Seat 7: 9dceacc1 (86,013 in chips)
+Seat 8: 59b9414e (33,367 in chips)
+Hero: posts the ante 150
+59b9414e: posts the ante 150
+850d8fea: posts the ante 150
+2591c277: posts the ante 150
+131225b7: posts the ante 150
+23a37112: posts the ante 150
+9dceacc1: posts the ante 150
+dbed9fec: posts the ante 150
+9dceacc1: posts small blind 600
+59b9414e: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [4d Th]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+131225b7: calls 1,200
+850d8fea: folds
+2591c277: folds
+23a37112: folds
+Hero: folds
+dbed9fec: raises 3,600 to 4,800
+9dceacc1: folds
+59b9414e: folds
+131225b7: folds
+Uncalled bet (3,600) returned to dbed9fec
+*** SHOWDOWN ***
+dbed9fec collected 5,400 from pot
+*** SUMMARY ***
+Total pot 5,400 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 2591c277 folded before Flop
+Seat 4: 23a37112 folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec (button) collected (5,400)
+Seat 7: 9dceacc1 (small blind) folded before Flop
+Seat 8: 59b9414e (big blind) folded before Flop
+
+
+Poker Hand #TM6181548757: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level15(600/1,200(150)) - 2026/07/15 00:05:57
+Table '15' 8-max Seat #5 is the button
+Seat 1: 131225b7 (34,603 in chips)
+Seat 2: 850d8fea (27,543 in chips)
+Seat 3: 2591c277 (22,154 in chips)
+Seat 4: 23a37112 (28,920 in chips)
+Seat 5: Hero (25,645 in chips)
+Seat 6: dbed9fec (34,199 in chips)
+Seat 7: 9dceacc1 (88,563 in chips)
+Seat 8: 59b9414e (33,517 in chips)
+Hero: posts the ante 150
+59b9414e: posts the ante 150
+850d8fea: posts the ante 150
+2591c277: posts the ante 150
+131225b7: posts the ante 150
+23a37112: posts the ante 150
+9dceacc1: posts the ante 150
+dbed9fec: posts the ante 150
+dbed9fec: posts small blind 600
+9dceacc1: posts big blind 1,200
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [4d Ad]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+59b9414e: folds
+131225b7: raises 1,200 to 2,400
+850d8fea: folds
+2591c277: calls 2,400
+23a37112: folds
+Hero: folds
+dbed9fec: folds
+9dceacc1: calls 1,200
+*** FLOP *** [4c 6s Kh]
+9dceacc1: checks
+131225b7: bets 4,500
+2591c277: folds
+9dceacc1: folds
+Uncalled bet (4,500) returned to 131225b7
+*** SHOWDOWN ***
+131225b7 collected 9,000 from pot
+*** SUMMARY ***
+Total pot 9,000 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [4c 6s Kh]
+Seat 1: 131225b7 won (9,000)
+Seat 2: 850d8fea folded before Flop
+Seat 3: 2591c277 folded on the Flop
+Seat 4: 23a37112 folded before Flop
+Seat 5: Hero (button) folded before Flop
+Seat 6: dbed9fec (small blind) folded before Flop
+Seat 7: 9dceacc1 (big blind) folded on the Flop
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548747: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level14(500/1,000(125)) - 2026/07/15 00:05:08
+Table '15' 8-max Seat #4 is the button
+Seat 1: 131225b7 (34,728 in chips)
+Seat 2: 850d8fea (27,668 in chips)
+Seat 3: 2591c277 (22,279 in chips)
+Seat 4: 23a37112 (29,045 in chips)
+Seat 5: Hero (26,270 in chips)
+Seat 6: dbed9fec (32,824 in chips)
+Seat 7: 9dceacc1 (88,688 in chips)
+Seat 8: 59b9414e (33,642 in chips)
+59b9414e: posts the ante 125
+Hero: posts the ante 125
+850d8fea: posts the ante 125
+2591c277: posts the ante 125
+131225b7: posts the ante 125
+23a37112: posts the ante 125
+9dceacc1: posts the ante 125
+dbed9fec: posts the ante 125
+Hero: posts small blind 500
+dbed9fec: posts big blind 1,000
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [7d 3h]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+9dceacc1: folds
+59b9414e: folds
+131225b7: folds
+850d8fea: folds
+2591c277: folds
+23a37112: folds
+Hero: folds
+Uncalled bet (500) returned to dbed9fec
+*** SHOWDOWN ***
+dbed9fec collected 2,000 from pot
+*** SUMMARY ***
+Total pot 2,000 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 2591c277 folded before Flop
+Seat 4: 23a37112 (button) folded before Flop
+Seat 5: Hero (small blind) folded before Flop
+Seat 6: dbed9fec (big blind) collected (2,000)
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548717: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level14(500/1,000(125)) - 2026/07/15 00:03:41
+Table '15' 8-max Seat #3 is the button
+Seat 1: 131225b7 (16,239 in chips)
+Seat 2: 850d8fea (27,793 in chips)
+Seat 3: 2591c277 (38,518 in chips)
+Seat 4: 23a37112 (29,670 in chips)
+Seat 5: Hero (27,395 in chips)
+Seat 6: dbed9fec (32,949 in chips)
+Seat 7: 9dceacc1 (88,813 in chips)
+Seat 8: 59b9414e (33,767 in chips)
+59b9414e: posts the ante 125
+Hero: posts the ante 125
+850d8fea: posts the ante 125
+2591c277: posts the ante 125
+131225b7: posts the ante 125
+23a37112: posts the ante 125
+9dceacc1: posts the ante 125
+dbed9fec: posts the ante 125
+23a37112: posts small blind 500
+Hero: posts big blind 1,000
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [2s 8c]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+dbed9fec: folds
+9dceacc1: folds
+59b9414e: folds
+131225b7: calls 1,000
+850d8fea: folds
+2591c277: calls 1,000
+23a37112: folds
+Hero: checks
+*** FLOP *** [Qc 9h 3h]
+Hero: checks
+131225b7: bets 2,250
+2591c277: calls 2,250
+Hero: folds
+*** TURN *** [Qc 9h 3h] [9d]
+131225b7: checks
+2591c277: bets 4,500
+131225b7: raises 8,364 to 12,864 and is all-in
+2591c277: calls 8,364
+131225b7: shows [Js 9s] (three of a kind, Nines)
+2591c277: shows [Jh 4h] (a pair of Nines)
+*** RIVER *** [Qc 9h 3h 9d] [Qd]
+*** SHOWDOWN ***
+131225b7 collected 34,728 from pot
+*** SUMMARY ***
+Total pot 34,728 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Qc 9h 3h 9d Qd]
+Seat 1: 131225b7 showed [Js 9s] and won (34,728) with a full house, Nines full of Queens
+Seat 2: 850d8fea folded before Flop
+Seat 3: 2591c277 (button) showed [Jh 4h] and lost with two pair, Queens and Nines
+Seat 4: 23a37112 (small blind) folded before Flop
+Seat 5: Hero (big blind) folded on the Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548677: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level14(500/1,000(125)) - 2026/07/15 00:01:42
+Table '15' 8-max Seat #2 is the button
+Seat 1: 131225b7 (16,364 in chips)
+Seat 2: 850d8fea (27,918 in chips)
+Seat 3: 2591c277 (46,476 in chips)
+Seat 4: 23a37112 (30,795 in chips)
+Seat 5: Hero (27,520 in chips)
+Seat 6: dbed9fec (33,074 in chips)
+Seat 7: 9dceacc1 (79,105 in chips)
+Seat 8: 59b9414e (33,892 in chips)
+59b9414e: posts the ante 125
+Hero: posts the ante 125
+850d8fea: posts the ante 125
+2591c277: posts the ante 125
+131225b7: posts the ante 125
+23a37112: posts the ante 125
+9dceacc1: posts the ante 125
+dbed9fec: posts the ante 125
+2591c277: posts small blind 500
+23a37112: posts big blind 1,000
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [6d 4h]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+Hero: folds
+dbed9fec: folds
+9dceacc1: raises 1,000 to 2,000
+59b9414e: folds
+131225b7: folds
+850d8fea: folds
+2591c277: calls 1,500
+23a37112: folds
+*** FLOP *** [5h 4c 5s]
+2591c277: checks
+9dceacc1: bets 1,700
+2591c277: calls 1,700
+*** TURN *** [5h 4c 5s] [Jd]
+2591c277: checks
+9dceacc1: bets 4,133
+2591c277: calls 4,133
+*** RIVER *** [5h 4c 5s Jd] [Qc]
+2591c277: checks
+9dceacc1: checks
+2591c277: shows [6c 6h] (two pair, Sixes and Fives)
+9dceacc1: shows [Ad Ah] (two pair, Aces and Fives)
+*** SHOWDOWN ***
+9dceacc1 collected 17,666 from pot
+*** SUMMARY ***
+Total pot 17,666 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [5h 4c 5s Jd Qc]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea (button) folded before Flop
+Seat 3: 2591c277 (small blind) showed [6c 6h] and lost with two pair, Sixes and Fives
+Seat 4: 23a37112 (big blind) folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 showed [Ad Ah] and won (17,666) with two pair, Aces and Fives
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548655: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level14(500/1,000(125)) - 2026/07/14 23:54:46
+Table '15' 8-max Seat #1 is the button
+Seat 1: 131225b7 (18,489 in chips)
+Seat 2: 850d8fea (28,543 in chips)
+Seat 3: 2591c277 (48,601 in chips)
+Seat 4: 23a37112 (25,420 in chips)
+Seat 5: Hero (27,645 in chips)
+Seat 6: dbed9fec (33,199 in chips)
+Seat 7: 9dceacc1 (79,230 in chips)
+Seat 8: 59b9414e (34,017 in chips)
+59b9414e: posts the ante 125
+Hero: posts the ante 125
+850d8fea: posts the ante 125
+2591c277: posts the ante 125
+131225b7: posts the ante 125
+23a37112: posts the ante 125
+9dceacc1: posts the ante 125
+dbed9fec: posts the ante 125
+850d8fea: posts small blind 500
+2591c277: posts big blind 1,000
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [9c 2h]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+23a37112: raises 1,000 to 2,000
+Hero: folds
+dbed9fec: folds
+9dceacc1: folds
+59b9414e: folds
+131225b7: calls 2,000
+850d8fea: folds
+2591c277: calls 1,000
+*** FLOP *** [5s Jh Js]
+2591c277: checks
+23a37112: checks
+131225b7: checks
+*** TURN *** [5s Jh Js] [5d]
+2591c277: checks
+23a37112: bets 2,475
+131225b7: folds
+2591c277: folds
+Uncalled bet (2,475) returned to 23a37112
+*** SHOWDOWN ***
+23a37112 collected 7,500 from pot
+*** SUMMARY ***
+Total pot 7,500 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [5s Jh Js 5d]
+Seat 1: 131225b7 (button) folded on the Turn
+Seat 2: 850d8fea (small blind) folded before Flop
+Seat 3: 2591c277 (big blind) folded on the Turn
+Seat 4: 23a37112 won (7,500)
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548639: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level14(500/1,000(125)) - 2026/07/14 23:53:53
+Table '15' 8-max Seat #8 is the button
+Seat 1: 131225b7 (16,614 in chips)
+Seat 2: 850d8fea (29,668 in chips)
+Seat 3: 2591c277 (48,726 in chips)
+Seat 4: 23a37112 (25,545 in chips)
+Seat 5: Hero (27,770 in chips)
+Seat 6: dbed9fec (33,324 in chips)
+Seat 7: 9dceacc1 (79,355 in chips)
+Seat 8: 59b9414e (34,142 in chips)
+59b9414e: posts the ante 125
+Hero: posts the ante 125
+850d8fea: posts the ante 125
+2591c277: posts the ante 125
+131225b7: posts the ante 125
+23a37112: posts the ante 125
+9dceacc1: posts the ante 125
+dbed9fec: posts the ante 125
+131225b7: posts small blind 500
+850d8fea: posts big blind 1,000
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [9d 5s]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+2591c277: folds
+23a37112: folds
+Hero: folds
+dbed9fec: folds
+9dceacc1: folds
+59b9414e: folds
+131225b7: calls 500
+850d8fea: checks
+*** FLOP *** [Tc 3s 7c]
+131225b7: checks
+850d8fea: checks
+*** TURN *** [Tc 3s 7c] [Kh]
+131225b7: bets 1,500
+850d8fea: folds
+Uncalled bet (1,500) returned to 131225b7
+*** SHOWDOWN ***
+131225b7 collected 3,000 from pot
+*** SUMMARY ***
+Total pot 3,000 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Tc 3s 7c Kh]
+Seat 1: 131225b7 (small blind) won (3,000)
+Seat 2: 850d8fea (big blind) folded on the Turn
+Seat 3: 2591c277 folded before Flop
+Seat 4: 23a37112 folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 59b9414e (button) folded before Flop
+
+
+Poker Hand #TM6181548624: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level14(500/1,000(125)) - 2026/07/14 23:53:03
+Table '15' 8-max Seat #7 is the button
+Seat 1: 131225b7 (21,489 in chips)
+Seat 2: 850d8fea (29,793 in chips)
+Seat 3: 2591c277 (48,851 in chips)
+Seat 4: 23a37112 (25,670 in chips)
+Seat 5: Hero (27,895 in chips)
+Seat 6: dbed9fec (33,449 in chips)
+Seat 7: 9dceacc1 (73,230 in chips)
+Seat 8: 59b9414e (34,767 in chips)
+59b9414e: posts the ante 125
+Hero: posts the ante 125
+850d8fea: posts the ante 125
+2591c277: posts the ante 125
+131225b7: posts the ante 125
+23a37112: posts the ante 125
+9dceacc1: posts the ante 125
+dbed9fec: posts the ante 125
+59b9414e: posts small blind 500
+131225b7: posts big blind 1,000
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [3d 4s]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+850d8fea: folds
+2591c277: folds
+23a37112: folds
+Hero: folds
+dbed9fec: folds
+9dceacc1: raises 1,000 to 2,000
+59b9414e: folds
+131225b7: calls 1,000
+*** FLOP *** [Ks 7c Kh]
+131225b7: checks
+9dceacc1: checks
+*** TURN *** [Ks 7c Kh] [Ts]
+131225b7: bets 2,750
+9dceacc1: calls 2,750
+*** RIVER *** [Ks 7c Kh Ts] [6c]
+131225b7: checks
+9dceacc1: checks
+131225b7: shows [5s Ac] (a pair of Kings)
+9dceacc1: shows [8c Tc] (two pair, Kings and Tens)
+*** SHOWDOWN ***
+9dceacc1 collected 11,000 from pot
+*** SUMMARY ***
+Total pot 11,000 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Ks 7c Kh Ts 6c]
+Seat 1: 131225b7 (big blind) showed [5s Ac] and lost with a pair of Kings
+Seat 2: 850d8fea folded before Flop
+Seat 3: 2591c277 folded before Flop
+Seat 4: 23a37112 folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 (button) showed [8c Tc] and won (11,000) with two pair, Kings and Tens
+Seat 8: 59b9414e (small blind) folded before Flop
+
+
+Poker Hand #TM6181548616: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level14(500/1,000(125)) - 2026/07/14 23:52:43
+Table '15' 8-max Seat #6 is the button
+Seat 1: 131225b7 (21,614 in chips)
+Seat 2: 850d8fea (29,918 in chips)
+Seat 3: 2591c277 (48,976 in chips)
+Seat 4: 23a37112 (25,795 in chips)
+Seat 5: Hero (25,520 in chips)
+Seat 6: dbed9fec (33,574 in chips)
+Seat 7: 9dceacc1 (73,855 in chips)
+Seat 8: 59b9414e (35,892 in chips)
+Hero: posts the ante 125
+59b9414e: posts the ante 125
+850d8fea: posts the ante 125
+2591c277: posts the ante 125
+131225b7: posts the ante 125
+23a37112: posts the ante 125
+9dceacc1: posts the ante 125
+dbed9fec: posts the ante 125
+9dceacc1: posts small blind 500
+59b9414e: posts big blind 1,000
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [9d 8s]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+131225b7: folds
+850d8fea: folds
+2591c277: folds
+23a37112: folds
+Hero: raises 1,000 to 2,000
+dbed9fec: folds
+9dceacc1: folds
+59b9414e: folds
+Uncalled bet (1,000) returned to Hero
+*** SHOWDOWN ***
+Hero collected 3,500 from pot
+*** SUMMARY ***
+Total pot 3,500 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 2591c277 folded before Flop
+Seat 4: 23a37112 folded before Flop
+Seat 5: Hero collected (3,500)
+Seat 6: dbed9fec (button) folded before Flop
+Seat 7: 9dceacc1 (small blind) folded before Flop
+Seat 8: 59b9414e (big blind) folded before Flop
+
+
+Poker Hand #TM6181548579: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level14(500/1,000(125)) - 2026/07/14 23:50:53
+Table '15' 8-max Seat #5 is the button
+Seat 1: 131225b7 (21,739 in chips)
+Seat 2: 850d8fea (34,518 in chips)
+Seat 3: 2591c277 (58,502 in chips)
+Seat 4: 23a37112 (25,920 in chips)
+Seat 5: Hero (25,645 in chips)
+Seat 6: dbed9fec (34,199 in chips)
+Seat 7: 9dceacc1 (58,604 in chips)
+Seat 8: 59b9414e (36,017 in chips)
+Hero: posts the ante 125
+59b9414e: posts the ante 125
+850d8fea: posts the ante 125
+2591c277: posts the ante 125
+131225b7: posts the ante 125
+23a37112: posts the ante 125
+9dceacc1: posts the ante 125
+dbed9fec: posts the ante 125
+dbed9fec: posts small blind 500
+9dceacc1: posts big blind 1,000
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [Js 9c]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+59b9414e: folds
+131225b7: folds
+850d8fea: raises 1,000 to 2,000
+2591c277: calls 2,000
+23a37112: folds
+Hero: folds
+dbed9fec: folds
+9dceacc1: calls 1,000
+*** FLOP *** [6h Th 7s]
+9dceacc1: checks
+850d8fea: checks
+2591c277: bets 2,475
+9dceacc1: calls 2,475
+850d8fea: calls 2,475
+*** TURN *** [6h Th 7s] [Ks]
+9dceacc1: checks
+850d8fea: checks
+2591c277: bets 4,926
+9dceacc1: raises 10,668 to 15,594
+850d8fea: folds
+2591c277: folds
+Uncalled bet (10,668) returned to 9dceacc1
+*** SHOWDOWN ***
+9dceacc1 collected 24,777 from pot
+*** SUMMARY ***
+Total pot 24,777 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6h Th 7s Ks]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded on the Turn
+Seat 3: 2591c277 folded on the Turn
+Seat 4: 23a37112 folded before Flop
+Seat 5: Hero (button) folded before Flop
+Seat 6: dbed9fec (small blind) folded before Flop
+Seat 7: 9dceacc1 (big blind) won (24,777)
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548543: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level13(400/800(100)) - 2026/07/14 23:49:09
+Table '15' 8-max Seat #4 is the button
+Seat 1: 131225b7 (21,839 in chips)
+Seat 2: 850d8fea (34,618 in chips)
+Seat 3: 2591c277 (58,602 in chips)
+Seat 4: 23a37112 (26,020 in chips)
+Seat 5: Hero (26,145 in chips)
+Seat 6: dbed9fec (35,899 in chips)
+Seat 7: 9dceacc1 (58,704 in chips)
+Seat 8: 59b9414e (33,317 in chips)
+59b9414e: posts the ante 100
+Hero: posts the ante 100
+850d8fea: posts the ante 100
+2591c277: posts the ante 100
+131225b7: posts the ante 100
+23a37112: posts the ante 100
+9dceacc1: posts the ante 100
+dbed9fec: posts the ante 100
+Hero: posts small blind 400
+dbed9fec: posts big blind 800
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [8s 7d]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+9dceacc1: folds
+59b9414e: raises 800 to 1,600
+131225b7: folds
+850d8fea: folds
+2591c277: folds
+23a37112: folds
+Hero: folds
+dbed9fec: calls 800
+*** FLOP *** [6c 4h Js]
+dbed9fec: checks
+59b9414e: checks
+*** TURN *** [6c 4h Js] [4s]
+dbed9fec: checks
+59b9414e: checks
+*** RIVER *** [6c 4h Js 4s] [As]
+dbed9fec: checks
+59b9414e: checks
+dbed9fec: shows [Tc Th] (two pair, Tens and Fours)
+59b9414e: shows [Ts Ah] (two pair, Aces and Fours)
+*** SHOWDOWN ***
+59b9414e collected 4,400 from pot
+*** SUMMARY ***
+Total pot 4,400 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6c 4h Js 4s As]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 2591c277 folded before Flop
+Seat 4: 23a37112 (button) folded before Flop
+Seat 5: Hero (small blind) folded before Flop
+Seat 6: dbed9fec (big blind) showed [Tc Th] and lost with two pair, Tens and Fours
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 59b9414e showed [Ts Ah] and won (4,400) with two pair, Aces and Fours
+
+
+Poker Hand #TM6181548509: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level13(400/800(100)) - 2026/07/14 23:47:46
+Table '15' 8-max Seat #3 is the button
+Seat 1: 131225b7 (21,939 in chips)
+Seat 2: 850d8fea (41,354 in chips)
+Seat 3: 2591c277 (50,066 in chips)
+Seat 4: 23a37112 (26,520 in chips)
+Seat 5: Hero (27,045 in chips)
+Seat 6: dbed9fec (35,999 in chips)
+Seat 7: 9dceacc1 (58,804 in chips)
+Seat 8: 59b9414e (33,417 in chips)
+59b9414e: posts the ante 100
+Hero: posts the ante 100
+850d8fea: posts the ante 100
+2591c277: posts the ante 100
+131225b7: posts the ante 100
+23a37112: posts the ante 100
+9dceacc1: posts the ante 100
+dbed9fec: posts the ante 100
+23a37112: posts small blind 400
+Hero: posts big blind 800
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [5h Tc]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+dbed9fec: folds
+9dceacc1: folds
+59b9414e: folds
+131225b7: folds
+850d8fea: raises 800 to 1,600
+2591c277: calls 1,600
+23a37112: folds
+Hero: folds
+*** FLOP *** [2c Td 7d]
+850d8fea: checks
+2591c277: checks
+*** TURN *** [2c Td 7d] [6s]
+850d8fea: bets 2,000
+2591c277: calls 2,000
+*** RIVER *** [2c Td 7d 6s] [8d]
+850d8fea: checks
+2591c277: bets 3,036
+850d8fea: calls 3,036
+2591c277: shows [9s 8c] (a straight, Ten to Six)
+850d8fea: shows [Kd Kh] (a pair of Kings)
+*** SHOWDOWN ***
+2591c277 collected 15,272 from pot
+*** SUMMARY ***
+Total pot 15,272 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [2c Td 7d 6s 8d]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea showed [Kd Kh] and lost with a pair of Kings
+Seat 3: 2591c277 (button) showed [9s 8c] and won (15,272) with a straight, Ten to Six
+Seat 4: 23a37112 (small blind) folded before Flop
+Seat 5: Hero (big blind) folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548482: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level13(400/800(100)) - 2026/07/14 23:46:34
+Table '15' 8-max Seat #2 is the button
+Seat 1: 131225b7 (22,039 in chips)
+Seat 2: 850d8fea (19,777 in chips)
+Seat 3: 2591c277 (50,566 in chips)
+Seat 4: 23a37112 (27,420 in chips)
+Seat 5: Hero (27,145 in chips)
+Seat 6: dbed9fec (36,099 in chips)
+Seat 7: 9dceacc1 (78,581 in chips)
+Seat 8: 59b9414e (33,517 in chips)
+59b9414e: posts the ante 100
+Hero: posts the ante 100
+850d8fea: posts the ante 100
+2591c277: posts the ante 100
+131225b7: posts the ante 100
+23a37112: posts the ante 100
+9dceacc1: posts the ante 100
+dbed9fec: posts the ante 100
+2591c277: posts small blind 400
+23a37112: posts big blind 800
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to 23a37112 
+Dealt to Hero [6c As]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+Hero: folds
+dbed9fec: folds
+9dceacc1: raises 800 to 1,600
+59b9414e: folds
+131225b7: folds
+850d8fea: raises 18,077 to 19,677 and is all-in
+2591c277: folds
+23a37112: folds
+9dceacc1: calls 18,077
+850d8fea: shows [Kd Qs]
+9dceacc1: shows [8d 8s]
+*** FLOP *** [Kh 9d Th]
+*** TURN *** [Kh 9d Th] [7c]
+*** RIVER *** [Kh 9d Th 7c] [Jh]
+*** SHOWDOWN ***
+850d8fea collected 41,354 from pot
+*** SUMMARY ***
+Total pot 41,354 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Kh 9d Th 7c Jh]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea (button) showed [Kd Qs] and won (41,354) with a straight, King to Nine
+Seat 3: 2591c277 (small blind) folded before Flop
+Seat 4: 23a37112 (big blind) folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 showed [8d 8s] and lost with a straight, Jack to Seven
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548453: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level13(400/800(100)) - 2026/07/14 23:45:02
+Table '15' 8-max Seat #1 is the button
+Seat 1: 131225b7 (15,892 in chips)
+Seat 2: 850d8fea (20,277 in chips)
+Seat 3: 2591c277 (54,213 in chips)
+Seat 5: Hero (28,845 in chips)
+Seat 6: dbed9fec (36,199 in chips)
+Seat 7: 9dceacc1 (78,681 in chips)
+Seat 8: 59b9414e (33,617 in chips)
+59b9414e: posts the ante 100
+Hero: posts the ante 100
+850d8fea: posts the ante 100
+2591c277: posts the ante 100
+131225b7: posts the ante 100
+9dceacc1: posts the ante 100
+dbed9fec: posts the ante 100
+850d8fea: posts small blind 400
+2591c277: posts big blind 800
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to Hero [9d Ac]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+Hero: raises 800 to 1,600
+dbed9fec: folds
+9dceacc1: folds
+59b9414e: folds
+131225b7: calls 1,600
+850d8fea: folds
+2591c277: calls 800
+*** FLOP *** [8h Th 8c]
+2591c277: checks
+Hero: checks
+131225b7: bets 1,947
+2591c277: calls 1,947
+Hero: folds
+*** TURN *** [8h Th 8c] [7c]
+2591c277: checks
+131225b7: checks
+*** RIVER *** [8h Th 8c 7c] [3d]
+2591c277: checks
+131225b7: bets 4,897
+2591c277: folds
+Uncalled bet (4,897) returned to 131225b7
+*** SHOWDOWN ***
+131225b7 collected 9,794 from pot
+*** SUMMARY ***
+Total pot 9,794 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [8h Th 8c 7c 3d]
+Seat 1: 131225b7 (button) won (9,794)
+Seat 2: 850d8fea (small blind) folded before Flop
+Seat 3: 2591c277 (big blind) folded on the River
+Seat 5: Hero folded on the Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548427: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level13(400/800(100)) - 2026/07/14 23:43:36
+Table '15' 8-max Seat #8 is the button
+Seat 1: 131225b7 (16,392 in chips)
+Seat 2: 850d8fea (21,177 in chips)
+Seat 3: 2591c277 (55,113 in chips)
+Seat 4: f1e51e35 (7,906 in chips)
+Seat 5: Hero (28,945 in chips)
+Seat 6: dbed9fec (36,299 in chips)
+Seat 7: 9dceacc1 (68,175 in chips)
+Seat 8: 59b9414e (33,717 in chips)
+f1e51e35: posts the ante 100
+59b9414e: posts the ante 100
+Hero: posts the ante 100
+850d8fea: posts the ante 100
+2591c277: posts the ante 100
+131225b7: posts the ante 100
+9dceacc1: posts the ante 100
+dbed9fec: posts the ante 100
+131225b7: posts small blind 400
+850d8fea: posts big blind 800
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 2591c277 
+Dealt to f1e51e35 
+Dealt to Hero [Jh 5s]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+2591c277: calls 800
+f1e51e35: raises 7,006 to 7,806 and is all-in
+Hero: folds
+dbed9fec: folds
+9dceacc1: calls 7,806
+59b9414e: folds
+131225b7: folds
+850d8fea: folds
+2591c277: folds
+f1e51e35: shows [6d 6h]
+9dceacc1: shows [Js Jc]
+*** FLOP *** [Ks Qs 7d]
+*** TURN *** [Ks Qs 7d] [Kd]
+*** RIVER *** [Ks Qs 7d Kd] [8h]
+131225b7: shows [Kc] (three of a kind, Kings)
+2591c277: shows [Kh] (three of a kind, Kings)
+*** SHOWDOWN ***
+9dceacc1 collected 18,412 from pot
+*** SUMMARY ***
+Total pot 18,412 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Ks Qs 7d Kd 8h]
+Seat 1: 131225b7 (small blind) folded before Flop
+Seat 2: 850d8fea (big blind) folded before Flop
+Seat 3: 2591c277 folded before Flop
+Seat 4: f1e51e35 showed [6d 6h] and lost with two pair, Kings and Sixes
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 showed [Js Jc] and won (18,412) with two pair, Kings and Jacks
+Seat 8: 59b9414e (button) folded before Flop
+
+
+Poker Hand #TM6181548418: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level13(400/800(100)) - 2026/07/14 23:43:14
+Table '15' 8-max Seat #7 is the button
+Seat 1: 131225b7 (17,292 in chips)
+Seat 2: 850d8fea (21,277 in chips)
+Seat 4: f1e51e35 (8,006 in chips)
+Seat 5: Hero (29,045 in chips)
+Seat 6: dbed9fec (34,499 in chips)
+Seat 7: 9dceacc1 (68,275 in chips)
+Seat 8: 59b9414e (34,217 in chips)
+f1e51e35: posts the ante 100
+Hero: posts the ante 100
+59b9414e: posts the ante 100
+850d8fea: posts the ante 100
+131225b7: posts the ante 100
+9dceacc1: posts the ante 100
+dbed9fec: posts the ante 100
+59b9414e: posts small blind 400
+131225b7: posts big blind 800
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to f1e51e35 
+Dealt to Hero [9h 2h]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+850d8fea: folds
+f1e51e35: folds
+Hero: folds
+dbed9fec: raises 800 to 1,600
+9dceacc1: folds
+59b9414e: folds
+131225b7: folds
+Uncalled bet (800) returned to dbed9fec
+*** SHOWDOWN ***
+dbed9fec collected 2,700 from pot
+*** SUMMARY ***
+Total pot 2,700 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 131225b7 (big blind) folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 4: f1e51e35 folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec collected (2,700)
+Seat 7: 9dceacc1 (button) folded before Flop
+Seat 8: 59b9414e (small blind) folded before Flop
+
+
+Poker Hand #TM6181548401: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level12(350/700(85)) - 2026/07/14 23:42:27
+Table '15' 8-max Seat #6 is the button
+Seat 1: 131225b7 (17,377 in chips)
+Seat 2: 850d8fea (21,362 in chips)
+Seat 3: 247cc9e7 (961 in chips)
+Seat 4: f1e51e35 (5,485 in chips)
+Seat 5: Hero (29,130 in chips)
+Seat 6: dbed9fec (34,584 in chips)
+Seat 7: 9dceacc1 (68,710 in chips)
+Seat 8: 59b9414e (35,002 in chips)
+f1e51e35: posts the ante 85
+Hero: posts the ante 85
+59b9414e: posts the ante 85
+850d8fea: posts the ante 85
+247cc9e7: posts the ante 85
+131225b7: posts the ante 85
+9dceacc1: posts the ante 85
+dbed9fec: posts the ante 85
+9dceacc1: posts small blind 350
+59b9414e: posts big blind 700
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 247cc9e7 
+Dealt to f1e51e35 
+Dealt to Hero [3h 4d]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+131225b7: folds
+850d8fea: folds
+247cc9e7: raises 176 to 876 and is all-in
+f1e51e35: raises 4,524 to 5,400 and is all-in
+Hero: folds
+dbed9fec: folds
+9dceacc1: folds
+59b9414e: folds
+Uncalled bet (4,524) returned to f1e51e35
+f1e51e35: shows [Jc Kh]
+247cc9e7: shows [Qh Ts]
+*** FLOP *** [5s 6h 3d]
+*** TURN *** [5s 6h 3d] [3c]
+*** RIVER *** [5s 6h 3d 3c] [5c]
+*** SHOWDOWN ***
+f1e51e35 collected 3,482 from pot
+*** SUMMARY ***
+Total pot 3,482 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [5s 6h 3d 3c 5c]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 247cc9e7 showed [Qh Ts] and lost with two pair, Fives and Threes
+Seat 4: f1e51e35 showed [Jc Kh] and won (3,482) with two pair, Fives and Threes
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec (button) folded before Flop
+Seat 7: 9dceacc1 (small blind) folded before Flop
+Seat 8: 59b9414e (big blind) folded before Flop
+
+
+Poker Hand #TM6181548373: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level12(350/700(85)) - 2026/07/14 23:41:09
+Table '15' 8-max Seat #5 is the button
+Seat 1: 131225b7 (18,162 in chips)
+Seat 2: 850d8fea (21,447 in chips)
+Seat 3: 247cc9e7 (17,298 in chips)
+Seat 4: f1e51e35 (5,570 in chips)
+Seat 5: Hero (29,215 in chips)
+Seat 6: dbed9fec (16,337 in chips)
+Seat 7: 9dceacc1 (69,495 in chips)
+Seat 8: 59b9414e (35,087 in chips)
+f1e51e35: posts the ante 85
+Hero: posts the ante 85
+59b9414e: posts the ante 85
+850d8fea: posts the ante 85
+247cc9e7: posts the ante 85
+131225b7: posts the ante 85
+9dceacc1: posts the ante 85
+dbed9fec: posts the ante 85
+dbed9fec: posts small blind 350
+9dceacc1: posts big blind 700
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 247cc9e7 
+Dealt to f1e51e35 
+Dealt to Hero [5d Jh]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+59b9414e: folds
+131225b7: calls 700
+850d8fea: folds
+247cc9e7: raises 16,513 to 17,213 and is all-in
+f1e51e35: folds
+Hero: folds
+dbed9fec: calls 15,902 and is all-in
+9dceacc1: folds
+131225b7: folds
+Uncalled bet (961) returned to 247cc9e7
+247cc9e7: shows [Th Qs]
+dbed9fec: shows [Ah Kd]
+*** FLOP *** [8s 4d 2s]
+*** TURN *** [8s 4d 2s] [7c]
+*** RIVER *** [8s 4d 2s 7c] [2d]
+*** SHOWDOWN ***
+dbed9fec collected 34,584 from pot
+*** SUMMARY ***
+Total pot 34,584 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [8s 4d 2s 7c 2d]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 247cc9e7 showed [Th Qs] and lost with a pair of Twos
+Seat 4: f1e51e35 folded before Flop
+Seat 5: Hero (button) folded before Flop
+Seat 6: dbed9fec (small blind) showed [Ah Kd] and won (34,584) with a pair of Twos
+Seat 7: 9dceacc1 (big blind) folded before Flop
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548367: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level12(350/700(85)) - 2026/07/14 23:40:41
+Table '15' 8-max Seat #4 is the button
+Seat 1: 131225b7 (18,247 in chips)
+Seat 2: 850d8fea (21,532 in chips)
+Seat 3: 247cc9e7 (17,383 in chips)
+Seat 4: f1e51e35 (5,655 in chips)
+Seat 5: Hero (27,920 in chips)
+Seat 6: dbed9fec (17,122 in chips)
+Seat 7: 9dceacc1 (69,580 in chips)
+Seat 8: 59b9414e (35,172 in chips)
+f1e51e35: posts the ante 85
+59b9414e: posts the ante 85
+Hero: posts the ante 85
+850d8fea: posts the ante 85
+247cc9e7: posts the ante 85
+131225b7: posts the ante 85
+9dceacc1: posts the ante 85
+dbed9fec: posts the ante 85
+Hero: posts small blind 350
+dbed9fec: posts big blind 700
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 247cc9e7 
+Dealt to f1e51e35 
+Dealt to Hero [4h 8h]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 59b9414e 
+9dceacc1: folds
+59b9414e: folds
+131225b7: folds
+850d8fea: folds
+247cc9e7: folds
+f1e51e35: folds
+Hero: raises 1,050 to 1,750
+dbed9fec: folds
+Uncalled bet (1,050) returned to Hero
+*** SHOWDOWN ***
+Hero collected 2,080 from pot
+*** SUMMARY ***
+Total pot 2,080 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 247cc9e7 folded before Flop
+Seat 4: f1e51e35 (button) folded before Flop
+Seat 5: Hero (small blind) collected (2,080)
+Seat 6: dbed9fec (big blind) folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 59b9414e folded before Flop
+
+
+Poker Hand #TM6181548331: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level12(350/700(85)) - 2026/07/14 23:38:47
+Table '15' 8-max Seat #3 is the button
+Seat 1: 131225b7 (18,332 in chips)
+Seat 2: 850d8fea (21,617 in chips)
+Seat 3: 247cc9e7 (50,190 in chips)
+Seat 4: f1e51e35 (6,090 in chips)
+Seat 5: Hero (31,196 in chips)
+Seat 6: dbed9fec (17,207 in chips)
+Seat 7: 9dceacc1 (32,807 in chips)
+f1e51e35: posts the ante 85
+Hero: posts the ante 85
+850d8fea: posts the ante 85
+247cc9e7: posts the ante 85
+131225b7: posts the ante 85
+9dceacc1: posts the ante 85
+dbed9fec: posts the ante 85
+f1e51e35: posts small blind 350
+Hero: posts big blind 700
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 247cc9e7 
+Dealt to f1e51e35 
+Dealt to Hero [3s 2s]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+dbed9fec: folds
+9dceacc1: raises 700 to 1,400
+131225b7: folds
+850d8fea: folds
+247cc9e7: calls 1,400
+f1e51e35: folds
+Hero: calls 700
+*** FLOP *** [Ks Th 3h]
+Hero: checks
+9dceacc1: bets 1,791
+247cc9e7: calls 1,791
+Hero: calls 1,791
+*** TURN *** [Ks Th 3h] [2c]
+Hero: checks
+9dceacc1: bets 6,300
+247cc9e7: raises 7,629 to 13,929
+Hero: folds
+9dceacc1: calls 7,629
+*** RIVER *** [Ks Th 3h 2c] [5d]
+9dceacc1: checks
+247cc9e7: bets 19,188
+9dceacc1: calls 15,602 and is all-in
+Uncalled bet (3,586) returned to 247cc9e7
+247cc9e7: shows [Kh Qc] (a pair of Kings)
+9dceacc1: shows [Ah As] (a pair of Aces)
+*** SHOWDOWN ***
+9dceacc1 collected 69,580 from pot
+*** SUMMARY ***
+Total pot 69,580 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Ks Th 3h 2c 5d]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 247cc9e7 (button) showed [Kh Qc] and lost with a pair of Kings
+Seat 4: f1e51e35 (small blind) folded before Flop
+Seat 5: Hero (big blind) folded on the Turn
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 showed [Ah As] and won (69,580) with a pair of Aces
+
+
+Poker Hand #TM6181548311: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level12(350/700(85)) - 2026/07/14 23:37:57
+Table '15' 8-max Seat #2 is the button
+Seat 1: 131225b7 (18,417 in chips)
+Seat 2: 850d8fea (24,482 in chips)
+Seat 3: 247cc9e7 (46,115 in chips)
+Seat 4: f1e51e35 (6,875 in chips)
+Seat 5: Hero (31,281 in chips)
+Seat 6: dbed9fec (17,292 in chips)
+Seat 7: 9dceacc1 (32,892 in chips)
+Seat 8: 3168ca64 (26,532 in chips)
+3168ca64: posts the ante 85
+f1e51e35: posts the ante 85
+Hero: posts the ante 85
+850d8fea: posts the ante 85
+247cc9e7: posts the ante 85
+131225b7: posts the ante 85
+9dceacc1: posts the ante 85
+dbed9fec: posts the ante 85
+247cc9e7: posts small blind 350
+f1e51e35: posts big blind 700
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 247cc9e7 
+Dealt to f1e51e35 
+Dealt to Hero [Kd 5c]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 3168ca64 
+Hero: folds
+dbed9fec: folds
+9dceacc1: folds
+3168ca64: folds
+131225b7: folds
+850d8fea: raises 700 to 1,400
+247cc9e7: calls 1,050
+f1e51e35: folds
+*** FLOP *** [Kc 6h 2s]
+247cc9e7: bets 1,380
+850d8fea: calls 1,380
+*** TURN *** [Kc 6h 2s] [Qd]
+247cc9e7: bets 2,291
+850d8fea: folds
+Uncalled bet (2,291) returned to 247cc9e7
+*** SHOWDOWN ***
+247cc9e7 collected 6,940 from pot
+*** SUMMARY ***
+Total pot 6,940 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Kc 6h 2s Qd]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea (button) folded on the Turn
+Seat 3: 247cc9e7 (small blind) won (6,940)
+Seat 4: f1e51e35 (big blind) folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 3168ca64 folded before Flop
+
+
+Poker Hand #TM6181548281: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level12(350/700(85)) - 2026/07/14 23:36:39
+Table '15' 8-max Seat #1 is the button
+Seat 1: 131225b7 (18,502 in chips)
+Seat 2: 850d8fea (25,267 in chips)
+Seat 3: 247cc9e7 (58,776 in chips)
+Seat 4: f1e51e35 (6,960 in chips)
+Seat 5: Hero (31,366 in chips)
+Seat 6: dbed9fec (17,377 in chips)
+Seat 7: 9dceacc1 (32,977 in chips)
+Seat 8: 3168ca64 (12,661 in chips)
+3168ca64: posts the ante 85
+f1e51e35: posts the ante 85
+Hero: posts the ante 85
+850d8fea: posts the ante 85
+247cc9e7: posts the ante 85
+131225b7: posts the ante 85
+9dceacc1: posts the ante 85
+dbed9fec: posts the ante 85
+850d8fea: posts small blind 350
+247cc9e7: posts big blind 700
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 247cc9e7 
+Dealt to f1e51e35 
+Dealt to Hero [9s 7h]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 3168ca64 
+f1e51e35: folds
+Hero: folds
+dbed9fec: folds
+9dceacc1: folds
+3168ca64: calls 700
+131225b7: folds
+850d8fea: calls 350
+247cc9e7: checks
+*** FLOP *** [Jc Ad 8h]
+850d8fea: checks
+247cc9e7: checks
+3168ca64: bets 918
+850d8fea: folds
+247cc9e7: calls 918
+*** TURN *** [Jc Ad 8h] [4h]
+247cc9e7: checks
+3168ca64: checks
+*** RIVER *** [Jc Ad 8h 4h] [Qh]
+247cc9e7: bets 4,616
+3168ca64: raises 6,342 to 10,958 and is all-in
+247cc9e7: calls 6,342
+3168ca64: shows [Th 9d] (a straight, Queen to Eight)
+247cc9e7: shows [8d 9h] (a pair of Eights)
+*** SHOWDOWN ***
+3168ca64 collected 26,532 from pot
+*** SUMMARY ***
+Total pot 26,532 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Jc Ad 8h 4h Qh]
+Seat 1: 131225b7 (button) folded before Flop
+Seat 2: 850d8fea (small blind) folded on the Flop
+Seat 3: 247cc9e7 (big blind) showed [8d 9h] and lost with a pair of Eights
+Seat 4: f1e51e35 folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 3168ca64 showed [Th 9d] and won (26,532) with a straight, Queen to Eight
+
+
+Poker Hand #TM6181548252: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level12(350/700(85)) - 2026/07/14 23:35:25
+Table '15' 8-max Seat #8 is the button
+Seat 1: 131225b7 (18,937 in chips)
+Seat 2: 850d8fea (26,752 in chips)
+Seat 3: 247cc9e7 (36,061 in chips)
+Seat 4: f1e51e35 (7,045 in chips)
+Seat 5: Hero (31,451 in chips)
+Seat 6: dbed9fec (27,647 in chips)
+Seat 7: 9dceacc1 (33,062 in chips)
+Seat 8: 3168ca64 (22,931 in chips)
+3168ca64: posts the ante 85
+f1e51e35: posts the ante 85
+Hero: posts the ante 85
+850d8fea: posts the ante 85
+247cc9e7: posts the ante 85
+131225b7: posts the ante 85
+9dceacc1: posts the ante 85
+dbed9fec: posts the ante 85
+131225b7: posts small blind 350
+850d8fea: posts big blind 700
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 247cc9e7 
+Dealt to f1e51e35 
+Dealt to Hero [Td 3c]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 3168ca64 
+247cc9e7: raises 700 to 1,400
+f1e51e35: folds
+Hero: folds
+dbed9fec: calls 1,400
+9dceacc1: folds
+3168ca64: calls 1,400
+131225b7: folds
+850d8fea: calls 700
+*** FLOP *** [Qd Js Th]
+850d8fea: checks
+247cc9e7: bets 3,315
+dbed9fec: calls 3,315
+3168ca64: calls 3,315
+850d8fea: folds
+*** TURN *** [Qd Js Th] [7c]
+247cc9e7: bets 5,470
+dbed9fec: calls 5,470
+3168ca64: calls 5,470
+*** RIVER *** [Qd Js Th 7c] [3s]
+247cc9e7: bets 25,791 and is all-in
+dbed9fec: folds
+3168ca64: folds
+Uncalled bet (25,791) returned to 247cc9e7
+*** SHOWDOWN ***
+247cc9e7 collected 32,985 from pot
+*** SUMMARY ***
+Total pot 32,985 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Qd Js Th 7c 3s]
+Seat 1: 131225b7 (small blind) folded before Flop
+Seat 2: 850d8fea (big blind) folded on the Flop
+Seat 3: 247cc9e7 won (32,985)
+Seat 4: f1e51e35 folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded on the River
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 3168ca64 (button) folded on the River
+
+
+Poker Hand #TM6181548241: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level12(350/700(85)) - 2026/07/14 23:34:58
+Table '15' 8-max Seat #7 is the button
+Seat 1: 131225b7 (19,722 in chips)
+Seat 2: 850d8fea (26,837 in chips)
+Seat 3: 247cc9e7 (36,146 in chips)
+Seat 4: f1e51e35 (5,400 in chips)
+Seat 5: Hero (31,536 in chips)
+Seat 6: dbed9fec (27,732 in chips)
+Seat 7: 9dceacc1 (33,147 in chips)
+Seat 8: 3168ca64 (23,366 in chips)
+3168ca64: posts the ante 85
+f1e51e35: posts the ante 85
+Hero: posts the ante 85
+850d8fea: posts the ante 85
+247cc9e7: posts the ante 85
+131225b7: posts the ante 85
+9dceacc1: posts the ante 85
+dbed9fec: posts the ante 85
+3168ca64: posts small blind 350
+131225b7: posts big blind 700
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 247cc9e7 
+Dealt to f1e51e35 
+Dealt to Hero [Ac 2d]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 3168ca64 
+850d8fea: folds
+247cc9e7: folds
+f1e51e35: raises 4,615 to 5,315 and is all-in
+Hero: folds
+dbed9fec: folds
+9dceacc1: folds
+3168ca64: folds
+131225b7: folds
+Uncalled bet (4,615) returned to f1e51e35
+*** SHOWDOWN ***
+f1e51e35 collected 2,430 from pot
+*** SUMMARY ***
+Total pot 2,430 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 131225b7 (big blind) folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 247cc9e7 folded before Flop
+Seat 4: f1e51e35 collected (2,430)
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 (button) folded before Flop
+Seat 8: 3168ca64 (small blind) folded before Flop
+
+
+Poker Hand #TM6181548230: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level11(300/600(75)) - 2026/07/14 23:34:16
+Table '15' 8-max Seat #6 is the button
+Seat 1: 131225b7 (19,797 in chips)
+Seat 2: 850d8fea (26,912 in chips)
+Seat 3: 247cc9e7 (36,221 in chips)
+Seat 4: f1e51e35 (5,475 in chips)
+Seat 5: Hero (29,211 in chips)
+Seat 6: dbed9fec (27,807 in chips)
+Seat 7: 9dceacc1 (34,422 in chips)
+Seat 8: 3168ca64 (24,041 in chips)
+3168ca64: posts the ante 75
+f1e51e35: posts the ante 75
+Hero: posts the ante 75
+850d8fea: posts the ante 75
+247cc9e7: posts the ante 75
+131225b7: posts the ante 75
+9dceacc1: posts the ante 75
+dbed9fec: posts the ante 75
+9dceacc1: posts small blind 300
+3168ca64: posts big blind 600
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 247cc9e7 
+Dealt to f1e51e35 
+Dealt to Hero [Jc Qc]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 3168ca64 
+131225b7: folds
+850d8fea: folds
+247cc9e7: folds
+f1e51e35: folds
+Hero: raises 600 to 1,200
+dbed9fec: folds
+9dceacc1: calls 900
+3168ca64: folds
+*** FLOP *** [7d 3d 2d]
+9dceacc1: checks
+Hero: bets 1,800
+9dceacc1: folds
+Uncalled bet (1,800) returned to Hero
+*** SHOWDOWN ***
+Hero collected 3,600 from pot
+*** SUMMARY ***
+Total pot 3,600 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [7d 3d 2d]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 247cc9e7 folded before Flop
+Seat 4: f1e51e35 folded before Flop
+Seat 5: Hero won (3,600)
+Seat 6: dbed9fec (button) folded before Flop
+Seat 7: 9dceacc1 (small blind) folded on the Flop
+Seat 8: 3168ca64 (big blind) folded before Flop
+
+
+Poker Hand #TM6181548214: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level11(300/600(75)) - 2026/07/14 23:33:42
+Table '15' 8-max Seat #5 is the button
+Seat 1: 131225b7 (19,872 in chips)
+Seat 2: 850d8fea (26,987 in chips)
+Seat 3: 247cc9e7 (36,296 in chips)
+Seat 5: Hero (29,286 in chips)
+Seat 6: dbed9fec (28,182 in chips)
+Seat 7: 9dceacc1 (33,672 in chips)
+Seat 8: 3168ca64 (24,116 in chips)
+3168ca64: posts the ante 75
+Hero: posts the ante 75
+850d8fea: posts the ante 75
+247cc9e7: posts the ante 75
+131225b7: posts the ante 75
+9dceacc1: posts the ante 75
+dbed9fec: posts the ante 75
+dbed9fec: posts small blind 300
+9dceacc1: posts big blind 600
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 247cc9e7 
+Dealt to Hero [8s 3d]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 3168ca64 
+3168ca64: folds
+131225b7: folds
+850d8fea: folds
+247cc9e7: folds
+Hero: folds
+dbed9fec: folds
+Uncalled bet (300) returned to 9dceacc1
+*** SHOWDOWN ***
+9dceacc1 collected 1,125 from pot
+*** SUMMARY ***
+Total pot 1,125 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 247cc9e7 folded before Flop
+Seat 5: Hero (button) folded before Flop
+Seat 6: dbed9fec (small blind) folded before Flop
+Seat 7: 9dceacc1 (big blind) collected (1,125)
+Seat 8: 3168ca64 folded before Flop
+
+
+Poker Hand #TM6181548197: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level11(300/600(75)) - 2026/07/14 23:32:37
+Table '15' 8-max Seat #4 is the button
+Seat 1: 131225b7 (19,947 in chips)
+Seat 2: 850d8fea (27,062 in chips)
+Seat 3: 247cc9e7 (37,585 in chips)
+Seat 4: 35879205 (17,585 in chips)
+Seat 5: Hero (9,437 in chips)
+Seat 6: dbed9fec (28,857 in chips)
+Seat 7: 9dceacc1 (33,747 in chips)
+Seat 8: 3168ca64 (24,191 in chips)
+3168ca64: posts the ante 75
+Hero: posts the ante 75
+850d8fea: posts the ante 75
+35879205: posts the ante 75
+247cc9e7: posts the ante 75
+131225b7: posts the ante 75
+9dceacc1: posts the ante 75
+dbed9fec: posts the ante 75
+Hero: posts small blind 300
+dbed9fec: posts big blind 600
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 247cc9e7 
+Dealt to 35879205 
+Dealt to Hero [7c 7h]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 3168ca64 
+9dceacc1: folds
+3168ca64: folds
+131225b7: folds
+850d8fea: folds
+247cc9e7: raises 600 to 1,200
+35879205: calls 1,200
+Hero: raises 8,162 to 9,362 and is all-in
+dbed9fec: folds
+247cc9e7: calls 8,162
+35879205: raises 8,148 to 17,510 and is all-in
+247cc9e7: calls 8,148
+35879205: shows [Th Ac]
+Hero: shows [7c 7h]
+247cc9e7: shows [Qc Kd]
+*** FLOP *** [7d 9s Ks]
+*** TURN *** [7d 9s Ks] [4c]
+*** RIVER *** [7d 9s Ks 4c] [3h]
+*** SHOWDOWN ***
+Hero collected 29,286 from pot
+247cc9e7 collected 16,296 from pot
+*** SUMMARY ***
+Total pot 45,582 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [7d 9s Ks 4c 3h]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 247cc9e7 showed [Qc Kd] and won (16,296) with a pair of Kings
+Seat 4: 35879205 (button) showed [Th Ac] and lost with Ace high
+Seat 5: Hero (small blind) showed [7c 7h] and won (29,286) with three of a kind, Sevens
+Seat 6: dbed9fec (big blind) folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 3168ca64 folded before Flop
+
+
+Poker Hand #TM6181548181: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level11(300/600(75)) - 2026/07/14 23:31:43
+Table '15' 8-max Seat #3 is the button
+Seat 1: 131225b7 (20,022 in chips)
+Seat 2: 850d8fea (27,137 in chips)
+Seat 3: 247cc9e7 (40,345 in chips)
+Seat 4: 35879205 (17,960 in chips)
+Seat 5: Hero (10,712 in chips)
+Seat 6: dbed9fec (28,932 in chips)
+Seat 7: 9dceacc1 (33,822 in chips)
+Seat 8: 3168ca64 (19,481 in chips)
+3168ca64: posts the ante 75
+Hero: posts the ante 75
+850d8fea: posts the ante 75
+247cc9e7: posts the ante 75
+35879205: posts the ante 75
+131225b7: posts the ante 75
+9dceacc1: posts the ante 75
+dbed9fec: posts the ante 75
+35879205: posts small blind 300
+Hero: posts big blind 600
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 850d8fea 
+Dealt to 247cc9e7 
+Dealt to 35879205 
+Dealt to Hero [4c Qc]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 3168ca64 
+dbed9fec: folds
+9dceacc1: folds
+3168ca64: raises 600 to 1,200
+131225b7: folds
+850d8fea: folds
+247cc9e7: calls 1,200
+35879205: folds
+Hero: calls 600
+*** FLOP *** [Kh Jh Ac]
+Hero: checks
+3168ca64: bets 1,485
+247cc9e7: calls 1,485
+Hero: folds
+*** TURN *** [Kh Jh Ac] [5d]
+3168ca64: bets 16,721 and is all-in
+247cc9e7: folds
+Uncalled bet (16,721) returned to 3168ca64
+*** SHOWDOWN ***
+3168ca64 collected 7,470 from pot
+*** SUMMARY ***
+Total pot 7,470 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Kh Jh Ac 5d]
+Seat 1: 131225b7 folded before Flop
+Seat 2: 850d8fea folded before Flop
+Seat 3: 247cc9e7 (button) folded on the Turn
+Seat 4: 35879205 (small blind) folded before Flop
+Seat 5: Hero (big blind) folded on the Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 3168ca64 showed [Js Ah] and won (7,470)
+
+
+Poker Hand #TM6181548163: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level11(300/600(75)) - 2026/07/14 23:30:43
+Table '15' 8-max Seat #1 is the button
+Seat 1: 131225b7 (21,297 in chips)
+Seat 2: 3347f8f2 (9,250 in chips)
+Seat 3: 247cc9e7 (41,020 in chips)
+Seat 4: 35879205 (18,035 in chips)
+Seat 5: Hero (10,787 in chips)
+Seat 6: dbed9fec (29,007 in chips)
+Seat 7: 9dceacc1 (22,322 in chips)
+Seat 8: 3168ca64 (19,556 in chips)
+3168ca64: posts the ante 75
+Hero: posts the ante 75
+3347f8f2: posts the ante 75
+35879205: posts the ante 75
+247cc9e7: posts the ante 75
+131225b7: posts the ante 75
+9dceacc1: posts the ante 75
+dbed9fec: posts the ante 75
+3347f8f2: posts small blind 300
+247cc9e7: posts big blind 600
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 3347f8f2 
+Dealt to 247cc9e7 
+Dealt to 35879205 
+Dealt to Hero [4c 8d]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 3168ca64 
+35879205: folds
+Hero: folds
+dbed9fec: folds
+9dceacc1: raises 600 to 1,200
+3168ca64: folds
+131225b7: calls 1,200
+3347f8f2: raises 7,975 to 9,175 and is all-in
+247cc9e7: folds
+9dceacc1: calls 7,975
+131225b7: folds
+3347f8f2: shows [Tc Kd]
+9dceacc1: shows [Th Ah]
+*** FLOP *** [6h Qh Qc]
+*** TURN *** [6h Qh Qc] [9c]
+*** RIVER *** [6h Qh Qc 9c] [2c]
+*** SHOWDOWN ***
+9dceacc1 collected 20,750 from pot
+*** SUMMARY ***
+Total pot 20,750 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6h Qh Qc 9c 2c]
+Seat 1: 131225b7 (button) folded before Flop
+Seat 2: 3347f8f2 (small blind) showed [Tc Kd] and lost with a pair of Queens
+Seat 3: 247cc9e7 (big blind) folded before Flop
+Seat 4: 35879205 folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 showed [Th Ah] and won (20,750) with a pair of Queens
+Seat 8: 3168ca64 folded before Flop
+
+
+Poker Hand #TM6181548141: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level11(300/600(75)) - 2026/07/14 23:29:36
+Table '15' 8-max Seat #8 is the button
+Seat 1: 131225b7 (16,272 in chips)
+Seat 2: 3347f8f2 (9,925 in chips)
+Seat 3: 247cc9e7 (44,995 in chips)
+Seat 4: 35879205 (18,110 in chips)
+Seat 5: Hero (10,862 in chips)
+Seat 6: dbed9fec (29,082 in chips)
+Seat 7: 9dceacc1 (22,397 in chips)
+Seat 8: 3168ca64 (19,631 in chips)
+3168ca64: posts the ante 75
+Hero: posts the ante 75
+3347f8f2: posts the ante 75
+35879205: posts the ante 75
+247cc9e7: posts the ante 75
+131225b7: posts the ante 75
+9dceacc1: posts the ante 75
+dbed9fec: posts the ante 75
+131225b7: posts small blind 300
+3347f8f2: posts big blind 600
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 3347f8f2 
+Dealt to 247cc9e7 
+Dealt to 35879205 
+Dealt to Hero [2s As]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 3168ca64 
+247cc9e7: raises 600 to 1,200
+35879205: folds
+Hero: folds
+dbed9fec: folds
+9dceacc1: folds
+3168ca64: folds
+131225b7: raises 2,700 to 3,900
+3347f8f2: folds
+247cc9e7: calls 2,700
+*** FLOP *** [7s 3s 6d]
+131225b7: checks
+247cc9e7: checks
+*** TURN *** [7s 3s 6d] [Ac]
+131225b7: checks
+247cc9e7: checks
+*** RIVER *** [7s 3s 6d Ac] [Jd]
+131225b7: checks
+247cc9e7: checks
+131225b7: shows [3c Qc] (a pair of Threes)
+247cc9e7: shows [9d Kd] (Ace high)
+*** SHOWDOWN ***
+131225b7 collected 9,000 from pot
+*** SUMMARY ***
+Total pot 9,000 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [7s 3s 6d Ac Jd]
+Seat 1: 131225b7 (small blind) showed [3c Qc] and won (9,000) with a pair of Threes
+Seat 2: 3347f8f2 (big blind) folded before Flop
+Seat 3: 247cc9e7 showed [9d Kd] and lost with Ace high
+Seat 4: 35879205 folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 folded before Flop
+Seat 8: 3168ca64 (button) folded before Flop
+
+
+Poker Hand #TM6181548130: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level11(300/600(75)) - 2026/07/14 23:28:57
+Table '15' 8-max Seat #7 is the button
+Seat 1: 131225b7 (16,947 in chips)
+Seat 2: 3347f8f2 (10,000 in chips)
+Seat 3: 247cc9e7 (41,170 in chips)
+Seat 4: 35879205 (19,385 in chips)
+Seat 5: Hero (10,937 in chips)
+Seat 6: dbed9fec (29,157 in chips)
+Seat 7: 9dceacc1 (23,672 in chips)
+Seat 8: 3168ca64 (20,006 in chips)
+3168ca64: posts the ante 75
+Hero: posts the ante 75
+3347f8f2: posts the ante 75
+35879205: posts the ante 75
+247cc9e7: posts the ante 75
+131225b7: posts the ante 75
+9dceacc1: posts the ante 75
+dbed9fec: posts the ante 75
+3168ca64: posts small blind 300
+131225b7: posts big blind 600
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 3347f8f2 
+Dealt to 247cc9e7 
+Dealt to 35879205 
+Dealt to Hero [5d As]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 3168ca64 
+3347f8f2: folds
+247cc9e7: raises 600 to 1,200
+35879205: calls 1,200
+Hero: folds
+dbed9fec: folds
+9dceacc1: calls 1,200
+3168ca64: folds
+131225b7: folds
+*** FLOP *** [Ah 8h 6d]
+247cc9e7: bets 1,683
+35879205: folds
+9dceacc1: folds
+Uncalled bet (1,683) returned to 247cc9e7
+*** SHOWDOWN ***
+247cc9e7 collected 5,100 from pot
+*** SUMMARY ***
+Total pot 5,100 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Ah 8h 6d]
+Seat 1: 131225b7 (big blind) folded before Flop
+Seat 2: 3347f8f2 folded before Flop
+Seat 3: 247cc9e7 won (5,100)
+Seat 4: 35879205 folded on the Flop
+Seat 5: Hero folded before Flop
+Seat 6: dbed9fec folded before Flop
+Seat 7: 9dceacc1 (button) folded on the Flop
+Seat 8: 3168ca64 (small blind) folded before Flop
+
+
+Poker Hand #TM6181548114: Tournament #298096893, Daily Classic $1 Hold'em No Limit - Level11(300/600(75)) - 2026/07/14 23:28:05
+Table '15' 8-max Seat #6 is the button
+Seat 1: 131225b7 (17,622 in chips)
+Seat 3: 247cc9e7 (41,845 in chips)
+Seat 4: 35879205 (19,460 in chips)
+Seat 5: Hero (10,000 in chips)
+Seat 6: dbed9fec (29,232 in chips)
+Seat 7: 9dceacc1 (24,047 in chips)
+Seat 8: 3168ca64 (19,068 in chips)
+3168ca64: posts the ante 75
+Hero: posts the ante 75
+35879205: posts the ante 75
+247cc9e7: posts the ante 75
+131225b7: posts the ante 75
+9dceacc1: posts the ante 75
+dbed9fec: posts the ante 75
+9dceacc1: posts small blind 300
+3168ca64: posts big blind 600
+*** HOLE CARDS ***
+Dealt to 131225b7 
+Dealt to 247cc9e7 
+Dealt to 35879205 
+Dealt to Hero [9d 9c]
+Dealt to dbed9fec 
+Dealt to 9dceacc1 
+Dealt to 3168ca64 
+131225b7: calls 600
+247cc9e7: calls 600
+35879205: folds
+Hero: raises 9,325 to 9,925 and is all-in
+dbed9fec: folds
+9dceacc1: folds
+3168ca64: calls 9,325
+131225b7: folds
+247cc9e7: folds
+Hero: shows [9d 9c]
+3168ca64: shows [9s 9h]
+*** FLOP *** [Ah Ac Ts]
+*** TURN *** [Ah Ac Ts] [6s]
+*** RIVER *** [Ah Ac Ts 6s] [4h]
+131225b7: shows [6c 4c] (two pair, Aces and Sixes)
+*** SHOWDOWN ***
+3168ca64 collected 10,938 from pot
+Hero collected 10,937 from pot
+*** SUMMARY ***
+Total pot 21,875 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Ah Ac Ts 6s 4h]
+Seat 1: 131225b7 folded before Flop
+Seat 3: 247cc9e7 folded before Flop
+Seat 4: 35879205 folded before Flop
+Seat 5: Hero showed [9d 9c] and won (10,937) with two pair, Aces and Nines
+Seat 6: dbed9fec (button) folded before Flop
+Seat 7: 9dceacc1 (small blind) folded before Flop
+Seat 8: 3168ca64 (big blind) showed [9s 9h] and won (10,938) with two pair, Aces and Nines
+
+

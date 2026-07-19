@@ -1,0 +1,104 @@
+Poker Hand #TM6185002925: Tournament #298282246, GGPoker Japan school Freerolls $300 GTD 6MAX Hold'em No Limit - Level11(350/700(100)) - 2026/07/15 20:32:51
+Table '23' 6-max Seat #3 is the button
+Seat 1: ed307da5 (28,320 in chips)
+Seat 2: f284e2ca (9,994 in chips)
+Seat 3: 8e55107d (3,550 in chips)
+Seat 4: Hero (378 in chips)
+Seat 5: 181bcf1f (3,510 in chips)
+Seat 6: fa667181 (35,552 in chips)
+181bcf1f: posts the ante 100
+Hero: posts the ante 100
+8e55107d: posts the ante 100
+f284e2ca: posts the ante 100
+ed307da5: posts the ante 100
+fa667181: posts the ante 100
+Hero: posts small blind 278
+181bcf1f: posts big blind 700
+*** HOLE CARDS ***
+Dealt to ed307da5 
+Dealt to f284e2ca 
+Dealt to 8e55107d 
+Dealt to Hero [5s Kd]
+Dealt to 181bcf1f 
+Dealt to fa667181 
+fa667181: raises 700 to 1,400
+ed307da5: calls 1,400
+f284e2ca: folds
+8e55107d: raises 2,050 to 3,450 and is all-in
+181bcf1f: calls 2,710 and is all-in
+fa667181: calls 2,050
+ed307da5: calls 2,050
+*** FLOP *** [Ah 8h Jc]
+fa667181: bets 4,831
+ed307da5: folds
+Uncalled bet (4,831) returned to fa667181
+fa667181: shows [2d As] (a pair of Aces)
+8e55107d: shows [9s 7h] (Ace high)
+Hero: shows [5s Kd] (Ace high)
+181bcf1f: shows [5c Ac] (a pair of Aces)
+*** TURN *** [Ah 8h Jc] [3h]
+*** RIVER *** [Ah 8h Jc 3h] [Kc]
+*** SHOWDOWN ***
+fa667181 collected 995 from pot
+181bcf1f collected 995 from pot
+fa667181 collected 6,264 from pot
+181bcf1f collected 6,264 from pot
+fa667181 collected 120 from pot
+*** SUMMARY ***
+Total pot 14,638 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Ah 8h Jc 3h Kc]
+Seat 1: ed307da5 folded on the Flop
+Seat 2: f284e2ca folded before Flop
+Seat 3: 8e55107d (button) showed [9s 7h] and lost with Ace high
+Seat 4: Hero (small blind) showed [5s Kd] and lost with a pair of Kings
+Seat 5: 181bcf1f (big blind) showed [5c Ac] and won (7,259) with a pair of Aces
+Seat 6: fa667181 showed [2d As] and won (7,379) with a pair of Aces
+
+
+Poker Hand #TM6185002912: Tournament #298282246, GGPoker Japan school Freerolls $300 GTD 6MAX Hold'em No Limit - Level11(350/700(100)) - 2026/07/15 20:32:14
+Table '23' 6-max Seat #2 is the button
+Seat 1: ed307da5 (28,420 in chips)
+Seat 2: f284e2ca (4,622 in chips)
+Seat 3: 8e55107d (4,000 in chips)
+Seat 4: Hero (5,000 in chips)
+Seat 5: 181bcf1f (3,610 in chips)
+Seat 6: fa667181 (35,652 in chips)
+181bcf1f: posts the ante 100
+Hero: posts the ante 100
+8e55107d: posts the ante 100
+f284e2ca: posts the ante 100
+ed307da5: posts the ante 100
+fa667181: posts the ante 100
+8e55107d: posts small blind 350
+Hero: posts big blind 700
+*** HOLE CARDS ***
+Dealt to ed307da5 
+Dealt to f284e2ca 
+Dealt to 8e55107d 
+Dealt to Hero [Qd 9c]
+Dealt to 181bcf1f 
+Dealt to fa667181 
+181bcf1f: folds
+fa667181: folds
+ed307da5: folds
+f284e2ca: raises 3,822 to 4,522 and is all-in
+8e55107d: folds
+Hero: calls 3,822
+f284e2ca: shows [As 7h]
+Hero: shows [Qd 9c]
+*** FLOP *** [6d Ad 5s]
+*** TURN *** [6d Ad 5s] [8h]
+*** RIVER *** [6d Ad 5s 8h] [Qs]
+*** SHOWDOWN ***
+f284e2ca collected 9,994 from pot
+*** SUMMARY ***
+Total pot 9,994 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6d Ad 5s 8h Qs]
+Seat 1: ed307da5 folded before Flop
+Seat 2: f284e2ca (button) showed [As 7h] and won (9,994) with a pair of Aces
+Seat 3: 8e55107d (small blind) folded before Flop
+Seat 4: Hero (big blind) showed [Qd 9c] and lost with a pair of Queens
+Seat 5: 181bcf1f folded before Flop
+Seat 6: fa667181 folded before Flop
+
+

@@ -1,0 +1,101 @@
+Poker Hand #TM6026969679: Tournament #287389903, Daily Hyper $1 Hold'em No Limit - Level8(150/300(35)) - 2026/06/01 22:14:38
+Table '65' 6-max Seat #1 is the button
+Seat 1: bee66630 (7,995 in chips)
+Seat 2: bf240c07 (7,825 in chips)
+Seat 3: b8ca1cf6 (21,445 in chips)
+Seat 4: f1a8e915 (14,319 in chips)
+Seat 5: Hero (5,965 in chips)
+Seat 6: 38bc10c8 (4,275 in chips)
+bee66630: posts the ante 35
+Hero: posts the ante 35
+f1a8e915: posts the ante 35
+bf240c07: posts the ante 35
+38bc10c8: posts the ante 35
+b8ca1cf6: posts the ante 35
+bf240c07: posts small blind 150
+b8ca1cf6: posts big blind 300
+*** HOLE CARDS ***
+Dealt to bee66630 
+Dealt to bf240c07 
+Dealt to b8ca1cf6 
+Dealt to f1a8e915 
+Dealt to Hero [9d 9s]
+Dealt to 38bc10c8 
+f1a8e915: folds
+Hero: raises 300 to 600
+38bc10c8: folds
+bee66630: calls 600
+bf240c07: folds
+b8ca1cf6: raises 2,160 to 2,760
+Hero: raises 3,170 to 5,930 and is all-in
+bee66630: folds
+b8ca1cf6: calls 3,170
+Hero: shows [9d 9s]
+b8ca1cf6: shows [Jd Jc]
+*** FLOP *** [Ah Qs 4d]
+*** TURN *** [Ah Qs 4d] [Th]
+*** RIVER *** [Ah Qs 4d Th] [8h]
+*** SHOWDOWN ***
+b8ca1cf6 collected 12,820 from pot
+*** SUMMARY ***
+Total pot 12,820 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Ah Qs 4d Th 8h]
+Seat 1: bee66630 (button) folded before Flop
+Seat 2: bf240c07 (small blind) folded before Flop
+Seat 3: b8ca1cf6 (big blind) showed [Jd Jc] and won (12,820) with a pair of Jacks
+Seat 4: f1a8e915 folded before Flop
+Seat 5: Hero showed [9d 9s] and lost with a pair of Nines
+Seat 6: 38bc10c8 folded before Flop
+
+
+Poker Hand #TM6026969636: Tournament #287389903, Daily Hyper $1 Hold'em No Limit - Level8(150/300(35)) - 2026/06/01 22:12:32
+Table '65' 6-max Seat #6 is the button
+Seat 1: bee66630 (8,330 in chips)
+Seat 2: bf240c07 (5,940 in chips)
+Seat 3: b8ca1cf6 (21,480 in chips)
+Seat 4: f1a8e915 (14,354 in chips)
+Seat 5: Hero (6,000 in chips)
+Seat 6: 38bc10c8 (5,720 in chips)
+bee66630: posts the ante 35
+Hero: posts the ante 35
+f1a8e915: posts the ante 35
+bf240c07: posts the ante 35
+38bc10c8: posts the ante 35
+b8ca1cf6: posts the ante 35
+bee66630: posts small blind 150
+bf240c07: posts big blind 300
+*** HOLE CARDS ***
+Dealt to bee66630 
+Dealt to bf240c07 
+Dealt to b8ca1cf6 
+Dealt to f1a8e915 
+Dealt to Hero [9s 2h]
+Dealt to 38bc10c8 
+b8ca1cf6: folds
+f1a8e915: folds
+Hero: folds
+38bc10c8: calls 300
+bee66630: calls 150
+bf240c07: raises 1,110 to 1,410
+38bc10c8: calls 1,110
+bee66630: folds
+*** FLOP *** [8d 2c 4s]
+bf240c07: checks
+38bc10c8: checks
+*** TURN *** [8d 2c 4s] [Qh]
+bf240c07: bets 1,099
+38bc10c8: folds
+Uncalled bet (1,099) returned to bf240c07
+*** SHOWDOWN ***
+bf240c07 collected 3,330 from pot
+*** SUMMARY ***
+Total pot 3,330 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [8d 2c 4s Qh]
+Seat 1: bee66630 (small blind) folded before Flop
+Seat 2: bf240c07 (big blind) won (3,330)
+Seat 3: b8ca1cf6 folded before Flop
+Seat 4: f1a8e915 folded before Flop
+Seat 5: Hero folded before Flop
+Seat 6: 38bc10c8 (button) folded on the Turn
+
+

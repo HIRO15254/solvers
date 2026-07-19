@@ -1,0 +1,331 @@
+Poker Hand #TM6113915524: Tournament #293312473, Mini Forty Stack $4.40 Hold'em No Limit - Level15(1,750/3,500(450)) - 2026/06/26 02:17:13
+Table '13' 8-max Seat #1 is the button
+Seat 1: 46cfbe4c (98,168 in chips)
+Seat 2: Hero (29,000 in chips)
+Seat 3: 72b0b5ec (144,688 in chips)
+Seat 4: af45c597 (176,805 in chips)
+Seat 5: df6c12af (26,250 in chips)
+Seat 6: d4ed822c (143,691 in chips)
+Seat 7: 70ce5813 (76,827 in chips)
+Seat 8: b19487ca (70,500 in chips)
+d4ed822c: posts the ante 450
+72b0b5ec: posts the ante 450
+70ce5813: posts the ante 450
+Hero: posts the ante 450
+df6c12af: posts the ante 450
+af45c597: posts the ante 450
+46cfbe4c: posts the ante 450
+b19487ca: posts the ante 450
+Hero: posts small blind 1,750
+72b0b5ec: posts big blind 3,500
+*** HOLE CARDS ***
+Dealt to 46cfbe4c 
+Dealt to Hero [Kh Jh]
+Dealt to 72b0b5ec 
+Dealt to af45c597 
+Dealt to df6c12af 
+Dealt to d4ed822c 
+Dealt to 70ce5813 
+Dealt to b19487ca 
+af45c597: raises 3,500 to 7,000
+df6c12af: folds
+d4ed822c: folds
+70ce5813: folds
+b19487ca: calls 7,000
+46cfbe4c: folds
+Hero: raises 21,550 to 28,550 and is all-in
+72b0b5ec: folds
+af45c597: calls 21,550
+b19487ca: calls 21,550
+*** FLOP *** [8s 9d 9s]
+af45c597: checks
+b19487ca: checks
+*** TURN *** [8s 9d 9s] [8h]
+af45c597: checks
+b19487ca: checks
+*** RIVER *** [8s 9d 9s 8h] [7d]
+af45c597: checks
+b19487ca: checks
+Hero: shows [Kh Jh] (two pair, Nines and Eights)
+af45c597: shows [Ah Th] (two pair, Nines and Eights)
+b19487ca: shows [3c 3s] (two pair, Nines and Eights)
+*** SHOWDOWN ***
+af45c597 collected 92,750 from pot
+*** SUMMARY ***
+Total pot 92,750 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [8s 9d 9s 8h 7d]
+Seat 1: 46cfbe4c (button) folded before Flop
+Seat 2: Hero (small blind) showed [Kh Jh] and lost with two pair, Nines and Eights
+Seat 3: 72b0b5ec (big blind) folded before Flop
+Seat 4: af45c597 showed [Ah Th] and won (92,750) with two pair, Nines and Eights
+Seat 5: df6c12af folded before Flop
+Seat 6: d4ed822c folded before Flop
+Seat 7: 70ce5813 folded before Flop
+Seat 8: b19487ca showed [3c 3s] and lost with two pair, Nines and Eights
+
+
+Poker Hand #TM6113915466: Tournament #293312473, Mini Forty Stack $4.40 Hold'em No Limit - Level15(1,750/3,500(450)) - 2026/06/26 02:16:17
+Table '13' 8-max Seat #8 is the button
+Seat 1: 46cfbe4c (100,368 in chips)
+Seat 2: Hero (38,200 in chips)
+Seat 3: 72b0b5ec (145,138 in chips)
+Seat 4: af45c597 (177,255 in chips)
+Seat 5: df6c12af (26,700 in chips)
+Seat 6: d4ed822c (144,141 in chips)
+Seat 7: 70ce5813 (77,277 in chips)
+Seat 8: b19487ca (56,850 in chips)
+d4ed822c: posts the ante 450
+72b0b5ec: posts the ante 450
+70ce5813: posts the ante 450
+Hero: posts the ante 450
+df6c12af: posts the ante 450
+af45c597: posts the ante 450
+46cfbe4c: posts the ante 450
+b19487ca: posts the ante 450
+46cfbe4c: posts small blind 1,750
+Hero: posts big blind 3,500
+*** HOLE CARDS ***
+Dealt to 46cfbe4c 
+Dealt to Hero [Qc 5c]
+Dealt to 72b0b5ec 
+Dealt to af45c597 
+Dealt to df6c12af 
+Dealt to d4ed822c 
+Dealt to 70ce5813 
+Dealt to b19487ca 
+72b0b5ec: folds
+af45c597: folds
+df6c12af: folds
+d4ed822c: folds
+70ce5813: folds
+b19487ca: raises 5,250 to 8,750
+46cfbe4c: folds
+Hero: calls 5,250
+*** FLOP *** [6h 9s 7h]
+Hero: checks
+b19487ca: bets 17,595
+Hero: folds
+Uncalled bet (17,595) returned to b19487ca
+*** SHOWDOWN ***
+b19487ca collected 22,850 from pot
+*** SUMMARY ***
+Total pot 22,850 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6h 9s 7h]
+Seat 1: 46cfbe4c (small blind) folded before Flop
+Seat 2: Hero (big blind) folded on the Flop
+Seat 3: 72b0b5ec folded before Flop
+Seat 4: af45c597 folded before Flop
+Seat 5: df6c12af folded before Flop
+Seat 6: d4ed822c folded before Flop
+Seat 7: 70ce5813 folded before Flop
+Seat 8: b19487ca (button) won (22,850)
+
+
+Poker Hand #TM6113915433: Tournament #293312473, Mini Forty Stack $4.40 Hold'em No Limit - Level15(1,750/3,500(450)) - 2026/06/26 02:15:46
+Table '13' 8-max Seat #7 is the button
+Seat 1: 46cfbe4c (104,318 in chips)
+Seat 2: Hero (38,650 in chips)
+Seat 3: 72b0b5ec (152,588 in chips)
+Seat 4: af45c597 (177,705 in chips)
+Seat 5: df6c12af (27,150 in chips)
+Seat 6: d4ed822c (128,741 in chips)
+Seat 7: 70ce5813 (77,727 in chips)
+Seat 8: b19487ca (59,050 in chips)
+d4ed822c: posts the ante 450
+72b0b5ec: posts the ante 450
+70ce5813: posts the ante 450
+Hero: posts the ante 450
+df6c12af: posts the ante 450
+af45c597: posts the ante 450
+46cfbe4c: posts the ante 450
+b19487ca: posts the ante 450
+b19487ca: posts small blind 1,750
+46cfbe4c: posts big blind 3,500
+*** HOLE CARDS ***
+Dealt to 46cfbe4c 
+Dealt to Hero [3s Qd]
+Dealt to 72b0b5ec 
+Dealt to af45c597 
+Dealt to df6c12af 
+Dealt to d4ed822c 
+Dealt to 70ce5813 
+Dealt to b19487ca 
+Hero: folds
+72b0b5ec: raises 3,500 to 7,000
+af45c597: folds
+df6c12af: folds
+d4ed822c: raises 12,250 to 19,250
+70ce5813: folds
+b19487ca: folds
+46cfbe4c: folds
+72b0b5ec: folds
+Uncalled bet (12,250) returned to d4ed822c
+*** SHOWDOWN ***
+d4ed822c collected 22,850 from pot
+*** SUMMARY ***
+Total pot 22,850 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 46cfbe4c (big blind) folded before Flop
+Seat 2: Hero folded before Flop
+Seat 3: 72b0b5ec folded before Flop
+Seat 4: af45c597 folded before Flop
+Seat 5: df6c12af folded before Flop
+Seat 6: d4ed822c collected (22,850)
+Seat 7: 70ce5813 (button) folded before Flop
+Seat 8: b19487ca (small blind) folded before Flop
+
+
+Poker Hand #TM6113915404: Tournament #293312473, Mini Forty Stack $4.40 Hold'em No Limit - Level15(1,750/3,500(450)) - 2026/06/26 02:15:13
+Table '13' 8-max Seat #6 is the button
+Seat 1: 46cfbe4c (95,918 in chips)
+Seat 2: Hero (39,100 in chips)
+Seat 3: 72b0b5ec (153,038 in chips)
+Seat 4: af45c597 (178,155 in chips)
+Seat 5: df6c12af (27,600 in chips)
+Seat 6: d4ed822c (129,191 in chips)
+Seat 7: 70ce5813 (79,927 in chips)
+Seat 8: b19487ca (63,000 in chips)
+d4ed822c: posts the ante 450
+72b0b5ec: posts the ante 450
+70ce5813: posts the ante 450
+Hero: posts the ante 450
+df6c12af: posts the ante 450
+af45c597: posts the ante 450
+46cfbe4c: posts the ante 450
+b19487ca: posts the ante 450
+70ce5813: posts small blind 1,750
+b19487ca: posts big blind 3,500
+*** HOLE CARDS ***
+Dealt to 46cfbe4c 
+Dealt to Hero [2s Js]
+Dealt to 72b0b5ec 
+Dealt to af45c597 
+Dealt to df6c12af 
+Dealt to d4ed822c 
+Dealt to 70ce5813 
+Dealt to b19487ca 
+46cfbe4c: raises 3,500 to 7,000
+Hero: folds
+72b0b5ec: folds
+af45c597: folds
+df6c12af: folds
+d4ed822c: folds
+70ce5813: folds
+b19487ca: folds
+Uncalled bet (3,500) returned to 46cfbe4c
+*** SHOWDOWN ***
+46cfbe4c collected 12,350 from pot
+*** SUMMARY ***
+Total pot 12,350 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 46cfbe4c collected (12,350)
+Seat 2: Hero folded before Flop
+Seat 3: 72b0b5ec folded before Flop
+Seat 4: af45c597 folded before Flop
+Seat 5: df6c12af folded before Flop
+Seat 6: d4ed822c (button) folded before Flop
+Seat 7: 70ce5813 (small blind) folded before Flop
+Seat 8: b19487ca (big blind) folded before Flop
+
+
+Poker Hand #TM6113915360: Tournament #293312473, Mini Forty Stack $4.40 Hold'em No Limit - Level15(1,750/3,500(450)) - 2026/06/26 02:14:32
+Table '13' 8-max Seat #5 is the button
+Seat 1: 46cfbe4c (96,368 in chips)
+Seat 2: Hero (39,550 in chips)
+Seat 3: 72b0b5ec (153,488 in chips)
+Seat 4: af45c597 (178,605 in chips)
+Seat 5: df6c12af (28,050 in chips)
+Seat 6: d4ed822c (131,391 in chips)
+Seat 7: 70ce5813 (83,877 in chips)
+Seat 8: b19487ca (54,600 in chips)
+72b0b5ec: posts the ante 450
+d4ed822c: posts the ante 450
+70ce5813: posts the ante 450
+Hero: posts the ante 450
+df6c12af: posts the ante 450
+af45c597: posts the ante 450
+46cfbe4c: posts the ante 450
+b19487ca: posts the ante 450
+d4ed822c: posts small blind 1,750
+70ce5813: posts big blind 3,500
+*** HOLE CARDS ***
+Dealt to 46cfbe4c 
+Dealt to Hero [Td 4h]
+Dealt to 72b0b5ec 
+Dealt to af45c597 
+Dealt to df6c12af 
+Dealt to d4ed822c 
+Dealt to 70ce5813 
+Dealt to b19487ca 
+b19487ca: raises 3,500 to 7,000
+46cfbe4c: folds
+Hero: folds
+72b0b5ec: folds
+af45c597: folds
+df6c12af: folds
+d4ed822c: folds
+70ce5813: folds
+Uncalled bet (3,500) returned to b19487ca
+*** SHOWDOWN ***
+b19487ca collected 12,350 from pot
+*** SUMMARY ***
+Total pot 12,350 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 46cfbe4c folded before Flop
+Seat 2: Hero folded before Flop
+Seat 3: 72b0b5ec folded before Flop
+Seat 4: af45c597 folded before Flop
+Seat 5: df6c12af (button) folded before Flop
+Seat 6: d4ed822c (small blind) folded before Flop
+Seat 7: 70ce5813 (big blind) folded before Flop
+Seat 8: b19487ca collected (12,350)
+
+
+Poker Hand #TM6113915333: Tournament #293312473, Mini Forty Stack $4.40 Hold'em No Limit - Level15(1,750/3,500(450)) - 2026/06/26 02:14:09
+Table '13' 8-max Seat #4 is the button
+Seat 1: 46cfbe4c (96,818 in chips)
+Seat 2: Hero (40,000 in chips)
+Seat 3: 72b0b5ec (153,938 in chips)
+Seat 4: af45c597 (179,055 in chips)
+Seat 5: df6c12af (30,250 in chips)
+Seat 6: d4ed822c (126,491 in chips)
+Seat 7: 70ce5813 (84,327 in chips)
+Seat 8: b19487ca (55,050 in chips)
+72b0b5ec: posts the ante 450
+d4ed822c: posts the ante 450
+70ce5813: posts the ante 450
+Hero: posts the ante 450
+af45c597: posts the ante 450
+df6c12af: posts the ante 450
+46cfbe4c: posts the ante 450
+b19487ca: posts the ante 450
+df6c12af: posts small blind 1,750
+d4ed822c: posts big blind 3,500
+*** HOLE CARDS ***
+Dealt to 46cfbe4c 
+Dealt to Hero [8d 3h]
+Dealt to 72b0b5ec 
+Dealt to af45c597 
+Dealt to df6c12af 
+Dealt to d4ed822c 
+Dealt to 70ce5813 
+Dealt to b19487ca 
+70ce5813: folds
+b19487ca: folds
+46cfbe4c: folds
+Hero: folds
+72b0b5ec: folds
+af45c597: folds
+df6c12af: folds
+Uncalled bet (1,750) returned to d4ed822c
+*** SHOWDOWN ***
+d4ed822c collected 7,100 from pot
+*** SUMMARY ***
+Total pot 7,100 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 46cfbe4c folded before Flop
+Seat 2: Hero folded before Flop
+Seat 3: 72b0b5ec folded before Flop
+Seat 4: af45c597 (button) folded before Flop
+Seat 5: df6c12af (small blind) folded before Flop
+Seat 6: d4ed822c (big blind) collected (7,100)
+Seat 7: 70ce5813 folded before Flop
+Seat 8: b19487ca folded before Flop
+
+

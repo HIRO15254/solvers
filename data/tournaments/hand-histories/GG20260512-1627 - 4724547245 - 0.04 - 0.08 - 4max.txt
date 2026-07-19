@@ -1,0 +1,415 @@
+Poker Hand #TM129797284: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level5(40/80) - 2026/05/13 01:31:36
+Table '47245' 4-max Seat #2 is the button
+Seat 2: 1bdb6557 (705 in chips)
+Seat 4: Hero (95 in chips)
+1bdb6557: posts small blind 40
+Hero: posts big blind 80
+*** HOLE CARDS ***
+Dealt to 1bdb6557 
+Dealt to Hero [Jd 5h]
+1bdb6557: raises 625 to 705 and is all-in
+Hero: calls 15 and is all-in
+Uncalled bet (610) returned to 1bdb6557
+1bdb6557: shows [Qd Kh]
+Hero: shows [Jd 5h]
+*** FLOP *** [Td Kd 8c]
+*** TURN *** [Td Kd 8c] [9h]
+*** RIVER *** [Td Kd 8c 9h] [3c]
+*** SHOWDOWN ***
+1bdb6557 collected 190 from pot
+*** SUMMARY ***
+Total pot 190 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Td Kd 8c 9h 3c]
+Seat 2: 1bdb6557 (small blind) showed [Qd Kh] and won (190) with a pair of Kings
+Seat 4: Hero (big blind) showed [Jd 5h] and lost with King high
+
+
+Poker Hand #TM129797282: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level5(40/80) - 2026/05/13 01:31:26
+Table '47245' 4-max Seat #4 is the button
+Seat 2: 1bdb6557 (665 in chips)
+Seat 4: Hero (135 in chips)
+Hero: posts small blind 40
+1bdb6557: posts big blind 80
+*** HOLE CARDS ***
+Dealt to 1bdb6557 
+Dealt to Hero [7c 4s]
+Hero: folds
+Uncalled bet (40) returned to 1bdb6557
+*** SHOWDOWN ***
+1bdb6557 collected 80 from pot
+*** SUMMARY ***
+Total pot 80 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 2: 1bdb6557 (big blind) collected (80)
+Seat 4: Hero (small blind) folded before Flop
+
+
+Poker Hand #TM129797275: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level4(25/50) - 2026/05/13 01:30:59
+Table '47245' 4-max Seat #3 is the button
+Seat 2: 1bdb6557 (560 in chips)
+Seat 3: bf5850d1 (80 in chips)
+Seat 4: Hero (160 in chips)
+Hero: posts small blind 25
+1bdb6557: posts big blind 50
+*** HOLE CARDS ***
+Dealt to 1bdb6557 
+Dealt to bf5850d1 
+Dealt to Hero [7d 6c]
+bf5850d1: raises 30 to 80 and is all-in
+Hero: folds
+1bdb6557: calls 30
+bf5850d1: shows [Td Kd]
+1bdb6557: shows [8h 3s]
+*** FLOP *** [2s 3h 9c]
+*** TURN *** [2s 3h 9c] [9h]
+*** RIVER *** [2s 3h 9c 9h] [5d]
+*** SHOWDOWN ***
+1bdb6557 collected 185 from pot
+*** SUMMARY ***
+Total pot 185 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [2s 3h 9c 9h 5d]
+Seat 2: 1bdb6557 (big blind) showed [8h 3s] and won (185) with two pair, Nines and Threes
+Seat 3: bf5850d1 (button) showed [Td Kd] and lost with a pair of Nines
+Seat 4: Hero (small blind) folded before Flop
+
+
+Poker Hand #TM129797273: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level4(25/50) - 2026/05/13 01:30:41
+Table '47245' 4-max Seat #2 is the button
+Seat 2: 1bdb6557 (230 in chips)
+Seat 3: bf5850d1 (170 in chips)
+Seat 4: Hero (160 in chips)
+bf5850d1: posts small blind 25
+Hero: posts big blind 50
+*** HOLE CARDS ***
+Dealt to 1bdb6557 
+Dealt to bf5850d1 
+Dealt to Hero [As 3s]
+1bdb6557: raises 180 to 230 and is all-in
+bf5850d1: calls 145 and is all-in
+Hero: calls 110 and is all-in
+Uncalled bet (60) returned to 1bdb6557
+1bdb6557: shows [Th Ks]
+bf5850d1: shows [Kh 6d]
+Hero: shows [As 3s]
+*** FLOP *** [6h Qd Tc]
+*** TURN *** [6h Qd Tc] [2s]
+*** RIVER *** [6h Qd Tc 2s] [7s]
+*** SHOWDOWN ***
+1bdb6557 collected 480 from pot
+1bdb6557 collected 20 from pot
+*** SUMMARY ***
+Total pot 500 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6h Qd Tc 2s 7s]
+Seat 2: 1bdb6557 (button) showed [Th Ks] and won (500) with a pair of Tens
+Seat 3: bf5850d1 (small blind) showed [Kh 6d] and lost with a pair of Sixes
+Seat 4: Hero (big blind) showed [As 3s] and lost with Ace high
+
+
+Poker Hand #TM129797271: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level4(25/50) - 2026/05/13 01:30:33
+Table '47245' 4-max Seat #4 is the button
+Seat 2: 1bdb6557 (180 in chips)
+Seat 3: bf5850d1 (220 in chips)
+Seat 4: Hero (160 in chips)
+1bdb6557: posts small blind 25
+bf5850d1: posts big blind 50
+*** HOLE CARDS ***
+Dealt to 1bdb6557 
+Dealt to bf5850d1 
+Dealt to Hero [Td 4c]
+Hero: folds
+1bdb6557: raises 130 to 180 and is all-in
+bf5850d1: folds
+Uncalled bet (130) returned to 1bdb6557
+*** SHOWDOWN ***
+1bdb6557 collected 100 from pot
+*** SUMMARY ***
+Total pot 100 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 2: 1bdb6557 (small blind) collected (100)
+Seat 3: bf5850d1 (big blind) folded before Flop
+Seat 4: Hero (button) folded before Flop (didn't bet)
+
+
+Poker Hand #TM129797268: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level4(25/50) - 2026/05/13 01:30:24
+Table '47245' 4-max Seat #3 is the button
+Seat 2: 1bdb6557 (230 in chips)
+Seat 3: bf5850d1 (145 in chips)
+Seat 4: Hero (185 in chips)
+Hero: posts small blind 25
+1bdb6557: posts big blind 50
+*** HOLE CARDS ***
+Dealt to 1bdb6557 
+Dealt to bf5850d1 
+Dealt to Hero [7h Td]
+bf5850d1: raises 95 to 145 and is all-in
+Hero: folds
+1bdb6557: folds
+Uncalled bet (95) returned to bf5850d1
+*** SHOWDOWN ***
+bf5850d1 collected 125 from pot
+*** SUMMARY ***
+Total pot 125 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 2: 1bdb6557 (big blind) folded before Flop
+Seat 3: bf5850d1 (button) collected (125)
+Seat 4: Hero (small blind) folded before Flop
+
+
+Poker Hand #TM129797267: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level3(15/30) - 2026/05/13 01:30:08
+Table '47245' 4-max Seat #2 is the button
+Seat 2: 1bdb6557 (230 in chips)
+Seat 3: bf5850d1 (115 in chips)
+Seat 4: Hero (215 in chips)
+bf5850d1: posts small blind 15
+Hero: posts big blind 30
+*** HOLE CARDS ***
+Dealt to 1bdb6557 
+Dealt to bf5850d1 
+Dealt to Hero [6h 8h]
+1bdb6557: folds
+bf5850d1: raises 85 to 115 and is all-in
+Hero: folds
+Uncalled bet (85) returned to bf5850d1
+*** SHOWDOWN ***
+bf5850d1 collected 60 from pot
+*** SUMMARY ***
+Total pot 60 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 2: 1bdb6557 (button) folded before Flop (didn't bet)
+Seat 3: bf5850d1 (small blind) collected (60)
+Seat 4: Hero (big blind) folded before Flop
+
+
+Poker Hand #TM129797265: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level3(15/30) - 2026/05/13 01:29:58
+Table '47245' 4-max Seat #4 is the button
+Seat 2: 1bdb6557 (200 in chips)
+Seat 3: bf5850d1 (145 in chips)
+Seat 4: Hero (215 in chips)
+1bdb6557: posts small blind 15
+bf5850d1: posts big blind 30
+*** HOLE CARDS ***
+Dealt to 1bdb6557 
+Dealt to bf5850d1 
+Dealt to Hero [5s 4h]
+Hero: folds
+1bdb6557: raises 170 to 200 and is all-in
+bf5850d1: folds
+Uncalled bet (170) returned to 1bdb6557
+*** SHOWDOWN ***
+1bdb6557 collected 60 from pot
+*** SUMMARY ***
+Total pot 60 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 2: 1bdb6557 (small blind) collected (60)
+Seat 3: bf5850d1 (big blind) folded before Flop
+Seat 4: Hero (button) folded before Flop (didn't bet)
+
+
+Poker Hand #TM129797263: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level3(15/30) - 2026/05/13 01:29:33
+Table '47245' 4-max Seat #3 is the button
+Seat 2: 1bdb6557 (265 in chips)
+Seat 3: bf5850d1 (65 in chips)
+Seat 4: Hero (230 in chips)
+Hero: posts small blind 15
+1bdb6557: posts big blind 30
+*** HOLE CARDS ***
+Dealt to 1bdb6557 
+Dealt to bf5850d1 
+Dealt to Hero [Qs 5d]
+bf5850d1: raises 35 to 65 and is all-in
+Hero: folds
+1bdb6557: calls 35
+bf5850d1: shows [3c 3s]
+1bdb6557: shows [5s 4h]
+*** FLOP *** [Ad 7h Qh]
+*** TURN *** [Ad 7h Qh] [2s]
+*** RIVER *** [Ad 7h Qh 2s] [Kd]
+*** SHOWDOWN ***
+bf5850d1 collected 145 from pot
+*** SUMMARY ***
+Total pot 145 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Ad 7h Qh 2s Kd]
+Seat 2: 1bdb6557 (big blind) showed [5s 4h] and lost with Ace high
+Seat 3: bf5850d1 (button) showed [3c 3s] and won (145) with a pair of Threes
+Seat 4: Hero (small blind) folded before Flop
+
+
+Poker Hand #TM129797261: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level2(10/20) - 2026/05/13 01:29:21
+Table '47245' 4-max Seat #2 is the button
+Seat 2: 1bdb6557 (235 in chips)
+Seat 3: bf5850d1 (75 in chips)
+Seat 4: Hero (250 in chips)
+bf5850d1: posts small blind 10
+Hero: posts big blind 20
+*** HOLE CARDS ***
+Dealt to 1bdb6557 
+Dealt to bf5850d1 
+Dealt to Hero [5c 9c]
+1bdb6557: raises 215 to 235 and is all-in
+bf5850d1: folds
+Hero: folds
+Uncalled bet (215) returned to 1bdb6557
+*** SHOWDOWN ***
+1bdb6557 collected 50 from pot
+*** SUMMARY ***
+Total pot 50 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 2: 1bdb6557 (button) collected (50)
+Seat 3: bf5850d1 (small blind) folded before Flop
+Seat 4: Hero (big blind) folded before Flop
+
+
+Poker Hand #TM129797257: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level2(10/20) - 2026/05/13 01:29:00
+Table '47245' 4-max Seat #4 is the button
+Seat 1: 288a8959 (95 in chips)
+Seat 2: 1bdb6557 (140 in chips)
+Seat 3: bf5850d1 (75 in chips)
+Seat 4: Hero (250 in chips)
+288a8959: posts small blind 10
+1bdb6557: posts big blind 20
+*** HOLE CARDS ***
+Dealt to 288a8959 
+Dealt to 1bdb6557 
+Dealt to bf5850d1 
+Dealt to Hero [6h 9h]
+bf5850d1: folds
+Hero: folds
+288a8959: raises 75 to 95 and is all-in
+1bdb6557: calls 75
+288a8959: shows [Ts Js]
+1bdb6557: shows [Qs Kd]
+*** FLOP *** [5c Ks 7c]
+*** TURN *** [5c Ks 7c] [Ad]
+*** RIVER *** [5c Ks 7c Ad] [9d]
+*** SHOWDOWN ***
+1bdb6557 collected 190 from pot
+*** SUMMARY ***
+Total pot 190 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [5c Ks 7c Ad 9d]
+Seat 1: 288a8959 (small blind) showed [Ts Js] and lost with Ace high
+Seat 2: 1bdb6557 (big blind) showed [Qs Kd] and won (190) with a pair of Kings
+Seat 3: bf5850d1 folded before Flop (didn't bet)
+Seat 4: Hero (button) folded before Flop (didn't bet)
+
+
+Poker Hand #TM129797254: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level2(10/20) - 2026/05/13 01:28:38
+Table '47245' 4-max Seat #3 is the button
+Seat 1: 288a8959 (80 in chips)
+Seat 2: 1bdb6557 (65 in chips)
+Seat 3: bf5850d1 (75 in chips)
+Seat 4: Hero (260 in chips)
+Hero: posts small blind 10
+288a8959: posts big blind 20
+*** HOLE CARDS ***
+Dealt to 288a8959 
+Dealt to 1bdb6557 
+Dealt to bf5850d1 
+Dealt to Hero [4s 5h]
+1bdb6557: raises 45 to 65 and is all-in
+bf5850d1: folds
+Hero: folds
+288a8959: calls 45
+1bdb6557: shows [6d 6s]
+288a8959: shows [Jh Tc]
+*** FLOP *** [3h 8c 8d]
+*** TURN *** [3h 8c 8d] [5c]
+*** RIVER *** [3h 8c 8d 5c] [9c]
+*** SHOWDOWN ***
+1bdb6557 collected 140 from pot
+*** SUMMARY ***
+Total pot 140 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [3h 8c 8d 5c 9c]
+Seat 1: 288a8959 (big blind) showed [Jh Tc] and lost with a pair of Eights
+Seat 2: 1bdb6557 showed [6d 6s] and won (140) with two pair, Eights and Sixes
+Seat 3: bf5850d1 (button) folded before Flop (didn't bet)
+Seat 4: Hero (small blind) folded before Flop
+
+
+Poker Hand #TM129797252: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level1(5/10) - 2026/05/13 01:28:12
+Table '47245' 4-max Seat #2 is the button
+Seat 1: 288a8959 (90 in chips)
+Seat 2: 1bdb6557 (65 in chips)
+Seat 3: bf5850d1 (80 in chips)
+Seat 4: Hero (165 in chips)
+bf5850d1: posts small blind 5
+Hero: posts big blind 10
+*** HOLE CARDS ***
+Dealt to 288a8959 
+Dealt to 1bdb6557 
+Dealt to bf5850d1 
+Dealt to Hero [Js Kc]
+288a8959: raises 80 to 90 and is all-in
+1bdb6557: folds
+bf5850d1: folds
+Hero: calls 80
+288a8959: shows [Ah Qc]
+Hero: shows [Js Kc]
+*** FLOP *** [9d 2s 2d]
+*** TURN *** [9d 2s 2d] [5c]
+*** RIVER *** [9d 2s 2d 5c] [Ks]
+*** SHOWDOWN ***
+Hero collected 185 from pot
+*** SUMMARY ***
+Total pot 185 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [9d 2s 2d 5c Ks]
+Seat 1: 288a8959 showed [Ah Qc] and lost with a pair of Twos
+Seat 2: 1bdb6557 (button) folded before Flop (didn't bet)
+Seat 3: bf5850d1 (small blind) folded before Flop
+Seat 4: Hero (big blind) showed [Js Kc] and won (185) with two pair, Kings and Twos
+
+
+Poker Hand #TM129797250: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level1(5/10) - 2026/05/13 01:27:45
+Table '47245' 4-max Seat #1 is the button
+Seat 1: 288a8959 (90 in chips)
+Seat 2: 1bdb6557 (70 in chips)
+Seat 3: bf5850d1 (80 in chips)
+Seat 4: Hero (80 in chips)
+1bdb6557: posts small blind 5
+bf5850d1: posts big blind 10
+*** HOLE CARDS ***
+Dealt to 288a8959 
+Dealt to 1bdb6557 
+Dealt to bf5850d1 
+Dealt to Hero [Ac Qh]
+Hero: raises 70 to 80 and is all-in
+288a8959: folds
+1bdb6557: folds
+bf5850d1: calls 70 and is all-in
+Hero: shows [Ac Qh]
+bf5850d1: shows [5d Ks]
+*** FLOP *** [7s Jd 4h]
+*** TURN *** [7s Jd 4h] [3d]
+*** RIVER *** [7s Jd 4h 3d] [3c]
+*** SHOWDOWN ***
+Hero collected 165 from pot
+*** SUMMARY ***
+Total pot 165 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [7s Jd 4h 3d 3c]
+Seat 1: 288a8959 (button) folded before Flop (didn't bet)
+Seat 2: 1bdb6557 (small blind) folded before Flop
+Seat 3: bf5850d1 (big blind) showed [5d Ks] and lost with a pair of Threes
+Seat 4: Hero showed [Ac Qh] and won (165) with a pair of Threes
+
+
+Poker Hand #TM129797247: Tournament #284515837, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level1(5/10) - 2026/05/13 01:27:25
+Table '47245' 4-max Seat #4 is the button
+Seat 1: 288a8959 (80 in chips)
+Seat 2: 1bdb6557 (80 in chips)
+Seat 3: bf5850d1 (80 in chips)
+Seat 4: Hero (80 in chips)
+288a8959: posts small blind 5
+1bdb6557: posts big blind 10
+*** HOLE CARDS ***
+Dealt to 288a8959 
+Dealt to 1bdb6557 
+Dealt to bf5850d1 
+Dealt to Hero [9c 8c]
+bf5850d1: folds
+Hero: folds
+288a8959: raises 70 to 80 and is all-in
+1bdb6557: folds
+Uncalled bet (70) returned to 288a8959
+*** SHOWDOWN ***
+288a8959 collected 20 from pot
+*** SUMMARY ***
+Total pot 20 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 288a8959 (small blind) collected (20)
+Seat 2: 1bdb6557 (big blind) folded before Flop
+Seat 3: bf5850d1 folded before Flop (didn't bet)
+Seat 4: Hero (button) folded before Flop (didn't bet)
+
+

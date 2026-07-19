@@ -1,0 +1,64 @@
+Poker Hand #TM6184818845: Tournament #299784725, $10,000 Bounty Hunters Series Cash Drop Hold'em No Limit - Level1(500/1,000(2,000,000,000)) - 2026/07/16 02:05:02
+Table '1095' 8-max Seat #6 is the button
+Seat 1: 11add5e0 (3,335 in chips)
+Seat 2: 540f439d (8,541 in chips)
+Seat 3: 35ba254b (7,808 in chips)
+Seat 4: 3fa63251 (6,178 in chips)
+Seat 5: 1b5c120b (2,572 in chips)
+Seat 6: 6c2ad916 (18,417 in chips)
+Seat 7: a5ece96 (2,829 in chips)
+Seat 8: Hero (4,648 in chips)
+6c2ad916: posts the ante 18,417
+Hero: posts the ante 4,648
+540f439d: posts the ante 8,541
+3fa63251: posts the ante 6,178
+1b5c120b: posts the ante 2,572
+11add5e0: posts the ante 3,335
+a5ece96: posts the ante 2,829
+35ba254b: posts the ante 7,808
+a5ece96: posts small blind 0
+Hero: posts big blind 0
+*** HOLE CARDS ***
+Dealt to 11add5e0 
+Dealt to 540f439d 
+Dealt to 35ba254b 
+Dealt to 3fa63251 
+Dealt to 1b5c120b 
+Dealt to 6c2ad916 
+Dealt to a5ece96 
+Dealt to Hero [Qh Tc]
+Uncalled bet (9,876) returned to 6c2ad916
+a5ece96: shows [Jh 2c]
+Hero: shows [Qh Tc]
+11add5e0: shows [6c 3h]
+540f439d: shows [Kh 5h]
+35ba254b: shows [Ts Ks]
+3fa63251: shows [Qd 4c]
+1b5c120b: shows [Jc 5c]
+6c2ad916: shows [Kd Td]
+*** FLOP *** [4d Js 6d]
+*** TURN *** [4d Js 6d] [9c]
+*** RIVER *** [4d Js 6d 9c] [Ah]
+*** SHOWDOWN ***
+1b5c120b collected 10,288 from pot
+a5ece96 collected 10,288 from pot
+a5ece96 collected 1,799 from pot
+11add5e0 collected 3,036 from pot
+3fa63251 collected 6,565 from pot
+3fa63251 collected 6,120 from pot
+35ba254b collected 2,445 from pot
+6c2ad916 collected 2,445 from pot
+6c2ad916 collected 1,466 from pot
+*** SUMMARY ***
+Total pot 44,452 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [4d Js 6d 9c Ah]
+Seat 1: 11add5e0 showed [6c 3h] and won (3,036) with a pair of Sixes
+Seat 2: 540f439d showed [Kh 5h] and lost with Ace high
+Seat 3: 35ba254b showed [Ts Ks] and won (2,445) with Ace high
+Seat 4: 3fa63251 showed [Qd 4c] and won (12,685) with a pair of Fours
+Seat 5: 1b5c120b showed [Jc 5c] and won (10,288) with a pair of Jacks
+Seat 6: 6c2ad916 (button) showed [Kd Td] and won (3,911) with Ace high
+Seat 7: a5ece96 (small blind) showed [Jh 2c] and won (12,087) with a pair of Jacks
+Seat 8: Hero (big blind) showed [Qh Tc] and lost with Ace high
+
+

@@ -1,0 +1,30 @@
+Poker Hand #TM178638617: Tournament #283357788, Step 0 - Avatar Race Omaha No Limit - Level1(5/10) - 2026/05/07 23:35:52
+Table '1' 3-max Seat #1 is the button
+Seat 1: 8b487798 (100 in chips)
+Seat 2: 152ce23b (100 in chips)
+Seat 3: Hero (100 in chips)
+152ce23b: posts small blind 5
+Hero: posts big blind 10
+*** HOLE CARDS ***
+Dealt to 8b487798 
+Dealt to 152ce23b 
+Dealt to Hero [Kh Kd Qd Qs]
+8b487798: raises 90 to 100 and is all-in
+152ce23b: calls 95 and is all-in
+Hero: calls 90 and is all-in
+8b487798: shows [Ad Ac Js Ts]
+152ce23b: shows [2s 3s 4h 5h]
+Hero: shows [Kh Kd Qd Qs]
+*** FLOP *** [7s 8s 4d]
+*** TURN *** [7s 8s 4d] [6d]
+*** RIVER *** [7s 8s 4d 6d] [3h]
+*** SHOWDOWN ***
+152ce23b collected 300 from pot
+*** SUMMARY ***
+Total pot 300 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [7s 8s 4d 6d 3h]
+Seat 1: 8b487798 (button) showed [Ad Ac Js Ts] and lost with a pair of Aces
+Seat 2: 152ce23b (small blind) showed [2s 3s 4h 5h] and won (300) with a straight, Eight to Four
+Seat 3: Hero (big blind) showed [Kh Kd Qd Qs] and lost with a pair of Kings
+
+

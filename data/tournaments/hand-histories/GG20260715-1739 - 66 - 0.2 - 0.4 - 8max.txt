@@ -1,0 +1,1359 @@
+Poker Hand #TM6180664846: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level7(200/400(40)) - 2026/07/16 03:06:49
+Table '6' 8-max Seat #5 is the button
+Seat 1: f25b3cae (6,120 in chips)
+Seat 2: 47dc6b52 (7,922 in chips)
+Seat 3: Hero (4,013 in chips)
+Seat 4: 405f4692 (9,749 in chips)
+Seat 5: 95951d97 (5,899 in chips)
+Seat 6: f3b92edc (19,877 in chips)
+Seat 7: 8b4d424 (2,170 in chips)
+Seat 8: 2aac1f24 (7,580 in chips)
+405f4692: posts the ante 40
+Hero: posts the ante 40
+f25b3cae: posts the ante 40
+47dc6b52: posts the ante 40
+95951d97: posts the ante 40
+2aac1f24: posts the ante 40
+8b4d424: posts the ante 40
+f3b92edc: posts the ante 40
+f3b92edc: posts small blind 200
+8b4d424: posts big blind 400
+*** HOLE CARDS ***
+Dealt to f25b3cae 
+Dealt to 47dc6b52 
+Dealt to Hero [Qs Qh]
+Dealt to 405f4692 
+Dealt to 95951d97 
+Dealt to f3b92edc 
+Dealt to 8b4d424 
+Dealt to 2aac1f24 
+2aac1f24: folds
+f25b3cae: raises 400 to 800
+47dc6b52: raises 7,082 to 7,882 and is all-in
+Hero: calls 3,973 and is all-in
+405f4692: folds
+95951d97: folds
+f3b92edc: folds
+8b4d424: folds
+f25b3cae: calls 5,280 and is all-in
+Uncalled bet (1,802) returned to 47dc6b52
+47dc6b52: shows [As Qd]
+Hero: shows [Qs Qh]
+f25b3cae: shows [Kd Kc]
+*** FLOP *** [6c Tc 7s]
+*** TURN *** [6c Tc 7s] [Jh]
+*** RIVER *** [6c Tc 7s Jh] [Kh]
+*** SHOWDOWN ***
+47dc6b52 collected 12,839 from pot
+47dc6b52 collected 4,214 from pot
+*** SUMMARY ***
+Total pot 17,053 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6c Tc 7s Jh Kh]
+Seat 1: f25b3cae showed [Kd Kc] and lost with three of a kind, Kings
+Seat 2: 47dc6b52 showed [As Qd] and won (17,053) with a straight, Ace to Ten
+Seat 3: Hero showed [Qs Qh] and lost with a pair of Queens
+Seat 4: 405f4692 folded before Flop
+Seat 5: 95951d97 (button) folded before Flop
+Seat 6: f3b92edc (small blind) folded before Flop
+Seat 7: 8b4d424 (big blind) folded before Flop
+Seat 8: 2aac1f24 folded before Flop
+
+
+Poker Hand #TM6180664837: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level7(200/400(40)) - 2026/07/16 03:05:16
+Table '6' 8-max Seat #4 is the button
+Seat 1: f25b3cae (6,160 in chips)
+Seat 2: 47dc6b52 (7,962 in chips)
+Seat 3: Hero (4,053 in chips)
+Seat 4: 405f4692 (7,669 in chips)
+Seat 5: 95951d97 (6,139 in chips)
+Seat 6: f3b92edc (21,517 in chips)
+Seat 7: 8b4d424 (2,210 in chips)
+Seat 8: 2aac1f24 (7,620 in chips)
+405f4692: posts the ante 40
+Hero: posts the ante 40
+f25b3cae: posts the ante 40
+47dc6b52: posts the ante 40
+95951d97: posts the ante 40
+2aac1f24: posts the ante 40
+8b4d424: posts the ante 40
+f3b92edc: posts the ante 40
+95951d97: posts small blind 200
+f3b92edc: posts big blind 400
+*** HOLE CARDS ***
+Dealt to f25b3cae 
+Dealt to 47dc6b52 
+Dealt to Hero [9d 4d]
+Dealt to 405f4692 
+Dealt to 95951d97 
+Dealt to f3b92edc 
+Dealt to 8b4d424 
+Dealt to 2aac1f24 
+8b4d424: folds
+2aac1f24: folds
+f25b3cae: folds
+47dc6b52: folds
+Hero: folds
+405f4692: raises 400 to 800
+95951d97: folds
+f3b92edc: calls 400
+*** FLOP *** [Qd Qh 3s]
+f3b92edc: checks
+405f4692: bets 800
+f3b92edc: calls 800
+*** TURN *** [Qd Qh 3s] [4s]
+f3b92edc: checks
+405f4692: checks
+*** RIVER *** [Qd Qh 3s 4s] [Ah]
+f3b92edc: checks
+405f4692: bets 2,000
+f3b92edc: folds
+Uncalled bet (2,000) returned to 405f4692
+*** SHOWDOWN ***
+405f4692 collected 3,720 from pot
+*** SUMMARY ***
+Total pot 3,720 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Qd Qh 3s 4s Ah]
+Seat 1: f25b3cae folded before Flop
+Seat 2: 47dc6b52 folded before Flop
+Seat 3: Hero folded before Flop
+Seat 4: 405f4692 (button) won (3,720)
+Seat 5: 95951d97 (small blind) folded before Flop
+Seat 6: f3b92edc (big blind) folded on the River
+Seat 7: 8b4d424 folded before Flop
+Seat 8: 2aac1f24 folded before Flop
+
+
+Poker Hand #TM6179065930: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level7(200/400(40)) - 2026/07/16 03:04:01
+Table '5' 8-max Seat #1 is the button
+Seat 1: Hero (4,093 in chips)
+Seat 3: 4d424658 (936 in chips)
+Seat 4: f3b92edc (20,461 in chips)
+Seat 5: d4293331 (7,440 in chips)
+Seat 6: eb6075aa (5,350 in chips)
+Hero: posts the ante 40
+eb6075aa: posts the ante 40
+4d424658: posts the ante 40
+d4293331: posts the ante 40
+f3b92edc: posts the ante 40
+4d424658: posts small blind 200
+f3b92edc: posts big blind 400
+*** HOLE CARDS ***
+Dealt to Hero [3c 8s]
+Dealt to 4d424658 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+d4293331: folds
+eb6075aa: folds
+Hero: folds
+4d424658: raises 496 to 896 and is all-in
+f3b92edc: calls 496
+4d424658: shows [6s 9c]
+f3b92edc: shows [Td Js]
+*** FLOP *** [Qh 8d 2c]
+*** TURN *** [Qh 8d 2c] [9s]
+*** RIVER *** [Qh 8d 2c 9s] [Ts]
+*** SHOWDOWN ***
+f3b92edc collected 1,992 from pot
+*** SUMMARY ***
+Total pot 1,992 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Qh 8d 2c 9s Ts]
+Seat 1: Hero (button) folded before Flop
+Seat 3: 4d424658 (small blind) showed [6s 9c] and lost with a pair of Nines
+Seat 4: f3b92edc (big blind) showed [Td Js] and won (1,992) with a straight, Queen to Eight
+Seat 5: d4293331 folded before Flop
+Seat 6: eb6075aa folded before Flop
+
+
+Poker Hand #TM6179065926: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level7(200/400(40)) - 2026/07/16 03:03:11
+Table '5' 8-max Seat #8 is the button
+Seat 1: Hero (1,848 in chips)
+Seat 3: 4d424658 (1,376 in chips)
+Seat 4: f3b92edc (20,501 in chips)
+Seat 5: d4293331 (7,480 in chips)
+Seat 6: eb6075aa (5,390 in chips)
+Seat 8: e0b0ff9d (1,685 in chips)
+Hero: posts the ante 40
+eb6075aa: posts the ante 40
+4d424658: posts the ante 40
+e0b0ff9d: posts the ante 40
+d4293331: posts the ante 40
+f3b92edc: posts the ante 40
+Hero: posts small blind 200
+4d424658: posts big blind 400
+*** HOLE CARDS ***
+Dealt to Hero [3c As]
+Dealt to 4d424658 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to e0b0ff9d 
+f3b92edc: folds
+d4293331: folds
+eb6075aa: folds
+e0b0ff9d: raises 1,245 to 1,645 and is all-in
+Hero: calls 1,445
+4d424658: folds
+e0b0ff9d: shows [9h Ad]
+Hero: shows [3c As]
+*** FLOP *** [Ks 3d 8h]
+*** TURN *** [Ks 3d 8h] [2d]
+*** RIVER *** [Ks 3d 8h 2d] [Td]
+*** SHOWDOWN ***
+Hero collected 3,930 from pot
+*** SUMMARY ***
+Total pot 3,930 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Ks 3d 8h 2d Td]
+Seat 1: Hero (small blind) showed [3c As] and won (3,930) with a pair of Threes
+Seat 3: 4d424658 (big blind) folded before Flop
+Seat 4: f3b92edc folded before Flop
+Seat 5: d4293331 folded before Flop
+Seat 6: eb6075aa folded before Flop
+Seat 8: e0b0ff9d (button) showed [9h Ad] and lost with Ace high
+
+
+Poker Hand #TM6179065923: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level6(150/300(30)) - 2026/07/16 03:02:14
+Table '5' 8-max Seat #6 is the button
+Seat 1: Hero (2,178 in chips)
+Seat 3: 4d424658 (3,786 in chips)
+Seat 4: f3b92edc (20,531 in chips)
+Seat 5: d4293331 (7,510 in chips)
+Seat 6: eb6075aa (2,410 in chips)
+Seat 8: e0b0ff9d (1,865 in chips)
+Hero: posts the ante 30
+eb6075aa: posts the ante 30
+4d424658: posts the ante 30
+e0b0ff9d: posts the ante 30
+d4293331: posts the ante 30
+f3b92edc: posts the ante 30
+e0b0ff9d: posts small blind 150
+Hero: posts big blind 300
+*** HOLE CARDS ***
+Dealt to Hero [Jh As]
+Dealt to 4d424658 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to e0b0ff9d 
+4d424658: raises 456 to 756
+f3b92edc: folds
+d4293331: folds
+eb6075aa: raises 1,624 to 2,380 and is all-in
+e0b0ff9d: folds
+Hero: folds
+4d424658: calls 1,624
+eb6075aa: shows [5c 5h]
+4d424658: shows [Kh 9c]
+*** FLOP *** [6s 4s Qc]
+*** TURN *** [6s 4s Qc] [2h]
+*** RIVER *** [6s 4s Qc 2h] [7h]
+*** SHOWDOWN ***
+eb6075aa collected 5,390 from pot
+*** SUMMARY ***
+Total pot 5,390 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6s 4s Qc 2h 7h]
+Seat 1: Hero (big blind) folded before Flop
+Seat 3: 4d424658 showed [Kh 9c] and lost with King high
+Seat 4: f3b92edc folded before Flop
+Seat 5: d4293331 folded before Flop
+Seat 6: eb6075aa (button) showed [5c 5h] and won (5,390) with a pair of Fives
+Seat 8: e0b0ff9d (small blind) folded before Flop
+
+
+Poker Hand #TM6179065919: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level6(150/300(30)) - 2026/07/16 03:01:05
+Table '5' 8-max Seat #5 is the button
+Seat 1: Hero (2,208 in chips)
+Seat 2: 5b04819c (9,649 in chips)
+Seat 3: 4d424658 (3,816 in chips)
+Seat 4: f3b92edc (9,982 in chips)
+Seat 5: d4293331 (7,540 in chips)
+Seat 6: eb6075aa (2,590 in chips)
+Seat 8: e0b0ff9d (2,495 in chips)
+Hero: posts the ante 30
+4d424658: posts the ante 30
+eb6075aa: posts the ante 30
+5b04819c: posts the ante 30
+e0b0ff9d: posts the ante 30
+d4293331: posts the ante 30
+f3b92edc: posts the ante 30
+eb6075aa: posts small blind 150
+e0b0ff9d: posts big blind 300
+*** HOLE CARDS ***
+Dealt to Hero [3h 8s]
+Dealt to 5b04819c 
+Dealt to 4d424658 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to e0b0ff9d 
+Hero: folds
+5b04819c: raises 300 to 600
+4d424658: folds
+f3b92edc: calls 600
+d4293331: folds
+eb6075aa: folds
+e0b0ff9d: calls 300
+*** FLOP *** [3s Qh 9h]
+e0b0ff9d: checks
+5b04819c: bets 1,620
+f3b92edc: calls 1,620
+e0b0ff9d: folds
+*** TURN *** [3s Qh 9h] [Jc]
+5b04819c: bets 7,399 and is all-in
+f3b92edc: calls 7,399
+5b04819c: shows [Ah 7d] (Ace high)
+f3b92edc: shows [Jd Js] (three of a kind, Jacks)
+*** RIVER *** [3s Qh 9h Jc] [3d]
+*** SHOWDOWN ***
+f3b92edc collected 20,198 from pot
+*** SUMMARY ***
+Total pot 20,198 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [3s Qh 9h Jc 3d]
+Seat 1: Hero folded before Flop
+Seat 2: 5b04819c showed [Ah 7d] and lost with a pair of Threes
+Seat 3: 4d424658 folded before Flop
+Seat 4: f3b92edc showed [Jd Js] and won (20,198) with a full house, Jacks full of Threes
+Seat 5: d4293331 (button) folded before Flop
+Seat 6: eb6075aa (small blind) folded before Flop
+Seat 8: e0b0ff9d (big blind) folded on the Flop
+
+
+Poker Hand #TM6179065918: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level6(150/300(30)) - 2026/07/16 03:00:34
+Table '5' 8-max Seat #4 is the button
+Seat 1: Hero (2,238 in chips)
+Seat 2: 5b04819c (9,679 in chips)
+Seat 3: 4d424658 (3,846 in chips)
+Seat 4: f3b92edc (9,322 in chips)
+Seat 5: d4293331 (7,720 in chips)
+Seat 6: eb6075aa (2,920 in chips)
+Seat 7: f25b3cae (3,150 in chips)
+Seat 8: e0b0ff9d (2,525 in chips)
+Hero: posts the ante 30
+4d424658: posts the ante 30
+eb6075aa: posts the ante 30
+5b04819c: posts the ante 30
+f25b3cae: posts the ante 30
+e0b0ff9d: posts the ante 30
+d4293331: posts the ante 30
+f3b92edc: posts the ante 30
+d4293331: posts small blind 150
+eb6075aa: posts big blind 300
+*** HOLE CARDS ***
+Dealt to Hero [4d 6d]
+Dealt to 5b04819c 
+Dealt to 4d424658 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to f25b3cae 
+Dealt to e0b0ff9d 
+f25b3cae: folds
+e0b0ff9d: folds
+Hero: folds
+5b04819c: folds
+4d424658: folds
+f3b92edc: raises 600 to 900
+d4293331: folds
+eb6075aa: folds
+Uncalled bet (600) returned to f3b92edc
+*** SHOWDOWN ***
+f3b92edc collected 990 from pot
+*** SUMMARY ***
+Total pot 990 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: Hero folded before Flop
+Seat 2: 5b04819c folded before Flop
+Seat 3: 4d424658 folded before Flop
+Seat 4: f3b92edc (button) collected (990)
+Seat 5: d4293331 (small blind) folded before Flop
+Seat 6: eb6075aa (big blind) folded before Flop
+Seat 7: f25b3cae folded before Flop
+Seat 8: e0b0ff9d folded before Flop
+
+
+Poker Hand #TM6179065913: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level6(150/300(30)) - 2026/07/16 02:54:24
+Table '5' 8-max Seat #3 is the button
+Seat 1: Hero (646 in chips)
+Seat 2: 5b04819c (8,646 in chips)
+Seat 3: 4d424658 (3,876 in chips)
+Seat 4: f3b92edc (9,502 in chips)
+Seat 5: d4293331 (10,045 in chips)
+Seat 6: eb6075aa (2,950 in chips)
+Seat 7: f25b3cae (3,180 in chips)
+Seat 8: e0b0ff9d (2,555 in chips)
+Hero: posts the ante 30
+4d424658: posts the ante 30
+eb6075aa: posts the ante 30
+5b04819c: posts the ante 30
+f25b3cae: posts the ante 30
+e0b0ff9d: posts the ante 30
+d4293331: posts the ante 30
+f3b92edc: posts the ante 30
+f3b92edc: posts small blind 150
+d4293331: posts big blind 300
+*** HOLE CARDS ***
+Dealt to Hero [2d Ks]
+Dealt to 5b04819c 
+Dealt to 4d424658 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to f25b3cae 
+Dealt to e0b0ff9d 
+eb6075aa: folds
+f25b3cae: folds
+e0b0ff9d: folds
+Hero: raises 316 to 616 and is all-in
+5b04819c: calls 616
+4d424658: folds
+f3b92edc: folds
+d4293331: calls 316
+*** FLOP *** [Kh Th Ts]
+d4293331: checks
+5b04819c: bets 1,679
+d4293331: calls 1,679
+*** TURN *** [Kh Th Ts] [4d]
+d4293331: checks
+5b04819c: bets 6,321 and is all-in
+d4293331: folds
+Uncalled bet (6,321) returned to 5b04819c
+5b04819c: shows [8h 6h] (a pair of Tens)
+Hero: shows [2d Ks] (two pair, Kings and Tens)
+*** RIVER *** [Kh Th Ts 4d] [Qs]
+*** SHOWDOWN ***
+Hero collected 2,238 from pot
+5b04819c collected 3,358 from pot
+*** SUMMARY ***
+Total pot 5,596 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Kh Th Ts 4d Qs]
+Seat 1: Hero showed [2d Ks] and won (2,238) with two pair, Kings and Tens
+Seat 2: 5b04819c showed [8h 6h] and won (3,358) with a pair of Tens
+Seat 3: 4d424658 (button) folded before Flop
+Seat 4: f3b92edc (small blind) folded before Flop
+Seat 5: d4293331 (big blind) folded on the Turn
+Seat 6: eb6075aa folded before Flop
+Seat 7: f25b3cae folded before Flop
+Seat 8: e0b0ff9d folded before Flop
+
+
+Poker Hand #TM6179065912: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level6(150/300(30)) - 2026/07/16 02:53:48
+Table '5' 8-max Seat #2 is the button
+Seat 1: Hero (676 in chips)
+Seat 2: 5b04819c (7,686 in chips)
+Seat 3: 4d424658 (4,056 in chips)
+Seat 4: f3b92edc (9,832 in chips)
+Seat 5: d4293331 (10,075 in chips)
+Seat 6: eb6075aa (2,980 in chips)
+Seat 7: f25b3cae (3,210 in chips)
+Seat 8: e0b0ff9d (2,885 in chips)
+Hero: posts the ante 30
+eb6075aa: posts the ante 30
+4d424658: posts the ante 30
+5b04819c: posts the ante 30
+f25b3cae: posts the ante 30
+e0b0ff9d: posts the ante 30
+d4293331: posts the ante 30
+f3b92edc: posts the ante 30
+4d424658: posts small blind 150
+f3b92edc: posts big blind 300
+*** HOLE CARDS ***
+Dealt to Hero [6d Ks]
+Dealt to 5b04819c 
+Dealt to 4d424658 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to f25b3cae 
+Dealt to e0b0ff9d 
+d4293331: folds
+eb6075aa: folds
+f25b3cae: folds
+e0b0ff9d: calls 300
+Hero: folds
+5b04819c: raises 7,356 to 7,656 and is all-in
+4d424658: folds
+f3b92edc: folds
+e0b0ff9d: folds
+Uncalled bet (7,356) returned to 5b04819c
+*** SHOWDOWN ***
+5b04819c collected 1,290 from pot
+*** SUMMARY ***
+Total pot 1,290 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: Hero folded before Flop
+Seat 2: 5b04819c (button) collected (1,290)
+Seat 3: 4d424658 (small blind) folded before Flop
+Seat 4: f3b92edc (big blind) folded before Flop
+Seat 5: d4293331 folded before Flop
+Seat 6: eb6075aa folded before Flop
+Seat 7: f25b3cae folded before Flop
+Seat 8: e0b0ff9d folded before Flop
+
+
+Poker Hand #TM6179065909: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level6(150/300(30)) - 2026/07/16 02:53:20
+Table '5' 8-max Seat #1 is the button
+Seat 1: Hero (706 in chips)
+Seat 2: 5b04819c (7,866 in chips)
+Seat 3: 4d424658 (4,386 in chips)
+Seat 4: f3b92edc (10,162 in chips)
+Seat 5: d4293331 (10,105 in chips)
+Seat 6: eb6075aa (3,010 in chips)
+Seat 7: f25b3cae (2,250 in chips)
+Seat 8: e0b0ff9d (2,915 in chips)
+Hero: posts the ante 30
+eb6075aa: posts the ante 30
+4d424658: posts the ante 30
+f25b3cae: posts the ante 30
+5b04819c: posts the ante 30
+e0b0ff9d: posts the ante 30
+d4293331: posts the ante 30
+f3b92edc: posts the ante 30
+5b04819c: posts small blind 150
+4d424658: posts big blind 300
+*** HOLE CARDS ***
+Dealt to Hero [6h Qc]
+Dealt to 5b04819c 
+Dealt to 4d424658 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to f25b3cae 
+Dealt to e0b0ff9d 
+f3b92edc: calls 300
+d4293331: folds
+eb6075aa: folds
+f25b3cae: raises 1,920 to 2,220 and is all-in
+e0b0ff9d: folds
+Hero: folds
+5b04819c: folds
+4d424658: folds
+f3b92edc: folds
+Uncalled bet (1,920) returned to f25b3cae
+*** SHOWDOWN ***
+f25b3cae collected 1,290 from pot
+*** SUMMARY ***
+Total pot 1,290 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: Hero (button) folded before Flop
+Seat 2: 5b04819c (small blind) folded before Flop
+Seat 3: 4d424658 (big blind) folded before Flop
+Seat 4: f3b92edc folded before Flop
+Seat 5: d4293331 folded before Flop
+Seat 6: eb6075aa folded before Flop
+Seat 7: f25b3cae collected (1,290)
+Seat 8: e0b0ff9d folded before Flop
+
+
+Poker Hand #TM6179065908: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level6(150/300(30)) - 2026/07/16 02:52:50
+Table '5' 8-max Seat #7 is the button
+Seat 1: Hero (293 in chips)
+Seat 2: 5b04819c (8,159 in chips)
+Seat 4: f3b92edc (10,192 in chips)
+Seat 5: d4293331 (10,135 in chips)
+Seat 6: eb6075aa (3,040 in chips)
+Seat 7: f25b3cae (2,280 in chips)
+Hero: posts the ante 30
+eb6075aa: posts the ante 30
+f25b3cae: posts the ante 30
+5b04819c: posts the ante 30
+d4293331: posts the ante 30
+f3b92edc: posts the ante 30
+Hero: posts small blind 150
+5b04819c: posts big blind 300
+*** HOLE CARDS ***
+Dealt to Hero [7h 9c]
+Dealt to 5b04819c 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to f25b3cae 
+f3b92edc: folds
+d4293331: folds
+eb6075aa: folds
+f25b3cae: folds
+Hero: calls 113 and is all-in
+Uncalled bet (37) returned to 5b04819c
+Hero: shows [7h 9c]
+5b04819c: shows [Js 8c]
+*** FLOP *** [6h 9h Qs]
+*** TURN *** [6h 9h Qs] [3s]
+*** RIVER *** [6h 9h Qs 3s] [2h]
+*** SHOWDOWN ***
+Hero collected 706 from pot
+*** SUMMARY ***
+Total pot 706 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6h 9h Qs 3s 2h]
+Seat 1: Hero (small blind) showed [7h 9c] and won (706) with a pair of Nines
+Seat 2: 5b04819c (big blind) showed [Js 8c] and lost with Queen high
+Seat 4: f3b92edc folded before Flop
+Seat 5: d4293331 folded before Flop
+Seat 6: eb6075aa folded before Flop
+Seat 7: f25b3cae (button) folded before Flop
+
+
+Poker Hand #TM6179065903: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level5(125/250(25)) - 2026/07/16 02:51:38
+Table '5' 8-max Seat #6 is the button
+Seat 1: Hero (4,260 in chips)
+Seat 2: 5b04819c (3,967 in chips)
+Seat 4: f3b92edc (10,217 in chips)
+Seat 5: d4293331 (10,160 in chips)
+Seat 6: eb6075aa (3,065 in chips)
+Seat 7: f25b3cae (2,430 in chips)
+Hero: posts the ante 25
+eb6075aa: posts the ante 25
+5b04819c: posts the ante 25
+f25b3cae: posts the ante 25
+d4293331: posts the ante 25
+f3b92edc: posts the ante 25
+f25b3cae: posts small blind 125
+Hero: posts big blind 250
+*** HOLE CARDS ***
+Dealt to Hero [Qs 5d]
+Dealt to 5b04819c 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to f25b3cae 
+5b04819c: raises 250 to 500
+f3b92edc: folds
+d4293331: folds
+eb6075aa: folds
+f25b3cae: folds
+Hero: calls 250
+*** FLOP *** [2h 9c 6s]
+Hero: checks
+5b04819c: checks
+*** TURN *** [2h 9c 6s] [9h]
+Hero: bets 957
+5b04819c: calls 957
+*** RIVER *** [2h 9c 6s 9h] [6h]
+Hero: bets 2,778 and is all-in
+5b04819c: calls 2,485 and is all-in
+Uncalled bet (293) returned to Hero
+Hero: shows [Qs 5d] (two pair, Nines and Sixes)
+5b04819c: shows [Jh Kh] (a flush King high)
+*** SHOWDOWN ***
+5b04819c collected 8,159 from pot
+*** SUMMARY ***
+Total pot 8,159 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [2h 9c 6s 9h 6h]
+Seat 1: Hero (big blind) showed [Qs 5d] and lost with two pair, Nines and Sixes
+Seat 2: 5b04819c showed [Jh Kh] and won (8,159) with a flush King high
+Seat 4: f3b92edc folded before Flop
+Seat 5: d4293331 folded before Flop
+Seat 6: eb6075aa (button) folded before Flop
+Seat 7: f25b3cae (small blind) folded before Flop
+
+
+Poker Hand #TM6179065900: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level5(125/250(25)) - 2026/07/16 02:51:10
+Table '5' 8-max Seat #5 is the button
+Seat 1: Hero (4,285 in chips)
+Seat 2: 5b04819c (3,992 in chips)
+Seat 4: f3b92edc (10,242 in chips)
+Seat 5: d4293331 (10,435 in chips)
+Seat 6: eb6075aa (2,440 in chips)
+Seat 7: f25b3cae (2,705 in chips)
+Hero: posts the ante 25
+eb6075aa: posts the ante 25
+5b04819c: posts the ante 25
+f25b3cae: posts the ante 25
+d4293331: posts the ante 25
+f3b92edc: posts the ante 25
+eb6075aa: posts small blind 125
+f25b3cae: posts big blind 250
+*** HOLE CARDS ***
+Dealt to Hero [4d 2s]
+Dealt to 5b04819c 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to f25b3cae 
+Hero: folds
+5b04819c: folds
+f3b92edc: folds
+d4293331: calls 250
+eb6075aa: raises 2,165 to 2,415 and is all-in
+f25b3cae: folds
+d4293331: folds
+Uncalled bet (2,165) returned to eb6075aa
+*** SHOWDOWN ***
+eb6075aa collected 900 from pot
+*** SUMMARY ***
+Total pot 900 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: Hero folded before Flop
+Seat 2: 5b04819c folded before Flop
+Seat 4: f3b92edc folded before Flop
+Seat 5: d4293331 (button) folded before Flop
+Seat 6: eb6075aa (small blind) collected (900)
+Seat 7: f25b3cae (big blind) folded before Flop
+
+
+Poker Hand #TM6179065897: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level5(125/250(25)) - 2026/07/16 02:50:25
+Table '5' 8-max Seat #4 is the button
+Seat 1: Hero (1,905 in chips)
+Seat 2: 5b04819c (5,897 in chips)
+Seat 4: f3b92edc (10,267 in chips)
+Seat 5: d4293331 (10,585 in chips)
+Seat 6: eb6075aa (2,715 in chips)
+Seat 7: f25b3cae (2,730 in chips)
+Hero: posts the ante 25
+eb6075aa: posts the ante 25
+5b04819c: posts the ante 25
+f25b3cae: posts the ante 25
+d4293331: posts the ante 25
+f3b92edc: posts the ante 25
+d4293331: posts small blind 125
+eb6075aa: posts big blind 250
+*** HOLE CARDS ***
+Dealt to Hero [Qd 8d]
+Dealt to 5b04819c 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to f25b3cae 
+f25b3cae: folds
+Hero: raises 1,630 to 1,880 and is all-in
+5b04819c: raises 3,992 to 5,872 and is all-in
+f3b92edc: folds
+d4293331: folds
+eb6075aa: folds
+Uncalled bet (3,992) returned to 5b04819c
+5b04819c: shows [Td Ts]
+Hero: shows [Qd 8d]
+*** FLOP *** [6d Ad 9h]
+*** TURN *** [6d Ad 9h] [Kd]
+*** RIVER *** [6d Ad 9h Kd] [9c]
+*** SHOWDOWN ***
+Hero collected 4,285 from pot
+*** SUMMARY ***
+Total pot 4,285 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6d Ad 9h Kd 9c]
+Seat 1: Hero showed [Qd 8d] and won (4,285) with a flush Ace high
+Seat 2: 5b04819c showed [Td Ts] and lost with two pair, Tens and Nines
+Seat 4: f3b92edc (button) folded before Flop
+Seat 5: d4293331 (small blind) folded before Flop
+Seat 6: eb6075aa (big blind) folded before Flop
+Seat 7: f25b3cae folded before Flop
+
+
+Poker Hand #TM6179065891: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level5(125/250(25)) - 2026/07/16 02:49:22
+Table '5' 8-max Seat #2 is the button
+Seat 1: Hero (1,930 in chips)
+Seat 2: 5b04819c (6,960 in chips)
+Seat 4: f3b92edc (5,419 in chips)
+Seat 5: d4293331 (10,860 in chips)
+Seat 6: eb6075aa (2,740 in chips)
+Seat 7: f25b3cae (3,793 in chips)
+Seat 8: c1c4413c (2,397 in chips)
+c1c4413c: posts the ante 25
+Hero: posts the ante 25
+eb6075aa: posts the ante 25
+5b04819c: posts the ante 25
+f25b3cae: posts the ante 25
+d4293331: posts the ante 25
+f3b92edc: posts the ante 25
+f3b92edc: posts small blind 125
+d4293331: posts big blind 250
+*** HOLE CARDS ***
+Dealt to Hero [5s 5c]
+Dealt to 5b04819c 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to f25b3cae 
+Dealt to c1c4413c 
+eb6075aa: folds
+f25b3cae: calls 250
+c1c4413c: raises 788 to 1,038
+Hero: folds
+5b04819c: calls 1,038
+f3b92edc: calls 913
+d4293331: folds
+f25b3cae: calls 788
+*** FLOP *** [9c Qs Ad]
+f3b92edc: checks
+f25b3cae: checks
+c1c4413c: checks
+5b04819c: checks
+*** TURN *** [9c Qs Ad] [As]
+f3b92edc: bets 4,356 and is all-in
+f25b3cae: folds
+c1c4413c: calls 1,334 and is all-in
+5b04819c: folds
+Uncalled bet (3,022) returned to f3b92edc
+f3b92edc: shows [Ac 4s] (three of a kind, Aces)
+c1c4413c: shows [Jh Jc] (two pair, Aces and Jacks)
+*** RIVER *** [9c Qs Ad As] [9d]
+*** SHOWDOWN ***
+f3b92edc collected 7,245 from pot
+*** SUMMARY ***
+Total pot 7,245 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [9c Qs Ad As 9d]
+Seat 1: Hero folded before Flop
+Seat 2: 5b04819c (button) folded on the Turn
+Seat 4: f3b92edc (small blind) showed [Ac 4s] and won (7,245) with a full house, Aces full of Nines
+Seat 5: d4293331 (big blind) folded before Flop
+Seat 6: eb6075aa folded before Flop
+Seat 7: f25b3cae folded on the Turn
+Seat 8: c1c4413c showed [Jh Jc] and lost with two pair, Aces and Jacks
+
+
+Poker Hand #TM6179065889: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level5(125/250(25)) - 2026/07/16 02:48:54
+Table '5' 8-max Seat #1 is the button
+Seat 1: Hero (1,955 in chips)
+Seat 2: 5b04819c (7,110 in chips)
+Seat 4: f3b92edc (5,694 in chips)
+Seat 5: d4293331 (10,885 in chips)
+Seat 6: eb6075aa (3,015 in chips)
+Seat 7: f25b3cae (3,018 in chips)
+Seat 8: c1c4413c (2,422 in chips)
+c1c4413c: posts the ante 25
+Hero: posts the ante 25
+eb6075aa: posts the ante 25
+f25b3cae: posts the ante 25
+5b04819c: posts the ante 25
+d4293331: posts the ante 25
+f3b92edc: posts the ante 25
+5b04819c: posts small blind 125
+f3b92edc: posts big blind 250
+*** HOLE CARDS ***
+Dealt to Hero [7s 4c]
+Dealt to 5b04819c 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to f25b3cae 
+Dealt to c1c4413c 
+d4293331: folds
+eb6075aa: calls 250
+f25b3cae: raises 2,743 to 2,993 and is all-in
+c1c4413c: folds
+Hero: folds
+5b04819c: folds
+f3b92edc: folds
+eb6075aa: folds
+Uncalled bet (2,743) returned to f25b3cae
+*** SHOWDOWN ***
+f25b3cae collected 1,050 from pot
+*** SUMMARY ***
+Total pot 1,050 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: Hero (button) folded before Flop
+Seat 2: 5b04819c (small blind) folded before Flop
+Seat 4: f3b92edc (big blind) folded before Flop
+Seat 5: d4293331 folded before Flop
+Seat 6: eb6075aa folded before Flop
+Seat 7: f25b3cae collected (1,050)
+Seat 8: c1c4413c folded before Flop
+
+
+Poker Hand #TM6179065883: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level5(125/250(25)) - 2026/07/16 02:47:40
+Table '5' 8-max Seat #8 is the button
+Seat 1: Hero (2,105 in chips)
+Seat 2: 5b04819c (5,785 in chips)
+Seat 4: f3b92edc (5,719 in chips)
+Seat 5: d4293331 (10,910 in chips)
+Seat 6: eb6075aa (3,040 in chips)
+Seat 7: f25b3cae (3,043 in chips)
+Seat 8: c1c4413c (3,497 in chips)
+c1c4413c: posts the ante 25
+Hero: posts the ante 25
+eb6075aa: posts the ante 25
+f25b3cae: posts the ante 25
+5b04819c: posts the ante 25
+d4293331: posts the ante 25
+f3b92edc: posts the ante 25
+Hero: posts small blind 125
+5b04819c: posts big blind 250
+*** HOLE CARDS ***
+Dealt to Hero [2h 4s]
+Dealt to 5b04819c 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to f25b3cae 
+Dealt to c1c4413c 
+f3b92edc: folds
+d4293331: folds
+eb6075aa: folds
+f25b3cae: folds
+c1c4413c: calls 250
+Hero: folds
+5b04819c: raises 800 to 1,050
+c1c4413c: calls 800
+*** FLOP *** [6h 7h Kd]
+5b04819c: checks
+c1c4413c: checks
+*** TURN *** [6h 7h Kd] [8h]
+5b04819c: bets 1,800
+c1c4413c: folds
+Uncalled bet (1,800) returned to 5b04819c
+*** SHOWDOWN ***
+5b04819c collected 2,400 from pot
+*** SUMMARY ***
+Total pot 2,400 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6h 7h Kd 8h]
+Seat 1: Hero (small blind) folded before Flop
+Seat 2: 5b04819c (big blind) won (2,400)
+Seat 4: f3b92edc folded before Flop
+Seat 5: d4293331 folded before Flop
+Seat 6: eb6075aa folded before Flop
+Seat 7: f25b3cae folded before Flop
+Seat 8: c1c4413c (button) folded on the Turn
+
+
+Poker Hand #TM6179065881: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level4(100/200(20)) - 2026/07/16 02:46:39
+Table '5' 8-max Seat #7 is the button
+Seat 1: Hero (2,325 in chips)
+Seat 2: 5b04819c (2,094 in chips)
+Seat 3: f03bb2a4 (1,197 in chips)
+Seat 4: f3b92edc (7,813 in chips)
+Seat 5: d4293331 (10,930 in chips)
+Seat 6: eb6075aa (3,060 in chips)
+Seat 7: f25b3cae (3,063 in chips)
+Seat 8: c1c4413c (3,617 in chips)
+c1c4413c: posts the ante 20
+Hero: posts the ante 20
+eb6075aa: posts the ante 20
+f25b3cae: posts the ante 20
+5b04819c: posts the ante 20
+d4293331: posts the ante 20
+f03bb2a4: posts the ante 20
+f3b92edc: posts the ante 20
+c1c4413c: posts small blind 100
+Hero: posts big blind 200
+*** HOLE CARDS ***
+Dealt to Hero [9d 3s]
+Dealt to 5b04819c 
+Dealt to f03bb2a4 
+Dealt to f3b92edc 
+Dealt to d4293331 
+Dealt to eb6075aa 
+Dealt to f25b3cae 
+Dealt to c1c4413c 
+5b04819c: raises 200 to 400
+f03bb2a4: raises 777 to 1,177 and is all-in
+f3b92edc: calls 1,177
+d4293331: folds
+eb6075aa: folds
+f25b3cae: folds
+c1c4413c: folds
+Hero: folds
+5b04819c: raises 897 to 2,074 and is all-in
+f3b92edc: calls 897
+5b04819c: shows [As 8s]
+f03bb2a4: shows [Jh Th]
+f3b92edc: shows [Ah Tc]
+*** FLOP *** [7h Ks 2s]
+*** TURN *** [7h Ks 2s] [4c]
+*** RIVER *** [7h Ks 2s 4c] [Ts]
+*** SHOWDOWN ***
+5b04819c collected 3,991 from pot
+5b04819c collected 1,794 from pot
+*** SUMMARY ***
+Total pot 5,785 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [7h Ks 2s 4c Ts]
+Seat 1: Hero (big blind) folded before Flop
+Seat 2: 5b04819c showed [As 8s] and won (5,785) with a flush Ace high
+Seat 3: f03bb2a4 showed [Jh Th] and lost with a pair of Tens
+Seat 4: f3b92edc showed [Ah Tc] and lost with a pair of Tens
+Seat 5: d4293331 folded before Flop
+Seat 6: eb6075aa folded before Flop
+Seat 7: f25b3cae (button) folded before Flop
+Seat 8: c1c4413c (small blind) folded before Flop
+
+
+Poker Hand #TM6184231643: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level4(100/200(20)) - 2026/07/16 02:45:06
+Table '3' 8-max Seat #6 is the button
+Seat 1: 405f4692 (7,459 in chips)
+Seat 2: f51680f2 (4,190 in chips)
+Seat 3: bdb05730 (2,994 in chips)
+Seat 4: Hero (2,345 in chips)
+Seat 5: eb6075aa (3,080 in chips)
+Seat 6: 6e1b3387 (5,075 in chips)
+Seat 8: 8f2cc8eb (2,890 in chips)
+405f4692: posts the ante 20
+bdb05730: posts the ante 20
+Hero: posts the ante 20
+eb6075aa: posts the ante 20
+f51680f2: posts the ante 20
+8f2cc8eb: posts the ante 20
+6e1b3387: posts the ante 20
+8f2cc8eb: posts small blind 100
+405f4692: posts big blind 200
+*** HOLE CARDS ***
+Dealt to 405f4692 
+Dealt to f51680f2 
+Dealt to bdb05730 
+Dealt to Hero [2c 6s]
+Dealt to eb6075aa 
+Dealt to 6e1b3387 
+Dealt to 8f2cc8eb 
+f51680f2: folds
+bdb05730: raises 2,774 to 2,974 and is all-in
+Hero: folds
+eb6075aa: folds
+6e1b3387: folds
+8f2cc8eb: calls 2,770 and is all-in
+405f4692: folds
+Uncalled bet (104) returned to bdb05730
+bdb05730: shows [Th Ah]
+8f2cc8eb: shows [Ts 9s]
+*** FLOP *** [7s 7c 5h]
+*** TURN *** [7s 7c 5h] [Ac]
+*** RIVER *** [7s 7c 5h Ac] [2h]
+*** SHOWDOWN ***
+bdb05730 collected 6,080 from pot
+*** SUMMARY ***
+Total pot 6,080 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [7s 7c 5h Ac 2h]
+Seat 1: 405f4692 (big blind) folded before Flop
+Seat 2: f51680f2 folded before Flop
+Seat 3: bdb05730 showed [Th Ah] and won (6,080) with two pair, Aces and Sevens
+Seat 4: Hero folded before Flop
+Seat 5: eb6075aa folded before Flop
+Seat 6: 6e1b3387 (button) folded before Flop
+Seat 8: 8f2cc8eb (small blind) showed [Ts 9s] and lost with a pair of Sevens
+
+
+Poker Hand #TM6184231642: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level4(100/200(20)) - 2026/07/16 02:44:36
+Table '3' 8-max Seat #5 is the button
+Seat 1: 405f4692 (7,479 in chips)
+Seat 2: f51680f2 (3,770 in chips)
+Seat 3: bdb05730 (3,014 in chips)
+Seat 4: Hero (2,365 in chips)
+Seat 5: eb6075aa (3,100 in chips)
+Seat 6: 6e1b3387 (5,195 in chips)
+Seat 8: 8f2cc8eb (3,110 in chips)
+405f4692: posts the ante 20
+bdb05730: posts the ante 20
+Hero: posts the ante 20
+eb6075aa: posts the ante 20
+f51680f2: posts the ante 20
+8f2cc8eb: posts the ante 20
+6e1b3387: posts the ante 20
+6e1b3387: posts small blind 100
+8f2cc8eb: posts big blind 200
+*** HOLE CARDS ***
+Dealt to 405f4692 
+Dealt to f51680f2 
+Dealt to bdb05730 
+Dealt to Hero [6c Kc]
+Dealt to eb6075aa 
+Dealt to 6e1b3387 
+Dealt to 8f2cc8eb 
+405f4692: folds
+f51680f2: raises 200 to 400
+bdb05730: folds
+Hero: folds
+eb6075aa: folds
+6e1b3387: folds
+8f2cc8eb: folds
+Uncalled bet (200) returned to f51680f2
+*** SHOWDOWN ***
+f51680f2 collected 640 from pot
+*** SUMMARY ***
+Total pot 640 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 405f4692 folded before Flop
+Seat 2: f51680f2 collected (640)
+Seat 3: bdb05730 folded before Flop
+Seat 4: Hero folded before Flop
+Seat 5: eb6075aa (button) folded before Flop
+Seat 6: 6e1b3387 (small blind) folded before Flop
+Seat 8: 8f2cc8eb (big blind) folded before Flop
+
+
+Poker Hand #TM6184231640: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level4(100/200(20)) - 2026/07/16 02:43:54
+Table '3' 8-max Seat #4 is the button
+Seat 1: 405f4692 (6,859 in chips)
+Seat 2: f51680f2 (3,790 in chips)
+Seat 3: bdb05730 (3,034 in chips)
+Seat 4: Hero (2,385 in chips)
+Seat 5: eb6075aa (3,220 in chips)
+Seat 6: 6e1b3387 (5,615 in chips)
+Seat 8: 8f2cc8eb (3,130 in chips)
+405f4692: posts the ante 20
+bdb05730: posts the ante 20
+Hero: posts the ante 20
+f51680f2: posts the ante 20
+eb6075aa: posts the ante 20
+8f2cc8eb: posts the ante 20
+6e1b3387: posts the ante 20
+eb6075aa: posts small blind 100
+6e1b3387: posts big blind 200
+*** HOLE CARDS ***
+Dealt to 405f4692 
+Dealt to f51680f2 
+Dealt to bdb05730 
+Dealt to Hero [8s Qs]
+Dealt to eb6075aa 
+Dealt to 6e1b3387 
+Dealt to 8f2cc8eb 
+8f2cc8eb: folds
+405f4692: raises 200 to 400
+f51680f2: folds
+bdb05730: folds
+Hero: folds
+eb6075aa: folds
+6e1b3387: calls 200
+*** FLOP *** [Tc 7c Qc]
+6e1b3387: checks
+405f4692: bets 780
+6e1b3387: folds
+Uncalled bet (780) returned to 405f4692
+*** SHOWDOWN ***
+405f4692 collected 1,040 from pot
+*** SUMMARY ***
+Total pot 1,040 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Tc 7c Qc]
+Seat 1: 405f4692 won (1,040)
+Seat 2: f51680f2 folded before Flop
+Seat 3: bdb05730 folded before Flop
+Seat 4: Hero (button) folded before Flop
+Seat 5: eb6075aa (small blind) folded before Flop
+Seat 6: 6e1b3387 (big blind) folded on the Flop
+Seat 8: 8f2cc8eb folded before Flop
+
+
+Poker Hand #TM6184231638: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level4(100/200(20)) - 2026/07/16 02:42:51
+Table '3' 8-max Seat #3 is the button
+Seat 1: 405f4692 (5,689 in chips)
+Seat 2: f51680f2 (3,810 in chips)
+Seat 3: bdb05730 (3,054 in chips)
+Seat 4: Hero (2,505 in chips)
+Seat 5: eb6075aa (4,170 in chips)
+Seat 6: 6e1b3387 (5,635 in chips)
+Seat 7: bcd8c05e (5,307 in chips)
+Seat 8: 8f2cc8eb (3,150 in chips)
+405f4692: posts the ante 20
+bdb05730: posts the ante 20
+Hero: posts the ante 20
+bcd8c05e: posts the ante 20
+f51680f2: posts the ante 20
+eb6075aa: posts the ante 20
+8f2cc8eb: posts the ante 20
+6e1b3387: posts the ante 20
+Hero: posts small blind 100
+eb6075aa: posts big blind 200
+*** HOLE CARDS ***
+Dealt to 405f4692 
+Dealt to f51680f2 
+Dealt to bdb05730 
+Dealt to Hero [8s Kd]
+Dealt to eb6075aa 
+Dealt to 6e1b3387 
+Dealt to bcd8c05e 
+Dealt to 8f2cc8eb 
+6e1b3387: folds
+bcd8c05e: folds
+8f2cc8eb: folds
+405f4692: raises 200 to 400
+f51680f2: folds
+bdb05730: folds
+Hero: folds
+eb6075aa: calls 200
+*** FLOP *** [4h 2s 2h]
+eb6075aa: bets 530
+405f4692: raises 4,739 to 5,269 and is all-in
+eb6075aa: folds
+Uncalled bet (4,739) returned to 405f4692
+*** SHOWDOWN ***
+405f4692 collected 2,120 from pot
+*** SUMMARY ***
+Total pot 2,120 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [4h 2s 2h]
+Seat 1: 405f4692 won (2,120)
+Seat 2: f51680f2 folded before Flop
+Seat 3: bdb05730 (button) folded before Flop
+Seat 4: Hero (small blind) folded before Flop
+Seat 5: eb6075aa (big blind) folded on the Flop
+Seat 6: 6e1b3387 folded before Flop
+Seat 7: bcd8c05e folded before Flop
+Seat 8: 8f2cc8eb folded before Flop
+
+
+Poker Hand #TM6184231635: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level3(75/150(15)) - 2026/07/16 02:41:37
+Table '3' 8-max Seat #2 is the button
+Seat 1: 405f4692 (4,739 in chips)
+Seat 2: f51680f2 (3,825 in chips)
+Seat 3: bdb05730 (3,614 in chips)
+Seat 4: Hero (2,820 in chips)
+Seat 5: eb6075aa (4,185 in chips)
+Seat 6: 6e1b3387 (5,650 in chips)
+Seat 7: bcd8c05e (5,322 in chips)
+Seat 8: 8f2cc8eb (3,165 in chips)
+405f4692: posts the ante 15
+bdb05730: posts the ante 15
+Hero: posts the ante 15
+bcd8c05e: posts the ante 15
+f51680f2: posts the ante 15
+eb6075aa: posts the ante 15
+8f2cc8eb: posts the ante 15
+6e1b3387: posts the ante 15
+bdb05730: posts small blind 75
+Hero: posts big blind 150
+*** HOLE CARDS ***
+Dealt to 405f4692 
+Dealt to f51680f2 
+Dealt to bdb05730 
+Dealt to Hero [Jc 8s]
+Dealt to eb6075aa 
+Dealt to 6e1b3387 
+Dealt to bcd8c05e 
+Dealt to 8f2cc8eb 
+eb6075aa: folds
+6e1b3387: folds
+bcd8c05e: folds
+8f2cc8eb: folds
+405f4692: raises 150 to 300
+f51680f2: folds
+bdb05730: calls 225
+Hero: calls 150
+*** FLOP *** [3s Kd Jd]
+bdb05730: checks
+Hero: checks
+405f4692: checks
+*** TURN *** [3s Kd Jd] [Qd]
+bdb05730: bets 245
+Hero: folds
+405f4692: raises 830 to 1,075
+bdb05730: folds
+Uncalled bet (830) returned to 405f4692
+*** SHOWDOWN ***
+405f4692 collected 1,510 from pot
+*** SUMMARY ***
+Total pot 1,510 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [3s Kd Jd Qd]
+Seat 1: 405f4692 won (1,510)
+Seat 2: f51680f2 (button) folded before Flop
+Seat 3: bdb05730 (small blind) folded on the Turn
+Seat 4: Hero (big blind) folded on the Turn
+Seat 5: eb6075aa folded before Flop
+Seat 6: 6e1b3387 folded before Flop
+Seat 7: bcd8c05e folded before Flop
+Seat 8: 8f2cc8eb folded before Flop
+
+
+Poker Hand #TM6180664747: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level3(75/150(15)) - 2026/07/16 02:40:47
+Table '2' 8-max Seat #8 is the button
+Seat 1: 9ea4679b (1,854 in chips)
+Seat 2: Hero (2,985 in chips)
+Seat 3: f3b92edc (7,217 in chips)
+Seat 4: c1c4413c (4,509 in chips)
+Seat 5: d4293331 (2,970 in chips)
+Seat 6: 666f159b (1,608 in chips)
+Seat 7: ded53ae8 (5,339 in chips)
+Seat 8: f25b3cae (3,568 in chips)
+c1c4413c: posts the ante 15
+Hero: posts the ante 15
+f25b3cae: posts the ante 15
+d4293331: posts the ante 15
+ded53ae8: posts the ante 15
+666f159b: posts the ante 15
+f3b92edc: posts the ante 15
+9ea4679b: posts the ante 15
+9ea4679b: posts small blind 75
+Hero: posts big blind 150
+*** HOLE CARDS ***
+Dealt to 9ea4679b 
+Dealt to Hero [Jc 9h]
+Dealt to f3b92edc 
+Dealt to c1c4413c 
+Dealt to d4293331 
+Dealt to 666f159b 
+Dealt to ded53ae8 
+Dealt to f25b3cae 
+f3b92edc: folds
+c1c4413c: folds
+d4293331: raises 150 to 300
+666f159b: folds
+ded53ae8: raises 300 to 600
+f25b3cae: folds
+9ea4679b: calls 525
+Hero: folds
+d4293331: raises 2,355 to 2,955 and is all-in
+ded53ae8: calls 2,355
+9ea4679b: calls 1,239 and is all-in
+d4293331: shows [Qd Qc]
+ded53ae8: shows [Ah 8d]
+9ea4679b: shows [Ad 8c]
+*** FLOP *** [2h Qs Ks]
+*** TURN *** [2h Qs Ks] [3c]
+*** RIVER *** [2h Qs Ks 3c] [3s]
+666f159b: shows [3d] (three of a kind, Threes)
+*** SHOWDOWN ***
+d4293331 collected 5,787 from pot
+d4293331 collected 2,232 from pot
+*** SUMMARY ***
+Total pot 8,019 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [2h Qs Ks 3c 3s]
+Seat 1: 9ea4679b (small blind) showed [Ad 8c] and lost with a pair of Threes
+Seat 2: Hero (big blind) folded before Flop
+Seat 3: f3b92edc folded before Flop
+Seat 4: c1c4413c folded before Flop
+Seat 5: d4293331 showed [Qd Qc] and won (8,019) with a full house, Queens full of Threes
+Seat 6: 666f159b folded before Flop
+Seat 7: ded53ae8 showed [Ah 8d] and lost with a pair of Threes
+Seat 8: f25b3cae (button) folded before Flop
+
+
+Poker Hand #TM6180664741: Tournament #299881667, WSOP Express: $10 Step 3 to Step 4 Hold'em No Limit - Level3(75/150(15)) - 2026/07/16 02:39:37
+Table '2' 8-max Seat #7 is the button
+Seat 1: 9ea4679b (2,544 in chips)
+Seat 2: Hero (3,000 in chips)
+Seat 3: f3b92edc (7,232 in chips)
+Seat 4: c1c4413c (4,824 in chips)
+Seat 5: d4293331 (2,985 in chips)
+Seat 6: 666f159b (1,623 in chips)
+Seat 7: ded53ae8 (4,184 in chips)
+Seat 8: f25b3cae (3,658 in chips)
+c1c4413c: posts the ante 15
+Hero: posts the ante 15
+f25b3cae: posts the ante 15
+d4293331: posts the ante 15
+ded53ae8: posts the ante 15
+666f159b: posts the ante 15
+f3b92edc: posts the ante 15
+9ea4679b: posts the ante 15
+f25b3cae: posts small blind 75
+9ea4679b: posts big blind 150
+*** HOLE CARDS ***
+Dealt to 9ea4679b 
+Dealt to Hero [3d 5c]
+Dealt to f3b92edc 
+Dealt to c1c4413c 
+Dealt to d4293331 
+Dealt to 666f159b 
+Dealt to ded53ae8 
+Dealt to f25b3cae 
+Hero: folds
+f3b92edc: folds
+c1c4413c: calls 150
+d4293331: folds
+666f159b: folds
+ded53ae8: raises 150 to 300
+f25b3cae: folds
+9ea4679b: calls 150
+c1c4413c: calls 150
+*** FLOP *** [Jh 2s Td]
+9ea4679b: checks
+c1c4413c: checks
+ded53ae8: bets 375
+9ea4679b: calls 375
+c1c4413c: folds
+*** TURN *** [Jh 2s Td] [3c]
+9ea4679b: checks
+ded53ae8: bets 609
+9ea4679b: folds
+Uncalled bet (609) returned to ded53ae8
+*** SHOWDOWN ***
+ded53ae8 collected 1,845 from pot
+*** SUMMARY ***
+Total pot 1,845 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Jh 2s Td 3c]
+Seat 1: 9ea4679b (big blind) folded on the Turn
+Seat 2: Hero folded before Flop
+Seat 3: f3b92edc folded before Flop
+Seat 4: c1c4413c folded on the Flop
+Seat 5: d4293331 folded before Flop
+Seat 6: 666f159b folded before Flop
+Seat 7: ded53ae8 (button) won (1,845)
+Seat 8: f25b3cae (small blind) folded before Flop
+
+

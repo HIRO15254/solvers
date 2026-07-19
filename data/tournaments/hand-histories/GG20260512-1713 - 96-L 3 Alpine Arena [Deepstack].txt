@@ -1,0 +1,809 @@
+Poker Hand #TM5944357313: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level17(2,500/5,000(600)) - 2026/05/13 02:25:32
+Table '454' 8-max Seat #5 is the button
+Seat 1: Hero (5,500 in chips)
+Seat 2: 741d684e (265,588 in chips)
+Seat 3: 6e7c6d3e (48,860 in chips)
+Seat 4: f1da6380 (158,975 in chips)
+Seat 5: 824219df (96,604 in chips)
+Seat 6: 6f8bbb3 (264,091 in chips)
+Seat 7: 901759d8 (88,250 in chips)
+Seat 8: 50957c46 (43,650 in chips)
+Hero: posts the ante 600
+6f8bbb3: posts the ante 600
+824219df: posts the ante 600
+f1da6380: posts the ante 600
+741d684e: posts the ante 600
+50957c46: posts the ante 600
+901759d8: posts the ante 600
+6e7c6d3e: posts the ante 600
+6f8bbb3: posts small blind 2,500
+901759d8: posts big blind 5,000
+*** HOLE CARDS ***
+Dealt to Hero [Qh 7s]
+Dealt to 741d684e 
+Dealt to 6e7c6d3e 
+Dealt to f1da6380 
+Dealt to 824219df 
+Dealt to 6f8bbb3 
+Dealt to 901759d8 
+Dealt to 50957c46 
+50957c46: folds
+Hero: calls 4,900 and is all-in
+741d684e: raises 5,000 to 10,000
+6e7c6d3e: folds
+f1da6380: calls 10,000
+824219df: folds
+6f8bbb3: calls 7,500
+901759d8: calls 5,000
+*** FLOP *** [3s Kd 2s]
+6f8bbb3: checks
+901759d8: checks
+741d684e: checks
+f1da6380: bets 49,700
+6f8bbb3: raises 49,700 to 99,400
+901759d8: folds
+741d684e: folds
+f1da6380: raises 48,975 to 148,375 and is all-in
+6f8bbb3: calls 48,975
+f1da6380: shows [As Js] (Ace high)
+6f8bbb3: shows [3h 3d] (three of a kind, Threes)
+Hero: shows [Qh 7s] (King high)
+*** TURN *** [3s Kd 2s] [9c]
+*** RIVER *** [3s Kd 2s 9c] [Th]
+*** SHOWDOWN ***
+6f8bbb3 collected 29,300 from pot
+6f8bbb3 collected 317,150 from pot
+*** SUMMARY ***
+Total pot 346,450 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [3s Kd 2s 9c Th]
+Seat 1: Hero showed [Qh 7s] and lost with King high
+Seat 2: 741d684e folded on the Flop
+Seat 3: 6e7c6d3e folded before Flop
+Seat 4: f1da6380 showed [As Js] and lost with Ace high
+Seat 5: 824219df (button) folded before Flop
+Seat 6: 6f8bbb3 (small blind) showed [3h 3d] and won (346,450) with three of a kind, Threes
+Seat 7: 901759d8 (big blind) folded on the Flop
+Seat 8: 50957c46 folded before Flop
+
+
+Poker Hand #TM5944357183: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level17(2,500/5,000(600)) - 2026/05/13 02:24:21
+Table '454' 8-max Seat #4 is the button
+Seat 1: Hero (6,100 in chips)
+Seat 2: 741d684e (168,600 in chips)
+Seat 4: f1da6380 (159,575 in chips)
+Seat 5: 824219df (185,592 in chips)
+Seat 6: 6f8bbb3 (269,691 in chips)
+Seat 7: 901759d8 (88,850 in chips)
+Seat 8: 50957c46 (44,250 in chips)
+Hero: posts the ante 600
+6f8bbb3: posts the ante 600
+f1da6380: posts the ante 600
+824219df: posts the ante 600
+741d684e: posts the ante 600
+50957c46: posts the ante 600
+901759d8: posts the ante 600
+824219df: posts small blind 2,500
+6f8bbb3: posts big blind 5,000
+*** HOLE CARDS ***
+Dealt to Hero [Jd 8s]
+Dealt to 741d684e 
+Dealt to f1da6380 
+Dealt to 824219df 
+Dealt to 6f8bbb3 
+Dealt to 901759d8 
+Dealt to 50957c46 
+901759d8: folds
+50957c46: folds
+Hero: folds
+741d684e: raises 6,000 to 11,000
+f1da6380: folds
+824219df: calls 8,500
+6f8bbb3: folds
+*** FLOP *** [Kc 9h Jc]
+824219df: bets 10,296
+741d684e: calls 10,296
+*** TURN *** [Kc 9h Jc] [Qd]
+824219df: bets 17,092
+741d684e: calls 17,092
+*** RIVER *** [Kc 9h Jc Qd] [2s]
+824219df: checks
+741d684e: bets 50,000
+824219df: calls 50,000
+741d684e: shows [Td Tc] (a straight, King to Nine)
+824219df: shows [7d Kd] (a pair of Kings)
+*** SHOWDOWN ***
+741d684e collected 185,976 from pot
+*** SUMMARY ***
+Total pot 185,976 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Kc 9h Jc Qd 2s]
+Seat 1: Hero folded before Flop
+Seat 2: 741d684e showed [Td Tc] and won (185,976) with a straight, King to Nine
+Seat 4: f1da6380 (button) folded before Flop
+Seat 5: 824219df (small blind) showed [7d Kd] and lost with a pair of Kings
+Seat 6: 6f8bbb3 (big blind) folded before Flop
+Seat 7: 901759d8 folded before Flop
+Seat 8: 50957c46 folded before Flop
+
+
+Poker Hand #TM5944357057: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level17(2,500/5,000(600)) - 2026/05/13 02:23:07
+Table '454' 8-max Seat #3 is the button
+Seat 1: Hero (6,700 in chips)
+Seat 2: 741d684e (169,200 in chips)
+Seat 3: 2912d901 (67,950 in chips)
+Seat 4: f1da6380 (83,025 in chips)
+Seat 5: 824219df (191,192 in chips)
+Seat 6: 6f8bbb3 (270,291 in chips)
+Seat 7: 901759d8 (89,450 in chips)
+Seat 8: 50957c46 (44,850 in chips)
+Hero: posts the ante 600
+6f8bbb3: posts the ante 600
+824219df: posts the ante 600
+f1da6380: posts the ante 600
+741d684e: posts the ante 600
+2912d901: posts the ante 600
+50957c46: posts the ante 600
+901759d8: posts the ante 600
+f1da6380: posts small blind 2,500
+824219df: posts big blind 5,000
+*** HOLE CARDS ***
+Dealt to Hero [Ks 4d]
+Dealt to 741d684e 
+Dealt to 2912d901 
+Dealt to f1da6380 
+Dealt to 824219df 
+Dealt to 6f8bbb3 
+Dealt to 901759d8 
+Dealt to 50957c46 
+6f8bbb3: folds
+901759d8: folds
+50957c46: folds
+Hero: folds
+741d684e: folds
+2912d901: raises 62,350 to 67,350 and is all-in
+f1da6380: calls 64,850
+824219df: folds
+2912d901: shows [3h As]
+f1da6380: shows [Ah 8h]
+*** FLOP *** [4s Qc 8d]
+*** TURN *** [4s Qc 8d] [9c]
+*** RIVER *** [4s Qc 8d 9c] [2d]
+*** SHOWDOWN ***
+f1da6380 collected 144,500 from pot
+*** SUMMARY ***
+Total pot 144,500 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [4s Qc 8d 9c 2d]
+Seat 1: Hero folded before Flop
+Seat 2: 741d684e folded before Flop
+Seat 3: 2912d901 (button) showed [3h As] and lost with Ace high
+Seat 4: f1da6380 (small blind) showed [Ah 8h] and won (144,500) with a pair of Eights
+Seat 5: 824219df (big blind) folded before Flop
+Seat 6: 6f8bbb3 folded before Flop
+Seat 7: 901759d8 folded before Flop
+Seat 8: 50957c46 folded before Flop
+
+
+Poker Hand #TM5944356998: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level16(2,000/4,000(500)) - 2026/05/13 02:22:32
+Table '454' 8-max Seat #2 is the button
+Seat 1: Hero (7,200 in chips)
+Seat 2: 741d684e (159,700 in chips)
+Seat 3: 2912d901 (70,450 in chips)
+Seat 4: f1da6380 (87,525 in chips)
+Seat 5: 824219df (191,692 in chips)
+Seat 6: 6f8bbb3 (270,791 in chips)
+Seat 7: 901759d8 (89,950 in chips)
+Seat 8: 50957c46 (45,350 in chips)
+Hero: posts the ante 500
+6f8bbb3: posts the ante 500
+824219df: posts the ante 500
+f1da6380: posts the ante 500
+741d684e: posts the ante 500
+2912d901: posts the ante 500
+50957c46: posts the ante 500
+901759d8: posts the ante 500
+2912d901: posts small blind 2,000
+f1da6380: posts big blind 4,000
+*** HOLE CARDS ***
+Dealt to Hero [5s 3c]
+Dealt to 741d684e 
+Dealt to 2912d901 
+Dealt to f1da6380 
+Dealt to 824219df 
+Dealt to 6f8bbb3 
+Dealt to 901759d8 
+Dealt to 50957c46 
+824219df: folds
+6f8bbb3: folds
+901759d8: folds
+50957c46: folds
+Hero: folds
+741d684e: raises 4,000 to 8,000
+2912d901: folds
+f1da6380: folds
+Uncalled bet (4,000) returned to 741d684e
+*** SHOWDOWN ***
+741d684e collected 14,000 from pot
+*** SUMMARY ***
+Total pot 14,000 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: Hero folded before Flop
+Seat 2: 741d684e (button) collected (14,000)
+Seat 3: 2912d901 (small blind) folded before Flop
+Seat 4: f1da6380 (big blind) folded before Flop
+Seat 5: 824219df folded before Flop
+Seat 6: 6f8bbb3 folded before Flop
+Seat 7: 901759d8 folded before Flop
+Seat 8: 50957c46 folded before Flop
+
+
+Poker Hand #TM5944356901: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level16(2,000/4,000(500)) - 2026/05/13 02:21:37
+Table '454' 8-max Seat #1 is the button
+Seat 1: Hero (7,700 in chips)
+Seat 2: 741d684e (162,200 in chips)
+Seat 3: 2912d901 (78,950 in chips)
+Seat 4: f1da6380 (74,025 in chips)
+Seat 5: 824219df (192,192 in chips)
+Seat 6: 6f8bbb3 (271,291 in chips)
+Seat 7: 901759d8 (90,450 in chips)
+Seat 8: 50957c46 (45,850 in chips)
+Hero: posts the ante 500
+6f8bbb3: posts the ante 500
+824219df: posts the ante 500
+f1da6380: posts the ante 500
+741d684e: posts the ante 500
+2912d901: posts the ante 500
+50957c46: posts the ante 500
+901759d8: posts the ante 500
+741d684e: posts small blind 2,000
+2912d901: posts big blind 4,000
+*** HOLE CARDS ***
+Dealt to Hero [3c 5d]
+Dealt to 741d684e 
+Dealt to 2912d901 
+Dealt to f1da6380 
+Dealt to 824219df 
+Dealt to 6f8bbb3 
+Dealt to 901759d8 
+Dealt to 50957c46 
+f1da6380: raises 4,000 to 8,000
+824219df: folds
+6f8bbb3: folds
+901759d8: folds
+50957c46: folds
+Hero: folds
+741d684e: folds
+2912d901: calls 4,000
+*** FLOP *** [Qh 9d Qd]
+2912d901: checks
+f1da6380: bets 11,000
+2912d901: folds
+Uncalled bet (11,000) returned to f1da6380
+*** SHOWDOWN ***
+f1da6380 collected 22,000 from pot
+*** SUMMARY ***
+Total pot 22,000 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Qh 9d Qd]
+Seat 1: Hero (button) folded before Flop
+Seat 2: 741d684e (small blind) folded before Flop
+Seat 3: 2912d901 (big blind) folded on the Flop
+Seat 4: f1da6380 won (22,000)
+Seat 5: 824219df folded before Flop
+Seat 6: 6f8bbb3 folded before Flop
+Seat 7: 901759d8 folded before Flop
+Seat 8: 50957c46 folded before Flop
+
+
+Poker Hand #TM5944356852: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level16(2,000/4,000(500)) - 2026/05/13 02:21:12
+Table '454' 8-max Seat #8 is the button
+Seat 1: Hero (10,200 in chips)
+Seat 2: 741d684e (166,700 in chips)
+Seat 3: 2912d901 (69,450 in chips)
+Seat 4: f1da6380 (74,525 in chips)
+Seat 5: 824219df (192,692 in chips)
+Seat 6: 6f8bbb3 (271,791 in chips)
+Seat 7: 901759d8 (90,950 in chips)
+Seat 8: 50957c46 (46,350 in chips)
+6f8bbb3: posts the ante 500
+Hero: posts the ante 500
+824219df: posts the ante 500
+f1da6380: posts the ante 500
+741d684e: posts the ante 500
+2912d901: posts the ante 500
+50957c46: posts the ante 500
+901759d8: posts the ante 500
+Hero: posts small blind 2,000
+741d684e: posts big blind 4,000
+*** HOLE CARDS ***
+Dealt to Hero [5c Qh]
+Dealt to 741d684e 
+Dealt to 2912d901 
+Dealt to f1da6380 
+Dealt to 824219df 
+Dealt to 6f8bbb3 
+Dealt to 901759d8 
+Dealt to 50957c46 
+2912d901: raises 4,000 to 8,000
+f1da6380: folds
+824219df: folds
+6f8bbb3: folds
+901759d8: folds
+50957c46: folds
+Hero: folds
+741d684e: folds
+Uncalled bet (4,000) returned to 2912d901
+*** SHOWDOWN ***
+2912d901 collected 14,000 from pot
+*** SUMMARY ***
+Total pot 14,000 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: Hero (small blind) folded before Flop
+Seat 2: 741d684e (big blind) folded before Flop
+Seat 3: 2912d901 collected (14,000)
+Seat 4: f1da6380 folded before Flop
+Seat 5: 824219df folded before Flop
+Seat 6: 6f8bbb3 folded before Flop
+Seat 7: 901759d8 folded before Flop
+Seat 8: 50957c46 (button) folded before Flop
+
+
+Poker Hand #TM5944356754: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level16(2,000/4,000(500)) - 2026/05/13 02:20:14
+Table '454' 8-max Seat #7 is the button
+Seat 1: Hero (2,600 in chips)
+Seat 2: 741d684e (167,200 in chips)
+Seat 3: 2912d901 (69,950 in chips)
+Seat 4: f1da6380 (75,025 in chips)
+Seat 5: 824219df (193,192 in chips)
+Seat 6: 6f8bbb3 (274,391 in chips)
+Seat 7: 901759d8 (91,450 in chips)
+Seat 8: 50957c46 (48,850 in chips)
+6f8bbb3: posts the ante 500
+Hero: posts the ante 500
+824219df: posts the ante 500
+f1da6380: posts the ante 500
+741d684e: posts the ante 500
+2912d901: posts the ante 500
+50957c46: posts the ante 500
+901759d8: posts the ante 500
+50957c46: posts small blind 2,000
+Hero: posts big blind 2,100
+*** HOLE CARDS ***
+Dealt to Hero [8s 2h]
+Dealt to 741d684e 
+Dealt to 2912d901 
+Dealt to f1da6380 
+Dealt to 824219df 
+Dealt to 6f8bbb3 
+Dealt to 901759d8 
+Dealt to 50957c46 
+741d684e: folds
+2912d901: folds
+f1da6380: folds
+824219df: folds
+6f8bbb3: raises 4,400 to 8,400
+901759d8: folds
+50957c46: folds
+Uncalled bet (6,300) returned to 6f8bbb3
+6f8bbb3: shows [9s Kc]
+Hero: shows [8s 2h]
+*** FLOP *** [8h 7h Ts]
+*** TURN *** [8h 7h Ts] [As]
+*** RIVER *** [8h 7h Ts As] [3s]
+*** SHOWDOWN ***
+Hero collected 10,200 from pot
+*** SUMMARY ***
+Total pot 10,200 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [8h 7h Ts As 3s]
+Seat 1: Hero (big blind) showed [8s 2h] and won (10,200) with a pair of Eights
+Seat 2: 741d684e folded before Flop
+Seat 3: 2912d901 folded before Flop
+Seat 4: f1da6380 folded before Flop
+Seat 5: 824219df folded before Flop
+Seat 6: 6f8bbb3 showed [9s Kc] and lost with Ace high
+Seat 7: 901759d8 (button) folded before Flop
+Seat 8: 50957c46 (small blind) folded before Flop
+
+
+Poker Hand #TM5944533997: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level16(2,000/4,000(500)) - 2026/05/13 02:18:59
+Table '481' 8-max Seat #1 is the button
+Seat 1: Hero (40,100 in chips)
+Seat 2: a545469a (30,850 in chips)
+Seat 3: dc7e4613 (37,500 in chips)
+Seat 5: 889cf059 (142,911 in chips)
+Seat 6: 755ed524 (70,948 in chips)
+Seat 7: 5bcf9b40 (55,029 in chips)
+Seat 8: 4032772c (205,085 in chips)
+755ed524: posts the ante 500
+dc7e4613: posts the ante 500
+Hero: posts the ante 500
+4032772c: posts the ante 500
+889cf059: posts the ante 500
+a545469a: posts the ante 500
+5bcf9b40: posts the ante 500
+a545469a: posts small blind 2,000
+dc7e4613: posts big blind 4,000
+*** HOLE CARDS ***
+Dealt to Hero [Th Kh]
+Dealt to a545469a 
+Dealt to dc7e4613 
+Dealt to 889cf059 
+Dealt to 755ed524 
+Dealt to 5bcf9b40 
+Dealt to 4032772c 
+889cf059: folds
+755ed524: folds
+5bcf9b40: folds
+4032772c: raises 4,000 to 8,000
+Hero: raises 31,600 to 39,600 and is all-in
+a545469a: folds
+dc7e4613: calls 33,000 and is all-in
+4032772c: folds
+Uncalled bet (2,600) returned to Hero
+Hero: shows [Th Kh]
+dc7e4613: shows [8s 4s]
+*** FLOP *** [6c 3s 8d]
+*** TURN *** [6c 3s 8d] [7d]
+*** RIVER *** [6c 3s 8d 7d] [3h]
+*** SHOWDOWN ***
+dc7e4613 collected 87,500 from pot
+*** SUMMARY ***
+Total pot 87,500 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6c 3s 8d 7d 3h]
+Seat 1: Hero (button) showed [Th Kh] and lost with a pair of Threes
+Seat 2: a545469a (small blind) folded before Flop
+Seat 3: dc7e4613 (big blind) showed [8s 4s] and won (87,500) with two pair, Eights and Threes
+Seat 5: 889cf059 folded before Flop
+Seat 6: 755ed524 folded before Flop
+Seat 7: 5bcf9b40 folded before Flop
+Seat 8: 4032772c folded before Flop
+
+
+Poker Hand #TM5944533937: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level16(2,000/4,000(500)) - 2026/05/13 02:18:26
+Table '481' 8-max Seat #8 is the button
+Seat 1: Hero (42,600 in chips)
+Seat 2: a545469a (35,350 in chips)
+Seat 3: dc7e4613 (38,000 in chips)
+Seat 5: 889cf059 (143,411 in chips)
+Seat 6: 755ed524 (71,448 in chips)
+Seat 7: 5bcf9b40 (55,529 in chips)
+Seat 8: 4032772c (196,085 in chips)
+755ed524: posts the ante 500
+dc7e4613: posts the ante 500
+4032772c: posts the ante 500
+Hero: posts the ante 500
+889cf059: posts the ante 500
+a545469a: posts the ante 500
+5bcf9b40: posts the ante 500
+Hero: posts small blind 2,000
+a545469a: posts big blind 4,000
+*** HOLE CARDS ***
+Dealt to Hero [2s Jc]
+Dealt to a545469a 
+Dealt to dc7e4613 
+Dealt to 889cf059 
+Dealt to 755ed524 
+Dealt to 5bcf9b40 
+Dealt to 4032772c 
+dc7e4613: folds
+889cf059: folds
+755ed524: folds
+5bcf9b40: folds
+4032772c: raises 176,000 to 180,000
+Hero: folds
+a545469a: folds
+Uncalled bet (176,000) returned to 4032772c
+*** SHOWDOWN ***
+4032772c collected 13,500 from pot
+*** SUMMARY ***
+Total pot 13,500 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: Hero (small blind) folded before Flop
+Seat 2: a545469a (big blind) folded before Flop
+Seat 3: dc7e4613 folded before Flop
+Seat 5: 889cf059 folded before Flop
+Seat 6: 755ed524 folded before Flop
+Seat 7: 5bcf9b40 folded before Flop
+Seat 8: 4032772c (button) collected (13,500)
+
+
+Poker Hand #TM5944533857: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level16(2,000/4,000(500)) - 2026/05/13 02:17:40
+Table '481' 8-max Seat #7 is the button
+Seat 1: Hero (37,600 in chips)
+Seat 2: a545469a (35,850 in chips)
+Seat 3: dc7e4613 (38,500 in chips)
+Seat 5: 889cf059 (143,911 in chips)
+Seat 6: 755ed524 (71,948 in chips)
+Seat 7: 5bcf9b40 (56,029 in chips)
+Seat 8: 4032772c (198,585 in chips)
+755ed524: posts the ante 500
+dc7e4613: posts the ante 500
+Hero: posts the ante 500
+4032772c: posts the ante 500
+889cf059: posts the ante 500
+a545469a: posts the ante 500
+5bcf9b40: posts the ante 500
+4032772c: posts small blind 2,000
+Hero: posts big blind 4,000
+*** HOLE CARDS ***
+Dealt to Hero [6d 3h]
+Dealt to a545469a 
+Dealt to dc7e4613 
+Dealt to 889cf059 
+Dealt to 755ed524 
+Dealt to 5bcf9b40 
+Dealt to 4032772c 
+a545469a: folds
+dc7e4613: folds
+889cf059: folds
+755ed524: folds
+5bcf9b40: folds
+4032772c: folds
+Uncalled bet (2,000) returned to Hero
+*** SHOWDOWN ***
+Hero collected 7,500 from pot
+*** SUMMARY ***
+Total pot 7,500 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: Hero (big blind) collected (7,500)
+Seat 2: a545469a folded before Flop
+Seat 3: dc7e4613 folded before Flop
+Seat 5: 889cf059 folded before Flop
+Seat 6: 755ed524 folded before Flop
+Seat 7: 5bcf9b40 (button) folded before Flop
+Seat 8: 4032772c (small blind) folded before Flop
+
+
+Poker Hand #TM5944533742: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level16(2,000/4,000(500)) - 2026/05/13 02:16:35
+Table '481' 8-max Seat #6 is the button
+Seat 1: Hero (38,100 in chips)
+Seat 2: a545469a (36,350 in chips)
+Seat 3: dc7e4613 (39,000 in chips)
+Seat 5: 889cf059 (152,411 in chips)
+Seat 6: 755ed524 (72,448 in chips)
+Seat 7: 5bcf9b40 (58,529 in chips)
+Seat 8: 4032772c (185,585 in chips)
+755ed524: posts the ante 500
+dc7e4613: posts the ante 500
+Hero: posts the ante 500
+4032772c: posts the ante 500
+889cf059: posts the ante 500
+a545469a: posts the ante 500
+5bcf9b40: posts the ante 500
+5bcf9b40: posts small blind 2,000
+4032772c: posts big blind 4,000
+*** HOLE CARDS ***
+Dealt to Hero [7s 2c]
+Dealt to a545469a 
+Dealt to dc7e4613 
+Dealt to 889cf059 
+Dealt to 755ed524 
+Dealt to 5bcf9b40 
+Dealt to 4032772c 
+Hero: folds
+a545469a: folds
+dc7e4613: folds
+889cf059: raises 4,000 to 8,000
+755ed524: folds
+5bcf9b40: folds
+4032772c: calls 4,000
+*** FLOP *** [8s 5d 6h]
+4032772c: checks
+889cf059: checks
+*** TURN *** [8s 5d 6h] [4h]
+4032772c: bets 18,190
+889cf059: folds
+Uncalled bet (18,190) returned to 4032772c
+*** SHOWDOWN ***
+4032772c collected 21,500 from pot
+*** SUMMARY ***
+Total pot 21,500 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [8s 5d 6h 4h]
+Seat 1: Hero folded before Flop
+Seat 2: a545469a folded before Flop
+Seat 3: dc7e4613 folded before Flop
+Seat 5: 889cf059 folded on the Turn
+Seat 6: 755ed524 (button) folded before Flop
+Seat 7: 5bcf9b40 (small blind) folded before Flop
+Seat 8: 4032772c (big blind) won (21,500)
+
+
+Poker Hand #TM5944533695: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level16(2,000/4,000(500)) - 2026/05/13 02:16:07
+Table '481' 8-max Seat #5 is the button
+Seat 1: Hero (38,600 in chips)
+Seat 2: a545469a (36,850 in chips)
+Seat 3: dc7e4613 (39,500 in chips)
+Seat 5: 889cf059 (152,911 in chips)
+Seat 6: 755ed524 (65,448 in chips)
+Seat 7: 5bcf9b40 (63,029 in chips)
+Seat 8: 4032772c (186,085 in chips)
+755ed524: posts the ante 500
+dc7e4613: posts the ante 500
+Hero: posts the ante 500
+4032772c: posts the ante 500
+889cf059: posts the ante 500
+a545469a: posts the ante 500
+5bcf9b40: posts the ante 500
+755ed524: posts small blind 2,000
+5bcf9b40: posts big blind 4,000
+*** HOLE CARDS ***
+Dealt to Hero [4d Kh]
+Dealt to a545469a 
+Dealt to dc7e4613 
+Dealt to 889cf059 
+Dealt to 755ed524 
+Dealt to 5bcf9b40 
+Dealt to 4032772c 
+4032772c: folds
+Hero: folds
+a545469a: folds
+dc7e4613: folds
+889cf059: folds
+755ed524: raises 60,948 to 64,948 and is all-in
+5bcf9b40: folds
+Uncalled bet (60,948) returned to 755ed524
+*** SHOWDOWN ***
+755ed524 collected 11,500 from pot
+*** SUMMARY ***
+Total pot 11,500 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: Hero folded before Flop
+Seat 2: a545469a folded before Flop
+Seat 3: dc7e4613 folded before Flop
+Seat 5: 889cf059 (button) folded before Flop
+Seat 6: 755ed524 (small blind) collected (11,500)
+Seat 7: 5bcf9b40 (big blind) folded before Flop
+Seat 8: 4032772c folded before Flop
+
+
+Poker Hand #TM5944533537: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level16(2,000/4,000(500)) - 2026/05/13 02:14:45
+Table '481' 8-max Seat #4 is the button
+Seat 1: Hero (39,100 in chips)
+Seat 2: a545469a (37,350 in chips)
+Seat 3: dc7e4613 (40,000 in chips)
+Seat 4: bc80a00b (36,515 in chips)
+Seat 5: 889cf059 (109,396 in chips)
+Seat 6: 755ed524 (69,948 in chips)
+Seat 7: 5bcf9b40 (63,529 in chips)
+Seat 8: 4032772c (186,585 in chips)
+bc80a00b: posts the ante 500
+755ed524: posts the ante 500
+dc7e4613: posts the ante 500
+Hero: posts the ante 500
+4032772c: posts the ante 500
+889cf059: posts the ante 500
+a545469a: posts the ante 500
+5bcf9b40: posts the ante 500
+889cf059: posts small blind 2,000
+755ed524: posts big blind 4,000
+*** HOLE CARDS ***
+Dealt to Hero [9h Ks]
+Dealt to a545469a 
+Dealt to dc7e4613 
+Dealt to bc80a00b 
+Dealt to 889cf059 
+Dealt to 755ed524 
+Dealt to 5bcf9b40 
+Dealt to 4032772c 
+5bcf9b40: folds
+4032772c: folds
+Hero: folds
+a545469a: folds
+dc7e4613: folds
+bc80a00b: raises 32,015 to 36,015 and is all-in
+889cf059: raises 72,881 to 108,896 and is all-in
+755ed524: folds
+Uncalled bet (72,881) returned to 889cf059
+889cf059: shows [Ah Jh]
+bc80a00b: shows [9s Qd]
+*** FLOP *** [6c 7d 9c]
+*** TURN *** [6c 7d 9c] [Ac]
+*** RIVER *** [6c 7d 9c Ac] [6h]
+*** SHOWDOWN ***
+889cf059 collected 80,030 from pot
+*** SUMMARY ***
+Total pot 80,030 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6c 7d 9c Ac 6h]
+Seat 1: Hero folded before Flop
+Seat 2: a545469a folded before Flop
+Seat 3: dc7e4613 folded before Flop
+Seat 4: bc80a00b (button) showed [9s Qd] and lost with two pair, Nines and Sixes
+Seat 5: 889cf059 (small blind) showed [Ah Jh] and won (80,030) with two pair, Aces and Sixes
+Seat 6: 755ed524 (big blind) folded before Flop
+Seat 7: 5bcf9b40 folded before Flop
+Seat 8: 4032772c folded before Flop
+
+
+Poker Hand #TM5944533497: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level15(1,750/3,500(450)) - 2026/05/13 02:14:29
+Table '481' 8-max Seat #2 is the button
+Seat 1: Hero (39,550 in chips)
+Seat 2: a545469a (37,800 in chips)
+Seat 4: bc80a00b (38,715 in chips)
+Seat 5: 889cf059 (104,946 in chips)
+Seat 6: 755ed524 (70,398 in chips)
+Seat 7: 5bcf9b40 (63,979 in chips)
+Seat 8: 4032772c (187,035 in chips)
+bc80a00b: posts the ante 450
+755ed524: posts the ante 450
+Hero: posts the ante 450
+4032772c: posts the ante 450
+889cf059: posts the ante 450
+a545469a: posts the ante 450
+5bcf9b40: posts the ante 450
+bc80a00b: posts small blind 1,750
+889cf059: posts big blind 3,500
+*** HOLE CARDS ***
+Dealt to Hero [Qs 5c]
+Dealt to a545469a 
+Dealt to bc80a00b 
+Dealt to 889cf059 
+Dealt to 755ed524 
+Dealt to 5bcf9b40 
+Dealt to 4032772c 
+755ed524: folds
+5bcf9b40: folds
+4032772c: folds
+Hero: folds
+a545469a: folds
+bc80a00b: folds
+Uncalled bet (1,750) returned to 889cf059
+*** SHOWDOWN ***
+889cf059 collected 6,650 from pot
+*** SUMMARY ***
+Total pot 6,650 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: Hero folded before Flop
+Seat 2: a545469a (button) folded before Flop
+Seat 4: bc80a00b (small blind) folded before Flop
+Seat 5: 889cf059 (big blind) collected (6,650)
+Seat 6: 755ed524 folded before Flop
+Seat 7: 5bcf9b40 folded before Flop
+Seat 8: 4032772c folded before Flop
+
+
+Poker Hand #TM5944533359: Tournament #283300916, 96-L: $3 Alpine Arena [Deepstack] Hold'em No Limit - Level15(1,750/3,500(450)) - 2026/05/13 02:13:12
+Table '481' 8-max Seat #1 is the button
+Seat 1: Hero (40,000 in chips)
+Seat 2: a545469a (40,000 in chips)
+Seat 4: bc80a00b (46,165 in chips)
+Seat 5: 889cf059 (105,396 in chips)
+Seat 6: 755ed524 (70,848 in chips)
+Seat 7: 5bcf9b40 (64,429 in chips)
+Seat 8: 4032772c (175,585 in chips)
+bc80a00b: posts the ante 450
+755ed524: posts the ante 450
+Hero: posts the ante 450
+4032772c: posts the ante 450
+889cf059: posts the ante 450
+a545469a: posts the ante 450
+5bcf9b40: posts the ante 450
+a545469a: posts small blind 1,750
+bc80a00b: posts big blind 3,500
+*** HOLE CARDS ***
+Dealt to Hero [Tc 3d]
+Dealt to a545469a 
+Dealt to bc80a00b 
+Dealt to 889cf059 
+Dealt to 755ed524 
+Dealt to 5bcf9b40 
+Dealt to 4032772c 
+889cf059: folds
+755ed524: folds
+5bcf9b40: folds
+4032772c: raises 3,500 to 7,000
+Hero: folds
+a545469a: folds
+bc80a00b: calls 3,500
+*** FLOP *** [Td 2s Ad]
+bc80a00b: checks
+4032772c: checks
+*** TURN *** [Td 2s Ad] [Ac]
+bc80a00b: checks
+4032772c: bets 7,938
+bc80a00b: folds
+Uncalled bet (7,938) returned to 4032772c
+*** SHOWDOWN ***
+4032772c collected 18,900 from pot
+*** SUMMARY ***
+Total pot 18,900 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Td 2s Ad Ac]
+Seat 1: Hero (button) folded before Flop
+Seat 2: a545469a (small blind) folded before Flop
+Seat 4: bc80a00b (big blind) folded on the Turn
+Seat 5: 889cf059 folded before Flop
+Seat 6: 755ed524 folded before Flop
+Seat 7: 5bcf9b40 folded before Flop
+Seat 8: 4032772c won (18,900)
+
+

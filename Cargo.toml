@@ -11,6 +11,7 @@ members = [
     "crates/preflop",
     "crates/multiway",
     "crates/formats",
+    "crates/tournament",
     "app/cli",
     "app/gui",
 ]
@@ -32,6 +33,7 @@ abstraction = { path = "crates/abstraction" }
 preflop = { path = "crates/preflop" }
 multiway = { path = "crates/multiway" }
 formats = { path = "crates/formats" }
+tournament = { path = "crates/tournament" }
 cli = { path = "app/cli" }
 
 # NOTE: aya_poker's "std" feature is broken in 0.1.0 (aya_base gates no_std on

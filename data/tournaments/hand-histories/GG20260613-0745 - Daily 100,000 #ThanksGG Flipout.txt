@@ -1,0 +1,237 @@
+Poker Hand #TM6068950977: Tournament #290679414, Daily $100,000 #ThanksGG Flipout Hold'em No Limit - Level1(500/1,000(2,000,000,000)) - 2026/06/13 16:48:10
+Table '1174' 9-max Seat #2 is the button
+Seat 1: bff21423 (33,056 in chips)
+Seat 2: e7137fca (31,765 in chips)
+Seat 3: b682986f (10,448 in chips)
+Seat 4: 36cdf4c8 (16,880 in chips)
+Seat 5: Hero (382,785 in chips)
+Seat 6: 201f6464 (572,071 in chips)
+Seat 7: 4e2a7e36 (171 in chips)
+Seat 8: a5f4df08 (285,922 in chips)
+a5f4df08: posts the ante 285,922
+Hero: posts the ante 382,785
+4e2a7e36: posts the ante 171
+b682986f: posts the ante 10,448
+e7137fca: posts the ante 31,765
+36cdf4c8: posts the ante 16,880
+bff21423: posts the ante 33,056
+201f6464: posts the ante 572,071
+b682986f: posts small blind 0
+36cdf4c8: posts big blind 0
+*** HOLE CARDS ***
+Dealt to bff21423 
+Dealt to e7137fca 
+Dealt to b682986f 
+Dealt to 36cdf4c8 
+Dealt to Hero [Ad 6d]
+Dealt to 201f6464 
+Dealt to 4e2a7e36 
+Dealt to a5f4df08 
+Uncalled bet (189,286) returned to 201f6464
+b682986f: shows [7h 4d]
+36cdf4c8: shows [2d 4s]
+Hero: shows [Ad 6d]
+201f6464: shows [5s 8d]
+4e2a7e36: shows [8s 9c]
+a5f4df08: shows [2s As]
+bff21423: shows [8c 5h]
+e7137fca: shows [9h Ah]
+*** FLOP *** [Td 7s 6s]
+*** TURN *** [Td 7s 6s] [3s]
+*** RIVER *** [Td 7s 6s 3s] [Js]
+*** SHOWDOWN ***
+a5f4df08 collected 1,368 from pot
+a5f4df08 collected 71,939 from pot
+a5f4df08 collected 38,592 from pot
+a5f4df08 collected 74,425 from pot
+a5f4df08 collected 5,164 from pot
+a5f4df08 collected 758,598 from pot
+201f6464 collected 193,726 from pot
+*** SUMMARY ***
+Total pot 1,143,812 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Td 7s 6s 3s Js]
+Seat 1: bff21423 showed [8c 5h] and lost with Jack high
+Seat 2: e7137fca (button) showed [9h Ah] and lost with Ace high
+Seat 3: b682986f (small blind) showed [7h 4d] and lost with a pair of Sevens
+Seat 4: 36cdf4c8 (big blind) showed [2d 4s] and lost with a flush Jack high
+Seat 5: Hero showed [Ad 6d] and lost with a pair of Sixes
+Seat 6: 201f6464 showed [5s 8d] and won (193,726) with a flush Jack high
+Seat 7: 4e2a7e36 showed [8s 9c] and lost with a flush Jack high
+Seat 8: a5f4df08 showed [2s As] and won (950,086) with a flush Ace high
+
+
+Poker Hand #TM6068950959: Tournament #290679414, Daily $100,000 #ThanksGG Flipout Hold'em No Limit - Level1(500/1,000(2,000,000,000)) - 2026/06/13 16:47:39
+Table '1174' 9-max Seat #1 is the button
+Seat 1: 27399f2b (16,023 in chips)
+Seat 5: Hero (230,795 in chips)
+Seat 6: b915c833 (12,456 in chips)
+Seat 7: cce0f4bd (21,130 in chips)
+Seat 8: fecb24ca (26,946 in chips)
+Seat 9: 34b56211 (75,435 in chips)
+fecb24ca: posts the ante 26,946
+Hero: posts the ante 230,795
+b915c833: posts the ante 12,456
+27399f2b: posts the ante 16,023
+34b56211: posts the ante 75,435
+cce0f4bd: posts the ante 21,130
+Hero: posts small blind 500
+b915c833: posts big blind 0
+*** HOLE CARDS ***
+Dealt to 27399f2b 
+Dealt to Hero [Jh Jd]
+Dealt to b915c833 
+Dealt to cce0f4bd 
+Dealt to fecb24ca 
+Dealt to 34b56211 
+Uncalled bet (155,360) returned to Hero
+Uncalled bet (500) returned to Hero
+Hero: shows [Jh Jd]
+b915c833: shows [2s 5d]
+cce0f4bd: shows [5c 4h]
+fecb24ca: shows [Ac 8h]
+34b56211: shows [3s 3h]
+27399f2b: shows [3d 7s]
+*** FLOP *** [8s 4d 5s]
+*** TURN *** [8s 4d 5s] [4s]
+*** RIVER *** [8s 4d 5s 4s] [Js]
+*** SHOWDOWN ***
+Hero collected 74,736 from pot
+Hero collected 17,835 from pot
+Hero collected 20,428 from pot
+Hero collected 17,448 from pot
+Hero collected 96,978 from pot
+*** SUMMARY ***
+Total pot 227,425 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [8s 4d 5s 4s Js]
+Seat 1: 27399f2b (button) showed [3d 7s] and lost with a flush Jack high
+Seat 5: Hero (small blind) showed [Jh Jd] and won (227,425) with a full house, Jacks full of Fours
+Seat 6: b915c833 (big blind) showed [2s 5d] and lost with a flush Jack high
+Seat 7: cce0f4bd showed [5c 4h] and lost with a full house, Fours full of Fives
+Seat 8: fecb24ca showed [Ac 8h] and lost with two pair, Eights and Fours
+Seat 9: 34b56211 showed [3s 3h] and lost with a flush Jack high
+
+
+Poker Hand #TM6068950940: Tournament #290679414, Daily $100,000 #ThanksGG Flipout Hold'em No Limit - Level1(500/1,000(2,000,000,000)) - 2026/06/13 16:47:12
+Table '1174' 9-max Seat #5 is the button
+Seat 1: 27399f2b (2,289 in chips)
+Seat 2: 601159c0 (56,241 in chips)
+Seat 3: 7a79bb1b (8,070 in chips)
+Seat 4: 4e2555e0 (38,384 in chips)
+Seat 5: Hero (77,020 in chips)
+Seat 8: 554aff5b (29,950 in chips)
+Seat 9: 67d33c57 (34,864 in chips)
+7a79bb1b: posts the ante 8,070
+Hero: posts the ante 77,020
+4e2555e0: posts the ante 38,384
+554aff5b: posts the ante 29,950
+27399f2b: posts the ante 2,289
+601159c0: posts the ante 56,241
+67d33c57: posts the ante 34,864
+554aff5b: posts small blind 0
+67d33c57: posts big blind 0
+*** HOLE CARDS ***
+Dealt to 27399f2b 
+Dealt to 601159c0 
+Dealt to 7a79bb1b 
+Dealt to 4e2555e0 
+Dealt to Hero [Ad 7c]
+Dealt to 554aff5b 
+Dealt to 67d33c57 
+Uncalled bet (20,779) returned to Hero
+554aff5b: shows [Qh 2c]
+67d33c57: shows [8h Jd]
+27399f2b: shows [7d 7h]
+601159c0: shows [4s Kh]
+7a79bb1b: shows [Ac Qd]
+4e2555e0: shows [5s Kd]
+Hero: shows [Ad 7c]
+*** FLOP *** [9d 8d 7s]
+*** TURN *** [9d 8d 7s] [As]
+*** RIVER *** [9d 8d 7s As] [Ks]
+*** SHOWDOWN ***
+27399f2b collected 16,023 from pot
+Hero collected 34,686 from pot
+Hero collected 109,400 from pot
+Hero collected 19,656 from pot
+Hero collected 10,560 from pot
+Hero collected 35,714 from pot
+*** SUMMARY ***
+Total pot 226,039 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [9d 8d 7s As Ks]
+Seat 1: 27399f2b showed [7d 7h] and won (16,023) with three of a kind, Sevens
+Seat 2: 601159c0 showed [4s Kh] and lost with a pair of Kings
+Seat 3: 7a79bb1b showed [Ac Qd] and lost with a pair of Aces
+Seat 4: 4e2555e0 showed [5s Kd] and lost with a pair of Kings
+Seat 5: Hero (button) showed [Ad 7c] and won (210,016) with two pair, Aces and Sevens
+Seat 8: 554aff5b (small blind) showed [Qh 2c] and lost with Ace high
+Seat 9: 67d33c57 (big blind) showed [8h Jd] and lost with a pair of Eights
+
+
+Poker Hand #TM6068950910: Tournament #290679414, Daily $100,000 #ThanksGG Flipout Hold'em No Limit - Level1(500/1,000(2,000,000,000)) - 2026/06/13 16:45:02
+Table '1174' 9-max Seat #3 is the button
+Seat 1: c01555c1 (12,396 in chips)
+Seat 2: 73d3c77b (3,537 in chips)
+Seat 3: 7a79bb1b (11,909 in chips)
+Seat 4: 8d7c54af (10,018 in chips)
+Seat 5: Hero (10,295 in chips)
+Seat 6: 91279c78 (1,695 in chips)
+Seat 7: 51d2e11 (22,423 in chips)
+Seat 8: 554aff5b (21,730 in chips)
+Seat 9: 67d33c57 (55,901 in chips)
+7a79bb1b: posts the ante 11,909
+Hero: posts the ante 10,295
+91279c78: posts the ante 1,695
+554aff5b: posts the ante 21,730
+51d2e11: posts the ante 22,423
+c01555c1: posts the ante 12,396
+73d3c77b: posts the ante 3,537
+67d33c57: posts the ante 55,901
+8d7c54af: posts the ante 10,018
+8d7c54af: posts small blind 0
+Hero: posts big blind 0
+*** HOLE CARDS ***
+Dealt to c01555c1 
+Dealt to 73d3c77b 
+Dealt to 7a79bb1b 
+Dealt to 8d7c54af 
+Dealt to Hero [9h 8c]
+Dealt to 91279c78 
+Dealt to 51d2e11 
+Dealt to 554aff5b 
+Dealt to 67d33c57 
+Uncalled bet (33,478) returned to 67d33c57
+8d7c54af: shows [4c Kd]
+Hero: shows [9h 8c]
+91279c78: shows [Ah Td]
+51d2e11: shows [Qd 3h]
+554aff5b: shows [9s 7h]
+67d33c57: shows [5d 5h]
+c01555c1: shows [2c Qh]
+73d3c77b: shows [Ad 6d]
+7a79bb1b: shows [Th Js]
+*** FLOP *** [9d Jd 8h]
+*** TURN *** [9d Jd 8h] [2s]
+*** RIVER *** [9d Jd 8h 2s] [6c]
+*** SHOWDOWN ***
+Hero collected 15,255 from pot
+Hero collected 14,736 from pot
+Hero collected 45,367 from pot
+Hero collected 1,662 from pot
+7a79bb1b collected 8,070 from pot
+554aff5b collected 1,948 from pot
+554aff5b collected 28,002 from pot
+67d33c57 collected 1,386 from pot
+*** SUMMARY ***
+Total pot 116,426 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [9d Jd 8h 2s 6c]
+Seat 1: c01555c1 showed [2c Qh] and lost with a pair of Twos
+Seat 2: 73d3c77b showed [Ad 6d] and lost with a pair of Sixes
+Seat 3: 7a79bb1b (button) showed [Th Js] and won (8,070) with a pair of Jacks
+Seat 4: 8d7c54af (small blind) showed [4c Kd] and lost with King high
+Seat 5: Hero (big blind) showed [9h 8c] and won (77,020) with two pair, Nines and Eights
+Seat 6: 91279c78 showed [Ah Td] and lost with Ace high
+Seat 7: 51d2e11 showed [Qd 3h] and lost with Queen high
+Seat 8: 554aff5b showed [9s 7h] and won (29,950) with a pair of Nines
+Seat 9: 67d33c57 showed [5d 5h] and won (1,386) with a pair of Fives
+
+

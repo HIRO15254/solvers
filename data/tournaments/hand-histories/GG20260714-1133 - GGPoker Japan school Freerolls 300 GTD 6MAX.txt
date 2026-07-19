@@ -1,0 +1,89 @@
+Poker Hand #TM6181345477: Tournament #298079719, GGPoker Japan school Freerolls $300 GTD 6MAX Hold'em No Limit - Level12(400/800(120)) - 2026/07/14 20:33:53
+Table '3' 6-max Seat #2 is the button
+Seat 1: b5f55b85 (9,680 in chips)
+Seat 2: 90390e71 (7,871 in chips)
+Seat 3: 6f587800 (13,630 in chips)
+Seat 4: 837bd252 (31,158 in chips)
+Seat 5: f84b29f6 (12,080 in chips)
+Seat 6: Hero (6,800 in chips)
+b5f55b85: posts the ante 120
+Hero: posts the ante 120
+f84b29f6: posts the ante 120
+6f587800: posts the ante 120
+837bd252: posts the ante 120
+90390e71: posts the ante 120
+6f587800: posts small blind 400
+837bd252: posts big blind 800
+*** HOLE CARDS ***
+Dealt to b5f55b85 
+Dealt to 90390e71 
+Dealt to 6f587800 
+Dealt to 837bd252 
+Dealt to f84b29f6 
+Dealt to Hero [Ks 9s]
+f84b29f6: folds
+Hero: raises 5,880 to 6,680 and is all-in
+b5f55b85: folds
+90390e71: folds
+6f587800: folds
+837bd252: calls 5,880
+Hero: shows [Ks 9s]
+837bd252: shows [2d Ac]
+*** FLOP *** [Td 3d Ad]
+*** TURN *** [Td 3d Ad] [2s]
+*** RIVER *** [Td 3d Ad 2s] [5d]
+*** SHOWDOWN ***
+837bd252 collected 14,480 from pot
+*** SUMMARY ***
+Total pot 14,480 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Td 3d Ad 2s 5d]
+Seat 1: b5f55b85 folded before Flop
+Seat 2: 90390e71 (button) folded before Flop
+Seat 3: 6f587800 (small blind) folded before Flop
+Seat 4: 837bd252 (big blind) showed [2d Ac] and won (14,480) with a flush Ace high
+Seat 5: f84b29f6 folded before Flop
+Seat 6: Hero showed [Ks 9s] and lost with Ace high
+
+
+Poker Hand #TM6181345462: Tournament #298079719, GGPoker Japan school Freerolls $300 GTD 6MAX Hold'em No Limit - Level12(400/800(120)) - 2026/07/14 20:33:27
+Table '3' 6-max Seat #1 is the button
+Seat 1: b5f55b85 (9,800 in chips)
+Seat 2: 90390e71 (8,391 in chips)
+Seat 3: 6f587800 (14,550 in chips)
+Seat 4: 837bd252 (31,278 in chips)
+Seat 5: f84b29f6 (12,200 in chips)
+Seat 6: Hero (5,000 in chips)
+b5f55b85: posts the ante 120
+Hero: posts the ante 120
+f84b29f6: posts the ante 120
+6f587800: posts the ante 120
+837bd252: posts the ante 120
+90390e71: posts the ante 120
+90390e71: posts small blind 400
+6f587800: posts big blind 800
+*** HOLE CARDS ***
+Dealt to b5f55b85 
+Dealt to 90390e71 
+Dealt to 6f587800 
+Dealt to 837bd252 
+Dealt to f84b29f6 
+Dealt to Hero [Qs Kc]
+837bd252: folds
+f84b29f6: folds
+Hero: raises 4,080 to 4,880 and is all-in
+b5f55b85: folds
+90390e71: folds
+6f587800: folds
+Uncalled bet (4,080) returned to Hero
+*** SHOWDOWN ***
+Hero collected 2,720 from pot
+*** SUMMARY ***
+Total pot 2,720 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: b5f55b85 (button) folded before Flop
+Seat 2: 90390e71 (small blind) folded before Flop
+Seat 3: 6f587800 (big blind) folded before Flop
+Seat 4: 837bd252 folded before Flop
+Seat 5: f84b29f6 folded before Flop
+Seat 6: Hero collected (2,720)
+
+

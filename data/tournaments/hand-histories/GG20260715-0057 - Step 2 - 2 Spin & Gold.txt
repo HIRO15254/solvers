@@ -1,0 +1,125 @@
+Poker Hand #TM15280693: Tournament #299739315, Step 2 - $2 Spin & Gold Hold'em No Limit - Level1(10/20) - 2026/07/15 09:58:46
+Table '75879' 6-max Seat #6 is the button
+Seat 1: 2081c5c7 (300 in chips)
+Seat 2: 73f01801 (300 in chips)
+Seat 3: Hero (30 in chips)
+Seat 4: a719d908 (290 in chips)
+Seat 6: ed948da2 (880 in chips)
+2081c5c7: posts small blind 10
+73f01801: posts big blind 20
+*** HOLE CARDS ***
+Dealt to 2081c5c7 
+Dealt to 73f01801 
+Dealt to Hero [Kh 7c]
+Dealt to a719d908 
+Dealt to ed948da2 
+Hero: raises 10 to 30 and is all-in
+a719d908: folds
+ed948da2: calls 30
+2081c5c7: calls 20
+73f01801: folds
+*** FLOP *** [8d 5d 3c]
+2081c5c7: checks
+ed948da2: checks
+*** TURN *** [8d 5d 3c] [5s]
+2081c5c7: bets 55
+ed948da2: folds
+Uncalled bet (55) returned to 2081c5c7
+2081c5c7: shows [Kd 3d] (two pair, Fives and Threes)
+Hero: shows [Kh 7c] (a pair of Fives)
+*** RIVER *** [8d 5d 3c 5s] [Ah]
+*** SHOWDOWN ***
+2081c5c7 collected 110 from pot
+*** SUMMARY ***
+Total pot 110 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [8d 5d 3c 5s Ah]
+Seat 1: 2081c5c7 (small blind) showed [Kd 3d] and won (110) with two pair, Fives and Threes
+Seat 2: 73f01801 (big blind) folded before Flop
+Seat 3: Hero showed [Kh 7c] and lost with a pair of Fives
+Seat 4: a719d908 folded before Flop (didn't bet)
+Seat 6: ed948da2 (button) folded on the Turn
+
+
+Poker Hand #TM15280691: Tournament #299739315, Step 2 - $2 Spin & Gold Hold'em No Limit - Level1(10/20) - 2026/07/15 09:58:08
+Table '75879' 6-max Seat #4 is the button
+Seat 1: 2081c5c7 (300 in chips)
+Seat 2: 73f01801 (300 in chips)
+Seat 3: Hero (330 in chips)
+Seat 4: a719d908 (290 in chips)
+Seat 5: ce8fa4eb (280 in chips)
+Seat 6: ed948da2 (300 in chips)
+ce8fa4eb: posts small blind 10
+ed948da2: posts big blind 20
+*** HOLE CARDS ***
+Dealt to 2081c5c7 
+Dealt to 73f01801 
+Dealt to Hero [Kc Kh]
+Dealt to a719d908 
+Dealt to ce8fa4eb 
+Dealt to ed948da2 
+2081c5c7: folds
+73f01801: folds
+Hero: raises 20 to 40
+a719d908: folds
+ce8fa4eb: raises 20 to 60
+ed948da2: raises 20 to 80
+Hero: raises 250 to 330 and is all-in
+ce8fa4eb: calls 220 and is all-in
+ed948da2: calls 220 and is all-in
+Uncalled bet (30) returned to Hero
+Hero: shows [Kc Kh]
+ce8fa4eb: shows [5c 5s]
+ed948da2: shows [9d Js]
+*** FLOP *** [6c 9h 3c]
+*** TURN *** [6c 9h 3c] [Jh]
+*** RIVER *** [6c 9h 3c Jh] [7s]
+*** SHOWDOWN ***
+ed948da2 collected 840 from pot
+ed948da2 collected 40 from pot
+*** SUMMARY ***
+Total pot 880 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6c 9h 3c Jh 7s]
+Seat 1: 2081c5c7 folded before Flop (didn't bet)
+Seat 2: 73f01801 folded before Flop (didn't bet)
+Seat 3: Hero showed [Kc Kh] and lost with a pair of Kings
+Seat 4: a719d908 (button) folded before Flop (didn't bet)
+Seat 5: ce8fa4eb (small blind) showed [5c 5s] and lost with a pair of Fives
+Seat 6: ed948da2 (big blind) showed [9d Js] and won (880) with two pair, Jacks and Nines
+
+
+Poker Hand #TM15280689: Tournament #299739315, Step 2 - $2 Spin & Gold Hold'em No Limit - Level1(10/20) - 2026/07/15 09:57:44
+Table '75879' 6-max Seat #3 is the button
+Seat 1: 2081c5c7 (300 in chips)
+Seat 2: 73f01801 (300 in chips)
+Seat 3: Hero (300 in chips)
+Seat 4: a719d908 (300 in chips)
+Seat 5: ce8fa4eb (300 in chips)
+Seat 6: ed948da2 (300 in chips)
+a719d908: posts small blind 10
+ce8fa4eb: posts big blind 20
+*** HOLE CARDS ***
+Dealt to 2081c5c7 
+Dealt to 73f01801 
+Dealt to Hero [8s Ks]
+Dealt to a719d908 
+Dealt to ce8fa4eb 
+Dealt to ed948da2 
+ed948da2: folds
+2081c5c7: folds
+73f01801: folds
+Hero: raises 20 to 40
+a719d908: folds
+ce8fa4eb: folds
+Uncalled bet (20) returned to Hero
+*** SHOWDOWN ***
+Hero collected 50 from pot
+*** SUMMARY ***
+Total pot 50 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 2081c5c7 folded before Flop (didn't bet)
+Seat 2: 73f01801 folded before Flop (didn't bet)
+Seat 3: Hero (button) collected (50)
+Seat 4: a719d908 (small blind) folded before Flop
+Seat 5: ce8fa4eb (big blind) folded before Flop
+Seat 6: ed948da2 folded before Flop (didn't bet)
+
+

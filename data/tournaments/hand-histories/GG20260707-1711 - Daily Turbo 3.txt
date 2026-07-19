@@ -1,0 +1,121 @@
+Poker Hand #TM6157781523: Tournament #296498947, Daily Turbo $3 Hold'em No Limit - Level11(250/500(60)) - 2026/07/08 02:12:52
+Table '18' 8-max Seat #4 is the button
+Seat 1: 90979ac1 (8,297 in chips)
+Seat 2: 6bd57c80 (7,945 in chips)
+Seat 3: 9f3ca40d (23,334 in chips)
+Seat 4: 707c621c (22,196 in chips)
+Seat 5: Hero (7,045 in chips)
+Seat 6: 82384d72 (940 in chips)
+Seat 7: 5f26531f (18,968 in chips)
+Seat 8: 8183bd3a (18,628 in chips)
+707c621c: posts the ante 60
+Hero: posts the ante 60
+9f3ca40d: posts the ante 60
+6bd57c80: posts the ante 60
+82384d72: posts the ante 60
+8183bd3a: posts the ante 60
+5f26531f: posts the ante 60
+90979ac1: posts the ante 60
+Hero: posts small blind 250
+82384d72: posts big blind 500
+*** HOLE CARDS ***
+Dealt to 90979ac1 
+Dealt to 6bd57c80 
+Dealt to 9f3ca40d 
+Dealt to 707c621c 
+Dealt to Hero [9c Ac]
+Dealt to 82384d72 
+Dealt to 5f26531f 
+Dealt to 8183bd3a 
+5f26531f: folds
+8183bd3a: folds
+90979ac1: folds
+6bd57c80: folds
+9f3ca40d: raises 1,000 to 1,500
+707c621c: folds
+Hero: raises 5,485 to 6,985 and is all-in
+82384d72: calls 380 and is all-in
+9f3ca40d: calls 5,485
+Hero: shows [9c Ac]
+82384d72: shows [3c 2d]
+9f3ca40d: shows [8d 8c]
+*** FLOP *** [7h Tc 9d]
+*** TURN *** [7h Tc 9d] [6s]
+*** RIVER *** [7h Tc 9d 6s] [Ad]
+*** SHOWDOWN ***
+9f3ca40d collected 3,120 from pot
+9f3ca40d collected 12,210 from pot
+*** SUMMARY ***
+Total pot 15,330 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [7h Tc 9d 6s Ad]
+Seat 1: 90979ac1 folded before Flop
+Seat 2: 6bd57c80 folded before Flop
+Seat 3: 9f3ca40d showed [8d 8c] and won (15,330) with a straight, Ten to Six
+Seat 4: 707c621c (button) folded before Flop
+Seat 5: Hero (small blind) showed [9c Ac] and lost with two pair, Aces and Nines
+Seat 6: 82384d72 (big blind) showed [3c 2d] and lost with Ace high
+Seat 7: 5f26531f folded before Flop
+Seat 8: 8183bd3a folded before Flop
+
+
+Poker Hand #TM6157781471: Tournament #296498947, Daily Turbo $3 Hold'em No Limit - Level10(225/450(55)) - 2026/07/08 02:11:39
+Table '18' 8-max Seat #3 is the button
+Seat 1: 90979ac1 (8,352 in chips)
+Seat 2: 6bd57c80 (8,000 in chips)
+Seat 3: 9f3ca40d (20,249 in chips)
+Seat 4: 707c621c (23,151 in chips)
+Seat 5: Hero (8,000 in chips)
+Seat 6: 82384d72 (995 in chips)
+Seat 7: 5f26531f (19,923 in chips)
+Seat 8: 8183bd3a (18,683 in chips)
+707c621c: posts the ante 55
+Hero: posts the ante 55
+9f3ca40d: posts the ante 55
+6bd57c80: posts the ante 55
+82384d72: posts the ante 55
+8183bd3a: posts the ante 55
+5f26531f: posts the ante 55
+90979ac1: posts the ante 55
+707c621c: posts small blind 225
+Hero: posts big blind 450
+*** HOLE CARDS ***
+Dealt to 90979ac1 
+Dealt to 6bd57c80 
+Dealt to 9f3ca40d 
+Dealt to 707c621c 
+Dealt to Hero [7s Qs]
+Dealt to 82384d72 
+Dealt to 5f26531f 
+Dealt to 8183bd3a 
+82384d72: folds
+5f26531f: raises 450 to 900
+8183bd3a: folds
+90979ac1: folds
+6bd57c80: folds
+9f3ca40d: calls 900
+707c621c: calls 675
+Hero: calls 450
+*** FLOP *** [Tc As 9c]
+707c621c: checks
+Hero: checks
+5f26531f: checks
+9f3ca40d: bets 3,030
+707c621c: folds
+Hero: folds
+5f26531f: folds
+Uncalled bet (3,030) returned to 9f3ca40d
+*** SHOWDOWN ***
+9f3ca40d collected 4,040 from pot
+*** SUMMARY ***
+Total pot 4,040 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Tc As 9c]
+Seat 1: 90979ac1 folded before Flop
+Seat 2: 6bd57c80 folded before Flop
+Seat 3: 9f3ca40d (button) won (4,040)
+Seat 4: 707c621c (small blind) folded on the Flop
+Seat 5: Hero (big blind) folded on the Flop
+Seat 6: 82384d72 folded before Flop
+Seat 7: 5f26531f folded on the Flop
+Seat 8: 8183bd3a folded before Flop
+
+

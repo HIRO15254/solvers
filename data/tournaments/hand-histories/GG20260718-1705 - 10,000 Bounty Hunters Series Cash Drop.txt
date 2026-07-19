@@ -1,0 +1,62 @@
+Poker Hand #TM6196466229: Tournament #300431130, $10,000 Bounty Hunters Series Cash Drop Hold'em No Limit - Level1(500/1,000(2,000,000,000)) - 2026/07/19 02:05:02
+Table '174' 8-max Seat #6 is the button
+Seat 1: 340b7f2a (19,460 in chips)
+Seat 2: 6117f498 (10,454 in chips)
+Seat 3: 98156d50 (2,800 in chips)
+Seat 4: d0684ab1 (2,721 in chips)
+Seat 5: ad60132 (7,175 in chips)
+Seat 6: Hero (4,548 in chips)
+Seat 7: 3f900628 (2,425 in chips)
+Seat 8: c7559f3e (8,578 in chips)
+Hero: posts the ante 4,548
+d0684ab1: posts the ante 2,721
+c7559f3e: posts the ante 8,578
+3f900628: posts the ante 2,425
+6117f498: posts the ante 10,454
+98156d50: posts the ante 2,800
+340b7f2a: posts the ante 19,460
+ad60132: posts the ante 7,175
+3f900628: posts small blind 0
+c7559f3e: posts big blind 0
+*** HOLE CARDS ***
+Dealt to 340b7f2a 
+Dealt to 6117f498 
+Dealt to 98156d50 
+Dealt to d0684ab1 
+Dealt to ad60132 
+Dealt to Hero [3c Td]
+Dealt to 3f900628 
+Dealt to c7559f3e 
+Uncalled bet (9,006) returned to 340b7f2a
+3f900628: shows [9c Ts]
+c7559f3e: shows [Tc Th]
+340b7f2a: shows [2d 6h]
+6117f498: shows [4d 3h]
+98156d50: shows [Kh 5s]
+d0684ab1: shows [Ac Jd]
+ad60132: shows [Ad 6c]
+Hero: shows [3c Td]
+*** FLOP *** [Qh 9d 2h]
+*** TURN *** [Qh 9d 2h] [3s]
+*** RIVER *** [Qh 9d 2h 3s] [Jc]
+*** SHOWDOWN ***
+d0684ab1 collected 19,400 from pot
+d0684ab1 collected 2,072 from pot
+c7559f3e collected 474 from pot
+c7559f3e collected 8,740 from pot
+c7559f3e collected 10,508 from pot
+c7559f3e collected 4,209 from pot
+6117f498 collected 3,752 from pot
+*** SUMMARY ***
+Total pot 49,155 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Qh 9d 2h 3s Jc]
+Seat 1: 340b7f2a showed [2d 6h] and lost with a pair of Twos
+Seat 2: 6117f498 showed [4d 3h] and won (3,752) with a pair of Threes
+Seat 3: 98156d50 showed [Kh 5s] and lost with King high
+Seat 4: d0684ab1 showed [Ac Jd] and won (21,472) with a pair of Jacks
+Seat 5: ad60132 showed [Ad 6c] and lost with Ace high
+Seat 6: Hero (button) showed [3c Td] and lost with a pair of Threes
+Seat 7: 3f900628 (small blind) showed [9c Ts] and lost with a pair of Nines
+Seat 8: c7559f3e (big blind) showed [Tc Th] and won (23,931) with a pair of Tens
+
+

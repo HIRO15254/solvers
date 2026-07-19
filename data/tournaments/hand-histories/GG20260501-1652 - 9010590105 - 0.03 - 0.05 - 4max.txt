@@ -1,0 +1,387 @@
+Poker Hand #TM129067455: Tournament #282035839, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level4(25/50) - 2026/05/02 01:56:16
+Table '90105' 4-max Seat #4 is the button
+Seat 2: Hero (185 in chips)
+Seat 3: da6664fb (330 in chips)
+Seat 4: 6699eeb0 (285 in chips)
+Hero: posts small blind 25
+da6664fb: posts big blind 50
+*** HOLE CARDS ***
+Dealt to Hero [Jh Kd]
+Dealt to da6664fb 
+Dealt to 6699eeb0 
+6699eeb0: raises 235 to 285 and is all-in
+Hero: calls 160 and is all-in
+da6664fb: calls 235
+6699eeb0: shows [Ac Ts]
+Hero: shows [Jh Kd]
+da6664fb: shows [4c Kc]
+*** FLOP *** [2s 8c 8d]
+*** TURN *** [2s 8c 8d] [Td]
+*** RIVER *** [2s 8c 8d Td] [3s]
+*** SHOWDOWN ***
+6699eeb0 collected 555 from pot
+6699eeb0 collected 200 from pot
+*** SUMMARY ***
+Total pot 755 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [2s 8c 8d Td 3s]
+Seat 2: Hero (small blind) showed [Jh Kd] and lost with a pair of Eights
+Seat 3: da6664fb (big blind) showed [4c Kc] and lost with a pair of Eights
+Seat 4: 6699eeb0 (button) showed [Ac Ts] and won (755) with two pair, Tens and Eights
+
+
+Poker Hand #TM129067452: Tournament #282035839, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level4(25/50) - 2026/05/02 01:55:52
+Table '90105' 4-max Seat #3 is the button
+Seat 2: Hero (80 in chips)
+Seat 3: da6664fb (410 in chips)
+Seat 4: 6699eeb0 (310 in chips)
+6699eeb0: posts small blind 25
+Hero: posts big blind 50
+*** HOLE CARDS ***
+Dealt to Hero [Js 8d]
+Dealt to da6664fb 
+Dealt to 6699eeb0 
+da6664fb: raises 360 to 410 and is all-in
+6699eeb0: folds
+Hero: calls 30 and is all-in
+Uncalled bet (330) returned to da6664fb
+da6664fb: shows [9s 9d]
+Hero: shows [Js 8d]
+*** FLOP *** [Qh 6c Ad]
+*** TURN *** [Qh 6c Ad] [Kh]
+*** RIVER *** [Qh 6c Ad Kh] [Jc]
+*** SHOWDOWN ***
+Hero collected 185 from pot
+*** SUMMARY ***
+Total pot 185 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Qh 6c Ad Kh Jc]
+Seat 2: Hero (big blind) showed [Js 8d] and won (185) with a pair of Jacks
+Seat 3: da6664fb (button) showed [9s 9d] and lost with a pair of Nines
+Seat 4: 6699eeb0 (small blind) folded before Flop
+
+
+Poker Hand #TM129067451: Tournament #282035839, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level4(25/50) - 2026/05/02 01:55:32
+Table '90105' 4-max Seat #2 is the button
+Seat 2: Hero (140 in chips)
+Seat 3: da6664fb (220 in chips)
+Seat 4: 6699eeb0 (360 in chips)
+da6664fb: posts small blind 25
+6699eeb0: posts big blind 50
+*** HOLE CARDS ***
+Dealt to Hero [9h Jh]
+Dealt to da6664fb 
+Dealt to 6699eeb0 
+Hero: raises 90 to 140 and is all-in
+da6664fb: raises 80 to 220 and is all-in
+6699eeb0: folds
+Uncalled bet (80) returned to da6664fb
+da6664fb: shows [Ad 7h]
+Hero: shows [9h Jh]
+*** FLOP *** [5d 2s 5s]
+*** TURN *** [5d 2s 5s] [As]
+*** RIVER *** [5d 2s 5s As] [6s]
+*** SHOWDOWN ***
+da6664fb collected 330 from pot
+*** SUMMARY ***
+Total pot 330 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [5d 2s 5s As 6s]
+Seat 2: Hero (button) showed [9h Jh] and lost with a pair of Fives
+Seat 3: da6664fb (small blind) showed [Ad 7h] and won (330) with two pair, Aces and Fives
+Seat 4: 6699eeb0 (big blind) folded before Flop
+
+
+Poker Hand #TM129067448: Tournament #282035839, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level3(15/30) - 2026/05/02 01:55:11
+Table '90105' 4-max Seat #4 is the button
+Seat 2: Hero (250 in chips)
+Seat 3: da6664fb (110 in chips)
+Seat 4: 6699eeb0 (360 in chips)
+Hero: posts small blind 15
+da6664fb: posts big blind 30
+*** HOLE CARDS ***
+Dealt to Hero [4c As]
+Dealt to da6664fb 
+Dealt to 6699eeb0 
+6699eeb0: folds
+Hero: raises 220 to 250 and is all-in
+da6664fb: calls 80 and is all-in
+Uncalled bet (140) returned to Hero
+Hero: shows [4c As]
+da6664fb: shows [3s 3h]
+*** FLOP *** [3d Ad Qs]
+*** TURN *** [3d Ad Qs] [2c]
+*** RIVER *** [3d Ad Qs 2c] [2h]
+*** SHOWDOWN ***
+da6664fb collected 220 from pot
+*** SUMMARY ***
+Total pot 220 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [3d Ad Qs 2c 2h]
+Seat 2: Hero (small blind) showed [4c As] and lost with two pair, Aces and Twos
+Seat 3: da6664fb (big blind) showed [3s 3h] and won (220) with a full house, Threes full of Twos
+Seat 4: 6699eeb0 (button) folded before Flop (didn't bet)
+
+
+Poker Hand #TM129067446: Tournament #282035839, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level3(15/30) - 2026/05/02 01:54:52
+Table '90105' 4-max Seat #3 is the button
+Seat 1: 88978f9c (20 in chips)
+Seat 2: Hero (250 in chips)
+Seat 3: da6664fb (75 in chips)
+Seat 4: 6699eeb0 (375 in chips)
+6699eeb0: posts small blind 15
+88978f9c: posts big blind 20
+*** HOLE CARDS ***
+Dealt to 88978f9c 
+Dealt to Hero [2s 9c]
+Dealt to da6664fb 
+Dealt to 6699eeb0 
+Hero: folds
+da6664fb: raises 45 to 75 and is all-in
+6699eeb0: folds
+Uncalled bet (55) returned to da6664fb
+da6664fb: shows [As Ah]
+88978f9c: shows [2c 3h]
+*** FLOP *** [3c Kc Ks]
+*** TURN *** [3c Kc Ks] [9s]
+*** RIVER *** [3c Kc Ks 9s] [Ac]
+*** SHOWDOWN ***
+da6664fb collected 55 from pot
+*** SUMMARY ***
+Total pot 55 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [3c Kc Ks 9s Ac]
+Seat 1: 88978f9c (big blind) showed [2c 3h] and lost with two pair, Kings and Threes
+Seat 2: Hero folded before Flop (didn't bet)
+Seat 3: da6664fb (button) showed [As Ah] and won (55) with a full house, Aces full of Kings
+Seat 4: 6699eeb0 (small blind) folded before Flop
+
+
+Poker Hand #TM129067444: Tournament #282035839, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level3(15/30) - 2026/05/02 01:54:27
+Table '90105' 4-max Seat #2 is the button
+Seat 1: 88978f9c (200 in chips)
+Seat 2: Hero (250 in chips)
+Seat 3: da6664fb (90 in chips)
+Seat 4: 6699eeb0 (180 in chips)
+da6664fb: posts small blind 15
+6699eeb0: posts big blind 30
+*** HOLE CARDS ***
+Dealt to 88978f9c 
+Dealt to Hero [2c 6c]
+Dealt to da6664fb 
+Dealt to 6699eeb0 
+88978f9c: raises 170 to 200 and is all-in
+Hero: folds
+da6664fb: folds
+6699eeb0: calls 150 and is all-in
+Uncalled bet (20) returned to 88978f9c
+88978f9c: shows [6h Tc]
+6699eeb0: shows [Ks Ad]
+*** FLOP *** [5h Jd 9c]
+*** TURN *** [5h Jd 9c] [9d]
+*** RIVER *** [5h Jd 9c 9d] [7c]
+*** SHOWDOWN ***
+6699eeb0 collected 375 from pot
+*** SUMMARY ***
+Total pot 375 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [5h Jd 9c 9d 7c]
+Seat 1: 88978f9c showed [6h Tc] and lost with a pair of Nines
+Seat 2: Hero (button) folded before Flop (didn't bet)
+Seat 3: da6664fb (small blind) folded before Flop
+Seat 4: 6699eeb0 (big blind) showed [Ks Ad] and won (375) with a pair of Nines
+
+
+Poker Hand #TM129067443: Tournament #282035839, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level2(10/20) - 2026/05/02 01:54:17
+Table '90105' 4-max Seat #1 is the button
+Seat 1: 88978f9c (170 in chips)
+Seat 2: Hero (260 in chips)
+Seat 3: da6664fb (110 in chips)
+Seat 4: 6699eeb0 (180 in chips)
+Hero: posts small blind 10
+da6664fb: posts big blind 20
+*** HOLE CARDS ***
+Dealt to 88978f9c 
+Dealt to Hero [4c 6h]
+Dealt to da6664fb 
+Dealt to 6699eeb0 
+6699eeb0: folds
+88978f9c: raises 150 to 170 and is all-in
+Hero: folds
+da6664fb: folds
+Uncalled bet (150) returned to 88978f9c
+*** SHOWDOWN ***
+88978f9c collected 50 from pot
+*** SUMMARY ***
+Total pot 50 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 88978f9c (button) collected (50)
+Seat 2: Hero (small blind) folded before Flop
+Seat 3: da6664fb (big blind) folded before Flop
+Seat 4: 6699eeb0 folded before Flop (didn't bet)
+
+
+Poker Hand #TM129067441: Tournament #282035839, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level2(10/20) - 2026/05/02 01:53:42
+Table '90105' 4-max Seat #4 is the button
+Seat 1: 88978f9c (300 in chips)
+Seat 2: Hero (130 in chips)
+Seat 3: da6664fb (110 in chips)
+Seat 4: 6699eeb0 (180 in chips)
+88978f9c: posts small blind 10
+Hero: posts big blind 20
+*** HOLE CARDS ***
+Dealt to 88978f9c 
+Dealt to Hero [Kc 3c]
+Dealt to da6664fb 
+Dealt to 6699eeb0 
+da6664fb: folds
+6699eeb0: folds
+88978f9c: raises 280 to 300 and is all-in
+Hero: calls 110 and is all-in
+Uncalled bet (170) returned to 88978f9c
+88978f9c: shows [2s As]
+Hero: shows [Kc 3c]
+*** FLOP *** [6h 3s 7c]
+*** TURN *** [6h 3s 7c] [4s]
+*** RIVER *** [6h 3s 7c 4s] [Kd]
+*** SHOWDOWN ***
+Hero collected 260 from pot
+*** SUMMARY ***
+Total pot 260 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [6h 3s 7c 4s Kd]
+Seat 1: 88978f9c (small blind) showed [2s As] and lost with Ace high
+Seat 2: Hero (big blind) showed [Kc 3c] and won (260) with two pair, Kings and Threes
+Seat 3: da6664fb folded before Flop (didn't bet)
+Seat 4: 6699eeb0 (button) folded before Flop (didn't bet)
+
+
+Poker Hand #TM129067440: Tournament #282035839, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level2(10/20) - 2026/05/02 01:53:33
+Table '90105' 4-max Seat #3 is the button
+Seat 1: 88978f9c (290 in chips)
+Seat 2: Hero (130 in chips)
+Seat 3: da6664fb (110 in chips)
+Seat 4: 6699eeb0 (190 in chips)
+6699eeb0: posts small blind 10
+88978f9c: posts big blind 20
+*** HOLE CARDS ***
+Dealt to 88978f9c 
+Dealt to Hero [Qh 7d]
+Dealt to da6664fb 
+Dealt to 6699eeb0 
+Hero: folds
+da6664fb: folds
+6699eeb0: folds
+Uncalled bet (10) returned to 88978f9c
+*** SHOWDOWN ***
+88978f9c collected 20 from pot
+*** SUMMARY ***
+Total pot 20 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Seat 1: 88978f9c (big blind) collected (20)
+Seat 2: Hero folded before Flop (didn't bet)
+Seat 3: da6664fb (button) folded before Flop (didn't bet)
+Seat 4: 6699eeb0 (small blind) folded before Flop
+
+
+Poker Hand #TM129067439: Tournament #282035839, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level1(5/10) - 2026/05/02 01:53:12
+Table '90105' 4-max Seat #2 is the button
+Seat 1: 88978f9c (370 in chips)
+Seat 2: Hero (80 in chips)
+Seat 3: da6664fb (70 in chips)
+Seat 4: 6699eeb0 (200 in chips)
+da6664fb: posts small blind 5
+6699eeb0: posts big blind 10
+*** HOLE CARDS ***
+Dealt to 88978f9c 
+Dealt to Hero [As Jd]
+Dealt to da6664fb 
+Dealt to 6699eeb0 
+88978f9c: raises 360 to 370 and is all-in
+Hero: calls 80 and is all-in
+da6664fb: calls 65 and is all-in
+6699eeb0: folds
+Uncalled bet (290) returned to 88978f9c
+88978f9c: shows [9h Th]
+Hero: shows [As Jd]
+da6664fb: shows [Ad Js]
+*** FLOP *** [Qh 7h 3s]
+*** TURN *** [Qh 7h 3s] [5c]
+*** RIVER *** [Qh 7h 3s 5c] [Kc]
+*** SHOWDOWN ***
+da6664fb collected 110 from pot
+Hero collected 110 from pot
+Hero collected 20 from pot
+*** SUMMARY ***
+Total pot 240 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Qh 7h 3s 5c Kc]
+Seat 1: 88978f9c showed [9h Th] and lost with King high
+Seat 2: Hero (button) showed [As Jd] and won (130) with Ace high
+Seat 3: da6664fb (small blind) showed [Ad Js] and won (110) with Ace high
+Seat 4: 6699eeb0 (big blind) folded before Flop
+
+
+Poker Hand #TM129067438: Tournament #282035839, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level1(5/10) - 2026/05/02 01:52:51
+Table '90105' 4-max Seat #1 is the button
+Seat 1: 88978f9c (330 in chips)
+Seat 2: Hero (70 in chips)
+Seat 3: da6664fb (80 in chips)
+Seat 4: 6699eeb0 (80 in chips)
+Hero: posts small blind 5
+da6664fb: posts big blind 10
+*** HOLE CARDS ***
+Dealt to 88978f9c 
+Dealt to Hero [Ah Qd]
+Dealt to da6664fb 
+Dealt to 6699eeb0 
+6699eeb0: raises 70 to 80 and is all-in
+88978f9c: raises 250 to 330 and is all-in
+Hero: calls 65 and is all-in
+da6664fb: folds
+Uncalled bet (250) returned to 88978f9c
+88978f9c: shows [7d 7c]
+Hero: shows [Ah Qd]
+6699eeb0: shows [6h 7h]
+*** FLOP *** [Ks 5s 6c]
+*** TURN *** [Ks 5s 6c] [8s]
+*** RIVER *** [Ks 5s 6c 8s] [4s]
+da6664fb: shows [3s] (a flush King high)
+*** SHOWDOWN ***
+6699eeb0 collected 110 from pot
+88978f9c collected 110 from pot
+6699eeb0 collected 10 from pot
+88978f9c collected 10 from pot
+*** SUMMARY ***
+Total pot 240 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [Ks 5s 6c 8s 4s]
+Seat 1: 88978f9c (button) showed [7d 7c] and won (120) with a straight, Eight to Four
+Seat 2: Hero (small blind) showed [Ah Qd] and lost with Ace high
+Seat 3: da6664fb (big blind) folded before Flop
+Seat 4: 6699eeb0 showed [6h 7h] and won (120) with a straight, Eight to Four
+
+
+Poker Hand #TM129067437: Tournament #282035839, Step 1 - $0.50 All-in or Fold AoF Hold'em No Limit - Level1(5/10) - 2026/05/02 01:52:24
+Table '90105' 4-max Seat #4 is the button
+Seat 1: 88978f9c (240 in chips)
+Seat 2: Hero (80 in chips)
+Seat 3: da6664fb (80 in chips)
+Seat 4: 6699eeb0 (80 in chips)
+88978f9c: posts small blind 5
+Hero: posts big blind 10
+*** HOLE CARDS ***
+Dealt to 88978f9c 
+Dealt to Hero [Ac 7s]
+Dealt to da6664fb 
+Dealt to 6699eeb0 
+da6664fb: folds
+6699eeb0: raises 70 to 80 and is all-in
+88978f9c: raises 160 to 240 and is all-in
+Hero: folds
+Uncalled bet (160) returned to 88978f9c
+88978f9c: shows [Th As]
+6699eeb0: shows [Ah 8c]
+*** FLOP *** [7c Qd 6d]
+*** TURN *** [7c Qd 6d] [2h]
+*** RIVER *** [7c Qd 6d 2h] [2s]
+*** SHOWDOWN ***
+88978f9c collected 170 from pot
+*** SUMMARY ***
+Total pot 170 | Rake 0 | Jackpot 0 | Bingo 0 | Fortune 0 | Tax 0
+Board [7c Qd 6d 2h 2s]
+Seat 1: 88978f9c (small blind) showed [Th As] and won (170) with a pair of Twos
+Seat 2: Hero (big blind) folded before Flop
+Seat 3: da6664fb folded before Flop (didn't bet)
+Seat 4: 6699eeb0 (button) showed [Ah 8c] and lost with a pair of Twos
+
+
