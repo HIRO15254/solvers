@@ -1,8 +1,12 @@
 //! Hybrid Independent Chip Model evaluation.
 //!
-//! Fields through 15 players use exact subset dynamic programming.  Larger
-//! fields use deterministic weighted finish-order sampling with a Fenwick
-//! tree, keeping each sample at `O(n log n)` through the 100-player limit.
+//! Fields through 15 players use exact subset dynamic programming. Standalone
+//! estimates use deterministic weighted finish-order sampling with a Fenwick
+//! tree. Preflop solves prepare equivalent exponential-race samples once and
+//! reuse the outside-field order at every terminal.
+
+use std::cmp::Ordering;
+use std::collections::{BTreeMap, BinaryHeap};
 
 use rand::seq::SliceRandom;
 use rand::{RngCore, SeedableRng};
@@ -13,7 +17,9 @@ use thiserror::Error;
 use crate::types::{MwChips, SeatId, SeatVec};
 
 pub const EXACT_ICM_MAX_PLAYERS: usize = 15;
-pub const ICM_MAX_PLAYERS: usize = 100;
+pub const ICM_MAX_PLAYERS: usize = 10_000;
+const MAX_OUTSIDE_STACK_GROUPS: usize = 64;
+const MAX_PREPARED_RACE_BYTES: usize = 1 << 30;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -39,8 +45,315 @@ pub struct IcmDeltaEstimate {
     pub terminal_values: SeatVec<f64>,
 }
 
+/// Reusable ICM evaluator for the many terminal stack vectors visited by a
+/// preflop solve.
+///
+/// For sampled fields, a Plackett--Luce finish order is represented as an
+/// exponential race: player `i` arrives at `Exp(1) / stack[i]`, and ascending
+/// arrivals have exactly the ICM finish-order distribution. Identical
+/// off-table stacks are grouped exactly; more than 64 distinct stacks are
+/// compressed into logarithmic groups preserving count and total chip mass.
+/// Their paid-place arrivals are prepared once. A terminal evaluation sorts
+/// at most nine table arrivals and finds each rank by binary search. Baseline
+/// and terminal values use the same races (common random numbers), so the
+/// reported error is the error of the EV *difference*, not the conservative
+/// error of two independent estimates.
+pub(crate) struct PreparedIcm {
+    starting_table: SeatVec<MwChips>,
+    outside_field: Vec<MwChips>,
+    payouts: Vec<f64>,
+    samples: u64,
+    seed: u64,
+    baseline: IcmEstimate,
+    races: Option<PreparedRaces>,
+}
+
+struct PreparedRaces {
+    paid_places: usize,
+    outside_kept: usize,
+    table_exponentials: Vec<f64>,
+    outside_arrivals: Vec<f32>,
+    baseline_samples: Vec<f64>,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct StackGroup {
+    count: u32,
+    stack: f64,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct NextArrival {
+    time: f64,
+    group: usize,
+    remaining: u32,
+    stack: f64,
+}
+
+impl PartialEq for NextArrival {
+    fn eq(&self, other: &Self) -> bool {
+        self.time.to_bits() == other.time.to_bits() && self.group == other.group
+    }
+}
+
+impl Eq for NextArrival {}
+
+impl PartialOrd for NextArrival {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for NextArrival {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other
+            .time
+            .total_cmp(&self.time)
+            .then_with(|| other.group.cmp(&self.group))
+    }
+}
+
+impl PreparedIcm {
+    pub(crate) fn new(
+        starting_table: SeatVec<MwChips>,
+        outside_field: Vec<MwChips>,
+        payouts: Vec<f64>,
+        samples: u64,
+        seed: u64,
+    ) -> Result<Self, IcmError> {
+        let mut field = starting_table.as_slice().to_vec();
+        field.extend_from_slice(&outside_field);
+        validate_inputs(&field, &payouts)?;
+        if field.len() <= EXACT_ICM_MAX_PLAYERS {
+            let baseline = estimate_icm(&field, &payouts, samples, seed)?;
+            return Ok(Self {
+                starting_table,
+                outside_field,
+                payouts,
+                samples,
+                seed,
+                baseline,
+                races: None,
+            });
+        }
+        if samples < 2 {
+            return Err(IcmError::TooFewSamples(samples));
+        }
+        // Tournament configs require positive starting stacks. Keep the
+        // public helper's historical zero-stack behavior by falling back to
+        // the general sampler for manually constructed inputs instead of
+        // forcing an arbitrary order among Exp(rate=0) arrivals.
+        if field.contains(&MwChips::ZERO) {
+            let baseline = estimate_icm(&field, &payouts, samples, seed)?;
+            return Ok(Self {
+                starting_table,
+                outside_field,
+                payouts,
+                samples,
+                seed,
+                baseline,
+                races: None,
+            });
+        }
+
+        let table_len = starting_table.len();
+        let sample_count =
+            usize::try_from(samples).map_err(|_| IcmError::TooManySamples(samples))?;
+        let paid_places = payouts
+            .iter()
+            .rposition(|&payout| payout != 0.0)
+            .map_or(0, |place| place + 1);
+        let outside_kept = outside_field.len().min(paid_places);
+        let table_slots = sample_count
+            .checked_mul(table_len)
+            .ok_or(IcmError::TooManySamples(samples))?;
+        let outside_slots = sample_count
+            .checked_mul(outside_kept)
+            .ok_or(IcmError::TooManySamples(samples))?;
+        let prepared_bytes = table_slots
+            .checked_mul(std::mem::size_of::<f64>() * 2)
+            .and_then(|bytes| {
+                outside_slots
+                    .checked_mul(std::mem::size_of::<f32>())
+                    .and_then(|outside_bytes| bytes.checked_add(outside_bytes))
+            })
+            .ok_or(IcmError::TooManySamples(samples))?;
+        if prepared_bytes > MAX_PREPARED_RACE_BYTES {
+            return Err(IcmError::PreparedRaceMemory {
+                required: prepared_bytes,
+                limit: MAX_PREPARED_RACE_BYTES,
+            });
+        }
+        let mut rng = ChaCha20Rng::seed_from_u64(seed);
+        let mut table_exponentials = Vec::with_capacity(table_slots);
+        let mut outside_arrivals = Vec::with_capacity(outside_slots);
+        let mut baseline_samples = vec![0.0; table_slots];
+        let mut means = vec![0.0; table_len];
+        let mut m2 = vec![0.0; table_len];
+        let mut sample_values = vec![0.0; table_len];
+        let mut table_order = Vec::with_capacity(table_len);
+        let outside_groups = compress_outside_field(&outside_field);
+        let mut outside_heap = BinaryHeap::with_capacity(outside_groups.len());
+
+        for sample in 0..sample_count {
+            let table_start = table_exponentials.len();
+            for _ in 0..table_len {
+                table_exponentials.push(unit_exponential(&mut rng));
+            }
+            generate_grouped_arrivals(
+                &outside_groups,
+                outside_kept,
+                &mut rng,
+                &mut outside_heap,
+                &mut outside_arrivals,
+            );
+
+            table_order.clear();
+            for (seat, &stack) in starting_table.iter().enumerate() {
+                if stack > MwChips::ZERO {
+                    table_order.push((
+                        table_exponentials[table_start + seat] / stack.raw() as f64,
+                        seat,
+                    ));
+                }
+            }
+            table_order.sort_unstable_by(|left, right| left.0.total_cmp(&right.0));
+            sample_values.fill(0.0);
+            let outside_start = sample * outside_kept;
+            assign_table_payouts(
+                &table_order,
+                &outside_arrivals[outside_start..outside_start + outside_kept],
+                &payouts,
+                paid_places,
+                &mut sample_values,
+            );
+            let count = (sample + 1) as f64;
+            for seat in 0..table_len {
+                let value = sample_values[seat];
+                let delta = value - means[seat];
+                means[seat] += delta / count;
+                m2[seat] += delta * (value - means[seat]);
+                baseline_samples[sample * table_len + seat] = value;
+            }
+        }
+
+        let standard_errors = m2
+            .into_iter()
+            .map(|sum| (sum / (samples - 1) as f64 / samples as f64).sqrt())
+            .collect::<Vec<_>>();
+        let ci95 = confidence_intervals(&means, &standard_errors);
+        let baseline = IcmEstimate {
+            values: means,
+            standard_errors,
+            ci95,
+            mode: IcmMode::Sampled { samples, seed },
+        };
+        Ok(Self {
+            starting_table,
+            outside_field,
+            payouts,
+            samples,
+            seed,
+            baseline,
+            races: Some(PreparedRaces {
+                paid_places,
+                outside_kept,
+                table_exponentials,
+                outside_arrivals,
+                baseline_samples,
+            }),
+        })
+    }
+
+    pub(crate) fn terminal_delta(
+        &self,
+        final_table: &SeatVec<MwChips>,
+    ) -> Result<IcmDeltaEstimate, IcmError> {
+        if self.starting_table.len() != final_table.len() {
+            return Err(IcmError::SeatCount);
+        }
+        let Some(races) = &self.races else {
+            return terminal_icm_delta_with_baseline(
+                &self.starting_table,
+                final_table,
+                &self.outside_field,
+                &self.payouts,
+                self.samples,
+                self.seed,
+                &self.baseline,
+            );
+        };
+        self.sampled_terminal_delta(final_table, races)
+    }
+
+    fn sampled_terminal_delta(
+        &self,
+        final_table: &SeatVec<MwChips>,
+        races: &PreparedRaces,
+    ) -> Result<IcmDeltaEstimate, IcmError> {
+        let table_len = self.starting_table.len();
+        let sample_count =
+            usize::try_from(self.samples).map_err(|_| IcmError::TooManySamples(self.samples))?;
+        let (fixed_values, bottom) =
+            busted_prizes(&self.starting_table, final_table, &self.payouts)?;
+        let places_to_sample = bottom.min(races.paid_places);
+        let mut terminal_means = vec![0.0; table_len];
+        let mut delta_means = vec![0.0; table_len];
+        let mut delta_m2 = vec![0.0; table_len];
+        let mut table_order = Vec::with_capacity(table_len);
+        let mut sample_values = vec![0.0; table_len];
+
+        for sample in 0..sample_count {
+            sample_values.copy_from_slice(&fixed_values);
+            table_order.clear();
+            let table_start = sample * table_len;
+            for (seat, &stack) in final_table.iter().enumerate() {
+                if stack > MwChips::ZERO {
+                    table_order.push((
+                        races.table_exponentials[table_start + seat] / stack.raw() as f64,
+                        seat,
+                    ));
+                }
+            }
+            table_order.sort_unstable_by(|left, right| left.0.total_cmp(&right.0));
+            let outside_start = sample * races.outside_kept;
+            let outside =
+                &races.outside_arrivals[outside_start..outside_start + races.outside_kept];
+            assign_table_payouts(
+                &table_order,
+                outside,
+                &self.payouts,
+                places_to_sample,
+                &mut sample_values,
+            );
+            let count = (sample + 1) as f64;
+            for seat in 0..table_len {
+                let terminal = sample_values[seat];
+                let terminal_delta = terminal - terminal_means[seat];
+                terminal_means[seat] += terminal_delta / count;
+                let paired = terminal - races.baseline_samples[table_start + seat];
+                let mean_delta = paired - delta_means[seat];
+                delta_means[seat] += mean_delta / count;
+                delta_m2[seat] += mean_delta * (paired - delta_means[seat]);
+            }
+        }
+        let errors = delta_m2
+            .into_iter()
+            .map(|sum| (sum / (self.samples - 1) as f64 / self.samples as f64).sqrt())
+            .collect::<Vec<_>>();
+        let ci95 = confidence_intervals(&delta_means, &errors);
+        Ok(IcmDeltaEstimate {
+            deltas: SeatVec::new_unchecked(delta_means),
+            standard_errors: SeatVec::new_unchecked(errors),
+            ci95: SeatVec::new_unchecked(ci95),
+            baseline_values: SeatVec::new_unchecked(self.baseline.values[..table_len].to_vec()),
+            terminal_values: SeatVec::new_unchecked(terminal_means),
+        })
+    }
+}
+
 /// Automatically selects exact DP for fields through 15 and deterministic
-/// Monte Carlo for fields 16 through 100.
+/// Monte Carlo for fields 16 through 10,000.
 pub fn estimate_icm(
     stacks: &[MwChips],
     payouts: &[f64],
@@ -125,22 +438,26 @@ fn sampled_icm(
     let mut means = vec![0.0f64; n];
     let mut m2 = vec![0.0f64; n];
     let mut result = vec![0.0f64; n];
+    let paid_places = payouts
+        .iter()
+        .rposition(|&payout| payout != 0.0)
+        .map_or(0, |place| place + 1);
     for sample_index in 1..=samples {
         result.fill(0.0);
         let mut tree = Fenwick::new(&weights);
         let mut place = 0usize;
-        while tree.total > 0 {
+        while tree.total > 0 && place < paid_places {
             let target = random_below(&mut rng, tree.total);
             let player = tree.find(target);
             result[player] = payouts[place];
             tree.remove(player, weights[player]);
             place += 1;
         }
-        if place < n {
+        if tree.total == 0 && place < paid_places {
             let mut zero_players: Vec<usize> =
                 (0..n).filter(|&player| weights[player] == 0).collect();
             zero_players.shuffle(&mut rng);
-            for player in zero_players {
+            for player in zero_players.into_iter().take(paid_places - place) {
                 result[player] = payouts[place];
                 place += 1;
             }
@@ -184,18 +501,14 @@ pub fn terminal_icm_delta(
     samples: u64,
     seed: u64,
 ) -> Result<IcmDeltaEstimate, IcmError> {
-    let mut baseline_stacks = starting_table.as_slice().to_vec();
-    baseline_stacks.extend_from_slice(outside_field);
-    let baseline = estimate_icm(&baseline_stacks, payouts, samples, seed)?;
-    terminal_icm_delta_with_baseline(
-        starting_table,
-        final_table,
-        outside_field,
-        payouts,
+    PreparedIcm::new(
+        starting_table.clone(),
+        outside_field.to_vec(),
+        payouts.to_vec(),
         samples,
         seed,
-        &baseline,
-    )
+    )?
+    .terminal_delta(final_table)
 }
 
 /// Terminal ICM delta using a start-of-hand estimate computed once by the
@@ -224,34 +537,8 @@ pub(crate) fn terminal_icm_delta_with_baseline(
         });
     }
 
-    let mut terminal_values = vec![0.0f64; table_len];
+    let (mut terminal_values, bottom) = busted_prizes(starting_table, final_table, payouts)?;
     let mut terminal_errors = vec![0.0f64; table_len];
-    let mut busted: Vec<SeatId> = starting_table
-        .seats()
-        .filter(|&seat| final_table[seat] == MwChips::ZERO)
-        .collect();
-    busted.sort_unstable_by_key(|&seat| (starting_table[seat], seat));
-
-    let mut bottom = payouts.len();
-    let mut index = 0usize;
-    while index < busted.len() {
-        let starting_stack = starting_table[busted[index]];
-        let mut end = index + 1;
-        while end < busted.len() && starting_table[busted[end]] == starting_stack {
-            end += 1;
-        }
-        let group = end - index;
-        let first_prize = bottom.checked_sub(group).ok_or(IcmError::PayoutCount {
-            expected: field_len,
-            actual: payouts.len(),
-        })?;
-        let split = payouts[first_prize..bottom].iter().sum::<f64>() / group as f64;
-        for &seat in &busted[index..end] {
-            terminal_values[seat.index()] = split;
-        }
-        bottom = first_prize;
-        index = end;
-    }
 
     let survivors: Vec<SeatId> = final_table
         .seats()
@@ -295,6 +582,140 @@ pub(crate) fn terminal_icm_delta_with_baseline(
         baseline_values: SeatVec::new_unchecked(baseline_values),
         terminal_values: SeatVec::new_unchecked(terminal_values),
     })
+}
+
+fn busted_prizes(
+    starting_table: &SeatVec<MwChips>,
+    final_table: &SeatVec<MwChips>,
+    payouts: &[f64],
+) -> Result<(Vec<f64>, usize), IcmError> {
+    let mut values = vec![0.0; starting_table.len()];
+    let mut busted: Vec<SeatId> = starting_table
+        .seats()
+        .filter(|&seat| final_table[seat] == MwChips::ZERO)
+        .collect();
+    busted.sort_unstable_by_key(|&seat| (starting_table[seat], seat));
+    let mut bottom = payouts.len();
+    let mut index = 0;
+    while index < busted.len() {
+        let starting_stack = starting_table[busted[index]];
+        let mut end = index + 1;
+        while end < busted.len() && starting_table[busted[end]] == starting_stack {
+            end += 1;
+        }
+        let group = end - index;
+        let first_prize = bottom.checked_sub(group).ok_or(IcmError::PayoutCount {
+            expected: starting_table.len(),
+            actual: payouts.len(),
+        })?;
+        let split = payouts[first_prize..bottom].iter().sum::<f64>() / group as f64;
+        for &seat in &busted[index..end] {
+            values[seat.index()] = split;
+        }
+        bottom = first_prize;
+        index = end;
+    }
+    Ok((values, bottom))
+}
+
+fn assign_table_payouts(
+    table: &[(f64, usize)],
+    outside: &[f32],
+    payouts: &[f64],
+    places: usize,
+    values: &mut [f64],
+) {
+    for (table_before, &(arrival, seat)) in table.iter().enumerate() {
+        let outside_before = outside.partition_point(|&candidate| f64::from(candidate) < arrival);
+        let place = table_before + outside_before;
+        if place < places {
+            values[seat] = payouts[place];
+        }
+    }
+}
+
+fn compress_outside_field(stacks: &[MwChips]) -> Vec<StackGroup> {
+    let mut exact = BTreeMap::<u64, u32>::new();
+    for &stack in stacks {
+        *exact.entry(stack.raw()).or_default() += 1;
+    }
+    if exact.len() <= MAX_OUTSIDE_STACK_GROUPS {
+        return exact
+            .into_iter()
+            .map(|(stack, count)| StackGroup {
+                count,
+                stack: stack as f64,
+            })
+            .collect();
+    }
+
+    let min_stack = *exact.keys().next().expect("non-empty outside field") as f64;
+    let max_stack = *exact.keys().next_back().expect("non-empty outside field") as f64;
+    let log_min = min_stack.ln();
+    let log_span = max_stack.ln() - log_min;
+    let mut bins = vec![(0u32, 0u128); MAX_OUTSIDE_STACK_GROUPS];
+    for (stack, count) in exact {
+        let scaled = ((stack as f64).ln() - log_min) / log_span;
+        let bin =
+            ((scaled * MAX_OUTSIDE_STACK_GROUPS as f64) as usize).min(MAX_OUTSIDE_STACK_GROUPS - 1);
+        bins[bin].0 += count;
+        bins[bin].1 += stack as u128 * u128::from(count);
+    }
+    bins.into_iter()
+        .filter_map(|(count, total)| {
+            (count != 0).then_some(StackGroup {
+                count,
+                // Preserve the group's total chip mass, hence its initial
+                // exponential-race rate, exactly (up to f64 conversion).
+                stack: total as f64 / f64::from(count),
+            })
+        })
+        .collect()
+}
+
+fn generate_grouped_arrivals(
+    groups: &[StackGroup],
+    kept: usize,
+    rng: &mut impl RngCore,
+    heap: &mut BinaryHeap<NextArrival>,
+    out: &mut Vec<f32>,
+) {
+    heap.clear();
+    for (group, spec) in groups.iter().copied().enumerate() {
+        let rate = f64::from(spec.count) * spec.stack;
+        heap.push(NextArrival {
+            time: unit_exponential(rng) / rate,
+            group,
+            remaining: spec.count,
+            stack: spec.stack,
+        });
+    }
+    for _ in 0..kept {
+        let mut next = heap
+            .pop()
+            .expect("kept arrivals cannot exceed outside player count");
+        out.push(next.time as f32);
+        next.remaining -= 1;
+        if next.remaining != 0 {
+            let rate = f64::from(next.remaining) * next.stack;
+            next.time += unit_exponential(rng) / rate;
+            heap.push(next);
+        }
+    }
+}
+
+fn unit_exponential(rng: &mut impl RngCore) -> f64 {
+    const DENOMINATOR: f64 = (1u64 << 53) as f64 + 1.0;
+    let numerator = ((rng.next_u64() >> 11) + 1) as f64;
+    -(numerator / DENOMINATOR).ln()
+}
+
+fn confidence_intervals(means: &[f64], errors: &[f64]) -> Vec<[f64; 2]> {
+    means
+        .iter()
+        .zip(errors)
+        .map(|(&mean, &stderr)| [mean - 1.96 * stderr, mean + 1.96 * stderr])
+        .collect()
 }
 
 fn validate_inputs(stacks: &[MwChips], payouts: &[f64]) -> Result<(), IcmError> {
@@ -389,7 +810,7 @@ fn random_below(rng: &mut impl RngCore, upper: u128) -> u128 {
 
 #[derive(Debug, Error)]
 pub enum IcmError {
-    #[error("ICM field must contain 2 through 100 players, got {0}")]
+    #[error("ICM field must contain 2 through 10000 players, got {0}")]
     FieldSize(usize),
     #[error("ICM payouts length must be {expected}, got {actual}")]
     PayoutCount { expected: usize, actual: usize },
@@ -399,6 +820,12 @@ pub enum IcmError {
     PayoutOrder,
     #[error("sampled ICM requires at least two samples, got {0}")]
     TooFewSamples(u64),
+    #[error("sample count is too large for this platform: {0}")]
+    TooManySamples(u64),
+    #[error(
+        "prepared ICM races require {required} bytes, above the {limit}-byte limit; reduce samples or the number of paid places"
+    )]
+    PreparedRaceMemory { required: usize, limit: usize },
     #[error("table stack vectors have different seat counts")]
     SeatCount,
     #[error("ICM baseline length must be {expected}, got {actual}")]
@@ -547,6 +974,101 @@ mod tests {
         let payouts: Vec<f64> = (0..100).rev().map(|value| value as f64).collect();
         let estimate = estimate_icm(&stacks, &payouts, 32, 9).unwrap();
         assert_eq!(estimate.values.len(), 100);
+    }
+
+    #[test]
+    fn ten_thousand_player_prepared_field_smoke_test() {
+        let starting = SeatVec::try_new(vec![MwChips(800), MwChips(1_200)]).unwrap();
+        let outside = vec![MwChips(1_000); ICM_MAX_PLAYERS - starting.len()];
+        let mut payouts = vec![0.0; ICM_MAX_PLAYERS];
+        payouts[..9].copy_from_slice(&[100.0, 80.0, 60.0, 50.0, 40.0, 30.0, 20.0, 10.0, 5.0]);
+        let prepared = PreparedIcm::new(starting.clone(), outside, payouts, 256, 2026).unwrap();
+        let delta = prepared.terminal_delta(&starting).unwrap();
+        assert_eq!(delta.deltas.as_slice(), &[0.0, 0.0]);
+        assert_eq!(delta.standard_errors.as_slice(), &[0.0, 0.0]);
+    }
+
+    #[test]
+    fn outside_stack_compression_is_bounded_and_preserves_chip_mass() {
+        let stacks: Vec<_> = (1..=1_000).map(MwChips).collect();
+        let groups = compress_outside_field(&stacks);
+        assert!(groups.len() <= MAX_OUTSIDE_STACK_GROUPS);
+        assert_eq!(
+            groups
+                .iter()
+                .map(|group| group.count as usize)
+                .sum::<usize>(),
+            stacks.len()
+        );
+        let original = stacks.iter().map(|stack| stack.raw() as f64).sum::<f64>();
+        let compressed = groups
+            .iter()
+            .map(|group| f64::from(group.count) * group.stack)
+            .sum::<f64>();
+        assert!((original - compressed).abs() < 1e-6);
+    }
+
+    #[test]
+    fn field_above_ten_thousand_is_rejected() {
+        let stacks = vec![MwChips(1); ICM_MAX_PLAYERS + 1];
+        let payouts = vec![0.0; stacks.len()];
+        assert!(matches!(
+            estimate_icm(&stacks, &payouts, 2, 0),
+            Err(IcmError::FieldSize(size)) if size == ICM_MAX_PLAYERS + 1
+        ));
+    }
+
+    #[test]
+    fn oversized_prepared_race_memory_is_rejected_before_allocation() {
+        let starting = SeatVec::try_new(vec![MwChips(1_000), MwChips(1_000)]).unwrap();
+        let outside = vec![MwChips(1_000); ICM_MAX_PLAYERS - starting.len()];
+        let payouts = vec![1.0; ICM_MAX_PLAYERS];
+        assert!(matches!(
+            PreparedIcm::new(starting, outside, payouts, 30_000, 0),
+            Err(IcmError::PreparedRaceMemory { .. })
+        ));
+    }
+
+    #[test]
+    fn prepared_large_field_reuses_identical_races_for_zero_delta() {
+        let starting = SeatVec::try_new(vec![MwChips(700), MwChips(1_300)]).unwrap();
+        let outside = vec![MwChips(1_000); 14];
+        let mut payouts = vec![0.0; 16];
+        payouts[..4].copy_from_slice(&[100.0, 60.0, 40.0, 20.0]);
+        let prepared = PreparedIcm::new(starting.clone(), outside, payouts, 2_000, 91).unwrap();
+        let delta = prepared.terminal_delta(&starting).unwrap();
+        assert_eq!(delta.deltas.as_slice(), &[0.0, 0.0]);
+        assert_eq!(delta.standard_errors.as_slice(), &[0.0, 0.0]);
+        assert_eq!(delta.baseline_values, delta.terminal_values);
+    }
+
+    #[test]
+    fn prepared_large_field_is_deterministic_and_preserves_table_chip_effect() {
+        let starting = SeatVec::try_new(vec![MwChips(1_000), MwChips(1_000)]).unwrap();
+        let final_stacks = SeatVec::try_new(vec![MwChips(1_500), MwChips(500)]).unwrap();
+        let outside = vec![MwChips(1_000); 14];
+        let mut payouts = vec![0.0; 16];
+        payouts[..3].copy_from_slice(&[100.0, 60.0, 40.0]);
+        let first = PreparedIcm::new(
+            starting.clone(),
+            outside.clone(),
+            payouts.clone(),
+            10_000,
+            19,
+        )
+        .unwrap()
+        .terminal_delta(&final_stacks)
+        .unwrap();
+        let second = PreparedIcm::new(starting, outside, payouts, 10_000, 19)
+            .unwrap()
+            .terminal_delta(&final_stacks)
+            .unwrap();
+        assert_eq!(first, second);
+        assert!(first.deltas[SeatId(0)] > 0.0);
+        assert!(first.deltas[SeatId(1)] < 0.0);
+        for (delta, interval) in first.deltas.iter().zip(first.ci95.iter()) {
+            assert!(interval[0] <= *delta && *delta <= interval[1]);
+        }
     }
 
     #[test]

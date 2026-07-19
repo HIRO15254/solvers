@@ -141,9 +141,17 @@ computed at the start of the hand and terminal utility is the change from that
 baseline.  Same-hand busts are ordered by starting stack; equal starting stacks
 split the affected payout slots.
 
-Fields of at most 15 players use exact subset dynamic programming.  Fields of
-16 through 100 use deterministic finish-order Monte Carlo and report confidence
-intervals.  Larger fields are rejected.
+Fields of at most 15 players use exact subset dynamic programming. Fields of
+16 through 10,000 use deterministic exponential-race Monte Carlo and report
+confidence intervals. The off-table field is represented by at most 64
+log-stack groups (identical stacks are grouped exactly); each group's total
+chip mass is preserved. Only arrivals through the last non-zero payout are
+prepared, and table-player ranks are found by binary search in those arrivals.
+Prepared-race memory is approximately
+`samples * (16 * table_players + 4 * min(outside_players, paid_places))`
+bytes and is capped at 1 GiB; an oversized configuration fails before
+allocation with guidance to reduce `samples` or paid places.
+Larger fields are rejected.
 
 ## Abstraction and reproducibility
 
@@ -381,7 +389,18 @@ which worlds get sampled.
   keyed cache (`HoldemGame`'s ICM terminal cache): distinct combos that
   happen to produce the same final stack vector (e.g. many combos tying or
   losing the same way) already share one ICM evaluation for free, without any
-  vector-specific bookkeeping.
+  vector-specific bookkeeping. Fields of at most 15 players use exact subset
+  DP. Larger fields use a reusable exponential-race approximation: an ICM
+  finish order is sampled as `Exp(1) / stack`. Identical outside stacks are
+  represented exactly as one group; more than 64 distinct stacks are
+  compressed into logarithmic groups that preserve player count and total
+  chip mass. The outside-field arrival orders are prepared once, and each
+  terminal locates the at-most-nine changed table arrivals by binary search.
+  Sampling stops after the last non-zero prize. The start and terminal stack
+  vectors share the same races (common
+  random numbers), so `ci95` measures the error of the utility difference
+  actually consumed by MCCFR. `samples` controls this deterministic,
+  seed-reproducible approximation.
 - **Rollout-abstraction batching.** A vector traversal needs a bucket for
   every feasible combo instead of just one, so the vector-traverser path
   calls `MultiwayAbstraction::bucket_batch` (via

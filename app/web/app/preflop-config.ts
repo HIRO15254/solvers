@@ -817,7 +817,7 @@ function validateMultiwaySettings(settings: PreflopSettings): string[] {
         errors.push(`Outside stack #${index + 1} may not exceed ${MAX_MULTIWAY_STACK_BB}bb.`);
       }
     });
-    if (totalPlayers > 100) errors.push("ICM supports at most 100 remaining players.");
+    if (totalPlayers > 10_000) errors.push("ICM supports at most 10000 remaining players.");
     if (payouts.length > totalPlayers) {
       errors.push("Payout count cannot exceed the remaining-player count.");
     }
