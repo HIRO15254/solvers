@@ -189,7 +189,7 @@ pub fn load_files<I: IntoIterator<Item = PathBuf>>(files: I) -> Result<Tournamen
         .into_iter()
         .map(|(id, entry)| {
             let mut hands: Vec<Hand> = entry.hands.into_values().collect();
-            hands.sort_by(|a, b| (a.played_at, a.id).cmp(&(b.played_at, b.id)));
+            hands.sort_by_key(|a| (a.played_at, a.id));
             Tournament {
                 id,
                 name: entry.name,
@@ -200,7 +200,7 @@ pub fn load_files<I: IntoIterator<Item = PathBuf>>(files: I) -> Result<Tournamen
         })
         .collect();
 
-    tournaments.sort_by(|a, b| (earliest_activity(a), a.id).cmp(&(earliest_activity(b), b.id)));
+    tournaments.sort_by_key(|a| (earliest_activity(a), a.id));
 
     Ok(TournamentSet { tournaments })
 }
