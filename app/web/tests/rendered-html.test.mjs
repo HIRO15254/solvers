@@ -342,4 +342,22 @@ test("validates Bridge v2 limits and preserves incomplete sizing drafts", async 
       error.includes("at least two distinct amounts"),
     ),
   );
+
+  const tenThousandPlayerIcm = structuredClone(icmPreset.settings);
+  tenThousandPlayerIcm.outsideStacksText = Array(10_000 - tenThousandPlayerIcm.tableSize)
+    .fill("20")
+    .join(",");
+  tenThousandPlayerIcm.payoutsText = "100,0";
+  assert.equal(
+    validateSettings(tenThousandPlayerIcm).some((error) =>
+      error.includes("ICM supports at most"),
+    ),
+    false,
+  );
+  tenThousandPlayerIcm.outsideStacksText += ",20";
+  assert.ok(
+    validateSettings(tenThousandPlayerIcm).some((error) =>
+      error.includes("ICM supports at most 10000"),
+    ),
+  );
 });

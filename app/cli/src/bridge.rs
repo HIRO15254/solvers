@@ -185,7 +185,7 @@ struct HealthResponse<'a> {
 #[serde(rename_all = "camelCase")]
 struct HealthCapabilities {
     max_players: u8,
-    max_icm_field: u8,
+    max_icm_field: u16,
     exact_icm_field: u8,
     config_schemas: [&'static str; 2],
     result_schemas: [u16; 2],
@@ -410,7 +410,7 @@ fn handle_request(
                     busy,
                     capabilities: HealthCapabilities {
                         max_players: 9,
-                        max_icm_field: 100,
+                        max_icm_field: 10_000,
                         exact_icm_field: 15,
                         config_schemas: ["hu-v1", "multiway-v2"],
                         result_schemas: [1, 2],

@@ -636,7 +636,7 @@ impl UtilityConfig {
                 ..
             } => {
                 let field = table_players + outside_field.len();
-                if !(2..=100).contains(&field) {
+                if !(2..=crate::icm::ICM_MAX_PLAYERS).contains(&field) {
                     return Err(ConfigError::IcmField(field));
                 }
                 if payouts.len() != field {
@@ -833,7 +833,7 @@ pub enum ConfigError {
     OpponentBucketProfile(u8),
     #[error("ehs2-table does not support per-opponent bucket budgets")]
     Ehs2TableOpponentBuckets,
-    #[error("ICM field must contain 2 through 100 players, got {0}")]
+    #[error("ICM field must contain 2 through 10000 players, got {0}")]
     IcmField(usize),
     #[error("ICM payouts length must be {expected}, got {actual}")]
     PayoutCount { expected: usize, actual: usize },

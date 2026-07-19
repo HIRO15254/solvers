@@ -273,7 +273,7 @@ fn bridge_http_smoke() {
     let health_v2 = health_v2.json();
     assert_eq!(health_v2["apiVersion"], 2);
     assert_eq!(health_v2["capabilities"]["maxPlayers"], 9);
-    assert_eq!(health_v2["capabilities"]["maxIcmField"], 100);
+    assert_eq!(health_v2["capabilities"]["maxIcmField"], 10_000);
     assert_eq!(health_v2["capabilities"]["exactIcmField"], 15);
     assert_eq!(
         health_v2["capabilities"]["stages"],

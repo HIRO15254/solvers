@@ -61,7 +61,7 @@ formats スキーマ v1 凍結 → `wasm` viewer-only 静的サイト(`.sol` 読
 ## M9 — 2–9 seat Multiway プリフロップ/全 street (2026-07)
 既存 HU engine を凍結したまま `multiway` crate と `kind = "preflop-multiway"` を追加。共有実カード world の joint range sampling、lazy betting history、全 street NLHE、refund/side pot/rake、BBA、卓外 field を含む hybrid ICM、active-opponent 別 rollout bucket、external-sampling MCCFR、v2 metrics、`.mwckpt` / `.mwsol`、Bridge v2 と Web workbench を一体で提供する。
 
-**Exit:** 2/3/6/9 人の betting/settlement property、exact ICM ≤15・sampled ICM ≤100、deterministic checkpoint resume、9-max smoke、HU v1 golden 不変、Web test/build。3 人以上は `exploitability` / `NashConv` / GTO と呼ばず、seat EV/CI・positive-regret proxy・strategy drift・held-out deviation gain を報告する。
+**Exit:** 2/3/6/9 人の betting/settlement property、exact ICM ≤15・grouped sampled ICM ≤10,000、deterministic checkpoint resume、9-max smoke、HU v1 golden 不変、Web test/build。3 人以上は `exploitability` / `NashConv` / GTO と呼ばず、seat EV/CI・positive-regret proxy・strategy drift・held-out deviation gain を報告する。
 
 **Delivered:** deterministic sample-id merge（thread数変更・再開を含む）、4 MiB chunked `.mwckpt` v3、indexed `.mwsol` v2、Bridge v2 managed resume、4 canonical Web presets、9-max 8/8/8 smoke・64/64/64 desktop benchmark・3-player full-enumeration oracleを受入契約として固定。（当時の受入契約の記録。現行フォーマットは `.mwckpt` v6 / `.mwsol` v3。）
 

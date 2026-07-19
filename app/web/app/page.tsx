@@ -48,6 +48,7 @@ const HANDS = RANKS.flatMap((rowRank, row) =>
 const DEFAULT_BRIDGE_URL = "http://127.0.0.1:38127";
 const VALIDATION_SUMMARY_ID = "validation-summary";
 const VALIDATION_MESSAGES_ID = "validation-messages";
+const ICM_READBACK_LIMIT = 200;
 
 type RangeSeat = "sb" | "bb";
 type EngineState = "offline" | "checking" | "online";
@@ -438,7 +439,12 @@ export default function Home() {
   const payoutReadback = useMemo(
     () =>
       Array.from(
-        { length: Math.max(icmFieldSize, parsedPayouts.length) },
+        {
+          length: Math.min(
+            Math.max(icmFieldSize, parsedPayouts.length),
+            ICM_READBACK_LIMIT,
+          ),
+        },
         (_, index) => ({
           place: index + 1,
           amount: parsedPayouts[index] ?? 0,
@@ -1993,7 +1999,9 @@ export default function Home() {
                               </thead>
                               <tbody>
                                 {parsedOutsideStacks.length ? (
-                                  parsedOutsideStacks.map((stack, index) => (
+                                  parsedOutsideStacks
+                                    .slice(0, ICM_READBACK_LIMIT)
+                                    .map((stack, index) => (
                                     <tr key={`outside-${index}`}>
                                       <th scope="row">Field {index + 1}</th>
                                       <td>{stack.toLocaleString()}bb</td>
@@ -2006,6 +2014,11 @@ export default function Home() {
                                 )}
                               </tbody>
                             </table>
+                            {parsedOutsideStacks.length > ICM_READBACK_LIMIT ? (
+                              <p className="helper">
+                                残り{(parsedOutsideStacks.length - ICM_READBACK_LIMIT).toLocaleString()}人は表示を省略しています。
+                              </p>
+                            ) : null}
                           </div>
                         </section>
                         <section className="icm-readback-panel" aria-labelledby="payout-readback-title">
@@ -2030,6 +2043,11 @@ export default function Home() {
                                 ))}
                               </tbody>
                             </table>
+                            {Math.max(icmFieldSize, parsedPayouts.length) > ICM_READBACK_LIMIT ? (
+                              <p className="helper">
+                                残り{(Math.max(icmFieldSize, parsedPayouts.length) - ICM_READBACK_LIMIT).toLocaleString()}順位は表示を省略しています。
+                              </p>
+                            ) : null}
                           </div>
                         </section>
                       </div>
@@ -2040,7 +2058,7 @@ export default function Home() {
                             <option value="auto">Auto (≤15 exact)</option>
                           </select>
                           <p className="helper">
-                            15人以下はexact、16人以上はMonte Carloへ自動で切り替わります。
+                            15人以下はexact、16〜10,000人は最大64スタックグループの指数レース近似へ自動で切り替わります。
                           </p>
                         </label>
                         <label className="field">
@@ -2075,7 +2093,7 @@ export default function Home() {
                       </div>
                       <p className="inline-callout">
                         未入力の下位payoutはフィールド人数まで0で補完します。最大
-                        {bridgeCapabilities?.maxIcmField ?? 100}人、15人以下はautoで
+                        {bridgeCapabilities?.maxIcmField ?? 10_000}人、15人以下はautoで
                         exact DPです。ICMとrakeは併用できません。
                       </p>
                     </div>

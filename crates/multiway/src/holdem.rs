@@ -11,7 +11,7 @@ use crate::betting::{Action, BettingState, HandPhase, SeatStatus};
 use crate::config::{
     CompiledRake, MultiwayConfig, RakeConfig, RecallMode, UtilityConfig, ValidatedMultiwayConfig,
 };
-use crate::icm::{IcmEstimate, estimate_icm, terminal_icm_delta_with_baseline};
+use crate::icm::PreparedIcm;
 use crate::sampler::{DealSampler, SampleError, SampledWorld};
 use crate::settlement::{
     PotLayer, Settlement, SettlementError, build_rated_pots, settle_ranked, settle_showdown,
@@ -27,12 +27,7 @@ const ICM_TERMINAL_CACHE_ENTRIES: usize = 65_536;
 enum UtilityRuntime {
     ChipEv,
     TournamentIcm {
-        starting: SeatVec<MwChips>,
-        outside_field: Vec<MwChips>,
-        payouts: Vec<f64>,
-        samples: u64,
-        seed: u64,
-        baseline: IcmEstimate,
+        calculator: Arc<PreparedIcm>,
         terminal_cache: Arc<Mutex<HashMap<Vec<u64>, SeatVec<f64>>>>,
     },
 }
@@ -79,16 +74,10 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                         .collect(),
                 )
                 .expect("validated seat count is supported");
-                let mut baseline_stacks = starting.as_slice().to_vec();
-                baseline_stacks.extend_from_slice(&outside_field);
-                let baseline = estimate_icm(&baseline_stacks, payouts, *samples, *seed)?;
+                let calculator =
+                    PreparedIcm::new(starting, outside_field, payouts.clone(), *samples, *seed)?;
                 UtilityRuntime::TournamentIcm {
-                    starting,
-                    outside_field,
-                    payouts: payouts.clone(),
-                    samples: *samples,
-                    seed: *seed,
-                    baseline,
+                    calculator: Arc::new(calculator),
                     terminal_cache: Arc::new(Mutex::new(HashMap::new())),
                 }
             }
@@ -271,12 +260,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
             )
             .expect("configured seat count is valid")),
             UtilityRuntime::TournamentIcm {
-                starting,
-                outside_field,
-                payouts,
-                samples,
-                seed,
-                baseline,
+                calculator,
                 terminal_cache,
             } => {
                 let key: Vec<u64> = settlement
@@ -292,16 +276,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                 {
                     return Ok(cached);
                 }
-                let deltas = terminal_icm_delta_with_baseline(
-                    starting,
-                    &settlement.final_stacks,
-                    outside_field,
-                    payouts,
-                    *samples,
-                    *seed,
-                    baseline,
-                )?
-                .deltas;
+                let deltas = calculator.terminal_delta(&settlement.final_stacks)?.deltas;
                 let mut cache = terminal_cache
                     .lock()
                     .map_err(|_| HoldemGameError::IcmCachePoisoned)?;
