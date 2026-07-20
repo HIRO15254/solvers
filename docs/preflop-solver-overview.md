@@ -140,14 +140,14 @@ HU エンジンが持つ exploitability / NashConv とは意図的に別名に�
 ## 7. 実行するには
 
 ```sh
-# GUI(Setup → Solve(収束チャート)→ Results(13×13 マトリクス))
-cargo run -p gui --release
-
-# CLI(同じ TOML 形式。GUI のプリセット/エクスポートと互換)
+# CLI(UI プリセット examples/presets/*.toml と同じ TOML 形式)
 cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
   --output result.json --metrics metrics.jsonl \
   --checkpoint solve.mwckpt --sol solve.mwsol
 ```
+
+GUI は再構築中(旧 egui GUI は 2026-07 に削除。後継の Tauri 同梱 Web GUI は
+`docs/app-structure.md` のロードマップ参照)。
 
 小さく速い動作確認には `tools/bench/mw_6max_64b.toml`(6-max・64 バケット・
 4096 sweeps、ウォームなら数秒)が便利。
@@ -156,4 +156,4 @@ cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
 
 - `docs/multiway-preflop.md` — 精算規則・ICM・抽象化・成果物フォーマットの厳密仕様(日本語版: `docs/multiway-preflop.jp.md`)
 - `docs/architecture.md` — ワークスペース全体の設計(HU 厳密エンジンとの関係)
-- `docs/native-gui-plan.md` — ネイティブ GUI の設計メモ
+- `docs/app-structure.md` — アプリ構成(CLI + Tauri 同梱 Web GUI、デバイス貸し)

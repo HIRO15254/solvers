@@ -13,6 +13,33 @@ fn workspace_root() -> std::path::PathBuf {
         .to_path_buf()
 }
 
+/// Fully decodes an `.mwsol` file through the paged `MwSolReader` API
+/// (there is no longer a single-shot `read_mwsol` convenience wrapper).
+fn read_mwsol_full(path: &std::path::Path) -> formats::MultiwaySolution {
+    let mut reader = formats::MwSolReader::open(path).expect("open mwsol");
+    let total = reader.strategy_count();
+    let mut cursor = 0;
+    let mut strategies = Vec::with_capacity(total);
+    while cursor < total {
+        let page = reader
+            .read_strategy_page(cursor, formats::MWSOL_MAX_PAGE_LIMIT)
+            .expect("read strategy page");
+        strategies.extend(page.strategies);
+        cursor = page.next_cursor.unwrap_or(total);
+    }
+    let metadata = reader.metadata().clone();
+    formats::MultiwaySolution {
+        schema_version: metadata.schema_version,
+        config_toml: metadata.config_toml,
+        abstraction_fingerprint: metadata.abstraction_fingerprint,
+        sweeps: metadata.sweeps,
+        approximate_profile: metadata.approximate_profile,
+        seats: metadata.seats,
+        histories: metadata.histories,
+        strategies,
+    }
+}
+
 #[test]
 fn inspect_smoke() {
     let config = workspace_root().join("examples/river_small.toml");
@@ -180,8 +207,8 @@ fn solve_checkpoint_and_metrics_smoke() {
     let reported_iters: u64 = done_line_field(&stdout, "iterations=").parse().unwrap();
 
     assert!(checkpoint.exists());
-    let header = formats::peek_header(&checkpoint).expect("peek checkpoint header");
-    assert_eq!(header.iteration, reported_iters);
+    let loaded = formats::read_checkpoint(&checkpoint).expect("read checkpoint");
+    assert_eq!(loaded.iteration, reported_iters);
 
     let content = std::fs::read_to_string(&metrics).unwrap();
     let mut last_iter = 0u64;
@@ -228,8 +255,8 @@ fn resume_equivalence_kuhn() {
         "--checkpoint",
         checkpoint.to_str().unwrap(),
     ]);
-    let header = formats::peek_header(&checkpoint).unwrap();
-    assert_eq!(header.iteration, 200);
+    let loaded = formats::read_checkpoint(&checkpoint).unwrap();
+    assert_eq!(loaded.iteration, 200);
 
     run_solvers_ok(&[
         "resume",
@@ -382,7 +409,7 @@ fn multiway_i16_storage_writes_a_quantized_mwsol() {
         solution_path.to_str().unwrap(),
     ]);
 
-    let solution = formats::read_mwsol(&solution_path).unwrap();
+    let solution = read_mwsol_full(&solution_path);
     assert!(!solution.strategies.is_empty());
     let grid = f64::from(i16::MAX);
     for block in &solution.strategies {

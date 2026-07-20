@@ -40,17 +40,18 @@
 ## 2. レイヤ構成と workspace
 
 > **2026-07 アプリ再編**: アプリケーション層(1 アプリ = Preflop + Postflop を
-> `game.kind` で切り替え。CLI + それをラップした Web UI + 補助のネイティブ GUI)を
-> `app/` ディレクトリに分離した。アプリレベルの設計(bridge による「デバイス貸し」
-> モデル含む)は `docs/app-structure.md` を参照。以下はその反映済みレイアウト。
+> `game.kind` で切り替え)を `app/` ディレクトリに分離。同月、旧 2 UI
+> (Next.js workbench / egui ネイティブ GUI)を削除し、Web 技術の静的 SPA を
+> Tauri 2 で同梱する構成(GUI + CLI を 1 インストーラで配布、デバイス貸しは
+> GUI→リモート bridge 接続)に移行中。アプリレベルの設計は
+> `docs/app-structure.md` を参照。以下はその反映済みレイアウト。
 
 ```
 app:        cli (bin "solvers": TOML batch + UPI subset REPL + CSV reports + ANSI 13×13 grid、
                  bin+lib。serve = 認証付き loopback bridge)
-            web (Next.js/vinext workbench。bridge 経由でローカル実行、公開可。
-                 現状 Preflop/multiway — Postflop セクションは今後)
-            gui (egui/eframe ネイティブ。multiway preflop 専用: Setup/Solve/Results、
-                 収束ライブチャート、13×13 戦略マトリクス、プリセット管理)
+            ui (計画: Vite + React 静的 SPA。bridge client + 接続プロファイル、
+                Setup/Solve/Results、13×13 戦略マトリクス)
+            desktop (計画: Tauri 2 シェル。bridge を in-process 起動、CLI を sidecar 同梱)
 future:     py (PyO3, M3〜) · wasm (viewer-only, M8)
 multiway:    multiway — generative NLHE / joint deal / side pots / rollout buckets / MCCFR
 schemas:    formats — SolveConfig / NodeQuery→NodeReport / Checkpoint(.ckpt) / Artifact(.sol)
@@ -76,18 +77,17 @@ solvers/
 ├── tools/plot_convergence.py
 ├── app/
 │   ├── cli/            # bin "solvers"(package "cli"、bin+lib): serve/solve/resume/bench/
-│   │                   # inspect/mw-eval/report。config スキーマと multiway セッション構築
-│   │                   # (session.rs) を gui と共有
-│   ├── web/            # workbench(範囲/ツリー編集、multiway explorer、bridge client)
-│   └── gui/            # bin "solvers-gui": egui/eframe ネイティブ GUI (multiway preflop、
-│                       # docs/native-gui-plan.md 参照)
+│   │                   # inspect/mw-eval/report。lib は config スキーマ / bridge /
+│   │                   # multiway セッション構築(session.rs)
+│   ├── ui/             # (計画) Web GUI: Vite + React 静的 SPA
+│   └── desktop/        # (計画) Tauri 2 シェル(bridge in-process + CLI sidecar)
 └── crates/
     ├── cards/          # Card/CardSet/Chips/Street/PerPlayer<T>、"22+,A2s+" range parser、
     │                   # aya_poker (Zlib/Apache-2.0/MIT) evaluator wrapper。workspace 内依存なし
     ├── hand-index/     # Waugh isomorphism 移植(BSD, attribution)。canonical_flops()。
     │                   # テストで 169/1,286,792/55,190,538/2,428,287,420 と 1,755/16,432/134,459 を固定
     ├── cfr-ref/        # scalar oracle。最適化禁止・凍結
-    ├── engine/         # ホットコア。deps: rayon, wide(feature "simd")
+    ├── engine/         # ホットコア。deps: rayon(+ optional serde)
     ├── game/           # GameSpec/TreeBuilder/payoff pipeline/toy(Kuhn, Leduc)
     ├── holdem/         # Mode A。deps: cards, hand-index, engine, game
     ├── abstraction/    # bucketing pipeline + disk cache。deps: cards, hand-index, rayon
@@ -266,4 +266,4 @@ Bunching は HU では厳密に無効なので実装しないが、range を「�
 | per-history State / 汎用 EFG framework | OpenSpiel の罠(実測 100–400x) |
 | 自作 hand evaluator | `aya_poker`(Zlib/Apache-2.0/MIT, OMPEval 系)で十分、しかもホットパス外。変種評価(lowball/Badugi/short-deck)も同 crate で賄える |
 
-主要依存(全て permissive): `aya_poker, rayon, serde, toml, postcard, zstd, blake3, clap, thiserror/anyhow, rand+rand_chacha, criterion(dev), wide(optional), ratatui(cli), pyo3/maturin(後), wasm-bindgen(後)`。
+主要依存(全て permissive): `aya_poker, rayon, serde, toml, postcard, zstd, blake3, clap, thiserror/anyhow, rand+rand_chacha, tiny_http(bridge), criterion(dev), pyo3/maturin(後), wasm-bindgen(後)`。(`wide` は実測で不採用 — `docs/bench.md` 参照。`ratatui` は未使用。)

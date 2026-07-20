@@ -18,14 +18,12 @@
 //! CFR schedules (dcfr/cfr-plus/vanilla/linear-cfr/hs-dcfr) on the same
 //! config in one pass.
 
-pub mod auto_run;
 pub mod bench;
 pub mod bridge;
 pub mod config;
 pub mod inspect;
 pub mod multiway_solve;
 pub mod mw_eval;
-pub mod node_eval;
 pub mod postflop_setup;
 pub mod preflop_setup;
 pub mod report;

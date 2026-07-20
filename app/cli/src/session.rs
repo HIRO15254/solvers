@@ -10,7 +10,6 @@
 //! parameters resolved from `[run]`, and the raw config text/hash to stamp
 //! onto whatever artifact the caller eventually writes.
 
-use std::collections::HashMap;
 use std::path::Path;
 use std::time::Instant;
 
@@ -30,9 +29,7 @@ use multiway::config::{
     AbstractionKind, FieldPlayerConfig, RakeConfig as MultiwayRake,
     UtilityConfig as MultiwayUtility,
 };
-use multiway::solver::{
-    DEFAULT_PRUNE_THRESHOLD, InfoKey, PolicyEntry, ProfileEvaluation, SolverConfig,
-};
+use multiway::solver::{DEFAULT_PRUNE_THRESHOLD, ProfileEvaluation, SolverConfig};
 use multiway::{DealSampler, HoldemGame, MultiwaySolver};
 use rayon::prelude::*;
 
@@ -296,13 +293,11 @@ pub fn build_multiway_session(
     })
 }
 
-/// Scale factor `derive_prune_threshold` (here and in
-/// `gui::model::derive_prune_threshold`, which mirrors this same formula
-/// over the GUI's own model type) applies to the game's total stakes to get
-/// `algorithm.prune_threshold` when the key is omitted. See
+/// Scale factor `derive_prune_threshold` applies to the game's total stakes
+/// to get `algorithm.prune_threshold` when the key is omitted. See
 /// `derive_prune_threshold`'s doc comment for how this scale was
 /// calibrated.
-pub const PRUNE_THRESHOLD_STAKE_FACTOR: f64 = -10.0;
+pub(crate) const PRUNE_THRESHOLD_STAKE_FACTOR: f64 = -10.0;
 
 /// Derives `algorithm.prune_threshold` when `algorithm.prune = true` but the
 /// key itself is omitted, from the game's stakes: `-10.0 *` the total
@@ -339,11 +334,9 @@ fn derive_prune_threshold(
 }
 
 /// Hard cap on the adaptive stop-rule evaluation sample count: matches the
-/// ladder cap documented on `run.stop_dev_gain`. Shared by the CLI drive
-/// loop (`multiway_solve::run_inner`) and the GUI worker's drive loop, which
-/// both implement the same `run.stop_dev_gain` convergence rule via
-/// [`run_stop_rule_check`].
-pub const MAX_STOP_RULE_SAMPLES: u64 = 65_536;
+/// ladder cap documented on `run.stop_dev_gain`, enforced by the CLI drive
+/// loop (`multiway_solve::run_inner`) via [`run_stop_rule_check`].
+pub(crate) const MAX_STOP_RULE_SAMPLES: u64 = 65_536;
 
 /// Mutable state of the wall-clock convergence stop rule (`run.stop_dev_gain`)
 /// across one run, threaded through repeated [`run_stop_rule_check`] calls.
@@ -537,31 +530,6 @@ fn build_multiway_game_from_config(
     Ok((game, sampler))
 }
 
-/// `[algorithm]`/`[run]`-independent counterpart of `build_multiway_session`:
-/// parses just `raw_toml`'s `[game]`/`[rake]`/`[utility]` sections and builds
-/// a working game + deal sampler, without constructing a solver. Shared by
-/// `build_multiway_session` and any caller (e.g. node-action evaluation over
-/// a loaded `.mwsol`, see `crate::node_eval`) that only needs to replay
-/// betting lines and deal worlds from a config's embedded game rules.
-pub fn build_multiway_game(
-    raw_toml: &str,
-) -> Result<(
-    HoldemGame<MultiwayAbstractionBackend>,
-    DealSampler,
-    multiway::MultiwayConfig,
-)> {
-    let config: SolveConfig = toml::from_str(raw_toml).context("parsing config")?;
-    let GameSection::PreflopMultiway(game_config) = config.game else {
-        return Err(anyhow!(
-            "multiway solve path requires kind = \"preflop-multiway\""
-        ));
-    };
-    let utility = convert_utility(config.utility)?;
-    let rake = convert_rake(config.rake);
-    let (game, sampler) = build_multiway_game_from_config(&game_config, &utility, &rake)?;
-    Ok((game, sampler, game_config))
-}
-
 /// Builds (or loads, or retrains-and-overwrites) the trained
 /// rollout/k-means abstraction for `AbstractionKind::RolloutKmeans`.
 /// Factored out of `build_multiway_session` so the two backend kinds don't
@@ -671,11 +639,11 @@ fn build_ehs2_table_abstraction(
     ))
 }
 
-/// `pub` (rather than `pub(crate)`) so the native GUI can run cheap
-/// `validate_economics` checks against the live Setup-tab model without
+/// Converts the config-schema `[utility]` section into the solver's
+/// `MultiwayUtility`, running cheap `validate_economics` checks without
 /// paying for a full `build_multiway_session` (which also trains the card
 /// abstraction and builds the game).
-pub fn convert_utility(utility: UtilitySection) -> Result<MultiwayUtility> {
+pub(crate) fn convert_utility(utility: UtilitySection) -> Result<MultiwayUtility> {
     Ok(match utility {
         UtilitySection::ChipEv => MultiwayUtility::ChipEv,
         UtilitySection::TournamentIcm {
@@ -703,8 +671,9 @@ pub fn convert_utility(utility: UtilitySection) -> Result<MultiwayUtility> {
     })
 }
 
-/// `pub` for the same reason as [`convert_utility`].
-pub fn convert_rake(rake: RakeSection) -> MultiwayRake {
+/// Converts the config-schema `[rake]` section into the solver's
+/// `MultiwayRake`.
+pub(crate) fn convert_rake(rake: RakeSection) -> MultiwayRake {
     match rake {
         RakeSection::None => MultiwayRake::None,
         RakeSection::PercentCap {
@@ -733,41 +702,6 @@ pub fn convert_rake(rake: RakeSection) -> MultiwayRake {
 /// evaluation/checkpoint cadences fire exactly on their configured multiples.
 pub fn distance_to_boundary(current: u64, cadence: u64) -> u64 {
     cadence - current % cadence
-}
-
-/// Per-seat average strategy L1 drift since `prior`, used for the
-/// convergence-diagnostics metrics row.
-pub fn strategy_drift(
-    policies: &[PolicyEntry],
-    prior: &HashMap<InfoKey, Vec<f32>>,
-    seats: usize,
-) -> Vec<f64> {
-    let mut totals = vec![0.0; seats];
-    let mut counts = vec![0u64; seats];
-    for entry in policies {
-        let current = entry.column.average_strategy();
-        let value = prior.get(&entry.key).map_or(0.0, |previous| {
-            current
-                .iter()
-                .zip(previous)
-                .map(|(&left, &right)| f64::from((left - right).abs()))
-                .sum::<f64>()
-                * 0.5
-        });
-        totals[entry.key.player as usize] += value;
-        counts[entry.key.player as usize] += 1;
-    }
-    totals
-        .into_iter()
-        .zip(counts)
-        .map(|(total, count)| {
-            if count == 0 {
-                0.0
-            } else {
-                total / count as f64
-            }
-        })
-        .collect()
 }
 
 /// Assembles one `MultiwayMetricsRow` from solver metrics, drift, elapsed

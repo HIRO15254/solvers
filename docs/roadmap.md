@@ -5,10 +5,17 @@
 アルゴリズム研究基盤は基本の A/B ベンチ + JSONL メトリクスまで。
 
 決定済みの方針(2026-07、アプリ再編): 成果物は **1 アプリ(Preflop + Postflop を
-`game.kind` で切り替え)**。アプリ = CLI(bin `solvers`)+ それをラップした Web UI
-(ローカル実行のほか、UI を Web に公開して自デバイスを貸すことが可能)。アプリ層は
-`app/{cli,web,gui}` に分離済み。設計と残タスク(bridge の postflop 対応、Web UI の
-Postflop セクション)は `docs/app-structure.md` を参照。
+`game.kind` で切り替え)**。アプリ = CLI(bin `solvers`)+ それをラップした Web 技術の
+GUI(静的 SPA)を Tauri 2 でネイティブアプリとして同梱し、GUI + CLI を 1 インストーラで
+配布する。デバイス貸しは GUI からリモート bridge(`solvers serve`)への接続で実現
+(ローカル/リモートを接続プロファイルで切替)。旧 2 UI(`app/web` Next.js workbench、
+`app/gui` egui ネイティブ GUI)は 2026-07 に削除済み。
+
+決定済みの方針(2026-07-20、優先順位): **GUI 再構築は将来タスク**として仕様を
+`docs/app-structure.md` に凍結(bridge の Origin/Host 緩和・postflop job API、
+`app/ui` SPA、`app/desktop` Tauri シェル、配布 CI の 4 段)。**当面はマルチウェイ
+preflop ソルバーの CLI としての完成度向上を優先する**(唯一の実行エンジン入口は
+CLI という不変条件のもと、GUI はいつ着手しても bridge 経由で後付けできる)。
 
 ## M0 — 基盤(週 1–2)
 virtual workspace 化、CI(fmt/clippy/test)、`LICENSE-POLICY.md`。`cards`(型、range parser、`aya_poker` evaluator 統合)、`hand-index`(canonical board 列挙。Waugh 完全 index の移植は M7 の abstraction cache キーまで遅延)。

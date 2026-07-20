@@ -8,7 +8,6 @@ pub mod abstraction;
 pub mod betting;
 pub mod checkpoint;
 pub mod config;
-pub mod estimate;
 pub mod holdem;
 pub mod icm;
 pub mod sampler;
@@ -32,17 +31,14 @@ pub use config::{
     AbstractionConfig, AbstractionKind, ActiveOpponentBucketConfig, BettingConfig, MultiwayConfig,
     RecallMode, SeatConfig, StreetBettingConfig, UtilityConfig,
 };
-pub use estimate::{DenseArenaEstimate, EstimateError, estimate_dense_arena};
 pub use holdem::{HoldemGame, HoldemGameError};
 pub use icm::{IcmDeltaEstimate, IcmError, IcmEstimate, IcmMode, estimate_icm, terminal_icm_delta};
 pub use sampler::{CountedSample, DealSampler, SampleError, SampledWorld, SamplingDiagnostics};
 pub use settlement::{PotLayer, Settlement};
 pub use solver::{
-    ActionProbability, AverageStrategyLookup, DenseArenaStats, DenseNodeContext, DeviatorPolicy,
-    ExternalSamplingGame, HistoryEntry, HistoryKey, InfoKey, MultiwaySolver, NodeActionAggregate,
-    NodeActionEvaluation, NodeActionGroupEvaluation, PolicyColumn, PolicyEntry, PrivateInfo,
-    ProfileEstimate, ProfileEvaluation, ProfileVariant, SolverConfig, SolverError, SolverMetrics,
-    SolverState, evaluate_node_actions,
+    ActionProbability, DenseNodeContext, DeviatorPolicy, ExternalSamplingGame, HistoryEntry,
+    HistoryKey, InfoKey, MultiwaySolver, PolicyColumn, PolicyEntry, PrivateInfo, ProfileEstimate,
+    ProfileEvaluation, ProfileVariant, SolverConfig, SolverError, SolverMetrics, SolverState,
 };
 pub use tree::{PublicTree, TreeError};
 pub use types::{MwChips, SeatId, SeatMask, SeatVec, Street};

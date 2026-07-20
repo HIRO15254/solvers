@@ -19,6 +19,33 @@ fn workspace_root() -> PathBuf {
         .to_path_buf()
 }
 
+/// Fully decodes an `.mwsol` file through the paged `MwSolReader` API
+/// (there is no longer a single-shot `read_mwsol` convenience wrapper).
+fn read_mwsol_full(path: &Path) -> formats::MultiwaySolution {
+    let mut reader = formats::MwSolReader::open(path).expect("open mwsol");
+    let total = reader.strategy_count();
+    let mut cursor = 0;
+    let mut strategies = Vec::with_capacity(total);
+    while cursor < total {
+        let page = reader
+            .read_strategy_page(cursor, formats::MWSOL_MAX_PAGE_LIMIT)
+            .expect("read strategy page");
+        strategies.extend(page.strategies);
+        cursor = page.next_cursor.unwrap_or(total);
+    }
+    let metadata = reader.metadata().clone();
+    formats::MultiwaySolution {
+        schema_version: metadata.schema_version,
+        config_toml: metadata.config_toml,
+        abstraction_fingerprint: metadata.abstraction_fingerprint,
+        sweeps: metadata.sweeps,
+        approximate_profile: metadata.approximate_profile,
+        seats: metadata.seats,
+        histories: metadata.histories,
+        strategies,
+    }
+}
+
 fn run_fixture(name: &str) -> FixtureRun {
     let directory = tempfile::tempdir().expect("create acceptance tempdir");
     let result_path = directory.path().join("result.json");
@@ -50,7 +77,7 @@ fn run_fixture(name: &str) -> FixtureRun {
             .expect("acceptance result must be JSON");
     let checkpoint = multiway::MultiwayCheckpoint::load_unchecked(&checkpoint_path)
         .expect("acceptance checkpoint must load");
-    let solution = formats::read_mwsol(&solution_path).expect("acceptance mwsol must load");
+    let solution = read_mwsol_full(&solution_path);
     FixtureRun {
         _directory: directory,
         result,
@@ -174,7 +201,7 @@ fn two_player_push_fold_tracks_the_existing_hu_exact_solver() {
         .collect();
     assert_eq!(hu_jam.len(), 169);
 
-    let solution = formats::read_mwsol(&multiway_solution_path).unwrap();
+    let solution = read_mwsol_full(&multiway_solution_path);
     let mut multiway_jam = vec![None; 169];
     for block in solution.strategies.iter().filter(|block| {
         block.key.history == [0; 16]
