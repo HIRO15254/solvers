@@ -1,9 +1,12 @@
 # Multiway preflop and blueprint solver
 
-本書は `docs/multiway-preflop.md` の日本語版である。仕様の正本(canonical)は
-英語版とし、差異がある場合は英語版を優先する。このソルバーが何を計算し、
+> **現行実装リファレンス。** 次期Multiway Preflop CLI v1の確定仕様は
+> `docs/multiway-preflop-cli-spec.jp.md` を正本とする。移行中に本書と差異がある
+> 場合、既存binaryの説明には本書、実装目標にはv1確定仕様を使う。
+
+本書は `docs/multiway-preflop.md` の日本語版であり、現行実装が何を計算し、
 なぜそうなっているのか、概念面の概要は `docs/preflop-solver-overview.md` を参照。
-本書はその厳密な仕様である。
+本書はその挙動記録である。
 
 9-max の BBA/ICM 設定をそのまま実行できる例が
 `examples/preflop_multiway_9max.toml` にある。

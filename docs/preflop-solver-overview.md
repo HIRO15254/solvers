@@ -2,7 +2,8 @@
 
 `solvers` のマルチウェイプリフロップソルバー(`crates/multiway` + CLI/GUI)が
 「何を入力に、どういう計算をして、何を出すのか」を、実装の技術詳細より一段上の
-視点で説明する。厳密な仕様は `docs/multiway-preflop.md`、全体設計は
+視点で説明する。次期CLIの確定仕様は `docs/multiway-preflop-cli-spec.jp.md`、
+現行実装の挙動は `docs/multiway-preflop.md`、全体設計は
 `docs/architecture.md` を参照。
 
 ---
@@ -154,6 +155,7 @@ GUI は再構築中(旧 egui GUI は 2026-07 に削除。後継の Tauri 同梱 
 
 ## 8. 関連ドキュメント
 
-- `docs/multiway-preflop.md` — 精算規則・ICM・抽象化・成果物フォーマットの厳密仕様(日本語版: `docs/multiway-preflop.jp.md`)
+- `docs/multiway-preflop-cli-spec.jp.md` — 次期Multiway Preflop CLI v1の確定仕様
+- `docs/multiway-preflop.md` — 現行実装の精算規則・ICM・抽象化・成果物フォーマット(日本語版: `docs/multiway-preflop.jp.md`)
 - `docs/architecture.md` — ワークスペース全体の設計(HU 厳密エンジンとの関係)
 - `docs/app-structure.md` — アプリ構成(CLI + Tauri 同梱 Web GUI、デバイス貸し)

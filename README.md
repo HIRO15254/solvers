@@ -13,12 +13,13 @@ Early development. See [docs/roadmap.md](docs/roadmap.md) for milestones.
 
 ## Documentation
 
+- [docs/multiway-preflop-cli-spec.jp.md](docs/multiway-preflop-cli-spec.jp.md) — approved target specification for the Multiway Preflop CLI v1
 - [docs/app-structure.md](docs/app-structure.md) — the app structure (one app with preflop + postflop solving, CLI + web UI)
 - [docs/architecture.md](docs/architecture.md) — integrated architecture design
 - [docs/research-survey.md](docs/research-survey.md) — survey of CFR variants,
   abstraction and acceleration techniques, with an adoption plan
 - [docs/roadmap.md](docs/roadmap.md) — M0–M9 milestones and exit criteria
-- [docs/multiway-preflop.md](docs/multiway-preflop.md) — 2–9 player rules, MCCFR semantics, ICM, and artifacts
+- [docs/multiway-preflop.md](docs/multiway-preflop.md) — current implementation reference for 2–9 player rules, MCCFR semantics, ICM, and artifacts
 - [LICENSE-POLICY.md](LICENSE-POLICY.md) — clean-room policy for AGPL references
 
 ## Workspace layout

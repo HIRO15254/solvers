@@ -1,8 +1,13 @@
 # Multiway preflop and blueprint solver
 
+> **Current implementation reference.** The approved target specification for
+> Multiway Preflop CLI v1 is `docs/multiway-preflop-cli-spec.jp.md`. During the
+> migration, use this document to explain the existing binary and the v1 spec
+> as the implementation target.
+
 For a conceptual overview of what this solver computes and why (in
 Japanese), see `docs/preflop-solver-overview.md`; this document is the
-precise reference. A Japanese translation of this reference is maintained
+current-behavior reference. A Japanese translation of this reference is maintained
 at `docs/multiway-preflop.jp.md`.
 
 A runnable 9-max BBA/ICM configuration is in

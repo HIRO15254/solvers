@@ -17,6 +17,13 @@ GUI(静的 SPA)を Tauri 2 でネイティブアプリとして同梱し、GUI +
 preflop ソルバーの CLI としての完成度向上を優先する**(唯一の実行エンジン入口は
 CLI という不変条件のもと、GUI はいつ着手しても bridge 経由で後付けできる)。
 
+決定済みの方針(2026-07-21、Multiway CLI v1): table/forced bet、betting tree、
+economics/ICM、abstraction/recall、External Sampling MCCFR、停止条件、runtime/resume、
+artifact、inspection/research、CLI surfaceを
+`docs/multiway-preflop-cli-spec.jp.md` に凍結した。唯一残っていたrollout sample既定は
+再現実験で512に決定済み（`docs/validation/multiway-rollout-samples-2026-07-21.md`）。
+以後のM9作業は、旧optionを互換維持せず削除し、このschemaへ段階移行する。
+
 ## M0 — 基盤(週 1–2)
 virtual workspace 化、CI(fmt/clippy/test)、`LICENSE-POLICY.md`。`cards`(型、range parser、`aya_poker` evaluator 統合)、`hand-index`(canonical board 列挙。Waugh 完全 index の移植は M7 の abstraction cache キーまで遅延)。
 **Exit:** canonical boards 1,755 / 16,432 / 134,459 のカウント固定;range parser golden test。(Waugh index のサイズ固定 169 / 1,286,792 / 55,190,538 / 2,428,287,420 と round-trip fuzz は M7 に移動)
