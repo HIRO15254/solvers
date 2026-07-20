@@ -296,10 +296,8 @@ pub fn build_multiway_session(
     })
 }
 
-/// Scale factor `derive_prune_threshold` (here and in
-/// `gui::model::derive_prune_threshold`, which mirrors this same formula
-/// over the GUI's own model type) applies to the game's total stakes to get
-/// `algorithm.prune_threshold` when the key is omitted. See
+/// Scale factor `derive_prune_threshold` applies to the game's total stakes
+/// to get `algorithm.prune_threshold` when the key is omitted. See
 /// `derive_prune_threshold`'s doc comment for how this scale was
 /// calibrated.
 pub const PRUNE_THRESHOLD_STAKE_FACTOR: f64 = -10.0;

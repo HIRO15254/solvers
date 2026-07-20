@@ -484,9 +484,8 @@ mod tests {
     use super::*;
 
     /// `SolveConfig` (and all its section types) must round-trip through
-    /// `toml::to_string`, so a GUI can load a config, edit it, and export it
-    /// as a preset using the exact same schema the CLI parses (see
-    /// docs/native-gui-plan.md, section C/E).
+    /// `toml::to_string`, so a UI can load a config, edit it, and export it
+    /// as a preset using the exact same schema the CLI parses.
     #[test]
     fn multiway_config_round_trips_through_toml_serialization() {
         let raw = include_str!("../../../examples/preflop_multiway_9max.toml");

@@ -518,14 +518,11 @@ The multiway artifact contracts are separate from frozen HU v1:
   without an explicit checkpoint derive a `.mwckpt` beside the result (or
   `multiway-resource-limit.mwckpt` when no result path was supplied).
 
-The native GUI (`cargo run -p gui --release`, bin `solvers-gui`) embeds this
-solver in-process: Setup (full config editing with live validation and
-TOML preset save/load/import/export interchangeable with `solvers solve`
-configs), Solve (live convergence charts: per-seat average positive regret
-and strategy drift vs sweeps, per-seat EV ± CI at the evaluation cadence,
-pause/resume/finish/cancel), and Results (GTO-Wizard-style 13×13 preflop
-strategy matrix with per-action stacked frequency bars, public-history
-navigation, and `.mwsol` file browsing).
+The native egui GUI that previously embedded this solver in-process was
+removed in 2026-07 together with the Next.js web workbench; the successor is
+a single web-tech GUI bundled as a Tauri app that drives the solver through
+the Bridge below (see `docs/app-structure.md`). Its preset TOMLs live on in
+`examples/presets/`.
 
 Bridge v2 exposes health/capabilities, validation, create/status/cancel,
 result, checkpoint, and paginated strategy endpoints alongside unchanged v1.

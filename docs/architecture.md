@@ -40,17 +40,18 @@
 ## 2. レイヤ構成と workspace
 
 > **2026-07 アプリ再編**: アプリケーション層(1 アプリ = Preflop + Postflop を
-> `game.kind` で切り替え。CLI + それをラップした Web UI + 補助のネイティブ GUI)を
-> `app/` ディレクトリに分離した。アプリレベルの設計(bridge による「デバイス貸し」
-> モデル含む)は `docs/app-structure.md` を参照。以下はその反映済みレイアウト。
+> `game.kind` で切り替え)を `app/` ディレクトリに分離。同月、旧 2 UI
+> (Next.js workbench / egui ネイティブ GUI)を削除し、Web 技術の静的 SPA を
+> Tauri 2 で同梱する構成(GUI + CLI を 1 インストーラで配布、デバイス貸しは
+> GUI→リモート bridge 接続)に移行中。アプリレベルの設計は
+> `docs/app-structure.md` を参照。以下はその反映済みレイアウト。
 
 ```
 app:        cli (bin "solvers": TOML batch + UPI subset REPL + CSV reports + ANSI 13×13 grid、
                  bin+lib。serve = 認証付き loopback bridge)
-            web (Next.js/vinext workbench。bridge 経由でローカル実行、公開可。
-                 現状 Preflop/multiway — Postflop セクションは今後)
-            gui (egui/eframe ネイティブ。multiway preflop 専用: Setup/Solve/Results、
-                 収束ライブチャート、13×13 戦略マトリクス、プリセット管理)
+            ui (計画: Vite + React 静的 SPA。bridge client + 接続プロファイル、
+                Setup/Solve/Results、13×13 戦略マトリクス)
+            desktop (計画: Tauri 2 シェル。bridge を in-process 起動、CLI を sidecar 同梱)
 future:     py (PyO3, M3〜) · wasm (viewer-only, M8)
 multiway:    multiway — generative NLHE / joint deal / side pots / rollout buckets / MCCFR
 schemas:    formats — SolveConfig / NodeQuery→NodeReport / Checkpoint(.ckpt) / Artifact(.sol)
@@ -76,11 +77,10 @@ solvers/
 ├── tools/plot_convergence.py
 ├── app/
 │   ├── cli/            # bin "solvers"(package "cli"、bin+lib): serve/solve/resume/bench/
-│   │                   # inspect/mw-eval/report。config スキーマと multiway セッション構築
-│   │                   # (session.rs) を gui と共有
-│   ├── web/            # workbench(範囲/ツリー編集、multiway explorer、bridge client)
-│   └── gui/            # bin "solvers-gui": egui/eframe ネイティブ GUI (multiway preflop、
-│                       # docs/native-gui-plan.md 参照)
+│   │                   # inspect/mw-eval/report。lib は config スキーマ / bridge /
+│   │                   # multiway セッション構築(session.rs)
+│   ├── ui/             # (計画) Web GUI: Vite + React 静的 SPA
+│   └── desktop/        # (計画) Tauri 2 シェル(bridge in-process + CLI sidecar)
 └── crates/
     ├── cards/          # Card/CardSet/Chips/Street/PerPlayer<T>、"22+,A2s+" range parser、
     │                   # aya_poker (Zlib/Apache-2.0/MIT) evaluator wrapper。workspace 内依存なし

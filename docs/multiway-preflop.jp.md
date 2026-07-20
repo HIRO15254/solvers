@@ -544,15 +544,11 @@ vector traverser 自体も既定で無効であり、CLI は「vector なしの�
   結果のそばに `.mwckpt` を派生させる(結果パスが与えられなかった場合は
   `multiway-resource-limit.mwckpt`)。
 
-ネイティブ GUI(`cargo run -p gui --release`、バイナリ `solvers-gui`)は
-このソルバーをプロセス内に埋め込む。Setup(ライブバリデーション付きの
-完全な設定編集、`solvers solve` の設定と相互運用可能な TOML プリセットの
-保存/読み込み/インポート/エクスポート)、Solve(sweep に対するシートごとの
-平均正 regret と戦略ドリフト、評価周期ごとのシートごとの EV ± CI を
-表示するライブ収束チャート、一時停止/再開/終了/キャンセル)、そして
-Results(per-action の積み上げ頻度バー、公開履歴ナビゲーション、`.mwsol`
-ファイルブラウジングを備えた GTO-Wizard 風の 13×13 プリフロップ戦略
-マトリクス)から構成される。
+このソルバーをプロセス内に埋め込んでいたネイティブ egui GUI は、Next.js の
+Web workbench とともに 2026-07 に削除された。後継は Tauri アプリとして
+同梱される単一の Web 技術 GUI で、下記の Bridge 経由でソルバーを駆動する
+(`docs/app-structure.md` 参照)。プリセット TOML は `examples/presets/` に
+引き継がれている。
 
 Bridge v2 は、変更されていない v1 と並んで、ヘルス/機能情報、バリデーション、
 作成/ステータス/キャンセル、結果、チェックポイント、ページ分割された戦略

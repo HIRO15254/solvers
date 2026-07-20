@@ -2331,26 +2331,26 @@ check_every = 1
     }
 
     #[test]
-    fn web_multiway_preset_snapshots_pass_rust_validation() {
+    fn multiway_preset_snapshots_pass_rust_validation() {
         const PRESETS: [(&str, &str, usize); 4] = [
             (
                 "multiway-9max-pushfold",
-                include_str!("../../../app/web/presets/multiway-9max-pushfold.toml"),
+                include_str!("../../../examples/presets/multiway-9max-pushfold.toml"),
                 9,
             ),
             (
                 "multiway-9max-mtt-icm",
-                include_str!("../../../app/web/presets/multiway-9max-mtt-icm.toml"),
+                include_str!("../../../examples/presets/multiway-9max-mtt-icm.toml"),
                 9,
             ),
             (
                 "multiway-6max-cash",
-                include_str!("../../../app/web/presets/multiway-6max-cash.toml"),
+                include_str!("../../../examples/presets/multiway-6max-cash.toml"),
                 6,
             ),
             (
                 "multiway-9max-research",
-                include_str!("../../../app/web/presets/multiway-9max-research.toml"),
+                include_str!("../../../examples/presets/multiway-9max-research.toml"),
                 9,
             ),
         ];

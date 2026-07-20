@@ -25,16 +25,17 @@ Early development. See [docs/roadmap.md](docs/roadmap.md) for milestones.
 
 The project ships **one application** containing both a preflop solver (HU +
 2–9 player multiway) and a postflop solver (exact, fixed flop), selected by
-the config's `game.kind`. It is operated through a CLI and a web UI that
-wraps it. See [docs/app-structure.md](docs/app-structure.md).
+the config's `game.kind`. It is operated through a CLI and a bundled web-tech
+GUI that wraps it (Tauri shell + static SPA, in progress — the previous
+Next.js and egui UIs were removed in 2026-07). See
+[docs/app-structure.md](docs/app-structure.md).
 
 ```
 app/
 ├── cli         # `solvers` binary: solve / resume / inspect / report / serve / bench / mw-eval
-├── web         # web UI: 169-class range/config editor + multiway explorer,
-│               # talking to the CLI's authenticated local bridge (postflop
-│               # section is a roadmap item)
-└── gui         # `solvers-gui` binary: native egui workbench (Setup / Solve / Results)
+├── ui          # (planned) web GUI: Vite + React static SPA talking to the
+│               # CLI's authenticated bridge (local or remote)
+└── desktop     # (planned) Tauri 2 shell: in-process bridge + CLI sidecar
 crates/
 ├── cards       # card/chip/street types, range parser, hand-evaluator wrapper
 ├── hand-index  # suit-isomorphism board canonicalization
@@ -54,11 +55,8 @@ crates/
 cargo test --workspace            # correctness harness (Kuhn/Leduc known solutions, oracle diff)
 cargo run -p cli --release -- solve examples/kuhn.toml
 
-# Web UI (run these in separate terminals):
+# Bridge (authenticated loopback HTTP job API used by the GUI):
 cargo run -p cli --release -- serve --origin http://localhost:3000
-cd app/web
-npm install
-npm run dev
 
 # --- Preflop ---------------------------------------------------------------
 # 9-max BBA + tournament ICM; writes v2 JSON, .mwckpt, and .mwsol.

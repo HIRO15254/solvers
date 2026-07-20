@@ -12,7 +12,6 @@ members = [
     "crates/multiway",
     "crates/formats",
     "app/cli",
-    "app/gui",
 ]
 
 [workspace.package]
