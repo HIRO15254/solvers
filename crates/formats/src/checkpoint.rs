@@ -6,7 +6,7 @@
 //! place) so a process killed mid-write never corrupts a previously-good
 //! checkpoint.
 
-use std::io::{Read, Write};
+use std::io::Write;
 use std::path::Path;
 
 use engine::SolverState;
@@ -14,8 +14,8 @@ use engine::SolverState;
 /// Fixed header layout, all multi-byte fields little-endian: magic (8
 /// bytes) + format version (u16) + config hash (32 bytes) + iteration
 /// (u64) = 50 bytes. The iteration is duplicated from the (compressed)
-/// payload so `peek_header` can report progress without paying for a zstd
-/// decompression.
+/// payload so the header alone can report progress without paying for a
+/// zstd decompression.
 pub const HEADER_LEN: usize = 8 + 2 + 32 + 8;
 
 const MAGIC: &[u8; 8] = b"SLVRCKPT";
@@ -39,7 +39,7 @@ pub enum CheckpointError {
 /// Just the header, for cheap progress checks without decompressing the
 /// (potentially large) payload.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct CheckpointHeader {
+pub(crate) struct CheckpointHeader {
     pub config_hash: [u8; 32],
     pub iteration: u64,
 }
@@ -80,27 +80,6 @@ fn build_header(config_hash: [u8; 32], iteration: u64) -> [u8; HEADER_LEN] {
     buf[10..42].copy_from_slice(&config_hash);
     buf[42..50].copy_from_slice(&iteration.to_le_bytes());
     buf
-}
-
-/// Reads only the header (`HEADER_LEN` bytes), for cheap progress checks.
-pub fn peek_header(path: &Path) -> Result<CheckpointHeader, CheckpointError> {
-    let mut file = std::fs::File::open(path)?;
-    let mut buf = [0u8; HEADER_LEN];
-    let mut filled = 0;
-    loop {
-        let n = file.read(&mut buf[filled..])?;
-        if n == 0 {
-            break;
-        }
-        filled += n;
-    }
-    if filled < HEADER_LEN {
-        return Err(CheckpointError::Truncated {
-            expected: HEADER_LEN,
-            actual: filled,
-        });
-    }
-    parse_header(&buf)
 }
 
 /// Reads and fully decodes a checkpoint (header + zstd-decompressed,
@@ -210,9 +189,6 @@ mod tests {
         assert_eq!(loaded.config_hash, hash);
         assert_eq!(loaded.iteration, state.iteration);
         assert_eq!(loaded.state, state);
-        let header = peek_header(&path).unwrap();
-        assert_eq!(header.config_hash, hash);
-        assert_eq!(header.iteration, state.iteration);
         let _ = std::fs::remove_file(&path);
     }
 
@@ -234,7 +210,6 @@ mod tests {
         let mut bytes = std::fs::read(&path).unwrap();
         bytes[0] = b'X';
         std::fs::write(&path, &bytes).unwrap();
-        assert!(matches!(peek_header(&path), Err(CheckpointError::BadMagic)));
         assert!(matches!(
             read_checkpoint(&path),
             Err(CheckpointError::BadMagic)
@@ -249,7 +224,7 @@ mod tests {
         let mut bytes = std::fs::read(&path).unwrap();
         bytes[8..10].copy_from_slice(&99u16.to_le_bytes());
         std::fs::write(&path, &bytes).unwrap();
-        match peek_header(&path) {
+        match read_checkpoint(&path) {
             Err(CheckpointError::BadVersion { found, expected }) => {
                 assert_eq!(found, 99);
                 assert_eq!(expected, FORMAT_VERSION);
@@ -265,14 +240,13 @@ mod tests {
         write_checkpoint(&path, [0u8; 32], &sample_state_f32()).unwrap();
         let bytes = std::fs::read(&path).unwrap();
         std::fs::write(&path, &bytes[..HEADER_LEN - 5]).unwrap();
-        match peek_header(&path) {
+        match read_checkpoint(&path) {
             Err(CheckpointError::Truncated { expected, actual }) => {
                 assert_eq!(expected, HEADER_LEN);
                 assert_eq!(actual, HEADER_LEN - 5);
             }
             other => panic!("expected Truncated, got {other:?}"),
         }
-        assert!(read_checkpoint(&path).is_err());
         let _ = std::fs::remove_file(&path);
     }
 

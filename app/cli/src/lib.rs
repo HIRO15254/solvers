@@ -18,7 +18,6 @@
 //! CFR schedules (dcfr/cfr-plus/vanilla/linear-cfr/hs-dcfr) on the same
 //! config in one pass.
 
-pub mod auto_run;
 pub mod bench;
 pub mod bridge;
 pub mod config;

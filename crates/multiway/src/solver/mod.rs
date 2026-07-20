@@ -32,7 +32,6 @@ mod workers;
 mod tests;
 
 pub use errors::SolverError;
-pub use eval::evaluate_node_actions;
 
 use support::*;
 use workers::*;
@@ -191,30 +190,6 @@ pub trait ExternalSamplingGame: Send + Sync {
     ) {
         let _ = (state, world, traverser, combos, out);
         unimplemented!("terminal_utilities_for_combos is required only for traverser_vector mode")
-    }
-}
-
-/// Resolves the average strategy for one information set, so
-/// [`evaluate_node_actions`] can run identically over a live
-/// [`MultiwaySolver`]'s in-memory storage (sparse or dense) or a loaded
-/// `formats::MultiwaySolution`. Both sources key their storage by exactly
-/// the fields [`InfoKey`] already carries -- the blake3-chained public
-/// history, the acting seat, its street, its active-opponent count, and its
-/// bucket path -- so `InfoKey` is the minimal common lookup signature.
-///
-/// A lookup miss -- an infoset the training run never actually visited -- is
-/// not an error: implementors return `None`, and [`evaluate_node_actions`]
-/// falls back to uniform probability over that node's legal actions.
-pub trait AverageStrategyLookup {
-    /// Average-strategy probabilities at `key`, normalized to sum to `1`.
-    /// `None` iff `key` was never visited.
-    fn lookup(&self, key: InfoKey) -> Option<Vec<f64>>;
-}
-
-impl<G: ExternalSamplingGame> AverageStrategyLookup for MultiwaySolver<G> {
-    fn lookup(&self, key: InfoKey) -> Option<Vec<f64>> {
-        self.average_strategy(key)
-            .map(|probabilities| probabilities.iter().map(|&p| f64::from(p)).collect())
     }
 }
 
@@ -515,15 +490,6 @@ pub struct SolverMetrics {
     pub average_positive_regret: Vec<f64>,
 }
 
-/// Dense-arena preflight numbers; see [`MultiwaySolver::dense_arena_stats`].
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct DenseArenaStats {
-    pub node_count: u64,
-    pub total_columns: u64,
-    pub total_slots: u64,
-    pub estimated_bytes: u64,
-}
-
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ProfileEstimate {
     pub mean: f64,
@@ -570,60 +536,6 @@ pub struct ProfileVariant {
     /// plain regret matching carries no last-iterate convergence guarantee
     /// (the average is the object with the CCE-style bound).
     pub use_current_strategy: bool,
-}
-
-/// One hand-group's row of [`evaluate_node_actions`]'s per-action EV
-/// estimates. "Group" here is the acting seat's current-street bucket at the
-/// evaluated node -- for a preflop node this is exactly the 169-class.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct NodeActionGroupEvaluation {
-    /// The acting seat's current-street bucket (the group id).
-    pub group: BucketId,
-    /// This group's share of the total self-normalized importance weight
-    /// across every group that appeared in the sample. Every returned
-    /// group's `weight_share` sums to `1` across [`NodeActionEvaluation::groups`]
-    /// (subject to floating-point rounding).
-    pub weight_share: f64,
-    /// The group's own average-strategy probabilities at the evaluated node
-    /// (uniform on a lookup miss), aligned with
-    /// [`NodeActionEvaluation::action_labels`]; sums to `1`.
-    pub frequencies: Vec<f64>,
-    /// Per-action EV estimate for hands in this group, aligned with
-    /// [`NodeActionEvaluation::action_labels`]. See [`evaluate_node_actions`]
-    /// for the estimator.
-    pub actions: Vec<ProfileEstimate>,
-    /// Samples that landed in this group with nonzero path weight.
-    pub samples: u64,
-}
-
-/// One action's range-wide aggregate across every group, produced by
-/// [`evaluate_node_actions`].
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct NodeActionAggregate {
-    pub ev: ProfileEstimate,
-    /// `Σ_g weight_share(g) · frequencies(g)[action]`: the weighted-average
-    /// looked-up action frequency across the reached range. This is the
-    /// profile's own frequency (not derived from the EV samples), reported
-    /// alongside the EV for a GTO-Wizard-style per-action row.
-    pub frequency: f64,
-}
-
-/// Per-hand-group, per-action expected-utility estimate of "take this action
-/// now, then everyone (including the actor) plays the current average
-/// strategy to the end of the hand", produced by [`evaluate_node_actions`].
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct NodeActionEvaluation {
-    /// The acting seat at the evaluated node.
-    pub actor: usize,
-    /// Stable index-to-action mapping, shared by every group row and the
-    /// aggregate row.
-    pub action_labels: Vec<String>,
-    pub samples: u64,
-    pub total_deal_attempts: u64,
-    /// Sorted by [`NodeActionGroupEvaluation::group`].
-    pub groups: Vec<NodeActionGroupEvaluation>,
-    /// Aligned with `action_labels`.
-    pub aggregate: Vec<NodeActionAggregate>,
 }
 
 /// Sparse external-sampling MCCFR state.  A policy column exists only after
@@ -1584,8 +1496,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// `f64` to avoid precision loss over many `f32` accumulators. This is
     /// the correct cheap weight for a live "range-wide action frequency"
     /// aggregation over a node's buckets: unlike a bucket count, it is
-    /// reach-weighted, and unlike re-deriving weights from
-    /// [`Self::evaluate_node_actions`], it costs nothing beyond the scan
+    /// reach-weighted and costs nothing beyond the scan
     /// [`Self::strategies_at`] already performs.
     pub fn strategies_at_with_mass(
         &self,
@@ -1782,18 +1693,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// computation every drive-loop chunk.
     pub fn hand_updates(&self) -> u64 {
         self.hand_updates
-    }
-
-    /// Dense-arena preflight numbers, or `None` in `RecallMode::Full` (there
-    /// is no arena to report on). Useful for a CLI/GUI to print what the
-    /// `RecallMode::Street` preallocation actually cost before training.
-    pub fn dense_arena_stats(&self) -> Option<DenseArenaStats> {
-        self.dense.as_ref().map(|dense| DenseArenaStats {
-            node_count: dense.arena.node_count() as u64,
-            total_columns: dense.arena.total_columns(),
-            total_slots: dense.arena.total_slots(),
-            estimated_bytes: dense.arena.estimated_bytes(),
-        })
     }
 
     /// Per-seat average-strategy L1 drift since `prior`, refreshing `prior`

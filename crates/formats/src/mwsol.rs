@@ -228,19 +228,6 @@ impl MultiwaySolutionMetadata {
         }
     }
 
-    fn into_solution(self, strategies: Vec<MultiwayStrategyBlock>) -> MultiwaySolution {
-        MultiwaySolution {
-            schema_version: self.schema_version,
-            config_toml: self.config_toml,
-            abstraction_fingerprint: self.abstraction_fingerprint,
-            sweeps: self.sweeps,
-            approximate_profile: self.approximate_profile,
-            seats: self.seats,
-            histories: self.histories,
-            strategies,
-        }
-    }
-
     pub fn resolve_history(&self, key: [u8; 16]) -> Option<Vec<MultiwayHistoryAction>> {
         resolve_history(&self.histories, key)
     }
@@ -402,7 +389,7 @@ fn history_child(parent: [u8; 16], actor: u8, action_index: u32) -> [u8; 16] {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct MwSolHeader {
+pub(crate) struct MwSolHeader {
     pub config_hash: [u8; 32],
     pub abstraction_fingerprint: [u8; 32],
     pub sweeps: u64,
@@ -434,18 +421,11 @@ pub struct MwSolStrategyPage {
 #[derive(Debug)]
 pub struct MwSolReader {
     file: File,
-    header: MwSolHeader,
     metadata: MultiwaySolutionMetadata,
     index_start: u64,
     frames_start: u64,
     strategy_count: usize,
     format_version: u16,
-}
-
-/// Writes an `.mwsol` file with `f32` strategy frames (version 3). Alias
-/// for `write_mwsol_with(path, solution, MwsolStorage::F32)`.
-pub fn write_mwsol(path: &Path, solution: &MultiwaySolution) -> Result<(), MwSolError> {
-    write_mwsol_with(path, solution, MwsolStorage::F32)
 }
 
 /// Writes an `.mwsol` file (version 3), encoding each strategy frame per
@@ -607,20 +587,6 @@ fn write_mwsol_frames(
     Ok(())
 }
 
-pub fn peek_mwsol_header(path: &Path) -> Result<MwSolHeader, MwSolError> {
-    let mut file = std::fs::File::open(path)?;
-    let mut bytes = [0; MWSOL_HEADER_LEN];
-    file.read_exact(&mut bytes).map_err(|error| {
-        if error.kind() == std::io::ErrorKind::UnexpectedEof {
-            MwSolError::Truncated
-        } else {
-            MwSolError::Io(error)
-        }
-    })?;
-    let (header, _format_version) = decode_header(&bytes)?;
-    Ok(header)
-}
-
 impl MwSolReader {
     pub fn open(path: &Path) -> Result<Self, MwSolError> {
         let mut file = File::open(path)?;
@@ -769,17 +735,12 @@ impl MwSolReader {
 
         Ok(Self {
             file,
-            header,
             metadata,
             index_start,
             frames_start,
             strategy_count,
             format_version,
         })
-    }
-
-    pub fn header(&self) -> MwSolHeader {
-        self.header
     }
 
     /// The on-disk format version this file was read as (2 or 3).
@@ -880,22 +841,6 @@ impl MwSolReader {
     }
 }
 
-pub fn read_mwsol(path: &Path) -> Result<MultiwaySolution, MwSolError> {
-    let mut reader = MwSolReader::open(path)?;
-    let total = reader.strategy_count();
-    let mut cursor = 0;
-    let mut strategies = Vec::with_capacity(total);
-    while cursor < total {
-        let page = reader.read_strategy_page(cursor, MWSOL_MAX_PAGE_LIMIT)?;
-        strategies.extend(page.strategies);
-        cursor = page.next_cursor.unwrap_or(total);
-    }
-    let MwSolReader { metadata, .. } = reader;
-    let solution = metadata.into_solution(strategies);
-    solution.validate()?;
-    Ok(solution)
-}
-
 fn encode_header(header: MwSolHeader, format_version: u16) -> [u8; MWSOL_HEADER_LEN] {
     let mut bytes = [0; MWSOL_HEADER_LEN];
     bytes[..8].copy_from_slice(MAGIC);
@@ -914,8 +859,7 @@ fn encode_header(header: MwSolHeader, format_version: u16) -> [u8; MWSOL_HEADER_
 
 /// Decodes the fixed header, returning the on-disk format version alongside
 /// it so callers that need to branch on frame layout (`MwSolReader::open`)
-/// can, while callers that only want header fields (`peek_mwsol_header`)
-/// can discard it.
+/// can use it directly.
 fn decode_header(bytes: &[u8; MWSOL_HEADER_LEN]) -> Result<(MwSolHeader, u16), MwSolError> {
     if &bytes[..8] != MAGIC {
         return Err(MwSolError::BadMagic);
@@ -1123,6 +1067,53 @@ mod tests {
     use super::*;
     use std::fs::OpenOptions;
 
+    /// Fully decodes an `.mwsol` file through the paged reader API (the
+    /// same steps the now-removed `read_mwsol` convenience wrapper used to
+    /// perform), for tests that want to assert on a complete
+    /// [`MultiwaySolution`] rather than paging through it themselves.
+    fn decode_via_reader(path: &Path) -> Result<MultiwaySolution, MwSolError> {
+        let mut reader = MwSolReader::open(path)?;
+        let total = reader.strategy_count();
+        let mut cursor = 0;
+        let mut strategies = Vec::with_capacity(total);
+        while cursor < total {
+            let page = reader.read_strategy_page(cursor, MWSOL_MAX_PAGE_LIMIT)?;
+            strategies.extend(page.strategies);
+            cursor = page.next_cursor.unwrap_or(total);
+        }
+        let metadata = reader.metadata().clone();
+        let solution = MultiwaySolution {
+            schema_version: metadata.schema_version,
+            config_toml: metadata.config_toml,
+            abstraction_fingerprint: metadata.abstraction_fingerprint,
+            sweeps: metadata.sweeps,
+            approximate_profile: metadata.approximate_profile,
+            seats: metadata.seats,
+            histories: metadata.histories,
+            strategies,
+        };
+        solution.validate()?;
+        Ok(solution)
+    }
+
+    /// Reads and decodes just the fixed header (the same steps the
+    /// now-removed `peek_mwsol_header` convenience wrapper used to
+    /// perform), for tests that corrupt specific byte regions and need the
+    /// header's declared offsets/lengths to find them.
+    fn peek_header(path: &Path) -> Result<MwSolHeader, MwSolError> {
+        let mut file = std::fs::File::open(path)?;
+        let mut bytes = [0u8; MWSOL_HEADER_LEN];
+        file.read_exact(&mut bytes).map_err(|error| {
+            if error.kind() == std::io::ErrorKind::UnexpectedEof {
+                MwSolError::Truncated
+            } else {
+                MwSolError::Io(error)
+            }
+        })?;
+        let (header, _format_version) = decode_header(&bytes)?;
+        Ok(header)
+    }
+
     fn solution() -> MultiwaySolution {
         MultiwaySolution {
             schema_version: MULTIWAY_SCHEMA_VERSION,
@@ -1207,17 +1198,17 @@ mod tests {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().join("profile.mwsol");
         let expected = solution();
-        write_mwsol(&path, &expected).unwrap();
-        write_mwsol(&path, &expected).unwrap();
+        write_mwsol_with(&path, &expected, MwsolStorage::F32).unwrap();
+        write_mwsol_with(&path, &expected, MwsolStorage::F32).unwrap();
 
-        let header = peek_mwsol_header(&path).unwrap();
+        let header = peek_header(&path).unwrap();
         assert_eq!(header.sweeps, 99);
         assert_eq!(header.strategy_count, expected.strategies.len() as u64);
         assert!(header.metadata_compressed_len > 0);
         assert!(header.metadata_uncompressed_len > 0);
 
         let mut reader = MwSolReader::open(&path).unwrap();
-        assert_eq!(reader.header(), header);
+        assert_eq!(peek_header(&path).unwrap(), header);
         assert_eq!(reader.format_version(), MWSOL_FORMAT_VERSION);
         assert_eq!(reader.strategy_count(), expected.strategies.len());
         assert_eq!(reader.metadata().sweeps, 99);
@@ -1239,7 +1230,7 @@ mod tests {
             Err(MwSolError::InvalidPageLimit { .. })
         ));
 
-        let decoded = read_mwsol(&path).unwrap();
+        let decoded = decode_via_reader(&path).unwrap();
         assert_eq!(decoded, expected);
         assert!(decoded.strategy(expected.strategies[0].key).is_some());
     }
@@ -1249,8 +1240,8 @@ mod tests {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().join("selective.mwsol");
         let expected = solution();
-        write_mwsol(&path, &expected).unwrap();
-        let header = peek_mwsol_header(&path).unwrap();
+        write_mwsol_with(&path, &expected, MwsolStorage::F32).unwrap();
+        let header = peek_header(&path).unwrap();
         let corrupt_index = expected.strategies.len() - 1;
         let entry = read_index_entry(&path, header, corrupt_index);
         flip_byte(
@@ -1267,7 +1258,7 @@ mod tests {
                 if index == corrupt_index
         ));
         assert!(matches!(
-            read_mwsol(&path),
+            decode_via_reader(&path),
             Err(MwSolError::StrategyChecksumMismatch { index })
                 if index == corrupt_index
         ));
@@ -1277,8 +1268,8 @@ mod tests {
     fn metadata_and_index_corruption_are_detected_before_strategy_reads() {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().join("regions.mwsol");
-        write_mwsol(&path, &solution()).unwrap();
-        let header = peek_mwsol_header(&path).unwrap();
+        write_mwsol_with(&path, &solution(), MwsolStorage::F32).unwrap();
+        let header = peek_header(&path).unwrap();
         flip_byte(
             &path,
             MWSOL_HEADER_LEN as u64 + header.metadata_compressed_len / 2,
@@ -1288,8 +1279,8 @@ mod tests {
             Err(MwSolError::MetadataChecksumMismatch)
         ));
 
-        write_mwsol(&path, &solution()).unwrap();
-        let header = peek_mwsol_header(&path).unwrap();
+        write_mwsol_with(&path, &solution(), MwsolStorage::F32).unwrap();
+        let header = peek_header(&path).unwrap();
         flip_byte(&path, index_start(header) + 1);
         assert!(matches!(
             MwSolReader::open(&path),
@@ -1301,7 +1292,7 @@ mod tests {
     fn truncation_and_trailing_bytes_are_rejected_by_exact_file_length() {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().join("length.mwsol");
-        write_mwsol(&path, &solution()).unwrap();
+        write_mwsol_with(&path, &solution(), MwsolStorage::F32).unwrap();
         let file = OpenOptions::new().write(true).open(&path).unwrap();
         let original_len = file.metadata().unwrap().len();
         file.set_len(original_len - 1).unwrap();
@@ -1312,7 +1303,7 @@ mod tests {
             Err(MwSolError::Truncated)
         ));
 
-        write_mwsol(&path, &solution()).unwrap();
+        write_mwsol_with(&path, &solution(), MwsolStorage::F32).unwrap();
         let mut file = OpenOptions::new().append(true).open(&path).unwrap();
         file.write_all(&[0]).unwrap();
         file.sync_all().unwrap();
@@ -1326,9 +1317,9 @@ mod tests {
     fn declared_decompression_lengths_and_limits_are_enforced() {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().join("limits.mwsol");
-        write_mwsol(&path, &solution()).unwrap();
+        write_mwsol_with(&path, &solution(), MwsolStorage::F32).unwrap();
 
-        let mut header = peek_mwsol_header(&path).unwrap();
+        let mut header = peek_header(&path).unwrap();
         header.metadata_uncompressed_len = MAX_METADATA_UNCOMPRESSED_BYTES + 1;
         let mut file = OpenOptions::new().write(true).open(&path).unwrap();
         file.seek(SeekFrom::Start(0)).unwrap();
@@ -1342,8 +1333,8 @@ mod tests {
                 if declared == MAX_METADATA_UNCOMPRESSED_BYTES + 1
         ));
 
-        write_mwsol(&path, &solution()).unwrap();
-        let header = peek_mwsol_header(&path).unwrap();
+        write_mwsol_with(&path, &solution(), MwsolStorage::F32).unwrap();
+        let header = peek_header(&path).unwrap();
         let mut entry = read_index_entry(&path, header, 0);
         entry.uncompressed_len += 1;
         rewrite_index_entry(&path, header, 0, entry);
@@ -1354,8 +1345,8 @@ mod tests {
         ));
         drop(reader);
 
-        write_mwsol(&path, &solution()).unwrap();
-        let header = peek_mwsol_header(&path).unwrap();
+        write_mwsol_with(&path, &solution(), MwsolStorage::F32).unwrap();
+        let header = peek_header(&path).unwrap();
         let mut entry = read_index_entry(&path, header, 0);
         entry.uncompressed_len = MAX_STRATEGY_BLOCK_UNCOMPRESSED_BYTES + 1;
         rewrite_index_entry(&path, header, 0, entry);
@@ -1369,8 +1360,8 @@ mod tests {
     fn index_offsets_are_checked_even_with_a_valid_index_checksum() {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().join("offset.mwsol");
-        write_mwsol(&path, &solution()).unwrap();
-        let header = peek_mwsol_header(&path).unwrap();
+        write_mwsol_with(&path, &solution(), MwsolStorage::F32).unwrap();
+        let header = peek_header(&path).unwrap();
         let mut entry = read_index_entry(&path, header, 0);
         entry.offset = 1;
         rewrite_index_entry(&path, header, 0, entry);
@@ -1393,7 +1384,7 @@ mod tests {
         bytes[8..10].copy_from_slice(&1u16.to_le_bytes());
         std::fs::write(&path, bytes).unwrap();
         assert!(matches!(
-            peek_mwsol_header(&path),
+            MwSolReader::open(&path),
             Err(MwSolError::BadVersion {
                 found: 1,
                 min: MWSOL_MIN_FORMAT_VERSION,
@@ -1469,7 +1460,7 @@ mod tests {
 
         let mut reader = MwSolReader::open(&path).unwrap();
         assert_eq!(reader.format_version(), MWSOL_FORMAT_VERSION);
-        let decoded = read_mwsol(&path).unwrap();
+        let decoded = decode_via_reader(&path).unwrap();
         assert_eq!(decoded.strategies.len(), expected.strategies.len());
         for (got, want) in decoded.strategies.iter().zip(expected.strategies.iter()) {
             assert_eq!(got.key, want.key);
@@ -1530,15 +1521,15 @@ mod tests {
         let expected = solution();
 
         write_legacy_v2(&v2_path, &expected).unwrap();
-        write_mwsol(&v3_path, &expected).unwrap();
+        write_mwsol_with(&v3_path, &expected, MwsolStorage::F32).unwrap();
 
         let mut v2_reader = MwSolReader::open(&v2_path).unwrap();
         assert_eq!(v2_reader.format_version(), 2);
-        let v2_decoded = read_mwsol(&v2_path).unwrap();
+        let v2_decoded = decode_via_reader(&v2_path).unwrap();
 
         let mut v3_reader = MwSolReader::open(&v3_path).unwrap();
         assert_eq!(v3_reader.format_version(), MWSOL_FORMAT_VERSION);
-        let v3_decoded = read_mwsol(&v3_path).unwrap();
+        let v3_decoded = decode_via_reader(&v3_path).unwrap();
 
         assert_eq!(v2_decoded, expected);
         assert_eq!(v2_decoded, v3_decoded);

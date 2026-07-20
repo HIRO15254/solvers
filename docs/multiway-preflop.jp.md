@@ -603,21 +603,14 @@ sweep 数は常にランのメトリクス/結果アーティファクトに記�
 ことを意味する。この 2 つのノブは、厳密な再現性が重要な場面では併用しない
 ことを前提としている。
 
-後の GUI「Auto モード」を支えるため、設定とエスティメータのみで完結する
-2 つのヘルパーが存在する(どちらもカード抽象化やディールサンプラーを構築
-しないため、ランに着手する前に呼び出しても十分高速である):
-
-- `multiway::estimate_dense_arena(&MultiwayConfig) -> DenseArenaEstimate` は、
-  `recall = "street"` のプリフライトと同じツリー列挙とアリーナサイズ計算を
-  再利用するが、訓練済みの抽象化の代わりにバケット数のみのスタンドイン
-  抽象化で駆動するため、ロールアウト/EHS² の訓練コストを払うことなく
-  *任意の* バケット数選択について仮想的なデンスアリーナのサイズを見積もれる。
-- `cli::auto_run::derive_auto_run(&MultiwayConfig, threads, memory_budget_bytes)
-  -> AutoRunDerivation` は `sweep_batch = threads.div_ceil(seats)` と、
-  `estimate_dense_arena` に基づき `memory_budget_bytes` に収まる
-  `[64, 128, 256, 512, 1024, 2048, 4096]` の中で最大の均一バケット数を選ぶ。
-  これは呼び出し側自身のスレッド数/メモリ予算の情報のみに基づく(ここでは
-  マシン検出は一切行われない)。
+かつては GUI「Auto モード」を支えるため、設定とエスティメータのみで完結
+する 2 つのヘルパー -- `multiway::estimate_dense_arena`(訓練前のデンス
+アリーナサイズ見積もり)と `cli::auto_run::derive_auto_run`(その見積もりと
+呼び出し側のスレッド数/メモリ予算の情報から `sweep_batch` とバケット数を
+選ぶ)-- がここに存在した。両者は本番コードからの利用が無い休眠中の
+GUI 支援コードとして 2026-07 に削除された(将来 GUI が必要とすればコード
+は git 履歴から復元できる)。「Auto モード」のうち停止ルール側である
+`run.stop_dev_gain`(前述)は CLI で引き続き有効である。
 
 ### 戦略 purification の計測(`solvers mw-eval --purify`)
 

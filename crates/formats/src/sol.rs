@@ -16,7 +16,7 @@
 //! followed by a zstd-compressed postcard encoding of the payload, written
 //! atomically via temp-file-then-rename.
 
-use std::io::{Read, Write};
+use std::io::Write;
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
@@ -56,7 +56,7 @@ pub enum SolError {
 /// Just the header, for cheap identity/progress checks without
 /// decompressing the (potentially large) payload.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SolHeader {
+pub(crate) struct SolHeader {
     pub config_hash: [u8; 32],
     pub iteration: u64,
 }
@@ -143,28 +143,6 @@ fn build_header(config_hash: [u8; 32], iteration: u64) -> [u8; HEADER_LEN] {
     buf[10..42].copy_from_slice(&config_hash);
     buf[42..50].copy_from_slice(&iteration.to_le_bytes());
     buf
-}
-
-/// Reads only the header (`HEADER_LEN` bytes), for cheap identity/progress
-/// checks without decompressing the payload.
-pub fn peek_sol_header(path: &Path) -> Result<SolHeader, SolError> {
-    let mut file = std::fs::File::open(path)?;
-    let mut buf = [0u8; HEADER_LEN];
-    let mut filled = 0;
-    loop {
-        let n = file.read(&mut buf[filled..])?;
-        if n == 0 {
-            break;
-        }
-        filled += n;
-    }
-    if filled < HEADER_LEN {
-        return Err(SolError::Truncated {
-            expected: HEADER_LEN,
-            actual: filled,
-        });
-    }
-    parse_header(&buf)
 }
 
 /// Reads and fully decodes a `.sol` file (header + zstd-decompressed,
@@ -354,13 +332,6 @@ mod tests {
         let loaded = read_sol(&path).unwrap();
         assert_eq!(loaded, payload);
 
-        let header = peek_sol_header(&path).unwrap();
-        assert_eq!(header.iteration, payload.meta.iterations);
-        assert_eq!(
-            header.config_hash,
-            config_hash(payload.config_toml.as_bytes())
-        );
-
         let _ = std::fs::remove_file(&path);
     }
 
@@ -409,7 +380,6 @@ mod tests {
         let mut bytes = std::fs::read(&path).unwrap();
         bytes[0] = b'X';
         std::fs::write(&path, &bytes).unwrap();
-        assert!(matches!(peek_sol_header(&path), Err(SolError::BadMagic)));
         assert!(matches!(read_sol(&path), Err(SolError::BadMagic)));
         let _ = std::fs::remove_file(&path);
     }
@@ -421,7 +391,7 @@ mod tests {
         let mut bytes = std::fs::read(&path).unwrap();
         bytes[8..10].copy_from_slice(&99u16.to_le_bytes());
         std::fs::write(&path, &bytes).unwrap();
-        match peek_sol_header(&path) {
+        match read_sol(&path) {
             Err(SolError::BadVersion { found, expected }) => {
                 assert_eq!(found, 99);
                 assert_eq!(expected, FORMAT_VERSION);
@@ -437,14 +407,13 @@ mod tests {
         write_sol(&path, &sample_payload()).unwrap();
         let bytes = std::fs::read(&path).unwrap();
         std::fs::write(&path, &bytes[..HEADER_LEN - 5]).unwrap();
-        match peek_sol_header(&path) {
+        match read_sol(&path) {
             Err(SolError::Truncated { expected, actual }) => {
                 assert_eq!(expected, HEADER_LEN);
                 assert_eq!(actual, HEADER_LEN - 5);
             }
             other => panic!("expected Truncated, got {other:?}"),
         }
-        assert!(read_sol(&path).is_err());
         let _ = std::fs::remove_file(&path);
     }
 

@@ -579,22 +579,14 @@ but it means **bit-reproducible runs must set a fixed `run.sweeps` and leave
 `stop_dev_gain` unset**; the two knobs are not meant to be combined when
 exact reproducibility matters.
 
-Two config-and-estimator-only helpers exist in support of a later GUI "auto
-mode" (neither builds a card abstraction or a deal sampler, so both are fast
-enough to call before committing to a run):
-
-- `multiway::estimate_dense_arena(&MultiwayConfig) -> DenseArenaEstimate`
-  reuses the same tree enumeration and arena-sizing math as the
-  `recall = "street"` preflight, but drives it with a bucket-count-only stand-in
-  abstraction instead of a trained one, so it can size a hypothetical dense
-  arena for *any* bucket-count choice without paying rollout/EHS² training
-  cost.
-- `cli::auto_run::derive_auto_run(&MultiwayConfig, threads, memory_budget_bytes)
-  -> AutoRunDerivation` picks `sweep_batch = threads.div_ceil(seats)` and the
-  largest uniform bucket count from `[64, 128, 256, 512, 1024, 2048, 4096]`
-  that fits `memory_budget_bytes` per `estimate_dense_arena`, given the
-  caller's own thread/memory-budget facts (no machine detection happens
-  here).
+Two config-and-estimator-only helpers used to exist here in support of a
+GUI "auto mode" -- `multiway::estimate_dense_arena` (a pre-training
+dense-arena size estimate) and `cli::auto_run::derive_auto_run` (which picked
+`sweep_batch` and a bucket count from that estimate plus the caller's
+thread/memory-budget facts). Both were removed in 2026-07 as dormant
+GUI-support code with no production consumer (recoverable from git history
+if a future GUI needs them). The stop-rule half of "auto mode,"
+`run.stop_dev_gain` (above), remains live in the CLI.
 
 ### Strategy purification measurement (`solvers mw-eval --purify`)
 

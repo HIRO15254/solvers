@@ -50,20 +50,6 @@ pub enum SolverError {
     IncompleteSweepState,
     #[error("profile evaluation sample count must be positive")]
     ZeroEvaluationSamples,
-    #[error(
-        "evaluate_node_actions path index {index} at depth {depth} is out of range for \
-         {actions} legal actions"
-    )]
-    EvaluationPathIndexOutOfRange {
-        depth: usize,
-        index: usize,
-        actions: usize,
-    },
-    #[error(
-        "evaluate_node_actions path hit a terminal state at depth {depth} before reaching the \
-         requested node"
-    )]
-    EvaluationPathTerminalEarly { depth: usize },
     #[error("numeric accumulation exceeded f32 storage")]
     NumericOverflow,
     #[error("counter overflow")]
