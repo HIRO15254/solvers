@@ -7,6 +7,11 @@
 > `app/gui` の egui ネイティブ GUI)は削除した。後継は Web 技術による
 > 単一の GUI(静的 SPA)を Tauri 2 でネイティブアプリとして同梱する構成。
 > 旧 UI のプリセット TOML は `examples/presets/` に退避済み。
+>
+> **位置づけ(2026-07-20 決定)**: GUI 再構築は**仕様を本書に凍結した将来
+> タスク**であり、当面はマルチウェイ preflop ソルバーの CLI としての完成度
+> 向上を優先する。GUI に着手する際は本書後半のロードマップ(bridge 拡張 →
+> `app/ui` SPA → `app/desktop` Tauri → 配布 CI)にそのまま従うこと。
 
 ## 決定事項
 
@@ -99,7 +104,7 @@ toy game(Kuhn/Leduc)はエンジンのスモークチェック用 config とし�
 - bridge の health レスポンス `service: "solvers"` と `/v1` `/v2` の
   job API は GUI が接続確認・互換性検証に使う契約。
 
-## ロードマップ(このアプリ構成の残タスク)
+## GUI 実装ロードマップ(将来タスク — 着手時はこの順で)
 
 1. **bridge 拡張**(GUI の前提):
    - Origin なし + 有効トークンのリクエストを許可(非ブラウザクライアント)。

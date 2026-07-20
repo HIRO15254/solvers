@@ -25,10 +25,11 @@ Early development. See [docs/roadmap.md](docs/roadmap.md) for milestones.
 
 The project ships **one application** containing both a preflop solver (HU +
 2–9 player multiway) and a postflop solver (exact, fixed flop), selected by
-the config's `game.kind`. It is operated through a CLI and a bundled web-tech
-GUI that wraps it (Tauri shell + static SPA, in progress — the previous
-Next.js and egui UIs were removed in 2026-07). See
-[docs/app-structure.md](docs/app-structure.md).
+the config's `game.kind`. It is operated through a CLI; a bundled web-tech
+GUI that wraps it (Tauri shell + static SPA) is a planned future milestone
+with its spec frozen in [docs/app-structure.md](docs/app-structure.md) — the
+previous Next.js and egui UIs were removed in 2026-07. Near-term focus is
+the multiway preflop solver's CLI completeness.
 
 ```
 app/
