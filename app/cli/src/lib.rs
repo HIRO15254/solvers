@@ -25,7 +25,6 @@ pub mod config;
 pub mod inspect;
 pub mod multiway_solve;
 pub mod mw_eval;
-pub mod node_eval;
 pub mod postflop_setup;
 pub mod preflop_setup;
 pub mod report;

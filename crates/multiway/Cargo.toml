@@ -9,8 +9,6 @@ description = "Sampled 2-9 player NLHE solving with side pots and tournament uti
 [dependencies]
 abstraction = { workspace = true }
 cards = { workspace = true }
-hand-index = { workspace = true }
-anyhow = { workspace = true }
 blake3 = { workspace = true }
 postcard = { workspace = true }
 rand = { workspace = true }

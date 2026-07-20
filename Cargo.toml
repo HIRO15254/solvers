@@ -31,7 +31,6 @@ abstraction = { path = "crates/abstraction" }
 preflop = { path = "crates/preflop" }
 multiway = { path = "crates/multiway" }
 formats = { path = "crates/formats" }
-cli = { path = "app/cli" }
 
 # NOTE: aya_poker's "std" feature is broken in 0.1.0 (aya_base gates no_std on
 # `cfg(std)` instead of `feature = "std"`), so we use the default no_std build.
@@ -52,7 +51,6 @@ blake3 = "1"
 postcard = { version = "1", features = ["alloc", "use-std"] }
 zstd = "0.13"
 rustc-hash = "2"
-sysinfo = { version = "0.32", default-features = false, features = ["system"] }
 
 [profile.release]
 lto = "thin"

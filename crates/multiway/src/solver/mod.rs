@@ -504,7 +504,6 @@ pub struct SolverState {
 pub struct SolverMetrics {
     pub sweeps: u64,
     pub traversals: u64,
-    pub terminal_evaluations: u64,
     pub infosets: u64,
     pub memory_bytes: u64,
     pub total_deal_attempts: u64,
@@ -1896,7 +1895,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         SolverMetrics {
             sweeps: self.completed_sweeps,
             traversals: self.traversals,
-            terminal_evaluations: self.terminal_evaluations,
             infosets,
             memory_bytes,
             total_deal_attempts: self.total_deal_attempts,

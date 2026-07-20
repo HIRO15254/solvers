@@ -87,7 +87,7 @@ solvers/
     ├── hand-index/     # Waugh isomorphism 移植(BSD, attribution)。canonical_flops()。
     │                   # テストで 169/1,286,792/55,190,538/2,428,287,420 と 1,755/16,432/134,459 を固定
     ├── cfr-ref/        # scalar oracle。最適化禁止・凍結
-    ├── engine/         # ホットコア。deps: rayon, wide(feature "simd")
+    ├── engine/         # ホットコア。deps: rayon(+ optional serde)
     ├── game/           # GameSpec/TreeBuilder/payoff pipeline/toy(Kuhn, Leduc)
     ├── holdem/         # Mode A。deps: cards, hand-index, engine, game
     ├── abstraction/    # bucketing pipeline + disk cache。deps: cards, hand-index, rayon
@@ -266,4 +266,4 @@ Bunching は HU では厳密に無効なので実装しないが、range を「�
 | per-history State / 汎用 EFG framework | OpenSpiel の罠(実測 100–400x) |
 | 自作 hand evaluator | `aya_poker`(Zlib/Apache-2.0/MIT, OMPEval 系)で十分、しかもホットパス外。変種評価(lowball/Badugi/short-deck)も同 crate で賄える |
 
-主要依存(全て permissive): `aya_poker, rayon, serde, toml, postcard, zstd, blake3, clap, thiserror/anyhow, rand+rand_chacha, criterion(dev), wide(optional), ratatui(cli), pyo3/maturin(後), wasm-bindgen(後)`。
+主要依存(全て permissive): `aya_poker, rayon, serde, toml, postcard, zstd, blake3, clap, thiserror/anyhow, rand+rand_chacha, tiny_http(bridge), criterion(dev), pyo3/maturin(後), wasm-bindgen(後)`。(`wide` は実測で不採用 — `docs/bench.md` 参照。`ratatui` は未使用。)
