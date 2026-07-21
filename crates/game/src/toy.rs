@@ -212,7 +212,7 @@ impl Builder<'_> {
             if state.first_checked {
                 let next = BetState {
                     history: format!("{}c", state.history),
-                    ..state.clone()
+                    ..state
                 };
                 actions.push(("check".into(), self.end_round(next)));
             } else {
@@ -220,7 +220,7 @@ impl Builder<'_> {
                     to_act: actor.opponent(),
                     first_checked: true,
                     history: format!("{}c", state.history),
-                    ..state.clone()
+                    ..state
                 };
                 actions.push(("check".into(), self.betting(next)));
             }
@@ -234,7 +234,7 @@ impl Builder<'_> {
                     raises_used: state.raises_used + 1,
                     contrib,
                     history: format!("{}b", state.history),
-                    ..state.clone()
+                    ..state
                 };
                 actions.push(("bet".into(), self.betting(next)));
             }
@@ -242,7 +242,7 @@ impl Builder<'_> {
             // Fold.
             let fold_state = BetState {
                 history: format!("{}f", state.history),
-                ..state.clone()
+                ..state
             };
             actions.push((
                 "fold".into(),
@@ -256,7 +256,7 @@ impl Builder<'_> {
                     contrib,
                     outstanding: Chips::ZERO,
                     history: format!("{}k", state.history),
-                    ..state.clone()
+                    ..state
                 };
                 actions.push(("call".into(), self.end_round(next)));
             }
@@ -270,7 +270,7 @@ impl Builder<'_> {
                     raises_used: state.raises_used + 1,
                     contrib,
                     history: format!("{}r", state.history),
-                    ..state.clone()
+                    ..state
                 };
                 actions.push(("raise".into(), self.betting(next)));
             }
@@ -278,7 +278,7 @@ impl Builder<'_> {
 
         let tag = self.node_info.len() as u32;
         self.node_info.push(ToyNodeInfo {
-            history: state.history.clone(),
+            history: state.history,
             actions: actions.iter().map(|(name, _)| name.clone()).collect(),
         });
         TempNode::Action {

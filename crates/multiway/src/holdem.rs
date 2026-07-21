@@ -1,10 +1,10 @@
 //! Production adapter joining the betting, deal, settlement, utility, and
 //! abstraction layers into one generative no-limit Hold'em game.
 
-use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
 use cards::{combo_cards, rank_of};
+use rustc_hash::FxHashMap;
 
 use crate::abstraction::{BucketContext, BucketId, BucketPath, MultiwayAbstraction};
 use crate::betting::{Action, BettingState, HandPhase, SeatStatus};
@@ -20,7 +20,7 @@ use crate::settlement::{
 };
 use crate::solver::{ExternalSamplingGame, PrivateInfo};
 use crate::tree::DenseNodeContext;
-use crate::types::{CHIPS_PER_BB, MwChips, SeatId, SeatMask, SeatVec, Street};
+use crate::types::{CHIPS_PER_BB, MAX_SEATS, MwChips, SeatId, SeatMask, SeatVec, Street};
 
 const ICM_TERMINAL_CACHE_ENTRIES: usize = 65_536;
 
@@ -29,7 +29,7 @@ enum UtilityRuntime {
     ChipEv,
     TournamentIcm {
         calculator: Arc<PreparedIcm>,
-        terminal_cache: Arc<Mutex<HashMap<Vec<u64>, SeatVec<f64>>>>,
+        terminal_cache: Arc<Mutex<FxHashMap<[u64; MAX_SEATS], SeatVec<f64>>>>,
     },
 }
 
@@ -79,7 +79,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                     PreparedIcm::new(starting, outside_field, payouts.clone(), *samples, *seed)?;
                 UtilityRuntime::TournamentIcm {
                     calculator: Arc::new(calculator),
-                    terminal_cache: Arc::new(Mutex::new(HashMap::new())),
+                    terminal_cache: Arc::new(Mutex::new(FxHashMap::default())),
                 }
             }
         };
@@ -264,17 +264,17 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                 calculator,
                 terminal_cache,
             } => {
-                let key: Vec<u64> = settlement
-                    .final_stacks
-                    .iter()
-                    .map(|stack| stack.raw())
-                    .collect();
-                if let Some(cached) = terminal_cache
-                    .lock()
-                    .map_err(|_| HoldemGameError::IcmCachePoisoned)?
-                    .get(&key)
-                    .cloned()
-                {
+                let mut key = [0u64; MAX_SEATS];
+                for (slot, stack) in key.iter_mut().zip(&settlement.final_stacks) {
+                    *slot = stack.raw();
+                }
+                let cached = {
+                    let cache = terminal_cache
+                        .lock()
+                        .map_err(|_| HoldemGameError::IcmCachePoisoned)?;
+                    cache.get(&key).cloned()
+                };
+                if let Some(cached) = cached {
                     return Ok(cached);
                 }
                 let deltas = calculator.terminal_delta(&settlement.final_stacks)?.deltas;
@@ -284,6 +284,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                 if cache.len() < ICM_TERMINAL_CACHE_ENTRIES {
                     cache.entry(key).or_insert_with(|| deltas.clone());
                 }
+                drop(cache);
                 Ok(deltas)
             }
         }
@@ -438,7 +439,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                     .filter(|view| view.hero_eligible)
                     .filter_map(|view| view.best_opp_rank)
                     .collect();
-                let mut cache: HashMap<u64, f64> = HashMap::new();
+                let mut cache: FxHashMap<u64, f64> = FxHashMap::default();
                 out.reserve(combos.len());
                 for &combo in combos {
                     let (first, second) = combo_cards(combo);

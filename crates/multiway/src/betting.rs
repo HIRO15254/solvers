@@ -168,7 +168,7 @@ impl BettingState {
 
         // Forced contributions are applied in the v1 normative order:
         // individual antes, table-common dead money, then all live blinds.
-        for seat in seats.seats().collect::<Vec<_>>() {
+        for seat in config.seats.seats() {
             post(
                 &mut seats[seat],
                 config.forced_antes[seat],
@@ -180,7 +180,7 @@ impl BettingState {
             config.common_ante,
             Contribution::Common,
         );
-        for seat in seats.seats().collect::<Vec<_>>() {
+        for seat in config.seats.seats() {
             post(
                 &mut seats[seat],
                 config.forced_blinds[seat],
@@ -596,8 +596,8 @@ impl BettingState {
         self.last_full_raise = self.big_blind;
         self.full_wager_established = false;
         self.aggressive_actions = 0;
-        for seat in self.seats.seats().collect::<Vec<_>>() {
-            self.seats[seat].raise_reopen_at = None;
+        for index in 0..self.num_seats() {
+            self.seats[SeatId::new_unchecked(index as u8)].raise_reopen_at = None;
         }
         self.pending = self.active_mask();
         self.phase = HandPhase::Betting;
@@ -1088,7 +1088,7 @@ mod tests {
         // all-in target, so the merged and native all-in entries must dedup
         // to exactly one action.
         let actions = bb_state.legal_actions(&betting).unwrap();
-        let all_in_raises: Vec<_> = actions
+        let all_in_raises = actions
             .iter()
             .filter(|action| {
                 matches!(
@@ -1100,8 +1100,8 @@ mod tests {
                     }
                 )
             })
-            .collect();
-        assert_eq!(all_in_raises.len(), 1);
+            .count();
+        assert_eq!(all_in_raises, 1);
         assert!(!actions.iter().any(|action| matches!(
             action,
             Action::RaiseTo {

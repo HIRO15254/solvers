@@ -1563,10 +1563,7 @@ fn pruned_bucket_action_gets_no_update_and_others_are_unchanged() {
     // unpruned run (a real sweep was played against it) but is
     // unchanged in the pruned run (the visit that would have updated it
     // skipped that (bucket, action) pair entirely).
-    assert_ne!(
-        unpruned_dense.arena.regrets[unpruned_range.clone()][0],
-        -10.4
-    );
+    assert_ne!(unpruned_dense.arena.regrets[unpruned_range][0], -10.4);
     assert_eq!(pruned_dense.arena.regrets[pruned_range][0], -10.4);
 
     // (b) A pruning coin is drawn from the same `rng` stream used for

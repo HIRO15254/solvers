@@ -442,7 +442,7 @@ impl<'a> Repl<'a> {
         self.render_grid(&weights, &values);
     }
 
-    fn cmd_range(&mut self, arg: &str) {
+    fn cmd_range(&self, arg: &str) {
         let player = match arg {
             "oop" => Player::P0,
             "ip" => Player::P1,

@@ -431,7 +431,7 @@ fn asymmetric_ranges_suppress_iso_merging() {
     let sym = PostflopConfig {
         ranges: PerPlayer::new("44,55".parse().unwrap(), "33,66".parse().unwrap()),
         iso_merging: true,
-        ..base.clone()
+        ..base
     };
     let sym_off = PostflopConfig {
         iso_merging: false,
@@ -1044,7 +1044,7 @@ fn matching_raise_and_bet_fractions_reproduce_shared_size_tree() {
         ranges,
         pot: Chips(4),
         effective_stack: Chips(100),
-        bet_fractions: bet_fractions.clone(),
+        bet_fractions,
         raise_fractions: PerStreet {
             flop: PerPlayer::new(vec![], vec![]),
             turn: PerPlayer::new(vec![], vec![]),

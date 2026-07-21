@@ -851,6 +851,7 @@ dependencies = [
  "rand",
  "rand_chacha",
  "rayon",
+ "rustc-hash",
  "serde",
  "thiserror",
 ]

@@ -973,7 +973,7 @@ impl Counting<'_> {
                     to_act: opp,
                     checked: true,
                     history: String::new(),
-                    ..state.clone()
+                    ..state
                 };
                 self.post_betting(next);
             }
@@ -985,7 +985,7 @@ impl Counting<'_> {
             let call_state = PostState {
                 street_contrib,
                 history: String::new(),
-                ..state.clone()
+                ..state
             };
             self.street_end(call_state);
         }

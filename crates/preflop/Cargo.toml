@@ -12,6 +12,7 @@ engine.workspace = true
 game.workspace = true
 hand-index.workspace = true
 rayon.workspace = true
+rustc-hash.workspace = true
 serde.workspace = true
 postcard.workspace = true
 thiserror.workspace = true

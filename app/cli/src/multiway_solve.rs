@@ -544,7 +544,7 @@ fn run_inner(
         } else {
             0.0
         },
-        seats: last_row.seats.clone(),
+        seats: last_row.seats,
         strategy_blocks: snapshot.policies.len(),
         config_hash: formats::config_hash_hex(&mw_session.config_hash),
         effective_config,

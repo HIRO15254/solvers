@@ -39,17 +39,22 @@ pub fn has_v1_schema(raw: &str) -> Result<bool> {
     Ok(true)
 }
 
-pub fn parse_and_lower(raw: &str) -> Result<SolveConfig> {
+fn base_directory(config_path: &Path) -> &Path {
+    config_path.parent().unwrap_or_else(|| Path::new("."))
+}
+
+fn parse_and_lower_with_base(raw: &str, base_dir: Option<&Path>) -> Result<SolveConfig> {
     validate_decimal_chip_tokens(raw)?;
     let source: V1Config = toml::from_str(raw).context("parsing Multiway Preflop v1 config")?;
-    source.lower(None)
+    source.lower(base_dir)
+}
+
+pub fn parse_and_lower(raw: &str) -> Result<SolveConfig> {
+    parse_and_lower_with_base(raw, None)
 }
 
 pub fn parse_and_lower_at(raw: &str, config_path: &Path) -> Result<SolveConfig> {
-    validate_decimal_chip_tokens(raw)?;
-    let source: V1Config = toml::from_str(raw).context("parsing Multiway Preflop v1 config")?;
-    let base = config_path.parent().unwrap_or_else(|| Path::new("."));
-    source.lower(Some(base))
+    parse_and_lower_with_base(raw, Some(base_directory(config_path)))
 }
 
 pub fn probability_encoding(raw: &str) -> Result<ProbabilityEncoding> {
@@ -57,38 +62,39 @@ pub fn probability_encoding(raw: &str) -> Result<ProbabilityEncoding> {
     Ok(source.output.probability_encoding)
 }
 
-pub fn normalized_config(raw: &str) -> Result<serde_json::Value> {
-    validate_decimal_chip_tokens(raw)?;
-    parse_and_lower(raw).context("validating Multiway Preflop v1 config before normalization")?;
-    let mut source: V1Config = toml::from_str(raw).context("parsing Multiway Preflop v1 config")?;
-    source.materialize_effective()?;
-    serde_json::to_value(&source).context("serializing normalized Multiway Preflop v1 config")
-}
-pub fn normalized_toml(raw: &str) -> Result<String> {
-    let json = normalized_config(raw)?;
-    let value = json_to_toml(json)?.ok_or_else(|| anyhow!("effective config is empty"))?;
-    let normalized =
-        toml::to_string_pretty(&value).context("serializing effective Multiway Preflop v1 TOML")?;
-    parse_and_lower(&normalized).context("reparsing normalized Multiway Preflop v1 config")?;
-    Ok(normalized)
-}
-pub fn normalized_config_at(raw: &str, config_path: &Path) -> Result<serde_json::Value> {
-    validate_decimal_chip_tokens(raw)?;
-    parse_and_lower_at(raw, config_path)
+fn normalized_config_with_base(raw: &str, base_dir: Option<&Path>) -> Result<serde_json::Value> {
+    parse_and_lower_with_base(raw, base_dir)
         .context("validating Multiway Preflop v1 config before normalization")?;
     let mut source: V1Config = toml::from_str(raw).context("parsing Multiway Preflop v1 config")?;
-    let base = config_path.parent().unwrap_or_else(|| Path::new("."));
-    source.materialize_effective_at(base)?;
+    match base_dir {
+        Some(base_dir) => source.materialize_effective_at(base_dir)?,
+        None => source.materialize_effective()?,
+    }
     serde_json::to_value(&source).context("serializing normalized Multiway Preflop v1 config")
 }
 
-pub fn normalized_toml_at(raw: &str, config_path: &Path) -> Result<String> {
-    let json = normalized_config_at(raw, config_path)?;
+pub fn normalized_config(raw: &str) -> Result<serde_json::Value> {
+    normalized_config_with_base(raw, None)
+}
+
+pub fn normalized_config_at(raw: &str, config_path: &Path) -> Result<serde_json::Value> {
+    normalized_config_with_base(raw, Some(base_directory(config_path)))
+}
+
+fn normalized_toml_from_json(json: serde_json::Value) -> Result<String> {
     let value = json_to_toml(json)?.ok_or_else(|| anyhow!("effective config is empty"))?;
     let normalized =
         toml::to_string_pretty(&value).context("serializing effective Multiway Preflop v1 TOML")?;
     parse_and_lower(&normalized).context("reparsing normalized Multiway Preflop v1 config")?;
     Ok(normalized)
+}
+
+pub fn normalized_toml(raw: &str) -> Result<String> {
+    normalized_toml_from_json(normalized_config(raw)?)
+}
+
+pub fn normalized_toml_at(raw: &str, config_path: &Path) -> Result<String> {
+    normalized_toml_from_json(normalized_config_at(raw, config_path)?)
 }
 
 fn json_to_toml(value: serde_json::Value) -> Result<Option<toml::Value>> {
@@ -158,10 +164,10 @@ pub fn apply_solve_overrides(
 ) -> Result<String> {
     validate_decimal_chip_tokens(raw)?;
     let mut source: V1Config = toml::from_str(raw).context("parsing Multiway Preflop v1 config")?;
-    source.materialize_effective()?;
     if let Some(config_path) = config_path {
-        let base = config_path.parent().unwrap_or_else(|| Path::new("."));
-        source.materialize_effective_at(base)?;
+        source.materialize_effective_at(base_directory(config_path))?;
+    } else {
+        source.materialize_effective()?;
     }
     if matches!(source.run.resources.threads, AutoOrUsize::Auto) {
         source.run.resources.threads = AutoOrUsize::Name("auto".into());
@@ -461,10 +467,8 @@ fn parse_size_literal(source: &str) -> Result<SizeSpec> {
         .strip_prefix("geometric(allin,")
         .and_then(|value| value.strip_suffix(')'))
     {
-        let inner = inner
-            .trim()
-            .strip_prefix("streets=")
-            .unwrap_or(inner.trim());
+        let inner = inner.trim();
+        let inner = inner.strip_prefix("streets=").unwrap_or(inner);
         let streets = inner
             .parse::<u8>()
             .with_context(|| format!("invalid geometric street count in {source:?}"))?;

@@ -1330,7 +1330,7 @@ mod tests {
         let sampled: Vec<Vec<Card>> = canonical_flops()
             .into_iter()
             .step_by(50)
-            .map(|(b, _)| b.flop.clone())
+            .map(|(b, _)| b.flop)
             .collect();
         // closed_literal_boards assumes its turn cards don't collide with
         // the flop, so filter the 52 candidates per flop.

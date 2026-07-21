@@ -289,6 +289,42 @@ impl FrameBlockV4 {
     }
 }
 
+/// Largest-remainder quantization shared by the signed legacy codec and the
+/// unsigned v4 codec. Keeping the allocation and tie-breaking logic in one
+/// place prevents the two wire encodings from drifting apart.
+fn quantize_largest_remainder(probabilities: &[f32], denominator: u64) -> Vec<u64> {
+    let sum: f64 = probabilities.iter().map(|&p| f64::from(p)).sum();
+    if probabilities.is_empty() || sum <= 0.0 || !sum.is_finite() {
+        return vec![0; probabilities.len()];
+    }
+
+    let denominator_f64 = denominator as f64;
+    let mut quantized = Vec::with_capacity(probabilities.len());
+    let mut fractions = Vec::with_capacity(probabilities.len());
+    let mut floor_sum = 0u64;
+    for (index, &probability) in probabilities.iter().enumerate() {
+        let scaled = f64::from(probability) / sum * denominator_f64;
+        let floor = scaled.floor() as u64;
+        floor_sum = floor_sum.saturating_add(floor);
+        quantized.push(floor);
+        fractions.push((index, scaled - floor as f64));
+    }
+
+    let remainder = denominator
+        .saturating_sub(floor_sum)
+        .min(quantized.len() as u64);
+    fractions.sort_by(|&(index_a, fraction_a), &(index_b, fraction_b)| {
+        fraction_b
+            .partial_cmp(&fraction_a)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| index_a.cmp(&index_b))
+    });
+    for &(index, _) in fractions.iter().take(remainder as usize) {
+        quantized[index] += 1;
+    }
+    quantized
+}
+
 /// Quantizes probabilities to `i16` fixed point with denominator
 /// `i16::MAX` (32767) using the largest-remainder method, so
 /// `sum(quantized) == 32767` exactly and every entry is `>= 0`. Input need
@@ -296,36 +332,9 @@ impl FrameBlockV4 {
 /// tolerates the same `1e-4` slack `validate_strategy_block` allows.
 #[cfg(test)]
 fn quantize_i16(probabilities: &[f32]) -> Vec<i16> {
-    let denominator = f64::from(MWSOL_I16_DENOMINATOR);
-    let sum: f64 = probabilities.iter().map(|&p| f64::from(p)).sum();
-    if probabilities.is_empty() || sum <= 0.0 || !sum.is_finite() {
-        return vec![0; probabilities.len()];
-    }
-
-    let scaled: Vec<f64> = probabilities
-        .iter()
-        .map(|&p| f64::from(p) / sum * denominator)
-        .collect();
-    let mut floors: Vec<i64> = scaled.iter().map(|&value| value.floor() as i64).collect();
-    let floor_sum: i64 = floors.iter().sum();
-    let remainder = (MWSOL_I16_DENOMINATOR as i64 - floor_sum).clamp(0, floors.len() as i64);
-
-    let mut order: Vec<usize> = (0..probabilities.len()).collect();
-    order.sort_by(|&a, &b| {
-        let fraction_a = scaled[a] - floors[a] as f64;
-        let fraction_b = scaled[b] - floors[b] as f64;
-        fraction_b
-            .partial_cmp(&fraction_a)
-            .unwrap_or(std::cmp::Ordering::Equal)
-            .then_with(|| a.cmp(&b))
-    });
-    for &index in order.iter().take(remainder as usize) {
-        floors[index] += 1;
-    }
-
-    floors
+    quantize_largest_remainder(probabilities, MWSOL_I16_DENOMINATOR as u64)
         .into_iter()
-        .map(|value| value.clamp(0, i64::from(MWSOL_I16_DENOMINATOR)) as i16)
+        .map(|value| value.min(MWSOL_I16_DENOMINATOR as u64) as i16)
         .collect()
 }
 
@@ -333,36 +342,7 @@ fn quantize_i16(probabilities: &[f32]) -> Vec<i16> {
 /// Largest-remainder assignment and stable index tie-breaks preserve an exact
 /// encoded sum while keeping the result deterministic.
 fn quantize_u16(probabilities: &[f32]) -> Vec<u16> {
-    let denominator = f64::from(MWSOL_U16_DENOMINATOR);
-    let sum: f64 = probabilities.iter().map(|&p| f64::from(p)).sum();
-    if probabilities.is_empty() || sum <= 0.0 || !sum.is_finite() {
-        return vec![0; probabilities.len()];
-    }
-
-    let scaled: Vec<f64> = probabilities
-        .iter()
-        .map(|&p| f64::from(p) / sum * denominator)
-        .collect();
-    let mut floors: Vec<u64> = scaled.iter().map(|&value| value.floor() as u64).collect();
-    let floor_sum: u64 = floors.iter().sum();
-    let remainder = u64::from(MWSOL_U16_DENOMINATOR)
-        .saturating_sub(floor_sum)
-        .min(floors.len() as u64);
-
-    let mut order: Vec<usize> = (0..probabilities.len()).collect();
-    order.sort_by(|&a, &b| {
-        let fraction_a = scaled[a] - floors[a] as f64;
-        let fraction_b = scaled[b] - floors[b] as f64;
-        fraction_b
-            .partial_cmp(&fraction_a)
-            .unwrap_or(std::cmp::Ordering::Equal)
-            .then_with(|| a.cmp(&b))
-    });
-    for &index in order.iter().take(remainder as usize) {
-        floors[index] += 1;
-    }
-
-    floors
+    quantize_largest_remainder(probabilities, u64::from(MWSOL_U16_DENOMINATOR))
         .into_iter()
         .map(|value| value.min(u64::from(MWSOL_U16_DENOMINATOR)) as u16)
         .collect()
@@ -479,14 +459,7 @@ impl MultiwaySolutionMetadata {
     }
 
     fn actions_for_strategy(&self, key: MultiwayStrategyKey) -> Result<Vec<String>, MwSolError> {
-        let state = self
-            .public_states
-            .binary_search_by_key(&key.history, |state| state.history)
-            .ok()
-            .map(|index| &self.public_states[index])
-            .filter(|state| state.actor == Some(key.actor))
-            .ok_or(MwSolError::InvalidPublicStates)?;
-        Ok(state
+        Ok(public_state_for_strategy(&self.public_states, key)?
             .legal_actions
             .iter()
             .map(MultiwayPublicAction::label)
@@ -515,6 +488,17 @@ impl MultiwaySolutionMetadata {
     }
 }
 
+fn public_state_for_strategy(
+    public_states: &[MultiwayPublicState],
+    key: MultiwayStrategyKey,
+) -> Result<&MultiwayPublicState, MwSolError> {
+    public_states
+        .binary_search_by_key(&key.history, |state| state.history)
+        .ok()
+        .map(|index| &public_states[index])
+        .filter(|state| state.actor == Some(key.actor))
+        .ok_or(MwSolError::InvalidPublicStates)
+}
 impl MultiwaySolution {
     pub fn strategy(&self, key: MultiwayStrategyKey) -> Option<&MultiwayStrategyBlock> {
         self.strategies
@@ -562,19 +546,21 @@ impl MultiwaySolution {
         {
             return Err(MwSolError::InvalidStrategyWeights);
         }
+        let mut cached_public_node = None;
+        let mut expected_actions = Vec::new();
         for block in &self.strategies {
             validate_strategy_block(block, &self.histories)?;
-            let expected_actions = self
-                .public_states
-                .binary_search_by_key(&block.key.history, |state| state.history)
-                .ok()
-                .map(|index| &self.public_states[index])
-                .filter(|state| state.actor == Some(block.key.actor))
-                .ok_or(MwSolError::InvalidPublicStates)?
-                .legal_actions
-                .iter()
-                .map(MultiwayPublicAction::label)
-                .collect::<Vec<_>>();
+            let public_node = (block.key.history, block.key.actor);
+            if cached_public_node != Some(public_node) {
+                expected_actions.clear();
+                expected_actions.extend(
+                    public_state_for_strategy(&self.public_states, block.key)?
+                        .legal_actions
+                        .iter()
+                        .map(MultiwayPublicAction::label),
+                );
+                cached_public_node = Some(public_node);
+            }
             if block.actions != expected_actions {
                 return Err(MwSolError::InvalidStrategy(block.key));
             }
@@ -687,29 +673,53 @@ fn validate_histories(histories: &[MultiwayHistoryNode]) -> Result<(), MwSolErro
     if histories.windows(2).any(|pair| pair[0].key >= pair[1].key) {
         return Err(MwSolError::InvalidHistoryTrie);
     }
+
+    // Resolve every parent once. The previous per-node walk back to the root
+    // repeated the same ancestry scans and became quadratic on deep trees.
+    let mut parents = Vec::with_capacity(histories.len());
     for node in histories {
         if node.key == [0; 16]
             || node.key != history_child(node.parent, node.actor, node.action_index)
             || node.action.is_empty()
-            || (node.parent != [0; 16]
-                && histories
-                    .binary_search_by_key(&node.parent, |entry| entry.key)
-                    .is_err())
         {
             return Err(MwSolError::InvalidHistoryTrie);
         }
-        let mut key = node.key;
-        for depth in 0..=histories.len() {
-            if key == [0; 16] {
-                break;
+        let parent = if node.parent == [0; 16] {
+            None
+        } else {
+            Some(
+                histories
+                    .binary_search_by_key(&node.parent, |entry| entry.key)
+                    .map_err(|_| MwSolError::InvalidHistoryTrie)?,
+            )
+        };
+        parents.push(parent);
+    }
+
+    // Each node has at most one parent, so a three-color walk detects cycles
+    // in linear time after the parent lookup pass.
+    let mut state = vec![0u8; histories.len()];
+    let mut path = Vec::new();
+    for start in 0..histories.len() {
+        if state[start] == 2 {
+            continue;
+        }
+        path.clear();
+        let mut current = Some(start);
+        while let Some(index) = current {
+            match state[index] {
+                0 => {
+                    state[index] = 1;
+                    path.push(index);
+                    current = parents[index];
+                }
+                1 => return Err(MwSolError::InvalidHistoryTrie),
+                2 => break,
+                _ => unreachable!(),
             }
-            if depth == histories.len() {
-                return Err(MwSolError::InvalidHistoryTrie);
-            }
-            let index = histories
-                .binary_search_by_key(&key, |entry| entry.key)
-                .map_err(|_| MwSolError::InvalidHistoryTrie)?;
-            key = histories[index].parent;
+        }
+        for &index in &path {
+            state[index] = 2;
         }
     }
     Ok(())
@@ -1094,7 +1104,7 @@ impl MwSolReader {
                 return Err(MwSolError::InvalidStrategyWeights);
             }
             if format_version >= 4 {
-                metadata.actions_for_strategy(entry.key)?;
+                public_state_for_strategy(&metadata.public_states, entry.key)?;
             }
             if entry.offset != indexed_payload_len {
                 return Err(MwSolError::StrategyOffsetMismatch {
@@ -1379,7 +1389,7 @@ fn decompress_exact(
 fn hash_file_region(file: &mut File, start: u64, len: u64) -> Result<[u8; 32], MwSolError> {
     file.seek(SeekFrom::Start(start))?;
     let mut remaining = len;
-    let mut buffer = [0u8; 64 * 1024];
+    let mut buffer = vec![0u8; 64 * 1024];
     let mut hasher = blake3::Hasher::new();
     while remaining > 0 {
         let take = usize::try_from(remaining.min(buffer.len() as u64))
@@ -1898,6 +1908,25 @@ mod tests {
         ));
     }
 
+    #[test]
+    fn deep_history_trie_validation_is_stack_safe_and_linear_after_sorting() {
+        let mut histories = Vec::with_capacity(4_096);
+        let mut parent = [0; 16];
+        for action_index in 0..4_096u32 {
+            let actor = (action_index % 9) as u8;
+            let key = history_child(parent, actor, action_index);
+            histories.push(MultiwayHistoryNode {
+                key,
+                parent,
+                actor,
+                action_index,
+                action: "check".into(),
+            });
+            parent = key;
+        }
+        histories.sort_unstable_by_key(|node| node.key);
+        validate_histories(&histories).unwrap();
+    }
     /// Synthesizes a version-2 `.mwsol` file: same layout as production
     /// writes, but frames are plain postcard-encoded `MultiwayStrategyBlock`s
     /// (no `FrameBlock` wrapper) and the header declares version 2, exactly
@@ -1927,7 +1956,59 @@ mod tests {
     }
 
     #[test]
+    fn shared_quantizer_matches_the_previous_wire_algorithm() {
+        let reference = |probabilities: &[f32], denominator: u64| {
+            let sum: f64 = probabilities.iter().map(|&p| f64::from(p)).sum();
+            let scaled: Vec<f64> = probabilities
+                .iter()
+                .map(|&p| f64::from(p) / sum * denominator as f64)
+                .collect();
+            let mut floors: Vec<u64> = scaled.iter().map(|&value| value.floor() as u64).collect();
+            let floor_sum: u64 = floors.iter().sum();
+            let remainder = denominator
+                .saturating_sub(floor_sum)
+                .min(floors.len() as u64);
+            let mut order: Vec<usize> = (0..probabilities.len()).collect();
+            order.sort_by(|&a, &b| {
+                let fraction_a = scaled[a] - floors[a] as f64;
+                let fraction_b = scaled[b] - floors[b] as f64;
+                fraction_b
+                    .partial_cmp(&fraction_a)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+                    .then_with(|| a.cmp(&b))
+            });
+            for &index in order.iter().take(remainder as usize) {
+                floors[index] += 1;
+            }
+            floors
+        };
+
+        let mut random = 0x9e37_79b9_7f4a_7c15u64;
+        for len in 1..=32 {
+            let mut probabilities = Vec::with_capacity(len);
+            for _ in 0..len {
+                random = random
+                    .wrapping_mul(6_364_136_223_846_793_005)
+                    .wrapping_add(1);
+                probabilities.push(((random >> 32) as u32 % 10_000 + 1) as f32);
+            }
+            for denominator in [
+                MWSOL_I16_DENOMINATOR as u64,
+                u64::from(MWSOL_U16_DENOMINATOR),
+            ] {
+                assert_eq!(
+                    quantize_largest_remainder(&probabilities, denominator),
+                    reference(&probabilities, denominator)
+                );
+            }
+        }
+    }
+    #[test]
     fn quantize_i16_sums_exactly_and_stays_non_negative() {
+        assert_eq!(quantize_i16(&[0.5, 0.5]), vec![16_384, 16_383]);
+        assert_eq!(quantize_u16(&[0.5, 0.5]), vec![32_768, 32_767]);
+        assert_eq!(quantize_u16(&[1.0 / 3.0; 3]), vec![21_845; 3]);
+
         let cases: &[&[f32]] = &[
             &[1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0],
             &[0.9999, 0.0001],

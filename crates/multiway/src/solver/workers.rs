@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use super::support::*;
 use super::*;
 
@@ -705,6 +707,16 @@ impl<'a, G: ExternalSamplingGame> DenseTraversalWorker<'a, G> {
 ///   accumulating the average only where an opponent's single-hand line
 ///   happens to sample it starves it relative to the (already dense)
 ///   regret updates; the fix is to make the average dense too.
+struct BucketPolicy {
+    strategy: Vec<f64>,
+    prunable_actions: u64,
+}
+
+struct BucketUpdate {
+    weight_sum: f64,
+    reach_weight_sum: f64,
+    action_diffs: Vec<f64>,
+}
 pub(super) struct VectorTraversalWorker<'a, G: ExternalSamplingGame> {
     game: &'a G,
     tree: &'a PublicTree,
@@ -725,7 +737,7 @@ pub(super) struct VectorTraversalWorker<'a, G: ExternalSamplingGame> {
     /// every later traverser node on the same street within this traversal
     /// (board and bucket-active-opponents are fixed for a whole street; see
     /// `TreeNode::bucket_active_opponents`).
-    bucket_cache: [Option<Vec<BucketId>>; 4],
+    bucket_cache: [Option<Arc<[BucketId]>>; 4],
 }
 
 impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
@@ -862,16 +874,15 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                 let table = self
                     .game
                     .buckets_for_combos(&state, world, traverser, &self.combos);
-                self.bucket_cache[street_index] = Some(table);
+                self.bucket_cache[street_index] = Some(Arc::from(table));
             }
-            // Cloned (not borrowed) so the recursive `self.traverse` calls
-            // below, which need `&mut self`, don't conflict with a live
-            // borrow of `self.bucket_cache`. `BucketId` is a `u32`, so this
-            // is a cheap per-visit copy.
-            let bucket_table: Vec<BucketId> = self.bucket_cache[street_index]
-                .as_ref()
-                .expect("populated above")
-                .clone();
+            // Keep an owned, constant-time handle across recursive calls instead of
+            // cloning the full combo-to-bucket table at every traverser node.
+            let bucket_table = Arc::clone(
+                self.bucket_cache[street_index]
+                    .as_ref()
+                    .expect("populated above"),
+            );
 
             // Per-bucket regret-matched strategy for every bucket present
             // among the currently active combos (buckets absent from
@@ -882,38 +893,33 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
             // probability and regret below `prune_threshold` -- so no
             // second arena lookup is needed later.
             let prune_threshold = self.config.prune_threshold as f32;
-            let mut bucket_strategy: FxHashMap<BucketId, Vec<f64>> = FxHashMap::default();
-            // Per-bucket prunable (bucket, action) pairs as a bitmask over
-            // action indices (one `u64` per unique bucket, no per-bucket
-            // allocation -- a `Vec<bool>` variant measurably slowed
-            // deep-threshold runs where nothing is ever prunable), plus the
-            // per-action OR across every bucket so the "anything prunable
-            // for this action?" test below is O(1). Actions past index 63
-            // are simply never prunable; real trees have far fewer actions
-            // per node.
-            let mut bucket_prunable: FxHashMap<BucketId, u64> = FxHashMap::default();
-            let mut any_prunable: u64 = 0;
+            let mut bucket_policies: FxHashMap<BucketId, BucketPolicy> = FxHashMap::default();
+            // Per-bucket prunable actions are stored beside the strategy,
+            // avoiding a second hash table and lookup throughout this node.
+            // Actions past index 63 are never prunable; real trees have far
+            // fewer actions per node.
+            let mut any_prunable = 0u64;
             for &idx in active {
                 let bucket = bucket_table[idx];
-                if let Entry::Vacant(entry) = bucket_strategy.entry(bucket) {
+                if let Entry::Vacant(entry) = bucket_policies.entry(bucket) {
                     let range = self.arena.slot_range(node_id, bucket)?;
                     let regrets = &self.arena.regrets[range];
-                    let sigma = regret_matching(regrets);
+                    let strategy = regret_matching(regrets);
+                    let mut prunable_actions = 0u64;
                     if self.config.prune {
-                        let mut mask = 0u64;
                         for (action, (&probability, &regret)) in
-                            sigma.iter().zip(regrets.iter()).enumerate().take(64)
+                            strategy.iter().zip(regrets.iter()).enumerate().take(64)
                         {
                             if probability == 0.0 && regret < prune_threshold {
-                                mask |= 1u64 << action;
+                                prunable_actions |= 1u64 << action;
                             }
                         }
-                        if mask != 0 {
-                            any_prunable |= mask;
-                            bucket_prunable.insert(bucket, mask);
-                        }
                     }
-                    entry.insert(sigma);
+                    any_prunable |= prunable_actions;
+                    entry.insert(BucketPolicy {
+                        strategy,
+                        prunable_actions,
+                    });
                 }
             }
 
@@ -924,17 +930,15 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
             // when pruning is enabled and something is prunable for this
             // action -- so a `prune = false` (or nothing-prunable)
             // traversal never advances `rng` any differently than before
-            // this feature existed.
-            let mut action_skips_pruned: Vec<bool> = vec![false; num_actions];
-            let mut skipped_mask: u64 = 0;
-            if any_prunable != 0 {
-                for (action, skip) in action_skips_pruned.iter_mut().enumerate().take(64) {
-                    if any_prunable & (1u64 << action) != 0 {
-                        let needle = rng.gen_range(0.0..1.0);
-                        *skip = needle < self.config.prune_skip_probability;
-                        if *skip {
-                            skipped_mask |= 1u64 << action;
-                        }
+            // this feature existed. A single bitmask also avoids allocating
+            // one `Vec<bool>` at every traverser node.
+            let mut skipped_mask = 0u64;
+            for action in 0..num_actions.min(64) {
+                let action_bit = 1u64 << action;
+                if any_prunable & action_bit != 0 {
+                    let needle = rng.gen_range(0.0..1.0);
+                    if needle < self.config.prune_skip_probability {
+                        skipped_mask |= action_bit;
                     }
                 }
             }
@@ -942,7 +946,8 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
             let mut action_values: Vec<Vec<f64>> = Vec::with_capacity(num_actions);
             for action in 0..num_actions {
                 let next_state = self.game.next_state_with(&state, &actions, action);
-                let child_value = if action_skips_pruned[action] {
+                let skips_pruned = action < 64 && skipped_mask & (1u64 << action) != 0;
+                let child_value = if skips_pruned {
                     // Combo-subset descent: drop combos whose bucket is a
                     // pruning candidate for this action. Their
                     // regret-matched probability is exactly zero, so they
@@ -953,9 +958,8 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                     let mut child_active = Vec::with_capacity(active_len);
                     let mut child_positions = Vec::with_capacity(active_len);
                     for (pos, &idx) in active.iter().enumerate() {
-                        let pruned = bucket_prunable
-                            .get(&bucket_table[idx])
-                            .is_some_and(|&mask| mask & action_bit != 0);
+                        let pruned =
+                            bucket_policies[&bucket_table[idx]].prunable_actions & action_bit != 0;
                         if !pruned {
                             child_active.push(idx);
                             child_positions.push(pos);
@@ -970,7 +974,7 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                                 .iter()
                                 .zip(child_positions.iter())
                                 .map(|(&idx, &pos)| {
-                                    let strategy = &bucket_strategy[&bucket_table[idx]];
+                                    let strategy = &bucket_policies[&bucket_table[idx]].strategy;
                                     own_reach[pos] * strategy[action]
                                 })
                                 .collect();
@@ -1004,7 +1008,7 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                             // `action`.
                             let mut child_own_reach = vec![0.0; active_len];
                             for (pos, &idx) in active.iter().enumerate() {
-                                let strategy = &bucket_strategy[&bucket_table[idx]];
+                                let strategy = &bucket_policies[&bucket_table[idx]].strategy;
                                 child_own_reach[pos] = own_reach[pos] * strategy[action];
                             }
                             self.traverse(
@@ -1032,7 +1036,7 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
             let mut node_value = vec![0.0; active_len];
             for (pos, value) in node_value.iter_mut().enumerate() {
                 let idx = active[pos];
-                let strategy = &bucket_strategy[&bucket_table[idx]];
+                let strategy = &bucket_policies[&bucket_table[idx]].strategy;
                 let mut total = 0.0;
                 for (action, values) in action_values.iter().enumerate() {
                     total += strategy[action] * values[pos];
@@ -1048,29 +1052,30 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
             // by `sum_{h in F, B(h)=b} weight(h)` -- the feasible-weighted
             // mean described on `Self`. The same pass also accumulates
             // `sum_{h in F, B(h)=b} weight(h) * own_reach(h)`, the dense
-            // average-strategy mass for bucket b at this node (see `Self`'s
-            // doc comment) -- deliberately a separate accumulator from
-            // `bucket_weight_sum`, which stays reach-free for the regret
-            // aggregation above.
-            let mut bucket_weight_sum: FxHashMap<BucketId, f64> = FxHashMap::default();
-            let mut bucket_diff_sum: FxHashMap<BucketId, Vec<f64>> = FxHashMap::default();
-            let mut bucket_reach_weight_sum: FxHashMap<BucketId, f64> = FxHashMap::default();
+            // average-strategy mass for bucket b at this node. Keeping all
+            // three values in one record reduces three hash-table probes per
+            // combo to one without changing floating-point accumulation order.
+            let mut bucket_updates: FxHashMap<BucketId, BucketUpdate> = FxHashMap::default();
             for (pos, &idx) in active.iter().enumerate() {
                 let bucket = bucket_table[idx];
                 let weight = self.weights[idx];
-                *bucket_weight_sum.entry(bucket).or_insert(0.0) += weight;
-                *bucket_reach_weight_sum.entry(bucket).or_insert(0.0) += weight * own_reach[pos];
-                let diffs = bucket_diff_sum
+                let update = bucket_updates
                     .entry(bucket)
-                    .or_insert_with(|| vec![0.0; num_actions]);
+                    .or_insert_with(|| BucketUpdate {
+                        weight_sum: 0.0,
+                        reach_weight_sum: 0.0,
+                        action_diffs: vec![0.0; num_actions],
+                    });
+                update.weight_sum += weight;
+                update.reach_weight_sum += weight * own_reach[pos];
+
                 // A (bucket, action) pair that this visit actually pruned
                 // gets exactly no regret update -- not a `weight * (0.0 -
                 // node_value)` update -- because the action was never
-                // sampled for this bucket this visit. One hash lookup per
-                // combo (not per combo x action), and zero when nothing was
+                // sampled for this bucket this visit. Zero when nothing was
                 // skipped at this node.
                 let pruned_mask = if skipped_mask != 0 {
-                    skipped_mask & bucket_prunable.get(&bucket).copied().unwrap_or(0)
+                    skipped_mask & bucket_policies[&bucket].prunable_actions
                 } else {
                     0
                 };
@@ -1078,21 +1083,18 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                     if action < 64 && pruned_mask & (1u64 << action) != 0 {
                         continue;
                     }
-                    diffs[action] += weight * (values[pos] - node_value[pos]);
+                    update.action_diffs[action] += weight * (values[pos] - node_value[pos]);
                 }
             }
-            for (bucket, weight_sum) in bucket_weight_sum {
+            for (bucket, mut update) in bucket_updates {
                 // Every bucket present in `bucket_table` has at least one
                 // feasible member with positive range weight, so this is
                 // always strictly positive; the guard is defensive only.
-                if weight_sum <= 0.0 {
+                if update.weight_sum <= 0.0 {
                     continue;
                 }
-                let mut diffs = bucket_diff_sum
-                    .remove(&bucket)
-                    .expect("weight sum and diff sum are populated together above");
-                for value in diffs.iter_mut() {
-                    let scaled = sample_importance * (*value / weight_sum);
+                for value in &mut update.action_diffs {
+                    let scaled = sample_importance * (*value / update.weight_sum);
                     if !scaled.is_finite() {
                         return Err(SolverError::NumericOverflow);
                     }
@@ -1101,7 +1103,7 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                 let column = self.arena.column_id(node_id, bucket)?;
                 self.events.push(DenseEvent::AddRegret {
                     column,
-                    values: diffs,
+                    values: update.action_diffs,
                 });
 
                 // Dense average-strategy accumulation: unlike regret, this
@@ -1113,12 +1115,13 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                 // was pruned upstream by a zero-probability ancestor
                 // action) contributes nothing, so it's skipped rather than
                 // pushing a no-op event.
-                let mass = bucket_reach_weight_sum.remove(&bucket).unwrap_or(0.0);
-                if mass > 0.0 {
-                    let sigma = &bucket_strategy[&bucket];
+                if update.reach_weight_sum > 0.0 {
+                    let sigma = &bucket_policies[&bucket].strategy;
                     let values: Vec<f64> = sigma
                         .iter()
-                        .map(|&probability| self.linear_weight * mass * probability)
+                        .map(|&probability| {
+                            self.linear_weight * update.reach_weight_sum * probability
+                        })
                         .collect();
                     self.events.push(DenseEvent::AddStrategy { column, values });
                 }

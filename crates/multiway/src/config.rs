@@ -1351,7 +1351,7 @@ stack_bb = 12
         let toml_text = toml::to_string(&config).unwrap();
         assert!(!toml_text.contains("recall"));
 
-        let mut street = config.clone();
+        let mut street = config;
         street.abstraction.recall = RecallMode::Street;
         let street_json = serde_json::to_string(&street.abstraction).unwrap();
         assert!(street_json.contains("\"recall\":\"street\""));
@@ -1376,7 +1376,7 @@ stack_bb = 12
         let toml_text = toml::to_string(&config).unwrap();
         assert!(!toml_text.contains("rollout-kmeans"));
 
-        let mut ehs2 = config.clone();
+        let mut ehs2 = config;
         ehs2.abstraction.kind = AbstractionKind::Ehs2Table;
         let ehs2_json = serde_json::to_string(&ehs2.abstraction).unwrap();
         assert!(ehs2_json.contains("\"kind\":\"ehs2-table\""));
@@ -1429,7 +1429,7 @@ stack_bb = 12
         let toml_text = toml::to_string(&config).unwrap();
         assert!(!toml_text.contains("max_betting_players"));
 
-        let mut capped = config.clone();
+        let mut capped = config;
         capped.betting.flop.max_betting_players = Some(2);
         let capped_json = serde_json::to_string(&capped.betting.flop).unwrap();
         assert!(capped_json.contains("\"max_betting_players\":2"));

@@ -28,10 +28,11 @@ serde_json = { workspace = true }
 tempfile = { workspace = true }
 tiny_http = { workspace = true }
 
+toml = { workspace = true }
+toml_edit = { workspace = true }
+
 [target.'cfg(unix)'.dependencies]
 libc = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { workspace = true }
-toml = { workspace = true }
-toml_edit = { workspace = true }

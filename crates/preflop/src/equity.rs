@@ -33,7 +33,6 @@
 //! release mode; [`EquityTable::load_or_compute`] adds an optional disk
 //! cache (postcard, magic + version header) so repeated CLI runs skip it.
 
-use std::collections::HashMap;
 use std::io::Write;
 use std::path::Path;
 
@@ -42,6 +41,7 @@ use cards::{Card, HandRank, NUM_CLASSES, NUM_COMBOS, combo_cards, rank_of};
 use hand_index::SuitPerm;
 use hand_index::{all_suit_perms, permute_card};
 use rayon::prelude::*;
+use rustc_hash::FxHashMap;
 
 use crate::classes::{class_of_combo, compat_counts};
 
@@ -146,7 +146,8 @@ fn permute_board(perm: &SuitPerm, board: [Card; 5]) -> [Card; 5] {
 /// (summing to `C(52, 5) = 2,598,960`).
 pub(crate) fn canonical_boards() -> Vec<([Card; 5], u32)> {
     let all: Vec<Card> = cards::ALL_CARDS.into_iter().collect();
-    let mut counts: HashMap<[u8; 5], u32> = HashMap::with_capacity(140_000);
+    let mut counts: FxHashMap<[u8; 5], u32> = FxHashMap::default();
+    counts.reserve(140_000);
     for i in 0..52 {
         for j in (i + 1)..52 {
             for k in (j + 1)..52 {

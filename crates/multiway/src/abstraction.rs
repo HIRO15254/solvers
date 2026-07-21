@@ -5,7 +5,6 @@
 //! count is part of every query so an abstraction can distinguish, for
 //! example, heads-up river strength from strength against five ranges.
 
-use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::path::Path;
 use std::sync::Mutex;
@@ -18,6 +17,7 @@ use cards::{
 use rand::SeedableRng;
 use rand::seq::SliceRandom;
 use rand_chacha::ChaCha20Rng;
+use rustc_hash::FxHashMap;
 
 use crate::types::Street;
 
@@ -594,7 +594,7 @@ impl RolloutKMeansBuilder {
             bucket_counts,
             sets,
             fingerprint,
-            assignment_cache: Mutex::new(HashMap::new()),
+            assignment_cache: Mutex::new(FxHashMap::default()),
         })
     }
 }
@@ -608,7 +608,7 @@ pub struct RolloutKMeansAbstraction {
     bucket_counts: [StreetBucketCounts; 8],
     sets: Vec<CentroidSet>,
     fingerprint: [u8; 32],
-    assignment_cache: Mutex<HashMap<RolloutKey, BucketId>>,
+    assignment_cache: Mutex<FxHashMap<RolloutKey, BucketId>>,
 }
 
 impl RolloutKMeansAbstraction {
@@ -911,16 +911,22 @@ impl MultiwayAbstraction for RolloutKMeansAbstraction {
             // the Monte Carlo work happens above, not while holding the
             // mutex, so a batch never blocks unrelated cache readers/writers
             // for the duration of a rollout.
-            let computed: Vec<(usize, RolloutKey, BucketId)> = misses
-                .iter()
-                .map(|&index| {
-                    let key = keys[index];
+            let mut computed = Vec::with_capacity(misses.len());
+            let mut batch_buckets = FxHashMap::default();
+            batch_buckets.reserve(misses.len());
+            for &index in &misses {
+                let key = keys[index];
+                let bucket = if let Some(&bucket) = batch_buckets.get(&key) {
+                    bucket
+                } else {
                     let hole = [Card::from_index(key.hole[0]), Card::from_index(key.hole[1])];
                     let features = stream.features_for_hole(hole);
                     let bucket = nearest_centroid(features, &set.centroids) as BucketId;
-                    (index, key, bucket)
-                })
-                .collect();
+                    batch_buckets.insert(key, bucket);
+                    bucket
+                };
+                computed.push((index, key, bucket));
+            }
             let mut cache = self
                 .assignment_cache
                 .lock()
