@@ -301,6 +301,7 @@ dependencies = [
  "formats",
  "game",
  "holdem",
+ "libc",
  "multiway",
  "preflop",
  "rand",
@@ -310,6 +311,8 @@ dependencies = [
  "tempfile",
  "tiny_http",
  "toml",
+ "toml_edit",
+ "windows-sys",
 ]
 
 [[package]]

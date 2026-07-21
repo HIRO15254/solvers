@@ -12,6 +12,7 @@ use cards::Range;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::rake_condition::{CompiledRakeCondition, compile as compile_rake_condition};
 use crate::types::{MAX_SEATS, MIN_SEATS, MwChips, SeatId, SeatVec, Street};
 
 const DEFAULT_RANGE: &str = "";
@@ -27,6 +28,8 @@ pub struct MultiwayConfig {
     pub ante: AnteConfig,
     #[serde(default)]
     pub betting: BettingConfig,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub forced_bets: Option<ForcedBetConfig>,
     #[serde(default)]
     pub abstraction: AbstractionConfig,
 }
@@ -90,6 +93,18 @@ pub enum AnteConfig {
     },
 }
 
+/// Normalized v1 forced contributions. Legacy configs leave this absent and
+/// derive the usual SB/BB plus table ante from `blinds` and `ante`.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ForcedBetConfig {
+    pub blinds_bb: Vec<f64>,
+    pub antes_bb: Vec<f64>,
+    #[serde(default)]
+    pub common_ante_bb: f64,
+    pub nominal_big_blind_bb: f64,
+    pub first_to_act: SeatId,
+}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct BettingConfig {
@@ -103,6 +118,8 @@ pub struct BettingConfig {
     pub turn: StreetBettingConfig,
     #[serde(default = "default_postflop_betting")]
     pub river: StreetBettingConfig,
+    #[serde(default)]
+    pub rules: Vec<TreeRule>,
 }
 
 impl Default for BettingConfig {
@@ -113,6 +130,7 @@ impl Default for BettingConfig {
             flop: default_postflop_betting(),
             turn: default_postflop_betting(),
             river: default_postflop_betting(),
+            rules: Vec::new(),
         }
     }
 }
@@ -126,6 +144,60 @@ impl BettingConfig {
             Street::River => &self.river,
         }
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct TreeRule {
+    pub priority: i32,
+    pub source_order: u32,
+    pub street: RuleStreet,
+    pub condition: String,
+    pub effect: RuleEffect,
+    pub action: Option<RuleAction>,
+    pub sizes: Vec<SizeSpec>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum RuleStreet {
+    Preflop,
+    Flop,
+    Turn,
+    River,
+    Postflop,
+}
+
+impl RuleStreet {
+    pub fn matches(self, street: Street) -> bool {
+        match self {
+            Self::Preflop => street == Street::Preflop,
+            Self::Flop => street == Street::Flop,
+            Self::Turn => street == Street::Turn,
+            Self::River => street == Street::River,
+            Self::Postflop => street != Street::Preflop,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum RuleEffect {
+    Add,
+    Remove,
+    Replace,
+    Force,
+    Checkdown,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum RuleAction {
+    Fold,
+    Check,
+    Call,
+    Bet,
+    Raise,
 }
 
 fn default_true() -> bool {
@@ -180,7 +252,7 @@ fn default_max_aggressive_actions() -> u8 {
 
 fn default_preflop_betting() -> StreetBettingConfig {
     StreetBettingConfig {
-        bet_sizes: vec![SizeSpec::ToBb { value: 2.5 }],
+        bet_sizes: vec![SizeSpec::PreviousBetMultiple { factor: 2.5 }],
         isolate_sizes: None,
         raise_sizes: vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
         max_aggressive_actions: 4,
@@ -226,6 +298,13 @@ pub enum SizeSpec {
     /// name-tagged-serialization reason as `MinRaise`.
     StackFraction {
         fraction: f64,
+    },
+    AllIn,
+    EffectiveStackFraction {
+        fraction: f64,
+    },
+    GeometricAllIn {
+        streets: u8,
     },
 }
 
@@ -388,6 +467,23 @@ pub struct FieldPlayerConfig {
     pub stack_bb: f64,
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum RakeAllocation {
+    #[default]
+    MainFirst,
+    Proportional,
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum RakeRounding {
+    #[default]
+    Down,
+    Nearest,
+    Up,
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum RakeConfig {
@@ -398,6 +494,13 @@ pub enum RakeConfig {
         cap_bb: f64,
         #[serde(default)]
         no_flop_no_drop: bool,
+    },
+    Generic {
+        rate: f64,
+        cap_bb: Option<f64>,
+        when: String,
+        allocation: RakeAllocation,
+        rounding: RakeRounding,
     },
     GgPreflop {
         rate: f64,
@@ -413,6 +516,11 @@ pub struct ValidatedMultiwayConfig {
     pub blinds: ValidatedBlinds,
     pub ante: ValidatedAnte,
     pub betting: BettingConfig,
+    pub forced_blinds: SeatVec<MwChips>,
+    pub forced_antes: SeatVec<MwChips>,
+    pub common_ante: MwChips,
+    pub nominal_big_blind: MwChips,
+    pub preflop_first_to_act: SeatId,
     pub abstraction: AbstractionConfig,
 }
 
@@ -444,6 +552,13 @@ pub enum CompiledRake {
         rate: f64,
         cap: MwChips,
         no_flop_no_drop: bool,
+    },
+    Generic {
+        rate: f64,
+        cap: Option<MwChips>,
+        when: CompiledRakeCondition,
+        allocation: RakeAllocation,
+        rounding: RakeRounding,
     },
     GgPreflop {
         rate: f64,
@@ -515,6 +630,36 @@ impl MultiwayConfig {
             AnteConfig::BigBlind { amount_bb } => nonnegative_finite("ante.amount_bb", amount_bb)?,
         }
 
+        if let Some(forced) = &self.forced_bets {
+            if forced.blinds_bb.len() != num_seats || forced.antes_bb.len() != num_seats {
+                return Err(ConfigError::ForcedBetCount {
+                    expected: num_seats,
+                    blinds: forced.blinds_bb.len(),
+                    antes: forced.antes_bb.len(),
+                });
+            }
+            if forced.first_to_act.index() >= num_seats {
+                return Err(ConfigError::FirstActor {
+                    actor: forced.first_to_act.index(),
+                    num_seats,
+                });
+            }
+            nonnegative_finite(
+                "forced_bets.nominal_big_blind_bb",
+                forced.nominal_big_blind_bb,
+            )?;
+            nonnegative_finite("forced_bets.common_ante_bb", forced.common_ante_bb)?;
+            for (seat, &amount) in forced.blinds_bb.iter().enumerate() {
+                nonnegative_finite(&format!("forced_bets.blinds_bb[{seat}]"), amount)?;
+            }
+            for (seat, &amount) in forced.antes_bb.iter().enumerate() {
+                nonnegative_finite(&format!("forced_bets.antes_bb[{seat}]"), amount)?;
+            }
+            let maximum = forced.blinds_bb.iter().copied().fold(0.0, f64::max);
+            if maximum != forced.nominal_big_blind_bb {
+                return Err(ConfigError::NominalBlind);
+            }
+        }
         validate_betting(&self.betting)?;
         if self.abstraction.flop_buckets == 0
             || self.abstraction.turn_buckets == 0
@@ -593,6 +738,45 @@ impl MultiwayConfig {
                 MwChips::try_from_bb(amount_bb).expect("validated ante must convert"),
             ),
         };
+        let num_seats = self.seats.len();
+        let small_blind_seat = if num_seats == 2 {
+            self.button
+        } else {
+            self.button.next(num_seats)
+        };
+        let big_blind_seat = small_blind_seat.next(num_seats);
+        let mut forced_blinds = vec![MwChips::ZERO; num_seats];
+        forced_blinds[small_blind_seat.index()] =
+            MwChips::try_from_bb(self.blinds.small_bb).expect("validated blind must convert");
+        forced_blinds[big_blind_seat.index()] =
+            MwChips::try_from_bb(self.blinds.big_bb).expect("validated blind must convert");
+        let mut forced_antes = vec![MwChips::ZERO; num_seats];
+        let mut common_ante = MwChips::ZERO;
+        match ante {
+            ValidatedAnte::None => {}
+            ValidatedAnte::Each(amount) => forced_antes.fill(amount),
+            ValidatedAnte::BigBlind(amount) => common_ante = amount,
+        }
+        let mut nominal_big_blind =
+            MwChips::try_from_bb(self.blinds.big_bb).expect("validated blind must convert");
+        let mut preflop_first_to_act = big_blind_seat.next(num_seats);
+        if let Some(forced) = &self.forced_bets {
+            forced_blinds = forced
+                .blinds_bb
+                .iter()
+                .map(|&value| MwChips::try_from_bb(value).expect("validated blind must convert"))
+                .collect();
+            forced_antes = forced
+                .antes_bb
+                .iter()
+                .map(|&value| MwChips::try_from_bb(value).expect("validated ante must convert"))
+                .collect();
+            common_ante = MwChips::try_from_bb(forced.common_ante_bb)
+                .expect("validated common ante must convert");
+            nominal_big_blind = MwChips::try_from_bb(forced.nominal_big_blind_bb)
+                .expect("validated nominal blind must convert");
+            preflop_first_to_act = forced.first_to_act;
+        }
         Ok(ValidatedMultiwayConfig {
             seats: SeatVec::new_unchecked(seats),
             button: self.button,
@@ -604,6 +788,11 @@ impl MultiwayConfig {
             },
             ante,
             betting: self.betting.clone(),
+            forced_blinds: SeatVec::new_unchecked(forced_blinds),
+            forced_antes: SeatVec::new_unchecked(forced_antes),
+            common_ante,
+            nominal_big_blind,
+            preflop_first_to_act,
             abstraction: self.abstraction.clone(),
         })
     }
@@ -687,6 +876,30 @@ impl RakeConfig {
                     no_flop_no_drop,
                 })
             }
+            RakeConfig::Generic {
+                rate,
+                cap_bb,
+                ref when,
+                allocation,
+                rounding,
+            } => {
+                rate_value(rate)?;
+                let cap = cap_bb
+                    .map(|cap_bb| {
+                        nonnegative_finite("rake.cap_bb", cap_bb)?;
+                        MwChips::try_from_bb(cap_bb)
+                            .map_err(|_| ConfigError::Number("rake.cap_bb".into()))
+                    })
+                    .transpose()?;
+                let when = compile_rake_condition(when).map_err(ConfigError::RakeCondition)?;
+                Ok(CompiledRake::Generic {
+                    rate,
+                    cap,
+                    when,
+                    allocation,
+                    rounding,
+                })
+            }
             RakeConfig::GgPreflop {
                 rate,
                 cap_bb,
@@ -720,6 +933,14 @@ fn validate_size_spec(size: &SizeSpec) -> Result<(), ConfigError> {
         }
         SizeSpec::MinRaise => Ok(()),
         SizeSpec::StackFraction { fraction } => positive_finite("size.stack-fraction", fraction),
+        SizeSpec::AllIn => Ok(()),
+        SizeSpec::EffectiveStackFraction { fraction } => {
+            positive_finite("size.effective-stack-fraction", fraction)
+        }
+        SizeSpec::GeometricAllIn { streets } if streets > 0 => Ok(()),
+        SizeSpec::GeometricAllIn { .. } => {
+            Err(ConfigError::Number("size.geometric streets".into()))
+        }
     }
 }
 
@@ -763,6 +984,54 @@ fn validate_betting(config: &BettingConfig) -> Result<(), ConfigError> {
             }
         } else if section.max_betting_players == Some(0) {
             return Err(ConfigError::MaxBettingPlayers);
+        }
+    }
+    if config.rules.len() > 256 {
+        return Err(ConfigError::TreeRule(
+            "at most 256 tree rules are allowed".into(),
+        ));
+    }
+    for (index, rule) in config.rules.iter().enumerate() {
+        if rule.condition.trim().is_empty() {
+            return Err(ConfigError::TreeRule(format!(
+                "tree rule {index} has an empty condition"
+            )));
+        }
+        crate::tree_rules::validate_condition(&rule.condition).map_err(ConfigError::TreeRule)?;
+        match rule.effect {
+            RuleEffect::Checkdown if rule.action.is_none() && rule.sizes.is_empty() => {}
+            RuleEffect::Checkdown => {
+                return Err(ConfigError::TreeRule(format!(
+                    "checkdown tree rule {index} must omit action and sizes"
+                )));
+            }
+            _ if rule.action.is_none() => {
+                return Err(ConfigError::TreeRule(format!(
+                    "tree rule {index} requires an action"
+                )));
+            }
+            _ => {}
+        }
+        if rule.sizes.len() > 32 {
+            return Err(ConfigError::TreeRule(format!(
+                "tree rule {index} has more than 32 sizes"
+            )));
+        }
+        for size in &rule.sizes {
+            validate_size_spec(size)?;
+        }
+        if rule.effect == RuleEffect::Force
+            && config.rules[..index].iter().any(|other| {
+                other.effect == RuleEffect::Force
+                    && other.priority == rule.priority
+                    && other.street == rule.street
+                    && other.condition.trim() == rule.condition.trim()
+                    && (other.action != rule.action || other.sizes != rule.sizes)
+            })
+        {
+            return Err(ConfigError::TreeRule(format!(
+                "tree rule {index} conflicts with an earlier force at the same priority"
+            )));
         }
     }
     Ok(())
@@ -815,6 +1084,18 @@ pub enum ConfigError {
     EmptyName(usize),
     #[error("small blind must be non-negative and less than a positive big blind")]
     Blinds,
+    #[error(
+        "forced bet vectors must each contain {expected} seats (blinds={blinds}, antes={antes})"
+    )]
+    ForcedBetCount {
+        expected: usize,
+        blinds: usize,
+        antes: usize,
+    },
+    #[error("preflop first actor {actor} is outside a {num_seats}-seat table")]
+    FirstActor { actor: usize, num_seats: usize },
+    #[error("nominal big blind must equal the maximum configured live blind")]
+    NominalBlind,
     #[error("seat {seat} range is invalid: {message}")]
     Range { seat: usize, message: String },
     #[error("seat {0} range must contain positive combo weight")]
@@ -845,6 +1126,8 @@ pub enum ConfigError {
     PayoutOrder,
     #[error("ICM payouts must contain at least two distinct values")]
     FlatPayouts,
+    #[error("invalid rake condition: {0}")]
+    RakeCondition(String),
     #[error("rake rate must be from zero through one")]
     RakeRate,
     #[error("per-hand rake and tournament ICM cannot be combined")]
@@ -861,8 +1144,9 @@ pub enum ConfigError {
         "seat {seat} {street:?}.max_betting_players must match the table's value for that street"
     )]
     SeatMaxBettingPlayersMismatch { seat: usize, street: Street },
+    #[error("invalid tree rule: {0}")]
+    TreeRule(String),
 }
-
 #[cfg(test)]
 mod tests {
     use super::*;

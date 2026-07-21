@@ -2,6 +2,27 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
+/// Parses either the legacy shared solver schema or the dedicated Multiway
+/// Preflop v1 schema. Keeping routing here gives every caller one canonical
+/// parser while v1 stays absent from the legacy `GameSection` wire format.
+pub fn parse_solve_config(raw: &str) -> anyhow::Result<SolveConfig> {
+    if crate::multiway_v1::has_v1_schema(raw)? {
+        crate::multiway_v1::parse_and_lower(raw)
+    } else {
+        toml::from_str(raw).map_err(Into::into)
+    }
+}
+pub fn parse_solve_config_at(
+    raw: &str,
+    config_path: &std::path::Path,
+) -> anyhow::Result<SolveConfig> {
+    if crate::multiway_v1::has_v1_schema(raw)? {
+        crate::multiway_v1::parse_and_lower_at(raw, config_path)
+    } else {
+        toml::from_str(raw).map_err(Into::into)
+    }
+}
+
 /// One experiment = one TOML file. Unknown fields are rejected so typos
 /// fail loudly instead of silently running a different experiment.
 #[derive(Deserialize, Serialize, Debug)]
@@ -202,6 +223,13 @@ pub enum RakeSection {
         cap: f64,
         #[serde(default)]
         no_flop_no_drop: bool,
+    },
+    Generic {
+        rate: f64,
+        cap: Option<f64>,
+        when: String,
+        allocation: multiway::RakeAllocation,
+        rounding: multiway::RakeRounding,
     },
     GgPreflop {
         rate: f64,

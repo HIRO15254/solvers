@@ -1,16 +1,17 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::io::Write;
 use std::path::{Component, Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::time::Instant;
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, anyhow};
 use formats::{MULTIWAY_SCHEMA_VERSION, MultiwayMetricsRow, MultiwayMetricsWriter};
 use multiway::solver::InfoKey;
-use multiway::{HoldemGame, MultiwaySolver};
+use multiway::{ExternalSamplingGame, HoldemGame, MultiwaySolver};
 use serde::Serialize;
 
-use crate::config::{GameSection, SolveConfig, StorageKind};
+use crate::config::{GameSection, SolveConfig, StorageKind, UtilitySection};
 use crate::session;
 
 const APPROXIMATION_NOTICE: &str = "3人以上は多人数・一般和ゲームのregret-minimized approximationです。Nash/GTO保証やexploitability指標ではありません。";
@@ -20,6 +21,12 @@ const APPROXIMATION_NOTICE: &str = "3人以上は多人数・一般和ゲーム�
 enum CompletionStatus {
     Completed,
     ResourceLimit,
+    #[serde(rename = "sweep-limit")]
+    SweepLimit,
+    #[serde(rename = "target-reached")]
+    TargetReached,
+    #[serde(rename = "time-limit")]
+    TimeLimit,
     Cancelled,
     /// The convergence stop rule (`run.stop_dev_gain`) fired: the maximum
     /// per-seat held-out deviation-gain-lower-bound CI upper bound stayed
@@ -52,6 +59,17 @@ struct ResultV2 {
     seats: Vec<formats::MultiwaySeatMetrics>,
     strategy_blocks: usize,
     config_hash: String,
+    effective_config: serde_json::Value,
+    game_fingerprint: String,
+    abstraction_fingerprint: String,
+    algorithm_fingerprint: String,
+    configuration_fingerprint: String,
+    profile_type: &'static str,
+    guarantee_boundary: &'static str,
+    chip_unit_bb: f64,
+    utility_unit: &'static str,
+    started_unix_ms: u64,
+    finished_unix_ms: u64,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -76,6 +94,7 @@ pub fn run(
         mwsol_path,
         cancel,
         None,
+        false,
         emit_progress,
     )
 }
@@ -90,6 +109,7 @@ pub fn resume(
     config_hash: [u8; 32],
     mwsol_path: Option<&Path>,
     cancel: Option<&AtomicBool>,
+    reset_confirmations: bool,
     emit_progress: bool,
 ) -> Result<()> {
     run_inner(
@@ -102,6 +122,7 @@ pub fn resume(
         mwsol_path,
         cancel,
         Some(checkpoint_path),
+        reset_confirmations,
         emit_progress,
     )
 }
@@ -117,6 +138,7 @@ fn run_inner(
     mwsol_path: Option<&Path>,
     cancel: Option<&AtomicBool>,
     resume_checkpoint: Option<&Path>,
+    reset_confirmations: bool,
     emit_progress: bool,
 ) -> Result<()> {
     validate_artifact_paths(output, metrics_path, checkpoint_path, mwsol_path)?;
@@ -149,7 +171,7 @@ fn run_inner(
         let sweep_batch = mw_session.solver.config().sweep_batch.max(1);
         let threads = mw_session.threads as u64;
         if seats * sweep_batch < threads {
-            println!(
+            eprintln!(
                 "hint: {seats} seats x run.sweep_batch {sweep_batch} = {} parallel traversals \
                  < {threads} threads; run.sweep_batch = {} would use every core",
                 seats * sweep_batch,
@@ -162,6 +184,7 @@ fn run_inner(
         .map(MultiwayMetricsWriter::create_or_append)
         .transpose()
         .context("opening multiway metrics")?;
+    let started_unix_ms = unix_ms()?;
     let started = Instant::now();
     // Seeds `prior` with the current averages (the drift result is
     // discarded), so a resumed run's first drift row measures movement since
@@ -169,7 +192,25 @@ fn run_inner(
     let mut prior: HashMap<InfoKey, Vec<f32>> = HashMap::new();
     mw_session.solver.strategy_drift_refresh(&mut prior);
     let mut last_row = MultiwayMetricsRow::sampling(mw_session.game_config.seats.len());
-    let mut status = CompletionStatus::Completed;
+    let is_v1 = crate::multiway_v1::has_v1_schema(raw_config).unwrap_or(false);
+    let checkpoint_interval = if is_v1 {
+        Some(Duration::from_secs(
+            crate::multiway_v1::checkpoint_interval_secs(raw_config)?,
+        ))
+    } else {
+        None
+    };
+    let mut last_checkpoint = Instant::now();
+    let mut status = if is_v1 {
+        CompletionStatus::SweepLimit
+    } else {
+        CompletionStatus::Completed
+    };
+    let max_time = if is_v1 {
+        crate::multiway_v1::max_time_secs(raw_config)?.map(Duration::from_secs)
+    } else {
+        None
+    };
     let mut has_evaluation = false;
     // Convergence stop rule (`run.stop_dev_gain`) state; see
     // `session::StopRuleState` and the stop-rule block inside the drive loop
@@ -178,8 +219,40 @@ fn run_inner(
     // cap, not a target, so the sweep count a converged run actually stops
     // at is machine-dependent (documented on `run.stop_dev_gain`).
     let mut stop_rule_state = session::StopRuleState::new(mw_session.evaluation_samples);
+    let cumulative_before = mw_session
+        .checkpoint_runtime
+        .map_or(0, |runtime| runtime.cumulative_solve_millis);
+    if let Some(runtime) = mw_session.checkpoint_runtime {
+        stop_rule_state.samples = runtime.evaluation_samples;
+        stop_rule_state.confirmations_met = runtime.confirmations_met;
+        stop_rule_state.eval_index = runtime.evaluation_sequence;
+    }
+    if reset_confirmations {
+        stop_rule_state.confirmations_met = 0;
+    }
+    if resume_checkpoint.is_some() {
+        let resumed = mw_session.solver.metrics();
+        last_row = session::metrics_row(
+            &resumed,
+            vec![0.0; mw_session.game_config.seats.len()],
+            Duration::from_millis(cumulative_before).as_secs_f64(),
+            None,
+        );
+        last_row.phase = "resume-segment".into();
+        if let Some(writer) = metrics_writer.as_mut() {
+            writer
+                .append(&last_row)
+                .context("writing resume progress event")?;
+        }
+    }
 
     while mw_session.solver.completed_sweeps() < mw_session.sweeps_target {
+        if max_time.is_some_and(|limit| {
+            Duration::from_millis(cumulative_before).saturating_add(started.elapsed()) >= limit
+        }) {
+            status = CompletionStatus::TimeLimit;
+            break;
+        }
         if cancel.is_some_and(|token| token.load(Ordering::Relaxed)) {
             status = CompletionStatus::Cancelled;
             break;
@@ -239,7 +312,7 @@ fn run_inner(
                     .context("writing multiway metrics")?;
             }
             if emit_progress {
-                println!(
+                eprintln!(
                     "sweeps={:>8} traversals={:>10} infosets={:>9} regret_proxy={:.3e} memory={}MiB",
                     now.sweeps,
                     now.traversals,
@@ -249,22 +322,39 @@ fn run_inner(
                 );
             }
         }
+        let checkpoint_due = mw_session
+            .checkpoint_every
+            .is_some_and(|cadence| sweeps_now % cadence == 0)
+            || checkpoint_interval.is_some_and(|interval| last_checkpoint.elapsed() >= interval);
         if let Some(path) = checkpoint_path
-            && mw_session
-                .checkpoint_every
-                .is_some_and(|cadence| sweeps_now % cadence == 0)
+            && checkpoint_due
         {
-            write_checkpoint(&mw_session.solver, path)?;
+            write_checkpoint(
+                &mw_session.solver,
+                path,
+                raw_config,
+                &stop_rule_state,
+                mw_session.evaluation_cadence,
+                &started,
+                cumulative_before,
+            )?;
+            last_checkpoint = Instant::now();
+            if let Some(writer) = metrics_writer.as_mut() {
+                let mut checkpoint_event = last_row.clone();
+                checkpoint_event.phase = "checkpoint".into();
+                writer
+                    .append(&checkpoint_event)
+                    .context("writing checkpoint progress event")?;
+            }
         }
 
-        // Convergence stop rule: an ADDITIONAL trigger layered on top of the
-        // cadence-based evaluation/checkpoint boundaries above, never a
-        // replacement for them. It fires on wall-clock time rather than a
-        // sweep boundary, so it is checked once per drive-loop chunk
-        // regardless of where `sweeps_now` falls relative to
-        // `evaluation_cadence`/`checkpoint_every`.
+        // v1 evaluates the operational stop rule on deterministic sweep
+        // cadence. Legacy configs retain their documented wall-clock trigger.
         if let Some(stop_rule) = mw_session.stop_rule
-            && stop_rule_state.last_eval.elapsed().as_secs_f64() >= stop_rule.eval_period_secs
+            && ((is_v1 && sweeps_now % mw_session.evaluation_cadence == 0)
+                || (!is_v1
+                    && stop_rule_state.last_eval.elapsed().as_secs_f64()
+                        >= stop_rule.eval_period_secs))
         {
             let samples_before = stop_rule_state.samples;
             let check = session::run_stop_rule_check(
@@ -292,7 +382,7 @@ fn run_inner(
             }
 
             if emit_progress && let Some(doubled) = check.samples_doubled_to {
-                println!(
+                eprintln!(
                     "stop-rule: max CI width {:.6} exceeds threshold {:.6}; \
                      doubling evaluation samples {samples_before} -> {doubled}",
                     check.max_width, stop_rule.dev_gain_threshold
@@ -300,7 +390,11 @@ fn run_inner(
             }
 
             if check.converged {
-                status = CompletionStatus::Converged;
+                status = if is_v1 {
+                    CompletionStatus::TargetReached
+                } else {
+                    CompletionStatus::Converged
+                };
                 break;
             }
         }
@@ -308,9 +402,17 @@ fn run_inner(
 
     let final_checkpoint = final_checkpoint_path(status, checkpoint_path, output);
     if let Some(path) = final_checkpoint.as_deref() {
-        write_checkpoint(&mw_session.solver, path)?;
+        write_checkpoint(
+            &mw_session.solver,
+            path,
+            raw_config,
+            &stop_rule_state,
+            mw_session.evaluation_cadence,
+            &started,
+            cumulative_before,
+        )?;
         if emit_progress && status == CompletionStatus::ResourceLimit {
-            println!("resource_limit checkpoint: {}", path.display());
+            eprintln!("resource_limit checkpoint: {}", path.display());
         }
     }
     // The rollout abstraction's assignment cache is pure memoization
@@ -353,6 +455,9 @@ fn run_inner(
     last_row.phase = match status {
         CompletionStatus::Completed => "completed",
         CompletionStatus::ResourceLimit => "resource_limit",
+        CompletionStatus::SweepLimit => "sweep-limit",
+        CompletionStatus::TargetReached => "target-reached",
+        CompletionStatus::TimeLimit => "time-limit",
         CompletionStatus::Cancelled => "cancelled",
         CompletionStatus::Converged => "converged",
     }
@@ -364,23 +469,57 @@ fn run_inner(
     }
 
     let snapshot = mw_session.solver.snapshot_state();
-    if let Some(path) = mwsol_path {
+    if let Some(path) = mwsol_path
+        && !matches!(
+            status,
+            CompletionStatus::ResourceLimit | CompletionStatus::Cancelled
+        )
+    {
         let solution = session::make_solution(
             &mw_session.config_toml,
             mw_session.solver.abstraction_fingerprint(),
+            mw_session.solver.configuration_fingerprint(),
+            mw_session.solver.game(),
             &snapshot,
             &last_row,
         );
         // `run.storage` selects the artifact encoding only; the live MCCFR
         // state and `.mwckpt` checkpoints stay f32 regardless.
-        let artifact_storage = match mw_session.storage {
-            StorageKind::F32 => formats::MwsolStorage::F32,
-            StorageKind::I16 => formats::MwsolStorage::I16,
+        let artifact_storage = if is_v1 {
+            match crate::multiway_v1::probability_encoding(raw_config)? {
+                crate::multiway_v1::ProbabilityEncoding::U16 => formats::MwsolStorage::U16,
+                crate::multiway_v1::ProbabilityEncoding::F32 => formats::MwsolStorage::F32,
+            }
+        } else {
+            match mw_session.storage {
+                StorageKind::F32 => formats::MwsolStorage::F32,
+                StorageKind::I16 => formats::MwsolStorage::I16,
+            }
         };
         formats::write_mwsol_with(path, &solution, artifact_storage)
             .with_context(|| format!("writing {}", path.display()))?;
     }
     let elapsed = started.elapsed().as_secs_f64();
+    let effective = crate::config::parse_solve_config(raw_config)?;
+    let algorithm_material = serde_json::to_vec(&effective.algorithm)?;
+    let effective_config = if is_v1 {
+        crate::multiway_v1::normalized_config(raw_config)?
+    } else {
+        serde_json::to_value(&effective)?
+    };
+    let utility_unit = match &effective.utility {
+        UtilitySection::ChipEv => "bb",
+        UtilitySection::TournamentIcm { .. } | UtilitySection::Icm { .. } => "prize",
+    };
+    let game_fingerprint = formats::config_hash_hex(&mw_session.solver.game().game_fingerprint());
+    let algorithm_fingerprint =
+        formats::config_hash_hex(&formats::config_hash(algorithm_material.as_slice()));
+    let abstraction_fingerprint =
+        formats::config_hash_hex(&mw_session.solver.abstraction_fingerprint());
+    let configuration_fingerprint =
+        formats::config_hash_hex(&mw_session.solver.configuration_fingerprint());
+    let finished_unix_ms = unix_ms()?;
+
     let result = ResultV2 {
         schema_version: MULTIWAY_SCHEMA_VERSION,
         kind: "preflop-multiway",
@@ -408,14 +547,55 @@ fn run_inner(
         seats: last_row.seats.clone(),
         strategy_blocks: snapshot.policies.len(),
         config_hash: formats::config_hash_hex(&mw_session.config_hash),
+        effective_config,
+        game_fingerprint,
+        abstraction_fingerprint,
+        algorithm_fingerprint,
+        configuration_fingerprint,
+        profile_type: "linear-average-regret-minimized-profile",
+        guarantee_boundary: APPROXIMATION_NOTICE,
+        chip_unit_bb: 0.001,
+        utility_unit,
+        started_unix_ms,
+        finished_unix_ms,
     };
     let json = serde_json::to_string_pretty(&result)?;
     if let Some(path) = output {
-        std::fs::write(path, format!("{json}\n"))
-            .with_context(|| format!("writing {}", path.display()))?;
+        write_atomic(path, format!("{json}\n").as_bytes())
+            .with_context(|| format!("atomically writing {}", path.display()))?;
     } else {
         println!("{json}");
     }
+    if emit_progress {
+        let exit_code = match status {
+            CompletionStatus::ResourceLimit => 75,
+            CompletionStatus::Cancelled => 130,
+            _ => 0,
+        };
+        crate::CLI_EXIT_CODE.store(exit_code, Ordering::SeqCst);
+    }
+    Ok(())
+}
+fn unix_ms() -> Result<u64> {
+    let millis = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .context("system clock predates Unix epoch")?
+        .as_millis();
+    u64::try_from(millis).context("Unix timestamp does not fit u64")
+}
+
+fn write_atomic(path: &Path, contents: &[u8]) -> Result<()> {
+    let directory = path
+        .parent()
+        .filter(|parent| !parent.as_os_str().is_empty())
+        .unwrap_or_else(|| Path::new("."));
+    let mut temporary = tempfile::NamedTempFile::new_in(directory)?;
+    temporary.write_all(contents)?;
+    temporary.flush()?;
+    temporary.as_file().sync_all()?;
+    temporary
+        .persist(path)
+        .map_err(|error| anyhow!(error.error))?;
     Ok(())
 }
 
@@ -524,8 +704,24 @@ fn final_checkpoint_path<'a>(
 fn write_checkpoint<A: multiway::MultiwayAbstraction>(
     solver: &MultiwaySolver<HoldemGame<A>>,
     path: &Path,
+    raw_config: &str,
+    stop_state: &session::StopRuleState,
+    evaluation_cadence: u64,
+    started: &Instant,
+    cumulative_before: u64,
 ) -> Result<()> {
+    let current = solver.completed_sweeps();
+    let runtime = multiway::checkpoint::CheckpointRuntimeState {
+        confirmations_met: stop_state.confirmations_met,
+        next_evaluation_sweep: current
+            .saturating_add(session::distance_to_boundary(current, evaluation_cadence)),
+        evaluation_samples: stop_state.samples,
+        evaluation_sequence: stop_state.eval_index,
+        cumulative_solve_millis: cumulative_before
+            .saturating_add(started.elapsed().as_millis().min(u128::from(u64::MAX)) as u64),
+    };
     multiway::checkpoint::MultiwayCheckpoint::capture(solver)
+        .with_runtime_metadata(raw_config, runtime)
         .write_atomic(path)
         .with_context(|| format!("writing {}", path.display()))
 }

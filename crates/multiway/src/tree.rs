@@ -470,6 +470,7 @@ mod tests {
             blinds: BlindConfig::default(),
             ante: AnteConfig::None,
             betting: BettingConfig::default(),
+            forced_bets: None,
             abstraction: AbstractionConfig::default(),
         }
     }

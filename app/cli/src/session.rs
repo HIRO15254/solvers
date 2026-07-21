@@ -17,8 +17,8 @@ use abstraction::{Ehs2Abstraction, Ehs2Params};
 use anyhow::{Context, Result, anyhow};
 use formats::{
     Estimate, MULTIWAY_SCHEMA_VERSION, MultiwayHistoryNode, MultiwayMetricsRow,
-    MultiwaySeatMetrics, MultiwaySeatResult, MultiwaySolution, MultiwayStrategyBlock,
-    MultiwayStrategyKey,
+    MultiwayPublicAction, MultiwayPublicState, MultiwaySeatMetrics, MultiwaySeatResult,
+    MultiwaySolution, MultiwayStrategyBlock, MultiwayStrategyKey, MultiwayStrategyWeight,
 };
 use multiway::abstraction::{
     MultiwayAbstractionBackend, RolloutKMeansAbstraction, RolloutKMeansBuilder,
@@ -30,7 +30,7 @@ use multiway::config::{
     UtilityConfig as MultiwayUtility,
 };
 use multiway::solver::{DEFAULT_PRUNE_THRESHOLD, ProfileEvaluation, SolverConfig};
-use multiway::{DealSampler, HoldemGame, MultiwaySolver};
+use multiway::{DealSampler, ExternalSamplingGame, HoldemGame, MultiwaySolver};
 use rayon::prelude::*;
 
 use crate::config::{
@@ -80,6 +80,7 @@ pub struct MultiwaySession {
     /// The multiway game config (seats, blinds, betting), kept around for
     /// display purposes (seat names/positions, button seat).
     pub game_config: multiway::MultiwayConfig,
+    pub checkpoint_runtime: Option<multiway::checkpoint::CheckpointRuntimeState>,
 }
 
 /// Default [`StopRule::confirmations`] and [`StopRule::eval_period_secs`]
@@ -101,7 +102,8 @@ pub fn build_multiway_session(
     raw_toml: &str,
     resume_checkpoint: Option<&Path>,
 ) -> Result<MultiwaySession> {
-    let config: SolveConfig = toml::from_str(raw_toml).context("parsing config")?;
+    let config: SolveConfig =
+        crate::config::parse_solve_config(raw_toml).context("parsing config")?;
     let SolveConfig {
         game,
         rake,
@@ -248,9 +250,11 @@ pub fn build_multiway_session(
     };
     let evaluation_seed = solver_config.seed ^ 0x6576_616c_7561_7465;
 
+    let mut checkpoint_runtime = None;
     let solver = if let Some(path) = resume_checkpoint {
         let checkpoint = MultiwayCheckpoint::load_unchecked(path)
             .with_context(|| format!("reading multiway checkpoint {}", path.display()))?;
+        checkpoint_runtime = checkpoint.config_toml.as_ref().map(|_| checkpoint.runtime);
         let solver =
             MultiwaySolver::from_state_with_config(game, sampler, checkpoint.state, solver_config)
                 .context("restoring multiway MCCFR state")?;
@@ -290,6 +294,7 @@ pub fn build_multiway_session(
         config_toml: raw_toml.to_string(),
         config_hash: formats::config_hash(raw_toml.as_bytes()),
         game_config,
+        checkpoint_runtime,
     })
 }
 
@@ -685,6 +690,19 @@ pub(crate) fn convert_rake(rake: RakeSection) -> MultiwayRake {
             cap_bb: cap / multiway::types::CHIPS_PER_BB as f64,
             no_flop_no_drop,
         },
+        RakeSection::Generic {
+            rate,
+            cap,
+            when,
+            allocation,
+            rounding,
+        } => MultiwayRake::Generic {
+            rate,
+            cap_bb: cap,
+            when,
+            allocation,
+            rounding,
+        },
         RakeSection::GgPreflop {
             rate,
             cap,
@@ -759,19 +777,126 @@ fn profile_estimate(value: &multiway::solver::ProfileEstimate) -> Estimate {
     }
 }
 
+fn public_action(action: &multiway::Action) -> MultiwayPublicAction {
+    match action {
+        multiway::Action::Fold => MultiwayPublicAction::Fold,
+        multiway::Action::Check => MultiwayPublicAction::Check,
+        multiway::Action::Call { amount, all_in } => MultiwayPublicAction::Call {
+            amount_millibb: amount.raw(),
+            all_in: *all_in,
+        },
+        multiway::Action::BetTo {
+            to,
+            all_in,
+            full_raise,
+        } => MultiwayPublicAction::BetTo {
+            amount_millibb: to.raw(),
+            all_in: *all_in,
+            full_raise: *full_raise,
+        },
+        multiway::Action::RaiseTo {
+            to,
+            all_in,
+            full_raise,
+        } => MultiwayPublicAction::RaiseTo {
+            amount_millibb: to.raw(),
+            all_in: *all_in,
+            full_raise: *full_raise,
+        },
+    }
+}
+
+fn make_public_tree(
+    game: &HoldemGame<MultiwayAbstractionBackend>,
+) -> (Vec<MultiwayHistoryNode>, Vec<MultiwayPublicState>) {
+    let root = multiway::solver::ExternalSamplingGame::root_state(game);
+    let mut pending = vec![(multiway::solver::HistoryKey::ROOT, root)];
+    let mut histories = Vec::new();
+    let mut public_states = Vec::new();
+
+    while let Some((history, state)) = pending.pop() {
+        let actor = state.to_act.map(|seat| seat.0);
+        let actions = game.legal_actions(&state);
+        public_states.push(MultiwayPublicState {
+            history: history.0,
+            street: state.street.index() as u8,
+            actor,
+            pot_millibb: state.pot_size().raw(),
+            remaining_stacks_millibb: state
+                .seats
+                .iter()
+                .map(|seat| seat.remaining.raw())
+                .collect(),
+            legal_actions: actions.iter().map(public_action).collect(),
+        });
+        let Some(actor) = actor else {
+            continue;
+        };
+        for (action_index, action) in actions.iter().enumerate().rev() {
+            let child = history.child(actor as usize, action_index);
+            histories.push(MultiwayHistoryNode {
+                key: child.0,
+                parent: history.0,
+                actor,
+                action_index: action_index as u32,
+                action: public_action(action).label(),
+            });
+            let next = multiway::solver::ExternalSamplingGame::next_state_with(
+                game,
+                &state,
+                &actions,
+                action_index,
+            );
+            pending.push((child, next));
+        }
+    }
+
+    histories.sort_by_key(|entry| entry.key);
+    public_states.sort_by_key(|state| state.history);
+    (histories, public_states)
+}
+
 /// Builds the exportable `.mwsol` artifact from a solver state snapshot and
-/// its final metrics row. Shared by every caller that persists a multiway
-/// solve's average strategy (the CLI's `--mwsol`, and eventually the GUI's
-/// "Finish" action).
+/// its final metrics row. Only visited infosets are formal solution entries;
+/// absent keys remain explicitly unvisited rather than becoming uniform.
+/// Shared by every caller that persists a multiway solve's average strategy.
 pub fn make_solution(
     config_toml: &str,
     abstraction_fingerprint: [u8; 32],
+    configuration_fingerprint: [u8; 32],
+    game: &HoldemGame<MultiwayAbstractionBackend>,
     state: &multiway::solver::SolverState,
     row: &MultiwayMetricsRow,
 ) -> MultiwaySolution {
+    let effective = crate::config::parse_solve_config(config_toml)
+        .expect("solution config was validated before solving");
+    let algorithm_material =
+        serde_json::to_vec(&effective.algorithm).expect("effective algorithm is serializable");
+    let (histories, public_states) = make_public_tree(game);
+    let strategy_weights = state
+        .policies
+        .iter()
+        .filter(|entry| entry.column.strategy_sum.iter().any(|value| *value > 0.0))
+        .map(|entry| MultiwayStrategyWeight {
+            key: MultiwayStrategyKey {
+                history: entry.key.history.0,
+                actor: entry.key.player,
+                street: entry.key.street,
+                active_opponents: entry.key.active_opponents,
+                bucket_path: entry.key.bucket_path,
+            },
+            weight: entry
+                .column
+                .strategy_sum
+                .iter()
+                .map(|value| f64::from(*value))
+                .sum(),
+        })
+        .collect();
     let strategies = state
         .policies
         .iter()
+        .filter(|entry| entry.column.strategy_sum.iter().any(|value| *value > 0.0))
         .map(|entry| MultiwayStrategyBlock {
             key: MultiwayStrategyKey {
                 history: entry.key.history.0,
@@ -787,20 +912,16 @@ pub fn make_solution(
     MultiwaySolution {
         schema_version: MULTIWAY_SCHEMA_VERSION,
         config_toml: config_toml.to_string(),
+        config_fingerprint: formats::config_hash(config_toml.as_bytes()),
+        game_fingerprint: game.game_fingerprint(),
+        algorithm_fingerprint: formats::config_hash(&algorithm_material),
         abstraction_fingerprint,
+        configuration_fingerprint,
+        stop_status: row.phase.clone(),
+        chip_unit_bb: 0.001,
         sweeps: row.sweeps,
         approximate_profile: true,
-        histories: state
-            .histories
-            .iter()
-            .map(|entry| MultiwayHistoryNode {
-                key: entry.key.0,
-                parent: entry.parent.0,
-                actor: entry.actor,
-                action_index: entry.action_index,
-                action: entry.action_label.clone(),
-            })
-            .collect(),
+        histories,
         seats: row
             .seats
             .iter()
@@ -813,6 +934,8 @@ pub fn make_solution(
             })
             .collect(),
         strategies,
+        public_states,
+        strategy_weights,
     }
 }
 

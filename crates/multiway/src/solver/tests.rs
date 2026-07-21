@@ -1585,7 +1585,7 @@ fn pruned_bucket_action_gets_no_update_and_others_are_unchanged() {
 }
 
 #[test]
-fn vector_traverser_rejects_full_recall_game() {
+fn vector_traverser_accepts_full_recall_game_with_sparse_storage() {
     let result = MultiwaySolver::new(
         DominatedChoice,
         DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
@@ -1594,14 +1594,10 @@ fn vector_traverser_rejects_full_recall_game() {
             ..SolverConfig::default()
         },
     );
-    let error = match result {
-        Ok(_) => panic!("expected a recall-mode validation error"),
-        Err(error) => error,
-    };
-    assert!(matches!(
-        error,
-        SolverError::VectorTraverserRequiresStreetRecall
-    ));
+    let mut solver = result.expect("full-recall vector mode is supported");
+    assert!(solver.dense.is_none());
+    solver.run_sweeps(1).unwrap();
+    assert!(solver.hand_updates > solver.traversals);
 }
 
 #[test]
@@ -2015,6 +2011,7 @@ fn street_recall_holdem_game_reaches_every_street_without_error() {
         blinds: BlindConfig::default(),
         ante: AnteConfig::None,
         betting: BettingConfig::default(),
+        forced_bets: None,
         abstraction: AbstractionConfig::default(),
     };
     config.abstraction.flop_buckets = 4;
@@ -2132,6 +2129,7 @@ fn vector_traverser_root_strategy_sum_is_dense_after_few_sweeps() {
         blinds: BlindConfig::default(),
         ante: AnteConfig::None,
         betting: BettingConfig::default(),
+        forced_bets: None,
         abstraction: AbstractionConfig::default(),
     };
     config.abstraction.flop_buckets = 2;
@@ -2213,6 +2211,7 @@ fn vector_traverser_holdem_game_reaches_every_street_without_error() {
         blinds: BlindConfig::default(),
         ante: AnteConfig::None,
         betting: BettingConfig::default(),
+        forced_bets: None,
         abstraction: AbstractionConfig::default(),
     };
     config.abstraction.flop_buckets = 4;
@@ -2306,6 +2305,7 @@ fn vector_traverser_icm_smoke_test() {
         blinds: BlindConfig::default(),
         ante: AnteConfig::None,
         betting: BettingConfig::default(),
+        forced_bets: None,
         abstraction: AbstractionConfig::default(),
     };
     config.abstraction.flop_buckets = 3;

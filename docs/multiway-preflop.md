@@ -502,22 +502,23 @@ The multiway artifact contracts are separate from frozen HU v1:
   table and per-frame, table, and aggregate BLAKE3 integrity checks. Postcard
   serialization is streamed through a temporary file instead of duplicating
   the full raw state in memory.
-- `.mwckpt` container version 6 adds the regret-pruning fields (`prune`,
-  `prune_threshold`, `prune_skip_probability`) to the serialized
-  `SolverConfig`. Version 5 added `traverser_vector` and a `hand_updates`
-  counter to `SolverState` (see "Vector-traverser sampling" above); loading
-  transparently accepts version 5 (filling the prune fields with their
-  disabled defaults), while versions 3-4 are no longer loadable and fail
-  with a clear unsupported-version error. Every checkpoint this process
-  writes is always the current version.
+- `.mwckpt` container version 7 embeds the effective v1 configuration and
+  runtime stop state (confirmation count, next evaluation, sample count,
+  sequence, and cumulative solve time), which enables configuration-free
+  resume. Version 6 added regret-pruning fields and version 5 added the
+  vector-traverser state. Readers temporarily accept versions 5-7 for the
+  real-data migration gate, filling newer fields with safe defaults for old
+  inputs; versions 3-4 fail with an unsupported-version error. Every
+  checkpoint this process writes is version 7.
 - `.mwsol` stores metadata/public-history recall separately from a sorted
   strategy index.  Each strategy block is an independent checked frame, so a
   Bridge page query reads only the requested blocks.
-- `.mwsol` format v3 adds an optional i16 fixed-point strategy encoding
-  (`run.storage = "i16"`; denominator `i16::MAX` with largest-remainder
-  rounding, so each block's quantized probabilities sum exactly to one).
-  Readers accept v2 and v3 and always return f32 probabilities; the live
-  MCCFR state and `.mwckpt` checkpoints stay f32 regardless of this knob.
+- `.mwsol` format v4 adds unsigned 16-bit fixed-point strategy encoding
+  (denominator 65535 with stable largest-remainder rounding, so each block
+  sums exactly to one). Explicit f32 storage remains available; the v3 i16
+  form is legacy-only during the real-data migration gate. Readers accept
+  v2-v4 and always expose f32 probabilities, while live MCCFR state and
+  `.mwckpt` checkpoints remain f32.
 - When the policy memory cap is reached, the solver does not evict policy.  It
   ends with `resource_limit` and writes the requested checkpoint; CLI runs
   without an explicit checkpoint derive a `.mwckpt` beside the result (or

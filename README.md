@@ -14,6 +14,8 @@ Early development. See [docs/roadmap.md](docs/roadmap.md) for milestones.
 ## Documentation
 
 - [docs/multiway-preflop-cli-spec.jp.md](docs/multiway-preflop-cli-spec.jp.md) — approved target specification for the Multiway Preflop CLI v1
+- [docs/multiway-preflop-v1.md](docs/multiway-preflop-v1.md) — concise human/AI implementation guide and contract map
+- [docs/multiway-preflop-toml-reference.jp.md](docs/multiway-preflop-toml-reference.jp.md) — complete reference for every Multiway Preflop v1 TOML key, type, default, and constraint
 - [docs/app-structure.md](docs/app-structure.md) — the app structure (one app with preflop + postflop solving, CLI + web UI)
 - [docs/architecture.md](docs/architecture.md) — integrated architecture design
 - [docs/research-survey.md](docs/research-survey.md) — survey of CFR variants,
@@ -61,6 +63,11 @@ cargo run -p cli --release -- solve examples/kuhn.toml
 cargo run -p cli --release -- serve --origin http://localhost:3000
 
 # --- Preflop ---------------------------------------------------------------
+# Multiway Preflop v1: validate, then write one self-contained run directory.
+cargo run -p cli --release -- validate examples/preflop_multiway_v1_smoke.toml
+cargo run -p cli --release -- solve examples/preflop_multiway_v1_smoke.toml \
+    --out runs/v1-smoke
+
 # 9-max BBA + tournament ICM; writes v2 JSON, .mwckpt, and .mwsol.
 cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
     --output result.json --checkpoint solve.mwckpt --sol solve.mwsol

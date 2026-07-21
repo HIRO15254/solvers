@@ -814,6 +814,7 @@ fn handle_create_job(
                                 mwsol_path.as_deref(),
                                 cancel.as_deref(),
                                 false,
+                                false,
                             )
                         } else {
                             crate::multiway_solve::run(
@@ -831,6 +832,10 @@ fn handle_create_job(
                     } else {
                         crate::solve::run(
                             &config_path,
+                            None,
+                            None,
+                            None,
+                            None,
                             Some(&result_path),
                             &["".to_string()],
                             Some(&metrics_path),
@@ -1836,6 +1841,19 @@ fn multiway_rake_config(rake: &RakeSection) -> multiway::config::RakeConfig {
             cap_bb: *cap / chips_per_bb,
             no_flop_no_drop: *no_flop_no_drop,
         },
+        RakeSection::Generic {
+            rate,
+            cap,
+            when,
+            allocation,
+            rounding,
+        } => multiway::config::RakeConfig::Generic {
+            rate: *rate,
+            cap_bb: *cap,
+            when: when.clone(),
+            allocation: *allocation,
+            rounding: *rounding,
+        },
         RakeSection::GgPreflop {
             rate,
             cap,
@@ -1850,6 +1868,18 @@ fn multiway_rake_config(rake: &RakeSection) -> multiway::config::RakeConfig {
 fn validate_common_sections(config: &SolveConfig) -> std::result::Result<(), String> {
     match &config.rake {
         RakeSection::None => {}
+        RakeSection::Generic { rate, cap, .. } => {
+            validate_finite("rake.rate", *rate)?;
+            if !(0.0..=1.0).contains(rate) {
+                return Err("rake.rate must be between 0 and 1.".to_string());
+            }
+            if let Some(cap) = cap {
+                validate_finite("rake.cap", *cap)?;
+                if *cap < 0.0 {
+                    return Err("rake.cap may not be negative.".to_string());
+                }
+            }
+        }
         RakeSection::PercentCap { rate, cap, .. } | RakeSection::GgPreflop { rate, cap, .. } => {
             validate_finite("rake.rate", *rate)?;
             validate_finite("rake.cap", *cap)?;

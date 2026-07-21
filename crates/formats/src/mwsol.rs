@@ -13,13 +13,15 @@ use serde::{Deserialize, Serialize};
 use crate::{Estimate, MULTIWAY_SCHEMA_VERSION, config_hash, config_hash_hex};
 
 pub const MWSOL_HEADER_LEN: usize = 8 + 2 + 32 + 32 + 8 + 8 + 8 + 8 + 8 + 32 + 32;
-pub const MWSOL_FORMAT_VERSION: u16 = 3;
-/// Oldest on-disk version this reader still accepts. Version 2 frames are
-/// plain postcard-encoded `MultiwayStrategyBlock`s (no quantization
-/// support); version 3 wraps each frame in `FrameBlock` so it can carry
-/// either an `F32` or `I16`-quantized payload.
+pub const MWSOL_FORMAT_VERSION: u16 = 4;
+/// Oldest on-disk version this reader still accepts during the real-data
+/// migration gate. Version 2 frames are plain postcard blocks, version 3
+/// introduces the framed F32/I16 representation, and version 4 adds the
+/// unsigned U16 representation used by the v1 contract.
 pub const MWSOL_MIN_FORMAT_VERSION: u16 = 2;
 pub const MWSOL_MAX_PAGE_LIMIT: usize = 4096;
+/// Denominator used by unsigned v4 probability quantization.
+const MWSOL_U16_DENOMINATOR: u16 = u16::MAX;
 /// Denominator used by i16 quantization (`i16::MAX`): quantized entries for
 /// a block always sum to exactly this value.
 const MWSOL_I16_DENOMINATOR: i16 = i16::MAX;
@@ -58,7 +60,75 @@ pub struct MultiwayHistoryNode {
     pub action: String,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum MultiwayPublicAction {
+    Fold,
+    Check,
+    Call {
+        amount_millibb: u64,
+        all_in: bool,
+    },
+    BetTo {
+        amount_millibb: u64,
+        all_in: bool,
+        full_raise: bool,
+    },
+    RaiseTo {
+        amount_millibb: u64,
+        all_in: bool,
+        full_raise: bool,
+    },
+}
+
+impl MultiwayPublicAction {
+    pub fn label(&self) -> String {
+        match self {
+            Self::Fold => "fold".into(),
+            Self::Check => "check".into(),
+            Self::Call {
+                amount_millibb,
+                all_in,
+            } => format!(
+                "call:{amount_millibb}{}",
+                if *all_in { ":all-in" } else { "" }
+            ),
+            Self::BetTo {
+                amount_millibb,
+                all_in,
+                ..
+            } => format!(
+                "bet-to:{amount_millibb}{}",
+                if *all_in { ":all-in" } else { "" }
+            ),
+            Self::RaiseTo {
+                amount_millibb,
+                all_in,
+                ..
+            } => format!(
+                "raise-to:{amount_millibb}{}",
+                if *all_in { ":all-in" } else { "" }
+            ),
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MultiwayPublicState {
+    pub history: [u8; 16],
+    pub street: u8,
+    pub actor: Option<u8>,
+    pub pot_millibb: u64,
+    pub remaining_stacks_millibb: Vec<u64>,
+    pub legal_actions: Vec<MultiwayPublicAction>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+pub struct MultiwayStrategyWeight {
+    pub key: MultiwayStrategyKey,
+    pub weight: f64,
+}
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+
 pub struct MultiwayStrategyBlock {
     pub key: MultiwayStrategyKey,
     /// Structured labels such as `fold`, `call`, and `raise-to:2500`.
@@ -76,6 +146,8 @@ pub enum MwsolStorage {
     /// Quantize probabilities to `i16` fixed point (denominator
     /// `i16::MAX`), roughly halving strategy payload size.
     I16,
+    /// Quantize probabilities to unsigned 16-bit fixed point.
+    U16,
 }
 
 /// Version-3 frame payload. Version-2 files instead store a plain
@@ -93,9 +165,15 @@ enum FrameBlock {
         actions: Vec<String>,
         quantized: Vec<i16>,
     },
+    U16 {
+        key: MultiwayStrategyKey,
+        actions: Vec<String>,
+        quantized: Vec<u16>,
+    },
 }
 
 impl FrameBlock {
+    #[cfg(test)]
     fn from_block(block: &MultiwayStrategyBlock, storage: MwsolStorage) -> Self {
         match storage {
             MwsolStorage::F32 => FrameBlock::F32 {
@@ -107,6 +185,11 @@ impl FrameBlock {
                 key: block.key,
                 actions: block.actions.clone(),
                 quantized: quantize_i16(&block.probabilities),
+            },
+            MwsolStorage::U16 => FrameBlock::U16 {
+                key: block.key,
+                actions: block.actions.clone(),
+                quantized: quantize_u16(&block.probabilities),
             },
         }
     }
@@ -137,6 +220,71 @@ impl FrameBlock {
                     probabilities,
                 }
             }
+
+            FrameBlock::U16 {
+                key,
+                actions,
+                quantized,
+            } => {
+                let probabilities = quantized
+                    .iter()
+                    .map(|&q| f32::from(q) / f32::from(MWSOL_U16_DENOMINATOR))
+                    .collect();
+                MultiwayStrategyBlock {
+                    key,
+                    actions,
+                    probabilities,
+                }
+            }
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+enum FrameBlockV4 {
+    F32 {
+        key: MultiwayStrategyKey,
+        probabilities: Vec<f32>,
+    },
+    U16 {
+        key: MultiwayStrategyKey,
+        quantized: Vec<u16>,
+    },
+}
+
+impl FrameBlockV4 {
+    fn from_block(
+        block: &MultiwayStrategyBlock,
+        storage: MwsolStorage,
+    ) -> Result<Self, MwSolError> {
+        match storage {
+            MwsolStorage::F32 => Ok(Self::F32 {
+                key: block.key,
+                probabilities: block.probabilities.clone(),
+            }),
+            MwsolStorage::U16 => Ok(Self::U16 {
+                key: block.key,
+                quantized: quantize_u16(&block.probabilities),
+            }),
+            MwsolStorage::I16 => Err(MwSolError::UnsupportedStrategyEncoding),
+        }
+    }
+
+    fn into_block(self, actions: Vec<String>) -> MultiwayStrategyBlock {
+        match self {
+            Self::F32 { key, probabilities } => MultiwayStrategyBlock {
+                key,
+                actions,
+                probabilities,
+            },
+            Self::U16 { key, quantized } => MultiwayStrategyBlock {
+                key,
+                actions,
+                probabilities: quantized
+                    .iter()
+                    .map(|value| f32::from(*value) / f32::from(MWSOL_U16_DENOMINATOR))
+                    .collect(),
+            },
         }
     }
 }
@@ -146,6 +294,7 @@ impl FrameBlock {
 /// `sum(quantized) == 32767` exactly and every entry is `>= 0`. Input need
 /// not sum exactly to `1.0`; it is normalized by its own sum first, so this
 /// tolerates the same `1e-4` slack `validate_strategy_block` allows.
+#[cfg(test)]
 fn quantize_i16(probabilities: &[f32]) -> Vec<i16> {
     let denominator = f64::from(MWSOL_I16_DENOMINATOR);
     let sum: f64 = probabilities.iter().map(|&p| f64::from(p)).sum();
@@ -180,6 +329,45 @@ fn quantize_i16(probabilities: &[f32]) -> Vec<i16> {
         .collect()
 }
 
+/// Quantizes a distribution to unsigned fixed point with denominator 65,535.
+/// Largest-remainder assignment and stable index tie-breaks preserve an exact
+/// encoded sum while keeping the result deterministic.
+fn quantize_u16(probabilities: &[f32]) -> Vec<u16> {
+    let denominator = f64::from(MWSOL_U16_DENOMINATOR);
+    let sum: f64 = probabilities.iter().map(|&p| f64::from(p)).sum();
+    if probabilities.is_empty() || sum <= 0.0 || !sum.is_finite() {
+        return vec![0; probabilities.len()];
+    }
+
+    let scaled: Vec<f64> = probabilities
+        .iter()
+        .map(|&p| f64::from(p) / sum * denominator)
+        .collect();
+    let mut floors: Vec<u64> = scaled.iter().map(|&value| value.floor() as u64).collect();
+    let floor_sum: u64 = floors.iter().sum();
+    let remainder = u64::from(MWSOL_U16_DENOMINATOR)
+        .saturating_sub(floor_sum)
+        .min(floors.len() as u64);
+
+    let mut order: Vec<usize> = (0..probabilities.len()).collect();
+    order.sort_by(|&a, &b| {
+        let fraction_a = scaled[a] - floors[a] as f64;
+        let fraction_b = scaled[b] - floors[b] as f64;
+        fraction_b
+            .partial_cmp(&fraction_a)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| a.cmp(&b))
+    });
+    for &index in order.iter().take(remainder as usize) {
+        floors[index] += 1;
+    }
+
+    floors
+        .into_iter()
+        .map(|value| value.min(u64::from(MWSOL_U16_DENOMINATOR)) as u16)
+        .collect()
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct MultiwaySeatResult {
     pub seat: u8,
@@ -193,26 +381,76 @@ pub struct MultiwaySeatResult {
 pub struct MultiwaySolutionMetadata {
     pub schema_version: u16,
     pub config_toml: String,
+    pub config_fingerprint: [u8; 32],
+    pub game_fingerprint: [u8; 32],
+    pub algorithm_fingerprint: [u8; 32],
     pub abstraction_fingerprint: [u8; 32],
+    pub configuration_fingerprint: [u8; 32],
+    pub stop_status: String,
+    pub chip_unit_bb: f64,
     pub sweeps: u64,
     pub approximate_profile: bool,
     pub seats: Vec<MultiwaySeatResult>,
     /// Strictly key-sorted compact trie; shared by all private buckets.
     pub histories: Vec<MultiwayHistoryNode>,
+    pub public_states: Vec<MultiwayPublicState>,
+    pub strategy_weights: Vec<MultiwayStrategyWeight>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct MultiwaySolution {
     pub schema_version: u16,
     pub config_toml: String,
+    pub config_fingerprint: [u8; 32],
+    pub game_fingerprint: [u8; 32],
+    pub algorithm_fingerprint: [u8; 32],
     pub abstraction_fingerprint: [u8; 32],
+    pub configuration_fingerprint: [u8; 32],
+    pub stop_status: String,
+    pub chip_unit_bb: f64,
     pub sweeps: u64,
     pub approximate_profile: bool,
     pub seats: Vec<MultiwaySeatResult>,
     /// Strictly key-sorted compact trie; shared by all private buckets.
     pub histories: Vec<MultiwayHistoryNode>,
+    pub public_states: Vec<MultiwayPublicState>,
+    pub strategy_weights: Vec<MultiwayStrategyWeight>,
     /// Must be strictly sorted by `key`.
     pub strategies: Vec<MultiwayStrategyBlock>,
+}
+
+#[derive(Deserialize, Serialize)]
+struct LegacyMultiwaySolutionMetadata {
+    schema_version: u16,
+    config_toml: String,
+    abstraction_fingerprint: [u8; 32],
+    sweeps: u64,
+    approximate_profile: bool,
+    seats: Vec<MultiwaySeatResult>,
+    histories: Vec<MultiwayHistoryNode>,
+}
+
+impl From<LegacyMultiwaySolutionMetadata> for MultiwaySolutionMetadata {
+    fn from(value: LegacyMultiwaySolutionMetadata) -> Self {
+        let config_fingerprint = config_hash(value.config_toml.as_bytes());
+        Self {
+            schema_version: value.schema_version,
+            config_toml: value.config_toml,
+            config_fingerprint,
+            game_fingerprint: [0; 32],
+            algorithm_fingerprint: [0; 32],
+            abstraction_fingerprint: value.abstraction_fingerprint,
+            configuration_fingerprint: [0; 32],
+            stop_status: "legacy".into(),
+            chip_unit_bb: 0.001,
+            sweeps: value.sweeps,
+            approximate_profile: value.approximate_profile,
+            seats: value.seats,
+            histories: value.histories,
+            public_states: Vec::new(),
+            strategy_weights: Vec::new(),
+        }
+    }
 }
 
 impl MultiwaySolutionMetadata {
@@ -220,11 +458,19 @@ impl MultiwaySolutionMetadata {
         Self {
             schema_version: solution.schema_version,
             config_toml: solution.config_toml.clone(),
+            config_fingerprint: solution.config_fingerprint,
+            game_fingerprint: solution.game_fingerprint,
+            algorithm_fingerprint: solution.algorithm_fingerprint,
             abstraction_fingerprint: solution.abstraction_fingerprint,
+            configuration_fingerprint: solution.configuration_fingerprint,
+            stop_status: solution.stop_status.clone(),
+            chip_unit_bb: solution.chip_unit_bb,
             sweeps: solution.sweeps,
             approximate_profile: solution.approximate_profile,
             seats: solution.seats.clone(),
             histories: solution.histories.clone(),
+            public_states: solution.public_states.clone(),
+            strategy_weights: solution.strategy_weights.clone(),
         }
     }
 
@@ -232,12 +478,40 @@ impl MultiwaySolutionMetadata {
         resolve_history(&self.histories, key)
     }
 
+    fn actions_for_strategy(&self, key: MultiwayStrategyKey) -> Result<Vec<String>, MwSolError> {
+        let state = self
+            .public_states
+            .binary_search_by_key(&key.history, |state| state.history)
+            .ok()
+            .map(|index| &self.public_states[index])
+            .filter(|state| state.actor == Some(key.actor))
+            .ok_or(MwSolError::InvalidPublicStates)?;
+        Ok(state
+            .legal_actions
+            .iter()
+            .map(MultiwayPublicAction::label)
+            .collect())
+    }
+
     fn validate(&self) -> Result<(), MwSolError> {
         validate_metadata_fields(
             self.schema_version,
             self.approximate_profile,
             &self.histories,
-        )
+        )?;
+        validate_v4_identity(
+            V4Identity {
+                config_toml: &self.config_toml,
+                config_fingerprint: self.config_fingerprint,
+                game_fingerprint: self.game_fingerprint,
+                algorithm_fingerprint: self.algorithm_fingerprint,
+                configuration_fingerprint: self.configuration_fingerprint,
+                stop_status: &self.stop_status,
+                chip_unit_bb: self.chip_unit_bb,
+            },
+            !self.public_states.is_empty() || !self.strategy_weights.is_empty(),
+        )?;
+        validate_v4_metadata(&self.histories, &self.public_states, &self.strategy_weights)
     }
 }
 
@@ -259,6 +533,19 @@ impl MultiwaySolution {
             self.approximate_profile,
             &self.histories,
         )?;
+        validate_v4_identity(
+            V4Identity {
+                config_toml: &self.config_toml,
+                config_fingerprint: self.config_fingerprint,
+                game_fingerprint: self.game_fingerprint,
+                algorithm_fingerprint: self.algorithm_fingerprint,
+                configuration_fingerprint: self.configuration_fingerprint,
+                stop_status: &self.stop_status,
+                chip_unit_bb: self.chip_unit_bb,
+            },
+            !self.public_states.is_empty() || !self.strategy_weights.is_empty(),
+        )?;
+        validate_v4_metadata(&self.histories, &self.public_states, &self.strategy_weights)?;
         if self
             .strategies
             .windows(2)
@@ -266,11 +553,98 @@ impl MultiwaySolution {
         {
             return Err(MwSolError::UnsortedIndex);
         }
+        if self.strategy_weights.len() != self.strategies.len()
+            || self
+                .strategy_weights
+                .iter()
+                .zip(&self.strategies)
+                .any(|(weight, block)| weight.key != block.key)
+        {
+            return Err(MwSolError::InvalidStrategyWeights);
+        }
         for block in &self.strategies {
             validate_strategy_block(block, &self.histories)?;
+            let expected_actions = self
+                .public_states
+                .binary_search_by_key(&block.key.history, |state| state.history)
+                .ok()
+                .map(|index| &self.public_states[index])
+                .filter(|state| state.actor == Some(block.key.actor))
+                .ok_or(MwSolError::InvalidPublicStates)?
+                .legal_actions
+                .iter()
+                .map(MultiwayPublicAction::label)
+                .collect::<Vec<_>>();
+            if block.actions != expected_actions {
+                return Err(MwSolError::InvalidStrategy(block.key));
+            }
         }
         Ok(())
     }
+}
+struct V4Identity<'a> {
+    config_toml: &'a str,
+    config_fingerprint: [u8; 32],
+    game_fingerprint: [u8; 32],
+    algorithm_fingerprint: [u8; 32],
+    configuration_fingerprint: [u8; 32],
+    stop_status: &'a str,
+    chip_unit_bb: f64,
+}
+
+fn validate_v4_identity(identity: V4Identity<'_>, has_v4_content: bool) -> Result<(), MwSolError> {
+    if !has_v4_content {
+        return Ok(());
+    }
+    if identity.config_fingerprint != config_hash(identity.config_toml.as_bytes())
+        || identity.game_fingerprint == [0; 32]
+        || identity.algorithm_fingerprint == [0; 32]
+        || identity.configuration_fingerprint == [0; 32]
+        || identity.chip_unit_bb.to_bits() != 0.001_f64.to_bits()
+        || !matches!(
+            identity.stop_status,
+            "completed" | "sweep-limit" | "target-reached" | "time-limit" | "converged"
+        )
+    {
+        return Err(MwSolError::InvalidSolutionMetadata);
+    }
+    Ok(())
+}
+
+fn validate_v4_metadata(
+    histories: &[MultiwayHistoryNode],
+    public_states: &[MultiwayPublicState],
+    strategy_weights: &[MultiwayStrategyWeight],
+) -> Result<(), MwSolError> {
+    if public_states.is_empty() && strategy_weights.is_empty() {
+        return Ok(());
+    }
+    if public_states.is_empty()
+        || public_states
+            .windows(2)
+            .any(|pair| pair[0].history >= pair[1].history)
+        || public_states.iter().any(|state| {
+            (state.history != [0; 16]
+                && histories
+                    .binary_search_by_key(&state.history, |entry| entry.key)
+                    .is_err())
+                || state.remaining_stacks_millibb.is_empty()
+                || (state.actor.is_some() && state.legal_actions.is_empty())
+        })
+    {
+        return Err(MwSolError::InvalidPublicStates);
+    }
+    if strategy_weights.is_empty()
+        || strategy_weights
+            .windows(2)
+            .any(|pair| pair[0].key >= pair[1].key)
+        || strategy_weights
+            .iter()
+            .any(|entry| !entry.weight.is_finite() || entry.weight <= 0.0)
+    {
+        return Err(MwSolError::InvalidStrategyWeights);
+    }
+    Ok(())
 }
 
 fn resolve_history(
@@ -428,16 +802,16 @@ pub struct MwSolReader {
     format_version: u16,
 }
 
-/// Writes an `.mwsol` file (version 3), encoding each strategy frame per
-/// `storage`. `I16` quantization happens only at write time; the in-memory
-/// `MultiwaySolution` stays `f32` throughout.
+/// Writes an `.mwsol` file (version 4), encoding each strategy frame as
+/// unsigned U16 or F32 according to `storage`. Signed I16 is rejected; the
+/// in-memory `MultiwaySolution` stays `f32` throughout.
 pub fn write_mwsol_with(
     path: &Path,
     solution: &MultiwaySolution,
     storage: MwsolStorage,
 ) -> Result<(), MwSolError> {
     write_mwsol_frames(path, solution, MWSOL_FORMAT_VERSION, |block| {
-        let frame = FrameBlock::from_block(block, storage);
+        let frame = FrameBlockV4::from_block(block, storage)?;
         Ok(postcard::to_allocvec(&frame)?)
     })
 }
@@ -455,7 +829,19 @@ fn write_mwsol_frames(
     solution.validate()?;
 
     let metadata = MultiwaySolutionMetadata::from_solution(solution);
-    let metadata_raw = postcard::to_allocvec(&metadata)?;
+    let metadata_raw = if format_version >= 4 {
+        postcard::to_allocvec(&metadata)?
+    } else {
+        postcard::to_allocvec(&LegacyMultiwaySolutionMetadata {
+            schema_version: solution.schema_version,
+            config_toml: solution.config_toml.clone(),
+            abstraction_fingerprint: solution.abstraction_fingerprint,
+            sweeps: solution.sweeps,
+            approximate_profile: solution.approximate_profile,
+            seats: solution.seats.clone(),
+            histories: solution.histories.clone(),
+        })?
+    };
     let metadata_uncompressed_len =
         u64::try_from(metadata_raw.len()).map_err(|_| MwSolError::LengthOverflow)?;
     if metadata_uncompressed_len > MAX_METADATA_UNCOMPRESSED_BYTES {
@@ -655,8 +1041,18 @@ impl MwSolReader {
             header.metadata_uncompressed_len,
             MAX_METADATA_UNCOMPRESSED_BYTES,
         )?;
-        let metadata: MultiwaySolutionMetadata = postcard::from_bytes(&metadata_raw)?;
+        let metadata: MultiwaySolutionMetadata = if format_version >= 4 {
+            postcard::from_bytes(&metadata_raw)?
+        } else {
+            postcard::from_bytes::<LegacyMultiwaySolutionMetadata>(&metadata_raw)?.into()
+        };
         metadata.validate()?;
+        if format_version >= 4
+            && (metadata.strategy_weights.len() != strategy_count
+                || (strategy_count > 0 && metadata.public_states.is_empty()))
+        {
+            return Err(MwSolError::InvalidStrategyWeights);
+        }
 
         let computed = config_hash(metadata.config_toml.as_bytes());
         if computed != header.config_hash {
@@ -688,6 +1084,18 @@ impl MwSolReader {
                 return Err(MwSolError::UnsortedIndex);
             }
             validate_strategy_key(entry.key, &metadata.histories)?;
+            if format_version >= 4
+                && metadata
+                    .strategy_weights
+                    .get(index)
+                    .map(|weight| weight.key)
+                    != Some(entry.key)
+            {
+                return Err(MwSolError::InvalidStrategyWeights);
+            }
+            if format_version >= 4 {
+                metadata.actions_for_strategy(entry.key)?;
+            }
             if entry.offset != indexed_payload_len {
                 return Err(MwSolError::StrategyOffsetMismatch {
                     index,
@@ -815,7 +1223,10 @@ impl MwSolReader {
                 entry.uncompressed_len,
                 MAX_STRATEGY_BLOCK_UNCOMPRESSED_BYTES,
             )?;
-            let block: MultiwayStrategyBlock = if self.format_version >= 3 {
+            let block: MultiwayStrategyBlock = if self.format_version >= 4 {
+                let frame: FrameBlockV4 = postcard::from_bytes(&raw)?;
+                frame.into_block(self.metadata.actions_for_strategy(entry.key)?)
+            } else if self.format_version >= 3 {
                 let frame: FrameBlock = postcard::from_bytes(&raw)?;
                 frame.into_block()
             } else {
@@ -1042,6 +1453,14 @@ pub enum MwSolError {
     UnsortedIndex,
     #[error("multiway public-history trie is invalid")]
     InvalidHistoryTrie,
+    #[error("multiway public-state table is invalid")]
+    InvalidPublicStates,
+    #[error("multiway solution identity/quality metadata is invalid")]
+    InvalidSolutionMetadata,
+    #[error("multiway strategy-weight table is invalid")]
+    InvalidStrategyWeights,
+    #[error("signed i16 strategy encoding is unsupported in .mwsol v4")]
+    UnsupportedStrategyEncoding,
     #[error("invalid strategy block for {0:?}")]
     InvalidStrategy(MultiwayStrategyKey),
     #[error(".mwsol cursor {cursor} is past strategy count {total}")]
@@ -1085,14 +1504,24 @@ mod tests {
         let solution = MultiwaySolution {
             schema_version: metadata.schema_version,
             config_toml: metadata.config_toml,
+            config_fingerprint: metadata.config_fingerprint,
+            game_fingerprint: metadata.game_fingerprint,
+            algorithm_fingerprint: metadata.algorithm_fingerprint,
             abstraction_fingerprint: metadata.abstraction_fingerprint,
+            configuration_fingerprint: metadata.configuration_fingerprint,
+            stop_status: metadata.stop_status,
+            chip_unit_bb: metadata.chip_unit_bb,
             sweeps: metadata.sweeps,
             approximate_profile: metadata.approximate_profile,
             seats: metadata.seats,
             histories: metadata.histories,
+            public_states: metadata.public_states,
+            strategy_weights: metadata.strategy_weights,
             strategies,
         };
-        solution.validate()?;
+        if reader.format_version() >= 4 {
+            solution.validate()?;
+        }
         Ok(solution)
     }
 
@@ -1115,24 +1544,52 @@ mod tests {
     }
 
     fn solution() -> MultiwaySolution {
+        let key = |index| MultiwayStrategyKey {
+            history: [0; 16],
+            actor: 0,
+            street: 0,
+            active_opponents: 2,
+            bucket_path: [12 + index as u32, 0, 0, 0],
+        };
+        let config_toml = "[game]\nkind = \"preflop-multiway\"\n".to_string();
         MultiwaySolution {
             schema_version: MULTIWAY_SCHEMA_VERSION,
-            config_toml: "[game]\nkind = \"preflop-multiway\"\n".into(),
+            config_fingerprint: config_hash(config_toml.as_bytes()),
+            config_toml,
+            game_fingerprint: [5; 32],
+            algorithm_fingerprint: [6; 32],
             abstraction_fingerprint: [7; 32],
+            configuration_fingerprint: [8; 32],
+            stop_status: "completed".into(),
+            chip_unit_bb: 0.001,
             sweeps: 99,
             approximate_profile: true,
             seats: Vec::new(),
             histories: Vec::new(),
+            public_states: vec![MultiwayPublicState {
+                history: [0; 16],
+                street: 0,
+                actor: Some(0),
+                pot_millibb: 1_500,
+                remaining_stacks_millibb: vec![99_500, 99_000],
+                legal_actions: vec![
+                    MultiwayPublicAction::Fold,
+                    MultiwayPublicAction::Call {
+                        amount_millibb: 500,
+                        all_in: false,
+                    },
+                ],
+            }],
+            strategy_weights: (0..5)
+                .map(|index| MultiwayStrategyWeight {
+                    key: key(index),
+                    weight: 10.0,
+                })
+                .collect(),
             strategies: (0..5)
                 .map(|index| MultiwayStrategyBlock {
-                    key: MultiwayStrategyKey {
-                        history: [0; 16],
-                        actor: 0,
-                        street: 0,
-                        active_opponents: 2,
-                        bucket_path: [12 + index, 0, 0, 0],
-                    },
-                    actions: vec!["fold".into(), "call".into()],
+                    key: key(index),
+                    actions: vec!["fold".into(), "call:500".into()],
                     probabilities: vec![0.25, 0.75],
                 })
                 .collect(),
@@ -1418,8 +1875,12 @@ mod tests {
             action_index: 1,
             action: "raise-to:2500".into(),
         });
+        value.public_states[0].history = key;
         for strategy in &mut value.strategies {
             strategy.key.history = key;
+        }
+        for weight in &mut value.strategy_weights {
+            weight.key.history = key;
         }
         let expected = vec![MultiwayHistoryAction {
             actor: 2,
@@ -1445,42 +1906,24 @@ mod tests {
         write_mwsol_frames(path, solution, 2, |block| Ok(postcard::to_allocvec(block)?))
     }
 
+    fn write_legacy_v3(path: &Path, solution: &MultiwaySolution) -> Result<(), MwSolError> {
+        write_mwsol_frames(path, solution, 3, |block| {
+            Ok(postcard::to_allocvec(&FrameBlock::from_block(
+                block,
+                MwsolStorage::F32,
+            ))?)
+        })
+    }
+
     #[test]
-    fn i16_storage_round_trips_within_quantization_tolerance() {
+    fn i16_storage_is_rejected_by_v4() {
         let directory = tempfile::tempdir().unwrap();
-        let path = directory.path().join("quantized.mwsol");
-        let mut expected = solution();
-        // Exercise awkward, non-power-of-two probabilities in addition to
-        // the default 0.25/0.75 split already present in `solution()`.
-        expected.strategies[0].actions = vec!["fold".into(), "call".into(), "raise-to:2500".into()];
-        expected.strategies[0].probabilities = vec![1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0];
-        expected.strategies[1].probabilities = vec![0.9999, 0.0001];
-
-        write_mwsol_with(&path, &expected, MwsolStorage::I16).unwrap();
-
-        let mut reader = MwSolReader::open(&path).unwrap();
-        assert_eq!(reader.format_version(), MWSOL_FORMAT_VERSION);
-        let decoded = decode_via_reader(&path).unwrap();
-        assert_eq!(decoded.strategies.len(), expected.strategies.len());
-        for (got, want) in decoded.strategies.iter().zip(expected.strategies.iter()) {
-            assert_eq!(got.key, want.key);
-            assert_eq!(got.actions, want.actions);
-            let mut max_error = 0f32;
-            for (a, b) in got.probabilities.iter().zip(want.probabilities.iter()) {
-                max_error = max_error.max((a - b).abs());
-            }
-            assert!(
-                max_error < 1e-4,
-                "max error {max_error} for key {:?}",
-                got.key
-            );
-            let sum: f32 = got.probabilities.iter().sum();
-            assert!(
-                (sum - 1.0).abs() < 1e-4,
-                "decoded sum {sum} not within f32 rounding of 1.0"
-            );
-        }
-        let _ = reader.read_strategy_page(0, 1).unwrap();
+        let path = directory.path().join("signed.mwsol");
+        assert!(matches!(
+            write_mwsol_with(&path, &solution(), MwsolStorage::I16),
+            Err(MwSolError::UnsupportedStrategyEncoding)
+        ));
+        assert!(!path.exists());
     }
 
     #[test]
@@ -1514,25 +1957,58 @@ mod tests {
     }
 
     #[test]
-    fn version_two_files_are_read_identically_to_version_three() {
+    fn u16_storage_round_trips_and_uses_the_full_denominator() {
         let directory = tempfile::tempdir().unwrap();
-        let v2_path = directory.path().join("legacy.mwsol");
-        let v3_path = directory.path().join("current.mwsol");
+        let path = directory.path().join("unsigned.mwsol");
+        let expected = solution();
+        write_mwsol_with(&path, &expected, MwsolStorage::U16).unwrap();
+
+        let reader = MwSolReader::open(&path).unwrap();
+        assert_eq!(reader.format_version(), 4);
+        let decoded = decode_via_reader(&path).unwrap();
+        for (got, want) in decoded.strategies.iter().zip(&expected.strategies) {
+            assert_eq!(got.actions, want.actions);
+            let max_error = got
+                .probabilities
+                .iter()
+                .zip(&want.probabilities)
+                .map(|(a, b)| (a - b).abs())
+                .fold(0.0_f32, f32::max);
+            assert!(max_error <= 1.0 / f32::from(u16::MAX));
+        }
+        let quantized = quantize_u16(&[1.0 / 3.0; 3]);
+        assert_eq!(quantized.iter().map(|&q| u64::from(q)).sum::<u64>(), 65_535);
+    }
+
+    #[test]
+    fn legacy_versions_remain_readable_behind_the_migration_gate() {
+        let directory = tempfile::tempdir().unwrap();
+        let v2_path = directory.path().join("v2.mwsol");
+        let v3_path = directory.path().join("v3.mwsol");
+        let v4_path = directory.path().join("v4.mwsol");
         let expected = solution();
 
         write_legacy_v2(&v2_path, &expected).unwrap();
-        write_mwsol_with(&v3_path, &expected, MwsolStorage::F32).unwrap();
+        write_legacy_v3(&v3_path, &expected).unwrap();
+        write_mwsol_with(&v4_path, &expected, MwsolStorage::F32).unwrap();
 
         let mut v2_reader = MwSolReader::open(&v2_path).unwrap();
-        assert_eq!(v2_reader.format_version(), 2);
-        let v2_decoded = decode_via_reader(&v2_path).unwrap();
-
         let mut v3_reader = MwSolReader::open(&v3_path).unwrap();
-        assert_eq!(v3_reader.format_version(), MWSOL_FORMAT_VERSION);
-        let v3_decoded = decode_via_reader(&v3_path).unwrap();
+        let v4_reader = MwSolReader::open(&v4_path).unwrap();
+        assert_eq!(v2_reader.format_version(), 2);
+        assert_eq!(v3_reader.format_version(), 3);
+        assert_eq!(v4_reader.format_version(), 4);
 
-        assert_eq!(v2_decoded, expected);
-        assert_eq!(v2_decoded, v3_decoded);
+        let v2_decoded = decode_via_reader(&v2_path).unwrap();
+        let v3_decoded = decode_via_reader(&v3_path).unwrap();
+        let v4_decoded = decode_via_reader(&v4_path).unwrap();
+        assert!(v2_decoded.public_states.is_empty());
+        assert!(v2_decoded.strategy_weights.is_empty());
+        assert!(v3_decoded.public_states.is_empty());
+        assert!(v3_decoded.strategy_weights.is_empty());
+        assert_eq!(v2_decoded.strategies, expected.strategies);
+        assert_eq!(v3_decoded.strategies, expected.strategies);
+        assert_eq!(v4_decoded, expected);
 
         let v2_page = v2_reader.read_strategy_page(0, 2).unwrap();
         let v3_page = v3_reader.read_strategy_page(0, 2).unwrap();

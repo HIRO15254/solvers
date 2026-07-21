@@ -37,11 +37,19 @@ fn read_mwsol_full(path: &Path) -> formats::MultiwaySolution {
     formats::MultiwaySolution {
         schema_version: metadata.schema_version,
         config_toml: metadata.config_toml,
+        config_fingerprint: metadata.config_fingerprint,
+        game_fingerprint: metadata.game_fingerprint,
+        algorithm_fingerprint: metadata.algorithm_fingerprint,
         abstraction_fingerprint: metadata.abstraction_fingerprint,
+        configuration_fingerprint: metadata.configuration_fingerprint,
+        stop_status: metadata.stop_status,
+        chip_unit_bb: metadata.chip_unit_bb,
         sweeps: metadata.sweeps,
         approximate_profile: metadata.approximate_profile,
         seats: metadata.seats,
         histories: metadata.histories,
+        public_states: metadata.public_states,
+        strategy_weights: metadata.strategy_weights,
         strategies,
     }
 }

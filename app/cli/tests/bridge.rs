@@ -364,7 +364,7 @@ check_every = 1
     assert_eq!(validated.status, 200, "body: {:?}", validated.json());
     assert_eq!(
         validated.json(),
-        json!({ "valid": true, "schemaVersion": 2 })
+        json!({ "valid": true, "schemaVersion": 3 })
     );
 
     let unsafe_resume_body = serde_json::to_vec(&json!({

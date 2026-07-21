@@ -16,3 +16,15 @@
   `#[ignore]`d and run on CI in release via `--include-ignored`.
 - The `cfr-ref` crate is a frozen differential-testing oracle: do not optimize it and do not
   share code between it and `engine`/`game`.
+
+## Multiway Preflop specification synchronization
+
+The normative specification is `docs/multiway-preflop-cli-spec.jp.md`; the
+human/AI implementation guide is `docs/multiway-preflop-v1.md`; and the
+complete configuration reference is `docs/multiway-preflop-toml-reference.jp.md`.
+Any change to the Multiway Preflop contract or a default MUST update all three documents,
+the dedicated parser/runtime, tests, examples, CLI help, and affected
+artifact metadata in the same change set. Do not declare the task complete
+while they disagree. Unsupported normative behavior must fail explicitly and
+remain documented as an open migration boundary; never silently ignore it or
+preserve an option that the v1 specification removes.

@@ -5,7 +5,8 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::betting::{BettingState, HandPhase, SeatStatus};
-use crate::config::CompiledRake;
+use crate::config::{CompiledRake, RakeAllocation, RakeRounding};
+use crate::rake_condition::RakeConditionContext;
 use crate::types::{MwChips, SeatId, SeatMask, SeatVec};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -157,7 +158,7 @@ pub(crate) fn build_rated_pots(
     rake: CompiledRake,
 ) -> Result<PotConstruction, SettlementError> {
     let mut construction = build_pots(state)?;
-    apply_rake(&mut construction.pots, rake, state.flop_dealt)?;
+    apply_rake(&mut construction.pots, rake, state)?;
     Ok(construction)
 }
 
@@ -254,7 +255,7 @@ fn settle_with_winners(
     mut winners_for: impl FnMut(&PotLayer, usize) -> Result<SeatMask, SettlementError>,
 ) -> Result<Settlement, SettlementError> {
     let PotConstruction { mut pots, refunds } = build_pots(state)?;
-    let total_rake = apply_rake(&mut pots, rake, state.flop_dealt)?;
+    let total_rake = apply_rake(&mut pots, rake, state)?;
     let mut awards = SeatVec::new_unchecked(vec![MwChips::ZERO; state.num_seats()]);
     for (index, pot) in pots.iter().enumerate() {
         let winners = winners_for(pot, index)?;
@@ -298,12 +299,18 @@ fn settle_with_winners(
 fn apply_rake(
     pots: &mut [PotLayer],
     rake: CompiledRake,
-    flop_dealt: bool,
+    state: &BettingState,
 ) -> Result<MwChips, SettlementError> {
     let gross = pots
         .iter()
         .map(|pot| pot.gross)
         .fold(MwChips::ZERO, |sum, value| sum + value);
+    let rake_context = RakeConditionContext {
+        flop_dealt: state.flop_dealt,
+        showdown: !matches!(state.phase, HandPhase::Uncontested { .. }),
+        players_dealt: state.num_seats() as u8,
+        players_saw_flop: state.street_active_players[crate::types::Street::Flop.index()],
+    };
     let total = match rake {
         CompiledRake::None => MwChips::ZERO,
         CompiledRake::PercentCap {
@@ -311,10 +318,24 @@ fn apply_rake(
             cap,
             no_flop_no_drop,
         } => {
-            if no_flop_no_drop && !flop_dealt {
+            if no_flop_no_drop && !state.flop_dealt {
                 MwChips::ZERO
             } else {
                 percentage(gross, rate).min(cap)
+            }
+        }
+        CompiledRake::Generic {
+            rate,
+            cap,
+            when,
+            rounding,
+            ..
+        } => {
+            if !when.matches(rake_context) {
+                MwChips::ZERO
+            } else {
+                let value = percentage_with_rounding(gross, rate, rounding);
+                cap.map_or(value, |cap| value.min(cap))
             }
         }
         CompiledRake::GgPreflop {
@@ -334,6 +355,26 @@ fn apply_rake(
     }
     if gross == MwChips::ZERO || total > gross {
         return Err(SettlementError::ChipInvariant);
+    }
+
+    if matches!(
+        rake,
+        CompiledRake::Generic {
+            allocation: RakeAllocation::MainFirst,
+            ..
+        }
+    ) {
+        let mut remaining = total;
+        for pot in pots {
+            let share = remaining.min(pot.gross);
+            pot.rake = share;
+            pot.net = pot.gross - share;
+            remaining -= share;
+        }
+        if remaining != MwChips::ZERO {
+            return Err(SettlementError::ChipInvariant);
+        }
+        return Ok(total);
     }
 
     let denominator = gross.raw() as u128;
@@ -387,6 +428,16 @@ fn award_split(
 
 fn percentage(amount: MwChips, rate: f64) -> MwChips {
     MwChips((amount.raw() as f64 * rate).floor() as u64)
+}
+
+fn percentage_with_rounding(amount: MwChips, rate: f64, rounding: RakeRounding) -> MwChips {
+    let exact = amount.raw() as f64 * rate;
+    let rounded = match rounding {
+        RakeRounding::Down => exact.floor(),
+        RakeRounding::Nearest => exact.round(),
+        RakeRounding::Up => exact.ceil(),
+    };
+    MwChips(rounded as u64)
 }
 
 fn multiply(amount: MwChips, count: usize) -> Result<MwChips, SettlementError> {
@@ -477,6 +528,9 @@ mod tests {
             flop_dealt: true,
             phase: HandPhase::Showdown,
             preflop_voluntary_call_seen: false,
+            preflop_limpers: 0,
+            preflop_flats: 0,
+            last_preflop_aggressor: None,
         }
     }
 
@@ -538,6 +592,33 @@ mod tests {
         .unwrap();
         assert_eq!(settled.total_rake, MwChips(15));
         assert_eq!(settled.final_stacks[SeatId(0)], MwChips(185));
+    }
+
+    #[test]
+    fn generic_rake_honors_main_first_allocation_and_rounding() {
+        let state = manual(&[100, 50, 20], &[0, 0, 0], &[SeatStatus::AllIn; 3]);
+        let rated = build_rated_pots(
+            &state,
+            CompiledRake::Generic {
+                rate: 0.1,
+                cap: None,
+                when: crate::rake_condition::compile("true").unwrap(),
+                allocation: RakeAllocation::MainFirst,
+                rounding: RakeRounding::Down,
+            },
+        )
+        .unwrap();
+        assert_eq!(rated.pots.iter().map(|pot| pot.rake.raw()).sum::<u64>(), 12);
+        assert_eq!(rated.pots[0].rake, MwChips(12));
+        assert!(rated.pots[1..].iter().all(|pot| pot.rake == MwChips::ZERO));
+        assert_eq!(
+            percentage_with_rounding(MwChips(15), 0.1, RakeRounding::Nearest),
+            MwChips(2)
+        );
+        assert_eq!(
+            percentage_with_rounding(MwChips(11), 0.1, RakeRounding::Up),
+            MwChips(2)
+        );
     }
 
     #[test]

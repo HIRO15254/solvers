@@ -12,17 +12,13 @@ use crate::solver::{
 };
 
 const CHECKPOINT_MAGIC: &[u8; 8] = b"SLVRMWCP";
-/// Bumped 5 -> 6 when [`SolverConfig`] grew `prune`, `prune_threshold`, and
-/// `prune_skip_probability` fields. `load` transparently accepts version 6
-/// (current) and [`MIN_SUPPORTED_CHECKPOINT_VERSION`] (version 5, decoding
-/// the older on-disk `SolverConfig` shape without the prune fields and
-/// filling `prune = false`, `prune_threshold = DEFAULT_PRUNE_THRESHOLD`,
-/// `prune_skip_probability = DEFAULT_PRUNE_SKIP_PROBABILITY`); every
-/// checkpoint this process *writes* is always the current version. Versions
-/// 3-4 (predating `sweep_batch`, then `traverser_vector`/`hand_updates`) are
-/// no longer loadable -- their legacy mirror structs and `From` conversions
-/// were removed once nothing in production needed to resume that old.
-pub const CHECKPOINT_VERSION: u16 = 6;
+/// Version 7 embeds the effective v1 config plus runtime stop/evaluation state
+/// so the checkpoint can resume without a separate TOML file. Readers retain
+/// versions 5-6 only for the explicit real-data migration gate, converting
+/// their older solver/config shapes and defaulting the new metadata. Every
+/// checkpoint this process writes uses the current version; versions 3-4 are
+/// no longer loadable.
+pub const CHECKPOINT_VERSION: u16 = 7;
 /// Oldest checkpoint container version [`MultiwayCheckpoint::load_unchecked`]
 /// still reads. Bump only alongside a matching legacy mirror struct and
 /// `From` conversion into the current [`SolverState`] shape.
@@ -57,6 +53,31 @@ struct ChunkEntry {
 pub struct MultiwayCheckpoint {
     pub header: MultiwayCheckpointHeader,
     pub state: SolverState,
+    pub config_toml: Option<String>,
+    pub runtime: CheckpointRuntimeState,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CheckpointRuntimeState {
+    pub confirmations_met: u32,
+    pub next_evaluation_sweep: u64,
+    pub evaluation_samples: u64,
+    pub evaluation_sequence: u64,
+    pub cumulative_solve_millis: u64,
+}
+
+#[derive(Deserialize, Serialize)]
+struct CheckpointPayloadV7 {
+    state: SolverState,
+    config_toml: String,
+    runtime: CheckpointRuntimeState,
+}
+
+#[derive(Serialize)]
+struct CheckpointPayloadV7Ref<'a> {
+    state: &'a SolverState,
+    config_toml: &'a str,
+    runtime: CheckpointRuntimeState,
 }
 
 /// Mirrors [`SolverConfig`]'s on-disk shape for checkpoint container version
@@ -139,6 +160,8 @@ impl MultiwayCheckpoint {
                 chunk_table_checksum: [0; 32],
             },
             state,
+            config_toml: None,
+            runtime: CheckpointRuntimeState::default(),
         }
     }
 
@@ -148,6 +171,16 @@ impl MultiwayCheckpoint {
             solver.configuration_fingerprint(),
             solver.abstraction_fingerprint(),
         )
+    }
+
+    pub fn with_runtime_metadata(
+        mut self,
+        config_toml: impl Into<String>,
+        runtime: CheckpointRuntimeState,
+    ) -> Self {
+        self.config_toml = Some(config_toml.into());
+        self.runtime = runtime;
+        self
     }
 
     /// Writes to a temporary file in the destination directory, fsyncs it,
@@ -177,7 +210,12 @@ impl MultiwayCheckpoint {
         let mut raw_file = tempfile::NamedTempFile::new_in(directory)?;
         {
             let writer = BufWriter::new(raw_file.as_file_mut());
-            let mut writer = postcard::to_io(&self.state, writer)?;
+            let payload = CheckpointPayloadV7Ref {
+                state: &self.state,
+                config_toml: self.config_toml.as_deref().unwrap_or(""),
+                runtime: self.runtime,
+            };
+            let mut writer = postcard::to_io(&payload, writer)?;
             writer.flush()?;
         }
         let uncompressed_len = raw_file.as_file().metadata()?.len();
@@ -419,11 +457,19 @@ impl MultiwayCheckpoint {
             });
         }
 
-        let state: SolverState = match header.version {
-            6 => postcard::from_bytes(&raw)?,
+        let (state, config_toml, runtime) = match header.version {
+            7 => {
+                let payload: CheckpointPayloadV7 = postcard::from_bytes(&raw)?;
+                (payload.state, Some(payload.config_toml), payload.runtime)
+            }
+            6 => (
+                postcard::from_bytes(&raw)?,
+                None,
+                CheckpointRuntimeState::default(),
+            ),
             5 => {
                 let legacy: SolverStateV5 = postcard::from_bytes(&raw)?;
-                legacy.into()
+                (legacy.into(), None, CheckpointRuntimeState::default())
             }
             other => {
                 // `decode_header` already rejected anything outside
@@ -444,7 +490,12 @@ impl MultiwayCheckpoint {
                 state: state.next_sample_id,
             });
         }
-        Ok(Self { header, state })
+        Ok(Self {
+            header,
+            state,
+            config_toml: config_toml.filter(|value| !value.is_empty()),
+            runtime,
+        })
     }
 }
 
@@ -1040,6 +1091,28 @@ mod tests {
         assert_eq!(loaded.state.config.prune_threshold, -12_345.5);
         assert_eq!(loaded.state.config.prune_skip_probability, 0.42);
         assert_eq!(loaded.state, pruned_state);
+    }
+
+    #[test]
+    fn v7_round_trips_self_contained_config_and_runtime_state() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("self-contained.mwckpt");
+        let runtime = CheckpointRuntimeState {
+            confirmations_met: 2,
+            next_evaluation_sweep: 30_000,
+            evaluation_samples: 8_192,
+            evaluation_sequence: 7,
+            cumulative_solve_millis: 123_456,
+        };
+        let checkpoint = MultiwayCheckpoint::new(state(), [1; 32], [2; 32])
+            .with_runtime_metadata("schema = \"solvers.multiway-preflop/v1\"", runtime);
+        checkpoint.write_atomic(&path).unwrap();
+        let loaded = MultiwayCheckpoint::load(&path, [1; 32], [2; 32]).unwrap();
+        assert_eq!(
+            loaded.config_toml.as_deref(),
+            checkpoint.config_toml.as_deref()
+        );
+        assert_eq!(loaded.runtime, runtime);
     }
 
     #[test]

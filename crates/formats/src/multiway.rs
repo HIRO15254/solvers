@@ -5,12 +5,12 @@
 //! and intentionally avoid the `exploitability` / `nash_conv` vocabulary.
 
 use std::fs::{File, OpenOptions};
-use std::io::{self, Write};
+use std::io::{self, BufRead, BufReader, Write};
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-pub const MULTIWAY_SCHEMA_VERSION: u16 = 2;
+pub const MULTIWAY_SCHEMA_VERSION: u16 = 3;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -76,22 +76,51 @@ impl MultiwayMetricsRow {
     }
 }
 
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ProgressEvent<'a> {
+    sequence: u64,
+    event: &'a str,
+    #[serde(flatten)]
+    row: &'a MultiwayMetricsRow,
+}
+
 pub struct MultiwayMetricsWriter {
     file: File,
+    next_sequence: u64,
 }
 
 impl MultiwayMetricsWriter {
     pub fn create_or_append(path: &Path) -> io::Result<Self> {
+        let next_sequence = if path.exists() {
+            BufReader::new(File::open(path)?)
+                .lines()
+                .map_while(Result::ok)
+                .filter_map(|line| serde_json::from_str::<serde_json::Value>(&line).ok())
+                .filter_map(|event| event.get("sequence")?.as_u64())
+                .max()
+                .map_or(0, |last| last.saturating_add(1))
+        } else {
+            0
+        };
         Ok(Self {
             file: OpenOptions::new().create(true).append(true).open(path)?,
+            next_sequence,
         })
     }
 
     pub fn append(&mut self, row: &MultiwayMetricsRow) -> io::Result<()> {
-        let mut line = serde_json::to_string(row).map_err(io::Error::other)?;
+        let event = ProgressEvent {
+            sequence: self.next_sequence,
+            event: &row.phase,
+            row,
+        };
+        let mut line = serde_json::to_string(&event).map_err(io::Error::other)?;
         line.push('\n');
         self.file.write_all(line.as_bytes())?;
-        self.file.flush()
+        self.file.flush()?;
+        self.next_sequence = self.next_sequence.saturating_add(1);
+        Ok(())
     }
 }
 
@@ -109,5 +138,25 @@ mod tests {
             serde_json::from_str::<MultiwayMetricsRow>(&json).unwrap(),
             row
         );
+    }
+
+    #[test]
+    fn progress_writer_assigns_monotonic_event_sequences() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("progress.jsonl");
+        let row = MultiwayMetricsRow::sampling(3);
+        {
+            let mut writer = MultiwayMetricsWriter::create_or_append(&path).unwrap();
+            writer.append(&row).unwrap();
+            writer.append(&row).unwrap();
+        }
+        let lines: Vec<serde_json::Value> = std::fs::read_to_string(path)
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        assert_eq!(lines[0]["sequence"], 0);
+        assert_eq!(lines[1]["sequence"], 1);
+        assert_eq!(lines[0]["event"], "sampling");
     }
 }

@@ -31,11 +31,19 @@ fn read_mwsol_full(path: &std::path::Path) -> formats::MultiwaySolution {
     formats::MultiwaySolution {
         schema_version: metadata.schema_version,
         config_toml: metadata.config_toml,
+        config_fingerprint: metadata.config_fingerprint,
+        game_fingerprint: metadata.game_fingerprint,
+        algorithm_fingerprint: metadata.algorithm_fingerprint,
         abstraction_fingerprint: metadata.abstraction_fingerprint,
+        configuration_fingerprint: metadata.configuration_fingerprint,
+        stop_status: metadata.stop_status,
+        chip_unit_bb: metadata.chip_unit_bb,
         sweeps: metadata.sweeps,
         approximate_profile: metadata.approximate_profile,
         seats: metadata.seats,
         histories: metadata.histories,
+        public_states: metadata.public_states,
+        strategy_weights: metadata.strategy_weights,
         strategies,
     }
 }
@@ -368,16 +376,22 @@ fn multiway_resource_limit_writes_an_implicit_checkpoint() {
     let output_path = dir.join("result.json");
     let checkpoint_path = dir.join("result.mwckpt");
 
-    let command = run_solvers_ok(&[
+    let command = run_solvers(&[
         "solve",
         config.to_str().unwrap(),
         "--output",
         output_path.to_str().unwrap(),
     ]);
-    let stdout = String::from_utf8_lossy(&command.stdout);
+    assert_eq!(
+        command.status.code(),
+        Some(75),
+        "resource limits must use the stable EX_TEMPFAIL-style exit code; stderr: {}",
+        String::from_utf8_lossy(&command.stderr)
+    );
+    let stderr = String::from_utf8_lossy(&command.stderr);
     assert!(
-        stdout.contains(&checkpoint_path.display().to_string()),
-        "stdout must identify the recovery checkpoint: {stdout}"
+        stderr.contains(&checkpoint_path.display().to_string()),
+        "stderr must identify the recovery checkpoint: {stderr}"
     );
     assert!(checkpoint_path.is_file());
     let checkpoint = multiway::MultiwayCheckpoint::load_unchecked(&checkpoint_path).unwrap();
@@ -391,27 +405,21 @@ fn multiway_resource_limit_writes_an_implicit_checkpoint() {
 
 #[test]
 #[ignore = "trains the multiway rollout artifact; CI runs it in release"]
-fn multiway_i16_storage_writes_a_quantized_mwsol() {
-    let dir = temp_dir("multiway-i16");
-    let raw =
-        std::fs::read_to_string(workspace_root().join("examples/preflop_multiway_3max_smoke.toml"))
-            .unwrap();
-    let quantized = raw.replace("storage = \"f32\"", "storage = \"i16\"");
-    assert_ne!(raw, quantized, "smoke config storage fixture changed");
-    let config = dir.join("i16.toml");
-    std::fs::write(&config, quantized).unwrap();
-    let solution_path = dir.join("result.mwsol");
+fn multiway_v1_u16_storage_writes_a_quantized_mwsol() {
+    let dir = temp_dir("multiway-v1-u16");
+    let config = workspace_root().join("examples/preflop_multiway_v1_smoke.toml");
+    let run_dir = dir.join("run");
 
     run_solvers_ok(&[
         "solve",
         config.to_str().unwrap(),
-        "--sol",
-        solution_path.to_str().unwrap(),
+        "--out",
+        run_dir.to_str().unwrap(),
     ]);
 
-    let solution = read_mwsol_full(&solution_path);
+    let solution = read_mwsol_full(&run_dir.join("solution.mwsol"));
     assert!(!solution.strategies.is_empty());
-    let grid = f64::from(i16::MAX);
+    let grid = f64::from(u16::MAX);
     for block in &solution.strategies {
         let sum: f32 = block.probabilities.iter().sum();
         assert!((sum - 1.0).abs() <= 1e-4, "quantized sum drifted: {sum}");
@@ -419,7 +427,7 @@ fn multiway_i16_storage_writes_a_quantized_mwsol() {
             let units = f64::from(probability) * grid;
             assert!(
                 (units - units.round()).abs() < 1e-3,
-                "probability {probability} is not on the i16 grid"
+                "probability {probability} is not on the u16 grid"
             );
         }
     }
@@ -466,7 +474,8 @@ fn bench_kuhn_two_schedules() {
     let metrics_dir = dir.join("metrics");
 
     let output = run_solvers_ok(&[
-        "bench",
+        "experiment",
+        "benchmark",
         config.to_str().unwrap(),
         "--schedules",
         "dcfr,cfr-plus",

@@ -18,11 +18,104 @@
 //! CFR schedules (dcfr/cfr-plus/vanilla/linear-cfr/hs-dcfr) on the same
 //! config in one pass.
 
+pub static CLI_CANCEL: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+pub static CLI_EXIT_CODE: std::sync::atomic::AtomicI32 = std::sync::atomic::AtomicI32::new(0);
+static CLI_INTERRUPT_COUNT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
+#[cfg(unix)]
+extern "C" fn handle_sigint(_signal: libc::c_int) {
+    use std::sync::atomic::Ordering;
+    if CLI_INTERRUPT_COUNT.fetch_add(1, Ordering::SeqCst) == 0 {
+        CLI_CANCEL.store(true, Ordering::SeqCst);
+    } else {
+        unsafe { libc::_exit(130) }
+    }
+}
+
+#[cfg(windows)]
+unsafe extern "system" fn handle_console_interrupt(control_type: u32) -> i32 {
+    use std::sync::atomic::Ordering;
+    use windows_sys::Win32::System::Console::{CTRL_BREAK_EVENT, CTRL_C_EVENT};
+    if control_type != CTRL_C_EVENT && control_type != CTRL_BREAK_EVENT {
+        return 0;
+    }
+    if CLI_INTERRUPT_COUNT.fetch_add(1, Ordering::SeqCst) == 0 {
+        CLI_CANCEL.store(true, Ordering::SeqCst);
+    } else {
+        std::process::exit(130);
+    }
+    1
+}
+
+pub fn install_signal_handler() -> anyhow::Result<()> {
+    CLI_CANCEL.store(false, std::sync::atomic::Ordering::SeqCst);
+    CLI_EXIT_CODE.store(0, std::sync::atomic::Ordering::SeqCst);
+    CLI_INTERRUPT_COUNT.store(0, std::sync::atomic::Ordering::SeqCst);
+    #[cfg(unix)]
+    unsafe {
+        if libc::signal(libc::SIGINT, handle_sigint as libc::sighandler_t) == libc::SIG_ERR {
+            return Err(anyhow::anyhow!("installing SIGINT handler failed"));
+        }
+    }
+    #[cfg(windows)]
+    unsafe {
+        if windows_sys::Win32::System::Console::SetConsoleCtrlHandler(
+            Some(handle_console_interrupt),
+            1,
+        ) == 0
+        {
+            return Err(anyhow::anyhow!(
+                "installing console interrupt handler failed"
+            ));
+        }
+    }
+    Ok(())
+}
+
+pub fn error_exit_code(error: &anyhow::Error) -> i32 {
+    if error.chain().any(|cause| {
+        cause.is::<formats::MwSolError>()
+            || cause.is::<formats::SolError>()
+            || cause.is::<formats::CheckpointError>()
+            || cause.is::<multiway::checkpoint::CheckpointError>()
+    }) {
+        return 3;
+    }
+    let message = format!("{error:#}").to_ascii_lowercase();
+    if message.contains("unsupported .mw")
+        || message.contains("bad magic")
+        || message.contains("fingerprint mismatch")
+        || message.contains("belongs to a different")
+        || message.contains("config hash") && message.contains("checkpoint")
+    {
+        3
+    } else if message.contains("resource limit")
+        || message.contains("memory budget")
+        || message.contains("exceeds memory")
+        || message.contains("memory limit")
+        || message.contains("arena preflight")
+    {
+        75
+    } else if message.contains("parsing config")
+        || message.contains("validating")
+        || message.contains("unknown field")
+        || message.contains("schema")
+        || message.contains("must be")
+        || message.contains("requires --out")
+    {
+        2
+    } else {
+        1
+    }
+}
 pub mod bench;
 pub mod bridge;
 pub mod config;
+pub mod config_new;
 pub mod inspect;
+pub mod multiway_artifact;
 pub mod multiway_solve;
+pub mod multiway_v1;
 pub mod mw_eval;
 pub mod postflop_setup;
 pub mod preflop_setup;
@@ -31,6 +124,7 @@ pub mod resume;
 pub mod session;
 pub mod sol;
 pub mod solve;
+pub mod validate;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
@@ -44,6 +138,11 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Create a Multiway Preflop v1 configuration template.
+    Config {
+        #[command(subcommand)]
+        command: ConfigCommand,
+    },
     /// Run the authenticated loopback bridge used by the local web UI.
     Serve {
         /// Exact browser Origin allowed by CORS (scheme, host, and port).
@@ -56,10 +155,35 @@ enum Command {
         #[arg(long)]
         threads: Option<usize>,
     },
+    /// Validate a Multiway Preflop v1 config without starting a solve.
+    Validate {
+        config: std::path::PathBuf,
+        #[arg(long, value_enum, default_value = "human")]
+        format: validate::ValidationFormat,
+        /// Print the normalized, default-expanded effective configuration.
+        #[arg(long)]
+        show_effective: bool,
+        /// Write the reparsable effective TOML configuration to this path.
+        #[arg(long)]
+        write_effective: Option<std::path::PathBuf>,
+    },
     /// Solve the game described by a TOML config file.
     Solve {
         /// Path to the config file (see examples/kuhn.toml).
         config: std::path::PathBuf,
+        /// Required run directory for Multiway Preflop v1.
+        #[arg(long)]
+        out: Option<std::path::PathBuf>,
+        /// Override v1 worker threads for this invocation.
+        #[arg(long)]
+        threads: Option<usize>,
+        /// Override the v1 memory budget (for example, 12GiB).
+        #[arg(long)]
+        memory: Option<String>,
+        /// Override the v1 cumulative solve-time limit.
+        #[arg(long)]
+        max_time: Option<String>,
+
         /// Write the average strategy as JSON to this path.
         #[arg(long)]
         output: Option<std::path::PathBuf>,
@@ -93,49 +217,74 @@ enum Command {
     },
     /// Continue a checkpointed solve to `run.iterations` total iterations.
     Resume {
-        /// Path to the exact same config file used to produce the
-        /// checkpoint (verified by blake3 hash of its raw bytes).
+        /// Multiway v1 checkpoint, or the legacy config used with --checkpoint.
         config: std::path::PathBuf,
-        /// Path to the `.ckpt` file to resume from (and keep autosaving to).
+        /// Legacy checkpoint path. Omit for a self-contained v1 `.mwckpt`.
+        #[arg(long, hide = true)]
+        checkpoint: Option<std::path::PathBuf>,
+        /// Fork the resumed run into a new, empty directory.
         #[arg(long)]
-        checkpoint: std::path::PathBuf,
-        /// Write the average strategy as JSON to this path.
+        out: Option<std::path::PathBuf>,
+        /// Override worker threads for this resume segment.
         #[arg(long)]
+        threads: Option<usize>,
+        /// Override the memory budget for this resume segment.
+        #[arg(long)]
+        memory: Option<String>,
+        /// Override the cumulative solve-time limit.
+        #[arg(long)]
+        max_time: Option<String>,
+        /// Override the total sweep ceiling.
+        #[arg(long)]
+        max_sweeps: Option<u64>,
+        /// Override the measured-deviation stop target.
+        #[arg(long)]
+        stop_target: Option<f64>,
+        /// Override samples per stopping evaluation.
+        #[arg(long)]
+        evaluation_samples: Option<u64>,
+        /// Override evaluation and progress cadence in sweeps.
+        #[arg(long)]
+        evaluation_cadence: Option<u64>,
+        /// Override periodic checkpoint cadence (for example, 15m).
+        #[arg(long)]
+        checkpoint_interval: Option<String>,
+        /// Legacy output path; hidden from the v1 command surface.
+        #[arg(long, hide = true)]
         output: Option<std::path::PathBuf>,
         /// Betting-line history to export (postflop/preflop; repeatable).
-        #[arg(long = "history", default_value = "")]
+        #[arg(long = "history", default_value = "", hide = true)]
         history: Vec<String>,
         /// Append a metrics row (JSONL) at every exploitability check.
-        #[arg(long)]
+        #[arg(long, hide = true)]
         metrics: Option<std::path::PathBuf>,
     },
-    /// Solve the same config once per named CFR schedule and print a
-    /// wall-clock/exploitability comparison table.
-    Bench {
-        /// Path to the config file; its own `[algorithm]` section is
-        /// ignored in favor of `--schedules`.
-        config: std::path::PathBuf,
-        /// Comma-separated schedule names (dcfr, cfr-plus, vanilla,
-        /// linear-cfr, hs-dcfr), each run with its project-default
-        /// parameters.
-        #[arg(long, value_delimiter = ',')]
-        schedules: Vec<String>,
-        /// Overrides `run.iterations` for every schedule.
-        #[arg(long)]
-        iterations: Option<u64>,
-        /// Writes one `<schedule>.jsonl` metrics file per schedule into
-        /// this directory (created if missing).
-        #[arg(long = "metrics-dir")]
-        metrics_dir: Option<std::path::PathBuf>,
+    /// Explicit research and benchmarking workflows.
+    Experiment {
+        #[command(subcommand)]
+        command: ExperimentCommand,
     },
-    /// Solve a postflop config, then explore the resulting strategy
-    /// interactively (a small UPI-subset REPL). Exactly one of `config` or
-    /// `--sol` is required.
+    /// Inspect a formal .mwsol artifact, or open the legacy postflop explorer.
     Inspect {
-        /// Path to the config file (must be `kind = "postflop"`). Mutually
-        /// exclusive with `--sol`.
+        /// Path to a .mwsol artifact or legacy postflop config.
         #[arg(conflicts_with = "sol")]
         config: Option<std::path::PathBuf>,
+        /// Public node: root, a 32-digit history key, or slash-separated action labels/indices.
+        #[arg(long, default_value = "root")]
+        node: String,
+        /// Artifact view to render.
+        #[arg(long, value_enum, default_value = "node")]
+        view: multiway_artifact::InspectView,
+        /// Override the acting seat used by the strategy grid.
+        #[arg(long)]
+        actor: Option<u8>,
+        /// Samples for on-demand EV/CI evaluation.
+        #[arg(long, default_value_t = 4096)]
+        samples: u64,
+        #[arg(long, default_value_t = 1)]
+        seed: u64,
+        #[arg(long = "br-traversals", default_value_t = 20_000)]
+        br_traversals: u64,
         /// Overrides `run.iterations` from the config (live solve only).
         #[arg(long)]
         iterations: Option<u64>,
@@ -156,36 +305,32 @@ enum Command {
         #[arg(long = "river-target")]
         river_target: Option<f64>,
     },
-    /// Measures strategy purification/thresholding (Ganzfried & Sandholm,
-    /// AAMAS 2012) against a multiway checkpoint's average profile. A dev
-    /// tool: restores the checkpoint, runs no further sweeps, and prints
-    /// one held-out deviation-gain line per requested threshold.
-    MwEval {
-        /// Path to the exact same config file used to produce the
-        /// checkpoint (multiway configs only).
-        config: std::path::PathBuf,
-        /// Path to the `.mwckpt` checkpoint to restore and evaluate.
-        #[arg(long)]
-        checkpoint: std::path::PathBuf,
-        /// Held-out Monte Carlo samples per threshold.
+    /// Re-evaluate a formal `.mwsol` average profile with trained deviations.
+    Evaluate {
+        solution: std::path::PathBuf,
         #[arg(long, default_value_t = 4096)]
         samples: u64,
-        /// Evaluation RNG seed.
         #[arg(long, default_value_t = 1)]
         seed: u64,
-        /// Comma-separated purification thresholds in `[0.0, 1.0]`.
-        #[arg(long, default_value = "0.0")]
-        purify: String,
-        /// Best-response training traversals per seat per threshold. `0`
-        /// disables deviator training (regret-greedy heuristic only).
-        #[arg(long = "br-traversals", default_value_t = 2000)]
+        #[arg(long = "br-traversals", default_value_t = 20_000)]
         br_traversals: u64,
-        /// Evaluate the LAST-ITERATE regret-matched current strategy
-        /// instead of the linear average (diagnostic: plain regret
-        /// matching has no last-iterate guarantee; see
-        /// `MultiwaySolver::evaluate_profile`).
-        #[arg(long, default_value_t = false)]
-        current: bool,
+    },
+    /// Export a stable JSON or CSV view from a `.mwsol` artifact.
+    Export {
+        solution: std::path::PathBuf,
+        #[arg(value_enum)]
+        view: multiway_artifact::ExportView,
+        #[arg(long, value_enum, default_value = "json")]
+        format: multiway_artifact::ExportFormat,
+        #[arg(long)]
+        output: Option<std::path::PathBuf>,
+    },
+    /// Compare two formal `.mwsol` average profiles.
+    Compare {
+        left: std::path::PathBuf,
+        right: std::path::PathBuf,
+        #[arg(long)]
+        cross_game: bool,
     },
     /// Solve the same postflop config across multiple boards and write a
     /// CSV report (one row per board).
@@ -207,18 +352,78 @@ enum Command {
     },
 }
 
+#[derive(Subcommand)]
+enum ConfigCommand {
+    /// Print or write a valid v1 configuration template.
+    New {
+        #[arg(long, value_enum, default_value = "minimal")]
+        template: config_new::ConfigTemplate,
+        #[arg(long)]
+        out: Option<std::path::PathBuf>,
+    },
+}
+#[derive(Subcommand)]
+enum ExperimentCommand {
+    /// Compare average, last-iterate, or purified checkpoint profiles.
+    Profile {
+        config: std::path::PathBuf,
+        #[arg(long)]
+        checkpoint: std::path::PathBuf,
+        #[arg(long, default_value_t = 4096)]
+        samples: u64,
+        #[arg(long, default_value_t = 1)]
+        seed: u64,
+        #[arg(long, default_value = "0.0")]
+        purify: String,
+        #[arg(long = "br-traversals", default_value_t = 2000)]
+        br_traversals: u64,
+        #[arg(long, default_value_t = false)]
+        current: bool,
+    },
+    /// Compare two artifacts in the research namespace.
+    Compare {
+        left: std::path::PathBuf,
+        right: std::path::PathBuf,
+        #[arg(long)]
+        cross_game: bool,
+    },
+    /// Benchmark named CFR schedules.
+    Benchmark {
+        config: std::path::PathBuf,
+        #[arg(long, value_delimiter = ',')]
+        schedules: Vec<String>,
+        #[arg(long)]
+        iterations: Option<u64>,
+        #[arg(long = "metrics-dir")]
+        metrics_dir: Option<std::path::PathBuf>,
+    },
+}
+
 /// Parses `std::env::args()` and dispatches to the requested subcommand.
 /// The `solvers` binary's `main` is just `cli::main_impl()`.
 pub fn main_impl() -> Result<()> {
     let cli = Cli::parse();
     match cli.command {
+        Command::Config { command } => match command {
+            ConfigCommand::New { template, out } => config_new::run(template, out.as_deref()),
+        },
         Command::Serve {
             origin,
             port,
             threads,
         } => bridge::run(&origin, port, threads),
+        Command::Validate {
+            config,
+            format,
+            show_effective,
+            write_effective,
+        } => validate::run(&config, format, show_effective, write_effective.as_deref()),
         Command::Solve {
             config,
+            out,
+            threads,
+            memory,
+            max_time,
             output,
             history,
             metrics,
@@ -228,6 +433,10 @@ pub fn main_impl() -> Result<()> {
             sol_streets,
         } => solve::run(
             &config,
+            out.as_deref(),
+            threads,
+            memory.as_deref(),
+            max_time.as_deref(),
             output.as_deref(),
             &history,
             metrics.as_deref(),
@@ -240,29 +449,88 @@ pub fn main_impl() -> Result<()> {
             config,
             checkpoint,
             output,
+            out,
+            threads,
+            memory,
+            max_time,
             history,
+            max_sweeps,
+            stop_target,
+            evaluation_samples,
+            evaluation_cadence,
+            checkpoint_interval,
             metrics,
         } => resume::run(
             &config,
-            &checkpoint,
+            checkpoint.as_deref(),
+            out.as_deref(),
+            threads,
+            memory.as_deref(),
+            max_time.as_deref(),
             output.as_deref(),
+            max_sweeps,
+            stop_target,
+            evaluation_samples,
+            evaluation_cadence,
+            checkpoint_interval.as_deref(),
             &history,
             metrics.as_deref(),
         ),
-        Command::Bench {
-            config,
-            schedules,
-            iterations,
-            metrics_dir,
-        } => bench::run(&config, &schedules, iterations, metrics_dir.as_deref()),
+        Command::Experiment { command } => match command {
+            ExperimentCommand::Profile {
+                config,
+                checkpoint,
+                samples,
+                seed,
+                purify,
+                br_traversals,
+                current,
+            } => mw_eval::run(
+                &config,
+                &checkpoint,
+                samples,
+                seed,
+                &purify,
+                br_traversals,
+                current,
+            ),
+            ExperimentCommand::Compare {
+                left,
+                right,
+                cross_game,
+            } => multiway_artifact::compare(&left, &right, cross_game),
+            ExperimentCommand::Benchmark {
+                config,
+                schedules,
+                iterations,
+                metrics_dir,
+            } => bench::run(&config, &schedules, iterations, metrics_dir.as_deref()),
+        },
         Command::Inspect {
             config,
+            node,
+            view,
+            actor,
+            samples,
+            seed,
+            br_traversals,
             iterations,
             target_nash_conv,
             sol,
             river_iterations,
             river_target,
         } => match (config, sol) {
+            (Some(config), None) if config.extension().is_some_and(|value| value == "mwsol") => {
+                multiway_artifact::inspect(
+                    &config,
+                    &node,
+                    view,
+                    actor,
+                    samples,
+                    seed,
+                    br_traversals,
+                )
+            }
             (Some(config), None) => inspect::run(&config, iterations, target_nash_conv),
             (None, Some(sol)) => inspect::run_sol(&sol, river_iterations, river_target),
             (None, None) => Err(anyhow::anyhow!("inspect requires either <config> or --sol")),
@@ -270,23 +538,23 @@ pub fn main_impl() -> Result<()> {
                 unreachable!("clap's conflicts_with prevents both being set")
             }
         },
-        Command::MwEval {
-            config,
-            checkpoint,
+        Command::Evaluate {
+            solution,
             samples,
             seed,
-            purify,
             br_traversals,
-            current,
-        } => mw_eval::run(
-            &config,
-            &checkpoint,
-            samples,
-            seed,
-            &purify,
-            br_traversals,
-            current,
-        ),
+        } => multiway_artifact::evaluate(&solution, samples, seed, br_traversals),
+        Command::Export {
+            solution,
+            view,
+            format,
+            output,
+        } => multiway_artifact::export(&solution, view, format, output.as_deref()),
+        Command::Compare {
+            left,
+            right,
+            cross_game,
+        } => multiway_artifact::compare(&left, &right, cross_game),
         Command::Report {
             config,
             boards,

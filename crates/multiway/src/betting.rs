@@ -9,7 +9,7 @@
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::config::{BettingConfig, SizeSpec, ValidatedAnte, ValidatedMultiwayConfig};
+use crate::config::{BettingConfig, RuleAction, RuleEffect, SizeSpec, ValidatedMultiwayConfig};
 use crate::types::{MwChips, SeatId, SeatMask, SeatVec, Street};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -136,6 +136,9 @@ pub struct BettingState {
     /// in [`BettingState::new`] via `post`, never through [`Self::apply`], so
     /// they never set this flag.
     pub preflop_voluntary_call_seen: bool,
+    pub preflop_limpers: u8,
+    pub preflop_flats: u8,
+    pub last_preflop_aggressor: Option<SeatId>,
 }
 
 impl BettingState {
@@ -163,50 +166,55 @@ impl BettingState {
                 .collect(),
         );
 
-        // Tournament and cash-game conventions both post antes before blinds.
-        match config.ante {
-            ValidatedAnte::None => {}
-            ValidatedAnte::Each(amount) => {
-                for seat in seats.seats().collect::<Vec<_>>() {
-                    post(&mut seats[seat], amount, Contribution::Dead);
-                }
-            }
-            ValidatedAnte::BigBlind(amount) => {
-                post(&mut seats[big_blind_seat], amount, Contribution::Common);
-            }
+        // Forced contributions are applied in the v1 normative order:
+        // individual antes, table-common dead money, then all live blinds.
+        for seat in seats.seats().collect::<Vec<_>>() {
+            post(
+                &mut seats[seat],
+                config.forced_antes[seat],
+                Contribution::Dead,
+            );
         }
         post(
-            &mut seats[small_blind_seat],
-            config.blinds.small,
-            Contribution::Street(Street::Preflop),
-        );
-        post(
             &mut seats[big_blind_seat],
-            config.blinds.big,
-            Contribution::Street(Street::Preflop),
+            config.common_ante,
+            Contribution::Common,
         );
+        for seat in seats.seats().collect::<Vec<_>>() {
+            post(
+                &mut seats[seat],
+                config.forced_blinds[seat],
+                Contribution::Street(Street::Preflop),
+            );
+        }
 
         let mut state = Self {
             seats,
             button: config.button,
             small_blind_seat,
             big_blind_seat,
-            big_blind: config.blinds.big,
+            big_blind: config.nominal_big_blind,
             street: Street::Preflop,
             street_active_players: [num_seats as u8, 0, 0, 0],
             to_act: None,
             // A short forced big blind does not lower the nominal call price.
-            bet_to_match: config.blinds.big,
-            last_full_raise: config.blinds.big,
+            bet_to_match: config.nominal_big_blind,
+            last_full_raise: config.nominal_big_blind,
             full_wager_established: true,
             pending: SeatMask::EMPTY,
             aggressive_actions: 0,
             flop_dealt: false,
             phase: HandPhase::Betting,
             preflop_voluntary_call_seen: false,
+            preflop_limpers: 0,
+            preflop_flats: 0,
+            last_preflop_aggressor: None,
         };
         state.pending = state.active_mask();
-        state.finish_or_select(big_blind_seat, &config.betting);
+        let before_first = config
+            .preflop_first_to_act
+            .advance(num_seats - 1, num_seats);
+        state.finish_or_select(before_first, &config.betting);
         Ok(state)
     }
 
@@ -296,7 +304,7 @@ impl BettingState {
             || !another_active
             || self.aggressive_actions >= street_config.max_aggressive_actions
         {
-            return Ok(actions);
+            return apply_tree_rules(self, config, actor, actions);
         }
 
         let minimum = self.minimum_full_target();
@@ -320,6 +328,23 @@ impl BettingState {
                 SizeSpec::PotAfterCall { fraction } => called_to + scale(pot_after_call, fraction),
                 SizeSpec::PreviousBetMultiple { factor } => scale(self.bet_to_match, factor),
                 SizeSpec::MinRaise => minimum,
+                SizeSpec::AllIn => maximum,
+                SizeSpec::EffectiveStackFraction { fraction } => {
+                    let effective = self
+                        .seats
+                        .seats()
+                        .filter(|seat| {
+                            *seat != actor && self.seats[*seat].status != SeatStatus::Folded
+                        })
+                        .map(|seat| self.current_wager(seat) + self.seats[seat].remaining)
+                        .max()
+                        .unwrap_or(maximum)
+                        .min(maximum);
+                    scale(effective, fraction)
+                }
+                SizeSpec::GeometricAllIn { streets } => {
+                    geometric_allin_target(called_to, pot_after_call, maximum, streets)
+                }
                 SizeSpec::StackFraction { fraction } => scale(maximum, fraction),
             };
             let mut target = if proposed < minimum && maximum >= minimum {
@@ -375,7 +400,7 @@ impl BettingState {
             };
             actions.push(action);
         }
-        Ok(actions)
+        apply_tree_rules(self, config, actor, actions)
     }
 
     pub fn apply(&mut self, action: Action, config: &BettingConfig) -> Result<(), BettingError> {
@@ -417,6 +442,11 @@ impl BettingState {
             }
             Action::Call { amount, .. } => {
                 if self.street == Street::Preflop {
+                    if self.aggressive_actions == 0 {
+                        self.preflop_limpers = self.preflop_limpers.saturating_add(1);
+                    } else {
+                        self.preflop_flats = self.preflop_flats.saturating_add(1);
+                    }
                     self.preflop_voluntary_call_seen = true;
                 }
                 self.pay_street(actor, amount)?;
@@ -439,6 +469,10 @@ impl BettingState {
                         to
                     };
                     self.full_wager_established = true;
+                }
+                if self.street == Street::Preflop {
+                    self.last_preflop_aggressor = Some(actor);
+                    self.preflop_flats = 0;
                 }
                 self.aggressive_actions = self.aggressive_actions.saturating_add(1);
                 self.seats[actor].raise_reopen_at = Some(saturating_add(to, self.last_full_raise));
@@ -500,6 +534,15 @@ impl BettingState {
             return;
         }
         self.to_act = self.next_in_mask(after, self.pending);
+        if self.to_act.is_some_and(|actor| {
+            betting.rules.iter().any(|rule| {
+                rule.effect == RuleEffect::Checkdown
+                    && crate::tree_rules::matches(rule, self, actor).unwrap_or(false)
+            })
+        }) {
+            self.pending = SeatMask::EMPTY;
+            self.end_betting_round(betting);
+        }
     }
 
     /// Closes the current street's betting round and opens the next one, or
@@ -524,6 +567,10 @@ impl BettingState {
         if self.active_mask().len() <= 1 {
             self.phase = HandPhase::Runout;
             self.flop_dealt = true;
+            if self.street == Street::Preflop {
+                self.street_active_players[Street::Flop.index()] =
+                    self.non_folded_mask().len() as u8;
+            }
             return;
         }
         let players_entering_next_street = self.street_active_players[self.street.index()];
@@ -554,7 +601,7 @@ impl BettingState {
         }
         self.pending = self.active_mask();
         self.phase = HandPhase::Betting;
-        self.to_act = self.next_in_mask(self.button, self.pending);
+        self.finish_or_select(self.button, betting);
     }
 
     fn next_in_mask(&self, after: SeatId, mask: SeatMask) -> Option<SeatId> {
@@ -587,6 +634,116 @@ fn post(seat: &mut SeatState, requested: MwChips, contribution: Contribution) {
 fn saturating_add(left: MwChips, right: MwChips) -> MwChips {
     MwChips(left.raw().saturating_add(right.raw()))
 }
+fn apply_tree_rules(
+    state: &BettingState,
+    config: &BettingConfig,
+    actor: SeatId,
+    mut actions: Vec<Action>,
+) -> Result<Vec<Action>, BettingError> {
+    let mut rules = config.rules.iter().collect::<Vec<_>>();
+    rules.sort_by_key(|rule| (rule.priority, rule.source_order));
+    for rule in rules {
+        if !crate::tree_rules::matches(rule, state, actor).map_err(BettingError::TreeRule)? {
+            continue;
+        }
+        if rule.effect == RuleEffect::Checkdown {
+            actions.retain(|action| matches!(action, Action::Check));
+            continue;
+        }
+        let action_kind = rule
+            .action
+            .ok_or_else(|| BettingError::TreeRule("non-checkdown rule requires action".into()))?;
+        let candidates = rule_candidates(state, config, action_kind, &rule.sizes)?;
+        match rule.effect {
+            RuleEffect::Add => actions.extend(candidates),
+            RuleEffect::Remove => actions.retain(|action| !action_matches(action, action_kind)),
+            RuleEffect::Replace => {
+                actions.retain(|action| !action_matches(action, action_kind));
+                actions.extend(candidates);
+            }
+            RuleEffect::Force => actions = candidates,
+            RuleEffect::Checkdown => unreachable!(),
+        }
+        actions.sort_by_key(action_sort_key);
+        actions.dedup();
+    }
+    Ok(actions)
+}
+
+fn rule_candidates(
+    state: &BettingState,
+    config: &BettingConfig,
+    action_kind: RuleAction,
+    sizes: &[SizeSpec],
+) -> Result<Vec<Action>, BettingError> {
+    if !matches!(action_kind, RuleAction::Bet | RuleAction::Raise) {
+        let mut base = config.clone();
+        base.rules.clear();
+        return Ok(state
+            .legal_actions(&base)?
+            .into_iter()
+            .filter(|action| action_matches(action, action_kind))
+            .collect());
+    }
+
+    let mut scoped = config.clone();
+    scoped.rules.clear();
+    let street = match state.street {
+        Street::Preflop => &mut scoped.preflop,
+        Street::Flop => &mut scoped.flop,
+        Street::Turn => &mut scoped.turn,
+        Street::River => &mut scoped.river,
+    };
+    street.include_allin = false;
+    if state.aggressive_actions == 0 {
+        street.bet_sizes = sizes.to_vec();
+        street.isolate_sizes = Some(sizes.to_vec());
+    } else {
+        street.raise_sizes = sizes.to_vec();
+    }
+    Ok(state
+        .legal_actions(&scoped)?
+        .into_iter()
+        .filter(|action| action_matches(action, action_kind))
+        .collect())
+}
+
+fn action_matches(action: &Action, kind: RuleAction) -> bool {
+    matches!(
+        (action, kind),
+        (Action::Fold, RuleAction::Fold)
+            | (Action::Check, RuleAction::Check)
+            | (Action::Call { .. }, RuleAction::Call)
+            | (Action::BetTo { .. }, RuleAction::Bet)
+            | (Action::RaiseTo { .. }, RuleAction::Raise)
+    )
+}
+
+fn action_sort_key(action: &Action) -> (u8, u64) {
+    match action {
+        Action::Fold => (0, 0),
+        Action::Check => (1, 0),
+        Action::Call { amount, .. } => (2, amount.raw()),
+        Action::BetTo { to, .. } => (3, to.raw()),
+        Action::RaiseTo { to, .. } => (4, to.raw()),
+    }
+}
+
+fn geometric_allin_target(
+    called_to: MwChips,
+    pot_after_call: MwChips,
+    maximum: MwChips,
+    streets: u8,
+) -> MwChips {
+    let remaining = maximum.saturating_sub(called_to);
+    if remaining == MwChips::ZERO || pot_after_call == MwChips::ZERO {
+        return maximum;
+    }
+    let steps = f64::from(streets.max(1));
+    let growth = 1.0 + 2.0 * remaining.raw() as f64 / pot_after_call.raw() as f64;
+    let fraction = (growth.powf(1.0 / steps) - 1.0) / 2.0;
+    called_to + scale(pot_after_call, fraction)
+}
 
 fn scale(amount: MwChips, factor: f64) -> MwChips {
     let scaled = (amount.raw() as f64 * factor).round();
@@ -603,6 +760,8 @@ pub enum BettingError {
     IllegalAction { actor: SeatId, action: Action },
     #[error("betting chip invariant was violated")]
     ChipInvariant,
+    #[error("invalid tree rule: {0}")]
+    TreeRule(String),
 }
 
 #[cfg(test)]
@@ -625,6 +784,7 @@ mod tests {
             blinds: BlindConfig::default(),
             ante,
             betting: BettingConfig::default(),
+            forced_bets: None,
             abstraction: AbstractionConfig::default(),
         }
         .validated()
@@ -1122,5 +1282,28 @@ mod tests {
 
         assert_eq!(state.phase, HandPhase::Runout);
         assert_eq!(state.players_on_street(Street::Flop), 3);
+    }
+    #[test]
+    fn tree_checkdown_skips_a_matching_street_without_decision_nodes() {
+        let (mut state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
+        betting.rules.push(crate::config::TreeRule {
+            priority: 100,
+            source_order: 0,
+            street: crate::config::RuleStreet::Flop,
+            condition: "players >= 3".into(),
+            effect: crate::config::RuleEffect::Checkdown,
+            action: None,
+            sizes: Vec::new(),
+        });
+        while state.street == Street::Preflop {
+            let actions = state.legal_actions(&betting).unwrap();
+            let action = actions
+                .into_iter()
+                .find(|action| matches!(action, Action::Call { .. } | Action::Check))
+                .unwrap();
+            state.apply(action, &betting).unwrap();
+        }
+        assert_eq!(state.street, Street::Turn);
+        assert_eq!(state.phase, HandPhase::Betting);
     }
 }

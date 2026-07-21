@@ -10,10 +10,12 @@ pub mod checkpoint;
 pub mod config;
 pub mod holdem;
 pub mod icm;
+mod rake_condition;
 pub mod sampler;
 pub mod settlement;
 pub mod solver;
 pub mod tree;
+mod tree_rules;
 pub mod types;
 
 pub use abstraction::{
@@ -29,7 +31,7 @@ pub use checkpoint::{
 };
 pub use config::{
     AbstractionConfig, AbstractionKind, ActiveOpponentBucketConfig, BettingConfig, MultiwayConfig,
-    RecallMode, SeatConfig, StreetBettingConfig, UtilityConfig,
+    RakeAllocation, RakeRounding, RecallMode, SeatConfig, StreetBettingConfig, UtilityConfig,
 };
 pub use holdem::{HoldemGame, HoldemGameError};
 pub use icm::{IcmDeltaEstimate, IcmError, IcmEstimate, IcmMode, estimate_icm, terminal_icm_delta};

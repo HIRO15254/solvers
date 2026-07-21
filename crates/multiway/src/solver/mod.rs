@@ -759,6 +759,10 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         &self.game
     }
 
+    pub fn into_components(self) -> (G, DealSampler, SolverConfig) {
+        (self.game, self.sampler, self.config)
+    }
+
     pub fn sampler(&self) -> &DealSampler {
         &self.sampler
     }
@@ -949,6 +953,55 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         let mut action_rng = traversal_action_rng(self.config.seed, sample_id, traverser);
         let mut reach = vec![1.0; self.game.num_players()];
         match &self.dense {
+            None if self.config.traverser_vector => {
+                let feasible = self.sampler.feasible_combos(traverser, &sample.world);
+                let base_rng = action_rng.clone();
+                let mut combined = TraversalDelta {
+                    sample_id,
+                    traverser,
+                    deal_attempts: u64::from(sample.attempts),
+                    terminal_evaluations: 0,
+                    hand_updates: feasible.len() as u64,
+                    events: Vec::new(),
+                };
+                for (combo, weight) in feasible {
+                    let mut holes = sample.world.hole_combos().to_vec();
+                    holes[traverser] = combo;
+                    let combo_world = SampledWorld::new(holes, *sample.world.runout())?;
+                    let mut combo_rng = base_rng.clone();
+                    let mut combo_reach = vec![1.0; self.game.num_players()];
+                    let mut worker = TraversalWorker::new(self, linear_weight);
+                    worker.traverse(
+                        self.game.root_state(),
+                        &combo_world,
+                        traverser,
+                        HistoryKey::ROOT,
+                        &mut combo_reach,
+                        1.0,
+                        &mut combo_rng,
+                        0,
+                    )?;
+                    let delta = worker.finish(sample_id, traverser, 0);
+                    combined.terminal_evaluations = combined
+                        .terminal_evaluations
+                        .checked_add(delta.terminal_evaluations)
+                        .ok_or(SolverError::CounterOverflow)?;
+                    for mut event in delta.events {
+                        match &mut event {
+                            TraversalEvent::AddRegret { values, .. }
+                            | TraversalEvent::AddStrategy { values, .. } => {
+                                for value in values {
+                                    *value *= weight;
+                                }
+                            }
+                            TraversalEvent::EnsurePolicy { .. }
+                            | TraversalEvent::EnsureHistory(_) => {}
+                        }
+                        combined.events.push(event);
+                    }
+                }
+                Ok(AnyTraversalDelta::Sparse(combined))
+            }
             None => {
                 let mut worker = TraversalWorker::new(self, linear_weight);
                 worker.traverse(

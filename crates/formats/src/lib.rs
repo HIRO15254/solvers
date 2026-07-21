@@ -19,9 +19,10 @@ pub use multiway::{
 };
 pub use mwsol::{
     MWSOL_FORMAT_VERSION, MWSOL_HEADER_LEN, MWSOL_MAX_PAGE_LIMIT, MWSOL_MIN_FORMAT_VERSION,
-    MultiwayHistoryAction, MultiwayHistoryNode, MultiwaySeatResult, MultiwaySolution,
-    MultiwaySolutionMetadata, MultiwayStrategyBlock, MultiwayStrategyKey, MwSolError, MwSolReader,
-    MwSolStrategyPage, MwsolStorage, write_mwsol_with,
+    MultiwayHistoryAction, MultiwayHistoryNode, MultiwayPublicAction, MultiwayPublicState,
+    MultiwaySeatResult, MultiwaySolution, MultiwaySolutionMetadata, MultiwayStrategyBlock,
+    MultiwayStrategyKey, MultiwayStrategyWeight, MwSolError, MwSolReader, MwSolStrategyPage,
+    MwsolStorage, write_mwsol_with,
 };
 pub use sol::{
     SolError, SolMeta, SolPayload, StrategyBlock, StreetsStored, dequantize_probs, quantize_probs,

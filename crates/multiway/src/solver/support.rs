@@ -46,9 +46,6 @@ pub(super) fn validate_setup<G: ExternalSamplingGame>(
     if config.sweep_batch == 0 {
         return Err(SolverError::ZeroSweepBatch);
     }
-    if config.traverser_vector && !matches!(game.recall_mode(), RecallMode::Street) {
-        return Err(SolverError::VectorTraverserRequiresStreetRecall);
-    }
     if config.prune {
         if !config.traverser_vector {
             return Err(SolverError::PruneRequiresVector);

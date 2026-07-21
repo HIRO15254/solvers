@@ -9,7 +9,8 @@ use cards::{combo_cards, rank_of};
 use crate::abstraction::{BucketContext, BucketId, BucketPath, MultiwayAbstraction};
 use crate::betting::{Action, BettingState, HandPhase, SeatStatus};
 use crate::config::{
-    CompiledRake, MultiwayConfig, RakeConfig, RecallMode, UtilityConfig, ValidatedMultiwayConfig,
+    AbstractionConfig, CompiledRake, MultiwayConfig, RakeConfig, RecallMode, UtilityConfig,
+    ValidatedMultiwayConfig,
 };
 use crate::icm::PreparedIcm;
 use crate::sampler::{DealSampler, SampleError, SampledWorld};
@@ -86,7 +87,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
         let mut hasher = blake3::Hasher::new();
         hasher.update(b"solvers.multiway.holdem.v1");
         let mut game_identity = config.clone();
-        game_identity.abstraction.artifact_cache = None;
+        game_identity.abstraction = AbstractionConfig::default();
         hasher.update(&serde_json::to_vec(&game_identity)?);
         hasher.update(&serde_json::to_vec(utility)?);
         hasher.update(&serde_json::to_vec(rake)?);
@@ -783,6 +784,7 @@ mod tests {
             blinds: BlindConfig::default(),
             ante: AnteConfig::None,
             betting: BettingConfig::default(),
+            forced_bets: None,
             abstraction: AbstractionConfig::default(),
         }
     }
@@ -903,11 +905,13 @@ mod tests {
     }
 
     #[test]
-    fn operational_artifact_path_does_not_change_game_identity() {
+    fn abstraction_settings_do_not_change_game_identity() {
         let mut first = config();
         first.abstraction.artifact_cache = Some("cache/first.mwab".into());
         let mut second = first.clone();
         second.abstraction.artifact_cache = Some("other/second.mwab".into());
+        second.abstraction.flop_buckets += 1;
+        second.abstraction.rollout_samples += 1;
         let first = HoldemGame::new(
             &first,
             &UtilityConfig::ChipEv,
@@ -963,6 +967,9 @@ mod tests {
             flop_dealt: true,
             phase: HandPhase::Showdown,
             preflop_voluntary_call_seen: false,
+            preflop_limpers: 0,
+            preflop_flats: 0,
+            last_preflop_aggressor: None,
         }
     }
 
@@ -1108,6 +1115,9 @@ mod tests {
             full_wager_established: false,
             pending: SeatMask::EMPTY,
             aggressive_actions: 0,
+            preflop_limpers: 0,
+            preflop_flats: 0,
+            last_preflop_aggressor: None,
             flop_dealt: true,
             phase: HandPhase::Showdown,
             preflop_voluntary_call_seen: false,
@@ -1129,6 +1139,7 @@ mod tests {
             blinds: BlindConfig::default(),
             ante: AnteConfig::None,
             betting: BettingConfig::default(),
+            forced_bets: None,
             abstraction: AbstractionConfig::default(),
         }
     }

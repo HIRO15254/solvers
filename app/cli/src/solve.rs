@@ -26,6 +26,10 @@ use crate::sol::{SolExportSpec, SolStreets};
 #[allow(clippy::too_many_arguments)]
 pub fn run(
     config_path: &Path,
+    out: Option<&Path>,
+    threads: Option<usize>,
+    memory: Option<&str>,
+    max_time: Option<&str>,
     output: Option<&Path>,
     histories: &[String],
     metrics: Option<&Path>,
@@ -36,8 +40,80 @@ pub fn run(
 ) -> Result<()> {
     let raw_bytes =
         std::fs::read(config_path).with_context(|| format!("reading {}", config_path.display()))?;
-    let raw = std::str::from_utf8(&raw_bytes).context("config file is not valid UTF-8")?;
-    let mut config: SolveConfig = toml::from_str(raw).context("parsing config")?;
+    let source_raw = std::str::from_utf8(&raw_bytes).context("config file is not valid UTF-8")?;
+    let is_multiway_v1 = crate::multiway_v1::has_v1_schema(source_raw)?;
+    let effective_raw = if is_multiway_v1 {
+        crate::multiway_v1::apply_solve_overrides(
+            source_raw,
+            threads,
+            memory,
+            max_time,
+            Some(config_path),
+        )?
+    } else {
+        if threads.is_some() || memory.is_some() || max_time.is_some() {
+            return Err(anyhow!(
+                "--threads, --memory, and --max-time are Multiway Preflop v1 overrides"
+            ));
+        }
+        source_raw.to_owned()
+    };
+    let raw = effective_raw.as_str();
+    let mut run_output = None;
+    let mut run_metrics = None;
+    let mut run_checkpoint = None;
+    let mut run_solution = None;
+    if is_multiway_v1 {
+        let directory =
+            out.ok_or_else(|| anyhow!("Multiway Preflop v1 requires --out <run-directory>"))?;
+        if output.is_some()
+            || metrics.is_some()
+            || checkpoint.is_some()
+            || sol.is_some()
+            || iterations.is_some()
+            || histories.iter().any(|history| !history.is_empty())
+        {
+            return Err(anyhow!(
+                "Multiway Preflop v1 uses only --out; remove legacy output/history/checkpoint overrides"
+            ));
+        }
+        if directory.exists() {
+            if !directory.is_dir() {
+                return Err(anyhow!(
+                    "run output {} is not a directory",
+                    directory.display()
+                ));
+            }
+            if std::fs::read_dir(directory)
+                .with_context(|| format!("reading {}", directory.display()))?
+                .next()
+                .is_some()
+            {
+                return Err(anyhow!(
+                    "run output directory {} is not empty",
+                    directory.display()
+                ));
+            }
+        } else {
+            std::fs::create_dir_all(directory)
+                .with_context(|| format!("creating {}", directory.display()))?;
+        }
+        run_output = Some(directory.join("run.json"));
+        run_metrics = Some(directory.join("progress.jsonl"));
+        run_checkpoint = Some(directory.join("checkpoint.mwckpt"));
+        run_solution = Some(directory.join("solution.mwsol"));
+    } else if out.is_some() {
+        return Err(anyhow!(
+            "--out is reserved for schema = {:?}; legacy configs use their existing output flags",
+            crate::multiway_v1::SCHEMA
+        ));
+    }
+    let output = run_output.as_deref().or(output);
+    let metrics = run_metrics.as_deref().or(metrics);
+    let checkpoint = run_checkpoint.as_deref().or(checkpoint);
+    let sol = run_solution.as_deref().or(sol);
+    let mut config: SolveConfig =
+        crate::config::parse_solve_config_at(raw, config_path).context("parsing config")?;
     if let Some(it) = iterations {
         if matches!(config.game, GameSection::PreflopMultiway(_)) {
             config.run.sweeps = Some(it);
@@ -48,7 +124,7 @@ pub fn run(
     // Hashed from the raw file bytes, not the parsed/overridden struct: a
     // `--iterations` override must not change what a checkpoint is stamped
     // with, since `resume` re-derives the same hash from the same file.
-    let config_hash = formats::config_hash(&raw_bytes);
+    let config_hash = formats::config_hash(raw.as_bytes());
     if matches!(config.game, GameSection::PreflopMultiway(_)) {
         return crate::multiway_solve::run(
             raw,
@@ -58,7 +134,7 @@ pub fn run(
             checkpoint,
             config_hash,
             sol,
-            None,
+            Some(&crate::CLI_CANCEL),
             true,
         );
     }

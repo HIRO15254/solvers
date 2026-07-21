@@ -118,6 +118,7 @@ pub fn build_rake(rake: &RakeSection) -> Box<dyn RakeModel> {
             cap: *cap,
             no_flop_no_drop: *no_flop_no_drop,
         }),
+        RakeSection::Generic { .. } => panic!("generic rake is only valid in Multiway Preflop v1"),
         RakeSection::GgPreflop {
             rate,
             cap,
