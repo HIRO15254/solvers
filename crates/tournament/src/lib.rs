@@ -14,6 +14,7 @@
 //! them by tournament id into a [`TournamentSet`], deduplicating hands and
 //! preferring the summary's name/game where both are present.
 
+pub mod analysis;
 mod hand_history;
 mod load;
 mod model;
