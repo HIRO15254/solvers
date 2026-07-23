@@ -11,6 +11,7 @@
 //! makes this a release-only-speed workload; tens of seconds for the full
 //! corpus is expected and fine for a one-shot analysis.
 
+use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 use cards::Card;
@@ -125,6 +126,41 @@ fn main() {
             .filter(|h| h.cards_to_come == cards_to_come)
             .collect();
         print_subtotal(&format!("cards_to_come={cards_to_come}"), &subset);
+    }
+    println!();
+
+    // Group by "series": the tournament name with any trailing " $<amount>"
+    // buy-in suffix folded away, so "Daily Hyper $1" and "Daily Hyper $3"
+    // aggregate into one "Daily Hyper" row. Sorted by total luck ascending
+    // (most unlucky series first). Both BB and raw-chip diffs are shown,
+    // because BB-normalization (dividing each hand by its big blind) and raw
+    // chips can disagree in sign when big pots happen at different stack
+    // depths than small ones.
+    let mut by_series: BTreeMap<String, (usize, f64, f64)> = BTreeMap::new();
+    for h in &report.hands {
+        let series = h
+            .tournament_name
+            .split(" $")
+            .next()
+            .unwrap_or(&h.tournament_name)
+            .to_string();
+        let entry = by_series.entry(series).or_insert((0, 0.0, 0.0));
+        entry.0 += 1;
+        entry.1 += h.luck_bb;
+        entry.2 += h.actual_collected as f64 - h.hero_equity * h.eligible_pot as f64;
+    }
+    let mut series_rows: Vec<(String, usize, f64, f64)> = by_series
+        .into_iter()
+        .map(|(name, (n, bb, chips))| (name, n, bb, chips))
+        .collect();
+    series_rows.sort_by(|a, b| a.2.partial_cmp(&b.2).expect("luck_bb is always finite"));
+    println!("--- By tournament series (trailing buy-in folded) ---");
+    for (name, n, bb, chips) in &series_rows {
+        println!(
+            "  {name:36} n={n:2}  total luck = {:>10}   (chips {:+.0})",
+            fmt_bb(*bb),
+            chips
+        );
     }
     println!();
 
