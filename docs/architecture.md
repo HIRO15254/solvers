@@ -42,16 +42,17 @@
 > **2026-07 アプリ再編**: アプリケーション層(1 アプリ = Preflop + Postflop を
 > `game.kind` で切り替え)を `app/` ディレクトリに分離。同月、旧 2 UI
 > (Next.js workbench / egui ネイティブ GUI)を削除し、Web 技術の静的 SPA を
-> Tauri 2 で同梱する構成(GUI + CLI を 1 インストーラで配布、デバイス貸しは
-> GUI→リモート bridge 接続)に移行中。アプリレベルの設計は
+> Tauri 2 executableへ内包する構成へ移行した。2026-07-23時点で3画面と
+> desktop shellは実装済み、Local/Remote transportは未実装。アプリレベルの設計は
 > `docs/app-structure.md` を参照。以下はその反映済みレイアウト。
 
 ```
 app:        cli (bin "solvers": TOML batch + UPI subset REPL + CSV reports + ANSI 13×13 grid、
                  bin+lib。serve = 認証付き loopback bridge)
-            ui (計画: Vite + React 静的 SPA。bridge client + 接続プロファイル、
-                Setup/Solve/Results、13×13 戦略マトリクス)
-            desktop (計画: Tauri 2 シェル。bridge を in-process 起動、CLI を sidecar 同梱)
+            ui (Vite + React + shadcn/ui静的SPA。接続profile、
+                Setup/Solving/Results、13×13戦略matrix。現在fixture)
+            desktop (Tauri 2 shell。SPAをsolvers-gui executableへ内包。
+                     将来Localはcli libをin-process利用)
 future:     py (PyO3, M3〜) · wasm (viewer-only, M8)
 multiway:    multiway — generative NLHE / joint deal / side pots / rollout buckets / MCCFR
 schemas:    formats — SolveConfig / NodeQuery→NodeReport / Checkpoint(.ckpt) / Artifact(.sol)
@@ -76,11 +77,12 @@ solvers/
 ├── LICENSE-POLICY.md     # AGPL/無ライセンス = read-only の明文化
 ├── tools/plot_convergence.py
 ├── app/
-│   ├── cli/            # bin "solvers"(package "cli"、bin+lib): serve/solve/resume/bench/
-│   │                   # inspect/mw-eval/report。lib は config スキーマ / bridge /
+│   ├── cli/            # bin "solvers"(package "cli"、bin+lib): config/validate/solve/
+│   │                   # resume/inspect/evaluate/export/compare/experiment/report/serve。
+│   │                   # lib は config スキーマ / bridge /
 │   │                   # multiway セッション構築(session.rs)
-│   ├── ui/             # (計画) Web GUI: Vite + React 静的 SPA
-│   └── desktop/        # (計画) Tauri 2 シェル(bridge in-process + CLI sidecar)
+│   ├── ui/             # Web GUI: Vite + React + shadcn/ui静的SPA
+│   └── desktop/        # Tauri 2 shell。SPA内包、transport未実装
 └── crates/
     ├── cards/          # Card/CardSet/Chips/Street/PerPlayer<T>、"22+,A2s+" range parser、
     │                   # aya_poker (Zlib/Apache-2.0/MIT) evaluator wrapper。workspace 内依存なし

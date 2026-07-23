@@ -53,7 +53,11 @@ pub fn install_signal_handler() -> anyhow::Result<()> {
     CLI_INTERRUPT_COUNT.store(0, std::sync::atomic::Ordering::SeqCst);
     #[cfg(unix)]
     unsafe {
-        if libc::signal(libc::SIGINT, handle_sigint as libc::sighandler_t) == libc::SIG_ERR {
+        if libc::signal(
+            libc::SIGINT,
+            handle_sigint as *const () as libc::sighandler_t,
+        ) == libc::SIG_ERR
+        {
             return Err(anyhow::anyhow!("installing SIGINT handler failed"));
         }
     }

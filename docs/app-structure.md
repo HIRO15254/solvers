@@ -8,10 +8,11 @@
 > 単一の GUI(静的 SPA)を Tauri 2 でネイティブアプリとして同梱する構成。
 > 旧 UI のプリセット TOML は `examples/presets/` に退避済み。
 >
-> **位置づけ(2026-07-20 決定)**: GUI 再構築は**仕様を本書に凍結した将来
-> タスク**であり、当面はマルチウェイ preflop ソルバーの CLI としての完成度
-> 向上を優先する。GUI に着手する際は本書後半のロードマップ(bridge 拡張 →
-> `app/ui` SPA → `app/desktop` Tauri → 配布 CI)にそのまま従うこと。
+> **位置づけ(2026-07-23 更新)**: `app/ui` の3画面と `app/desktop` の Tauri
+> shell は、操作可能な **visual fixture shell** として実装済み。config 検証、
+> Local Solve、Remote bridge、credential、artifact I/O には未接続である。
+> GUI v1 の設定対象は Multiway Preflop v1 だけで、画面と target transport の
+> 正本は `docs/gui-spec.jp.md`。
 
 ## 決定事項
 
@@ -21,36 +22,41 @@
    - **Postflop** = Mode A exact postflop(`kind = "postflop"`)。
      固定 flop・1,326-combo フルレンジの厳密ソルブ。
    - どちらを解くかは config の `game.kind` で切り替える(binary は分けない)。
-2. **アプリは CLI と、それをラップした同梱 GUI で操作可能。**
-   CLI(bin `solvers`)が唯一の実行エンジン入口で、GUI は CLI 内蔵の
-   bridge(認証付き loopback HTTP、`solvers serve`)を経由して同じ config
-   パーサ・solver エントリポイントを呼ぶ。UI からできることは必ず CLI でも
-   できる(UI は TOML を生成して送るだけなので、UI で組んだ設定は常に
-   ファイルに保存して CLI で直接実行できる)。
+2. **target では CLI と同梱 GUI の両方から同じ実行境界を使う。**
+   CLI(bin `solvers`)は現在の batch 実行入口。GUI v1 の Local transport は将来
+   `app/cli` のlibraryを同一processで呼び、Remote transportだけがCLI内蔵の
+   認証付きbridge(`solvers serve`)へ接続する。どちらも同じconfig parser、
+   solver entrypoint、artifact writerを使う。UIで組んだ設定はTOMLへ保存して
+   CLIから直接実行できなければならない。GUI v1 は
+   `solvers.multiway-preflop/v1` だけを扱い、HU preflop と exact postflop の
+   GUI対応は別versionで定義する。
 3. **GUI は Web 技術の静的 SPA を Tauri 2 のネイティブアプリとして配布する。**
-   Tauri アプリは `app/cli` の lib 部分をリンクして bridge を in-process で
-   起動し、発行したトークンを WebView に注入する。CLI バイナリ `solvers` は
-   Tauri の sidecar として同一インストーラに同梱する(= GUI + CLI を
-   1 パッケージで配布)。
+   React/Vite の build 成果物を platform ごとの raw `solvers-gui` executable
+   へ compile 時に内包する。GUI 起動時に Node、Web server、CLI sidecar を
+   必要としない。OS WebView は prerequisite として利用する。Local Solve も
+   `app/cli` library を link した同じ GUI executable 内で完結させる。
+   standalone `solvers` CLI は研究・batch 用の別成果物として維持する。
 4. **デバイス貸しは「GUI からリモート bridge に接続する」方式。**
-   GUI は接続プロファイル(Local = in-process bridge / Remote = URL +
-   トークン)を持つ。貸す側は `solvers serve` を起動して URL とトークンを
-   渡すだけでよく、GUI もホスティングも不要。bridge は loopback bind の
-   まま維持し、リモート到達は利用者が選ぶトンネル(Tailscale / SSH
-   ポートフォワード等)で暗号化された経路を確保する。
+   GUI は接続プロファイル(Local = in-process library / Remote = URL +
+   credential reference)を持つ。貸す側は `solvers serve` を起動し、さらに
+   Tailscale Serve、SSH port forwarding、reverse proxy 等で loopback bridge
+   までの暗号化経路 / TLS termination を用意してから URL と credential を渡す。
+   GUI 自体のホスティングは不要で、GUI は tunnel を構築しない。
 
 ## ディレクトリ構造
 
 ```
 solvers/
 ├── app/                    # アプリケーション層(1 アプリ)
-│   ├── cli/                #   bin "solvers": solve/resume/bench/inspect/report/mw-eval/serve
+│   ├── cli/                #   bin "solvers": config/validate/solve/resume/inspect/
+│   │                       #   evaluate/export/compare/experiment/report/serve
 │   │                       #   (bin+lib。lib は config スキーマ / 各コマンドドライバ / bridge /
 │   │                       #    .sol viewer / multiway セッション構築)
-│   ├── ui/                 #   (計画) Web GUI: Vite + React 静的 SPA。bridge client、
-│   │                       #   接続プロファイル、Setup/Solve/Results、13×13 グリッド
-│   └── desktop/            #   (計画) Tauri 2 シェル: cli lib をリンクして bridge を
-│                           #   in-process 起動、solvers CLI を sidecar 同梱
+│   ├── ui/                 #   Web GUI: Vite + React + shadcn/ui 静的 SPA。
+│   │                       #   Multiway v1 fixture、Setup/Solving/Results、
+│   │                       #   preflop 13×13 / target postflop bucket view
+│   └── desktop/            #   Tauri 2シェル: SPAをsolvers-guiへ内包。
+│                           #   Local/Remote transportは未実装
 ├── crates/                 # エンジン/ドメイン層(アプリ非依存)
 │   ├── cards, hand-index, engine, game, holdem, abstraction,
 │   ├── preflop, multiway, formats
@@ -60,7 +66,8 @@ solvers/
 ```
 
 依存方向: `app/cli` が研究 crate 群(`docs/architecture.md` §2 の依存グラフ)を
-束ね、`app/desktop` は `app/cli` の lib 部分のみを直接消費する。ドメイン crate
+束ねる。現在の `app/desktop` は静的SPAだけを内包し、Local transport実装時に
+`app/cli` のlib部分を直接消費する。ドメイン crate
 (`preflop`, `holdem`, `multiway`, …)はアプリの知識を持たない。
 
 ## CLI
@@ -69,23 +76,24 @@ solvers/
 
 | コマンド | 対象 | 備考 |
 |---|---|---|
-| `solve` / `resume` / `bench` | 全 kind | `game.kind` で Preflop / Postflop / toy を切り替え |
-| `serve`(bridge) | Preflop / multiway | postflop job API は未実装(下記ロードマップ) |
-| `inspect`(UPI-subset REPL) | Postflop | preflop 対応はロードマップ M6 残タスク |
+| `config new` / `validate` | config | v1 template、strict parse、effective config |
+| `solve` / `resume` | 全 kind | `game.kind` で Preflop / Postflop / toy を切り替え |
+| `serve`(bridge) | Preflop / multiway | 現行は `/v2`。GUI target は Multiway v1 専用 `/v3` |
+| `inspect` / `evaluate` / `export` / `compare` | artifacts | `.mwsol` v4とpostflop viewer |
 | `report`(複数ボード CSV) | Postflop | |
-| `mw-eval` | multiway | checkpoint の purification 評価 |
+| `experiment ...` | research | profile / compare / benchmark |
 
-toy game(Kuhn/Leduc)はエンジンのスモークチェック用 config としてそのまま
-`solve`/`bench` で受け付ける。
+toy game(Kuhn/Leduc)はエンジンのスモークチェック用configとして`solve`または
+research commandで受け付ける。
 
-## GUI と「デバイス貸し」モデル
+## GUI と「デバイス貸し」モデル(target)
 
 ```
 [Tauri GUI(app/desktop + app/ui)]
         │ 接続プロファイルで切替
-        ├── Local:  in-process bridge(起動時にトークン注入)
-        └── Remote: http://<接続先>:<port> + Bearer token
-                    │(到達経路はトンネル: Tailscale / ssh -L / cloudflared 等)
+        ├── Local:  Tauri command → in-process cli library
+        └── Remote: Tauri Rust HTTP client → URL + Bearer token
+                    │(operator が用意した HTTPS / loopback tunnel)
                     ▼
 [bridge: 127.0.0.1 に bind する認証付き HTTP(CLI 内蔵、`solvers serve`)]
         │ 同一プロセス内で config パース → solver 実行
@@ -93,35 +101,38 @@ toy game(Kuhn/Leduc)はエンジンのスモークチェック用 config とし�
 [ソルバー実行(bridge が動くデバイスの CPU/RAM を使用)]
 ```
 
-- bridge は **loopback にのみ bind** する。リモートの相手が接続する場合も、
-  ポート公開はユーザーが選んだ手段(トンネル等)で行い、bridge 自体は
-  256-bit 一時トークンで保護する。Origin 検証はブラウザクライアントの
-  CSRF 対策として維持しつつ、Origin ヘッダを送らない非ブラウザ
-  クライアント(Tauri の Rust 側 HTTP、curl)はトークン認証のみで許可する
-  (ロードマップ参照)。
-- 長時間ラン・checkpoint 運用は CLI が主経路(UI は TOML を保存して
-  `solvers solve` に引き継ぐ)。
-- bridge の health レスポンス `service: "solvers"` と `/v1` `/v2` の
-  job API は GUI が接続確認・互換性検証に使う契約。
+- bridge は **loopback にのみ bind** する。v3 credential は 256-bit 以上で
+  server の保護された credential file と GUI 側 OS credential store に保存する。
+  non-loopback の平文 HTTP は拒否し、HTTPS または client loopback への tunnel
+  だけを許可する。
+- Origin を送らない Tauri Rust client は valid token で認証する。browser request
+  には exact Origin / Host を引き続き要求する。
+- Remote job / event / artifact は persistent server-managed run に保存し、GUIを
+  閉じても継続する。Local job は GUI process と同居するため、close 時に
+  cooperative cancel + atomic checkpoint を完了してから終了する。
+- 現行bridge `/v2` はGUIのtarget contractではない。v1 parser、live average
+  snapshot、durable job、認証済み Tauri client 対応を加えた v3 contract は
+  `docs/gui-spec.jp.md` §7–8に確定する。
 
-## GUI 実装ロードマップ(将来タスク — 着手時はこの順で)
+## GUI 実装ロードマップ
 
-1. **bridge 拡張**(GUI の前提):
-   - Origin なし + 有効トークンのリクエストを許可(非ブラウザクライアント)。
-     Host 検証もトークン認証済みクライアントに対して緩和。
-   - 収束ライブチャート用のメトリクス取得(ポーリングで不足なら iteration
-     履歴付き status か SSE)。
-   - **postflop job API**: config 検証・`memory_usage()` プリフライト・
-     solve・NodeReport クエリ。
-2. **`app/ui`(Vite + React 静的 SPA)**: Setup(config 編集・プリセット・
-   TOML エクスポート)/ Solve(job 投入・進捗・収束チャート・checkpoint)/
-   Results(13×13 戦略マトリクス、アクション頻度バー、multiway explorer)。
-   接続プロファイル管理(Local/Remote)。API クライアント層は base URL で
-   パラメータ化する。
-3. **`app/desktop`(Tauri 2)**: bridge の in-process 起動とトークン注入、
-   `solvers` CLI の sidecar 同梱、3 OS のバンドル生成。
+1. **visual fixture shell と desktop shell** — 2026-07-23完了:
+   - `app/ui`: Setup / Solving / Results、接続 profile、synthetic 13×13 strategy。
+   - `app/desktop`: Tauri 2 で production SPA を raw `solvers-gui` に内包。
+   - fixture だけで、Solve、validation、filesystem、network へは接続しない。
+2. **Local transport**:
+   - `app/cli` libraryのv1 parser / preflight / solve / inspect / exportを
+     Tauri commandからin-process利用する。
+   - complete sweep 境界の average strategy snapshot を atomic publishする。
+   - Local / Remote 共通の v3 DTO と job state machine を使う。
+3. **Remote bridge v3**:
+   - credential store / server identity / capability handshake。
+   - durable idempotent job、SSE + polling replay、managed artifact / child resume。
+   - preflop 13×13 と postflop abstraction bucket の live / final strategy。
 4. **配布 CI**: GitHub Actions release ワークフロー(macOS/Windows/Linux
-   マトリクスで `tauri build` → GitHub Releases)。SPA の lint/test/build を
-   CI に追加。コード署名/notarization は配布先が広がった時点で検討。
+   マトリクス)。raw executable の build / smoke test を先に固定し、platform
+   envelope、コード署名、notarization は別の配布 milestone とする。
 5. `.sol` viewer artifact の閲覧のみの WASM 静的サイト(bridge 不要)は
    ロードマップ M8 の対象(据え置き)。
+6. HU preflop / exact postflop の GUI 設定画面と remote job API は GUI v1 の
+   scope 外とし、追加時に別 contract version を定義する。

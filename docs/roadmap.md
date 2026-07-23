@@ -4,18 +4,21 @@
 プレイングエージェント機能(Slumbot 対戦・action translation・safe gadget)は非目標。
 アルゴリズム研究基盤は基本の A/B ベンチ + JSONL メトリクスまで。
 
-決定済みの方針(2026-07、アプリ再編): 成果物は **1 アプリ(Preflop + Postflop を
-`game.kind` で切り替え)**。アプリ = CLI(bin `solvers`)+ それをラップした Web 技術の
-GUI(静的 SPA)を Tauri 2 でネイティブアプリとして同梱し、GUI + CLI を 1 インストーラで
-配布する。デバイス貸しは GUI からリモート bridge(`solvers serve`)への接続で実現
-(ローカル/リモートを接続プロファイルで切替)。旧 2 UI(`app/web` Next.js workbench、
-`app/gui` egui ネイティブ GUI)は 2026-07 に削除済み。
+決定済みの方針(2026-07、アプリ再編): codebase は **1アプリ(Preflop +
+Postflop)** とし、CLI(bin `solvers`)と Web 技術の GUI を同じ solver library 上に
+置く。GUI は静的 SPA を Tauri 2 の platform 別 raw `solvers-gui` executableへ
+内包し、実行時に Node、Web server、CLI sidecar を要求しない。standalone CLI は
+研究・batch 用の別成果物として維持する。旧2 UI(`app/web` Next.js workbench、
+`app/gui` egui native GUI)は2026-07に削除済み。
 
-決定済みの方針(2026-07-20、優先順位): **GUI 再構築は将来タスク**として仕様を
-`docs/app-structure.md` に凍結(bridge の Origin/Host 緩和・postflop job API、
-`app/ui` SPA、`app/desktop` Tauri シェル、配布 CI の 4 段)。**当面はマルチウェイ
-preflop ソルバーの CLI としての完成度向上を優先する**(唯一の実行エンジン入口は
-CLI という不変条件のもと、GUI はいつ着手しても bridge 経由で後付けできる)。
+決定済みの方針(2026-07-23、GUI v1): `app/ui` の Setup / Solving / Results と
+`app/desktop` の Tauri shell は **操作可能な visual fixture shell** まで完了した。
+config validation、Local / Remote Solve、credential、artifact I/O は未実装。
+GUI v1 の設定対象は `solvers.multiway-preflop/v1`だけとし、target は Local の
+in-process library と Remote bridge v3 の共通 gateway とする。Remote 到達用の
+encrypted tunnel / TLS termination は server operator が用意する。画面、単一
+executable、durable job、live average strategy の確定契約は
+`docs/gui-spec.jp.md`、構成と実装順は `docs/app-structure.md` を正本とする。
 
 決定済みの方針(2026-07-21、Multiway CLI v1): table/forced bet、betting tree、
 economics/ICM、abstraction/recall、External Sampling MCCFR、停止条件、runtime/resume、
@@ -73,11 +76,11 @@ formats スキーマ v1 凍結 → `wasm` viewer-only 静的サイト(`.sol` 読
 **Exit:** 100bb SRP の solve を 50 MB NoRivers artifact からブラウザで閲覧、river はオンデマンド再 solve。
 
 ## M9 — 2–9 seat Multiway プリフロップ/全 street (2026-07)
-既存 HU engine を凍結したまま `multiway` crate と `kind = "preflop-multiway"` を追加。共有実カード world の joint range sampling、lazy betting history、全 street NLHE、refund/side pot/rake、BBA、卓外 field を含む hybrid ICM、active-opponent 別 rollout bucket、external-sampling MCCFR、v2 metrics、`.mwckpt` / `.mwsol`、Bridge v2 と Web workbench を一体で提供する。
+既存 HU engine を凍結したまま `multiway` crate と `kind = "preflop-multiway"` を追加。共有実カード world の joint range sampling、lazy betting history、全 street NLHE、refund/side pot/rake、BBA、卓外 field を含む hybrid ICM、active-opponent 別 rollout bucket、external-sampling MCCFR、versioned metrics、`.mwckpt` / `.mwsol` を提供する。Bridge v2 と旧 Web workbench は当時の delivery であり、現在の GUI transport target は bridge v3 である。
 
 **Exit:** 2/3/6/9 人の betting/settlement property、exact ICM ≤15・grouped sampled ICM ≤10,000、deterministic checkpoint resume、9-max smoke、HU v1 golden 不変、Web test/build。3 人以上は `exploitability` / `NashConv` / GTO と呼ばず、seat EV/CI・positive-regret proxy・strategy drift・held-out deviation gain を報告する。
 
-**Delivered:** deterministic sample-id merge（thread数変更・再開を含む）、4 MiB chunked `.mwckpt` v3、indexed `.mwsol` v2、Bridge v2 managed resume、4 canonical Web presets、9-max 8/8/8 smoke・64/64/64 desktop benchmark・3-player full-enumeration oracleを受入契約として固定。（当時の受入契約の記録。現行フォーマットは `.mwckpt` v6 / `.mwsol` v3。）
+**Delivered:** deterministic sample-id merge（thread数変更・再開を含む）、4 MiB chunked `.mwckpt` v3、indexed `.mwsol` v2、Bridge v2 managed resume、4 canonical Web presets、9-max 8/8/8 smoke・64/64/64 desktop benchmark・3-player full-enumeration oracleを受入契約として固定。（当時の受入契約の記録。現行フォーマットは `.mwckpt` v7 / `.mwsol` v4。）
 
 > **M9 進捗(2026-07-16..18、高速化・収束・GUI 波)**: ネイティブ GUI(`crates/gui`、egui)+ i16 `.mwsol`。rollout v2(board 正準ストリーム)と EHS² テーブルバックエンドで HRC 級スループット(783k→1.4M hu/s)、HRC 型 check-down `max_betting_players`(dense arena 163 分の 1)。Auto モード(マシン検出→バケットラダー/sweep_batch/収束停止しきい値の実体化)+ 収束停止ルール(devGainLB CI 上界 × 確認回数、適応サンプル倍加)+ **BR バースト**(凍結平均相手に逸脱者を訓練し greedy との per-seat max — 停止証明の強化)。Pluribus 型 regret 枝刈り(-10×スタック校正、+3-4%)、`ε=0`+割引 10k 細粒化(同品質到達 sweep 数 ~半分)。計測系: `mw-eval`(purification/thresholding — argmax で 2.6 倍タイト、last-iterate 診断 — 実用ラン長で平均よりタイト)。**実測で棄却**: 動的枝刈りしきい値、warm-start バケットラダー(粗フェーズが 1.26 倍しか速くなく回収不能 → 撤去)、VR-MCCFR ベースライン、MMD/QRE 移行(メモリが希少でなくなり売りが消滅)、バケット 4096(200k sweep では推定ノイズ律速で悪化)。詳細な採否根拠は `docs/multiway-preflop.md` と計測ログ参照。
 

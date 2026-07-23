@@ -16,7 +16,8 @@ Early development. See [docs/roadmap.md](docs/roadmap.md) for milestones.
 - [docs/multiway-preflop-cli-spec.jp.md](docs/multiway-preflop-cli-spec.jp.md) — approved target specification for the Multiway Preflop CLI v1
 - [docs/multiway-preflop-v1.md](docs/multiway-preflop-v1.md) — concise human/AI implementation guide and contract map
 - [docs/multiway-preflop-toml-reference.jp.md](docs/multiway-preflop-toml-reference.jp.md) — complete reference for every Multiway Preflop v1 TOML key, type, default, and constraint
-- [docs/app-structure.md](docs/app-structure.md) — the app structure (one app with preflop + postflop solving, CLI + web UI)
+- [docs/app-structure.md](docs/app-structure.md) — the app structure (one app with preflop + postflop solving, CLI + embedded web UI)
+- [docs/gui-spec.jp.md](docs/gui-spec.jp.md) — the three-screen visual fixture shell and the fixed Local / Remote v3 target contract
 - [docs/architecture.md](docs/architecture.md) — integrated architecture design
 - [docs/research-survey.md](docs/research-survey.md) — survey of CFR variants,
   abstraction and acceleration techniques, with an adoption plan
@@ -28,18 +29,19 @@ Early development. See [docs/roadmap.md](docs/roadmap.md) for milestones.
 
 The project ships **one application** containing both a preflop solver (HU +
 2–9 player multiway) and a postflop solver (exact, fixed flop), selected by
-the config's `game.kind`. It is operated through a CLI; a bundled web-tech
-GUI that wraps it (Tauri shell + static SPA) is a planned future milestone
-with its spec frozen in [docs/app-structure.md](docs/app-structure.md) — the
-previous Next.js and egui UIs were removed in 2026-07. Near-term focus is
-the multiway preflop solver's CLI completeness.
+the config's `game.kind`. The CLI is the current execution surface. A new
+web-tech GUI provides a Setup / Solving / Results visual fixture shell as a
+React static SPA embedded in a Tauri 2 executable. GUI v1 targets Multiway
+Preflop v1 only. Local and Remote transports, config validation, solver
+execution, credentials, and artifact I/O remain deliberately unconnected. See
+[docs/gui-spec.jp.md](docs/gui-spec.jp.md) for that implementation boundary.
 
 ```
 app/
-├── cli         # `solvers` binary: solve / resume / inspect / report / serve / bench / mw-eval
-├── ui          # (planned) web GUI: Vite + React static SPA talking to the
-│               # CLI's authenticated bridge (local or remote)
-└── desktop     # (planned) Tauri 2 shell: in-process bridge + CLI sidecar
+├── cli         # `solvers`: config / validate / solve / resume / inspect /
+│               # evaluate / export / compare / experiment / report / serve
+├── ui          # Vite + React + shadcn/ui fixture SPA; Setup / Solving / Results
+└── desktop     # Tauri 2 shell embedding the SPA in raw `solvers-gui`
 crates/
 ├── cards       # card/chip/street types, range parser, hand-evaluator wrapper
 ├── hand-index  # suit-isomorphism board canonicalization
@@ -49,7 +51,7 @@ crates/
 ├── abstraction # heads-up blueprint abstraction
 ├── preflop     # exact/bucketed heads-up preflop path
 ├── multiway    # generative 2–9 seat NLHE + external-sampling MCCFR
-├── formats     # v1 HU and v2 multiway metrics/checkpoints/solution artifacts
+├── formats     # versioned HU and multiway metrics/checkpoints/solution artifacts
 └── holdem      # Mode A: exact multi-street postflop solving, aggregation/equity helpers
 ```
 
@@ -59,7 +61,8 @@ crates/
 cargo test --workspace            # correctness harness (Kuhn/Leduc known solutions, oracle diff)
 cargo run -p cli --release -- solve examples/kuhn.toml
 
-# Bridge (authenticated loopback HTTP job API used by the GUI):
+# Current bridge v2 (authenticated loopback API; the fixture GUI is not
+# connected to it, and GUI v1 targets the separate v3 contract):
 cargo run -p cli --release -- serve --origin http://localhost:3000
 
 # --- Preflop ---------------------------------------------------------------
@@ -68,7 +71,8 @@ cargo run -p cli --release -- validate examples/preflop_multiway_v1_smoke.toml
 cargo run -p cli --release -- solve examples/preflop_multiway_v1_smoke.toml \
     --out runs/v1-smoke
 
-# 9-max BBA + tournament ICM; writes v2 JSON, .mwckpt, and .mwsol.
+# Legacy-schema 9-max BBA + tournament ICM; writes versioned JSON,
+# .mwckpt, and .mwsol artifacts.
 cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
     --output result.json --checkpoint solve.mwckpt --sol solve.mwsol
 
@@ -83,6 +87,16 @@ cargo run -p cli --release -- inspect examples/river_small.toml
 # Aggregate CSV across boards (frequencies, EVs, equity per board):
 cargo run -p cli --release -- report examples/river_small.toml \
     --boards "2c 7d 9h Js Qs,2c 7d 9h Js Ks" --output report.csv
+
+# --- GUI prototype ---------------------------------------------------------
+# Build the static SPA, then one host-specific raw desktop executable.
+pnpm --dir app/ui install
+pnpm --dir app/ui build
+cargo build --release -p solvers-desktop
+
+# target/release/solvers-gui opens the embedded Web UI using the OS WebView.
+# It is not yet a signed/notarized platform bundle. The current GUI is a
+# visual fixture shell and does not start real Local or Remote solves.
 ```
 
 ## License
