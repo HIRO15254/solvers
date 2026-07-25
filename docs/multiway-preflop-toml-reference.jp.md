@@ -43,8 +43,10 @@ schema = "solvers.multiway-preflop/v1"
 # solution probability encoding
 ```
 
-必須top-level keyは `schema` と `game`。`economics`、`solver`、`run`、
-`output` はtableごと省略でき、その場合は各節の既定値を使う。
+必須top-level keyは `schema` と `game`。さらにproduction solveでは
+`[game.abstraction] kind = "ehs2-percentile"`の明示が必須である。
+`economics`、`solver`、`run`、`output` はtableごと省略でき、その場合は各節の
+既定値を使う。
 
 ## `[game]`
 
@@ -106,6 +108,14 @@ frontendは `standard` と `script` の2種類だけ。
 ```toml
 [game.tree]
 kind = "standard"        # tableごと省略した場合の既定
+allow_limp = false       # optional。省略時はgeneric defaultのtrue
+reraise_jam_above_actor_starting_stack = { numerator = 1, denominator = 3 }
+
+[game.tree.max_aggressive_actions]
+preflop = 6
+flop = 4
+turn = 4
+river = 4
 
 [[game.tree.rules]]
 priority = 100           # optional、既定100。小さい順に適用
@@ -115,6 +125,16 @@ effect = "replace"       # 必須
 action = "raise"         # checkdown以外で必須
 sizes = ["2.2x", "allin"] # optional、既定[]
 ```
+
+tree field:
+
+| key | 型/値 |
+|---|---|
+| `kind` | `standard` |
+| `allow_limp` | optional boolean。省略時は既存generic default |
+| `max_aggressive_actions` | optional table。`preflop`/`flop`/`turn`/`river`の4つの`u8`が必須 |
+| `reraise_jam_above_actor_starting_stack` | optional `{ numerator=u32, denominator=u32 }`。`0 < numerator/denominator <= 1` |
+| `rules` | optional typed rule array |
 
 rule field:
 
@@ -128,12 +148,22 @@ rule field:
 | `sizes` | size literal配列。checkdownでは禁止 |
 
 同じpriorityはsource順、異なるpriorityは昇順で適用する。明示ruleがないstandard treeは
-規範仕様のopen/raise/postflop sizingとaggression capを生成する。
+規範仕様のopen/raise/postflop sizingとaggression capを生成する。上記fieldを省略した
+generic defaultは変更されない。limp禁止やbenchmark固有capは明示configだけのopt-in。
+
+`reraise_jam_above_actor_starting_stack`はpreflop 3bet以降のnormal sizeだけに適用する。
+normal raise-toをmin-raiseとactor stack capで解決した後、整数比で
+`target * denominator > actor hand-start stack * numerator`ならall-inへ置換する。
+等号では置換せず、menuに明示all-inがあればnormalとそのall-inの両方を残す。
+stack cap、置換、all-in追加後に同じchip targetとなるactionは1つへdedupする。
 
 conditionで参照できる値:
 
 - `position`
 - `in_position`
+- `in_position_to_last_aggressor`
+- `preflop_participant`
+- `open_cold_calls`
 - `players`
 - `limpers`
 - `flats`
@@ -146,6 +176,13 @@ conditionで参照できる値:
 
 演算子は比較、`in`、`!`、`&&`、`||`、括弧。literalはboolean、数値、
 文字列、配列に限定される。
+
+`in_position`の意味は従来どおりで、preflopではBTN、postflopでは残存seat中の
+最終actorを表す。`in_position_to_last_aggressor`はpreflop専用で、直前raiserより
+固定postflop action orderが後ならtrue。直前raiser不在または同一seatならfalse。
+`preflop_participant`はforced blind/anteを除くcallまたはaggressive actionをすでに
+行ったactorでtrue。`open_cold_calls`はopenを最初のvoluntary actionとしてcallした
+非BB seat数であり、BB defenseは含めない。
 
 size literal:
 
@@ -170,6 +207,14 @@ voluntary raiseは除外される。
 [game.tree]
 kind = "script"
 source = "trees/short-stack.mwtree"  # 必須。config directory基準
+allow_limp = false
+reraise_jam_above_actor_starting_stack = { numerator = 1, denominator = 3 }
+
+[game.tree.max_aggressive_actions]
+preflop = 6
+flop = 4
+turn = 4
+river = 4
 
 [game.tree.params]
 open = "2.2x"
@@ -179,6 +224,8 @@ enabled = true
 
 `params` の値はstring、integer、finite float、booleanのみ。配列/tableはerror。
 script pathは正規化時に読み込まれ、effective configではstandard typed ruleへ展開される。
+Standardと同じ3 optional fieldを指定でき、展開後もeffective configとfingerprintへ
+保持される。
 
 `.mwtree` の完全な形:
 
@@ -202,55 +249,61 @@ loop、再帰、function、include、file/network/environment/time/RNGアクセ�
 
 ## `[game.abstraction]`
 
-### Multiway rollout
-
 ```toml
 [game.abstraction]
-kind = "multiway-rollout"  # 既定
-rollouts_per_state = 512   # optional、実効既定512、正のu32
-seed = 0                   # optional、実効既定0、u64
+kind = "ehs2-percentile"   # productionでは明示必須
 
 [game.abstraction.buckets]
 flop = 64                  # 各field既定64、正のu32
 turn = 64
 river = 64
-
-[game.abstraction.opponent_buckets]
-"1" = { flop = 128, turn = 128, river = 128 }
-"2" = { flop = 96, turn = 96, river = 96 }
 ```
 
-`opponent_buckets` のkeyはheroを除くstreet開始時のnon-folded opponent数。
-tableで到達可能な `1..seat_count-1` だけを指定できる。各inline tableは
-`flop`、`turn`、`river` を省略でき、省略fieldは64になる。
-現行runtime幅へlowerできないbucket数はerrorになり、resource preflightも適用される。
-preflop bucketは常に169 classで設定keyを持たない。
-
-### EHS² percentile
-
-```toml
-[game.abstraction]
-kind = "ehs2-percentile"
-
-[game.abstraction.buckets]
-flop = 64
-turn = 64
-river = 64
-```
-
-このbackendでは `rollouts_per_state`、`seed`、
-`game.abstraction.opponent_buckets` を指定するとerror。
+- production backendはuniform heads-up E[HS²] percentileだけである。
+- `kind`を省略した旧v1 configは歴史的にrolloutを意味したため、EHS²へ黙って
+  読み替えず`MWP001`で拒否する。
+- `rollouts_per_state`、abstraction `seed`、`training`、
+  `opponent_buckets`はproduction surfaceから削除され、指定すると`MWP001`。
+- flop/turn/river bucket数は引き続き設定可能で既定64/64/64。各値は正で現行runtime
+  幅へlower可能でなければならない。resource不足でも自動縮小しない。
+- preflop bucketは常に169 classで設定keyを持たない。
+- 全canonical flop/turn/river boardとlegal hole-comboのassignmentをSolve開始前に
+  buildまたはvalidated cacheからloadし、Solve中にmappingを追加しない。
 
 ### `[game.information]`
 
 ```toml
 [game.information]
-recall = "current-street" # 既定。ほかは"bucket-history"
+recall = "current-street" # optional。省略時もこの固定値
 ```
 
-- `current-street`: 現在street bucketだけでinfosetをkeyする。
-- `bucket-history`: 到達済みstreetのbucket pathを保持する。
-- legacy値 `full`、`street` は使用不可。
+- productionで許される値は`current-street`だけで、現在street bucketだけをinfoset
+  keyへ入れる。table自体を省略しても同じ固定値になる。
+- `bucket-history`、旧`full`/`street`、その他の値は`MWP002`。
+- recallはgame fingerprintには含めない。同一table/range/tree/economicsであれば、
+  card abstractionを研究比較してもgame fingerprintは一致する。
+- abstraction fingerprintは検証済みEHS² content、bucket数、`current-street` domainを
+  含む。retired rollout/full fingerprintをaliasまたは変換しない。
+
+### Production removal and migration errors
+
+| code | productionで拒否する入力/操作 | 削除理由 |
+|---|---|---|
+| `MWP001` | rollout、`kind`省略、rollout-only field | Tournamentでは両referenceのpoint estimateでEHS²に劣り、rollout referenceのrollout−EHS²は`+0.131368`、paired 95% intervalも`[+0.019435,+0.229442]`。Cashは269.1 s対65.8 sで約4倍、river coverageも`1369/1446 = 0.94675 < 0.95`。Solve中に増えるassignment cacheもsweep-0事前確保に反する。 |
+| `MWP002` | bucket-history/full recall | EHS² K64でもTournamentは3,695/10,000 sweeps・12,952,950 infosets・6,216,908,800 bytes (5.79 GiB) peak RSS、Cashは4,267/10,000 sweeps・14,662,363 infosets・6,859,571,200 bytes (6.39 GiB) peak RSSでresource limit。全policy arenaを起動時に確保するproduction contractを満たせない。 |
+| `MWP003` | schema v1ではないlegacy multiway solve/resume configまたはcheckpoint | retired algorithm stateを現行semanticsへ黙って変換しない。canonical v1へ移行する。 |
+| `MWP004` | retired rollout/full artifactのlive再評価またはreal-card比較 | summary、tree、strategy、range、記録済みEVの静的readは可能だが、retired backendの再構築はproductionに含めない。 |
+
+Solve中にbucket境界またはcentroidを更新するdynamic reclusteringは、削除前にも
+production/config optionとして実装されていない。retired rolloutはSolve前に固定
+centroidを作り、Solve中はassignmentをmemoizeしただけである。
+
+default-feature production binaryには`solvers experiment` namespaceを含めず、
+retired rollout/full workerへproduction command/runtime pathから到達できない。明示
+`CARGO_TARGET_DIR=target/research-release cargo build -p cli --release
+--features research --bin solvers`で分離して作った再現実験用binaryだけが歴史的
+configを実行できる。default production binaryとproduction validationの許容optionは
+増えない。
 
 ## `[economics]`
 
@@ -318,6 +371,9 @@ kind = "regret-based"       # 既定。regret-based|none
 ```
 
 `single-hand` と `regret-based` pruningの組合せはerror。
+productionの情報状態は`current-street`固定で、regret-based pruningは
+`range-vector + current-street`のdense workerに実装する。retired full-recall
+artifactは静的に読めるが、そのworkerをproduction solve/resumeで再生しない。
 `discount.kind="none"` と `pruning.kind="none"` のtableには追加fieldを置けない。
 thread数、batch、seed、exploration、discount、pruningはfingerprint/checkpoint互換性に
 関係する。
@@ -331,7 +387,7 @@ max_time = "12h"       # optional。validation/abstraction buildを除く累積s
 
 [run.resources]
 threads = "auto"       # 既定auto、または正の整数
-memory = "auto"        # 既定auto、bytes整数または"12GiB"等
+memory = "auto"        # 既定auto = production policy arena 6GiB
 
 [run.stop]
 target = "default"             # 既定default、またはfinite positive number
@@ -348,8 +404,30 @@ durationは小文字suffixの `s`、`m`、`h` のみ。例:
 `"30s"`、`"15m"`、`"12h"`。`0s` はerror。
 
 memoryは正のbytes整数、または整数+`KiB|MiB|GiB`。例:
-`1073741824`、`"1024MiB"`、`"12GiB"`。小数や `GB` は不可。
+`1073741824`、`"1024MiB"`、`"6GiB"`。小数や `GB` は不可。productionでは
+`"auto"`を6 GiBへ解決し、明示値も6 GiB以下だけを受理する。これを超えるhistorical
+実験は`--features research` buildだけで再現する。
 `threads="auto"` は `min(logical CPUs, seats * batch_sweeps)`。
+
+固定50M decision-node capはない。`current-street`はfull public treeやarenaを
+保持・確保する前のcount-only traversalで、2本の`f32` policy配列、touched bit、
+dense index tableからarena bytesを累積する。設定memoryを厳密に超える最初の
+node prefixでresource errorになる。任意のnode checkpointはbenchmark callerが
+明示した場合だけ適用される。
+
+preflight成功後、new solve/resumeは全policy arenaをfallible allocationする。
+regret、strategy-sum、touched bitの全bufferへ4 KiB以下の間隔でwriteし、各bufferの
+最終要素にもwriteして全OS pageをfault-inする。返される
+`PolicyArenaAllocation`のnodes、columns、slots、bytesと
+`pages_committed=true`を確認するまでsolverを返さず、sweep 0および最初のsampled
+postflop traversalを開始しない。allocation失敗、arena上限超過、page commit未完了ではresource
+errorとし、sparse fallback、部分開始、bucket数自動縮小を行わない。
+
+`memory`はpolicy arena payloadの上限でありprocess RSS hard capではない。public
+tree/history、EHS² table/cache、thread scratch、evaluation、checkpoint staging、
+allocator overhead等は含まない。processを8 GiB以内にする場合は別途
+cgroup/containerまたは外部RSS watchdogで`8,589,934,592` bytes以下を強制する。
+arena上限だけを8 GiB RSS保証として扱わない。
 
 `target="default"` の実効値:
 
@@ -376,7 +454,7 @@ probability_encoding = "u16"  # 既定。u16|f32
 ## 完全な設定例
 
 次はoptional surfaceを一通り示すcash例。相互排他的な
-`script`、`ehs2-percentile`、`tournament-icm` は各節の例を参照する。
+`script`、`tournament-icm` は各節の例を参照する。
 
 ```toml
 schema = "solvers.multiway-preflop/v1"
@@ -405,6 +483,14 @@ blind_bb = 2.0
 
 [game.tree]
 kind = "standard"
+allow_limp = false
+reraise_jam_above_actor_starting_stack = { numerator = 1, denominator = 3 }
+
+[game.tree.max_aggressive_actions]
+preflop = 6
+flop = 4
+turn = 4
+river = 4
 
 [[game.tree.rules]]
 priority = 100
@@ -421,17 +507,12 @@ when = "players >= 5"
 effect = "checkdown"
 
 [game.abstraction]
-kind = "multiway-rollout"
-rollouts_per_state = 512
-seed = 0
+kind = "ehs2-percentile"
 
 [game.abstraction.buckets]
 flop = 64
 turn = 64
 river = 64
-
-[game.abstraction.opponent_buckets]
-"1" = { flop = 128, turn = 128, river = 128 }
 
 [game.information]
 recall = "current-street"
@@ -492,6 +573,14 @@ solvers validate config.toml --show-effective
 solvers validate config.toml --write-effective effective.toml
 solvers solve config.toml --out runs/my-run
 ```
+
+実装状況（2026-07-25）: 現行`validate`はschema、数値・条件付きsemantic、
+economics、normalization/effective-config出力までで、tree compile、
+abstraction到達数、resource/fingerprint/output preflightはsolve時にのみ
+実行される。solve時は固定node capではなくdense-arena byte preflightを行い、
+成功後に全arenaをfallible allocation/page-touchしてからだけsweep 0を開始する。
+validate単体がこのsolve-time resource barrierまで実行しない点は規範v1 contractに
+対する既知の実装gapである。
 
 v1 solve-time overrideは `--threads`、`--memory`、`--max-time` のみ。
 generic `--set` はなく、legacyの個別output flagはv1では拒否される。

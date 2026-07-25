@@ -30,7 +30,7 @@ game = { path = "crates/game" }
 holdem = { path = "crates/holdem" }
 abstraction = { path = "crates/abstraction" }
 preflop = { path = "crates/preflop" }
-multiway = { path = "crates/multiway" }
+multiway = { path = "crates/multiway", default-features = false }
 formats = { path = "crates/formats" }
 
 # NOTE: aya_poker's "std" feature is broken in 0.1.0 (aya_base gates no_std on

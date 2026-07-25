@@ -8,8 +8,10 @@
 //! that; [`build_arena`] then sizes and preallocates one contiguous,
 //! node-major `[node][bucket][action]` arena of regrets/strategy sums for
 //! every information set the tree can ever reach, so a Street-recall solve's
-//! memory footprint is fixed at preflight time instead of growing with the
-//! number of visited information sets.
+//! policy-arena footprint is fixed at preflight time instead of growing with
+//! the number of visited information sets. The public tree, abstraction
+//! caches, worker scratch, evaluation, and artifact staging remain additional
+//! process memory.
 
 use std::ops::Range;
 
@@ -22,12 +24,16 @@ use crate::types::Street;
 /// Preorder index into [`PublicTree::nodes`]. Root is always `0`.
 pub type NodeId = u32;
 
-/// Hard safety cap on enumerated decision nodes. A malformed or extremely
-/// wide betting configuration (many bet/raise sizes, high
-/// `max_aggressive_actions`, many seats) can blow up combinatorially even
-/// though it does not depend on any card range; this cap turns that into a
-/// prompt, typed failure instead of an unbounded allocation.
-pub const MAX_TREE_NODES: usize = 50_000_000;
+/// Representation limit for a fully materialized public tree.
+///
+/// This is not a production resource policy. Production feasibility is
+/// governed by the solver's byte limit via [`preflight_arena_with_limits`].
+/// The bound only guarantees that every materialized node has a distinct
+/// [`NodeId`].
+pub const MAX_TREE_NODES: usize = (NodeId::MAX as usize).saturating_add(1);
+
+/// Maximum number of dense columns addressable by a `u32` wire column id.
+const MAX_DENSE_COLUMNS: u64 = u32::MAX as u64 + 1;
 
 /// One action's destination out of a decision node: either another decision
 /// node, or a terminal state (settlement happens outside the public tree,
@@ -75,14 +81,58 @@ pub struct PublicTree {
     pub by_history: FxHashMap<HistoryKey, NodeId>,
 }
 
+/// Non-retaining census of a public tree and its dense policy arena.
+///
+/// The counts describe the complete tree when
+/// [`preflight_arena_with_limits`] returns `Ok`. A byte or node limit error
+/// instead reports the first prefix that crossed the corresponding resource
+/// boundary.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct TreePreflight {
+    pub node_count: usize,
+    pub total_columns: u64,
+    pub total_slots: u64,
+    pub estimated_arena_bytes: u64,
+}
+
 /// Walks the public game tree once, deterministically, from
 /// `game.root_state()`. Only decision nodes are recorded; terminals are
-/// [`Child::Terminal`] markers on their parent.
+/// [`Child::Terminal`] markers on their parent. The only implicit node bound
+/// is the [`NodeId`] representation limit; production callers should run the
+/// byte- and depth-bounded APIs first. This convenience wrapper is for
+/// trusted finite games.
 pub fn enumerate_tree<G: ExternalSamplingGame>(game: &G) -> Result<PublicTree, TreeError> {
+    enumerate_tree_with_limit(game, MAX_TREE_NODES)
+}
+
+/// Walks the public game tree with a caller-selected decision-node cap.
+///
+/// This is intended for callers that explicitly want a node checkpoint. The
+/// requested limit is clamped only to the [`NodeId`] representation limit,
+/// not to a production policy constant.
+pub fn enumerate_tree_with_limit<G: ExternalSamplingGame>(
+    game: &G,
+    max_nodes: usize,
+) -> Result<PublicTree, TreeError> {
+    enumerate_tree_with_limits(game, max_nodes, u32::MAX)
+}
+
+/// Materializes a public tree with explicit representation/checkpoint and
+/// structural-depth bounds.
+///
+/// Production dense storage passes the same traversal-depth guard used by
+/// MCCFR so a malformed cyclic adapter fails as a typed error instead of
+/// recursing until stack overflow.
+pub fn enumerate_tree_with_limits<G: ExternalSamplingGame>(
+    game: &G,
+    max_nodes: usize,
+    max_depth: u32,
+) -> Result<PublicTree, TreeError> {
     let root = game.root_state();
     if game.actor(&root).is_none() {
         return Err(TreeError::RootIsTerminal);
     }
+    let max_nodes = max_nodes.min(MAX_TREE_NODES);
     let mut nodes = Vec::new();
     let mut by_history = FxHashMap::default();
     enumerate_node(
@@ -91,10 +141,171 @@ pub fn enumerate_tree<G: ExternalSamplingGame>(game: &G) -> Result<PublicTree, T
         HistoryKey::ROOT,
         None,
         0,
+        0,
+        max_nodes,
+        max_depth,
         &mut nodes,
         &mut by_history,
     )?;
     Ok(PublicTree { nodes, by_history })
+}
+
+/// Measures the full public tree without retaining its nodes and stops at
+/// the solver's dense-arena byte limit.
+///
+/// Production dense storage calls this before materializing the tree, so an
+/// infeasible action abstraction fails with [`TreeError::MemoryLimit`]
+/// instead of first allocating an arbitrary fixed number of public nodes.
+/// This convenience wrapper assumes a trusted finite game; production uses
+/// [`preflight_arena_with_limits_and_depth`].
+pub fn preflight_arena<G: ExternalSamplingGame>(
+    game: &G,
+    max_memory_bytes: u64,
+) -> Result<TreePreflight, TreeError> {
+    preflight_arena_with_limits(game, MAX_TREE_NODES, max_memory_bytes)
+}
+
+/// Non-retaining public-tree/dense-arena census with explicit resource
+/// limits.
+///
+/// `max_nodes` is useful as an optional benchmark checkpoint. It is not a
+/// production default. The function attempts node `max_nodes + 1` before
+/// returning [`TreeError::TooManyNodes`], and returns
+/// [`TreeError::MemoryLimit`] at the first node whose cumulative dense-arena
+/// estimate strictly exceeds `max_memory_bytes`.
+pub fn preflight_arena_with_limits<G: ExternalSamplingGame>(
+    game: &G,
+    max_nodes: usize,
+    max_memory_bytes: u64,
+) -> Result<TreePreflight, TreeError> {
+    preflight_arena_with_limits_and_depth(game, max_nodes, max_memory_bytes, u32::MAX)
+}
+
+/// Non-retaining census with explicit node, arena-byte, and structural
+/// depth bounds.
+pub fn preflight_arena_with_limits_and_depth<G: ExternalSamplingGame>(
+    game: &G,
+    max_nodes: usize,
+    max_memory_bytes: u64,
+    max_depth: u32,
+) -> Result<TreePreflight, TreeError> {
+    let root = game.root_state();
+    if game.actor(&root).is_none() {
+        return Err(TreeError::RootIsTerminal);
+    }
+    let max_nodes = max_nodes.min(MAX_TREE_NODES);
+    let mut preflight = TreePreflight::default();
+    preflight_node(
+        game,
+        root,
+        0,
+        max_nodes,
+        max_memory_bytes,
+        max_depth,
+        &mut preflight,
+    )?;
+    Ok(preflight)
+}
+
+fn preflight_node<G: ExternalSamplingGame>(
+    game: &G,
+    state: G::State,
+    depth: u32,
+    max_nodes: usize,
+    max_memory_bytes: u64,
+    max_depth: u32,
+    preflight: &mut TreePreflight,
+) -> Result<(), TreeError> {
+    if depth > max_depth {
+        return Err(TreeError::DepthLimit { limit: max_depth });
+    }
+    let actor = game
+        .actor(&state)
+        .expect("caller only recurses into decision states");
+    if preflight.node_count >= max_nodes {
+        return Err(TreeError::TooManyNodes { limit: max_nodes });
+    }
+    let node_id = preflight.node_count as NodeId;
+    let actions = game.node_actions(&state);
+    let num_actions = game.num_actions_of(&actions);
+    if num_actions == 0 {
+        return Err(TreeError::NoActions { actor });
+    }
+    if u32::try_from(num_actions).is_err() {
+        return Err(TreeError::SizeOverflow);
+    }
+
+    // Validate the same public action-label contract as full enumeration
+    // while retaining only one node's small menu.
+    let mut action_labels = Vec::with_capacity(num_actions);
+    let mut label_buf = String::new();
+    for index in 0..num_actions {
+        label_buf.clear();
+        game.write_action_label(&actions, index, &mut label_buf);
+        if label_buf.is_empty() {
+            return Err(TreeError::EmptyActionLabel { node: node_id });
+        }
+        if action_labels.contains(&label_buf) {
+            return Err(TreeError::DuplicateActionLabel { node: node_id });
+        }
+        action_labels.push(std::mem::take(&mut label_buf));
+    }
+
+    let context = game.dense_node_context(&state);
+    let buckets = u64::from(game.bucket_count(context.street, context.bucket_active_opponents));
+    if buckets == 0 {
+        return Err(TreeError::ZeroBuckets);
+    }
+    let slots = buckets
+        .checked_mul(num_actions as u64)
+        .ok_or(TreeError::SizeOverflow)?;
+    preflight.node_count += 1;
+    preflight.total_columns = preflight
+        .total_columns
+        .checked_add(buckets)
+        .ok_or(TreeError::SizeOverflow)?;
+    if preflight.total_columns > MAX_DENSE_COLUMNS {
+        return Err(TreeError::ColumnIdOverflow);
+    }
+    preflight.total_slots = preflight
+        .total_slots
+        .checked_add(slots)
+        .ok_or(TreeError::SizeOverflow)?;
+    preflight.estimated_arena_bytes = estimate_bytes(
+        preflight.node_count,
+        preflight.total_columns,
+        preflight.total_slots,
+    )?;
+    if preflight.estimated_arena_bytes > max_memory_bytes {
+        return Err(TreeError::MemoryLimit {
+            node_count: preflight.node_count,
+            total_columns: preflight.total_columns,
+            limit: max_memory_bytes,
+            needed: preflight.estimated_arena_bytes,
+        });
+    }
+
+    for index in 0..num_actions {
+        let child_depth = depth
+            .checked_add(1)
+            .ok_or(TreeError::DepthLimit { limit: max_depth })?;
+        if child_depth > max_depth {
+            return Err(TreeError::DepthLimit { limit: max_depth });
+        }
+        let child_state = game.next_state_with(&state, &actions, index);
+        if game.actor(&child_state).is_some() {
+            preflight_node(
+                game,
+                child_state,
+                child_depth,
+                max_nodes,
+                max_memory_bytes,
+                max_depth,
+                preflight,
+            )?;
+        }
+    }
+    Ok(())
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -104,22 +315,29 @@ fn enumerate_node<G: ExternalSamplingGame>(
     history: HistoryKey,
     parent: Option<NodeId>,
     parent_action_index: u32,
+    depth: u32,
+    max_nodes: usize,
+    max_depth: u32,
     nodes: &mut Vec<TreeNode>,
     by_history: &mut FxHashMap<HistoryKey, NodeId>,
 ) -> Result<NodeId, TreeError> {
+    if depth > max_depth {
+        return Err(TreeError::DepthLimit { limit: max_depth });
+    }
     let actor = game
         .actor(&state)
         .expect("caller only recurses into decision states");
-    if nodes.len() >= MAX_TREE_NODES {
-        return Err(TreeError::TooManyNodes {
-            limit: MAX_TREE_NODES,
-        });
+    if nodes.len() >= max_nodes {
+        return Err(TreeError::TooManyNodes { limit: max_nodes });
     }
     let node_id = nodes.len() as NodeId;
     let actions = game.node_actions(&state);
     let num_actions = game.num_actions_of(&actions);
     if num_actions == 0 {
         return Err(TreeError::NoActions { actor });
+    }
+    if u32::try_from(num_actions).is_err() {
+        return Err(TreeError::SizeOverflow);
     }
     let mut action_labels = Vec::with_capacity(num_actions);
     let mut label_buf = String::new();
@@ -151,6 +369,12 @@ fn enumerate_node<G: ExternalSamplingGame>(
 
     let mut children = Vec::with_capacity(num_actions);
     for index in 0..num_actions {
+        let child_depth = depth
+            .checked_add(1)
+            .ok_or(TreeError::DepthLimit { limit: max_depth })?;
+        if child_depth > max_depth {
+            return Err(TreeError::DepthLimit { limit: max_depth });
+        }
         let child_state = game.next_state_with(&state, &actions, index);
         let child_history = history.child(actor, index);
         if game.actor(&child_state).is_none() {
@@ -162,6 +386,9 @@ fn enumerate_node<G: ExternalSamplingGame>(
                 child_history,
                 Some(node_id),
                 index as u32,
+                child_depth,
+                max_nodes,
+                max_depth,
                 nodes,
                 by_history,
             )?;
@@ -200,6 +427,11 @@ pub struct DenseArena {
     total_slots: u64,
     touched_count: u64,
     estimated_bytes: u64,
+    /// `true` only after every OS page backing the fixed policy payload has
+    /// been written at least once. Ordinary research/library construction
+    /// may leave this false; the production constructor requires it before
+    /// returning a solver.
+    pages_committed: bool,
 }
 
 impl DenseArena {
@@ -221,6 +453,34 @@ impl DenseArena {
 
     pub fn touched_count(&self) -> u64 {
         self.touched_count
+    }
+
+    pub fn pages_committed(&self) -> bool {
+        self.pages_committed
+    }
+
+    #[cfg(test)]
+    pub(crate) fn touched_storage_layout(&self) -> (*const u64, usize, usize) {
+        (
+            self.touched.as_ptr(),
+            self.touched.len(),
+            self.touched.capacity(),
+        )
+    }
+
+    /// Faults in every page of the fixed policy payload. This turns the
+    /// allocator's potentially demand-zero/overcommitted reservation into a
+    /// startup barrier: a production solver is not returned until the
+    /// regret, strategy-sum, and touched-bit buffers have all been written.
+    ///
+    /// This does not claim that the whole process fits the solver payload
+    /// limit. The public tree, abstraction tables, worker scratch, and
+    /// allocator overhead remain additional process memory.
+    pub(crate) fn commit_pages(&mut self) {
+        commit_slice_pages(&mut self.regrets);
+        commit_slice_pages(&mut self.strategy_sum);
+        commit_slice_pages(&mut self.touched);
+        self.pages_committed = true;
     }
 
     pub fn bucket_count_of(&self, node: NodeId) -> u32 {
@@ -336,6 +596,9 @@ pub fn build_arena<G: ExternalSamplingGame>(
         total_columns = total_columns
             .checked_add(buckets)
             .ok_or(TreeError::SizeOverflow)?;
+        if total_columns > MAX_DENSE_COLUMNS {
+            return Err(TreeError::ColumnIdOverflow);
+        }
         let slots = buckets
             .checked_mul(actions)
             .ok_or(TreeError::SizeOverflow)?;
@@ -364,19 +627,66 @@ pub fn build_arena<G: ExternalSamplingGame>(
         slot_base,
         bucket_count,
         num_actions,
-        regrets: vec![0.0; total_slots_usize],
-        strategy_sum: vec![0.0; total_slots_usize],
-        touched: vec![0u64; touched_words],
+        regrets: try_zeroed_vec(total_slots_usize, "regret")?,
+        strategy_sum: try_zeroed_vec(total_slots_usize, "strategy-sum")?,
+        touched: try_zeroed_vec(touched_words, "touched-bitset")?,
         total_columns,
         total_slots,
         touched_count: 0,
         estimated_bytes,
+        pages_committed: false,
     })
+}
+
+fn try_zeroed_vec<T: Copy + Default>(
+    len: usize,
+    buffer: &'static str,
+) -> Result<Vec<T>, TreeError> {
+    let requested_bytes = len
+        .checked_mul(std::mem::size_of::<T>())
+        .ok_or(TreeError::SizeOverflow)?;
+    let mut values = Vec::new();
+    values
+        .try_reserve_exact(len)
+        .map_err(|_| TreeError::AllocationFailed {
+            buffer,
+            requested_bytes,
+        })?;
+    // `try_reserve_exact` above established the complete capacity. Resize
+    // only initializes those slots and therefore cannot request more memory.
+    values.resize(len, T::default());
+    Ok(values)
+}
+
+fn commit_slice_pages<T: Copy + Default>(values: &mut [T]) {
+    if values.is_empty() {
+        return;
+    }
+    // 4 KiB is no larger than the base page size on supported production
+    // platforms. Touching at this cadence therefore writes at least one
+    // element in every actual page (and more than one on larger-page
+    // systems). Volatile writes prevent the compiler from removing writes
+    // whose value is already zero.
+    let elements_per_touch = (4096 / std::mem::size_of::<T>()).max(1);
+    for index in (0..values.len()).step_by(elements_per_touch) {
+        // SAFETY: `index` comes from a range bounded by `values.len()`.
+        unsafe {
+            std::ptr::write_volatile(values.as_mut_ptr().add(index), T::default());
+        }
+    }
+    let last = values.len() - 1;
+    // SAFETY: a non-empty slice always contains `last`.
+    unsafe {
+        std::ptr::write_volatile(values.as_mut_ptr().add(last), T::default());
+    }
 }
 
 /// Two `f32` arrays per slot (regrets + strategy sums) plus one touched bit
 /// per column plus a small constant per-node table overhead
-/// (`column_base`/`slot_base`/`bucket_count`/`num_actions` entries).
+/// (`column_base`/`slot_base`/`bucket_count`/`num_actions` entries) and the
+/// two trailing `u64` base-table sentinels. `Vec` headers, spare capacity,
+/// allocator rounding, and the separate [`PublicTree`] remain process
+/// overhead outside this payload estimate.
 fn estimate_bytes(
     node_count: usize,
     total_columns: u64,
@@ -395,6 +705,7 @@ fn estimate_bytes(
     slot_bytes
         .checked_add(touched_bytes)
         .and_then(|value| value.checked_add(node_table_bytes))
+        .and_then(|value| value.checked_add(2 * std::mem::size_of::<u64>() as u64))
         .ok_or(TreeError::SizeOverflow)
 }
 
@@ -406,12 +717,10 @@ const fn size_of_f32() -> u64 {
 pub enum TreeError {
     #[error("root state has no acting seat; nothing to enumerate")]
     RootIsTerminal,
-    #[error(
-        "public betting tree exceeds the {limit} decision-node safety cap; restrict the betting \
-         tree (fewer bet/raise sizes, lower max_aggressive_actions, fewer seats) before using \
-         recall = \"street\""
-    )]
+    #[error("public betting tree exceeds the caller's {limit} decision-node checkpoint")]
     TooManyNodes { limit: usize },
+    #[error("public betting tree exceeds the {limit}-action structural depth limit")]
+    DepthLimit { limit: u32 },
     #[error("decision node for actor {actor} has no legal actions")]
     NoActions { actor: usize },
     #[error("public tree node {node} produced an empty action label")]
@@ -423,15 +732,20 @@ pub enum TreeError {
     #[error("dense arena size overflowed while summing bucket/slot counts")]
     SizeOverflow,
     #[error(
-        "dense arena preflight for {node_count} nodes / {total_columns} columns needs {needed} \
-         bytes, exceeding the {limit} byte memory limit; use recall = \"full\" or shrink the \
-         abstraction/betting tree"
+        "dense arena exceeds the {limit} byte memory limit at a prefix of {node_count} nodes / \
+         {total_columns} columns (at least {needed} bytes); reduce bucket counts or shrink the \
+         betting tree"
     )]
     MemoryLimit {
         node_count: usize,
         total_columns: u64,
         limit: u64,
         needed: u64,
+    },
+    #[error("memory allocation failed for the complete {buffer} buffer ({requested_bytes} bytes)")]
+    AllocationFailed {
+        buffer: &'static str,
+        requested_bytes: usize,
     },
     #[error("dense arena column id overflowed u32")]
     ColumnIdOverflow,
@@ -450,7 +764,9 @@ pub enum TreeError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::abstraction::FeatureHashAbstraction;
+    use crate::abstraction::{
+        BucketContext, BucketId, FeatureHashAbstraction, MultiwayAbstraction,
+    };
     use crate::config::{AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, SeatConfig};
     use crate::config::{MultiwayConfig, RakeConfig, UtilityConfig};
     use crate::holdem::HoldemGame;
@@ -486,6 +802,34 @@ mod tests {
     }
 
     #[test]
+    fn impossible_policy_buffer_reservation_returns_a_typed_error() {
+        assert!(matches!(
+            try_zeroed_vec::<u8>(usize::MAX, "test-policy"),
+            Err(TreeError::AllocationFailed {
+                buffer: "test-policy",
+                ..
+            })
+        ));
+    }
+
+    #[derive(Clone, Copy, Debug)]
+    struct MaxBucketAbstraction;
+
+    impl MultiwayAbstraction for MaxBucketAbstraction {
+        fn num_buckets(&self, _street: Street, _active_opponents: u8) -> u32 {
+            u32::MAX
+        }
+
+        fn bucket(&self, _context: BucketContext<'_>) -> BucketId {
+            unreachable!("tree tests never evaluate cards")
+        }
+
+        fn fingerprint(&self) -> [u8; 32] {
+            [0x42; 32]
+        }
+    }
+
+    #[test]
     fn enumerated_tree_node_and_terminal_counts_are_stable() {
         let game = smoke_game();
         let tree = enumerate_tree(&game).unwrap();
@@ -505,6 +849,41 @@ mod tests {
     }
 
     #[test]
+    fn configurable_node_limit_has_an_inclusive_decision_node_boundary() {
+        let game = smoke_game();
+
+        let zero_error = enumerate_tree_with_limit(&game, 0).unwrap_err();
+        assert!(matches!(zero_error, TreeError::TooManyNodes { limit: 0 }));
+
+        let below_error = enumerate_tree_with_limit(&game, 3_657).unwrap_err();
+        assert!(matches!(
+            below_error,
+            TreeError::TooManyNodes { limit: 3_657 }
+        ));
+
+        let exact = enumerate_tree_with_limit(&game, 3_658).unwrap();
+        let production = enumerate_tree(&game).unwrap();
+        assert_eq!(exact.nodes.len(), 3_658);
+        assert_eq!(exact.by_history, production.by_history);
+        assert_eq!(
+            exact
+                .nodes
+                .iter()
+                .map(|node| (&node.history, &node.children))
+                .collect::<Vec<_>>(),
+            production
+                .nodes
+                .iter()
+                .map(|node| (&node.history, &node.children))
+                .collect::<Vec<_>>()
+        );
+
+        let above_hard_cap =
+            enumerate_tree_with_limit(&game, MAX_TREE_NODES.saturating_add(1)).unwrap();
+        assert_eq!(above_hard_cap.by_history, production.by_history);
+    }
+
+    #[test]
     fn arena_preflight_matches_manual_bucket_sum() {
         let game = smoke_game();
         let tree = enumerate_tree(&game).unwrap();
@@ -520,6 +899,110 @@ mod tests {
         assert_eq!(arena.total_slots(), expected_slots);
         assert_eq!(arena.regrets.len() as u64, expected_slots);
         assert_eq!(arena.strategy_sum.len() as u64, expected_slots);
+    }
+
+    #[test]
+    fn non_retaining_preflight_matches_materialized_arena() {
+        let game = smoke_game();
+        let measured = preflight_arena(&game, u64::MAX).unwrap();
+        let tree = enumerate_tree(&game).unwrap();
+        let arena = build_arena(&game, &tree, u64::MAX).unwrap();
+
+        assert_eq!(measured.node_count, tree.nodes.len());
+        assert_eq!(measured.total_columns, arena.total_columns());
+        assert_eq!(measured.total_slots, arena.total_slots());
+        assert_eq!(measured.estimated_arena_bytes, arena.estimated_bytes());
+    }
+
+    #[test]
+    fn non_retaining_preflight_node_checkpoint_is_inclusive() {
+        let game = smoke_game();
+        let error = preflight_arena_with_limits(&game, 3_657, u64::MAX).unwrap_err();
+        assert!(matches!(error, TreeError::TooManyNodes { limit: 3_657 }));
+
+        let measured = preflight_arena_with_limits(&game, 3_658, u64::MAX).unwrap();
+        assert_eq!(measured.node_count, 3_658);
+    }
+
+    #[test]
+    fn non_retaining_preflight_obeys_exact_byte_boundary() {
+        let game = smoke_game();
+        let complete = preflight_arena(&game, u64::MAX).unwrap();
+
+        let equal = preflight_arena(&game, complete.estimated_arena_bytes).unwrap();
+        assert_eq!(equal, complete);
+
+        let error = preflight_arena(&game, complete.estimated_arena_bytes - 1).unwrap_err();
+        let TreeError::MemoryLimit {
+            node_count,
+            total_columns,
+            limit,
+            needed,
+        } = error
+        else {
+            panic!("expected exact byte-boundary failure");
+        };
+        assert_eq!(node_count, complete.node_count);
+        assert_eq!(total_columns, complete.total_columns);
+        assert_eq!(limit + 1, complete.estimated_arena_bytes);
+        assert_eq!(needed, complete.estimated_arena_bytes);
+    }
+
+    #[test]
+    fn production_depth_guard_fails_before_unbounded_recursion() {
+        let game = smoke_game();
+        assert!(matches!(
+            preflight_arena_with_limits_and_depth(&game, MAX_TREE_NODES, u64::MAX, 0),
+            Err(TreeError::DepthLimit { limit: 0 })
+        ));
+        assert!(matches!(
+            enumerate_tree_with_limits(&game, MAX_TREE_NODES, 0),
+            Err(TreeError::DepthLimit { limit: 0 })
+        ));
+    }
+
+    #[test]
+    fn dense_column_count_is_rejected_before_wire_id_overflow() {
+        let game = HoldemGame::new(
+            &smoke_config(),
+            &UtilityConfig::ChipEv,
+            &RakeConfig::None,
+            MaxBucketAbstraction,
+        )
+        .unwrap();
+        assert!(matches!(
+            preflight_arena(&game, u64::MAX),
+            Err(TreeError::ColumnIdOverflow)
+        ));
+
+        let tree = enumerate_tree(&game).unwrap();
+        assert!(matches!(
+            build_arena(&game, &tree, u64::MAX),
+            Err(TreeError::ColumnIdOverflow)
+        ));
+    }
+
+    #[test]
+    fn non_retaining_preflight_stops_on_byte_boundary() {
+        let game = smoke_game();
+        let one_node = preflight_arena_with_limits(&game, MAX_TREE_NODES, u64::MAX)
+            .unwrap()
+            .estimated_arena_bytes;
+        let error = preflight_arena_with_limits(&game, MAX_TREE_NODES, 1).unwrap_err();
+        let TreeError::MemoryLimit {
+            node_count,
+            total_columns,
+            limit,
+            needed,
+        } = error
+        else {
+            panic!("expected a byte-bounded preflight failure");
+        };
+        assert_eq!(node_count, 1);
+        assert!(total_columns > 0);
+        assert_eq!(limit, 1);
+        assert!(needed > limit);
+        assert!(one_node >= needed);
     }
 
     #[test]

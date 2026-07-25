@@ -1,0 +1,47 @@
+# Input template for the representative-envelope transfer generator.
+#
+# The two entries below are examples, not selected winners. Replace each
+# finalist with the corresponding case winner after the canonical experiment
+# has completed. The ten transfer scenarios themselves are fixed in the
+# generator and cannot be cherry-picked through this manifest.
+
+schema = "solvers.abstraction-transfer-validation/v1"
+
+[run]
+max_sweeps = 500
+check_every_sweeps = 500
+evaluation_samples = 2048
+deviator_traversals = 5000
+threads = 6
+memory = "6GiB"
+checkpoint_interval = "15m"
+
+[[finalist]]
+case = "tournament"
+id = "T-R256-example"
+kind = "rollout-kmeans"
+flop_buckets = 256
+turn_buckets = 256
+river_buckets = 256
+rollout_samples = 512
+points_per_bucket = 8
+kmeans_iterations = 10
+recall = "full"
+abstraction_seed = 0
+solver_seed = 1011
+evaluation_seed = 424242
+
+[[finalist]]
+case = "cash"
+id = "C-R256-example"
+kind = "rollout-kmeans"
+flop_buckets = 256
+turn_buckets = 256
+river_buckets = 256
+rollout_samples = 2048
+points_per_bucket = 8
+kmeans_iterations = 10
+recall = "full"
+abstraction_seed = 0
+solver_seed = 1011
+evaluation_seed = 424242

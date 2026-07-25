@@ -19,6 +19,9 @@ button = 0
 [game.defaults]
 stack_bb = 100.0
 range = "random"
+
+[game.abstraction]
+kind = "ehs2-percentile"
 "#;
 
 const FULL: &str = r#"schema = "solvers.multiway-preflop/v1"
@@ -38,17 +41,12 @@ range = "random"
 kind = "standard"
 
 [game.abstraction]
-kind = "multiway-rollout"
-rollouts_per_state = 512
-seed = 0
+kind = "ehs2-percentile"
 
 [game.abstraction.buckets]
 flop = 64
 turn = 64
 river = 64
-
-[game.information]
-recall = "current-street"
 
 [economics]
 kind = "cash"
@@ -93,8 +91,8 @@ pub fn run(template: ConfigTemplate, out: Option<&Path>) -> Result<()> {
         ConfigTemplate::Minimal => MINIMAL,
         ConfigTemplate::Full => FULL,
     };
-    crate::multiway_v1::parse_and_lower(rendered)
-        .context("validating built-in Multiway Preflop v1 template")?;
+    crate::multiway_v1::validate_production_contract(rendered)
+        .context("validating built-in production Multiway Preflop v1 template")?;
     if let Some(path) = out {
         std::fs::write(path, rendered)
             .with_context(|| format!("writing config template {}", path.display()))?;
@@ -109,8 +107,10 @@ mod tests {
 
     #[test]
     fn minimal_and_full_templates_are_valid() {
-        crate::multiway_v1::parse_and_lower(MINIMAL).unwrap();
-        crate::multiway_v1::parse_and_lower(FULL).unwrap();
+        for template in [MINIMAL, FULL] {
+            crate::multiway_v1::parse_and_lower(template).unwrap();
+            crate::multiway_v1::validate_production_contract(template).unwrap();
+        }
     }
 
     #[test]
@@ -135,9 +135,6 @@ mod tests {
             "sizes",
             "source",
             "params",
-            "rollouts_per_state",
-            "opponent_buckets",
-            "recall",
             "payouts",
             "outside_field_bb",
             "samples",
@@ -161,10 +158,7 @@ mod tests {
             "deviator_traversals",
             "interval",
             "probability_encoding",
-            "multiway-rollout",
             "ehs2-percentile",
-            "current-street",
-            "bucket-history",
             "tournament-icm",
             "range-vector",
             "single-hand",

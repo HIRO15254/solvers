@@ -1,0 +1,244 @@
+{
+  "schema": "solvers.abstraction-optimization.evidence/v1",
+  "scope": {
+    "rung": "s3",
+    "seedPairs": [
+      {
+        "abstraction": 0,
+        "solver": 1011,
+        "evaluation": 424242
+      }
+    ],
+    "note": "The EHS2 and rollout references were evaluated as separate proper-subset filtered runs. Both rankings are screening_only; no combined unfiltered S3 ranking artifact exists."
+  },
+  "contract": {
+    "manifest": {
+      "path": "experiments/abstraction-optimization-2026-07-25/manifest.toml",
+      "sha256": "d80ef8f50d049d7aab8fcc912f8abde8bc55e6bbb0206b7056c2ce059b83125b",
+      "manifestFingerprint": "d22c55caf8d68af7ac665b7825fb926011b5dffcd80165bcd4084737ba516366"
+    },
+    "generatedMetadata": {
+      "path": "target/abstraction-optimization-2026-07-25/configs/experiment-metadata.json",
+      "sha256": "8c662c8d4b8c9817d2442c926bf48ab11ad54f22626f15166f19536000144419"
+    },
+    "solver": {
+      "path": "target/release/solvers",
+      "sha256": "d63816af6be596c1d39c37f4132e9ab919ddaaf0357c2b3e9eef9e3e872a1dc1"
+    },
+    "bootstrapBinary": {
+      "path": "target/release/examples/paired_reference_bootstrap",
+      "sha256": "cef1679c676ca64e863f9ae2c3f437fafec3e7d41118a173f0e98203ab3649df"
+    },
+    "transferGenerator": {
+      "binaryPath": "target/release/examples/generate_abstraction_transfer_configs",
+      "binarySha256": "c49abf596ac418ffd87861de3ee95d976601ff48a82f88ae02c9a70c8c0762ba",
+      "sourcePath": "app/cli/examples/generate_abstraction_transfer_configs.rs",
+      "sourceSha256": "b8d3eb48865c3805b4976b6c2edd2d3732a59f1dcbdbbdf5d3f11ae720a0d758",
+      "verification": "Both tracked tentative configs validated and had byte-identical normalized effective-config output to the generator-verified 6-max canonical anchors."
+    }
+  },
+  "evidenceGroups": [
+    {
+      "id": "s3_solve_resources",
+      "status": "validated_measurement",
+      "sourceIds": [
+        "s3-solve-summary"
+      ]
+    },
+    {
+      "id": "ehs_screening_subset",
+      "referenceFilter": "^s3-ehs2-k512$",
+      "candidateCount": 6,
+      "coverageStatus": "failed",
+      "formalDecision": "screening_only",
+      "sourceIds": [
+        "s3-ehs2-evaluation-summary",
+        "s3-ehs2-coverage-csv",
+        "s3-ehs2-coverage-json",
+        "s3-ehs2-ranking-csv",
+        "s3-ehs2-ranking-json"
+      ]
+    },
+    {
+      "id": "rollout_screening_subset",
+      "referenceFilter": "^s3-rollout-k512-r4096-s7001$",
+      "candidateCount": 4,
+      "coverageStatus": "failed",
+      "formalDecision": "screening_only",
+      "sourceIds": [
+        "s3-rollout-evaluation-summary",
+        "s3-rollout-coverage-csv",
+        "s3-rollout-coverage-json",
+        "s3-rollout-ranking-csv",
+        "s3-rollout-ranking-json"
+      ]
+    },
+    {
+      "id": "full_recall_resource_ceiling",
+      "status": "validated_bounded_measurement",
+      "sourceIds": [
+        "full-recall-ceiling-initial",
+        "full-recall-ceiling-adaptive"
+      ]
+    }
+  ],
+  "sourceArtifacts": [
+    {
+      "id": "s3-solve-summary",
+      "path": "target/abstraction-optimization-2026-07-25/s3-s1011-solve-summary.csv",
+      "sha256": "e46ee1a82745b30a7484f746bf610028430688c213419c8a8ec8cc60a04e9772"
+    },
+    {
+      "id": "s3-ehs2-evaluation-summary",
+      "path": "target/abstraction-optimization-2026-07-25/s3-rung-rf-90e0c222753730f0-evaluation-summary.csv",
+      "sha256": "d54b32be73c67826b3b409bab65690a58642f8686b75dc331d991dbca7249131"
+    },
+    {
+      "id": "s3-ehs2-coverage-csv",
+      "path": "target/abstraction-optimization-2026-07-25/s3-rung-rf-90e0c222753730f0-coverage-gates.csv",
+      "sha256": "ae6e8816de11641358127eadccba7f47fda64ee6faf4627f6bbbb38302b33b13"
+    },
+    {
+      "id": "s3-ehs2-coverage-json",
+      "path": "target/abstraction-optimization-2026-07-25/s3-rung-rf-90e0c222753730f0-coverage-gates.json",
+      "sha256": "12a43918aa2fa8286e28766dfbc3ad797cba3082a5ede28eafb08e648da1d253"
+    },
+    {
+      "id": "s3-ehs2-ranking-csv",
+      "path": "target/abstraction-optimization-2026-07-25/s3-rung-rf-90e0c222753730f0-ranking.csv",
+      "sha256": "133fab0b75aeb4e0cb5f7d7ec9a864126fc5eff292d890b20878020361dbfd8e"
+    },
+    {
+      "id": "s3-ehs2-ranking-json",
+      "path": "target/abstraction-optimization-2026-07-25/s3-rung-rf-90e0c222753730f0-ranking.json",
+      "sha256": "988b906aec413914636a586d25f23a9171a044f494a0dea32ff3a3e315e5e417"
+    },
+    {
+      "id": "s3-rollout-evaluation-summary",
+      "path": "target/abstraction-optimization-2026-07-25/s3-rung-rf-d568d740eb6b210d-evaluation-summary.csv",
+      "sha256": "757f4d114beaa5fabe21c5898e99f11bd5f06c1ee950b6139e2683d65eb96c87"
+    },
+    {
+      "id": "s3-rollout-coverage-csv",
+      "path": "target/abstraction-optimization-2026-07-25/s3-rung-rf-d568d740eb6b210d-coverage-gates.csv",
+      "sha256": "b8477a84fe796eb7d2aab1e1ba7e1765c32f1ecb69f06b9a5506996cae23e17a"
+    },
+    {
+      "id": "s3-rollout-coverage-json",
+      "path": "target/abstraction-optimization-2026-07-25/s3-rung-rf-d568d740eb6b210d-coverage-gates.json",
+      "sha256": "9f361dce3170d60e0d20322ba94b78a858b7e7019dd285481847ffee555df74e"
+    },
+    {
+      "id": "s3-rollout-ranking-csv",
+      "path": "target/abstraction-optimization-2026-07-25/s3-rung-rf-d568d740eb6b210d-ranking.csv",
+      "sha256": "a32cc9d8166ed2b256afa917fc5c5c21b1b148eef12d801fa2a594c2adaeeada"
+    },
+    {
+      "id": "s3-rollout-ranking-json",
+      "path": "target/abstraction-optimization-2026-07-25/s3-rung-rf-d568d740eb6b210d-ranking.json",
+      "sha256": "757d42e9d52432dea6264ae0550c878bfceb7fc11a0efcaee452f76d05a404fe"
+    },
+    {
+      "id": "full-recall-ceiling-initial",
+      "path": "target/abstraction-resource-ceiling-2026-07-25/resource-ceiling-s10000-summary.csv",
+      "sha256": "1360452f44624a9487992ea2257e4f6bd1b3c92252f2fe457438fb8a6dc1ed56"
+    },
+    {
+      "id": "full-recall-ceiling-adaptive",
+      "path": "target/abstraction-resource-ceiling-adaptive-2026-07-25/resource-ceiling-s10000-summary.csv",
+      "sha256": "1c461c15b60c84c4b888ed7d03f79774c5ca1387d62b1d5be96a9d6347e684d9"
+    },
+    {
+      "id": "tournament-tentative-source-config",
+      "path": "target/abstraction-optimization-2026-07-25/configs/T-E128-street-a0-s1011.toml",
+      "sha256": "321af14fcae78e3024c1a50226c872a72cd9fcb8ff1def32f6f9fd159e538259"
+    },
+    {
+      "id": "cash-tentative-source-config",
+      "path": "target/abstraction-optimization-2026-07-25/configs/C-E256-street-a0-s1011.toml",
+      "sha256": "90ab80c67984d7066aa1760b8ab089c931e00deceeb51c9f083554113c4973f3"
+    }
+  ],
+  "distilledArtifacts": [
+    {
+      "path": "experiments/abstraction-optimization-2026-07-25/evidence/s3-solve-resources.csv",
+      "sha256": "09ce62ef810374c9d9d5b67db20c7b9dd0ac0c64e957e17aea97d50f571c1a73",
+      "sourceIds": [
+        "s3-solve-summary"
+      ]
+    },
+    {
+      "path": "experiments/abstraction-optimization-2026-07-25/evidence/s3-reference-candidate-results.csv",
+      "sha256": "defb9517f8de43f95e89b51dc2967c2c550576029dbb18b4fb3412bf78f5ea45",
+      "sourceIds": [
+        "s3-ehs2-evaluation-summary",
+        "s3-ehs2-coverage-csv",
+        "s3-ehs2-ranking-csv",
+        "s3-ehs2-ranking-json",
+        "s3-rollout-evaluation-summary",
+        "s3-rollout-coverage-csv",
+        "s3-rollout-ranking-csv",
+        "s3-rollout-ranking-json"
+      ]
+    },
+    {
+      "path": "experiments/abstraction-optimization-2026-07-25/evidence/s3-paired-comparisons.csv",
+      "sha256": "e77ab64b4cb2beb72012ff21daadab21d26fffed5844b87fd15b1abb451ea07b",
+      "sourceIds": [
+        "s3-ehs2-ranking-json",
+        "s3-rollout-ranking-json"
+      ]
+    },
+    {
+      "path": "experiments/abstraction-optimization-2026-07-25/evidence/full-recall-resource-ceiling.csv",
+      "sha256": "2e502eedf2e7778223c28a508b6a60717c3b6a310fbd4a7aa8bc62c505772353",
+      "sourceIds": [
+        "full-recall-ceiling-initial",
+        "full-recall-ceiling-adaptive"
+      ]
+    }
+  ],
+  "fingerprints": {
+    "games": {
+      "tournament6Max50bb": "a31e08f41b36e46fcf340e432d27209dea872bcfa21e3104ee6037255e0af512",
+      "cash6Max100bb": "c35365b8e6ab8df1bbacdd9a6a862c527205bc048c58fa7db8b05f81bf3bc55b"
+    },
+    "candidateAbstractions": {
+      "T-E64-street": "3ed0ca3edaabd3bf14e88ce08705d3e14175e5ea419c41b2b9753883e334b120",
+      "T-E128-street": "685e2b1d6a50a8299ad9c62e95d58d68de34f55cb66bfa1b40ecc10a048a8727",
+      "T-R128-street": "6c40170417715ab0d08b980d92b6e2130ff8d7e309acff781f6261e7f31e95a0",
+      "T-R128-base-street": "e13ee5c2f1787e1841cf8a1fa611f6c419528da010770f5a322e46f477856610",
+      "C-E64-street": "3ed0ca3edaabd3bf14e88ce08705d3e14175e5ea419c41b2b9753883e334b120",
+      "C-E256-street": "29e5f5f110b46a9fcdb2ea953d878604267dc2d0d9d0ca484982ed1107a41dad",
+      "C-R128-street": "37509582022dfeddf2f6e609eb369d76ec0ae248bdbf41d9ff612fc5ee27a474",
+      "C-R256-base-street": "b53aac0bf05588b22d7cb5aa22ac3184a6acdd0f617648086dfe4b731c9895c1",
+      "E64-full-recall": "109e6771acbf60b4a917970500e30c1fac43bfe2ccc31181aba9c32f9479f73e"
+    },
+    "references": {
+      "s3-ehs2-k512": "1958b8ffb6d7980c639d3358eb8d82b741b1f1c7c0491bd334bb9e23cbc994c4",
+      "s3-rollout-k512-r4096-s7001": "10382a8bd0f31c8b64e2b0460535448d9c3cac07918c92372e0a7a385c479263"
+    }
+  },
+  "tentativePortableConfigs": [
+    {
+      "candidateId": "T-E128-street",
+      "path": "experiments/abstraction-optimization-2026-07-25/tentative-defaults/tournament-6max-50bb-tentative-ehs2-k128-current-street-v1.toml",
+      "sha256": "8e3ac5328de8e001c748812c59e7aad2db01841acce8a53592b5da260686bd38",
+      "gameFingerprint": "a31e08f41b36e46fcf340e432d27209dea872bcfa21e3104ee6037255e0af512",
+      "treeContractFingerprint": "97e3c3ebf3da73e7f6e218bffd2b43399f87ab3a207b099f90de63058b8db604",
+      "abstractionSpecFingerprint": "f560fc25bdd96938f1961ec0e0b7d09275e980f10e725df07a0361ded87caea9",
+      "runtimeAbstractionFingerprint": "685e2b1d6a50a8299ad9c62e95d58d68de34f55cb66bfa1b40ecc10a048a8727",
+      "effectiveConfigMatchedGeneratorOutput": true
+    },
+    {
+      "candidateId": "C-E256-street",
+      "path": "experiments/abstraction-optimization-2026-07-25/tentative-defaults/cash-6max-100bb-tentative-ehs2-k256-current-street-v1.toml",
+      "sha256": "ed95ca3da4c5b47b8a397d893456cfa712f64ad80b917b996c9a8587f02a48be",
+      "gameFingerprint": "c35365b8e6ab8df1bbacdd9a6a862c527205bc048c58fa7db8b05f81bf3bc55b",
+      "treeContractFingerprint": "bb50096add4d3a554dec23b3eaaba35a15c26e121eaa77c4c5b0d402b1a6b821",
+      "abstractionSpecFingerprint": "90d067553607aaad64cf452476ae6c9202851a7236fd09d8a079b371257b28bd",
+      "runtimeAbstractionFingerprint": "29e5f5f110b46a9fcdb2ea953d878604267dc2d0d9d0ca484982ed1107a41dad",
+      "effectiveConfigMatchedGeneratorOutput": true
+    }
+  ]
+}

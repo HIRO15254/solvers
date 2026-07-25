@@ -1,0 +1,100 @@
+# Identical to tournament-6max-rollout64.toml except for the card abstraction.
+
+[game]
+kind = "preflop-multiway"
+button = 3
+
+[[game.seats]]
+stack_bb = 20.0
+range = ""
+[[game.seats]]
+stack_bb = 20.0
+range = ""
+[[game.seats]]
+stack_bb = 20.0
+range = ""
+[[game.seats]]
+stack_bb = 20.0
+range = ""
+[[game.seats]]
+stack_bb = 20.0
+range = ""
+[[game.seats]]
+stack_bb = 20.0
+range = ""
+
+[game.blinds]
+small_bb = 0.5
+big_bb = 1.0
+
+[game.ante]
+kind = "each"
+amount_bb = 0.125
+
+[game.betting]
+allow_limp = true
+
+[game.betting.preflop]
+bet_sizes = [{ kind = "to-bb", value = 2.2 }, { kind = "to-bb", value = 2.5 }]
+isolate_sizes = [{ kind = "to-bb", value = 3.0 }, { kind = "to-bb", value = 3.5 }]
+raise_sizes = [{ kind = "previous-bet-multiple", factor = 2.5 }, { kind = "previous-bet-multiple", factor = 3.0 }]
+max_aggressive_actions = 4
+include_allin = true
+
+[game.betting.flop]
+bet_sizes = [{ kind = "pot-after-call", fraction = 0.5 }]
+raise_sizes = [{ kind = "pot-after-call", fraction = 0.75 }]
+max_aggressive_actions = 2
+include_allin = true
+max_betting_players = 2
+
+[game.betting.turn]
+bet_sizes = [{ kind = "pot-after-call", fraction = 0.5 }]
+raise_sizes = [{ kind = "pot-after-call", fraction = 0.75 }]
+max_aggressive_actions = 2
+include_allin = true
+max_betting_players = 2
+
+[game.betting.river]
+bet_sizes = [{ kind = "pot-after-call", fraction = 0.5 }]
+raise_sizes = [{ kind = "pot-after-call", fraction = 0.75 }]
+max_aggressive_actions = 2
+include_allin = true
+max_betting_players = 2
+
+[game.abstraction]
+kind = "ehs2-table"
+flop_buckets = 64
+turn_buckets = 64
+river_buckets = 64
+recall = "full"
+artifact_cache = "target/abstraction-experiment/ehs2-64.postcard"
+
+[rake]
+kind = "none"
+
+[utility]
+kind = "tournament-icm"
+payouts = [50.0, 30.0, 20.0, 0.0, 0.0, 0.0]
+
+[algorithm]
+schedule = "external-sampling-mccfr"
+seed = 1011
+exploration_epsilon = 0.0
+discount_every = 10000
+discount_until = 10000000
+traverser_vector = true
+# Full recall uses the sparse vector fallback; dense-worker pruning does not apply.
+prune = false
+
+[run]
+sweeps = 2000
+seed = 1011
+check_every = 2000
+storage = "f32"
+threads = 6
+max_memory_bytes = 4294967296
+evaluation_samples = 512
+evaluation_cadence = 2000
+sweep_batch = 1
+checkpoint_every = 2000

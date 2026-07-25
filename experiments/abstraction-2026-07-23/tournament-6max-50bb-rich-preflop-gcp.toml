@@ -1,0 +1,120 @@
+# GCP memory-feasibility run for the requested 6-max/50bb tournament tree.
+#
+# This intentionally uses the legacy compatibility schema because it exposes
+# the rollout artifact cache needed by the experiment. `solvers validate` is
+# v1-only; run this file through `solvers solve`, whose canonical parser still
+# supports this compatibility shape.
+#
+# Every reachable preflop decision may use two normal sizes plus all-in.
+# Postflop is checked down so this isolates the preflop action-tree cost.
+# The paired `action_tree_preflight` example measures 7--9 max without
+# allocating the dense arena.
+
+[game]
+kind = "preflop-multiway"
+button = 3
+
+[[game.seats]]
+stack_bb = 50.0
+range = ""
+[[game.seats]]
+stack_bb = 50.0
+range = ""
+[[game.seats]]
+stack_bb = 50.0
+range = ""
+[[game.seats]]
+stack_bb = 50.0
+range = ""
+[[game.seats]]
+stack_bb = 50.0
+range = ""
+[[game.seats]]
+stack_bb = 50.0
+range = ""
+
+[game.blinds]
+small_bb = 0.5
+big_bb = 1.0
+
+[game.ante]
+kind = "each"
+amount_bb = 0.125
+
+[game.betting]
+allow_limp = true
+
+[game.betting.preflop]
+bet_sizes = [
+  { kind = "to-bb", value = 2.2 },
+  { kind = "to-bb", value = 2.5 },
+]
+isolate_sizes = [
+  { kind = "to-bb", value = 3.0 },
+  { kind = "to-bb", value = 3.5 },
+]
+raise_sizes = [
+  { kind = "previous-bet-multiple", factor = 2.5 },
+  { kind = "previous-bet-multiple", factor = 3.0 },
+]
+max_aggressive_actions = 4
+include_allin = true
+
+[game.betting.flop]
+bet_sizes = []
+raise_sizes = []
+max_aggressive_actions = 0
+include_allin = false
+max_betting_players = 1
+
+[game.betting.turn]
+bet_sizes = []
+raise_sizes = []
+max_aggressive_actions = 0
+include_allin = false
+max_betting_players = 1
+
+[game.betting.river]
+bet_sizes = []
+raise_sizes = []
+max_aggressive_actions = 0
+include_allin = false
+max_betting_players = 1
+
+[game.abstraction]
+kind = "rollout-kmeans"
+flop_buckets = 256
+turn_buckets = 256
+river_buckets = 256
+rollout_samples = 512
+seed = 0
+recall = "street"
+artifact_cache = "target/abstraction-experiment/gcp-tournament-k256-r512.mwab"
+
+[rake]
+kind = "none"
+
+[utility]
+kind = "tournament-icm"
+payouts = [50.0, 30.0, 20.0, 0.0, 0.0, 0.0]
+
+[algorithm]
+schedule = "external-sampling-mccfr"
+seed = 1011
+exploration_epsilon = 0.0
+discount_every = 10000
+discount_until = 10000000
+traverser_vector = false
+prune = false
+
+[run]
+sweeps = 1000
+seed = 1011
+check_every = 1000
+storage = "f32"
+threads = 8
+max_memory_bytes = 34359738368
+evaluation_samples = 64
+evaluation_cadence = 1000
+sweep_batch = 1
+checkpoint_every = 1000

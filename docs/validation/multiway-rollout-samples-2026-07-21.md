@@ -1,10 +1,14 @@
 # Multiway rollout sample default experiment (2026-07-21)
 
+> **Status: HISTORICAL RESEARCH.** 512はretired rollout backend内の
+> card-only実験結果であり、production defaultではない。Productionは
+> EHS²/current-street固定で、rolloutを`MWP001`で拒否する。
+
 ## Decision
 
-Multiway Preflop CLI v1 の `game.abstraction.rollouts_per_state` の既定値は
+当時のMultiway Preflop CLI v1案では`game.abstraction.rollouts_per_state`の値を
 **512** とする。現行 CLI の 256 と、`RolloutKMeansParams::default()` の 10,000
-は実装移行時に廃止し、公開 CLI と直接 Rust API の既定値を 512 に統一する。
+を統一するための実験だった。現production CLIにはこのoption自体がない。
 
 これは恒久的な品質上限ではない。ユーザーは正の `u32` 値を明示でき、より高い
 精度を必要とする検証ランでは 1,024 以上を選択できる。
@@ -14,7 +18,8 @@ Multiway Preflop CLI v1 の `game.abstraction.rollouts_per_state` の既定値�
 再実行コマンド:
 
 ```sh
-cargo run --release -p multiway --example rollout_sample_experiment
+cargo run --release -p multiway --features research-abstractions \
+  --example rollout_sample_experiment
 ```
 
 実験コードは
@@ -67,4 +72,3 @@ cargo run --release -p multiway --example rollout_sample_experiment
 - 代表的な6-max/9-max solveで、512から1,024への変更が停止判定または主要rangeを
   実用上有意に変える証拠が得られたとき
 - batch rollout実装のコスト曲線が変わったとき
-

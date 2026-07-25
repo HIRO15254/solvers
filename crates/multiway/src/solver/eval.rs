@@ -50,6 +50,26 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         seed: u64,
         variant: ProfileVariant,
     ) -> Result<DeviatorPolicy, SolverError> {
+        Ok(self
+            .train_deviator_with_report(seat, traversals, seed, variant)?
+            .policy)
+    }
+
+    /// Like [`Self::train_deviator`], retaining reference-partition visit
+    /// counts for coverage reporting.
+    ///
+    /// When the game overrides [`ExternalSamplingGame::deviation_bucket`],
+    /// only the deviating seat's local regret/action table uses that common
+    /// reference key. Every frozen candidate-policy lookup remains keyed by
+    /// [`ExternalSamplingGame::bucket`]. With the trait defaults this takes
+    /// the historical key path exactly.
+    pub fn train_deviator_with_report(
+        &self,
+        seat: usize,
+        traversals: u64,
+        seed: u64,
+        variant: ProfileVariant,
+    ) -> Result<DeviatorTrainingResult, SolverError> {
         validate_purify_threshold(variant.purify_threshold)?;
         self.train_deviator_core(
             seat,
@@ -67,7 +87,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         seed: u64,
         purify_threshold: f32,
         use_current_strategy: bool,
-    ) -> Result<DeviatorPolicy, SolverError> {
+    ) -> Result<DeviatorTrainingResult, SolverError> {
         let num_players = self.game.num_players();
         if seat >= num_players {
             return Err(SolverError::InvalidActor {
@@ -92,12 +112,32 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 use_current_strategy,
             )?;
         }
+        let coverage = DeviatorTrainingCoverage {
+            traversals,
+            visited_infosets: regrets.len() as u64,
+            retained_infosets: regrets
+                .values()
+                .filter(|(_, visits)| *visits >= MIN_DEVIATOR_POLICY_VISITS)
+                .count() as u64,
+            total_visits: regrets.values().fold(0u64, |total, (_, visits)| {
+                total.saturating_add(u64::from(*visits))
+            }),
+            retained_visits: regrets
+                .values()
+                .filter(|(_, visits)| *visits >= MIN_DEVIATOR_POLICY_VISITS)
+                .fold(0u64, |total, (_, visits)| {
+                    total.saturating_add(u64::from(*visits))
+                }),
+        };
         let actions = regrets
             .into_iter()
             .filter(|(_, (_, visits))| *visits >= MIN_DEVIATOR_POLICY_VISITS)
             .map(|(key, (r, _))| (key, regret_greedy_action(&r) as u16))
             .collect();
-        Ok(DeviatorPolicy { seat, actions })
+        Ok(DeviatorTrainingResult {
+            policy: DeviatorPolicy { seat, actions },
+            coverage,
+        })
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -136,8 +176,18 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         if num_actions == 0 {
             return Err(SolverError::NoActions { actor });
         }
-        let private = self.game.bucket(&state, world, actor);
-        validate_private_info(private, num_players, self.game.recall_mode())?;
+        let (private, recall) = if actor == seat {
+            (
+                self.game.deviation_bucket(&state, world, actor),
+                self.game.deviation_recall_mode(),
+            )
+        } else {
+            (
+                self.game.bucket(&state, world, actor),
+                self.game.recall_mode(),
+            )
+        };
+        validate_private_info(private, num_players, recall)?;
         let key = InfoKey {
             history,
             player: actor as u8,
@@ -313,6 +363,133 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         )
     }
 
+    /// Held-out evaluation of only the trained deviator keyed by the game's
+    /// common deviation/reference abstraction.
+    ///
+    /// Unlike [`Self::evaluate_profile`], this does not also consider the
+    /// candidate-specific regret-greedy heuristic. At the deviating seat it
+    /// looks up trained actions only with
+    /// [`ExternalSamplingGame::deviation_bucket`]. An unvisited reference key
+    /// samples the candidate's ordinary baseline strategy, making the
+    /// fallback a no-deviation policy rather than a candidate-specific greedy
+    /// action. Opponent and fallback strategy reads always use candidate
+    /// [`ExternalSamplingGame::bucket`] keys.
+    ///
+    /// The raw per-world values are returned so callers can make paired
+    /// comparisons across candidate abstractions driven by the same
+    /// `(seed, sample_id)` physical deals.
+    pub fn evaluate_reference_deviators(
+        &self,
+        samples: u64,
+        seed: u64,
+        deviators: &[DeviatorPolicy],
+        variant: ProfileVariant,
+    ) -> Result<ReferenceDeviationEvaluation, SolverError> {
+        validate_purify_threshold(variant.purify_threshold)?;
+        if samples == 0 {
+            return Err(SolverError::ZeroEvaluationSamples);
+        }
+        let num_players = self.game.num_players();
+        if deviators.len() != num_players {
+            return Err(SolverError::InvalidState(
+                "deviators must contain exactly one policy per seat",
+            ));
+        }
+        for (seat, dev) in deviators.iter().enumerate() {
+            if dev.seat != seat {
+                return Err(SolverError::InvalidState(
+                    "deviators must be seat-indexed (deviators[i].seat == i)",
+                ));
+            }
+        }
+
+        let mut means = vec![0.0; num_players];
+        let mut m2 = vec![0.0; num_players];
+        let mut gain_means = vec![0.0; num_players];
+        let mut gain_m2 = vec![0.0; num_players];
+        let mut candidate_policy_coverage = vec![CandidatePolicyCoverage::default(); num_players];
+        let mut coverage = vec![ReferenceDeviationCoverage::default(); num_players];
+        let mut worlds = Vec::new();
+        let mut total_deal_attempts = 0u64;
+
+        for sample_id in 0..samples {
+            let mut deal_rng = evaluation_deal_rng(seed, sample_id);
+            let sample = self.sampler.sample_counted(&mut deal_rng)?;
+            total_deal_attempts = total_deal_attempts
+                .checked_add(u64::from(sample.attempts))
+                .ok_or(SolverError::CounterOverflow)?;
+            let mut profile_rng = evaluation_action_rng(seed, sample_id, None);
+            let baseline = self.evaluate_world(
+                &sample.world,
+                &mut profile_rng,
+                None,
+                None,
+                variant.purify_threshold,
+                variant.use_current_strategy,
+                Some(&mut candidate_policy_coverage),
+            )?;
+            let count = (sample_id + 1) as f64;
+            for seat in 0..num_players {
+                let delta = baseline[seat] - means[seat];
+                means[seat] += delta / count;
+                m2[seat] += delta * (baseline[seat] - means[seat]);
+            }
+
+            let mut deviating_seat_utilities = Vec::with_capacity(num_players);
+            let mut gains = Vec::with_capacity(num_players);
+            for seat in 0..num_players {
+                let mut trained_rng = deviator_evaluation_action_rng(seed, sample_id, seat);
+                let (trained, sample_coverage) = self.evaluate_reference_world(
+                    &sample.world,
+                    &mut trained_rng,
+                    seat,
+                    deviators,
+                    variant.purify_threshold,
+                    variant.use_current_strategy,
+                )?;
+                coverage[seat].checked_add_assign(sample_coverage)?;
+
+                let deviating_utility = trained[seat];
+                let gain = deviating_utility - baseline[seat];
+                let gain_delta = gain - gain_means[seat];
+                gain_means[seat] += gain_delta / count;
+                gain_m2[seat] += gain_delta * (gain - gain_means[seat]);
+                deviating_seat_utilities.push(deviating_utility);
+                gains.push(gain);
+            }
+            worlds.push(ReferenceDeviationWorld {
+                sample_id,
+                baseline_utilities: baseline,
+                deviating_seat_utilities,
+                gains,
+            });
+        }
+
+        let seats = means
+            .into_iter()
+            .zip(m2)
+            .map(|(mean, sum_squared_error)| profile_estimate(mean, sum_squared_error, samples))
+            .collect();
+        let deviation_gain_lower_bound = gain_means
+            .into_iter()
+            .zip(gain_m2)
+            .map(|(mean, sum_squared_error)| {
+                nonnegative_gain_estimate(mean, sum_squared_error, samples)
+            })
+            .collect();
+        Ok(ReferenceDeviationEvaluation {
+            evaluation: ProfileEvaluation {
+                samples,
+                total_deal_attempts,
+                seats,
+                deviation_gain_lower_bound: Some(deviation_gain_lower_bound),
+            },
+            candidate_policy_coverage,
+            coverage,
+            worlds,
+        })
+    }
+
     fn evaluate_average_profile_core(
         &self,
         samples: u64,
@@ -362,6 +539,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 None,
                 purify_threshold,
                 use_current_strategy,
+                None,
             )?;
             let count = (sample_id + 1) as f64;
             for seat in 0..num_players {
@@ -377,6 +555,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     None,
                     purify_threshold,
                     use_current_strategy,
+                    None,
                 )?;
                 let gain = deviation[seat] - utilities[seat];
                 let gain_delta = gain - gain_means[seat][0];
@@ -392,6 +571,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                         deviators,
                         purify_threshold,
                         use_current_strategy,
+                        None,
                     )?;
                     let gain = trained[seat] - utilities[seat];
                     let gain_delta = gain - gain_means[seat][1];
@@ -435,6 +615,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         deviators: Option<&[DeviatorPolicy]>,
         purify_threshold: f32,
         use_current_strategy: bool,
+        mut candidate_policy_coverage: Option<&mut [CandidatePolicyCoverage]>,
     ) -> Result<Vec<f64>, SolverError> {
         let num_players = self.game.num_players();
         let mut state = self.game.root_state();
@@ -476,6 +657,12 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             // `policy` already dispatches on storage mode, so this evaluation
             // loop needs no dense/sparse branch of its own.
             let stored = self.policy(key);
+            if let Some(coverage) = candidate_policy_coverage.as_deref_mut() {
+                let seat = coverage
+                    .get_mut(actor)
+                    .ok_or(SolverError::InvalidActor { actor, num_players })?;
+                seat.record(private.street, stored.is_some())?;
+            }
             let strategy = if let Some(column) = &stored {
                 if column.action_labels != labels {
                     return Err(SolverError::ActionLabelsChanged { key });
@@ -509,6 +696,115 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                         Some(column) => regret_greedy_action(&column.regrets),
                         None => sample_profile_action(&strategy, rng),
                     },
+                }
+            } else {
+                sample_profile_action(&strategy, rng)
+            };
+            state = self.game.next_state_with(&state, &actions, action);
+            history = history.child(actor, action);
+            if depth == self.config.max_traversal_depth {
+                return Err(SolverError::DepthLimit {
+                    limit: self.config.max_traversal_depth,
+                });
+            }
+        }
+        unreachable!("depth loop returns at its upper bound")
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn evaluate_reference_world(
+        &self,
+        world: &SampledWorld,
+        rng: &mut ChaCha20Rng,
+        deviator: usize,
+        deviators: &[DeviatorPolicy],
+        purify_threshold: f32,
+        use_current_strategy: bool,
+    ) -> Result<(Vec<f64>, ReferenceDeviationCoverage), SolverError> {
+        let num_players = self.game.num_players();
+        let mut coverage = ReferenceDeviationCoverage::default();
+        let mut state = self.game.root_state();
+        let mut history = HistoryKey::ROOT;
+        for depth in 0..=self.config.max_traversal_depth {
+            let Some(actor) = self.game.actor(&state) else {
+                let mut utilities = vec![0.0; num_players];
+                self.game.terminal_utilities(&state, world, &mut utilities);
+                if let Some((seat, &utility)) = utilities
+                    .iter()
+                    .enumerate()
+                    .find(|(_, utility)| !utility.is_finite())
+                {
+                    return Err(SolverError::NonFiniteUtility { seat, utility });
+                }
+                return Ok((utilities, coverage));
+            };
+            if actor >= num_players {
+                return Err(SolverError::InvalidActor { actor, num_players });
+            }
+            let actions = self.game.node_actions(&state);
+            let num_actions = self.game.num_actions_of(&actions);
+            if num_actions == 0 {
+                return Err(SolverError::NoActions { actor });
+            }
+            let private = self.game.bucket(&state, world, actor);
+            validate_private_info(private, num_players, self.game.recall_mode())?;
+            let candidate_key = InfoKey {
+                history,
+                player: actor as u8,
+                street: private.street,
+                active_opponents: private.active_opponents,
+                bucket_path: private.bucket_path,
+            };
+            let labels = (0..num_actions)
+                .map(|index| self.game.action_label_of(&actions, index))
+                .collect::<Vec<_>>();
+            validate_action_labels(&labels)?;
+            let stored = self.policy(candidate_key);
+            let strategy = if let Some(column) = &stored {
+                if column.action_labels != labels {
+                    return Err(SolverError::ActionLabelsChanged { key: candidate_key });
+                }
+                let mut strategy = if use_current_strategy {
+                    regret_matching_f32(&column.regrets)
+                } else {
+                    column.average_strategy()
+                };
+                if purify_threshold > 0.0 {
+                    purify_strategy(&mut strategy, purify_threshold);
+                }
+                strategy
+            } else {
+                vec![1.0 / num_actions as f32; num_actions]
+            };
+
+            let action = if actor == deviator {
+                let reference_private = self.game.deviation_bucket(&state, world, actor);
+                validate_private_info(
+                    reference_private,
+                    num_players,
+                    self.game.deviation_recall_mode(),
+                )?;
+                let reference_key = InfoKey {
+                    history,
+                    player: actor as u8,
+                    street: reference_private.street,
+                    active_opponents: reference_private.active_opponents,
+                    bucket_path: reference_private.bucket_path,
+                };
+                let trained = deviators[actor]
+                    .actions
+                    .get(&reference_key)
+                    .copied()
+                    .filter(|&index| (index as usize) < num_actions);
+                match trained {
+                    Some(index) => {
+                        coverage.record(private.street, true)?;
+                        index as usize
+                    }
+                    None => {
+                        coverage.record(private.street, false)?;
+                        sample_profile_action(&strategy, rng)
+                    }
                 }
             } else {
                 sample_profile_action(&strategy, rng)

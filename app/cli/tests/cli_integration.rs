@@ -284,130 +284,122 @@ fn resume_equivalence_kuhn() {
 }
 
 #[test]
-#[ignore = "trains the multiway rollout artifact three times; CI runs it in release"]
-fn multiway_resume_is_bit_identical_to_a_straight_run() {
-    let dir = temp_dir("multiway-resume-equiv");
-    let base_config =
-        std::fs::read_to_string(workspace_root().join("examples/preflop_multiway_3max_smoke.toml"))
-            .unwrap();
-    let config_one = dir.join("one-thread.toml");
-    let config_four = dir.join("four-threads.toml");
-    let smaller_memory =
-        base_config.replace("max_memory_bytes = 67108864", "max_memory_bytes = 33554432");
-    assert_ne!(smaller_memory, base_config, "smoke memory fixture changed");
-    std::fs::write(&config_one, format!("{smaller_memory}\nthreads = 1\n")).unwrap();
-    std::fs::write(&config_four, format!("{base_config}\nthreads = 4\n")).unwrap();
-    let straight_checkpoint = dir.join("straight.mwckpt");
-    let resumed_checkpoint = dir.join("resumed.mwckpt");
-    let straight_result = dir.join("straight.json");
-    let resumed_result = dir.join("resumed.json");
-
-    run_solvers_ok(&[
-        "solve",
-        config_four.to_str().unwrap(),
-        "--checkpoint",
-        straight_checkpoint.to_str().unwrap(),
-        "--output",
-        straight_result.to_str().unwrap(),
-    ]);
-    run_solvers_ok(&[
-        "solve",
-        config_one.to_str().unwrap(),
-        "--iterations",
-        "1",
-        "--checkpoint",
-        resumed_checkpoint.to_str().unwrap(),
-    ]);
-    run_solvers_ok(&[
-        "resume",
-        config_four.to_str().unwrap(),
-        "--checkpoint",
-        resumed_checkpoint.to_str().unwrap(),
-        "--output",
-        resumed_result.to_str().unwrap(),
-    ]);
-
-    let straight = multiway::MultiwayCheckpoint::load_unchecked(&straight_checkpoint).unwrap();
-    let resumed = multiway::MultiwayCheckpoint::load_unchecked(&resumed_checkpoint).unwrap();
-    assert_eq!(straight.header.next_sample_id, 6);
-    assert_eq!(straight.state, resumed.state);
-    assert_eq!(
-        std::fs::read(&straight_checkpoint).unwrap(),
-        std::fs::read(&resumed_checkpoint).unwrap()
-    );
-    assert_eq!(
-        straight.header.configuration_fingerprint,
-        resumed.header.configuration_fingerprint
-    );
-    assert_eq!(
-        straight.header.abstraction_fingerprint,
-        resumed.header.abstraction_fingerprint
-    );
-
-    let straight_json: serde_json::Value =
-        serde_json::from_slice(&std::fs::read(straight_result).unwrap()).unwrap();
-    let resumed_json: serde_json::Value =
-        serde_json::from_slice(&std::fs::read(resumed_result).unwrap()).unwrap();
-    for field in [
-        "sweeps",
-        "traversals",
-        "infosets",
-        "memoryBytes",
-        "totalDealAttempts",
-        "meanDealAttempts",
-        "seats",
-        "strategyBlocks",
-        "configHash",
-    ] {
-        assert_eq!(straight_json[field], resumed_json[field], "field {field}");
-    }
-}
-
-#[test]
-fn multiway_resource_limit_writes_an_implicit_checkpoint() {
-    let dir = temp_dir("multiway-resource-limit");
-    let raw =
-        std::fs::read_to_string(workspace_root().join("examples/preflop_multiway_3max_smoke.toml"))
-            .unwrap();
-    let limited = raw.replace("max_memory_bytes = 67108864", "max_memory_bytes = 1");
-    assert_ne!(raw, limited, "smoke config memory limit fixture changed");
-    let config = dir.join("limited.toml");
-    std::fs::write(&config, limited).unwrap();
-    let output_path = dir.join("result.json");
-    let checkpoint_path = dir.join("result.mwckpt");
-
-    let command = run_solvers(&[
+#[cfg(not(feature = "research"))]
+fn legacy_multiway_solve_is_rejected_before_creating_artifacts() {
+    let dir = temp_dir("multiway-legacy-rejected");
+    let config = workspace_root().join("examples/preflop_multiway_3max_smoke.toml");
+    let result = dir.join("result.json");
+    let checkpoint = dir.join("result.mwckpt");
+    let solution = dir.join("result.mwsol");
+    let output = run_solvers(&[
         "solve",
         config.to_str().unwrap(),
         "--output",
-        output_path.to_str().unwrap(),
+        result.to_str().unwrap(),
+        "--checkpoint",
+        checkpoint.to_str().unwrap(),
+        "--sol",
+        solution.to_str().unwrap(),
     ]);
-    assert_eq!(
-        command.status.code(),
-        Some(75),
-        "resource limits must use the stable EX_TEMPFAIL-style exit code; stderr: {}",
-        String::from_utf8_lossy(&command.stderr)
-    );
-    let stderr = String::from_utf8_lossy(&command.stderr);
     assert!(
-        stderr.contains(&checkpoint_path.display().to_string()),
-        "stderr must identify the recovery checkpoint: {stderr}"
+        !output.status.success(),
+        "legacy Multiway solve unexpectedly succeeded"
     );
-    assert!(checkpoint_path.is_file());
-    let checkpoint = multiway::MultiwayCheckpoint::load_unchecked(&checkpoint_path).unwrap();
-    assert_eq!(checkpoint.header.next_sample_id, 0);
-    assert_eq!(checkpoint.state.completed_sweeps, 0);
-
-    let result: serde_json::Value =
-        serde_json::from_slice(&std::fs::read(output_path).unwrap()).unwrap();
-    assert_eq!(result["status"], "resource_limit");
+    assert!(
+        String::from_utf8_lossy(&output.stderr).contains("MWP003"),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(!result.exists());
+    assert!(!checkpoint.exists());
+    assert!(!solution.exists());
 }
 
 #[test]
-#[ignore = "trains the multiway rollout artifact; CI runs it in release"]
-fn multiway_v1_u16_storage_writes_a_quantized_mwsol() {
-    let dir = temp_dir("multiway-v1-u16");
+fn production_validate_rejects_the_research_rollout_fixture() {
     let config = workspace_root().join("examples/preflop_multiway_v1_smoke.toml");
+    let output = run_solvers(&["validate", config.to_str().unwrap()]);
+    assert!(
+        !output.status.success(),
+        "retired rollout fixture unexpectedly passed production validation"
+    );
+    assert!(
+        String::from_utf8_lossy(&output.stderr).contains("MWP001"),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+}
+
+#[test]
+#[cfg(feature = "research")]
+fn research_build_solves_resumes_and_live_evaluates_legacy_rollout() {
+    let dir = temp_dir("multiway-legacy-research");
+    let config = workspace_root().join("examples/preflop_multiway_3max_smoke.toml");
+    let first_result = dir.join("first.json");
+    let resumed_result = dir.join("resumed.json");
+    let checkpoint = dir.join("result.mwckpt");
+    let solution = dir.join("result.mwsol");
+
+    run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--iterations",
+        "1",
+        "--output",
+        first_result.to_str().unwrap(),
+        "--checkpoint",
+        checkpoint.to_str().unwrap(),
+        "--sol",
+        solution.to_str().unwrap(),
+    ]);
+    assert!(first_result.is_file());
+    assert!(checkpoint.is_file());
+    assert!(solution.is_file());
+
+    run_solvers_ok(&[
+        "resume",
+        config.to_str().unwrap(),
+        "--checkpoint",
+        checkpoint.to_str().unwrap(),
+        "--output",
+        resumed_result.to_str().unwrap(),
+    ]);
+    let resumed: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(&resumed_result).unwrap()).unwrap();
+    assert_eq!(resumed["sweeps"], 2);
+
+    let evaluated = run_solvers_ok(&[
+        "evaluate",
+        solution.to_str().unwrap(),
+        "--samples",
+        "8",
+        "--br-traversals",
+        "1",
+    ]);
+    let evaluation: serde_json::Value =
+        serde_json::from_slice(&evaluated.stdout).expect("research evaluation JSON");
+    assert_eq!(evaluation["seats"].as_array().map(Vec::len), Some(3));
+    assert_eq!(
+        evaluation["deviation_gain_lower_bound"]
+            .as_array()
+            .map(Vec::len),
+        Some(3)
+    );
+}
+
+#[test]
+#[cfg(feature = "research")]
+fn research_build_solves_and_resumes_v1_rollout_with_bucket_history() {
+    let dir = temp_dir("multiway-v1-research-full");
+    let source = workspace_root().join("examples/preflop_multiway_v1_smoke.toml");
+    let mut raw = std::fs::read_to_string(source).unwrap();
+    raw = raw.replace("confirmations = 1", "confirmations = 100");
+    raw.push_str(
+        "\n[game.information]\nrecall = \"bucket-history\"\n\
+         \n[solver.pruning]\nkind = \"none\"\n",
+    );
+    let config = dir.join("research-v1.toml");
+    std::fs::write(&config, raw).unwrap();
     let run_dir = dir.join("run");
 
     run_solvers_ok(&[
@@ -416,6 +408,45 @@ fn multiway_v1_u16_storage_writes_a_quantized_mwsol() {
         "--out",
         run_dir.to_str().unwrap(),
     ]);
+    let checkpoint = run_dir.join("checkpoint.mwckpt");
+    assert!(checkpoint.is_file());
+    assert!(run_dir.join("solution.mwsol").is_file());
+
+    run_solvers_ok(&["resume", checkpoint.to_str().unwrap(), "--max-sweeps", "3"]);
+    let resumed: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(run_dir.join("run.json")).unwrap()).unwrap();
+    assert_eq!(resumed["sweeps"], 3);
+}
+
+#[test]
+#[ignore = "builds the full EHS2 tables; explicit release acceptance only"]
+fn multiway_v1_u16_storage_writes_a_quantized_mwsol() {
+    let dir = temp_dir("multiway-v1-u16");
+    let config = workspace_root().join("examples/preflop_multiway_v1_production_smoke.toml");
+    let run_dir = dir.join("run");
+
+    run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        run_dir.to_str().unwrap(),
+    ]);
+
+    let result: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(run_dir.join("run.json")).unwrap()).unwrap();
+    assert_eq!(
+        result["policyStorage"],
+        "preallocated-all-current-street-buckets"
+    );
+    assert_eq!(result["preallocatedPagesCommitted"], true);
+    assert!(result["preallocatedNodes"].as_u64().unwrap() > 0);
+    assert!(result["preallocatedColumns"].as_u64().unwrap() > 0);
+    assert!(result["preallocatedSlots"].as_u64().unwrap() > 0);
+    assert!(result["preallocatedBytes"].as_u64().unwrap() > 0);
+    assert_eq!(
+        result["policyArenaLimitBytes"].as_u64().unwrap(),
+        cli::multiway_v1::PRODUCTION_POLICY_ARENA_LIMIT_BYTES
+    );
 
     let solution = read_mwsol_full(&run_dir.join("solution.mwsol"));
     assert!(!solution.strategies.is_empty());
@@ -467,6 +498,7 @@ fn resume_tampered_config_errors() {
 }
 
 #[test]
+#[cfg(feature = "research")]
 fn bench_kuhn_two_schedules() {
     let dir = temp_dir("bench");
     let config = dir.join("kuhn.toml");

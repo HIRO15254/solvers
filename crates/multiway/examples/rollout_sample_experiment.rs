@@ -1,7 +1,9 @@
-//! Reproducible quality/runtime experiment for the rollout sample default.
+//! Historical research-only quality/runtime experiment for the retired
+//! rollout sample setting.
 //!
 //! Run with:
-//! `cargo run --release -p multiway --example rollout_sample_experiment`
+//! `cargo run --release -p multiway --features research-abstractions \
+//!   --example rollout_sample_experiment`
 
 use std::collections::BTreeMap;
 use std::time::Instant;

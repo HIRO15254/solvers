@@ -1,3 +1,6 @@
+# Historical research benchmark only.
+# The production `solve` command rejects this legacy payload with MWP003.
+
 [game]
 kind = "preflop-multiway"
 button = 3

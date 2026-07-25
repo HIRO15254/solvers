@@ -35,8 +35,8 @@ const MAX_FACTOR_LEVELS: usize = 16;
 const MAX_RANGE_BYTES: usize = 4 * 1024;
 const MAX_GRAMMAR_PATHS: u64 = 100_000;
 const MAX_STORAGE_BYTES: u64 = 2 * 1024 * 1024 * 1024;
+const MAX_MULTIWAY_ARENA_BYTES: u64 = 6 * 1024 * 1024 * 1024;
 const MAX_MULTIWAY_BUCKETS: u16 = 4_096;
-const MAX_MULTIWAY_ROLLOUT_SAMPLES: u32 = 1_000_000;
 const MAX_MULTIWAY_EVALUATION_SAMPLES: u64 = 1_000_000;
 const MAX_MULTIWAY_ICM_SAMPLES: u64 = 1_000_000;
 const MAX_MULTIWAY_SWEEP_BATCH: u64 = 64;
@@ -1580,6 +1580,7 @@ fn sanitize_multiway_config(
     managed_cache: &Path,
     threads: Option<usize>,
 ) -> std::result::Result<SanitizedConfig, String> {
+    validate_release_multiway_abstraction(raw, game)?;
     let utility = match &config.utility {
         UtilitySection::ChipEv => multiway::config::UtilityConfig::ChipEv,
         UtilitySection::TournamentIcm {
@@ -1671,22 +1672,6 @@ fn sanitize_multiway_config(
             "Multiway abstraction bucket counts may not exceed {MAX_MULTIWAY_BUCKETS}."
         ));
     }
-    for (index, profile) in game.abstraction.active_opponent_buckets.iter().enumerate() {
-        if profile.flop_buckets > MAX_MULTIWAY_BUCKETS
-            || profile.turn_buckets > MAX_MULTIWAY_BUCKETS
-            || profile.river_buckets > MAX_MULTIWAY_BUCKETS
-        {
-            return Err(format!(
-                "game.abstraction.active_opponent_buckets[{index}] bucket counts may not exceed {MAX_MULTIWAY_BUCKETS}."
-            ));
-        }
-    }
-    if game.abstraction.rollout_samples > MAX_MULTIWAY_ROLLOUT_SAMPLES {
-        return Err(format!(
-            "game.abstraction.rollout_samples may not exceed {MAX_MULTIWAY_ROLLOUT_SAMPLES}."
-        ));
-    }
-
     validate_common_sections(config)?;
     if !matches!(
         config.algorithm,
@@ -1734,10 +1719,15 @@ fn sanitize_multiway_config(
             "run.evaluation_samples must be from 1 through {MAX_MULTIWAY_EVALUATION_SAMPLES} when supplied."
         ));
     }
-    let memory_limit = config.run.max_memory_bytes.unwrap_or(MAX_STORAGE_BYTES);
-    if memory_limit == 0 || memory_limit > MAX_STORAGE_BYTES {
+    let memory_limit = config
+        .run
+        .max_memory_bytes
+        .unwrap_or(MAX_MULTIWAY_ARENA_BYTES);
+    if memory_limit == 0 || memory_limit > MAX_MULTIWAY_ARENA_BYTES {
         return Err(format!(
-            "run.max_memory_bytes must be from 1 through {MAX_STORAGE_BYTES}."
+            "run.max_memory_bytes must be from 1 through {MAX_MULTIWAY_ARENA_BYTES}; this is \
+             the policy-arena payload cap, while the 8 GiB process limit requires external \
+             monitoring and headroom."
         ));
     }
     if config
@@ -1758,7 +1748,7 @@ fn sanitize_multiway_config(
     let cache_fingerprint = formats::config_hash(raw.as_bytes());
     let cache_key = formats::config_hash_hex(&cache_fingerprint);
     let cache_directory = managed_cache.parent().unwrap_or_else(|| Path::new("."));
-    let cache_path = cache_directory.join(format!("multiway-rollout-{cache_key}.mwab"));
+    let cache_path = cache_directory.join(format!("multiway-ehs2-{cache_key}.bin"));
     let game_table = table
         .get_mut("game")
         .and_then(toml::Value::as_table_mut)
@@ -1796,6 +1786,71 @@ fn sanitize_multiway_config(
         schema_version: formats::MULTIWAY_SCHEMA_VERSION,
         kind: JobKind::Multiway,
     })
+}
+
+fn validate_release_multiway_abstraction(
+    raw: &str,
+    game: &multiway::MultiwayConfig,
+) -> std::result::Result<(), String> {
+    let document: toml::Value =
+        toml::from_str(raw).map_err(|error| format!("TOML config is invalid: {error}"))?;
+    let abstraction = document
+        .get("game")
+        .and_then(toml::Value::as_table)
+        .and_then(|game| game.get("abstraction"))
+        .and_then(toml::Value::as_table)
+        .ok_or_else(|| {
+            "MWP001: Bridge multiway jobs require explicit [game.abstraction] \
+             kind = \"ehs2-table\" and recall = \"street\"; omitted legacy defaults select \
+             removed rollout/full semantics."
+                .to_string()
+        })?;
+    if abstraction.get("kind").and_then(toml::Value::as_str) != Some("ehs2-table")
+        || !matches!(
+            game.abstraction.kind,
+            multiway::config::AbstractionKind::Ehs2Table
+        )
+    {
+        return Err(
+            "MWP001: rollout-kmeans was removed from Bridge production jobs because its \
+             state-to-bucket assignment cache grows during Solve; use kind = \"ehs2-table\"."
+                .to_string(),
+        );
+    }
+    if abstraction.get("recall").and_then(toml::Value::as_str) != Some("street")
+        || !matches!(
+            game.abstraction.recall,
+            multiway::config::RecallMode::Street
+        )
+    {
+        return Err(
+            "MWP002: full/bucket-history recall was removed from Bridge production jobs because \
+             sparse policy memory grows during Solve; use recall = \"street\"."
+                .to_string(),
+        );
+    }
+    if abstraction.contains_key("artifact_cache") {
+        return Err(
+            "MWP001: user-selected game.abstraction.artifact_cache paths were removed from \
+             Bridge production jobs; Bridge assigns a managed content-addressed EHS2 cache."
+                .to_string(),
+        );
+    }
+    for retired in [
+        "rollout_samples",
+        "points_per_bucket",
+        "kmeans_iterations",
+        "seed",
+        "active_opponent_buckets",
+    ] {
+        if abstraction.contains_key(retired) {
+            return Err(format!(
+                "MWP001: game.abstraction.{retired} is rollout-only and was removed from Bridge \
+                 production jobs."
+            ));
+        }
+    }
+    Ok(())
 }
 
 fn validate_managed_multiway_betting(
@@ -2237,24 +2292,20 @@ check_every = 1
         assert_eq!(parsed.run.threads, Some(3));
         assert_eq!(parsed.run.par_chance_depth, None);
         assert_eq!(parsed.run.par_min_children, None);
-        assert_eq!(parsed.run.max_memory_bytes, Some(MAX_STORAGE_BYTES));
+        assert_eq!(parsed.run.max_memory_bytes, Some(2 * 1024 * 1024 * 1024));
         let GameSection::PreflopMultiway(game) = parsed.game else {
             panic!("expected multiway config");
         };
         let artifact_cache = game.abstraction.artifact_cache.unwrap();
-        assert!(
-            artifact_cache
-                .to_string_lossy()
-                .contains("multiway-rollout-")
-        );
+        assert!(artifact_cache.to_string_lossy().contains("multiway-ehs2-"));
         assert_eq!(
             artifact_cache.extension().and_then(|value| value.to_str()),
-            Some("mwab")
+            Some("bin")
         );
 
         let oversized = raw.replace(
             "max_memory_bytes = 2147483648",
-            "max_memory_bytes = 2147483649",
+            &format!("max_memory_bytes = {}", MAX_MULTIWAY_ARENA_BYTES + 1),
         );
         assert!(sanitize_config(&oversized, Path::new("unused"), None, true).is_err());
 
@@ -2329,7 +2380,7 @@ check_every = 1
     }
 
     #[test]
-    fn multiway_sanitization_caps_active_opponent_bucket_overrides() {
+    fn multiway_sanitization_rejects_retired_active_opponent_bucket_overrides() {
         let raw = include_str!("../../../examples/preflop_multiway_9max.toml");
         let with_override = |buckets| {
             format!(
@@ -2339,30 +2390,39 @@ check_every = 1
             )
         };
 
-        assert!(
-            sanitize_config(
-                &with_override(MAX_MULTIWAY_BUCKETS),
-                Path::new("unused"),
-                None,
-                true,
-            )
-            .is_ok()
-        );
         let Err(error) = sanitize_config(
-            &with_override(MAX_MULTIWAY_BUCKETS + 1),
+            &with_override(MAX_MULTIWAY_BUCKETS),
             Path::new("unused"),
             None,
             true,
         ) else {
             panic!("an oversized active-opponent bucket override must be rejected");
         };
-        assert!(error.contains("game.abstraction.active_opponent_buckets[0]"));
-        assert!(error.contains(&MAX_MULTIWAY_BUCKETS.to_string()));
+        assert!(error.contains("MWP001"));
+        assert!(error.contains("active_opponent_buckets"));
+    }
+
+    #[test]
+    fn multiway_sanitization_rejects_user_selected_abstraction_cache_paths() {
+        let raw = include_str!("../../../examples/preflop_multiway_9max.toml");
+        let with_cache = raw.replace(
+            "recall = \"street\"",
+            "recall = \"street\"\nartifact_cache = \"/tmp/user-selected.bin\"",
+        );
+        assert_ne!(with_cache, raw);
+        let Err(error) = sanitize_config(&with_cache, Path::new("managed"), Some(4), true) else {
+            panic!("a user-selected Bridge abstraction cache must be rejected");
+        };
+        assert!(error.contains("MWP001"), "{error}");
+        assert!(
+            error.contains("managed content-addressed EHS2 cache"),
+            "{error}"
+        );
     }
 
     #[test]
     fn multiway_preset_snapshots_pass_rust_validation() {
-        const PRESETS: [(&str, &str, usize); 4] = [
+        const PRESETS: [(&str, &str, usize); 3] = [
             (
                 "multiway-9max-pushfold",
                 include_str!("../../../examples/presets/multiway-9max-pushfold.toml"),
@@ -2378,11 +2438,6 @@ check_every = 1
                 include_str!("../../../examples/presets/multiway-6max-cash.toml"),
                 6,
             ),
-            (
-                "multiway-9max-research",
-                include_str!("../../../examples/presets/multiway-9max-research.toml"),
-                9,
-            ),
         ];
 
         for (name, raw, expected_seats) in PRESETS {
@@ -2396,6 +2451,12 @@ check_every = 1
             };
             assert_eq!(game.seats.len(), expected_seats, "{name}");
         }
+
+        let research = include_str!("../../../examples/presets/multiway-9max-research.toml");
+        let Err(error) = sanitize_config(research, Path::new("managed"), Some(4), true) else {
+            panic!("research rollout preset must not enter the production Bridge");
+        };
+        assert!(error.contains("MWP001"), "{error}");
     }
 
     #[test]

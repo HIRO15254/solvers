@@ -10,7 +10,7 @@
 //! parameters resolved from `[run]`, and the raw config text/hash to stamp
 //! onto whatever artifact the caller eventually writes.
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use abstraction::{Ehs2Abstraction, Ehs2Params};
@@ -21,12 +21,15 @@ use formats::{
     MultiwaySolution, MultiwayStrategyBlock, MultiwayStrategyKey, MultiwayStrategyWeight,
 };
 use multiway::abstraction::{
-    MultiwayAbstractionBackend, RolloutKMeansAbstraction, RolloutKMeansBuilder,
-    RolloutKMeansParams, StreetBucketCounts, TableAbstractionAdapter, ehs2_table_fingerprint,
+    MultiwayAbstractionBackend, TableAbstractionAdapter, ehs2_table_fingerprint,
+};
+#[cfg(any(feature = "research", test))]
+use multiway::abstraction::{
+    RolloutKMeansAbstraction, RolloutKMeansBuilder, RolloutKMeansParams, StreetBucketCounts,
 };
 use multiway::checkpoint::MultiwayCheckpoint;
 use multiway::config::{
-    AbstractionKind, FieldPlayerConfig, RakeConfig as MultiwayRake,
+    AbstractionKind, FieldPlayerConfig, RakeConfig as MultiwayRake, RecallMode,
     UtilityConfig as MultiwayUtility,
 };
 use multiway::solver::{DEFAULT_PRUNE_THRESHOLD, ProfileEvaluation, SolverConfig};
@@ -81,6 +84,23 @@ pub struct MultiwaySession {
     /// display purposes (seat names/positions, button seat).
     pub game_config: multiway::MultiwayConfig,
     pub checkpoint_runtime: Option<multiway::checkpoint::CheckpointRuntimeState>,
+    /// Evaluation-only common abstraction metadata. This is absent from
+    /// ordinary solve/resume sessions and never contributes to checkpoint
+    /// compatibility.
+    pub deviation_reference: Option<DeviationReferenceMetadata>,
+}
+
+/// Identity and persistence location of an evaluation-only common
+/// abstraction attached by [`build_multiway_session_with_deviation`].
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeviationReferenceMetadata {
+    pub config_hash: [u8; 32],
+    pub game_fingerprint: [u8; 32],
+    /// Backend plus reference recall semantics, composed by the same helper
+    /// used for a primary solver abstraction fingerprint.
+    pub abstraction_fingerprint: [u8; 32],
+    pub recall: RecallMode,
+    pub artifact_cache: Option<PathBuf>,
 }
 
 /// Default [`StopRule::confirmations`] and [`StopRule::eval_period_secs`]
@@ -102,6 +122,61 @@ pub fn build_multiway_session(
     raw_toml: &str,
     resume_checkpoint: Option<&Path>,
 ) -> Result<MultiwaySession> {
+    build_multiway_session_internal(
+        raw_toml,
+        None,
+        resume_checkpoint,
+        SessionStoragePolicy::Compatibility,
+    )
+}
+
+/// Production solve/resume constructor. It accepts only the fixed
+/// EHS2/current-street contract and returns only after the complete policy
+/// arena has been allocated and page-committed.
+pub fn build_production_multiway_session(
+    raw_toml: &str,
+    resume_checkpoint: Option<&Path>,
+) -> Result<MultiwaySession> {
+    build_multiway_session_internal(
+        raw_toml,
+        None,
+        resume_checkpoint,
+        SessionStoragePolicy::PreallocatedProduction,
+    )
+}
+
+/// Builds a candidate session with a separately configured common
+/// abstraction used only for deviator training/evaluation.
+///
+/// The reference's public game, ranges, rake, and utility must have the exact
+/// same game fingerprint as the candidate. Its algorithm/run sections are not
+/// used. The reference is attached before checkpoint restore; core
+/// fingerprints intentionally continue to describe only the candidate.
+pub fn build_multiway_session_with_deviation(
+    raw_toml: &str,
+    deviation_raw_toml: &str,
+    resume_checkpoint: Option<&Path>,
+) -> Result<MultiwaySession> {
+    build_multiway_session_internal(
+        raw_toml,
+        Some(deviation_raw_toml),
+        resume_checkpoint,
+        SessionStoragePolicy::Compatibility,
+    )
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum SessionStoragePolicy {
+    Compatibility,
+    PreallocatedProduction,
+}
+
+fn build_multiway_session_internal(
+    raw_toml: &str,
+    deviation_raw_toml: Option<&str>,
+    resume_checkpoint: Option<&Path>,
+    storage_policy: SessionStoragePolicy,
+) -> Result<MultiwaySession> {
     let config: SolveConfig =
         crate::config::parse_solve_config(raw_toml).context("parsing config")?;
     let SolveConfig {
@@ -116,6 +191,14 @@ pub fn build_multiway_session(
             "multiway solve path requires kind = \"preflop-multiway\""
         ));
     };
+    if matches!(storage_policy, SessionStoragePolicy::PreallocatedProduction) {
+        validate_production_abstraction(&game_config)?;
+        if deviation_raw_toml.is_some() {
+            return Err(anyhow!(
+                "production sessions do not accept a separately configured deviation abstraction"
+            ));
+        }
+    }
     if run.target_nash_conv.is_some() {
         return Err(anyhow!(
             "multiway profiles do not expose NashConv; remove run.target_nash_conv"
@@ -123,7 +206,15 @@ pub fn build_multiway_session(
     }
     let utility = convert_utility(utility)?;
     let rake = convert_rake(rake);
-    let (game, sampler) = build_multiway_game_from_config(&game_config, &utility, &rake)?;
+    let (mut game, sampler) = build_multiway_game_from_config(&game_config, &utility, &rake)?;
+    let mut deviation_reference = deviation_raw_toml
+        .map(|raw| build_deviation_reference(raw, game.game_fingerprint()))
+        .transpose()
+        .context("building common deviation reference")?;
+    if let Some(reference) = deviation_reference.as_mut() {
+        let recall = reference.metadata.recall;
+        game = game.with_deviation_abstraction(reference.backend(), recall);
+    }
 
     let (
         algorithm_seed,
@@ -235,9 +326,10 @@ pub fn build_multiway_session(
     } else {
         prune_threshold_override.unwrap_or_else(|| derive_prune_threshold(&utility, &game_config))
     };
+    let max_memory_bytes = resolve_policy_memory_limit(storage_policy, run.max_memory_bytes)?;
     let solver_config = SolverConfig {
         seed: run.seed.unwrap_or(algorithm_seed),
-        max_memory_bytes: run.max_memory_bytes.unwrap_or(DEFAULT_MEMORY_LIMIT),
+        max_memory_bytes,
         max_traversal_depth: 512,
         exploration_epsilon,
         discount_every,
@@ -252,12 +344,33 @@ pub fn build_multiway_session(
 
     let mut checkpoint_runtime = None;
     let solver = if let Some(path) = resume_checkpoint {
-        let checkpoint = MultiwayCheckpoint::load_unchecked(path)
-            .with_context(|| format!("reading multiway checkpoint {}", path.display()))?;
+        let expected_configuration =
+            multiway::solver::configuration_fingerprint_for_setup(&game, &sampler, solver_config);
+        let expected_abstraction = multiway::abstraction_fingerprint_with_recall(
+            game.abstraction_fingerprint(),
+            game.recall_mode(),
+        );
+        let checkpoint =
+            MultiwayCheckpoint::load(path, expected_configuration, expected_abstraction)
+                .with_context(|| format!("reading multiway checkpoint {}", path.display()))?;
         checkpoint_runtime = checkpoint.config_toml.as_ref().map(|_| checkpoint.runtime);
-        let solver =
-            MultiwaySolver::from_state_with_config(game, sampler, checkpoint.state, solver_config)
-                .context("restoring multiway MCCFR state")?;
+        let solver = match storage_policy {
+            SessionStoragePolicy::Compatibility => MultiwaySolver::from_state_with_config(
+                game,
+                sampler,
+                checkpoint.state,
+                solver_config,
+            ),
+            SessionStoragePolicy::PreallocatedProduction => {
+                MultiwaySolver::from_state_with_config_preallocated(
+                    game,
+                    sampler,
+                    checkpoint.state,
+                    solver_config,
+                )
+            }
+        }
+        .context("restoring multiway MCCFR state")?;
         if solver.configuration_fingerprint() != checkpoint.header.configuration_fingerprint {
             return Err(anyhow!(
                 "checkpoint belongs to different table rules or ranges"
@@ -270,8 +383,27 @@ pub fn build_multiway_session(
         }
         solver
     } else {
-        MultiwaySolver::new(game, sampler, solver_config).context("initializing multiway MCCFR")?
+        match storage_policy {
+            SessionStoragePolicy::Compatibility => {
+                MultiwaySolver::new(game, sampler, solver_config)
+            }
+            SessionStoragePolicy::PreallocatedProduction => {
+                MultiwaySolver::new_preallocated(game, sampler, solver_config)
+            }
+        }
+        .context("initializing multiway MCCFR")?
     };
+
+    if matches!(storage_policy, SessionStoragePolicy::PreallocatedProduction) {
+        let allocation = solver.policy_arena_allocation().ok_or_else(|| {
+            anyhow!("production solver returned without a preallocated policy arena")
+        })?;
+        if !allocation.pages_committed {
+            return Err(anyhow!(
+                "production solver returned before policy arena pages were committed"
+            ));
+        }
+    }
 
     if solver.metrics().sweeps > sweeps {
         return Err(anyhow!(
@@ -295,6 +427,108 @@ pub fn build_multiway_session(
         config_hash: formats::config_hash(raw_toml.as_bytes()),
         game_config,
         checkpoint_runtime,
+        deviation_reference: deviation_reference.map(|reference| reference.metadata),
+    })
+}
+
+fn resolve_policy_memory_limit(
+    storage_policy: SessionStoragePolicy,
+    configured: Option<u64>,
+) -> Result<u64> {
+    if matches!(storage_policy, SessionStoragePolicy::Compatibility) {
+        return Ok(configured.unwrap_or(DEFAULT_MEMORY_LIMIT));
+    }
+    let resolved = match configured {
+        None | Some(u64::MAX) => crate::multiway_v1::PRODUCTION_POLICY_ARENA_LIMIT_BYTES,
+        Some(bytes) => bytes,
+    };
+    if resolved > crate::multiway_v1::PRODUCTION_POLICY_ARENA_LIMIT_BYTES {
+        return Err(anyhow!(
+            "production policy arena memory limit is 6GiB ({} bytes); lower \
+             run.resources.memory and enforce the separate 8GiB process RSS limit externally",
+            crate::multiway_v1::PRODUCTION_POLICY_ARENA_LIMIT_BYTES
+        ));
+    }
+    Ok(resolved)
+}
+
+fn validate_production_abstraction(game: &multiway::MultiwayConfig) -> Result<()> {
+    if !matches!(game.abstraction.kind, AbstractionKind::Ehs2Table) {
+        return Err(anyhow!(
+            "MWP001: rollout-kmeans was removed from production because its assignment cache \
+             grows during Solve; use canonical v1 kind = \"ehs2-percentile\""
+        ));
+    }
+    if !matches!(game.abstraction.recall, RecallMode::Street) {
+        return Err(anyhow!(
+            "MWP002: full/bucket-history recall was removed from production because sparse \
+             policy memory grows during Solve; production requires current-street preallocation"
+        ));
+    }
+    if !game.abstraction.active_opponent_buckets.is_empty() {
+        return Err(anyhow!(
+            "MWP001: active-opponent bucket overrides are rollout-only and unavailable in production"
+        ));
+    }
+    Ok(())
+}
+
+struct BuiltDeviationReference {
+    backend: Option<MultiwayAbstractionBackend>,
+    metadata: DeviationReferenceMetadata,
+}
+
+impl BuiltDeviationReference {
+    fn backend(&mut self) -> MultiwayAbstractionBackend {
+        self.backend
+            .take()
+            .expect("reference backend is moved into the candidate exactly once")
+    }
+}
+
+fn build_deviation_reference(
+    raw_toml: &str,
+    candidate_game_fingerprint: [u8; 32],
+) -> Result<BuiltDeviationReference> {
+    let config: SolveConfig =
+        crate::config::parse_solve_config(raw_toml).context("parsing reference config")?;
+    let SolveConfig {
+        game,
+        rake,
+        utility,
+        algorithm: _,
+        run: _,
+    } = config;
+    let GameSection::PreflopMultiway(game_config) = game else {
+        return Err(anyhow!(
+            "common deviation reference requires kind = \"preflop-multiway\""
+        ));
+    };
+    let utility = convert_utility(utility)?;
+    let rake = convert_rake(rake);
+    let (reference_game, _) = build_multiway_game_from_config(&game_config, &utility, &rake)?;
+    let reference_game_fingerprint = reference_game.game_fingerprint();
+    if candidate_game_fingerprint != reference_game_fingerprint {
+        return Err(anyhow!(
+            "candidate/reference game fingerprint mismatch: candidate={}, reference={}",
+            formats::config_hash_hex(&candidate_game_fingerprint),
+            formats::config_hash_hex(&reference_game_fingerprint)
+        ));
+    }
+    let recall = game_config.abstraction.recall;
+    let abstraction_fingerprint = multiway::abstraction_fingerprint_with_recall(
+        reference_game.abstraction_fingerprint(),
+        recall,
+    );
+    Ok(BuiltDeviationReference {
+        backend: Some(reference_game.into_abstraction()),
+        metadata: DeviationReferenceMetadata {
+            config_hash: formats::config_hash(raw_toml.as_bytes()),
+            game_fingerprint: reference_game_fingerprint,
+            abstraction_fingerprint,
+            recall,
+            artifact_cache: game_config.abstraction.artifact_cache,
+        },
     })
 }
 
@@ -397,6 +631,29 @@ pub fn train_deviators_parallel(
             .collect::<std::result::Result<Vec<_>, _>>()
     })
     .map_err(|error| anyhow!("training deviator: {error}"))
+}
+
+/// Reference-evaluation counterpart to [`train_deviators_parallel`] that
+/// retains each seat's training coverage report.
+pub fn train_deviators_with_reports_parallel(
+    solver: &MultiwaySolver<HoldemGame<MultiwayAbstractionBackend>>,
+    num_players: usize,
+    threads: usize,
+    traversals: u64,
+    seed: u64,
+    variant: multiway::ProfileVariant,
+) -> Result<Vec<multiway::DeviatorTrainingResult>> {
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(threads)
+        .build()
+        .map_err(|error| anyhow!("building deviator training thread pool: {error}"))?;
+    pool.install(|| {
+        (0..num_players)
+            .into_par_iter()
+            .map(|seat| solver.train_deviator_with_report(seat, traversals, seed, variant))
+            .collect::<std::result::Result<Vec<_>, _>>()
+    })
+    .map_err(|error| anyhow!("training reference deviator: {error}"))
 }
 
 /// Result of one [`run_stop_rule_check`] call: the evaluation plus what
@@ -523,7 +780,17 @@ fn build_multiway_game_from_config(
         .context("validating multiway game and utility")?;
     let abstraction = match game_config.abstraction.kind {
         AbstractionKind::RolloutKmeans => {
-            MultiwayAbstractionBackend::RolloutKMeans(build_rollout_abstraction(game_config)?)
+            #[cfg(any(feature = "research", test))]
+            {
+                MultiwayAbstractionBackend::RolloutKMeans(build_rollout_abstraction(game_config)?)
+            }
+            #[cfg(not(any(feature = "research", test)))]
+            {
+                return Err(anyhow!(
+                    "MWP001: rollout-kmeans is unavailable in the production binary; \
+                     use kind = \"ehs2-table\" or rebuild with --features research"
+                ));
+            }
         }
         AbstractionKind::Ehs2Table => {
             MultiwayAbstractionBackend::Ehs2Table(build_ehs2_table_abstraction(game_config)?)
@@ -539,6 +806,7 @@ fn build_multiway_game_from_config(
 /// rollout/k-means abstraction for `AbstractionKind::RolloutKmeans`.
 /// Factored out of `build_multiway_session` so the two backend kinds don't
 /// share one branchy block.
+#[cfg(any(feature = "research", test))]
 fn build_rollout_abstraction(
     game_config: &multiway::MultiwayConfig,
 ) -> Result<RolloutKMeansAbstraction> {
@@ -549,7 +817,9 @@ fn build_rollout_abstraction(
         rollout_samples: game_config.abstraction.rollout_samples,
         seed: game_config.abstraction.seed,
     };
-    let mut abstraction_builder = RolloutKMeansBuilder::new(params);
+    let mut abstraction_builder = RolloutKMeansBuilder::new(params)
+        .points_per_bucket(game_config.abstraction.points_per_bucket)
+        .kmeans_iterations(game_config.abstraction.kmeans_iterations);
     for profile in &game_config.abstraction.active_opponent_buckets {
         abstraction_builder = abstraction_builder
             .active_opponent_buckets(
@@ -954,6 +1224,43 @@ mod tests {
     }
 
     #[test]
+    fn production_policy_memory_auto_is_six_gib_and_cannot_exceed_it() {
+        let limit = crate::multiway_v1::PRODUCTION_POLICY_ARENA_LIMIT_BYTES;
+        assert_eq!(
+            resolve_policy_memory_limit(SessionStoragePolicy::PreallocatedProduction, None)
+                .unwrap(),
+            limit
+        );
+        assert_eq!(
+            resolve_policy_memory_limit(
+                SessionStoragePolicy::PreallocatedProduction,
+                Some(u64::MAX),
+            )
+            .unwrap(),
+            limit
+        );
+        assert_eq!(
+            resolve_policy_memory_limit(SessionStoragePolicy::PreallocatedProduction, Some(limit),)
+                .unwrap(),
+            limit
+        );
+        assert!(
+            resolve_policy_memory_limit(
+                SessionStoragePolicy::PreallocatedProduction,
+                Some(limit + 1),
+            )
+            .unwrap_err()
+            .to_string()
+            .contains("6GiB")
+        );
+        assert_eq!(
+            resolve_policy_memory_limit(SessionStoragePolicy::Compatibility, Some(u64::MAX))
+                .unwrap(),
+            u64::MAX
+        );
+    }
+
+    #[test]
     fn shared_rake_chip_units_convert_to_multiway_bb() {
         let rake = convert_rake(RakeSection::PercentCap {
             rate: 0.05,
@@ -986,6 +1293,62 @@ mod tests {
         assert_eq!(session.sweeps_target, 2);
         assert_eq!(session.config_toml, raw);
         assert_eq!(session.stop_rule, None);
+        assert_eq!(session.deviation_reference, None);
+        assert!(session.solver.game().deviation_abstraction().is_none());
+    }
+
+    #[test]
+    fn common_deviation_reference_attaches_before_checkpoint_restore() {
+        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let reference_raw = raw
+            .replace("flop_buckets = 8", "flop_buckets = 4")
+            .replace("turn_buckets = 8", "turn_buckets = 4")
+            .replace("river_buckets = 8", "river_buckets = 4")
+            .replace("seed = 17", "seed = 23");
+        let directory = tempfile::tempdir().unwrap();
+        let checkpoint_path = directory.path().join("candidate.mwckpt");
+
+        let mut original = build_multiway_session(raw, None).unwrap();
+        original.solver.run_sweeps(1).unwrap();
+        let candidate_configuration = original.solver.configuration_fingerprint();
+        let candidate_abstraction = original.solver.abstraction_fingerprint();
+        MultiwayCheckpoint::capture(&original.solver)
+            .write_atomic(&checkpoint_path)
+            .unwrap();
+
+        let restored =
+            build_multiway_session_with_deviation(raw, &reference_raw, Some(&checkpoint_path))
+                .unwrap();
+        assert_eq!(restored.solver.metrics().sweeps, 1);
+        assert_eq!(
+            restored.solver.configuration_fingerprint(),
+            candidate_configuration
+        );
+        assert_eq!(
+            restored.solver.abstraction_fingerprint(),
+            candidate_abstraction
+        );
+        let reference = restored
+            .deviation_reference
+            .as_ref()
+            .expect("reference metadata");
+        assert_ne!(reference.abstraction_fingerprint, candidate_abstraction);
+        assert_eq!(reference.recall, RecallMode::Full);
+        assert!(restored.solver.game().deviation_abstraction().is_some());
+    }
+
+    #[test]
+    fn common_deviation_reference_rejects_a_different_game() {
+        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let different_game = raw.replacen("stack_bb = 2.0", "stack_bb = 3.0", 1);
+        let error = build_multiway_session_with_deviation(raw, &different_game, None)
+            .err()
+            .expect("different game must fail");
+        let error = format!("{error:#}");
+        assert!(
+            error.contains("candidate/reference game fingerprint mismatch"),
+            "unexpected error: {error}"
+        );
     }
 
     fn with_stop_dev_gain(dev_gain: &str, extra: &str) -> String {
@@ -1076,10 +1439,9 @@ mod tests {
         spliced
     }
 
-    /// `traverser_vector` (and thus `prune`) requires the dense
-    /// street-recall arena; splices `recall = "street"` into
-    /// `[game.abstraction]` alongside `with_algorithm_extra`'s
-    /// `[algorithm]` splice.
+    /// Pruning is exercised only by the dense street-recall vector worker, so
+    /// this helper splices `recall = "street"` into `[game.abstraction]`
+    /// alongside `with_algorithm_extra`'s `[algorithm]` splice.
     fn with_algorithm_extra_and_street_recall(extra: &str) -> String {
         let raw = with_algorithm_extra(extra);
         let anchor = "seed = 17\n";
@@ -1168,6 +1530,53 @@ mod tests {
             reloaded.fingerprint(),
             session.solver.abstraction_fingerprint()
         );
+    }
+
+    #[test]
+    fn rollout_training_config_is_wired_and_invalidates_a_mismatched_artifact() {
+        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml")
+            .replace("flop_buckets = 8", "flop_buckets = 1")
+            .replace("turn_buckets = 8", "turn_buckets = 1")
+            .replace("river_buckets = 8", "river_buckets = 1")
+            .replace("rollout_samples = 8", "rollout_samples = 1");
+        let directory = tempfile::tempdir().unwrap();
+        let artifact_path = directory.path().join("rollout.mwab");
+        let literal = format!("{:?}", artifact_path.display().to_string());
+        let first_config = raw.replacen(
+            "seed = 17\n",
+            &format!(
+                "seed = 17\npoints_per_bucket = 1\nkmeans_iterations = 1\n\
+                 artifact_cache = {literal}\n"
+            ),
+            1,
+        );
+        let first = build_multiway_session(&first_config, None).unwrap();
+        let first_rollout = first
+            .solver
+            .game()
+            .abstraction()
+            .rollout()
+            .expect("configured rollout backend");
+        assert_eq!(first_rollout.training_params().points_per_bucket, 1);
+        assert_eq!(first_rollout.training_params().kmeans_iterations, 1);
+        let first_fingerprint = first_rollout.fingerprint();
+
+        let second_config =
+            first_config.replacen("points_per_bucket = 1", "points_per_bucket = 2", 1);
+        let second = build_multiway_session(&second_config, None).unwrap();
+        let second_rollout = second
+            .solver
+            .game()
+            .abstraction()
+            .rollout()
+            .expect("configured rollout backend");
+        assert_eq!(second_rollout.training_params().points_per_bucket, 2);
+        assert_eq!(second_rollout.training_params().kmeans_iterations, 1);
+        assert_ne!(second_rollout.fingerprint(), first_fingerprint);
+
+        let overwritten = RolloutKMeansAbstraction::read_artifact(&artifact_path).unwrap();
+        assert_eq!(overwritten.training_params().points_per_bucket, 2);
+        assert_eq!(overwritten.fingerprint(), second_rollout.fingerprint());
     }
 
     #[test]

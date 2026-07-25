@@ -139,6 +139,14 @@ pub struct BettingState {
     pub preflop_limpers: u8,
     pub preflop_flats: u8,
     pub last_preflop_aggressor: Option<SeatId>,
+    /// Seats that have taken a voluntary preflop call or aggressive action.
+    /// Forced contributions are posted before play and never enter this mask.
+    #[serde(default)]
+    pub preflop_participants: SeatMask,
+    /// Number of first-time, non-big-blind seats that called the open before
+    /// any re-raise. Big-blind defense is deliberately outside this cap.
+    #[serde(default)]
+    pub preflop_open_cold_calls: u8,
 }
 
 impl BettingState {
@@ -209,6 +217,8 @@ impl BettingState {
             preflop_limpers: 0,
             preflop_flats: 0,
             last_preflop_aggressor: None,
+            preflop_participants: SeatMask::EMPTY,
+            preflop_open_cold_calls: 0,
         };
         state.pending = state.active_mask();
         let before_first = config
@@ -352,6 +362,19 @@ impl BettingState {
             } else {
                 proposed.min(maximum)
             };
+            if self.street == Street::Preflop
+                && self.aggressive_actions > 0
+                && !matches!(size, &SizeSpec::AllIn)
+                && street_config
+                    .reraise_jam_above_actor_starting_stack
+                    .is_some_and(|ratio| {
+                        u128::from(target.raw()) * u128::from(ratio.denominator)
+                            > u128::from(self.seats[actor].starting_stack.raw())
+                                * u128::from(ratio.numerator)
+                    })
+            {
+                target = maximum;
+            }
             // Raise-cap merge (HRC-style): a target that already reaches the
             // configured fraction of the effective stack collapses into the
             // all-in target instead of standing as its own sized action. This
@@ -442,11 +465,20 @@ impl BettingState {
             }
             Action::Call { amount, .. } => {
                 if self.street == Street::Preflop {
+                    let first_voluntary_action = !self.preflop_participants.contains(actor);
                     if self.aggressive_actions == 0 {
                         self.preflop_limpers = self.preflop_limpers.saturating_add(1);
                     } else {
                         self.preflop_flats = self.preflop_flats.saturating_add(1);
                     }
+                    if self.aggressive_actions == 1
+                        && actor != self.big_blind_seat
+                        && first_voluntary_action
+                    {
+                        self.preflop_open_cold_calls =
+                            self.preflop_open_cold_calls.saturating_add(1);
+                    }
+                    self.preflop_participants.insert(actor);
                     self.preflop_voluntary_call_seen = true;
                 }
                 self.pay_street(actor, amount)?;
@@ -471,6 +503,7 @@ impl BettingState {
                     self.full_wager_established = true;
                 }
                 if self.street == Street::Preflop {
+                    self.preflop_participants.insert(actor);
                     self.last_preflop_aggressor = Some(actor);
                     self.preflop_flats = 0;
                 }
@@ -1109,6 +1142,182 @@ mod tests {
                 ..
             }
         )));
+    }
+
+    #[test]
+    fn exact_reraise_jam_ratio_is_strict_at_one_third_and_deduplicates_all_in() {
+        let actions_for = |raise_to_bb: f64| {
+            let (mut state, mut betting) = state(&[99.0, 99.0, 99.0], 0, AnteConfig::None);
+            betting.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 3.0 }];
+            betting.preflop.raise_sizes =
+                vec![crate::config::SizeSpec::ToBb { value: raise_to_bb }];
+            betting.preflop.include_allin = true;
+            betting.preflop.reraise_jam_above_actor_starting_stack =
+                Some(crate::config::StackRatio {
+                    numerator: 1,
+                    denominator: 3,
+                });
+
+            let open = state
+                .legal_actions(&betting)
+                .unwrap()
+                .into_iter()
+                .find(|action| {
+                    matches!(
+                        action,
+                        Action::RaiseTo {
+                            to: MwChips(3_000),
+                            ..
+                        }
+                    )
+                })
+                .unwrap();
+            state.apply(open, &betting).unwrap();
+            let call = state
+                .legal_actions(&betting)
+                .unwrap()
+                .into_iter()
+                .find(|action| matches!(action, Action::Call { .. }))
+                .unwrap();
+            state.apply(call, &betting).unwrap();
+            assert_eq!(state.to_act, Some(SeatId(2)));
+            state.legal_actions(&betting).unwrap()
+        };
+
+        for retained in [MwChips(32_999), MwChips(33_000)] {
+            let actions = actions_for(retained.as_bb());
+            assert!(actions.iter().any(|action| {
+                matches!(
+                    action,
+                    Action::RaiseTo {
+                        to,
+                        all_in: false,
+                        ..
+                    } if *to == retained
+                )
+            }));
+            assert_eq!(
+                actions
+                    .iter()
+                    .filter(|action| matches!(
+                        action,
+                        Action::RaiseTo {
+                            to: MwChips(99_000),
+                            all_in: true,
+                            ..
+                        }
+                    ))
+                    .count(),
+                1
+            );
+        }
+
+        let above = actions_for(33.001);
+        assert!(!above.iter().any(|action| matches!(
+            action,
+            Action::RaiseTo {
+                to: MwChips(33_001),
+                ..
+            }
+        )));
+        assert_eq!(
+            above
+                .iter()
+                .filter(|action| matches!(
+                    action,
+                    Action::RaiseTo {
+                        to: MwChips(99_000),
+                        all_in: true,
+                        ..
+                    }
+                ))
+                .count(),
+            1
+        );
+
+        // The same threshold never changes an opening size, even when that
+        // open is above one third of the starting stack.
+        let (opening_state, mut opening_betting) = state(&[99.0, 99.0, 99.0], 0, AnteConfig::None);
+        opening_betting.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 40.0 }];
+        opening_betting.preflop.include_allin = false;
+        opening_betting
+            .preflop
+            .reraise_jam_above_actor_starting_stack = Some(crate::config::StackRatio {
+            numerator: 1,
+            denominator: 3,
+        });
+        assert!(
+            opening_state
+                .legal_actions(&opening_betting)
+                .unwrap()
+                .iter()
+                .any(|action| matches!(
+                    action,
+                    Action::RaiseTo {
+                        to: MwChips(40_000),
+                        all_in: false,
+                        ..
+                    }
+                ))
+        );
+    }
+
+    #[test]
+    fn preflop_participants_and_non_bb_open_cold_calls_exclude_forced_posts() {
+        let (mut state, mut betting) = state(&[100.0; 6], 0, AnteConfig::None);
+        betting.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 2.5 }];
+        betting.preflop.include_allin = false;
+        assert!(state.preflop_participants.is_empty());
+        assert_eq!(state.preflop_open_cold_calls, 0);
+
+        let open = state
+            .legal_actions(&betting)
+            .unwrap()
+            .into_iter()
+            .find(|action| matches!(action, Action::RaiseTo { .. }))
+            .unwrap();
+        assert_eq!(state.to_act, Some(SeatId(3)));
+        state.apply(open, &betting).unwrap();
+        assert!(state.preflop_participants.contains(SeatId(3)));
+
+        for (actor, expected_calls) in [(SeatId(4), 1), (SeatId(5), 2), (SeatId(0), 3)] {
+            assert_eq!(state.to_act, Some(actor));
+            let call = state
+                .legal_actions(&betting)
+                .unwrap()
+                .into_iter()
+                .find(|action| matches!(action, Action::Call { .. }))
+                .unwrap();
+            state.apply(call, &betting).unwrap();
+            assert!(state.preflop_participants.contains(actor));
+            assert_eq!(state.preflop_open_cold_calls, expected_calls);
+        }
+
+        assert_eq!(state.to_act, Some(SeatId(1)));
+        state.apply(Action::Fold, &betting).unwrap();
+        assert_eq!(state.to_act, Some(SeatId(2)));
+        let bb_call = state
+            .legal_actions(&betting)
+            .unwrap()
+            .into_iter()
+            .find(|action| matches!(action, Action::Call { .. }))
+            .unwrap();
+        state.apply(bb_call, &betting).unwrap();
+        assert!(state.preflop_participants.contains(SeatId(2)));
+        assert_eq!(state.preflop_open_cold_calls, 3);
+        assert!(!state.preflop_participants.contains(SeatId(1)));
+    }
+
+    #[test]
+    fn participant_fields_default_when_deserializing_older_betting_state() {
+        let (state, _) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
+        let mut encoded = serde_json::to_value(state).unwrap();
+        let object = encoded.as_object_mut().unwrap();
+        object.remove("preflop_participants");
+        object.remove("preflop_open_cold_calls");
+        let decoded: BettingState = serde_json::from_value(encoded).unwrap();
+        assert!(decoded.preflop_participants.is_empty());
+        assert_eq!(decoded.preflop_open_cold_calls, 0);
     }
 
     #[test]

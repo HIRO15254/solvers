@@ -1872,6 +1872,7 @@ impl<A: CardAbstraction> MultiwayAbstraction for TableAbstractionAdapter<A> {
 /// game/session types stay concrete and the rollout-only assignment-cache
 /// persistence can be reached by callers that hold the backend.
 pub enum MultiwayAbstractionBackend {
+    #[cfg(any(feature = "research-abstractions", test))]
     RolloutKMeans(RolloutKMeansAbstraction),
     Ehs2Table(TableAbstractionAdapter<Ehs2Abstraction>),
 }
@@ -1881,6 +1882,7 @@ impl MultiwayAbstractionBackend {
     /// [`RolloutKMeansAbstraction::persist_assignment_cache`] after a solve.
     /// The ehs2-table backend has no assignment cache of its own: its
     /// content is already fully determined (and disk-cached) at build time.
+    #[cfg(any(feature = "research-abstractions", test))]
     pub fn rollout(&self) -> Option<&RolloutKMeansAbstraction> {
         match self {
             MultiwayAbstractionBackend::RolloutKMeans(inner) => Some(inner),
@@ -1892,6 +1894,7 @@ impl MultiwayAbstractionBackend {
 impl MultiwayAbstraction for MultiwayAbstractionBackend {
     fn num_buckets(&self, street: Street, active_opponents: u8) -> u32 {
         match self {
+            #[cfg(any(feature = "research-abstractions", test))]
             MultiwayAbstractionBackend::RolloutKMeans(inner) => {
                 inner.num_buckets(street, active_opponents)
             }
@@ -1903,6 +1906,7 @@ impl MultiwayAbstraction for MultiwayAbstractionBackend {
 
     fn bucket(&self, context: BucketContext<'_>) -> BucketId {
         match self {
+            #[cfg(any(feature = "research-abstractions", test))]
             MultiwayAbstractionBackend::RolloutKMeans(inner) => inner.bucket(context),
             MultiwayAbstractionBackend::Ehs2Table(inner) => inner.bucket(context),
         }
@@ -1916,6 +1920,7 @@ impl MultiwayAbstraction for MultiwayAbstractionBackend {
         combos: &[usize],
     ) -> Vec<BucketId> {
         match self {
+            #[cfg(any(feature = "research-abstractions", test))]
             MultiwayAbstractionBackend::RolloutKMeans(inner) => {
                 inner.bucket_batch(street, board, active_opponents, combos)
             }
@@ -1927,6 +1932,7 @@ impl MultiwayAbstraction for MultiwayAbstractionBackend {
 
     fn fingerprint(&self) -> [u8; 32] {
         match self {
+            #[cfg(any(feature = "research-abstractions", test))]
             MultiwayAbstractionBackend::RolloutKMeans(inner) => inner.fingerprint(),
             MultiwayAbstractionBackend::Ehs2Table(inner) => inner.fingerprint(),
         }

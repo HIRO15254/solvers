@@ -1,14 +1,24 @@
 #!/usr/bin/env bash
-# Multiway solve throughput benchmark: runs a config N times and reports
-# per-run traversals/s plus elapsed seconds (first run may include rollout
-# abstraction training unless the artifact cache is already warm).
+# Historical/research-only multiway throughput benchmark. It exercises the
+# retired legacy payload and rollout/full-recall path, so it must use the
+# opt-in research binary rather than the production release.
+# Runs a config N times and reports per-run traversals/s plus elapsed seconds
+# (the first run may include rollout abstraction training unless warm).
 # Usage: tools/bench/mw_bench.sh <config.toml> [runs]
 set -euo pipefail
 config="$1"
 runs="${2:-3}"
 root="$(cd "$(dirname "$0")/../.." && pwd)"
-bin="$root/target/release/solvers.exe"
-[ -f "$bin" ] || bin="$root/target/release/solvers"
+bin="$root/target/research-release/release/solvers.exe"
+[ -f "$bin" ] || bin="$root/target/research-release/release/solvers"
+if [[ ! -x "$bin" ]]; then
+  echo \
+    "missing research solver; build with: \
+CARGO_TARGET_DIR=target/research-release cargo build --release -p cli \
+--features research --bin solvers" \
+    >&2
+  exit 2
+fi
 
 for i in $(seq 1 "$runs"); do
   out="$(mktemp)"

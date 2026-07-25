@@ -11,6 +11,43 @@ use rand::{SeedableRng, rngs::StdRng};
 use serde::Serialize;
 
 use crate::session;
+
+fn parse_solution_config(config_toml: &str) -> Result<crate::config::SolveConfig> {
+    let (compatible, _) = crate::config::solution_artifact_compatible_config(config_toml)?;
+    crate::config::parse_solve_config(&compatible)
+}
+
+fn build_solution_session(config_toml: &str) -> Result<session::MultiwaySession> {
+    let (compatible, _) = crate::config::solution_artifact_compatible_config(config_toml)?;
+    let config = crate::config::parse_solve_config(&compatible)?;
+    let crate::config::GameSection::PreflopMultiway(game) = &config.game else {
+        bail!("solution does not contain a Multiway Preflop game");
+    };
+    let retired = !matches!(
+        game.abstraction.kind,
+        multiway::config::AbstractionKind::Ehs2Table
+    ) || !matches!(
+        game.abstraction.recall,
+        multiway::config::RecallMode::Street
+    );
+    #[cfg(not(feature = "research"))]
+    if retired {
+        bail!(
+            "MWP004: this historical artifact uses retired rollout/full-recall semantics; \
+             summary, tree, strategy, ranges, and recorded EV remain readable, but live \
+             re-evaluation and real-card comparison require an opt-in research build"
+        );
+    }
+    #[cfg(feature = "research")]
+    {
+        let _ = retired;
+        session::build_multiway_session(&compatible, None)
+    }
+    #[cfg(not(feature = "research"))]
+    {
+        session::build_production_multiway_session(&compatible, None)
+    }
+}
 fn key_hex(key: [u8; 16]) -> String {
     key.iter().map(|byte| format!("{byte:02x}")).collect()
 }
@@ -157,7 +194,7 @@ fn range_matrix(
     strategies: &[formats::MultiwayStrategyBlock],
     target: [u8; 16],
 ) -> Result<Vec<serde_json::Value>> {
-    let config = crate::config::parse_solve_config(&metadata.config_toml)?;
+    let config = parse_solution_config(&metadata.config_toml)?;
     let crate::config::GameSection::PreflopMultiway(game) = config.game else {
         bail!("range inspection requires a Multiway Preflop solution");
     };
@@ -485,7 +522,7 @@ pub fn export(
 }
 
 fn export_ranges_json(config_toml: &str) -> Result<String> {
-    let config = crate::config::parse_solve_config(config_toml)?;
+    let config = parse_solution_config(config_toml)?;
     let crate::config::GameSection::PreflopMultiway(game) = config.game else {
         bail!("range export requires a Multiway Preflop solution");
     };
@@ -499,7 +536,7 @@ fn export_ranges_json(config_toml: &str) -> Result<String> {
 }
 
 fn export_ranges_csv(config_toml: &str) -> Result<String> {
-    let config = crate::config::parse_solve_config(config_toml)?;
+    let config = parse_solution_config(config_toml)?;
     let crate::config::GameSection::PreflopMultiway(game) = config.game else {
         bail!("range export requires a Multiway Preflop solution");
     };
@@ -536,7 +573,7 @@ fn export_ev_csv(seats: &[formats::MultiwaySeatResult]) -> String {
 }
 
 fn comparison_mapping(config_toml: &str) -> Result<(usize, &'static str)> {
-    let config = crate::config::parse_solve_config(config_toml)?;
+    let config = parse_solution_config(config_toml)?;
     let crate::config::GameSection::PreflopMultiway(game) = &config.game else {
         bail!("compare requires Multiway Preflop solutions");
     };
@@ -546,6 +583,14 @@ fn comparison_mapping(config_toml: &str) -> Result<(usize, &'static str)> {
         | crate::config::UtilitySection::Icm { .. } => "prize",
     };
     Ok((game.seats.len(), unit))
+}
+
+fn comparison_recall(config_toml: &str) -> Result<multiway::RecallMode> {
+    let config = parse_solution_config(config_toml)?;
+    let crate::config::GameSection::PreflopMultiway(game) = config.game else {
+        bail!("compare requires Multiway Preflop solutions");
+    };
+    Ok(game.abstraction.recall)
 }
 
 const CROSS_ABSTRACTION_SAMPLES: u64 = 1_024;
@@ -576,6 +621,38 @@ struct Comparison {
     left_stop_status: String,
     right_stop_status: String,
     seats: Vec<SeatComparison>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ComparisonBasis {
+    BucketInfoset,
+    SharedRealCardSample,
+}
+
+impl ComparisonBasis {
+    fn for_artifacts(
+        left_fingerprint: [u8; 32],
+        right_fingerprint: [u8; 32],
+        left_recall: multiway::RecallMode,
+        right_recall: multiway::RecallMode,
+    ) -> Self {
+        // Recall is checked independently for compatibility with artifacts
+        // written before recall entered the abstraction fingerprint. Two
+        // legacy current-street/full solutions can carry the same backend
+        // fingerprint even though their infoset keys are not comparable.
+        if left_fingerprint == right_fingerprint && left_recall == right_recall {
+            Self::BucketInfoset
+        } else {
+            Self::SharedRealCardSample
+        }
+    }
+
+    fn label(self) -> &'static str {
+        match self {
+            Self::BucketInfoset => "bucket-infoset",
+            Self::SharedRealCardSample => "shared-real-card-sample",
+        }
+    }
 }
 
 fn strategy_l1(
@@ -664,9 +741,9 @@ fn compare_shared_real_cards(
     left: &BTreeMap<formats::MultiwayStrategyKey, formats::MultiwayStrategyBlock>,
     right: &BTreeMap<formats::MultiwayStrategyKey, formats::MultiwayStrategyBlock>,
 ) -> Result<(usize, usize, usize, f64, f64)> {
-    let left_session = session::build_multiway_session(&left_meta.config_toml, None)
+    let left_session = build_solution_session(&left_meta.config_toml)
         .context("rebuilding the left abstraction")?;
-    let right_session = session::build_multiway_session(&right_meta.config_toml, None)
+    let right_session = build_solution_session(&right_meta.config_toml)
         .context("rebuilding the right abstraction")?;
     let (left_game, sampler, _) = left_session.solver.into_components();
     let (right_game, _, _) = right_session.solver.into_components();
@@ -744,6 +821,8 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
     let (right_meta, right_blocks) = read_solution(right_path)?;
     let left_mapping = comparison_mapping(&left_meta.config_toml)?;
     let right_mapping = comparison_mapping(&right_meta.config_toml)?;
+    let left_recall = comparison_recall(&left_meta.config_toml)?;
+    let right_recall = comparison_recall(&right_meta.config_toml)?;
     if !cross_game && left_meta.game_fingerprint != right_meta.game_fingerprint {
         bail!(
             "solutions have different game fingerprints; pass --cross-game to compare explicitly"
@@ -760,11 +839,17 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
         .into_iter()
         .map(|block| (block.key, block))
         .collect();
-    let same_abstraction = left_meta.abstraction_fingerprint == right_meta.abstraction_fingerprint;
-    let (shared, only_left, only_right, mean, maximum) = if same_abstraction {
-        compare_same_abstraction(&left, &right)?
-    } else {
-        compare_shared_real_cards(&left_meta, &right_meta, &left, &right)?
+    let basis = ComparisonBasis::for_artifacts(
+        left_meta.abstraction_fingerprint,
+        right_meta.abstraction_fingerprint,
+        left_recall,
+        right_recall,
+    );
+    let (shared, only_left, only_right, mean, maximum) = match basis {
+        ComparisonBasis::BucketInfoset => compare_same_abstraction(&left, &right)?,
+        ComparisonBasis::SharedRealCardSample => {
+            compare_shared_real_cards(&left_meta, &right_meta, &left, &right)?
+        }
     };
     let seats = left_meta
         .seats
@@ -799,15 +884,12 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
         })
         .collect::<Result<Vec<_>>>()?;
     let result = Comparison {
-        basis: if same_abstraction {
-            "bucket-infoset"
-        } else {
-            "shared-real-card-sample"
-        },
+        basis: basis.label(),
         shared_infosets: shared,
         only_left,
         only_right,
-        real_card_samples: (!same_abstraction).then_some(CROSS_ABSTRACTION_SAMPLES),
+        real_card_samples: (basis == ComparisonBasis::SharedRealCardSample)
+            .then_some(CROSS_ABSTRACTION_SAMPLES),
         mean_strategy_l1: mean,
         max_strategy_l1: maximum,
         sweep_delta: i128::from(right_meta.sweeps) - i128::from(left_meta.sweeps),
@@ -831,8 +913,8 @@ fn evaluate_prepared(
     if samples == 0 || (train_deviators && br_traversals == 0) {
         bail!("evaluation requires positive samples and deviation traversals");
     }
-    let mut mw_session = session::build_multiway_session(config_toml, None)
-        .context("rebuilding the solution game")?;
+    let mut mw_session =
+        build_solution_session(config_toml).context("rebuilding the solution game")?;
     let num_players = mw_session.game_config.seats.len();
     let traversals = metadata.sweeps.saturating_mul(num_players as u64);
     let mut needed_histories: BTreeSet<_> = blocks.iter().map(|block| block.key.history).collect();
@@ -891,9 +973,12 @@ fn evaluate_prepared(
             .collect(),
     };
     let (game, sampler, config) = mw_session.solver.into_components();
-    mw_session.solver =
-        multiway::MultiwaySolver::from_state_with_config(game, sampler, state, config)
-            .context("restoring the formal average profile")?;
+    #[cfg(feature = "research")]
+    let restored = multiway::MultiwaySolver::from_state_with_config(game, sampler, state, config);
+    #[cfg(not(feature = "research"))]
+    let restored =
+        multiway::MultiwaySolver::from_state_with_config_preallocated(game, sampler, state, config);
+    mw_session.solver = restored.context("restoring the formal average profile")?;
     let deviators = if train_deviators {
         Some(session::train_deviators_parallel(
             &mw_session.solver,
@@ -967,7 +1052,7 @@ fn node_conditioned_evaluation(
     samples: u64,
     seed: u64,
 ) -> Result<serde_json::Value> {
-    let mut config = crate::config::parse_solve_config(&metadata.config_toml)?;
+    let mut config = parse_solution_config(&metadata.config_toml)?;
     let crate::config::GameSection::PreflopMultiway(game) = &mut config.game else {
         bail!("node EV requires a Multiway Preflop solution");
     };
@@ -1104,4 +1189,158 @@ fn inspect_ev(
     .with_context(|| format!("writing evaluation cache {}", cache_path.display()))?;
     println!("{}", serde_json::to_string_pretty(&rendered)?);
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{
+        ComparisonBasis, build_solution_session, comparison_recall, parse_solution_config,
+    };
+    use crate::session;
+    use multiway::ExternalSamplingGame;
+
+    #[test]
+    fn solution_reads_normalize_only_historical_full_recall_pruning() {
+        let v1 = format!(
+            "{}\n[game.information]\nrecall = \"bucket-history\"\n\
+             [solver.pruning]\nkind = \"regret-based\"\n",
+            include_str!("../../../examples/preflop_multiway_v1_smoke.toml")
+        );
+        assert!(
+            crate::config::parse_solve_config(&v1).is_err(),
+            "new solve configs must reject the unsupported combination"
+        );
+        let (compatible, migrated) =
+            crate::config::solution_artifact_compatible_config(&v1).unwrap();
+        assert!(migrated);
+        let parsed = parse_solution_config(&compatible).unwrap();
+        let crate::config::AlgorithmSection::ExternalSamplingMccfr { prune, .. } = parsed.algorithm
+        else {
+            panic!()
+        };
+        assert!(!prune);
+        #[cfg(not(feature = "research"))]
+        {
+            let Err(retired) = build_solution_session(&v1) else {
+                panic!("retired v1 artifact must not rebuild a live production backend");
+            };
+            let retired = retired.to_string();
+            assert!(retired.contains("MWP004"), "{retired}");
+        }
+        #[cfg(feature = "research")]
+        assert!(
+            build_solution_session(&v1).is_ok(),
+            "research builds must reconstruct retired v1 abstractions"
+        );
+
+        let single_hand = v1.replace("kind = \"range-vector\"", "kind = \"single-hand\"");
+        let (_, migrated) =
+            crate::config::solution_artifact_compatible_config(&single_hand).unwrap();
+        assert!(
+            !migrated,
+            "an independently invalid single-hand combination must not be relaxed"
+        );
+
+        let current_street = v1.replace("bucket-history", "current-street");
+        let (_, migrated) =
+            crate::config::solution_artifact_compatible_config(&current_street).unwrap();
+        assert!(!migrated);
+
+        let legacy = include_str!("../../../examples/preflop_multiway_3max_smoke.toml").replacen(
+            "discount_until = 10000000",
+            "discount_until = 10000000\ntraverser_vector = true\nprune = true",
+            1,
+        );
+        assert!(
+            session::build_multiway_session(&legacy, None).is_err(),
+            "the engine must reject new legacy configs with the no-op bit"
+        );
+        let (compatible, migrated) =
+            crate::config::solution_artifact_compatible_config(&legacy).unwrap();
+        assert!(migrated);
+        #[cfg(not(feature = "research"))]
+        {
+            let Err(retired) = build_solution_session(&compatible) else {
+                panic!("retired legacy artifact must not rebuild a live production backend");
+            };
+            let retired = retired.to_string();
+            assert!(retired.contains("MWP004"), "{retired}");
+        }
+        #[cfg(feature = "research")]
+        assert!(
+            build_solution_session(&compatible).is_ok(),
+            "research builds must reconstruct retired legacy abstractions"
+        );
+    }
+
+    #[test]
+    fn compare_routes_different_recall_fingerprints_through_real_cards() {
+        let bucket_history =
+            include_str!("../../../examples/preflop_multiway_3max_smoke.toml").to_string();
+        let anchor = "seed = 17\n";
+        let current_street =
+            bucket_history.replacen(anchor, &format!("{anchor}recall = \"street\"\n"), 1);
+        assert_ne!(current_street, bucket_history);
+        assert_eq!(
+            comparison_recall(&bucket_history).unwrap(),
+            multiway::RecallMode::Full
+        );
+        assert_eq!(
+            comparison_recall(&current_street).unwrap(),
+            multiway::RecallMode::Street
+        );
+        assert_eq!(
+            comparison_recall(include_str!(
+                "../../../examples/preflop_multiway_v1_smoke.toml"
+            ))
+            .unwrap(),
+            multiway::RecallMode::Street,
+            "the v1 default must lower to current-street recall"
+        );
+
+        let bucket_history =
+            session::build_multiway_session(&bucket_history, None).expect("bucket-history session");
+        let current_street =
+            session::build_multiway_session(&current_street, None).expect("current-street session");
+        let bucket_history_fingerprint = bucket_history.solver.abstraction_fingerprint();
+        let current_street_fingerprint = current_street.solver.abstraction_fingerprint();
+
+        assert_eq!(
+            bucket_history.solver.game().game_fingerprint(),
+            current_street.solver.game().game_fingerprint(),
+            "recall must not turn a same-game comparison into cross-game mode"
+        );
+        assert_ne!(
+            bucket_history_fingerprint, current_street_fingerprint,
+            "recall semantics must be part of abstraction compatibility"
+        );
+        assert_eq!(
+            ComparisonBasis::for_artifacts(
+                bucket_history_fingerprint,
+                bucket_history_fingerprint,
+                multiway::RecallMode::Full,
+                multiway::RecallMode::Full,
+            ),
+            ComparisonBasis::BucketInfoset
+        );
+        assert_eq!(
+            ComparisonBasis::for_artifacts(
+                bucket_history_fingerprint,
+                current_street_fingerprint,
+                multiway::RecallMode::Full,
+                multiway::RecallMode::Street,
+            ),
+            ComparisonBasis::SharedRealCardSample
+        );
+        assert_eq!(
+            ComparisonBasis::for_artifacts(
+                bucket_history_fingerprint,
+                bucket_history_fingerprint,
+                multiway::RecallMode::Full,
+                multiway::RecallMode::Street,
+            ),
+            ComparisonBasis::SharedRealCardSample,
+            "legacy artifacts may share the backend fingerprint across recall modes"
+        );
+    }
 }

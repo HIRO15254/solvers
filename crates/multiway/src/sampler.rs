@@ -294,14 +294,14 @@ impl DealSampler {
         })
     }
 
-    /// Feasible hole-combo set for `seat` in `world`, used by the
-    /// vector-traverser dense path: every positive-weight combo in `seat`'s
-    /// configured range that does not intersect any other seat's sampled
-    /// hole cards nor the sampled runout. `world`'s own dealt combo for
-    /// `seat` is deliberately not special-cased (it may or may not appear in
-    /// the returned set on its own merits); the deal stream that produced
-    /// `world` is otherwise unchanged by this query. Returned in the range's
-    /// deterministic support order, as `(combo, weight)` pairs.
+    /// Feasible hole-combo set for `seat` in `world`, used by both the dense
+    /// and full-recall sparse vector-traverser paths: every positive-weight
+    /// combo in `seat`'s configured range that does not intersect any other
+    /// seat's sampled hole cards nor the sampled runout. `world`'s own dealt
+    /// combo for `seat` is deliberately not special-cased (it may or may not
+    /// appear in the returned set on its own merits); the deal stream that
+    /// produced `world` is otherwise unchanged by this query. Returned in
+    /// the range's deterministic support order, as `(combo, weight)` pairs.
     pub fn feasible_combos(&self, seat: usize, world: &SampledWorld) -> Vec<(usize, f64)> {
         let mut dead = CardSet::EMPTY;
         for other in 0..world.num_players() {

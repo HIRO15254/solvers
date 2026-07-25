@@ -50,7 +50,6 @@ pub fn run(
         || threads.is_some()
         || memory.is_some()
         || max_time.is_some()
-        || max_sweeps.is_some()
         || stop_target.is_some()
         || evaluation_samples.is_some()
         || evaluation_cadence.is_some()
@@ -63,15 +62,25 @@ pub fn run(
     let raw_bytes =
         std::fs::read(config_path).with_context(|| format!("reading {}", config_path.display()))?;
     let raw = std::str::from_utf8(&raw_bytes).context("config file is not valid UTF-8")?;
-    let config: SolveConfig = toml::from_str(raw).context("parsing config")?;
+    let mut config: SolveConfig = toml::from_str(raw).context("parsing config")?;
     let config_hash = formats::config_hash(&raw_bytes);
+    apply_legacy_multiway_max_sweeps(&mut config, max_sweeps)?;
 
+    #[cfg(not(feature = "research"))]
     if matches!(config.game, GameSection::PreflopMultiway(_)) {
-        if histories.iter().any(|history| !history.is_empty()) {
-            return Err(anyhow!(
-                "multiway resume does not export --history selections; use the .mwsol strategy query"
-            ));
-        }
+        return Err(anyhow!(
+            "MWP003: legacy preflop-multiway checkpoints cannot be resumed by the production \
+             binary; historical solutions remain readable, while continued rollout/full-recall \
+             experiments require a research build"
+        ));
+    }
+
+    #[cfg(feature = "research")]
+    if matches!(config.game, GameSection::PreflopMultiway(_)) {
+        println!(
+            "resuming research multiway checkpoint to target={}",
+            config.run.sweeps.unwrap_or(config.run.iterations)
+        );
         return crate::multiway_solve::resume(
             raw,
             config,
@@ -81,8 +90,8 @@ pub fn run(
             config_hash,
             None,
             Some(&crate::CLI_CANCEL),
-            true,
             false,
+            true,
         );
     }
 
@@ -130,6 +139,25 @@ pub fn run(
     result.map(|_summary| ())
 }
 
+fn apply_legacy_multiway_max_sweeps(
+    config: &mut SolveConfig,
+    max_sweeps: Option<u64>,
+) -> Result<()> {
+    let Some(max_sweeps) = max_sweeps else {
+        return Ok(());
+    };
+    if max_sweeps == 0 {
+        return Err(anyhow!("--max-sweeps must be positive"));
+    }
+    if !matches!(config.game, GameSection::PreflopMultiway(_)) {
+        return Err(anyhow!(
+            "--max-sweeps is available only for Multiway Preflop checkpoints"
+        ));
+    }
+    config.run.sweeps = Some(max_sweeps);
+    Ok(())
+}
+
 #[allow(clippy::too_many_arguments)]
 fn run_self_contained_multiway(
     checkpoint_path: &Path,
@@ -156,14 +184,28 @@ fn run_self_contained_multiway(
             "Multiway Preflop v1 resume does not accept --history"
         ));
     }
-    let checkpoint = multiway::checkpoint::MultiwayCheckpoint::load_unchecked(checkpoint_path)
+    let mut checkpoint = multiway::checkpoint::MultiwayCheckpoint::load_unchecked(checkpoint_path)
         .with_context(|| format!("reading {}", checkpoint_path.display()))?;
-    let raw = checkpoint.config_toml.ok_or_else(|| {
+    let raw = checkpoint.config_toml.take().ok_or_else(|| {
         anyhow!("checkpoint is not self-contained; pass its config and --checkpoint")
     })?;
+    // `multiway_solve::resume` reloads the checkpoint after lowering the
+    // embedded config. Drop this first decoded state before that second load
+    // and before the full dense arena is page-committed; otherwise a
+    // self-contained resume retains two complete checkpoint states at the
+    // preallocation peak.
+    drop(checkpoint);
     if !crate::multiway_v1::has_v1_schema(&raw)? {
         return Err(anyhow!(
             "self-contained resume requires a Multiway Preflop v1 checkpoint"
+        ));
+    }
+    let (_, historical_noop_pruning) = crate::config::solution_artifact_compatible_config(&raw)?;
+    if historical_noop_pruning {
+        return Err(anyhow!(
+            "this checkpoint uses the historical bucket-history + regret-based pruning \
+             combination whose pruning bit was a no-op; solution artifacts remain readable, \
+             but resuming this checkpoint requires a future explicit offline migration"
         ));
     }
     let raw = crate::multiway_v1::apply_resume_overrides(
@@ -221,7 +263,50 @@ fn run_self_contained_multiway(
         config_hash,
         Some(&solution_path),
         Some(&crate::CLI_CANCEL),
-        true,
         stop_target.is_some(),
+        true,
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const MULTIWAY: &str = include_str!(
+        "../../../experiments/abstraction-2026-07-23/\
+         tournament-6max-50bb-one-size-postflop.toml"
+    );
+
+    #[test]
+    fn legacy_multiway_max_sweeps_is_a_positive_total_target() {
+        let mut config: SolveConfig = toml::from_str(MULTIWAY).unwrap();
+        apply_legacy_multiway_max_sweeps(&mut config, Some(2_000)).unwrap();
+        assert_eq!(config.run.sweeps, Some(2_000));
+        assert!(
+            apply_legacy_multiway_max_sweeps(&mut config, Some(0))
+                .unwrap_err()
+                .to_string()
+                .contains("must be positive")
+        );
+    }
+
+    #[test]
+    fn legacy_non_multiway_rejects_max_sweeps() {
+        let mut config: SolveConfig = toml::from_str(
+            r#"
+[game]
+kind = "kuhn"
+
+[run]
+iterations = 1
+"#,
+        )
+        .unwrap();
+        assert!(
+            apply_legacy_multiway_max_sweeps(&mut config, Some(2))
+                .unwrap_err()
+                .to_string()
+                .contains("only for Multiway Preflop")
+        );
+    }
 }

@@ -6,6 +6,12 @@ license.workspace = true
 repository.workspace = true
 description = "solvers command-line interface"
 
+[features]
+default = []
+# Opt-in command surface for reproducibility experiments. Production release
+# builds intentionally omit it.
+research = ["multiway/research-abstractions"]
+
 [[bin]]
 name = "solvers"
 path = "src/main.rs"
@@ -18,7 +24,7 @@ formats = { workspace = true }
 game = { workspace = true }
 holdem = { workspace = true }
 preflop = { workspace = true }
-multiway = { workspace = true }
+multiway = { workspace = true, default-features = false }
 anyhow = { workspace = true }
 clap = { workspace = true }
 rayon = { workspace = true }
@@ -36,3 +42,8 @@ libc = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { workspace = true }
+
+[dev-dependencies]
+# Unit/integration tests retain historical artifact and experiment coverage;
+# this does not enable the feature in `cargo build --release --bin solvers`.
+multiway = { workspace = true, features = ["research-abstractions"] }

@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
@@ -21,6 +22,106 @@ pub fn parse_solve_config_at(
     } else {
         toml::from_str(raw).map_err(Into::into)
     }
+}
+
+/// Replays solution artifacts written before full-recall regret pruning
+/// became a validation error.
+///
+/// Those runs set the pruning bit in metadata, but the full-recall sparse
+/// worker never read it. Solution inspection/evaluation can therefore
+/// preserve the historical algorithm exactly by lowering that one no-op bit
+/// to `false`. New solve configs never pass through this compatibility path.
+pub(crate) fn solution_artifact_compatible_config(
+    raw: &str,
+) -> anyhow::Result<(Cow<'_, str>, bool)> {
+    let mut document: toml::Value = toml::from_str(raw)?;
+    let is_v1 =
+        document.get("schema").and_then(toml::Value::as_str) == Some(crate::multiway_v1::SCHEMA);
+
+    let migrate_v1 = if is_v1 {
+        let recall = document
+            .get("game")
+            .and_then(toml::Value::as_table)
+            .and_then(|game| game.get("information"))
+            .and_then(toml::Value::as_table)
+            .and_then(|information| information.get("recall"))
+            .and_then(toml::Value::as_str);
+        let solver = document.get("solver");
+        let solver_shape_is_valid = solver.is_none() || solver.is_some_and(toml::Value::is_table);
+        let solver_kind = solver
+            .and_then(toml::Value::as_table)
+            .and_then(|solver| solver.get("kind"))
+            .and_then(toml::Value::as_str);
+        let solver_was_range_vector = matches!(solver_kind, None | Some("range-vector"));
+        let pruning = solver
+            .and_then(toml::Value::as_table)
+            .and_then(|solver| solver.get("pruning"));
+        let pruning_was_historical_default = pruning.is_none()
+            || pruning
+                .and_then(toml::Value::as_table)
+                .and_then(|pruning| pruning.get("kind"))
+                .and_then(toml::Value::as_str)
+                == Some("regret-based");
+        recall == Some("bucket-history")
+            && solver_shape_is_valid
+            && solver_was_range_vector
+            && pruning_was_historical_default
+    } else {
+        false
+    };
+
+    let migrate_legacy = if is_v1 {
+        false
+    } else {
+        let game = document.get("game").and_then(toml::Value::as_table);
+        let abstraction = game
+            .and_then(|game| game.get("abstraction"))
+            .and_then(toml::Value::as_table);
+        let recall = abstraction
+            .and_then(|abstraction| abstraction.get("recall"))
+            .and_then(toml::Value::as_str);
+        let algorithm = document.get("algorithm").and_then(toml::Value::as_table);
+        game.and_then(|game| game.get("kind"))
+            .and_then(toml::Value::as_str)
+            == Some("preflop-multiway")
+            && matches!(recall, None | Some("full"))
+            && algorithm
+                .and_then(|algorithm| algorithm.get("schedule"))
+                .and_then(toml::Value::as_str)
+                == Some("external-sampling-mccfr")
+            && algorithm
+                .and_then(|algorithm| algorithm.get("traverser_vector"))
+                .and_then(toml::Value::as_bool)
+                == Some(true)
+            && algorithm
+                .and_then(|algorithm| algorithm.get("prune"))
+                .and_then(toml::Value::as_bool)
+                == Some(true)
+    };
+
+    if migrate_v1 {
+        let root = document
+            .as_table_mut()
+            .expect("a TOML document always has a root table");
+        let solver = root
+            .entry("solver")
+            .or_insert_with(|| toml::Value::Table(toml::map::Map::new()))
+            .as_table_mut()
+            .expect("shape checked above");
+        let mut pruning = toml::map::Map::new();
+        pruning.insert("kind".into(), toml::Value::String("none".into()));
+        solver.insert("pruning".into(), toml::Value::Table(pruning));
+    } else if migrate_legacy {
+        document
+            .get_mut("algorithm")
+            .and_then(toml::Value::as_table_mut)
+            .expect("shape checked above")
+            .insert("prune".into(), toml::Value::Boolean(false));
+    } else {
+        return Ok((Cow::Borrowed(raw), false));
+    }
+
+    Ok((Cow::Owned(toml::to_string_pretty(&document)?), true))
 }
 
 /// One experiment = one TOML file. Unknown fields are rejected so typos
@@ -297,18 +398,20 @@ pub enum AlgorithmSection {
         /// `multiway::solver::SolverConfig::traverser_vector`): one
         /// traversal updates every feasible hole combo of the sampled
         /// traverser seat at once, instead of only the one combo the deal
-        /// sampler dealt it. Only valid with `game.abstraction.recall =
-        /// "street"`. `false` (the default) is the original algorithm,
-        /// byte-identical to before this field existed.
+        /// sampler dealt it. Street recall uses the dense vector worker;
+        /// full recall uses weighted sparse scalar traversals. `false` (the
+        /// default) is the original algorithm, byte-identical to before this
+        /// field existed.
         #[serde(default, skip_serializing_if = "is_false")]
         traverser_vector: bool,
         /// Enables Pluribus-style regret-based pruning (see
         /// `multiway::solver::SolverConfig::prune`): in vector-traverser
-        /// mode, zero-probability actions whose regret sits far below
-        /// `prune_threshold` are skipped (with probability
-        /// `prune_skip_probability`) rather than descended into. `false`
-        /// (the default) is the original algorithm, byte-identical to
-        /// before this field existed. Requires `traverser_vector = true`.
+        /// mode with current-street recall, zero-probability actions whose
+        /// regret sits far below `prune_threshold` are skipped (with
+        /// probability `prune_skip_probability`) rather than descended into.
+        /// `false` (the default) is the original algorithm, byte-identical to
+        /// before this field existed. Requires `traverser_vector = true` and
+        /// current-street recall.
         #[serde(default, skip_serializing_if = "is_false")]
         prune: bool,
         /// Regret threshold below which a zero-probability action becomes

@@ -232,6 +232,17 @@ pub struct StreetBettingConfig {
     /// behavior). Must be finite and in `(0.0, 1.0]` when present.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allin_threshold: Option<f64>,
+    /// Exact preflop re-raise jam threshold. After a normal raise target has
+    /// been resolved against the minimum raise and the actor's stack cap,
+    /// targets strictly above this fraction of the actor's starting stack
+    /// collapse to all-in. Equality deliberately keeps both the normal size
+    /// and any explicitly configured all-in. This applies only after an open
+    /// (`aggressive_actions > 0`); it never changes an opening size.
+    ///
+    /// This exact-rational threshold and the legacy floating-point
+    /// `allin_threshold` are mutually exclusive.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reraise_jam_above_actor_starting_stack: Option<StackRatio>,
     /// HRC-style check-down threshold (flop/turn/river only). When the
     /// non-folded seat count at this street's start (all-in seats included)
     /// exceeds this value, the street has no betting at all: no decision
@@ -246,6 +257,13 @@ pub struct StreetBettingConfig {
     pub max_betting_players: Option<u8>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct StackRatio {
+    pub numerator: u32,
+    pub denominator: u32,
+}
+
 fn default_max_aggressive_actions() -> u8 {
     4
 }
@@ -258,6 +276,7 @@ fn default_preflop_betting() -> StreetBettingConfig {
         max_aggressive_actions: 4,
         include_allin: true,
         allin_threshold: None,
+        reraise_jam_above_actor_starting_stack: None,
         max_betting_players: None,
     }
 }
@@ -270,6 +289,7 @@ fn default_postflop_betting() -> StreetBettingConfig {
         max_aggressive_actions: 3,
         include_allin: true,
         allin_threshold: None,
+        reraise_jam_above_actor_starting_stack: None,
         max_betting_players: None,
     }
 }
@@ -321,6 +341,23 @@ pub struct AbstractionConfig {
     /// has a default, so it need not be unset there).
     #[serde(default = "default_rollout_samples")]
     pub rollout_samples: u32,
+    /// Number of deterministic rollout feature points generated per bucket
+    /// while training the rollout/k-means abstraction. Skipped at the
+    /// historical default so configs predating this field retain identical
+    /// serialized bytes and hashes.
+    #[serde(
+        default = "default_points_per_bucket",
+        skip_serializing_if = "is_default_points_per_bucket"
+    )]
+    pub points_per_bucket: u32,
+    /// Maximum deterministic k-means refinement iterations. Like
+    /// `points_per_bucket`, the historical default is omitted from
+    /// serialization for backward compatibility.
+    #[serde(
+        default = "default_kmeans_iterations",
+        skip_serializing_if = "is_default_kmeans_iterations"
+    )]
+    pub kmeans_iterations: u32,
     /// Ignored by `kind = "ehs2-table"` for the same reason as
     /// `rollout_samples`.
     #[serde(default)]
@@ -341,15 +378,17 @@ pub struct AbstractionConfig {
     /// `Street` switches to a bounded-memory dense arena keyed only by the
     /// current street's bucket (a Monker/Pluribus-style imperfect-recall
     /// abstraction); see `docs/multiway-preflop.md`. Skipped when `Full` so
-    /// every config predating this field serializes identically and keeps
-    /// its game fingerprint.
+    /// every legacy config predating this field keeps identical serialized
+    /// bytes/config hashes. Recall is independently excluded from game
+    /// identity and included in abstraction identity.
     #[serde(default, skip_serializing_if = "RecallMode::is_full")]
     pub recall: RecallMode,
     /// Selects the postflop card-abstraction backend. `RolloutKmeans` (the
     /// default) is the trained rollout/k-means abstraction; `Ehs2Table` uses
     /// precomputed exact EHS^2 percentile tables (O(1) lookup, no solve-time
     /// Monte Carlo, no per-opponent-count budgets). Skipped when
-    /// `RolloutKmeans` for the same fingerprint-stability reason as `recall`.
+    /// `RolloutKmeans` to preserve legacy serialized bytes/config hashes.
+    /// Backend content is independently covered by abstraction identity.
     #[serde(default, skip_serializing_if = "AbstractionKind::is_rollout_kmeans")]
     pub kind: AbstractionKind,
 }
@@ -411,6 +450,8 @@ impl Default for AbstractionConfig {
             turn_buckets: default_buckets(),
             river_buckets: default_buckets(),
             rollout_samples: default_rollout_samples(),
+            points_per_bucket: default_points_per_bucket(),
+            kmeans_iterations: default_kmeans_iterations(),
             seed: 0,
             active_opponent_buckets: Vec::new(),
             artifact_cache: None,
@@ -435,6 +476,22 @@ fn default_buckets() -> u16 {
 
 fn default_rollout_samples() -> u32 {
     256
+}
+
+fn default_points_per_bucket() -> u32 {
+    8
+}
+
+fn is_default_points_per_bucket(value: &u32) -> bool {
+    *value == default_points_per_bucket()
+}
+
+fn default_kmeans_iterations() -> u32 {
+    20
+}
+
+fn is_default_kmeans_iterations(value: &u32) -> bool {
+    *value == default_kmeans_iterations()
 }
 
 /// Standalone `[utility]` payload used by both CLI and direct library users.
@@ -669,6 +726,18 @@ impl MultiwayConfig {
         }
         if self.abstraction.rollout_samples == 0 {
             return Err(ConfigError::RolloutSamples);
+        }
+        if self.abstraction.points_per_bucket == 0 {
+            return Err(ConfigError::TrainingPointsPerBucket);
+        }
+        if self.abstraction.kmeans_iterations == 0 {
+            return Err(ConfigError::KMeansIterations);
+        }
+        if matches!(self.abstraction.kind, AbstractionKind::Ehs2Table)
+            && (self.abstraction.points_per_bucket != default_points_per_bucket()
+                || self.abstraction.kmeans_iterations != default_kmeans_iterations())
+        {
+            return Err(ConfigError::Ehs2TableTraining);
         }
         if matches!(self.abstraction.kind, AbstractionKind::Ehs2Table)
             && !self.abstraction.active_opponent_buckets.is_empty()
@@ -978,6 +1047,21 @@ fn validate_betting(config: &BettingConfig) -> Result<(), ConfigError> {
                 return Err(ConfigError::AllinThreshold(threshold));
             }
         }
+        if let Some(ratio) = section.reraise_jam_above_actor_starting_stack {
+            if ratio.numerator == 0 || ratio.denominator == 0 || ratio.numerator > ratio.denominator
+            {
+                return Err(ConfigError::ReraiseJamRatio {
+                    numerator: ratio.numerator,
+                    denominator: ratio.denominator,
+                });
+            }
+            if section.allin_threshold.is_some() {
+                return Err(ConfigError::ConflictingAllinThresholds(street));
+            }
+            if street != Street::Preflop {
+                return Err(ConfigError::PostflopReraiseJamRatio(street));
+            }
+        }
         if street == Street::Preflop {
             if section.max_betting_players.is_some() {
                 return Err(ConfigError::PreflopMaxBettingPlayers);
@@ -1110,6 +1194,12 @@ pub enum ConfigError {
     Buckets,
     #[error("abstraction rollout_samples must be positive")]
     RolloutSamples,
+    #[error("abstraction points_per_bucket must be positive")]
+    TrainingPointsPerBucket,
+    #[error("abstraction kmeans_iterations must be positive")]
+    KMeansIterations,
+    #[error("ehs2-table does not support non-default rollout training parameters")]
+    Ehs2TableTraining,
     #[error("active-opponent bucket profile {0} is duplicate or outside this table")]
     OpponentBucketProfile(u8),
     #[error("ehs2-table does not support per-opponent bucket budgets")]
@@ -1134,6 +1224,18 @@ pub enum ConfigError {
     IcmWithRake,
     #[error("allin_threshold must be finite and within (0.0, 1.0], got {0}")]
     AllinThreshold(f64),
+    #[error(
+        "reraise_jam_above_actor_starting_stack must be an exact ratio within (0, 1], got {numerator}/{denominator}"
+    )]
+    ReraiseJamRatio { numerator: u32, denominator: u32 },
+    #[error(
+        "{0:?} cannot configure both allin_threshold and reraise_jam_above_actor_starting_stack"
+    )]
+    ConflictingAllinThresholds(Street),
+    #[error(
+        "{0:?}.reraise_jam_above_actor_starting_stack is not supported; the threshold applies only to preflop re-raises"
+    )]
+    PostflopReraiseJamRatio(Street),
     #[error(
         "preflop.max_betting_players is not supported; check-down thresholds apply only to flop, turn, and river"
     )]
@@ -1339,11 +1441,80 @@ stack_bb = 12
     }
 
     #[test]
+    fn exact_reraise_jam_ratio_validates_round_trips_and_conflicts_are_rejected() {
+        let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        config
+            .betting
+            .preflop
+            .reraise_jam_above_actor_starting_stack = Some(StackRatio {
+            numerator: 1,
+            denominator: 3,
+        });
+        config.validate().unwrap();
+
+        let encoded = toml::to_string(&config).unwrap();
+        assert!(encoded.contains("reraise_jam_above_actor_starting_stack"));
+        let decoded: MultiwayConfig = toml::from_str(&encoded).unwrap();
+        assert_eq!(
+            decoded
+                .betting
+                .preflop
+                .reraise_jam_above_actor_starting_stack,
+            Some(StackRatio {
+                numerator: 1,
+                denominator: 3,
+            })
+        );
+        decoded.validate().unwrap();
+
+        for ratio in [
+            StackRatio {
+                numerator: 0,
+                denominator: 3,
+            },
+            StackRatio {
+                numerator: 1,
+                denominator: 0,
+            },
+            StackRatio {
+                numerator: 4,
+                denominator: 3,
+            },
+        ] {
+            let mut invalid: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+            invalid
+                .betting
+                .preflop
+                .reraise_jam_above_actor_starting_stack = Some(ratio);
+            assert!(matches!(
+                invalid.validate(),
+                Err(ConfigError::ReraiseJamRatio { .. })
+            ));
+        }
+
+        config.betting.preflop.allin_threshold = Some(0.85);
+        assert!(matches!(
+            config.validate(),
+            Err(ConfigError::ConflictingAllinThresholds(Street::Preflop))
+        ));
+
+        let mut postflop: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        postflop.betting.flop.reraise_jam_above_actor_starting_stack = Some(StackRatio {
+            numerator: 1,
+            denominator: 3,
+        });
+        assert!(matches!(
+            postflop.validate(),
+            Err(ConfigError::PostflopReraiseJamRatio(Street::Flop))
+        ));
+    }
+
+    #[test]
     fn default_recall_mode_is_full_and_is_omitted_from_serialization() {
         // Regression guard: `recall` must not appear in a default-mode
-        // config's serialized form (JSON, used for the game fingerprint, or
-        // TOML), so every config that predates this field keeps an
-        // unchanged fingerprint and round-trips unchanged.
+        // config's serialized form (JSON or TOML), so every config that
+        // predates this field keeps unchanged bytes/config hashes and
+        // round-trips unchanged.
         let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
         assert_eq!(config.abstraction.recall, RecallMode::Full);
         let json = serde_json::to_string(&config.abstraction).unwrap();
@@ -1362,9 +1533,9 @@ stack_bb = 12
     #[test]
     fn default_abstraction_kind_is_rollout_kmeans_and_is_omitted_from_serialization() {
         // Regression guard: `kind` must not appear in a default-mode
-        // config's serialized form (JSON, used for the game fingerprint, or
-        // TOML), so every config that predates this field keeps an
-        // unchanged fingerprint and round-trips unchanged. The whole-config
+        // config's serialized form (JSON or TOML), so every config that
+        // predates this field keeps unchanged bytes/config hashes and
+        // round-trips unchanged. The whole-config
         // TOML already contains the word "kind" from unrelated tagged enums
         // (`ante`'s `kind = "none"`, betting size `kind` tags), so the TOML
         // check below looks for the serialized variant name specifically
@@ -1382,6 +1553,65 @@ stack_bb = 12
         assert!(ehs2_json.contains("\"kind\":\"ehs2-table\""));
         let decoded: AbstractionConfig = serde_json::from_str(&ehs2_json).unwrap();
         assert_eq!(decoded.kind, AbstractionKind::Ehs2Table);
+    }
+
+    #[test]
+    fn rollout_training_defaults_are_omitted_and_nondefaults_round_trip() {
+        // These values were hard-coded in RolloutTrainingParams before they
+        // became configurable. Omitting them must therefore preserve the
+        // serialized form of every existing core config.
+        let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        assert_eq!(config.abstraction.points_per_bucket, 8);
+        assert_eq!(config.abstraction.kmeans_iterations, 20);
+        let json = serde_json::to_string(&config.abstraction).unwrap();
+        assert!(!json.contains("points_per_bucket"));
+        assert!(!json.contains("kmeans_iterations"));
+        let toml_text = toml::to_string(&config).unwrap();
+        assert!(!toml_text.contains("points_per_bucket"));
+        assert!(!toml_text.contains("kmeans_iterations"));
+
+        let mut tuned = config;
+        tuned.abstraction.points_per_bucket = 16;
+        tuned.abstraction.kmeans_iterations = 40;
+        let tuned_json = serde_json::to_string(&tuned.abstraction).unwrap();
+        assert!(tuned_json.contains("\"points_per_bucket\":16"));
+        assert!(tuned_json.contains("\"kmeans_iterations\":40"));
+        let decoded: AbstractionConfig = serde_json::from_str(&tuned_json).unwrap();
+        assert_eq!(decoded.points_per_bucket, 16);
+        assert_eq!(decoded.kmeans_iterations, 40);
+    }
+
+    #[test]
+    fn rollout_training_parameters_are_validated_and_ehs2_rejects_nondefaults() {
+        let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
+        config.abstraction.points_per_bucket = 0;
+        assert!(matches!(
+            config.validate(),
+            Err(ConfigError::TrainingPointsPerBucket)
+        ));
+
+        config.abstraction.points_per_bucket = 8;
+        config.abstraction.kmeans_iterations = 0;
+        assert!(matches!(
+            config.validate(),
+            Err(ConfigError::KMeansIterations)
+        ));
+
+        config.abstraction.kmeans_iterations = 20;
+        config.abstraction.kind = AbstractionKind::Ehs2Table;
+        config.validate().unwrap();
+
+        config.abstraction.points_per_bucket = 16;
+        assert!(matches!(
+            config.validate(),
+            Err(ConfigError::Ehs2TableTraining)
+        ));
+        config.abstraction.points_per_bucket = 8;
+        config.abstraction.kmeans_iterations = 40;
+        assert!(matches!(
+            config.validate(),
+            Err(ConfigError::Ehs2TableTraining)
+        ));
     }
 
     #[test]
@@ -1411,8 +1641,16 @@ stack_bb = 12
         let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
         config.validate().unwrap();
         assert!(config.betting.preflop.allin_threshold.is_none());
+        assert!(
+            config
+                .betting
+                .preflop
+                .reraise_jam_above_actor_starting_stack
+                .is_none()
+        );
         let encoded = toml::to_string(&config).unwrap();
         assert!(!encoded.contains("allin_threshold"));
+        assert!(!encoded.contains("reraise_jam_above_actor_starting_stack"));
         assert!(!encoded.contains("min-raise"));
         assert!(!encoded.contains("stack-fraction"));
     }

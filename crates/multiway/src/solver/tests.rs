@@ -14,6 +14,18 @@ enum ToyState {
 #[derive(Clone, Copy)]
 struct DominatedChoice;
 
+#[derive(Clone, Copy)]
+struct CoarseCandidateReferenceChoice;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum FourStreetState {
+    Decision(u8),
+    Terminal,
+}
+
+#[derive(Clone, Copy)]
+struct FourStreetGame;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum PrefixState {
     Opponent,
@@ -40,6 +52,80 @@ enum ThreePlayerOracleState {
 struct ThreePlayerOracleGame;
 
 const ORACLE_HERO_PAYOFFS: [[f64; 2]; 2] = [[4.0, 0.0], [-2.0, 2.0]];
+
+impl ExternalSamplingGame for FourStreetGame {
+    type State = FourStreetState;
+    type Actions = FourStreetState;
+
+    fn num_players(&self) -> usize {
+        2
+    }
+
+    fn root_state(&self) -> Self::State {
+        FourStreetState::Decision(0)
+    }
+
+    fn actor(&self, state: &Self::State) -> Option<usize> {
+        matches!(state, FourStreetState::Decision(_)).then_some(0)
+    }
+
+    fn node_actions(&self, state: &Self::State) -> Self::Actions {
+        *state
+    }
+
+    fn num_actions_of(&self, actions: &Self::Actions) -> usize {
+        usize::from(matches!(actions, FourStreetState::Decision(_)))
+    }
+
+    fn next_state_with(
+        &self,
+        _state: &Self::State,
+        actions: &Self::Actions,
+        action_index: usize,
+    ) -> Self::State {
+        assert_eq!(action_index, 0);
+        match *actions {
+            FourStreetState::Decision(street) if street < 3 => {
+                FourStreetState::Decision(street + 1)
+            }
+            FourStreetState::Decision(3) => FourStreetState::Terminal,
+            FourStreetState::Decision(_) => panic!("street out of range"),
+            FourStreetState::Terminal => panic!("terminal state has no child"),
+        }
+    }
+
+    fn write_action_label(&self, actions: &Self::Actions, action_index: usize, out: &mut String) {
+        assert!(matches!(actions, FourStreetState::Decision(_)));
+        assert_eq!(action_index, 0);
+        out.push_str("continue");
+    }
+
+    fn bucket(&self, state: &Self::State, _world: &SampledWorld, _actor: usize) -> PrivateInfo {
+        let FourStreetState::Decision(street) = *state else {
+            panic!("terminal state has no bucket")
+        };
+        PrivateInfo::from_path(
+            Street::ALL[street as usize],
+            1,
+            BucketPath {
+                preflop: 0,
+                flop: 0,
+                turn: 0,
+                river: 0,
+            },
+        )
+    }
+
+    fn terminal_utilities(
+        &self,
+        state: &Self::State,
+        _world: &SampledWorld,
+        utilities: &mut [f64],
+    ) {
+        assert_eq!(*state, FourStreetState::Terminal);
+        utilities.fill(0.0);
+    }
+}
 
 impl ExternalSamplingGame for PrefixImportanceGame {
     type State = PrefixState;
@@ -292,6 +378,95 @@ impl ExternalSamplingGame for DominatedChoice {
     }
 }
 
+impl ExternalSamplingGame for CoarseCandidateReferenceChoice {
+    type State = ToyState;
+    type Actions = ToyState;
+
+    fn num_players(&self) -> usize {
+        2
+    }
+
+    fn root_state(&self) -> Self::State {
+        ToyState::Choose
+    }
+
+    fn actor(&self, state: &Self::State) -> Option<usize> {
+        matches!(state, ToyState::Choose).then_some(0)
+    }
+
+    fn node_actions(&self, state: &Self::State) -> Self::Actions {
+        *state
+    }
+
+    fn num_actions_of(&self, actions: &Self::Actions) -> usize {
+        usize::from(matches!(actions, ToyState::Choose)) * 2
+    }
+
+    fn next_state_with(
+        &self,
+        _state: &Self::State,
+        actions: &Self::Actions,
+        action_index: usize,
+    ) -> Self::State {
+        assert_eq!(*actions, ToyState::Choose);
+        ToyState::Terminal(action_index)
+    }
+
+    fn write_action_label(&self, _actions: &Self::Actions, action_index: usize, out: &mut String) {
+        out.push_str(match action_index {
+            0 => "best",
+            1 => "dominated",
+            _ => panic!("action out of range"),
+        });
+    }
+
+    /// Deliberately coarse candidate abstraction: all deals share one key.
+    fn bucket(&self, _state: &Self::State, _world: &SampledWorld, _actor: usize) -> PrivateInfo {
+        PrivateInfo::from_path(
+            Street::Preflop,
+            1,
+            BucketPath {
+                preflop: 0,
+                flop: 0,
+                turn: 0,
+                river: 0,
+            },
+        )
+    }
+
+    /// Common reference abstraction separates the sampled deals.
+    fn deviation_bucket(
+        &self,
+        _state: &Self::State,
+        world: &SampledWorld,
+        actor: usize,
+    ) -> PrivateInfo {
+        PrivateInfo::from_path(
+            Street::Preflop,
+            1,
+            BucketPath {
+                preflop: (world.hole_combo(actor) % 2) as u32,
+                flop: 0,
+                turn: 0,
+                river: 0,
+            },
+        )
+    }
+
+    fn terminal_utilities(
+        &self,
+        state: &Self::State,
+        _world: &SampledWorld,
+        utilities: &mut [f64],
+    ) {
+        let ToyState::Terminal(action) = *state else {
+            panic!("not terminal")
+        };
+        utilities[0] = if action == 0 { 1.0 } else { -1.0 };
+        utilities[1] = -utilities[0];
+    }
+}
+
 fn solver(seed: u64, memory: u64) -> MultiwaySolver<DominatedChoice> {
     solver_with_batch(seed, memory, 1)
 }
@@ -308,6 +483,48 @@ fn solver_with_batch(seed: u64, memory: u64, sweep_batch: u64) -> MultiwaySolver
             discount_every: 5,
             discount_until: 100,
             sweep_batch,
+            traverser_vector: false,
+            prune: false,
+            prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+            prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
+        },
+    )
+    .unwrap()
+}
+
+fn reference_choice_solver(seed: u64) -> MultiwaySolver<CoarseCandidateReferenceChoice> {
+    MultiwaySolver::new(
+        CoarseCandidateReferenceChoice,
+        DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+        SolverConfig {
+            seed,
+            max_memory_bytes: 1 << 20,
+            max_traversal_depth: 16,
+            exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
+            discount_every: 5,
+            discount_until: 100,
+            sweep_batch: 1,
+            traverser_vector: false,
+            prune: false,
+            prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+            prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
+        },
+    )
+    .unwrap()
+}
+
+fn four_street_solver(seed: u64) -> MultiwaySolver<FourStreetGame> {
+    MultiwaySolver::new(
+        FourStreetGame,
+        DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+        SolverConfig {
+            seed,
+            max_memory_bytes: 1 << 20,
+            max_traversal_depth: 16,
+            exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
+            discount_every: 5,
+            discount_until: 100,
+            sweep_batch: 1,
             traverser_vector: false,
             prune: false,
             prune_threshold: DEFAULT_PRUNE_THRESHOLD,
@@ -410,20 +627,344 @@ fn prefix_solver(seed: u64) -> MultiwaySolver<PrefixImportanceGame> {
 fn train_deviator_is_deterministic() {
     let mut solver = prefix_solver(41);
     solver.run_sweeps(3).unwrap();
+    let before = solver.snapshot_state();
     let first = solver
         .train_deviator(0, 300, 555, ProfileVariant::default())
         .unwrap();
-    let second = solver
-        .train_deviator(0, 300, 555, ProfileVariant::default())
+    let reported = solver
+        .train_deviator_with_report(0, 300, 555, ProfileVariant::default())
         .unwrap();
-    assert_eq!(first.actions, second.actions);
+    assert_eq!(first, reported.policy);
     assert_eq!(first.seat, 0);
+    assert_eq!(reported.coverage.traversals, 300);
+    assert_eq!(solver.snapshot_state(), before);
     // A different seat/seed/traversal count must not accidentally
     // collide with the same trained policy.
     let other_seat = solver
         .train_deviator(1, 300, 555, ProfileVariant::default())
         .unwrap();
     assert_eq!(other_seat.seat, 1);
+}
+
+#[test]
+fn deviator_training_uses_reference_keys_over_a_coarse_candidate() {
+    let solver = reference_choice_solver(71);
+    let trained = solver
+        .train_deviator_with_report(0, 256, 991, ProfileVariant::default())
+        .unwrap();
+    let mut buckets = trained
+        .policy
+        .actions
+        .keys()
+        .map(|key| key.bucket_path[0])
+        .collect::<Vec<_>>();
+    buckets.sort_unstable();
+    buckets.dedup();
+    assert_eq!(buckets, vec![0, 1]);
+    assert_eq!(trained.coverage.visited_infosets, 2);
+    assert_eq!(trained.coverage.retained_infosets, 2);
+    assert_eq!(trained.coverage.total_visits, 256);
+    assert_eq!(trained.coverage.retained_visits, 256);
+}
+
+#[test]
+fn reference_evaluation_falls_back_to_candidate_baseline_not_greedy() {
+    let mut solver = reference_choice_solver(81);
+    solver.run_sweeps(1).unwrap();
+    let candidate = solver
+        .policies
+        .get_mut(&root_key())
+        .expect("one sweep creates the candidate root policy");
+    // Candidate baseline is pure action 1, while candidate regret-greedy is
+    // pure action 0. This makes the required fallback distinction exact.
+    candidate.strategy_sum = vec![0.0, 1.0];
+    candidate.regrets = vec![1.0, 0.0];
+    let deviators = vec![
+        DeviatorPolicy {
+            seat: 0,
+            actions: FxHashMap::default(),
+        },
+        DeviatorPolicy {
+            seat: 1,
+            actions: FxHashMap::default(),
+        },
+    ];
+
+    let legacy = solver
+        .evaluate_profile(32, 1234, Some(&deviators), ProfileVariant::default())
+        .unwrap();
+    assert_eq!(
+        legacy.deviation_gain_lower_bound.as_ref().unwrap()[0].mean,
+        2.0
+    );
+
+    let reference = solver
+        .evaluate_reference_deviators(32, 1234, &deviators, ProfileVariant::default())
+        .unwrap();
+    assert_eq!(reference.evaluation.seats[0].mean, -1.0);
+    assert_eq!(
+        reference.candidate_policy_coverage[0],
+        CandidatePolicyCoverage {
+            decision_visits: 32,
+            stored_strategy_visits: 32,
+            uniform_fallback_visits: 0,
+            decision_visits_by_street: StreetVisitCounts {
+                preflop: 32,
+                ..StreetVisitCounts::default()
+            },
+            stored_strategy_visits_by_street: StreetVisitCounts {
+                preflop: 32,
+                ..StreetVisitCounts::default()
+            },
+            uniform_fallback_visits_by_street: StreetVisitCounts::default(),
+        }
+    );
+    assert_eq!(
+        reference.candidate_policy_coverage[0].stored_strategy_fraction(),
+        1.0
+    );
+    assert_eq!(
+        reference
+            .evaluation
+            .deviation_gain_lower_bound
+            .as_ref()
+            .unwrap()[0]
+            .mean,
+        0.0
+    );
+    assert_eq!(
+        reference.coverage[0],
+        ReferenceDeviationCoverage {
+            decision_visits: 32,
+            trained_action_visits: 0,
+            baseline_fallback_visits: 32,
+            decision_visits_by_street: StreetVisitCounts {
+                preflop: 32,
+                ..StreetVisitCounts::default()
+            },
+            trained_action_visits_by_street: StreetVisitCounts::default(),
+            baseline_fallback_visits_by_street: StreetVisitCounts {
+                preflop: 32,
+                ..StreetVisitCounts::default()
+            },
+        }
+    );
+    assert_eq!(reference.coverage[0].trained_action_fraction(), 0.0);
+    assert!(
+        reference
+            .worlds
+            .iter()
+            .all(|world| world.gains == vec![0.0, 0.0])
+    );
+}
+
+#[test]
+fn reference_evaluation_reports_candidate_uniform_fallback_coverage() {
+    let solver = reference_choice_solver(810);
+    let deviators = vec![
+        DeviatorPolicy {
+            seat: 0,
+            actions: FxHashMap::default(),
+        },
+        DeviatorPolicy {
+            seat: 1,
+            actions: FxHashMap::default(),
+        },
+    ];
+    let reference = solver
+        .evaluate_reference_deviators(16, 9876, &deviators, ProfileVariant::default())
+        .unwrap();
+    assert_eq!(
+        reference.candidate_policy_coverage[0],
+        CandidatePolicyCoverage {
+            decision_visits: 16,
+            stored_strategy_visits: 0,
+            uniform_fallback_visits: 16,
+            decision_visits_by_street: StreetVisitCounts {
+                preflop: 16,
+                ..StreetVisitCounts::default()
+            },
+            stored_strategy_visits_by_street: StreetVisitCounts::default(),
+            uniform_fallback_visits_by_street: StreetVisitCounts {
+                preflop: 16,
+                ..StreetVisitCounts::default()
+            },
+        }
+    );
+    assert_eq!(
+        reference.candidate_policy_coverage[0].stored_strategy_fraction(),
+        0.0
+    );
+}
+
+#[test]
+fn reference_evaluation_looks_up_trained_actions_by_reference_key() {
+    let mut solver = reference_choice_solver(82);
+    solver.run_sweeps(1).unwrap();
+    let candidate = solver
+        .policies
+        .get_mut(&root_key())
+        .expect("one sweep creates the candidate root policy");
+    candidate.strategy_sum = vec![0.0, 1.0];
+    candidate.regrets = vec![1.0, 0.0];
+
+    let mut reference_one = root_key();
+    reference_one.bucket_path[0] = 1;
+    let deviators = vec![
+        DeviatorPolicy {
+            seat: 0,
+            actions: FxHashMap::from_iter([(reference_one, 0)]),
+        },
+        DeviatorPolicy {
+            seat: 1,
+            actions: FxHashMap::default(),
+        },
+    ];
+    let reference = solver
+        .evaluate_reference_deviators(64, 4321, &deviators, ProfileVariant::default())
+        .unwrap();
+    let coverage = reference.coverage[0];
+    assert_eq!(coverage.decision_visits, 64);
+    assert!(coverage.trained_action_visits > 0);
+    assert!(coverage.baseline_fallback_visits > 0);
+    assert_eq!(
+        coverage.trained_action_visits + coverage.baseline_fallback_visits,
+        coverage.decision_visits
+    );
+    assert_eq!(
+        reference
+            .worlds
+            .iter()
+            .filter(|world| world.gains[0] == 2.0)
+            .count() as u64,
+        coverage.trained_action_visits
+    );
+}
+
+#[test]
+fn reference_evaluation_attributes_coverage_to_each_street() {
+    let solver = four_street_solver(83);
+    let hero = solver
+        .train_deviator_with_report(0, 8, 7654, ProfileVariant::default())
+        .unwrap();
+    let opponent = solver
+        .train_deviator_with_report(1, 8, 7655, ProfileVariant::default())
+        .unwrap();
+    assert_eq!(hero.policy.actions.len(), Street::ALL.len());
+    assert!(opponent.policy.actions.is_empty());
+
+    let samples = 5;
+    let reference = solver
+        .evaluate_reference_deviators(
+            samples,
+            4322,
+            &[hero.policy, opponent.policy],
+            ProfileVariant::default(),
+        )
+        .unwrap();
+    let every_street = StreetVisitCounts {
+        preflop: samples,
+        flop: samples,
+        turn: samples,
+        river: samples,
+    };
+
+    let candidate = reference.candidate_policy_coverage[0];
+    assert_eq!(candidate.decision_visits, 4 * samples);
+    assert_eq!(candidate.uniform_fallback_visits, 4 * samples);
+    assert_eq!(candidate.stored_strategy_visits, 0);
+    assert_eq!(candidate.decision_visits_by_street, every_street);
+    assert_eq!(candidate.uniform_fallback_visits_by_street, every_street);
+    assert_eq!(
+        candidate.stored_strategy_visits_by_street,
+        StreetVisitCounts::default()
+    );
+    assert_eq!(
+        candidate.decision_visits_by_street.total(),
+        candidate.decision_visits
+    );
+    assert_eq!(
+        candidate.uniform_fallback_visits_by_street.total(),
+        candidate.uniform_fallback_visits
+    );
+    assert_eq!(
+        candidate.stored_strategy_visits_by_street.total(),
+        candidate.stored_strategy_visits
+    );
+    assert_eq!(
+        candidate.decision_visits,
+        candidate.stored_strategy_visits + candidate.uniform_fallback_visits
+    );
+
+    let deviator = reference.coverage[0];
+    assert_eq!(deviator.decision_visits, 4 * samples);
+    assert_eq!(deviator.trained_action_visits, 4 * samples);
+    assert_eq!(deviator.baseline_fallback_visits, 0);
+    assert_eq!(deviator.decision_visits_by_street, every_street);
+    assert_eq!(deviator.trained_action_visits_by_street, every_street);
+    assert_eq!(
+        deviator.baseline_fallback_visits_by_street,
+        StreetVisitCounts::default()
+    );
+    assert_eq!(
+        deviator.decision_visits_by_street.total(),
+        deviator.decision_visits
+    );
+    assert_eq!(
+        deviator.trained_action_visits_by_street.total(),
+        deviator.trained_action_visits
+    );
+    assert_eq!(
+        deviator.baseline_fallback_visits_by_street.total(),
+        deviator.baseline_fallback_visits
+    );
+    assert_eq!(
+        deviator.decision_visits,
+        deviator.trained_action_visits + deviator.baseline_fallback_visits
+    );
+
+    assert_eq!(
+        reference.candidate_policy_coverage[1],
+        CandidatePolicyCoverage::default()
+    );
+    assert_eq!(reference.coverage[1], ReferenceDeviationCoverage::default());
+
+    let json = serde_json::to_value(&reference).unwrap();
+    assert_eq!(
+        json["candidate_policy_coverage"][0]["decision_visits_by_street"]["flop"],
+        samples
+    );
+    assert_eq!(
+        json["coverage"][0]["trained_action_visits_by_street"]["river"],
+        samples
+    );
+}
+
+#[test]
+fn coverage_without_street_counters_deserializes_with_zero_defaults() {
+    let candidate: CandidatePolicyCoverage = serde_json::from_value(serde_json::json!({
+        "decision_visits": 3,
+        "stored_strategy_visits": 2,
+        "uniform_fallback_visits": 1
+    }))
+    .unwrap();
+    assert_eq!(candidate.decision_visits, 3);
+    assert_eq!(
+        candidate.decision_visits_by_street,
+        StreetVisitCounts::default()
+    );
+
+    let reference: ReferenceDeviationCoverage = serde_json::from_value(serde_json::json!({
+        "decision_visits": 3,
+        "trained_action_visits": 1,
+        "baseline_fallback_visits": 2
+    }))
+    .unwrap();
+    assert_eq!(reference.decision_visits, 3);
+    assert_eq!(
+        reference.trained_action_visits_by_street,
+        StreetVisitCounts::default()
+    );
 }
 
 #[test]
@@ -1614,6 +2155,38 @@ fn prune_requires_vector_traverser() {
 }
 
 #[test]
+fn prune_requires_street_recall() {
+    let result = MultiwaySolver::new(
+        DominatedChoice,
+        DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+        SolverConfig {
+            traverser_vector: true,
+            prune: true,
+            prune_threshold: -1.0,
+            prune_skip_probability: 0.5,
+            ..SolverConfig::default()
+        },
+    );
+    assert!(matches!(
+        result,
+        Err(SolverError::PruneRequiresStreetRecall)
+    ));
+}
+
+#[test]
+fn production_preallocation_rejects_full_recall_before_any_traversal() {
+    let result = MultiwaySolver::new_preallocated(
+        DominatedChoice,
+        DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+        SolverConfig::default(),
+    );
+    assert!(matches!(
+        result,
+        Err(SolverError::PreallocatedStorageRequiresStreetRecall)
+    ));
+}
+
+#[test]
 fn prune_threshold_must_be_finite_and_negative() {
     let result = MultiwaySolver::new(
         DenseDominatedChoice,
@@ -1749,6 +2322,103 @@ fn vector_traverser_checkpoint_v5_round_trip_and_resume() {
 }
 
 #[test]
+fn production_resume_rebuilds_and_commits_the_complete_arena_before_returning() {
+    let mut original = dense_vector_toy_solver(919, 1);
+    original.run_sweeps_with_threads(12, 2).unwrap();
+    let state = original.snapshot_state();
+    let expected_state = state.clone();
+    let config = state.config;
+
+    let mut resumed = MultiwaySolver::from_state_with_config_preallocated(
+        DenseToyGame,
+        DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+        state,
+        config,
+    )
+    .unwrap();
+
+    let allocation = resumed.policy_arena_allocation().unwrap();
+    assert!(allocation.pages_committed);
+    assert_eq!(resumed.completed_sweeps(), 12);
+    assert_eq!(resumed.snapshot_state(), expected_state);
+
+    let dense_before = resumed.dense.as_ref().unwrap();
+    let regrets_layout = (
+        dense_before.arena.regrets.as_ptr(),
+        dense_before.arena.regrets.len(),
+        dense_before.arena.regrets.capacity(),
+    );
+    let strategy_layout = (
+        dense_before.arena.strategy_sum.as_ptr(),
+        dense_before.arena.strategy_sum.len(),
+        dense_before.arena.strategy_sum.capacity(),
+    );
+    let touched_layout = dense_before.arena.touched_storage_layout();
+
+    resumed.run_sweeps_with_threads(5, 2).unwrap();
+    original.run_sweeps_with_threads(5, 2).unwrap();
+    assert_eq!(resumed.snapshot_state(), original.snapshot_state());
+    let dense_after = resumed.dense.as_ref().unwrap();
+    assert_eq!(
+        (
+            dense_after.arena.regrets.as_ptr(),
+            dense_after.arena.regrets.len(),
+            dense_after.arena.regrets.capacity(),
+        ),
+        regrets_layout
+    );
+    assert_eq!(
+        (
+            dense_after.arena.strategy_sum.as_ptr(),
+            dense_after.arena.strategy_sum.len(),
+            dense_after.arena.strategy_sum.capacity(),
+        ),
+        strategy_layout
+    );
+    assert_eq!(dense_after.arena.touched_storage_layout(), touched_layout);
+    assert_eq!(resumed.policy_arena_allocation().unwrap(), allocation);
+}
+
+#[test]
+fn production_resume_rejects_duplicate_dense_checkpoint_entries() {
+    let mut original = dense_vector_toy_solver(920, 1);
+    original.run_sweeps_with_threads(2, 1).unwrap();
+    let state = original.snapshot_state();
+    assert!(!state.histories.is_empty());
+    assert!(!state.policies.is_empty());
+
+    let mut duplicate_history = state.clone();
+    duplicate_history
+        .histories
+        .push(duplicate_history.histories[0].clone());
+    let config = duplicate_history.config;
+    assert!(matches!(
+        MultiwaySolver::from_state_with_config_preallocated(
+            DenseToyGame,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            duplicate_history,
+            config,
+        ),
+        Err(SolverError::DuplicateHistory(_))
+    ));
+
+    let mut duplicate_policy = state;
+    duplicate_policy
+        .policies
+        .push(duplicate_policy.policies[0].clone());
+    let config = duplicate_policy.config;
+    assert!(matches!(
+        MultiwaySolver::from_state_with_config_preallocated(
+            DenseToyGame,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            duplicate_policy,
+            config,
+        ),
+        Err(SolverError::DuplicatePolicy(_))
+    ));
+}
+
+#[test]
 fn street_recall_preflight_fails_before_allocating_when_memory_limit_is_tiny() {
     let result = MultiwaySolver::new(
         DenseToyGame,
@@ -1774,6 +2444,41 @@ fn street_recall_preflight_fails_before_allocating_when_memory_limit_is_tiny() {
     assert!(matches!(
         error,
         SolverError::Tree(TreeError::MemoryLimit { .. })
+    ));
+}
+
+#[test]
+fn production_preallocation_obeys_the_exact_arena_byte_boundary() {
+    let measured = crate::tree::preflight_arena(&DenseToyGame, u64::MAX).unwrap();
+    let build = |max_memory_bytes| {
+        MultiwaySolver::new_preallocated(
+            DenseToyGame,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            SolverConfig {
+                seed: 1,
+                max_memory_bytes,
+                max_traversal_depth: 16,
+                exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
+                discount_every: DEFAULT_DISCOUNT_EVERY,
+                discount_until: DEFAULT_DISCOUNT_UNTIL,
+                sweep_batch: 1,
+                traverser_vector: false,
+                prune: false,
+                prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+                prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
+            },
+        )
+    };
+
+    let exact = build(measured.estimated_arena_bytes).unwrap();
+    let allocation = exact.policy_arena_allocation().unwrap();
+    assert_eq!(allocation.bytes, measured.estimated_arena_bytes);
+    assert!(allocation.pages_committed);
+    assert_eq!(exact.completed_sweeps(), 0);
+
+    assert!(matches!(
+        build(measured.estimated_arena_bytes - 1),
+        Err(SolverError::Tree(TreeError::MemoryLimit { .. }))
     ));
 }
 
@@ -1908,6 +2613,36 @@ fn street_recall_checkpoint_round_trip_and_resume() {
 }
 
 #[test]
+fn abstraction_fingerprint_domain_separates_street_recall() {
+    let backend = DenseToyGame.abstraction_fingerprint();
+    assert_eq!(backend, [0; 32]);
+
+    let street = dense_toy_solver(55, 1);
+    assert_ne!(street.abstraction_fingerprint(), backend);
+
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory.path().join("street-recall.mwckpt");
+    crate::checkpoint::MultiwayCheckpoint::capture(&street)
+        .write_atomic(&path)
+        .unwrap();
+    assert!(matches!(
+        crate::checkpoint::MultiwayCheckpoint::load(
+            &path,
+            street.configuration_fingerprint(),
+            backend,
+        ),
+        Err(crate::checkpoint::CheckpointError::AbstractionMismatch)
+    ));
+
+    let full = solver(55, 64 * 1024 * 1024);
+    assert_eq!(
+        full.abstraction_fingerprint(),
+        full.game().abstraction_fingerprint(),
+        "full recall must keep the historical backend fingerprint"
+    );
+}
+
+#[test]
 fn street_recall_discount_fires_and_matches_sparse_arithmetic() {
     // Same seed/game/config shape as `batched_discount_scales_regret_and_strategy_at_cadence`.
     let mut solver = dense_dominated_solver(1);
@@ -2029,7 +2764,7 @@ fn street_recall_holdem_game_reaches_every_street_without_error() {
     )
     .unwrap();
     let sampler = game.deal_sampler().unwrap();
-    let mut solver = MultiwaySolver::new(
+    let mut solver = MultiwaySolver::new_preallocated(
         game,
         sampler,
         SolverConfig {
@@ -2047,7 +2782,78 @@ fn street_recall_holdem_game_reaches_every_street_without_error() {
         },
     )
     .unwrap();
+    let allocation_before = solver.policy_arena_allocation().unwrap();
+    assert!(allocation_before.pages_committed);
+    assert_eq!(solver.completed_sweeps(), 0);
+    let dense_before = solver.dense.as_ref().unwrap();
+    assert!(
+        dense_before
+            .tree
+            .nodes
+            .iter()
+            .any(|node| node.street == Street::Flop)
+    );
+    assert!(
+        dense_before
+            .tree
+            .nodes
+            .iter()
+            .any(|node| node.street == Street::Turn)
+    );
+    assert!(
+        dense_before
+            .tree
+            .nodes
+            .iter()
+            .any(|node| node.street == Street::River)
+    );
+    let mut postflop_nodes = [0u64; 3];
+    let mut postflop_slots = 0u64;
+    for (node_index, node) in dense_before.tree.nodes.iter().enumerate() {
+        if node.street == Street::Preflop {
+            continue;
+        }
+        postflop_nodes[node.street.index() - 1] += 1;
+        let node_id = node_index as NodeId;
+        let expected_buckets = solver
+            .game
+            .bucket_count(node.street, node.bucket_active_opponents);
+        assert_eq!(
+            dense_before.arena.bucket_count_of(node_id),
+            expected_buckets
+        );
+        for bucket in 0..expected_buckets {
+            let slots = dense_before.arena.slot_range(node_id, bucket).unwrap();
+            assert_eq!(slots.len(), node.action_labels.len());
+            postflop_slots += slots.len() as u64;
+        }
+    }
+    assert!(
+        postflop_nodes.iter().all(|&count| count > 0),
+        "every postflop street must have preallocated public nodes: {postflop_nodes:?}"
+    );
+    assert!(postflop_slots > 0);
+    assert_eq!(dense_before.arena.touched_count(), 0);
+    let regrets_ptr = dense_before.arena.regrets.as_ptr();
+    let strategy_ptr = dense_before.arena.strategy_sum.as_ptr();
+    let (touched_ptr, touched_len, touched_capacity) = dense_before.arena.touched_storage_layout();
+    let regrets_len = dense_before.arena.regrets.len();
+    let strategy_len = dense_before.arena.strategy_sum.len();
+    let regrets_capacity = dense_before.arena.regrets.capacity();
+    let strategy_capacity = dense_before.arena.strategy_sum.capacity();
     solver.run_sweeps_with_threads(200, 4).unwrap();
+    let dense_after = solver.dense.as_ref().unwrap();
+    assert_eq!(dense_after.arena.regrets.as_ptr(), regrets_ptr);
+    assert_eq!(dense_after.arena.strategy_sum.as_ptr(), strategy_ptr);
+    assert_eq!(
+        dense_after.arena.touched_storage_layout(),
+        (touched_ptr, touched_len, touched_capacity)
+    );
+    assert_eq!(dense_after.arena.regrets.len(), regrets_len);
+    assert_eq!(dense_after.arena.strategy_sum.len(), strategy_len);
+    assert_eq!(dense_after.arena.regrets.capacity(), regrets_capacity);
+    assert_eq!(dense_after.arena.strategy_sum.capacity(), strategy_capacity);
+    assert_eq!(solver.policy_arena_allocation().unwrap(), allocation_before);
 
     let snapshot = solver.snapshot_state();
     assert!(!snapshot.policies.is_empty());
