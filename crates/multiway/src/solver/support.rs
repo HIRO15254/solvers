@@ -50,6 +50,9 @@ pub(super) fn validate_setup<G: ExternalSamplingGame>(
         if !config.traverser_vector {
             return Err(SolverError::PruneRequiresVector);
         }
+        if matches!(game.recall_mode(), RecallMode::Full) {
+            return Err(SolverError::PruneRequiresStreetRecall);
+        }
         if !config.prune_threshold.is_finite() || config.prune_threshold >= 0.0 {
             return Err(SolverError::PruneThresholdNotNegative(
                 config.prune_threshold,
@@ -186,6 +189,7 @@ pub(super) fn validate_history_entry(
     Ok(())
 }
 
+#[cfg(any(feature = "research-abstractions", test))]
 pub(super) fn validate_history_graph(
     histories: &FxHashMap<HistoryKey, HistoryEntry>,
 ) -> Result<(), SolverError> {

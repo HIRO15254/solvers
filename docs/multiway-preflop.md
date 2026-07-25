@@ -1,29 +1,32 @@
 # Multiway preflop and blueprint solver
 
-> **Current implementation reference.** The approved target specification for
-> Multiway Preflop CLI v1 is `docs/multiway-preflop-cli-spec.jp.md`. During the
-> migration, use this document to explain the existing binary and the v1 spec
-> as the implementation target.
+> **Implementation reference.** The production release contract is
+> `docs/multiway-preflop-cli-spec.jp.md`. The default release binary fixes the
+> abstraction to EHS2/current-street and allocates and page-touches the full
+> policy arena before sweep 0. Rollout/full-recall material retained below is
+> historical and research-build documentation, not a production option.
 
 For a conceptual overview of what this solver computes and why (in
 Japanese), see `docs/preflop-solver-overview.md`; this document is the
 current-behavior reference. A Japanese translation of this reference is maintained
 at `docs/multiway-preflop.jp.md`.
 
-A runnable 9-max BBA/ICM configuration is in
-`examples/preflop_multiway_9max.toml`:
+Generate a canonical production v1 configuration with the CLI:
 
 ```sh
-cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
-  --output result.json --metrics metrics.jsonl \
-  --checkpoint solve.mwckpt --sol solve.mwsol
+cargo run -p cli --release -- config new --template full --out solve.toml
+cargo run -p cli --release -- solve solve.toml --out run
 ```
+
+`examples/preflop_multiway_9max.toml` is a Bridge compatibility envelope, not
+a direct production CLI input.
 
 The multiway path solves two through nine dealt seats without changing the
 exact heads-up vector engine.  It is a sampled, generative NLHE game: every
 traversal draws one physical set of disjoint hole cards and a shared five-card
-runout, reveals the board street by street, and stores policy only for the
-abstract observations that were visited.
+runout and reveals the board street by street. Production allocates policy for
+every reachable public node × current-street bucket × action before sweep 0,
+then updates the columns visited by sampled traversals.
 
 ## Correctness boundary
 
@@ -52,6 +55,21 @@ river each have independent bet sizes, raise sizes, aggressive-action caps,
 and all-in switches.  A seat may replace the complete table betting profile.
 If an older config omits `isolate_sizes`, the table reuses `bet_sizes` for
 backward compatibility.
+
+`BettingConfig.allow_limp = false` removes only an unopened voluntary call of
+the nominal big-blind price; calls after an open remain legal unless a tree
+rule removes them. The public state also records a serde-defaulted mask of
+seats that have voluntarily called or acted aggressively preflop and the
+number of first-time, non-BB callers of the open. Forced blinds and antes
+never enter either value, and BB defence is deliberately excluded from the
+open-cold-call count.
+
+Tree-rule conditions expose those values as `preflop_participant` and
+`open_cold_calls`. `in_position_to_last_aggressor` is a separate preflop
+boolean comparing the actor with the immediately preceding raiser in fixed
+postflop action order. It is false without a preceding raiser or when both
+seats are the same. The older `in_position` selector is unchanged: preflop it
+means BTN, while postflop it means the last acting non-folded seat.
 
 ### Size vocabulary
 
@@ -82,6 +100,19 @@ because it is folding an already-proposed sized target into the all-in
 rather than proposing a new action. Duplicate targets (e.g. a merged size and
 the native `include_allin` entry) are deduplicated, so the seat sees exactly
 one all-in action. Configs that omit `allin_threshold` are unaffected.
+
+`StreetBettingConfig.reraise_jam_above_actor_starting_stack` is a separate,
+exact rational merge for preflop re-raises. It accepts
+`StackRatio { numerator, denominator }` with
+`0 < numerator / denominator <= 1`. For a normal size at the 3bet or later,
+the target is first resolved through the minimum-raise and actor stack caps.
+The implementation then compares integers and replaces it with all-in iff
+`target * denominator > actor_hand_start_stack * numerator`. Equality does
+not merge: the normal target and any separately configured, legal, distinct
+explicit all-in both remain. Explicit `AllIn` sizes are not transformed, and
+final chip targets are deduplicated. This option is rejected outside preflop
+and cannot be combined with the inclusive, effective-all-in-based
+`allin_threshold`.
 
 ### Check-down thresholds (`max_betting_players`)
 
@@ -160,20 +191,28 @@ Larger fields are rejected.
 
 ## Abstraction and reproducibility
 
+The production release fixes card abstraction to EHS2 percentile and recall
+to current-street. Explicit `kind = "ehs2-percentile"` is a migration guard:
+older v1 omission meant rollout and must not be silently reinterpreted. The
+rollout/full-recall descriptions below document research and historical
+artifact semantics.
+
 Preflop observations use the 169 conventional classes. Postflop observations
 are clustered separately for one through eight active opponents using expected
-pot share, its second moment, and scoop/tie probabilities.  Information sets
-retain the complete bucket path.  The artifact seed, rollout parameters,
-rules, and centroids form a fingerprint checked by caches and checkpoints.
+pot share, its second moment, and scoop/tie probabilities. Full recall retains
+the complete bucket path; street recall retains only the current bucket. The
+artifact seed, rollout parameters, and centroids form an abstraction
+fingerprint checked by caches and checkpoints. Public table/range/tree/economics
+rules form the separate game fingerprint.
 
-### Abstraction backends (`game.abstraction.kind`)
+### Research/historical abstraction backends (`game.abstraction.kind`)
 
-`kind` selects the postflop card-abstraction backend. It defaults to
-`"rollout-kmeans"` and is omitted from a config's serialized identity (and
-therefore its game fingerprint) whenever it is `"rollout-kmeans"`, so every
-config written before this option existed is unaffected byte-for-byte.
+In the research/legacy config, `kind` selects the postflop card-abstraction
+backend. Its historical default is `"rollout-kmeans"`, omitted from serialized
+legacy configs at that value so older bytes remain unchanged. Card abstraction
+is deliberately excluded from the game fingerprint regardless of backend.
 
-- **`"rollout-kmeans"` (default).** The trained rollout/k-means abstraction
+- **`"rollout-kmeans"` (legacy research default).** The trained rollout/k-means abstraction
   described below: opponent-count-aware, with solve-time Monte Carlo bucket
   assignment that is memoized (per canonical situation) and persisted to
   `artifact_cache` after a solve.
@@ -196,12 +235,13 @@ config written before this option existed is unaffected byte-for-byte.
     conditioning, no scoop/tie modeling) -- it is a cheaper, zero-Monte-Carlo
     alternative, not a strictly better abstraction.
 
-Switching `kind` changes the abstraction fingerprint (naturally -- the two
-backends produce different buckets from the same board), so a checkpoint or
-`.mwsol` built under one backend is not resumable under the other, the same
-way a changed bucket count already isn't.
+Switching `kind` keeps the game fingerprint stable but changes the abstraction
+fingerprint (naturally -- the two backends produce different buckets from the
+same board), so a checkpoint or `.mwsol` built under one backend is not
+resumable under the other. Cross-abstraction solution comparison therefore
+uses shared real-card samples rather than directly equating bucket IDs.
 
-### v2 rollout: one sample stream per board
+### Research-only v2 rollout: one sample stream per board
 
 Every postflop bucket lookup canonicalizes `(street, active_opponents, hole,
 board)` to a suit-isomorphism-minimal key. That key is now **board-major**:
@@ -243,57 +283,71 @@ artifact is not a hard error: the CLI (and any caller going through
 `build_multiway_session`) prints a warning to stderr, retrains from
 scratch, and overwrites the file with a fresh version-3 artifact.
 
-### Recall mode and the policy memory model (`game.abstraction.recall`)
+### Research/historical recall modes and the policy memory model
 
-`recall` selects how private information keys the solver's policy storage.
-It defaults to `"full"` and is omitted from a config's serialized identity
-(and therefore its game fingerprint) whenever it is `"full"`, so every config
-written before this option existed is unaffected byte-for-byte. Setting
-`recall = "street"` **does** change the game fingerprint: a Street-recall
-checkpoint/`.mwsol` is not interchangeable with the Full-recall run of the
-same table, and resuming across the two is rejected the same way a changed
-betting tree or bucket count would be.
+In the research/legacy config, `recall` selects how private information keys
+policy storage. Its historical default is `"full"`, omitted from serialized
+legacy configs at that value. Recall is deliberately excluded from the game
+fingerprint, so the same table/ranges/tree/economics stays the same game across
+both modes. Compatibility is enforced by the abstraction fingerprint instead:
+full recall preserves the historical backend fingerprint, while street recall
+domain-separates it. Resuming across modes is rejected, and solution comparison
+uses shared real-card samples rather than directly equating their private
+bucket keys. A street-recall checkpoint written before this domain separation
+also fails resume explicitly; legacy solutions remain readable and compare
+through the embedded-recall/real-card path.
 
-- **`"full"` (default): sparse, full recall.** A `HashMap<InfoKey,
+- **`"full"` (legacy research default): sparse, full recall.** A `HashMap<InfoKey,
   PolicyColumn>` entry is created the first time a `(public history, player,
   bucket path through every already-reached street)` triple is visited.
   Memory therefore grows with the number of *distinct visited* information
   sets — unbounded in principle, and in practice proportional to sweep count
   until the abstraction/tree is exhausted (measured: ~122 MiB at 4,096
   sweeps growing to ~3.4 GiB by 196k sweeps on a 6-max 64-bucket table). This
-  is today's behavior, unchanged.
+  is retired research behavior, not the production storage contract.
 - **`"street"`: dense, street (imperfect) recall.** Private information is
   keyed by *only* the current street's bucket — the Monker/Pluribus
   convention: earlier streets are never revisited (a speed bonus, since
   their buckets need not even be recomputed) and never appear in the key,
   trading finer strategy conditioning for a hard memory bound. At solver
-  construction (or checkpoint resume), the *entire* public betting tree is
-  enumerated once (no card dependence: chance is already sampled once,
-  outside the public tree) and a single contiguous, node-major
-  `[node][bucket][action]` arena of `f32` regrets and strategy sums is
-  preallocated for every information set the tree can ever reach — touched
-  or not. Memory is therefore **fixed** for the run's lifetime: it is
-  computed and checked against `run.max_memory_bytes` *before* the (usually
-  multi-gigabyte) arena is allocated, so an oversized tree/abstraction fails
-  fast with a typed error naming the node/column counts and the estimated
-  byte count, instead of growing until it hits (or blows through) the
-  process's memory budget. `infosets` in the metrics stream reports the
-  *touched* column count (a running counter, cheap to read), while
-  `memory_bytes` reports the constant preflight estimate rather than a
-  running total.
-- **Tradeoff.** Street recall bounds memory and is faster per traversal (no
+  construction (or checkpoint resume), a non-retaining count-only census
+  first walks the deterministic public betting tree
+  (no card dependence: chance is already sampled once outside it). For every
+  node it accumulates buckets and actions for the dense arena and stops at the
+  first prefix whose estimate strictly exceeds `run.max_memory_bytes`. Only a
+  completed census is followed by materializing the public tree and fallibly
+  allocating a single contiguous, node-major
+  `[node][bucket][action]` arena of `f32` regrets and strategy sums for every
+  information set the tree can ever reach — touched or not. The production
+  constructor volatile-writes every page of the regret, strategy-sum, and
+  touched-bit buffers before returning the session. The
+  **policy arena** is therefore fixed for the run's lifetime: it
+  includes two `f32` arrays per action slot, one touched bit per column, and
+  the dense index tables. An oversized arena fails with a typed error naming
+  the first exceeding node prefix, column count, configured limit, and
+  estimated bytes. This is not a process-RSS cap: the materialized public
+  tree/history index, abstraction/cache, worker scratch, evaluation,
+  checkpoint staging, and allocator overhead require additional memory.
+  There is no fixed 50-million-node production cap; a caller-supplied node
+  limit is only a benchmark checkpoint, while the `u32` `NodeId` width remains
+  a representation limit.
+  `infosets` in the metrics stream reports the *touched* column count (a
+  running counter, cheap to read), while `memory_bytes` reports the constant
+  arena estimate rather than total RSS.
+- **Historical tradeoff.** Street recall bounds memory and is faster per traversal (no
   earlier-street bucket recomputation, no per-node hash-map bookkeeping), at
   the cost of coarser, imperfect-recall strategy conditioning — the same
-  simplification production solvers like Monker/Pluribus use. Whether that
-  costs meaningfully more regret depends on the abstraction and betting tree;
-  measure it for a given table rather than assuming either mode dominates.
+  simplification used by solvers such as Monker/Pluribus. The production
+  binary no longer exposes this recall choice: it requires street recall and
+  rejects full recall with `MWP002`.
   Because the arena is sized from the *full* enumerated public tree (not
   just its typical playout), a rich betting tree (many bet/raise sizes, high
   `max_aggressive_actions`, many seats) can make `"street"` mode's
-  preallocation infeasible even when `"full"` mode comfortably fits in the
-  same memory budget for a normal number of sweeps; the fix is the same one
-  the preflight error suggests — shrink the betting tree (fewer sizes, lower
-  aggressive-action caps) or bucket counts, or stay on `"full"`.
+  preallocation infeasible even when historical sparse `"full"` mode fit for a
+  bounded number of sweeps. Production must fail before sweep 0; the operator
+  may explicitly shrink the betting tree or bucket counts, or raise the arena
+  budget while separately preserving the process-RSS boundary. It must not
+  fall back to `"full"`.
 
 Deal, action, and evaluation random streams are derived independently from the
 base seed, deterministic sample ID, traverser, and sample purpose. Checkpoints
@@ -332,18 +386,17 @@ once per sweep, so `should_continue` granularity coarsens to whole batches.
 ### Vector-traverser sampling (`algorithm.traverser_vector`)
 
 Ordinary external sampling updates exactly one hand per traversal: the
-traverser's own dealt combo. `algorithm.traverser_vector = true` (only valid
-with `recall = "street"`; rejected with a typed error under `"full"`, since it
-needs the dense arena's precomputed tree) instead updates *every feasible
-hole combo* of the sampled traverser seat in one traversal, against the same
-sampled opponents and board. "Feasible" means positive weight in the
-traverser's configured range and disjoint from every other seat's sampled
-hole cards and the sampled board — everything else about the deal stream
-(including exactly which combo the sampler happened to deal the traverser)
-is unchanged, so switching this on does not change the RNG consumption or
-which worlds get sampled.
+traverser's own dealt combo. `algorithm.traverser_vector = true` instead
+updates *every feasible hole combo* of the sampled traverser seat against the
+same sampled opponents and board. It supports both recall modes, but through
+different implementations: `recall = "street"` uses the optimized dense
+vector worker described below, while `"full"` preserves the whole bucket path
+by running one weighted sparse scalar traversal per feasible combo. "Feasible"
+means positive weight in the traverser's configured range and disjoint from
+every other seat's sampled hole cards and the sampled board.
 
-- **Why it's faster.** The tree is still walked exactly once per traversal;
+- **Why the dense path is faster.** Under street recall, the tree is walked
+  exactly once per traversal;
   only the traverser's own decision nodes do more work (one action
   exploration per node, same as today, but every child value is now a vector
   over the feasible combos instead of a scalar). Terminal evaluation for a
@@ -351,7 +404,7 @@ which worlds get sampled.
   (`settle_ranked`) once per feasible combo instead of building an entire
   second traversal, so the speedup comes from amortizing the walk itself, not
   from a cheaper per-combo evaluation.
-- **Bucket aggregation.** At a traverser decision node, each feasible combo
+- **Dense-path bucket aggregation.** At a traverser decision node, each feasible combo
   `h` maps to a per-street abstraction bucket `B(h)` (preflop: the 169-class
   index). The regret matching strategy is looked up once per *distinct*
   bucket reached by the vector (not once per combo). The regret added to
@@ -362,7 +415,7 @@ which worlds get sampled.
   Buckets with no feasible member simply never appear and get no update.
   This matches the ordinary scalar external-sampling update in expectation
   over which combo actually gets dealt to that bucket.
-- **Average strategy is dense too.** Unlike scalar external sampling (which
+- **The dense-path average strategy is dense too.** Unlike scalar external sampling (which
   only adds to `strategy_sum` at opponent nodes, on the seat's single sampled
   hand), vector mode accumulates the average strategy at *traverser* nodes,
   over every feasible combo: bucket `b`'s column gets
@@ -406,7 +459,7 @@ which worlds get sampled.
   random numbers), so `ci95` measures the error of the utility difference
   actually consumed by MCCFR. `samples` controls this deterministic,
   seed-reproducible approximation.
-- **Rollout-abstraction batching.** A vector traversal needs a bucket for
+- **Rollout-abstraction batching.** A dense street-recall vector traversal needs a bucket for
   every feasible combo instead of just one, so the vector-traverser path
   calls `MultiwayAbstraction::bucket_batch` (via
   `ExternalSamplingGame::buckets_for_combos`) once per node instead of
@@ -417,7 +470,8 @@ which worlds get sampled.
   rollout: one sample stream per board" above. This is what makes
   `traverser_vector` mode's dominant cost (previously ~99% cold-rollout
   Monte Carlo) amortize across the ~hundreds of feasible combos sharing a
-  board instead of re-paying it per combo.
+  board instead of re-paying it per combo. The full-recall sparse fallback
+  does not use this batch path and can therefore be substantially slower.
 - **Assignment cache growth and the persist cap.** The memoized
   `(RolloutKey -> BucketId)` assignment cache still grows with the number of
   distinct canonical keys visited, and a wide vector-traverser run visits
@@ -433,8 +487,8 @@ which worlds get sampled.
 
 ### Regret-based pruning (`algorithm.prune`)
 
-Pluribus-style regret-based pruning (RBP), only meaningful in
-`traverser_vector` mode: at a traverser decision node, a (bucket, action)
+Pluribus-style regret-based pruning (RBP), implemented only by the dense
+street-recall `traverser_vector` worker: at a traverser decision node, a (bucket, action)
 pair becomes a *pruning candidate* once its regret-matched probability is
 exactly zero and its accumulated regret has fallen far below a threshold.
 Rather than descending into every prunable action's subtree on every
@@ -448,9 +502,15 @@ recovering action climb back out of pruning.
 Three `[algorithm]` keys control it, all optional:
 
 - `prune` (bool, default `false`): enables the feature. Only valid together
-  with `traverser_vector = true` — the CLI (`cli::session`) rejects `prune =
-  true` with `traverser_vector = false` before ever building the game, and
-  the engine (`SolverConfig::validate_setup`) rejects it too as a backstop.
+  with `traverser_vector = true` and `recall = "street"` — the CLI rejects
+  either unsupported combination before solving, and the engine
+  (`SolverConfig::validate_setup`) returns a typed error as a backstop.
+  `recall = "full"` uses the sparse fallback and therefore requires
+  `prune = false`; pruning is never silently ignored.
+  Solution readers preserve older full-recall artifacts that recorded
+  `prune = true` by replaying that historically unused bit as `false`.
+  Self-contained checkpoints with that combination are not resumed until an
+  explicit fingerprint-preserving offline migration exists.
 - `prune_threshold` (float, no static default): the regret floor below which
   a zero-probability action becomes prunable. When `prune = true` and this
   key is omitted, it is derived from the game's stakes: `-10.0 *` the sum

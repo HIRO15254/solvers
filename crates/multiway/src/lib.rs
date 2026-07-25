@@ -1,8 +1,11 @@
 //! Sampled multiway NLHE solving for two through nine table seats.
 //!
 //! This crate is deliberately separate from the exact heads-up vector
-//! engine.  It samples one physical card world shared by every seat, keeps
-//! public betting history lazily, and stores only visited strategy buckets.
+//! engine. It samples one physical card world shared by every seat.
+//! Production uses current-street recall and allocates the complete public
+//! tree × bucket × action policy arena before sweep 0; the optional
+//! `research-abstractions` feature retains historical sparse/full-recall and
+//! rollout experimentation paths.
 
 pub mod abstraction;
 pub mod betting;
@@ -38,9 +41,12 @@ pub use icm::{IcmDeltaEstimate, IcmError, IcmEstimate, IcmMode, estimate_icm, te
 pub use sampler::{CountedSample, DealSampler, SampleError, SampledWorld, SamplingDiagnostics};
 pub use settlement::{PotLayer, Settlement};
 pub use solver::{
-    ActionProbability, DenseNodeContext, DeviatorPolicy, ExternalSamplingGame, HistoryEntry,
-    HistoryKey, InfoKey, MultiwaySolver, PolicyColumn, PolicyEntry, PrivateInfo, ProfileEstimate,
-    ProfileEvaluation, ProfileVariant, SolverConfig, SolverError, SolverMetrics, SolverState,
+    ActionProbability, CandidatePolicyCoverage, DenseNodeContext, DeviatorPolicy,
+    DeviatorTrainingCoverage, DeviatorTrainingResult, ExternalSamplingGame, HistoryEntry,
+    HistoryKey, InfoKey, MultiwaySolver, PolicyArenaAllocation, PolicyColumn, PolicyEntry,
+    PrivateInfo, ProfileEstimate, ProfileEvaluation, ProfileVariant, ReferenceDeviationCoverage,
+    ReferenceDeviationEvaluation, ReferenceDeviationWorld, SolverConfig, SolverError,
+    SolverMetrics, SolverState, StreetVisitCounts, abstraction_fingerprint_with_recall,
 };
 pub use tree::{PublicTree, TreeError};
 pub use types::{MwChips, SeatId, SeatMask, SeatVec, Street};

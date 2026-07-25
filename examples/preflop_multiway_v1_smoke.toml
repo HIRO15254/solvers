@@ -1,3 +1,6 @@
+# Research fixture only: exercises the retired multiway-rollout decoder.
+# The production `validate`/`solve` commands reject it with MWP001.
+
 schema = "solvers.multiway-preflop/v1"
 
 [game]

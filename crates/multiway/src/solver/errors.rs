@@ -10,6 +10,11 @@ pub enum SolverError {
     SamplerPlayerCount { game: usize, sampler: usize },
     #[error("memory limit must be positive")]
     ZeroMemoryLimit,
+    #[error(
+        "preallocated production storage requires current-street recall; \
+         bucket-history/full recall grows sparse policy state during the solve"
+    )]
+    PreallocatedStorageRequiresStreetRecall,
     #[error("traversal depth limit must be positive")]
     ZeroDepthLimit,
     #[error("exploration epsilon must be finite and in [0, 1], found {epsilon}")]
@@ -85,13 +90,13 @@ pub enum SolverError {
     UnmappedDenseEntry { key: InfoKey },
     #[error("dense history entry {0:?} does not match the enumerated public tree")]
     UnmappedDenseHistory(HistoryKey),
-    #[error(
-        "SolverConfig::traverser_vector requires recall = \"street\" (the dense arena); the \
-         current game uses RecallMode::Full"
-    )]
-    VectorTraverserRequiresStreetRecall,
     #[error("SolverConfig::prune requires SolverConfig::traverser_vector to be true")]
     PruneRequiresVector,
+    #[error(
+        "SolverConfig::prune requires RecallMode::Street; the full-recall sparse vector worker \
+         does not implement regret-based pruning"
+    )]
+    PruneRequiresStreetRecall,
     #[error("prune threshold must be finite and strictly negative, found {0}")]
     PruneThresholdNotNegative(f64),
     #[error("prune skip probability must be finite and in [0, 1], found {0}")]

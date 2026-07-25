@@ -2,6 +2,7 @@
 
 Status: **承認済み・実装基準**  
 確定日: 2026-07-21  
+Production abstraction contract更新: 2026-07-25
 Schema: `solvers.multiway-preflop/v1`
 
 この文書は Multiway Preflop Solver CLI の次期 v1 に対する正本である。
@@ -20,8 +21,10 @@ Schema: `solvers.multiway-preflop/v1`
 - 精算は抽象bucketではなく、sampleされた実カード、正確なhand rank、refund、
   main/side potで行う。
 - 通常利用の正式戦略はLinear average strategyだけである。
-- 実験機能は `solvers experiment` 以下に隔離し、通常configや正式solutionの意味を
-  増やさない。
+- production releaseはdefault featureでbuildし、`solvers experiment` namespaceから
+  rollout/full-recallへ到達できない。再現実験用buildだけが明示
+  `--features research`でそれらを有効化できる。productionと同じtarget pathへ
+  上書きせず、`CARGO_TARGET_DIR=target/research-release`へ分離する。
 - v1 parserはunknown field、無意味な組合せ、表現不能な数値を警告ではなくerrorにする。
 
 ## 1. Table、seat、range
@@ -121,6 +124,13 @@ blind_bb = 0.0       # explicit zero disables the derived SB for this seat
 ```toml
 [game.tree]
 kind = "standard"       # default
+allow_limp = false      # optional。省略時はgeneric defaultを維持
+
+[game.tree.max_aggressive_actions]
+preflop = 6
+flop = 4
+turn = 4
+river = 4
 ```
 
 ```toml
@@ -128,10 +138,28 @@ kind = "standard"       # default
 kind = "script"
 source = "trees/short-stack.mwtree"
 params = { open = "2.2x", jam_spr = 0.8 }
+allow_limp = false
+
+[game.tree.max_aggressive_actions]
+preflop = 6
+flop = 4
+turn = 4
+river = 4
 ```
 
 どちらも同じversioned `TreeRuleProgram`へcompileする。fingerprintは入力テキストや
 記述順ではなく、正規化したIRから作る。旧 `[game.betting.*]` schemaは削除する。
+両frontendは同じoptionalな`allow_limp`、street別`max_aggressive_actions`、
+`reraise_jam_above_actor_starting_stack`を持ち、scriptをeffective configへ展開しても
+これらを保持する。省略時は従来のgeneric standard defaultを変えない。
+
+`max_aggressive_actions`を指定する場合は`preflop`、`flop`、`turn`、`river`の4値を
+すべて指定する。`reraise_jam_above_actor_starting_stack`は
+`{ numerator = N, denominator = D }`という正の整数比で、`0 < N/D <= 1`を満たす
+必要がある。preflopの3bet以降に限り、normal targetをmin-raiseとactor stack capで
+解決した後、`target * D > actor hand-start stack * N`ならそのnormal sizeをall-inへ
+置換する。等号では置換せず、menuに明示all-inがあればnormal sizeとそのall-inの
+両方を残す。stack capやall-in置換後に同じchip targetとなるactionは1つへdedupする。
 
 ### 3.2 Standard default
 
@@ -146,6 +174,10 @@ params = { open = "2.2x", jam_spr = 0.8 }
 - postflopのaggressive actionはstreetごとに最大3回。
 - donk betを許可。
 - player数による暗黙checkdownはしない。
+
+これは汎用solverの既定であり、benchmark固有Treeではない。limp禁止、street別cap、
+position/participant/cold-call制約、strict starting-stack jam境界は
+`[game.tree]`とtyped rulesで明示したconfigだけに適用する。
 
 同じrule modelで、street、position、IP/OOP、HU/MW、limper数、flat数、現在の
 aggression数、squeeze、c-bet、donk、SPRをselectorにできる。rule effectは
@@ -173,10 +205,19 @@ effect = "checkdown"
 - built-in default ruleのpriorityは0。user ruleの既定priorityは100。
 - `street`は`preflop|flop|turn|river|postflop`。
 - `action`は`fold|check|call|bet|raise`。`checkdown`では省略する。
-- `when`で使える値は`position`、`in_position`、`players`、`limpers`、`flats`、
-  `aggressions`、`unopened`、`squeeze`、`cbet`、`donk`、`spr`と、boolean/数値/文字列、
-  比較、`in`、`!`、`&&`、`||`、括弧だけ。
+- `when`で使える値は`position`、`in_position`、
+  `in_position_to_last_aggressor`、`preflop_participant`、`open_cold_calls`、
+  `players`、`limpers`、`flats`、`aggressions`、`unopened`、`squeeze`、`cbet`、
+  `donk`、`spr`と、boolean/数値/文字列、比較、`in`、`!`、`&&`、`||`、括弧だけ。
 - 同じpriorityは記述順、異なるpriorityは昇順に適用する。
+
+`in_position`の既存意味は変更しない。preflopではBTNかどうか、postflopでは残存seat中
+最後にactionするseatかどうかを表す。`in_position_to_last_aggressor`はpreflop専用で、
+直前raiserとの固定postflop action orderを比較する。直前raiserがいない場合とactor
+自身が直前raiserの場合はfalse。`preflop_participant`はforced blind/ante以外の
+callまたはaggressive actionをすでに行ったactorでtrueとなる。
+`open_cold_calls`はopenを最初のvoluntary actionとしてcallした非BB seat数であり、
+BB defenseは数えない。
 
 使用可能なsize primitiveは次に固定する。
 
@@ -290,59 +331,82 @@ seed = 11
 
 ## 5. Card abstraction and information
 
-### 5.1 Backend
+### 5.1 Production backend
 
 ```toml
 [game.abstraction]
-kind = "multiway-rollout"
-rollouts_per_state = 512
-seed = 0
+kind = "ehs2-percentile" # productionでは明示必須
 
 [game.abstraction.buckets]
 flop = 64
 turn = 64
 river = 64
 
-[game.abstraction.opponent_buckets]
-"1" = { flop = 128, turn = 128, river = 128 }
-
 [game.information]
-recall = "current-street"
+recall = "current-street" # optional。省略してもこの固定値
 ```
 
 - preflopは固定169 class。
-- 既定backendは`multiway-rollout`。
-- featureはexpected pot share、expected share squared、scoop probability、tie
-  probability。
-- opponent handはrange非依存のuniform legal dealからsampleする。戦略rangeを
-  abstraction trainingへfeedbackしない。
-- `rollouts_per_state`既定は**512**。正の`u32`を明示可能。
-- 512の根拠は
-  `docs/validation/multiway-rollout-samples-2026-07-21.md`。現行CLIの256と
-  internal default 10,000は移行時に統一する。
-- opponent keyはstreet開始時点のnon-folded opponent数（hero除外）。同じstreet中の
-  foldでbucketを切り替えない。
-- table上で到達可能なopponent数だけmodelを訓練する。
-- bucket数は正の`u32`。恣意的上限を置かず、memory/time preflightで可否を決める。
-- global bucket既定はflop/turn/riverすべて64。opponent overrideがないcountはglobal値を
-  使う。
+- production backendはuniform heads-up E[HS²] percentile tableだけである。全canonical
+  flop/turn/river boardとlegal hole-comboのassignmentをSolve開始前にbuildまたは
+  validated cacheからloadし、Solve中にstate-to-bucket mappingを追加しない。
+- `kind="ehs2-percentile"`は省略不可。v1で`kind`を省略した旧configは歴史的に
+  `multiway-rollout`を意味するため、同じbytesをEHS²へ黙って読み替えず`MWP001`で
+  拒否する。
+- flop/turn/river bucket数は引き続き設定可能で、既定は`64/64/64`。各値は正で現行
+  runtime幅へlower可能でなければならず、resource不足時もbucket数を自動縮小しない。
+- productionは`rollouts_per_state`、rollout `seed`、`training`、
+  `opponent_buckets`を`MWP001`で拒否する。
+- `[game.information]`を省略した場合もrecallは`current-street`固定。明示する場合に
+  許される値も`current-street`だけで、現在street bucketだけをinfoset keyへ入れる。
+  `bucket-history`、旧`full`/`street`、その他の値は`MWP002`で拒否する。
+- `MWP001`の根拠は、同bucket数のsolve-level比較でTournament rollout候補が両reference
+  のpoint estimateでEHS²に劣り、rollout referenceではrollout−EHS²が
+  `+0.131368`、paired 95% intervalも`[+0.019435,+0.229442]`でinferiorとなったこと、
+  Cash rollout候補がEHS²の約4倍
+  (`269.1s`対`65.8s`)を要し、river coverageも
+  `1369/1446 = 0.94675 < 0.95`でgate失敗したこと、およびassignment cacheが
+  Solve中に増えてsweep-0事前確保contractに反することである。
+- `MWP002`の根拠は、EHS² K64 full recallでもTournamentが
+  `3,695/10,000` sweeps・`12,952,950` infosets・peak RSS
+  `6,216,908,800` bytes (5.79 GiB)、Cashが`4,267/10,000` sweeps・
+  `14,662,363` infosets・peak RSS `6,859,571,200` bytes (6.39 GiB)でresource
+  limitに達し、固定arenaを事前確保するproduction contractを満たせなかったことである。
+- Solve中にbucket境界やcentroidを更新するdynamic reclusteringは、削除前にも
+  production optionとして実装されていない。retired rollout実装が行っていたのは
+  Solve前の固定centroid trainingと、Solve中のassignment memoizationであり、
+  clustering自体の更新ではない。
 
-`kind="ehs2-percentile"` は明示的な高速近似backendとして残す。これはuniform
-heads-up E[HS²] percentileであり、multiway opponent conditioning、scoop/tie featureを
-持たない。このbackendでrollout seed/sample/opponent overrideを指定した場合は無視せず
-errorにする。
+### 5.2 Preallocation、cache、fingerprint
 
-### 5.2 Recall and cache
-
-- `[game.information] recall="current-street"` が既定。現在street bucketだけでkeyする。
-- `recall="bucket-history"` は到達済みbucket pathを保持する。
-- 旧`full`/`street`名は削除する。
-- sparse/dense storageはrecallの意味ではないため、このsectionには置かない。
-- model cache（centroid等）とassignment cache（具体局面→bucket）は別の
-  content-addressed cacheとする。
+- productionはpolicy storageを`[public decision node][current-street bucket][action]`
+  のdense arenaとして構築する。preflight完了後にregret、strategy-sum、touched
+  bitsetをfallible allocationし、全bufferの全OS pageへwriteしてからだけsolverを返す。
+  このstartup barrierはnew solveとresumeの両方に適用し、完了時点はsweep 0より前、
+  したがって最初のsampled solve traversalがpostflopへ到達するより前である。
+- allocation失敗、arena byte上限超過、page-commit未完了ではSolveを開始しない。
+  sparse storageへのfallback、bucket数縮小、部分arenaでの開始は禁止する。
+- game fingerprintはtable/range/tree/economicsの同一性を表し、card abstraction backend、
+  bucket内容、固定recallを含めない。abstraction fingerprintはEHS² table format、
+  bucket数、`current-street` domainを含む。retired rollout/full fingerprintを
+  EHS²/current-streetへaliasまたは変換しない。
 - cache pathは運用設定でありgame fingerprintに含めない。検証済みcache内容の
-  fingerprintは含める。
+  fingerprintは含める。EHS² table cacheは全3 postflop streetを含み、retired rollout
+  cacheをEHS² cacheとして上書きしない。
 - `FeatureHash`はpublic backendから削除する。
+
+### 5.3 Migration error contract
+
+| code | productionで拒否する入力 | 必須の意味 |
+|---|---|---|
+| `MWP001` | rollout、`kind`省略、rollout-only field | EHS²を明示し、全assignmentをsweep 0前に固定する |
+| `MWP002` | bucket-history/full recall | current-streetの全policy arena事前確保を使う |
+| `MWP003` | schema v1ではないlegacy multiway solve/resume configまたはcheckpoint | v1へ移行する。retired実験の継続はresearch buildだけ |
+| `MWP004` | retired rollout/full artifactのlive再評価またはreal-card比較 | static readは可能。backend再構築はresearch buildだけ |
+
+旧config/checkpointを現行semanticsへ黙って変換してはならない。retired `.mwsol`の
+summary、tree、strategy、range、記録済みEVはproduction readerで静的に読めるが、
+live re-evaluationとretired backendを必要とするreal-card comparisonは`MWP004`とする。
 
 ## 6. Solver algorithm
 
@@ -366,19 +430,32 @@ kind = "regret-based"
 - `range-vector`が既定。1 traversalでdealt seatのrange vectorを更新する。小さな
   card-removal近似を意図的に含むため、solution metadataにguaranteeを明示する。
 - `single-hand`はvalidation/research用に残し、通常の推奨ではない。
-- 両solver kindは`current-street`と`bucket-history`を実装する。resource不足は
-  preflight errorであり、組合せ自体をsemantic errorにしない。
+- productionの情報状態は`current-street`固定であり、両solver kindとも同じ
+  dense policy arenaを使う。retired `bucket-history` workerへproduction
+  command/runtime pathから到達できない。
 - `opponent_exploration`既定0。0以上1以下の有限値として明示変更可能。
 - `batch_sweeps`は正の整数で変更可能、既定1。結果、fingerprint、checkpoint互換性に
   影響するためauto調整しない。
 - periodic discount既定は10,000 sweepsごと、10,000,000 sweepsまで。`kind="none"`
   も明示可能。
-- regret-based pruningは`range-vector`で既定on。thresholdはutility scaleの-10倍
-  （cashはtotal starting stacks、tournamentはtotal prize pool）から導出し、
-  5% revisitをformat/algorithm versionで固定する。通常configにthresholdやskip
-  probabilityを公開しない。`kind="none"`は可能。
+- regret-based pruningは`range-vector + current-street`で既定on。thresholdは
+  utility scaleの-10倍（cashはtotal starting stacks、tournamentはtotal prize
+  pool）から導出し、5% revisitをformat/algorithm versionで固定する。通常configに
+  thresholdやskip probabilityを公開しない。`kind="none"`は可能。
 - `single-hand`ではregret pruningを禁止する。
-- Dynamic pruning threshold、warm-start bucket ladder、VR-MCCFR、MMD/QREは削除。
+- retired full-recall solutionに歴史的な`regret-based` bitが残る場合でも、
+  production artifact readerは記録済みstrategy等を静的に読むだけで、そのalgorithm
+  を再開または再評価しない。live operationは`MWP004`、legacy resumeは`MWP003`で
+  拒否する。
+- 次の研究optionもproduction surfaceには戻さない。
+
+  | option | 現在の判断 |
+  |---|---|
+  | dynamic pruning threshold | 固定`-10× utility scale`と5% revisitは実測で3–4%改善したが、動的selectorの追加利益を示すvalidator-backed結果が残っていない |
+  | warm-start bucket ladder | coarse phaseが1.26倍にしかならず、別arenaへの移行・再訓練costを回収できなかった |
+  | VR-MCCFR baseline | baseline state/update costに見合うsolve-level改善がpromotionされなかった |
+  | MMD/QRE | 別のlast-iterate algorithm/solution semanticsを導入するだけのproduction収束証拠がなく、正式出力はLinear averageのままとする |
+  | automatic 4096-bucket preset | 200k sweepではbucket解像度よりsampling noiseが律速だった。bucket数field自体は保持し、対象Treeで非現実的な値はarena preflightで拒否する |
 - last iterateを正式solutionにしない。
 
 正式strategyは各infoset/actionの累積sampling weightで正規化したLinear average。
@@ -410,10 +487,34 @@ interval = "15m"
 
 - `threads="auto"` は `min(logical CPUs, seats * batch_sweeps)`。正の整数も指定可。
 - sample ID順のdeterministic mergeにより、thread数変更はresult bit patternを変えない。
-- `memory="auto"` は利用可能memoryのおよそ80%。`"12GiB"`等の明示値も可能。
-- CLI独自の2/4 GiB capは置かない。Bridge/service policyのcapはCLI仕様と分離する。
-- peak見積りはtree、policy/regret、abstraction cache、thread scratch、evaluation、
-  checkpoint stagingを含める。見積り超過はallocation前に失敗する。
+- productionの`memory="auto"`はpolicy arenaの
+  `6,442,450,944` bytes（6 GiB）へ決定的に解決する。明示値も6 GiB以下だけを
+  受理する。research buildのcompatibility decoderはhistorical値を維持する。
+- 6 GiBはarena payloadのproduction capであり、process RSS capではない。
+  Bridge/serviceも同じarena上限を使う。
+- 固定50M decision-node capは置かない。`u32`の`NodeId`表現限界はresource policyでは
+  なく、任意のnode checkpointはbenchmark callerが明示した場合だけ適用する。
+- `current-street`のdense workerは、full public treeやarenaを保持・確保する前に
+  count-only traversalを行う。各nodeのbucket/action数から、2本の`f32`
+  regret/strategy-sum配列、columnごとのtouched bit、dense index tableのbytesを
+  累積し、設定memoryを厳密に超える最初のprefixでtyped resource errorを返す。
+- preflight成功後はその全policy arenaをfallible allocationする。regret、
+  strategy-sum、touched bitの各bufferについて4 KiB以下の間隔でwriteし、最終要素も
+  writeして全OS pageを実際にfault-inする。`PolicyArenaAllocation`のnodes、columns、
+  slots、bytes、`pages_committed=true`を確認できるまでnew solve/resumeともsolverを
+  返さず、sweep 0および最初のsampled postflop traversalを開始しない。
+- `[run.resources].memory`はこのpolicy arena payloadに対する上限であり、process RSS
+  のhard capではない。materialized public tree/history index、EHS² table/cache、
+  thread scratch、evaluation、checkpoint staging、allocator overheadは別途memoryを
+  使う。8 GiB運用ではcgroup/containerまたは外部RSS watchdogで
+  `8,589,934,592` bytes以下を別に強制する。arena上限だけを「8 GiB RSS保証」と表示
+  してはならない。
+- `run.json`は`policyStorage =
+  "preallocated-all-current-street-buckets"`、`preallocatedNodes`、
+  `preallocatedColumns`、`preallocatedSlots`、`preallocatedBytes`、
+  `preallocatedPagesCommitted = true`、`policyArenaLimitBytes = 6442450944`を
+  記録する。production runでこの値を
+  research-compatible storageとして出力してはならない。
 
 ### 7.2 Operational completion criterion
 
@@ -481,7 +582,7 @@ my-run/
 - stop statusとquality/CI
 - 完全なpublic tree、各nodeの公開state、typed legal actions
 - visited infosetのaverage strategyとstrategy weight
-- recall/bucket metadata、abstraction modelまたはcontent-addressed rebuild情報
+- 固定`current-street`、bucket metadata、EHS² modelまたはcontent-addressed rebuild情報
 - seat EVとその推定品質
 
 actionは文字列をbucketごとに重複保存せず、decision nodeごとにtyped tableとして1回
@@ -510,6 +611,15 @@ probability_encoding = "u16"
 
 - `validate`: schema、数値、tree compile、abstraction到達数、memory、stop、fingerprint、
   output衝突をsolve前に検査。
+
+実装状況（2026-07-25）: 上記はv1の規範contractである。現行`validate`はschema、
+数値・条件付きsemantic、economics、normalization/effective-config出力までで、
+tree compile、abstraction到達数、resource estimate、fingerprints、output
+preflightは未実装でsolve時にのみ実行される。solve時は固定node capではなく
+dense-arena byte preflightを行い、成功後に全arenaをfallible allocation/page-touch
+してからだけsweep 0を開始する。`validate`単体がこのsolve-time barrierまで実行しない
+点は、本書§12に対する既知のgapである。
+
 - `inspect`: HRC/Pio型node navigation。pot、stack、action、13×13 strategy/range、
   bucket、weight、unvisited、on-demand EV/CIを表示。
 - `evaluate`: formal average profileを標準停止評価と同じ方法で再評価。
@@ -517,24 +627,35 @@ probability_encoding = "u16"
 - `compare`: 2 solutionのstrategy/EV/quality差分。
 
 異なるgame fingerprintのcompareは既定で拒否する。明示的cross-game modeでも単位と
-seat mappingが定義できない場合は拒否する。異なるabstraction同士はbucket IDを直接
-比べず、共有したreal-card sampleへ展開して比較する。
+seat mappingが定義できない場合は拒否する。productionがlive比較できるのは
+EHS²/current-street artifactだけで、同一abstractionならpersist済みinfoset、bucket数
+等が異なるEHS²同士なら共有real-card sampleへ展開して比較する。retired
+rollout/full artifactはsummary、tree、strategy、range、記録済みEVの静的比較だけを
+許可し、backend再構築を要するlive re-evaluation/real-card比較は`MWP004`で拒否する。
 
 通常`evaluate`はgreedy+trained deviatorを無効化できない。`br-traversals=0`のような
 品質を黙って落とすshortcutは削除する。
 
 ### 9.2 Research namespace
 
-研究機能は次だけを公開する。
+研究機能はproduction releaseには含めない。明示的な
+次のbuildで作った専用binaryだけが公開する。
+
+```sh
+CARGO_TARGET_DIR=target/research-release \
+  cargo build -p cli --release --features research --bin solvers
+```
 
 ```text
-solvers experiment profile
-solvers experiment compare
-solvers experiment benchmark
+target/research-release/release/solvers experiment profile
+target/research-release/release/solvers experiment compare
+target/research-release/release/solvers experiment benchmark
 ```
 
 ここではaverage/last/purified、range-vector/single-hand、exploration、discount、
-pruning、batch、bucket、rollout/EHS²、recall、f32/u16を明示的に比較できる。
+pruning、batch、bucket、retired rollout/EHS²、retired full/current recall、
+f32/u16を明示的に比較できる。このfeatureは移行・再現専用であり、production
+config surfaceや正式solutionの選択肢を増やさない。
 
 - purificationは診断またはderived artifactであり、元solutionを上書きしない。
 - last iterateはcheckpointからのみ読み、正式solutionとして保存しない。
@@ -556,9 +677,11 @@ solvers inspect
 solvers evaluate
 solvers export
 solvers compare
-solvers experiment ...
 solvers serve
 ```
+
+`solvers experiment ...`は上記production command listに含めず、明示
+`--features research`のbinaryだけに存在する。
 
 Multiway v1 configは先頭の`schema`で専用parserへrouteする。他gameとの巨大な
 `GameSection` enumへ押し込まない。Bridgeは同じparser、default展開、normalizer、
@@ -576,6 +699,9 @@ button = 0
 [game.defaults]
 stack_bb = 100.0
 range = "random"
+
+[game.abstraction]
+kind = "ehs2-percentile"
 ```
 
 parse pipelineは次の順序に固定する。
@@ -641,14 +767,14 @@ pipe時もANSI/progress barをstdoutへ混ぜない。
 | Tree | `[game.betting.*]`、互換fallback、暗黙checkdown | `game.tree` standard/script → shared IR |
 | Economics | `[utility]`+`[rake]`、room preset、PKO/FGS | `[economics]` generic cash/ICM |
 | ICM | name/count/map形式field、64-group暗黙圧縮 | `outside_field_bb`配列 |
-| Abstraction | FeatureHash公開、cache pathをgame identity化 | rollout/EHS²、content-addressed cache |
-| Recall | `full`/`street`、storageとの混同 | `current-street`/`bucket-history` |
+| Abstraction | FeatureHash、rollout、rollout-only field、cache pathをgame identity化 | 明示EHS²、content-addressed cache |
+| Recall | `full`/`street`/`bucket-history`、storageとの混同 | `current-street`固定 |
 | Algorithm | schedule selector、dynamic pruning、warm ladder、VR、MMD/QRE | External Sampling MCCFR固定 |
 | Runtime | iterations/sweeps重複、run seed、複数cadence、wall-clock eval | sweeps、solver seed、sweep cadence |
 | Auto | hidden bucket/batch/quality materialization | 明示default + resource preflight |
 | Output | 個別output flags、fixed notice、always-true approximation bool | 1 run directory、structured guarantee |
 | Encoding | signed i16 strategy | u16 probability / f32 research |
-| Evaluation | `mw-eval`、`--current`、`br=0` | evaluate + experiment namespace |
+| Evaluation | `mw-eval`、`--current`、`br=0` | production `evaluate`、research buildのexperiment namespace |
 | Formats | `.mwsol v2/v3`、`.mwckpt v5/v6` compatibility reader | v4/v7（実データ確認後） |
 
 ## 12. 実装完了条件
@@ -661,10 +787,19 @@ v1仕様の実装完了は、単に新keyがparseできることではなく、�
    fingerprint normalizationのgolden testがある。
 3. 2/3/6/9 seat、arbitrary button/blind/ante/first actor、short forced all-in、side pot、
    odd chip、cash rake、exact/MC ICMのtestsがある。
-4. standard treeと等価scriptが同じIR/fingerprint/public treeを生成する。
-5. `range-vector × bucket-history`を含む全正式組合せが動作する。
+4. standard treeと等価scriptが、`allow_limp`、street別aggression cap、
+   starting-stack jam ratioを含めて同じIR/fingerprint/public treeを生成する。
+5. production configは明示EHS²/current-streetだけを受け付け、rollout/省略kindを
+   `MWP001`、full/bucket-historyを`MWP002`で拒否する。
 6. thread数変更とcheckpoint resumeがbit-identicalで、stop stateも連続する。
 7. run directory/artifactのatomicity、unsupported version、unvisited infosetを検証する。
 8. stop statusとexit codeを混同せず、3人以上をNash/GTO/convergedと表示しない。
 9. `cargo fmt --all --check`、`cargo clippy --workspace --all-targets`、
    `cargo test --workspace`が通る。
+10. optional Tree fieldの旧config default、effective-config round-trip、fingerprintと、
+    3 selectorのpublic-state意味論、strict ratioの直下・等号・超過境界を検証する。
+11. new solve/resumeともsweep 0前に全policy arenaをfallible allocationし、全pageへの
+    writeと`pages_committed=true`を検証する。arena byte上限と外部8 GiB RSS上限を
+    混同しない。
+12. production binaryに`solvers experiment`、rollout/full workerがなく、retired
+    artifactの静的readと`MWP003`/`MWP004` migration errorが契約どおりである。

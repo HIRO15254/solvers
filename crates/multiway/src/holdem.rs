@@ -39,6 +39,10 @@ pub struct HoldemGame<A> {
     config: ValidatedMultiwayConfig,
     root: BettingState,
     abstraction: A,
+    /// Optional common abstraction used only by trained-deviation
+    /// diagnostics. It deliberately does not contribute to either game or
+    /// candidate-abstraction fingerprints.
+    deviation_abstraction: Option<(A, RecallMode)>,
     utility: UtilityRuntime,
     rake: CompiledRake,
     game_fingerprint: [u8; 32],
@@ -96,6 +100,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
             config: validated,
             root,
             abstraction,
+            deviation_abstraction: None,
             utility: utility_runtime,
             rake: compiled_rake,
             game_fingerprint,
@@ -112,6 +117,39 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
     /// `MultiwaySolver`.
     pub fn abstraction(&self) -> &A {
         &self.abstraction
+    }
+
+    /// Consumes the game and returns its primary abstraction backend. This is
+    /// useful for moving a separately built reference backend into
+    /// [`Self::with_deviation_abstraction`] without requiring the backend to
+    /// implement `Clone`.
+    pub fn into_abstraction(self) -> A {
+        self.abstraction
+    }
+
+    /// Installs a common reference abstraction for deviator training and
+    /// held-out reference-only evaluation.
+    ///
+    /// This is diagnostic state: it never changes the main solver's buckets,
+    /// dense/sparse storage mode, checkpoint compatibility, game fingerprint,
+    /// or candidate-abstraction fingerprint.
+    pub fn with_deviation_abstraction(mut self, abstraction: A, recall: RecallMode) -> Self {
+        self.deviation_abstraction = Some((abstraction, recall));
+        self
+    }
+
+    /// Evaluation-only reference abstraction, when configured. Callers may
+    /// use the concrete accessor after evaluation to persist backend caches.
+    pub fn deviation_abstraction(&self) -> Option<&A> {
+        self.deviation_abstraction
+            .as_ref()
+            .map(|(abstraction, _)| abstraction)
+    }
+
+    pub fn configured_deviation_recall_mode(&self) -> Option<RecallMode> {
+        self.deviation_abstraction
+            .as_ref()
+            .map(|(_, recall)| *recall)
     }
 
     pub fn deal_sampler(&self) -> Result<DealSampler, SampleError> {
@@ -210,11 +248,12 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
     }
 
     /// Like [`Self::bucket_for_street`], but for an arbitrary hole combo
-    /// instead of the actor's own dealt one. Used by the vector-traverser
-    /// path (only valid for [`RecallMode::Street`], i.e. `street ==
-    /// state.street`, the only street `ExternalSamplingGame::bucket_for_combo`
-    /// ever queries) to bucket every feasible traverser combo against the
-    /// same fixed board/active-opponent context.
+    /// instead of the actor's own dealt one. Used by the dense
+    /// street-recall vector batch hook (`street == state.street`) to bucket
+    /// every feasible traverser combo against one fixed
+    /// board/active-opponent context. The full-recall sparse-vector fallback
+    /// instead substitutes each combo into its sampled world and follows the
+    /// ordinary scalar bucket-path lookup.
     fn bucket_for_combo_and_street(
         &self,
         state: &BettingState,
@@ -222,7 +261,17 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
         combo: usize,
         street: Street,
     ) -> BucketId {
-        self.abstraction.bucket(BucketContext {
+        Self::bucket_for_combo_and_street_with(&self.abstraction, state, world, combo, street)
+    }
+
+    fn bucket_for_combo_and_street_with(
+        abstraction: &A,
+        state: &BettingState,
+        world: &SampledWorld,
+        combo: usize,
+        street: Street,
+    ) -> BucketId {
+        abstraction.bucket(BucketContext {
             street,
             board: world.board(street),
             combo,
@@ -234,6 +283,34 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
         let bucket = |street: Street| {
             if street.index() <= state.street.index() {
                 self.bucket_for_street(state, world, actor, street)
+            } else {
+                0
+            }
+        };
+        BucketPath {
+            preflop: bucket(Street::Preflop),
+            flop: bucket(Street::Flop),
+            turn: bucket(Street::Turn),
+            river: bucket(Street::River),
+        }
+    }
+
+    fn bucket_path_with(
+        &self,
+        abstraction: &A,
+        state: &BettingState,
+        world: &SampledWorld,
+        actor: usize,
+    ) -> BucketPath {
+        let bucket = |street: Street| {
+            if street.index() <= state.street.index() {
+                Self::bucket_for_combo_and_street_with(
+                    abstraction,
+                    state,
+                    world,
+                    world.hole_combo(actor),
+                    street,
+                )
             } else {
                 0
             }
@@ -669,8 +746,42 @@ impl<A: MultiwayAbstraction> ExternalSamplingGame for HoldemGame<A> {
         }
     }
 
+    fn deviation_bucket(
+        &self,
+        state: &Self::State,
+        world: &SampledWorld,
+        actor: usize,
+    ) -> PrivateInfo {
+        let Some((abstraction, recall)) = &self.deviation_abstraction else {
+            return self.bucket(state, world, actor);
+        };
+        let opponents = state.non_folded_mask().len().saturating_sub(1) as u8;
+        match recall {
+            RecallMode::Full => PrivateInfo::from_path(
+                state.street,
+                opponents,
+                self.bucket_path_with(abstraction, state, world, actor),
+            ),
+            RecallMode::Street => {
+                let bucket = Self::bucket_for_combo_and_street_with(
+                    abstraction,
+                    state,
+                    world,
+                    world.hole_combo(actor),
+                    state.street,
+                );
+                PrivateInfo::from_current_bucket(state.street, opponents, bucket)
+            }
+        }
+    }
+
     fn recall_mode(&self) -> RecallMode {
         self.config.abstraction.recall
+    }
+
+    fn deviation_recall_mode(&self) -> RecallMode {
+        self.configured_deviation_recall_mode()
+            .unwrap_or_else(|| self.recall_mode())
     }
 
     fn bucket_count(&self, street: Street, active_opponents: u8) -> u32 {
@@ -930,6 +1041,67 @@ mod tests {
         assert_eq!(first.game_fingerprint(), second.game_fingerprint());
     }
 
+    #[test]
+    fn deviation_abstraction_is_accessible_without_changing_fingerprints() {
+        let candidate = FeatureHashAbstraction::new(FeatureHashParams {
+            flop_buckets: 32,
+            turn_buckets: 64,
+            river_buckets: 128,
+        })
+        .unwrap();
+        let plain_game = HoldemGame::new(
+            &config(),
+            &UtilityConfig::ChipEv,
+            &RakeConfig::None,
+            candidate.clone(),
+        )
+        .unwrap();
+        let game = HoldemGame::new(
+            &config(),
+            &UtilityConfig::ChipEv,
+            &RakeConfig::None,
+            candidate,
+        )
+        .unwrap();
+        let game_fingerprint = plain_game.game_fingerprint();
+        let abstraction_fingerprint = plain_game.abstraction_fingerprint();
+        let reference = FeatureHashAbstraction::new(FeatureHashParams {
+            flop_buckets: 257,
+            turn_buckets: 509,
+            river_buckets: 1_021,
+        })
+        .unwrap();
+        let reference_fingerprint = reference.fingerprint();
+
+        let game = game.with_deviation_abstraction(reference, RecallMode::Street);
+        assert_eq!(game.game_fingerprint(), game_fingerprint);
+        assert_eq!(game.abstraction_fingerprint(), abstraction_fingerprint);
+        assert_eq!(
+            game.deviation_abstraction().unwrap().fingerprint(),
+            reference_fingerprint
+        );
+        assert_eq!(
+            game.configured_deviation_recall_mode(),
+            Some(RecallMode::Street)
+        );
+        assert_eq!(game.deviation_recall_mode(), RecallMode::Street);
+
+        let plain_sampler = plain_game.deal_sampler().unwrap();
+        let reference_sampler = game.deal_sampler().unwrap();
+        let plain_solver =
+            crate::solver::MultiwaySolver::with_defaults(plain_game, plain_sampler).unwrap();
+        let reference_solver =
+            crate::solver::MultiwaySolver::with_defaults(game, reference_sampler).unwrap();
+        assert_eq!(
+            plain_solver.configuration_fingerprint(),
+            reference_solver.configuration_fingerprint()
+        );
+        assert_eq!(
+            plain_solver.abstraction_fingerprint(),
+            reference_solver.abstraction_fingerprint()
+        );
+    }
+
     /// Manually built 3-seat all-in showdown, mirroring
     /// `settlement::tests::manual` (individual commits 5000/3000/1000 chips
     /// -- i.e. 5/3/1 bb -- with no common pot, all-in): pot layers are a
@@ -971,6 +1143,8 @@ mod tests {
             preflop_limpers: 0,
             preflop_flats: 0,
             last_preflop_aggressor: None,
+            preflop_participants: SeatMask::EMPTY,
+            preflop_open_cold_calls: 0,
         }
     }
 
@@ -1119,6 +1293,8 @@ mod tests {
             preflop_limpers: 0,
             preflop_flats: 0,
             last_preflop_aggressor: None,
+            preflop_participants: SeatMask::EMPTY,
+            preflop_open_cold_calls: 0,
             flop_dealt: true,
             phase: HandPhase::Showdown,
             preflop_voluntary_call_seen: false,

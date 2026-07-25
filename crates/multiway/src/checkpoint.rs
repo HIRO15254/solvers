@@ -301,19 +301,19 @@ impl MultiwayCheckpoint {
         expected_configuration: [u8; 32],
         expected_abstraction: [u8; 32],
     ) -> Result<Self, CheckpointError> {
-        let checkpoint = Self::load_unchecked(path)?;
-        if checkpoint.header.configuration_fingerprint != expected_configuration {
-            return Err(CheckpointError::ConfigurationMismatch);
-        }
-        if checkpoint.header.abstraction_fingerprint != expected_abstraction {
-            return Err(CheckpointError::AbstractionMismatch);
-        }
-        Ok(checkpoint)
+        Self::load_internal(path, Some((expected_configuration, expected_abstraction)))
     }
 
     /// Loads and integrity-checks a checkpoint without compatibility hashes.
     /// This is intended for inspection tools; resumes should use [`Self::load`].
     pub fn load_unchecked(path: &Path) -> Result<Self, CheckpointError> {
+        Self::load_internal(path, None)
+    }
+
+    fn load_internal(
+        path: &Path,
+        expected_fingerprints: Option<([u8; 32], [u8; 32])>,
+    ) -> Result<Self, CheckpointError> {
         let mut file = File::open(path)?;
         let file_len = file.metadata()?.len();
         if file_len < HEADER_LEN as u64 {
@@ -322,6 +322,14 @@ impl MultiwayCheckpoint {
         let mut encoded_header = [0u8; HEADER_LEN];
         file.read_exact(&mut encoded_header)?;
         let header = decode_header(&encoded_header)?;
+        if let Some((expected_configuration, expected_abstraction)) = expected_fingerprints {
+            if header.configuration_fingerprint != expected_configuration {
+                return Err(CheckpointError::ConfigurationMismatch);
+            }
+            if header.abstraction_fingerprint != expected_abstraction {
+                return Err(CheckpointError::AbstractionMismatch);
+            }
+        }
 
         if header.uncompressed_len > MAX_UNCOMPRESSED_BYTES {
             return Err(CheckpointError::UncompressedTooLarge {
@@ -923,11 +931,20 @@ mod tests {
     }
 
     #[test]
-    fn compatibility_hashes_are_enforced_before_resume() {
+    fn compatibility_hashes_are_enforced_before_payload_decode() {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().join("hashes.mwcp");
         MultiwayCheckpoint::new(state(), [1; 32], [2; 32])
             .write_atomic(&path)
+            .unwrap();
+        // Keep the valid header but remove the chunk table/payload. A
+        // mismatched resume must reject from the header without allocating
+        // or decoding the declared checkpoint state.
+        std::fs::OpenOptions::new()
+            .write(true)
+            .open(&path)
+            .unwrap()
+            .set_len(HEADER_LEN as u64)
             .unwrap();
         assert!(matches!(
             MultiwayCheckpoint::load(&path, [9; 32], [2; 32]),

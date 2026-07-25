@@ -91,9 +91,21 @@ impl DenseStorage {
     pub(super) fn build<G: ExternalSamplingGame>(
         game: &G,
         max_memory_bytes: u64,
+        max_traversal_depth: u32,
+        commit_pages: bool,
     ) -> Result<Self, SolverError> {
-        let tree = tree::enumerate_tree(game)?;
-        let arena = tree::build_arena(game, &tree, max_memory_bytes)?;
+        tree::preflight_arena_with_limits_and_depth(
+            game,
+            tree::MAX_TREE_NODES,
+            max_memory_bytes,
+            max_traversal_depth,
+        )?;
+        let tree =
+            tree::enumerate_tree_with_limits(game, tree::MAX_TREE_NODES, max_traversal_depth)?;
+        let mut arena = tree::build_arena(game, &tree, max_memory_bytes)?;
+        if commit_pages {
+            arena.commit_pages();
+        }
         Ok(Self { tree, arena })
     }
 

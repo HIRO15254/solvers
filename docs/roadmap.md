@@ -20,9 +20,14 @@ CLI という不変条件のもと、GUI はいつ着手しても bridge 経由�
 決定済みの方針(2026-07-21、Multiway CLI v1): table/forced bet、betting tree、
 economics/ICM、abstraction/recall、External Sampling MCCFR、停止条件、runtime/resume、
 artifact、inspection/research、CLI surfaceを
-`docs/multiway-preflop-cli-spec.jp.md` に凍結した。唯一残っていたrollout sample既定は
-再現実験で512に決定済み（`docs/validation/multiway-rollout-samples-2026-07-21.md`）。
-以後のM9作業は、旧optionを互換維持せず削除し、このschemaへ段階移行する。
+`docs/multiway-preflop-cli-spec.jp.md` に凍結した。
+
+決定済みの方針(2026-07-25、Production abstraction): 既定releaseは
+EHS²/current-street固定とし、全policy arenaをsweep 0前にfallible確保して
+page-touchする。rollout sample既定512はhistorical research結果へ降格し、
+rollout/full-recallとその専用option、既定releaseのexperiment namespaceを削除した。
+根拠と未解決範囲は
+`docs/validation/multiway-abstraction-optimization-2026-07-25.md`を正本とする。
 
 ## M0 — 基盤(週 1–2)
 virtual workspace 化、CI(fmt/clippy/test)、`LICENSE-POLICY.md`。`cards`(型、range parser、`aya_poker` evaluator 統合)、`hand-index`(canonical board 列挙。Waugh 完全 index の移植は M7 の abstraction cache キーまで遅延)。
@@ -80,6 +85,11 @@ formats スキーマ v1 凍結 → `wasm` viewer-only 静的サイト(`.sol` 読
 **Delivered:** deterministic sample-id merge（thread数変更・再開を含む）、4 MiB chunked `.mwckpt` v3、indexed `.mwsol` v2、Bridge v2 managed resume、4 canonical Web presets、9-max 8/8/8 smoke・64/64/64 desktop benchmark・3-player full-enumeration oracleを受入契約として固定。（当時の受入契約の記録。現行フォーマットは `.mwckpt` v6 / `.mwsol` v3。）
 
 > **M9 進捗(2026-07-16..18、高速化・収束・GUI 波)**: ネイティブ GUI(`crates/gui`、egui)+ i16 `.mwsol`。rollout v2(board 正準ストリーム)と EHS² テーブルバックエンドで HRC 級スループット(783k→1.4M hu/s)、HRC 型 check-down `max_betting_players`(dense arena 163 分の 1)。Auto モード(マシン検出→バケットラダー/sweep_batch/収束停止しきい値の実体化)+ 収束停止ルール(devGainLB CI 上界 × 確認回数、適応サンプル倍加)+ **BR バースト**(凍結平均相手に逸脱者を訓練し greedy との per-seat max — 停止証明の強化)。Pluribus 型 regret 枝刈り(-10×スタック校正、+3-4%)、`ε=0`+割引 10k 細粒化(同品質到達 sweep 数 ~半分)。計測系: `mw-eval`(purification/thresholding — argmax で 2.6 倍タイト、last-iterate 診断 — 実用ラン長で平均よりタイト)。**実測で棄却**: 動的枝刈りしきい値、warm-start バケットラダー(粗フェーズが 1.26 倍しか速くなく回収不能 → 撤去)、VR-MCCFR ベースライン、MMD/QRE 移行(メモリが希少でなくなり売りが消滅)、バケット 4096(200k sweep では推定ノイズ律速で悪化)。詳細な採否根拠は `docs/multiway-preflop.md` と計測ログ参照。
+
+> **M9 production更新(2026-07-25)**: rollout/full-recallはresearch featureへ隔離し、
+> 新規production solve/resumeから削除。EHS²/current-streetの全到達
+> `[public node][bucket][action]` policy arenaをsweep 0前に確保・page-touchし、
+> memory不足時はfallbackせず開始前に失敗する。旧`.mwsol`の静的閲覧は維持する。
 
 > 根拠: external-sampling MCCFR は Lanctot et al. (NeurIPS 2009)。多人数・一般和で HU zero-sum と同じ Nash 保証がない境界は Gibson et al. (2013) に従う。straddle、missed/dead blind、multiple runouts、bounty、FGS、re-entry、PLO はこの milestone の対象外。
 

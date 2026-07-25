@@ -101,6 +101,23 @@ pub trait ExternalSamplingGame: Send + Sync {
     /// Active opponents excludes `actor` and is part of the information set.
     fn bucket(&self, state: &Self::State, world: &SampledWorld, actor: usize) -> PrivateInfo;
 
+    /// Private information used only to train and replay a deviation policy.
+    ///
+    /// The default delegates directly to [`Self::bucket`], preserving the
+    /// historical deviator path exactly. Production games may override this
+    /// with a common, finer reference abstraction so policies trained against
+    /// different candidate abstractions are compared on the same information
+    /// partition. Main-solver policy lookup must continue to use
+    /// [`Self::bucket`].
+    fn deviation_bucket(
+        &self,
+        state: &Self::State,
+        world: &SampledWorld,
+        actor: usize,
+    ) -> PrivateInfo {
+        self.bucket(state, world, actor)
+    }
+
     /// Writes one finite utility per seat at a terminal state.
     fn terminal_utilities(&self, state: &Self::State, world: &SampledWorld, utilities: &mut [f64]);
 
@@ -110,7 +127,11 @@ pub trait ExternalSamplingGame: Send + Sync {
         [0; 32]
     }
 
-    /// Identity of the concrete card abstraction used by [`Self::bucket`].
+    /// Identity of the concrete card-abstraction backend used by
+    /// [`Self::bucket`]. [`MultiwaySolver::abstraction_fingerprint`] composes
+    /// [`Self::recall_mode`] into this backend identity so checkpoint and
+    /// artifact compatibility also covers the policy's private-information
+    /// semantics.
     fn abstraction_fingerprint(&self) -> [u8; 32] {
         [0; 32]
     }
@@ -120,6 +141,15 @@ pub trait ExternalSamplingGame: Send + Sync {
     /// [`RecallMode::Street`] can rely on the default.
     fn recall_mode(&self) -> RecallMode {
         RecallMode::Full
+    }
+
+    /// Recall semantics for [`Self::deviation_bucket`].
+    ///
+    /// The default delegates to [`Self::recall_mode`] so games without an
+    /// evaluation-only reference abstraction retain bit-identical deviator
+    /// keys.
+    fn deviation_recall_mode(&self) -> RecallMode {
+        self.recall_mode()
     }
 
     /// Bucket cardinality for `(street, active_opponents)`: the same count
@@ -387,7 +417,12 @@ pub struct ActionProbability {
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SolverConfig {
     pub seed: u64,
-    /// Conservative cap for sparse policy payload plus hash-entry overhead.
+    /// Conservative storage-payload cap. Full recall applies it to sparse
+    /// policy/history payload plus hash-entry overhead; street recall applies
+    /// it to the dense arena estimate. The retained public tree, abstraction
+    /// caches, worker scratch, evaluation, allocator overhead, and artifact
+    /// staging are additional process memory and require an external process
+    /// limit/headroom policy.
     pub max_memory_bytes: u64,
     /// Guard against a malformed game adapter producing a cycle.
     pub max_traversal_depth: u32,
@@ -407,12 +442,12 @@ pub struct SolverConfig {
     /// Enables "vector-traverser" external sampling: one traversal updates
     /// every feasible hole combo of the sampled traverser seat at once
     /// against the same sampled opponents/board, instead of only the one
-    /// combo the deal sampler happened to deal that seat. Only valid when
-    /// [`ExternalSamplingGame::recall_mode`] is [`RecallMode::Street`] (the
-    /// dense arena); [`validate_setup`] rejects `true` under
-    /// [`RecallMode::Full`]. `false` (the default) is the original
-    /// one-hand-per-traversal algorithm, byte-identical to before this field
-    /// existed.
+    /// combo the deal sampler happened to deal that seat. Street recall uses
+    /// the optimized dense vector worker. Full recall preserves the bucket
+    /// path by running one weighted sparse scalar traversal per feasible
+    /// combo against the same sampled opponents and board. `false` (the
+    /// default) is the original one-hand-per-traversal algorithm,
+    /// byte-identical to before this field existed.
     pub traverser_vector: bool,
     /// Enables Pluribus-style regret-based pruning at traverser decision
     /// nodes in vector mode: a (bucket, action) whose regret-matched
@@ -420,9 +455,11 @@ pub struct SolverConfig {
     /// [`Self::prune_threshold`] is skipped (with probability
     /// [`Self::prune_skip_probability`]) rather than descended into, saving
     /// the traversal work that would only ever multiply by a zero
-    /// probability. `false` (the default) is byte-identical to before this
-    /// field existed. [`validate_setup`] rejects `true` unless
-    /// [`Self::traverser_vector`] is also `true`.
+    /// probability. This optimization is implemented only by the dense
+    /// street-recall vector worker. `false` (the default) is byte-identical to
+    /// before this field existed. [`validate_setup`] rejects `true` unless
+    /// [`Self::traverser_vector`] is also `true` and the game uses
+    /// [`RecallMode::Street`].
     pub prune: bool,
     /// Regret threshold (utility units) below which a zero-probability
     /// (bucket, action) becomes a pruning candidate. Must be finite and
@@ -490,6 +527,19 @@ pub struct SolverMetrics {
     pub average_positive_regret: Vec<f64>,
 }
 
+/// Fixed policy-arena allocation completed before a production solver is
+/// returned. Counts cover every reachable public decision node and every
+/// current-street bucket at that node, whether or not a traversal has
+/// visited the corresponding information set.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PolicyArenaAllocation {
+    pub nodes: u64,
+    pub columns: u64,
+    pub slots: u64,
+    pub bytes: u64,
+    pub pages_committed: bool,
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ProfileEstimate {
     pub mean: f64,
@@ -509,14 +559,267 @@ pub struct ProfileEvaluation {
     pub deviation_gain_lower_bound: Option<Vec<ProfileEstimate>>,
 }
 
+/// Reach-weighted coverage of the candidate profile on the unmodified
+/// baseline trajectories used by [`MultiwaySolver::evaluate_reference_deviators`].
+///
+/// Each sampled decision is attributed to the acting seat. A stored strategy
+/// means the candidate solver had a policy column for that concrete
+/// information key; otherwise evaluation used the documented uniform
+/// fallback.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct StreetVisitCounts {
+    pub preflop: u64,
+    pub flop: u64,
+    pub turn: u64,
+    pub river: u64,
+}
+
+impl StreetVisitCounts {
+    /// Returns the count for one street.
+    pub const fn get(self, street: Street) -> u64 {
+        match street {
+            Street::Preflop => self.preflop,
+            Street::Flop => self.flop,
+            Street::Turn => self.turn,
+            Street::River => self.river,
+        }
+    }
+
+    /// Sum of all four street counters.
+    pub const fn total(self) -> u64 {
+        self.preflop
+            .saturating_add(self.flop)
+            .saturating_add(self.turn)
+            .saturating_add(self.river)
+    }
+
+    fn checked_increment(&mut self, street: u8) -> Result<(), SolverError> {
+        let count = match street {
+            0 => &mut self.preflop,
+            1 => &mut self.flop,
+            2 => &mut self.turn,
+            3 => &mut self.river,
+            _ => {
+                return Err(SolverError::InvalidPrivateInfo("street is outside 0..=3"));
+            }
+        };
+        *count = count.checked_add(1).ok_or(SolverError::CounterOverflow)?;
+        Ok(())
+    }
+
+    fn checked_add_assign(&mut self, other: Self) -> Result<(), SolverError> {
+        self.preflop = self
+            .preflop
+            .checked_add(other.preflop)
+            .ok_or(SolverError::CounterOverflow)?;
+        self.flop = self
+            .flop
+            .checked_add(other.flop)
+            .ok_or(SolverError::CounterOverflow)?;
+        self.turn = self
+            .turn
+            .checked_add(other.turn)
+            .ok_or(SolverError::CounterOverflow)?;
+        self.river = self
+            .river
+            .checked_add(other.river)
+            .ok_or(SolverError::CounterOverflow)?;
+        Ok(())
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CandidatePolicyCoverage {
+    pub decision_visits: u64,
+    pub stored_strategy_visits: u64,
+    pub uniform_fallback_visits: u64,
+    /// Decision visits attributed to the public street of the candidate
+    /// information key. This sums to [`Self::decision_visits`].
+    #[serde(default)]
+    pub decision_visits_by_street: StreetVisitCounts,
+    /// Stored-policy visits by street. This sums to
+    /// [`Self::stored_strategy_visits`].
+    #[serde(default)]
+    pub stored_strategy_visits_by_street: StreetVisitCounts,
+    /// Uniform candidate fallback visits by street. This sums to
+    /// [`Self::uniform_fallback_visits`].
+    #[serde(default)]
+    pub uniform_fallback_visits_by_street: StreetVisitCounts,
+}
+
+impl CandidatePolicyCoverage {
+    pub fn stored_strategy_fraction(self) -> f64 {
+        if self.decision_visits == 0 {
+            0.0
+        } else {
+            self.stored_strategy_visits as f64 / self.decision_visits as f64
+        }
+    }
+
+    fn record(&mut self, street: u8, stored: bool) -> Result<(), SolverError> {
+        self.decision_visits = self
+            .decision_visits
+            .checked_add(1)
+            .ok_or(SolverError::CounterOverflow)?;
+        self.decision_visits_by_street.checked_increment(street)?;
+        if stored {
+            self.stored_strategy_visits = self
+                .stored_strategy_visits
+                .checked_add(1)
+                .ok_or(SolverError::CounterOverflow)?;
+            self.stored_strategy_visits_by_street
+                .checked_increment(street)?;
+        } else {
+            self.uniform_fallback_visits = self
+                .uniform_fallback_visits
+                .checked_add(1)
+                .ok_or(SolverError::CounterOverflow)?;
+            self.uniform_fallback_visits_by_street
+                .checked_increment(street)?;
+        }
+        Ok(())
+    }
+}
+
+/// Visit-weighted coverage of one reference-keyed deviator during held-out
+/// replay.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReferenceDeviationCoverage {
+    /// Number of decisions taken by the deviating seat.
+    pub decision_visits: u64,
+    /// Decisions for which a valid trained action existed at the reference
+    /// information key.
+    pub trained_action_visits: u64,
+    /// Decisions that replayed the candidate baseline strategy because the
+    /// reference key was absent (or its stored action was no longer legal).
+    pub baseline_fallback_visits: u64,
+    /// Deviating-seat decisions attributed to the public street. This sums
+    /// to [`Self::decision_visits`].
+    #[serde(default)]
+    pub decision_visits_by_street: StreetVisitCounts,
+    /// Trained reference actions used by street. This sums to
+    /// [`Self::trained_action_visits`].
+    #[serde(default)]
+    pub trained_action_visits_by_street: StreetVisitCounts,
+    /// Candidate-baseline fallbacks by street. This sums to
+    /// [`Self::baseline_fallback_visits`].
+    #[serde(default)]
+    pub baseline_fallback_visits_by_street: StreetVisitCounts,
+}
+
+impl ReferenceDeviationCoverage {
+    pub fn trained_action_fraction(self) -> f64 {
+        if self.decision_visits == 0 {
+            0.0
+        } else {
+            self.trained_action_visits as f64 / self.decision_visits as f64
+        }
+    }
+
+    fn record(&mut self, street: u8, trained: bool) -> Result<(), SolverError> {
+        self.decision_visits = self
+            .decision_visits
+            .checked_add(1)
+            .ok_or(SolverError::CounterOverflow)?;
+        self.decision_visits_by_street.checked_increment(street)?;
+        if trained {
+            self.trained_action_visits = self
+                .trained_action_visits
+                .checked_add(1)
+                .ok_or(SolverError::CounterOverflow)?;
+            self.trained_action_visits_by_street
+                .checked_increment(street)?;
+        } else {
+            self.baseline_fallback_visits = self
+                .baseline_fallback_visits
+                .checked_add(1)
+                .ok_or(SolverError::CounterOverflow)?;
+            self.baseline_fallback_visits_by_street
+                .checked_increment(street)?;
+        }
+        Ok(())
+    }
+
+    fn checked_add_assign(&mut self, other: Self) -> Result<(), SolverError> {
+        self.decision_visits = self
+            .decision_visits
+            .checked_add(other.decision_visits)
+            .ok_or(SolverError::CounterOverflow)?;
+        self.trained_action_visits = self
+            .trained_action_visits
+            .checked_add(other.trained_action_visits)
+            .ok_or(SolverError::CounterOverflow)?;
+        self.baseline_fallback_visits = self
+            .baseline_fallback_visits
+            .checked_add(other.baseline_fallback_visits)
+            .ok_or(SolverError::CounterOverflow)?;
+        self.decision_visits_by_street
+            .checked_add_assign(other.decision_visits_by_street)?;
+        self.trained_action_visits_by_street
+            .checked_add_assign(other.trained_action_visits_by_street)?;
+        self.baseline_fallback_visits_by_street
+            .checked_add_assign(other.baseline_fallback_visits_by_street)?;
+        Ok(())
+    }
+}
+
+/// Per-physical-world raw values retained for paired comparisons between
+/// candidate abstractions.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct ReferenceDeviationWorld {
+    pub sample_id: u64,
+    /// Utility vector from replaying the candidate's unmodified profile.
+    pub baseline_utilities: Vec<f64>,
+    /// `deviating_seat_utilities[i]` is seat `i`'s utility when only that seat
+    /// replays its reference-keyed trained deviator.
+    pub deviating_seat_utilities: Vec<f64>,
+    /// Paired difference
+    /// `deviating_seat_utilities[i] - baseline_utilities[i]`.
+    pub gains: Vec<f64>,
+}
+
+/// Held-out evaluation that considers only the common-reference trained
+/// deviator (plus the no-deviation fallback), never the candidate-specific
+/// regret-greedy heuristic used by [`MultiwaySolver::evaluate_profile`].
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct ReferenceDeviationEvaluation {
+    pub evaluation: ProfileEvaluation,
+    /// Candidate-policy coverage measured only on the unmodified baseline
+    /// replay, indexed by acting seat.
+    pub candidate_policy_coverage: Vec<CandidatePolicyCoverage>,
+    pub coverage: Vec<ReferenceDeviationCoverage>,
+    pub worlds: Vec<ReferenceDeviationWorld>,
+}
+
 /// A fixed per-seat deviation policy trained by [`MultiwaySolver::train_deviator`]:
 /// for each information set it visited during training, the single action index
 /// it deviates to. Infosets it never visited fall back to the caller's usual
-/// deviation behavior (see [`MultiwaySolver::evaluate_profile`]).
+/// deviation behavior. A policy trained with the default candidate keys is
+/// compatible with [`MultiwaySolver::evaluate_profile`]; one trained with an
+/// overridden [`ExternalSamplingGame::deviation_bucket`] must be replayed by
+/// [`MultiwaySolver::evaluate_reference_deviators`].
 #[derive(Clone, Debug, PartialEq)]
 pub struct DeviatorPolicy {
     pub seat: usize,
     pub actions: FxHashMap<InfoKey, u16>,
+}
+
+/// Training-time coverage of the reference information partition.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DeviatorTrainingCoverage {
+    pub traversals: u64,
+    pub visited_infosets: u64,
+    pub retained_infosets: u64,
+    pub total_visits: u64,
+    pub retained_visits: u64,
+}
+
+/// A trained policy together with reference-partition visit counts. The
+/// original [`MultiwaySolver::train_deviator`] API returns only `policy`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct DeviatorTrainingResult {
+    pub policy: DeviatorPolicy,
+    pub coverage: DeviatorTrainingCoverage,
 }
 
 /// Which profile [`MultiwaySolver::evaluate_profile`] replays / a deviator
@@ -560,12 +863,90 @@ pub struct MultiwaySolver<G: ExternalSamplingGame> {
     dense: Option<DenseStorage>,
 }
 
+/// Composes a backend fingerprint with the private-recall semantics that
+/// define an information key. Full recall deliberately preserves the
+/// historical backend fingerprint byte-for-byte.
+pub fn abstraction_fingerprint_with_recall(backend: [u8; 32], recall: RecallMode) -> [u8; 32] {
+    match recall {
+        RecallMode::Full => backend,
+        RecallMode::Street => {
+            let mut hasher = blake3::Hasher::new();
+            hasher.update(b"solvers.multiway.abstraction.current-street.v1");
+            hasher.update(&backend);
+            *hasher.finalize().as_bytes()
+        }
+    }
+}
+
+/// Computes the resume/configuration fingerprint before a solver (and, for
+/// current-street production, its dense arena) is constructed. Checkpoint
+/// loaders use this to reject a mismatched header before allocating and
+/// page-committing the complete policy arena.
+pub fn configuration_fingerprint_for_setup<G: ExternalSamplingGame>(
+    game: &G,
+    sampler: &DealSampler,
+    config: SolverConfig,
+) -> [u8; 32] {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"solvers.multiway.solver-config.v4");
+    hasher.update(&config.seed.to_le_bytes());
+    hasher.update(&config.max_traversal_depth.to_le_bytes());
+    hasher.update(&config.exploration_epsilon.to_bits().to_le_bytes());
+    hasher.update(&config.discount_every.to_le_bytes());
+    hasher.update(&config.discount_until.to_le_bytes());
+    hasher.update(&config.sweep_batch.to_le_bytes());
+    hasher.update(&[u8::from(config.traverser_vector)]);
+    hasher.update(&[u8::from(config.prune)]);
+    hasher.update(&config.prune_threshold.to_bits().to_le_bytes());
+    hasher.update(&config.prune_skip_probability.to_bits().to_le_bytes());
+    hasher.update(&sampler.range_fingerprint());
+    hasher.update(&game.game_fingerprint());
+    *hasher.finalize().as_bytes()
+}
+
 impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     pub fn new(game: G, sampler: DealSampler, config: SolverConfig) -> Result<Self, SolverError> {
+        Self::new_internal(game, sampler, config, false)
+    }
+
+    /// Constructs the production storage layout. Unlike [`Self::new`], this
+    /// rejects sparse/full recall and does not return until every page of the
+    /// complete current-street policy arena has been touched.
+    pub fn new_preallocated(
+        game: G,
+        sampler: DealSampler,
+        config: SolverConfig,
+    ) -> Result<Self, SolverError> {
+        if !matches!(game.recall_mode(), RecallMode::Street) {
+            return Err(SolverError::PreallocatedStorageRequiresStreetRecall);
+        }
+        Self::new_internal(game, sampler, config, true)
+    }
+
+    fn new_internal(
+        game: G,
+        sampler: DealSampler,
+        config: SolverConfig,
+        commit_pages: bool,
+    ) -> Result<Self, SolverError> {
         validate_setup(&game, &sampler, config)?;
         let dense = match game.recall_mode() {
-            RecallMode::Full => None,
-            RecallMode::Street => Some(DenseStorage::build(&game, config.max_memory_bytes)?),
+            RecallMode::Full => {
+                #[cfg(any(feature = "research-abstractions", test))]
+                {
+                    None
+                }
+                #[cfg(not(any(feature = "research-abstractions", test)))]
+                {
+                    return Err(SolverError::PreallocatedStorageRequiresStreetRecall);
+                }
+            }
+            RecallMode::Street => Some(DenseStorage::build(
+                &game,
+                config.max_memory_bytes,
+                config.max_traversal_depth,
+                commit_pages,
+            )?),
         };
         Ok(Self {
             game,
@@ -603,8 +984,33 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     pub fn from_state_with_config(
         game: G,
         sampler: DealSampler,
+        state: SolverState,
+        current_config: SolverConfig,
+    ) -> Result<Self, SolverError> {
+        Self::from_state_with_config_internal(game, sampler, state, current_config, false)
+    }
+
+    /// Production resume counterpart of [`Self::new_preallocated`]. The full
+    /// arena is rebuilt and page-committed before any checkpoint columns are
+    /// replayed and before the resumed solver is returned.
+    pub fn from_state_with_config_preallocated(
+        game: G,
+        sampler: DealSampler,
+        state: SolverState,
+        current_config: SolverConfig,
+    ) -> Result<Self, SolverError> {
+        if !matches!(game.recall_mode(), RecallMode::Street) {
+            return Err(SolverError::PreallocatedStorageRequiresStreetRecall);
+        }
+        Self::from_state_with_config_internal(game, sampler, state, current_config, true)
+    }
+
+    fn from_state_with_config_internal(
+        game: G,
+        sampler: DealSampler,
         mut state: SolverState,
         current_config: SolverConfig,
+        commit_pages: bool,
     ) -> Result<Self, SolverError> {
         validate_setup(&game, &sampler, current_config)?;
         if state.schema_version != SOLVER_STATE_VERSION {
@@ -617,7 +1023,11 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             return Err(SolverError::ResumeConfigurationMismatch);
         }
         state.config.max_memory_bytes = current_config.max_memory_bytes;
-        let expected_sweeps = state.traversals / game.num_players() as u64;
+        let num_players = game.num_players() as u64;
+        if !state.traversals.is_multiple_of(num_players) {
+            return Err(SolverError::IncompleteSweepState);
+        }
+        let expected_sweeps = state.traversals / num_players;
         if state.completed_sweeps != expected_sweeps {
             return Err(SolverError::InvalidState(
                 "completed sweep count is inconsistent with traversals",
@@ -630,68 +1040,74 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         }
 
         if matches!(game.recall_mode(), RecallMode::Street) {
-            return Self::from_state_dense(game, sampler, state);
+            return Self::from_state_dense(game, sampler, state, commit_pages);
         }
+        #[cfg(not(any(feature = "research-abstractions", test)))]
+        return Err(SolverError::PreallocatedStorageRequiresStreetRecall);
 
-        let mut histories: FxHashMap<HistoryKey, HistoryEntry> = FxHashMap::default();
-        histories.reserve(state.histories.len());
-        let mut approx_memory_bytes = 0u64;
-        for entry in state.histories {
-            validate_history_entry(&entry, game.num_players())?;
-            approx_memory_bytes = approx_memory_bytes
-                .checked_add(history_memory_bytes(&entry.action_label)?)
-                .ok_or(SolverError::MemoryAccountingOverflow)?;
-            let key = entry.key;
-            if histories.insert(key, entry).is_some() {
-                return Err(SolverError::DuplicateHistory(key));
+        #[cfg(any(feature = "research-abstractions", test))]
+        {
+            let mut histories: FxHashMap<HistoryKey, HistoryEntry> = FxHashMap::default();
+            histories.reserve(state.histories.len());
+            let mut approx_memory_bytes = 0u64;
+            for entry in state.histories {
+                validate_history_entry(&entry, game.num_players())?;
+                approx_memory_bytes = approx_memory_bytes
+                    .checked_add(history_memory_bytes(&entry.action_label)?)
+                    .ok_or(SolverError::MemoryAccountingOverflow)?;
+                let key = entry.key;
+                if histories.insert(key, entry).is_some() {
+                    return Err(SolverError::DuplicateHistory(key));
+                }
             }
-        }
-        validate_history_graph(&histories)?;
+            validate_history_graph(&histories)?;
 
-        let mut policies: FxHashMap<InfoKey, PolicyColumn> = FxHashMap::default();
-        policies.reserve(state.policies.len());
-        for entry in state.policies {
-            validate_column(
-                entry.key,
-                &entry.column,
-                game.num_players(),
-                RecallMode::Full,
-            )?;
-            if entry.key.history != HistoryKey::ROOT && !histories.contains_key(&entry.key.history)
-            {
-                return Err(SolverError::InvalidState(
-                    "policy refers to an unknown public history",
-                ));
+            let mut policies: FxHashMap<InfoKey, PolicyColumn> = FxHashMap::default();
+            policies.reserve(state.policies.len());
+            for entry in state.policies {
+                validate_column(
+                    entry.key,
+                    &entry.column,
+                    game.num_players(),
+                    RecallMode::Full,
+                )?;
+                if entry.key.history != HistoryKey::ROOT
+                    && !histories.contains_key(&entry.key.history)
+                {
+                    return Err(SolverError::InvalidState(
+                        "policy refers to an unknown public history",
+                    ));
+                }
+                approx_memory_bytes = approx_memory_bytes
+                    .checked_add(entry_memory_bytes(&entry.column.action_labels)?)
+                    .ok_or(SolverError::MemoryAccountingOverflow)?;
+                if policies.insert(entry.key, entry.column).is_some() {
+                    return Err(SolverError::DuplicatePolicy(entry.key));
+                }
             }
-            approx_memory_bytes = approx_memory_bytes
-                .checked_add(entry_memory_bytes(&entry.column.action_labels)?)
-                .ok_or(SolverError::MemoryAccountingOverflow)?;
-            if policies.insert(entry.key, entry.column).is_some() {
-                return Err(SolverError::DuplicatePolicy(entry.key));
+            if approx_memory_bytes > state.config.max_memory_bytes {
+                return Err(SolverError::MemoryLimit {
+                    limit: state.config.max_memory_bytes,
+                    needed: approx_memory_bytes,
+                });
             }
-        }
-        if approx_memory_bytes > state.config.max_memory_bytes {
-            return Err(SolverError::MemoryLimit {
-                limit: state.config.max_memory_bytes,
-                needed: approx_memory_bytes,
-            });
-        }
 
-        Ok(Self {
-            game,
-            sampler,
-            config: state.config,
-            policies,
-            histories,
-            approx_memory_bytes,
-            traversals: state.traversals,
-            completed_sweeps: state.completed_sweeps,
-            next_sample_id: state.next_sample_id,
-            total_deal_attempts: state.total_deal_attempts,
-            terminal_evaluations: state.terminal_evaluations,
-            hand_updates: state.hand_updates,
-            dense: None,
-        })
+            Ok(Self {
+                game,
+                sampler,
+                config: state.config,
+                policies,
+                histories,
+                approx_memory_bytes,
+                traversals: state.traversals,
+                completed_sweeps: state.completed_sweeps,
+                next_sample_id: state.next_sample_id,
+                total_deal_attempts: state.total_deal_attempts,
+                terminal_evaluations: state.terminal_evaluations,
+                hand_updates: state.hand_updates,
+                dense: None,
+            })
+        }
     }
 
     /// [`Self::from_state_with_config`]'s `RecallMode::Street` path: rebuilds
@@ -701,22 +1117,40 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     fn from_state_dense(
         game: G,
         sampler: DealSampler,
-        state: SolverState,
+        mut state: SolverState,
+        commit_pages: bool,
     ) -> Result<Self, SolverError> {
-        let mut dense_storage = DenseStorage::build(&game, state.config.max_memory_bytes)?;
+        let mut dense_storage = DenseStorage::build(
+            &game,
+            state.config.max_memory_bytes,
+            state.config.max_traversal_depth,
+            false,
+        )?;
+        state.histories.sort_unstable_by_key(|entry| entry.key);
+        state.policies.sort_unstable_by_key(|entry| entry.key);
+        let mut previous_history = None;
         for entry in &state.histories {
             validate_history_entry(entry, game.num_players())?;
+            if previous_history == Some(entry.key) {
+                return Err(SolverError::DuplicateHistory(entry.key));
+            }
+            previous_history = Some(entry.key);
             if !dense_storage.tree.by_history.contains_key(&entry.key) {
                 return Err(SolverError::UnmappedDenseHistory(entry.key));
             }
         }
-        for entry in state.policies {
+        let mut previous_policy = None;
+        for entry in &state.policies {
             validate_column(
                 entry.key,
                 &entry.column,
                 game.num_players(),
                 RecallMode::Street,
             )?;
+            if previous_policy == Some(entry.key) {
+                return Err(SolverError::DuplicatePolicy(entry.key));
+            }
+            previous_policy = Some(entry.key);
             let (node_id, bucket) = dense_storage
                 .target(entry.key)
                 .ok_or(SolverError::UnmappedDenseEntry { key: entry.key })?;
@@ -732,6 +1166,18 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     current: entry.column.regrets.len(),
                 });
             }
+        }
+        if commit_pages {
+            dense_storage.arena.commit_pages();
+        }
+        for entry in state.policies {
+            let (node_id, bucket) = dense_storage
+                .target(entry.key)
+                .expect("checkpoint entry was mapped in the validation pass");
+            let range = dense_storage
+                .arena
+                .slot_range(node_id, bucket)
+                .expect("checkpoint bucket was validated in the validation pass");
             dense_storage.arena.regrets[range.clone()].copy_from_slice(&entry.column.regrets);
             dense_storage.arena.strategy_sum[range].copy_from_slice(&entry.column.strategy_sum);
             let column = dense_storage.arena.column_id(node_id, bucket)?;
@@ -771,27 +1217,33 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         self.config
     }
 
-    /// Fingerprint covering solver knobs, ranges, and public game rules.
-    pub fn configuration_fingerprint(&self) -> [u8; 32] {
-        let mut hasher = blake3::Hasher::new();
-        hasher.update(b"solvers.multiway.solver-config.v4");
-        hasher.update(&self.config.seed.to_le_bytes());
-        hasher.update(&self.config.max_traversal_depth.to_le_bytes());
-        hasher.update(&self.config.exploration_epsilon.to_bits().to_le_bytes());
-        hasher.update(&self.config.discount_every.to_le_bytes());
-        hasher.update(&self.config.discount_until.to_le_bytes());
-        hasher.update(&self.config.sweep_batch.to_le_bytes());
-        hasher.update(&[u8::from(self.config.traverser_vector)]);
-        hasher.update(&[u8::from(self.config.prune)]);
-        hasher.update(&self.config.prune_threshold.to_bits().to_le_bytes());
-        hasher.update(&self.config.prune_skip_probability.to_bits().to_le_bytes());
-        hasher.update(&self.sampler.range_fingerprint());
-        hasher.update(&self.game.game_fingerprint());
-        *hasher.finalize().as_bytes()
+    /// Returns the fixed arena report for current-street storage. Production
+    /// callers require `Some` with `pages_committed = true` before sweep 0.
+    pub fn policy_arena_allocation(&self) -> Option<PolicyArenaAllocation> {
+        self.dense.as_ref().map(|dense| PolicyArenaAllocation {
+            nodes: dense.arena.node_count() as u64,
+            columns: dense.arena.total_columns(),
+            slots: dense.arena.total_slots(),
+            bytes: dense.arena.estimated_bytes(),
+            pages_committed: dense.arena.pages_committed(),
+        })
     }
 
+    /// Fingerprint covering solver knobs, ranges, and public game rules.
+    pub fn configuration_fingerprint(&self) -> [u8; 32] {
+        configuration_fingerprint_for_setup(&self.game, &self.sampler, self.config)
+    }
+
+    /// Identity of the card-abstraction backend and private-recall semantics.
+    ///
+    /// Full recall deliberately retains the historical backend fingerprint
+    /// byte-for-byte. Street recall is domain-separated so it cannot alias a
+    /// full-recall checkpoint or solution built from the same buckets.
     pub fn abstraction_fingerprint(&self) -> [u8; 32] {
-        self.game.abstraction_fingerprint()
+        abstraction_fingerprint_with_recall(
+            self.game.abstraction_fingerprint(),
+            self.game.recall_mode(),
+        )
     }
 
     /// Runs complete sweeps using a deterministic ordered-delta batch.

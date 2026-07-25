@@ -13,7 +13,7 @@ use multiway::config::{
     AbstractionConfig, AbstractionKind, ActiveOpponentBucketConfig, AnteConfig, BettingConfig,
     BlindConfig, ForcedBetConfig, MultiwayConfig, RakeAllocation as RuntimeRakeAllocation,
     RakeRounding as RuntimeRakeRounding, RecallMode, RuleAction, RuleEffect, RuleStreet,
-    SeatConfig, SizeSpec, TreeRule as RuntimeTreeRule,
+    SeatConfig, SizeSpec, StackRatio, TreeRule as RuntimeTreeRule,
 };
 use multiway::types::{MAX_SEATS, MIN_SEATS, SeatId};
 use serde::{Deserialize, Serialize};
@@ -24,6 +24,12 @@ use crate::config::{
 };
 
 pub const SCHEMA: &str = "solvers.multiway-preflop/v1";
+pub const ROLLOUT_REMOVED_CODE: &str = "MWP001";
+pub const FULL_RECALL_REMOVED_CODE: &str = "MWP002";
+/// Fixed production policy-arena ceiling. The separate process limit remains
+/// 8 GiB so EHS² tables, the public tree, workers, and allocator overhead
+/// retain headroom.
+pub const PRODUCTION_POLICY_ARENA_LIMIT_BYTES: u64 = 6 * 1024 * 1024 * 1024;
 
 pub fn has_v1_schema(raw: &str) -> Result<bool> {
     let value: toml::Value = toml::from_str(raw).context("parsing TOML document")?;
@@ -37,6 +43,105 @@ pub fn has_v1_schema(raw: &str) -> Result<bool> {
         bail!("unsupported config schema {schema:?}; expected {SCHEMA:?}");
     }
     Ok(true)
+}
+
+/// Enforces the release solve/resume contract without changing the
+/// historical v1 decoder used by read-only artifact compatibility and
+/// research builds.
+///
+/// `kind` must be explicit because an omitted kind historically selected
+/// `multiway-rollout`; silently interpreting the same bytes as EHS² would
+/// change abstraction fingerprints and strategy semantics.
+pub fn validate_production_contract(raw: &str) -> Result<()> {
+    let value: toml::Value = toml::from_str(raw).context("parsing TOML document")?;
+    let root = value
+        .as_table()
+        .ok_or_else(|| anyhow!("TOML root must be a table"))?;
+    if root.get("schema").and_then(toml::Value::as_str) != Some(SCHEMA) {
+        bail!("production Multiway Preflop solve requires schema = {SCHEMA:?}");
+    }
+    let game = root
+        .get("game")
+        .and_then(toml::Value::as_table)
+        .ok_or_else(|| anyhow!("[game] table is required"))?;
+    let abstraction = game
+        .get("abstraction")
+        .and_then(toml::Value::as_table)
+        .ok_or_else(|| {
+            anyhow!(
+                "{ROLLOUT_REMOVED_CODE}: production requires explicit \
+                 [game.abstraction] kind = \"ehs2-percentile\"; omission historically selected \
+                 the removed multiway-rollout backend"
+            )
+        })?;
+    match abstraction.get("kind").and_then(toml::Value::as_str) {
+        Some("ehs2-percentile") => {}
+        Some("multiway-rollout") => bail!(
+            "{ROLLOUT_REMOVED_CODE}: game.abstraction.kind = \"multiway-rollout\" was removed \
+             from production: concrete state-to-bucket assignments grow during Solve, violating \
+             the sweep-0 preallocation contract; the measured Tournament comparator was inferior \
+             and the Cash comparator was about 4x slower and failed 0.95 river coverage"
+        ),
+        Some(kind) => bail!(
+            "{ROLLOUT_REMOVED_CODE}: production supports only \
+             game.abstraction.kind = \"ehs2-percentile\", found {kind:?}"
+        ),
+        None => bail!(
+            "{ROLLOUT_REMOVED_CODE}: production requires explicit \
+             game.abstraction.kind = \"ehs2-percentile\"; omission historically selected the \
+             removed multiway-rollout backend"
+        ),
+    }
+    for retired in ["rollouts_per_state", "seed", "training", "opponent_buckets"] {
+        if abstraction.contains_key(retired) {
+            bail!(
+                "{ROLLOUT_REMOVED_CODE}: game.abstraction.{retired} is rollout-only and was \
+                 removed from the production config; EHS2 is deterministic and fully built \
+                 before sweep 0"
+            );
+        }
+    }
+
+    if let Some(information) = game.get("information") {
+        let information = information
+            .as_table()
+            .ok_or_else(|| anyhow!("[game.information] must be a table"))?;
+        match information.get("recall").and_then(toml::Value::as_str) {
+            None | Some("current-street") => {}
+            Some("bucket-history") => bail!(
+                "{FULL_RECALL_REMOVED_CODE}: game.information.recall = \"bucket-history\" was \
+                 removed from production: its sparse policy map grows during Solve and EHS2 K64 \
+                 already hit the resource limit at 3,695/10,000 Tournament sweeps and \
+                 4,267/10,000 Cash sweeps"
+            ),
+            Some(recall) => bail!(
+                "{FULL_RECALL_REMOVED_CODE}: production uses fixed current-street recall, found \
+                 {recall:?}"
+            ),
+        }
+    }
+
+    let lowered = parse_and_lower(raw).context("validating production v1 config")?;
+    if lowered
+        .run
+        .max_memory_bytes
+        .is_some_and(|bytes| bytes != u64::MAX && bytes > PRODUCTION_POLICY_ARENA_LIMIT_BYTES)
+    {
+        bail!(
+            "production policy arena memory limit is 6GiB \
+             ({PRODUCTION_POLICY_ARENA_LIMIT_BYTES} bytes); lower run.resources.memory and use \
+             an external 8GiB process limit for total RSS"
+        );
+    }
+    let GameSection::PreflopMultiway(game) = lowered.game else {
+        unreachable!("v1 always lowers to Multiway Preflop")
+    };
+    if !matches!(game.abstraction.kind, AbstractionKind::Ehs2Table)
+        || !matches!(game.abstraction.recall, RecallMode::Street)
+    {
+        bail!("production contract lowering did not produce EHS2/current-street semantics");
+    }
+    Ok(())
 }
 
 fn base_directory(config_path: &Path) -> &Path {
@@ -162,6 +267,11 @@ pub fn apply_solve_overrides(
     max_time: Option<&str>,
     config_path: Option<&Path>,
 ) -> Result<String> {
+    // The default binary accepts only the fixed production abstraction.
+    // Research builds deliberately retain the historical v1 decoder so the
+    // checked-in rollout/full-recall experiments remain reproducible.
+    #[cfg(not(feature = "research"))]
+    validate_production_contract(raw)?;
     validate_decimal_chip_tokens(raw)?;
     let mut source: V1Config = toml::from_str(raw).context("parsing Multiway Preflop v1 config")?;
     if let Some(config_path) = config_path {
@@ -186,7 +296,10 @@ pub fn apply_solve_overrides(
     }
     let effective = toml::to_string_pretty(&source)
         .context("serializing solve-time v1 overrides and effective config")?;
-    parse_and_lower(&effective).context("validating solve-time v1 overrides")?;
+    #[cfg(not(feature = "research"))]
+    validate_production_contract(&effective).context("validating solve-time v1 overrides")?;
+    #[cfg(feature = "research")]
+    parse_and_lower(&effective).context("validating research solve-time v1 overrides")?;
     Ok(effective)
 }
 
@@ -393,7 +506,7 @@ struct Game {
     tree: Tree,
     #[serde(default)]
     abstraction: CardAbstraction,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Information::is_current_street")]
     information: Information,
 }
 
@@ -428,6 +541,12 @@ enum FirstActor {
 #[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
 enum Tree {
     Standard {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        allow_limp: Option<bool>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        max_aggressive_actions: Option<StreetAggressionCaps>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        reraise_jam_above_actor_starting_stack: Option<TreeStackRatio>,
         #[serde(default)]
         rules: Vec<TreeRule>,
     },
@@ -435,8 +554,31 @@ enum Tree {
         source: String,
         #[serde(default)]
         params: BTreeMap<String, toml::Value>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        allow_limp: Option<bool>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        max_aggressive_actions: Option<StreetAggressionCaps>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        reraise_jam_above_actor_starting_stack: Option<TreeStackRatio>,
     },
 }
+
+#[derive(Debug, Clone, Copy, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StreetAggressionCaps {
+    preflop: u8,
+    flop: u8,
+    turn: u8,
+    river: u8,
+}
+
+#[derive(Debug, Clone, Copy, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct TreeStackRatio {
+    numerator: u32,
+    denominator: u32,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct TreeRule {
@@ -690,7 +832,12 @@ fn substitute_params(source: &str, params: &BTreeMap<String, String>) -> String 
 
 impl Default for Tree {
     fn default() -> Self {
-        Self::Standard { rules: Vec::new() }
+        Self::Standard {
+            allow_limp: None,
+            max_aggressive_actions: None,
+            reraise_jam_above_actor_starting_stack: None,
+            rules: Vec::new(),
+        }
     }
 }
 
@@ -709,9 +856,11 @@ struct CardAbstraction {
     kind: CardAbstractionKind,
     rollouts_per_state: Option<u32>,
     seed: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    training: Option<AbstractionTraining>,
     #[serde(default)]
     buckets: BucketCounts,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     opponent_buckets: BTreeMap<String, BucketCounts>,
 }
 
@@ -721,8 +870,27 @@ impl Default for CardAbstraction {
             kind: CardAbstractionKind::MultiwayRollout,
             rollouts_per_state: None,
             seed: None,
+            training: None,
             buckets: BucketCounts::default(),
             opponent_buckets: BTreeMap::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct AbstractionTraining {
+    #[serde(default = "default_points_per_bucket")]
+    points_per_bucket: u32,
+    #[serde(default = "default_kmeans_iterations")]
+    kmeans_iterations: u32,
+}
+
+impl Default for AbstractionTraining {
+    fn default() -> Self {
+        Self {
+            points_per_bucket: default_points_per_bucket(),
+            kmeans_iterations: default_kmeans_iterations(),
         }
     }
 }
@@ -761,6 +929,12 @@ enum Recall {
 struct Information {
     #[serde(default)]
     recall: Recall,
+}
+
+impl Information {
+    fn is_current_street(&self) -> bool {
+        matches!(self.recall, Recall::CurrentStreet)
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -1066,12 +1240,24 @@ impl V1Config {
         self.game.defaults.stack_bb = Some(default_stack);
         self.game.defaults.range = Some(default_range);
         self.game.preflop_first_to_act = FirstActor::Seat(first_actor as u8);
-        if matches!(
-            self.game.abstraction.kind,
-            CardAbstractionKind::MultiwayRollout
-        ) {
-            self.game.abstraction.rollouts_per_state.get_or_insert(512);
-            self.game.abstraction.seed.get_or_insert(0);
+        match self.game.abstraction.kind {
+            CardAbstractionKind::MultiwayRollout => {
+                self.game.abstraction.rollouts_per_state.get_or_insert(512);
+                self.game.abstraction.seed.get_or_insert(0);
+                self.game
+                    .abstraction
+                    .training
+                    .get_or_insert_with(AbstractionTraining::default);
+            }
+            CardAbstractionKind::Ehs2Percentile
+                if self.game.abstraction.training == Some(AbstractionTraining::default()) =>
+            {
+                // Explicit defaults are accepted for schema symmetry, but
+                // EHS² has no training phase, so its canonical effective
+                // config omits this no-op table just like a legacy config.
+                self.game.abstraction.training = None;
+            }
+            CardAbstractionKind::Ehs2Percentile => {}
         }
         Ok(())
     }
@@ -1081,9 +1267,19 @@ impl V1Config {
     /// therefore remain reparsable after the original .mwtree file moves.
     fn materialize_effective_at(&mut self, base_dir: &Path) -> Result<()> {
         self.materialize_effective()?;
-        let Tree::Script { source, params } = &self.game.tree else {
+        let Tree::Script {
+            source,
+            params,
+            allow_limp,
+            max_aggressive_actions,
+            reraise_jam_above_actor_starting_stack,
+        } = &self.game.tree
+        else {
             return Ok(());
         };
+        let allow_limp = *allow_limp;
+        let max_aggressive_actions = *max_aggressive_actions;
+        let reraise_jam_above_actor_starting_stack = *reraise_jam_above_actor_starting_stack;
         let path = base_dir.join(source);
         let program = std::fs::read_to_string(&path)
             .with_context(|| format!("reading mwtree source {}", path.display()))?;
@@ -1117,7 +1313,12 @@ impl V1Config {
                     .collect(),
             })
             .collect();
-        self.game.tree = Tree::Standard { rules };
+        self.game.tree = Tree::Standard {
+            allow_limp,
+            max_aggressive_actions,
+            reraise_jam_above_actor_starting_stack,
+            rules,
+        };
         Ok(())
     }
 
@@ -1134,9 +1335,30 @@ impl V1Config {
         }
         check_grid("game.common_ante_bb", self.game.common_ante_bb, true)?;
 
-        let tree_rules = match &self.game.tree {
-            Tree::Standard { rules } => lower_tree_rules(rules)?,
-            Tree::Script { source, params } => {
+        let (
+            tree_rules,
+            allow_limp,
+            max_aggressive_actions,
+            reraise_jam_above_actor_starting_stack,
+        ) = match &self.game.tree {
+            Tree::Standard {
+                rules,
+                allow_limp,
+                max_aggressive_actions,
+                reraise_jam_above_actor_starting_stack,
+            } => (
+                lower_tree_rules(rules)?,
+                *allow_limp,
+                *max_aggressive_actions,
+                *reraise_jam_above_actor_starting_stack,
+            ),
+            Tree::Script {
+                source,
+                params,
+                allow_limp,
+                max_aggressive_actions,
+                reraise_jam_above_actor_starting_stack,
+            } => {
                 let base = base_dir.ok_or_else(|| {
                     anyhow!(
                         "script tree requires a config file path for relative source resolution"
@@ -1145,9 +1367,21 @@ impl V1Config {
                 let path = base.join(source);
                 let program = std::fs::read_to_string(&path)
                     .with_context(|| format!("reading mwtree source {}", path.display()))?;
-                lower_tree_script(&program, params)?
+                (
+                    lower_tree_script(&program, params)?,
+                    *allow_limp,
+                    *max_aggressive_actions,
+                    *reraise_jam_above_actor_starting_stack,
+                )
             }
         };
+        if let Some(ratio) = reraise_jam_above_actor_starting_stack
+            && (ratio.numerator == 0
+                || ratio.denominator == 0
+                || ratio.numerator > ratio.denominator)
+        {
+            bail!("game.tree.reraise_jam_above_actor_starting_stack must be a ratio in (0, 1]");
+        }
 
         let sb = if count == 2 {
             usize::from(self.game.button)
@@ -1248,6 +1482,12 @@ impl V1Config {
         if !vector && prune {
             bail!("regret-based pruning is forbidden with solver.kind = \"single-hand\"");
         }
+        if prune && matches!(abstraction.recall, RecallMode::Full) {
+            bail!(
+                "regret-based pruning requires game.information.recall = \"current-street\"; \
+                 set solver.pruning.kind = \"none\" for \"bucket-history\""
+            );
+        }
         if self.run.max_sweeps == 0 {
             bail!("run.max_sweeps must be positive");
         }
@@ -1276,8 +1516,10 @@ impl V1Config {
             }),
         );
         let memory = Some(parse_memory(self.run.resources.memory)?.unwrap_or(u64::MAX));
-        // No legacy 2/4 GiB CLI cap: the runtime's allocation checks remain
-        // authoritative until platform available-memory probing is installed.
+        // The compatibility decoder preserves `auto` as the historical
+        // sentinel. Production validation/session construction resolves it
+        // to the fixed 6 GiB arena limit without changing embedded historical
+        // artifact configs decoded for read-only access.
         let target_scale = match &utility {
             UtilitySection::ChipEv => 1.0,
             UtilitySection::TournamentIcm { payouts, .. } => payouts.iter().sum::<f64>(),
@@ -1305,16 +1547,32 @@ impl V1Config {
         let _encoding = self.output.probability_encoding;
 
         let nominal_big_blind_bb = forced_blinds.iter().copied().fold(0.0, f64::max);
+        let mut betting = BettingConfig {
+            rules: tree_rules,
+            ..BettingConfig::default()
+        };
+        if let Some(allow_limp) = allow_limp {
+            betting.allow_limp = allow_limp;
+        }
+        if let Some(caps) = max_aggressive_actions {
+            betting.preflop.max_aggressive_actions = caps.preflop;
+            betting.flop.max_aggressive_actions = caps.flop;
+            betting.turn.max_aggressive_actions = caps.turn;
+            betting.river.max_aggressive_actions = caps.river;
+        }
+        if let Some(ratio) = reraise_jam_above_actor_starting_stack {
+            betting.preflop.reraise_jam_above_actor_starting_stack = Some(StackRatio {
+                numerator: ratio.numerator,
+                denominator: ratio.denominator,
+            });
+        }
         Ok(SolveConfig {
             game: GameSection::PreflopMultiway(MultiwayConfig {
                 seats,
                 button: SeatId::new_unchecked(self.game.button),
                 blinds: BlindConfig::default(),
                 ante: AnteConfig::None,
-                betting: BettingConfig {
-                    rules: tree_rules,
-                    ..BettingConfig::default()
-                },
+                betting,
                 forced_bets: Some(ForcedBetConfig {
                     blinds_bb: forced_blinds,
                     antes_bb: forced_antes,
@@ -1365,6 +1623,13 @@ fn lower_abstraction(
     information: Information,
     seats: usize,
 ) -> Result<AbstractionConfig> {
+    let training = source.training.unwrap_or_default();
+    if training.points_per_bucket == 0 {
+        bail!("game.abstraction.training.points_per_bucket must be positive");
+    }
+    if training.kmeans_iterations == 0 {
+        bail!("game.abstraction.training.kmeans_iterations must be positive");
+    }
     let buckets = source.buckets;
     let cast = |field: &str, value: u32| -> Result<u16> {
         if value == 0 {
@@ -1394,6 +1659,8 @@ fn lower_abstraction(
             turn_buckets: cast("turn buckets", buckets.turn)?,
             river_buckets: cast("river buckets", buckets.river)?,
             rollout_samples: source.rollouts_per_state.unwrap_or(512),
+            points_per_bucket: training.points_per_bucket,
+            kmeans_iterations: training.kmeans_iterations,
             seed: source.seed.unwrap_or(0),
             active_opponent_buckets: overrides,
             artifact_cache: None,
@@ -1404,6 +1671,9 @@ fn lower_abstraction(
             kind: AbstractionKind::RolloutKmeans,
         }),
         CardAbstractionKind::Ehs2Percentile => {
+            if training != AbstractionTraining::default() {
+                bail!("ehs2-percentile forbids non-default rollout training parameters");
+            }
             if source.rollouts_per_state.is_some() || source.seed.is_some() || !overrides.is_empty()
             {
                 bail!("ehs2-percentile forbids rollout samples, seed, and opponent overrides");
@@ -1413,6 +1683,8 @@ fn lower_abstraction(
                 turn_buckets: cast("turn buckets", buckets.turn)?,
                 river_buckets: cast("river buckets", buckets.river)?,
                 rollout_samples: 512,
+                points_per_bucket: training.points_per_bucket,
+                kmeans_iterations: training.kmeans_iterations,
                 seed: 0,
                 active_opponent_buckets: Vec::new(),
                 artifact_cache: None,
@@ -1590,6 +1862,12 @@ fn one_u64() -> u64 {
 fn default_buckets() -> u32 {
     64
 }
+fn default_points_per_bucket() -> u32 {
+    8
+}
+fn default_kmeans_iterations() -> u32 {
+    20
+}
 fn default_discount_every() -> u64 {
     10_000
 }
@@ -1627,6 +1905,9 @@ fn default_target() -> Target {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use multiway::abstraction::FeatureHashAbstraction;
+    use multiway::holdem::HoldemGame;
+    use multiway::solver::ExternalSamplingGame;
 
     const MINIMAL: &str = r#"
 schema = "solvers.multiway-preflop/v1"
@@ -1639,6 +1920,32 @@ button = 0
 stack_bb = 100.0
 range = "random"
 "#;
+
+    const PRODUCTION_MINIMAL: &str = r#"
+schema = "solvers.multiway-preflop/v1"
+
+[game]
+seat_count = 6
+button = 0
+
+[game.defaults]
+stack_bb = 100.0
+range = "random"
+
+[game.abstraction]
+kind = "ehs2-percentile"
+"#;
+
+    fn game_fingerprint(lowered: SolveConfig) -> [u8; 32] {
+        let GameSection::PreflopMultiway(game) = lowered.game else {
+            panic!()
+        };
+        let utility = crate::session::convert_utility(lowered.utility).unwrap();
+        let rake = crate::session::convert_rake(lowered.rake);
+        HoldemGame::new(&game, &utility, &rake, FeatureHashAbstraction::default())
+            .unwrap()
+            .game_fingerprint()
+    }
 
     #[test]
     fn minimal_config_materializes_v1_defaults() {
@@ -1654,6 +1961,8 @@ range = "random"
         );
         assert_eq!(game.abstraction.flop_buckets, 64);
         assert_eq!(game.abstraction.rollout_samples, 512);
+        assert_eq!(game.abstraction.points_per_bucket, 8);
+        assert_eq!(game.abstraction.kmeans_iterations, 20);
         assert_eq!(game.abstraction.recall, RecallMode::Street);
         let AlgorithmSection::ExternalSamplingMccfr {
             exploration_epsilon,
@@ -1677,23 +1986,305 @@ range = "random"
     }
 
     #[test]
+    fn production_contract_is_ehs2_current_street_only() {
+        validate_production_contract(PRODUCTION_MINIMAL).unwrap();
+
+        let omitted = validate_production_contract(MINIMAL)
+            .expect_err("historical rollout default must not be silently reinterpreted");
+        assert!(omitted.to_string().contains(ROLLOUT_REMOVED_CODE));
+        assert!(
+            omitted
+                .to_string()
+                .contains("omission historically selected")
+        );
+
+        let rollout = format!("{MINIMAL}\n[game.abstraction]\nkind = \"multiway-rollout\"\n");
+        let rollout_error = validate_production_contract(&rollout)
+            .unwrap_err()
+            .to_string();
+        assert!(rollout_error.contains(ROLLOUT_REMOVED_CODE));
+        assert!(rollout_error.contains("preallocation contract"));
+
+        let full = format!(
+            "{PRODUCTION_MINIMAL}\n[game.information]\nrecall = \"bucket-history\"\n\n\
+             [solver.pruning]\nkind = \"none\"\n"
+        );
+        let full_error = validate_production_contract(&full).unwrap_err().to_string();
+        assert!(full_error.contains(FULL_RECALL_REMOVED_CODE));
+        assert!(full_error.contains("3,695/10,000"));
+    }
+
+    #[test]
+    fn production_contract_rejects_every_rollout_only_child_option() {
+        for retired in [
+            "rollouts_per_state = 512",
+            "seed = 7",
+            "training = { points_per_bucket = 8, kmeans_iterations = 20 }",
+            "opponent_buckets = { 1 = { flop = 64, turn = 64, river = 64 } }",
+        ] {
+            let raw = PRODUCTION_MINIMAL.replace(
+                "kind = \"ehs2-percentile\"",
+                &format!("kind = \"ehs2-percentile\"\n{retired}"),
+            );
+            let error = validate_production_contract(&raw).unwrap_err().to_string();
+            assert!(error.contains(ROLLOUT_REMOVED_CODE), "{error}");
+            assert!(error.contains("rollout-only"), "{error}");
+        }
+    }
+
+    #[test]
+    fn bucket_history_requires_pruning_none() {
+        let bucket_history =
+            format!("{MINIMAL}\n[game.information]\nrecall = \"bucket-history\"\n");
+        let error = parse_and_lower(&bucket_history)
+            .expect_err("default regret-based pruning is unsupported with bucket-history");
+        assert!(error.to_string().contains(
+            "regret-based pruning requires game.information.recall = \"current-street\""
+        ));
+
+        let explicit_none = format!("{bucket_history}\n[solver.pruning]\nkind = \"none\"\n");
+        let lowered = parse_and_lower(&explicit_none).unwrap();
+        let AlgorithmSection::ExternalSamplingMccfr { prune, .. } = lowered.algorithm else {
+            panic!()
+        };
+        assert!(!prune);
+    }
+
+    #[test]
     fn normalized_effective_toml_is_reparsable() {
         let effective = normalized_toml(MINIMAL).unwrap();
         assert!(effective.contains("rollouts_per_state = 512"));
+        assert!(effective.contains("points_per_bucket = 8"));
+        assert!(effective.contains("kmeans_iterations = 20"));
         assert!(effective.contains("probability_encoding = \"u16\""));
         parse_and_lower(&effective).unwrap();
     }
 
     #[test]
+    fn abstraction_training_effective_round_trip_and_legacy_omission_are_stable() {
+        let explicit_defaults = format!(
+            "{MINIMAL}\n[game.abstraction.training]\n\
+             points_per_bucket = 8\nkmeans_iterations = 20\n"
+        );
+        let omitted_effective = normalized_toml(MINIMAL).unwrap();
+        let explicit_effective = normalized_toml(&explicit_defaults).unwrap();
+        assert_eq!(omitted_effective, explicit_effective);
+        assert_eq!(
+            formats::config_hash(omitted_effective.as_bytes()),
+            formats::config_hash(explicit_effective.as_bytes())
+        );
+        assert_eq!(
+            omitted_effective,
+            normalized_toml(&omitted_effective).unwrap()
+        );
+
+        let tuned = format!(
+            "{MINIMAL}\n[game.abstraction.training]\n\
+             points_per_bucket = 16\nkmeans_iterations = 40\n"
+        );
+        let lowered = parse_and_lower(&tuned).unwrap();
+        let GameSection::PreflopMultiway(game) = lowered.game else {
+            panic!()
+        };
+        assert_eq!(game.abstraction.points_per_bucket, 16);
+        assert_eq!(game.abstraction.kmeans_iterations, 40);
+        let tuned_effective = normalized_toml(&tuned).unwrap();
+        assert_ne!(
+            formats::config_hash(tuned_effective.as_bytes()),
+            formats::config_hash(omitted_effective.as_bytes())
+        );
+        assert_eq!(tuned_effective, normalized_toml(&tuned_effective).unwrap());
+    }
+
+    #[test]
+    fn abstraction_training_validation_and_ehs2_contract_are_enforced() {
+        for (field, value) in [("points_per_bucket", 0), ("kmeans_iterations", 0)] {
+            let raw = format!("{MINIMAL}\n[game.abstraction.training]\n{field} = {value}\n");
+            let error = parse_and_lower(&raw).unwrap_err().to_string();
+            assert!(error.contains(field), "{error}");
+            assert!(error.contains("must be positive"), "{error}");
+        }
+
+        let ehs2_default = format!(
+            "{MINIMAL}\n[game.abstraction]\nkind = \"ehs2-percentile\"\n\n\
+             [game.abstraction.training]\n\
+             points_per_bucket = 8\nkmeans_iterations = 20\n"
+        );
+        assert!(parse_and_lower(&ehs2_default).is_ok());
+        let ehs2_omitted = format!("{MINIMAL}\n[game.abstraction]\nkind = \"ehs2-percentile\"\n");
+        assert_eq!(
+            normalized_toml(&ehs2_default).unwrap(),
+            normalized_toml(&ehs2_omitted).unwrap()
+        );
+
+        for training in [
+            "points_per_bucket = 16\nkmeans_iterations = 20",
+            "points_per_bucket = 8\nkmeans_iterations = 40",
+        ] {
+            let raw = format!(
+                "{MINIMAL}\n[game.abstraction]\nkind = \"ehs2-percentile\"\n\n\
+                 [game.abstraction.training]\n{training}\n"
+            );
+            let error = parse_and_lower(&raw).unwrap_err().to_string();
+            assert!(
+                error.contains("forbids non-default rollout training parameters"),
+                "{error}"
+            );
+        }
+    }
+
+    #[test]
+    fn benchmark_tree_settings_lower_and_keep_a_stable_effective_fingerprint() {
+        let raw = format!(
+            "{MINIMAL}\n[game.tree]\nkind = \"standard\"\nallow_limp = false\n\
+             reraise_jam_above_actor_starting_stack = {{ numerator = 1, denominator = 3 }}\n\n\
+             [game.tree.max_aggressive_actions]\npreflop = 6\nflop = 4\nturn = 4\nriver = 4\n"
+        );
+        let lowered = parse_and_lower(&raw).unwrap();
+        let GameSection::PreflopMultiway(game) = lowered.game else {
+            panic!()
+        };
+        assert!(!game.betting.allow_limp);
+        assert_eq!(game.betting.preflop.max_aggressive_actions, 6);
+        assert_eq!(game.betting.flop.max_aggressive_actions, 4);
+        assert_eq!(game.betting.turn.max_aggressive_actions, 4);
+        assert_eq!(game.betting.river.max_aggressive_actions, 4);
+        assert_eq!(
+            game.betting.preflop.reraise_jam_above_actor_starting_stack,
+            Some(StackRatio {
+                numerator: 1,
+                denominator: 3,
+            })
+        );
+        assert!(
+            game.betting
+                .flop
+                .reraise_jam_above_actor_starting_stack
+                .is_none()
+        );
+
+        let first = normalized_toml(&raw).unwrap();
+        let second = normalized_toml(&first).unwrap();
+        assert_eq!(first, second);
+        assert_eq!(
+            formats::config_hash(first.as_bytes()),
+            formats::config_hash(second.as_bytes())
+        );
+    }
+
+    #[test]
+    fn tracked_benchmark_compatibility_configs_match_canonical_game_fingerprints() {
+        let repository = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+        for (canonical_name, compatibility_name, expected_fingerprint) in [
+            (
+                "tournament-6max-50bb-benchmark-v1.toml",
+                "tournament-6max-50bb-one-size-postflop.toml",
+                "a31e08f41b36e46fcf340e432d27209dea872bcfa21e3104ee6037255e0af512",
+            ),
+            (
+                "cash-6max-100bb-benchmark-v1.toml",
+                "cash-6max-100bb-one-size-postflop.toml",
+                "c35365b8e6ab8df1bbacdd9a6a862c527205bc048c58fa7db8b05f81bf3bc55b",
+            ),
+        ] {
+            let directory = repository.join("experiments/abstraction-2026-07-23");
+            let canonical_path = directory.join(canonical_name);
+            let compatibility_path = directory.join(compatibility_name);
+            let canonical_raw = std::fs::read_to_string(&canonical_path).unwrap();
+            let compatibility_raw = std::fs::read_to_string(&compatibility_path).unwrap();
+
+            let canonical =
+                crate::config::parse_solve_config_at(&canonical_raw, &canonical_path).unwrap();
+            let compatibility =
+                crate::config::parse_solve_config_at(&compatibility_raw, &compatibility_path)
+                    .unwrap();
+            let canonical_fingerprint = game_fingerprint(canonical);
+            assert_eq!(
+                canonical_fingerprint,
+                game_fingerprint(compatibility),
+                "{canonical_name} and {compatibility_name} lowered to different games"
+            );
+            assert_eq!(
+                formats::config_hash_hex(&canonical_fingerprint),
+                expected_fingerprint,
+                "{canonical_name} changed from the measured benchmark game"
+            );
+        }
+    }
+
+    #[test]
+    fn omitted_tree_settings_preserve_legacy_runtime_defaults() {
+        let raw = format!("{MINIMAL}\n[game.tree]\nkind = \"standard\"\n");
+        let lowered = parse_and_lower(&raw).unwrap();
+        let GameSection::PreflopMultiway(game) = lowered.game else {
+            panic!()
+        };
+        let defaults = BettingConfig::default();
+        assert_eq!(game.betting.allow_limp, defaults.allow_limp);
+        assert_eq!(
+            game.betting.preflop.max_aggressive_actions,
+            defaults.preflop.max_aggressive_actions
+        );
+        assert_eq!(
+            game.betting.flop.max_aggressive_actions,
+            defaults.flop.max_aggressive_actions
+        );
+        assert_eq!(
+            game.betting.turn.max_aggressive_actions,
+            defaults.turn.max_aggressive_actions
+        );
+        assert_eq!(
+            game.betting.river.max_aggressive_actions,
+            defaults.river.max_aggressive_actions
+        );
+        assert!(
+            game.betting
+                .preflop
+                .reraise_jam_above_actor_starting_stack
+                .is_none()
+        );
+        assert_eq!(
+            game_fingerprint(parse_and_lower(MINIMAL).unwrap()),
+            game_fingerprint(parse_and_lower(&raw).unwrap())
+        );
+    }
+
+    #[test]
+    fn invalid_reraise_jam_ratio_is_rejected_during_v1_parse() {
+        for ratio in [
+            "{ numerator = 0, denominator = 3 }",
+            "{ numerator = 1, denominator = 0 }",
+            "{ numerator = 4, denominator = 3 }",
+        ] {
+            let raw = format!(
+                "{MINIMAL}\n[game.tree]\nkind = \"standard\"\n\
+                 reraise_jam_above_actor_starting_stack = {ratio}\n"
+            );
+            assert!(
+                parse_and_lower(&raw)
+                    .unwrap_err()
+                    .to_string()
+                    .contains("must be a ratio in (0, 1]")
+            );
+        }
+    }
+
+    #[test]
     fn solve_time_overrides_are_normalized_and_validated() {
+        let memory = if cfg!(feature = "research") {
+            "12GiB"
+        } else {
+            "6GiB"
+        };
         let effective =
-            apply_solve_overrides(MINIMAL, Some(3), Some("12GiB"), Some("2h"), None).unwrap();
+            apply_solve_overrides(PRODUCTION_MINIMAL, Some(3), Some(memory), Some("2h"), None)
+                .unwrap();
         assert_eq!(max_time_secs(&effective).unwrap(), Some(7_200));
         let value: toml::Value = toml::from_str(&effective).unwrap();
         assert_eq!(value["run"]["resources"]["threads"].as_integer(), Some(3));
-        assert_eq!(value["run"]["resources"]["memory"].as_str(), Some("12GiB"));
+        assert_eq!(value["run"]["resources"]["memory"].as_str(), Some(memory));
         let resumed = apply_resume_overrides(
-            MINIMAL,
+            PRODUCTION_MINIMAL,
             None,
             None,
             None,
@@ -1714,6 +2305,21 @@ range = "random"
             resumed["run"]["checkpoint"]["interval"].as_str(),
             Some("2m")
         );
+    }
+
+    #[cfg(not(feature = "research"))]
+    #[test]
+    fn production_memory_override_is_bounded_below_the_process_limit() {
+        validate_production_contract(PRODUCTION_MINIMAL).unwrap();
+        let at_limit =
+            apply_solve_overrides(PRODUCTION_MINIMAL, None, Some("6GiB"), None, None).unwrap();
+        validate_production_contract(&at_limit).unwrap();
+
+        let error =
+            apply_solve_overrides(PRODUCTION_MINIMAL, None, Some("7GiB"), None, None).unwrap_err();
+        let error = format!("{error:#}");
+        assert!(error.contains("production policy arena memory limit is 6GiB"));
+        assert!(error.contains("external 8GiB process limit"));
     }
 
     #[test]
@@ -1831,13 +2437,38 @@ ante_bb = 0.125
             "preflop when unopened { replace raise [2.2x, allin] }\n",
         )
         .unwrap();
-        let raw = format!("{MINIMAL}\n[game.tree]\nkind = \"script\"\nsource = \"tree.mwtree\"\n");
+        let raw = format!(
+            "{MINIMAL}\n[game.tree]\nkind = \"script\"\nsource = \"tree.mwtree\"\n\
+             allow_limp = false\n\
+             reraise_jam_above_actor_starting_stack = {{ numerator = 1, denominator = 3 }}\n\n\
+             [game.tree.max_aggressive_actions]\npreflop = 6\nflop = 4\nturn = 4\nriver = 4\n"
+        );
+        let script_fingerprint = game_fingerprint(parse_and_lower_at(&raw, &config_path).unwrap());
         let effective = normalized_toml_at(&raw, &config_path).unwrap();
         assert!(effective.contains("kind = \"standard\""));
         assert!(effective.contains("2.2x"));
+        assert!(effective.contains("allow_limp = false"));
+        assert!(effective.contains("preflop = 6"));
+        assert!(effective.contains("reraise_jam_above_actor_starting_stack"));
         assert!(!effective.contains("tree.mwtree"));
         std::fs::remove_file(script_path).unwrap();
-        parse_and_lower(&effective).unwrap();
+        let lowered = parse_and_lower(&effective).unwrap();
+        let GameSection::PreflopMultiway(game) = lowered.game else {
+            panic!()
+        };
+        assert!(!game.betting.allow_limp);
+        assert_eq!(game.betting.preflop.max_aggressive_actions, 6);
+        assert_eq!(
+            game.betting.preflop.reraise_jam_above_actor_starting_stack,
+            Some(StackRatio {
+                numerator: 1,
+                denominator: 3,
+            })
+        );
+        assert_eq!(
+            script_fingerprint,
+            game_fingerprint(parse_and_lower(&effective).unwrap())
+        );
     }
 
     #[test]

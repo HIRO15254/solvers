@@ -2,7 +2,7 @@
 
 `solvers` のマルチウェイプリフロップソルバー(`crates/multiway` + CLI/GUI)が
 「何を入力に、どういう計算をして、何を出すのか」を、実装の技術詳細より一段上の
-視点で説明する。次期CLIの確定仕様は `docs/multiway-preflop-cli-spec.jp.md`、
+視点で説明する。Production CLIの確定仕様は `docs/multiway-preflop-cli-spec.jp.md`、
 現行実装の挙動は `docs/multiway-preflop.md`、全体設計は
 `docs/architecture.md` を参照。
 
@@ -89,20 +89,30 @@ external sampling では、1 回の走査(traversal)で:
 
 - **プリフロップ**: 169 の標準ハンドクラス(AA, AKs, AKo, ...)。これは
   情報を失わない(suit isomorphism のみ)。
-- **フロップ以降**: 「ハンド+ボード」を Monte Carlo ロールアウトで特徴量化
-  (期待ポットシェア、その 2 次モーメント、スクープ/チョップ率)し、
-  k-means で少数の **バケット**(既定 32〜、設定可能)に量子化する。
-  バケット数は「生き残っている相手の人数」ごとに変えられる
-  (ヘッズアップの turn は細かく、5-way は粗く、など)。
-- 情報集合キーは到達した全ストリートのバケット列(full recall)を保持する。
+- **フロップ以降**: 全canonical boardとlegal hole comboについてuniform
+  heads-up E[HS²] percentile tableをSolve前にbuildまたはvalidated cacheからloadし、
+  **バケット**へ量子化する。flop/turn/riverのbucket数は設定可能で、既定は
+  64/64/64。resource不足でも自動縮小しない。
+- 情報集合キーは現在streetのbucketだけを保持する(current-street recall)。
+  Productionで選べるbackend/recallはこの組合せだけである。
 
 重要なのは **圧縮されるのは戦略の索引だけ** という点。ショーダウンの精算は
 常にサンプルされた実カードで行うため、バケットが粗くても「間違ったハンドが
 勝つ」ことはない。粗さの影響は「似た状況をまとめて 1 つの戦略で扱う」
 という形でのみ現れる。
 
-バケットの割当(セントロイド学習+割当キャッシュ)は決定的で、
-`artifact_cache` にファイル保存すれば次回以降のソルブはウォームスタートする。
+Productionは全到達public decision node × current-street bucket × actionのpolicy
+arenaをfallibleに確保し、全OS pageへwriteしてからだけsolverを返す。このbarrierは
+sweep 0、したがって最初のsampled postflop traversalより前に完了する。
+`[run.resources].memory`はarena payload上限で、process RSS hard capではない。
+productionの`memory = "auto"`は6 GiB arenaへ解決し、明示値も6 GiB以下に制限する。
+それでもEHS² table、public tree、worker scratch等を含む
+8 GiB process上限はcgroup/containerまたは外部RSS watchdogで別に強制する。
+
+旧rollout/k-means backendはSolve中にassignment cacheが増え、bucket-history/full
+recallもsparse policy mapが増えるため、productionからそれぞれ`MWP001`/`MWP002`で
+削除された。再現実験は`--features research` buildに隔離され、dynamic
+re-clusteringは元々実装されていない。
 
 ## 5. 何が保証され、何が保証されないか
 
@@ -127,9 +137,10 @@ HU エンジンが持つ exploitability / NashConv とは意図的に別名に�
 
 ## 6. 出力と再現性
 
-- **`.mwsol`**: 閲覧用アーティファクト。設定 TOML 全文、公開アクション履歴の
-  trie、情報集合ごとの平均戦略(f32、または `run.storage = "i16"` で
-  16bit 固定小数点量子化)を、ページ読み出し可能な索引付きで格納。
+- **`.mwsol`**: 閲覧用アーティファクト。normalized effective config、公開tree、
+  情報集合ごとの平均戦略を、ページ読み出し可能な索引付きで格納する。
+  probability encodingは既定`u16`(分母65,535)で、research/inspection用に
+  `f32`も選べる。signed `i16` strategy encodingはproduction v1では使わない。
   GUI の Results タブや Web ブリッジがこれを表示する。
 - **`.mwckpt`**: 再開用チェックポイント(累積 regret を含む全学習状態)。
   `solvers resume` / GUI から続きを回せる。
@@ -141,17 +152,17 @@ HU エンジンが持つ exploitability / NashConv とは意図的に別名に�
 ## 7. 実行するには
 
 ```sh
-# CLI(UI プリセット examples/presets/*.toml と同じ TOML 形式)
-cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
-  --output result.json --metrics metrics.jsonl \
-  --checkpoint solve.mwckpt --sol solve.mwsol
+# canonical production v1 configを生成し、1つのrun directoryへ出力する
+cargo run -p cli --release -- config new --template full --out solve.toml
+cargo run -p cli --release -- solve solve.toml --out runs/my-run
 ```
 
 GUI は再構築中(旧 egui GUI は 2026-07 に削除。後継の Tauri 同梱 Web GUI は
 `docs/app-structure.md` のロードマップ参照)。
 
-小さく速い動作確認には `tools/bench/mw_6max_64b.toml`(6-max・64 バケット・
-4096 sweeps、ウォームなら数秒)が便利。
+`examples/preflop_multiway_v1_production_smoke.toml`はproduction parser contractの
+検証fixtureである。`tools/bench/mw_6max_64b.toml`はretired rollout/full-recallを
+測るhistorical research fixtureであり、通常releaseでは実行しない。
 
 ## 8. 関連ドキュメント
 

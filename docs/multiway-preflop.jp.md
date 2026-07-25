@@ -1,27 +1,32 @@
 # Multiway preflop and blueprint solver
 
-> **現行実装リファレンス。** 次期Multiway Preflop CLI v1の確定仕様は
-> `docs/multiway-preflop-cli-spec.jp.md` を正本とする。移行中に本書と差異がある
-> 場合、既存binaryの説明には本書、実装目標にはv1確定仕様を使う。
+> **実装リファレンス。** Production releaseの正本は
+> `docs/multiway-preflop-cli-spec.jp.md` である。既定release binaryは
+> EHS²/current-street固定で、全policy arenaをsweep 0前に確保・page-touchする。
+> 本書に残るrollout/full-recallの説明は、旧artifactの意味と
+> `--features research` buildによる再現実験のためのhistorical referenceであり、
+> productionで選択できるオプションではない。
 
 本書は `docs/multiway-preflop.md` の日本語版であり、現行実装が何を計算し、
 なぜそうなっているのか、概念面の概要は `docs/preflop-solver-overview.md` を参照。
 本書はその挙動記録である。
 
-9-max の BBA/ICM 設定をそのまま実行できる例が
-`examples/preflop_multiway_9max.toml` にある。
+Production用canonical v1設定はCLIから生成できる。
 
 ```sh
-cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
-  --output result.json --metrics metrics.jsonl \
-  --checkpoint solve.mwckpt --sol solve.mwsol
+cargo run -p cli --release -- config new --template full --out solve.toml
+cargo run -p cli --release -- solve solve.toml --out run
 ```
+
+`examples/preflop_multiway_9max.toml`はBridge compatibility用のlegacy envelopeで
+あり、production CLIの直接入力ではない。
 
 マルチウェイ経路は、正確なヘッズアップ・ベクトルエンジンを一切変更することなく、
 2 席から 9 席までの配牌済みシートを解く。これはサンプリング型の生成的 NLHE
 ゲームであり、各走査(traversal)は互いに重複しないホールカード 1 セットと
 共有の 5 枚ボードを実際に引き、ボードをストリートごとに公開しながら進み、
-実際に訪れた抽象観測に対してのみ戦略を保存する。
+productionでは、全到達public node × 全current-street bucket × actionの戦略領域を
+sweep 0より前に確保し、走査中はそのうち訪問した列を更新する。
 
 ## Correctness boundary
 
@@ -51,6 +56,19 @@ cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
 スイッチを持つ。1 シートがテーブル全体のベッティングプロファイルを丸ごと
 置き換えることもできる。古い設定に `isolate_sizes` が存在しない場合、後方
 互換性のためテーブルは `bet_sizes` を再利用する。
+
+`BettingConfig.allow_limp = false`が除去するのは、未open時に名目BB額を
+voluntary callするactionだけである。open後のcallはTree ruleで除去しない限り
+合法のまま。public stateは、preflopでvoluntary callまたはaggressive actionを
+行ったseatのserde-default付きmaskと、openを最初のvoluntary actionとしてcallした
+非BB seat数も保持する。forced blind/anteはどちらにも入らず、BB defenseは
+open-cold-call数から明示的に除外する。
+
+Tree-rule conditionはこれらを`preflop_participant`と`open_cold_calls`として
+公開する。`in_position_to_last_aggressor`は別のpreflop booleanで、actorと
+直前raiserの固定postflop action orderを比較する。直前raiser不在または同一seatなら
+false。既存`in_position` selectorの意味は変えない。preflopではBTN、postflopでは
+non-folded seat中最後にactionするseatを表す。
 
 ### Size vocabulary
 
@@ -83,6 +101,18 @@ HRC 方式のレイズキャップ併合を追加する。サイズが解決し�
 ネイティブな `include_allin` エントリなど)は重複排除されるため、シートには
 オールインアクションがちょうど 1 つだけ見える。`allin_threshold` を省略した
 設定は影響を受けない。
+
+`StreetBettingConfig.reraise_jam_above_actor_starting_stack`は、これとは別の
+preflop reraise専用のexact rational mergeである。
+`StackRatio { numerator, denominator }`は`0 < numerator / denominator <= 1`を
+満たす必要がある。3bet以降のnormal sizeは、まずminimum raiseとactor stack capで
+targetを解決する。その後、整数比で
+`target * denominator > actor hand-start stack * numerator`の場合に限りall-inへ
+置換する。等号では置換せず、別途設定された合法かつdistinctな明示all-inがあれば、
+normal targetとその両方を残す。明示`AllIn` size自体は変換せず、最後に同じchip
+targetをdedupする。
+このoptionはpostflopでは拒否し、inclusiveかつeffective-all-in基準の
+`allin_threshold`とは併用できない。
 
 ### チェックダウン閾値 (`max_betting_players`)
 
@@ -163,22 +193,28 @@ HRC 方式のレイズキャップ併合を追加する。サイズが解決し�
 
 ## Abstraction and reproducibility
 
+Production releaseではcard abstractionはEHS² percentile、recallは
+current-streetに固定される。`kind = "ehs2-percentile"`の明示は、旧v1で
+省略時にrolloutを選んでいた設定を黙って別の意味へ変更しないための移行guardで
+あり、backend selectorではない。以下のrollout/full-recall記述は
+research/historical互換性の説明である。
+
 プリフロップ観測は伝統的な 169 クラスを用いる。ポストフロップ観測は、
 アクティブな相手の人数(1 人から 8 人まで)ごとに別々にクラスタリングされ、
 期待ポットシェア、その 2 次モーメント、スクープ/タイ確率を用いる。
-情報集合は完全なバケットパスを保持する。アーティファクトのシード、
-ロールアウトパラメータ、ルール、セントロイドはフィンガープリントを構成し、
-キャッシュとチェックポイントによって検査される。
+full recallは完全なbucket pathを、street recallは現在bucketだけを保持する。
+アーティファクトのseed、rollout parameter、centroidはabstraction fingerprintを
+構成し、cacheとcheckpointで検査される。公開table/range/tree/economics ruleは
+別のgame fingerprintを構成する。
 
-### 抽象化バックエンド (`game.abstraction.kind`)
+### Research/historical抽象化バックエンド (`game.abstraction.kind`)
 
-`kind` はポストフロップのカード抽象化バックエンドを選択する。既定値は
-`"rollout-kmeans"` であり、`"rollout-kmeans"` である限り設定のシリアライズ
-されたアイデンティティ(したがってゲームフィンガープリント)から省略され
-るため、このオプションが存在する前に書かれたすべての設定はバイト単位で
-影響を受けない。
+research/legacy configでは、`kind`がポストフロップのカード抽象化backendを
+選択する。historical defaultは`"rollout-kmeans"`で、その値ではlegacy configの
+シリアライズから省略されるため、古いconfig bytesを維持する。card abstractionは
+backendにかかわらずgame fingerprintから意図的に除外される。
 
-- **`"rollout-kmeans"`(既定)。** 以下で説明するトレーニング済みロール
+- **`"rollout-kmeans"`(legacy research既定)。** 以下で説明するトレーニング済みロール
   アウト/k-means 抽象化: アクティブな相手の人数を考慮し、ソルブ時の
   Monte Carlo によるバケット割り当てが(正規化された状況ごとに)メモ化
   され、ソルブ後に `artifact_cache` へ永続化される。
@@ -202,12 +238,13 @@ HRC 方式のレイズキャップ併合を追加する。サイズが解決し�
     一様レンジのハンドストレングス統計量である -- Monte Carlo を伴わない
     より安価な代替手段であり、厳密により優れた抽象化ではない。
 
-`kind` を切り替えるとフィンガープリントが変わる(当然ながら、2 つの
-バックエンドは同じボードから異なるバケットを生成する)ため、一方の
-バックエンドで構築されたチェックポイントや `.mwsol` は、もう一方の下では
-再開できない -- バケット数を変更した場合と同じ扱いである。
+`kind` を切り替えてもgame fingerprintは変わらないが、abstraction fingerprintは
+変わる(2つのbackendは同じboardから異なるbucketを生成する)。このため、一方の
+backendで構築されたcheckpointや`.mwsol`は他方でresumeできない。異なる
+abstractionのsolution compareはbucket IDを直接同一視せず、共有real-card sampleを
+使う。
 
-### v2 ロールアウト: ボードごとに 1 本のサンプルストリーム
+### Research-only v2 ロールアウト: ボードごとに 1 本のサンプルストリーム
 
 すべてのポストフロップバケット検索は `(street, active_opponents, hole,
 board)` を、スート同型のもとで最小となる正規化キーに変換する。このキーは
@@ -250,60 +287,64 @@ vector-traverser サンプリングにおける「ロールアウト抽象化の
 元)は stderr に警告を出力し、最初から再訓練し、新しいバージョン 3 の
 アーティファクトでファイルを上書きする。
 
-### Recall mode and the policy memory model (`game.abstraction.recall`)
+### Research/historical recall modeとpolicy memory model
 
-`recall` は、プライベート情報がソルバーのポリシーストレージをどのようにキー
-付けするかを選択する。既定値は `"full"` であり、`"full"` である限り設定の
-シリアライズされたアイデンティティ(したがってゲームフィンガープリント)
-から省略されるため、このオプションが存在する以前に書かれたすべての設定は
-バイト単位で影響を受けない。`recall = "street"` を設定すると、ゲーム
-フィンガープリントは**変化する**: Street-recall のチェックポイント/
-`.mwsol` は、同一テーブルの Full-recall による実行と互換ではなく、両者間
-での再開は、ベッティングツリーやバケット数が変更された場合と同様に拒否
-される。
+research/legacy configでは、`recall`がprivate情報によるpolicy storageのkey方法を
+選択する。historical defaultの`"full"`はlegacy configのシリアライズから省略され、
+旧config bytesを維持する。recallはgame fingerprintから意図的に除外されるため、
+table/range/tree/economicsが同じなら両modeは同じgameである。
+互換性はabstraction fingerprintで分離する: full recallは歴史的backend
+fingerprintを維持し、street recallはdomain separationする。modeをまたぐresumeは
+拒否し、solution compareはprivate bucket keyを直接同一視せず共有real-card
+sampleを使う。domain separation導入前のstreet-recall checkpointもresumeを
+明示errorにするが、旧solutionは読取可能で、埋込recall/real-card経路で比較する。
 
-- **`"full"`(既定): 疎な、完全な recall。** `(公開履歴、プレイヤー、
+- **`"full"`(legacy research既定): 疎な、完全な recall。** `(公開履歴、プレイヤー、
   これまでに到達した各ストリートを通るバケットパス)` の三つ組が最初に
   訪問された時点で `HashMap<InfoKey, PolicyColumn>` のエントリが作成
   される。したがってメモリは*訪問済みの異なる*情報集合の数に応じて
   増加する — 原理的には無制限であり、実際には抽象化/ツリーが尽きるまで
   は sweep 数に比例する(実測: 6-max・64 バケットのテーブルで 4,096
   sweep 時点で約 122 MiB、196k sweep までに約 3.4 GiB に増加)。これは
-  今日の(変更されていない)挙動である。
+  retired research実装の挙動であり、production storage contractではない。
 - **`"street"`: 密な、street(不完全)recall。** プライベート情報は
   *現在のストリートのバケットのみ*でキー付けされる — Monker/Pluribus
   方式の慣例であり、それより前のストリートは二度と再訪されず(バケット
   を再計算する必要すらないため速度上のボーナスとなる)、キーにも一切
   現れない。これはより精緻な戦略条件付けを、固定されたメモリ上限と
-  引き換えにするものである。ソルバー構築時(またはチェックポイント再開
-  時)に、公開ベッティングツリー*全体*が一度だけ列挙され(カードへの
-  依存はない: チャンスは公開ツリーの外側で既に一度サンプルされている)、
-  `f32` の regret と戦略和からなる単一の連続した node-major な
+  引き換えにするものである。ソルバー構築時(またはcheckpoint resume時)は、
+  full tree/arenaを保持・確保しないcount-only censusで、決定的なpublic betting
+  treeをまず走査する(card依存はなく、chanceはpublic tree外でsampleされる)。
+  各nodeのbucket/action数からdense arena bytesを累積し、
+  `run.max_memory_bytes`を厳密に超える最初のprefixで停止する。censusが完走した
+  場合だけpublic treeをmaterializeし、`f32`のregretとstrategy sumからなる
+  単一の連続したnode-majorな
   `[node][bucket][action]` アリーナが、ツリーが到達しうるすべての情報
-  集合について(実際に触れられるかどうかに関わらず)前もって確保される。
-  したがってメモリはその走行の生涯にわたって**固定**である: それは
-  (通常は数ギガバイトに及ぶ)アリーナが確保される*前に*計算され
-  `run.max_memory_bytes` と照合されるため、過大なツリー/抽象化は、
-  プロセスのメモリ予算に達する(あるいはそれを突き破る)まで増加し続け
-  る代わりに、ノード数/カラム数と推定バイト数を示す型付きエラーで早期
-  に失敗する。メトリクスストリームの `infosets` は*触れられた*カラム数
-  (安価に読める累積カウンタ)を報告し、`memory_bytes` は累積値ではなく
-  一定のプリフライト推定値を報告する。
-- **トレードオフ。** Street recall はメモリを制限し、走査あたりも高速
+  集合について(実際に触れられるかどうかに関わらず)fallibleに確保される。
+  Production constructorはregret、strategy sum、touched bitsetの全ページを
+  volatile writeでtouchし終えるまでsessionを返さない。
+  したがって**policy arena**はrun中固定である。見積りはaction slotごとの2本の
+  `f32`配列、columnごとのtouched bit、dense index tableを含み、超過時は最初に
+  超えたnode prefix、column数、設定上限、推定bytesを示すtyped errorになる。
+  ただしこれはprocess RSS上限ではない。materialized public tree/history index、
+  abstraction/cache、worker scratch、evaluation、checkpoint staging、allocator
+  overheadは別途memoryを使う。固定50M decision-node production capはなく、
+  caller指定node limitはbenchmark checkpointに限る。`u32`の`NodeId`幅は
+  representation limitとして残る。metricsの`infosets`は触れたcolumn数を、
+  `memory_bytes`はtotal RSSではなく固定arena推定値を報告する。
+- **Historical tradeoff。** Street recall はメモリを制限し、走査あたりも高速
   である(以前のストリートのバケット再計算がなく、ノードごとのハッシュ
   マップ管理もない)。その代償として、粗い、不完全 recall の戦略条件
-  付けとなる — これは Monker/Pluribus のような実運用ソルバーが用いるの
-  と同じ簡略化である。それが有意に多くの regret を招くかどうかは抽象化
-  とベッティングツリーに依存するため、どちらのモードが優れているかを
-  仮定せず、対象のテーブルごとに実測すべきである。アリーナは(典型的な
+  付けとなる — これは Monker/Pluribus のようなソルバーが用いる簡略化で
+  ある。production binaryはこのrecall選択を公開せずstreet固定とし、fullを
+  `MWP002`で拒否する。アリーナは(典型的な
   プレイアウトだけでなく)*完全に*列挙された公開ツリーからサイズが決まる
   ため、豊富なベッティングツリー(多数のベット/レイズサイズ、高い
   `max_aggressive_actions`、多数のシート)では、通常の sweep 数に対して
-  `"full"` モードなら同じメモリ予算に余裕をもって収まる場合でも、
-  `"street"` モードの事前確保が実行不可能になり得る。その対処法は
-  プリフライトエラーが示すものと同じである — ベッティングツリーを縮小
-  する(サイズを減らす、アグレッシブアクション上限を下げる)か、バケット
-  数を減らすか、`"full"` のままにする。
+  historical sparse `"full"` が有限sweepだけ収まる場合でも、`"street"` の
+  事前確保が実行不可能になり得る。productionはsweep 0前に失敗し、
+  operatorがベッティングツリーまたはbucket数を明示的に縮小するか、process
+  RSS境界を別に維持したままarena予算を上げる。`"full"`へfallbackしない。
 
 配牌・アクション・評価の乱数ストリームは、ベースシード、決定的なサンプル ID、
 トラバーサー、サンプル目的からそれぞれ独立に導出される。チェックポイントは
@@ -348,18 +389,16 @@ sweep ごとではなくバッチごとに 1 回だけポーリングされる�
 
 通常の external sampling は、走査(traversal)ごとにちょうど 1 つのハンド
 — トラバーサー自身に配られたコンボ — のみを更新する。
-`algorithm.traverser_vector = true`(`recall = "street"` の場合にのみ有効;
-`"full"` では型付きエラーで拒否される。デンスアリーナの事前計算済みツリーを
-必要とするためである)は、代わりに、サンプルされたトラバーサーシートの
-*実行可能なホールコンボすべて* を、同一のサンプルされた相手とボードに
-対して 1 回の走査で更新する。「実行可能」とは、トラバーサーの設定された
-レンジで正の重みを持ち、かつ他のすべてのシートのサンプルされたホールカード
-およびサンプルされたボードと重複がないことを意味する — 配牌ストリームの
-それ以外の部分(サンプラーがたまたまトラバーサーに配ったコンボが具体的に
-どれであるかを含む)は変わらないため、これを有効にしても RNG の消費量や
-どの世界がサンプルされるかは変化しない。
+`algorithm.traverser_vector = true` は、代わりに、サンプルされた
+トラバーサーシートの*実行可能なホールコンボすべて*を、同一のサンプルされた
+相手とボードに対して更新する。両 recall mode をサポートするが実装経路は
+異なる: `recall = "street"` は以下の最適化済み dense vector worker を使い、
+`"full"` は完全な bucket path を保つため、実行可能なコンボごとに重み付き
+sparse scalar traversal を1回ずつ実行する。「実行可能」とは、設定レンジで
+正の重みを持ち、他席のホールカードおよびボードと重複しないことをいう。
 
-- **なぜ速いのか。** ツリーは依然として走査ごとにちょうど 1 回だけ辿られる。
+- **dense 経路が速い理由。** street recall では、ツリーは走査ごとに
+  ちょうど 1 回だけ辿られる。
   変わるのはトラバーサー自身の意思決定ノードでの処理量だけであり(1 ノード
   あたりのアクション探索は今日と同じ 1 回だが、各子の値はスカラーではなく
   実行可能なコンボにわたるベクトルになる)。ショーダウンの終端評価は、
@@ -367,7 +406,7 @@ sweep ごとではなくバッチごとに 1 回だけポーリングされる�
   第 2 の走査を丸ごと構築する代わりに実行可能なコンボごとに 1 回再実行
   するため、高速化は走査そのものを償却することから来るのであって、コンボ
   ごとの評価が安くなるからではない。
-- **バケット集約。** トラバーサーの意思決定ノードでは、実行可能な各コンボ
+- **dense 経路のバケット集約。** トラバーサーの意思決定ノードでは、実行可能な各コンボ
   `h` はストリートごとの抽象化バケット `B(h)`(プリフロップでは 169
   クラスのインデックス)に写像される。regret matching 戦略は、ベクトルが
   到達する*相異なる*バケットごとに 1 回だけ(コンボごとにではなく)参照
@@ -379,7 +418,7 @@ sweep ごとではなくバッチごとに 1 回だけポーリングされる�
   メンバーを持たないバケットは単に現れず、更新も受けない。これは、実際に
   どのコンボがそのバケットに配られるかにわたる期待値において、通常の
   スカラー external sampling の更新と一致する。
-- **平均戦略も密になる。** スカラー external sampling(相手ノードでのみ、
+- **dense 経路では平均戦略も密になる。** スカラー external sampling(相手ノードでのみ、
   シートの単一のサンプルされたハンドに対して `strategy_sum` を加算する)
   とは異なり、vector モードは*トラバーサー*ノードで、実行可能なコンボ
   すべてにわたって平均戦略を蓄積する: バケット `b` のカラムは
@@ -423,7 +462,7 @@ sweep ごとではなくバッチごとに 1 回だけポーリングされる�
   (common random numbers)ため、`ci95` は MCCFR が実際に使うユーティリティ
   差分そのものの誤差を表す。`samples` がこの seed 再現可能な近似精度を制御
   する。
-- **ロールアウト抽象化のバッチ化。** vector 走査は、1 つだけでなく実行
+- **ロールアウト抽象化のバッチ化。** dense street-recall vector 走査は、1 つだけでなく実行
   可能なコンボすべてについてバケットを必要とするため、vector-traverser
   経路はノードごとに `bucket` をコンボごとに 1 回呼ぶ代わりに
   `MultiwayAbstraction::bucket_batch`(`ExternalSamplingGame::buckets_for_combos`
@@ -435,7 +474,8 @@ sweep ごとではなくバッチごとに 1 回だけポーリングされる�
   ストリーム」を参照。これにより、`traverser_vector` モードの支配的な
   コスト(以前は ~99% がコールドロールアウトの Monte Carlo であった)が、
   ボードを共有する数百のオーダーの実行可能なコンボにわたって償却される
-  ようになり、コンボごとに再度支払う必要がなくなる。
+  ようになり、コンボごとに再度支払う必要がなくなる。full-recall の
+  sparse fallback はこの batch 経路を使わないため、大幅に遅くなり得る。
 - **割り当てキャッシュの増加と永続化キャップ。** メモ化された
   `(RolloutKey -> BucketId)` 割り当てキャッシュは、訪問された相異なる
   正規化キーの数に応じて増加し続け、幅広い vector-traverser のランは、
@@ -453,8 +493,9 @@ sweep ごとではなくバッチごとに 1 回だけポーリングされる�
 
 ### Regret ベースの枝刈り (`algorithm.prune`)
 
-Pluribus 流の regret ベース枝刈り(RBP)。`traverser_vector` モードでのみ
-意味を持つ。traverser の意思決定ノードにおいて、regret-matched
+Pluribus 流の regret ベース枝刈り(RBP)。dense street-recall
+`traverser_vector` worker にのみ実装される。traverser の意思決定ノードに
+おいて、regret-matched
 確率がちょうどゼロで、かつ累積 regret がある閾値を大きく下回っている
 (bucket, action) の組は「枝刈り候補」になる。枝刈り候補になったすべての
 アクションのサブツリーへ毎回降りていく代わりに、確率
@@ -468,10 +509,13 @@ Pluribus 流の regret ベース枝刈り(RBP)。`traverser_vector` モードで
 `[algorithm]` の 3 つのキーがこれを制御する。いずれも省略可能:
 
 - `prune` (bool、既定値 `false`): 機能を有効にする。`traverser_vector =
-  true` と組み合わせた場合にのみ有効 — CLI (`cli::session`) はゲームを
-  構築する前に `traverser_vector = false` での `prune = true` を拒否し、
-  エンジン側 (`SolverConfig::validate_setup`) もバックストップとして
-  同様に拒否する。
+  true` かつ `recall = "street"` の場合にのみ有効 — CLI はどちらの未対応
+  組合せもsolve前に拒否し、エンジン側 (`SolverConfig::validate_setup`) も
+  typed errorを返す。`recall = "full"` のsparse fallbackでは
+  `prune = false` が必須であり、枝刈りを黙って無視しない。
+  旧full-recall solutionが`prune = true`を記録している場合、readerは歴史的に
+  未使用だったそのbitだけを`false`として再生する。自己完結checkpointは、
+  fingerprintを保つ明示的offline migrationが実装されるまでresumeを拒否する。
 - `prune_threshold` (浮動小数点数、静的な既定値なし): ゼロ確率のアクションが
   枝刈り候補になる regret の下限値。`prune = true` かつこのキーが
   省略された場合、ゲームのステークから導出される: `[utility] kind =

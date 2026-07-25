@@ -352,7 +352,7 @@ check_every = 1
     let mut post_headers = authenticated.clone();
     post_headers.push(("Content-Type", "application/json"));
 
-    let multiway_toml = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+    let multiway_toml = include_str!("../../../examples/preflop_multiway_bridge_compat_smoke.toml");
     let validate_body = serde_json::to_vec(&json!({ "configToml": multiway_toml })).unwrap();
     let validated = bridge.request(
         "POST",
@@ -415,14 +415,14 @@ check_every = 1
 }
 
 #[test]
-#[ignore = "trains a multiway rollout artifact; CI runs it in release with --include-ignored"]
+#[ignore = "builds the full EHS2 tables; explicit release acceptance only"]
 fn bridge_v2_multiway_lifecycle_and_managed_resume() {
     let bridge = Bridge::spawn();
     let authenticated = bridge.authenticated_headers();
     let mut post_headers = string_headers(&authenticated);
     post_headers.push(("Content-Type", "application/json"));
 
-    let config_toml = include_str!("../../../examples/preflop_multiway_3max_smoke.toml")
+    let config_toml = include_str!("../../../examples/preflop_multiway_bridge_compat_smoke.toml")
         .replace("sweeps = 2", "sweeps = 1");
     let create_body = serde_json::to_vec(&json!({ "configToml": config_toml })).unwrap();
     let created = bridge.request(
@@ -539,13 +539,13 @@ fn bridge_v2_multiway_lifecycle_and_managed_resume() {
 }
 
 #[test]
-#[ignore = "runs a cancellable multiway worker; CI runs it in release with --include-ignored"]
+#[ignore = "builds full EHS2 tables before running a cancellable release worker"]
 fn bridge_v2_cancel_interrupts_a_large_solver_chunk() {
     let bridge = Bridge::spawn();
     let authenticated = bridge.authenticated_headers();
     let mut post_headers = string_headers(&authenticated);
     post_headers.push(("Content-Type", "application/json"));
-    let base = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+    let base = include_str!("../../../examples/preflop_multiway_bridge_compat_smoke.toml");
     let config_toml = base
         .replace("sweeps = 2", "sweeps = 10000000")
         .replace("check_every = 1", "check_every = 10000000")

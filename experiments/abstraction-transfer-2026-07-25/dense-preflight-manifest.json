@@ -1,0 +1,82 @@
+{
+  "schema": "solvers.abstraction-transfer-dense-preflight/v1",
+  "run": {
+    "profile": "benchmark",
+    "postflop": "one-size",
+    "max_memory_bytes": 8589934592,
+    "rss_limit_bytes": 8053063680,
+    "buckets": [1, 2, 16, 64, 128, 256]
+  },
+  "scenario": [
+    {
+      "case": "tournament",
+      "id": "tournament-6max-5bb",
+      "seats": 6,
+      "stack_bb": 5,
+      "game_fingerprint": "02f0179b06ec036f79c6b0141e67a65bfb9a71f73557203db210516bb2bba63c"
+    },
+    {
+      "case": "tournament",
+      "id": "tournament-6max-50bb",
+      "seats": 6,
+      "stack_bb": 50,
+      "game_fingerprint": "a31e08f41b36e46fcf340e432d27209dea872bcfa21e3104ee6037255e0af512"
+    },
+    {
+      "case": "tournament",
+      "id": "tournament-8max-20bb",
+      "seats": 8,
+      "stack_bb": 20,
+      "game_fingerprint": "c357fb191000573a575708cfee241722ab201c8f1e584b8783ac299da4258e9f"
+    },
+    {
+      "case": "tournament",
+      "id": "tournament-9max-5bb",
+      "seats": 9,
+      "stack_bb": 5,
+      "game_fingerprint": "0908aa79db3d1149e055d3a25bb1e6ab25fd5e7fb956cbe7cb06e4e8ab5c8b5f"
+    },
+    {
+      "case": "tournament",
+      "id": "tournament-9max-50bb",
+      "seats": 9,
+      "stack_bb": 50,
+      "game_fingerprint": "39e87301e3169b897cfb59b9be452be7360ba13c574ad8a5d0a03bb8013c2282"
+    },
+    {
+      "case": "cash",
+      "id": "cash-6max-100bb",
+      "seats": 6,
+      "stack_bb": 100,
+      "game_fingerprint": "c35365b8e6ab8df1bbacdd9a6a862c527205bc048c58fa7db8b05f81bf3bc55b"
+    },
+    {
+      "case": "cash",
+      "id": "cash-6max-800bb",
+      "seats": 6,
+      "stack_bb": 800,
+      "game_fingerprint": "9d88e6644bccff8e5bde62ec9c8a480b0b344b60ac2ffeaba7140e201dfd3ce5"
+    },
+    {
+      "case": "cash",
+      "id": "cash-8max-400bb",
+      "seats": 8,
+      "stack_bb": 400,
+      "game_fingerprint": "b40006617d4fc8c8129699ffeba92cbe71306975127fbcfa76264a4a9ba1e843"
+    },
+    {
+      "case": "cash",
+      "id": "cash-9max-100bb",
+      "seats": 9,
+      "stack_bb": 100,
+      "game_fingerprint": "488aa4a6817cfb4d918ae033a5de1432f5484c1117afbad044bccd4cb002cbfa"
+    },
+    {
+      "case": "cash",
+      "id": "cash-9max-800bb",
+      "seats": 9,
+      "stack_bb": 800,
+      "game_fingerprint": "e28ba6bd1205332cbb98291772bf3d8b47925264bb89d384ad81e98ddb92cb20"
+    }
+  ]
+}

@@ -1,3 +1,6 @@
+# Historical research acceptance fixture only.
+# The production `solve` command rejects this legacy payload with MWP003.
+
 [game]
 kind = "preflop-multiway"
 button = 6

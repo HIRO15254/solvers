@@ -48,6 +48,13 @@ struct ResultV2 {
     traversals: u64,
     infosets: u64,
     memory_bytes: u64,
+    policy_storage: &'static str,
+    preallocated_nodes: u64,
+    preallocated_columns: u64,
+    preallocated_slots: u64,
+    preallocated_bytes: u64,
+    preallocated_pages_committed: bool,
+    policy_arena_limit_bytes: u64,
     elapsed_secs: f64,
     traversals_per_second: f64,
     total_deal_attempts: u64,
@@ -147,20 +154,43 @@ fn run_inner(
             "multiway solve path requires kind = \"preflop-multiway\""
         ));
     }
-    // `config` may carry a CLI `--iterations` override baked into
-    // `run.sweeps` (see `solve::run`), which never appears in `raw_config`'s
-    // own bytes. Re-serializing it (config.rs's schema round-trips through
-    // TOML) lets `build_multiway_session` validate and build against these
-    // *effective* run parameters, while the artifact-facing
-    // `config_toml`/`config_hash` below are restored to the original file
-    // bytes so checkpoints/solutions are stamped exactly as before this
-    // refactor -- the override never changes what a checkpoint is stamped
-    // with.
-    let effective_toml =
-        toml::to_string(&config).context("re-serializing the effective multiway config")?;
+    // Canonical v1 TOML is already materialized with all supported CLI
+    // overrides before this function is called. Keep it in that schema:
+    // lowering `discount.kind = "none"` deliberately uses `u64::MAX` in the
+    // runtime struct, which TOML cannot represent and therefore must not be
+    // round-tripped through the legacy shared schema. Historical research
+    // configs can still carry a legacy `--iterations` override in `config`,
+    // so only that path is re-serialized.
+    let effective_toml = if crate::multiway_v1::has_v1_schema(raw_config)? {
+        raw_config.to_owned()
+    } else {
+        toml::to_string(&config).context("re-serializing the effective multiway config")?
+    };
+    #[cfg(not(any(feature = "research", test)))]
+    let mut mw_session =
+        session::build_production_multiway_session(&effective_toml, resume_checkpoint)?;
+    #[cfg(any(feature = "research", test))]
     let mut mw_session = session::build_multiway_session(&effective_toml, resume_checkpoint)?;
     mw_session.config_toml = raw_config.to_string();
     mw_session.config_hash = config_hash;
+    let policy_allocation = mw_session.solver.policy_arena_allocation();
+    #[cfg(not(any(feature = "research", test)))]
+    let policy_allocation = Some(
+        policy_allocation
+            .filter(|allocation| allocation.pages_committed)
+            .ok_or_else(|| {
+                anyhow!("production solver has no page-committed preallocated policy arena")
+            })?,
+    );
+    if emit_progress && let Some(policy_allocation) = policy_allocation {
+        eprintln!(
+            "policy arena committed before sweep 0: nodes={} columns={} slots={} bytes={}",
+            policy_allocation.nodes,
+            policy_allocation.columns,
+            policy_allocation.slots,
+            policy_allocation.bytes
+        );
+    }
 
     // One sweep only yields `seats` parallel traversals, so the machine is
     // undersubscribed whenever `seats x sweep_batch < threads`. Purely a
@@ -415,20 +445,6 @@ fn run_inner(
             eprintln!("resource_limit checkpoint: {}", path.display());
         }
     }
-    // The rollout abstraction's assignment cache is pure memoization
-    // (deterministic f(centroids, key)), so it only grows as the solve
-    // visits more concrete rollout keys. Re-save it here so a later run
-    // against the same `artifact_cache` path starts warm instead of
-    // re-paying every cache miss this run already resolved. `.rollout()` is
-    // `None` for the ehs2-table backend, whose content is already fully
-    // determined (and disk-cached) at build time -- nothing to persist.
-    if let Some(path) = mw_session.game_config.abstraction.artifact_cache.as_deref()
-        && let Some(rollout) = mw_session.solver.game().abstraction().rollout()
-    {
-        rollout
-            .persist_assignment_cache(path)
-            .with_context(|| format!("persisting rollout assignment cache {}", path.display()))?;
-    }
     let final_metrics = mw_session.solver.metrics();
     if !has_evaluation || last_row.sweeps != final_metrics.sweeps {
         let evaluation = if status == CompletionStatus::Cancelled {
@@ -530,6 +546,18 @@ fn run_inner(
         traversals: final_metrics.traversals,
         infosets: final_metrics.infosets,
         memory_bytes: final_metrics.memory_bytes,
+        policy_storage: if policy_allocation.is_some_and(|allocation| allocation.pages_committed) {
+            "preallocated-all-current-street-buckets"
+        } else {
+            "research-compatibility"
+        },
+        preallocated_nodes: policy_allocation.map_or(0, |allocation| allocation.nodes),
+        preallocated_columns: policy_allocation.map_or(0, |allocation| allocation.columns),
+        preallocated_slots: policy_allocation.map_or(0, |allocation| allocation.slots),
+        preallocated_bytes: policy_allocation.map_or(0, |allocation| allocation.bytes),
+        preallocated_pages_committed: policy_allocation
+            .is_some_and(|allocation| allocation.pages_committed),
+        policy_arena_limit_bytes: mw_session.solver.config().max_memory_bytes,
         elapsed_secs: elapsed,
         traversals_per_second: if elapsed > 0.0 {
             final_metrics.traversals as f64 / elapsed

@@ -1,6 +1,8 @@
-# Multiway MCCFR throughput benchmark: 6-max 100bb, 64-bucket all-street
-# abstraction. The rollout artifact is cached under target/ so repeated runs
-# measure sweep throughput, not abstraction training.
+# Historical/research-only Multiway MCCFR throughput benchmark: legacy
+# 6-max 100bb, rollout/full-recall, 64 buckets on every street. Production
+# rejects this payload with MWP003; use tools/bench/mw_bench.sh with the
+# isolated --features research binary. The rollout artifact is cached under
+# target/ so repeated runs measure sweep throughput, not abstraction training.
 [game]
 kind = "preflop-multiway"
 button = 3

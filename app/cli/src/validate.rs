@@ -39,6 +39,7 @@ pub fn run(
             crate::multiway_v1::SCHEMA
         ));
     }
+    crate::multiway_v1::validate_production_contract(&raw)?;
     let config = parse_solve_config_at(&raw, config_path)?;
     let GameSection::PreflopMultiway(game) = &config.game else {
         unreachable!("v1 routing always lowers to a multiway game")

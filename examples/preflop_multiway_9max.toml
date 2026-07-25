@@ -1,3 +1,7 @@
+# Bridge compatibility example using the legacy internal payload.
+# This is not a canonical v1 CLI config; direct release `solve` rejects it
+# with MWP003. Bridge sanitization fixes the managed cache/resource paths.
+
 [game]
 kind = "preflop-multiway"
 button = 6
@@ -84,11 +88,11 @@ max_aggressive_actions = 2
 include_allin = true
 
 [game.abstraction]
+kind = "ehs2-table"
+recall = "street"
 flop_buckets = 32
 turn_buckets = 32
 river_buckets = 32
-rollout_samples = 256
-seed = 7
 
 [rake]
 kind = "none"

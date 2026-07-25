@@ -217,6 +217,13 @@ impl Parser<'_> {
                 self.state.num_seats(),
             )),
             "in_position" => Value::Bool(is_in_position(self.state, self.actor)),
+            "in_position_to_last_aggressor" => {
+                Value::Bool(is_in_position_to_last_aggressor(self.state, self.actor))
+            }
+            "preflop_participant" => {
+                Value::Bool(self.state.preflop_participants.contains(self.actor))
+            }
+            "open_cold_calls" => Value::Number(f64::from(self.state.preflop_open_cold_calls)),
             "players" => Value::Number(active_players as f64),
             "limpers" => Value::Number(f64::from(self.state.preflop_limpers)),
             "flats" => Value::Number(f64::from(self.state.preflop_flats)),
@@ -365,6 +372,22 @@ fn is_in_position(state: &BettingState, actor: SeatId) -> bool {
         == Some(actor)
 }
 
+fn is_in_position_to_last_aggressor(state: &BettingState, actor: SeatId) -> bool {
+    if state.street != crate::types::Street::Preflop {
+        return false;
+    }
+    let Some(aggressor) = state.last_preflop_aggressor else {
+        return false;
+    };
+    if actor == aggressor {
+        return false;
+    }
+    let seats = state.num_seats();
+    let postflop_rank =
+        |seat: SeatId| (seat.index() + seats - state.button.next(seats).index()) % seats;
+    postflop_rank(actor) > postflop_rank(aggressor)
+}
+
 fn spr(state: &BettingState, actor: SeatId) -> f64 {
     let pot = state.pot_size().raw();
     if pot == 0 {
@@ -426,6 +449,104 @@ mod tests {
                 },
                 &state,
                 state.to_act.unwrap(),
+            )
+            .unwrap()
+        );
+    }
+
+    #[test]
+    fn new_preflop_selectors_track_pairwise_position_participation_and_cold_calls() {
+        let config = MultiwayConfig {
+            seats: (0..6)
+                .map(|_| SeatConfig {
+                    name: None,
+                    stack_bb: 100.0,
+                    range: String::new(),
+                    betting: None,
+                })
+                .collect(),
+            button: SeatId(0),
+            blinds: BlindConfig::default(),
+            ante: AnteConfig::None,
+            betting: BettingConfig::default(),
+            forced_bets: None,
+            abstraction: AbstractionConfig::default(),
+        };
+        let mut state = BettingState::new(&config.validated().unwrap()).unwrap();
+        let base_rule = TreeRule {
+            priority: 0,
+            source_order: 0,
+            street: RuleStreet::Preflop,
+            condition: String::new(),
+            effect: RuleEffect::Remove,
+            action: Some(RuleAction::Call),
+            sizes: Vec::new(),
+        };
+
+        // In a six-handed table with BTN=0, fixed postflop order is
+        // SB(1), BB(2), UTG(3), HJ(4), CO(5), BTN(0).
+        state.last_preflop_aggressor = Some(SeatId(3));
+        assert!(
+            matches(
+                &TreeRule {
+                    condition: "in_position_to_last_aggressor".into(),
+                    ..base_rule.clone()
+                },
+                &state,
+                SeatId(5),
+            )
+            .unwrap()
+        );
+        state.last_preflop_aggressor = Some(SeatId(0));
+        for actor in [SeatId(1), SeatId(2)] {
+            assert!(
+                !matches(
+                    &TreeRule {
+                        condition: "in_position_to_last_aggressor".into(),
+                        ..base_rule.clone()
+                    },
+                    &state,
+                    actor,
+                )
+                .unwrap()
+            );
+        }
+        state.street = crate::types::Street::Flop;
+        assert!(
+            !matches(
+                &TreeRule {
+                    street: RuleStreet::Postflop,
+                    condition: "in_position_to_last_aggressor".into(),
+                    ..base_rule.clone()
+                },
+                &state,
+                SeatId(0),
+            )
+            .unwrap()
+        );
+        state.street = crate::types::Street::Preflop;
+
+        state.preflop_participants.insert(SeatId(3));
+        state.preflop_open_cold_calls = 2;
+        assert!(
+            matches(
+                &TreeRule {
+                    condition: "preflop_participant && open_cold_calls == 2".into(),
+                    ..base_rule.clone()
+                },
+                &state,
+                SeatId(3),
+            )
+            .unwrap()
+        );
+        assert!(
+            !matches(
+                &TreeRule {
+                    condition: "preflop_participant".into(),
+                    ..base_rule
+                },
+                &state,
+                SeatId(4),
             )
             .unwrap()
         );

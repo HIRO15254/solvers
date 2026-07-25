@@ -1,0 +1,191 @@
+# Warm-artifact compatibility companion for the canonical
+# tournament-6max-50bb-benchmark-v1.toml. Bucket-history/full recall creates
+# policy entries on demand instead of allocating the dense public-tree arena.
+#
+# This intentionally uses the compatibility schema only because v1 does not
+# expose `artifact_cache`. Do not run it unless its lowered game/tree
+# fingerprint has first been checked against the canonical v1 config.
+#
+# Tournament contract: no limp; open 2bb/all-in; 3bet 2.5x/all-in; 4bet+
+# 2x/all-in; at most two non-BB open cold callers (BB defense is separate);
+# and no new caller may enter after a 3bet.
+
+[game]
+kind = "preflop-multiway"
+button = 3
+
+[[game.seats]]
+stack_bb = 50.0
+range = ""
+[[game.seats]]
+stack_bb = 50.0
+range = ""
+[[game.seats]]
+stack_bb = 50.0
+range = ""
+[[game.seats]]
+stack_bb = 50.0
+range = ""
+[[game.seats]]
+stack_bb = 50.0
+range = ""
+[[game.seats]]
+stack_bb = 50.0
+range = ""
+
+[game.blinds]
+small_bb = 0.5
+big_bb = 1.0
+
+[game.ante]
+kind = "none"
+
+[game.forced_bets]
+blinds_bb = [0.0, 0.0, 0.0, 0.0, 0.5, 1.0]
+antes_bb = [0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
+common_ante_bb = 0.0
+nominal_big_blind_bb = 1.0
+first_to_act = 0
+
+[game.betting]
+allow_limp = false
+
+[game.betting.preflop]
+bet_sizes = [{ kind = "previous-bet-multiple", factor = 2.5 }]
+raise_sizes = [{ kind = "previous-bet-multiple", factor = 3.0 }]
+max_aggressive_actions = 6
+include_allin = true
+
+[game.betting.flop]
+bet_sizes = [{ kind = "pot-after-call", fraction = 0.5 }]
+raise_sizes = [{ kind = "pot-after-call", fraction = 0.75 }]
+max_aggressive_actions = 4
+include_allin = true
+
+[game.betting.turn]
+bet_sizes = [{ kind = "pot-after-call", fraction = 0.5 }]
+raise_sizes = [{ kind = "pot-after-call", fraction = 0.75 }]
+max_aggressive_actions = 4
+include_allin = true
+
+[game.betting.river]
+bet_sizes = [{ kind = "pot-after-call", fraction = 0.5 }]
+raise_sizes = [{ kind = "pot-after-call", fraction = 0.75 }]
+max_aggressive_actions = 4
+include_allin = true
+
+[[game.betting.rules]]
+priority = 100
+source_order = 0
+street = "preflop"
+condition = "unopened"
+effect = "replace"
+action = "raise"
+sizes = [
+  { kind = "to-bb", value = 2.0 },
+  { kind = "all-in" },
+]
+
+[[game.betting.rules]]
+priority = 100
+source_order = 1
+street = "preflop"
+condition = "aggressions == 1"
+effect = "replace"
+action = "raise"
+sizes = [
+  { kind = "previous-bet-multiple", factor = 2.5 },
+  { kind = "all-in" },
+]
+
+[[game.betting.rules]]
+priority = 100
+source_order = 2
+street = "preflop"
+condition = "aggressions >= 2"
+effect = "replace"
+action = "raise"
+sizes = [
+  { kind = "previous-bet-multiple", factor = 2.0 },
+  { kind = "all-in" },
+]
+
+[[game.betting.rules]]
+priority = 100
+source_order = 3
+street = "postflop"
+condition = "aggressions == 0"
+effect = "replace"
+action = "bet"
+sizes = [
+  { kind = "pot-after-call", fraction = 0.5 },
+  { kind = "all-in" },
+]
+
+[[game.betting.rules]]
+priority = 100
+source_order = 4
+street = "postflop"
+condition = "aggressions >= 1"
+effect = "replace"
+action = "raise"
+sizes = [
+  { kind = "previous-bet-multiple", factor = 2.5 },
+  { kind = "all-in" },
+]
+
+[[game.betting.rules]]
+priority = 200
+source_order = 5
+street = "preflop"
+condition = "aggressions == 1 && open_cold_calls >= 2 && position != \"BB\""
+effect = "remove"
+action = "call"
+sizes = []
+
+[[game.betting.rules]]
+priority = 200
+source_order = 6
+street = "preflop"
+condition = "aggressions >= 2 && !preflop_participant"
+effect = "remove"
+action = "call"
+sizes = []
+
+[game.abstraction]
+kind = "rollout-kmeans"
+flop_buckets = 256
+turn_buckets = 256
+river_buckets = 256
+rollout_samples = 512
+seed = 0
+recall = "full"
+artifact_cache = "target/abstraction-experiment/gcp-tournament-k256-r512.mwab"
+
+[rake]
+kind = "none"
+
+[utility]
+kind = "tournament-icm"
+payouts = [50.0, 30.0, 20.0, 0.0, 0.0, 0.0]
+
+[algorithm]
+schedule = "external-sampling-mccfr"
+seed = 1011
+exploration_epsilon = 0.0
+discount_every = 10000
+discount_until = 10000000
+traverser_vector = true
+prune = false
+
+[run]
+sweeps = 100
+seed = 1011
+check_every = 100
+storage = "f32"
+threads = 6
+max_memory_bytes = 6442450944
+evaluation_samples = 16
+evaluation_cadence = 100
+sweep_batch = 1
+checkpoint_every = 100

@@ -1,0 +1,113 @@
+# Pure recall ablation: 6-max, 100bb raked cash, current-street recall.
+#
+# This file is intentionally identical to cash-6max-recall-full.toml except
+# for `game.abstraction.recall`.
+
+[game]
+kind = "preflop-multiway"
+button = 3
+
+[[game.seats]]
+stack_bb = 100.0
+range = ""
+[[game.seats]]
+stack_bb = 100.0
+range = ""
+[[game.seats]]
+stack_bb = 100.0
+range = ""
+[[game.seats]]
+stack_bb = 100.0
+range = ""
+[[game.seats]]
+stack_bb = 100.0
+range = ""
+[[game.seats]]
+stack_bb = 100.0
+range = ""
+
+[game.blinds]
+small_bb = 0.5
+big_bb = 1.0
+
+[game.ante]
+kind = "none"
+
+[game.betting]
+allow_limp = true
+
+[game.betting.preflop]
+bet_sizes = [{ kind = "to-bb", value = 2.5 }]
+isolate_sizes = [{ kind = "to-bb", value = 3.5 }]
+raise_sizes = [{ kind = "previous-bet-multiple", factor = 3.0 }]
+max_aggressive_actions = 4
+include_allin = true
+
+[game.betting.flop]
+bet_sizes = [{ kind = "pot-after-call", fraction = 0.5 }]
+raise_sizes = []
+max_aggressive_actions = 1
+include_allin = false
+max_betting_players = 2
+
+[game.betting.turn]
+bet_sizes = []
+raise_sizes = []
+max_aggressive_actions = 0
+include_allin = false
+max_betting_players = 1
+
+[game.betting.river]
+bet_sizes = []
+raise_sizes = []
+max_aggressive_actions = 0
+include_allin = false
+max_betting_players = 1
+
+[[game.betting.rules]]
+priority = 100
+source_order = 0
+street = "flop"
+condition = "aggressions == 0 && !cbet"
+effect = "checkdown"
+sizes = []
+
+[game.abstraction]
+kind = "rollout-kmeans"
+flop_buckets = 64
+turn_buckets = 64
+river_buckets = 64
+rollout_samples = 512
+seed = 11
+recall = "street"
+artifact_cache = "target/abstraction-experiment/rollout64.mwab"
+
+[rake]
+kind = "percent-cap"
+rate = 0.05
+cap = 4000.0
+no_flop_no_drop = true
+
+[utility]
+kind = "chip-ev"
+
+[algorithm]
+schedule = "external-sampling-mccfr"
+seed = 1011
+exploration_epsilon = 0.0
+discount_every = 10000
+discount_until = 10000000
+traverser_vector = false
+prune = false
+
+[run]
+sweeps = 50000
+seed = 1011
+check_every = 50000
+storage = "f32"
+threads = 6
+max_memory_bytes = 8589934592
+evaluation_samples = 512
+evaluation_cadence = 50000
+sweep_batch = 1
+checkpoint_every = 50000
