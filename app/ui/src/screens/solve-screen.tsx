@@ -46,9 +46,9 @@ import {
 } from "@/components/ui/chart"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import type {
   ConnectionProfileViewModel,
-  JobState,
   StrategyEntry,
 } from "@/lib/solve-contract"
 import type {
@@ -60,6 +60,18 @@ import type {
 } from "@/lib/native-gateway"
 import { errorMessage } from "@/lib/native-gateway"
 import { strategyActionColors } from "@/lib/strategy-colors"
+import {
+  formatBytes,
+  formatElapsed,
+  formatInteger,
+  formatRate,
+} from "@/lib/format"
+import {
+  isTerminal,
+  statusBadgeClass,
+  statusBadgeVariant,
+  terminalStates,
+} from "@/lib/job-status"
 
 const chartConfig = {
   deviation: {
@@ -68,71 +80,12 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-const terminalStates = new Set<JobState>([
-  "target-reached",
-  "sweep-limit",
-  "time-limit",
-  "cancelled",
-  "resource-limit",
-  "failed",
-])
-
 type SolveScreenProps = {
   profile: ConnectionProfileViewModel
   gateway: DesktopSolveGateway
   jobId: string
   displayName: string
   onViewResults: () => void
-}
-
-function formatInteger(value: string) {
-  try {
-    return BigInt(value).toLocaleString("ja-JP")
-  } catch {
-    return value
-  }
-}
-
-function formatElapsed(value: string | null) {
-  if (value === null) {
-    return "—"
-  }
-  const parsed = Number(value)
-  if (!Number.isFinite(parsed)) {
-    return value
-  }
-  const seconds = Math.max(0, Math.floor(parsed))
-  const hours = Math.floor(seconds / 3600)
-  const minutes = Math.floor((seconds % 3600) / 60)
-  const rest = seconds % 60
-  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m ${rest}s`
-}
-
-function formatRate(value: string | null) {
-  if (value === null) {
-    return "—"
-  }
-  const parsed = Number(value)
-  return Number.isFinite(parsed)
-    ? parsed.toLocaleString("ja-JP", { maximumFractionDigits: 0 })
-    : value
-}
-
-function formatBytes(value: string | null) {
-  if (value === null) {
-    return "—"
-  }
-  try {
-    const bytes = BigInt(value)
-    const mibTimesTen = (bytes * 10n) / 1_048_576n
-    if (mibTimesTen >= 10_240n) {
-      const gibTimesTen = (bytes * 10n) / 1_073_741_824n
-      return `${gibTimesTen / 10n}.${gibTimesTen % 10n} GiB`
-    }
-    return `${mibTimesTen / 10n}.${mibTimesTen % 10n} MiB`
-  } catch {
-    return value
-  }
 }
 
 function sweepPercent(progress: NativeProgress | null) {
@@ -160,18 +113,8 @@ function measuredDeviation(progress: NativeProgress | null) {
   return finite.length ? Math.max(...finite) : null
 }
 
-function statusVariant(state: JobState) {
-  if (state === "target-reached") {
-    return "default" as const
-  }
-  if (state === "failed") {
-    return "destructive" as const
-  }
-  return "secondary" as const
-}
-
-function isActive(state: JobState) {
-  return !terminalStates.has(state)
+function isActive(state: NativeJobSnapshot["state"]) {
+  return !isTerminal(state)
 }
 
 export function SolveScreen({
@@ -191,6 +134,7 @@ export function SolveScreen({
   const [pollError, setPollError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const [strategyMessage, setStrategyMessage] = useState<string | null>(null)
+  const [chartScale, setChartScale] = useState<"log" | "linear">("log")
   const afterSequence = useRef<string | undefined>(undefined)
 
   const refresh = useCallback(
@@ -313,6 +257,28 @@ export function SolveScreen({
     return [...new Map(points.map((point) => [point.sweeps, point])).values()]
   }, [events, progress])
   const target = Number(progress?.stopTarget)
+  const canUseLog =
+    chartData.length > 0 && chartData.every((p) => p.deviation > 0)
+  const effectiveScale = chartScale === "log" && canUseLog ? "log" : "linear"
+  const remainingSecs = (() => {
+    if (!progress || progress.elapsedSecs === null) {
+      return null
+    }
+    const elapsed = Number(progress.elapsedSecs)
+    const sweeps = Number(progress.sweeps)
+    const maxSweeps = Number(progress.maxSweeps)
+    if (
+      !Number.isFinite(elapsed) ||
+      elapsed <= 0 ||
+      !Number.isFinite(sweeps) ||
+      !Number.isFinite(maxSweeps) ||
+      sweeps <= 0 ||
+      maxSweeps <= sweeps
+    ) {
+      return null
+    }
+    return Math.floor((elapsed * (maxSweeps - sweeps)) / sweeps)
+  })()
 
   const cancel = async () => {
     setCancelling(true)
@@ -377,7 +343,12 @@ export function SolveScreen({
         </div>
         <div className="flex items-center gap-2">
           {job ? (
-            <Badge variant={statusVariant(job.state)}>{job.state}</Badge>
+            <Badge
+              variant={statusBadgeVariant(job.state)}
+              className={statusBadgeClass(job.state)}
+            >
+              {job.state}
+            </Badge>
           ) : null}
           <Button
             variant="outline"
@@ -434,50 +405,59 @@ export function SolveScreen({
 
       <Card size="sm" className="overflow-visible">
         <CardContent className="solve-status-strip">
-          <div className="solve-sweep-progress">
-            <div className="flex items-center justify-between gap-3 text-xs">
-              <span className="font-medium">Sweep limit</span>
-              <span className="font-mono text-muted-foreground">
-                {progress ? formatInteger(progress.sweeps) : "—"} /{" "}
-                {progress ? formatInteger(progress.maxSweeps) : "—"} ·{" "}
-                <strong className="text-foreground">
-                  {percent.toFixed(1)}%
-                </strong>
-              </span>
-            </div>
-            <Progress value={percent} aria-label="sweep上限の消化率" />
-            <p className="text-[10px] text-muted-foreground">
-              上限消化率であり、収束確率ではありません。
-            </p>
+          <div className="solve-primary-metric">
+            <span>Measured deviation · 95% CI upper</span>
+            <strong>
+              {deviation === null ? "—" : deviation.toFixed(4)}
+              {deviation !== null && progress ? (
+                <em>{progress.stopTargetUnit}</em>
+              ) : null}
+            </strong>
+            <small>
+              <IconActivity />
+              {progress ? (
+                <>
+                  target {progress.stopTarget} {progress.stopTargetUnit}
+                  {deviation !== null && Number(progress.stopTarget) > 0
+                    ? ` · target比 ${(deviation / Number(progress.stopTarget)).toFixed(1)}×`
+                    : null}
+                </>
+              ) : (
+                "—"
+              )}
+            </small>
+          </div>
+
+          <div className="metric-tile">
+            <span>Sweeps</span>
+            <strong>
+              {progress ? formatInteger(progress.sweeps) : "—"} /{" "}
+              {progress ? formatInteger(progress.maxSweeps) : "—"}
+            </strong>
+            <Progress
+              className="metric-tile-progress"
+              value={percent}
+              aria-label="sweep上限の消化率"
+            />
+            <small>
+              {percent.toFixed(1)}% · 上限消化率（収束確率ではない）
+            </small>
           </div>
 
           <div className="metric-tile">
             <span>Elapsed</span>
-            <strong>
-              {progress?.elapsedSecs !== null &&
-              progress?.elapsedSecs !== undefined
-                ? formatElapsed(progress.elapsedSecs)
-                : "—"}
-            </strong>
+            <strong>{formatElapsed(progress?.elapsedSecs ?? null)}</strong>
             <small>
-              <IconClock /> wall clock
+              <IconClock />
+              {job && isActive(job.state) && remainingSecs !== null
+                ? `残り ${formatElapsed(String(remainingSecs))}（sweep budget基準）`
+                : "wall clock"}
             </small>
           </div>
-          <div className="metric-tile">
-            <span>Deviation upper</span>
-            <strong>{deviation === null ? "—" : deviation.toFixed(6)}</strong>
-            <small>
-              <IconActivity /> max seat CI
-            </small>
-          </div>
+
           <div className="metric-tile">
             <span>Resources</span>
-            <strong>
-              {progress?.memoryBytes !== null &&
-              progress?.memoryBytes !== undefined
-                ? formatBytes(progress.memoryBytes)
-                : "—"}
-            </strong>
+            <strong>{formatBytes(progress?.memoryBytes ?? null)}</strong>
             <small>
               <IconCpu />{" "}
               {progress?.handUpdatesPerSecond !== null &&
@@ -485,6 +465,9 @@ export function SolveScreen({
                 ? `${formatRate(progress.handUpdatesPerSecond)} updates/s`
                 : "—"}
             </small>
+            {progress?.infosets !== null && progress?.infosets !== undefined ? (
+              <small>{formatInteger(progress.infosets)} infosets</small>
+            ) : null}
           </div>
         </CardContent>
       </Card>
@@ -495,7 +478,26 @@ export function SolveScreen({
             <CardTitle>品質推移</CardTitle>
             <CardDescription>
               seatごとのdeviation gain 95% CI upper boundの最大値
+              {progress ? `（${progress.stopTargetUnit}）` : ""}
             </CardDescription>
+            <CardAction>
+              <ToggleGroup
+                size="sm"
+                value={[effectiveScale]}
+                onValueChange={(next) => {
+                  const value = next[0]
+                  if (!value) {
+                    return
+                  }
+                  setChartScale(value as "log" | "linear")
+                }}
+              >
+                <ToggleGroupItem value="log" disabled={!canUseLog}>
+                  Log
+                </ToggleGroupItem>
+                <ToggleGroupItem value="linear">Linear</ToggleGroupItem>
+              </ToggleGroup>
+            </CardAction>
           </CardHeader>
           <CardContent>
             {chartData.length ? (
@@ -520,13 +522,22 @@ export function SolveScreen({
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={(value: number) => value.toFixed(3)}
+                    scale={effectiveScale}
+                    domain={
+                      effectiveScale === "log" ? ["auto", "auto"] : [0, "auto"]
+                    }
+                    tickFormatter={(value: number) =>
+                      effectiveScale === "log"
+                        ? Number(value.toPrecision(2)).toString()
+                        : value.toFixed(3)
+                    }
                   />
                   <ChartTooltip
                     cursor={false}
                     content={<ChartTooltipContent />}
                   />
-                  {Number.isFinite(target) ? (
+                  {Number.isFinite(target) &&
+                  (effectiveScale === "linear" || target > 0) ? (
                     <ReferenceLine
                       y={target}
                       stroke="#f59e0b"

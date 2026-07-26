@@ -51,6 +51,7 @@ import type {
   NativeJobSnapshot,
 } from "@/lib/native-gateway"
 import { errorMessage } from "@/lib/native-gateway"
+import { formatBytes, formatInteger } from "@/lib/format"
 import {
   applyTreePreset,
   createDefaultFormDraft,
@@ -80,36 +81,6 @@ type ConfigSource =
       fileName: string
       configToml: string
     }
-
-function formatBytes(raw: string) {
-  try {
-    const bytes = BigInt(raw)
-    const units: Array<[bigint, string]> = [
-      [1_099_511_627_776n, "TiB"],
-      [1_073_741_824n, "GiB"],
-      [1_048_576n, "MiB"],
-      [1_024n, "KiB"],
-    ]
-    for (const [unit, label] of units) {
-      if (bytes >= unit) {
-        const whole = bytes / unit
-        const tenth = ((bytes % unit) * 10n) / unit
-        return `${whole.toLocaleString("ja-JP")}.${tenth} ${label}`
-      }
-    }
-    return `${bytes.toLocaleString("ja-JP")} bytes`
-  } catch {
-    return raw
-  }
-}
-
-function formatInteger(raw: string) {
-  try {
-    return BigInt(raw).toLocaleString("ja-JP")
-  } catch {
-    return raw
-  }
-}
 
 function memoryPercent(estimate: string, budget: string) {
   try {
@@ -237,6 +208,13 @@ export function SetupScreen({
     return generatedToml.value
   }
 
+  const currentSourceId = () =>
+    source.kind === "toml"
+      ? source.sourceId
+      : draft.treeKind === "script"
+        ? (draft.treeScriptSourceId ?? undefined)
+        : undefined
+
   const runOperation = async (
     label: string,
     operation: () => Promise<void>
@@ -299,12 +277,7 @@ export function SetupScreen({
   const handleValidate = () =>
     runOperation("validate", async () => {
       const configToml = currentToml()
-      const sourceId =
-        source.kind === "toml"
-          ? source.sourceId
-          : draft.treeKind === "script"
-            ? (draft.treeScriptSourceId ?? undefined)
-            : undefined
+      const sourceId = currentSourceId()
       const revision = draftRevision.current
       const result = await gateway.validateConfig(configToml, sourceId)
       if (revision === draftRevision.current) {
@@ -319,17 +292,37 @@ export function SetupScreen({
     runOperation("start", async () => {
       const name = draft.name.trim() || "Untitled solve"
       const revision = draftRevision.current
+      let current = validation
       if (
-        !validation?.valid ||
-        !validation.effectiveConfigToml ||
-        !validation.configFingerprint
+        !current?.valid ||
+        !current.effectiveConfigToml ||
+        !current.configFingerprint
       ) {
-        throw new Error("設定をもう一度ツリー構築・検証してください。")
+        const result = await gateway.validateConfig(
+          currentToml(),
+          currentSourceId()
+        )
+        if (revision !== draftRevision.current) {
+          return
+        }
+        setValidation(result)
+        current = result
+        if (!result.valid) {
+          requestAnimationFrame(() => commandBarRef.current?.focus())
+          return
+        }
+      }
+      if (
+        !current.valid ||
+        !current.effectiveConfigToml ||
+        !current.configFingerprint
+      ) {
+        return
       }
       const job = await gateway.startJob(
         name,
-        validation.effectiveConfigToml,
-        validation.configFingerprint
+        current.effectiveConfigToml,
+        current.configFingerprint
       )
       if (revision === draftRevision.current) {
         onJobStarted(job, name || job.id)
@@ -488,12 +481,12 @@ export function SetupScreen({
                 ? "設定を修正してください"
                 : validation?.valid
                   ? "ツリーとresourceを確認済み"
-                  : "設定後にツリーを構築・検証してください"}
+                  : "Solve開始で構築・検証から実行します"}
             </strong>
           </div>
           <p className={commandError ? "command-error" : undefined}>
             {commandError ??
-              "構築・検証が成功した設定だけSolveを開始できます。"}
+              "Solve開始は未検証の設定を自動で構築・検証してから実行します。"}
           </p>
         </div>
         <Button
@@ -511,14 +504,14 @@ export function SetupScreen({
           ) : (
             <IconCheck />
           )}
-          1 · ツリー構築・検証
+          ツリー構築・検証
         </Button>
         <Button
           disabled={
             !nativeReady ||
             isRemote ||
             busyAction !== null ||
-            !validation?.valid
+            generatedToml.error !== null
           }
           onClick={handleStart}
         >
@@ -527,7 +520,7 @@ export function SetupScreen({
           ) : (
             <IconArrowRight />
           )}
-          2 · Solve開始
+          {validation?.valid ? "Solve開始" : "検証してSolve開始"}
         </Button>
       </div>
 

@@ -843,14 +843,53 @@
 
 .solve-status-strip {
   display: grid;
-  grid-template-columns: minmax(320px, 1.7fr) repeat(3, minmax(112px, 0.5fr));
+  grid-template-columns:
+    minmax(240px, 1.3fr) minmax(190px, 1fr) repeat(2, minmax(130px, 0.7fr));
   align-items: end;
   gap: 1rem;
 }
 
-.solve-sweep-progress {
-  display: grid;
-  gap: 0.35rem;
+.solve-primary-metric {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.solve-primary-metric > span {
+  color: var(--muted-foreground);
+  font-size: 0.6rem;
+}
+
+.solve-primary-metric strong {
+  margin-top: 0.12rem;
+  font-size: 1.45rem;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.solve-primary-metric em {
+  font-style: normal;
+  color: var(--muted-foreground);
+  font-size: 0.6rem;
+  margin-left: 0.3rem;
+}
+
+.solve-primary-metric > small {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.2rem;
+  color: var(--muted-foreground);
+  font-size: 0.58rem;
+}
+
+.solve-primary-metric svg {
+  width: 12px;
+  height: 12px;
+}
+
+.metric-tile .metric-tile-progress {
+  margin-top: 0.3rem;
 }
 
 .solve-dashboard {
@@ -1322,7 +1361,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .solve-sweep-progress {
+  .solve-primary-metric {
     grid-column: 1 / -1;
   }
 
@@ -1396,10 +1435,6 @@
 
   .solve-status-strip {
     grid-template-columns: 1fr;
-  }
-
-  .solve-sweep-progress {
-    grid-column: auto;
   }
 
   .nav-item {

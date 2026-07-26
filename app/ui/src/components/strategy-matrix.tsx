@@ -28,6 +28,14 @@ function handLabel(row: number, column: number) {
   return `${ranks[column]}${ranks[row]}o`
 }
 
+const semanticShort: Record<TypedAction["semantic"], string> = {
+  fold: "F",
+  check: "X",
+  call: "C",
+  "bet-to": "B",
+  "raise-to": "R",
+}
+
 function probabilityPercent(entry: StrategyEntry, actionIndex: number) {
   if (entry.status === "unvisited" || entry.probabilityU16 === null) {
     return 0
@@ -35,13 +43,27 @@ function probabilityPercent(entry: StrategyEntry, actionIndex: number) {
   return ((entry.probabilityU16[actionIndex] ?? 0) / 65_535) * 100
 }
 
-function maximumProbabilityPercent(entry: StrategyEntry) {
-  if (!entry.probabilityU16?.length) {
-    return 0
+function dominantAction(
+  entry: StrategyEntry | undefined,
+  actions: TypedAction[]
+): { short: string; percent: number } | null {
+  if (!entry || entry.status === "unvisited" || !entry.probabilityU16?.length) {
+    return null
   }
-  return Math.max(
-    ...entry.probabilityU16.map((_, index) => probabilityPercent(entry, index))
-  )
+  let bestIndex = -1
+  let bestPercent = -Infinity
+  actions.forEach((_, index) => {
+    const percent = probabilityPercent(entry, index)
+    if (percent > bestPercent) {
+      bestPercent = percent
+      bestIndex = index
+    }
+  })
+  if (bestIndex === -1) {
+    return null
+  }
+  const action = actions[bestIndex]
+  return { short: semanticShort[action.semantic], percent: bestPercent }
 }
 
 function isOutOfRange(entry: StrategyEntry | undefined) {
@@ -110,6 +132,7 @@ export function StrategyMatrix({
               const label = handLabel(row, column)
               const entry = entriesByLabel.get(label)
               const isSelected = entry ? selectedId === entry.id : false
+              const dominant = dominantAction(entry, actions)
               const accessibleStrategy = !entry
                 ? `${label}: snapshotにデータがありません`
                 : entry.status === "unvisited" || entry.probabilityU16 === null
@@ -136,16 +159,15 @@ export function StrategyMatrix({
                     background: cellBackground(entry, actionColors),
                   }}
                   aria-label={accessibleStrategy}
+                  title={accessibleStrategy}
                   aria-pressed={isSelected}
                   onClick={() => entry && onSelect(entry)}
                   disabled={!entry}
                 >
                   <span>{label}</span>
-                  {!compact &&
-                  entry?.status === "visited" &&
-                  entry.probabilityU16 ? (
+                  {!compact && dominant ? (
                     <small>
-                      {Math.round(maximumProbabilityPercent(entry))}%
+                      {dominant.short} {Math.round(dominant.percent)}
                     </small>
                   ) : null}
                 </button>
@@ -174,42 +196,54 @@ export function StrategyBucketList({
   const actionColors = strategyActionColors(actions)
   return (
     <div className="max-h-[520px] divide-y overflow-auto rounded-lg border">
-      {entries.map((entry) => (
-        <button
-          type="button"
-          className={cn(
-            "grid w-full gap-3 px-3 py-2.5 text-left hover:bg-muted/50 md:grid-cols-[minmax(140px,0.6fr)_minmax(260px,1.4fr)]",
-            selectedId === entry.id && "bg-muted"
-          )}
-          key={entry.id}
-          onClick={() => onSelect(entry)}
-          aria-pressed={selectedId === entry.id}
-        >
-          <span>
-            <strong className="block">{entry.label}</strong>
-            <small className="text-muted-foreground">
-              {entry.bucketPath?.join(" / ") ?? entry.id} · {entry.status}
-            </small>
-          </span>
-          {entry.status === "unvisited" || !entry.probabilityU16 ? (
-            <span className="text-xs text-muted-foreground">unvisited</span>
-          ) : (
-            <span className="flex min-w-0 overflow-hidden rounded-full">
-              {actions.map((action, index) => (
-                <span
-                  key={action.id}
-                  className="h-5 min-w-0"
-                  title={`${action.label}: ${probabilityPercent(entry, index).toFixed(1)}%`}
-                  style={{
-                    width: `${probabilityPercent(entry, index)}%`,
-                    backgroundColor: actionColors[index],
-                  }}
-                />
-              ))}
+      {entries.map((entry) => {
+        const accessibleStrategy =
+          entry.status === "unvisited" || entry.probabilityU16 === null
+            ? `${entry.label}: unvisited`
+            : `${entry.label}: ${actions
+                .map(
+                  (action, index) =>
+                    `${action.label} ${probabilityPercent(entry, index).toFixed(1)}%`
+                )
+                .join(", ")}`
+        return (
+          <button
+            type="button"
+            className={cn(
+              "grid w-full gap-3 px-3 py-2.5 text-left hover:bg-muted/50 md:grid-cols-[minmax(140px,0.6fr)_minmax(260px,1.4fr)]",
+              selectedId === entry.id && "bg-muted"
+            )}
+            key={entry.id}
+            title={accessibleStrategy}
+            onClick={() => onSelect(entry)}
+            aria-pressed={selectedId === entry.id}
+          >
+            <span>
+              <strong className="block">{entry.label}</strong>
+              <small className="text-muted-foreground">
+                {entry.bucketPath?.join(" / ") ?? entry.id} · {entry.status}
+              </small>
             </span>
-          )}
-        </button>
-      ))}
+            {entry.status === "unvisited" || !entry.probabilityU16 ? (
+              <span className="text-xs text-muted-foreground">unvisited</span>
+            ) : (
+              <span className="flex min-w-0 overflow-hidden rounded-full">
+                {actions.map((action, index) => (
+                  <span
+                    key={action.id}
+                    className="h-5 min-w-0"
+                    title={`${action.label}: ${probabilityPercent(entry, index).toFixed(1)}%`}
+                    style={{
+                      width: `${probabilityPercent(entry, index)}%`,
+                      backgroundColor: actionColors[index],
+                    }}
+                  />
+                ))}
+              </span>
+            )}
+          </button>
+        )
+      })}
     </div>
   )
 }

@@ -37,7 +37,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
   ConnectionProfileViewModel,
-  JobState,
   StrategyEntry,
 } from "@/lib/solve-contract"
 import type {
@@ -51,6 +50,18 @@ import type {
 import { errorMessage } from "@/lib/native-gateway"
 import { strategyActionColors } from "@/lib/strategy-colors"
 import { cn } from "@/lib/utils"
+import {
+  formatBytes,
+  formatDecimal,
+  formatElapsed,
+  formatInteger,
+  formatScientific,
+} from "@/lib/format"
+import {
+  statusBadgeClass,
+  statusBadgeVariant,
+  terminalStates,
+} from "@/lib/job-status"
 
 type ResultsScreenProps = {
   profile: ConnectionProfileViewModel
@@ -65,60 +76,6 @@ const artifactLabels: Record<ArtifactKind, string> = {
   progress: "progress.jsonl",
   solution: "solution.mwsol",
   checkpoint: "checkpoint.mwckpt",
-}
-
-const terminalStates = new Set<JobState>([
-  "target-reached",
-  "sweep-limit",
-  "time-limit",
-  "cancelled",
-  "resource-limit",
-  "failed",
-])
-
-function formatInteger(value: string) {
-  try {
-    return BigInt(value).toLocaleString("ja-JP")
-  } catch {
-    return value
-  }
-}
-
-function formatBytes(value: string | null) {
-  if (value === null) {
-    return "size unknown"
-  }
-  try {
-    const bytes = BigInt(value)
-    if (bytes >= 1_073_741_824n) {
-      const scaled = (bytes * 10n) / 1_073_741_824n
-      return `${scaled / 10n}.${scaled % 10n} GiB`
-    }
-    const scaled = (bytes * 10n) / 1_048_576n
-    return `${scaled / 10n}.${scaled % 10n} MiB`
-  } catch {
-    return value
-  }
-}
-
-function statusVariant(state: JobState) {
-  if (state === "target-reached") {
-    return "default" as const
-  }
-  if (state === "failed") {
-    return "destructive" as const
-  }
-  return "secondary" as const
-}
-
-function formatDecimal(value: string, digits = 6) {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed.toFixed(digits) : value
-}
-
-function formatScientific(value: string, digits = 3) {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed.toExponential(digits) : value
 }
 
 export function ResultsScreen({
@@ -232,7 +189,6 @@ export function ResultsScreen({
     [job?.progress?.seats]
   )
   const sweeps = job?.progress?.sweeps ?? strategy?.currentSweeps ?? "unknown"
-  const elapsed = Number(job?.progress?.elapsedSecs ?? NaN)
   const deviationValues = seats.flatMap((seat) =>
     seat.deviationGain ? [Number(seat.deviationGain.ci95[1])] : []
   )
@@ -328,7 +284,12 @@ export function ResultsScreen({
         <div>
           <div className="flex flex-wrap items-center gap-2">
             {job ? (
-              <Badge variant={statusVariant(job.state)}>{job.state}</Badge>
+              <Badge
+                variant={statusBadgeVariant(job.state)}
+                className={statusBadgeClass(job.state)}
+              >
+                {job.state}
+              </Badge>
             ) : null}
             <span className="eyebrow">RUN #{jobId}</span>
           </div>
@@ -436,18 +397,21 @@ export function ResultsScreen({
               <CardContent className="metric-card">
                 <span>Deviation upper</span>
                 <strong>
-                  {deviation === null ? "—" : deviation.toFixed(6)}
+                  {deviation === null ? "—" : deviation.toFixed(4)}
                 </strong>
-                <small>max seat 95% CI</small>
+                <small>
+                  max seat 95% CI
+                  {job?.progress
+                    ? ` · target ${job.progress.stopTarget} ${job.progress.stopTargetUnit}`
+                    : ""}
+                </small>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="metric-card">
                 <span>Elapsed</span>
                 <strong>
-                  {Number.isFinite(elapsed)
-                    ? `${(elapsed / 3600).toFixed(2)} h`
-                    : "—"}
+                  {formatElapsed(job?.progress?.elapsedSecs ?? null)}
                 </strong>
                 <small>cumulative solve elapsed</small>
               </CardContent>
@@ -578,7 +542,9 @@ export function ResultsScreen({
                     <TableHeader>
                       <TableRow>
                         <TableHead>Seat</TableHead>
-                        <TableHead className="text-right">EV</TableHead>
+                        <TableHead className="text-right">
+                          {result ? `EV（${result.units.utility}）` : "EV"}
+                        </TableHead>
                         <TableHead className="text-right">95% CI</TableHead>
                         <TableHead className="text-right">
                           Positive regret
