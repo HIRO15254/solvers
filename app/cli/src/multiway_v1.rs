@@ -26,10 +26,12 @@ use crate::config::{
 pub const SCHEMA: &str = "solvers.multiway-preflop/v1";
 pub const ROLLOUT_REMOVED_CODE: &str = "MWP001";
 pub const FULL_RECALL_REMOVED_CODE: &str = "MWP002";
-/// Fixed production policy-arena ceiling. The separate process limit remains
-/// 8 GiB so EHS² tables, the public tree, workers, and allocator overhead
-/// retain headroom.
-pub const PRODUCTION_POLICY_ARENA_LIMIT_BYTES: u64 = 6 * 1024 * 1024 * 1024;
+/// Deterministic production policy-arena budget that `memory = "auto"`
+/// resolves to. Explicit `run.resources.memory` values pass through
+/// unchanged, including values above this budget; the operator must size the
+/// external process-RSS boundary with headroom above whatever arena budget
+/// is configured (8 GiB for the default 6 GiB arena).
+pub const PRODUCTION_POLICY_ARENA_AUTO_BYTES: u64 = 6 * 1024 * 1024 * 1024;
 
 pub fn has_v1_schema(raw: &str) -> Result<bool> {
     let value: toml::Value = toml::from_str(raw).context("parsing TOML document")?;
@@ -122,17 +124,6 @@ pub fn validate_production_contract(raw: &str) -> Result<()> {
     }
 
     let lowered = parse_and_lower(raw).context("validating production v1 config")?;
-    if lowered
-        .run
-        .max_memory_bytes
-        .is_some_and(|bytes| bytes != u64::MAX && bytes > PRODUCTION_POLICY_ARENA_LIMIT_BYTES)
-    {
-        bail!(
-            "production policy arena memory limit is 6GiB \
-             ({PRODUCTION_POLICY_ARENA_LIMIT_BYTES} bytes); lower run.resources.memory and use \
-             an external 8GiB process limit for total RSS"
-        );
-    }
     let GameSection::PreflopMultiway(game) = lowered.game else {
         unreachable!("v1 always lowers to Multiway Preflop")
     };
@@ -1518,7 +1509,7 @@ impl V1Config {
         let memory = Some(parse_memory(self.run.resources.memory)?.unwrap_or(u64::MAX));
         // The compatibility decoder preserves `auto` as the historical
         // sentinel. Production validation/session construction resolves it
-        // to the fixed 6 GiB arena limit without changing embedded historical
+        // to the 6 GiB auto budget without changing embedded historical
         // artifact configs decoded for read-only access.
         let target_scale = match &utility {
             UtilitySection::ChipEv => 1.0,
@@ -2271,11 +2262,7 @@ kind = "ehs2-percentile"
 
     #[test]
     fn solve_time_overrides_are_normalized_and_validated() {
-        let memory = if cfg!(feature = "research") {
-            "12GiB"
-        } else {
-            "6GiB"
-        };
+        let memory = "12GiB";
         let effective =
             apply_solve_overrides(PRODUCTION_MINIMAL, Some(3), Some(memory), Some("2h"), None)
                 .unwrap();
@@ -2307,19 +2294,18 @@ kind = "ehs2-percentile"
         );
     }
 
-    #[cfg(not(feature = "research"))]
     #[test]
-    fn production_memory_override_is_bounded_below_the_process_limit() {
+    fn production_memory_override_accepts_values_above_the_auto_budget() {
         validate_production_contract(PRODUCTION_MINIMAL).unwrap();
         let at_limit =
             apply_solve_overrides(PRODUCTION_MINIMAL, None, Some("6GiB"), None, None).unwrap();
         validate_production_contract(&at_limit).unwrap();
 
-        let error =
-            apply_solve_overrides(PRODUCTION_MINIMAL, None, Some("7GiB"), None, None).unwrap_err();
-        let error = format!("{error:#}");
-        assert!(error.contains("production policy arena memory limit is 6GiB"));
-        assert!(error.contains("external 8GiB process limit"));
+        let above_limit =
+            apply_solve_overrides(PRODUCTION_MINIMAL, None, Some("7GiB"), None, None).unwrap();
+        validate_production_contract(&above_limit).unwrap();
+        let value: toml::Value = toml::from_str(&above_limit).unwrap();
+        assert_eq!(value["run"]["resources"]["memory"].as_str(), Some("7GiB"));
     }
 
     #[test]

@@ -105,9 +105,10 @@ Productionは全到達public decision node × current-street bucket × actionの
 arenaをfallibleに確保し、全OS pageへwriteしてからだけsolverを返す。このbarrierは
 sweep 0、したがって最初のsampled postflop traversalより前に完了する。
 `[run.resources].memory`はarena payload上限で、process RSS hard capではない。
-productionの`memory = "auto"`は6 GiB arenaへ解決し、明示値も6 GiB以下に制限する。
-それでもEHS² table、public tree、worker scratch等を含む
-8 GiB process上限はcgroup/containerまたは外部RSS watchdogで別に強制する。
+productionの`memory = "auto"`は6 GiB arenaへ解決する。明示値はそのままarena
+上限になり、6 GiB超も指定できる。EHS² table、public tree、worker scratch等を
+含むprocess上限は、arena上限にheadroomを足した値（既定6 GiB arenaなら8 GiB）で
+cgroup/containerまたは外部RSS watchdogにより別に強制する。
 
 旧rollout/k-means backendはSolve中にassignment cacheが増え、bucket-history/full
 recallもsparse policy mapが増えるため、productionからそれぞれ`MWP001`/`MWP002`で

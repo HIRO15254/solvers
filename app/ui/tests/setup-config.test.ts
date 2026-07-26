@@ -296,8 +296,8 @@ describe("Solve設定フォーム", () => {
     expect(renderFormDraftToml({ ...draft, memory: "1GiB" })).toContain(
       'memory = "1GiB"'
     )
-    expect(() => renderFormDraftToml({ ...draft, memory: "7GiB" })).toThrow(
-      DraftTokenError
+    expect(renderFormDraftToml({ ...draft, memory: "7GiB" })).toContain(
+      'memory = "7GiB"'
     )
   })
 

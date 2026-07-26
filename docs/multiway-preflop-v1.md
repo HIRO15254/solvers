@@ -179,7 +179,8 @@ bucket reduction.
 `run.json` records `policyStorage =
 "preallocated-all-current-street-buckets"`, the preallocated node/column/slot
 and byte counts, `preallocatedPagesCommitted = true`, and
-`policyArenaLimitBytes = 6442450944`.
+`policyArenaLimitBytes` set to the resolved arena budget (`6442450944` when
+`memory = "auto"`).
 
 A caller-selected node limit is only a benchmark checkpoint; the remaining
 implicit bound is the `u32` `NodeId` representation. `[run.resources].memory`
@@ -187,10 +188,11 @@ limits policy-arena payload bytes, not process RSS. Public-tree/history
 storage, EHS² tables and caches, worker scratch, evaluation, checkpoint
 staging, allocator overhead, and other resident pages require separate
 headroom. In production, `memory = "auto"` resolves deterministically to
-6 GiB and explicit policy-arena limits above 6 GiB are rejected. An 8 GiB
-process boundary must still be enforced separately by
-a cgroup/container or external RSS watchdog at no more than
-8,589,934,592 bytes; the arena limit alone is not an 8 GiB RSS guarantee.
+6 GiB; explicit policy-arena limits are accepted as given, including values
+above 6 GiB. A process boundary must still be enforced separately by a
+cgroup/container or external RSS watchdog, sized with headroom above the
+configured arena limit (8,589,934,592 bytes for the default 6 GiB arena);
+the arena limit alone is not an RSS guarantee.
 
 A v1 solve accepts one new, empty run directory and reserves:
 

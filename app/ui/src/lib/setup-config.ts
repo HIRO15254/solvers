@@ -113,7 +113,6 @@ const SIGNED_DECIMAL = /^-?(?:0|[1-9]\d*)(?:\.\d+)?$/
 const DURATION = /^(?:[1-9]\d*)[smh]$/
 const MEMORY_WITH_UNIT = /^(?:[1-9]\d*)(?:KiB|MiB|GiB)$/
 const POSITIVE_INTEGER = /^[1-9]\d*$/
-const PRODUCTION_POLICY_ARENA_LIMIT_BYTES = 6n * 1024n * 1024n * 1024n
 
 export const MAX_TREE_RULES = 256
 export const MAX_TREE_RULE_SIZES = 32
@@ -1018,31 +1017,6 @@ export function renderFormDraftToml(draft: FormSolveDraft) {
                 "memoryはauto、bytes整数、または12GiB等で入力してください。"
               )
             })()
-  const memoryBytes =
-    memoryToken === "auto"
-      ? null
-      : POSITIVE_INTEGER.test(memoryToken)
-        ? BigInt(memoryToken)
-        : (() => {
-            const units = memoryToken.slice(-3)
-            const amount = BigInt(memoryToken.slice(0, -3))
-            const multiplier =
-              units === "KiB"
-                ? 1024n
-                : units === "MiB"
-                  ? 1024n * 1024n
-                  : 1024n * 1024n * 1024n
-            return amount * multiplier
-          })()
-  if (
-    memoryBytes !== null &&
-    memoryBytes > PRODUCTION_POLICY_ARENA_LIMIT_BYTES
-  ) {
-    throw new DraftTokenError(
-      "run.resources.memory",
-      "productionのpolicy arena上限は6GiBです。"
-    )
-  }
   const treeRuleLines =
     draft.treeKind === "standard" ? renderTreeRules(draft.treeRules) : []
   const firstActor =

@@ -230,10 +230,10 @@ fingerprint と一致しなければ job を作らない。Remote v1 に file up
 - guarantee boundary
 - Local run directory または Remote managed run label
 
-`memory = "auto"`はproduction policy arena上限の6 GiBとして決定的に検証する。
+`memory = "auto"`はproduction policy arena既定の6 GiBとして決定的に検証する。
 hostの空きmemory量には連動させない。normalizer内部のauto sentinelをDTOや画面へ
-表示せず、budget modeは`auto`、budget bytesは6 GiBとして返す。明示値も6 GiBを
-超えた場合はvalidation errorとする。
+表示せず、budget modeは`auto`、budget bytesは6 GiBとして返す。明示値は
+そのままbudget bytesとして返し、6 GiB超もvalidation errorにしない。
 
 exactと呼べる範囲はdense policy arenaのSolver stateとsampled ICMのprepared
 race bufferであり、別々に表示する。公開tree、abstraction cache、thread scratch、

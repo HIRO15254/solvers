@@ -734,7 +734,7 @@ impl LocalBackend {
             .run
             .max_memory_bytes
             .filter(|bytes| *bytes != u64::MAX)
-            .unwrap_or(cli::multiway_v1::PRODUCTION_POLICY_ARENA_LIMIT_BYTES);
+            .unwrap_or(cli::multiway_v1::PRODUCTION_POLICY_ARENA_AUTO_BYTES);
         let fits_budget = resource
             .solver_state_bytes
             .map(|estimate| estimate <= memory_budget_bytes);

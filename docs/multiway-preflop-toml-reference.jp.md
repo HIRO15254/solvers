@@ -405,8 +405,8 @@ durationは小文字suffixの `s`、`m`、`h` のみ。例:
 
 memoryは正のbytes整数、または整数+`KiB|MiB|GiB`。例:
 `1073741824`、`"1024MiB"`、`"6GiB"`。小数や `GB` は不可。productionでは
-`"auto"`を6 GiBへ解決し、明示値も6 GiB以下だけを受理する。これを超えるhistorical
-実験は`--features research` buildだけで再現する。
+`"auto"`を6 GiBへ解決する。明示値は正のarena payload上限としてそのまま受理し、
+6 GiBを超える指定もできる。
 `threads="auto"` は `min(logical CPUs, seats * batch_sweeps)`。
 
 固定50M decision-node capはない。`current-street`はfull public treeやarenaを

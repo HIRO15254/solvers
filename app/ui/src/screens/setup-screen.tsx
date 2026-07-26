@@ -974,7 +974,8 @@ export function SetupScreen({
                             }
                           />
                           <p className="field-help">
-                            auto = 6 GiB。productionでは明示値も6 GiB以下。
+                            auto = 6 GiB。明示値はpolicy
+                            arena上限としてそのまま使用（6 GiB超も可）。
                           </p>
                         </div>
                         <div className="field-stack">
@@ -1249,7 +1250,7 @@ export function SetupScreen({
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {memoryPreflight.budgetMode === "auto"
-                            ? "auto · production固定6 GiB"
+                            ? "auto · 既定6 GiB"
                             : "明示指定した上限"}
                         </p>
                       </div>

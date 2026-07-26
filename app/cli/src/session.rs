@@ -258,7 +258,7 @@ pub fn preflight_multiway_config(raw_toml: &str) -> Result<MultiwayResourcePrefl
     let memory_limit = run
         .max_memory_bytes
         .filter(|bytes| *bytes != u64::MAX)
-        .unwrap_or(crate::multiway_v1::PRODUCTION_POLICY_ARENA_LIMIT_BYTES);
+        .unwrap_or(crate::multiway_v1::PRODUCTION_POLICY_ARENA_AUTO_BYTES);
     let arena = match multiway::tree::preflight_arena(&game, memory_limit) {
         Ok(arena) => arena,
         Err(multiway::tree::TreeError::MemoryLimit {
@@ -631,16 +631,9 @@ fn resolve_policy_memory_limit(
         return Ok(configured.unwrap_or(DEFAULT_MEMORY_LIMIT));
     }
     let resolved = match configured {
-        None | Some(u64::MAX) => crate::multiway_v1::PRODUCTION_POLICY_ARENA_LIMIT_BYTES,
+        None | Some(u64::MAX) => crate::multiway_v1::PRODUCTION_POLICY_ARENA_AUTO_BYTES,
         Some(bytes) => bytes,
     };
-    if resolved > crate::multiway_v1::PRODUCTION_POLICY_ARENA_LIMIT_BYTES {
-        return Err(anyhow!(
-            "production policy arena memory limit is 6GiB ({} bytes); lower \
-             run.resources.memory and enforce the separate 8GiB process RSS limit externally",
-            crate::multiway_v1::PRODUCTION_POLICY_ARENA_LIMIT_BYTES
-        ));
-    }
     Ok(resolved)
 }
 
@@ -1416,8 +1409,8 @@ mod tests {
     }
 
     #[test]
-    fn production_policy_memory_auto_is_six_gib_and_cannot_exceed_it() {
-        let limit = crate::multiway_v1::PRODUCTION_POLICY_ARENA_LIMIT_BYTES;
+    fn production_policy_memory_auto_is_six_gib_and_explicit_values_pass_through() {
+        let limit = crate::multiway_v1::PRODUCTION_POLICY_ARENA_AUTO_BYTES;
         assert_eq!(
             resolve_policy_memory_limit(SessionStoragePolicy::PreallocatedProduction, None)
                 .unwrap(),
@@ -1436,14 +1429,13 @@ mod tests {
                 .unwrap(),
             limit
         );
-        assert!(
+        assert_eq!(
             resolve_policy_memory_limit(
                 SessionStoragePolicy::PreallocatedProduction,
                 Some(limit + 1),
             )
-            .unwrap_err()
-            .to_string()
-            .contains("6GiB")
+            .unwrap(),
+            limit + 1
         );
         assert_eq!(
             resolve_policy_memory_limit(SessionStoragePolicy::Compatibility, Some(u64::MAX))

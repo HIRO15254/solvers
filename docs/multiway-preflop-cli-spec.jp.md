@@ -488,10 +488,13 @@ interval = "15m"
 - `threads="auto"` は `min(logical CPUs, seats * batch_sweeps)`。正の整数も指定可。
 - sample ID順のdeterministic mergeにより、thread数変更はresult bit patternを変えない。
 - productionの`memory="auto"`はpolicy arenaの
-  `6,442,450,944` bytes（6 GiB）へ決定的に解決する。明示値も6 GiB以下だけを
-  受理する。research buildのcompatibility decoderはhistorical値を維持する。
-- 6 GiBはarena payloadのproduction capであり、process RSS capではない。
-  Bridge/serviceも同じarena上限を使う。
+  `6,442,450,944` bytes（6 GiB）へ決定的に解決する。明示値は正のarena payload
+  上限としてそのまま受理し、6 GiBを超える指定もできる。research buildの
+  compatibility decoderはhistorical値を維持する。
+- 6 GiBは`auto`の既定budgetであり、明示値のcapでもprocess RSS capでもない。
+  Bridge/serviceも同じ解決規則を使う。arena budgetを引き上げた場合は、
+  EHS² table、public tree、worker scratch等のheadroomを含むprocess RSS上限も
+  外部で同じだけ引き上げる。
 - 固定50M decision-node capは置かない。`u32`の`NodeId`表現限界はresource policyでは
   なく、任意のnode checkpointはbenchmark callerが明示した場合だけ適用する。
 - `current-street`のdense workerは、full public treeやarenaを保持・確保する前に
