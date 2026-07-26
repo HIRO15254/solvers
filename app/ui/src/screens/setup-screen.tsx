@@ -1,15 +1,23 @@
-import { useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import {
   IconArrowRight,
   IconBolt,
   IconCheck,
   IconChevronRight,
   IconCpu,
+  IconDownload,
   IconFileDescription,
+  IconFolderOpen,
   IconInfoCircle,
+  IconLoader2,
   IconStack2,
 } from "@tabler/icons-react"
 
+import { BettingTreeEditor } from "@/components/betting-tree-editor"
+import { EconomicsEditor } from "@/components/economics-editor"
+import { ResumeDialog, type ResumeSubmission } from "@/components/resume-dialog"
+import { SetupPresetPicker } from "@/components/setup-preset-picker"
+import { TableRangeEditor } from "@/components/table-range-editor"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,7 +28,6 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -31,58 +38,334 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
+import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { demoDraft } from "@/data/demo"
-import type { ConnectionProfileViewModel } from "@/lib/solve-contract"
-import { cn } from "@/lib/utils"
+import { Textarea } from "@/components/ui/textarea"
+import type {
+  ConnectionProfileViewModel,
+  ValidationResult,
+} from "@/lib/solve-contract"
+import type {
+  CheckpointSource,
+  DesktopSolveGateway,
+  NativeJobSnapshot,
+} from "@/lib/native-gateway"
+import { errorMessage } from "@/lib/native-gateway"
+import {
+  applyTreePreset,
+  createDefaultFormDraft,
+  createRecommendedSetupPreset,
+  DraftTokenError,
+  renderFormDraftToml,
+  splitNumericTokenList,
+  type FormSolveDraft,
+  type RecommendedSetupPresetId,
+  type TreePresetId,
+} from "@/lib/setup-config"
 
 type SetupScreenProps = {
   profile: ConnectionProfileViewModel
-  onStart: () => void
+  gateway: DesktopSolveGateway
+  onJobStarted: (job: NativeJobSnapshot, name: string) => void
+  onCheckpointResumed: (job: NativeJobSnapshot, name: string) => void
+  onResultOpened: (job: NativeJobSnapshot, name: string) => void
   onOpenConnections: () => void
 }
 
-const seats = [
-  { seat: 0, position: "BTN", className: "seat-0" },
-  { seat: 1, position: "SB", className: "seat-1" },
-  { seat: 2, position: "BB", className: "seat-2" },
-  { seat: 3, position: "UTG", className: "seat-3" },
-  { seat: 4, position: "HJ", className: "seat-4" },
-  { seat: 5, position: "CO", className: "seat-5" },
-]
+type ConfigSource =
+  | { kind: "form" }
+  | {
+      kind: "toml"
+      sourceId: string
+      fileName: string
+      configToml: string
+    }
 
-type SeatDraft = {
-  stack: string
-  blind: string
-  range: string
+function formatBytes(raw: string) {
+  try {
+    const bytes = BigInt(raw)
+    const units: Array<[bigint, string]> = [
+      [1_099_511_627_776n, "TiB"],
+      [1_073_741_824n, "GiB"],
+      [1_048_576n, "MiB"],
+      [1_024n, "KiB"],
+    ]
+    for (const [unit, label] of units) {
+      if (bytes >= unit) {
+        const whole = bytes / unit
+        const tenth = ((bytes % unit) * 10n) / unit
+        return `${whole.toLocaleString("ja-JP")}.${tenth} ${label}`
+      }
+    }
+    return `${bytes.toLocaleString("ja-JP")} bytes`
+  } catch {
+    return raw
+  }
 }
 
-const initialSeatDrafts: SeatDraft[] = seats.map((seat) => ({
-  stack: "100.000",
-  blind: seat.seat === 1 ? "0.500" : seat.seat === 2 ? "1.000" : "0.000",
-  range: seat.seat === 3 ? "22+,A2s+,K9s+,QTs+,JTs,ATo+,KQo" : "random",
-}))
+function formatInteger(raw: string) {
+  try {
+    return BigInt(raw).toLocaleString("ja-JP")
+  } catch {
+    return raw
+  }
+}
+
+function memoryPercent(estimate: string, budget: string) {
+  try {
+    const estimateBytes = BigInt(estimate)
+    const budgetBytes = BigInt(budget)
+    if (budgetBytes <= 0n) {
+      return null
+    }
+    const perMille = (estimateBytes * 1_000n) / budgetBytes
+    return Number(perMille > 1_000n ? 1_000n : perMille) / 10
+  } catch {
+    return null
+  }
+}
 
 export function SetupScreen({
   profile,
-  onStart,
+  gateway,
+  onJobStarted,
+  onCheckpointResumed,
+  onResultOpened,
   onOpenConnections,
 }: SetupScreenProps) {
-  const [activeSeat, setActiveSeat] = useState(3)
-  const [seatDrafts, setSeatDrafts] = useState<SeatDraft[]>(initialSeatDrafts)
-  const [rakeEnabled, setRakeEnabled] = useState(false)
+  const [draft, setDraft] = useState<FormSolveDraft>(createDefaultFormDraft)
+  const [source, setSource] = useState<ConfigSource>({ kind: "form" })
+  const [setupPreset, setSetupPreset] = useState<
+    RecommendedSetupPresetId | "custom"
+  >("custom")
+  const [treePreset, setTreePreset] = useState<TreePresetId | "custom">(
+    "compact-checkdown"
+  )
+  const [editorTab, setEditorTab] = useState("table")
+  const [validation, setValidation] = useState<ValidationResult | null>(null)
+  const [busyAction, setBusyAction] = useState<string | null>(null)
+  const [operationError, setOperationError] = useState<string | null>(null)
+  const [checkpointSource, setCheckpointSource] =
+    useState<CheckpointSource | null>(null)
+  const draftRevision = useRef(0)
+  const commandBarRef = useRef<HTMLDivElement>(null)
   const isRemote = profile.kind === "remote"
-  const activeSeatDraft = seatDrafts[activeSeat] ?? initialSeatDrafts[0]
+  const nativeReady = gateway.availability.available
+  const configLocked = busyAction === "validate" || busyAction === "start"
+  const treePreflight = validation?.preflight?.tree
+  const memoryPreflight = validation?.preflight?.memory
+  const economicsPreflight = validation?.preflight?.economics
+  const icmFieldPlayers =
+    draft.seatCount +
+    splitNumericTokenList(draft.economics.tournamentIcm.outsideFieldBb).length
+  const solverStatePercent =
+    memoryPreflight?.solverStateBytes && memoryPreflight.budgetBytes
+      ? memoryPercent(
+          memoryPreflight.solverStateBytes,
+          memoryPreflight.budgetBytes
+        )
+      : null
 
-  const updateActiveSeat = (field: keyof SeatDraft, value: string) => {
-    setSeatDrafts((current) =>
-      current.map((seat, index) =>
-        index === activeSeat ? { ...seat, [field]: value } : seat
-      )
-    )
+  const generatedToml = useMemo(() => {
+    if (source.kind === "toml") {
+      return { value: source.configToml, error: null }
+    }
+    try {
+      return { value: renderFormDraftToml(draft), error: null }
+    } catch (error) {
+      return {
+        value: null,
+        error:
+          error instanceof DraftTokenError
+            ? `${error.path}: ${error.message}`
+            : errorMessage(error),
+      }
+    }
+  }, [draft, source])
+  const validationError = validation?.errors[0]
+  const commandError =
+    operationError ??
+    generatedToml.error ??
+    (validationError
+      ? `${validationError.path}: ${validationError.message}`
+      : null)
+
+  const invalidate = () => {
+    draftRevision.current += 1
+    setValidation(null)
+    setOperationError(null)
   }
+
+  const updateDraft = (next: FormSolveDraft) => {
+    setDraft(next)
+    setSetupPreset("custom")
+    invalidate()
+  }
+
+  const handleSetupPreset = (presetId: RecommendedSetupPresetId) => {
+    const next = createRecommendedSetupPreset(presetId)
+    setSource({ kind: "form" })
+    setDraft(next)
+    setSetupPreset(presetId)
+    setTreePreset(
+      presetId === "cash-6max-100bb-k256"
+        ? "cash-canonical"
+        : "tournament-canonical"
+    )
+    setEditorTab("table")
+    invalidate()
+  }
+
+  const handleTreePreset = (presetId: TreePresetId) => {
+    setSource({ kind: "form" })
+    setDraft((current) => applyTreePreset(current, presetId))
+    setSetupPreset("custom")
+    setTreePreset(presetId)
+    setEditorTab("tree")
+    invalidate()
+  }
+
+  const updateTreeDraft = (next: FormSolveDraft) => {
+    setTreePreset("custom")
+    updateDraft(next)
+  }
+
+  const currentToml = () => {
+    if (!generatedToml.value) {
+      throw new Error(generatedToml.error ?? "設定をTOMLへ変換できません。")
+    }
+    return generatedToml.value
+  }
+
+  const runOperation = async (
+    label: string,
+    operation: () => Promise<void>
+  ) => {
+    setBusyAction(label)
+    setOperationError(null)
+    try {
+      await operation()
+    } catch (error) {
+      setOperationError(errorMessage(error))
+    } finally {
+      setBusyAction(null)
+    }
+  }
+
+  const handleLoadConfig = () =>
+    runOperation("load", async () => {
+      const loaded = await gateway.loadConfig()
+      if (!loaded) {
+        return
+      }
+      setSource({
+        kind: "toml",
+        sourceId: loaded.sourceId,
+        fileName: loaded.fileName,
+        configToml: loaded.configToml,
+      })
+      setSetupPreset("custom")
+      setTreePreset("custom")
+      setDraft((current) => ({
+        ...current,
+        name: loaded.fileName.replace(/\.toml$/i, ""),
+      }))
+      invalidate()
+    })
+
+  const handleSaveConfig = () =>
+    runOperation("save", async () => {
+      await gateway.saveConfig(currentToml(), `${draft.name || "solve"}.toml`)
+    })
+
+  const handlePickTreeScript = () =>
+    runOperation("tree-script", async () => {
+      const selected = await gateway.pickTreeScript()
+      if (!selected) {
+        return
+      }
+      setDraft((current) => ({
+        ...current,
+        treeKind: "script",
+        treeScriptSource: selected.fileName,
+        treeScriptSourceId: selected.sourceId,
+      }))
+      setSetupPreset("custom")
+      setTreePreset("custom")
+      setEditorTab("tree")
+      invalidate()
+    })
+
+  const handleValidate = () =>
+    runOperation("validate", async () => {
+      const configToml = currentToml()
+      const sourceId =
+        source.kind === "toml"
+          ? source.sourceId
+          : draft.treeKind === "script"
+            ? (draft.treeScriptSourceId ?? undefined)
+            : undefined
+      const revision = draftRevision.current
+      const result = await gateway.validateConfig(configToml, sourceId)
+      if (revision === draftRevision.current) {
+        setValidation(result)
+        if (!result.valid) {
+          requestAnimationFrame(() => commandBarRef.current?.focus())
+        }
+      }
+    })
+
+  const handleStart = () =>
+    runOperation("start", async () => {
+      const name = draft.name.trim() || "Untitled solve"
+      const revision = draftRevision.current
+      if (
+        !validation?.valid ||
+        !validation.effectiveConfigToml ||
+        !validation.configFingerprint
+      ) {
+        throw new Error("設定をもう一度ツリー構築・検証してください。")
+      }
+      const job = await gateway.startJob(
+        name,
+        validation.effectiveConfigToml,
+        validation.configFingerprint
+      )
+      if (revision === draftRevision.current) {
+        onJobStarted(job, name || job.id)
+      }
+    })
+
+  const handleOpenResult = (kind: "run" | "solution") =>
+    runOperation(kind, async () => {
+      const job =
+        kind === "run" ? await gateway.openRun() : await gateway.openSolution()
+      if (job) {
+        onResultOpened(job, job.id)
+      }
+    })
+
+  const handlePickCheckpoint = () =>
+    runOperation("checkpoint-pick", async () => {
+      const selected = await gateway.pickCheckpoint()
+      if (selected) {
+        setCheckpointSource(selected)
+      }
+    })
+
+  const handleResumeCheckpoint = (submission: ResumeSubmission) =>
+    runOperation("checkpoint-resume", async () => {
+      if (!checkpointSource) {
+        return
+      }
+      const job = await gateway.resumeCheckpoint(
+        checkpointSource.sourceId,
+        submission.name,
+        submission.overrides
+      )
+      setCheckpointSource(null)
+      onCheckpointResumed(job, submission.name)
+    })
 
   return (
     <div className="screen-stack">
@@ -91,15 +374,16 @@ export function SetupScreen({
           <div className="eyebrow">NEW SOLVE</div>
           <h1>Solve設定を作成</h1>
           <p>
-            テーブル、ツリー、精度と実行先をひとつの再現可能な設定へまとめます。
+            v1設定をRust
+            normalizerで検証し、同じ実効TOMLからローカルSolveを開始します。
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
             size="sm"
-            disabled
-            title="GUI fixtureではファイルを読み込みません"
+            disabled={!nativeReady || busyAction !== null}
+            onClick={handleLoadConfig}
           >
             <IconFileDescription />
             TOMLを読み込む
@@ -107,345 +391,721 @@ export function SetupScreen({
           <Button
             variant="outline"
             size="sm"
-            disabled
-            title="GUI fixtureではファイルを保存しません"
+            disabled={
+              !nativeReady || busyAction !== null || !generatedToml.value
+            }
+            onClick={handleSaveConfig}
           >
+            <IconDownload />
             下書きを保存
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!nativeReady || busyAction !== null}
+            onClick={() => handleOpenResult("solution")}
+          >
+            <IconFolderOpen />
+            .mwsolを開く
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!nativeReady || busyAction !== null}
+            onClick={handlePickCheckpoint}
+          >
+            <IconStack2 />
+            .mwckptから再開
           </Button>
         </div>
       </div>
 
-      <Alert>
-        <IconInfoCircle />
-        <AlertTitle>GUI fixture</AlertTitle>
-        <AlertDescription>
-          入力・進捗・結果は画面確認用のサンプルです。設定検証、Solve実行、ファイル入出力は行いません。
-        </AlertDescription>
-      </Alert>
-
-      {isRemote ? (
-        <Alert className="border-amber-300 bg-amber-50 text-amber-950">
+      {!nativeReady ? (
+        <Alert>
           <IconInfoCircle />
-          <AlertTitle>リモートSolveは契約プレビューです</AlertTitle>
-          <AlertDescription className="text-amber-800">
-            この画面では設定と実行フローを確認できますが、今回の実装はネットワークへジョブを送信しません。
+          <AlertTitle>Browser preview</AlertTitle>
+          <AlertDescription>
+            {gateway.availability.reason}
+            設定内容は確認できますが、検証・Solve・ファイル操作は無効です。
           </AlertDescription>
         </Alert>
       ) : null}
 
+      {isRemote ? (
+        <Alert className="border-amber-300 bg-amber-50 text-amber-950">
+          <IconInfoCircle />
+          <AlertTitle>Remoteは仕様・UIのみです</AlertTitle>
+          <AlertDescription className="text-amber-800">
+            接続先プロファイルは確認できますが、認証・送信・remote
+            job作成はこの実装には含まれません。
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {operationError || generatedToml.error ? (
+        <Alert variant="destructive">
+          <IconInfoCircle />
+          <AlertTitle>操作を完了できませんでした</AlertTitle>
+          <AlertDescription>
+            {operationError ?? generatedToml.error}
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      <div
+        ref={commandBarRef}
+        className="setup-command-bar"
+        role="region"
+        aria-label="Solve設定の検証と開始"
+        aria-live="polite"
+        aria-atomic="true"
+        aria-busy={busyAction === "validate" || busyAction === "start"}
+        tabIndex={-1}
+      >
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <Badge
+              variant={
+                generatedToml.error
+                  ? "destructive"
+                  : validation?.valid
+                    ? "default"
+                    : validation
+                      ? "destructive"
+                      : "outline"
+              }
+            >
+              {generatedToml.error
+                ? "入力エラー"
+                : validation?.valid
+                  ? "BUILD OK"
+                  : validation
+                    ? "要修正"
+                    : "未検証"}
+            </Badge>
+            <strong className="truncate">
+              {commandError
+                ? "設定を修正してください"
+                : validation?.valid
+                  ? "ツリーとresourceを確認済み"
+                  : "設定後にツリーを構築・検証してください"}
+            </strong>
+          </div>
+          <p className={commandError ? "command-error" : undefined}>
+            {commandError ??
+              "構築・検証が成功した設定だけSolveを開始できます。"}
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          disabled={
+            !nativeReady ||
+            isRemote ||
+            busyAction !== null ||
+            generatedToml.error !== null
+          }
+          onClick={handleValidate}
+        >
+          {busyAction === "validate" ? (
+            <IconLoader2 className="animate-spin" />
+          ) : (
+            <IconCheck />
+          )}
+          1 · ツリー構築・検証
+        </Button>
+        <Button
+          disabled={
+            !nativeReady ||
+            isRemote ||
+            busyAction !== null ||
+            !validation?.valid
+          }
+          onClick={handleStart}
+        >
+          {busyAction === "start" ? (
+            <IconLoader2 className="animate-spin" />
+          ) : (
+            <IconArrowRight />
+          )}
+          2 · Solve開始
+        </Button>
+      </div>
+
       <div className="setup-layout">
-        <div className="min-w-0 space-y-4">
+        <fieldset
+          className="min-w-0 space-y-4 border-0 p-0 disabled:opacity-75"
+          disabled={configLocked}
+        >
           <Card>
             <CardHeader className="border-b">
-              <CardTitle>開始点</CardTitle>
+              <h2 className="font-heading text-sm font-medium">開始点</h2>
               <CardDescription>
-                実戦的な初期値から始め、必要な差分だけを編集します。
+                フォームまたは読み込んだTOMLのどちらか一方を編集します。
               </CardDescription>
               <CardAction>
-                <Badge variant="secondary">Multiway v1</Badge>
+                <Badge variant="secondary">
+                  {source.kind === "form" ? "Multiway v1" : source.fileName}
+                </Badge>
               </CardAction>
             </CardHeader>
-            <CardContent className="grid gap-4 pt-0 md:grid-cols-3">
+            <CardContent className="grid gap-4 md:grid-cols-3">
               <div className="field-stack md:col-span-2">
                 <Label htmlFor="solve-name">Solve名</Label>
-                <Input id="solve-name" defaultValue={demoDraft.name} />
+                <Input
+                  id="solve-name"
+                  value={draft.name}
+                  onChange={(event) =>
+                    setDraft({ ...draft, name: event.target.value })
+                  }
+                />
               </div>
               <div className="field-stack">
-                <Label>プリセット</Label>
-                <Select defaultValue="cash-6max">
-                  <SelectTrigger className="w-full" aria-label="プリセット">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cash-6max">
-                      6-max Cash · 100BB
-                    </SelectItem>
-                    <SelectItem value="mtt-9max">9-max MTT · ICM</SelectItem>
-                    <SelectItem value="push-fold">9-max Push / Fold</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="border-b">
-              <CardTitle>テーブルとレンジ</CardTitle>
-              <CardDescription>
-                seat IDはbuttonから時計回り。クリックして個別設定を編集します。
-              </CardDescription>
-              <CardAction>
-                <Select defaultValue="6">
-                  <SelectTrigger aria-label="Seat数">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="2">2 seats</SelectItem>
-                    <SelectItem value="6">6 seats</SelectItem>
-                    <SelectItem value="9">9 seats</SelectItem>
-                  </SelectContent>
-                </Select>
-              </CardAction>
-            </CardHeader>
-            <CardContent className="table-editor">
-              <div className="seat-map" role="group" aria-label="6 seat table">
-                <div className="poker-table">
-                  <span>6-MAX</span>
-                  <small>0.5 / 1 BB</small>
-                </div>
-                {seats.map((seat) => (
-                  <button
-                    type="button"
-                    className={cn(
-                      "seat-chip",
-                      seat.className,
-                      activeSeat === seat.seat && "seat-chip--active"
-                    )}
-                    key={seat.seat}
-                    onClick={() => setActiveSeat(seat.seat)}
-                    aria-pressed={activeSeat === seat.seat}
-                  >
-                    <span>
-                      S{seat.seat} · {seat.position}
-                    </span>
-                    <strong>{seatDrafts[seat.seat]?.stack ?? "—"} BB</strong>
-                    <small>{seatDrafts[seat.seat]?.range ?? "—"}</small>
-                  </button>
-                ))}
-              </div>
-
-              <div className="seat-detail">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-medium">
-                      Seat {activeSeat} · {seats[activeSeat]?.position}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      defaultから上書き
-                    </p>
-                  </div>
-                  <Badge variant="outline">
-                    {activeSeat === 0 ? "Button" : "Player"}
-                  </Badge>
-                </div>
-                <Separator />
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                  <div className="field-stack">
-                    <Label htmlFor="stack">Stack (BB)</Label>
-                    <Input
-                      id="stack"
-                      type="number"
-                      value={activeSeatDraft.stack}
-                      onChange={(event) =>
-                        updateActiveSeat("stack", event.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="field-stack">
-                    <Label htmlFor="blind">Live blind (BB)</Label>
-                    <Input
-                      id="blind"
-                      type="number"
-                      value={activeSeatDraft.blind}
-                      onChange={(event) =>
-                        updateActiveSeat("blind", event.target.value)
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="field-stack">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="range">Range</Label>
-                    <Button
-                      variant="link"
-                      size="xs"
-                      disabled
-                      title="レンジグリッドはGUI fixtureでは利用できません"
-                    >
-                      グリッドで編集
-                    </Button>
-                  </div>
-                  <Input
-                    id="range"
-                    value={activeSeatDraft.range}
-                    onChange={(event) =>
-                      updateActiveSeat("range", event.target.value)
+                <Label>設定ソース</Label>
+                <Select
+                  value={source.kind}
+                  onValueChange={(value) => {
+                    if (value === "form") {
+                      setSource({ kind: "form" })
+                      invalidate()
                     }
-                  />
-                  <p className="field-help">
-                    1,326 comboへ正規化して検証します。
-                  </p>
-                </div>
+                  }}
+                >
+                  <SelectTrigger className="w-full" aria-label="設定ソース">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="form">フォームエディター</SelectItem>
+                    {source.kind === "toml" ? (
+                      <SelectItem value="toml">Imported TOML</SelectItem>
+                    ) : null}
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="border-b">
-              <CardTitle>ゲームとアルゴリズム</CardTitle>
-              <CardDescription>
-                主要項目を先に表示し、詳細設定は同じ正規化済みTOMLへ出力します。
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="tree">
-                <TabsList
-                  variant="line"
-                  className="w-full max-w-full justify-start overflow-x-auto"
-                >
-                  <TabsTrigger value="tree">Betting tree</TabsTrigger>
-                  <TabsTrigger value="economics">Economics</TabsTrigger>
-                  <TabsTrigger value="solver">Solver</TabsTrigger>
-                  <TabsTrigger value="runtime">Runtime</TabsTrigger>
-                </TabsList>
+          <SetupPresetPicker
+            setupPreset={setupPreset}
+            treePreset={treePreset}
+            onSetupPresetChange={handleSetupPreset}
+            onTreePresetChange={handleTreePreset}
+          />
 
-                <TabsContent
-                  value="tree"
-                  className="grid gap-4 pt-3 md:grid-cols-2"
-                >
-                  <div className="field-stack">
-                    <Label>Tree frontend</Label>
-                    <Select defaultValue="standard">
-                      <SelectTrigger
-                        className="w-full"
-                        aria-label="Tree frontend"
+          {source.kind === "toml" ? (
+            <Card>
+              <CardHeader className="border-b">
+                <h2 className="font-heading text-sm font-medium">
+                  Imported TOML
+                </h2>
+                <CardDescription>
+                  相対.mwtreeは検証時にopaque
+                  sourceIdを使ってmaterializeします。client
+                  pathはReactへ渡されません。
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  className="min-h-96 font-mono text-xs"
+                  value={source.configToml}
+                  onChange={(event) => {
+                    setSource({ ...source, configToml: event.target.value })
+                    invalidate()
+                  }}
+                  spellCheck={false}
+                  aria-label="Multiway v1 TOML"
+                />
+              </CardContent>
+            </Card>
+          ) : (
+            <Tabs
+              value={editorTab}
+              onValueChange={setEditorTab}
+              className="setup-editor-workbench"
+            >
+              <TabsList className="setup-editor-tabs">
+                <TabsTrigger value="table">1 · テーブル</TabsTrigger>
+                <TabsTrigger value="economics">2 · ICM / Rake</TabsTrigger>
+                <TabsTrigger value="tree">3 · Tree</TabsTrigger>
+                <TabsTrigger value="solver">4 · Solver / 実行</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="table" className="mt-0">
+                <TableRangeEditor draft={draft} onChange={updateDraft} />
+              </TabsContent>
+
+              <TabsContent value="economics" className="mt-0">
+                <EconomicsEditor draft={draft} onChange={updateDraft} />
+              </TabsContent>
+
+              <TabsContent value="tree" className="mt-0">
+                <BettingTreeEditor
+                  treeKind={draft.treeKind}
+                  scriptSource={draft.treeScriptSource}
+                  scriptParams={draft.treeScriptParams}
+                  allowLimp={draft.treeAllowLimp}
+                  aggressionCapsEnabled={draft.treeAggressionCapsEnabled}
+                  aggressionCaps={{
+                    preflop: draft.treeAggressionCapPreflop,
+                    flop: draft.treeAggressionCapFlop,
+                    turn: draft.treeAggressionCapTurn,
+                    river: draft.treeAggressionCapRiver,
+                  }}
+                  reraiseJamEnabled={draft.treeReraiseJamEnabled}
+                  reraiseJamNumerator={draft.treeReraiseJamNumerator}
+                  reraiseJamDenominator={draft.treeReraiseJamDenominator}
+                  rules={draft.treeRules}
+                  onChange={(treeRules) =>
+                    updateTreeDraft({ ...draft, treeRules })
+                  }
+                  onTreeConfigChange={(update) =>
+                    updateTreeDraft({ ...draft, ...update })
+                  }
+                  onPickScript={() => void handlePickTreeScript()}
+                  disabled={configLocked}
+                />
+              </TabsContent>
+
+              <TabsContent value="solver" className="mt-0">
+                <Card size="sm">
+                  <CardHeader className="border-b">
+                    <h2 className="font-heading text-sm font-medium">
+                      Solver・実行設定
+                    </h2>
+                    <CardDescription>
+                      精度・abstractionと、実行上限・resourceを分けて設定します。
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Tabs defaultValue="solver">
+                      <TabsList
+                        variant="line"
+                        className="w-full max-w-full justify-start overflow-x-auto"
                       >
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="standard">
-                          Standard · typed rules
-                        </SelectItem>
-                        <SelectItem value="script">Script · .mwtree</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="field-help">
-                      Open 2.5×、reraise 3×、legal all-inを含む標準ツリー。
-                    </p>
-                  </div>
-                  <div className="rounded-lg border bg-muted/25 p-3">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">Tree preview</span>
-                      <Badge variant="secondary">1,284 nodes</Badge>
-                    </div>
-                    <div className="mt-3 space-y-2 text-xs text-muted-foreground">
-                      <p className="flex justify-between">
-                        <span>Preflop aggressive cap</span>
-                        <strong className="text-foreground">4</strong>
-                      </p>
-                      <p className="flex justify-between">
-                        <span>Postflop bet / raise</span>
-                        <strong className="text-foreground">50% / 75%</strong>
-                      </p>
-                      <p className="flex justify-between">
-                        <span>Donk bet</span>
-                        <strong className="text-foreground">Allowed</strong>
-                      </p>
-                    </div>
-                  </div>
-                </TabsContent>
+                        <TabsTrigger value="solver">Solver・精度</TabsTrigger>
+                        <TabsTrigger value="runtime">
+                          実行・リソース
+                        </TabsTrigger>
+                      </TabsList>
 
-                <TabsContent
-                  value="economics"
-                  className="grid gap-4 pt-3 md:grid-cols-2"
-                >
-                  <div className="field-stack">
-                    <Label>Economics</Label>
-                    <Select defaultValue="cash">
-                      <SelectTrigger className="w-full" aria-label="Economics">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cash">Cash · chipEV</SelectItem>
-                        <SelectItem value="icm">Tournament · ICM</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex items-center justify-between rounded-lg border p-3">
-                    <div>
-                      <p className="font-medium">Rake</p>
-                      <p className="text-xs text-muted-foreground">
-                        offの場合はno-rake
-                      </p>
-                    </div>
-                    <Switch
-                      checked={rakeEnabled}
-                      onCheckedChange={setRakeEnabled}
-                      aria-label="Rakeを有効化"
-                    />
-                  </div>
-                </TabsContent>
+                      <TabsContent value="solver" className="space-y-4 pt-3">
+                        <div className="grid gap-3 rounded-lg border p-3 md:grid-cols-3">
+                          <div className="rounded-md border bg-muted/25 p-3 md:col-span-3">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div>
+                                <Label>Production abstraction</Label>
+                                <p className="field-help">
+                                  EHS² percentile・current-street
+                                  recallでsweep前に全policy arenaを確保します。
+                                </p>
+                              </div>
+                              <div className="flex gap-2">
+                                <Badge variant="secondary">EHS²</Badge>
+                                <Badge variant="outline">Current street</Badge>
+                              </div>
+                            </div>
+                          </div>
+                          {(["flop", "turn", "river"] as const).map(
+                            (street) => {
+                              const field = `${street}Buckets` as const
+                              return (
+                                <div className="field-stack" key={street}>
+                                  <Label htmlFor={`${street}-buckets`}>
+                                    {street[0].toUpperCase() + street.slice(1)}{" "}
+                                    buckets
+                                  </Label>
+                                  <Input
+                                    id={`${street}-buckets`}
+                                    inputMode="numeric"
+                                    value={draft[field]}
+                                    onChange={(event) =>
+                                      updateDraft({
+                                        ...draft,
+                                        [field]: event.target.value,
+                                      })
+                                    }
+                                  />
+                                </div>
+                              )
+                            }
+                          )}
+                        </div>
 
-                <TabsContent
-                  value="solver"
-                  className="grid gap-4 pt-3 md:grid-cols-3"
-                >
-                  <div className="field-stack">
-                    <Label>Algorithm</Label>
-                    <Input value="External Sampling MCCFR" readOnly />
-                  </div>
-                  <div className="field-stack">
-                    <Label htmlFor="rollouts">Rollouts / state</Label>
-                    <Input id="rollouts" type="number" defaultValue="512" />
-                    <p className="field-help">検証済みの標準値</p>
-                  </div>
-                  <div className="field-stack">
-                    <Label>Recall</Label>
-                    <Select defaultValue="current">
-                      <SelectTrigger className="w-full" aria-label="Recall">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="current">Current street</SelectItem>
-                        <SelectItem value="history">Bucket history</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </TabsContent>
+                        <div className="grid gap-3 rounded-lg border p-3 md:grid-cols-4">
+                          <div className="field-stack">
+                            <Label>Solver kind</Label>
+                            <Select
+                              value={draft.solverKind}
+                              onValueChange={(solverKind) =>
+                                updateDraft({
+                                  ...draft,
+                                  solverKind:
+                                    solverKind as FormSolveDraft["solverKind"],
+                                  pruningKind:
+                                    solverKind === "single-hand"
+                                      ? "none"
+                                      : draft.pruningKind,
+                                })
+                              }
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="range-vector">
+                                  Range vector
+                                </SelectItem>
+                                <SelectItem value="single-hand">
+                                  Single hand
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="field-stack">
+                            <Label htmlFor="solver-seed">Solver seed</Label>
+                            <Input
+                              id="solver-seed"
+                              inputMode="numeric"
+                              value={draft.solverSeed}
+                              onChange={(event) =>
+                                updateDraft({
+                                  ...draft,
+                                  solverSeed: event.target.value,
+                                })
+                              }
+                            />
+                          </div>
+                          <div className="field-stack">
+                            <Label htmlFor="opponent-exploration">
+                              Opponent exploration
+                            </Label>
+                            <Input
+                              id="opponent-exploration"
+                              inputMode="decimal"
+                              value={draft.opponentExploration}
+                              onChange={(event) =>
+                                updateDraft({
+                                  ...draft,
+                                  opponentExploration: event.target.value,
+                                })
+                              }
+                            />
+                          </div>
+                          <div className="field-stack">
+                            <Label htmlFor="batch-sweeps">Batch sweeps</Label>
+                            <Input
+                              id="batch-sweeps"
+                              inputMode="numeric"
+                              value={draft.batchSweeps}
+                              onChange={(event) =>
+                                updateDraft({
+                                  ...draft,
+                                  batchSweeps: event.target.value,
+                                })
+                              }
+                            />
+                          </div>
+                          <div className="field-stack">
+                            <Label>Discount</Label>
+                            <Select
+                              value={draft.discountKind}
+                              onValueChange={(discountKind) =>
+                                updateDraft({
+                                  ...draft,
+                                  discountKind:
+                                    discountKind as FormSolveDraft["discountKind"],
+                                })
+                              }
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="periodic">
+                                  Periodic
+                                </SelectItem>
+                                <SelectItem value="none">None</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          {draft.discountKind === "periodic" ? (
+                            <>
+                              <div className="field-stack">
+                                <Label htmlFor="discount-every">
+                                  Discount every
+                                </Label>
+                                <Input
+                                  id="discount-every"
+                                  inputMode="numeric"
+                                  value={draft.discountEverySweeps}
+                                  onChange={(event) =>
+                                    updateDraft({
+                                      ...draft,
+                                      discountEverySweeps: event.target.value,
+                                    })
+                                  }
+                                />
+                              </div>
+                              <div className="field-stack">
+                                <Label htmlFor="discount-until">
+                                  Discount until
+                                </Label>
+                                <Input
+                                  id="discount-until"
+                                  inputMode="numeric"
+                                  value={draft.discountUntilSweeps}
+                                  onChange={(event) =>
+                                    updateDraft({
+                                      ...draft,
+                                      discountUntilSweeps: event.target.value,
+                                    })
+                                  }
+                                />
+                              </div>
+                            </>
+                          ) : null}
+                          <div className="field-stack">
+                            <Label>Pruning</Label>
+                            <Select
+                              value={draft.pruningKind}
+                              disabled={draft.solverKind === "single-hand"}
+                              onValueChange={(pruningKind) =>
+                                updateDraft({
+                                  ...draft,
+                                  pruningKind:
+                                    pruningKind as FormSolveDraft["pruningKind"],
+                                })
+                              }
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="regret-based">
+                                  Regret based
+                                </SelectItem>
+                                <SelectItem value="none">None</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </TabsContent>
 
-                <TabsContent
-                  value="runtime"
-                  className="grid gap-4 pt-3 md:grid-cols-3"
-                >
-                  <div className="field-stack">
-                    <Label htmlFor="sweeps">Max sweeps</Label>
-                    <Input id="sweeps" defaultValue="5,000,000" />
-                  </div>
-                  <div className="field-stack">
-                    <Label htmlFor="target">Stop target</Label>
-                    <Input id="target" defaultValue="0.05" />
-                    <p className="field-help">BB / hand</p>
-                  </div>
-                  <div className="field-stack">
-                    <Label>Resources</Label>
-                    <Select defaultValue="auto">
-                      <SelectTrigger className="w-full" aria-label="Resources">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="auto">Auto · recommended</SelectItem>
-                        <SelectItem value="manual">Manual</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-        </div>
+                      <TabsContent
+                        value="runtime"
+                        className="grid gap-4 pt-3 md:grid-cols-3"
+                      >
+                        <div className="field-stack">
+                          <Label htmlFor="sweeps">Max sweeps</Label>
+                          <Input
+                            id="sweeps"
+                            inputMode="numeric"
+                            value={draft.maxSweeps}
+                            onChange={(event) =>
+                              updateDraft({
+                                ...draft,
+                                maxSweeps: event.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="field-stack">
+                          <Label htmlFor="max-time">Max time（optional）</Label>
+                          <Input
+                            id="max-time"
+                            value={draft.maxTime}
+                            placeholder="12h"
+                            onChange={(event) =>
+                              updateDraft({
+                                ...draft,
+                                maxTime: event.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="field-stack">
+                          <Label htmlFor="target">Stop target</Label>
+                          <Input
+                            id="target"
+                            value={draft.stopTarget}
+                            onChange={(event) =>
+                              updateDraft({
+                                ...draft,
+                                stopTarget: event.target.value,
+                              })
+                            }
+                          />
+                          <p className="field-help">
+                            {draft.economics.kind === "tournament-icm"
+                              ? '"default" = total prize poolの0.0001。明示値はprize pool比率。'
+                              : '"default" = 0.05 BB / hand。明示値はBB / hand。'}
+                          </p>
+                        </div>
+                        <div className="field-stack">
+                          <Label htmlFor="checkpoint">
+                            Checkpoint interval
+                          </Label>
+                          <Input
+                            id="checkpoint"
+                            value={draft.checkpointInterval}
+                            onChange={(event) =>
+                              updateDraft({
+                                ...draft,
+                                checkpointInterval: event.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="field-stack">
+                          <Label htmlFor="threads">Threads</Label>
+                          <Input
+                            id="threads"
+                            value={draft.threads}
+                            onChange={(event) =>
+                              updateDraft({
+                                ...draft,
+                                threads: event.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="field-stack">
+                          <Label htmlFor="memory">Memory</Label>
+                          <Input
+                            id="memory"
+                            value={draft.memory}
+                            onChange={(event) =>
+                              updateDraft({
+                                ...draft,
+                                memory: event.target.value,
+                              })
+                            }
+                          />
+                          <p className="field-help">
+                            auto = 6 GiB。productionでは明示値も6 GiB以下。
+                          </p>
+                        </div>
+                        <div className="field-stack">
+                          <Label htmlFor="stop-check-every">
+                            Evaluate every sweeps
+                          </Label>
+                          <Input
+                            id="stop-check-every"
+                            inputMode="numeric"
+                            value={draft.stopCheckEverySweeps}
+                            onChange={(event) =>
+                              updateDraft({
+                                ...draft,
+                                stopCheckEverySweeps: event.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="field-stack">
+                          <Label htmlFor="stop-confirmations">
+                            Confirmations
+                          </Label>
+                          <Input
+                            id="stop-confirmations"
+                            inputMode="numeric"
+                            value={draft.stopConfirmations}
+                            onChange={(event) =>
+                              updateDraft({
+                                ...draft,
+                                stopConfirmations: event.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="field-stack">
+                          <Label htmlFor="evaluation-samples">
+                            Evaluation samples
+                          </Label>
+                          <Input
+                            id="evaluation-samples"
+                            inputMode="numeric"
+                            value={draft.evaluationSamples}
+                            onChange={(event) =>
+                              updateDraft({
+                                ...draft,
+                                evaluationSamples: event.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="field-stack">
+                          <Label htmlFor="deviator-traversals">
+                            Deviator traversals
+                          </Label>
+                          <Input
+                            id="deviator-traversals"
+                            inputMode="numeric"
+                            value={draft.deviatorTraversals}
+                            onChange={(event) =>
+                              updateDraft({
+                                ...draft,
+                                deviatorTraversals: event.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="field-stack">
+                          <Label>Probability encoding</Label>
+                          <Select
+                            value={draft.probabilityEncoding}
+                            onValueChange={(probabilityEncoding) =>
+                              updateDraft({
+                                ...draft,
+                                probabilityEncoding:
+                                  probabilityEncoding as FormSolveDraft["probabilityEncoding"],
+                              })
+                            }
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="u16">
+                                U16 production
+                              </SelectItem>
+                              <SelectItem value="f32">F32 research</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          )}
+        </fieldset>
 
         <aside className="setup-summary">
           <Card className="sticky-card">
             <CardHeader className="border-b">
-              <CardTitle>実行サマリー</CardTitle>
+              <h2 className="font-heading text-sm font-medium">実行サマリー</h2>
               <CardDescription>
-                {isRemote
-                  ? "Capability未確認 · 送信しません"
-                  : "Preflightの表示サンプル"}
+                {validation
+                  ? validation.valid
+                    ? "Rust validation済み"
+                    : "設定を修正してください"
+                  : "検証すると実効設定とresource設定を表示します"}
               </CardDescription>
               <CardAction>
-                <Badge variant="outline">
-                  {isRemote ? "未確認" : "FIXTURE"}
+                <Badge
+                  variant={
+                    validation?.valid
+                      ? "default"
+                      : validation
+                        ? "destructive"
+                        : "outline"
+                  }
+                >
+                  {validation?.valid
+                    ? "VALID"
+                    : validation
+                      ? "INVALID"
+                      : "未検証"}
                 </Badge>
               </CardAction>
             </CardHeader>
@@ -453,6 +1113,7 @@ export function SetupScreen({
               <button
                 type="button"
                 className="machine-summary"
+                disabled={busyAction !== null}
                 onClick={onOpenConnections}
               >
                 <span className="rounded-md border bg-background p-2">
@@ -465,105 +1126,355 @@ export function SetupScreen({
                 <span className="min-w-0 flex-1 text-left">
                   <small>SOLVE先</small>
                   <strong className="truncate">{profile.name}</strong>
-                  <em>
-                    {isRemote ? "Remote · contract only" : "Local · fixture"}
-                  </em>
+                  <em>{isRemote ? "Remote · 未実装" : "Local · in-process"}</em>
                 </span>
                 <IconChevronRight className="size-4 text-muted-foreground" />
               </button>
 
               <div className="summary-metrics">
                 <div>
-                  <span>Threads</span>
-                  <strong>{isRemote ? "未確認" : "12 / sample"}</strong>
+                  <span>Economics</span>
+                  <strong>
+                    {economicsPreflight
+                      ? economicsPreflight.kind === "cash"
+                        ? "ChipEV"
+                        : `ICM · ${economicsPreflight.fieldPlayers}p`
+                      : source.kind === "toml"
+                        ? "未検証"
+                        : draft.economics.kind === "cash"
+                          ? "ChipEV"
+                          : `ICM · ${icmFieldPlayers}p`}
+                  </strong>
                 </div>
                 <div>
-                  <span>Peak memory</span>
-                  <strong>{isRemote ? "未確認" : "9.6 GiB · sample"}</strong>
+                  <span>Threads</span>
+                  <strong>
+                    {validation?.preflight?.threads
+                      ? source.kind === "form" && draft.threads === "auto"
+                        ? `auto → ${validation.preflight.threads}`
+                        : validation.preflight.threads
+                      : "—"}
+                  </strong>
+                </div>
+                <div>
+                  <span>Recall</span>
+                  <strong>{treePreflight?.recallMode ?? "—"}</strong>
+                </div>
+                <div>
+                  <span>Decision nodes</span>
+                  <strong>
+                    {treePreflight
+                      ? formatInteger(treePreflight.decisionNodes)
+                      : "—"}
+                  </strong>
+                </div>
+                <div>
+                  <span>Solver state</span>
+                  <strong>
+                    {memoryPreflight?.solverStateBytes
+                      ? formatBytes(memoryPreflight.solverStateBytes)
+                      : memoryPreflight?.estimateKind === "prefix-lower-bound"
+                        ? "prefix下限"
+                        : "—"}
+                  </strong>
+                </div>
+                <div>
+                  <span>メモリ上限</span>
+                  <strong>
+                    {memoryPreflight
+                      ? formatBytes(memoryPreflight.budgetBytes)
+                      : "—"}
+                  </strong>
                 </div>
                 <div>
                   <span>Abstraction</span>
-                  <strong>64 / 64 / 64</strong>
+                  <strong>{validation?.preflight?.abstraction ?? "—"}</strong>
                 </div>
                 <div>
-                  <span>Estimate</span>
-                  <strong>{isRemote ? "未算出" : "~ 4h 03m · sample"}</strong>
+                  <span>Fingerprint</span>
+                  <strong className="truncate">
+                    {validation?.configFingerprint?.slice(0, 12) ?? "—"}
+                  </strong>
                 </div>
               </div>
 
-              <Separator />
+              {treePreflight && memoryPreflight ? (
+                <>
+                  <div className="space-y-3 rounded-lg border p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-medium">
+                          ベッティングツリー検証済み
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          実Solverと同じ公開action treeを全探索
+                        </p>
+                      </div>
+                      <Badge variant="secondary">
+                        {formatInteger(treePreflight.decisionNodes)} nodes
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="text-muted-foreground">
+                          Terminal edges
+                        </span>
+                        <strong className="block font-mono">
+                          {treePreflight.terminalEdges
+                            ? formatInteger(treePreflight.terminalEdges)
+                            : "prefix検証中断"}
+                        </strong>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">
+                          Policy columns
+                        </span>
+                        <strong className="block font-mono">
+                          {treePreflight.policyColumns
+                            ? formatInteger(treePreflight.policyColumns)
+                            : "prefix検証中断"}
+                        </strong>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-muted-foreground">
+                          Policy slots
+                        </span>
+                        <strong className="block font-mono">
+                          {treePreflight.policySlots
+                            ? formatInteger(treePreflight.policySlots)
+                            : "prefix検証中断"}
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
 
-              <div className="space-y-2.5">
-                <p className="text-xs font-medium">
-                  {isRemote ? "Remote preflight" : "Validation sample"}
-                </p>
-                {(isRemote
-                  ? [
-                      "Capability handshake · 未実行",
-                      "Config schema · 未確認",
-                      "Resource limits · 未確認",
-                      "Remote run · 未作成",
-                    ]
-                  : [
-                      "Config schema v1 · sample",
-                      "Ranges · 7,956 combos · sample",
-                      "Tree rules · sample",
-                      "Memory budget · sample",
-                    ]
-                ).map((item) => (
-                  <p
-                    className="flex items-center gap-2 text-xs text-muted-foreground"
-                    key={item}
-                  >
-                    <span
-                      className={cn(
-                        "rounded-full p-0.5",
-                        isRemote
-                          ? "bg-muted text-muted-foreground"
-                          : "bg-emerald-100 text-emerald-700"
-                      )}
-                    >
-                      {isRemote ? (
-                        <IconInfoCircle className="size-3" />
+                  <div className="space-y-3 rounded-lg border p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-medium">
+                          Solver stateメモリ
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {memoryPreflight.budgetMode === "auto"
+                            ? "auto · production固定6 GiB"
+                            : "明示指定した上限"}
+                        </p>
+                      </div>
+                      <Badge
+                        variant={
+                          memoryPreflight.fitsBudget === false
+                            ? "destructive"
+                            : memoryPreflight.fitsBudget === true
+                              ? "default"
+                              : "secondary"
+                        }
+                      >
+                        {memoryPreflight.fitsBudget === false
+                          ? "上限超過"
+                          : memoryPreflight.fitsBudget === true
+                            ? "範囲内"
+                            : "動的"}
+                      </Badge>
+                    </div>
+
+                    {memoryPreflight.solverStateBytes ? (
+                      <>
+                        <div className="flex items-baseline justify-between gap-2 text-xs">
+                          <strong className="font-mono">
+                            {formatBytes(memoryPreflight.solverStateBytes)}
+                          </strong>
+                          <span className="text-muted-foreground">
+                            / {formatBytes(memoryPreflight.budgetBytes)}
+                          </span>
+                        </div>
+                        {solverStatePercent !== null ? (
+                          <Progress
+                            value={solverStatePercent}
+                            aria-label="Solver stateのメモリ上限使用率"
+                          />
+                        ) : null}
+                        <p className="text-xs text-muted-foreground">
+                          {memoryPreflight.headroomBytes
+                            ? `余裕 ${formatBytes(memoryPreflight.headroomBytes)}`
+                            : memoryPreflight.fitsBudget === false
+                              ? "ツリー、bucket数、またはメモリ上限を調整してください。"
+                              : "上限と同量です。"}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        policy arena上限を超えたtree
+                        prefixで検証を停止しました。
+                      </p>
+                    )}
+                    <p className="border-t pt-2 text-xs text-muted-foreground">
+                      この値はpolicy arenaのSolver stateです。公開ツリー、
+                      ICM準備領域、abstraction cache、thread scratch、評価、
+                      checkpoint stagingを含むプロセス全体のpeakではありません。
+                    </p>
+                  </div>
+
+                  {economicsPreflight?.kind === "tournament-icm" ? (
+                    <div className="space-y-3 rounded-lg border p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div>
+                          <p className="text-sm font-medium">Tournament ICM</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatInteger(economicsPreflight.fieldPlayers)}
+                            人・有賞
+                            {formatInteger(economicsPreflight.paidPlaces)}位
+                          </p>
+                        </div>
+                        <Badge variant="secondary">
+                          {economicsPreflight.mode === "exact"
+                            ? "Exact"
+                            : "Sampled"}
+                        </Badge>
+                      </div>
+                      {economicsPreflight.preparedBytes ? (
+                        <>
+                          <div className="flex items-baseline justify-between gap-2 text-xs">
+                            <span>ICM準備領域</span>
+                            <strong className="font-mono">
+                              {formatBytes(economicsPreflight.preparedBytes)}
+                            </strong>
+                          </div>
+                          <div className="flex items-baseline justify-between gap-2 text-xs">
+                            <span className="text-muted-foreground">
+                              内部上限
+                            </span>
+                            <span className="font-mono text-muted-foreground">
+                              {economicsPreflight.preparedLimitBytes
+                                ? formatBytes(
+                                    economicsPreflight.preparedLimitBytes
+                                  )
+                                : "—"}
+                            </span>
+                          </div>
+                          <Badge
+                            variant={
+                              economicsPreflight.fitsPreparedLimit === false
+                                ? "destructive"
+                                : "default"
+                            }
+                          >
+                            {economicsPreflight.fitsPreparedLimit === false
+                              ? "上限超過"
+                              : `${formatInteger(economicsPreflight.samples ?? "0")} samples`}
+                          </Badge>
+                        </>
                       ) : (
-                        <IconCheck className="size-3" />
+                        <p className="text-xs text-muted-foreground">
+                          15人以下はsubset dynamic programmingによるexact
+                          ICMです。sampled race bufferは使いません。
+                        </p>
                       )}
-                    </span>
-                    {item}
+                    </div>
+                  ) : null}
+                </>
+              ) : null}
+
+              {validation?.errors.length ? (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-destructive">
+                    Validation errors
                   </p>
-                ))}
-              </div>
+                  {validation.errors.map((error, index) => (
+                    <p
+                      className="text-xs text-destructive"
+                      key={`${error.path}-${error.code}-${index}`}
+                    >
+                      <strong>{error.path}</strong>: {error.message}
+                    </p>
+                  ))}
+                </div>
+              ) : validation?.valid ? (
+                <div className="space-y-2">
+                  {[
+                    "Config schema v1",
+                    "Ranges / collision-free deal",
+                    ...(economicsPreflight?.kind === "tournament-icm"
+                      ? [
+                          economicsPreflight.mode === "exact"
+                            ? "Exact ICM economics"
+                            : "Sampled ICM preparation fits limit",
+                        ]
+                      : []),
+                    "Betting tree construction",
+                    memoryPreflight?.estimateKind === "prefix-lower-bound"
+                      ? "Tree prefix lower bound reported"
+                      : "Solver state fits memory budget",
+                  ].map((item) => (
+                    <p
+                      className="flex items-center gap-2 text-xs text-muted-foreground"
+                      key={item}
+                    >
+                      <span className="rounded-full bg-emerald-100 p-0.5 text-emerald-700">
+                        <IconCheck className="size-3" />
+                      </span>
+                      {item}
+                    </p>
+                  ))}
+                </div>
+              ) : null}
+
+              {validation?.warnings.length ? (
+                <div className="space-y-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-amber-950">
+                  <p className="text-xs font-medium">Validation warnings</p>
+                  {validation.warnings.map((warning, index) => (
+                    <p
+                      className="text-xs text-amber-800"
+                      key={`${warning.path}-${warning.code}-${index}`}
+                    >
+                      <strong>{warning.path}</strong>: {warning.message}
+                    </p>
+                  ))}
+                </div>
+              ) : null}
 
               <Alert>
                 <IconInfoCircle />
                 <AlertTitle>品質の境界</AlertTitle>
                 <AlertDescription>
-                  3人以上はregret-minimized
-                  profileであり、認証済みNash/GTO解ではありません。
+                  {validation?.guaranteeBoundary ??
+                    "3人以上はregret-minimized profileであり、認証済みNash/GTO解ではありません。"}
                 </AlertDescription>
               </Alert>
             </CardContent>
-            <CardFooter className="flex-col gap-2 border-t">
-              <Button className="w-full" size="lg" onClick={onStart}>
-                {isRemote ? "リモート実行デモを表示" : "ローカル実行デモを表示"}
-                <IconArrowRight />
+            <CardFooter className="border-t">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full"
+                disabled={!nativeReady || busyAction !== null}
+                onClick={() => handleOpenResult("run")}
+              >
+                <IconFolderOpen />
+                生成済みrunを開く
               </Button>
-              <p className="text-center text-[11px] text-muted-foreground">
-                {isRemote
-                  ? "remote managed run: 未作成"
-                  : "fixture run: ファイルを作成しません"}
-              </p>
             </CardFooter>
           </Card>
 
           <div className="flex items-start gap-2 rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
             <IconStack2 className="mt-0.5 size-4 shrink-0" />
             <p>
-              実装時は有効値を含むTOMLとfingerprintを成果物へ記録します。fixtureでは保存しません。
+              job作成には検証済みeffective
+              TOMLとfingerprintだけを渡します。入力元pathは送信しません。
             </p>
           </div>
         </aside>
       </div>
+      {checkpointSource ? (
+        <ResumeDialog
+          key={checkpointSource.sourceId}
+          sourceLabel={checkpointSource.fileName}
+          completedSweeps={checkpointSource.completedSweeps}
+          suggestedName={checkpointSource.suggestedName}
+          busy={busyAction === "checkpoint-resume"}
+          onCancel={() => setCheckpointSource(null)}
+          onConfirm={handleResumeCheckpoint}
+        />
+      ) : null}
     </div>
   )
 }

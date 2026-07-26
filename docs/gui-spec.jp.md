@@ -1,15 +1,15 @@
 # Solvers Web GUI v1 仕様
 
-Status: **操作可能な visual fixture shell 実装済み / Solve transport 未実装**  
-確定日: 2026-07-23  
+Status: **Local Solver / 生成File接続済み・Remote Solveは仕様 / UIのみ**
+更新日: 2026-07-25
 UI preset: `shadcn/ui --preset bdvw9nmi`
 
 この文書は、Web 技術で作成する Solvers GUI v1 の画面、配布形態、Local /
 Remote Solve 境界に対する正本である。「今回」と「target」を次の意味で区別する。
 
-- **今回**: `app/ui` の操作可能な visual fixture shell と、静的 SPA を内包する
-  `app/desktop` の Tauri shell。fixture から solver、bridge、filesystem、
-  credential store、remote network への接続はない。
+- **今回**: `app/ui` の3画面と、静的SPA・Local job/file backend・既存Rust
+  Solver libraryを内包する`app/desktop`のTauri shell。Localは実接続済み。
+  Remoteは画面と本書のcontractだけで、credential store / networkへは接続しない。
 - **target**: 本書で確定する製品契約。実装済みという意味ではない。
 
 GUI v1 が設定・実行する solver は **Multiway Preflop v1**
@@ -21,23 +21,45 @@ postflop (`kind = "postflop"`) はアプリ全体および CLI には残るが�
 
 ## 0. 実装境界
 
-| 項目 | 今回 | target |
+| 項目 | 今回 | 未実装 / target |
 |---|---|---|
-| Setup / Solving / Results | 操作可能な visual shell | 実データと全 target 項目を接続 |
-| form control | fixture の一部だけ操作可能 | v1 config 全体と lossless に同期 |
-| strategy | synthetic 13×13 fixture | atomic live average / final artifact |
-| node / actor 選択 | visual fixture | node ごとの実データへ接続 |
-| Local / Remote profile | 選択 UI | LocalGateway / RemoteGateway |
-| validation / preflight | synthetic 表示 | v1 parser / normalizer / resource preflight |
-| Solve / cancel / resume | 未実装 | durable job contract |
-| artifact import / export | 未実装 | CLI と同じ reader / writer |
-| Tauri shell | 静的 SPA を raw executable に内包 | Local solver library も同じ executable に link |
+| Setup / Solving / Results | Local実データへ接続 | Remote実データ |
+| form control | 全v1 fieldの専用control + typed betting-tree rule editor + lossless TOML editor | なし |
+| strategy | evaluation境界のroot live average / `.mwsol` final | public treeのnode picker |
+| Local / Remote profile | LocalGateway実装 / Remote選択UI | RemoteGateway |
+| validation | v1 parser / normalizer、production contract、range・ICM semantics、公開treeのbyte-bounded preflight、dense Solver state / sampled ICM準備領域の検証 | process全体の厳密なpeak memory上界 |
+| Solve / cancel / resume | in-process worker、cooperative cancel、checkpoint resume | process restart後のjob reattach |
+| Local window close | 画面の停止action | 実行中close guard + checkpoint完了待ち |
+| artifact import / export | CLIと同じrun/progress/mwsol/mwckpt | Remote artifact transfer |
+| Tauri shell | SPAとLocal Solver libraryを同じexecutableへlink | 署名済みplatform bundle |
 
-今回の画面に表示する run、validation、resource、strategy、result、artifact はすべて
-fixture であり、実行・検証済みの値ではない。fixture build では全画面に
-`FIXTURE — Solve は実行されません` を常時表示し、Local / Remote の primary
-action はそれぞれ `ローカル実行をプレビュー` / `リモート実行をプレビュー` とする。
-書込・停止・共有・export を装う action は disabled にし、理由を表示する。
+### 0.1 CLI wrapperとしての完成条件
+
+GUI v1で「CLI wrapperとして対応」と呼ぶ範囲は、Multiway Preflop v1の設定から
+artifact生成までのproduct workflowに固定する。
+
+| CLI surface | GUI v1 |
+|---|---|
+| `config new` | Form既定値とlossless TOML editor |
+| `validate` | `ツリー構築・メモリ検証`。CLIと同じnormalizer / preflight |
+| `solve` | Local in-process job |
+| `resume` | checkpoint選択とoverride dialog |
+| `inspect` | Solve中root snapshot / Results strategy・seat・quality view |
+| artifact export | run directory / `.mwsol` / `.mwckpt`のnative file操作 |
+
+`serve`はTauri内のLocalGatewayが置き換える内部transportであり、GUIのuser actionには
+しない。`experiment` / `report`とexact postflop専用surfaceは研究・batch CLIとして
+GUI v1の完成条件から除外する。任意nodeの`inspect`、on-demand `evaluate`、
+solution間`compare`を追加する場合はResults workflowの次versionとして扱う。
+
+全v1 fieldを専用controlから設定でき、TOML editor / file importからも同じ
+normalizerへ渡せることを必須とする。相互排他的なfieldは無効値を生成しないよう
+kindに応じて表示を切り替え、Rust normalizer / preflightを最終判定とする。
+
+Local画面のrun、validation、strategy、result、artifactは実データだけを表示する。
+ブラウザーpreviewではnative操作を無効化し、その理由を表示する。Remote profileでは
+primary actionを無効化し、仕様 / UIのみであることを常時表示する。存在しないEV、
+未訪問strategy、未生成artifactをsynthetic値で補完しない。
 
 ## 1. 配布形態
 
@@ -69,8 +91,7 @@ solvers-gui executable
 ├── Tauri 2 native window + OS WebView
 ├── embedded React / Vite static SPA
 └── SolverGateway
-    ├── Fixture data      今回: screen が直接参照
-    ├── LocalGateway      target: 同一 process の Rust library
+    ├── LocalGateway      今回: 同一 process の Rust library
     └── RemoteGateway     target: Tauri Rust HTTP client
 ```
 
@@ -110,12 +131,13 @@ visual system は preset から生成された次を維持する。
 ### 3.1 flow
 
 1. preset または TOML を選ぶ。
-2. table / player を編集する。
-3. betting tree、economics、solver、runtime を編集する。
+2. `テーブル`、`ICM / Rake`、`Tree`、`Solver / 実行`の段階タブで必要な領域だけを
+   開き、全playerのstack / blind / ante / rangeとSolve条件を編集する。
+3. cash / Tournament ICMを選び、betting tree、solver、runtimeを編集する。
 4. Local / Remote profile を選ぶ。
-5. profile 上で validation / resource preflight を実行する。
+5. `ツリー構築・メモリ検証`でvalidation / resource preflightを実行する。
 6. effective config と guarantee boundary を確認する。
-7. `Solve を開始` する。
+7. 検証成功後に有効になる`Solve を開始`を実行する。
 
 フォームと TOML を別の正本として持たない。編集 draft は v1 schema の field と
 lossless に対応し、BB、rate、target、duration、memory、整数を含む入力 token を
@@ -133,24 +155,55 @@ integer、resource estimate を表示する。unknown field、irrelevant field�
 - `game.seat_count`、`game.button`
 - `standard_blinds`、`preflop_first_to_act`、`common_ante_bb`
 - default stack / range
-- seat ごとの stack、range、blind、ante
+- seat ごとの stack、range、blind、anteを同時編集するcompact data grid
 - tree frontend (`standard | script`)
 - economics (`cash | tournament-icm`) と rake
+- Tournament ICMのpayout、outside field stack、sample数、seed
 - max sweeps、stop target、resources
 
 詳細領域:
 
 - typed tree rules / `.mwtree`
-- abstraction kind、street bucket、opponent bucket
-- `rollouts_per_state`。既定は検証済みの 512
-- information recall
+- Preflop Tree Builder（open / limp後raise / re-raise / aggression cap）
+- Postflop Tree Builder（street別bet / raise size / aggression cap）
+- common tree option（`allow_limp`、street別`max_aggressive_actions`、
+  `reraise_jam_above_actor_starting_stack`）
+- EHS² percentileのflop / turn / river bucket
 - solver seed、exploration、batch、discount、pruning
 - evaluation budget / cadence、checkpoint interval
 - output probability encoding
 
-現 schema で無効な field は disabled control として残さず、form、TOML、request
-から除外する。economics により stop target の unit が変わるため、cash では
-BB/hand、tournament ICM では prize unit を明示する。
+mainでtrackedされる2026-07-25のportable canonical v1から、次の全設定presetを
+選択できるようにする。いずれも実験上の**暫定anchor**であり、solver全体の確定既定値
+とは表示しない。
+
+- Cash 6-max / 100BB / EHS² K256 / current-street
+- Tournament 6-max / 50BB / EHS² K128 / current-street
+
+Treeだけを差し替えるtemplateとして、Canonical Cash、Canonical Tournament、
+Push/Fold、production smoke、軽量checkdownを提供する。Tree template適用時は
+table、range、economics、abstraction、solver、runtimeを保持する。旧rollout/full
+recallの研究presetおよびlegacy Bridge payloadはproduction GUIへ表示しない。
+
+フォームの6-max既定値は、全席のrangeを`random`（全1,326 combo、weight 1）とする。
+検証と初回Solveを現実的な規模に保つため、Preflop Tree Builderからopen、
+limp後raise、re-raise、aggression capを明示ruleとして生成し、既定ではpostflopを
+checkdownにする。`Standard postflop tree`を選ぶとpreflop後も組み込みstandard
+treeを使う。Postflop Tree Builderを適用するとPreflop ruleを保持したまま、
+Flop・Turn・Riverごとのbet / raise sizeとstreet内aggression capを明示ruleとして
+生成する。生成ruleを暗黙に適用したり、generated TOMLから隠したりしない。
+
+production contractは`ehs2-percentile`と`current-street`に固定する。研究用の
+rollout abstraction、`rollouts_per_state`、opponent bucket override、
+`bucket-history`はdisabled controlとして残さず、form、TOML、requestから除外する。
+economics により stop target の unit が変わるため、cash では
+BB/hand、tournament ICM ではtotal prize pool比率を明示する。economics切替時の
+targetは`"default"`へ戻し、cashでは0.05 BB/hand、ICMではprize poolの0.0001を使う。
+
+Tournament ICMのpayoutとoutside field stackは、表計算から貼り付けられるよう
+改行・空白・comma区切りを受け付ける。fieldが15人以下ならexact ICMとして
+`samples` / `seed`を出力しない。16人以上ではdeterministic Monte Carloとして
+両fieldを表示・出力する。ICMとrakeは同時にeffective configへ出力しない。
 
 ### 3.3 `.mwtree` と Remote
 
@@ -165,10 +218,27 @@ fingerprint と一致しなければ job を作らない。Remote v1 に file up
 ### 3.4 summary
 
 - connection profile と、Remote の場合は verified server identity
-- threads / peak memory / abstraction / rough time estimate
-- schema / range / tree / resource validation
+- threads / abstraction / rough time estimate
+- schema、range、collision-free deal、betting tree construction
+- economics kind。ICMではfield人数、有賞順位数、exact / sampled mode
+- decision node、terminal edge、policy column / slot
+- 完全走査できた場合はdense policy arenaのexact Solver state bytes、memory
+  budget、headroom、適否
+- memory上限に達した場合は、そのtree prefixまでのdecision nodeと必要bytesを
+  下限として表示し、terminal edge / policy column / slotの未確定値を捏造しない
+- sampled ICMではprepared race buffer bytes、1 GiB内部上限、適否
 - guarantee boundary
 - Local run directory または Remote managed run label
+
+`memory = "auto"`はproduction policy arena上限の6 GiBとして決定的に検証する。
+hostの空きmemory量には連動させない。normalizer内部のauto sentinelをDTOや画面へ
+表示せず、budget modeは`auto`、budget bytesは6 GiBとして返す。明示値も6 GiBを
+超えた場合はvalidation errorとする。
+
+exactと呼べる範囲はdense policy arenaのSolver stateとsampled ICMのprepared
+race bufferであり、別々に表示する。公開tree、abstraction cache、thread scratch、
+evaluation、checkpoint stagingを含むprocess全体のpeakではない。UIは前者を
+`Solver state`、後者を`ICM準備領域`と表示し、合算値を`peak memory`と呼ばない。
 
 time estimate は sweep budget を消化する参考値であり、収束時刻の予測ではない。
 
@@ -265,10 +335,9 @@ terminal status は次だけを使う。
 ### 6.1 gateway boundary
 
 React screen は HTTP、Bearer token、Tauri command、local path を直接扱わない。
-`SolveGateway` を唯一の I/O 境界とする。今回の `app/ui/src/lib/solve-contract.ts`
-には fixture view model と target adapter DTO の compile-time sketch を併置する。
-field 名と型の正本は本節と Remote v3 contract とし、transport 実装時はこの契約へ
-一致させる。
+`SolveGateway` を唯一の I/O 境界とする。LocalGatewayはTauriの公開`invoke`
+APIをadapter内だけで利用し、native dialogが選択したpathはopaque source IDへ
+置換する。field名と型の正本は本節とRemote v3 contractとする。
 
 ```ts
 interface SolveGateway {
@@ -334,8 +403,9 @@ effective config / DTO だけを canonical form にする。
 - resource preflight
 - guarantee boundary と units
 
-warning は performance hint のみに使い、schema、irrelevant field、precision、
-range、tree、resource hard limit は error とする。
+warning はperformance hintまたは固定値を算出できないdynamic resource境界に使う。
+schema、irrelevant field、precision、range、tree、resource hard limit違反はerror
+とする。
 
 ```ts
 type ValidationResult = {
@@ -346,8 +416,36 @@ type ValidationResult = {
   configFingerprint: string | null
   preflight: {
     threads: string
-    peakMemoryBytes: string
     abstraction: string
+    economics:
+      | { kind: "cash" }
+      | {
+          kind: "tournament-icm"
+          fieldPlayers: UInt64String
+          paidPlaces: UInt64String
+          mode: "exact" | "sampled"
+          samples: UInt64String | null
+          seed: UInt64String | null
+          preparedBytes: UInt64String | null
+          preparedLimitBytes: UInt64String | null
+          fitsPreparedLimit: boolean | null
+        }
+    tree: {
+      recallMode: "current-street"
+      decisionNodes: UInt64String
+      terminalEdges: UInt64String | null
+      policyColumns: UInt64String | null
+      policySlots: UInt64String | null
+    }
+    memory: {
+      estimateKind: "exact-dense" | "prefix-lower-bound"
+      solverStateBytes: UInt64String | null
+      budgetMode: "auto" | "explicit"
+      availableBytes: UInt64String | null
+      budgetBytes: UInt64String
+      headroomBytes: UInt64String | null
+      fitsBudget: boolean | null
+    }
   } | null
   guaranteeBoundary: string
   units: { utility: string; chipUnitBb: "0.001" }
@@ -547,13 +645,13 @@ type Estimate = {
 type MultiwayProgressV3 = {
   sweeps: UInt64String
   maxSweeps: UInt64String
-  elapsedSecs: DecimalString
+  elapsedSecs: DecimalString | null
   stopTarget: DecimalString
   stopTargetUnit: string
-  memoryBytes: UInt64String
-  traversalsPerSecond: DecimalString
-  handUpdatesPerSecond: DecimalString
-  infosets: UInt64String
+  memoryBytes: UInt64String | null
+  traversalsPerSecond: DecimalString | null
+  handUpdatesPerSecond: DecimalString | null
+  infosets: UInt64String | null
   checkpoint: {
     available: boolean
     generatedAt: string | null
@@ -636,6 +734,11 @@ type ExportReceipt = {
   sha256: string
 }
 ```
+
+通常のjob progressでは上記nullable fieldもすべて値を持つ。単体の
+`solution.mwsol` importでは成果物に記録されていないelapsed、memory、rate、
+infosetsだけを`null`とし、sweepsとseat metricsはsolution metadataから復元する。
+未知値を0として補完しない。
 
 `connectionProfileId` は server DTO へ送らず、SolverGateway が client-local binding
 として `JobSnapshot` と一緒に保持する。
@@ -782,22 +885,27 @@ type StrategySnapshotV1 = {
 `nodeId` は game fingerprint 内で stable な opaque public-history ID であり、
 breadcrumb label を query key に使わない。visited entry の `probabilityU16` は
 actions と同じ順序・同じ長さで、各値 0〜65,535、合計 65,535 とする。
-unvisited entry は `probabilityU16 = null`, `ev = null`。coverage は
-requested view の全 entry weight に対する visited entry weight の比で 0〜1 とする。
+unvisited entry は `probabilityU16 = null`, `ev = null`。coverage はrequested
+viewで定義されたentry domainに対するvisited entry数の比で0〜1とする。reachを
+観測できないunvisited entryへ仮のweightを割り当ててweight coverageを装わない。
 
-server は `run.stop.check_every_sweeps` の各 complete evaluation boundary と、
-terminal 正常停止の直前に immutable average snapshot を publish する。同じ
-snapshot に異なる sweep の block を混在させない。
+Localはcomplete-sweepのprogress / evaluation boundaryとterminal遷移時に、
+immutable average snapshotをpublishする。Remote targetも同じ境界を採用する。
+同じsnapshotに異なるsweepのblockを混在させない。
 
 - `live-average`: running job の最新 scheduled boundary を publish 済み。
 - `stale`: 最新 scheduled boundary の publish に失敗し、前回 snapshot を返した。
 - `final`: `target-reached` / `sweep-limit` / `time-limit` の formal solution と一致。
 
-snapshot がまだ1件もなければ HTTP 409 `snapshot_not_available_yet`。
-`cancelled` / `resource-limit` / `failed` は final snapshot を生成せず、取得済みの
-前回 snapshot を `stale` として表示できるだけとする。
+snapshotがまだ1件もなく、訪問済みroot strategyもなければHTTP 409
+`snapshot_not_available_yet`。`cancelled` / `resource-limit` / `failed`はformal
+solution由来の`final`を生成しない。最後のcomplete sweepで取得できたaverage
+snapshot（terminal observationを含む）があれば`stale`として表示する。
 
 ### 7.8 connection loss と window close
+
+この節はtarget contractである。今回のLocal実装はwindow close requestを保留せず、
+実行中は画面上の停止actionを使う。
 
 - connection loss 時は `Connection lost`、last received time、cached strategy を
   `STALE` として表示し、Remote job が停止したと推測しない。
@@ -848,20 +956,31 @@ target は WCAG 2.2 AA を基準とする。
 
 ## 10. 受入条件
 
-### 10.1 visual fixture shell
+### 10.1 Local desktop
 
-- `pnpm lint` と `pnpm build` が成功する。
+- `bun run test`、`bun run lint`、`bun run build` が成功する。
 - `cargo build --release -p solvers-desktop` が raw `solvers-gui` を生成する。
 - executable 1個の起動で、network / Node.js /別 Web server なしに SPA を表示する。
 - hash URL と navigation から3画面を移動できる。
 - Local / Remote profile UI を切り替えられる。
-- 全画面で fixture と分かり、実 Solve / validation / artifact write を装わない。
-- Solving に preflop strategy fixture が主要領域として見える。
+- v1 TOMLを実normalizerで検証し、同じeffective TOMLをin-process Solverへ渡す。
+- typed ruleを追加・削除・複製・並べ替えでき、表示順を保った
+  `[[game.tree.rules]]`としてeffective TOMLへ渡す。
+- 全席のposition / stack / blind / ante / rangeを1行ずつ同時に比較・編集できる。
+- Cash / Tournament ICMを切り替え、payoutとoutside field stackを一括貼り付けできる。
+- 15人以下のexact ICMと16人以上のsampled ICMを自動で切り替え、sampled
+  ICM準備領域が内部上限を超える設定はjobを作成しない。
+- Solve開始前に実Solverと同じrange feasibilityを検証し、public treeを
+  allocation-freeかつmemory byte-boundedで走査・集計する。
+- 完全走査時はSolver stateのnode / slot / bytesを表示する。memory budgetを
+  超えた場合はjobを作成せず、停止したprefixのnode / bytesを下限値として表示する。
+- 実Solveをcancelでき、evaluation境界のlinear average strategyをSolvingに表示する。
+- run directory / `.mwsol`を開き、4 artifactをnative dialogで書き出せる。
+- `.mwckpt`を選択して新しいmanaged runへresumeできる。
+- browser preview / Remote profileは実行済みのように見せずnative actionを無効化する。
 
-### 10.2 product transport
+### 10.2 Remote product transport (未実装)
 
-- LocalGateway が同じ executable 内の v1 libraryだけで validate / solve / cancel /
-  resume / result / artifact を完結する。
 - RemoteGateway が v3 handshake、credential store、durable job、SSE / polling
   replay、reattach を満たす。
 - Local / Remote は同じ effective config fingerprint、job state、result semantics

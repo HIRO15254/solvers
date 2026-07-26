@@ -1286,7 +1286,7 @@ fn multiway_result_state(path: &Path) -> Option<JobState> {
             |result| match result.get("status").and_then(|status| status.as_str()) {
                 Some("completed") => Some(JobState::Succeeded),
                 Some("cancelled") => Some(JobState::Cancelled),
-                Some("resource_limit") => Some(JobState::ResourceLimit),
+                Some("resource-limit" | "resource_limit") => Some(JobState::ResourceLimit),
                 _ => None,
             },
         )

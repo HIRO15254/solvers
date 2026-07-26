@@ -12,12 +12,12 @@ Postflop)** とし、CLI(bin `solvers`)と Web 技術の GUI を同じ solver li
 `app/gui` egui native GUI)は2026-07に削除済み。
 
 決定済みの方針(2026-07-23、GUI v1): `app/ui` の Setup / Solving / Results と
-`app/desktop` の Tauri shell は **操作可能な visual fixture shell** まで完了した。
-config validation、Local / Remote Solve、credential、artifact I/O は未実装。
-GUI v1 の設定対象は `solvers.multiway-preflop/v1`だけとし、target は Local の
-in-process library と Remote bridge v3 の共通 gateway とする。Remote 到達用の
-encrypted tunnel / TLS termination は server operator が用意する。画面、単一
-executable、durable job、live average strategy の確定契約は
+`app/desktop` の Tauri shellは、config validation、in-process Local Solve、
+cancel、live average strategy、checkpoint resume、artifact I/Oまで実装済み。
+GUI v1 の設定対象は`solvers.multiway-preflop/v1`だけとし、Remote bridge v3と
+credentialは仕様とUIのみで未実装とする。Remote到達用のencrypted tunnel /
+TLS terminationはserver operatorが用意する。画面、単一executable、
+durable job、live average strategyの確定契約は
 `docs/gui-spec.jp.md`、構成と実装順は `docs/app-structure.md` を正本とする。
 
 決定済みの方針(2026-07-21、Multiway CLI v1): table/forced bet、betting tree、

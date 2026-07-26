@@ -42,17 +42,18 @@
 > **2026-07 アプリ再編**: アプリケーション層(1 アプリ = Preflop + Postflop を
 > `game.kind` で切り替え)を `app/` ディレクトリに分離。同月、旧 2 UI
 > (Next.js workbench / egui ネイティブ GUI)を削除し、Web 技術の静的 SPA を
-> Tauri 2 executableへ内包する構成へ移行した。2026-07-23時点で3画面と
-> desktop shellは実装済み、Local/Remote transportは未実装。アプリレベルの設計は
-> `docs/app-structure.md` を参照。以下はその反映済みレイアウト。
+> Tauri 2 executableへ内包する構成へ移行した。2026-07-23時点で3画面、
+> in-process Local Solver、live strategy、checkpoint resume、artifact I/Oまで
+> 実装済み。Remote transportは仕様とUIのみである。アプリレベルの設計は
+> `docs/app-structure.md`を参照。以下はその反映済みレイアウト。
 
 ```
 app:        cli (bin "solvers": TOML batch + UPI subset REPL + CSV reports + ANSI 13×13 grid、
                  bin+lib。serve = 認証付き loopback bridge)
             ui (Vite + React + shadcn/ui静的SPA。接続profile、
-                Setup/Solving/Results、13×13戦略matrix。現在fixture)
-            desktop (Tauri 2 shell。SPAをsolvers-gui executableへ内包。
-                     将来Localはcli libをin-process利用)
+                Setup/Solving/Results、実Solverの13×13戦略matrix)
+            desktop (Tauri 2。SPAとLocal job/file backendをsolvers-guiへ内包し、
+                     cli libをin-process利用。Remote transportは将来対象)
 future:     py (PyO3, M3〜) · wasm (viewer-only, M8)
 multiway:    multiway — generative NLHE / joint deal / side pots / rollout buckets / MCCFR
 schemas:    formats — SolveConfig / NodeQuery→NodeReport / Checkpoint(.ckpt) / Artifact(.sol)
@@ -82,7 +83,7 @@ solvers/
 │   │                   # lib は config スキーマ / bridge /
 │   │                   # multiway セッション構築(session.rs)
 │   ├── ui/             # Web GUI: Vite + React + shadcn/ui静的SPA
-│   └── desktop/        # Tauri 2 shell。SPA内包、transport未実装
+│   └── desktop/        # Tauri 2。SPA + Local job/file backend、Remote未実装
 └── crates/
     ├── cards/          # Card/CardSet/Chips/Street/PerPlayer<T>、"22+,A2s+" range parser、
     │                   # aya_poker (Zlib/Apache-2.0/MIT) evaluator wrapper。workspace 内依存なし

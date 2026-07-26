@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "identifier": "com.solvers.strategy-studio",
   "build": {
-    "beforeDevCommand": "pnpm --dir ../ui dev",
-    "beforeBuildCommand": "pnpm --dir ../ui build",
+    "beforeDevCommand": "bun run --cwd ../ui dev",
+    "beforeBuildCommand": "bun run --cwd ../ui build",
     "devUrl": "http://localhost:1420",
     "frontendDist": "../ui/dist"
   },

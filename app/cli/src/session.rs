@@ -21,7 +21,8 @@ use formats::{
     MultiwaySolution, MultiwayStrategyBlock, MultiwayStrategyKey, MultiwayStrategyWeight,
 };
 use multiway::abstraction::{
-    MultiwayAbstractionBackend, TableAbstractionAdapter, ehs2_table_fingerprint,
+    BucketContext, BucketId, MultiwayAbstraction, MultiwayAbstractionBackend,
+    TableAbstractionAdapter, ehs2_table_fingerprint,
 };
 #[cfg(any(feature = "research", test))]
 use multiway::abstraction::{
@@ -29,11 +30,11 @@ use multiway::abstraction::{
 };
 use multiway::checkpoint::MultiwayCheckpoint;
 use multiway::config::{
-    AbstractionKind, FieldPlayerConfig, RakeConfig as MultiwayRake, RecallMode,
+    AbstractionConfig, AbstractionKind, FieldPlayerConfig, RakeConfig as MultiwayRake, RecallMode,
     UtilityConfig as MultiwayUtility,
 };
 use multiway::solver::{DEFAULT_PRUNE_THRESHOLD, ProfileEvaluation, SolverConfig};
-use multiway::{DealSampler, ExternalSamplingGame, HoldemGame, MultiwaySolver};
+use multiway::{DealSampler, ExternalSamplingGame, HoldemGame, MultiwaySolver, Street};
 use rayon::prelude::*;
 
 use crate::config::{
@@ -101,6 +102,197 @@ pub struct DeviationReferenceMetadata {
     pub abstraction_fingerprint: [u8; 32],
     pub recall: RecallMode,
     pub artifact_cache: Option<PathBuf>,
+}
+
+/// Resource facts derived from the production public tree and configured
+/// bucket counts without allocating the policy arena or building EHS² tables.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct MultiwayResourcePreflight {
+    pub complete: bool,
+    pub recall: RecallMode,
+    pub decision_nodes: u64,
+    pub terminal_edges: Option<u64>,
+    pub icm: Option<MultiwayIcmPreflight>,
+    pub policy_columns: Option<u64>,
+    pub policy_slots: Option<u64>,
+    pub solver_state_bytes: Option<u64>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct MultiwayIcmPreflight {
+    pub field_players: u64,
+    pub paid_places: u64,
+    pub mode: IcmPreflightMode,
+    pub samples: Option<u64>,
+    pub seed: Option<u64>,
+    pub prepared_bytes: Option<u64>,
+    pub prepared_limit_bytes: Option<u64>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum IcmPreflightMode {
+    Exact,
+    Sampled,
+}
+
+struct ResourcePreflightAbstraction {
+    config: AbstractionConfig,
+}
+
+impl MultiwayAbstraction for ResourcePreflightAbstraction {
+    fn num_buckets(&self, street: Street, active_opponents: u8) -> u32 {
+        if street == Street::Preflop {
+            return cards::NUM_CLASSES as u32;
+        }
+        let profile = self.config.buckets_for(active_opponents);
+        match street {
+            Street::Preflop => unreachable!("preflop returned above"),
+            Street::Flop => profile.map_or(u32::from(self.config.flop_buckets), |counts| {
+                u32::from(counts.flop_buckets)
+            }),
+            Street::Turn => profile.map_or(u32::from(self.config.turn_buckets), |counts| {
+                u32::from(counts.turn_buckets)
+            }),
+            Street::River => profile.map_or(u32::from(self.config.river_buckets), |counts| {
+                u32::from(counts.river_buckets)
+            }),
+        }
+    }
+
+    fn bucket(&self, _context: BucketContext<'_>) -> BucketId {
+        unreachable!("resource preflight never assigns physical hands to buckets")
+    }
+
+    fn fingerprint(&self) -> [u8; 32] {
+        [0; 32]
+    }
+}
+
+/// Runs the production contract, range/economics checks, and byte-bounded
+/// non-retaining tree preflight used by the desktop GUI.
+pub fn preflight_multiway_config(raw_toml: &str) -> Result<MultiwayResourcePreflight> {
+    crate::multiway_v1::validate_production_contract(raw_toml)
+        .context("validating production Multiway Preflop contract")?;
+    let config =
+        crate::config::parse_solve_config(raw_toml).context("parsing config for preflight")?;
+    let SolveConfig {
+        game,
+        rake,
+        utility,
+        run,
+        ..
+    } = config;
+    let GameSection::PreflopMultiway(game_config) = game else {
+        return Err(anyhow!(
+            "multiway resource preflight requires kind = \"preflop-multiway\""
+        ));
+    };
+
+    let utility = convert_utility(utility)?;
+    let rake = convert_rake(rake);
+    game_config
+        .validate_economics(&utility, &rake)
+        .context("validating multiway game and utility for preflight")?;
+    let icm = match &utility {
+        MultiwayUtility::ChipEv => None,
+        MultiwayUtility::TournamentIcm {
+            outside_field,
+            payouts,
+            samples,
+            seed,
+        } => {
+            let field_players = game_config
+                .seats
+                .len()
+                .checked_add(outside_field.len())
+                .context("counting ICM field players")?;
+            let paid_places = payouts
+                .iter()
+                .rposition(|payout| *payout != 0.0)
+                .map_or(0, |place| place + 1);
+            if field_players <= multiway::icm::EXACT_ICM_MAX_PLAYERS {
+                Some(MultiwayIcmPreflight {
+                    field_players: field_players as u64,
+                    paid_places: paid_places as u64,
+                    mode: IcmPreflightMode::Exact,
+                    samples: None,
+                    seed: None,
+                    prepared_bytes: None,
+                    prepared_limit_bytes: None,
+                })
+            } else {
+                let prepared_bytes = multiway::icm::prepared_race_memory_bytes(
+                    game_config.seats.len(),
+                    outside_field.len(),
+                    paid_places,
+                    *samples,
+                )
+                .context("sizing sampled ICM preparation buffers")?;
+                Some(MultiwayIcmPreflight {
+                    field_players: field_players as u64,
+                    paid_places: paid_places as u64,
+                    mode: IcmPreflightMode::Sampled,
+                    samples: Some(*samples),
+                    seed: Some(*seed),
+                    prepared_bytes: Some(prepared_bytes as u64),
+                    prepared_limit_bytes: Some(multiway::icm::MAX_PREPARED_RACE_BYTES as u64),
+                })
+            }
+        }
+    };
+
+    let recall = game_config.abstraction.recall;
+    let abstraction = ResourcePreflightAbstraction {
+        config: game_config.abstraction.clone(),
+    };
+    let game = HoldemGame::new(
+        &game_config,
+        &MultiwayUtility::ChipEv,
+        &MultiwayRake::None,
+        abstraction,
+    )
+    .context("building public multiway game for preflight")?;
+    let _sampler = game
+        .deal_sampler()
+        .context("compiling table ranges for preflight")?;
+    let memory_limit = run
+        .max_memory_bytes
+        .filter(|bytes| *bytes != u64::MAX)
+        .unwrap_or(crate::multiway_v1::PRODUCTION_POLICY_ARENA_LIMIT_BYTES);
+    let arena = match multiway::tree::preflight_arena(&game, memory_limit) {
+        Ok(arena) => arena,
+        Err(multiway::tree::TreeError::MemoryLimit {
+            node_count,
+            total_columns,
+            needed,
+            ..
+        }) => {
+            return Ok(MultiwayResourcePreflight {
+                complete: false,
+                recall,
+                decision_nodes: node_count as u64,
+                terminal_edges: None,
+                icm,
+                policy_columns: Some(total_columns),
+                policy_slots: None,
+                solver_state_bytes: Some(needed),
+            });
+        }
+        Err(error) => {
+            return Err(error).context("counting public tree and sizing the policy arena");
+        }
+    };
+
+    Ok(MultiwayResourcePreflight {
+        complete: true,
+        recall,
+        decision_nodes: arena.node_count as u64,
+        terminal_edges: Some(arena.terminal_edges),
+        icm,
+        policy_columns: Some(arena.total_columns),
+        policy_slots: Some(arena.total_slots),
+        solver_state_bytes: Some(arena.estimated_arena_bytes),
+    })
 }
 
 /// Default [`StopRule::confirmations`] and [`StopRule::eval_period_secs`]

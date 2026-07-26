@@ -9,10 +9,9 @@
 > 旧 UI のプリセット TOML は `examples/presets/` に退避済み。
 >
 > **位置づけ(2026-07-23 更新)**: `app/ui` の3画面と `app/desktop` の Tauri
-> shell は、操作可能な **visual fixture shell** として実装済み。config 検証、
-> Local Solve、Remote bridge、credential、artifact I/O には未接続である。
-> GUI v1 の設定対象は Multiway Preflop v1 だけで、画面と target transport の
-> 正本は `docs/gui-spec.jp.md`。
+> shell は、Multiway Preflop v1のconfig検証、Local Solve、live strategy、
+> cancel/resume、artifact I/Oへ接続済み。Remote bridge / credentialは仕様と
+> UIのみで未接続である。画面とtransport境界の正本は`docs/gui-spec.jp.md`。
 
 ## 決定事項
 
@@ -22,9 +21,9 @@
    - **Postflop** = Mode A exact postflop(`kind = "postflop"`)。
      固定 flop・1,326-combo フルレンジの厳密ソルブ。
    - どちらを解くかは config の `game.kind` で切り替える(binary は分けない)。
-2. **target では CLI と同梱 GUI の両方から同じ実行境界を使う。**
-   CLI(bin `solvers`)は現在の batch 実行入口。GUI v1 の Local transport は将来
-   `app/cli` のlibraryを同一processで呼び、Remote transportだけがCLI内蔵の
+2. **CLI と同梱 GUI の両方から同じ実行境界を使う。**
+   CLI(bin `solvers`)はbatch実行入口。GUI v1 のLocal transportは
+   `app/cli` のlibraryを同一processで呼び、将来のRemote transportだけがCLI内蔵の
    認証付きbridge(`solvers serve`)へ接続する。どちらも同じconfig parser、
    solver entrypoint、artifact writerを使う。UIで組んだ設定はTOMLへ保存して
    CLIから直接実行できなければならない。GUI v1 は
@@ -53,10 +52,10 @@ solvers/
 │   │                       #   (bin+lib。lib は config スキーマ / 各コマンドドライバ / bridge /
 │   │                       #    .sol viewer / multiway セッション構築)
 │   ├── ui/                 #   Web GUI: Vite + React + shadcn/ui 静的 SPA。
-│   │                       #   Multiway v1 fixture、Setup/Solving/Results、
-│   │                       #   preflop 13×13 / target postflop bucket view
-│   └── desktop/            #   Tauri 2シェル: SPAをsolvers-guiへ内包。
-│                           #   Local/Remote transportは未実装
+│   │                       #   Multiway v1 Setup/Solving/Results、
+│   │                       #   preflop 13×13 / postflop bucket strategy view
+│   └── desktop/            #   Tauri 2: Local job/file backendとSPAを
+│                           #   solvers-guiへ内包。Remote transportは未実装
 ├── crates/                 # エンジン/ドメイン層(アプリ非依存)
 │   ├── cards, hand-index, engine, game, holdem, abstraction,
 │   ├── preflop, multiway, formats
@@ -66,7 +65,7 @@ solvers/
 ```
 
 依存方向: `app/cli` が研究 crate 群(`docs/architecture.md` §2 の依存グラフ)を
-束ねる。現在の `app/desktop` は静的SPAだけを内包し、Local transport実装時に
+束ねる。`app/desktop` は静的SPAとLocal job/file backendを内包し、
 `app/cli` のlib部分を直接消費する。ドメイン crate
 (`preflop`, `holdem`, `multiway`, …)はアプリの知識を持たない。
 
@@ -86,7 +85,7 @@ solvers/
 toy game(Kuhn/Leduc)はエンジンのスモークチェック用configとして`solve`または
 research commandで受け付ける。
 
-## GUI と「デバイス貸し」モデル(target)
+## GUI と「デバイス貸し」モデル(Local実装済み / Remote target)
 
 ```
 [Tauri GUI(app/desktop + app/ui)]
@@ -107,32 +106,30 @@ research commandで受け付ける。
   だけを許可する。
 - Origin を送らない Tauri Rust client は valid token で認証する。browser request
   には exact Origin / Host を引き続き要求する。
-- Remote job / event / artifact は persistent server-managed run に保存し、GUIを
-  閉じても継続する。Local job は GUI process と同居するため、close 時に
-  cooperative cancel + atomic checkpoint を完了してから終了する。
+- Remote targetではjob / event / artifactをpersistent server-managed runへ保存し、
+  GUIを閉じても継続する。Local jobはGUI processと同居する。実行中のwindow closeを
+  cooperative cancel + atomic checkpointで保留するclose guardは今後の対象であり、
+  現実装は画面の停止actionを使う。
 - 現行bridge `/v2` はGUIのtarget contractではない。v1 parser、live average
   snapshot、durable job、認証済み Tauri client 対応を加えた v3 contract は
   `docs/gui-spec.jp.md` §7–8に確定する。
 
 ## GUI 実装ロードマップ
 
-1. **visual fixture shell と desktop shell** — 2026-07-23完了:
-   - `app/ui`: Setup / Solving / Results、接続 profile、synthetic 13×13 strategy。
-   - `app/desktop`: Tauri 2 で production SPA を raw `solvers-gui` に内包。
-   - fixture だけで、Solve、validation、filesystem、network へは接続しない。
-2. **Local transport**:
-   - `app/cli` libraryのv1 parser / preflight / solve / inspect / exportを
-     Tauri commandからin-process利用する。
-   - complete sweep 境界の average strategy snapshot を atomic publishする。
-   - Local / Remote 共通の v3 DTO と job state machine を使う。
-3. **Remote bridge v3**:
+1. **desktop shellとLocal transport** — 2026-07-23完了:
+   - `app/ui`: Setup / Solving / Results、接続profile、実strategy / artifact表示。
+   - `app/desktop`: production SPAと`app/cli` libraryをraw `solvers-gui`へ内包。
+   - v1 parse/normalize、Local solve/cancel、complete evaluation境界のaverage
+     strategy、checkpoint resume、run/solution import、artifact exportを実装。
+   - browser previewはnative操作を無効化し、実行済みのように見せない。
+2. **Remote bridge v3**:
    - credential store / server identity / capability handshake。
    - durable idempotent job、SSE + polling replay、managed artifact / child resume。
    - preflop 13×13 と postflop abstraction bucket の live / final strategy。
-4. **配布 CI**: GitHub Actions release ワークフロー(macOS/Windows/Linux
+3. **配布 CI**: GitHub Actions release ワークフロー(macOS/Windows/Linux
    マトリクス)。raw executable の build / smoke test を先に固定し、platform
    envelope、コード署名、notarization は別の配布 milestone とする。
-5. `.sol` viewer artifact の閲覧のみの WASM 静的サイト(bridge 不要)は
+4. `.sol` viewer artifact の閲覧のみの WASM 静的サイト(bridge 不要)は
    ロードマップ M8 の対象(据え置き)。
-6. HU preflop / exact postflop の GUI 設定画面と remote job API は GUI v1 の
+5. HU preflop / exact postflop の GUI 設定画面と remote job API は GUI v1 の
    scope 外とし、追加時に別 contract version を定義する。

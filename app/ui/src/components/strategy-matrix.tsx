@@ -1,40 +1,97 @@
-import { ranks } from "@/data/demo"
-import type { StrategyCellViewModel } from "@/lib/solve-contract"
+import type { StrategyEntry, TypedAction } from "@/lib/solve-contract"
+import { strategyActionColors } from "@/lib/strategy-colors"
 import { cn } from "@/lib/utils"
 
+const ranks = [
+  "A",
+  "K",
+  "Q",
+  "J",
+  "T",
+  "9",
+  "8",
+  "7",
+  "6",
+  "5",
+  "4",
+  "3",
+  "2",
+] as const
+
+function handLabel(row: number, column: number) {
+  if (row === column) {
+    return `${ranks[row]}${ranks[column]}`
+  }
+  if (row < column) {
+    return `${ranks[row]}${ranks[column]}s`
+  }
+  return `${ranks[column]}${ranks[row]}o`
+}
+
+function probabilityPercent(entry: StrategyEntry, actionIndex: number) {
+  if (entry.status === "unvisited" || entry.probabilityU16 === null) {
+    return 0
+  }
+  return ((entry.probabilityU16[actionIndex] ?? 0) / 65_535) * 100
+}
+
+function maximumProbabilityPercent(entry: StrategyEntry) {
+  if (!entry.probabilityU16?.length) {
+    return 0
+  }
+  return Math.max(
+    ...entry.probabilityU16.map((_, index) => probabilityPercent(entry, index))
+  )
+}
+
+function isOutOfRange(entry: StrategyEntry | undefined) {
+  if (!entry) {
+    return true
+  }
+  const weight = Number(entry.weight)
+  return Number.isFinite(weight) && weight <= 0
+}
+
+function cellBackground(
+  entry: StrategyEntry | undefined,
+  actionColors: string[]
+) {
+  if (isOutOfRange(entry)) {
+    return "#18181b"
+  }
+  if (!entry || entry.status === "unvisited" || entry.probabilityU16 === null) {
+    return "repeating-linear-gradient(135deg, #52525b 0 5px, #3f3f46 5px 10px)"
+  }
+
+  let cursor = 0
+  const stops = actionColors.map((color, index) => {
+    const start = cursor
+    cursor += probabilityPercent(entry, index)
+    return `${color} ${start}% ${Math.min(100, cursor)}%`
+  })
+  return stops.length
+    ? `linear-gradient(90deg, ${stops.join(", ")})`
+    : "#18181b"
+}
+
 type StrategyMatrixProps = {
-  cells: StrategyCellViewModel[]
-  selectedHand: string
-  onSelect: (cell: StrategyCellViewModel) => void
+  entries: StrategyEntry[]
+  actions: TypedAction[]
+  selectedId: string | null
+  onSelect: (entry: StrategyEntry) => void
   compact?: boolean
 }
 
-function cellBackground(cell: StrategyCellViewModel) {
-  if (cell.status === "unvisited") {
-    return "var(--muted)"
-  }
-
-  const raiseEnd = probabilityPercent(cell, "raise-2500")
-  const callEnd = raiseEnd + probabilityPercent(cell, "call")
-  return `linear-gradient(135deg, #7c3aed 0% ${raiseEnd}%, #16a34a ${raiseEnd}% ${callEnd}%, #d4d4d8 ${callEnd}% 100%)`
-}
-
-function probabilityPercent(cell: StrategyCellViewModel, actionId: string) {
-  if (cell.status === "unvisited") {
-    return 0
-  }
-  const value =
-    cell.probabilities.find((item) => item.actionId === actionId)
-      ?.probabilityU16 ?? 0
-  return (value / 65_535) * 100
-}
-
 export function StrategyMatrix({
-  cells,
-  selectedHand,
+  entries,
+  actions,
+  selectedId,
   onSelect,
   compact = false,
 }: StrategyMatrixProps) {
+  const entriesByLabel = new Map(entries.map((entry) => [entry.label, entry]))
+  const actionColors = strategyActionColors(actions)
+
   return (
     <div className="strategy-scroll" role="region" aria-label="13 × 13 戦略表">
       <div
@@ -50,34 +107,46 @@ export function StrategyMatrix({
           <div className="contents" key={`row-${rank}`}>
             <span className="strategy-axis">{rank}</span>
             {ranks.map((_, column) => {
-              const cell = cells[row * ranks.length + column]
-              const isSelected = selectedHand === cell.hand
-              const raise = probabilityPercent(cell, "raise-2500")
-              const call = probabilityPercent(cell, "call")
-              const darkText = cell.status === "unvisited" || raise + call < 28
-              const accessibleStrategy =
-                cell.status === "unvisited"
-                  ? `${cell.hand}: 未訪問。戦略とEVはありません`
-                  : `${cell.hand}: raise ${raise.toFixed(1)}%, call ${call.toFixed(1)}%, fold ${probabilityPercent(cell, "fold").toFixed(1)}%`
+              const label = handLabel(row, column)
+              const entry = entriesByLabel.get(label)
+              const isSelected = entry ? selectedId === entry.id : false
+              const accessibleStrategy = !entry
+                ? `${label}: snapshotにデータがありません`
+                : entry.status === "unvisited" || entry.probabilityU16 === null
+                  ? `${entry.label}: unvisited`
+                  : `${entry.label}: ${actions
+                      .map(
+                        (action, index) =>
+                          `${action.label} ${probabilityPercent(entry, index).toFixed(1)}%`
+                      )
+                      .join(", ")}`
 
               return (
                 <button
                   type="button"
-                  key={cell.hand}
+                  key={label}
                   className={cn(
                     "strategy-cell",
                     isSelected && "strategy-cell--selected",
-                    darkText ? "text-zinc-950" : "text-white",
-                    cell.status === "unvisited" && "strategy-cell--unvisited"
+                    (!entry || entry.status === "unvisited") &&
+                      "strategy-cell--unvisited text-white",
+                    entry?.status === "visited" && "text-white"
                   )}
-                  style={{ background: cellBackground(cell) }}
+                  style={{
+                    background: cellBackground(entry, actionColors),
+                  }}
                   aria-label={accessibleStrategy}
                   aria-pressed={isSelected}
-                  onClick={() => onSelect(cell)}
+                  onClick={() => entry && onSelect(entry)}
+                  disabled={!entry}
                 >
-                  <span>{cell.hand}</span>
-                  {!compact && cell.status === "visited" ? (
-                    <small>{Math.round(raise)}R</small>
+                  <span>{label}</span>
+                  {!compact &&
+                  entry?.status === "visited" &&
+                  entry.probabilityU16 ? (
+                    <small>
+                      {Math.round(maximumProbabilityPercent(entry))}%
+                    </small>
                   ) : null}
                 </button>
               )
@@ -89,80 +158,133 @@ export function StrategyMatrix({
   )
 }
 
-type ActionBreakdownProps = {
-  cell: StrategyCellViewModel
+type StrategyBucketListProps = {
+  entries: StrategyEntry[]
+  actions: TypedAction[]
+  selectedId: string | null
+  onSelect: (entry: StrategyEntry) => void
 }
 
-export function ActionBreakdown({ cell }: ActionBreakdownProps) {
-  if (cell.status === "unvisited") {
+export function StrategyBucketList({
+  entries,
+  actions,
+  selectedId,
+  onSelect,
+}: StrategyBucketListProps) {
+  const actionColors = strategyActionColors(actions)
+  return (
+    <div className="max-h-[520px] divide-y overflow-auto rounded-lg border">
+      {entries.map((entry) => (
+        <button
+          type="button"
+          className={cn(
+            "grid w-full gap-3 px-3 py-2.5 text-left hover:bg-muted/50 md:grid-cols-[minmax(140px,0.6fr)_minmax(260px,1.4fr)]",
+            selectedId === entry.id && "bg-muted"
+          )}
+          key={entry.id}
+          onClick={() => onSelect(entry)}
+          aria-pressed={selectedId === entry.id}
+        >
+          <span>
+            <strong className="block">{entry.label}</strong>
+            <small className="text-muted-foreground">
+              {entry.bucketPath?.join(" / ") ?? entry.id} · {entry.status}
+            </small>
+          </span>
+          {entry.status === "unvisited" || !entry.probabilityU16 ? (
+            <span className="text-xs text-muted-foreground">unvisited</span>
+          ) : (
+            <span className="flex min-w-0 overflow-hidden rounded-full">
+              {actions.map((action, index) => (
+                <span
+                  key={action.id}
+                  className="h-5 min-w-0"
+                  title={`${action.label}: ${probabilityPercent(entry, index).toFixed(1)}%`}
+                  style={{
+                    width: `${probabilityPercent(entry, index)}%`,
+                    backgroundColor: actionColors[index],
+                  }}
+                />
+              ))}
+            </span>
+          )}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+type ActionBreakdownProps = {
+  entry: StrategyEntry | null
+  actions: TypedAction[]
+}
+
+export function ActionBreakdown({ entry, actions }: ActionBreakdownProps) {
+  const actionColors = strategyActionColors(actions)
+  if (!entry) {
+    return (
+      <p className="text-xs text-muted-foreground">
+        戦略entryを選択してください。
+      </p>
+    )
+  }
+
+  if (entry.status === "unvisited" || entry.probabilityU16 === null) {
     return (
       <div className="space-y-4">
         <div>
-          <p className="text-2xl font-semibold tracking-tight">{cell.hand}</p>
+          <p className="text-2xl font-semibold tracking-tight">{entry.label}</p>
           <p className="text-xs text-muted-foreground">
-            {cell.combos} combos · 未訪問
+            {entry.comboCount ?? "—"} combos · unvisited
           </p>
         </div>
         <p className="rounded-md border border-dashed p-2 text-xs text-muted-foreground">
-          このinfosetは未訪問です。戦略・EVは存在せず、uniformや0%として補完しません。
+          このinfosetは未訪問です。strategyとEVを0%やuniformで補完しません。
         </p>
       </div>
     )
   }
 
-  const actions = [
-    {
-      label: "Raise to 2.500 BB",
-      value: probabilityPercent(cell, "raise-2500"),
-      color: "bg-violet-600",
-    },
-    {
-      label: "Call",
-      value: probabilityPercent(cell, "call"),
-      color: "bg-green-600",
-    },
-    {
-      label: "Fold",
-      value: probabilityPercent(cell, "fold"),
-      color: "bg-zinc-300",
-    },
-  ]
-
   return (
     <div className="space-y-4">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="text-2xl font-semibold tracking-tight">{cell.hand}</p>
+          <p className="text-2xl font-semibold tracking-tight">{entry.label}</p>
           <p className="text-xs text-muted-foreground">
-            {cell.combos} combos · average strategy
+            {entry.comboCount ?? "—"} combos · weight {entry.weight}
           </p>
         </div>
         <div className="text-right">
           <p className="text-xs text-muted-foreground">EV</p>
           <p className="font-mono text-sm font-semibold">
-            {cell.evMilliBb >= 0 ? "+" : ""}
-            {(cell.evMilliBb / 1_000).toFixed(3)} BB
+            {entry.ev ? `${entry.ev.value} ${entry.ev.unit}` : "not available"}
           </p>
         </div>
       </div>
 
       <div className="space-y-3">
-        {actions.map((action) => (
-          <div className="space-y-1.5" key={action.label}>
-            <div className="flex items-center justify-between text-xs">
-              <span>{action.label}</span>
-              <span className="font-mono font-medium">
-                {action.value.toFixed(1)}%
-              </span>
+        {actions.map((action, index) => {
+          const value = probabilityPercent(entry, index)
+          return (
+            <div className="space-y-1.5" key={action.id}>
+              <div className="flex items-center justify-between gap-3 text-xs">
+                <span>{action.label}</span>
+                <span className="font-mono font-medium">
+                  {value.toFixed(1)}%
+                </span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${value}%`,
+                    backgroundColor: actionColors[index],
+                  }}
+                />
+              </div>
             </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-              <div
-                className={cn("h-full rounded-full", action.color)}
-                style={{ width: `${action.value}%` }}
-              />
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

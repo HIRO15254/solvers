@@ -1,19 +1,11 @@
 export type AppScreen = "setup" | "solving" | "results"
 
-/*
- * Visual fixture models
- *
- * These types make the implemented screen fixtures internally consistent.
- * They are deliberately named separately from the target v3 wire contract
- * below: no fixture object is valid evidence of a real Solve.
- */
-
 export type LocalConnectionProfileViewModel = {
   id: "local"
   name: string
   kind: "local"
   transport: "in-process"
-  status: "fixture-only"
+  status: "available"
 }
 
 export type RemoteConnectionProfileViewModel = {
@@ -23,173 +15,18 @@ export type RemoteConnectionProfileViewModel = {
   transport: "encrypted-tunnel"
   endpoint: string
   credentialRef?: string
-  status: "contract-only"
+  status: "spec-only"
 }
 
 export type ConnectionProfileViewModel =
   LocalConnectionProfileViewModel | RemoteConnectionProfileViewModel
-
-/** Exact BB tokens stay strings until the future Rust normalizer accepts them. */
-export type DecimalBb = string
-
-export type SeatConfigViewModel = {
-  seat: number
-  stackBb: DecimalBb
-  liveBlindBb: DecimalBb
-  anteBb: DecimalBb
-  range: string
-}
-
-export type MaterializedTreeViewModel = {
-  aggressiveActionCap: number
-  openToBb: DecimalBb
-  reraiseMultiplier: DecimalBb
-  postflopBetFraction: DecimalBb
-  postflopRaiseFraction: DecimalBb
-  donkBet: boolean
-  legalAllIn: boolean
-}
-
-export type SolveDraftViewModel = {
-  schema: "solvers.multiway-preflop/v1"
-  name: string
-  game: {
-    kind: "preflop-multiway"
-    seatCount: number
-    button: number
-    standardBlinds: boolean
-    firstToAct?: number
-    commonAnteBb: DecimalBb
-    seats: SeatConfigViewModel[]
-    tree:
-      | { kind: "standard"; rules: MaterializedTreeViewModel }
-      | {
-          kind: "script"
-          sourceName: string
-          materializedRules: MaterializedTreeViewModel
-        }
-  }
-  economics:
-    | {
-        kind: "cash"
-        rake: {
-          enabled: boolean
-          percent: DecimalBb
-          capBb: DecimalBb
-        }
-      }
-    | {
-        kind: "tournament-icm"
-        payouts: DecimalBb[]
-      }
-  solver: {
-    algorithm: "external-sampling-mccfr"
-    rolloutsPerState: number
-    recall: "current-street" | "bucket-history"
-    abstractionBuckets: [number, number, number]
-  }
-  run: {
-    maxSweeps: number
-    stopTarget: {
-      metric: "measured-deviation-gain"
-      valueBbPerHand: DecimalBb
-      consecutiveConfirmations: number
-    }
-    evaluationSamples: number
-    threads: "auto" | number
-    memory: "auto" | string
-    checkpointEverySweeps: number
-  }
-}
-
-export type SolveProgressViewModel = {
-  sweep: number
-  maxSweeps: number
-  elapsedSeconds: number
-  /** A sweep-throughput projection, never a convergence prediction. */
-  sweepBasedRemainingSeconds?: number
-  measuredDeviation: number
-  target: number
-  checkpointAgeSeconds: number
-}
-
-export type ActionSemantic =
-  "bet-to" | "raise-to" | "all-in" | "check" | "call" | "fold"
-
-export type StrategyActionViewModel = {
-  id: string
-  label: string
-  semantic: ActionSemantic
-  amountMilliBb?: number
-}
-
-export type ActionProbabilityViewModel = {
-  actionId: string
-  probabilityU16: number
-}
-
-export type StrategyCellViewModel =
-  | {
-      hand: string
-      combos: number
-      status: "visited"
-      probabilities: ActionProbabilityViewModel[]
-      evMilliBb: number
-      reachWeightU16?: number
-    }
-  | {
-      hand: string
-      combos: number
-      status: "unvisited"
-      probabilities: null
-      evMilliBb: null
-      reachWeightU16?: null
-    }
-
-export type StrategyBucketViewModel = {
-  bucketId: string
-  label: string
-  status: "visited" | "unvisited"
-  probabilities: ActionProbabilityViewModel[] | null
-  evMilliBb: number | null
-  reachWeightU16: number | null
-}
-
-type StrategySnapshotViewModelBase = {
-  schema: "solvers.strategy-snapshot/v1"
-  revision: number
-  generatedAt: string
-  status: "live" | "stale" | "final"
-  source: "live-average" | "solution"
-  asOfSweeps: number
-  street: "preflop" | "flop" | "turn" | "river"
-  node: {
-    id: string
-    publicHistory: string[]
-    label: string
-    actor: number
-  }
-  actions: StrategyActionViewModel[]
-}
-
-export type StrategySnapshotViewModel = StrategySnapshotViewModelBase &
-  (
-    | {
-        view: "preflop-hand-classes"
-        cells: StrategyCellViewModel[]
-      }
-    | {
-        view: "postflop-abstraction-buckets"
-        buckets: StrategyBucketViewModel[]
-      }
-  )
 
 export const localProfile: LocalConnectionProfileViewModel = {
   id: "local",
   name: "このマシン",
   kind: "local",
   transport: "in-process",
-  status: "fixture-only",
+  status: "available",
 }
 
 export const remoteProfile: RemoteConnectionProfileViewModel = {
@@ -199,15 +36,15 @@ export const remoteProfile: RemoteConnectionProfileViewModel = {
   transport: "encrypted-tunnel",
   endpoint: "https://solver.internal",
   credentialRef: "os-keychain://solvers/remote-lab",
-  status: "contract-only",
+  status: "spec-only",
 }
 
 /*
  * Target product contract
  *
- * This mirrors docs/gui-spec.jp.md. It is a compile-time contract sketch only;
- * no LocalGateway, RemoteGateway, credential, filesystem, or network adapter is
- * implemented in this UI turn. The Japanese specification remains normative.
+ * This mirrors docs/gui-spec.jp.md. The desktop UI maps the local subset to
+ * Tauri commands in native-gateway.ts. Remote transport, credentials, and
+ * network adapters remain a specification-only surface.
  */
 
 export type DecimalString = string
@@ -238,8 +75,36 @@ export type ValidationResult = {
   configFingerprint: string | null
   preflight: {
     threads: string
-    peakMemoryBytes: UInt64String
     abstraction: string
+    economics:
+      | { kind: "cash" }
+      | {
+          kind: "tournament-icm"
+          fieldPlayers: UInt64String
+          paidPlaces: UInt64String
+          mode: "exact" | "sampled"
+          samples: UInt64String | null
+          seed: UInt64String | null
+          preparedBytes: UInt64String | null
+          preparedLimitBytes: UInt64String | null
+          fitsPreparedLimit: boolean | null
+        }
+    tree: {
+      recallMode: "current-street"
+      decisionNodes: UInt64String
+      terminalEdges: UInt64String | null
+      policyColumns: UInt64String | null
+      policySlots: UInt64String | null
+    }
+    memory: {
+      estimateKind: "exact-dense" | "prefix-lower-bound"
+      solverStateBytes: UInt64String | null
+      budgetMode: "auto" | "explicit"
+      availableBytes: UInt64String | null
+      budgetBytes: UInt64String
+      headroomBytes: UInt64String | null
+      fitsBudget: boolean | null
+    }
   } | null
   guaranteeBoundary: string
   units: { utility: string; chipUnitBb: "0.001" }
@@ -306,21 +171,21 @@ export type JobState =
   | "failed"
 
 export type Estimate = {
-  mean: number
-  stderr: number
-  ci95: [number, number]
+  mean: DecimalString
+  stderr: DecimalString
+  ci95: [DecimalString, DecimalString]
 }
 
 export type MultiwayProgressV3 = {
   sweeps: UInt64String
   maxSweeps: UInt64String
-  elapsedSecs: number
-  stopTarget: number
+  elapsedSecs: DecimalString | null
+  stopTarget: DecimalString
   stopTargetUnit: string
-  memoryBytes: UInt64String
-  traversalsPerSecond: number
-  handUpdatesPerSecond: number
-  infosets: UInt64String
+  memoryBytes: UInt64String | null
+  traversalsPerSecond: DecimalString | null
+  handUpdatesPerSecond: DecimalString | null
+  infosets: UInt64String | null
   checkpoint: {
     available: boolean
     generatedAt: string | null
@@ -328,8 +193,8 @@ export type MultiwayProgressV3 = {
   seats: Array<{
     seat: number
     profileEv: Estimate | null
-    averagePositiveRegret: number
-    strategyDriftL1: number
+    averagePositiveRegret: DecimalString
+    strategyDriftL1: DecimalString
     deviationGain: Estimate | null
   }>
 }
@@ -441,7 +306,7 @@ export type ExportRequest =
 export type TypedAction = {
   id: string
   semantic: "fold" | "check" | "call" | "bet-to" | "raise-to"
-  amountMilliBb: number | null
+  amountMilliBb: IntegerString | null
   allIn: boolean
   fullRaise: boolean | null
   label: string
@@ -451,17 +316,17 @@ export type StrategyEntry = {
   id: string
   label: string
   status: "visited" | "unvisited"
-  weight: number
+  weight: DecimalString
   comboCount: number | null
   bucketPath: number[] | null
   probabilityU16: number[] | null
-  ev: { value: number; unit: string } | null
+  ev: { value: DecimalString; unit: string } | null
 }
 
 export type StrategySnapshotV1 = {
   schemaVersion: 1
   jobId: string
-  revision: number
+  revision: UInt64String
   status: "live-average" | "stale" | "final"
   strategyKind: "linear-average"
   generatedAt: string
@@ -471,7 +336,7 @@ export type StrategySnapshotV1 = {
     nodeId: string
     actorSeat: number
     street: "preflop" | "flop" | "turn" | "river"
-    potMilliBb: number
+    potMilliBb: IntegerString | null
     activeOpponents: number
     breadcrumb: Array<{
       actorSeat: number
@@ -483,7 +348,7 @@ export type StrategySnapshotV1 = {
     | { kind: "preflop-hand-classes"; entries: StrategyEntry[] }
     | { kind: "postflop-buckets"; entries: StrategyEntry[] }
   approximate: true
-  coverage: number
+  coverage: DecimalString
 }
 
 export interface SolveGateway {

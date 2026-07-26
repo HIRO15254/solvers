@@ -113,7 +113,7 @@ export function ConnectionDialog({
               <strong>このマシン</strong>
               <small>同一バイナリ内のローカルアダプター</small>
             </span>
-            <Badge variant="secondary">デモ</Badge>
+            <Badge variant="secondary">LOCAL</Badge>
           </button>
 
           <button
@@ -139,7 +139,7 @@ export function ConnectionDialog({
               <strong>リモートマシン</strong>
               <small>暗号化トンネル越しのsolvers bridge</small>
             </span>
-            <Badge variant="outline">契約プレビュー</Badge>
+            <Badge variant="outline">UI / SPEC</Badge>
           </button>
         </div>
 
@@ -171,13 +171,13 @@ export function ConnectionDialog({
               <Input
                 id="token"
                 type="password"
-                placeholder="GUI fixtureでは入力できません"
+                placeholder="Remote adapter実装時に入力"
                 autoComplete="off"
                 disabled
               />
               <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <IconShieldLock className="size-3.5" />
-                デモでは入力・保存しません。実装時はOSの資格情報ストアを使用します。
+                今回は入力・保存しません。実装時はOSの資格情報ストアを使用します。
               </p>
             </div>
           </div>
@@ -187,7 +187,7 @@ export function ConnectionDialog({
             <AlertTitle>単一バイナリ構成</AlertTitle>
             <AlertDescription>
               配布版は静的SPAを内包します。このGUI
-              fixtureはローカルSolveを実行せず、将来Rustライブラリを同一プロセスで呼び出します。
+              からRustライブラリを同一プロセスで呼び出してローカルSolveを実行します。
             </AlertDescription>
           </Alert>
         )}
@@ -206,7 +206,7 @@ export function ConnectionDialog({
           <Button variant="ghost" onClick={() => handleOpenChange(false)}>
             キャンセル
           </Button>
-          <Button onClick={applyProfile}>このデモのSolve先に設定</Button>
+          <Button onClick={applyProfile}>Solve先に設定</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

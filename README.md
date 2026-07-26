@@ -17,7 +17,7 @@ Early development. See [docs/roadmap.md](docs/roadmap.md) for milestones.
 - [docs/multiway-preflop-v1.md](docs/multiway-preflop-v1.md) — concise human/AI implementation guide and contract map
 - [docs/multiway-preflop-toml-reference.jp.md](docs/multiway-preflop-toml-reference.jp.md) — complete reference for every Multiway Preflop v1 TOML key, type, default, and constraint
 - [docs/app-structure.md](docs/app-structure.md) — the app structure (one app with preflop + postflop solving, CLI + embedded web UI)
-- [docs/gui-spec.jp.md](docs/gui-spec.jp.md) — the three-screen visual fixture shell and the fixed Local / Remote v3 target contract
+- [docs/gui-spec.jp.md](docs/gui-spec.jp.md) — the three-screen desktop GUI, implemented Local workflow, and Remote v3 target contract
 - [docs/architecture.md](docs/architecture.md) — integrated architecture design
 - [docs/research-survey.md](docs/research-survey.md) — survey of CFR variants,
   abstraction and acceleration techniques, with an adoption plan
@@ -30,18 +30,19 @@ Early development. See [docs/roadmap.md](docs/roadmap.md) for milestones.
 The project ships **one application** containing both a preflop solver (HU +
 2–9 player multiway) and a postflop solver (exact, fixed flop), selected by
 the config's `game.kind`. The CLI is the current execution surface. A new
-web-tech GUI provides a Setup / Solving / Results visual fixture shell as a
-React static SPA embedded in a Tauri 2 executable. GUI v1 targets Multiway
-Preflop v1 only. Local and Remote transports, config validation, solver
-execution, credentials, and artifact I/O remain deliberately unconnected. See
-[docs/gui-spec.jp.md](docs/gui-spec.jp.md) for that implementation boundary.
+web-tech GUI provides Setup / Solving / Results as a React static SPA embedded
+in a Tauri 2 executable. GUI v1 targets Multiway Preflop v1 only. Its Local
+workflow uses the same Rust parser, solver, checkpoint, and solution formats as
+the CLI in-process; Remote profiles remain a UI and protocol specification and
+do not send jobs yet. See [docs/gui-spec.jp.md](docs/gui-spec.jp.md) for the
+exact implementation boundary.
 
 ```
 app/
 ├── cli         # `solvers`: config / validate / solve / resume / inspect /
 │               # evaluate / export / compare / experiment / report / serve
-├── ui          # Vite + React + shadcn/ui fixture SPA; Setup / Solving / Results
-└── desktop     # Tauri 2 shell embedding the SPA in raw `solvers-gui`
+├── ui          # Vite + React + shadcn/ui SPA; Setup / Solving / Results
+└── desktop     # Tauri 2 Local job/file backend + embedded SPA
 crates/
 ├── cards       # card/chip/street types, range parser, hand-evaluator wrapper
 ├── hand-index  # suit-isomorphism board canonicalization
@@ -61,8 +62,8 @@ crates/
 cargo test --workspace            # correctness harness (Kuhn/Leduc known solutions, oracle diff)
 cargo run -p cli --release -- solve examples/kuhn.toml
 
-# Current bridge v2 (authenticated loopback API; the fixture GUI is not
-# connected to it, and GUI v1 targets the separate v3 contract):
+# Current bridge v2 (authenticated loopback API). The desktop Local workflow
+# does not use this loopback transport; Remote GUI support targets v3:
 cargo run -p cli --release -- serve --origin http://localhost:3000
 
 # --- Preflop ---------------------------------------------------------------
@@ -88,15 +89,15 @@ cargo run -p cli --release -- inspect examples/river_small.toml
 cargo run -p cli --release -- report examples/river_small.toml \
     --boards "2c 7d 9h Js Qs,2c 7d 9h Js Ks" --output report.csv
 
-# --- GUI prototype ---------------------------------------------------------
-# Build the static SPA, then one host-specific raw desktop executable.
-pnpm --dir app/ui install
-pnpm --dir app/ui build
-cargo build --release -p solvers-desktop
+# --- Desktop GUI -----------------------------------------------------------
+# Install/build the static SPA, then one host-specific raw desktop executable.
+bun ci --cwd app/ui
+bun run --cwd app/ui desktop:build
 
 # target/release/solvers-gui opens the embedded Web UI using the OS WebView.
-# It is not yet a signed/notarized platform bundle. The current GUI is a
-# visual fixture shell and does not start real Local or Remote solves.
+# Local validation, solving, cancellation, checkpoint resume, and artifact I/O
+# run in this process. Remote Solve is specification/UI only. The executable is
+# not yet a signed/notarized platform bundle.
 ```
 
 ## License

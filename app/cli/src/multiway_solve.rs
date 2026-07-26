@@ -7,7 +7,7 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, anyhow};
 use formats::{MULTIWAY_SCHEMA_VERSION, MultiwayMetricsRow, MultiwayMetricsWriter};
-use multiway::solver::InfoKey;
+use multiway::solver::{HistoryKey, InfoKey};
 use multiway::{ExternalSamplingGame, HoldemGame, MultiwaySolver};
 use serde::Serialize;
 
@@ -79,6 +79,26 @@ struct ResultV2 {
     finished_unix_ms: u64,
 }
 
+/// One visited root information set in a live, linear-average strategy
+/// observation. Missing root buckets remain absent instead of being
+/// synthesized as a uniform strategy.
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LiveRootStrategyEntry {
+    pub key: InfoKey,
+    pub actions: Vec<String>,
+    pub probabilities: Vec<f32>,
+    pub weight: f64,
+}
+
+/// Owned data published at completed evaluation boundaries.
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiwayRunObservation {
+    pub metrics: MultiwayMetricsRow,
+    pub root_strategy: Vec<LiveRootStrategyEntry>,
+}
+
 #[allow(clippy::too_many_arguments)]
 pub fn run(
     raw_config: &str,
@@ -103,6 +123,37 @@ pub fn run(
         None,
         false,
         emit_progress,
+        None,
+    )
+}
+
+/// Starts a production solve and publishes owned progress observations.
+#[allow(clippy::too_many_arguments)]
+pub fn run_observed(
+    raw_config: &str,
+    config: SolveConfig,
+    output: Option<&Path>,
+    metrics_path: Option<&Path>,
+    checkpoint_path: Option<&Path>,
+    config_hash: [u8; 32],
+    mwsol_path: Option<&Path>,
+    cancel: Option<&AtomicBool>,
+    emit_progress: bool,
+    observer: &mut dyn FnMut(MultiwayRunObservation),
+) -> Result<()> {
+    run_inner(
+        raw_config,
+        config,
+        output,
+        metrics_path,
+        checkpoint_path,
+        config_hash,
+        mwsol_path,
+        cancel,
+        None,
+        false,
+        emit_progress,
+        Some(observer),
     )
 }
 
@@ -131,6 +182,38 @@ pub fn resume(
         Some(checkpoint_path),
         reset_confirmations,
         emit_progress,
+        None,
+    )
+}
+
+/// Resumes a production solve and publishes owned progress observations.
+#[allow(clippy::too_many_arguments)]
+pub fn resume_observed(
+    raw_config: &str,
+    config: SolveConfig,
+    output: Option<&Path>,
+    metrics_path: Option<&Path>,
+    checkpoint_path: &Path,
+    config_hash: [u8; 32],
+    mwsol_path: Option<&Path>,
+    cancel: Option<&AtomicBool>,
+    reset_confirmations: bool,
+    emit_progress: bool,
+    observer: &mut dyn FnMut(MultiwayRunObservation),
+) -> Result<()> {
+    run_inner(
+        raw_config,
+        config,
+        output,
+        metrics_path,
+        Some(checkpoint_path),
+        config_hash,
+        mwsol_path,
+        cancel,
+        Some(checkpoint_path),
+        reset_confirmations,
+        emit_progress,
+        Some(observer),
     )
 }
 
@@ -147,6 +230,7 @@ fn run_inner(
     resume_checkpoint: Option<&Path>,
     reset_confirmations: bool,
     emit_progress: bool,
+    mut observer: Option<&mut dyn FnMut(MultiwayRunObservation)>,
 ) -> Result<()> {
     validate_artifact_paths(output, metrics_path, checkpoint_path, mwsol_path)?;
     if !matches!(config.game, GameSection::PreflopMultiway(_)) {
@@ -351,6 +435,7 @@ fn run_inner(
                     now.memory_bytes / (1024 * 1024),
                 );
             }
+            publish_observation(&mw_session, &last_row, &mut observer);
         }
         let checkpoint_due = mw_session
             .checkpoint_every
@@ -418,6 +503,7 @@ fn run_inner(
                     check.max_width, stop_rule.dev_gain_threshold
                 );
             }
+            publish_observation(&mw_session, &last_row, &mut observer);
 
             if check.converged {
                 status = if is_v1 {
@@ -478,6 +564,7 @@ fn run_inner(
         CompletionStatus::Converged => "converged",
     }
     .to_string();
+    publish_observation(&mw_session, &last_row, &mut observer);
     if let Some(writer) = metrics_writer.as_mut() {
         writer
             .append(&last_row)
@@ -760,6 +847,33 @@ fn mean(values: &[f64]) -> f64 {
     } else {
         values.iter().sum::<f64>() / values.len() as f64
     }
+}
+
+fn publish_observation(
+    session: &session::MultiwaySession,
+    metrics: &MultiwayMetricsRow,
+    observer: &mut Option<&mut dyn FnMut(MultiwayRunObservation)>,
+) {
+    let Some(observer) = observer.as_deref_mut() else {
+        return;
+    };
+    let root_strategy = session
+        .solver
+        .strategies_at_with_mass(HistoryKey::ROOT)
+        .into_iter()
+        .map(
+            |(key, actions, probabilities, weight)| LiveRootStrategyEntry {
+                key,
+                actions,
+                probabilities,
+                weight,
+            },
+        )
+        .collect();
+    observer(MultiwayRunObservation {
+        metrics: metrics.clone(),
+        root_strategy,
+    });
 }
 
 #[cfg(test)]

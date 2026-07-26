@@ -556,6 +556,15 @@ average positive-regret diagnostics, strategy drift, and a held-out unilateral
 deviation-gain lower bound.  It deliberately does not reuse the heads-up
 `exploitability` or `nash_conv` field names.
 
+`elapsedSecs` is solve time accumulated across a fresh run and every resume
+segment when the checkpoint carries v7 runtime timing. The rate fields use the
+same cumulative counters and time window. Compatibility v5/v6 checkpoints have
+no prior timing: on that migration path `elapsedSecs` and the rate denominator
+cover only the current resume segment, and the rate numerators are the segment's
+`traversals`/`handUpdates` deltas even though the count fields remain cumulative.
+The unknown-history marker is preserved in subsequently written checkpoints,
+so an old checkpoint can never make an all-time counter look artificially fast.
+
 The multiway artifact contracts are separate from frozen HU v1:
 
 - `.mwckpt` uses independently compressed 4 MiB frames with a checked chunk
@@ -580,7 +589,7 @@ The multiway artifact contracts are separate from frozen HU v1:
   v2-v4 and always expose f32 probabilities, while live MCCFR state and
   `.mwckpt` checkpoints remain f32.
 - When the policy memory cap is reached, the solver does not evict policy.  It
-  ends with `resource_limit` and writes the requested checkpoint; CLI runs
+  ends with `resource-limit` and writes the requested checkpoint; CLI runs
   without an explicit checkpoint derive a `.mwckpt` beside the result (or
   `multiway-resource-limit.mwckpt` when no result path was supplied).
 

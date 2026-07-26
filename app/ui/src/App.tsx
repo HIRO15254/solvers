@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react"
+import { lazy, Suspense, useEffect, useMemo, useState } from "react"
 import {
   IconActivity,
   IconCards,
@@ -19,12 +19,18 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { demoSession } from "@/data/demo"
-import type {
-  AppScreen,
-  ConnectionProfileViewModel,
-} from "@/lib/solve-contract"
+import type { ConnectionProfileViewModel } from "@/lib/solve-contract"
 import { localProfile } from "@/lib/solve-contract"
+import {
+  createNativeGateway,
+  type NativeJobSnapshot,
+} from "@/lib/native-gateway"
+import {
+  hashForRoute,
+  navigateTo,
+  routeFromHash,
+  type AppRoute,
+} from "@/lib/routes"
 import { cn } from "@/lib/utils"
 
 const SetupScreen = lazy(() =>
@@ -43,79 +49,92 @@ const ResultsScreen = lazy(() =>
   }))
 )
 
+type JobBinding = {
+  jobId: string
+  name: string
+  profile: ConnectionProfileViewModel
+}
+
 const navigation = [
   {
     id: "setup" as const,
-    hash: "#/setup",
     label: "設定",
     detail: "Solveを作成",
     icon: IconPlus,
   },
   {
     id: "solving" as const,
-    hash: "#/solve/demo-run",
     label: "Solve中",
     detail: "進捗と戦略",
     icon: IconActivity,
   },
   {
     id: "results" as const,
-    hash: "#/results/demo-result",
     label: "結果",
     detail: "戦略を分析",
     icon: IconChartBar,
   },
 ]
 
-function screenFromHash(hash: string): AppScreen {
-  if (hash.startsWith("#/solve")) {
-    return "solving"
+function routeForNavigation(
+  screen: AppRoute["screen"],
+  jobId?: string
+): AppRoute | null {
+  if (screen === "setup") {
+    return { screen }
   }
-  if (hash.startsWith("#/results")) {
-    return "results"
-  }
-  return "setup"
+  return jobId ? { screen, jobId } : null
 }
 
 function SolversApp() {
-  const [screen, setScreen] = useState<AppScreen>(() =>
-    screenFromHash(window.location.hash)
+  const gateway = useMemo(() => createNativeGateway(), [])
+  const [route, setRoute] = useState<AppRoute>(() =>
+    routeFromHash(window.location.hash)
   )
   const [profile, setProfile] =
     useState<ConnectionProfileViewModel>(localProfile)
-  const [runProfile, setRunProfile] =
-    useState<ConnectionProfileViewModel>(localProfile)
+  const [binding, setBinding] = useState<JobBinding | null>(() => {
+    const initial = routeFromHash(window.location.hash)
+    if (initial.screen === "setup") {
+      return null
+    }
+    return {
+      jobId: initial.jobId,
+      name: initial.jobId,
+      profile: localProfile,
+    }
+  })
   const [connectionOpen, setConnectionOpen] = useState(false)
   const { theme, setTheme } = useTheme()
   const isDark = theme === "dark"
-  const displayedProfile = screen === "setup" ? profile : runProfile
+  const currentJobId = route.screen === "setup" ? binding?.jobId : route.jobId
+  const displayedProfile =
+    route.screen === "setup" ? profile : (binding?.profile ?? localProfile)
 
   useEffect(() => {
-    const onHashChange = () => setScreen(screenFromHash(window.location.hash))
+    const onHashChange = () => setRoute(routeFromHash(window.location.hash))
     window.addEventListener("hashchange", onHashChange)
     if (!window.location.hash) {
-      window.location.hash = "#/setup"
+      window.location.hash = hashForRoute({ screen: "setup" })
     }
     return () => window.removeEventListener("hashchange", onHashChange)
   }, [])
 
-  const navigate = (next: AppScreen) => {
-    const item = navigation.find((entry) => entry.id === next)
-    if (item) {
-      window.location.assign(item.hash)
-    }
+  const bindJob = (
+    job: NativeJobSnapshot,
+    name: string,
+    destination: "solving" | "results",
+    boundProfile: ConnectionProfileViewModel
+  ) => {
+    setBinding({ jobId: job.id, name, profile: boundProfile })
+    navigateTo({ screen: destination, jobId: job.id })
   }
 
-  const navigateFromShell = (next: AppScreen) => {
-    if (screen === "setup" && next !== "setup") {
-      setRunProfile(profile)
+  const navigateFromShell = (screen: AppRoute["screen"]) => {
+    const next = routeForNavigation(screen, currentJobId)
+    if (next) {
+      navigateTo(next)
     }
-    navigate(next)
-  }
-
-  const startDemo = () => {
-    setRunProfile(profile)
-    navigate("solving")
   }
 
   return (
@@ -137,19 +156,22 @@ function SolversApp() {
 
           <div className="topbar-context">
             <span className="hidden text-xs text-muted-foreground sm:inline">
-              {screen === "setup"
+              {route.screen === "setup"
                 ? "New solve"
-                : `${demoSession.name} · ${demoSession.id}`}
+                : `${binding?.name ?? route.jobId} · ${route.jobId}`}
             </span>
-            <Badge variant="outline" className="hidden sm:inline-flex">
-              FIXTURE
+            <Badge
+              variant={gateway.availability.available ? "outline" : "secondary"}
+              className="hidden sm:inline-flex"
+            >
+              {gateway.availability.available ? "DESKTOP" : "BROWSER PREVIEW"}
             </Badge>
-            {screen !== "setup" ? (
+            {route.screen !== "setup" ? (
               <Badge
-                variant={screen === "solving" ? "default" : "secondary"}
+                variant={route.screen === "solving" ? "default" : "secondary"}
                 className="hidden sm:inline-flex"
               >
-                {screen === "solving" ? "DEMO RUNNING" : "SWEEP LIMIT"}
+                {route.screen === "solving" ? "JOB" : "RESULT"}
               </Badge>
             ) : null}
           </div>
@@ -160,17 +182,19 @@ function SolversApp() {
               size="sm"
               className="connection-button"
               onClick={() => setConnectionOpen(true)}
-              disabled={screen !== "setup"}
+              disabled={route.screen !== "setup"}
               title={
-                screen === "setup"
+                route.screen === "setup"
                   ? "Solve先を選択"
-                  : "実行デモのSolve先は開始時のプロファイルに固定されています"
+                  : "job作成後のSolve先は固定されています"
               }
             >
               <span
                 className={cn(
                   "connection-indicator",
-                  "connection-indicator--preview"
+                  displayedProfile.kind === "local" &&
+                    gateway.availability.available &&
+                    "connection-indicator--online"
                 )}
                 aria-hidden="true"
               />
@@ -200,7 +224,8 @@ function SolversApp() {
             <p className="sidebar-label">WORKFLOW</p>
             {navigation.map((item, index) => {
               const Icon = item.icon
-              const isActive = screen === item.id
+              const isActive = route.screen === item.id
+              const destination = routeForNavigation(item.id, currentJobId)
               return (
                 <button
                   type="button"
@@ -208,6 +233,12 @@ function SolversApp() {
                   key={item.id}
                   aria-current={isActive ? "page" : undefined}
                   onClick={() => navigateFromShell(item.id)}
+                  disabled={!destination}
+                  title={
+                    destination
+                      ? undefined
+                      : "Solveを開始するか、生成済みsolutionを開いてください"
+                  }
                 >
                   <span className="nav-number">0{index + 1}</span>
                   <span className="nav-icon">
@@ -217,7 +248,7 @@ function SolversApp() {
                     <strong>{item.label}</strong>
                     <small>{item.detail}</small>
                   </span>
-                  {item.id === "solving" && screen === "solving" ? (
+                  {item.id === "solving" && isActive ? (
                     <span
                       className="status-dot status-dot--live"
                       aria-hidden="true"
@@ -234,7 +265,7 @@ function SolversApp() {
               type="button"
               className="utility-link opacity-50"
               disabled
-              title="GUI fixtureでは利用できません"
+              title="今後の設定画面で提供します"
             >
               <IconSettings />
               環境設定
@@ -243,14 +274,14 @@ function SolversApp() {
               type="button"
               className="utility-link opacity-50"
               disabled
-              title="GUI fixtureでは利用できません"
+              title="ガイドは未収録です"
             >
               <IconHelpCircle />
               ガイド
             </button>
             <div className="version-block">
               <span>solvers 0.1.0</span>
-              <small>GUI prototype · bdvw9nmi</small>
+              <small>Desktop GUI · bdvw9nmi</small>
             </div>
           </div>
         </aside>
@@ -263,21 +294,47 @@ function SolversApp() {
               </div>
             }
           >
-            {screen === "setup" ? (
+            {route.screen === "setup" ? (
               <SetupScreen
                 profile={profile}
-                onStart={startDemo}
+                gateway={gateway}
+                onJobStarted={(job, name) =>
+                  bindJob(job, name, "solving", profile)
+                }
+                onCheckpointResumed={(job, name) =>
+                  bindJob(job, name, "solving", localProfile)
+                }
+                onResultOpened={(job, name) =>
+                  bindJob(job, name, "results", localProfile)
+                }
                 onOpenConnections={() => setConnectionOpen(true)}
               />
             ) : null}
-            {screen === "solving" ? (
+            {route.screen === "solving" ? (
               <SolveScreen
-                profile={runProfile}
-                onViewResults={() => navigate("results")}
+                profile={displayedProfile}
+                gateway={gateway}
+                jobId={route.jobId}
+                displayName={
+                  binding?.jobId === route.jobId ? binding.name : route.jobId
+                }
+                onViewResults={() =>
+                  navigateTo({ screen: "results", jobId: route.jobId })
+                }
               />
             ) : null}
-            {screen === "results" ? (
-              <ResultsScreen profile={runProfile} runId={demoSession.id} />
+            {route.screen === "results" ? (
+              <ResultsScreen
+                profile={displayedProfile}
+                gateway={gateway}
+                jobId={route.jobId}
+                displayName={
+                  binding?.jobId === route.jobId ? binding.name : route.jobId
+                }
+                onJobResumed={(job, name) =>
+                  bindJob(job, name, "solving", localProfile)
+                }
+              />
             ) : null}
           </Suspense>
         </main>
