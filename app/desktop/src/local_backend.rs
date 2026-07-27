@@ -20,7 +20,10 @@ const MAX_CONFIG_BYTES: u64 = 1024 * 1024;
 const MAX_RESULT_BYTES: u64 = 32 * 1024 * 1024;
 const MAX_PROGRESS_EVENTS: usize = 500;
 const ROOT_NODE_ID: &str = "00000000000000000000000000000000";
-const LIVE_STRATEGY_LEASE_MILLIS: u64 = 5_000;
+// The Solve screen normally renews this every two seconds. Keep enough slack
+// for a briefly busy or background-throttled webview without leaving live
+// strategy scans enabled indefinitely after the screen is closed.
+const LIVE_STRATEGY_LEASE_MILLIS: u64 = 30_000;
 
 pub type EventSink = Arc<dyn Fn(LocalJobEvent) + Send + Sync + 'static>;
 
