@@ -251,9 +251,14 @@ export function StrategyBucketList({
 type ActionBreakdownProps = {
   entry: StrategyEntry | null
   actions: TypedAction[]
+  showEv?: boolean
 }
 
-export function ActionBreakdown({ entry, actions }: ActionBreakdownProps) {
+export function ActionBreakdown({
+  entry,
+  actions,
+  showEv = true,
+}: ActionBreakdownProps) {
   const actionColors = strategyActionColors(actions)
   if (!entry) {
     return (
@@ -273,7 +278,10 @@ export function ActionBreakdown({ entry, actions }: ActionBreakdownProps) {
           </p>
         </div>
         <p className="rounded-md border border-dashed p-2 text-xs text-muted-foreground">
-          このinfosetは未訪問です。strategyとEVを0%やuniformで補完しません。
+          このinfosetは未訪問です。
+          {showEv
+            ? "strategyとEVを0%やuniformで補完しません。"
+            : "strategyを0%やuniformで補完しません。"}
         </p>
       </div>
     )
@@ -288,12 +296,16 @@ export function ActionBreakdown({ entry, actions }: ActionBreakdownProps) {
             {entry.comboCount ?? "—"} combos · weight {entry.weight}
           </p>
         </div>
-        <div className="text-right">
-          <p className="text-xs text-muted-foreground">EV</p>
-          <p className="font-mono text-sm font-semibold">
-            {entry.ev ? `${entry.ev.value} ${entry.ev.unit}` : "not available"}
-          </p>
-        </div>
+        {showEv ? (
+          <div className="text-right">
+            <p className="text-xs text-muted-foreground">EV</p>
+            <p className="font-mono text-sm font-semibold">
+              {entry.ev
+                ? `${entry.ev.value} ${entry.ev.unit}`
+                : "not available"}
+            </p>
+          </div>
+        ) : null}
       </div>
 
       <div className="space-y-3">

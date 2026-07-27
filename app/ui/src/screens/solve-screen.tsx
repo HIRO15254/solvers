@@ -231,18 +231,6 @@ export function SolveScreen({
   const progress = job?.progress ?? eventProgress
   const percent = sweepPercent(progress)
   const deviation = measuredDeviation(progress)
-  const onlineTrainingEvs =
-    progress?.seats.flatMap((seat) =>
-      seat.onlineTrainingEv
-        ? [
-            {
-              seat: seat.seat,
-              mean: Number(seat.onlineTrainingEv.mean),
-              observations: seat.onlineTrainingEv.observations,
-            },
-          ]
-        : []
-    ) ?? []
   const terminal = job ? terminalStates.has(job.state) : false
   const actionColors = useMemo(
     () => strategyActionColors(strategy?.actions ?? []),
@@ -484,47 +472,6 @@ export function SolveScreen({
         </CardContent>
       </Card>
 
-      <Card size="sm">
-        <CardHeader className="border-b">
-          <CardTitle>Online training EV</CardTitle>
-          <CardDescription>
-            MCCFR traversalのroot returnをLinear weightで累積したlive推定。held-out
-            profile EVや停止判定には使用しません。
-          </CardDescription>
-          <CardAction>
-            <Badge variant="outline">TRAINING-PATH</Badge>
-          </CardAction>
-        </CardHeader>
-        <CardContent>
-          {onlineTrainingEvs.length ? (
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-              {onlineTrainingEvs.map((estimate) => (
-                <div
-                  className="rounded-md border bg-muted/25 px-3 py-2"
-                  key={estimate.seat}
-                >
-                  <div className="text-[10px] text-muted-foreground">
-                    Seat {estimate.seat}
-                  </div>
-                  <div className="mt-0.5 font-mono text-sm font-semibold">
-                    {Number.isFinite(estimate.mean)
-                      ? estimate.mean.toFixed(4)
-                      : "—"}
-                  </div>
-                  <div className="mt-1 text-[10px] text-muted-foreground">
-                    {formatInteger(estimate.observations)} observations
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-lg border border-dashed py-5 text-center text-xs text-muted-foreground">
-              最初のtraining traversalを待っています。
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
       <div className="solve-dashboard">
         <Card size="sm">
           <CardHeader className="border-b">
@@ -752,6 +699,7 @@ export function SolveScreen({
                   <ActionBreakdown
                     entry={selectedEntry}
                     actions={strategy.actions}
+                    showEv={false}
                   />
                   <Separator />
                   <div className="space-y-2">
