@@ -1988,7 +1988,13 @@ fn snapshot(record: &JobRecord) -> JobSnapshot {
             inner.latest_progress.clone(),
         )
     };
-    let progress = latest_progress_file(record).or(cached_progress);
+    // Live observations are newer than the last durable progress.jsonl row.
+    // Prefer the cache while a process is attached; terminal/import paths
+    // already seed or refresh that cache from their durable artifact.
+    let mut progress = cached_progress.or_else(|| latest_progress_file(record));
+    if let Some(progress) = progress.as_mut() {
+        progress.checkpoint = checkpoint_progress(record);
+    }
     let artifacts = JobArtifacts {
         run: descriptor(record.paths.run.as_deref()),
         progress: descriptor(record.paths.progress.as_deref()),
@@ -2011,7 +2017,14 @@ fn snapshot(record: &JobRecord) -> JobSnapshot {
 }
 
 fn latest_progress(record: &JobRecord) -> Option<ProgressDto> {
-    latest_progress_file(record).or_else(|| lock(&record.inner).latest_progress.clone())
+    let mut progress = lock(&record.inner)
+        .latest_progress
+        .clone()
+        .or_else(|| latest_progress_file(record));
+    if let Some(progress) = progress.as_mut() {
+        progress.checkpoint = checkpoint_progress(record);
+    }
+    progress
 }
 
 fn latest_progress_file(record: &JobRecord) -> Option<ProgressDto> {

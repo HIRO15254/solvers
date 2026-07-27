@@ -365,6 +365,7 @@ fn run_inner(
     let mut stop_rule_state = session::StopRuleState::new(mw_session.evaluation_samples);
     let mut last_live_observation = Instant::now();
     let mut published_live_observation = false;
+    let mut last_quality_observation_sweeps = None;
     let cumulative_before = mw_session
         .checkpoint_runtime
         .map_or(0, |runtime| runtime.cumulative_solve_millis);
@@ -414,6 +415,10 @@ fn run_inner(
             .min(evaluation_delta)
             .min(checkpoint_delta)
             .max(1);
+        let chunk_end = current
+            .checked_add(chunk)
+            .ok_or(multiway::solver::SolverError::CounterOverflow)?;
+        let mut deferred_live_observation = false;
         match mw_session.solver.run_sweeps_with_threads_until_observed(
             chunk,
             mw_session.threads,
@@ -423,9 +428,22 @@ fn run_inner(
                     && (!published_live_observation
                         || last_live_observation.elapsed() >= LIVE_OBSERVATION_PERIOD)
                 {
-                    publish_live_observation(solver, cumulative_before, &started, &mut observer);
-                    last_live_observation = Instant::now();
-                    published_live_observation = true;
+                    if solver.completed_sweeps() == chunk_end {
+                        // The drive loop may immediately run a quality
+                        // evaluation or checkpoint at this boundary. Defer
+                        // the live event so the UI sees one coherent update
+                        // after that work rather than a before/after pair.
+                        deferred_live_observation = true;
+                    } else {
+                        publish_live_observation(
+                            solver,
+                            cumulative_before,
+                            &started,
+                            &mut observer,
+                        );
+                        last_live_observation = Instant::now();
+                        published_live_observation = true;
+                    }
                 }
             },
         ) {
@@ -447,72 +465,23 @@ fn run_inner(
         }
 
         let sweeps_now = mw_session.solver.completed_sweeps();
-        if sweeps_now % mw_session.evaluation_cadence == 0 || sweeps_now == mw_session.sweeps_target
-        {
-            let now = mw_session.solver.metrics();
-            let evaluation = mw_session
-                .solver
-                .evaluate_average_profile(mw_session.evaluation_samples, mw_session.evaluation_seed)
-                .context("evaluating held-out multiway profile")?;
-            let drift = mw_session.solver.strategy_drift_refresh(&mut prior);
-            last_row = session::metrics_row(
-                &now,
-                drift,
-                started.elapsed().as_secs_f64(),
-                Some(&evaluation),
-            );
-            has_evaluation = true;
-            if let Some(writer) = metrics_writer.as_mut() {
-                writer
-                    .append(&last_row)
-                    .context("writing multiway metrics")?;
-            }
-            if emit_progress {
-                eprintln!(
-                    "sweeps={:>8} traversals={:>10} infosets={:>9} regret_proxy={:.3e} memory={}MiB",
-                    now.sweeps,
-                    now.traversals,
-                    now.infosets,
-                    mean(&now.average_positive_regret),
-                    now.memory_bytes / (1024 * 1024),
-                );
-            }
-            publish_observation(&mw_session, &last_row, &mut observer);
-        }
-        let checkpoint_due = mw_session
-            .checkpoint_every
-            .is_some_and(|cadence| sweeps_now % cadence == 0)
-            || checkpoint_interval.is_some_and(|interval| last_checkpoint.elapsed() >= interval);
-        if let Some(path) = checkpoint_path
-            && checkpoint_due
-        {
-            write_checkpoint(
-                &mw_session.solver,
-                path,
-                raw_config,
-                &stop_rule_state,
-                mw_session.evaluation_cadence,
-                &started,
-                cumulative_before,
-            )?;
-            last_checkpoint = Instant::now();
-            if let Some(writer) = metrics_writer.as_mut() {
-                let mut checkpoint_event = last_row.clone();
-                checkpoint_event.phase = "checkpoint".into();
-                writer
-                    .append(&checkpoint_event)
-                    .context("writing checkpoint progress event")?;
-            }
-        }
-
         // v1 evaluates the operational stop rule on deterministic sweep
         // cadence. Legacy configs retain their documented wall-clock trigger.
-        if let Some(stop_rule) = mw_session.stop_rule
-            && ((is_v1 && sweeps_now % mw_session.evaluation_cadence == 0)
+        let stop_check_due = mw_session.stop_rule.is_some_and(|stop_rule| {
+            (is_v1 && sweeps_now % mw_session.evaluation_cadence == 0)
                 || (!is_v1
                     && stop_rule_state.last_eval.elapsed().as_secs_f64()
-                        >= stop_rule.eval_period_secs))
-        {
+                        >= stop_rule.eval_period_secs)
+        });
+        let regular_evaluation_due = sweeps_now % mw_session.evaluation_cadence == 0
+            || sweeps_now == mw_session.sweeps_target;
+        let mut quality_published = false;
+        let mut stop_after_boundary = false;
+
+        if stop_check_due {
+            let stop_rule = mw_session
+                .stop_rule
+                .expect("stop_check_due requires a stop rule");
             let samples_before = stop_rule_state.samples;
             let check = session::run_stop_rule_check(
                 &mw_session.solver,
@@ -546,6 +515,8 @@ fn run_inner(
                 );
             }
             publish_observation(&mw_session, &last_row, &mut observer);
+            quality_published = true;
+            last_quality_observation_sweeps = Some(sweeps_now);
 
             if check.converged {
                 status = if is_v1 {
@@ -553,8 +524,85 @@ fn run_inner(
                 } else {
                     CompletionStatus::Converged
                 };
-                break;
+                stop_after_boundary = true;
             }
+        } else if regular_evaluation_due {
+            let now = mw_session.solver.metrics();
+            let evaluation = mw_session
+                .solver
+                .evaluate_average_profile(mw_session.evaluation_samples, mw_session.evaluation_seed)
+                .context("evaluating held-out multiway profile")?;
+            let drift = mw_session.solver.strategy_drift_refresh(&mut prior);
+            last_row = session::metrics_row(
+                &now,
+                drift,
+                started.elapsed().as_secs_f64(),
+                Some(&evaluation),
+            );
+            has_evaluation = true;
+            if let Some(writer) = metrics_writer.as_mut() {
+                writer
+                    .append(&last_row)
+                    .context("writing multiway metrics")?;
+            }
+            if emit_progress {
+                eprintln!(
+                    "sweeps={:>8} traversals={:>10} infosets={:>9} regret_proxy={:.3e} memory={}MiB",
+                    now.sweeps,
+                    now.traversals,
+                    now.infosets,
+                    mean(&now.average_positive_regret),
+                    now.memory_bytes / (1024 * 1024),
+                );
+            }
+            publish_observation(&mw_session, &last_row, &mut observer);
+            quality_published = true;
+            last_quality_observation_sweeps = Some(sweeps_now);
+        }
+        if quality_published {
+            last_live_observation = Instant::now();
+            published_live_observation = true;
+        }
+
+        let checkpoint_due = mw_session
+            .checkpoint_every
+            .is_some_and(|cadence| sweeps_now % cadence == 0)
+            || checkpoint_interval.is_some_and(|interval| last_checkpoint.elapsed() >= interval);
+        if let Some(path) = checkpoint_path
+            && checkpoint_due
+            && !stop_after_boundary
+        {
+            write_checkpoint(
+                &mw_session.solver,
+                path,
+                raw_config,
+                &stop_rule_state,
+                mw_session.evaluation_cadence,
+                &started,
+                cumulative_before,
+            )?;
+            last_checkpoint = Instant::now();
+            if let Some(writer) = metrics_writer.as_mut() {
+                let mut checkpoint_event = last_row.clone();
+                checkpoint_event.phase = "checkpoint".into();
+                writer
+                    .append(&checkpoint_event)
+                    .context("writing checkpoint progress event")?;
+            }
+        }
+
+        if deferred_live_observation && !quality_published {
+            publish_live_observation(
+                &mw_session.solver,
+                cumulative_before,
+                &started,
+                &mut observer,
+            );
+            last_live_observation = Instant::now();
+            published_live_observation = true;
+        }
+        if stop_after_boundary {
+            break;
         }
     }
 
@@ -606,7 +654,9 @@ fn run_inner(
         CompletionStatus::Converged => "converged",
     }
     .to_string();
-    publish_observation(&mw_session, &last_row, &mut observer);
+    if last_quality_observation_sweeps != Some(last_row.sweeps) {
+        publish_observation(&mw_session, &last_row, &mut observer);
+    }
     if let Some(writer) = metrics_writer.as_mut() {
         writer
             .append(&last_row)
@@ -1012,6 +1062,39 @@ mod tests {
             .expect("result output must be valid JSON")
     }
 
+    fn run_to_json_observed(
+        raw: &str,
+        config: SolveConfig,
+    ) -> (serde_json::Value, Vec<(String, u64)>) {
+        let config_hash = formats::config_hash(raw.as_bytes());
+        let dir = tempfile::tempdir().unwrap();
+        let output = dir.path().join("result.json");
+        let mut observations = Vec::new();
+        run_observed(
+            raw,
+            config,
+            Some(&output),
+            None,
+            None,
+            config_hash,
+            None,
+            None,
+            false,
+            &mut |observation| match observation {
+                MultiwayRunObservation::Live(observation) => {
+                    observations.push(("live".into(), observation.sweeps));
+                }
+                MultiwayRunObservation::Quality(observation) => {
+                    observations.push(("quality".into(), observation.metrics.sweeps));
+                }
+            },
+        )
+        .expect("observed multiway run should succeed");
+        let result = serde_json::from_str(&std::fs::read_to_string(&output).unwrap())
+            .expect("result output must be valid JSON");
+        (result, observations)
+    }
+
     /// A very lax threshold (1000 bb, far above anything a 2bb-effective-stack
     /// smoke table could ever produce) with a single required confirmation
     /// and a near-zero wall-clock evaluation period must converge on the
@@ -1028,12 +1111,20 @@ mod tests {
              stop_br_traversals = 50\n",
         );
         let config: SolveConfig = toml::from_str(&raw).expect("parse spliced config");
-        let result = run_to_json(&raw, config);
+        let (result, observations) = run_to_json_observed(&raw, config);
         assert_eq!(result["status"], "converged");
         let sweeps = result["sweeps"].as_u64().unwrap();
         assert!(
             sweeps < 100_000,
             "expected an early stop, got {sweeps} sweeps"
+        );
+        let quality_at_stop = observations
+            .iter()
+            .filter(|(kind, observation_sweeps)| kind == "quality" && *observation_sweeps == sweeps)
+            .count();
+        assert_eq!(
+            quality_at_stop, 1,
+            "the stop boundary must publish only the post-deviator quality observation"
         );
     }
 

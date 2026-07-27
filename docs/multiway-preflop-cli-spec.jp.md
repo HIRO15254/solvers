@@ -468,7 +468,9 @@ Linear weightで累積した補助telemetryである。これは変化中のregr
 profile上の非held-out推定であり、CIを持たず、正式なaverage-profile EV、quality metric、
 停止判定、artifact記録値のいずれにも使わない。累積値はprocess segment内だけに保持し、
 checkpoint/resume時は0から再開する。live observationのために追加のevaluation traversalを
-実行しない。
+実行しない。evaluation/停止判定境界では直前のlive eventを抑止し、trained deviationを
+含むquality評価の完了後に1回だけpublishしてからcheckpointを書く。同一sweepの
+pre-evaluation値、post-deviator値、final値を連続publishしない。
 
 ## 7. Runtime、停止、resume
 

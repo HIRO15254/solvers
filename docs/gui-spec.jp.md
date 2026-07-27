@@ -275,6 +275,10 @@ Localは完了したsweep batchの直後に最初のsnapshotをpublishし、以�
 読まず、そのbatch完了後に更新する。`onlineTrainingEv`は同じobservationで配信するが、
 変化中のtraining profileから得た非held-out telemetryとして明確に分離し、profile EV
 やquality chartへ混ぜない。resumeで累積はリセットされる。
+evaluation/停止判定境界では、その直前のlive snapshotを別eventとして表示せず、
+trained deviationを含むquality評価後のsnapshotを1回だけ表示してからcheckpoint状態を
+更新する。polling時は古い`progress.jsonl`行より新しいin-memory live observationを
+優先し、sweeps、elapsed、rate、online training EVを古い値へ巻き戻さない。
 
 header に必ず次を表示する。
 

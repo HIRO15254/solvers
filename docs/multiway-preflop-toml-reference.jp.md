@@ -445,7 +445,9 @@ strategyと`onlineTrainingEv`を、最初のbatch後および以後おおむね2
 `onlineTrainingEv`は各seatのtraining traversalのroot returnをsweepのLinear weightで
 累積した、process segment内だけの非held-out telemetryである。追加設定はなく、
 checkpointへ保存せずresume時にリセットする。CI、正式profile EV、停止判定、
-`progress.jsonl`/solutionの記録値には使用しない。
+`progress.jsonl`/solutionの記録値には使用しない。evaluation/停止判定境界では
+pre-evaluationのlive更新を抑止し、trained deviationを含むquality評価後の1回だけを
+publishしてからcheckpointを書く。
 
 ## `[output]`
 

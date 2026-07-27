@@ -217,6 +217,11 @@ confidence interval, and is never used as a formal profile EV, quality metric,
 or stopping input. Its accumulator is process-segment-local and resets on
 resume. These live observations add no evaluation traversals and are not
 appended as two-second rows to `progress.jsonl`.
+At an evaluation or stopping boundary, the pre-evaluation live event is
+deferred. The solver publishes one post-quality observation—including trained
+deviation when the stop rule is due—then writes the checkpoint. It does not
+publish pre-evaluation, post-deviator, and duplicate final observations for
+the same sweep.
 
 `inspect --node` accepts `root`, a 32-hex-digit public-history key, or a
 slash-separated sequence of action labels/action indices. `--view node`
