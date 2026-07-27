@@ -207,6 +207,17 @@ Legacy per-file output flags are rejected for schema v1. The run and artifacts
 must describe multiway results as approximate profiles and must not label a
 sweep/time limit as convergence.
 
+For the Local GUI, the solver may publish a live observation after a completed
+sweep batch, initially after the first batch and then throttled to roughly two
+seconds. The root strategy in that observation is still the linear average
+strategy. `onlineTrainingEv` is a separate, linear-sweep-weighted average of
+the root returns already produced by each seat's MCCFR training traversal. It
+tracks the changing regret-matched training profile, is not held out, has no
+confidence interval, and is never used as a formal profile EV, quality metric,
+or stopping input. Its accumulator is process-segment-local and resets on
+resume. These live observations add no evaluation traversals and are not
+appended as two-second rows to `progress.jsonl`.
+
 `inspect --node` accepts `root`, a 32-hex-digit public-history key, or a
 slash-separated sequence of action labels/action indices. `--view node`
 (default) returns the public state plus 13×13 strategy and conditional-range

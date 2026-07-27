@@ -1,7 +1,7 @@
 # Solvers Web GUI v1 仕様
 
 Status: **Local Solver / 生成File接続済み・Remote Solveは仕様 / UIのみ**
-更新日: 2026-07-25
+更新日: 2026-07-27
 UI preset: `shadcn/ui --preset bdvw9nmi`
 
 この文書は、Web 技術で作成する Solvers GUI v1 の画面、配布形態、Local /
@@ -25,7 +25,7 @@ postflop (`kind = "postflop"`) はアプリ全体および CLI には残るが�
 |---|---|---|
 | Setup / Solving / Results | Local実データへ接続 | Remote実データ |
 | form control | 全v1 fieldの専用control + typed betting-tree rule editor + lossless TOML editor | なし |
-| strategy | evaluation境界のroot live average / `.mwsol` final | public treeのnode picker |
+| strategy | 約2秒のbatch境界root live average / `.mwsol` final | public treeのnode picker |
 | Local / Remote profile | LocalGateway実装 / Remote選択UI | RemoteGateway |
 | validation | v1 parser / normalizer、production contract、range・ICM semantics、公開treeのbyte-bounded preflight、dense Solver state / sampled ICM準備領域の検証 | process全体の厳密なpeak memory上界 |
 | Solve / cancel / resume | in-process worker、cooperative cancel、checkpoint resume | process restart後のjob reattach |
@@ -252,6 +252,7 @@ Multiway で表示する正式指標:
 - elapsed time
 - memory、traversals / second、hand updates / second、infosets
 - seat EV / CI
+- online training EV（training traversalのroot return。CIなし、停止判定には不使用）
 - average positive regret
 - strategy drift
 - measured deviation の one-sided 95% CI upper bound
@@ -268,6 +269,12 @@ Multiway で表示する正式指標:
 strategy は desktop で常時見える主要領域に置く。正式表示は、最後に完了した
 sweep 境界までの **Linear average strategy** だけである。last iterate や現在の
 regret-matched strategy を正式 profile として表示しない。
+
+Localは完了したsweep batchの直後に最初のsnapshotをpublishし、以後はbatch境界で
+おおむね2秒にthrottleして更新する。1 batch自体が2秒を超える場合は、partial batchを
+読まず、そのbatch完了後に更新する。`onlineTrainingEv`は同じobservationで配信するが、
+変化中のtraining profileから得た非held-out telemetryとして明確に分離し、profile EV
+やquality chartへ混ぜない。resumeで累積はリセットされる。
 
 header に必ず次を表示する。
 
@@ -659,8 +666,13 @@ type MultiwayProgressV3 = {
   seats: Array<{
     seat: number
     profileEv: Estimate | null
-    averagePositiveRegret: DecimalString
-    strategyDriftL1: DecimalString
+    onlineTrainingEv: {
+      mean: DecimalString
+      observations: UInt64String
+      totalWeight: DecimalString
+    } | null
+    averagePositiveRegret: DecimalString | null
+    strategyDriftL1: DecimalString | null
     deviationGain: Estimate | null
   }>
 }
@@ -735,7 +747,9 @@ type ExportReceipt = {
 }
 ```
 
-通常のjob progressでは上記nullable fieldもすべて値を持つ。単体の
+evaluation boundary後の通常job progressでは上記nullable fieldもすべて値を持つ。
+最初のevaluation前の高頻度observationでは、まだ計算していないmemory、infosets、
+profile EV、regret、drift、deviationを`null`のままにする。単体の
 `solution.mwsol` importでは成果物に記録されていないelapsed、memory、rate、
 infosetsだけを`null`とし、sweepsとseat metricsはsolution metadataから復元する。
 未知値を0として補完しない。
@@ -889,8 +903,9 @@ unvisited entry は `probabilityU16 = null`, `ev = null`。coverage はrequested
 viewで定義されたentry domainに対するvisited entry数の比で0〜1とする。reachを
 観測できないunvisited entryへ仮のweightを割り当ててweight coverageを装わない。
 
-Localはcomplete-sweepのprogress / evaluation boundaryとterminal遷移時に、
-immutable average snapshotをpublishする。Remote targetも同じ境界を採用する。
+Localは完了したsweep batchの高頻度observation、evaluation boundary、terminal遷移時に、
+immutable average snapshotをpublishする。高頻度observationはephemeralで、
+`progress.jsonl`へ2秒ごとの行を追加しない。Remote targetは将来同じ境界を採用する。
 同じsnapshotに異なるsweepのblockを混在させない。
 
 - `live-average`: running job の最新 scheduled boundary を publish 済み。

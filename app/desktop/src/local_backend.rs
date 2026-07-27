@@ -301,11 +301,20 @@ pub struct EstimateDto {
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct OnlineTrainingEvDto {
+    pub mean: String,
+    pub observations: String,
+    pub total_weight: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SeatMetricsDto {
     pub seat: u8,
     pub profile_ev: Option<EstimateDto>,
-    pub average_positive_regret: String,
-    pub strategy_drift_l1: String,
+    pub online_training_ev: Option<OnlineTrainingEvDto>,
+    pub average_positive_regret: Option<String>,
+    pub strategy_drift_l1: Option<String>,
     pub deviation_gain: Option<EstimateDto>,
 }
 
@@ -1617,8 +1626,28 @@ fn run_worker(
     let observation_record = Arc::clone(record);
     let observation_events = Arc::clone(&events);
     let mut observer = move |observation: cli::multiway_solve::MultiwayRunObservation| {
-        let progress = progress_from_metrics(&observation.metrics, &observation_record);
-        let strategy = live_root_snapshot(&observation_record, &observation);
+        let (progress, strategy) = match observation {
+            cli::multiway_solve::MultiwayRunObservation::Quality(observation) => {
+                let mut progress = progress_from_metrics(&observation.metrics, &observation_record);
+                apply_online_training_ev(&mut progress, &observation.online_training_ev);
+                let strategy = live_root_snapshot(
+                    &observation_record,
+                    observation.metrics.sweeps,
+                    &observation.root_strategy,
+                );
+                (progress, strategy)
+            }
+            cli::multiway_solve::MultiwayRunObservation::Live(observation) => {
+                let previous = lock(&observation_record.inner).latest_progress.clone();
+                let progress = progress_from_live(&observation, &observation_record, previous);
+                let strategy = live_root_snapshot(
+                    &observation_record,
+                    observation.sweeps,
+                    &observation.root_strategy,
+                );
+                (progress, strategy)
+            }
+        };
         let state = {
             let mut inner = lock(&observation_record.inner);
             inner.latest_progress = Some(progress.clone());
@@ -1741,6 +1770,65 @@ fn progress_from_metrics(metrics: &MultiwayMetricsRow, record: &JobRecord) -> Pr
     }
 }
 
+fn progress_from_live(
+    live: &cli::multiway_solve::MultiwayLiveObservation,
+    record: &JobRecord,
+    previous: Option<ProgressDto>,
+) -> ProgressDto {
+    let mut progress = previous.unwrap_or_else(|| ProgressDto {
+        sweeps: "0".into(),
+        max_sweeps: record.max_sweeps.to_string(),
+        elapsed_secs: None,
+        stop_target: record.stop_target.clone(),
+        stop_target_unit: record.stop_target_unit.clone(),
+        memory_bytes: None,
+        traversals_per_second: None,
+        hand_updates_per_second: None,
+        infosets: None,
+        checkpoint: checkpoint_progress(record),
+        seats: Vec::new(),
+    });
+    progress.sweeps = live.sweeps.to_string();
+    progress.elapsed_secs = Some(finite_decimal(live.elapsed_secs));
+    progress.traversals_per_second = (live.elapsed_secs > 0.0)
+        .then(|| finite_decimal(live.traversals as f64 / live.elapsed_secs));
+    progress.hand_updates_per_second = (live.elapsed_secs > 0.0)
+        .then(|| finite_decimal(live.hand_updates as f64 / live.elapsed_secs));
+    progress.checkpoint = checkpoint_progress(record);
+    apply_online_training_ev(&mut progress, &live.online_training_ev);
+    progress
+}
+
+fn apply_online_training_ev(
+    progress: &mut ProgressDto,
+    estimates: &[cli::multiway_solve::LiveOnlineTrainingEv],
+) {
+    for estimate in estimates {
+        let online = OnlineTrainingEvDto {
+            mean: finite_decimal(estimate.mean),
+            observations: estimate.observations.to_string(),
+            total_weight: finite_decimal(estimate.total_weight),
+        };
+        if let Some(seat) = progress
+            .seats
+            .iter_mut()
+            .find(|seat| seat.seat == estimate.seat)
+        {
+            seat.online_training_ev = Some(online);
+        } else {
+            progress.seats.push(SeatMetricsDto {
+                seat: estimate.seat,
+                profile_ev: None,
+                online_training_ev: Some(online),
+                average_positive_regret: None,
+                strategy_drift_l1: None,
+                deviation_gain: None,
+            });
+        }
+    }
+    progress.seats.sort_unstable_by_key(|seat| seat.seat);
+}
+
 fn progress_from_solution(
     metadata: &formats::MultiwaySolutionMetadata,
     contract: &ConfigContract,
@@ -1767,8 +1855,9 @@ fn seat_metrics_dto(metrics: &formats::MultiwaySeatMetrics) -> SeatMetricsDto {
     SeatMetricsDto {
         seat: metrics.seat,
         profile_ev: metrics.profile_ev.as_ref().map(estimate_dto),
-        average_positive_regret: finite_decimal(metrics.average_positive_regret),
-        strategy_drift_l1: finite_decimal(metrics.strategy_drift_l1),
+        online_training_ev: None,
+        average_positive_regret: Some(finite_decimal(metrics.average_positive_regret)),
+        strategy_drift_l1: Some(finite_decimal(metrics.strategy_drift_l1)),
         deviation_gain: metrics
             .deviation_gain_lower_bound
             .as_ref()
@@ -1780,8 +1869,9 @@ fn seat_result_dto(result: &formats::MultiwaySeatResult) -> SeatMetricsDto {
     SeatMetricsDto {
         seat: result.seat,
         profile_ev: result.profile_ev.as_ref().map(estimate_dto),
-        average_positive_regret: finite_decimal(result.average_positive_regret),
-        strategy_drift_l1: finite_decimal(result.strategy_drift_l1),
+        online_training_ev: None,
+        average_positive_regret: Some(finite_decimal(result.average_positive_regret)),
+        strategy_drift_l1: Some(finite_decimal(result.strategy_drift_l1)),
         deviation_gain: result.deviation_gain_lower_bound.as_ref().map(estimate_dto),
     }
 }
@@ -1812,9 +1902,10 @@ fn checkpoint_progress(record: &JobRecord) -> CheckpointProgressDto {
 
 fn live_root_snapshot(
     record: &JobRecord,
-    observation: &cli::multiway_solve::MultiwayRunObservation,
+    sweeps: u64,
+    root_strategy: &[cli::multiway_solve::LiveRootStrategyEntry],
 ) -> Option<StrategySnapshot> {
-    let first = observation.root_strategy.first()?;
+    let first = root_strategy.first()?;
     let actor = first.key.player;
     let active_opponents = first.key.active_opponents;
     let actions = first
@@ -1822,8 +1913,7 @@ fn live_root_snapshot(
         .iter()
         .map(|label| typed_action_from_label(label))
         .collect::<Vec<_>>();
-    let by_bucket: BTreeMap<u32, &cli::multiway_solve::LiveRootStrategyEntry> = observation
-        .root_strategy
+    let by_bucket: BTreeMap<u32, &cli::multiway_solve::LiveRootStrategyEntry> = root_strategy
         .iter()
         .filter(|entry| entry.key.player == actor && entry.key.street == 0)
         .map(|entry| (entry.key.bucket_path[0], entry))
@@ -1863,12 +1953,12 @@ fn live_root_snapshot(
     Some(StrategySnapshot {
         schema_version: 1,
         job_id: record.id.clone(),
-        revision: observation.metrics.sweeps.to_string(),
+        revision: sweeps.to_string(),
         status: "live-average".into(),
         strategy_kind: "linear-average",
         generated_at: rfc3339(unix_ms()),
-        as_of_sweeps: observation.metrics.sweeps.to_string(),
-        current_sweeps: observation.metrics.sweeps.to_string(),
+        as_of_sweeps: sweeps.to_string(),
+        current_sweeps: sweeps.to_string(),
         node: StrategyNodeDto {
             node_id: ROOT_NODE_ID.into(),
             actor_seat: actor,
@@ -3439,8 +3529,9 @@ action = "raise"
                     stderr: "0.01".into(),
                     ci95: ["0.08".into(), "0.12".into()],
                 }),
-                average_positive_regret: "0.2".into(),
-                strategy_drift_l1: "0.3".into(),
+                online_training_ev: None,
+                average_positive_regret: Some("0.2".into()),
+                strategy_drift_l1: Some("0.3".into()),
                 deviation_gain: None,
             }],
         };
@@ -3467,6 +3558,7 @@ action = "raise"
                         "stderr": "0.01",
                         "ci95": ["0.08", "0.12"]
                     },
+                    "onlineTrainingEv": null,
                     "averagePositiveRegret": "0.2",
                     "strategyDriftL1": "0.3",
                     "deviationGain": null

@@ -2,7 +2,7 @@
 
 Status: **承認済み・実装基準**  
 確定日: 2026-07-21  
-Production abstraction contract更新: 2026-07-25
+Production abstraction/live telemetry contract更新: 2026-07-27
 Schema: `solvers.multiway-preflop/v1`
 
 この文書は Multiway Preflop Solver CLI の次期 v1 に対する正本である。
@@ -461,6 +461,15 @@ kind = "regret-based"
 正式strategyは各infoset/actionの累積sampling weightで正規化したLinear average。
 unvisited infosetをuniform strategyとして捏造しない。
 
+Local GUI向けlive observationは、完了したsweep batchの境界で取得し、最初のbatch後と
+以後おおむね2秒ごとに配信できる。ここでroot strategyは同じLinear averageを使う。
+`onlineTrainingEv`は各seatのMCCFR traversalが既に計算したroot returnを、そのsweepの
+Linear weightで累積した補助telemetryである。これは変化中のregret-matched training
+profile上の非held-out推定であり、CIを持たず、正式なaverage-profile EV、quality metric、
+停止判定、artifact記録値のいずれにも使わない。累積値はprocess segment内だけに保持し、
+checkpoint/resume時は0から再開する。live observationのために追加のevaluation traversalを
+実行しない。
+
 ## 7. Runtime、停止、resume
 
 ```toml
@@ -573,6 +582,8 @@ my-run/
   fingerprint、profile type、保証境界、units、quality summary、timestamps。
 - `progress.jsonl`: monotonic event sequence。sweep/evaluation/checkpoint/resource warning、
   resume segmentを追記する。
+- GUIの高頻度`onlineTrainingEv`/root-strategy observationはephemeral transport stateで、
+  `progress.jsonl`へ2秒ごとの行を追加しない。
 - `solution.mwsol`: 閲覧・評価・export用の正式average strategy。
 - `checkpoint.mwckpt`: regret等を含む再開用state。
 - `run.json`、solution、checkpointはatomic write。JSONLは1 event単位でappendする。

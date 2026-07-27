@@ -576,7 +576,9 @@ export function ResultsScreen({
                               : "—"}
                           </TableCell>
                           <TableCell className="text-right font-mono">
-                            {formatScientific(seat.averagePositiveRegret)}
+                            {seat.averagePositiveRegret !== null
+                              ? formatScientific(seat.averagePositiveRegret)
+                              : "—"}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -598,13 +600,17 @@ export function ResultsScreen({
                       <p className="flex justify-between gap-3">
                         <span>Average positive regret</span>
                         <strong className="font-mono">
-                          {formatScientific(seat.averagePositiveRegret, 4)}
+                          {seat.averagePositiveRegret !== null
+                            ? formatScientific(seat.averagePositiveRegret, 4)
+                            : "—"}
                         </strong>
                       </p>
                       <p className="flex justify-between gap-3">
                         <span>Strategy drift L1</span>
                         <strong className="font-mono">
-                          {formatScientific(seat.strategyDriftL1, 4)}
+                          {seat.strategyDriftL1 !== null
+                            ? formatScientific(seat.strategyDriftL1, 4)
+                            : "—"}
                         </strong>
                       </p>
                       <p className="flex justify-between gap-3">

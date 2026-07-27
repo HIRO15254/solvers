@@ -15,6 +15,7 @@ use crate::config::{GameSection, SolveConfig, StorageKind, UtilitySection};
 use crate::session;
 
 const APPROXIMATION_NOTICE: &str = "3人以上は多人数・一般和ゲームのregret-minimized approximationです。Nash/GTO保証やexploitability指標ではありません。";
+const LIVE_OBSERVATION_PERIOD: Duration = Duration::from_secs(2);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -91,12 +92,41 @@ pub struct LiveRootStrategyEntry {
     pub weight: f64,
 }
 
-/// Owned data published at completed evaluation boundaries.
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct MultiwayRunObservation {
-    pub metrics: MultiwayMetricsRow,
+pub struct LiveOnlineTrainingEv {
+    pub seat: u8,
+    pub mean: f64,
+    pub observations: u64,
+    pub total_weight: f64,
+}
+
+/// Cheap data published during training without a held-out evaluation.
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiwayLiveObservation {
+    pub sweeps: u64,
+    pub traversals: u64,
+    pub hand_updates: u64,
+    pub elapsed_secs: f64,
+    pub online_training_ev: Vec<LiveOnlineTrainingEv>,
     pub root_strategy: Vec<LiveRootStrategyEntry>,
+}
+
+/// Full quality data published at completed evaluation boundaries.
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiwayQualityObservation {
+    pub metrics: MultiwayMetricsRow,
+    pub online_training_ev: Vec<LiveOnlineTrainingEv>,
+    pub root_strategy: Vec<LiveRootStrategyEntry>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(tag = "kind", rename_all = "kebab-case")]
+pub enum MultiwayRunObservation {
+    Live(MultiwayLiveObservation),
+    Quality(MultiwayQualityObservation),
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -333,6 +363,8 @@ fn run_inner(
     // cap, not a target, so the sweep count a converged run actually stops
     // at is machine-dependent (documented on `run.stop_dev_gain`).
     let mut stop_rule_state = session::StopRuleState::new(mw_session.evaluation_samples);
+    let mut last_live_observation = Instant::now();
+    let mut published_live_observation = false;
     let cumulative_before = mw_session
         .checkpoint_runtime
         .map_or(0, |runtime| runtime.cumulative_solve_millis);
@@ -382,11 +414,21 @@ fn run_inner(
             .min(evaluation_delta)
             .min(checkpoint_delta)
             .max(1);
-        match mw_session
-            .solver
-            .run_sweeps_with_threads_until(chunk, mw_session.threads, || {
-                !cancel.is_some_and(|token| token.load(Ordering::Relaxed))
-            }) {
+        match mw_session.solver.run_sweeps_with_threads_until_observed(
+            chunk,
+            mw_session.threads,
+            || !cancel.is_some_and(|token| token.load(Ordering::Relaxed)),
+            |solver| {
+                if observer.is_some()
+                    && (!published_live_observation
+                        || last_live_observation.elapsed() >= LIVE_OBSERVATION_PERIOD)
+                {
+                    publish_live_observation(solver, cumulative_before, &started, &mut observer);
+                    last_live_observation = Instant::now();
+                    published_live_observation = true;
+                }
+            },
+        ) {
             Ok(completed) => {
                 if completed < chunk {
                     status = CompletionStatus::Cancelled;
@@ -857,8 +899,40 @@ fn publish_observation(
     let Some(observer) = observer.as_deref_mut() else {
         return;
     };
-    let root_strategy = session
-        .solver
+    observer(MultiwayRunObservation::Quality(
+        MultiwayQualityObservation {
+            metrics: metrics.clone(),
+            online_training_ev: online_training_ev(&session.solver),
+            root_strategy: live_root_strategy(&session.solver),
+        },
+    ));
+}
+
+fn publish_live_observation(
+    solver: &MultiwaySolver<HoldemGame<multiway::MultiwayAbstractionBackend>>,
+    cumulative_before: u64,
+    started: &Instant,
+    observer: &mut Option<&mut dyn FnMut(MultiwayRunObservation)>,
+) {
+    let Some(observer) = observer.as_deref_mut() else {
+        return;
+    };
+    observer(MultiwayRunObservation::Live(MultiwayLiveObservation {
+        sweeps: solver.completed_sweeps(),
+        traversals: solver.traversals(),
+        hand_updates: solver.hand_updates(),
+        elapsed_secs: Duration::from_millis(cumulative_before)
+            .saturating_add(started.elapsed())
+            .as_secs_f64(),
+        online_training_ev: online_training_ev(solver),
+        root_strategy: live_root_strategy(solver),
+    }));
+}
+
+fn live_root_strategy(
+    solver: &MultiwaySolver<HoldemGame<multiway::MultiwayAbstractionBackend>>,
+) -> Vec<LiveRootStrategyEntry> {
+    solver
         .strategies_at_with_mass(HistoryKey::ROOT)
         .into_iter()
         .map(
@@ -869,11 +943,22 @@ fn publish_observation(
                 weight,
             },
         )
-        .collect();
-    observer(MultiwayRunObservation {
-        metrics: metrics.clone(),
-        root_strategy,
-    });
+        .collect()
+}
+
+fn online_training_ev(
+    solver: &MultiwaySolver<HoldemGame<multiway::MultiwayAbstractionBackend>>,
+) -> Vec<LiveOnlineTrainingEv> {
+    solver
+        .online_training_ev()
+        .into_iter()
+        .map(|estimate| LiveOnlineTrainingEv {
+            seat: estimate.seat,
+            mean: estimate.mean,
+            observations: estimate.observations,
+            total_weight: estimate.total_weight,
+        })
+        .collect()
 }
 
 #[cfg(test)]

@@ -440,6 +440,13 @@ arena上限だけを8 GiB RSS保証として扱わない。
 停止評価はtrained deviatorを含み、`evaluation_samples`、
 `deviator_traversals` を0にして無効化できない。
 
+これらの停止評価とは別に、Local GUIは完了したsweep batchからrootのLinear average
+strategyと`onlineTrainingEv`を、最初のbatch後および以後おおむね2秒ごとに更新する。
+`onlineTrainingEv`は各seatのtraining traversalのroot returnをsweepのLinear weightで
+累積した、process segment内だけの非held-out telemetryである。追加設定はなく、
+checkpointへ保存せずresume時にリセットする。CI、正式profile EV、停止判定、
+`progress.jsonl`/solutionの記録値には使用しない。
+
 ## `[output]`
 
 ```toml
