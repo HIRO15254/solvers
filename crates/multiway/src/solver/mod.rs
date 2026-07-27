@@ -340,6 +340,28 @@ pub struct HistoryEntry {
     pub action_label: String,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum PublicActionDestination {
+    PreflopDecision(HistoryKey),
+    PostflopBoundary,
+    Terminal,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PublicNodeAction {
+    pub label: String,
+    pub destination: PublicActionDestination,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PublicNodeView {
+    pub history: HistoryKey,
+    pub actor: u8,
+    pub street: Street,
+    pub active_opponents: u8,
+    pub actions: Vec<PublicNodeAction>,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct InfoKey {
     pub history: HistoryKey,
@@ -525,55 +547,6 @@ pub struct SolverMetrics {
     /// Sum of positive cumulative regrets divided by completed updates for
     /// each seat.  This is a sampled diagnostic, not exploitability.
     pub average_positive_regret: Vec<f64>,
-}
-
-/// Cheap live estimate accumulated from the root return already produced by
-/// each MCCFR training traversal. The mean is weighted with the same linear
-/// sweep weight as the solver's average-strategy accumulator.
-///
-/// This estimates the changing regret-matched training path. It is not a
-/// held-out evaluation of the exported linear-average profile and must never
-/// be used for convergence or stopping decisions.
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct OnlineTrainingEv {
-    pub seat: u8,
-    pub mean: f64,
-    pub observations: u64,
-    pub total_weight: f64,
-}
-
-#[derive(Clone, Copy, Debug, Default)]
-struct OnlineTrainingEvAccumulator {
-    mean: f64,
-    observations: u64,
-    total_weight: f64,
-}
-
-impl OnlineTrainingEvAccumulator {
-    fn updated(self, value: f64, weight: f64) -> Result<Self, SolverError> {
-        if !value.is_finite() || !weight.is_finite() || weight <= 0.0 {
-            return Err(SolverError::InvalidState(
-                "online training EV received a non-finite value or invalid weight",
-            ));
-        }
-        let total_weight = self.total_weight + weight;
-        if !total_weight.is_finite() {
-            return Err(SolverError::CounterOverflow);
-        }
-        let observations = self
-            .observations
-            .checked_add(1)
-            .ok_or(SolverError::CounterOverflow)?;
-        let mean = self.mean + (weight / total_weight) * (value - self.mean);
-        if !mean.is_finite() {
-            return Err(SolverError::NumericOverflow);
-        }
-        Ok(Self {
-            mean,
-            observations,
-            total_weight,
-        })
-    }
 }
 
 /// Fixed policy-arena allocation completed before a production solver is
@@ -909,10 +882,6 @@ pub struct MultiwaySolver<G: ExternalSamplingGame> {
     total_deal_attempts: u64,
     terminal_evaluations: u64,
     hand_updates: u64,
-    /// Segment-local UI diagnostic. It is intentionally omitted from
-    /// checkpoints because it has no effect on solver updates or artifacts;
-    /// a resumed process starts a fresh online observation segment.
-    online_training_ev: Vec<OnlineTrainingEvAccumulator>,
     dense: Option<DenseStorage>,
 }
 
@@ -983,7 +952,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         commit_pages: bool,
     ) -> Result<Self, SolverError> {
         validate_setup(&game, &sampler, config)?;
-        let num_players = game.num_players();
         let dense = match game.recall_mode() {
             RecallMode::Full => {
                 #[cfg(any(feature = "research-abstractions", test))]
@@ -1015,7 +983,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             total_deal_attempts: 0,
             terminal_evaluations: 0,
             hand_updates: 0,
-            online_training_ev: vec![OnlineTrainingEvAccumulator::default(); num_players],
             dense,
         })
     }
@@ -1102,7 +1069,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
 
         #[cfg(any(feature = "research-abstractions", test))]
         {
-            let online_seats = game.num_players();
             let mut histories: FxHashMap<HistoryKey, HistoryEntry> = FxHashMap::default();
             histories.reserve(state.histories.len());
             let mut approx_memory_bytes = 0u64;
@@ -1161,7 +1127,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 total_deal_attempts: state.total_deal_attempts,
                 terminal_evaluations: state.terminal_evaluations,
                 hand_updates: state.hand_updates,
-                online_training_ev: vec![OnlineTrainingEvAccumulator::default(); online_seats],
                 dense: None,
             })
         }
@@ -1177,7 +1142,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         mut state: SolverState,
         commit_pages: bool,
     ) -> Result<Self, SolverError> {
-        let online_seats = game.num_players();
         let mut dense_storage = DenseStorage::build(
             &game,
             state.config.max_memory_bytes,
@@ -1255,7 +1219,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             total_deal_attempts: state.total_deal_attempts,
             terminal_evaluations: state.terminal_evaluations,
             hand_updates: state.hand_updates,
-            online_training_ev: vec![OnlineTrainingEvAccumulator::default(); online_seats],
             dense: Some(dense_storage),
         })
     }
@@ -1377,8 +1340,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
 
     /// [`Self::run_sweeps_with_threads_until`] with a cheap read-only hook
     /// after every committed sweep batch. The hook runs on the drive thread
-    /// while the worker pool stays alive, allowing a GUI to publish counters,
-    /// root strategy, and online training EV without forcing a held-out
+    /// while the worker pool stays alive, allowing a GUI to publish counters
+    /// and one requested preflop-node strategy without forcing a held-out
     /// evaluation or rebuilding the pool.
     pub fn run_sweeps_with_threads_until_observed<F, O>(
         &mut self,
@@ -1490,14 +1453,11 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 let mut combined = TraversalDelta {
                     sample_id,
                     traverser,
-                    root_value: 0.0,
                     deal_attempts: u64::from(sample.attempts),
                     terminal_evaluations: 0,
                     hand_updates: feasible.len() as u64,
                     events: Vec::new(),
                 };
-                let mut root_value_sum = 0.0;
-                let mut root_weight_sum = 0.0;
                 for (combo, weight) in feasible {
                     let mut holes = sample.world.hole_combos().to_vec();
                     holes[traverser] = combo;
@@ -1505,7 +1465,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     let mut combo_rng = base_rng.clone();
                     let mut combo_reach = vec![1.0; self.game.num_players()];
                     let mut worker = TraversalWorker::new(self, linear_weight);
-                    let root_value = worker.traverse(
+                    worker.traverse(
                         self.game.root_state(),
                         &combo_world,
                         traverser,
@@ -1515,9 +1475,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                         &mut combo_rng,
                         0,
                     )?;
-                    root_value_sum += weight * root_value;
-                    root_weight_sum += weight;
-                    let delta = worker.finish(sample_id, traverser, root_value, 0);
+                    let delta = worker.finish(sample_id, traverser, 0);
                     combined.terminal_evaluations = combined
                         .terminal_evaluations
                         .checked_add(delta.terminal_evaluations)
@@ -1536,20 +1494,11 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                         combined.events.push(event);
                     }
                 }
-                if !root_weight_sum.is_finite() || root_weight_sum <= 0.0 {
-                    return Err(SolverError::InvalidState(
-                        "vector traversal had no positive feasible range weight",
-                    ));
-                }
-                combined.root_value = root_value_sum / root_weight_sum;
-                if !combined.root_value.is_finite() {
-                    return Err(SolverError::NumericOverflow);
-                }
                 Ok(AnyTraversalDelta::Sparse(combined))
             }
             None => {
                 let mut worker = TraversalWorker::new(self, linear_weight);
-                let root_value = worker.traverse(
+                worker.traverse(
                     self.game.root_state(),
                     &sample.world,
                     traverser,
@@ -1562,7 +1511,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 Ok(AnyTraversalDelta::Sparse(worker.finish(
                     sample_id,
                     traverser,
-                    root_value,
                     u64::from(sample.attempts),
                 )))
             }
@@ -1587,7 +1535,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     combos,
                     weights,
                 );
-                let root_values = worker.traverse(
+                worker.traverse(
                     self.game.root_state(),
                     0,
                     &sample.world,
@@ -1598,18 +1546,16 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     &mut action_rng,
                     0,
                 )?;
-                let root_value = worker.range_weighted_root_value(&root_values)?;
                 Ok(AnyTraversalDelta::Dense(worker.finish(
                     sample_id,
                     traverser,
-                    root_value,
                     u64::from(sample.attempts),
                 )))
             }
             Some(dense) => {
                 let mut worker =
                     DenseTraversalWorker::new(&self.game, dense, self.config, linear_weight);
-                let root_value = worker.traverse(
+                worker.traverse(
                     self.game.root_state(),
                     0,
                     &sample.world,
@@ -1622,7 +1568,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 Ok(AnyTraversalDelta::Dense(worker.finish(
                     sample_id,
                     traverser,
-                    root_value,
                     u64::from(sample.attempts),
                 )))
             }
@@ -1678,11 +1623,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         let mut total_deal_attempts = self.total_deal_attempts;
         let mut terminal_evaluations = self.terminal_evaluations;
         let mut hand_updates = self.hand_updates;
-        let mut online_training_ev = self.online_training_ev.clone();
-        let online_weight = self
-            .completed_sweeps
-            .checked_add(1)
-            .ok_or(SolverError::CounterOverflow)? as f64;
 
         for (seat, delta) in deltas.into_iter().enumerate() {
             let expected_sample_id = self
@@ -1703,9 +1643,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             hand_updates = hand_updates
                 .checked_add(delta.hand_updates)
                 .ok_or(SolverError::CounterOverflow)?;
-            online_training_ev[seat] =
-                online_training_ev[seat].updated(delta.root_value, online_weight)?;
-
             for event in delta.events {
                 match event {
                     TraversalEvent::EnsurePolicy { key, action_labels } => {
@@ -1825,7 +1762,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         self.total_deal_attempts = total_deal_attempts;
         self.terminal_evaluations = terminal_evaluations;
         self.hand_updates = hand_updates;
-        self.online_training_ev = online_training_ev;
         self.traversals = traversals;
         self.next_sample_id = next_sample_id;
         self.completed_sweeps = completed_sweeps;
@@ -1855,11 +1791,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         let mut total_deal_attempts = self.total_deal_attempts;
         let mut terminal_evaluations = self.terminal_evaluations;
         let mut hand_updates = self.hand_updates;
-        let mut online_training_ev = self.online_training_ev.clone();
-        let online_weight = self
-            .completed_sweeps
-            .checked_add(1)
-            .ok_or(SolverError::CounterOverflow)? as f64;
 
         for (seat, delta) in deltas.into_iter().enumerate() {
             let expected_sample_id = self
@@ -1880,9 +1811,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             hand_updates = hand_updates
                 .checked_add(delta.hand_updates)
                 .ok_or(SolverError::CounterOverflow)?;
-            online_training_ev[seat] =
-                online_training_ev[seat].updated(delta.root_value, online_weight)?;
-
             for event in delta.events {
                 match event {
                     DenseEvent::AddRegret { column, values } => {
@@ -1938,7 +1866,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         self.total_deal_attempts = total_deal_attempts;
         self.terminal_evaluations = terminal_evaluations;
         self.hand_updates = hand_updates;
-        self.online_training_ev = online_training_ev;
         self.apply_early_discount();
         Ok(())
     }
@@ -2094,6 +2021,43 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         };
         children.sort_unstable_by_key(|entry| (entry.actor, entry.action_index));
         children
+    }
+
+    /// Public metadata for one materialized decision node. Production
+    /// current-street solvers use the dense tree, so this is an O(actions)
+    /// read with no traversal or strategy scan. Sparse research solvers do
+    /// not retain enough state to classify unvisited/terminal children.
+    pub fn public_node_view(&self, history: HistoryKey) -> Option<PublicNodeView> {
+        let dense = self.dense.as_ref()?;
+        let &node_id = dense.tree.by_history.get(&history)?;
+        let node = &dense.tree.nodes[node_id as usize];
+        let actions = node
+            .action_labels
+            .iter()
+            .cloned()
+            .zip(&node.children)
+            .map(|(label, child)| {
+                let destination = match *child {
+                    tree::Child::Terminal => PublicActionDestination::Terminal,
+                    tree::Child::Decision(child_id) => {
+                        let child = &dense.tree.nodes[child_id as usize];
+                        if child.street == Street::Preflop {
+                            PublicActionDestination::PreflopDecision(child.history)
+                        } else {
+                            PublicActionDestination::PostflopBoundary
+                        }
+                    }
+                };
+                PublicNodeAction { label, destination }
+            })
+            .collect();
+        Some(PublicNodeView {
+            history,
+            actor: node.actor,
+            street: node.street,
+            active_opponents: node.active_opponents,
+            actions,
+        })
     }
 
     /// Current average strategy of every policy column at `history`, sorted
@@ -2311,27 +2275,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// computation every drive-loop chunk.
     pub fn hand_updates(&self) -> u64 {
         self.hand_updates
-    }
-
-    /// Segment-local, linear-weighted root EV estimates collected from the
-    /// training traversals themselves. Cheap enough for live UI telemetry.
-    ///
-    /// These values follow the changing regret-matched training profile and
-    /// are neither independent nor held out. Use [`Self::evaluate_profile`]
-    /// for quality reporting and all stopping decisions.
-    pub fn online_training_ev(&self) -> Vec<OnlineTrainingEv> {
-        self.online_training_ev
-            .iter()
-            .enumerate()
-            .filter_map(|(seat, estimate)| {
-                (estimate.observations > 0).then_some(OnlineTrainingEv {
-                    seat: seat as u8,
-                    mean: estimate.mean,
-                    observations: estimate.observations,
-                    total_weight: estimate.total_weight,
-                })
-            })
-            .collect()
     }
 
     /// Per-seat average-strategy L1 drift since `prior`, refreshing `prior`

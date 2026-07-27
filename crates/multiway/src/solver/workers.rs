@@ -24,10 +24,6 @@ pub(super) enum TraversalEvent {
 pub(super) struct TraversalDelta {
     pub(super) sample_id: u64,
     pub(super) traverser: usize,
-    /// Importance-corrected root return produced by this training traversal.
-    /// This is a sample from the changing regret-matched training profile,
-    /// not an evaluation of the exported linear-average profile.
-    pub(super) root_value: f64,
     pub(super) deal_attempts: u64,
     pub(super) terminal_evaluations: u64,
     pub(super) hand_updates: u64,
@@ -47,9 +43,6 @@ pub(super) enum DenseEvent {
 pub(super) struct DenseTraversalDelta {
     pub(super) sample_id: u64,
     pub(super) traverser: usize,
-    /// Range-aggregated, importance-corrected root return for this training
-    /// traversal. See [`TraversalDelta::root_value`].
-    pub(super) root_value: f64,
     pub(super) deal_attempts: u64,
     pub(super) terminal_evaluations: u64,
     pub(super) hand_updates: u64,
@@ -230,13 +223,11 @@ impl<'a, G: ExternalSamplingGame> TraversalWorker<'a, G> {
         self,
         sample_id: u64,
         traverser: usize,
-        root_value: f64,
         deal_attempts: u64,
     ) -> TraversalDelta {
         TraversalDelta {
             sample_id,
             traverser,
-            root_value,
             deal_attempts,
             terminal_evaluations: self.terminal_evaluations,
             // The scalar algorithm updates exactly one sampled hand per
@@ -534,13 +525,11 @@ impl<'a, G: ExternalSamplingGame> DenseTraversalWorker<'a, G> {
         self,
         sample_id: u64,
         traverser: usize,
-        root_value: f64,
         deal_attempts: u64,
     ) -> DenseTraversalDelta {
         DenseTraversalDelta {
             sample_id,
             traverser,
-            root_value,
             deal_attempts,
             terminal_evaluations: self.terminal_evaluations,
             hand_updates: 1,
@@ -790,36 +779,16 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
         self,
         sample_id: u64,
         traverser: usize,
-        root_value: f64,
         deal_attempts: u64,
     ) -> DenseTraversalDelta {
         DenseTraversalDelta {
             sample_id,
             traverser,
-            root_value,
             deal_attempts,
             terminal_evaluations: self.terminal_evaluations,
             hand_updates: self.combos.len() as u64,
             events: self.events,
         }
-    }
-
-    pub(super) fn range_weighted_root_value(&self, values: &[f64]) -> Result<f64, SolverError> {
-        if values.len() != self.weights.len() {
-            return Err(SolverError::InvalidState(
-                "vector root value count did not match feasible range weights",
-            ));
-        }
-        let mut numerator = 0.0;
-        let mut denominator = 0.0;
-        for (&value, &weight) in values.iter().zip(&self.weights) {
-            numerator += value * weight;
-            denominator += weight;
-        }
-        if !numerator.is_finite() || !denominator.is_finite() || denominator <= 0.0 {
-            return Err(SolverError::NumericOverflow);
-        }
-        Ok(numerator / denominator)
     }
 
     /// Evaluates the traverser's terminal utility for the subset of the

@@ -193,11 +193,6 @@ export type MultiwayProgressV3 = {
   seats: Array<{
     seat: number
     profileEv: Estimate | null
-    onlineTrainingEv?: {
-      mean: DecimalString
-      observations: UInt64String
-      totalWeight: DecimalString
-    } | null
     averagePositiveRegret: DecimalString | null
     strategyDriftL1: DecimalString | null
     deviationGain: Estimate | null

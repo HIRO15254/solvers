@@ -43,11 +43,11 @@ pub use settlement::{PotLayer, Settlement};
 pub use solver::{
     ActionProbability, CandidatePolicyCoverage, DenseNodeContext, DeviatorPolicy,
     DeviatorTrainingCoverage, DeviatorTrainingResult, ExternalSamplingGame, HistoryEntry,
-    HistoryKey, InfoKey, MultiwaySolver, OnlineTrainingEv, PolicyArenaAllocation, PolicyColumn,
-    PolicyEntry, PrivateInfo, ProfileEstimate, ProfileEvaluation, ProfileVariant,
-    ReferenceDeviationCoverage, ReferenceDeviationEvaluation, ReferenceDeviationWorld,
-    SolverConfig, SolverError, SolverMetrics, SolverState, StreetVisitCounts,
-    abstraction_fingerprint_with_recall,
+    HistoryKey, InfoKey, MultiwaySolver, PolicyArenaAllocation, PolicyColumn, PolicyEntry,
+    PrivateInfo, ProfileEstimate, ProfileEvaluation, ProfileVariant, PublicActionDestination,
+    PublicNodeAction, PublicNodeView, ReferenceDeviationCoverage, ReferenceDeviationEvaluation,
+    ReferenceDeviationWorld, SolverConfig, SolverError, SolverMetrics, SolverState,
+    StreetVisitCounts, abstraction_fingerprint_with_recall,
 };
 pub use tree::{PublicTree, TreeError};
 pub use types::{MwChips, SeatId, SeatMask, SeatVec, Street};

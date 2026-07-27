@@ -80,6 +80,8 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
+const ROOT_NODE_ID = "00000000000000000000000000000000"
+
 type SolveScreenProps = {
   profile: ConnectionProfileViewModel
   gateway: DesktopSolveGateway
@@ -136,6 +138,21 @@ export function SolveScreen({
   const [strategyMessage, setStrategyMessage] = useState<string | null>(null)
   const [chartScale, setChartScale] = useState<"log" | "linear">("log")
   const afterSequence = useRef<string | undefined>(undefined)
+  const requestedNodeId = useRef(ROOT_NODE_ID)
+
+  const acceptStrategy = useCallback((snapshot: LocalStrategySnapshot) => {
+    setStrategy(snapshot)
+    setStrategyMessage(null)
+    setSelectedEntry((current) => {
+      const entries = snapshot.view.entries
+      return (
+        entries.find((entry) => entry.id === current?.id) ??
+        entries.find((entry) => entry.status === "visited") ??
+        entries[0] ??
+        null
+      )
+    })
+  }, [])
 
   const refresh = useCallback(
     async (quiet = false) => {
@@ -175,18 +192,11 @@ export function SolveScreen({
           afterSequence.current = page.lastSequence
         }
         try {
-          const snapshot = await gateway.getStrategy(jobId)
-          setStrategy(snapshot)
-          setStrategyMessage(null)
-          setSelectedEntry((current) => {
-            const entries = snapshot.view.entries
-            return (
-              entries.find((entry) => entry.id === current?.id) ??
-              entries.find((entry) => entry.status === "visited") ??
-              entries[0] ??
-              null
-            )
-          })
+          const snapshot = await gateway.getStrategy(
+            jobId,
+            requestedNodeId.current
+          )
+          acceptStrategy(snapshot)
         } catch (error) {
           setStrategyMessage(errorMessage(error))
         }
@@ -200,7 +210,22 @@ export function SolveScreen({
         setRefreshing(false)
       }
     },
-    [gateway, jobId, profile.kind]
+    [acceptStrategy, gateway, jobId, profile.kind]
+  )
+
+  const navigateToNode = useCallback(
+    async (nodeId: string) => {
+      requestedNodeId.current = nodeId
+      setStrategy(null)
+      setSelectedEntry(null)
+      setStrategyMessage("選択したPreflop Nodeのsnapshotを待っています。")
+      try {
+        acceptStrategy(await gateway.getStrategy(jobId, nodeId))
+      } catch (error) {
+        setStrategyMessage(errorMessage(error))
+      }
+    },
+    [acceptStrategy, gateway, jobId]
   )
 
   useEffect(() => {
@@ -619,7 +644,7 @@ export function SolveScreen({
       <Card>
         <CardHeader className="border-b">
           <CardTitle className="flex items-center gap-2">
-            現在の戦略
+            Preflop Tree
             {strategy ? (
               <Badge
                 variant={strategy.status === "stale" ? "secondary" : "default"}
@@ -632,7 +657,7 @@ export function SolveScreen({
             {strategy
               ? `Linear average · revision ${strategy.revision} · as of ${formatInteger(strategy.asOfSweeps)} sweeps · ${strategy.node.street}`
               : (strategyMessage ??
-                "complete evaluation boundaryを待っています")}
+                "Root Nodeのlive snapshotを取得しています")}
           </CardDescription>
           {strategy ? (
             <CardAction>
@@ -647,11 +672,23 @@ export function SolveScreen({
             <>
               <div className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-2">
                 <div className="node-breadcrumb" aria-label="現在のnode">
-                  <strong>Root</strong>
-                  {strategy.node.breadcrumb.map((item, index) => (
-                    <span key={`${item.actorSeat}-${index}`}>
+                  <button
+                    className="font-semibold hover:underline disabled:no-underline"
+                    disabled={strategy.node.nodeId === ROOT_NODE_ID}
+                    onClick={() => void navigateToNode(ROOT_NODE_ID)}
+                    type="button"
+                  >
+                    Root
+                  </button>
+                  {strategy.node.breadcrumb.map((item) => (
+                    <button
+                      className="hover:underline"
+                      key={item.nodeId}
+                      onClick={() => void navigateToNode(item.nodeId)}
+                      type="button"
+                    >
                       / S{item.actorSeat} {item.actionLabel}
-                    </span>
+                    </button>
                   ))}
                 </div>
                 <span className="text-xs text-muted-foreground">
@@ -665,9 +702,24 @@ export function SolveScreen({
                 <div className="min-w-0 p-4">
                   <div className="mb-3 flex flex-wrap items-center gap-3">
                     {strategy.actions.map((action, index) => (
-                      <span
-                        className="flex items-center gap-1.5 text-xs"
+                      <Button
+                        className="h-7 gap-1.5 px-2 text-xs"
+                        disabled={action.childNodeId === null}
                         key={action.id}
+                        onClick={() =>
+                          action.childNodeId
+                            ? void navigateToNode(action.childNodeId)
+                            : undefined
+                        }
+                        size="sm"
+                        title={
+                          action.destination === "postflop"
+                            ? "Postflop NodeはSolve中の閲覧対象外です"
+                            : action.destination === "terminal"
+                              ? "Terminal action"
+                              : "次のPreflop Nodeを開く"
+                        }
+                        variant="outline"
                       >
                         <i
                           className="size-2 rounded-full"
@@ -676,7 +728,12 @@ export function SolveScreen({
                           }}
                         />
                         {action.label}
-                      </span>
+                        {action.destination === "postflop"
+                          ? " · Postflop"
+                          : action.destination === "terminal"
+                            ? " · Terminal"
+                            : ""}
+                      </Button>
                     ))}
                   </div>
                   {strategy.view.kind === "preflop-hand-classes" ? (

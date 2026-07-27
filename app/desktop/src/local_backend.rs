@@ -11,6 +11,7 @@ use cli::config::{GameSection, SolveConfig, UtilitySection};
 use formats::{
     MultiwayMetricsRow, MultiwayPublicAction, MultiwayStrategyBlock, MultiwayStrategyKey,
 };
+use multiway::HistoryKey;
 use rand::{RngCore, rngs::OsRng};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -19,6 +20,7 @@ const MAX_CONFIG_BYTES: u64 = 1024 * 1024;
 const MAX_RESULT_BYTES: u64 = 32 * 1024 * 1024;
 const MAX_PROGRESS_EVENTS: usize = 500;
 const ROOT_NODE_ID: &str = "00000000000000000000000000000000";
+const LIVE_STRATEGY_LEASE_MILLIS: u64 = 5_000;
 
 pub type EventSink = Arc<dyn Fn(LocalJobEvent) + Send + Sync + 'static>;
 
@@ -301,18 +303,9 @@ pub struct EstimateDto {
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct OnlineTrainingEvDto {
-    pub mean: String,
-    pub observations: String,
-    pub total_weight: String,
-}
-
-#[derive(Clone, Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SeatMetricsDto {
     pub seat: u8,
     pub profile_ev: Option<EstimateDto>,
-    pub online_training_ev: Option<OnlineTrainingEvDto>,
     pub average_positive_regret: Option<String>,
     pub strategy_drift_l1: Option<String>,
     pub deviation_gain: Option<EstimateDto>,
@@ -435,11 +428,14 @@ pub struct TypedActionDto {
     pub all_in: bool,
     pub full_raise: Option<bool>,
     pub label: String,
+    pub destination: &'static str,
+    pub child_node_id: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BreadcrumbDto {
+    pub node_id: String,
     pub actor_seat: u8,
     pub action: TypedActionDto,
 }
@@ -536,6 +532,19 @@ struct JobInner {
     error: Option<JobErrorDto>,
     latest_progress: Option<ProgressDto>,
     live_strategy: Option<StrategySnapshot>,
+    requested_live_node: Option<LiveNodeRequest>,
+}
+
+#[derive(Clone, Copy)]
+struct LiveNodeRequest {
+    history: HistoryKey,
+    expires_ms: u64,
+}
+
+impl LiveNodeRequest {
+    fn active_history_at(self, now_ms: u64) -> Option<HistoryKey> {
+        (self.expires_ms >= now_ms).then_some(self.history)
+    }
 }
 
 impl JobRecord {
@@ -975,6 +984,7 @@ impl LocalBackend {
                 error: None,
                 latest_progress: None,
                 live_strategy: None,
+                requested_live_node: None,
             }),
         });
         lock(&self.inner.jobs).insert(id.clone(), Arc::clone(&record));
@@ -1300,6 +1310,7 @@ impl LocalBackend {
                 error: None,
                 latest_progress: None,
                 live_strategy: None,
+                requested_live_node: None,
             }),
         });
         lock(&self.inner.jobs).insert(id, Arc::clone(&record));
@@ -1358,6 +1369,7 @@ impl LocalBackend {
                 error: None,
                 latest_progress: Some(imported_progress),
                 live_strategy: None,
+                requested_live_node: None,
             }),
         });
         lock(&self.inner.jobs).insert(id, Arc::clone(&record));
@@ -1509,15 +1521,31 @@ impl LocalBackend {
 
     pub fn get_strategy(&self, id: &str, node_id: Option<&str>) -> CommandResult<StrategySnapshot> {
         let record = self.job(id)?;
-        if node_id.is_none_or(|node| node == ROOT_NODE_ID)
-            && let Some(strategy) = lock(&record.inner).live_strategy.clone()
-            && !record
-                .paths
-                .solution
-                .as_ref()
-                .is_some_and(|path| path.is_file())
+        let requested_id = node_id.unwrap_or(ROOT_NODE_ID).to_ascii_lowercase();
+        if !record
+            .paths
+            .solution
+            .as_ref()
+            .is_some_and(|path| path.is_file())
         {
-            return Ok(strategy);
+            let requested = HistoryKey(parse_node_id(&requested_id)?);
+            let mut inner = lock(&record.inner);
+            inner.requested_live_node = Some(LiveNodeRequest {
+                history: requested,
+                expires_ms: unix_ms().saturating_add(LIVE_STRATEGY_LEASE_MILLIS),
+            });
+            if let Some(strategy) = inner
+                .live_strategy
+                .as_ref()
+                .filter(|strategy| strategy.node.node_id == requested_id)
+                .cloned()
+            {
+                return Ok(strategy);
+            }
+            return Err(CommandError::retryable(
+                "strategy_snapshot_pending",
+                "選択したPreflop Nodeのstrategyを次のlive更新で取得します。",
+            ));
         }
         let solution = record
             .paths
@@ -1530,7 +1558,7 @@ impl LocalBackend {
                     "正式strategyはsolution.mwsol生成後に閲覧できます。",
                 )
             })?;
-        strategy_snapshot(&record, solution, node_id.unwrap_or(ROOT_NODE_ID))
+        strategy_snapshot(&record, solution, &requested_id)
     }
 
     pub fn artifact_path(&self, id: &str, kind: ArtifactKind) -> CommandResult<PathBuf> {
@@ -1623,27 +1651,32 @@ fn run_worker(
         .expect("managed job has solution.mwsol");
     let config_hash = formats::config_hash(record.config_toml.as_bytes());
 
+    let request_record = Arc::clone(record);
+    let live_node_request = move || {
+        lock(&request_record.inner)
+            .requested_live_node
+            .and_then(|request| request.active_history_at(unix_ms()))
+    };
     let observation_record = Arc::clone(record);
     let observation_events = Arc::clone(&events);
     let mut observer = move |observation: cli::multiway_solve::MultiwayRunObservation| {
         let (progress, strategy) = match observation {
             cli::multiway_solve::MultiwayRunObservation::Quality(observation) => {
-                let mut progress = progress_from_metrics(&observation.metrics, &observation_record);
-                apply_online_training_ev(&mut progress, &observation.online_training_ev);
-                let strategy = live_root_snapshot(
+                let progress = progress_from_metrics(&observation.metrics, &observation_record);
+                let strategy = live_node_snapshot(
                     &observation_record,
                     observation.metrics.sweeps,
-                    &observation.root_strategy,
+                    observation.strategy_node.as_ref(),
                 );
                 (progress, strategy)
             }
             cli::multiway_solve::MultiwayRunObservation::Live(observation) => {
                 let previous = lock(&observation_record.inner).latest_progress.clone();
                 let progress = progress_from_live(&observation, &observation_record, previous);
-                let strategy = live_root_snapshot(
+                let strategy = live_node_snapshot(
                     &observation_record,
                     observation.sweeps,
-                    &observation.root_strategy,
+                    observation.strategy_node.as_ref(),
                 );
                 (progress, strategy)
             }
@@ -1665,7 +1698,7 @@ fn run_worker(
 
     let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         if is_resume {
-            cli::multiway_solve::resume_observed(
+            cli::multiway_solve::resume_observed_with_node(
                 &record.config_toml,
                 config,
                 Some(run_path),
@@ -1676,10 +1709,11 @@ fn run_worker(
                 Some(cancel.as_ref()),
                 reset_confirmations,
                 false,
+                &live_node_request,
                 &mut observer,
             )
         } else {
-            cli::multiway_solve::run_observed(
+            cli::multiway_solve::run_observed_with_node(
                 &record.config_toml,
                 config,
                 Some(run_path),
@@ -1689,6 +1723,7 @@ fn run_worker(
                 Some(solution_path),
                 Some(cancel.as_ref()),
                 false,
+                &live_node_request,
                 &mut observer,
             )
         }
@@ -1795,38 +1830,7 @@ fn progress_from_live(
     progress.hand_updates_per_second = (live.elapsed_secs > 0.0)
         .then(|| finite_decimal(live.hand_updates as f64 / live.elapsed_secs));
     progress.checkpoint = checkpoint_progress(record);
-    apply_online_training_ev(&mut progress, &live.online_training_ev);
     progress
-}
-
-fn apply_online_training_ev(
-    progress: &mut ProgressDto,
-    estimates: &[cli::multiway_solve::LiveOnlineTrainingEv],
-) {
-    for estimate in estimates {
-        let online = OnlineTrainingEvDto {
-            mean: finite_decimal(estimate.mean),
-            observations: estimate.observations.to_string(),
-            total_weight: finite_decimal(estimate.total_weight),
-        };
-        if let Some(seat) = progress
-            .seats
-            .iter_mut()
-            .find(|seat| seat.seat == estimate.seat)
-        {
-            seat.online_training_ev = Some(online);
-        } else {
-            progress.seats.push(SeatMetricsDto {
-                seat: estimate.seat,
-                profile_ev: None,
-                online_training_ev: Some(online),
-                average_positive_regret: None,
-                strategy_drift_l1: None,
-                deviation_gain: None,
-            });
-        }
-    }
-    progress.seats.sort_unstable_by_key(|seat| seat.seat);
 }
 
 fn progress_from_solution(
@@ -1855,7 +1859,6 @@ fn seat_metrics_dto(metrics: &formats::MultiwaySeatMetrics) -> SeatMetricsDto {
     SeatMetricsDto {
         seat: metrics.seat,
         profile_ev: metrics.profile_ev.as_ref().map(estimate_dto),
-        online_training_ev: None,
         average_positive_regret: Some(finite_decimal(metrics.average_positive_regret)),
         strategy_drift_l1: Some(finite_decimal(metrics.strategy_drift_l1)),
         deviation_gain: metrics
@@ -1869,7 +1872,6 @@ fn seat_result_dto(result: &formats::MultiwaySeatResult) -> SeatMetricsDto {
     SeatMetricsDto {
         seat: result.seat,
         profile_ev: result.profile_ev.as_ref().map(estimate_dto),
-        online_training_ev: None,
         average_positive_regret: Some(finite_decimal(result.average_positive_regret)),
         strategy_drift_l1: Some(finite_decimal(result.strategy_drift_l1)),
         deviation_gain: result.deviation_gain_lower_bound.as_ref().map(estimate_dto),
@@ -1900,20 +1902,28 @@ fn checkpoint_progress(record: &JobRecord) -> CheckpointProgressDto {
     }
 }
 
-fn live_root_snapshot(
+fn live_node_snapshot(
     record: &JobRecord,
     sweeps: u64,
-    root_strategy: &[cli::multiway_solve::LiveRootStrategyEntry],
+    node: Option<&cli::multiway_solve::LiveStrategyNode>,
 ) -> Option<StrategySnapshot> {
-    let first = root_strategy.first()?;
-    let actor = first.key.player;
-    let active_opponents = first.key.active_opponents;
-    let actions = first
+    let node = node?;
+    if node.street != 0 {
+        return None;
+    }
+    let actor = node.actor;
+    let actions = node
         .actions
         .iter()
-        .map(|label| typed_action_from_label(label))
+        .map(|action| {
+            let mut typed = typed_action_from_label(&action.action);
+            typed.destination = action.destination;
+            typed.child_node_id = action.child.map(|child| hex(&child.0));
+            typed
+        })
         .collect::<Vec<_>>();
-    let by_bucket: BTreeMap<u32, &cli::multiway_solve::LiveRootStrategyEntry> = root_strategy
+    let by_bucket: BTreeMap<u32, &cli::multiway_solve::LiveStrategyEntry> = node
+        .strategy
         .iter()
         .filter(|entry| entry.key.player == actor && entry.key.street == 0)
         .map(|entry| (entry.key.bucket_path[0], entry))
@@ -1960,12 +1970,20 @@ fn live_root_snapshot(
         as_of_sweeps: sweeps.to_string(),
         current_sweeps: sweeps.to_string(),
         node: StrategyNodeDto {
-            node_id: ROOT_NODE_ID.into(),
+            node_id: hex(&node.history.0),
             actor_seat: actor,
             street: "preflop".into(),
             pot_milli_bb: None,
-            active_opponents,
-            breadcrumb: Vec::new(),
+            active_opponents: node.active_opponents,
+            breadcrumb: node
+                .breadcrumb
+                .iter()
+                .map(|item| BreadcrumbDto {
+                    node_id: hex(&item.node.0),
+                    actor_seat: item.actor,
+                    action: typed_action_from_label(&item.action),
+                })
+                .collect(),
         },
         actions,
         view: StrategyViewDto {
@@ -2234,13 +2252,19 @@ fn strategy_snapshot(
             usize::from(total > 0) as f64,
         )
     };
+    let mut breadcrumb_cursor = HistoryKey::ROOT;
     let breadcrumb = metadata
         .resolve_history(history)
         .unwrap_or_default()
         .into_iter()
-        .map(|action| BreadcrumbDto {
-            actor_seat: action.actor,
-            action: typed_action_from_label(&action.action),
+        .map(|action| {
+            breadcrumb_cursor =
+                breadcrumb_cursor.child(action.actor as usize, action.action_index as usize);
+            BreadcrumbDto {
+                node_id: hex(&breadcrumb_cursor.0),
+                actor_seat: action.actor,
+                action: typed_action_from_label(&action.action),
+            }
         })
         .collect();
     let active_opponents = blocks
@@ -2312,6 +2336,8 @@ fn typed_action(action: &MultiwayPublicAction) -> TypedActionDto {
         all_in,
         full_raise,
         label,
+        destination: "unknown",
+        child_node_id: None,
     }
 }
 
@@ -2330,6 +2356,8 @@ fn typed_action_from_label(label: &str) -> TypedActionDto {
         all_in,
         full_raise: None,
         label: label.into(),
+        destination: "unknown",
+        child_node_id: None,
     }
 }
 
@@ -2966,6 +2994,17 @@ mod tests {
     }
 
     #[test]
+    fn live_node_request_expires_when_the_ui_stops_polling() {
+        let history = HistoryKey::ROOT.child(2, 3);
+        let request = LiveNodeRequest {
+            history,
+            expires_ms: 10_000,
+        };
+        assert_eq!(request.active_history_at(10_000), Some(history));
+        assert_eq!(request.active_history_at(10_001), None);
+    }
+
+    #[test]
     fn fixed_point_probabilities_sum_exactly() {
         let encoded = quantize_u16(&[0.333_333_34, 0.333_333_34, 0.333_333_34]);
         assert_eq!(
@@ -3542,7 +3581,6 @@ action = "raise"
                     stderr: "0.01".into(),
                     ci95: ["0.08".into(), "0.12".into()],
                 }),
-                online_training_ev: None,
                 average_positive_regret: Some("0.2".into()),
                 strategy_drift_l1: Some("0.3".into()),
                 deviation_gain: None,
@@ -3571,7 +3609,6 @@ action = "raise"
                         "stderr": "0.01",
                         "ci95": ["0.08", "0.12"]
                     },
-                    "onlineTrainingEv": null,
                     "averagePositiveRegret": "0.2",
                     "strategyDriftL1": "0.3",
                     "deviationGain": null
@@ -3603,6 +3640,8 @@ action = "raise"
                 all_in: false,
                 full_raise: None,
                 label: "fold".into(),
+                destination: "terminal",
+                child_node_id: None,
             }],
             view: StrategyViewDto {
                 kind: "preflop-hand-classes".into(),

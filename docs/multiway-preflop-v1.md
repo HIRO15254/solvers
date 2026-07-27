@@ -209,14 +209,13 @@ sweep/time limit as convergence.
 
 For the Local GUI, the solver may publish a live observation after a completed
 sweep batch, initially after the first batch and then throttled to roughly two
-seconds. The root strategy in that observation is still the linear average
-strategy. `onlineTrainingEv` is a separate, linear-sweep-weighted average of
-the root returns already produced by each seat's MCCFR training traversal. It
-tracks the changing regret-matched training profile, is not held out, has no
-confidence interval, and is never used as a formal profile EV, quality metric,
-or stopping input. Its accumulator is process-segment-local and resets on
-resume. These live observations add no evaluation traversals and are not
-appended as two-second rows to `progress.jsonl`.
+seconds. It reads the linear average strategy only for the one preflop node
+currently requested by the GUI and classifies each action as another preflop
+decision, a postflop boundary, or terminal. It does not evaluate EV, expose
+postflop nodes, or snapshot every preflop node. These live observations add no
+evaluation traversals. The request uses a short lease, so strategy scans stop
+after GUI polling stops. Observations are not appended as two-second rows to
+`progress.jsonl`.
 At an evaluation or stopping boundary, the pre-evaluation live event is
 deferred. The solver publishes one post-quality observation—including trained
 deviation when the stop rule is due—then writes the checkpoint. It does not

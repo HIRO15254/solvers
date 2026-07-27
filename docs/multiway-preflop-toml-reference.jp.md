@@ -440,14 +440,12 @@ arena上限だけを8 GiB RSS保証として扱わない。
 停止評価はtrained deviatorを含み、`evaluation_samples`、
 `deviator_traversals` を0にして無効化できない。
 
-これらの停止評価とは別に、Local GUIは完了したsweep batchからrootのLinear average
-strategyと`onlineTrainingEv`を、最初のbatch後および以後おおむね2秒ごとに更新する。
-`onlineTrainingEv`は各seatのtraining traversalのroot returnをsweepのLinear weightで
-累積した、process segment内だけの非held-out telemetryである。追加設定はなく、
-checkpointへ保存せずresume時にリセットする。CI、正式profile EV、停止判定、
-`progress.jsonl`/solutionの記録値には使用しない。evaluation/停止判定境界では
-pre-evaluationのlive更新を抑止し、trained deviationを含むquality評価後の1回だけを
-publishしてからcheckpointを書く。
+これらの停止評価とは別に、Local GUIは完了したsweep batchから、GUIが選択している
+1つのPreflop nodeのLinear average strategyだけを、最初のbatch後および以後おおむね
+2秒ごとに更新する。Postflop node、EV、非表示Nodeのstrategyは計算しない。追加設定はなく、
+GUI pollingで更新する短いleaseが切れればstrategy scanも停止する。高頻度snapshotは
+checkpointや`progress.jsonl`へ保存しない。evaluation/停止判定境界では
+pre-evaluationのlive更新を抑止し、quality評価後の1回だけをpublishしてからcheckpointを書く。
 
 ## `[output]`
 

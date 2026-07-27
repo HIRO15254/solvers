@@ -61,6 +61,8 @@ type NativeTypedAction = {
   allIn: boolean
   fullRaise: boolean | null
   label: string
+  destination: "preflop" | "postflop" | "terminal" | "unknown"
+  childNodeId: string | null
 }
 
 type NativeStrategyEntry = {
@@ -89,7 +91,11 @@ type NativeStrategySnapshot = {
     street: "preflop" | "flop" | "turn" | "river"
     potMilliBb: number | string | null
     activeOpponents: number
-    breadcrumb: Array<{ actorSeat: number; action: NativeTypedAction }>
+    breadcrumb: Array<{
+      nodeId: string
+      actorSeat: number
+      action: NativeTypedAction
+    }>
   }
   actions: NativeTypedAction[]
   view: {
@@ -115,9 +121,18 @@ export type LocalStrategySnapshot = {
     street: "preflop" | "flop" | "turn" | "river"
     potMilliBb: string | null
     activeOpponents: number
-    breadcrumb: Array<{ actorSeat: number; actionLabel: string }>
+    breadcrumb: Array<{
+      nodeId: string
+      actorSeat: number
+      actionLabel: string
+    }>
   }
-  actions: TypedAction[]
+  actions: Array<
+    TypedAction & {
+      destination: "preflop" | "postflop" | "terminal" | "unknown"
+      childNodeId: string | null
+    }
+  >
   view: {
     kind: "preflop-hand-classes" | "postflop-buckets"
     entries: StrategyEntry[]
@@ -213,6 +228,7 @@ function normalizeStrategy(
       potMilliBb:
         source.node.potMilliBb === null ? null : String(source.node.potMilliBb),
       breadcrumb: source.node.breadcrumb.map((item) => ({
+        nodeId: item.nodeId,
         actorSeat: item.actorSeat,
         actionLabel: item.action.label,
       })),
@@ -221,6 +237,8 @@ function normalizeStrategy(
       ...action,
       amountMilliBb:
         action.amountMilliBb === null ? null : String(action.amountMilliBb),
+      destination: action.destination,
+      childNodeId: action.childNodeId,
     })),
     view: {
       kind: source.view.kind,

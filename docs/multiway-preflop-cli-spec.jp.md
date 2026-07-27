@@ -462,15 +462,12 @@ kind = "regret-based"
 unvisited infosetをuniform strategyとして捏造しない。
 
 Local GUI向けlive observationは、完了したsweep batchの境界で取得し、最初のbatch後と
-以後おおむね2秒ごとに配信できる。ここでroot strategyは同じLinear averageを使う。
-`onlineTrainingEv`は各seatのMCCFR traversalが既に計算したroot returnを、そのsweepの
-Linear weightで累積した補助telemetryである。これは変化中のregret-matched training
-profile上の非held-out推定であり、CIを持たず、正式なaverage-profile EV、quality metric、
-停止判定、artifact記録値のいずれにも使わない。累積値はprocess segment内だけに保持し、
-checkpoint/resume時は0から再開する。live observationのために追加のevaluation traversalを
-実行しない。evaluation/停止判定境界では直前のlive eventを抑止し、trained deviationを
-含むquality評価の完了後に1回だけpublishしてからcheckpointを書く。同一sweepの
-pre-evaluation値、post-deviator値、final値を連続publishしない。
+以後おおむね2秒ごとに配信できる。GUIが要求した1つのPreflop nodeについてだけ同じ
+Linear average strategyを読み、actionごとの次のPreflop decision、
+Postflop境界、terminalを返す。Postflop node、EV、全Preflop node strategyの一括snapshotは
+計算しない。GUI requestは短いleaseで、pollingが止まればstrategy scanも停止する。
+evaluation/停止判定境界では直前のlive eventを抑止し、quality評価の完了後に1回だけ
+publishしてからcheckpointを書く。
 
 ## 7. Runtime、停止、resume
 
@@ -584,7 +581,7 @@ my-run/
   fingerprint、profile type、保証境界、units、quality summary、timestamps。
 - `progress.jsonl`: monotonic event sequence。sweep/evaluation/checkpoint/resource warning、
   resume segmentを追記する。
-- GUIの高頻度`onlineTrainingEv`/root-strategy observationはephemeral transport stateで、
+- GUIの高頻度selected-preflop-strategy observationはephemeral transport stateで、
   `progress.jsonl`へ2秒ごとの行を追加しない。
 - `solution.mwsol`: 閲覧・評価・export用の正式average strategy。
 - `checkpoint.mwckpt`: regret等を含む再開用state。

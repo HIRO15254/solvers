@@ -251,8 +251,6 @@ Multiway で表示する正式指標:
 - sweeps / max sweeps
 - elapsed time
 - memory、traversals / second、hand updates / second、infosets
-- seat EV / CI
-- online training EV（training traversalのroot return。CIなし、停止判定には不使用）
 - average positive regret
 - strategy drift
 - measured deviation の one-sided 95% CI upper bound
@@ -272,13 +270,14 @@ regret-matched strategy を正式 profile として表示しない。
 
 Localは完了したsweep batchの直後に最初のsnapshotをpublishし、以後はbatch境界で
 おおむね2秒にthrottleして更新する。1 batch自体が2秒を超える場合は、partial batchを
-読まず、そのbatch完了後に更新する。`onlineTrainingEv`は同じobservationで配信するが、
-変化中のtraining profileから得た非held-out telemetryとして明確に分離し、profile EV
-やquality chartへ混ぜない。resumeで累積はリセットされる。
+読まず、そのbatch完了後に更新する。Solve中はGUIが選択中の1つのPreflop nodeだけを読み、
+actionから別のPreflop nodeへ移動できる。Postflop境界とterminalは表示するが遷移せず、
+EVと非表示Nodeのstrategyは計算しない。requestはpollingで更新する短いleaseとし、
+画面を離れた後はstrategy scanを停止する。
 evaluation/停止判定境界では、その直前のlive snapshotを別eventとして表示せず、
 trained deviationを含むquality評価後のsnapshotを1回だけ表示してからcheckpoint状態を
 更新する。polling時は古い`progress.jsonl`行より新しいin-memory live observationを
-優先し、sweeps、elapsed、rate、online training EVを古い値へ巻き戻さない。
+優先し、sweeps、elapsed、rateを古い値へ巻き戻さない。
 
 header に必ず次を表示する。
 
@@ -670,11 +669,6 @@ type MultiwayProgressV3 = {
   seats: Array<{
     seat: number
     profileEv: Estimate | null
-    onlineTrainingEv: {
-      mean: DecimalString
-      observations: UInt64String
-      totalWeight: DecimalString
-    } | null
     averagePositiveRegret: DecimalString | null
     strategyDriftL1: DecimalString | null
     deviationGain: Estimate | null
@@ -916,8 +910,8 @@ immutable average snapshotをpublishする。高頻度observationはephemeralで
 - `stale`: 最新 scheduled boundary の publish に失敗し、前回 snapshot を返した。
 - `final`: `target-reached` / `sweep-limit` / `time-limit` の formal solution と一致。
 
-snapshotがまだ1件もなく、訪問済みroot strategyもなければHTTP 409
-`snapshot_not_available_yet`。`cancelled` / `resource-limit` / `failed`はformal
+requested nodeのsnapshotがまだなければretryable
+`strategy_snapshot_pending`。`cancelled` / `resource-limit` / `failed`はformal
 solution由来の`final`を生成しない。最後のcomplete sweepで取得できたaverage
 snapshot（terminal observationを含む）があれば`stale`として表示する。
 

@@ -559,11 +559,6 @@ fn dominated_action_disappears_from_current_and_average_policy() {
     assert_eq!(metrics.traversals, 200);
     assert_eq!(metrics.average_positive_regret.len(), 2);
     assert!(metrics.infosets >= 1);
-    let online = solver.online_training_ev();
-    assert_eq!(online.len(), 2);
-    assert!(online.iter().all(|estimate| estimate.observations == 100
-        && estimate.mean.is_finite()
-        && estimate.total_weight > 0.0));
 }
 
 #[test]
@@ -1230,17 +1225,10 @@ fn ordered_deltas_make_thread_counts_and_resume_bit_identical() {
         state,
     )
     .unwrap();
-    assert!(resumed.online_training_ev().is_empty());
     resumed.run_sweeps_with_threads(23, 4).unwrap();
 
     assert_eq!(uninterrupted.snapshot_state(), resumed.snapshot_state());
     assert_eq!(uninterrupted.metrics(), resumed.metrics());
-    assert!(
-        resumed
-            .online_training_ev()
-            .iter()
-            .all(|estimate| estimate.observations == 23)
-    );
 }
 
 #[test]
@@ -1287,10 +1275,6 @@ fn observed_sweep_batches_report_committed_state_without_changing_results() {
 
     assert_eq!(boundaries, vec![4, 8, 10]);
     assert_eq!(observed.snapshot_state(), reference.snapshot_state());
-    assert_eq!(
-        observed.online_training_ev(),
-        reference.online_training_ev()
-    );
 }
 
 #[test]
@@ -2290,18 +2274,10 @@ fn vector_traverser_is_deterministic_across_thread_counts_and_reruns() {
         multi_threaded.snapshot_state()
     );
     assert_eq!(single_threaded.metrics(), multi_threaded.metrics());
-    assert_eq!(
-        single_threaded.online_training_ev(),
-        multi_threaded.online_training_ev()
-    );
 
     let mut rerun = dense_vector_toy_solver(4104, 1);
     rerun.run_sweeps_with_threads(20, 4).unwrap();
     assert_eq!(single_threaded.snapshot_state(), rerun.snapshot_state());
-    assert_eq!(
-        single_threaded.online_training_ev(),
-        rerun.online_training_ev()
-    );
 }
 
 #[test]
@@ -2742,6 +2718,24 @@ fn street_recall_node_children_and_strategies_at_use_the_enumerated_tree() {
             .expect("child is enumerated");
         assert_eq!(resolved, *child);
     }
+    let root = solver
+        .public_node_view(HistoryKey::ROOT)
+        .expect("dense root metadata");
+    assert_eq!(root.street, Street::Preflop);
+    assert_eq!(root.actor, 0);
+    assert_eq!(root.actions.len(), 2);
+    let mut navigable_children = root
+        .actions
+        .iter()
+        .filter_map(|action| match action.destination {
+            PublicActionDestination::PreflopDecision(history) => Some(history),
+            PublicActionDestination::PostflopBoundary | PublicActionDestination::Terminal => None,
+        })
+        .collect::<Vec<_>>();
+    navigable_children.sort_unstable();
+    let mut expected_children = children.iter().map(|child| child.key).collect::<Vec<_>>();
+    expected_children.sort_unstable();
+    assert_eq!(navigable_children, expected_children);
 
     let rows = solver.strategies_at(HistoryKey::ROOT);
     assert!(!rows.is_empty());
