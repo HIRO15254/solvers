@@ -656,8 +656,7 @@ export function SolveScreen({
           <CardDescription>
             {strategy
               ? `Linear average · revision ${strategy.revision} · as of ${formatInteger(strategy.asOfSweeps)} sweeps · ${strategy.node.street}`
-              : (strategyMessage ??
-                "Root Nodeのlive snapshotを取得しています")}
+              : (strategyMessage ?? "Root Nodeのlive snapshotを取得しています")}
           </CardDescription>
           {strategy ? (
             <CardAction>

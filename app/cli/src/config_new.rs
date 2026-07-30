@@ -115,7 +115,7 @@ mod tests {
 
     #[test]
     fn toml_reference_covers_the_public_surface() {
-        let reference = include_str!("../../../docs/multiway-preflop-toml-reference.jp.md");
+        let reference = include_str!("../../../docs/multiway-preflop-v1.jp.md");
         for token in [
             "schema",
             "seat_count",

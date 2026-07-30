@@ -17,8 +17,8 @@ node・policy slot・Solver state memoryも検証します。6-max既定値に�
 postflop checkdown ruleが1件あり、
 削除すると組み込みstandard full treeへ戻ります。
 Remote profileは仕様とUIのみで、networkへjobを送信しません。ブラウザー単体の
-previewではnative操作を明示的に無効化します。仕様は
-`../../docs/gui-spec.jp.md`を参照してください。
+previewではnative操作を明示的に無効化します。利用方法は
+`../../docs/user-guide.jp.md`、内部境界は`../../docs/architecture.md`を参照してください。
 
 ```sh
 bun ci

@@ -1,4 +1,4 @@
-# Bucketed blueprint game (M6 slice 4) — design
+# Bucketed blueprint game — research design
 
 Mode B の最終形態(Monker 級)への最初の一歩。169-class の lossless preflop trunk に、
 EHS² バケツ空間上のポストフロップ・ベッティングを **1 本の `PublicTree`** として接続し、

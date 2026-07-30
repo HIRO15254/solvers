@@ -249,7 +249,7 @@ pub struct StreetBettingConfig {
     /// nodes, not even checks; play proceeds straight to the next street (or
     /// showdown). `None` (default) preserves unlimited betting, so every
     /// config predating this field serializes identically and keeps its game
-    /// fingerprint. See `docs/multiway-preflop.md`. Rejected on preflop and
+    /// fingerprint. See `docs/multiway-preflop-v1.jp.md`. Rejected on preflop and
     /// must be at least `1` when present; also a public-tree property, so a
     /// per-seat betting override must not disagree with the table's value
     /// for the same street (see [`MultiwayConfig::validate`]).
@@ -377,7 +377,7 @@ pub struct AbstractionConfig {
     /// `Full` (the default) is unchanged sparse, full-recall behavior.
     /// `Street` switches to a bounded-memory dense arena keyed only by the
     /// current street's bucket (a Monker/Pluribus-style imperfect-recall
-    /// abstraction); see `docs/multiway-preflop.md`. Skipped when `Full` so
+    /// abstraction); see `docs/multiway-preflop-v1.jp.md`. Skipped when `Full` so
     /// every legacy config predating this field keeps identical serialized
     /// bytes/config hashes. Recall is independently excluded from game
     /// identity and included in abstraction identity.

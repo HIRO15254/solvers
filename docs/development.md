@@ -1,4 +1,44 @@
-# Benchmarking
+# 開発・検証ガイド
+
+この文書は、開発時の検証、benchmark、残タスクをまとめる。
+
+## 必須検証
+
+通常の変更は最低限次を通す。
+
+```sh
+cargo fmt --all --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+
+cd app/ui
+bun run typecheck
+bun run lint
+bun test
+bun run build
+```
+
+loopback HTTP testがsandboxのbind制限で失敗した場合は、ポート利用可能な環境で同じ
+testを再実行する。Production EHS² table buildや大規模solveとして`#[ignore]`された
+acceptance testは、release acceptance時に明示実行する。
+
+Multiway v1のTOML surfaceを変える場合は、parser/runtimeだけでなく
+`docs/multiway-preflop-v1.jp.md`、template、examples、fingerprint、
+checkpoint/solution metadataを同じchange setで更新する。
+
+## 現行roadmap
+
+- Remote GUI v3: credential、capability handshake、durable job、event replay、
+  managed artifact、child resume。
+- Desktop distribution: macOS/Windows/Linux build、署名、notarization、installer。
+- HU preflop / exact postflopのGUI設定とversioned transport。
+- Multiway abstraction品質: bucket数・action abstractionと外部検証の再現可能な比較。
+- Viewer/研究workflow: artifact query、Python/WASM境界の必要性を実測で判断する。
+
+完了済みmilestoneの時系列日誌は現行文書へ追記せず、Git履歴と
+`docs/validation/`の再現可能な証拠から参照する。
+
+## Benchmarking
 
 Two complementary layers: a criterion micro/macro-bench suite for fast local
 A/B iteration on the hot code paths, and a "bench bar" recipe (a single real
@@ -61,7 +101,7 @@ of changes) whenever the baseline itself should move.
 
 ## Bench bar
 
-Roadmap M3 exit criteria (see `docs/roadmap.md`), measured on
+Historical M3 exit criteria, measured on
 `examples/3betpot_fast.toml` (a 100bb 3-bet-pot flop spot, calibrated with
 `holdem::memory_usage` to ~1.29 GB of f32 storage -- see that file's header
 comment) at `target_nash_conv = 0.2`, i.e. 0.1% of the 200-chip-x10-unit pot:
@@ -156,7 +196,7 @@ the post-LTO symbols, on this sandbox's `target-cpu=native` codegen:
 | `PostflopEvaluator::eval` → `showdown_kernel` | scalar (f64) | sorted-rank sweep with loop-carried prefix sums and per-card `[f64; 52]` inclusion-exclusion bookkeeping — algorithmically sequential, out of SIMD scope by design |
 | `PostflopEvaluator::eval` → fold kernel | scalar (f64) | same per-card bookkeeping structure |
 
-**`wide` SIMD decision (roadmap M3)**: no `wide` code lands. The evidence
+**`wide` SIMD decision**: no `wide` code lands. The evidence
 gate was "audit shows scalar AND micro-benches show the op is material AND a
 `wide` rewrite beats the baseline" — the audit shows every material
 per-iteration loop already auto-vectorizes post-LTO, and the remaining scalar

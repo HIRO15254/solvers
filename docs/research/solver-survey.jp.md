@@ -1,9 +1,9 @@
-# 抽象化・高速化手法サーベイと採用計画
+# 抽象化・高速化手法サーベイ
 
 > 本書は 2026-07 時点の Web 調査(6 テーマ並列)の成果物である。前半は技法サーベイと
 > 本プロジェクトでの採用計画、後半は調査テーマ毎の詳細所見と参考文献。
-> アーキテクチャへの反映は [architecture.md](architecture.md)、実装順は
-> [roadmap.md](roadmap.md) を参照。
+> アーキテクチャへの反映は [../architecture.md](../architecture.md)、実装順は
+> 現行の採用状況と残タスクは[../development.md](../development.md)を参照。
 >
 > 採用判断の補足: 調査は hand evaluator として `holdem-hand-evaluator`(MIT)を第一候補に
 > 挙げたが、crates.io 未公開(git 直依存が必要)のため、同等の OMPEval 系で変種評価も備える
@@ -495,4 +495,3 @@ For a research solver, the minimal-effort path is: stabilize the Rust library AP
 - [GTO Wizard blog — Custom Aggregated Reports (custom ranges, rake, ICM, bounties)](https://blog.gtowizard.com/introducing_custom_aggregated_reports/)
 - [wasm-bindgen-rayon — rayon thread pools in WebAssembly (COOP/COEP required)](https://docs.rs/wasm-bindgen-rayon)
 - [pyrust-poker — PyO3/maturin Rust poker library precedent for notebooks](https://pypi.org/project/pyrust-poker/)
-

@@ -4,7 +4,7 @@
 //! at realistic postflop-node shapes: `A = 3` actions (a typical
 //! bet/call/fold-shaped node), `H = 1,326` hands (every hold'em combo).
 //!
-//! Run with `cargo bench -p engine` (see `docs/bench.md`'s "Criterion
+//! Run with `cargo bench -p engine` (see `docs/development.md`'s "Criterion
 //! suite" section for the full A/B workflow via `--save-baseline`/
 //! `--baseline`); `cargo bench -p engine -- --test` runs one iteration per
 //! bench as a compile+smoke-test check.

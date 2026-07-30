@@ -1,12 +1,39 @@
-# Multiway Preflop v1 TOML 完全リファレンス
+# Multiway Preflop v1 規範仕様
 
 対象schema: `solvers.multiway-preflop/v1`
-規範仕様: [multiway-preflop-cli-spec.jp.md](multiway-preflop-cli-spec.jp.md)
-運用ガイド: [multiway-preflop-v1.md](multiway-preflop-v1.md)
+利用・運用ガイド: [user-guide.jp.md](user-guide.jp.md)
+全体設計: [architecture.md](architecture.md)
 
-この文書は、現行のMultiway Preflop v1 parserが受け付けるTOML surfaceを
-人間とAIの双方が検索しやすい形で列挙する。規範仕様と矛盾する場合は規範仕様を優先する。
+この文書をProduction Multiway Preflop v1の唯一の規範仕様とする。現行parserが
+受け付けるTOML surface、計算モデル、停止判定、成果物契約を、人間とAIの双方が
+検索しやすい形で列挙する。
 全tableはunknown keyを拒否し、ここにないlegacy keyを黙って無視しない。
+
+## 契約の境界
+
+- 対象は2〜9 seatのNLHE Multiway Preflop Production solve。
+- 正式profileはreach-weighted Linear average strategy。current strategyや
+  live閲覧用snapshotを正式solutionとして扱わない。
+- Production abstractionはEHS² percentile、information recallはcurrent-streetだけ。
+- Public treeとpolicy arenaはSolve前に完全列挙・preallocate・page touchする。
+- Postflopはterminal utilityを得るために走査するが、GUI閲覧・solution exportの
+  対象はPreflop nodeだけ。
+- 3人以上の結果はregret-minimized approximationであり、Nash/GTO保証はしない。
+- configはstrictで、unknown、retired、別mode専用keyをerrorにする。
+
+### 計算と停止判定
+
+1 sweepは各seatが1回ずつtraverserとなるExternal-Sampling MCCFR更新である。
+相手actionはsampleし、traverser actionは全分岐する。regretとLinear average
+strategyの更新がSolve本体である。
+
+`run.stop`が有効な場合、`check_every_sweeps`境界で平均profile評価とtrained
+deviator評価を行う。全seatについてdeviation gainの95% CI upperがtarget以下となる
+確認を`confirmations`回連続で満たしたときだけ`target-reached`とする。
+`max_sweeps`と`max_time`は安全budgetであり、到達自体は収束を意味しない。
+
+GUI閲覧用のEV、Postflop strategy、全Preflop Node snapshotは生成しない。
+live Tree閲覧時だけ要求中のPreflop Node 1個のaverage strategyを読み取る。
 
 ## 共通規則
 
@@ -581,13 +608,13 @@ solvers validate config.toml --write-effective effective.toml
 solvers solve config.toml --out runs/my-run
 ```
 
-実装状況（2026-07-25）: 現行`validate`はschema、数値・条件付きsemantic、
+CLIの`validate`はschema、数値・条件付きsemantic、
 economics、normalization/effective-config出力までで、tree compile、
 abstraction到達数、resource/fingerprint/output preflightはsolve時にのみ
 実行される。solve時は固定node capではなくdense-arena byte preflightを行い、
 成功後に全arenaをfallible allocation/page-touchしてからだけsweep 0を開始する。
-validate単体がこのsolve-time resource barrierまで実行しない点は規範v1 contractに
-対する既知の実装gapである。
+CLIの`validate`単体はこのsolve-time resource barrierまで実行しない。Desktopの
+Setup preflightはtreeとresource estimateも実行する。
 
 v1 solve-time overrideは `--threads`、`--memory`、`--max-time` のみ。
 generic `--set` はなく、legacyの個別output flagはv1では拒否される。
@@ -597,10 +624,9 @@ generic `--set` はなく、legacyの個別output flagはv1では拒否される
 TOML surface、型、enum、既定値、条件付きvalidation、単位、path解決のいずれかを
 変更する場合は、同じchange setで次を同期する。
 
-1. 規範仕様 `docs/multiway-preflop-cli-spec.jp.md`
-2. この完全リファレンス
-3. `docs/multiway-preflop-v1.md`
-4. typed parser/runtime、template、CLI help
-5. tests、examples、fingerprint、checkpoint/solution metadata
+1. この規範仕様
+2. `docs/user-guide.jp.md`の利用者向け説明
+3. typed parser/runtime、template、CLI help
+4. tests、examples、fingerprint、checkpoint/solution metadata
 
 AIはこれらが一致しない状態でMultiway Preflopの仕様変更を完了扱いにしてはならない。

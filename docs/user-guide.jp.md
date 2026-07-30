@@ -1,10 +1,9 @@
-# このプリフロップソルバーは何をしているか
+# Solvers 利用ガイド
 
 `solvers` のマルチウェイプリフロップソルバー(`crates/multiway` + CLI/GUI)が
 「何を入力に、どういう計算をして、何を出すのか」を、実装の技術詳細より一段上の
-視点で説明する。Production CLIの確定仕様は `docs/multiway-preflop-cli-spec.jp.md`、
-現行実装の挙動は `docs/multiway-preflop.md`、全体設計は
-`docs/architecture.md` を参照。
+視点で説明し、CLIとGUIの実行手順をまとめる。Production契約と全TOML項目は
+`docs/multiway-preflop-v1.jp.md`、内部設計は`docs/architecture.md`を参照。
 
 ---
 
@@ -77,9 +76,8 @@ external sampling では、1 回の走査(traversal)で:
   減衰させ、収束を速める)。
 - **早期ディスカウント**: 序盤の累積 regret を周期的に減衰させる
   (Pluribus 系の慣行)。
-- **`run.sweep_batch`**: N sweep 分の走査をまとめて並列発行し、席数を超える
-  並列度を得る(N>1 は結果が変わるが品質はほぼ同等。詳細は
-  `docs/multiway-preflop.md` の Sweep batching 節)。
+- **`solver.batch_sweeps`**: N sweep 分の走査をまとめて並列発行し、席数を超える
+  並列度を得る(N>1 は結果が変わるが品質はほぼ同等。規範仕様の該当keyを参照)。
 
 ## 4. 抽象化: なぜ現実的な時間で解けるのか
 
@@ -150,7 +148,7 @@ HU エンジンが持つ exploitability / NashConv とは意図的に別名に�
   違う再開は拒否される。乱数はシード+サンプル ID から導出され、
   プロセスやスレッド数に依存しない。
 
-## 7. 実行するには
+## 7. CLIで実行する
 
 ```sh
 # canonical production v1 configを生成し、1つのrun directoryへ出力する
@@ -158,16 +156,47 @@ cargo run -p cli --release -- config new --template full --out solve.toml
 cargo run -p cli --release -- solve solve.toml --out runs/my-run
 ```
 
-GUI は再構築中(旧 egui GUI は 2026-07 に削除。後継の Tauri 同梱 Web GUI は
-`docs/app-structure.md` のロードマップ参照)。
+`validate`はstrict parseとeffective configを確認する。Production solveはさらに
+tree compile、dense arena byte preflight、allocation/page touchを完了してから
+sweep 0を開始する。再開にはrun directory内の`.mwckpt`と同じeffective configを使う。
 
 `examples/preflop_multiway_v1_production_smoke.toml`はproduction parser contractの
 検証fixtureである。`tools/bench/mw_6max_64b.toml`はretired rollout/full-recallを
 測るhistorical research fixtureであり、通常releaseでは実行しない。
 
-## 8. 関連ドキュメント
+## 8. GUIで実行する
 
-- `docs/multiway-preflop-cli-spec.jp.md` — 次期Multiway Preflop CLI v1の確定仕様
-- `docs/multiway-preflop.md` — 現行実装の精算規則・ICM・抽象化・成果物フォーマット(日本語版: `docs/multiway-preflop.jp.md`)
-- `docs/architecture.md` — ワークスペース全体の設計(HU 厳密エンジンとの関係)
-- `docs/app-structure.md` — アプリ構成(CLI + Tauri 同梱 Web GUI、デバイス貸し)
+`solvers-gui`はVite/React SPAをTauri 2 executableへ内包したLocal applicationで、
+Node、Web server、CLI sidecarを起動時に必要としない。
+
+1. **Setup**でtable、economics、tree、resource、stop条件を設定する。
+2. **検証してSolve開始**でtree buildとpreflightを行い、成功したeffective TOMLと
+   fingerprintだけをjobへ渡す。
+3. **Solving**でsweep、速度、resource、formal evaluationを確認する。
+4. **Preflop Tree**ではRootからactionを選び、Solve中の任意のPreflop nodeを閲覧する。
+5. 完了後は**Results**で正式な`.mwsol`戦略とqualityを確認・exportする。
+
+Solve中のTree表示は、選択中の1つのPreflop nodeについてLinear average strategyだけを
+live更新する。Postflop node、EV、全Node snapshotは計算しない。画面は2秒ごとに要求を
+更新し、要求が30秒途絶えるとlive strategy scanを止める。Postflopへ進むactionと
+terminal actionは境界として表示するが展開しない。
+
+Local jobはGUI process内で動く。停止操作はcooperative cancel後に再開用checkpointを
+残す。Remote profileは将来のtransport contractを表すUIであり、job submission、
+credential、remote persistenceは未実装である。
+
+## 9. 結果と停止状態
+
+- `target-reached`: configured deviation targetを必要回数確認した。
+- `sweep-limit` / `time-limit`:budgetへ到達したがtarget達成を意味しない。
+- `cancelled`:利用者が停止し、resume可能なcheckpointを保存した。
+- `resource-limit`:確保または実行resourceの境界へ到達した。
+
+Multiwayのmeasured deviationは単独seatのtrained deviationに対する推定であり、
+多人数一般和ゲームのNash/GTO保証ではない。Sweep消化率や残り時間も収束確率ではない。
+
+## 10. 関連ドキュメント
+
+- `docs/multiway-preflop-v1.jp.md` — Production v1の規範仕様と全TOML項目
+- `docs/architecture.md` — workspace、solver、CLI、GUIの内部設計
+- `docs/development.md` — test、benchmark、変更手順

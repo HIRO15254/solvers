@@ -843,8 +843,10 @@
 
 .solve-status-strip {
   display: grid;
-  grid-template-columns:
-    minmax(240px, 1.3fr) minmax(190px, 1fr) repeat(2, minmax(130px, 0.7fr));
+  grid-template-columns: minmax(240px, 1.3fr) minmax(190px, 1fr) repeat(
+      2,
+      minmax(130px, 0.7fr)
+    );
   align-items: end;
   gap: 1rem;
 }

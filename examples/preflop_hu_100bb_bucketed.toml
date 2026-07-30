@@ -5,7 +5,7 @@
 #
 # Bucket counts (50/20/8) are deliberately coarser on later streets: the
 # deliverable here is PREFLOP ranges, so turn/river fidelity is traded for
-# tree storage and artifact build time (see `docs/blueprint-design.md`).
+# tree storage and artifact build time (see `docs/research/blueprint-design.md`).
 #
 # NOTE: a cold run builds the EHS² abstraction and blueprint artifacts from
 # scratch, which takes on the order of 10 minutes in release mode (the

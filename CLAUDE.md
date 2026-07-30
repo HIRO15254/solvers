@@ -9,7 +9,8 @@
 
 ## Project conventions
 
-- Workspace layout, architecture, and roadmap: see `docs/architecture.md`, `docs/roadmap.md`.
+- Workspace layout and architecture: see `docs/architecture.md`; development workflow and
+  current roadmap: see `docs/development.md`.
 - License policy (MIT OR Apache-2.0, clean-room vs AGPL references): see `LICENSE-POLICY.md`.
 - Every commit must pass `cargo fmt --all --check`, `cargo clippy --workspace --all-targets`
   (warnings are denied on CI), and `cargo test --workspace`. Expensive tests are
@@ -19,9 +20,9 @@
 
 ## Multiway Preflop specification synchronization
 
-The normative specification is `docs/multiway-preflop-cli-spec.jp.md`; the
-human/AI implementation guide is `docs/multiway-preflop-v1.md`; and the
-complete configuration reference is `docs/multiway-preflop-toml-reference.jp.md`.
+The single normative specification and complete configuration reference is
+`docs/multiway-preflop-v1.jp.md`; the operational guide is
+`docs/user-guide.jp.md`.
 Any change to the Multiway Preflop contract or a default MUST update all three documents,
 the dedicated parser/runtime, tests, examples, CLI help, and affected
 artifact metadata in the same change set. Do not declare the task complete

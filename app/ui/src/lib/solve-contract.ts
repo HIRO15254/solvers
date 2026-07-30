@@ -42,7 +42,7 @@ export const remoteProfile: RemoteConnectionProfileViewModel = {
 /*
  * Target product contract
  *
- * This mirrors docs/gui-spec.jp.md. The desktop UI maps the local subset to
+ * This mirrors docs/architecture.md. The desktop UI maps the local subset to
  * Tauri commands in native-gateway.ts. Remote transport, credentials, and
  * network adapters remain a specification-only surface.
  */

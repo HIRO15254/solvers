@@ -1,6 +1,6 @@
 //! Macro-benchmark of a turn-start postflop solve: builds the tree once,
 //! then benches `Solver::run(5)` from a fixed snapshot, sequentially and in
-//! parallel. Compare against `docs/bench.md`'s bench-bar targets, and use
+//! parallel. Compare against `docs/development.md`'s bench-bar targets, and use
 //! `--save-baseline`/`--baseline` (see that doc's "Criterion suite" section)
 //! to A/B solver changes.
 //!

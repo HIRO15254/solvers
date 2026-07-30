@@ -9,20 +9,16 @@ For three or more players, results are regret-minimized approximations rather th
 
 ## Status
 
-Early development. See [docs/roadmap.md](docs/roadmap.md) for milestones.
+Active development. See the [documentation portal](docs/README.md) and
+[development guide](docs/development.md) for current boundaries and remaining work.
 
 ## Documentation
 
-- [docs/multiway-preflop-cli-spec.jp.md](docs/multiway-preflop-cli-spec.jp.md) — approved target specification for the Multiway Preflop CLI v1
-- [docs/multiway-preflop-v1.md](docs/multiway-preflop-v1.md) — concise human/AI implementation guide and contract map
-- [docs/multiway-preflop-toml-reference.jp.md](docs/multiway-preflop-toml-reference.jp.md) — complete reference for every Multiway Preflop v1 TOML key, type, default, and constraint
-- [docs/app-structure.md](docs/app-structure.md) — the app structure (one app with preflop + postflop solving, CLI + embedded web UI)
-- [docs/gui-spec.jp.md](docs/gui-spec.jp.md) — the three-screen desktop GUI, implemented Local workflow, and Remote v3 target contract
-- [docs/architecture.md](docs/architecture.md) — integrated architecture design
-- [docs/research-survey.md](docs/research-survey.md) — survey of CFR variants,
-  abstraction and acceleration techniques, with an adoption plan
-- [docs/roadmap.md](docs/roadmap.md) — M0–M9 milestones and exit criteria
-- [docs/multiway-preflop.md](docs/multiway-preflop.md) — current implementation reference for 2–9 player rules, MCCFR semantics, ICM, and artifacts
+- [docs/README.md](docs/README.md) — documentation map and source-of-truth hierarchy
+- [docs/user-guide.jp.md](docs/user-guide.jp.md) — GUI/CLI usage and operational interpretation
+- [docs/multiway-preflop-v1.jp.md](docs/multiway-preflop-v1.jp.md) — normative Multiway Preflop v1 contract and complete TOML reference
+- [docs/architecture.md](docs/architecture.md) — solver, workspace, CLI, and desktop architecture
+- [docs/development.md](docs/development.md) — tests, benchmarks, change workflow, and current roadmap
 - [LICENSE-POLICY.md](LICENSE-POLICY.md) — clean-room policy for AGPL references
 
 ## Workspace layout
@@ -34,8 +30,8 @@ web-tech GUI provides Setup / Solving / Results as a React static SPA embedded
 in a Tauri 2 executable. GUI v1 targets Multiway Preflop v1 only. Its Local
 workflow uses the same Rust parser, solver, checkpoint, and solution formats as
 the CLI in-process; Remote profiles remain a UI and protocol specification and
-do not send jobs yet. See [docs/gui-spec.jp.md](docs/gui-spec.jp.md) for the
-exact implementation boundary.
+do not send jobs yet. See [docs/user-guide.jp.md](docs/user-guide.jp.md) and
+[docs/architecture.md](docs/architecture.md) for the exact implementation boundary.
 
 ```
 app/

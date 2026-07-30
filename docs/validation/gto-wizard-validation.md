@@ -2,7 +2,7 @@
      手順書。下位モデル(Sonnet / Haiku)がそのまま再現できるよう、判断を要さない
      機械的手順として記述する。設計背景は docs/architecture.md §7(正当性検証)を参照。 -->
 
-# 手順書: GTO Wizard との出力精度クロスチェック(postflop / Mode A)
+# 手順書: GTO Wizardとの出力精度クロスチェック(postflop / Mode A)
 
 ## 0. この文書の目的と使い方
 

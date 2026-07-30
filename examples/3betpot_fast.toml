@@ -1,8 +1,8 @@
 # 100bb 3-bet-pot flop spot (chips-x10 units), sized for the M5 bench-bar
-# recipe in docs/bench.md: single-raised action on the flop (one bet size,
+# recipe in docs/development.md: single-raised action on the flop (one bet size,
 # one re-raise), a single bet size and no re-raise on turn/river. Calibrated
 # with `holdem::memory_usage` to land the f32 storage estimate between 1.0
-# and 1.4 GB (the bench bar's window at this scale) -- see docs/bench.md's
+# and 1.4 GB (the bench bar's window at this scale) -- see docs/development.md's
 # "Bench bar" section for the calibration recipe and what to record when
 # re-running this after a solver change.
 #
