@@ -1,0 +1,149 @@
+schema = "solvers.multiway-preflop/v1"
+
+[game]
+seat_count = 6
+button = 0
+standard_blinds = false
+preflop_first_to_act = 4
+common_ante_bb = 0.000
+
+[game.defaults]
+stack_bb = 80.000
+range = "QQ+"
+
+[[game.players]]
+seat = 0
+stack_bb = 100.000
+range = "random"
+blind_bb = 0.000
+ante_bb = 0.000
+
+[[game.players]]
+seat = 1
+stack_bb = 100.000
+range = "random"
+blind_bb = 0.500
+ante_bb = 0.000
+
+[[game.players]]
+seat = 2
+stack_bb = 100.000
+range = "random"
+blind_bb = 1.000
+ante_bb = 0.000
+
+[[game.players]]
+seat = 3
+stack_bb = 100.000
+range = "random"
+blind_bb = 0.000
+ante_bb = 0.000
+
+[[game.players]]
+seat = 4
+stack_bb = 100.000
+range = "random"
+blind_bb = 0.000
+ante_bb = 0.000
+
+[[game.players]]
+seat = 5
+stack_bb = 100.000
+range = "random"
+blind_bb = 0.000
+ante_bb = 0.000
+
+[game.tree]
+kind = "standard"
+allow_limp = true
+reraise_jam_above_actor_starting_stack = { numerator = 1, denominator = 3 }
+
+[game.tree.max_aggressive_actions]
+preflop = 6
+flop = 3
+turn = 2
+river = 1
+
+[[game.tree.rules]]
+priority = 100
+street = "preflop"
+when = "unopened"
+effect = "replace"
+action = "raise"
+sizes = ["2.5x", "allin"]
+
+[[game.tree.rules]]
+priority = 110
+street = "preflop"
+when = "limpers > 0 && aggressions == 0"
+effect = "replace"
+action = "raise"
+sizes = ["2.5x", "allin"]
+
+[[game.tree.rules]]
+priority = 120
+street = "preflop"
+when = "aggressions >= 1"
+effect = "replace"
+action = "raise"
+sizes = ["3x", "allin"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions >= 4"
+effect = "remove"
+action = "raise"
+
+[[game.tree.rules]]
+priority = 200
+street = "postflop"
+when = "players >= 2"
+effect = "checkdown"
+
+[game.abstraction]
+kind = "ehs2-percentile"
+
+[game.abstraction.buckets]
+flop = 32
+turn = 48
+river = 96
+
+[game.information]
+recall = "current-street"
+
+[economics]
+kind = "cash"
+
+[solver]
+kind = "single-hand"
+seed = 19
+opponent_exploration = 0.125
+batch_sweeps = 3
+
+[solver.discount]
+kind = "none"
+
+[solver.pruning]
+kind = "none"
+
+[run]
+max_sweeps = 5000000
+max_time = "12h"
+
+[run.resources]
+threads = "auto"
+memory = "auto"
+
+[run.stop]
+target = 0.050
+check_every_sweeps = 2000
+confirmations = 5
+evaluation_samples = 8192
+deviator_traversals = 40000
+
+[run.checkpoint]
+interval = "15m"
+
+[output]
+probability_encoding = "f32"

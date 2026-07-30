@@ -445,7 +445,7 @@ fn multiway_v1_u16_storage_writes_a_quantized_mwsol() {
     assert!(result["preallocatedBytes"].as_u64().unwrap() > 0);
     assert_eq!(
         result["policyArenaLimitBytes"].as_u64().unwrap(),
-        cli::multiway_v1::PRODUCTION_POLICY_ARENA_LIMIT_BYTES
+        cli::multiway_v1::PRODUCTION_POLICY_ARENA_AUTO_BYTES
     );
 
     let solution = read_mwsol_full(&run_dir.join("solution.mwsol"));

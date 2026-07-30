@@ -90,6 +90,7 @@ pub struct PublicTree {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct TreePreflight {
     pub node_count: usize,
+    pub terminal_edges: u64,
     pub total_columns: u64,
     pub total_slots: u64,
     pub estimated_arena_bytes: u64,
@@ -303,6 +304,11 @@ fn preflight_node<G: ExternalSamplingGame>(
                 max_depth,
                 preflight,
             )?;
+        } else {
+            preflight.terminal_edges = preflight
+                .terminal_edges
+                .checked_add(1)
+                .ok_or(TreeError::SizeOverflow)?;
         }
     }
     Ok(())
@@ -909,6 +915,14 @@ mod tests {
         let arena = build_arena(&game, &tree, u64::MAX).unwrap();
 
         assert_eq!(measured.node_count, tree.nodes.len());
+        assert_eq!(
+            measured.terminal_edges,
+            tree.nodes
+                .iter()
+                .flat_map(|node| node.children.iter())
+                .filter(|child| matches!(child, Child::Terminal))
+                .count() as u64
+        );
         assert_eq!(measured.total_columns, arena.total_columns());
         assert_eq!(measured.total_slots, arena.total_slots());
         assert_eq!(measured.estimated_arena_bytes, arena.estimated_bytes());

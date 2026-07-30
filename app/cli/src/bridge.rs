@@ -35,7 +35,7 @@ const MAX_FACTOR_LEVELS: usize = 16;
 const MAX_RANGE_BYTES: usize = 4 * 1024;
 const MAX_GRAMMAR_PATHS: u64 = 100_000;
 const MAX_STORAGE_BYTES: u64 = 2 * 1024 * 1024 * 1024;
-const MAX_MULTIWAY_ARENA_BYTES: u64 = 6 * 1024 * 1024 * 1024;
+const DEFAULT_MULTIWAY_ARENA_BYTES: u64 = 6 * 1024 * 1024 * 1024;
 const MAX_MULTIWAY_BUCKETS: u16 = 4_096;
 const MAX_MULTIWAY_EVALUATION_SAMPLES: u64 = 1_000_000;
 const MAX_MULTIWAY_ICM_SAMPLES: u64 = 1_000_000;
@@ -1286,7 +1286,7 @@ fn multiway_result_state(path: &Path) -> Option<JobState> {
             |result| match result.get("status").and_then(|status| status.as_str()) {
                 Some("completed") => Some(JobState::Succeeded),
                 Some("cancelled") => Some(JobState::Cancelled),
-                Some("resource_limit") => Some(JobState::ResourceLimit),
+                Some("resource-limit" | "resource_limit") => Some(JobState::ResourceLimit),
                 _ => None,
             },
         )
@@ -1722,13 +1722,13 @@ fn sanitize_multiway_config(
     let memory_limit = config
         .run
         .max_memory_bytes
-        .unwrap_or(MAX_MULTIWAY_ARENA_BYTES);
-    if memory_limit == 0 || memory_limit > MAX_MULTIWAY_ARENA_BYTES {
-        return Err(format!(
-            "run.max_memory_bytes must be from 1 through {MAX_MULTIWAY_ARENA_BYTES}; this is \
-             the policy-arena payload cap, while the 8 GiB process limit requires external \
-             monitoring and headroom."
-        ));
+        .unwrap_or(DEFAULT_MULTIWAY_ARENA_BYTES);
+    if memory_limit == 0 {
+        return Err(
+            "run.max_memory_bytes must be positive; this is the policy-arena payload budget, \
+             while the process RSS limit requires external monitoring and headroom."
+                .to_string(),
+        );
     }
     if config
         .run
@@ -2305,9 +2305,18 @@ check_every = 1
 
         let oversized = raw.replace(
             "max_memory_bytes = 2147483648",
-            &format!("max_memory_bytes = {}", MAX_MULTIWAY_ARENA_BYTES + 1),
+            &format!("max_memory_bytes = {}", DEFAULT_MULTIWAY_ARENA_BYTES + 1),
         );
-        assert!(sanitize_config(&oversized, Path::new("unused"), None, true).is_err());
+        let sanitized_oversized =
+            sanitize_config(&oversized, Path::new("unused"), None, true).unwrap();
+        let parsed_oversized: SolveConfig = toml::from_str(&sanitized_oversized.toml).unwrap();
+        assert_eq!(
+            parsed_oversized.run.max_memory_bytes,
+            Some(DEFAULT_MULTIWAY_ARENA_BYTES + 1)
+        );
+
+        let zeroed = raw.replace("max_memory_bytes = 2147483648", "max_memory_bytes = 0");
+        assert!(sanitize_config(&zeroed, Path::new("unused"), None, true).is_err());
 
         let research = raw.replace("sweeps = 1000", "sweeps = 5000000");
         assert!(sanitize_config(&research, Path::new("unused"), Some(3), true).is_ok());

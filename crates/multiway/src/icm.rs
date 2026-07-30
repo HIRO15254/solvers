@@ -18,8 +18,8 @@ use crate::types::{MwChips, SeatId, SeatVec};
 
 pub const EXACT_ICM_MAX_PLAYERS: usize = 15;
 pub const ICM_MAX_PLAYERS: usize = 10_000;
+pub const MAX_PREPARED_RACE_BYTES: usize = 1 << 30;
 const MAX_OUTSIDE_STACK_GROUPS: usize = 64;
-const MAX_PREPARED_RACE_BYTES: usize = 1 << 30;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -43,6 +43,35 @@ pub struct IcmDeltaEstimate {
     pub ci95: SeatVec<[f64; 2]>,
     pub baseline_values: SeatVec<f64>,
     pub terminal_values: SeatVec<f64>,
+}
+
+/// Exact heap bytes used by the sampled ICM race buffers. This excludes the
+/// small fixed-size vectors and reports the same three large allocations
+/// guarded by [`MAX_PREPARED_RACE_BYTES`] in [`PreparedIcm::new`].
+pub fn prepared_race_memory_bytes(
+    table_players: usize,
+    outside_players: usize,
+    paid_places: usize,
+    samples: u64,
+) -> Result<usize, IcmError> {
+    if samples < 2 {
+        return Err(IcmError::TooFewSamples(samples));
+    }
+    let sample_count = usize::try_from(samples).map_err(|_| IcmError::TooManySamples(samples))?;
+    let table_slots = sample_count
+        .checked_mul(table_players)
+        .ok_or(IcmError::TooManySamples(samples))?;
+    let outside_slots = sample_count
+        .checked_mul(outside_players.min(paid_places))
+        .ok_or(IcmError::TooManySamples(samples))?;
+    table_slots
+        .checked_mul(std::mem::size_of::<f64>() * 2)
+        .and_then(|bytes| {
+            outside_slots
+                .checked_mul(std::mem::size_of::<f32>())
+                .and_then(|outside_bytes| bytes.checked_add(outside_bytes))
+        })
+        .ok_or(IcmError::TooManySamples(samples))
 }
 
 /// Reusable ICM evaluator for the many terminal stack vectors visited by a
@@ -170,14 +199,8 @@ impl PreparedIcm {
         let outside_slots = sample_count
             .checked_mul(outside_kept)
             .ok_or(IcmError::TooManySamples(samples))?;
-        let prepared_bytes = table_slots
-            .checked_mul(std::mem::size_of::<f64>() * 2)
-            .and_then(|bytes| {
-                outside_slots
-                    .checked_mul(std::mem::size_of::<f32>())
-                    .and_then(|outside_bytes| bytes.checked_add(outside_bytes))
-            })
-            .ok_or(IcmError::TooManySamples(samples))?;
+        let prepared_bytes =
+            prepared_race_memory_bytes(table_len, outside_field.len(), paid_places, samples)?;
         if prepared_bytes > MAX_PREPARED_RACE_BYTES {
             return Err(IcmError::PreparedRaceMemory {
                 required: prepared_bytes,
@@ -835,6 +858,18 @@ pub enum IcmError {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn prepared_race_memory_matches_the_runtime_buffer_layout() {
+        assert_eq!(
+            prepared_race_memory_bytes(9, 91, 15, 100_000).unwrap(),
+            9 * 100_000 * 16 + 15 * 100_000 * 4
+        );
+        assert!(matches!(
+            prepared_race_memory_bytes(9, 91, 15, 1),
+            Err(IcmError::TooFewSamples(1))
+        ));
+    }
 
     #[test]
     fn exact_heads_up_matches_chip_fraction() {

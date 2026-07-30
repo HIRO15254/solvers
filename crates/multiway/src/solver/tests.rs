@@ -1258,6 +1258,26 @@ fn sweep_batching_is_bit_identical_across_thread_counts() {
 }
 
 #[test]
+fn observed_sweep_batches_report_committed_state_without_changing_results() {
+    let mut observed = solver_with_batch(99, 1 << 20, 4);
+    let mut boundaries = Vec::new();
+    observed
+        .run_sweeps_with_threads_until_observed(
+            10,
+            4,
+            || true,
+            |solver| boundaries.push(solver.completed_sweeps()),
+        )
+        .unwrap();
+
+    let mut reference = solver_with_batch(99, 1 << 20, 4);
+    reference.run_sweeps_with_threads(10, 4).unwrap();
+
+    assert_eq!(boundaries, vec![4, 8, 10]);
+    assert_eq!(observed.snapshot_state(), reference.snapshot_state());
+}
+
+#[test]
 fn sweep_batching_reduces_regret_comparably_to_unbatched() {
     const SWEEPS: u64 = 400;
 
@@ -2698,6 +2718,24 @@ fn street_recall_node_children_and_strategies_at_use_the_enumerated_tree() {
             .expect("child is enumerated");
         assert_eq!(resolved, *child);
     }
+    let root = solver
+        .public_node_view(HistoryKey::ROOT)
+        .expect("dense root metadata");
+    assert_eq!(root.street, Street::Preflop);
+    assert_eq!(root.actor, 0);
+    assert_eq!(root.actions.len(), 2);
+    let mut navigable_children = root
+        .actions
+        .iter()
+        .filter_map(|action| match action.destination {
+            PublicActionDestination::PreflopDecision(history) => Some(history),
+            PublicActionDestination::PostflopBoundary | PublicActionDestination::Terminal => None,
+        })
+        .collect::<Vec<_>>();
+    navigable_children.sort_unstable();
+    let mut expected_children = children.iter().map(|child| child.key).collect::<Vec<_>>();
+    expected_children.sort_unstable();
+    assert_eq!(navigable_children, expected_children);
 
     let rows = solver.strategies_at(HistoryKey::ROOT);
     assert!(!rows.is_empty());

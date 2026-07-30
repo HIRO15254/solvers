@@ -9,37 +9,36 @@ For three or more players, results are regret-minimized approximations rather th
 
 ## Status
 
-Early development. See [docs/roadmap.md](docs/roadmap.md) for milestones.
+Active development. See the [documentation portal](docs/README.md) and
+[development guide](docs/development.md) for current boundaries and remaining work.
 
 ## Documentation
 
-- [docs/multiway-preflop-cli-spec.jp.md](docs/multiway-preflop-cli-spec.jp.md) — approved target specification for the Multiway Preflop CLI v1
-- [docs/multiway-preflop-v1.md](docs/multiway-preflop-v1.md) — concise human/AI implementation guide and contract map
-- [docs/multiway-preflop-toml-reference.jp.md](docs/multiway-preflop-toml-reference.jp.md) — complete reference for every Multiway Preflop v1 TOML key, type, default, and constraint
-- [docs/app-structure.md](docs/app-structure.md) — the app structure (one app with preflop + postflop solving, CLI + web UI)
-- [docs/architecture.md](docs/architecture.md) — integrated architecture design
-- [docs/research-survey.md](docs/research-survey.md) — survey of CFR variants,
-  abstraction and acceleration techniques, with an adoption plan
-- [docs/roadmap.md](docs/roadmap.md) — M0–M9 milestones and exit criteria
-- [docs/multiway-preflop.md](docs/multiway-preflop.md) — current implementation reference for 2–9 player rules, MCCFR semantics, ICM, and artifacts
+- [docs/README.md](docs/README.md) — documentation map and source-of-truth hierarchy
+- [docs/user-guide.jp.md](docs/user-guide.jp.md) — GUI/CLI usage and operational interpretation
+- [docs/multiway-preflop-v1.jp.md](docs/multiway-preflop-v1.jp.md) — normative Multiway Preflop v1 contract and complete TOML reference
+- [docs/architecture.md](docs/architecture.md) — solver, workspace, CLI, and desktop architecture
+- [docs/development.md](docs/development.md) — tests, benchmarks, change workflow, and current roadmap
 - [LICENSE-POLICY.md](LICENSE-POLICY.md) — clean-room policy for AGPL references
 
 ## Workspace layout
 
 The project ships **one application** containing both a preflop solver (HU +
 2–9 player multiway) and a postflop solver (exact, fixed flop), selected by
-the config's `game.kind`. It is operated through a CLI; a bundled web-tech
-GUI that wraps it (Tauri shell + static SPA) is a planned future milestone
-with its spec frozen in [docs/app-structure.md](docs/app-structure.md) — the
-previous Next.js and egui UIs were removed in 2026-07. Near-term focus is
-the multiway preflop solver's CLI completeness.
+the config's `game.kind`. The CLI is the current execution surface. A new
+web-tech GUI provides Setup / Solving / Results as a React static SPA embedded
+in a Tauri 2 executable. GUI v1 targets Multiway Preflop v1 only. Its Local
+workflow uses the same Rust parser, solver, checkpoint, and solution formats as
+the CLI in-process; Remote profiles remain a UI and protocol specification and
+do not send jobs yet. See [docs/user-guide.jp.md](docs/user-guide.jp.md) and
+[docs/architecture.md](docs/architecture.md) for the exact implementation boundary.
 
 ```
 app/
-├── cli         # `solvers` binary: solve / resume / inspect / report / serve / bench / mw-eval
-├── ui          # (planned) web GUI: Vite + React static SPA talking to the
-│               # CLI's authenticated bridge (local or remote)
-└── desktop     # (planned) Tauri 2 shell: in-process bridge + CLI sidecar
+├── cli         # `solvers`: config / validate / solve / resume / inspect /
+│               # evaluate / export / compare / experiment / report / serve
+├── ui          # Vite + React + shadcn/ui SPA; Setup / Solving / Results
+└── desktop     # Tauri 2 Local job/file backend + embedded SPA
 crates/
 ├── cards       # card/chip/street types, range parser, hand-evaluator wrapper
 ├── hand-index  # suit-isomorphism board canonicalization
@@ -49,7 +48,7 @@ crates/
 ├── abstraction # heads-up blueprint abstraction
 ├── preflop     # exact/bucketed heads-up preflop path
 ├── multiway    # generative 2–9 seat NLHE + external-sampling MCCFR
-├── formats     # v1 HU and v2 multiway metrics/checkpoints/solution artifacts
+├── formats     # versioned HU and multiway metrics/checkpoints/solution artifacts
 └── holdem      # Mode A: exact multi-street postflop solving, aggregation/equity helpers
 ```
 
@@ -59,7 +58,8 @@ crates/
 cargo test --workspace            # correctness harness (Kuhn/Leduc known solutions, oracle diff)
 cargo run -p cli --release -- solve examples/kuhn.toml
 
-# Bridge (authenticated loopback HTTP job API used by the GUI):
+# Current bridge v2 (authenticated loopback API). The desktop Local workflow
+# does not use this loopback transport; Remote GUI support targets v3:
 cargo run -p cli --release -- serve --origin http://localhost:3000
 
 # --- Preflop ---------------------------------------------------------------
@@ -68,7 +68,8 @@ cargo run -p cli --release -- validate examples/preflop_multiway_v1_smoke.toml
 cargo run -p cli --release -- solve examples/preflop_multiway_v1_smoke.toml \
     --out runs/v1-smoke
 
-# 9-max BBA + tournament ICM; writes v2 JSON, .mwckpt, and .mwsol.
+# Legacy-schema 9-max BBA + tournament ICM; writes versioned JSON,
+# .mwckpt, and .mwsol artifacts.
 cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
     --output result.json --checkpoint solve.mwckpt --sol solve.mwsol
 
@@ -83,6 +84,16 @@ cargo run -p cli --release -- inspect examples/river_small.toml
 # Aggregate CSV across boards (frequencies, EVs, equity per board):
 cargo run -p cli --release -- report examples/river_small.toml \
     --boards "2c 7d 9h Js Qs,2c 7d 9h Js Ks" --output report.csv
+
+# --- Desktop GUI -----------------------------------------------------------
+# Install/build the static SPA, then one host-specific raw desktop executable.
+bun ci --cwd app/ui
+bun run --cwd app/ui desktop:build
+
+# target/release/solvers-gui opens the embedded Web UI using the OS WebView.
+# Local validation, solving, cancellation, checkpoint resume, and artifact I/O
+# run in this process. Remote Solve is specification/UI only. The executable is
+# not yet a signed/notarized platform bundle.
 ```
 
 ## License

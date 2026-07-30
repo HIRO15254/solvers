@@ -189,7 +189,7 @@ enum Command {
         /// Override v1 worker threads for this invocation.
         #[arg(long)]
         threads: Option<usize>,
-        /// Override the v1 policy-arena budget, up to the production 6GiB limit.
+        /// Override the v1 policy-arena budget (auto resolves to 6GiB).
         #[arg(long)]
         memory: Option<String>,
         /// Override the v1 cumulative solve-time limit.

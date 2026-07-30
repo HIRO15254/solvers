@@ -7,7 +7,7 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, anyhow};
 use formats::{MULTIWAY_SCHEMA_VERSION, MultiwayMetricsRow, MultiwayMetricsWriter};
-use multiway::solver::InfoKey;
+use multiway::solver::{HistoryKey, InfoKey};
 use multiway::{ExternalSamplingGame, HoldemGame, MultiwaySolver};
 use serde::Serialize;
 
@@ -15,6 +15,7 @@ use crate::config::{GameSection, SolveConfig, StorageKind, UtilitySection};
 use crate::session;
 
 const APPROXIMATION_NOTICE: &str = "3人以上は多人数・一般和ゲームのregret-minimized approximationです。Nash/GTO保証やexploitability指標ではありません。";
+const LIVE_OBSERVATION_PERIOD: Duration = Duration::from_secs(2);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -79,6 +80,71 @@ struct ResultV2 {
     finished_unix_ms: u64,
 }
 
+/// One visited information set at the requested live preflop node. Missing
+/// buckets remain absent instead of being synthesized as a uniform strategy.
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LiveStrategyEntry {
+    pub key: InfoKey,
+    pub actions: Vec<String>,
+    pub probabilities: Vec<f32>,
+    pub weight: f64,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LiveBreadcrumb {
+    pub node: HistoryKey,
+    pub actor: u8,
+    pub action: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LiveNodeAction {
+    pub action: String,
+    pub destination: &'static str,
+    pub child: Option<HistoryKey>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LiveStrategyNode {
+    pub history: HistoryKey,
+    pub actor: u8,
+    pub street: u8,
+    pub active_opponents: u8,
+    pub breadcrumb: Vec<LiveBreadcrumb>,
+    pub actions: Vec<LiveNodeAction>,
+    pub strategy: Vec<LiveStrategyEntry>,
+}
+
+/// Cheap data published during training without a held-out evaluation.
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiwayLiveObservation {
+    pub sweeps: u64,
+    pub traversals: u64,
+    pub hand_updates: u64,
+    pub elapsed_secs: f64,
+    pub strategy_node: Option<LiveStrategyNode>,
+}
+
+/// Full quality data published at completed evaluation boundaries.
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiwayQualityObservation {
+    pub metrics: MultiwayMetricsRow,
+    pub strategy_node: Option<LiveStrategyNode>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(tag = "kind", rename_all = "kebab-case")]
+pub enum MultiwayRunObservation {
+    Live(MultiwayLiveObservation),
+    Quality(MultiwayQualityObservation),
+}
+
 #[allow(clippy::too_many_arguments)]
 pub fn run(
     raw_config: &str,
@@ -103,6 +169,73 @@ pub fn run(
         None,
         false,
         emit_progress,
+        None,
+        None,
+    )
+}
+
+/// Starts a production solve and publishes owned progress observations.
+#[allow(clippy::too_many_arguments)]
+pub fn run_observed(
+    raw_config: &str,
+    config: SolveConfig,
+    output: Option<&Path>,
+    metrics_path: Option<&Path>,
+    checkpoint_path: Option<&Path>,
+    config_hash: [u8; 32],
+    mwsol_path: Option<&Path>,
+    cancel: Option<&AtomicBool>,
+    emit_progress: bool,
+    observer: &mut dyn FnMut(MultiwayRunObservation),
+) -> Result<()> {
+    run_inner(
+        raw_config,
+        config,
+        output,
+        metrics_path,
+        checkpoint_path,
+        config_hash,
+        mwsol_path,
+        cancel,
+        None,
+        false,
+        emit_progress,
+        None,
+        Some(observer),
+    )
+}
+
+/// Starts a production solve with live observations for the preflop node
+/// selected by `live_node_request`. The callback is read only at observation
+/// boundaries, so no tree or strategy work is added to training batches.
+#[allow(clippy::too_many_arguments)]
+pub fn run_observed_with_node(
+    raw_config: &str,
+    config: SolveConfig,
+    output: Option<&Path>,
+    metrics_path: Option<&Path>,
+    checkpoint_path: Option<&Path>,
+    config_hash: [u8; 32],
+    mwsol_path: Option<&Path>,
+    cancel: Option<&AtomicBool>,
+    emit_progress: bool,
+    live_node_request: &dyn Fn() -> Option<HistoryKey>,
+    observer: &mut dyn FnMut(MultiwayRunObservation),
+) -> Result<()> {
+    run_inner(
+        raw_config,
+        config,
+        output,
+        metrics_path,
+        checkpoint_path,
+        config_hash,
+        mwsol_path,
+        cancel,
+        None,
+        false,
+        emit_progress,
+        Some(live_node_request),
+        Some(observer),
     )
 }
 
@@ -131,6 +264,72 @@ pub fn resume(
         Some(checkpoint_path),
         reset_confirmations,
         emit_progress,
+        None,
+        None,
+    )
+}
+
+/// Resumes a production solve and publishes owned progress observations.
+#[allow(clippy::too_many_arguments)]
+pub fn resume_observed(
+    raw_config: &str,
+    config: SolveConfig,
+    output: Option<&Path>,
+    metrics_path: Option<&Path>,
+    checkpoint_path: &Path,
+    config_hash: [u8; 32],
+    mwsol_path: Option<&Path>,
+    cancel: Option<&AtomicBool>,
+    reset_confirmations: bool,
+    emit_progress: bool,
+    observer: &mut dyn FnMut(MultiwayRunObservation),
+) -> Result<()> {
+    run_inner(
+        raw_config,
+        config,
+        output,
+        metrics_path,
+        Some(checkpoint_path),
+        config_hash,
+        mwsol_path,
+        cancel,
+        Some(checkpoint_path),
+        reset_confirmations,
+        emit_progress,
+        None,
+        Some(observer),
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn resume_observed_with_node(
+    raw_config: &str,
+    config: SolveConfig,
+    output: Option<&Path>,
+    metrics_path: Option<&Path>,
+    checkpoint_path: &Path,
+    config_hash: [u8; 32],
+    mwsol_path: Option<&Path>,
+    cancel: Option<&AtomicBool>,
+    reset_confirmations: bool,
+    emit_progress: bool,
+    live_node_request: &dyn Fn() -> Option<HistoryKey>,
+    observer: &mut dyn FnMut(MultiwayRunObservation),
+) -> Result<()> {
+    run_inner(
+        raw_config,
+        config,
+        output,
+        metrics_path,
+        Some(checkpoint_path),
+        config_hash,
+        mwsol_path,
+        cancel,
+        Some(checkpoint_path),
+        reset_confirmations,
+        emit_progress,
+        Some(live_node_request),
+        Some(observer),
     )
 }
 
@@ -147,6 +346,8 @@ fn run_inner(
     resume_checkpoint: Option<&Path>,
     reset_confirmations: bool,
     emit_progress: bool,
+    live_node_request: Option<&dyn Fn() -> Option<HistoryKey>>,
+    mut observer: Option<&mut dyn FnMut(MultiwayRunObservation)>,
 ) -> Result<()> {
     validate_artifact_paths(output, metrics_path, checkpoint_path, mwsol_path)?;
     if !matches!(config.game, GameSection::PreflopMultiway(_)) {
@@ -249,6 +450,9 @@ fn run_inner(
     // cap, not a target, so the sweep count a converged run actually stops
     // at is machine-dependent (documented on `run.stop_dev_gain`).
     let mut stop_rule_state = session::StopRuleState::new(mw_session.evaluation_samples);
+    let mut last_live_observation = Instant::now();
+    let mut published_live_observation = false;
+    let mut last_quality_observation_sweeps = None;
     let cumulative_before = mw_session
         .checkpoint_runtime
         .map_or(0, |runtime| runtime.cumulative_solve_millis);
@@ -298,11 +502,39 @@ fn run_inner(
             .min(evaluation_delta)
             .min(checkpoint_delta)
             .max(1);
-        match mw_session
-            .solver
-            .run_sweeps_with_threads_until(chunk, mw_session.threads, || {
-                !cancel.is_some_and(|token| token.load(Ordering::Relaxed))
-            }) {
+        let chunk_end = current
+            .checked_add(chunk)
+            .ok_or(multiway::solver::SolverError::CounterOverflow)?;
+        let mut deferred_live_observation = false;
+        match mw_session.solver.run_sweeps_with_threads_until_observed(
+            chunk,
+            mw_session.threads,
+            || !cancel.is_some_and(|token| token.load(Ordering::Relaxed)),
+            |solver| {
+                if observer.is_some()
+                    && (!published_live_observation
+                        || last_live_observation.elapsed() >= LIVE_OBSERVATION_PERIOD)
+                {
+                    if solver.completed_sweeps() == chunk_end {
+                        // The drive loop may immediately run a quality
+                        // evaluation or checkpoint at this boundary. Defer
+                        // the live event so the UI sees one coherent update
+                        // after that work rather than a before/after pair.
+                        deferred_live_observation = true;
+                    } else {
+                        publish_live_observation(
+                            solver,
+                            cumulative_before,
+                            &started,
+                            live_node_request,
+                            &mut observer,
+                        );
+                        last_live_observation = Instant::now();
+                        published_live_observation = true;
+                    }
+                }
+            },
+        ) {
             Ok(completed) => {
                 if completed < chunk {
                     status = CompletionStatus::Cancelled;
@@ -321,71 +553,23 @@ fn run_inner(
         }
 
         let sweeps_now = mw_session.solver.completed_sweeps();
-        if sweeps_now % mw_session.evaluation_cadence == 0 || sweeps_now == mw_session.sweeps_target
-        {
-            let now = mw_session.solver.metrics();
-            let evaluation = mw_session
-                .solver
-                .evaluate_average_profile(mw_session.evaluation_samples, mw_session.evaluation_seed)
-                .context("evaluating held-out multiway profile")?;
-            let drift = mw_session.solver.strategy_drift_refresh(&mut prior);
-            last_row = session::metrics_row(
-                &now,
-                drift,
-                started.elapsed().as_secs_f64(),
-                Some(&evaluation),
-            );
-            has_evaluation = true;
-            if let Some(writer) = metrics_writer.as_mut() {
-                writer
-                    .append(&last_row)
-                    .context("writing multiway metrics")?;
-            }
-            if emit_progress {
-                eprintln!(
-                    "sweeps={:>8} traversals={:>10} infosets={:>9} regret_proxy={:.3e} memory={}MiB",
-                    now.sweeps,
-                    now.traversals,
-                    now.infosets,
-                    mean(&now.average_positive_regret),
-                    now.memory_bytes / (1024 * 1024),
-                );
-            }
-        }
-        let checkpoint_due = mw_session
-            .checkpoint_every
-            .is_some_and(|cadence| sweeps_now % cadence == 0)
-            || checkpoint_interval.is_some_and(|interval| last_checkpoint.elapsed() >= interval);
-        if let Some(path) = checkpoint_path
-            && checkpoint_due
-        {
-            write_checkpoint(
-                &mw_session.solver,
-                path,
-                raw_config,
-                &stop_rule_state,
-                mw_session.evaluation_cadence,
-                &started,
-                cumulative_before,
-            )?;
-            last_checkpoint = Instant::now();
-            if let Some(writer) = metrics_writer.as_mut() {
-                let mut checkpoint_event = last_row.clone();
-                checkpoint_event.phase = "checkpoint".into();
-                writer
-                    .append(&checkpoint_event)
-                    .context("writing checkpoint progress event")?;
-            }
-        }
-
         // v1 evaluates the operational stop rule on deterministic sweep
         // cadence. Legacy configs retain their documented wall-clock trigger.
-        if let Some(stop_rule) = mw_session.stop_rule
-            && ((is_v1 && sweeps_now % mw_session.evaluation_cadence == 0)
+        let stop_check_due = mw_session.stop_rule.is_some_and(|stop_rule| {
+            (is_v1 && sweeps_now % mw_session.evaluation_cadence == 0)
                 || (!is_v1
                     && stop_rule_state.last_eval.elapsed().as_secs_f64()
-                        >= stop_rule.eval_period_secs))
-        {
+                        >= stop_rule.eval_period_secs)
+        });
+        let regular_evaluation_due = sweeps_now % mw_session.evaluation_cadence == 0
+            || sweeps_now == mw_session.sweeps_target;
+        let mut quality_published = false;
+        let mut stop_after_boundary = false;
+
+        if stop_check_due {
+            let stop_rule = mw_session
+                .stop_rule
+                .expect("stop_check_due requires a stop rule");
             let samples_before = stop_rule_state.samples;
             let check = session::run_stop_rule_check(
                 &mw_session.solver,
@@ -418,6 +602,9 @@ fn run_inner(
                     check.max_width, stop_rule.dev_gain_threshold
                 );
             }
+            publish_observation(&mw_session, &last_row, live_node_request, &mut observer);
+            quality_published = true;
+            last_quality_observation_sweeps = Some(sweeps_now);
 
             if check.converged {
                 status = if is_v1 {
@@ -425,8 +612,86 @@ fn run_inner(
                 } else {
                     CompletionStatus::Converged
                 };
-                break;
+                stop_after_boundary = true;
             }
+        } else if regular_evaluation_due {
+            let now = mw_session.solver.metrics();
+            let evaluation = mw_session
+                .solver
+                .evaluate_average_profile(mw_session.evaluation_samples, mw_session.evaluation_seed)
+                .context("evaluating held-out multiway profile")?;
+            let drift = mw_session.solver.strategy_drift_refresh(&mut prior);
+            last_row = session::metrics_row(
+                &now,
+                drift,
+                started.elapsed().as_secs_f64(),
+                Some(&evaluation),
+            );
+            has_evaluation = true;
+            if let Some(writer) = metrics_writer.as_mut() {
+                writer
+                    .append(&last_row)
+                    .context("writing multiway metrics")?;
+            }
+            if emit_progress {
+                eprintln!(
+                    "sweeps={:>8} traversals={:>10} infosets={:>9} regret_proxy={:.3e} memory={}MiB",
+                    now.sweeps,
+                    now.traversals,
+                    now.infosets,
+                    mean(&now.average_positive_regret),
+                    now.memory_bytes / (1024 * 1024),
+                );
+            }
+            publish_observation(&mw_session, &last_row, live_node_request, &mut observer);
+            quality_published = true;
+            last_quality_observation_sweeps = Some(sweeps_now);
+        }
+        if quality_published {
+            last_live_observation = Instant::now();
+            published_live_observation = true;
+        }
+
+        let checkpoint_due = mw_session
+            .checkpoint_every
+            .is_some_and(|cadence| sweeps_now % cadence == 0)
+            || checkpoint_interval.is_some_and(|interval| last_checkpoint.elapsed() >= interval);
+        if let Some(path) = checkpoint_path
+            && checkpoint_due
+            && !stop_after_boundary
+        {
+            write_checkpoint(
+                &mw_session.solver,
+                path,
+                raw_config,
+                &stop_rule_state,
+                mw_session.evaluation_cadence,
+                &started,
+                cumulative_before,
+            )?;
+            last_checkpoint = Instant::now();
+            if let Some(writer) = metrics_writer.as_mut() {
+                let mut checkpoint_event = last_row.clone();
+                checkpoint_event.phase = "checkpoint".into();
+                writer
+                    .append(&checkpoint_event)
+                    .context("writing checkpoint progress event")?;
+            }
+        }
+
+        if deferred_live_observation && !quality_published {
+            publish_live_observation(
+                &mw_session.solver,
+                cumulative_before,
+                &started,
+                live_node_request,
+                &mut observer,
+            );
+            last_live_observation = Instant::now();
+            published_live_observation = true;
+        }
+        if stop_after_boundary {
+            break;
         }
     }
 
@@ -478,6 +743,9 @@ fn run_inner(
         CompletionStatus::Converged => "converged",
     }
     .to_string();
+    if last_quality_observation_sweeps != Some(last_row.sweeps) {
+        publish_observation(&mw_session, &last_row, live_node_request, &mut observer);
+    }
     if let Some(writer) = metrics_writer.as_mut() {
         writer
             .append(&last_row)
@@ -762,6 +1030,114 @@ fn mean(values: &[f64]) -> f64 {
     }
 }
 
+fn publish_observation(
+    session: &session::MultiwaySession,
+    metrics: &MultiwayMetricsRow,
+    live_node_request: Option<&dyn Fn() -> Option<HistoryKey>>,
+    observer: &mut Option<&mut dyn FnMut(MultiwayRunObservation)>,
+) {
+    let Some(observer) = observer.as_deref_mut() else {
+        return;
+    };
+    observer(MultiwayRunObservation::Quality(
+        MultiwayQualityObservation {
+            metrics: metrics.clone(),
+            strategy_node: requested_live_strategy(&session.solver, live_node_request),
+        },
+    ));
+}
+
+fn publish_live_observation(
+    solver: &MultiwaySolver<HoldemGame<multiway::MultiwayAbstractionBackend>>,
+    cumulative_before: u64,
+    started: &Instant,
+    live_node_request: Option<&dyn Fn() -> Option<HistoryKey>>,
+    observer: &mut Option<&mut dyn FnMut(MultiwayRunObservation)>,
+) {
+    let Some(observer) = observer.as_deref_mut() else {
+        return;
+    };
+    observer(MultiwayRunObservation::Live(MultiwayLiveObservation {
+        sweeps: solver.completed_sweeps(),
+        traversals: solver.traversals(),
+        hand_updates: solver.hand_updates(),
+        elapsed_secs: Duration::from_millis(cumulative_before)
+            .saturating_add(started.elapsed())
+            .as_secs_f64(),
+        strategy_node: requested_live_strategy(solver, live_node_request),
+    }));
+}
+
+fn requested_live_strategy(
+    solver: &MultiwaySolver<HoldemGame<multiway::MultiwayAbstractionBackend>>,
+    request: Option<&dyn Fn() -> Option<HistoryKey>>,
+) -> Option<LiveStrategyNode> {
+    let requested = request.and_then(|request| request())?;
+    live_strategy_node(solver, requested)
+}
+
+fn live_strategy_node(
+    solver: &MultiwaySolver<HoldemGame<multiway::MultiwayAbstractionBackend>>,
+    history: HistoryKey,
+) -> Option<LiveStrategyNode> {
+    let node = solver.public_node_view(history)?;
+    if node.street != multiway::Street::Preflop {
+        return None;
+    }
+    let mut breadcrumb = Vec::new();
+    let mut cursor = history;
+    while cursor != HistoryKey::ROOT {
+        let edge = solver.history_entry(cursor)?;
+        breadcrumb.push(LiveBreadcrumb {
+            node: cursor,
+            actor: edge.actor,
+            action: edge.action_label,
+        });
+        cursor = edge.parent;
+    }
+    breadcrumb.reverse();
+    let actions = node
+        .actions
+        .into_iter()
+        .map(|action| match action.destination {
+            multiway::PublicActionDestination::PreflopDecision(child) => LiveNodeAction {
+                action: action.label,
+                destination: "preflop",
+                child: Some(child),
+            },
+            multiway::PublicActionDestination::PostflopBoundary => LiveNodeAction {
+                action: action.label,
+                destination: "postflop",
+                child: None,
+            },
+            multiway::PublicActionDestination::Terminal => LiveNodeAction {
+                action: action.label,
+                destination: "terminal",
+                child: None,
+            },
+        })
+        .collect();
+    let strategy = solver
+        .strategies_at_with_mass(history)
+        .into_iter()
+        .map(|(key, actions, probabilities, weight)| LiveStrategyEntry {
+            key,
+            actions,
+            probabilities,
+            weight,
+        })
+        .collect();
+    Some(LiveStrategyNode {
+        history,
+        actor: node.actor,
+        street: node.street as u8,
+        active_opponents: node.active_opponents,
+        breadcrumb,
+        actions,
+        strategy,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -813,6 +1189,47 @@ mod tests {
             .expect("result output must be valid JSON")
     }
 
+    fn run_to_json_observed(
+        raw: &str,
+        config: SolveConfig,
+    ) -> (serde_json::Value, Vec<(String, u64)>) {
+        let config_hash = formats::config_hash(raw.as_bytes());
+        let dir = tempfile::tempdir().unwrap();
+        let output = dir.path().join("result.json");
+        let mut observations = Vec::new();
+        run_observed(
+            raw,
+            config,
+            Some(&output),
+            None,
+            None,
+            config_hash,
+            None,
+            None,
+            false,
+            &mut |observation| match observation {
+                MultiwayRunObservation::Live(observation) => {
+                    assert!(
+                        observation.strategy_node.is_none(),
+                        "the default observer must not scan a strategy node"
+                    );
+                    observations.push(("live".into(), observation.sweeps));
+                }
+                MultiwayRunObservation::Quality(observation) => {
+                    assert!(
+                        observation.strategy_node.is_none(),
+                        "the default observer must not scan a strategy node"
+                    );
+                    observations.push(("quality".into(), observation.metrics.sweeps));
+                }
+            },
+        )
+        .expect("observed multiway run should succeed");
+        let result = serde_json::from_str(&std::fs::read_to_string(&output).unwrap())
+            .expect("result output must be valid JSON");
+        (result, observations)
+    }
+
     /// A very lax threshold (1000 bb, far above anything a 2bb-effective-stack
     /// smoke table could ever produce) with a single required confirmation
     /// and a near-zero wall-clock evaluation period must converge on the
@@ -829,12 +1246,20 @@ mod tests {
              stop_br_traversals = 50\n",
         );
         let config: SolveConfig = toml::from_str(&raw).expect("parse spliced config");
-        let result = run_to_json(&raw, config);
+        let (result, observations) = run_to_json_observed(&raw, config);
         assert_eq!(result["status"], "converged");
         let sweeps = result["sweeps"].as_u64().unwrap();
         assert!(
             sweeps < 100_000,
             "expected an early stop, got {sweeps} sweeps"
+        );
+        let quality_at_stop = observations
+            .iter()
+            .filter(|(kind, observation_sweeps)| kind == "quality" && *observation_sweeps == sweeps)
+            .count();
+        assert_eq!(
+            quality_at_stop, 1,
+            "the stop boundary must publish only the post-deviator quality observation"
         );
     }
 

@@ -1,0 +1,22 @@
+# Solvers documentation
+
+このdirectoryの正本文書は次の5本である。仕様変更では、同じchange setで
+実装・test・該当する正本文書を同期する。
+
+| 文書 | 対象 | 役割 |
+|---|---|---|
+| [user-guide.jp.md](user-guide.jp.md) | 利用者・operator | GUI/CLIの使い方、Solveの読み方、resumeと成果物 |
+| [multiway-preflop-v1.jp.md](multiway-preflop-v1.jp.md) | 実装者・利用者 | `solvers.multiway-preflop/v1`の唯一の規範仕様と全TOML項目 |
+| [architecture.md](architecture.md) | 実装者 | solver、crate、CLI、Tauri GUIの設計境界 |
+| [development.md](development.md) | contributor | test、benchmark、変更手順、未完了roadmap |
+| この文書 | 全員 | 文書構造と正本関係 |
+
+## 補助資料
+
+- [`validation/`](validation/) — 実測fixture、再現手順、検証結果。仕様ではなく証拠。
+- [`research/`](research/) — 採否判断に使った研究設計・サーベイ。Production契約ではない。
+
+正本文書と補助資料が矛盾する場合は
+`multiway-preflop-v1.jp.md`、実装とtest、補助資料の順に扱う。
+過去のmilestone日誌、廃止済みUI、retired production optionはGit履歴に残し、
+現行文書の通常導線には置かない。

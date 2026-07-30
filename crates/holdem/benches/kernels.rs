@@ -5,7 +5,7 @@
 //! full 1,326-combo table, the same amount of work a real solve asks of
 //! them every terminal visit.
 //!
-//! Run with `cargo bench -p holdem` (see `docs/bench.md`); `cargo bench -p
+//! Run with `cargo bench -p holdem` (see `docs/development.md`); `cargo bench -p
 //! holdem -- --test` runs one iteration per bench as a smoke test.
 
 use std::time::Duration;

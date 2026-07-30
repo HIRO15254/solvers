@@ -1,0 +1,143 @@
+schema = "solvers.multiway-preflop/v1"
+
+[game]
+seat_count = 6
+button = 0
+standard_blinds = true
+preflop_first_to_act = "utg"
+common_ante_bb = 0.000
+
+[game.defaults]
+stack_bb = 100.000
+range = "random"
+
+[[game.players]]
+seat = 0
+stack_bb = 100.000
+range = "random"
+blind_bb = 0.000
+ante_bb = 0.000
+
+[[game.players]]
+seat = 1
+stack_bb = 100.000
+range = "random"
+blind_bb = 0.500
+ante_bb = 0.000
+
+[[game.players]]
+seat = 2
+stack_bb = 100.000
+range = "random"
+blind_bb = 1.000
+ante_bb = 0.000
+
+[[game.players]]
+seat = 3
+stack_bb = 100.000
+range = "random"
+blind_bb = 0.000
+ante_bb = 0.000
+
+[[game.players]]
+seat = 4
+stack_bb = 100.000
+range = "random"
+blind_bb = 0.000
+ante_bb = 0.000
+
+[[game.players]]
+seat = 5
+stack_bb = 100.000
+range = "random"
+blind_bb = 0.000
+ante_bb = 0.000
+
+[game.tree]
+kind = "standard"
+allow_limp = false
+
+[[game.tree.rules]]
+priority = 100
+street = "preflop"
+when = "unopened"
+effect = "replace"
+action = "raise"
+sizes = ["2.5x", "allin"]
+
+[[game.tree.rules]]
+priority = 110
+street = "preflop"
+when = "limpers > 0 && aggressions == 0"
+effect = "replace"
+action = "raise"
+sizes = ["2.5x", "allin"]
+
+[[game.tree.rules]]
+priority = 120
+street = "preflop"
+when = "aggressions >= 1"
+effect = "replace"
+action = "raise"
+sizes = ["3x", "allin"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions >= 4"
+effect = "remove"
+action = "raise"
+
+[[game.tree.rules]]
+priority = 200
+street = "postflop"
+when = "players >= 2"
+effect = "checkdown"
+
+[game.abstraction]
+kind = "ehs2-percentile"
+
+[game.abstraction.buckets]
+flop = 64
+turn = 64
+river = 64
+
+[game.information]
+recall = "current-street"
+
+[economics]
+kind = "cash"
+
+[solver]
+kind = "range-vector"
+seed = 0
+opponent_exploration = 0.0
+batch_sweeps = 1
+
+[solver.discount]
+kind = "periodic"
+every_sweeps = 10000
+until_sweeps = 10000000
+
+[solver.pruning]
+kind = "regret-based"
+
+[run]
+max_sweeps = 5000000
+
+[run.resources]
+threads = "auto"
+memory = "auto"
+
+[run.stop]
+target = 0.050
+check_every_sweeps = 10000
+confirmations = 3
+evaluation_samples = 4096
+deviator_traversals = 20000
+
+[run.checkpoint]
+interval = "15m"
+
+[output]
+probability_encoding = "u16"

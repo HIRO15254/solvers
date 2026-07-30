@@ -340,6 +340,28 @@ pub struct HistoryEntry {
     pub action_label: String,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum PublicActionDestination {
+    PreflopDecision(HistoryKey),
+    PostflopBoundary,
+    Terminal,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PublicNodeAction {
+    pub label: String,
+    pub destination: PublicActionDestination,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PublicNodeView {
+    pub history: HistoryKey,
+    pub actor: u8,
+    pub street: Street,
+    pub active_opponents: u8,
+    pub actions: Vec<PublicNodeAction>,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct InfoKey {
     pub history: HistoryKey,
@@ -1308,10 +1330,29 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         &mut self,
         sweeps: u64,
         threads: usize,
-        mut should_continue: F,
+        should_continue: F,
     ) -> Result<u64, SolverError>
     where
         F: FnMut() -> bool,
+    {
+        self.run_sweeps_with_threads_until_observed(sweeps, threads, should_continue, |_| {})
+    }
+
+    /// [`Self::run_sweeps_with_threads_until`] with a cheap read-only hook
+    /// after every committed sweep batch. The hook runs on the drive thread
+    /// while the worker pool stays alive, allowing a GUI to publish counters
+    /// and one requested preflop-node strategy without forcing a held-out
+    /// evaluation or rebuilding the pool.
+    pub fn run_sweeps_with_threads_until_observed<F, O>(
+        &mut self,
+        sweeps: u64,
+        threads: usize,
+        mut should_continue: F,
+        mut after_batch: O,
+    ) -> Result<u64, SolverError>
+    where
+        F: FnMut() -> bool,
+        O: FnMut(&Self),
     {
         if threads == 0 {
             return Err(SolverError::ZeroThreads);
@@ -1382,6 +1423,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     .checked_add(1)
                     .ok_or(SolverError::CounterOverflow)?;
             }
+            after_batch(self);
             sweeps_remaining -= batch;
         }
         Ok(completed)
@@ -1601,7 +1643,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             hand_updates = hand_updates
                 .checked_add(delta.hand_updates)
                 .ok_or(SolverError::CounterOverflow)?;
-
             for event in delta.events {
                 match event {
                     TraversalEvent::EnsurePolicy { key, action_labels } => {
@@ -1770,7 +1811,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             hand_updates = hand_updates
                 .checked_add(delta.hand_updates)
                 .ok_or(SolverError::CounterOverflow)?;
-
             for event in delta.events {
                 match event {
                     DenseEvent::AddRegret { column, values } => {
@@ -1981,6 +2021,43 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         };
         children.sort_unstable_by_key(|entry| (entry.actor, entry.action_index));
         children
+    }
+
+    /// Public metadata for one materialized decision node. Production
+    /// current-street solvers use the dense tree, so this is an O(actions)
+    /// read with no traversal or strategy scan. Sparse research solvers do
+    /// not retain enough state to classify unvisited/terminal children.
+    pub fn public_node_view(&self, history: HistoryKey) -> Option<PublicNodeView> {
+        let dense = self.dense.as_ref()?;
+        let &node_id = dense.tree.by_history.get(&history)?;
+        let node = &dense.tree.nodes[node_id as usize];
+        let actions = node
+            .action_labels
+            .iter()
+            .cloned()
+            .zip(&node.children)
+            .map(|(label, child)| {
+                let destination = match *child {
+                    tree::Child::Terminal => PublicActionDestination::Terminal,
+                    tree::Child::Decision(child_id) => {
+                        let child = &dense.tree.nodes[child_id as usize];
+                        if child.street == Street::Preflop {
+                            PublicActionDestination::PreflopDecision(child.history)
+                        } else {
+                            PublicActionDestination::PostflopBoundary
+                        }
+                    }
+                };
+                PublicNodeAction { label, destination }
+            })
+            .collect();
+        Some(PublicNodeView {
+            history,
+            actor: node.actor,
+            street: node.street,
+            active_opponents: node.active_opponents,
+            actions,
+        })
     }
 
     /// Current average strategy of every policy column at `history`, sorted
