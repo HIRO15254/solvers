@@ -2,10 +2,11 @@ use std::collections::BTreeMap;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::net::TcpStream;
 use std::process::{Child, Command, Stdio};
-use std::sync::mpsc;
+use std::sync::{Mutex, OnceLock, mpsc};
 use std::thread;
 use std::time::Duration;
 
+use formats::MULTIWAY_SCHEMA_VERSION;
 use serde_json::{Value, json};
 
 const ORIGIN: &str = "http://localhost:3000";
@@ -14,6 +15,7 @@ const STARTUP_TIMEOUT: Duration = Duration::from_secs(10);
 
 struct ChildGuard {
     child: Child,
+    stdout_reader: Option<thread::JoinHandle<()>>,
 }
 
 impl Drop for ChildGuard {
@@ -22,6 +24,9 @@ impl Drop for ChildGuard {
             let _ = self.child.kill();
         }
         let _ = self.child.wait();
+        if let Some(reader) = self.stdout_reader.take() {
+            let _ = reader.join();
+        }
     }
 }
 
@@ -41,10 +46,14 @@ impl Bridge {
             .stderr(Stdio::inherit())
             .spawn()
             .expect("spawn solvers serve");
-        let mut process = ChildGuard { child };
+        let mut process = ChildGuard {
+            child,
+            stdout_reader: None,
+        };
 
         // Read on a helper thread so a broken startup cannot hang the test
-        // indefinitely. The bridge's stdout contract contains only this line.
+        // indefinitely. Keep draining after the startup line because solver
+        // progress is also written to stdout while a job is running.
         let stdout = process.child.stdout.take().expect("capture bridge stdout");
         let (sender, receiver) = mpsc::sync_channel(1);
         let reader = thread::spawn(move || {
@@ -56,13 +65,14 @@ impl Bridge {
                 Err(error) => Err(format!("read bridge startup line: {error}")),
             };
             let _ = sender.send(result);
+            let _ = std::io::copy(&mut reader, &mut std::io::sink());
         });
+        process.stdout_reader = Some(reader);
 
         let line = receiver
             .recv_timeout(STARTUP_TIMEOUT)
             .unwrap_or_else(|error| panic!("wait for bridge startup line: {error}"))
             .expect("bridge startup failed");
-        reader.join().expect("bridge stdout reader panicked");
 
         let fields: Vec<_> = line.trim_end().split_ascii_whitespace().collect();
         assert_eq!(fields.len(), 4, "unexpected bridge startup line: {line:?}");
@@ -250,6 +260,13 @@ fn wait_for_terminal_job(bridge: &Bridge, id: &str) -> Value {
     }
 }
 
+fn bridge_acceptance_lock() -> std::sync::MutexGuard<'static, ()> {
+    static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+    LOCK.get_or_init(|| Mutex::new(()))
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+}
+
 #[test]
 fn bridge_http_smoke() {
     let bridge = Bridge::spawn();
@@ -417,6 +434,7 @@ check_every = 1
 #[test]
 #[ignore = "builds the full EHS2 tables; explicit release acceptance only"]
 fn bridge_v2_multiway_lifecycle_and_managed_resume() {
+    let _serial = bridge_acceptance_lock();
     let bridge = Bridge::spawn();
     let authenticated = bridge.authenticated_headers();
     let mut post_headers = string_headers(&authenticated);
@@ -462,7 +480,7 @@ fn bridge_v2_multiway_lifecycle_and_managed_resume() {
         &[],
     );
     assert_eq!(result.status, 200);
-    assert_eq!(result.json()["schemaVersion"], 2);
+    assert_eq!(result.json()["schemaVersion"], MULTIWAY_SCHEMA_VERSION);
     assert_eq!(result.json()["approximateProfile"], true);
 
     let v1_result = bridge.request(
@@ -541,6 +559,7 @@ fn bridge_v2_multiway_lifecycle_and_managed_resume() {
 #[test]
 #[ignore = "builds full EHS2 tables before running a cancellable release worker"]
 fn bridge_v2_cancel_interrupts_a_large_solver_chunk() {
+    let _serial = bridge_acceptance_lock();
     let bridge = Bridge::spawn();
     let authenticated = bridge.authenticated_headers();
     let mut post_headers = string_headers(&authenticated);
@@ -578,30 +597,10 @@ fn bridge_v2_cancel_interrupts_a_large_solver_chunk() {
     );
     assert_eq!(cancelled.status, 202, "body: {:?}", cancelled.json());
 
+    let terminal = wait_for_terminal_job(&bridge, &id);
+    assert_eq!(terminal["status"], "cancelled");
     let get_headers = bridge.authenticated_headers();
     let get_headers = string_headers(&get_headers);
-    let started = std::time::Instant::now();
-    let terminal = loop {
-        let response = bridge.request(
-            "GET",
-            &format!("/v2/jobs/{id}"),
-            &bridge.addr,
-            &get_headers,
-            &[],
-        );
-        assert_eq!(response.status, 200, "body: {:?}", response.json());
-        let body = response.json();
-        match body["status"].as_str() {
-            Some("cancelled") => break body,
-            Some("running" | "cancelling") => {}
-            status => panic!("unexpected cancellation status {status:?}: {body:?}"),
-        }
-        assert!(
-            started.elapsed() < Duration::from_secs(30),
-            "cancel was not observed at a sweep boundary: {body:?}"
-        );
-        thread::sleep(Duration::from_millis(25));
-    };
     let result = bridge.request(
         "GET",
         terminal["resultUrl"].as_str().unwrap(),
