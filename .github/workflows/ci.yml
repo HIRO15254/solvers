@@ -56,5 +56,3 @@ jobs:
         run: cargo build --locked --release -p solvers-desktop --features custom-protocol
       - name: Test (debug)
         run: cargo test --workspace
-      - name: Test (release, includes expensive count-pinning tests)
-        run: cargo test --workspace --release -- --include-ignored

@@ -1,0 +1,35 @@
+name: Long-running acceptance
+
+on:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  # Portable builds on CI (override the local target-cpu=native default).
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  release-ignored:
+    name: Release tests (includes ignored)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Tauri system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Test release profile, including long-running ignored tests
+        run: cargo test --workspace --release -- --include-ignored
