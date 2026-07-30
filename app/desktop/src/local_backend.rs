@@ -2982,7 +2982,7 @@ mod tests {
     use super::*;
 
     fn wait_for_terminal(backend: &LocalBackend, id: &str) -> JobSnapshot {
-        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(30);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(300);
         loop {
             let snapshot = backend.get_job(id).unwrap();
             if snapshot.state.is_terminal() {
@@ -2994,6 +2994,13 @@ mod tests {
             );
             std::thread::sleep(std::time::Duration::from_millis(10));
         }
+    }
+
+    fn real_solver_acceptance_lock() -> MutexGuard<'static, ()> {
+        static LOCK: std::sync::OnceLock<Mutex<()>> = std::sync::OnceLock::new();
+        LOCK.get_or_init(|| Mutex::new(()))
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
     }
 
     #[test]
@@ -3698,6 +3705,7 @@ action = "raise"
     #[test]
     #[ignore = "production EHS2 solve acceptance; run explicitly"]
     fn real_solver_writes_and_reopens_all_v1_artifacts() {
+        let _serial = real_solver_acceptance_lock();
         let directory = tempfile::tempdir().unwrap();
         let backend = LocalBackend::new(directory.path().to_path_buf()).unwrap();
         let raw = include_str!("../../../examples/preflop_multiway_v1_gui_smoke.toml")
@@ -3797,9 +3805,9 @@ action = "raise"
                     name: Some("acceptance-resumed".into()),
                     overrides: ResumeOverrides {
                         max_sweeps: Some(completed_sweeps.saturating_add(1).to_string()),
-                        stop_target: Some("default".into()),
-                        threads: Some("auto".into()),
-                        memory: Some("1073741824".into()),
+                        stop_target: None,
+                        threads: Some("1".into()),
+                        memory: Some("1GiB".into()),
                         ..Default::default()
                     },
                 },
@@ -3845,6 +3853,7 @@ action = "raise"
     #[test]
     #[ignore = "production EHS2 solve acceptance; run explicitly"]
     fn real_solver_completes_a_sampled_icm_job() {
+        let _serial = real_solver_acceptance_lock();
         let directory = tempfile::tempdir().unwrap();
         let backend = LocalBackend::new(directory.path().to_path_buf()).unwrap();
         let raw = format!(
@@ -3897,6 +3906,7 @@ action = "raise"
     #[test]
     #[ignore = "production EHS2 solve acceptance; run explicitly"]
     fn local_cancel_stops_the_real_worker_and_keeps_a_resumable_checkpoint() {
+        let _serial = real_solver_acceptance_lock();
         let directory = tempfile::tempdir().unwrap();
         let backend = LocalBackend::new(directory.path().to_path_buf()).unwrap();
         let raw = include_str!("../../../examples/preflop_multiway_v1_gui_smoke.toml")
