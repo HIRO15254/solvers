@@ -147,6 +147,67 @@ bucket 数は policy arena の大きさを変えない(arena は preflop decisio
 抽象化の質の測定手段は production 表面の `solvers evaluate`(`.mwsol` を訓練済み deviation で再評価)と
 `solvers compare`(2 つの `.mwsol` 比較)が担う。研究を再開する場合は git 履歴から復元する。
 
+### R9. キャッシュは machine スコープ、config は run スコープ
+
+抽象化キャッシュの置き場所は config に書かない。解決順は
+`--cache-dir` > `SOLVERS_CACHE_DIR` > OS の user cache directory とする。
+
+根拠は 3 つの実測である。
+
+- v1 config は `artifact_cache` に `None` を渡しており、**毎 run で EHS² を
+  再構築している**(3-max smoke で 113–136 秒)。共有できていない。
+- 構築済みキャッシュの実体は **543 MB**。run directory ごとに置く選択肢は
+  最初から成立しない。
+- キャッシュ内容は `Ehs2Params{flop,turn,river}` と street 集合だけで決まる。
+  つまり machine に 1 つあれば足り、run や config に紐づける理由がない。
+
+config に書かないことは R10 の前提でもある。config が machine 固有の path を
+持つ限り、その config を別 host へ送れない。
+
+ファイル名は content-addressed にする: `ehs2/v{CACHE_VERSION}-f{K}-t{K}-r{K}.postcard`。
+固定名 1 つだと、K=128 の run と K=256 の run(cash 推奨値)が互いの成果物を
+上書きし続ける。既存の `load` は params 不一致を拒否するので破損はしないが、
+毎回 2 分の再構築を繰り返す。
+
+**同時実行**: 現行の `Ehs2Abstraction::save` は temp + rename で atomic だが、
+temp 名を出力ファイル名から作る(`.ehs2.postcard.tmp`)。共有キャッシュに同じ
+key を書く run が 2 つ走ると同一 temp path へ交互に書き込む。temp 名に pid と
+nonce を入れて一意にする。内容は決定的なので、rename の勝者はどちらでもよい。
+
+同じ key を複数 run が同時に構築する無駄(113 秒 × N)は、`O_EXCL` の lock file で
+1 本に絞る。lock 保持者が構築し、他は最終ファイルの出現を待つ。stale lock は
+時間で諦めて自前構築へ落とす。CLI 単独では滅多に競合しないので、これは daemon が
+複数 job を捌く Phase 2 で入れる。
+
+キャッシュ hit / 構築時間は `events.jsonl` に `Notice` として残す。GUI と daemon が
+「なぜ最初の 2 分が無反応なのか」を説明できる必要がある。
+
+### R10. remote へ送る config は self-contained でなければならない
+
+daemon は config を**テキストとして**受け取る。受信側の filesystem を基準に相対
+path を解決してはならない。送信側と受信側で別のファイルを指すため、同じ config が
+host によって別のゲームになる。
+
+v1 で path 値を持つキーは `game.tree.source`(mwtree script)ただ 1 つである。
+そして **effective config は既に self-contained である**: `materialize_effective_at`
+が script を lowering 済み rule 列へ展開するため、`validate --write-effective` の
+出力と run directory の `run.toml` には `source` が残らない。既存テスト
+`script_effective_config_is_self_contained` が、script ファイルを削除したうえで
+effective config を再 parse し、game fingerprint が一致することを確認している。
+
+したがって規則はこうなる。
+
+- **remote 投入の wire format は effective config とする。** client は
+  `validate --write-effective` 相当を通してから送る。
+- daemon は path 値キーを含む config を**解決せず拒否する**。「解決できなかった」
+  ではなく「self-contained でない」を理由として返す。
+- ローカルの `solve config.toml` は従来どおり config file の directory 基準で
+  解決する。手元の利便性を捨てる理由はない。
+
+R9 によって cache path が config から消えるので、この規則の対象は
+`game.tree.source` だけになる。legacy/HU family の `equity_cache` /
+`abstraction_cache` / `artifacts_cache` も同じ理由で machine スコープへ移す。
+
 ## 5. run directory 契約
 
 ### 5.1 レイアウト
@@ -170,8 +231,8 @@ bucket 数は policy arena の大きさを変えない(arena は preflop decisio
 不定期の離散事象であり、混ぜると既存 progress 行のスキーマが壊れ、クライアント側にフィルタが
 必要になるため。
 
-EHS2 等の抽象化キャッシュは run directory の外に置く(複数 run で共有するため)。共有キャッシュの
-既定位置は未決(§9)。
+EHS² 等の抽象化キャッシュは run directory の外、machine スコープの cache root に置く(R9)。
+実体が 543 MB あるため run ごとの複製は成立しない。
 
 ### 5.2 state 遷移
 
@@ -239,8 +300,8 @@ solvers inspect | evaluate | export | compare | report
 ## 7. daemon プロトコル草案(Phase 2 で確定)
 
 ```
-POST /v1/validate                      正規化 config + 診断
-POST /v1/runs                          run 作成(config TOML + 実行オプション)→ run_id
+POST /v1/validate                      正規化 config + 診断。self-contained 化にも使う
+POST /v1/runs                          run 作成(self-contained config TOML)→ run_id
 GET  /v1/runs                          一覧(state と進捗要約)
 GET  /v1/runs/{id}                     manifest + 最新 progress
 GET  /v1/runs/{id}/events?from=OFFSET  SSE。切断後は offset 指定で再開
@@ -249,6 +310,9 @@ POST /v1/runs/{id}/resume              中断ジョブの再開
 GET  /v1/runs/{id}/artifacts/{name}    成果物ダウンロード
 GET  /v1/solution/{id}/node?...        .mwsol のノード閲覧(inspect 相当)
 ```
+
+`POST /v1/runs` は path 値キーを含む config を拒否する(R10)。client は
+`POST /v1/validate` の正規化結果、つまり effective config を送る。
 
 型定義は `crates/protocol` に隔離する。`formats` は成果物フォーマット専用のまま維持する。
 認証は bearer token(daemon 起動時に生成し、ローカルは設定ディレクトリに保存)。
@@ -289,11 +353,32 @@ Phase 1でschemaとrun directory契約を確定させる際に、移植コスト
 比較して判断する。それまで`multiway`の`research-abstractions` featureが唯一の
 利用者であり、いかなるbinaryもこれを有効化しない。
 
+### EHS² キャッシュを 2 層にするか(R9 の派生、Phase 2 で判断)
+
+現在のキャッシュは **bucket id を保存している**。しかし高価な計算は bucket 化では
+なく、その手前の E[HS²] score sweep である。`build_table` は score を出してから
+weighted equal-frequency threshold を取り、第 2 pass で id へ量子化する。第 2 pass は
+score に対して決定的で安い。
+
+つまり K を変えると、K に依存しない 2 分の計算までやり直している。K=128 と K=256 を
+併用する運用(cash 推奨値が 256)では毎回これを払う。
+
+- **案 A(単層)**: 現状のまま、file 名を content-addressed にするだけ。K ごとに
+  543 MB と 2 分。実装は小さく、bucket id は 1 bit も変わらない。
+- **案 B(2 層)**: K 非依存の score 層(f32、約 1.1 GB)を 1 度だけ作り、K ごとの
+  bucket 層はそこから導出する。score が同一なら threshold も id も同一になるので
+  **bit 単位で現行と一致する**(fingerprint が変わらない)。
+- **案 C(却下)**: score を量子化して 1 ファイルに畳む。tie の構造が変わって
+  bucket 境界が動きうるため、abstraction fingerprint が変わる。artifact の同一性を
+  壊すので採らない。
+
+推奨は **A を先に入れ、B は sweep と導出の実測比を取ってから**である。B の利得は
+「2 分のうち何秒が sweep か」で決まり、そこはまだ測っていない。
+
 ## 10. 未決事項
 
-- 共有抽象化キャッシュ(EHS2)の既定位置と、複数 run からの同時アクセス制御
-- Postflop / HU の config schema 版番号と、Multiway v1 との共通セクションの切り出し方
-- リモート実行時の config 内相対パス(range ファイル等)の解決規則
+- EHS² キャッシュを score 層と bucket 層に分けるか(下記)
+- Postflop / HU の config schema を正規化契約へ格上げするか(現在は版マーカーのみ)
 - daemon のジョブキュー方針(FIFO / 優先度 / メモリ予算ベース)
 - 生成された TypeScript 型の配置とドリフト検出手段
 - full-recall/sparse storage を削除するか、toy game を dense 契約へ移植するか
