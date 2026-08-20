@@ -28,9 +28,24 @@ impl Daemon {
             .to_ip()
             .map(|address| address.port())
             .unwrap_or_default();
+        // The banner comes first, and always. Anything a client waits for
+        // -- a port, a readiness signal -- must not be preceded by output
+        // whose presence depends on what the runs root happened to hold.
         println!("solversd listening on http://{address} (port {port})");
         println!("runs root: {}", self.api.runs.path().display());
         println!("token: {}", self.token);
+
+        let recovered = self.api.recover();
+        if !recovered.requeued.is_empty() {
+            println!("resubmitted {} queued run(s)", recovered.requeued.len());
+        }
+        if !recovered.interrupted.is_empty() {
+            println!(
+                "{} run(s) were interrupted by a previous daemon and can be resumed: {}",
+                recovered.interrupted.len(),
+                recovered.interrupted.join(", ")
+            );
+        }
 
         let shared = Arc::new(self);
         for request in server.incoming_requests() {

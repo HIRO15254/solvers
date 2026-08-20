@@ -48,9 +48,22 @@ case "$command" in
       previous="$argument"
     done
     [ "$command" = resume ] && directory="$1"
+    now=1700000000000
+    # The real CLI records `running` before it does any work, so a crash
+    # never leaves a started run looking like it never started. The stub
+    # does the same, then optionally holds its slot.
+    printf '{"schemaVersion":1,"runId":"%s","state":"running","gameKind":"kuhn",' \
+      "$(basename "$directory")" > "$directory/manifest.json"
+    printf '"configSchema":"solvers.toy/v1","configHash":"aa","cliVersion":"stub",' \
+      >> "$directory/manifest.json"
+    printf '"command":["solve"],"pid":%s,"createdUnixMs":%s,"startedUnixMs":%s,' \
+      "$$" "$now" "$now" >> "$directory/manifest.json"
+    printf '"finishedUnixMs":null,"failure":null,"completion":null}\n' \
+      >> "$directory/manifest.json"
+    printf '{"seq":0,"unixMs":%s,"level":"info","kind":"state","state":"running"}\n' \
+      "$now" > "$directory/events.jsonl"
     # A config marked BLOCK holds its slot, so a test can observe queueing.
     if grep -q "BLOCK" "$directory/run.toml" 2>/dev/null; then sleep 30; fi
-    now=1700000000000
     printf '{"schemaVersion":1,"runId":"%s","state":"completed","gameKind":"kuhn",' \
       "$(basename "$directory")" > "$directory/manifest.json"
     printf '"configSchema":"solvers.toy/v1","configHash":"aa","cliVersion":"stub",' \
@@ -59,8 +72,6 @@ case "$command" in
       "$now" "$now" >> "$directory/manifest.json"
     printf '"finishedUnixMs":%s,"failure":null,"completion":"completed"}\n' \
       "$now" >> "$directory/manifest.json"
-    printf '{"seq":0,"unixMs":%s,"level":"info","kind":"state","state":"running"}\n' \
-      "$now" > "$directory/events.jsonl"
     printf '{"seq":1,"unixMs":%s,"level":"info","kind":"state","state":"completed"}\n' \
       "$now" >> "$directory/events.jsonl"
     printf '{"iteration":42,"elapsedSecs":0.5}\n' > "$directory/progress.jsonl"
@@ -71,8 +82,11 @@ esac
 struct Daemon {
     child: Child,
     port: u16,
+    /// Kept alive for the daemon's lifetime when this instance owns it. A
+    /// restart test supplies its own directory instead, so the runs root
+    /// and the stub survive the first daemon.
     #[allow(dead_code)]
-    home: tempfile::TempDir,
+    home: Option<tempfile::TempDir>,
     runs: PathBuf,
 }
 
@@ -86,14 +100,24 @@ impl Drop for Daemon {
 impl Daemon {
     fn start(max_concurrent: usize) -> Self {
         let home = tempfile::tempdir().expect("temp home");
-        let solver = home.path().join("solvers");
-        std::fs::write(&solver, STUB_SOLVER).unwrap();
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            std::fs::set_permissions(&solver, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let mut daemon = Self::start_in(home.path(), max_concurrent);
+        daemon.home = Some(home);
+        daemon
+    }
+
+    /// Starts a daemon over `home`, writing the stub solver there if it is
+    /// not already present. Restarting means calling this twice.
+    fn start_in(home: &Path, max_concurrent: usize) -> Self {
+        let solver = home.join("solvers");
+        if !solver.exists() {
+            std::fs::write(&solver, STUB_SOLVER).unwrap();
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::PermissionsExt;
+                std::fs::set_permissions(&solver, std::fs::Permissions::from_mode(0o755)).unwrap();
+            }
         }
-        let runs = home.path().join("runs");
+        let runs = home.join("runs");
 
         // Port 0 asks the OS for a free port, which the daemon prints.
         let mut child = Command::new(env!("CARGO_BIN_EXE_solversd"))
@@ -108,25 +132,12 @@ impl Daemon {
             .spawn()
             .expect("spawn solversd");
 
-        let mut banner = [0u8; 256];
-        let read = child
-            .stdout
-            .as_mut()
-            .expect("daemon stdout")
-            .read(&mut banner)
-            .expect("read the daemon banner");
-        let banner = String::from_utf8_lossy(&banner[..read]).into_owned();
-        let port = banner
-            .split("(port ")
-            .nth(1)
-            .and_then(|rest| rest.split(')').next())
-            .and_then(|port| port.parse().ok())
-            .unwrap_or_else(|| panic!("no port in banner: {banner:?}"));
+        let port = read_port(&mut child);
 
         Self {
             child,
             port,
-            home,
+            home: None,
             runs,
         }
     }
@@ -190,6 +201,31 @@ impl Daemon {
         }
         panic!("run {run_id} never finished");
     }
+}
+
+/// The daemon prints the port it bound, which is how a test finds an
+/// OS-assigned one.
+///
+/// Read line by line rather than in one chunk: the daemon prints more after
+/// the banner, and a fixed read could split a line in half.
+fn read_port(child: &mut Child) -> u16 {
+    let stdout = child.stdout.as_mut().expect("daemon stdout");
+    let mut reader = std::io::BufReader::new(stdout);
+    let mut line = String::new();
+    for _ in 0..10 {
+        line.clear();
+        let read = std::io::BufRead::read_line(&mut reader, &mut line).expect("read a banner line");
+        assert!(read > 0, "the daemon exited before announcing a port");
+        if let Some(port) = line
+            .split("(port ")
+            .nth(1)
+            .and_then(|rest| rest.split(')').next())
+            .and_then(|port| port.parse().ok())
+        {
+            return port;
+        }
+    }
+    panic!("no port in the daemon's first lines: {line:?}");
 }
 
 fn parse(body: &str) -> serde_json::Value {
@@ -464,4 +500,27 @@ fn a_solution_view_of_a_run_without_one_is_unavailable() {
 
     let (status, _) = daemon.get(&format!("/v1/runs/{run_id}/solution/nonsense"));
     assert_eq!(status, 404);
+}
+
+/// A queued run outlives the daemon that accepted it.
+///
+/// Its directory is the only record that it was accepted, so a restart has
+/// to find it and start it. Otherwise "the daemon keeps no state" would
+/// mean "the daemon forgets".
+#[test]
+fn a_restart_picks_up_a_run_that_was_still_queued() {
+    let home = tempfile::tempdir().expect("temp home");
+    let daemon = Daemon::start_in(home.path(), 1);
+    let (_, blocking) = daemon.post("/v1/runs", &config("BLOCK"));
+    assert_eq!(blocking["state"], "running");
+    let (_, waiting) = daemon.post("/v1/runs", &config("waits-for-a-restart"));
+    assert_eq!(waiting["state"], "queued");
+    let waiting_id = waiting["runId"].as_str().unwrap().to_string();
+
+    // Restart over the same directory, with nothing holding a slot.
+    drop(daemon);
+    let restarted = Daemon::start_in(home.path(), 1);
+
+    let recovered = restarted.await_terminal(&waiting_id);
+    assert_eq!(recovered["state"], "completed");
 }

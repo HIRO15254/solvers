@@ -325,10 +325,56 @@ impl Api {
         Ok(directory)
     }
 
+    /// Picks up the runs a previous daemon left behind.
+    ///
+    /// Runs that were waiting for a slot are resubmitted: their directories
+    /// are the only record that they were accepted, and a restart that
+    /// dropped them would make "the daemon keeps no state" a lie rather
+    /// than a design (R2, R11).
+    ///
+    /// Runs the previous daemon was *executing* are left alone. Their
+    /// process died with it, so they read as `interrupted`, and continuing
+    /// one is a decision with a cost -- it re-solves from the last
+    /// checkpoint -- that belongs to whoever asks for it.
+    pub fn recover(&self) -> Recovered {
+        let mut recovered = Recovered::default();
+        let Ok(runs) = self.runs.list() else {
+            return recovered;
+        };
+        for run in runs {
+            match run.state {
+                RunState::Queued => {
+                    let Ok(directory) = self.runs.directory(&run.run_id) else {
+                        continue;
+                    };
+                    if self
+                        .jobs
+                        .submit(&run.run_id, &directory, JobCommand::Solve)
+                        .is_ok()
+                    {
+                        recovered.requeued.push(run.run_id);
+                    }
+                }
+                RunState::Interrupted => recovered.interrupted.push(run.run_id),
+                _ => {}
+            }
+        }
+        recovered
+    }
+
     /// Restarts anything the finished jobs made room for.
     pub fn pump(&self) {
         let _ = self.jobs.pump();
     }
+}
+
+/// What a restart found waiting for it.
+#[derive(Debug, Default)]
+pub struct Recovered {
+    /// Runs resubmitted because they never started.
+    pub requeued: Vec<String>,
+    /// Runs whose previous process died mid-solve. Reported, not restarted.
+    pub interrupted: Vec<String>,
 }
 
 /// The files a client may download, in the order a listing reports them.

@@ -131,7 +131,10 @@ daemon は状態を持たない(R2)。したがって「slot 待ち」も run di
 しなければならず、daemon を再起動したら待ち行列ごと復元できる必要がある。
 
 そのため daemon は job を受理した時点で run directory を作り、`run.toml` と
-`state = "queued"` の manifest を書く。CLI 側の `solve --out` は空 directory だけを
+`state = "queued"` の manifest を書く。daemon 起動時は runs root を走査し、
+`queued` のまま残っていた run を再投入する。`interrupted`(前の daemon が実行中に
+死んだ run)は**再開しない** — checkpoint からの再実行にはコストがあり、それを
+払うかは要求した者が決めることである。報告だけして待つ。CLI 側の `solve --out` は空 directory だけを
 受け付けていたが、**用意済みの queued directory であれば引き取る**(`create_or_adopt`)。
 引き取り可能なのは「manifest が queued で、中身が `manifest.json` / `run.toml` /
 `stdout.log` だけ」の場合に限る。それ以外の populated directory は従来どおり拒否する。
