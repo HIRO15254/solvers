@@ -246,7 +246,7 @@ Tauri は「daemon を同梱起動して SPA をホストするだけ」の薄�
 
 | Phase | 内容 | 完了条件 |
 |-------|------|----------|
-| **0** | 表面の刈り込み: GUI 削除、legacy 受理経路の削除、研究ライン削除(R8)、`crates/cli` へ集約、CI 簡素化、文書同期 | production 表面が schema 付き config のみになる |
+| **0**(完了) | 表面の刈り込み: GUI 削除、legacy 受理経路の削除、研究ライン削除(R8)、`crates/cli` へ集約、CI 簡素化、文書同期 | Multiway Preflop の production 表面が schema 付き config のみになる |
 | **1** | run directory 契約の確立: 全 kind の schema 必須化と `--out` 一本化、manifest/events 導入、`status`/`watch`/`runs ls` 追加 | GUI なしで長時間ランを投入・監視・再開できる |
 | **2** | `crates/protocol` + `solversd`(子プロセス管理・キュー・認証・SSE) | リモートホスト上の run を CLI から投入・監視・再開できる |
 | **3** | Web GUI(純クライアント SPA) | ローカル / リモートを同一 UI で扱える |

@@ -23,7 +23,8 @@ checkpoint/solution metadataを同じchange setで更新する。
 
 アプリケーション層の再設計は`docs/app-architecture.md`を正本とし、Phase 0〜3で進める。
 
-- Phase 0(進行中): GUI削除、legacy受理経路の削除、研究ラインの削除、`crates/cli`への集約。
+- Phase 0(完了): GUI削除、legacy受理経路の削除、研究ラインの削除、`crates/cli`への集約。
+  full-recall/sparse storageの削除だけはPhase 1へ送った(理由はapp-architecture.md §9)。
 - Phase 1: run directory契約の確立。全kindのschema必須化と`--out`一本化、
   manifest/events、`status`/`watch`/`runs ls`。
 - Phase 2: `crates/protocol`と`solversd`(子プロセス管理、queue、認証、SSE)。
