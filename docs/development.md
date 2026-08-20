@@ -149,9 +149,8 @@ equivalent `.ckpt` checkpoint's size at this scale. Export both from the same
 solve and compare:
 
 ```sh
-target/release/solvers solve examples/3betpot_fast.toml \
-    --checkpoint /tmp/3betpot_fast.ckpt --sol /tmp/3betpot_fast.sol
-ls -la /tmp/3betpot_fast.ckpt /tmp/3betpot_fast.sol
+target/release/solvers solve examples/3betpot_fast.toml --out /tmp/3betpot_fast
+ls -la /tmp/3betpot_fast/checkpoint.ckpt /tmp/3betpot_fast/solution.sol
 ```
 
 (`--sol-streets no-rivers`, the default, is the artifact this bar targets --

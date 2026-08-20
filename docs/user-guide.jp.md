@@ -212,6 +212,11 @@ cargo run -p cli --release -- runs ls runs
 cargo run -p cli --release -- resume runs/my-run
 ```
 
+これはMultiway Preflopに限らない。Postflop、HU Preflop、toy gameも同じ
+`solve --out` / `status` / `watch` / `resume` で扱う。engineごとに違うのは
+run directory内の2ファイル(`checkpoint.mwckpt`/`solution.mwsol`と
+`checkpoint.ckpt`/`solution.sol`)だけである。
+
 再開は同じrun directoryに追記する。`manifest.json`のrun idと作成時刻は保たれ、
 `events.jsonl`の`seq`も連続する。別のdirectoryへ分岐したい場合は`--out`を渡す。
 

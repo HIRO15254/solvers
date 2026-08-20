@@ -196,9 +196,9 @@ enum Command {
     Solve {
         /// Path to the config file (see examples/kuhn.toml).
         config: std::path::PathBuf,
-        /// Required run directory for Multiway Preflop v1.
+        /// Run directory to create. Every artifact of the run lands here.
         #[arg(long)]
-        out: Option<std::path::PathBuf>,
+        out: std::path::PathBuf,
         /// Override v1 worker threads for this invocation.
         #[arg(long)]
         threads: Option<usize>,
@@ -208,30 +208,10 @@ enum Command {
         /// Override the v1 cumulative solve-time limit.
         #[arg(long)]
         max_time: Option<String>,
-
-        /// Write the average strategy as JSON to this path.
-        #[arg(long)]
-        output: Option<std::path::PathBuf>,
         /// Betting-line history to export (postflop/preflop; repeatable).
         /// Defaults to the root node only.
         #[arg(long = "history", default_value = "")]
         history: Vec<String>,
-        /// Append a metrics row (JSONL) at every exploitability check.
-        #[arg(long)]
-        metrics: Option<std::path::PathBuf>,
-        /// Autosave a checkpoint at every exploitability check (and once
-        /// more at the end), stamped with this config file's blake3 hash.
-        #[arg(long)]
-        checkpoint: Option<std::path::PathBuf>,
-        /// Overrides `run.iterations` for this invocation only. Does not
-        /// change the checkpoint's config hash, which is always derived
-        /// from the raw config file bytes.
-        #[arg(long)]
-        iterations: Option<u64>,
-        /// Export a compact `.sol` viewer artifact after the run completes
-        /// (postflop configs only; browse it later with `inspect --sol`).
-        #[arg(long)]
-        sol: Option<std::path::PathBuf>,
         /// Which streets get stored strategy blocks in the `.sol` export.
         /// `no-rivers` (default) omits river action nodes -- the viewer
         /// re-solves them lazily on demand; `full` stores every action node
@@ -242,12 +222,9 @@ enum Command {
     },
     /// Continue a checkpointed solve to `run.iterations` total iterations.
     Resume {
-        /// Run directory from `solve --out` (or a bare `.mwckpt`). Legacy
-        /// configs pass their config here together with --checkpoint.
-        config: std::path::PathBuf,
-        /// Legacy checkpoint path. Omit for a self-contained v1 `.mwckpt`.
-        #[arg(long, hide = true)]
-        checkpoint: Option<std::path::PathBuf>,
+        /// Run directory from `solve --out`, or a bare self-contained
+        /// `.mwckpt` that was moved out of one.
+        run: std::path::PathBuf,
         /// Fork the resumed run into a new, empty directory.
         #[arg(long)]
         out: Option<std::path::PathBuf>,
@@ -275,15 +252,9 @@ enum Command {
         /// Override periodic checkpoint cadence (for example, 15m).
         #[arg(long)]
         checkpoint_interval: Option<String>,
-        /// Legacy output path; hidden from the v1 command surface.
-        #[arg(long, hide = true)]
-        output: Option<std::path::PathBuf>,
         /// Betting-line history to export (postflop/preflop; repeatable).
-        #[arg(long = "history", default_value = "", hide = true)]
+        #[arg(long = "history", default_value = "")]
         history: Vec<String>,
-        /// Append a metrics row (JSONL) at every exploitability check.
-        #[arg(long, hide = true)]
-        metrics: Option<std::path::PathBuf>,
     },
     /// Inspect a formal .mwsol artifact, or open the legacy postflop explorer.
     Inspect {
@@ -436,31 +407,19 @@ pub fn main_impl() -> Result<()> {
             threads,
             memory,
             max_time,
-            output,
             history,
-            metrics,
-            checkpoint,
-            iterations,
-            sol,
             sol_streets,
         } => solve::run(
             &config,
-            out.as_deref(),
+            &out,
             threads,
             memory.as_deref(),
             max_time.as_deref(),
-            output.as_deref(),
             &history,
-            metrics.as_deref(),
-            checkpoint.as_deref(),
-            iterations,
-            sol.as_deref(),
             sol_streets,
         ),
         Command::Resume {
-            config,
-            checkpoint,
-            output,
+            run,
             out,
             threads,
             memory,
@@ -471,22 +430,18 @@ pub fn main_impl() -> Result<()> {
             evaluation_samples,
             evaluation_cadence,
             checkpoint_interval,
-            metrics,
         } => resume::run(
-            &config,
-            checkpoint.as_deref(),
+            &run,
             out.as_deref(),
             threads,
             memory.as_deref(),
             max_time.as_deref(),
-            output.as_deref(),
             max_sweeps,
             stop_target,
             evaluation_samples,
             evaluation_cadence,
             checkpoint_interval.as_deref(),
             &history,
-            metrics.as_deref(),
         ),
         Command::Inspect {
             config,

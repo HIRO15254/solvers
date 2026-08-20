@@ -23,19 +23,18 @@ use crate::postflop_setup;
 use crate::preflop_setup;
 use crate::sol::{SolExportSpec, SolStreets};
 
-#[allow(clippy::too_many_arguments)]
+/// Solves `config_path` into the run directory `out`.
+///
+/// There is one output path: a solve produces a run directory or it produces
+/// nothing. That is what lets `status`, `watch`, and the future job daemon
+/// treat every run the same way, whichever engine ran it.
 pub fn run(
     config_path: &Path,
-    out: Option<&Path>,
+    out: &Path,
     threads: Option<usize>,
     memory: Option<&str>,
     max_time: Option<&str>,
-    output: Option<&Path>,
     histories: &[String],
-    metrics: Option<&Path>,
-    checkpoint: Option<&Path>,
-    iterations: Option<u64>,
-    sol: Option<&Path>,
     sol_streets: SolStreets,
 ) -> Result<()> {
     let raw_bytes =
@@ -59,55 +58,41 @@ pub fn run(
         source_raw.to_owned()
     };
     let raw = effective_raw.as_str();
-    let mut run_paths = None;
-    if is_multiway_v1 {
-        let directory =
-            out.ok_or_else(|| anyhow!("Multiway Preflop v1 requires --out <run-directory>"))?;
-        if output.is_some()
-            || metrics.is_some()
-            || checkpoint.is_some()
-            || sol.is_some()
-            || iterations.is_some()
-            || histories.iter().any(|history| !history.is_empty())
-        {
-            return Err(anyhow!(
-                "Multiway Preflop v1 uses only --out; remove legacy output/history/checkpoint overrides"
-            ));
-        }
-        crate::run_dir::create_empty(directory)?;
-        run_paths = Some(crate::run_dir::RunPaths::multiway(directory));
-    } else if let Some(directory) = out {
-        if output.is_some() || metrics.is_some() || checkpoint.is_some() || sol.is_some() {
-            return Err(anyhow!(
-                "--out writes a run directory; remove the individual \
-                 --output/--metrics/--checkpoint/--sol paths"
-            ));
-        }
-        crate::run_dir::create_empty(directory)?;
-        run_paths = Some(crate::run_dir::RunPaths::heads_up(directory));
+    if is_multiway_v1 && histories.iter().any(|history| !history.is_empty()) {
+        return Err(anyhow!(
+            "Multiway Preflop v1 publishes strategy through its solution artifact, \
+             not --history"
+        ));
     }
-    let mut config: SolveConfig =
+    crate::run_dir::create_empty(out)?;
+    let config: SolveConfig =
         crate::config::parse_solve_config_at(raw, config_path).context("parsing config")?;
+    let run_paths = if is_multiway_v1 {
+        crate::run_dir::RunPaths::multiway(out)
+    } else {
+        crate::run_dir::RunPaths::heads_up(out)
+    };
 
-    // A run directory supplies every artifact path. The two engines differ
+    // The run directory supplies every artifact path. The two engines differ
     // only in which file each artifact lands in: the multiway path reports
     // its summary as `run.json` and its strategy inside `solution.mwsol`,
     // while the heads-up path writes a separate `strategy.json` and only
     // has a `.sol` viewer artifact for postflop games.
-    let (output, metrics, checkpoint, sol) = match run_paths.as_ref() {
-        Some(paths) if is_multiway_v1 => (
+    let paths = &run_paths;
+    let (output, metrics, checkpoint, sol) = if is_multiway_v1 {
+        (
             Some(paths.result.as_path()),
             Some(paths.progress.as_path()),
             Some(paths.checkpoint.as_path()),
             Some(paths.solution.as_path()),
-        ),
-        Some(paths) => (
+        )
+    } else {
+        (
             Some(paths.strategy.as_path()),
             Some(paths.progress.as_path()),
             Some(paths.checkpoint.as_path()),
             matches!(config.game, GameSection::Postflop { .. }).then(|| paths.solution.as_path()),
-        ),
-        None => (output, metrics, checkpoint, sol),
+        )
     };
 
     if !is_multiway_v1 && matches!(config.game, GameSection::PreflopMultiway(_)) {
@@ -117,31 +102,10 @@ pub fn run(
             crate::multiway_v1::SCHEMA
         ));
     }
-    if let Some(it) = iterations {
-        if matches!(config.game, GameSection::PreflopMultiway(_)) {
-            config.run.sweeps = Some(it);
-        } else {
-            config.run.iterations = it;
-        }
-    }
-    // Hashed from the raw file bytes, not the parsed/overridden struct: a
-    // `--iterations` override must not change what a checkpoint is stamped
-    // with, since `resume` re-derives the same hash from the same file.
+    // Hashed from the raw file bytes rather than the parsed struct, so
+    // `resume` re-derives the same stamp from the run directory's copy.
     let config_hash = formats::config_hash(raw.as_bytes());
     if matches!(config.game, GameSection::PreflopMultiway(_)) {
-        let Some(paths) = run_paths.as_ref() else {
-            return crate::multiway_solve::run(
-                raw,
-                config,
-                output,
-                metrics,
-                checkpoint,
-                config_hash,
-                sol,
-                Some(&crate::CLI_CANCEL),
-                true,
-            );
-        };
         let mut recorder = crate::run_dir::RunRecorder::start(
             &paths.directory,
             "preflop-multiway",
@@ -203,24 +167,11 @@ pub fn run(
         None => None,
     };
 
-    let Some(paths) = run_paths.as_ref() else {
-        return solve_heads_up(
-            config,
-            output,
-            histories,
-            metrics,
-            checkpoint_sink,
-            sol_spec,
-            None,
-        )
-        .map(|_summary| ());
-    };
-
     let game_kind = game_kind_name(&config.game);
     let mut recorder = crate::run_dir::RunRecorder::start(
         &paths.directory,
         game_kind,
-        None,
+        config.schema.clone(),
         config_hash,
         raw,
         vec![
@@ -266,7 +217,7 @@ pub fn run(
 }
 
 /// Names the game for a run manifest. These match the config's `kind`.
-fn game_kind_name(game: &GameSection) -> &'static str {
+pub(crate) fn game_kind_name(game: &GameSection) -> &'static str {
     match game {
         GameSection::Kuhn => "kuhn",
         GameSection::Leduc => "leduc",
@@ -348,6 +299,7 @@ impl RunHooks<'static> {
 /// signature unchanged means `resume` and `bench` (which never export
 /// `.sol` files) don't need to touch their call sites for the `.sol`
 /// feature at all.
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn run_with_storage<S: Storage>(
     config: SolveConfig,
     output: Option<&Path>,
@@ -355,6 +307,7 @@ pub(crate) fn run_with_storage<S: Storage>(
     metrics: Option<&Path>,
     checkpoint: Option<(&Path, [u8; 32])>,
     resume_state: Option<SolverState>,
+    events: Option<&mut formats::RunEventLog>,
 ) -> Result<RunSummary> {
     run_with_storage_impl::<S>(
         config,
@@ -364,7 +317,7 @@ pub(crate) fn run_with_storage<S: Storage>(
         checkpoint,
         resume_state,
         None,
-        None,
+        events,
     )
 }
 

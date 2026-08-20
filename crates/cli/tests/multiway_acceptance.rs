@@ -100,30 +100,19 @@ fn retired_v1_abstraction_options_have_stable_rejection_codes() {
 #[test]
 
 fn hand_written_lowered_configs_are_rejected_by_release_solve() {
-    {
-        let name = "lowered.toml";
-        let directory = tempfile::tempdir().expect("create rejection tempdir");
-        let config = directory.path().join(name);
-        std::fs::write(&config, common::LOWERED_LEGACY).expect("write lowered fixture");
-        let result = directory.path().join("result.json");
-        let checkpoint = directory.path().join("result.mwckpt");
-        let solution = directory.path().join("result.mwsol");
-        let output = run_solvers(&[
-            "solve",
-            config.to_str().unwrap(),
-            "--output",
-            result.to_str().unwrap(),
-            "--checkpoint",
-            checkpoint.to_str().unwrap(),
-            "--sol",
-            solution.to_str().unwrap(),
-        ]);
-        assert_error_code(&output, "MWP003");
-        assert!(!result.exists(), "{name} unexpectedly wrote a result");
-        assert!(
-            !checkpoint.exists(),
-            "{name} unexpectedly wrote a checkpoint"
-        );
-        assert!(!solution.exists(), "{name} unexpectedly wrote a solution");
+    let directory = tempfile::tempdir().expect("create rejection tempdir");
+    let config = directory.path().join("lowered.toml");
+    std::fs::write(&config, common::LOWERED_LEGACY).expect("write lowered fixture");
+    let run = directory.path().join("run");
+
+    let output = run_solvers(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
+    ]);
+    assert_error_code(&output, "MWP003");
+    for name in ["run.json", "checkpoint.mwckpt", "solution.mwsol"] {
+        assert!(!run.join(name).exists(), "{name} was written anyway");
     }
 }

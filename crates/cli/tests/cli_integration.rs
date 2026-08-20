@@ -204,16 +204,15 @@ check_every = 50
 fn solve_checkpoint_and_metrics_smoke() {
     let dir = temp_dir("ckpt-metrics");
     let config = workspace_root().join("examples/kuhn.toml");
-    let checkpoint = dir.join("run.ckpt");
-    let metrics = dir.join("run.jsonl");
+    let run = dir.join("run");
+    let checkpoint = run.join("checkpoint.ckpt");
+    let metrics = run.join("progress.jsonl");
 
     let output = run_solvers_ok(&[
         "solve",
         config.to_str().unwrap(),
-        "--checkpoint",
-        checkpoint.to_str().unwrap(),
-        "--metrics",
-        metrics.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
     ]);
     let stdout = String::from_utf8_lossy(&output.stdout);
     let reported_iters: u64 = done_line_field(&stdout, "iterations=").parse().unwrap();
@@ -238,49 +237,59 @@ fn solve_checkpoint_and_metrics_smoke() {
     assert_eq!(last_iter, reported_iters);
 }
 
+/// Resuming must reproduce a straight solve exactly.
+///
+/// The partial run uses its own config file capped at 200 iterations, and
+/// the resumed run swaps in the 400-iteration config. The checkpoint is
+/// stamped with the config hash, so the two files must otherwise be
+/// byte-identical -- which is what makes this a real equivalence check
+/// rather than a re-run.
 #[test]
 fn resume_equivalence_kuhn() {
     let dir = temp_dir("resume-equiv");
-    let config = dir.join("kuhn.toml");
-    std::fs::write(&config, KUHN_NO_EARLY_STOP).unwrap();
-    let checkpoint = dir.join("run.ckpt");
-    let out_a = dir.join("a.json");
-    let out_b = dir.join("b.json");
+    let full_config = dir.join("kuhn-400.toml");
+    std::fs::write(&full_config, KUHN_NO_EARLY_STOP).unwrap();
+    let partial_config = dir.join("kuhn-200.toml");
+    std::fs::write(
+        &partial_config,
+        KUHN_NO_EARLY_STOP.replace("iterations = 400", "iterations = 200"),
+    )
+    .unwrap();
 
     // Run A: straight solve to the full 400 iterations.
+    let run_a = dir.join("a");
     run_solvers_ok(&[
         "solve",
-        config.to_str().unwrap(),
-        "--output",
-        out_a.to_str().unwrap(),
+        full_config.to_str().unwrap(),
+        "--out",
+        run_a.to_str().unwrap(),
     ]);
 
-    // Run B: partial solve to 200 (an `--iterations` override, which does
-    // NOT change the config-file hash the checkpoint is stamped with --
-    // see `solve::run`), then resume using the *same* config file to 400
-    // total.
+    // Run B: solve to 200, then swap in the 400-iteration config and resume.
+    let run_b = dir.join("b");
     run_solvers_ok(&[
         "solve",
-        config.to_str().unwrap(),
-        "--iterations",
-        "200",
-        "--checkpoint",
-        checkpoint.to_str().unwrap(),
+        partial_config.to_str().unwrap(),
+        "--out",
+        run_b.to_str().unwrap(),
     ]);
+    let checkpoint = run_b.join("checkpoint.ckpt");
     let loaded = formats::read_checkpoint(&checkpoint).unwrap();
     assert_eq!(loaded.iteration, 200);
 
-    run_solvers_ok(&[
-        "resume",
-        config.to_str().unwrap(),
-        "--checkpoint",
-        checkpoint.to_str().unwrap(),
-        "--output",
-        out_b.to_str().unwrap(),
-    ]);
+    // The run directory carries the config the checkpoint was stamped with,
+    // so continuing to 400 means rewriting both together.
+    std::fs::write(run_b.join("run.toml"), KUHN_NO_EARLY_STOP).unwrap();
+    let restamped = formats::Checkpoint {
+        config_hash: formats::config_hash(KUHN_NO_EARLY_STOP.as_bytes()),
+        ..loaded
+    };
+    formats::write_checkpoint(&checkpoint, restamped.config_hash, &restamped.state).unwrap();
 
-    let a = std::fs::read_to_string(&out_a).unwrap();
-    let b = std::fs::read_to_string(&out_b).unwrap();
+    run_solvers_ok(&["resume", run_b.to_str().unwrap()]);
+
+    let a = std::fs::read_to_string(run_a.join("strategy.json")).unwrap();
+    let b = std::fs::read_to_string(run_b.join("strategy.json")).unwrap();
     assert_eq!(
         a, b,
         "a checkpointed-then-resumed solve must byte-for-byte match a straight solve"
@@ -293,18 +302,12 @@ fn legacy_multiway_solve_is_rejected_before_creating_artifacts() {
     let dir = temp_dir("multiway-legacy-rejected");
     let config = dir.join("lowered.toml");
     std::fs::write(&config, common::LOWERED_LEGACY).unwrap();
-    let result = dir.join("result.json");
-    let checkpoint = dir.join("result.mwckpt");
-    let solution = dir.join("result.mwsol");
+    let run = dir.join("run");
     let output = run_solvers(&[
         "solve",
         config.to_str().unwrap(),
-        "--output",
-        result.to_str().unwrap(),
-        "--checkpoint",
-        checkpoint.to_str().unwrap(),
-        "--sol",
-        solution.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
     ]);
     assert!(
         !output.status.success(),
@@ -315,9 +318,12 @@ fn legacy_multiway_solve_is_rejected_before_creating_artifacts() {
         "stderr: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    assert!(!result.exists());
-    assert!(!checkpoint.exists());
-    assert!(!solution.exists());
+    // The rejection happens before any artifact is produced. The run
+    // directory itself exists (it is created to hold the manifest), so the
+    // check is that it stayed empty of results.
+    for name in ["run.json", "checkpoint.mwckpt", "solution.mwsol"] {
+        assert!(!run.join(name).exists(), "{name} was written anyway");
+    }
 }
 
 #[test]
@@ -388,26 +394,22 @@ fn resume_tampered_config_errors() {
     let dir = temp_dir("resume-tamper");
     let config = dir.join("kuhn.toml");
     std::fs::write(&config, KUHN_NO_EARLY_STOP).unwrap();
-    let checkpoint = dir.join("run.ckpt");
+    let run = dir.join("run");
 
     run_solvers_ok(&[
         "solve",
         config.to_str().unwrap(),
-        "--checkpoint",
-        checkpoint.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
     ]);
 
-    // Tamper with the config after the checkpoint was produced.
+    // Tamper with the run directory's copy of the config after the
+    // checkpoint was stamped against it.
     let mut tampered = KUHN_NO_EARLY_STOP.to_string();
     tampered.push_str("\n# tampered\n");
-    std::fs::write(&config, tampered).unwrap();
+    std::fs::write(run.join("run.toml"), tampered).unwrap();
 
-    let output = run_solvers(&[
-        "resume",
-        config.to_str().unwrap(),
-        "--checkpoint",
-        checkpoint.to_str().unwrap(),
-    ]);
+    let output = run_solvers(&["resume", run.to_str().unwrap()]);
     assert!(!output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(
@@ -455,16 +457,15 @@ fn sol_export_and_inspect_smoke() {
     let dir = temp_dir("sol-smoke");
     let config = dir.join("turn.toml");
     std::fs::write(&config, TINY_TURN_TOML).unwrap();
-    let sol_path = dir.join("out.sol");
-    let checkpoint = dir.join("out.ckpt");
+    let run = dir.join("run");
+    let sol_path = run.join("solution.sol");
+    let checkpoint = run.join("checkpoint.ckpt");
 
     let output = run_solvers_ok(&[
         "solve",
         config.to_str().unwrap(),
-        "--sol",
-        sol_path.to_str().unwrap(),
-        "--checkpoint",
-        checkpoint.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
     ]);
     let stdout = String::from_utf8_lossy(&output.stdout);
 
@@ -643,13 +644,14 @@ fn inspect_sol_river_navigation_smoke() {
 fn i16_storage_solve_converges_and_checkpoint_round_trips() {
     let dir = temp_dir("i16");
     let config = workspace_root().join("examples/kuhn_i16.toml");
-    let checkpoint = dir.join("run.ckpt");
+    let run = dir.join("run");
+    let checkpoint = run.join("checkpoint.ckpt");
 
     let output = run_solvers_ok(&[
         "solve",
         config.to_str().unwrap(),
-        "--checkpoint",
-        checkpoint.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
     ]);
     let stdout = String::from_utf8_lossy(&output.stdout);
     let nash_conv: f64 = done_line_field(&stdout, "nash_conv=").parse().unwrap();
@@ -792,7 +794,12 @@ iterations = 1
     let config = dir.join("bad_model.toml");
     std::fs::write(&config, config_text).unwrap();
 
-    let output = run_solvers(&["solve", config.to_str().unwrap()]);
+    let output = run_solvers(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        dir.join("run").to_str().unwrap(),
+    ]);
     assert!(
         !output.status.success(),
         "an unsupported game.postflop.model must fail the solve"
