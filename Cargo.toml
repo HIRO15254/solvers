@@ -50,7 +50,7 @@ clap = { version = "4", features = ["derive"] }
 rand = "0.8"
 rand_chacha = "0.3"
 tempfile = "3"
-tiny_http = "0.12"
+tiny_http = { version = "0.12", features = ["ssl-rustls"] }
 criterion = "0.5"
 blake3 = "1"
 postcard = { version = "1", features = ["alloc", "use-std"] }

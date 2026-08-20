@@ -9,6 +9,7 @@ mod api;
 mod http;
 mod jobs;
 mod runs;
+mod tls;
 
 use std::path::PathBuf;
 
@@ -27,10 +28,17 @@ struct Cli {
     /// Directory holding run directories. This is the daemon's entire state.
     #[arg(long, default_value = "runs")]
     runs: PathBuf,
-    /// Address to bind. Loopback by default: a token alone is not enough to
-    /// expose this to a network, which needs TLS and a deliberate choice.
+    /// Address to bind. Loopback by default; a non-loopback address
+    /// requires TLS, since the bearer token would otherwise cross the
+    /// network in clear.
     #[arg(long, default_value = "127.0.0.1:38127")]
     bind: String,
+    /// PEM certificate chain to serve TLS with. Requires --tls-key.
+    #[arg(long, requires = "tls_key")]
+    tls_cert: Option<PathBuf>,
+    /// PEM private key for --tls-cert.
+    #[arg(long, requires = "tls_cert")]
+    tls_key: Option<PathBuf>,
     /// The `solvers` binary to run. Defaults to one beside this executable,
     /// then to `solvers` on PATH.
     #[arg(long)]
@@ -65,6 +73,12 @@ fn run() -> Result<()> {
         .with_context(|| format!("opening the runs root {}", cli.runs.display()))?;
     let jobs = JobRunner::new(solver.clone(), cli.cache_dir.clone(), cli.max_concurrent);
 
+    let tls = match (cli.tls_cert.as_deref(), cli.tls_key.as_deref()) {
+        (Some(certificate), Some(key)) => Some(tls::Tls::load(certificate, key)?),
+        _ => None,
+    };
+    tls::check_exposure(&cli.bind, tls.is_some())?;
+
     Daemon {
         api: Api { runs, jobs, solver },
         token: cli
@@ -72,7 +86,7 @@ fn run() -> Result<()> {
             .or_else(|| std::env::var("SOLVERSD_TOKEN").ok())
             .unwrap_or_else(generate_token),
     }
-    .serve(&cli.bind)
+    .serve(&cli.bind, tls)
 }
 
 /// A 256-bit token, hex-encoded.

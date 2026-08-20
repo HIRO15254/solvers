@@ -148,6 +148,12 @@ policy arena を確保するため、律速は CPU ではなくメモリであ�
 local = loopback + token、remote = TLS + token。GUI 側の分岐は接続プロファイル(URL とトークン)のみ。
 「ローカル専用の in-process 経路」は作らない。
 
+**非 loopback への bind は TLS なしでは拒否する。** token は「誰が要求しているか」を
+証明するだけで、「誰が聞いているか」には何もしない。平文接続では token 自体が header で
+ネットワークを流れるため、経路上の第三者がそれを取って run の投入・cancel・solution の
+取得までできてしまう。警告ではなく起動拒否とし、代替(SSH tunnel 越しの loopback)を
+error message で示す。
+
 ### R8. 抽象化最適化の研究ラインは打ち切る
 
 `experiment` サブコマンド、`research-abstractions` feature、RolloutKMeans 抽象化、研究専用 example、
@@ -415,8 +421,7 @@ TypeScript の型は `crates/protocol` から生成し、手書きしない(R4)�
    Multiway v1 専用になる。
 2. **TypeScript 型の生成手段**(§10)。手書きに逃げる余地を残さないため、最初の 1 行を
    書く前に決める。
-3. **TLS**(§9 Phase 2 残)。remote profile を UI に出す以上、接続が保護されている必要が
-   ある。ローカルのみで始めるなら後回しでよい。
+3. ~~TLS~~(実装済み)。remote profile を UI に出せる状態になっている。
 
 旧 SPA(2026-08 に削除)の画面構成とコンポーネントは、tag `pre-gui-removal` 以前の
 Git 履歴に残っている。`strategy-matrix`、`betting-tree-editor`、`table-range-editor` は
@@ -428,7 +433,7 @@ UX 資産として参照する価値があるが、config を TS 側で解釈す
 |-------|------|----------|
 | **0**(完了) | 表面の刈り込み: GUI 削除、legacy 受理経路の削除、研究ライン削除(R8)、`crates/cli` へ集約、CI 簡素化、文書同期 | Multiway Preflop の production 表面が schema 付き config のみになる |
 | **1**(完了) | run directory 契約の確立: manifest/events 導入、`status`/`watch`/`runs ls`、run directory を受け取る `resume`、全 kind の schema 必須化、全 kind の `--out` 一本化 | GUI なしで長時間ランを投入・監視・再開できる |
-| **2**(進行中) | `crates/protocol` + `solversd`(子プロセス管理・キュー・認証・event page・artifact/solution view)。TLS とリモート運用は残 | リモートホスト上の run を CLI から投入・監視・再開できる |
+| **2**(完了) | `crates/protocol` + `solversd`(子プロセス管理・キュー・認証・TLS・event page・artifact/solution view) | リモートホスト上の run を CLI から投入・監視・再開できる |
 | **3**(未着手) | Web GUI(純クライアント SPA)。設計は §8、着手条件は §8.6 | ローカル / リモートを同一 UI で扱える |
 
 Phase 1 と 2 の順序が重要である。run directory 契約を確定させてから daemon を書くことで、
@@ -494,8 +499,6 @@ GUI(Phase 3)の着手前に決めるべきものを先に挙げる。理由は �
 - **Postflop / HU の config schema を正規化契約へ格上げするか**(現在は版マーカーのみ)。
   Setup 画面の形がここで決まる。
 - **生成された TypeScript 型の配置とドリフト検出手段**。手書きに逃げる余地を残さない。
-- **TLS**(Phase 2 の残)。remote profile を UI に出すなら必要。
-
 GUI とは独立に残っているもの。
 
 - full-recall/sparse storage を削除するか、toy game を dense 契約へ移植するか(§9 の注記)

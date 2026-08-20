@@ -28,10 +28,10 @@ checkpoint/solution metadataを同じchange setで更新する。
 - Phase 1(完了): run directory契約の確立。manifest/events、
   `status`/`watch`/`runs ls`、run directoryを受け取る`resume`、
   全kindのschema必須化と`--out`一本化。
-- Phase 2(進行中): `crates/protocol`と`solversd`。job 投入・監視・cancel・resume・
-  queue・bearer token・artifact/solution view まで動作。残りはTLSとremote運用。
+- Phase 2(完了): `crates/protocol`と`solversd`。job 投入・監視・cancel・resume・
+  queue・bearer token・TLS・artifact/solution view まで動作。
 - Phase 3: Web GUI(純client)。設計は`app-architecture.md` §8に記録済み、未着手。
-  着手条件(Postflop/HU schema、TS型生成、TLS)は同 §8.6。
+  着手条件(Postflop/HU schema、TS型生成)は同 §8.6。
 - Viewer/研究workflow: artifact query、Python/WASM境界の必要性を実測で判断する。
 
 完了済みmilestoneの時系列日誌は現行文書へ追記せず、Git履歴と

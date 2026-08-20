@@ -12,6 +12,7 @@ use serde::Serialize;
 use tiny_http::{Header, Method, Request, Response, Server};
 
 use crate::api::Api;
+use crate::tls::Tls;
 
 pub struct Daemon {
     pub api: Api,
@@ -20,9 +21,13 @@ pub struct Daemon {
 
 impl Daemon {
     /// Serves until the process is stopped.
-    pub fn serve(self, address: &str) -> Result<()> {
-        let server =
-            Server::http(address).map_err(|error| anyhow::anyhow!("binding {address}: {error}"))?;
+    pub fn serve(self, address: &str, tls: Option<Tls>) -> Result<()> {
+        let scheme = if tls.is_some() { "https" } else { "http" };
+        let server = match tls {
+            Some(tls) => Server::https(address, tls.into_config()),
+            None => Server::http(address),
+        }
+        .map_err(|error| anyhow::anyhow!("binding {address}: {error}"))?;
         let port = server
             .server_addr()
             .to_ip()
@@ -31,7 +36,7 @@ impl Daemon {
         // The banner comes first, and always. Anything a client waits for
         // -- a port, a readiness signal -- must not be preceded by output
         // whose presence depends on what the runs root happened to hold.
-        println!("solversd listening on http://{address} (port {port})");
+        println!("solversd listening on {scheme}://{address} (port {port})");
         println!("runs root: {}", self.api.runs.path().display());
         println!("token: {}", self.token);
 

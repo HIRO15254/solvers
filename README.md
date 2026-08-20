@@ -121,6 +121,20 @@ curl -H "Authorization: Bearer $TOKEN" localhost:38127/v1/runs/$ID/solution/summ
 Runs it creates are ordinary run directories: `solvers status` and
 `solvers watch` read them too.
 
+Binding anything but loopback requires TLS -- the token travels in a header,
+so a clear connection hands it to anyone on the path:
+
+```bash
+openssl req -x509 -newkey rsa:2048 -nodes -days 365 \
+    -keyout key.pem -out cert.pem -subj "/CN=$(hostname)" \
+    -addext "subjectAltName=DNS:$(hostname)"
+cargo run -p daemon --release -- --bind 0.0.0.0:38127 \
+    --tls-cert cert.pem --tls-key key.pem
+```
+
+Without a certificate, reach a remote daemon through an SSH tunnel to its
+loopback address instead.
+
 ## License
 
 MIT OR Apache-2.0, at your option. See [LICENSE-POLICY.md](LICENSE-POLICY.md)
