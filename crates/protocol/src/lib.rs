@@ -127,6 +127,62 @@ pub struct EventPage {
     pub terminal: bool,
 }
 
+/// One downloadable file in a run directory.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ArtifactEntry {
+    pub name: String,
+    pub bytes: u64,
+}
+
+/// `GET /v1/runs/{id}/artifacts` -- what the run has produced so far.
+///
+/// Only files the run-directory contract defines are listed. A run
+/// directory is not a general file share, and a client that could name any
+/// path would turn the daemon into one.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ArtifactListResponse {
+    pub artifacts: Vec<ArtifactEntry>,
+}
+
+/// Views a solved artifact can be rendered as, matching `solvers export`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum SolutionView {
+    Strategy,
+    Actions,
+    Range,
+    Ev,
+    Tree,
+    Summary,
+}
+
+impl SolutionView {
+    pub fn parse(value: &str) -> Option<Self> {
+        Some(match value {
+            "strategy" => Self::Strategy,
+            "actions" => Self::Actions,
+            "range" => Self::Range,
+            "ev" => Self::Ev,
+            "tree" => Self::Tree,
+            "summary" => Self::Summary,
+            _ => return None,
+        })
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Strategy => "strategy",
+            Self::Actions => "actions",
+            Self::Range => "range",
+            Self::Ev => "ev",
+            Self::Tree => "tree",
+            Self::Summary => "summary",
+        }
+    }
+}
+
 /// Every failure the daemon reports, with a code a client can branch on.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -149,6 +205,9 @@ pub enum ErrorCode {
     /// The request was well-formed but not applicable -- cancelling a run
     /// that already stopped, resuming one with no checkpoint.
     Conflict,
+    /// The run exists but has not produced what was asked for -- a
+    /// solution view of a run that has not finished, say.
+    Unavailable,
     /// The daemon failed at something that was not the client's fault.
     Internal,
 }
@@ -168,6 +227,7 @@ impl ErrorResponse {
             ErrorCode::NotFound => 404,
             ErrorCode::InvalidConfig | ErrorCode::ConfigNotSelfContained => 400,
             ErrorCode::Conflict => 409,
+            ErrorCode::Unavailable => 409,
             ErrorCode::Internal => 500,
         }
     }
@@ -219,6 +279,7 @@ mod tests {
             (ErrorCode::InvalidConfig, 400),
             (ErrorCode::ConfigNotSelfContained, 400),
             (ErrorCode::Conflict, 409),
+            (ErrorCode::Unavailable, 409),
             (ErrorCode::Internal, 500),
         ] {
             assert_eq!(ErrorResponse::new(code, "x").http_status(), status);
@@ -227,6 +288,22 @@ mod tests {
 
     /// The event page is the resumable half of the protocol; its two fields
     /// are what makes a disconnect recoverable.
+    /// The view names are the client's vocabulary and must match the CLI's.
+    #[test]
+    fn solution_views_round_trip_through_their_names() {
+        for view in [
+            SolutionView::Strategy,
+            SolutionView::Actions,
+            SolutionView::Range,
+            SolutionView::Ev,
+            SolutionView::Tree,
+            SolutionView::Summary,
+        ] {
+            assert_eq!(SolutionView::parse(view.as_str()), Some(view));
+        }
+        assert_eq!(SolutionView::parse("nonsense"), None);
+    }
+
     #[test]
     fn an_event_page_carries_the_offset_to_resume_from() {
         let page = EventPage {

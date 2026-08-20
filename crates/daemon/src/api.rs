@@ -9,8 +9,9 @@ use std::process::Command;
 
 use formats::{RunEventLog, RunManifest, RunState, read_events};
 use protocol::{
-    CreateRunRequest, CreateRunResponse, ErrorCode, ErrorResponse, EventPage, PROTOCOL_VERSION,
-    RunListResponse, RunSummary, ServerInfo, ValidateRequest, ValidateResponse,
+    ArtifactEntry, ArtifactListResponse, CreateRunRequest, CreateRunResponse, ErrorCode,
+    ErrorResponse, EventPage, PROTOCOL_VERSION, RunListResponse, RunSummary, ServerInfo,
+    SolutionView, ValidateRequest, ValidateResponse,
 };
 
 use crate::jobs::{CancelOutcome, JobCommand, JobRunner};
@@ -163,16 +164,7 @@ impl Api {
 
     /// A page of a run's event log, starting at `from` bytes.
     pub fn events(&self, run_id: &str, from: u64) -> ApiResult<EventPage> {
-        let directory = self
-            .runs
-            .directory(run_id)
-            .map_err(|error| ErrorResponse::new(ErrorCode::NotFound, error.to_string()))?;
-        if !formats::is_run_directory(&directory) {
-            return Err(ErrorResponse::new(
-                ErrorCode::NotFound,
-                format!("no run {run_id:?}"),
-            ));
-        }
+        let directory = self.run_directory(run_id)?;
         let path = RunEventLog::path_in(&directory);
         let (events, next_offset) = match read_events(&path, from) {
             Ok(page) => page,
@@ -235,9 +227,136 @@ impl Api {
         })
     }
 
+    /// The files a run has produced, of those the contract defines.
+    ///
+    /// The list is an allow-list rather than a directory listing: a run
+    /// directory holds whatever the solver wrote there, and a client that
+    /// could name any path would turn the daemon into a file server.
+    pub fn artifacts(&self, run_id: &str) -> ApiResult<ArtifactListResponse> {
+        let directory = self.run_directory(run_id)?;
+        let mut artifacts = Vec::new();
+        for name in ARTIFACTS {
+            if let Ok(metadata) = std::fs::metadata(directory.join(name)) {
+                artifacts.push(ArtifactEntry {
+                    name: (*name).to_string(),
+                    bytes: metadata.len(),
+                });
+            }
+        }
+        Ok(ArtifactListResponse { artifacts })
+    }
+
+    /// One artifact's bytes, with the content type to serve it as.
+    pub fn artifact(&self, run_id: &str, name: &str) -> ApiResult<(Vec<u8>, &'static str)> {
+        let directory = self.run_directory(run_id)?;
+        if !ARTIFACTS.contains(&name) {
+            return Err(ErrorResponse::new(
+                ErrorCode::NotFound,
+                format!("{name:?} is not a run artifact"),
+            ));
+        }
+        let path = directory.join(name);
+        let bytes = std::fs::read(&path).map_err(|error| {
+            if error.kind() == std::io::ErrorKind::NotFound {
+                ErrorResponse::new(
+                    ErrorCode::Unavailable,
+                    format!("run {run_id:?} has not produced {name:?}"),
+                )
+            } else {
+                internal(error)
+            }
+        })?;
+        Ok((bytes, content_type(name)))
+    }
+
+    /// Renders a view of a finished run's solution artifact.
+    ///
+    /// Shelling out to `solvers export` keeps one implementation of what a
+    /// view means, so the daemon and the CLI cannot drift into showing
+    /// different numbers for the same solve (R4, R5).
+    pub fn solution_view(
+        &self,
+        run_id: &str,
+        view: SolutionView,
+        csv: bool,
+    ) -> ApiResult<(Vec<u8>, &'static str)> {
+        let directory = self.run_directory(run_id)?;
+        let solution = directory.join(formats::RUN_SOLUTION_FILE);
+        if !solution.is_file() {
+            return Err(ErrorResponse::new(
+                ErrorCode::Unavailable,
+                format!(
+                    "run {run_id:?} has no {}; only a finished multiway run has one",
+                    formats::RUN_SOLUTION_FILE
+                ),
+            ));
+        }
+        let output = Command::new(&self.solver)
+            .arg("export")
+            .arg(&solution)
+            .arg(view.as_str())
+            .arg("--format")
+            .arg(if csv { "csv" } else { "json" })
+            .output()
+            .map_err(internal)?;
+        if !output.status.success() {
+            return Err(ErrorResponse::new(
+                ErrorCode::Internal,
+                String::from_utf8_lossy(&output.stderr).trim().to_string(),
+            ));
+        }
+        Ok((
+            output.stdout,
+            if csv { "text/csv" } else { "application/json" },
+        ))
+    }
+
+    fn run_directory(&self, run_id: &str) -> ApiResult<std::path::PathBuf> {
+        let directory = self
+            .runs
+            .directory(run_id)
+            .map_err(|error| ErrorResponse::new(ErrorCode::NotFound, error.to_string()))?;
+        if !formats::is_run_directory(&directory) {
+            return Err(ErrorResponse::new(
+                ErrorCode::NotFound,
+                format!("no run {run_id:?}"),
+            ));
+        }
+        Ok(directory)
+    }
+
     /// Restarts anything the finished jobs made room for.
     pub fn pump(&self) {
         let _ = self.jobs.pump();
+    }
+}
+
+/// The files a client may download, in the order a listing reports them.
+///
+/// Every name comes from the run-directory contract; nothing else in the
+/// directory is reachable.
+const ARTIFACTS: &[&str] = &[
+    formats::RUN_MANIFEST_FILE,
+    formats::RUN_CONFIG_FILE,
+    formats::RUN_RESULT_FILE,
+    formats::RUN_PROGRESS_FILE,
+    formats::RUN_EVENTS_FILE,
+    formats::RUN_STRATEGY_FILE,
+    formats::RUN_SOLUTION_FILE,
+    formats::RUN_HU_SOLUTION_FILE,
+    formats::RUN_CHECKPOINT_FILE,
+    formats::RUN_HU_CHECKPOINT_FILE,
+    "stdout.log",
+];
+
+fn content_type(name: &str) -> &'static str {
+    match name.rsplit('.').next() {
+        Some("json") => "application/json",
+        // JSON Lines is not JSON: served as plain text so a client streams
+        // it line by line rather than trying to parse the whole file.
+        Some("jsonl") | Some("log") => "text/plain",
+        Some("toml") => "text/plain",
+        _ => "application/octet-stream",
     }
 }
 
@@ -264,6 +383,23 @@ pub fn default_solver_path() -> std::path::PathBuf {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Nothing outside the contract is downloadable, however it is spelled.
+    #[test]
+    fn only_contract_file_names_are_artifacts() {
+        assert!(ARTIFACTS.contains(&"manifest.json"));
+        assert!(ARTIFACTS.contains(&"solution.mwsol"));
+        for outside in ["../../etc/passwd", ".cache", "run.toml.bak", ""] {
+            assert!(!ARTIFACTS.contains(&outside), "{outside:?} is reachable");
+        }
+    }
+
+    #[test]
+    fn content_types_follow_the_file_kind() {
+        assert_eq!(content_type("manifest.json"), "application/json");
+        assert_eq!(content_type("events.jsonl"), "text/plain");
+        assert_eq!(content_type("solution.mwsol"), "application/octet-stream");
+    }
 
     #[test]
     fn a_validation_error_naming_a_missing_file_is_classified_as_not_self_contained() {

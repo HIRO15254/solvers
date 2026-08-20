@@ -29,7 +29,7 @@ checkpoint/solution metadataを同じchange setで更新する。
   `status`/`watch`/`runs ls`、run directoryを受け取る`resume`、
   全kindのschema必須化と`--out`一本化。
 - Phase 2(進行中): `crates/protocol`と`solversd`。job 投入・監視・cancel・resume・
-  queue・bearer token まで動作。残りはTLSと remote 運用、artifact download。
+  queue・bearer token・artifact/solution view まで動作。残りはTLSとremote運用。
 - Phase 3: Web GUI(純client)。
 - Viewer/研究workflow: artifact query、Python/WASM境界の必要性を実測で判断する。
 

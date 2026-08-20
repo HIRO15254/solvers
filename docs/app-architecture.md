@@ -323,9 +323,17 @@ GET  /v1/runs/{id}                     manifest + 最新 progress
 GET  /v1/runs/{id}/events?from=OFFSET  event page。offset で再開する
 POST /v1/runs/{id}/cancel              SIGINT 相当(checkpoint 保存して終了)
 POST /v1/runs/{id}/resume              停止した run の再開
-(未実装) GET /v1/runs/{id}/artifacts/{name}   成果物ダウンロード
-(未実装) GET /v1/solution/{id}/node?...       .mwsol のノード閲覧
+GET  /v1/runs/{id}/artifacts           run が産んだ file の一覧(名前と byte 数)
+GET  /v1/runs/{id}/artifacts/{name}    成果物ダウンロード
+GET  /v1/runs/{id}/solution/{view}     .mwsol の view (?format=csv 可)
 ```
+
+artifact の `{name}` は run directory 契約が定める名前の allow-list に限る。
+directory listing をそのまま出すと、solver が置いた任意の file — 将来の cache や
+scratch — まで取得できてしまい、run directory が汎用の file share になる。
+
+solution view は `solvers export` へ委譲する。view の意味の実装を 1 つに保つことで、
+daemon と CLI が同じ solve について違う数字を出す余地をなくす(R4、R5)。
 
 event の配信は SSE ではなく offset 付き page とした。読み手が保持するのは
 `nextOffset` だけで、これは `solvers watch --from` と同じ contract である。同じ
@@ -355,7 +363,7 @@ Tauri は「daemon を同梱起動して SPA をホストするだけ」の薄�
 |-------|------|----------|
 | **0**(完了) | 表面の刈り込み: GUI 削除、legacy 受理経路の削除、研究ライン削除(R8)、`crates/cli` へ集約、CI 簡素化、文書同期 | Multiway Preflop の production 表面が schema 付き config のみになる |
 | **1**(完了) | run directory 契約の確立: manifest/events 導入、`status`/`watch`/`runs ls`、run directory を受け取る `resume`、全 kind の schema 必須化、全 kind の `--out` 一本化 | GUI なしで長時間ランを投入・監視・再開できる |
-| **2**(進行中) | `crates/protocol` + `solversd`(子プロセス管理・キュー・認証・event page)。TLS とリモート運用は残 | リモートホスト上の run を CLI から投入・監視・再開できる |
+| **2**(進行中) | `crates/protocol` + `solversd`(子プロセス管理・キュー・認証・event page・artifact/solution view)。TLS とリモート運用は残 | リモートホスト上の run を CLI から投入・監視・再開できる |
 | **3** | Web GUI(純クライアント SPA) | ローカル / リモートを同一 UI で扱える |
 
 Phase 1 と 2 の順序が重要である。run directory 契約を確定させてから daemon を書くことで、

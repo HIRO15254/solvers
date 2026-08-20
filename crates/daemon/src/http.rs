@@ -7,7 +7,7 @@
 use std::sync::Arc;
 
 use anyhow::{Context, Result};
-use protocol::{CreateRunRequest, ErrorCode, ErrorResponse, ValidateRequest};
+use protocol::{CreateRunRequest, ErrorCode, ErrorResponse, SolutionView, ValidateRequest};
 use serde::Serialize;
 use tiny_http::{Header, Method, Request, Response, Server};
 
@@ -92,6 +92,31 @@ impl Daemon {
                     .and_then(|value| value.parse::<u64>().ok())
                     .unwrap_or(0);
                 respond(request, self.api.events(id, from))
+            }
+            (Method::Get, ["v1", "runs", id, "artifacts"]) => {
+                respond(request, self.api.artifacts(id))
+            }
+            (Method::Get, ["v1", "runs", id, "artifacts", name]) => {
+                match self.api.artifact(id, name) {
+                    Ok((bytes, content_type)) => send_bytes(request, 200, &bytes, content_type),
+                    Err(error) => respond_error(request, error),
+                }
+            }
+            (Method::Get, ["v1", "runs", id, "solution", view]) => {
+                let Some(view) = SolutionView::parse(view) else {
+                    return respond_error(
+                        request,
+                        ErrorResponse::new(
+                            ErrorCode::NotFound,
+                            format!("{view:?} is not a solution view"),
+                        ),
+                    );
+                };
+                let csv = query_value(&query, "format").as_deref() == Some("csv");
+                match self.api.solution_view(id, view, csv) {
+                    Ok((bytes, content_type)) => send_bytes(request, 200, &bytes, content_type),
+                    Err(error) => respond_error(request, error),
+                }
             }
             (Method::Post, ["v1", "runs", id, "cancel"]) => {
                 let outcome = self.api.cancel(id);
@@ -178,11 +203,18 @@ fn respond_error(request: Request, error: ErrorResponse) -> Result<()> {
 }
 
 fn send(request: Request, status: u16, body: &str) -> Result<()> {
-    let header = Header::from_bytes(&b"Content-Type"[..], &b"application/json"[..])
+    send_bytes(request, status, body.as_bytes(), "application/json")
+}
+
+/// Artifacts are served as bytes with their own content type: a `.mwsol` is
+/// binary and a `.jsonl` is a stream of lines, neither of which a client
+/// should be told is a JSON document.
+fn send_bytes(request: Request, status: u16, body: &[u8], content_type: &str) -> Result<()> {
+    let header = Header::from_bytes(&b"Content-Type"[..], content_type.as_bytes())
         .map_err(|()| anyhow::anyhow!("building the content-type header"))?;
     request
         .respond(
-            Response::from_string(body)
+            Response::from_data(body)
                 .with_status_code(status)
                 .with_header(header),
         )

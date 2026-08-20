@@ -114,6 +114,8 @@ curl -H "Authorization: Bearer $TOKEN" localhost:38127/v1/runs
 curl -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
     -d "{\"configToml\": $(jq -Rs . < config.toml)}" localhost:38127/v1/runs
 curl -H "Authorization: Bearer $TOKEN" "localhost:38127/v1/runs/$ID/events?from=0"
+curl -H "Authorization: Bearer $TOKEN" localhost:38127/v1/runs/$ID/artifacts
+curl -H "Authorization: Bearer $TOKEN" localhost:38127/v1/runs/$ID/solution/summary
 ```
 
 Runs it creates are ordinary run directories: `solvers status` and

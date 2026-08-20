@@ -375,3 +375,93 @@ fn a_run_past_the_limit_is_queued_and_visible() {
         "a queued run must already be on disk"
     );
 }
+
+/// A client needs the run's outputs, not just its status. The listing is an
+/// allow-list of the contract's file names, so a run directory never
+/// becomes a general file share.
+#[test]
+fn artifacts_are_listed_and_downloadable_by_contract_name() {
+    let daemon = Daemon::start(1);
+    let (_, created) = daemon.post("/v1/runs", &config("artifacts"));
+    let run_id = created["runId"].as_str().unwrap().to_string();
+    daemon.await_terminal(&run_id);
+
+    let (status, listing) = daemon.get(&format!("/v1/runs/{run_id}/artifacts"));
+    assert_eq!(status, 200);
+    let names: Vec<&str> = listing["artifacts"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|entry| entry["name"].as_str().unwrap())
+        .collect();
+    assert!(names.contains(&"manifest.json"), "{names:?}");
+    assert!(names.contains(&"run.toml"), "{names:?}");
+    assert!(names.contains(&"events.jsonl"), "{names:?}");
+    // Only files that exist are listed, with their real size. An empty
+    // `stdout.log` is a legitimate entry -- a run that printed nothing.
+    assert!(!names.contains(&"solution.mwsol"), "{names:?}");
+    let manifest = listing["artifacts"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|entry| entry["name"] == "manifest.json")
+        .unwrap();
+    assert_eq!(
+        manifest["bytes"].as_u64().unwrap(),
+        std::fs::metadata(daemon.runs.join(&run_id).join("manifest.json"))
+            .unwrap()
+            .len()
+    );
+
+    let (status, body) = daemon.request(
+        "GET",
+        &format!("/v1/runs/{run_id}/artifacts/run.toml"),
+        Some("test-token"),
+        None,
+    );
+    assert_eq!(status, 200);
+    assert!(body.contains("solvers.toy/v1"), "{body:?}");
+}
+
+/// Anything outside the contract is not reachable, however it is spelled.
+#[test]
+fn an_artifact_outside_the_contract_is_not_found() {
+    let daemon = Daemon::start(1);
+    let (_, created) = daemon.post("/v1/runs", &config("allowlist"));
+    let run_id = created["runId"].as_str().unwrap().to_string();
+    daemon.await_terminal(&run_id);
+
+    for name in ["..%2F..%2Fetc%2Fpasswd", ".cache", "run.toml.bak"] {
+        let (status, _) = daemon.get(&format!("/v1/runs/{run_id}/artifacts/{name}"));
+        assert_eq!(status, 404, "{name} was reachable");
+    }
+}
+
+/// Asking for a file the run has not produced is not the same as asking for
+/// one that does not exist in the contract.
+#[test]
+fn a_missing_artifact_is_reported_as_unavailable() {
+    let daemon = Daemon::start(1);
+    let (_, created) = daemon.post("/v1/runs", &config("missing"));
+    let run_id = created["runId"].as_str().unwrap().to_string();
+    daemon.await_terminal(&run_id);
+
+    let (status, error) = daemon.get(&format!("/v1/runs/{run_id}/artifacts/solution.mwsol"));
+    assert_eq!(status, 409);
+    assert_eq!(error["code"], "unavailable");
+}
+
+#[test]
+fn a_solution_view_of_a_run_without_one_is_unavailable() {
+    let daemon = Daemon::start(1);
+    let (_, created) = daemon.post("/v1/runs", &config("noview"));
+    let run_id = created["runId"].as_str().unwrap().to_string();
+    daemon.await_terminal(&run_id);
+
+    let (status, error) = daemon.get(&format!("/v1/runs/{run_id}/solution/summary"));
+    assert_eq!(status, 409);
+    assert_eq!(error["code"], "unavailable");
+
+    let (status, _) = daemon.get(&format!("/v1/runs/{run_id}/solution/nonsense"));
+    assert_eq!(status, 404);
+}
