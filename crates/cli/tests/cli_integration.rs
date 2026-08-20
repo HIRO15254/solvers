@@ -1175,3 +1175,56 @@ fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
         .collect();
     assert_eq!(seqs, (0..seqs.len() as u64).collect::<Vec<_>>());
 }
+
+/// A cold cache costs minutes; a warm one must cost nothing. The run also
+/// has to say which of the two happened, since a watcher otherwise sees an
+/// unexplained silence before the first progress row.
+#[test]
+#[ignore = "builds the full EHS2 tables once; explicit release acceptance only"]
+fn the_abstraction_cache_is_shared_across_runs() {
+    let dir = temp_dir("ehs2-cache");
+    let cache = dir.join("cache");
+    let config = workspace_root().join("examples/preflop_multiway_v1_3max_smoke.toml");
+
+    let cold = run_solvers_ok(&[
+        "--cache-dir",
+        cache.to_str().unwrap(),
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        dir.join("cold").to_str().unwrap(),
+    ]);
+    assert!(
+        String::from_utf8_lossy(&cold.stdout).contains("ehs2 tables: built"),
+        "the first run must build the tables"
+    );
+
+    // The table's file name carries the bucket counts, so a second run with
+    // different counts would not reuse this one.
+    let cached: Vec<_> = std::fs::read_dir(cache.join("ehs2"))
+        .expect("cache directory")
+        .map(|entry| entry.unwrap().file_name().to_string_lossy().into_owned())
+        .collect();
+    assert_eq!(cached.len(), 1, "{cached:?}");
+    assert!(cached[0].contains("-f2-t2-r2."), "{cached:?}");
+
+    let warm_run = dir.join("warm");
+    let warm = run_solvers_ok(&[
+        "--cache-dir",
+        cache.to_str().unwrap(),
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        warm_run.to_str().unwrap(),
+    ]);
+    assert!(
+        String::from_utf8_lossy(&warm.stdout).contains("ehs2 tables: loaded"),
+        "the second run must load the cached tables"
+    );
+
+    let events = std::fs::read_to_string(warm_run.join("events.jsonl")).unwrap();
+    assert!(
+        events.contains("ehs2 tables loaded in"),
+        "the run event log must record the cache hit: {events}"
+    );
+}

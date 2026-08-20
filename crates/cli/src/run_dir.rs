@@ -179,6 +179,17 @@ impl RunRecorder {
     /// are already in `progress.jsonl`, so only the discrete ones land here.
     pub fn observe(&mut self, observation: &MultiwayRunObservation) {
         let payload = match observation {
+            MultiwayRunObservation::Abstraction(abstraction) => Some(RunEventPayload::Notice {
+                message: format!(
+                    "ehs2 tables {} in {:.2}s",
+                    if abstraction.cached {
+                        "loaded"
+                    } else {
+                        "built"
+                    },
+                    abstraction.secs
+                ),
+            }),
             MultiwayRunObservation::Checkpoint(checkpoint) => Some(RunEventPayload::Checkpoint {
                 sweeps: checkpoint.sweeps,
             }),

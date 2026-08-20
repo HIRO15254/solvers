@@ -619,6 +619,9 @@ abstraction到達数、resource/fingerprint/output preflightはsolve時にのみ
 CLIの`validate`単体はこのsolve-time resource barrierまで実行しない。Desktopの
 Setup preflightはtreeとresource estimateも実行する。
 
+抽象化cacheの位置は`--cache-dir` > `SOLVERS_CACHE_DIR` > OSのuser cache directoryで
+決まり、configには書かない。machine固有のpathを持つconfigは別hostへ送れないためである。
+
 v1 solve-time overrideは `--threads`、`--memory`、`--max-time` のみ。
 generic `--set` はなく、legacyの個別output flagはv1では拒否される。
 `resume`はrun directoryを受け取り、その中の`checkpoint.mwckpt`を使う。

@@ -97,6 +97,16 @@ pub struct MultiwayQualityObservation {
     pub metrics: MultiwayMetricsRow,
 }
 
+/// The card abstraction is ready. Published before sweep 0 because a cold
+/// EHS² build takes minutes, and a watcher otherwise sees an unexplained
+/// silence between `running` and the first progress row.
+#[derive(Clone, Copy, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiwayAbstractionObservation {
+    pub cached: bool,
+    pub secs: f64,
+}
+
 /// A checkpoint was written; the run is resumable from this sweep count.
 #[derive(Clone, Copy, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -117,6 +127,7 @@ pub struct MultiwayStopObservation {
 #[derive(Clone, Debug, Serialize)]
 #[serde(tag = "kind", rename_all = "kebab-case")]
 pub enum MultiwayRunObservation {
+    Abstraction(MultiwayAbstractionObservation),
     Live(MultiwayLiveObservation),
     Quality(MultiwayQualityObservation),
     Checkpoint(MultiwayCheckpointObservation),
@@ -280,6 +291,16 @@ fn run_inner(
         session::build_production_multiway_session(&effective_toml, resume_checkpoint)?;
     #[cfg(test)]
     let mut mw_session = session::build_multiway_session(&effective_toml, resume_checkpoint)?;
+    if let Some(ready) = mw_session.abstraction_ready
+        && let Some(observer) = &mut observer
+    {
+        observer(MultiwayRunObservation::Abstraction(
+            MultiwayAbstractionObservation {
+                cached: ready.cached,
+                secs: ready.secs,
+            },
+        ));
+    }
     mw_session.config_toml = raw_config.to_string();
     mw_session.config_hash = config_hash;
     let policy_allocation = mw_session.solver.policy_arena_allocation();
@@ -1055,6 +1076,9 @@ mod tests {
                 }
                 MultiwayRunObservation::Quality(observation) => {
                     observations.push(("quality".into(), observation.metrics.sweeps));
+                }
+                MultiwayRunObservation::Abstraction(observation) => {
+                    observations.push(("abstraction".into(), observation.cached as u64));
                 }
                 MultiwayRunObservation::Checkpoint(observation) => {
                     observations.push(("checkpoint".into(), observation.sweeps));

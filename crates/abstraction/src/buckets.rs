@@ -96,6 +96,10 @@ pub struct Ehs2Abstraction {
     river: Option<StreetTable>,
 }
 
+/// Distinguishes concurrent cache writers within one process; the pid
+/// distinguishes them across processes.
+static TEMP_NONCE: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
 // --- canonical-board key helpers -------------------------------------------
 
 fn flop_key(board: &Board) -> Vec<u8> {
@@ -700,7 +704,7 @@ impl Ehs2Abstraction {
         Ok(table)
     }
 
-    /// Writes the table atomically (temp file + rename).
+    /// Writes the table atomically (unique temp file + rename).
     pub fn save(&self, path: &Path) -> Result<(), BucketCacheError> {
         let payload = postcard::to_allocvec(self)?;
         let mut buf = Vec::with_capacity(CACHE_HEADER_LEN + payload.len());
@@ -712,11 +716,18 @@ impl Ehs2Abstraction {
             .parent()
             .filter(|p| !p.as_os_str().is_empty())
             .unwrap_or_else(|| Path::new("."));
+        // Unique per writer: a shared cache root means two processes can
+        // build the same table at once, and a temp name derived only from
+        // the target would have them writing into one file before both
+        // renamed it into place. The content is deterministic, so whichever
+        // rename lands last is still correct.
         let tmp_name = format!(
-            ".{}.tmp",
+            ".{}.{}.{}.tmp",
             path.file_name()
                 .and_then(|n| n.to_str())
-                .unwrap_or("ehs2buckets.postcard")
+                .unwrap_or("ehs2buckets.postcard"),
+            std::process::id(),
+            TEMP_NONCE.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
         );
         let tmp_path = dir.join(tmp_name);
         {

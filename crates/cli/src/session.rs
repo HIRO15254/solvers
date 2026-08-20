@@ -63,8 +63,20 @@ pub struct StopRule {
 
 /// Everything needed to run (or resume) a multiway solve: the constructed
 /// solver plus the run parameters resolved from `[run]`.
+/// How the run got its card abstraction, for the run's event log.
+///
+/// Building the EHS² tables takes minutes on a cold cache, so a watcher that
+/// sees nothing during that time needs to be told why.
+#[derive(Clone, Copy, Debug)]
+pub struct AbstractionReady {
+    pub cached: bool,
+    pub secs: f64,
+}
+
 pub struct MultiwaySession {
     pub solver: MultiwaySolver<HoldemGame<MultiwayAbstractionBackend>>,
+    /// `None` for a backend that needs no table (the test baseline).
+    pub abstraction_ready: Option<AbstractionReady>,
     pub sweeps_target: u64,
     pub threads: usize,
     pub evaluation_cadence: u64,
@@ -423,7 +435,7 @@ fn build_multiway_session_internal(
     }
     let utility = convert_utility(utility)?;
     let rake = convert_rake(rake);
-    let (mut game, sampler) =
+    let (mut game, sampler, abstraction_ready) =
         build_multiway_game_from_config(&game_config, &utility, &rake, abstraction_policy)?;
     let mut deviation_reference = deviation_raw_toml
         .map(|raw| build_deviation_reference(raw, game.game_fingerprint(), abstraction_policy))
@@ -635,6 +647,7 @@ fn build_multiway_session_internal(
 
     Ok(MultiwaySession {
         solver,
+        abstraction_ready,
         sweeps_target: sweeps,
         threads,
         evaluation_cadence,
@@ -721,7 +734,7 @@ fn build_deviation_reference(
     };
     let utility = convert_utility(utility)?;
     let rake = convert_rake(rake);
-    let (reference_game, _) =
+    let (reference_game, _, _) =
         build_multiway_game_from_config(&game_config, &utility, &rake, abstraction_policy)?;
     let reference_game_fingerprint = reference_game.game_fingerprint();
     if candidate_game_fingerprint != reference_game_fingerprint {
@@ -991,10 +1004,18 @@ fn build_multiway_game_from_config(
     utility: &MultiwayUtility,
     rake: &MultiwayRake,
     abstraction_policy: AbstractionPolicy,
-) -> Result<(HoldemGame<MultiwayAbstractionBackend>, DealSampler)> {
+) -> Result<(
+    HoldemGame<MultiwayAbstractionBackend>,
+    DealSampler,
+    Option<AbstractionReady>,
+)> {
     game_config
         .validate_economics(utility, rake)
         .context("validating multiway game and utility")?;
+    // Only the EHS² backend has a table worth reporting; the test baseline
+    // is built in microseconds.
+    #[allow(unused_assignments)]
+    let mut ready = None;
     let abstraction = match abstraction_policy {
         #[cfg(test)]
         AbstractionPolicy::CheapBaseline => MultiwayAbstractionBackend::FeatureHash(
@@ -1012,14 +1033,16 @@ fn build_multiway_game_from_config(
                 ));
             }
             AbstractionKind::Ehs2Table => {
-                MultiwayAbstractionBackend::Ehs2Table(build_ehs2_table_abstraction(game_config)?)
+                let (table, report) = build_ehs2_table_abstraction(game_config)?;
+                ready = Some(report);
+                MultiwayAbstractionBackend::Ehs2Table(table)
             }
         },
     };
     let game = HoldemGame::new(game_config, utility, rake, abstraction)
         .context("building generative multiway game")?;
     let sampler = game.deal_sampler().context("compiling table ranges")?;
-    Ok((game, sampler))
+    Ok((game, sampler, ready))
 }
 
 /// Builds (or loads, or rebuilds-and-overwrites -- see
@@ -1031,13 +1054,24 @@ fn build_multiway_game_from_config(
 /// determined by `params` at build time.
 fn build_ehs2_table_abstraction(
     game_config: &multiway::MultiwayConfig,
-) -> Result<TableAbstractionAdapter<Ehs2Abstraction>> {
+) -> Result<(TableAbstractionAdapter<Ehs2Abstraction>, AbstractionReady)> {
     let params = Ehs2Params {
         flop_buckets: u32::from(game_config.abstraction.flop_buckets),
         turn_buckets: u32::from(game_config.abstraction.turn_buckets),
         river_buckets: u32::from(game_config.abstraction.river_buckets),
     };
-    let cache = game_config.abstraction.artifact_cache.as_deref();
+    // A config may still name its own cache file; otherwise the table comes
+    // from the machine-scoped cache, which is where a 543 MB artifact that
+    // depends only on the bucket counts belongs.
+    let machine_cache = match game_config.abstraction.artifact_cache {
+        Some(_) => None,
+        None => crate::cache::ehs2_table(params)?,
+    };
+    let cache = game_config
+        .abstraction
+        .artifact_cache
+        .as_deref()
+        .or(machine_cache.as_deref());
     if let Some(parent) = cache
         .and_then(Path::parent)
         .filter(|parent| !parent.as_os_str().is_empty())
@@ -1045,6 +1079,7 @@ fn build_ehs2_table_abstraction(
         std::fs::create_dir_all(parent)
             .with_context(|| format!("creating ehs2 table cache directory {}", parent.display()))?;
     }
+    let cached = cache.is_some_and(Path::is_file);
     let start = Instant::now();
     let streets = [
         cards::Street::Flop,
@@ -1053,12 +1088,16 @@ fn build_ehs2_table_abstraction(
     ];
     let table = Ehs2Abstraction::load_or_build(params, &streets, cache);
     println!(
-        "ehs2 tables: ready in {:.2}s",
+        "ehs2 tables: {} in {:.2}s",
+        if cached { "loaded" } else { "built" },
         start.elapsed().as_secs_f64()
     );
-    Ok(TableAbstractionAdapter::new(
-        table,
-        ehs2_table_fingerprint(params),
+    Ok((
+        TableAbstractionAdapter::new(table, ehs2_table_fingerprint(params)),
+        AbstractionReady {
+            cached,
+            secs: start.elapsed().as_secs_f64(),
+        },
     ))
 }
 

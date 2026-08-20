@@ -64,6 +64,11 @@ cargo run -p cli --release -- validate examples/preflop_multiway_v1_3max_smoke.t
 cargo run -p cli --release -- solve examples/preflop_multiway_v1_3max_smoke.toml \
     --out runs/v1-smoke
 
+# Abstraction tables are cached per machine, not per run: the first solve
+# builds them (~107s), later ones load them (~0.4s).
+cargo run -p cli --release -- --cache-dir ~/.cache/solvers \
+    solve examples/preflop_multiway_v1_3max_smoke.toml --out runs/v1-smoke
+
 # Size the public tree and policy arena before committing to a long run:
 cargo run -p cli --release -- validate examples/preflop_multiway_v1_default.toml \
     --resources

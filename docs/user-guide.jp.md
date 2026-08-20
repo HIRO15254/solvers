@@ -225,7 +225,26 @@ run directory内の2ファイル(`checkpoint.mwckpt`/`solution.mwsol`と
 `examples/preflop_multiway_v1_production_smoke.toml`はproduction parser contractの
 検証fixtureである。
 
-## 9. 実行前にリソースを見積もる
+## 9. 抽象化キャッシュ
+
+EHS² tableの構築は実測で約107秒かかり、成果物は数百MBある。内容はbucket数だけで
+決まるので、run directoryではなくmachine単位のcacheへ置く。
+
+```sh
+# 既定は SOLVERS_CACHE_DIR、無ければOSのuser cache directory
+cargo run -p cli --release -- --cache-dir ~/.cache/solvers solve CONFIG.toml --out runs/r1
+```
+
+2回目以降は`ehs2 tables: loaded in 0.36s`となる(実測107.73s → 0.36s)。cache hitと
+構築時間は`events.jsonl`にも残るので、`watch`で「最初の2分が無反応な理由」が分かる。
+
+file名はbucket数を含む(`v2-f128-t128-r128.postcard`)。K=128とK=256を併用しても
+互いを上書きしないが、Kごとに1度は構築が必要である。
+
+**cache pathをconfigに書いてはならない。** machine固有のpathを持つconfigは別hostへ
+送れない(`docs/app-architecture.md` R9/R10)。
+
+## 10. 実行前にリソースを見積もる
 
 長時間runへ入る前に、public treeを保持せずに構築してpolicy arenaの必要量だけを
 報告できる。
@@ -242,7 +261,7 @@ GUIは2026-08に削除した。設定作成・実行・監視をGUIから行う�
 して起動するjob daemonのclientとして作り直す。目標設計は`docs/app-architecture.md`を
 参照。
 
-## 10. 結果と停止状態
+## 11. 結果と停止状態
 
 - `target-reached`: configured deviation targetを必要回数確認した。
 - `sweep-limit` / `time-limit`:budgetへ到達したがtarget達成を意味しない。
@@ -252,7 +271,7 @@ GUIは2026-08に削除した。設定作成・実行・監視をGUIから行う�
 Multiwayのmeasured deviationは単独seatのtrained deviationに対する推定であり、
 多人数一般和ゲームのNash/GTO保証ではない。Sweep消化率や残り時間も収束確率ではない。
 
-## 11. 関連ドキュメント
+## 12. 関連ドキュメント
 
 - `docs/multiway-preflop-v1.jp.md` — Production v1の規範仕様と全TOML項目
 - `docs/architecture.md` — workspace、solver、CLIの内部設計

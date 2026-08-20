@@ -115,6 +115,7 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
         1
     }
 }
+pub mod cache;
 pub mod config;
 pub mod config_new;
 pub mod inspect;
@@ -141,6 +142,12 @@ use clap::{Parser, Subcommand};
 #[command(name = "solvers", version)]
 #[command(about = "Poker solver")]
 struct Cli {
+    /// Directory for machine-scoped caches (abstraction tables). Defaults to
+    /// `SOLVERS_CACHE_DIR`, then the platform's per-user cache directory.
+    /// Never write this into a config: a config naming a local path cannot
+    /// be sent to another host.
+    #[arg(long, global = true)]
+    cache_dir: Option<std::path::PathBuf>,
     #[command(subcommand)]
     command: Command,
 }
@@ -368,6 +375,9 @@ enum ConfigCommand {
 /// The `solvers` binary's `main` is just `cli::main_impl()`.
 pub fn main_impl() -> Result<()> {
     let cli = Cli::parse();
+    if let Some(root) = cli.cache_dir.as_deref() {
+        cache::set_root_override(root);
+    }
     match cli.command {
         Command::Config { command } => match command {
             ConfigCommand::New { template, out } => config_new::run(template, out.as_deref()),
