@@ -7,7 +7,7 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, anyhow};
 use formats::{MULTIWAY_SCHEMA_VERSION, MultiwayMetricsRow, MultiwayMetricsWriter};
-use multiway::solver::{HistoryKey, InfoKey};
+use multiway::solver::InfoKey;
 use multiway::{ExternalSamplingGame, HoldemGame, MultiwaySolver};
 use serde::Serialize;
 
@@ -80,45 +80,6 @@ struct ResultV2 {
     finished_unix_ms: u64,
 }
 
-/// One visited information set at the requested live preflop node. Missing
-/// buckets remain absent instead of being synthesized as a uniform strategy.
-#[derive(Clone, Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct LiveStrategyEntry {
-    pub key: InfoKey,
-    pub actions: Vec<String>,
-    pub probabilities: Vec<f32>,
-    pub weight: f64,
-}
-
-#[derive(Clone, Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct LiveBreadcrumb {
-    pub node: HistoryKey,
-    pub actor: u8,
-    pub action: String,
-}
-
-#[derive(Clone, Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct LiveNodeAction {
-    pub action: String,
-    pub destination: &'static str,
-    pub child: Option<HistoryKey>,
-}
-
-#[derive(Clone, Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct LiveStrategyNode {
-    pub history: HistoryKey,
-    pub actor: u8,
-    pub street: u8,
-    pub active_opponents: u8,
-    pub breadcrumb: Vec<LiveBreadcrumb>,
-    pub actions: Vec<LiveNodeAction>,
-    pub strategy: Vec<LiveStrategyEntry>,
-}
-
 /// Cheap data published during training without a held-out evaluation.
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -127,7 +88,6 @@ pub struct MultiwayLiveObservation {
     pub traversals: u64,
     pub hand_updates: u64,
     pub elapsed_secs: f64,
-    pub strategy_node: Option<LiveStrategyNode>,
 }
 
 /// Full quality data published at completed evaluation boundaries.
@@ -135,7 +95,6 @@ pub struct MultiwayLiveObservation {
 #[serde(rename_all = "camelCase")]
 pub struct MultiwayQualityObservation {
     pub metrics: MultiwayMetricsRow,
-    pub strategy_node: Option<LiveStrategyNode>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -170,7 +129,6 @@ pub fn run(
         false,
         emit_progress,
         None,
-        None,
     )
 }
 
@@ -200,41 +158,6 @@ pub fn run_observed(
         None,
         false,
         emit_progress,
-        None,
-        Some(observer),
-    )
-}
-
-/// Starts a production solve with live observations for the preflop node
-/// selected by `live_node_request`. The callback is read only at observation
-/// boundaries, so no tree or strategy work is added to training batches.
-#[allow(clippy::too_many_arguments)]
-pub fn run_observed_with_node(
-    raw_config: &str,
-    config: SolveConfig,
-    output: Option<&Path>,
-    metrics_path: Option<&Path>,
-    checkpoint_path: Option<&Path>,
-    config_hash: [u8; 32],
-    mwsol_path: Option<&Path>,
-    cancel: Option<&AtomicBool>,
-    emit_progress: bool,
-    live_node_request: &dyn Fn() -> Option<HistoryKey>,
-    observer: &mut dyn FnMut(MultiwayRunObservation),
-) -> Result<()> {
-    run_inner(
-        raw_config,
-        config,
-        output,
-        metrics_path,
-        checkpoint_path,
-        config_hash,
-        mwsol_path,
-        cancel,
-        None,
-        false,
-        emit_progress,
-        Some(live_node_request),
         Some(observer),
     )
 }
@@ -265,71 +188,6 @@ pub fn resume(
         reset_confirmations,
         emit_progress,
         None,
-        None,
-    )
-}
-
-/// Resumes a production solve and publishes owned progress observations.
-#[allow(clippy::too_many_arguments)]
-pub fn resume_observed(
-    raw_config: &str,
-    config: SolveConfig,
-    output: Option<&Path>,
-    metrics_path: Option<&Path>,
-    checkpoint_path: &Path,
-    config_hash: [u8; 32],
-    mwsol_path: Option<&Path>,
-    cancel: Option<&AtomicBool>,
-    reset_confirmations: bool,
-    emit_progress: bool,
-    observer: &mut dyn FnMut(MultiwayRunObservation),
-) -> Result<()> {
-    run_inner(
-        raw_config,
-        config,
-        output,
-        metrics_path,
-        Some(checkpoint_path),
-        config_hash,
-        mwsol_path,
-        cancel,
-        Some(checkpoint_path),
-        reset_confirmations,
-        emit_progress,
-        None,
-        Some(observer),
-    )
-}
-
-#[allow(clippy::too_many_arguments)]
-pub fn resume_observed_with_node(
-    raw_config: &str,
-    config: SolveConfig,
-    output: Option<&Path>,
-    metrics_path: Option<&Path>,
-    checkpoint_path: &Path,
-    config_hash: [u8; 32],
-    mwsol_path: Option<&Path>,
-    cancel: Option<&AtomicBool>,
-    reset_confirmations: bool,
-    emit_progress: bool,
-    live_node_request: &dyn Fn() -> Option<HistoryKey>,
-    observer: &mut dyn FnMut(MultiwayRunObservation),
-) -> Result<()> {
-    run_inner(
-        raw_config,
-        config,
-        output,
-        metrics_path,
-        Some(checkpoint_path),
-        config_hash,
-        mwsol_path,
-        cancel,
-        Some(checkpoint_path),
-        reset_confirmations,
-        emit_progress,
-        Some(live_node_request),
-        Some(observer),
     )
 }
 
@@ -346,7 +204,6 @@ fn run_inner(
     resume_checkpoint: Option<&Path>,
     reset_confirmations: bool,
     emit_progress: bool,
-    live_node_request: Option<&dyn Fn() -> Option<HistoryKey>>,
     mut observer: Option<&mut dyn FnMut(MultiwayRunObservation)>,
 ) -> Result<()> {
     validate_artifact_paths(output, metrics_path, checkpoint_path, mwsol_path)?;
@@ -526,7 +383,6 @@ fn run_inner(
                             solver,
                             cumulative_before,
                             &started,
-                            live_node_request,
                             &mut observer,
                         );
                         last_live_observation = Instant::now();
@@ -602,7 +458,7 @@ fn run_inner(
                     check.max_width, stop_rule.dev_gain_threshold
                 );
             }
-            publish_observation(&mw_session, &last_row, live_node_request, &mut observer);
+            publish_observation(&last_row, &mut observer);
             quality_published = true;
             last_quality_observation_sweeps = Some(sweeps_now);
 
@@ -643,7 +499,7 @@ fn run_inner(
                     now.memory_bytes / (1024 * 1024),
                 );
             }
-            publish_observation(&mw_session, &last_row, live_node_request, &mut observer);
+            publish_observation(&last_row, &mut observer);
             quality_published = true;
             last_quality_observation_sweeps = Some(sweeps_now);
         }
@@ -684,7 +540,6 @@ fn run_inner(
                 &mw_session.solver,
                 cumulative_before,
                 &started,
-                live_node_request,
                 &mut observer,
             );
             last_live_observation = Instant::now();
@@ -744,7 +599,7 @@ fn run_inner(
     }
     .to_string();
     if last_quality_observation_sweeps != Some(last_row.sweeps) {
-        publish_observation(&mw_session, &last_row, live_node_request, &mut observer);
+        publish_observation(&last_row, &mut observer);
     }
     if let Some(writer) = metrics_writer.as_mut() {
         writer
@@ -1031,9 +886,7 @@ fn mean(values: &[f64]) -> f64 {
 }
 
 fn publish_observation(
-    session: &session::MultiwaySession,
     metrics: &MultiwayMetricsRow,
-    live_node_request: Option<&dyn Fn() -> Option<HistoryKey>>,
     observer: &mut Option<&mut dyn FnMut(MultiwayRunObservation)>,
 ) {
     let Some(observer) = observer.as_deref_mut() else {
@@ -1042,7 +895,6 @@ fn publish_observation(
     observer(MultiwayRunObservation::Quality(
         MultiwayQualityObservation {
             metrics: metrics.clone(),
-            strategy_node: requested_live_strategy(&session.solver, live_node_request),
         },
     ));
 }
@@ -1051,7 +903,6 @@ fn publish_live_observation(
     solver: &MultiwaySolver<HoldemGame<multiway::MultiwayAbstractionBackend>>,
     cumulative_before: u64,
     started: &Instant,
-    live_node_request: Option<&dyn Fn() -> Option<HistoryKey>>,
     observer: &mut Option<&mut dyn FnMut(MultiwayRunObservation)>,
 ) {
     let Some(observer) = observer.as_deref_mut() else {
@@ -1064,78 +915,7 @@ fn publish_live_observation(
         elapsed_secs: Duration::from_millis(cumulative_before)
             .saturating_add(started.elapsed())
             .as_secs_f64(),
-        strategy_node: requested_live_strategy(solver, live_node_request),
     }));
-}
-
-fn requested_live_strategy(
-    solver: &MultiwaySolver<HoldemGame<multiway::MultiwayAbstractionBackend>>,
-    request: Option<&dyn Fn() -> Option<HistoryKey>>,
-) -> Option<LiveStrategyNode> {
-    let requested = request.and_then(|request| request())?;
-    live_strategy_node(solver, requested)
-}
-
-fn live_strategy_node(
-    solver: &MultiwaySolver<HoldemGame<multiway::MultiwayAbstractionBackend>>,
-    history: HistoryKey,
-) -> Option<LiveStrategyNode> {
-    let node = solver.public_node_view(history)?;
-    if node.street != multiway::Street::Preflop {
-        return None;
-    }
-    let mut breadcrumb = Vec::new();
-    let mut cursor = history;
-    while cursor != HistoryKey::ROOT {
-        let edge = solver.history_entry(cursor)?;
-        breadcrumb.push(LiveBreadcrumb {
-            node: cursor,
-            actor: edge.actor,
-            action: edge.action_label,
-        });
-        cursor = edge.parent;
-    }
-    breadcrumb.reverse();
-    let actions = node
-        .actions
-        .into_iter()
-        .map(|action| match action.destination {
-            multiway::PublicActionDestination::PreflopDecision(child) => LiveNodeAction {
-                action: action.label,
-                destination: "preflop",
-                child: Some(child),
-            },
-            multiway::PublicActionDestination::PostflopBoundary => LiveNodeAction {
-                action: action.label,
-                destination: "postflop",
-                child: None,
-            },
-            multiway::PublicActionDestination::Terminal => LiveNodeAction {
-                action: action.label,
-                destination: "terminal",
-                child: None,
-            },
-        })
-        .collect();
-    let strategy = solver
-        .strategies_at_with_mass(history)
-        .into_iter()
-        .map(|(key, actions, probabilities, weight)| LiveStrategyEntry {
-            key,
-            actions,
-            probabilities,
-            weight,
-        })
-        .collect();
-    Some(LiveStrategyNode {
-        history,
-        actor: node.actor,
-        street: node.street as u8,
-        active_opponents: node.active_opponents,
-        breadcrumb,
-        actions,
-        strategy,
-    })
 }
 
 #[cfg(test)]
@@ -1209,17 +989,9 @@ mod tests {
             false,
             &mut |observation| match observation {
                 MultiwayRunObservation::Live(observation) => {
-                    assert!(
-                        observation.strategy_node.is_none(),
-                        "the default observer must not scan a strategy node"
-                    );
                     observations.push(("live".into(), observation.sweeps));
                 }
                 MultiwayRunObservation::Quality(observation) => {
-                    assert!(
-                        observation.strategy_node.is_none(),
-                        "the default observer must not scan a strategy node"
-                    );
                     observations.push(("quality".into(), observation.metrics.sweeps));
                 }
             },

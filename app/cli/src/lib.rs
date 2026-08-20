@@ -118,7 +118,6 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
     }
 }
 pub mod bench;
-pub mod bridge;
 pub mod config;
 pub mod config_new;
 pub mod inspect;
@@ -155,18 +154,6 @@ enum Command {
         #[command(subcommand)]
         command: ConfigCommand,
     },
-    /// Run the authenticated loopback bridge used by the local web UI.
-    Serve {
-        /// Exact browser Origin allowed by CORS (scheme, host, and port).
-        #[arg(long, default_value = "http://localhost:3000")]
-        origin: String,
-        /// Loopback TCP port. Use 0 to select an ephemeral free port.
-        #[arg(long, default_value_t = 38127)]
-        port: u16,
-        /// Rayon worker threads owned by the bridge process.
-        #[arg(long)]
-        threads: Option<usize>,
-    },
     /// Validate a Multiway Preflop v1 config without starting a solve.
     Validate {
         config: std::path::PathBuf,
@@ -178,6 +165,10 @@ enum Command {
         /// Write the reparsable effective TOML configuration to this path.
         #[arg(long)]
         write_effective: Option<std::path::PathBuf>,
+        /// Also build the public tree without retaining it and report the
+        /// policy arena a real solve would need.
+        #[arg(long)]
+        resources: bool,
     },
     /// Solve the game described by a TOML config file.
     Solve {
@@ -432,17 +423,19 @@ pub fn main_impl() -> Result<()> {
         Command::Config { command } => match command {
             ConfigCommand::New { template, out } => config_new::run(template, out.as_deref()),
         },
-        Command::Serve {
-            origin,
-            port,
-            threads,
-        } => bridge::run(&origin, port, threads),
         Command::Validate {
             config,
             format,
             show_effective,
             write_effective,
-        } => validate::run(&config, format, show_effective, write_effective.as_deref()),
+            resources,
+        } => validate::run(
+            &config,
+            format,
+            show_effective,
+            write_effective.as_deref(),
+            resources,
+        ),
         Command::Solve {
             config,
             out,

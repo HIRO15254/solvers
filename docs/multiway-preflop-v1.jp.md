@@ -16,7 +16,7 @@
   live閲覧用snapshotを正式solutionとして扱わない。
 - Production abstractionはEHS² percentile、information recallはcurrent-streetだけ。
 - Public treeとpolicy arenaはSolve前に完全列挙・preallocate・page touchする。
-- Postflopはterminal utilityを得るために走査するが、GUI閲覧・solution exportの
+- Postflopはterminal utilityを得るために走査するが、閲覧・solution exportの
   対象はPreflop nodeだけ。
 - 3人以上の結果はregret-minimized approximationであり、Nash/GTO保証はしない。
 - configはstrictで、unknown、retired、別mode専用keyをerrorにする。
@@ -32,8 +32,7 @@ deviator評価を行う。全seatについてdeviation gainの95% CI upperがtar
 確認を`confirmations`回連続で満たしたときだけ`target-reached`とする。
 `max_sweeps`と`max_time`は安全budgetであり、到達自体は収束を意味しない。
 
-GUI閲覧用のEV、Postflop strategy、全Preflop Node snapshotは生成しない。
-live Tree閲覧時だけ要求中のPreflop Node 1個のaverage strategyを読み取る。
+閲覧用のEV、Postflop strategy、全Preflop Node snapshotは生成しない。
 
 ## 共通規則
 
@@ -466,13 +465,6 @@ arena上限だけを8 GiB RSS保証として扱わない。
 明示targetはcashではBB/hand、tournamentではtotal prize pool比率として解釈される。
 停止評価はtrained deviatorを含み、`evaluation_samples`、
 `deviator_traversals` を0にして無効化できない。
-
-これらの停止評価とは別に、Local GUIは完了したsweep batchから、GUIが選択している
-1つのPreflop nodeのLinear average strategyだけを、最初のbatch後および以後おおむね
-2秒ごとに更新する。Postflop node、EV、非表示Nodeのstrategyは計算しない。追加設定はなく、
-GUI pollingで更新する短いleaseが切れればstrategy scanも停止する。高頻度snapshotは
-checkpointや`progress.jsonl`へ保存しない。evaluation/停止判定境界では
-pre-evaluationのlive更新を抑止し、quality評価後の1回だけをpublishしてからcheckpointを書く。
 
 ## `[output]`
 

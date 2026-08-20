@@ -1,8 +1,8 @@
 # Solvers 利用ガイド
 
-`solvers` のマルチウェイプリフロップソルバー(`crates/multiway` + CLI/GUI)が
+`solvers` のマルチウェイプリフロップソルバー(`crates/multiway` + CLI)が
 「何を入力に、どういう計算をして、何を出すのか」を、実装の技術詳細より一段上の
-視点で説明し、CLIとGUIの実行手順をまとめる。Production契約と全TOML項目は
+視点で説明し、CLIの実行手順をまとめる。Production契約と全TOML項目は
 `docs/multiway-preflop-v1.jp.md`、内部設計は`docs/architecture.md`を参照。
 
 ---
@@ -11,7 +11,7 @@
 
 テキサスホールデム(NLHE)の **2〜9 人テーブルのプリフロップ戦略** を計算する。
 
-入力は「テーブルのルール一式」を書いた TOML 設定(GUI のプリセットと同一形式):
+入力は「テーブルのルール一式」を書いた TOML 設定:
 
 - 席ごとのスタック(bb)と参加レンジ(省略時は全 1,326 コンボ)
 - ブラインド、アンティ(each / big-blind ante)、ボタン位置
@@ -22,7 +22,7 @@
 
 出力は **各ポジション・各状況(誰が何をした後か)・各ハンドごとの混合戦略**、
 つまり「UTG が 2.5bb オープンした後の BTN は、AKo で 3-bet 62% / コール 30% /
-フォールド 8%」のような確率分布の表である。GUI の Results タブの 13×13
+フォールド 8%」のような確率分布の表である。`solvers inspect` が表示する 13×13
 マトリクスや `.mwsol` アーティファクトはこれを表示・保存したもの。
 
 直感的には「このルール設定の下で、全員が互いに最善を尽くし合ったとき
@@ -118,11 +118,11 @@ re-clusteringは元々実装されていない。
 - **2 人(HU 構成)**: CFR の標準理論どおり、平均戦略は Nash 均衡に収束する。
 - **3 人以上**: 一般和・多人数ゲームでは「全員の regret を最小化した profile」
   が Nash 均衡である保証は理論的に存在しない。本ソルバーの出力は
-  **regret-minimized approximation** であり、CLI/GUI が常に表示する
+  **regret-minimized approximation** であり、CLI が常に表示する
   「approximate profile — Nash/GTO 保証なし」はこの意味である。
   実務上は(商用の多人数ソルバーと同様)十分に有用な近似となる。
 
-収束の観察には次の指標を使う(GUI の Solve タブ / metrics JSONL):
+収束の観察には次の指標を使う(run directory の `progress.jsonl`):
 
 | 指標 | 意味 | 読み方 |
 |---|---|---|
@@ -140,9 +140,9 @@ HU エンジンが持つ exploitability / NashConv とは意図的に別名に�
   情報集合ごとの平均戦略を、ページ読み出し可能な索引付きで格納する。
   probability encodingは既定`u16`(分母65,535)で、research/inspection用に
   `f32`も選べる。signed `i16` strategy encodingはproduction v1では使わない。
-  GUI の Results タブや Web ブリッジがこれを表示する。
+  `solvers inspect` / `solvers export` がこれを読む。
 - **`.mwckpt`**: 再開用チェックポイント(累積 regret を含む全学習状態)。
-  `solvers resume` / GUI から続きを回せる。
+  `solvers resume` で続きを回せる。
 - **metrics JSONL**: 上表の指標の時系列。
 - すべての成果物に設定の blake3 ハッシュが刻印され、設定が 1 バイトでも
   違う再開は拒否される。乱数はシード+サンプル ID から導出され、
@@ -164,26 +164,22 @@ sweep 0を開始する。再開にはrun directory内の`.mwckpt`と同じeffect
 検証fixtureである。`tools/bench/mw_6max_64b.toml`はretired rollout/full-recallを
 測るhistorical research fixtureであり、通常releaseでは実行しない。
 
-## 8. GUIで実行する
+## 8. 実行前にリソースを見積もる
 
-`solvers-gui`はVite/React SPAをTauri 2 executableへ内包したLocal applicationで、
-Node、Web server、CLI sidecarを起動時に必要としない。
+長時間runへ入る前に、public treeを保持せずに構築してpolicy arenaの必要量だけを
+報告できる。
 
-1. **Setup**でtable、economics、tree、resource、stop条件を設定する。
-2. **検証してSolve開始**でtree buildとpreflightを行い、成功したeffective TOMLと
-   fingerprintだけをjobへ渡す。
-3. **Solving**でsweep、速度、resource、formal evaluationを確認する。
-4. **Preflop Tree**ではRootからactionを選び、Solve中の任意のPreflop nodeを閲覧する。
-5. 完了後は**Results**で正式な`.mwsol`戦略とqualityを確認・exportする。
+```sh
+solvers validate CONFIG.toml --resources
+```
 
-Solve中のTree表示は、選択中の1つのPreflop nodeについてLinear average strategyだけを
-live更新する。Postflop node、EV、全Node snapshotは計算しない。画面は2秒ごとに要求を
-更新し、要求が30秒途絶えるとlive strategy scanを止める。Postflopへ進むactionと
-terminal actionは境界として表示するが展開しない。
+`decision_nodes`、`policy_slots`、`solver_state_bytes`が返る。これはdense arenaの
+見積りであり、process RSSではない。public tree、EHS2 table、worker scratch、
+evaluation、checkpoint stagingはこの数値の外側にある。
 
-Local jobはGUI process内で動く。停止操作はcooperative cancel後に再開用checkpointを
-残す。Remote profileは将来のtransport contractを表すUIであり、job submission、
-credential、remote persistenceは未実装である。
+GUIは2026-08に削除した。設定作成・実行・監視をGUIから行う構成は、CLIを子プロセスと
+して起動するjob daemonのclientとして作り直す。目標設計は`docs/app-architecture.md`を
+参照。
 
 ## 9. 結果と停止状態
 
@@ -198,5 +194,6 @@ Multiwayのmeasured deviationは単独seatのtrained deviationに対する推定
 ## 10. 関連ドキュメント
 
 - `docs/multiway-preflop-v1.jp.md` — Production v1の規範仕様と全TOML項目
-- `docs/architecture.md` — workspace、solver、CLI、GUIの内部設計
+- `docs/architecture.md` — workspace、solver、CLIの内部設計
+- `docs/app-architecture.md` — CLI / job daemon / Web GUIの目標設計
 - `docs/development.md` — test、benchmark、変更手順

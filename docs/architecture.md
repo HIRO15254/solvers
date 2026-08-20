@@ -32,29 +32,24 @@
 | 6 | **crate 粒度** | research: `poker-core` に統合 / ext・perf: cards / hand-index 分離 | **分離**(`cards`, `hand-index`) | **performance/extensibility**。Waugh 移植は自己完結・独立テスト可能・単独公開可能な資産 |
 | 7 | **DiscountSchedule の形** | research: 5 メソッド / perf: `at(t)` → 構造体 / ext: budget 引数付き | `fn at(&self, t: u64, planned_iters: Option<u64>) -> Discounts { pos, neg, avg, floor_neg, reset_avg }` | **performance の形 + extensibility の引数**。HS-DCFR の線形スケジュールは総 iteration 数 n を要するため budget 引数が必須 |
 | 8 | **デフォルトアルゴリズム** | 3 案一致 | DCFR α=1.5, β=0, **γ=3.0** + power-of-4 average reset、alternating updates、RM+ floor(γ=2 canonical は選択可) | 一致(b-inary の実測優位) |
-| 9 | **WASM viewer** | 3 案一致 | artifact 読み込み専用の静的サイト先行(in-browser solving なし ⇒ SharedArrayBuffer/COOP/COEP 不要)、Tauri は任意 | 一致 |
+| 9 | **WASM viewer** | 3 案一致 | artifact 読み込み専用の静的サイト先行(in-browser solving なし ⇒ SharedArrayBuffer/COOP/COEP 不要) | 一致 |
 | 10 | **UPI 互換 CLI** | 3 案一致 | UPI-compatible subset を interactive mode に実装(既存 MIT ツール群を継承) | 一致 |
 
 ---
 
 ## 2. レイヤ構成と workspace
 
-> **2026-07 アプリ再編**: アプリケーション層(1 アプリ = Preflop + Postflop を
-> `game.kind` で切り替え)を `app/` ディレクトリに分離。同月、旧 2 UI
-> (Next.js workbench / egui ネイティブ GUI)を削除し、Web 技術の静的 SPA を
-> Tauri 2 executableへ内包する構成へ移行した。2026-07-23時点で3画面、
-> in-process Local Solver、live strategy、checkpoint resume、artifact I/Oまで
-> 実装済み。Remote transportは仕様とUIのみである。アプリレベルの設計は
-> アプリケーション境界は§9も参照。以下はその反映済みレイアウト。
+> **2026-08 アプリ再編**: アプリケーション層(1 アプリ = Preflop + Postflop を
+> `game.kind` で切り替え)を `app/` ディレクトリに分離した上で、GUI(React SPA +
+> Tauri 2 shell)と loopback bridge を削除し、CLI を唯一の実行体に戻した。GUI は
+> CLI プロセスを起動する job daemon のクライアントとして作り直す。その目標設計と
+> 段階計画は[app-architecture.md](app-architecture.md)、アプリケーション境界は
+> §9 を参照。以下は削除を反映したレイアウトである。
 
 ```
 app:        cli (bin "solvers": TOML batch + UPI subset REPL + CSV reports + ANSI 13×13 grid、
-                 bin+lib。serve = 認証付き loopback bridge)
-            ui (Vite + React + shadcn/ui静的SPA。接続profile、
-                Setup/Solving/Results、実Solverの13×13戦略matrix)
-            desktop (Tauri 2。SPAとLocal job/file backendをsolvers-guiへ内包し、
-                     cli libをin-process利用。Remote transportは将来対象)
-future:     py (PyO3, M3〜) · wasm (viewer-only, M8)
+                 bin+lib。lib は統合テストが直接叩く)
+future:     protocol + solversd (job daemon) · web GUI · py (PyO3) · wasm (viewer-only)
 multiway:    multiway — generative NLHE / joint deal / side pots / rollout buckets / MCCFR
 schemas:    formats — SolveConfig / NodeQuery→NodeReport / Checkpoint(.ckpt) / Artifact(.sol)
 sessions:   holdem::PostflopGame · preflop::PreflopGame
@@ -78,12 +73,9 @@ solvers/
 ├── LICENSE-POLICY.md     # AGPL/無ライセンス = read-only の明文化
 ├── tools/plot_convergence.py
 ├── app/
-│   ├── cli/            # bin "solvers"(package "cli"、bin+lib): config/validate/solve/
-│   │                   # resume/inspect/evaluate/export/compare/experiment/report/serve。
-│   │                   # lib は config スキーマ / bridge /
-│   │                   # multiway セッション構築(session.rs)
-│   ├── ui/             # Web GUI: Vite + React + shadcn/ui静的SPA
-│   └── desktop/        # Tauri 2。SPA + Local job/file backend、Remote未実装
+│   └── cli/            # bin "solvers"(package "cli"、bin+lib): config/validate/solve/
+│                       # resume/inspect/evaluate/export/compare/experiment/report。
+│                       # lib は config スキーマと multiway セッション構築(session.rs)
 └── crates/
     ├── cards/          # Card/CardSet/Chips/Street/PerPlayer<T>、"22+,A2s+" range parser、
     │                   # aya_poker (Zlib/Apache-2.0/MIT) evaluator wrapper。workspace 内依存なし
@@ -254,37 +246,36 @@ Bunching は HU では厳密に無効なので実装しないが、range を「�
 **Viewer 境界**: 全 frontend は単一の versioned serde スキーマ `NodeQuery(Pio 式 colon path "r:0:b100:c:8h:c") → NodeReport { schema_version, actions, strategy, ev, equity, ranges, pot, board }` を消費。
 1. **CLI interactive = UPI-compatible subset**(`load_tree, show_node, show_strategy, show_range, calc_ev, calc_eq, go, stop, set_accuracy, set_rake, set_icm, dump_tree, lock_node`)+ ANSI 13×13 grid + **CSV aggregate reports**(flop subset 上の per-flop frequency/EV/EQ — 研究者が実際に消費する成果物)。
 2. **PyO3/maturin(早期)**: notebook が研究フェーズの主 viewer。
-3. **WASM(後期)**: `.sol` 読み込み専用静的サイト(13×13 grid + action-frequency bar で wasm-postflop 価値の ~90%、UI は新規実装 — AGPL fork 不可)、任意で Tauri。
+3. **WASM(後期)**: `.sol` 読み込み専用静的サイト(13×13 grid + action-frequency bar で wasm-postflop 価値の ~90%、UI は新規実装 — AGPL fork 不可)。
 
 ---
 
 ## 9. アプリケーション境界
 
-アプリケーションは1つで、batch/research用の`solvers` CLIと、同じRust libraryを
-in-processで呼ぶTauri 2 GUIを提供する。
+アプリケーションは1つで、実行体は`solvers` CLIだけである。GUIとリモート実行は
+CLIを子プロセスとして起動するjob daemonのクライアントとして設計する。目標設計と
+段階計画は[app-architecture.md](app-architecture.md)を正本とする。
 
 ```text
-app/ui       Vite + Reactの静的SPA
-    ↓ typed gateway
-app/desktop  Tauri shell、Local job/file backend、SPA埋め込み
-    ↓ direct library call
-app/cli      config、solve、resume、artifact driver、loopback bridge
+(将来) web GUI     静的SPA。solver知識を持たない純client
+    ↓ versioned JSON over HTTP(localもremoteも同一)
+(将来) solversd    job daemon。run directoryの作成・監視・queue・認証
+    ↓ child process + run directory
+app/cli            config、validate、solve、resume、artifact driver
     ↓
-crates/*     engine、game、holdem、preflop、multiway、formats
+crates/*           engine、game、holdem、preflop、multiway、formats
 ```
 
-- GUI v1は`solvers.multiway-preflop/v1`のSetup / Solving / Resultsを扱う。
-- Local Solveは同じexecutable内で完結し、Node、sidecar、HTTP serverを必要としない。
-- CLIとGUIは同じstrict parser、normalized config、solver、artifact writerを使う。
-- Local live Treeは要求中のPreflop Node 1個だけを読む。Postflop strategyとEVは
-  GUI契約に含めない。
-- `solvers serve`は認証付きloopback bridgeを提供するが、GUIのRemote profileは
-  transport、credential、durable remote jobが未実装の将来境界である。
-- raw `solvers-gui` executableはplatformごとにbuildする。署名、notarization、
-  installerは別の配布milestoneとする。
+- 2026-08にReact SPA、Tauri shell、`solvers serve` loopback bridgeを削除した。
+  GUIがsolverをin-processで実行したため、job制御がCLIとGUIで二重化し、
+  走っているjobへ後から接続できない構造になっていたためである。
+- daemonはsolverを自プロセスで実行しない。`solvers solve --out <run-dir>`を
+  起動するだけであり、job状態はrun directoryにのみ存在する。
+- config検証と正規化の実装はRust側の1本だけとする。clientは正規化結果を表示する。
+- daemonが提供する操作はCLIからも実行できる状態を維持する。
 
 依存方向は常にapplicationからdomainへ向ける。`multiway`、`holdem`、
-`preflop`等のdomain crateはTauri、HTTP、screen stateを知らない。
+`preflop`等のdomain crateはHTTP、job、screen stateを知らない。
 
 ## 10. Multiway Production経路
 
@@ -293,8 +284,7 @@ policy arenaを確保・page touchしてからsweep 0を開始する。Hot trave
 world、legal action、regret update、Linear average strategy updateだけを行う。
 
 進捗表示はcompleted sweep/traversal/hand-update counterをO(1)で読む。正式な
-profile EVとtrained deviationは設定された停止判定境界だけで評価する。GUI閲覧要求は
-hot traversalへ混ぜず、完了batchの間で選択Nodeだけをscanする。
+profile EVとtrained deviationは設定された停止判定境界だけで評価する。
 
 ## 11. 非目標(anti-over-engineering 台帳)
 
@@ -307,4 +297,4 @@ hot traversalへ混ぜず、完了batchの間で選択Nodeだけをscanする。
 | per-history State / 汎用 EFG framework | OpenSpiel の罠(実測 100–400x) |
 | 自作 hand evaluator | `aya_poker`(Zlib/Apache-2.0/MIT, OMPEval 系)で十分、しかもホットパス外。変種評価(lowball/Badugi/short-deck)も同 crate で賄える |
 
-主要依存(全て permissive): `aya_poker, rayon, serde, toml, postcard, zstd, blake3, clap, thiserror/anyhow, rand+rand_chacha, tiny_http(bridge), criterion(dev), pyo3/maturin(後), wasm-bindgen(後)`。(`wide` は実測で不採用 — `docs/development.md` 参照。`ratatui` は未使用。)
+主要依存(全て permissive): `aya_poker, rayon, serde, toml, postcard, zstd, blake3, clap, thiserror/anyhow, rand+rand_chacha, criterion(dev), pyo3/maturin(後), wasm-bindgen(後)`。(`wide` は実測で不採用 — `docs/development.md` 参照。`ratatui` は未使用。)

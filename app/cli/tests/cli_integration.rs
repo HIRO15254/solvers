@@ -905,3 +905,70 @@ iterations = 1
         "expected an error naming the bad value and the supported one, got: {stderr}"
     );
 }
+
+/// Ported from the retired desktop backend: the canonical 6-max default
+/// surface must build a public tree and size a policy arena without
+/// allocating it. `--resources` is the CLI's only tree-preflight surface.
+#[test]
+fn validate_resources_sizes_the_default_surface_tree() {
+    let config = workspace_root().join("examples/preflop_multiway_v1_default.toml");
+    let output = run_solvers(&[
+        "validate",
+        config.to_str().unwrap(),
+        "--resources",
+        "--format",
+        "json",
+    ]);
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let summary: serde_json::Value =
+        serde_json::from_slice(&output.stdout).expect("validate --format json emits JSON");
+    let resources = &summary["resources"];
+    assert_eq!(resources["complete"], serde_json::json!(true));
+    for field in [
+        "decisionNodes",
+        "terminalEdges",
+        "policyColumns",
+        "policySlots",
+        "solverStateBytes",
+    ] {
+        assert!(
+            resources[field].as_u64().is_some_and(|value| value > 0),
+            "{field} must be a positive preflight count: {resources}"
+        );
+    }
+}
+
+/// Ported from the retired desktop backend: the full-option surface fixture
+/// must survive normalization with its non-default choices intact.
+#[test]
+fn validate_accepts_the_full_surface_fixture() {
+    let config = workspace_root().join("examples/preflop_multiway_v1_full_surface.toml");
+    let output = run_solvers(&[
+        "validate",
+        config.to_str().unwrap(),
+        "--show-effective",
+        "--resources",
+    ]);
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    for expected in [
+        "preflop_first_to_act = 4",
+        "opponent_exploration = 0.125",
+        "max_time = \"12h\"",
+        "probability_encoding = \"f32\"",
+    ] {
+        assert!(
+            stdout.contains(expected),
+            "effective config lost {expected}:\n{stdout}"
+        );
+    }
+    assert!(stdout.contains("resources: complete=true"));
+}

@@ -15,9 +15,10 @@ Active development. See the [documentation portal](docs/README.md) and
 ## Documentation
 
 - [docs/README.md](docs/README.md) — documentation map and source-of-truth hierarchy
-- [docs/user-guide.jp.md](docs/user-guide.jp.md) — GUI/CLI usage and operational interpretation
+- [docs/user-guide.jp.md](docs/user-guide.jp.md) — CLI usage and operational interpretation
 - [docs/multiway-preflop-v1.jp.md](docs/multiway-preflop-v1.jp.md) — normative Multiway Preflop v1 contract and complete TOML reference
-- [docs/architecture.md](docs/architecture.md) — solver, workspace, CLI, and desktop architecture
+- [docs/architecture.md](docs/architecture.md) — solver, workspace, and CLI architecture
+- [docs/app-architecture.md](docs/app-architecture.md) — target design for the CLI core, job daemon, and future Web GUI
 - [docs/development.md](docs/development.md) — tests, benchmarks, change workflow, and current roadmap
 - [LICENSE-POLICY.md](LICENSE-POLICY.md) — clean-room policy for AGPL references
 
@@ -25,20 +26,16 @@ Active development. See the [documentation portal](docs/README.md) and
 
 The project ships **one application** containing both a preflop solver (HU +
 2–9 player multiway) and a postflop solver (exact, fixed flop), selected by
-the config's `game.kind`. The CLI is the current execution surface. A new
-web-tech GUI provides Setup / Solving / Results as a React static SPA embedded
-in a Tauri 2 executable. GUI v1 targets Multiway Preflop v1 only. Its Local
-workflow uses the same Rust parser, solver, checkpoint, and solution formats as
-the CLI in-process; Remote profiles remain a UI and protocol specification and
-do not send jobs yet. See [docs/user-guide.jp.md](docs/user-guide.jp.md) and
-[docs/architecture.md](docs/architecture.md) for the exact implementation boundary.
+the config's `game.kind`. The CLI is the only execution surface: a config file
+goes in, a run directory comes out. A job daemon and a Web GUI are planned as
+clients of that CLI rather than as second execution paths — see
+[docs/app-architecture.md](docs/app-architecture.md) for the target design and
+its phases.
 
 ```
 app/
-├── cli         # `solvers`: config / validate / solve / resume / inspect /
-│               # evaluate / export / compare / experiment / report / serve
-├── ui          # Vite + React + shadcn/ui SPA; Setup / Solving / Results
-└── desktop     # Tauri 2 Local job/file backend + embedded SPA
+└── cli         # `solvers`: config / validate / solve / resume / inspect /
+                # evaluate / export / compare / experiment / report
 crates/
 ├── cards       # card/chip/street types, range parser, hand-evaluator wrapper
 ├── hand-index  # suit-isomorphism board canonicalization
@@ -58,15 +55,15 @@ crates/
 cargo test --workspace            # correctness harness (Kuhn/Leduc known solutions, oracle diff)
 cargo run -p cli --release -- solve examples/kuhn.toml
 
-# Current bridge v2 (authenticated loopback API). The desktop Local workflow
-# does not use this loopback transport; Remote GUI support targets v3:
-cargo run -p cli --release -- serve --origin http://localhost:3000
-
 # --- Preflop ---------------------------------------------------------------
 # Multiway Preflop v1: validate, then write one self-contained run directory.
-cargo run -p cli --release -- validate examples/preflop_multiway_v1_smoke.toml
-cargo run -p cli --release -- solve examples/preflop_multiway_v1_smoke.toml \
+cargo run -p cli --release -- validate examples/preflop_multiway_v1_3max_smoke.toml
+cargo run -p cli --release -- solve examples/preflop_multiway_v1_3max_smoke.toml \
     --out runs/v1-smoke
+
+# Size the public tree and policy arena before committing to a long run:
+cargo run -p cli --release -- validate examples/preflop_multiway_v1_default.toml \
+    --resources
 
 # Legacy-schema 9-max BBA + tournament ICM; writes versioned JSON,
 # .mwckpt, and .mwsol artifacts.
@@ -84,16 +81,6 @@ cargo run -p cli --release -- inspect examples/river_small.toml
 # Aggregate CSV across boards (frequencies, EVs, equity per board):
 cargo run -p cli --release -- report examples/river_small.toml \
     --boards "2c 7d 9h Js Qs,2c 7d 9h Js Ks" --output report.csv
-
-# --- Desktop GUI -----------------------------------------------------------
-# Install/build the static SPA, then one host-specific raw desktop executable.
-bun ci --cwd app/ui
-bun run --cwd app/ui desktop:build
-
-# target/release/solvers-gui opens the embedded Web UI using the OS WebView.
-# Local validation, solving, cancellation, checkpoint resume, and artifact I/O
-# run in this process. Remote Solve is specification/UI only. The executable is
-# not yet a signed/notarized platform bundle.
 ```
 
 ## License

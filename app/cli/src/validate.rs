@@ -22,7 +22,65 @@ struct ValidationSummary {
     chip_unit_bb: f64,
     profile: &'static str,
     #[serde(skip_serializing_if = "Option::is_none")]
+    resources: Option<ResourceSummary>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     effective_config: Option<serde_json::Value>,
+}
+
+/// Byte-bounded tree preflight reported by `--resources`. Every field is
+/// derived without allocating the policy arena or building EHS2 tables.
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ResourceSummary {
+    complete: bool,
+    recall: String,
+    decision_nodes: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    terminal_edges: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    policy_columns: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    policy_slots: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    solver_state_bytes: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    icm: Option<IcmSummary>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct IcmSummary {
+    field_players: u64,
+    paid_places: u64,
+    mode: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    samples: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    prepared_bytes: Option<u64>,
+}
+
+impl From<crate::session::MultiwayResourcePreflight> for ResourceSummary {
+    fn from(preflight: crate::session::MultiwayResourcePreflight) -> Self {
+        Self {
+            complete: preflight.complete,
+            recall: format!("{:?}", preflight.recall).to_lowercase(),
+            decision_nodes: preflight.decision_nodes,
+            terminal_edges: preflight.terminal_edges,
+            policy_columns: preflight.policy_columns,
+            policy_slots: preflight.policy_slots,
+            solver_state_bytes: preflight.solver_state_bytes,
+            icm: preflight.icm.map(|icm| IcmSummary {
+                field_players: icm.field_players,
+                paid_places: icm.paid_places,
+                mode: match icm.mode {
+                    crate::session::IcmPreflightMode::Exact => "exact",
+                    crate::session::IcmPreflightMode::Sampled => "sampled",
+                },
+                samples: icm.samples,
+                prepared_bytes: icm.prepared_bytes,
+            }),
+        }
+    }
 }
 
 pub fn run(
@@ -30,6 +88,7 @@ pub fn run(
     format: ValidationFormat,
     show_effective: bool,
     write_effective: Option<&Path>,
+    resources: bool,
 ) -> Result<()> {
     let raw = std::fs::read_to_string(config_path)
         .with_context(|| format!("reading {}", config_path.display()))?;
@@ -54,6 +113,12 @@ pub fn run(
         std::fs::write(path, &effective_toml)
             .with_context(|| format!("writing effective config {}", path.display()))?;
     }
+    let resource_summary = resources
+        .then(|| crate::session::preflight_multiway_config(&raw))
+        .transpose()
+        .context("running the resource preflight")?
+        .map(ResourceSummary::from);
+
     let effective_config = show_effective
         .then(|| crate::multiway_v1::normalized_config_at(&raw, config_path))
         .transpose()?;
@@ -68,6 +133,7 @@ pub fn run(
         } else {
             "external-sampling MCCFR average profile"
         },
+        resources: resource_summary,
         effective_config,
     };
     match format {
@@ -76,6 +142,22 @@ pub fn run(
             summary.schema, summary.seat_count, summary.chip_unit_bb, summary.profile
         ),
         ValidationFormat::Json => println!("{}", serde_json::to_string_pretty(&summary)?),
+    }
+    if let Some(resources) = &summary.resources
+        && matches!(format, ValidationFormat::Human)
+    {
+        println!(
+            "resources: complete={} recall={} decision_nodes={} policy_slots={} solver_state_bytes={}",
+            resources.complete,
+            resources.recall,
+            resources.decision_nodes,
+            resources
+                .policy_slots
+                .map_or_else(|| "n/a".to_string(), |slots| slots.to_string()),
+            resources
+                .solver_state_bytes
+                .map_or_else(|| "n/a".to_string(), |bytes| bytes.to_string()),
+        );
     }
     if show_effective && matches!(format, ValidationFormat::Human) {
         println!("\n{effective_toml}");

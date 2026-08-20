@@ -169,7 +169,10 @@ impl MultiwayAbstraction for ResourcePreflightAbstraction {
 }
 
 /// Runs the production contract, range/economics checks, and byte-bounded
-/// non-retaining tree preflight used by the desktop GUI.
+/// non-retaining tree preflight behind `solvers validate --resources`.
+///
+/// The tree is walked without retaining nodes, so this reports the arena a
+/// real solve would need without allocating it or building EHS² tables.
 pub fn preflight_multiway_config(raw_toml: &str) -> Result<MultiwayResourcePreflight> {
     crate::multiway_v1::validate_production_contract(raw_toml)
         .context("validating production Multiway Preflop contract")?;
