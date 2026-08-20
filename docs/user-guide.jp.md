@@ -136,7 +136,29 @@ recallもsparse policy mapが増えるため、productionからそれぞれ`MWP0
 HU エンジンが持つ exploitability / NashConv とは意図的に別名にしてある
 (同じ保証を持たないため)。
 
-## 6. 出力と再現性
+## 6. run directoryと出力
+
+`solve --out <dir>`は1つのrun directoryを作る。runの状態はすべてこのdirectoryにあり、
+solverプロセスのメモリには残らない。だから走っているrunへ後から別プロセスで接続できる。
+
+```
+<run-dir>/
+├── run.toml           # 実行に使ったeffective config(そのまま再実行できる)
+├── manifest.json      # runのidentityとstate。状態遷移時のみatomicに置換
+├── progress.jsonl     # 定期サンプル(下表の指標の時系列)。追記のみ
+├── events.jsonl       # 離散event(state遷移、checkpoint、停止理由、失敗)。追記のみ
+├── run.json           # 完了サマリ
+├── checkpoint.mwckpt  # 再開用
+└── solution.mwsol     # 閲覧用成果物
+```
+
+stateは`running` / `completed` / `failed` / `canceled` / `interrupted`である。
+`interrupted`は誰も書き込まない。manifestが`running`のままpidが消えている状態を
+読み手が導出したもので、checkpointがあればそこから再開できる。
+
+`events.jsonl`は1行1 JSON、`seq`が0から単調増加し、既存行を書き換えない。読み手は
+byte offsetを保持して再開し、`seq`の連続でとりこぼしを検出する。`progress.jsonl`とは
+役割が違う: 前者は不定期のlifecycle event、後者は時系列グラフ用の定期数値である。
 
 - **`.mwsol`**: 閲覧用アーティファクト。normalized effective config、公開tree、
   情報集合ごとの平均戦略を、ページ読み出し可能な索引付きで格納する。
@@ -145,7 +167,7 @@ HU エンジンが持つ exploitability / NashConv とは意図的に別名に�
   `solvers inspect` / `solvers export` がこれを読む。
 - **`.mwckpt`**: 再開用チェックポイント(累積 regret を含む全学習状態)。
   `solvers resume` で続きを回せる。
-- **metrics JSONL**: 上表の指標の時系列。
+- **`progress.jsonl`**: 上表の指標の時系列。
 - すべての成果物に設定の blake3 ハッシュが刻印され、設定が 1 バイトでも
   違う再開は拒否される。乱数はシード+サンプル ID から導出され、
   プロセスやスレッド数に依存しない。
@@ -160,12 +182,42 @@ cargo run -p cli --release -- solve solve.toml --out runs/my-run
 
 `validate`はstrict parseとeffective configを確認する。Production solveはさらに
 tree compile、dense arena byte preflight、allocation/page touchを完了してから
-sweep 0を開始する。再開にはrun directory内の`.mwckpt`と同じeffective configを使う。
+sweep 0を開始する。
+
+## 8. 走っているrunを監視する
+
+別のterminal、別のプロセスから、実行中のrunへいつでも接続できる。
+
+```sh
+# 現在の状態(state、sweeps、経過、再開可否、event offset)
+cargo run -p cli --release -- status runs/my-run
+
+# eventを追う。runが止まるまで追従し、止まったら次のoffsetを表示する
+cargo run -p cli --release -- watch runs/my-run
+
+# 切断後は表示されたoffsetから続きだけを読む
+cargo run -p cli --release -- watch runs/my-run --from 246
+
+# runs rootの一覧
+cargo run -p cli --release -- runs ls runs
+```
+
+`--format json`でどれも機械可読な出力になる。
+
+停止はCtrl-C(SIGINT)で、cooperative cancelの後にcheckpointを書いてから終了する。
+`status`は`canceled`と`resumable`を報告し、run directoryをそのまま渡せば再開する。
+
+```sh
+cargo run -p cli --release -- resume runs/my-run
+```
+
+再開は同じrun directoryに追記する。`manifest.json`のrun idと作成時刻は保たれ、
+`events.jsonl`の`seq`も連続する。別のdirectoryへ分岐したい場合は`--out`を渡す。
 
 `examples/preflop_multiway_v1_production_smoke.toml`はproduction parser contractの
 検証fixtureである。
 
-## 8. 実行前にリソースを見積もる
+## 9. 実行前にリソースを見積もる
 
 長時間runへ入る前に、public treeを保持せずに構築してpolicy arenaの必要量だけを
 報告できる。
@@ -182,7 +234,7 @@ GUIは2026-08に削除した。設定作成・実行・監視をGUIから行う�
 して起動するjob daemonのclientとして作り直す。目標設計は`docs/app-architecture.md`を
 参照。
 
-## 9. 結果と停止状態
+## 10. 結果と停止状態
 
 - `target-reached`: configured deviation targetを必要回数確認した。
 - `sweep-limit` / `time-limit`:budgetへ到達したがtarget達成を意味しない。
@@ -192,7 +244,7 @@ GUIは2026-08に削除した。設定作成・実行・監視をGUIから行う�
 Multiwayのmeasured deviationは単独seatのtrained deviationに対する推定であり、
 多人数一般和ゲームのNash/GTO保証ではない。Sweep消化率や残り時間も収束確率ではない。
 
-## 10. 関連ドキュメント
+## 11. 関連ドキュメント
 
 - `docs/multiway-preflop-v1.jp.md` — Production v1の規範仕様と全TOML項目
 - `docs/architecture.md` — workspace、solver、CLIの内部設計

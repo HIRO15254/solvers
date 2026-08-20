@@ -8,6 +8,7 @@ mod hash;
 mod metrics;
 mod multiway;
 mod mwsol;
+mod run;
 mod sol;
 
 pub use checkpoint::{Checkpoint, CheckpointError, HEADER_LEN, read_checkpoint, write_checkpoint};
@@ -23,6 +24,12 @@ pub use mwsol::{
     MultiwaySeatResult, MultiwaySolution, MultiwaySolutionMetadata, MultiwayStrategyBlock,
     MultiwayStrategyKey, MultiwayStrategyWeight, MwSolError, MwSolReader, MwSolStrategyPage,
     MwsolStorage, write_mwsol_with,
+};
+pub use run::{
+    RUN_CHECKPOINT_FILE, RUN_CONFIG_FILE, RUN_EVENTS_FILE, RUN_MANIFEST_FILE, RUN_MANIFEST_VERSION,
+    RUN_PROGRESS_FILE, RUN_RESULT_FILE, RUN_SOLUTION_FILE, RunEvent, RunEventLevel, RunEventLog,
+    RunEventPayload, RunManifest, RunState, is_run_directory, last_progress_row, read_events,
+    unix_millis,
 };
 pub use sol::{
     SolError, SolMeta, SolPayload, StrategyBlock, StreetsStored, dequantize_probs, quantize_probs,

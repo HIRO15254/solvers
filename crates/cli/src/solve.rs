@@ -59,10 +59,7 @@ pub fn run(
         source_raw.to_owned()
     };
     let raw = effective_raw.as_str();
-    let mut run_output = None;
-    let mut run_metrics = None;
-    let mut run_checkpoint = None;
-    let mut run_solution = None;
+    let mut run_paths = None;
     if is_multiway_v1 {
         let directory =
             out.ok_or_else(|| anyhow!("Multiway Preflop v1 requires --out <run-directory>"))?;
@@ -77,41 +74,30 @@ pub fn run(
                 "Multiway Preflop v1 uses only --out; remove legacy output/history/checkpoint overrides"
             ));
         }
-        if directory.exists() {
-            if !directory.is_dir() {
-                return Err(anyhow!(
-                    "run output {} is not a directory",
-                    directory.display()
-                ));
-            }
-            if std::fs::read_dir(directory)
-                .with_context(|| format!("reading {}", directory.display()))?
-                .next()
-                .is_some()
-            {
-                return Err(anyhow!(
-                    "run output directory {} is not empty",
-                    directory.display()
-                ));
-            }
-        } else {
-            std::fs::create_dir_all(directory)
-                .with_context(|| format!("creating {}", directory.display()))?;
-        }
-        run_output = Some(directory.join("run.json"));
-        run_metrics = Some(directory.join("progress.jsonl"));
-        run_checkpoint = Some(directory.join("checkpoint.mwckpt"));
-        run_solution = Some(directory.join("solution.mwsol"));
+        crate::run_dir::create_empty(directory)?;
+        run_paths = Some(crate::run_dir::RunPaths::new(directory));
     } else if out.is_some() {
         return Err(anyhow!(
             "--out is reserved for schema = {:?}; legacy configs use their existing output flags",
             crate::multiway_v1::SCHEMA
         ));
     }
-    let output = run_output.as_deref().or(output);
-    let metrics = run_metrics.as_deref().or(metrics);
-    let checkpoint = run_checkpoint.as_deref().or(checkpoint);
-    let sol = run_solution.as_deref().or(sol);
+    let output = run_paths
+        .as_ref()
+        .map(|paths| paths.result.as_path())
+        .or(output);
+    let metrics = run_paths
+        .as_ref()
+        .map(|paths| paths.progress.as_path())
+        .or(metrics);
+    let checkpoint = run_paths
+        .as_ref()
+        .map(|paths| paths.checkpoint.as_path())
+        .or(checkpoint);
+    let sol = run_paths
+        .as_ref()
+        .map(|paths| paths.solution.as_path())
+        .or(sol);
     let mut config: SolveConfig =
         crate::config::parse_solve_config_at(raw, config_path).context("parsing config")?;
 
@@ -134,7 +120,33 @@ pub fn run(
     // with, since `resume` re-derives the same hash from the same file.
     let config_hash = formats::config_hash(raw.as_bytes());
     if matches!(config.game, GameSection::PreflopMultiway(_)) {
-        return crate::multiway_solve::run(
+        let Some(paths) = run_paths.as_ref() else {
+            return crate::multiway_solve::run(
+                raw,
+                config,
+                output,
+                metrics,
+                checkpoint,
+                config_hash,
+                sol,
+                Some(&crate::CLI_CANCEL),
+                true,
+            );
+        };
+        let mut recorder = crate::run_dir::RunRecorder::start(
+            &paths.directory,
+            "preflop-multiway",
+            Some(crate::multiway_v1::SCHEMA.to_string()),
+            config_hash,
+            raw,
+            vec![
+                "solve".to_string(),
+                config_path.display().to_string(),
+                "--out".to_string(),
+                paths.directory.display().to_string(),
+            ],
+        )?;
+        let outcome = crate::multiway_solve::run_observed(
             raw,
             config,
             output,
@@ -144,7 +156,10 @@ pub fn run(
             sol,
             Some(&crate::CLI_CANCEL),
             true,
+            &mut |observation| recorder.observe(&observation),
         );
+        let completion = crate::run_dir::completion_status(&paths.directory);
+        return recorder.finish(outcome, completion);
     }
 
     let checkpoint_sink = checkpoint.map(|path| (path, config_hash));

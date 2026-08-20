@@ -125,6 +125,8 @@ pub mod postflop_setup;
 pub mod preflop_setup;
 pub mod report;
 pub mod resume;
+pub mod run_dir;
+pub mod runs;
 pub mod session;
 pub mod sol;
 pub mod solve;
@@ -165,6 +167,30 @@ enum Command {
         /// policy arena a real solve would need.
         #[arg(long)]
         resources: bool,
+    },
+    /// Report what a run directory currently says about itself.
+    Status {
+        run: std::path::PathBuf,
+        #[arg(long, value_enum, default_value = "human")]
+        format: runs::ReportFormat,
+    },
+    /// Follow a run directory's event log until the run stops.
+    Watch {
+        run: std::path::PathBuf,
+        /// Byte offset into `events.jsonl` to resume from. `solvers status`
+        /// reports the offset to use.
+        #[arg(long, default_value_t = 0)]
+        from: u64,
+        /// Seconds between polls while the run is still going.
+        #[arg(long = "poll-secs", default_value_t = 1.0)]
+        poll_secs: f64,
+        #[arg(long, value_enum, default_value = "human")]
+        format: runs::ReportFormat,
+    },
+    /// List the run directories under a runs root.
+    Runs {
+        #[command(subcommand)]
+        command: RunsCommand,
     },
     /// Solve the game described by a TOML config file.
     Solve {
@@ -216,7 +242,8 @@ enum Command {
     },
     /// Continue a checkpointed solve to `run.iterations` total iterations.
     Resume {
-        /// Multiway v1 checkpoint, or the legacy config used with --checkpoint.
+        /// Run directory from `solve --out` (or a bare `.mwckpt`). Legacy
+        /// configs pass their config here together with --checkpoint.
         config: std::path::PathBuf,
         /// Legacy checkpoint path. Omit for a self-contained v1 `.mwckpt`.
         #[arg(long, hide = true)]
@@ -347,6 +374,16 @@ enum Command {
 }
 
 #[derive(Subcommand)]
+enum RunsCommand {
+    /// List run directories directly under `root`.
+    Ls {
+        root: std::path::PathBuf,
+        #[arg(long, value_enum, default_value = "human")]
+        format: runs::ReportFormat,
+    },
+}
+
+#[derive(Subcommand)]
 enum ConfigCommand {
     /// Print or write a valid v1 configuration template.
     New {
@@ -363,6 +400,22 @@ pub fn main_impl() -> Result<()> {
     match cli.command {
         Command::Config { command } => match command {
             ConfigCommand::New { template, out } => config_new::run(template, out.as_deref()),
+        },
+        Command::Status { run, format } => runs::status(&run, format),
+        Command::Watch {
+            run,
+            from,
+            poll_secs,
+            format,
+        } => runs::watch(
+            &run,
+            from,
+            std::time::Duration::from_secs_f64(poll_secs.max(0.05)),
+            format,
+            &CLI_CANCEL,
+        ),
+        Command::Runs { command } => match command {
+            RunsCommand::Ls { root, format } => runs::list(&root, format),
         },
         Command::Validate {
             config,

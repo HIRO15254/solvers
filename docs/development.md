@@ -25,8 +25,9 @@ checkpoint/solution metadataを同じchange setで更新する。
 
 - Phase 0(完了): GUI削除、legacy受理経路の削除、研究ラインの削除、`crates/cli`への集約。
   full-recall/sparse storageの削除だけはPhase 1へ送った(理由はapp-architecture.md §9)。
-- Phase 1: run directory契約の確立。全kindのschema必須化と`--out`一本化、
-  manifest/events、`status`/`watch`/`runs ls`。
+- Phase 1(進行中): run directory契約の確立。manifest/events、
+  `status`/`watch`/`runs ls`、run directoryを受け取る`resume`まで完了。
+  残りはPostflop/HUのschema策定と`--out`一本化。
 - Phase 2: `crates/protocol`と`solversd`(子プロセス管理、queue、認証、SSE)。
 - Phase 3: Web GUI(純client)。
 - Viewer/研究workflow: artifact query、Python/WASM境界の必要性を実測で判断する。

@@ -605,6 +605,10 @@ solvers validate config.toml
 solvers validate config.toml --show-effective
 solvers validate config.toml --write-effective effective.toml
 solvers solve config.toml --out runs/my-run
+solvers status runs/my-run
+solvers watch runs/my-run --from OFFSET
+solvers runs ls runs
+solvers resume runs/my-run
 ```
 
 CLIの`validate`はschema、数値・条件付きsemantic、
@@ -617,6 +621,34 @@ Setup preflightはtreeとresource estimateも実行する。
 
 v1 solve-time overrideは `--threads`、`--memory`、`--max-time` のみ。
 generic `--set` はなく、legacyの個別output flagはv1では拒否される。
+`resume`はrun directoryを受け取り、その中の`checkpoint.mwckpt`を使う。
+
+## run directory契約
+
+`solve --out <dir>`が作るdirectoryがrunの唯一の永続状態である。solverプロセスの
+メモリにrun状態を持たないため、走っているrunへ別プロセスが後から接続できる。
+
+| file | 役割 | 書き込み規則 |
+|---|---|---|
+| `run.toml` | 実行に使ったeffective config | 開始時に1度 |
+| `manifest.json` | run identityとstate | 状態遷移時のみ、temp file + renameでatomicに置換 |
+| `progress.jsonl` | 定期metric sample | 追記のみ |
+| `events.jsonl` | 離散lifecycle event | 追記のみ、`seq`は0から単調増加、既存行を書き換えない |
+| `run.json` | 完了サマリ | 完了時に1度 |
+| `checkpoint.mwckpt` | 再開用state | checkpoint cadenceごと |
+| `solution.mwsol` | 閲覧用成果物 | 完了時に1度 |
+
+manifestの`state`は`running`、`completed`、`failed`、`canceled`、`interrupted`。
+`interrupted`はどのプロセスも書き込まない。manifestが`running`のまま記録pidが
+存在しない状態を読み手が導出する。この判定は同一host上でのみ有効であり、
+network越しにrun directoryを読む場合は使えない。
+
+読み手は`events.jsonl`のbyte offsetを保持して再開する。行の途中までしか書かれて
+いない末尾は返さず、そのbyteをoffsetに含めない。次回読み出しで完全な行として読む。
+
+`events.jsonl`と`progress.jsonl`を分けるのは、前者が不定期のlifecycle event、
+後者が固定schemaの時系列数値だからである。混在させると既存のprogress行schemaが
+壊れ、読み手全員にfilterを強いる。
 
 ## 同期規則
 

@@ -860,3 +860,212 @@ fn validate_accepts_the_full_surface_fixture() {
     }
     assert!(stdout.contains("resources: complete=true"));
 }
+
+// --- run directory: status / watch / runs ls ------------------------------
+
+/// Builds a run directory the way `solve --out` leaves one, without paying
+/// for a real solve. `status`, `watch`, and `runs ls` read only these files,
+/// so this exercises the same contract the commands promise.
+fn fabricate_run(directory: &std::path::Path, state: &str, with_checkpoint: bool) {
+    std::fs::create_dir_all(directory).unwrap();
+    let run_id = directory.file_name().unwrap().to_string_lossy();
+    let terminal = state != "running";
+    let manifest = serde_json::json!({
+        "schemaVersion": 1,
+        "runId": run_id,
+        "state": state,
+        "gameKind": "preflop-multiway",
+        "configSchema": "solvers.multiway-preflop/v1",
+        "configHash": "aa".repeat(32),
+        "cliVersion": "0.1.0",
+        "command": ["solve", "config.toml"],
+        // A pid that owns nothing, so a `running` manifest here is the
+        // abandoned case.
+        "pid": 0,
+        "createdUnixMs": 1_700_000_000_000u64,
+        "startedUnixMs": 1_700_000_000_000u64,
+        "finishedUnixMs": terminal.then_some(1_700_000_060_000u64),
+        "failure": serde_json::Value::Null,
+        "completion": terminal.then_some("target-reached"),
+    });
+    std::fs::write(
+        directory.join("manifest.json"),
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+
+    let mut events = String::from(
+        "{\"seq\":0,\"unixMs\":1700000000000,\"level\":\"info\",\"kind\":\"state\",\"state\":\"running\"}\n",
+    );
+    if terminal {
+        events.push_str(&format!(
+            "{{\"seq\":1,\"unixMs\":1700000060000,\"level\":\"info\",\"kind\":\"state\",\"state\":\"{state}\"}}\n"
+        ));
+    }
+    std::fs::write(directory.join("events.jsonl"), events).unwrap();
+    std::fs::write(
+        directory.join("progress.jsonl"),
+        "{\"sweeps\":128,\"elapsedSecs\":12.5}\n",
+    )
+    .unwrap();
+    if with_checkpoint {
+        std::fs::write(
+            directory.join("checkpoint.mwckpt"),
+            b"not a real checkpoint",
+        )
+        .unwrap();
+    }
+}
+
+#[test]
+fn status_reports_a_finished_run_as_json() {
+    let dir = temp_dir("run-status");
+    let run = dir.join("run-a");
+    fabricate_run(&run, "completed", false);
+
+    let output = run_solvers_ok(&["status", run.to_str().unwrap(), "--format", "json"]);
+    let status: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(status["runId"], "run-a");
+    assert_eq!(status["state"], "completed");
+    assert_eq!(status["sweeps"], 128);
+    assert_eq!(status["completion"], "target-reached");
+    assert_eq!(status["resumable"], false);
+    assert!(status["eventsOffset"].as_u64().unwrap() > 0);
+}
+
+/// The case the whole run-directory contract exists for: a run whose owning
+/// process is gone must not keep reporting itself as running.
+#[cfg(unix)]
+#[test]
+fn status_reports_an_abandoned_run_as_interrupted_and_resumable() {
+    let dir = temp_dir("run-status-abandoned");
+    let run = dir.join("run-b");
+    fabricate_run(&run, "running", true);
+
+    let output = run_solvers_ok(&["status", run.to_str().unwrap(), "--format", "json"]);
+    let status: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(status["state"], "interrupted");
+    assert_eq!(status["recordedState"], "running");
+    assert_eq!(status["resumable"], true);
+}
+
+#[test]
+fn watch_replays_a_finished_run_and_resumes_from_an_offset() {
+    let dir = temp_dir("run-watch");
+    let run = dir.join("run-c");
+    fabricate_run(&run, "completed", false);
+
+    let all = run_solvers_ok(&["watch", run.to_str().unwrap(), "--format", "json"]);
+    let lines: Vec<&str> = std::str::from_utf8(&all.stdout)
+        .unwrap()
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .collect();
+    assert_eq!(lines.len(), 2, "stdout: {lines:?}");
+    let first: serde_json::Value = serde_json::from_str(lines[0]).unwrap();
+    assert_eq!(first["seq"], 0);
+
+    // Resuming past the first line yields only what follows it.
+    let first_line_len = std::fs::read_to_string(run.join("events.jsonl"))
+        .unwrap()
+        .lines()
+        .next()
+        .unwrap()
+        .len()
+        + 1;
+    let tail = run_solvers_ok(&[
+        "watch",
+        run.to_str().unwrap(),
+        "--from",
+        &first_line_len.to_string(),
+        "--format",
+        "json",
+    ]);
+    let tail_lines: Vec<&str> = std::str::from_utf8(&tail.stdout)
+        .unwrap()
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .collect();
+    assert_eq!(tail_lines.len(), 1);
+    let only: serde_json::Value = serde_json::from_str(tail_lines[0]).unwrap();
+    assert_eq!(only["seq"], 1);
+}
+
+#[test]
+fn watch_rejects_a_directory_that_is_not_a_run() {
+    let dir = temp_dir("run-watch-invalid");
+    std::fs::create_dir_all(dir.join("empty")).unwrap();
+    let output = run_solvers(&["watch", dir.join("empty").to_str().unwrap()]);
+    assert!(!output.status.success());
+    assert!(
+        String::from_utf8_lossy(&output.stderr).contains("not a run directory"),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+}
+
+#[test]
+fn runs_ls_lists_run_directories_and_skips_everything_else() {
+    let dir = temp_dir("runs-ls");
+    fabricate_run(&dir.join("run-a"), "completed", false);
+    fabricate_run(&dir.join("run-b"), "failed", false);
+    std::fs::create_dir_all(dir.join("scratch")).unwrap();
+    std::fs::write(dir.join("notes.txt"), "x").unwrap();
+
+    let output = run_solvers_ok(&["runs", "ls", dir.to_str().unwrap(), "--format", "json"]);
+    let listing: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let runs = listing["runs"].as_array().unwrap();
+    assert_eq!(runs.len(), 2);
+    assert_eq!(runs[0]["runId"], "run-a");
+    assert_eq!(runs[1]["runId"], "run-b");
+}
+
+#[test]
+#[ignore = "builds the full EHS2 tables; explicit release acceptance only"]
+fn a_solve_records_a_complete_run_directory() {
+    let dir = temp_dir("run-directory-contract");
+    let config = workspace_root().join("examples/preflop_multiway_v1_3max_smoke.toml");
+    let run = dir.join("run");
+    run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
+    ]);
+
+    for name in [
+        "manifest.json",
+        "events.jsonl",
+        "progress.jsonl",
+        "run.json",
+        "run.toml",
+        "checkpoint.mwckpt",
+        "solution.mwsol",
+    ] {
+        assert!(run.join(name).is_file(), "{name} is missing");
+    }
+
+    let manifest: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(run.join("manifest.json")).unwrap()).unwrap();
+    assert_eq!(manifest["state"], "completed");
+    assert_eq!(manifest["gameKind"], "preflop-multiway");
+    assert_eq!(manifest["configSchema"], "solvers.multiway-preflop/v1");
+    assert!(manifest["finishedUnixMs"].as_u64().is_some());
+
+    // `run.toml` must be the config the run actually used, so a run
+    // directory can be re-solved from itself.
+    let recorded = std::fs::read_to_string(run.join("run.toml")).unwrap();
+    assert!(recorded.contains("solvers.multiway-preflop/v1"));
+
+    let events: Vec<serde_json::Value> = std::fs::read_to_string(run.join("events.jsonl"))
+        .unwrap()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    assert_eq!(events.first().unwrap()["state"], "running");
+    assert_eq!(events.last().unwrap()["state"], "completed");
+    assert!(events.iter().any(|event| event["kind"] == "stop"));
+    for (index, event) in events.iter().enumerate() {
+        assert_eq!(event["seq"], index as u64, "event sequence must be dense");
+    }
+}

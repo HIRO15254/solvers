@@ -64,6 +64,14 @@ cargo run -p cli --release -- solve examples/preflop_multiway_v1_3max_smoke.toml
 cargo run -p cli --release -- validate examples/preflop_multiway_v1_default.toml \
     --resources
 
+# Attach to a run from any other process, at any time: a run directory is the
+# whole interface. Ctrl-C the solve and `resume` picks it up from its
+# checkpoint.
+cargo run -p cli --release -- status runs/v1-smoke
+cargo run -p cli --release -- watch  runs/v1-smoke --from 0
+cargo run -p cli --release -- runs ls runs
+cargo run -p cli --release -- resume runs/v1-smoke
+
 # --- Postflop --------------------------------------------------------------
 # Exact postflop solve (prints a memory estimate before building the tree):
 cargo run -p cli --release -- solve examples/postflop_srp20.toml

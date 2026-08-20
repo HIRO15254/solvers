@@ -31,7 +31,7 @@ pub fn run(
 ) -> Result<()> {
     let Some(checkpoint_path) = checkpoint_path else {
         return run_self_contained_multiway(
-            config_path,
+            &resolve_checkpoint(config_path)?,
             out,
             threads,
             memory,
@@ -157,6 +157,28 @@ fn apply_legacy_multiway_max_sweeps(
 }
 
 #[allow(clippy::too_many_arguments)]
+/// Accepts either a run directory or a checkpoint file.
+///
+/// A run directory is the documented input -- it is what `solve --out`
+/// produces and what `status`/`watch` read -- so pointing `resume` at one is
+/// the normal case. A bare `.mwckpt` still works for a checkpoint that was
+/// moved out of its directory.
+fn resolve_checkpoint(path: &Path) -> Result<std::path::PathBuf> {
+    if !path.is_dir() {
+        return Ok(path.to_path_buf());
+    }
+    let checkpoint = path.join(formats::RUN_CHECKPOINT_FILE);
+    if !checkpoint.is_file() {
+        return Err(anyhow!(
+            "run directory {} has no {}; it never reached its first checkpoint",
+            path.display(),
+            formats::RUN_CHECKPOINT_FILE
+        ));
+    }
+    Ok(checkpoint)
+}
+
+#[allow(clippy::too_many_arguments)]
 fn run_self_contained_multiway(
     checkpoint_path: &Path,
     out: Option<&Path>,
@@ -248,22 +270,31 @@ fn run_self_contained_multiway(
     } else {
         checkpoint_path
     };
-    let run_path = directory.join("run.json");
-    let progress_path = directory.join("progress.jsonl");
-    let solution_path = directory.join("solution.mwsol");
+    let paths = crate::run_dir::RunPaths::new(directory);
     let config_hash = formats::config_hash(raw.as_bytes());
-    crate::multiway_solve::resume(
+    let mut recorder = crate::run_dir::RunRecorder::reopen(
+        directory,
+        "preflop-multiway",
+        Some(crate::multiway_v1::SCHEMA.to_string()),
+        config_hash,
+        &raw,
+        vec!["resume".to_string(), directory.display().to_string()],
+    )?;
+    let outcome = crate::multiway_solve::resume_observed(
         &raw,
         config,
-        Some(&run_path),
-        Some(&progress_path),
+        Some(&paths.result),
+        Some(&paths.progress),
         active_checkpoint,
         config_hash,
-        Some(&solution_path),
+        Some(&paths.solution),
         Some(&crate::CLI_CANCEL),
         stop_target.is_some(),
         true,
-    )
+        &mut |observation| recorder.observe(&observation),
+    );
+    let completion = crate::run_dir::completion_status(directory);
+    recorder.finish(outcome, completion)
 }
 
 #[cfg(test)]

@@ -97,11 +97,30 @@ pub struct MultiwayQualityObservation {
     pub metrics: MultiwayMetricsRow,
 }
 
+/// A checkpoint was written; the run is resumable from this sweep count.
+#[derive(Clone, Copy, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiwayCheckpointObservation {
+    pub sweeps: u64,
+}
+
+/// The solver reached its terminal status. Published once, before the
+/// artifacts are written, so a watcher learns the reason at the moment the
+/// solve stops rather than when the last file lands.
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiwayStopObservation {
+    pub reason: String,
+    pub sweeps: u64,
+}
+
 #[derive(Clone, Debug, Serialize)]
 #[serde(tag = "kind", rename_all = "kebab-case")]
 pub enum MultiwayRunObservation {
     Live(MultiwayLiveObservation),
     Quality(MultiwayQualityObservation),
+    Checkpoint(MultiwayCheckpointObservation),
+    Stop(MultiwayStopObservation),
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -188,6 +207,38 @@ pub fn resume(
         reset_confirmations,
         emit_progress,
         None,
+    )
+}
+
+/// [`resume`] with an observer, so a resumed segment records the same run
+/// events as a fresh solve.
+#[allow(clippy::too_many_arguments)]
+pub fn resume_observed(
+    raw_config: &str,
+    config: SolveConfig,
+    output: Option<&Path>,
+    metrics_path: Option<&Path>,
+    checkpoint_path: &Path,
+    config_hash: [u8; 32],
+    mwsol_path: Option<&Path>,
+    cancel: Option<&AtomicBool>,
+    reset_confirmations: bool,
+    emit_progress: bool,
+    observer: &mut dyn FnMut(MultiwayRunObservation),
+) -> Result<()> {
+    run_inner(
+        raw_config,
+        config,
+        output,
+        metrics_path,
+        Some(checkpoint_path),
+        config_hash,
+        mwsol_path,
+        cancel,
+        Some(checkpoint_path),
+        reset_confirmations,
+        emit_progress,
+        Some(observer),
     )
 }
 
@@ -533,6 +584,11 @@ fn run_inner(
                     .append(&checkpoint_event)
                     .context("writing checkpoint progress event")?;
             }
+            if let Some(observer) = observer.as_deref_mut() {
+                observer(MultiwayRunObservation::Checkpoint(
+                    MultiwayCheckpointObservation { sweeps: sweeps_now },
+                ));
+            }
         }
 
         if deferred_live_observation && !quality_published {
@@ -600,6 +656,12 @@ fn run_inner(
     .to_string();
     if last_quality_observation_sweeps != Some(last_row.sweeps) {
         publish_observation(&last_row, &mut observer);
+    }
+    if let Some(observer) = &mut observer {
+        observer(MultiwayRunObservation::Stop(MultiwayStopObservation {
+            reason: last_row.phase.clone(),
+            sweeps: last_row.sweeps,
+        }));
     }
     if let Some(writer) = metrics_writer.as_mut() {
         writer
@@ -993,6 +1055,12 @@ mod tests {
                 }
                 MultiwayRunObservation::Quality(observation) => {
                     observations.push(("quality".into(), observation.metrics.sweeps));
+                }
+                MultiwayRunObservation::Checkpoint(observation) => {
+                    observations.push(("checkpoint".into(), observation.sweeps));
+                }
+                MultiwayRunObservation::Stop(observation) => {
+                    observations.push((format!("stop:{}", observation.reason), observation.sweeps));
                 }
             },
         )
