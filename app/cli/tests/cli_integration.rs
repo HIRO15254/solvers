@@ -1,3 +1,5 @@
+mod common;
+
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -287,7 +289,8 @@ fn resume_equivalence_kuhn() {
 
 fn legacy_multiway_solve_is_rejected_before_creating_artifacts() {
     let dir = temp_dir("multiway-legacy-rejected");
-    let config = workspace_root().join("examples/preflop_multiway_3max_smoke.toml");
+    let config = dir.join("lowered.toml");
+    std::fs::write(&config, common::LOWERED_LEGACY).unwrap();
     let result = dir.join("result.json");
     let checkpoint = dir.join("result.mwckpt");
     let solution = dir.join("result.mwsol");
@@ -316,12 +319,14 @@ fn legacy_multiway_solve_is_rejected_before_creating_artifacts() {
 }
 
 #[test]
-fn production_validate_rejects_the_research_rollout_fixture() {
-    let config = workspace_root().join("examples/preflop_multiway_v1_smoke.toml");
+fn production_validate_rejects_the_retired_rollout_abstraction() {
+    let dir = temp_dir("multiway-rollout-rejected");
+    let config = dir.join("rollout.toml");
+    std::fs::write(&config, common::V1_RETIRED_ROLLOUT).unwrap();
     let output = run_solvers(&["validate", config.to_str().unwrap()]);
     assert!(
         !output.status.success(),
-        "retired rollout fixture unexpectedly passed production validation"
+        "a config naming the retired rollout abstraction must not validate"
     );
     assert!(
         String::from_utf8_lossy(&output.stderr).contains("MWP001"),

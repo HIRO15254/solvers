@@ -117,9 +117,8 @@ pub fn run(
 
     if !is_multiway_v1 && matches!(config.game, GameSection::PreflopMultiway(_)) {
         return Err(anyhow!(
-            "MWP003: legacy preflop-multiway solve configs were removed from the production \
-             binary because their omitted defaults select rollout-kmeans + full recall; migrate \
-             to schema = {:?}, explicit kind = \"ehs2-percentile\", and current-street recall",
+            "MWP003: hand-written lowered preflop-multiway configs are not accepted; \
+             write schema = {:?} instead",
             crate::multiway_v1::SCHEMA
         ));
     }

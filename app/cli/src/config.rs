@@ -619,7 +619,7 @@ mod tests {
     /// as a preset using the exact same schema the CLI parses.
     #[test]
     fn multiway_config_round_trips_through_toml_serialization() {
-        let raw = include_str!("../../../examples/preflop_multiway_9max.toml");
+        let raw = crate::test_fixtures::LOWERED_9MAX_ICM;
         let original: SolveConfig = toml::from_str(raw).expect("parse original multiway config");
         let serialized = toml::to_string(&original).expect("serialize SolveConfig back to TOML");
         let reparsed: SolveConfig =
@@ -646,7 +646,7 @@ mod tests {
 
     #[test]
     fn traverser_vector_defaults_to_false_and_is_omitted_when_unset() {
-        let raw = include_str!("../../../examples/preflop_multiway_9max.toml");
+        let raw = crate::test_fixtures::LOWERED_9MAX_ICM;
         let mut config: SolveConfig = toml::from_str(raw).expect("parse example multiway config");
         let AlgorithmSection::ExternalSamplingMccfr {
             traverser_vector, ..
@@ -948,7 +948,7 @@ iterations = 10
 
     #[test]
     fn stop_rule_keys_round_trip_and_absent_keys_serialize_byte_identically() {
-        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let raw = crate::test_fixtures::LOWERED_3MAX;
         let baseline: SolveConfig = toml::from_str(raw).expect("parse example multiway config");
         assert_eq!(baseline.run.stop_dev_gain, None);
         assert_eq!(baseline.run.stop_confirmations, None);

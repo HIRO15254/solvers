@@ -65,11 +65,6 @@ cargo run -p cli --release -- solve examples/preflop_multiway_v1_3max_smoke.toml
 cargo run -p cli --release -- validate examples/preflop_multiway_v1_default.toml \
     --resources
 
-# Legacy-schema 9-max BBA + tournament ICM; writes versioned JSON,
-# .mwckpt, and .mwsol artifacts.
-cargo run -p cli --release -- solve examples/preflop_multiway_9max.toml \
-    --output result.json --checkpoint solve.mwckpt --sol solve.mwsol
-
 # --- Postflop --------------------------------------------------------------
 # Exact postflop solve (prints a memory estimate before building the tree):
 cargo run -p cli --release -- solve examples/postflop_srp20.toml

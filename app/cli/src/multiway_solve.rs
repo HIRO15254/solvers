@@ -924,7 +924,7 @@ mod tests {
 
     #[test]
     fn multiway_example_parses_the_public_contract() {
-        let raw = include_str!("../../../examples/preflop_multiway_9max.toml");
+        let raw = crate::test_fixtures::LOWERED_9MAX_ICM;
         let parsed: SolveConfig = toml::from_str(raw).unwrap();
         assert!(matches!(parsed.game, GameSection::PreflopMultiway(_)));
     }
@@ -934,7 +934,7 @@ mod tests {
     /// key) and overrides `sweeps` to `cap`, so the stop rule's cap acts as
     /// a safety net rather than the actual target.
     fn smoke_with_stop_rule(cap: u64, extra_stop_keys: &str) -> String {
-        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let raw = crate::test_fixtures::LOWERED_3MAX;
         let with_cap = raw.replacen("sweeps = 2\n", &format!("sweeps = {cap}\n"), 1);
         assert_ne!(with_cap, raw, "the sweeps anchor must have matched");
         let spliced = with_cap.replacen(
@@ -1053,7 +1053,7 @@ mod tests {
         stop_dev_gain: f64,
         stop_confirmations: u32,
     ) -> String {
-        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let raw = crate::test_fixtures::LOWERED_3MAX;
         let raw = raw.replace("stack_bb = 2.0", "stack_bb = 20.0");
         let raw = raw.replacen(
             "[game.betting.preflop]\nbet_sizes = []\nraise_sizes = []\nmax_aggressive_actions = 1\ninclude_allin = true\n",
@@ -1106,7 +1106,7 @@ mod tests {
 
     #[test]
     fn three_player_smoke_contract_parses() {
-        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let raw = crate::test_fixtures::LOWERED_3MAX;
         let parsed: SolveConfig = toml::from_str(raw).unwrap();
         assert!(matches!(parsed.game, GameSection::PreflopMultiway(_)));
         assert_eq!(parsed.run.sweeps, Some(2));

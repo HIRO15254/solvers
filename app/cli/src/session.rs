@@ -1432,7 +1432,7 @@ mod tests {
 
     #[test]
     fn multiway_example_builds_a_session() {
-        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let raw = crate::test_fixtures::LOWERED_3MAX;
         let session = build_multiway_session(raw, None).expect("build multiway session");
         assert_eq!(session.sweeps_target, 2);
         assert_eq!(session.config_toml, raw);
@@ -1443,7 +1443,7 @@ mod tests {
 
     #[test]
     fn common_deviation_reference_attaches_before_checkpoint_restore() {
-        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let raw = crate::test_fixtures::LOWERED_3MAX;
         let reference_raw = raw
             .replace("flop_buckets = 8", "flop_buckets = 4")
             .replace("turn_buckets = 8", "turn_buckets = 4")
@@ -1477,13 +1477,13 @@ mod tests {
             .as_ref()
             .expect("reference metadata");
         assert_ne!(reference.abstraction_fingerprint, candidate_abstraction);
-        assert_eq!(reference.recall, RecallMode::Full);
+        assert_eq!(reference.recall, RecallMode::Street);
         assert!(restored.solver.game().deviation_abstraction().is_some());
     }
 
     #[test]
     fn common_deviation_reference_rejects_a_different_game() {
-        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let raw = crate::test_fixtures::LOWERED_3MAX;
         let different_game = raw.replacen("stack_bb = 2.0", "stack_bb = 3.0", 1);
         let error = build_multiway_session_with_deviation(raw, &different_game, None)
             .err()
@@ -1496,7 +1496,7 @@ mod tests {
     }
 
     fn with_stop_dev_gain(dev_gain: &str, extra: &str) -> String {
-        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let raw = crate::test_fixtures::LOWERED_3MAX;
         let anchor = "evaluation_cadence = 1\n";
         let spliced = raw.replacen(
             anchor,
@@ -1576,27 +1576,16 @@ mod tests {
     /// Splices `extra` right after `discount_until` in `[algorithm]`,
     /// mirroring `with_stop_dev_gain`'s splice-into-`[run]` helper.
     fn with_algorithm_extra(extra: &str) -> String {
-        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let raw = crate::test_fixtures::LOWERED_3MAX;
         let anchor = "discount_until = 10000000\n";
         let spliced = raw.replacen(anchor, &format!("{anchor}{extra}"), 1);
         assert_ne!(spliced, raw, "the splice anchor must have matched");
         spliced
     }
 
-    /// Pruning is exercised only by the dense street-recall vector worker, so
-    /// this helper splices `recall = "street"` into `[game.abstraction]`
-    /// alongside `with_algorithm_extra`'s `[algorithm]` splice.
-    fn with_algorithm_extra_and_street_recall(extra: &str) -> String {
-        let raw = with_algorithm_extra(extra);
-        let anchor = "seed = 17\n";
-        let spliced = raw.replacen(anchor, &format!("{anchor}recall = \"street\"\n"), 1);
-        assert_ne!(spliced, raw, "the recall splice anchor must have matched");
-        spliced
-    }
-
     #[test]
     fn prune_without_explicit_threshold_derives_from_chip_ev_stakes() {
-        let raw = with_algorithm_extra_and_street_recall("traverser_vector = true\nprune = true\n");
+        let raw = with_algorithm_extra("traverser_vector = true\nprune = true\n");
         let session = build_multiway_session(&raw, None).expect("build multiway session");
         let config = session.solver.config();
         assert!(config.prune);
@@ -1610,7 +1599,7 @@ mod tests {
 
     #[test]
     fn prune_with_explicit_threshold_uses_it_verbatim() {
-        let raw = with_algorithm_extra_and_street_recall(
+        let raw = with_algorithm_extra(
             "traverser_vector = true\nprune = true\nprune_threshold = -42.0\nprune_skip_probability = 0.5\n",
         );
         let session = build_multiway_session(&raw, None).expect("build multiway session");
@@ -1622,7 +1611,7 @@ mod tests {
 
     #[test]
     fn prune_disabled_by_default_and_ignores_the_derivation() {
-        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let raw = crate::test_fixtures::LOWERED_3MAX;
         let session = build_multiway_session(raw, None).expect("build multiway session");
         let config = session.solver.config();
         assert!(!config.prune);
@@ -1647,7 +1636,7 @@ mod tests {
     #[test]
     #[ignore = "builds full EHS2 tables over every canonical board; CI runs it in release with --include-ignored"]
     fn ehs2_table_backend_builds_a_session_and_caches_its_tables() {
-        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
+        let raw = crate::test_fixtures::LOWERED_3MAX;
         let directory = tempfile::tempdir().unwrap();
         let cache_path = directory.path().join("ehs2.postcard");
 

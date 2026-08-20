@@ -128,6 +128,8 @@ pub mod resume;
 pub mod session;
 pub mod sol;
 pub mod solve;
+#[cfg(test)]
+mod test_fixtures;
 pub mod validate;
 
 use anyhow::Result;

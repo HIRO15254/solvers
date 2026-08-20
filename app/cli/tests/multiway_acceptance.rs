@@ -1,3 +1,5 @@
+mod common;
+
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
@@ -76,7 +78,9 @@ fn canonical_production_smoke_validates_without_building_ehs_tables() {
 #[test]
 fn retired_v1_abstraction_options_have_stable_rejection_codes() {
     let root = workspace_root();
-    let rollout = root.join("examples").join("preflop_multiway_v1_smoke.toml");
+    let directory = tempfile::tempdir().expect("create rollout rejection tempdir");
+    let rollout = directory.path().join("rollout.toml");
+    std::fs::write(&rollout, common::V1_RETIRED_ROLLOUT).expect("write rollout fixture");
     let rollout_output = run_solvers(&["validate", rollout.to_str().unwrap()]);
     assert_error_code(&rollout_output, "MWP001");
 
@@ -95,15 +99,12 @@ fn retired_v1_abstraction_options_have_stable_rejection_codes() {
 
 #[test]
 
-fn historical_legacy_acceptance_fixtures_are_rejected_by_release_solve() {
-    for name in [
-        "preflop_multiway_3max_smoke.toml",
-        "preflop_multiway_9max_8b_smoke.toml",
-        "preflop_multiway_6max_64b_desktop.toml",
-        "preflop_multiway_hu_10bb_pushfold.toml",
-    ] {
+fn hand_written_lowered_configs_are_rejected_by_release_solve() {
+    {
+        let name = "lowered.toml";
         let directory = tempfile::tempdir().expect("create rejection tempdir");
-        let config = workspace_root().join("examples").join(name);
+        let config = directory.path().join(name);
+        std::fs::write(&config, common::LOWERED_LEGACY).expect("write lowered fixture");
         let result = directory.path().join("result.json");
         let checkpoint = directory.path().join("result.mwckpt");
         let solution = directory.path().join("result.mwsol");

@@ -1192,7 +1192,7 @@ mod tests {
         let v1 = format!(
             "{}\n[game.information]\nrecall = \"bucket-history\"\n\
              [solver.pruning]\nkind = \"regret-based\"\n",
-            include_str!("../../../examples/preflop_multiway_v1_smoke.toml")
+            crate::test_fixtures::V1_RETIRED_ROLLOUT
         );
         assert!(
             crate::config::parse_solve_config(&v1).is_err(),
@@ -1229,7 +1229,7 @@ mod tests {
             crate::config::solution_artifact_compatible_config(&current_street).unwrap();
         assert!(!migrated);
 
-        let legacy = include_str!("../../../examples/preflop_multiway_3max_smoke.toml").replacen(
+        let legacy = crate::test_fixtures::lowered_3max_full_recall().replacen(
             "discount_until = 10000000",
             "discount_until = 10000000\ntraverser_vector = true\nprune = true",
             1,
@@ -1253,11 +1253,8 @@ mod tests {
 
     #[test]
     fn compare_routes_different_recall_fingerprints_through_real_cards() {
-        let bucket_history =
-            include_str!("../../../examples/preflop_multiway_3max_smoke.toml").to_string();
-        let anchor = "seed = 17\n";
-        let current_street =
-            bucket_history.replacen(anchor, &format!("{anchor}recall = \"street\"\n"), 1);
+        let bucket_history = crate::test_fixtures::lowered_3max_full_recall();
+        let current_street = crate::test_fixtures::LOWERED_3MAX.to_string();
         assert_ne!(current_street, bucket_history);
         assert_eq!(
             comparison_recall(&bucket_history).unwrap(),
@@ -1268,10 +1265,7 @@ mod tests {
             multiway::RecallMode::Street
         );
         assert_eq!(
-            comparison_recall(include_str!(
-                "../../../examples/preflop_multiway_v1_smoke.toml"
-            ))
-            .unwrap(),
+            comparison_recall(crate::test_fixtures::V1_RETIRED_ROLLOUT).unwrap(),
             multiway::RecallMode::Street,
             "the v1 default must lower to current-street recall"
         );
