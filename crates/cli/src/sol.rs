@@ -689,6 +689,7 @@ check_every = 16
         let expl = solver.exploitability();
         let nash_conv = expl[Player::P0] + expl[Player::P1];
         let summary = RunSummary {
+            canceled: false,
             iterations: solver.iteration(),
             wall: elapsed,
             expl_p0: expl[Player::P0],

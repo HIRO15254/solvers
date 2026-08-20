@@ -189,6 +189,7 @@ pub fn run(
         checkpoint_sink,
         sol_spec,
         Some(recorder.events_mut()),
+        Some(&crate::CLI_CANCEL),
     );
     // A heads-up run has no solver-reported completion status: it either
     // reached its iteration budget or its `target_nash_conv`. Record the
@@ -209,7 +210,14 @@ pub fn run(
                 format!("{}\n", serde_json::to_string_pretty(&recorded)?),
             )
             .with_context(|| format!("writing {}", paths.result.display()))?;
-            Some("completed".to_string())
+            Some(
+                if summary.canceled {
+                    "cancelled"
+                } else {
+                    "completed"
+                }
+                .to_string(),
+            )
         }
         Err(_) => None,
     };
@@ -236,6 +244,7 @@ fn solve_heads_up(
     checkpoint_sink: Option<(&Path, [u8; 32])>,
     sol_spec: Option<SolExportSpec>,
     events: Option<&mut formats::RunEventLog>,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
 ) -> Result<RunSummary> {
     match config.run.storage {
         StorageKind::F32 => run_with_storage_sol::<F32Storage>(
@@ -247,6 +256,7 @@ fn solve_heads_up(
             None,
             sol_spec,
             events,
+            cancel,
         ),
         StorageKind::I16 => run_with_storage_sol::<I16Storage>(
             config,
@@ -257,6 +267,7 @@ fn solve_heads_up(
             None,
             sol_spec,
             events,
+            cancel,
         ),
     }
 }
@@ -274,6 +285,13 @@ pub(crate) struct RunHooks<'a> {
     /// events go here so `watch` shows the same lifecycle for a heads-up
     /// run as for a multiway one.
     pub events: Option<&'a mut formats::RunEventLog>,
+    /// Cooperative cancel flag. Checked once per exploitability check, so
+    /// Ctrl-C stops at a checkpoint boundary and leaves the run resumable
+    /// rather than killing it mid-iteration.
+    pub cancel: Option<&'a std::sync::atomic::AtomicBool>,
+    /// Set when [`Self::cancel`] fired, so the caller records the run as
+    /// canceled rather than completed.
+    pub canceled: bool,
     /// Wall-clock reference for `MetricsRow::elapsed_secs`, taken once at
     /// the start of the (possibly resumed) solve.
     pub start: Instant,
@@ -285,6 +303,8 @@ impl RunHooks<'static> {
             metrics: None,
             checkpoint: None,
             events: None,
+            cancel: None,
+            canceled: false,
             start: Instant::now(),
         }
     }
@@ -308,6 +328,7 @@ pub(crate) fn run_with_storage<S: Storage>(
     checkpoint: Option<(&Path, [u8; 32])>,
     resume_state: Option<SolverState>,
     events: Option<&mut formats::RunEventLog>,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
 ) -> Result<RunSummary> {
     run_with_storage_impl::<S>(
         config,
@@ -318,6 +339,7 @@ pub(crate) fn run_with_storage<S: Storage>(
         resume_state,
         None,
         events,
+        cancel,
     )
 }
 
@@ -334,6 +356,7 @@ pub(crate) fn run_with_storage_sol<S: Storage>(
     resume_state: Option<SolverState>,
     sol: Option<SolExportSpec>,
     events: Option<&mut formats::RunEventLog>,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
 ) -> Result<RunSummary> {
     run_with_storage_impl::<S>(
         config,
@@ -344,6 +367,7 @@ pub(crate) fn run_with_storage_sol<S: Storage>(
         resume_state,
         sol,
         events,
+        cancel,
     )
 }
 
@@ -357,6 +381,7 @@ fn run_with_storage_impl<S: Storage>(
     resume_state: Option<SolverState>,
     sol: Option<SolExportSpec>,
     events: Option<&mut formats::RunEventLog>,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
 ) -> Result<RunSummary> {
     let rake = postflop_setup::build_rake(&config.rake);
     let utility = postflop_setup::build_utility(&config.utility);
@@ -375,6 +400,8 @@ fn run_with_storage_impl<S: Storage>(
         metrics: metrics_writer.as_mut(),
         checkpoint,
         events,
+        cancel,
+        canceled: false,
         start: Instant::now(),
     };
 
@@ -464,6 +491,10 @@ fn run_with_storage_impl<S: Storage>(
             unreachable!("multiway games dispatch before the HU storage path")
         }
     }
+    .map(|summary| RunSummary {
+        canceled: hooks.canceled,
+        ..summary
+    })
 }
 
 /// Convergence loop shared by every game: run a chunk of iterations, report
@@ -509,6 +540,20 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
         }
         checkpoint_now(solver, hooks)?;
 
+        if hooks
+            .cancel
+            .is_some_and(|cancel| cancel.load(std::sync::atomic::Ordering::SeqCst))
+        {
+            println!("cancelled at iteration {}", solver.iteration());
+            hooks.canceled = true;
+            if let Some(events) = hooks.events.as_deref_mut() {
+                let _ = events.info(formats::RunEventPayload::Stop {
+                    reason: "cancelled".to_string(),
+                });
+            }
+            break;
+        }
+
         if let Some(target) = run.target_nash_conv
             && nash_conv < target
         {
@@ -548,6 +593,9 @@ pub(crate) struct RunSummary {
     pub expl_p0: f64,
     pub expl_p1: f64,
     pub nash_conv: f64,
+    /// The run stopped on request at a checkpoint boundary, not because it
+    /// reached its budget or its convergence target.
+    pub canceled: bool,
 }
 
 /// Final convergence summary, shared by every game.
@@ -566,6 +614,7 @@ pub(crate) fn print_done<E: TerminalEvaluator, S: Storage>(
         nash_conv,
     );
     RunSummary {
+        canceled: false,
         iterations: solver.iteration(),
         wall: elapsed,
         expl_p0: expl[Player::P0],

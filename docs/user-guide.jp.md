@@ -206,6 +206,8 @@ cargo run -p cli --release -- runs ls runs
 `--format json`でどれも機械可読な出力になる。
 
 停止はCtrl-C(SIGINT)で、cooperative cancelの後にcheckpointを書いてから終了する。
+これはmultiwayとheads-upの双方で同じである(cancelはevaluation境界で効くため、
+`check_every`が大きいと反応まで最大1 chunk分かかる)。
 `status`は`canceled`と`resumable`を報告し、run directoryをそのまま渡せば再開する。
 
 ```sh

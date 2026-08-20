@@ -1086,3 +1086,92 @@ fn a_solve_records_a_complete_run_directory() {
         assert_eq!(event["seq"], index as u64, "event sequence must be dense");
     }
 }
+
+/// The iteration count on a run directory's last progress row.
+fn last_progress_iteration(run: &std::path::Path) -> u64 {
+    let progress = std::fs::read_to_string(run.join("progress.jsonl")).unwrap();
+    let last = progress.lines().last().expect("at least one progress row");
+    serde_json::from_str::<serde_json::Value>(last).unwrap()["iteration"]
+        .as_u64()
+        .unwrap()
+}
+
+/// A stopped heads-up run is resumable off its own checkpoint name, which
+/// differs from the multiway one.
+#[test]
+fn status_reports_a_canceled_heads_up_run_as_resumable() {
+    let dir = temp_dir("run-status-hu");
+    let run = dir.join("run-hu");
+    fabricate_run(&run, "canceled", false);
+    std::fs::write(run.join("checkpoint.ckpt"), b"not a real checkpoint").unwrap();
+
+    let output = run_solvers_ok(&["status", run.to_str().unwrap(), "--format", "json"]);
+    let status: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(status["state"], "canceled");
+    assert_eq!(status["resumable"], true);
+}
+
+/// Ctrl-C during a heads-up solve must stop at a checkpoint boundary and
+/// leave the run resumable, the same way it does for a multiway solve.
+#[test]
+#[ignore = "spawns and signals a solve; explicit release acceptance only"]
+fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
+    let dir = temp_dir("hu-cancel-resume");
+    let config = dir.join("long.toml");
+    std::fs::write(
+        &config,
+        KUHN_NO_EARLY_STOP.replace("iterations = 400", "iterations = 20000000"),
+    )
+    .unwrap();
+    let run = dir.join("run");
+
+    let mut child = std::process::Command::new(env!("CARGO_BIN_EXE_solvers"))
+        .args([
+            "solve",
+            config.to_str().unwrap(),
+            "--out",
+            run.to_str().unwrap(),
+        ])
+        .stdout(std::process::Stdio::null())
+        .spawn()
+        .expect("spawn solve");
+    while !run.join("progress.jsonl").exists() {
+        std::thread::sleep(std::time::Duration::from_millis(50));
+    }
+    unsafe { libc::kill(child.id() as libc::pid_t, libc::SIGINT) };
+    assert!(child.wait().expect("wait for solve").success());
+
+    let manifest: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(run.join("manifest.json")).unwrap()).unwrap();
+    assert_eq!(manifest["state"], "canceled");
+    assert_eq!(manifest["completion"], "cancelled");
+
+    let before = last_progress_iteration(&run);
+
+    let mut resumed = std::process::Command::new(env!("CARGO_BIN_EXE_solvers"))
+        .args(["resume", run.to_str().unwrap()])
+        .stdout(std::process::Stdio::null())
+        .spawn()
+        .expect("spawn resume");
+    std::thread::sleep(std::time::Duration::from_millis(500));
+    unsafe { libc::kill(resumed.id() as libc::pid_t, libc::SIGINT) };
+    assert!(resumed.wait().expect("wait for resume").success());
+
+    let after = last_progress_iteration(&run);
+    assert!(
+        after > before,
+        "resume must continue past {before}, got {after}"
+    );
+
+    // The resumed segment continues the same event sequence.
+    let seqs: Vec<u64> = std::fs::read_to_string(run.join("events.jsonl"))
+        .unwrap()
+        .lines()
+        .map(|line| {
+            serde_json::from_str::<serde_json::Value>(line).unwrap()["seq"]
+                .as_u64()
+                .unwrap()
+        })
+        .collect();
+    assert_eq!(seqs, (0..seqs.len() as u64).collect::<Vec<_>>());
+}

@@ -138,6 +138,7 @@ fn resume_heads_up(
             checkpoint_sink,
             Some(checkpoint.state),
             Some(recorder.events_mut()),
+            Some(&crate::CLI_CANCEL),
         ),
         StorageKind::I16 => run_with_storage::<I16Storage>(
             config,
@@ -147,9 +148,17 @@ fn resume_heads_up(
             checkpoint_sink,
             Some(checkpoint.state),
             Some(recorder.events_mut()),
+            Some(&crate::CLI_CANCEL),
         ),
     };
-    let completion = outcome.as_ref().ok().map(|_| "completed".to_string());
+    let completion = outcome.as_ref().ok().map(|summary| {
+        if summary.canceled {
+            "cancelled"
+        } else {
+            "completed"
+        }
+        .to_string()
+    });
     recorder.finish(outcome.map(|_summary| ()), completion)
 }
 

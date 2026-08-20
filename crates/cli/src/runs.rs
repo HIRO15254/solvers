@@ -60,7 +60,10 @@ fn read_status(directory: &Path) -> Result<RunStatus> {
     let events_offset = std::fs::metadata(RunEventLog::path_in(directory))
         .map(|metadata| metadata.len())
         .unwrap_or(0);
-    let checkpoint = directory.join(formats::RUN_CHECKPOINT_FILE).is_file();
+    // Either engine's checkpoint makes a stopped run resumable; which one
+    // is present also says which engine produced the run.
+    let checkpoint = directory.join(formats::RUN_CHECKPOINT_FILE).is_file()
+        || directory.join(formats::RUN_HU_CHECKPOINT_FILE).is_file();
 
     Ok(RunStatus {
         run_id: manifest.run_id.clone(),
