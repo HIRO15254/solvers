@@ -10,16 +10,9 @@
 cargo fmt --all --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
-
-cd app/ui
-bun run typecheck
-bun run lint
-bun test
-bun run build
 ```
 
-loopback HTTP testがsandboxのbind制限で失敗した場合は、ポート利用可能な環境で同じ
-testを再実行する。Production EHS² table buildや大規模solveとして`#[ignore]`された
+Production EHS² table buildや大規模solveとして`#[ignore]`された
 acceptance testは、release acceptance時に明示実行する。
 
 Multiway v1のTOML surfaceを変える場合は、parser/runtimeだけでなく

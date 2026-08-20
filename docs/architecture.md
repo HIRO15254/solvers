@@ -48,7 +48,7 @@
 
 ```
 app:        cli (bin "solvers": TOML batch + UPI subset REPL + CSV reports + ANSI 13×13 grid、
-                 bin+lib。lib は統合テストが直接叩く)
+                 bin+lib。lib は統合テストが直接叩く。crates/cli に同居)
 future:     protocol + solversd (job daemon) · web GUI · py (PyO3) · wasm (viewer-only)
 multiway:    multiway — generative NLHE / joint deal / side pots / EHS² buckets / MCCFR
 schemas:    formats — SolveConfig / NodeQuery→NodeReport / Checkpoint(.ckpt) / Artifact(.sol)
@@ -72,11 +72,10 @@ solvers/
 ├── .cargo/config.toml    # -C target-cpu=native(研究ビルド)
 ├── LICENSE-POLICY.md     # AGPL/無ライセンス = read-only の明文化
 ├── tools/plot_convergence.py
-├── app/
-│   └── cli/            # bin "solvers"(package "cli"、bin+lib): config/validate/solve/
-│                       # resume/inspect/evaluate/export/compare/report。
-│                       # lib は config スキーマと multiway セッション構築(session.rs)
 └── crates/
+    ├── cli/            # bin "solvers"(package "cli"、bin+lib): config/validate/solve/
+    │                   # resume/inspect/evaluate/export/compare/report。
+    │                   # lib は config スキーマと multiway セッション構築(session.rs)
     ├── cards/          # Card/CardSet/Chips/Street/PerPlayer<T>、"22+,A2s+" range parser、
     │                   # aya_poker (Zlib/Apache-2.0/MIT) evaluator wrapper。workspace 内依存なし
     ├── hand-index/     # Waugh isomorphism 移植(BSD, attribution)。canonical_flops()。
@@ -93,7 +92,7 @@ solvers/
     └── wasm/           # (M8) wasm-bindgen viewer-only adapter
 ```
 
-依存方向(厳格): HU は `cards → hand-index → {engine ∥ cfr-ref} → game → holdem → {abstraction → preflop}`、multiway は `cards → multiway` の独立経路で、双方を formats 消費側(`app/cli`・py・wasm)が束ねる。**engine は poker 固有 crate に依存しない。formats は solver 実装へ依存しない。アプリ層(`app/*`)以外はアプリの知識を持たない。**
+依存方向(厳格): HU は `cards → hand-index → {engine ∥ cfr-ref} → game → holdem → {abstraction → preflop}`、multiway は `cards → multiway` の独立経路で、双方を formats 消費側(`crates/cli`・py・wasm)が束ねる。**engine は poker 固有 crate に依存しない。formats は solver 実装へ依存しない。アプリケーション層以外はアプリの知識を持たない。**
 
 ---
 
@@ -261,7 +260,7 @@ CLIを子プロセスとして起動するjob daemonのクライアントとし�
     ↓ versioned JSON over HTTP(localもremoteも同一)
 (将来) solversd    job daemon。run directoryの作成・監視・queue・認証
     ↓ child process + run directory
-app/cli            config、validate、solve、resume、artifact driver
+crates/cli         config、validate、solve、resume、artifact driver
     ↓
 crates/*           engine、game、holdem、preflop、multiway、formats
 ```

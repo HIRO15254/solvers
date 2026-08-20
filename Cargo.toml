@@ -11,7 +11,7 @@ members = [
     "crates/preflop",
     "crates/multiway",
     "crates/formats",
-    "app/cli",
+    "crates/cli",
 ]
 
 [workspace.package]
