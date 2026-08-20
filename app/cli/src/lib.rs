@@ -1,22 +1,20 @@
 //! `solvers` command-line interface, as a library.
 //!
-//! This crate is split bin+lib so a future native GUI crate can reuse the
-//! exact config schema (`config::SolveConfig`) and multiway session
-//! construction (`session::build_multiway_session`) the CLI uses, without
-//! depending on `clap`/stdout-driven behavior. `main.rs` is a thin binary
-//! shim that just calls [`main_impl`].
+//! This crate is split bin+lib so the integration tests can drive the config
+//! schema (`config::SolveConfig`) and multiway session construction
+//! (`session::build_multiway_session`) directly, without going through
+//! `clap`/stdout. `main.rs` is a thin binary shim that just calls
+//! [`main_impl`].
 //!
 //! M1 scope: solve toy games from a TOML config, report convergence, and
 //! export the average strategy as JSON. The config schema is the seed of
 //! the future `formats::SolveConfig` (M3), which will add board/range/tree
 //! sections for hold'em and blake3 config hashing.
 //!
-//! M3 adds the research-workflow slice: `solve --checkpoint`/`--metrics`
-//! autosave progress (via the `formats` crate's `.ckpt`/JSONL formats),
-//! `resume` continues a checkpointed run to its configured iteration total
-//! bit-for-bit identically to an uninterrupted solve, and `bench` compares
-//! CFR schedules (dcfr/cfr-plus/vanilla/linear-cfr/hs-dcfr) on the same
-//! config in one pass.
+//! `solve --checkpoint`/`--metrics` autosave progress (via the `formats`
+//! crate's `.ckpt`/JSONL formats), and `resume` continues a checkpointed run
+//! to its configured iteration total bit-for-bit identically to an
+//! uninterrupted solve.
 
 pub static CLI_CANCEL: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 pub static CLI_EXIT_CODE: std::sync::atomic::AtomicI32 = std::sync::atomic::AtomicI32::new(0);
@@ -117,15 +115,12 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
         1
     }
 }
-pub mod bench;
 pub mod config;
 pub mod config_new;
 pub mod inspect;
 pub mod multiway_artifact;
 pub mod multiway_solve;
 pub mod multiway_v1;
-#[cfg(feature = "research")]
-pub mod mw_eval;
 pub mod postflop_setup;
 pub mod preflop_setup;
 pub mod report;
@@ -140,8 +135,7 @@ use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
 #[command(name = "solvers", version)]
-#[cfg_attr(feature = "research", command(about = "Research poker solver"))]
-#[cfg_attr(not(feature = "research"), command(about = "Production poker solver"))]
+#[command(about = "Poker solver")]
 struct Cli {
     #[command(subcommand)]
     command: Command,
@@ -262,12 +256,6 @@ enum Command {
         #[arg(long, hide = true)]
         metrics: Option<std::path::PathBuf>,
     },
-    /// Explicit research and benchmarking workflows (research build only).
-    #[cfg(feature = "research")]
-    Experiment {
-        #[command(subcommand)]
-        command: ExperimentCommand,
-    },
     /// Inspect a formal .mwsol artifact, or open the legacy postflop explorer.
     Inspect {
         /// Path to a .mwsol artifact or legacy postflop config.
@@ -366,55 +354,6 @@ enum ConfigCommand {
         out: Option<std::path::PathBuf>,
     },
 }
-#[cfg(feature = "research")]
-#[derive(Subcommand)]
-enum ExperimentCommand {
-    /// Compare average, last-iterate, or purified checkpoint profiles.
-    Profile {
-        config: std::path::PathBuf,
-        #[arg(long)]
-        checkpoint: std::path::PathBuf,
-        /// Common card abstraction used only to key trained deviations.
-        #[arg(long = "deviator-config")]
-        deviator_config: Option<std::path::PathBuf>,
-        /// Write the common-reference JSON report to a file. Only valid with
-        /// `--deviator-config`; legacy profile output remains stdout-only.
-        #[arg(long, requires = "deviator_config")]
-        output: Option<std::path::PathBuf>,
-        /// Experiment rung recorded in common-reference reports. When
-        /// omitted, the report uses a sweep-derived standalone scope.
-        #[arg(long, requires = "deviator_config")]
-        experiment_rung: Option<String>,
-        #[arg(long, default_value_t = 4096)]
-        samples: u64,
-        #[arg(long, default_value_t = 1)]
-        seed: u64,
-        #[arg(long, default_value = "0.0")]
-        purify: String,
-        #[arg(long = "br-traversals", default_value_t = 2000)]
-        br_traversals: u64,
-        #[arg(long, default_value_t = false)]
-        current: bool,
-    },
-    /// Compare two artifacts in the research namespace.
-    Compare {
-        left: std::path::PathBuf,
-        right: std::path::PathBuf,
-        #[arg(long)]
-        cross_game: bool,
-    },
-    /// Benchmark named CFR schedules.
-    Benchmark {
-        config: std::path::PathBuf,
-        #[arg(long, value_delimiter = ',')]
-        schedules: Vec<String>,
-        #[arg(long)]
-        iterations: Option<u64>,
-        #[arg(long = "metrics-dir")]
-        metrics_dir: Option<std::path::PathBuf>,
-    },
-}
-
 /// Parses `std::env::args()` and dispatches to the requested subcommand.
 /// The `solvers` binary's `main` is just `cli::main_impl()`.
 pub fn main_impl() -> Result<()> {
@@ -494,43 +433,6 @@ pub fn main_impl() -> Result<()> {
             &history,
             metrics.as_deref(),
         ),
-        #[cfg(feature = "research")]
-        Command::Experiment { command } => match command {
-            ExperimentCommand::Profile {
-                config,
-                checkpoint,
-                deviator_config,
-                output,
-                experiment_rung,
-                samples,
-                seed,
-                purify,
-                br_traversals,
-                current,
-            } => mw_eval::run(
-                &config,
-                &checkpoint,
-                deviator_config.as_deref(),
-                output.as_deref(),
-                experiment_rung.as_deref(),
-                samples,
-                seed,
-                &purify,
-                br_traversals,
-                current,
-            ),
-            ExperimentCommand::Compare {
-                left,
-                right,
-                cross_game,
-            } => multiway_artifact::compare(&left, &right, cross_game),
-            ExperimentCommand::Benchmark {
-                config,
-                schedules,
-                iterations,
-                metrics_dir,
-            } => bench::run(&config, &schedules, iterations, metrics_dir.as_deref()),
-        },
         Command::Inspect {
             config,
             node,
@@ -598,78 +500,8 @@ pub fn main_impl() -> Result<()> {
 mod tests {
     use super::*;
 
-    #[cfg(feature = "research")]
     #[test]
-    fn experiment_profile_accepts_common_reference_and_output() {
-        let cli = Cli::try_parse_from([
-            "solvers",
-            "experiment",
-            "profile",
-            "candidate.toml",
-            "--checkpoint",
-            "candidate.mwckpt",
-            "--deviator-config",
-            "reference.toml",
-            "--output",
-            "report.json",
-            "--experiment-rung",
-            "s1",
-        ])
-        .unwrap();
-        let Command::Experiment {
-            command:
-                ExperimentCommand::Profile {
-                    deviator_config,
-                    output,
-                    experiment_rung,
-                    ..
-                },
-        } = cli.command
-        else {
-            panic!("expected experiment profile");
-        };
-        assert_eq!(
-            deviator_config.as_deref(),
-            Some(std::path::Path::new("reference.toml"))
-        );
-        assert_eq!(output.as_deref(), Some(std::path::Path::new("report.json")));
-        assert_eq!(experiment_rung.as_deref(), Some("s1"));
-    }
-
-    #[cfg(feature = "research")]
-    #[test]
-    fn experiment_profile_output_requires_common_reference() {
-        assert!(
-            Cli::try_parse_from([
-                "solvers",
-                "experiment",
-                "profile",
-                "candidate.toml",
-                "--checkpoint",
-                "candidate.mwckpt",
-                "--output",
-                "report.json",
-            ])
-            .is_err()
-        );
-        assert!(
-            Cli::try_parse_from([
-                "solvers",
-                "experiment",
-                "profile",
-                "candidate.toml",
-                "--checkpoint",
-                "candidate.mwckpt",
-                "--experiment-rung",
-                "s1",
-            ])
-            .is_err()
-        );
-    }
-
-    #[cfg(not(feature = "research"))]
-    #[test]
-    fn production_command_surface_omits_experiment_namespace() {
+    fn the_command_surface_has_no_experiment_namespace() {
         assert!(Cli::try_parse_from(["solvers", "experiment", "profile"]).is_err());
     }
 

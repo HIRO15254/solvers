@@ -50,7 +50,7 @@
 app:        cli (bin "solvers": TOML batch + UPI subset REPL + CSV reports + ANSI 13×13 grid、
                  bin+lib。lib は統合テストが直接叩く)
 future:     protocol + solversd (job daemon) · web GUI · py (PyO3) · wasm (viewer-only)
-multiway:    multiway — generative NLHE / joint deal / side pots / rollout buckets / MCCFR
+multiway:    multiway — generative NLHE / joint deal / side pots / EHS² buckets / MCCFR
 schemas:    formats — SolveConfig / NodeQuery→NodeReport / Checkpoint(.ckpt) / Artifact(.sol)
 sessions:   holdem::PostflopGame · preflop::PreflopGame
 mode B:     preflop — PostflopModel(EquityShowdown / SolvedFlopSubset / Bucketed)
@@ -74,7 +74,7 @@ solvers/
 ├── tools/plot_convergence.py
 ├── app/
 │   └── cli/            # bin "solvers"(package "cli"、bin+lib): config/validate/solve/
-│                       # resume/inspect/evaluate/export/compare/experiment/report。
+│                       # resume/inspect/evaluate/export/compare/report。
 │                       # lib は config スキーマと multiway セッション構築(session.rs)
 └── crates/
     ├── cards/          # Card/CardSet/Chips/Street/PerPlayer<T>、"22+,A2s+" range parser、

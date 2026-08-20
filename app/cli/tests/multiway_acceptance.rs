@@ -94,7 +94,7 @@ fn retired_v1_abstraction_options_have_stable_rejection_codes() {
 }
 
 #[test]
-#[cfg(not(feature = "research"))]
+
 fn historical_legacy_acceptance_fixtures_are_rejected_by_release_solve() {
     for name in [
         "preflop_multiway_3max_smoke.toml",

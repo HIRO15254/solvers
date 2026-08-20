@@ -1,5 +1,9 @@
 # Canonical benchmark and historical GCP resource evidence (2026-07-23--24)
 
+> **注記(2026-08)**: 本書が参照する `experiments/` 配下の設定・スクリプト・CSVは、
+> 抽象化最適化の研究ラインを打ち切った際に削除した。以下のpath表記は当時の
+> repository内位置であり、実体はGit履歴(tag `pre-gui-removal` 以前)から取得する。
+
 This note supplements `multiway-abstraction-parameters-2026-07-23.md`. The
 current results use the canonical benchmark Tree and a dense-arena byte
 boundary. The former rich-preflop/one-size and GCP/checkdown results remain
@@ -12,8 +16,8 @@ and were not rerun.
 
 The tracked canonical v1 configurations are:
 
-- [tournament-6max-50bb-benchmark-v1.toml](../../experiments/abstraction-2026-07-23/tournament-6max-50bb-benchmark-v1.toml);
-- [cash-6max-100bb-benchmark-v1.toml](../../experiments/abstraction-2026-07-23/cash-6max-100bb-benchmark-v1.toml).
+- `experiments/abstraction-2026-07-23/tournament-6max-50bb-benchmark-v1.toml`;
+- `experiments/abstraction-2026-07-23/cash-6max-100bb-benchmark-v1.toml`.
 
 Tournament forbids limps, opens to 2bb or all-in, uses 2.5x or all-in at the
 3bet and 2x or all-in at 4bet+, permits at most two non-BB callers of the
@@ -34,7 +38,7 @@ checkdown.
 
 `action_tree_preflight` defaults to the `benchmark` profile. The 44-case
 source of truth is
-[action-tree-benchmark-6gib-2026-07-24.csv](../../experiments/abstraction-2026-07-23/action-tree-benchmark-6gib-2026-07-24.csv).
+`experiments/abstraction-2026-07-23/action-tree-benchmark-6gib-2026-07-24.csv`.
 Each case ran in its own local process with no explicit node checkpoint and a
 6 GiB (6,442,450,944 B) dense-arena payload limit.
 
@@ -70,7 +74,7 @@ legacy results below.
 ### Sparse feasibility anchors
 
 The source of truth is
-[sparse-feasibility-100sweeps-2026-07-24.csv](../../experiments/abstraction-2026-07-23/sparse-feasibility-100sweeps-2026-07-24.csv).
+`experiments/abstraction-2026-07-23/sparse-feasibility-100sweeps-2026-07-24.csv`.
 Both runs use bucket-history/full recall, range-vector traversal, pruning
 disabled, a 6 GiB solver accounting limit, 100 sweeps, and warm rollout
 artifacts.

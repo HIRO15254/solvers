@@ -6,12 +6,6 @@ license.workspace = true
 repository.workspace = true
 description = "solvers command-line interface"
 
-[features]
-default = []
-# Opt-in command surface for reproducibility experiments. Production release
-# builds intentionally omit it.
-research = ["multiway/research-abstractions"]
-
 [[bin]]
 name = "solvers"
 path = "src/main.rs"
@@ -43,6 +37,7 @@ libc = { workspace = true }
 windows-sys = { workspace = true }
 
 [dev-dependencies]
-# Unit/integration tests retain historical artifact and experiment coverage;
-# this does not enable the feature in `cargo build --release --bin solvers`.
+# Only the retired full-recall/sparse solver path is behind this feature, and
+# only the unit tests still reach it. It goes away with that path; production
+# `cargo build --release --bin solvers` never enables it.
 multiway = { workspace = true, features = ["research-abstractions"] }

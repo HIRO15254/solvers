@@ -3,9 +3,8 @@
 //! This crate is deliberately separate from the exact heads-up vector
 //! engine. It samples one physical card world shared by every seat.
 //! Production uses current-street recall and allocates the complete public
-//! tree × bucket × action policy arena before sweep 0; the optional
-//! `research-abstractions` feature retains historical sparse/full-recall and
-//! rollout experimentation paths.
+//! tree × bucket × action policy arena before sweep 0. The card abstraction
+//! is an EHS² percentile table.
 
 pub mod abstraction;
 pub mod betting;
@@ -23,10 +22,8 @@ pub mod types;
 
 pub use abstraction::{
     AbstractionError, BucketContext, BucketId, BucketPath, FeatureHashAbstraction,
-    FeatureHashParams, MultiwayAbstraction, MultiwayAbstractionBackend, RolloutAbstractionError,
-    RolloutArtifactError, RolloutFeatures, RolloutKMeansAbstraction, RolloutKMeansBuilder,
-    RolloutKMeansParams, RolloutTrainingParams, StreetBucketCounts, TableAbstractionAdapter,
-    ehs2_table_fingerprint,
+    FeatureHashParams, MultiwayAbstraction, MultiwayAbstractionBackend, StreetBucketCounts,
+    TableAbstractionAdapter, ehs2_table_fingerprint,
 };
 pub use betting::{Action, BettingState, SeatStatus};
 pub use checkpoint::{

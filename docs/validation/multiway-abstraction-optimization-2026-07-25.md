@@ -1,5 +1,9 @@
 # Multiway Preflop abstraction optimization S3（2026-07-25）
 
+> **注記(2026-08)**: 本書が参照する `experiments/` 配下の設定・スクリプト・CSVは、
+> 抽象化最適化の研究ラインを打ち切った際に削除した。以下のpath表記は当時の
+> repository内位置であり、実体はGit履歴(tag `pre-gui-removal` 以前)から取得する。
+
 本書は、指定canonical Tree上で行ったabstraction optimizationの現行decision
 recordである。2026-07-23の
 [card-only実験](multiway-abstraction-parameters-2026-07-23.md)は、その測定範囲に
@@ -8,7 +12,7 @@ recordである。2026-07-23の
 
 生成物を置いた`target/`は正本から直接リンクしない。tracked distilled evidenceと
 source artifactのSHA-256対応は
-[provenance-index.json](../../experiments/abstraction-optimization-2026-07-25/evidence/provenance-index.json)
+`experiments/abstraction-optimization-2026-07-25/evidence/provenance-index.json`
 を正本とする。
 
 ## Statusの定義
@@ -33,8 +37,8 @@ source artifactのSHA-256対応は
 
 portable canonical v1 config:
 
-- [Tournament tentative EHS2 K128 current-street](../../experiments/abstraction-optimization-2026-07-25/tentative-defaults/tournament-6max-50bb-tentative-ehs2-k128-current-street-v1.toml)
-- [Cash tentative EHS2 K256 current-street](../../experiments/abstraction-optimization-2026-07-25/tentative-defaults/cash-6max-100bb-tentative-ehs2-k256-current-street-v1.toml)
+- `experiments/abstraction-optimization-2026-07-25/tentative-defaults/tournament-6max-50bb-tentative-ehs2-k128-current-street-v1.toml`
+- `experiments/abstraction-optimization-2026-07-25/tentative-defaults/cash-6max-100bb-tentative-ehs2-k256-current-street-v1.toml`
 
 この「default」は次の追加実験までの**6-max anchor用実験既定**を意味する。
 solver全体、6--9 max envelope、または収束済みproduction設定の既定ではない。
@@ -90,9 +94,9 @@ aliasしない。
 ## 実験contract
 
 実験contractは
-[manifest.toml](../../experiments/abstraction-optimization-2026-07-25/manifest.toml)、
+`experiments/abstraction-optimization-2026-07-25/manifest.toml`、
 実行・coverage・ranking規約は
-[runner README](../../experiments/abstraction-optimization-2026-07-25/README.md)
+`experiments/abstraction-optimization-2026-07-25/README.md`
 を正本とする。
 
 - solve: S3、10,000 sweeps、abstraction seed 0、solver seed 1011。
@@ -120,7 +124,7 @@ aliasしない。
 ### S3 solve resource
 
 次表の6候補は10,000 sweepsを完走した。全8 solve行は
-[s3-solve-resources.csv](../../experiments/abstraction-optimization-2026-07-25/evidence/s3-solve-resources.csv)
+`experiments/abstraction-optimization-2026-07-25/evidence/s3-solve-resources.csv`
 にあり、表では両reference判断に使った候補とE64 controlを示す。
 
 | case | candidate | infosets | solver bytes | solver elapsed | segment wall | peak RSS bytes |
@@ -140,7 +144,7 @@ formal resource Paretoは未解決である。segment wallもbuild、restore、p
 ### Candidate coverageとpoint max gain
 
 完全な値とfingerprintは
-[s3-reference-candidate-results.csv](../../experiments/abstraction-optimization-2026-07-25/evidence/s3-reference-candidate-results.csv)
+`experiments/abstraction-optimization-2026-07-25/evidence/s3-reference-candidate-results.csv`
 に保存した。`coverage`列はaggregate / flop / turn / river、gainはlower-is-better
 である。
 
@@ -168,9 +172,9 @@ formal winnerの認定ではない。
 
 paired comparisonは常に`candidate - point champion`方向である。主要統計と
 bootstrap seedは
-[s3-paired-comparisons.csv](../../experiments/abstraction-optimization-2026-07-25/evidence/s3-paired-comparisons.csv)
+`experiments/abstraction-optimization-2026-07-25/evidence/s3-paired-comparisons.csv`
 に、binaryとsource artifactのSHA-256は
-[provenance-index.json](../../experiments/abstraction-optimization-2026-07-25/evidence/provenance-index.json)
+`experiments/abstraction-optimization-2026-07-25/evidence/provenance-index.json`
 に保存した。
 
 | case | reference | comparison | delta | bootstrap percentile 95% interval | multiplicity-controlled screening status |
@@ -186,7 +190,7 @@ intervalは両方0を跨ぎ、multiplicity-controlled statusもunresolvedであ�
 
 ### Full-recall E64 resource ceiling
 
-[full-recall-resource-ceiling.csv](../../experiments/abstraction-optimization-2026-07-25/evidence/full-recall-resource-ceiling.csv)
+`experiments/abstraction-optimization-2026-07-25/evidence/full-recall-resource-ceiling.csv`
 は、current-street finalistとは別のEHS2 K64 full-recall checkpoint forkである。
 
 | case | internal cap | stop sweeps | infosets | solver bytes | peak RSS bytes | result |
@@ -255,8 +259,8 @@ comparator coverage failure、実行costを合わせた暫定運用判断であ�
 5. cold cache build timeとresume segment開始sweepが未記録で、formal resource
    Paretoとmanifest記載のresource tie-breakは未完了。
 6. representative fixed-tenについては
-   [transfer README](../../experiments/abstraction-transfer-2026-07-25/README.md)と
-   [dense preflight manifest](../../experiments/abstraction-transfer-2026-07-25/dense-preflight-manifest.json)
+   `experiments/abstraction-transfer-2026-07-25/README.md`と
+   `experiments/abstraction-transfer-2026-07-25/dense-preflight-manifest.json`
    にplan/generator/harness contractがあるだけで、実
    `dense-preflight-summary.csv`は存在しない。したがってfixed-tenのdense結果、
    solve transfer、6--9 max / 全指定stackへの一般化は**未実行**である。
@@ -286,11 +290,11 @@ generic solverの既定値を変更しない。
 
 ## Tracked evidence
 
-- [S3 solve resources](../../experiments/abstraction-optimization-2026-07-25/evidence/s3-solve-resources.csv)
-- [S3 reference別coverageとmax gain](../../experiments/abstraction-optimization-2026-07-25/evidence/s3-reference-candidate-results.csv)
-- [S3 paired comparisons](../../experiments/abstraction-optimization-2026-07-25/evidence/s3-paired-comparisons.csv)
-- [Full-recall resource ceiling](../../experiments/abstraction-optimization-2026-07-25/evidence/full-recall-resource-ceiling.csv)
-- [Artifact provenance index](../../experiments/abstraction-optimization-2026-07-25/evidence/provenance-index.json)
+- `experiments/abstraction-optimization-2026-07-25/evidence/s3-solve-resources.csv`
+- `experiments/abstraction-optimization-2026-07-25/evidence/s3-reference-candidate-results.csv`
+- `experiments/abstraction-optimization-2026-07-25/evidence/s3-paired-comparisons.csv`
+- `experiments/abstraction-optimization-2026-07-25/evidence/full-recall-resource-ceiling.csv`
+- `experiments/abstraction-optimization-2026-07-25/evidence/provenance-index.json`
 
 distilled CSVは絶対pathを含まず、source artifactを改変してformal artifactへ昇格した
 ものでもない。各値のsource SHA、manifest SHA、metadata SHA、solver SHA、

@@ -30,23 +30,14 @@ fn build_solution_session(config_toml: &str) -> Result<session::MultiwaySession>
         game.abstraction.recall,
         multiway::config::RecallMode::Street
     );
-    #[cfg(not(feature = "research"))]
     if retired {
         bail!(
             "MWP004: this historical artifact uses retired rollout/full-recall semantics; \
              summary, tree, strategy, ranges, and recorded EV remain readable, but live \
-             re-evaluation and real-card comparison require an opt-in research build"
+             re-evaluation and real-card comparison are no longer supported"
         );
     }
-    #[cfg(feature = "research")]
-    {
-        let _ = retired;
-        session::build_multiway_session(&compatible, None)
-    }
-    #[cfg(not(feature = "research"))]
-    {
-        session::build_production_multiway_session(&compatible, None)
-    }
+    session::build_production_multiway_session(&compatible, None)
 }
 fn key_hex(key: [u8; 16]) -> String {
     key.iter().map(|byte| format!("{byte:02x}")).collect()
@@ -973,9 +964,6 @@ fn evaluate_prepared(
             .collect(),
     };
     let (game, sampler, config) = mw_session.solver.into_components();
-    #[cfg(feature = "research")]
-    let restored = multiway::MultiwaySolver::from_state_with_config(game, sampler, state, config);
-    #[cfg(not(feature = "research"))]
     let restored =
         multiway::MultiwaySolver::from_state_with_config_preallocated(game, sampler, state, config);
     mw_session.solver = restored.context("restoring the formal average profile")?;
@@ -1219,7 +1207,7 @@ mod tests {
             panic!()
         };
         assert!(!prune);
-        #[cfg(not(feature = "research"))]
+
         {
             let Err(retired) = build_solution_session(&v1) else {
                 panic!("retired v1 artifact must not rebuild a live production backend");
@@ -1227,11 +1215,6 @@ mod tests {
             let retired = retired.to_string();
             assert!(retired.contains("MWP004"), "{retired}");
         }
-        #[cfg(feature = "research")]
-        assert!(
-            build_solution_session(&v1).is_ok(),
-            "research builds must reconstruct retired v1 abstractions"
-        );
 
         let single_hand = v1.replace("kind = \"range-vector\"", "kind = \"single-hand\"");
         let (_, migrated) =
@@ -1258,7 +1241,7 @@ mod tests {
         let (compatible, migrated) =
             crate::config::solution_artifact_compatible_config(&legacy).unwrap();
         assert!(migrated);
-        #[cfg(not(feature = "research"))]
+
         {
             let Err(retired) = build_solution_session(&compatible) else {
                 panic!("retired legacy artifact must not rebuild a live production backend");
@@ -1266,11 +1249,6 @@ mod tests {
             let retired = retired.to_string();
             assert!(retired.contains("MWP004"), "{retired}");
         }
-        #[cfg(feature = "research")]
-        assert!(
-            build_solution_session(&compatible).is_ok(),
-            "research builds must reconstruct retired legacy abstractions"
-        );
     }
 
     #[test]

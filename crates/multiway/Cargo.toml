@@ -8,9 +8,9 @@ description = "Sampled 2-9 player NLHE solving with side pots and tournament uti
 
 [features]
 default = []
-# Rollout/k-means and its solve-time assignment cache are retained only for
-# reproducibility experiments. Production and ordinary workspace builds omit
-# this feature; opt in explicitly for research binaries.
+# Gates only the retired full-recall/sparse solver path, which production
+# configs already reject with MWP002. Nothing enables it; it exists so the
+# sparse path stays compiled until it is deleted outright.
 research-abstractions = []
 
 [dependencies]
@@ -32,18 +32,6 @@ zstd = { workspace = true }
 libc = { workspace = true }
 toml = { workspace = true }
 
-[[example]]
-name = "rollout_sample_experiment"
-required-features = ["research-abstractions"]
 
-[[example]]
-name = "abstraction_bucket_experiment"
-required-features = ["research-abstractions"]
 
-[[example]]
-name = "abstraction_method_experiment"
-required-features = ["research-abstractions"]
 
-[[example]]
-name = "abstraction_training_experiment"
-required-features = ["research-abstractions"]

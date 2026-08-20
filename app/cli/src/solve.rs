@@ -114,7 +114,7 @@ pub fn run(
     let sol = run_solution.as_deref().or(sol);
     let mut config: SolveConfig =
         crate::config::parse_solve_config_at(raw, config_path).context("parsing config")?;
-    #[cfg(not(feature = "research"))]
+
     if !is_multiway_v1 && matches!(config.game, GameSection::PreflopMultiway(_)) {
         return Err(anyhow!(
             "MWP003: legacy preflop-multiway solve configs were removed from the production \

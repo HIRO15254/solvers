@@ -1,5 +1,9 @@
 # Multiway Preflop abstraction experiment (2026-07-23, historical)
 
+> **注記(2026-08)**: 本書が参照する `experiments/` 配下の設定・スクリプト・CSVは、
+> 抽象化最適化の研究ラインを打ち切った際に削除した。以下のpath表記は当時の
+> repository内位置であり、実体はGit履歴(tag `pre-gui-removal` 以前)から取得する。
+
 > **Status: HISTORICAL / card-only scope VALIDATED.**
 > 本書の§1--4はTree非依存card-only実験の測定範囲に限って有効である。
 > solve-levelの暫定設定、canonical Tree上のS3結果、resource ceiling、未完の
@@ -81,13 +85,13 @@ process RSS、materialized public tree、cache、worker scratch等のhard capで
   Rust/Cargo 1.96.1、release build。solve anchorは6 threads。本書記載の
   harness/runtime/config変更を加えたworktree上で実行。
 - dense正本:
-  [action-tree-benchmark-6gib-2026-07-24.csv](../../experiments/abstraction-2026-07-23/action-tree-benchmark-6gib-2026-07-24.csv)。
+  `experiments/abstraction-2026-07-23/action-tree-benchmark-6gib-2026-07-24.csv`。
   1ケース1process、6GiB dense-arena payload上限。
 - sparse正本:
-  [sparse-feasibility-100sweeps-2026-07-24.csv](../../experiments/abstraction-2026-07-23/sparse-feasibility-100sweeps-2026-07-24.csv)。
+  `experiments/abstraction-2026-07-23/sparse-feasibility-100sweeps-2026-07-24.csv`。
   canonical v1 configは
-  [tournament-6max-50bb-benchmark-v1.toml](../../experiments/abstraction-2026-07-23/tournament-6max-50bb-benchmark-v1.toml)と
-  [cash-6max-100bb-benchmark-v1.toml](../../experiments/abstraction-2026-07-23/cash-6max-100bb-benchmark-v1.toml)。
+  `experiments/abstraction-2026-07-23/tournament-6max-50bb-benchmark-v1.toml`と
+  `experiments/abstraction-2026-07-23/cash-6max-100bb-benchmark-v1.toml`。
 - historical preflop-only/checkdown baseline: GCP `e2-highmem-8`
   (8 vCPU / 64GiB)、
   Ubuntu 24.04、Rust 1.97.1、`us-central1`。詳細な計測値とcleanup記録は
@@ -287,7 +291,7 @@ seeds 11/29/47を比較した。
 正本v1 configと同じgame/tree fingerprintを持つwarm-artifact compatibility
 configで、range-vector、bucket-history、pruning none、6 threads、100 sweepsを
 実行した。正本結果は
-[sparse-feasibility-100sweeps-2026-07-24.csv](../../experiments/abstraction-2026-07-23/sparse-feasibility-100sweeps-2026-07-24.csv)。
+`experiments/abstraction-2026-07-23/sparse-feasibility-100sweeps-2026-07-24.csv`。
 
 | case | K / rollout | sweeps / traversals | infosets | solver bytes | wall | process peak RSS |
 |---|---:|---:|---:|---:|---:|---:|
@@ -366,7 +370,7 @@ bucket-history solveより約4.5倍memoryを使った。Cash root L1は0.424。
 `action_tree_preflight`の既定`benchmark` profileで44ケースを1 processずつ実行した。
 固定node capは指定せず、`current-street` dense arena payloadを6GiB
 （6,442,450,944 B）までcount-only traversalした。正本は
-[action-tree-benchmark-6gib-2026-07-24.csv](../../experiments/abstraction-2026-07-23/action-tree-benchmark-6gib-2026-07-24.csv)。
+`experiments/abstraction-2026-07-23/action-tree-benchmark-6gib-2026-07-24.csv`。
 
 | case | seats | completed tested depths | deepest complete: exact nodes / arena bytes | first MemoryLimit depth | first exceeding prefix N / columns / bytes |
 |---|---:|---|---:|---:|---:|
@@ -436,8 +440,8 @@ rolloutを`MWP001`、bucket-historyを`MWP002`で拒否するため、production
 推奨値として使用しない。Treeを含む当時の正本は次の2ファイルであり、
 abstraction断片だけではTreeを再現しない。
 
-- [tournament-6max-50bb-benchmark-v1.toml](../../experiments/abstraction-2026-07-23/tournament-6max-50bb-benchmark-v1.toml)
-- [cash-6max-100bb-benchmark-v1.toml](../../experiments/abstraction-2026-07-23/cash-6max-100bb-benchmark-v1.toml)
+- `experiments/abstraction-2026-07-23/tournament-6max-50bb-benchmark-v1.toml`
+- `experiments/abstraction-2026-07-23/cash-6max-100bb-benchmark-v1.toml`
 
 Tournament abstraction:
 

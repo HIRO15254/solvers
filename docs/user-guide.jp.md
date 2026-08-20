@@ -110,8 +110,8 @@ cgroup/containerまたは外部RSS watchdogにより別に強制する。
 
 旧rollout/k-means backendはSolve中にassignment cacheが増え、bucket-history/full
 recallもsparse policy mapが増えるため、productionからそれぞれ`MWP001`/`MWP002`で
-削除された。再現実験は`--features research` buildに隔離され、dynamic
-re-clusteringは元々実装されていない。
+削除された。2026-08にrollout実装本体と`solvers experiment` namespaceも削除した。
+現行の抽象化はEHS² percentile + current-street recallだけである。
 
 ## 5. 何が保証され、何が保証されないか
 
@@ -161,8 +161,7 @@ tree compile、dense arena byte preflight、allocation/page touchを完了して
 sweep 0を開始する。再開にはrun directory内の`.mwckpt`と同じeffective configを使う。
 
 `examples/preflop_multiway_v1_production_smoke.toml`はproduction parser contractの
-検証fixtureである。`tools/bench/mw_6max_64b.toml`はretired rollout/full-recallを
-測るhistorical research fixtureであり、通常releaseでは実行しない。
+検証fixtureである。
 
 ## 8. 実行前にリソースを見積もる
 

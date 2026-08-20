@@ -261,7 +261,7 @@ pub fn apply_solve_overrides(
     // The default binary accepts only the fixed production abstraction.
     // Research builds deliberately retain the historical v1 decoder so the
     // checked-in rollout/full-recall experiments remain reproducible.
-    #[cfg(not(feature = "research"))]
+
     validate_production_contract(raw)?;
     validate_decimal_chip_tokens(raw)?;
     let mut source: V1Config = toml::from_str(raw).context("parsing Multiway Preflop v1 config")?;
@@ -287,9 +287,9 @@ pub fn apply_solve_overrides(
     }
     let effective = toml::to_string_pretty(&source)
         .context("serializing solve-time v1 overrides and effective config")?;
-    #[cfg(not(feature = "research"))]
+
     validate_production_contract(&effective).context("validating solve-time v1 overrides")?;
-    #[cfg(feature = "research")]
+
     parse_and_lower(&effective).context("validating research solve-time v1 overrides")?;
     Ok(effective)
 }
@@ -2161,46 +2161,6 @@ kind = "ehs2-percentile"
             formats::config_hash(first.as_bytes()),
             formats::config_hash(second.as_bytes())
         );
-    }
-
-    #[test]
-    fn tracked_benchmark_compatibility_configs_match_canonical_game_fingerprints() {
-        let repository = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
-        for (canonical_name, compatibility_name, expected_fingerprint) in [
-            (
-                "tournament-6max-50bb-benchmark-v1.toml",
-                "tournament-6max-50bb-one-size-postflop.toml",
-                "a31e08f41b36e46fcf340e432d27209dea872bcfa21e3104ee6037255e0af512",
-            ),
-            (
-                "cash-6max-100bb-benchmark-v1.toml",
-                "cash-6max-100bb-one-size-postflop.toml",
-                "c35365b8e6ab8df1bbacdd9a6a862c527205bc048c58fa7db8b05f81bf3bc55b",
-            ),
-        ] {
-            let directory = repository.join("experiments/abstraction-2026-07-23");
-            let canonical_path = directory.join(canonical_name);
-            let compatibility_path = directory.join(compatibility_name);
-            let canonical_raw = std::fs::read_to_string(&canonical_path).unwrap();
-            let compatibility_raw = std::fs::read_to_string(&compatibility_path).unwrap();
-
-            let canonical =
-                crate::config::parse_solve_config_at(&canonical_raw, &canonical_path).unwrap();
-            let compatibility =
-                crate::config::parse_solve_config_at(&compatibility_raw, &compatibility_path)
-                    .unwrap();
-            let canonical_fingerprint = game_fingerprint(canonical);
-            assert_eq!(
-                canonical_fingerprint,
-                game_fingerprint(compatibility),
-                "{canonical_name} and {compatibility_name} lowered to different games"
-            );
-            assert_eq!(
-                formats::config_hash_hex(&canonical_fingerprint),
-                expected_fingerprint,
-                "{canonical_name} changed from the measured benchmark game"
-            );
-        }
     }
 
     #[test]

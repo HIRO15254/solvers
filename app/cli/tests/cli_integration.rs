@@ -284,7 +284,7 @@ fn resume_equivalence_kuhn() {
 }
 
 #[test]
-#[cfg(not(feature = "research"))]
+
 fn legacy_multiway_solve_is_rejected_before_creating_artifacts() {
     let dir = temp_dir("multiway-legacy-rejected");
     let config = workspace_root().join("examples/preflop_multiway_3max_smoke.toml");
@@ -328,94 +328,6 @@ fn production_validate_rejects_the_research_rollout_fixture() {
         "stderr: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-}
-
-#[test]
-#[cfg(feature = "research")]
-fn research_build_solves_resumes_and_live_evaluates_legacy_rollout() {
-    let dir = temp_dir("multiway-legacy-research");
-    let config = workspace_root().join("examples/preflop_multiway_3max_smoke.toml");
-    let first_result = dir.join("first.json");
-    let resumed_result = dir.join("resumed.json");
-    let checkpoint = dir.join("result.mwckpt");
-    let solution = dir.join("result.mwsol");
-
-    run_solvers_ok(&[
-        "solve",
-        config.to_str().unwrap(),
-        "--iterations",
-        "1",
-        "--output",
-        first_result.to_str().unwrap(),
-        "--checkpoint",
-        checkpoint.to_str().unwrap(),
-        "--sol",
-        solution.to_str().unwrap(),
-    ]);
-    assert!(first_result.is_file());
-    assert!(checkpoint.is_file());
-    assert!(solution.is_file());
-
-    run_solvers_ok(&[
-        "resume",
-        config.to_str().unwrap(),
-        "--checkpoint",
-        checkpoint.to_str().unwrap(),
-        "--output",
-        resumed_result.to_str().unwrap(),
-    ]);
-    let resumed: serde_json::Value =
-        serde_json::from_str(&std::fs::read_to_string(&resumed_result).unwrap()).unwrap();
-    assert_eq!(resumed["sweeps"], 2);
-
-    let evaluated = run_solvers_ok(&[
-        "evaluate",
-        solution.to_str().unwrap(),
-        "--samples",
-        "8",
-        "--br-traversals",
-        "1",
-    ]);
-    let evaluation: serde_json::Value =
-        serde_json::from_slice(&evaluated.stdout).expect("research evaluation JSON");
-    assert_eq!(evaluation["seats"].as_array().map(Vec::len), Some(3));
-    assert_eq!(
-        evaluation["deviation_gain_lower_bound"]
-            .as_array()
-            .map(Vec::len),
-        Some(3)
-    );
-}
-
-#[test]
-#[cfg(feature = "research")]
-fn research_build_solves_and_resumes_v1_rollout_with_bucket_history() {
-    let dir = temp_dir("multiway-v1-research-full");
-    let source = workspace_root().join("examples/preflop_multiway_v1_smoke.toml");
-    let mut raw = std::fs::read_to_string(source).unwrap();
-    raw = raw.replace("confirmations = 1", "confirmations = 100");
-    raw.push_str(
-        "\n[game.information]\nrecall = \"bucket-history\"\n\
-         \n[solver.pruning]\nkind = \"none\"\n",
-    );
-    let config = dir.join("research-v1.toml");
-    std::fs::write(&config, raw).unwrap();
-    let run_dir = dir.join("run");
-
-    run_solvers_ok(&[
-        "solve",
-        config.to_str().unwrap(),
-        "--out",
-        run_dir.to_str().unwrap(),
-    ]);
-    let checkpoint = run_dir.join("checkpoint.mwckpt");
-    assert!(checkpoint.is_file());
-    assert!(run_dir.join("solution.mwsol").is_file());
-
-    run_solvers_ok(&["resume", checkpoint.to_str().unwrap(), "--max-sweeps", "3"]);
-    let resumed: serde_json::Value =
-        serde_json::from_str(&std::fs::read_to_string(run_dir.join("run.json")).unwrap()).unwrap();
-    assert_eq!(resumed["sweeps"], 3);
 }
 
 #[test]
@@ -495,35 +407,6 @@ fn resume_tampered_config_errors() {
         stderr.to_lowercase().contains("hash"),
         "expected a hash-mismatch message, got: {stderr}"
     );
-}
-
-#[test]
-#[cfg(feature = "research")]
-fn bench_kuhn_two_schedules() {
-    let dir = temp_dir("bench");
-    let config = dir.join("kuhn.toml");
-    std::fs::write(&config, KUHN_NO_EARLY_STOP).unwrap();
-    let metrics_dir = dir.join("metrics");
-
-    let output = run_solvers_ok(&[
-        "experiment",
-        "benchmark",
-        config.to_str().unwrap(),
-        "--schedules",
-        "dcfr,cfr-plus",
-        "--metrics-dir",
-        metrics_dir.to_str().unwrap(),
-    ]);
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(stdout.contains("schedule"));
-    assert!(stdout.contains("nash_conv"));
-    assert!(stdout.contains("dcfr"));
-    assert!(stdout.contains("cfr-plus"));
-
-    assert!(metrics_dir.join("dcfr.jsonl").exists());
-    assert!(metrics_dir.join("cfr-plus.jsonl").exists());
-    let dcfr_metrics = std::fs::read_to_string(metrics_dir.join("dcfr.jsonl")).unwrap();
-    assert!(dcfr_metrics.lines().count() > 0);
 }
 
 // --- `.sol` viewer artifact: `solve --sol` / `inspect --sol` ---------------

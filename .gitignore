@@ -7,7 +7,5 @@
 /runs
 /.cache
 __pycache__/
-# Ad-hoc benchmark sweep configs (see tools/bench/mw_bench.sh); never committed.
-tools/bench/_mw_*.toml
 # Per-agent instruction mirror of CLAUDE.md; local-only by policy.
 AGENTS.md

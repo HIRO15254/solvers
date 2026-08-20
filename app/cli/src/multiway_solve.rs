@@ -224,15 +224,15 @@ fn run_inner(
     } else {
         toml::to_string(&config).context("re-serializing the effective multiway config")?
     };
-    #[cfg(not(any(feature = "research", test)))]
+    #[cfg(not(test))]
     let mut mw_session =
         session::build_production_multiway_session(&effective_toml, resume_checkpoint)?;
-    #[cfg(any(feature = "research", test))]
+    #[cfg(test)]
     let mut mw_session = session::build_multiway_session(&effective_toml, resume_checkpoint)?;
     mw_session.config_toml = raw_config.to_string();
     mw_session.config_hash = config_hash;
     let policy_allocation = mw_session.solver.policy_arena_allocation();
-    #[cfg(not(any(feature = "research", test)))]
+    #[cfg(not(test))]
     let policy_allocation = Some(
         policy_allocation
             .filter(|allocation| allocation.pages_committed)

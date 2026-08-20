@@ -66,7 +66,6 @@ pub fn run(
     let config_hash = formats::config_hash(&raw_bytes);
     apply_legacy_multiway_max_sweeps(&mut config, max_sweeps)?;
 
-    #[cfg(not(feature = "research"))]
     if matches!(config.game, GameSection::PreflopMultiway(_)) {
         return Err(anyhow!(
             "MWP003: legacy preflop-multiway checkpoints cannot be resumed by the production \
@@ -75,7 +74,6 @@ pub fn run(
         ));
     }
 
-    #[cfg(feature = "research")]
     if matches!(config.game, GameSection::PreflopMultiway(_)) {
         println!(
             "resuming research multiway checkpoint to target={}",
@@ -272,10 +270,7 @@ fn run_self_contained_multiway(
 mod tests {
     use super::*;
 
-    const MULTIWAY: &str = include_str!(
-        "../../../experiments/abstraction-2026-07-23/\
-         tournament-6max-50bb-one-size-postflop.toml"
-    );
+    const MULTIWAY: &str = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
 
     #[test]
     fn legacy_multiway_max_sweeps_is_a_positive_total_target() {

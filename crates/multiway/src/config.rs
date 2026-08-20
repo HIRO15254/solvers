@@ -398,12 +398,13 @@ pub struct AbstractionConfig {
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum AbstractionKind {
-    /// Trained rollout/k-means abstraction, opponent-count-aware, computed
-    /// (and memoized) at solve time.
-    #[default]
+    /// Retired trained rollout/k-means abstraction. The implementation was
+    /// removed; the variant survives so configs that still name it fail with
+    /// an explicit MWP001 instead of an opaque unknown-variant error.
     RolloutKmeans,
     /// Precomputed exact EHS² percentile tables over every canonical board,
     /// O(1) lookup, no solve-time Monte Carlo.
+    #[default]
     Ehs2Table,
 }
 

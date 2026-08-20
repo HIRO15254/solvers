@@ -24,10 +24,8 @@ use multiway::abstraction::{
     BucketContext, BucketId, MultiwayAbstraction, MultiwayAbstractionBackend,
     TableAbstractionAdapter, ehs2_table_fingerprint,
 };
-#[cfg(any(feature = "research", test))]
-use multiway::abstraction::{
-    RolloutKMeansAbstraction, RolloutKMeansBuilder, RolloutKMeansParams, StreetBucketCounts,
-};
+#[cfg(test)]
+use multiway::abstraction::{FeatureHashAbstraction, FeatureHashParams};
 use multiway::checkpoint::MultiwayCheckpoint;
 use multiway::config::{
     AbstractionConfig, AbstractionKind, FieldPlayerConfig, RakeConfig as MultiwayRake, RecallMode,
@@ -313,7 +311,13 @@ const DEFAULT_STOP_BR_TRAVERSALS: u64 = 2_000;
 /// `.mwckpt` file (always f32 internally, regardless of `run.storage`) and
 /// verifies its configuration/abstraction fingerprints match this config
 /// before returning.
-pub fn build_multiway_session(
+/// Test-only session builder. It swaps the configured EHS² percentile table
+/// for the cheap deterministic feature-hash baseline, because building a real
+/// EHS² table costs minutes and these tests exercise session wiring rather
+/// than bucket quality. Production code paths use
+/// [`build_production_multiway_session`].
+#[cfg(test)]
+pub(crate) fn build_multiway_session(
     raw_toml: &str,
     resume_checkpoint: Option<&Path>,
 ) -> Result<MultiwaySession> {
@@ -322,6 +326,7 @@ pub fn build_multiway_session(
         None,
         resume_checkpoint,
         SessionStoragePolicy::Compatibility,
+        AbstractionPolicy::CheapBaseline,
     )
 }
 
@@ -337,6 +342,7 @@ pub fn build_production_multiway_session(
         None,
         resume_checkpoint,
         SessionStoragePolicy::PreallocatedProduction,
+        AbstractionPolicy::Configured,
     )
 }
 
@@ -347,7 +353,8 @@ pub fn build_production_multiway_session(
 /// same game fingerprint as the candidate. Its algorithm/run sections are not
 /// used. The reference is attached before checkpoint restore; core
 /// fingerprints intentionally continue to describe only the candidate.
-pub fn build_multiway_session_with_deviation(
+#[cfg(test)]
+pub(crate) fn build_multiway_session_with_deviation(
     raw_toml: &str,
     deviation_raw_toml: &str,
     resume_checkpoint: Option<&Path>,
@@ -357,13 +364,26 @@ pub fn build_multiway_session_with_deviation(
         Some(deviation_raw_toml),
         resume_checkpoint,
         SessionStoragePolicy::Compatibility,
+        AbstractionPolicy::CheapBaseline,
     )
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum SessionStoragePolicy {
+    /// Sparse storage, reachable only from the test-only session builders.
+    #[cfg(test)]
     Compatibility,
     PreallocatedProduction,
+}
+
+/// Which card abstraction a session build should use.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum AbstractionPolicy {
+    /// Build what the config selects. The only production choice.
+    Configured,
+    /// Substitute the cheap feature-hash baseline.
+    #[cfg(test)]
+    CheapBaseline,
 }
 
 fn build_multiway_session_internal(
@@ -371,6 +391,7 @@ fn build_multiway_session_internal(
     deviation_raw_toml: Option<&str>,
     resume_checkpoint: Option<&Path>,
     storage_policy: SessionStoragePolicy,
+    abstraction_policy: AbstractionPolicy,
 ) -> Result<MultiwaySession> {
     let config: SolveConfig =
         crate::config::parse_solve_config(raw_toml).context("parsing config")?;
@@ -401,9 +422,10 @@ fn build_multiway_session_internal(
     }
     let utility = convert_utility(utility)?;
     let rake = convert_rake(rake);
-    let (mut game, sampler) = build_multiway_game_from_config(&game_config, &utility, &rake)?;
+    let (mut game, sampler) =
+        build_multiway_game_from_config(&game_config, &utility, &rake, abstraction_policy)?;
     let mut deviation_reference = deviation_raw_toml
-        .map(|raw| build_deviation_reference(raw, game.game_fingerprint()))
+        .map(|raw| build_deviation_reference(raw, game.game_fingerprint(), abstraction_policy))
         .transpose()
         .context("building common deviation reference")?;
     if let Some(reference) = deviation_reference.as_mut() {
@@ -550,6 +572,7 @@ fn build_multiway_session_internal(
                 .with_context(|| format!("reading multiway checkpoint {}", path.display()))?;
         checkpoint_runtime = checkpoint.config_toml.as_ref().map(|_| checkpoint.runtime);
         let solver = match storage_policy {
+            #[cfg(test)]
             SessionStoragePolicy::Compatibility => MultiwaySolver::from_state_with_config(
                 game,
                 sampler,
@@ -579,6 +602,7 @@ fn build_multiway_session_internal(
         solver
     } else {
         match storage_policy {
+            #[cfg(test)]
             SessionStoragePolicy::Compatibility => {
                 MultiwaySolver::new(game, sampler, solver_config)
             }
@@ -630,7 +654,7 @@ fn resolve_policy_memory_limit(
     storage_policy: SessionStoragePolicy,
     configured: Option<u64>,
 ) -> Result<u64> {
-    if matches!(storage_policy, SessionStoragePolicy::Compatibility) {
+    if !matches!(storage_policy, SessionStoragePolicy::PreallocatedProduction) {
         return Ok(configured.unwrap_or(DEFAULT_MEMORY_LIMIT));
     }
     let resolved = match configured {
@@ -677,6 +701,7 @@ impl BuiltDeviationReference {
 fn build_deviation_reference(
     raw_toml: &str,
     candidate_game_fingerprint: [u8; 32],
+    abstraction_policy: AbstractionPolicy,
 ) -> Result<BuiltDeviationReference> {
     let config: SolveConfig =
         crate::config::parse_solve_config(raw_toml).context("parsing reference config")?;
@@ -694,7 +719,8 @@ fn build_deviation_reference(
     };
     let utility = convert_utility(utility)?;
     let rake = convert_rake(rake);
-    let (reference_game, _) = build_multiway_game_from_config(&game_config, &utility, &rake)?;
+    let (reference_game, _) =
+        build_multiway_game_from_config(&game_config, &utility, &rake, abstraction_policy)?;
     let reference_game_fingerprint = reference_game.game_fingerprint();
     if candidate_game_fingerprint != reference_game_fingerprint {
         return Err(anyhow!(
@@ -962,104 +988,36 @@ fn build_multiway_game_from_config(
     game_config: &multiway::MultiwayConfig,
     utility: &MultiwayUtility,
     rake: &MultiwayRake,
+    abstraction_policy: AbstractionPolicy,
 ) -> Result<(HoldemGame<MultiwayAbstractionBackend>, DealSampler)> {
     game_config
         .validate_economics(utility, rake)
         .context("validating multiway game and utility")?;
-    let abstraction = match game_config.abstraction.kind {
-        AbstractionKind::RolloutKmeans => {
-            #[cfg(any(feature = "research", test))]
-            {
-                MultiwayAbstractionBackend::RolloutKMeans(build_rollout_abstraction(game_config)?)
-            }
-            #[cfg(not(any(feature = "research", test)))]
-            {
+    let abstraction = match abstraction_policy {
+        #[cfg(test)]
+        AbstractionPolicy::CheapBaseline => MultiwayAbstractionBackend::FeatureHash(
+            FeatureHashAbstraction::new(FeatureHashParams {
+                flop_buckets: u32::from(game_config.abstraction.flop_buckets),
+                turn_buckets: u32::from(game_config.abstraction.turn_buckets),
+                river_buckets: u32::from(game_config.abstraction.river_buckets),
+            })
+            .context("building the feature-hash baseline abstraction")?,
+        ),
+        AbstractionPolicy::Configured => match game_config.abstraction.kind {
+            AbstractionKind::RolloutKmeans => {
                 return Err(anyhow!(
-                    "MWP001: rollout-kmeans is unavailable in the production binary; \
-                     use kind = \"ehs2-table\" or rebuild with --features research"
+                    "MWP001: rollout-kmeans was removed; use kind = \"ehs2-table\""
                 ));
             }
-        }
-        AbstractionKind::Ehs2Table => {
-            MultiwayAbstractionBackend::Ehs2Table(build_ehs2_table_abstraction(game_config)?)
-        }
+            AbstractionKind::Ehs2Table => {
+                MultiwayAbstractionBackend::Ehs2Table(build_ehs2_table_abstraction(game_config)?)
+            }
+        },
     };
     let game = HoldemGame::new(game_config, utility, rake, abstraction)
         .context("building generative multiway game")?;
     let sampler = game.deal_sampler().context("compiling table ranges")?;
     Ok((game, sampler))
-}
-
-/// Builds (or loads, or retrains-and-overwrites) the trained
-/// rollout/k-means abstraction for `AbstractionKind::RolloutKmeans`.
-/// Factored out of `build_multiway_session` so the two backend kinds don't
-/// share one branchy block.
-#[cfg(any(feature = "research", test))]
-fn build_rollout_abstraction(
-    game_config: &multiway::MultiwayConfig,
-) -> Result<RolloutKMeansAbstraction> {
-    let params = RolloutKMeansParams {
-        flop_buckets: u32::from(game_config.abstraction.flop_buckets),
-        turn_buckets: u32::from(game_config.abstraction.turn_buckets),
-        river_buckets: u32::from(game_config.abstraction.river_buckets),
-        rollout_samples: game_config.abstraction.rollout_samples,
-        seed: game_config.abstraction.seed,
-    };
-    let mut abstraction_builder = RolloutKMeansBuilder::new(params)
-        .points_per_bucket(game_config.abstraction.points_per_bucket)
-        .kmeans_iterations(game_config.abstraction.kmeans_iterations);
-    for profile in &game_config.abstraction.active_opponent_buckets {
-        abstraction_builder = abstraction_builder
-            .active_opponent_buckets(
-                profile.active_opponents,
-                StreetBucketCounts {
-                    flop: u32::from(profile.flop_buckets),
-                    turn: u32::from(profile.turn_buckets),
-                    river: u32::from(profile.river_buckets),
-                },
-            )
-            .context("configuring active-opponent bucket budgets")?;
-    }
-    let abstraction = if let Some(path) = game_config.abstraction.artifact_cache.as_deref() {
-        // A stale/incompatible artifact (wrong version, corrupt, parameter
-        // mismatch, ...) is not fatal: retrain from scratch and overwrite it,
-        // the same recovery a missing file already gets below. Only an I/O
-        // error during the *write* that follows still propagates.
-        let reusable = path
-            .is_file()
-            .then(|| abstraction_builder.load_artifact(path));
-        match reusable {
-            Some(Ok(abstraction)) => abstraction,
-            other => {
-                if let Some(Err(error)) = other {
-                    eprintln!(
-                        "warning: rollout artifact {} could not be reused ({error}); retraining and overwriting it",
-                        path.display()
-                    );
-                }
-                if let Some(parent) = path
-                    .parent()
-                    .filter(|parent| !parent.as_os_str().is_empty())
-                {
-                    std::fs::create_dir_all(parent).with_context(|| {
-                        format!("creating rollout artifact directory {}", parent.display())
-                    })?;
-                }
-                let abstraction = abstraction_builder
-                    .build()
-                    .context("training deterministic multiway rollout abstraction")?;
-                abstraction
-                    .write_artifact(path)
-                    .with_context(|| format!("writing rollout artifact {}", path.display()))?;
-                abstraction
-            }
-        }
-    } else {
-        abstraction_builder
-            .build()
-            .context("training deterministic multiway rollout abstraction")?
-    };
-    Ok(abstraction)
 }
 
 /// Builds (or loads, or rebuilds-and-overwrites -- see
@@ -1401,7 +1359,6 @@ pub fn make_solution(
 mod tests {
     use super::*;
     use crate::config::RakeSection;
-    use multiway::abstraction::MultiwayAbstraction;
     use multiway::solver::DEFAULT_PRUNE_SKIP_PROBABILITY;
 
     #[test]
@@ -1688,85 +1645,6 @@ mod tests {
     }
 
     #[test]
-    fn stale_rollout_artifact_is_retrained_and_overwritten() {
-        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
-        let directory = tempfile::tempdir().unwrap();
-        let artifact_path = directory.path().join("rollout.mwab");
-        std::fs::write(&artifact_path, b"not a valid rollout artifact").unwrap();
-
-        // Splice `artifact_cache` into `[game.abstraction]` right after the
-        // existing `seed` key.
-        let literal = format!("{:?}", artifact_path.display().to_string());
-        let config_with_cache = raw.replacen(
-            "seed = 17\n",
-            &format!("seed = 17\nartifact_cache = {literal}\n"),
-            1,
-        );
-        assert_ne!(
-            config_with_cache, raw,
-            "artifact_cache injection must have matched"
-        );
-
-        let session = build_multiway_session(&config_with_cache, None)
-            .expect("a stale/corrupt artifact must be retrained rather than hard-erroring");
-        assert_eq!(session.sweeps_target, 2);
-
-        let reloaded = RolloutKMeansAbstraction::read_artifact(&artifact_path)
-            .expect("the retrained artifact must have overwritten the file and round-trip");
-        assert_eq!(
-            reloaded.fingerprint(),
-            session.solver.abstraction_fingerprint()
-        );
-    }
-
-    #[test]
-    fn rollout_training_config_is_wired_and_invalidates_a_mismatched_artifact() {
-        let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml")
-            .replace("flop_buckets = 8", "flop_buckets = 1")
-            .replace("turn_buckets = 8", "turn_buckets = 1")
-            .replace("river_buckets = 8", "river_buckets = 1")
-            .replace("rollout_samples = 8", "rollout_samples = 1");
-        let directory = tempfile::tempdir().unwrap();
-        let artifact_path = directory.path().join("rollout.mwab");
-        let literal = format!("{:?}", artifact_path.display().to_string());
-        let first_config = raw.replacen(
-            "seed = 17\n",
-            &format!(
-                "seed = 17\npoints_per_bucket = 1\nkmeans_iterations = 1\n\
-                 artifact_cache = {literal}\n"
-            ),
-            1,
-        );
-        let first = build_multiway_session(&first_config, None).unwrap();
-        let first_rollout = first
-            .solver
-            .game()
-            .abstraction()
-            .rollout()
-            .expect("configured rollout backend");
-        assert_eq!(first_rollout.training_params().points_per_bucket, 1);
-        assert_eq!(first_rollout.training_params().kmeans_iterations, 1);
-        let first_fingerprint = first_rollout.fingerprint();
-
-        let second_config =
-            first_config.replacen("points_per_bucket = 1", "points_per_bucket = 2", 1);
-        let second = build_multiway_session(&second_config, None).unwrap();
-        let second_rollout = second
-            .solver
-            .game()
-            .abstraction()
-            .rollout()
-            .expect("configured rollout backend");
-        assert_eq!(second_rollout.training_params().points_per_bucket, 2);
-        assert_eq!(second_rollout.training_params().kmeans_iterations, 1);
-        assert_ne!(second_rollout.fingerprint(), first_fingerprint);
-
-        let overwritten = RolloutKMeansAbstraction::read_artifact(&artifact_path).unwrap();
-        assert_eq!(overwritten.training_params().points_per_bucket, 2);
-        assert_eq!(overwritten.fingerprint(), second_rollout.fingerprint());
-    }
-
-    #[test]
     #[ignore = "builds full EHS2 tables over every canonical board; CI runs it in release with --include-ignored"]
     fn ehs2_table_backend_builds_a_session_and_caches_its_tables() {
         let raw = include_str!("../../../examples/preflop_multiway_3max_smoke.toml");
@@ -1775,7 +1653,6 @@ mod tests {
 
         // Splice `kind = "ehs2-table"` and `artifact_cache` into
         // `[game.abstraction]` right after the existing `seed` key, mirroring
-        // `stale_rollout_artifact_is_retrained_and_overwritten`'s splice.
         let literal = format!("{:?}", cache_path.display().to_string());
         let config_with_kind = raw.replacen(
             "seed = 17\n",
@@ -1790,10 +1667,6 @@ mod tests {
         let session = build_multiway_session(&config_with_kind, None)
             .expect("the ehs2-table backend must build a session");
         assert_eq!(session.sweeps_target, 2);
-        assert!(
-            session.solver.game().abstraction().rollout().is_none(),
-            "the ehs2-table backend has no rollout assignment cache to persist"
-        );
         assert!(
             cache_path.is_file(),
             "the ehs2 bucket-table cache must be written at build time"

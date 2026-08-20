@@ -35,7 +35,7 @@ its phases.
 ```
 app/
 └── cli         # `solvers`: config / validate / solve / resume / inspect /
-                # evaluate / export / compare / experiment / report
+                # evaluate / export / compare / report
 crates/
 ├── cards       # card/chip/street types, range parser, hand-evaluator wrapper
 ├── hand-index  # suit-isomorphism board canonicalization
