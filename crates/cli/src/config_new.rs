@@ -44,9 +44,9 @@ kind = "standard"
 kind = "ehs2-percentile"
 
 [game.abstraction.buckets]
-flop = 64
-turn = 64
-river = 64
+flop = 128
+turn = 128
+river = 128
 
 [economics]
 kind = "cash"

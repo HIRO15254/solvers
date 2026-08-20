@@ -28,20 +28,32 @@ source artifactのSHA-256対応は
 
 ## 現在のdecision
 
-| case | tentative experimental default | status |
+**2026-08更新**: abstraction optimizationの研究ラインを打ち切った
+(`docs/app-architecture.md` R8)。追加実験でpromotion条件を満たす見込みがなくなった
+ため、下表のTENTATIVE値をそのままproduction defaultへ昇格させた。昇格させたのは
+「これ以上の測定を待たない」という運用判断であり、測定範囲が広がったことを意味しない。
+
+| case | production default | 由来 |
 |---|---|---|
-| Tournament 6-max/50bb | EHS2 percentile、F/T/R = 128、current-street | **TENTATIVE** |
-| Cash 6-max/100bb | EHS2 percentile、F/T/R = 256、current-street | **TENTATIVE** |
-| generic solver default | 変更なし | **VALIDATED** |
-| 6--9 max / 全指定stackのproduction default | 未確定 | **LIMITATION** |
+| 全case共通の既定 | EHS2 percentile、F/T/R = 128、current-street | 下記Tournament 6-max/50bb anchor |
+| Tournament 6-max/50bb | EHS2 percentile、F/T/R = 128、current-street | S3 solve-level screening |
+| Cash 6-max/100bb | EHS2 percentile、F/T/R = 256、current-street | S3 solve-level screening。既定ではなく明示指定を推奨 |
+| 6--9 max / 全指定stack | 測定なし。既定の128をそのまま使う | **LIMITATION** |
+
+単一の既定は128とした。cashの256を全体既定に採ると、cash 6-max/100bbという1 anchorの
+測定を6--9 max全体へ外挿することになる。utility kindで既定を切り替える条件付き
+defaultは、正規化を説明不能にするため採らない。
+
+なおpostflop bucket数はpolicy arenaの大きさを変えない(arenaはpreflop decision node ×
+169 class × action)。128への引き上げはarena byte上限に影響しない。
 
 portable canonical v1 config:
 
 - `experiments/abstraction-optimization-2026-07-25/tentative-defaults/tournament-6max-50bb-tentative-ehs2-k128-current-street-v1.toml`
 - `experiments/abstraction-optimization-2026-07-25/tentative-defaults/cash-6max-100bb-tentative-ehs2-k256-current-street-v1.toml`
 
-この「default」は次の追加実験までの**6-max anchor用実験既定**を意味する。
-solver全体、6--9 max envelope、または収束済みproduction設定の既定ではない。
+昇格後も測定範囲は変わらない。この既定は**6-max anchorの測定に基づくproduction既定**
+であり、6--9 max envelope全体で最適であることを示すものではない。
 
 ## Production release policy（2026-07-25）
 

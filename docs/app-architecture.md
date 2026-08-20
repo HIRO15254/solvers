@@ -120,10 +120,14 @@ local = loopback + token、remote = TLS + token。GUI 側の分岐は接続プ�
 `experiment` サブコマンド、`research-abstractions` feature、RolloutKMeans 抽象化、研究専用 example、
 `experiments/` ディレクトリを削除する。
 
-`docs/validation/multiway-abstraction-optimization-2026-07-25.md` の暫定値(Tournament 6-max/50bb =
-EHS2 K128 current-street、Cash 6-max/100bb = EHS2 K256 current-street)を production default として
-文書に昇格させ、「6--9 max 全 stack の default 未確定」という LIMITATION は解消済みの前提を置かず、
-未確定のまま既定値を固定する旨を明記する。
+`docs/validation/multiway-abstraction-optimization-2026-07-25.md` の暫定値を production default へ
+昇格させた(2026-08 実施)。単一の既定は **F/T/R = 128**(Tournament 6-max/50bb anchor 由来)とし、
+Cash 6-max/100bb anchor の 256 は既定にせず明示指定の推奨に留める。utility kind で既定を切り替える
+条件付き default は正規化を説明不能にするため採らない。「6--9 max 全 stack は測定なし」という
+LIMITATION は解消していないので、そのまま記載を残す。
+
+bucket 数は policy arena の大きさを変えない(arena は preflop decision node × 169 class × action)。
+64 → 128 の引き上げは arena byte 上限に影響しないことを `validate --resources` で実測確認した。
 
 抽象化の質の測定手段は production 表面の `solvers evaluate`(`.mwsol` を訓練済み deviation で再評価)と
 `solvers compare`(2 つの `.mwsol` 比較)が担う。研究を再開する場合は git 履歴から復元する。

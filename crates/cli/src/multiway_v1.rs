@@ -1850,8 +1850,12 @@ fn yes() -> bool {
 fn one_u64() -> u64 {
     1
 }
+/// Promoted from the 2026-07-25 abstraction study's Tournament 6-max/50bb
+/// anchor (see `docs/validation/multiway-abstraction-optimization-2026-07-25.md`).
+/// The Cash 6-max/100bb anchor measured better at 256; that stays an explicit
+/// override rather than a second, utility-conditional default.
 fn default_buckets() -> u32 {
-    64
+    128
 }
 fn default_points_per_bucket() -> u32 {
     8
@@ -1950,7 +1954,7 @@ kind = "ehs2-percentile"
                 .iter()
                 .all(|seat| seat.name.is_none() && seat.range.is_empty())
         );
-        assert_eq!(game.abstraction.flop_buckets, 64);
+        assert_eq!(game.abstraction.flop_buckets, 128);
         assert_eq!(game.abstraction.rollout_samples, 512);
         assert_eq!(game.abstraction.points_per_bucket, 8);
         assert_eq!(game.abstraction.kmeans_iterations, 20);

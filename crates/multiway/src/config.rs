@@ -472,7 +472,7 @@ impl AbstractionConfig {
 }
 
 fn default_buckets() -> u16 {
-    32
+    128
 }
 
 fn default_rollout_samples() -> u32 {
@@ -1275,7 +1275,7 @@ stack_bb = 12
         let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
         config.validate().unwrap();
         assert_eq!(config.blinds.small_bb, 0.5);
-        assert_eq!(config.abstraction.flop_buckets, 32);
+        assert_eq!(config.abstraction.flop_buckets, 128);
         assert!(config.abstraction.active_opponent_buckets.is_empty());
         assert!(config.betting.allow_limp);
         assert_eq!(config.compile_ranges().unwrap().len(), 3);

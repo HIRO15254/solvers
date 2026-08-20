@@ -280,9 +280,9 @@ loop、再帰、function、include、file/network/environment/time/RNGアクセ�
 kind = "ehs2-percentile"   # productionでは明示必須
 
 [game.abstraction.buckets]
-flop = 64                  # 各field既定64、正のu32
-turn = 64
-river = 64
+flop = 128                 # 各field既定128、正のu32
+turn = 128
+river = 128
 ```
 
 - production backendはuniform heads-up E[HS²] percentileだけである。
@@ -290,8 +290,15 @@ river = 64
   読み替えず`MWP001`で拒否する。
 - `rollouts_per_state`、abstraction `seed`、`training`、
   `opponent_buckets`はproduction surfaceから削除され、指定すると`MWP001`。
-- flop/turn/river bucket数は引き続き設定可能で既定64/64/64。各値は正で現行runtime
+- flop/turn/river bucket数は引き続き設定可能で既定128/128/128。各値は正で現行runtime
   幅へlower可能でなければならない。resource不足でも自動縮小しない。
+- この既定は2026-07-25のabstraction studyのTournament 6-max/50bb anchorに由来する
+  (`docs/validation/multiway-abstraction-optimization-2026-07-25.md`)。同studyの
+  Cash 6-max/100bb anchorは256が良好だったため、cash gameでは明示指定を推奨する。
+  utility kindに応じて既定を変える条件付きdefaultは採らない。
+- postflop bucket数はpolicy arenaの大きさを変えない。arenaはpreflop decision node ×
+  169 preflop class × actionで決まる。bucket数が効くのはEHS² tableの量子化と
+  postflop走査であり、arena byte上限とは独立である。
 - preflop bucketは常に169 classで設定keyを持たない。
 - 全canonical flop/turn/river boardとlegal hole-comboのassignmentをSolve開始前に
   buildまたはvalidated cacheからloadし、Solve中にmappingを追加しない。
@@ -536,9 +543,9 @@ effect = "checkdown"
 kind = "ehs2-percentile"
 
 [game.abstraction.buckets]
-flop = 64
-turn = 64
-river = 64
+flop = 128
+turn = 128
+river = 128
 
 [game.information]
 recall = "current-street"

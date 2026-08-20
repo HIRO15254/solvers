@@ -90,7 +90,9 @@ external sampling では、1 回の走査(traversal)で:
 - **フロップ以降**: 全canonical boardとlegal hole comboについてuniform
   heads-up E[HS²] percentile tableをSolve前にbuildまたはvalidated cacheからloadし、
   **バケット**へ量子化する。flop/turn/riverのbucket数は設定可能で、既定は
-  64/64/64。resource不足でも自動縮小しない。
+  128/128/128。resource不足でも自動縮小しない。cash gameは256が良好という測定が
+  あるため、明示指定を推奨する(`docs/multiway-preflop-v1.jp.md`参照)。
+  なおbucket数はpolicy arenaの大きさを変えない。
 - 情報集合キーは現在streetのbucketだけを保持する(current-street recall)。
   Productionで選べるbackend/recallはこの組合せだけである。
 
