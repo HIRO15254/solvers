@@ -125,6 +125,21 @@ schema は toy game(kuhn / leduc)を含む全 kind に必須とする。パー�
 lowered 形状(`kind = "preflop-multiway"` を持つ共有 struct)は利用者が書く config
 family ではないため、schema 宣言を要求しない。手書きは全入口が MWP003 で拒否する。
 
+### R11. queued run はディスク上に存在する
+
+daemon は状態を持たない(R2)。したがって「slot 待ち」も run directory として存在
+しなければならず、daemon を再起動したら待ち行列ごと復元できる必要がある。
+
+そのため daemon は job を受理した時点で run directory を作り、`run.toml` と
+`state = "queued"` の manifest を書く。CLI 側の `solve --out` は空 directory だけを
+受け付けていたが、**用意済みの queued directory であれば引き取る**(`create_or_adopt`)。
+引き取り可能なのは「manifest が queued で、中身が `manifest.json` / `run.toml` /
+`stdout.log` だけ」の場合に限る。それ以外の populated directory は従来どおり拒否する。
+
+同時実行数は固定 slot 数の FIFO とし、既定は 1。1 run が sweep 0 の前に数 GiB の
+policy arena を確保するため、律速は CPU ではなくメモリであり、その予算を知って
+いるのは operator だけである。ヒューリスティックではなく flag にした理由がこれ。
+
 ### R7. リモートは「同じ daemon を別ホストで動かす」だけ
 
 local = loopback + token、remote = TLS + token。GUI 側の分岐は接続プロファイル(URL とトークン)のみ。
@@ -300,16 +315,22 @@ solvers inspect | evaluate | export | compare | report
 ## 7. daemon プロトコル草案(Phase 2 で確定)
 
 ```
+GET  /v1                               protocol version、CLI version、同時実行数
 POST /v1/validate                      正規化 config + 診断。self-contained 化にも使う
 POST /v1/runs                          run 作成(self-contained config TOML)→ run_id
 GET  /v1/runs                          一覧(state と進捗要約)
 GET  /v1/runs/{id}                     manifest + 最新 progress
-GET  /v1/runs/{id}/events?from=OFFSET  SSE。切断後は offset 指定で再開
+GET  /v1/runs/{id}/events?from=OFFSET  event page。offset で再開する
 POST /v1/runs/{id}/cancel              SIGINT 相当(checkpoint 保存して終了)
-POST /v1/runs/{id}/resume              中断ジョブの再開
-GET  /v1/runs/{id}/artifacts/{name}    成果物ダウンロード
-GET  /v1/solution/{id}/node?...        .mwsol のノード閲覧(inspect 相当)
+POST /v1/runs/{id}/resume              停止した run の再開
+(未実装) GET /v1/runs/{id}/artifacts/{name}   成果物ダウンロード
+(未実装) GET /v1/solution/{id}/node?...       .mwsol のノード閲覧
 ```
+
+event の配信は SSE ではなく offset 付き page とした。読み手が保持するのは
+`nextOffset` だけで、これは `solvers watch --from` と同じ contract である。同じ
+append-only file を同じ規約で読むので、実装も理解も 1 つで済む。SSE は「毎回
+polling するより安い」以上の利点がないため、必要になってから足す。
 
 `POST /v1/runs` は path 値キーを含む config を拒否する(R10)。client は
 `POST /v1/validate` の正規化結果、つまり effective config を送る。
@@ -334,7 +355,7 @@ Tauri は「daemon を同梱起動して SPA をホストするだけ」の薄�
 |-------|------|----------|
 | **0**(完了) | 表面の刈り込み: GUI 削除、legacy 受理経路の削除、研究ライン削除(R8)、`crates/cli` へ集約、CI 簡素化、文書同期 | Multiway Preflop の production 表面が schema 付き config のみになる |
 | **1**(完了) | run directory 契約の確立: manifest/events 導入、`status`/`watch`/`runs ls`、run directory を受け取る `resume`、全 kind の schema 必須化、全 kind の `--out` 一本化 | GUI なしで長時間ランを投入・監視・再開できる |
-| **2** | `crates/protocol` + `solversd`(子プロセス管理・キュー・認証・SSE) | リモートホスト上の run を CLI から投入・監視・再開できる |
+| **2**(進行中) | `crates/protocol` + `solversd`(子プロセス管理・キュー・認証・event page)。TLS とリモート運用は残 | リモートホスト上の run を CLI から投入・監視・再開できる |
 | **3** | Web GUI(純クライアント SPA) | ローカル / リモートを同一 UI で扱える |
 
 Phase 1 と 2 の順序が重要である。run directory 契約を確定させてから daemon を書くことで、
@@ -396,6 +417,5 @@ B は「K を多数試す実験を再開する」場合にのみ再検討する�
 ## 10. 未決事項
 
 - Postflop / HU の config schema を正規化契約へ格上げするか(現在は版マーカーのみ)
-- daemon のジョブキュー方針(FIFO / 優先度 / メモリ予算ベース)
 - 生成された TypeScript 型の配置とドリフト検出手段
 - full-recall/sparse storage を削除するか、toy game を dense 契約へ移植するか

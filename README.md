@@ -35,7 +35,10 @@ its phases.
 ```
 crates/
 ├── cli         # `solvers` binary: config / validate / solve / resume /
-│               # inspect / evaluate / export / compare / report
+│               # status / watch / runs / inspect / evaluate / export /
+│               # compare / report
+├── protocol    # versioned wire types for the job daemon
+├── daemon      # `solversd`: creates run directories and spawns the CLI
 ├── cards       # card/chip/street types, range parser, hand-evaluator wrapper
 ├── hand-index  # suit-isomorphism board canonicalization
 ├── cfr-ref     # frozen scalar CFR oracle for differential testing
@@ -93,6 +96,28 @@ cargo run -p cli --release -- inspect examples/river_small.toml
 cargo run -p cli --release -- report examples/river_small.toml \
     --boards "2c 7d 9h Js Qs,2c 7d 9h Js Ks" --output report.csv
 ```
+
+## Running solves through a daemon
+
+`solversd` accepts a config over HTTP, prepares a run directory, and spawns
+`solvers` into it. It never solves anything itself and keeps no state of its
+own, so a restart finds every run by reading the runs root again.
+
+```bash
+cargo run -p daemon --release -- --runs runs --max-concurrent 1
+```
+
+It prints a bearer token at startup. Every request carries it:
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" localhost:38127/v1/runs
+curl -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+    -d "{\"configToml\": $(jq -Rs . < config.toml)}" localhost:38127/v1/runs
+curl -H "Authorization: Bearer $TOKEN" "localhost:38127/v1/runs/$ID/events?from=0"
+```
+
+Runs it creates are ordinary run directories: `solvers status` and
+`solvers watch` read them too.
 
 ## License
 

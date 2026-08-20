@@ -9,8 +9,8 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 use formats::{
     RUN_CHECKPOINT_FILE, RUN_CONFIG_FILE, RUN_HU_CHECKPOINT_FILE, RUN_HU_SOLUTION_FILE,
-    RUN_PROGRESS_FILE, RUN_RESULT_FILE, RUN_SOLUTION_FILE, RUN_STRATEGY_FILE, RunEventLevel,
-    RunEventLog, RunEventPayload, RunManifest, RunState,
+    RUN_MANIFEST_FILE, RUN_PROGRESS_FILE, RUN_RESULT_FILE, RUN_SOLUTION_FILE, RUN_STRATEGY_FILE,
+    RunEventLevel, RunEventLog, RunEventPayload, RunManifest, RunState,
 };
 
 use crate::multiway_solve::MultiwayRunObservation;
@@ -57,27 +57,44 @@ impl RunPaths {
     }
 }
 
-/// Requires `directory` to be absent or empty, and creates it.
+/// Prepares `directory` to receive a run: absent, empty, or queued.
 ///
-/// A run directory is the run's identity, so refusing to reuse a populated
-/// one keeps two runs from interleaving their events and artifacts.
-pub fn create_empty(directory: &Path) -> Result<()> {
-    if directory.exists() {
-        if !directory.is_dir() {
-            anyhow::bail!("run output {} is not a directory", directory.display());
-        }
-        if std::fs::read_dir(directory)
-            .with_context(|| format!("reading {}", directory.display()))?
-            .next()
-            .is_some()
-        {
-            anyhow::bail!("run output directory {} is not empty", directory.display());
-        }
-    } else {
-        std::fs::create_dir_all(directory)
-            .with_context(|| format!("creating {}", directory.display()))?;
+/// A run directory is the run's identity, so a populated one is refused --
+/// two runs writing into one directory would interleave their events and
+/// artifacts. The one exception is a directory a scheduler prepared: a
+/// `queued` manifest and the config to run, and nothing else. Queued runs
+/// have to exist on disk, because that is the only place the daemon keeps
+/// state, and a daemon restart has to find them again.
+pub fn create_or_adopt(directory: &Path) -> Result<()> {
+    if !directory.exists() {
+        return std::fs::create_dir_all(directory)
+            .with_context(|| format!("creating {}", directory.display()));
     }
-    Ok(())
+    if !directory.is_dir() {
+        anyhow::bail!("run output {} is not a directory", directory.display());
+    }
+    let entries: Vec<String> = std::fs::read_dir(directory)
+        .with_context(|| format!("reading {}", directory.display()))?
+        .filter_map(Result::ok)
+        .map(|entry| entry.file_name().to_string_lossy().into_owned())
+        .collect();
+    if entries.is_empty() {
+        return Ok(());
+    }
+    // `stdout.log` is the scheduler's own capture of this process, opened
+    // before the run starts.
+    let prepared = [RUN_MANIFEST_FILE, RUN_CONFIG_FILE, "stdout.log"];
+    let only_prepared = entries.iter().all(|name| prepared.contains(&name.as_str()));
+    let queued = RunManifest::read(directory)
+        .map(|manifest| manifest.state == RunState::Queued)
+        .unwrap_or(false);
+    if only_prepared && queued {
+        return Ok(());
+    }
+    anyhow::bail!(
+        "run output directory {} is not empty, and is not a queued run to adopt",
+        directory.display()
+    )
 }
 
 /// Owns a run's `manifest.json` and `events.jsonl` for the duration of a
@@ -105,8 +122,16 @@ impl RunRecorder {
             .file_name()
             .map(|name| name.to_string_lossy().into_owned())
             .unwrap_or_else(|| directory.display().to_string());
-        let manifest =
+        let mut manifest =
             RunManifest::new(run_id, game_kind, config_schema, hex(&config_hash), command);
+        // Adopting a queued run keeps the moment it was accepted, so a
+        // client sees the wait it actually had rather than the wait after
+        // a slot opened.
+        if let Ok(queued) = RunManifest::read(directory)
+            && queued.state == RunState::Queued
+        {
+            manifest.created_unix_ms = queued.created_unix_ms;
+        }
         manifest
             .write_atomic(directory)
             .with_context(|| format!("writing the run manifest in {}", directory.display()))?;
@@ -270,15 +295,69 @@ mod tests {
         let run = directory.path().join("run");
         std::fs::create_dir(&run).unwrap();
         std::fs::write(run.join("stray.txt"), "x").unwrap();
-        let error = create_empty(&run).unwrap_err().to_string();
+        let error = create_or_adopt(&run).unwrap_err().to_string();
         assert!(error.contains("not empty"), "{error}");
+    }
+
+    /// A scheduler writes the manifest and config before a slot frees up,
+    /// so the run is visible while it waits. The solve then adopts that
+    /// directory instead of refusing it.
+    #[test]
+    fn a_queued_run_directory_is_adopted_and_keeps_its_identity() {
+        let directory = tempfile::tempdir().unwrap();
+        let run = directory.path().join("queued-run");
+        std::fs::create_dir(&run).unwrap();
+        let mut prepared = RunManifest::new(
+            "queued-run",
+            "pending",
+            None,
+            "pending",
+            vec!["solve".into()],
+        );
+        prepared.state = RunState::Queued;
+        prepared.created_unix_ms = 1_700_000_000_000;
+        prepared.write_atomic(&run).unwrap();
+        std::fs::write(run.join(RUN_CONFIG_FILE), "schema = \"x\"\n").unwrap();
+
+        create_or_adopt(&run).expect("a queued directory must be adoptable");
+        let recorder = RunRecorder::start(
+            &run,
+            "kuhn",
+            Some("solvers.toy/v1".into()),
+            [1; 32],
+            "schema = \"solvers.toy/v1\"\n",
+            vec!["solve".into()],
+        )
+        .unwrap();
+        recorder.finish(Ok(()), Some("completed".into())).unwrap();
+
+        let manifest = RunManifest::read(&run).unwrap();
+        assert_eq!(manifest.state, RunState::Completed);
+        assert_eq!(manifest.game_kind, "kuhn");
+        assert_eq!(
+            manifest.created_unix_ms, 1_700_000_000_000,
+            "the queued moment must survive adoption"
+        );
+    }
+
+    /// A directory holding a finished run is not a queued one, and must not
+    /// be silently reused.
+    #[test]
+    fn a_finished_run_directory_is_not_adopted() {
+        let directory = tempfile::tempdir().unwrap();
+        let run = directory.path().join("done");
+        std::fs::create_dir(&run).unwrap();
+        let mut manifest = RunManifest::new("done", "kuhn", None, "aa", vec!["solve".into()]);
+        manifest.finish(RunState::Completed, None);
+        manifest.write_atomic(&run).unwrap();
+        assert!(create_or_adopt(&run).is_err());
     }
 
     #[test]
     fn a_completed_run_closes_its_manifest_and_events() {
         let directory = tempfile::tempdir().unwrap();
         let run = directory.path().join("run");
-        create_empty(&run).unwrap();
+        create_or_adopt(&run).unwrap();
         let recorder = RunRecorder::start(
             &run,
             "preflop-multiway",
@@ -319,7 +398,7 @@ mod tests {
     fn a_cancelled_run_closes_as_canceled() {
         let directory = tempfile::tempdir().unwrap();
         let run = directory.path().join("run");
-        create_empty(&run).unwrap();
+        create_or_adopt(&run).unwrap();
         let recorder =
             RunRecorder::start(&run, "preflop-multiway", None, [0; 32], "", Vec::new()).unwrap();
         recorder.finish(Ok(()), Some("cancelled".into())).unwrap();
@@ -330,7 +409,7 @@ mod tests {
     fn a_failed_run_records_the_error_and_returns_it() {
         let directory = tempfile::tempdir().unwrap();
         let run = directory.path().join("run");
-        create_empty(&run).unwrap();
+        create_or_adopt(&run).unwrap();
         let recorder =
             RunRecorder::start(&run, "preflop-multiway", None, [0; 32], "", Vec::new()).unwrap();
         let error = recorder

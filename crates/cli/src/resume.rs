@@ -108,7 +108,7 @@ fn resume_heads_up(
     // the original stays exactly as it was left.
     let directory = match out {
         Some(fork) => {
-            crate::run_dir::create_empty(fork)?;
+            crate::run_dir::create_or_adopt(fork)?;
             std::fs::write(fork.join(formats::RUN_CONFIG_FILE), raw)?;
             std::fs::copy(checkpoint_path, fork.join(formats::RUN_HU_CHECKPOINT_FILE))?;
             fork

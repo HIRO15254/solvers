@@ -64,7 +64,7 @@ pub fn run(
              not --history"
         ));
     }
-    crate::run_dir::create_empty(out)?;
+    crate::run_dir::create_or_adopt(out)?;
     let config: SolveConfig =
         crate::config::parse_solve_config_at(raw, config_path).context("parsing config")?;
     let run_paths = if is_multiway_v1 {
