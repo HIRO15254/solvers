@@ -14,6 +14,8 @@
 # this board (chance-node fan-out and node/element counts are governed by
 # the board length and bet grammar, not by which combos carry weight), so
 # both ranges are picked for realism, not to hit the target.
+schema = "solvers.postflop/v1"
+
 [game]
 kind = "postflop"
 board = "Qs Jh 2h"

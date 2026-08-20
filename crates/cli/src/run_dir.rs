@@ -8,29 +8,51 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use formats::{
-    RUN_CHECKPOINT_FILE, RUN_CONFIG_FILE, RUN_PROGRESS_FILE, RUN_RESULT_FILE, RUN_SOLUTION_FILE,
-    RunEventLevel, RunEventLog, RunEventPayload, RunManifest, RunState,
+    RUN_CHECKPOINT_FILE, RUN_CONFIG_FILE, RUN_HU_CHECKPOINT_FILE, RUN_HU_SOLUTION_FILE,
+    RUN_PROGRESS_FILE, RUN_RESULT_FILE, RUN_SOLUTION_FILE, RUN_STRATEGY_FILE, RunEventLevel,
+    RunEventLog, RunEventPayload, RunManifest, RunState,
 };
 
 use crate::multiway_solve::MultiwayRunObservation;
 
 /// The artifact paths inside one run directory.
+///
+/// The layout is the same for every game; only the two engine-specific
+/// artifacts differ, because the heads-up engine and the multiway engine
+/// write different checkpoint and solution formats.
 pub struct RunPaths {
     pub directory: PathBuf,
     pub result: PathBuf,
     pub progress: PathBuf,
     pub checkpoint: PathBuf,
     pub solution: PathBuf,
+    /// Average strategy for the requested betting lines. Heads-up only:
+    /// the multiway path publishes strategy through `solution.mwsol`.
+    pub strategy: PathBuf,
 }
 
 impl RunPaths {
-    pub fn new(directory: &Path) -> Self {
+    /// Layout for the sampled multiway engine (`.mwckpt` / `.mwsol`).
+    pub fn multiway(directory: &Path) -> Self {
         Self {
             directory: directory.to_path_buf(),
             result: directory.join(RUN_RESULT_FILE),
             progress: directory.join(RUN_PROGRESS_FILE),
             checkpoint: directory.join(RUN_CHECKPOINT_FILE),
             solution: directory.join(RUN_SOLUTION_FILE),
+            strategy: directory.join(RUN_STRATEGY_FILE),
+        }
+    }
+
+    /// Layout for the exact heads-up engine (`.ckpt` / `.sol`).
+    pub fn heads_up(directory: &Path) -> Self {
+        Self {
+            directory: directory.to_path_buf(),
+            result: directory.join(RUN_RESULT_FILE),
+            progress: directory.join(RUN_PROGRESS_FILE),
+            checkpoint: directory.join(RUN_HU_CHECKPOINT_FILE),
+            solution: directory.join(RUN_HU_SOLUTION_FILE),
+            strategy: directory.join(RUN_STRATEGY_FILE),
         }
     }
 }
@@ -141,6 +163,16 @@ impl RunRecorder {
             manifest,
             events,
         })
+    }
+
+    /// The run's single event writer.
+    ///
+    /// Everything that appends to `events.jsonl` must go through this one
+    /// handle: two writers would each keep their own `seq` counter and
+    /// produce duplicate sequence numbers, which is exactly what a reader
+    /// uses to detect a gap.
+    pub fn events_mut(&mut self) -> &mut RunEventLog {
+        &mut self.events
     }
 
     /// Turns solver observations into run events. Live and quality samples

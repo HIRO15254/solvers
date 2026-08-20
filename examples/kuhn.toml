@@ -1,4 +1,6 @@
 # Kuhn poker to near-exact convergence. Expected value for P0: -1/18.
+schema = "solvers.toy/v1"
+
 [game]
 kind = "kuhn"
 

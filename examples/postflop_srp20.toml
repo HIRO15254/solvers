@@ -1,5 +1,7 @@
 # Single-raised-pot flop, full 1,326-combo ranges, three streets, two raises
 # per street. Release-scale: do not run this to completion in a debug build.
+schema = "solvers.postflop/v1"
+
 [game]
 kind = "postflop"
 board = "Ks 7h 2d"

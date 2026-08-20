@@ -2,6 +2,8 @@
 # raises with all-in offered at every level, limp allowed. Shares the same
 # equity cache as the push/fold example (same 169x169 table regardless of
 # stack depth or betting grammar).
+schema = "solvers.preflop-hu/v1"
+
 [game]
 kind = "preflop"
 effective_stack_bb = 100.0

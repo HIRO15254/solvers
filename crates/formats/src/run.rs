@@ -31,8 +31,14 @@ pub const RUN_EVENTS_FILE: &str = "events.jsonl";
 pub const RUN_PROGRESS_FILE: &str = "progress.jsonl";
 pub const RUN_RESULT_FILE: &str = "run.json";
 pub const RUN_CONFIG_FILE: &str = "run.toml";
+/// Multiway artifacts. The heads-up engine writes its own formats, so its
+/// two artifacts have distinct names inside the same directory layout.
 pub const RUN_CHECKPOINT_FILE: &str = "checkpoint.mwckpt";
 pub const RUN_SOLUTION_FILE: &str = "solution.mwsol";
+pub const RUN_HU_CHECKPOINT_FILE: &str = "checkpoint.ckpt";
+pub const RUN_HU_SOLUTION_FILE: &str = "solution.sol";
+/// Average strategy for the requested betting lines (heads-up path).
+pub const RUN_STRATEGY_FILE: &str = "strategy.json";
 
 /// Where a run is in its lifecycle.
 ///

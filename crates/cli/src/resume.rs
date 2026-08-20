@@ -270,7 +270,7 @@ fn run_self_contained_multiway(
     } else {
         checkpoint_path
     };
-    let paths = crate::run_dir::RunPaths::new(directory);
+    let paths = crate::run_dir::RunPaths::multiway(directory);
     let config_hash = formats::config_hash(raw.as_bytes());
     let mut recorder = crate::run_dir::RunRecorder::reopen(
         directory,
@@ -320,6 +320,8 @@ mod tests {
     fn legacy_non_multiway_rejects_max_sweeps() {
         let mut config: SolveConfig = toml::from_str(
             r#"
+schema = "solvers.toy/v1"
+
 [game]
 kind = "kuhn"
 

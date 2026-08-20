@@ -71,9 +71,11 @@ fn read_status(directory: &Path) -> Result<RunStatus> {
         config_hash: manifest.config_hash.clone(),
         completion: manifest.completion.clone(),
         failure: manifest.failure.clone(),
+        // Multiway rows count sweeps; the heads-up engine counts
+        // iterations. Both mean "how far has this run got".
         sweeps: progress
             .as_ref()
-            .and_then(|row| row.get("sweeps")?.as_u64()),
+            .and_then(|row| row.get("sweeps").or_else(|| row.get("iteration"))?.as_u64()),
         elapsed_secs: progress
             .as_ref()
             .and_then(|row| row.get("elapsedSecs")?.as_f64()),

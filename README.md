@@ -50,9 +50,13 @@ crates/
 
 ## Quick start
 
+Every config declares the family it belongs to: `solvers.toy/v1`,
+`solvers.postflop/v1`, `solvers.preflop-hu/v1`, or `solvers.multiway-preflop/v1`.
+Every solve writes one run directory.
+
 ```sh
 cargo test --workspace            # correctness harness (Kuhn/Leduc known solutions, oracle diff)
-cargo run -p cli --release -- solve examples/kuhn.toml
+cargo run -p cli --release -- solve examples/kuhn.toml --out runs/kuhn
 
 # --- Preflop ---------------------------------------------------------------
 # Multiway Preflop v1: validate, then write one self-contained run directory.

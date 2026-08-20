@@ -75,31 +75,40 @@ pub fn run(
             ));
         }
         crate::run_dir::create_empty(directory)?;
-        run_paths = Some(crate::run_dir::RunPaths::new(directory));
-    } else if out.is_some() {
-        return Err(anyhow!(
-            "--out is reserved for schema = {:?}; legacy configs use their existing output flags",
-            crate::multiway_v1::SCHEMA
-        ));
+        run_paths = Some(crate::run_dir::RunPaths::multiway(directory));
+    } else if let Some(directory) = out {
+        if output.is_some() || metrics.is_some() || checkpoint.is_some() || sol.is_some() {
+            return Err(anyhow!(
+                "--out writes a run directory; remove the individual \
+                 --output/--metrics/--checkpoint/--sol paths"
+            ));
+        }
+        crate::run_dir::create_empty(directory)?;
+        run_paths = Some(crate::run_dir::RunPaths::heads_up(directory));
     }
-    let output = run_paths
-        .as_ref()
-        .map(|paths| paths.result.as_path())
-        .or(output);
-    let metrics = run_paths
-        .as_ref()
-        .map(|paths| paths.progress.as_path())
-        .or(metrics);
-    let checkpoint = run_paths
-        .as_ref()
-        .map(|paths| paths.checkpoint.as_path())
-        .or(checkpoint);
-    let sol = run_paths
-        .as_ref()
-        .map(|paths| paths.solution.as_path())
-        .or(sol);
     let mut config: SolveConfig =
         crate::config::parse_solve_config_at(raw, config_path).context("parsing config")?;
+
+    // A run directory supplies every artifact path. The two engines differ
+    // only in which file each artifact lands in: the multiway path reports
+    // its summary as `run.json` and its strategy inside `solution.mwsol`,
+    // while the heads-up path writes a separate `strategy.json` and only
+    // has a `.sol` viewer artifact for postflop games.
+    let (output, metrics, checkpoint, sol) = match run_paths.as_ref() {
+        Some(paths) if is_multiway_v1 => (
+            Some(paths.result.as_path()),
+            Some(paths.progress.as_path()),
+            Some(paths.checkpoint.as_path()),
+            Some(paths.solution.as_path()),
+        ),
+        Some(paths) => (
+            Some(paths.strategy.as_path()),
+            Some(paths.progress.as_path()),
+            Some(paths.checkpoint.as_path()),
+            matches!(config.game, GameSection::Postflop { .. }).then(|| paths.solution.as_path()),
+        ),
+        None => (output, metrics, checkpoint, sol),
+    };
 
     if !is_multiway_v1 && matches!(config.game, GameSection::PreflopMultiway(_)) {
         return Err(anyhow!(
@@ -194,6 +203,89 @@ pub fn run(
         None => None,
     };
 
+    let Some(paths) = run_paths.as_ref() else {
+        return solve_heads_up(
+            config,
+            output,
+            histories,
+            metrics,
+            checkpoint_sink,
+            sol_spec,
+            None,
+        )
+        .map(|_summary| ());
+    };
+
+    let game_kind = game_kind_name(&config.game);
+    let mut recorder = crate::run_dir::RunRecorder::start(
+        &paths.directory,
+        game_kind,
+        None,
+        config_hash,
+        raw,
+        vec![
+            "solve".to_string(),
+            config_path.display().to_string(),
+            "--out".to_string(),
+            paths.directory.display().to_string(),
+        ],
+    )?;
+    let outcome = solve_heads_up(
+        config,
+        output,
+        histories,
+        metrics,
+        checkpoint_sink,
+        sol_spec,
+        Some(recorder.events_mut()),
+    );
+    // A heads-up run has no solver-reported completion status: it either
+    // reached its iteration budget or its `target_nash_conv`. Record the
+    // convergence summary as `run.json` so `status` reports the same shape
+    // a multiway run does.
+    let completion = match &outcome {
+        Ok(summary) => {
+            let recorded = serde_json::json!({
+                "kind": game_kind,
+                "iterations": summary.iterations,
+                "wallSecs": summary.wall.as_secs_f64(),
+                "explP0": summary.expl_p0,
+                "explP1": summary.expl_p1,
+                "nashConv": summary.nash_conv,
+            });
+            std::fs::write(
+                &paths.result,
+                format!("{}\n", serde_json::to_string_pretty(&recorded)?),
+            )
+            .with_context(|| format!("writing {}", paths.result.display()))?;
+            Some("completed".to_string())
+        }
+        Err(_) => None,
+    };
+    recorder.finish(outcome.map(|_summary| ()), completion)
+}
+
+/// Names the game for a run manifest. These match the config's `kind`.
+fn game_kind_name(game: &GameSection) -> &'static str {
+    match game {
+        GameSection::Kuhn => "kuhn",
+        GameSection::Leduc => "leduc",
+        GameSection::Postflop { .. } => "postflop",
+        GameSection::Preflop { .. } => "preflop",
+        GameSection::PreflopMultiway(_) => "preflop-multiway",
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn solve_heads_up(
+    config: SolveConfig,
+    output: Option<&Path>,
+    histories: &[String],
+    metrics: Option<&Path>,
+    checkpoint_sink: Option<(&Path, [u8; 32])>,
+    sol_spec: Option<SolExportSpec>,
+    events: Option<&mut formats::RunEventLog>,
+) -> Result<RunSummary> {
     match config.run.storage {
         StorageKind::F32 => run_with_storage_sol::<F32Storage>(
             config,
@@ -203,6 +295,7 @@ pub fn run(
             checkpoint_sink,
             None,
             sol_spec,
+            events,
         ),
         StorageKind::I16 => run_with_storage_sol::<I16Storage>(
             config,
@@ -212,9 +305,9 @@ pub fn run(
             checkpoint_sink,
             None,
             sol_spec,
+            events,
         ),
     }
-    .map(|_summary| ())
 }
 
 /// Optional side effects hooked into [`run_loop`]'s exploitability-check
@@ -226,6 +319,10 @@ pub(crate) struct RunHooks<'a> {
     pub metrics: Option<&'a mut formats::MetricsWriter>,
     /// Checkpoint path and the config-file hash to stamp it with.
     pub checkpoint: Option<(&'a Path, [u8; 32])>,
+    /// Run event log, when the solve owns a run directory. Checkpoint
+    /// events go here so `watch` shows the same lifecycle for a heads-up
+    /// run as for a multiway one.
+    pub events: Option<&'a mut formats::RunEventLog>,
     /// Wall-clock reference for `MetricsRow::elapsed_secs`, taken once at
     /// the start of the (possibly resumed) solve.
     pub start: Instant,
@@ -236,6 +333,7 @@ impl RunHooks<'static> {
         RunHooks {
             metrics: None,
             checkpoint: None,
+            events: None,
             start: Instant::now(),
         }
     }
@@ -266,12 +364,14 @@ pub(crate) fn run_with_storage<S: Storage>(
         checkpoint,
         resume_state,
         None,
+        None,
     )
 }
 
 /// Same as [`run_with_storage`], but additionally exports a `.sol` viewer
 /// artifact once the run completes (postflop configs only) when `sol` is
 /// `Some`.
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn run_with_storage_sol<S: Storage>(
     config: SolveConfig,
     output: Option<&Path>,
@@ -280,6 +380,7 @@ pub(crate) fn run_with_storage_sol<S: Storage>(
     checkpoint: Option<(&Path, [u8; 32])>,
     resume_state: Option<SolverState>,
     sol: Option<SolExportSpec>,
+    events: Option<&mut formats::RunEventLog>,
 ) -> Result<RunSummary> {
     run_with_storage_impl::<S>(
         config,
@@ -289,6 +390,7 @@ pub(crate) fn run_with_storage_sol<S: Storage>(
         checkpoint,
         resume_state,
         sol,
+        events,
     )
 }
 
@@ -301,6 +403,7 @@ fn run_with_storage_impl<S: Storage>(
     checkpoint: Option<(&Path, [u8; 32])>,
     resume_state: Option<SolverState>,
     sol: Option<SolExportSpec>,
+    events: Option<&mut formats::RunEventLog>,
 ) -> Result<RunSummary> {
     let rake = postflop_setup::build_rake(&config.rake);
     let utility = postflop_setup::build_utility(&config.utility);
@@ -318,6 +421,7 @@ fn run_with_storage_impl<S: Storage>(
     let mut hooks = RunHooks {
         metrics: metrics_writer.as_mut(),
         checkpoint,
+        events,
         start: Instant::now(),
     };
 
@@ -468,10 +572,16 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
 /// converges (or hits its iteration cap) between two `check_every` marks.
 fn checkpoint_now<E: TerminalEvaluator, S: Storage>(
     solver: &Solver<E, S>,
-    hooks: &RunHooks<'_>,
+    hooks: &mut RunHooks<'_>,
 ) -> Result<()> {
-    if let Some((path, hash)) = hooks.checkpoint {
-        formats::write_checkpoint(path, hash, &solver.state())?;
+    let Some((path, hash)) = hooks.checkpoint else {
+        return Ok(());
+    };
+    formats::write_checkpoint(path, hash, &solver.state())?;
+    if let Some(events) = hooks.events.as_deref_mut() {
+        let _ = events.info(formats::RunEventPayload::Checkpoint {
+            sweeps: solver.iteration(),
+        });
     }
     Ok(())
 }

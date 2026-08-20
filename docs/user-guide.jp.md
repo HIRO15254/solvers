@@ -11,7 +11,8 @@
 
 テキサスホールデム(NLHE)の **2〜9 人テーブルのプリフロップ戦略** を計算する。
 
-入力は「テーブルのルール一式」を書いた TOML 設定:
+入力は「テーブルのルール一式」を書いた TOML 設定である。先頭でschemaを宣言する
+(Multiway Preflopは`solvers.multiway-preflop/v1`、他はpostflop / preflop-hu / toy):
 
 - 席ごとのスタック(bb)と参加レンジ(省略時は全 1,326 コンボ)
 - ブラインド、アンティ(each / big-blind ante)、ボタン位置

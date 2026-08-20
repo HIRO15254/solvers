@@ -14,6 +14,8 @@
 # every `#[ignore]`d test in release via `--include-ignored`, and a 10-minute
 # cold build would blow that budget. The orchestrator validates this config
 # end-to-end manually instead.
+schema = "solvers.preflop-hu/v1"
+
 [game]
 kind = "preflop"
 effective_stack_bb = 100.0

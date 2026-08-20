@@ -1,6 +1,8 @@
 # 10bb push/fold: the SB may only jam or fold; the BB may only call or fold.
 # The exact 169x169 equity table takes about a minute to compute in release
 # mode, so this caches it to disk after the first run.
+schema = "solvers.preflop-hu/v1"
+
 [game]
 kind = "preflop"
 effective_stack_bb = 10.0

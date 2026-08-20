@@ -108,7 +108,21 @@ daemon が提供する操作はすべて CLI からも実行できること(`sol
 削除対象は「legacy TOML を利用者入力として受理する経路」であって、内部 IR ではない。
 
 schema は toy game(kuhn / leduc)を含む全 kind に必須とする。パーサの分岐が 1 本になり、
-クライアントは schema 文字列だけで kind を判定できる。
+クライアントは schema 文字列だけで kind を判定できる。family は 4 つ:
+
+| schema | game.kind | 位置づけ |
+|---|---|---|
+| `solvers.multiway-preflop/v1` | `preflop-multiway` | 正規化契約。専用仕様書を持つ |
+| `solvers.postflop/v1` | `postflop` | 共有 config 形状の版マーカー |
+| `solvers.preflop-hu/v1` | `preflop` | 同上 |
+| `solvers.toy/v1` | `kuhn` / `leduc` | 同上 |
+
+後者 3 つは「どのパーサが読むか」を宣言するものであり、Multiway v1 のような
+正規化・effective config・error code 体系を持つという意味ではない。それらを
+導入する場合は v2 として別に切る。
+
+lowered 形状(`kind = "preflop-multiway"` を持つ共有 struct)は利用者が書く config
+family ではないため、schema 宣言を要求しない。手書きは全入口が MWP003 で拒否する。
 
 ### R7. リモートは「同じ daemon を別ホストで動かす」だけ
 
@@ -254,7 +268,7 @@ Tauri は「daemon を同梱起動して SPA をホストするだけ」の薄�
 | Phase | 内容 | 完了条件 |
 |-------|------|----------|
 | **0**(完了) | 表面の刈り込み: GUI 削除、legacy 受理経路の削除、研究ライン削除(R8)、`crates/cli` へ集約、CI 簡素化、文書同期 | Multiway Preflop の production 表面が schema 付き config のみになる |
-| **1**(進行中) | run directory 契約の確立: manifest/events 導入、`status`/`watch`/`runs ls` 追加、run directory を受け取る `resume`(完了)。全 kind の schema 必須化と `--out` 一本化(残) | GUI なしで長時間ランを投入・監視・再開できる |
+| **1**(完了) | run directory 契約の確立: manifest/events 導入、`status`/`watch`/`runs ls`、run directory を受け取る `resume`、全 kind の schema 必須化、全 kind の `--out` 一本化 | GUI なしで長時間ランを投入・監視・再開できる |
 | **2** | `crates/protocol` + `solversd`(子プロセス管理・キュー・認証・SSE) | リモートホスト上の run を CLI から投入・監視・再開できる |
 | **3** | Web GUI(純クライアント SPA) | ローカル / リモートを同一 UI で扱える |
 

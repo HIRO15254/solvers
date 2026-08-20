@@ -396,6 +396,7 @@ fn build_multiway_session_internal(
     let config: SolveConfig =
         crate::config::parse_solve_config(raw_toml).context("parsing config")?;
     let SolveConfig {
+        schema: _,
         game,
         rake,
         utility,
@@ -706,6 +707,7 @@ fn build_deviation_reference(
     let config: SolveConfig =
         crate::config::parse_solve_config(raw_toml).context("parsing reference config")?;
     let SolveConfig {
+        schema: _,
         game,
         rake,
         utility,

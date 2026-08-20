@@ -1,6 +1,8 @@
 # Kuhn poker with the quantized i16 storage backend (see engine::I16Storage):
 # checks that the quantized backend still converges and that its
 # StorageState::I16 checkpoint variant round-trips.
+schema = "solvers.toy/v1"
+
 [game]
 kind = "kuhn"
 

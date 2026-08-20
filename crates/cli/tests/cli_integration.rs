@@ -187,6 +187,8 @@ fn done_line_field(stdout: &str, key: &str) -> String {
 /// the two runs' step counts diverge, since checking it is unconditional
 /// wall-clock/loop-position-dependent, not just a function of iteration).
 const KUHN_NO_EARLY_STOP: &str = r#"
+schema = "solvers.toy/v1"
+
 [game]
 kind = "kuhn"
 
@@ -423,6 +425,8 @@ fn resume_tampered_config_errors() {
 /// than shared) since this is a separate test binary with no access to
 /// `cli`'s internal `sol` module.
 const TINY_TURN_TOML: &str = r#"
+schema = "solvers.postflop/v1"
+
 [game]
 kind = "postflop"
 board = "2s 7s Ks 2h"
@@ -523,6 +527,8 @@ fn sol_export_and_inspect_smoke() {
 /// end-to-end navigation smoke, not an accuracy check, see `sol.rs`'s
 /// `river_resolve_accuracy` unit test for that).
 const TINY_TURN_TOML_NO_ISO: &str = r#"
+schema = "solvers.postflop/v1"
+
 [game]
 kind = "postflop"
 board = "2s 7s Ks 2h"
@@ -668,6 +674,8 @@ fn i16_storage_solve_converges_and_checkpoint_round_trips() {
 /// so the exact equity table's compute-then-cache-hit round trip is
 /// self-contained and never touches a shared/repo-level cache.
 const PREFLOP_PUSHFOLD_TOML_TEMPLATE: &str = r#"
+schema = "solvers.preflop-hu/v1"
+
 [game]
 kind = "preflop"
 effective_stack_bb = 10.0
@@ -765,6 +773,8 @@ fn preflop_pushfold_solve_smoke() {
 fn preflop_bucketed_unsupported_model_errors() {
     let dir = temp_dir("preflop-bucketed-bad-model");
     let config_text = r#"
+schema = "solvers.preflop-hu/v1"
+
 [game]
 kind = "preflop"
 effective_stack_bb = 10.0

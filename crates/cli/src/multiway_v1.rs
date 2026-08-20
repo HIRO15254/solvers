@@ -41,10 +41,26 @@ pub fn has_v1_schema(raw: &str) -> Result<bool> {
     let schema = schema
         .as_str()
         .ok_or_else(|| anyhow!("schema must be a string"))?;
-    if schema != SCHEMA {
-        bail!("unsupported config schema {schema:?}; expected {SCHEMA:?}");
+    if schema == SCHEMA {
+        return Ok(true);
     }
-    Ok(true)
+    // The other families are parsed by the shared solver config, which
+    // checks the declaration against `game.kind` itself. Only a string that
+    // belongs to no family is an error here.
+    if matches!(
+        schema,
+        crate::config::SCHEMA_TOY
+            | crate::config::SCHEMA_POSTFLOP
+            | crate::config::SCHEMA_PREFLOP_HU
+    ) {
+        return Ok(false);
+    }
+    bail!(
+        "unsupported config schema {schema:?}; expected one of {SCHEMA:?}, {:?}, {:?}, {:?}",
+        crate::config::SCHEMA_TOY,
+        crate::config::SCHEMA_POSTFLOP,
+        crate::config::SCHEMA_PREFLOP_HU
+    );
 }
 
 /// Enforces the release solve/resume contract without changing the
@@ -1558,6 +1574,7 @@ impl V1Config {
             });
         }
         Ok(SolveConfig {
+            schema: Some(SCHEMA.to_string()),
             game: GameSection::PreflopMultiway(MultiwayConfig {
                 seats,
                 button: SeatId::new_unchecked(self.game.button),

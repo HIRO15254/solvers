@@ -6,22 +6,74 @@ use serde::{Deserialize, Serialize};
 /// Parses either the legacy shared solver schema or the dedicated Multiway
 /// Preflop v1 schema. Keeping routing here gives every caller one canonical
 /// parser while v1 stays absent from the legacy `GameSection` wire format.
+/// Schema strings, one per config family. Every config declares one, so a
+/// reader knows which parser owns the file before looking at its contents,
+/// and a client can route on the string alone.
+///
+/// `solvers.multiway-preflop/v1` is a normalized contract with its own
+/// specification (`docs/multiway-preflop-v1.jp.md`). The three below are
+/// version markers over the shared solver config shape; they say which
+/// parser reads the file, not that the shape has been normalized.
+pub const SCHEMA_TOY: &str = "solvers.toy/v1";
+pub const SCHEMA_POSTFLOP: &str = "solvers.postflop/v1";
+pub const SCHEMA_PREFLOP_HU: &str = "solvers.preflop-hu/v1";
+
+/// The schema a `game.kind` must declare, or `None` for a shape that is not
+/// a user-facing config family.
+///
+/// `preflop-multiway` in this shared struct is the *lowered* form that
+/// `multiway_v1` produces, and that checkpoints and solution artifacts
+/// carry. It is not something a user writes: every CLI entry point already
+/// rejects a hand-written one with MWP003, which explains the migration far
+/// better than a missing-schema error would.
+fn expected_schema(game: &GameSection) -> Option<&'static str> {
+    match game {
+        GameSection::Kuhn | GameSection::Leduc => Some(SCHEMA_TOY),
+        GameSection::Postflop { .. } => Some(SCHEMA_POSTFLOP),
+        GameSection::Preflop { .. } => Some(SCHEMA_PREFLOP_HU),
+        GameSection::PreflopMultiway(_) => None,
+    }
+}
+
+/// Rejects a config that does not declare the schema its `game.kind`
+/// belongs to.
+///
+/// Requiring the declaration on every family -- toy games included -- keeps
+/// one rule instead of a list of exceptions, and means the run manifest can
+/// always record which contract a run was produced under.
+fn check_schema(config: &SolveConfig) -> anyhow::Result<()> {
+    let Some(expected) = expected_schema(&config.game) else {
+        return Ok(());
+    };
+    match config.schema.as_deref() {
+        Some(declared) if declared == expected => Ok(()),
+        Some(declared) => Err(anyhow::anyhow!(
+            "config declares schema = {declared:?} but its game.kind needs {expected:?}"
+        )),
+        None => Err(anyhow::anyhow!(
+            "config has no schema; add schema = {expected:?} at the top of the file"
+        )),
+    }
+}
+
 pub fn parse_solve_config(raw: &str) -> anyhow::Result<SolveConfig> {
     if crate::multiway_v1::has_v1_schema(raw)? {
-        crate::multiway_v1::parse_and_lower(raw)
-    } else {
-        toml::from_str(raw).map_err(Into::into)
+        return crate::multiway_v1::parse_and_lower(raw);
     }
+    let config: SolveConfig = toml::from_str(raw)?;
+    check_schema(&config)?;
+    Ok(config)
 }
 pub fn parse_solve_config_at(
     raw: &str,
     config_path: &std::path::Path,
 ) -> anyhow::Result<SolveConfig> {
     if crate::multiway_v1::has_v1_schema(raw)? {
-        crate::multiway_v1::parse_and_lower_at(raw, config_path)
-    } else {
-        toml::from_str(raw).map_err(Into::into)
+        return crate::multiway_v1::parse_and_lower_at(raw, config_path);
     }
+    let config: SolveConfig = toml::from_str(raw)?;
+    check_schema(&config)?;
+    Ok(config)
 }
 
 /// Replays solution artifacts written before full-recall regret pruning
@@ -129,6 +181,11 @@ pub(crate) fn solution_artifact_compatible_config(
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct SolveConfig {
+    /// The config family this file belongs to; see [`SCHEMA_TOY`] and its
+    /// siblings. Absent on a config lowered from another schema, whose
+    /// declaration lives in the source file rather than the lowered form.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub schema: Option<String>,
     pub game: GameSection,
     #[serde(default)]
     pub rake: RakeSection,
@@ -681,6 +738,8 @@ mod tests {
     #[test]
     fn preflop_config_minimal_applies_defaults() {
         let raw = r#"
+schema = "solvers.preflop-hu/v1"
+
 [game]
 kind = "preflop"
 effective_stack_bb = 100.0
@@ -724,6 +783,8 @@ iterations = 10
     #[test]
     fn preflop_config_fully_specified_overrides_every_default() {
         let raw = r#"
+schema = "solvers.preflop-hu/v1"
+
 [game]
 kind = "preflop"
 effective_stack_bb = 10.0
@@ -781,6 +842,8 @@ iterations = 10
     #[test]
     fn preflop_config_rejects_unknown_field() {
         let raw = r#"
+schema = "solvers.preflop-hu/v1"
+
 [game]
 kind = "preflop"
 effective_stack_bb = 100.0
@@ -801,6 +864,8 @@ iterations = 10
     #[test]
     fn postflop_section_absent_by_default() {
         let raw = r#"
+schema = "solvers.preflop-hu/v1"
+
 [game]
 kind = "preflop"
 effective_stack_bb = 100.0
@@ -821,6 +886,8 @@ iterations = 10
     #[test]
     fn postflop_section_parses_fully_specified() {
         let raw = r#"
+schema = "solvers.preflop-hu/v1"
+
 [game]
 kind = "preflop"
 effective_stack_bb = 100.0
@@ -871,6 +938,8 @@ iterations = 10
     #[test]
     fn postflop_section_defaults() {
         let raw = r#"
+schema = "solvers.preflop-hu/v1"
+
 [game]
 kind = "preflop"
 effective_stack_bb = 100.0
@@ -904,6 +973,8 @@ iterations = 10
     #[test]
     fn postflop_section_rejects_unknown_field() {
         let raw = r#"
+schema = "solvers.preflop-hu/v1"
+
 [game]
 kind = "preflop"
 effective_stack_bb = 100.0

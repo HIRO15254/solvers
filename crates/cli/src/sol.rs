@@ -581,6 +581,8 @@ mod tests {
     /// single chance node whose children are exactly the river-entry nodes,
     /// small enough to build/solve/re-solve fast even in a debug build.
     const TINY_TURN_TOML: &str = r#"
+schema = "solvers.postflop/v1"
+
 [game]
 kind = "postflop"
 board = "2s 7s Ks 2h"
@@ -609,6 +611,8 @@ check_every = 32
     /// river at all, so `export_sol` must force `Full` regardless of the
     /// caller's requested mode.
     const TINY_RIVER_TOML: &str = r#"
+schema = "solvers.postflop/v1"
+
 [game]
 kind = "postflop"
 board = "2s 7s Ks 2h 9d"
