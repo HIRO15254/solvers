@@ -350,15 +350,77 @@ polling するより安い」以上の利点がないため、必要になって
 認証は bearer token(daemon 起動時に生成し、ローカルは設定ディレクトリに保存)。
 同時実行数は daemon がキューで制限する(1 run あたり数 GiB の arena を確保するため)。
 
-## 8. GUI の責務
+## 8. GUI 設計(Phase 3、未着手)
 
-**担うもの:** config の組み立て UI、run の一覧と状態表示、進捗の可視化、成果物(戦略・EV)の閲覧、
-接続プロファイル(URL + token)の管理。
+本章は実装前の設計記録である。着手条件は §8.6 に置いた。
 
-**担わないもの:** config の検証・正規化(R4)、ソルバー実行(R1)、ジョブ状態の保持(R2)、
-ローカル専用経路(R7)。
+### 8.1 責務
 
-Tauri は「daemon を同梱起動して SPA をホストするだけ」の薄いシェルとして後付け可能だが必須ではない。
+**担うもの:** config の組み立て UI、run の一覧と状態表示、進捗の可視化、成果物
+(戦略・EV)の閲覧、接続プロファイル(URL + token)の管理。
+
+**担わないもの:** config の検証・正規化(R4)、ソルバー実行(R1)、ジョブ状態の保持
+(R2)、ローカル専用経路(R7)。
+
+GUI は daemon の純クライアントである。**GUI が持ってよい状態は、接続プロファイルと
+「どの run のどのオフセットまで読んだか」だけ**で、それ以外は必ずサーバへ問い合わせる。
+旧構成が壊れたのは、この境界を越えて GUI 側に job 状態を持たせたためである(§2)。
+
+### 8.2 画面と、必要な API
+
+| 画面 | 役割 | 使う endpoint |
+|---|---|---|
+| Connect | URL と token の管理、接続確認 | `GET /v1` |
+| Setup | config の組み立て・検証・resource 見積り | `POST /v1/validate`(`resources: true`) |
+| Runs | run 一覧、state、進捗、投入 | `GET /v1/runs`、`POST /v1/runs` |
+| Run detail | 1 run の進捗・event・cancel・resume | `GET /v1/runs/{id}`、`/events?from=`、`/cancel`、`/resume` |
+| Results | 戦略・EV・tree の閲覧、成果物取得 | `/solution/{view}`、`/artifacts`、`/artifacts/{name}` |
+
+Setup 画面は**自前で config を検証しない**。TOML を組み立てて `POST /v1/validate` へ
+投げ、返ってきた診断と正規化結果をそのまま表示する。投入するのはその正規化結果
+(effective config)であり、これが R10 を満たす唯一の方法でもある。
+
+### 8.3 event の追い方
+
+run detail は `GET /v1/runs/{id}/events?from=OFFSET` を polling し、`nextOffset` だけを
+保持する。再接続時はその値から再開すれば、切断していた時間の長さに関係なく取りこぼしが
+ない。`seq` の連続性が欠落の検出手段である。
+
+`terminal: true` を受け取ったら polling を止める。進捗の数値(sweeps、elapsed)は event
+ではなく `GET /v1/runs/{id}` から取る。両者は更新頻度も意味も違う(§5.1)。
+
+polling 間隔は 1--2 秒で始めてよい。SSE を足すのは、この頻度が実測で問題になってから
+判断する(§7)。
+
+### 8.4 型の生成
+
+TypeScript の型は `crates/protocol` から生成し、手書きしない(R4)。旧構成では
+`setup-config.ts` が Rust と別に config を解釈しており、仕様変更のたびに二重更新が
+必要だった。生成手段と drift 検出は未決(§10)。
+
+### 8.5 配布
+
+静的 SPA として配れる。Tauri は「daemon を同梱起動して SPA をホストするだけ」の薄い
+シェルとして後付け可能だが必須ではなく、**GUI が Tauri の有無で挙動を変えてはならない**。
+ローカルもリモートも同じ HTTP クライアントを使う(R7)。
+
+### 8.6 着手条件
+
+**CLI と protocol の表面が落ち着いてから着手する。** GUI は CLI 表面の投影であり、
+土台が動いている間に作ると、旧構成と同じく二重実装と drift を招く。具体的には、
+着手前に次を確定させる。
+
+1. **Postflop / HU の config schema**(§10)。Setup 画面の形はここで決まる。正規化契約へ
+   格上げするなら effective config と error code 体系が付き、しないなら Setup は
+   Multiway v1 専用になる。
+2. **TypeScript 型の生成手段**(§10)。手書きに逃げる余地を残さないため、最初の 1 行を
+   書く前に決める。
+3. **TLS**(§9 Phase 2 残)。remote profile を UI に出す以上、接続が保護されている必要が
+   ある。ローカルのみで始めるなら後回しでよい。
+
+旧 SPA(2026-08 に削除)の画面構成とコンポーネントは、tag `pre-gui-removal` 以前の
+Git 履歴に残っている。`strategy-matrix`、`betting-tree-editor`、`table-range-editor` は
+UX 資産として参照する価値があるが、config を TS 側で解釈する構造は再導入しない。
 
 ## 9. 段階計画
 
@@ -367,7 +429,7 @@ Tauri は「daemon を同梱起動して SPA をホストするだけ」の薄�
 | **0**(完了) | 表面の刈り込み: GUI 削除、legacy 受理経路の削除、研究ライン削除(R8)、`crates/cli` へ集約、CI 簡素化、文書同期 | Multiway Preflop の production 表面が schema 付き config のみになる |
 | **1**(完了) | run directory 契約の確立: manifest/events 導入、`status`/`watch`/`runs ls`、run directory を受け取る `resume`、全 kind の schema 必須化、全 kind の `--out` 一本化 | GUI なしで長時間ランを投入・監視・再開できる |
 | **2**(進行中) | `crates/protocol` + `solversd`(子プロセス管理・キュー・認証・event page・artifact/solution view)。TLS とリモート運用は残 | リモートホスト上の run を CLI から投入・監視・再開できる |
-| **3** | Web GUI(純クライアント SPA) | ローカル / リモートを同一 UI で扱える |
+| **3**(未着手) | Web GUI(純クライアント SPA)。設計は §8、着手条件は §8.6 | ローカル / リモートを同一 UI で扱える |
 
 Phase 1 と 2 の順序が重要である。run directory 契約を確定させてから daemon を書くことで、
 daemon が独自のジョブ状態を持つ誘惑を構造的に断てる。Phase 0 で表面を先に刈り込むのは、
@@ -427,6 +489,13 @@ B は「K を多数試す実験を再開する」場合にのみ再検討する�
 
 ## 10. 未決事項
 
-- Postflop / HU の config schema を正規化契約へ格上げするか(現在は版マーカーのみ)
-- 生成された TypeScript 型の配置とドリフト検出手段
-- full-recall/sparse storage を削除するか、toy game を dense 契約へ移植するか
+GUI(Phase 3)の着手前に決めるべきものを先に挙げる。理由は §8.6。
+
+- **Postflop / HU の config schema を正規化契約へ格上げするか**(現在は版マーカーのみ)。
+  Setup 画面の形がここで決まる。
+- **生成された TypeScript 型の配置とドリフト検出手段**。手書きに逃げる余地を残さない。
+- **TLS**(Phase 2 の残)。remote profile を UI に出すなら必要。
+
+GUI とは独立に残っているもの。
+
+- full-recall/sparse storage を削除するか、toy game を dense 契約へ移植するか(§9 の注記)

@@ -30,7 +30,8 @@ checkpoint/solution metadataを同じchange setで更新する。
   全kindのschema必須化と`--out`一本化。
 - Phase 2(進行中): `crates/protocol`と`solversd`。job 投入・監視・cancel・resume・
   queue・bearer token・artifact/solution view まで動作。残りはTLSとremote運用。
-- Phase 3: Web GUI(純client)。
+- Phase 3: Web GUI(純client)。設計は`app-architecture.md` §8に記録済み、未着手。
+  着手条件(Postflop/HU schema、TS型生成、TLS)は同 §8.6。
 - Viewer/研究workflow: artifact query、Python/WASM境界の必要性を実測で判断する。
 
 完了済みmilestoneの時系列日誌は現行文書へ追記せず、Git履歴と
