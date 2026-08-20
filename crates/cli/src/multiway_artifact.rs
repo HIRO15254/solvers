@@ -1185,7 +1185,7 @@ mod tests {
         ComparisonBasis, build_solution_session, comparison_recall, parse_solution_config,
     };
     use crate::session;
-    use multiway::ExternalSamplingGame;
+    use multiway::MultiwayAbstraction;
 
     #[test]
     fn solution_reads_normalize_only_historical_full_recall_pruning() {
@@ -1270,17 +1270,17 @@ mod tests {
             "the v1 default must lower to current-street recall"
         );
 
-        let bucket_history =
-            session::build_multiway_session(&bucket_history, None).expect("bucket-history session");
+        // Full recall has no solver left to build, so derive its fingerprint
+        // the same way a session would: from the backend plus the recall
+        // semantics. The current-street side still builds a real session, so
+        // the two stay comparable.
         let current_street =
             session::build_multiway_session(&current_street, None).expect("current-street session");
-        let bucket_history_fingerprint = bucket_history.solver.abstraction_fingerprint();
         let current_street_fingerprint = current_street.solver.abstraction_fingerprint();
-
-        assert_eq!(
-            bucket_history.solver.game().game_fingerprint(),
-            current_street.solver.game().game_fingerprint(),
-            "recall must not turn a same-game comparison into cross-game mode"
+        let backend_fingerprint = current_street.solver.game().abstraction().fingerprint();
+        let bucket_history_fingerprint = multiway::abstraction_fingerprint_with_recall(
+            backend_fingerprint,
+            multiway::RecallMode::Full,
         );
         assert_ne!(
             bucket_history_fingerprint, current_street_fingerprint,

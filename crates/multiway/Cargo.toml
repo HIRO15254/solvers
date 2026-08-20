@@ -8,9 +8,11 @@ description = "Sampled 2-9 player NLHE solving with side pots and tournament uti
 
 [features]
 default = []
-# Gates only the retired full-recall/sparse solver path, which production
-# configs already reject with MWP002. Nothing enables it; it exists so the
-# sparse path stays compiled until it is deleted outright.
+# Compiles the full-recall/sparse storage path. Production configs reject
+# `recall = "full"` with MWP002, so no binary enables this; five of the
+# crate's seven toy test games still run on that storage, because the dense
+# arena requires a game whose public tree can be enumerated up front.
+# Removing it means porting those toy games to the dense tree contract.
 research-abstractions = []
 
 [dependencies]

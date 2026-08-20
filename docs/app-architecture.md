@@ -255,6 +255,18 @@ Phase 1 と 2 の順序が重要である。run directory 契約を確定させ�
 daemon が独自のジョブ状態を持つ誘惑を構造的に断てる。Phase 0 で表面を先に刈り込むのは、
 刈り込む前に run directory 契約を設計すると、消える予定の経路まで契約に含めてしまうためである。
 
+### full-recall / sparse ストレージの扱い(Phase 0 で判明)
+
+`recall = "full"` のsparse policy storageは、production configが既にMWP002で拒否する
+retired pathである。しかしこれは単なる遺物ではなく、`multiway` crateのtoy game 7本中
+5本が動いているストレージでもある。dense arenaは事前に列挙可能なpublic treeを要求する
+ため、toy gameをdenseへ移すにはtree列挙契約への移植が必要になる。
+
+したがって削除は「不要コードの除去」ではなく「hot coreのテスト基盤の移植」であり、
+Phase 1でschemaとrun directory契約を確定させる際に、移植コストと得られる単純化を
+比較して判断する。それまで`multiway`の`research-abstractions` featureが唯一の
+利用者であり、いかなるbinaryもこれを有効化しない。
+
 ## 10. 未決事項
 
 - 共有抽象化キャッシュ(EHS2)の既定位置と、複数 run からの同時アクセス制御
@@ -262,3 +274,4 @@ daemon が独自のジョブ状態を持つ誘惑を構造的に断てる。Phas
 - リモート実行時の config 内相対パス(range ファイル等)の解決規則
 - daemon のジョブキュー方針(FIFO / 優先度 / メモリ予算ベース)
 - 生成された TypeScript 型の配置とドリフト検出手段
+- full-recall/sparse storage を削除するか、toy game を dense 契約へ移植するか
