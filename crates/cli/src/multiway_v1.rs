@@ -44,22 +44,14 @@ pub fn has_v1_schema(raw: &str) -> Result<bool> {
     if schema == SCHEMA {
         return Ok(true);
     }
-    // The other families are parsed by the shared solver config, which
-    // checks the declaration against `game.kind` itself. Only a string that
-    // belongs to no family is an error here.
-    if matches!(
-        schema,
-        crate::config::SCHEMA_TOY
-            | crate::config::SCHEMA_POSTFLOP
-            | crate::config::SCHEMA_PREFLOP_HU
-    ) {
+    // Every other family belongs to `solver_config_v1`, which reports its
+    // own errors. Only a string no parser claims is an error here.
+    if crate::solver_config_v1::owns(schema) {
         return Ok(false);
     }
     bail!(
-        "unsupported config schema {schema:?}; expected one of {SCHEMA:?}, {:?}, {:?}, {:?}",
-        crate::config::SCHEMA_TOY,
-        crate::config::SCHEMA_POSTFLOP,
-        crate::config::SCHEMA_PREFLOP_HU
+        "unsupported config schema {schema:?}; expected one of {SCHEMA:?}, {}",
+        crate::solver_config_v1::SCHEMAS.join(", ")
     );
 }
 

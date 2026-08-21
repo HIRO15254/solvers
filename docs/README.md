@@ -1,12 +1,13 @@
 # Solvers documentation
 
-このdirectoryの正本文書は次の6本である。仕様変更では、同じchange setで
+このdirectoryの正本文書は次の7本である。仕様変更では、同じchange setで
 実装・test・該当する正本文書を同期する。
 
 | 文書 | 対象 | 役割 |
 |---|---|---|
 | [user-guide.jp.md](user-guide.jp.md) | 利用者・operator | CLIの使い方、Solveの読み方、resumeと成果物 |
 | [multiway-preflop-v1.jp.md](multiway-preflop-v1.jp.md) | 実装者・利用者 | `solvers.multiway-preflop/v1`の唯一の規範仕様と全TOML項目 |
+| [solver-config-v1.jp.md](solver-config-v1.jp.md) | 実装者・利用者 | toy / postflop / preflop-huの規範仕様と全TOML項目 |
 | [architecture.md](architecture.md) | 実装者 | solver、crate、CLIの設計境界 |
 | [app-architecture.md](app-architecture.md) | 実装者 | application層(CLI / job daemon / Web GUI)の目標設計と段階計画 |
 | [development.md](development.md) | contributor | test、benchmark、変更手順、未完了roadmap |

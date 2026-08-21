@@ -28,7 +28,8 @@ pub fn run(
 ) -> Result<()> {
     let raw = std::fs::read_to_string(config_path)
         .with_context(|| format!("reading {}", config_path.display()))?;
-    let config: crate::config::SolveConfig = toml::from_str(&raw).context("parsing config")?;
+    let config =
+        crate::config::parse_solve_config_at(&raw, config_path).context("parsing config")?;
 
     let (oop_range, ip_range, pot, effective_stack, iso_merging, bets) = match config.game {
         GameSection::Postflop {

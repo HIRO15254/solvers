@@ -14,12 +14,12 @@ use crate::session;
 
 fn parse_solution_config(config_toml: &str) -> Result<crate::config::SolveConfig> {
     let (compatible, _) = crate::config::solution_artifact_compatible_config(config_toml)?;
-    crate::config::parse_solve_config(&compatible)
+    crate::config::parse_internal_config(&compatible)
 }
 
 fn build_solution_session(config_toml: &str) -> Result<session::MultiwaySession> {
     let (compatible, _) = crate::config::solution_artifact_compatible_config(config_toml)?;
-    let config = crate::config::parse_solve_config(&compatible)?;
+    let config = crate::config::parse_internal_config(&compatible)?;
     let crate::config::GameSection::PreflopMultiway(game) = &config.game else {
         bail!("solution does not contain a Multiway Preflop game");
     };

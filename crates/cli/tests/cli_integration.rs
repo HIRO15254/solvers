@@ -430,7 +430,6 @@ const TINY_TURN_TOML: &str = r#"
 schema = "solvers.postflop/v1"
 
 [game]
-kind = "postflop"
 board = "2s 7s Ks 2h"
 oop_range = "44,55"
 ip_range = "33,66"
@@ -531,7 +530,6 @@ const TINY_TURN_TOML_NO_ISO: &str = r#"
 schema = "solvers.postflop/v1"
 
 [game]
-kind = "postflop"
 board = "2s 7s Ks 2h"
 oop_range = "44,55"
 ip_range = "33,66"
@@ -679,7 +677,6 @@ const PREFLOP_PUSHFOLD_TOML_TEMPLATE: &str = r#"
 schema = "solvers.preflop-hu/v1"
 
 [game]
-kind = "preflop"
 effective_stack_bb = 10.0
 open_sizes_bb = []
 raise_factors = []
@@ -778,7 +775,6 @@ fn preflop_bucketed_unsupported_model_errors() {
 schema = "solvers.preflop-hu/v1"
 
 [game]
-kind = "preflop"
 effective_stack_bb = 10.0
 open_sizes_bb = []
 raise_factors = []

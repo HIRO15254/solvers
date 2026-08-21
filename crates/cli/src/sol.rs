@@ -31,7 +31,7 @@ use holdem::{
     river_entry_state, river_resolve_config,
 };
 
-use crate::config::{GameSection, SolveConfig};
+use crate::config::GameSection;
 use crate::postflop_setup;
 use crate::solve::RunSummary;
 
@@ -222,7 +222,9 @@ pub(crate) fn load_sol(
 ) -> Result<LoadedSol> {
     let payload = read_sol(path).with_context(|| format!("reading {}", path.display()))?;
 
-    let config: SolveConfig = toml::from_str(&payload.config_toml)
+    // An artifact embeds whatever config text produced it, so this reads
+    // both the current families and the shapes older artifacts carry.
+    let config = crate::config::parse_internal_config(&payload.config_toml)
         .context(".sol artifact's embedded config failed to parse")?;
     match &config.game {
         GameSection::Postflop { .. } => {}
@@ -584,7 +586,6 @@ mod tests {
 schema = "solvers.postflop/v1"
 
 [game]
-kind = "postflop"
 board = "2s 7s Ks 2h"
 oop_range = "44,55"
 ip_range = "33,66"
@@ -614,7 +615,6 @@ check_every = 32
 schema = "solvers.postflop/v1"
 
 [game]
-kind = "postflop"
 board = "2s 7s Ks 2h 9d"
 oop_range = "44,55"
 ip_range = "33,66"
@@ -649,7 +649,9 @@ check_every = 16
         raw: &str,
         iterations: u64,
     ) -> (Solver<PostflopEvaluator, S>, Street, RunSummary) {
-        let config: SolveConfig = toml::from_str(raw).expect("parse fixture toml");
+        // The fixtures are source configs, so they go through the contract
+        // parser rather than the internal shape.
+        let config = crate::solver_config_v1::parse_and_lower(raw).expect("parse fixture toml");
         let GameSection::Postflop {
             board,
             oop_range,

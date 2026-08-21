@@ -4,13 +4,11 @@
 schema = "solvers.preflop-hu/v1"
 
 [game]
-kind = "preflop"
 effective_stack_bb = 10.0
 open_sizes_bb = []
 raise_factors = []
 max_raises = 1
 allow_limp = false
-equity_cache = ".cache/preflop_equity.bin"
 
 [algorithm]
 schedule = "dcfr"

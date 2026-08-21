@@ -68,20 +68,46 @@ fn platform_cache_dir() -> Option<PathBuf> {
 /// fixed name would make a K=128 run and a K=256 run rebuild in turn,
 /// forever.
 pub fn ehs2_table(params: Ehs2Params) -> Result<Option<PathBuf>> {
+    named(
+        "ehs2",
+        &format!(
+            "v{}-f{}-t{}-r{}.postcard",
+            CACHE_FORMAT_VERSION, params.flop_buckets, params.turn_buckets, params.river_buckets
+        ),
+    )
+}
+
+/// Cache file for the exact heads-up preflop equity table.
+///
+/// The table has no parameters -- it is the same 169x169 exact equity for
+/// every run -- so one file per format version serves everything.
+pub fn preflop_equity() -> Result<Option<PathBuf>> {
+    named("preflop", &format!("equity-v{CACHE_FORMAT_VERSION}.bin"))
+}
+
+/// Cache file for a bucketed-blueprint artifact set.
+///
+/// Keyed by the abstraction it was built over: blueprint artifacts are
+/// derived from those buckets, so a different table means different
+/// artifacts.
+pub fn blueprint(params: Ehs2Params) -> Result<Option<PathBuf>> {
+    named(
+        "blueprint",
+        &format!(
+            "v{}-f{}-t{}-r{}.bin",
+            CACHE_FORMAT_VERSION, params.flop_buckets, params.turn_buckets, params.river_buckets
+        ),
+    )
+}
+
+fn named(directory: &str, file: &str) -> Result<Option<PathBuf>> {
     let Some(root) = root() else {
         return Ok(None);
     };
-    let directory = root.join("ehs2");
-    std::fs::create_dir_all(&directory).with_context(|| {
-        format!(
-            "creating the abstraction cache directory {}",
-            directory.display()
-        )
-    })?;
-    Ok(Some(directory.join(format!(
-        "v{}-f{}-t{}-r{}.postcard",
-        CACHE_FORMAT_VERSION, params.flop_buckets, params.turn_buckets, params.river_buckets
-    ))))
+    let directory = root.join(directory);
+    std::fs::create_dir_all(&directory)
+        .with_context(|| format!("creating the cache directory {}", directory.display()))?;
+    Ok(Some(directory.join(file)))
 }
 
 #[cfg(test)]

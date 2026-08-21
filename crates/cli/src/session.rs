@@ -187,7 +187,7 @@ pub fn preflight_multiway_config(raw_toml: &str) -> Result<MultiwayResourcePrefl
     crate::multiway_v1::validate_production_contract(raw_toml)
         .context("validating production Multiway Preflop contract")?;
     let config =
-        crate::config::parse_solve_config(raw_toml).context("parsing config for preflight")?;
+        crate::config::parse_internal_config(raw_toml).context("parsing config for preflight")?;
     let SolveConfig {
         game,
         rake,
@@ -406,7 +406,7 @@ fn build_multiway_session_internal(
     abstraction_policy: AbstractionPolicy,
 ) -> Result<MultiwaySession> {
     let config: SolveConfig =
-        crate::config::parse_solve_config(raw_toml).context("parsing config")?;
+        crate::config::parse_internal_config(raw_toml).context("parsing config")?;
     let SolveConfig {
         schema: _,
         game,
@@ -718,7 +718,7 @@ fn build_deviation_reference(
     abstraction_policy: AbstractionPolicy,
 ) -> Result<BuiltDeviationReference> {
     let config: SolveConfig =
-        crate::config::parse_solve_config(raw_toml).context("parsing reference config")?;
+        crate::config::parse_internal_config(raw_toml).context("parsing reference config")?;
     let SolveConfig {
         schema: _,
         game,
@@ -1325,7 +1325,7 @@ pub fn make_solution(
     state: &multiway::solver::SolverState,
     row: &MultiwayMetricsRow,
 ) -> MultiwaySolution {
-    let effective = crate::config::parse_solve_config(config_toml)
+    let effective = crate::config::parse_internal_config(config_toml)
         .expect("solution config was validated before solving");
     let algorithm_material =
         serde_json::to_vec(&effective.algorithm).expect("effective algorithm is serializable");

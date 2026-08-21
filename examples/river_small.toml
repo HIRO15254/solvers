@@ -4,7 +4,6 @@
 schema = "solvers.postflop/v1"
 
 [game]
-kind = "postflop"
 board = "2c 7d 9h Js Qs"
 oop_range = "22+,A2s+,KTo+"
 ip_range = "55-22,QJs,A5s-A2s,KQo,T9s"

@@ -131,6 +131,7 @@ pub mod runs;
 pub mod session;
 pub mod sol;
 pub mod solve;
+pub mod solver_config_v1;
 #[cfg(test)]
 mod test_fixtures;
 pub mod validate;

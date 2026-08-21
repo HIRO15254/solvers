@@ -722,7 +722,7 @@ fn run_inner(
             .with_context(|| format!("writing {}", path.display()))?;
     }
     let elapsed = started.elapsed().as_secs_f64();
-    let effective = crate::config::parse_solve_config(raw_config)?;
+    let effective = crate::config::parse_internal_config(raw_config)?;
     let algorithm_material = serde_json::to_vec(&effective.algorithm)?;
     let effective_config = if is_v1 {
         crate::multiway_v1::normalized_config(raw_config)?

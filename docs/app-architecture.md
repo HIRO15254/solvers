@@ -114,13 +114,13 @@ schema は toy game(kuhn / leduc)を含む全 kind に必須とする。パー�
 | schema | game.kind | 位置づけ |
 |---|---|---|
 | `solvers.multiway-preflop/v1` | `preflop-multiway` | 正規化契約。専用仕様書を持つ |
-| `solvers.postflop/v1` | `postflop` | 共有 config 形状の版マーカー |
-| `solvers.preflop-hu/v1` | `preflop` | 同上 |
+| `solvers.postflop/v1` | (schema が決める) | 正規化契約。`solver-config-v1.jp.md` |
+| `solvers.preflop-hu/v1` | (schema が決める) | 同上 |
 | `solvers.toy/v1` | `kuhn` / `leduc` | 同上 |
 
-後者 3 つは「どのパーサが読むか」を宣言するものであり、Multiway v1 のような
-正規化・effective config・error code 体系を持つという意味ではない。それらを
-導入する場合は v2 として別に切る。
+後者 3 つは 2026-08 に版マーカーから正規化契約へ格上げした。Multiway と同様に
+正規化・effective config・error code(`SLV###`)を持つ。schema が family を決めるので
+`[game] kind` は持たない(toy だけは 2 game を含むため残す)。
 
 lowered 形状(`kind = "preflop-multiway"` を持つ共有 struct)は利用者が書く config
 family ではないため、schema 宣言を要求しない。手書きは全入口が MWP003 で拒否する。
@@ -416,9 +416,8 @@ TypeScript の型は `crates/protocol` から生成し、手書きしない(R4)�
 土台が動いている間に作ると、旧構成と同じく二重実装と drift を招く。具体的には、
 着手前に次を確定させる。
 
-1. **Postflop / HU の config schema**(§10)。Setup 画面の形はここで決まる。正規化契約へ
-   格上げするなら effective config と error code 体系が付き、しないなら Setup は
-   Multiway v1 専用になる。
+1. ~~Postflop / HU の config schema~~(格上げ済み)。4 family すべてが
+   `POST /v1/validate` を通り、effective config と error code を返す。
 2. **TypeScript 型の生成手段**(§10)。手書きに逃げる余地を残さないため、最初の 1 行を
    書く前に決める。
 3. ~~TLS~~(実装済み)。remote profile を UI に出せる状態になっている。
@@ -496,8 +495,6 @@ B は「K を多数試す実験を再開する」場合にのみ再検討する�
 
 GUI(Phase 3)の着手前に決めるべきものを先に挙げる。理由は §8.6。
 
-- **Postflop / HU の config schema を正規化契約へ格上げするか**(現在は版マーカーのみ)。
-  Setup 画面の形がここで決まる。
 - **生成された TypeScript 型の配置とドリフト検出手段**。手書きに逃げる余地を残さない。
 GUI とは独立に残っているもの。
 

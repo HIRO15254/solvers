@@ -857,7 +857,12 @@ fn solve_preflop_showdown<S: Storage>(
     resume_state: Option<SolverState>,
     hooks: &mut RunHooks<'_>,
 ) -> Result<RunSummary> {
-    let table = preflop_setup::load_or_compute_equity_table(equity_cache);
+    // The cache is a machine resource, not a config value (R9): a config
+    // naming one could not be sent to another host.
+    let machine_equity_cache = crate::cache::preflop_equity()?;
+    let table = preflop_setup::load_or_compute_equity_table(
+        equity_cache.or(machine_equity_cache.as_deref()),
+    );
     let model = EquityShowdown {
         realization: PerPlayer::new(equity_realization[0], equity_realization[1]),
     };
@@ -975,17 +980,32 @@ fn solve_preflop_bucketed<S: Storage>(
          10 minutes in release mode; abstraction-cache/artifacts-cache make reruns instant."
     );
 
-    let table = preflop_setup::load_or_compute_equity_table(equity_cache);
+    // The cache is a machine resource, not a config value (R9): a config
+    // naming one could not be sent to another host.
+    let machine_equity_cache = crate::cache::preflop_equity()?;
+    let table = preflop_setup::load_or_compute_equity_table(
+        equity_cache.or(machine_equity_cache.as_deref()),
+    );
 
     let abs_params = Ehs2Params {
         flop_buckets: section.flop_buckets,
         turn_buckets: section.turn_buckets,
         river_buckets: section.river_buckets,
     };
-    let abs =
-        preflop_setup::load_or_build_abstraction(abs_params, section.abstraction_cache.as_deref());
-    let artifacts =
-        preflop_setup::load_or_build_artifacts(&abs, section.artifacts_cache.as_deref());
+    let abs = preflop_setup::load_or_build_abstraction(
+        abs_params,
+        section
+            .abstraction_cache
+            .as_deref()
+            .or(crate::cache::ehs2_table(abs_params)?.as_deref()),
+    );
+    let artifacts = preflop_setup::load_or_build_artifacts(
+        &abs,
+        section
+            .artifacts_cache
+            .as_deref()
+            .or(crate::cache::blueprint(abs_params)?.as_deref()),
+    );
 
     let bets = PostflopBets {
         flop: PerPlayer::new(section.bets_flop.clone(), section.bets_flop),

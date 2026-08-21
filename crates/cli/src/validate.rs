@@ -93,10 +93,7 @@ pub fn run(
     let raw = std::fs::read_to_string(config_path)
         .with_context(|| format!("reading {}", config_path.display()))?;
     if !crate::multiway_v1::has_v1_schema(&raw)? {
-        return Err(anyhow!(
-            "validate currently requires schema = {:?}",
-            crate::multiway_v1::SCHEMA
-        ));
+        return validate_solver_config(&raw, format, show_effective, write_effective, resources);
     }
     crate::multiway_v1::validate_production_contract(&raw)?;
     let config = parse_solve_config_at(&raw, config_path)?;
@@ -158,6 +155,67 @@ pub fn run(
                 .solver_state_bytes
                 .map_or_else(|| "n/a".to_string(), |bytes| bytes.to_string()),
         );
+    }
+    if show_effective && matches!(format, ValidationFormat::Human) {
+        println!("\n{effective_toml}");
+    }
+    Ok(())
+}
+
+/// `validate` for the toy, postflop, and heads-up preflop contracts.
+///
+/// Their effective config is the parsed form serialized back, so the same
+/// call both checks the file and produces the self-contained form a daemon
+/// wants (R10).
+fn validate_solver_config(
+    raw: &str,
+    format: ValidationFormat,
+    show_effective: bool,
+    write_effective: Option<&Path>,
+    resources: bool,
+) -> Result<()> {
+    if resources {
+        return Err(anyhow!(
+            "--resources reports the multiway policy arena; the exact engine \
+             prints its memory estimate when the solve builds its tree"
+        ));
+    }
+    let effective_toml = crate::solver_config_v1::normalized_toml(raw)?;
+    let kind = crate::solver_config_v1::game_kind(raw)?;
+    let schema = crate::solver_config_v1::declared(raw)?;
+    if let Some(path) = write_effective {
+        std::fs::write(path, &effective_toml)
+            .with_context(|| format!("writing effective config {}", path.display()))?;
+    }
+
+    #[derive(Serialize)]
+    #[serde(rename_all = "camelCase")]
+    struct SolverConfigSummary {
+        status: &'static str,
+        schema: String,
+        game_kind: &'static str,
+        profile: &'static str,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        effective_config: Option<serde_json::Value>,
+    }
+
+    let summary = SolverConfigSummary {
+        status: "valid",
+        schema,
+        game_kind: kind,
+        // Two-player zero-sum, so the average strategy converges to Nash --
+        // unlike the multiway families, which say the opposite.
+        profile: "vector CFR average profile; converges to Nash for two players",
+        effective_config: show_effective
+            .then(|| crate::solver_config_v1::normalized_json(raw))
+            .transpose()?,
+    };
+    match format {
+        ValidationFormat::Json => println!("{}", serde_json::to_string_pretty(&summary)?),
+        ValidationFormat::Human => println!(
+            "valid: schema={} game_kind={} profile={}",
+            summary.schema, summary.game_kind, summary.profile
+        ),
     }
     if show_effective && matches!(format, ValidationFormat::Human) {
         println!("\n{effective_toml}");

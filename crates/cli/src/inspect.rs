@@ -12,7 +12,7 @@ use engine::{CompiledGame, F32Storage, NodeId, NodeKind, PublicTree, ReachMap, S
 use game::PayoffPipeline;
 use holdem::{PostflopEvaluator, PostflopNodeInfo, class_average, class_weights, range_equity};
 
-use crate::config::{GameSection, SolveConfig};
+use crate::config::GameSection;
 use crate::postflop_setup;
 use crate::sol::{LiveProvider, SolProvider, StrategyProvider};
 
@@ -27,7 +27,8 @@ pub fn run(
 ) -> Result<()> {
     let raw = std::fs::read_to_string(config_path)
         .with_context(|| format!("reading {}", config_path.display()))?;
-    let config: SolveConfig = toml::from_str(&raw).context("parsing config")?;
+    let config =
+        crate::config::parse_solve_config_at(&raw, config_path).context("parsing config")?;
 
     match &config.game {
         GameSection::Postflop { .. } => {}
