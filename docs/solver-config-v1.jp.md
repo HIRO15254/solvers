@@ -134,6 +134,14 @@ exploitability と `nash_conv` は基準の移動で変わらない。全 termin
 
 Multiway Preflop の `[game.tree]` と同じ位置・同じ語彙を使う。
 
+> **決定済み・未実装**: この章の `[game.tree.<street>]`(`oop_bet` / `ip_bet` /
+> `oop_raise` / `ip_raise` / `oop_donk`)は、`.tree` script へ置き換える。
+> `[game.tree]` に残るのは script で書けないもの — `max_aggressive_actions`
+> table、`allin_threshold`、`include_allin` — だけになる。script は展開せず
+> config へインライン化し、`param` 宣言がそのまま GUI の変数スキーマになる。
+> 設計と旧 key の対応表は
+> [postflop-tree-script-v1.jp.md](postflop-tree-script-v1.jp.md)。
+
 ```toml
 [game.tree]
 kind = "standard"          # 既定 "standard"。現在の唯一の frontend

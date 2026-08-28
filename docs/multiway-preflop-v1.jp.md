@@ -261,6 +261,12 @@ script pathは正規化時に読み込まれ、effective configではstandard ty
 Standardと同じ3 optional fieldを指定でき、展開後もeffective configとfingerprintへ
 保持される。
 
+> **決定済み・未実装**: 正規化を「typed ruleへ展開」から「script本文のインライン化」へ
+> 変える。`params`が正規化を生き延びるので、GUIがscript本文に触らずに変数だけを
+> 編集できるようになる。あわせてscript文法へ入れ子、`if`/`else if`/`else`、
+> street list(`flop, turn`)を追加する。平坦な既存`.mwtree`は互換のまま動く。
+> 設計は[postflop-tree-script-v1.jp.md](postflop-tree-script-v1.jp.md)。
+
 `.mwtree` の完全な形:
 
 ```text

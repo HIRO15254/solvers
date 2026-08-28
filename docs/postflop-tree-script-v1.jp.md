@@ -63,6 +63,17 @@ river = 2
 cb = 40
 ```
 
+script の在処を指す key は 2 つあり、**排他である**。両方書くと `SLV002`。
+
+| key | 使う場面 |
+|---|---|
+| `source` | 手元で書くとき。config file の directory 基準の相対 path |
+| `script` | 正規化後。script 本文そのものを持つ TOML リテラル文字列 |
+
+`validate --write-effective` と `run.toml` では `source` が消えて `script` になる。
+config が machine を離れる形は **常に `script`(直埋め込み)だけ**であり、
+`source` を持つ config を remote へ投入することはできない(R10)。
+
 `kind = "none"`(既定)は script を持たない木で、どのノードにもベットが無い
 check-down になる。ベットのある木には script が要る。
 
@@ -475,7 +486,7 @@ config は `oop_range` に数千文字の range 文字列を持つものがあ�
 
 | 状況 | code |
 |---|---|
-| `[game.tree]` に未知の key | `SLV002` |
+| `[game.tree]` に未知の key、`source` と `script` の同時指定 | `SLV002` |
 | script の構文エラー(`{` `}` の不一致、`else` が `if` に対応しない、body が空) | `SLV004` |
 | 未知の street / effect / action、street list の重複 | `SLV004` |
 | `checkdown` に `action` / `sizes` を書いた | `SLV004` |

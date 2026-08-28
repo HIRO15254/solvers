@@ -221,6 +221,14 @@ v1 で path 値を持つキーは `game.tree.source`(mwtree script)ただ 1 つ�
 `script_effective_config_is_self_contained` が、script ファイルを削除したうえで
 effective config を再 parse し、game fingerprint が一致することを確認している。
 
+> **決定済み・未実装**: この self-contained 化の手段を、rule 列への展開から
+> **script 本文のインライン化**へ変える。`source`(path)を script テキストへ
+> 置き換えるので path は残らず、R10 はそのまま満たす。展開を止める理由は、
+> 展開すると `param` が size へ溶けて消え、GUI が編集できる変数が無くなること、
+> 書いた形と `run.toml` の形が食い違うことの 2 つである。設計は
+> [postflop-tree-script-v1.jp.md](postflop-tree-script-v1.jp.md)。この規則
+> (path 値キーを remote 投入で拒否する)自体は変わらない。
+
 したがって規則はこうなる。
 
 - **remote 投入の wire format は effective config とする。** client は
