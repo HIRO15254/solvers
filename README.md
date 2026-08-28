@@ -86,11 +86,19 @@ cargo run -p cli --release -- resume runs/v1-smoke
 
 # --- Postflop --------------------------------------------------------------
 # Exact postflop solve (prints a memory estimate before building the tree):
-cargo run -p cli --release -- solve examples/postflop_srp20.toml
+cargo run -p cli --release -- solve examples/postflop_srp20.toml --out runs/srp20
 
 # Interactive strategy browser: solve, then explore nodes with 13x13
 # ANSI grids (`show`, `go <action>`, `grid <action>`, `eq`, `combos AKs`, ...):
 cargo run -p cli --release -- inspect examples/river_small.toml
+
+# Machine-readable views over the solved artifact (summary / tree / actions /
+# strategy / ev / range; `--node all` covers every stored node):
+cargo run -p cli --release -- export runs/srp20/solution.sol ev \
+    --node all --format csv --output ev.csv
+
+# Diff two solves of the same tree, node by node:
+cargo run -p cli --release -- compare runs/a/solution.sol runs/b/solution.sol
 
 # Aggregate CSV across boards (frequencies, EVs, equity per board):
 cargo run -p cli --release -- report examples/river_small.toml \

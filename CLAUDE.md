@@ -18,14 +18,32 @@
 - The `cfr-ref` crate is a frozen differential-testing oracle: do not optimize it and do not
   share code between it and `engine`/`game`.
 
-## Multiway Preflop specification synchronization
+## Contract specification synchronization
 
-The single normative specification and complete configuration reference is
-`docs/multiway-preflop-v1.jp.md`; the operational guide is
-`docs/user-guide.jp.md`.
-Any change to the Multiway Preflop contract or a default MUST update all three documents,
-the dedicated parser/runtime, tests, examples, CLI help, and affected
-artifact metadata in the same change set. Do not declare the task complete
-while they disagree. Unsupported normative behavior must fail explicitly and
-remain documented as an open migration boundary; never silently ignore it or
-preserve an option that the v1 specification removes.
+Each solver family has one normative specification, and `docs/cli-reference.jp.md`
+covers every command and flag of both binaries across all families:
+
+| family | normative specification |
+|---|---|
+| `solvers.multiway-preflop/v1` | `docs/multiway-preflop-v1.jp.md` |
+| `solvers.postflop/v1` | `docs/solver-config-v1.jp.md` (input, output, and supported range) |
+| `solvers.preflop-hu/v1`, `solvers.toy/v1` | `docs/solver-config-v1.jp.md` (their `[game]` chapters) |
+
+`docs/user-guide.jp.md` is the operational guide for all of them.
+
+Any change to a contract or a default MUST update, in the same change set: the
+family's normative specification, `docs/cli-reference.jp.md` if a command or
+flag moved, `docs/user-guide.jp.md`, the parser/runtime, tests, `examples/`,
+the `config new` templates, CLI help strings, and affected artifact metadata.
+Changing an output contract (`strategy.json`, the `report` CSV, `.sol`,
+`.mwsol`, the run directory) also means `crates/formats` and the writers in
+`crates/cli`.
+
+Do not declare the task complete while they disagree. Two tests in
+`crates/cli/src/config_new.rs` check this mechanically:
+`the_postflop_reference_covers_the_whole_surface` and
+`the_cli_reference_covers_every_command`.
+
+Unsupported normative behavior must fail explicitly and remain documented as an
+open migration boundary; never silently ignore it or preserve an option that the
+specification removes.

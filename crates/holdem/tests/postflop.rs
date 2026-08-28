@@ -6,17 +6,52 @@
 use std::time::Instant;
 
 use cards::{
-    ALL_CARDS, Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of,
+    ALL_CARDS, Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, SizeSpec, combo_cards,
+    rank_of,
 };
-use engine::{Dcfr, F32Storage, I16Storage, ParConfig, Solver};
+use engine::{Dcfr, F32Storage, I16Storage, NodeKind, ParConfig, Solver};
 use game::{ChipEv, NoRake, PayoffPipeline};
-use holdem::{PerStreet, PostflopConfig, build_postflop_game, memory_usage};
+use holdem::{PerStreet, PostflopConfig, StreetTree, build_postflop_game, memory_usage};
 use rayon::prelude::*;
 
 fn chip_ev() -> PayoffPipeline<'static> {
     PayoffPipeline {
         rake: &NoRake,
         utility: &ChipEv,
+    }
+}
+
+/// A street whose bet menu and raise menu use different pot fractions —
+/// `StreetTree::pot_fractions` assumes they're shared, so the tests
+/// exercising `oop_raise`/`ip_raise` independently of `oop_bet`/`ip_bet`
+/// build the `StreetTree` by hand instead.
+fn manual_street(
+    oop_bet: &[f64],
+    ip_bet: &[f64],
+    oop_raise: &[f64],
+    ip_raise: &[f64],
+    max_aggressive_actions: u32,
+) -> StreetTree {
+    let sizes = |fractions: &[f64]| -> Vec<SizeSpec> {
+        fractions
+            .iter()
+            .map(|&fraction| SizeSpec::PotAfterCall { fraction })
+            .collect()
+    };
+    let raise_levels = |fractions: &[f64]| -> Vec<Vec<SizeSpec>> {
+        if fractions.is_empty() {
+            Vec::new()
+        } else {
+            vec![sizes(fractions)]
+        }
+    };
+    StreetTree {
+        oop_bet: sizes(oop_bet),
+        ip_bet: sizes(ip_bet),
+        oop_raise: Some(raise_levels(oop_raise)),
+        ip_raise: Some(raise_levels(ip_raise)),
+        max_aggressive_actions,
+        ..Default::default()
     }
 }
 
@@ -319,20 +354,10 @@ fn iso_on_off_converge_to_same_value() {
         ranges,
         pot: Chips(2),
         effective_stack: Chips(20),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![], vec![]),
-        },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![], vec![]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 1,
-            river: 0,
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
+            river: StreetTree::pot_fractions(&[], &[], 0),
         },
         ..Default::default()
     };
@@ -389,20 +414,10 @@ fn asymmetric_ranges_suppress_iso_merging() {
         ),
         pot: Chips(2),
         effective_stack: Chips(20),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![], vec![]),
-        },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![], vec![]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 1,
-            river: 0,
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
+            river: StreetTree::pot_fractions(&[], &[], 0),
         },
         ..Default::default()
     };
@@ -464,20 +479,10 @@ fn flop_solve_is_zero_sum() {
         ranges: PerPlayer::new("AA,KK".parse().unwrap(), "QQ,JJ".parse().unwrap()),
         pot: Chips(4),
         effective_stack: Chips(20),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![0.5], vec![0.5]),
-        },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![0.5], vec![0.5]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 0,
-            river: 1,
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[], &[], 0),
+            river: StreetTree::pot_fractions(&[0.5], &[0.5], 1),
         },
         ..Default::default()
     };
@@ -508,22 +513,10 @@ fn allin_runout_matches_direct_equity() {
         ranges: PerPlayer::new("AA".parse().unwrap(), "KK".parse().unwrap()),
         pot: Chips(2),
         effective_stack: Chips(1),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            // Fraction far larger than the pot: raw size always clamps to
-            // the 1-chip stack, i.e. any bet is an all-in bet.
-            river: PerPlayer::new(vec![5.0], vec![5.0]),
-        },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![5.0], vec![5.0]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 0,
-            river: 1,
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[], &[], 0),
+            river: StreetTree::pot_fractions(&[5.0], &[5.0], 1),
         },
         ..Default::default()
     };
@@ -550,20 +543,10 @@ fn memory_usage_matches_allocated() {
         ranges: PerPlayer::new("AA,KK".parse().unwrap(), "QQ,JJ".parse().unwrap()),
         pot: Chips(4),
         effective_stack: Chips(20),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![0.5], vec![0.5]),
-        },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![0.5], vec![0.5]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 0,
-            river: 1,
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[], &[], 0),
+            river: StreetTree::pot_fractions(&[0.5], &[0.5], 1),
         },
         ..Default::default()
     };
@@ -575,6 +558,64 @@ fn memory_usage_matches_allocated() {
         game.game.tree.storage_len as u64 * 2 * 4
     );
     assert_eq!(estimate.nodes, game.game.tree.nodes.len() as u64);
+
+    // Extend the cross-check to a tree that actually exercises donk menus,
+    // per-level raises, `include_allin`, and `allin_threshold` together
+    // (flop -> turn, an IP bet OOP can only call sets up the turn's donk
+    // spot), so `memory_usage`'s `Counting` mirror and the real `Builder`
+    // can never disagree about any of these features' fan-out. Single-combo
+    // ranges disjoint from an asymmetric board keep the two-chance-deal tree
+    // small enough to build without `#[ignore]`.
+    let flop = StreetTree {
+        ip_bet: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
+        max_aggressive_actions: 1,
+        ..Default::default()
+    };
+    let turn = StreetTree {
+        oop_bet: vec![SizeSpec::ToChips { value: 5.0 }],
+        oop_donk: Some(vec![SizeSpec::ToChips { value: 3.0 }]),
+        oop_raise: Some(vec![vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }]]),
+        ip_raise: Some(vec![
+            vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
+            vec![SizeSpec::PreviousBetMultiple { factor: 2.0 }],
+        ]),
+        max_aggressive_actions: 3,
+        include_allin: true,
+        allin_threshold: Some(0.9),
+        ..Default::default()
+    };
+    let rich_config = PostflopConfig {
+        board: parse_cards("2s 7d 9h"),
+        ranges: PerPlayer::new(
+            "AsAh".parse::<Range>().unwrap(),
+            "KdKc".parse::<Range>().unwrap(),
+        ),
+        pot: Chips(4),
+        effective_stack: Chips(40),
+        streets: PerStreet {
+            flop,
+            turn,
+            river: StreetTree::default(),
+        },
+        min_bet: Chips(1),
+        iso_merging: true,
+        track_node_info: true,
+    };
+    let rich_estimate = memory_usage(&rich_config);
+    let rich_game = build_postflop_game(&rich_config, chip_ev());
+    let real_terminals = rich_game
+        .game
+        .tree
+        .nodes
+        .iter()
+        .filter(|node| node.kind == NodeKind::Terminal)
+        .count() as u64;
+    assert_eq!(
+        rich_estimate.f32_bytes,
+        rich_game.game.tree.storage_len as u64 * 2 * 4
+    );
+    assert_eq!(rich_estimate.nodes, rich_game.game.tree.nodes.len() as u64);
+    assert_eq!(rich_estimate.terminals, real_terminals);
 }
 
 /// Perf smoke test on a realistic 3-bet-pot spot: build + solve telemetry
@@ -594,27 +635,17 @@ fn smoke_solve_3bet_pot() {
             .unwrap(),
         "22+,ATs+,KJs+,AQo+".parse::<Range>().unwrap(),
     );
-    let bet_55 = || PerPlayer::new(vec![0.55], vec![0.55]);
     let config = PostflopConfig {
         board: board.to_vec(),
         ranges,
         pot: Chips(200),
         effective_stack: Chips(725),
-        bet_fractions: PerStreet {
-            flop: bet_55(),
-            turn: bet_55(),
-            river: bet_55(),
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[0.55], &[0.55], 2),
+            turn: StreetTree::pot_fractions(&[0.55], &[0.55], 2),
+            river: StreetTree::pot_fractions(&[0.55], &[0.55], 2),
         },
-        raise_fractions: PerStreet {
-            flop: bet_55(),
-            turn: bet_55(),
-            river: bet_55(),
-        },
-        max_raises: PerStreet {
-            flop: 2,
-            turn: 2,
-            river: 2,
-        },
+        min_bet: Chips(1),
         iso_merging: true,
         track_node_info: false,
     };
@@ -683,21 +714,12 @@ fn untracked_node_info_stays_empty() {
         ranges: PerPlayer::new("44,55".parse().unwrap(), "33,66".parse().unwrap()),
         pot: Chips(2),
         effective_stack: Chips(20),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![], vec![]),
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
+            river: StreetTree::pot_fractions(&[], &[], 0),
         },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![], vec![]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 1,
-            river: 0,
-        },
+        min_bet: Chips(1),
         iso_merging: true,
         track_node_info: false,
     };
@@ -736,20 +758,10 @@ fn iso_quotient_matches_full_tree_per_hand() {
         ranges: ranges.clone(),
         pot: Chips(2),
         effective_stack: Chips(20),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
-        },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 1,
-            river: 1,
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
+            river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
         },
         ..Default::default()
     };
@@ -812,20 +824,10 @@ fn member_branch_matches_suit_permuted_rep_branch() {
         ranges: ranges.clone(),
         pot: Chips(2),
         effective_stack: Chips(20),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
-        },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 0,
-            river: 1,
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[], &[], 0),
+            river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
         },
         iso_merging: false,
         ..Default::default()
@@ -889,20 +891,10 @@ fn i16_storage_matches_f32_on_small_turn_spot() {
         ranges,
         pot: Chips(2),
         effective_stack: Chips(20),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![], vec![]),
-        },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![], vec![]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 1,
-            river: 0,
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
+            river: StreetTree::pot_fractions(&[], &[], 0),
         },
         ..Default::default()
     };
@@ -961,21 +953,12 @@ fn raise_fractions_size_independently_of_bet_fractions() {
         ranges,
         pot: Chips(4),
         effective_stack: Chips(100),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![0.5], vec![0.5]),
+        streets: PerStreet {
+            flop: manual_street(&[], &[], &[], &[], 0),
+            turn: manual_street(&[], &[], &[], &[], 0),
+            river: manual_street(&[0.5], &[0.5], &[1.0], &[1.0], 2),
         },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 0,
-            river: 2,
-        },
+        min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
     };
@@ -991,7 +974,7 @@ fn raise_fractions_size_independently_of_bet_fractions() {
         game.node_info[root_tag].actions
     );
 
-    let facing_bet = game.node_by_history("b2").expect("facing-bet history");
+    let facing_bet = game.node_by_history("r2").expect("facing-bet history");
     let facing_tag = game.game.tree.tags[facing_bet as usize] as usize;
     assert!(
         game.node_info[facing_tag]
@@ -1010,47 +993,97 @@ fn raise_fractions_size_independently_of_bet_fractions() {
 /// changes that amount but not the tree's shape -- node count depends only
 /// on how many distinct fractions each list holds, not their values.
 #[test]
+fn an_unset_raise_menu_reuses_the_bet_menu() {
+    // The pre-`StreetTree` grammar had `oop_raise`/`ip_raise` fall back to
+    // `oop`/`ip`, so a config that names only bet sizes still raises with
+    // them. Losing that fallback would silently shrink every such tree, so
+    // pin it: `None` and an explicit copy of the bet menu must build the
+    // same tree, and an explicit empty menu must not.
+    let board = parse_cards("2c 7d 9h Js Qs");
+    let ranges = PerPlayer::new(
+        "AA".parse::<Range>().unwrap(),
+        "KK".parse::<Range>().unwrap(),
+    );
+    let bets = vec![SizeSpec::PotAfterCall { fraction: 0.5 }];
+    let build = |oop_raise: Option<Vec<Vec<SizeSpec>>>| {
+        let river = StreetTree {
+            oop_bet: bets.clone(),
+            ip_bet: bets.clone(),
+            oop_raise: oop_raise.clone(),
+            ip_raise: oop_raise,
+            ..StreetTree::default()
+        };
+        holdem::memory_usage(&PostflopConfig {
+            board: board.clone(),
+            ranges: ranges.clone(),
+            pot: Chips(10),
+            effective_stack: Chips(50),
+            streets: PerStreet {
+                river,
+                ..PerStreet::default()
+            },
+            ..PostflopConfig::default()
+        })
+    };
+
+    let fallback = build(None);
+    let explicit = build(Some(vec![bets.clone()]));
+    assert_eq!(
+        (fallback.nodes, fallback.terminals),
+        (explicit.nodes, explicit.terminals),
+        "an unset raise menu must build the same tree as an explicit copy of the bet menu"
+    );
+
+    let never = build(Some(Vec::new()));
+    assert!(
+        never.nodes < fallback.nodes,
+        "an explicitly empty raise menu must remove the raise branches: \
+         {} vs {}",
+        never.nodes,
+        fallback.nodes
+    );
+}
+
+#[test]
 fn matching_raise_and_bet_fractions_reproduce_shared_size_tree() {
     let board = parse_cards("2c 7d 9h Js Qs");
     let ranges = PerPlayer::new(
         "AA".parse::<Range>().unwrap(),
         "KK".parse::<Range>().unwrap(),
     );
-    let bet_fractions = PerStreet {
-        flop: PerPlayer::new(vec![], vec![]),
-        turn: PerPlayer::new(vec![], vec![]),
-        river: PerPlayer::new(vec![0.5], vec![0.5]),
-    };
-    let max_raises = PerStreet {
-        flop: 0,
-        turn: 0,
-        river: 2,
-    };
+    // Shared-size street: `oop_raise`/`ip_raise` reuse the same 0.5 pot
+    // fraction as `oop_bet`/`ip_bet` (what `StreetTree::pot_fractions`
+    // always builds).
+    let shared_river = StreetTree::pot_fractions(&[0.5], &[0.5], 2);
     let shared_config = PostflopConfig {
         board: board.clone(),
         ranges: ranges.clone(),
         pot: Chips(4),
         effective_stack: Chips(100),
-        bet_fractions: bet_fractions.clone(),
-        raise_fractions: bet_fractions.clone(),
-        max_raises: max_raises.clone(),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::default(),
+            river: shared_river,
+        },
+        min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
     };
     let shared_game = build_postflop_game(&shared_config, chip_ev());
 
+    // Distinct-size street: same 0.5 bet menu, but a 1.0 raise menu.
+    let distinct_river = manual_street(&[0.5], &[0.5], &[1.0], &[1.0], 2);
     let distinct_config = PostflopConfig {
         board,
         ranges,
         pot: Chips(4),
         effective_stack: Chips(100),
-        bet_fractions,
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::default(),
+            river: distinct_river,
         },
-        max_raises,
+        min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
     };
@@ -1063,7 +1096,7 @@ fn matching_raise_and_bet_fractions_reproduce_shared_size_tree() {
     );
 
     let facing_bet = shared_game
-        .node_by_history("b2")
+        .node_by_history("r2")
         .expect("facing-bet history");
     let facing_tag = shared_game.game.tree.tags[facing_bet as usize] as usize;
     assert!(
@@ -1073,4 +1106,609 @@ fn matching_raise_and_bet_fractions_reproduce_shared_size_tree() {
         "facing-bet actions: {:?}",
         shared_game.node_info[facing_tag].actions
     );
+}
+
+// --- New size-literal grammar: raise levels, donk, all-in handling --------
+
+/// `oop_raise`/`ip_raise` index by raise level (index 0 = the street's
+/// first raise, deeper levels reuse the last entry): a `"3x"` at level 0
+/// must size off the bet it faces, and a distinct `"2.5x"` at level 1 must
+/// size off the *raise* it faces, not repeat level 0's multiple.
+#[test]
+fn raise_levels_apply_distinct_multiples_per_level() {
+    let board = parse_cards("2c 7d 9h Js Qs");
+    let ranges = PerPlayer::new(
+        "AA".parse::<Range>().unwrap(),
+        "KK".parse::<Range>().unwrap(),
+    );
+    let river = StreetTree {
+        oop_bet: vec![SizeSpec::ToChips { value: 10.0 }],
+        oop_raise: Some(vec![
+            vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
+            vec![SizeSpec::PreviousBetMultiple { factor: 2.5 }],
+        ]),
+        ip_raise: Some(vec![
+            vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
+            vec![SizeSpec::PreviousBetMultiple { factor: 2.5 }],
+        ]),
+        max_aggressive_actions: 3,
+        ..Default::default()
+    };
+    let config = PostflopConfig {
+        board,
+        ranges,
+        pot: Chips(4),
+        effective_stack: Chips(1000),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::default(),
+            river,
+        },
+        min_bet: Chips(1),
+        iso_merging: true,
+        track_node_info: true,
+    };
+    let game = build_postflop_game(&config, chip_ev());
+
+    // Level 0 (the street's first raise, facing OOP's opening 10-chip bet):
+    // "3x" of the bet, i.e. 30.
+    let facing_bet = game.node_by_history("r10").expect("facing-bet history");
+    let tag = game.game.tree.tags[facing_bet as usize] as usize;
+    assert!(
+        game.node_info[tag]
+            .actions
+            .contains(&"raise to 30".to_string()),
+        "level 0 should apply 3x the bet: {:?}",
+        game.node_info[tag].actions
+    );
+
+    // Level 1 (the second raise, facing IP's 30-chip raise): "2.5x" of the
+    // raise (75), not level 0's "3x" (which would give 90).
+    let facing_reraise = game
+        .node_by_history("r10r30")
+        .expect("facing-reraise history");
+    let tag = game.game.tree.tags[facing_reraise as usize] as usize;
+    assert!(
+        game.node_info[tag]
+            .actions
+            .contains(&"raise to 75".to_string()),
+        "level 1 should apply 2.5x the raise it faces: {:?}",
+        game.node_info[tag].actions
+    );
+    assert!(
+        !game.node_info[tag]
+            .actions
+            .contains(&"raise to 90".to_string()),
+        "level 1 must not reuse level 0's 3x multiple: {:?}",
+        game.node_info[tag].actions
+    );
+}
+
+/// `oop_donk` gates OOP's opening menu on a street whose previous street's
+/// last aggressor was IP: an empty donk menu (`Some(vec![])`) removes OOP's
+/// bet from that turn node, while the same turn node (reached after the flop
+/// checked through instead) keeps OOP's ordinary `oop_bet` menu, since
+/// `previous_aggressor` is `None` there.
+#[test]
+fn donk_menu_controls_oop_opening_action_after_a_called_ip_bet() {
+    let board = parse_cards("2s 7d 9h");
+    let ranges = PerPlayer::new(
+        "AsAh".parse::<Range>().unwrap(),
+        "KdKc".parse::<Range>().unwrap(),
+    );
+    let flop = StreetTree {
+        ip_bet: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
+        max_aggressive_actions: 1,
+        ..Default::default()
+    };
+    let turn = StreetTree {
+        oop_bet: vec![SizeSpec::ToChips { value: 5.0 }],
+        oop_donk: Some(Vec::new()),
+        max_aggressive_actions: 1,
+        ..Default::default()
+    };
+    let config = PostflopConfig {
+        board,
+        ranges,
+        pot: Chips(2),
+        effective_stack: Chips(100),
+        streets: PerStreet {
+            flop,
+            turn,
+            river: StreetTree::default(),
+        },
+        min_bet: Chips(1),
+        iso_merging: true,
+        track_node_info: true,
+    };
+    let game = build_postflop_game(&config, chip_ev());
+
+    // IP bet the flop (root check "x", IP bets to 1, OOP calls: "xr1c"),
+    // then a turn card deals: `previous_aggressor = Some(IP)`, so the empty
+    // donk menu applies and OOP's turn node must offer only "check". The
+    // history must be exactly "xr1c[Xy]" (8 chars) -- a bare prefix/suffix
+    // match would also catch a deeper river-entry node reached after the
+    // turn itself checks through (e.g. "xr1c[Xy]xx[Ab]"), which has its own
+    // (empty, default) menu and would make this assertion pass for the
+    // wrong reason.
+    let donked_node = game
+        .node_info
+        .iter()
+        .find(|info| info.history.starts_with("xr1c[") && info.history.len() == 8)
+        .unwrap_or_else(|| {
+            panic!(
+                "expected a turn node after a called IP flop bet: {:?}",
+                game.node_info
+                    .iter()
+                    .map(|i| &i.history)
+                    .collect::<Vec<_>>()
+            )
+        });
+    assert_eq!(
+        donked_node.actions,
+        vec!["check".to_string()],
+        "an empty donk menu must remove OOP's bet: {:?}",
+        donked_node.actions
+    );
+
+    // Flop checked through ("xx"): `previous_aggressor = None`, so OOP's
+    // turn node keeps its ordinary bet menu. Same exact-length guard as
+    // above: "xx[Xy]" is 6 chars.
+    let checked_node = game
+        .node_info
+        .iter()
+        .find(|info| info.history.starts_with("xx[") && info.history.len() == 6)
+        .unwrap_or_else(|| panic!("expected a turn node after a flop check-check"));
+    assert!(
+        checked_node.actions.contains(&"bet 5".to_string()),
+        "a checked-through flop must not suppress OOP's turn bet menu: {:?}",
+        checked_node.actions
+    );
+}
+
+/// `include_allin` adds exactly one extra all-in action alongside a sized
+/// menu that has room below the maximum, but does not duplicate the all-in
+/// target when a sized entry already resolves to it.
+#[test]
+fn include_allin_adds_one_action_without_duplicating_an_already_allin_size() {
+    let board = parse_cards("2c 7d 9h Js Qs");
+    let ranges = PerPlayer::new(
+        "AA".parse::<Range>().unwrap(),
+        "KK".parse::<Range>().unwrap(),
+    );
+    let with_room = StreetTree {
+        oop_bet: vec![SizeSpec::StackFraction { fraction: 0.5 }],
+        include_allin: true,
+        max_aggressive_actions: 1,
+        ..Default::default()
+    };
+    let config_a = PostflopConfig {
+        board: board.clone(),
+        ranges: ranges.clone(),
+        pot: Chips(2),
+        effective_stack: Chips(10),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::default(),
+            river: with_room,
+        },
+        min_bet: Chips(1),
+        iso_merging: true,
+        track_node_info: true,
+    };
+    let game_a = build_postflop_game(&config_a, chip_ev());
+    let root_a = game_a.node_by_history("").expect("root history");
+    let tag_a = game_a.game.tree.tags[root_a as usize] as usize;
+    assert_eq!(
+        game_a.node_info[tag_a].actions,
+        vec![
+            "check".to_string(),
+            "bet 5".to_string(),
+            "bet 10".to_string(),
+        ],
+        "include_allin should add exactly one extra all-in action: {:?}",
+        game_a.node_info[tag_a].actions
+    );
+
+    let already_allin = StreetTree {
+        oop_bet: vec![SizeSpec::StackFraction { fraction: 1.0 }],
+        include_allin: true,
+        max_aggressive_actions: 1,
+        ..Default::default()
+    };
+    let config_b = PostflopConfig {
+        board,
+        ranges,
+        pot: Chips(2),
+        effective_stack: Chips(10),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::default(),
+            river: already_allin,
+        },
+        min_bet: Chips(1),
+        iso_merging: true,
+        track_node_info: true,
+    };
+    let game_b = build_postflop_game(&config_b, chip_ev());
+    let root_b = game_b.node_by_history("").expect("root history");
+    let tag_b = game_b.game.tree.tags[root_b as usize] as usize;
+    assert_eq!(
+        game_b.node_info[tag_b].actions,
+        vec!["check".to_string(), "bet 10".to_string()],
+        "an already-all-in size must not be duplicated by include_allin: {:?}",
+        game_b.node_info[tag_b].actions
+    );
+}
+
+/// `allin_threshold` collapses a size landing at or above that fraction of
+/// the actor's maximum target into the all-in target itself, even without
+/// `include_allin`.
+#[test]
+fn allin_threshold_merges_a_near_max_size_into_allin() {
+    let board = parse_cards("2c 7d 9h Js Qs");
+    let ranges = PerPlayer::new(
+        "AA".parse::<Range>().unwrap(),
+        "KK".parse::<Range>().unwrap(),
+    );
+    let river = StreetTree {
+        oop_bet: vec![SizeSpec::StackFraction { fraction: 0.9 }],
+        allin_threshold: Some(0.8),
+        max_aggressive_actions: 1,
+        ..Default::default()
+    };
+    let config = PostflopConfig {
+        board,
+        ranges,
+        pot: Chips(2),
+        effective_stack: Chips(10),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::default(),
+            river,
+        },
+        min_bet: Chips(1),
+        iso_merging: true,
+        track_node_info: true,
+    };
+    let game = build_postflop_game(&config, chip_ev());
+    let root = game.node_by_history("").expect("root history");
+    let tag = game.game.tree.tags[root as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["check".to_string(), "bet 10".to_string()],
+        "a 90% target above the 80% threshold must merge into all-in: {:?}",
+        game.node_info[tag].actions
+    );
+}
+
+/// A raise proposal that resolves under the minimum full raise is bumped up
+/// to it rather than standing as an illegal short raise.
+#[test]
+fn sub_minimum_raise_is_bumped_to_the_minimum_full_raise() {
+    let board = parse_cards("2c 7d 9h Js Qs");
+    let ranges = PerPlayer::new(
+        "AA".parse::<Range>().unwrap(),
+        "KK".parse::<Range>().unwrap(),
+    );
+    // OOP opens for 2 (a literal `ToChips`, so `min_bet`'s default of 1 has
+    // no effect on the open itself): the facing node's `last_full_raise` is
+    // then 2, and the minimum full raise is `bet_to_match(2) +
+    // last_full_raise(2) = 4`. IP's raise menu proposes a 20% pot-after-call
+    // raise, which resolves to 3 -- under the minimum -- so it must be
+    // bumped up to 4 rather than standing as its own action.
+    let river = StreetTree {
+        oop_bet: vec![SizeSpec::ToChips { value: 2.0 }],
+        ip_raise: Some(vec![vec![SizeSpec::PotAfterCall { fraction: 0.2 }]]),
+        max_aggressive_actions: 2,
+        ..Default::default()
+    };
+    let config = PostflopConfig {
+        board,
+        ranges,
+        pot: Chips(2),
+        effective_stack: Chips(100),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::default(),
+            river,
+        },
+        min_bet: Chips(1),
+        iso_merging: true,
+        track_node_info: true,
+    };
+    let game = build_postflop_game(&config, chip_ev());
+    let facing_bet = game.node_by_history("r2").expect("facing-bet history");
+    let tag = game.game.tree.tags[facing_bet as usize] as usize;
+    assert!(
+        game.node_info[tag]
+            .actions
+            .contains(&"raise to 4".to_string()),
+        "a sub-minimum raise proposal must be bumped to the minimum full raise: {:?}",
+        game.node_info[tag].actions
+    );
+    assert!(
+        !game.node_info[tag]
+            .actions
+            .contains(&"raise to 3".to_string()),
+        "the sub-minimum raw target must not survive alongside the bumped one: {:?}",
+        game.node_info[tag].actions
+    );
+}
+
+/// `min_bet` is the smallest legal opening bet: a config with `min_bet =
+/// Chips(5)` bumps a 3-chip opening proposal up to 5 rather than opening
+/// for less.
+#[test]
+fn min_bet_refuses_to_open_below_its_own_value() {
+    let board = parse_cards("2c 7d 9h Js Qs");
+    let ranges = PerPlayer::new(
+        "AA".parse::<Range>().unwrap(),
+        "KK".parse::<Range>().unwrap(),
+    );
+    let river = StreetTree {
+        oop_bet: vec![SizeSpec::ToChips { value: 3.0 }],
+        max_aggressive_actions: 1,
+        ..Default::default()
+    };
+    let config = PostflopConfig {
+        board,
+        ranges,
+        pot: Chips(2),
+        effective_stack: Chips(100),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::default(),
+            river,
+        },
+        min_bet: Chips(5),
+        iso_merging: true,
+        track_node_info: true,
+    };
+    let game = build_postflop_game(&config, chip_ev());
+    let root = game.node_by_history("").expect("root history");
+    let tag = game.game.tree.tags[root as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["check".to_string(), "bet 5".to_string()],
+        "an opening bet below min_bet must be bumped up to min_bet: {:?}",
+        game.node_info[tag].actions
+    );
+}
+
+/// An odd starting pot builds and solves like any other; its chip-EV
+/// terminal payoffs match the even pot one chip larger exactly (both round
+/// the shared floor/ceil split the same way once the extra chip is
+/// absorbed), and exceed the even pot one chip smaller by exactly 1.
+#[test]
+fn odd_pot_terminal_payoffs_match_the_neighboring_even_pots() {
+    // Deterministic showdown, no betting at all: P0 (the full house board's
+    // Aces) always wins, so its chip-EV payoff is exactly `pot -
+    // oop_share`, i.e. the amount contributed by IP. `oop_share = pot / 2`
+    // (floor) regardless of parity, so an odd pot and the even pot one chip
+    // *larger* both give IP the same ceil share -- while the even pot one
+    // chip *smaller* gives IP one less chip, dropping P0's EV by exactly 1.
+    let board = parse_cards("Ks Kh Kd 2c 2d");
+    let ranges = PerPlayer::new(
+        "AA".parse::<Range>().unwrap(),
+        "QQ".parse::<Range>().unwrap(),
+    );
+    let ev_for_pot = |pot: u32| -> f64 {
+        let config = PostflopConfig {
+            board: board.clone(),
+            ranges: ranges.clone(),
+            pot: Chips(pot),
+            effective_stack: Chips(100),
+            streets: PerStreet {
+                flop: StreetTree::default(),
+                turn: StreetTree::default(),
+                river: StreetTree::default(),
+            },
+            min_bet: Chips(1),
+            iso_merging: true,
+            track_node_info: true,
+        };
+        let game = build_postflop_game(&config, chip_ev());
+        let mut solver = Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(1));
+        solver.run(1);
+        solver.expected_value(Player::P0)
+    };
+
+    let ev_odd = ev_for_pot(7);
+    let ev_smaller_even = ev_for_pot(6);
+    let ev_larger_even = ev_for_pot(8);
+
+    assert!(
+        (ev_odd - ev_larger_even).abs() < 1e-6,
+        "odd pot 7 (OOP=3/IP=4) should match even pot 8's EV (OOP=4/IP=4): \
+         {ev_odd} vs {ev_larger_even}"
+    );
+    assert!(
+        (ev_odd - ev_smaller_even - 1.0).abs() < 1e-6,
+        "odd pot 7 should exceed even pot 6's EV (OOP=3/IP=3) by exactly 1 chip: \
+         {ev_odd} vs {ev_smaller_even}"
+    );
+}
+
+/// A history round trip through `viewer::river_entry_state` using the `r`
+/// compact-history token (not the pre-rename `b`): a bet *and* a raise both
+/// emit `r{to}` tokens, and replaying that exact history reconstructs the
+/// same pot/effective-stack the trunk itself carried into the river.
+#[test]
+fn history_round_trip_uses_r_tokens_through_river_entry_state() {
+    let board = parse_cards("2s 7s Ks 2h");
+    let ranges = PerPlayer::new(
+        "44,55".parse::<Range>().unwrap(),
+        "33,66".parse::<Range>().unwrap(),
+    );
+    let config = PostflopConfig {
+        board,
+        ranges,
+        pot: Chips(2),
+        effective_stack: Chips(20),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 2),
+            river: StreetTree::default(),
+        },
+        min_bet: Chips(1),
+        iso_merging: true,
+        track_node_info: true,
+    };
+    let game = build_postflop_game(&config, chip_ev());
+
+    // OOP bets 2 ("r2"), IP raises to 7 ("r7"), OOP calls ("c"): the
+    // river-entry history is "r2r7c[Xy]" for whichever card the chance node
+    // deals -- both the opening bet and the raise answering it use `r`.
+    let entry = game
+        .node_info
+        .iter()
+        .find(|info| info.history.starts_with("r2r7c[") && info.history.ends_with(']'))
+        .unwrap_or_else(|| {
+            panic!(
+                "expected a river-entry node at \"r2r7c[..]\": {:?}",
+                game.node_info
+                    .iter()
+                    .map(|i| &i.history)
+                    .collect::<Vec<_>>()
+            )
+        });
+
+    let state = holdem::river_entry_state(&config, &entry.history)
+        .unwrap_or_else(|e| panic!("replay failed for history {:?}: {e}", entry.history));
+
+    // c = 7 (both players' turn-street contribution once the raise is
+    // called): pot' = trunk.pot(2) + 2*7 = 16, eff' = trunk.stack(20) - 7 = 13.
+    assert_eq!(state.pot, Chips(16));
+    assert_eq!(state.effective_stack, Chips(13));
+    assert_eq!(state.board.len(), 5);
+    assert!(
+        game.node_by_history(&entry.history).is_some(),
+        "the replayed history must resolve back to a real node in the trunk"
+    );
+}
+
+/// The root is a node like any other: values read at node 0 against the
+/// root ranges must aggregate to exactly what `expected_value` reports.
+/// This is what lets `export ev` answer any node with the same primitive
+/// the root EV already uses.
+#[test]
+fn per_node_values_at_the_root_agree_with_the_root_expected_value() {
+    let board = parse_cards("2c 7d 9h Js Qs");
+    let ranges = PerPlayer::new(
+        "22+,A2s+".parse::<Range>().unwrap(),
+        "22+,A2s+".parse::<Range>().unwrap(),
+    );
+    let config = PostflopConfig {
+        board,
+        ranges,
+        pot: Chips(20),
+        effective_stack: Chips(80),
+        streets: PerStreet {
+            river: StreetTree::pot_fractions(&[0.5], &[0.5], 2),
+            ..PerStreet::default()
+        },
+        ..PostflopConfig::default()
+    };
+    let pipeline = PayoffPipeline {
+        rake: &NoRake,
+        utility: &ChipEv,
+    };
+    let game = build_postflop_game(&config, pipeline);
+    let mut solver = Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(64));
+    solver.run(64);
+
+    let root_ranges = &solver.game().root_ranges;
+    for player in Player::BOTH {
+        let reach = PerPlayer::new(
+            root_ranges[Player::P0].as_slice(),
+            root_ranges[Player::P1].as_slice(),
+        );
+        let values = solver.expected_values_at(0, player, reach);
+        let own = &root_ranges[player];
+        let total: f64 = own
+            .iter()
+            .zip(&values)
+            .map(|(&r, &v)| r as f64 * v as f64)
+            .sum();
+        let aggregated = total / solver.game().normalizer;
+        let expected = solver.expected_value(player);
+        assert!(
+            (aggregated - expected).abs() < 1e-6,
+            "player {player:?}: per-node {aggregated} vs root {expected}"
+        );
+    }
+
+    // And a best response is never worse than the profile it answers.
+    let reach = PerPlayer::new(
+        root_ranges[Player::P0].as_slice(),
+        root_ranges[Player::P1].as_slice(),
+    );
+    let ev = solver.expected_values_at(0, Player::P0, reach);
+    let br = solver.best_response_values_at(0, Player::P0, reach);
+    for (hand, (&value, &best)) in ev.iter().zip(&br).enumerate() {
+        assert!(
+            best >= value - 1e-4,
+            "hand {hand}: br {best} below profile value {value}"
+        );
+    }
+}
+
+/// A node's recorded contribution is what re-bases its counterfactual
+/// values onto the subgame-start basis, so it has to be the real total —
+/// starting-pot share included — and the two sides have to sum to the pot
+/// at that node.
+#[test]
+fn node_info_records_the_pot_contribution_at_each_node() {
+    let board = parse_cards("2c 7d 9h Js Qs");
+    let ranges = PerPlayer::new(
+        "AA".parse::<Range>().unwrap(),
+        "KK".parse::<Range>().unwrap(),
+    );
+    let config = PostflopConfig {
+        board,
+        ranges,
+        pot: Chips(20),
+        effective_stack: Chips(80),
+        streets: PerStreet {
+            river: StreetTree::pot_fractions(&[0.5], &[0.5], 2),
+            ..PerStreet::default()
+        },
+        ..PostflopConfig::default()
+    };
+    let pipeline = PayoffPipeline {
+        rake: &NoRake,
+        utility: &ChipEv,
+    };
+    let game = build_postflop_game(&config, pipeline);
+
+    let root = game
+        .node_info
+        .iter()
+        .find(|info| info.history.is_empty())
+        .expect("root node info");
+    assert_eq!(root.contrib[Player::P0], Chips(10));
+    assert_eq!(root.contrib[Player::P1], Chips(10));
+    assert_eq!(root.street, cards::Street::River);
+
+    // After OOP bets 10 (50% of a 20 pot) the pot at that node is 30.
+    let faced = game
+        .node_info
+        .iter()
+        .find(|info| info.history == "r10")
+        .expect("node after a 10 bet");
+    assert_eq!(faced.contrib[Player::P0], Chips(20));
+    assert_eq!(faced.contrib[Player::P1], Chips(10));
+
+    for info in &game.node_info {
+        if info.history == "<untagged>" {
+            continue;
+        }
+        let pot = info.contrib[Player::P0] + info.contrib[Player::P1];
+        assert!(
+            pot >= config.pot,
+            "history {:?}: pot {pot} below the starting pot",
+            info.history
+        );
+    }
 }

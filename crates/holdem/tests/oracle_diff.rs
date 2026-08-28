@@ -11,7 +11,7 @@ use cards::{Card, CardSet, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, ra
 use cfr_ref::{RefGame, best_response_value, expected_value};
 use engine::{Dcfr, F32Storage, NodeKind, ParConfig, Solver};
 use game::{ChipEv, NoRake, PayoffPipeline};
-use holdem::{PerStreet, PostflopConfig, build_postflop_game};
+use holdem::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
 
 const BOARD: &str = "Ks Qs 7h 2d";
 const P0_RANGE: &str = "AhAd,QhQd,7c7d";
@@ -31,7 +31,7 @@ fn board_cards() -> [Card; 4] {
 // ---------------------------------------------------------------------------
 // Scalar oracle side: per-(combo pair, history) states mirroring the
 // builder's rules (sizing = round(f * pot-after-call), history tokens
-// x / c / f / b{total} / [card]).
+// x / c / f / r{total} / [card]).
 // ---------------------------------------------------------------------------
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -109,7 +109,7 @@ impl MicroHoldem {
                 next.outstanding = extra;
                 next.raises_used += 1;
                 next.to_act = 1 - actor;
-                next.history.push_str(&format!("b{}", next.contrib[actor]));
+                next.history.push_str(&format!("r{}", next.contrib[actor]));
             }
             'f' => {
                 next.history.push('f');
@@ -263,20 +263,10 @@ fn engine_game() -> holdem::PostflopGame {
             ranges: PerPlayer::new(P0_RANGE.parse().unwrap(), P1_RANGE.parse().unwrap()),
             pot: cards::Chips(POT),
             effective_stack: cards::Chips(STACK),
-            bet_fractions: PerStreet {
-                flop: PerPlayer::new(vec![], vec![]),
-                turn: PerPlayer::new(vec![1.0], vec![1.0]),
-                river: PerPlayer::new(vec![1.0], vec![1.0]),
-            },
-            raise_fractions: PerStreet {
-                flop: PerPlayer::new(vec![], vec![]),
-                turn: PerPlayer::new(vec![1.0], vec![1.0]),
-                river: PerPlayer::new(vec![1.0], vec![1.0]),
-            },
-            max_raises: PerStreet {
-                flop: 0,
-                turn: 1,
-                river: 1,
+            streets: PerStreet {
+                flop: StreetTree::pot_fractions(&[], &[], 0),
+                turn: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
+                river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
             },
             iso_merging: false,
             ..Default::default()

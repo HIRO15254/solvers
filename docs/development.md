@@ -32,7 +32,13 @@ checkpoint/solution metadataを同じchange setで更新する。
   queue・bearer token・TLS・artifact/solution view まで動作。
 - Phase 3: Web GUI(純client)。設計は`app-architecture.md` §8に記録済み、未着手。
   着手条件はTS型生成の手段のみ(同 §8.6)。Postflop/HU schemaは格上げ済み。
-- Viewer/研究workflow: artifact query、Python/WASM境界の必要性を実測で判断する。
+- Viewer/研究workflow: postflopのartifact queryは`export`(6 view、`--node all`)と
+  `compare`で閉じた。`.sol`は戦略とper-hand値の両方を持つので、`strategy.json`と
+  `solve --history`はpostflopから削除済み。Python/WASM境界の必要性は引き続き実測で判断する。
+
+現時点でpostflopに残る制約は`docs/solver-config-v1.jp.md`「サポート範囲と制約」に
+列挙してある。大きいものは3つ: 条件ルール(`[[game.tree.rules]]`相当)の未実装、
+非対称スタック不可、`evaluate`非対応。
 
 完了済みmilestoneの時系列日誌は現行文書へ追記せず、Git履歴と
 `docs/validation/`の再現可能な証拠から参照する。
@@ -143,22 +149,6 @@ path); if the bench-bar command SIGILLs here, that's a sandbox artifact --
 re-run on real target hardware (or a debug build, `cargo run -p cli --`,
 which reproduces the preflight estimate line but not the timing) before
 treating a bar miss as a real regression.
-
-## `.sol` size check
-
-M5's exit criterion: a `.sol` viewer artifact must be under 10% of the
-equivalent `.ckpt` checkpoint's size at this scale. Export both from the same
-solve and compare:
-
-```sh
-target/release/solvers solve examples/3betpot_fast.toml --out /tmp/3betpot_fast
-ls -la /tmp/3betpot_fast/checkpoint.ckpt /tmp/3betpot_fast/solution.sol
-```
-
-(`--sol-streets no-rivers`, the default, is the artifact this bar targets --
-river action nodes are re-solved lazily by the viewer rather than stored; see
-`crate::sol` and `holdem::viewer`'s module docs.) Record both file sizes and
-the ratio; investigate if it's above 10%.
 
 ## Assembly audit
 

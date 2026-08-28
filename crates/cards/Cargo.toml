@@ -8,4 +8,8 @@ description = "Card, chip, and range primitives shared by all solver crates"
 
 [dependencies]
 aya_poker = { workspace = true }
+serde = { workspace = true }
 thiserror = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

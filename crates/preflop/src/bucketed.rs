@@ -368,7 +368,7 @@ impl TerminalEvaluator for BlueprintEvaluator {
 
 /// A compiled blueprint game plus node metadata (same conventions as
 /// [`crate::PreflopGame`]: tag-0 sentinel, history tokens — postflop
-/// streets are separated by `/`, with `x`/`c`/`f`/`b{to}` action tokens
+/// streets are separated by `/`, with `x`/`c`/`f`/`r{to}` action tokens
 /// where `to` is the actor's total street contribution in chips).
 pub struct BlueprintGame {
     pub game: CompiledGame<BlueprintEvaluator>,
@@ -431,7 +431,7 @@ impl PostState {
 /// acting player at `state` (pot-fraction sizing, all-in clamping,
 /// same-amount dedup) — mirrors `holdem::postflop::raise_targets`'s math
 /// (see its doc comment), adapted to return the absolute street-contribution
-/// `to` (this crate's `b{to}` token convention) rather than a delta, and
+/// `to` (this crate's `r{to}` token convention) rather than a delta, and
 /// with an explicit `include_allin` branch (`holdem`'s bet-fraction lists
 /// reach the stack directly instead). Shared between the real builder and
 /// the memory-usage dry run.
@@ -737,7 +737,7 @@ impl Builder<'_> {
         for to in post_raise_targets(&state, self.post, self.trunk.effective_stack) {
             let mut street_contrib = state.street_contrib;
             street_contrib[actor] = to;
-            let history = self.extend_history(&state.history, &format!("b{}", to.0));
+            let history = self.extend_history(&state.history, &format!("r{}", to.0));
             let label = self.action_label(|| {
                 if outstanding == Chips::ZERO {
                     format!("Bet {to}")

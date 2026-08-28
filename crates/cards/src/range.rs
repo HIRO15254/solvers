@@ -120,12 +120,22 @@ pub struct ParseRangeError(pub String);
 ///
 /// - pairs: `AA`, `22+`, `TT-77`
 /// - unpaired classes: `AKs`, `AKo`, `AK` (both), `A2s+`, `KTo+`, `ATs-A5s`
+/// - connector/gapper runs, constant rank gap: `T9s-54s`, `J9s-64s`
 /// - explicit combos: `AhKh`
 /// - per-entry weight suffix: `AA:0.5`, `A2s+:0.25`
+/// - `"random"` as the entire spec string (not one comma entry): every combo
+///   at weight 1, same as PioSOLVER and the Multiway Preflop `range =
+///   "random"` default
+///
+/// A spec that parses but selects no combos (including the empty string) is
+/// a [`ParseRangeError`], not an empty [`Range`].
 impl FromStr for Range {
     type Err = ParseRangeError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s == "random" {
+            return Ok(Range::full());
+        }
         let mut range = Range::default();
         for raw in s.split(',') {
             let entry = raw.trim();
@@ -147,6 +157,9 @@ impl FromStr for Range {
             };
             apply_spec(&mut range, spec, weight)
                 .ok_or_else(|| ParseRangeError(entry.to_string()))?;
+        }
+        if range.num_combos() == 0 {
+            return Err(ParseRangeError(s.to_string()));
         }
         Ok(range)
     }
@@ -210,13 +223,29 @@ fn apply_dash_range(range: &mut Range, first: &str, second: &str, weight: f32) -
         }
         return Some(());
     }
-    // Same-high-card kicker range, e.g. ATs-A5s.
-    if hi1 != hi2 || hi1 == lo1 || hi2 == lo2 {
+    if hi1 == lo1 || hi2 == lo2 {
+        // One endpoint is a pair and the other isn't; there's no sensible
+        // run between them.
         return None;
     }
-    let (top, bottom) = (lo1.max(lo2), lo1.min(lo2));
-    for r in bottom..=top {
-        range.set_class(hi1, r, s1, weight);
+    if hi1 == hi2 {
+        // Same-high-card kicker range, e.g. ATs-A5s.
+        let (top, bottom) = (lo1.max(lo2), lo1.min(lo2));
+        for r in bottom..=top {
+            range.set_class(hi1, r, s1, weight);
+        }
+        return Some(());
+    }
+    // Connector/gapper range with a constant rank gap, e.g. T9s-54s
+    // (gap 1), J9s-64s (gap 2). Every class from the lower bound to the
+    // upper bound, inclusive, that shares the endpoints' gap is included.
+    let gap = hi1 - lo1;
+    if gap != hi2 - lo2 {
+        return None;
+    }
+    let (top, bottom) = (hi1.max(hi2), hi1.min(hi2));
+    for hi in bottom..=top {
+        range.set_class(hi, hi - gap, s1, weight);
     }
     Some(())
 }
@@ -277,6 +306,23 @@ mod tests {
     }
 
     #[test]
+    fn connector_and_gapper_dash_ranges() {
+        // Constant-gap-1 connector run: T9s, 98s, 87s, 76s, 65s, 54s.
+        assert_eq!(combos("T9s-54s"), 6 * 4);
+        assert_eq!(combos("T9o-54o"), 6 * 12);
+        // Constant-gap-2 (one-gapper) run: J9s, T8s, 97s, 86s, 75s, 64s.
+        assert_eq!(combos("J9s-64s"), 6 * 4);
+        // Either endpoint order is accepted, same as the pair/kicker forms.
+        assert_eq!(combos("54s-T9s"), combos("T9s-54s"));
+    }
+
+    #[test]
+    fn random_selects_every_combo() {
+        assert_eq!(combos("random"), NUM_COMBOS);
+        assert_eq!("random".parse::<Range>().unwrap().num_combos(), 1326);
+    }
+
+    #[test]
     fn full_range() {
         assert_eq!(Range::full().num_combos(), NUM_COMBOS);
         // A "any two" written out: pairs + all suited + all offsuit.
@@ -311,6 +357,16 @@ mod tests {
         assert!("XX".parse::<Range>().is_err());
         assert!("AAs".parse::<Range>().is_err());
         assert!("AA:1.5".parse::<Range>().is_err());
-        assert!("AKs-QJs".parse::<Range>().is_err());
+        // Different rank gap between the two dash endpoints (T9 is gap 1,
+        // 53 is gap 2): not a valid connector/gapper run.
+        assert!("T9s-53s".parse::<Range>().is_err());
+    }
+
+    #[test]
+    fn rejects_ranges_that_select_no_combos() {
+        assert!("".parse::<Range>().is_err());
+        assert!("  ".parse::<Range>().is_err());
+        // Every entry present, but all with weight zero.
+        assert!("AA:0".parse::<Range>().is_err());
     }
 }

@@ -10,10 +10,10 @@ ip_range = "55-22,QJs,A5s-A2s,KQo,T9s"
 pot = 10
 effective_stack = 50
 
-[game.bets.river]
-oop = [0.5]
-ip = [0.5]
-max_raises = 2
+[game.tree.river]
+oop_bet = [50]
+ip_bet = [50]
+max_aggressive_actions = 2
 
 [run]
 iterations = 200

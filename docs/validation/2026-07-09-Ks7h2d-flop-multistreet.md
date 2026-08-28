@@ -53,6 +53,11 @@ GW と 0.3% 差まで一致した。nash_conv はどちらも ~0.17 chips で「
 
 EV 変換: `GW_EV_bb = (ev_chips + pot/2)/100`(リバー検証で確立した式がマルチストリートでも整合)。
 
+> **旧契約での記録**。現在の solvers は EV を subgame 開始基準で報告するので `+ pot/2` は
+> 不要になり、変換は `GW_EV_bb = ev_chips / 100` である。config の綴りも変わっており、
+> `max_raises` は `max_aggressive_actions`、ベットサイズはポット比ではなく百分率
+> (`0.33` → `33`)である。記録した数値そのものは有効。
+
 ## 総合判定: BORDERLINE(コア数値系 pass、深部戦略は均衡集合内の別点)
 
 - **pass の核心**: flop BTN スタブノードの 0.3% 一致。BTN のスタブ EV はターン/リバー全サブツリーの

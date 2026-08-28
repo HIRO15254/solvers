@@ -1,3 +1,5 @@
+use std::sync::Mutex;
+
 use cards::{PerPlayer, Player};
 use rayon::prelude::*;
 
@@ -214,6 +216,119 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             self.par.chance_depth,
         );
         self.root_aggregate(p, &out)
+    }
+
+    /// Per-hand counterfactual values of the average profile for `p` at
+    /// `node`, given the reach vectors *at that node*.
+    ///
+    /// [`Self::expected_value`] is this at the root, aggregated against the
+    /// root range. Deeper nodes need reaches the caller computes with
+    /// [`crate::reach_at`], because a node's values are only meaningful
+    /// against the range that actually arrives there — the root range would
+    /// answer a different question. Passing both players' reaches also
+    /// gives the hand count on each side, which the tree does not store per
+    /// node.
+    ///
+    /// The result is one value per hand of `p`, on the same basis as the
+    /// solve's payoffs. Callers that report EV re-base it themselves (for
+    /// postflop, onto the subgame-start basis).
+    pub fn expected_values_at(
+        &self,
+        node: NodeId,
+        p: Player,
+        reach: PerPlayer<&[f32]>,
+    ) -> Vec<f32> {
+        self.values_at(node, p, reach, ev_pass)
+    }
+
+    /// Per-hand best-response values for `p` at `node` against the
+    /// opponent's average strategy. Subtracting
+    /// [`Self::expected_values_at`] gives per-hand regret at that node.
+    pub fn best_response_values_at(
+        &self,
+        node: NodeId,
+        p: Player,
+        reach: PerPlayer<&[f32]>,
+    ) -> Vec<f32> {
+        self.values_at(node, p, reach, br_pass)
+    }
+
+    fn values_at(
+        &self,
+        node: NodeId,
+        p: Player,
+        reach: PerPlayer<&[f32]>,
+        pass: ValuePass<E, S>,
+    ) -> Vec<f32> {
+        let ctx = ValueCtx {
+            tree: &self.game.tree,
+            evaluator: &self.game.evaluator,
+            storage: &self.storage,
+            p,
+            par: self.par,
+        };
+        let mut scratch = Scratch::new();
+        let mut out = scratch.take(reach[p].len());
+        pass(
+            &ctx,
+            &mut scratch,
+            node,
+            reach[p.opponent()],
+            &mut out,
+            self.par.chance_depth,
+        );
+        out.to_vec()
+    }
+
+    /// Per-hand values of the average profile for `p` at **every** action
+    /// node, indexed by `StorageRef::index`, in one pass.
+    ///
+    /// [`Self::expected_values_at`] answers one node and costs a walk of
+    /// that node's whole subtree, so asking it for every node would be
+    /// quadratic. An artifact that stores values for every node needs this
+    /// instead: the value pass already computes each node's vector on its
+    /// way back up, and this records them as it goes.
+    ///
+    /// Entries are `None` for storage refs the pass never reached.
+    pub fn expected_values_everywhere(&self, p: Player) -> Vec<Option<Vec<f32>>> {
+        let recorded = Mutex::new(vec![None; self.game.tree.storage_refs.len()]);
+        let ctx = ValueCtx {
+            tree: &self.game.tree,
+            evaluator: &self.game.evaluator,
+            storage: &self.storage,
+            p,
+            par: self.par,
+        };
+        let combine = |sref: StorageRef, children_flat: &[f32], out: &mut [f32]| {
+            let num_hands = sref.num_hands as usize;
+            let mut sigma = vec![0.0f32; sref.len()];
+            ctx.storage.average_strategy(sref, sref.index, &mut sigma);
+            for a in 0..sref.num_actions as usize {
+                let row = &sigma[a * num_hands..(a + 1) * num_hands];
+                let child = &children_flat[a * num_hands..(a + 1) * num_hands];
+                for h in 0..out.len() {
+                    out[h] += row[h] * child[h];
+                }
+            }
+        };
+        let record = |node: NodeId, values: &[f32]| {
+            let sref = ctx.tree.storage_ref(ctx.tree.node(node));
+            recorded.lock().expect("value recorder mutex")[sref.index as usize] =
+                Some(values.to_vec());
+        };
+        let mut scratch = Scratch::new();
+        let mut out = scratch.take(self.game.tree.root_dims[p] as usize);
+        value_pass(
+            &ctx,
+            &mut scratch,
+            0,
+            &self.game.root_ranges[p.opponent()],
+            &mut out,
+            &combine,
+            &record,
+            self.par.chance_depth,
+        );
+        recorded.into_inner().expect("value recorder mutex")
     }
 
     /// Best-response value against the opponent's average strategy, per deal.
@@ -666,16 +781,18 @@ pub(crate) struct ValueCtx<'w, E, S> {
 /// the opponent's average strategy. Writes `p`'s values at this node into
 /// `out` (dimension implied by `out.len()`).
 #[allow(clippy::too_many_arguments)]
-fn value_pass<E: TerminalEvaluator, S: Storage, C>(
+fn value_pass<E: TerminalEvaluator, S: Storage, C, R>(
     ctx: &ValueCtx<'_, E, S>,
     scratch: &mut Scratch,
     node_id: NodeId,
     opp_reach: &[f32],
     out: &mut [f32],
     combine: &C,
+    record: &R,
     par_budget: u32,
 ) where
     C: Fn(StorageRef, &[f32], &mut [f32]) + Sync,
+    R: Fn(NodeId, &[f32]) + Sync,
 {
     let node = *ctx.tree.node(node_id);
     match node.kind {
@@ -723,6 +840,7 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C>(
                             &opp_next,
                             &mut child_out,
                             combine,
+                            record,
                             child_budget,
                         );
                         scratch.put(opp_next);
@@ -757,6 +875,7 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C>(
                         &opp_next,
                         &mut child_out,
                         combine,
+                        record,
                         child_budget,
                     );
                     ctx.tree
@@ -773,7 +892,9 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C>(
             let mut children_flat = scratch.take(num_actions * my_dim);
             for (a, child) in ctx.tree.children(node_id).enumerate() {
                 let row = &mut children_flat[a * my_dim..(a + 1) * my_dim];
-                value_pass(ctx, scratch, child, opp_reach, row, combine, par_budget);
+                value_pass(
+                    ctx, scratch, child, opp_reach, row, combine, record, par_budget,
+                );
             }
             combine(sref, &children_flat, out);
             scratch.put(children_flat);
@@ -801,6 +922,7 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C>(
                     &opp_next,
                     &mut child_out,
                     combine,
+                    record,
                     par_budget,
                 );
                 for h in 0..my_dim {
@@ -812,9 +934,24 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C>(
             scratch.put(sigma);
         }
     }
+    // Both action branches have `out` finished by here, whoever is to act,
+    // so a caller recording per-node values sees every action node exactly
+    // once. `combine` cannot do this: it only fires on `ctx.p`'s own nodes.
+    if node.kind == NodeKind::Action {
+        record(node_id, out);
+    }
 }
 
+/// The recorder [`value_pass`] uses when the caller only wants the root
+/// aggregate. Monomorphization compiles it away.
+fn no_record(_: NodeId, _: &[f32]) {}
+
 /// Expected values for `p` when both players play their average strategy.
+/// One walk of the tree that fills per-hand values: [`ev_pass`] for the
+/// average profile, [`br_pass`] for a best response. Named so
+/// [`Solver::values_at`] can take either without spelling the signature out.
+type ValuePass<E, S> = fn(&ValueCtx<'_, E, S>, &mut Scratch, NodeId, &[f32], &mut [f32], u32);
+
 pub(crate) fn ev_pass<E: TerminalEvaluator, S: Storage>(
     ctx: &ValueCtx<'_, E, S>,
     scratch: &mut Scratch,
@@ -835,7 +972,9 @@ pub(crate) fn ev_pass<E: TerminalEvaluator, S: Storage>(
             }
         }
     };
-    value_pass(ctx, scratch, node_id, opp_reach, out, &combine, par_budget);
+    value_pass(
+        ctx, scratch, node_id, opp_reach, out, &combine, &no_record, par_budget,
+    );
 }
 
 /// Best-response values for `p` against the opponent's average strategy:
@@ -857,5 +996,7 @@ pub(crate) fn br_pass<E: TerminalEvaluator, S: Storage>(
                 .fold(f32::NEG_INFINITY, f32::max);
         }
     };
-    value_pass(ctx, scratch, node_id, opp_reach, out, &combine, par_budget);
+    value_pass(
+        ctx, scratch, node_id, opp_reach, out, &combine, &no_record, par_budget,
+    );
 }

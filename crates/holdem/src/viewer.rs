@@ -43,7 +43,7 @@ use std::fmt;
 use cards::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range, Street};
 use engine::{NodeId, NodeKind, PublicTree};
 
-use crate::postflop::{PerStreet, PostflopConfig};
+use crate::postflop::{PerStreet, PostflopConfig, StreetTree};
 
 /// Street of every node in `tree`, given the tree's starting street (derived
 /// by the caller from the starting board length: 3 cards = Flop, 4 = Turn,
@@ -98,7 +98,7 @@ pub struct RiverEntryState {
 /// Failure replaying a history string in [`river_entry_state`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ReplayError {
-    /// An unrecognized character, or a malformed `b{amount}`/`[Xy]` token.
+    /// An unrecognized character, or a malformed `r{amount}`/`[Xy]` token.
     BadToken(String),
     /// The history reached a fold before completing the board to 5 cards —
     /// there is no river subgame to reconstruct after a fold.
@@ -115,10 +115,6 @@ pub enum ReplayError {
     /// comment), so this indicates the supplied history does not correspond
     /// to a real path through `config`'s builder grammar.
     UnequalContribution { p0: Chips, p1: Chips },
-    /// `pot' = trunk.pot + 2c` was odd. Structurally impossible given the
-    /// builder's even-starting-pot invariant (see `PostflopConfig::pot`),
-    /// kept as a defensive check rather than a silent wraparound.
-    OddPot(Chips),
     /// `eff' = trunk.effective_stack - c` would be zero or negative: no
     /// chips remain behind at the river, so there is no river subgame with
     /// any action left to resolve.
@@ -144,7 +140,6 @@ impl fmt::Display for ReplayError {
                 f,
                 "unequal contributions at river entry: p0={p0} p1={p1} (not a valid history)"
             ),
-            ReplayError::OddPot(pot) => write!(f, "river-entry pot {pot} is odd"),
             ReplayError::StackUnderflow {
                 effective_stack,
                 contrib,
@@ -159,7 +154,7 @@ impl fmt::Display for ReplayError {
 impl std::error::Error for ReplayError {}
 
 /// One history token, per `crate::postflop::Builder::extend_history`'s
-/// grammar: `x` check, `f` fold, `c` call, `b{to}` bet/raise, `[Xy]` a
+/// grammar: `x` check, `f` fold, `c` call, `r{to}` bet/raise, `[Xy]` a
 /// chance card extending the board.
 enum Token {
     Check,
@@ -187,7 +182,7 @@ fn tokenize(history: &str) -> Result<Vec<Token>, ReplayError> {
             'x' => tokens.push(Token::Check),
             'f' => tokens.push(Token::Fold),
             'c' => tokens.push(Token::Call),
-            'b' => {
+            'r' => {
                 let mut digits = String::new();
                 while let Some(&d) = chars.peek() {
                     if d.is_ascii_digit() {
@@ -199,7 +194,7 @@ fn tokenize(history: &str) -> Result<Vec<Token>, ReplayError> {
                 }
                 let to: u32 = digits
                     .parse()
-                    .map_err(|_| ReplayError::BadToken(format!("b{digits}")))?;
+                    .map_err(|_| ReplayError::BadToken(format!("r{digits}")))?;
                 tokens.push(Token::Bet(to));
             }
             '[' => {
@@ -218,13 +213,13 @@ fn tokenize(history: &str) -> Result<Vec<Token>, ReplayError> {
     Ok(tokens)
 }
 
-/// Replays a history string of tokens `x` / `c` / `f` / `b{to}` / `[Xy]`
+/// Replays a history string of tokens `x` / `c` / `f` / `r{to}` / `[Xy]`
 /// against `config` (the trunk [`PostflopConfig`]) up to a river-entry node,
 /// returning that node's board/pot/effective-stack state.
 ///
 /// The replay does not need to track "outstanding" (the amount owed to
 /// call) as a separate quantity, because of an invariant in
-/// `crate::postflop::Builder::betting`/`raise_targets`: `b{to}` already
+/// `crate::postflop::Builder::betting`/`raise_targets`: `r{to}` already
 /// encodes the acting player's new *absolute* contribution `to`, and every
 /// bet/raise leaves `outstanding == |contrib[P0] - contrib[P1]|` (the raise
 /// size is layered on top of whatever the actor already owed). So a `c`
@@ -287,10 +282,11 @@ pub fn river_entry_state(
         return Err(ReplayError::UnequalContribution { p0, p1 });
     }
     let c = p0;
+    // `pot' = trunk.pot + 2c` inherits its parity from `trunk.pot`: an odd
+    // trunk pot is legal (see `PostflopConfig::pot`), so this can be odd
+    // too — no defensive check needed, `build_postflop_game`'s terminal-pot
+    // split handles it the same way it does the trunk's own.
     let pot = config.pot + c + c;
-    if !pot.0.is_multiple_of(2) {
-        return Err(ReplayError::OddPot(pot));
-    }
     if c >= config.effective_stack {
         return Err(ReplayError::StackUnderflow {
             effective_stack: config.effective_stack,
@@ -317,12 +313,15 @@ pub fn river_entry_state(
 /// 1]` factors, per [`engine::reach_at`]'s contract: strategy-column
 /// probabilities and `Mask`/`Transition` weights, none of which ever push a
 /// product outside `[0, 1]`; clamped defensively against float rounding at
-/// the boundary regardless), river bet/raise menus and raise cap copied from
-/// `trunk` (the only street the fresh subgame ever plays), flop/turn menus
-/// left empty (moot: a river-start board has no chance nodes), `iso_merging:
-/// false` (also moot, for the same reason — nothing left to merge with no
-/// chance nodes), and `track_node_info: true` (a re-solved subgame is
-/// exactly the thing a viewer wants node histories for).
+/// the boundary regardless), river tree and `min_bet` copied from `trunk`
+/// (the only street the fresh subgame ever plays — a copied `oop_donk` is
+/// moot too, since this subgame's own river is its first street, so the
+/// builder always seeds `previous_aggressor: None` for it regardless of
+/// what the menu says), flop/turn trees left at `StreetTree::default()`
+/// (moot: a river-start board has no chance nodes), `iso_merging: false`
+/// (also moot, for the same reason — nothing left to merge with no chance
+/// nodes), and `track_node_info: true` (a re-solved subgame is exactly the
+/// thing a viewer wants node histories for).
 pub fn river_resolve_config(
     trunk: &PostflopConfig,
     entry: &RiverEntryState,
@@ -341,21 +340,12 @@ pub fn river_resolve_config(
         ranges: PerPlayer::new(build_range(Player::P0), build_range(Player::P1)),
         pot: entry.pot,
         effective_stack: entry.effective_stack,
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(Vec::new(), Vec::new()),
-            turn: PerPlayer::new(Vec::new(), Vec::new()),
-            river: trunk.bet_fractions.river.clone(),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::default(),
+            river: trunk.streets.river.clone(),
         },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(Vec::new(), Vec::new()),
-            turn: PerPlayer::new(Vec::new(), Vec::new()),
-            river: trunk.raise_fractions.river.clone(),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 0,
-            river: trunk.max_raises.river,
-        },
+        min_bet: trunk.min_bet,
         iso_merging: false,
         track_node_info: true,
     }

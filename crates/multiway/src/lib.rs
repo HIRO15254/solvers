@@ -12,7 +12,7 @@ pub mod checkpoint;
 pub mod config;
 pub mod holdem;
 pub mod icm;
-mod rake_condition;
+pub mod rake_condition;
 pub mod sampler;
 pub mod settlement;
 pub mod solver;
@@ -35,6 +35,7 @@ pub use config::{
 };
 pub use holdem::{HoldemGame, HoldemGameError};
 pub use icm::{IcmDeltaEstimate, IcmError, IcmEstimate, IcmMode, estimate_icm, terminal_icm_delta};
+pub use rake_condition::{CompiledRakeCondition, RakeConditionContext};
 pub use sampler::{CountedSample, DealSampler, SampleError, SampledWorld, SamplingDiagnostics};
 pub use settlement::{PotLayer, Settlement};
 pub use solver::{

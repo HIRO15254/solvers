@@ -31,7 +31,8 @@ pub fn run(
     let config =
         crate::config::parse_solve_config_at(&raw, config_path).context("parsing config")?;
 
-    let (oop_range, ip_range, pot, effective_stack, iso_merging, bets) = match config.game {
+    let (oop_range, ip_range, pot, effective_stack, iso_merging, min_bet, tree) = match config.game
+    {
         GameSection::Postflop {
             board,
             oop_range,
@@ -39,17 +40,30 @@ pub fn run(
             pot,
             effective_stack,
             iso_merging,
-            bets,
+            min_bet,
+            tree,
         } => {
             eprintln!("note: config board {board:?} ignored; using --boards");
-            (oop_range, ip_range, pot, effective_stack, iso_merging, bets)
+            (
+                oop_range,
+                ip_range,
+                pot,
+                effective_stack,
+                iso_merging,
+                min_bet,
+                tree,
+            )
         }
         GameSection::Preflop { .. } => {
             return Err(anyhow!(
                 "report does not support preflop configs yet (kind = \"preflop\")"
             ));
         }
-        _ => return Err(anyhow!("report only supports kind = \"postflop\" configs")),
+        _ => {
+            return Err(anyhow!(
+                "report only supports schema = \"solvers.postflop/v1\" configs"
+            ));
+        }
     };
 
     let raw_boards = collect_board_tokens(boards_arg, boards_file)?;
@@ -68,8 +82,8 @@ pub fn run(
         })
         .collect::<Result<Vec<_>>>()?;
 
-    let rake = postflop_setup::build_rake(&config.rake);
-    let utility = postflop_setup::build_utility(&config.utility);
+    let rake = crate::economics::build_rake(&config.rake)?;
+    let utility = crate::economics::build_utility(&config.utility)?;
 
     let mut header_labels: Option<Vec<String>> = None;
     let mut csv_rows: Vec<String> = Vec::new();
@@ -87,7 +101,8 @@ pub fn run(
             pot,
             effective_stack,
             iso_merging,
-            bets.clone(),
+            min_bet,
+            tree.lower(),
         )?;
 
         let estimate = holdem::memory_usage(&pf_config);
@@ -135,8 +150,11 @@ pub fn run(
             nash_conv,
         );
 
-        let ev_oop = solver.expected_value(Player::P0);
-        let ev_ip = solver.expected_value(Player::P1);
+        let ev = postflop_setup::subgame_ev(
+            crate::solve::solver_ev(&solver),
+            postflop_setup::subgame_ev_offset(&pf_config, utility.as_ref()),
+        );
+        let (ev_oop, ev_ip) = (ev[Player::P0], ev[Player::P1]);
 
         let tree = &solver.game().tree;
         let root_node = *tree.node(0);

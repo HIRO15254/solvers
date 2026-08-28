@@ -121,9 +121,12 @@ fn report_smoke() {
         let cols: Vec<&str> = line.split(',').collect();
         let ev_oop: f64 = cols[ev_oop_idx].parse().unwrap();
         let ev_ip: f64 = cols[ev_ip_idx].parse().unwrap();
+        // Postflop EV is measured from the start of the subgame, so the two
+        // sides split the starting pot rather than summing to zero.
+        // `examples/river_small.toml` has `pot = 10` and no rake.
         assert!(
-            (ev_oop + ev_ip).abs() < 1e-2,
-            "ev_oop+ev_ip should be ~0, got {ev_oop} + {ev_ip}"
+            (ev_oop + ev_ip - 10.0).abs() < 1e-2,
+            "ev_oop+ev_ip should be the starting pot 10, got {ev_oop} + {ev_ip}"
         );
     }
     assert_eq!(row_count, 2);
@@ -436,15 +439,15 @@ ip_range = "33,66"
 pot = 2
 effective_stack = 20
 
-[game.bets.turn]
-oop = [0.75]
-ip = [0.75]
-max_raises = 1
+[game.tree.turn]
+oop_bet = [75]
+ip_bet = [75]
+max_aggressive_actions = 1
 
-[game.bets.river]
-oop = [1.0]
-ip = [1.0]
-max_raises = 1
+[game.tree.river]
+oop_bet = [100]
+ip_bet = [100]
+max_aggressive_actions = 1
 
 [run]
 iterations = 32
@@ -471,15 +474,36 @@ fn sol_export_and_inspect_smoke() {
     assert!(sol_path.exists(), "sol file must be written");
     assert!(checkpoint.exists(), "checkpoint file must be written");
 
-    // `.sol` omits river strategy blocks (NoRivers is the default mode) and
-    // stores 16-bit quantized probabilities instead of full-precision
-    // regrets + strategy sums, so it must be substantially smaller than the
-    // checkpoint of the same solve.
+    // The two artifacts answer different questions and are sized
+    // accordingly: the checkpoint carries full-precision regrets and
+    // strategy sums so a run can continue, while `.sol` carries 16-bit
+    // quantized strategies and values for reading. Even at the default
+    // `full` mode, which stores every action node, `.sol` stays the smaller
+    // of the two.
     let sol_size = std::fs::metadata(&sol_path).unwrap().len();
     let ckpt_size = std::fs::metadata(&checkpoint).unwrap().len();
     assert!(
-        sol_size < ckpt_size / 4,
-        "sol ({sol_size} bytes) should be well under 1/4 of the checkpoint ({ckpt_size} bytes)"
+        sol_size < ckpt_size,
+        "sol ({sol_size} bytes) should be smaller than the checkpoint ({ckpt_size} bytes)"
+    );
+
+    // And `no-rivers` is the lever for a much smaller artifact: it drops
+    // the river nodes, which dominate the count.
+    let small_run = dir.join("run-no-rivers");
+    run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        small_run.to_str().unwrap(),
+        "--sol-streets",
+        "no-rivers",
+    ]);
+    let small_size = std::fs::metadata(small_run.join("solution.sol"))
+        .unwrap()
+        .len();
+    assert!(
+        small_size * 4 < sol_size,
+        "no-rivers ({small_size} bytes) should be far smaller than full ({sol_size} bytes)"
     );
 
     // `solve`'s stdout must mention the exported block count.
@@ -537,15 +561,15 @@ pot = 2
 effective_stack = 20
 iso_merging = false
 
-[game.bets.turn]
-oop = [0.75]
-ip = [0.75]
-max_raises = 1
+[game.tree.turn]
+oop_bet = [75]
+ip_bet = [75]
+max_aggressive_actions = 1
 
-[game.bets.river]
-oop = [1.0]
-ip = [1.0]
-max_raises = 1
+[game.tree.river]
+oop_bet = [100]
+ip_bet = [100]
+max_aggressive_actions = 1
 
 [run]
 iterations = 200
@@ -1222,5 +1246,144 @@ fn the_abstraction_cache_is_shared_across_runs() {
     assert!(
         events.contains("ehs2 tables loaded in"),
         "the run event log must record the cache hit: {events}"
+    );
+}
+
+/// Postflop publishes through `solution.sol`, which `export` reads. There
+/// is deliberately no second JSON of the same thing: `--history` and
+/// `strategy.json` belong to the families that have no artifact.
+#[test]
+fn postflop_publishes_through_the_artifact_not_strategy_json() {
+    let dir = temp_dir("postflop-export");
+    let config = workspace_root().join("examples/river_small.toml");
+    let run = dir.join("run");
+    run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
+    ]);
+
+    assert!(
+        run.join("solution.sol").exists(),
+        "artifact must be written"
+    );
+    assert!(
+        !run.join("strategy.json").exists(),
+        "postflop must not write strategy.json any more"
+    );
+
+    // `--history` names the retired path, so it has to point at the new one.
+    let rejected = Command::new(env!("CARGO_BIN_EXE_solvers"))
+        .args([
+            "solve",
+            config.to_str().unwrap(),
+            "--out",
+            dir.join("rejected").to_str().unwrap(),
+            "--history",
+            "r5",
+        ])
+        .output()
+        .expect("run solvers");
+    assert!(!rejected.status.success(), "--history must be refused");
+    let stderr = String::from_utf8_lossy(&rejected.stderr);
+    assert!(stderr.contains("export"), "{stderr}");
+    assert!(stderr.contains("--node"), "{stderr}");
+
+    // Every view renders, and the per-node views accept `all`.
+    let sol = run.join("solution.sol");
+    for (view, node) in [
+        ("summary", "root"),
+        ("range", "root"),
+        ("tree", "all"),
+        ("actions", "all"),
+        ("strategy", "root"),
+        ("ev", "root"),
+    ] {
+        for format in ["json", "csv"] {
+            let output = run_solvers_ok(&[
+                "export",
+                sol.to_str().unwrap(),
+                view,
+                "--node",
+                node,
+                "--format",
+                format,
+            ]);
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            assert!(
+                !stdout.trim().is_empty(),
+                "export {view} --format {format} produced nothing"
+            );
+            // Progress notices belong on stderr: a CSV a caller pipes into
+            // a file must be nothing but the table.
+            assert!(
+                !stdout.contains("rebuilding tree"),
+                "export {view} leaked a progress line into stdout: {stdout}"
+            );
+        }
+    }
+
+    // The EV view reports the same root numbers the summary does.
+    let summary = run_solvers_ok(&["export", sol.to_str().unwrap(), "summary"]);
+    let summary: serde_json::Value = serde_json::from_slice(&summary.stdout).expect("summary json");
+    let ev_oop = summary["ev_oop"].as_f64().expect("ev_oop");
+    assert!(
+        ev_oop > 0.0 && ev_oop < 10.0,
+        "ev_oop {ev_oop} outside the pot"
+    );
+}
+
+/// `compare` lines two artifacts up by node, so an artifact compared with
+/// itself must report exactly zero, and two solves of the same config that
+/// ran for different lengths must differ a little and agree on the spot.
+#[test]
+fn postflop_compare_reports_zero_against_itself() {
+    let dir = temp_dir("postflop-compare");
+    let short = workspace_root().join("examples/river_small.toml");
+    let long = dir.join("long.toml");
+    std::fs::write(
+        &long,
+        std::fs::read_to_string(&short)
+            .unwrap()
+            .replace("iterations = 200", "iterations = 2000"),
+    )
+    .unwrap();
+
+    let run_short = dir.join("short");
+    let run_long = dir.join("long");
+    run_solvers_ok(&[
+        "solve",
+        short.to_str().unwrap(),
+        "--out",
+        run_short.to_str().unwrap(),
+    ]);
+    run_solvers_ok(&[
+        "solve",
+        long.to_str().unwrap(),
+        "--out",
+        run_long.to_str().unwrap(),
+    ]);
+    let a = run_short.join("solution.sol");
+    let b = run_long.join("solution.sol");
+
+    let same = run_solvers_ok(&["compare", a.to_str().unwrap(), a.to_str().unwrap()]);
+    let same: serde_json::Value = serde_json::from_slice(&same.stdout).expect("compare json");
+    assert_eq!(same["mean_strategy_l1"].as_f64(), Some(0.0));
+    assert_eq!(same["max_ev_delta"].as_f64(), Some(0.0));
+    assert!(same["nodes"].as_u64().unwrap() > 0);
+
+    let differ = run_solvers_ok(&["compare", a.to_str().unwrap(), b.to_str().unwrap()]);
+    let differ: serde_json::Value = serde_json::from_slice(&differ.stdout).expect("compare json");
+    assert!(
+        differ["mean_strategy_l1"].as_f64().unwrap() > 0.0,
+        "two different solve lengths should not play identically"
+    );
+    // A longer solve of the same spot converges toward the same root EV.
+    let ev = differ["ev_oop"].as_array().unwrap();
+    let (left, right) = (ev[0].as_f64().unwrap(), ev[1].as_f64().unwrap());
+    assert!(
+        (left - right).abs() < 0.1,
+        "root EV drifted: {left} vs {right}"
     );
 }

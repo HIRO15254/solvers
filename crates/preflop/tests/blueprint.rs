@@ -240,7 +240,7 @@ fn structure_smoke_matches_memory_usage_and_bb_acts_first() {
 
     // Preflop open (r25), call: continuation into the flop street (pinned
     // history convention: postflop streets separated by `/`, tokens
-    // `x`/`c`/`f`/`b{to}` with `to` the actor's total street contribution).
+    // `x`/`c`/`f`/`r{to}` with `to` the actor's total street contribution).
     let flop_first = game
         .node_by_history("r25c/")
         .expect("flop's first decision node (BB to act)");
@@ -262,7 +262,7 @@ fn structure_smoke_matches_memory_usage_and_bb_acts_first() {
     // BB bets 25 (half the 50-chip flop pot), SB calls: turn's first
     // decision node, still BB.
     let turn_first = game
-        .node_by_history("r25c/b25c/")
+        .node_by_history("r25c/r25c/")
         .expect("turn's first decision node (BB to act)");
     assert_eq!(
         game.game.tree.node(turn_first).player,

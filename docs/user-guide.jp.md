@@ -273,9 +273,88 @@ GUIは2026-08に削除した。設定作成・実行・監視をGUIから行う�
 Multiwayのmeasured deviationは単独seatのtrained deviationに対する推定であり、
 多人数一般和ゲームのNash/GTO保証ではない。Sweep消化率や残り時間も収束確率ではない。
 
-## 12. 関連ドキュメント
+## 12. Postflop subgame を解く
 
-- `docs/multiway-preflop-v1.jp.md` — Production v1の規範仕様と全TOML項目
+`schema = "solvers.postflop/v1"` は固定 board の heads-up postflop subgame を
+正確に解く。Multiway と違い sampling ではなく 1,326 combo の vector engine なので、
+平均戦略は Nash へ収束する。全 TOML 項目は `docs/solver-config-v1.jp.md` が規範である。
+
+最小構成は board・両者のレンジ・pot・effective stack・street ごとの bet menu である。
+
+```toml
+schema = "solvers.postflop/v1"
+
+[game]
+board = "Ks 7h 2d"
+oop_range = "22+,A2s+,K9s+,QTs+,JTs,ATo+,KQo"
+ip_range = "random"
+pot = 50
+effective_stack = 200
+
+[game.tree.flop]
+oop_bet = [33, 75]
+ip_bet = [50]
+ip_raise = [["3x"], ["a"]]
+max_aggressive_actions = 3
+include_allin = true
+
+[run]
+target_nash_conv = 0.05
+max_time = "30m"
+```
+
+`[game.tree]` の size literal は PioSOLVER と同じ綴りで、Multiway Preflop とも
+共通である。裸の数値は **pot の百分率**(`33` = 33%pot)、`"20c"` が chip 単位、
+`"3x"` が直前 wager の倍率(`"2x"` が最小 legal raise)、`"a"` がオールイン、
+`"e"` / `"3e"` が等比サイズ(残り street 数 / 3 street)。Pio に対応する綴りが
+無い `"min"`、`"60%stack"`、`"80%effective"` は明示形のままである。
+絶対値だけ単位が違い、Multiway は BB の `"2.5bb"` を使う。
+
+Pio 系ツールと対応する主な knob:
+
+| やりたいこと | key |
+|---|---|
+| street・player ごとの bet size | `[game.tree.<street>] oop_bet` / `ip_bet` |
+| 3bet / 4bet で size を変える | `oop_raise` / `ip_raise` を level ごとの list of list で書く(省略時は bet menu を再利用、`[]` で raise 禁止) |
+| donk bet を禁止する / 別 size にする | `oop_donk = []` / `oop_donk = [30]` |
+| 常に all-in を候補に入れる | `include_allin = true`(単発なら menu に `"a"`) |
+| 大きい size を all-in へ丸める | `allin_threshold = 0.8` |
+| street ごとの bet+raise 上限 | `max_aggressive_actions` |
+| 最小 bet 額(big blind 相当) | `[game] min_bet` |
+
+レーキとトーナメント ICM も Multiway と同じモデルを共有する。`[rake] kind = "generic"`
+は `when` 条件式・rounding まで同じ実装で、`[utility] kind = "tournament-icm"` は
+場外スタックを含む ICM(15 人以下は厳密、16 人以上は決定的 Monte Carlo)を使う。
+
+実行・監視・再開の手順は Multiway と同じである。
+
+```sh
+cargo run -p cli --release -- validate examples/postflop_srp20.toml --show-effective
+cargo run -p cli --release -- solve examples/postflop_srp20.toml --out runs/srp20
+cargo run -p cli --release -- inspect --sol runs/srp20/solution.sol
+cargo run -p cli --release -- export runs/srp20/solution.sol ev --node all --format csv
+```
+
+EV は **subgame 開始基準** で、「この spot から自分が持ち帰るチップ − ここから
+追加投入するチップ」である。`ev_oop + ev_ip = pot − 期待レーキ` になり、
+`ev_ip = -ev_oop` ではない。Pio / GTO Wizard と同じ基準なので、外部ツールの EV と
+そのまま比較できる。
+
+解いた結果は `solution.sol` 一つに入る。戦略とハンドごとの EV が両方入っているので、
+`export` がそこから機械可読な view を出す(`summary` / `tree` / `actions` /
+`strategy` / `ev` / `range`)。`--node all` で全ノードを一度に吐ける。
+2 つの解を突き合わせるなら `compare` を使う。postflop は `strategy.json` を
+書かず、`solve --history` も受け付けない。
+
+`inspect --node` と `export --node` が受け取る betting-line 文字列の token は
+`x`(check)、`f`(fold)、`c`(call)、`r{到達額}`(bet / raise)、`[Th]`(配牌)である。
+例: `xr5c[Th]xx`。
+
+## 13. 関連ドキュメント
+
+- `docs/multiway-preflop-v1.jp.md` — Multiway Preflop v1の規範仕様と全TOML項目
+- `docs/solver-config-v1.jp.md` — postflop / preflop-hu / toyの規範仕様と全TOML項目
+- `docs/cli-reference.jp.md` — 全コマンド・全flag・exit code・daemonのHTTP API
 - `docs/architecture.md` — workspace、solver、CLIの内部設計
 - `docs/app-architecture.md` — CLI / job daemon / Web GUIの目標設計
 - `docs/development.md` — test、benchmark、変更手順

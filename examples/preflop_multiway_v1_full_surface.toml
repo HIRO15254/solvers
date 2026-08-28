@@ -70,7 +70,7 @@ street = "preflop"
 when = "unopened"
 effect = "replace"
 action = "raise"
-sizes = ["2.5x", "allin"]
+sizes = ["2.5x", "a"]
 
 [[game.tree.rules]]
 priority = 110
@@ -78,7 +78,7 @@ street = "preflop"
 when = "limpers > 0 && aggressions == 0"
 effect = "replace"
 action = "raise"
-sizes = ["2.5x", "allin"]
+sizes = ["2.5x", "a"]
 
 [[game.tree.rules]]
 priority = 120
@@ -86,7 +86,7 @@ street = "preflop"
 when = "aggressions >= 1"
 effect = "replace"
 action = "raise"
-sizes = ["3x", "allin"]
+sizes = ["3x", "a"]
 
 [[game.tree.rules]]
 priority = 130

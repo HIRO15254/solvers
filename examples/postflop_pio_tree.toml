@@ -1,0 +1,62 @@
+# Pio-style flop tree exercising the whole `[game.tree]` surface: two bet
+# sizes per player, per-level raise menus, a donk menu OOP may not use, an
+# all-in merge threshold, a generic condition rake, and tournament ICM
+# against an outside field. Small ranges keep it debug-runnable; the point
+# is the tree grammar, not the spot.
+schema = "solvers.postflop/v1"
+
+[game]
+board = "Qs Jh 2h"
+oop_range = "TT+,AQs+,KQs"
+ip_range = "JJ-99,AQs-ATs,KQs,QJs"
+pot = 21
+effective_stack = 195
+min_bet = 1
+
+[game.tree]
+kind = "standard"
+
+[game.tree.flop]
+oop_bet = [33, 75]
+ip_bet = [50]
+oop_raise = [["3x"]]
+ip_raise = [["3x"], ["a"]]
+max_aggressive_actions = 3
+include_allin = true
+allin_threshold = 0.8
+
+[game.tree.turn]
+oop_bet = [66]
+ip_bet = [66]
+oop_donk = []
+oop_raise = [["2.5x"]]
+ip_raise = [["2.5x"]]
+max_aggressive_actions = 2
+
+[game.tree.river]
+oop_bet = ["1e"]
+ip_bet = [75, "a"]
+oop_donk = [30]
+max_aggressive_actions = 2
+
+[rake]
+kind = "generic"
+rate = 0.05
+cap = 6.0
+when = "flop_dealt"
+allocation = "main-first"
+rounding = "down"
+rounding_unit = 1.0
+
+[utility]
+kind = "tournament-icm"
+payouts = [1000.0, 600.0, 400.0]
+outside_field = [1800.0, 2600.0]
+
+[algorithm]
+schedule = "dcfr"
+
+[run]
+max_time = "2m"
+check_every = 50
+target_nash_conv = 0.05

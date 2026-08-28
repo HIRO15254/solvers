@@ -101,8 +101,10 @@ daemon が提供する操作はすべて CLI からも実行できること(`sol
 
 すべての production config は `schema = "solvers.<family>/v1"` を宣言する。schema を持たない TOML は
 一律で拒否する。出力先は `--out <run-dir>` のみとし、`--output` / `--metrics` / `--checkpoint` / `--sol` /
-`--iterations` は廃止する(Phase 1 で実施済み)。`--history` と `--sol-streets` は「何を書き出すか」を
-選ぶ入力であって出力先ではないため残す。
+`--iterations` は廃止する(Phase 1 で実施済み)。`--sol-streets` は「何を書き出すか」を
+選ぶ入力であって出力先ではないため残す。`--history` は artifact を持たない family
+(`solvers.toy/v1` と `solvers.preflop-hu/v1`)にだけ残り、postflop では削除した。
+postflop は戦略も per-hand 値も `solution.sol` に入れ、`solvers export` が読む。
 
 過去互換は考慮しない。schema なし config を受理する経路は削除する。ただし現在 v1 config は
 `GameSection::PreflopMultiway` に lower されてから解かれるため、**内部表現としての既存 struct は残る**。

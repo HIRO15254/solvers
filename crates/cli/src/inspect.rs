@@ -48,7 +48,8 @@ pub fn run(
         pot,
         effective_stack,
         iso_merging,
-        bets,
+        min_bet,
+        tree,
     } = config.game
     else {
         unreachable!("checked above");
@@ -61,19 +62,21 @@ pub fn run(
         pot,
         effective_stack,
         iso_merging,
-        bets,
+        min_bet,
+        tree.lower(),
     )?;
     let board_cards = pf_config.board.clone();
 
     let estimate = holdem::memory_usage(&pf_config);
     postflop_setup::print_memory_estimate(estimate);
 
-    let rake = postflop_setup::build_rake(&config.rake);
-    let utility = postflop_setup::build_utility(&config.utility);
+    let rake = crate::economics::build_rake(&config.rake)?;
+    let utility = crate::economics::build_utility(&config.utility)?;
     let pipeline = PayoffPipeline {
         rake: rake.as_ref(),
         utility: utility.as_ref(),
     };
+    let ev_offset = postflop_setup::subgame_ev_offset(&pf_config, pipeline.utility);
     let pf_game = holdem::build_postflop_game(&pf_config, pipeline);
     let node_info: Vec<PostflopNodeInfo> = pf_game.node_info.clone();
 
@@ -96,10 +99,17 @@ pub fn run(
     let start = Instant::now();
     crate::solve::run_loop(&mut solver, &run_cfg, &mut crate::solve::RunHooks::none())?;
     let elapsed = start.elapsed();
-    crate::solve::print_done(&solver, elapsed);
+    crate::solve::print_done(
+        &solver,
+        elapsed,
+        postflop_setup::subgame_ev(crate::solve::solver_ev(&solver), ev_offset),
+    );
 
     let no_color = std::env::var_os("NO_COLOR").is_some();
-    let mut provider = LiveProvider(&solver);
+    let mut provider = LiveProvider {
+        solver: &solver,
+        ev_offset,
+    };
     let mut repl = Repl {
         game: solver.game(),
         provider: &mut provider,
@@ -162,6 +172,36 @@ struct Repl<'a> {
 }
 
 impl<'a> Repl<'a> {
+    /// Both players' reach at the current node.
+    ///
+    /// Action frequencies and per-hand values are only meaningful against
+    /// the range that actually arrives at a node. Weighting by the root
+    /// range instead — which this used to do — answers a different
+    /// question: it counts hands that could never have got here.
+    fn reach_here(&mut self) -> Result<PerPlayer<Vec<f32>>> {
+        let tree = &self.game.tree;
+        let root_slices = PerPlayer::new(
+            self.game.root_ranges[Player::P0].as_slice(),
+            self.game.root_ranges[Player::P1].as_slice(),
+        );
+        let provider = &mut self.provider;
+        let mut failure = None;
+        let reach =
+            engine::reach_at(
+                tree,
+                root_slices,
+                self.current,
+                |id, _sref, out| match provider.average_strategy(id) {
+                    Ok(avg) => out.copy_from_slice(&avg),
+                    Err(error) => failure = Some(error),
+                },
+            );
+        match failure {
+            Some(error) => Err(error),
+            None => Ok(reach),
+        }
+    }
+
     fn interact(&mut self) -> Result<()> {
         let stdin = io::stdin();
         let mut line = String::new();
@@ -285,10 +325,17 @@ impl<'a> Repl<'a> {
                         return;
                     }
                 };
-                let root_range = &self.game.root_ranges[node.player];
+                let reach = match self.reach_here() {
+                    Ok(reach) => reach,
+                    Err(e) => {
+                        println!("error: {e}");
+                        return;
+                    }
+                };
+                let weight = &reach[node.player];
                 let freqs = postflop_setup::action_frequencies(
                     &avg,
-                    root_range,
+                    weight,
                     sref.num_actions as usize,
                     sref.num_hands as usize,
                 );
@@ -425,16 +472,19 @@ impl<'a> Repl<'a> {
                 return;
             }
         };
-        let root_range = &self.game.root_ranges[node.player];
-        let freqs = postflop_setup::action_frequencies(
-            &avg,
-            root_range,
-            sref.num_actions as usize,
-            num_hands,
-        );
+        let reach = match self.reach_here() {
+            Ok(reach) => reach,
+            Err(e) => {
+                println!("error: {e}");
+                return;
+            }
+        };
+        let weight = &reach[node.player];
+        let freqs =
+            postflop_setup::action_frequencies(&avg, weight, sref.num_actions as usize, num_hands);
         let per_combo = &avg[pos * num_hands..(pos + 1) * num_hands];
-        let weights = class_weights(root_range);
-        let raw = class_average(root_range, per_combo);
+        let weights = class_weights(weight);
+        let raw = class_average(weight, per_combo);
         let mut values = [0.0f64; 169];
         for c in 0..169 {
             values[c] = raw[c] * 100.0;
@@ -568,7 +618,7 @@ impl<'a> Repl<'a> {
 
 /// Resolves a `go`/`grid` argument against an action node's label list: an
 /// exact label match first, else a positional index.
-fn resolve_action(actions: &[String], arg: &str) -> Result<usize, String> {
+pub(crate) fn resolve_action(actions: &[String], arg: &str) -> Result<usize, String> {
     if let Some(p) = actions.iter().position(|a| a == arg) {
         return Ok(p);
     }
@@ -584,8 +634,9 @@ fn resolve_action(actions: &[String], arg: &str) -> Result<usize, String> {
 
 /// Maps an action label to the history token the tree builder would have
 /// appended: `check`->`"x"`, `fold`->`"f"`, `call`->`"c"`, and bet/raise
-/// labels (`"bet 30"`, `"raise to 30"`) to `"b{amount}"` using the label's
-/// last whitespace-separated token as the amount.
+/// labels (`"bet 30"`, `"raise to 30"`) to `"r{amount}"` using the label's
+/// last whitespace-separated token as the amount. Bets and raises share one
+/// token because both simply name the wager the actor moves to.
 fn history_token(label: &str) -> String {
     match label {
         "check" => "x".to_string(),
@@ -593,7 +644,7 @@ fn history_token(label: &str) -> String {
         "call" => "c".to_string(),
         _ => {
             let amount = label.rsplit(' ').next().unwrap_or(label);
-            format!("b{amount}")
+            format!("r{amount}")
         }
     }
 }
@@ -626,7 +677,7 @@ fn identify_card(mask: &[f32]) -> Option<Card> {
 /// merged class (see `cmd_help`'s iso-merging note). Falls back to a bare
 /// `dealN` when neither source applies (e.g. an `Identity` map, which this
 /// builder never uses at a chance node, or an untagged/non-action child).
-fn chance_child_label(
+pub(crate) fn chance_child_label(
     tree: &PublicTree,
     node_info: &[PostflopNodeInfo],
     node_id: NodeId,

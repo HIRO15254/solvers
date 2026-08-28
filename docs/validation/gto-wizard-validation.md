@@ -82,8 +82,8 @@ GW を「独立した外部オラクル」として使い、Mode A(exact postflo
 | IP のフロップ入場レンジ(重み付き) | `game.ip_range` | 同上。 |
 | 開始ポット | `game.pot` | 整数チップ。**単位規約は §4.1**。 |
 | 実効スタック(behind) | `game.effective_stack` | 整数チップ。pot と**同じ単位**で。 |
-| 各ストリートのベット/レイズサイズ(%ポット) | `game.bets.{flop,turn,river}.{oop,ip}` | **%→分数**(75% → `0.75`)。意味論は §4.3。 |
-| レイズ上限(1 ストリートあたりのベット+レイズ回数) | `game.bets.{street}.max_raises` | GW のツリー深さに合わせる。既定 2。 |
+| 各ストリートのベット/レイズサイズ(%ポット) | `game.tree.{flop,turn,river}.{oop_bet,ip_bet}` | **%→size literal**(75% → `"75%pot"`、裸の `0.75` も同義)。意味論は §4.3。 |
+| レイズ上限(1 ストリートあたりのベット+レイズ回数) | `game.tree.{street}.max_aggressive_actions` | GW のツリー深さに合わせる。既定 2。 |
 | レーキ(キャッシュ) | `[rake]` | §4.4。ChipEV スポットなら省略(=NoRake)。 |
 | ICM(MTT) | `[utility]` | §4.4。通常は ChipEV スポットを選ぶ(ICM は当面対象外推奨)。 |
 
@@ -110,7 +110,7 @@ GW を「独立した外部オラクル」として使い、Mode A(exact postflo
      → リバーカード選択(ペア/フラッシュ/ストレートを完成させないカードを選ぶ)。
   2. リバーの OOP first action ノードで、**両者の到達レンジを Copy**(§3.3)。x-x 経由なので
      ポット・スタックはフロップ開始時と同じ。
-  3. solvers 側は `board` に 5 枚書き、`[game.bets.river]` だけ定義した config にする(§4.6 の
+  3. solvers 側は `board` に 5 枚書き、`[game.tree.river]` だけ定義した config にする(§4.6 の
      雛形から flop/turn セクションを削る)。到達レンジがそのまま入場レンジになる。
   - 到達レンジは GW の均衡戦略で重み付けされた「多数の中途半端な重み」を含むが、Copy 文字列が
     フル精度なので転記誤差は出ない(手動転記なら §3.2 の⚠️どおり避けるべきパターン)。
@@ -172,9 +172,9 @@ stack_bb: __
 pot_flop_bb: __
 board: __ __ __
 bet_tree:
-  flop:  oop=[__%] ip=[__%] max_raises=__(不明なら N/A)
-  turn:  oop=[__%] ip=[__%] max_raises=__
-  river: oop=[__%] ip=[__%] max_raises=__
+  flop:  oop_bet=[__%] ip_bet=[__%] max_aggressive_actions=__(不明なら N/A)
+  turn:  oop_bet=[__%] ip_bet=[__%] max_aggressive_actions=__
+  river: oop_bet=[__%] ip_bet=[__%] max_aggressive_actions=__
 oop_range: <ハンド:重み のカンマ区切り、またはコピーしたレンジ文字列>
 ip_range:  <同上>
 compare_node: flop OOP first action (root)
@@ -325,6 +325,10 @@ notes: <UI 上の注意・確信が持てなかった読み取り・スクショ
 
 ### 4.3 ベットサイズの意味論(GW と一致させる肝)
 
+config のサイズ表記は PioSOLVER と同じで、**裸の数値はポットの百分率**である
+(`75` = 75%pot)。1 未満の裸の数値は旧表記のポット比と見なして `SLV004` で拒否される
+(`docs/solver-config-v1.jp.md`「size literal」)。
+
 solver の内部計算(`crates/holdem/src/postflop.rs`)は標準のポット比コンベンション:
 
 ```
@@ -332,22 +336,22 @@ pot_after_call = 現ポット + コール額(outstanding)
 レイズ上乗せ  = fraction × pot_after_call
 ```
 
-- **ベット(未対面, outstanding=0)**: `fraction × 現ポット`。→ GW の「75% pot bet」= `0.75`。**そのまま一致**。
+- **ベット(未対面, outstanding=0)**: `fraction × 現ポット`。→ GW の「75% pot bet」= `75`。**そのまま一致**。
 - **レイズ(対面)**: 「コールしてから、コール後ポットの fraction を上乗せ」。これは PioSOLVER / GW の
-  標準 pot レイズ表記と同じ。→ GW が「pot% 表記」でレイズサイズを出しているなら `%/100` で一致。
+  標準 pot レイズ表記と同じ。→ GW が「pot% 表記」でレイズサイズを出しているなら**その数値をそのまま**書く。
 - **GW の表示の実際(実測)**: アクションボタンは「Bet 2 (36%)」「Raise 7 (53%)」のように
   **到達総額(bb)+ %** の併記。% の定義は上記コンベンションと同一で、検算式は
   `fraction = (到達総額 − コール額) / (現ポット + コール額 × 2)`。
   例: pot 5.5bb で Bet 2 に対する Raise 7 → (7−2)/(5.5+2+2) = 52.6% ≒ 表示 53%。
-  **転記前に必ずこの検算をする**(GW 表示 % は丸めなので、fraction には検算した正確な値ではなく
-  bb 額から逆算した値を使う。例: `2/5.5 = 0.36363636`)。
+  **転記前に必ずこの検算をする**(GW 表示 % は丸めなので、config には表示 % ではなく
+  bb 額から逆算した値を使う。例: `2/5.5 = 36.363636`)。
 - **bet / raise のサイズ分離(2026-07-09 追加)**: GW はベットとレイズで異なるサイズ集合を使う
   (実測例: リバーのベット 36/73/155% に対し、レイズは 53/84/126%)。config は
   `oop_raise` / `ip_raise` でレイズ専用サイズを指定できる(省略時は `oop`/`ip` に
   フォールバック = 従来挙動):
   ```toml
-  [game.bets.river]
-  oop = [0.364, 0.727, 1.545, 17.727]          # ベット(未対面)
+  [game.tree.river]
+  oop_bet = [0.364, 0.727, 1.545, 17.727]          # ベット(未対面)
   ip  = [0.364, 0.727, 1.545, 17.727]
   oop_raise = [0.526, 0.842, 1.263, 17.727]     # レイズ(対面)← GW の実サイズを検算して転記
   ip_raise  = [0.526, 0.842, 1.263, 17.727]
@@ -427,20 +431,20 @@ ip_range  = "JJ,TT,AQs,KQs,QJs,JTs,AQo"    # ← GW の入場レンジを転記
 pot = 550                                   # 5.5bb, 1bb=100chips
 effective_stack = 10000                     # 100bb
 
-[game.bets.flop]
-oop = [0.75]   # ← GW のフロップサイズ(%→分数)
+[game.tree.flop]
+oop_bet = [0.75]   # ← GW のフロップサイズ(%→分数)
 ip  = [0.75]
-max_raises = 2
+max_aggressive_actions = 2
 
-[game.bets.turn]
-oop = [0.75]
+[game.tree.turn]
+oop_bet = [0.75]
 ip  = [0.75]
-max_raises = 1
+max_aggressive_actions = 1
 
-[game.bets.river]
-oop = [0.75]
+[game.tree.river]
+oop_bet = [0.75]
 ip  = [0.75]
-max_raises = 1
+max_aggressive_actions = 1
 
 [algorithm]
 schedule = "dcfr"
@@ -464,10 +468,10 @@ solve/inspect は最初に必ずツリーサイズ見積りを 1 行出す:
 tree: nodes=... terminals=... rank_tables=... storage=XXX MiB (f32) / YYY MiB (i16)
 ```
 
-- **⚠️** `storage` が搭載 RAM に対して過大(例 >8 GB)なら、ベットサイズ数 / max_raises を減らすか、
+- **⚠️** `storage` が搭載 RAM に対して過大(例 >8 GB)なら、ベットサイズ数 / max_aggressive_actions を減らすか、
   ターン単独・リバー単独スポットに切り替える。無理に走らせない。
-- **実測(Ks7h2d フロップ開始, 単一サイズ)**: max_raises 3/2/2 → 11.4 GB(f32)、2/1/1 → 2.9 GB、
-  1/1/1 → 1.7 GB(i16 なら 863 MB)。**max_raises が最も効くレバー**。
+- **実測(Ks7h2d フロップ開始, 単一サイズ)**: max_aggressive_actions 3/2/2 → 11.4 GB(f32)、2/1/1 → 2.9 GB、
+  1/1/1 → 1.7 GB(i16 なら 863 MB)。**max_aggressive_actions が最も効くレバー**。
 - **⚠️ Windows のコミット制限**: 物理 RAM に空きがあっても `memory allocation of N bytes failed` で
   落ちることがある(コミットチャージ逼迫。ブラウザ等の常駐が多い環境)。preflight の i16 サイズが
   「空き RAM の 1/4」程度に収まる構成まで絞ると安全。
@@ -480,7 +484,7 @@ tree: nodes=... terminals=... rank_tables=... storage=XXX MiB (f32) / YYY MiB (i
 NO_COLOR=1 ./target/release/solvers inspect gw-check-XXX.toml
 ```
 
-- 解き終わると `done: iterations=... wall=...s value_p0=... nash_conv=...` が出て `>` プロンプトになる。
+- 解き終わると `done: iterations=... wall=...s ev_p0=... ev_p1=... nash_conv=...` が出て `>` プロンプトになる。
 - **収束確認**: 最終 `nash_conv` が `target_nash_conv` を下回っているか(=`target nash_conv ... reached` が出たか)を確認。
   出ていなければ収束不足 → §6.4。
 
@@ -563,16 +567,17 @@ solve → 全コマンドの出力 → 終了、が 1 回で取れる(2026-07-09
 ### 6.3 EV の比較(単位換算注意)
 
 - `ev` 行の `ev_oop` / `ev_ip` は**このチップ単位/ディール**での期待値。`1bb=100chips` なら `/100` で bb。
-- **基準の変換式(確定、2026-07-09 検証)**:
+- **基準の変換は単位換算だけ**:
   ```
-  GW_EV(bb) = (ev_chips + pot/2) / 100     (1bb=100chips のとき)
+  GW_EV(bb) = ev_chips / 100     (1bb=100chips のとき)
   ```
-  根拠: postflop ゲームは両者が `pot/2` を拠出済み・`stacks_before = effective_stack + pot/2` として
-  構築され(`crates/holdem/src/postflop.rs` の `terminal()`)、表示 EV は stacks_before 基準の純増減。
-  一方 GW の EV は「ポット全体を賞金とみなした期待獲得 bb」なので、自分の拠出済み `pot/2` を足し戻すと
-  一致する。実測: ev_oop=−39.9 → (−39.9+275)/100 = 2.35bb vs GW 2.37bb(差 0.4% pot)。
-- **整合性チェック**: `ev_oop + ev_ip = −期待レーキ(chips)`(レーキなしなら 0)。
-  GW 側も `EV_OOP + EV_IP = pot − 期待レーキ` になっているはずなので相互検算できる。
+  solvers の postflop EV は subgame 開始基準(「この spot から持ち帰るチップ − ここから追加投入する
+  チップ」)で、GW の「ポット全体を賞金とみなした期待獲得 bb」と同じ定義である
+  (`docs/solver-config-v1.jp.md` の「EV の基準」)。
+  かつては表示 EV が hand 開始基準だったため `+ pot/2` を手で足す必要があったが、
+  その補正は solver 側に取り込んだ。過去の検証記録に残る `(ev + pot/2)` 表記は旧基準のものである。
+- **整合性チェック**: `ev_oop + ev_ip = pot − 期待レーキ(chips)`(レーキなしなら `pot`)。
+  GW 側も同じ式になるので相互検算できる。
 - 変換式が合わない(> 数 % pot ずれる)場合のみメインループにエスカレーション。
   相対比較(2 ハンド間の EV 差、`EV/pot`)は従来どおり頑健なフォールバック。
 - **⚠️ 一般和 / レーキ時**: レーキ有りは general-sum。`ev_ip ≠ -ev_oop` が正常(両者を独立に見る)。
@@ -656,7 +661,7 @@ solve → 全コマンドの出力 → 終了、が 1 回で取れる(2026-07-09
 NO_COLOR=1 ./target/release/solvers inspect examples/turn_small.toml
 # 解けたら > プロンプトで:
 > ev
-ev_oop=10.000000 ev_ip=-10.000000 expl_oop=0.000e0 ... nash_conv=0.000e0 iterations=400
+ev_oop=20.000000 ev_ip=0.000000 expl_oop=0.000e0 ... nash_conv=0.000e0 iterations=400
 > show
 kind: action (oop to act)
   [0] check: 0.000

@@ -9,6 +9,7 @@ use std::collections::{BTreeMap, HashSet};
 use std::path::Path;
 
 use anyhow::{Context, Result, anyhow, bail};
+use cards::SizeUnit;
 use multiway::config::{
     AbstractionConfig, AbstractionKind, ActiveOpponentBucketConfig, AnteConfig, BettingConfig,
     BlindConfig, ForcedBetConfig, MultiwayConfig, RakeAllocation as RuntimeRakeAllocation,
@@ -596,53 +597,12 @@ fn default_rule_priority() -> i32 {
     100
 }
 
+/// Parses a Multiway Preflop bet-size literal (bb-denominated). Delegates to
+/// the shared grammar in `cards::sizing`; the error is re-wrapped as
+/// `anyhow::Error` but keeps the same message text this crate has always
+/// produced.
 fn parse_size_literal(source: &str) -> Result<SizeSpec> {
-    let source = source.trim();
-    if source == "min" {
-        return Ok(SizeSpec::MinRaise);
-    }
-    if source == "allin" {
-        return Ok(SizeSpec::AllIn);
-    }
-    if let Some(inner) = source
-        .strip_prefix("geometric(allin,")
-        .and_then(|value| value.strip_suffix(')'))
-    {
-        let inner = inner.trim();
-        let inner = inner.strip_prefix("streets=").unwrap_or(inner);
-        let streets = inner
-            .parse::<u8>()
-            .with_context(|| format!("invalid geometric street count in {source:?}"))?;
-        if streets == 0 {
-            bail!("geometric street count must be positive");
-        }
-        return Ok(SizeSpec::GeometricAllIn { streets });
-    }
-    let (number, kind) = ["%effective", "%stack", "%pot", "bb", "x"]
-        .into_iter()
-        .find_map(|suffix| source.strip_suffix(suffix).map(|number| (number, suffix)))
-        .ok_or_else(|| anyhow!("invalid tree size literal {source:?}"))?;
-    let value = number
-        .parse::<f64>()
-        .with_context(|| format!("invalid number in tree size {source:?}"))?;
-    if !value.is_finite() || value <= 0.0 {
-        bail!("tree size must be finite and positive: {source:?}");
-    }
-    Ok(match kind {
-        "bb" => SizeSpec::ToBb { value },
-        "%pot" => SizeSpec::PotAfterCall {
-            fraction: value / 100.0,
-        },
-        "x" if value > 1.0 => SizeSpec::PreviousBetMultiple { factor: value },
-        "x" => bail!("current-bet multiple must be greater than one: {source:?}"),
-        "%effective" => SizeSpec::EffectiveStackFraction {
-            fraction: value / 100.0,
-        },
-        "%stack" => SizeSpec::StackFraction {
-            fraction: value / 100.0,
-        },
-        _ => unreachable!(),
-    })
+    Ok(SizeSpec::parse(source, SizeUnit::Bb)?)
 }
 
 fn lower_tree_rules(rules: &[TreeRule]) -> Result<Vec<RuntimeTreeRule>> {
@@ -1176,6 +1136,18 @@ struct Output {
 
 impl V1Config {
     fn materialize_effective(&mut self) -> Result<()> {
+        // Size literals are written in whichever accepted spelling the
+        // author preferred; an effective config states the canonical one,
+        // so the same tree always reads the same way. Parsing here also
+        // means a bad literal fails during normalization rather than
+        // surviving into a stored effective config.
+        if let Tree::Standard { rules, .. } = &mut self.game.tree {
+            for rule in rules {
+                for size in &mut rule.sizes {
+                    *size = parse_size_literal(size)?.render(SizeUnit::Bb);
+                }
+            }
+        }
         let count = usize::from(self.game.seat_count);
         let default_stack = self.game.defaults.stack_bb.ok_or_else(|| {
             anyhow!("game.defaults.stack_bb is required unless every seat overrides it")
@@ -1293,22 +1265,7 @@ impl V1Config {
                 sizes: rule
                     .sizes
                     .into_iter()
-                    .map(|size| match size {
-                        SizeSpec::ToBb { value } => format!("{value}bb"),
-                        SizeSpec::PotAfterCall { fraction } => format!("{}%pot", fraction * 100.0),
-                        SizeSpec::PreviousBetMultiple { factor } => format!("{factor}x"),
-                        SizeSpec::MinRaise => "min".into(),
-                        SizeSpec::AllIn => "allin".into(),
-                        SizeSpec::EffectiveStackFraction { fraction } => {
-                            format!("{}%effective", fraction * 100.0)
-                        }
-                        SizeSpec::StackFraction { fraction } => {
-                            format!("{}%stack", fraction * 100.0)
-                        }
-                        SizeSpec::GeometricAllIn { streets } => {
-                            format!("geometric(allin,streets={streets})")
-                        }
-                    })
+                    .map(|size| size.render(SizeUnit::Bb))
                     .collect(),
             })
             .collect();
@@ -1595,6 +1552,7 @@ impl V1Config {
                 prune_skip_probability: multiway::solver::DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
             run: RunSection {
+                max_time_secs: None,
                 iterations: 0,
                 sweeps: Some(self.run.max_sweeps),
                 seed: None,
@@ -1731,6 +1689,9 @@ fn lower_economics(
                     when: rake.when,
                     allocation,
                     rounding,
+                    // Multiway chip amounts are big blinds on the fixed
+                    // `.001 BB` grid; the lowered rounding unit says so.
+                    rounding_unit: 0.001,
                 },
             ))
         }
@@ -2357,6 +2318,27 @@ ante_bb = 0.125
         assert_eq!(state.amount_to_call(SeatId::new_unchecked(4)).raw(), 2_000);
         assert_eq!(state.pot_size().raw(), 2_125);
     }
+
+    /// Size literals are shared with the postflop family and canonicalize
+    /// to PioSOLVER's spelling, so an effective config states one form
+    /// whichever the author wrote.
+    #[test]
+    fn size_literals_normalize_to_the_pio_spelling() {
+        let raw = format!(
+            "{MINIMAL}\n[game.tree]\nkind = \"standard\"\n\
+             [[game.tree.rules]]\nstreet = \"preflop\"\nwhen = \"unopened\"\n\
+             effect = \"replace\"\naction = \"raise\"\n\
+             sizes = [\"2.2x\", \"allin\", \"50%pot\", \"geometric(allin,2)\"]\n"
+        );
+        let effective = normalized_toml(&raw).unwrap();
+        assert!(effective.contains("\"a\""), "{effective}");
+        assert!(effective.contains("\"50\""), "{effective}");
+        assert!(effective.contains("\"2e\""), "{effective}");
+        assert!(!effective.contains("\"allin\""), "{effective}");
+        assert!(!effective.contains("%pot"), "{effective}");
+        assert_eq!(normalized_toml(&effective).unwrap(), effective);
+    }
+
     #[test]
     fn standard_tree_rules_lower_sizes_and_change_legal_actions() {
         let raw = format!(

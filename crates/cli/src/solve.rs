@@ -3,13 +3,13 @@ use std::time::{Duration, Instant};
 
 use abstraction::Ehs2Params;
 use anyhow::{Context, Result, anyhow};
-use cards::{NUM_CLASSES, NUM_COMBOS, PerPlayer, Player, combo_cards};
+use cards::{NUM_CLASSES, PerPlayer, Player};
 use engine::{
     DiscountSchedule, F32Storage, I16Storage, NodeId, NodeKind, ParConfig, Solver, SolverState,
     Storage, TerminalEvaluator,
 };
 use game::PayoffPipeline;
-use holdem::{PostflopEvaluator, build_postflop_game};
+use holdem::build_postflop_game;
 use preflop::{
     EquityShowdown, PostflopBets, PreflopConfig, blueprint_memory_usage, build_blueprint_game,
     build_preflop_game,
@@ -17,7 +17,7 @@ use preflop::{
 use serde::Serialize;
 
 use crate::config::{
-    BetsSection, GameSection, PostflopSection, RunSection, SolveConfig, StorageKind,
+    GameSection, PostflopSection, RunSection, SolveConfig, StorageKind, TreeSection,
 };
 use crate::postflop_setup;
 use crate::preflop_setup;
@@ -67,6 +67,15 @@ pub fn run(
     crate::run_dir::create_or_adopt(out)?;
     let config: SolveConfig =
         crate::config::parse_solve_config_at(raw, config_path).context("parsing config")?;
+    if matches!(config.game, GameSection::Postflop { .. })
+        && histories.iter().any(|history| !history.is_empty())
+    {
+        return Err(anyhow!(
+            "postflop publishes strategy through solution.sol; read a node with \
+             `solvers export <run>/solution.sol strategy --node <NODE>` \
+             (or `--node all`) instead of --history"
+        ));
+    }
     let run_paths = if is_multiway_v1 {
         crate::run_dir::RunPaths::multiway(out)
     } else {
@@ -86,12 +95,22 @@ pub fn run(
             Some(paths.checkpoint.as_path()),
             Some(paths.solution.as_path()),
         )
+    } else if matches!(config.game, GameSection::Postflop { .. }) {
+        // Postflop publishes strategy through `solution.sol`, which
+        // `export` reads: a second, partial JSON of the same thing would be
+        // one more shape to keep in agreement for no gain.
+        (
+            None,
+            Some(paths.progress.as_path()),
+            Some(paths.checkpoint.as_path()),
+            Some(paths.solution.as_path()),
+        )
     } else {
         (
             Some(paths.strategy.as_path()),
             Some(paths.progress.as_path()),
             Some(paths.checkpoint.as_path()),
-            matches!(config.game, GameSection::Postflop { .. }).then(|| paths.solution.as_path()),
+            None,
         )
     };
 
@@ -383,8 +402,8 @@ fn run_with_storage_impl<S: Storage>(
     events: Option<&mut formats::RunEventLog>,
     cancel: Option<&std::sync::atomic::AtomicBool>,
 ) -> Result<RunSummary> {
-    let rake = postflop_setup::build_rake(&config.rake);
-    let utility = postflop_setup::build_utility(&config.utility);
+    let rake = crate::economics::build_rake(&config.rake)?;
+    let utility = crate::economics::build_utility(&config.utility)?;
     let pipeline = PayoffPipeline {
         rake: rake.as_ref(),
         utility: utility.as_ref(),
@@ -433,7 +452,8 @@ fn run_with_storage_impl<S: Storage>(
             pot,
             effective_stack,
             iso_merging,
-            bets,
+            min_bet,
+            tree,
         } => solve_postflop::<S>(
             pipeline,
             &board,
@@ -442,12 +462,11 @@ fn run_with_storage_impl<S: Storage>(
             pot,
             effective_stack,
             iso_merging,
-            bets,
+            min_bet,
+            tree,
             schedule,
             schedule_name,
             &config.run,
-            output,
-            histories,
             resume_state,
             sol,
             &mut hooks,
@@ -498,7 +517,9 @@ fn run_with_storage_impl<S: Storage>(
 }
 
 /// Convergence loop shared by every game: run a chunk of iterations, report
-/// exploitability, and stop early once `target_nash_conv` is hit. Generic
+/// exploitability, and stop early once `target_nash_conv` or `max_time` is
+/// hit. Both stop conditions are evaluated only at `check_every` marks, so
+/// a run overshoots by at most one chunk. Generic
 /// over both the terminal evaluator and the storage backend so toy games,
 /// postflop subgames, and both storage backends all reuse it unchanged.
 ///
@@ -560,6 +581,24 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
             println!("target nash_conv {target:.3e} reached");
             break;
         }
+
+        // Checked here rather than mid-chunk so a time-limited run still
+        // stops on an exploitability mark, with a checkpoint already
+        // written for it.
+        if let Some(limit) = run.max_time_secs
+            && elapsed_secs >= limit as f64
+        {
+            println!(
+                "max_time {limit}s reached at iteration {}",
+                solver.iteration()
+            );
+            if let Some(events) = hooks.events.as_deref_mut() {
+                let _ = events.info(formats::RunEventPayload::Stop {
+                    reason: "time-limit".to_string(),
+                });
+            }
+            break;
+        }
     }
     Ok(())
 }
@@ -589,6 +628,8 @@ fn checkpoint_now<E: TerminalEvaluator, S: Storage>(
 /// don't have to scrape stdout or recompute exploitability.
 pub(crate) struct RunSummary {
     pub iterations: u64,
+    /// Root EV per player, on the family's reporting basis.
+    pub ev: PerPlayer<f64>,
     pub wall: Duration,
     pub expl_p0: f64,
     pub expl_p1: f64,
@@ -599,28 +640,46 @@ pub(crate) struct RunSummary {
 }
 
 /// Final convergence summary, shared by every game.
+///
+/// `ev` is already on the family's reporting basis — for postflop that is
+/// the subgame-start basis (see [`crate::postflop_setup::subgame_ev`]), for
+/// the others it is the solver's own value. Both players' numbers are
+/// printed because neither family guarantees `ev_p1 == -ev_p0`: rake makes
+/// any game general-sum, and postflop's basis makes the pair sum to the
+/// starting pot rather than to zero.
 pub(crate) fn print_done<E: TerminalEvaluator, S: Storage>(
     solver: &Solver<E, S>,
     elapsed: Duration,
+    ev: PerPlayer<f64>,
 ) -> RunSummary {
     let expl = solver.exploitability();
     let nash_conv = expl[Player::P0] + expl[Player::P1];
-    let value = solver.expected_value(Player::P0);
     println!(
-        "done: iterations={} wall={:.2}s value_p0={:.6} nash_conv={:.3e}",
+        "done: iterations={} wall={:.2}s ev_p0={:.6} ev_p1={:.6} nash_conv={:.3e}",
         solver.iteration(),
         elapsed.as_secs_f64(),
-        value,
+        ev[Player::P0],
+        ev[Player::P1],
         nash_conv,
     );
     RunSummary {
         canceled: false,
         iterations: solver.iteration(),
         wall: elapsed,
+        ev,
         expl_p0: expl[Player::P0],
         expl_p1: expl[Player::P1],
         nash_conv,
     }
+}
+
+/// The solver's own root values, for the families whose reported EV is the
+/// solver value unchanged.
+pub(crate) fn solver_ev<E: TerminalEvaluator, S: Storage>(solver: &Solver<E, S>) -> PerPlayer<f64> {
+    PerPlayer::new(
+        solver.expected_value(Player::P0),
+        solver.expected_value(Player::P1),
+    )
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -649,7 +708,7 @@ fn solve_toy<S: Storage>(
     let start = Instant::now();
     run_loop(&mut solver, run, hooks)?;
     let elapsed = start.elapsed();
-    let summary = print_done(&solver, elapsed);
+    let summary = print_done(&solver, elapsed, solver_ev(&solver));
     checkpoint_now(&solver, hooks)?;
 
     if let Some(path) = output {
@@ -670,12 +729,11 @@ fn solve_postflop<S: Storage>(
     pot: u32,
     effective_stack: u32,
     iso_merging: bool,
-    bets: BetsSection,
+    min_bet: u32,
+    tree: TreeSection,
     schedule: Box<dyn DiscountSchedule>,
     schedule_name: &str,
     run: &RunSection,
-    output: Option<&Path>,
-    histories: &[String],
     resume_state: Option<SolverState>,
     sol: Option<SolExportSpec>,
     hooks: &mut RunHooks<'_>,
@@ -687,7 +745,8 @@ fn solve_postflop<S: Storage>(
         pot,
         effective_stack,
         iso_merging,
-        bets,
+        min_bet,
+        tree.lower(),
     )?;
 
     // Cheap dry run before committing to the (possibly very large) real
@@ -696,30 +755,14 @@ fn solve_postflop<S: Storage>(
     let estimate = holdem::memory_usage(&config);
     postflop_setup::print_memory_estimate(estimate);
 
+    // Captured before `pipeline` is consumed by the build: every EV this
+    // run reports is on the subgame-start basis, and this is the constant
+    // that puts it there.
+    let ev_offset = postflop_setup::subgame_ev_offset(&config, pipeline.utility);
     let pf_game = build_postflop_game(&config, pipeline);
-
-    // Resolve the requested export histories to node ids (and their
-    // player/action labels) while the built tree and node_info are still
-    // both in hand; `pf_game.game` moves into the solver right after.
-    let mut resolved = Vec::new();
-    for history in histories {
-        match pf_game.node_by_history(history) {
-            Some(node_id) => {
-                let tag = pf_game.game.tree.tags[node_id as usize] as usize;
-                let info = &pf_game.node_info[tag];
-                let player = pf_game.game.tree.node(node_id).player.index();
-                resolved.push(ResolvedHistory {
-                    history: history.clone(),
-                    node_id,
-                    player,
-                    actions: info.actions.clone(),
-                });
-            }
-            None => {
-                eprintln!("warning: unknown history {history:?}, skipping");
-            }
-        }
-    }
+    // Kept past the solver move: the `.sol` export needs every node's
+    // contribution to re-base its stored values.
+    let node_info = pf_game.node_info.clone();
 
     if let Some(n) = run.threads {
         // Ignore "already initialized": tests and repeated calls within one
@@ -747,19 +790,16 @@ fn solve_postflop<S: Storage>(
     let start = Instant::now();
     run_loop(&mut solver, run, hooks)?;
     let elapsed = start.elapsed();
-    let summary = print_done(&solver, elapsed);
+    let summary = print_done(
+        &solver,
+        elapsed,
+        postflop_setup::subgame_ev(solver_ev(&solver), ev_offset),
+    );
     checkpoint_now(&solver, hooks)?;
-
-    if let Some(path) = output {
-        let report = export_postflop(&resolved, &solver);
-        std::fs::write(path, serde_json::to_string_pretty(&report)?)
-            .with_context(|| format!("writing {}", path.display()))?;
-        println!("strategy written to {}", path.display());
-    }
 
     if let Some(spec) = &sol {
         let start_street = crate::sol::start_street_from_board_len(config.board.len());
-        crate::sol::export_sol(spec, &solver, start_street, &summary)?;
+        crate::sol::export_sol(spec, &solver, &node_info, start_street, &summary)?;
     }
 
     Ok(summary)
@@ -923,7 +963,7 @@ fn solve_preflop_showdown<S: Storage>(
     let start = Instant::now();
     run_loop(&mut solver, run, hooks)?;
     let elapsed = start.elapsed();
-    let summary = print_done(&solver, elapsed);
+    let summary = print_done(&solver, elapsed, solver_ev(&solver));
     checkpoint_now(&solver, hooks)?;
 
     print_preflop_root_summary(&solver, &root_actions);
@@ -1074,7 +1114,7 @@ fn solve_preflop_bucketed<S: Storage>(
     let start = Instant::now();
     run_loop(&mut solver, run, hooks)?;
     let elapsed = start.elapsed();
-    let summary = print_done(&solver, elapsed);
+    let summary = print_done(&solver, elapsed, solver_ev(&solver));
     checkpoint_now(&solver, hooks)?;
 
     print_preflop_root_summary(&solver, &root_actions);
@@ -1180,72 +1220,6 @@ fn export_toy<S: Storage>(
         expected_value_p0: solver.expected_value(Player::P0),
         exploitability: [expl[Player::P0], expl[Player::P1]],
         nodes,
-    }
-}
-
-#[derive(Serialize)]
-struct PostflopReport {
-    game: String,
-    iterations: u64,
-    expected_value_p0: f64,
-    exploitability: [f64; 2],
-    entries: Vec<HistoryEntry>,
-}
-
-#[derive(Serialize)]
-struct HistoryEntry {
-    history: String,
-    player: usize,
-    actions: Vec<String>,
-    /// One row per combo with non-zero range weight for the acting player:
-    /// `[combo_index, "AhKs", [action probabilities...]]`.
-    strategy: Vec<(usize, String, Vec<f32>)>,
-}
-
-fn export_postflop<S: Storage>(
-    entries: &[ResolvedHistory],
-    solver: &Solver<PostflopEvaluator, S>,
-) -> PostflopReport {
-    let tree = &solver.game().tree;
-    let mut out = Vec::with_capacity(entries.len());
-    for entry in entries {
-        let node = tree.node(entry.node_id);
-        let sref = tree.storage_ref(node);
-        let (num_actions, num_hands) = (sref.num_actions as usize, sref.num_hands as usize);
-        debug_assert_eq!(num_hands, NUM_COMBOS);
-        let sigma = solver.average_strategy_at(entry.node_id);
-        // The game's own root ranges, not the raw user-specified `Range`:
-        // these are already zeroed for combos that conflict with the
-        // starting board, so board-blocked hands (e.g. a pocket pair whose
-        // rank sits on the board) never leak into the export with
-        // meaningless untouched storage values.
-        let range = &solver.game().root_ranges[Player::from_index(entry.player)];
-
-        let mut strategy = Vec::new();
-        for combo in 0..num_hands {
-            if range[combo] <= 0.0 {
-                continue;
-            }
-            let (hi, lo) = combo_cards(combo);
-            let probs: Vec<f32> = (0..num_actions)
-                .map(|a| sigma[a * num_hands + combo])
-                .collect();
-            strategy.push((combo, format!("{hi}{lo}"), probs));
-        }
-        out.push(HistoryEntry {
-            history: entry.history.clone(),
-            player: entry.player,
-            actions: entry.actions.clone(),
-            strategy,
-        });
-    }
-    let expl = solver.exploitability();
-    PostflopReport {
-        game: "postflop".to_string(),
-        iterations: solver.iteration(),
-        expected_value_p0: solver.expected_value(Player::P0),
-        exploitability: [expl[Player::P0], expl[Player::P1]],
-        entries: out,
     }
 }
 

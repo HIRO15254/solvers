@@ -1153,6 +1153,9 @@ pub(crate) fn convert_rake(rake: RakeSection) -> MultiwayRake {
             when,
             allocation,
             rounding,
+            // Multiway's own rake grammar fixes the rounding unit at
+            // `.001 BB`; only the heads-up families make it configurable.
+            rounding_unit: _,
         } => MultiwayRake::Generic {
             rate,
             cap_bb: cap,

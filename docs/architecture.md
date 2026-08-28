@@ -194,6 +194,7 @@ HU showdown の結果集合は {P0 wins, tie, P1 wins} のみ ⇒ per-terminal �
 - **Suit isomorphism は builder が適用**(エンジンは関知しない): turn/river canonical カードのみを deal に列挙し weight に多重度を畳み込む。平均 ~1.7–1.9x、monotone board で最大 24x のノード削減。22,100→1,755 canonical flop は preflop 層で使用。
 - **Showdown kernel**: build 時に canonical river 毎に全 live combo を評価(evaluator はホットパス外、~1.2G evals/s)し rank ソート済みレンジ + card-removal 簿記を保存。solve 時は **O(n+m) sorted-rank sweep**。Fold kernel は O(n) の inclusion–exclusion(`opp_total − sum_by_card[c1] − sum_by_card[c2] + opp_reach[combo]`)。
 - **Session API**(postflop-solver 形状を踏襲): `with_config → memory_usage → allocate_memory(compress) → solve(params) → play/apply_history/back_to_root → cache_normalized_weights → strategy()/expected_values(p)/equity(p)/compute_exploitability()`(flat `Vec<f32>`、`[action*num_hands + hand]`)。
+- **任意ノードの値**: `Solver::expected_values_at` / `best_response_values_at` は `engine::reach_at` が返す到達確率を受けて 1 ノードの per-hand 反実仮想値を返し、`expected_values_everywhere` は 1 パスで全 action node 分を記録する(ノード毎に呼ぶと二次オーダーになるため)。反実仮想値を 1 ハンドあたりのチップへ直すには相手の到達確率で割る必要があり、その除数は fold kernel と同じ inclusion–exclusion で求める。`.sol` はこの正規化済みの値を保存する。
 - **メモリ見積り**: bytes ≈ 2 buffer × B × Σ(actions × hands)、B=4(f32)/≈2(i16)。100bb 3-bet pot flop tree で **~0.8–1.4 GB f32 / ~500–700 MB i16**(校正点: b-inary 1.25 GB / 660 MB、Pio 1.41 GB、GTO+ 705 MB)。16 GB RAM でほぼ全 postflop 構成をカバー。
 - **メモリ現実チェック**: その ~1 GB 級の数字は 3-bet pot での較正値
   (b-inary 1.25 GB / Pio 1.41 GB という参照点自体が 3-bet pot)。

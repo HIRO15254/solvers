@@ -11,7 +11,7 @@ use cards::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range, Street};
 use engine::{Dcfr, F32Storage, NodeId, NodeKind, ParConfig, PublicTree, Solver};
 use game::{ChipEv, NoRake, PayoffPipeline};
 use holdem::{
-    PerStreet, PostflopConfig, build_postflop_game, node_streets, river_entry_state,
+    PerStreet, PostflopConfig, StreetTree, build_postflop_game, node_streets, river_entry_state,
     river_resolve_config,
 };
 
@@ -55,20 +55,10 @@ fn small_turn_config() -> PostflopConfig {
         ),
         pot: Chips(2),
         effective_stack: Chips(20),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
-        },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 1,
-            river: 1,
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
+            river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
         },
         ..Default::default()
     }
@@ -89,20 +79,10 @@ fn small_flop_config() -> PostflopConfig {
         ),
         pot: Chips(2),
         effective_stack: Chips(20),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![0.5], vec![0.5]),
-            turn: PerPlayer::new(vec![0.5], vec![0.5]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
-        },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![0.5], vec![0.5]),
-            turn: PerPlayer::new(vec![0.5], vec![0.5]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
-        },
-        max_raises: PerStreet {
-            flop: 1,
-            turn: 1,
-            river: 1,
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[0.5], &[0.5], 1),
+            turn: StreetTree::pot_fractions(&[0.5], &[0.5], 1),
+            river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
         },
         ..Default::default()
     }
@@ -200,11 +180,11 @@ fn river_entry_state_bet_call_turn_line() {
     // pot_after_call = pot_now + outstanding(0) = 2, raw = round(0.75*2) =
     // round(1.5) = 2, extra = min(max(2,1), behind(20)-outstanding(0)) = 2,
     // additional = outstanding(0) + extra(2) = 2 => contrib[P0] = 0+2 = 2,
-    // history token "b2".
+    // history token "r2".
     // P1 calls: contrib[P1] = contrib[P0] = 2, token "c".
     // Chance deals "2c" (distinct suit from the board's existing "2s"/"2h").
     // c = 2, so pot' = 2 + 2*2 = 6, eff' = 20 - 2 = 18.
-    let state = river_entry_state(&config, "b2c[2c]").expect("valid bet-call-deal history");
+    let state = river_entry_state(&config, "r2c[2c]").expect("valid bet-call-deal history");
     assert_eq!(state.board, parse_board5("2s 7s Ks 2h 2c"));
     assert_eq!(state.pot, Chips(6));
     assert_eq!(state.effective_stack, Chips(18));
@@ -215,19 +195,19 @@ fn river_entry_state_accumulates_contribution_across_two_streets() {
     let config = small_flop_config();
     // Flop: P0 bets. pot_now = 2+0+0=2, pot_after_call = 2+0=2,
     // raw = round(0.5*2) = 1, extra = min(max(1,1), 20-0-0=20) = 1,
-    // additional = 0+1 = 1 => contrib[P0] = 1, token "b1".
+    // additional = 0+1 = 1 => contrib[P0] = 1, token "r1".
     // P1 calls: contrib[P1] = 1, token "c". Chance deals turn card "2c"
     // (board becomes 2s 7s Ks 2c).
     //
     // Turn: pot_now = 2+1+1=4, pot_after_call = 4+0=4,
     // raw = round(0.5*4) = 2, extra = min(max(2,1), (20-1)-0=19) = 2,
-    // additional = 0+2 = 2 => contrib[P0] = 1+2 = 3, token "b3".
+    // additional = 0+2 = 2 => contrib[P0] = 1+2 = 3, token "r3".
     // P1 calls: contrib[P1] = 3, token "c". Chance deals river card "9d"
     // (board becomes 2s 7s Ks 2c 9d).
     //
     // c = 3 chips, accumulated across both streets' bets (1 then +2), so
     // pot' = trunk.pot(2) + 2*3 = 8, eff' = trunk.stack(20) - 3 = 17.
-    let state = river_entry_state(&config, "b1c[2c]b3c[9d]")
+    let state = river_entry_state(&config, "r1c[2c]r3c[9d]")
         .expect("valid two-street bet-call-deal history");
     assert_eq!(state.board, parse_board5("2s 7s Ks 2c 9d"));
     assert_eq!(state.pot, Chips(8));
@@ -339,20 +319,10 @@ fn fast_turn_config_for_solve() -> PostflopConfig {
         ),
         pot: Chips(2),
         effective_stack: Chips(20),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![], vec![]),
-        },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![], vec![]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 1,
-            river: 0,
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
+            river: StreetTree::pot_fractions(&[], &[], 0),
         },
         ..Default::default()
     }

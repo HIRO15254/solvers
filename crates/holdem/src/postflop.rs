@@ -19,8 +19,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::ops::Index;
 
 use cards::{
-    ALL_CARDS, Card, CardSet, Chips, HandRank, NUM_COMBOS, PerPlayer, Player, Range, Street,
-    combo_cards, combo_index, rank_of,
+    ALL_CARDS, Card, CardSet, Chips, HandRank, NUM_COMBOS, PerPlayer, Player, Range, SizeSpec,
+    Street, combo_cards, combo_index, geometric_allin_target, rank_of,
 };
 use engine::{
     CompiledGame, NodeId, PublicTree, ReachMap, SparseTransition, TempNode, TerminalEvaluator,
@@ -56,6 +56,83 @@ impl<T> Index<Street> for PerStreet<T> {
     }
 }
 
+/// One street's betting grammar, mirroring
+/// `multiway::config::StreetBettingConfig` for the heads-up postflop engine:
+/// the same `SizeSpec` vocabulary, `chips` instead of `bb` as the absolute
+/// unit, plus raise-level indexing and a donk menu that multiway's flat
+/// per-street `raise_sizes` list has no equivalent of (multiway never faces
+/// the "OOP reopens after being checked to on a street IP was last aggressive
+/// on" situation the way a HU postflop subgame does).
+#[derive(Clone, Debug)]
+pub struct StreetTree {
+    /// Sizes for OOP opening the betting on this street (no outstanding bet
+    /// to face).
+    pub oop_bet: Vec<SizeSpec>,
+    /// Sizes for IP opening the betting on this street.
+    pub ip_bet: Vec<SizeSpec>,
+    /// Sizes facing an outstanding bet, indexed by raise level: index 0 is
+    /// the first raise of the street. A level past the end reuses the last
+    /// entry. `None` reuses the player's own bet menu as a single level —
+    /// the fallback every config had before raise menus were separable, so
+    /// a tree that names only bet sizes still raises with them.
+    /// `Some(vec![])` means no sized raises at all.
+    pub oop_raise: Option<Vec<Vec<SizeSpec>>>,
+    pub ip_raise: Option<Vec<Vec<SizeSpec>>>,
+    /// OOP's opening menu on a street whose previous street's last
+    /// aggressor was IP (a "donk" spot). `None` reuses `oop_bet`;
+    /// `Some(vec![])` forbids donking outright.
+    pub oop_donk: Option<Vec<SizeSpec>>,
+    /// Maximum bets plus raises on this street (multiway's name for what
+    /// this used to call `max_raises`).
+    pub max_aggressive_actions: u32,
+    /// Always offer the all-in target in addition to the sized menu.
+    pub include_allin: bool,
+    /// Targets at or above this fraction of the actor's maximum target
+    /// collapse into the all-in target. Finite and in `(0.0, 1.0]`.
+    pub allin_threshold: Option<f64>,
+}
+
+impl Default for StreetTree {
+    fn default() -> Self {
+        StreetTree {
+            oop_bet: Vec::new(),
+            ip_bet: Vec::new(),
+            oop_raise: None,
+            ip_raise: None,
+            oop_donk: None,
+            max_aggressive_actions: 2,
+            include_allin: false,
+            allin_threshold: None,
+        }
+    }
+}
+
+impl StreetTree {
+    /// A street whose bet and raise menus are the same pot fractions for
+    /// both players — the shape every config had before size literals, kept
+    /// as a short constructor for the test/bench fixtures that just want a
+    /// classic single-level pot-fraction tree. `oop`/`ip` become the opening
+    /// bet menus, and the raise menus fall back to them.
+    pub fn pot_fractions(oop: &[f64], ip: &[f64], max_aggressive_actions: u32) -> StreetTree {
+        let sizes = |fractions: &[f64]| -> Vec<SizeSpec> {
+            fractions
+                .iter()
+                .map(|&fraction| SizeSpec::PotAfterCall { fraction })
+                .collect()
+        };
+        StreetTree {
+            oop_bet: sizes(oop),
+            ip_bet: sizes(ip),
+            oop_raise: None,
+            ip_raise: None,
+            oop_donk: None,
+            max_aggressive_actions,
+            include_allin: false,
+            allin_threshold: None,
+        }
+    }
+}
+
 /// A postflop subgame: starting board (3, 4, or 5 cards fixes the starting
 /// street), both ranges, the pot already built, remaining effective stacks,
 /// and a bet grammar per street.
@@ -64,19 +141,30 @@ pub struct PostflopConfig {
     /// 3 (flop), 4 (turn), or 5 (river) distinct cards.
     pub board: Vec<Card>,
     pub ranges: PerPlayer<Range>,
-    /// Pot at the start of the subgame; must be even (equal contributions).
+    /// Pot at the start of the subgame. Need not be even: an odd pot splits
+    /// as OOP = `pot / 2` (floor), IP = `pot - pot / 2` at every terminal, so
+    /// `contrib[P0] + contrib[P1]` always equals `pot` exactly.
+    ///
+    /// That split is an internal bookkeeping convention with no modelling
+    /// content, and a config never states it. `PayoffPipeline::bake`
+    /// cancels it out of `stacks_after` algebraically, so it reaches the
+    /// baked payoffs only as a per-player constant — the same constant at
+    /// every terminal, which no strategy, best response, or exploitability
+    /// can see. It survives in exactly one place: the level of the reported
+    /// root EV, which [`PostflopConfig::starting_share`] adds back so the
+    /// reported number is measured from the start of the subgame (see that
+    /// method).
     pub pot: Chips,
     /// Chips behind for each player, at the start of the subgame.
     pub effective_stack: Chips,
-    /// Bet sizes (no outstanding bet to face) as fractions of the current
-    /// pot, per street per player.
-    pub bet_fractions: PerStreet<PerPlayer<Vec<f64>>>,
-    /// Raise sizes (facing an outstanding bet) as fractions of the pot after
-    /// a call, per street per player. Always populated; callers that want the
-    /// classic shared-size behaviour copy `bet_fractions` here.
-    pub raise_fractions: PerStreet<PerPlayer<Vec<f64>>>,
-    /// Maximum number of bets+raises per street.
-    pub max_raises: PerStreet<u32>,
+    /// Betting grammar per street: opening bet/donk menus, raise menus by
+    /// level, the aggressive-action cap, and all-in handling.
+    pub streets: PerStreet<StreetTree>,
+    /// Smallest legal opening bet and smallest legal raise increment — the
+    /// big blind's role in a game that has no blinds. `SizeSpec::MinRaise`
+    /// and the minimum-full-raise bump (see `raise_targets`) are both
+    /// anchored on this value.
+    pub min_bet: Chips,
     /// Merge turn/river deals into suit-isomorphism classes. The default
     /// constructor sets this `true`; river-only subgames (via the
     /// [`crate::river`] shim) never deal, so it has no effect there.
@@ -87,6 +175,29 @@ pub struct PostflopConfig {
     pub track_node_info: bool,
 }
 
+impl PostflopConfig {
+    /// This player's slice of the starting pot, under the internal
+    /// floor/ceil split (see [`PostflopConfig::pot`]).
+    ///
+    /// Solve payoffs are measured from before the pot was built, which is
+    /// what keeps an unraked chip-EV game exactly zero-sum. Adding this
+    /// share back to a player's root EV re-bases it on the start of the
+    /// subgame: "chips this player takes out of the pot, minus the chips
+    /// they put in from here". The two re-based EVs then sum to
+    /// `pot - E[rake]`, which is the convention PioSOLVER and GTO Wizard
+    /// report and what the validation workflow compares against. Because
+    /// the solver value already carries `-starting_share`, adding it back
+    /// cancels the split exactly: the reported EV is the same whichever way
+    /// an odd chip was assigned.
+    pub fn starting_share(&self, player: Player) -> Chips {
+        let oop = Chips(self.pot.0 / 2);
+        match player {
+            Player::P0 => oop,
+            Player::P1 => self.pot - oop,
+        }
+    }
+}
+
 impl Default for PostflopConfig {
     fn default() -> Self {
         PostflopConfig {
@@ -94,9 +205,8 @@ impl Default for PostflopConfig {
             ranges: PerPlayer::new(Range::default(), Range::default()),
             pot: Chips::ZERO,
             effective_stack: Chips::ZERO,
-            bet_fractions: PerStreet::default(),
-            raise_fractions: PerStreet::default(),
-            max_raises: PerStreet::default(),
+            streets: PerStreet::default(),
+            min_bet: Chips(1),
             iso_merging: true,
             track_node_info: true,
         }
@@ -104,10 +214,29 @@ impl Default for PostflopConfig {
 }
 
 /// Node metadata mirroring the toy games' and river slice's scheme.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct PostflopNodeInfo {
     pub history: String,
     pub actions: Vec<String>,
+    /// Street this node belongs to.
+    pub street: Street,
+    /// Each player's total contribution to the pot at this node, the
+    /// starting-pot share included. Re-basing a node's counterfactual value
+    /// onto the subgame-start basis is exactly "add your own contribution
+    /// here" (see `PostflopConfig::starting_share`), so a reader of the
+    /// values needs this alongside them.
+    pub contrib: PerPlayer<Chips>,
+}
+
+impl Default for PostflopNodeInfo {
+    fn default() -> Self {
+        PostflopNodeInfo {
+            history: String::new(),
+            actions: Vec::new(),
+            street: Street::Flop,
+            contrib: PerPlayer::new(Chips::ZERO, Chips::ZERO),
+        }
+    }
 }
 
 pub struct PostflopGame {
@@ -208,6 +337,36 @@ struct LineState {
     first_checked: bool,
     all_in: bool,
     history: String,
+    /// Both players' equal cumulative contribution at the moment this
+    /// street began. A street always starts right after a call or a
+    /// check-check, both of which leave `contrib[P0] == contrib[P1]`, so one
+    /// shared value suffices for both players' street-relative wagers (see
+    /// `raise_targets`).
+    street_start: Chips,
+    /// Size of the last full bet/raise increment on this street; `ZERO`
+    /// before any bet/raise has happened this street. Reset at each street
+    /// start, alongside `street_start`.
+    last_full_raise: Chips,
+    /// The last player to bet or raise on the PREVIOUS street; `None` when
+    /// that street checked through, or when this is the subgame's first
+    /// street. Selects `oop_donk` vs `oop_bet` for OOP's opening action on
+    /// this street — see `raise_targets`'s menu selection.
+    previous_aggressor: Option<Player>,
+    /// The last player to bet or raise on THIS street so far; `None` until
+    /// someone does. Carried forward into the next street's
+    /// `previous_aggressor` by `street_end`/`deal_chance`.
+    street_aggressor: Option<Player>,
+}
+
+/// Betting streets left to play from `street`, inclusive — what Pio's bare
+/// `e` geometric size divides the remaining stack across.
+fn streets_remaining(street: Street) -> u8 {
+    match street {
+        Street::Flop => 3,
+        Street::Turn => 2,
+        Street::River => 1,
+        Street::Preflop => unreachable!("postflop trees start no earlier than the flop"),
+    }
 }
 
 fn next_street(street: Street) -> Street {
@@ -277,38 +436,142 @@ fn chance_groups(board: &[Card], iso_merging: bool, sym: &[SuitPerm]) -> Vec<Dea
     }
 }
 
-/// Distinct total-contribution amounts a bet/raise can reach for the acting
-/// player at `state` (post pot-fraction sizing, all-in clamping, and
-/// same-amount dedup). Shared between the real builder (which turns each
-/// into a child node) and the memory-usage dry run (which only needs the
-/// count), so the two can never produce a different action count for the
-/// same config.
+/// `(amount * fraction).round()`, clamped into `Chips`' `u32` range. Matches
+/// `multiway::betting::scale`'s rounding convention (same size-literal
+/// grammar, chip unit instead of bb).
+fn scale(amount: Chips, fraction: f64) -> Chips {
+    let scaled = (amount.as_f64() * fraction).round();
+    Chips(scaled.clamp(0.0, u32::MAX as f64) as u32)
+}
+
+/// Distinct street-wager targets a bet/raise can reach for the acting player
+/// at `state`: every configured `SizeSpec` resolved to a raise-to target
+/// (street-relative, i.e. the actor's total contribution *this street*),
+/// bumped up to the minimum full raise, clamped to all-in, merged into
+/// all-in past `allin_threshold`, and deduped — the resolution order fixed
+/// by `docs/solver-config-v1.jp.md`'s `[game.tree]` size-literal table
+/// (identical to `multiway::betting::BettingState::legal_actions`'s size
+/// resolution, `ToChips`/chip-unit literals instead of `ToBb`/bb). Returned
+/// as *additional* contribution over the actor's current street wager — the
+/// shape both `Builder::betting` and the counting mirror `Counting::betting`
+/// consume — so the two can never disagree about a node's action count.
 fn raise_targets(state: &LineState, config: &PostflopConfig) -> Vec<Chips> {
-    let actor = state.to_act;
-    if state.raises_used >= config.max_raises[state.street] {
+    let street = &config.streets[state.street];
+    if state.raises_used >= street.max_aggressive_actions {
         return Vec::new();
     }
-    let pot_now = config.pot + state.contrib[Player::P0] + state.contrib[Player::P1];
-    let behind = config.effective_stack - state.contrib[actor];
+    let actor = state.to_act;
+    let opponent = actor.opponent();
+    // Street-relative wagers: `contrib` is cumulative across the whole
+    // subgame, but every size literal (and the minimum-full-raise rule) is
+    // defined in terms of this street's own wagers.
+    let actor_wager = state.contrib[actor] - state.street_start;
+    let bet_to_match = state.contrib[opponent] - state.street_start;
+    let maximum = config.effective_stack - state.street_start;
+    let behind = maximum - actor_wager;
     if behind <= state.outstanding {
         return Vec::new();
     }
-    let fractions = if state.outstanding == Chips::ZERO {
-        &config.bet_fractions[state.street][actor]
+
+    let to_call = state.outstanding.min(behind);
+    let pot_now = config.pot + state.contrib[Player::P0] + state.contrib[Player::P1];
+    let pot_after_call = pot_now + to_call;
+    let called_to = actor_wager + to_call;
+
+    // `multiway::betting::BettingState::minimum_full_target`, with
+    // `min_bet` playing the big blind's role: the first bet of a street must
+    // reach `min_bet`, and every later raise must reach the previous full
+    // raise's own increment on top of the bet it faces.
+    let minimum = if state.last_full_raise > Chips::ZERO {
+        (bet_to_match + state.last_full_raise).min(maximum)
     } else {
-        &config.raise_fractions[state.street][actor]
+        (bet_to_match + config.min_bet).min(maximum)
     };
-    let mut seen: Vec<Chips> = Vec::new();
-    for &fraction in fractions {
-        let pot_after_call = pot_now + state.outstanding;
-        let raw = (fraction * pot_after_call.as_f64()).round() as u32;
-        let extra = Chips(raw.max(1)).min(behind - state.outstanding);
-        let additional = state.outstanding + extra;
-        if !seen.contains(&additional) {
-            seen.push(additional);
+
+    let menu: &[SizeSpec] = if state.outstanding > Chips::ZERO {
+        let (configured, fallback) = match actor {
+            Player::P0 => (&street.oop_raise, &street.oop_bet),
+            Player::P1 => (&street.ip_raise, &street.ip_bet),
+        };
+        // An unset raise menu reuses the player's own bet menu as one
+        // level, which is what a config naming only bet sizes has always
+        // meant. Writing an empty list is the way to say "never raise".
+        let raises: &[Vec<SizeSpec>] = match configured {
+            Some(levels) => levels,
+            None => std::slice::from_ref(fallback),
+        };
+        if raises.is_empty() {
+            &[]
+        } else {
+            // `raises_used` counts every bet/raise so far this street
+            // (bet included), so the first raise decision (level 0) is
+            // always seen with `raises_used == 1`.
+            let level = (state.raises_used as usize - 1).min(raises.len() - 1);
+            &raises[level]
         }
+    } else if actor == Player::P0 && state.previous_aggressor == Some(Player::P1) {
+        street.oop_donk.as_deref().unwrap_or(&street.oop_bet)
+    } else {
+        match actor {
+            Player::P0 => &street.oop_bet,
+            Player::P1 => &street.ip_bet,
+        }
+    };
+
+    let mut targets: Vec<Chips> = Vec::with_capacity(menu.len() + 1);
+    for &size in menu {
+        let mut target = match size {
+            SizeSpec::ToBb { .. } => unreachable!(
+                "the bb size literal belongs to the Multiway Preflop family; \
+                 postflop configs are chip-denominated and never produce ToBb"
+            ),
+            SizeSpec::PotAfterCall { fraction } => called_to + scale(pot_after_call, fraction),
+            SizeSpec::PreviousBetMultiple { factor } => scale(bet_to_match, factor),
+            SizeSpec::MinRaise => minimum,
+            SizeSpec::AllIn => maximum,
+            // Postflop has a single shared `effective_stack`, so the
+            // effective stack IS the actor's maximum target — the two
+            // variants resolve identically here, unlike multiway's
+            // per-opponent `EffectiveStackFraction`.
+            SizeSpec::StackFraction { fraction }
+            | SizeSpec::EffectiveStackFraction { fraction } => scale(maximum, fraction),
+            // Pio's bare `e` splits the stack over the streets that are
+            // left, so a flop `e` is three bets and a river `e` is one.
+            SizeSpec::GeometricAllIn { streets: _ } | SizeSpec::GeometricAllInRemaining => {
+                let streets = match size {
+                    SizeSpec::GeometricAllIn { streets } => streets,
+                    _ => streets_remaining(state.street),
+                };
+                Chips(geometric_allin_target(
+                    called_to.0 as u64,
+                    pot_after_call.0 as u64,
+                    maximum.0 as u64,
+                    streets,
+                ) as u32)
+            }
+            SizeSpec::ToChips { value } => Chips(value.round().clamp(0.0, u32::MAX as f64) as u32),
+        };
+        if target < minimum && maximum >= minimum {
+            target = minimum;
+        }
+        target = target.min(maximum);
+        if let Some(threshold) = street.allin_threshold
+            && target >= scale(maximum, threshold)
+        {
+            target = maximum;
+        }
+        targets.push(target);
     }
-    seen
+    if street.include_allin {
+        targets.push(maximum);
+    }
+    targets.sort_unstable();
+    targets.dedup();
+    targets.retain(|&target| target > bet_to_match);
+    targets
+        .into_iter()
+        .map(|target| target - actor_wager)
+        .collect()
 }
 
 struct Builder<'a> {
@@ -333,7 +596,6 @@ struct Builder<'a> {
 
 /// Builds a postflop subgame through the payoff pipeline.
 pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>) -> PostflopGame {
-    assert!(config.pot.0.is_multiple_of(2), "pot must be even");
     let board_len = config.board.len();
     assert!(
         (3..=5).contains(&board_len),
@@ -362,7 +624,8 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         transition_ids: BTreeMap::new(),
         node_info: vec![PostflopNodeInfo {
             history: "<untagged>".into(),
-            actions: Vec::new(),
+            street: start_street,
+            ..PostflopNodeInfo::default()
         }],
     };
     let root = builder.betting(LineState {
@@ -375,6 +638,10 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         first_checked: false,
         all_in: false,
         history: String::new(),
+        street_start: Chips::ZERO,
+        last_full_raise: Chips::ZERO,
+        previous_aggressor: None,
+        street_aggressor: None,
     });
 
     // Root ranges as 1,326-weight vectors with board conflicts zeroed.
@@ -524,7 +791,7 @@ impl Builder<'_> {
             ));
         }
 
-        // Bets and raises share sizing logic: `f * pot after call`.
+        // Bets and raises share sizing/resolution logic (`raise_targets`).
         for additional in raise_targets(&state, self.config) {
             let mut contrib = state.contrib;
             contrib[actor] += additional;
@@ -536,23 +803,33 @@ impl Builder<'_> {
                     format!("raise to {to}")
                 }
             });
+            // `additional - state.outstanding` is this raise's increment
+            // over the bet it faces (`target - bet_to_match` in
+            // street-relative terms — see `raise_targets`'s doc comment for
+            // why the two are equal), which becomes both the new
+            // `outstanding` owed and the street's `last_full_raise` for the
+            // next minimum-raise computation.
+            let increment = additional - state.outstanding;
             let next = LineState {
                 to_act: actor.opponent(),
                 contrib,
-                outstanding: additional - state.outstanding,
+                outstanding: increment,
                 raises_used: state.raises_used + 1,
-                history: self.extend_history(&state.history, || format!("b{to}")),
+                last_full_raise: increment,
+                street_aggressor: Some(actor),
+                history: self.extend_history(&state.history, || format!("r{to}")),
                 ..state.clone()
             };
             actions.push((verb, self.betting(next)));
         }
 
-        self.finish_action_node(actor, state.history, actions)
+        self.finish_action_node(actor, &state, state.history.clone(), actions)
     }
 
     fn finish_action_node(
         &mut self,
         actor: Player,
+        state: &LineState,
         history: String,
         actions: Vec<(String, TempNode)>,
     ) -> TempNode {
@@ -561,6 +838,11 @@ impl Builder<'_> {
             self.node_info.push(PostflopNodeInfo {
                 history,
                 actions: actions.iter().map(|(name, _)| name.clone()).collect(),
+                street: state.street,
+                contrib: PerPlayer::new(
+                    self.config.starting_share(Player::P0) + state.contrib[Player::P0],
+                    self.config.starting_share(Player::P1) + state.contrib[Player::P1],
+                ),
             });
             tag
         } else {
@@ -590,6 +872,12 @@ impl Builder<'_> {
     }
 
     fn deal_chance(&mut self, state: LineState) -> TempNode {
+        debug_assert_eq!(
+            state.contrib[Player::P0],
+            state.contrib[Player::P1],
+            "a chance node is only ever reached right after a call or a check-check, \
+             both of which leave contributions equal"
+        );
         let next = next_street(state.street);
         let denom = deal_denom(state.street);
         let groups = chance_groups(&state.board, self.config.iso_merging, &self.sym);
@@ -631,6 +919,16 @@ impl Builder<'_> {
                 first_checked: false,
                 all_in: state.all_in,
                 history,
+                // A chance node is only ever reached right after a call or a
+                // check-check, both of which leave `contrib[P0] ==
+                // contrib[P1]` — that shared value is the new street's
+                // baseline. `state.street_aggressor` (this street's bettor,
+                // or `None` on a check-check) becomes the next street's
+                // `previous_aggressor`, the donk-menu signal.
+                street_start: state.contrib[Player::P0],
+                last_full_raise: Chips::ZERO,
+                previous_aggressor: state.street_aggressor,
+                street_aggressor: None,
             };
 
             let child = if state.all_in {
@@ -706,10 +1004,15 @@ impl Builder<'_> {
     }
 
     fn terminal(&mut self, state: &LineState, kind: TerminalKind) -> TempNode {
-        let half_pot = Chips(self.config.pot.0 / 2);
+        // Starting-pot split for an odd `pot` (see `PostflopConfig::pot`):
+        // internal bookkeeping only, and it cancels out of every reported
+        // number. What it buys is the zero-sum property — payoffs measured
+        // from before the pot was built.
+        let oop_share = self.config.starting_share(Player::P0);
+        let ip_share = self.config.starting_share(Player::P1);
         let contrib = PerPlayer::new(
-            half_pot + state.contrib[Player::P0],
-            half_pot + state.contrib[Player::P1],
+            oop_share + state.contrib[Player::P0],
+            ip_share + state.contrib[Player::P1],
         );
         let descriptor = TerminalDescriptor {
             kind,
@@ -717,8 +1020,8 @@ impl Builder<'_> {
             pot: contrib[Player::P0] + contrib[Player::P1],
             contrib,
             stacks_before: PerPlayer::new(
-                self.config.effective_stack + half_pot,
-                self.config.effective_stack + half_pot,
+                self.config.effective_stack + oop_share,
+                self.config.effective_stack + ip_share,
             ),
         };
         let payoffs = self.pipeline.bake(&descriptor);
@@ -813,6 +1116,10 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
         first_checked: false,
         all_in: false,
         history: String::new(),
+        street_start: Chips::ZERO,
+        last_full_raise: Chips::ZERO,
+        previous_aggressor: None,
+        street_aggressor: None,
     });
 
     MemoryEstimate {
@@ -874,11 +1181,14 @@ impl Counting<'_> {
             let actor = state.to_act;
             let mut contrib = state.contrib;
             contrib[actor] += additional;
+            let increment = additional - state.outstanding;
             let next = LineState {
                 to_act: actor.opponent(),
                 contrib,
-                outstanding: additional - state.outstanding,
+                outstanding: increment,
                 raises_used: state.raises_used + 1,
+                last_full_raise: increment,
+                street_aggressor: Some(actor),
                 ..state.clone()
             };
             self.betting(next);
@@ -917,6 +1227,10 @@ impl Counting<'_> {
                 first_checked: false,
                 all_in: state.all_in,
                 history: String::new(),
+                street_start: state.contrib[Player::P0],
+                last_full_raise: Chips::ZERO,
+                previous_aggressor: state.street_aggressor,
+                street_aggressor: None,
             };
             if state.all_in {
                 self.after_deal(child_state);

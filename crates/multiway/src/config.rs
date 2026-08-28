@@ -294,39 +294,10 @@ fn default_postflop_betting() -> StreetBettingConfig {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
-pub enum SizeSpec {
-    ToBb {
-        value: f64,
-    },
-    PotAfterCall {
-        fraction: f64,
-    },
-    PreviousBetMultiple {
-        factor: f64,
-    },
-    /// Always resolves to the minimum legal full raise/bet target for the
-    /// current node (`BettingState::minimum_full_target`). Appended after the
-    /// original three variants: both TOML (`kind` tag) and the JSON game
-    /// fingerprint identify variants by name, so this ordering is purely
-    /// cosmetic and does not break existing configs or fingerprints.
-    MinRaise,
-    /// Resolves to `fraction` of the acting seat's maximum possible target
-    /// (`actor_wager + remaining stack`), i.e. a fraction of an effective
-    /// all-in. Appended after the original three variants for the same
-    /// name-tagged-serialization reason as `MinRaise`.
-    StackFraction {
-        fraction: f64,
-    },
-    AllIn,
-    EffectiveStackFraction {
-        fraction: f64,
-    },
-    GeometricAllIn {
-        streets: u8,
-    },
-}
+/// Bet/raise size grammar, shared with every other config family that
+/// lowers a bet or raise tree. Defined in `cards::sizing`; re-exported here
+/// so `multiway::config::SizeSpec` keeps working for every existing user.
+pub use cards::SizeSpec;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -1011,6 +982,15 @@ fn validate_size_spec(size: &SizeSpec) -> Result<(), ConfigError> {
         SizeSpec::GeometricAllIn { .. } => {
             Err(ConfigError::Number("size.geometric streets".into()))
         }
+        // Bare `e` carries no street count to validate: the engine reads it
+        // off the street being resolved.
+        SizeSpec::GeometricAllInRemaining => Ok(()),
+        // `to-chips` is the postflop family's absolute chip literal; the
+        // `SizeSpec` enum is shared with `cards::sizing` (see the type
+        // there), but multiway seats are configured in bb, so a config that
+        // spells `kind = "to-chips"` for a multiway size is rejected here
+        // rather than silently accepted.
+        SizeSpec::ToChips { .. } => Err(ConfigError::UnsupportedSizeKind("to-chips")),
     }
 }
 
@@ -1249,6 +1229,10 @@ pub enum ConfigError {
     SeatMaxBettingPlayersMismatch { seat: usize, street: Street },
     #[error("invalid tree rule: {0}")]
     TreeRule(String),
+    #[error(
+        "size.kind {0:?} is a postflop-only bet-size literal and is not supported by multiway preflop"
+    )]
+    UnsupportedSizeKind(&'static str),
 }
 #[cfg(test)]
 mod tests {
@@ -1300,8 +1284,16 @@ stack_bb = 12
         assert!(matches!(config.validate(), Err(ConfigError::Button { .. })));
 
         config.button = SeatId(0);
+        // `cards::Range::from_str` now rejects any spec that selects zero
+        // combos (including a range whose only entry has weight 0), so this
+        // now fails inside `Range::from_str` itself and surfaces as
+        // `ConfigError::Range` rather than reaching the
+        // `total_weight() <= 0.0` check that produces `EmptyRange`.
         config.seats[0].range = "AA:0".to_string();
-        assert!(matches!(config.validate(), Err(ConfigError::EmptyRange(0))));
+        assert!(matches!(
+            config.validate(),
+            Err(ConfigError::Range { seat: 0, .. })
+        ));
 
         let bad = format!("{}\nunknown = 1", minimal_toml());
         assert!(toml::from_str::<MultiwayConfig>(&bad).is_err());

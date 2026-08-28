@@ -355,7 +355,19 @@ impl BettingState {
                 SizeSpec::GeometricAllIn { streets } => {
                     geometric_allin_target(called_to, pot_after_call, maximum, streets)
                 }
+                // Pio's bare `e`: divide the remaining stack across the
+                // streets still to be played, this one included.
+                SizeSpec::GeometricAllInRemaining => geometric_allin_target(
+                    called_to,
+                    pot_after_call,
+                    maximum,
+                    streets_remaining(self.street),
+                ),
                 SizeSpec::StackFraction { fraction } => scale(maximum, fraction),
+                SizeSpec::ToChips { .. } => unreachable!(
+                    "ToChips is the postflop-family chip literal; the multiway config \
+                     parser (SizeUnit::Bb) never produces it"
+                ),
             };
             let mut target = if proposed < minimum && maximum >= minimum {
                 minimum
@@ -762,20 +774,31 @@ fn action_sort_key(action: &Action) -> (u8, u64) {
     }
 }
 
+/// Delegates to `cards::geometric_allin_target`, the unit-free formula
+/// shared with every other engine that resolves a `GeometricAllIn` size.
+/// Betting streets left to play from `street`, inclusive — what a bare `e`
+/// geometric size divides the remaining stack across.
+fn streets_remaining(street: Street) -> u8 {
+    match street {
+        Street::Preflop => 4,
+        Street::Flop => 3,
+        Street::Turn => 2,
+        Street::River => 1,
+    }
+}
+
 fn geometric_allin_target(
     called_to: MwChips,
     pot_after_call: MwChips,
     maximum: MwChips,
     streets: u8,
 ) -> MwChips {
-    let remaining = maximum.saturating_sub(called_to);
-    if remaining == MwChips::ZERO || pot_after_call == MwChips::ZERO {
-        return maximum;
-    }
-    let steps = f64::from(streets.max(1));
-    let growth = 1.0 + 2.0 * remaining.raw() as f64 / pot_after_call.raw() as f64;
-    let fraction = (growth.powf(1.0 / steps) - 1.0) / 2.0;
-    called_to + scale(pot_after_call, fraction)
+    MwChips(cards::geometric_allin_target(
+        called_to.raw(),
+        pot_after_call.raw(),
+        maximum.raw(),
+        streets,
+    ))
 }
 
 fn scale(amount: MwChips, factor: f64) -> MwChips {

@@ -1,15 +1,17 @@
 //! Shared helpers for building a postflop subgame from a [`SolveConfig`],
 //! used by `solve`, `inspect`, and `report` so there is exactly one
-//! implementation of board/range parsing, rake/utility/schedule
-//! construction, and the memory-estimate preflight line.
+//! implementation of board/range parsing, discount-schedule construction,
+//! and the memory-estimate preflight line. The rake and utility models live
+//! in [`crate::economics`], which owns the two that are shared with the
+//! sampled multiway engine.
 
 use anyhow::{Result, anyhow};
-use cards::{Card, Chips, PerPlayer, Range};
+use cards::{Card, Chips, PerPlayer, Player, Range};
 use engine::{CfrPlus, Dcfr, DiscountSchedule, HsDcfr, Vanilla, linear_cfr};
-use game::{ChipEv, GgPreflopRake, Icm, NoRake, PercentCapRake, RakeModel, UtilityModel};
-use holdem::{MemoryEstimate, PerStreet, PostflopConfig};
+use game::UtilityModel;
+use holdem::{MemoryEstimate, PerStreet, PostflopConfig, StreetTree};
 
-use crate::config::{AlgorithmSection, BetsSection, RakeSection, UtilitySection};
+use crate::config::AlgorithmSection;
 
 /// Parses a whitespace-separated board string ("Ks 7h 2d") into cards.
 pub fn parse_board(board: &str) -> Result<Vec<Card>> {
@@ -30,7 +32,12 @@ pub fn parse_range(label: &str, spec: &str) -> Result<Range> {
         .map_err(|e| anyhow!("parsing {label} {spec:?}: {e}"))
 }
 
-/// Builds a [`PostflopConfig`] from the raw config fields.
+/// Builds a [`PostflopConfig`] from the raw config fields. `streets` and
+/// `min_bet` are handed over already resolved to `holdem`'s new
+/// `StreetTree`-based grammar (TOML `[game.tree]` parsing lives in
+/// `crate::config`/`crate::solver_config_v1`, which construct `StreetTree`
+/// directly rather than an intermediate `bets`-section shape) — this
+/// function only owns board/range parsing and the `PostflopConfig` literal.
 #[allow(clippy::too_many_arguments)]
 pub fn build_postflop_config(
     board: &str,
@@ -39,107 +46,71 @@ pub fn build_postflop_config(
     pot: u32,
     effective_stack: u32,
     iso_merging: bool,
-    bets: BetsSection,
+    min_bet: u32,
+    streets: PerStreet<StreetTree>,
 ) -> Result<PostflopConfig> {
     let board = parse_board(board)?;
     let oop = parse_range("oop_range", oop_range)?;
     let ip = parse_range("ip_range", ip_range)?;
     let ranges = PerPlayer::new(oop, ip);
 
-    // Raise sizes fall back to the matching bet sizes when the TOML omits
-    // `oop_raise`/`ip_raise`, so pre-existing configs keep the classic
-    // shared-size tree unchanged.
-    let raise_fractions = PerStreet {
-        flop: PerPlayer::new(
-            bets.flop
-                .oop_raise
-                .clone()
-                .unwrap_or_else(|| bets.flop.oop.clone()),
-            bets.flop
-                .ip_raise
-                .clone()
-                .unwrap_or_else(|| bets.flop.ip.clone()),
-        ),
-        turn: PerPlayer::new(
-            bets.turn
-                .oop_raise
-                .clone()
-                .unwrap_or_else(|| bets.turn.oop.clone()),
-            bets.turn
-                .ip_raise
-                .clone()
-                .unwrap_or_else(|| bets.turn.ip.clone()),
-        ),
-        river: PerPlayer::new(
-            bets.river
-                .oop_raise
-                .clone()
-                .unwrap_or_else(|| bets.river.oop.clone()),
-            bets.river
-                .ip_raise
-                .clone()
-                .unwrap_or_else(|| bets.river.ip.clone()),
-        ),
-    };
-    let bet_fractions = PerStreet {
-        flop: PerPlayer::new(bets.flop.oop, bets.flop.ip),
-        turn: PerPlayer::new(bets.turn.oop, bets.turn.ip),
-        river: PerPlayer::new(bets.river.oop, bets.river.ip),
-    };
-    let max_raises = PerStreet {
-        flop: bets.flop.max_raises,
-        turn: bets.turn.max_raises,
-        river: bets.river.max_raises,
-    };
-
     Ok(PostflopConfig {
         board,
         ranges,
         pot: Chips(pot),
         effective_stack: Chips(effective_stack),
-        bet_fractions,
-        raise_fractions,
-        max_raises,
+        streets,
+        min_bet: Chips(min_bet),
         iso_merging,
         track_node_info: true,
     })
 }
 
-/// Builds the rake trait object from its config section.
-pub fn build_rake(rake: &RakeSection) -> Box<dyn RakeModel> {
-    match rake {
-        RakeSection::None => Box::new(NoRake),
-        RakeSection::PercentCap {
-            rate,
-            cap,
-            no_flop_no_drop,
-        } => Box::new(PercentCapRake {
-            rate: *rate,
-            cap: *cap,
-            no_flop_no_drop: *no_flop_no_drop,
-        }),
-        RakeSection::Generic { .. } => panic!("generic rake is only valid in Multiway Preflop v1"),
-        RakeSection::GgPreflop {
-            rate,
-            cap,
-            exempt_pot,
-        } => Box::new(GgPreflopRake {
-            rate: *rate,
-            cap: *cap,
-            exempt_pot: Chips(*exempt_pot),
-        }),
-    }
+/// The constant that re-bases a postflop solver's root values on the start
+/// of the subgame.
+///
+/// The solve measures utility from before the pot was built, which is what
+/// keeps an unraked chip-EV game exactly zero-sum. This offset moves the
+/// zero point to the root of the subgame — both players holding only the
+/// chips behind them, with the pot dead on the table — so the reported
+/// number answers "what does this player take out of this spot, net of what
+/// they still have to put in". That is the basis PioSOLVER and GTO Wizard
+/// report and the one `docs/validation/gto-wizard-validation.md` compares
+/// against.
+///
+/// It goes through the utility model rather than adding chips directly,
+/// because under ICM the solver's values are prize units and adding a chip
+/// count to them would be a unit error. Under chip EV the model is the
+/// identity and this reduces to "add your slice of the starting pot".
+///
+/// The internal split of the starting pot cancels either way: the solver
+/// value carries `-utility(stacks_before)` and this adds it straight back,
+/// leaving `utility(stacks_after) - utility(both players' behind stacks)`.
+/// So the reported EV never depends on which player was credited with an
+/// odd pot's extra chip.
+pub fn subgame_ev_offset(config: &PostflopConfig, utility: &dyn UtilityModel) -> PerPlayer<f64> {
+    let behind = config.effective_stack.as_f64();
+    let before = PerPlayer::new(
+        behind + config.starting_share(Player::P0).as_f64(),
+        behind + config.starting_share(Player::P1).as_f64(),
+    );
+    let solve_baseline = utility.utility(&before);
+    let subgame_baseline = utility.utility(&PerPlayer::new(behind, behind));
+    PerPlayer::new(
+        solve_baseline[Player::P0] - subgame_baseline[Player::P0],
+        solve_baseline[Player::P1] - subgame_baseline[Player::P1],
+    )
 }
 
-/// Builds the utility trait object from its config section.
-pub fn build_utility(utility: &UtilitySection) -> Box<dyn UtilityModel> {
-    match utility {
-        UtilitySection::ChipEv => Box::new(ChipEv),
-        UtilitySection::Icm { payouts } => Box::new(Icm { payouts: *payouts }),
-        UtilitySection::TournamentIcm { .. } => {
-            unreachable!("tournament ICM is handled by the multiway solve path")
-        }
-    }
+/// Applies [`subgame_ev_offset`] to a solver's root values.
+///
+/// Under chip EV without rake the two results sum to the starting pot; with
+/// rake, to the pot less the expected rake. They never sum to zero.
+pub fn subgame_ev(solver_ev: PerPlayer<f64>, offset: PerPlayer<f64>) -> PerPlayer<f64> {
+    PerPlayer::new(
+        solver_ev[Player::P0] + offset[Player::P0],
+        solver_ev[Player::P1] + offset[Player::P1],
+    )
 }
 
 /// Builds the discount schedule from its config section. Matches by
@@ -181,27 +152,32 @@ pub fn print_memory_estimate(estimate: MemoryEstimate) {
     );
 }
 
-/// Range-weighted overall frequency of each action at an action node: for
-/// action `a`, `sum_combo(root_range[combo] * avg_strategy[a][combo]) /
-/// sum_combo(root_range[combo])`, using the acting player's ROOT range
-/// weights (not the node's actual reach, which may differ deeper in the
-/// tree after card removal — this is a deliberate simplification for
-/// reporting purposes, not a solve-path quantity). Returns one frequency per
-/// action, `0.0` for every action if the root range has zero total weight.
+/// Reach-weighted overall frequency of each action at an action node: for
+/// action `a`, `sum_combo(weight[combo] * avg_strategy[a][combo]) /
+/// sum_combo(weight[combo])`.
+///
+/// `weight` is the acting player's reach *at that node* (see
+/// `engine::reach_at`), not their root range. The two agree at the root and
+/// diverge below it: a hand that folded upstream, or that card removal has
+/// made impossible, still carries root weight but no reach, and counting it
+/// would report a frequency over hands that could not be there.
+///
+/// Returns one frequency per action, and `0.0` for every action when the
+/// node is unreachable (total weight zero).
 pub fn action_frequencies(
     avg_strategy: &[f32],
-    root_range: &[f32],
+    weight: &[f32],
     num_actions: usize,
     num_hands: usize,
 ) -> Vec<f64> {
-    let total: f64 = root_range.iter().map(|&w| w as f64).sum();
+    let total: f64 = weight.iter().map(|&w| w as f64).sum();
     if total <= 0.0 {
         return vec![0.0; num_actions];
     }
     (0..num_actions)
         .map(|a| {
             let row = &avg_strategy[a * num_hands..(a + 1) * num_hands];
-            let sum: f64 = root_range
+            let sum: f64 = weight
                 .iter()
                 .zip(row)
                 .map(|(&w, &s)| w as f64 * s as f64)
@@ -209,4 +185,90 @@ pub fn action_frequencies(
             sum / total
         })
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use game::{ChipEv, Icm};
+    use holdem::PerStreet;
+
+    fn config(pot: u32) -> PostflopConfig {
+        PostflopConfig {
+            pot: Chips(pot),
+            effective_stack: Chips(100),
+            streets: PerStreet::default(),
+            ..PostflopConfig::default()
+        }
+    }
+
+    /// Under chip EV the re-basing is exactly "add your slice of the
+    /// starting pot", and the two slices are the whole pot.
+    #[test]
+    fn chip_ev_offset_is_the_starting_pot_split() {
+        for pot in [10, 11] {
+            let offset = subgame_ev_offset(&config(pot), &ChipEv);
+            assert_eq!(offset[Player::P0], (pot / 2) as f64);
+            assert_eq!(offset[Player::P1], (pot - pot / 2) as f64);
+            assert_eq!(offset[Player::P0] + offset[Player::P1], pot as f64);
+        }
+    }
+
+    /// The reported EV must not depend on which player was credited with an
+    /// odd pot's extra chip: the solver value carries `-share` and the
+    /// offset adds it straight back. Simulated here by checking that a
+    /// solver value expressed relative to either split re-bases to the same
+    /// number.
+    #[test]
+    fn the_starting_split_cancels_out_of_the_reported_ev() {
+        let config = config(11);
+        let offset = subgame_ev_offset(&config, &ChipEv);
+        // "OOP takes the whole pot, invests nothing more": the solver value
+        // is the pot minus OOP's own share, whichever share that is.
+        let solver_ev = PerPlayer::new(11.0 - offset[Player::P0], -(11.0 - offset[Player::P0]));
+        let reported = subgame_ev(solver_ev, offset);
+        assert!((reported[Player::P0] - 11.0).abs() < 1e-12);
+        assert!((reported[Player::P1] - 0.0).abs() < 1e-12);
+    }
+
+    /// The offset goes through the utility model, so under ICM it is a
+    /// difference of prize-unit values, never a chip count. Two-player ICM
+    /// depends only on the stack ratio, so crediting both players with a
+    /// symmetric slice of the pot changes nothing and the offset is zero —
+    /// which is exactly the reading that catches a regression to "add the
+    /// chips", where it would be the pot split instead.
+    #[test]
+    fn the_two_player_icm_offset_is_zero_not_a_chip_count() {
+        let icm = Icm {
+            payouts: [100.0, 60.0],
+        };
+        let offset = subgame_ev_offset(&config(20), &icm);
+        assert!(offset[Player::P0].abs() < 1e-12, "{offset:?}");
+        assert!(offset[Player::P1].abs() < 1e-12, "{offset:?}");
+    }
+
+    /// With an outside field the pair's own stacks are no longer the whole
+    /// tournament, so the pot does move their equity and the offset is
+    /// nonzero — but still in prize units, orders of magnitude away from
+    /// the chip split it would be under a unit error.
+    #[test]
+    fn the_tournament_icm_offset_is_nonzero_but_still_prize_units() {
+        let icm = crate::economics::TournamentIcm::new(
+            vec![1000.0, 600.0, 400.0],
+            vec![300.0, 400.0],
+            100_000,
+            0,
+        )
+        .expect("valid tournament ICM");
+        let offset = subgame_ev_offset(&config(20), &icm);
+        assert!(offset[Player::P0] > 0.0, "{offset:?}");
+        assert!(
+            offset[Player::P0] < 20.0,
+            "a prize-unit offset must not look like the chip split: {offset:?}"
+        );
+        assert!(
+            (offset[Player::P0] - offset[Player::P1]).abs() < 1e-9,
+            "an even pot splits symmetrically: {offset:?}"
+        );
+    }
 }

@@ -13,7 +13,7 @@ use cards::{Card, Chips, PerPlayer, Range};
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use engine::{Dcfr, F32Storage, ParConfig, Solver};
 use game::{ChipEv, NoRake, PayoffPipeline};
-use holdem::{PerStreet, PostflopConfig, build_postflop_game};
+use holdem::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
 
 fn chip_ev() -> PayoffPipeline<'static> {
     PayoffPipeline {
@@ -58,21 +58,12 @@ fn turn_config() -> PostflopConfig {
         ),
         pot: Chips(20),
         effective_stack: Chips(80),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
+            river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
         },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 1,
-            river: 1,
-        },
+        min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
     }

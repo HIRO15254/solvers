@@ -33,6 +33,6 @@ pub use run::{
     unix_millis,
 };
 pub use sol::{
-    SolError, SolMeta, SolPayload, StrategyBlock, StreetsStored, dequantize_probs, quantize_probs,
-    read_sol, write_sol,
+    SolError, SolMeta, SolPayload, StrategyBlock, StreetsStored, ValueBlock, dequantize_probs,
+    dequantize_values, quantize_probs, quantize_values, read_sol, write_sol,
 };

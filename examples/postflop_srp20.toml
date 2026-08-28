@@ -9,20 +9,20 @@ ip_range = "22+,A2s+,K7s+,Q8s+,J8s+,T7s+,96s+,86s+,75s+,65s,54s,A5o+,K9o+,Q9o+,J
 pot = 50
 effective_stack = 200
 
-[game.bets.flop]
-oop = [1.0]
-ip = [1.0]
-max_raises = 2
+[game.tree.flop]
+oop_bet = [100]
+ip_bet = [100]
+max_aggressive_actions = 2
 
-[game.bets.turn]
-oop = [1.0]
-ip = [1.0]
-max_raises = 2
+[game.tree.turn]
+oop_bet = [100]
+ip_bet = [100]
+max_aggressive_actions = 2
 
-[game.bets.river]
-oop = [1.0]
-ip = [1.0]
-max_raises = 2
+[game.tree.river]
+oop_bet = [100]
+ip_bet = [100]
+max_aggressive_actions = 2
 
 [algorithm]
 schedule = "dcfr"

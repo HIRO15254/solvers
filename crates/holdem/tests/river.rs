@@ -143,7 +143,7 @@ fn clairvoyance_game_matches_closed_form() {
     };
     let game = build_river_game(&config, chip_ev());
     let root = game.node_by_history("").unwrap();
-    let facing_bet = game.node_by_history("b2").unwrap();
+    let facing_bet = game.node_by_history("r2").unwrap();
     let node_info = game.node_info.clone();
     let tree_tags = game.game.tree.tags.clone();
 

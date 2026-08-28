@@ -191,6 +191,8 @@ name = "cards"
 version = "0.1.0"
 dependencies = [
  "aya_poker",
+ "serde",
+ "serde_json",
  "thiserror",
 ]
 

@@ -10,7 +10,7 @@ use engine::{CompiledGame, NodeId};
 use game::PayoffPipeline;
 
 use crate::postflop::{
-    PerStreet, PostflopConfig, PostflopEvaluator, PostflopGame, build_postflop_game,
+    PerStreet, PostflopConfig, PostflopEvaluator, PostflopGame, StreetTree, build_postflop_game,
 };
 
 /// A river subgame: fixed 5-card board, both ranges, existing pot
@@ -58,28 +58,26 @@ impl RiverGame {
 
 /// Builds a river subgame through the payoff pipeline.
 pub fn build_river_game(config: &RiverConfig, pipeline: PayoffPipeline<'_>) -> RiverGame {
+    // `RiverConfig` predates `StreetTree` and only exposes one pot-fraction
+    // size list per player; `StreetTree::pot_fractions` reuses it as both
+    // the opening bet menu and every raise level's menu, the classic
+    // shared-size behaviour this shim has always had.
+    let river_tree = StreetTree::pot_fractions(
+        &config.bet_fractions[cards::Player::P0],
+        &config.bet_fractions[cards::Player::P1],
+        config.max_raises,
+    );
     let postflop_config = PostflopConfig {
         board: config.board.to_vec(),
         ranges: config.ranges.clone(),
         pot: config.pot,
         effective_stack: config.effective_stack,
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(Vec::new(), Vec::new()),
-            turn: PerPlayer::new(Vec::new(), Vec::new()),
-            river: config.bet_fractions.clone(),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::default(),
+            river: river_tree,
         },
-        // `RiverConfig` predates the bet/raise split and only exposes one
-        // size list; keep the classic shared-size behaviour.
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(Vec::new(), Vec::new()),
-            turn: PerPlayer::new(Vec::new(), Vec::new()),
-            river: config.bet_fractions.clone(),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 0,
-            river: config.max_raises,
-        },
+        min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
     };

@@ -9,6 +9,7 @@ mod card;
 mod eval;
 mod range;
 mod set;
+mod sizing;
 mod types;
 
 pub use card::{ALL_CARDS, Card, NUM_CARDS, ParseCardError, Rank, Suit};
@@ -17,4 +18,5 @@ pub use range::{
     NUM_CLASSES, NUM_COMBOS, ParseRangeError, Range, class_index, combo_cards, combo_index,
 };
 pub use set::CardSet;
+pub use sizing::{ParseSizeError, SizeSpec, SizeUnit, geometric_allin_target};
 pub use types::{Chips, PerPlayer, Player, Street};

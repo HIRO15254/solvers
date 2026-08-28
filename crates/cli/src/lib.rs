@@ -118,10 +118,12 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
 pub mod cache;
 pub mod config;
 pub mod config_new;
+pub mod economics;
 pub mod inspect;
 pub mod multiway_artifact;
 pub mod multiway_solve;
 pub mod multiway_v1;
+mod postflop_artifact;
 pub mod postflop_setup;
 pub mod preflop_setup;
 pub mod report;
@@ -155,12 +157,12 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Create a Multiway Preflop v1 configuration template.
+    /// Create a configuration template.
     Config {
         #[command(subcommand)]
         command: ConfigCommand,
     },
-    /// Validate a Multiway Preflop v1 config without starting a solve.
+    /// Validate a config of any family without starting a solve.
     Validate {
         config: std::path::PathBuf,
         #[arg(long, value_enum, default_value = "human")]
@@ -202,7 +204,7 @@ enum Command {
     },
     /// Solve the game described by a TOML config file.
     Solve {
-        /// Path to the config file (see examples/kuhn.toml).
+        /// Path to the config file (see examples/).
         config: std::path::PathBuf,
         /// Run directory to create. Every artifact of the run lands here.
         #[arg(long)]
@@ -216,16 +218,18 @@ enum Command {
         /// Override the v1 cumulative solve-time limit.
         #[arg(long)]
         max_time: Option<String>,
-        /// Betting-line history to export (postflop/preflop; repeatable).
-        /// Defaults to the root node only.
+        /// Betting-line history to export into `strategy.json` (toy and
+        /// heads-up preflop only; repeatable). Defaults to the root node.
+        /// Postflop publishes through `solution.sol`: read a node with
+        /// `export --node` instead.
         #[arg(long = "history", default_value = "")]
         history: Vec<String>,
-        /// Which streets get stored strategy blocks in the `.sol` export.
-        /// `no-rivers` (default) omits river action nodes -- the viewer
-        /// re-solves them lazily on demand; `full` stores every action node
-        /// (and is forced regardless of this flag when the config itself
-        /// starts on the river).
-        #[arg(long = "sol-streets", value_enum, default_value = "no-rivers")]
+        /// Which streets get stored strategy and value blocks in the `.sol`
+        /// export. `full` (default) stores every action node. `no-rivers`
+        /// omits river action nodes for a much smaller artifact -- the
+        /// viewer then re-solves those subtrees on demand, so their values
+        /// are recomputed rather than as-solved.
+        #[arg(long = "sol-streets", value_enum, default_value = "full")]
         sol_streets: sol::SolStreets,
     },
     /// Continue a checkpointed solve to `run.iterations` total iterations.
@@ -260,7 +264,9 @@ enum Command {
         /// Override periodic checkpoint cadence (for example, 15m).
         #[arg(long)]
         checkpoint_interval: Option<String>,
-        /// Betting-line history to export (postflop/preflop; repeatable).
+        /// Betting-line history to export into `strategy.json` (toy and
+        /// heads-up preflop only; repeatable). Postflop publishes through
+        /// `solution.sol`; read a node with `export --node` instead.
         #[arg(long = "history", default_value = "")]
         history: Vec<String>,
     },
@@ -315,13 +321,18 @@ enum Command {
         #[arg(long = "br-traversals", default_value_t = 20_000)]
         br_traversals: u64,
     },
-    /// Export a stable JSON or CSV view from a `.mwsol` artifact.
+    /// Export a stable JSON or CSV view from a `.sol` or `.mwsol` artifact.
     Export {
         solution: std::path::PathBuf,
         #[arg(value_enum)]
         view: multiway_artifact::ExportView,
         #[arg(long, value_enum, default_value = "json")]
         format: multiway_artifact::ExportFormat,
+        /// Postflop only: which node the per-node views cover. `root`, a
+        /// betting-line history (`xr10c`), slash-separated action labels
+        /// (`check/bet 10`), or `all` for every stored node.
+        #[arg(long, default_value = "root")]
+        node: String,
         #[arg(long)]
         output: Option<std::path::PathBuf>,
     },
@@ -335,8 +346,9 @@ enum Command {
     /// Solve the same postflop config across multiple boards and write a
     /// CSV report (one row per board).
     Report {
-        /// Path to the config file (must be `kind = "postflop"`); its own
-        /// `board` field is ignored in favor of `--boards`/`--boards-file`.
+        /// Path to the config file (schema = "solvers.postflop/v1"); its
+        /// own `board` field is ignored in favor of
+        /// `--boards`/`--boards-file`.
         config: std::path::PathBuf,
         /// Comma-separated boards, each 3/4/5 cards (e.g.
         /// "Ks7h2d,Ks7h2c" or "Ks 7h 2d,Ks 7h 2c").
@@ -364,8 +376,11 @@ enum RunsCommand {
 
 #[derive(Subcommand)]
 enum ConfigCommand {
-    /// Print or write a valid v1 configuration template.
+    /// Print or write a valid configuration template.
     New {
+        /// Config family to template.
+        #[arg(long, value_enum, default_value = "multiway-preflop")]
+        schema: config_new::ConfigSchema,
         #[arg(long, value_enum, default_value = "minimal")]
         template: config_new::ConfigTemplate,
         #[arg(long)]
@@ -381,7 +396,11 @@ pub fn main_impl() -> Result<()> {
     }
     match cli.command {
         Command::Config { command } => match command {
-            ConfigCommand::New { template, out } => config_new::run(template, out.as_deref()),
+            ConfigCommand::New {
+                schema,
+                template,
+                out,
+            } => config_new::run(schema, template, out.as_deref()),
         },
         Command::Status { run, format } => runs::status(&run, format),
         Command::Watch {
@@ -496,13 +515,26 @@ pub fn main_impl() -> Result<()> {
             solution,
             view,
             format,
+            node,
             output,
-        } => multiway_artifact::export(&solution, view, format, output.as_deref()),
+        } => {
+            if solution.extension().is_some_and(|value| value == "mwsol") {
+                multiway_artifact::export(&solution, view, format, output.as_deref())
+            } else {
+                postflop_artifact::export(&solution, view, format, &node, output.as_deref())
+            }
+        }
         Command::Compare {
             left,
             right,
             cross_game,
-        } => multiway_artifact::compare(&left, &right, cross_game),
+        } => {
+            if left.extension().is_some_and(|value| value == "mwsol") {
+                multiway_artifact::compare(&left, &right, cross_game)
+            } else {
+                postflop_artifact::compare(&left, &right, cross_game)
+            }
+        }
         Command::Report {
             config,
             boards,

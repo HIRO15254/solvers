@@ -101,6 +101,40 @@ pub struct StrategyBlock {
     pub probs: Vec<u8>,
 }
 
+/// One action node's per-hand values, on the subgame-start basis (the
+/// node's own contribution already added back, so a reader never has to
+/// know the internal split of the starting pot).
+///
+/// Stored rather than recomputed because a `NoRivers` artifact cannot
+/// recompute them: its river strategies are gone, and the viewer's lazy
+/// re-solve produces different play and therefore different values. Even
+/// for `Full` artifacts, recomputing means a whole value pass per query.
+///
+/// A hand that cannot be held at the node is stored as zero. A
+/// counterfactual value exists for every hand whether or not it can arrive
+/// there, so keeping them would make these blocks dense where the strategy
+/// blocks are sparse — most of an artifact's size — for numbers no reader
+/// wants.
+/// Quantized to `i16` against a per-block scale, the way strategies are
+/// quantized to `u16` against a fixed denominator: a node's values are
+/// bounded by the chips it can still win or lose, so one scale per block
+/// carries them at about one part in 32,767 — far finer than any solve's
+/// own convergence error, at half the bytes of `f32` and with much better
+/// compression, since the low mantissa bits that survive `f32` are noise
+/// no reader can use.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ValueBlock {
+    /// Same `sref` space as [`StrategyBlock`].
+    pub sref: u32,
+    /// Chips (or prize units) one quantization step represents. Zero when
+    /// every value in the block is zero.
+    pub scale: f32,
+    /// OOP's per-hand values then IP's, little-endian `i16` multiples of
+    /// `scale`, stored as raw bytes for the same reason
+    /// [`StrategyBlock::probs`] is.
+    pub values: Vec<u8>,
+}
+
 /// The full decoded `.sol` contents.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SolPayload {
@@ -114,6 +148,10 @@ pub struct SolPayload {
     pub mode: StreetsStored,
     /// One entry per stored action node, ascending by `sref`.
     pub blocks: Vec<StrategyBlock>,
+    /// Per-hand values for the same nodes as `blocks`, ascending by
+    /// `sref`. The two lists always cover the same node set: a reader that
+    /// found a strategy for a node can always find its values too.
+    pub values: Vec<ValueBlock>,
 }
 
 fn parse_header(buf: &[u8; HEADER_LEN]) -> Result<SolHeader, SolError> {
@@ -213,6 +251,41 @@ pub fn write_sol(path: &Path, payload: &SolPayload) -> Result<(), SolError> {
 /// `q = round(p * 65535)`. Deliberately does not renormalize on the way in
 /// — `dequantize_probs` is responsible for restoring an exact per-hand sum
 /// of 1.0 after the rounding error introduced here.
+/// Quantizes a value block to `i16` against a scale chosen from its own
+/// largest magnitude. Returns `(scale, bytes)`; `scale` is `0.0` when every
+/// value is zero, which `dequantize_values` reads back as all zeros.
+pub fn quantize_values(values: &[f32]) -> (f32, Vec<u8>) {
+    let peak = values.iter().fold(0.0f32, |peak, v| peak.max(v.abs()));
+    let scale = if peak > 0.0 { peak / 32_767.0 } else { 0.0 };
+    let mut bytes = Vec::with_capacity(values.len() * 2);
+    for &v in values {
+        let q = if scale > 0.0 {
+            (v / scale).round().clamp(-32_767.0, 32_767.0) as i16
+        } else {
+            0
+        };
+        bytes.extend_from_slice(&q.to_le_bytes());
+    }
+    (scale, bytes)
+}
+
+/// Dequantizes a [`quantize_values`] blob. `bytes.len()` must be twice
+/// `len`; a mismatch is `SolError::Truncated` rather than a panic, for the
+/// same reason [`dequantize_probs`] reports it that way.
+pub fn dequantize_values(bytes: &[u8], scale: f32, len: usize) -> Result<Vec<f32>, SolError> {
+    let expected = len * 2;
+    if bytes.len() != expected {
+        return Err(SolError::Truncated {
+            expected,
+            actual: bytes.len(),
+        });
+    }
+    Ok(bytes
+        .chunks_exact(2)
+        .map(|chunk| i16::from_le_bytes([chunk[0], chunk[1]]) as f32 * scale)
+        .collect())
+}
+
 pub fn quantize_probs(probs: &[f32]) -> Vec<u8> {
     let mut bytes = Vec::with_capacity(probs.len() * 2);
     for &p in probs {
@@ -320,7 +393,48 @@ mod tests {
                     ]),
                 },
             ],
+            // Same srefs as `blocks`, in the same order: the two lists
+            // always describe the same nodes.
+            values: vec![
+                value_block(3, &[2.0, -1.0, 0.5, 0.0, -2.0, 1.0, -0.5, 0.0]),
+                value_block(9, &[7.5, -7.5, -7.5, 7.5]),
+            ],
         }
+    }
+
+    fn value_block(sref: u32, values: &[f32]) -> ValueBlock {
+        let (scale, bytes) = quantize_values(values);
+        ValueBlock {
+            sref,
+            scale,
+            values: bytes,
+        }
+    }
+
+    /// Values survive the `i16` round trip well inside any solve's own
+    /// convergence error, and an all-zero block stays exactly zero rather
+    /// than dividing by a zero scale.
+    #[test]
+    fn value_quantization_round_trips_within_tolerance() {
+        let values = [0.0, 1.0, -1.0, 250.0, -250.0, 0.125, -0.125];
+        let (scale, bytes) = quantize_values(&values);
+        let back = dequantize_values(&bytes, scale, values.len()).unwrap();
+        let step = 250.0 / 32_767.0;
+        for (original, restored) in values.iter().zip(&back) {
+            assert!(
+                (original - restored).abs() <= step,
+                "{original} restored as {restored}"
+            );
+        }
+
+        let (scale, bytes) = quantize_values(&[0.0, 0.0, 0.0]);
+        assert_eq!(scale, 0.0);
+        assert_eq!(dequantize_values(&bytes, scale, 3).unwrap(), vec![0.0; 3]);
+
+        assert!(
+            dequantize_values(&bytes, 1.0, 4).is_err(),
+            "length mismatch"
+        );
     }
 
     #[test]

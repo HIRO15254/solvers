@@ -16,6 +16,12 @@ impl CompiledRakeCondition {
         let index = context_index(context);
         self.bits[index / 64] & (1_u64 << (index % 64)) != 0
     }
+
+    /// True when the condition matches no context in the compiled truth
+    /// table at all (e.g. `players_dealt > 20`), so it can never fire.
+    pub fn is_never(self) -> bool {
+        self.bits.iter().all(|word| *word == 0)
+    }
 }
 
 pub fn compile(source: &str) -> Result<CompiledRakeCondition, String> {
@@ -228,5 +234,12 @@ mod tests {
             players_saw_flop: 4,
         }));
         assert!(compile("cards_seen > 3").is_err());
+    }
+
+    #[test]
+    fn is_never_detects_an_unsatisfiable_condition() {
+        assert!(compile("players_dealt > 20").unwrap().is_never());
+        assert!(!compile("true").unwrap().is_never());
+        assert!(!compile("flop_dealt").unwrap().is_never());
     }
 }

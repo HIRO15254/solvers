@@ -10,7 +10,7 @@
 use cards::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range};
 use engine::{Dcfr, F32Storage, ParConfig, Solver};
 use game::{ChipEv, Icm, NoRake, PayoffPipeline, PercentCapRake};
-use holdem::{PerStreet, PostflopConfig, build_postflop_game};
+use holdem::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
 
 fn chip_ev() -> PayoffPipeline<'static> {
     PayoffPipeline {
@@ -46,20 +46,10 @@ fn small_turn_config() -> PostflopConfig {
         ),
         pot: Chips(2),
         effective_stack: Chips(20),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
-        },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![0.75], vec![0.75]),
-            river: PerPlayer::new(vec![1.0], vec![1.0]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 1,
-            river: 1,
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
+            river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
         },
         ..Default::default()
     }
@@ -163,20 +153,10 @@ fn small_river_config() -> PostflopConfig {
         ),
         pot: Chips(10),
         effective_stack: Chips(50),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![0.5], vec![0.5]),
-        },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![0.5], vec![0.5]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 0,
-            river: 2,
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[], &[], 0),
+            river: StreetTree::pot_fractions(&[0.5], &[0.5], 2),
         },
         ..Default::default()
     }
@@ -272,34 +252,25 @@ fn clairvoyance_config() -> PostflopConfig {
         ),
         pot: Chips(2),
         effective_stack: Chips(2),
-        bet_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![1.0], vec![]),
+        streets: PerStreet {
+            flop: StreetTree::pot_fractions(&[], &[], 0),
+            turn: StreetTree::pot_fractions(&[], &[], 0),
+            river: StreetTree::pot_fractions(&[1.0], &[], 1),
         },
-        raise_fractions: PerStreet {
-            flop: PerPlayer::new(vec![], vec![]),
-            turn: PerPlayer::new(vec![], vec![]),
-            river: PerPlayer::new(vec![1.0], vec![]),
-        },
-        max_raises: PerStreet {
-            flop: 0,
-            turn: 0,
-            river: 1,
-        },
+        min_bet: Chips(1),
         iso_merging: false,
         track_node_info: true,
     }
 }
 
-/// QQ's call frequency at the facing-bet node ("b2": P0 bet to 2, actions
+/// QQ's call frequency at the facing-bet node ("r2": P0 bet to 2, actions
 /// [fold, call]) and 33's bluffing frequency at the root (actions [check,
 /// bet 2]), for the clairvoyance spot under `pipeline`.
 fn clairvoyance_frequencies(pipeline: PayoffPipeline<'_>, iterations: u64) -> (f64, f64) {
     let config = clairvoyance_config();
     let game = build_postflop_game(&config, pipeline);
     let root = game.node_by_history("").expect("root history");
-    let facing_bet = game.node_by_history("b2").expect("facing-bet history");
+    let facing_bet = game.node_by_history("r2").expect("facing-bet history");
     let mut solver =
         Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(iterations));
     solver.run(iterations);

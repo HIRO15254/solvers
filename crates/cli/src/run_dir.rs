@@ -26,8 +26,10 @@ pub struct RunPaths {
     pub progress: PathBuf,
     pub checkpoint: PathBuf,
     pub solution: PathBuf,
-    /// Average strategy for the requested betting lines. Heads-up only:
-    /// the multiway path publishes strategy through `solution.mwsol`.
+    /// Average strategy for the requested betting lines. Toy games and the
+    /// heads-up preflop family only: postflop publishes through
+    /// `solution.sol` and multiway through `solution.mwsol`, both of which
+    /// `export` reads.
     pub strategy: PathBuf,
 }
 

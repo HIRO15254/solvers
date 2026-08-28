@@ -1,6 +1,8 @@
 use std::borrow::Cow;
 use std::path::PathBuf;
 
+use cards::{SizeSpec, SizeUnit};
+use holdem::{PerStreet, StreetTree};
 use serde::{Deserialize, Serialize};
 
 /// Parses either the legacy shared solver schema or the dedicated Multiway
@@ -185,7 +187,7 @@ pub struct SolveConfig {
 #[serde(deny_unknown_fields, tag = "kind", rename_all = "kebab-case")]
 // This is a config struct deserialized once per run and then destructured
 // away; the size difference between variants never sits on a hot path, so
-// boxing `bets` to appease the lint would just add indirection for nothing.
+// boxing `tree` to appease the lint would just add indirection for nothing.
 #[allow(clippy::large_enum_variant)]
 pub enum GameSection {
     Kuhn,
@@ -202,9 +204,14 @@ pub enum GameSection {
         ip_range: String,
         pot: u32,
         effective_stack: u32,
+        /// Smallest legal opening bet, and the smallest legal raise
+        /// increment: the big blind's role in a game that has no blinds.
+        #[serde(default = "default_min_bet")]
+        min_bet: u32,
         #[serde(default = "default_true")]
         iso_merging: bool,
-        bets: BetsSection,
+        #[serde(default)]
+        tree: TreeSection,
     },
     Preflop {
         /// Per-player starting stack, in big blinds.
@@ -306,54 +313,197 @@ fn default_postflop_max_raises() -> u32 {
     2
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
+/// `[game.tree]`: the postflop betting grammar, named and shaped after
+/// Multiway Preflop's `[game.tree]` so one vocabulary covers both engines.
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 #[serde(deny_unknown_fields)]
-pub struct BetsSection {
+pub struct TreeSection {
+    /// Tree frontend. Only `"standard"` exists; the key is here so a later
+    /// frontend can be added the way Multiway Preflop added `"script"`.
+    #[serde(default = "default_tree_kind")]
+    pub kind: String,
     #[serde(default)]
-    pub flop: StreetBets,
+    pub flop: StreetTreeSection,
     #[serde(default)]
-    pub turn: StreetBets,
+    pub turn: StreetTreeSection,
     #[serde(default)]
-    pub river: StreetBets,
+    pub river: StreetTreeSection,
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
-#[serde(deny_unknown_fields)]
-pub struct StreetBets {
-    /// Out-of-position bet sizes (no outstanding bet to face), as fractions
-    /// of the pot after a call.
-    #[serde(default)]
-    pub oop: Vec<f64>,
-    /// In-position bet sizes (no outstanding bet to face), as fractions of
-    /// the pot after a call.
-    #[serde(default)]
-    pub ip: Vec<f64>,
-    /// Out-of-position raise sizes when facing a bet. Falls back to `oop`
-    /// when omitted.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub oop_raise: Option<Vec<f64>>,
-    /// In-position raise sizes when facing a bet. Falls back to `ip` when
-    /// omitted.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub ip_raise: Option<Vec<f64>>,
-    #[serde(default = "default_max_raises")]
-    pub max_raises: u32,
+fn default_tree_kind() -> String {
+    "standard".to_string()
 }
 
-impl Default for StreetBets {
+/// One street's menus. The field names mirror
+/// `multiway::config::StreetBettingConfig`.
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct StreetTreeSection {
+    /// Out-of-position sizes with no outstanding bet to face.
+    #[serde(default)]
+    pub oop_bet: Vec<ChipSize>,
+    /// In-position sizes with no outstanding bet to face.
+    #[serde(default)]
+    pub ip_bet: Vec<ChipSize>,
+    /// Out-of-position sizes facing a bet, by raise level. Absent reuses
+    /// `oop_bet`; an empty list forbids raising.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oop_raise: Option<RaiseMenu>,
+    /// In-position sizes facing a bet, by raise level. Absent reuses
+    /// `ip_bet`; an empty list forbids raising.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ip_raise: Option<RaiseMenu>,
+    /// Out-of-position sizes when opening a street the in-position player
+    /// was last aggressive on. `None` reuses `oop_bet`; an empty list
+    /// forbids donking.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oop_donk: Option<Vec<ChipSize>>,
+    /// Bets plus raises allowed on this street.
+    #[serde(default = "default_max_aggressive_actions")]
+    pub max_aggressive_actions: u32,
+    /// Always offer the all-in target alongside the sized menu.
+    #[serde(default)]
+    pub include_allin: bool,
+    /// Targets at or above this fraction of the all-in target collapse into
+    /// it. Finite, in `(0.0, 1.0]`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub allin_threshold: Option<f64>,
+}
+
+impl Default for StreetTreeSection {
     fn default() -> Self {
-        StreetBets {
-            oop: Vec::new(),
-            ip: Vec::new(),
+        StreetTreeSection {
+            oop_bet: Vec::new(),
+            ip_bet: Vec::new(),
             oop_raise: None,
             ip_raise: None,
-            max_raises: default_max_raises(),
+            oop_donk: None,
+            max_aggressive_actions: default_max_aggressive_actions(),
+            include_allin: false,
+            allin_threshold: None,
         }
     }
 }
 
-fn default_max_raises() -> u32 {
+fn default_max_aggressive_actions() -> u32 {
     2
+}
+
+fn default_min_bet() -> u32 {
+    1
+}
+
+fn default_rake_when() -> String {
+    "flop_dealt".to_string()
+}
+
+/// One chip. Multiway Preflop lowers its own fixed `.001 BB` grid here
+/// instead, because its chip amounts are big blinds.
+fn default_rounding_unit() -> f64 {
+    1.0
+}
+
+impl TreeSection {
+    /// Lowers the TOML surface onto the builder's per-street grammar.
+    ///
+    /// The two shapes are deliberately one-to-one: every key here is a
+    /// field there, so a reader can check the contract against the builder
+    /// without a translation table.
+    pub fn lower(&self) -> PerStreet<StreetTree> {
+        PerStreet {
+            flop: self.flop.lower(),
+            turn: self.turn.lower(),
+            river: self.river.lower(),
+        }
+    }
+}
+
+impl StreetTreeSection {
+    fn lower(&self) -> StreetTree {
+        StreetTree {
+            oop_bet: specs(&self.oop_bet),
+            ip_bet: specs(&self.ip_bet),
+            oop_raise: self.oop_raise.as_ref().map(RaiseMenu::lower),
+            ip_raise: self.ip_raise.as_ref().map(RaiseMenu::lower),
+            oop_donk: self.oop_donk.as_deref().map(specs),
+            max_aggressive_actions: self.max_aggressive_actions,
+            include_allin: self.include_allin,
+            allin_threshold: self.allin_threshold,
+        }
+    }
+}
+
+impl RaiseMenu {
+    fn lower(&self) -> Vec<Vec<SizeSpec>> {
+        self.0.iter().map(|level| specs(level)).collect()
+    }
+}
+
+fn specs(sizes: &[ChipSize]) -> Vec<SizeSpec> {
+    sizes.iter().map(|size| size.0).collect()
+}
+
+/// One menu entry, in PioSOLVER's spelling: a bare number is a percentage
+/// of the pot (`33`), `c` is chips (`20c`), `x` is a multiple of the wager
+/// faced (`3x`), `a` is all-in, `e`/`3e` are geometric. A TOML number and
+/// the same number quoted mean the same thing, and it always writes the
+/// canonical literal back, so an effective config normalizes to itself.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ChipSize(pub SizeSpec);
+
+impl Serialize for ChipSize {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(&self.0.render(SizeUnit::Chips))
+    }
+}
+
+impl<'de> Deserialize<'de> for ChipSize {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        enum Raw {
+            Literal(String),
+            Percent(f64),
+        }
+        let text = match Raw::deserialize(deserializer)? {
+            Raw::Literal(text) => text,
+            // A TOML number is Pio's bare percentage; routing it through the
+            // same parser as a string keeps one definition of what `33`
+            // means, including the "that looks like the old pot fraction"
+            // rejection.
+            Raw::Percent(percent) => percent.to_string(),
+        };
+        SizeSpec::parse(&text, SizeUnit::Chips)
+            .map(ChipSize)
+            .map_err(serde::de::Error::custom)
+    }
+}
+
+/// A raise menu, either flat (one list applied at every raise level) or one
+/// list per level. Both spellings normalize to the per-level form, so an
+/// effective config always says which level each size belongs to.
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct RaiseMenu(pub Vec<Vec<ChipSize>>);
+
+impl Serialize for RaiseMenu {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        self.0.serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for RaiseMenu {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        enum Raw {
+            PerLevel(Vec<Vec<ChipSize>>),
+            Flat(Vec<ChipSize>),
+        }
+        Ok(match Raw::deserialize(deserializer)? {
+            Raw::PerLevel(levels) => RaiseMenu(levels),
+            Raw::Flat(sizes) => RaiseMenu(vec![sizes]),
+        })
+    }
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]
@@ -367,12 +517,22 @@ pub enum RakeSection {
         #[serde(default)]
         no_flop_no_drop: bool,
     },
+    /// Condition-based rake, shared verbatim with Multiway Preflop's
+    /// `[economics.rake]`. `cap` and `rounding_unit` are in the family's own
+    /// chip unit: chips for postflop, big blinds for a lowered multiway
+    /// config.
     Generic {
         rate: f64,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         cap: Option<f64>,
+        #[serde(default = "default_rake_when")]
         when: String,
+        #[serde(default)]
         allocation: multiway::RakeAllocation,
+        #[serde(default)]
         rounding: multiway::RakeRounding,
+        #[serde(default = "default_rounding_unit")]
+        rounding_unit: f64,
     },
     GgPreflop {
         rate: f64,
@@ -555,6 +715,12 @@ pub struct RunSection {
     /// Exploitability check cadence, in iterations.
     #[serde(default = "default_check_every")]
     pub check_every: u64,
+    /// Cumulative solve-time budget in seconds, honoured by the heads-up
+    /// families at `check_every` boundaries. Multiway Preflop reads its own
+    /// `run.max_time` straight from the source text, so this stays `None`
+    /// on a lowered multiway config.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_time_secs: Option<u64>,
     /// Storage backend for regrets/strategy sums. `f32` is the plain
     /// backend; `i16` is the quantized backend (see `engine::I16Storage`),
     /// trading precision for ~4x less memory on large postflop trees.
@@ -964,28 +1130,83 @@ iterations = 10
         );
     }
 
-    fn parse_bets(toml: &str) -> BetsSection {
+    fn parse_tree(toml: &str) -> TreeSection {
         #[derive(Deserialize)]
         #[serde(deny_unknown_fields)]
         struct Wrapper {
-            bets: BetsSection,
+            tree: TreeSection,
         }
-        toml::from_str::<Wrapper>(toml).unwrap().bets
+        toml::from_str::<Wrapper>(toml).unwrap().tree
+    }
+
+    /// A bare number is Pio's pot percentage, and the quoted form and the
+    /// pre-Pio `"50%pot"` spelling must land on the same size.
+    #[test]
+    fn a_size_menu_reads_bare_numbers_as_pot_percentages() {
+        let tree = parse_tree(
+            r#"
+            [tree.flop]
+            oop_bet = [50, "75", "125%pot"]
+            ip_bet = ["a"]
+            "#,
+        );
+        assert_eq!(
+            tree.flop.oop_bet,
+            vec![
+                ChipSize(SizeSpec::PotAfterCall { fraction: 0.5 }),
+                ChipSize(SizeSpec::PotAfterCall { fraction: 0.75 }),
+                ChipSize(SizeSpec::PotAfterCall { fraction: 1.25 }),
+            ],
+        );
+        assert_eq!(tree.flop.ip_bet, vec![ChipSize(SizeSpec::AllIn)]);
+    }
+
+    /// The pre-Pio spelling was a pot *fraction*, so `0.5` used to mean the
+    /// half pot it now reads as half a percent of. It has to say so.
+    #[test]
+    fn a_bare_pot_fraction_names_the_percentage_to_write_instead() {
+        #[derive(Debug, Deserialize)]
+        struct Wrapper {
+            #[allow(dead_code)]
+            tree: TreeSection,
+        }
+        let error = toml::from_str::<Wrapper>("[tree.flop]\noop_bet = [0.5]\n")
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("percentages"), "{error}");
+        assert!(error.contains("write 50"), "{error}");
     }
 
     #[test]
-    fn oop_raise_and_ip_raise_parse() {
-        let bets = parse_bets(
-            r#"
-            [bets.flop]
-            oop = [0.5]
-            ip = [0.5]
-            oop_raise = [1.0]
-            ip_raise = [0.75]
-            "#,
+    fn a_raise_menu_reads_flat_and_per_level_spellings() {
+        let flat = parse_tree("[tree.flop]\noop_raise = [\"3x\"]\n");
+        assert_eq!(
+            flat.flop.oop_raise,
+            Some(RaiseMenu(vec![vec![ChipSize(
+                SizeSpec::PreviousBetMultiple { factor: 3.0 }
+            )]])),
+            "a flat list is one level"
         );
-        assert_eq!(bets.flop.oop_raise, Some(vec![1.0]));
-        assert_eq!(bets.flop.ip_raise, Some(vec![0.75]));
+        let levels = parse_tree("[tree.flop]\nip_raise = [[\"3x\"], [\"allin\"]]\n");
+        assert_eq!(
+            levels.flop.ip_raise,
+            Some(RaiseMenu(vec![
+                vec![ChipSize(SizeSpec::PreviousBetMultiple { factor: 3.0 })],
+                vec![ChipSize(SizeSpec::AllIn)],
+            ]))
+        );
+    }
+
+    #[test]
+    fn a_size_menu_writes_the_pio_literal_back() {
+        let tree = parse_tree("[tree.river]\noop_bet = [50, \"allin\"]\nip_raise = [\"2.5x\"]\n");
+        let text = toml::to_string(&tree).unwrap();
+        assert!(text.contains("\"50\""), "{text}");
+        assert!(
+            text.contains("\"a\""),
+            "a bare `allin` must normalize to Pio's `a`: {text}"
+        );
+        assert!(text.contains("\"2.5x\""), "{text}");
     }
 
     #[test]
@@ -1033,15 +1254,22 @@ iterations = 10
     }
 
     #[test]
-    fn omitted_oop_raise_and_ip_raise_default_to_none() {
-        let bets = parse_bets(
+    fn omitted_menus_default_to_empty_and_donk_defaults_to_none() {
+        let tree = parse_tree(
             r#"
-            [bets.flop]
-            oop = [0.5]
-            ip = [0.5]
+            [tree.flop]
+            oop_bet = [50]
+            ip_bet = [50]
             "#,
         );
-        assert_eq!(bets.flop.oop_raise, None);
-        assert_eq!(bets.flop.ip_raise, None);
+        assert_eq!(
+            tree.flop.oop_raise, None,
+            "an unset raise menu reuses oop_bet"
+        );
+        assert_eq!(tree.flop.ip_raise, None);
+        assert_eq!(tree.flop.oop_donk, None);
+        assert_eq!(tree.flop.max_aggressive_actions, 2);
+        assert!(!tree.flop.include_allin);
+        assert_eq!(tree.flop.allin_threshold, None);
     }
 }

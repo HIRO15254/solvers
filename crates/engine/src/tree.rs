@@ -270,7 +270,7 @@ impl PublicTree {
     /// (`crate::solver::cfr_pass`/`value_pass`, `crate::mccfr::mccfr_pass`),
     /// which must size their per-deal scratch buffers identically or trip
     /// `SparseTransition::apply_forward`'s dimension assertions.
-    pub(crate) fn mapped_dim(&self, map: ReachMap, dim: u32) -> u32 {
+    pub fn mapped_dim(&self, map: ReachMap, dim: u32) -> u32 {
         match map {
             ReachMap::Identity => dim,
             ReachMap::Mask(m) => {

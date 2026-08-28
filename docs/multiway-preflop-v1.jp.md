@@ -149,7 +149,7 @@ street = "preflop"       # 必須
 when = 'unopened && position in ["CO", "BTN"]'
 effect = "replace"       # 必須
 action = "raise"         # checkdown以外で必須
-sizes = ["2.2x", "allin"] # optional、既定[]
+sizes = ["2.2x", "a"]     # optional、既定[]
 ```
 
 tree field:
@@ -212,20 +212,28 @@ conditionで参照できる値:
 
 size literal:
 
+綴りはPioSOLVERに合わせてあり、`solvers.postflop/v1`と同一の文法である
+(`docs/solver-config-v1.jp.md`)。単位だけがfamilyで違い、absolute targetは
+multiwayが`"2.5bb"`、postflopが`"20c"`である。
+
 | 例 | 意味 |
 |---|---|
-| `"2.5bb"` | absolute BB target |
-| `"50%pot"` | call後potに対するfraction |
-| `"3x"` | current bet multiple。1より大きいこと |
+| `"50"` | call後potに対する百分率。裸の数値もPioと同じ読み |
+| `"2.5bb"` | absolute BB target(multiway専用) |
+| `"3x"` | current bet multiple。1より大きいこと。`"2x"`が最小legal raise |
+| `"a"` | legal all-in |
+| `"e"` | 残りstreet数でall-inへ到達する等比size |
+| `"3e"` | 3 streetでall-inへ到達 |
 | `"min"` | legal minimum |
-| `"allin"` | legal all-in |
 | `"80%effective"` | effective stack fraction |
 | `"60%stack"` | actor stack fraction |
-| `"geometric(allin,2)"` | 2 streetでall-inへ到達 |
-| `"geometric(allin,streets=2)"` | 上と同義の明示形 |
 
 値は有限かつ正でなければならない。同じchip targetはmergeされ、sub-minimum
 voluntary raiseは除外される。
+
+旧綴りの`"allin"`、`"50%pot"`、`"geometric(allin,2)"`、
+`"geometric(allin,streets=2)"`も入力としては受理し、effective configでは上表の
+正規形へ正規化する。
 
 ### Script frontend
 
@@ -267,11 +275,15 @@ flop when players >= 4 {
 }
 
 river when spr <= 0.8 {
-  force bet geometric(allin, streets=1)
+  force bet 1e
 }
 ```
 
 loop、再帰、function、include、file/network/environment/time/RNGアクセスはない。
+
+`param`名はscript本文の識別子をそのまま置換するので、`a`、`e`、`min`のような
+size literalと同じ名前のparamを宣言するとそのliteralを隠す。paramには
+`open`、`jam_spr`のような説明的な名前を使うこと。
 
 ## `[game.abstraction]`
 
@@ -531,7 +543,7 @@ street = "preflop"
 when = 'unopened && position in ["CO", "BTN"]'
 effect = "replace"
 action = "raise"
-sizes = ["2.2x", "allin"]
+sizes = ["2.2x", "a"]
 
 [[game.tree.rules]]
 priority = 200
