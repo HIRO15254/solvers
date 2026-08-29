@@ -80,6 +80,9 @@ pub fn build_river_game(config: &RiverConfig, pipeline: PayoffPipeline<'_>) -> R
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
+        // A river-only shim has no earlier street, so there is no preflop
+        // aggressor to seed `cbet`/`donk` from.
+        preflop_aggressor: None,
     };
     let PostflopGame { game, node_info } = build_postflop_game(&postflop_config, pipeline);
     RiverGame {

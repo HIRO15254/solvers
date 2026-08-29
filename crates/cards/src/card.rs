@@ -110,6 +110,18 @@ pub(crate) fn rank_from_char(c: char) -> Option<Rank> {
         .map(|r| r as Rank)
 }
 
+const RANK_NAMES: [&str; 13] = [
+    "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A",
+];
+
+/// Renders a rank as the single-character name a config author would type
+/// (matches `RANK_CHARS`), with no allocation. Panics if `rank` is out of
+/// range.
+pub fn rank_name(rank: Rank) -> &'static str {
+    assert!((rank as usize) < RANK_NAMES.len(), "rank out of range");
+    RANK_NAMES[rank as usize]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -137,5 +149,18 @@ mod tests {
         assert!("Xx".parse::<Card>().is_err());
         assert!("A".parse::<Card>().is_err());
         assert!("Ass".parse::<Card>().is_err());
+    }
+
+    #[test]
+    fn rank_name_matches_rank_chars() {
+        for (rank, &ch) in RANK_CHARS.iter().enumerate() {
+            assert_eq!(rank_name(rank as Rank), ch.to_string());
+        }
+    }
+
+    #[test]
+    #[should_panic]
+    fn rank_name_panics_out_of_range() {
+        rank_name(13);
     }
 }

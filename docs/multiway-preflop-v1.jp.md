@@ -265,7 +265,8 @@ Standardと同じ3 optional fieldを指定でき、展開後もeffective config�
 > 変える。`params`が正規化を生き延びるので、GUIがscript本文に触らずに変数だけを
 > 編集できるようになる。あわせてscript文法へ入れ子、`if`/`else if`/`else`、
 > street list(`flop, turn`)を追加する。平坦な既存`.mwtree`は互換のまま動く。
-> 設計は[postflop-tree-script-v1.jp.md](postflop-tree-script-v1.jp.md)。
+> postflop側は実装済みで、文法と正規化の規範は
+> [solver-config-v1.jp.md](solver-config-v1.jp.md)の`[game.tree]`章にある。
 
 `.mwtree` の完全な形:
 

@@ -132,6 +132,106 @@ fn report_smoke() {
     assert_eq!(row_count, 2);
 }
 
+/// A river-only config whose tree script gives paired and unpaired boards
+/// genuinely different root menus (`when paired` / `when !paired`, each
+/// replacing `bet` with a different size): the paired board's root actions
+/// are `check` / `bet 10`, the unpaired board's are `check` / `bet 5`.
+const REPORT_UNION_TOML: &str = r#"
+schema = "solvers.postflop/v1"
+
+[game]
+board = "2c 7d 9h Js Qs"
+oop_range = "22+,A2s+,KTo+"
+ip_range = "55-22,QJs,A5s-A2s,KQo,T9s"
+pot = 10
+effective_stack = 50
+
+[game.tree]
+kind = "script"
+script = '''
+river {
+  when paired {
+    replace bet [100]
+  }
+  when !paired {
+    replace bet [50]
+  }
+}
+'''
+
+[run]
+iterations = 200
+check_every = 50
+"#;
+
+/// `report`'s CSV header is the union of every board's root action labels,
+/// not one menu shared by all boards: a board predicate in the tree script
+/// (`when paired`) legitimately gives two boards different root menus, and
+/// sweeping boards is `report`'s whole job. A board missing a label the
+/// union has (because its own root menu never had that action) gets an
+/// empty cell there, not `0` -- "never had this action" and "had it and
+/// never took it" are different facts a reader averaging the column must be
+/// able to tell apart.
+#[test]
+fn report_csv_header_is_the_union_of_boards_root_actions() {
+    let dir = temp_dir("report-union");
+    let config = dir.join("report_union.toml");
+    std::fs::write(&config, REPORT_UNION_TOML).unwrap();
+
+    let output = run_solvers_ok(&[
+        "report",
+        config.to_str().unwrap(),
+        "--boards",
+        "2c 7d 9h Js Qs,2c 7d 9h Js Jd",
+    ]);
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let mut lines = stdout.lines();
+    let header = lines.next().unwrap();
+    let header_cols: Vec<&str> = header.split(',').collect();
+    assert!(
+        header_cols.contains(&"freq_check"),
+        "header must have freq_check: {header}"
+    );
+    assert!(
+        header_cols.contains(&"freq_bet_5"),
+        "header must have the unpaired board's bet: {header}"
+    );
+    assert!(
+        header_cols.contains(&"freq_bet_10"),
+        "header must have the paired board's bet: {header}"
+    );
+
+    let board_idx = header_cols.iter().position(|&c| c == "board").unwrap();
+    let bet5_idx = header_cols.iter().position(|&c| c == "freq_bet_5").unwrap();
+    let bet10_idx = header_cols
+        .iter()
+        .position(|&c| c == "freq_bet_10")
+        .unwrap();
+
+    let rows: Vec<Vec<&str>> = lines
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| line.split(',').collect())
+        .collect();
+    assert_eq!(rows.len(), 2);
+
+    let unpaired_row = rows
+        .iter()
+        .find(|row| row[board_idx] == "2c 7d 9h Js Qs")
+        .expect("unpaired board row present");
+    let paired_row = rows
+        .iter()
+        .find(|row| row[board_idx] == "2c 7d 9h Js Jd")
+        .expect("paired board row present");
+
+    // The unpaired board's root menu never had `bet 10`: empty, not `0`.
+    assert_eq!(unpaired_row[bet10_idx], "");
+    assert!(!unpaired_row[bet5_idx].is_empty());
+
+    // Symmetric: the paired board's root menu never had `bet 5`.
+    assert_eq!(paired_row[bet5_idx], "");
+    assert!(!paired_row[bet10_idx].is_empty());
+}
+
 // --- M3 research-workflow: checkpoint / metrics / resume / bench ---------
 
 static TEMP_COUNTER: AtomicU64 = AtomicU64::new(0);
@@ -439,15 +539,16 @@ ip_range = "33,66"
 pot = 2
 effective_stack = 20
 
-[game.tree.turn]
-oop_bet = [75]
-ip_bet = [75]
-max_aggressive_actions = 1
+[game.tree]
+kind = "script"
+script = '''
+turn { replace bet [75] }
+river { replace bet [100] }
+'''
 
-[game.tree.river]
-oop_bet = [100]
-ip_bet = [100]
-max_aggressive_actions = 1
+[game.tree.max_aggressive_actions]
+turn = 1
+river = 1
 
 [run]
 iterations = 32
@@ -561,15 +662,16 @@ pot = 2
 effective_stack = 20
 iso_merging = false
 
-[game.tree.turn]
-oop_bet = [75]
-ip_bet = [75]
-max_aggressive_actions = 1
+[game.tree]
+kind = "script"
+script = '''
+turn { replace bet [75] }
+river { replace bet [100] }
+'''
 
-[game.tree.river]
-oop_bet = [100]
-ip_bet = [100]
-max_aggressive_actions = 1
+[game.tree.max_aggressive_actions]
+turn = 1
+river = 1
 
 [run]
 iterations = 200

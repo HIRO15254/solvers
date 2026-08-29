@@ -93,7 +93,14 @@ pub fn run(
     let raw = std::fs::read_to_string(config_path)
         .with_context(|| format!("reading {}", config_path.display()))?;
     if !crate::multiway_v1::has_v1_schema(&raw)? {
-        return validate_solver_config(&raw, format, show_effective, write_effective, resources);
+        return validate_solver_config(
+            &raw,
+            config_path,
+            format,
+            show_effective,
+            write_effective,
+            resources,
+        );
     }
     crate::multiway_v1::validate_production_contract(&raw)?;
     let config = parse_solve_config_at(&raw, config_path)?;
@@ -169,6 +176,7 @@ pub fn run(
 /// wants (R10).
 fn validate_solver_config(
     raw: &str,
+    config_path: &Path,
     format: ValidationFormat,
     show_effective: bool,
     write_effective: Option<&Path>,
@@ -180,9 +188,9 @@ fn validate_solver_config(
              prints its memory estimate when the solve builds its tree"
         ));
     }
-    let effective_toml = crate::solver_config_v1::normalized_toml(raw)?;
-    let kind = crate::solver_config_v1::game_kind(raw)?;
-    let schema = crate::solver_config_v1::declared(raw)?;
+    let effective_toml = crate::solver_config_v1::normalized_toml_at(raw, config_path)?;
+    let kind = crate::solver_config_v1::game_kind_at(raw, config_path)?;
+    let schema = crate::solver_config_v1::declared_at(raw, config_path)?;
     if let Some(path) = write_effective {
         std::fs::write(path, &effective_toml)
             .with_context(|| format!("writing effective config {}", path.display()))?;
@@ -197,6 +205,13 @@ fn validate_solver_config(
         profile: &'static str,
         #[serde(skip_serializing_if = "Option::is_none")]
         effective_config: Option<serde_json::Value>,
+        /// The compiled tree script's `param` schema and lowered rule list --
+        /// a read-only diagnostic that never feeds `effective_config` (see
+        /// `solver_config_v1::tree_diagnostic_at`). Absent for the toy and
+        /// preflop-hu families, and for a postflop config with `kind =
+        /// "none"`.
+        #[serde(skip_serializing_if = "Option::is_none")]
+        tree: Option<serde_json::Value>,
     }
 
     let summary = SolverConfigSummary {
@@ -207,8 +222,9 @@ fn validate_solver_config(
         // unlike the multiway families, which say the opposite.
         profile: "vector CFR average profile; converges to Nash for two players",
         effective_config: show_effective
-            .then(|| crate::solver_config_v1::normalized_json(raw))
+            .then(|| crate::solver_config_v1::normalized_json_at(raw, config_path))
             .transpose()?,
+        tree: crate::solver_config_v1::tree_diagnostic_at(raw, config_path)?,
     };
     match format {
         ValidationFormat::Json => println!("{}", serde_json::to_string_pretty(&summary)?),

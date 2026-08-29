@@ -23,20 +23,19 @@ ip_range = "JJ-22,AQs-A2s,KQs-KTs,QJs-QTs,JTs,T9s,98s,AQo-ATo,KQo"
 pot = 200
 effective_stack = 900
 
-[game.tree.flop]
-oop_bet = [75]
-ip_bet = [75]
-max_aggressive_actions = 2
+[game.tree]
+kind = "script"
+script = '''
+flop, turn, river {
+  replace bet [75]
+  replace raise [75]
+}
+'''
 
-[game.tree.turn]
-oop_bet = [75]
-ip_bet = [75]
-max_aggressive_actions = 1
-
-[game.tree.river]
-oop_bet = [75]
-ip_bet = [75]
-max_aggressive_actions = 1
+[game.tree.max_aggressive_actions]
+flop = 2
+turn = 1
+river = 1
 
 [algorithm]
 schedule = "dcfr"

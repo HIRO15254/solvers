@@ -104,9 +104,14 @@ ip_range = "random"
 pot = 50
 effective_stack = 200
 
-[game.tree.flop]
-oop_bet = [50]
-ip_bet = [50]
+[game.tree]
+kind = "script"
+script = '''
+flop {
+  replace bet [50]
+  replace raise [50]
+}
+'''
 
 [run]
 target_nash_conv = 0.05
@@ -122,32 +127,46 @@ pot = 50
 effective_stack = 200
 min_bet = 1
 iso_merging = true
+preflop_aggressor = "ip"
 
 [game.tree]
-kind = "standard"
-
-[game.tree.flop]
-oop_bet = [33, 75]
-ip_bet = [50]
-oop_raise = [["3x"]]
-ip_raise = [["3x"], ["a"]]
-max_aggressive_actions = 3
+kind = "script"
 include_allin = true
 allin_threshold = 0.8
+script = '''
+# c-bet size (pot %)
+param cb = 33
+# barrel size (pot %)
+param barrel = 66
 
-[game.tree.turn]
-oop_bet = [66]
-ip_bet = [66]
-oop_donk = []
-oop_raise = [["2.5x"]]
-ip_raise = [["2.5x"]]
-max_aggressive_actions = 2
+flop {
+  when donk { remove bet }
+  when cbet {
+    replace bet [cb, 75]
+  }
+  when aggressions == 1 { replace raise [3x] }
+}
 
-[game.tree.river]
-oop_bet = [75, "a"]
-ip_bet = [75, "a"]
-oop_donk = [30]
-max_aggressive_actions = 2
+turn {
+  # `raise` only exists once someone has bet, so this sits outside the
+  # `unopened` block -- nested, its condition would be
+  # `aggressions == 0 && aggressions == 1` and it would never fire.
+  when unopened { replace bet [barrel] }
+  when aggressions == 1 { replace raise [2.5x] }
+}
+
+river when unopened {
+  replace bet [75, a]
+}
+'''
+
+[game.tree.max_aggressive_actions]
+flop = 3
+turn = 2
+river = 2
+
+[game.tree.params]
+cb = 40
 
 [rake]
 kind = "generic"
@@ -345,20 +364,36 @@ mod tests {
             "effective_stack",
             "min_bet",
             "iso_merging",
+            "preflop_aggressor",
             // [game.tree]
-            "oop_bet",
-            "ip_bet",
-            "oop_raise",
-            "ip_raise",
-            "oop_donk",
+            "kind",
+            "source",
+            "script",
             "max_aggressive_actions",
             "include_allin",
             "allin_threshold",
+            "params",
+            // tree script grammar
+            "param",
+            "define",
+            "checkdown",
+            "aggressions",
+            "unopened",
+            "in_position",
+            "cbet",
+            "donk",
+            "spr",
+            "facing_pct",
+            // board predicates
+            "paired",
+            "monotone",
+            "flush_possible",
+            "straight_possible",
             // size literals
             "20c",
             "3x",
-            "\"a\"",
-            "\"e\"",
+            "`a`",
+            "`e`",
             "3e",
             "min",
             "80%effective",

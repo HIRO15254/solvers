@@ -9,15 +9,15 @@ ip_range = "KK,TT,AQs,KQs"
 pot = 20
 effective_stack = 80
 
-[game.tree.turn]
-oop_bet = [100]
-ip_bet = [100]
-max_aggressive_actions = 1
+[game.tree]
+kind = "script"
+script = '''
+turn, river { replace bet [100] }
+'''
 
-[game.tree.river]
-oop_bet = [100]
-ip_bet = [100]
-max_aggressive_actions = 1
+[game.tree.max_aggressive_actions]
+turn = 1
+river = 1
 
 [algorithm]
 schedule = "dcfr"

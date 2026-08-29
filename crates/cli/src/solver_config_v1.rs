@@ -20,14 +20,19 @@
 //! that lowers into the same internal config, and it has its own document.
 
 use std::collections::BTreeSet;
+use std::path::Path;
+use std::str::FromStr;
 
 use anyhow::{Context, Result, anyhow, bail};
-use cards::{SizeSpec, Street};
+use cards::script::{
+    ActionKind, CmpOp, Condition, Effect, Literal, ParamKind, ParamSchema, Rule, Script,
+};
+use cards::{SizeSpec, SizeUnit, Street};
 use serde::{Deserialize, Serialize};
 
 use crate::config::{
-    AlgorithmSection, ChipSize, GameSection, OutsidePlayerSection, PostflopSection, RakeSection,
-    RunSection, SolveConfig, StorageKind, StreetTreeSection, TreeSection, UtilitySection,
+    AlgorithmSection, GameSection, OutsidePlayerSection, PostflopSection, RakeSection, RunSection,
+    SolveConfig, StorageKind, TreeSection, UtilitySection,
 };
 
 pub const SCHEMA_TOY: &str = "solvers.toy/v1";
@@ -209,11 +214,20 @@ pub struct PostflopGame {
     /// Merge suit-isomorphic turn/river deals.
     #[serde(default = "default_true")]
     pub iso_merging: bool,
-    /// The betting tree. Every street's menu is empty by default, which is
-    /// a check-down: a config that offers no bets says so rather than
-    /// failing to mention them.
+    /// The side that last bet or raised before this subgame began --
+    /// `"oop"` / `"ip"` / `"none"` (the default). Exists only to define the
+    /// tree script's `cbet`/`donk` variables on the starting street.
+    #[serde(default = "default_preflop_aggressor")]
+    pub preflop_aggressor: String,
+    /// The betting tree. `kind = "none"` (the default) is a check-down: a
+    /// config that offers no bets says so rather than failing to mention
+    /// them.
     #[serde(default)]
     pub tree: TreeSection,
+}
+
+fn default_preflop_aggressor() -> String {
+    "none".to_string()
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -412,12 +426,18 @@ fn declared_schema(raw: &str) -> Result<String> {
     )
 }
 
-fn parse_family(raw: &str) -> Result<Family> {
+/// [`parse_family`] with a base directory to resolve a postflop
+/// `[game.tree] source` against. `base_dir` is `None` when no config file
+/// path is available (round-tripping already-inlined bytes, or a config
+/// known not to use `source`); a `[game.tree] source` config parsed that
+/// way fails explicitly rather than silently resolving against the current
+/// directory.
+fn parse_family_at(raw: &str, base_dir: Option<&Path>) -> Result<Family> {
     let schema = declared_schema(raw)?;
     // Parsing per declared family, rather than by trying each in turn,
     // means an error names the keys *that* family accepts instead of
     // reporting that the file matched none of three shapes.
-    let family = match schema.as_str() {
+    let mut family = match schema.as_str() {
         SCHEMA_TOY => Family::Toy(toml::from_str(raw).map_err(key_error)?),
         SCHEMA_POSTFLOP => {
             reject_retired_postflop_keys(raw)?;
@@ -429,8 +449,58 @@ fn parse_family(raw: &str) -> Result<Family> {
             SCHEMAS.join(", ")
         ),
     };
+    if let Family::Postflop(config) = &mut family {
+        // Checked on what the author actually wrote, before `source` (if
+        // any) is resolved into `script` below -- resolving first would
+        // make a legitimate `source`-only config look like it named
+        // neither.
+        check_tree_shape(&config.game.tree)?;
+        if config.game.tree.source.is_some() {
+            let base_dir = base_dir.ok_or_else(|| {
+                anyhow!(
+                    "SLV004: [game.tree] source requires a config file path for relative \
+                     resolution; run this through a command that knows the file's location"
+                )
+            })?;
+            config.game.tree.resolve_source_at(base_dir)?;
+        }
+    }
     validate_semantics(&family)?;
     Ok(family)
+}
+
+fn parse_family(raw: &str) -> Result<Family> {
+    parse_family_at(raw, None)
+}
+
+/// `source`/`script` are exclusive, and `kind = "none"` takes neither --
+/// `docs/solver-config-v1.jp.md`'s `[game.tree]` chapter and its 廃止した key
+/// table. An unrecognized `kind` is left to `validate_semantics` (`SLV004`,
+/// a value problem rather than a shape one).
+fn check_tree_shape(tree: &TreeSection) -> Result<()> {
+    match tree.kind.as_str() {
+        "none" => {
+            if tree.source.is_some() || tree.script.is_some() {
+                bail!(
+                    "SLV002: [game.tree] kind = \"none\" takes neither source nor script; a \
+                     check-down tree has no script to read. Set kind = \"script\" to use one."
+                );
+            }
+        }
+        "script" => {
+            if tree.source.is_some() && tree.script.is_some() {
+                bail!("SLV002: [game.tree] source and script are exclusive; write only one.");
+            }
+            if tree.source.is_none() && tree.script.is_none() {
+                bail!(
+                    "SLV002: [game.tree] kind = \"script\" requires source or script; write one \
+                     of them, or set kind = \"none\" for a check-down tree."
+                );
+            }
+        }
+        _ => {}
+    }
+    Ok(())
 }
 
 /// Names the replacement for a key this contract retired.
@@ -470,6 +540,47 @@ fn reject_retired_postflop_keys(raw: &str) -> Result<()> {
              \"3x\", or \"allin\"; a bare fraction still means a pot fraction."
         );
     }
+    if let Some(tree) = game.get("tree").and_then(toml::Value::as_table) {
+        let retired_streets: Vec<&str> = ["flop", "turn", "river"]
+            .into_iter()
+            .filter(|street| tree.contains_key(*street))
+            .collect();
+        // The menu keys are also caught one level up, where an author who
+        // deleted the `[game.tree.<street>]` headers but kept their contents
+        // would land. `deny_unknown_fields` rejects those too, but only with
+        // a field list -- it cannot say where each key went.
+        let retired_menu_keys: Vec<&str> =
+            ["oop_bet", "ip_bet", "oop_raise", "ip_raise", "oop_donk"]
+                .into_iter()
+                .filter(|key| tree.contains_key(*key))
+                .collect();
+        let sections = if !retired_streets.is_empty() {
+            retired_streets
+                .iter()
+                .map(|street| format!("[game.tree.{street}]"))
+                .collect::<Vec<_>>()
+                .join(", ")
+        } else if !retired_menu_keys.is_empty() {
+            retired_menu_keys
+                .iter()
+                .map(|key| format!("[game.tree] {key}"))
+                .collect::<Vec<_>>()
+                .join(", ")
+        } else {
+            String::new()
+        };
+        if !sections.is_empty() {
+            bail!(
+                "SLV002: {sections} was removed; every street's betting menu is now a tree \
+                 script under [game.tree] (kind = \"script\", source or script). Inside it: \
+                 oop_bet/ip_bet become `replace bet [...]`, oop_raise/ip_raise become `replace \
+                 raise [...]` (raise level is the `aggressions` variable), oop_donk becomes \
+                 `when donk {{ ... }}`, per-street max_aggressive_actions moves to the \
+                 [game.tree.max_aggressive_actions] table, and per-street include_allin / \
+                 allin_threshold move to the tree-level [game.tree] keys of the same name."
+            );
+        }
+    }
     Ok(())
 }
 
@@ -491,21 +602,6 @@ fn key_error(error: toml::de::Error) -> anyhow::Error {
     }
 }
 
-/// A street section nobody wrote: every menu empty and every knob at its
-/// default. Used to tell "the author left this street alone" from "the
-/// author configured a street this board never reaches".
-fn is_default_street(section: &StreetTreeSection) -> bool {
-    let default = StreetTreeSection::default();
-    section.oop_bet.is_empty()
-        && section.ip_bet.is_empty()
-        && section.oop_raise.is_none()
-        && section.ip_raise.is_none()
-        && section.oop_donk.is_none()
-        && section.max_aggressive_actions == default.max_aggressive_actions
-        && section.include_allin == default.include_allin
-        && section.allin_threshold.is_none()
-}
-
 fn street_name(street: Street) -> &'static str {
     match street {
         Street::Flop => "flop",
@@ -515,33 +611,24 @@ fn street_name(street: Street) -> &'static str {
     }
 }
 
-/// Range and finiteness checks the size-literal parser cannot make on its
-/// own, plus the per-street knobs.
-fn validate_street(label: &str, section: &StreetTreeSection) -> Result<()> {
-    let mut menus: Vec<(String, &[ChipSize])> = vec![
-        (format!("{label}.oop_bet"), &section.oop_bet),
-        (format!("{label}.ip_bet"), &section.ip_bet),
-    ];
-    if let Some(donk) = &section.oop_donk {
-        menus.push((format!("{label}.oop_donk"), donk));
-    }
-    for (menu_label, levels) in [
-        (format!("{label}.oop_raise"), &section.oop_raise),
-        (format!("{label}.ip_raise"), &section.ip_raise),
-    ] {
-        for (level, sizes) in levels.iter().flat_map(|menu| menu.0.iter()).enumerate() {
-            menus.push((format!("{menu_label}[{level}]"), sizes));
+/// Every rule's sizes, checked against the compiled script's own rule list
+/// rather than a TOML menu section -- the tree-script surface has no other
+/// place a bad size literal's *value* (as opposed to its syntax, which
+/// `SizeSpec::parse` already rejects at compile time) could hide.
+fn validate_rule_sizes(rules: &[Rule]) -> Result<()> {
+    for rule in rules {
+        let label = format!(
+            "a {} rule on {}",
+            match rule.action {
+                Some(cards::script::ActionKind::Bet) => "bet",
+                Some(cards::script::ActionKind::Raise) => "raise",
+                None => "checkdown",
+            },
+            street_name(rule.street)
+        );
+        for size in &rule.sizes {
+            check_size(&label, *size)?;
         }
-    }
-    for (menu_label, sizes) in menus {
-        for size in sizes {
-            check_size(&menu_label, size.0)?;
-        }
-    }
-    if let Some(threshold) = section.allin_threshold
-        && !(threshold.is_finite() && threshold > 0.0 && threshold <= 1.0)
-    {
-        bail!("SLV004: {label}.allin_threshold must be finite and within (0, 1]");
     }
     Ok(())
 }
@@ -729,35 +816,55 @@ fn validate_semantics(family: &Family) -> Result<()> {
             if game.min_bet == 0 {
                 bail!("SLV004: min_bet must be positive");
             }
-            if game.tree.kind != "standard" {
+            crate::postflop_setup::parse_preflop_aggressor(&game.preflop_aggressor)
+                .map_err(|error| anyhow!("SLV004: {error}"))?;
+            if !matches!(game.tree.kind.as_str(), "none" | "script") {
                 bail!(
-                    "SLV004: unknown tree frontend {:?}; the postflop family has only \"standard\"",
+                    "SLV004: unknown [game.tree] kind {:?}; the postflop family has \"none\" or \
+                     \"script\"",
                     game.tree.kind
                 );
             }
+            if let Some(threshold) = game.tree.allin_threshold
+                && !(threshold.is_finite() && threshold > 0.0 && threshold <= 1.0)
+            {
+                bail!("SLV004: [game.tree] allin_threshold must be finite and within (0, 1]");
+            }
+            // Compiling here, through the same code the tree builder uses,
+            // is what stops a broken script from surviving normalization
+            // and only failing once `solve` builds the tree.
+            let script = game
+                .tree
+                .compiled_script()
+                .map_err(|error| anyhow!("SLV004: {error}"))?;
+            if let Some(script) = &script {
+                for key in game.tree.params.keys() {
+                    if !script.params.iter().any(|param| &param.name == key) {
+                        bail!("SLV004: [game.tree.params] {key:?} does not name a declared param");
+                    }
+                }
+            }
+            let rules: &[Rule] = script.as_ref().map_or(&[], |script| &script.rules);
             let start = match board.len() {
                 3 => Street::Flop,
                 4 => Street::Turn,
                 _ => Street::River,
             };
-            for (street, label, section) in [
-                (Street::Flop, "flop", &game.tree.flop),
-                (Street::Turn, "turn", &game.tree.turn),
-                (Street::River, "river", &game.tree.river),
-            ] {
-                // A menu on a street this board already passed cannot be
+            for rule in rules {
+                // A rule on a street this board already passed cannot be
                 // reached, and silently dropping it would let a config
                 // describe a tree it does not get. Say so instead.
-                if street < start && !is_default_street(section) {
+                if rule.street < start {
                     bail!(
-                        "SLV004: [game.tree.{label}] is set, but a {}-card board starts on the \
-                         {}; remove the section or shorten the board",
+                        "SLV004: a tree-script rule targets {}, but a {}-card board starts on \
+                         the {}; remove the rule or shorten the board",
+                        street_name(rule.street),
                         board.len(),
                         street_name(start)
                     );
                 }
-                validate_street(label, section)?;
             }
+            validate_rule_sizes(rules)?;
             validate_postflop_economics(&config.rake, &config.utility)?;
         }
         Family::PreflopHu(config) => {
@@ -786,9 +893,8 @@ fn validate_semantics(family: &Family) -> Result<()> {
     Ok(())
 }
 
-/// Parses a config and lowers it into the shared internal representation.
-pub fn parse_and_lower(raw: &str) -> Result<SolveConfig> {
-    Ok(match parse_family(raw)? {
+fn lower_family(family: Family) -> Result<SolveConfig> {
+    Ok(match family {
         Family::Toy(config) => SolveConfig {
             schema: Some(config.schema),
             game: match config.game {
@@ -810,6 +916,7 @@ pub fn parse_and_lower(raw: &str) -> Result<SolveConfig> {
                 effective_stack: config.game.effective_stack,
                 min_bet: config.game.min_bet,
                 iso_merging: config.game.iso_merging,
+                preflop_aggressor: config.game.preflop_aggressor,
                 tree: config.game.tree,
             },
             rake: config.rake,
@@ -841,6 +948,71 @@ pub fn parse_and_lower(raw: &str) -> Result<SolveConfig> {
     })
 }
 
+/// Parses a config and lowers it into the shared internal representation.
+pub fn parse_and_lower(raw: &str) -> Result<SolveConfig> {
+    lower_family(parse_family(raw)?)
+}
+
+/// [`parse_and_lower`], resolving a postflop `[game.tree] source` relative
+/// to `config_path`'s directory.
+pub fn parse_and_lower_at(raw: &str, config_path: &Path) -> Result<SolveConfig> {
+    lower_family(parse_family_at(raw, Some(base_directory(config_path)))?)
+}
+
+fn base_directory(config_path: &Path) -> &Path {
+    config_path.parent().unwrap_or_else(|| Path::new("."))
+}
+
+/// Rewrites a postflop `[game.tree] script` value from serde's default
+/// `"""..."""` multi-line basic string into the TOML literal string
+/// `'''...'''` the contract writes -- see `docs/solver-config-v1.jp.md`'s
+/// "正規化 — script は展開せずインライン化する" section. A script body is bare
+/// tokens and comments, never a quote or backslash, so the literal form
+/// never needs to escape anything; the one thing it cannot represent is the
+/// delimiter sequence `'''` itself; appearing inside the body (almost
+/// certainly inside a comment) is an explicit error rather than something to
+/// silently work around.
+///
+/// A no-op (including for the toy and preflop-hu families) when the parsed
+/// document has no `[game.tree] script` string to rewrite.
+fn literalize_tree_script(effective_toml: &str) -> Result<String> {
+    let mut document = toml_edit::DocumentMut::from_str(effective_toml)
+        .context("re-parsing the effective config as a TOML document")?;
+    // Checked read-only first: `Item::get_mut` auto-vivifies a missing key
+    // as `Item::None` (the machinery that lets `doc["a"]["b"] = v` create
+    // tables on the fly), so chaining `get_mut` alone would "find" a
+    // `[game.tree] script` on every config, toy and preflop-hu included.
+    // `Item::get` has no such side effect.
+    let has_script = document
+        .get("game")
+        .and_then(|game| game.get("tree"))
+        .and_then(|tree| tree.get("script"))
+        .is_some();
+    if !has_script {
+        return Ok(document.to_string());
+    }
+    let script_item = document
+        .get_mut("game")
+        .and_then(|game| game.get_mut("tree"))
+        .and_then(|tree| tree.get_mut("script"))
+        .expect("presence just checked above");
+    let text = script_item
+        .as_str()
+        .ok_or_else(|| anyhow!("[game.tree] script did not serialize as a string"))?
+        .to_string();
+    if text.contains("'''") {
+        bail!(
+            "SLV004: [game.tree] script contains \"'''\", which cannot be written as a TOML \
+             literal string; rewrite the script to avoid that exact sequence"
+        );
+    }
+    let literal = format!("'''\n{text}'''");
+    *script_item = toml_edit::Item::Value(
+        toml_edit::Value::from_str(&literal).context("building the literal script value")?,
+    );
+    Ok(document.to_string())
+}
+
 /// The config with every default written out.
 ///
 /// Defaults live in the field declarations, so normalizing is deserialize +
@@ -848,12 +1020,28 @@ pub fn parse_and_lower(raw: &str) -> Result<SolveConfig> {
 /// config returns the same bytes.
 pub fn normalized_toml(raw: &str) -> Result<String> {
     let family = parse_family(raw)?;
-    toml::to_string_pretty(&family).context("serializing the effective config")
+    let text = toml::to_string_pretty(&family).context("serializing the effective config")?;
+    literalize_tree_script(&text)
+}
+
+/// [`normalized_toml`], resolving a postflop `[game.tree] source` relative
+/// to `config_path`'s directory.
+pub fn normalized_toml_at(raw: &str, config_path: &Path) -> Result<String> {
+    let family = parse_family_at(raw, Some(base_directory(config_path)))?;
+    let text = toml::to_string_pretty(&family).context("serializing the effective config")?;
+    literalize_tree_script(&text)
 }
 
 /// The same, as JSON, for `validate --format json --show-effective`.
 pub fn normalized_json(raw: &str) -> Result<serde_json::Value> {
     let family = parse_family(raw)?;
+    serde_json::to_value(&family).context("serializing the effective config")
+}
+
+/// [`normalized_json`], resolving a postflop `[game.tree] source` relative
+/// to `config_path`'s directory.
+pub fn normalized_json_at(raw: &str, config_path: &Path) -> Result<serde_json::Value> {
+    let family = parse_family_at(raw, Some(base_directory(config_path)))?;
     serde_json::to_value(&family).context("serializing the effective config")
 }
 
@@ -863,16 +1051,264 @@ pub fn declared(raw: &str) -> Result<String> {
     declared_schema(raw)
 }
 
-/// The `game.kind` a config declares, for the run manifest.
-pub fn game_kind(raw: &str) -> Result<&'static str> {
-    Ok(match parse_family(raw)? {
+/// [`declared`], resolving a postflop `[game.tree] source` relative to
+/// `config_path`'s directory.
+pub fn declared_at(raw: &str, config_path: &Path) -> Result<String> {
+    parse_family_at(raw, Some(base_directory(config_path)))?;
+    declared_schema(raw)
+}
+
+fn game_kind_of(family: &Family) -> &'static str {
+    match family {
         Family::Toy(config) => match config.game {
             ToyGame::Kuhn => "kuhn",
             ToyGame::Leduc => "leduc",
         },
         Family::Postflop(_) => "postflop",
         Family::PreflopHu(_) => "preflop",
-    })
+    }
+}
+
+/// The `game.kind` a config declares, for the run manifest.
+pub fn game_kind(raw: &str) -> Result<&'static str> {
+    Ok(game_kind_of(&parse_family(raw)?))
+}
+
+/// [`game_kind`], resolving a postflop `[game.tree] source` relative to
+/// `config_path`'s directory.
+pub fn game_kind_at(raw: &str, config_path: &Path) -> Result<&'static str> {
+    Ok(game_kind_of(&parse_family_at(
+        raw,
+        Some(base_directory(config_path)),
+    )?))
+}
+
+// --- tree diagnostic (`validate` only) --------------------------------------
+//
+// Everything below renders a compiled tree script back to source-like JSON
+// for `solvers validate`'s benefit -- see docs/solver-config-v1.jp.md's
+// "param 宣言は変数スキーマである" section. It is read-only: nothing here feeds
+// `normalized_toml`/`normalized_json`, which keep carrying the script body
+// verbatim (`literalize_tree_script`) rather than this expanded form.
+
+/// The `tree` diagnostic `validate --format json` reports: a postflop
+/// config's compiled `param` schema and lowered `rule` list. `None` for the
+/// toy and preflop-hu families (no `[game.tree]` at all) and for a postflop
+/// config with `kind = "none"` (no script compiled, so nothing to report).
+pub fn tree_diagnostic_at(raw: &str, config_path: &Path) -> Result<Option<serde_json::Value>> {
+    let family = parse_family_at(raw, Some(base_directory(config_path)))?;
+    let Family::Postflop(config) = &family else {
+        return Ok(None);
+    };
+    let Some(script) = config.game.tree.compiled_script()? else {
+        return Ok(None);
+    };
+    render_tree_diagnostic(&script).map(Some)
+}
+
+/// A `param` declaration, as reported by the `tree` diagnostic: the variable
+/// schema a GUI would build a form from.
+#[derive(Serialize)]
+struct ParamDiagnostic {
+    name: String,
+    #[serde(rename = "type")]
+    kind: &'static str,
+    /// The *effective* default -- the script's own `param` value, overridden
+    /// by `[game.tree.params]` where present (`ParamSchema::default` is
+    /// already resolved that way; see `resolve_declarations` in
+    /// `cards::script::parse`). A JSON number/bool for `number`/`bool`
+    /// params, so a numeric default round-trips as JSON's own number type
+    /// instead of a quoted string.
+    default: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+}
+
+/// One lowered rule, as reported by the `tree` diagnostic: what the tree
+/// builder will actually apply, in source order, with its condition
+/// rendered back to source-like text and its sizes rendered with
+/// `SizeSpec::render` -- both so a reader can check this against their
+/// script's `if`/`else` chain directly.
+#[derive(Serialize)]
+struct RuleDiagnostic {
+    street: &'static str,
+    condition: String,
+    effect: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    action: Option<&'static str>,
+    sizes: Vec<String>,
+}
+
+#[derive(Serialize)]
+struct TreeDiagnostic {
+    params: Vec<ParamDiagnostic>,
+    rules: Vec<RuleDiagnostic>,
+}
+
+fn render_tree_diagnostic(script: &Script) -> Result<serde_json::Value> {
+    let diagnostic = TreeDiagnostic {
+        params: script.params.iter().map(render_param).collect(),
+        rules: script.rules.iter().map(render_rule).collect(),
+    };
+    serde_json::to_value(diagnostic).context("serializing the tree diagnostic")
+}
+
+fn render_param(param: &ParamSchema) -> ParamDiagnostic {
+    let (kind, default) = match param.kind {
+        ParamKind::Number => ("number", param_number_value(&param.default)),
+        ParamKind::Bool => ("bool", serde_json::Value::Bool(param.default == "true")),
+        ParamKind::Token => ("token", serde_json::Value::String(param.default.clone())),
+    };
+    ParamDiagnostic {
+        name: param.name.clone(),
+        kind,
+        default,
+        description: param.description.clone(),
+    }
+}
+
+/// Renders a `number`-kind param's default as a JSON number, preferring an
+/// integer so a config that wrote a bare integer (`cb = 40`) round-trips as
+/// JSON's own integer type rather than picking up a synthetic `.0`.
+/// `ParamKind::Number` is only ever inferred when `default` already parses
+/// as `f64` (`infer_param_kind` in `cards::script::parse`), so the `f64`
+/// fallback parse never actually fails; `unwrap_or` covers it rather than
+/// panicking on a diagnostic path.
+fn param_number_value(default: &str) -> serde_json::Value {
+    if let Ok(value) = default.parse::<i64>() {
+        return serde_json::Value::from(value);
+    }
+    let value: f64 = default.parse().unwrap_or(0.0);
+    serde_json::Number::from_f64(value)
+        .map(serde_json::Value::Number)
+        .unwrap_or(serde_json::Value::Null)
+}
+
+fn render_rule(rule: &Rule) -> RuleDiagnostic {
+    RuleDiagnostic {
+        street: street_name(rule.street),
+        condition: render_condition(&rule.condition),
+        effect: effect_name(rule.effect),
+        action: rule.action.map(action_name),
+        sizes: rule
+            .sizes
+            .iter()
+            .map(|size| size.render(SizeUnit::Chips))
+            .collect(),
+    }
+}
+
+fn action_name(action: ActionKind) -> &'static str {
+    match action {
+        ActionKind::Bet => "bet",
+        ActionKind::Raise => "raise",
+    }
+}
+
+fn effect_name(effect: Effect) -> &'static str {
+    match effect {
+        Effect::Add => "add",
+        Effect::Remove => "remove",
+        Effect::Replace => "replace",
+        Effect::Force => "force",
+        Effect::Checkdown => "checkdown",
+    }
+}
+
+/// Renders a lowered rule's [`Condition`] back to source-like text, using
+/// the tree script's own precedence (`||` lowest, `&&` next, unary `!`
+/// tightest, comparisons/membership/truth tightest of all): a subexpression
+/// is parenthesized only when it sits under an operator that binds tighter
+/// than it does.
+///
+/// `Not` is the one deliberate exception -- its operand is always
+/// parenthesized, matching this contract's own normalization example
+/// (`!(A) && !(B) && !(C) && D`, in the "正規化" section): a bare `!paired`
+/// reads fine on its own, but scanning a long `&&` chain for which term is
+/// negated does not, and a reader checking this rule against their
+/// `if`/`else` chain is doing exactly that scan.
+fn render_condition(condition: &Condition) -> String {
+    render_condition_prec(condition, 0)
+}
+
+/// `min_prec` is the precedence of the operator `condition` sits under (0 at
+/// the top level, `||`'s own precedence); `condition` is parenthesized if
+/// its own precedence is lower. Precedence levels: `||` = 0, `&&` = 1,
+/// everything else (unary `!`, comparisons, membership, `Truth`, `Const`) =
+/// 2, matching `cards::script::cond`'s grammar (`parse_or` < `parse_and` <
+/// `parse_unary` < `parse_predicate`).
+fn render_condition_prec(condition: &Condition, min_prec: u8) -> String {
+    let (text, prec) = match condition {
+        // `Const` has no script syntax of its own -- it only ever appears as
+        // the base of an unconditioned statement (`Const(true)`) or, once
+        // `Condition::specialize` is wired into the tree builder, a folded
+        // board-only condition. Spelling it out beats inventing pseudo-code.
+        Condition::Const(true) => ("always".to_string(), 2),
+        Condition::Const(false) => ("never".to_string(), 2),
+        Condition::Truth(var) => (var.name().to_string(), 2),
+        Condition::Not(inner) => (format!("!({})", render_condition_prec(inner, 0)), 2),
+        Condition::And(left, right) => (
+            format!(
+                "{} && {}",
+                render_condition_prec(left, 1),
+                render_condition_prec(right, 1)
+            ),
+            1,
+        ),
+        Condition::Or(left, right) => (
+            format!(
+                "{} || {}",
+                render_condition_prec(left, 0),
+                render_condition_prec(right, 0)
+            ),
+            0,
+        ),
+        Condition::Compare { var, op, value } => (
+            format!(
+                "{} {} {}",
+                var.name(),
+                cmp_op_str(*op),
+                render_literal(value)
+            ),
+            2,
+        ),
+        Condition::Member { var, values } => (
+            format!(
+                "{} in [{}]",
+                var.name(),
+                values
+                    .iter()
+                    .map(render_literal)
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            ),
+            2,
+        ),
+    };
+    if prec < min_prec {
+        format!("({text})")
+    } else {
+        text
+    }
+}
+
+fn cmp_op_str(op: CmpOp) -> &'static str {
+    match op {
+        CmpOp::Lt => "<",
+        CmpOp::Le => "<=",
+        CmpOp::Eq => "==",
+        CmpOp::Ne => "!=",
+        CmpOp::Ge => ">=",
+        CmpOp::Gt => ">",
+    }
+}
+
+fn render_literal(literal: &Literal) -> String {
+    match literal {
+        Literal::Bool(value) => value.to_string(),
+        Literal::Number(value) => format!("{value}"),
+        Literal::Text(value) => format!("{value:?}"),
+    }
 }
 
 #[cfg(test)]
@@ -889,9 +1325,11 @@ ip_range = "22+"
 pot = 20
 effective_stack = 80
 
-[game.tree.river]
-oop_bet = [50]
-ip_bet = [50]
+[game.tree]
+kind = "script"
+script = '''
+river { replace bet [50] }
+'''
 
 [run]
 iterations = 100
@@ -1056,6 +1494,38 @@ iterations = 100
         assert!(error.contains("max_aggressive_actions"), "{error}");
     }
 
+    /// The same menu keys with their `[game.tree.<street>]` headers deleted
+    /// -- the shape an author lands on halfway through migrating -- must
+    /// still name where each key went, not just list the valid fields the
+    /// way `deny_unknown_fields` would.
+    #[test]
+    fn retired_menu_keys_directly_under_the_tree_table_name_their_replacement() {
+        let halfway = r#"
+schema = "solvers.postflop/v1"
+
+[game]
+board = "2c 7d 9h Js Qs"
+oop_range = "22+"
+ip_range = "22+"
+pot = 20
+effective_stack = 80
+
+[game.tree]
+kind = "script"
+oop_bet = [50]
+oop_donk = []
+
+[run]
+iterations = 100
+"#;
+        let error = parse_and_lower(halfway).unwrap_err().to_string();
+        assert!(error.contains("SLV002"), "{error}");
+        assert!(error.contains("oop_bet"), "{error}");
+        assert!(error.contains("oop_donk"), "{error}");
+        assert!(error.contains("replace bet"), "{error}");
+        assert!(error.contains("when donk"), "{error}");
+    }
+
     /// Every input that used to pass `validate` and then panic the builder.
     #[test]
     fn validate_rejects_what_the_builder_used_to_panic_on() {
@@ -1075,7 +1545,7 @@ iterations = 100
         let error = parse_and_lower(&bad_when).unwrap_err().to_string();
         assert!(error.contains("SLV004"), "{error}");
 
-        let negative = POSTFLOP.replace("oop_bet = [50]", "oop_bet = [-1.0]");
+        let negative = POSTFLOP.replace("[50]", "[-1]");
         let error = parse_and_lower(&negative).unwrap_err().to_string();
         assert!(error.contains("positive"), "{error}");
 
@@ -1084,32 +1554,39 @@ iterations = 100
         assert!(error.contains("SLV004"), "{error}");
     }
 
-    /// A menu on a street the board has already passed describes a tree the
-    /// config will not get, so it is an error rather than a silent no-op.
+    /// A rule targeting a street the board has already passed describes a
+    /// tree the config will not get, so it is an error rather than a silent
+    /// no-op.
     #[test]
     fn a_menu_on_an_unreachable_street_is_rejected() {
         let unreachable = POSTFLOP.replace(
-            "[game.tree.river]",
-            "[game.tree.flop]\noop_bet = [50]\n\n[game.tree.river]",
+            "river { replace bet [50] }",
+            "flop { replace bet [50] }\nriver { replace bet [50] }",
         );
         let error = parse_and_lower(&unreachable).unwrap_err().to_string();
         assert!(error.contains("SLV004"), "{error}");
-        assert!(error.contains("[game.tree.flop]"), "{error}");
+        assert!(error.contains("flop"), "{error}");
         assert!(error.contains("river"), "{error}");
     }
 
     #[test]
     fn size_literals_and_bare_fractions_mean_the_same_tree() {
-        let literal = POSTFLOP.replace("oop_bet = [50]", "oop_bet = [\"50%pot\"]");
+        let literal = POSTFLOP.replace("[50]", "[50%pot]");
         let from_fraction = parse_and_lower(POSTFLOP).unwrap();
         let from_literal = parse_and_lower(&literal).unwrap();
+        let GameSection::Postflop { tree: fraction, .. } = from_fraction.game else {
+            panic!("expected GameSection::Postflop");
+        };
+        let GameSection::Postflop { tree: literal, .. } = from_literal.game else {
+            panic!("expected GameSection::Postflop");
+        };
         assert_eq!(
-            format!("{:?}", from_fraction.game),
-            format!("{:?}", from_literal.game)
+            format!("{:?}", fraction.lower().unwrap()),
+            format!("{:?}", literal.lower().unwrap())
         );
 
         // The bb literal belongs to the family that has blinds.
-        let bb = POSTFLOP.replace("oop_bet = [50]", "oop_bet = [\"2.5bb\"]");
+        let bb = POSTFLOP.replace("[50]", "[2.5bb]");
         let error = parse_and_lower(&bb).unwrap_err().to_string();
         assert!(error.contains("bb"), "{error}");
     }

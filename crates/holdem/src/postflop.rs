@@ -18,9 +18,12 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::ops::Index;
 
+use cards::script::{
+    ActionKind, CmpOp, Condition, Effect, Literal, PreviousAggressor, Rule, RuleContext, Var,
+};
 use cards::{
-    ALL_CARDS, Card, CardSet, Chips, HandRank, NUM_COMBOS, PerPlayer, Player, Range, SizeSpec,
-    Street, combo_cards, combo_index, geometric_allin_target, rank_of,
+    ALL_CARDS, BoardFacts, Card, CardSet, Chips, HandRank, NUM_COMBOS, PerPlayer, Player, Range,
+    SizeSpec, Street, combo_cards, combo_index, geometric_allin_target, rank_of,
 };
 use engine::{
     CompiledGame, NodeId, PublicTree, ReachMap, SparseTransition, TempNode, TerminalEvaluator,
@@ -56,36 +59,27 @@ impl<T> Index<Street> for PerStreet<T> {
     }
 }
 
-/// One street's betting grammar, mirroring
-/// `multiway::config::StreetBettingConfig` for the heads-up postflop engine:
-/// the same `SizeSpec` vocabulary, `chips` instead of `bb` as the absolute
-/// unit, plus raise-level indexing and a donk menu that multiway's flat
-/// per-street `raise_sizes` list has no equivalent of (multiway never faces
-/// the "OOP reopens after being checked to on a street IP was last aggressive
-/// on" situation the way a HU postflop subgame does).
+/// One street's betting grammar: the tree-script rules that get replayed at
+/// every decision node on this street (see [`node_actions`]), plus the
+/// structural limits a script cannot express (`docs/postflop-tree-script-v1.jp.md`'s
+/// 適用モデル chapter: `max_aggressive_actions` is a memory-preflight input,
+/// and `allin_threshold` is a size-resolution rule, not an action-list
+/// add/remove). `rules` used to come only from the five fixed-menu fields
+/// (`oop_bet`/`ip_bet`/`oop_raise`/`ip_raise`/`oop_donk`) a pre-script
+/// grammar had; [`StreetTree::from_script`] is what a compiled tree script
+/// (`cards::script::Script`) builds this from now, and
+/// [`StreetTree::pot_fractions`] is the short constructor test/bench
+/// fixtures use for the common single-level pot-fraction case.
 #[derive(Clone, Debug)]
 pub struct StreetTree {
-    /// Sizes for OOP opening the betting on this street (no outstanding bet
-    /// to face).
-    pub oop_bet: Vec<SizeSpec>,
-    /// Sizes for IP opening the betting on this street.
-    pub ip_bet: Vec<SizeSpec>,
-    /// Sizes facing an outstanding bet, indexed by raise level: index 0 is
-    /// the first raise of the street. A level past the end reuses the last
-    /// entry. `None` reuses the player's own bet menu as a single level —
-    /// the fallback every config had before raise menus were separable, so
-    /// a tree that names only bet sizes still raises with them.
-    /// `Some(vec![])` means no sized raises at all.
-    pub oop_raise: Option<Vec<Vec<SizeSpec>>>,
-    pub ip_raise: Option<Vec<Vec<SizeSpec>>>,
-    /// OOP's opening menu on a street whose previous street's last
-    /// aggressor was IP (a "donk" spot). `None` reuses `oop_bet`;
-    /// `Some(vec![])` forbids donking outright.
-    pub oop_donk: Option<Vec<SizeSpec>>,
+    /// This street's tree-script rules, in source order. Source order is
+    /// the entire priority model -- there is no priority field.
+    pub rules: Vec<Rule>,
     /// Maximum bets plus raises on this street (multiway's name for what
     /// this used to call `max_raises`).
     pub max_aggressive_actions: u32,
-    /// Always offer the all-in target in addition to the sized menu.
+    /// Always offer the all-in target in addition to whatever the rules
+    /// produce. Applied before any rule runs (see [`node_actions`]).
     pub include_allin: bool,
     /// Targets at or above this fraction of the actor's maximum target
     /// collapse into the all-in target. Finite and in `(0.0, 1.0]`.
@@ -95,11 +89,7 @@ pub struct StreetTree {
 impl Default for StreetTree {
     fn default() -> Self {
         StreetTree {
-            oop_bet: Vec::new(),
-            ip_bet: Vec::new(),
-            oop_raise: None,
-            ip_raise: None,
-            oop_donk: None,
+            rules: Vec::new(),
             max_aggressive_actions: 2,
             include_allin: false,
             allin_threshold: None,
@@ -107,12 +97,73 @@ impl Default for StreetTree {
     }
 }
 
+/// AND-combines two conditions without ever nesting `Const(true)`, matching
+/// `cards::script::cond`'s own simplification convention -- not load-bearing
+/// here (the translated rules never actually combine two `Const`s), just
+/// keeping every hand-built `Condition` in the same normal form the script
+/// compiler would produce.
+fn and(left: Condition, right: Condition) -> Condition {
+    Condition::And(Box::new(left), Box::new(right))
+}
+
+fn not(inner: Condition) -> Condition {
+    Condition::Not(Box::new(inner))
+}
+
+/// One raise menu's levels as `Add Raise` rules gated on `aggressions`: level
+/// `i` (`0`-based) applies when `i < levels.len() - 1` and
+/// `aggressions == i + 1`, and the last level applies when
+/// `aggressions >= levels.len()` -- reproducing
+/// `raise_targets`'s old `level = (raises_used - 1).min(len - 1)` selection.
+/// An empty `levels` yields no rules at all ("never raise"). Used by
+/// [`StreetTree::pot_fractions`], the short constructor for the common
+/// single-level case.
+fn raise_level_rules(street: Street, actor: Condition, levels: &[Vec<SizeSpec>]) -> Vec<Rule> {
+    let len = levels.len();
+    levels
+        .iter()
+        .enumerate()
+        .map(|(i, sizes)| {
+            let aggression = if i + 1 < len {
+                Condition::Compare {
+                    var: Var::Aggressions,
+                    op: CmpOp::Eq,
+                    value: Literal::Number((i + 1) as f64),
+                }
+            } else {
+                Condition::Compare {
+                    var: Var::Aggressions,
+                    op: CmpOp::Ge,
+                    value: Literal::Number(len as f64),
+                }
+            };
+            Rule {
+                street,
+                condition: and(actor.clone(), aggression),
+                effect: Effect::Add,
+                action: Some(ActionKind::Raise),
+                sizes: sizes.clone(),
+            }
+        })
+        .collect()
+}
+
 impl StreetTree {
     /// A street whose bet and raise menus are the same pot fractions for
     /// both players — the shape every config had before size literals, kept
     /// as a short constructor for the test/bench fixtures that just want a
     /// classic single-level pot-fraction tree. `oop`/`ip` become the opening
-    /// bet menus, and the raise menus fall back to them.
+    /// bet menus, and the raise menus reuse them as a single level (an
+    /// unraised street's `oop_raise`/`ip_raise` used to fall back to the
+    /// player's own bet menu; this constructor reproduces exactly that).
+    ///
+    /// Has no `street` parameter (63 call sites across tests, benches, and
+    /// `src/river.rs` depend on this exact signature), so the rules built
+    /// below are tagged with an arbitrary placeholder street (`Street::Flop`).
+    /// That's sound: `StreetTree`'s only consumer (`node_actions`) selects
+    /// which street's rules to run structurally, by indexing
+    /// `PerStreet<StreetTree>` with the node's own street -- it never reads
+    /// `Rule::street` back out of the rules it runs.
     pub fn pot_fractions(oop: &[f64], ip: &[f64], max_aggressive_actions: u32) -> StreetTree {
         let sizes = |fractions: &[f64]| -> Vec<SizeSpec> {
             fractions
@@ -120,15 +171,71 @@ impl StreetTree {
                 .map(|&fraction| SizeSpec::PotAfterCall { fraction })
                 .collect()
         };
+        let street = Street::Flop;
+        let not_in_position = not(Condition::Truth(Var::InPosition));
+        let in_position = Condition::Truth(Var::InPosition);
+        let oop_sizes = sizes(oop);
+        let ip_sizes = sizes(ip);
+
+        let mut rules = vec![
+            Rule {
+                street,
+                condition: not_in_position.clone(),
+                effect: Effect::Add,
+                action: Some(ActionKind::Bet),
+                sizes: oop_sizes.clone(),
+            },
+            Rule {
+                street,
+                condition: in_position.clone(),
+                effect: Effect::Add,
+                action: Some(ActionKind::Bet),
+                sizes: ip_sizes.clone(),
+            },
+        ];
+        rules.extend(raise_level_rules(
+            street,
+            not_in_position,
+            std::slice::from_ref(&oop_sizes),
+        ));
+        rules.extend(raise_level_rules(
+            street,
+            in_position,
+            std::slice::from_ref(&ip_sizes),
+        ));
+
         StreetTree {
-            oop_bet: sizes(oop),
-            ip_bet: sizes(ip),
-            oop_raise: None,
-            ip_raise: None,
-            oop_donk: None,
+            rules,
             max_aggressive_actions,
             include_allin: false,
             allin_threshold: None,
+        }
+    }
+
+    /// Collects one street's rules out of a compiled tree script's flat rule
+    /// list (`cards::script::Script::rules`), preserving source order --
+    /// source order is the script's entire priority model (see
+    /// `docs/postflop-tree-script-v1.jp.md`'s 平坦化の規則 chapter), so this
+    /// must not reorder or resort what it filters. `rules` is the *whole*
+    /// script's rule list (every street's statements interleaved in source
+    /// order); this keeps only the ones tagged for `street`, exactly as
+    /// `node_actions` expects to run them.
+    pub fn from_script(
+        street: Street,
+        rules: &[Rule],
+        max_aggressive_actions: u32,
+        include_allin: bool,
+        allin_threshold: Option<f64>,
+    ) -> StreetTree {
+        StreetTree {
+            rules: rules
+                .iter()
+                .filter(|rule| rule.street == street)
+                .cloned()
+                .collect(),
+            max_aggressive_actions,
+            include_allin,
+            allin_threshold,
         }
     }
 }
@@ -157,12 +264,13 @@ pub struct PostflopConfig {
     pub pot: Chips,
     /// Chips behind for each player, at the start of the subgame.
     pub effective_stack: Chips,
-    /// Betting grammar per street: opening bet/donk menus, raise menus by
-    /// level, the aggressive-action cap, and all-in handling.
+    /// Betting grammar per street: the tree-script rules that build each
+    /// node's action menu, plus the structural limits a script cannot
+    /// override (the aggressive-action cap and all-in handling).
     pub streets: PerStreet<StreetTree>,
     /// Smallest legal opening bet and smallest legal raise increment — the
     /// big blind's role in a game that has no blinds. `SizeSpec::MinRaise`
-    /// and the minimum-full-raise bump (see `raise_targets`) are both
+    /// and the minimum-full-raise bump (see `sized_targets`) are both
     /// anchored on this value.
     pub min_bet: Chips,
     /// Merge turn/river deals into suit-isomorphism classes. The default
@@ -173,6 +281,12 @@ pub struct PostflopConfig {
     /// [`PostflopGame::node_by_history`]. Costs a `String` + `Vec<String>`
     /// per action node, so large flop trees may want this off.
     pub track_node_info: bool,
+    /// The last player to bet or raise before this subgame began. Exists
+    /// only to define the `cbet`/`donk` tree-script variables on the
+    /// starting street (see `rule_context`); it affects nothing else, and in
+    /// particular is unrelated to `StreetTree`'s own `previous_aggressor`
+    /// bookkeeping across streets *within* the subgame.
+    pub preflop_aggressor: Option<Player>,
 }
 
 impl PostflopConfig {
@@ -198,6 +312,9 @@ impl PostflopConfig {
     }
 }
 
+/// A blank subgame to fill in field by field — an empty board and a zero
+/// stack are not a runnable config, so this is a starting point for test
+/// fixtures rather than something to hand to `build_postflop_game`.
 impl Default for PostflopConfig {
     fn default() -> Self {
         PostflopConfig {
@@ -209,6 +326,7 @@ impl Default for PostflopConfig {
             min_bet: Chips(1),
             iso_merging: true,
             track_node_info: true,
+            preflop_aggressor: None,
         }
     }
 }
@@ -328,6 +446,12 @@ impl TerminalEvaluator for PostflopEvaluator {
 struct LineState {
     street: Street,
     board: Vec<Card>,
+    /// Suit-permutation-invariant summary of `board`, for the tree-script
+    /// board predicates (`paired`, `two_tone`, ...). Computed once per
+    /// chance branch -- at the root, and again in `deal_chance` each time a
+    /// card is dealt -- and never recomputed per decision node, since it
+    /// only ever changes when `board` does.
+    board_facts: BoardFacts,
     to_act: Player,
     /// Total chips committed this subgame (all streets), per player —
     /// *not* reset between streets, unlike `outstanding`/`raises_used`.
@@ -341,7 +465,7 @@ struct LineState {
     /// street began. A street always starts right after a call or a
     /// check-check, both of which leave `contrib[P0] == contrib[P1]`, so one
     /// shared value suffices for both players' street-relative wagers (see
-    /// `raise_targets`).
+    /// `sized_targets`).
     street_start: Chips,
     /// Size of the last full bet/raise increment on this street; `ZERO`
     /// before any bet/raise has happened this street. Reset at each street
@@ -349,8 +473,8 @@ struct LineState {
     last_full_raise: Chips,
     /// The last player to bet or raise on the PREVIOUS street; `None` when
     /// that street checked through, or when this is the subgame's first
-    /// street. Selects `oop_donk` vs `oop_bet` for OOP's opening action on
-    /// this street — see `raise_targets`'s menu selection.
+    /// street. Read by the tree-script `donk` variable via `rule_context` --
+    /// see `docs/postflop-tree-script-v1.jp.md`'s 適用モデル chapter.
     previous_aggressor: Option<Player>,
     /// The last player to bet or raise on THIS street so far; `None` until
     /// someone does. Carried forward into the next street's
@@ -444,18 +568,27 @@ fn scale(amount: Chips, fraction: f64) -> Chips {
     Chips(scaled.clamp(0.0, u32::MAX as f64) as u32)
 }
 
-/// Distinct street-wager targets a bet/raise can reach for the acting player
-/// at `state`: every configured `SizeSpec` resolved to a raise-to target
+/// Resolves an explicit size menu at `state` into additional-contribution
+/// wagers: every entry of `sizes` resolved to a raise-to target
 /// (street-relative, i.e. the actor's total contribution *this street*),
 /// bumped up to the minimum full raise, clamped to all-in, merged into
-/// all-in past `allin_threshold`, and deduped — the resolution order fixed
-/// by `docs/solver-config-v1.jp.md`'s `[game.tree]` size-literal table
+/// all-in past `allin_threshold`, sorted, deduped, and filtered down to
+/// targets that actually raise the bet faced — the resolution order fixed by
+/// `docs/solver-config-v1.jp.md`'s `[game.tree]` size-literal table
 /// (identical to `multiway::betting::BettingState::legal_actions`'s size
 /// resolution, `ToChips`/chip-unit literals instead of `ToBb`/bb). Returned
 /// as *additional* contribution over the actor's current street wager — the
 /// shape both `Builder::betting` and the counting mirror `Counting::betting`
 /// consume — so the two can never disagree about a node's action count.
-fn raise_targets(state: &LineState, config: &PostflopConfig) -> Vec<Chips> {
+///
+/// This is everything the old (pre-tree-script) `raise_targets` did *except*
+/// choosing which menu to resolve and appending the `include_allin` target —
+/// both now the caller's job (`node_actions`), since which menu applies is a
+/// tree-script rule's concern, not this function's. The two early returns
+/// below stay here rather than moving to the caller: they are structural
+/// limits (`max_aggressive_actions`, "no chips behind") that no script rule
+/// is allowed to override by naming its own sizes.
+fn sized_targets(state: &LineState, config: &PostflopConfig, sizes: &[SizeSpec]) -> Vec<Chips> {
     let street = &config.streets[state.street];
     if state.raises_used >= street.max_aggressive_actions {
         return Vec::new();
@@ -488,38 +621,8 @@ fn raise_targets(state: &LineState, config: &PostflopConfig) -> Vec<Chips> {
         (bet_to_match + config.min_bet).min(maximum)
     };
 
-    let menu: &[SizeSpec] = if state.outstanding > Chips::ZERO {
-        let (configured, fallback) = match actor {
-            Player::P0 => (&street.oop_raise, &street.oop_bet),
-            Player::P1 => (&street.ip_raise, &street.ip_bet),
-        };
-        // An unset raise menu reuses the player's own bet menu as one
-        // level, which is what a config naming only bet sizes has always
-        // meant. Writing an empty list is the way to say "never raise".
-        let raises: &[Vec<SizeSpec>] = match configured {
-            Some(levels) => levels,
-            None => std::slice::from_ref(fallback),
-        };
-        if raises.is_empty() {
-            &[]
-        } else {
-            // `raises_used` counts every bet/raise so far this street
-            // (bet included), so the first raise decision (level 0) is
-            // always seen with `raises_used == 1`.
-            let level = (state.raises_used as usize - 1).min(raises.len() - 1);
-            &raises[level]
-        }
-    } else if actor == Player::P0 && state.previous_aggressor == Some(Player::P1) {
-        street.oop_donk.as_deref().unwrap_or(&street.oop_bet)
-    } else {
-        match actor {
-            Player::P0 => &street.oop_bet,
-            Player::P1 => &street.ip_bet,
-        }
-    };
-
-    let mut targets: Vec<Chips> = Vec::with_capacity(menu.len() + 1);
-    for &size in menu {
+    let mut targets: Vec<Chips> = Vec::with_capacity(sizes.len());
+    for &size in sizes {
         let mut target = match size {
             SizeSpec::ToBb { .. } => unreachable!(
                 "the bb size literal belongs to the Multiway Preflop family; \
@@ -562,9 +665,6 @@ fn raise_targets(state: &LineState, config: &PostflopConfig) -> Vec<Chips> {
         }
         targets.push(target);
     }
-    if street.include_allin {
-        targets.push(maximum);
-    }
     targets.sort_unstable();
     targets.dedup();
     targets.retain(|&target| target > bet_to_match);
@@ -572,6 +672,207 @@ fn raise_targets(state: &LineState, config: &PostflopConfig) -> Vec<Chips> {
         .into_iter()
         .map(|target| target - actor_wager)
         .collect()
+}
+
+/// One legal action at a decision node. `Wager` carries the *additional*
+/// chips the actor puts in over their current contribution — the same
+/// quantity `sized_targets` already returns.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum NodeAction {
+    Fold,
+    Check,
+    Call,
+    Wager(Chips),
+}
+
+/// The non-aggressive action(s) every node starts from before any wager is
+/// considered: `check` with no outstanding bet, `fold`+`call` facing one.
+/// Also the fallback `node_actions` returns when rules empty the list out
+/// entirely (see that function) — the only sound reading of `force` /
+/// `checkdown` / `remove` clearing every candidate, and what keeps
+/// `engine::tree`'s `assert!(num_actions >= 1)` satisfied.
+fn base_actions(state: &LineState) -> Vec<NodeAction> {
+    if state.outstanding == Chips::ZERO {
+        vec![NodeAction::Check]
+    } else {
+        vec![NodeAction::Fold, NodeAction::Call]
+    }
+}
+
+/// Sort key reproducing the fixed push order `Builder`/`Counting` have
+/// always used: check-or-fold-then-call first, then wagers ascending by
+/// size. Rules re-sort by this key after every edit (see `node_actions`), so
+/// a script-driven tree still yields the exact same child order, history
+/// strings, and `node_info.actions` list as the old fixed-menu grammar would
+/// for the same resolved sizes.
+fn action_sort_key(action: NodeAction) -> (u8, u32) {
+    match action {
+        NodeAction::Fold => (0, 0),
+        NodeAction::Check => (1, 0),
+        NodeAction::Call => (2, 0),
+        NodeAction::Wager(chips) => (3, chips.0),
+    }
+}
+
+/// This node's `RuleContext`, filled in from `state`/`config` per
+/// `docs/postflop-tree-script-v1.jp.md`'s variable table. `actor` is
+/// `state.to_act`: `in_position` and `previous_aggressor` are both read
+/// relative to whoever is on the move at this node, not either player fixed.
+fn rule_context(state: &LineState, config: &PostflopConfig) -> RuleContext {
+    let actor = state.to_act;
+    let pot_now = config.pot + state.contrib[Player::P0] + state.contrib[Player::P1];
+    let behind = config.effective_stack - state.contrib[actor];
+    RuleContext {
+        aggressions: state.raises_used,
+        in_position: actor == Player::P1,
+        spr: if pot_now == Chips::ZERO {
+            0.0
+        } else {
+            behind.as_f64() / pot_now.as_f64()
+        },
+        pot: pot_now.as_f64(),
+        to_call: state.outstanding.min(behind).as_f64(),
+        previous_aggressor: match state.previous_aggressor {
+            None => PreviousAggressor::None,
+            Some(p) if p == actor => PreviousAggressor::Actor,
+            Some(_) => PreviousAggressor::Opponent,
+        },
+        board: state.board_facts,
+    }
+}
+
+/// Every legal action at `state`: the base non-aggressive action(s), the
+/// `include_allin` default (added before any rule runs, per
+/// `docs/postflop-tree-script-v1.jp.md`'s 適用モデル chapter -- a script can
+/// then edit it away), then this street's tree-script rules applied in
+/// source order. A rule whose `action` doesn't match the node's own wager
+/// kind (`Bet` with no outstanding bet, `Raise` facing one) is inert and
+/// skipped entirely. Shared between the real builder and the memory-usage
+/// dry run so the two can never disagree about a node's action count or
+/// order.
+fn node_actions(state: &LineState, config: &PostflopConfig) -> Vec<NodeAction> {
+    let street = &config.streets[state.street];
+    let mut actions = base_actions(state);
+
+    if street.include_allin {
+        actions.extend(
+            sized_targets(state, config, &[SizeSpec::AllIn])
+                .into_iter()
+                .map(NodeAction::Wager),
+        );
+    }
+
+    let ctx = rule_context(state, config);
+    let node_kind = if state.outstanding == Chips::ZERO {
+        ActionKind::Bet
+    } else {
+        ActionKind::Raise
+    };
+
+    for rule in &street.rules {
+        if !rule.condition.eval(&ctx) {
+            continue;
+        }
+        if rule.effect == Effect::Checkdown {
+            actions.retain(|a| matches!(a, NodeAction::Check));
+        } else if rule.action == Some(node_kind) {
+            let sized = || {
+                sized_targets(state, config, &rule.sizes)
+                    .into_iter()
+                    .map(NodeAction::Wager)
+            };
+            match rule.effect {
+                Effect::Remove => actions.retain(|a| !matches!(a, NodeAction::Wager(_))),
+                Effect::Replace => {
+                    actions.retain(|a| !matches!(a, NodeAction::Wager(_)));
+                    actions.extend(sized());
+                }
+                Effect::Add => actions.extend(sized()),
+                Effect::Force => actions = sized().collect(),
+                Effect::Checkdown => unreachable!("checked above"),
+            }
+        } else {
+            // The rule names the other wager kind (`remove bet` facing a
+            // bet, `force raise [..]` with nothing to raise): inert here.
+            continue;
+        }
+        actions.sort_by_key(|&a| action_sort_key(a));
+        actions.dedup();
+    }
+
+    if actions.is_empty() {
+        base_actions(state)
+    } else {
+        actions
+    }
+}
+
+/// Where one [`NodeAction`] leads from `state`. Carries the full state
+/// transition (`contrib`, `outstanding`, `raises_used`, `last_full_raise`,
+/// `street_aggressor`, `to_act`, `first_checked`) that used to be duplicated
+/// between `Builder::betting` and `Counting::betting`. Does NOT touch
+/// `history` — building history strings and node info stays with `Builder`,
+/// the only walker that has them; callers extend `history` themselves from
+/// the returned state's other fields.
+enum ChildStep {
+    /// Another decision node on this street.
+    Betting(LineState),
+    /// The street is over: showdown at the river, otherwise a chance node.
+    StreetEnd(LineState),
+    /// `actor` folded.
+    Fold,
+}
+
+/// The state-arithmetic core of a betting-tree edge, shared by both walkers.
+/// The check action can lead to two different [`ChildStep`]s depending on
+/// `state.first_checked`: the first check on a street reopens the betting
+/// (`Betting`), while the second check (check-check) ends the street
+/// (`StreetEnd`).
+fn child_step(state: &LineState, action: NodeAction) -> ChildStep {
+    let actor = state.to_act;
+    match action {
+        NodeAction::Fold => ChildStep::Fold,
+        NodeAction::Check => {
+            if state.first_checked {
+                ChildStep::StreetEnd(state.clone())
+            } else {
+                ChildStep::Betting(LineState {
+                    to_act: actor.opponent(),
+                    first_checked: true,
+                    ..state.clone()
+                })
+            }
+        }
+        NodeAction::Call => {
+            let mut contrib = state.contrib;
+            contrib[actor] += state.outstanding;
+            ChildStep::StreetEnd(LineState {
+                contrib,
+                outstanding: Chips::ZERO,
+                ..state.clone()
+            })
+        }
+        NodeAction::Wager(additional) => {
+            let mut contrib = state.contrib;
+            contrib[actor] += additional;
+            // This raise's increment over the bet it faces (see
+            // `sized_targets`'s doc comment for why `additional -
+            // state.outstanding` equals `target - bet_to_match` in
+            // street-relative terms), which becomes both the new
+            // `outstanding` owed and the street's `last_full_raise` for the
+            // next minimum-raise computation.
+            let increment = additional - state.outstanding;
+            ChildStep::Betting(LineState {
+                to_act: actor.opponent(),
+                contrib,
+                outstanding: increment,
+                raises_used: state.raises_used + 1,
+                last_full_raise: increment,
+                street_aggressor: Some(actor),
+                ..state.clone()
+            })
+        }
+    }
 }
 
 struct Builder<'a> {
@@ -630,6 +931,7 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
     };
     let root = builder.betting(LineState {
         street: start_street,
+        board_facts: BoardFacts::new(&config.board),
         board: config.board.clone(),
         to_act: Player::P0,
         contrib: PerPlayer::new(Chips::ZERO, Chips::ZERO),
@@ -640,7 +942,7 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         history: String::new(),
         street_start: Chips::ZERO,
         last_full_raise: Chips::ZERO,
-        previous_aggressor: None,
+        previous_aggressor: config.preflop_aggressor,
         street_aggressor: None,
     });
 
@@ -752,75 +1054,43 @@ impl Builder<'_> {
         let actor = state.to_act;
         let mut actions: Vec<(String, TempNode)> = Vec::new();
 
-        if state.outstanding == Chips::ZERO {
-            if state.first_checked {
-                let next = LineState {
-                    history: self.extend_history(&state.history, || "x".into()),
-                    ..state.clone()
-                };
-                actions.push((self.action_label(|| "check".into()), self.street_end(next)));
-            } else {
-                let next = LineState {
-                    to_act: actor.opponent(),
-                    first_checked: true,
-                    history: self.extend_history(&state.history, || "x".into()),
-                    ..state.clone()
-                };
-                actions.push((self.action_label(|| "check".into()), self.betting(next)));
-            }
-        } else {
-            let fold_state = LineState {
-                history: self.extend_history(&state.history, || "f".into()),
-                ..state.clone()
-            };
-            actions.push((
-                self.action_label(|| "fold".into()),
-                self.terminal(&fold_state, TerminalKind::Fold { folder: actor }),
-            ));
-            let mut contrib = state.contrib;
-            contrib[actor] += state.outstanding;
-            let call_state = LineState {
-                contrib,
-                outstanding: Chips::ZERO,
-                history: self.extend_history(&state.history, || "c".into()),
-                ..state.clone()
-            };
-            actions.push((
-                self.action_label(|| "call".into()),
-                self.street_end(call_state),
-            ));
-        }
-
-        // Bets and raises share sizing/resolution logic (`raise_targets`).
-        for additional in raise_targets(&state, self.config) {
-            let mut contrib = state.contrib;
-            contrib[actor] += additional;
-            let to = contrib[actor];
-            let verb = self.action_label(|| {
-                if state.outstanding == Chips::ZERO {
-                    format!("bet {to}")
-                } else {
-                    format!("raise to {to}")
+        for action in node_actions(&state, self.config) {
+            // A wager's label and history token both name `to`, the
+            // actor's new cumulative contribution. Recomputing it inside
+            // each closure keeps both of them lazy: with
+            // `track_node_info = false` neither closure runs at all.
+            let wager_to = |additional| state.contrib[actor] + additional;
+            let label = self.action_label(|| match action {
+                NodeAction::Fold => "fold".into(),
+                NodeAction::Check => "check".into(),
+                NodeAction::Call => "call".into(),
+                NodeAction::Wager(additional) => {
+                    let to = wager_to(additional);
+                    if state.outstanding == Chips::ZERO {
+                        format!("bet {to}")
+                    } else {
+                        format!("raise to {to}")
+                    }
                 }
             });
-            // `additional - state.outstanding` is this raise's increment
-            // over the bet it faces (`target - bet_to_match` in
-            // street-relative terms — see `raise_targets`'s doc comment for
-            // why the two are equal), which becomes both the new
-            // `outstanding` owed and the street's `last_full_raise` for the
-            // next minimum-raise computation.
-            let increment = additional - state.outstanding;
-            let next = LineState {
-                to_act: actor.opponent(),
-                contrib,
-                outstanding: increment,
-                raises_used: state.raises_used + 1,
-                last_full_raise: increment,
-                street_aggressor: Some(actor),
-                history: self.extend_history(&state.history, || format!("r{to}")),
-                ..state.clone()
+            let history = self.extend_history(&state.history, || match action {
+                NodeAction::Fold => "f".into(),
+                NodeAction::Check => "x".into(),
+                NodeAction::Call => "c".into(),
+                NodeAction::Wager(additional) => format!("r{}", wager_to(additional)),
+            });
+            let child = match child_step(&state, action) {
+                ChildStep::Fold => {
+                    let fold_state = LineState {
+                        history,
+                        ..state.clone()
+                    };
+                    self.terminal(&fold_state, TerminalKind::Fold { folder: actor })
+                }
+                ChildStep::StreetEnd(next) => self.street_end(LineState { history, ..next }),
+                ChildStep::Betting(next) => self.betting(LineState { history, ..next }),
             };
-            actions.push((verb, self.betting(next)));
+            actions.push((label, child));
         }
 
         self.finish_action_node(actor, &state, state.history.clone(), actions)
@@ -906,11 +1176,13 @@ impl Builder<'_> {
 
             let mut board = state.board.clone();
             board.push(group.representative);
+            let board_facts = BoardFacts::new(&board);
             let history =
                 self.extend_history(&state.history, || format!("[{}]", group.representative));
 
             let child_state = LineState {
                 street: next,
+                board_facts,
                 board,
                 to_act: Player::P0,
                 contrib: state.contrib,
@@ -1108,6 +1380,7 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
     };
     counting.betting(LineState {
         street: start_street,
+        board_facts: BoardFacts::new(&config.board),
         board: config.board.clone(),
         to_act: Player::P0,
         contrib: PerPlayer::new(Chips::ZERO, Chips::ZERO),
@@ -1118,7 +1391,7 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
         history: String::new(),
         street_start: Chips::ZERO,
         last_full_raise: Chips::ZERO,
-        previous_aggressor: None,
+        previous_aggressor: config.preflop_aggressor,
         street_aggressor: None,
     });
 
@@ -1132,7 +1405,7 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
 }
 
 /// Counting-only mirror of [`Builder`]'s recursion. Reuses the same
-/// `raise_targets`/`chance_groups` shape helpers as the real builder so the
+/// `node_actions`/`chance_groups` shape helpers as the real builder so the
 /// two can never disagree about how many children a node has.
 struct Counting<'a> {
     config: &'a PostflopConfig,
@@ -1148,50 +1421,15 @@ impl Counting<'_> {
     fn betting(&mut self, state: LineState) {
         self.nodes += 1;
         self.action_nodes += 1;
-        let mut num_actions: u64 = 0;
 
-        if state.outstanding == Chips::ZERO {
-            num_actions += 1;
-            if state.first_checked {
-                self.street_end(state.clone());
-            } else {
-                let next = LineState {
-                    to_act: state.to_act.opponent(),
-                    first_checked: true,
-                    ..state.clone()
-                };
-                self.betting(next);
+        let actions = node_actions(&state, self.config);
+        let num_actions = actions.len() as u64;
+        for action in actions {
+            match child_step(&state, action) {
+                ChildStep::Fold => self.terminal_fold(),
+                ChildStep::StreetEnd(next) => self.street_end(next),
+                ChildStep::Betting(next) => self.betting(next),
             }
-        } else {
-            num_actions += 2;
-            self.terminal_fold();
-            let mut contrib = state.contrib;
-            contrib[state.to_act] += state.outstanding;
-            let call_state = LineState {
-                contrib,
-                outstanding: Chips::ZERO,
-                ..state.clone()
-            };
-            self.street_end(call_state);
-        }
-
-        let raises = raise_targets(&state, self.config);
-        num_actions += raises.len() as u64;
-        for additional in raises {
-            let actor = state.to_act;
-            let mut contrib = state.contrib;
-            contrib[actor] += additional;
-            let increment = additional - state.outstanding;
-            let next = LineState {
-                to_act: actor.opponent(),
-                contrib,
-                outstanding: increment,
-                raises_used: state.raises_used + 1,
-                last_full_raise: increment,
-                street_aggressor: Some(actor),
-                ..state.clone()
-            };
-            self.betting(next);
         }
 
         self.elements += num_actions * NUM_COMBOS as u64;
@@ -1217,8 +1455,10 @@ impl Counting<'_> {
         for group in &groups {
             let mut board = state.board.clone();
             board.push(group.representative);
+            let board_facts = BoardFacts::new(&board);
             let child_state = LineState {
                 street: next,
+                board_facts,
                 board,
                 to_act: Player::P0,
                 contrib: state.contrib,
@@ -1262,5 +1502,90 @@ impl Counting<'_> {
         let mut key = board5;
         key.sort_unstable();
         self.rank_table_keys.insert(key);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn cards(text: &str) -> Vec<Card> {
+        text.split_whitespace()
+            .map(|card| card.parse().expect("test board card"))
+            .collect()
+    }
+
+    /// Every member of a suit-isomorphism class must produce the same
+    /// [`BoardFacts`], on every street.
+    ///
+    /// `deal_chance` pushes only the class *representative* onto the child
+    /// board, so a board predicate that could tell two members of a class
+    /// apart would be evaluated on the representative and then applied to
+    /// the whole class. That builds a wrong tree with no panic and no
+    /// failing assertion: `iso_merging` is an exact quotient only as long
+    /// as nothing downstream can observe which member was dealt. Builder /
+    /// Counting parity would not catch it either, since both walkers would
+    /// be equally wrong.
+    ///
+    /// `BoardFacts::new` is proved suit-permutation invariant in
+    /// `cards::board`, and the classes here come from permutations that fix
+    /// both the board and the ranges — so this holds by construction. It is
+    /// pinned end to end anyway, through this crate's own private
+    /// `chance_groups`, because it is the one property whose violation is
+    /// silent.
+    #[test]
+    fn every_member_of_a_merged_class_has_the_representative_board_facts() {
+        // Suit-symmetric ranges, so `range_preserving_perms` is the full
+        // group and the board's own stabilizer decides what merges. A
+        // suit-pinned range (`AhKh`) would shrink the stabilizer to the
+        // identity and this sweep would merge nothing at all -- which the
+        // `merged_classes` assertion below exists to catch.
+        let ranges = PerPlayer::new(
+            "AA,KQs,76s".parse::<Range>().expect("oop range"),
+            "JTs,99,AKo".parse::<Range>().expect("ip range"),
+        );
+        let sym = range_preserving_perms(&ranges);
+
+        let mut merged_classes = 0;
+        for board_text in [
+            // Monotone: the three unused suits are freely permutable, so
+            // every off-suit turn card merges into one class.
+            "As Ks Qs",
+            // Two unused suits: the turn's `d` and `s` cards merge pairwise.
+            "Th 9h 8h 2c",
+            // Paired and two-tone, a different stabilizer again.
+            "2c 2d 9d",
+            // All four suits present: the stabilizer is trivial and every
+            // class is a singleton. Included so the sweep also covers the
+            // un-merged path.
+            "2c 7d 9h Ks",
+        ] {
+            let board = cards(board_text);
+            for group in chance_groups(&board, true, &sym) {
+                if group.members.len() > 1 {
+                    merged_classes += 1;
+                }
+                let facts_of = |card: Card| {
+                    let mut extended = board.clone();
+                    extended.push(card);
+                    BoardFacts::new(&extended)
+                };
+                let representative = facts_of(group.representative);
+                for &member in &group.members {
+                    assert_eq!(
+                        facts_of(member),
+                        representative,
+                        "board {board_text}: member {member} of the class dealt as \
+                         {} disagrees about the board",
+                        group.representative,
+                    );
+                }
+            }
+        }
+        // Without this the sweep could pass by merging nothing at all.
+        assert!(
+            merged_classes > 0,
+            "the sweep saw no merged class, so it proved nothing about merging"
+        );
     }
 }

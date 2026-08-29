@@ -5,9 +5,10 @@
 
 use std::time::Instant;
 
+use cards::script::{ActionKind, CmpOp, Condition, Effect, Literal, Rule, Var};
 use cards::{
-    ALL_CARDS, Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, SizeSpec, combo_cards,
-    rank_of,
+    ALL_CARDS, Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, SizeSpec, Street,
+    combo_cards, rank_of,
 };
 use engine::{Dcfr, F32Storage, I16Storage, NodeKind, ParConfig, Solver};
 use game::{ChipEv, NoRake, PayoffPipeline};
@@ -21,11 +22,161 @@ fn chip_ev() -> PayoffPipeline<'static> {
     }
 }
 
+/// The pre-script per-street menu shape `crates/holdem/src/postflop.rs` used
+/// to expose as `StreetMenus`/`StreetTree::from_menus`, before the CLI's
+/// TOML surface moved onto tree scripts and that translation point was
+/// retired from the production module. It survives here, private to this
+/// test file, purely as a convenient way to build a `StreetTree` covering
+/// donk menus, per-level raises, `include_allin`, and `allin_threshold`
+/// together -- writing the equivalent script text for every such fixture
+/// would be far less readable than naming the menu directly.
+#[derive(Clone, Debug)]
+struct StreetMenus {
+    oop_bet: Vec<SizeSpec>,
+    ip_bet: Vec<SizeSpec>,
+    oop_raise: Option<Vec<Vec<SizeSpec>>>,
+    ip_raise: Option<Vec<Vec<SizeSpec>>>,
+    oop_donk: Option<Vec<SizeSpec>>,
+    max_aggressive_actions: u32,
+    include_allin: bool,
+    allin_threshold: Option<f64>,
+}
+
+impl Default for StreetMenus {
+    // Written by hand, not derived: `#[derive(Default)]` would give
+    // `max_aggressive_actions: 0`, but several call sites write
+    // `..Default::default()` expecting `StreetTree::default()`'s old meaning
+    // (`max_aggressive_actions: 2`) -- see e.g.
+    // `an_unset_raise_menu_reuses_the_bet_menu`, which needs raises to be
+    // legal at all to exercise what it is testing.
+    fn default() -> Self {
+        StreetMenus {
+            oop_bet: Vec::new(),
+            ip_bet: Vec::new(),
+            oop_raise: None,
+            ip_raise: None,
+            oop_donk: None,
+            max_aggressive_actions: 2,
+            include_allin: false,
+            allin_threshold: None,
+        }
+    }
+}
+
+fn and(left: Condition, right: Condition) -> Condition {
+    Condition::And(Box::new(left), Box::new(right))
+}
+
+fn not(inner: Condition) -> Condition {
+    Condition::Not(Box::new(inner))
+}
+
+/// One raise menu's levels as `Add Raise` rules gated on `aggressions`,
+/// mirroring `holdem::postflop`'s retired `raise_level_rules`: level `i`
+/// (`0`-based) applies when `i < levels.len() - 1` and `aggressions == i +
+/// 1`, and the last level applies when `aggressions >= levels.len()`.
+fn raise_level_rules(street: Street, actor: Condition, levels: &[Vec<SizeSpec>]) -> Vec<Rule> {
+    let len = levels.len();
+    levels
+        .iter()
+        .enumerate()
+        .map(|(i, sizes)| {
+            let aggression = if i + 1 < len {
+                Condition::Compare {
+                    var: Var::Aggressions,
+                    op: CmpOp::Eq,
+                    value: Literal::Number((i + 1) as f64),
+                }
+            } else {
+                Condition::Compare {
+                    var: Var::Aggressions,
+                    op: CmpOp::Ge,
+                    value: Literal::Number(len as f64),
+                }
+            };
+            Rule {
+                street,
+                condition: and(actor.clone(), aggression),
+                effect: Effect::Add,
+                action: Some(ActionKind::Raise),
+                sizes: sizes.clone(),
+            }
+        })
+        .collect()
+}
+
+/// Translates [`StreetMenus`] into the equivalent tree-script rules, exactly
+/// as the retired `holdem::postflop::StreetTree::from_menus` did: the donk
+/// menu (if any), the OOP opening menu, the IP opening menu, then OOP's
+/// raise levels, then IP's raise levels, all `Effect::Add`. An unset raise
+/// menu reuses that player's own bet menu as a single level.
+fn from_menus(street: Street, menus: StreetMenus) -> StreetTree {
+    let not_in_position = not(Condition::Truth(Var::InPosition));
+    let in_position = Condition::Truth(Var::InPosition);
+    let donk = Condition::Truth(Var::Donk);
+
+    let mut rules = Vec::new();
+
+    if let Some(donk_sizes) = &menus.oop_donk {
+        rules.push(Rule {
+            street,
+            condition: and(not_in_position.clone(), donk.clone()),
+            effect: Effect::Add,
+            action: Some(ActionKind::Bet),
+            sizes: donk_sizes.clone(),
+        });
+    }
+
+    let oop_bet_condition = if menus.oop_donk.is_some() {
+        and(not_in_position.clone(), not(donk))
+    } else {
+        not_in_position.clone()
+    };
+    rules.push(Rule {
+        street,
+        condition: oop_bet_condition,
+        effect: Effect::Add,
+        action: Some(ActionKind::Bet),
+        sizes: menus.oop_bet.clone(),
+    });
+
+    rules.push(Rule {
+        street,
+        condition: in_position.clone(),
+        effect: Effect::Add,
+        action: Some(ActionKind::Bet),
+        sizes: menus.ip_bet.clone(),
+    });
+
+    let oop_levels = menus
+        .oop_raise
+        .clone()
+        .unwrap_or_else(|| vec![menus.oop_bet.clone()]);
+    rules.extend(raise_level_rules(street, not_in_position, &oop_levels));
+
+    let ip_levels = menus
+        .ip_raise
+        .clone()
+        .unwrap_or_else(|| vec![menus.ip_bet.clone()]);
+    rules.extend(raise_level_rules(street, in_position, &ip_levels));
+
+    StreetTree {
+        rules,
+        max_aggressive_actions: menus.max_aggressive_actions,
+        include_allin: menus.include_allin,
+        allin_threshold: menus.allin_threshold,
+    }
+}
+
 /// A street whose bet menu and raise menu use different pot fractions —
 /// `StreetTree::pot_fractions` assumes they're shared, so the tests
 /// exercising `oop_raise`/`ip_raise` independently of `oop_bet`/`ip_bet`
-/// build the `StreetTree` by hand instead.
+/// build the `StreetTree` by hand instead, via `StreetMenus`/`from_menus`
+/// (unlike `pot_fractions`, this is a private test helper with only 4 call
+/// sites, so it can afford a real `street` parameter instead of a
+/// placeholder).
 fn manual_street(
+    street: Street,
     oop_bet: &[f64],
     ip_bet: &[f64],
     oop_raise: &[f64],
@@ -45,14 +196,17 @@ fn manual_street(
             vec![sizes(fractions)]
         }
     };
-    StreetTree {
-        oop_bet: sizes(oop_bet),
-        ip_bet: sizes(ip_bet),
-        oop_raise: Some(raise_levels(oop_raise)),
-        ip_raise: Some(raise_levels(ip_raise)),
-        max_aggressive_actions,
-        ..Default::default()
-    }
+    from_menus(
+        street,
+        StreetMenus {
+            oop_bet: sizes(oop_bet),
+            ip_bet: sizes(ip_bet),
+            oop_raise: Some(raise_levels(oop_raise)),
+            ip_raise: Some(raise_levels(ip_raise)),
+            max_aggressive_actions,
+            ..Default::default()
+        },
+    )
 }
 
 fn parse_cards(s: &str) -> Vec<Card> {
@@ -61,6 +215,31 @@ fn parse_cards(s: &str) -> Vec<Card> {
 
 fn flop3(s: &str) -> [Card; 3] {
     parse_cards(s).try_into().unwrap()
+}
+
+/// A minimal river-start config for the tree-script rule-application tests
+/// below: a completed 5-card board, single-combo ranges with plenty of
+/// effective stack behind, and every rule under test living on `river`
+/// (flop/turn are moot -- a river-start board deals no chance nodes).
+fn river_only_config(river: StreetTree) -> PostflopConfig {
+    PostflopConfig {
+        board: parse_cards("2c 7d 9h Js Qs"),
+        ranges: PerPlayer::new(
+            "AA".parse::<Range>().unwrap(),
+            "KK".parse::<Range>().unwrap(),
+        ),
+        pot: Chips(4),
+        effective_stack: Chips(100),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::default(),
+            river,
+        },
+        min_bet: Chips(1),
+        iso_merging: true,
+        track_node_info: true,
+        preflop_aggressor: None,
+    }
 }
 
 /// Direct enumeration of a check-down flop subgame's value to P0: average
@@ -566,24 +745,30 @@ fn memory_usage_matches_allocated() {
     // can never disagree about any of these features' fan-out. Single-combo
     // ranges disjoint from an asymmetric board keep the two-chance-deal tree
     // small enough to build without `#[ignore]`.
-    let flop = StreetTree {
-        ip_bet: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
-        max_aggressive_actions: 1,
-        ..Default::default()
-    };
-    let turn = StreetTree {
-        oop_bet: vec![SizeSpec::ToChips { value: 5.0 }],
-        oop_donk: Some(vec![SizeSpec::ToChips { value: 3.0 }]),
-        oop_raise: Some(vec![vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }]]),
-        ip_raise: Some(vec![
-            vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
-            vec![SizeSpec::PreviousBetMultiple { factor: 2.0 }],
-        ]),
-        max_aggressive_actions: 3,
-        include_allin: true,
-        allin_threshold: Some(0.9),
-        ..Default::default()
-    };
+    let flop = from_menus(
+        Street::Flop,
+        StreetMenus {
+            ip_bet: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
+            max_aggressive_actions: 1,
+            ..Default::default()
+        },
+    );
+    let turn = from_menus(
+        Street::Turn,
+        StreetMenus {
+            oop_bet: vec![SizeSpec::ToChips { value: 5.0 }],
+            oop_donk: Some(vec![SizeSpec::ToChips { value: 3.0 }]),
+            oop_raise: Some(vec![vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }]]),
+            ip_raise: Some(vec![
+                vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
+                vec![SizeSpec::PreviousBetMultiple { factor: 2.0 }],
+            ]),
+            max_aggressive_actions: 3,
+            include_allin: true,
+            allin_threshold: Some(0.9),
+            ..Default::default()
+        },
+    );
     let rich_config = PostflopConfig {
         board: parse_cards("2s 7d 9h"),
         ranges: PerPlayer::new(
@@ -600,6 +785,7 @@ fn memory_usage_matches_allocated() {
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
+        preflop_aggressor: None,
     };
     let rich_estimate = memory_usage(&rich_config);
     let rich_game = build_postflop_game(&rich_config, chip_ev());
@@ -616,6 +802,99 @@ fn memory_usage_matches_allocated() {
     );
     assert_eq!(rich_estimate.nodes, rich_game.game.tree.nodes.len() as u64);
     assert_eq!(rich_estimate.terminals, real_terminals);
+
+    // Extend the parity check once more to a tree the old fixed-menu grammar
+    // could never express at all: a `force raise [...]` rule that strips
+    // fold *and* call from a facing-bet node. The old menus always kept
+    // fold+call as an unconditional baseline at every such node -- only bet
+    // and raise candidates were ever configurable -- so a node with no
+    // fold/call branch is a genuinely new tree shape, and `Builder`'s real
+    // recursion and `Counting`'s dry-run mirror must still agree on it.
+    let force_river = StreetTree {
+        rules: vec![
+            // Opens the betting so there is a facing-bet node to force at.
+            Rule {
+                street: Street::River,
+                condition: Condition::Compare {
+                    var: Var::Aggressions,
+                    op: CmpOp::Eq,
+                    value: Literal::Number(0.0),
+                },
+                effect: Effect::Add,
+                action: Some(ActionKind::Bet),
+                sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
+            },
+            // Facing that bet, fold and call are gone: the only legal
+            // actions are the forced raise sizes.
+            Rule {
+                street: Street::River,
+                condition: Condition::Compare {
+                    var: Var::Aggressions,
+                    op: CmpOp::Ge,
+                    value: Literal::Number(1.0),
+                },
+                effect: Effect::Force,
+                action: Some(ActionKind::Raise),
+                sizes: vec![SizeSpec::PreviousBetMultiple { factor: 2.0 }],
+            },
+        ],
+        max_aggressive_actions: 2,
+        include_allin: false,
+        allin_threshold: None,
+    };
+    let force_config = PostflopConfig {
+        board: parse_cards("2c 7d 9h Js Qs"),
+        ranges: PerPlayer::new(
+            "AA".parse::<Range>().unwrap(),
+            "KK".parse::<Range>().unwrap(),
+        ),
+        pot: Chips(4),
+        effective_stack: Chips(100),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::default(),
+            river: force_river,
+        },
+        min_bet: Chips(1),
+        iso_merging: true,
+        track_node_info: true,
+        preflop_aggressor: None,
+    };
+    let force_estimate = memory_usage(&force_config);
+    let force_game = build_postflop_game(&force_config, chip_ev());
+    let force_real_terminals = force_game
+        .game
+        .tree
+        .nodes
+        .iter()
+        .filter(|node| node.kind == NodeKind::Terminal)
+        .count() as u64;
+    assert_eq!(
+        force_estimate.f32_bytes,
+        force_game.game.tree.storage_len as u64 * 2 * 4
+    );
+    assert_eq!(
+        force_estimate.nodes,
+        force_game.game.tree.nodes.len() as u64
+    );
+    assert_eq!(force_estimate.terminals, force_real_terminals);
+
+    // The facing-bet node itself must actually have lost fold/call: this is
+    // what makes the tree shape novel, not just a smaller number.
+    let facing_bet = force_game
+        .node_by_history("r2")
+        .expect("facing-bet history");
+    let tag = force_game.game.tree.tags[facing_bet as usize] as usize;
+    assert!(
+        !force_game.node_info[tag]
+            .actions
+            .contains(&"fold".to_string())
+            && !force_game.node_info[tag]
+                .actions
+                .contains(&"call".to_string()),
+        "a force raise rule must remove fold and call from the facing-bet node: {:?}",
+        force_game.node_info[tag].actions
+    );
 }
 
 /// Perf smoke test on a realistic 3-bet-pot spot: build + solve telemetry
@@ -648,6 +927,7 @@ fn smoke_solve_3bet_pot() {
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: false,
+        preflop_aggressor: None,
     };
 
     let estimate = memory_usage(&config);
@@ -722,6 +1002,7 @@ fn untracked_node_info_stays_empty() {
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: false,
+        preflop_aggressor: None,
     };
     let game = build_postflop_game(&config, chip_ev());
     assert_eq!(
@@ -954,13 +1235,14 @@ fn raise_fractions_size_independently_of_bet_fractions() {
         pot: Chips(4),
         effective_stack: Chips(100),
         streets: PerStreet {
-            flop: manual_street(&[], &[], &[], &[], 0),
-            turn: manual_street(&[], &[], &[], &[], 0),
-            river: manual_street(&[0.5], &[0.5], &[1.0], &[1.0], 2),
+            flop: manual_street(Street::Flop, &[], &[], &[], &[], 0),
+            turn: manual_street(Street::Turn, &[], &[], &[], &[], 0),
+            river: manual_street(Street::River, &[0.5], &[0.5], &[1.0], &[1.0], 2),
         },
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
+        preflop_aggressor: None,
     };
     let game = build_postflop_game(&config, chip_ev());
 
@@ -1006,13 +1288,16 @@ fn an_unset_raise_menu_reuses_the_bet_menu() {
     );
     let bets = vec![SizeSpec::PotAfterCall { fraction: 0.5 }];
     let build = |oop_raise: Option<Vec<Vec<SizeSpec>>>| {
-        let river = StreetTree {
-            oop_bet: bets.clone(),
-            ip_bet: bets.clone(),
-            oop_raise: oop_raise.clone(),
-            ip_raise: oop_raise,
-            ..StreetTree::default()
-        };
+        let river = from_menus(
+            Street::River,
+            StreetMenus {
+                oop_bet: bets.clone(),
+                ip_bet: bets.clone(),
+                oop_raise: oop_raise.clone(),
+                ip_raise: oop_raise,
+                ..Default::default()
+            },
+        );
         holdem::memory_usage(&PostflopConfig {
             board: board.clone(),
             ranges: ranges.clone(),
@@ -1068,11 +1353,12 @@ fn matching_raise_and_bet_fractions_reproduce_shared_size_tree() {
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
+        preflop_aggressor: None,
     };
     let shared_game = build_postflop_game(&shared_config, chip_ev());
 
     // Distinct-size street: same 0.5 bet menu, but a 1.0 raise menu.
-    let distinct_river = manual_street(&[0.5], &[0.5], &[1.0], &[1.0], 2);
+    let distinct_river = manual_street(Street::River, &[0.5], &[0.5], &[1.0], &[1.0], 2);
     let distinct_config = PostflopConfig {
         board,
         ranges,
@@ -1086,6 +1372,7 @@ fn matching_raise_and_bet_fractions_reproduce_shared_size_tree() {
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
+        preflop_aggressor: None,
     };
     let distinct_game = build_postflop_game(&distinct_config, chip_ev());
 
@@ -1121,19 +1408,22 @@ fn raise_levels_apply_distinct_multiples_per_level() {
         "AA".parse::<Range>().unwrap(),
         "KK".parse::<Range>().unwrap(),
     );
-    let river = StreetTree {
-        oop_bet: vec![SizeSpec::ToChips { value: 10.0 }],
-        oop_raise: Some(vec![
-            vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
-            vec![SizeSpec::PreviousBetMultiple { factor: 2.5 }],
-        ]),
-        ip_raise: Some(vec![
-            vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
-            vec![SizeSpec::PreviousBetMultiple { factor: 2.5 }],
-        ]),
-        max_aggressive_actions: 3,
-        ..Default::default()
-    };
+    let river = from_menus(
+        Street::River,
+        StreetMenus {
+            oop_bet: vec![SizeSpec::ToChips { value: 10.0 }],
+            oop_raise: Some(vec![
+                vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
+                vec![SizeSpec::PreviousBetMultiple { factor: 2.5 }],
+            ]),
+            ip_raise: Some(vec![
+                vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
+                vec![SizeSpec::PreviousBetMultiple { factor: 2.5 }],
+            ]),
+            max_aggressive_actions: 3,
+            ..Default::default()
+        },
+    );
     let config = PostflopConfig {
         board,
         ranges,
@@ -1147,6 +1437,7 @@ fn raise_levels_apply_distinct_multiples_per_level() {
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
+        preflop_aggressor: None,
     };
     let game = build_postflop_game(&config, chip_ev());
 
@@ -1196,17 +1487,23 @@ fn donk_menu_controls_oop_opening_action_after_a_called_ip_bet() {
         "AsAh".parse::<Range>().unwrap(),
         "KdKc".parse::<Range>().unwrap(),
     );
-    let flop = StreetTree {
-        ip_bet: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
-        max_aggressive_actions: 1,
-        ..Default::default()
-    };
-    let turn = StreetTree {
-        oop_bet: vec![SizeSpec::ToChips { value: 5.0 }],
-        oop_donk: Some(Vec::new()),
-        max_aggressive_actions: 1,
-        ..Default::default()
-    };
+    let flop = from_menus(
+        Street::Flop,
+        StreetMenus {
+            ip_bet: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
+            max_aggressive_actions: 1,
+            ..Default::default()
+        },
+    );
+    let turn = from_menus(
+        Street::Turn,
+        StreetMenus {
+            oop_bet: vec![SizeSpec::ToChips { value: 5.0 }],
+            oop_donk: Some(Vec::new()),
+            max_aggressive_actions: 1,
+            ..Default::default()
+        },
+    );
     let config = PostflopConfig {
         board,
         ranges,
@@ -1220,6 +1517,7 @@ fn donk_menu_controls_oop_opening_action_after_a_called_ip_bet() {
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
+        preflop_aggressor: None,
     };
     let game = build_postflop_game(&config, chip_ev());
 
@@ -1276,12 +1574,15 @@ fn include_allin_adds_one_action_without_duplicating_an_already_allin_size() {
         "AA".parse::<Range>().unwrap(),
         "KK".parse::<Range>().unwrap(),
     );
-    let with_room = StreetTree {
-        oop_bet: vec![SizeSpec::StackFraction { fraction: 0.5 }],
-        include_allin: true,
-        max_aggressive_actions: 1,
-        ..Default::default()
-    };
+    let with_room = from_menus(
+        Street::River,
+        StreetMenus {
+            oop_bet: vec![SizeSpec::StackFraction { fraction: 0.5 }],
+            include_allin: true,
+            max_aggressive_actions: 1,
+            ..Default::default()
+        },
+    );
     let config_a = PostflopConfig {
         board: board.clone(),
         ranges: ranges.clone(),
@@ -1295,6 +1596,7 @@ fn include_allin_adds_one_action_without_duplicating_an_already_allin_size() {
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
+        preflop_aggressor: None,
     };
     let game_a = build_postflop_game(&config_a, chip_ev());
     let root_a = game_a.node_by_history("").expect("root history");
@@ -1310,12 +1612,15 @@ fn include_allin_adds_one_action_without_duplicating_an_already_allin_size() {
         game_a.node_info[tag_a].actions
     );
 
-    let already_allin = StreetTree {
-        oop_bet: vec![SizeSpec::StackFraction { fraction: 1.0 }],
-        include_allin: true,
-        max_aggressive_actions: 1,
-        ..Default::default()
-    };
+    let already_allin = from_menus(
+        Street::River,
+        StreetMenus {
+            oop_bet: vec![SizeSpec::StackFraction { fraction: 1.0 }],
+            include_allin: true,
+            max_aggressive_actions: 1,
+            ..Default::default()
+        },
+    );
     let config_b = PostflopConfig {
         board,
         ranges,
@@ -1329,6 +1634,7 @@ fn include_allin_adds_one_action_without_duplicating_an_already_allin_size() {
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
+        preflop_aggressor: None,
     };
     let game_b = build_postflop_game(&config_b, chip_ev());
     let root_b = game_b.node_by_history("").expect("root history");
@@ -1351,12 +1657,15 @@ fn allin_threshold_merges_a_near_max_size_into_allin() {
         "AA".parse::<Range>().unwrap(),
         "KK".parse::<Range>().unwrap(),
     );
-    let river = StreetTree {
-        oop_bet: vec![SizeSpec::StackFraction { fraction: 0.9 }],
-        allin_threshold: Some(0.8),
-        max_aggressive_actions: 1,
-        ..Default::default()
-    };
+    let river = from_menus(
+        Street::River,
+        StreetMenus {
+            oop_bet: vec![SizeSpec::StackFraction { fraction: 0.9 }],
+            allin_threshold: Some(0.8),
+            max_aggressive_actions: 1,
+            ..Default::default()
+        },
+    );
     let config = PostflopConfig {
         board,
         ranges,
@@ -1370,6 +1679,7 @@ fn allin_threshold_merges_a_near_max_size_into_allin() {
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
+        preflop_aggressor: None,
     };
     let game = build_postflop_game(&config, chip_ev());
     let root = game.node_by_history("").expect("root history");
@@ -1397,12 +1707,15 @@ fn sub_minimum_raise_is_bumped_to_the_minimum_full_raise() {
     // last_full_raise(2) = 4`. IP's raise menu proposes a 20% pot-after-call
     // raise, which resolves to 3 -- under the minimum -- so it must be
     // bumped up to 4 rather than standing as its own action.
-    let river = StreetTree {
-        oop_bet: vec![SizeSpec::ToChips { value: 2.0 }],
-        ip_raise: Some(vec![vec![SizeSpec::PotAfterCall { fraction: 0.2 }]]),
-        max_aggressive_actions: 2,
-        ..Default::default()
-    };
+    let river = from_menus(
+        Street::River,
+        StreetMenus {
+            oop_bet: vec![SizeSpec::ToChips { value: 2.0 }],
+            ip_raise: Some(vec![vec![SizeSpec::PotAfterCall { fraction: 0.2 }]]),
+            max_aggressive_actions: 2,
+            ..Default::default()
+        },
+    );
     let config = PostflopConfig {
         board,
         ranges,
@@ -1416,6 +1729,7 @@ fn sub_minimum_raise_is_bumped_to_the_minimum_full_raise() {
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
+        preflop_aggressor: None,
     };
     let game = build_postflop_game(&config, chip_ev());
     let facing_bet = game.node_by_history("r2").expect("facing-bet history");
@@ -1446,11 +1760,14 @@ fn min_bet_refuses_to_open_below_its_own_value() {
         "AA".parse::<Range>().unwrap(),
         "KK".parse::<Range>().unwrap(),
     );
-    let river = StreetTree {
-        oop_bet: vec![SizeSpec::ToChips { value: 3.0 }],
-        max_aggressive_actions: 1,
-        ..Default::default()
-    };
+    let river = from_menus(
+        Street::River,
+        StreetMenus {
+            oop_bet: vec![SizeSpec::ToChips { value: 3.0 }],
+            max_aggressive_actions: 1,
+            ..Default::default()
+        },
+    );
     let config = PostflopConfig {
         board,
         ranges,
@@ -1464,6 +1781,7 @@ fn min_bet_refuses_to_open_below_its_own_value() {
         min_bet: Chips(5),
         iso_merging: true,
         track_node_info: true,
+        preflop_aggressor: None,
     };
     let game = build_postflop_game(&config, chip_ev());
     let root = game.node_by_history("").expect("root history");
@@ -1507,6 +1825,7 @@ fn odd_pot_terminal_payoffs_match_the_neighboring_even_pots() {
             min_bet: Chips(1),
             iso_merging: true,
             track_node_info: true,
+            preflop_aggressor: None,
         };
         let game = build_postflop_game(&config, chip_ev());
         let mut solver = Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(1));
@@ -1554,6 +1873,7 @@ fn history_round_trip_uses_r_tokens_through_river_entry_state() {
         min_bet: Chips(1),
         iso_merging: true,
         track_node_info: true,
+        preflop_aggressor: None,
     };
     let game = build_postflop_game(&config, chip_ev());
 
@@ -1711,4 +2031,480 @@ fn node_info_records_the_pot_contribution_at_each_node() {
             info.history
         );
     }
+}
+
+// --- Tree-script rule application (docs/postflop-tree-script-v1.jp.md's
+// 適用モデル chapter) -------------------------------------------------------
+
+#[test]
+fn tree_script_effect_add_appends_a_wager_candidate() {
+    let river = StreetTree {
+        rules: vec![Rule {
+            street: Street::River,
+            condition: Condition::Const(true),
+            effect: Effect::Add,
+            action: Some(ActionKind::Bet),
+            sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+        }],
+        max_aggressive_actions: 2,
+        include_allin: false,
+        allin_threshold: None,
+    };
+    let game = build_postflop_game(&river_only_config(river), chip_ev());
+    let root = game.node_by_history("").expect("root history");
+    let tag = game.game.tree.tags[root as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["check".to_string(), "bet 5".to_string()],
+        "add must append the sized wager to the base action list: {:?}",
+        game.node_info[tag].actions
+    );
+}
+
+#[test]
+fn tree_script_effect_remove_strips_every_wager_of_that_kind() {
+    let river = StreetTree {
+        rules: vec![
+            Rule {
+                street: Street::River,
+                condition: Condition::Const(true),
+                effect: Effect::Add,
+                action: Some(ActionKind::Bet),
+                sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+            },
+            Rule {
+                street: Street::River,
+                condition: Condition::Const(true),
+                effect: Effect::Remove,
+                action: Some(ActionKind::Bet),
+                sizes: vec![],
+            },
+        ],
+        max_aggressive_actions: 2,
+        include_allin: false,
+        allin_threshold: None,
+    };
+    let game = build_postflop_game(&river_only_config(river), chip_ev());
+    let root = game.node_by_history("").expect("root history");
+    let tag = game.game.tree.tags[root as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["check".to_string()],
+        "remove must strip every wager of its action kind: {:?}",
+        game.node_info[tag].actions
+    );
+}
+
+#[test]
+fn tree_script_effect_replace_swaps_the_wager_menu() {
+    let river = StreetTree {
+        rules: vec![
+            Rule {
+                street: Street::River,
+                condition: Condition::Const(true),
+                effect: Effect::Add,
+                action: Some(ActionKind::Bet),
+                sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+            },
+            Rule {
+                street: Street::River,
+                condition: Condition::Const(true),
+                effect: Effect::Replace,
+                action: Some(ActionKind::Bet),
+                sizes: vec![SizeSpec::ToChips { value: 8.0 }],
+            },
+        ],
+        max_aggressive_actions: 2,
+        include_allin: false,
+        allin_threshold: None,
+    };
+    let game = build_postflop_game(&river_only_config(river), chip_ev());
+    let root = game.node_by_history("").expect("root history");
+    let tag = game.game.tree.tags[root as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["check".to_string(), "bet 8".to_string()],
+        "replace must drop the earlier wager and offer only its own sizes: {:?}",
+        game.node_info[tag].actions
+    );
+}
+
+#[test]
+fn tree_script_effect_force_drops_fold_check_and_call_too() {
+    let river = StreetTree {
+        rules: vec![Rule {
+            street: Street::River,
+            condition: Condition::Const(true),
+            effect: Effect::Force,
+            action: Some(ActionKind::Bet),
+            sizes: vec![SizeSpec::ToChips { value: 8.0 }],
+        }],
+        max_aggressive_actions: 2,
+        include_allin: false,
+        allin_threshold: None,
+    };
+    let game = build_postflop_game(&river_only_config(river), chip_ev());
+    let root = game.node_by_history("").expect("root history");
+    let tag = game.game.tree.tags[root as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["bet 8".to_string()],
+        "force must replace the whole action list, check included: {:?}",
+        game.node_info[tag].actions
+    );
+}
+
+#[test]
+fn tree_script_effect_checkdown_keeps_only_check() {
+    let river = StreetTree {
+        rules: vec![
+            Rule {
+                street: Street::River,
+                condition: Condition::Const(true),
+                effect: Effect::Add,
+                action: Some(ActionKind::Bet),
+                sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+            },
+            Rule {
+                street: Street::River,
+                condition: Condition::Const(true),
+                effect: Effect::Checkdown,
+                action: None,
+                sizes: vec![],
+            },
+        ],
+        max_aggressive_actions: 2,
+        include_allin: false,
+        allin_threshold: None,
+    };
+    let game = build_postflop_game(&river_only_config(river), chip_ev());
+    let root = game.node_by_history("").expect("root history");
+    let tag = game.game.tree.tags[root as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["check".to_string()],
+        "checkdown must remove every action except check: {:?}",
+        game.node_info[tag].actions
+    );
+}
+
+/// A `Raise`-kind rule at a `Bet`-kind node (no outstanding bet to face) --
+/// or vice versa -- does nothing at all, per the spec's inert-rule rule.
+#[test]
+fn tree_script_rule_action_kind_mismatch_is_inert() {
+    let river = StreetTree {
+        rules: vec![Rule {
+            street: Street::River,
+            condition: Condition::Const(true),
+            effect: Effect::Force,
+            action: Some(ActionKind::Raise),
+            sizes: vec![SizeSpec::ToChips { value: 9.0 }],
+        }],
+        max_aggressive_actions: 2,
+        include_allin: false,
+        allin_threshold: None,
+    };
+    let game = build_postflop_game(&river_only_config(river), chip_ev());
+    let root = game.node_by_history("").expect("root history");
+    let tag = game.game.tree.tags[root as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["check".to_string()],
+        "a raise-kind rule must be inert at a bet-kind node: {:?}",
+        game.node_info[tag].actions
+    );
+}
+
+/// `include_allin` is applied before any rule runs, so the all-in it added
+/// survives only if a rule re-adds it -- `replace`/`force` both drop it
+/// (along with everything else of their kind) exactly like any other rule
+/// edit would. `replace` still leaves `check` standing; `force` does not.
+#[test]
+fn tree_script_include_allin_applies_before_rules() {
+    let replace_river = StreetTree {
+        rules: vec![Rule {
+            street: Street::River,
+            condition: Condition::Const(true),
+            effect: Effect::Replace,
+            action: Some(ActionKind::Bet),
+            sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
+        }],
+        max_aggressive_actions: 1,
+        include_allin: true,
+        allin_threshold: None,
+    };
+    let game = build_postflop_game(&river_only_config(replace_river), chip_ev());
+    let root = game.node_by_history("").expect("root history");
+    let tag = game.game.tree.tags[root as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["check".to_string(), "bet 2".to_string()],
+        "replace must drop include_allin's default all-in unless it re-adds \
+         one, while still leaving check standing: {:?}",
+        game.node_info[tag].actions
+    );
+
+    let force_river = StreetTree {
+        rules: vec![Rule {
+            street: Street::River,
+            condition: Condition::Const(true),
+            effect: Effect::Force,
+            action: Some(ActionKind::Bet),
+            sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
+        }],
+        max_aggressive_actions: 1,
+        include_allin: true,
+        allin_threshold: None,
+    };
+    let game = build_postflop_game(&river_only_config(force_river), chip_ev());
+    let root = game.node_by_history("").expect("root history");
+    let tag = game.game.tree.tags[root as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["bet 2".to_string()],
+        "force must drop include_allin's default all-in exactly like replace \
+         does, but check does not survive force either: {:?}",
+        game.node_info[tag].actions
+    );
+}
+
+/// Emptying a node's action list -- however it happens -- falls back to the
+/// base actions rather than leaving the node with zero legal actions, which
+/// `engine::tree`'s `assert!(num_actions >= 1)` would otherwise catch.
+#[test]
+fn tree_script_emptying_a_node_falls_back_to_base_actions() {
+    // (a) `force` with no resolvable size: `max_aggressive_actions = 0`
+    // makes `sized_targets` always return empty, so the forced action list
+    // is empty from the start.
+    let no_room = StreetTree {
+        rules: vec![Rule {
+            street: Street::River,
+            condition: Condition::Const(true),
+            effect: Effect::Force,
+            action: Some(ActionKind::Bet),
+            sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+        }],
+        max_aggressive_actions: 0,
+        include_allin: false,
+        allin_threshold: None,
+    };
+    let game = build_postflop_game(&river_only_config(no_room), chip_ev());
+    let root = game.node_by_history("").expect("root history");
+    let tag = game.game.tree.tags[root as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["check".to_string()],
+        "a force rule with no resolvable size must fall back to the base \
+         actions: {:?}",
+        game.node_info[tag].actions
+    );
+
+    // (b) `remove`, after an earlier `force` already dropped check: nothing
+    // is left at all once the forced wager is also removed.
+    let force_then_remove = StreetTree {
+        rules: vec![
+            Rule {
+                street: Street::River,
+                condition: Condition::Const(true),
+                effect: Effect::Force,
+                action: Some(ActionKind::Bet),
+                sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+            },
+            Rule {
+                street: Street::River,
+                condition: Condition::Const(true),
+                effect: Effect::Remove,
+                action: Some(ActionKind::Bet),
+                sizes: vec![],
+            },
+        ],
+        max_aggressive_actions: 1,
+        include_allin: false,
+        allin_threshold: None,
+    };
+    let game = build_postflop_game(&river_only_config(force_then_remove), chip_ev());
+    let root = game.node_by_history("").expect("root history");
+    let tag = game.game.tree.tags[root as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["check".to_string()],
+        "removing the only action a force rule left behind must fall back \
+         to the base actions: {:?}",
+        game.node_info[tag].actions
+    );
+
+    // (c) `checkdown` at a node facing a bet: retaining only check leaves
+    // nothing, since a facing-bet node has no check to retain.
+    let bet_then_checkdown = StreetTree {
+        rules: vec![
+            Rule {
+                street: Street::River,
+                condition: Condition::Const(true),
+                effect: Effect::Add,
+                action: Some(ActionKind::Bet),
+                sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+            },
+            Rule {
+                street: Street::River,
+                condition: Condition::Compare {
+                    var: Var::Aggressions,
+                    op: CmpOp::Ge,
+                    value: Literal::Number(1.0),
+                },
+                effect: Effect::Checkdown,
+                action: None,
+                sizes: vec![],
+            },
+        ],
+        max_aggressive_actions: 1,
+        include_allin: false,
+        allin_threshold: None,
+    };
+    let game = build_postflop_game(&river_only_config(bet_then_checkdown), chip_ev());
+    let facing_bet = game.node_by_history("r5").expect("facing-bet history");
+    let tag = game.game.tree.tags[facing_bet as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["fold".to_string(), "call".to_string()],
+        "checkdown emptying a facing-bet node must fall back to fold+call: {:?}",
+        game.node_info[tag].actions
+    );
+}
+
+/// `preflop_aggressor` seeds the starting street's `previous_aggressor`:
+/// the aggressor's own node sees `cbet`, the other player's node (reached
+/// after a check, still at `aggressions == 0`) sees `donk`, and with no
+/// preflop aggressor at all neither ever fires.
+#[test]
+fn tree_script_preflop_aggressor_drives_cbet_and_donk() {
+    let river = StreetTree {
+        rules: vec![
+            Rule {
+                street: Street::River,
+                condition: Condition::Truth(Var::Cbet),
+                effect: Effect::Add,
+                action: Some(ActionKind::Bet),
+                sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+            },
+            Rule {
+                street: Street::River,
+                condition: Condition::Truth(Var::Donk),
+                effect: Effect::Add,
+                action: Some(ActionKind::Bet),
+                sizes: vec![SizeSpec::ToChips { value: 7.0 }],
+            },
+        ],
+        max_aggressive_actions: 1,
+        include_allin: false,
+        allin_threshold: None,
+    };
+    let build = |preflop_aggressor: Option<Player>| {
+        let mut config = river_only_config(river.clone());
+        config.preflop_aggressor = preflop_aggressor;
+        build_postflop_game(&config, chip_ev())
+    };
+    let actions_at = |game: &holdem::PostflopGame, history: &str| -> Vec<String> {
+        let id = game.node_by_history(history).expect("node history");
+        let tag = game.game.tree.tags[id as usize] as usize;
+        game.node_info[tag].actions.clone()
+    };
+
+    // P0 (OOP, root) was the preflop aggressor: root sees cbet, and P1's
+    // node after P0 checks (still aggressions == 0) sees donk.
+    let game = build(Some(Player::P0));
+    assert_eq!(
+        actions_at(&game, ""),
+        vec!["check".to_string(), "bet 5".to_string()],
+        "the preflop aggressor's own node must see cbet"
+    );
+    assert_eq!(
+        actions_at(&game, "x"),
+        vec!["check".to_string(), "bet 7".to_string()],
+        "the other player's node must see donk"
+    );
+
+    // P1 (IP) was the preflop aggressor: cbet/donk swap sides.
+    let game = build(Some(Player::P1));
+    assert_eq!(
+        actions_at(&game, ""),
+        vec!["check".to_string(), "bet 7".to_string()],
+        "the non-aggressor's own node must see donk"
+    );
+    assert_eq!(
+        actions_at(&game, "x"),
+        vec!["check".to_string(), "bet 5".to_string()],
+        "the preflop aggressor's node must see cbet"
+    );
+
+    // No preflop aggressor at all: neither variable is ever true.
+    let game = build(None);
+    assert_eq!(
+        actions_at(&game, ""),
+        vec!["check".to_string()],
+        "with no preflop aggressor, cbet must never fire"
+    );
+    assert_eq!(
+        actions_at(&game, "x"),
+        vec!["check".to_string()],
+        "with no preflop aggressor, donk must never fire"
+    );
+}
+
+/// A board predicate (`paired`) selects a different action list on
+/// different turn runouts of the same flop, specialized once per dealt
+/// board rather than reused across every card.
+#[test]
+fn tree_script_board_predicate_selects_different_menus_on_different_runouts() {
+    let turn = StreetTree {
+        rules: vec![Rule {
+            street: Street::Turn,
+            condition: Condition::Truth(Var::Paired),
+            effect: Effect::Add,
+            action: Some(ActionKind::Bet),
+            sizes: vec![SizeSpec::ToChips { value: 9.0 }],
+        }],
+        max_aggressive_actions: 1,
+        include_allin: false,
+        allin_threshold: None,
+    };
+    let config = PostflopConfig {
+        board: parse_cards("2c 7d 9h"),
+        ranges: PerPlayer::new(
+            "AsAh".parse::<Range>().unwrap(),
+            "QdQc".parse::<Range>().unwrap(),
+        ),
+        pot: Chips(4),
+        effective_stack: Chips(100),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn,
+            river: StreetTree::default(),
+        },
+        min_bet: Chips(1),
+        iso_merging: false,
+        track_node_info: true,
+        preflop_aggressor: None,
+    };
+    let game = build_postflop_game(&config, chip_ev());
+
+    // "2h" pairs the flop's "2c": the turn's `paired` predicate fires.
+    let paired_turn = game.node_by_history("xx[2h]").expect("paired turn history");
+    let tag = game.game.tree.tags[paired_turn as usize] as usize;
+    assert!(
+        game.node_info[tag].actions.contains(&"bet 9".to_string()),
+        "a paired runout must offer the predicate-gated bet: {:?}",
+        game.node_info[tag].actions
+    );
+
+    // "Ks" does not pair the board: the predicate must not fire.
+    let unpaired_turn = game
+        .node_by_history("xx[Ks]")
+        .expect("unpaired turn history");
+    let tag = game.game.tree.tags[unpaired_turn as usize] as usize;
+    assert_eq!(
+        game.node_info[tag].actions,
+        vec!["check".to_string()],
+        "an unpaired runout must not offer the predicate-gated bet: {:?}",
+        game.node_info[tag].actions
+    );
 }

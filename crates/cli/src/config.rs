@@ -1,7 +1,9 @@
 use std::borrow::Cow;
+use std::collections::BTreeMap;
 use std::path::PathBuf;
 
-use cards::{SizeSpec, SizeUnit};
+use cards::Street;
+use cards::script::{POSTFLOP, Script};
 use holdem::{PerStreet, StreetTree};
 use serde::{Deserialize, Serialize};
 
@@ -51,8 +53,9 @@ pub(crate) fn parse_internal_config(raw: &str) -> anyhow::Result<SolveConfig> {
     toml::from_str(raw).map_err(Into::into)
 }
 
-/// [`parse_solve_config`] with a base directory for the one family that has
-/// a path-valued key (Multiway Preflop's mwtree source).
+/// [`parse_solve_config`] with a base directory for the families that have a
+/// path-valued key: Multiway Preflop's `.mwtree` `source`, and postflop's
+/// `[game.tree] source`.
 pub fn parse_solve_config_at(
     raw: &str,
     config_path: &std::path::Path,
@@ -60,7 +63,7 @@ pub fn parse_solve_config_at(
     if crate::multiway_v1::has_v1_schema(raw)? {
         return crate::multiway_v1::parse_and_lower_at(raw, config_path);
     }
-    crate::solver_config_v1::parse_and_lower(raw)
+    crate::solver_config_v1::parse_and_lower_at(raw, config_path)
 }
 
 /// Replays solution artifacts written before full-recall regret pruning
@@ -210,6 +213,15 @@ pub enum GameSection {
         min_bet: u32,
         #[serde(default = "default_true")]
         iso_merging: bool,
+        /// The side that last bet or raised before this subgame began, if
+        /// any -- exists only to define the tree script's `cbet`/`donk`
+        /// variables on the starting street. Kept as the raw declared
+        /// string (`"oop"` / `"ip"` / `"none"`); `postflop_setup` resolves
+        /// it to `Option<cards::Player>` at solve time, the same way
+        /// `board`/`oop_range`/`ip_range` stay strings here and are parsed
+        /// downstream.
+        #[serde(default = "default_preflop_aggressor")]
+        preflop_aggressor: String,
         #[serde(default)]
         tree: TreeSection,
     },
@@ -313,74 +325,75 @@ fn default_postflop_max_raises() -> u32 {
     2
 }
 
-/// `[game.tree]`: the postflop betting grammar, named and shaped after
-/// Multiway Preflop's `[game.tree]` so one vocabulary covers both engines.
+/// `[game.tree]`: the postflop betting grammar. Every node's menu comes from
+/// a tree script (`docs/solver-config-v1.jp.md`'s `[game.tree]` chapter);
+/// what stays here is only what a script cannot express or should not have
+/// to (`max_aggressive_actions`, `allin_threshold`) or that is shorter as a
+/// blanket default than as a script statement everywhere (`include_allin`).
+/// Named and shaped after Multiway Preflop's `[game.tree]` so one vocabulary
+/// covers both engines.
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 #[serde(deny_unknown_fields)]
 pub struct TreeSection {
-    /// Tree frontend. Only `"standard"` exists; the key is here so a later
-    /// frontend can be added the way Multiway Preflop added `"script"`.
+    /// Tree frontend. `"none"` (the default) is a check-down tree with no
+    /// bets anywhere and takes neither `source` nor `script`. `"script"`
+    /// reads a tree script from one of them.
     #[serde(default = "default_tree_kind")]
     pub kind: String,
-    #[serde(default)]
-    pub flop: StreetTreeSection,
-    #[serde(default)]
-    pub turn: StreetTreeSection,
-    #[serde(default)]
-    pub river: StreetTreeSection,
-}
-
-fn default_tree_kind() -> String {
-    "standard".to_string()
-}
-
-/// One street's menus. The field names mirror
-/// `multiway::config::StreetBettingConfig`.
-#[derive(Deserialize, Serialize, Debug, Clone)]
-#[serde(deny_unknown_fields)]
-pub struct StreetTreeSection {
-    /// Out-of-position sizes with no outstanding bet to face.
-    #[serde(default)]
-    pub oop_bet: Vec<ChipSize>,
-    /// In-position sizes with no outstanding bet to face.
-    #[serde(default)]
-    pub ip_bet: Vec<ChipSize>,
-    /// Out-of-position sizes facing a bet, by raise level. Absent reuses
-    /// `oop_bet`; an empty list forbids raising.
+    /// Path to the script file, relative to the config file's directory.
+    /// Exclusive with `script`. Resolved into `script` (and cleared) as
+    /// part of parsing a config with a known path, so nothing downstream of
+    /// that ever sees a path again -- `docs/app-architecture.md` R10, and
+    /// this contract's "正規化はインライン化" rule.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub oop_raise: Option<RaiseMenu>,
-    /// In-position sizes facing a bet, by raise level. Absent reuses
-    /// `ip_bet`; an empty list forbids raising.
+    pub source: Option<String>,
+    /// The script's own body. Exclusive with `source`; this is the only
+    /// form an effective config carries.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub ip_raise: Option<RaiseMenu>,
-    /// Out-of-position sizes when opening a street the in-position player
-    /// was last aggressive on. `None` reuses `oop_bet`; an empty list
-    /// forbids donking.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub oop_donk: Option<Vec<ChipSize>>,
-    /// Bets plus raises allowed on this street.
-    #[serde(default = "default_max_aggressive_actions")]
-    pub max_aggressive_actions: u32,
-    /// Always offer the all-in target alongside the sized menu.
+    pub script: Option<String>,
+    /// Always offer the all-in target, on every street, before any rule
+    /// runs.
     #[serde(default)]
     pub include_allin: bool,
     /// Targets at or above this fraction of the all-in target collapse into
-    /// it. Finite, in `(0.0, 1.0]`.
+    /// it, on every street. Finite, in `(0.0, 1.0]`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allin_threshold: Option<f64>,
+    /// Bets plus raises allowed, per street -- a structural limit a script
+    /// cannot express (memory preflight needs it before the tree is built).
+    #[serde(default)]
+    pub max_aggressive_actions: MaxAggressiveActionsSection,
+    /// Overrides the script's own `param` defaults. Untouched by
+    /// normalization: this is the variable schema a GUI edits, and it must
+    /// survive alongside the (possibly templated) script body.
+    #[serde(default)]
+    pub params: BTreeMap<String, toml::Value>,
 }
 
-impl Default for StreetTreeSection {
+fn default_tree_kind() -> String {
+    "none".to_string()
+}
+
+/// `[game.tree.max_aggressive_actions]`: the bets-plus-raises cap per
+/// street, defaulting to 2 on all three the way `StreetTree::default` always
+/// has.
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct MaxAggressiveActionsSection {
+    #[serde(default = "default_max_aggressive_actions")]
+    pub flop: u32,
+    #[serde(default = "default_max_aggressive_actions")]
+    pub turn: u32,
+    #[serde(default = "default_max_aggressive_actions")]
+    pub river: u32,
+}
+
+impl Default for MaxAggressiveActionsSection {
     fn default() -> Self {
-        StreetTreeSection {
-            oop_bet: Vec::new(),
-            ip_bet: Vec::new(),
-            oop_raise: None,
-            ip_raise: None,
-            oop_donk: None,
-            max_aggressive_actions: default_max_aggressive_actions(),
-            include_allin: false,
-            allin_threshold: None,
+        MaxAggressiveActionsSection {
+            flop: default_max_aggressive_actions(),
+            turn: default_max_aggressive_actions(),
+            river: default_max_aggressive_actions(),
         }
     }
 }
@@ -389,8 +402,110 @@ fn default_max_aggressive_actions() -> u32 {
     2
 }
 
+impl TreeSection {
+    /// Resolves `source` (a path, relative to `base_dir`) into `script` (the
+    /// file's own text) and clears `source`, so nothing downstream of this
+    /// call ever sees a path again. A no-op when `source` is absent (`kind =
+    /// "none"`, or a `kind = "script"` config that already carries `script`
+    /// directly).
+    pub fn resolve_source_at(&mut self, base_dir: &std::path::Path) -> anyhow::Result<()> {
+        let Some(source) = self.source.take() else {
+            return Ok(());
+        };
+        let path = base_dir.join(&source);
+        let text = std::fs::read_to_string(&path).map_err(|error| {
+            anyhow::anyhow!("SLV004: reading tree script {}: {error}", path.display())
+        })?;
+        self.script = Some(text);
+        Ok(())
+    }
+
+    /// Compiles this tree's script against `[game.tree.params]`'s
+    /// overrides. `None` for `kind = "none"`: no script to compile, and
+    /// therefore no rules on any street. Assumes `source` (if any) has
+    /// already been resolved into `script` -- see [`Self::resolve_source_at`].
+    pub fn compiled_script(&self) -> anyhow::Result<Option<Script>> {
+        match self.kind.as_str() {
+            "none" => Ok(None),
+            "script" => {
+                let text = self.script.as_deref().ok_or_else(|| {
+                    anyhow::anyhow!(
+                        "[game.tree] kind = \"script\" has no script body; source was not \
+                         resolved before this config reached the tree builder"
+                    )
+                })?;
+                let overrides = param_overrides(&self.params)?;
+                Ok(Some(Script::compile(text, &overrides, &POSTFLOP)?))
+            }
+            other => anyhow::bail!("unknown [game.tree] kind {other:?}"),
+        }
+    }
+
+    /// Lowers the TOML surface onto the builder's per-street tree-script
+    /// rules: compiles the script once, then hands each street
+    /// [`StreetTree::from_script`] its own slice of the flat rule list, in
+    /// source order.
+    pub fn lower(&self) -> anyhow::Result<PerStreet<StreetTree>> {
+        let rules = self
+            .compiled_script()?
+            .map(|script| script.rules)
+            .unwrap_or_default();
+        let caps = self.max_aggressive_actions;
+        Ok(PerStreet {
+            flop: StreetTree::from_script(
+                Street::Flop,
+                &rules,
+                caps.flop,
+                self.include_allin,
+                self.allin_threshold,
+            ),
+            turn: StreetTree::from_script(
+                Street::Turn,
+                &rules,
+                caps.turn,
+                self.include_allin,
+                self.allin_threshold,
+            ),
+            river: StreetTree::from_script(
+                Street::River,
+                &rules,
+                caps.river,
+                self.include_allin,
+                self.allin_threshold,
+            ),
+        })
+    }
+}
+
+/// Converts `[game.tree.params]`'s TOML values into the single-token strings
+/// `cards::script::Script::compile`'s `overrides` expect -- the same
+/// scalar-only conversion Multiway Preflop's `.mwtree` `params` table uses.
+fn param_overrides(
+    params: &BTreeMap<String, toml::Value>,
+) -> anyhow::Result<BTreeMap<String, String>> {
+    params
+        .iter()
+        .map(|(name, value)| {
+            let text = match value {
+                toml::Value::String(value) => value.clone(),
+                toml::Value::Integer(value) => value.to_string(),
+                toml::Value::Float(value) if value.is_finite() => value.to_string(),
+                toml::Value::Boolean(value) => value.to_string(),
+                _ => anyhow::bail!(
+                    "[game.tree.params] {name:?} must be a scalar (string, number, or bool)"
+                ),
+            };
+            Ok((name.clone(), text))
+        })
+        .collect()
+}
+
 fn default_min_bet() -> u32 {
     1
+}
+
+fn default_preflop_aggressor() -> String {
+    "none".to_string()
 }
 
 fn default_rake_when() -> String {
@@ -401,109 +516,6 @@ fn default_rake_when() -> String {
 /// instead, because its chip amounts are big blinds.
 fn default_rounding_unit() -> f64 {
     1.0
-}
-
-impl TreeSection {
-    /// Lowers the TOML surface onto the builder's per-street grammar.
-    ///
-    /// The two shapes are deliberately one-to-one: every key here is a
-    /// field there, so a reader can check the contract against the builder
-    /// without a translation table.
-    pub fn lower(&self) -> PerStreet<StreetTree> {
-        PerStreet {
-            flop: self.flop.lower(),
-            turn: self.turn.lower(),
-            river: self.river.lower(),
-        }
-    }
-}
-
-impl StreetTreeSection {
-    fn lower(&self) -> StreetTree {
-        StreetTree {
-            oop_bet: specs(&self.oop_bet),
-            ip_bet: specs(&self.ip_bet),
-            oop_raise: self.oop_raise.as_ref().map(RaiseMenu::lower),
-            ip_raise: self.ip_raise.as_ref().map(RaiseMenu::lower),
-            oop_donk: self.oop_donk.as_deref().map(specs),
-            max_aggressive_actions: self.max_aggressive_actions,
-            include_allin: self.include_allin,
-            allin_threshold: self.allin_threshold,
-        }
-    }
-}
-
-impl RaiseMenu {
-    fn lower(&self) -> Vec<Vec<SizeSpec>> {
-        self.0.iter().map(|level| specs(level)).collect()
-    }
-}
-
-fn specs(sizes: &[ChipSize]) -> Vec<SizeSpec> {
-    sizes.iter().map(|size| size.0).collect()
-}
-
-/// One menu entry, in PioSOLVER's spelling: a bare number is a percentage
-/// of the pot (`33`), `c` is chips (`20c`), `x` is a multiple of the wager
-/// faced (`3x`), `a` is all-in, `e`/`3e` are geometric. A TOML number and
-/// the same number quoted mean the same thing, and it always writes the
-/// canonical literal back, so an effective config normalizes to itself.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct ChipSize(pub SizeSpec);
-
-impl Serialize for ChipSize {
-    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.serialize_str(&self.0.render(SizeUnit::Chips))
-    }
-}
-
-impl<'de> Deserialize<'de> for ChipSize {
-    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        #[derive(Deserialize)]
-        #[serde(untagged)]
-        enum Raw {
-            Literal(String),
-            Percent(f64),
-        }
-        let text = match Raw::deserialize(deserializer)? {
-            Raw::Literal(text) => text,
-            // A TOML number is Pio's bare percentage; routing it through the
-            // same parser as a string keeps one definition of what `33`
-            // means, including the "that looks like the old pot fraction"
-            // rejection.
-            Raw::Percent(percent) => percent.to_string(),
-        };
-        SizeSpec::parse(&text, SizeUnit::Chips)
-            .map(ChipSize)
-            .map_err(serde::de::Error::custom)
-    }
-}
-
-/// A raise menu, either flat (one list applied at every raise level) or one
-/// list per level. Both spellings normalize to the per-level form, so an
-/// effective config always says which level each size belongs to.
-#[derive(Debug, Clone, Default, PartialEq)]
-pub struct RaiseMenu(pub Vec<Vec<ChipSize>>);
-
-impl Serialize for RaiseMenu {
-    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        self.0.serialize(serializer)
-    }
-}
-
-impl<'de> Deserialize<'de> for RaiseMenu {
-    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        #[derive(Deserialize)]
-        #[serde(untagged)]
-        enum Raw {
-            PerLevel(Vec<Vec<ChipSize>>),
-            Flat(Vec<ChipSize>),
-        }
-        Ok(match Raw::deserialize(deserializer)? {
-            Raw::PerLevel(levels) => RaiseMenu(levels),
-            Raw::Flat(sizes) => RaiseMenu(vec![sizes]),
-        })
-    }
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]
@@ -1139,74 +1151,78 @@ iterations = 10
         toml::from_str::<Wrapper>(toml).unwrap().tree
     }
 
-    /// A bare number is Pio's pot percentage, and the quoted form and the
-    /// pre-Pio `"50%pot"` spelling must land on the same size.
+    /// `kind = "none"` (the default) is a check-down tree with no rules on
+    /// any street, and its structural defaults match the old
+    /// `StreetTree::default()` (`max_aggressive_actions = 2` on every
+    /// street, no all-in default).
     #[test]
-    fn a_size_menu_reads_bare_numbers_as_pot_percentages() {
+    fn kind_none_is_the_default_and_lowers_to_an_empty_ruleset() {
+        let tree = parse_tree("[tree]\n");
+        assert_eq!(tree.kind, "none");
+        assert_eq!(tree.source, None);
+        assert_eq!(tree.script, None);
+        assert!(!tree.include_allin);
+        assert_eq!(tree.allin_threshold, None);
+        assert_eq!(tree.max_aggressive_actions.flop, 2);
+        assert_eq!(tree.max_aggressive_actions.turn, 2);
+        assert_eq!(tree.max_aggressive_actions.river, 2);
+
+        let streets = tree.lower().unwrap();
+        assert!(streets.flop.rules.is_empty());
+        assert!(streets.turn.rules.is_empty());
+        assert!(streets.river.rules.is_empty());
+    }
+
+    /// A `kind = "script"` tree compiles its `script` body once and hands
+    /// each street exactly the rules tagged for it, in source order.
+    #[test]
+    fn kind_script_lowers_each_streets_own_rules() {
         let tree = parse_tree(
             r#"
-            [tree.flop]
-            oop_bet = [50, "75", "125%pot"]
-            ip_bet = ["a"]
+            [tree]
+            kind = "script"
+            script = '''
+            flop { replace bet [33] }
+            turn, river { checkdown }
+            '''
             "#,
         );
-        assert_eq!(
-            tree.flop.oop_bet,
-            vec![
-                ChipSize(SizeSpec::PotAfterCall { fraction: 0.5 }),
-                ChipSize(SizeSpec::PotAfterCall { fraction: 0.75 }),
-                ChipSize(SizeSpec::PotAfterCall { fraction: 1.25 }),
-            ],
-        );
-        assert_eq!(tree.flop.ip_bet, vec![ChipSize(SizeSpec::AllIn)]);
+        let streets = tree.lower().unwrap();
+        assert_eq!(streets.flop.rules.len(), 1);
+        assert_eq!(streets.turn.rules.len(), 1);
+        assert_eq!(streets.river.rules.len(), 1);
     }
 
-    /// The pre-Pio spelling was a pot *fraction*, so `0.5` used to mean the
-    /// half pot it now reads as half a percent of. It has to say so.
+    /// `[game.tree.params]` overrides the script's own `param` defaults
+    /// without touching the script body.
     #[test]
-    fn a_bare_pot_fraction_names_the_percentage_to_write_instead() {
-        #[derive(Debug, Deserialize)]
-        struct Wrapper {
-            #[allow(dead_code)]
-            tree: TreeSection,
-        }
-        let error = toml::from_str::<Wrapper>("[tree.flop]\noop_bet = [0.5]\n")
-            .unwrap_err()
-            .to_string();
-        assert!(error.contains("percentages"), "{error}");
-        assert!(error.contains("write 50"), "{error}");
+    fn params_override_the_scripts_own_defaults() {
+        let tree = parse_tree(
+            r#"
+            [tree]
+            kind = "script"
+            script = '''
+            param cb = 33
+            flop { replace bet [cb] }
+            '''
+
+            [tree.params]
+            cb = 50
+            "#,
+        );
+        let script = tree.compiled_script().unwrap().unwrap();
+        assert_eq!(script.params[0].default, "50");
     }
 
+    /// `[game.tree.max_aggressive_actions]` is per-street, defaulting to 2
+    /// on every street when the table (or a field in it) is omitted.
     #[test]
-    fn a_raise_menu_reads_flat_and_per_level_spellings() {
-        let flat = parse_tree("[tree.flop]\noop_raise = [\"3x\"]\n");
-        assert_eq!(
-            flat.flop.oop_raise,
-            Some(RaiseMenu(vec![vec![ChipSize(
-                SizeSpec::PreviousBetMultiple { factor: 3.0 }
-            )]])),
-            "a flat list is one level"
-        );
-        let levels = parse_tree("[tree.flop]\nip_raise = [[\"3x\"], [\"allin\"]]\n");
-        assert_eq!(
-            levels.flop.ip_raise,
-            Some(RaiseMenu(vec![
-                vec![ChipSize(SizeSpec::PreviousBetMultiple { factor: 3.0 })],
-                vec![ChipSize(SizeSpec::AllIn)],
-            ]))
-        );
-    }
-
-    #[test]
-    fn a_size_menu_writes_the_pio_literal_back() {
-        let tree = parse_tree("[tree.river]\noop_bet = [50, \"allin\"]\nip_raise = [\"2.5x\"]\n");
-        let text = toml::to_string(&tree).unwrap();
-        assert!(text.contains("\"50\""), "{text}");
-        assert!(
-            text.contains("\"a\""),
-            "a bare `allin` must normalize to Pio's `a`: {text}"
-        );
-        assert!(text.contains("\"2.5x\""), "{text}");
+    fn max_aggressive_actions_defaults_to_two_per_street() {
+        let tree =
+            parse_tree("[tree]\nkind = \"none\"\n\n[tree.max_aggressive_actions]\nflop = 3\n");
+        assert_eq!(tree.max_aggressive_actions.flop, 3);
+        assert_eq!(tree.max_aggressive_actions.turn, 2);
+        assert_eq!(tree.max_aggressive_actions.river, 2);
     }
 
     #[test]
@@ -1251,25 +1267,5 @@ iterations = 10
         assert_eq!(reparsed.run.stop_confirmations, Some(3));
         assert_eq!(reparsed.run.stop_eval_period_secs, Some(5.0));
         assert_eq!(reparsed.run.stop_br_traversals, Some(500));
-    }
-
-    #[test]
-    fn omitted_menus_default_to_empty_and_donk_defaults_to_none() {
-        let tree = parse_tree(
-            r#"
-            [tree.flop]
-            oop_bet = [50]
-            ip_bet = [50]
-            "#,
-        );
-        assert_eq!(
-            tree.flop.oop_raise, None,
-            "an unset raise menu reuses oop_bet"
-        );
-        assert_eq!(tree.flop.ip_raise, None);
-        assert_eq!(tree.flop.oop_donk, None);
-        assert_eq!(tree.flop.max_aggressive_actions, 2);
-        assert!(!tree.flop.include_allin);
-        assert_eq!(tree.flop.allin_threshold, None);
     }
 }

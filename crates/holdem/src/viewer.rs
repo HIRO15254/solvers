@@ -86,13 +86,20 @@ fn next_street(street: Street) -> Street {
 
 /// State at the moment a river-entry node is reached: the completed 5-card
 /// board, the pot already built (both players' contributions, from every
-/// earlier street, folded in — see the module doc's design contract), and
-/// the effective stack remaining behind.
+/// earlier street, folded in — see the module doc's design contract), the
+/// effective stack remaining behind, and the turn's aggressor (the trunk's
+/// last street before the river), for `river_resolve_config` to seed as the
+/// fresh subgame's `preflop_aggressor`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct RiverEntryState {
     pub board: [Card; 5],
     pub pot: Chips,
     pub effective_stack: Chips,
+    /// The last player to bet or raise on the turn; `None` if the turn
+    /// checked through (or this is a from-the-turn trunk with no earlier
+    /// street at all). Defines the `cbet`/`donk` tree-script variables on
+    /// the resolved river subgame's own first (and only) street.
+    pub previous_aggressor: Option<Player>,
 }
 
 /// Failure replaying a history string in [`river_entry_state`].
@@ -215,11 +222,11 @@ fn tokenize(history: &str) -> Result<Vec<Token>, ReplayError> {
 
 /// Replays a history string of tokens `x` / `c` / `f` / `r{to}` / `[Xy]`
 /// against `config` (the trunk [`PostflopConfig`]) up to a river-entry node,
-/// returning that node's board/pot/effective-stack state.
+/// returning that node's board/pot/effective-stack/aggressor state.
 ///
 /// The replay does not need to track "outstanding" (the amount owed to
 /// call) as a separate quantity, because of an invariant in
-/// `crate::postflop::Builder::betting`/`raise_targets`: `r{to}` already
+/// `crate::postflop::Builder::betting`/`sized_targets`: `r{to}` already
 /// encodes the acting player's new *absolute* contribution `to`, and every
 /// bet/raise leaves `outstanding == |contrib[P0] - contrib[P1]|` (the raise
 /// size is layered on top of whatever the actor already owed). So a `c`
@@ -227,6 +234,15 @@ fn tokenize(history: &str) -> Result<Vec<Token>, ReplayError> {
 /// opponent's, and a chance token is only ever reached once contributions
 /// are already equal (the invariant this function's `UnequalContribution`
 /// error defends).
+///
+/// `street_aggressor`/`previous_aggressor` mirror
+/// `crate::postflop::LineState`'s own fields exactly: a `Token::Bet` records
+/// its actor as this street's aggressor, and a `Token::Chance` carries that
+/// aggressor forward into `previous_aggressor` and clears it for the new
+/// street -- so once the loop consumes the final chance token (the one that
+/// completes the board to 5 cards), `previous_aggressor` holds the *turn's*
+/// aggressor, exactly what a fresh river-start subgame needs to seed its own
+/// `PostflopConfig::preflop_aggressor`.
 pub fn river_entry_state(
     config: &PostflopConfig,
     history: &str,
@@ -237,6 +253,8 @@ pub fn river_entry_state(
     let mut contrib = PerPlayer::new(Chips::ZERO, Chips::ZERO);
     let mut to_act = Player::P0;
     let mut first_checked = false;
+    let mut street_aggressor: Option<Player> = None;
+    let mut previous_aggressor: Option<Player> = None;
 
     for token in tokens {
         match token {
@@ -261,6 +279,7 @@ pub fn river_entry_state(
             }
             Token::Bet(to) => {
                 contrib[to_act] = Chips(to);
+                street_aggressor = Some(to_act);
                 to_act = to_act.opponent();
             }
             Token::Chance(card) => {
@@ -270,6 +289,8 @@ pub fn river_entry_state(
                 board.push(card);
                 to_act = Player::P0;
                 first_checked = false;
+                previous_aggressor = street_aggressor;
+                street_aggressor = None;
             }
         }
     }
@@ -302,6 +323,7 @@ pub fn river_entry_state(
         board,
         pot,
         effective_stack,
+        previous_aggressor,
     })
 }
 
@@ -314,14 +336,21 @@ pub fn river_entry_state(
 /// probabilities and `Mask`/`Transition` weights, none of which ever push a
 /// product outside `[0, 1]`; clamped defensively against float rounding at
 /// the boundary regardless), river tree and `min_bet` copied from `trunk`
-/// (the only street the fresh subgame ever plays — a copied `oop_donk` is
-/// moot too, since this subgame's own river is its first street, so the
-/// builder always seeds `previous_aggressor: None` for it regardless of
-/// what the menu says), flop/turn trees left at `StreetTree::default()`
-/// (moot: a river-start board has no chance nodes), `iso_merging: false`
-/// (also moot, for the same reason — nothing left to merge with no chance
-/// nodes), and `track_node_info: true` (a re-solved subgame is exactly the
-/// thing a viewer wants node histories for).
+/// (the only street the fresh subgame ever plays), flop/turn trees left at
+/// `StreetTree::default()` (moot: a river-start board has no chance nodes),
+/// `iso_merging: false` (also moot, for the same reason — nothing left to
+/// merge with no chance nodes), and `track_node_info: true` (a re-solved
+/// subgame is exactly the thing a viewer wants node histories for).
+///
+/// `preflop_aggressor: entry.previous_aggressor` is **not** moot, unlike the
+/// paragraph this replaces used to claim: once a street's rules can branch
+/// on `cbet`/`donk` (`docs/postflop-tree-script-v1.jp.md`'s 適用モデル
+/// chapter), a fresh river subgame that always seeded `previous_aggressor:
+/// None` would offer a *different* menu than the same node has in the
+/// trunk — wrong whenever the trunk's turn was bet or raised into. Carrying
+/// `entry.previous_aggressor` through is what keeps this function's
+/// structural-equivalence contract (see the module doc) true under a
+/// donk/cbet-aware ruleset, not just under fixed per-street menus.
 pub fn river_resolve_config(
     trunk: &PostflopConfig,
     entry: &RiverEntryState,
@@ -348,5 +377,54 @@ pub fn river_resolve_config(
         min_bet: trunk.min_bet,
         iso_merging: false,
         track_node_info: true,
+        preflop_aggressor: entry.previous_aggressor,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn parse_cards(s: &str) -> Vec<Card> {
+        s.split_whitespace().map(|c| c.parse().unwrap()).collect()
+    }
+
+    /// A minimal turn-start config for exercising `river_entry_state`'s
+    /// `previous_aggressor` bookkeeping: `river_entry_state` is a pure
+    /// history-string replay that never consults `config.streets` (only
+    /// `board`/`pot`/`effective_stack`), so the betting grammar here is
+    /// irrelevant -- only a board long enough to reach 5 cards and a stack
+    /// that comfortably covers whatever the replayed history bets.
+    fn turn_start_config() -> PostflopConfig {
+        PostflopConfig {
+            board: parse_cards("2s 7s Ks 2h"),
+            ranges: PerPlayer::new(Range::default(), Range::default()),
+            pot: Chips(2),
+            effective_stack: Chips(100),
+            ..PostflopConfig::default()
+        }
+    }
+
+    /// An IP (P1) bet-call ending the turn ("x" OOP checks, reopening the
+    /// betting to P1; "r10" IP bets; "c" OOP calls) must carry P1 forward as
+    /// `previous_aggressor` at the river-entry node the chance token deals
+    /// into -- see `river_resolve_config`'s doc comment on why this can no
+    /// longer be treated as moot once rules branch on `cbet`/`donk`.
+    #[test]
+    fn previous_aggressor_carries_the_turns_ip_bettor_into_river_entry() {
+        let config = turn_start_config();
+        let state =
+            river_entry_state(&config, "xr10c[9d]").expect("valid check-bet-call-deal history");
+        assert_eq!(state.previous_aggressor, Some(Player::P1));
+    }
+
+    /// A turn that checks through ("xx") leaves no aggressor at all: the
+    /// river-entry node's `previous_aggressor` must be `None`, exactly as it
+    /// was before this field existed.
+    #[test]
+    fn previous_aggressor_is_none_when_the_turn_checks_through() {
+        let config = turn_start_config();
+        let state = river_entry_state(&config, "xx[9d]").expect("valid check-check-deal history");
+        assert_eq!(state.previous_aggressor, None);
     }
 }

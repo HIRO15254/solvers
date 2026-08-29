@@ -32,6 +32,21 @@ pub fn parse_range(label: &str, spec: &str) -> Result<Range> {
         .map_err(|e| anyhow!("parsing {label} {spec:?}: {e}"))
 }
 
+/// Parses `[game] preflop_aggressor` (`"oop"` / `"ip"` / `"none"`) into the
+/// side [`PostflopConfig::preflop_aggressor`] wants. `"oop"` is
+/// [`Player::P0`], matching this module's own `PerPlayer::new(oop, ip)`
+/// convention below.
+pub fn parse_preflop_aggressor(value: &str) -> Result<Option<Player>> {
+    match value {
+        "none" => Ok(None),
+        "oop" => Ok(Some(Player::P0)),
+        "ip" => Ok(Some(Player::P1)),
+        other => Err(anyhow!(
+            "unknown preflop_aggressor {other:?}; expected \"oop\", \"ip\", or \"none\""
+        )),
+    }
+}
+
 /// Builds a [`PostflopConfig`] from the raw config fields. `streets` and
 /// `min_bet` are handed over already resolved to `holdem`'s new
 /// `StreetTree`-based grammar (TOML `[game.tree]` parsing lives in
@@ -48,11 +63,13 @@ pub fn build_postflop_config(
     iso_merging: bool,
     min_bet: u32,
     streets: PerStreet<StreetTree>,
+    preflop_aggressor: &str,
 ) -> Result<PostflopConfig> {
     let board = parse_board(board)?;
     let oop = parse_range("oop_range", oop_range)?;
     let ip = parse_range("ip_range", ip_range)?;
     let ranges = PerPlayer::new(oop, ip);
+    let preflop_aggressor = parse_preflop_aggressor(preflop_aggressor)?;
 
     Ok(PostflopConfig {
         board,
@@ -63,6 +80,7 @@ pub fn build_postflop_config(
         min_bet: Chips(min_bet),
         iso_merging,
         track_node_info: true,
+        preflop_aggressor,
     })
 }
 

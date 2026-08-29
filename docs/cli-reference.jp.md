@@ -100,14 +100,54 @@ solvers validate <CONFIG> [--format FORMAT] [--show-effective]
 | `--write-effective PATH` | — | 同じものを再 parse 可能な TOML として書く |
 | `--resources` | — | public tree を構築(保持せず)して policy arena を報告 |
 
-schema 判定・型・値域・条件付き検証・正規化までを行う。tree compile と
-abstraction 到達数、resource/fingerprint preflight は `solve` 時にだけ走る。
+schema 判定・型・値域・条件付き検証・正規化までを行う。abstraction 到達数と
+resource/fingerprint preflight は `solve` 時にだけ走る。
+
+tree script は正規化の一部として parse し、条件をコンパイルする。壊れた script が
+effective config を素通りして solve 時に落ちることはない。正規化では
+`[game.tree] source`(path)が `script`(本文)へ置き換わるので、effective config は
+script file を消しても解ける。
 
 `--resources` は Multiway の dense arena 見積り専用である。heads-up config に渡すと
 error になる。exact engine の tree サイズ見積りは `solve` が tree を組むときに出る。
 
 `--show-effective` の出力はそのまま入力に戻せる。正規化は冪等で、effective config を
 もう一度正規化すると同じ bytes が返る。
+
+### `--format json` の body
+
+toy / postflop / preflop-hu の 3 契約:
+
+```json
+{
+  "status": "valid",
+  "schema": "solvers.postflop/v1",
+  "gameKind": "postflop",
+  "profile": "vector CFR average profile; converges to Nash for two players",
+  "effectiveConfig": { "...": "--show-effective のときだけ" },
+  "tree": {
+    "params": [
+      {"name": "cb", "type": "number", "default": 40, "description": "c-bet size (pot %)"}
+    ],
+    "rules": [
+      {"street": "flop", "condition": "donk", "effect": "remove", "action": "bet", "sizes": []},
+      {"street": "flop", "condition": "cbet && paired", "effect": "replace", "action": "bet", "sizes": ["25", "75"]}
+    ]
+  }
+}
+```
+
+`tree` は script を持つ postflop config(`[game.tree] kind = "script"`)にだけ付く
+読み取り専用の診断で、GUI がフォームを組み立てるための情報である
+(`docs/solver-config-v1.jp.md`「param 宣言は変数スキーマである」章)。`params` は
+`param` 宣言の変数スキーマ(`[game.tree.params]` の上書きを反映した実効値付き)、
+`rules` はビルダーが適用する順序そのままの平坦化された rule 列で、`condition` は
+ソース風テキストへ、`sizes` は size literal へ戻して書く。`effectiveConfig` や
+`run.toml` には決して現れない。`kind = "none"` の postflop config、および toy /
+preflop-hu では `tree` key 自体が無い。
+
+Multiway Preflop(v1)は `seatCount` / `chipUnitBb` を別途持ち、`tree` は無い
+(`docs/multiway-preflop-v1.jp.md` を見よ)。
 
 ## `solvers solve`
 

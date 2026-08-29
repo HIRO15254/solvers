@@ -216,18 +216,16 @@ host によって別のゲームになる。
 
 v1 で path 値を持つキーは `game.tree.source`(mwtree script)ただ 1 つである。
 そして **effective config は既に self-contained である**: `materialize_effective_at`
-が script を lowering 済み rule 列へ展開するため、`validate --write-effective` の
-出力と run directory の `run.toml` には `source` が残らない。既存テスト
-`script_effective_config_is_self_contained` が、script ファイルを削除したうえで
-effective config を再 parse し、game fingerprint が一致することを確認している。
+が script の `source`(path)を解決するため、`validate --write-effective` の出力と
+run directory の `run.toml` には `source` が残らない。script ファイルを削除したうえで
+effective config を再 parse し、game fingerprint が一致することを確認するテストが
+両 family にある。
 
-> **決定済み・未実装**: この self-contained 化の手段を、rule 列への展開から
-> **script 本文のインライン化**へ変える。`source`(path)を script テキストへ
-> 置き換えるので path は残らず、R10 はそのまま満たす。展開を止める理由は、
-> 展開すると `param` が size へ溶けて消え、GUI が編集できる変数が無くなること、
-> 書いた形と `run.toml` の形が食い違うことの 2 つである。設計は
-> [postflop-tree-script-v1.jp.md](postflop-tree-script-v1.jp.md)。この規則
-> (path 値キーを remote 投入で拒否する)自体は変わらない。
+解決の**手段**は family で違う。postflop は script 本文をそのまま config へ
+**インライン化**する。`params` が正規化を生き延びて GUI が編集できる変数として
+残り、書いた形と `run.toml` の形が一致するからである。Multiway はまだ lowering 済み
+rule 列へ展開しており、同じインライン化へ揃えるのは今後の作業である。どちらの手段でも
+path は残らないので、この規則(path 値キーを remote 投入で拒否する)は変わらない。
 
 したがって規則はこうなる。
 

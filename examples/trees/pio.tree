@@ -1,0 +1,49 @@
+# Pio-style flop tree exercising the tree-script surface: param/define,
+# nesting, if/else, and a board predicate. Companion to
+# examples/postflop_pio_tree.toml, which reaches this through
+# [game.tree] source and overrides `cb` via [game.tree.params].
+
+# c-bet size (pot %)
+param cb = 33
+# barrel size on the turn (pot %)
+param barrel = 66
+
+define wet = flush_possible || straight_possible
+
+flop {
+  # BB does not donk into BTN's preflop raise.
+  when donk {
+    remove bet
+  }
+  when cbet {
+    if paired {
+      replace bet [25, 75]
+    } else if wet {
+      replace bet [cb, 75]
+    } else {
+      replace bet [cb]
+    }
+  }
+  when aggressions == 1 {
+    replace raise [3x]
+    when spr <= 3 { replace raise [a] }
+  }
+}
+
+turn {
+  when unopened {
+    if donk {
+      remove bet
+    } else {
+      replace bet [barrel]
+    }
+  }
+  # Outside the `unopened` block on purpose: a raise only exists once
+  # someone has bet, so nesting this under `unopened` would make its
+  # condition `aggressions == 0 && aggressions == 1` and it would never fire.
+  when aggressions == 1 { replace raise [2.5x] }
+}
+
+river when unopened {
+  replace bet [75, a]
+}

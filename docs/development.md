@@ -37,8 +37,9 @@ checkpoint/solution metadataを同じchange setで更新する。
   `solve --history`はpostflopから削除済み。Python/WASM境界の必要性は引き続き実測で判断する。
 
 現時点でpostflopに残る制約は`docs/solver-config-v1.jp.md`「サポート範囲と制約」に
-列挙してある。大きいものは3つ: 条件ルール(`[[game.tree.rules]]`相当)の未実装、
-非対称スタック不可、`evaluate`非対応。
+列挙してある。大きいものは2つ: 非対称スタック不可、`evaluate`非対応。条件ルールは
+`.tree` scriptとして実装済みで、`[game.tree]`章が規範である。Multiwayのscriptを
+同じ文法・同じインライン化正規化へ揃えるのが次の作業。
 
 完了済みmilestoneの時系列日誌は現行文書へ追記せず、Git履歴と
 `docs/validation/`の再現可能な証拠から参照する。

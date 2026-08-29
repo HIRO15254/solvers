@@ -412,7 +412,12 @@ fn content_type(name: &str) -> &'static str {
 /// recognizes them to give the client the more useful code. A miss only
 /// costs the client a less specific error, never a wrong result.
 fn mentions_a_path(message: &str) -> bool {
+    // Needles are the error texts themselves, never a bare extension: a
+    // `.tree` needle would also match every message naming the `[game.tree]`
+    // table, so an `SLV002` about a retired key would come back to the
+    // client as "your config is not self-contained".
     message.contains("mwtree")
+        || message.contains("reading tree script")
         || message.contains("No such file")
         || message.contains("requires a config file path")
 }
@@ -451,6 +456,17 @@ mod tests {
     fn a_validation_error_naming_a_missing_file_is_classified_as_not_self_contained() {
         assert!(mentions_a_path("reading mwtree source /x/y.mwtree"));
         assert!(mentions_a_path("No such file or directory"));
+        assert!(mentions_a_path(
+            "SLV004: reading tree script /x/trees/srp.tree: Permission denied"
+        ));
+        assert!(mentions_a_path(
+            "SLV004: [game.tree] source requires a config file path for relative resolution"
+        ));
         assert!(!mentions_a_path("MWP001: rollout-kmeans was removed"));
+        // Naming the `[game.tree]` table is not naming a file.
+        assert!(!mentions_a_path(
+            "SLV002: [game.tree.flop] was removed; every street's betting menu is now a tree \
+             script under [game.tree]"
+        ));
     }
 }

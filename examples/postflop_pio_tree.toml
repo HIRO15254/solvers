@@ -1,8 +1,10 @@
-# Pio-style flop tree exercising the whole `[game.tree]` surface: two bet
-# sizes per player, per-level raise menus, a donk menu OOP may not use, an
-# all-in merge threshold, a generic condition rake, and tournament ICM
-# against an outside field. Small ranges keep it debug-runnable; the point
-# is the tree grammar, not the spot.
+# Pio-style flop tree exercising the whole tree-script surface: a `source`
+# file (examples/trees/pio.tree) with `param`/`define`, nesting, `if`/`else`,
+# and a board predicate; `[game.tree.params]` overriding one of its params;
+# `[game.tree.max_aggressive_actions]` per street; tree-level `include_allin`
+# / `allin_threshold`; `[game] preflop_aggressor`; and the generic condition
+# rake plus tournament ICM against an outside field it already had. Small
+# ranges keep it debug-runnable; the point is the tree grammar, not the spot.
 schema = "solvers.postflop/v1"
 
 [game]
@@ -12,32 +14,21 @@ ip_range = "JJ-99,AQs-ATs,KQs,QJs"
 pot = 21
 effective_stack = 195
 min_bet = 1
+preflop_aggressor = "ip"
 
 [game.tree]
-kind = "standard"
-
-[game.tree.flop]
-oop_bet = [33, 75]
-ip_bet = [50]
-oop_raise = [["3x"]]
-ip_raise = [["3x"], ["a"]]
-max_aggressive_actions = 3
+kind = "script"
+source = "trees/pio.tree"
 include_allin = true
 allin_threshold = 0.8
 
-[game.tree.turn]
-oop_bet = [66]
-ip_bet = [66]
-oop_donk = []
-oop_raise = [["2.5x"]]
-ip_raise = [["2.5x"]]
-max_aggressive_actions = 2
+[game.tree.max_aggressive_actions]
+flop = 3
+turn = 2
+river = 2
 
-[game.tree.river]
-oop_bet = ["1e"]
-ip_bet = [75, "a"]
-oop_donk = [30]
-max_aggressive_actions = 2
+[game.tree.params]
+cb = 40
 
 [rake]
 kind = "generic"

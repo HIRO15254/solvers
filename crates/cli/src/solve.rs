@@ -453,6 +453,7 @@ fn run_with_storage_impl<S: Storage>(
             effective_stack,
             iso_merging,
             min_bet,
+            preflop_aggressor,
             tree,
         } => solve_postflop::<S>(
             pipeline,
@@ -464,6 +465,7 @@ fn run_with_storage_impl<S: Storage>(
             iso_merging,
             min_bet,
             tree,
+            &preflop_aggressor,
             schedule,
             schedule_name,
             &config.run,
@@ -731,6 +733,7 @@ fn solve_postflop<S: Storage>(
     iso_merging: bool,
     min_bet: u32,
     tree: TreeSection,
+    preflop_aggressor: &str,
     schedule: Box<dyn DiscountSchedule>,
     schedule_name: &str,
     run: &RunSection,
@@ -746,7 +749,8 @@ fn solve_postflop<S: Storage>(
         effective_stack,
         iso_merging,
         min_bet,
-        tree.lower(),
+        tree.lower()?,
+        preflop_aggressor,
     )?;
 
     // Cheap dry run before committing to the (possibly very large) real

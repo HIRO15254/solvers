@@ -77,6 +77,7 @@ pot = 21                   # 必須、正。偶数である必要はない
 effective_stack = 80       # 必須、正。両者共通
 min_bet = 1                # 既定 1。1 回の bet/raise の最小増分(chip)
 iso_merging = true         # 既定 true。turn/river の suit 同型を併合する
+preflop_aggressor = "ip"   # 既定 "none"。"oop" | "ip" | "none"
 ```
 
 `pot` は合計額だけを意味し、誰がいくら入れたか(内訳、デッドマネー)は書かない。
@@ -88,6 +89,13 @@ OOP `pot / 2`(切り捨て)/ IP 残り に割っているが、これは零和�
 `min_bet` は big blind に相当する最小 wager である。NLHE の min-raise 規則
 (`min-raise = 直前の bet/raise 増分`、初回 bet は `min_bet`)はこの値を基準に
 強制され、これを下回る size literal は最小合法 target まで引き上げられる。
+
+`preflop_aggressor` は、この subgame に入る前に最後に bet / raise を行った側を
+宣言する。single-raised pot で BTN が open して BB が call したなら `"ip"`、OOP が
+3bet して IP が call したなら `"oop"`、limped pot なら `"none"` である。これは
+tree script の `cbet` / `donk` を開始 street で定義するためだけに存在し、木の他の
+部分にも pot の内訳にも影響しない。既定の `"none"` では開始 street の `cbet` /
+`donk` がどちらも false になる。
 
 ## EV の基準
 
@@ -132,90 +140,363 @@ exploitability と `nash_conv` は基準の移動で変わらない。全 termin
 
 ## `[game.tree]` — postflop の betting tree
 
-Multiway Preflop の `[game.tree]` と同じ位置・同じ語彙を使う。
-
-> **決定済み・未実装**: この章の `[game.tree.<street>]`(`oop_bet` / `ip_bet` /
-> `oop_raise` / `ip_raise` / `oop_donk`)は、`.tree` script へ置き換える。
-> `[game.tree]` に残るのは script で書けないもの — `max_aggressive_actions`
-> table、`allin_threshold`、`include_allin` — だけになる。script は展開せず
-> config へインライン化し、`param` 宣言がそのまま GUI の変数スキーマになる。
-> 設計と旧 key の対応表は
-> [postflop-tree-script-v1.jp.md](postflop-tree-script-v1.jp.md)。
+Multiway Preflop の `[game.tree]` と同じ位置・同じ語彙を使う。各ノードのベット
+メニューは **tree script** が決め、`[game.tree]` に直接書くのは script で書けない、
+あるいは書くべきでないものだけである。
 
 ```toml
 [game.tree]
-kind = "standard"          # 既定 "standard"。現在の唯一の frontend
+kind = "script"                 # 既定 "none"。"none" | "script"
+source = "trees/srp.tree"       # script file。config file の directory 基準
+include_allin = false           # 既定 false。全ノードで all-in を候補に足す
+allin_threshold = 0.85          # 任意。既定なし
 
-[game.tree.flop]           # flop / turn / river それぞれ任意
-oop_bet = [50]             # 既定 []。OOP が bet を持たない局面で選べる size
-ip_bet = [50, "a"]
-oop_raise = ["3x"]         # 任意。省略時は oop_bet を再利用、[] で raise 禁止
-ip_raise = ["3x"]          # 任意。省略時は ip_bet を再利用、[] で raise 禁止
-oop_donk = []              # 任意。省略時は oop_bet
-max_aggressive_actions = 2 # 既定 2。その street の bet+raise 合計上限
-include_allin = false      # 既定 false
-allin_threshold = 0.85     # 任意。既定なし
+[game.tree.max_aggressive_actions]   # 任意。既定は 3 street とも 2
+flop = 3
+turn = 2
+river = 2
+
+[game.tree.params]              # script の param 既定値を上書きする
+cb = 40
 ```
+
+| key | 意味 |
+|---|---|
+| `kind` | `"none"`(既定)はどのノードにもベットが無い check-down の木。`"script"` は script を読む |
+| `source` | script file への相対 path。`script` と排他 |
+| `script` | script 本文そのもの。`source` と排他。正規化後はこちらだけが残る |
+| `include_allin` | 全ノードで all-in を既定の候補にする |
+| `allin_threshold` | 解決した target が最大 target のこの比率以上なら all-in へ併合する |
+| `max_aggressive_actions` | その street の bet + raise の合計上限 |
+| `params` | script の `param` 既定値を上書きする |
+
+`[game.tree]` に残した 3 つは、いずれも rule では書けないか、書くべきでない。
+
+| key | 残す理由 |
+|---|---|
+| `max_aggressive_actions` | `when aggressions >= N { remove raise }` で書けはするが、木の大きさの構造的上限であり、メモリ preflight が build 前に見積もるために宣言で要る |
+| `allin_threshold` | 「解決した size が最大の 85% 以上なら all-in へ併合する」は **size 解決時**の規則で、action list への足し引きでは表現できない |
+| `include_allin` | script でも `add bet [a]` と書けるが、全ノードに効く既定として持てる方が短い |
+
+`include_allin` は **script より先に**効く。全ノードの既定であって、script が後から
+`remove` や `replace` で編集できる対象である。
+
+### 正規化 — script は展開せずインライン化する
+
+`validate --write-effective` と `run.toml` では、`source`(path)が `script`(本文)へ
+置き換わる。rule 列へは展開しない。
+
+```toml
+[game.tree]
+kind = "script"
+script = '''
+# c-bet サイズ(pot 比 %)
+param cb = 33
+
+flop when cbet {
+  replace bet [cb]
+}
+'''
+
+[game.tree.params]
+cb = 40
+```
+
+config が machine を離れる形は常にこの直埋め込みだけであり、`source` を持つ config を
+remote へ投入することはできない(`app-architecture.md` R10)。Multiway が採っている
+「rule 列へ展開する」方式を採らない理由は 3 つある。
+
+1. **`params` が正規化を生き延びる。** 展開すると `cb` は `sizes = [33]` へ溶けて
+   消え、GUI が触れる変数が無くなる
+2. **書いた形と `run.toml` の形が一致する。** レビューでも再現でも同じテキストを見る
+3. **`if` / `else` の展開形が膨らまない。** 平坦化すると `else` 枝の条件は
+   `!(A) && !(B) && !(C) && D` になる。内部ではそうなるが、シリアライズはしない
+
+TOML はリテラル文字列 `'''...'''` を使う。script 本文は裸 token なので引用符を
+含まず、エスケープ処理が無い方が安全である。
+
+### script の構造
+
+script は **street block** の並びで、その中に文と入れ子の条件 block を書く。
+
+```text
+flop {
+  when donk { remove bet }
+  when cbet {
+    replace bet [33]
+    when flush_possible || straight_possible { replace bet [33, 75] }
+  }
+}
+
+turn, river when unopened {
+  if spr <= 2 { force bet [a] }
+  else        { replace bet [66] }
+}
+```
+
+street list は `flop` / `turn` / `river` をカンマで並べる。「全 street」を意味する
+キーワードは持たない — 3 つ並べる。同じ street を 1 つの list 内で 2 回書くことは
+できない(`SLV004`)が、別々の block が同じ street を挙げるのは構わない。
+
+block の中に書けるものは 3 つある。
+
+| 形 | 意味 |
+|---|---|
+| `<effect> <action> [sizes...]` / `checkdown` | 文。そこまでの条件で action list を書き換える |
+| `when <condition> { ... }` | 入れ子。囲っている条件と **AND** で結合する。深さ制限なし |
+| `if <cond> { } else if <cond> { } else { }` | 排他分岐。各枝は先行枝の否定と AND される |
+
+`<street list> when <condition> { ... }` は
+`<street list> { when <condition> { ... } }` の略記である。
+
+`else` の否定は機械が付けるので、`!paired && !monotone` を手で並べる必要はない。
+枝が互いに排他であることが構文で保証されるので、同じ action を複数の rule が黙って
+上書きし合う事故が起きない。
+
+script は上から読んで上から適用されるだけの世界であり、`priority` を持たない。
+順序を変えたければ文の位置を動かす。ループ、再帰、function、include、
+file / network / environment / time / RNG アクセスは無い。
+
+### 文 — action list の書き換え
+
+各 decision node で、まず合法な非攻撃 action(`fold` / `check` / `call`)を作る。
+**ベットとレイズは script が足さない限り存在しない。**
+
+| effect | 動作 |
+|---|---|
+| `add` | 候補を足す |
+| `remove` | その action 種別を全部消す |
+| `replace` | その種別を消してから候補を足す |
+| `force` | 候補だけにする(fold と check も消える) |
+| `checkdown` | check 以外を全部消す。`action` と `sizes` は書けない |
+
+`<action>` は `bet`(向かい合うベットが無い局面)か `raise`(ベットに直面している
+局面)である。ノードの種別と食い違う rule はそのノードでは何もしない。
+
+土台に候補が無い段階では `replace` と `add` は同じ結果になる。`replace` を
+「このノードのメニューはこれ」と読める慣用形として使い、`add` は既に足したメニューへ
+追加するときに使う。
+
+**候補が空になったら非攻撃 action へ戻す。** `force` の候補が解決できなかった場合、
+`remove` で候補が尽きた場合、ベットに直面したノードで `checkdown` を当てた場合が
+これに当たる。action の無いノードは木として存在できないので、「候補だけにする、
+ただし候補が在れば」が唯一健全な読みである。
+
+**script の size は裸の token で書く。** `[33, 75]` `[a]` `[3e]` `[3x]` であって
+`["a"]` ではない。script 本文は文字列 literal を持たない。
+
+### param と define
+
+```text
+# c-bet サイズ(pot 比 %)
+param cb = 33
+
+define wet = flush_possible || straight_possible
+```
+
+`param NAME = VALUE` は本文の識別子を **token として** 置換する。size にも条件にも
+使える。`[game.tree.params]` の同名 key が既定値を上書きする。**値は単一 token に
+限る** — 複数 token を許すと `param wet = a || b` が `wet && paired` を
+`a || b && paired` へ展開して優先順位を壊すからである。
+
+`define NAME = <condition>` は条件式に名前を付ける。条件の中でだけ使え、展開は
+括弧で囲んでから行う(`wet && paired` は `(a || b) && paired` になる)。`define` は
+`[game.tree.params]` から上書きできない。script の内部語彙であって、外から
+差し替える変数ではないからである。
+
+`param` / `define` のどちらも、size literal(`a` / `e` / `min`)および条件変数と
+同じ名前は `SLV004` で拒否する。置換で literal と変数を隠さないためである。
+
+### param 宣言は変数スキーマである
+
+`param` の並びは、その script が外へ公開する変数の定義そのものである。組込の
+テンプレートライブラリは持たない。**どの script もそのままテンプレートとして
+扱える。**
+
+| 要素 | 由来 |
+|---|---|
+| 名前 | `param` の識別子 |
+| 型 | 既定値の literal から推論。数値 → `number`、`true` / `false` → `bool`、それ以外 → `token` |
+| 既定値 | `param` に書かれた値 |
+| 説明 | その `param` 行の直前にある連続したコメント行 |
+
+範囲や選択肢は宣言しない。妥当な範囲はその param がどこで使われるか(size token か
+SPR 閾値か)で決まり、宣言すると `validate` が実際に強制する内容と二重管理になる
+からである。不正な値は `validate` が落とす。
+
+`solvers validate --format json` は、script を持つ postflop config について、この
+変数スキーマと平坦化した rule 列を `tree` key の下に**読み取り専用の診断**として
+返す。
+
+```json
+{
+  "tree": {
+    "params": [
+      {"name": "cb", "type": "number", "default": 40, "description": "c-bet size (pot %)"}
+    ],
+    "rules": [
+      {"street": "flop", "condition": "donk", "effect": "remove", "action": "bet", "sizes": []},
+      {"street": "flop", "condition": "cbet && paired", "effect": "replace", "action": "bet", "sizes": ["25", "75"]}
+    ]
+  }
+}
+```
+
+`params` は上の表そのもの。`default` は**実効値**で、script 自身の `param` 既定値を
+`[game.tree.params]` が上書きしていればその値になる。`rules` はビルダーが実際に適用
+する順序そのままで、各 rule の `condition` は演算子の優先順位(`||` が最弱、`&&` が
+次、単項 `!` が最強)に従って必要な括弧だけを付けたソース風テキストへ、`sizes` は
+`SizeSpec::render` の綴りへ戻す。無条件文の条件(`Condition::Const(true)`)は
+`"always"` と書く。`action` は `checkdown` rule では省略する。
+
+`tree` は診断であって config の一部ではない。`--write-effective` や `run.toml`、
+normalize の結果には決して現れない — script 本文と `[game.tree.params]` をそのまま
+持ち歩く理由(「正規化 — script は展開せずインライン化する」)がここでも変わらない
+ためである。`kind = "none"` の postflop config、および toy / preflop-hu / multiway
+の 3 契約では `tree` key 自体が無い(空 object ではない)。
+
+### 条件式
+
+文法は Multiway と同一である。`!`、`&&`、`||`、括弧、比較(`<` `<=` `==` `!=`
+`>=` `>`)、`in [...]`。literal は boolean、数値、文字列。
+
+| 変数 | 型 | 意味 |
+|---|---|---|
+| `aggressions` | 数値 | この street のここまでの bet + raise 数。raise level でもある |
+| `raises` | 数値 | `aggressions` の別名 |
+| `unopened` | bool | `aggressions == 0` |
+| `in_position` | bool | actor が IP なら true |
+| `position` | 文字列 | `"OOP"` または `"IP"` |
+| `players` | 数値 | 常に 2。config を family 間で持ち運べるように受理する |
+| `spr` | 数値 | actor の残り stack ÷ 現在 pot |
+| `pot` | 数値 | この node の pot(chip) |
+| `to_call` | 数値 | 直面している call 額(chip)。unopened では 0 |
+| `facing_pct` | 数値 | `to_call ÷ pot × 100`。unopened では 0 |
+| `cbet` | bool | `unopened` かつ直前 aggressor が actor 自身 |
+| `donk` | bool | `unopened` かつ直前 aggressor が存在し、actor ではない |
+
+**直前 aggressor** は、その street より前の最後の bet / raise を行った側である。
+tree 内に前の street が無い開始 street では `[game] preflop_aggressor` の値を使う。
+前の street が check-check で終わっていれば直前 aggressor は存在せず、`cbet` も
+`donk` も false になる。
+
+raise level を狙うのに専用の構文は要らない。`aggressions` がそのまま level である。
+
+```text
+flop when aggressions == 1 { replace raise [3x] }   # 最初のレイズ
+flop when aggressions == 2 { replace raise [a] }    # リレイズ
+```
+
+Multiway にあって postflop には無い変数(`limpers`、`flats`、`squeeze`、
+`open_cold_calls`、`preflop_participant`、`in_position_to_last_aggressor`)は
+preflop 概念なので、未知の識別子として `SLV004` で拒否する。黙って false にはしない。
+
+#### 盤面述語
+
+その node で配られている board(flop 3 枚 / turn 4 枚 / river 5 枚)に対して評価する。
+
+| 変数 | 型 | 意味 |
+|---|---|---|
+| `board_cards` | 数値 | 3 / 4 / 5 |
+| `board_suits` | 数値 | board 上の異なる suit の数 |
+| `board_ranks` | 数値 | board 上の異なる rank の数 |
+| `straight_ranks` | 数値 | どれかの 5 rank 幅の窓に入る board rank の最大数(1〜5)。A は高低どちらでも数える |
+| `paired` | bool | `board_ranks < board_cards` |
+| `monotone` | bool | `board_suits == 1` |
+| `two_tone` | bool | `board_suits == 2` |
+| `rainbow` | bool | `board_suits == board_cards` |
+| `flush_possible` | bool | いずれかの suit が 3 枚以上ある |
+| `straight_possible` | bool | `straight_ranks >= 3` |
+| `high_card` | 文字列 | board の最高 rank。`"A"`〜`"2"` |
+| `low_card` | 文字列 | board の最低 rank |
+
+`straight_possible` の「5 rank 幅の窓に 3 rank 以上」は「ホールカード 2 枚で
+ストレートが完成しうる」と厳密に一致する(`A K 2` は窓に 2 枚しか入らず false、
+`9 7 5` は 3 枚で true)。定義は全 street で正しいが、river では大半の board で
+true になり弁別力が落ちる。そこを細かく見たい場合は `straight_ranks >= 4` のように
+数値で書く。street ごとの特別扱いはしない。
+
+**suit 置換不変であることが必須条件である。** `iso_merging` は suit 同型な deal を
+1 本の枝へ厳密な商として併合する。併合されたクラスの member 間で値が変わる述語を
+入れると、その商が成立しなくなる。上の述語はすべて rank だけ、または suit の
+「構造」(何種類あるか、最大何枚同色か)だけを見ており、suit の付け替えで変わらない。
+将来述語を足すときも同じ条件を満たすこと。満たせない述語が要る場合は
+`iso_merging = false` を要求するのではなく、その述語を採用しない。
 
 ### size literal
 
 綴りは PioSOLVER に合わせてある。Pio のサイズ文字列をそのまま貼れる。
 文法は Multiway Preflop と同一で、絶対値の単位だけが family で違う
-(postflop は chip の `"20c"`、Multiway Preflop は BB の `"2.5bb"`)。
+(postflop は chip の `20c`、Multiway Preflop は BB の `2.5bb`)。
 他 family の絶対値 literal は `SLV004` で拒否する。
+
+size が出てくるのは script の `[...]` の中だけなので、**裸の token で書く**。
+`[33, 75]` `[a]` `[3e]` であって `["a"]` ではない。
 
 | literal | 意味 |
 |---|---|
-| `50` / `"50"` | call 後 pot の 50%。裸の数値でも書ける |
-| `"20c"` | chip 単位の絶対 raise-to 額 |
-| `"3x"` | 直前 wager の倍率。1 より大きいこと。`"2x"` が最小 legal raise |
-| `"a"` | 最大 target(残 stack 全部) |
-| `"e"` | 残り street 数で all-in へ到達する等比 size(flop なら 3、river なら 1) |
-| `"3e"` | 3 street で all-in へ到達 |
-| `"min"` | 最小 legal bet / raise |
-| `"80%effective"` | effective stack に対する比率 |
-| `"60%stack"` | actor の最大 target に対する比率 |
+| `50` | call 後 pot の 50% |
+| `20c` | chip 単位の絶対 raise-to 額 |
+| `3x` | 直前 wager の倍率。1 より大きいこと。`2x` が最小 legal raise |
+| `a` | 最大 target(残 stack 全部) |
+| `e` | 残り street 数で all-in へ到達する等比 size(flop なら 3、river なら 1) |
+| `3e` | 3 street で all-in へ到達 |
+| `min` | 最小 legal bet / raise |
+| `80%effective` | effective stack に対する比率 |
+| `60%stack` | actor の最大 target に対する比率 |
 
 `min` / `%effective` / `%stack` は Pio に対応する綴りが無いので明示形のままである。
 
-旧綴りの `"allin"`、`"50%pot"`、`"geometric(allin,2)"`、
-`"geometric(allin,streets=2)"` も入力としては受理し、effective config では
-上表の正規形へ正規化する。
+旧綴りの `allin`、`50%pot`、`geometric(allin,2)`、`geometric(allin,streets=2)` も
+入力としては受理する。ただし `geometric(...)` は括弧とカンマを含むので script の
+size list では書けない。`3e` を使う。
 
 **裸の数値は百分率である。** `33` は 33%pot であって 3300%pot ではない。
 1 未満の裸の数値は、旧綴りの pot 比(`0.33` が 3 分の 1 を意味した)である
 可能性が高いので `SLV004` で拒否し、書くべき値を名指しする。本当に 1% 未満の
 size が要るときは `"0.33%pot"` と明示する。
 
-値はすべて有限かつ正。解決順序は次で固定する。
+値はすべて有限かつ正。解決順序は次章で固定する。
+
+### 解決順序
+
+各 decision node で action list が決まるまで。
+
+1. 合法な非攻撃 action(`fold` / `check` / `call`)を作る
+2. `include_allin = true` なら all-in 候補を足す
+3. その street の rule をソース順に適用する。各 rule の size list は下の手順で解決する
+4. 各 rule の後に整列して dedup する
+5. 候補が空になったら 1 へ戻す
+
+1 つの size literal から chip target が決まるまで。
 
 1. literal を street 内の wager(その street での拠出額)基準の raise-to target へ解決する
 2. `min_bet` と直前増分から決まる最小合法 target を下回るものは最小合法 target へ引き上げる
 3. actor の最大 target(all-in)で上限を切る
 4. `allin_threshold` があり `target >= allin_threshold * 最大 target` なら all-in へ併合する
-5. `include_allin = true` なら all-in を追加する
-6. 同一 chip target を 1 つへ dedup し、直前 wager 以下の target を捨てる
+5. 同一 chip target を 1 つへ dedup し、直前 wager 以下の target を捨てる
 
-### raise level
+`max_aggressive_actions` に達したノード、および残 stack が call 額以下のノードでは、
+どんな rule を書いても候補は空になる。構造的上限は script から破れない。
 
-`oop_raise` / `ip_raise` は size list、または raise level ごとの list の list を書ける。
-level 0 がその street の最初の raise で、指定より深い level は最後の要素を再利用する。
+### error
 
-省略した場合は自分の bet menu(`oop_bet` / `ip_bet`)を 1 level として再利用する。
-bet size だけを書いた config が同じ size で raise するという、size literal 導入前からの
-挙動である。raise を禁止したい場合は `[]` を明示する。
+| 状況 | code |
+|---|---|
+| `[game.tree]` に未知の key、`source` と `script` の同時指定 | `SLV002` |
+| 廃止した `[game.tree.<street>]` とその menu key | `SLV002` |
+| script の構文エラー(`{` `}` の不一致、`else` が `if` に対応しない、body が空) | `SLV004` |
+| 未知の street / effect / action、1 つの street list 内での重複 | `SLV004` |
+| `checkdown` に `action` / `sizes` を書いた | `SLV004` |
+| `when` の構文エラー、未知の識別子、型不一致 | `SLV004` |
+| size literal の解析失敗、値域外 | `SLV004` |
+| `param` の値が複数 token、`[game.tree.params]` に未宣言の key | `SLV004` |
+| 予約名と衝突する `param` / `define` | `SLV004` |
+| `kind = "script"` で `source` が読めない | `SLV004` |
 
-```toml
-[game.tree.flop]
-ip_raise = [["3x"], ["2.5x"], ["a"]]       # 3bet 以降を level ごとに変える
-```
-
-### donk
-
-`oop_donk` は「直前 street の最終 aggressor が IP だった street で、OOP が先に
-bet する」局面の menu である。省略時は `oop_bet` を使い、`[]` を書くと donk を
-禁止できる。subgame の開始 street には tree 内に直前 street が無いので常に
-`oop_bet` を使う。直前 street が check-check で終わった場合も `oop_bet` である。
+script は正規化時に parse して条件をコンパイルする。壊れた script が effective
+config を素通りして solve 時に落ちることはない。script 由来の error は script 本文の
+行番号を持つ。
 
 ## `[game]` — `solvers.preflop-hu/v1`
 
@@ -353,6 +634,12 @@ bet と raise を同じ `r` で表すのは、両者が「到達額を宣言す�
 | `[game.bets]` | `[game.tree]` | `SLV002` |
 | `[game.bets.*] oop` / `ip` | `oop_bet` / `ip_bet` | `SLV002` |
 | `[game.bets.*] max_raises` | `max_aggressive_actions` | `SLV002` |
+| `[game.tree.<street>]` | `[game.tree]` の script | `SLV002` |
+| `[game.tree.*] oop_bet` / `ip_bet` | script の `replace bet [...]` | `SLV002` |
+| `[game.tree.*] oop_raise` / `ip_raise` | script の `replace raise [...]`(level は `aggressions` で指定) | `SLV002` |
+| `[game.tree.*] oop_donk` | script の `when donk { ... }` | `SLV002` |
+| `[game.tree.*] max_aggressive_actions` | `[game.tree.max_aggressive_actions]` table | `SLV002` |
+| `[game.tree.*] include_allin` / `allin_threshold` | `[game.tree]` 直下(全 street 共通) | `SLV002` |
 
 どれも黙って読み替えず、置換先を名指しする error にする。
 
@@ -477,13 +764,20 @@ CSV では配列列(`actions` / `probabilities`)を `|` で連結する。
 ### `report` の CSV
 
 ```
-board,iterations,wall_s,nash_conv,ev_oop,ev_ip,oop_equity,freq_check,freq_bet_5
-2c 7d 9h Js Qs,200,0.0719,0.00245,6.75310,3.24690,0.624368,0.427459,0.572541
+board,iterations,wall_s,nash_conv,ev_oop,ev_ip,oop_equity,freq_check,freq_bet_5,freq_bet_10
+2c 7d 9h Js Qs,200,0.0719,0.00245,6.75310,3.24690,0.624368,0.427459,0.572541,
+2c 7d 9h Js Jd,200,0.0682,0.00135,6.73813,3.26187,0.593463,0.430183,,0.569817
 ```
 
-先頭 7 列は固定で、`freq_*` は root node の action label から作られる。したがって
-列数と列名は tree の形に依存し、ボードごとに root の action 集合が変わる config
-では列が揃わない。`oop_equity` は OOP の root range 加重 equity である。
+先頭 7 列は固定で、`freq_*` は **全ボードの root action label の和集合**から作られる。
+tree script の board 述語(`when paired { ... }`)はボードごとに root の action 集合を
+変えてよく、複数ボードを掃く `report` はまさにその config を扱うコマンドだからである。
+列の並びはボードを `--boards` / `--boards-file` に与えた順で初出したラベルを先着順に
+並べたもので、決定的かつ再現可能である(アルファベット順などボード集合と無関係な基準
+は取らない)。あるボードの root action 集合にそのラベルが無ければ、そのセルは
+**空文字であって `0` ではない**。「そのボードにその action が無かった」ことと
+「action はあったが選ばれなかった(頻度 0)」ことは別の事実であり、列を平均する読み手が
+両者を区別できなければならない。`oop_equity` は OOP の root range 加重 equity である。
 
 ### `solution.sol`
 
@@ -567,13 +861,15 @@ solvers resume runs/my-run
 | **プレイヤーは 2 人固定** | 3 人以上は Multiway Preflop の別契約 | exact vector engine は 2 人零和を前提にしている |
 | **stack は左右対称** | `effective_stack` は 1 つだけ。非対称 stack は書けない | 非対称にすると side pot が要る。HU subgame では effective stack を超える部分は死に金なので、多くの spot はこれで表現できる |
 | **開始 pot の内訳は書けない** | `pot` は合計額のみ | 内訳は木にも戦略にも報告 EV にも影響しない(「EV の基準」章) |
-| **tree frontend は `standard` のみ** | `kind` に他の値を書くと `SLV004` | Multiway の `script`(`.mwtree`)と `[[game.tree.rules]]` 条件ルールに相当するものは未実装 |
-| **donk は OOP のみ** | `oop_donk` だけがある | IP の probe は「相手が check した後の bet」で、`ip_bet` がそのまま担う |
+| **ハンド固有の条件は書けない** | 条件変数にハンドを読むものが無い | vector CFR は木を 1 本だけ作り、1,326 combo 全部が同じ木を共有して reach ベクトルを流す。ハンドで木を変えるのは public tree ではない。それを表現するのは木ではなく戦略である |
+| **suit を名指しする盤面述語は入れない** | そのような変数が無い | `iso_merging` の商が壊れる(「盤面述語」章) |
+| **script は `history` を読めない** | そのような変数が無い | `track_node_info = false` では履歴が空で、メモリ preflight では常に空。木が debug フラグに依存してしまう |
+| **`allin_threshold` は street ごとに変えられない** | `[game.tree]` 直下の 1 つだけ | size 解決時の規則であって action list の編集ではないので、rule では表現できない。street ごとに変えたい場合は script で明示 size を書く |
 | **`[run]` table は必須** | 中の key は全て省略できるが table は書く | 予算について config が一言も述べない状態を作らないため |
 | **`--threads` / `--memory` / `--max-time` は使えない** | 渡すと error | Multiway 専用 override。heads-up は `[run] threads` / `[run] max_time` を config に書く |
 | **`solve --history` は使えない** | 渡すと error | `strategy.json` を書かないため。ノードは `export --node` で読む |
 | **`evaluate` は非対応** | `.mwsol` 専用 | sampling 解に trained deviation をぶつけて再評価するもので、exact engine に対応する概念が無い。相当するのは exploitability で、`summary` view と `.sol` の meta にある |
-| **`report` の CSV 列は root 固定** | 列は root の action label から作る | 任意 node のレポートは `export` が出す。ボードごとに root の action 集合が変わる config では `report` の列が揃わない |
+| **`report` は root node 限定** | 列は全ボードの root action label の**和集合**。ボードごとに集合が変わっても列は揃う(無い action は空セル) | 任意 node のレポートは `export` が出す。root だけなら 1 回の解でボード横断の比較ができる |
 | **`no-rivers` は river の値を持たない** | river ノードを指す `export` は明示エラー | 既定の `full` なら全ノードが揃う。`no-rivers` は巨大ツリー向けの容量オプトイン |
 | **iso 併合の member remap は保留** | `inspect` は代表カードに `*` を付けて示す | 併合自体は厳密な商であり、戦略と EV は非併合 tree と一致する。表示のみの制限 |
 | **`.sol` は u16 量子化** | `storage` は情報用 | `f32` で解いた run でも artifact は u16 |
@@ -589,7 +885,8 @@ solvers resume runs/my-run
 | 絶対 size 単位 | chip(`"20c"`) | BB(`"2.5bb"`) |
 | size literal 文法 | 共通(PioSOLVER 準拠) | 共通 |
 | rake / ICM モデル | 共通実装を流用 | 同じ実装 |
-| tree frontend | `standard` のみ | `standard` + `script` + 条件ルール |
+| tree frontend | `script`(`.tree`) | `script`(`.mwtree`)+ `standard` の rule 配列 |
+| script の正規化 | 本文をインライン化 | rule 列へ展開 |
 | 停止判定 | `iterations` / `max_time` / `target_nash_conv` | sweep 予算 + trained deviator 評価 |
 | artifact の値 | 戦略 + per-hand 値(`i16`) | 戦略のみ(`u16` / `f32`) |
 
@@ -601,9 +898,13 @@ TOML surface、型、既定値、条件付き validation、単位のいずれか
 1. この規範仕様(入力・出力・制約)と、CLI を変えるなら
    [cli-reference.jp.md](cli-reference.jp.md)
 2. `crates/cli/src/solver_config_v1.rs` の parser と test
-3. `examples/` の該当 config と `crates/cli/src/config_new.rs` の template
-4. `docs/user-guide.jp.md` の利用者向け説明
-5. CLI help 文字列
+3. tree script の文法・条件変数・盤面述語を変えるなら `crates/cards/src/script/`
+   (parser と平坦化)、`crates/cards/src/board.rs`(盤面述語)、
+   `crates/holdem/src/postflop.rs`(rule 適用)
+4. `examples/` の該当 config と `examples/trees/` の script、
+   `crates/cli/src/config_new.rs` の template
+5. `docs/user-guide.jp.md` の利用者向け説明
+6. CLI help 文字列
 
 出力契約(`strategy.json`、`report` の CSV、`.sol`、run directory)を変える場合は
 `crates/formats` と `crates/cli/src/{solve,sol,report}.rs` も同じ change set に含める。

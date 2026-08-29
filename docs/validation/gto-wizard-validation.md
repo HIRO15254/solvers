@@ -34,7 +34,7 @@ GW を「独立した外部オラクル」として使い、Mode A(exact postflo
 
 | 項目 | 内容 |
 |---|---|
-| 対象 | **postflop のみ**(`kind = "postflop"`)。preflop(Mode B)は未実装(roadmap M6)なので対象外。 |
+| 対象 | **postflop のみ**(`schema = "solvers.postflop/v1"`)。preflop(Mode B)は未実装(roadmap M6)なので対象外。 |
 | GW プラン | **プリセット閲覧のみ**を前提(カスタムソルブ機能は使わない)。 |
 | 比較対象 | アクション頻度 / エクイティ / EV(この 3 つ。優先度は §6 参照)。 |
 | 前提物 | ① `cargo build --release -p cli` 済み(`target/release/solvers`)。② GW サブスクリプション。③ Claude for Chrome。 |
@@ -82,8 +82,8 @@ GW を「独立した外部オラクル」として使い、Mode A(exact postflo
 | IP のフロップ入場レンジ(重み付き) | `game.ip_range` | 同上。 |
 | 開始ポット | `game.pot` | 整数チップ。**単位規約は §4.1**。 |
 | 実効スタック(behind) | `game.effective_stack` | 整数チップ。pot と**同じ単位**で。 |
-| 各ストリートのベット/レイズサイズ(%ポット) | `game.tree.{flop,turn,river}.{oop_bet,ip_bet}` | **%→size literal**(75% → `"75%pot"`、裸の `0.75` も同義)。意味論は §4.3。 |
-| レイズ上限(1 ストリートあたりのベット+レイズ回数) | `game.tree.{street}.max_aggressive_actions` | GW のツリー深さに合わせる。既定 2。 |
+| 各ストリートのベット/レイズサイズ(%ポット) | `[game.tree] script` の `replace bet` / `replace raise` | **%をそのまま裸 token で**書く(75% → `75`)。1 未満の裸の数値は error になる。意味論は §4.3。 |
+| レイズ上限(1 ストリートあたりのベット+レイズ回数) | `[game.tree.max_aggressive_actions]` table | GW のツリー深さに合わせる。既定 2。 |
 | レーキ(キャッシュ) | `[rake]` | §4.4。ChipEV スポットなら省略(=NoRake)。 |
 | ICM(MTT) | `[utility]` | §4.4。通常は ChipEV スポットを選ぶ(ICM は当面対象外推奨)。 |
 
@@ -172,9 +172,9 @@ stack_bb: __
 pot_flop_bb: __
 board: __ __ __
 bet_tree:
-  flop:  oop_bet=[__%] ip_bet=[__%] max_aggressive_actions=__(不明なら N/A)
-  turn:  oop_bet=[__%] ip_bet=[__%] max_aggressive_actions=__
-  river: oop_bet=[__%] ip_bet=[__%] max_aggressive_actions=__
+  flop:  oop bet=[__%] ip bet=[__%] max_aggressive_actions=__(不明なら N/A)
+  turn:  oop bet=[__%] ip bet=[__%] max_aggressive_actions=__
+  river: oop bet=[__%] ip bet=[__%] max_aggressive_actions=__
 oop_range: <ハンド:重み のカンマ区切り、またはコピーしたレンジ文字列>
 ip_range:  <同上>
 compare_node: flop OOP first action (root)
@@ -346,15 +346,20 @@ pot_after_call = 現ポット + コール額(outstanding)
   **転記前に必ずこの検算をする**(GW 表示 % は丸めなので、config には表示 % ではなく
   bb 額から逆算した値を使う。例: `2/5.5 = 36.363636`)。
 - **bet / raise のサイズ分離(2026-07-09 追加)**: GW はベットとレイズで異なるサイズ集合を使う
-  (実測例: リバーのベット 36/73/155% に対し、レイズは 53/84/126%)。config は
-  `oop_raise` / `ip_raise` でレイズ専用サイズを指定できる(省略時は `oop`/`ip` に
-  フォールバック = 従来挙動):
+  (実測例: リバーのベット 36/73/155% に対し、レイズは 53/84/126%)。script は
+  `bet`(未対面)と `raise`(対面)を別の action 種別として書き分けられる:
   ```toml
-  [game.tree.river]
-  oop_bet = [0.364, 0.727, 1.545, 17.727]          # ベット(未対面)
-  ip  = [0.364, 0.727, 1.545, 17.727]
-  oop_raise = [0.526, 0.842, 1.263, 17.727]     # レイズ(対面)← GW の実サイズを検算して転記
-  ip_raise  = [0.526, 0.842, 1.263, 17.727]
+  [game.tree]
+  kind = "script"
+  script = '''
+  river {
+    replace bet   [36.363636, 72.727273, 154.545455, 1772.727273]
+    replace raise [52.631579, 84.210526, 126.315789, 1772.727273]
+  }
+  '''
+
+  [game.tree.max_aggressive_actions]
+  river = 3
   ```
 - **⚠️ それでも残る制約(実測 2026-07-09)**: GW は**レイズメニューも対面ベットサイズごと・
   ノードごとに変える**ため、リスト 1 本では最頻の対面(最小ベット)しか厳密化できない。
@@ -423,28 +428,28 @@ threads = 6
 
 ```toml
 # gw-check-<日付>-<スポット名>.toml
+schema = "solvers.postflop/v1"
+
 [game]
-kind = "postflop"
 board = "Qs Jh 2h"
 oop_range = "TT,99,AQs,AQo:0.5,A5s,KQs"   # ← GW の入場レンジを転記
 ip_range  = "JJ,TT,AQs,KQs,QJs,JTs,AQo"    # ← GW の入場レンジを転記
 pot = 550                                   # 5.5bb, 1bb=100chips
 effective_stack = 10000                     # 100bb
 
-[game.tree.flop]
-oop_bet = [0.75]   # ← GW のフロップサイズ(%→分数)
-ip  = [0.75]
-max_aggressive_actions = 2
+[game.tree]
+kind = "script"
+script = '''
+flop, turn, river {
+  replace bet   [75]     # ← GW のサイズをそのまま %(裸 token)で
+  replace raise [75]
+}
+'''
 
-[game.tree.turn]
-oop_bet = [0.75]
-ip  = [0.75]
-max_aggressive_actions = 1
-
-[game.tree.river]
-oop_bet = [0.75]
-ip  = [0.75]
-max_aggressive_actions = 1
+[game.tree.max_aggressive_actions]
+flop = 2
+turn = 1
+river = 1
 
 [algorithm]
 schedule = "dcfr"

@@ -387,6 +387,7 @@ pub(crate) fn load_sol(
         effective_stack,
         iso_merging,
         min_bet,
+        preflop_aggressor,
         tree,
     } = config.game
     else {
@@ -401,7 +402,8 @@ pub(crate) fn load_sol(
         effective_stack,
         iso_merging,
         min_bet,
-        tree.lower(),
+        tree.lower()?,
+        &preflop_aggressor,
     )?;
     let board_cards = pf_config.board.clone();
     let rake = crate::economics::build_rake(&config.rake)?;
@@ -769,15 +771,16 @@ ip_range = "33,66"
 pot = 2
 effective_stack = 20
 
-[game.tree.turn]
-oop_bet = [75]
-ip_bet = [75]
-max_aggressive_actions = 1
+[game.tree]
+kind = "script"
+script = '''
+turn { replace bet [75] }
+river { replace bet [100] }
+'''
 
-[game.tree.river]
-oop_bet = [100]
-ip_bet = [100]
-max_aggressive_actions = 1
+[game.tree.max_aggressive_actions]
+turn = 1
+river = 1
 
 [run]
 iterations = 32
@@ -798,10 +801,14 @@ ip_range = "33,66"
 pot = 2
 effective_stack = 20
 
-[game.tree.river]
-oop_bet = [100]
-ip_bet = [100]
-max_aggressive_actions = 1
+[game.tree]
+kind = "script"
+script = '''
+river { replace bet [100] }
+'''
+
+[game.tree.max_aggressive_actions]
+river = 1
 
 [run]
 iterations = 16
@@ -842,6 +849,7 @@ check_every = 16
             effective_stack,
             iso_merging,
             min_bet,
+            preflop_aggressor,
             tree,
         } = config.game
         else {
@@ -855,7 +863,8 @@ check_every = 16
             effective_stack,
             iso_merging,
             min_bet,
-            tree.lower(),
+            tree.lower().expect("lower tree script"),
+            &preflop_aggressor,
         )
         .expect("build postflop config");
         let start_street = start_street_from_board_len(pf_config.board.len());

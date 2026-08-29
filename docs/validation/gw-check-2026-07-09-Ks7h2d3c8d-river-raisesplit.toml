@@ -13,12 +13,17 @@ ip_range = "3h3d: 0.02627,3s3d: 0.010166,3s3h: 0.004032,4d4c: 0.03059,4h4c: 0.03
 pot = 550
 effective_stack = 9750
 
-[game.tree.river]
-oop_bet = [36.363636, 72.727273, 154.545455, 1772.727273]
-ip_bet  = [36.363636, 72.727273, 154.545455, 1772.727273]
-oop_raise = [52.631578999999995, 84.210526, 126.315789, 1772.727273]
-ip_raise  = [52.631578999999995, 84.210526, 126.315789, 1772.727273]
-max_aggressive_actions = 3
+[game.tree]
+kind = "script"
+script = '''
+river {
+  replace bet [36.363636, 72.727273, 154.545455, 1772.727273]
+  replace raise [52.631578999999995, 84.210526, 126.315789, 1772.727273]
+}
+'''
+
+[game.tree.max_aggressive_actions]
+river = 3
 
 [rake]
 kind = "percent-cap"

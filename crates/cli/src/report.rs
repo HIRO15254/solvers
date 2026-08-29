@@ -8,6 +8,7 @@
 //! card) boards, which solve in seconds even in a debug build, whereas flop
 //! boards take minutes.
 
+use std::collections::{HashMap, HashSet};
 use std::path::Path;
 use std::time::Instant;
 
@@ -31,40 +32,42 @@ pub fn run(
     let config =
         crate::config::parse_solve_config_at(&raw, config_path).context("parsing config")?;
 
-    let (oop_range, ip_range, pot, effective_stack, iso_merging, min_bet, tree) = match config.game
-    {
-        GameSection::Postflop {
-            board,
-            oop_range,
-            ip_range,
-            pot,
-            effective_stack,
-            iso_merging,
-            min_bet,
-            tree,
-        } => {
-            eprintln!("note: config board {board:?} ignored; using --boards");
-            (
+    let (oop_range, ip_range, pot, effective_stack, iso_merging, min_bet, preflop_aggressor, tree) =
+        match config.game {
+            GameSection::Postflop {
+                board,
                 oop_range,
                 ip_range,
                 pot,
                 effective_stack,
                 iso_merging,
                 min_bet,
+                preflop_aggressor,
                 tree,
-            )
-        }
-        GameSection::Preflop { .. } => {
-            return Err(anyhow!(
-                "report does not support preflop configs yet (kind = \"preflop\")"
-            ));
-        }
-        _ => {
-            return Err(anyhow!(
-                "report only supports schema = \"solvers.postflop/v1\" configs"
-            ));
-        }
-    };
+            } => {
+                eprintln!("note: config board {board:?} ignored; using --boards");
+                (
+                    oop_range,
+                    ip_range,
+                    pot,
+                    effective_stack,
+                    iso_merging,
+                    min_bet,
+                    preflop_aggressor,
+                    tree,
+                )
+            }
+            GameSection::Preflop { .. } => {
+                return Err(anyhow!(
+                    "report does not support preflop configs yet (kind = \"preflop\")"
+                ));
+            }
+            _ => {
+                return Err(anyhow!(
+                    "report only supports schema = \"solvers.postflop/v1\" configs"
+                ));
+            }
+        };
 
     let raw_boards = collect_board_tokens(boards_arg, boards_file)?;
     let boards: Vec<Vec<Card>> = raw_boards
@@ -85,8 +88,23 @@ pub fn run(
     let rake = crate::economics::build_rake(&config.rake)?;
     let utility = crate::economics::build_utility(&config.utility)?;
 
-    let mut header_labels: Option<Vec<String>> = None;
-    let mut csv_rows: Vec<String> = Vec::new();
+    // The header is the union of every board's root action labels, not one
+    // fixed menu: a script's board predicate (`when paired { ... }`) can
+    // legitimately give two boards different root actions, and sweeping
+    // boards is `report`'s whole job. `union_labels` collects that union in
+    // first-seen order -- the order boards were given in `--boards`/
+    // `--boards-file`, which is the user's own input order and therefore
+    // stable and reproducible across runs over the same board list -- rather
+    // than, say, sorting alphabetically, which would scramble a
+    // deliberately-ordered menu like "check, bet 33, bet 75". Each board's
+    // per-label frequencies are kept in a map and only projected onto
+    // `union_labels` once every board has been solved and the union is
+    // final; a board missing a label in the union gets an empty cell there,
+    // not `0` -- "this action did not exist here" and "this action existed
+    // and was never taken" are different facts.
+    let mut union_labels: Vec<String> = Vec::new();
+    let mut seen_labels: HashSet<String> = HashSet::new();
+    let mut board_rows: Vec<(Vec<String>, HashMap<String, String>)> = Vec::new();
 
     for (i, board_cards) in boards.iter().enumerate() {
         let board_str: String = board_cards
@@ -102,7 +120,8 @@ pub fn run(
             effective_stack,
             iso_merging,
             min_bet,
-            tree.lower(),
+            tree.lower()?,
+            &preflop_aggressor,
         )?;
 
         let estimate = holdem::memory_usage(&pf_config);
@@ -170,18 +189,16 @@ pub fn run(
             sref.num_hands as usize,
         );
         let labels = &root_info.actions;
-
-        match &header_labels {
-            None => header_labels = Some(labels.clone()),
-            Some(h) => {
-                if h != labels {
-                    return Err(anyhow!(
-                        "board {board_str:?} produced a different action tree than the first board \
-                         (labels {labels:?} vs {h:?}); all boards must share the same betting structure"
-                    ));
-                }
+        for label in labels {
+            if seen_labels.insert(label.clone()) {
+                union_labels.push(label.clone());
             }
         }
+        let freq_by_label: HashMap<String, String> = labels
+            .iter()
+            .zip(&freqs)
+            .map(|(label, f)| (label.clone(), fmt_sig(*f, 6)))
+            .collect();
 
         // Range-weighted mean of the OOP equity vector: a simple
         // weight-average over combos, not a joint-compatible-weight
@@ -200,7 +217,7 @@ pub fn run(
             0.0
         };
 
-        let mut row = vec![
+        let prefix = vec![
             board_str.clone(),
             solver.iteration().to_string(),
             fmt_sig(elapsed.as_secs_f64(), 6),
@@ -209,13 +226,9 @@ pub fn run(
             fmt_sig(ev_ip, 6),
             fmt_sig(oop_equity, 6),
         ];
-        for f in &freqs {
-            row.push(fmt_sig(*f, 6));
-        }
-        csv_rows.push(row.join(","));
+        board_rows.push((prefix, freq_by_label));
     }
 
-    let labels = header_labels.unwrap_or_default();
     let mut header_fields = vec![
         "board".to_string(),
         "iterations".to_string(),
@@ -225,15 +238,23 @@ pub fn run(
         "ev_ip".to_string(),
         "oop_equity".to_string(),
     ];
-    for label in &labels {
+    for label in &union_labels {
         header_fields.push(format!("freq_{}", label.replace(' ', "_")));
     }
 
     let mut out = String::new();
     out.push_str(&header_fields.join(","));
     out.push('\n');
-    for row in &csv_rows {
-        out.push_str(row);
+    for (prefix, freq_by_label) in &board_rows {
+        let mut row = prefix.clone();
+        // A label absent from this board's own action list -- because a
+        // script's board predicate gave a different menu here than on some
+        // other board -- gets an empty cell, not `0`: this board never had
+        // the action to take, as opposed to having it and never taking it.
+        for label in &union_labels {
+            row.push(freq_by_label.get(label).cloned().unwrap_or_default());
+        }
+        out.push_str(&row.join(","));
         out.push('\n');
     }
 

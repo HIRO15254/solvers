@@ -10,10 +10,14 @@ ip_range = "55-22,QJs,A5s-A2s,KQo,T9s"
 pot = 10
 effective_stack = 50
 
-[game.tree.river]
-oop_bet = [50]
-ip_bet = [50]
-max_aggressive_actions = 2
+[game.tree]
+kind = "script"
+script = '''
+river {
+  replace bet [50]
+  replace raise [50]
+}
+'''
 
 [run]
 iterations = 200

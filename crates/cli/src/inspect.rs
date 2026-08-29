@@ -49,6 +49,7 @@ pub fn run(
         effective_stack,
         iso_merging,
         min_bet,
+        preflop_aggressor,
         tree,
     } = config.game
     else {
@@ -63,7 +64,8 @@ pub fn run(
         effective_stack,
         iso_merging,
         min_bet,
-        tree.lower(),
+        tree.lower()?,
+        &preflop_aggressor,
     )?;
     let board_cards = pf_config.board.clone();
 

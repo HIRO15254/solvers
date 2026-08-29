@@ -16,20 +16,20 @@ ip_range = "2h2c: 1,2s2c: 1,2s2h: 1,3d3c: 1,3h3c: 1,3h3d: 1,3s3c: 1,3s3d: 1,3s3h
 pot = 550
 effective_stack = 9750
 
-[game.tree.flop]
-oop_bet = [33]
-ip_bet  = [33]
-max_aggressive_actions = 1
+[game.tree]
+kind = "script"
+script = '''
+flop, turn { replace bet [33] }
+river {
+  when in_position { replace bet [125] }
+  when !in_position { replace bet [33] }
+}
+'''
 
-[game.tree.turn]
-oop_bet = [33]
-ip_bet  = [33]
-max_aggressive_actions = 1
-
-[game.tree.river]
-oop_bet = [33]
-ip_bet  = [125]
-max_aggressive_actions = 1
+[game.tree.max_aggressive_actions]
+flop = 1
+turn = 1
+river = 1
 
 [algorithm]
 schedule = "dcfr"

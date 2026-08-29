@@ -279,7 +279,7 @@ Multiwayのmeasured deviationは単独seatのtrained deviationに対する推定
 正確に解く。Multiway と違い sampling ではなく 1,326 combo の vector engine なので、
 平均戦略は Nash へ収束する。全 TOML 項目は `docs/solver-config-v1.jp.md` が規範である。
 
-最小構成は board・両者のレンジ・pot・effective stack・street ごとの bet menu である。
+最小構成は board・両者のレンジ・pot・effective stack・そして木を組む tree script である。
 
 ```toml
 schema = "solvers.postflop/v1"
@@ -291,36 +291,59 @@ ip_range = "random"
 pot = 50
 effective_stack = 200
 
-[game.tree.flop]
-oop_bet = [33, 75]
-ip_bet = [50]
-ip_raise = [["3x"], ["a"]]
-max_aggressive_actions = 3
+[game.tree]
+kind = "script"
+script = '''
+flop {
+  if in_position { replace bet [50] }
+  else           { replace bet [33, 75] }
+
+  when in_position {
+    if aggressions == 1 { replace raise [3x] }
+    else                { replace raise [a] }
+  }
+}
+'''
 include_allin = true
+
+[game.tree.max_aggressive_actions]
+flop = 3
 
 [run]
 target_nash_conv = 0.05
 max_time = "30m"
 ```
 
-`[game.tree]` の size literal は PioSOLVER と同じ綴りで、Multiway Preflop とも
-共通である。裸の数値は **pot の百分率**(`33` = 33%pot)、`"20c"` が chip 単位、
-`"3x"` が直前 wager の倍率(`"2x"` が最小 legal raise)、`"a"` がオールイン、
-`"e"` / `"3e"` が等比サイズ(残り street 数 / 3 street)。Pio に対応する綴りが
-無い `"min"`、`"60%stack"`、`"80%effective"` は明示形のままである。
-絶対値だけ単位が違い、Multiway は BB の `"2.5bb"` を使う。
+script は `flop` / `turn` / `river` の block に分かれ、その中で条件によって各ノードの
+action list を書き換える。`when` は入れ子にでき、内側は外側と AND で結合する。
+`if` / `else` は排他分岐で、否定は機械が付ける。script 本文の代わりに
+`source = "trees/srp.tree"` と外部 file を指すこともできる。`validate` と `solve` は
+その本文を config へ**インライン化**するので、`run.toml` と `.sol` は file が無くても
+再現できる。
 
-Pio 系ツールと対応する主な knob:
+size literal は PioSOLVER と同じ綴りで、Multiway Preflop とも共通である。script の
+中では**裸の token で書く**(`[33, 75]`、`["33"]` ではない)。裸の数値は
+**pot の百分率**(`33` = 33%pot)、`20c` が chip 単位、`3x` が直前 wager の倍率
+(`2x` が最小 legal raise)、`a` がオールイン、`e` / `3e` が等比サイズ
+(残り street 数 / 3 street)。Pio に対応する綴りが無い `min`、`60%stack`、
+`80%effective` は明示形のままである。絶対値だけ単位が違い、Multiway は BB の
+`2.5bb` を使う。
 
-| やりたいこと | key |
+Pio 系ツールと対応する主な書き方:
+
+| やりたいこと | 書き方 |
 |---|---|
-| street・player ごとの bet size | `[game.tree.<street>] oop_bet` / `ip_bet` |
-| 3bet / 4bet で size を変える | `oop_raise` / `ip_raise` を level ごとの list of list で書く(省略時は bet menu を再利用、`[]` で raise 禁止) |
-| donk bet を禁止する / 別 size にする | `oop_donk = []` / `oop_donk = [30]` |
-| 常に all-in を候補に入れる | `include_allin = true`(単発なら menu に `"a"`) |
-| 大きい size を all-in へ丸める | `allin_threshold = 0.8` |
-| street ごとの bet+raise 上限 | `max_aggressive_actions` |
+| street・player ごとの bet size | `flop { if in_position { replace bet [50] } else { replace bet [33] } }` |
+| 3bet / 4bet で size を変える | `when aggressions == 1 { replace raise [3x] }` — `aggressions` がそのまま raise level |
+| donk bet を禁止する / 別 size にする | `when donk { remove bet }` / `when donk { replace bet [30] }` |
+| 盤面テクスチャで振り分ける | `when paired { ... }`、`if monotone { ... } else { ... }` |
+| SPR で切り替える | `when spr <= 3 { replace bet [a] }` |
+| 常に all-in を候補に入れる | `[game.tree] include_allin = true`(単発なら size list に `a`) |
+| 大きい size を all-in へ丸める | `[game.tree] allin_threshold = 0.8` |
+| street ごとの bet+raise 上限 | `[game.tree.max_aggressive_actions]` table |
 | 最小 bet 額(big blind 相当) | `[game] min_bet` |
+| c-bet / donk を開始 street で定義する | `[game] preflop_aggressor` |
+| size を後から差し替えられるようにする | script に `param cb = 33` を宣言し、`[game.tree.params]` で上書きする |
 
 レーキとトーナメント ICM も Multiway と同じモデルを共有する。`[rake] kind = "generic"`
 は `when` 条件式・rounding まで同じ実装で、`[utility] kind = "tournament-icm"` は

@@ -260,6 +260,7 @@ fn clairvoyance_config() -> PostflopConfig {
         min_bet: Chips(1),
         iso_merging: false,
         track_node_info: true,
+        preflop_aggressor: None,
     }
 }
 

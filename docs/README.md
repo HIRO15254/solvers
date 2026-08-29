@@ -14,14 +14,6 @@
 | [development.md](development.md) | contributor | test、benchmark、変更手順、未完了roadmap |
 | この文書 | 全員 | 文書構造と正本関係 |
 
-## 設計中の仕様
-
-まだ実装していない機能の設計。正本ではなく、実装した時点で正本へ畳み込んで退役する。
-
-- [postflop-tree-script-v1.jp.md](postflop-tree-script-v1.jp.md) — postflopのbetting treeを
-  `.tree` scriptで書く設計。`[game.tree.<street>]`を置き換え、正規化はインライン化、
-  `param`宣言がGUIの変数スキーマになる
-
 ## 補助資料
 
 - [`validation/`](validation/) — 実測fixture、再現手順、検証結果。仕様ではなく証拠。
