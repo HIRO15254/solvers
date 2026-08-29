@@ -16,10 +16,11 @@
 //! river-only shim in [`crate::river`].
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::ops::Index;
+use std::ops::{Index, IndexMut};
 
 use cards::script::{
-    ActionKind, CmpOp, Condition, Effect, Literal, PreviousAggressor, Rule, RuleContext, Var,
+    ActionKind, CmpOp, Condition, Effect, Literal, PostflopVar, PreviousAggressor, Rule,
+    RuleContext,
 };
 use cards::{
     ALL_CARDS, BoardFacts, Card, CardSet, Chips, HandRank, NUM_COMBOS, PerPlayer, Player, Range,
@@ -40,7 +41,7 @@ use crate::kernel;
 /// A value per postflop street. `Preflop` is out of scope for this crate
 /// (postflop trees start no earlier than the flop) and indexing with it
 /// panics.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct PerStreet<T> {
     pub flop: T,
     pub turn: T,
@@ -59,9 +60,20 @@ impl<T> Index<Street> for PerStreet<T> {
     }
 }
 
+impl<T> IndexMut<Street> for PerStreet<T> {
+    fn index_mut(&mut self, street: Street) -> &mut T {
+        match street {
+            Street::Preflop => unreachable!("postflop trees never index Preflop"),
+            Street::Flop => &mut self.flop,
+            Street::Turn => &mut self.turn,
+            Street::River => &mut self.river,
+        }
+    }
+}
+
 /// One street's betting grammar: the tree-script rules that get replayed at
 /// every decision node on this street (see [`node_actions`]), plus the
-/// structural limits a script cannot express (`docs/postflop-tree-script-v1.jp.md`'s
+/// structural limits a script cannot express (`docs/solver-config-v1.jp.md`'s
 /// 適用モデル chapter: `max_aggressive_actions` is a memory-preflight input,
 /// and `allin_threshold` is a size-resolution rule, not an action-list
 /// add/remove). `rules` used to come only from the five fixed-menu fields
@@ -74,7 +86,7 @@ impl<T> Index<Street> for PerStreet<T> {
 pub struct StreetTree {
     /// This street's tree-script rules, in source order. Source order is
     /// the entire priority model -- there is no priority field.
-    pub rules: Vec<Rule>,
+    pub rules: Vec<Rule<PostflopVar>>,
     /// Maximum bets plus raises on this street (multiway's name for what
     /// this used to call `max_raises`).
     pub max_aggressive_actions: u32,
@@ -102,11 +114,11 @@ impl Default for StreetTree {
 /// here (the translated rules never actually combine two `Const`s), just
 /// keeping every hand-built `Condition` in the same normal form the script
 /// compiler would produce.
-fn and(left: Condition, right: Condition) -> Condition {
+fn and(left: Condition<PostflopVar>, right: Condition<PostflopVar>) -> Condition<PostflopVar> {
     Condition::And(Box::new(left), Box::new(right))
 }
 
-fn not(inner: Condition) -> Condition {
+fn not(inner: Condition<PostflopVar>) -> Condition<PostflopVar> {
     Condition::Not(Box::new(inner))
 }
 
@@ -118,7 +130,11 @@ fn not(inner: Condition) -> Condition {
 /// An empty `levels` yields no rules at all ("never raise"). Used by
 /// [`StreetTree::pot_fractions`], the short constructor for the common
 /// single-level case.
-fn raise_level_rules(street: Street, actor: Condition, levels: &[Vec<SizeSpec>]) -> Vec<Rule> {
+fn raise_level_rules(
+    street: Street,
+    actor: Condition<PostflopVar>,
+    levels: &[Vec<SizeSpec>],
+) -> Vec<Rule<PostflopVar>> {
     let len = levels.len();
     levels
         .iter()
@@ -126,13 +142,13 @@ fn raise_level_rules(street: Street, actor: Condition, levels: &[Vec<SizeSpec>])
         .map(|(i, sizes)| {
             let aggression = if i + 1 < len {
                 Condition::Compare {
-                    var: Var::Aggressions,
+                    var: PostflopVar::Aggressions,
                     op: CmpOp::Eq,
                     value: Literal::Number((i + 1) as f64),
                 }
             } else {
                 Condition::Compare {
-                    var: Var::Aggressions,
+                    var: PostflopVar::Aggressions,
                     op: CmpOp::Ge,
                     value: Literal::Number(len as f64),
                 }
@@ -172,8 +188,8 @@ impl StreetTree {
                 .collect()
         };
         let street = Street::Flop;
-        let not_in_position = not(Condition::Truth(Var::InPosition));
-        let in_position = Condition::Truth(Var::InPosition);
+        let not_in_position = not(Condition::Truth(PostflopVar::InPosition));
+        let in_position = Condition::Truth(PostflopVar::InPosition);
         let oop_sizes = sizes(oop);
         let ip_sizes = sizes(ip);
 
@@ -215,14 +231,14 @@ impl StreetTree {
     /// Collects one street's rules out of a compiled tree script's flat rule
     /// list (`cards::script::Script::rules`), preserving source order --
     /// source order is the script's entire priority model (see
-    /// `docs/postflop-tree-script-v1.jp.md`'s 平坦化の規則 chapter), so this
+    /// `docs/solver-config-v1.jp.md`'s script の構造 chapter), so this
     /// must not reorder or resort what it filters. `rules` is the *whole*
     /// script's rule list (every street's statements interleaved in source
     /// order); this keeps only the ones tagged for `street`, exactly as
     /// `node_actions` expects to run them.
     pub fn from_script(
         street: Street,
-        rules: &[Rule],
+        rules: &[Rule<PostflopVar>],
         max_aggressive_actions: u32,
         include_allin: bool,
         allin_threshold: Option<f64>,
@@ -360,6 +376,12 @@ impl Default for PostflopNodeInfo {
 pub struct PostflopGame {
     pub game: CompiledGame<PostflopEvaluator>,
     pub node_info: Vec<PostflopNodeInfo>,
+    /// Which tree-script rules' conditions were ever true during this
+    /// build -- see [`RuleHits`]. A caller (the CLI) diffs this against
+    /// `config.streets` to name every rule that matched nothing and warn
+    /// about it; `memory_usage`'s dry run reports the identical set for the
+    /// same config (see that function's doc comment).
+    pub rule_hits: RuleHits,
 }
 
 impl PostflopGame {
@@ -474,7 +496,7 @@ struct LineState {
     /// The last player to bet or raise on the PREVIOUS street; `None` when
     /// that street checked through, or when this is the subgame's first
     /// street. Read by the tree-script `donk` variable via `rule_context` --
-    /// see `docs/postflop-tree-script-v1.jp.md`'s 適用モデル chapter.
+    /// see `docs/solver-config-v1.jp.md`'s 文 — action list の書き換え chapter.
     previous_aggressor: Option<Player>,
     /// The last player to bet or raise on THIS street so far; `None` until
     /// someone does. Carried forward into the next street's
@@ -715,7 +737,7 @@ fn action_sort_key(action: NodeAction) -> (u8, u32) {
 }
 
 /// This node's `RuleContext`, filled in from `state`/`config` per
-/// `docs/postflop-tree-script-v1.jp.md`'s variable table. `actor` is
+/// `docs/solver-config-v1.jp.md`'s condition variable table. `actor` is
 /// `state.to_act`: `in_position` and `previous_aggressor` are both read
 /// relative to whoever is on the move at this node, not either player fixed.
 fn rule_context(state: &LineState, config: &PostflopConfig) -> RuleContext {
@@ -741,16 +763,56 @@ fn rule_context(state: &LineState, config: &PostflopConfig) -> RuleContext {
     }
 }
 
+/// Whether each tree-script rule's *condition* ever evaluated true at some
+/// decision node during a build walk (`node_actions`) -- one `bool` per
+/// rule, indexed by that rule's position within its own street's
+/// `StreetTree::rules` (i.e. `StreetTree::from_script`'s per-street filter
+/// order), not by position in the whole script's flat rule list. This is
+/// the empirical answer to "did any node satisfy this rule?" --
+/// deliberately *not* "did the rule change the action list", since a rule
+/// whose condition is true but whose `action` names the wager kind the node
+/// doesn't have (see `node_actions`'s inert-rule branch) still had its
+/// guard checked and is not what a script author needs warned about; only
+/// a condition that is never true anywhere is the silent-authoring mistake
+/// `docs/solver-config-v1.jp.md`'s `[game.tree]` chapter's dead-rule
+/// warning exists for.
+///
+/// A `Vec<bool>` per street, not a `HashMap`: `node_actions` runs at every
+/// decision node of trees with hundreds of thousands of nodes, so recording
+/// a hit must be a plain indexed write, not a hashed insert.
+pub type RuleHits = PerStreet<Vec<bool>>;
+
+/// A fresh, all-`false` [`RuleHits`] sized to `config`'s three
+/// `StreetTree::rules` lists -- the shape both [`Builder`] and [`Counting`]
+/// start their walk from, so they can never disagree about how many rules
+/// exist per street.
+fn rule_hits_for(config: &PostflopConfig) -> RuleHits {
+    PerStreet {
+        flop: vec![false; config.streets.flop.rules.len()],
+        turn: vec![false; config.streets.turn.rules.len()],
+        river: vec![false; config.streets.river.rules.len()],
+    }
+}
+
 /// Every legal action at `state`: the base non-aggressive action(s), the
 /// `include_allin` default (added before any rule runs, per
-/// `docs/postflop-tree-script-v1.jp.md`'s 適用モデル chapter -- a script can
+/// `docs/solver-config-v1.jp.md`'s 解決順序 chapter -- a script can
 /// then edit it away), then this street's tree-script rules applied in
 /// source order. A rule whose `action` doesn't match the node's own wager
 /// kind (`Bet` with no outstanding bet, `Raise` facing one) is inert and
 /// skipped entirely. Shared between the real builder and the memory-usage
 /// dry run so the two can never disagree about a node's action count or
 /// order.
-fn node_actions(state: &LineState, config: &PostflopConfig) -> Vec<NodeAction> {
+///
+/// `hits` records, per rule, whether its condition was ever seen true (see
+/// [`RuleHits`]) -- threaded in as an accumulator rather than returned, so
+/// this function's return type (and therefore both call sites) stays
+/// exactly as it was before the dead-rule diagnostic existed.
+fn node_actions(
+    state: &LineState,
+    config: &PostflopConfig,
+    hits: &mut RuleHits,
+) -> Vec<NodeAction> {
     let street = &config.streets[state.street];
     let mut actions = base_actions(state);
 
@@ -769,10 +831,11 @@ fn node_actions(state: &LineState, config: &PostflopConfig) -> Vec<NodeAction> {
         ActionKind::Raise
     };
 
-    for rule in &street.rules {
+    for (index, rule) in street.rules.iter().enumerate() {
         if !rule.condition.eval(&ctx) {
             continue;
         }
+        hits[state.street][index] = true;
         if rule.effect == Effect::Checkdown {
             actions.retain(|a| matches!(a, NodeAction::Check));
         } else if rule.action == Some(node_kind) {
@@ -893,6 +956,9 @@ struct Builder<'a> {
     transitions: Vec<SparseTransition>,
     transition_ids: BTreeMap<(Vec<Card>, Vec<Card>), u32>,
     node_info: Vec<PostflopNodeInfo>,
+    /// Accumulated by every [`node_actions`] call this walk makes -- see
+    /// [`RuleHits`].
+    hits: RuleHits,
 }
 
 /// Builds a postflop subgame through the payoff pipeline.
@@ -928,6 +994,7 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
             street: start_street,
             ..PostflopNodeInfo::default()
         }],
+        hits: rule_hits_for(config),
     };
     let root = builder.betting(LineState {
         street: start_street,
@@ -981,6 +1048,7 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         masks,
         transitions,
         node_info,
+        hits,
         ..
     } = builder;
 
@@ -1023,6 +1091,7 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
             zero_sum,
         },
         node_info,
+        rule_hits: hits,
     }
 }
 
@@ -1054,7 +1123,7 @@ impl Builder<'_> {
         let actor = state.to_act;
         let mut actions: Vec<(String, TempNode)> = Vec::new();
 
-        for action in node_actions(&state, self.config) {
+        for action in node_actions(&state, self.config, &mut self.hits) {
             // A wager's label and history token both name `to`, the
             // actor's new cumulative contribution. Recomputing it inside
             // each closure keeps both of them lazy: with
@@ -1343,7 +1412,12 @@ impl Builder<'_> {
 
 /// Storage/node/terminal/rank-table footprint of a [`PostflopConfig`],
 /// without actually building the tree.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+///
+/// No longer `Copy` once [`RuleHits`] joined the struct (a `Vec<bool>` per
+/// street isn't); every caller already used this by move or by field access,
+/// never relying on implicit duplication, so dropping `Copy` is not a
+/// breaking change in practice.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MemoryEstimate {
     /// Bytes for an `F32Storage` backend (two `f32` arenas).
     pub f32_bytes: u64,
@@ -1353,6 +1427,13 @@ pub struct MemoryEstimate {
     pub nodes: u64,
     pub terminals: u64,
     pub rank_tables: u64,
+    /// Which tree-script rules' conditions were ever true during this dry
+    /// run -- see [`RuleHits`]. Reports the identical set
+    /// [`build_postflop_game`] would for the same config (`Counting` and
+    /// `Builder` share `node_actions`), which is what lets the CLI print
+    /// the dead-rule warning from the cheap preflight, before committing to
+    /// a possibly very large real build.
+    pub rule_hits: RuleHits,
 }
 
 /// Dry-run of [`build_postflop_game`]'s recursion that counts storage
@@ -1377,6 +1458,7 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
         terminals: 0,
         action_nodes: 0,
         rank_table_keys: BTreeSet::new(),
+        hits: rule_hits_for(config),
     };
     counting.betting(LineState {
         street: start_street,
@@ -1401,6 +1483,7 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
         nodes: counting.nodes,
         terminals: counting.terminals,
         rank_tables: counting.rank_table_keys.len() as u64,
+        rule_hits: counting.hits,
     }
 }
 
@@ -1415,6 +1498,9 @@ struct Counting<'a> {
     terminals: u64,
     action_nodes: u64,
     rank_table_keys: BTreeSet<[Card; 5]>,
+    /// Accumulated by every [`node_actions`] call this dry run makes -- see
+    /// [`RuleHits`].
+    hits: RuleHits,
 }
 
 impl Counting<'_> {
@@ -1422,7 +1508,7 @@ impl Counting<'_> {
         self.nodes += 1;
         self.action_nodes += 1;
 
-        let actions = node_actions(&state, self.config);
+        let actions = node_actions(&state, self.config, &mut self.hits);
         let num_actions = actions.len() as u64;
         for action in actions {
             match child_step(&state, action) {

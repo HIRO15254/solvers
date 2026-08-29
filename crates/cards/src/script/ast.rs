@@ -7,19 +7,17 @@
 //! place: `Rule`, `Script`, and friends are read here without wading
 //! through tokenizing or substitution.
 
-use super::cond::Condition;
+pub use super::cond::ActionKind;
+use super::cond::{Condition, Vars};
 use crate::{SizeSpec, Street};
 
-/// Which kind of aggressive action a rule's `add` / `remove` / `replace` /
-/// `force` names.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum ActionKind {
-    Bet,
-    Raise,
-}
-
 /// How a rule changes the action list already built for a node.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+/// `Serialize`/`Deserialize` are here for the same reason as on
+/// [`ActionKind`]: `multiway::config::RuleEffect` is a type alias for this
+/// enum, so its typed `[[..rules]]` TOML surface needs no second copy of the
+/// same five spellings.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "kebab-case")]
 pub enum Effect {
     /// Adds the given sizes as candidates.
     Add,
@@ -38,13 +36,13 @@ pub enum Effect {
 
 /// One flattened tree-script rule: applied to the base action list at every
 /// decision node on `street` whose `condition` evaluates true. Rules from
-/// one compiled [`Script`] apply in source order -- see the module's
+/// one compiled [`Script<V>`] apply in source order -- see the module's
 /// "flattening" doc on [`super::lower`] -- so this carries no separate
 /// priority field.
 #[derive(Clone, Debug, PartialEq)]
-pub struct Rule {
+pub struct Rule<V> {
     pub street: Street,
-    pub condition: Condition,
+    pub condition: Condition<V>,
     pub effect: Effect,
     /// `None` only for `Effect::Checkdown`.
     pub action: Option<ActionKind>,
@@ -75,9 +73,9 @@ pub struct ParamSchema {
 /// A compiled tree script: the `param` schema it exposes, and the flat rule
 /// list the tree builder replays at every decision node.
 #[derive(Clone, Debug, PartialEq)]
-pub struct Script {
+pub struct Script<V> {
     pub params: Vec<ParamSchema>,
-    pub rules: Vec<Rule>,
+    pub rules: Vec<Rule<V>>,
 }
 
 // ---- private parse tree, produced by `parse.rs` and consumed by `lower.rs` ----
@@ -86,7 +84,7 @@ pub struct Script {
 /// condition (if any) already parsed and type-checked -- lowering only
 /// needs to combine conditions and assign streets, not parse anything.
 #[derive(Clone, Debug)]
-pub(crate) enum StmtAst {
+pub(crate) enum StmtAst<V: Vars> {
     /// A bare statement: `<effect> <action> [sizes...]` or `checkdown`.
     Action {
         effect: Effect,
@@ -95,13 +93,13 @@ pub(crate) enum StmtAst {
     },
     /// `when <condition> { <body> }`.
     When {
-        condition: Condition,
-        body: Vec<StmtAst>,
+        condition: Condition<V>,
+        body: Vec<StmtAst<V>>,
     },
     /// `if <cond> { } else if <cond> { } else { }`, with `else` optional.
     If {
-        arms: Vec<(Condition, Vec<StmtAst>)>,
-        else_body: Option<Vec<StmtAst>>,
+        arms: Vec<(Condition<V>, Vec<StmtAst<V>>)>,
+        else_body: Option<Vec<StmtAst<V>>>,
     },
 }
 
@@ -109,8 +107,8 @@ pub(crate) enum StmtAst {
 /// list resolved to [`Street`]s and its shorthand `when` (if any) already
 /// parsed.
 #[derive(Clone, Debug)]
-pub(crate) struct StreetBlockAst {
+pub(crate) struct StreetBlockAst<V: Vars> {
     pub streets: Vec<Street>,
-    pub condition: Option<Condition>,
-    pub body: Vec<StmtAst>,
+    pub condition: Option<Condition<V>>,
+    pub body: Vec<StmtAst<V>>,
 }

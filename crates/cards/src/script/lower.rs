@@ -8,10 +8,10 @@
 //! separate priority field (see the spec's "flattening" section).
 
 use super::ast::{Rule, StmtAst, StreetBlockAst};
-use super::cond::{Condition, and_simplify};
+use super::cond::{Condition, Vars, and_simplify};
 
 /// Flattens every street block into one rule list, in source order.
-pub(crate) fn lower(blocks: Vec<StreetBlockAst>) -> Vec<Rule> {
+pub(crate) fn lower<V: Vars>(blocks: Vec<StreetBlockAst<V>>) -> Vec<Rule<V>> {
     let mut rules = Vec::new();
     for block in blocks {
         // A street block with no shorthand `when` starts from `Const(true)`
@@ -24,11 +24,11 @@ pub(crate) fn lower(blocks: Vec<StreetBlockAst>) -> Vec<Rule> {
     rules
 }
 
-fn lower_body(
+fn lower_body<V: Vars>(
     streets: &[crate::Street],
-    enclosing: &Condition,
-    body: &[StmtAst],
-    rules: &mut Vec<Rule>,
+    enclosing: &Condition<V>,
+    body: &[StmtAst<V>],
+    rules: &mut Vec<Rule<V>>,
 ) {
     for stmt in body {
         match stmt {
@@ -80,15 +80,15 @@ fn lower_body(
 #[cfg(test)]
 mod tests {
     use super::super::ast::{ActionKind, Effect};
-    use super::super::cond::{CmpOp, Literal, PreviousAggressor, RuleContext, Var};
+    use super::super::cond::{CmpOp, Literal, PostflopVar, PreviousAggressor, RuleContext};
     use super::*;
     use crate::{BoardFacts, SizeSpec, Street};
 
-    fn truth(var: Var) -> Condition {
+    fn truth(var: PostflopVar) -> Condition<PostflopVar> {
         Condition::Truth(var)
     }
 
-    fn cmp(var: Var, op: CmpOp, value: f64) -> Condition {
+    fn cmp(var: PostflopVar, op: CmpOp, value: f64) -> Condition<PostflopVar> {
         Condition::Compare {
             var,
             op,
@@ -96,7 +96,11 @@ mod tests {
         }
     }
 
-    fn action(effect: Effect, action_kind: ActionKind, sizes: Vec<SizeSpec>) -> StmtAst {
+    fn action(
+        effect: Effect,
+        action_kind: ActionKind,
+        sizes: Vec<SizeSpec>,
+    ) -> StmtAst<PostflopVar> {
         StmtAst::Action {
             effect,
             action: Some(action_kind),
@@ -125,12 +129,12 @@ mod tests {
         let cb75 = SizeSpec::PotAfterCall { fraction: 0.75 };
         let allin = SizeSpec::AllIn;
         let wet = Condition::Or(
-            Box::new(truth(Var::FlushPossible)),
-            Box::new(truth(Var::StraightPossible)),
+            Box::new(truth(PostflopVar::FlushPossible)),
+            Box::new(truth(PostflopVar::StraightPossible)),
         );
         let block = StreetBlockAst {
             streets: vec![Street::Flop],
-            condition: Some(truth(Var::Cbet)),
+            condition: Some(truth(PostflopVar::Cbet)),
             body: vec![
                 action(Effect::Replace, ActionKind::Bet, vec![cb]),
                 StmtAst::When {
@@ -138,7 +142,7 @@ mod tests {
                     body: vec![action(Effect::Replace, ActionKind::Bet, vec![cb, cb75])],
                 },
                 StmtAst::When {
-                    condition: cmp(Var::Spr, CmpOp::Le, 3.0),
+                    condition: cmp(PostflopVar::Spr, CmpOp::Le, 3.0),
                     body: vec![action(Effect::Replace, ActionKind::Raise, vec![allin])],
                 },
             ],
@@ -191,16 +195,16 @@ mod tests {
         let size66 = SizeSpec::PotAfterCall { fraction: 0.66 };
         let size75 = SizeSpec::PotAfterCall { fraction: 0.75 };
         let wet = Condition::Or(
-            Box::new(truth(Var::FlushPossible)),
-            Box::new(truth(Var::StraightPossible)),
+            Box::new(truth(PostflopVar::FlushPossible)),
+            Box::new(truth(PostflopVar::StraightPossible)),
         );
         let block = StreetBlockAst {
             streets: vec![Street::Flop],
-            condition: Some(truth(Var::Cbet)),
+            condition: Some(truth(PostflopVar::Cbet)),
             body: vec![StmtAst::If {
                 arms: vec![
                     (
-                        truth(Var::Paired),
+                        truth(PostflopVar::Paired),
                         vec![action(
                             Effect::Replace,
                             ActionKind::Bet,
@@ -208,7 +212,7 @@ mod tests {
                         )],
                     ),
                     (
-                        truth(Var::Monotone),
+                        truth(PostflopVar::Monotone),
                         vec![action(Effect::Replace, ActionKind::Bet, vec![size33])],
                     ),
                     (
@@ -270,7 +274,7 @@ mod tests {
             condition: None,
             body: vec![StmtAst::If {
                 arms: vec![(
-                    truth(Var::Paired),
+                    truth(PostflopVar::Paired),
                     vec![action(Effect::Remove, ActionKind::Bet, vec![])],
                 )],
                 else_body: None,
@@ -291,7 +295,7 @@ mod tests {
     /// `Condition::Const(true)`, not a chain of vacuous `true && true`.
     #[test]
     fn unconditioned_statement_gets_const_true() {
-        let block = StreetBlockAst {
+        let block: StreetBlockAst<PostflopVar> = StreetBlockAst {
             streets: vec![Street::Turn],
             condition: None,
             body: vec![StmtAst::Action {
@@ -312,11 +316,11 @@ mod tests {
             streets: vec![Street::River],
             condition: None,
             body: vec![StmtAst::When {
-                condition: truth(Var::Unopened),
+                condition: truth(PostflopVar::Unopened),
                 body: vec![StmtAst::When {
-                    condition: cmp(Var::Spr, CmpOp::Le, 2.0),
+                    condition: cmp(PostflopVar::Spr, CmpOp::Le, 2.0),
                     body: vec![StmtAst::When {
-                        condition: truth(Var::Paired),
+                        condition: truth(PostflopVar::Paired),
                         body: vec![action(
                             Effect::Force,
                             ActionKind::Bet,
@@ -349,7 +353,7 @@ mod tests {
     fn same_street_in_two_separate_blocks_lowers_independently() {
         let first = StreetBlockAst {
             streets: vec![Street::Turn],
-            condition: Some(truth(Var::Unopened)),
+            condition: Some(truth(PostflopVar::Unopened)),
             body: vec![action(
                 Effect::Replace,
                 ActionKind::Bet,
@@ -358,7 +362,7 @@ mod tests {
         };
         let second = StreetBlockAst {
             streets: vec![Street::Turn, Street::River],
-            condition: Some(truth(Var::Monotone)),
+            condition: Some(truth(PostflopVar::Monotone)),
             body: vec![StmtAst::Action {
                 effect: Effect::Checkdown,
                 action: None,

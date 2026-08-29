@@ -102,7 +102,7 @@ pub fn run(
             resources,
         );
     }
-    crate::multiway_v1::validate_production_contract(&raw)?;
+    crate::multiway_v1::validate_production_contract_at(&raw, config_path)?;
     let config = parse_solve_config_at(&raw, config_path)?;
     let GameSection::PreflopMultiway(game) = &config.game else {
         unreachable!("v1 routing always lowers to a multiway game")
@@ -117,8 +117,12 @@ pub fn run(
         std::fs::write(path, &effective_toml)
             .with_context(|| format!("writing effective config {}", path.display()))?;
     }
+    // The preflight runs on the *effective* config, not the raw one: it is
+    // measuring the arena the solve will actually need, and only the
+    // effective config has a `[game.tree] source` already inlined, so a
+    // config that names a script file can be preflighted at all.
     let resource_summary = resources
-        .then(|| crate::session::preflight_multiway_config(&raw))
+        .then(|| crate::session::preflight_multiway_config(&effective_toml))
         .transpose()
         .context("running the resource preflight")?
         .map(ResourceSummary::from);

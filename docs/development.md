@@ -38,8 +38,9 @@ checkpoint/solution metadataを同じchange setで更新する。
 
 現時点でpostflopに残る制約は`docs/solver-config-v1.jp.md`「サポート範囲と制約」に
 列挙してある。大きいものは2つ: 非対称スタック不可、`evaluate`非対応。条件ルールは
-`.tree` scriptとして実装済みで、`[game.tree]`章が規範である。Multiwayのscriptを
-同じ文法・同じインライン化正規化へ揃えるのが次の作業。
+`.tree` scriptとして実装済みで、`[game.tree]`章が規範である。Multiwayの`.mwtree`
+scriptも同じ`cards::script`フロントエンド(入れ子、`if`/`else`、`param`/`define`、
+インライン化正規化)へ揃え済み(`docs/multiway-preflop-v1.jp.md`)。
 
 完了済みmilestoneの時系列日誌は現行文書へ追記せず、Git履歴と
 `docs/validation/`の再現可能な証拠から参照する。

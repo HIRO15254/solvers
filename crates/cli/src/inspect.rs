@@ -70,7 +70,8 @@ pub fn run(
     let board_cards = pf_config.board.clone();
 
     let estimate = holdem::memory_usage(&pf_config);
-    postflop_setup::print_memory_estimate(estimate);
+    postflop_setup::print_memory_estimate(&estimate);
+    postflop_setup::warn_unmatched_rules(&pf_config.streets, &estimate.rule_hits);
 
     let rake = crate::economics::build_rake(&config.rake)?;
     let utility = crate::economics::build_utility(&config.utility)?;

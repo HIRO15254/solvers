@@ -106,6 +106,16 @@ pub fn run(
     let mut seen_labels: HashSet<String> = HashSet::new();
     let mut board_rows: Vec<(Vec<String>, HashMap<String, String>)> = Vec::new();
 
+    // A rule's dead-rule warning (see `postflop_setup::warn_unmatched_rules`)
+    // is accumulated OR-wise across every board in the sweep, then reported
+    // once at the end -- not per board, which would be noise for a rule that
+    // legitimately only matches some boards (a paired-board-only rule on a
+    // sweep of unpaired boards, say). `tree_streets` is the same
+    // `PerStreet<StreetTree>` on every board (only the board itself varies
+    // per iteration), so any one board's copy names every rule correctly.
+    let mut rule_hits_acc: Option<holdem::RuleHits> = None;
+    let mut tree_streets: Option<holdem::PerStreet<holdem::StreetTree>> = None;
+
     for (i, board_cards) in boards.iter().enumerate() {
         let board_str: String = board_cards
             .iter()
@@ -124,7 +134,15 @@ pub fn run(
             &preflop_aggressor,
         )?;
 
+        if tree_streets.is_none() {
+            tree_streets = Some(pf_config.streets.clone());
+        }
+
         let estimate = holdem::memory_usage(&pf_config);
+        match rule_hits_acc.as_mut() {
+            Some(acc) => postflop_setup::merge_rule_hits(acc, &estimate.rule_hits),
+            None => rule_hits_acc = Some(estimate.rule_hits.clone()),
+        }
         if i == 0 {
             // Same fields as `postflop_setup::print_memory_estimate`, but
             // routed to stderr: stdout is reserved for the CSV report alone
@@ -227,6 +245,12 @@ pub fn run(
             fmt_sig(oop_equity, 6),
         ];
         board_rows.push((prefix, freq_by_label));
+    }
+
+    // Once, after every board -- see the accumulator's own doc comment
+    // above the loop for why per-board would be noise.
+    if let (Some(streets), Some(rule_hits)) = (&tree_streets, &rule_hits_acc) {
+        postflop_setup::warn_unmatched_rules(streets, rule_hits);
     }
 
     let mut header_fields = vec![

@@ -178,6 +178,25 @@ river の戦略も値も持たないので、その後 river ノードを `expor
 
 `--out` が既に空でない directory を指すと、queued run の adopt でない限り error になる。
 
+postflop config を solve すると、木を組む前に `tree: nodes=... terminals=...
+rank_tables=... storage=... MiB (f32) / ... MiB (i16)` という一行を stdout に出す
+(memory preflight の見積り)。その直後、`[game.tree]` のどのルールも一度も
+node に当たらなかった場合は stderr に warning を出す:
+
+```
+warning: 1 tree-script rule matched no node and had no effect:
+  turn rule 2: replace raise [2.5x]  when aggressions == 0 && aggressions == 1
+```
+
+これは実際に木を組みながら「このルールの条件が一度でも真になったノードが
+あったか」を数えた結果であり、静的な構文チェックではない
+(`docs/solver-config-v1.jp.md`「解決順序」章)。あくまで warning であって
+run を失敗させない — 条件と矛盾しない書き方をしていても、盤面や config の
+組み合わせによっては構造的にそのルールへ到達しないことがあり、それ自体は
+不正ではないため。抑制する flag も無い。`solvers report` は複数盤面を
+sweep するため、盤面ごとではなく sweep 全体を通じて一度も当たらなかった
+ルールだけを、sweep 終了後に一度だけ報告する。
+
 ## `solvers resume`
 
 ```sh

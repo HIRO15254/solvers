@@ -582,7 +582,7 @@ impl BettingState {
         if self.to_act.is_some_and(|actor| {
             betting.rules.iter().any(|rule| {
                 rule.effect == RuleEffect::Checkdown
-                    && crate::tree_rules::matches(rule, self, actor).unwrap_or(false)
+                    && crate::tree_rules::matches(rule, self, actor)
             })
         }) {
             self.pending = SeatMask::EMPTY;
@@ -688,7 +688,7 @@ fn apply_tree_rules(
     let mut rules = config.rules.iter().collect::<Vec<_>>();
     rules.sort_by_key(|rule| (rule.priority, rule.source_order));
     for rule in rules {
-        if !crate::tree_rules::matches(rule, state, actor).map_err(BettingError::TreeRule)? {
+        if !crate::tree_rules::matches(rule, state, actor) {
             continue;
         }
         if rule.effect == RuleEffect::Checkdown {
@@ -1518,15 +1518,15 @@ mod tests {
     #[test]
     fn tree_checkdown_skips_a_matching_street_without_decision_nodes() {
         let (mut state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
-        betting.rules.push(crate::config::TreeRule {
-            priority: 100,
-            source_order: 0,
-            street: crate::config::RuleStreet::Flop,
-            condition: "players >= 3".into(),
-            effect: crate::config::RuleEffect::Checkdown,
-            action: None,
-            sizes: Vec::new(),
-        });
+        betting.rules.push(crate::config::TreeRule::new(
+            100,
+            0,
+            crate::config::RuleStreet::Flop,
+            "players >= 3".into(),
+            crate::config::RuleEffect::Checkdown,
+            None,
+            Vec::new(),
+        ));
         while state.street == Street::Preflop {
             let actions = state.legal_actions(&betting).unwrap();
             let action = actions

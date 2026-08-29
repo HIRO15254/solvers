@@ -5,7 +5,7 @@
 
 use std::time::Instant;
 
-use cards::script::{ActionKind, CmpOp, Condition, Effect, Literal, Rule, Var};
+use cards::script::{ActionKind, CmpOp, Condition, Effect, Literal, PostflopVar, Rule};
 use cards::{
     ALL_CARDS, Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, SizeSpec, Street,
     combo_cards, rank_of,
@@ -63,11 +63,11 @@ impl Default for StreetMenus {
     }
 }
 
-fn and(left: Condition, right: Condition) -> Condition {
+fn and(left: Condition<PostflopVar>, right: Condition<PostflopVar>) -> Condition<PostflopVar> {
     Condition::And(Box::new(left), Box::new(right))
 }
 
-fn not(inner: Condition) -> Condition {
+fn not(inner: Condition<PostflopVar>) -> Condition<PostflopVar> {
     Condition::Not(Box::new(inner))
 }
 
@@ -75,7 +75,11 @@ fn not(inner: Condition) -> Condition {
 /// mirroring `holdem::postflop`'s retired `raise_level_rules`: level `i`
 /// (`0`-based) applies when `i < levels.len() - 1` and `aggressions == i +
 /// 1`, and the last level applies when `aggressions >= levels.len()`.
-fn raise_level_rules(street: Street, actor: Condition, levels: &[Vec<SizeSpec>]) -> Vec<Rule> {
+fn raise_level_rules(
+    street: Street,
+    actor: Condition<PostflopVar>,
+    levels: &[Vec<SizeSpec>],
+) -> Vec<Rule<PostflopVar>> {
     let len = levels.len();
     levels
         .iter()
@@ -83,13 +87,13 @@ fn raise_level_rules(street: Street, actor: Condition, levels: &[Vec<SizeSpec>])
         .map(|(i, sizes)| {
             let aggression = if i + 1 < len {
                 Condition::Compare {
-                    var: Var::Aggressions,
+                    var: PostflopVar::Aggressions,
                     op: CmpOp::Eq,
                     value: Literal::Number((i + 1) as f64),
                 }
             } else {
                 Condition::Compare {
-                    var: Var::Aggressions,
+                    var: PostflopVar::Aggressions,
                     op: CmpOp::Ge,
                     value: Literal::Number(len as f64),
                 }
@@ -111,9 +115,9 @@ fn raise_level_rules(street: Street, actor: Condition, levels: &[Vec<SizeSpec>])
 /// raise levels, then IP's raise levels, all `Effect::Add`. An unset raise
 /// menu reuses that player's own bet menu as a single level.
 fn from_menus(street: Street, menus: StreetMenus) -> StreetTree {
-    let not_in_position = not(Condition::Truth(Var::InPosition));
-    let in_position = Condition::Truth(Var::InPosition);
-    let donk = Condition::Truth(Var::Donk);
+    let not_in_position = not(Condition::Truth(PostflopVar::InPosition));
+    let in_position = Condition::Truth(PostflopVar::InPosition);
+    let donk = Condition::Truth(PostflopVar::Donk);
 
     let mut rules = Vec::new();
 
@@ -816,7 +820,7 @@ fn memory_usage_matches_allocated() {
             Rule {
                 street: Street::River,
                 condition: Condition::Compare {
-                    var: Var::Aggressions,
+                    var: PostflopVar::Aggressions,
                     op: CmpOp::Eq,
                     value: Literal::Number(0.0),
                 },
@@ -829,7 +833,7 @@ fn memory_usage_matches_allocated() {
             Rule {
                 street: Street::River,
                 condition: Condition::Compare {
-                    var: Var::Aggressions,
+                    var: PostflopVar::Aggressions,
                     op: CmpOp::Ge,
                     value: Literal::Number(1.0),
                 },
@@ -2033,7 +2037,7 @@ fn node_info_records_the_pot_contribution_at_each_node() {
     }
 }
 
-// --- Tree-script rule application (docs/postflop-tree-script-v1.jp.md's
+// --- Tree-script rule application (docs/solver-config-v1.jp.md's
 // 適用モデル chapter) -------------------------------------------------------
 
 #[test]
@@ -2347,7 +2351,7 @@ fn tree_script_emptying_a_node_falls_back_to_base_actions() {
             Rule {
                 street: Street::River,
                 condition: Condition::Compare {
-                    var: Var::Aggressions,
+                    var: PostflopVar::Aggressions,
                     op: CmpOp::Ge,
                     value: Literal::Number(1.0),
                 },
@@ -2381,14 +2385,14 @@ fn tree_script_preflop_aggressor_drives_cbet_and_donk() {
         rules: vec![
             Rule {
                 street: Street::River,
-                condition: Condition::Truth(Var::Cbet),
+                condition: Condition::Truth(PostflopVar::Cbet),
                 effect: Effect::Add,
                 action: Some(ActionKind::Bet),
                 sizes: vec![SizeSpec::ToChips { value: 5.0 }],
             },
             Rule {
                 street: Street::River,
-                condition: Condition::Truth(Var::Donk),
+                condition: Condition::Truth(PostflopVar::Donk),
                 effect: Effect::Add,
                 action: Some(ActionKind::Bet),
                 sizes: vec![SizeSpec::ToChips { value: 7.0 }],
@@ -2458,7 +2462,7 @@ fn tree_script_board_predicate_selects_different_menus_on_different_runouts() {
     let turn = StreetTree {
         rules: vec![Rule {
             street: Street::Turn,
-            condition: Condition::Truth(Var::Paired),
+            condition: Condition::Truth(PostflopVar::Paired),
             effect: Effect::Add,
             action: Some(ActionKind::Bet),
             sizes: vec![SizeSpec::ToChips { value: 9.0 }],
@@ -2506,5 +2510,121 @@ fn tree_script_board_predicate_selects_different_menus_on_different_runouts() {
         vec!["check".to_string()],
         "an unpaired runout must not offer the predicate-gated bet: {:?}",
         game.node_info[tag].actions
+    );
+}
+
+/// A tiny multi-street config exercising `PostflopGame::rule_hits` /
+/// `MemoryEstimate::rule_hits`: flop has two rules -- an OOP bet rule
+/// (`!in_position`) that must match the flop's very first decision (P0
+/// always acts first), and a raise rule nested under a contradiction
+/// (`aggressions == 0 && aggressions == 1`) that can never be true -- the
+/// exact "never fires" shape a nested `when` can produce (see
+/// `examples/trees/pio.tree`'s comment on it, and this crate's own
+/// `docs/solver-config-v1.jp.md`). Turn has one rule, `Condition::Const(false)`,
+/// deliberately never true. Single-combo ranges disjoint from the board
+/// keep the build small enough to run without `#[ignore]`.
+fn rule_hits_fixture() -> PostflopConfig {
+    let flop_rules = vec![
+        Rule {
+            street: Street::Flop,
+            condition: not(Condition::Truth(PostflopVar::InPosition)),
+            effect: Effect::Add,
+            action: Some(ActionKind::Bet),
+            sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
+        },
+        Rule {
+            street: Street::Flop,
+            condition: and(
+                Condition::Compare {
+                    var: PostflopVar::Aggressions,
+                    op: CmpOp::Eq,
+                    value: Literal::Number(0.0),
+                },
+                Condition::Compare {
+                    var: PostflopVar::Aggressions,
+                    op: CmpOp::Eq,
+                    value: Literal::Number(1.0),
+                },
+            ),
+            effect: Effect::Add,
+            action: Some(ActionKind::Raise),
+            sizes: vec![SizeSpec::PreviousBetMultiple { factor: 2.0 }],
+        },
+    ];
+    let turn_rules = vec![Rule {
+        street: Street::Turn,
+        condition: Condition::Const(false),
+        effect: Effect::Add,
+        action: Some(ActionKind::Bet),
+        sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
+    }];
+    PostflopConfig {
+        board: parse_cards("2s 7d 9h"),
+        ranges: PerPlayer::new(
+            "AsAh".parse::<Range>().unwrap(),
+            "KdKc".parse::<Range>().unwrap(),
+        ),
+        pot: Chips(4),
+        effective_stack: Chips(40),
+        streets: PerStreet {
+            flop: StreetTree {
+                rules: flop_rules,
+                max_aggressive_actions: 2,
+                include_allin: false,
+                allin_threshold: None,
+            },
+            turn: StreetTree {
+                rules: turn_rules,
+                max_aggressive_actions: 2,
+                include_allin: false,
+                allin_threshold: None,
+            },
+            river: StreetTree::default(),
+        },
+        min_bet: Chips(1),
+        iso_merging: true,
+        track_node_info: true,
+        preflop_aggressor: None,
+    }
+}
+
+/// A rule whose condition is satisfied is recorded as matched; a rule whose
+/// condition is never true is recorded as unmatched; and the two are kept
+/// in separate per-street vectors, so street A's rule 0 and street B's rule
+/// 0 can disagree without colliding (flop rule 0 matches here, turn rule 0
+/// does not -- both are "rule 0" of their own street).
+#[test]
+fn rule_hits_are_tracked_per_rule_and_do_not_collide_across_streets() {
+    let config = rule_hits_fixture();
+    let game = build_postflop_game(&config, chip_ev());
+
+    assert!(
+        game.rule_hits.flop[0],
+        "the OOP bet rule opens the flop's root decision and must be recorded as matched"
+    );
+    assert!(
+        !game.rule_hits.flop[1],
+        "the nested-contradiction raise rule can never be true and must be recorded as unmatched"
+    );
+    assert!(
+        !game.rule_hits.turn[0],
+        "turn rule 0 is `Const(false)` and must never be recorded as matched, \
+         regardless of flop rule 0's own (unrelated) state"
+    );
+}
+
+/// `memory_usage`'s dry run (`Counting`) and the real build (`Builder`)
+/// share `node_actions`, so they must report the exact same `rule_hits` for
+/// the same config -- the property that lets the CLI print its dead-rule
+/// warning off the cheap preflight estimate instead of the real build.
+#[test]
+fn memory_usage_rule_hits_match_the_real_build() {
+    let config = rule_hits_fixture();
+    let estimate = memory_usage(&config);
+    let game = build_postflop_game(&config, chip_ev());
+
+    assert_eq!(
+        estimate.rule_hits, game.rule_hits,
+        "the dry run and the real build must agree on every rule's match state"
     );
 }

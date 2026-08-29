@@ -232,6 +232,160 @@ fn report_csv_header_is_the_union_of_boards_root_actions() {
     assert!(!paired_row[bet10_idx].is_empty());
 }
 
+// --- dead tree-script rule warning ---------------------------------------
+
+/// `examples/river_small.toml` with a third river rule nested under a
+/// contradiction (`aggressions == 0 && aggressions == 1`) -- the exact
+/// "never fires" shape `docs/solver-config-v1.jp.md` warns a nested
+/// `when` can produce (see `examples/trees/pio.tree`'s comment on it).
+const RIVER_WITH_DEAD_RULE_TOML: &str = r#"
+schema = "solvers.postflop/v1"
+
+[game]
+board = "2c 7d 9h Js Qs"
+oop_range = "22+,A2s+,KTo+"
+ip_range = "55-22,QJs,A5s-A2s,KQo,T9s"
+pot = 10
+effective_stack = 50
+
+[game.tree]
+kind = "script"
+script = '''
+river {
+  replace bet [50]
+  replace raise [50]
+  when aggressions == 0 {
+    when aggressions == 1 { replace raise [75] }
+  }
+}
+'''
+
+[run]
+iterations = 200
+check_every = 50
+"#;
+
+/// `solve` must warn on stderr, after the `tree: nodes=...` preflight line,
+/// about a rule whose condition never evaluated true anywhere in the build
+/// -- and name it precisely enough (street, 1-based position within that
+/// street, and the rendered effect/action/sizes/condition) that a reader
+/// can find it in their own script. This is a warning, not a failure: the
+/// run must still solve and exit successfully.
+#[test]
+fn solve_warns_about_a_tree_script_rule_that_matches_nothing() {
+    let dir = temp_dir("dead-rule-solve");
+    let config = dir.join("dead_rule.toml");
+    std::fs::write(&config, RIVER_WITH_DEAD_RULE_TOML).unwrap();
+    let run = dir.join("run");
+
+    let output = run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
+    ]);
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+
+    assert!(
+        stdout.starts_with("tree: nodes="),
+        "stdout should still open with the tree preflight line: {stdout}"
+    );
+    assert!(
+        stderr.contains("warning: 1 tree-script rule matched no node and had no effect:"),
+        "stderr: {stderr}"
+    );
+    assert!(
+        stderr.contains(
+            "river rule 3: replace raise [75]  when aggressions == 0 && aggressions == 1"
+        ),
+        "stderr must name the dead rule's street, position, and rendered body: {stderr}"
+    );
+}
+
+/// A config with no dead rule (`examples/river_small.toml`'s two river
+/// rules are both unconditional, so both always match) must print no
+/// warning at all.
+#[test]
+fn solve_prints_no_warning_when_every_rule_matches() {
+    let dir = temp_dir("no-dead-rule-solve");
+    let config = workspace_root().join("examples/river_small.toml");
+    let run = dir.join("run");
+
+    let output = run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
+    ]);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        !stderr.contains("tree-script rule"),
+        "a config with no dead rule must print no dead-rule warning: {stderr}"
+    );
+}
+
+/// `report` sweeps many boards, and a rule that only matches on some of
+/// them (here: `REPORT_UNION_TOML`'s `when paired` / `when !paired`, each
+/// matching exactly one of the two boards below) is working as intended,
+/// not a bug -- so the per-board coverage must not, by itself, trigger the
+/// warning. Complements `solve_warns_about_a_tree_script_rule_that_matches_nothing`,
+/// which covers the single-board case.
+#[test]
+fn report_prints_no_warning_for_a_rule_that_matches_on_some_boards() {
+    let dir = temp_dir("report-union-no-warning");
+    let config = dir.join("report_union.toml");
+    std::fs::write(&config, REPORT_UNION_TOML).unwrap();
+
+    let output = run_solvers_ok(&[
+        "report",
+        config.to_str().unwrap(),
+        "--boards",
+        "2c 7d 9h Js Qs,2c 7d 9h Js Jd",
+    ]);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        !stderr.contains("tree-script rule"),
+        "each rule matches on at least one of the two boards, so no warning is expected: {stderr}"
+    );
+}
+
+/// `report` must still accumulate across the whole sweep and warn once, at
+/// the end, about a rule that matches on NO board at all -- adding a third,
+/// unreachable river rule (`spr < 0` is never true) to `REPORT_UNION_TOML`'s
+/// script. Printed once, not once per board: per-board would be noise for
+/// the (legitimate) rules above it.
+#[test]
+fn report_warns_once_about_a_rule_unmatched_on_every_board() {
+    let dir = temp_dir("report-union-warning");
+    let config = dir.join("report_union_bad.toml");
+    std::fs::write(
+        &config,
+        REPORT_UNION_TOML.replace(
+            "  when !paired {\n    replace bet [50]\n  }\n",
+            "  when !paired {\n    replace bet [50]\n  }\n  when spr < 0 { replace raise [200] }\n",
+        ),
+    )
+    .unwrap();
+
+    let output = run_solvers_ok(&[
+        "report",
+        config.to_str().unwrap(),
+        "--boards",
+        "2c 7d 9h Js Qs,2c 7d 9h Js Jd",
+    ]);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    let occurrences = stderr.matches("tree-script rule matched no node").count();
+    assert_eq!(
+        occurrences, 1,
+        "the warning must be printed exactly once, after the whole sweep: {stderr}"
+    );
+    assert!(
+        stderr.contains("river rule 3: replace raise [200]  when spr < 0"),
+        "stderr: {stderr}"
+    );
+}
+
 // --- M3 research-workflow: checkpoint / metrics / resume / bench ---------
 
 static TEMP_COUNTER: AtomicU64 = AtomicU64::new(0);

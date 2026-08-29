@@ -1,7 +1,14 @@
-# Pio-style flop tree exercising the tree-script surface: param/define,
-# nesting, if/else, and a board predicate. Companion to
+# Pio-style tree exercising the tree-script surface: param/define, nesting,
+# if/else, and board predicates. Companion to
 # examples/postflop_pio_tree.toml, which reaches this through
 # [game.tree] source and overrides `cb` via [game.tree.params].
+#
+# Board texture branches live on the turn, not the flop, on purpose. The
+# flop is fixed by [game] board, so on a single-board config exactly one
+# arm of a flop if/else chain can ever fire and the others are reported as
+# dead rules ("使われないルールの警告"). Turn runouts vary, so every arm
+# there is reachable. A `report` sweep over many flops is the case where
+# flop texture branching earns its place.
 
 # c-bet size (pot %)
 param cb = 33
@@ -16,17 +23,10 @@ flop {
     remove bet
   }
   when cbet {
-    if paired {
-      replace bet [25, 75]
-    } else if wet {
-      replace bet [cb, 75]
-    } else {
-      replace bet [cb]
-    }
+    replace bet [cb]
   }
   when aggressions == 1 {
     replace raise [3x]
-    when spr <= 3 { replace raise [a] }
   }
 }
 
@@ -34,6 +34,10 @@ turn {
   when unopened {
     if donk {
       remove bet
+    } else if paired {
+      replace bet [33]
+    } else if wet {
+      replace bet [100]
     } else {
       replace bet [barrel]
     }
@@ -41,7 +45,9 @@ turn {
   # Outside the `unopened` block on purpose: a raise only exists once
   # someone has bet, so nesting this under `unopened` would make its
   # condition `aggressions == 0 && aggressions == 1` and it would never fire.
-  when aggressions == 1 { replace raise [2.5x] }
+  when aggressions == 1 {
+    replace raise [2.5x]
+  }
 }
 
 river when unopened {

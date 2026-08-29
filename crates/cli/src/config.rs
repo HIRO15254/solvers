@@ -1,9 +1,11 @@
 use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::path::PathBuf;
+use std::str::FromStr;
 
+use anyhow::{Context, Result, anyhow, bail};
 use cards::Street;
-use cards::script::{POSTFLOP, Script};
+use cards::script::{POSTFLOP, PostflopVar, Script};
 use holdem::{PerStreet, StreetTree};
 use serde::{Deserialize, Serialize};
 
@@ -424,7 +426,7 @@ impl TreeSection {
     /// overrides. `None` for `kind = "none"`: no script to compile, and
     /// therefore no rules on any street. Assumes `source` (if any) has
     /// already been resolved into `script` -- see [`Self::resolve_source_at`].
-    pub fn compiled_script(&self) -> anyhow::Result<Option<Script>> {
+    pub fn compiled_script(&self) -> anyhow::Result<Option<Script<PostflopVar>>> {
         match self.kind.as_str() {
             "none" => Ok(None),
             "script" => {
@@ -479,8 +481,9 @@ impl TreeSection {
 
 /// Converts `[game.tree.params]`'s TOML values into the single-token strings
 /// `cards::script::Script::compile`'s `overrides` expect -- the same
-/// scalar-only conversion Multiway Preflop's `.mwtree` `params` table uses.
-fn param_overrides(
+/// scalar-only conversion Multiway Preflop's `.mwtree` `params` table uses
+/// (`crate::multiway_v1::lower_tree_script` reuses this directly).
+pub(crate) fn param_overrides(
     params: &BTreeMap<String, toml::Value>,
 ) -> anyhow::Result<BTreeMap<String, String>> {
     params
@@ -828,6 +831,61 @@ pub enum StorageKind {
     #[default]
     F32,
     I16,
+}
+
+/// Rewrites a `[game.tree] script` value from serde's default
+/// `"""..."""` multi-line basic string into the TOML literal string
+/// `'''...'''` the contract writes -- see `docs/solver-config-v1.jp.md`'s
+/// "正規化 — script は展開せずインライン化する" section. A script body is bare
+/// tokens, comments, and the occasional quoted text literal
+/// (`high_card in ["A", "K"]`), but never a backslash, so the literal form
+/// never needs to escape anything; the one thing it cannot represent is the
+/// delimiter sequence `'''` itself; appearing inside the body (almost
+/// certainly inside a comment) is an explicit error rather than something to
+/// silently work around.
+///
+/// Shared by both families: postflop and Multiway Preflop write their
+/// script to the same `[game.tree] script` key and want the same literal
+/// form, so `code` is the only thing that differs (`SLV004` / `MWP004`).
+/// A no-op (including for the toy and preflop-hu families, and for a
+/// multiway config still on `kind = "standard"`) when the parsed document
+/// has no `[game.tree] script` string to rewrite.
+pub(crate) fn literalize_tree_script(code: &str, effective_toml: &str) -> Result<String> {
+    let mut document = toml_edit::DocumentMut::from_str(effective_toml)
+        .context("re-parsing the effective config as a TOML document")?;
+    // Checked read-only first: `Item::get_mut` auto-vivifies a missing key
+    // as `Item::None` (the machinery that lets `doc["a"]["b"] = v` create
+    // tables on the fly), so chaining `get_mut` alone would "find" a
+    // `[game.tree] script` on every config, toy and preflop-hu included.
+    // `Item::get` has no such side effect.
+    let has_script = document
+        .get("game")
+        .and_then(|game| game.get("tree"))
+        .and_then(|tree| tree.get("script"))
+        .is_some();
+    if !has_script {
+        return Ok(document.to_string());
+    }
+    let script_item = document
+        .get_mut("game")
+        .and_then(|game| game.get_mut("tree"))
+        .and_then(|tree| tree.get_mut("script"))
+        .expect("presence just checked above");
+    let text = script_item
+        .as_str()
+        .ok_or_else(|| anyhow!("[game.tree] script did not serialize as a string"))?
+        .to_string();
+    if text.contains("'''") {
+        bail!(
+            "{code}: [game.tree] script contains \"'''\", which cannot be written as a TOML \
+             literal string; rewrite the script to avoid that exact sequence"
+        );
+    }
+    let literal = format!("'''\n{text}'''");
+    *script_item = toml_edit::Item::Value(
+        toml_edit::Value::from_str(&literal).context("building the literal script value")?,
+    );
+    Ok(document.to_string())
 }
 
 #[cfg(test)]

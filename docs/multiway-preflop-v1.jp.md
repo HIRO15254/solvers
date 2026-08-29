@@ -240,7 +240,7 @@ voluntary raiseは除外される。
 ```toml
 [game.tree]
 kind = "script"
-source = "trees/short-stack.mwtree"  # 必須。config directory基準
+source = "trees/short-stack.mwtree"  # sourceかscriptのどちらか一方が必須。config directory基準
 allow_limp = false
 reraise_jam_above_actor_starting_stack = { numerator = 1, denominator = 3 }
 
@@ -256,41 +256,60 @@ jam_spr = 0.8
 enabled = true
 ```
 
-`params` の値はstring、integer、finite float、booleanのみ。配列/tableはerror。
-script pathは正規化時に読み込まれ、effective configではstandard typed ruleへ展開される。
-Standardと同じ3 optional fieldを指定でき、展開後もeffective configとfingerprintへ
-保持される。
+`.mwtree`の文法(トークン化、`param`/`define`、街ブロックの入れ子、`if`/`else if`/
+`else`、条件式、size literal、error)はpostflopの`.tree`スクリプトと同じ
+`cards::script`フロントエンドを共有する。共通部分の規範は
+[solver-config-v1.jp.md](solver-config-v1.jp.md)の`[game.tree]`章にあり、ここには
+multiway固有の差分だけを記す:
 
-> **決定済み・未実装**: 正規化を「typed ruleへ展開」から「script本文のインライン化」へ
-> 変える。`params`が正規化を生き延びるので、GUIがscript本文に触らずに変数だけを
-> 編集できるようになる。あわせてscript文法へ入れ子、`if`/`else if`/`else`、
-> street list(`flop, turn`)を追加する。平坦な既存`.mwtree`は互換のまま動く。
-> postflop側は実装済みで、文法と正規化の規範は
-> [solver-config-v1.jp.md](solver-config-v1.jp.md)の`[game.tree]`章にある。
+- streetキーワードは`preflop`/`flop`/`turn`/`river`の4つ(postflopは`flop`/`turn`/
+  `river`の3つで`preflop`を持たない)。旧`postflop`擬似streetキーワードはscriptの
+  文法から削除されている。ただし上記「Standard frontend」の`[[game.tree.rules]]`
+  typed rule surfaceでは`street = "postflop"`(`RuleStreet::Postflop`)は引き続き
+  有効で、scriptだけがこのキーワードを持たない。
+- actionは`fold`/`check`/`call`/`bet`/`raise`の5つすべてを使える
+  (postflopは`bet`/`raise`の2つだけ)。
+- size literalの単位はBB建て(`"2.2x"`、`"2.5bb"`など)。postflopはchip建て。
+- conditionで参照できる変数は上記「conditionで参照できる値」の14個で、
+  postflopの盤面変数(`paired`、`high_card`など)は存在しない。
 
-`.mwtree` の完全な形:
+`params`の値はstring、integer、finite float、booleanのみ。配列/tableはerror。
+`source`と`script`は排他で、正規化時に`source`のファイル内容が`script`へ
+インライン化される(展開はしない: `params`はGUIが編集する変数schemaなので、
+展開して捨てるとその情報が失われる)。normalize後のeffective configは
+`kind = "script"`のまま`script`本文と`params`を両方保持し、typed rule array
+(`[[game.tree.rules]]`)へは展開されない。元の`.mwtree`ファイルを削除しても、
+effective configだけで同じgameへ再lowerできる。
+
+`.mwtree` の完全な形(入れ子・`if`/`else`・street listを使う例):
 
 ```text
+# 開raiseのopen size(BB建て)
 param open = 2.2x
 
 preflop when unopened {
   replace raise [open, allin]
+  when position in ["CO", "BTN"] {
+    replace raise [open, 2.5x, allin]
+  }
 }
 
-flop when players >= 4 {
+flop, turn when players >= 4 {
   checkdown
 }
 
-river when spr <= 0.8 {
-  force bet 1e
+river {
+  if spr <= 0.8      { force bet [1e] }
+  else if unopened   { replace bet [66, a] }
+  else               { remove bet }
 }
 ```
 
 loop、再帰、function、include、file/network/environment/time/RNGアクセスはない。
 
 `param`名はscript本文の識別子をそのまま置換するので、`a`、`e`、`min`のような
-size literalと同じ名前のparamを宣言するとそのliteralを隠す。paramには
-`open`、`jam_spr`のような説明的な名前を使うこと。
+size literalと同じ名前のparamを宣言するとそのliteralを隠す(実際には予約名なので
+宣言自体がerrorになる)。paramには`open`、`jam_spr`のような説明的な名前を使うこと。
 
 ## `[game.abstraction]`
 

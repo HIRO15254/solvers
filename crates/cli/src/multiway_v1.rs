@@ -64,6 +64,21 @@ pub fn has_v1_schema(raw: &str) -> Result<bool> {
 /// `multiway-rollout`; silently interpreting the same bytes as EHS² would
 /// change abstraction fingerprints and strategy semantics.
 pub fn validate_production_contract(raw: &str) -> Result<()> {
+    validate_production_contract_with_base(raw, None)
+}
+
+/// [`validate_production_contract`] for a config read from a file, so the
+/// lowering it performs can resolve a `[game.tree] source` against the
+/// config's own directory. Without this a perfectly valid
+/// `kind = "script", source = "t.mwtree"` config fails `solvers validate`
+/// with "script tree requires a config file path", even though the path was
+/// known all along -- the contract check ran on the raw text and lowered
+/// without it.
+pub fn validate_production_contract_at(raw: &str, config_path: &Path) -> Result<()> {
+    validate_production_contract_with_base(raw, Some(base_directory(config_path)))
+}
+
+fn validate_production_contract_with_base(raw: &str, base_dir: Option<&Path>) -> Result<()> {
     let value: toml::Value = toml::from_str(raw).context("parsing TOML document")?;
     let root = value
         .as_table()
@@ -132,7 +147,8 @@ pub fn validate_production_contract(raw: &str) -> Result<()> {
         }
     }
 
-    let lowered = parse_and_lower(raw).context("validating production v1 config")?;
+    let lowered =
+        parse_and_lower_with_base(raw, base_dir).context("validating production v1 config")?;
     let GameSection::PreflopMultiway(game) = lowered.game else {
         unreachable!("v1 always lowers to Multiway Preflop")
     };
@@ -190,6 +206,11 @@ fn normalized_toml_from_json(json: serde_json::Value) -> Result<String> {
     let value = json_to_toml(json)?.ok_or_else(|| anyhow!("effective config is empty"))?;
     let normalized =
         toml::to_string_pretty(&value).context("serializing effective Multiway Preflop v1 TOML")?;
+    // Same literal-string form postflop writes, from the same helper: both
+    // families put their script at `[game.tree] script`, and an effective
+    // config that reads differently per family would defeat the point of
+    // sharing one grammar.
+    let normalized = crate::config::literalize_tree_script("MWP004", &normalized)?;
     parse_and_lower(&normalized).context("reparsing normalized Multiway Preflop v1 config")?;
     Ok(normalized)
 }
@@ -271,7 +292,10 @@ pub fn apply_solve_overrides(
     // Research builds deliberately retain the historical v1 decoder so the
     // checked-in rollout/full-recall experiments remain reproducible.
 
-    validate_production_contract(raw)?;
+    match config_path {
+        Some(config_path) => validate_production_contract_at(raw, config_path)?,
+        None => validate_production_contract(raw)?,
+    }
     validate_decimal_chip_tokens(raw)?;
     let mut source: V1Config = toml::from_str(raw).context("parsing Multiway Preflop v1 config")?;
     if let Some(config_path) = config_path {
@@ -551,7 +575,18 @@ enum Tree {
         rules: Vec<TreeRule>,
     },
     Script {
-        source: String,
+        /// Path to the `.mwtree` source, relative to the config file's
+        /// directory. Exclusive with `script`. Resolved into `script` (and
+        /// cleared) as part of normalizing a config with a known path, so
+        /// nothing downstream of that ever sees a path again -- mirrors the
+        /// postflop family's `[game.tree] source`/`script` (`TreeSection` in
+        /// `crate::config`).
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        source: Option<String>,
+        /// The script's own body. Exclusive with `source`; this is the only
+        /// form an effective config carries.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        script: Option<String>,
         #[serde(default)]
         params: BTreeMap<String, toml::Value>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -561,6 +596,24 @@ enum Tree {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         reraise_jam_above_actor_starting_stack: Option<TreeStackRatio>,
     },
+}
+
+/// `source`/`script` are exclusive, and at least one is required -- mirrors
+/// `crate::solver_config_v1::check_tree_shape`.
+fn check_tree_script_shape(tree: &Tree) -> Result<()> {
+    let Tree::Script { source, script, .. } = tree else {
+        return Ok(());
+    };
+    if source.is_some() && script.is_some() {
+        bail!("[game.tree] source and script are exclusive; write only one.");
+    }
+    if source.is_none() && script.is_none() {
+        bail!(
+            "[game.tree] kind = \"script\" requires source or script; write one of them, or \
+             set kind = \"standard\" for an empty rule list."
+        );
+    }
+    Ok(())
 }
 
 #[derive(Debug, Clone, Copy, Deserialize, Serialize)]
@@ -620,173 +673,33 @@ fn lower_tree_rules(rules: &[TreeRule]) -> Result<Vec<RuntimeTreeRule>> {
             .iter()
             .map(|size| parse_size_literal(size))
             .collect::<Result<Vec<_>>>()?;
-        lowered.push(RuntimeTreeRule {
-            priority: rule.priority,
-            source_order: source_order as u32,
-            street: rule.street,
-            condition: rule.condition.trim().to_owned(),
-            effect: rule.effect,
-            action: rule.action,
+        lowered.push(RuntimeTreeRule::new(
+            rule.priority,
+            source_order as u32,
+            rule.street,
+            rule.condition.trim().to_owned(),
+            rule.effect,
+            rule.action,
             sizes,
-        });
+        ));
     }
     lowered.sort_by_key(|rule| (rule.priority, rule.source_order));
     Ok(lowered)
 }
+/// Compiles a `.mwtree` script against `multiway::tree_rules::MULTIWAY` --
+/// the same `cards::script` front end (tokenizing, substitution, nesting,
+/// `if`/`else`, `param`/`define`) postflop's `.tree` scripts compile
+/// through -- and lowers the result straight to [`RuntimeTreeRule`]s. This
+/// is the entire multiway-specific frontend now: it owns nothing but the
+/// `toml::Value` -> `String` param-override conversion `crate::config`'s own
+/// postflop `[game.tree.params]` handling already needed, reused verbatim
+/// via `crate::config::param_overrides`.
 fn lower_tree_script(
     source: &str,
     params: &BTreeMap<String, toml::Value>,
 ) -> Result<Vec<RuntimeTreeRule>> {
-    let mut values = BTreeMap::<String, String>::new();
-    let mut program = String::new();
-    for line in source.lines() {
-        let line = line.split('#').next().unwrap_or("").trim();
-        if line.is_empty() {
-            continue;
-        }
-        if let Some(declaration) = line.strip_prefix("param ") {
-            let (name, value) = declaration
-                .split_once('=')
-                .ok_or_else(|| anyhow!("invalid mwtree param declaration {line:?}"))?;
-            values.insert(name.trim().to_owned(), value.trim().to_owned());
-        } else {
-            program.push_str(line);
-            program.push('\n');
-        }
-    }
-    for (name, value) in params {
-        let value = match value {
-            toml::Value::String(value) => value.clone(),
-            toml::Value::Integer(value) => value.to_string(),
-            toml::Value::Float(value) if value.is_finite() => value.to_string(),
-            toml::Value::Boolean(value) => value.to_string(),
-            _ => bail!("mwtree param {name:?} must be a scalar"),
-        };
-        values.insert(name.clone(), value);
-    }
-
-    let mut rules = Vec::new();
-    let mut remaining = program.as_str();
-    while !remaining.trim().is_empty() {
-        remaining = remaining.trim_start();
-        let open = remaining
-            .find('{')
-            .ok_or_else(|| anyhow!("mwtree rule is missing '{{'"))?;
-        let close = remaining[open + 1..]
-            .find('}')
-            .map(|index| open + 1 + index)
-            .ok_or_else(|| anyhow!("mwtree rule is missing '}}'"))?;
-        let header = remaining[..open].trim();
-        let body = remaining[open + 1..close].trim();
-        remaining = &remaining[close + 1..];
-        let (street, condition) = header
-            .split_once(" when ")
-            .ok_or_else(|| anyhow!("mwtree rule header requires 'street when condition'"))?;
-        let street = parse_rule_street(street.trim())?;
-        let condition = substitute_params(condition.trim(), &values);
-
-        if body == "checkdown" {
-            rules.push(TreeRule {
-                priority: 100,
-                street,
-                condition,
-                effect: RuleEffect::Checkdown,
-                action: None,
-                sizes: Vec::new(),
-            });
-            continue;
-        }
-        let mut words = body.splitn(3, char::is_whitespace);
-        let effect = parse_rule_effect(words.next().unwrap_or(""))?;
-        let action = parse_rule_action(words.next().unwrap_or(""))?;
-        let sizes = parse_script_sizes(words.next().unwrap_or(""), &values)?;
-        rules.push(TreeRule {
-            priority: 100,
-            street,
-            condition,
-            effect,
-            action: Some(action),
-            sizes,
-        });
-    }
-    lower_tree_rules(&rules)
-}
-
-fn parse_rule_street(value: &str) -> Result<RuleStreet> {
-    Ok(match value {
-        "preflop" => RuleStreet::Preflop,
-        "flop" => RuleStreet::Flop,
-        "turn" => RuleStreet::Turn,
-        "river" => RuleStreet::River,
-        "postflop" => RuleStreet::Postflop,
-        _ => bail!("invalid mwtree street {value:?}"),
-    })
-}
-
-fn parse_rule_effect(value: &str) -> Result<RuleEffect> {
-    Ok(match value {
-        "add" => RuleEffect::Add,
-        "remove" => RuleEffect::Remove,
-        "replace" => RuleEffect::Replace,
-        "force" => RuleEffect::Force,
-        _ => bail!("invalid mwtree effect {value:?}"),
-    })
-}
-
-fn parse_rule_action(value: &str) -> Result<RuleAction> {
-    Ok(match value {
-        "fold" => RuleAction::Fold,
-        "check" => RuleAction::Check,
-        "call" => RuleAction::Call,
-        "bet" => RuleAction::Bet,
-        "raise" => RuleAction::Raise,
-        _ => bail!("invalid mwtree action {value:?}"),
-    })
-}
-
-fn parse_script_sizes(source: &str, params: &BTreeMap<String, String>) -> Result<Vec<String>> {
-    let source = source.trim();
-    if source.is_empty() {
-        return Ok(Vec::new());
-    }
-    let values = if source.starts_with('[') && source.ends_with(']') {
-        source[1..source.len() - 1].split(',').collect::<Vec<_>>()
-    } else {
-        vec![source]
-    };
-    values
-        .into_iter()
-        .map(|value| {
-            let value = value.trim();
-            Ok(params
-                .get(value)
-                .cloned()
-                .unwrap_or_else(|| value.to_owned()))
-        })
-        .collect()
-}
-
-fn substitute_params(source: &str, params: &BTreeMap<String, String>) -> String {
-    let mut result = String::new();
-    let bytes = source.as_bytes();
-    let mut index = 0;
-    while index < bytes.len() {
-        if bytes[index].is_ascii_alphabetic() || bytes[index] == b'_' {
-            let start = index;
-            index += 1;
-            while index < bytes.len()
-                && (bytes[index].is_ascii_alphanumeric() || bytes[index] == b'_')
-            {
-                index += 1;
-            }
-            let word = &source[start..index];
-            result.push_str(params.get(word).map(String::as_str).unwrap_or(word));
-        } else {
-            result.push(bytes[index] as char);
-            index += 1;
-        }
-    }
-    result
+    let overrides = crate::config::param_overrides(params)?;
+    Ok(multiway::tree_rules::compile_script(source, &overrides)?)
 }
 
 impl Default for Tree {
@@ -1233,48 +1146,31 @@ impl V1Config {
         Ok(())
     }
 
-    /// Expands an external deterministic tree script into the standard rule
-    /// frontend. Effective configs embedded in checkpoints and solutions
-    /// therefore remain reparsable after the original .mwtree file moves.
+    /// Resolves a `Tree::Script`'s `source` (a path, relative to `base_dir`)
+    /// into `script` and clears `source`, so nothing downstream of this call
+    /// ever sees a path again. Effective configs embedded in checkpoints and
+    /// solutions therefore remain reparsable after the original `.mwtree`
+    /// file moves. A no-op for `Tree::Standard`, and for a `Tree::Script`
+    /// that already carries `script` directly -- mirrors the postflop
+    /// family's `TreeSection::resolve_source_at` (`crate::config`).
+    ///
+    /// Unlike the old flat scanner this replaces, the script body is kept
+    /// intact rather than expanded into `Tree::Standard { rules }`: nesting
+    /// and `if`/`else` compose several conditions per rule, and expanding
+    /// would throw away `params`, the variable schema a GUI edits.
     fn materialize_effective_at(&mut self, base_dir: &Path) -> Result<()> {
         self.materialize_effective()?;
-        let Tree::Script {
-            source,
-            params,
-            allow_limp,
-            max_aggressive_actions,
-            reraise_jam_above_actor_starting_stack,
-        } = &self.game.tree
-        else {
+        check_tree_script_shape(&self.game.tree)?;
+        let Tree::Script { source, script, .. } = &mut self.game.tree else {
             return Ok(());
         };
-        let allow_limp = *allow_limp;
-        let max_aggressive_actions = *max_aggressive_actions;
-        let reraise_jam_above_actor_starting_stack = *reraise_jam_above_actor_starting_stack;
-        let path = base_dir.join(source);
-        let program = std::fs::read_to_string(&path)
-            .with_context(|| format!("reading mwtree source {}", path.display()))?;
-        let rules = lower_tree_script(&program, params)?
-            .into_iter()
-            .map(|rule| TreeRule {
-                priority: rule.priority,
-                street: rule.street,
-                condition: rule.condition,
-                effect: rule.effect,
-                action: rule.action,
-                sizes: rule
-                    .sizes
-                    .into_iter()
-                    .map(|size| size.render(SizeUnit::Bb))
-                    .collect(),
-            })
-            .collect();
-        self.game.tree = Tree::Standard {
-            allow_limp,
-            max_aggressive_actions,
-            reraise_jam_above_actor_starting_stack,
-            rules,
+        let Some(path) = source.take() else {
+            return Ok(());
         };
+        let full_path = base_dir.join(&path);
+        let text = std::fs::read_to_string(&full_path)
+            .with_context(|| format!("reading mwtree source {}", full_path.display()))?;
+        *script = Some(text);
         Ok(())
     }
 
@@ -1290,6 +1186,7 @@ impl V1Config {
             bail!("game.button is outside the configured table");
         }
         check_grid("game.common_ante_bb", self.game.common_ante_bb, true)?;
+        check_tree_script_shape(&self.game.tree)?;
 
         let (
             tree_rules,
@@ -1310,19 +1207,29 @@ impl V1Config {
             ),
             Tree::Script {
                 source,
+                script,
                 params,
                 allow_limp,
                 max_aggressive_actions,
                 reraise_jam_above_actor_starting_stack,
             } => {
-                let base = base_dir.ok_or_else(|| {
-                    anyhow!(
-                        "script tree requires a config file path for relative source resolution"
-                    )
-                })?;
-                let path = base.join(source);
-                let program = std::fs::read_to_string(&path)
-                    .with_context(|| format!("reading mwtree source {}", path.display()))?;
+                // `check_tree_script_shape` already rejected both-or-neither,
+                // so exactly one of `source`/`script` is `Some` here.
+                let program = match (source, script) {
+                    (Some(source), None) => {
+                        let base = base_dir.ok_or_else(|| {
+                            anyhow!(
+                                "script tree requires a config file path for relative source \
+                                 resolution"
+                            )
+                        })?;
+                        let path = base.join(source);
+                        std::fs::read_to_string(&path)
+                            .with_context(|| format!("reading mwtree source {}", path.display()))?
+                    }
+                    (None, Some(script)) => script.clone(),
+                    _ => unreachable!("checked by check_tree_script_shape"),
+                };
                 (
                     lower_tree_script(&program, params)?,
                     *allow_limp,
@@ -2368,6 +2275,14 @@ ante_bb = 0.125
                 .any(|action| matches!(action, multiway::Action::RaiseTo { all_in: true, .. }))
         );
     }
+    /// `Tree::Script` normalizes by inlining the file's contents into
+    /// `script`, exactly as the postflop family's `[game.tree] source`
+    /// inlines into `script` (`crate::config::TreeSection::resolve_source_at`)
+    /// -- it does *not* expand into `Tree::Standard { rules }` the way it
+    /// used to. Both halves of "self-contained" still have to hold: no
+    /// `source =` (and therefore no path) remains in the effective config,
+    /// and deleting the original `.mwtree` file and re-lowering the
+    /// effective config still reaches the identical game.
     #[test]
     fn script_effective_config_is_self_contained() {
         let directory = tempfile::tempdir().unwrap();
@@ -2386,13 +2301,22 @@ ante_bb = 0.125
         );
         let script_fingerprint = game_fingerprint(parse_and_lower_at(&raw, &config_path).unwrap());
         let effective = normalized_toml_at(&raw, &config_path).unwrap();
-        assert!(effective.contains("kind = \"standard\""));
+        assert!(effective.contains("kind = \"script\""));
         assert!(effective.contains("2.2x"));
         assert!(effective.contains("allow_limp = false"));
         assert!(effective.contains("preflop = 6"));
         assert!(effective.contains("reraise_jam_above_actor_starting_stack"));
+        assert_eq!(effective.matches("source =").count(), 0);
         assert!(!effective.contains("tree.mwtree"));
-        std::fs::remove_file(script_path).unwrap();
+        // The script body is inlined verbatim, not expanded into rules: the
+        // rendered condition (`unopened`) and the raw size tokens
+        // (`2.2x`/`allin`) both appear as the script wrote them, and there
+        // is no lowered `[[game.tree.rules]]` array.
+        assert!(effective.contains("unopened"));
+        assert!(effective.contains("allin"));
+        assert_eq!(effective.matches("[[game.tree.rules]]").count(), 0);
+
+        std::fs::remove_file(&script_path).unwrap();
         let lowered = parse_and_lower(&effective).unwrap();
         let GameSection::PreflopMultiway(game) = lowered.game else {
             panic!()
@@ -2410,6 +2334,10 @@ ante_bb = 0.125
             script_fingerprint,
             game_fingerprint(parse_and_lower(&effective).unwrap())
         );
+
+        // Normalizing twice is byte-identical -- normalizing the already-
+        // inlined effective config is a no-op, not a second inlining.
+        assert_eq!(normalized_toml(&effective).unwrap(), effective);
     }
 
     #[test]
@@ -2436,5 +2364,85 @@ flop when players >= 4 {
             ]
         );
         assert_eq!(rules[1].effect, RuleEffect::Checkdown);
+    }
+
+    #[test]
+    fn script_source_and_script_are_exclusive_and_one_is_required() {
+        let both = format!(
+            "{MINIMAL}\n[game.tree]\nkind = \"script\"\nsource = \"a.mwtree\"\n\
+             script = \"flop {{ checkdown }}\"\n"
+        );
+        let error = parse_and_lower(&both).unwrap_err().to_string();
+        assert!(error.contains("exclusive"), "{error}");
+
+        let neither = format!("{MINIMAL}\n[game.tree]\nkind = \"script\"\n");
+        let error = parse_and_lower(&neither).unwrap_err().to_string();
+        assert!(error.contains("requires source or script"), "{error}");
+    }
+
+    /// End-to-end proof that multiway's `.mwtree` frontend is the same
+    /// `cards::script` grammar postflop's `.tree` scripts use: nesting,
+    /// `if`/`else if`/`else`, a multi-street list (`flop, turn`), and
+    /// `param` all compile through `source =`, and the normalized effective
+    /// config inlines the script body (not a lowered `[[game.tree.rules]]`
+    /// array) while still lowering to the identical game after the file is
+    /// deleted -- the same "self-contained" property
+    /// `script_effective_config_is_self_contained` checks for the flat case.
+    #[test]
+    fn mwtree_script_with_nesting_and_if_else_is_the_same_front_end_as_postflop() {
+        let directory = tempfile::tempdir().unwrap();
+        let config_path = directory.path().join("game.toml");
+        let script_path = directory.path().join("short-stack.mwtree");
+        std::fs::write(
+            &script_path,
+            r#"
+param open = 2.2x
+
+preflop when unopened {
+  replace raise [open, allin]
+  when position in ["CO", "BTN"] {
+    replace raise [open, 2.5x, allin]
+  }
+}
+
+flop, turn when players >= 4 {
+  checkdown
+}
+
+river {
+  if spr <= 0.8      { force bet [1e] }
+  else if unopened   { replace bet [66, a] }
+  else               { remove bet }
+}
+"#,
+        )
+        .unwrap();
+        let raw =
+            format!("{MINIMAL}\n[game.tree]\nkind = \"script\"\nsource = \"short-stack.mwtree\"\n");
+
+        let script_fingerprint = game_fingerprint(parse_and_lower_at(&raw, &config_path).unwrap());
+        let effective = normalized_toml_at(&raw, &config_path).unwrap();
+
+        // Inlined, not expanded: the script's own tokens survive verbatim,
+        // there is no lowered rule array, and no path remains.
+        assert!(effective.contains("kind = \"script\""));
+        assert!(effective.contains("when unopened"));
+        assert!(effective.contains("when position in"));
+        assert!(effective.contains("if spr <= 0.8"));
+        assert!(effective.contains("else if unopened"));
+        assert_eq!(effective.matches("[[game.tree.rules]]").count(), 0);
+        assert_eq!(effective.matches("source =").count(), 0);
+        assert!(!effective.contains("short-stack.mwtree"));
+
+        // Normalizing an already-inlined effective config is a no-op.
+        assert_eq!(normalized_toml(&effective).unwrap(), effective);
+
+        // Deleting the original file changes nothing: the effective config
+        // is the whole story.
+        std::fs::remove_file(&script_path).unwrap();
+        assert_eq!(
+            script_fingerprint,
+            game_fingerprint(parse_and_lower(&effective).unwrap())
+        );
     }
 }

@@ -479,6 +479,46 @@ size が要るときは `"0.33%pot"` と明示する。
 `max_aggressive_actions` に達したノード、および残 stack が call 額以下のノードでは、
 どんな rule を書いても候補は空になる。構造的上限は script から破れない。
 
+### 使われないルールの警告
+
+ある rule の条件が木の中のどの decision node でも一度も真にならなければ、その
+rule は黙って無視される — 木は書き手が意図したより小さく組まれるが、error には
+ならない。典型例は raise 専用の rule を `when unopened { ... }` の中に置くこと:
+条件が `aggressions == 0 && aggressions == 1` に平坦化され、矛盾するので
+決して真にならない。他にも、subgame の開始 street での `when donk`、どの
+node も届かない `spr` の閾値など、同じ形で静かに死ぬ書き方がいくつもある。
+
+この判定は **静的ではなく実測**である。矛盾するルールはそのうちの一部の
+ケースにすぎず、「実際にこの条件を満たすノードが木のどこかにあったか」
+だけが答えるべき問いだからである。そのため `solvers solve` は木を実際に
+組みながら rule ごとに一致の有無を数え、`tree: nodes=...` 行の直後、solve を
+始める前に stderr へ warning を出す(`docs/cli-reference.jp.md`の
+`solvers solve` 節を見よ):
+
+```
+warning: 1 tree-script rule matched no node and had no effect:
+  turn rule 2: replace raise [2.5x]  when unopened && aggressions == 1
+```
+
+条件は書いたとおりの形で戻す。上の例で矛盾しているのは `unopened`(すなわち
+`aggressions == 0`)と `aggressions == 1` の組み合わせである。
+
+**固定 board の上では `if` / `else` 連鎖の取られなかった枝が必ずここに出る。**
+枝は構文上排他なので、board が 1 つに決まっている config では最大 1 本しか
+発火しない。`when paired` を開始 street に書けば、その board が paired でない限り
+その枝は必ず「一致しなかった rule」として報告される。開始 street の board は
+`[game] board` で決まっているのだから、これは正しい報告である — その config に
+限れば本当に死んでいる。テクスチャで振り分けたいなら、ランナウトが変わる
+turn / river に書くか、多数の board を掃く `solvers report` で使う。
+
+これは常に warning であって error ではない。ある盤面や config の組み合わせで
+そのルールへ構造的に到達しないことは、それ自体不正ではない — 例えば
+「今は使わないが別の盤面のために残してある rule」は正当な書き方であり、
+抑制する flag も無い。`solvers report` のように多数の盤面を sweep する場合は、
+盤面ごとに報告すると frequency 列と同じだけノイズが出るため、sweep 全体で
+一度も一致しなかった rule だけを sweep 終了後に一度だけ報告する — 20 盤面中
+1 つでも一致すれば、そのルールは意図どおり働いているとみなす。
+
 ### error
 
 | 状況 | code |
@@ -885,8 +925,8 @@ solvers resume runs/my-run
 | 絶対 size 単位 | chip(`"20c"`) | BB(`"2.5bb"`) |
 | size literal 文法 | 共通(PioSOLVER 準拠) | 共通 |
 | rake / ICM モデル | 共通実装を流用 | 同じ実装 |
-| tree frontend | `script`(`.tree`) | `script`(`.mwtree`)+ `standard` の rule 配列 |
-| script の正規化 | 本文をインライン化 | rule 列へ展開 |
+| tree frontend | `script`(`.tree`)+ `standard` は空 | `script`(`.mwtree`)+ `standard` の rule 配列 |
+| script の正規化 | 本文をインライン化 | 本文をインライン化(共通の `cards::script` フロントエンド) |
 | 停止判定 | `iterations` / `max_time` / `target_nash_conv` | sweep 予算 + trained deviator 評価 |
 | artifact の値 | 戦略 + per-hand 値(`i16`) | 戦略のみ(`u16` / `f32`) |
 

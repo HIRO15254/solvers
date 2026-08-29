@@ -1,340 +1,245 @@
+//! Multiway's tree-rule condition dialect and evaluator.
+//!
+//! This is a thin adapter over `cards::script`'s generic condition grammar
+//! (`Vars`, `Condition<V>`, `Dialect<V>`, `VarSource<V>`) -- the same front
+//! end postflop's `.tree` scripts use -- providing the fourteen variables
+//! multiway's `when` strings and `.mwtree` scripts read. `TreeRule::compiled`
+//! (`config.rs`) is what makes evaluation compile-once: a condition string
+//! is parsed here exactly once, the first time it is checked (in practice,
+//! at config validation, since `MultiwayConfig::validate` calls it on every
+//! rule up front), and cached from then on -- `matches` below never
+//! reparses a string per decision node the way the old flat scanner did.
+//!
+//! Reusing `cards::script` also retires three bugs the old hand-rolled
+//! byte-position parser carried: it stripped comments with
+//! `line.split('#')`, so a `#` inside a string literal truncated the line;
+//! it cast `bytes[index] as char`, so a non-ASCII byte got mangled into
+//! latin-1 instead of erroring; and its effect grammar only recognized
+//! `checkdown` via a whole-body string equality check rather than a real
+//! grammar rule.
+
+use std::collections::BTreeMap;
+
+use cards::SizeUnit;
+use cards::script::{
+    ActionKind, Condition, Dialect, Script, ScriptError, Value, VarKind, VarSource, Vars,
+};
+
 use crate::betting::{BettingState, SeatStatus};
-use crate::config::TreeRule;
+use crate::config::{RuleStreet, TreeRule};
 use crate::types::SeatId;
 
-#[derive(Clone, Debug, PartialEq)]
-enum Value {
-    Bool(bool),
-    Number(f64),
-    Text(String),
+/// One named variable multiway's tree-rule conditions can read -- the same
+/// fourteen the old `context_value` resolved, ported onto `cards::script`'s
+/// generic condition grammar.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum MultiwayVar {
+    Position,
+    InPosition,
+    InPositionToLastAggressor,
+    PreflopParticipant,
+    OpenColdCalls,
+    Players,
+    Limpers,
+    Flats,
+    Aggressions,
+    Unopened,
+    Squeeze,
+    Cbet,
+    Donk,
+    Spr,
 }
 
-pub(crate) fn matches(
-    rule: &TreeRule,
-    state: &BettingState,
-    actor: SeatId,
-) -> Result<bool, String> {
-    if !rule.street.matches(state.street) {
-        return Ok(false);
+impl Vars for MultiwayVar {
+    fn name(self) -> &'static str {
+        use MultiwayVar::*;
+        match self {
+            Position => "position",
+            InPosition => "in_position",
+            InPositionToLastAggressor => "in_position_to_last_aggressor",
+            PreflopParticipant => "preflop_participant",
+            OpenColdCalls => "open_cold_calls",
+            Players => "players",
+            Limpers => "limpers",
+            Flats => "flats",
+            Aggressions => "aggressions",
+            Unopened => "unopened",
+            Squeeze => "squeeze",
+            Cbet => "cbet",
+            Donk => "donk",
+            Spr => "spr",
+        }
     }
-    let mut parser = Parser {
-        source: rule.condition.as_bytes(),
-        position: 0,
-        state,
-        actor,
-    };
-    let matched = parser.parse_or()?;
-    parser.skip_space();
-    if parser.position != parser.source.len() {
-        return Err(format!(
-            "unexpected token at byte {} in tree rule condition",
-            parser.position
-        ));
+
+    fn kind(self) -> VarKind {
+        use MultiwayVar::*;
+        match self {
+            Position => VarKind::Text,
+            InPosition
+            | InPositionToLastAggressor
+            | PreflopParticipant
+            | Unopened
+            | Squeeze
+            | Cbet
+            | Donk => VarKind::Bool,
+            OpenColdCalls | Players | Limpers | Flats | Aggressions | Spr => VarKind::Number,
+        }
     }
-    Ok(matched)
-}
-pub(crate) fn validate_condition(source: &str) -> Result<(), String> {
-    use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RuleEffect,
-        RuleStreet, SeatConfig,
-    };
-    let config = MultiwayConfig {
-        seats: (0..2)
-            .map(|_| SeatConfig {
-                name: None,
-                stack_bb: 100.0,
-                range: String::new(),
-                betting: None,
-            })
-            .collect(),
-        button: SeatId(0),
-        blinds: BlindConfig::default(),
-        ante: AnteConfig::None,
-        betting: BettingConfig::default(),
-        forced_bets: None,
-        abstraction: AbstractionConfig::default(),
-    }
-    .validated()
-    .map_err(|error| error.to_string())?;
-    let state = BettingState::new(&config).map_err(|error| error.to_string())?;
-    let rule = TreeRule {
-        priority: 0,
-        source_order: 0,
-        street: RuleStreet::Preflop,
-        condition: source.to_owned(),
-        effect: RuleEffect::Checkdown,
-        action: None,
-        sizes: Vec::new(),
-    };
-    matches(
-        &rule,
-        &state,
-        state.to_act.expect("heads-up root has actor"),
-    )
-    .map(|_| ())
 }
 
-struct Parser<'a> {
-    source: &'a [u8],
-    position: usize,
-    state: &'a BettingState,
-    actor: SeatId,
-}
+/// Every [`MultiwayVar`], in the order [`MULTIWAY`] exposes them.
+const ALL_MULTIWAY_VARS: &[MultiwayVar] = &[
+    MultiwayVar::Position,
+    MultiwayVar::InPosition,
+    MultiwayVar::InPositionToLastAggressor,
+    MultiwayVar::PreflopParticipant,
+    MultiwayVar::OpenColdCalls,
+    MultiwayVar::Players,
+    MultiwayVar::Limpers,
+    MultiwayVar::Flats,
+    MultiwayVar::Aggressions,
+    MultiwayVar::Unopened,
+    MultiwayVar::Squeeze,
+    MultiwayVar::Cbet,
+    MultiwayVar::Donk,
+    MultiwayVar::Spr,
+];
 
-impl Parser<'_> {
-    fn parse_or(&mut self) -> Result<bool, String> {
-        let mut value = self.parse_and()?;
-        while self.consume("||") {
-            let right = self.parse_and()?;
-            value = value || right;
-        }
-        Ok(value)
-    }
+/// Multiway's tree-script dialect: every [`MultiwayVar`], all four streets
+/// (unlike postflop, multiway rules can fire preflop), every [`ActionKind`]
+/// (multiway rules do add/remove fold/check/call candidates, unlike
+/// postflop's), and big-blind-denominated sizes.
+pub(crate) static MULTIWAY: Dialect<MultiwayVar> = Dialect {
+    vars: ALL_MULTIWAY_VARS,
+    streets: &[
+        ("preflop", cards::Street::Preflop),
+        ("flop", cards::Street::Flop),
+        ("turn", cards::Street::Turn),
+        ("river", cards::Street::River),
+    ],
+    actions: &[
+        ActionKind::Fold,
+        ActionKind::Check,
+        ActionKind::Call,
+        ActionKind::Bet,
+        ActionKind::Raise,
+    ],
+    unit: SizeUnit::Bb,
+};
 
-    fn parse_and(&mut self) -> Result<bool, String> {
-        let mut value = self.parse_unary()?;
-        while self.consume("&&") {
-            let right = self.parse_unary()?;
-            value = value && right;
-        }
-        Ok(value)
-    }
-
-    fn parse_unary(&mut self) -> Result<bool, String> {
-        if self.consume("!") {
-            return Ok(!self.parse_unary()?);
-        }
-        if self.consume("(") {
-            let value = self.parse_or()?;
-            if !self.consume(")") {
-                return Err("missing ')' in tree rule condition".into());
+impl VarSource<MultiwayVar> for (&BettingState, SeatId) {
+    fn value(&self, var: MultiwayVar) -> Value {
+        let (state, actor) = *self;
+        use MultiwayVar::*;
+        match var {
+            Position => Value::Text(position_name(actor, state.button, state.num_seats())),
+            InPosition => Value::Bool(is_in_position(state, actor)),
+            InPositionToLastAggressor => {
+                Value::Bool(is_in_position_to_last_aggressor(state, actor))
             }
-            return Ok(value);
-        }
-        self.parse_predicate()
-    }
-
-    fn parse_predicate(&mut self) -> Result<bool, String> {
-        let identifier = self.identifier()?;
-        let left = self.context_value(&identifier)?;
-        if self.consume_keyword("in") {
-            return self.parse_membership(left);
-        }
-        if let Some(operator) = self.comparison_operator() {
-            let right = self.literal()?;
-            return compare(left, right, operator);
-        }
-        match left {
-            Value::Bool(value) => Ok(value),
-            _ => Err(format!(
-                "tree rule value {identifier:?} requires a comparison or 'in'"
-            )),
-        }
-    }
-
-    fn parse_membership(&mut self, left: Value) -> Result<bool, String> {
-        if !self.consume("[") {
-            return Err("tree rule 'in' requires an array".into());
-        }
-        let mut found = false;
-        loop {
-            if self.consume("]") {
-                return Ok(found);
-            }
-            let candidate = self.literal()?;
-            found |= left == candidate;
-            if self.consume("]") {
-                return Ok(found);
-            }
-            if !self.consume(",") {
-                return Err("tree rule array requires ',' or ']'".into());
-            }
-        }
-    }
-
-    fn comparison_operator(&mut self) -> Option<&'static str> {
-        ["<=", ">=", "==", "!=", "<", ">"]
-            .into_iter()
-            .find(|operator| self.consume(operator))
-    }
-
-    fn literal(&mut self) -> Result<Value, String> {
-        self.skip_space();
-        if self.source.get(self.position) == Some(&b'\"') {
-            self.position += 1;
-            let start = self.position;
-            while self
-                .source
-                .get(self.position)
-                .is_some_and(|byte| *byte != b'\"')
-            {
-                self.position += 1;
-            }
-            if self.source.get(self.position) != Some(&b'\"') {
-                return Err("unterminated string in tree rule condition".into());
-            }
-            let text = std::str::from_utf8(&self.source[start..self.position])
-                .map_err(|_| "tree rule condition is not UTF-8".to_string())?
-                .to_owned();
-            self.position += 1;
-            return Ok(Value::Text(text));
-        }
-        let start = self.position;
-        if self.source.get(self.position) == Some(&b'-') {
-            self.position += 1;
-        }
-        while self
-            .source
-            .get(self.position)
-            .is_some_and(|byte| byte.is_ascii_digit() || *byte == b'.')
-        {
-            self.position += 1;
-        }
-        if self.position > start {
-            let number = std::str::from_utf8(&self.source[start..self.position])
-                .map_err(|_| "tree rule condition is not UTF-8".to_string())?
-                .parse::<f64>()
-                .map_err(|_| "invalid number in tree rule condition".to_string())?;
-            if !number.is_finite() {
-                return Err("tree rule number must be finite".into());
-            }
-            return Ok(Value::Number(number));
-        }
-        let word = self.identifier()?;
-        match word.as_str() {
-            "true" => Ok(Value::Bool(true)),
-            "false" => Ok(Value::Bool(false)),
-            _ => Ok(Value::Text(word)),
-        }
-    }
-
-    fn context_value(&self, identifier: &str) -> Result<Value, String> {
-        let active_players = self.state.non_folded_mask().len();
-        Ok(match identifier {
-            "position" => Value::Text(position_name(
-                self.actor,
-                self.state.button,
-                self.state.num_seats(),
-            )),
-            "in_position" => Value::Bool(is_in_position(self.state, self.actor)),
-            "in_position_to_last_aggressor" => {
-                Value::Bool(is_in_position_to_last_aggressor(self.state, self.actor))
-            }
-            "preflop_participant" => {
-                Value::Bool(self.state.preflop_participants.contains(self.actor))
-            }
-            "open_cold_calls" => Value::Number(f64::from(self.state.preflop_open_cold_calls)),
-            "players" => Value::Number(active_players as f64),
-            "limpers" => Value::Number(f64::from(self.state.preflop_limpers)),
-            "flats" => Value::Number(f64::from(self.state.preflop_flats)),
-            "aggressions" => Value::Number(f64::from(self.state.aggressive_actions)),
-            "unopened" => Value::Bool(self.state.aggressive_actions == 0),
-            "squeeze" => Value::Bool(
-                self.state.street == crate::types::Street::Preflop
-                    && self.state.aggressive_actions > 0
-                    && self.state.preflop_flats > 0,
+            PreflopParticipant => Value::Bool(state.preflop_participants.contains(actor)),
+            OpenColdCalls => Value::Number(f64::from(state.preflop_open_cold_calls)),
+            Players => Value::Number(state.non_folded_mask().len() as f64),
+            Limpers => Value::Number(f64::from(state.preflop_limpers)),
+            Flats => Value::Number(f64::from(state.preflop_flats)),
+            Aggressions => Value::Number(f64::from(state.aggressive_actions)),
+            Unopened => Value::Bool(state.aggressive_actions == 0),
+            Squeeze => Value::Bool(
+                state.street == crate::types::Street::Preflop
+                    && state.aggressive_actions > 0
+                    && state.preflop_flats > 0,
             ),
-            "cbet" => Value::Bool(
-                self.state.street != crate::types::Street::Preflop
-                    && self.state.aggressive_actions == 0
-                    && self.state.last_preflop_aggressor == Some(self.actor),
+            Cbet => Value::Bool(
+                state.street != crate::types::Street::Preflop
+                    && state.aggressive_actions == 0
+                    && state.last_preflop_aggressor == Some(actor),
             ),
-            "donk" => Value::Bool(
-                self.state.street != crate::types::Street::Preflop
-                    && self.state.aggressive_actions == 0
-                    && self.state.last_preflop_aggressor.is_some()
-                    && self.state.last_preflop_aggressor != Some(self.actor),
+            Donk => Value::Bool(
+                state.street != crate::types::Street::Preflop
+                    && state.aggressive_actions == 0
+                    && state.last_preflop_aggressor.is_some()
+                    && state.last_preflop_aggressor != Some(actor),
             ),
-            "spr" => Value::Number(spr(self.state, self.actor)),
-            other => return Err(format!("unknown tree rule identifier {other:?}")),
+            Spr => Value::Number(spr(state, actor)),
+        }
+    }
+}
+
+/// Compiles one multiway condition string (a `[[..rules]] when = "..."`
+/// value, or a rendered `.mwtree` rule condition -- see
+/// `crate::config::TreeRule::compiled`) against [`MULTIWAY`].
+pub(crate) fn compile(source: &str) -> Result<Condition<MultiwayVar>, ScriptError> {
+    Condition::parse(source, &MULTIWAY)
+}
+
+/// Compiles a whole `.mwtree` script against [`MULTIWAY`], applying
+/// `overrides` to any `param` it declares, and lowers the result straight to
+/// [`TreeRule`]s -- the same `cards::script` front end (tokenizing,
+/// substitution, nesting, `if`/`else`, `param`/`define`) postflop's `.tree`
+/// scripts compile through, so this is the whole answer to "put multiway's
+/// tree script on the same front end as postflop's". This is the only
+/// caller of [`crate::config::TreeRule::from_compiled`]: each compiled
+/// rule's condition is installed into the returned `TreeRule` directly, not
+/// reparsed from `Display`-rendered text.
+///
+/// Every rule gets `priority` 100 (ties with every other script rule, so
+/// `Vec<TreeRule>`'s sort-by-`(priority, source_order)` is a no-op and
+/// source order -- the flattened script's own order -- decides, matching
+/// `cards::script::Rule<V>`'s own "no priority field, source order is the
+/// whole model") and `source_order` set to its position in the flattened
+/// list, matching what the old flat scanner already did (it hardcoded the
+/// same 100 for the same reason).
+pub fn compile_script(
+    source: &str,
+    overrides: &BTreeMap<String, String>,
+) -> Result<Vec<TreeRule>, ScriptError> {
+    let script = Script::compile(source, overrides, &MULTIWAY)?;
+    Ok(script
+        .rules
+        .into_iter()
+        .enumerate()
+        .map(|(index, rule)| {
+            TreeRule::from_compiled(
+                100,
+                index as u32,
+                to_rule_street(rule.street),
+                rule.condition,
+                rule.effect,
+                rule.action,
+                rule.sizes,
+            )
         })
-    }
+        .collect())
+}
 
-    fn identifier(&mut self) -> Result<String, String> {
-        self.skip_space();
-        let start = self.position;
-        while self
-            .source
-            .get(self.position)
-            .is_some_and(|byte| byte.is_ascii_alphanumeric() || *byte == b'_' || *byte == b'-')
-        {
-            self.position += 1;
-        }
-        if start == self.position {
-            return Err(format!(
-                "expected tree rule expression at byte {}",
-                self.position
-            ));
-        }
-        std::str::from_utf8(&self.source[start..self.position])
-            .map(str::to_owned)
-            .map_err(|_| "tree rule condition is not UTF-8".to_string())
-    }
-
-    fn consume_keyword(&mut self, keyword: &str) -> bool {
-        let before = self.position;
-        if !self.consume(keyword) {
-            return false;
-        }
-        if self
-            .source
-            .get(self.position)
-            .is_some_and(|byte| byte.is_ascii_alphanumeric() || *byte == b'_')
-        {
-            self.position = before;
-            false
-        } else {
-            true
-        }
-    }
-
-    fn consume(&mut self, token: &str) -> bool {
-        self.skip_space();
-        if self.source[self.position..].starts_with(token.as_bytes()) {
-            self.position += token.len();
-            true
-        } else {
-            false
-        }
-    }
-
-    fn skip_space(&mut self) {
-        while self
-            .source
-            .get(self.position)
-            .is_some_and(u8::is_ascii_whitespace)
-        {
-            self.position += 1;
-        }
+/// `cards::Street` has no `Postflop` catch-all (only the typed `[[..rules]]`
+/// TOML surface's [`RuleStreet`] does, and `.mwtree` scripts dropped that
+/// keyword -- see the module docs on `MULTIWAY`), so every variant maps
+/// straight across.
+fn to_rule_street(street: cards::Street) -> RuleStreet {
+    match street {
+        cards::Street::Preflop => RuleStreet::Preflop,
+        cards::Street::Flop => RuleStreet::Flop,
+        cards::Street::Turn => RuleStreet::Turn,
+        cards::Street::River => RuleStreet::River,
     }
 }
 
-fn compare(left: Value, right: Value, operator: &str) -> Result<bool, String> {
-    Ok(match (left, right) {
-        (Value::Number(left), Value::Number(right)) => match operator {
-            "<=" => left <= right,
-            ">=" => left >= right,
-            "==" => left == right,
-            "!=" => left != right,
-            "<" => left < right,
-            ">" => left > right,
-            _ => unreachable!(),
-        },
-        (Value::Text(left), Value::Text(right)) => match operator {
-            "==" => left == right,
-            "!=" => left != right,
-            _ => return Err("strings in tree rules support only == and !=".into()),
-        },
-        (Value::Bool(left), Value::Bool(right)) => match operator {
-            "==" => left == right,
-            "!=" => left != right,
-            _ => return Err("booleans in tree rules support only == and !=".into()),
-        },
-        _ => return Err("tree rule comparison operands have different types".into()),
-    })
+/// True when `rule` matches this decision node: its street gates first
+/// (cheap, and checked outside the compiled condition since [`RuleStreet`]'s
+/// `Postflop` catch-all has no equivalent single [`MultiwayVar`]), then its
+/// condition, read from [`TreeRule::compiled`]'s cache rather than reparsed.
+/// Infallible: every rule's condition was already compiled -- and would have
+/// been rejected -- when the owning config was validated, so there is
+/// nothing left to fail here (matching postflop's own `Condition::eval`).
+pub(crate) fn matches(rule: &TreeRule, state: &BettingState, actor: SeatId) -> bool {
+    rule.street.matches(state.street) && rule.compiled().eval(&(state, actor))
 }
 
-fn position_name(actor: SeatId, button: SeatId, seats: usize) -> String {
+/// The identifier this seat plays under, computed from the button offset for
+/// two through nine seats. A fixed small vocabulary, so every arm is
+/// `&'static str` and nothing here allocates.
+fn position_name(actor: SeatId, button: SeatId, seats: usize) -> &'static str {
     const LABELS: [&[&str]; 8] = [
         &["BTN", "BB"],
         &["BTN", "SB", "BB"],
@@ -348,13 +253,13 @@ fn position_name(actor: SeatId, button: SeatId, seats: usize) -> String {
     let labels = LABELS[seats - 2];
     let offset = (actor.index() + seats - button.index()) % seats;
     if seats == 2 {
-        return labels[offset].into();
+        return labels[offset];
     }
     match offset {
-        0 => "BTN".into(),
-        1 => "SB".into(),
-        2 => "BB".into(),
-        _ => labels[offset - 3].into(),
+        0 => "BTN",
+        1 => "SB",
+        2 => "BB",
+        _ => labels[offset - 3],
     }
 }
 
@@ -411,6 +316,23 @@ mod tests {
         RuleEffect, RuleStreet, SeatConfig,
     };
 
+    fn rule(
+        condition: &str,
+        street: RuleStreet,
+        effect: RuleEffect,
+        action: RuleAction,
+    ) -> TreeRule {
+        TreeRule::new(
+            100,
+            0,
+            street,
+            condition.to_string(),
+            effect,
+            Some(action),
+            Vec::new(),
+        )
+    }
+
     #[test]
     fn selector_parser_supports_position_counts_flags_and_spr() {
         let config = MultiwayConfig {
@@ -430,28 +352,20 @@ mod tests {
             abstraction: AbstractionConfig::default(),
         };
         let state = BettingState::new(&config.validated().unwrap()).unwrap();
-        let rule = TreeRule {
-            priority: 100,
-            source_order: 0,
-            street: RuleStreet::Preflop,
-            condition: "unopened && position in [\"UTG\", \"HJ\"] && players == 6 && spr > 1"
-                .into(),
-            effect: RuleEffect::Replace,
-            action: Some(RuleAction::Raise),
-            sizes: Vec::new(),
-        };
-        assert!(matches(&rule, &state, state.to_act.unwrap()).unwrap());
-        assert!(
-            matches(
-                &TreeRule {
-                    condition: "!squeeze && flats == 0".into(),
-                    ..rule
-                },
-                &state,
-                state.to_act.unwrap(),
-            )
-            .unwrap()
+        let raise_rule = rule(
+            "unopened && position in [\"UTG\", \"HJ\"] && players == 6 && spr > 1",
+            RuleStreet::Preflop,
+            RuleEffect::Replace,
+            RuleAction::Raise,
         );
+        assert!(matches(&raise_rule, &state, state.to_act.unwrap()));
+        let squeeze_rule = rule(
+            "!squeeze && flats == 0",
+            RuleStreet::Preflop,
+            RuleEffect::Replace,
+            RuleAction::Raise,
+        );
+        assert!(matches(&squeeze_rule, &state, state.to_act.unwrap()));
     }
 
     #[test]
@@ -473,82 +387,49 @@ mod tests {
             abstraction: AbstractionConfig::default(),
         };
         let mut state = BettingState::new(&config.validated().unwrap()).unwrap();
-        let base_rule = TreeRule {
-            priority: 0,
-            source_order: 0,
-            street: RuleStreet::Preflop,
-            condition: String::new(),
-            effect: RuleEffect::Remove,
-            action: Some(RuleAction::Call),
-            sizes: Vec::new(),
-        };
 
         // In a six-handed table with BTN=0, fixed postflop order is
         // SB(1), BB(2), UTG(3), HJ(4), CO(5), BTN(0).
         state.last_preflop_aggressor = Some(SeatId(3));
-        assert!(
-            matches(
-                &TreeRule {
-                    condition: "in_position_to_last_aggressor".into(),
-                    ..base_rule.clone()
-                },
-                &state,
-                SeatId(5),
-            )
-            .unwrap()
+        let in_position_rule = rule(
+            "in_position_to_last_aggressor",
+            RuleStreet::Preflop,
+            RuleEffect::Remove,
+            RuleAction::Call,
         );
+        assert!(matches(&in_position_rule, &state, SeatId(5)));
+
         state.last_preflop_aggressor = Some(SeatId(0));
         for actor in [SeatId(1), SeatId(2)] {
-            assert!(
-                !matches(
-                    &TreeRule {
-                        condition: "in_position_to_last_aggressor".into(),
-                        ..base_rule.clone()
-                    },
-                    &state,
-                    actor,
-                )
-                .unwrap()
-            );
+            assert!(!matches(&in_position_rule, &state, actor));
         }
+
         state.street = crate::types::Street::Flop;
-        assert!(
-            !matches(
-                &TreeRule {
-                    street: RuleStreet::Postflop,
-                    condition: "in_position_to_last_aggressor".into(),
-                    ..base_rule.clone()
-                },
-                &state,
-                SeatId(0),
-            )
-            .unwrap()
+        let postflop_rule = rule(
+            "in_position_to_last_aggressor",
+            RuleStreet::Postflop,
+            RuleEffect::Remove,
+            RuleAction::Call,
         );
+        assert!(!matches(&postflop_rule, &state, SeatId(0)));
         state.street = crate::types::Street::Preflop;
 
         state.preflop_participants.insert(SeatId(3));
         state.preflop_open_cold_calls = 2;
-        assert!(
-            matches(
-                &TreeRule {
-                    condition: "preflop_participant && open_cold_calls == 2".into(),
-                    ..base_rule.clone()
-                },
-                &state,
-                SeatId(3),
-            )
-            .unwrap()
+        let participant_rule = rule(
+            "preflop_participant && open_cold_calls == 2",
+            RuleStreet::Preflop,
+            RuleEffect::Remove,
+            RuleAction::Call,
         );
-        assert!(
-            !matches(
-                &TreeRule {
-                    condition: "preflop_participant".into(),
-                    ..base_rule
-                },
-                &state,
-                SeatId(4),
-            )
-            .unwrap()
+        assert!(matches(&participant_rule, &state, SeatId(3)));
+
+        let participant_only_rule = rule(
+            "preflop_participant",
+            RuleStreet::Preflop,
+            RuleEffect::Remove,
+            RuleAction::Call,
         );
+        assert!(!matches(&participant_only_rule, &state, SeatId(4)));
     }
 }

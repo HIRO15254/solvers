@@ -757,7 +757,12 @@ fn solve_postflop<S: Storage>(
     // build, so an oversized config fails fast with a size estimate instead
     // of silently eating memory.
     let estimate = holdem::memory_usage(&config);
-    postflop_setup::print_memory_estimate(estimate);
+    postflop_setup::print_memory_estimate(&estimate);
+    // The dry run walks every decision node exactly like the real build
+    // (`Counting` mirrors `Builder`), so it already has the full answer to
+    // "did any node ever satisfy this rule?" -- no need to also inspect the
+    // real build's own `rule_hits` for a single-config run like this one.
+    postflop_setup::warn_unmatched_rules(&config.streets, &estimate.rule_hits);
 
     // Captured before `pipeline` is consumed by the build: every EV this
     // run reports is on the subgame-start basis, and this is the constant

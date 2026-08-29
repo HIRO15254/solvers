@@ -21,12 +21,9 @@
 
 use std::collections::BTreeSet;
 use std::path::Path;
-use std::str::FromStr;
 
 use anyhow::{Context, Result, anyhow, bail};
-use cards::script::{
-    ActionKind, CmpOp, Condition, Effect, Literal, ParamKind, ParamSchema, Rule, Script,
-};
+use cards::script::{ActionKind, Effect, ParamKind, ParamSchema, PostflopVar, Rule, Script};
 use cards::{SizeSpec, SizeUnit, Street};
 use serde::{Deserialize, Serialize};
 
@@ -615,7 +612,7 @@ fn street_name(street: Street) -> &'static str {
 /// rather than a TOML menu section -- the tree-script surface has no other
 /// place a bad size literal's *value* (as opposed to its syntax, which
 /// `SizeSpec::parse` already rejects at compile time) could hide.
-fn validate_rule_sizes(rules: &[Rule]) -> Result<()> {
+fn validate_rule_sizes(rules: &[Rule<PostflopVar>]) -> Result<()> {
     for rule in rules {
         let label = format!(
             "a {} rule on {}",
@@ -623,6 +620,14 @@ fn validate_rule_sizes(rules: &[Rule]) -> Result<()> {
                 Some(cards::script::ActionKind::Bet) => "bet",
                 Some(cards::script::ActionKind::Raise) => "raise",
                 None => "checkdown",
+                // `POSTFLOP`'s dialect (`cards::script::cond::POSTFLOP`)
+                // lists only `bet`/`raise` as accepted action words, so a
+                // compiled postflop rule never carries any other action.
+                Some(cards::script::ActionKind::Fold)
+                | Some(cards::script::ActionKind::Check)
+                | Some(cards::script::ActionKind::Call) => {
+                    unreachable!("postflop's dialect only accepts bet/raise actions")
+                }
             },
             street_name(rule.street)
         );
@@ -844,7 +849,7 @@ fn validate_semantics(family: &Family) -> Result<()> {
                     }
                 }
             }
-            let rules: &[Rule] = script.as_ref().map_or(&[], |script| &script.rules);
+            let rules: &[Rule<PostflopVar>] = script.as_ref().map_or(&[], |script| &script.rules);
             let start = match board.len() {
                 3 => Street::Flop,
                 4 => Street::Turn,
@@ -963,56 +968,6 @@ fn base_directory(config_path: &Path) -> &Path {
     config_path.parent().unwrap_or_else(|| Path::new("."))
 }
 
-/// Rewrites a postflop `[game.tree] script` value from serde's default
-/// `"""..."""` multi-line basic string into the TOML literal string
-/// `'''...'''` the contract writes -- see `docs/solver-config-v1.jp.md`'s
-/// "正規化 — script は展開せずインライン化する" section. A script body is bare
-/// tokens and comments, never a quote or backslash, so the literal form
-/// never needs to escape anything; the one thing it cannot represent is the
-/// delimiter sequence `'''` itself; appearing inside the body (almost
-/// certainly inside a comment) is an explicit error rather than something to
-/// silently work around.
-///
-/// A no-op (including for the toy and preflop-hu families) when the parsed
-/// document has no `[game.tree] script` string to rewrite.
-fn literalize_tree_script(effective_toml: &str) -> Result<String> {
-    let mut document = toml_edit::DocumentMut::from_str(effective_toml)
-        .context("re-parsing the effective config as a TOML document")?;
-    // Checked read-only first: `Item::get_mut` auto-vivifies a missing key
-    // as `Item::None` (the machinery that lets `doc["a"]["b"] = v` create
-    // tables on the fly), so chaining `get_mut` alone would "find" a
-    // `[game.tree] script` on every config, toy and preflop-hu included.
-    // `Item::get` has no such side effect.
-    let has_script = document
-        .get("game")
-        .and_then(|game| game.get("tree"))
-        .and_then(|tree| tree.get("script"))
-        .is_some();
-    if !has_script {
-        return Ok(document.to_string());
-    }
-    let script_item = document
-        .get_mut("game")
-        .and_then(|game| game.get_mut("tree"))
-        .and_then(|tree| tree.get_mut("script"))
-        .expect("presence just checked above");
-    let text = script_item
-        .as_str()
-        .ok_or_else(|| anyhow!("[game.tree] script did not serialize as a string"))?
-        .to_string();
-    if text.contains("'''") {
-        bail!(
-            "SLV004: [game.tree] script contains \"'''\", which cannot be written as a TOML \
-             literal string; rewrite the script to avoid that exact sequence"
-        );
-    }
-    let literal = format!("'''\n{text}'''");
-    *script_item = toml_edit::Item::Value(
-        toml_edit::Value::from_str(&literal).context("building the literal script value")?,
-    );
-    Ok(document.to_string())
-}
-
 /// The config with every default written out.
 ///
 /// Defaults live in the field declarations, so normalizing is deserialize +
@@ -1021,7 +976,7 @@ fn literalize_tree_script(effective_toml: &str) -> Result<String> {
 pub fn normalized_toml(raw: &str) -> Result<String> {
     let family = parse_family(raw)?;
     let text = toml::to_string_pretty(&family).context("serializing the effective config")?;
-    literalize_tree_script(&text)
+    crate::config::literalize_tree_script("SLV004", &text)
 }
 
 /// [`normalized_toml`], resolving a postflop `[game.tree] source` relative
@@ -1029,7 +984,7 @@ pub fn normalized_toml(raw: &str) -> Result<String> {
 pub fn normalized_toml_at(raw: &str, config_path: &Path) -> Result<String> {
     let family = parse_family_at(raw, Some(base_directory(config_path)))?;
     let text = toml::to_string_pretty(&family).context("serializing the effective config")?;
-    literalize_tree_script(&text)
+    crate::config::literalize_tree_script("SLV004", &text)
 }
 
 /// The same, as JSON, for `validate --format json --show-effective`.
@@ -1145,7 +1100,7 @@ struct TreeDiagnostic {
     rules: Vec<RuleDiagnostic>,
 }
 
-fn render_tree_diagnostic(script: &Script) -> Result<serde_json::Value> {
+fn render_tree_diagnostic(script: &Script<PostflopVar>) -> Result<serde_json::Value> {
     let diagnostic = TreeDiagnostic {
         params: script.params.iter().map(render_param).collect(),
         rules: script.rules.iter().map(render_rule).collect(),
@@ -1184,10 +1139,13 @@ fn param_number_value(default: &str) -> serde_json::Value {
         .unwrap_or(serde_json::Value::Null)
 }
 
-fn render_rule(rule: &Rule) -> RuleDiagnostic {
+fn render_rule(rule: &Rule<PostflopVar>) -> RuleDiagnostic {
     RuleDiagnostic {
         street: street_name(rule.street),
-        condition: render_condition(&rule.condition),
+        // `Condition<V>`'s own `Display` impl (`cards::script::cond`) is the
+        // one condition-to-text renderer; multiway's `.mwtree` frontend
+        // reuses the exact same impl for its own dialect.
+        condition: rule.condition.to_string(),
         effect: effect_name(rule.effect),
         action: rule.action.map(action_name),
         sizes: rule
@@ -1198,10 +1156,35 @@ fn render_rule(rule: &Rule) -> RuleDiagnostic {
     }
 }
 
+/// Renders one lowered rule as the single line `crate::postflop_setup`'s
+/// dead-rule warning names it with -- effect, action, and sizes exactly as
+/// the `tree` diagnostic already renders them (via [`render_rule`], so
+/// there is exactly one condition/size renderer, not two), plus the
+/// condition itself: a reader has to be able to match this against their
+/// own script's `when`/`if` chain, so the condition is the whole value of
+/// the message.
+pub(crate) fn render_rule_line(rule: &Rule<PostflopVar>) -> String {
+    let diagnostic = render_rule(rule);
+    let body = match diagnostic.action {
+        Some(action) => format!(
+            "{} {action} [{}]",
+            diagnostic.effect,
+            diagnostic.sizes.join(", ")
+        ),
+        // `Effect::Checkdown` carries neither action nor sizes.
+        None => diagnostic.effect.to_string(),
+    };
+    format!("{body}  when {}", diagnostic.condition)
+}
+
 fn action_name(action: ActionKind) -> &'static str {
     match action {
         ActionKind::Bet => "bet",
         ActionKind::Raise => "raise",
+        // See `validate_rule_sizes`: postflop's dialect never produces these.
+        ActionKind::Fold | ActionKind::Check | ActionKind::Call => {
+            unreachable!("postflop's dialect only accepts bet/raise actions")
+        }
     }
 }
 
@@ -1215,101 +1198,11 @@ fn effect_name(effect: Effect) -> &'static str {
     }
 }
 
-/// Renders a lowered rule's [`Condition`] back to source-like text, using
-/// the tree script's own precedence (`||` lowest, `&&` next, unary `!`
-/// tightest, comparisons/membership/truth tightest of all): a subexpression
-/// is parenthesized only when it sits under an operator that binds tighter
-/// than it does.
-///
-/// `Not` is the one deliberate exception -- its operand is always
-/// parenthesized, matching this contract's own normalization example
-/// (`!(A) && !(B) && !(C) && D`, in the "正規化" section): a bare `!paired`
-/// reads fine on its own, but scanning a long `&&` chain for which term is
-/// negated does not, and a reader checking this rule against their
-/// `if`/`else` chain is doing exactly that scan.
-fn render_condition(condition: &Condition) -> String {
-    render_condition_prec(condition, 0)
-}
-
-/// `min_prec` is the precedence of the operator `condition` sits under (0 at
-/// the top level, `||`'s own precedence); `condition` is parenthesized if
-/// its own precedence is lower. Precedence levels: `||` = 0, `&&` = 1,
-/// everything else (unary `!`, comparisons, membership, `Truth`, `Const`) =
-/// 2, matching `cards::script::cond`'s grammar (`parse_or` < `parse_and` <
-/// `parse_unary` < `parse_predicate`).
-fn render_condition_prec(condition: &Condition, min_prec: u8) -> String {
-    let (text, prec) = match condition {
-        // `Const` has no script syntax of its own -- it only ever appears as
-        // the base of an unconditioned statement (`Const(true)`) or, once
-        // `Condition::specialize` is wired into the tree builder, a folded
-        // board-only condition. Spelling it out beats inventing pseudo-code.
-        Condition::Const(true) => ("always".to_string(), 2),
-        Condition::Const(false) => ("never".to_string(), 2),
-        Condition::Truth(var) => (var.name().to_string(), 2),
-        Condition::Not(inner) => (format!("!({})", render_condition_prec(inner, 0)), 2),
-        Condition::And(left, right) => (
-            format!(
-                "{} && {}",
-                render_condition_prec(left, 1),
-                render_condition_prec(right, 1)
-            ),
-            1,
-        ),
-        Condition::Or(left, right) => (
-            format!(
-                "{} || {}",
-                render_condition_prec(left, 0),
-                render_condition_prec(right, 0)
-            ),
-            0,
-        ),
-        Condition::Compare { var, op, value } => (
-            format!(
-                "{} {} {}",
-                var.name(),
-                cmp_op_str(*op),
-                render_literal(value)
-            ),
-            2,
-        ),
-        Condition::Member { var, values } => (
-            format!(
-                "{} in [{}]",
-                var.name(),
-                values
-                    .iter()
-                    .map(render_literal)
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            ),
-            2,
-        ),
-    };
-    if prec < min_prec {
-        format!("({text})")
-    } else {
-        text
-    }
-}
-
-fn cmp_op_str(op: CmpOp) -> &'static str {
-    match op {
-        CmpOp::Lt => "<",
-        CmpOp::Le => "<=",
-        CmpOp::Eq => "==",
-        CmpOp::Ne => "!=",
-        CmpOp::Ge => ">=",
-        CmpOp::Gt => ">",
-    }
-}
-
-fn render_literal(literal: &Literal) -> String {
-    match literal {
-        Literal::Bool(value) => value.to_string(),
-        Literal::Number(value) => format!("{value}"),
-        Literal::Text(value) => format!("{value:?}"),
-    }
-}
+// A rule's `Condition<PostflopVar>` renders back to source-like text via its
+// own `Display` impl in `cards::script::cond` -- see `render_rule` above.
+// That impl is shared with multiway's `.mwtree` frontend, which has no other
+// source text for a rule whose condition is a nested `when`/`if`
+// composition.
 
 #[cfg(test)]
 mod tests {

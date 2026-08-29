@@ -84,7 +84,12 @@ pub fn build_river_game(config: &RiverConfig, pipeline: PayoffPipeline<'_>) -> R
         // aggressor to seed `cbet`/`donk` from.
         preflop_aggressor: None,
     };
-    let PostflopGame { game, node_info } = build_postflop_game(&postflop_config, pipeline);
+    // `rule_hits` is a build-diagnostic field only the CLI's dead-rule
+    // warning reads (see `holdem::RuleHits`); this river-only shim has no
+    // caller that wants it.
+    let PostflopGame {
+        game, node_info, ..
+    } = build_postflop_game(&postflop_config, pipeline);
     RiverGame {
         game,
         node_info: node_info

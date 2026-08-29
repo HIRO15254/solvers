@@ -11,9 +11,10 @@
 //! .tree source ──tokenize──► tokens ──substitute──► tokens ──parse──► AST ──lower──► Vec<Rule>
 //! ```
 //!
-//! See `docs/postflop-tree-script-v1.jp.md` for the normative grammar this
-//! module implements: 適用モデル, 条件式, 盤面述語, script frontend, error,
-//! 具体例. The grammar is the same one
+//! See `docs/solver-config-v1.jp.md`'s `[game.tree]` chapter for the
+//! normative grammar this module implements: script の構造,
+//! 文 — action list の書き換え, param と define, 条件式, 盤面述語,
+//! size literal, error. The grammar is the same one
 //! `crates/multiway/src/tree_rules.rs` evaluates today, ported to a
 //! compile-once/evaluate-many shape: multiway re-parses its condition
 //! string at every node, which is fine for a small preflop tree but not for
@@ -29,8 +30,8 @@ mod token;
 
 pub use ast::{ActionKind, Effect, ParamKind, ParamSchema, Rule, Script};
 pub use cond::{
-    CmpOp, Condition, Dialect, Literal, POSTFLOP, PartialContext, PreviousAggressor, RuleContext,
-    Var, VarKind,
+    CmpOp, Condition, Dialect, Literal, POSTFLOP, PartialContext, PostflopVar, PreviousAggressor,
+    RuleContext, Value, VarKind, VarSource, Vars,
 };
 
 /// An error compiling a tree script. Every error -- tokenizing, `param` /

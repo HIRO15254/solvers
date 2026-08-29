@@ -17,7 +17,7 @@ pub mod sampler;
 pub mod settlement;
 pub mod solver;
 pub mod tree;
-mod tree_rules;
+pub mod tree_rules;
 pub mod types;
 
 pub use abstraction::{

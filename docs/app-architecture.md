@@ -221,11 +221,12 @@ run directory の `run.toml` には `source` が残らない。script ファイ�
 effective config を再 parse し、game fingerprint が一致することを確認するテストが
 両 family にある。
 
-解決の**手段**は family で違う。postflop は script 本文をそのまま config へ
-**インライン化**する。`params` が正規化を生き延びて GUI が編集できる変数として
-残り、書いた形と `run.toml` の形が一致するからである。Multiway はまだ lowering 済み
-rule 列へ展開しており、同じインライン化へ揃えるのは今後の作業である。どちらの手段でも
-path は残らないので、この規則(path 値キーを remote 投入で拒否する)は変わらない。
+解決の**手段**は postflop と Multiway で同じである。どちらも script 本文をそのまま
+config へ**インライン化**する(`params` が正規化を生き延びて GUI が編集できる変数
+として残り、書いた形と `run.toml` の形が一致する)。Multiway もかつては lowering 済み
+rule 列へ展開していたが、`params` を失わずに GUI 編集を可能にするため、postflop と
+同じインライン化へ揃えた。どちらの family でも path は残らないので、この規則
+(path 値キーを remote 投入で拒否する)は変わらない。
 
 したがって規則はこうなる。
 

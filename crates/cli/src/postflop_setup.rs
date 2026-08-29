@@ -6,12 +6,13 @@
 //! sampled multiway engine.
 
 use anyhow::{Result, anyhow};
-use cards::{Card, Chips, PerPlayer, Player, Range};
+use cards::{Card, Chips, PerPlayer, Player, Range, Street};
 use engine::{CfrPlus, Dcfr, DiscountSchedule, HsDcfr, Vanilla, linear_cfr};
 use game::UtilityModel;
-use holdem::{MemoryEstimate, PerStreet, PostflopConfig, StreetTree};
+use holdem::{MemoryEstimate, PerStreet, PostflopConfig, RuleHits, StreetTree};
 
 use crate::config::AlgorithmSection;
+use crate::solver_config_v1::render_rule_line;
 
 /// Parses a whitespace-separated board string ("Ks 7h 2d") into cards.
 pub fn parse_board(board: &str) -> Result<Vec<Card>> {
@@ -158,8 +159,10 @@ pub fn build_schedule(algorithm: &AlgorithmSection) -> Box<dyn DiscountSchedule>
 }
 
 /// Prints the tree-size preflight line before committing to a (possibly
-/// very large) real build.
-pub fn print_memory_estimate(estimate: MemoryEstimate) {
+/// very large) real build. Takes `estimate` by reference (not by move, as
+/// it used to when it had no other field worth keeping) because
+/// `estimate.rule_hits` is read afterward by [`warn_unmatched_rules`].
+pub fn print_memory_estimate(estimate: &MemoryEstimate) {
     println!(
         "tree: nodes={} terminals={} rank_tables={} storage={:.1} MiB (f32) / {:.1} MiB (i16)",
         estimate.nodes,
@@ -168,6 +171,80 @@ pub fn print_memory_estimate(estimate: MemoryEstimate) {
         estimate.f32_bytes as f64 / (1024.0 * 1024.0),
         estimate.i16_bytes as f64 / (1024.0 * 1024.0),
     );
+}
+
+/// OR-merges `hits` into `acc`, street by street and rule by rule -- the
+/// aggregation `report`'s multi-board sweep needs: a rule counts as
+/// "matched" the moment ANY board's build satisfies it, so this must be a
+/// logical OR across boards, not a per-board report (a rule that only fires
+/// on one board out of twenty is working as intended, not a bug -- see
+/// `warn_unmatched_rules`'s doc comment). Panics if `acc` and `hits` don't
+/// have the same per-street rule counts, which would mean they came from
+/// two different tree scripts; callers only ever merge `RuleHits` produced
+/// from the same config's `streets`, so that never happens in practice.
+pub fn merge_rule_hits(acc: &mut RuleHits, hits: &RuleHits) {
+    for street in [Street::Flop, Street::Turn, Street::River] {
+        let acc_street = &mut acc[street];
+        let hit_street = &hits[street];
+        assert_eq!(
+            acc_street.len(),
+            hit_street.len(),
+            "merged RuleHits must come from the same tree script"
+        );
+        for (a, &b) in acc_street.iter_mut().zip(hit_street) {
+            *a |= b;
+        }
+    }
+}
+
+/// Warns (on stderr) about every tree-script rule whose condition never
+/// evaluated true at any decision node while `rule_hits` was being
+/// accumulated -- see `holdem::RuleHits`'s doc comment for exactly what
+/// counts as a match. This check is **empirical, not static**: a
+/// contradiction like `aggressions == 0 && aggressions == 1` is only one
+/// way a rule can go dead (a `when donk` on the street a subgame starts on,
+/// an `spr` threshold no node reaches, and a raise-level rule nested under
+/// an unopened-pot guard all fail the same silent way, none of them a
+/// syntactic contradiction), so "did any node satisfy this?" -- counted
+/// during the real tree build -- is the only question that actually
+/// answers it.
+///
+/// Always a warning, never a hard error, and this run never fails because
+/// of it: a config that deliberately keeps a rule for a board or condition
+/// this run doesn't currently reach is legitimate (`report` sweeps many
+/// boards where per-board rule coverage genuinely varies), so there is no
+/// flag to suppress this either -- see `docs/solver-config-v1.jp.md`'s
+/// `[game.tree]` chapter.
+pub fn warn_unmatched_rules(streets: &PerStreet<StreetTree>, rule_hits: &RuleHits) {
+    let mut lines: Vec<String> = Vec::new();
+    for (street, name) in [
+        (Street::Flop, "flop"),
+        (Street::Turn, "turn"),
+        (Street::River, "river"),
+    ] {
+        let rules = &streets[street].rules;
+        let hits = &rule_hits[street];
+        for (index, (rule, &hit)) in rules.iter().zip(hits).enumerate() {
+            if !hit {
+                lines.push(format!(
+                    "  {name} rule {}: {}",
+                    index + 1,
+                    render_rule_line(rule),
+                ));
+            }
+        }
+    }
+    if lines.is_empty() {
+        return;
+    }
+    eprintln!(
+        "warning: {} tree-script rule{} matched no node and had no effect:",
+        lines.len(),
+        if lines.len() == 1 { "" } else { "s" },
+    );
+    for line in lines {
+        eprintln!("{line}");
+    }
 }
 
 /// Reach-weighted overall frequency of each action at an action node: for

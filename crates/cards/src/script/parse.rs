@@ -27,12 +27,12 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 
 use super::ScriptError;
 use super::ast::{ActionKind, Effect, ParamKind, ParamSchema, Script, StmtAst, StreetBlockAst};
-use super::cond::{self, Dialect, is_reserved};
+use super::cond::{self, Dialect, Vars, is_reserved};
 use super::lower;
 use super::token::{self, Token, TokenKind, expect_punct, is_punct, is_word, line_at, tokenize};
 use crate::{SizeSpec, Street};
 
-impl Script {
+impl<V: Vars> Script<V> {
     /// Compiles a `.tree` script source against `dialect`, applying
     /// `overrides` to any `param` they name. `overrides` keys that do not
     /// name a declared `param` are an error, as is an override, `param`, or
@@ -40,8 +40,8 @@ impl Script {
     pub fn compile(
         source: &str,
         overrides: &BTreeMap<String, String>,
-        dialect: &Dialect,
-    ) -> Result<Script, ScriptError> {
+        dialect: &Dialect<V>,
+    ) -> Result<Script<V>, ScriptError> {
         let all_tokens = tokenize(source)?;
         let line_info = build_line_info(&all_tokens);
         let significant: Vec<Token> = all_tokens
@@ -147,7 +147,7 @@ enum TopLevel {
 
 /// True when `token` can legally start a new top-level item, i.e. is a
 /// valid stopping point for a `param`'s single-token value.
-fn starts_top_level(token: &Token, dialect: &Dialect) -> bool {
+fn starts_top_level<V: Vars>(token: &Token, dialect: &Dialect<V>) -> bool {
     match &token.kind {
         TokenKind::Word(word) => {
             word == "param" || word == "define" || dialect.streets.iter().any(|(n, _)| n == word)
@@ -161,7 +161,10 @@ fn starts_top_level(token: &Token, dialect: &Dialect) -> bool {
 /// content inside `{ ... }` is collected as opaque, not-yet-substituted
 /// token spans; the block/condition grammar only sees it after
 /// substitution (`parse_street_block`).
-fn scan_top_level(tokens: &[Token], dialect: &Dialect) -> Result<Vec<TopLevel>, ScriptError> {
+fn scan_top_level<V: Vars>(
+    tokens: &[Token],
+    dialect: &Dialect<V>,
+) -> Result<Vec<TopLevel>, ScriptError> {
     let mut items = Vec::new();
     let mut i = 0usize;
     while i < tokens.len() {
@@ -414,11 +417,11 @@ fn infer_param_kind(value_text: &str) -> ParamKind {
 /// declarations are rejected up front; each declaration's own references
 /// are then checked and substituted using only what has already been
 /// resolved, before it is itself marked resolved.
-fn resolve_declarations(
+fn resolve_declarations<V: Vars>(
     items: &[TopLevel],
     line_info: &HashMap<usize, LineInfo>,
     overrides: &BTreeMap<String, String>,
-    dialect: &Dialect,
+    dialect: &Dialect<V>,
 ) -> Result<(HashMap<String, Resolution>, Vec<ParamSchema>), ScriptError> {
     let mut declared_names: HashSet<String> = HashSet::new();
     for item in items {
@@ -525,11 +528,11 @@ fn resolve_declarations(
 
 // ---- street block / body / condition / size-list parsing ------------------
 
-fn parse_street_block(
+fn parse_street_block<V: Vars>(
     item: &StreetItem,
     resolved: &HashMap<String, Resolution>,
-    dialect: &Dialect,
-) -> Result<StreetBlockAst, ScriptError> {
+    dialect: &Dialect<V>,
+) -> Result<StreetBlockAst<V>, ScriptError> {
     let mut seen = HashSet::new();
     let mut streets = Vec::with_capacity(item.streets.len());
     for (name, line) in &item.streets {
@@ -589,11 +592,11 @@ fn parse_street_block(
     })
 }
 
-fn parse_body(
+fn parse_body<V: Vars>(
     tokens: &[Token],
     pos: &mut usize,
-    dialect: &Dialect,
-) -> Result<Vec<StmtAst>, ScriptError> {
+    dialect: &Dialect<V>,
+) -> Result<Vec<StmtAst<V>>, ScriptError> {
     let mut stmts = Vec::new();
     while *pos < tokens.len() && !is_punct(tokens, *pos, "}") {
         stmts.push(parse_stmt(tokens, pos, dialect)?);
@@ -601,11 +604,11 @@ fn parse_body(
     Ok(stmts)
 }
 
-fn parse_braced_body(
+fn parse_braced_body<V: Vars>(
     tokens: &[Token],
     pos: &mut usize,
-    dialect: &Dialect,
-) -> Result<Vec<StmtAst>, ScriptError> {
+    dialect: &Dialect<V>,
+) -> Result<Vec<StmtAst<V>>, ScriptError> {
     let open_line = line_at(tokens, *pos);
     expect_punct(tokens, pos, "{")?;
     if is_punct(tokens, *pos, "}") {
@@ -619,11 +622,26 @@ fn parse_braced_body(
     Ok(body)
 }
 
-fn parse_stmt(
+/// The dialect's action word at `pos`, if any, without consuming it --
+/// `dialect.actions` is what actually narrows the grammar per family
+/// (postflop's lists only `bet`/`raise`; multiway's lists all five).
+fn peek_action_word<V: Vars>(
+    tokens: &[Token],
+    pos: usize,
+    dialect: &Dialect<V>,
+) -> Option<ActionKind> {
+    dialect
+        .actions
+        .iter()
+        .copied()
+        .find(|action| is_word(tokens, pos, action.name()))
+}
+
+fn parse_stmt<V: Vars>(
     tokens: &[Token],
     pos: &mut usize,
-    dialect: &Dialect,
-) -> Result<StmtAst, ScriptError> {
+    dialect: &Dialect<V>,
+) -> Result<StmtAst<V>, ScriptError> {
     let line = line_at(tokens, *pos);
 
     if is_word(tokens, *pos, "when") {
@@ -637,7 +655,7 @@ fn parse_stmt(
     }
     if is_word(tokens, *pos, "checkdown") {
         *pos += 1;
-        if is_word(tokens, *pos, "bet") || is_word(tokens, *pos, "raise") {
+        if peek_action_word(tokens, *pos, dialect).is_some() {
             return Err(ScriptError {
                 line,
                 message: "'checkdown' does not take an action; write 'checkdown' on its own"
@@ -677,26 +695,28 @@ fn parse_stmt(
     *pos += 1;
 
     let action_line = line_at(tokens, *pos);
-    let action = if is_word(tokens, *pos, "bet") {
-        *pos += 1;
-        ActionKind::Bet
-    } else if is_word(tokens, *pos, "raise") {
-        *pos += 1;
-        ActionKind::Raise
-    } else {
+    let Some(action) = peek_action_word(tokens, *pos, dialect) else {
+        let names = dialect
+            .actions
+            .iter()
+            .map(|action| format!("'{}'", action.name()))
+            .collect::<Vec<_>>()
+            .join(", ");
         return Err(ScriptError {
             line: action_line,
-            message: "expected 'bet' or 'raise'".to_string(),
+            message: format!("expected one of: {names}"),
         });
     };
+    *pos += 1;
 
     if effect == Effect::Remove {
         if is_punct(tokens, *pos, "[") {
             return Err(ScriptError {
                 line: line_at(tokens, *pos),
-                message: "'remove' does not take a size list; write 'remove bet' or \
-                          'remove raise' with no sizes"
-                    .to_string(),
+                message: format!(
+                    "'remove' does not take a size list; write 'remove {}' with no sizes",
+                    action.name()
+                ),
             });
         }
         return Ok(StmtAst::Action {
@@ -714,7 +734,11 @@ fn parse_stmt(
     })
 }
 
-fn parse_if(tokens: &[Token], pos: &mut usize, dialect: &Dialect) -> Result<StmtAst, ScriptError> {
+fn parse_if<V: Vars>(
+    tokens: &[Token],
+    pos: &mut usize,
+    dialect: &Dialect<V>,
+) -> Result<StmtAst<V>, ScriptError> {
     *pos += 1; // consume 'if'
     let mut arms = Vec::new();
     let condition = cond::parse_condition(tokens, pos, dialect)?;
@@ -739,10 +763,10 @@ fn parse_if(tokens: &[Token], pos: &mut usize, dialect: &Dialect) -> Result<Stmt
     Ok(StmtAst::If { arms, else_body })
 }
 
-fn parse_size_list(
+fn parse_size_list<V: Vars>(
     tokens: &[Token],
     pos: &mut usize,
-    dialect: &Dialect,
+    dialect: &Dialect<V>,
 ) -> Result<Vec<SizeSpec>, ScriptError> {
     expect_punct(tokens, pos, "[")?;
     let mut sizes = Vec::new();
@@ -777,15 +801,18 @@ fn parse_size_list(
 
 #[cfg(test)]
 mod tests {
-    use super::super::cond::{POSTFLOP, PreviousAggressor, RuleContext};
+    use super::super::cond::{POSTFLOP, PostflopVar, PreviousAggressor, RuleContext};
     use super::*;
     use crate::BoardFacts;
 
-    fn compile(source: &str) -> Result<Script, ScriptError> {
+    fn compile(source: &str) -> Result<Script<PostflopVar>, ScriptError> {
         Script::compile(source, &BTreeMap::new(), &POSTFLOP)
     }
 
-    fn compile_with(source: &str, overrides: &[(&str, &str)]) -> Result<Script, ScriptError> {
+    fn compile_with(
+        source: &str,
+        overrides: &[(&str, &str)],
+    ) -> Result<Script<PostflopVar>, ScriptError> {
         let overrides = overrides
             .iter()
             .map(|(k, v)| (k.to_string(), v.to_string()))
