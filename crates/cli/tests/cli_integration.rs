@@ -1364,6 +1364,7 @@ fn a_solve_records_a_complete_run_directory() {
 }
 
 /// The iteration count on a run directory's last progress row.
+#[cfg(unix)]
 fn last_progress_iteration(run: &std::path::Path) -> u64 {
     let progress = std::fs::read_to_string(run.join("progress.jsonl")).unwrap();
     let last = progress.lines().last().expect("at least one progress row");
@@ -1390,6 +1391,7 @@ fn status_reports_a_canceled_heads_up_run_as_resumable() {
 /// Ctrl-C during a heads-up solve must stop at a checkpoint boundary and
 /// leave the run resumable, the same way it does for a multiway solve.
 #[test]
+#[cfg(unix)]
 #[ignore = "spawns and signals a solve; explicit release acceptance only"]
 fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
     let dir = temp_dir("hu-cancel-resume");

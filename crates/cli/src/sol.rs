@@ -27,8 +27,8 @@ use formats::{
 };
 use game::{PayoffPipeline, RakeModel, UtilityModel};
 use holdem::{
-    PostflopConfig, PostflopEvaluator, PostflopGame, PostflopNodeInfo, build_postflop_game,
-    node_streets, river_entry_state, river_resolve_config,
+    PostflopConfig, PostflopEvaluator, PostflopGame, build_postflop_game, node_streets,
+    river_entry_state, river_resolve_config,
 };
 
 use crate::config::GameSection;
@@ -98,22 +98,10 @@ fn human_size(bytes: u64) -> String {
     }
 }
 
-/// Exports a `.sol` viewer artifact for a completed postflop solve.
-///
-/// `start_street` is the subgame's starting street (from the built config's
-/// board length, via [`start_street_from_board_len`]); when it is
-/// [`Street::River`] the whole config IS the river, so `NoRivers` mode would
-/// store nothing at all -- this forces `Full` instead, printing a note only
-/// when that actually overrides the caller's requested mode.
-///
-/// `summary` supplies the iteration count and exploitability from the just-
-/// finished run; `solver` is queried directly (rather than trusting anything
-/// cached in `summary`) for both players' expected value, since a raked
-/// (general-sum) game's `ev[1]` is never just `-ev[0]`.
 /// Per-hand opponent reach compatible with each of `p`'s hands.
 ///
 /// A counterfactual value `v[h]` is `sum over opponent hands o of
-/// reach(o) * payoff(h, o)`, so turning it into "chips this hand expects"
+/// reach(o) * payoff(h, o)`, so turning it into a per-hand utility value
 /// means dividing by the reach that could actually be facing `h`. Hands
 /// sharing a card with `h` cannot, which is the usual inclusion-exclusion:
 /// total, minus the reach through each of `h`'s two cards, plus the one
@@ -189,10 +177,22 @@ fn walk_reaches<F>(
     }
 }
 
+/// Exports a `.sol` viewer artifact for a completed postflop solve.
+///
+/// `start_street` is the subgame's starting street (from the built config's
+/// board length, via [`start_street_from_board_len`]); when it is
+/// [`Street::River`] the whole config IS the river, so `NoRivers` mode would
+/// store nothing at all -- this forces `Full` instead, printing a note only
+/// when that actually overrides the caller's requested mode.
+///
+/// `summary` supplies the iteration count and exploitability from the just-
+/// finished run; `solver` is queried directly (rather than trusting anything
+/// cached in `summary`) for both players' expected value, since a raked
+/// (general-sum) game's `ev[1]` is never just `-ev[0]`.
 pub(crate) fn export_sol<S: Storage>(
     spec: &SolExportSpec,
     solver: &Solver<PostflopEvaluator, S>,
-    node_info: &[PostflopNodeInfo],
+    ev_offset: PerPlayer<f64>,
     start_street: Street,
     summary: &RunSummary,
 ) -> Result<()> {
@@ -246,7 +246,6 @@ pub(crate) fn export_sol<S: Storage>(
             sref: node.aux,
             probs: quantize_probs(&avg),
         });
-        let info = &node_info[tree.tags[id as usize] as usize];
         let reach = reaches[id as usize]
             .as_ref()
             .expect("every action node is visited by the reach walk");
@@ -254,10 +253,13 @@ pub(crate) fn export_sol<S: Storage>(
         for player in Player::BOTH {
             // A counterfactual value is opponent-reach-weighted, so it has
             // to be divided by the reach that could be facing this hand
-            // before a chip amount can be added to it. Skipping that would
+            // before a utility-valued offset can be added to it. Skipping that would
             // be a unit error, not a scaling one.
             let compatible = compatible_reach(&reach[player.opponent()]);
-            let offset = info.contrib[player].as_f64() as f32;
+            // Every node uses the original subgame's utility baseline.
+            // Adding this node's contributions would erase sunk wagers;
+            // adding chips at all would mix units for ICM.
+            let offset = ev_offset[player] as f32;
             let per_hand = recorded[player][node.aux as usize]
                 .as_ref()
                 .expect("every action node is recorded by the value pass");
@@ -742,9 +744,25 @@ impl StrategyProvider for SolProvider<'_> {
 mod tests {
     use super::*;
     use engine::I16Storage;
+    use holdem::PostflopNodeInfo;
     use std::sync::atomic::{AtomicU64, Ordering};
 
     static COUNTER: AtomicU64 = AtomicU64::new(0);
+
+    fn export_sol<S: Storage>(
+        spec: &SolExportSpec,
+        solver: &Solver<PostflopEvaluator, S>,
+        _node_info: &[PostflopNodeInfo],
+        start_street: Street,
+        summary: &RunSummary,
+    ) -> Result<()> {
+        let internal = crate::solve::solver_ev(solver);
+        let offset = PerPlayer::new(
+            summary.ev[Player::P0] - internal[Player::P0],
+            summary.ev[Player::P1] - internal[Player::P1],
+        );
+        super::export_sol(spec, solver, offset, start_street, summary)
+    }
 
     fn temp_path(name: &str) -> PathBuf {
         let id = COUNTER.fetch_add(1, Ordering::Relaxed);

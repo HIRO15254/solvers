@@ -195,6 +195,14 @@ fn validate_solver_config(
     let effective_toml = crate::solver_config_v1::normalized_toml_at(raw, config_path)?;
     let kind = crate::solver_config_v1::game_kind_at(raw, config_path)?;
     let schema = crate::solver_config_v1::declared_at(raw, config_path)?;
+    let config = parse_solve_config_at(raw, config_path)?;
+    let rake = crate::economics::build_rake(&config.rake)?;
+    let utility = crate::economics::build_utility(&config.utility)?;
+    let zero_sum = game::PayoffPipeline {
+        rake: rake.as_ref(),
+        utility: utility.as_ref(),
+    }
+    .is_zero_sum();
     if let Some(path) = write_effective {
         std::fs::write(path, &effective_toml)
             .with_context(|| format!("writing effective config {}", path.display()))?;
@@ -222,9 +230,11 @@ fn validate_solver_config(
         status: "valid",
         schema,
         game_kind: kind,
-        // Two-player zero-sum, so the average strategy converges to Nash --
-        // unlike the multiway families, which say the opposite.
-        profile: "vector CFR average profile; converges to Nash for two players",
+        profile: if zero_sum {
+            "vector CFR average profile; converges to Nash for two-player zero-sum games"
+        } else {
+            "vector CFR average profile; general-sum utilities, no Nash convergence guarantee"
+        },
         effective_config: show_effective
             .then(|| crate::solver_config_v1::normalized_json_at(raw, config_path))
             .transpose()?,

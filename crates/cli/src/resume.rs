@@ -10,7 +10,8 @@ use anyhow::{Context, Result, anyhow};
 use engine::{F32Storage, I16Storage};
 
 use crate::config::{GameSection, SolveConfig, StorageKind};
-use crate::solve::run_with_storage;
+use crate::sol::{SolExportSpec, SolStreets};
+use crate::solve::run_with_storage_sol;
 
 #[allow(clippy::too_many_arguments)]
 pub fn run(
@@ -78,6 +79,21 @@ fn resume_heads_up(
     let config: SolveConfig =
         crate::config::parse_solve_config(raw).context("parsing the run config")?;
     let config_hash = formats::config_hash(&raw_bytes);
+    let is_postflop = matches!(config.game, GameSection::Postflop { .. });
+    if is_postflop && histories.iter().any(|history| !history.is_empty()) {
+        return Err(anyhow!(
+            "postflop publishes through solution.sol; use export --node instead of --history"
+        ));
+    }
+    let previous_sol = run_directory.join(formats::RUN_HU_SOLUTION_FILE);
+    let sol_mode = if is_postflop && previous_sol.exists() {
+        match formats::read_sol(&previous_sol)?.mode {
+            formats::StreetsStored::Full => SolStreets::Full,
+            formats::StreetsStored::NoRivers => SolStreets::NoRivers,
+        }
+    } else {
+        SolStreets::Full
+    };
 
     if matches!(config.game, GameSection::PreflopMultiway(_)) {
         return Err(anyhow!(
@@ -111,6 +127,10 @@ fn resume_heads_up(
             crate::run_dir::create_or_adopt(fork)?;
             std::fs::write(fork.join(formats::RUN_CONFIG_FILE), raw)?;
             std::fs::copy(checkpoint_path, fork.join(formats::RUN_HU_CHECKPOINT_FILE))?;
+            let progress = run_directory.join(formats::RUN_PROGRESS_FILE);
+            if progress.exists() {
+                std::fs::copy(progress, fork.join(formats::RUN_PROGRESS_FILE))?;
+            }
             fork
         }
         None => run_directory,
@@ -125,40 +145,51 @@ fn resume_heads_up(
         vec!["resume".to_string(), directory.display().to_string()],
     )?;
     let checkpoint_sink = Some((paths.checkpoint.as_path(), config_hash));
+    let game_kind = crate::solve::game_kind_name(&config.game);
+    let sol = is_postflop.then(|| SolExportSpec {
+        path: paths.solution.clone(),
+        mode: sol_mode,
+        config_toml: raw.to_string(),
+        storage_name: match config.run.storage {
+            StorageKind::F32 => "f32",
+            StorageKind::I16 => "i16",
+        }
+        .into(),
+    });
+    let output = (!is_postflop).then_some(paths.strategy.as_path());
     // A storage-backend mismatch (e.g. the config now says `storage =
     // "i16"` but the checkpoint holds f32 state) surfaces naturally as a
-    // `StateMismatch` from `Solver::restore_state` inside `run_with_storage`
+    // `StateMismatch` from `Solver::restore_state` inside `run_with_storage_sol`
     // -- no separate check needed here.
     let outcome = match config.run.storage {
-        StorageKind::F32 => run_with_storage::<F32Storage>(
+        StorageKind::F32 => run_with_storage_sol::<F32Storage>(
             config,
-            Some(&paths.strategy),
+            output,
             histories,
             Some(&paths.progress),
             checkpoint_sink,
             Some(checkpoint.state),
+            sol,
             Some(recorder.events_mut()),
             Some(&crate::CLI_CANCEL),
         ),
-        StorageKind::I16 => run_with_storage::<I16Storage>(
+        StorageKind::I16 => run_with_storage_sol::<I16Storage>(
             config,
-            Some(&paths.strategy),
+            output,
             histories,
             Some(&paths.progress),
             checkpoint_sink,
             Some(checkpoint.state),
+            sol,
             Some(recorder.events_mut()),
             Some(&crate::CLI_CANCEL),
         ),
     };
-    let completion = outcome.as_ref().ok().map(|summary| {
-        if summary.canceled {
-            "cancelled"
-        } else {
-            "completed"
-        }
-        .to_string()
-    });
+    let completion = outcome
+        .as_ref()
+        .ok()
+        .map(|summary| crate::solve::write_heads_up_result(&paths.result, game_kind, summary))
+        .transpose()?;
     recorder.finish(outcome.map(|_summary| ()), completion)
 }
 

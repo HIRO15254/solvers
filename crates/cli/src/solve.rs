@@ -210,37 +210,37 @@ pub fn run(
         Some(recorder.events_mut()),
         Some(&crate::CLI_CANCEL),
     );
-    // A heads-up run has no solver-reported completion status: it either
-    // reached its iteration budget or its `target_nash_conv`. Record the
-    // convergence summary as `run.json` so `status` reports the same shape
-    // a multiway run does.
-    let completion = match &outcome {
-        Ok(summary) => {
-            let recorded = serde_json::json!({
-                "kind": game_kind,
-                "iterations": summary.iterations,
-                "wallSecs": summary.wall.as_secs_f64(),
-                "explP0": summary.expl_p0,
-                "explP1": summary.expl_p1,
-                "nashConv": summary.nash_conv,
-            });
-            std::fs::write(
-                &paths.result,
-                format!("{}\n", serde_json::to_string_pretty(&recorded)?),
-            )
-            .with_context(|| format!("writing {}", paths.result.display()))?;
-            Some(
-                if summary.canceled {
-                    "cancelled"
-                } else {
-                    "completed"
-                }
-                .to_string(),
-            )
-        }
-        Err(_) => None,
-    };
+    let completion = outcome
+        .as_ref()
+        .ok()
+        .map(|summary| write_heads_up_result(&paths.result, game_kind, summary))
+        .transpose()?;
     recorder.finish(outcome.map(|_summary| ()), completion)
+}
+
+/// Shared publication step for fresh and resumed HU runs.
+pub(crate) fn write_heads_up_result(
+    path: &Path,
+    kind: &str,
+    summary: &RunSummary,
+) -> Result<String> {
+    let recorded = serde_json::json!({
+        "kind": kind, "iterations": summary.iterations,
+        "wallSecs": summary.wall.as_secs_f64(),
+        "explP0": summary.expl_p0, "explP1": summary.expl_p1,
+        "nashConv": summary.nash_conv,
+    });
+    std::fs::write(
+        path,
+        format!("{}\n", serde_json::to_string_pretty(&recorded)?),
+    )
+    .with_context(|| format!("writing {}", path.display()))?;
+    Ok(if summary.canceled {
+        "cancelled"
+    } else {
+        "completed"
+    }
+    .to_string())
 }
 
 /// Names the game for a run manifest. These match the config's `kind`.
@@ -314,6 +314,8 @@ pub(crate) struct RunHooks<'a> {
     /// Wall-clock reference for `MetricsRow::elapsed_secs`, taken once at
     /// the start of the (possibly resumed) solve.
     pub start: Instant,
+    pub elapsed_before: Duration,
+    pub quiet: bool,
 }
 
 impl RunHooks<'static> {
@@ -325,46 +327,41 @@ impl RunHooks<'static> {
             cancel: None,
             canceled: false,
             start: Instant::now(),
+            elapsed_before: Duration::ZERO,
+            quiet: false,
         }
     }
 }
 
-/// Solves (or resumes) `config` with storage backend `S`, dispatching on
-/// the game kind. Shared by `solve`, `resume`, and `bench` so there is
-/// exactly one convergence loop and one export path in the codebase.
-///
-/// Never exports a `.sol` artifact -- see [`run_with_storage_sol`], the
-/// entry point `solve::run` uses instead, which does. Keeping this
-/// signature unchanged means `resume` and `bench` (which never export
-/// `.sol` files) don't need to touch their call sites for the `.sol`
-/// feature at all.
-#[allow(clippy::too_many_arguments)]
-pub(crate) fn run_with_storage<S: Storage>(
-    config: SolveConfig,
-    output: Option<&Path>,
-    histories: &[String],
-    metrics: Option<&Path>,
-    checkpoint: Option<(&Path, [u8; 32])>,
-    resume_state: Option<SolverState>,
-    events: Option<&mut formats::RunEventLog>,
-    cancel: Option<&std::sync::atomic::AtomicBool>,
-) -> Result<RunSummary> {
-    run_with_storage_impl::<S>(
-        config,
-        output,
-        histories,
-        metrics,
-        checkpoint,
-        resume_state,
-        None,
-        events,
-        cancel,
-    )
+impl RunHooks<'_> {
+    fn log(&self, message: std::fmt::Arguments<'_>) {
+        if self.quiet {
+            eprintln!("{message}");
+        } else {
+            println!("{message}");
+        }
+    }
 }
 
-/// Same as [`run_with_storage`], but additionally exports a `.sol` viewer
-/// artifact once the run completes (postflop configs only) when `sol` is
-/// `Some`.
+/// Last durable cumulative solve time; truncated tail rows are ignored.
+pub(crate) fn previous_elapsed(path: &Path) -> Result<Duration> {
+    use std::io::BufRead;
+    let file = match std::fs::File::open(path) {
+        Ok(file) => file,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(Duration::ZERO),
+        Err(error) => return Err(error.into()),
+    };
+    let mut elapsed = Duration::ZERO;
+    for line in std::io::BufReader::new(file).lines() {
+        if let Ok(row) = serde_json::from_str::<formats::MetricsRow>(&line?) {
+            elapsed = Duration::try_from_secs_f64(row.elapsed_secs)
+                .context("invalid recorded elapsed solve time")?;
+        }
+    }
+    Ok(elapsed)
+}
+
+/// Shared solve/resume path, including the postflop viewer artifact.
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn run_with_storage_sol<S: Storage>(
     config: SolveConfig,
@@ -412,6 +409,14 @@ fn run_with_storage_impl<S: Storage>(
     let schedule = postflop_setup::build_schedule(&config.algorithm);
     let schedule_name = schedule.name();
 
+    let elapsed_before = if resume_state.is_some() {
+        metrics
+            .map(previous_elapsed)
+            .transpose()?
+            .unwrap_or_default()
+    } else {
+        Duration::ZERO
+    };
     let mut metrics_writer = metrics
         .map(formats::MetricsWriter::create_or_append)
         .transpose()?;
@@ -422,9 +427,11 @@ fn run_with_storage_impl<S: Storage>(
         cancel,
         canceled: false,
         start: Instant::now(),
+        elapsed_before,
+        quiet: false,
     };
 
-    match config.game {
+    postflop_setup::with_threads(config.run.threads, || match config.game {
         GameSection::Kuhn => solve_toy::<S>(
             "kuhn",
             game::kuhn(pipeline),
@@ -511,7 +518,7 @@ fn run_with_storage_impl<S: Storage>(
         GameSection::PreflopMultiway(_) => {
             unreachable!("multiway games dispatch before the HU storage path")
         }
-    }
+    })
     .map(|summary| RunSummary {
         canceled: hooks.canceled,
         ..summary
@@ -534,6 +541,22 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
     run: &RunSection,
     hooks: &mut RunHooks<'_>,
 ) -> Result<()> {
+    if run.check_every == 0 {
+        return Err(anyhow!("SLV004: run.check_every must be positive"));
+    }
+    hooks.start = Instant::now();
+    if run
+        .max_time_secs
+        .is_some_and(|limit| hooks.elapsed_before >= Duration::from_secs(limit))
+    {
+        hooks.log(format_args!("max_time already reached before resume"));
+        if let Some(events) = hooks.events.as_deref_mut() {
+            let _ = events.info(formats::RunEventPayload::Stop {
+                reason: "time-limit".to_string(),
+            });
+        }
+        return Ok(());
+    }
     let mut remaining = run.iterations.saturating_sub(solver.iteration());
     while remaining > 0 {
         let chunk = run.check_every.min(remaining);
@@ -541,17 +564,17 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
         remaining -= chunk;
         let expl = solver.exploitability();
         let nash_conv = expl[Player::P0] + expl[Player::P1];
-        println!(
+        hooks.log(format_args!(
             "iter={:>8} expl_p0={:.3e} expl_p1={:.3e} nash_conv={:.3e}",
             solver.iteration(),
             expl[Player::P0],
             expl[Player::P1],
             nash_conv,
-        );
+        ));
 
         // Computed before touching `hooks.metrics` so the two field
         // borrows below never overlap.
-        let elapsed_secs = hooks.start.elapsed().as_secs_f64();
+        let elapsed_secs = (hooks.elapsed_before + hooks.start.elapsed()).as_secs_f64();
         if let Some(writer) = hooks.metrics.as_deref_mut() {
             writer.append(&formats::MetricsRow {
                 iteration: solver.iteration(),
@@ -567,7 +590,10 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
             .cancel
             .is_some_and(|cancel| cancel.load(std::sync::atomic::Ordering::SeqCst))
         {
-            println!("cancelled at iteration {}", solver.iteration());
+            hooks.log(format_args!(
+                "cancelled at iteration {}",
+                solver.iteration()
+            ));
             hooks.canceled = true;
             if let Some(events) = hooks.events.as_deref_mut() {
                 let _ = events.info(formats::RunEventPayload::Stop {
@@ -580,7 +606,7 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
         if let Some(target) = run.target_nash_conv
             && nash_conv < target
         {
-            println!("target nash_conv {target:.3e} reached");
+            hooks.log(format_args!("target nash_conv {target:.3e} reached"));
             break;
         }
 
@@ -590,10 +616,10 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
         if let Some(limit) = run.max_time_secs
             && elapsed_secs >= limit as f64
         {
-            println!(
+            hooks.log(format_args!(
                 "max_time {limit}s reached at iteration {}",
                 solver.iteration()
-            );
+            ));
             if let Some(events) = hooks.events.as_deref_mut() {
                 let _ = events.info(formats::RunEventPayload::Stop {
                     reason: "time-limit".to_string(),
@@ -709,7 +735,7 @@ fn solve_toy<S: Storage>(
     );
     let start = Instant::now();
     run_loop(&mut solver, run, hooks)?;
-    let elapsed = start.elapsed();
+    let elapsed = hooks.elapsed_before + start.elapsed();
     let summary = print_done(&solver, elapsed, solver_ev(&solver));
     checkpoint_now(&solver, hooks)?;
 
@@ -769,17 +795,6 @@ fn solve_postflop<S: Storage>(
     // that puts it there.
     let ev_offset = postflop_setup::subgame_ev_offset(&config, pipeline.utility);
     let pf_game = build_postflop_game(&config, pipeline);
-    // Kept past the solver move: the `.sol` export needs every node's
-    // contribution to re-base its stored values.
-    let node_info = pf_game.node_info.clone();
-
-    if let Some(n) = run.threads {
-        // Ignore "already initialized": tests and repeated calls within one
-        // process may have set the global pool already.
-        let _ = rayon::ThreadPoolBuilder::new()
-            .num_threads(n)
-            .build_global();
-    }
 
     let mut solver = Solver::<_, S>::new(pf_game.game, schedule, Some(run.iterations));
     solver.set_par(ParConfig {
@@ -798,7 +813,7 @@ fn solve_postflop<S: Storage>(
     );
     let start = Instant::now();
     run_loop(&mut solver, run, hooks)?;
-    let elapsed = start.elapsed();
+    let elapsed = hooks.elapsed_before + start.elapsed();
     let summary = print_done(
         &solver,
         elapsed,
@@ -808,7 +823,7 @@ fn solve_postflop<S: Storage>(
 
     if let Some(spec) = &sol {
         let start_street = crate::sol::start_street_from_board_len(config.board.len());
-        crate::sol::export_sol(spec, &solver, &node_info, start_street, &summary)?;
+        crate::sol::export_sol(spec, &solver, ev_offset, start_street, &summary)?;
     }
 
     Ok(summary)
@@ -971,7 +986,7 @@ fn solve_preflop_showdown<S: Storage>(
     );
     let start = Instant::now();
     run_loop(&mut solver, run, hooks)?;
-    let elapsed = start.elapsed();
+    let elapsed = hooks.elapsed_before + start.elapsed();
     let summary = print_done(&solver, elapsed, solver_ev(&solver));
     checkpoint_now(&solver, hooks)?;
 
@@ -1122,7 +1137,7 @@ fn solve_preflop_bucketed<S: Storage>(
     );
     let start = Instant::now();
     run_loop(&mut solver, run, hooks)?;
-    let elapsed = start.elapsed();
+    let elapsed = hooks.elapsed_before + start.elapsed();
     let summary = print_done(&solver, elapsed, solver_ev(&solver));
     checkpoint_now(&solver, hooks)?;
 

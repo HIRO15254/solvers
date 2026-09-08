@@ -355,10 +355,9 @@ pub struct PostflopNodeInfo {
     /// Street this node belongs to.
     pub street: Street,
     /// Each player's total contribution to the pot at this node, the
-    /// starting-pot share included. Re-basing a node's counterfactual value
-    /// onto the subgame-start basis is exactly "add your own contribution
-    /// here" (see `PostflopConfig::starting_share`), so a reader of the
-    /// values needs this alongside them.
+    /// starting-pot share included. Used to report the current pot. These
+    /// chip amounts must not be added to utility-valued EVs: all nodes use
+    /// the original subgame's fixed utility baseline.
     pub contrib: PerPlayer<Chips>,
 }
 

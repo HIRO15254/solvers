@@ -156,6 +156,17 @@ impl RunHeadsUp {
     /// at the value that means "not applicable".
     fn lower(self) -> Result<RunSection> {
         let max_time_secs = self.max_time.as_deref().map(parse_max_time).transpose()?;
+        if self.iterations == 0 || self.check_every == 0 {
+            bail!("SLV004: run.iterations and run.check_every must be positive");
+        }
+        if self.threads == Some(0) {
+            bail!("SLV004: run.threads must be positive when specified");
+        }
+        if let Some(target) = self.target_nash_conv
+            && (!target.is_finite() || target < 0.0)
+        {
+            bail!("SLV004: run.target_nash_conv must be finite and non-negative");
+        }
         Ok(RunSection {
             iterations: self.iterations,
             max_time_secs,
@@ -745,6 +756,18 @@ fn positive(value: f64) -> bool {
 /// Checks the things a type cannot: values in range, and sections whose
 /// variant does not apply to this family.
 fn validate_semantics(family: &Family) -> Result<()> {
+    // Normalization/validate and solve must check the same run controls.
+    match family {
+        Family::Toy(config) => {
+            config.run.clone().lower()?;
+        }
+        Family::Postflop(config) => {
+            config.run.clone().lower()?;
+        }
+        Family::PreflopHu(config) => {
+            config.run.clone().lower()?;
+        }
+    }
     let algorithm = match family {
         Family::Toy(config) => &config.algorithm,
         Family::Postflop(config) => &config.algorithm,
@@ -808,9 +831,11 @@ fn validate_semantics(family: &Family) -> Result<()> {
             if distinct.len() != board.len() {
                 bail!("SLV004: board {:?} repeats a card", game.board);
             }
-            crate::postflop_setup::parse_range("oop_range", &game.oop_range)
+            let oop = crate::postflop_setup::parse_range("oop_range", &game.oop_range)
                 .map_err(|error| anyhow!("SLV004: {error}"))?;
-            crate::postflop_setup::parse_range("ip_range", &game.ip_range)
+            let ip = crate::postflop_setup::parse_range("ip_range", &game.ip_range)
+                .map_err(|error| anyhow!("SLV004: {error}"))?;
+            crate::postflop_setup::validate_board_ranges(&board, &oop, &ip)
                 .map_err(|error| anyhow!("SLV004: {error}"))?;
             if game.pot == 0 {
                 bail!("SLV004: pot must be positive");

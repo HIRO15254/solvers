@@ -8,11 +8,13 @@ use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow};
 use cards::{Card, NUM_COMBOS, PerPlayer, Player, combo_cards};
-use engine::{CompiledGame, F32Storage, NodeId, NodeKind, PublicTree, ReachMap, Solver};
+use engine::{
+    CompiledGame, F32Storage, I16Storage, NodeId, NodeKind, PublicTree, ReachMap, Solver, Storage,
+};
 use game::PayoffPipeline;
 use holdem::{PostflopEvaluator, PostflopNodeInfo, class_average, class_weights, range_equity};
 
-use crate::config::GameSection;
+use crate::config::{GameSection, SolveConfig, StorageKind};
 use crate::postflop_setup;
 use crate::sol::{LiveProvider, SolProvider, StrategyProvider};
 
@@ -30,6 +32,17 @@ pub fn run(
     let config =
         crate::config::parse_solve_config_at(&raw, config_path).context("parsing config")?;
 
+    postflop_setup::with_threads(config.run.threads, || match config.run.storage {
+        StorageKind::F32 => run_config::<F32Storage>(config, iterations, target_nash_conv),
+        StorageKind::I16 => run_config::<I16Storage>(config, iterations, target_nash_conv),
+    })
+}
+
+fn run_config<S: Storage>(
+    config: SolveConfig,
+    iterations: Option<u64>,
+    target_nash_conv: Option<f64>,
+) -> Result<()> {
     match &config.game {
         GameSection::Postflop { .. } => {}
         GameSection::Preflop { .. } => {
@@ -88,13 +101,22 @@ pub fn run(
 
     let mut run_cfg = config.run;
     if let Some(it) = iterations {
+        if it == 0 {
+            return Err(anyhow!("SLV004: iterations must be positive"));
+        }
         run_cfg.iterations = it;
     }
     if let Some(t) = target_nash_conv {
+        if !t.is_finite() || t < 0.0 {
+            return Err(anyhow!(
+                "SLV004: target_nash_conv must be finite and non-negative"
+            ));
+        }
         run_cfg.target_nash_conv = Some(t);
     }
 
-    let mut solver = Solver::<_, F32Storage>::new(pf_game.game, schedule, Some(run_cfg.iterations));
+    let mut solver = Solver::<_, S>::new(pf_game.game, schedule, Some(run_cfg.iterations));
+    postflop_setup::configure_solver(&mut solver, &run_cfg);
     println!(
         "game=postflop schedule={} iterations={}",
         schedule_name, run_cfg.iterations
@@ -170,7 +192,7 @@ struct Repl<'a> {
     current: NodeId,
     /// Current node's history; empty string at root.
     history: String,
-    equity_cache: Option<PerPlayer<Vec<f32>>>,
+    equity_cache: Option<(NodeId, PerPlayer<Vec<f32>>)>,
     no_color: bool,
 }
 
@@ -276,7 +298,9 @@ impl<'a> Repl<'a> {
         println!("  root                 - jump back to the root");
         println!("  grid <action|index>  - 13x13 grid of per-class action frequency");
         println!("  range <oop|ip>       - 13x13 grid of a player's root-range class weights");
-        println!("  eq                   - 13x13 grid of oop's class-averaged equity vs ip");
+        println!(
+            "  eq                   - 13x13 grid of oop equity vs ip at the current board and reach"
+        );
         println!(
             "  combos <class>       - per-combo action probabilities for a range class (e.g. 'AA', 'AKs')"
         );
@@ -521,19 +545,34 @@ impl<'a> Repl<'a> {
     }
 
     fn cmd_eq(&mut self) {
-        if self.equity_cache.is_none() {
-            let eq = range_equity(&self.board, &self.game.root_ranges);
-            self.equity_cache = Some(eq);
+        let reach = match self.reach_here() {
+            Ok(reach) => reach,
+            Err(error) => {
+                println!("error: {error}");
+                return;
+            }
+        };
+        if !self
+            .equity_cache
+            .as_ref()
+            .is_some_and(|(id, _)| *id == self.current)
+        {
+            let mut board = self.board.clone();
+            for token in self.history.split('[').skip(1) {
+                if let Some(card) = token.split(']').next().and_then(|s| s.parse::<Card>().ok()) {
+                    board.push(card);
+                }
+            }
+            self.equity_cache = Some((self.current, range_equity(&board, &reach)));
         }
-        let root_range = &self.game.root_ranges[Player::P0];
-        let equity = &self.equity_cache.as_ref().unwrap()[Player::P0];
-        let weights = class_weights(root_range);
-        let raw = class_average(root_range, equity);
+        let equity = &self.equity_cache.as_ref().unwrap().1[Player::P0];
+        let weights = class_weights(&reach[Player::P0]);
+        let raw = class_average(&reach[Player::P0], equity);
         let mut values = [0.0f64; 169];
         for c in 0..169 {
             values[c] = raw[c] * 100.0;
         }
-        println!("oop equity vs ip range (class-averaged, %)");
+        println!("oop equity vs ip at current node (class-averaged, %)");
         self.render_grid(&weights, &values);
     }
 

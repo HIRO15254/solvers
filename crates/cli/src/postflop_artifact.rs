@@ -467,8 +467,8 @@ struct ValueRow {
     seat: String,
     combo: String,
     weight: f32,
-    /// Chips this hand takes out of the subgame from here, net of what it
-    /// still puts in. See `docs/solver-config-v1.jp.md`, "EV の基準".
+    /// Expected utility relative to the original subgame start, including
+    /// wagers already made. Chips for chip EV, prize units for ICM.
     ev: f32,
 }
 

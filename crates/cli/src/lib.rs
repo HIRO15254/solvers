@@ -233,6 +233,7 @@ enum Command {
         sol_streets: sol::SolStreets,
     },
     /// Continue a checkpointed solve to `run.iterations` total iterations.
+    /// HU Postflop updates solution.sol and run.json and keeps the cumulative time budget.
     Resume {
         /// Run directory from `solve --out`, or a bare self-contained
         /// `.mwckpt` that was moved out of one.
@@ -344,7 +345,8 @@ enum Command {
         cross_game: bool,
     },
     /// Solve the same postflop config across multiple boards and write a
-    /// CSV report (one row per board).
+    /// CSV report (one row per board). Uses the configured storage, threads,
+    /// and parallel settings; max_time applies separately to each board.
     Report {
         /// Path to the config file (schema = "solvers.postflop/v1"); its
         /// own `board` field is ignored in favor of

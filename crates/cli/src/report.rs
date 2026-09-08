@@ -14,11 +14,11 @@ use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow};
 use cards::{Card, Player};
-use engine::{F32Storage, Solver, TerminalEvaluator};
+use engine::{F32Storage, I16Storage, Solver, Storage};
 use game::PayoffPipeline;
 use holdem::range_equity;
 
-use crate::config::{GameSection, RunSection};
+use crate::config::{GameSection, SolveConfig, StorageKind};
 use crate::postflop_setup;
 
 pub fn run(
@@ -32,6 +32,18 @@ pub fn run(
     let config =
         crate::config::parse_solve_config_at(&raw, config_path).context("parsing config")?;
 
+    postflop_setup::with_threads(config.run.threads, || match config.run.storage {
+        StorageKind::F32 => run_config::<F32Storage>(config, boards_arg, boards_file, output),
+        StorageKind::I16 => run_config::<I16Storage>(config, boards_arg, boards_file, output),
+    })
+}
+
+fn run_config<S: Storage>(
+    config: SolveConfig,
+    boards_arg: Option<&str>,
+    boards_file: Option<&Path>,
+    output: Option<&Path>,
+) -> Result<()> {
     let (oop_range, ip_range, pot, effective_stack, iso_merging, min_bet, preflop_aggressor, tree) =
         match config.game {
             GameSection::Postflop {
@@ -167,15 +179,15 @@ pub fn run(
         let node_info = pf_game.node_info.clone();
 
         let schedule = postflop_setup::build_schedule(&config.algorithm);
-        let mut solver =
-            Solver::<_, F32Storage>::new(pf_game.game, schedule, Some(config.run.iterations));
+        let mut solver = Solver::<_, S>::new(pf_game.game, schedule, Some(config.run.iterations));
 
         let start = Instant::now();
-        // Deliberately not `crate::solve::run_loop`: that prints its
-        // per-chunk convergence trace to stdout, which would interleave
-        // with (and break parsing of) the CSV this command writes to
-        // stdout. Same chunking/early-stop semantics, progress on stderr.
-        run_loop_quiet(&mut solver, &config.run);
+        // Keep convergence progress on stderr so stdout remains valid CSV.
+        postflop_setup::configure_solver(&mut solver, &config.run);
+        let mut hooks = crate::solve::RunHooks::none();
+        hooks.quiet = true;
+        hooks.cancel = Some(&crate::CLI_CANCEL);
+        crate::solve::run_loop(&mut solver, &config.run, &mut hooks)?;
         let elapsed = start.elapsed();
 
         let expl = solver.exploitability();
@@ -245,6 +257,9 @@ pub fn run(
             fmt_sig(oop_equity, 6),
         ];
         board_rows.push((prefix, freq_by_label));
+        if hooks.canceled {
+            break;
+        }
     }
 
     // Once, after every board -- see the accumulator's own doc comment
@@ -290,33 +305,6 @@ pub fn run(
         None => print!("{out}"),
     }
     Ok(())
-}
-
-/// Same chunking and early-stop semantics as [`crate::solve::run_loop`], but
-/// reports progress on stderr instead of stdout — see the comment at its
-/// call site for why.
-fn run_loop_quiet<E: TerminalEvaluator>(solver: &mut Solver<E, F32Storage>, run: &RunSection) {
-    let mut remaining = run.iterations;
-    while remaining > 0 {
-        let chunk = run.check_every.min(remaining);
-        solver.run(chunk);
-        remaining -= chunk;
-        let expl = solver.exploitability();
-        let nash_conv = expl[Player::P0] + expl[Player::P1];
-        eprintln!(
-            "iter={:>8} expl_p0={:.3e} expl_p1={:.3e} nash_conv={:.3e}",
-            solver.iteration(),
-            expl[Player::P0],
-            expl[Player::P1],
-            nash_conv,
-        );
-        if let Some(target) = run.target_nash_conv
-            && nash_conv < target
-        {
-            eprintln!("target nash_conv {target:.3e} reached");
-            break;
-        }
-    }
 }
 
 /// Collects raw board tokens from exactly one of `--boards`/`--boards-file`.

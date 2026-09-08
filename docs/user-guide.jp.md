@@ -120,7 +120,7 @@ recallもsparse policy mapが増えるため、productionからそれぞれ`MWP0
 
 ## 5. 何が保証され、何が保証されないか
 
-- **2 人(HU 構成)**: CFR の標準理論どおり、平均戦略は Nash 均衡に収束する。
+- **2 人(HU 構成)**: 零和設定では CFR の標準理論どおり、平均戦略は Nash 均衡に収束する。一般和設定にはこの保証はない。
 - **3 人以上**: 一般和・多人数ゲームでは「全員の regret を最小化した profile」
   が Nash 均衡である保証は理論的に存在しない。本ソルバーの出力は
   **regret-minimized approximation** であり、CLI が常に表示する
@@ -277,7 +277,7 @@ Multiwayのmeasured deviationは単独seatのtrained deviationに対する推定
 
 `schema = "solvers.postflop/v1"` は固定 board の heads-up postflop subgame を
 正確に解く。Multiway と違い sampling ではなく 1,326 combo の vector engine なので、
-平均戦略は Nash へ収束する。全 TOML 項目は `docs/solver-config-v1.jp.md` が規範である。
+零和設定では平均戦略の Nash 収束保証がある。レーキや外部 field を含む ICM の一般和設定には保証しない。全 TOML 項目は `docs/solver-config-v1.jp.md` が規範である。
 
 最小構成は board・両者のレンジ・pot・effective stack・そして木を組む tree script である。
 
@@ -372,6 +372,18 @@ EV は **subgame 開始基準** で、「この spot から自分が持ち帰る
 `inspect --node` と `export --node` が受け取る betting-line 文字列の token は
 `x`(check)、`f`(fold)、`c`(call)、`r{到達額}`(bet / raise)、`[Th]`(配牌)である。
 例: `xr5c[Th]xx`。
+
+### HU Postflop の結果を再開・比較するとき
+
+ハンド別 EV は常に元の config の subgame 開始基準であり、後続ノードでそれまでの
+投入額を足し戻さない。chip-EV は chip、ICM は prize 単位である。開発中のため
+`.sol` の format version は 1 に据え置く。修正前に生成した EV は読み込み時には
+補正されないので、修正後の値は solve または `solvers resume RUN` で生成し直す。
+
+再開すると `solution.sol` と `run.json` も最新 iteration に更新される。fork も同様。
+`max_time` は保存済み solve 時間を含む累積予算で、上限済みなら反復を追加しない。
+`report` は各 board に個別の時間予算を適用する。`inspect` の `eq` は移動先の board と
+到達レンジを使い、live inspect と report でも設定した i16 / f32 とスレッド数が使われる。
 
 ## 13. 関連ドキュメント
 

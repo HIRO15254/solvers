@@ -101,9 +101,10 @@ pub struct StrategyBlock {
     pub probs: Vec<u8>,
 }
 
-/// One action node's per-hand values, on the subgame-start basis (the
-/// node's own contribution already added back, so a reader never has to
-/// know the internal split of the starting pot).
+/// One action node's per-hand values on the original subgame-start basis.
+/// The utility-valued baseline offset is identical at every node; wagers
+/// already made in the subgame remain costs. Values use chips for chip EV
+/// and prize units for ICM, including tournament ICM.
 ///
 /// Stored rather than recomputed because a `NoRivers` artifact cannot
 /// recompute them: its river strategies are gone, and the viewer's lazy

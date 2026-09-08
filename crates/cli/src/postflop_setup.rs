@@ -14,6 +14,30 @@ use holdem::{MemoryEstimate, PerStreet, PostflopConfig, RuleHits, StreetTree};
 use crate::config::AlgorithmSection;
 use crate::solver_config_v1::render_rule_line;
 
+/// Run work in a local pool when the configuration specifies a thread count.
+pub fn with_threads<T: Send>(
+    threads: Option<usize>,
+    work: impl FnOnce() -> Result<T> + Send,
+) -> Result<T> {
+    match threads {
+        Some(threads) => rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()?
+            .install(work),
+        None => work(),
+    }
+}
+
+pub fn configure_solver<E: engine::TerminalEvaluator, S: engine::Storage>(
+    solver: &mut engine::Solver<E, S>,
+    run: &crate::config::RunSection,
+) {
+    solver.set_par(engine::ParConfig {
+        chance_depth: run.par_chance_depth.unwrap_or(2),
+        min_children: run.par_min_children.unwrap_or(12),
+    });
+}
+
 /// Parses a whitespace-separated board string ("Ks 7h 2d") into cards.
 pub fn parse_board(board: &str) -> Result<Vec<Card>> {
     board
@@ -31,6 +55,36 @@ pub fn parse_board(board: &str) -> Result<Vec<Card>> {
 pub fn parse_range(label: &str, spec: &str) -> Result<Range> {
     spec.parse::<Range>()
         .map_err(|e| anyhow!("parsing {label} {spec:?}: {e}"))
+}
+
+/// Validate joint card feasibility before either the counting or real build.
+pub fn validate_board_ranges(board: &[Card], oop: &Range, ip: &Range) -> Result<()> {
+    let distinct: std::collections::BTreeSet<_> = board.iter().copied().collect();
+    if !(3..=5).contains(&board.len()) || distinct.len() != board.len() {
+        return Err(anyhow!("board must contain 3, 4, or 5 distinct cards"));
+    }
+    let live = |range: &Range| {
+        range
+            .weights()
+            .iter()
+            .enumerate()
+            .filter_map(|(index, &weight)| {
+                let (a, b) = cards::combo_cards(index);
+                (weight > 0.0 && !board.contains(&a) && !board.contains(&b)).then_some((a, b))
+            })
+            .collect::<Vec<_>>()
+    };
+    let oop = live(oop);
+    let ip = live(ip);
+    if !oop
+        .iter()
+        .any(|(a, b)| ip.iter().any(|(c, d)| a != c && a != d && b != c && b != d))
+    {
+        return Err(anyhow!(
+            "ranges share no compatible combos after board removal"
+        ));
+    }
+    Ok(())
 }
 
 /// Parses `[game] preflop_aggressor` (`"oop"` / `"ip"` / `"none"`) into the
@@ -69,6 +123,7 @@ pub fn build_postflop_config(
     let board = parse_board(board)?;
     let oop = parse_range("oop_range", oop_range)?;
     let ip = parse_range("ip_range", ip_range)?;
+    validate_board_ranges(&board, &oop, &ip)?;
     let ranges = PerPlayer::new(oop, ip);
     let preflop_aggressor = parse_preflop_aggressor(preflop_aggressor)?;
 

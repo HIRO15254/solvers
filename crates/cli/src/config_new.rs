@@ -169,6 +169,7 @@ river = 2
 cb = 40
 
 [rake]
+# With rake the profile has no Nash convergence guarantee.
 kind = "generic"
 rate = 0.05
 cap = 6.0
@@ -185,7 +186,9 @@ schedule = "dcfr"
 
 [run]
 iterations = 1000000
+# Cumulative solve time, including saved progress when resuming.
 max_time = "30m"
+# Must be positive; stopping conditions are checked at this cadence.
 check_every = 25
 storage = "f32"
 target_nash_conv = 0.05

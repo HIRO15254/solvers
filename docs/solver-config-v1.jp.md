@@ -27,8 +27,9 @@
 - **effective config は既定値をすべて明示する。** 既定は field 宣言に置いてあるので
   正規化は parse + serialize であり、冪等である(effective config を正規化すると
   同じ bytes が返る)。
-- 2 人零和なので平均戦略は Nash へ収束する。3 人以上の近似である Multiway とは
-  保証が違う。
+- 2 人零和の設定では平均戦略の Nash 収束保証がある。レーキや外部 field を含む
+  tournament ICM は一般和になり得るため、同じ保証は付けない。`validate` の
+  `profile` は rake / utility の零和判定に従って表示する。
 
 ## error code
 
@@ -137,6 +138,10 @@ EV が出るのは次の 4 か所で、すべて同じ基準である。
 
 exploitability と `nash_conv` は基準の移動で変わらない。全 terminal に同じ定数を
 足しても最適応答の差は動かないからである。
+
+ハンド別 EV も元の config の subgame 開始基準を維持する。後続ノードまでに
+投入済みの wager は費用に含め、ノードの pot や拠出額を足し戻さない。
+基準の移動量は全ノード共通で、ICM では必ず utility model を通した prize 単位を使う。
 
 ## `[game.tree]` — postflop の betting tree
 
@@ -630,7 +635,7 @@ iterations = 10000     # 既定 1000000。安全予算であって収束条件�
 max_time = "30m"       # 任意。累積 solve 時間の上限。s|m|h suffix
 check_every = 25       # 既定 25。exploitability 検査と停止判定の間隔
 storage = "f32"        # 既定 f32。"f32" | "i16"
-seed = 7               # 任意
+seed = 7               # 任意。exact HU では記録用。乱数列や戦略を変えない
 target_nash_conv = 0.001   # 任意。下回ったら早期終了
 threads = 8            # 任意
 par_chance_depth = 2   # postflop / preflop-hu のみ。任意
@@ -643,6 +648,17 @@ par_min_children = 12  # postflop / preflop-hu のみ。任意
 少なくとも一方を併記すること。`max_time` と `target_nash_conv` の判定は
 `check_every` 境界でのみ行う。duration は小文字 suffix の `s`、`m`、`h` だけを
 使い、`0s` は error である(Multiway Preflop の `run.max_time` と同じ文法)。
+
+`iterations` / `check_every` は正、指定した `threads` は正でなければならない。
+`target_nash_conv` は有限かつ非負。`max_time` を含め、これらは `validate` と
+`solve` の双方で同じ検査を行う。board 除去後の両レンジに互いに重ならない
+ハンドの組が存在しない場合も `SLV004` で拒否する。
+
+HU の `solve` / `resume` / live `inspect` / `report` は `storage`、`threads`、
+`par_chance_depth`、`par_min_children` を同じように適用する。
+`report` の時間予算は各 board ごと。`resume` の時間予算は `progress.jsonl` の
+最後の保存済み経過時間から累積する。再開前に上限へ到達済みなら反復を追加せず
+成果物を再生成する。再開時の rebuild・成果物出力時間は solve 時間に含めない。
 
 multiway の sampling 制御(`sweeps`、`evaluation_samples`、`evaluation_cadence`、
 `sweep_batch`、`stop_dev_gain`、`stop_confirmations`、`stop_eval_period_secs`、
@@ -683,9 +699,8 @@ bet と raise を同じ `r` で表すのは、両者が「到達額を宣言す�
 
 どれも黙って読み替えず、置換先を名指しする error にする。
 
-`.sol` artifact は生成時の config 本文をそのまま埋め込むので、改名前に書いた
-artifact を開くと同じ `SLV002` が出る。artifact format version は上げていない。
-version error より、どの key をどう書き換えればよいかを名指しする方が有用だからである。
+`.sol` artifact に埋め込まれた config が廃止 key を持つ場合は `SLV002` を返す。
+開発中のため、今回の修正では artifact format version を変更しない。
 
 ## `[algorithm]`
 
@@ -711,9 +726,9 @@ OS の user cache directory で決まる。
 | `manifest.json` | 状態遷移時に atomic 置換 | run identity と state |
 | `progress.jsonl` | 追記のみ | `check_every` ごとの metric |
 | `events.jsonl` | 追記のみ、`seq` は 0 から単調増加 | lifecycle event |
-| `run.json` | 完了時に 1 度 | 完了サマリ |
+| `run.json` | solve / resume 区間の完了時に更新 | 完了サマリ |
 | `checkpoint.ckpt` | `check_every` ごと | 再開用 solver state |
-| `solution.sol` | 完了時に 1 度 | 閲覧・解析用 artifact。戦略と per-hand 値 |
+| `solution.sol` | solve / resume 区間の完了時に更新 | 閲覧・解析用 artifact。戦略と per-hand 値 |
 
 Multiway は `checkpoint.mwckpt` / `solution.mwsol` を書く。
 
@@ -792,7 +807,7 @@ process も書かない。`state` が `running` のまま `pid` が存在しな�
 | `range` | seat × combo | `seat` `combo` `weight` |
 
 `weight` はそのノードでの到達確率で、ルートレンジの重みではない。`frequency` も
-同じ重みで加重する。`ev` はサブゲーム開始基準の 1 ハンドあたりチップである
+同じ重みで加重する。`ev` は元のサブゲーム開始基準の 1 ハンドあたり utility(chip-EV は chip、ICM は prize 単位)である
 (「EV の基準」章)。
 
 CSV では配列列(`actions` / `probabilities`)を `|` で連結する。
@@ -832,7 +847,7 @@ tree script の board 述語(`when paired { ... }`)はボードごとに root �
 | `blocks` | action node ごとの u16 固定小数戦略。`sref` 昇順 |
 | `values` | 同じ node 集合の per-hand 値。`sref` 昇順。OOP の全ハンド、続けて IP の全ハンド。block ごとの `scale` に対する `i16` |
 
-`meta.ev` は `strategy.json` の `ev_oop` / `ev_ip` と同じ値である。`meta.storage`
+`meta.ev` は `export summary` の `ev_oop` / `ev_ip` と同じ値である。`meta.storage`
 と `meta.wall_secs` は情報用で、`.sol` は常に u16 へ量子化する。
 
 `values` と `blocks` は常に同じ node 集合を覆う。戦略が見つかった node なら値も
@@ -858,6 +873,14 @@ action node を落として artifact を大幅に小さくするが、river の�
 header の hash は `blake3(config_toml)` と一致しなければならない。`.sol` が
 記述している config から静かにずれることはない。config 本文をそのまま埋め込むので、
 契約を変えた後に古い `.sol` を開くと、その config が現行 parser の error を返す。
+開発中のため format version は 1 に据え置く。EV 修正前に生成した artifact の値は
+読み込み時には補正されない。修正後の値が必要な場合は solve または checkpoint からの
+resume で生成し直す。
+
+`resume` は同じ iteration の checkpoint / `.sol` / `run.json` を出力する。
+既存の `.sol` があれば `full` / `no-rivers` を継承し、
+`.sol` がない場合は `full` とする。`--out` による fork でも成果物を全て作り、
+時間予算を維持するため progress をコピーする。postflop に `--history` は使えない。
 
 ## CLIとの対応
 
@@ -898,7 +921,7 @@ solvers resume runs/my-run
 
 | 制約 | 現在の挙動 | 理由 / 回避 |
 |---|---|---|
-| **プレイヤーは 2 人固定** | 3 人以上は Multiway Preflop の別契約 | exact vector engine は 2 人零和を前提にしている |
+| **プレイヤーは 2 人固定** | 3 人以上は Multiway Preflop の別契約 | vector engine は 2 人固定。一般和も計算するが Nash 収束保証は零和設定に限る |
 | **stack は左右対称** | `effective_stack` は 1 つだけ。非対称 stack は書けない | 非対称にすると side pot が要る。HU subgame では effective stack を超える部分は死に金なので、多くの spot はこれで表現できる |
 | **開始 pot の内訳は書けない** | `pot` は合計額のみ | 内訳は木にも戦略にも報告 EV にも影響しない(「EV の基準」章) |
 | **ハンド固有の条件は書けない** | 条件変数にハンドを読むものが無い | vector CFR は木を 1 本だけ作り、1,326 combo 全部が同じ木を共有して reach ベクトルを流す。ハンドで木を変えるのは public tree ではない。それを表現するのは木ではなく戦略である |
@@ -913,14 +936,14 @@ solvers resume runs/my-run
 | **`no-rivers` は river の値を持たない** | river ノードを指す `export` は明示エラー | 既定の `full` なら全ノードが揃う。`no-rivers` は巨大ツリー向けの容量オプトイン |
 | **iso 併合の member remap は保留** | `inspect` は代表カードに `*` を付けて示す | 併合自体は厳密な商であり、戦略と EV は非併合 tree と一致する。表示のみの制限 |
 | **`.sol` は u16 量子化** | `storage` は情報用 | `f32` で解いた run でも artifact は u16 |
-| **古い `.sol` は開けないことがある** | 埋め込み config が現行 parser の error を返す | format version は上げていない。version error より、どの key をどう直すかを名指しする方が有用だからである |
+| **開発中の artifact の値は自動補正しない** | format version は 1 のまま | EV 修正前の値は solve / resume で生成し直す。廃止 key を含む config は parser が拒否 |
 
 ### Multiway Preflop との差
 
 | 項目 | postflop | Multiway Preflop |
 |---|---|---|
 | engine | exact vector CFR | External-Sampling MCCFR |
-| 保証 | 平均戦略が Nash へ収束 | regret 最小化近似。Nash/GTO 保証なし |
+| 保証 | 零和設定のみ平均戦略の Nash 収束保証。一般和は保証なし | regret 最小化近似。Nash/GTO 保証なし |
 | card abstraction | 無し(1,326 combo) | EHS² percentile bucket |
 | 絶対 size 単位 | chip(`"20c"`) | BB(`"2.5bb"`) |
 | size literal 文法 | 共通(PioSOLVER 準拠) | 共通 |

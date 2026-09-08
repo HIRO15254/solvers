@@ -123,7 +123,7 @@ toy / postflop / preflop-hu の 3 契約:
   "status": "valid",
   "schema": "solvers.postflop/v1",
   "gameKind": "postflop",
-  "profile": "vector CFR average profile; converges to Nash for two players",
+  "profile": "vector CFR average profile; converges to Nash for two-player zero-sum games",
   "effectiveConfig": { "...": "--show-effective のときだけ" },
   "tree": {
     "params": [
@@ -293,7 +293,7 @@ solvers inspect <SOLUTION.mwsol> [--node NODE] [--view VIEW]
 | `root` | root へ戻る |
 | `grid <action\|index>` | class ごとの action 頻度を 13x13 で表示 |
 | `range <oop\|ip>` | その player の root range の class weight を 13x13 で表示 |
-| `eq` | OOP の class 平均 equity を 13x13 で表示 |
+| `eq` | 現在の board と到達レンジで OOP の class 平均 equity を 13x13 で表示 |
 | `combos <class>` | 1 class の combo ごとの action 確率(例 `combos AA`) |
 | `ev` | `ev_oop` / `ev_ip` / `expl_oop` / `expl_ip` / `nash_conv` / `iterations` |
 | `help` | コマンド一覧 |
@@ -365,7 +365,7 @@ stack の一致も要求し、`--cross-game` がその検査だけを外す。�
 |---|---|
 | `nodes` | 突き合わせた action node 数 |
 | `mean_strategy_l1` / `max_strategy_l1` / `max_strategy_node` | node ごとの「1 ハンドあたり平均 L1 距離」の平均・最大・最大のノード。0 が同一、2 が排反 |
-| `mean_max_ev_delta` / `max_ev_delta` / `max_ev_node` | node ごとの per-hand EV 差の最大値、その平均・最大・最大のノード(chip) |
+| `mean_max_ev_delta` / `max_ev_delta` / `max_ev_node` | node ごとの per-hand EV 差の最大値、その平均・最大・最大のノード(chip-EV は chip、ICM は prize 単位) |
 | `ev_oop` / `ev_ip` / `nash_conv` | 両 artifact の root 値 `[left, right]` |
 
 ## `solvers evaluate`
@@ -378,6 +378,22 @@ solvers evaluate <SOLUTION.mwsol> [--samples N] [--seed N] [--br-traversals N]
 `--samples 4096` / `--seed 1` / `--br-traversals 20000`。
 
 ---
+
+## HU Postflop の実行・成果物に関する補足
+
+`solve` / `resume` / live `inspect` / `report` は TOML の storage と並列設定を適用する。
+`report` は各 board ごとに `max_time` を判定する。`resume` は保存済み progress の
+経過時間を引き継ぎ、`solution.sol` と `run.json` も更新する。fork も同様で、
+postflop の `--history` は solve / resume とも拒否する。
+
+`inspect` の `eq` は現在の board と両者の到達レンジを使う。`range` は root range、
+`ev` は run 全体の root summary である。ハンド別 EV は `export ... ev --node ...` を使う。
+EV は元の subgame 開始基準を維持し、chip-EV は chip、ICM は prize 単位。
+
+レーキまたは外部 field を含む ICM の一般和設定では `validate` は
+`general-sum utilities, no Nash convergence guarantee` と表示する。
+`.sol` の format version は開発中のため 1 に据え置く。EV 修正前の artifact の値は
+読み込み時に補正されないため、修正後の値は solve / resume で生成し直す。
 
 ## `solversd`(job daemon)
 

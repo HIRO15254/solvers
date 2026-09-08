@@ -19,6 +19,8 @@ river {
 }
 '''
 
+# EV in solution.sol uses the original subgame baseline at every node.
+# With the default no-rake chip utility, its unit is chips.
 [run]
 iterations = 200
-check_every = 50
+check_every = 50 # positive stopping/checkpoint cadence
