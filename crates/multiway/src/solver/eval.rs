@@ -1,7 +1,173 @@
 use super::support::*;
 use super::*;
 
+// Two fixed candidate policies are selected on the same held-out batch.
+// A two-sided Bonferroni split of alpha=0.05 across them uses
+// Phi^-1(1 - 0.05 / (2 tails * 2 candidates)) = Phi^-1(0.9875).
+const TWO_CANDIDATE_CI95_Z: f64 = 2.2414;
+const PARALLEL_EVALUATION_CHUNK_SAMPLES: u64 = 4_096;
+
+/// Borrowed evaluation-only view of either sparse or dense policy storage.
+/// Public `policy()` returns an owned snapshot, but evaluation only reads the
+/// column; borrowing avoids cloning labels, regrets, and strategy sums at every
+/// visited node.
+struct EvaluationPolicy<'a> {
+    action_labels: &'a [String],
+    regrets: &'a [f32],
+    strategy_sum: &'a [f32],
+}
+
+struct ProfileEvaluationSample {
+    deal_attempts: u64,
+    utilities: Vec<f64>,
+    gains: Vec<[f64; 2]>,
+}
+
+struct ProfileEvaluationAccumulator {
+    means: Vec<f64>,
+    m2: Vec<f64>,
+    gain_means: Vec<[f64; 2]>,
+    gain_m2: Vec<[f64; 2]>,
+    total_deal_attempts: u64,
+}
+
+impl ProfileEvaluationAccumulator {
+    fn new(num_players: usize) -> Self {
+        Self {
+            means: vec![0.0; num_players],
+            m2: vec![0.0; num_players],
+            gain_means: vec![[0.0; 2]; num_players],
+            gain_m2: vec![[0.0; 2]; num_players],
+            total_deal_attempts: 0,
+        }
+    }
+
+    fn observe(
+        &mut self,
+        sample_id: u64,
+        sample: ProfileEvaluationSample,
+        has_trained_deviators: bool,
+    ) -> Result<(), SolverError> {
+        self.total_deal_attempts = self
+            .total_deal_attempts
+            .checked_add(sample.deal_attempts)
+            .ok_or(SolverError::CounterOverflow)?;
+        let count = (sample_id + 1) as f64;
+        for (seat, (&utility, gains)) in sample.utilities.iter().zip(&sample.gains).enumerate() {
+            let delta = utility - self.means[seat];
+            self.means[seat] += delta / count;
+            self.m2[seat] += delta * (utility - self.means[seat]);
+
+            let candidate_count = if has_trained_deviators { 2 } else { 1 };
+            for (candidate, &gain) in gains.iter().take(candidate_count).enumerate() {
+                let gain_delta = gain - self.gain_means[seat][candidate];
+                self.gain_means[seat][candidate] += gain_delta / count;
+                self.gain_m2[seat][candidate] +=
+                    gain_delta * (gain - self.gain_means[seat][candidate]);
+            }
+        }
+        Ok(())
+    }
+
+    fn finish(self, samples: u64, has_trained_deviators: bool) -> ProfileEvaluation {
+        let seats = self
+            .means
+            .into_iter()
+            .zip(self.m2)
+            .map(|(mean, sum_squared_error)| profile_estimate(mean, sum_squared_error, samples))
+            .collect();
+        let deviation_gain_lower_bound = self
+            .gain_means
+            .into_iter()
+            .zip(self.gain_m2)
+            .map(|(seat_means, seat_m2)| {
+                if has_trained_deviators {
+                    two_candidate_nonnegative_gain_estimate(seat_means, seat_m2, samples)
+                } else {
+                    nonnegative_gain_estimate(seat_means[0], seat_m2[0], samples)
+                }
+            })
+            .collect();
+        ProfileEvaluation {
+            samples,
+            total_deal_attempts: self.total_deal_attempts,
+            seats,
+            deviation_gain_lower_bound: Some(deviation_gain_lower_bound),
+        }
+    }
+}
+
+impl EvaluationPolicy<'_> {
+    fn strategy(&self, use_current_strategy: bool) -> Vec<f32> {
+        if use_current_strategy {
+            regret_matching_f32(self.regrets)
+        } else {
+            normalize_nonnegative_f32(self.strategy_sum)
+                .unwrap_or_else(|| regret_matching_f32(self.regrets))
+        }
+    }
+}
+
+/// Samples one profile action at every visited decision, then optionally
+/// replaces it with a fixed candidate action.
+///
+/// Always consuming the draw keeps cloned common-random-number streams aligned
+/// along the baseline/candidate shared prefix. The returned fixed action is
+/// deterministic, so consuming and discarding its profile draw does not change
+/// the candidate policy or either profile's marginal distribution.
+fn paired_profile_action(
+    strategy: &[f32],
+    fixed_action: Option<usize>,
+    rng: &mut ChaCha20Rng,
+) -> usize {
+    let sampled_action = sample_profile_action(strategy, rng);
+    fixed_action.unwrap_or(sampled_action)
+}
+
+/// Selection-adjusted estimate for the maximum gain of two fixed candidates.
+///
+/// `mean` remains the nonnegative maximum sample mean, and `stderr` remains
+/// the standard error of that argmax candidate as a diagnostic. The interval
+/// is the simultaneous approximate-normal envelope: the maximum of the two
+/// Bonferroni-adjusted lower endpoints and the maximum of their upper
+/// endpoints. Thus a high-variance candidate cannot disappear from the upper
+/// confidence bound merely because its observed mean ranked second.
+fn two_candidate_nonnegative_gain_estimate(
+    means: [f64; 2],
+    sum_squared_errors: [f64; 2],
+    samples: u64,
+) -> ProfileEstimate {
+    let stderrs = sum_squared_errors.map(|m2| standard_error(m2, samples));
+    let selected = usize::from(means[1] > means[0]);
+    let lower = (0..2)
+        .map(|candidate| (means[candidate] - TWO_CANDIDATE_CI95_Z * stderrs[candidate]).max(0.0))
+        .fold(0.0, f64::max);
+    let upper = (0..2)
+        .map(|candidate| (means[candidate] + TWO_CANDIDATE_CI95_Z * stderrs[candidate]).max(0.0))
+        .fold(0.0, f64::max);
+    ProfileEstimate {
+        mean: means[selected].max(0.0),
+        stderr: stderrs[selected],
+        ci95: [lower, upper],
+    }
+}
+
 impl<G: ExternalSamplingGame> MultiwaySolver<G> {
+    fn evaluation_policy(&self, key: InfoKey) -> Option<EvaluationPolicy<'_>> {
+        match &self.dense {
+            None => self.policies.get(&key).map(|column| EvaluationPolicy {
+                action_labels: &column.action_labels,
+                regrets: &column.regrets,
+                strategy_sum: &column.strategy_sum,
+            }),
+            Some(dense) => dense.column_view(key).map(|column| EvaluationPolicy {
+                action_labels: column.action_labels,
+                regrets: column.regrets,
+                strategy_sum: column.strategy_sum,
+            }),
+        }
+    }
+
     /// Trains a fixed deviation policy for `seat` against this solver's CURRENT
     /// profile at `variant` (frozen for the duration of training -- this method
     /// takes `&self` and never touches solver state). Runs `traversals`
@@ -307,11 +473,11 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// candidates are replayed on every sample (the greedy candidate on the
     /// exact RNG stream a plain [`Self::evaluate_average_profile`] would
     /// use, so its estimate is identical to the plain call's) and each
-    /// seat's reported bound is the candidate with the higher estimated
-    /// mean. Each candidate alone is a fixed policy evaluated on held-out
-    /// samples — a valid lower bound — and picking the larger of two such
-    /// bounds can only delay a threshold-crossing stop decision, i.e. it is
-    /// conservative in exactly the direction that matters. (The obvious
+    /// seat's reported mean is the larger candidate mean. Its confidence
+    /// interval is a simultaneous approximate-normal envelope over both
+    /// candidates, using a two-candidate Bonferroni adjustment; in
+    /// particular, the upper endpoint retains a lower-mean candidate when
+    /// its sampling uncertainty reaches higher. (The obvious
     /// alternative of REPLACING the greedy candidate with the trained one
     /// was measured to weaken the bound on large trees: a short burst
     /// leaves most deep infosets barely visited, and per-infoset noise
@@ -353,6 +519,30 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         deviators: Option<&[DeviatorPolicy]>,
         variant: ProfileVariant,
     ) -> Result<ProfileEvaluation, SolverError> {
+        self.evaluate_profile_with_threads(samples, seed, deviators, variant, 1)
+    }
+
+    /// Parallel counterpart to [`Self::evaluate_profile`].
+    ///
+    /// Physical worlds and every profile replay remain keyed only by
+    /// `(seed, sample_id)`. Workers return one independent sample result;
+    /// those results are then accumulated on the calling thread in ascending
+    /// sample-id order. Consequently every reported mean, standard error,
+    /// confidence interval, and deal-attempt count is bit-identical to the
+    /// one-thread method for the same inputs.
+    ///
+    /// `threads == 1` retains the original online O(1)-sample-memory path.
+    /// A larger value temporarily stores at most 4096 samples' scalar results
+    /// so it can preserve the sequential accumulation order with bounded
+    /// memory.
+    pub fn evaluate_profile_with_threads(
+        &self,
+        samples: u64,
+        seed: u64,
+        deviators: Option<&[DeviatorPolicy]>,
+        variant: ProfileVariant,
+        threads: usize,
+    ) -> Result<ProfileEvaluation, SolverError> {
         validate_purify_threshold(variant.purify_threshold)?;
         self.evaluate_average_profile_core(
             samples,
@@ -360,6 +550,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             deviators,
             variant.purify_threshold,
             variant.use_current_strategy,
+            threads,
         )
     }
 
@@ -418,7 +609,14 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             total_deal_attempts = total_deal_attempts
                 .checked_add(u64::from(sample.attempts))
                 .ok_or(SolverError::CounterOverflow)?;
-            let mut profile_rng = evaluation_action_rng(seed, sample_id, None);
+            // Clone one action stream for the baseline and every deviation.
+            // Their sampled play is therefore identical until a fixed
+            // deviator action first changes the public history. This is a
+            // common-random-numbers coupling: each replay keeps its original
+            // marginal distribution while the paired gain sheds unrelated
+            // opponent-action noise on the shared prefix.
+            let common_action_rng = evaluation_action_rng(seed, sample_id, None);
+            let mut profile_rng = common_action_rng.clone();
             let baseline = self.evaluate_world(
                 &sample.world,
                 &mut profile_rng,
@@ -438,7 +636,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             let mut deviating_seat_utilities = Vec::with_capacity(num_players);
             let mut gains = Vec::with_capacity(num_players);
             for seat in 0..num_players {
-                let mut trained_rng = deviator_evaluation_action_rng(seed, sample_id, seat);
+                let mut trained_rng = common_action_rng.clone();
                 let (trained, sample_coverage) = self.evaluate_reference_world(
                     &sample.world,
                     &mut trained_rng,
@@ -497,7 +695,11 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         deviators: Option<&[DeviatorPolicy]>,
         purify_threshold: f32,
         use_current_strategy: bool,
+        threads: usize,
     ) -> Result<ProfileEvaluation, SolverError> {
+        if threads == 0 {
+            return Err(SolverError::ZeroThreads);
+        }
         if samples == 0 {
             return Err(SolverError::ZeroEvaluationSamples);
         }
@@ -516,93 +718,114 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 }
             }
         }
-        let mut means = vec![0.0; num_players];
-        let mut m2 = vec![0.0; num_players];
-        // Candidate 0: regret-greedy heuristic (always). Candidate 1: the
-        // trained deviator (only when `deviators` is present). Accumulated
-        // separately; the per-seat winner by mean is reported.
-        let mut gain_means = vec![[0.0; 2]; num_players];
-        let mut gain_m2 = vec![[0.0; 2]; num_players];
-        let mut total_deal_attempts = 0u64;
+        let has_trained_deviators = deviators.is_some();
+        let mut accumulator = ProfileEvaluationAccumulator::new(num_players);
+        if threads == 1 {
+            for sample_id in 0..samples {
+                let sample = self.evaluate_profile_sample(
+                    sample_id,
+                    seed,
+                    deviators,
+                    purify_threshold,
+                    use_current_strategy,
+                )?;
+                accumulator.observe(sample_id, sample, has_trained_deviators)?;
+            }
+        } else {
+            let pool = rayon::ThreadPoolBuilder::new()
+                .num_threads(threads)
+                .build()
+                .map_err(|error| SolverError::ThreadPoolBuild(error.to_string()))?;
+            let mut chunk_start = 0;
+            while chunk_start < samples {
+                let chunk_end = chunk_start
+                    .saturating_add(PARALLEL_EVALUATION_CHUNK_SAMPLES)
+                    .min(samples);
+                let chunk_len = usize::try_from(chunk_end - chunk_start)
+                    .expect("the fixed evaluation chunk length fits usize");
+                let results = pool.install(|| {
+                    (0..chunk_len)
+                        .into_par_iter()
+                        .map(|offset| {
+                            let sample_id = chunk_start + offset as u64;
+                            self.evaluate_profile_sample(
+                                sample_id,
+                                seed,
+                                deviators,
+                                purify_threshold,
+                                use_current_strategy,
+                            )
+                        })
+                        .collect::<Vec<_>>()
+                });
+                // IndexedParallelIterator preserves sample-id order. Resolve
+                // failures and update Welford moments in that order as well.
+                for (offset, result) in results.into_iter().enumerate() {
+                    let sample_id = chunk_start + offset as u64;
+                    accumulator.observe(sample_id, result?, has_trained_deviators)?;
+                }
+                chunk_start = chunk_end;
+            }
+        }
+        Ok(accumulator.finish(samples, has_trained_deviators))
+    }
 
-        for sample_id in 0..samples {
-            let mut deal_rng = evaluation_deal_rng(seed, sample_id);
-            let sample = self.sampler.sample_counted(&mut deal_rng)?;
-            total_deal_attempts = total_deal_attempts
-                .checked_add(u64::from(sample.attempts))
-                .ok_or(SolverError::CounterOverflow)?;
-            let mut profile_rng = evaluation_action_rng(seed, sample_id, None);
-            let utilities = self.evaluate_world(
+    fn evaluate_profile_sample(
+        &self,
+        sample_id: u64,
+        seed: u64,
+        deviators: Option<&[DeviatorPolicy]>,
+        purify_threshold: f32,
+        use_current_strategy: bool,
+    ) -> Result<ProfileEvaluationSample, SolverError> {
+        let mut deal_rng = evaluation_deal_rng(seed, sample_id);
+        let sample = self.sampler.sample_counted(&mut deal_rng)?;
+        // All profile replays begin from the same action stream. See
+        // `paired_profile_action` for why fixed candidate decisions still
+        // consume one draw and preserve alignment along the shared prefix.
+        let common_action_rng = evaluation_action_rng(seed, sample_id, None);
+        let mut profile_rng = common_action_rng.clone();
+        let utilities = self.evaluate_world(
+            &sample.world,
+            &mut profile_rng,
+            None,
+            None,
+            purify_threshold,
+            use_current_strategy,
+            None,
+        )?;
+        let mut gains = vec![[0.0; 2]; utilities.len()];
+        for seat in 0..utilities.len() {
+            let mut deviation_rng = common_action_rng.clone();
+            let deviation = self.evaluate_world(
                 &sample.world,
-                &mut profile_rng,
-                None,
+                &mut deviation_rng,
+                Some(seat),
                 None,
                 purify_threshold,
                 use_current_strategy,
                 None,
             )?;
-            let count = (sample_id + 1) as f64;
-            for seat in 0..num_players {
-                let delta = utilities[seat] - means[seat];
-                means[seat] += delta / count;
-                m2[seat] += delta * (utilities[seat] - means[seat]);
+            gains[seat][0] = deviation[seat] - utilities[seat];
 
-                let mut deviation_rng = evaluation_action_rng(seed, sample_id, Some(seat));
-                let deviation = self.evaluate_world(
+            if deviators.is_some() {
+                let mut trained_rng = common_action_rng.clone();
+                let trained = self.evaluate_world(
                     &sample.world,
-                    &mut deviation_rng,
+                    &mut trained_rng,
                     Some(seat),
-                    None,
+                    deviators,
                     purify_threshold,
                     use_current_strategy,
                     None,
                 )?;
-                let gain = deviation[seat] - utilities[seat];
-                let gain_delta = gain - gain_means[seat][0];
-                gain_means[seat][0] += gain_delta / count;
-                gain_m2[seat][0] += gain_delta * (gain - gain_means[seat][0]);
-
-                if deviators.is_some() {
-                    let mut trained_rng = deviator_evaluation_action_rng(seed, sample_id, seat);
-                    let trained = self.evaluate_world(
-                        &sample.world,
-                        &mut trained_rng,
-                        Some(seat),
-                        deviators,
-                        purify_threshold,
-                        use_current_strategy,
-                        None,
-                    )?;
-                    let gain = trained[seat] - utilities[seat];
-                    let gain_delta = gain - gain_means[seat][1];
-                    gain_means[seat][1] += gain_delta / count;
-                    gain_m2[seat][1] += gain_delta * (gain - gain_means[seat][1]);
-                }
+                gains[seat][1] = trained[seat] - utilities[seat];
             }
         }
-
-        let seats = means
-            .into_iter()
-            .zip(m2)
-            .map(|(mean, sum_squared_error)| profile_estimate(mean, sum_squared_error, samples))
-            .collect();
-        let deviation_gain_lower_bound = gain_means
-            .into_iter()
-            .zip(gain_m2)
-            .map(|(seat_means, seat_m2)| {
-                let candidate = if deviators.is_some() && seat_means[1] > seat_means[0] {
-                    1
-                } else {
-                    0
-                };
-                nonnegative_gain_estimate(seat_means[candidate], seat_m2[candidate], samples)
-            })
-            .collect();
-        Ok(ProfileEvaluation {
-            samples,
-            total_deal_attempts,
-            seats,
-            deviation_gain_lower_bound: Some(deviation_gain_lower_bound),
+        Ok(ProfileEvaluationSample {
+            deal_attempts: u64::from(sample.attempts),
+            utilities,
+            gains,
         })
     }
 
@@ -654,9 +877,9 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 .map(|index| self.game.action_label_of(&actions, index))
                 .collect::<Vec<_>>();
             validate_action_labels(&labels)?;
-            // `policy` already dispatches on storage mode, so this evaluation
-            // loop needs no dense/sparse branch of its own.
-            let stored = self.policy(key);
+            // The borrowed view dispatches on storage mode without cloning
+            // the policy column at every evaluated decision.
+            let stored = self.evaluation_policy(key);
             if let Some(coverage) = candidate_policy_coverage.as_deref_mut() {
                 let seat = coverage
                     .get_mut(actor)
@@ -673,11 +896,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 // is from the average (plain regret matching has no
                 // last-iterate convergence guarantee; see the MMD/QRE
                 // literature for methods that do).
-                let mut strategy = if use_current_strategy {
-                    regret_matching_f32(&column.regrets)
-                } else {
-                    column.average_strategy()
-                };
+                let mut strategy = column.strategy(use_current_strategy);
                 if purify_threshold > 0.0 {
                     purify_strategy(&mut strategy, purify_threshold);
                 }
@@ -685,21 +904,21 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             } else {
                 vec![1.0 / num_actions as f32; num_actions]
             };
-            let action = if deviator == Some(actor) {
+            let fixed_action = if deviator == Some(actor) {
                 let trained = deviators
                     .and_then(|devs| devs[actor].actions.get(&key))
                     .copied()
                     .filter(|&index| (index as usize) < num_actions);
                 match trained {
-                    Some(index) => index as usize,
-                    None => match &stored {
-                        Some(column) => regret_greedy_action(&column.regrets),
-                        None => sample_profile_action(&strategy, rng),
-                    },
+                    Some(index) => Some(index as usize),
+                    None => stored
+                        .as_ref()
+                        .map(|column| regret_greedy_action(column.regrets)),
                 }
             } else {
-                sample_profile_action(&strategy, rng)
+                None
             };
+            let action = paired_profile_action(&strategy, fixed_action, rng);
             state = self.game.next_state_with(&state, &actions, action);
             history = history.child(actor, action);
             if depth == self.config.max_traversal_depth {
@@ -759,16 +978,12 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 .map(|index| self.game.action_label_of(&actions, index))
                 .collect::<Vec<_>>();
             validate_action_labels(&labels)?;
-            let stored = self.policy(candidate_key);
+            let stored = self.evaluation_policy(candidate_key);
             let strategy = if let Some(column) = &stored {
                 if column.action_labels != labels {
                     return Err(SolverError::ActionLabelsChanged { key: candidate_key });
                 }
-                let mut strategy = if use_current_strategy {
-                    regret_matching_f32(&column.regrets)
-                } else {
-                    column.average_strategy()
-                };
+                let mut strategy = column.strategy(use_current_strategy);
                 if purify_threshold > 0.0 {
                     purify_strategy(&mut strategy, purify_threshold);
                 }
@@ -777,7 +992,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 vec![1.0 / num_actions as f32; num_actions]
             };
 
-            let action = if actor == deviator {
+            let fixed_action = if actor == deviator {
                 let reference_private = self.game.deviation_bucket(&state, world, actor);
                 validate_private_info(
                     reference_private,
@@ -799,16 +1014,17 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 match trained {
                     Some(index) => {
                         coverage.record(private.street, true)?;
-                        index as usize
+                        Some(index as usize)
                     }
                     None => {
                         coverage.record(private.street, false)?;
-                        sample_profile_action(&strategy, rng)
+                        None
                     }
                 }
             } else {
-                sample_profile_action(&strategy, rng)
+                None
             };
+            let action = paired_profile_action(&strategy, fixed_action, rng);
             state = self.game.next_state_with(&state, &actions, action);
             history = history.child(actor, action);
             if depth == self.config.max_traversal_depth {
@@ -1017,4 +1233,179 @@ pub(super) fn validate_purify_threshold(purify_threshold: f32) -> Result<(), Sol
         ));
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod estimate_tests {
+    use super::*;
+
+    #[test]
+    fn borrowed_sparse_and_dense_views_match_owned_strategy_arithmetic() {
+        let owned = PolicyColumn {
+            action_labels: vec!["fold".into(), "call".into(), "raise".into()],
+            regrets: vec![-2.0, 1.0, 3.0],
+            strategy_sum: vec![2.0, 3.0, 5.0],
+        };
+        let sparse_view = EvaluationPolicy {
+            action_labels: &owned.action_labels,
+            regrets: &owned.regrets,
+            strategy_sum: &owned.strategy_sum,
+        };
+        assert_eq!(sparse_view.action_labels, owned.action_labels);
+        assert_eq!(sparse_view.strategy(false), owned.average_strategy());
+        assert_eq!(sparse_view.strategy(true), owned.current_strategy());
+
+        // Dense storage exposes the same three fields as independent arena
+        // slices. Include zero strategy mass to exercise the exact fallback
+        // to regret matching used by `PolicyColumn::average_strategy`.
+        let dense_labels = vec!["check".into(), "bet".into()];
+        let dense_regrets = vec![-1.0, 4.0];
+        let dense_strategy_sum = vec![0.0, 0.0];
+        let dense_view = EvaluationPolicy {
+            action_labels: &dense_labels,
+            regrets: &dense_regrets,
+            strategy_sum: &dense_strategy_sum,
+        };
+        let equivalent_owned = PolicyColumn {
+            action_labels: dense_labels.clone(),
+            regrets: dense_regrets.clone(),
+            strategy_sum: dense_strategy_sum.clone(),
+        };
+        assert_eq!(dense_view.action_labels, equivalent_owned.action_labels);
+        assert_eq!(
+            dense_view.strategy(false),
+            equivalent_owned.average_strategy()
+        );
+        assert_eq!(
+            dense_view.strategy(true),
+            equivalent_owned.current_strategy()
+        );
+    }
+
+    #[test]
+    fn paired_profile_action_matches_the_existing_sampler_without_a_fixed_action() {
+        let strategy = [0.15, 0.35, 0.5];
+        let mut expected_rng = evaluation_action_rng(17, 29, None);
+        let mut paired_rng = expected_rng.clone();
+
+        for _ in 0..64 {
+            assert_eq!(
+                paired_profile_action(&strategy, None, &mut paired_rng),
+                sample_profile_action(&strategy, &mut expected_rng)
+            );
+        }
+    }
+
+    #[test]
+    fn fixed_candidate_action_consumes_one_draw_and_keeps_shared_prefix_aligned() {
+        let first_strategy = [0.2, 0.3, 0.5];
+        let next_strategy = [0.4, 0.6];
+        let mut baseline_rng = evaluation_action_rng(31, 47, None);
+        let mut candidate_rng = baseline_rng.clone();
+
+        let _baseline_first = paired_profile_action(&first_strategy, None, &mut baseline_rng);
+        assert_eq!(
+            paired_profile_action(&first_strategy, Some(1), &mut candidate_rng),
+            1
+        );
+        assert_eq!(
+            paired_profile_action(&next_strategy, None, &mut candidate_rng),
+            paired_profile_action(&next_strategy, None, &mut baseline_rng),
+            "a fixed candidate decision must not shift later common draws"
+        );
+    }
+
+    #[test]
+    fn common_action_stream_eliminates_shared_prefix_noise_from_paired_gain() {
+        let stochastic_opponent = [0.5, 0.5];
+        let pure_baseline_deviator = [1.0, 0.0];
+        let mut paired_gains = Vec::new();
+        let mut independent_gains = Vec::new();
+
+        for sample_id in 0..512 {
+            let common_rng = evaluation_action_rng(73, sample_id, None);
+            let mut baseline_rng = common_rng.clone();
+            let mut paired_candidate_rng = common_rng.clone();
+            let mut independent_candidate_rng = evaluation_action_rng(73, sample_id, Some(0));
+
+            let baseline_noise =
+                paired_profile_action(&stochastic_opponent, None, &mut baseline_rng) as f64;
+            let baseline_action =
+                paired_profile_action(&pure_baseline_deviator, None, &mut baseline_rng) as f64;
+            let paired_noise =
+                paired_profile_action(&stochastic_opponent, None, &mut paired_candidate_rng) as f64;
+            let paired_action =
+                paired_profile_action(&pure_baseline_deviator, Some(1), &mut paired_candidate_rng)
+                    as f64;
+            let independent_noise =
+                paired_profile_action(&stochastic_opponent, None, &mut independent_candidate_rng)
+                    as f64;
+            let independent_action = paired_profile_action(
+                &pure_baseline_deviator,
+                Some(1),
+                &mut independent_candidate_rng,
+            ) as f64;
+
+            let baseline_utility = baseline_noise + baseline_action;
+            paired_gains.push(paired_noise + paired_action - baseline_utility);
+            independent_gains.push(independent_noise + independent_action - baseline_utility);
+        }
+
+        assert!(paired_gains.iter().all(|&gain| gain == 1.0));
+        let independent_mean =
+            independent_gains.iter().sum::<f64>() / independent_gains.len() as f64;
+        let independent_m2 = independent_gains
+            .iter()
+            .map(|gain| (gain - independent_mean).powi(2))
+            .sum::<f64>();
+        assert!(independent_m2 > 100.0);
+        assert!((independent_mean - 1.0).abs() < 0.1);
+    }
+
+    #[test]
+    fn simultaneous_envelope_retains_lower_mean_high_variance_upper() {
+        let samples = 101;
+        let means = [0.5, 0.4];
+        let m2 = [1.0, 100.0];
+        let estimate = two_candidate_nonnegative_gain_estimate(means, m2, samples);
+        let stderrs = m2.map(|value| standard_error(value, samples));
+
+        assert_eq!(estimate.mean, means[0]);
+        assert_eq!(estimate.stderr, stderrs[0]);
+        assert_eq!(
+            estimate.ci95,
+            [
+                (means[0] - TWO_CANDIDATE_CI95_Z * stderrs[0]).max(0.0),
+                (means[1] + TWO_CANDIDATE_CI95_Z * stderrs[1]).max(0.0),
+            ]
+        );
+    }
+
+    #[test]
+    fn simultaneous_envelope_is_candidate_order_invariant() {
+        let forward = two_candidate_nonnegative_gain_estimate([0.5, 0.4], [1.0, 100.0], 101);
+        let reversed = two_candidate_nonnegative_gain_estimate([0.4, 0.5], [100.0, 1.0], 101);
+        assert_eq!(forward, reversed);
+    }
+
+    #[test]
+    fn duplicate_candidate_keeps_diagnostic_and_widens_for_selection() {
+        let mean = 0.3;
+        let m2 = 9.0;
+        let samples = 101;
+        let single = nonnegative_gain_estimate(mean, m2, samples);
+        let duplicate = two_candidate_nonnegative_gain_estimate([mean; 2], [m2; 2], samples);
+
+        assert_eq!(duplicate.mean, single.mean);
+        assert_eq!(duplicate.stderr, single.stderr);
+        assert!(duplicate.ci95[0] <= single.ci95[0]);
+        assert!(duplicate.ci95[1] >= single.ci95[1]);
+    }
+
+    #[test]
+    fn simultaneous_envelope_clamps_the_no_deviation_option_at_zero() {
+        let estimate = two_candidate_nonnegative_gain_estimate([-0.2, -0.3], [0.01, 0.01], 101);
+        assert_eq!(estimate.mean, 0.0);
+        assert_eq!(estimate.ci95, [0.0, 0.0]);
+    }
 }

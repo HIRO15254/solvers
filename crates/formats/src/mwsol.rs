@@ -125,6 +125,12 @@ pub struct MultiwayPublicState {
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct MultiwayStrategyWeight {
     pub key: MultiwayStrategyKey,
+    /// Unnormalized accumulated average-strategy mass. Solver state 3 and later use
+    /// a fixed uniform opponent-action proposal, whose history-specific
+    /// visitation factor remains in this mass. Relative bucket weights at
+    /// one public history are meaningful; this is neither an actual profile
+    /// reach probability nor a comparable absolute mass across histories,
+    /// runs, or algorithm versions.
     pub weight: f64,
 }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]

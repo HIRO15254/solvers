@@ -2275,6 +2275,44 @@ ante_bb = 0.125
                 .any(|action| matches!(action, multiway::Action::RaiseTo { all_in: true, .. }))
         );
     }
+
+    #[test]
+    fn typed_rules_accept_last_preflop_aggressor_position() {
+        let raw = format!(
+            "{MINIMAL}\n[game.tree]\nkind = \"standard\"\n[[game.tree.rules]]\nstreet = \"preflop\"\nwhen = 'last_preflop_aggressor_position == \"UTG\"'\neffect = \"remove\"\naction = \"call\"\n"
+        );
+        let lowered = parse_and_lower(&raw).unwrap();
+        let GameSection::PreflopMultiway(game) = lowered.game else {
+            panic!()
+        };
+        assert_eq!(
+            game.betting.rules[0].condition,
+            "last_preflop_aggressor_position == \"UTG\""
+        );
+        assert_ne!(
+            game_fingerprint(parse_and_lower(MINIMAL).unwrap()),
+            game_fingerprint(parse_and_lower(&raw).unwrap())
+        );
+    }
+
+    #[test]
+    fn script_roundtrip_preserves_last_preflop_aggressor_position() {
+        let directory = tempfile::tempdir().unwrap();
+        let config_path = directory.path().join("game.toml");
+        let script_path = directory.path().join("position.mwtree");
+        std::fs::write(
+            &script_path,
+            "preflop when last_preflop_aggressor_position == \"UTG\" { remove call }\n",
+        )
+        .unwrap();
+        let raw =
+            format!("{MINIMAL}\n[game.tree]\nkind = \"script\"\nsource = \"position.mwtree\"\n");
+        let effective = normalized_toml_at(&raw, &config_path).unwrap();
+        assert!(effective.contains("last_preflop_aggressor_position"));
+        std::fs::remove_file(&script_path).unwrap();
+        assert!(parse_and_lower(&effective).is_ok());
+    }
+
     /// `Tree::Script` normalizes by inlining the file's contents into
     /// `script`, exactly as the postflop family's `[game.tree] source`
     /// inlines into `script` (`crate::config::TreeSection::resolve_source_at`)

@@ -2,7 +2,7 @@
 //!
 //! This is a thin adapter over `cards::script`'s generic condition grammar
 //! (`Vars`, `Condition<V>`, `Dialect<V>`, `VarSource<V>`) -- the same front
-//! end postflop's `.tree` scripts use -- providing the fourteen variables
+//! end postflop's `.tree` scripts use -- providing the fifteen variables
 //! multiway's `when` strings and `.mwtree` scripts read. `TreeRule::compiled`
 //! (`config.rs`) is what makes evaluation compile-once: a condition string
 //! is parsed here exactly once, the first time it is checked (in practice,
@@ -30,13 +30,14 @@ use crate::config::{RuleStreet, TreeRule};
 use crate::types::SeatId;
 
 /// One named variable multiway's tree-rule conditions can read -- the same
-/// fourteen the old `context_value` resolved, ported onto `cards::script`'s
+/// fifteen the old `context_value` resolved, ported onto `cards::script`'s
 /// generic condition grammar.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum MultiwayVar {
     Position,
     InPosition,
     InPositionToLastAggressor,
+    LastPreflopAggressorPosition,
     PreflopParticipant,
     OpenColdCalls,
     Players,
@@ -57,6 +58,7 @@ impl Vars for MultiwayVar {
             Position => "position",
             InPosition => "in_position",
             InPositionToLastAggressor => "in_position_to_last_aggressor",
+            LastPreflopAggressorPosition => "last_preflop_aggressor_position",
             PreflopParticipant => "preflop_participant",
             OpenColdCalls => "open_cold_calls",
             Players => "players",
@@ -74,7 +76,7 @@ impl Vars for MultiwayVar {
     fn kind(self) -> VarKind {
         use MultiwayVar::*;
         match self {
-            Position => VarKind::Text,
+            Position | LastPreflopAggressorPosition => VarKind::Text,
             InPosition
             | InPositionToLastAggressor
             | PreflopParticipant
@@ -92,6 +94,7 @@ const ALL_MULTIWAY_VARS: &[MultiwayVar] = &[
     MultiwayVar::Position,
     MultiwayVar::InPosition,
     MultiwayVar::InPositionToLastAggressor,
+    MultiwayVar::LastPreflopAggressorPosition,
     MultiwayVar::PreflopParticipant,
     MultiwayVar::OpenColdCalls,
     MultiwayVar::Players,
@@ -137,6 +140,7 @@ impl VarSource<MultiwayVar> for (&BettingState, SeatId) {
             InPositionToLastAggressor => {
                 Value::Bool(is_in_position_to_last_aggressor(state, actor))
             }
+            LastPreflopAggressorPosition => Value::Text(last_preflop_aggressor_position(state)),
             PreflopParticipant => Value::Bool(state.preflop_participants.contains(actor)),
             OpenColdCalls => Value::Number(f64::from(state.preflop_open_cold_calls)),
             Players => Value::Number(state.non_folded_mask().len() as f64),
@@ -293,6 +297,16 @@ fn is_in_position_to_last_aggressor(state: &BettingState, actor: SeatId) -> bool
     postflop_rank(actor) > postflop_rank(aggressor)
 }
 
+/// Returns the fixed table position of the most recent preflop aggressor.
+/// The value remains available after the street advances, so postflop rules
+/// can key off the last preflop raiser. An unopened hand evaluates to empty text.
+fn last_preflop_aggressor_position(state: &BettingState) -> &'static str {
+    state
+        .last_preflop_aggressor
+        .map(|aggressor| position_name(aggressor, state.button, state.num_seats()))
+        .unwrap_or("")
+}
+
 fn spr(state: &BettingState, actor: SeatId) -> f64 {
     let pot = state.pot_size().raw();
     if pot == 0 {
@@ -399,6 +413,31 @@ mod tests {
         );
         assert!(matches(&in_position_rule, &state, SeatId(5)));
 
+        state.last_preflop_aggressor = Some(SeatId(0));
+        let opener_position_rule = rule(
+            "last_preflop_aggressor_position == \"BTN\"",
+            RuleStreet::Preflop,
+            RuleEffect::Remove,
+            RuleAction::Call,
+        );
+        assert!(matches(&opener_position_rule, &state, SeatId(1)));
+        state.street = crate::types::Street::Flop;
+        let postflop_opener_position_rule = rule(
+            "last_preflop_aggressor_position == \"BTN\"",
+            RuleStreet::Postflop,
+            RuleEffect::Remove,
+            RuleAction::Call,
+        );
+        assert!(matches(&postflop_opener_position_rule, &state, SeatId(1)));
+        state.last_preflop_aggressor = None;
+        let unopened_position_rule = rule(
+            "last_preflop_aggressor_position == \"\"",
+            RuleStreet::Postflop,
+            RuleEffect::Remove,
+            RuleAction::Call,
+        );
+        assert!(matches(&unopened_position_rule, &state, SeatId(1)));
+        state.street = crate::types::Street::Preflop;
         state.last_preflop_aggressor = Some(SeatId(0));
         for actor in [SeatId(1), SeatId(2)] {
             assert!(!matches(&in_position_rule, &state, actor));

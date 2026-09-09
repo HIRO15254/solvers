@@ -28,6 +28,13 @@ postflop / preflop-hu / toyは`solver-config-v1.jp.md`が規範である。ど�
 フォールド 8%」のような確率分布の表である。`solvers inspect` が表示する 13×13
 マトリクスや `.mwsol` アーティファクトはこれを表示・保存したもの。
 
+tree ruleの`when`では`last_preflop_aggressor_position`を使うと、直近のpreflop
+aggressorを`UTG`、`HJ`、`CO`、`BTN`、`SB`、`BB`などのposition名で指定できる。
+まだraiseが無い場合は空文字であり、postflopへ進んだ後も最後のpreflop aggressorを
+参照できる。たとえば`last_preflop_aggressor_position == "UTG"`は最後のpreflop
+raiseをUTGが行った場合に真になる。UTG openに対する応答だけに限定するときは、
+preflop ruleで`aggressions == 1`も条件に加える。
+
 直感的には「このルール設定の下で、全員が互いに最善を尽くし合ったとき
 落ち着く均衡戦略(いわゆる GTO)」の近似を求めている。ただし 3 人以上では
 厳密な保証が変わる(§5)。
@@ -68,6 +75,19 @@ external sampling では、1 回の走査(traversal)で:
   それぞれの反実仮想価値から regret を更新する。
 - **他の席** は現在戦略(+探索 ε の一様混合)から 1 手だけサンプルして進む。
 
+既定の **range-vector** は、sampleされた相手hole cardsとboardを固定し、traverserの
+feasibleな全comboを一度に評価する。combo weightはそのcontextのfeasible range
+全体で正規化するため、single-hand走査でown handを1つsampleする場合の条件付き期待値
+と一致する。bucketごとの再正規化は行わず、card removalでbucket確率が変わることも
+更新量に残す。
+
+平均戦略はregret走査とは別の軽量走査で蓄積する。対象seatは自分の全actionを分岐して
+own reachを運び、他seatはcurrent strategyと無関係に合法actionを一様sampleする。
+このため相手の確率0 actionより後も平均profileから欠落しない。一様sampleでhistoryへ
+到達する固定確率`Q(history)`はcolumn内の正規化で相殺するので、逆数を掛けない。
+生のstrategy weightは同じhistory内のbucket集約には使えるが実到達確率ではなく、
+異なるhistory間では比較できない。
+
 1 **sweep** = 全席が 1 回ずつ traverser を務める。既定では sweep ごとに
 席数ぶんの走査を並列実行し、結果(regret / 平均戦略の増分)を席順に
 決定的にマージする。このため **同じシードなら、スレッド数を変えても
@@ -80,7 +100,8 @@ external sampling では、1 回の走査(traversal)で:
 - **早期ディスカウント**: 序盤の累積 regret を周期的に減衰させる
   (Pluribus 系の慣行)。
 - **`solver.batch_sweeps`**: N sweep 分の走査をまとめて並列発行し、席数を超える
-  並列度を得る(N>1 は結果が変わるが品質はほぼ同等。規範仕様の該当keyを参照)。
+  並列度を得る。N>1 は同一snapshotで複数sweepを生成するため結果が変わる。
+  時間と品質を同じ条件で比較して選ぶ(規範仕様の該当keyを参照)。
 
 ## 4. 抽象化: なぜ現実的な時間で解けるのか
 
@@ -120,12 +141,17 @@ recallもsparse policy mapが増えるため、productionからそれぞれ`MWP0
 
 ## 5. 何が保証され、何が保証されないか
 
-- **2 人(HU 構成)**: 零和設定では CFR の標準理論どおり、平均戦略は Nash 均衡に収束する。一般和設定にはこの保証はない。
+- **2 人(HU 構成)**: 完全recallの零和設定ではCFRの標準理論どおり、平均戦略は
+  Nash均衡へ収束する。Productionのcurrent-street abstractionは不完全recallなので、
+  この前提をそのまま満たさない。不完全recallでのboundは特定のgame classに限られ、
+  本構成が該当する証明はしていないため、held-out評価による検証が必要である
+  ([Lanctot et al., 2012](https://arxiv.org/abs/1205.0622))。
 - **3 人以上**: 一般和・多人数ゲームでは「全員の regret を最小化した profile」
   が Nash 均衡である保証は理論的に存在しない。本ソルバーの出力は
   **regret-minimized approximation** であり、CLI が常に表示する
   「approximate profile — Nash/GTO 保証なし」はこの意味である。
-  実務上は(商用の多人数ソルバーと同様)十分に有用な近似となる。
+  外部regretのCCE型boundが対象にするのはiteration間の相関を保つjoint-play経験分布で、
+  各seatの平均columnを独立に組み合わせた本solution profileへの保証ではない。
 
 収束の観察には次の指標を使う(run directory の `progress.jsonl`):
 
@@ -167,7 +193,10 @@ byte offsetを保持して再開し、`seq`の連続でとりこぼしを検出�
   情報集合ごとの平均戦略を、ページ読み出し可能な索引付きで格納する。
   probability encodingは既定`u16`(分母65,535)で、research/inspection用に
   `f32`も選べる。signed `i16` strategy encodingはproduction v1では使わない。
-  `solvers inspect` / `solvers export` がこれを読む。
+  `solvers inspect` / `solvers export` がこれを読む。Production v1はPreflop-onlyを
+  規範契約とするが、現在のwriterが正の平均質量を持つPostflop blockも保存し得る
+  契約不一致は未解決である。未訪問・平均質量0のpolicy、raw regret、量子化前の値は
+  保存しないため、現在のartifactを完全な全street solver stateとも扱わない。
 - **`.mwckpt`**: 再開用チェックポイント(累積 regret を含む全学習状態)。
   `solvers resume` で続きを回せる。
 - **`progress.jsonl`**: 上表の指標の時系列。
@@ -208,8 +237,12 @@ cargo run -p cli --release -- runs ls runs
 `--format json`でどれも機械可読な出力になる。
 
 停止はCtrl-C(SIGINT)で、cooperative cancelの後にcheckpointを書いてから終了する。
-これはmultiwayとheads-upの双方で同じである(cancelはevaluation境界で効くため、
-`check_every`が大きいと反応まで最大1 chunk分かかる)。
+Multiwayではcancel、`max_time`、定期checkpointを完了したsolver batchの境界で確認し、
+学習停止またはcheckpoint判定の遅れは最大1 batchである。判定後のcheckpoint I/O、
+予定された品質評価、最終成果物出力は途中で打ち切らないため、process終了はさらに
+遅くなりうる。定期checkpointだけが
+期限に達した場合は、予定外の品質評価を行わず保存後にsolveを続ける。
+Heads-upもcooperative cancelで停止する。
 `status`は`canceled`と`resumable`を報告し、run directoryをそのまま渡せば再開する。
 
 ```sh
@@ -223,6 +256,13 @@ run directory内の2ファイル(`checkpoint.mwckpt`/`solution.mwsol`と
 
 再開は同じrun directoryに追記する。`manifest.json`のrun idと作成時刻は保たれ、
 `events.jsonl`の`seq`も連続する。別のdirectoryへ分岐したい場合は`--out`を渡す。
+range-vectorの条件付きregret weightと独立average走査はsolver state version 3で
+導入された。solver state version 4では、同一streetでもstreet開始時の相手人数が
+異なるbranchに対してcombo bucket cacheを分離する。version 3以前のMultiway
+checkpointは再開できない。旧bucket更新と修正後の更新を同じ累積regret/平均戦略へ
+混ぜず、設定から新しいsolveを開始する。run metadataとsolutionの
+algorithm fingerprintはstate versionとeffective algorithm設定を含むため、この境界を
+成果物からも判別できる。旧solutionは比較・参照用には引き続き読める。
 
 `examples/preflop_multiway_v1_production_smoke.toml`はproduction parser contractの
 検証fixtureである。
@@ -272,6 +312,14 @@ GUIは2026-08に削除した。設定作成・実行・監視をGUIから行う�
 
 Multiwayのmeasured deviationは単独seatのtrained deviationに対する推定であり、
 多人数一般和ゲームのNash/GTO保証ではない。Sweep消化率や残り時間も収束確率ではない。
+停止確認ごとに学習用と独立した新しい評価サンプルを使い、checkpointからのresumeでも
+評価sequenceを引き継ぐ。表示CIが表すのは検査したdeviatorのサンプリング誤差であり、
+未発見のbest responseや抽象化誤差、停止までの検査全体を95%で保証するものではない。
+2つのdeviator候補から利得の大きいものを選ぶ評価では、候補ごとのBonferroni補正CIを
+まとめるため、表示CIは選ばれた候補の`stderr`だけから再計算できない。
+比較するprofileには同じカードと行動乱数列を与え、共通の展開での偶然の差を
+抑える。各停止確認には新しいsampleを使うため、同じ結果の再確認は数えない。
+停止評価の`evaluation_samples=1`は分散を推定できないため実効2として評価・記録する。
 
 ## 12. Postflop subgame を解く
 

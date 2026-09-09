@@ -763,8 +763,7 @@ fn build_deviation_reference(
 
 /// Scale factor `derive_prune_threshold` applies to the game's total stakes
 /// to get `algorithm.prune_threshold` when the key is omitted. See
-/// `derive_prune_threshold`'s doc comment for how this scale was
-/// calibrated.
+/// `derive_prune_threshold`'s doc comment for its calibration boundary.
 pub(crate) const PRUNE_THRESHOLD_STAKE_FACTOR: f64 = -10.0;
 
 /// Derives `algorithm.prune_threshold` when `algorithm.prune = true` but the
@@ -772,20 +771,16 @@ pub(crate) const PRUNE_THRESHOLD_STAKE_FACTOR: f64 = -10.0;
 /// starting stacks (in bb) for `[utility] kind = "chip-ev"`, or `-10.0 *`
 /// the total payouts for `kind = "tournament-icm"`.
 ///
-/// The `-10x` scale was calibrated empirically (paired 200k-sweep runs on a
-/// 6-max 100bb auto-shape config): vector-mode bucket regrets are
-/// range-weighted *means* over combos, so they grow orders of magnitude
-/// slower than the raw per-hand regrets Pluribus's famous very-negative
-/// constant was tuned for. At `-10x` total stacks a (bucket, action) only
-/// qualifies after roughly 10k+ sweeps of persistent domination (the ratio
-/// is stack-depth-invariant, since per-sweep regret deltas also scale with
-/// stack depth), which measurably sped up the paired runs, while `-1000x`
-/// essentially never activated within realistic run lengths and its
-/// bookkeeping made runs marginally slower. Two safety nets keep the
-/// comparatively shallow default honest: ~5% of visits still explore a
-/// pruned pair, and every batched early-discount event scales negative
-/// regrets back toward zero, periodically lifting borderline pairs above
-/// the threshold for a full re-check.
+/// This scale was originally calibrated with solver-state version 2's
+/// within-bucket-normalized range-vector regret updates. Version 3 instead
+/// normalizes over the full feasible own range, so each bucket's increment
+/// also carries its conditional feasible mass (roughly 1/169 for a uniform
+/// preflop range, with class-size and blocker variation). The old activation
+/// timing does not validate this threshold under the current estimator.
+/// Compare paired pruned and unpruned runs before drawing speed or quality
+/// conclusions. The 5% unpruned revisit probability provides opportunities
+/// to revisit skipped pairs; periodic discount moves negative regrets toward
+/// zero and can delay or reverse pruning eligibility.
 fn derive_prune_threshold(
     utility: &MultiwayUtility,
     game_config: &multiway::MultiwayConfig,
@@ -820,8 +815,8 @@ pub struct StopRuleState {
     /// [`run_stop_rule_check`] again.
     pub last_eval: Instant,
     /// Monotonically increasing index of the next check, folded into the
-    /// deviator-training seed so repeated checks never retrain against the
-    /// same random stream.
+    /// training and held-out evaluation seeds. Persisted in checkpoints so
+    /// resumed checks continue with fresh batches instead of reusing evidence.
     pub eval_index: u64,
 }
 
@@ -905,6 +900,23 @@ pub struct StopRuleCheck {
     pub converged: bool,
 }
 
+/// Independent, reproducible streams for a scheduled stop check. Replaying
+/// one fixed evaluation batch at every boundary would let a lucky batch
+/// count repeatedly toward `confirmations`, even for an unchanged profile.
+fn stop_check_seeds(seed: u64, sequence: u64) -> (u64, u64) {
+    let derive = |domain: &[u8]| {
+        let mut hasher = blake3::Hasher::new();
+        hasher.update(domain);
+        hasher.update(&seed.to_le_bytes());
+        hasher.update(&sequence.to_le_bytes());
+        u64::from_le_bytes(hasher.finalize().as_bytes()[..8].try_into().unwrap())
+    };
+    (
+        derive(b"solvers.multiway.stop-training.v1"),
+        derive(b"solvers.multiway.stop-held-out.v1"),
+    )
+}
+
 /// One stop-rule check: an optional best-response burst, the held-out
 /// evaluation, threshold/width bookkeeping, adaptive sample doubling, and
 /// the confirmations update. Callers are expected to have already checked
@@ -920,6 +932,10 @@ pub fn run_stop_rule_check(
     evaluation_seed: u64,
 ) -> Result<StopRuleCheck> {
     state.last_eval = Instant::now();
+    // One observation has no estimable sample variance. The diagnostic API
+    // permits it, but its zero standard error must not certify a stop.
+    // Persist and report the actual effective sample count.
+    state.samples = state.samples.max(2);
     // Best-response burst: stop-rule evaluations measure a per-seat deviator
     // TRAINED against the frozen current average profile rather than the
     // plain regret-greedy heuristic the ordinary evaluation-cadence rows
@@ -927,8 +943,11 @@ pub fn run_stop_rule_check(
     // tighter (higher) than a cadence row taken at the same sweep count.
     // That is intentional: the stop decision should use the strongest
     // available deviator, not the cheap heuristic every metrics row gets.
-    let training_seed = evaluation_seed ^ 0x6252_5354 ^ state.eval_index;
-    state.eval_index += 1;
+    let (training_seed, held_out_seed) = stop_check_seeds(evaluation_seed, state.eval_index);
+    state.eval_index = state
+        .eval_index
+        .checked_add(1)
+        .context("stop-rule evaluation sequence overflow")?;
     let deviators = if stop_rule.br_traversals > 0 {
         Some(
             train_deviators_parallel(
@@ -947,7 +966,7 @@ pub fn run_stop_rule_check(
     let evaluation = solver
         .evaluate_profile(
             state.samples,
-            evaluation_seed,
+            held_out_seed,
             deviators.as_deref(),
             multiway::ProfileVariant::default(),
         )
@@ -966,7 +985,7 @@ pub fn run_stop_rule_check(
         .map(|estimate| estimate.ci95[1] - estimate.ci95[0])
         .fold(0.0, f64::max);
 
-    state.confirmations_met = if max_upper < stop_rule.dev_gain_threshold {
+    state.confirmations_met = if max_upper <= stop_rule.dev_gain_threshold {
         state.confirmations_met + 1
     } else {
         0
@@ -1087,7 +1106,7 @@ fn build_ehs2_table_abstraction(
         cards::Street::River,
     ];
     let table = Ehs2Abstraction::load_or_build(params, &streets, cache);
-    println!(
+    eprintln!(
         "ehs2 tables: {} in {:.2}s",
         if cached { "loaded" } else { "built" },
         start.elapsed().as_secs_f64()
@@ -1316,6 +1335,20 @@ fn make_public_tree(
     (histories, public_states)
 }
 
+/// Identifies both configured algorithm settings and the numerical update
+/// semantics. Shared by the run summary and `.mwsol` writers so artifacts
+/// from before a solver-state correction remain distinguishable.
+pub(crate) fn multiway_algorithm_fingerprint(
+    algorithm: &crate::config::AlgorithmSection,
+) -> Result<[u8; 32]> {
+    let material = serde_json::to_vec(algorithm)?;
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"solvers.multiway.algorithm.v1");
+    hasher.update(&multiway::solver::SOLVER_STATE_VERSION.to_le_bytes());
+    hasher.update(&material);
+    Ok(*hasher.finalize().as_bytes())
+}
+
 /// Builds the exportable `.mwsol` artifact from a solver state snapshot and
 /// its final metrics row. Only visited infosets are formal solution entries;
 /// absent keys remain explicitly unvisited rather than becoming uniform.
@@ -1330,8 +1363,8 @@ pub fn make_solution(
 ) -> MultiwaySolution {
     let effective = crate::config::parse_internal_config(config_toml)
         .expect("solution config was validated before solving");
-    let algorithm_material =
-        serde_json::to_vec(&effective.algorithm).expect("effective algorithm is serializable");
+    let algorithm_fingerprint = multiway_algorithm_fingerprint(&effective.algorithm)
+        .expect("effective algorithm is serializable");
     let (histories, public_states) = make_public_tree(game);
     let strategy_weights = state
         .policies
@@ -1374,7 +1407,7 @@ pub fn make_solution(
         config_toml: config_toml.to_string(),
         config_fingerprint: formats::config_hash(config_toml.as_bytes()),
         game_fingerprint: game.game_fingerprint(),
-        algorithm_fingerprint: formats::config_hash(&algorithm_material),
+        algorithm_fingerprint,
         abstraction_fingerprint,
         configuration_fingerprint,
         stop_status: row.phase.clone(),
@@ -1404,6 +1437,114 @@ mod tests {
     use super::*;
     use crate::config::RakeSection;
     use multiway::solver::DEFAULT_PRUNE_SKIP_PROBABILITY;
+
+    #[test]
+    fn algorithm_identity_distinguishes_corrected_updates_from_legacy_artifacts() {
+        let config =
+            crate::config::parse_internal_config(crate::test_fixtures::LOWERED_3MAX).unwrap();
+        let old_identity = formats::config_hash(&serde_json::to_vec(&config.algorithm).unwrap());
+        let corrected = multiway_algorithm_fingerprint(&config.algorithm).unwrap();
+        assert_ne!(old_identity, corrected);
+        let restored: crate::config::AlgorithmSection =
+            serde_json::from_slice(&serde_json::to_vec(&config.algorithm).unwrap()).unwrap();
+        assert_eq!(
+            corrected,
+            multiway_algorithm_fingerprint(&restored).unwrap()
+        );
+    }
+
+    #[test]
+    fn stop_checks_use_fresh_held_out_batches_and_resume_the_sequence() {
+        let session = build_multiway_session(crate::test_fixtures::LOWERED_3MAX, None)
+            .expect("build cheap frozen-profile fixture");
+        let rule = StopRule {
+            dev_gain_threshold: 1.0e6,
+            confirmations: 3,
+            eval_period_secs: 1.0,
+            br_traversals: 0,
+        };
+        let mut state = StopRuleState::new(32);
+        let seed = 29;
+        let first = run_stop_rule_check(&session.solver, &rule, &mut state, 3, 1, seed).unwrap();
+        let expected = session
+            .solver
+            .evaluate_average_profile(32, stop_check_seeds(seed, 0).1)
+            .unwrap();
+        assert_eq!(first.evaluation, expected);
+        assert!(!first.converged);
+
+        // This is exactly the persisted stop-state subset restored by the
+        // drive loop, without involving wall-clock time in reproducibility.
+        let mut resumed = StopRuleState::new(state.samples);
+        resumed.eval_index = state.eval_index;
+        resumed.confirmations_met = state.confirmations_met;
+        let second = run_stop_rule_check(&session.solver, &rule, &mut state, 3, 1, seed).unwrap();
+        let replay = run_stop_rule_check(&session.solver, &rule, &mut resumed, 3, 1, seed).unwrap();
+        assert_eq!(second.evaluation, replay.evaluation);
+        assert_eq!(
+            second.evaluation,
+            session
+                .solver
+                .evaluate_average_profile(32, stop_check_seeds(seed, 1).1)
+                .unwrap()
+        );
+        assert_eq!(state.eval_index, resumed.eval_index);
+        assert_ne!(first.evaluation, second.evaluation);
+        assert_eq!(state.confirmations_met, 2);
+
+        let mut streams = std::collections::HashSet::new();
+        for sequence in 0..64 {
+            let (training, held_out) = stop_check_seeds(seed, sequence);
+            assert!(streams.insert(training));
+            assert!(streams.insert(held_out));
+        }
+    }
+
+    #[test]
+    fn stop_target_includes_equality_at_the_upper_bound() {
+        let session = build_multiway_session(crate::test_fixtures::LOWERED_3MAX, None).unwrap();
+        let mut state = StopRuleState::new(32);
+        let seed = 31;
+        let expected = session
+            .solver
+            .evaluate_average_profile(32, stop_check_seeds(seed, 0).1)
+            .unwrap();
+        let target = expected
+            .deviation_gain_lower_bound
+            .unwrap()
+            .iter()
+            .map(|estimate| estimate.ci95[1])
+            .fold(0.0, f64::max);
+        let rule = StopRule {
+            dev_gain_threshold: target,
+            confirmations: 1,
+            eval_period_secs: 1.0,
+            br_traversals: 0,
+        };
+        let check = run_stop_rule_check(&session.solver, &rule, &mut state, 3, 1, seed).unwrap();
+        assert_eq!(check.max_upper, target);
+        assert!(check.converged);
+    }
+
+    #[test]
+    fn stop_check_requires_variance_samples_and_rejects_sequence_overflow() {
+        let session = build_multiway_session(crate::test_fixtures::LOWERED_3MAX, None).unwrap();
+        let rule = StopRule {
+            dev_gain_threshold: 1.0e6,
+            confirmations: 1,
+            eval_period_secs: 1.0,
+            br_traversals: 0,
+        };
+        let mut state = StopRuleState::new(1);
+        let check = run_stop_rule_check(&session.solver, &rule, &mut state, 3, 1, 17).unwrap();
+        assert_eq!(check.evaluation.samples, 2);
+        assert_eq!(state.samples, 2);
+        state.eval_index = u64::MAX;
+        let error = run_stop_rule_check(&session.solver, &rule, &mut state, 3, 1, 17)
+            .err()
+            .expect("sequence exhaustion must fail rather than reuse a batch");
+        assert!(error.to_string().contains("sequence overflow"));
+    }
 
     #[test]
     fn boundaries_are_positive_and_repeat() {

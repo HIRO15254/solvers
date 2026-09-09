@@ -16,7 +16,12 @@ pub const MULTIWAY_SCHEMA_VERSION: u16 = 3;
 #[serde(rename_all = "camelCase")]
 pub struct Estimate {
     pub mean: f64,
+    /// Standard error of the reported point-estimate candidate. For a
+    /// maximum across deviation candidates, this alone does not reconstruct
+    /// the selection-adjusted interval; consumers must read `ci95` directly.
     pub stderr: f64,
+    /// Approximate sampling interval, including a simultaneous-candidate
+    /// correction when the metric selects the largest tested deviation.
     pub ci95: [f64; 2],
 }
 

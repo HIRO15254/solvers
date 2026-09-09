@@ -24,12 +24,41 @@
 ### 計算と停止判定
 
 1 sweepは各seatが1回ずつtraverserとなるExternal-Sampling MCCFR更新である。
-相手actionはsampleし、traverser actionは全分岐する。regretとLinear average
-strategyの更新がSolve本体である。
+regret走査では相手actionをsampleし、traverser actionを全分岐する。Linear average
+strategyは、同じsample済みcard worldを使う独立した平均専用走査で更新する。
+
+`range-vector` は、sample済みの相手hole cardsとboardに対してtraverserの全feasible
+comboを同時評価する。各comboのrange weightは、そのcontextでfeasibleな全comboの
+weight合計で1回だけ正規化する。bucket内だけで再正規化しない。これによりscalar
+External Samplingのown-hand samplingを条件付き期待値で置換した同一期待値のregret
+更新となり、card removalでfeasible range massが変わるcontextを過大・過小評価しない。
+
+平均専用走査は各seatにつき1回行う。平均対象seatのnodeでは全actionを分岐し、
+`t * own_reach * current_strategy`を加算する。他seatのnodeではcurrent strategyに
+依存せず合法actionを一様に1つsampleするため、確率0の相手actionより後のhistoryも
+supportを持つ。exact public history `I` に対する相手actionの一様proposal係数`Q(I)`は
+iteration、card、bucket、`I`での選択actionによらない固定係数なので、
+巨大な`1/Q(I)`を掛けずに保存する。
+`strategy_sum`をcolumn内で正規化するとこの係数は相殺する。従って生の
+`strategy_sum`/solutionのstrategy weightは同じhistory内のbucket集約には使えるが、
+実到達確率ではなく、異なるhistory間で大きさを比較・合算してはならない。
+`range-vector`平均は全feasible comboについて`weight / W_F * own_reach`をbucketごとに
+合算するため、single-hand平均専用走査のown-hand samplingを条件付き期待値で置換する。
 
 `run.stop`が有効な場合、`check_every_sweeps`境界で平均profile評価とtrained
 deviator評価を行う。全seatについてdeviation gainの95% CI upperがtarget以下となる
 確認を`confirmations`回連続で満たしたときだけ`target-reached`とする。
+各確認には学習用と分離した新しい評価乱数列を使い、同じ評価サンプルを
+繰り返し確認回数に数えない。評価sequenceはcheckpointに保存してresume時も継続する。
+CIは有限のdeviator候補に対するサンプリング誤差の近似区間であり、未発見の
+best response、抽象化誤差、繰り返し停止判定全体に対する95%保証は与えない。
+regret-greedyとtrainedの2候補を比較する場合は、候補選択を考慮したBonferroni補正の
+近似区間から最大利得の区間を作る。停止評価には分散推定用に最低2サンプルを使い、
+`evaluation_samples=1`は実効2へ引き上げ、実使用数を評価結果とcheckpointに記録する。
+同一評価sample内ではbaselineとdeviator候補に同じphysical worldと行動乱数列を
+与え、候補の固定actionでも乱数を1回消費して共通の履歴上のdrawを揃える。
+各profileの周辺分布を保ったpaired gainの標準誤差を計算する。候補間の独立性は
+仮定せず、共通乱数による分散削減をすべてのgameで保証するものではない。
 `max_sweeps`と`max_time`は安全budgetであり、到達自体は収束を意味しない。
 
 閲覧用のEV、Postflop strategy、全Preflop Node snapshotは生成しない。
@@ -188,6 +217,7 @@ conditionで参照できる値:
 - `position`
 - `in_position`
 - `in_position_to_last_aggressor`
+- `last_preflop_aggressor_position`
 - `preflop_participant`
 - `open_cold_calls`
 - `players`
@@ -206,6 +236,10 @@ conditionで参照できる値:
 `in_position`の意味は従来どおりで、preflopではBTN、postflopでは残存seat中の
 最終actorを表す。`in_position_to_last_aggressor`はpreflop専用で、直前raiserより
 固定postflop action orderが後ならtrue。直前raiser不在または同一seatならfalse。
+`last_preflop_aggressor_position`は直近のpreflop aggressorの固定position名を返す
+(例: `UTG`、`HJ`、`CO`、`BTN`、`SB`、`BB`)。まだraiseが無ければ空文字を返し、
+postflopへ進んでも最後のpreflop aggressorを保持する。これにより、postflop ruleでも
+open位置を区別できる。
 `preflop_participant`はforced blind/anteを除くcallまたはaggressive actionをすでに
 行ったactorでtrue。`open_cold_calls`はopenを最初のvoluntary actionとしてcallした
 非BB seat数であり、BB defenseは含めない。
@@ -270,7 +304,7 @@ multiway固有の差分だけを記す:
 - actionは`fold`/`check`/`call`/`bet`/`raise`の5つすべてを使える
   (postflopは`bet`/`raise`の2つだけ)。
 - size literalの単位はBB建て(`"2.2x"`、`"2.5bb"`など)。postflopはchip建て。
-- conditionで参照できる変数は上記「conditionで参照できる値」の14個で、
+- conditionで参照できる変数は上記「conditionで参照できる値」の15個で、
   postflopの盤面変数(`paired`、`high_card`など)は存在しない。
 
 `params`の値はstring、integer、finite float、booleanのみ。配列/tableはerror。
@@ -473,6 +507,12 @@ interval = "15m"       # 既定15m、正の整数+s|m|h
 
 durationは小文字suffixの `s`、`m`、`h` のみ。例:
 `"30s"`、`"15m"`、`"12h"`。`0s` はerror。
+`max_time`、cooperative cancel、wall-clockのcheckpoint `interval` は、完了した
+solver batchの境界で判定する。したがって、学習停止またはcheckpoint判定は最大で
+1 batchの実行時間だけ遅れる。checkpoint I/O、予定された品質評価、最終成果物の
+生成中は`max_time`による途中打切りを行わないため、processの終了時刻はさらに遅くなりうる。
+checkpointのために中断したrunは、その境界で保存して同じsolveを続行し、
+`check_every_sweeps`の品質評価を予定外に実行しない。
 
 memoryは正のbytes整数、または整数+`KiB|MiB|GiB`。例:
 `1073741824`、`"1024MiB"`、`"6GiB"`。小数や `GB` は不可。productionでは
@@ -663,6 +703,14 @@ Setup preflightはtreeとresource estimateも実行する。
 v1 solve-time overrideは `--threads`、`--memory`、`--max-time` のみ。
 generic `--set` はなく、legacyの個別output flagはv1では拒否される。
 `resume`はrun directoryを受け取り、その中の`checkpoint.mwckpt`を使う。
+range-vectorの条件付きregret weightと独立average走査はsolver state version 3で
+導入した。solver state version 4は、同一streetでもstreet開始時の相手人数が異なる
+counterfactual branchを正しく扱うため、range-vectorのcombo bucket cacheを
+`(street, bucket_active_opponents)`で分離する。version 3以前のcheckpointは、旧bucket
+更新と修正後の更新を1つの累積regret/averageへ混在させないためresumeを拒否する。
+旧solutionは静的参照のみ可能で、新しいsolveを開始する。成果物の
+algorithm fingerprintはsolver state versionとeffective algorithm設定を含むため、この
+境界をrun metadataとsolutionの双方で識別できる。
 
 ## run directory契約
 

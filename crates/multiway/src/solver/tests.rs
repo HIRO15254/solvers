@@ -51,7 +51,96 @@ enum ThreePlayerOracleState {
 #[derive(Clone, Copy)]
 struct ThreePlayerOracleGame;
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum AveragePathState {
+    FirstOpponent,
+    SecondOpponent { first: usize },
+    Averager { first: usize, second: usize },
+    Terminal,
+}
+
+#[derive(Clone, Copy)]
+struct AveragePathGame;
+
 const ORACLE_HERO_PAYOFFS: [[f64; 2]; 2] = [[4.0, 0.0], [-2.0, 2.0]];
+
+impl ExternalSamplingGame for AveragePathGame {
+    type State = AveragePathState;
+    type Actions = AveragePathState;
+
+    fn num_players(&self) -> usize {
+        3
+    }
+
+    fn root_state(&self) -> Self::State {
+        AveragePathState::FirstOpponent
+    }
+
+    fn actor(&self, state: &Self::State) -> Option<usize> {
+        match state {
+            AveragePathState::FirstOpponent => Some(1),
+            AveragePathState::SecondOpponent { .. } => Some(2),
+            AveragePathState::Averager { .. } => Some(0),
+            AveragePathState::Terminal => None,
+        }
+    }
+
+    fn node_actions(&self, state: &Self::State) -> Self::Actions {
+        *state
+    }
+
+    fn num_actions_of(&self, actions: &Self::Actions) -> usize {
+        usize::from(!matches!(actions, AveragePathState::Terminal)) * 2
+    }
+
+    fn next_state_with(
+        &self,
+        _state: &Self::State,
+        actions: &Self::Actions,
+        action_index: usize,
+    ) -> Self::State {
+        match *actions {
+            AveragePathState::FirstOpponent => AveragePathState::SecondOpponent {
+                first: action_index,
+            },
+            AveragePathState::SecondOpponent { first } => AveragePathState::Averager {
+                first,
+                second: action_index,
+            },
+            AveragePathState::Averager { .. } => AveragePathState::Terminal,
+            AveragePathState::Terminal => panic!("terminal state has no child"),
+        }
+    }
+
+    fn write_action_label(&self, actions: &Self::Actions, action_index: usize, out: &mut String) {
+        let prefix = match actions {
+            AveragePathState::FirstOpponent => "first",
+            AveragePathState::SecondOpponent { .. } => "second",
+            AveragePathState::Averager { .. } => "hero",
+            AveragePathState::Terminal => panic!("terminal state has no actions"),
+        };
+        use std::fmt::Write;
+        write!(out, "{prefix}-{action_index}").unwrap();
+    }
+
+    fn bucket(&self, _state: &Self::State, _world: &SampledWorld, _actor: usize) -> PrivateInfo {
+        PrivateInfo {
+            street: 0,
+            active_opponents: 2,
+            bucket_path: [0, UNREACHED_BUCKET, UNREACHED_BUCKET, UNREACHED_BUCKET],
+        }
+    }
+
+    fn terminal_utilities(
+        &self,
+        state: &Self::State,
+        _world: &SampledWorld,
+        utilities: &mut [f64],
+    ) {
+        assert_eq!(*state, AveragePathState::Terminal);
+        utilities.fill(0.0);
+    }
+}
 
 impl ExternalSamplingGame for FourStreetGame {
     type State = FourStreetState;
@@ -602,6 +691,46 @@ fn held_out_profile_evaluation_is_deterministic_and_read_only() {
     );
 }
 
+#[test]
+fn held_out_profile_parallelism_is_bit_identical() {
+    let mut solver = prefix_solver(92);
+    solver.run_sweeps(5).unwrap();
+    let deviators = (0..2)
+        .map(|seat| {
+            solver
+                .train_deviator(seat, 64, 3030 + seat as u64, ProfileVariant::default())
+                .unwrap()
+        })
+        .collect::<Vec<_>>();
+    let before = solver.snapshot_state();
+
+    for samples in [2, 257] {
+        for trained in [None, Some(deviators.as_slice())] {
+            let serial = solver
+                .evaluate_profile_with_threads(samples, 4040, trained, ProfileVariant::default(), 1)
+                .unwrap();
+            let two_threads = solver
+                .evaluate_profile_with_threads(samples, 4040, trained, ProfileVariant::default(), 2)
+                .unwrap();
+            let eight_threads = solver
+                .evaluate_profile_with_threads(samples, 4040, trained, ProfileVariant::default(), 8)
+                .unwrap();
+            let repeated = solver
+                .evaluate_profile_with_threads(samples, 4040, trained, ProfileVariant::default(), 8)
+                .unwrap();
+
+            assert_eq!(two_threads, serial);
+            assert_eq!(eight_threads, serial);
+            assert_eq!(repeated, serial);
+        }
+    }
+    assert_eq!(solver.snapshot_state(), before);
+    assert!(matches!(
+        solver.evaluate_profile_with_threads(2, 1, None, ProfileVariant::default(), 0),
+        Err(SolverError::ZeroThreads)
+    ));
+}
+
 fn prefix_solver(seed: u64) -> MultiwaySolver<PrefixImportanceGame> {
     MultiwaySolver::new(
         PrefixImportanceGame,
@@ -756,6 +885,41 @@ fn reference_evaluation_falls_back_to_candidate_baseline_not_greedy() {
             .iter()
             .all(|world| world.gains == vec![0.0, 0.0])
     );
+}
+
+#[test]
+fn reference_evaluation_empty_policies_are_exactly_paired_with_baseline() {
+    let mut solver = prefix_solver(83);
+    solver.run_sweeps(3).unwrap();
+    let deviators = vec![
+        DeviatorPolicy {
+            seat: 0,
+            actions: FxHashMap::default(),
+        },
+        DeviatorPolicy {
+            seat: 1,
+            actions: FxHashMap::default(),
+        },
+    ];
+
+    let result = solver
+        .evaluate_reference_deviators(128, 4321, &deviators, ProfileVariant::default())
+        .unwrap();
+
+    for world in &result.worlds {
+        assert_eq!(world.deviating_seat_utilities, world.baseline_utilities);
+        assert_eq!(world.gains, vec![0.0; 2]);
+    }
+    for gain in result
+        .evaluation
+        .deviation_gain_lower_bound
+        .as_ref()
+        .unwrap()
+    {
+        assert_eq!(gain.mean, 0.0);
+        assert_eq!(gain.stderr, 0.0);
+        assert_eq!(gain.ci95, [0.0, 0.0]);
+    }
 }
 
 #[test]
@@ -1792,6 +1956,24 @@ impl ExternalSamplingGame for DenseDominatedChoice {
 #[derive(Clone, Copy)]
 struct DenseToyGame;
 
+#[derive(Clone)]
+struct ConditionalWeightGame {
+    street_recall: bool,
+    bucket_zero_combo: usize,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ConditionalWeightState {
+    First,
+    Second {
+        first_action: usize,
+    },
+    Terminal {
+        first_action: usize,
+        second_action: usize,
+    },
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum DenseToyState {
     First,
@@ -1911,6 +2093,157 @@ impl ExternalSamplingGame for DenseToyGame {
         self.terminal_utilities(state, world, &mut utilities);
         out.clear();
         out.resize(combos.len(), utilities[traverser]);
+    }
+}
+
+impl ConditionalWeightGame {
+    fn combo_bucket(&self, combo: usize) -> BucketId {
+        u32::from(combo != self.bucket_zero_combo)
+    }
+
+    fn payoff(&self, combo: usize, first_action: usize, second_action: usize) -> f64 {
+        let hand_scale = if self.combo_bucket(combo) == 0 {
+            1.0
+        } else {
+            3.0
+        };
+        let action_value = [[4.0, -2.0], [1.0, 3.0]][first_action][second_action];
+        hand_scale * action_value
+    }
+}
+
+impl ExternalSamplingGame for ConditionalWeightGame {
+    type State = ConditionalWeightState;
+    type Actions = ConditionalWeightState;
+
+    fn num_players(&self) -> usize {
+        2
+    }
+
+    fn root_state(&self) -> Self::State {
+        ConditionalWeightState::First
+    }
+
+    fn actor(&self, state: &Self::State) -> Option<usize> {
+        (!matches!(state, ConditionalWeightState::Terminal { .. })).then_some(0)
+    }
+
+    fn node_actions(&self, state: &Self::State) -> Self::Actions {
+        *state
+    }
+
+    fn num_actions_of(&self, actions: &Self::Actions) -> usize {
+        usize::from(!matches!(actions, ConditionalWeightState::Terminal { .. })) * 2
+    }
+
+    fn next_state_with(
+        &self,
+        _state: &Self::State,
+        actions: &Self::Actions,
+        action_index: usize,
+    ) -> Self::State {
+        match *actions {
+            ConditionalWeightState::First => ConditionalWeightState::Second {
+                first_action: action_index,
+            },
+            ConditionalWeightState::Second { first_action } => ConditionalWeightState::Terminal {
+                first_action,
+                second_action: action_index,
+            },
+            ConditionalWeightState::Terminal { .. } => panic!("terminal state has no child"),
+        }
+    }
+
+    fn write_action_label(&self, actions: &Self::Actions, action_index: usize, out: &mut String) {
+        let labels = match actions {
+            ConditionalWeightState::First => ["left", "right"],
+            ConditionalWeightState::Second { .. } => ["up", "down"],
+            ConditionalWeightState::Terminal { .. } => panic!("terminal state has no actions"),
+        };
+        out.push_str(labels[action_index]);
+    }
+
+    fn bucket(&self, _state: &Self::State, world: &SampledWorld, actor: usize) -> PrivateInfo {
+        let bucket = self.combo_bucket(world.hole_combo(actor));
+        if self.street_recall {
+            PrivateInfo::from_current_bucket(Street::Preflop, 1, bucket)
+        } else {
+            PrivateInfo::from_path(
+                Street::Preflop,
+                1,
+                BucketPath {
+                    preflop: bucket,
+                    flop: 0,
+                    turn: 0,
+                    river: 0,
+                },
+            )
+        }
+    }
+
+    fn terminal_utilities(&self, state: &Self::State, world: &SampledWorld, utilities: &mut [f64]) {
+        let ConditionalWeightState::Terminal {
+            first_action,
+            second_action,
+        } = *state
+        else {
+            panic!("not terminal")
+        };
+        utilities[0] = self.payoff(world.hole_combo(0), first_action, second_action);
+        utilities[1] = -utilities[0];
+    }
+
+    fn recall_mode(&self) -> RecallMode {
+        if self.street_recall {
+            RecallMode::Street
+        } else {
+            RecallMode::Full
+        }
+    }
+
+    fn bucket_count(&self, _street: Street, _active_opponents: u8) -> u32 {
+        2
+    }
+
+    fn dense_node_context(&self, _state: &Self::State) -> DenseNodeContext {
+        DenseNodeContext {
+            street: Street::Preflop,
+            active_opponents: 1,
+            bucket_active_opponents: 1,
+        }
+    }
+
+    fn bucket_for_combo(
+        &self,
+        _state: &Self::State,
+        _world: &SampledWorld,
+        _actor: usize,
+        combo: usize,
+    ) -> BucketId {
+        self.combo_bucket(combo)
+    }
+
+    fn terminal_utilities_for_combos(
+        &self,
+        state: &Self::State,
+        _world: &SampledWorld,
+        _traverser: usize,
+        combos: &[usize],
+        out: &mut Vec<f64>,
+    ) {
+        let ConditionalWeightState::Terminal {
+            first_action,
+            second_action,
+        } = *state
+        else {
+            panic!("not terminal")
+        };
+        out.clear();
+        out.extend(
+            combos
+                .iter()
+                .map(|&combo| self.payoff(combo, first_action, second_action)),
+        );
     }
 }
 
@@ -2262,6 +2595,422 @@ fn vector_traverser_hand_updates_exceed_one_and_matches_scalar_metrics_shape() {
 }
 
 #[test]
+fn vector_conditional_weights_match_the_scalar_chance_expectation() {
+    use std::collections::BTreeMap;
+
+    let combo_a = cards::combo_index("As".parse().unwrap(), "Ah".parse().unwrap());
+    let combo_b = cards::combo_index("Ks".parse().unwrap(), "Kh".parse().unwrap());
+    let blocked = cards::combo_index("Qs".parse().unwrap(), "Qh".parse().unwrap());
+    let opponent = cards::combo_index("Qs".parse().unwrap(), "Jc".parse().unwrap());
+    let board = ["2c", "3d", "4h", "5s", "6c"].map(|card| card.parse().unwrap());
+    let world = SampledWorld::new(vec![combo_a, opponent], board).unwrap();
+
+    let mut own_range = Range::default();
+    own_range.set_weight(combo_a, 0.1);
+    own_range.set_weight(combo_b, 0.3);
+    own_range.set_weight(blocked, 0.6);
+    let mut opponent_range = Range::default();
+    opponent_range.set_weight(opponent, 1.0);
+    let sampler = DealSampler::new(vec![own_range, opponent_range]).unwrap();
+    let feasible = sampler.feasible_combos(0, &world);
+    assert_eq!(feasible.len(), 2);
+    assert!(feasible.iter().any(|(combo, _)| *combo == combo_a));
+    assert!(feasible.iter().any(|(combo, _)| *combo == combo_b));
+    assert!(!feasible.iter().any(|(combo, _)| *combo == blocked));
+
+    let config = SolverConfig {
+        seed: 9,
+        max_memory_bytes: 1 << 20,
+        max_traversal_depth: 16,
+        exploration_epsilon: 0.0,
+        discount_every: DEFAULT_DISCOUNT_EVERY,
+        discount_until: DEFAULT_DISCOUNT_UNTIL,
+        sweep_batch: 1,
+        traverser_vector: true,
+        prune: false,
+        prune_threshold: DEFAULT_PRUNE_THRESHOLD,
+        prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
+    };
+    let sparse_game = ConditionalWeightGame {
+        street_recall: false,
+        bucket_zero_combo: combo_a,
+    };
+    let sparse = MultiwaySolver::new(sparse_game, sampler.clone(), config).unwrap();
+    let dense_game = ConditionalWeightGame {
+        street_recall: true,
+        bucket_zero_combo: combo_a,
+    };
+    let dense_solver = MultiwaySolver::new(dense_game, sampler, config).unwrap();
+
+    let mut normalized = feasible.clone();
+    let mut normalized_weights = normalized
+        .iter()
+        .map(|(_, weight)| *weight)
+        .collect::<Vec<_>>();
+    normalize_feasible_weights(&mut normalized_weights).unwrap();
+    for ((_, weight), &normalized_weight) in normalized.iter_mut().zip(&normalized_weights) {
+        *weight = normalized_weight;
+    }
+
+    // Exact conditional expectation of the scalar worker, enumerating the
+    // two feasible own hands. Each scalar traversal sees the same initial
+    // policy snapshot and its event is weighted by P(hand | context).
+    let mut scalar_regrets: BTreeMap<InfoKey, Vec<f64>> = BTreeMap::new();
+    for &(combo, weight) in &normalized {
+        let combo_world = SampledWorld::new(vec![combo, opponent], board).unwrap();
+        let mut worker = TraversalWorker::new(&sparse, 7.0);
+        let mut reach = vec![1.0; 2];
+        let mut rng = ChaCha20Rng::seed_from_u64(123);
+        worker
+            .traverse(
+                sparse.game.root_state(),
+                &combo_world,
+                0,
+                HistoryKey::ROOT,
+                &mut reach,
+                1.0,
+                &mut rng,
+                0,
+            )
+            .unwrap();
+        for event in worker.finish(0, 0, 0).events {
+            if let TraversalEvent::AddRegret { key, values } = event {
+                let total = scalar_regrets
+                    .entry(key)
+                    .or_insert_with(|| vec![0.0; values.len()]);
+                for (sum, value) in total.iter_mut().zip(values) {
+                    *sum += weight * value;
+                }
+            }
+        }
+    }
+
+    // The dense vector worker receives raw unequal weights. Its constructor
+    // must normalize by the full feasible mass (1+3), and its bucket updates
+    // must retain bucket probabilities rather than divide them away.
+    let dense = dense_solver.dense.as_ref().unwrap();
+    let (combos, raw_weights): (Vec<_>, Vec<_>) = feasible.into_iter().unzip();
+    let active = (0..combos.len()).collect::<Vec<_>>();
+    let own_reach = vec![1.0; combos.len()];
+    let mut worker = VectorTraversalWorker::new(
+        &dense_solver.game,
+        dense,
+        config,
+        combos.clone(),
+        raw_weights,
+    )
+    .unwrap();
+    let mut rng = ChaCha20Rng::seed_from_u64(123);
+    worker
+        .traverse(
+            dense_solver.game.root_state(),
+            0,
+            &world,
+            0,
+            &active,
+            1.0,
+            &mut rng,
+            0,
+        )
+        .unwrap();
+    let mut vector_regrets: BTreeMap<InfoKey, Vec<f64>> = BTreeMap::new();
+    for event in worker.finish(0, 0, 0).events {
+        let (column, values) = match event {
+            DenseEvent::AddRegret { column, values } => (column, values),
+            DenseEvent::AddStrategy { .. } => {
+                panic!("regret traversal must not update the average policy")
+            }
+        };
+        let mut key = None;
+        for node_id in 0..dense.tree.nodes.len() as NodeId {
+            for bucket in 0..2 {
+                if dense.arena.column_id(node_id, bucket).unwrap() == column {
+                    key = Some(dense.info_key_for(node_id, bucket));
+                }
+            }
+        }
+        assert!(vector_regrets.insert(key.unwrap(), values).is_none());
+    }
+
+    assert_eq!(
+        scalar_regrets.keys().collect::<Vec<_>>(),
+        vector_regrets.keys().collect::<Vec<_>>()
+    );
+    for (key, expected) in scalar_regrets {
+        let actual = &vector_regrets[&key];
+        for (&left, &right) in expected.iter().zip(actual) {
+            assert!((left - right).abs() < 1.0e-12, "{key:?}: {left} != {right}");
+        }
+    }
+
+    // The separate sparse and dense-vector average-policy workers must agree
+    // with the same conditional own-hand expectation. At the
+    // second own decision, the nontrivial own reach is 1/2 from the root's
+    // uniform strategy, so each action receives 7 * weight * 1/2 * 1/2.
+    let mut sparse_strategy: BTreeMap<InfoKey, Vec<f64>> = BTreeMap::new();
+    for &(combo, weight) in &normalized {
+        let combo_world = SampledWorld::new(vec![combo, opponent], board).unwrap();
+        let mut average = SparseAverageStrategyWorker::new(&sparse, 7.0);
+        average
+            .traverse(
+                sparse.game.root_state(),
+                &combo_world,
+                0,
+                HistoryKey::ROOT,
+                weight,
+                &mut ChaCha20Rng::seed_from_u64(456),
+                0,
+            )
+            .unwrap();
+        for event in average.finish() {
+            if let TraversalEvent::AddStrategy { key, values } = event {
+                let total = sparse_strategy
+                    .entry(key)
+                    .or_insert_with(|| vec![0.0; values.len()]);
+                for (sum, value) in total.iter_mut().zip(values) {
+                    *sum += value;
+                }
+            }
+        }
+    }
+
+    let mut dense_average = DenseAverageStrategyWorker::new(&dense_solver.game, dense, config, 7.0);
+    dense_average
+        .traverse_vector(
+            dense_solver.game.root_state(),
+            0,
+            &world,
+            0,
+            &combos,
+            &normalized_weights,
+            &own_reach,
+            &mut ChaCha20Rng::seed_from_u64(456),
+            0,
+        )
+        .unwrap();
+    let mut vector_strategy: BTreeMap<InfoKey, Vec<f64>> = BTreeMap::new();
+    for event in dense_average.finish() {
+        let DenseEvent::AddStrategy { column, values } = event else {
+            panic!("average traversal must not update regret")
+        };
+        let mut key = None;
+        for node_id in 0..dense.tree.nodes.len() as NodeId {
+            for bucket in 0..2 {
+                if dense.arena.column_id(node_id, bucket).unwrap() == column {
+                    key = Some(dense.info_key_for(node_id, bucket));
+                }
+            }
+        }
+        assert!(vector_strategy.insert(key.unwrap(), values).is_none());
+    }
+
+    let mut expected_strategy: BTreeMap<InfoKey, Vec<f64>> = BTreeMap::new();
+    for &(combo, weight) in &normalized {
+        let bucket = sparse.game.combo_bucket(combo);
+        let root = InfoKey {
+            history: HistoryKey::ROOT,
+            player: 0,
+            street: 0,
+            active_opponents: 1,
+            bucket_path: [bucket, UNREACHED_BUCKET, UNREACHED_BUCKET, UNREACHED_BUCKET],
+        };
+        for (key, own_reach_at_node) in std::iter::once((root, 1.0)).chain((0..2).map(|action| {
+            (
+                InfoKey {
+                    history: HistoryKey::ROOT.child(0, action),
+                    ..root
+                },
+                0.5,
+            )
+        })) {
+            let values = expected_strategy.entry(key).or_insert_with(|| vec![0.0; 2]);
+            for value in values {
+                *value += 7.0 * weight * own_reach_at_node * 0.5;
+            }
+        }
+    }
+    assert_eq!(
+        expected_strategy.keys().collect::<Vec<_>>(),
+        vector_strategy.keys().collect::<Vec<_>>()
+    );
+    for (key, expected) in expected_strategy {
+        let sparse_actual = &sparse_strategy[&key];
+        let actual = &vector_strategy[&key];
+        for ((&left, &middle), &right) in expected.iter().zip(sparse_actual).zip(actual) {
+            assert!(
+                (left - middle).abs() < 1.0e-12,
+                "{key:?}: {left} != {middle}"
+            );
+            assert!((left - right).abs() < 1.0e-12, "{key:?}: {left} != {right}");
+        }
+    }
+}
+
+#[test]
+fn independent_average_pass_tracks_temporal_own_strategy_and_samples_zero_opponent_actions() {
+    use std::collections::BTreeMap;
+
+    let mut solver = MultiwaySolver::new(
+        AveragePathGame,
+        DealSampler::new(vec![Range::full(), Range::full(), Range::full()]).unwrap(),
+        SolverConfig {
+            seed: 71,
+            max_memory_bytes: 1 << 20,
+            max_traversal_depth: 16,
+            exploration_epsilon: 0.0,
+            ..SolverConfig::default()
+        },
+    )
+    .unwrap();
+    let board = ["2c", "3d", "4h", "5s", "6c"].map(|card| card.parse().unwrap());
+    let world = SampledWorld::new(
+        vec![
+            cards::combo_index("As".parse().unwrap(), "Ah".parse().unwrap()),
+            cards::combo_index("Ks".parse().unwrap(), "Kh".parse().unwrap()),
+            cards::combo_index("Qs".parse().unwrap(), "Qh".parse().unwrap()),
+        ],
+        board,
+    )
+    .unwrap();
+    let info_key = |history: HistoryKey, player: u8| InfoKey {
+        history,
+        player,
+        street: 0,
+        active_opponents: 2,
+        bucket_path: [0, UNREACHED_BUCKET, UNREACHED_BUCKET, UNREACHED_BUCKET],
+    };
+    let column = |labels: [&str; 2], regrets: [f32; 2]| PolicyColumn {
+        action_labels: labels.into_iter().map(str::to_string).collect(),
+        regrets: regrets.to_vec(),
+        strategy_sum: vec![0.0; 2],
+    };
+
+    // Both opponents put zero current-policy probability on at least one
+    // action. The independent average proposal must still visit all four
+    // descendant public histories with positive probability.
+    solver.policies.insert(
+        info_key(HistoryKey::ROOT, 1),
+        column(["first-0", "first-1"], [1.0, -1.0]),
+    );
+    let mut hero_keys = Vec::new();
+    for first in 0..2 {
+        let second_history = HistoryKey::ROOT.child(1, first);
+        solver.policies.insert(
+            info_key(second_history, 2),
+            column(["second-0", "second-1"], [-1.0, 1.0]),
+        );
+        for second in 0..2 {
+            let hero_history = second_history.child(2, second);
+            let key = info_key(hero_history, 0);
+            solver
+                .policies
+                .insert(key, column(["hero-0", "hero-1"], [1.0, -1.0]));
+            hero_keys.push(key);
+        }
+    }
+    assert_eq!(
+        solver.policies[&info_key(HistoryKey::ROOT, 1)].current_strategy(),
+        vec![1.0, 0.0]
+    );
+
+    let run_phase = |solver: &MultiwaySolver<AveragePathGame>, linear_weight: f64| {
+        let mut visited = Vec::new();
+        let mut sums: BTreeMap<InfoKey, Vec<f64>> = BTreeMap::new();
+        for seed in 0..64 {
+            let mut worker = SparseAverageStrategyWorker::new(solver, linear_weight);
+            worker
+                .traverse(
+                    solver.game.root_state(),
+                    &world,
+                    0,
+                    HistoryKey::ROOT,
+                    1.0,
+                    &mut ChaCha20Rng::seed_from_u64(seed),
+                    0,
+                )
+                .unwrap();
+            let strategy_events = worker
+                .finish()
+                .into_iter()
+                .filter_map(|event| match event {
+                    TraversalEvent::AddStrategy { key, values } => Some((key, values)),
+                    _ => None,
+                })
+                .collect::<Vec<_>>();
+            assert_eq!(strategy_events.len(), 1);
+            let (key, values) = &strategy_events[0];
+            visited.push(*key);
+            let total = sums.entry(*key).or_insert_with(|| vec![0.0; values.len()]);
+            for (sum, &value) in total.iter_mut().zip(values) {
+                *sum += value;
+            }
+        }
+        (visited, sums)
+    };
+
+    let (first_visited, first_sums) = run_phase(&solver, 1.0);
+    assert_eq!(
+        first_sums.len(),
+        4,
+        "all uniform opponent paths need support"
+    );
+    for (&key, values) in &first_sums {
+        assert!(hero_keys.contains(&key));
+        assert_eq!(values[1], 0.0);
+        assert!(values[0] > 0.0);
+    }
+
+    // Reverse both opponents, including which actions have probability zero,
+    // and change the averaged seat at the next linear-CFR time. Replaying the
+    // same uniform RNG seeds must visit the same exact histories in the same
+    // order; a proposal based on current opponent sigma would fail here.
+    solver
+        .policies
+        .get_mut(&info_key(HistoryKey::ROOT, 1))
+        .unwrap()
+        .regrets = vec![-1.0, 1.0];
+    for first in 0..2 {
+        solver
+            .policies
+            .get_mut(&info_key(HistoryKey::ROOT.child(1, first), 2))
+            .unwrap()
+            .regrets = vec![1.0, -1.0];
+    }
+    for &key in &hero_keys {
+        solver.policies.get_mut(&key).unwrap().regrets = vec![-1.0, 1.0];
+    }
+    let (second_visited, second_sums) = run_phase(&solver, 2.0);
+    assert_eq!(first_visited, second_visited);
+    assert_eq!(
+        first_sums.keys().collect::<Vec<_>>(),
+        second_sums.keys().collect::<Vec<_>>()
+    );
+    for key in hero_keys {
+        let visits = first_sums[&key][0];
+        assert_eq!(first_sums[&key], vec![visits, 0.0]);
+        assert_eq!(second_sums[&key], vec![0.0, 2.0 * visits]);
+    }
+
+    // Integration guard: a seat-0 regret traversal plus its independent
+    // average pass may add strategy mass only for seat 0. Reintroducing the
+    // old actor!=traverser updates would produce seat-1/2 strategy events.
+    let delta = solver.generate_traversal_delta(0, 0, 3.0).unwrap();
+    let AnyTraversalDelta::Sparse(delta) = delta else {
+        panic!("full recall must produce a sparse delta")
+    };
+    let strategy_players = delta
+        .events
+        .iter()
+        .filter_map(|event| match event {
+            TraversalEvent::AddStrategy { key, .. } => Some(key.player),
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+    assert!(!strategy_players.is_empty());
+    assert!(strategy_players.iter().all(|&player| player == 0));
+}
+
+#[test]
 fn vector_traverser_is_deterministic_across_thread_counts_and_reruns() {
     let mut single_threaded = dense_vector_toy_solver(4104, 1);
     single_threaded.run_sweeps_with_threads(20, 1).unwrap();
@@ -2302,6 +3051,22 @@ fn resume_rejects_mismatched_traverser_vector() {
             changed,
         ),
         Err(SolverError::ResumeConfigurationMismatch)
+    ));
+}
+
+#[test]
+fn resume_rejects_pre_conditional_weight_solver_state() {
+    let solver = dense_vector_toy_solver(22, 1);
+    let mut state = solver.snapshot_state();
+    state.schema_version = 2;
+    assert!(matches!(
+        MultiwaySolver::from_state(
+            DenseToyGame,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            state,
+        ),
+        Err(SolverError::StateVersion { found: 2, expected })
+            if expected == SOLVER_STATE_VERSION
     ));
 }
 
@@ -3234,4 +3999,193 @@ fn strategy_mass_differs_across_buckets_after_a_short_solve() {
         assert_eq!(labels, mass_labels);
         assert_eq!(probs, mass_probs);
     }
+}
+
+#[test]
+fn resume_rejects_street_only_bucket_cache_solver_state() {
+    let solver = dense_vector_toy_solver(23, 1);
+    let mut state = solver.snapshot_state();
+    state.schema_version = 3;
+    assert!(matches!(
+        MultiwaySolver::from_state(
+            DenseToyGame,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            state,
+        ),
+        Err(SolverError::StateVersion { found: 3, expected })
+            if expected == SOLVER_STATE_VERSION
+    ));
+}
+
+#[test]
+fn real_holdem_vector_bucket_cache_separates_opponent_contexts_on_one_street() {
+    use crate::abstraction::{BucketContext, MultiwayAbstraction};
+    use crate::config::{
+        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RakeConfig,
+        SeatConfig, UtilityConfig,
+    };
+    use crate::holdem::HoldemGame;
+    use crate::types::SeatId;
+
+    #[derive(Clone, Copy)]
+    struct OpponentCountBucket;
+
+    impl MultiwayAbstraction for OpponentCountBucket {
+        fn num_buckets(&self, _street: Street, _active_opponents: u8) -> u32 {
+            MAX_SEATS as u32
+        }
+
+        fn bucket(&self, context: BucketContext<'_>) -> BucketId {
+            u32::from(context.active_opponents)
+        }
+
+        fn fingerprint(&self) -> [u8; 32] {
+            [0x91; 32]
+        }
+    }
+
+    let mut config = MultiwayConfig {
+        seats: (0..3)
+            .map(|_| SeatConfig {
+                name: None,
+                stack_bb: 6.0,
+                range: String::new(),
+                betting: None,
+            })
+            .collect(),
+        button: SeatId(0),
+        blinds: BlindConfig::default(),
+        ante: AnteConfig::None,
+        betting: BettingConfig::default(),
+        forced_bets: None,
+        abstraction: AbstractionConfig::default(),
+    };
+    config.abstraction.recall = RecallMode::Street;
+    let game = HoldemGame::new(
+        &config,
+        &UtilityConfig::ChipEv,
+        &RakeConfig::None,
+        OpponentCountBucket,
+    )
+    .unwrap();
+    let sampler = game.deal_sampler().unwrap();
+    let solver = MultiwaySolver::new(
+        game,
+        sampler,
+        SolverConfig {
+            seed: 923,
+            max_memory_bytes: 1 << 25,
+            max_traversal_depth: 64,
+            traverser_vector: true,
+            ..SolverConfig::default()
+        },
+    )
+    .unwrap();
+    let dense = solver.dense.as_ref().unwrap();
+    let mut deal_rng = traversal_deal_rng(923, 0, 0);
+    let sample = solver.sampler.sample_counted(&mut deal_rng).unwrap();
+    let feasible = solver.sampler.feasible_combos(0, &sample.world);
+    let (combos, mut weights): (Vec<_>, Vec<_>) = feasible.into_iter().unzip();
+    normalize_feasible_weights(&mut weights).unwrap();
+    let own_reach = vec![1.0; combos.len()];
+    let column_context = dense
+        .tree
+        .nodes
+        .iter()
+        .enumerate()
+        .flat_map(|(node_index, node)| {
+            let node_id = node_index as NodeId;
+            (0..dense.arena.bucket_count_of(node_id)).map(move |bucket| {
+                (
+                    dense.arena.column_id(node_id, bucket).unwrap(),
+                    (node.street, node.bucket_active_opponents, bucket),
+                )
+            })
+        })
+        .collect::<FxHashMap<_, _>>();
+
+    let mut average_contexts =
+        std::array::from_fn::<_, 4, _>(|_| std::collections::BTreeSet::<u8>::new());
+    for seed in 0..16 {
+        let mut worker = DenseAverageStrategyWorker::new(&solver.game, dense, solver.config, 1.0);
+        worker
+            .traverse_vector(
+                solver.game.root_state(),
+                0,
+                &sample.world,
+                0,
+                &combos,
+                &weights,
+                &own_reach,
+                &mut ChaCha20Rng::seed_from_u64(seed),
+                0,
+            )
+            .unwrap();
+        for event in worker.finish() {
+            let DenseEvent::AddStrategy { column, .. } = event else {
+                continue;
+            };
+            let &(street, active_opponents, bucket) = column_context
+                .get(&column)
+                .expect("strategy event column belongs to the dense arena");
+            if street != Street::Preflop {
+                assert_eq!(
+                    bucket,
+                    u32::from(active_opponents),
+                    "average worker reused a bucket table across opponent contexts"
+                );
+                average_contexts[street.index()].insert(active_opponents);
+            }
+        }
+    }
+    assert!(
+        average_contexts.iter().any(|contexts| contexts.len() >= 2),
+        "fixture must visit two opponent contexts on one postflop street"
+    );
+
+    let active = (0..combos.len()).collect::<Vec<_>>();
+    let mut regret_contexts =
+        std::array::from_fn::<_, 4, _>(|_| std::collections::BTreeSet::<u8>::new());
+    for seed in 0..16 {
+        let mut worker = VectorTraversalWorker::new(
+            &solver.game,
+            dense,
+            solver.config,
+            combos.clone(),
+            weights.clone(),
+        )
+        .unwrap();
+        worker
+            .traverse(
+                solver.game.root_state(),
+                0,
+                &sample.world,
+                0,
+                &active,
+                1.0,
+                &mut ChaCha20Rng::seed_from_u64(seed),
+                0,
+            )
+            .unwrap();
+        for event in worker.finish(0, 0, 0).events {
+            let DenseEvent::AddRegret { column, .. } = event else {
+                continue;
+            };
+            let &(street, active_opponents, bucket) = column_context
+                .get(&column)
+                .expect("regret event column belongs to the dense arena");
+            if street != Street::Preflop {
+                assert_eq!(
+                    bucket,
+                    u32::from(active_opponents),
+                    "regret worker reused a bucket table across opponent contexts"
+                );
+                regret_contexts[street.index()].insert(active_opponents);
+            }
+        }
+    }
+    assert!(
+        regret_contexts.iter().any(|contexts| contexts.len() >= 2),
+        "fixture must visit two opponent contexts on one postflop street"
+    );
 }

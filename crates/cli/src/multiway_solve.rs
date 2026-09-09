@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::cell::Cell;
 use std::collections::HashMap;
 use std::io::Write;
 use std::path::{Component, Path, PathBuf};
@@ -35,6 +36,38 @@ enum CompletionStatus {
     /// consecutive wall-clock-spaced evaluations. See
     /// `crate::session::StopRule`.
     Converged,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum OperationalBoundary {
+    Cancelled,
+    TimeLimit,
+    CheckpointDue,
+}
+
+fn operational_boundary(
+    cancelled: bool,
+    cumulative_solve_time: Duration,
+    max_time: Option<Duration>,
+    since_checkpoint: Duration,
+    checkpoint_interval: Option<Duration>,
+    checkpoint_enabled: bool,
+) -> Option<OperationalBoundary> {
+    if cancelled {
+        Some(OperationalBoundary::Cancelled)
+    } else if max_time.is_some_and(|limit| cumulative_solve_time >= limit) {
+        Some(OperationalBoundary::TimeLimit)
+    } else if checkpoint_enabled
+        && checkpoint_interval.is_some_and(|interval| since_checkpoint >= interval)
+    {
+        Some(OperationalBoundary::CheckpointDue)
+    } else {
+        None
+    }
+}
+
+fn regular_evaluation_due(sweeps: u64, cadence: u64, target: u64) -> bool {
+    sweeps.is_multiple_of(cadence) || sweeps == target
 }
 
 #[derive(Serialize)]
@@ -435,10 +468,22 @@ fn run_inner(
             .checked_add(chunk)
             .ok_or(multiway::solver::SolverError::CounterOverflow)?;
         let mut deferred_live_observation = false;
+        let operational_stop = Cell::new(None);
         match mw_session.solver.run_sweeps_with_threads_until_observed(
             chunk,
             mw_session.threads,
-            || !cancel.is_some_and(|token| token.load(Ordering::Relaxed)),
+            || {
+                let reason = operational_boundary(
+                    cancel.is_some_and(|token| token.load(Ordering::Relaxed)),
+                    Duration::from_millis(cumulative_before).saturating_add(started.elapsed()),
+                    max_time,
+                    last_checkpoint.elapsed(),
+                    checkpoint_interval,
+                    checkpoint_path.is_some(),
+                );
+                operational_stop.set(reason);
+                reason.is_none()
+            },
             |solver| {
                 if observer.is_some()
                     && (!published_live_observation
@@ -465,8 +510,22 @@ fn run_inner(
         ) {
             Ok(completed) => {
                 if completed < chunk {
-                    status = CompletionStatus::Cancelled;
-                    break;
+                    match operational_stop.get() {
+                        Some(OperationalBoundary::Cancelled) => {
+                            status = CompletionStatus::Cancelled;
+                            break;
+                        }
+                        Some(OperationalBoundary::TimeLimit) => {
+                            status = CompletionStatus::TimeLimit;
+                            break;
+                        }
+                        Some(OperationalBoundary::CheckpointDue) => {}
+                        None => {
+                            return Err(anyhow!(
+                                "multiway solver stopped before its chunk boundary without an operational reason"
+                            ));
+                        }
+                    }
                 }
             }
             Err(multiway::solver::SolverError::MemoryLimit { .. }) => {
@@ -479,6 +538,14 @@ fn run_inner(
             status = CompletionStatus::Cancelled;
             break;
         }
+        if mw_session.solver.completed_sweeps() < mw_session.sweeps_target
+            && max_time.is_some_and(|limit| {
+                Duration::from_millis(cumulative_before).saturating_add(started.elapsed()) >= limit
+            })
+        {
+            status = CompletionStatus::TimeLimit;
+            break;
+        }
 
         let sweeps_now = mw_session.solver.completed_sweeps();
         // v1 evaluates the operational stop rule on deterministic sweep
@@ -489,8 +556,11 @@ fn run_inner(
                     && stop_rule_state.last_eval.elapsed().as_secs_f64()
                         >= stop_rule.eval_period_secs)
         });
-        let regular_evaluation_due = sweeps_now % mw_session.evaluation_cadence == 0
-            || sweeps_now == mw_session.sweeps_target;
+        let regular_evaluation_due = regular_evaluation_due(
+            sweeps_now,
+            mw_session.evaluation_cadence,
+            mw_session.sweeps_target,
+        );
         let mut quality_published = false;
         let mut stop_after_boundary = false;
 
@@ -599,8 +669,11 @@ fn run_inner(
             )?;
             last_checkpoint = Instant::now();
             if let Some(writer) = metrics_writer.as_mut() {
-                let mut checkpoint_event = last_row.clone();
-                checkpoint_event.phase = "checkpoint".into();
+                let checkpoint_metrics = mw_session.solver.metrics();
+                let elapsed_secs = Duration::from_millis(cumulative_before)
+                    .saturating_add(started.elapsed())
+                    .as_secs_f64();
+                let checkpoint_event = checkpoint_progress_row(&checkpoint_metrics, elapsed_secs);
                 writer
                     .append(&checkpoint_event)
                     .context("writing checkpoint progress event")?;
@@ -723,7 +796,6 @@ fn run_inner(
     }
     let elapsed = started.elapsed().as_secs_f64();
     let effective = crate::config::parse_internal_config(raw_config)?;
-    let algorithm_material = serde_json::to_vec(&effective.algorithm)?;
     let effective_config = if is_v1 {
         crate::multiway_v1::normalized_config(raw_config)?
     } else {
@@ -734,8 +806,9 @@ fn run_inner(
         UtilitySection::TournamentIcm { .. } | UtilitySection::Icm { .. } => "prize",
     };
     let game_fingerprint = formats::config_hash_hex(&mw_session.solver.game().game_fingerprint());
-    let algorithm_fingerprint =
-        formats::config_hash_hex(&formats::config_hash(algorithm_material.as_slice()));
+    let algorithm_fingerprint = formats::config_hash_hex(&session::multiway_algorithm_fingerprint(
+        &effective.algorithm,
+    )?);
     let abstraction_fingerprint =
         formats::config_hash_hex(&mw_session.solver.abstraction_fingerprint());
     let configuration_fingerprint =
@@ -968,6 +1041,20 @@ fn mean(values: &[f64]) -> f64 {
     }
 }
 
+fn checkpoint_progress_row(
+    metrics: &multiway::SolverMetrics,
+    elapsed_secs: f64,
+) -> MultiwayMetricsRow {
+    let mut row = session::metrics_row(
+        metrics,
+        vec![0.0; metrics.average_positive_regret.len()],
+        elapsed_secs,
+        None,
+    );
+    row.phase = "checkpoint".into();
+    row
+}
+
 fn publish_observation(
     metrics: &MultiwayMetricsRow,
     observer: &mut Option<&mut dyn FnMut(MultiwayRunObservation)>,
@@ -1004,6 +1091,73 @@ fn publish_live_observation(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn operational_boundaries_are_prioritized_and_checkpoint_needs_a_sink() {
+        let second = Duration::from_secs(1);
+        assert_eq!(
+            operational_boundary(true, second, Some(second), second, Some(second), true,),
+            Some(OperationalBoundary::Cancelled)
+        );
+        assert_eq!(
+            operational_boundary(false, second, Some(second), second, Some(second), true,),
+            Some(OperationalBoundary::TimeLimit)
+        );
+        assert_eq!(
+            operational_boundary(false, Duration::ZERO, None, second, Some(second), true),
+            Some(OperationalBoundary::CheckpointDue)
+        );
+        assert_eq!(
+            operational_boundary(false, Duration::ZERO, None, second, Some(second), false),
+            None
+        );
+        assert_eq!(
+            operational_boundary(
+                false,
+                Duration::ZERO,
+                Some(second),
+                second - Duration::from_nanos(1),
+                Some(second),
+                true,
+            ),
+            None
+        );
+    }
+
+    #[test]
+    fn checkpoint_progress_uses_current_counters_without_quality_estimates() {
+        let metrics = multiway::SolverMetrics {
+            sweeps: 12,
+            traversals: 72,
+            infosets: 34,
+            memory_bytes: 56,
+            total_deal_attempts: 90,
+            mean_deal_attempts: 1.25,
+            hand_updates: 789,
+            average_positive_regret: vec![1.5, 2.5],
+        };
+        let row = checkpoint_progress_row(&metrics, 4.0);
+        assert_eq!(row.phase, "checkpoint");
+        assert_eq!(row.sweeps, 12);
+        assert_eq!(row.traversals, 72);
+        assert_eq!(row.infosets, 34);
+        assert_eq!(row.memory_bytes, 56);
+        assert_eq!(row.elapsed_secs, 4.0);
+        assert_eq!(row.traversals_per_second, 18.0);
+        assert_eq!(row.hand_updates, 789);
+        assert_eq!(row.hand_updates_per_second, 197.25);
+        assert_eq!(row.seats.len(), 2);
+        assert!(row.seats.iter().all(|seat| {
+            seat.profile_ev.is_none()
+                && seat.deviation_gain_lower_bound.is_none()
+                && seat.strategy_drift_l1 == 0.0
+        }));
+        assert_eq!(row.seats[0].average_positive_regret, 1.5);
+        assert_eq!(row.seats[1].average_positive_regret, 2.5);
+        assert!(!regular_evaluation_due(12, 64, 100));
+        assert!(regular_evaluation_due(64, 64, 100));
+        assert!(regular_evaluation_due(100, 64, 100));
+    }
 
     #[test]
     fn multiway_example_parses_the_public_contract() {

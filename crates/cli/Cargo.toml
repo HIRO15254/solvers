@@ -20,6 +20,7 @@ holdem = { workspace = true }
 preflop = { workspace = true }
 multiway = { workspace = true, default-features = false }
 anyhow = { workspace = true }
+blake3 = { workspace = true }
 clap = { workspace = true }
 rayon = { workspace = true }
 rand = { workspace = true }

@@ -23,6 +23,7 @@ use crate::types::{MAX_SEATS, MIN_SEATS, Street};
 
 pub use crate::tree::DenseNodeContext;
 
+mod averaging;
 mod errors;
 mod eval;
 mod support;
@@ -33,10 +34,17 @@ mod tests;
 
 pub use errors::SolverError;
 
+use averaging::*;
 use support::*;
 use workers::*;
 
-pub const SOLVER_STATE_VERSION: u16 = 2;
+/// Solver-state version 4 keys range-vector combo-bucket caches by both street
+/// and the number of opponents active at that street's start. Version 3
+/// introduced scalar-equivalent conditional regret weighting and the
+/// independent full-support average-policy pass, but its street-only cache
+/// could reuse buckets across counterfactual branches with different player
+/// counts. Older checkpoints cannot be resumed without mixing update rules.
+pub const SOLVER_STATE_VERSION: u16 = 4;
 pub const DEFAULT_EXPLORATION_EPSILON: f64 = 0.06;
 pub const UNREACHED_BUCKET: BucketId = u32::MAX;
 pub const DEFAULT_DISCOUNT_EVERY: u64 = 100_000;
@@ -259,6 +267,29 @@ fn standard_error(sum_squared_error: f64, samples: u64) -> f64 {
     }
 }
 
+/// Normalize a vector traversal's feasible own-hand weights conditional on
+/// the sampled opponents and board.
+///
+/// The deal sampler first draws a complete physical world. After the sampled
+/// traverser's hand is discarded, the retained context has marginal
+/// probability proportional to the total feasible own-range mass `W_F`.
+/// Therefore a Rao-Blackwellized update must use `w(h) / W_F`; using raw
+/// weights (or normalizing separately inside each bucket) counts contexts
+/// with large `W_F` too often and does not have the scalar estimator's
+/// expectation.
+fn normalize_feasible_weights(weights: &mut [f64]) -> Result<(), SolverError> {
+    let total = weights.iter().sum::<f64>();
+    if !total.is_finite() || total <= 0.0 {
+        return Err(SolverError::InvalidState(
+            "vector traversal has non-positive or non-finite feasible range mass",
+        ));
+    }
+    for weight in weights {
+        *weight /= total;
+    }
+    Ok(())
+}
+
 fn regret_greedy_action(regrets: &[f32]) -> usize {
     regrets
         .iter()
@@ -377,7 +408,11 @@ pub struct PolicyColumn {
     pub action_labels: Vec<String>,
     /// Cumulative sampled counterfactual regrets.
     pub regrets: Vec<f32>,
-    /// Cumulative reach-weighted strategy numerators.
+    /// Cumulative linear own-reach-weighted strategy numerators. Every exact
+    /// public history also carries its fixed uniform-opponent proposal factor
+    /// `Q(history)`. That factor cancels in [`Self::average_strategy`] and is
+    /// shared by all buckets at the same history, but raw sums are neither
+    /// reach probabilities nor comparable across different histories.
     pub strategy_sum: Vec<f32>,
 }
 
@@ -574,9 +609,11 @@ pub struct ProfileEvaluation {
     pub samples: u64,
     pub total_deal_attempts: u64,
     pub seats: Vec<ProfileEstimate>,
-    /// Per-seat held-out estimate for one fixed regret-greedy unilateral
-    /// deviation (and the no-deviation option) against opponents' average
-    /// profile. This is a conservative candidate-policy diagnostic, not a
+    /// Per-seat held-out estimate for unilateral deviations against the
+    /// opponents' average profile. The regret-greedy candidate is always
+    /// evaluated; when trained deviators are supplied, the reported interval
+    /// is a simultaneous envelope over both finite candidates (plus the
+    /// no-deviation option). This is a candidate-policy diagnostic, not a
     /// best response, exploitability, or Nash-convergence claim.
     pub deviation_gain_lower_bound: Option<Vec<ProfileEstimate>>,
 }
@@ -858,8 +895,11 @@ pub struct ProfileVariant {
     pub purify_threshold: f32,
     /// Evaluate/train against the last-iterate regret-matched current
     /// strategy instead of the linear average profile. Diagnostic only:
-    /// plain regret matching carries no last-iterate convergence guarantee
-    /// (the average is the object with the CCE-style bound).
+    /// plain regret matching carries no last-iterate convergence guarantee.
+    /// In multiplayer games, external regret gives a CCE-style statement for
+    /// the correlated empirical sequence of joint play, not for the product
+    /// of independently normalized per-seat average-policy columns exposed
+    /// here.
     pub use_current_strategy: bool,
 }
 
@@ -1445,10 +1485,16 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         let mut deal_rng = traversal_deal_rng(self.config.seed, sample_id, traverser);
         let sample = self.sampler.sample_counted(&mut deal_rng)?;
         let mut action_rng = traversal_action_rng(self.config.seed, sample_id, traverser);
+        let mut average_rng = average_strategy_action_rng(self.config.seed, sample_id, traverser);
         let mut reach = vec![1.0; self.game.num_players()];
         match &self.dense {
             None if self.config.traverser_vector => {
-                let feasible = self.sampler.feasible_combos(traverser, &sample.world);
+                let mut feasible = self.sampler.feasible_combos(traverser, &sample.world);
+                let mut weights: Vec<f64> = feasible.iter().map(|(_, weight)| *weight).collect();
+                normalize_feasible_weights(&mut weights)?;
+                for ((_, weight), normalized) in feasible.iter_mut().zip(weights) {
+                    *weight = normalized;
+                }
                 let base_rng = action_rng.clone();
                 let mut combined = TraversalDelta {
                     sample_id,
@@ -1458,7 +1504,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     hand_updates: feasible.len() as u64,
                     events: Vec::new(),
                 };
-                for (combo, weight) in feasible {
+                for &(combo, weight) in &feasible {
                     let mut holes = sample.world.hole_combos().to_vec();
                     holes[traverser] = combo;
                     let combo_world = SampledWorld::new(holes, *sample.world.runout())?;
@@ -1482,17 +1528,39 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                         .ok_or(SolverError::CounterOverflow)?;
                     for mut event in delta.events {
                         match &mut event {
-                            TraversalEvent::AddRegret { values, .. }
-                            | TraversalEvent::AddStrategy { values, .. } => {
+                            TraversalEvent::AddRegret { values, .. } => {
                                 for value in values {
                                     *value *= weight;
                                 }
                             }
-                            TraversalEvent::EnsurePolicy { .. }
+                            TraversalEvent::AddStrategy { .. }
+                            | TraversalEvent::EnsurePolicy { .. }
                             | TraversalEvent::EnsureHistory(_) => {}
                         }
                         combined.events.push(event);
                     }
+                }
+                // Rao-Blackwellize the independent average-policy pass over
+                // the same conditionally feasible own range. Each hand gets
+                // the same uniform-opponent random stream; only its own
+                // private strategy and reach differ.
+                let average_base_rng = average_rng.clone();
+                for &(combo, weight) in &feasible {
+                    let mut holes = sample.world.hole_combos().to_vec();
+                    holes[traverser] = combo;
+                    let combo_world = SampledWorld::new(holes, *sample.world.runout())?;
+                    let mut combo_rng = average_base_rng.clone();
+                    let mut average = SparseAverageStrategyWorker::new(self, linear_weight);
+                    average.traverse(
+                        self.game.root_state(),
+                        &combo_world,
+                        traverser,
+                        HistoryKey::ROOT,
+                        weight,
+                        &mut combo_rng,
+                        0,
+                    )?;
+                    combined.events.extend(average.finish());
                 }
                 Ok(AnyTraversalDelta::Sparse(combined))
             }
@@ -1508,19 +1576,27 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     &mut action_rng,
                     0,
                 )?;
-                Ok(AnyTraversalDelta::Sparse(worker.finish(
-                    sample_id,
+                let mut delta = worker.finish(sample_id, traverser, u64::from(sample.attempts));
+                let mut average = SparseAverageStrategyWorker::new(self, linear_weight);
+                average.traverse(
+                    self.game.root_state(),
+                    &sample.world,
                     traverser,
-                    u64::from(sample.attempts),
-                )))
+                    HistoryKey::ROOT,
+                    1.0,
+                    &mut average_rng,
+                    0,
+                )?;
+                delta.events.extend(average.finish());
+                Ok(AnyTraversalDelta::Sparse(delta))
             }
             Some(dense) if self.config.traverser_vector => {
                 let feasible = self.sampler.feasible_combos(traverser, &sample.world);
                 let (combos, weights): (Vec<usize>, Vec<f64>) = feasible.into_iter().unzip();
-                // Own-reach starts at 1.0 for every feasible combo; unlike
-                // `reach` (seat-indexed, used by the scalar/dense-scalar
-                // workers), this is combo-indexed and threaded separately
-                // (see `VectorTraversalWorker::traverse`).
+                let mut normalized_weights = weights.clone();
+                normalize_feasible_weights(&mut normalized_weights)?;
+                // The averaging traversal tracks one own-reach value per
+                // feasible combo.
                 let own_reach = vec![1.0; combos.len()];
                 // The traversal starts with every feasible combo active;
                 // pruning (see `VectorTraversalWorker::traverse`) is the
@@ -1531,26 +1607,35 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     &self.game,
                     dense,
                     self.config,
-                    linear_weight,
-                    combos,
+                    combos.clone(),
                     weights,
-                );
+                )?;
                 worker.traverse(
                     self.game.root_state(),
                     0,
                     &sample.world,
                     traverser,
                     &active,
-                    &own_reach,
                     1.0,
                     &mut action_rng,
                     0,
                 )?;
-                Ok(AnyTraversalDelta::Dense(worker.finish(
-                    sample_id,
+                let mut delta = worker.finish(sample_id, traverser, u64::from(sample.attempts));
+                let mut average =
+                    DenseAverageStrategyWorker::new(&self.game, dense, self.config, linear_weight);
+                average.traverse_vector(
+                    self.game.root_state(),
+                    0,
+                    &sample.world,
                     traverser,
-                    u64::from(sample.attempts),
-                )))
+                    &combos,
+                    &normalized_weights,
+                    &own_reach,
+                    &mut average_rng,
+                    0,
+                )?;
+                delta.events.extend(average.finish());
+                Ok(AnyTraversalDelta::Dense(delta))
             }
             Some(dense) => {
                 let mut worker =
@@ -1565,11 +1650,20 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     &mut action_rng,
                     0,
                 )?;
-                Ok(AnyTraversalDelta::Dense(worker.finish(
-                    sample_id,
+                let mut delta = worker.finish(sample_id, traverser, u64::from(sample.attempts));
+                let mut average =
+                    DenseAverageStrategyWorker::new(&self.game, dense, self.config, linear_weight);
+                average.traverse_scalar(
+                    self.game.root_state(),
+                    0,
+                    &sample.world,
                     traverser,
-                    u64::from(sample.attempts),
-                )))
+                    1.0,
+                    &mut average_rng,
+                    0,
+                )?;
+                delta.events.extend(average.finish());
+                Ok(AnyTraversalDelta::Dense(delta))
             }
         }
     }
@@ -2073,13 +2167,13 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     }
 
     /// Same rows as [`Self::strategies_at`], plus each column's raw strategy
-    /// mass: `Σ_a strategy_sum[a]` (the linear-CFR reach-weighted
-    /// visitation mass -- see [`PolicyColumn::strategy_sum`]), summed in
-    /// `f64` to avoid precision loss over many `f32` accumulators. This is
-    /// the correct cheap weight for a live "range-wide action frequency"
-    /// aggregation over a node's buckets: unlike a bucket count, it is
-    /// reach-weighted and costs nothing beyond the scan
-    /// [`Self::strategies_at`] already performs.
+    /// mass: `Σ_a strategy_sum[a]`, summed in `f64` to avoid precision loss
+    /// over many `f32` accumulators. The mass includes the exact public
+    /// history's fixed uniform-opponent proposal factor `Q(history)`; it is
+    /// therefore a valid cheap weight for a live range-wide action-frequency
+    /// aggregation across buckets at this one history, where `Q` is common,
+    /// but is not a reach probability and must not be compared or aggregated
+    /// across different histories. See [`PolicyColumn::strategy_sum`].
     pub fn strategies_at_with_mass(
         &self,
         history: HistoryKey,

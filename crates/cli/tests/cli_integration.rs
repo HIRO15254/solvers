@@ -1473,7 +1473,7 @@ fn the_abstraction_cache_is_shared_across_runs() {
         dir.join("cold").to_str().unwrap(),
     ]);
     assert!(
-        String::from_utf8_lossy(&cold.stdout).contains("ehs2 tables: built"),
+        String::from_utf8_lossy(&cold.stderr).contains("ehs2 tables: built"),
         "the first run must build the tables"
     );
 
@@ -1496,7 +1496,7 @@ fn the_abstraction_cache_is_shared_across_runs() {
         warm_run.to_str().unwrap(),
     ]);
     assert!(
-        String::from_utf8_lossy(&warm.stdout).contains("ehs2 tables: loaded"),
+        String::from_utf8_lossy(&warm.stderr).contains("ehs2 tables: loaded"),
         "the second run must load the cached tables"
     );
 
@@ -1504,6 +1504,27 @@ fn the_abstraction_cache_is_shared_across_runs() {
     assert!(
         events.contains("ehs2 tables loaded in"),
         "the run event log must record the cache hit: {events}"
+    );
+    let evaluated = run_solvers_ok(&[
+        "--cache-dir",
+        cache.to_str().unwrap(),
+        "evaluate",
+        warm_run.join("solution.mwsol").to_str().unwrap(),
+        "--samples",
+        "2",
+        "--br-traversals",
+        "1",
+    ]);
+    let report: serde_json::Value =
+        serde_json::from_slice(&evaluated.stdout).expect("evaluate stdout must be pure JSON");
+    assert_eq!(report["samples"], 2);
+    let artifact = read_mwsol_full(&warm_run.join("solution.mwsol"));
+    let summary: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(warm_run.join("run.json")).unwrap()).unwrap();
+    assert_eq!(
+        summary["algorithmFingerprint"],
+        formats::config_hash_hex(&artifact.algorithm_fingerprint),
+        "run summary and solution must identify the same update semantics"
     );
 }
 

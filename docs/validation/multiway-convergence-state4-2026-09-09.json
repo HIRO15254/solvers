@@ -1,0 +1,77 @@
+{
+  "schema": "multiway-convergence-state4-evidence/v1",
+  "status": "diagnostic_only_no_full_gtow_certificate",
+  "state": 4,
+  "correctness_boundary": "state3 cache-bug results are invalid accuracy evidence; all numbers below use solver state version 4",
+  "inputs": {
+    "k32_t8_audit": {"path": "runs/multiway-convergence-round4-20260909/cloud-state4-k32-pair/k32-t8/audit.stdout.json", "sha256": "bc47cd9357305798fe34b7b6996f53c74e0e052f66675ff4b02edbe99643f2e0"},
+    "k32_t24_audit": {"path": "runs/multiway-convergence-round4-20260909/cloud-state4-k32-pair/k32-t24/audit.stdout.json", "sha256": "f188a813a8fd01548b5ba45800a8b26c7ca45ef4b6d438f72af712ddb1149e54"},
+    "k256_t24_audit": {"path": "runs/multiway-convergence-round4-20260909/cloud-state4-k256/k256-t24/audit.stdout.json", "sha256": "33a38bdd3e400001db64428d1b367d9ab5fcf1edef611f9e8f76aceffd382338"},
+    "gtow_reference": {"path": "docs/validation/gtowizard-preflop-2026-09-08.json", "sha256": "169a33a98dfb1ce4d8df53a090e977fe04621e8b152d36617a8c2fb499eb34c1"},
+    "gtow_hand_panel": {"path": "docs/validation/gtowizard-boundary-hands-2026-09-09.json"},
+    "census_cap2": {"path": "runs/gcp-convergence-20260909-control/research-state4/census-cap2.json", "encoding": "UTF-8 BOM accepted", "sha256": "44bebf7e6a77be8e9996f3b9b2ea9f15490085f1eaa86a7b48f2eddd82eba3f8"}
+  },
+  "matched_k32_thread_pair": {
+    "sweeps": 16384,
+    "threads": [8, 24],
+    "solver_state_version": 4,
+    "configuration_fingerprint": "ce5341b88015273e9b9ba728589b622749dd45b1fcde99b5aaf4a089846424b5",
+    "abstraction_fingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+    "policy_arena": {"nodes": 2671933, "columns": 87818800, "slots": 181382705, "bytes": 1526165400},
+    "exact_match": true,
+    "comparison_method": "tools/multiway_reference_compare.py"
+  },
+  "k256_vs_k32": {
+    "k256_sweeps": 65536,
+    "k32_sweeps": 16384,
+    "confounds": ["sweep count differs 4x", "abstraction bucket count differs (256 vs 32 river-side baseline)"],
+    "k256_policy_arena": {"nodes": 2671933, "columns": 682543504, "slots": 1407251601, "bytes": 11407457160},
+    "k256_abstraction_fingerprint": "29e5f5f110b46a9fcdb2ea953d878604267dc2d0d9d0ca484982ed1107a41dad",
+    "held_out_max_ci95_upper_bb_per_hand": {"seed101": 0.6595787660765883, "seed202": 0.6178105872199209}
+  },
+  "k32_reference_comparison": {
+    "rfi_nodes": [
+      {"seat":"UTG","measured":{"fold":87.53317035186849,"allin":1.2742706136355375,"raise":11.19255903449597}},
+      {"seat":"HJ","measured":{"fold":87.38855883661269,"allin":1.3189781358917827,"raise":11.292463027495534}},
+      {"seat":"CO","measured":{"fold":85.03856737269012,"allin":1.0609743002552698,"raise":13.900458327054602}},
+      {"seat":"BTN","measured":{"fold":75.78738673022325,"allin":2.947827408368533,"raise":21.264785861408214}},
+      {"seat":"SB","measured":{"call":35.1547296428034,"fold":26.13634509300185,"allin":1.8933414164623092,"raise":36.815583847732434}}
+    ],
+    "observed_hand_panel": [
+      {"seat":"UTG","hand":"AJo","measured":{"fold":0.0000027126402,"allin":0.08077759,"raise":99.919224}},
+      {"seat":"UTG","hand":"KQo","measured":{"fold":0.0000026794883,"allin":0.000016738701,"raise":99.99998}},
+      {"seat":"UTG","hand":"ATs","measured":{"fold":0.00018472709,"allin":0.0059346006,"raise":99.99388}},
+      {"seat":"UTG","hand":"55","measured":{"fold":99.77073,"allin":0.00004080841,"raise":0.229229}},
+      {"seat":"BTN","hand":"K8o","measured":{"fold":99.75375,"allin":0.08064808,"raise":0.16560684}},
+      {"seat":"BTN","hand":"Q8o","measured":{"fold":93.04205,"allin":0.10496218,"raise":6.8529814}},
+      {"seat":"BTN","hand":"J7s","measured":{"fold":87.85896,"allin":0.056000403,"raise":12.085039}},
+      {"seat":"BTN","hand":"54s","measured":{"fold":99.99772,"allin":0.002244183,"raise":0.000031680648}},
+      {"seat":"SB","hand":"K8o","measured":{"call":88.2264,"fold":11.098593,"allin":0.026013842,"raise":0.6489891}},
+      {"seat":"SB","hand":"Q8o","measured":{"call":19.463603,"fold":42.509437,"allin":0.028336636,"raise":37.99862}}
+    ],
+    "finite_candidate_gains": [
+      {"seed":101,"samples":4096,"mean_bb_per_hand":0.6898022460937517,"ci95_upper_bb_per_hand":1.2562893546218576},
+      {"seed":202,"samples":4096,"mean_bb_per_hand":0.7184228515625005,"ci95_upper_bb_per_hand":1.3116176738637513}
+    ]
+  },
+  "census_cap2": {
+    "complete": true,
+    "decision_nodes": 9262677,
+    "arena_bytes": 7280620448,
+    "u32_columns": true,
+    "groups_by_street": {
+      "preflop":{"decision_nodes":16912,"columns":2858128,"slots":6258577,"edges":37033},
+      "flop":{"decision_nodes":405033,"columns":51844224,"slots":115515264,"edges":902463},
+      "turn":{"decision_nodes":2240991,"columns":143423424,"slots":307082944,"edges":4798171},
+      "river":{"decision_nodes":6599741,"columns":211191712,"slots":447037152,"edges":13969911}
+    },
+    "bucket_schedules": {
+      "128/64/32":{"estimated_arena_bytes":7280620448},
+      "256/64/32":{"estimated_arena_bytes":8211223416},
+      "64/32/16":{"estimated_arena_bytes":3776675632}
+    },
+    "allocation_formula": "8*policy_slots + ceil(policy_columns/64)*8 + 24*decision_nodes + 16 (core aggregate; per-group sums include extra group overhead)",
+    "memory_interpretation": "mixed cap2 arena is 7.28 GB; this does not establish that 160 GB is necessary because additional process memory is separate"
+  },
+  "operational_context": {"cloud_next": "8 vCPU / 62 GiB", "local": "K32 batch8 and batch12 active", "no_claim": "No achievement or full-GTOW certificate; finite candidate gains and rounded hand panel are diagnostics only"}
+}

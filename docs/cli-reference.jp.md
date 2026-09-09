@@ -147,7 +147,10 @@ toy / postflop / preflop-hu の 3 契約:
 preflop-hu では `tree` key 自体が無い。
 
 Multiway Preflop(v1)は `seatCount` / `chipUnitBb` を別途持ち、`tree` は無い
-(`docs/multiway-preflop-v1.jp.md` を見よ)。
+(`docs/multiway-preflop-v1.jp.md` を見よ)。standard ruleまたは`.mwtree` scriptの
+`when` conditionでは、`last_preflop_aggressor_position`を使って直近のpreflop
+aggressorのposition名(`UTG`/`HJ`/`CO`/`BTN`/`SB`/`BB`等)を文字列比較できる。
+未raise時は空文字で、postflopでも値を保持する。
 
 ## `solvers solve`
 
@@ -268,7 +271,6 @@ solvers inspect <SOLUTION.mwsol> [--node NODE] [--view VIEW]
 
 `<CONFIG>` と `--sol` は排他である。`.mwsol` 拡張子なら multiway artifact viewer、
 それ以外の config なら postflop REPL、`--sol` なら postflop artifact viewer になる。
-
 | flag | 既定 | 適用 | 意味 |
 |---|---|---|---|
 | `--iterations N` | — | postflop live | config の `[run] iterations` を上書き |
@@ -376,6 +378,16 @@ solvers evaluate <SOLUTION.mwsol> [--samples N] [--seed N] [--br-traversals N]
 
 `.mwsol` 専用。average profile を trained deviation 付きで再評価する。既定は
 `--samples 4096` / `--seed 1` / `--br-traversals 20000`。
+結果はstdoutへJSONで出力し、EHS² cacheのbuild/load通知はstderrへ出す。
+deviationの2候補を比較するCIは候補選択を考慮した近似区間で、選ばれた候補の
+`stderr`だけから再構築しない。Nash/exploitability保証ではない。
+同一sampleのbaselineとdeviator候補はphysical worldと行動乱数列を共有し、
+共通履歴での行動ノイズを揃えたpaired gainから標準誤差を計算する。
+Production v1の規範契約はPreflop-only artifactだが、現在のwriterはstreetでfilterせず、
+正の平均質量を持つPostflop policy blockも保存し得る。これは未解決の契約不一致である。
+一方、未訪問・平均質量0のpolicy、raw regret、量子化前の値は保存されないため、現在の
+`.mwsol`を完全な全street solver stateとも扱わない。一般Postflop treeの学習時profileと
+同等な評価にはcheckpointを使い、artifact評価をGTO解や完全profileと同一視しない。
 
 ---
 

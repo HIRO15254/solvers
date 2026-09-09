@@ -303,6 +303,7 @@ version = "0.1.0"
 dependencies = [
  "abstraction",
  "anyhow",
+ "blake3",
  "cards",
  "clap",
  "engine",

@@ -341,6 +341,23 @@ pub(super) fn traversal_action_rng(seed: u64, sample_id: u64, traverser: usize) 
     ChaCha20Rng::from_seed(*hasher.finalize().as_bytes())
 }
 
+/// Independent public-action stream for the average-strategy pass.
+/// Keeping this separate from regret traversal means changes to pruning,
+/// exploration, or terminal traversal never perturb which average-policy
+/// histories receive samples.
+pub(super) fn average_strategy_action_rng(
+    seed: u64,
+    sample_id: u64,
+    averager: usize,
+) -> ChaCha20Rng {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"solvers.multiway.average-strategy-actions.v1");
+    hasher.update(&seed.to_le_bytes());
+    hasher.update(&sample_id.to_le_bytes());
+    hasher.update(&(averager as u64).to_le_bytes());
+    ChaCha20Rng::from_seed(*hasher.finalize().as_bytes())
+}
+
 pub(super) fn evaluation_deal_rng(seed: u64, sample_id: u64) -> ChaCha20Rng {
     let mut hasher = blake3::Hasher::new();
     hasher.update(b"solvers.multiway.profile-evaluation-deal.v1");
@@ -364,25 +381,6 @@ pub(super) fn evaluation_action_rng(
             hasher.update(b"solvers.multiway.profile-evaluation-baseline.v1");
         }
     }
-    hasher.update(&seed.to_le_bytes());
-    hasher.update(&sample_id.to_le_bytes());
-    ChaCha20Rng::from_seed(*hasher.finalize().as_bytes())
-}
-
-/// Action stream for the TRAINED-deviator replay inside
-/// [`MultiwaySolver::evaluate_profile`]: distinct from
-/// `evaluation_action_rng(_, _, Some(seat))`, which stays reserved for the
-/// regret-greedy candidate replay so that candidate's estimate is exactly
-/// the one a plain [`MultiwaySolver::evaluate_average_profile`] call would
-/// produce.
-pub(super) fn deviator_evaluation_action_rng(
-    seed: u64,
-    sample_id: u64,
-    seat: usize,
-) -> ChaCha20Rng {
-    let mut hasher = blake3::Hasher::new();
-    hasher.update(b"solvers.multiway.profile-evaluation-trained-deviation.v1");
-    hasher.update(&(seat as u64).to_le_bytes());
     hasher.update(&seed.to_le_bytes());
     hasher.update(&sample_id.to_le_bytes());
     ChaCha20Rng::from_seed(*hasher.finalize().as_bytes())

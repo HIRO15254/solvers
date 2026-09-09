@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "reference_kind": "manually_observed_ui_hand_frequencies",
+  "observed_date": "2026-09-09",
+  "source": "GTO Wizard Solutions UI",
+  "collection_scope": "Small panel of exact UI-visible hand-cell frequencies at unopened preflop nodes",
+  "solution": {
+    "gametype": "Cash6m50zGeneral",
+    "format": "NLHE Cash / Classic / 6max",
+    "stack_bb": 100,
+    "type": "General",
+    "rake_label": "NL50",
+    "opening_size_label": "GTO",
+    "three_bet_size_label": "GTO",
+    "postflop_sizes": "Multi Size",
+    "selected_game_ui": "Cash 100bb; 6max NL50; General GTO",
+    "strategy_view": "Strategy / Actions / Hands"
+  },
+  "frequency_unit": "percent of each displayed hand combo; Hands panel values are rounded to the shown tenth where applicable",
+  "limitations": [
+    "Values are read from the visible Hands panel after selecting the hand cell; they are not inferred from matrix color.",
+    "UI display rounding may make reconstructed totals differ slightly from 100%.",
+    "No action or hand filter was applied during collection.",
+    "Only the unopened node is represented; the URL may retain no later actions in this panel."
+  ],
+  "nodes": [
+    {
+      "actor": "UTG",
+      "history": [],
+      "history_spot": 0,
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&soltab=strategy&history_spot=0&preflop_actions=F-F-F-F-R3-C",
+      "hands": {
+        "AJo": {"allin_100": 0.0, "raise_2": 100.0, "fold": 0.0},
+        "KQo": {"allin_100": 0.0, "raise_2": 100.0, "fold": 0.0},
+        "ATs": {"allin_100": 0.0, "raise_2": 100.0, "fold": 0.0},
+        "55": {"allin_100": 0.0, "raise_2": 51.0, "fold": 49.0}
+      }
+    },
+    {
+      "actor": "BTN",
+      "history": ["UTG fold", "HJ fold", "CO fold"],
+      "history_spot": 3,
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&soltab=strategy&history_spot=3&preflop_actions=F-F-F-F-R3-C",
+      "hands": {
+        "K8o": {"allin_100": 0.0, "raise_2_5": 30.0, "fold": 70.0},
+        "Q8o": {"allin_100": 0.0, "raise_2_5": 4.0, "fold": 96.0},
+        "J7s": {"allin_100": 0.0, "raise_2_5": 100.0, "fold": 0.0},
+        "54s": {"allin_100": 0.0, "raise_2_5": 67.5, "fold": 32.5}
+      }
+    },
+    {
+      "actor": "SB",
+      "history": ["UTG fold", "HJ fold", "CO fold", "BTN fold"],
+      "history_spot": 4,
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&soltab=strategy&history_spot=4&solution_type=gwiz&gmfs_solution_tab=ai_sols&gmfft_sort_key=0&gmfft_sort_order=desc&preflop_actions=F-F-F-F",
+      "hands": {
+        "K8o": {"allin_100": 0.0, "raise_3": 63.0, "call": 37.0, "fold": 0.0},
+        "Q8o": {"allin_100": 0.0, "raise_3": 34.5, "call": 43.5, "fold": 22.0}
+      }
+    }
+  ]
+}

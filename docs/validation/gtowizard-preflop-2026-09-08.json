@@ -1,0 +1,60 @@
+{
+  "reference_kind": "manually-observed-rounded-ui-frequencies",
+  "observed_date": "2026-09-08",
+  "source": "GTO Wizard Solutions library",
+  "solution": {
+    "game": "NLHE Cash",
+    "players": 6,
+    "stack_bb": 100,
+    "type": "Classic / General",
+    "rake_label": "NL50",
+    "rake_numeric_parameters_verified": false,
+    "opening_size_label": "GTO",
+    "three_bet_size_label": "GTO",
+    "postflop_sizes": "Multi Size",
+    "gametype": "Cash6m50zGeneral",
+    "selection_verified": "active library row and screenshot",
+    "strategy_view": "Strategy / Actions",
+    "filter": "no action or hand filter applied during collection"
+  },
+  "limitations": [
+    "Displayed action percentages are rounded and can sum to 99.9 or 100.1 percent.",
+    "URLs preserve later actions; history_spot identifies the node actually observed. Only actions before that node condition the observation.",
+    "Numeric rake parameters and the complete action tree were not independently verified.",
+    "These values are external plausibility anchors, not exact expected test outputs or a convergence certificate.",
+    "The default repository example uses postflop checkdown and a different preflop menu; its distance from this reference includes model and tree error.",
+    "Use combo counts only as displayed diagnostics; do not reinterpret their small differences from 1326 as additional precision."
+  ],
+  "nodes": [
+    {
+      "actor": "UTG", "history": [], "history_spot": 0,
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&soltab=strategy&preflop_actions=F-F-F-F-R3-C&history_spot=0",
+      "actions": [{"action": "allin", "to_bb": 100, "percent": 0.0}, {"action": "raise", "to_bb": 2, "percent": 17.6}, {"action": "fold", "percent": 82.4}]
+    },
+    {
+      "actor": "HJ", "history": ["UTG fold"], "history_spot": 1,
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&soltab=strategy&preflop_actions=F-F-F-F-R3-C&history_spot=1",
+      "actions": [{"action": "allin", "to_bb": 100, "percent": 0.0}, {"action": "raise", "to_bb": 2, "percent": 21.6}, {"action": "fold", "percent": 78.4}]
+    },
+    {
+      "actor": "CO", "history": ["UTG fold", "HJ fold"], "history_spot": 2,
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&soltab=strategy&preflop_actions=F-F-F-F-R3-C&history_spot=2",
+      "actions": [{"action": "allin", "to_bb": 100, "percent": 0.0}, {"action": "raise", "to_bb": 2.3, "percent": 28.9}, {"action": "fold", "percent": 71.1}]
+    },
+    {
+      "actor": "BTN", "history": ["UTG fold", "HJ fold", "CO fold"], "history_spot": 3,
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&soltab=strategy&preflop_actions=F-F-F-F-R3-C&history_spot=3",
+      "actions": [{"action": "allin", "to_bb": 100, "percent": 0.0}, {"action": "raise", "to_bb": 2.5, "percent": 42.0}, {"action": "fold", "percent": 58.0}]
+    },
+    {
+      "actor": "SB", "history": ["UTG fold", "HJ fold", "CO fold", "BTN fold"], "history_spot": 4,
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&soltab=strategy&preflop_actions=F-F-F-F-R3-C&history_spot=4",
+      "actions": [{"action": "allin", "to_bb": 100, "percent": 0.0}, {"action": "raise", "to_bb": 3, "percent": 37.5}, {"action": "call", "to_bb": 1, "percent": 11.1}, {"action": "fold", "percent": 51.5}]
+    },
+    {
+      "actor": "BB", "history": ["UTG fold", "HJ fold", "CO fold", "BTN fold", "SB raise to 3bb"], "history_spot": 5,
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&soltab=strategy&preflop_actions=F-F-F-F-R3-C&history_spot=5",
+      "actions": [{"action": "allin", "to_bb": 100, "percent": 0.0}, {"action": "raise", "to_bb": 10, "percent": 17.2}, {"action": "call", "to_bb": 3, "percent": 35.2}, {"action": "fold", "percent": 47.5}]
+    }
+  ]
+}
