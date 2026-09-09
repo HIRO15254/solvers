@@ -221,10 +221,31 @@ mod tests {
 
     fn runner(max: usize) -> (tempfile::TempDir, JobRunner) {
         let directory = tempfile::tempdir().unwrap();
-        // `true` exits immediately, which is all these tests need: they
-        // exercise the queue, not the solver.
-        let runner = JobRunner::new(PathBuf::from("/usr/bin/true"), None, max);
+        // Invoked with solver CLI arguments, the Rust test harness exits
+        // immediately with an argument error. That is sufficient here:
+        // these tests exercise process slots and queueing, not the solver.
+        let runner = JobRunner::new(std::env::current_exe().unwrap(), None, max);
         (directory, runner)
+    }
+
+    #[test]
+    #[ignore = "spawned explicitly by the queue test"]
+    fn child_process_helper() {
+        if std::env::var_os("SOLVERS_QUEUE_TEST_CHILD").is_some() {
+            std::thread::sleep(std::time::Duration::from_secs(30));
+        }
+    }
+
+    fn sleeping_child() -> Child {
+        Command::new(std::env::current_exe().unwrap())
+            .env("SOLVERS_QUEUE_TEST_CHILD", "1")
+            .arg("--ignored")
+            .arg("--exact")
+            .arg("jobs::tests::child_process_helper")
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .unwrap()
     }
 
     fn run_dir(base: &Path, name: &str) -> PathBuf {
@@ -248,11 +269,7 @@ mod tests {
             let mut state = runner.state.lock().unwrap();
             state.running.push(Running {
                 run_id: "hold".into(),
-                child: Command::new("/bin/sleep")
-                    .arg("30")
-                    .stdout(Stdio::null())
-                    .spawn()
-                    .unwrap(),
+                child: sleeping_child(),
             });
             drop(state);
             runner.submit("b", &second, JobCommand::Solve).unwrap()

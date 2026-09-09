@@ -9,75 +9,46 @@ use std::io::{Read, Write};
 use std::net::TcpStream;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
+use std::sync::OnceLock;
 
-/// A `solvers` stand-in.
-///
-/// `validate` echoes the config back as its own effective form, and `solve`
-/// writes the manifest and events a real run would. That is exactly the
-/// surface the daemon depends on, so a change to it fails here.
-const STUB_SOLVER: &str = r#"#!/bin/sh
-set -e
-# Skip the global flags the daemon may pass.
-while [ "$1" = "--cache-dir" ]; do shift 2; done
-command="$1"; shift
-case "$command" in
-  validate)
-    config="$1"; shift
-    effective=""
-    while [ $# -gt 0 ]; do
-      case "$1" in
-        --write-effective) effective="$2"; shift 2;;
-        *) shift;;
-      esac
-    done
-    if grep -q "REJECT" "$config"; then
-      echo "MWP999: the stub was asked to reject this config" >&2
-      exit 1
-    fi
-    if grep -q "NEEDS_FILE" "$config"; then
-      echo "reading mwtree source /nowhere/tree.mwtree" >&2
-      exit 1
-    fi
-    [ -n "$effective" ] && cp "$config" "$effective"
-    echo '{"status":"valid","schema":"solvers.toy/v1"}'
-    ;;
-  solve|resume)
-    directory=""
-    for argument in "$@"; do
-      case "$previous" in --out) directory="$argument";; esac
-      previous="$argument"
-    done
-    [ "$command" = resume ] && directory="$1"
-    now=1700000000000
-    # The real CLI records `running` before it does any work, so a crash
-    # never leaves a started run looking like it never started. The stub
-    # does the same, then optionally holds its slot.
-    printf '{"schemaVersion":1,"runId":"%s","state":"running","gameKind":"kuhn",' \
-      "$(basename "$directory")" > "$directory/manifest.json"
-    printf '"configSchema":"solvers.toy/v1","configHash":"aa","cliVersion":"stub",' \
-      >> "$directory/manifest.json"
-    printf '"command":["solve"],"pid":%s,"createdUnixMs":%s,"startedUnixMs":%s,' \
-      "$$" "$now" "$now" >> "$directory/manifest.json"
-    printf '"finishedUnixMs":null,"failure":null,"completion":null}\n' \
-      >> "$directory/manifest.json"
-    printf '{"seq":0,"unixMs":%s,"level":"info","kind":"state","state":"running"}\n' \
-      "$now" > "$directory/events.jsonl"
-    # A config marked BLOCK holds its slot, so a test can observe queueing.
-    if grep -q "BLOCK" "$directory/run.toml" 2>/dev/null; then sleep 30; fi
-    printf '{"schemaVersion":1,"runId":"%s","state":"completed","gameKind":"kuhn",' \
-      "$(basename "$directory")" > "$directory/manifest.json"
-    printf '"configSchema":"solvers.toy/v1","configHash":"aa","cliVersion":"stub",' \
-      >> "$directory/manifest.json"
-    printf '"command":["solve"],"pid":1,"createdUnixMs":%s,"startedUnixMs":%s,' \
-      "$now" "$now" >> "$directory/manifest.json"
-    printf '"finishedUnixMs":%s,"failure":null,"completion":"completed"}\n' \
-      "$now" >> "$directory/manifest.json"
-    printf '{"seq":1,"unixMs":%s,"level":"info","kind":"state","state":"completed"}\n' \
-      "$now" >> "$directory/events.jsonl"
-    printf '{"iteration":42,"elapsedSecs":0.5}\n' > "$directory/progress.jsonl"
-    ;;
-esac
-"#;
+/// Build the std-only native `solvers` stand-in once for this test process.
+/// A native helper keeps the process orchestration assertions portable and,
+/// unlike a shell script, can be spawned and killed directly on Windows.
+fn stub_solver() -> &'static Path {
+    struct StubSolver {
+        _directory: tempfile::TempDir,
+        executable: PathBuf,
+    }
+
+    static STUB: OnceLock<StubSolver> = OnceLock::new();
+    &STUB
+        .get_or_init(|| {
+            let directory = tempfile::tempdir().expect("stub build directory");
+            let source = directory.path().join("solver_stub.rs");
+            std::fs::write(&source, include_str!("support/solver_stub.rs"))
+                .expect("write solver stub source");
+            let executable = directory
+                .path()
+                .join(format!("solver-stub{}", std::env::consts::EXE_SUFFIX));
+            let rustc = std::env::var_os("RUSTC").unwrap_or_else(|| "rustc".into());
+            let status = Command::new(rustc)
+                .arg("--edition=2024")
+                .arg(&source)
+                .arg("-o")
+                .arg(&executable)
+                .stdin(Stdio::null())
+                .stdout(Stdio::null())
+                .stderr(Stdio::inherit())
+                .status()
+                .expect("spawn rustc for solver stub");
+            assert!(status.success(), "compile solver stub");
+            StubSolver {
+                _directory: directory,
+                executable,
+            }
+        })
+        .executable
+}
 
 struct Daemon {
     child: Child,
@@ -105,18 +76,9 @@ impl Daemon {
         daemon
     }
 
-    /// Starts a daemon over `home`, writing the stub solver there if it is
-    /// not already present. Restarting means calling this twice.
+    /// Starts a daemon over `home`. Restarting means calling this twice.
     fn start_in(home: &Path, max_concurrent: usize) -> Self {
-        let solver = home.join("solvers");
-        if !solver.exists() {
-            std::fs::write(&solver, STUB_SOLVER).unwrap();
-            #[cfg(unix)]
-            {
-                use std::os::unix::fs::PermissionsExt;
-                std::fs::set_permissions(&solver, std::fs::Permissions::from_mode(0o755)).unwrap();
-            }
-        }
+        let solver = stub_solver();
         let runs = home.join("runs");
 
         // Port 0 asks the OS for a free port, which the daemon prints.
@@ -125,7 +87,7 @@ impl Daemon {
             .arg("--runs")
             .arg(&runs)
             .arg("--solver")
-            .arg(&solver)
+            .arg(solver)
             .arg("--max-concurrent")
             .arg(max_concurrent.to_string())
             .stdout(Stdio::piped())
