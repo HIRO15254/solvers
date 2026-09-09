@@ -727,6 +727,14 @@ algorithm fingerprintはsolver state versionとeffective algorithm設定を含�
 | `checkpoint.mwckpt` | 再開用state | checkpoint cadenceごと |
 | `solution.mwsol` | 閲覧用成果物 | 完了時に1度 |
 
+`.mwsol` format version 4 のstrategy indexは1 entry 91 byteの固定幅で、
+実装はindex全体を2 GiB以下、すなわち最大23,598,721 strategy blockに制限する。
+metadataは非圧縮4 GiB以下、strategy frameは合計非圧縮64 GiB以下である。
+writerはmetadataとindexを一時fileへstreamし、検証完了後にatomicに置換する。
+readerはmetadataをmemoryに保持する一方、strategy frameは最大4096件ずつpage
+読み出しする。format versionは4のままであるが、従来の10,000,000件上限を持つ
+古いreaderは、それを超える新しいv4成果物を拒否するため更新が必要である。
+
 manifestの`state`は`running`、`completed`、`failed`、`canceled`、`interrupted`。
 `interrupted`はどのプロセスも書き込まない。manifestが`running`のまま記録pidが
 存在しない状態を読み手が導出する。この判定は同一host上でのみ有効であり、

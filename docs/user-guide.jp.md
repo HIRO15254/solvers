@@ -193,10 +193,10 @@ byte offsetを保持して再開し、`seq`の連続でとりこぼしを検出�
   情報集合ごとの平均戦略を、ページ読み出し可能な索引付きで格納する。
   probability encodingは既定`u16`(分母65,535)で、research/inspection用に
   `f32`も選べる。signed `i16` strategy encodingはproduction v1では使わない。
-  `solvers inspect` / `solvers export` がこれを読む。Production v1はPreflop-onlyを
-  規範契約とするが、現在のwriterが正の平均質量を持つPostflop blockも保存し得る
-  契約不一致は未解決である。未訪問・平均質量0のpolicy、raw regret、量子化前の値は
-  保存しないため、現在のartifactを完全な全street solver stateとも扱わない。
+  `solvers inspect` / `solvers export` がこれを読む。v4の固定幅indexは2 GiB、
+  最大23,598,721 strategyで、metadataは非圧縮4 GiB以下である。writerは
+  一時fileへstreamしてからatomicに置換する。10,000,000 strategy上限だった
+  古いreaderで、それを超える新しいv4成果物を開く場合はreaderを更新する。
 - **`.mwckpt`**: 再開用チェックポイント(累積 regret を含む全学習状態)。
   `solvers resume` で続きを回せる。
 - **`progress.jsonl`**: 上表の指標の時系列。

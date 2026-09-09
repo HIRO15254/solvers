@@ -79,6 +79,13 @@ algorithm設定にsolver-state versionを加えて計算します。設定値が
 補正前と補正後の数値更新を区別できます。wire layoutとconfig/game fingerprintの
 定義は変えません。
 
+`.mwsol` v4は91-byte固定幅indexを2 GiBに制限するため、最大strategy数は
+23,598,721です。metadataの非圧縮上限は4 GiB、全strategy frameの非圧縮合計
+上限は64 GiBです。writerはmetadata/indexをatomic temporary fileへstreamし、
+readerはmetadataを保持してstrategyを最大4096件ずつpage読み出しします。
+10,000,000件上限だった古いreaderは、それを超えるv4 artifactを読めません。
+wire version、checkpoint、solver state、algorithm fingerprintは変わりません。
+
 checkpoint containerは現在 `crates/multiway/src/checkpoint.rs` の
 `CHECKPOINT_VERSION = 7` です。state version 4とcontainer version 7を同一視せず、
 どちらを変更したかをmetadataとmigration testに記録します。

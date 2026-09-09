@@ -271,6 +271,10 @@ solvers inspect <SOLUTION.mwsol> [--node NODE] [--view VIEW]
 
 `<CONFIG>` と `--sol` は排他である。`.mwsol` 拡張子なら multiway artifact viewer、
 それ以外の config なら postflop REPL、`--sol` なら postflop artifact viewer になる。
+`.mwsol` v4 readerは2 GiBの固定幅index（最大23,598,721 strategy）、非圧縮4 GiBの
+metadata、非圧縮合計64 GiBのstrategy frameを上限とし、frameを最大4096件ずつ読む。
+10,000,000 strategy上限だった古いreaderは、より大きいv4成果物には更新が必要である。
+
 | flag | 既定 | 適用 | 意味 |
 |---|---|---|---|
 | `--iterations N` | — | postflop live | config の `[run] iterations` を上書き |
@@ -383,11 +387,9 @@ deviationの2候補を比較するCIは候補選択を考慮した近似区間�
 `stderr`だけから再構築しない。Nash/exploitability保証ではない。
 同一sampleのbaselineとdeviator候補はphysical worldと行動乱数列を共有し、
 共通履歴での行動ノイズを揃えたpaired gainから標準誤差を計算する。
-Production v1の規範契約はPreflop-only artifactだが、現在のwriterはstreetでfilterせず、
-正の平均質量を持つPostflop policy blockも保存し得る。これは未解決の契約不一致である。
-一方、未訪問・平均質量0のpolicy、raw regret、量子化前の値は保存されないため、現在の
-`.mwsol`を完全な全street solver stateとも扱わない。一般Postflop treeの学習時profileと
-同等な評価にはcheckpointを使い、artifact評価をGTO解や完全profileと同一視しない。
+規範契約のPreflop-only exportには未解決の実装差分があり、現在のwriterは正の平均質量を
+持つPostflop blockも保存し得る。未訪問・平均質量0のpolicy、raw regret、量子化前の値は
+保存されないため、学習時の完全profileとは同等ではない。完全stateの評価にはcheckpointを使う。
 
 ---
 

@@ -3,9 +3,16 @@
 //! Unlike a `.mwckpt`, this format deliberately omits regrets and RNG state.
 //! Blocks are sorted by their complete infoset key, allowing a viewer or the
 //! bridge to binary-search one strategy without rebuilding a public tree.
+//!
+//! Version 4 bounds its fixed-width strategy index to 2 GiB (91 bytes per
+//! entry), or 23,598,721 strategy blocks. Metadata is bounded separately at
+//! 4 GiB uncompressed and strategy frames at 64 GiB total uncompressed.
+//! Writers stream metadata and index bytes to an atomic temporary file;
+//! readers retain metadata but page strategy frames in groups of at most
+//! [`MWSOL_MAX_PAGE_LIMIT`].
 
 use std::fs::File;
-use std::io::{Read, Seek, SeekFrom, Write};
+use std::io::{BufWriter, Read, Seek, SeekFrom, Write};
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
@@ -26,11 +33,19 @@ const MWSOL_U16_DENOMINATOR: u16 = u16::MAX;
 /// a block always sum to exactly this value.
 const MWSOL_I16_DENOMINATOR: i16 = i16::MAX;
 const MWSOL_INDEX_ENTRY_LEN: usize = 16 + 1 + 1 + 1 + 4 * 4 + 8 + 8 + 8 + 32;
+/// An index entry is fixed-width and readers validate it without retaining
+/// the complete index. Keep the accepted index itself within a documented
+/// byte budget instead of imposing an unrelated round-number block count.
+const MAX_STRATEGY_INDEX_BYTES: u64 = 2 * 1024 * 1024 * 1024;
+/// Bound the amount of index data retained while writing.  The index remains
+/// in its on-disk position before the frames, so a completed chunk is flushed
+/// with one seek and the payload writer resumes at its append position.
+const MWSOL_INDEX_CHUNK_BYTES: usize = 64 * 1024;
 const MAGIC: &[u8; 8] = b"SLVRMWSL";
 const MAX_METADATA_UNCOMPRESSED_BYTES: u64 = 4 * 1024 * 1024 * 1024;
 const MAX_STRATEGY_BLOCK_UNCOMPRESSED_BYTES: u64 = 16 * 1024 * 1024;
 const MAX_TOTAL_UNCOMPRESSED_BYTES: u64 = 64 * 1024 * 1024 * 1024;
-const MAX_STRATEGY_BLOCKS: u64 = 10_000_000;
+const MAX_STRATEGY_BLOCKS: u64 = MAX_STRATEGY_INDEX_BYTES / MWSOL_INDEX_ENTRY_LEN as u64;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct MultiwayStrategyKey {
@@ -383,6 +398,50 @@ pub struct MultiwaySolutionMetadata {
     pub strategy_weights: Vec<MultiwayStrategyWeight>,
 }
 
+/// Serialization-only view of v4 metadata. Serde encodes borrowed strings
+/// and slices identically to their owned counterparts, while this view lets
+/// the writer avoid cloning three potentially very large record vectors.
+#[derive(Serialize)]
+struct MultiwaySolutionMetadataRef<'a> {
+    schema_version: u16,
+    config_toml: &'a str,
+    config_fingerprint: [u8; 32],
+    game_fingerprint: [u8; 32],
+    algorithm_fingerprint: [u8; 32],
+    abstraction_fingerprint: [u8; 32],
+    configuration_fingerprint: [u8; 32],
+    stop_status: &'a str,
+    chip_unit_bb: f64,
+    sweeps: u64,
+    approximate_profile: bool,
+    seats: &'a [MultiwaySeatResult],
+    histories: &'a [MultiwayHistoryNode],
+    public_states: &'a [MultiwayPublicState],
+    strategy_weights: &'a [MultiwayStrategyWeight],
+}
+
+impl<'a> From<&'a MultiwaySolution> for MultiwaySolutionMetadataRef<'a> {
+    fn from(solution: &'a MultiwaySolution) -> Self {
+        Self {
+            schema_version: solution.schema_version,
+            config_toml: &solution.config_toml,
+            config_fingerprint: solution.config_fingerprint,
+            game_fingerprint: solution.game_fingerprint,
+            algorithm_fingerprint: solution.algorithm_fingerprint,
+            abstraction_fingerprint: solution.abstraction_fingerprint,
+            configuration_fingerprint: solution.configuration_fingerprint,
+            stop_status: &solution.stop_status,
+            chip_unit_bb: solution.chip_unit_bb,
+            sweeps: solution.sweeps,
+            approximate_profile: solution.approximate_profile,
+            seats: &solution.seats,
+            histories: &solution.histories,
+            public_states: &solution.public_states,
+            strategy_weights: &solution.strategy_weights,
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct MultiwaySolution {
     pub schema_version: u16,
@@ -440,6 +499,7 @@ impl From<LegacyMultiwaySolutionMetadata> for MultiwaySolutionMetadata {
 }
 
 impl MultiwaySolutionMetadata {
+    #[cfg(test)]
     fn from_solution(solution: &MultiwaySolution) -> Self {
         Self {
             schema_version: solution.schema_version,
@@ -818,6 +878,55 @@ pub struct MwSolReader {
     format_version: u16,
 }
 
+struct CountingHashWriter<W> {
+    inner: W,
+    written: u64,
+    hasher: blake3::Hasher,
+}
+
+impl<W> CountingHashWriter<W> {
+    fn new(inner: W) -> Self {
+        Self {
+            inner,
+            written: 0,
+            hasher: blake3::Hasher::new(),
+        }
+    }
+
+    fn finish(self) -> (W, u64, [u8; 32]) {
+        (self.inner, self.written, *self.hasher.finalize().as_bytes())
+    }
+}
+
+impl<W: Write> Write for CountingHashWriter<W> {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        let written = self.inner.write(bytes)?;
+        self.written = self
+            .written
+            .checked_add(written as u64)
+            .ok_or_else(|| std::io::Error::other("compressed metadata length overflow"))?;
+        self.hasher.update(&bytes[..written]);
+        Ok(written)
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        self.inner.flush()
+    }
+}
+
+fn checked_strategy_index_len(strategy_count: u64) -> Result<u64, MwSolError> {
+    if strategy_count > MAX_STRATEGY_BLOCKS {
+        return Err(MwSolError::StrategyCountTooLarge {
+            declared: strategy_count,
+            limit: MAX_STRATEGY_BLOCKS,
+        });
+    }
+    strategy_count
+        .checked_mul(MWSOL_INDEX_ENTRY_LEN as u64)
+        .filter(|bytes| *bytes <= MAX_STRATEGY_INDEX_BYTES)
+        .ok_or(MwSolError::LengthOverflow)
+}
+
 /// Writes an `.mwsol` file (version 4), encoding each strategy frame as
 /// unsigned U16 or F32 according to `storage`. Signed I16 is rejected; the
 /// in-memory `MultiwaySolution` stays `f32` throughout.
@@ -842,13 +951,52 @@ fn write_mwsol_frames(
     format_version: u16,
     encode_frame: impl Fn(&MultiwayStrategyBlock) -> Result<Vec<u8>, MwSolError>,
 ) -> Result<(), MwSolError> {
+    let strategy_count =
+        u64::try_from(solution.strategies.len()).map_err(|_| MwSolError::LengthOverflow)?;
+    let index_len = checked_strategy_index_len(strategy_count)?;
     solution.validate()?;
 
-    let metadata = MultiwaySolutionMetadata::from_solution(solution);
-    let metadata_raw = if format_version >= 4 {
-        postcard::to_allocvec(&metadata)?
+    let directory = path
+        .parent()
+        .filter(|parent| !parent.as_os_str().is_empty())
+        .unwrap_or_else(|| Path::new("."));
+    let mut temporary = tempfile::NamedTempFile::new_in(directory)?;
+    temporary.write_all(&[0; MWSOL_HEADER_LEN])?;
+
+    let (metadata_uncompressed_len, metadata_compressed_len, metadata_checksum) = if format_version
+        >= 4
+    {
+        let metadata = MultiwaySolutionMetadataRef::from(solution);
+        let uncompressed_len = u64::try_from(postcard::experimental::serialized_size(&metadata)?)
+            .map_err(|_| MwSolError::LengthOverflow)?;
+        if uncompressed_len == 0 || uncompressed_len > MAX_METADATA_UNCOMPRESSED_BYTES {
+            return Err(MwSolError::MetadataTooLarge {
+                declared: uncompressed_len,
+                limit: MAX_METADATA_UNCOMPRESSED_BYTES,
+            });
+        }
+        let counting = CountingHashWriter::new(&mut temporary);
+        let encoder = zstd::stream::write::Encoder::new(counting, 3)?;
+        // Postcard emits many small writes for a metadata table. Buffer them
+        // before crossing into zstd so millions of fields do not each enter
+        // the compressor separately.
+        let buffered = BufWriter::with_capacity(MWSOL_INDEX_CHUNK_BYTES, encoder);
+        let buffered = postcard::to_io(&metadata, buffered)?;
+        let encoder = buffered
+            .into_inner()
+            .map_err(|error| MwSolError::Io(error.into_error()))?;
+        let counting = encoder.finish()?;
+        let (_temporary, compressed_len, checksum) = counting.finish();
+        let compressed_limit = compression_bound(uncompressed_len)?;
+        if compressed_len == 0 || compressed_len > compressed_limit {
+            return Err(MwSolError::MetadataCompressedLengthInvalid {
+                declared: compressed_len,
+                limit: compressed_limit,
+            });
+        }
+        (uncompressed_len, compressed_len, checksum)
     } else {
-        postcard::to_allocvec(&LegacyMultiwaySolutionMetadata {
+        let metadata_raw = postcard::to_allocvec(&LegacyMultiwaySolutionMetadata {
             schema_version: solution.schema_version,
             config_toml: solution.config_toml.clone(),
             abstraction_fingerprint: solution.abstraction_fingerprint,
@@ -856,38 +1004,29 @@ fn write_mwsol_frames(
             approximate_profile: solution.approximate_profile,
             seats: solution.seats.clone(),
             histories: solution.histories.clone(),
-        })?
+        })?;
+        let uncompressed_len =
+            u64::try_from(metadata_raw.len()).map_err(|_| MwSolError::LengthOverflow)?;
+        if uncompressed_len == 0 || uncompressed_len > MAX_METADATA_UNCOMPRESSED_BYTES {
+            return Err(MwSolError::MetadataTooLarge {
+                declared: uncompressed_len,
+                limit: MAX_METADATA_UNCOMPRESSED_BYTES,
+            });
+        }
+        let compressed = zstd::stream::encode_all(metadata_raw.as_slice(), 3)?;
+        let compressed_len =
+            u64::try_from(compressed.len()).map_err(|_| MwSolError::LengthOverflow)?;
+        let compressed_limit = compression_bound(uncompressed_len)?;
+        if compressed_len == 0 || compressed_len > compressed_limit {
+            return Err(MwSolError::MetadataCompressedLengthInvalid {
+                declared: compressed_len,
+                limit: compressed_limit,
+            });
+        }
+        let checksum = *blake3::hash(&compressed).as_bytes();
+        temporary.write_all(&compressed)?;
+        (uncompressed_len, compressed_len, checksum)
     };
-    let metadata_uncompressed_len =
-        u64::try_from(metadata_raw.len()).map_err(|_| MwSolError::LengthOverflow)?;
-    if metadata_uncompressed_len > MAX_METADATA_UNCOMPRESSED_BYTES {
-        return Err(MwSolError::MetadataTooLarge {
-            declared: metadata_uncompressed_len,
-            limit: MAX_METADATA_UNCOMPRESSED_BYTES,
-        });
-    }
-    let metadata_compressed = zstd::stream::encode_all(metadata_raw.as_slice(), 3)?;
-    let metadata_compressed_len =
-        u64::try_from(metadata_compressed.len()).map_err(|_| MwSolError::LengthOverflow)?;
-    let metadata_compressed_limit = compression_bound(metadata_uncompressed_len)?;
-    if metadata_compressed_len == 0 || metadata_compressed_len > metadata_compressed_limit {
-        return Err(MwSolError::MetadataCompressedLengthInvalid {
-            declared: metadata_compressed_len,
-            limit: metadata_compressed_limit,
-        });
-    }
-
-    let strategy_count =
-        u64::try_from(solution.strategies.len()).map_err(|_| MwSolError::LengthOverflow)?;
-    if strategy_count > MAX_STRATEGY_BLOCKS {
-        return Err(MwSolError::StrategyCountTooLarge {
-            declared: strategy_count,
-            limit: MAX_STRATEGY_BLOCKS,
-        });
-    }
-    let index_len = strategy_count
-        .checked_mul(MWSOL_INDEX_ENTRY_LEN as u64)
-        .ok_or(MwSolError::LengthOverflow)?;
     let index_start = (MWSOL_HEADER_LEN as u64)
         .checked_add(metadata_compressed_len)
         .ok_or(MwSolError::LengthOverflow)?;
@@ -895,16 +1034,17 @@ fn write_mwsol_frames(
         .checked_add(index_len)
         .ok_or(MwSolError::LengthOverflow)?;
 
-    let directory = path
-        .parent()
-        .filter(|parent| !parent.as_os_str().is_empty())
-        .unwrap_or_else(|| Path::new("."));
-    let mut temporary = tempfile::NamedTempFile::new_in(directory)?;
     temporary.seek(SeekFrom::Start(frames_start))?;
 
     let mut strategy_payload_len = 0u64;
     let mut total_uncompressed_len = metadata_uncompressed_len;
     let mut index_hasher = blake3::Hasher::new();
+    // Each frame is an independent zstd stream, but reusing the compressor
+    // context avoids allocating and initializing one for every strategy.
+    let mut compressor = zstd::bulk::Compressor::new(3)?;
+    let mut payload_writer = BufWriter::with_capacity(MWSOL_INDEX_CHUNK_BYTES, &mut temporary);
+    let mut index_chunk = Vec::with_capacity(MWSOL_INDEX_CHUNK_BYTES);
+    let mut index_chunk_start = index_start;
     for (index, block) in solution.strategies.iter().enumerate() {
         let raw = encode_frame(block)?;
         let uncompressed_len = u64::try_from(raw.len()).map_err(|_| MwSolError::LengthOverflow)?;
@@ -925,7 +1065,7 @@ fn write_mwsol_frames(
             });
         }
 
-        let compressed = zstd::stream::encode_all(raw.as_slice(), 3)?;
+        let compressed = compressor.compress(raw.as_slice())?;
         let compressed_len =
             u64::try_from(compressed.len()).map_err(|_| MwSolError::LengthOverflow)?;
         let compressed_limit = compression_bound(uncompressed_len)?;
@@ -937,7 +1077,6 @@ fn write_mwsol_frames(
             });
         }
 
-        temporary.write_all(&compressed)?;
         let entry = MwSolStrategyIndexEntry {
             key: block.key,
             offset: strategy_payload_len,
@@ -946,25 +1085,40 @@ fn write_mwsol_frames(
             checksum: *blake3::hash(&compressed).as_bytes(),
         };
         let encoded_entry = encode_index_entry(entry);
+        if encoded_entry.len() > MWSOL_INDEX_CHUNK_BYTES {
+            return Err(MwSolError::LengthOverflow);
+        }
+        if !index_chunk.is_empty()
+            && index_chunk.len() + encoded_entry.len() > MWSOL_INDEX_CHUNK_BYTES
+        {
+            payload_writer.flush()?;
+            drop(payload_writer);
+            temporary.seek(SeekFrom::Start(index_chunk_start))?;
+            temporary.write_all(&index_chunk)?;
+            index_chunk_start = index_chunk_start
+                .checked_add(
+                    u64::try_from(index_chunk.len()).map_err(|_| MwSolError::LengthOverflow)?,
+                )
+                .ok_or(MwSolError::LengthOverflow)?;
+            index_chunk.clear();
+            let payload_end = frames_start
+                .checked_add(strategy_payload_len)
+                .ok_or(MwSolError::LengthOverflow)?;
+            temporary.seek(SeekFrom::Start(payload_end))?;
+            payload_writer = BufWriter::with_capacity(MWSOL_INDEX_CHUNK_BYTES, &mut temporary);
+        }
+        payload_writer.write_all(&compressed)?;
         index_hasher.update(&encoded_entry);
+        index_chunk.extend_from_slice(&encoded_entry);
         strategy_payload_len = strategy_payload_len
             .checked_add(compressed_len)
             .ok_or(MwSolError::LengthOverflow)?;
-
-        let index = u64::try_from(index).map_err(|_| MwSolError::LengthOverflow)?;
-        let index_position = index_start
-            .checked_add(
-                index
-                    .checked_mul(MWSOL_INDEX_ENTRY_LEN as u64)
-                    .ok_or(MwSolError::LengthOverflow)?,
-            )
-            .ok_or(MwSolError::LengthOverflow)?;
-        temporary.seek(SeekFrom::Start(index_position))?;
-        temporary.write_all(&encoded_entry)?;
-        let payload_end = frames_start
-            .checked_add(strategy_payload_len)
-            .ok_or(MwSolError::LengthOverflow)?;
-        temporary.seek(SeekFrom::Start(payload_end))?;
+    }
+    payload_writer.flush()?;
+    drop(payload_writer);
+    if !index_chunk.is_empty() {
+        temporary.seek(SeekFrom::Start(index_chunk_start))?;
+        temporary.write_all(&index_chunk)?;
     }
 
     let header = MwSolHeader {
@@ -975,12 +1129,11 @@ fn write_mwsol_frames(
         metadata_uncompressed_len,
         strategy_count,
         strategy_payload_len,
-        metadata_checksum: *blake3::hash(&metadata_compressed).as_bytes(),
+        metadata_checksum,
         index_checksum: *index_hasher.finalize().as_bytes(),
     };
     temporary.seek(SeekFrom::Start(0))?;
     temporary.write_all(&encode_header(header, format_version))?;
-    temporary.write_all(&metadata_compressed)?;
     temporary.flush()?;
     temporary.as_file().sync_all()?;
     temporary
@@ -1017,18 +1170,9 @@ impl MwSolReader {
                 limit: metadata_compressed_limit,
             });
         }
-        if header.strategy_count > MAX_STRATEGY_BLOCKS {
-            return Err(MwSolError::StrategyCountTooLarge {
-                declared: header.strategy_count,
-                limit: MAX_STRATEGY_BLOCKS,
-            });
-        }
+        let index_len = checked_strategy_index_len(header.strategy_count)?;
         let strategy_count =
             usize::try_from(header.strategy_count).map_err(|_| MwSolError::LengthOverflow)?;
-        let index_len = header
-            .strategy_count
-            .checked_mul(MWSOL_INDEX_ENTRY_LEN as u64)
-            .ok_or(MwSolError::LengthOverflow)?;
         let index_start = (MWSOL_HEADER_LEN as u64)
             .checked_add(header.metadata_compressed_len)
             .ok_or(MwSolError::LengthOverflow)?;
@@ -1612,6 +1756,29 @@ mod tests {
         }
     }
 
+    /// Produces enough small frames to exercise both a completed index chunk
+    /// and a non-full tail chunk without making the test artifact large.
+    fn multi_chunk_solution() -> MultiwaySolution {
+        let mut expected = solution();
+        let count = MWSOL_INDEX_CHUNK_BYTES / MWSOL_INDEX_ENTRY_LEN + 2;
+        let strategies: Vec<_> = (0..count)
+            .map(|index| {
+                let mut block = expected.strategies[0].clone();
+                block.key.bucket_path[0] = 12 + index as u32;
+                block
+            })
+            .collect();
+        expected.strategy_weights = strategies
+            .iter()
+            .map(|block| MultiwayStrategyWeight {
+                key: block.key,
+                weight: 10.0,
+            })
+            .collect();
+        expected.strategies = strategies;
+        expected
+    }
+
     fn index_start(header: MwSolHeader) -> u64 {
         MWSOL_HEADER_LEN as u64 + header.metadata_compressed_len
     }
@@ -1667,6 +1834,123 @@ mod tests {
     }
 
     #[test]
+    fn borrowed_v4_metadata_has_identical_postcard_wire_bytes() {
+        let value = solution();
+        let owned = MultiwaySolutionMetadata::from_solution(&value);
+        let borrowed = MultiwaySolutionMetadataRef::from(&value);
+        assert_eq!(
+            postcard::to_allocvec(&borrowed).unwrap(),
+            postcard::to_allocvec(&owned).unwrap()
+        );
+        assert_eq!(
+            postcard::experimental::serialized_size(&borrowed).unwrap(),
+            postcard::to_allocvec(&owned).unwrap().len()
+        );
+    }
+
+    #[test]
+    fn counting_hash_writer_handles_short_writes_and_io_errors() {
+        struct ShortWriter {
+            bytes: Vec<u8>,
+            max_write: usize,
+            fail_after: Option<usize>,
+        }
+
+        impl Write for ShortWriter {
+            fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+                if self
+                    .fail_after
+                    .is_some_and(|limit| self.bytes.len() >= limit)
+                {
+                    return Err(std::io::Error::other("injected write failure"));
+                }
+                let remaining = self
+                    .fail_after
+                    .map_or(usize::MAX, |limit| limit.saturating_sub(self.bytes.len()));
+                let take = bytes.len().min(self.max_write).min(remaining);
+                self.bytes.extend_from_slice(&bytes[..take]);
+                Ok(take)
+            }
+
+            fn flush(&mut self) -> std::io::Result<()> {
+                Ok(())
+            }
+        }
+
+        let payload = b"metadata-stream-payload";
+        let mut writer = CountingHashWriter::new(ShortWriter {
+            bytes: Vec::new(),
+            max_write: 3,
+            fail_after: None,
+        });
+        writer.write_all(payload).unwrap();
+        let (inner, written, checksum) = writer.finish();
+        assert_eq!(inner.bytes, payload);
+        assert_eq!(written, payload.len() as u64);
+        assert_eq!(checksum, *blake3::hash(payload).as_bytes());
+
+        let mut failing = CountingHashWriter::new(ShortWriter {
+            bytes: Vec::new(),
+            max_write: 3,
+            fail_after: Some(6),
+        });
+        assert!(failing.write_all(payload).is_err());
+    }
+
+    #[test]
+    fn strategy_limit_is_derived_from_two_gibibyte_index_budget() {
+        const RECOVERED_CHECKPOINT_STRATEGIES: u64 = 12_297_431;
+        assert_eq!(
+            checked_strategy_index_len(RECOVERED_CHECKPOINT_STRATEGIES).unwrap(),
+            1_119_066_221
+        );
+        assert_eq!(
+            MAX_STRATEGY_BLOCKS,
+            MAX_STRATEGY_INDEX_BYTES / MWSOL_INDEX_ENTRY_LEN as u64
+        );
+        assert!(matches!(
+            checked_strategy_index_len(MAX_STRATEGY_BLOCKS + 1),
+            Err(MwSolError::StrategyCountTooLarge { declared, limit })
+                if declared == MAX_STRATEGY_BLOCKS + 1 && limit == MAX_STRATEGY_BLOCKS
+        ));
+    }
+
+    #[test]
+    fn oversized_header_count_is_rejected_before_index_access() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("oversized-count.mwsol");
+        write_mwsol_with(&path, &solution(), MwsolStorage::F32).unwrap();
+        let mut header = peek_header(&path).unwrap();
+        header.strategy_count = MAX_STRATEGY_BLOCKS + 1;
+        let mut file = OpenOptions::new().write(true).open(&path).unwrap();
+        file.seek(SeekFrom::Start(0)).unwrap();
+        file.write_all(&encode_header(header, MWSOL_FORMAT_VERSION))
+            .unwrap();
+        file.sync_all().unwrap();
+        drop(file);
+        assert!(matches!(
+            MwSolReader::open(&path),
+            Err(MwSolError::StrategyCountTooLarge { declared, limit })
+                if declared == MAX_STRATEGY_BLOCKS + 1 && limit == MAX_STRATEGY_BLOCKS
+        ));
+    }
+
+    #[test]
+    fn failed_write_preserves_existing_artifact() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("atomic.mwsol");
+        write_mwsol_with(&path, &solution(), MwsolStorage::F32).unwrap();
+        let before = std::fs::read(&path).unwrap();
+        let mut invalid = solution();
+        invalid.strategies[0].probabilities[0] = f32::NAN;
+        assert!(matches!(
+            write_mwsol_with(&path, &invalid, MwsolStorage::F32),
+            Err(MwSolError::InvalidStrategy(_))
+        ));
+        assert_eq!(std::fs::read(&path).unwrap(), before);
+    }
+
+    #[test]
     fn indexed_artifact_round_trips_and_pages_selected_frames() {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().join("profile.mwsol");
@@ -1706,6 +1990,54 @@ mod tests {
         let decoded = decode_via_reader(&path).unwrap();
         assert_eq!(decoded, expected);
         assert!(decoded.strategy(expected.strategies[0].key).is_some());
+    }
+
+    #[test]
+    fn index_chunks_have_bounded_tail_and_f32_u16_decode_same_profiles() {
+        let directory = tempfile::tempdir().unwrap();
+        let f32_path = directory.path().join("f32.mwsol");
+        let u16_path = directory.path().join("u16.mwsol");
+        let expected = multi_chunk_solution();
+        assert!(expected.strategies.len() * MWSOL_INDEX_ENTRY_LEN > MWSOL_INDEX_CHUNK_BYTES);
+
+        write_mwsol_with(&f32_path, &expected, MwsolStorage::F32).unwrap();
+        write_mwsol_with(&u16_path, &expected, MwsolStorage::U16).unwrap();
+
+        let f32_decoded = decode_via_reader(&f32_path).unwrap();
+        let u16_decoded = decode_via_reader(&u16_path).unwrap();
+        assert_eq!(f32_decoded, expected);
+        assert_eq!(u16_decoded.config_toml, expected.config_toml);
+        assert_eq!(u16_decoded.strategy_weights, expected.strategy_weights);
+        assert_eq!(u16_decoded.strategies.len(), expected.strategies.len());
+        for ((f32_block, u16_block), expected_block) in f32_decoded
+            .strategies
+            .iter()
+            .zip(&u16_decoded.strategies)
+            .zip(&expected.strategies)
+        {
+            assert_eq!(f32_block.key, u16_block.key);
+            assert_eq!(f32_block.actions, u16_block.actions);
+            assert_eq!(f32_block.key, expected_block.key);
+            assert!(
+                u16_block
+                    .probabilities
+                    .iter()
+                    .zip(&expected_block.probabilities)
+                    .all(|(got, want)| (got - want).abs() <= 1.0 / f32::from(u16::MAX))
+            );
+        }
+        // Reading the last two entries confirms the non-full tail chunk was
+        // written at the correct index offset after a completed chunk.
+        let mut reader = MwSolReader::open(&u16_path).unwrap();
+        let tail = reader
+            .read_strategy_page(expected.strategies.len() - 2, 2)
+            .unwrap();
+        assert_eq!(tail.strategies.len(), 2);
+        assert_eq!(
+            tail.strategies[0].key,
+            expected.strategies[expected.strategies.len() - 2].key
+        );
+        assert_eq!(tail.next_cursor, None);
     }
 
     #[test]
