@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "reference_kind": "manually_observed_ui_aggregate_frequencies",
+  "observed_date": "2026-09-09",
+  "source": "GTO Wizard visible UI",
+  "solution": {
+    "gametype": "Cash6m50zGeneral",
+    "depth": 100,
+    "format": "NLHE Cash / Classic / 6max",
+    "rake_label": "NL50",
+    "opening_size_label": "GTO",
+    "three_bet_size_label": "GTO",
+    "postflop_sizes": "Multi Size",
+    "selection_visible": "Cash 100bb; 6max NL50; General GTO",
+    "view": "Strategy",
+    "filters": "none"
+  },
+  "method": "Root agent read the rendered Actions aggregate and action menu in the normal browser UI after load; values are displayed rounded percentages and combo-weight diagnostics, not color estimates or hidden state.",
+  "limitations": [
+    "Percentages are rounded; the second node sums to 100.1% as displayed.",
+    "URLs preserve the selected node history and may contain later actions; history_spot identifies the observed node.",
+    "This is a small SB limp boundary check, not a complete range or accuracy certificate."
+  ],
+  "nodes": [
+    {
+      "history": ["UTG fold", "HJ fold", "CO fold", "BTN fold", "SB call 1bb"],
+      "preflop_actions": "F-F-F-F-C",
+      "history_spot": 5,
+      "actor": "BB",
+      "stacks_bb": {"SB": 99.0, "BB": 99.0},
+      "pot_bb": 2.0,
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&preflop_actions=F-F-F-F-C&history_spot=5&soltab=strategy",
+      "actions": [
+        {"action": "allin", "to_bb": 100.0, "percent": 0.0, "combos": 0.0},
+        {"action": "raise", "to_bb": 5.0, "percent": 21.3, "combos": 282.54},
+        {"action": "raise", "to_bb": 3.0, "percent": 16.2, "combos": 214.58},
+        {"action": "check", "percent": 62.5, "combos": 829.42}
+      ]
+    },
+    {
+      "history": ["UTG fold", "HJ fold", "CO fold", "BTN fold", "SB call 1bb", "BB raise to 5bb"],
+      "preflop_actions": "F-F-F-F-C-R5",
+      "history_spot": 6,
+      "actor": "SB",
+      "stacks_bb": {"SB": 99.0, "BB": 95.0},
+      "pot_bb": 6.0,
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&preflop_actions=F-F-F-F-C-R5&history_spot=6&soltab=strategy",
+      "actions": [
+        {"action": "allin", "to_bb": 100.0, "percent": 0.0, "combos": 0.0},
+        {"action": "raise", "to_bb": 18.0, "percent": 9.1, "combos": 13.34},
+        {"action": "call", "percent": 25.7, "combos": 37.73},
+        {"action": "fold", "percent": 65.3, "combos": 95.90}
+      ]
+    },
+    {
+      "history": ["UTG fold", "HJ fold", "CO fold", "BTN fold", "SB call 1bb", "BB raise to 3bb"],
+      "preflop_actions": "F-F-F-F-C-R3",
+      "history_spot": 6,
+      "actor": "SB",
+      "stacks_bb": {"SB": 99.0, "BB": 97.0},
+      "pot_bb": 4.0,
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&preflop_actions=F-F-F-F-C-R3&history_spot=6&soltab=strategy",
+      "actions": [
+        {"action": "allin", "to_bb": 100.0, "percent": 0.0, "combos": 0.0},
+        {"action": "raise", "to_bb": 14.0, "percent": 11.0, "combos": 16.18},
+        {"action": "call", "percent": 43.9, "combos": 64.53},
+        {"action": "fold", "percent": 45.1, "combos": 66.19}
+      ]
+    }
+  ],
+  "fixture_implication": "The visible BB limp response includes raise-to-3bb, raise-to-5bb, and check. A scoped research fixture would need distinct SB responses to BB 3bb versus 5bb. The existing predicate DSL exposes aggressions, last aggressor position, pot/Spr, and participant flags, but no last aggressive size/to-call variable; adding a precise size predicate would be a contract change. No fixture was created without root review."
+}

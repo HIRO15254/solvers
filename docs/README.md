@@ -16,8 +16,8 @@
 
 ## 補助資料
 
-- [`validation/`](validation/) — 実測fixture、再現手順、検証結果。仕様ではなく証拠。
-- [`research/`](research/) — 採否判断に使った研究設計・サーベイ。Production契約ではない。
+- [`validation/`](validation/README.md) — 実測fixture、再現手順、検証結果。仕様ではなく証拠。
+- [`research/`](research/README.md) — 採否判断に使った研究設計・サーベイ。Production契約ではない。
 
 正本文書と補助資料が矛盾する場合は、その family の規範仕様
 (`multiway-preflop-v1.jp.md` または `solver-config-v1.jp.md`)、

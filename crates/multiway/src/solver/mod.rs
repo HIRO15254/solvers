@@ -24,6 +24,7 @@ use crate::types::{MAX_SEATS, MIN_SEATS, Street};
 pub use crate::tree::DenseNodeContext;
 
 mod averaging;
+mod drift;
 mod errors;
 mod eval;
 mod support;
@@ -32,9 +33,11 @@ mod workers;
 #[cfg(test)]
 mod tests;
 
+pub use drift::{StrategyDriftError, StrategyDriftTracker};
 pub use errors::SolverError;
 
 use averaging::*;
+use drift::StrategyDriftIdentity;
 use support::*;
 use workers::*;
 
@@ -56,6 +59,74 @@ pub const DEFAULT_PRUNE_SKIP_PROBABILITY: f64 = 0.95;
 pub const MIN_DEVIATOR_POLICY_VISITS: u32 = 8;
 const ENTRY_OVERHEAD_BYTES: u64 = 64;
 const HISTORY_OVERHEAD_BYTES: u64 = 48;
+
+fn finalize_drift(totals: Vec<f64>, counts: Vec<u64>) -> Vec<f64> {
+    totals
+        .into_iter()
+        .zip(counts)
+        .map(|(total, count)| {
+            if count == 0 {
+                0.0
+            } else {
+                total / count as f64
+            }
+        })
+        .collect()
+}
+
+fn refresh_dense_drift_in_place(
+    dense: &DenseStorage,
+    tracker: &mut StrategyDriftTracker,
+    num_players: usize,
+) -> Result<Vec<f64>, StrategyDriftError> {
+    let mut totals = vec![0.0; num_players];
+    let mut counts = vec![0u64; num_players];
+    let mut index = 0usize;
+    let mut offset = 0usize;
+    let mut failure = None;
+    for_each_touched_column(dense, |column, _key, node, range| {
+        if failure.is_some() {
+            return;
+        }
+        if tracker.dense_columns.get(index).copied() != Some(column) {
+            failure = Some(StrategyDriftError::IncompatibleLayout);
+            return;
+        }
+        let action_count = tracker.dense_action_counts[index] as usize;
+        let Some(end) = offset.checked_add(action_count) else {
+            failure = Some(StrategyDriftError::CorruptTracker);
+            return;
+        };
+        let Some(previous) = tracker.dense_probabilities.get_mut(offset..end) else {
+            failure = Some(StrategyDriftError::CorruptTracker);
+            return;
+        };
+        let current = normalize_nonnegative_f32(&dense.arena.strategy_sum[range.clone()])
+            .unwrap_or_else(|| regret_matching_f32(&dense.arena.regrets[range]));
+        if previous.len() != current.len() {
+            failure = Some(StrategyDriftError::IncompatibleLayout);
+            return;
+        }
+        let value = current
+            .iter()
+            .zip(previous.iter())
+            .map(|(&left, &right)| f64::from((left - right).abs()))
+            .sum::<f64>()
+            * 0.5;
+        previous.copy_from_slice(&current);
+        totals[node.actor as usize] += value;
+        counts[node.actor as usize] += 1;
+        index += 1;
+        offset = end;
+    });
+    if let Some(error) = failure {
+        return Err(error);
+    }
+    if index != tracker.dense_columns.len() || offset != tracker.dense_probabilities.len() {
+        return Err(StrategyDriftError::CorruptTracker);
+    }
+    Ok(finalize_drift(totals, counts))
+}
 
 /// Adapter contract between a poker state machine and the generic sampled
 /// solver.  Chance is sampled once, up front, in [`SampledWorld`]; therefore
@@ -569,7 +640,7 @@ pub struct SolverState {
     pub policies: Vec<PolicyEntry>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct SolverMetrics {
     pub sweeps: u64,
     pub traversals: u64,
@@ -901,6 +972,77 @@ pub struct ProfileVariant {
     /// of independently normalized per-seat average-policy columns exposed
     /// here.
     pub use_current_strategy: bool,
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum AverageSamplingResearchVariant {
+    UniformOne,
+    EnumerateFirstOpponent,
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct AverageSamplingResearchConfig {
+    pub variant: AverageSamplingResearchVariant,
+    pub sweeps: u64,
+    pub threads: usize,
+    pub histories: Vec<HistoryKey>,
+    /// Zero disables evaluation. Positive values must be at least two.
+    pub evaluation_samples: u64,
+    pub evaluation_seeds: Vec<u64>,
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum AverageSamplingResearchRowStatus {
+    AverageObserved,
+    ZeroAverageMassOmitted,
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct AverageSamplingResearchStrategyRow {
+    pub key: InfoKey,
+    pub status: AverageSamplingResearchRowStatus,
+    /// Present only when the independent average pass accumulated positive
+    /// finite mass. A touched zero-mass column's current-regret fallback is
+    /// deliberately omitted from this average-sampling result.
+    pub actions: Option<Vec<ActionProbability>>,
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct AverageSamplingResearchHistory {
+    pub history: HistoryKey,
+    pub strategies: Vec<AverageSamplingResearchStrategyRow>,
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct AverageSamplingResearchEvaluation {
+    pub seed: u64,
+    pub result: ProfileEvaluation,
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[derive(Clone, Debug, PartialEq, Serialize)]
+pub struct AverageSamplingResearchResult {
+    pub variant: AverageSamplingResearchVariant,
+    pub threads: usize,
+    pub metrics: SolverMetrics,
+    /// BLAKE3 over state version, game/config/abstraction identity, progress
+    /// counters, and the exact raw regret arena (dense) or every canonical
+    /// nonzero key/labels/regret column (sparse). Average-only events cannot
+    /// affect it. A runner must additionally match its immutable source and
+    /// executable hashes before treating two values as an A/B invariant.
+    pub current_regret_fingerprint: String,
+    /// Normalized strategies only. Raw mass differs by proposal and is
+    /// deliberately unavailable from this consuming API.
+    pub histories: Vec<AverageSamplingResearchHistory>,
+    pub evaluations: Vec<AverageSamplingResearchEvaluation>,
 }
 
 /// Sparse external-sampling MCCFR state.  A policy column exists only after
@@ -1387,8 +1529,29 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         &mut self,
         sweeps: u64,
         threads: usize,
+        should_continue: F,
+        after_batch: O,
+    ) -> Result<u64, SolverError>
+    where
+        F: FnMut() -> bool,
+        O: FnMut(&Self),
+    {
+        self.run_sweeps_with_threads_until_observed_sampling(
+            sweeps,
+            threads,
+            should_continue,
+            after_batch,
+            AverageOpponentSampling::UniformOne,
+        )
+    }
+
+    fn run_sweeps_with_threads_until_observed_sampling<F, O>(
+        &mut self,
+        sweeps: u64,
+        threads: usize,
         mut should_continue: F,
         mut after_batch: O,
+        average_sampling: AverageOpponentSampling,
     ) -> Result<u64, SolverError>
     where
         F: FnMut() -> bool,
@@ -1441,7 +1604,12 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                             .and_then(|value| value.checked_add(1))
                             .ok_or(SolverError::CounterOverflow)?
                             as f64;
-                        self.generate_traversal_delta(sample_id, traverser, linear_weight)
+                        self.generate_traversal_delta_with_average_sampling(
+                            sample_id,
+                            traverser,
+                            linear_weight,
+                            average_sampling,
+                        )
                     })
                     .collect::<Vec<_>>()
             });
@@ -1476,11 +1644,27 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// `self.completed_sweeps` here, so every traversal in a batch can use
     /// its own sweep's weight even though they all read the same policy
     /// snapshot.
+    #[cfg(test)]
     fn generate_traversal_delta(
         &self,
         sample_id: u64,
         traverser: usize,
         linear_weight: f64,
+    ) -> Result<AnyTraversalDelta, SolverError> {
+        self.generate_traversal_delta_with_average_sampling(
+            sample_id,
+            traverser,
+            linear_weight,
+            AverageOpponentSampling::UniformOne,
+        )
+    }
+
+    fn generate_traversal_delta_with_average_sampling(
+        &self,
+        sample_id: u64,
+        traverser: usize,
+        linear_weight: f64,
+        average_sampling: AverageOpponentSampling,
     ) -> Result<AnyTraversalDelta, SolverError> {
         let mut deal_rng = traversal_deal_rng(self.config.seed, sample_id, traverser);
         let sample = self.sampler.sample_counted(&mut deal_rng)?;
@@ -1550,7 +1734,11 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     holes[traverser] = combo;
                     let combo_world = SampledWorld::new(holes, *sample.world.runout())?;
                     let mut combo_rng = average_base_rng.clone();
-                    let mut average = SparseAverageStrategyWorker::new(self, linear_weight);
+                    let mut average = SparseAverageStrategyWorker::with_sampling(
+                        self,
+                        linear_weight,
+                        average_sampling,
+                    );
                     average.traverse(
                         self.game.root_state(),
                         &combo_world,
@@ -1577,7 +1765,11 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     0,
                 )?;
                 let mut delta = worker.finish(sample_id, traverser, u64::from(sample.attempts));
-                let mut average = SparseAverageStrategyWorker::new(self, linear_weight);
+                let mut average = SparseAverageStrategyWorker::with_sampling(
+                    self,
+                    linear_weight,
+                    average_sampling,
+                );
                 average.traverse(
                     self.game.root_state(),
                     &sample.world,
@@ -1624,11 +1816,12 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                         Ok(worker.finish(sample_id, traverser, u64::from(sample.attempts)))
                     },
                     || -> Result<Vec<DenseEvent>, SolverError> {
-                        let mut average = DenseAverageStrategyWorker::new(
+                        let mut average = DenseAverageStrategyWorker::with_sampling(
                             &self.game,
                             dense,
                             self.config,
                             linear_weight,
+                            average_sampling,
                         );
                         average.traverse_vector(
                             self.game.root_state(),
@@ -1644,7 +1837,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                         Ok(average.finish())
                     },
                 );
-                // Preserve serial error priority and event ordering.
+                // Preserve the serial contract: regret errors win when both
+                // branches fail, and regret events precede average events.
                 let mut delta = regret_result?;
                 delta.events.extend(average_result?);
                 Ok(AnyTraversalDelta::Dense(delta))
@@ -1663,8 +1857,13 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     0,
                 )?;
                 let mut delta = worker.finish(sample_id, traverser, u64::from(sample.attempts));
-                let mut average =
-                    DenseAverageStrategyWorker::new(&self.game, dense, self.config, linear_weight);
+                let mut average = DenseAverageStrategyWorker::with_sampling(
+                    &self.game,
+                    dense,
+                    self.config,
+                    linear_weight,
+                    average_sampling,
+                );
                 average.traverse_scalar(
                     self.game.root_state(),
                     0,
@@ -1678,6 +1877,186 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 Ok(AnyTraversalDelta::Dense(delta))
             }
         }
+    }
+
+    /// Runs a fresh solver under one average-policy sampling proposal and
+    /// consumes it, returning only normalized/read-only research output.
+    ///
+    /// This feature-gated API intentionally cannot return a solver or a
+    /// serializable [`SolverState`]. The experimental raw `strategy_sum`
+    /// scaling therefore cannot be written into an ordinary checkpoint or
+    /// solution under the production algorithm identity.
+    #[cfg(feature = "research-average-sampling")]
+    pub fn run_average_sampling_research(
+        mut self,
+        config: AverageSamplingResearchConfig,
+    ) -> Result<AverageSamplingResearchResult, SolverError> {
+        if self.completed_sweeps != 0 || self.traversals != 0 || self.next_sample_id != 0 {
+            return Err(SolverError::InvalidState(
+                "average-sampling research requires a fresh solver",
+            ));
+        }
+        if config.sweeps == 0 {
+            return Err(SolverError::InvalidState(
+                "average-sampling research requires at least one sweep",
+            ));
+        }
+        match (
+            config.evaluation_samples,
+            config.evaluation_seeds.is_empty(),
+        ) {
+            (0, true) => {}
+            (0, false) => {
+                return Err(SolverError::InvalidState(
+                    "evaluation seeds require at least two evaluation samples",
+                ));
+            }
+            (1, _) => {
+                return Err(SolverError::InvalidState(
+                    "average-sampling research evaluation requires at least two samples",
+                ));
+            }
+            (_, true) => {
+                return Err(SolverError::InvalidState(
+                    "evaluation samples require at least one evaluation seed",
+                ));
+            }
+            (_, false) => {}
+        }
+        let internal_variant = match config.variant {
+            AverageSamplingResearchVariant::UniformOne => AverageOpponentSampling::UniformOne,
+            AverageSamplingResearchVariant::EnumerateFirstOpponent => {
+                AverageOpponentSampling::EnumerateFirst
+            }
+        };
+        self.run_sweeps_with_threads_until_observed_sampling(
+            config.sweeps,
+            config.threads,
+            || true,
+            |_| {},
+            internal_variant,
+        )?;
+
+        let histories = config
+            .histories
+            .iter()
+            .copied()
+            .map(|history| {
+                let strategies = self
+                    .strategies_at_with_mass(history)
+                    .into_iter()
+                    .map(|(key, labels, probabilities, mass)| {
+                        if !mass.is_finite() || mass < 0.0 {
+                            return Err(SolverError::NumericOverflow);
+                        }
+                        let (status, actions) = if mass > 0.0 {
+                            (
+                                AverageSamplingResearchRowStatus::AverageObserved,
+                                Some(
+                                    labels
+                                        .into_iter()
+                                        .zip(probabilities)
+                                        .map(|(action, probability)| ActionProbability {
+                                            action,
+                                            probability,
+                                        })
+                                        .collect(),
+                                ),
+                            )
+                        } else {
+                            (
+                                AverageSamplingResearchRowStatus::ZeroAverageMassOmitted,
+                                None,
+                            )
+                        };
+                        Ok(AverageSamplingResearchStrategyRow {
+                            key,
+                            status,
+                            actions,
+                        })
+                    })
+                    .collect::<Result<Vec<_>, SolverError>>()?;
+                Ok(AverageSamplingResearchHistory {
+                    history,
+                    strategies,
+                })
+            })
+            .collect::<Result<Vec<_>, SolverError>>()?;
+        let mut evaluations = Vec::with_capacity(config.evaluation_seeds.len());
+        for seed in config.evaluation_seeds {
+            evaluations.push(AverageSamplingResearchEvaluation {
+                seed,
+                result: self.evaluate_profile_with_threads(
+                    config.evaluation_samples,
+                    seed,
+                    None,
+                    ProfileVariant::default(),
+                    config.threads,
+                )?,
+            });
+        }
+        Ok(AverageSamplingResearchResult {
+            variant: config.variant,
+            threads: config.threads,
+            metrics: self.metrics(),
+            current_regret_fingerprint: self.research_regret_fingerprint(),
+            histories,
+            evaluations,
+        })
+    }
+
+    #[cfg(feature = "research-average-sampling")]
+    fn research_regret_fingerprint(&self) -> String {
+        let mut hasher = blake3::Hasher::new();
+        hasher.update(b"solvers.multiway.research-regrets.v2");
+        hasher.update(&SOLVER_STATE_VERSION.to_le_bytes());
+        hasher.update(&self.configuration_fingerprint());
+        hasher.update(&self.abstraction_fingerprint());
+        for counter in [
+            self.completed_sweeps,
+            self.traversals,
+            self.next_sample_id,
+            self.total_deal_attempts,
+            self.terminal_evaluations,
+            self.hand_updates,
+        ] {
+            hasher.update(&counter.to_le_bytes());
+        }
+        match &self.dense {
+            Some(dense) => {
+                hasher.update(b"dense");
+                hasher.update(&(dense.arena.regrets.len() as u64).to_le_bytes());
+                for &regret in &dense.arena.regrets {
+                    hasher.update(&regret.to_bits().to_le_bytes());
+                }
+            }
+            None => {
+                hasher.update(b"sparse");
+                let mut entries = self
+                    .policies
+                    .iter()
+                    .filter(|(_, column)| column.regrets.iter().any(|&regret| regret != 0.0))
+                    .collect::<Vec<_>>();
+                entries.sort_unstable_by_key(|(key, _)| **key);
+                for (key, column) in entries {
+                    hasher.update(&key.history.0);
+                    hasher.update(&[key.player, key.street, key.active_opponents]);
+                    for bucket in key.bucket_path {
+                        hasher.update(&bucket.to_le_bytes());
+                    }
+                    hasher.update(&(column.action_labels.len() as u64).to_le_bytes());
+                    for label in &column.action_labels {
+                        hasher.update(&(label.len() as u64).to_le_bytes());
+                        hasher.update(label.as_bytes());
+                    }
+                    hasher.update(&(column.regrets.len() as u64).to_le_bytes());
+                    for &regret in &column.regrets {
+                        hasher.update(&regret.to_bits().to_le_bytes());
+                    }
+                }
+            }
+        }
+        hasher.finalize().to_hex().to_string()
     }
 
     /// Replays a complete sweep into scratch columns first. This makes the
@@ -2415,7 +2794,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 }
             }
             Some(dense) => {
-                for_each_touched_column(dense, |key, node, range| {
+                for_each_touched_column(dense, |_column, key, node, range| {
                     let current =
                         normalize_nonnegative_f32(&dense.arena.strategy_sum[range.clone()])
                             .unwrap_or_else(|| regret_matching_f32(&dense.arena.regrets[range]));
@@ -2446,6 +2825,137 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             .collect()
     }
 
+    /// Memory-compact equivalent of [`Self::strategy_drift_refresh`].
+    ///
+    /// Dense current-street storage uses arena column ids instead of full
+    /// [`InfoKey`] values and packs all previous normalized probabilities in
+    /// one allocation. Columns and their f32 probabilities are still visited
+    /// in the legacy method's node-major order, preserving its subtraction
+    /// and f64 reduction order exactly. A tracker binds to its first solver's
+    /// complete layout identity; callers must [`StrategyDriftTracker::reset`]
+    /// before intentionally reusing it with an incompatible solver.
+    pub fn strategy_drift_refresh_compact(
+        &self,
+        tracker: &mut StrategyDriftTracker,
+    ) -> Result<Vec<f64>, StrategyDriftError> {
+        let num_players = self.game.num_players();
+        let (is_dense, total_columns, total_slots) =
+            self.dense.as_ref().map_or((false, 0, 0), |dense| {
+                (true, dense.arena.total_columns(), dense.arena.total_slots())
+            });
+        let identity = StrategyDriftIdentity {
+            dense: is_dense,
+            players: num_players as u8,
+            total_columns,
+            total_slots,
+            configuration: self.configuration_fingerprint(),
+            abstraction: self.abstraction_fingerprint(),
+        };
+        match tracker.identity {
+            None => tracker.identity = Some(identity),
+            Some(bound) if bound == identity => {}
+            Some(_) => return Err(StrategyDriftError::IncompatibleLayout),
+        }
+
+        let Some(dense) = &self.dense else {
+            return Ok(self.strategy_drift_refresh(&mut tracker.sparse_prior));
+        };
+        let stored_slots = tracker
+            .dense_action_counts
+            .iter()
+            .try_fold(0usize, |sum, &count| sum.checked_add(count as usize));
+        if tracker.dense_columns.len() != tracker.dense_action_counts.len()
+            || stored_slots != Some(tracker.dense_probabilities.len())
+        {
+            return Err(StrategyDriftError::CorruptTracker);
+        }
+
+        let current_count = dense.arena.touched_count() as usize;
+        if current_count < tracker.dense_columns.len() {
+            return Err(StrategyDriftError::IncompatibleLayout);
+        }
+        if current_count == tracker.dense_columns.len() {
+            return refresh_dense_drift_in_place(dense, tracker, num_players);
+        }
+
+        let old_columns = std::mem::take(&mut tracker.dense_columns);
+        let old_action_counts = std::mem::take(&mut tracker.dense_action_counts);
+        let old_probabilities = std::mem::take(&mut tracker.dense_probabilities);
+        let mut new_columns = Vec::with_capacity(current_count);
+        let mut new_action_counts = Vec::with_capacity(current_count);
+        let mut new_probabilities = Vec::with_capacity(old_probabilities.len());
+        let mut totals = vec![0.0; num_players];
+        let mut counts = vec![0u64; num_players];
+        let mut old_index = 0usize;
+        let mut old_offset = 0usize;
+        let mut failure = None;
+
+        for_each_touched_column(dense, |column, _key, node, range| {
+            if failure.is_some() {
+                return;
+            }
+            let current = normalize_nonnegative_f32(&dense.arena.strategy_sum[range.clone()])
+                .unwrap_or_else(|| regret_matching_f32(&dense.arena.regrets[range]));
+            let value = if old_index < old_columns.len() {
+                if column < old_columns[old_index] {
+                    0.0
+                } else if column == old_columns[old_index] {
+                    let action_count = old_action_counts[old_index] as usize;
+                    let Some(end) = old_offset.checked_add(action_count) else {
+                        failure = Some(StrategyDriftError::CorruptTracker);
+                        return;
+                    };
+                    let Some(previous) = old_probabilities.get(old_offset..end) else {
+                        failure = Some(StrategyDriftError::CorruptTracker);
+                        return;
+                    };
+                    if previous.len() != current.len() {
+                        failure = Some(StrategyDriftError::IncompatibleLayout);
+                        return;
+                    }
+                    old_index += 1;
+                    old_offset = end;
+                    current
+                        .iter()
+                        .zip(previous)
+                        .map(|(&left, &right)| f64::from((left - right).abs()))
+                        .sum::<f64>()
+                        * 0.5
+                } else {
+                    failure = Some(StrategyDriftError::IncompatibleLayout);
+                    return;
+                }
+            } else {
+                0.0
+            };
+            let Ok(action_count) = u32::try_from(current.len()) else {
+                failure = Some(StrategyDriftError::IncompatibleLayout);
+                return;
+            };
+            totals[node.actor as usize] += value;
+            counts[node.actor as usize] += 1;
+            new_columns.push(column);
+            new_action_counts.push(action_count);
+            new_probabilities.extend_from_slice(&current);
+        });
+        if failure.is_none()
+            && (old_index != old_columns.len() || old_offset != old_probabilities.len())
+        {
+            failure = Some(StrategyDriftError::IncompatibleLayout);
+        }
+        if let Some(error) = failure {
+            tracker.dense_columns = old_columns;
+            tracker.dense_action_counts = old_action_counts;
+            tracker.dense_probabilities = old_probabilities;
+            return Err(error);
+        }
+        tracker.dense_columns = new_columns;
+        tracker.dense_action_counts = new_action_counts;
+        tracker.dense_probabilities = new_probabilities;
+
+        Ok(finalize_drift(totals, counts))
+    }
+
     pub fn metrics(&self) -> SolverMetrics {
         let num_players = self.game.num_players();
         let mut positive_regret = vec![0.0; num_players];
@@ -2464,7 +2974,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 (self.policies.len() as u64, self.approx_memory_bytes)
             }
             Some(dense) => {
-                for_each_touched_column(dense, |_, node, range| {
+                for_each_touched_column(dense, |_column, _, node, range| {
                     positive_regret[node.actor as usize] += dense.arena.regrets[range]
                         .iter()
                         .map(|&regret| f64::from(regret.max(0.0)))

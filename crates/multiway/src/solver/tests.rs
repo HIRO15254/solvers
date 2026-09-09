@@ -1442,6 +1442,26 @@ fn observed_sweep_batches_report_committed_state_without_changing_results() {
 }
 
 #[test]
+fn stopping_and_restarting_on_a_full_batch_boundary_preserves_state() {
+    let mut interrupted = solver_with_batch(99, 1 << 20, 4);
+    let mut polls = 0;
+    let completed = interrupted
+        .run_sweeps_with_threads_until(24, 4, || {
+            polls += 1;
+            polls <= 2
+        })
+        .unwrap();
+    assert_eq!(completed, 8);
+    interrupted.run_sweeps_with_threads(16, 4).unwrap();
+
+    let mut uninterrupted = solver_with_batch(99, 1 << 20, 4);
+    uninterrupted.run_sweeps_with_threads(24, 4).unwrap();
+
+    assert_eq!(interrupted.snapshot_state(), uninterrupted.snapshot_state());
+    assert_eq!(interrupted.metrics(), uninterrupted.metrics());
+}
+
+#[test]
 fn sweep_batching_reduces_regret_comparably_to_unbatched() {
     const SWEEPS: u64 = 400;
 
@@ -3011,6 +3031,233 @@ fn independent_average_pass_tracks_temporal_own_strategy_and_samples_zero_oppone
 }
 
 #[test]
+fn enumerate_first_opponent_stratifies_one_layer_and_samples_the_next() {
+    let solver = MultiwaySolver::new(
+        AveragePathGame,
+        DealSampler::new(vec![Range::full(), Range::full(), Range::full()]).unwrap(),
+        SolverConfig {
+            seed: 19,
+            max_memory_bytes: 1 << 20,
+            max_traversal_depth: 16,
+            ..SolverConfig::default()
+        },
+    )
+    .unwrap();
+    let board = ["2c", "3d", "4h", "5s", "6c"].map(|card| card.parse().unwrap());
+    let world = SampledWorld::new(
+        vec![
+            cards::combo_index("As".parse().unwrap(), "Ah".parse().unwrap()),
+            cards::combo_index("Ks".parse().unwrap(), "Kh".parse().unwrap()),
+            cards::combo_index("Qs".parse().unwrap(), "Qh".parse().unwrap()),
+        ],
+        board,
+    )
+    .unwrap();
+    let strategy_events = |mode| {
+        let mut worker = SparseAverageStrategyWorker::with_sampling(&solver, 1.0, mode);
+        let mut rng = ChaCha20Rng::seed_from_u64(808);
+        worker
+            .traverse(
+                solver.game.root_state(),
+                &world,
+                0,
+                HistoryKey::ROOT,
+                1.0,
+                &mut rng,
+                0,
+            )
+            .unwrap();
+        let events = worker
+            .finish()
+            .into_iter()
+            .filter_map(|event| match event {
+                TraversalEvent::AddStrategy { key, values } => Some((key, values)),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        (events, rng.next_u64())
+    };
+
+    let (uniform, uniform_next_rng) = strategy_events(AverageOpponentSampling::UniformOne);
+    let (enumerated, enumerated_next_rng) =
+        strategy_events(AverageOpponentSampling::EnumerateFirst);
+    assert_eq!(
+        uniform_next_rng, enumerated_next_rng,
+        "enumeration must leave later averager siblings on the baseline RNG stream"
+    );
+    assert_eq!(uniform.len(), 1);
+    assert_eq!(enumerated.len(), 2);
+    assert!(enumerated.contains(&uniform[0]));
+    assert!(enumerated.iter().all(|(_, values)| values == &[0.5, 0.5]));
+
+    let first_prefixes = enumerated
+        .iter()
+        .map(|(key, _)| {
+            if (0..2).any(|first| {
+                (0..2)
+                    .any(|second| key.history == HistoryKey::ROOT.child(1, first).child(2, second))
+            }) {
+                (0..2)
+                    .find(|&first| {
+                        (0..2).any(|second| {
+                            key.history == HistoryKey::ROOT.child(1, first).child(2, second)
+                        })
+                    })
+                    .unwrap()
+            } else {
+                panic!("unexpected averaged history: {:?}", key.history)
+            }
+        })
+        .collect::<std::collections::BTreeSet<_>>();
+    assert_eq!(first_prefixes, [0, 1].into_iter().collect());
+}
+
+#[test]
+fn enumerate_first_dense_vector_keeps_regrets_exact_and_is_thread_deterministic() {
+    let run = |threads| {
+        let mut solver = dense_vector_toy_solver(919, 2);
+        solver
+            .run_sweeps_with_threads_until_observed_sampling(
+                20,
+                threads,
+                || true,
+                |_| {},
+                AverageOpponentSampling::EnumerateFirst,
+            )
+            .unwrap();
+        solver
+    };
+    let one = run(1);
+    let four = run(4);
+    let repeated = run(4);
+    assert_eq!(one.snapshot_state(), four.snapshot_state());
+    assert_eq!(four.snapshot_state(), repeated.snapshot_state());
+
+    let mut uniform = dense_vector_toy_solver(919, 2);
+    uniform.run_sweeps_with_threads(20, 4).unwrap();
+    assert_eq!(
+        uniform.dense.as_ref().unwrap().arena.regrets,
+        four.dense.as_ref().unwrap().arena.regrets
+    );
+    assert_eq!(uniform.total_deal_attempts, four.total_deal_attempts);
+    assert_eq!(uniform.terminal_evaluations, four.terminal_evaluations);
+    assert_eq!(uniform.hand_updates, four.hand_updates);
+    assert_ne!(
+        uniform.dense.as_ref().unwrap().arena.strategy_sum,
+        four.dense.as_ref().unwrap().arena.strategy_sum
+    );
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[test]
+fn consuming_average_sampling_research_api_is_repeatable_and_regret_identical() {
+    let run = |variant, threads| {
+        dense_vector_toy_solver(920, 2)
+            .run_average_sampling_research(AverageSamplingResearchConfig {
+                variant,
+                sweeps: 20,
+                threads,
+                histories: vec![HistoryKey::ROOT, HistoryKey::ROOT.child(0, 0)],
+                evaluation_samples: 32,
+                evaluation_seeds: vec![9090],
+            })
+            .unwrap()
+    };
+    let uniform = run(AverageSamplingResearchVariant::UniformOne, 4);
+    let enumerated_one = run(AverageSamplingResearchVariant::EnumerateFirstOpponent, 1);
+    let enumerated_four = run(AverageSamplingResearchVariant::EnumerateFirstOpponent, 4);
+    let repeated = run(AverageSamplingResearchVariant::EnumerateFirstOpponent, 4);
+
+    assert_eq!(enumerated_one.threads, 1);
+    assert_eq!(enumerated_four.threads, 4);
+    assert_eq!(enumerated_one.metrics, enumerated_four.metrics);
+    assert_eq!(
+        enumerated_one.current_regret_fingerprint,
+        enumerated_four.current_regret_fingerprint
+    );
+    assert_eq!(enumerated_one.histories, enumerated_four.histories);
+    assert_eq!(enumerated_one.evaluations, enumerated_four.evaluations);
+    assert_eq!(enumerated_four, repeated);
+    assert_eq!(
+        uniform.current_regret_fingerprint,
+        enumerated_four.current_regret_fingerprint
+    );
+    assert_eq!(uniform.histories.len(), 2);
+    assert_eq!(enumerated_four.histories.len(), 2);
+    assert_eq!(
+        uniform.metrics.total_deal_attempts,
+        enumerated_four.metrics.total_deal_attempts
+    );
+    assert_eq!(
+        uniform.metrics.hand_updates,
+        enumerated_four.metrics.hand_updates
+    );
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[test]
+fn consuming_average_sampling_research_api_rejects_nonfresh_solver() {
+    let mut solver = dense_vector_toy_solver(921, 1);
+    solver.run_sweeps(1).unwrap();
+    assert!(matches!(
+        solver.run_average_sampling_research(AverageSamplingResearchConfig {
+            variant: AverageSamplingResearchVariant::EnumerateFirstOpponent,
+            sweeps: 1,
+            threads: 1,
+            histories: vec![HistoryKey::ROOT],
+            evaluation_samples: 0,
+            evaluation_seeds: Vec::new(),
+        }),
+        Err(SolverError::InvalidState(
+            "average-sampling research requires a fresh solver"
+        ))
+    ));
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[test]
+fn consuming_average_sampling_research_api_omits_zero_mass_fallbacks() {
+    let solver = MultiwaySolver::new(
+        AveragePathGame,
+        DealSampler::new(vec![Range::full(), Range::full(), Range::full()]).unwrap(),
+        SolverConfig {
+            seed: 922,
+            max_memory_bytes: 1 << 20,
+            max_traversal_depth: 16,
+            ..SolverConfig::default()
+        },
+    )
+    .unwrap();
+    let histories = (0..2)
+        .flat_map(|first| {
+            (0..2).map(move |second| HistoryKey::ROOT.child(1, first).child(2, second))
+        })
+        .collect();
+    let result = solver
+        .run_average_sampling_research(AverageSamplingResearchConfig {
+            variant: AverageSamplingResearchVariant::UniformOne,
+            sweeps: 1,
+            threads: 2,
+            histories,
+            evaluation_samples: 0,
+            evaluation_seeds: Vec::new(),
+        })
+        .unwrap();
+    let rows = result
+        .histories
+        .iter()
+        .flat_map(|history| &history.strategies)
+        .collect::<Vec<_>>();
+    assert!(rows.iter().any(|row| {
+        row.status == AverageSamplingResearchRowStatus::AverageObserved && row.actions.is_some()
+    }));
+    assert!(rows.iter().any(|row| {
+        row.status == AverageSamplingResearchRowStatus::ZeroAverageMassOmitted
+            && row.actions.is_none()
+    }));
+}
+
+#[test]
 fn vector_traverser_is_deterministic_across_thread_counts_and_reruns() {
     let mut single_threaded = dense_vector_toy_solver(4104, 1);
     single_threaded.run_sweeps_with_threads(20, 1).unwrap();
@@ -3027,6 +3274,57 @@ fn vector_traverser_is_deterministic_across_thread_counts_and_reruns() {
     let mut rerun = dense_vector_toy_solver(4104, 1);
     rerun.run_sweeps_with_threads(20, 4).unwrap();
     assert_eq!(single_threaded.snapshot_state(), rerun.snapshot_state());
+
+    assert_eq!(
+        single_threaded.configuration_fingerprint(),
+        multi_threaded.configuration_fingerprint()
+    );
+    assert_eq!(
+        single_threaded.abstraction_fingerprint(),
+        multi_threaded.abstraction_fingerprint()
+    );
+    let directory = tempfile::tempdir().unwrap();
+    let single_path = directory.path().join("single.mwckpt");
+    let parallel_path = directory.path().join("parallel.mwckpt");
+    crate::checkpoint::MultiwayCheckpoint::capture(&single_threaded)
+        .write_atomic(&single_path)
+        .unwrap();
+    crate::checkpoint::MultiwayCheckpoint::capture(&multi_threaded)
+        .write_atomic(&parallel_path)
+        .unwrap();
+    assert_eq!(
+        std::fs::read(single_path).unwrap(),
+        std::fs::read(parallel_path).unwrap(),
+        "inner regret/average scheduling must not change checkpoint bytes"
+    );
+}
+
+#[test]
+fn dense_vector_delta_keeps_regret_events_before_average_events() {
+    let solver = dense_vector_toy_solver(811, 1);
+    let delta = solver.generate_traversal_delta(0, 0, 1.0).unwrap();
+    let AnyTraversalDelta::Dense(delta) = delta else {
+        panic!("street-recall toy must generate a dense delta")
+    };
+    let first_strategy = delta
+        .events
+        .iter()
+        .position(|event| matches!(event, DenseEvent::AddStrategy { .. }))
+        .expect("average traversal must emit strategy events");
+    assert!(
+        first_strategy > 0,
+        "regret traversal must emit events first"
+    );
+    assert!(
+        delta.events[..first_strategy]
+            .iter()
+            .all(|event| matches!(event, DenseEvent::AddRegret { .. }))
+    );
+    assert!(
+        delta.events[first_strategy..]
+            .iter()
+            .all(|event| matches!(event, DenseEvent::AddStrategy { .. }))
+    );
 }
 
 #[test]
@@ -3066,6 +3364,22 @@ fn resume_rejects_pre_conditional_weight_solver_state() {
             state,
         ),
         Err(SolverError::StateVersion { found: 2, expected })
+            if expected == SOLVER_STATE_VERSION
+    ));
+}
+
+#[test]
+fn resume_rejects_street_only_bucket_cache_solver_state() {
+    let solver = dense_vector_toy_solver(23, 1);
+    let mut state = solver.snapshot_state();
+    state.schema_version = 3;
+    assert!(matches!(
+        MultiwaySolver::from_state(
+            DenseToyGame,
+            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+            state,
+        ),
+        Err(SolverError::StateVersion { found: 3, expected })
             if expected == SOLVER_STATE_VERSION
     ));
 }
@@ -3679,6 +3993,272 @@ fn street_recall_holdem_game_reaches_every_street_without_error() {
 }
 
 #[test]
+fn enumerate_first_real_holdem_changes_only_the_average_accumulator() {
+    use crate::abstraction::FeatureHashAbstraction;
+    use crate::config::{
+        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RakeConfig,
+        SeatConfig, UtilityConfig,
+    };
+    use crate::holdem::HoldemGame;
+    use crate::types::SeatId;
+
+    let build = || {
+        let mut config = MultiwayConfig {
+            seats: (0..3)
+                .map(|_| SeatConfig {
+                    name: None,
+                    stack_bb: 6.0,
+                    range: String::new(),
+                    betting: None,
+                })
+                .collect(),
+            button: SeatId(0),
+            blinds: BlindConfig::default(),
+            ante: AnteConfig::None,
+            betting: BettingConfig::default(),
+            forced_bets: None,
+            abstraction: AbstractionConfig::default(),
+        };
+        config.abstraction.flop_buckets = 2;
+        config.abstraction.turn_buckets = 2;
+        config.abstraction.river_buckets = 2;
+        config.abstraction.recall = RecallMode::Street;
+        let game = HoldemGame::new(
+            &config,
+            &UtilityConfig::ChipEv,
+            &RakeConfig::None,
+            FeatureHashAbstraction::new(crate::abstraction::FeatureHashParams {
+                flop_buckets: 2,
+                turn_buckets: 2,
+                river_buckets: 2,
+            })
+            .unwrap(),
+        )
+        .unwrap();
+        let sampler = game.deal_sampler().unwrap();
+        MultiwaySolver::new(
+            game,
+            sampler,
+            SolverConfig {
+                seed: 922,
+                max_memory_bytes: 1 << 24,
+                max_traversal_depth: 64,
+                sweep_batch: 1,
+                traverser_vector: true,
+                ..SolverConfig::default()
+            },
+        )
+        .unwrap()
+    };
+
+    let mut uniform = build();
+    uniform.run_sweeps_with_threads(2, 2).unwrap();
+    let mut enumerated = build();
+    enumerated
+        .run_sweeps_with_threads_until_observed_sampling(
+            2,
+            2,
+            || true,
+            |_| {},
+            AverageOpponentSampling::EnumerateFirst,
+        )
+        .unwrap();
+
+    let uniform_dense = uniform.dense.as_ref().unwrap();
+    let enumerated_dense = enumerated.dense.as_ref().unwrap();
+    assert_eq!(uniform_dense.arena.regrets, enumerated_dense.arena.regrets);
+    assert_eq!(uniform.total_deal_attempts, enumerated.total_deal_attempts);
+    assert_eq!(
+        uniform.terminal_evaluations,
+        enumerated.terminal_evaluations
+    );
+    assert_eq!(uniform.hand_updates, enumerated.hand_updates);
+    assert_ne!(
+        uniform_dense.arena.strategy_sum,
+        enumerated_dense.arena.strategy_sum
+    );
+}
+
+#[test]
+fn real_holdem_vector_bucket_cache_separates_opponent_contexts_on_one_street() {
+    use crate::abstraction::{BucketContext, MultiwayAbstraction};
+    use crate::config::{
+        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RakeConfig,
+        SeatConfig, UtilityConfig,
+    };
+    use crate::holdem::HoldemGame;
+    use crate::types::SeatId;
+
+    #[derive(Clone, Copy)]
+    struct OpponentCountBucket;
+
+    impl MultiwayAbstraction for OpponentCountBucket {
+        fn num_buckets(&self, _street: Street, _active_opponents: u8) -> u32 {
+            MAX_SEATS as u32
+        }
+
+        fn bucket(&self, context: BucketContext<'_>) -> BucketId {
+            u32::from(context.active_opponents)
+        }
+
+        fn fingerprint(&self) -> [u8; 32] {
+            [0x91; 32]
+        }
+    }
+
+    let mut config = MultiwayConfig {
+        seats: (0..3)
+            .map(|_| SeatConfig {
+                name: None,
+                stack_bb: 6.0,
+                range: String::new(),
+                betting: None,
+            })
+            .collect(),
+        button: SeatId(0),
+        blinds: BlindConfig::default(),
+        ante: AnteConfig::None,
+        betting: BettingConfig::default(),
+        forced_bets: None,
+        abstraction: AbstractionConfig::default(),
+    };
+    config.abstraction.recall = RecallMode::Street;
+    let game = HoldemGame::new(
+        &config,
+        &UtilityConfig::ChipEv,
+        &RakeConfig::None,
+        OpponentCountBucket,
+    )
+    .unwrap();
+    let sampler = game.deal_sampler().unwrap();
+    let solver = MultiwaySolver::new(
+        game,
+        sampler,
+        SolverConfig {
+            seed: 923,
+            max_memory_bytes: 1 << 25,
+            max_traversal_depth: 64,
+            traverser_vector: true,
+            ..SolverConfig::default()
+        },
+    )
+    .unwrap();
+    let dense = solver.dense.as_ref().unwrap();
+    let mut deal_rng = traversal_deal_rng(923, 0, 0);
+    let sample = solver.sampler.sample_counted(&mut deal_rng).unwrap();
+    let feasible = solver.sampler.feasible_combos(0, &sample.world);
+    let (combos, mut weights): (Vec<_>, Vec<_>) = feasible.into_iter().unzip();
+    normalize_feasible_weights(&mut weights).unwrap();
+    let own_reach = vec![1.0; combos.len()];
+    let column_context = dense
+        .tree
+        .nodes
+        .iter()
+        .enumerate()
+        .flat_map(|(node_index, node)| {
+            let node_id = node_index as NodeId;
+            (0..dense.arena.bucket_count_of(node_id)).map(move |bucket| {
+                (
+                    dense.arena.column_id(node_id, bucket).unwrap(),
+                    (node.street, node.bucket_active_opponents, bucket),
+                )
+            })
+        })
+        .collect::<FxHashMap<_, _>>();
+
+    let mut average_contexts =
+        std::array::from_fn::<_, 4, _>(|_| std::collections::BTreeSet::<u8>::new());
+    for seed in 0..16 {
+        let mut worker = DenseAverageStrategyWorker::with_sampling(
+            &solver.game,
+            dense,
+            solver.config,
+            1.0,
+            AverageOpponentSampling::UniformOne,
+        );
+        worker
+            .traverse_vector(
+                solver.game.root_state(),
+                0,
+                &sample.world,
+                0,
+                &combos,
+                &weights,
+                &own_reach,
+                &mut ChaCha20Rng::seed_from_u64(seed),
+                0,
+            )
+            .unwrap();
+        for event in worker.finish() {
+            let DenseEvent::AddStrategy { column, .. } = event else {
+                continue;
+            };
+            let &(street, active_opponents, bucket) = column_context
+                .get(&column)
+                .expect("strategy event column belongs to the dense arena");
+            if street != Street::Preflop {
+                assert_eq!(
+                    bucket,
+                    u32::from(active_opponents),
+                    "average worker reused a bucket table across opponent contexts"
+                );
+                average_contexts[street.index()].insert(active_opponents);
+            }
+        }
+    }
+    assert!(
+        average_contexts.iter().any(|contexts| contexts.len() >= 2),
+        "fixture must visit two opponent contexts on one postflop street"
+    );
+
+    let active = (0..combos.len()).collect::<Vec<_>>();
+    let mut regret_contexts =
+        std::array::from_fn::<_, 4, _>(|_| std::collections::BTreeSet::<u8>::new());
+    for seed in 0..16 {
+        let mut worker = VectorTraversalWorker::new(
+            &solver.game,
+            dense,
+            solver.config,
+            combos.clone(),
+            weights.clone(),
+        )
+        .unwrap();
+        worker
+            .traverse(
+                solver.game.root_state(),
+                0,
+                &sample.world,
+                0,
+                &active,
+                1.0,
+                &mut ChaCha20Rng::seed_from_u64(seed),
+                0,
+            )
+            .unwrap();
+        for event in worker.finish(0, 0, 0).events {
+            let DenseEvent::AddRegret { column, .. } = event else {
+                continue;
+            };
+            let &(street, active_opponents, bucket) = column_context
+                .get(&column)
+                .expect("regret event column belongs to the dense arena");
+            if street != Street::Preflop {
+                assert_eq!(
+                    bucket,
+                    u32::from(active_opponents),
+                    "regret worker reused a bucket table across opponent contexts"
+                );
+                regret_contexts[street.index()].insert(active_opponents);
+            }
+        }
+    }
+    assert!(
+        regret_contexts.iter().any(|contexts| contexts.len() >= 2),
+        "fixture must visit two opponent contexts on one postflop street"
+    );
+}
+
+#[test]
 fn vector_traverser_regret_trends_down_as_sweeps_accumulate() {
     let mut solver = dense_vector_toy_solver(31, 1);
     solver.run_sweeps(20).unwrap();
@@ -3999,241 +4579,4 @@ fn strategy_mass_differs_across_buckets_after_a_short_solve() {
         assert_eq!(labels, mass_labels);
         assert_eq!(probs, mass_probs);
     }
-}
-
-#[test]
-fn resume_rejects_street_only_bucket_cache_solver_state() {
-    let solver = dense_vector_toy_solver(23, 1);
-    let mut state = solver.snapshot_state();
-    state.schema_version = 3;
-    assert!(matches!(
-        MultiwaySolver::from_state(
-            DenseToyGame,
-            DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
-            state,
-        ),
-        Err(SolverError::StateVersion { found: 3, expected })
-            if expected == SOLVER_STATE_VERSION
-    ));
-}
-
-#[test]
-fn real_holdem_vector_bucket_cache_separates_opponent_contexts_on_one_street() {
-    use crate::abstraction::{BucketContext, MultiwayAbstraction};
-    use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RakeConfig,
-        SeatConfig, UtilityConfig,
-    };
-    use crate::holdem::HoldemGame;
-    use crate::types::SeatId;
-
-    #[derive(Clone, Copy)]
-    struct OpponentCountBucket;
-
-    impl MultiwayAbstraction for OpponentCountBucket {
-        fn num_buckets(&self, _street: Street, _active_opponents: u8) -> u32 {
-            MAX_SEATS as u32
-        }
-
-        fn bucket(&self, context: BucketContext<'_>) -> BucketId {
-            u32::from(context.active_opponents)
-        }
-
-        fn fingerprint(&self) -> [u8; 32] {
-            [0x91; 32]
-        }
-    }
-
-    let mut config = MultiwayConfig {
-        seats: (0..3)
-            .map(|_| SeatConfig {
-                name: None,
-                stack_bb: 6.0,
-                range: String::new(),
-                betting: None,
-            })
-            .collect(),
-        button: SeatId(0),
-        blinds: BlindConfig::default(),
-        ante: AnteConfig::None,
-        betting: BettingConfig::default(),
-        forced_bets: None,
-        abstraction: AbstractionConfig::default(),
-    };
-    config.abstraction.recall = RecallMode::Street;
-    let game = HoldemGame::new(
-        &config,
-        &UtilityConfig::ChipEv,
-        &RakeConfig::None,
-        OpponentCountBucket,
-    )
-    .unwrap();
-    let sampler = game.deal_sampler().unwrap();
-    let solver = MultiwaySolver::new(
-        game,
-        sampler,
-        SolverConfig {
-            seed: 923,
-            max_memory_bytes: 1 << 25,
-            max_traversal_depth: 64,
-            traverser_vector: true,
-            ..SolverConfig::default()
-        },
-    )
-    .unwrap();
-    let dense = solver.dense.as_ref().unwrap();
-    let mut deal_rng = traversal_deal_rng(923, 0, 0);
-    let sample = solver.sampler.sample_counted(&mut deal_rng).unwrap();
-    let feasible = solver.sampler.feasible_combos(0, &sample.world);
-    let (combos, mut weights): (Vec<_>, Vec<_>) = feasible.into_iter().unzip();
-    normalize_feasible_weights(&mut weights).unwrap();
-    let own_reach = vec![1.0; combos.len()];
-    let column_context = dense
-        .tree
-        .nodes
-        .iter()
-        .enumerate()
-        .flat_map(|(node_index, node)| {
-            let node_id = node_index as NodeId;
-            (0..dense.arena.bucket_count_of(node_id)).map(move |bucket| {
-                (
-                    dense.arena.column_id(node_id, bucket).unwrap(),
-                    (node.street, node.bucket_active_opponents, bucket),
-                )
-            })
-        })
-        .collect::<FxHashMap<_, _>>();
-
-    let mut average_contexts =
-        std::array::from_fn::<_, 4, _>(|_| std::collections::BTreeSet::<u8>::new());
-    for seed in 0..16 {
-        let mut worker = DenseAverageStrategyWorker::new(&solver.game, dense, solver.config, 1.0);
-        worker
-            .traverse_vector(
-                solver.game.root_state(),
-                0,
-                &sample.world,
-                0,
-                &combos,
-                &weights,
-                &own_reach,
-                &mut ChaCha20Rng::seed_from_u64(seed),
-                0,
-            )
-            .unwrap();
-        for event in worker.finish() {
-            let DenseEvent::AddStrategy { column, .. } = event else {
-                continue;
-            };
-            let &(street, active_opponents, bucket) = column_context
-                .get(&column)
-                .expect("strategy event column belongs to the dense arena");
-            if street != Street::Preflop {
-                assert_eq!(
-                    bucket,
-                    u32::from(active_opponents),
-                    "average worker reused a bucket table across opponent contexts"
-                );
-                average_contexts[street.index()].insert(active_opponents);
-            }
-        }
-    }
-    assert!(
-        average_contexts.iter().any(|contexts| contexts.len() >= 2),
-        "fixture must visit two opponent contexts on one postflop street"
-    );
-
-    let active = (0..combos.len()).collect::<Vec<_>>();
-    let mut regret_contexts =
-        std::array::from_fn::<_, 4, _>(|_| std::collections::BTreeSet::<u8>::new());
-    for seed in 0..16 {
-        let mut worker = VectorTraversalWorker::new(
-            &solver.game,
-            dense,
-            solver.config,
-            combos.clone(),
-            weights.clone(),
-        )
-        .unwrap();
-        worker
-            .traverse(
-                solver.game.root_state(),
-                0,
-                &sample.world,
-                0,
-                &active,
-                1.0,
-                &mut ChaCha20Rng::seed_from_u64(seed),
-                0,
-            )
-            .unwrap();
-        for event in worker.finish(0, 0, 0).events {
-            let DenseEvent::AddRegret { column, .. } = event else {
-                continue;
-            };
-            let &(street, active_opponents, bucket) = column_context
-                .get(&column)
-                .expect("regret event column belongs to the dense arena");
-            if street != Street::Preflop {
-                assert_eq!(
-                    bucket,
-                    u32::from(active_opponents),
-                    "regret worker reused a bucket table across opponent contexts"
-                );
-                regret_contexts[street.index()].insert(active_opponents);
-            }
-        }
-    }
-    assert!(
-        regret_contexts.iter().any(|contexts| contexts.len() >= 2),
-        "fixture must visit two opponent contexts on one postflop street"
-    );
-}
-
-#[test]
-fn stopping_and_restarting_on_a_full_batch_boundary_preserves_state() {
-    let mut interrupted = solver_with_batch(99, 1 << 20, 4);
-    let mut polls = 0;
-    let completed = interrupted
-        .run_sweeps_with_threads_until(24, 4, || {
-            polls += 1;
-            polls <= 2
-        })
-        .unwrap();
-    assert_eq!(completed, 8);
-    interrupted.run_sweeps_with_threads(16, 4).unwrap();
-
-    let mut uninterrupted = solver_with_batch(99, 1 << 20, 4);
-    uninterrupted.run_sweeps_with_threads(24, 4).unwrap();
-
-    assert_eq!(interrupted.snapshot_state(), uninterrupted.snapshot_state());
-    assert_eq!(interrupted.metrics(), uninterrupted.metrics());
-}
-
-#[test]
-fn dense_vector_delta_keeps_regret_events_before_average_events() {
-    let solver = dense_vector_toy_solver(811, 1);
-    let delta = solver.generate_traversal_delta(0, 0, 1.0).unwrap();
-    let AnyTraversalDelta::Dense(delta) = delta else {
-        panic!("street-recall toy must generate a dense delta")
-    };
-    let first_strategy = delta
-        .events
-        .iter()
-        .position(|event| matches!(event, DenseEvent::AddStrategy { .. }))
-        .expect("average traversal must emit strategy events");
-    assert!(
-        first_strategy > 0,
-        "regret traversal must emit events first"
-    );
-    assert!(
-        delta.events[..first_strategy]
-            .iter()
-            .all(|event| matches!(event, DenseEvent::AddRegret { .. }))
-    );
-    assert!(
-        delta.events[first_strategy..]
-            .iter()
-            .all(|event| matches!(event, DenseEvent::AddStrategy { .. }))
-    );
 }

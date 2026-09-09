@@ -763,6 +763,9 @@ fn run_inner(
             .context("writing final multiway metrics")?;
     }
 
+    // Drift is final. Release the previous-profile map before materializing
+    // snapshot/solution copies; it can contain every touched policy column.
+    drop(prior);
     let snapshot = mw_session.solver.snapshot_state();
     if let Some(path) = mwsol_path
         && !matches!(

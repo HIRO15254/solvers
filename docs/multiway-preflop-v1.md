@@ -135,14 +135,15 @@ Bonferroni補正の同時近似区間を使います。候補ごとの95%区間�
 solver stateとも扱いません。checkpointからの監査は別の経路です。
 修正にはwriter、metadata、reader、評価、出力テストを同期し、一般postflop treeで
 Preflop-onlyの範囲と拒否境界を検証する必要があります。
-この境界は、writer・reader・評価・出力テストを同期する後続変更で解消します。
+[ベンチマーク整理と修正優先度](validation/multiway-benchmarks-2026-09-09.md)に追跡します。
 
 CLIの `evaluate` は `.mwsol` に保存されたaverage policy blockを再評価します。
 現在のwriterは正の平均質量を持つPostflop blockも保存し得ますが、未訪問・平均質量0の
-policy、raw regret、量子化前の値はartifactにありません。したがって、一般Postflop
-treeでこの評価をGTO Wizardの完全解、学習時の完全profile、またはcheckpoint監査と
-同一視しません。`examples/bench_multiway/3max_2bb.toml`はall-inで閉じる小規模な
-sanity fixtureです。
+policy、raw regret、量子化前の値はartifactにありません。一般Postflop treeでこの評価を
+GTO Wizardの完全解、学習時の完全profile、またはcheckpoint監査と同一視しません。
+過去のbenchmarkに記録した `unknown-preflop-only-artifact` は当時の保守的な比較除外markerであり、
+現在のwriterがPreflopだけを保存する証拠ではありません。fixtureと結果の適用範囲は
+[ベンチマーク一覧](validation/multiway-benchmarks-2026-09-09.md)で管理します。
 
 ## File and test map
 
@@ -154,7 +155,8 @@ solver stateとworkerは `crates/multiway/src/solver/`、CLI lifecycleは
 
 回帰面は、library unit tests（`config.rs`、`solver/tests.rs`、`checkpoint.rs`）、
 CLI integration/acceptance（`crates/cli/tests/cli_integration.rs`、
-`multiway_acceptance.rs`）、template/help consistency（`config_new.rs` tests）
+`multiway_acceptance.rs`）、template/help consistency（`config_new.rs` tests）、
+Python benchmark fixture tests（`tools/tests/test_multiway_convergence_bench.py`）
 です。canonical examplesは `examples/preflop_multiway_v1_*.toml`、benchmark例は
 `examples/bench_multiway/` に置きます。
 

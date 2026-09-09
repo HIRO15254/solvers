@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "observed_date": "2026-09-09",
+  "goal": "Comparable or approximately matching preflop strategic tendencies within a few hours on powerful hardware",
+  "time_target": "a few hours on high-performance cloud hardware",
+  "cloud_budget_usd_total": 20,
+  "solution": {
+    "gametype": "Cash6m50zGeneral",
+    "format": "NLHE Cash / Classic / 6max",
+    "stack_bb": 100,
+    "type": "General",
+    "rake_label": "NL50",
+    "opening_size_label": "GTO",
+    "three_bet_size_label": "GTO",
+    "postflop_sizes": "Multi Size",
+    "selection_evidence": "Active library row 100 / General / NL50 / GTO / GTO; expanded history header 6max NL50 General GTO",
+    "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&soltab=strategy&history_spot=0"
+  },
+  "rake": {
+    "rate": 0.05,
+    "cap_bb": 4.0,
+    "rate_and_cap_verified_in_current_ui": true,
+    "ui_evidence": "Solutions library Rake help: NL50 = 4bb cap, 5% rake",
+    "application_and_rounding_independently_verified": false,
+    "official_reference": "https://blog.gtowizard.com/status-and-info-about-our-solutions/"
+  },
+  "open_raise_to_bb": {"UTG": 2.0, "HJ": 2.0, "CO": 2.3, "BTN": 2.5, "SB": 3.0},
+  "open_menu": {
+    "all_in_to_bb": 100.0,
+    "limp_displayed_only_for": ["SB"],
+    "observed_at": "unopened pot after earlier seats fold"
+  },
+  "three_bet_raise_to_bb": {
+    "UTG": {"HJ": 6.5, "CO": 6.5, "BTN": 7.5, "SB": 10.0, "BB": 12.0},
+    "HJ": {"CO": 6.5, "BTN": 7.5, "SB": 11.0, "BB": 12.3},
+    "CO": {"BTN": 7.5, "SB": 11.5, "BB": 13.5},
+    "BTN": {"SB": 12.0, "BB": 13.0},
+    "SB": {"BB": 10.0}
+  },
+  "three_bet_observation_scope": {
+    "method": "Visible expanded preflop history cards after selecting each opener's raise",
+    "condition": "Every intervening seat folds; no callers or squeezes",
+    "all_in_100_also_displayed": true,
+    "call_not_displayed": [{"opener": "UTG", "actor": "HJ"}],
+    "call_displayed_for_other_recorded_responses": true,
+    "urls": [
+      "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&preflop_actions=R2&history_spot=1",
+      "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&preflop_actions=F-R2&history_spot=2",
+      "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&preflop_actions=F-F-R2.3&history_spot=3",
+      "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&preflop_actions=F-F-F-R2.5&history_spot=4",
+      "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&preflop_actions=F-F-F-F-R3&history_spot=5"
+    ]
+  },
+  "additional_nodes": [
+    {
+      "history": ["UTG raise to 2bb", "HJ raise to 6.5bb"],
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&preflop_actions=R2-R6.5&history_spot=2",
+      "following_seats_fold_between_responses": true,
+      "four_bet_raise_to_bb": {"CO": 14.0, "BTN": 14.0, "SB": 20.0, "BB": 19.0, "UTG": 19.0},
+      "call_displayed": ["UTG"],
+      "call_not_displayed": ["CO", "BTN", "SB", "BB"],
+      "fold_and_all_in_100_also_displayed": true
+    },
+    {
+      "history": ["UTG fold", "HJ fold", "CO fold", "BTN raise to 2.5bb", "SB raise to 12bb"],
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&preflop_actions=F-F-F-R2.5-R12&history_spot=5",
+      "following_seats_fold_between_responses": true,
+      "four_bet_raise_to_bb": {"BB": 23.0, "BTN": 26.0},
+      "call_displayed": ["BB", "BTN"],
+      "fold_and_all_in_100_also_displayed": true,
+      "implication": "The displayed BB cold call disproves a universal no-cold-call-after-3bet rule. The partial fixture retains broader calls rather than generalizing the UTG/HJ observation."
+    },
+    {
+      "actor": "SB",
+      "history": ["UTG fold", "HJ fold", "CO fold", "BTN fold", "SB raise to 3bb", "BB raise to 10bb"],
+      "url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&depth=100&preflop_actions=F-F-F-F-R3-R10&history_spot=6&soltab=strategy",
+      "actions": [
+        {"action": "allin", "to_bb": 100.0, "percent": 2.9},
+        {"action": "raise", "to_bb": 21.0, "percent": 20.1},
+        {"action": "call", "percent": 12.7},
+        {"action": "fold", "percent": 64.3}
+      ],
+      "frequency_precision": "rounded UI display"
+    }
+  ],
+  "accuracy_reference": {
+    "source": "https://blog.gtowizard.com/status-and-info-about-our-solutions/",
+    "publication_date": "2021-03-29",
+    "historical_preflop_method": "MonkerSolver; buckets 30,30,30; Perfect, Large, Large; preflop >100 I/N",
+    "important_distinction": "The published percentages of pot describe postflop solve accuracy. They are not a verified multiway preflop Nash/exploitability bound and cannot be copied into our stopping target."
+  },
+  "remaining_model_gaps": [
+    "Complete 4bet/5bet and squeeze/limped-pot action menus have not been collected.",
+    "The full postflop action tree has not been collected; staged fixtures must identify their own sizes and aggression caps.",
+    "EHS2 percentile against a uniform heads-up opponent is not verified equivalent to the reference card abstraction.",
+    "Rake application, side-pot allocation, and rounding are not independently matched.",
+    "Range Copy reported success in the UI, but the connected browser clipboard returned empty; no full numeric range export was acquired."
+  ]
+}

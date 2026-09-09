@@ -1,0 +1,164 @@
+{
+  "status": "goal_unmet; old state-v3 vector results superseded for correctness claims",
+  "correctness_boundary": "Confirmed street-only combo-bucket cache reused tables across different active-opponent counts in both average and regret vector workers. These state-v3 numerical results must be recomputed after the fix; they are historical diagnostics, not valid accuracy evidence.",
+  "model": "6max100bb partial GTOW observed preflop menu; preflop cap4/postflop cap1; K32 current-street EHS2; single training seed0",
+  "old": {
+    "sweeps": 4096,
+    "nodes": [
+      {
+        "seat": "UTG",
+        "normal_raise_pct": 15.830798700147053,
+        "jam_pct": 2.0739088109424295,
+        "limp_pct": 0,
+        "fallback_reach_fraction": 0.0,
+        "effective_sample_size": 8192.0
+      },
+      {
+        "seat": "HJ",
+        "normal_raise_pct": 17.129793339352542,
+        "jam_pct": 1.5860507408148867,
+        "limp_pct": 0,
+        "fallback_reach_fraction": 0.0,
+        "effective_sample_size": 6918.063569702745
+      },
+      {
+        "seat": "CO",
+        "normal_raise_pct": 21.734107643325952,
+        "jam_pct": 2.547155379650535,
+        "limp_pct": 0,
+        "fallback_reach_fraction": 0.0,
+        "effective_sample_size": 5809.9555569198
+      },
+      {
+        "seat": "BTN",
+        "normal_raise_pct": 13.107192585717476,
+        "jam_pct": 7.8724567205064115,
+        "limp_pct": 0,
+        "fallback_reach_fraction": 0.0,
+        "effective_sample_size": 4657.7002593867865
+      },
+      {
+        "seat": "SB",
+        "normal_raise_pct": 18.333782057057068,
+        "jam_pct": 9.033129946609693,
+        "limp_pct": 28.30857011617489,
+        "fallback_reach_fraction": 0.0,
+        "effective_sample_size": 3975.8682215213307
+      }
+    ],
+    "evaluations": [
+      {
+        "seed": 101,
+        "samples": 2048,
+        "max_candidate_gain_mean_bb": 1.983933105468751,
+        "max_candidate_gain_ci95_upper_bb": 3.7371124019683237
+      },
+      {
+        "seed": 202,
+        "samples": 2048,
+        "max_candidate_gain_mean_bb": 1.6846713867187502,
+        "max_candidate_gain_ci95_upper_bb": 3.276407343781587
+      }
+    ]
+  },
+  "new": {
+    "sweeps": 65536,
+    "nodes": [
+      {
+        "seat": "UTG",
+        "normal_raise_pct": 11.99117040175266,
+        "jam_pct": 0.33324364319440103,
+        "limp_pct": 0,
+        "fallback_reach_fraction": 0.0,
+        "effective_sample_size": 16384.0
+      },
+      {
+        "seat": "HJ",
+        "normal_raise_pct": 15.246538479684926,
+        "jam_pct": 0.15046242749119676,
+        "limp_pct": 0,
+        "fallback_reach_fraction": 0.0,
+        "effective_sample_size": 14501.214257202575
+      },
+      {
+        "seat": "CO",
+        "normal_raise_pct": 27.927717138546658,
+        "jam_pct": 0.22978491460894007,
+        "limp_pct": 0,
+        "fallback_reach_fraction": 0.0,
+        "effective_sample_size": 12556.833590623199
+      },
+      {
+        "seat": "BTN",
+        "normal_raise_pct": 40.63611500894761,
+        "jam_pct": 0.2068940386065629,
+        "limp_pct": 0,
+        "fallback_reach_fraction": 0.0,
+        "effective_sample_size": 9686.993013543919
+      },
+      {
+        "seat": "SB",
+        "normal_raise_pct": 34.33384969818794,
+        "jam_pct": 0.11763758098516183,
+        "limp_pct": 32.941221807800545,
+        "fallback_reach_fraction": 0.0,
+        "effective_sample_size": 6289.159303772701
+      }
+    ],
+    "evaluations": [
+      {
+        "seed": 101,
+        "samples": 4096,
+        "max_candidate_gain_mean_bb": 0.3383317871093757,
+        "max_candidate_gain_ci95_upper_bb": 0.710271246484615
+      },
+      {
+        "seed": 202,
+        "samples": 4096,
+        "max_candidate_gain_mean_bb": 0.2561608886718753,
+        "max_candidate_gain_ci95_upper_bb": 0.5536907271118867
+      }
+    ]
+  },
+  "source_sha256": {
+    "runs\\multiway-gtow-model-20260909\\pilot-preflop4-cap1-k32\\audit.json": "12deae15d11be0a979072626a9ceccd6e76d673a09ef25f9149b306d942672a2",
+    "runs\\multiway-convergence-round4-20260909\\long-baseline\\audit.json": "5a754601e9b501f967e9f60831ab885ec7c3f20870abf981b540eee1cbbb1ced"
+  },
+  "same_configuration_fingerprint": true,
+  "same_abstraction_fingerprint": true,
+  "reference": {
+    "UTG": {
+      "allin": 0.0,
+      "raise": 17.6,
+      "fold": 82.4
+    },
+    "HJ": {
+      "allin": 0.0,
+      "raise": 21.6,
+      "fold": 78.4
+    },
+    "CO": {
+      "allin": 0.0,
+      "raise": 28.9,
+      "fold": 71.1
+    },
+    "BTN": {
+      "allin": 0.0,
+      "raise": 42.0,
+      "fold": 58.0
+    },
+    "SB": {
+      "allin": 0.0,
+      "raise": 37.5,
+      "call": 11.1,
+      "fold": 51.5
+    }
+  },
+  "limitations": [
+    "Same-seed continuation, not an algorithm A/B or across-seed robustness proof.",
+    "Old audit has2048 worlds/seed, new audit4096; diagnostic estimates have sampling error.",
+    "Finite fixed candidates are not full best responses or exploitability.",
+    "Game tree, rake conventions and abstraction still differ from GTOW.",
+    "Raw strategy mass is not physical opponent-conditioned reach."
+  ]
+}

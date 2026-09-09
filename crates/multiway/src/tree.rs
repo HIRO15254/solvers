@@ -14,7 +14,9 @@
 //! process memory.
 
 use std::ops::Range;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
+use rayon::prelude::*;
 use rustc_hash::FxHashMap;
 
 use crate::abstraction::BucketId;
@@ -49,7 +51,7 @@ pub enum Child {
 /// per public node, independent of private information), reused both to
 /// build [`crate::solver::HistoryEntry`] edges and as every column's
 /// `PolicyColumn::action_labels` in the dense arena.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TreeNode {
     pub history: HistoryKey,
     /// `None` only at the root.
@@ -75,7 +77,7 @@ pub struct TreeNode {
 }
 
 /// The fully enumerated public betting tree, in preorder.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct PublicTree {
     pub nodes: Vec<TreeNode>,
     pub by_history: FxHashMap<HistoryKey, NodeId>,
@@ -147,8 +149,395 @@ pub fn enumerate_tree_with_limits<G: ExternalSamplingGame>(
         max_depth,
         &mut nodes,
         &mut by_history,
+        true,
+        None,
     )?;
     Ok(PublicTree { nodes, by_history })
+}
+
+// Keep the planning prefix small even when the ambient Rayon pool is very
+// large. The retained prefix is at most a shallow tree with this many leaves;
+// the independently materialized subtree vectors share a separate global
+// node budget below.
+const PARALLEL_FRONTIER_TASKS_PER_THREAD: usize = 4;
+const MAX_PARALLEL_FRONTIER_TASKS: usize = 64;
+const MAX_PARALLEL_PREFIX_DEPTH: u32 = 4;
+
+struct ParallelFrontier<S> {
+    state: S,
+    history: HistoryKey,
+    depth: u32,
+}
+
+enum ParallelPlan<S> {
+    Frontier(ParallelFrontier<S>),
+    Expanded(ParallelPlanNode<S>),
+    Ready(usize),
+}
+
+struct ParallelPlanNode<S> {
+    history: HistoryKey,
+    actor: u8,
+    street: Street,
+    active_opponents: u8,
+    bucket_active_opponents: u8,
+    action_labels: Vec<String>,
+    children: Vec<ParallelPlanChild<S>>,
+}
+
+enum ParallelPlanChild<S> {
+    Decision(Box<ParallelPlan<S>>),
+    Terminal,
+}
+
+/// Research materializer that preserves the serial preorder while enumerating
+/// bounded, independent public subtrees on the current Rayon pool.
+///
+/// One-thread pools use [`enumerate_tree_with_limits`] directly. Multi-thread
+/// pools retain at most 64 frontier tasks and a depth-four planning prefix.
+/// All subtree workers share the caller's decision-node allowance, so their
+/// aggregate retained node count cannot grow beyond `max_nodes` (in addition
+/// to the bounded prefix). Completed subtrees are compact boxed slices.
+/// Ordered merging moves each subtree's node records; it does not clone their
+/// action-label or child buffers. The merge can temporarily retain at most
+/// `2 * max_nodes` `TreeNode` slots (source slices plus the exactly-sized
+/// destination), in addition to the bounded prefix and active worker `Vec`
+/// capacity. This function is therefore an internal timing experiment rather
+/// than a process-RSS guarantee.
+///
+/// If planning, a worker, or ordered merge encounters an error, the serial
+/// oracle is rerun. That preserves the existing depth-first error priority and
+/// exact error payload rather than exposing scheduler order.
+#[doc(hidden)]
+pub fn enumerate_tree_with_limits_parallel<G: ExternalSamplingGame>(
+    game: &G,
+    max_nodes: usize,
+    max_depth: u32,
+) -> Result<PublicTree, TreeError>
+where
+    G::State: Send,
+{
+    let threads = rayon::current_num_threads();
+    if threads <= 1 {
+        return enumerate_tree_with_limits(game, max_nodes, max_depth);
+    }
+    let max_nodes = max_nodes.min(MAX_TREE_NODES);
+    let root = game.root_state();
+    if game.actor(&root).is_none() {
+        return enumerate_tree_with_limits(game, max_nodes, max_depth);
+    }
+
+    let target_tasks = threads
+        .saturating_mul(PARALLEL_FRONTIER_TASKS_PER_THREAD)
+        .clamp(2, MAX_PARALLEL_FRONTIER_TASKS);
+    let mut plan = ParallelPlan::Frontier(ParallelFrontier {
+        state: root,
+        history: HistoryKey::ROOT,
+        depth: 0,
+    });
+    let mut frontier_count = 1usize;
+    while frontier_count < target_tasks {
+        match expand_one_parallel_frontier(
+            game,
+            &mut plan,
+            frontier_count,
+            MAX_PARALLEL_FRONTIER_TASKS,
+            max_depth,
+        ) {
+            Ok(Some(next_count)) => frontier_count = next_count,
+            Ok(None) => break,
+            Err(_) => return enumerate_tree_with_limits(game, max_nodes, max_depth),
+        }
+    }
+
+    let prefix_nodes = count_parallel_prefix_nodes(&plan);
+    if prefix_nodes > max_nodes {
+        return enumerate_tree_with_limits(game, max_nodes, max_depth);
+    }
+    let mut tasks = Vec::with_capacity(frontier_count);
+    extract_parallel_frontiers(&mut plan, &mut tasks);
+    if tasks.len() <= 1 {
+        return enumerate_tree_with_limits(game, max_nodes, max_depth);
+    }
+
+    let parallel_nodes_remaining = AtomicUsize::new(max_nodes - prefix_nodes);
+    let results: Vec<Result<Box<[TreeNode]>, TreeError>> = tasks
+        .into_par_iter()
+        .map(|task| {
+            let mut nodes = Vec::new();
+            // History entries are rebuilt once, in final preorder. Avoid a
+            // full per-subtree map while the result vectors coexist.
+            let mut unused_history = FxHashMap::default();
+            enumerate_node(
+                game,
+                task.state,
+                task.history,
+                None,
+                0,
+                task.depth,
+                max_nodes,
+                max_depth,
+                &mut nodes,
+                &mut unused_history,
+                false,
+                Some(&parallel_nodes_remaining),
+            )?;
+            Ok(nodes.into_boxed_slice())
+        })
+        .collect();
+    if results.iter().any(Result::is_err) {
+        return enumerate_tree_with_limits(game, max_nodes, max_depth);
+    }
+
+    let mut subtree_nodes: Vec<Option<Box<[TreeNode]>>> =
+        results.into_iter().map(|result| result.ok()).collect();
+    let total_nodes = subtree_nodes.iter().try_fold(prefix_nodes, |total, nodes| {
+        total.checked_add(nodes.as_ref().map_or(0, |nodes| nodes.len()))
+    });
+    let Some(total_nodes) = total_nodes else {
+        return enumerate_tree_with_limits(game, max_nodes, max_depth);
+    };
+    if total_nodes > max_nodes || total_nodes > MAX_TREE_NODES {
+        return enumerate_tree_with_limits(game, max_nodes, max_depth);
+    }
+
+    let mut nodes = Vec::with_capacity(total_nodes);
+    if merge_parallel_plan(&mut plan, None, 0, &mut subtree_nodes, &mut nodes).is_err()
+        || nodes.len() != total_nodes
+    {
+        return enumerate_tree_with_limits(game, max_nodes, max_depth);
+    }
+    let mut by_history = FxHashMap::default();
+    for (index, node) in nodes.iter().enumerate() {
+        by_history.insert(node.history, index as NodeId);
+    }
+    Ok(PublicTree { nodes, by_history })
+}
+
+fn expand_one_parallel_frontier<G: ExternalSamplingGame>(
+    game: &G,
+    plan: &mut ParallelPlan<G::State>,
+    frontier_count: usize,
+    max_frontiers: usize,
+    max_depth: u32,
+) -> Result<Option<usize>, TreeError> {
+    match plan {
+        ParallelPlan::Frontier(frontier) => {
+            if frontier.depth >= MAX_PARALLEL_PREFIX_DEPTH {
+                return Ok(None);
+            }
+            let expanded = expand_parallel_frontier(game, frontier, max_depth)?;
+            let added = expanded
+                .children
+                .iter()
+                .filter(|child| matches!(child, ParallelPlanChild::Decision(_)))
+                .count();
+            let next_count = frontier_count
+                .checked_sub(1)
+                .and_then(|count| count.checked_add(added))
+                .ok_or(TreeError::SizeOverflow)?;
+            if next_count > max_frontiers {
+                return Ok(None);
+            }
+            *plan = ParallelPlan::Expanded(expanded);
+            Ok(Some(next_count))
+        }
+        ParallelPlan::Expanded(node) => {
+            for child in &mut node.children {
+                if let ParallelPlanChild::Decision(child_plan) = child
+                    && let Some(next_count) = expand_one_parallel_frontier(
+                        game,
+                        child_plan,
+                        frontier_count,
+                        max_frontiers,
+                        max_depth,
+                    )?
+                {
+                    return Ok(Some(next_count));
+                }
+            }
+            Ok(None)
+        }
+        ParallelPlan::Ready(_) => Ok(None),
+    }
+}
+
+fn expand_parallel_frontier<G: ExternalSamplingGame>(
+    game: &G,
+    frontier: &ParallelFrontier<G::State>,
+    max_depth: u32,
+) -> Result<ParallelPlanNode<G::State>, TreeError> {
+    if frontier.depth > max_depth {
+        return Err(TreeError::DepthLimit { limit: max_depth });
+    }
+    let actor = game
+        .actor(&frontier.state)
+        .expect("frontier contains only decision states");
+    let actions = game.node_actions(&frontier.state);
+    let num_actions = game.num_actions_of(&actions);
+    if num_actions == 0 {
+        return Err(TreeError::NoActions { actor });
+    }
+    if u32::try_from(num_actions).is_err() {
+        return Err(TreeError::SizeOverflow);
+    }
+    let mut action_labels = Vec::with_capacity(num_actions);
+    let mut label_buf = String::new();
+    for index in 0..num_actions {
+        label_buf.clear();
+        game.write_action_label(&actions, index, &mut label_buf);
+        // The planner's local node id is immaterial: any error reruns the
+        // serial oracle, which supplies the canonical global id.
+        if label_buf.is_empty() {
+            return Err(TreeError::EmptyActionLabel { node: 0 });
+        }
+        if action_labels.contains(&label_buf) {
+            return Err(TreeError::DuplicateActionLabel { node: 0 });
+        }
+        action_labels.push(std::mem::take(&mut label_buf));
+    }
+    let context = game.dense_node_context(&frontier.state);
+    let mut children = Vec::with_capacity(num_actions);
+    for index in 0..num_actions {
+        let child_depth = frontier
+            .depth
+            .checked_add(1)
+            .ok_or(TreeError::DepthLimit { limit: max_depth })?;
+        if child_depth > max_depth {
+            return Err(TreeError::DepthLimit { limit: max_depth });
+        }
+        let child_state = game.next_state_with(&frontier.state, &actions, index);
+        if game.actor(&child_state).is_none() {
+            children.push(ParallelPlanChild::Terminal);
+        } else {
+            children.push(ParallelPlanChild::Decision(Box::new(
+                ParallelPlan::Frontier(ParallelFrontier {
+                    state: child_state,
+                    history: frontier.history.child(actor, index),
+                    depth: child_depth,
+                }),
+            )));
+        }
+    }
+    Ok(ParallelPlanNode {
+        history: frontier.history,
+        actor: actor as u8,
+        street: context.street,
+        active_opponents: context.active_opponents,
+        bucket_active_opponents: context.bucket_active_opponents,
+        action_labels,
+        children,
+    })
+}
+
+fn count_parallel_prefix_nodes<S>(plan: &ParallelPlan<S>) -> usize {
+    match plan {
+        ParallelPlan::Expanded(node) => {
+            1 + node
+                .children
+                .iter()
+                .map(|child| match child {
+                    ParallelPlanChild::Decision(child) => count_parallel_prefix_nodes(child),
+                    ParallelPlanChild::Terminal => 0,
+                })
+                .sum::<usize>()
+        }
+        ParallelPlan::Frontier(_) | ParallelPlan::Ready(_) => 0,
+    }
+}
+
+fn extract_parallel_frontiers<S>(plan: &mut ParallelPlan<S>, tasks: &mut Vec<ParallelFrontier<S>>) {
+    match plan {
+        ParallelPlan::Frontier(_) => {
+            let ready_index = tasks.len();
+            let old = std::mem::replace(plan, ParallelPlan::Ready(ready_index));
+            let ParallelPlan::Frontier(frontier) = old else {
+                unreachable!();
+            };
+            tasks.push(frontier);
+        }
+        ParallelPlan::Expanded(node) => {
+            for child in &mut node.children {
+                if let ParallelPlanChild::Decision(child) = child {
+                    extract_parallel_frontiers(child, tasks);
+                }
+            }
+        }
+        ParallelPlan::Ready(_) => {}
+    }
+}
+
+fn merge_parallel_plan<S>(
+    plan: &mut ParallelPlan<S>,
+    parent: Option<NodeId>,
+    parent_action_index: u32,
+    subtrees: &mut [Option<Box<[TreeNode]>>],
+    nodes: &mut Vec<TreeNode>,
+) -> Result<NodeId, TreeError> {
+    match plan {
+        ParallelPlan::Expanded(node) => {
+            let node_id = NodeId::try_from(nodes.len()).map_err(|_| TreeError::SizeOverflow)?;
+            nodes.push(TreeNode {
+                history: node.history,
+                parent,
+                parent_action_index,
+                actor: node.actor,
+                street: node.street,
+                active_opponents: node.active_opponents,
+                bucket_active_opponents: node.bucket_active_opponents,
+                action_labels: std::mem::take(&mut node.action_labels),
+                children: Vec::new(),
+            });
+            let mut children = Vec::with_capacity(node.children.len());
+            for (action_index, child) in node.children.iter_mut().enumerate() {
+                match child {
+                    ParallelPlanChild::Terminal => children.push(Child::Terminal),
+                    ParallelPlanChild::Decision(child) => {
+                        let child_id = merge_parallel_plan(
+                            child,
+                            Some(node_id),
+                            action_index as u32,
+                            subtrees,
+                            nodes,
+                        )?;
+                        children.push(Child::Decision(child_id));
+                    }
+                }
+            }
+            nodes[node_id as usize].children = children;
+            Ok(node_id)
+        }
+        ParallelPlan::Ready(index) => {
+            let subtree = subtrees
+                .get_mut(*index)
+                .and_then(Option::take)
+                .ok_or(TreeError::SizeOverflow)?;
+            let offset = NodeId::try_from(nodes.len()).map_err(|_| TreeError::SizeOverflow)?;
+            let mut subtree = subtree.into_vec();
+            for (local_index, node) in subtree.iter_mut().enumerate() {
+                if local_index == 0 {
+                    node.parent = parent;
+                    node.parent_action_index = parent_action_index;
+                } else if let Some(local_parent) = node.parent {
+                    node.parent = Some(
+                        offset
+                            .checked_add(local_parent)
+                            .ok_or(TreeError::SizeOverflow)?,
+                    );
+                }
+                for child in &mut node.children {
+                    if let Child::Decision(local_child) = child {
+                        *local_child = offset
+                            .checked_add(*local_child)
+                            .ok_or(TreeError::SizeOverflow)?;
+                    }
+                }
+            }
+            nodes.append(&mut subtree);
+            Ok(offset)
+        }
+        ParallelPlan::Frontier(_) => Err(TreeError::SizeOverflow),
+    }
 }
 
 /// Measures the full public tree without retaining its nodes and stops at
@@ -326,6 +715,8 @@ fn enumerate_node<G: ExternalSamplingGame>(
     max_depth: u32,
     nodes: &mut Vec<TreeNode>,
     by_history: &mut FxHashMap<HistoryKey, NodeId>,
+    record_history: bool,
+    parallel_nodes_remaining: Option<&AtomicUsize>,
 ) -> Result<NodeId, TreeError> {
     if depth > max_depth {
         return Err(TreeError::DepthLimit { limit: max_depth });
@@ -334,6 +725,15 @@ fn enumerate_node<G: ExternalSamplingGame>(
         .actor(&state)
         .expect("caller only recurses into decision states");
     if nodes.len() >= max_nodes {
+        return Err(TreeError::TooManyNodes { limit: max_nodes });
+    }
+    if let Some(remaining) = parallel_nodes_remaining
+        && remaining
+            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |count| {
+                count.checked_sub(1)
+            })
+            .is_err()
+    {
         return Err(TreeError::TooManyNodes { limit: max_nodes });
     }
     let node_id = nodes.len() as NodeId;
@@ -371,7 +771,9 @@ fn enumerate_node<G: ExternalSamplingGame>(
         action_labels,
         children: Vec::new(),
     });
-    by_history.insert(history, node_id);
+    if record_history {
+        by_history.insert(history, node_id);
+    }
 
     let mut children = Vec::with_capacity(num_actions);
     for index in 0..num_actions {
@@ -397,6 +799,8 @@ fn enumerate_node<G: ExternalSamplingGame>(
                 max_depth,
                 nodes,
                 by_history,
+                record_history,
+                parallel_nodes_remaining,
             )?;
             children.push(Child::Decision(child_id));
         }
@@ -852,6 +1256,54 @@ mod tests {
         assert_eq!(tree.by_history.len(), tree.nodes.len());
         assert_eq!(tree.nodes[0].history, HistoryKey::ROOT);
         assert!(tree.nodes[0].parent.is_none());
+    }
+
+    #[test]
+    fn ordered_parallel_enumeration_is_serial_exact_and_repeatable() {
+        let game = smoke_game();
+        let serial = enumerate_tree(&game).unwrap();
+        for threads in [1, 2, 8] {
+            let pool = rayon::ThreadPoolBuilder::new()
+                .num_threads(threads)
+                .build()
+                .unwrap();
+            let first = pool
+                .install(|| enumerate_tree_with_limits_parallel(&game, MAX_TREE_NODES, u32::MAX))
+                .unwrap();
+            let second = pool
+                .install(|| enumerate_tree_with_limits_parallel(&game, MAX_TREE_NODES, u32::MAX))
+                .unwrap();
+            assert_eq!(first, serial, "thread count {threads}");
+            assert_eq!(second, first, "thread count {threads}");
+        }
+    }
+
+    #[test]
+    fn ordered_parallel_enumeration_preserves_limit_and_depth_errors() {
+        let game = smoke_game();
+        for threads in [2, 8] {
+            let pool = rayon::ThreadPoolBuilder::new()
+                .num_threads(threads)
+                .build()
+                .unwrap();
+            let node_error = pool
+                .install(|| enumerate_tree_with_limits_parallel(&game, 3_657, u32::MAX))
+                .unwrap_err();
+            assert!(matches!(
+                node_error,
+                TreeError::TooManyNodes { limit: 3_657 }
+            ));
+
+            let depth_error = pool
+                .install(|| enumerate_tree_with_limits_parallel(&game, MAX_TREE_NODES, 0))
+                .unwrap_err();
+            assert!(matches!(depth_error, TreeError::DepthLimit { limit: 0 }));
+
+            let exact = pool
+                .install(|| enumerate_tree_with_limits_parallel(&game, 3_658, u32::MAX))
+                .unwrap();
+            assert_eq!(exact, enumerate_tree(&game).unwrap());
+        }
     }
 
     #[test]

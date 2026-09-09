@@ -13,6 +13,8 @@ pub mod config;
 pub mod holdem;
 pub mod icm;
 pub mod rake_condition;
+#[cfg(feature = "research-abstractions")]
+mod research_draw_abstraction;
 pub mod sampler;
 pub mod settlement;
 pub mod solver;
@@ -36,6 +38,8 @@ pub use config::{
 pub use holdem::{HoldemGame, HoldemGameError};
 pub use icm::{IcmDeltaEstimate, IcmError, IcmEstimate, IcmMode, estimate_icm, terminal_icm_delta};
 pub use rake_condition::{CompiledRakeCondition, RakeConditionContext};
+#[cfg(feature = "research-abstractions")]
+pub use research_draw_abstraction::{DrawAwareAbstraction, DrawAwareAbstractionError};
 pub use sampler::{CountedSample, DealSampler, SampleError, SampledWorld, SamplingDiagnostics};
 pub use settlement::{PotLayer, Settlement};
 pub use solver::{
@@ -46,6 +50,13 @@ pub use solver::{
     PublicNodeAction, PublicNodeView, ReferenceDeviationCoverage, ReferenceDeviationEvaluation,
     ReferenceDeviationWorld, SolverConfig, SolverError, SolverMetrics, SolverState,
     StreetVisitCounts, abstraction_fingerprint_with_recall,
+};
+#[cfg(feature = "research-average-sampling")]
+pub use solver::{
+    AverageSamplingResearchConfig, AverageSamplingResearchEvaluation,
+    AverageSamplingResearchHistory, AverageSamplingResearchResult,
+    AverageSamplingResearchRowStatus, AverageSamplingResearchStrategyRow,
+    AverageSamplingResearchVariant,
 };
 pub use tree::{PublicTree, TreeError};
 pub use types::{MwChips, SeatId, SeatMask, SeatVec, Street};

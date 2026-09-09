@@ -1,0 +1,263 @@
+{
+  "schema_version": 1,
+  "status": "state4_large_export_verified_locally_vm_stopped",
+  "current_state": "state4",
+  "state3_checkpoint_boundary": "state3 checkpoint/results are historical and invalid for state4 because the corrected active-opponent-count cache key requires a fresh run",
+  "purpose": "Efficient multiway convergence on larger machines and reliable long-running checkpoint/export, with GTOW validation and total GCP budget USD20",
+  "destination": {
+    "project": "solvers-abstraction-20260723",
+    "zone": "us-central1-a",
+    "planned_instance": "mw-convergence-c4-24-20260909-a",
+    "machine_type": "c4-highmem-24",
+    "vcpu": 24,
+    "memory_gib": 186,
+    "source_archive_path": "/opt/solvers-experiment/source.tgz",
+    "source_extract_path": "/opt/solvers-experiment/source",
+    "bootstrap_path": "/root/gcp_convergence_bootstrap.sh"
+  },
+  "budget": {
+    "user_total_usd": 20,
+    "initial_vm_max_hours": 4,
+    "spot_hourly_usd_observed": 0.89157,
+    "initial_compute_estimate_usd": 3.56628,
+    "price_to_recheck_before_launch": true,
+    "prior_usage_and_incidentals_reserved_usd": 4,
+    "aggregate_vm_hour_cap_at_observed_price": 12,
+    "restarts_are_manual_and_budget_checked": true
+  },
+  "payload": [
+    {
+      "path": "runs/gcp-convergence-20260909-control/final/source.tgz",
+      "bytes": 763039,
+      "file_count": 167,
+      "sha256": "a70f11a96e510da933e174fdf1dc9a98148807c5bfb140768741731c46a8d3b1",
+      "contents": "Allowlisted Cargo workspace sources, build-time reference documents, experiment fixtures and scripts, licenses; exact paths and individual hashes in source.manifest.json"
+    },
+    {
+      "path": "runs/gcp-convergence-20260909-control/final/source.manifest.json",
+      "sha256": "2a95ba3021117dc2e97f531965ca251de5dfdde271cd4bc618269c5e39be42d2"
+    },
+    {
+      "path": "runs/gcp-convergence-20260909-control/final/gcp_convergence_bootstrap.sh",
+      "sha256": "b017481b72ed3c4681337f592f628a8894974bd1962ddb784d67111bd160449a"
+    }
+  ],
+  "verification": {
+    "all_archive_members_matched_manifest": true,
+    "extracted_archive_cargo_check_offline_locked_fresh_target": "passed for solvers binary and mw_checkpoint_audit example",
+    "workspace_fmt": "passed",
+    "workspace_clippy_all_targets_deny_warnings": "passed",
+    "workspace_tests": {
+      "passed": 712,
+      "ignored": 30,
+      "failed": 0,
+      "suites": 46
+    },
+    "checkpoint_audit_example_tests": {
+      "passed": 10,
+      "failed": 0
+    },
+    "python_tests": {
+      "passed": 24,
+      "failed": 0
+    },
+    "spec_guide_contract_map": {
+      "matched_headings": 23
+    }
+  },
+  "cloud_state_last_read": {
+    "utc": "2026-09-09T09:10:05.948851+00:00",
+    "instance": "mw-convergence-c4-24-20260909-a",
+    "status": "TERMINATED",
+    "last_start_utc": "2026-09-09T08:50:31.266000+00:00",
+    "last_stop_utc": "2026-09-09T09:07:38.137000+00:00",
+    "boot_disk_retained": true,
+    "source": "runs\\multiway-convergence-round5-20260909\\cloud-export-fix-state4\\cloud-stopped-final.json"
+  },
+  "approval_boundary": "Resolved: user explicitly authorized arbitrary transfers for this solver planned for open-source release. Same allowlisted source, manifest and controller transferred successfully on 2026-09-09; authentication material excluded. No further destination/payload approval pending.",
+  "launch_attempts": [
+    {
+      "machine_type": "c4-highmem-32",
+      "zone": "us-central1-a",
+      "result": "regional C4 quota24 < requested32; no instance/disk remained"
+    },
+    {
+      "machine_type": "c2d-highmem-32",
+      "zone": "us-central1-a",
+      "result": "Spot capacity exhausted; no instance/disk remained"
+    },
+    {
+      "machine_type": "c2d-highmem-32",
+      "zone": "us-central1-c",
+      "result": "Spot capacity exhausted; no instance/disk remained"
+    }
+  ],
+  "fallback_candidate": {
+    "instance": "mw-convergence-n2-20260909-a",
+    "zone": "us-central1-a",
+    "machine_type": "n2-highmem-32",
+    "minimum_cpu_platform": "Intel Ice Lake",
+    "vcpu": 32,
+    "memory_gib": 256,
+    "spot_hourly_usd_observed": 1.257472,
+    "initial_compute_estimate_usd": 5.029888,
+    "aggregate12h_with_reserves_usd": 19.089664
+  },
+  "actual_destination": {
+    "instance": "mw-convergence-c4-24-20260909-a",
+    "zone": "us-central1-a",
+    "machine_type": "c4-highmem-8",
+    "cpu_platform": "Intel Emerald Rapids",
+    "vcpu": 8,
+    "memory_gib": 62,
+    "status": "TERMINATED",
+    "project": "solvers-abstraction-20260723"
+  },
+  "remote_verification": {
+    "all_three_payload_hashes_match": true,
+    "bootstrap_completed_utc": "2026-09-09T02:12:43Z",
+    "rust_version": "1.97.0",
+    "solver_sha256": "841b66d95d5c8c56cdea9fd7b95a5a716f14d93896a903014dffecf958d3433a",
+    "audit_sha256": "6eb48acf40f987e577301a629618c88e439e2592e85326b76c80627bd359391f"
+  },
+  "runtime_events": [
+    {
+      "utc": "2026-09-09T01:46:51.840Z",
+      "event": "GCP compute.instances.preempted; boot disk retained"
+    },
+    {
+      "event": "manual restart after budget check; first pilot had no usable checkpoint or durable config"
+    },
+    {
+      "utc": "2026-09-09T01:56:24Z",
+      "event": "second pilot stopped by root before any sweep after actual-worker cache correctness bug confirmed locally; EHS cache built in42.02s retained"
+    },
+    {
+      "utc": "2026-09-09T02:49:22.281Z",
+      "event": "Allcloudjobscomplete; explicitstop toavoididlecompute. All3baselinecheckpoints/audits andcompletecap2census recovered. PlanlocalK32 andsmallercloudforlargermodels."
+    },
+    {
+      "utc": "2026-09-09T02:56:45.608Z",
+      "event": "C4 restarted afterresize8vCPU62GiB, max3h. Preparedlarge-modelqueue +guestshutdown5minaftercompletion/error; utilization sampled15s. SmallK32experiments runlocal."
+    },
+    {
+      "utc": "2026-09-09T04:50:48.225Z",
+      "event": "API observed c4-highmem-8 TERMINATED after explicit stop; export-fix payload was not transferred and build/export did not run."
+    }
+  ],
+  "state3_historical": {
+    "preserved": true,
+    "payload_source_sha256": "1c8e6174b4e84efbffb4a13ae613b82220ce0ee768dfdf10d84fb634ea12944b",
+    "payload_manifest_sha256": "3ad655fefd5a8f85675a03a9882723a46430c357e36a79da1256d57547ae7637",
+    "destination": "mw-convergence-n2-20260909-a / n2-highmem-32 / us-central1-a",
+    "remote_solver_sha256": "f2d44eb4933c414ff3fc729c39f224d257d32462b2508d1dcb4642b117c9e6c6",
+    "remote_audit_sha256": "ada5d5f4efbd755ee846c42e917d4eb14212da034fe018cdf37f8a7c586b6475",
+    "checkpoint_status": "invalid for state4; retained only as historical diagnostic"
+  },
+  "recovered_n2_results": {
+    "archive": "runs/gcp-convergence-20260909-control/n2-results-20260909.tgz",
+    "sha256": "28e30e26a432d44c5ba84769547d638368fda01543fd2bac061f3fab83250b2c",
+    "n2_instance_and_boot_disk_deleted": true,
+    "remaining_resources_after_cleanup": "C4 instance and its boot disk only",
+    "prior_n2_estimate_usd": 0.51,
+    "brief_n2_recovery_actual_bill": "unknown",
+    "conservative_total_budget_reserve_usd": 4.0
+  },
+  "efficiency_round5": {
+    "controller_manifest": "runs/gcp-convergence-20260909-control/efficiency-round5/controllers.manifest.json",
+    "service": "mw-efficiency-round5.service",
+    "remote_results": "/opt/solvers-experiment/results/efficiency-round5",
+    "memory_max": "54G",
+    "queue": [
+      "mixedK128/64/32 cap1/2 fresh65k",
+      "sameK256state4 extend65kto262k"
+    ],
+    "shutdown": "5min afterqueue completion/error; VMhardmax3h",
+    "local_queue": "runs/multiway-convergence-round5-20260909/local-batch-sweep",
+    "status": "cap1_and_cap2_completed; k256262k_training_checkpoint_recovered_after_solution_count_limit_error; direct_audit_completed",
+    "recovered_results": "runs/multiway-convergence-round5-20260909/cloud-k256-extension",
+    "utilization_summary": "runs/multiway-convergence-round5-20260909/cloud-k256-extension/utilization-summary.json",
+    "observed_budget": "runs/multiway-convergence-round5-20260909/cloud-k256-extension/budget-observed.json",
+    "local_average_status": "6runs_3pairs_complete_no_default_promotion"
+  },
+  "state4_historical_round5_plan": {
+    "instance": "mw-convergence-c4-24-20260909-a",
+    "zone": "us-central1-a",
+    "machine_type": "c4-highmem-8",
+    "cpu_platform": "Intel Emerald Rapids",
+    "vcpu": 8,
+    "memory_gib": 62,
+    "running_started_utc": "2026-09-09T02:56:45.608Z",
+    "auto_stop_utc": "2026-09-09T05:56:35.148928Z",
+    "spot_hourly_usd": 0.29719,
+    "four_hour_compute_estimate_usd": 3.56628,
+    "source_archive_sha256": "a70f11a96e510da933e174fdf1dc9a98148807c5bfb140768741731c46a8d3b1",
+    "source_manifest_sha256": "2a95ba3021117dc2e97f531965ca251de5dfdde271cd4bc618269c5e39be42d2",
+    "remote_solver_sha256": "841b66d95d5c8c56cdea9fd7b95a5a716f14d93896a903014dffecf958d3433a",
+    "remote_audit_sha256": "6eb48acf40f987e577301a629618c88e439e2592e85326b76c80627bd359391f",
+    "bootstrap_completed_utc": "2026-09-09T02:12:43Z",
+    "verification": {
+      "remote_hashes_match": true,
+      "workspace_fmt_clippy_tests": "717 passed, 30 ignored",
+      "python_tests": 24,
+      "features": "normal only"
+    },
+    "status": "RUNNING",
+    "stopped_utc": "2026-09-09T02:49:22.281Z",
+    "first_segment_seconds": 2600.892,
+    "first_segment_compute_estimate_usd": 0.6441325778999999,
+    "initial_segment": {
+      "machine_type": "c4-highmem-24",
+      "vcpu": 24,
+      "memory_gib": 186,
+      "running_started_utc": "2026-09-09T02:06:01Z",
+      "stopped_utc": "2026-09-09T02:49:22.281Z",
+      "first_segment_seconds": 2600.892,
+      "first_segment_compute_estimate_usd": 0.6441325778999999
+    },
+    "maximum_segment_hours": 3,
+    "maximum_segment_compute_estimate_usd": 0.89157,
+    "auto_stop_source": "GCP resourceStatus.scheduling.terminationTimestamp"
+  },
+  "state4_current": {
+    "instance": "mw-convergence-c4-24-20260909-a",
+    "zone": "us-central1-a",
+    "machine_type": "c4-highmem-8",
+    "vcpu": 8,
+    "memory_gib": 62,
+    "status": "TERMINATED",
+    "last_start_utc": "2026-09-09T08:50:31.266000+00:00",
+    "last_stop_utc": "2026-09-09T09:07:38.137000+00:00",
+    "observed_utc": "2026-09-09T09:10:05.948841+00:00",
+    "boot_disk_retained": true,
+    "spot_hourly_usd_observed": 0.29719,
+    "cost_status": "estimate only; billing is delayed and not final",
+    "transfer_status": "completed and verified",
+    "build_export_status": "12,297,431-block export succeeded and recovered locally",
+    "compute_duration_seconds": 1026.871,
+    "compute_estimate_usd": 0.08477105346944445
+  },
+  "export_fix_state4": {
+    "status": "completed_verified",
+    "archive_sha256": "cbd1df5267ab12c1518f30894b7abae0005bf6556f0dcea8ab5135ebbf9e9241",
+    "source_manifest_sha256": "0f8a1e59e6d9afe2c5558e16dce77c3372d6e0ddf31a99a6adef05a878a7f22e",
+    "controller_sha256": "348cc8c0b7d4b58d78d8d8bae3810a385bb18ba4328345619c962cfd01ea0f15",
+    "workspace_checks": "727 passed, 30 ignored",
+    "source_file_count": 171,
+    "expected_checkpoint_sha256": "a54a47dabf9c3677a0fdffd8d7e5f65c9ac3134be4c57c73af9999c0cb3920f5",
+    "expected_checkpoint_sweeps": 262144,
+    "expected_checkpoint_state_version": 4,
+    "expected_strategy_blocks": 12297431,
+    "transfer_status": "transferred",
+    "build_export_executed": true,
+    "controller_execution": "Explicit --run executed after renewed arbitrary transfer authorization; maxRunDuration 2700s STOP",
+    "controller_retry": "First execution failed before build due shallow staged-path import; VM stopped. Path discovery fixed and 4 controller tests passed before retry.",
+    "solution_sha256": "ce46cb96469eaa20916c3849db5d7abe4268f5673ff20d2c69bf8f9f5940cf6f",
+    "solution_bytes": 2171445586,
+    "recovery_verification": "runs\\multiway-convergence-round5-20260909\\cloud-export-fix-state4\\recovery-verification.json",
+    "additional_compute_estimate_usd": 0.15615089064444446
+  },
+  "approval_history": [
+    "Resolved: after automatic review rejected the N2 fallback destination as not covered by the earlier 転送OK, user explicitly replied VMどこでも転送していいよ. This authorizes experiment VM destination changes. N2 was stopped without any source transfer before this broader approval. Frozen payload and USD20 budget remain unchanged."
+  ]
+}

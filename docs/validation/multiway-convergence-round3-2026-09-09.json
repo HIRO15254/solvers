@@ -1,0 +1,1525 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-09",
+  "goal_status": "in_progress; approximately GTOW-matching strategic tendencies within a few cloud hours not demonstrated",
+  "cloud_experiment_performed": false,
+  "reference": "docs/validation/gtowizard-target-2026-09-09.json",
+  "measurement_cautions": [
+    "Original cap1/cap2 variants changed ALL four street caps because a scratch text replacement matched preflop as well as flop. Actual caps are retained per record; these are not postflop-only sensitivity results.",
+    "The corrected variants anchor full field names and assert parsed preflop=4; original raw inputs and hashes were not overwritten.",
+    "Preflight records with complete=false are traversed prefixes at the memory budget, not total counts.",
+    "Wall times may include competing local preflights, audits, and test/build processes; no rigorous speedup claim follows.",
+    "Finite fixed-candidate held-out gains do not certify exploitability or Nash equilibrium.",
+    "Node action rates include physical card removal and prefix reach. Fallback fractions and Monte Carlo error remain explicit."
+  ],
+  "preflights": [
+    {
+      "name": "cap1-k256",
+      "config": "runs\\multiway-gtow-model-20260909\\cap1-k256.toml",
+      "binary_sha256": "16cc0a86b66af11aa90ce506c0afc324561a339cba8222110afd562a8b605675",
+      "config_sha256": "a1115c96286314969585fb114fe5376aa7a57d6e3dceb37fe7f1b0105dd0f0af",
+      "returncode": 0,
+      "result": {
+        "status": "valid",
+        "schema": "solvers.multiway-preflop/v1",
+        "seatCount": 6,
+        "chipUnitBb": 0.001,
+        "profile": "regret-minimized approximate profile; no Nash/GTO guarantee",
+        "resources": {
+          "complete": true,
+          "recall": "street",
+          "decisionNodes": 135654,
+          "terminalEdges": 154466,
+          "policyColumns": 34719420,
+          "policySlots": 74254021,
+          "solverStateBytes": 601627808
+        }
+      },
+      "wall_seconds": 3.7221091999672353,
+      "actual_aggression_caps": {
+        "preflop": 1,
+        "flop": 1,
+        "turn": 1,
+        "river": 1
+      },
+      "actual_buckets": {
+        "flop": 256,
+        "turn": 256,
+        "river": 256
+      },
+      "raw_record": "runs/multiway-gtow-model-20260909/cap1-k256-preflight.json"
+    },
+    {
+      "name": "cap1-k32",
+      "config": "runs\\multiway-gtow-model-20260909\\cap1-k32.toml",
+      "binary_sha256": "16cc0a86b66af11aa90ce506c0afc324561a339cba8222110afd562a8b605675",
+      "config_sha256": "5678d6975f10f713f71cab935b9c706e0d2d67c29be013bbb0c6ea14f52ffd07",
+      "returncode": 0,
+      "result": {
+        "status": "valid",
+        "schema": "solvers.multiway-preflop/v1",
+        "seatCount": 6,
+        "chipUnitBb": 0.001,
+        "profile": "regret-minimized approximate profile; no Nash/GTO guarantee",
+        "resources": {
+          "complete": true,
+          "recall": "street",
+          "decisionNodes": 135654,
+          "terminalEdges": 154466,
+          "policyColumns": 4353532,
+          "policySlots": 9309701,
+          "solverStateBytes": 78277512
+        }
+      },
+      "wall_seconds": 3.7444195999996737,
+      "actual_aggression_caps": {
+        "preflop": 1,
+        "flop": 1,
+        "turn": 1,
+        "river": 1
+      },
+      "actual_buckets": {
+        "flop": 32,
+        "turn": 32,
+        "river": 32
+      },
+      "raw_record": "runs/multiway-gtow-model-20260909/cap1-k32-preflight.json"
+    },
+    {
+      "name": "cap2-k256",
+      "config": "runs\\multiway-gtow-model-20260909\\cap2-k256.toml",
+      "binary_sha256": "16cc0a86b66af11aa90ce506c0afc324561a339cba8222110afd562a8b605675",
+      "config_sha256": "511a7c93d96476029e8816886f41184b974d1277691978feffe12b0b9f57237a",
+      "returncode": 0,
+      "result": {
+        "status": "valid",
+        "schema": "solvers.multiway-preflop/v1",
+        "seatCount": 6,
+        "chipUnitBb": 0.001,
+        "profile": "regret-minimized approximate profile; no Nash/GTO guarantee",
+        "resources": {
+          "complete": false,
+          "recall": "street",
+          "decisionNodes": 1900795,
+          "policyColumns": 486579421,
+          "solverStateBytes": 8589935408
+        }
+      },
+      "wall_seconds": 51.760358300060034,
+      "actual_aggression_caps": {
+        "preflop": 2,
+        "flop": 2,
+        "turn": 2,
+        "river": 2
+      },
+      "actual_buckets": {
+        "flop": 256,
+        "turn": 256,
+        "river": 256
+      },
+      "raw_record": "runs/multiway-gtow-model-20260909/cap2-k256-preflight.json"
+    },
+    {
+      "name": "cap2-k32",
+      "config": "runs\\multiway-gtow-model-20260909\\cap2-k32.toml",
+      "binary_sha256": "16cc0a86b66af11aa90ce506c0afc324561a339cba8222110afd562a8b605675",
+      "config_sha256": "1cdace2a80bc0c1d3e0cbcf7a04dd6045ae351079b4ab951d7000313281311f1",
+      "returncode": 0,
+      "result": {
+        "status": "valid",
+        "schema": "solvers.multiway-preflop/v1",
+        "seatCount": 6,
+        "chipUnitBb": 0.001,
+        "profile": "regret-minimized approximate profile; no Nash/GTO guarantee",
+        "resources": {
+          "complete": true,
+          "recall": "street",
+          "decisionNodes": 5656981,
+          "terminalEdges": 6526828,
+          "policyColumns": 181118470,
+          "policySlots": 390084479,
+          "solverStateBytes": 3279083208
+        }
+      },
+      "wall_seconds": 154.90996159997303,
+      "actual_aggression_caps": {
+        "preflop": 2,
+        "flop": 2,
+        "turn": 2,
+        "river": 2
+      },
+      "actual_buckets": {
+        "flop": 32,
+        "turn": 32,
+        "river": 32
+      },
+      "raw_record": "runs/multiway-gtow-model-20260909/cap2-k32-preflight.json"
+    },
+    {
+      "name": "cap1-k256",
+      "config": "runs\\multiway-gtow-model-20260909\\preflop4\\cap1-k256.toml",
+      "binary_sha256": "16cc0a86b66af11aa90ce506c0afc324561a339cba8222110afd562a8b605675",
+      "config_sha256": "0b50f2e14d44fdfe09e39d5d135494e0cc29359aa41329907b6a02dfa30d2a4a",
+      "returncode": 0,
+      "result": {
+        "status": "valid",
+        "schema": "solvers.multiway-preflop/v1",
+        "seatCount": 6,
+        "chipUnitBb": 0.001,
+        "profile": "regret-minimized approximate profile; no Nash/GTO guarantee",
+        "resources": {
+          "complete": false,
+          "recall": "street",
+          "decisionNodes": 2006324,
+          "policyColumns": 512523962,
+          "solverStateBytes": 8589939344
+        }
+      },
+      "wall_seconds": 66.55561909999233,
+      "actual_aggression_caps": {
+        "preflop": 4,
+        "flop": 1,
+        "turn": 1,
+        "river": 1
+      },
+      "actual_buckets": {
+        "flop": 256,
+        "turn": 256,
+        "river": 256
+      },
+      "raw_record": "runs/multiway-gtow-model-20260909/preflop4/cap1-k256-preflight.json"
+    },
+    {
+      "name": "cap2-k256",
+      "config": "runs\\multiway-gtow-model-20260909\\preflop4\\cap2-k256.toml",
+      "binary_sha256": "16cc0a86b66af11aa90ce506c0afc324561a339cba8222110afd562a8b605675",
+      "config_sha256": "1065b75e0508895b86fcc9ceee02734866545dcdd6a2e23e9b17f4c8c9b490b9",
+      "returncode": 0,
+      "result": {
+        "status": "valid",
+        "schema": "solvers.multiway-preflop/v1",
+        "seatCount": 6,
+        "chipUnitBb": 0.001,
+        "profile": "regret-minimized approximate profile; no Nash/GTO guarantee",
+        "resources": {
+          "complete": false,
+          "recall": "street",
+          "decisionNodes": 1906701,
+          "policyColumns": 487878903,
+          "solverStateBytes": 8589937696
+        }
+      },
+      "wall_seconds": 63.128591300104745,
+      "actual_aggression_caps": {
+        "preflop": 4,
+        "flop": 2,
+        "turn": 2,
+        "river": 2
+      },
+      "actual_buckets": {
+        "flop": 256,
+        "turn": 256,
+        "river": 256
+      },
+      "raw_record": "runs/multiway-gtow-model-20260909/preflop4/cap2-k256-preflight.json"
+    },
+    {
+      "name": "cap1-k256",
+      "config": "runs\\multiway-gtow-model-20260909\\observed-coldcall-preflop4\\cap1-k256.toml",
+      "binary_sha256": "16cc0a86b66af11aa90ce506c0afc324561a339cba8222110afd562a8b605675",
+      "config_sha256": "a67226068f28bd4f203c803c032f69c18a53f4a37a7fde8b9591fb98301772d5",
+      "returncode": 0,
+      "result": {
+        "status": "valid",
+        "schema": "solvers.multiway-preflop/v1",
+        "seatCount": 6,
+        "chipUnitBb": 0.001,
+        "profile": "regret-minimized approximate profile; no Nash/GTO guarantee",
+        "resources": {
+          "complete": false,
+          "recall": "street",
+          "decisionNodes": 2006324,
+          "policyColumns": 512523962,
+          "solverStateBytes": 8589939344
+        }
+      },
+      "wall_seconds": 86.58969149994664,
+      "actual_aggression_caps": {
+        "preflop": 4,
+        "flop": 1,
+        "turn": 1,
+        "river": 1
+      },
+      "actual_buckets": {
+        "flop": 256,
+        "turn": 256,
+        "river": 256
+      },
+      "raw_record": "runs/multiway-gtow-model-20260909/observed-coldcall-preflop4/cap1-k256-preflight.json"
+    },
+    {
+      "name": "cap1-k32",
+      "config": "runs\\multiway-gtow-model-20260909\\observed-coldcall-preflop4\\cap1-k32.toml",
+      "binary_sha256": "16cc0a86b66af11aa90ce506c0afc324561a339cba8222110afd562a8b605675",
+      "config_sha256": "0cce913dabaa9ababed1648b0baea2c73c90f3ee3ac8821a2ef88e5bede91bfb",
+      "returncode": 0,
+      "result": {
+        "status": "valid",
+        "schema": "solvers.multiway-preflop/v1",
+        "seatCount": 6,
+        "chipUnitBb": 0.001,
+        "profile": "regret-minimized approximate profile; no Nash/GTO guarantee",
+        "resources": {
+          "complete": true,
+          "recall": "street",
+          "decisionNodes": 2671933,
+          "terminalEdges": 2837730,
+          "policyColumns": 87818800,
+          "policySlots": 181382705,
+          "solverStateBytes": 1526165400
+        }
+      },
+      "wall_seconds": 113.11992590001319,
+      "actual_aggression_caps": {
+        "preflop": 4,
+        "flop": 1,
+        "turn": 1,
+        "river": 1
+      },
+      "actual_buckets": {
+        "flop": 32,
+        "turn": 32,
+        "river": 32
+      },
+      "raw_record": "runs/multiway-gtow-model-20260909/observed-coldcall-preflop4/cap1-k32-preflight.json"
+    },
+    {
+      "name": "cap2-k256",
+      "config": "runs\\multiway-gtow-model-20260909\\observed-coldcall-preflop4\\cap2-k256.toml",
+      "binary_sha256": "16cc0a86b66af11aa90ce506c0afc324561a339cba8222110afd562a8b605675",
+      "config_sha256": "ccd6fae9b8d4c6372c8a8a3160b025272c68577447758d215440d948dff5ef2f",
+      "returncode": 0,
+      "result": {
+        "status": "valid",
+        "schema": "solvers.multiway-preflop/v1",
+        "seatCount": 6,
+        "chipUnitBb": 0.001,
+        "profile": "regret-minimized approximate profile; no Nash/GTO guarantee",
+        "resources": {
+          "complete": false,
+          "recall": "street",
+          "decisionNodes": 1906701,
+          "policyColumns": 487878903,
+          "solverStateBytes": 8589937696
+        }
+      },
+      "wall_seconds": 81.43182930001058,
+      "actual_aggression_caps": {
+        "preflop": 4,
+        "flop": 2,
+        "turn": 2,
+        "river": 2
+      },
+      "actual_buckets": {
+        "flop": 256,
+        "turn": 256,
+        "river": 256
+      },
+      "raw_record": "runs/multiway-gtow-model-20260909/observed-coldcall-preflop4/cap2-k256-preflight.json"
+    }
+  ],
+  "pilots": [
+    {
+      "name": "pilot-cap1-k256",
+      "run_json": "runs/multiway-gtow-model-20260909/pilot-cap1-k256/run/run.json",
+      "aggression_caps": {
+        "flop": 1,
+        "preflop": 1,
+        "river": 1,
+        "turn": 1
+      },
+      "buckets": {
+        "flop": 256,
+        "river": 256,
+        "turn": 256
+      },
+      "sweeps": 4096,
+      "elapsed_secs_in_run": 64.6564079,
+      "preallocated_bytes": 601627808,
+      "infosets": 1860658,
+      "status": "sweep-limit",
+      "checkpoint_sha256": "ced3fcbefaa21e00034128627036b32590ae73ee232e648eb94f80fd97a22d9e",
+      "audit": {
+        "raw_json": "runs/multiway-gtow-model-20260909/pilot-cap1-k256/audit.json",
+        "schema_version": "solvers.multiway-checkpoint-audit/v1",
+        "samples_per_seed": 8192,
+        "br_training": {
+          "seed": 404,
+          "traversalsPerSeat": 100000,
+          "elapsedSecs": 161.0033497,
+          "coverage": [
+            {
+              "traversals": 100000,
+              "visited_infosets": 85302,
+              "retained_infosets": 4957,
+              "total_visits": 285812,
+              "retained_visits": 141552
+            },
+            {
+              "traversals": 100000,
+              "visited_infosets": 189373,
+              "retained_infosets": 23121,
+              "total_visits": 753017,
+              "retained_visits": 432628
+            },
+            {
+              "traversals": 100000,
+              "visited_infosets": 149145,
+              "retained_infosets": 15786,
+              "total_visits": 530469,
+              "retained_visits": 267597
+            },
+            {
+              "traversals": 100000,
+              "visited_infosets": 74742,
+              "retained_infosets": 9596,
+              "total_visits": 378673,
+              "retained_visits": 245414
+            },
+            {
+              "traversals": 100000,
+              "visited_infosets": 82815,
+              "retained_infosets": 7406,
+              "total_visits": 345639,
+              "retained_visits": 194836
+            },
+            {
+              "traversals": 100000,
+              "visited_infosets": 93102,
+              "retained_infosets": 7460,
+              "total_visits": 352243,
+              "retained_visits": 195189
+            }
+          ]
+        },
+        "evaluation_seeds": [
+          101,
+          202,
+          303
+        ],
+        "evaluations": [
+          {
+            "seed": 101,
+            "elapsedSecs": 29.7969066,
+            "result": {
+              "samples": 8192,
+              "total_deal_attempts": 8192,
+              "seats": [
+                {
+                  "mean": 0.033890502929687503,
+                  "stderr": 0.26717755572210883,
+                  "ci95": [
+                    -0.4897775062856458,
+                    0.5575585121450208
+                  ]
+                },
+                {
+                  "mean": -0.9757539062500006,
+                  "stderr": 0.3195136972535589,
+                  "ci95": [
+                    -1.602000752866976,
+                    -0.3495070596330252
+                  ]
+                },
+                {
+                  "mean": -0.9729470214843745,
+                  "stderr": 0.31759696197617904,
+                  "ci95": [
+                    -1.5954370669576854,
+                    -0.3504569760110636
+                  ]
+                },
+                {
+                  "mean": 0.39265576171875005,
+                  "stderr": 0.20528912691194495,
+                  "ci95": [
+                    -0.009710927028662053,
+                    0.7950224504661622
+                  ]
+                },
+                {
+                  "mean": 0.2765091552734371,
+                  "stderr": 0.25957211218100357,
+                  "ci95": [
+                    -0.2322521846013299,
+                    0.7852704951482041
+                  ]
+                },
+                {
+                  "mean": 0.4528542480468747,
+                  "stderr": 0.29687487663687995,
+                  "ci95": [
+                    -0.12902051016141003,
+                    1.0347290062551595
+                  ]
+                }
+              ],
+              "deviation_gain_lower_bound": [
+                {
+                  "mean": 0.7876955566406227,
+                  "stderr": 0.20507335977543018,
+                  "ci95": [
+                    0.3280441280399735,
+                    1.247346985241272
+                  ]
+                },
+                {
+                  "mean": 1.022736694335942,
+                  "stderr": 0.27247281497012976,
+                  "ci95": [
+                    0.41201612686189304,
+                    1.6689516937900017
+                  ]
+                },
+                {
+                  "mean": 0.9171693115234342,
+                  "stderr": 0.24031240032959592,
+                  "ci95": [
+                    0.3785330974246779,
+                    1.4558055256221905
+                  ]
+                },
+                {
+                  "mean": 0.2297091064453124,
+                  "stderr": 0.1617251238454327,
+                  "ci95": [
+                    0.0,
+                    0.5921997990324652
+                  ]
+                },
+                {
+                  "mean": 0.5033706054687495,
+                  "stderr": 0.17289926787481216,
+                  "ci95": [
+                    0.11583418645414545,
+                    0.8909070244833535
+                  ]
+                },
+                {
+                  "mean": 0.10089392089843781,
+                  "stderr": 0.20891004080267483,
+                  "ci95": [
+                    0.0,
+                    0.5691448863535532
+                  ]
+                }
+              ]
+            },
+            "max_candidate_ci_upper": 1.6689516937900017
+          },
+          {
+            "seed": 202,
+            "elapsedSecs": 46.7750608,
+            "result": {
+              "samples": 8192,
+              "total_deal_attempts": 8192,
+              "seats": [
+                {
+                  "mean": -0.24110595703125018,
+                  "stderr": 0.2486828729289184,
+                  "ci95": [
+                    -0.7285243879719303,
+                    0.24631247390942992
+                  ]
+                },
+                {
+                  "mean": -0.9562536621093723,
+                  "stderr": 0.31928280338361464,
+                  "ci95": [
+                    -1.582047956741257,
+                    -0.3304593674774876
+                  ]
+                },
+                {
+                  "mean": -1.0838796386718763,
+                  "stderr": 0.32555313373918743,
+                  "ci95": [
+                    -1.7219637808006838,
+                    -0.44579549654306894
+                  ]
+                },
+                {
+                  "mean": 0.4783531494140614,
+                  "stderr": 0.2000611403422881,
+                  "ci95": [
+                    0.08623331434317666,
+                    0.8704729844849461
+                  ]
+                },
+                {
+                  "mean": 0.6234078369140641,
+                  "stderr": 0.2602207232717281,
+                  "ci95": [
+                    0.11337521930147698,
+                    1.1334404545266512
+                  ]
+                },
+                {
+                  "mean": 0.389513305664063,
+                  "stderr": 0.27873878041595884,
+                  "ci95": [
+                    -0.15681470395121627,
+                    0.9358413152793423
+                  ]
+                }
+              ],
+              "deviation_gain_lower_bound": [
+                {
+                  "mean": 0.8069519042968732,
+                  "stderr": 0.1914971004964019,
+                  "ci95": [
+                    0.377730303244238,
+                    1.2361735053495084
+                  ]
+                },
+                {
+                  "mean": 1.0070075683593709,
+                  "stderr": 0.2462109136495115,
+                  "ci95": [
+                    0.45515042650535575,
+                    1.5588647102133861
+                  ]
+                },
+                {
+                  "mean": 1.078171874999995,
+                  "stderr": 0.3128507536157706,
+                  "ci95": [
+                    0.39095258424997537,
+                    1.779395554154383
+                  ]
+                },
+                {
+                  "mean": 0.2517418212890632,
+                  "stderr": 0.15335729736929438,
+                  "ci95": [
+                    0.0,
+                    0.5954768676125997
+                  ]
+                },
+                {
+                  "mean": 0.3328841552734388,
+                  "stderr": 0.18921434529443623,
+                  "ci95": [
+                    0.0,
+                    0.7569891888163882
+                  ]
+                },
+                {
+                  "mean": 0.30425451660156244,
+                  "stderr": 0.19461412471773262,
+                  "ci95": [
+                    0.0,
+                    0.7404626157438883
+                  ]
+                }
+              ]
+            },
+            "max_candidate_ci_upper": 1.779395554154383
+          },
+          {
+            "seed": 303,
+            "elapsedSecs": 46.1028427,
+            "result": {
+              "samples": 8192,
+              "total_deal_attempts": 8192,
+              "seats": [
+                {
+                  "mean": -0.10472900390625002,
+                  "stderr": 0.2481661396652576,
+                  "ci95": [
+                    -0.591134637650155,
+                    0.3816766298376549
+                  ]
+                },
+                {
+                  "mean": 0.20229968261718773,
+                  "stderr": 0.3396132091530263,
+                  "ci95": [
+                    -0.4633422073227437,
+                    0.8679415725571191
+                  ]
+                },
+                {
+                  "mean": -1.9184184570312468,
+                  "stderr": 0.31542017385331006,
+                  "ci95": [
+                    -2.5366419977837347,
+                    -1.300194916278759
+                  ]
+                },
+                {
+                  "mean": 0.42061157226562335,
+                  "stderr": 0.18422215031700578,
+                  "ci95": [
+                    0.05953615764429204,
+                    0.7816869868869547
+                  ]
+                },
+                {
+                  "mean": 0.22052111816406192,
+                  "stderr": 0.2587408200359716,
+                  "ci95": [
+                    -0.2866108891064424,
+                    0.7276531254345663
+                  ]
+                },
+                {
+                  "mean": 0.3971981201171863,
+                  "stderr": 0.2918987523068851,
+                  "ci95": [
+                    -0.17492343440430852,
+                    0.9693196746386812
+                  ]
+                }
+              ],
+              "deviation_gain_lower_bound": [
+                {
+                  "mean": 0.6158972167968758,
+                  "stderr": 0.18508265657963266,
+                  "ci95": [
+                    0.20105295033928716,
+                    1.0307414832544644
+                  ]
+                },
+                {
+                  "mean": 0.63195324707031,
+                  "stderr": 0.2731912394139417,
+                  "ci95": [
+                    0.019622403047901082,
+                    1.2442840910927189
+                  ]
+                },
+                {
+                  "mean": 1.2221396484375004,
+                  "stderr": 0.25187144513811616,
+                  "ci95": [
+                    0.6575949913049268,
+                    1.786684305570074
+                  ]
+                },
+                {
+                  "mean": 0.2617279052734368,
+                  "stderr": 0.1377661490494415,
+                  "ci95": [
+                    0.0,
+                    0.570516951752855
+                  ]
+                },
+                {
+                  "mean": 0.4137395019531253,
+                  "stderr": 0.23134196348344982,
+                  "ci95": [
+                    0.0,
+                    0.9322693789049297
+                  ]
+                },
+                {
+                  "mean": 0.36375146484374865,
+                  "stderr": 0.20484082118676805,
+                  "ci95": [
+                    0.0,
+                    0.8228816814517705
+                  ]
+                }
+              ]
+            },
+            "max_candidate_ci_upper": 1.786684305570074
+          }
+        ],
+        "nodes": [
+          {
+            "requested": "root",
+            "history": "00000000000000000000000000000000",
+            "actor": 3,
+            "activeOpponents": 5,
+            "actions": [
+              "fold",
+              "raise-to:2000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 16384,
+              "seed": 505,
+              "totalDealAttempts": 16384,
+              "conditionalActionRates": {
+                "fold": {
+                  "estimate": 0.7837365165854837,
+                  "standardError": 0.0029652793100811104
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.02898378131385665,
+                  "standardError": 0.0010525775128776436
+                },
+                "raise-to:2000": {
+                  "estimate": 0.1872797021006596,
+                  "standardError": 0.0026840595047411936
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 1.0,
+                "standardError": 0.0
+              },
+              "effectiveSampleSize": 16384.0,
+              "fallbackReachWeightFraction": {
+                "any": 0.0,
+                "currentRegret": 0.0,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "average_observed_classes": 169,
+            "total_classes": 169
+          },
+          {
+            "requested": "fold",
+            "history": "aa682c5b05922f0463f8ec1733821d42",
+            "actor": 4,
+            "activeOpponents": 4,
+            "actions": [
+              "fold",
+              "raise-to:2000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 16384,
+              "seed": 505,
+              "totalDealAttempts": 16384,
+              "conditionalActionRates": {
+                "fold": {
+                  "estimate": 0.7491571681520917,
+                  "standardError": 0.003381164803408994
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.07521734752513178,
+                  "standardError": 0.0020530271394575833
+                },
+                "raise-to:2000": {
+                  "estimate": 0.1756254843227767,
+                  "standardError": 0.0027215975746312164
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.7837365165854837,
+                "standardError": 0.0029652793100811104
+              },
+              "effectiveSampleSize": 13271.52825625819,
+              "fallbackReachWeightFraction": {
+                "any": 0.0,
+                "currentRegret": 0.0,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "average_observed_classes": 169,
+            "total_classes": 169
+          },
+          {
+            "requested": "fold/fold",
+            "history": "76edbf1ab7ec6e4cf36eb73924ab45d3",
+            "actor": 5,
+            "activeOpponents": 3,
+            "actions": [
+              "fold",
+              "raise-to:2300",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 16384,
+              "seed": 505,
+              "totalDealAttempts": 16384,
+              "conditionalActionRates": {
+                "fold": {
+                  "estimate": 0.6602483033774641,
+                  "standardError": 0.004113627390821785
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.07032652764789192,
+                  "standardError": 0.0019346931482318664
+                },
+                "raise-to:2300": {
+                  "estimate": 0.2694251689746438,
+                  "standardError": 0.0035431267697723415
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.5871418293425658,
+                "standardError": 0.0034577911327532203
+              },
+              "effectiveSampleSize": 10447.614985030485,
+              "fallbackReachWeightFraction": {
+                "any": 0.0,
+                "currentRegret": 0.0,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "average_observed_classes": 169,
+            "total_classes": 169
+          },
+          {
+            "requested": "fold/fold/fold",
+            "history": "48eb85a77a6e45460986c07bdde524e6",
+            "actor": 0,
+            "activeOpponents": 2,
+            "actions": [
+              "fold",
+              "raise-to:2500",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 16384,
+              "seed": 505,
+              "totalDealAttempts": 16384,
+              "conditionalActionRates": {
+                "fold": {
+                  "estimate": 0.7464022806864272,
+                  "standardError": 0.004411088834839344
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.04919691842660185,
+                  "standardError": 0.0015597483030303063
+                },
+                "raise-to:2500": {
+                  "estimate": 0.204400800886971,
+                  "standardError": 0.0038049044348736154
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.38765939666536964,
+                "standardError": 0.00331816242951032
+              },
+              "effectiveSampleSize": 7446.273440286746,
+              "fallbackReachWeightFraction": {
+                "any": 0.0,
+                "currentRegret": 0.0,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "average_observed_classes": 169,
+            "total_classes": 169
+          },
+          {
+            "requested": "fold/fold/fold/fold",
+            "history": "9f19fd2c6bb3147c16fd33531d8d9261",
+            "actor": 1,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:500",
+              "raise-to:3000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 16384,
+              "seed": 505,
+              "totalDealAttempts": 16384,
+              "conditionalActionRates": {
+                "call:500": {
+                  "estimate": 0.2521530813697273,
+                  "standardError": 0.0033699399732065984
+                },
+                "fold": {
+                  "estimate": 0.2640206159379838,
+                  "standardError": 0.003195553752835434
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.06325402480128207,
+                  "standardError": 0.0018116559962640915
+                },
+                "raise-to:3000": {
+                  "estimate": 0.4205722778910067,
+                  "standardError": 0.003359534867131856
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.2893498578005563,
+                "standardError": 0.0030047643669831787
+              },
+              "effectiveSampleSize": 5921.813555089816,
+              "fallbackReachWeightFraction": {
+                "any": 0.0,
+                "currentRegret": 0.0,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "average_observed_classes": 169,
+            "total_classes": 169
+          }
+        ]
+      }
+    },
+    {
+      "name": "pilot-preflop4-cap1-k32",
+      "run_json": "runs/multiway-gtow-model-20260909/pilot-preflop4-cap1-k32/run/run.json",
+      "aggression_caps": {
+        "flop": 1,
+        "preflop": 4,
+        "river": 1,
+        "turn": 1
+      },
+      "buckets": {
+        "flop": 32,
+        "river": 32,
+        "turn": 32
+      },
+      "sweeps": 4096,
+      "elapsed_secs_in_run": 189.5620056,
+      "preallocated_bytes": 1526165400,
+      "infosets": 1100888,
+      "status": "sweep-limit",
+      "checkpoint_sha256": "c190adbf50ceefe07c3fbe3c65615f2e8271be951a0621afa00922118bcfdd99",
+      "audit": {
+        "raw_json": "runs/multiway-gtow-model-20260909/pilot-preflop4-cap1-k32/audit.json",
+        "schema_version": "solvers.multiway-checkpoint-audit/v1",
+        "samples_per_seed": 2048,
+        "br_training": {
+          "seed": 7093782259666545012,
+          "traversalsPerSeat": 20000,
+          "elapsedSecs": 39.6162505,
+          "coverage": [
+            {
+              "traversals": 20000,
+              "visited_infosets": 28015,
+              "retained_infosets": 1083,
+              "total_visits": 66351,
+              "retained_visits": 23786
+            },
+            {
+              "traversals": 20000,
+              "visited_infosets": 43885,
+              "retained_infosets": 4737,
+              "total_visits": 171196,
+              "retained_visits": 100484
+            },
+            {
+              "traversals": 20000,
+              "visited_infosets": 34801,
+              "retained_infosets": 3087,
+              "total_visits": 105764,
+              "retained_visits": 46874
+            },
+            {
+              "traversals": 20000,
+              "visited_infosets": 21996,
+              "retained_infosets": 716,
+              "total_visits": 60559,
+              "retained_visits": 27601
+            },
+            {
+              "traversals": 20000,
+              "visited_infosets": 22486,
+              "retained_infosets": 842,
+              "total_visits": 60489,
+              "retained_visits": 26282
+            },
+            {
+              "traversals": 20000,
+              "visited_infosets": 28910,
+              "retained_infosets": 1024,
+              "total_visits": 66824,
+              "retained_visits": 25988
+            }
+          ]
+        },
+        "evaluation_seeds": [
+          101,
+          202
+        ],
+        "evaluations": [
+          {
+            "seed": 101,
+            "elapsedSecs": 9.6471971,
+            "result": {
+              "samples": 2048,
+              "total_deal_attempts": 2048,
+              "seats": [
+                {
+                  "mean": -0.08832519531249916,
+                  "stderr": 0.8707148329817173,
+                  "ci95": [
+                    -1.794926267956665,
+                    1.6182758773316666
+                  ]
+                },
+                {
+                  "mean": -2.3072949218749974,
+                  "stderr": 1.0099105175486527,
+                  "ci95": [
+                    -4.286719536270357,
+                    -0.3278703074796381
+                  ]
+                },
+                {
+                  "mean": -1.4471142578124998,
+                  "stderr": 1.027022541474214,
+                  "ci95": [
+                    -3.4600784391019594,
+                    0.5658499234769598
+                  ]
+                },
+                {
+                  "mean": 2.6787719726562433,
+                  "stderr": 0.887907032607596,
+                  "ci95": [
+                    0.9384741887453554,
+                    4.419069756567131
+                  ]
+                },
+                {
+                  "mean": -0.019641113281249997,
+                  "stderr": 0.8239028874186645,
+                  "ci95": [
+                    -1.6344907726218323,
+                    1.5952085460593324
+                  ]
+                },
+                {
+                  "mean": -0.0018554687499996551,
+                  "stderr": 0.9247291083345561,
+                  "ci95": [
+                    -1.8143245210857297,
+                    1.8106135835857304
+                  ]
+                }
+              ],
+              "deviation_gain_lower_bound": [
+                {
+                  "mean": 0.0,
+                  "stderr": 0.6418254675372498,
+                  "ci95": [
+                    0.0,
+                    1.4236022513754918
+                  ]
+                },
+                {
+                  "mean": 1.983933105468751,
+                  "stderr": 0.7263081407588087,
+                  "ci95": [
+                    0.3559860387719571,
+                    3.7371124019683237
+                  ]
+                },
+                {
+                  "mean": 1.237702636718749,
+                  "stderr": 0.7621719469281356,
+                  "ci95": [
+                    0.0,
+                    2.946034838563472
+                  ]
+                },
+                {
+                  "mean": 0.0,
+                  "stderr": 0.5740898013699142,
+                  "ci95": [
+                    0.0,
+                    0.7122043339155253
+                  ]
+                },
+                {
+                  "mean": 1.5889282226562502,
+                  "stderr": 0.5328292796365899,
+                  "ci95": [
+                    0.39464467527879754,
+                    3.1599506937966755
+                  ]
+                },
+                {
+                  "mean": 1.1683520507812482,
+                  "stderr": 0.6992535430627812,
+                  "ci95": [
+                    0.0,
+                    2.735658942202166
+                  ]
+                }
+              ]
+            },
+            "max_candidate_ci_upper": 3.7371124019683237
+          },
+          {
+            "seed": 202,
+            "elapsedSecs": 8.4229354,
+            "result": {
+              "samples": 2048,
+              "total_deal_attempts": 2048,
+              "seats": [
+                {
+                  "mean": 1.2973515625000003,
+                  "stderr": 0.9260848357718673,
+                  "ci95": [
+                    -0.5177747156128596,
+                    3.1124778406128604
+                  ]
+                },
+                {
+                  "mean": -2.792099609375001,
+                  "stderr": 0.96421056109267,
+                  "ci95": [
+                    -4.681952309116634,
+                    -0.9022469096333678
+                  ]
+                },
+                {
+                  "mean": -2.8497558593750068,
+                  "stderr": 0.9667825510063114,
+                  "ci95": [
+                    -4.7446496593473775,
+                    -0.9548620594026365
+                  ]
+                },
+                {
+                  "mean": 1.3942446289062511,
+                  "stderr": 0.7956271417653696,
+                  "ci95": [
+                    -0.16518456895387335,
+                    2.9536738267663756
+                  ]
+                },
+                {
+                  "mean": 1.60538330078125,
+                  "stderr": 0.8384703074387346,
+                  "ci95": [
+                    -0.038018501798669835,
+                    3.2487851033611697
+                  ]
+                },
+                {
+                  "mean": 0.14710546874999952,
+                  "stderr": 0.9059127883446794,
+                  "ci95": [
+                    -1.628483596405572,
+                    1.922694533905571
+                  ]
+                }
+              ],
+              "deviation_gain_lower_bound": [
+                {
+                  "mean": 0.9527387695312493,
+                  "stderr": 0.6996041538454871,
+                  "ci95": [
+                    0.0,
+                    2.5208315199605242
+                  ]
+                },
+                {
+                  "mean": 1.6846713867187502,
+                  "stderr": 0.7101525640505206,
+                  "ci95": [
+                    0.09293542965591328,
+                    3.276407343781587
+                  ]
+                },
+                {
+                  "mean": 1.218435058593749,
+                  "stderr": 0.7356547605789222,
+                  "ci95": [
+                    0.0,
+                    2.867331638955345
+                  ]
+                },
+                {
+                  "mean": 0.0,
+                  "stderr": 0.5047345032898349,
+                  "ci95": [
+                    0.0,
+                    0.5405240044796151
+                  ]
+                },
+                {
+                  "mean": 0.3818481445312486,
+                  "stderr": 0.42929560463338895,
+                  "ci95": [
+                    0.0,
+                    1.3440713127565265
+                  ]
+                },
+                {
+                  "mean": 0.3450708007812514,
+                  "stderr": 0.7432907161040555,
+                  "ci95": [
+                    0.0,
+                    2.0110826118568816
+                  ]
+                }
+              ]
+            },
+            "max_candidate_ci_upper": 3.276407343781587
+          }
+        ],
+        "nodes": [
+          {
+            "requested": "root",
+            "history": "00000000000000000000000000000000",
+            "actor": 3,
+            "activeOpponents": 5,
+            "actions": [
+              "fold",
+              "raise-to:2000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 8192,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 8192,
+              "conditionalActionRates": {
+                "fold": {
+                  "estimate": 0.8209529248891052,
+                  "standardError": 0.003892524868938327
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.020739088109424295,
+                  "standardError": 0.0008459202657982254
+                },
+                "raise-to:2000": {
+                  "estimate": 0.15830798700147053,
+                  "standardError": 0.003532688436229434
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 1.0,
+                "standardError": 0.0
+              },
+              "effectiveSampleSize": 8192.0,
+              "fallbackReachWeightFraction": {
+                "any": 0.0,
+                "currentRegret": 0.0,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "average_observed_classes": 169,
+            "total_classes": 169
+          },
+          {
+            "requested": "fold",
+            "history": "aa682c5b05922f0463f8ec1733821d42",
+            "actor": 4,
+            "activeOpponents": 4,
+            "actions": [
+              "fold",
+              "raise-to:2000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 8192,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 8192,
+              "conditionalActionRates": {
+                "fold": {
+                  "estimate": 0.8128415591983258,
+                  "standardError": 0.004284452562449153
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.015860507408148868,
+                  "standardError": 0.0005537831293606569
+                },
+                "raise-to:2000": {
+                  "estimate": 0.17129793339352542,
+                  "standardError": 0.004000671586825745
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.8209529248891052,
+                "standardError": 0.003892524868938327
+              },
+              "effectiveSampleSize": 6918.063569702745,
+              "fallbackReachWeightFraction": {
+                "any": 0.0,
+                "currentRegret": 0.0,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "average_observed_classes": 169,
+            "total_classes": 169
+          },
+          {
+            "requested": "fold/fold",
+            "history": "76edbf1ab7ec6e4cf36eb73924ab45d3",
+            "actor": 5,
+            "activeOpponents": 3,
+            "actions": [
+              "fold",
+              "raise-to:2300",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 8192,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 8192,
+              "conditionalActionRates": {
+                "fold": {
+                  "estimate": 0.7571873697702352,
+                  "standardError": 0.004943350657430004
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.02547155379650535,
+                  "standardError": 0.0009615680131228835
+                },
+                "raise-to:2300": {
+                  "estimate": 0.21734107643325953,
+                  "standardError": 0.0045155182494675756
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.6673046554952863,
+                "standardError": 0.004721111057111594
+              },
+              "effectiveSampleSize": 5809.9555569198,
+              "fallbackReachWeightFraction": {
+                "any": 0.0,
+                "currentRegret": 0.0,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "average_observed_classes": 169,
+            "total_classes": 169
+          },
+          {
+            "requested": "fold/fold/fold",
+            "history": "48eb85a77a6e45460986c07bdde524e6",
+            "actor": 0,
+            "activeOpponents": 2,
+            "actions": [
+              "fold",
+              "raise-to:2500",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 8192,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 8192,
+              "conditionalActionRates": {
+                "fold": {
+                  "estimate": 0.790203506937761,
+                  "standardError": 0.004845741657741202
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.07872456720506411,
+                  "standardError": 0.002601806021413823
+                },
+                "raise-to:2500": {
+                  "estimate": 0.13107192585717475,
+                  "standardError": 0.0036233764216548614
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.5052746569299087,
+                "standardError": 0.0048632318429954104
+              },
+              "effectiveSampleSize": 4657.7002593867865,
+              "fallbackReachWeightFraction": {
+                "any": 0.0,
+                "currentRegret": 0.0,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "average_observed_classes": 169,
+            "total_classes": 169
+          },
+          {
+            "requested": "fold/fold/fold/fold",
+            "history": "9f19fd2c6bb3147c16fd33531d8d9261",
+            "actor": 1,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:500",
+              "raise-to:3000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 8192,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 8192,
+              "conditionalActionRates": {
+                "call:500": {
+                  "estimate": 0.2830857011617489,
+                  "standardError": 0.004185290926160418
+                },
+                "fold": {
+                  "estimate": 0.4432451788015835,
+                  "standardError": 0.005320287781936114
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.09033129946609693,
+                  "standardError": 0.003199165240577494
+                },
+                "raise-to:3000": {
+                  "estimate": 0.1833378205705707,
+                  "standardError": 0.0038024081992923424
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.39926980587278793,
+                "standardError": 0.004542961990679373
+              },
+              "effectiveSampleSize": 3975.8682215213307,
+              "fallbackReachWeightFraction": {
+                "any": 0.0,
+                "currentRegret": 0.0,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "average_observed_classes": 169,
+            "total_classes": 169
+          }
+        ]
+      }
+    }
+  ],
+  "parallel_evaluation": {
+    "all_evaluation_values_exactly_equal": true,
+    "node_exports_exactly_equal": true,
+    "timings": {
+      "old-serial": {
+        "br_training_seconds": 15.3665572,
+        "evaluation_seconds": 13.8445018
+      },
+      "new-1": {
+        "br_training_seconds": 38.685991,
+        "evaluation_seconds": 11.2523208
+      },
+      "new-8": {
+        "br_training_seconds": 15.0006052,
+        "evaluation_seconds": 3.101102
+      }
+    },
+    "old_serial_over_new_8_evaluation_ratio": 4.464381307032145,
+    "new_1_over_new_8_evaluation_ratio": 3.628491033187557,
+    "interpretation": "Local measurement on a small full-policy checkpoint; no whole-solve or cloud speedup claim. Read individual run timings and concurrent workload notes."
+  },
+  "validation": {
+    "workspace_rust_passed": 712,
+    "workspace_ignored": 30,
+    "audit_example_passed": 10,
+    "python_passed": 24,
+    "fmt_check": "passed",
+    "workspace_clippy_all_targets_deny_warnings": "passed",
+    "spec_guide_headings_matched": 23
+  }
+}

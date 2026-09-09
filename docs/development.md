@@ -19,6 +19,18 @@ Multiway v1のTOML surfaceを変える場合は、parser/runtimeだけでなく
 `docs/multiway-preflop-v1.jp.md`、template、examples、fingerprint、
 checkpoint/solution metadataを同じchange setで更新する。
 
+## Workspace成果物の境界
+
+- `target/` はCargo build専用であり、研究結果や保存対象のrunを置かない。
+- `runs/` はsolver・benchmarkの実行結果を置くignored領域とする。保存対象のrunは
+  config、source revision、status、対応するvalidation reportを特定できるmetadataを持つ。
+- `.cache/` は再生成可能なmachine-local cache専用とする。script、source snapshot、
+  検証証拠は置かない。
+- 再現可能な入力と検証結果は`docs/validation/`、検討中のplan/designは
+  `docs/research/`に置く。Python testは`tools/tests/`へ集約する。
+- 一時directoryはrepository rootへ作らない。runnerの既定出力先は
+  `runs/benchmarks/`以下とする。
+
 ## 現行roadmap
 
 アプリケーション層の再設計は`docs/app-architecture.md`を正本とし、Phase 0〜3で進める。

@@ -1,0 +1,347 @@
+# Research screen: GTOW-observed opening and no-caller 3bet menus.
+# The remaining preflop sizes and one-size postflop tree are approximations.
+# This is not a complete GTO Wizard tree or an accuracy certificate.
+schema = "solvers.multiway-preflop/v1"
+
+[game]
+seat_count = 6
+button = 0
+standard_blinds = true
+preflop_first_to_act = "utg"
+
+[game.defaults]
+stack_bb = 100.0
+range = "random"
+
+[game.tree]
+kind = "standard"
+allow_limp = true
+reraise_jam_above_actor_starting_stack = { numerator = 1, denominator = 3 }
+
+[game.tree.max_aggressive_actions]
+preflop = 4
+flop = 4
+turn = 4
+river = 4
+
+
+[[game.tree.rules]]
+priority = 100
+street = "preflop"
+when = "unopened && position != \"SB\""
+effect = "remove"
+action = "call"
+
+[[game.tree.rules]]
+priority = 105
+street = "preflop"
+when = "limpers > 0 && aggressions == 0"
+effect = "replace"
+action = "raise"
+sizes = ["4bb", "a"]
+
+[[game.tree.rules]]
+priority = 110
+street = "preflop"
+when = "aggressions >= 1"
+effect = "replace"
+action = "raise"
+sizes = ["2.5x", "a"]
+
+[[game.tree.rules]]
+priority = 120
+street = "preflop"
+when = "unopened && limpers == 0 && position == \"UTG\""
+effect = "replace"
+action = "raise"
+sizes = ["2bb", "a"]
+
+[[game.tree.rules]]
+priority = 120
+street = "preflop"
+when = "unopened && limpers == 0 && position == \"HJ\""
+effect = "replace"
+action = "raise"
+sizes = ["2bb", "a"]
+
+[[game.tree.rules]]
+priority = 120
+street = "preflop"
+when = "unopened && limpers == 0 && position == \"CO\""
+effect = "replace"
+action = "raise"
+sizes = ["2.3bb", "a"]
+
+[[game.tree.rules]]
+priority = 120
+street = "preflop"
+when = "unopened && limpers == 0 && position == \"BTN\""
+effect = "replace"
+action = "raise"
+sizes = ["2.5bb", "a"]
+
+[[game.tree.rules]]
+priority = 120
+street = "preflop"
+when = "unopened && limpers == 0 && position == \"SB\""
+effect = "replace"
+action = "raise"
+sizes = ["3bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"HJ\""
+effect = "replace"
+action = "raise"
+sizes = ["6.5bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"CO\""
+effect = "replace"
+action = "raise"
+sizes = ["6.5bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"BTN\""
+effect = "replace"
+action = "raise"
+sizes = ["7.5bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"SB\""
+effect = "replace"
+action = "raise"
+sizes = ["10bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"BB\""
+effect = "replace"
+action = "raise"
+sizes = ["12bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"CO\""
+effect = "replace"
+action = "raise"
+sizes = ["6.5bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"BTN\""
+effect = "replace"
+action = "raise"
+sizes = ["7.5bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"SB\""
+effect = "replace"
+action = "raise"
+sizes = ["11bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"BB\""
+effect = "replace"
+action = "raise"
+sizes = ["12.3bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"BTN\""
+effect = "replace"
+action = "raise"
+sizes = ["7.5bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"SB\""
+effect = "replace"
+action = "raise"
+sizes = ["11.5bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"BB\""
+effect = "replace"
+action = "raise"
+sizes = ["13.5bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"BTN\" && position == \"SB\""
+effect = "replace"
+action = "raise"
+sizes = ["12bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"BTN\" && position == \"BB\""
+effect = "replace"
+action = "raise"
+sizes = ["13bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"SB\" && position == \"BB\""
+effect = "replace"
+action = "raise"
+sizes = ["10bb", "a"]
+
+# Fixed 100bb fixture: spr > 1 distinguishes a normal raise from the 100bb jam.
+# Preserve the legal call against a jam. Do not generalize this guard to other stacks.
+
+[[game.tree.rules]]
+priority = 140
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"HJ\" && spr > 1"
+effect = "remove"
+action = "call"
+
+[[game.tree.rules]]
+priority = 145
+street = "preflop"
+when = "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position in [\"CO\", \"BTN\", \"SB\", \"BB\"] && !preflop_participant"
+effect = "remove"
+action = "call"
+
+[[game.tree.rules]]
+priority = 146
+street = "preflop"
+when = "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"CO\""
+effect = "replace"
+action = "raise"
+sizes = ["14bb", "a"]
+
+[[game.tree.rules]]
+priority = 146
+street = "preflop"
+when = "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"BTN\""
+effect = "replace"
+action = "raise"
+sizes = ["14bb", "a"]
+
+[[game.tree.rules]]
+priority = 146
+street = "preflop"
+when = "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"SB\""
+effect = "replace"
+action = "raise"
+sizes = ["20bb", "a"]
+
+[[game.tree.rules]]
+priority = 146
+street = "preflop"
+when = "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"BB\""
+effect = "replace"
+action = "raise"
+sizes = ["19bb", "a"]
+
+[[game.tree.rules]]
+priority = 146
+street = "preflop"
+when = "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"UTG\""
+effect = "replace"
+action = "raise"
+sizes = ["19bb", "a"]
+
+[[game.tree.rules]]
+priority = 150
+street = "preflop"
+when = "aggressions == 2 && limpers == 0 && players == 2 && position == \"SB\" && last_preflop_aggressor_position == \"BB\""
+effect = "replace"
+action = "raise"
+sizes = ["21bb", "a"]
+
+[[game.tree.rules]]
+priority = 200
+street = "postflop"
+when = "players >= 2"
+effect = "replace"
+action = "bet"
+sizes = ["50", "a"]
+
+[[game.tree.rules]]
+priority = 210
+street = "postflop"
+when = "players >= 2"
+effect = "replace"
+action = "raise"
+sizes = ["2.5x", "a"]
+
+[game.abstraction]
+kind = "ehs2-percentile"
+
+[game.abstraction.buckets]
+flop = 256
+turn = 256
+river = 256
+
+[game.information]
+recall = "current-street"
+
+[economics]
+kind = "cash"
+
+[economics.rake]
+rate = 0.05
+cap_bb = 4.0
+# Working convention; application/rounding is not independently GTOW-verified.
+when = "flop_dealt"
+allocation = "main-first"
+rounding_unit_bb = 0.001
+rounding = "down"
+
+[solver]
+kind = "range-vector"
+seed = 0
+batch_sweeps = 4
+opponent_exploration = 0.0
+
+[solver.discount]
+kind = "none"
+
+[solver.pruning]
+kind = "none"
+
+[run]
+max_sweeps = 4096
+max_time = "2m"
+
+[run.resources]
+threads = 8
+memory = "8GiB"
+
+[run.stop]
+# Schedule a final quality observation, without an early-stop accuracy claim.
+target = 1000000.0
+check_every_sweeps = 4096
+confirmations = 1000000
+evaluation_samples = 1024
+deviator_traversals = 20000
+
+[run.checkpoint]
+interval = "5m"
+
+[output]
+probability_encoding = "u16"

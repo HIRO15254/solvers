@@ -1,0 +1,46 @@
+# Multiway ベンチマーク実行台帳（2026-09-09）
+
+この台帳は、保存済み manifest・config・stdout・execution record と既存の検証報告から、実際に実行された条件を整理したものです。記録のない項目は推測せず「記録なし」としました。`run.json` や CLI の `elapsedSecs` は、学習だけでなく評価・checkpoint・snapshot・solution 保存を含み得ます。`last progress` は run 内の最後の品質行、wrapper wall は外側プロセスの経過時間です。
+
+## 実行マトリクス
+
+| family / arm | 状態 | seed / sweeps / batch | threads / K (flop-turn-river) | variant / evaluation | hardware・source | provenance |
+|---|---|---|---|---|---|---|
+| 2026-09-08 小 fixture旧/修正版 | 完了（機能回帰） | 0,11,29 / 4,096 / 1 | 1 / 小 fixture 3max・6max | range-vector・single-hand、16,384 samples、eval seed 424242、deviator 20k/seat | Windows、16 logical CPU、Rust 1.97、release/native | [初回報告](multiway-convergence-2026-09-08.md) |
+| round2 20bb fixed comparison | 完了 | seed0 / 16,384 / 4 | 8 / 6max 20bb checkdown | range-vector、8,192 samples、deviator 100k/seat | Windows i7-10700KF、約32GiB、warm EHS2 | [round2](multiway-convergence-round2-2026-09-08.md)、`runs/multiway-round2-20260908/` |
+| round3 corrected K32 | 完了（品質未証明） | seed0 / 4,096 / 記録上の修正版条件 | 記録どおり | 2 seeds×2,048 worlds、deviator 20k/seat | ローカル、詳細は companion JSON | [round3](multiway-convergence-round3-2026-09-09.md) |
+| round3 all-street-cap1 K256 smoke | 完了した監査 | 4096 checkpoint、監査 seed 3件 | K256、preflop cap 4 ではない旧 all-street cap1 | 3×8,192 worlds、deviator 100k/seat | ローカル、旧モデル | [round3](multiway-convergence-round3-2026-09-09.md) |
+| round4 state4-local batch4 | 完了 | seed0 / 16,384 / 4 | 8 / K32-32-32、caps 4/1/1/1 | 2 eval seeds、4,096 audit samples、node 16,384、deviator 20k | Windows local、state4 | [`state4-local`](../../runs/multiway-convergence-round4-20260909/state4-local/)、[round4](multiway-convergence-round4-2026-09-09.md) |
+| round4 cloud state4 K32 t8 | 完了 | seed0 / 16,384 | 8 / K32-32-32、caps 4/1/1/1 | audit 成功、同一条件の t24 pair | GCP state4 archive | [`cloud-state4-k32-pair`](../../runs/multiway-convergence-round4-20260909/cloud-state4-k32-pair/)、[state4 JSON](multiway-convergence-state4-2026-09-09.json) |
+| round4 cloud state4 K32 t24 | 完了 | seed0 / 16,384 | 24 / K32-32-32、caps 4/1/1/1 | audit 成功、同一条件の t8 pair | GCP state4 archive | [`cloud-state4-k32-pair`](../../runs/multiway-convergence-round4-20260909/cloud-state4-k32-pair/)、[state4 JSON](multiway-convergence-state4-2026-09-09.json) |
+| round4 cloud state4 K256 t24 | 完了（後続比較の親） | seed0 / 65,536 | 24 / K256 | audit 成功 | GCP state4 | [`cloud-state4-k256`](../../runs/multiway-convergence-round4-20260909/cloud-state4-k256/)、[round5 JSON](multiway-convergence-round5-2026-09-09.json) |
+| round5 cloud cap1 | 完了 | seed0 / 65,536 / 4 | 8 / K128-64-32、caps 4/1/1/1 | eval 101,202、audit 4,096/seed、node 16,384、deviator 20k | GCP、48GiB arena budget、state4 | [`cloud-mixed-depth/cap1`](../../runs/multiway-convergence-round5-20260909/cloud-mixed-depth/cap1/)、[round5 JSON](multiway-convergence-round5-2026-09-09.json) |
+| round5 cloud cap2 | 完了 | seed0 / 65,536 / 4 | 8 / K128-64-32、caps 4/2/2/2 | 同 cap1 | GCP、同 state4、別 tree | [`cloud-mixed-depth/cap2`](../../runs/multiway-convergence-round5-20260909/cloud-mixed-depth/cap2/)、[round5 JSON](multiway-convergence-round5-2026-09-09.json) |
+| round5 local batch8 | 完了 | seed0 / 16,384 / 8 | 8 / K32-32-32、caps 4/1/1/1 | eval 101,202、audit 4,096/seed、node 16,384、deviator 20k | local、8GiB arena budget | [`local-batch-sweep/batch8`](../../runs/multiway-convergence-round5-20260909/local-batch-sweep/batch8/)、[round5 JSON](multiway-convergence-round5-2026-09-09.json) |
+| round5 local batch12 | 完了 | seed0 / 16,384 / 12 | 8 / K32-32-32、caps 4/1/1/1 | 同 batch8 | local、8GiB arena budget | [`local-batch-sweep/batch12`](../../runs/multiway-convergence-round5-20260909/local-batch-sweep/batch12/)、[round5 JSON](multiway-convergence-round5-2026-09-09.json) |
+| round5 local Simple K32 screen | 完了 | seed0 / 32,768 / b1,b4,periodic | 8 / K32-32-32 | evaluation screen 条件は manifest、各 arm 個別記録 | local state4 binary | [`local-simple-algorithm-screen`](../../runs/multiway-convergence-round5-20260909/local-simple-algorithm-screen/)、[screen plan](../research/active/multiway-algorithm-screen-plan-2026-09-09.md) |
+| round5 local Simple K128 screen | 完了 | seed0 / 32,768 / b4 | 8 / K128-128-128 | eval 101,202×2,048、169 class standard-copy frequency rows | local、cold K128 cache 約58.68s | [`local-simple-k128-screen`](../../runs/multiway-convergence-round5-20260909/local-simple-k128-screen/)、[Simple reference](gtowizard-simple-preflop-2026-09-09.json)、[round5 JSON](multiway-convergence-round5-2026-09-09.json) |
+| round5 local paired seeds | 完了 | seeds 0,11,29 / 32,768 / b1,b4 | 6 solver threads per process（共有 host） | 5 RFI / 10 hand panel、eval 条件は各 manifest | local、共有16 logical CPU | [`local-simple-paired-seeds`](../../runs/multiway-convergence-round5-20260909/local-simple-paired-seeds/)、[round5 JSON](multiway-convergence-round5-2026-09-09.json) |
+| round5 average-sampling pilot | 完了・昇格なし | seeds 0,11,29 / 4,096 | K32、b4、uniform-one 対 enumerate-first-opponent | evaluation omitted | local research binary、同一 regret fingerprint | [`average-sampling-summary.json`](../../runs/multiway-convergence-round5-20260909/average-sampling-summary.json) |
+| round5 K256 extension | solve完了・export別検証完了 | seed0 / 262,144（親65,536から継続） | 24→8 / K256、batch4 | eval cadence も変更、両実 sweep target 到達 | GCP、state4、resource/cadence confound | [`cloud-k256-extension`](../../runs/multiway-convergence-round5-20260909/cloud-k256-extension/)、[export verification](../../runs/multiway-convergence-round5-20260909/cloud-export-fix-state4/recovery-verification.json)、[round5 JSON](multiway-convergence-round5-2026-09-09.json) |
+| local SB-limp v1 | 除外 | seed0 / 16,384 | K32 | audit は設定不一致で失敗 | local | [round5](multiway-convergence-round5-2026-09-09.md) |
+| local SB-limp v2 | 完了・診断のみ | seed0 / 16,384 | K32、b4 | 8 audit nodes、UI menu 対応 | local state4 | [`local-limp-k32-v2`](../../runs/multiway-convergence-round5-20260909/local-limp-k32-v2/)、[round5 JSON](multiway-convergence-round5-2026-09-09.json) |
+| draw-aware abstraction | 完了・探索的、昇格なし | seed0 / 32,768 / b4 | 8 / effective K128、base draw-aware 32/32/128 | eval 101,202×2,048、5 nodes | frozen archive SHA `b7268fba...ed6b9`; binary SHA `315bb6de...f96e6a7e` | [`local-draw-abstraction-screen`](../../runs/multiway-convergence-round5-20260909/local-draw-abstraction-screen/)、[summary](../../runs/multiway-convergence-round5-20260909/local-draw-abstraction-screen/summary.json)、[plan](../research/active/multiway-draw-abstraction-2026-09-09.md) |
+| round5 parallel traversal screen | 完了（4 paired arms、数値完全一致） | seed0 / stage1 8,192・stage2 16,384 / b1,b4 | stage1 8、stage2 16 / Simple K32、caps 4/1/1/1 | evaluation disabled、5 histories | old/new frozen binaries、state4 | [`stage1-summary.json`](../../runs/multiway-convergence-round5-20260909/local-parallel-traversal-screen/stage1-summary.json)、[`stage2-summary.json`](../../runs/multiway-convergence-round5-20260909/local-parallel-traversal-screen/stage2-summary.json)、[parallel report](multiway-parallel-traversal-2026-09-09.md) |
+
+## 読み方と未解決点
+
+- 現行のquality baselineはstate4で統一し、state3の一般postflop profileはcache bugのため除外します。postflop decisionを持たない小fixtureの旧記録も、当時の機能・性能の履歴に限り、現行品質の代用にはしません。[round4 の correctness boundary](multiway-convergence-round4-2026-09-09.md) を優先します。
+- cloud cap1/cap2 は同じ nominal K・batch・sweepsでも tree cap が異なります。K128-64-32 と local K32-32-32 も直接の品質順位には使えません。
+- K256 の65,536→262,144は同一 state4/K の sweep extensionですが、24→8 threads と evaluation cadence 変更が wall time の交絡です。deterministic batch4/sample ID/merge order は維持され、両方 target sweeps に到達しています。
+- `wrapper wall`、`elapsedSecs`、`last progress elapsed` は同じ量ではありません。初期化、EHS2 cache、最終 snapshot/export、監査を分離できない記録では、training throughput として比較しません。
+- Simple の 5×169 参照は、UI の丸め表示を転記したものではなく、Standard Ranges の Copy 出力を物理 combo weight から169 classへ正規化したデータです。5 history の UI total、combo weight、nonzero physical count を照合済みで、General の丸めUI参照とは別データです。[Simple reference](gtowizard-simple-preflop-2026-09-09.json)
+- K256 の 2,171,445,586-byte `.mwsol` は recovery verification で SHA-256、metadata、先頭/末尾 strategy page を確認済みです。検証境界は全ページ再読ではなく、完全なGTOW証明でもありません。[verification](../../runs/multiway-convergence-round5-20260909/cloud-export-fix-state4/recovery-verification.json)
+- General のActions集計は丸められた UI frequency であり、exact denominator と prior-fold weighting が不明です。自作 audit の self-normalized conditional ratio と同一 estimand とは扱いません。
+- draw-aware は control gate 通過後に control/candidate とも完了した1 seedの探索的比較です。control は旧 K128 result と一致しましたが、candidate は別 regret fingerprint です。5ノード平均の weighted MAE/RMSE は control `0.141068/0.268747`、candidate `0.115510/0.241222`。この差は昇格・GTOW証明を意味しません。1 seedのため追加paired seedは保留です。
+- draw-aware の table preparation は control `0.973s` に対し candidate `57.722s`、solver-reported elapsed は `151.039/152.614s`、wrapper wall は `213.562/271.530s`。cold cache と harness を含み、training-only 比較ではありません。実験はこのペア完了後、ユーザー要請で停止しました。
+- 実行済みの seed は多くが seed0 一つです。paired-seed screen と average-sampling pilot は有限標本のばらつきを示す診断で、収束証明や full GTOW certificate ではありません。
+
+## 次の確認境界
+
+費用と長時間運用を判断するには、同一 state4・同一 tree・同一 sweep target で、まず実測の phase（table build / session construction / training / evaluation / export）を分ける必要があります。draw-aware の control が旧 K128 `result` と一致することを先に確認し、その後に representation 差を比較します。追加計算を行う場合も、同じ source/config/binary fingerprint と未使用 output directory を記録し、未完了・除外 run を精度結果へ混ぜません。

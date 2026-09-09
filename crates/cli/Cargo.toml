@@ -6,9 +6,28 @@ license.workspace = true
 repository.workspace = true
 description = "solvers command-line interface"
 
+[features]
+default = []
+research-average-sampling = ["multiway/research-average-sampling"]
+research-draw-abstraction = ["multiway/research-abstractions", "research-average-sampling"]
+
 [[bin]]
 name = "solvers"
 path = "src/main.rs"
+
+[[example]]
+name = "mw_average_sampling_research"
+path = "examples/mw_average_sampling_research.rs"
+required-features = ["research-average-sampling"]
+
+[[example]]
+name = "mw_draw_abstraction_research"
+path = "examples/mw_draw_abstraction_research.rs"
+required-features = ["research-draw-abstraction"]
+
+[[example]]
+name = "mw_tree_census"
+path = "examples/mw_tree_census.rs"
 
 [dependencies]
 abstraction = { workspace = true }

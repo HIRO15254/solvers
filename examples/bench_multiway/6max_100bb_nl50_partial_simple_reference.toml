@@ -1,0 +1,327 @@
+# Research screen for the partially observed GTOW Simple preflop tree.
+# Only the five unopened menus, all 15 no-caller responses to those opens, and
+# the listed SB-versus-BB 4bet menu were observed. Other later preflop nodes and
+# the one-size postflop tree are explicit approximations, not claimed matches.
+schema = "solvers.multiway-preflop/v1"
+
+[game]
+seat_count = 6
+button = 0
+standard_blinds = true
+preflop_first_to_act = "utg"
+
+[game.defaults]
+stack_bb = 100.0
+range = "random"
+
+[game.tree]
+kind = "standard"
+# The observed Simple SB unopened menu has no limp.
+allow_limp = false
+reraise_jam_above_actor_starting_stack = { numerator = 1, denominator = 3 }
+
+[game.tree.max_aggressive_actions]
+preflop = 4
+flop = 1
+turn = 1
+river = 1
+
+# All observed unopened menus omit call. This also makes the no-limp intent
+# explicit instead of relying only on allow_limp.
+[[game.tree.rules]]
+priority = 100
+street = "preflop"
+when = "unopened"
+effect = "remove"
+action = "call"
+
+# Unobserved later preflop raises retain a bounded generic approximation.
+[[game.tree.rules]]
+priority = 110
+street = "preflop"
+when = "aggressions >= 1"
+effect = "replace"
+action = "raise"
+sizes = ["2.5x", "a"]
+
+# GTOW Simple observed unopened menus. UTG and HJ have no all-in action;
+# CO, BTN, and SB display all-in even though its captured strategy weight is 0.
+[[game.tree.rules]]
+priority = 120
+street = "preflop"
+when = "unopened && limpers == 0 && position == \"UTG\""
+effect = "replace"
+action = "raise"
+sizes = ["2bb"]
+
+[[game.tree.rules]]
+priority = 120
+street = "preflop"
+when = "unopened && limpers == 0 && position == \"HJ\""
+effect = "replace"
+action = "raise"
+sizes = ["2bb"]
+
+[[game.tree.rules]]
+priority = 120
+street = "preflop"
+when = "unopened && limpers == 0 && position == \"CO\""
+effect = "replace"
+action = "raise"
+sizes = ["2.3bb", "a"]
+
+[[game.tree.rules]]
+priority = 120
+street = "preflop"
+when = "unopened && limpers == 0 && position == \"BTN\""
+effect = "replace"
+action = "raise"
+sizes = ["2.5bb", "a"]
+
+[[game.tree.rules]]
+priority = 120
+street = "preflop"
+when = "unopened && limpers == 0 && position == \"SB\""
+effect = "replace"
+action = "raise"
+sizes = ["3bb", "a"]
+
+# Observed no-caller responses to a UTG 2bb open. None of these five menus
+# displays all-in. HJ through SB omit call; BB retains call.
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"HJ\""
+effect = "replace"
+action = "raise"
+sizes = ["6.5bb"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"CO\""
+effect = "replace"
+action = "raise"
+sizes = ["6.5bb"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"BTN\""
+effect = "replace"
+action = "raise"
+sizes = ["7.5bb"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"SB\""
+effect = "replace"
+action = "raise"
+sizes = ["10bb"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"BB\""
+effect = "replace"
+action = "raise"
+sizes = ["12bb"]
+
+# Observed no-caller responses to a HJ 2bb open. All omit all-in.
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"CO\""
+effect = "replace"
+action = "raise"
+sizes = ["6.5bb"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"BTN\""
+effect = "replace"
+action = "raise"
+sizes = ["7.5bb"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"SB\""
+effect = "replace"
+action = "raise"
+sizes = ["11bb"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"BB\""
+effect = "replace"
+action = "raise"
+sizes = ["12.3bb"]
+
+# Observed no-caller responses to a CO 2.3bb open. These menus retain all-in.
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"BTN\""
+effect = "replace"
+action = "raise"
+sizes = ["7.5bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"SB\""
+effect = "replace"
+action = "raise"
+sizes = ["11.5bb", "a"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"BB\""
+effect = "replace"
+action = "raise"
+sizes = ["13.5bb", "a"]
+
+# Observed no-caller responses to a BTN 2.5bb open. Both omit all-in.
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"BTN\" && position == \"SB\""
+effect = "replace"
+action = "raise"
+sizes = ["12bb"]
+
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"BTN\" && position == \"BB\""
+effect = "replace"
+action = "raise"
+sizes = ["13bb"]
+
+# Observed no-caller response to a SB 3bb open. BB retains call and all-in.
+[[game.tree.rules]]
+priority = 130
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"SB\" && position == \"BB\""
+effect = "replace"
+action = "raise"
+sizes = ["10bb", "a"]
+
+[[game.tree.rules]]
+priority = 140
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && spr > 1 && last_preflop_aggressor_position == \"UTG\" && position in [\"HJ\", \"CO\", \"BTN\", \"SB\"]"
+effect = "remove"
+action = "call"
+
+[[game.tree.rules]]
+priority = 140
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && spr > 1 && last_preflop_aggressor_position == \"HJ\" && position in [\"CO\", \"BTN\", \"SB\"]"
+effect = "remove"
+action = "call"
+
+[[game.tree.rules]]
+priority = 140
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && spr > 1 && last_preflop_aggressor_position == \"CO\" && position in [\"BTN\", \"SB\"]"
+effect = "remove"
+action = "call"
+
+[[game.tree.rules]]
+priority = 140
+street = "preflop"
+when = "aggressions == 1 && limpers == 0 && flats == 0 && spr > 1 && last_preflop_aggressor_position == \"BTN\" && position == \"SB\""
+effect = "remove"
+action = "call"
+
+# The live Simple menu at SB 3bb -> BB 10bb gives SB fold/call/21bb/all-in.
+# It contains all-in despite the library preview's general no-4bet-jam wording,
+# so this fixture follows the observed node menu and does not remove 4bet jams.
+[[game.tree.rules]]
+priority = 150
+street = "preflop"
+when = "aggressions == 2 && limpers == 0 && players == 2 && position == \"SB\" && last_preflop_aggressor_position == \"BB\""
+effect = "replace"
+action = "raise"
+sizes = ["21bb", "a"]
+
+# Unobserved postflop menus remain a small research approximation.
+[[game.tree.rules]]
+priority = 200
+street = "postflop"
+when = "players >= 2"
+effect = "replace"
+action = "bet"
+sizes = ["50", "a"]
+
+[[game.tree.rules]]
+priority = 210
+street = "postflop"
+when = "players >= 2"
+effect = "replace"
+action = "raise"
+sizes = ["2.5x", "a"]
+
+[game.abstraction]
+kind = "ehs2-percentile"
+
+[game.abstraction.buckets]
+flop = 32
+turn = 32
+river = 32
+
+[game.information]
+recall = "current-street"
+
+[economics]
+kind = "cash"
+
+[economics.rake]
+rate = 0.05
+cap_bb = 4.0
+# The library preview states 5% / 4bb cap; application and rounding remain a
+# working convention rather than an independently verified engine contract.
+when = "flop_dealt"
+allocation = "main-first"
+rounding_unit_bb = 0.001
+rounding = "down"
+
+[solver]
+kind = "range-vector"
+seed = 0
+batch_sweeps = 4
+opponent_exploration = 0.0
+
+[solver.discount]
+kind = "none"
+
+[solver.pruning]
+kind = "none"
+
+[run]
+max_sweeps = 4096
+max_time = "2m"
+
+[run.resources]
+threads = 8
+memory = "8GiB"
+
+[run.stop]
+# Schedule a final quality observation, without an early-stop accuracy claim.
+target = 1000000.0
+check_every_sweeps = 4096
+confirmations = 1000000
+evaluation_samples = 1024
+deviator_traversals = 20000
+
+[run.checkpoint]
+interval = "5m"
+
+[output]
+probability_encoding = "u16"

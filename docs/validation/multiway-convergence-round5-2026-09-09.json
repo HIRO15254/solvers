@@ -1,0 +1,692 @@
+{
+  "schema": "multiway-convergence-round5-evidence/v1",
+  "date": "2026-09-09",
+  "scope": "Recovered state4 cloud cap1/cap2 and K256/262k, local batch and average-sampling screens, Simple K32/K128 and paired seeds, completed numerical-preserving parallel-traversal comparisons, and verified large-artifact export/recovery. See benchmark_catalog for the current interpretation and remaining work.",
+  "common_state": {
+    "solver_state_version": 4,
+    "threads": 8,
+    "cloud_memory": "48GiB arena budget",
+    "local_memory": "8GiB arena/policy budget",
+    "discount": "none",
+    "pruning": "none",
+    "evaluation_seeds": [
+      101,
+      202
+    ],
+    "audit_samples_per_seed": 4096,
+    "node_frequency_samples": 16384,
+    "deviator_traversals": 20000
+  },
+  "runs": [
+    {
+      "id": "cloud-cap1",
+      "path": "runs/multiway-convergence-round5-20260909/cloud-mixed-depth/cap1",
+      "buckets": {
+        "flop": 128,
+        "turn": 64,
+        "river": 32
+      },
+      "batch_sweeps": 4,
+      "sweeps": 65536,
+      "wrapper_wall_seconds": 550.6020238289999,
+      "last_progress_elapsed_seconds": 236.095456355,
+      "audit_node_rates_percent": {
+        "UTG_raise": 11.873775569503554,
+        "HJ_raise": 15.908516893676131,
+        "CO_raise": 24.841378268698048,
+        "BTN_raise": 40.815372668075334,
+        "SB_raise": 33.24865655587402,
+        "SB_call": 34.66833182698685,
+        "SB_fold": 31.968483069483245
+      },
+      "held_out_candidate_gain_mean_bb_per_hand": {
+        "seed101": 0.28072778320312475,
+        "seed202": 0.2612419433593755
+      },
+      "held_out_candidate_gain_ci95_upper_bb_per_hand": {
+        "seed101": 0.6132602321554512,
+        "seed202": 0.5984121055768112
+      },
+      "audit_sha256": "2ca247202e459b2ebb97aa105a6f4d757c6cd57a3783fee0e55fca6b28b12b8b",
+      "config_sha256": "ab71c52a8b26638b8b54767956a1b56e3513466366bfd58e856803450b2b1d80"
+    },
+    {
+      "id": "cloud-cap2",
+      "path": "runs/multiway-convergence-round5-20260909/cloud-mixed-depth/cap2",
+      "buckets": {
+        "flop": 128,
+        "turn": 64,
+        "river": 32
+      },
+      "max_aggressive_actions": {
+        "preflop": 4,
+        "flop": 2,
+        "turn": 2,
+        "river": 2
+      },
+      "batch_sweeps": 4,
+      "sweeps": 65536,
+      "wrapper_wall_seconds": 965.009596389,
+      "audit_node_rates_percent": {
+        "UTG_raise": 9.798853162677881,
+        "HJ_raise": 12.713707408704783,
+        "CO_raise": 26.64267977940364,
+        "BTN_raise": 39.519629038138795,
+        "SB_raise": 33.23918864006027,
+        "SB_call": 37.5024201369899,
+        "SB_fold": 29.15537223748286
+      },
+      "held_out_candidate_gain_mean_bb_per_hand": {
+        "seed101": 0.39920922851562574,
+        "seed202": 0.1807490234375001
+      },
+      "held_out_candidate_gain_ci95_upper_bb_per_hand": {
+        "seed101": 1.0773461182030488,
+        "seed202": 0.518508758279083
+      },
+      "audit_sha256": "9b5f4882589accddc876ddefb0fbb56aed1899b932dac6ff01e7ccd78e12dfa6",
+      "config_sha256": "ab7745023b4f013084dc803644703214e554f562a11896c36901e34ef2ca21e3"
+    },
+    {
+      "id": "local-batch4",
+      "path": "runs/multiway-convergence-round4-20260909/state4-local",
+      "buckets": {
+        "flop": 32,
+        "turn": 32,
+        "river": 32
+      },
+      "batch_sweeps": 4,
+      "sweeps": 16384,
+      "last_progress_elapsed_seconds": 153.9229142,
+      "policy_arena_bytes": 1526165400,
+      "limp_node_actions": {
+        "call:500": 35.1547296428034,
+        "fold": 26.13634509300185,
+        "raise-to:3000": 36.81558384773244,
+        "raise-to:100000:all-in": 1.893341416462362
+      },
+      "audit_sha256": "ed702a88b766ea36e9391d832dd166b66e5babc9c547b5c762322dccc7d05f90",
+      "config_sha256": "80b2f6b2612d358e9d816c35c29d765de4c9763ce65d77f246333c6c0dc8e180"
+    },
+    {
+      "id": "local-batch8",
+      "path": "runs/multiway-convergence-round5-20260909/local-batch-sweep/batch8",
+      "buckets": {
+        "flop": 32,
+        "turn": 32,
+        "river": 32
+      },
+      "batch_sweeps": 8,
+      "sweeps": 16384,
+      "wrapper_wall_seconds": 488.8895091000013,
+      "last_progress_elapsed_seconds": 141.2631395,
+      "audit_node_rates_percent": {
+        "UTG_raise": 11.192477582787536,
+        "HJ_raise": 10.756673223788464,
+        "CO_raise": 12.287933991964852,
+        "BTN_raise": 23.34446024378101,
+        "SB_raise": 28.903450527979064,
+        "SB_call": 36.25001345105366,
+        "SB_fold": 33.23052579966828
+      },
+      "held_out_candidate_gain_mean_bb_per_hand": {
+        "seed101": 0.6552973632812514,
+        "seed202": 0.9645817871093727
+      },
+      "held_out_candidate_gain_ci95_upper_bb_per_hand": {
+        "seed101": 1.214535366432981,
+        "seed202": 1.6303774083647506
+      },
+      "audit_sha256": "0947c3fc356c98998ed2ee389fbd59062eb9eaef1488d348af833ffe9a028e1e",
+      "config_sha256": "bbf87d63037347f3fe485d3f1f112e0a37829d5416fb9364ce29911e46a1936d"
+    },
+    {
+      "id": "local-batch12",
+      "path": "runs/multiway-convergence-round5-20260909/local-batch-sweep/batch12",
+      "buckets": {
+        "flop": 32,
+        "turn": 32,
+        "river": 32
+      },
+      "batch_sweeps": 12,
+      "sweeps": 16384,
+      "wrapper_wall_seconds": 507.1270767999813,
+      "last_progress_elapsed_seconds": 145.2896278,
+      "audit_node_rates_percent": {
+        "UTG_raise": 11.966541304668581,
+        "HJ_raise": 13.04246806414138,
+        "CO_raise": 10.301761964970336,
+        "BTN_raise": 19.26253100156818,
+        "SB_raise": 30.61769149755426,
+        "SB_call": 34.356769345414534,
+        "SB_fold": 33.46265794817801
+      },
+      "held_out_candidate_gain_mean_bb_per_hand": {
+        "seed101": 1.0077392578125004,
+        "seed202": 0.7166875000000027
+      },
+      "held_out_candidate_gain_ci95_upper_bb_per_hand": {
+        "seed101": 1.6411243646247193,
+        "seed202": 1.3347485905545722
+      },
+      "audit_sha256": "2280d0a7a9c3cf4b24a63825a512dcf68cdcec51cb34e542bb2177e93fcdf7da",
+      "config_sha256": "05e3e6989112982d4571f6e21e0bf8c804c1f2ce0ec3edfb91a329a7a4ddb37e"
+    }
+  ],
+  "confounds": {
+    "tree": "Completed cap1 and local batch4/8/12 use the same 4bb limp branch and max aggressive actions 4/1/1/1. Cloud cap2 changes flop/turn/river caps to 2/2/2, so cap1-versus-cap2 is a controlled tree-size comparison but not a pure quality ranking because both remain partial trees.",
+    "abstraction": "Cloud cap1/cap2 are K128/64/32. Local batch4/8/12 are K32/32/32.",
+    "iterations": "Cloud cap1/cap2 have 65536 sweeps; local batch4/8/12 have 16384.",
+    "batch": "Cloud cap1/cap2 use batch_sweeps=4. Local batch4/8/12 provide the same K32/32/32 tree at batch_sweeps=4/8/12, isolating batch-size sensitivity within the local K32 family.",
+    "resources": "Cloud cap1/cap2 use a 48GiB arena budget; local runs use 8GiB. Threads are 8 for all.",
+    "timing": "wrapper_wall_seconds includes process setup/teardown; last_progress_elapsed_seconds is the solver progress metric and must not be substituted for wrapper wall time."
+  },
+  "sampling": "Held-out values use seeds 101 and 202. Their spread is sampling-only noise conditional on each fixed run; differences between runs also contain tree, K, sweep, batch, and resource effects.",
+  "k256_same_state_extension": {
+    "baseline_path": "runs/multiway-convergence-round4-20260909/cloud-state4-k256/k256-t24",
+    "extension_path": "runs/multiway-convergence-round5-20260909/cloud-k256-extension/k256-extension/sweeps-262144",
+    "comparison": "Same state4 configuration and K256 abstraction; baseline checkpoint is 65536 sweeps and extension is 262144 sweeps. Resume used different resources/cadence (24 to 8 threads and changed evaluation cadence), so this is a sweep-extension comparison with resource/runtime confounds.",
+    "aggregate_normal_raise_percent": {
+      "baseline": {
+        "UTG": 10.709315473912731,
+        "HJ": 13.548873374214432,
+        "CO": 27.567971431874906,
+        "BTN": 38.19282145512194,
+        "SB": 34.24598033135622
+      },
+      "sweeps262144": {
+        "UTG": 20.574060557403534,
+        "HJ": 25.231388531014808,
+        "CO": 28.233870054192177,
+        "BTN": 42.72422647296648,
+        "SB": 29.705943453309903
+      }
+    },
+    "aggregate_action_percent": {
+      "baseline_SB": {
+        "call": 37.691860040706956,
+        "fold": 27.92961967456138,
+        "jam": 0.1325399533754442,
+        "raise": 34.24598033135622
+      },
+      "sweeps262144_SB": {
+        "call": 32.605864609731896,
+        "fold": 37.63955686683961,
+        "jam": 0.04863507011858942,
+        "raise": 29.705943453309903
+      }
+    },
+    "selected_panel_normal_raise_percent": {
+      "baseline": {
+        "UTG AJo": 99.878687,
+        "UTG KQo": 39.56035,
+        "UTG ATs": 99.89798,
+        "UTG 55": 0.16220178,
+        "BTN K8o": 0.06779947,
+        "BTN Q8o": 3.151669,
+        "BTN J7s": 94.30524,
+        "BTN 54s": 0.4442927,
+        "SB K8o": 93.165326,
+        "SB Q8o": 92.90512
+      },
+      "sweeps262144": {
+        "UTG AJo": 99.992394,
+        "UTG KQo": 96.2069,
+        "UTG ATs": 99.99361,
+        "UTG 55": 12.384133,
+        "BTN K8o": 25.756556,
+        "BTN Q8o": 42.804,
+        "BTN J7s": 99.66322,
+        "BTN 54s": 11.943602,
+        "SB K8o": 46.823877,
+        "SB Q8o": 25.186703
+      }
+    },
+    "held_out": {
+      "baseline": {
+        "seed101": {
+          "mean": 0.29419799804687463,
+          "ci95_upper": 0.6595787660765883
+        },
+        "seed202": {
+          "mean": 0.2701916503906253,
+          "ci95_upper": 0.6178105872199209
+        }
+      },
+      "sweeps262144": {
+        "seed101": {
+          "mean": 0.2168933105468743,
+          "ci95_upper": 0.5627589721345265
+        },
+        "seed202": {
+          "mean": 0.24577026367187374,
+          "ci95_upper": 0.6059147987099952
+        }
+      }
+    },
+    "artifacts": {
+      "baseline_audit_sha256": "33a38bdd3e400001db64428d1b367d9ab5fcf1edef611f9e8f76aceffd382338",
+      "extension_audit_sha256": "9af61a1a48f5f36540d2886dac16af328eba9e78adeae291db05be59a31cda7c",
+      "extension_archive_sha256": "b0cf7ad2540081f17e7c2179fc1dd07279d31b50073d023e223656b61f8d6075",
+      "extension_audit_archive_sha256": "17b104df8591c49bff9823e0dcf649cbdc5bb2ad69519f7d3452f868d5dbe2c"
+    }
+  },
+  "sb_limp_hypothesis": "The separate UI-visible SB-limp fixture exposes BB 3bb/5bb responses and SB 14bb/18bb branches. Its mismatch with the cloud cap1 SB aggregate may be a model-menu explanation, but these comparisons do not prove that hypothesis.",
+  "conclusion": "These artifacts show state4 observations and their confounds. They do not establish multiway accuracy, convergence, a full GTOW certificate, or an achievement threshold.",
+  "average_sampling_pilot": {
+    "status": "completed-no-promotion",
+    "summary_path": "runs/multiway-convergence-round5-20260909/average-sampling-summary.json",
+    "summary_sha256": "69fa0fa0322acddf212e3ff74ccbc993dd50ced85cd4a98db18368ce748401c1",
+    "seeds": [
+      0,
+      11,
+      29
+    ],
+    "sweeps": 4096,
+    "paired_regret_fingerprints_equal": true,
+    "measurement_boundary": "Global training seeds change regret learning as well as average sampling; the cross-seed spread is not an isolated averaging variance estimate. Held-out evaluation was omitted."
+  },
+  "local_limp_sensitivity": {
+    "status": "v1-misconfigured-excluded-v2-complete",
+    "path": "runs/multiway-convergence-round5-20260909/local-limp-k32",
+    "seed": 0,
+    "sweeps": 16384,
+    "buckets": [
+      32,
+      32,
+      32
+    ],
+    "batch_sweeps": 4,
+    "fresh_checkpoint_cadence_observed_sweeps": 10164,
+    "initial_mixedK_plan": "prepared but not run because local memory headroom was limited",
+    "result": "solve completed 16384 sweeps; audit failed before producing usable comparison output",
+    "reason": "Generated priority105 retained BB 4bb aggression while adding SB branches, so raise-to:3000 was absent. This is a configuration/menu mismatch, not a numerical correctness result.",
+    "solve_returncode": 0,
+    "solve_wall_seconds": 533.5143953999504,
+    "audit_returncode": 1,
+    "audit_wall_seconds": 238.73789280001074,
+    "outcome_path": "runs/multiway-convergence-round5-20260909/local-limp-k32/outcome.json",
+    "solve_execution_path": "runs/multiway-convergence-round5-20260909/local-limp-k32/solve.execution.json",
+    "audit_execution_path": "runs/multiway-convergence-round5-20260909/local-limp-k32/audit.execution.json",
+    "comparison_eligible": false,
+    "replacement": "runs/multiway-convergence-round5-20260909/local-limp-k32-v2",
+    "replacement_config_sha256": "c515e110f55d0d4e7a1b01a05d21a541e96950365885d6027e82a5234bb8e46",
+    "simple_preflop_status": "not_run; UI observation remains separate from General 6-max model",
+    "v2": {
+      "status": "complete",
+      "path": "runs/multiway-convergence-round5-20260909/local-limp-k32-v2",
+      "config_sha256": "c515e110f55d0d4e7a1b01a05d21a541e96950365885d6027e82a5234bb8e46",
+      "solve_returncode": 0,
+      "solve_wall_seconds": 550.7337471998762,
+      "audit_returncode": 0,
+      "audit_wall_seconds": 297.08351719984785,
+      "sweeps": 16384,
+      "comparison_eligible": true,
+      "monitor_path": "runs/multiway-convergence-round5-20260909/local-limp-k32-v2/monitor.jsonl",
+      "monitor_sampling_definition": "CPU mean = (last cumulative process CPU seconds - first) / observed sample interval / 8 configured solver threads; host logical CPU count is 16. RSS/available RAM are extrema only over target_verified samples.",
+      "monitor": {
+        "solve": {
+          "samples_target_verified": 34,
+          "observed_interval_start_utc": "2026-09-09T05:13:36.634300Z",
+          "observed_interval_end_utc": "2026-09-09T05:21:52.209011Z",
+          "observed_interval_seconds": 495.574711,
+          "cpu_seconds_first": 44.375,
+          "cpu_seconds_last": 1187.9375,
+          "cpu_seconds_cumulative_difference": 1143.5625,
+          "logical_cpus": 8,
+          "working_set_bytes_min": 572493824,
+          "working_set_bytes_max": 5466386432,
+          "peak_working_set_bytes_max": 5559861248,
+          "available_ram_bytes_min": 7241076736,
+          "sampling_source": "monitor.jsonl target_verified samples; 15-second cadence",
+          "host_logical_cpus": 16,
+          "configured_solver_threads": 8,
+          "cpu_average_fraction_of_8_configured_solver_threads": 0.28844351684442593,
+          "cpu_average_percent_of_8_configured_solver_threads": 28.844351684442593,
+          "cpu_average_fraction_of_host_16_logical_cpus": 0.14422175842221296,
+          "cpu_average_percent_of_host_16_logical_cpus": 14.422175842221296
+        },
+        "audit": {
+          "samples_target_verified": 20,
+          "observed_interval_start_utc": "2026-09-09T05:22:07.221831Z",
+          "observed_interval_end_utc": "2026-09-09T05:26:52.518487Z",
+          "observed_interval_seconds": 285.296656,
+          "cpu_seconds_first": 5.046875,
+          "cpu_seconds_last": 455.859375,
+          "cpu_seconds_cumulative_difference": 450.8125,
+          "logical_cpus": 8,
+          "working_set_bytes_min": 1128636416,
+          "working_set_bytes_max": 2877247488,
+          "peak_working_set_bytes_max": 3393183744,
+          "available_ram_bytes_min": 9871659008,
+          "sampling_source": "monitor.jsonl target_verified samples; 15-second cadence",
+          "host_logical_cpus": 16,
+          "configured_solver_threads": 8,
+          "cpu_average_fraction_of_8_configured_solver_threads": 0.1975191833303507,
+          "cpu_average_percent_of_8_configured_solver_threads": 19.75191833303507,
+          "cpu_average_fraction_of_host_16_logical_cpus": 0.09875959166517535,
+          "cpu_average_percent_of_host_16_logical_cpus": 9.875959166517536
+        }
+      },
+      "interpretation_boundary": "These timings and resource extrema cover observed monitor intervals and process execution records; they do not estimate unsampled startup/finalization or attribute strategy accuracy to this report."
+    }
+  },
+  "local_simple_reference_pending": {
+    "status": "complete",
+    "path": "runs/multiway-convergence-round5-20260909/local-simple-algorithm-screen",
+    "manifest_sha256": "243fc00457d87e92e92257e87cccadd377e912f1f8badf65012c5f7f865e5362",
+    "reference_sha256": "606b8bfd5bf78d877606b53ecbdd318f8fc361aed021e85365f8983dbf2af151",
+    "fixture_sha256": "57279091cd769b2605336d53fc1cddd29a812ae22d9ff1a55b8955d29ec3e126",
+    "source_archive_hash": "e6441362b61f101f3f8b8d5865f0529cccc1918ec01b6e7fb3c3de1c87c4efce",
+    "binary_sha256": "b1674011a6c338f0b1bb4e33e31c0fa490bbab88b1e560f8bec9c3c7b73c0769",
+    "training_seed": 0,
+    "arms": [
+      {
+        "name": "seed0000-none-b4",
+        "status": "complete",
+        "wall_seconds": 255.51496980013326,
+        "timed_region_seconds": 191.6134826,
+        "outside_timed_region_seconds": 63.90148720013326,
+        "mean_position_weighted_mae": 0.14039131966190538,
+        "pooled_weighted_rmse": 0.2608380870850446,
+        "heldout_max_gain_mean": {
+          "seed101": 0.32299414062499976,
+          "seed202": 0.2795996093750005
+        },
+        "sampled_resources": {
+          "samples": 16,
+          "observed_seconds": 225.3381739,
+          "mean_busy_core_equivalents": 4.971832914991063,
+          "host_capacity_percent_16_logical": 31.073955718694148,
+          "configured_worker_capacity_percent_8_threads": 62.147911437388295,
+          "max_sampled_working_set_bytes": 1402023936,
+          "max_reported_peak_working_set_bytes": 1402023936,
+          "min_sampled_available_ram_bytes": 10865262592
+        }
+      },
+      {
+        "name": "seed0000-periodic10000-b4",
+        "status": "complete",
+        "wall_seconds": 261.79173499997705,
+        "timed_region_seconds": 196.5060222,
+        "outside_timed_region_seconds": 65.28571279997706,
+        "mean_position_weighted_mae": 0.13150562190880039,
+        "pooled_weighted_rmse": 0.2576390914946864,
+        "heldout_max_gain_mean": {
+          "seed101": 0.7026611328125006,
+          "seed202": 0.5137622070312511
+        },
+        "sampled_resources": {
+          "samples": 17,
+          "observed_seconds": 240.3265543,
+          "mean_busy_core_equivalents": 4.67066312447022,
+          "host_capacity_percent_16_logical": 29.191644527938877,
+          "configured_worker_capacity_percent_8_threads": 58.38328905587775,
+          "max_sampled_working_set_bytes": 1401745408,
+          "max_reported_peak_working_set_bytes": 1401782272,
+          "min_sampled_available_ram_bytes": 10824507392
+        }
+      },
+      {
+        "name": "seed0000-none-b1",
+        "status": "complete",
+        "wall_seconds": 412.92453230009414,
+        "timed_region_seconds": 347.0082406,
+        "outside_timed_region_seconds": 65.91629170009412,
+        "mean_position_weighted_mae": 0.12100344878255054,
+        "pooled_weighted_rmse": 0.25311501677710246,
+        "heldout_max_gain_mean": {
+          "seed101": 0.387985839843751,
+          "seed202": 0.3948559570312494
+        },
+        "sampled_resources": {
+          "samples": 28,
+          "observed_seconds": 405.5007742,
+          "mean_busy_core_equivalents": 2.7177429615866813,
+          "host_capacity_percent_16_logical": 16.985893509916757,
+          "configured_worker_capacity_percent_8_threads": 33.97178701983351,
+          "max_sampled_working_set_bytes": 1400991744,
+          "max_reported_peak_working_set_bytes": 1401028608,
+          "min_sampled_available_ram_bytes": 10851823616
+        }
+      }
+    ],
+    "complete": true,
+    "measurement_boundary": "Simple partial-tree research rows and fixed-candidate held-out ProfileEvaluation only; no checkpoint/.mwsol, trained deviator, Nash/exploitability, or full-GTOW equivalence.",
+    "next_sensitivity": {
+      "description": "K128 under the same Simple fixture and the baseline none-b4 arm to separate abstraction sensitivity from batch/discount effects",
+      "status": "complete",
+      "path": "runs/multiway-convergence-round5-20260909/local-simple-k128-screen",
+      "manifest_sha256": "98553f2fa0c408ef8d8268b111f69d6d8369ce5f00af174993e22bbdaf44c116",
+      "derived_config_sha256": "615b5b4a3cb97105d0a46e0f3cd3196d954718ba0a5ad9969a3e7e2dcd4cc1f6",
+      "arm": "seed0000-none-b4",
+      "started_utc": "2026-09-09T06:12:45.136341Z",
+      "completed_utc": "2026-09-09T06:18:12.418102+00:00",
+      "sweeps": 32768,
+      "wall_seconds": 327.27702750009485,
+      "timed_region_seconds": 201.6108786,
+      "mean_position_weighted_mae": 0.14106832499610475,
+      "pooled_weighted_rmse": 0.2747344002529648,
+      "heldout_max_gain_mean_bb_per_hand": {
+        "seed101": 0.5667895507812496,
+        "seed202": 0.2813476562499995
+      },
+      "sampled_resources": {
+        "samples": 20,
+        "observed_seconds": 285.32550560000004,
+        "mean_busy_core_equivalents": 4.978141095424032,
+        "host_capacity_percent_16_logical": 31.113381846400202,
+        "configured_worker_capacity_percent_8_threads": 62.226763692800404,
+        "max_sampled_working_set_bytes": 2932301824,
+        "max_reported_peak_working_set_bytes": 3098587136,
+        "min_sampled_available_ram_bytes": 8961335296
+      },
+      "comparison_to_k32_none_b4": {
+        "baseline_path": "runs/multiway-convergence-round5-20260909/local-simple-algorithm-screen/seed0000-none-b4",
+        "wall_ratio": 1.280852655154,
+        "timed_region_ratio": 1.0521748045301693,
+        "mae_relative_percent": 0.48222734555793956,
+        "rmse_relative_percent": 5.327562904335137,
+        "interpretation": "No single-seed accuracy improvement. Raw wall ratio mixes the cold K128 EHS2 build (~58.68s) with solver work; K32 loaded a warmed cache in ~0.64s."
+      },
+      "interim_phase": "complete; cold K128 EHS2 table construction was about 58.68 seconds",
+      "interim_ehs2_build_seconds": 58.68,
+      "cache_comparison_note": "K32 arms loaded a warmed cache in about 0.64 seconds; raw wall times mix this cache difference with solver work.",
+      "interpretation_boundary": "One Simple partial-tree arm at training seed 0; no default promotion, Nash/exploitability guarantee, or full-GTOW equivalence."
+    },
+    "followup_reproducibility": {
+      "description": "K32 b4 versus b1 at training seeds 11 and 29 to test whether the seed-0 b1 MAE result persists",
+      "status": "complete",
+      "arms": [
+        "seed0011-none-b4",
+        "seed0011-none-b1",
+        "seed0029-none-b4",
+        "seed0029-none-b1"
+      ],
+      "started_utc_approx": "2026-09-09T06:32:16Z",
+      "manifest_sha256": {
+        "seed0011": "fa119df44298692dc8c9ea3b24e7f8d17672ecb684194c4e7601e14e88ab41e0",
+        "seed0029": "e7bdbabca34cb6b5f9b120dd16b72190ea8fd0009e2f0f0f6a2d2affa4aaecf5"
+      },
+      "arm_results": [
+        {
+          "name": "seed0011-none-b4",
+          "status": "complete",
+          "wall_seconds": 325.6551754998509,
+          "timed_region_seconds": 255.651828,
+          "mean_position_weighted_mae": 0.11678984877399172,
+          "pooled_weighted_rmse": 0.2438471126851903,
+          "stdout_sha256": "66182bbf47e1f2adfd884a98248bccc9b14102f2dd8f9c10b2214533acef07a9",
+          "config_sha256": "385c5a7db61c179d200892c8fda5dfde56b87c9c5885f8e7a481570c7dac02ea"
+        },
+        {
+          "name": "seed0011-none-b1",
+          "status": "complete",
+          "wall_seconds": 454.8829401000403,
+          "timed_region_seconds": 384.7357361,
+          "mean_position_weighted_mae": 0.14188650005872155,
+          "pooled_weighted_rmse": 0.2664237821521554,
+          "stdout_sha256": "863c044b22e2a045e928c0bf3d09eae7cd6d4d540e1f767ab003b8f546cfe1e8",
+          "config_sha256": "68f430ceec889529d87fb45b119200b7315c8357531aa97ce7ce59d7fbde2cc2"
+        },
+        {
+          "name": "seed0029-none-b4",
+          "status": "complete",
+          "wall_seconds": 321.4148933000397,
+          "timed_region_seconds": 251.5515738,
+          "mean_position_weighted_mae": 0.11979624233887551,
+          "pooled_weighted_rmse": 0.24037490107444184,
+          "stdout_sha256": "7a4da523d6513001b37ed96bef8c351372f50ff34165f39576e596987ad81d12",
+          "config_sha256": "137d7d5a4d40861f305b5adcb639123be0bb69655f214388214b4abc156290fd"
+        },
+        {
+          "name": "seed0029-none-b1",
+          "status": "complete",
+          "wall_seconds": 454.4348643999547,
+          "timed_region_seconds": 385.0228771,
+          "mean_position_weighted_mae": 0.10921779120193761,
+          "pooled_weighted_rmse": 0.23078002113554225,
+          "stdout_sha256": "c6f29c16d65a114a020bd0aaff9d94bf5e91ed06e5f70819412f7713abd67943",
+          "config_sha256": "bf2c69db4ed75f5e8131954235dc3c5091fa59178fe2bcc93257b5ebd3577749"
+        }
+      ],
+      "aggregate": {
+        "mean_mae_b4": 0.1256591369249242,
+        "mean_mae_b1": 0.12403591334773657,
+        "mean_paired_mae_delta_b1_minus_b4": -0.0016232235771876334,
+        "sample_sd_paired_mae_delta": 0.02355557797055547,
+        "seeds_with_lower_b1_mae": 2,
+        "seed_count": 3,
+        "wall_ratio_b1_over_b4": {
+          "seed0": 1.616048298943457,
+          "seed11": 1.3968239239614006,
+          "seed29": 1.413857521455116
+        }
+      },
+      "monitor_boundary": "Monitors started after solver launch; startup and pre-monitor resource use are unsampled. Seed 11/29 processes shared the 16-logical-CPU host, so timing ratios are descriptive.",
+      "execution_mode": "two sequential driver processes, at most 12 configured solver threads in aggregate",
+      "interpretation_boundary": "Fixed-sweep partial Simple model comparison; held-out evaluations are supplemental diagnostics, not exploitability. No default-setting change follows."
+    },
+    "host_observation_path": "runs/multiway-convergence-round5-20260909/local-simple-algorithm-screen/host-observation.json",
+    "resource_sampling_boundary": "15-second target-process samples; observed_seconds and CPU/RAM values are sampled windows, not unsampled startup/finalization estimates."
+  },
+  "validation": {
+    "status": "pass",
+    "format": "PASS",
+    "clippy": "PASS",
+    "workspace_tests": {
+      "passed": 731,
+      "failed": 0,
+      "ignored": 30
+    },
+    "python_algorithm_screen_driver_tests": {
+      "passed": 10,
+      "failed": 0
+    },
+    "python_simple_reference_comparison_tests": {
+      "passed": 8,
+      "failed": 0
+    },
+    "records_path": "runs/multiway-convergence-round5-20260909/checks",
+    "boundary": "Validation covers the current source and test suites; experiment outcomes are recorded separately and remain subject to their stated research boundaries."
+  },
+  "scaling_and_long_run": {
+    "status": "local_ab_and_large_export_complete",
+    "goal": "efficient larger-machine and long-run execution alongside GTOW quality",
+    "plan": "docs/validation/multiway-scaling-long-run-2026-09-09.md",
+    "parallel_traversal": {
+      "stage1": {
+        "stage": "stage1",
+        "comparisons": [
+          {
+            "batch_sweeps": 1,
+            "numerical_identity": "exact-result-and-fingerprints",
+            "old_timed_seconds": 83.6739228,
+            "new_timed_seconds": 67.9374565,
+            "timed_speedup": 1.2316316669877097,
+            "old_wall_seconds": 145.90746579994448,
+            "new_wall_seconds": 130.4660405998584,
+            "stdout_sha256": {
+              "old": "7ee775d63d8124727a81c29688fc6c4cae038f641c192ab307200dafeb1544ea",
+              "new": "2f8075c61762421814207bf77a221c1210a374743ff92f6915428c4f398efe14"
+            }
+          },
+          {
+            "batch_sweeps": 4,
+            "numerical_identity": "exact-result-and-fingerprints",
+            "old_timed_seconds": 46.9134126,
+            "new_timed_seconds": 43.9351879,
+            "timed_speedup": 1.0677867750737444,
+            "old_wall_seconds": 108.71002870006487,
+            "new_wall_seconds": 105.7098453999497,
+            "stdout_sha256": {
+              "old": "a400635475bd9005202c9e8a33d1ed40c5fb6cb915b4b965bf0f2d168a92bffb",
+              "new": "f72c3bd1d517ecb347ec4dafe141ee1ea7324ccf913e2a0ab1039227184c6c19"
+            }
+          }
+        ],
+        "timing_boundary": "training, selected strategy export, and solver disposal; excludes table/session initialization; evaluation disabled",
+        "interpretation": "single paired timing per configuration, not a repeated performance estimate or convergence comparison"
+      },
+      "stage2": {
+        "stage": "stage2",
+        "comparisons": [
+          {
+            "batch_sweeps": 1,
+            "numerical_identity": "exact-result-and-fingerprints",
+            "old_timed_seconds": 166.9376953,
+            "new_timed_seconds": 126.0209996,
+            "timed_speedup": 1.3246815675948662,
+            "old_wall_seconds": 230.846426300006,
+            "new_wall_seconds": 190.28051849990152,
+            "stdout_sha256": {
+              "old": "2689641a3683c0d4ddcce57e61eeee6138f750785b27992fa6ef812b193e2059",
+              "new": "df8ea25d9419c79504eda06c62f927e1c01147ca4d1adb38264b0263fe27603f"
+            }
+          },
+          {
+            "batch_sweeps": 4,
+            "numerical_identity": "exact-result-and-fingerprints",
+            "old_timed_seconds": 71.709221,
+            "new_timed_seconds": 63.5227716,
+            "timed_speedup": 1.128874247672153,
+            "old_wall_seconds": 134.20912109990604,
+            "new_wall_seconds": 126.05404009995982,
+            "stdout_sha256": {
+              "old": "0d6c4b8619683d5f9a79c0ed941a9268f153b4bbb9acbb30d10f0b9c9137b640",
+              "new": "6804cf32f571b8559a7036741b5235f6a31d06c050f6b83bc59f8a5eac61f65d"
+            }
+          }
+        ],
+        "timing_boundary": "training, selected strategy export, and solver disposal; excludes table/session initialization; evaluation disabled",
+        "interpretation": "single paired timing per configuration, not a repeated performance estimate or convergence comparison"
+      }
+    },
+    "large_export_verification": "runs\\multiway-convergence-round5-20260909\\cloud-export-fix-state4\\recovery-verification.json",
+    "vm_status": "TERMINATED",
+    "budget_record": "runs\\multiway-convergence-round5-20260909\\cloud-export-fix-state4\\budget-observed.json",
+    "validation": "runs\\multiway-convergence-round5-20260909\\scaling-validation\\validation.json",
+    "unresolved": [
+      "matched-sweep cloud scaling and repeated timings",
+      "initialization/restoration optimization",
+      "longer-run abstraction/GTOW quality evaluation"
+    ]
+  },
+  "benchmark_catalog": {
+    "path": "docs/validation/multiway-benchmarks-2026-09-09.md",
+    "configuration_index": "docs/validation/multiway-benchmark-config-index-2026-09-09.json",
+    "goal_status": "active",
+    "new_progress": [
+      "retained and historical benchmark settings documented",
+      "control reproduction gate enforced before experimental arm",
+      "preflop-only export contract mismatch explicitly tracked",
+      "seed-0 draw-aware/EHS A/B completed with strict-menu comparison and control parity gate"
+    ],
+    "pending": [
+      "draw-aware multi-seed quality and RSS validation",
+      "long-duration multi-seed quality and RSS validation",
+      "matched-hardware scaling of parallel traversal",
+      "preflop-only export contract reconciliation"
+    ]
+  }
+}

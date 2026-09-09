@@ -166,7 +166,7 @@ impl DenseStorage {
 /// dense-mode aggregations that must scan the whole arena deterministically.
 pub(super) fn for_each_touched_column<'a>(
     dense: &'a DenseStorage,
-    mut visit: impl FnMut(InfoKey, &'a tree::TreeNode, std::ops::Range<usize>),
+    mut visit: impl FnMut(u32, InfoKey, &'a tree::TreeNode, std::ops::Range<usize>),
 ) {
     for (node_index, node) in dense.tree.nodes.iter().enumerate() {
         let node_id = node_index as NodeId;
@@ -183,7 +183,7 @@ pub(super) fn for_each_touched_column<'a>(
                 .arena
                 .slot_range(node_id, bucket)
                 .expect("bucket is within this node's range");
-            visit(dense.info_key_for(node_id, bucket), node, range);
+            visit(column, dense.info_key_for(node_id, bucket), node, range);
         }
     }
 }

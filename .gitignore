@@ -7,5 +7,7 @@
 /runs
 /.cache
 __pycache__/
-# Per-agent instruction mirror of CLAUDE.md; local-only by policy.
-AGENTS.md
+.pytest_cache/
+*.pyc
+# Test-created temporary directories must not become repository inputs.
+/tmp*/
