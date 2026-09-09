@@ -7,7 +7,9 @@
 //! tuple is accepted, a single five-card runout is drawn from the remaining
 //! deck and shared by every branch of an external-sampling traversal.
 
-use cards::{ALL_CARDS, Card, CardSet, NUM_COMBOS, Range, combo_cards, combo_index};
+#[cfg(test)]
+use cards::ALL_CARDS;
+use cards::{Card, CardSet, NUM_COMBOS, Range, combo_cards, combo_index};
 use rand::seq::SliceRandom;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
@@ -27,7 +29,8 @@ const EXACT_DFS_MAX_SEAT_SUPPORT: usize = 128;
 /// their cards are still dead when later streets are revealed.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SampledWorld {
-    hole_combos: Vec<usize>,
+    hole_combos: [usize; MAX_PLAYERS],
+    num_players: u8,
     runout: [Card; 5],
 }
 
@@ -51,22 +54,26 @@ impl SamplingDiagnostics {
 impl SampledWorld {
     pub fn new(hole_combos: Vec<usize>, runout: [Card; 5]) -> Result<Self, SampleError> {
         validate_world(&hole_combos, &runout)?;
+        let num_players = hole_combos.len();
+        let mut stored_holes = [0; MAX_PLAYERS];
+        stored_holes[..num_players].copy_from_slice(&hole_combos);
         Ok(Self {
-            hole_combos,
+            hole_combos: stored_holes,
+            num_players: num_players as u8,
             runout,
         })
     }
 
     pub fn num_players(&self) -> usize {
-        self.hole_combos.len()
+        self.num_players as usize
     }
 
     pub fn hole_combo(&self, seat: usize) -> usize {
-        self.hole_combos[seat]
+        self.hole_combos()[seat]
     }
 
     pub fn hole_combos(&self) -> &[usize] {
-        &self.hole_combos
+        &self.hole_combos[..self.num_players()]
     }
 
     pub fn hole_cards(&self, seat: usize) -> (Card, Card) {
@@ -258,15 +265,16 @@ impl DealSampler {
             });
         }
 
-        let mut hole_combos = vec![0; self.ranges.len()];
+        let num_players = self.ranges.len();
+        let mut hole_combos = [0; MAX_PLAYERS];
         for attempts in 1..=self.max_attempts {
-            for (combo, range) in hole_combos.iter_mut().zip(&self.ranges) {
+            for (combo, range) in hole_combos[..num_players].iter_mut().zip(&self.ranges) {
                 *combo = range.sample(rng);
             }
 
             let mut dead = CardSet::EMPTY;
             let mut collision = false;
-            for &combo in &hole_combos {
+            for &combo in &hole_combos[..num_players] {
                 let (a, b) = combo_cards(combo);
                 if dead.contains(a) || dead.contains(b) {
                     collision = true;
@@ -283,6 +291,7 @@ impl DealSampler {
             return Ok(CountedSample {
                 world: SampledWorld {
                     hole_combos,
+                    num_players: num_players as u8,
                     runout,
                 },
                 attempts,
@@ -331,17 +340,19 @@ impl DealSampler {
     }
 
     fn sample_uniform_world<R: Rng + ?Sized>(&self, rng: &mut R) -> SampledWorld {
-        let mut deck: Vec<Card> = ALL_CARDS.into_iter().collect();
+        let mut deck: [Card; cards::NUM_CARDS] =
+            std::array::from_fn(|index| Card::from_index(index as u8));
         deck.shuffle(rng);
         let mut offset = 0;
-        let mut hole_combos = Vec::with_capacity(self.num_players());
-        for _ in 0..self.num_players() {
-            hole_combos.push(combo_index(deck[offset], deck[offset + 1]));
+        let mut hole_combos = [0; MAX_PLAYERS];
+        for combo in &mut hole_combos[..self.num_players()] {
+            *combo = combo_index(deck[offset], deck[offset + 1]);
             offset += 2;
         }
         let runout = deck[offset..offset + 5].try_into().expect("five cards");
         SampledWorld {
             hole_combos,
+            num_players: self.num_players() as u8,
             runout,
         }
     }
@@ -441,11 +452,17 @@ fn is_uniform_full_range(range: &Range) -> bool {
 }
 
 fn draw_runout<R: Rng + ?Sized>(dead: CardSet, rng: &mut R) -> [Card; 5] {
-    let mut deck: Vec<Card> = ALL_CARDS
-        .into_iter()
-        .filter(|&card| !dead.contains(card))
-        .collect();
-    deck.shuffle(rng);
+    let mut deck: [Card; cards::NUM_CARDS] =
+        std::array::from_fn(|index| Card::from_index(index as u8));
+    let mut live_len = 0;
+    for source in 0..deck.len() {
+        let card = deck[source];
+        if !dead.contains(card) {
+            deck[live_len] = card;
+            live_len += 1;
+        }
+    }
+    deck[..live_len].shuffle(rng);
     deck[..5].try_into().expect("at least five live cards")
 }
 
@@ -505,8 +522,77 @@ pub enum SampleError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::SeedableRng;
+    use rand::{RngCore, SeedableRng};
     use rand_chacha::ChaCha20Rng;
+    use std::hint::black_box;
+    use std::time::Instant;
+
+    fn sample_counted_legacy<R: Rng + ?Sized>(
+        sampler: &DealSampler,
+        rng: &mut R,
+    ) -> Result<CountedSample, SampleError> {
+        if sampler.uniform_full {
+            let mut deck: Vec<Card> = ALL_CARDS.into_iter().collect();
+            deck.shuffle(rng);
+            let mut offset = 0;
+            let mut hole_combos = Vec::with_capacity(sampler.num_players());
+            for _ in 0..sampler.num_players() {
+                hole_combos.push(combo_index(deck[offset], deck[offset + 1]));
+                offset += 2;
+            }
+            let runout = deck[offset..offset + 5].try_into().expect("five cards");
+            return Ok(CountedSample {
+                world: SampledWorld::new(hole_combos, runout)?,
+                attempts: 1,
+            });
+        }
+
+        let mut hole_combos = vec![0; sampler.ranges.len()];
+        for attempts in 1..=sampler.max_attempts {
+            for (combo, range) in hole_combos.iter_mut().zip(&sampler.ranges) {
+                *combo = range.sample(rng);
+            }
+            let mut dead = CardSet::EMPTY;
+            let mut collision = false;
+            for &combo in &hole_combos {
+                let (a, b) = combo_cards(combo);
+                if dead.contains(a) || dead.contains(b) {
+                    collision = true;
+                    break;
+                }
+                dead.insert(a);
+                dead.insert(b);
+            }
+            if collision {
+                continue;
+            }
+            let mut deck: Vec<Card> = ALL_CARDS
+                .into_iter()
+                .filter(|&card| !dead.contains(card))
+                .collect();
+            deck.shuffle(rng);
+            let runout = deck[..5].try_into().expect("at least five live cards");
+            return Ok(CountedSample {
+                world: SampledWorld::new(hole_combos, runout)?,
+                attempts,
+            });
+        }
+        Err(SampleError::AttemptsExhausted {
+            attempts: sampler.max_attempts,
+        })
+    }
+
+    fn assert_matches_legacy(sampler: &DealSampler, seed: u64) {
+        let mut current_rng = ChaCha20Rng::seed_from_u64(seed);
+        let mut legacy_rng = current_rng.clone();
+        for _ in 0..256 {
+            assert_eq!(
+                sampler.sample_counted(&mut current_rng),
+                sample_counted_legacy(sampler, &mut legacy_rng)
+            );
+        }
+        assert_eq!(current_rng.next_u64(), legacy_rng.next_u64());
+    }
 
     #[test]
     fn uniform_nine_way_world_has_twenty_three_unique_cards() {
@@ -545,6 +631,44 @@ mod tests {
                 sampler.sample_counted(&mut b)
             );
         }
+    }
+
+    #[test]
+    fn optimized_deck_path_matches_legacy_seed_streams() {
+        let uniform = DealSampler::new(vec![Range::full(); 6]).unwrap();
+        assert_matches_legacy(&uniform, 11);
+
+        let weighted = DealSampler::new(vec![
+            "22+,A2s+,KTo+".parse().unwrap(),
+            "55+,A8s+,AJo+".parse().unwrap(),
+            "77+,ATs+,AQo+".parse().unwrap(),
+        ])
+        .unwrap();
+        assert_matches_legacy(&weighted, 23);
+
+        // All seats draw from the same compact range, so the legacy path
+        // takes collision-rejection branches frequently before a legal
+        // tuple reaches the runout shuffle.
+        let collision_heavy = DealSampler::new(vec!["TT+,AKs,AKo".parse().unwrap(); 3]).unwrap();
+        assert_matches_legacy(&collision_heavy, 37);
+    }
+
+    #[test]
+    #[ignore = "manual release-mode sampler throughput benchmark"]
+    fn sampler_throughput_benchmark() {
+        const SAMPLES: u64 = 500_000;
+        let sampler = DealSampler::new(vec![Range::full(); 6]).unwrap();
+        let mut rng = ChaCha20Rng::seed_from_u64(91);
+        let started = Instant::now();
+        for _ in 0..SAMPLES {
+            black_box(sampler.sample_counted(&mut rng).unwrap());
+        }
+        let elapsed = started.elapsed();
+        eprintln!(
+            "uniform-six-way: {SAMPLES} samples in {:.6}s ({:.0} samples/s)",
+            elapsed.as_secs_f64(),
+            SAMPLES as f64 / elapsed.as_secs_f64()
+        );
     }
 
     #[test]
@@ -594,5 +718,15 @@ mod tests {
             SampledWorld::new(vec![aces, kings], bad_runout),
             Err(SampleError::CardCollision)
         );
+    }
+
+    #[test]
+    #[should_panic]
+    fn hole_combo_rejects_an_unoccupied_fixed_slot() {
+        let aces = combo_index("As".parse().unwrap(), "Ah".parse().unwrap());
+        let kings = combo_index("Ks".parse().unwrap(), "Kh".parse().unwrap());
+        let runout = ["2c", "3d", "4h", "5s", "6c"].map(|s| s.parse().unwrap());
+        let world = SampledWorld::new(vec![aces, kings], runout).unwrap();
+        let _ = world.hole_combo(2);
     }
 }
