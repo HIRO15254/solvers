@@ -1598,43 +1598,55 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 // The averaging traversal tracks one own-reach value per
                 // feasible combo.
                 let own_reach = vec![1.0; combos.len()];
-                // The traversal starts with every feasible combo active;
-                // pruning (see `VectorTraversalWorker::traverse`) is the
-                // only thing that ever shrinks this subset further down the
-                // tree.
-                let active: Vec<usize> = (0..combos.len()).collect();
-                let mut worker = VectorTraversalWorker::new(
-                    &self.game,
-                    dense,
-                    self.config,
-                    combos.clone(),
-                    weights,
-                )?;
-                worker.traverse(
-                    self.game.root_state(),
-                    0,
-                    &sample.world,
-                    traverser,
-                    &active,
-                    1.0,
-                    &mut action_rng,
-                    0,
-                )?;
-                let mut delta = worker.finish(sample_id, traverser, u64::from(sample.attempts));
-                let mut average =
-                    DenseAverageStrategyWorker::new(&self.game, dense, self.config, linear_weight);
-                average.traverse_vector(
-                    self.game.root_state(),
-                    0,
-                    &sample.world,
-                    traverser,
-                    &combos,
-                    &normalized_weights,
-                    &own_reach,
-                    &mut average_rng,
-                    0,
-                )?;
-                delta.events.extend(average.finish());
+                let regret_combos = combos.clone();
+                let (regret_result, average_result) = rayon::join(
+                    || -> Result<DenseTraversalDelta, SolverError> {
+                        // The regret traversal starts with every feasible combo
+                        // active. Pruning is the only operation that shrinks it.
+                        let active: Vec<usize> = (0..regret_combos.len()).collect();
+                        let mut worker = VectorTraversalWorker::new(
+                            &self.game,
+                            dense,
+                            self.config,
+                            regret_combos,
+                            weights,
+                        )?;
+                        worker.traverse(
+                            self.game.root_state(),
+                            0,
+                            &sample.world,
+                            traverser,
+                            &active,
+                            1.0,
+                            &mut action_rng,
+                            0,
+                        )?;
+                        Ok(worker.finish(sample_id, traverser, u64::from(sample.attempts)))
+                    },
+                    || -> Result<Vec<DenseEvent>, SolverError> {
+                        let mut average = DenseAverageStrategyWorker::new(
+                            &self.game,
+                            dense,
+                            self.config,
+                            linear_weight,
+                        );
+                        average.traverse_vector(
+                            self.game.root_state(),
+                            0,
+                            &sample.world,
+                            traverser,
+                            &combos,
+                            &normalized_weights,
+                            &own_reach,
+                            &mut average_rng,
+                            0,
+                        )?;
+                        Ok(average.finish())
+                    },
+                );
+                // Preserve serial error priority and event ordering.
+                let mut delta = regret_result?;
+                delta.events.extend(average_result?);
                 Ok(AnyTraversalDelta::Dense(delta))
             }
             Some(dense) => {

@@ -4189,3 +4189,51 @@ fn real_holdem_vector_bucket_cache_separates_opponent_contexts_on_one_street() {
         "fixture must visit two opponent contexts on one postflop street"
     );
 }
+
+#[test]
+fn stopping_and_restarting_on_a_full_batch_boundary_preserves_state() {
+    let mut interrupted = solver_with_batch(99, 1 << 20, 4);
+    let mut polls = 0;
+    let completed = interrupted
+        .run_sweeps_with_threads_until(24, 4, || {
+            polls += 1;
+            polls <= 2
+        })
+        .unwrap();
+    assert_eq!(completed, 8);
+    interrupted.run_sweeps_with_threads(16, 4).unwrap();
+
+    let mut uninterrupted = solver_with_batch(99, 1 << 20, 4);
+    uninterrupted.run_sweeps_with_threads(24, 4).unwrap();
+
+    assert_eq!(interrupted.snapshot_state(), uninterrupted.snapshot_state());
+    assert_eq!(interrupted.metrics(), uninterrupted.metrics());
+}
+
+#[test]
+fn dense_vector_delta_keeps_regret_events_before_average_events() {
+    let solver = dense_vector_toy_solver(811, 1);
+    let delta = solver.generate_traversal_delta(0, 0, 1.0).unwrap();
+    let AnyTraversalDelta::Dense(delta) = delta else {
+        panic!("street-recall toy must generate a dense delta")
+    };
+    let first_strategy = delta
+        .events
+        .iter()
+        .position(|event| matches!(event, DenseEvent::AddStrategy { .. }))
+        .expect("average traversal must emit strategy events");
+    assert!(
+        first_strategy > 0,
+        "regret traversal must emit events first"
+    );
+    assert!(
+        delta.events[..first_strategy]
+            .iter()
+            .all(|event| matches!(event, DenseEvent::AddRegret { .. }))
+    );
+    assert!(
+        delta.events[first_strategy..]
+            .iter()
+            .all(|event| matches!(event, DenseEvent::AddStrategy { .. }))
+    );
+}
