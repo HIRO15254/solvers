@@ -1,0 +1,151 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T20:05:50.202238+00:00",
+  "argv": [
+    "/usr/bin/python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/tests",
+    "-v"
+  ],
+  "cwd": "/opt/r1/current",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 300.0,
+    "grace_seconds": 5.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.25,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "disk_reserve_bytes": 12884901888
+  },
+  "runtime": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-7.0.0-1011-gcp-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "logical_cpus": 8
+  },
+  "outputs": {
+    "stdout": {
+      "path": "/opt/r1/codec-build07/04-python-tools/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "path": "/opt/r1/codec-build07/04-python-tools/stderr.log",
+      "sha256": "26786348495356e8addaf843d46875ea65462f9074c4473acb9f03b08a5953d0",
+      "bytes": 4839
+    },
+    "samples": {
+      "path": "/opt/r1/codec-build07/04-python-tools/samples.jsonl",
+      "sha256": "1a3693c8dfa8f5424f79db86efbd840e886660de1c488483551ba1e0e0bf995b",
+      "bytes": 6605
+    }
+  },
+  "identity_before": [
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/current/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/current/Cargo.lock",
+      "sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1",
+      "bytes": 40970
+    },
+    {
+      "path": "/opt/r1/current/.cargo/config.toml",
+      "sha256": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21",
+      "bytes": 125
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/current/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/current/Cargo.lock",
+      "sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1",
+      "bytes": 40970
+    },
+    {
+      "path": "/opt/r1/current/.cargo/config.toml",
+      "sha256": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21",
+      "bytes": 125
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 21,
+    "max_sample_gap_seconds": 0.25713676599991686,
+    "sampled_peak_tree_resident_bytes": 49455104,
+    "root_os_peak_resident_bytes": 28106752,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "max_observed_processes": 2
+  },
+  "containment": {
+    "kind": "posix_session_process_group",
+    "limitations": [
+      "setsid/setpgid can escape this process group; use a systemd/cgroup wrapper",
+      "supervisor SIGKILL, host failure or power loss does not kill the group",
+      "resident memory is sampled /proc RSS; brief descendants may be missed",
+      "summed RSS can double-count shared pages; this is not cgroup memory.current",
+      "wait4 root peak can include reaped descendant high-water marks; it is not a simultaneous tree peak"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 67419480064,
+    "available_bytes": 66139037696
+  },
+  "resolved_argv": [
+    "/usr/bin/python3.12",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/tests",
+    "-v"
+  ],
+  "disk_path": "/opt/r1",
+  "disk_free_before_bytes": 95299112960,
+  "started_at": "2026-09-25T20:05:50.214983+00:00",
+  "pid": 11959,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 28106752,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "elapsed_seconds": 5.131325636999918,
+    "at": "2026-09-25T20:05:55.352098+00:00",
+    "host_available_memory_bytes": 66174590976,
+    "disk_free_bytes": 95299014656
+  },
+  "elapsed_seconds": 5.137209646999963,
+  "ended_at": "2026-09-25T20:05:55.352229+00:00",
+  "supervisor_exit_code": 0
+}

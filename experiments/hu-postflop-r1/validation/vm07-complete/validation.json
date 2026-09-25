@@ -1,0 +1,1731 @@
+{
+  "boot_source_policy": "all observations retain their record/pointer; never attribute old validation or native binaries to another boot/source",
+  "distinct_boot_ids": [
+    "0727ebb3-36dd-4fae-b978-c629114703ed",
+    "1218b856-0cbd-4349-8ccc-a0ac7a7792ce",
+    "159efb96-10fb-4ce4-bb0f-bc2b27ee618f"
+  ],
+  "multiple_boots_observed": true,
+  "problems": [
+    {
+      "count": 94,
+      "reason": "required_linked_evidence_missing"
+    }
+  ],
+  "provenance_observations": [
+    {
+      "kind": "boot_id",
+      "pointer": "/boot_id",
+      "record": "records/build/build/result.json",
+      "value": "0727ebb3-36dd-4fae-b978-c629114703ed"
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/local_inventory/source_archives_present/0",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-05.json",
+      "value": {
+        "bytes": 1160505,
+        "path": "experiments/hu-postflop-r1/validation/sources/current-01.tar.gz",
+        "sha256": "e1eec592dcf180acc34f27c076d03a4b316694b86ca2cd9fc3cbf1dd5e5f211e"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/local_inventory/source_archives_present/1",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-05.json",
+      "value": {
+        "bytes": 1181970,
+        "path": "experiments/hu-postflop-r1/validation/sources/current-02.tar.gz",
+        "sha256": "5edec6bea4ce887847c3430b3c45e5c5251402f2780f3289e95409e40b4b8fc6"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/local_inventory/source_archives_present/2",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-05.json",
+      "value": {
+        "bytes": 1195310,
+        "path": "experiments/hu-postflop-r1/validation/sources/current-03.tar.gz",
+        "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/local_inventory/source_archives_present/3",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-05.json",
+      "value": {
+        "bytes": 1204318,
+        "path": "experiments/hu-postflop-r1/validation/sources/current-04.tar.gz",
+        "sha256": "3787c1479e71cfab6266d75865750a97ca370712032d22565215a985dc680472"
+      }
+    },
+    {
+      "kind": "boot_id",
+      "pointer": "/cpu_change/after/boot_id",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "value": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f"
+    },
+    {
+      "kind": "boot_id",
+      "pointer": "/evidence_availability/recovery/boot_id",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "value": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f"
+    },
+    {
+      "kind": "previous_boot_id",
+      "pointer": "/evidence_availability/recovery/previous_boot_id",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "value": "1218b856-0cbd-4349-8ccc-a0ac7a7792ce"
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/evidence_availability/recovery/source06_archive",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "value": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/evidence_availability/recovery/current_example",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "value": {
+        "bytes": 4249752,
+        "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+        "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/evidence_availability/recovery/baseline_example",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "value": {
+        "bytes": 4227680,
+        "path": "/opt/r1/target/baseline-audit-recovery/release/examples/hu_saved_profile_audit",
+        "sha256": "9efa72cb9cbeed080cda824ee91fccac29dd3d1f17822eb2d5da97b30fe6bc92"
+      }
+    },
+    {
+      "kind": "boot_id",
+      "pointer": "/host/boot_id",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "value": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f"
+    },
+    {
+      "kind": "hostname",
+      "pointer": "/host/hostname",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "value": "solvers-r1-20260925-06"
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/original_source03_plan",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "value": {
+        "bytes": 13808,
+        "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/plan.json",
+        "sha256": "7f3f3c60fec7d926b73f8b27d4f562a72fbc5ee47a18dcad73117131392a3d6a"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source_scope/audit_build_verifier",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "value": {
+        "bytes": 18459,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\saved-profile\\vm06-build-verification.py",
+        "sha256": "c36d85eb7d0131b575902d73991f7fd97f10a7cb4e9748df44faf2c1778cfe17"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source_scope/performance_baseline/binary",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "value": {
+        "bytes": 8813904,
+        "path": "/opt/r1/target/baseline/release/solvers",
+        "sha256": "77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source_scope/performance_baseline/source_evidence",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "value": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source_scope/performance_candidate06/binary",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "value": {
+        "bytes": 8868976,
+        "path": "/opt/r1/target/current-recovery/release/solvers",
+        "sha256": "5baae6ebe438bc0205968587a7447599a15832411aeab1558cfecc1dd7293031"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source_scope/performance_candidate06/source_evidence",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "value": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source_scope/quality_auditor_candidate06",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "value": {
+        "bytes": 1213908,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\validation\\sources\\current-06.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      }
+    },
+    {
+      "kind": "boot_id",
+      "pointer": "/host/boot_id",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "value": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f"
+    },
+    {
+      "kind": "hostname",
+      "pointer": "/host/hostname",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "value": "solvers-r1-20260925-06"
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source_scope/audit_build_verifier",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "value": {
+        "bytes": 18459,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\saved-profile\\vm06-build-verification.py",
+        "sha256": "c36d85eb7d0131b575902d73991f7fd97f10a7cb4e9748df44faf2c1778cfe17"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source_scope/performance_baseline/binary",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "value": {
+        "bytes": 8813904,
+        "path": "/opt/r1/target/baseline/release/solvers",
+        "sha256": "77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source_scope/performance_baseline/source_evidence",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "value": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source_scope/performance_candidate03/binary",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "value": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source_scope/performance_candidate03/source_evidence",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "value": {
+        "bytes": 1195310,
+        "path": "/opt/r1/candidate-v3-source.tar.gz",
+        "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source_scope/quality_auditor_candidate06",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "value": {
+        "bytes": 1213908,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\validation\\sources\\current-06.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      }
+    }
+  ],
+  "quality_acceptance": "not_evaluated_by_retainer",
+  "ready": false,
+  "reports": [],
+  "required_scopes": [],
+  "unresolved_references": [
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/checks/clippy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/checks/clippy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/checks/clippy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/checks/clippy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/checks/fmt/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/checks/fmt/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/checks/fmt/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/checks/fmt/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 1446024,
+        "path": "/usr/bin/bash",
+        "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/checks/toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/checks/toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 1446024,
+        "path": "/usr/bin/bash",
+        "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/checks/toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/checks/toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/checks/tools/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/checks/tools/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/checks/workspace/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/checks/workspace/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/checks/workspace/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/checks/workspace/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 1446024,
+        "path": "/usr/bin/bash",
+        "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/build/build/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/build/build/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 1446024,
+        "path": "/usr/bin/bash",
+        "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/build/build/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/build/build/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/build/build/01-fmt/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/build/build/01-fmt/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/build/build/01-fmt/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/build/build/01-fmt/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/build/build/02-clippy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/build/build/02-clippy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/build/build/02-clippy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/build/build/02-clippy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/build/build/03-workspace-tests/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/build/build/03-workspace-tests/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/build/build/03-workspace-tests/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/build/build/03-workspace-tests/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/build/build/04-python-tools/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/build/build/04-python-tools/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/build/build/05-release-cli/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/build/build/05-release-cli/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/build/build/05-release-cli/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/build/build/05-release-cli/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/build/build/06-release-codec-current/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/build/build/06-release-codec-current/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/build/build/06-release-codec-current/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/build/build/06-release-codec-current/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/build/build/07-release-codec-baseline/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/build/build/07-release-codec-baseline/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/build/build/07-release-codec-baseline/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/build/build/07-release-codec-baseline/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8635436,
+        "path": "runs/r1-cloud/vm05-build.tar.gz",
+        "sha256": "3c715889d53ce83fe8c033b317337c40e302bdf05ad8d0245e95566a4f7d499e"
+      },
+      "pointer": "/local_inventory/retained_bundles/0",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-05.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 11950377,
+        "path": "runs/r1-cloud/vm05-pipeline.tar.gz",
+        "sha256": "3730bdb23b8cd53d7de70d567bfa897a8f6e3337582622757868c82b86b8cb7e"
+      },
+      "pointer": "/local_inventory/retained_bundles/1",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-05.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 29508,
+        "path": "runs/r1-cloud/vm05-v3-checks.tar.gz",
+        "sha256": "33905062c8c8cef0d53605febc8deb3c0fe911c0555260ac11613382768b8ed0"
+      },
+      "pointer": "/local_inventory/retained_bundles/2",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-05.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1160505,
+        "path": "experiments/hu-postflop-r1/validation/sources/current-01.tar.gz",
+        "sha256": "e1eec592dcf180acc34f27c076d03a4b316694b86ca2cd9fc3cbf1dd5e5f211e"
+      },
+      "pointer": "/local_inventory/source_archives_present/0",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-05.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1181970,
+        "path": "experiments/hu-postflop-r1/validation/sources/current-02.tar.gz",
+        "sha256": "5edec6bea4ce887847c3430b3c45e5c5251402f2780f3289e95409e40b4b8fc6"
+      },
+      "pointer": "/local_inventory/source_archives_present/1",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-05.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1195310,
+        "path": "experiments/hu-postflop-r1/validation/sources/current-03.tar.gz",
+        "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970"
+      },
+      "pointer": "/local_inventory/source_archives_present/2",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-05.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1204318,
+        "path": "experiments/hu-postflop-r1/validation/sources/current-04.tar.gz",
+        "sha256": "3787c1479e71cfab6266d75865750a97ca370712032d22565215a985dc680472"
+      },
+      "pointer": "/local_inventory/source_archives_present/3",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-05.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/evidence_availability/recovery/source06_archive",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/evidence_availability/recovery/baseline_archive",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 4249752,
+        "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+        "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932"
+      },
+      "pointer": "/evidence_availability/recovery/current_example",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 4227680,
+        "path": "/opt/r1/target/baseline-audit-recovery/release/examples/hu_saved_profile_audit",
+        "sha256": "9efa72cb9cbeed080cda824ee91fccac29dd3d1f17822eb2d5da97b30fe6bc92"
+      },
+      "pointer": "/evidence_availability/recovery/baseline_example",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 23430,
+        "path": "experiments/hu-postflop-r1/saved-profile/evidence-vm06-build/records/recovery/recovery/result.json",
+        "sha256": "3fad2ecac424d18b67c12c4febe6a9928c4ee4bf647c485fa9fbfc789179c05a"
+      },
+      "pointer": "/evidence_availability/recovery/result",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 861,
+        "path": "experiments/hu-postflop-r1/saved-profile/evidence-vm06-build/records/recovery/recovery/complete.json",
+        "sha256": "ec99381d612c1b3dc44936c26470ca6bc9bf493e5bafbf0087e7288010cb2d13"
+      },
+      "pointer": "/evidence_availability/recovery/complete",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 20720,
+        "path": "experiments/hu-postflop-r1/saved-profile/vm06-build-report.json",
+        "sha256": "6f962edda89b1691d2714124a2d45ca13eec802d36ad4585af0129ae077893ce"
+      },
+      "pointer": "/evidence_availability/recovery/independent_verification",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 4,
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/addresses-after.json",
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "pointer": "/explicit_cleanup/evidence/addresses-after.json",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 154,
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/delete.log",
+        "sha256": "e87db45823d15b2ea117bd2442e7f6b37793c7ad6cc44779a62ad4385cda1e1f"
+      },
+      "pointer": "/explicit_cleanup/evidence/delete.log",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 4,
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/disks-after.json",
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "pointer": "/explicit_cleanup/evidence/disks-after.json",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 515,
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/instance-before.json",
+        "sha256": "5bcf897b06dd52313bbc13b5d2e4ff6d03e714101890dc9ec0b7d594a4920de7"
+      },
+      "pointer": "/explicit_cleanup/evidence/instance-before.json",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 4,
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/instances-after.json",
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "pointer": "/explicit_cleanup/evidence/instances-after.json",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 485,
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/operations.json",
+        "sha256": "4ade5a438f501da78d2cad3715c46a98d9315cd4c66894cf77d0c1297a5250e0"
+      },
+      "pointer": "/explicit_cleanup/evidence/operations.json",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 343,
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/reconciliation.json",
+        "sha256": "5307789b96ce0a32b00830e7732cef7dc80a83ddd3eac2c8134a41d77b4ecb0f"
+      },
+      "pointer": "/explicit_cleanup/evidence/reconciliation.json",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 431,
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/request.json",
+        "sha256": "fae4c7b9a085a8bff0c8d52d418b74fc96191421f0bd2b85e0a960d26f013568"
+      },
+      "pointer": "/explicit_cleanup/evidence/request.json",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 676,
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/verified-target.json",
+        "sha256": "b4e19104c9c6897f490fef056b157e6fec015e7cf53e147e351076e2e0c94db1"
+      },
+      "pointer": "/explicit_cleanup/evidence/verified-target.json",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8635436,
+        "path": "runs/r1-cloud/vm05-build.tar.gz",
+        "sha256": "3c715889d53ce83fe8c033b317337c40e302bdf05ad8d0245e95566a4f7d499e"
+      },
+      "pointer": "/downloads/0/archive",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8647,
+        "path": "runs/r1-cloud/vm05-build.tar.gz.manifest.json",
+        "sha256": "9749c3f50f600bdcb97c0184d0fe675cb3069877ded2f39330fb66b6f77e61ce"
+      },
+      "pointer": "/downloads/0/manifest",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 84,
+        "path": "runs/r1-cloud/vm05-build.tar.gz.sha256",
+        "sha256": "bc8a4969d189f9c3d3ce42df94901582f65fcab44796119a739aa5a3770c9564"
+      },
+      "pointer": "/downloads/0/checksum_sidecar",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 3900,
+        "path": "experiments/hu-postflop-r1/validation/vm05/build-download-verification.json",
+        "sha256": "9fae8925543d4bd5ec0057dfefd1f3531fb0f9e8ce64d4c1a3d42c15c445c5eb"
+      },
+      "pointer": "/downloads/0/download_verification",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 11950377,
+        "path": "runs/r1-cloud/vm05-pipeline.tar.gz",
+        "sha256": "3730bdb23b8cd53d7de70d567bfa897a8f6e3337582622757868c82b86b8cb7e"
+      },
+      "pointer": "/downloads/1/archive",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 471531,
+        "path": "runs/r1-cloud/vm05-pipeline.tar.gz.manifest.json",
+        "sha256": "7a415c4453dc3b1a086fb26245d3a055d1e75c7903938cd709d795c20bedc954"
+      },
+      "pointer": "/downloads/1/manifest",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 87,
+        "path": "runs/r1-cloud/vm05-pipeline.tar.gz.sha256",
+        "sha256": "e810141f1a49d7fc7e8a6d355c4400dd50ab391c888fd4fea39ddfe11e7920e9"
+      },
+      "pointer": "/downloads/1/checksum_sidecar",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1345,
+        "path": "experiments/hu-postflop-r1/pipeline/evidence-vm05/download-verification.json",
+        "sha256": "273020d2aa3f0a007bca97b1fd2b01e4967d91df83d2b668a6697644a37b456e"
+      },
+      "pointer": "/downloads/1/download_verification",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 29508,
+        "path": "runs/r1-cloud/vm05-v3-checks.tar.gz",
+        "sha256": "33905062c8c8cef0d53605febc8deb3c0fe911c0555260ac11613382768b8ed0"
+      },
+      "pointer": "/downloads/2/archive",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 9898,
+        "path": "runs/r1-cloud/vm05-v3-checks.tar.gz.manifest.json",
+        "sha256": "5e8c6c28372edda245596a45b548d6e18b060357ca98fc11c9cef4166ada9e59"
+      },
+      "pointer": "/downloads/2/manifest",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 88,
+        "path": "runs/r1-cloud/vm05-v3-checks.tar.gz.sha256",
+        "sha256": "28340ef656c1fad1cc26257dbadb03a31f1e2e8ae10a63cb4b74721202702d35"
+      },
+      "pointer": "/downloads/2/checksum_sidecar",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 2010,
+        "path": "experiments/hu-postflop-r1/validation/vm05-v3/download-verification.json",
+        "sha256": "8c19f3188312afb83c866455bb994c03925b28e1cc1eb5b36ff51ddb8b58c816"
+      },
+      "pointer": "/downloads/2/download_verification",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1373699,
+        "path": "runs/r1-cloud/vm06-checks-early.tar.gz",
+        "sha256": "5f08982dcfab989ac0351030cd2f10fe042d6bdd0cfd4456fa2c288f6738402b"
+      },
+      "pointer": "/downloads/3/archive",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 34835,
+        "path": "runs/r1-cloud/vm06-checks-early.tar.gz.manifest.json",
+        "sha256": "7e145812888a968a7ed2ec11c7ef65a694819d7aaeaeb3c8d2fef2b5d49b466e"
+      },
+      "pointer": "/downloads/3/manifest",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 91,
+        "path": "runs/r1-cloud/vm06-checks-early.tar.gz.sha256",
+        "sha256": "144544a52e290c26dc7397ad48e66590c72f371c4fb5e00aa4459594775af1b6"
+      },
+      "pointer": "/downloads/3/checksum_sidecar",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1118,
+        "path": "experiments/hu-postflop-r1/validation/vm06-source06/download-verification.json",
+        "sha256": "73025922b67d4fa15a028333faea7331dc94df542dd46602aeb20202067fdb19"
+      },
+      "pointer": "/downloads/3/download_verification",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 6928478,
+        "path": "runs/r1-cloud/vm06-recovery.tar.gz",
+        "sha256": "d40e55c982f8702640e744e550f5c7072a0777bb84cb547d9ee22bc53e2750a5"
+      },
+      "pointer": "/downloads/4/archive",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 20720,
+        "path": "experiments/hu-postflop-r1/saved-profile/vm06-build-report.json",
+        "sha256": "6f962edda89b1691d2714124a2d45ca13eec802d36ad4585af0129ae077893ce"
+      },
+      "pointer": "/downloads/4/download_verification",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 74438,
+        "path": "runs/r1-cloud/vm06-recovery.tar.gz.manifest.json",
+        "sha256": "7e30d99d92eb1c87cb7958f2bd24fe90cb640a8268eab23e863425f8f03e683e"
+      },
+      "pointer": "/downloads/4/manifest",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 87,
+        "path": "runs/r1-cloud/vm06-recovery.tar.gz.sha256",
+        "sha256": "8ee08043e77b49307b5e3d41ea894e07a471a6579102dfed16fc0b0eae5f6e51"
+      },
+      "pointer": "/downloads/4/checksum_sidecar",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 17934814,
+        "path": "runs/r1-cloud/vm06-v3-results.tar.gz",
+        "sha256": "3c679810a39b3fac58d394f95387b0d98cec94ccc299f325e5922eefb9264e2d"
+      },
+      "pointer": "/downloads/5/archive",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 40243,
+        "path": "experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+        "sha256": "311318d5d4f0de55352ec729d7e13ee992d2eb5d454a559cc287f9eb9f8db5e1"
+      },
+      "pointer": "/downloads/5/download_verification",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 488801,
+        "path": "runs/r1-cloud/vm06-v3-results.tar.gz.manifest.json",
+        "sha256": "753a6ce6e72337a715766db6aa4684bb0583bd4c7ce5580c8dab93be0001863c"
+      },
+      "pointer": "/downloads/5/manifest",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 89,
+        "path": "runs/r1-cloud/vm06-v3-results.tar.gz.sha256",
+        "sha256": "d107534e77e068e884f68f2e929b485449d4cdba60202647b90825729bb31bd9"
+      },
+      "pointer": "/downloads/5/checksum_sidecar",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 544160,
+        "path": "runs/r1-cloud/vm06-saved-audits.tar.gz",
+        "sha256": "378f3338a3c4ade87e01e749c33b4e5a232da2e5074385ffc70c64ab50d8d3bb"
+      },
+      "pointer": "/downloads/6/archive",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 40243,
+        "path": "experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+        "sha256": "311318d5d4f0de55352ec729d7e13ee992d2eb5d454a559cc287f9eb9f8db5e1"
+      },
+      "pointer": "/downloads/6/download_verification",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 156247,
+        "path": "runs/r1-cloud/vm06-saved-audits.tar.gz.manifest.json",
+        "sha256": "3d7e526e4b53db20f263675c4b905fd8d873fd6823001e221f56d772ded9d4ea"
+      },
+      "pointer": "/downloads/6/manifest",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 91,
+        "path": "runs/r1-cloud/vm06-saved-audits.tar.gz.sha256",
+        "sha256": "823a65eccbac0892f8b84001bfc2845985780aaa1cf5af26df183571034cf78b"
+      },
+      "pointer": "/downloads/6/checksum_sidecar",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 24168476,
+        "path": "runs/r1-cloud/vm06-phases.tar.gz",
+        "sha256": "eef21251eec733ee51b2bf6ab79c0776df1fc5b40a0b837c77a00f29ac42749d"
+      },
+      "pointer": "/downloads/7/archive",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 899992,
+        "path": "runs/r1-cloud/vm06-phases.tar.gz.manifest.json",
+        "sha256": "0bff7c90e09114e87ea91d90bd3218aa77e6bca78b0fb4da5f0c6bcc0eec0b92"
+      },
+      "pointer": "/downloads/7/manifest",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 85,
+        "path": "runs/r1-cloud/vm06-phases.tar.gz.sha256",
+        "sha256": "d01c5088a96292b4c287367506beab8977e1ff7ea2056a8b4308b57bd77d7e29"
+      },
+      "pointer": "/downloads/7/checksum_sidecar",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 59782,
+        "path": "experiments/hu-postflop-r1/phases/vm06-phase-report.json",
+        "sha256": "2bfdf9fcce753f5f0fc5df4c2809fd03e6fa37752f7049cd836e3dc0abc68c3a"
+      },
+      "pointer": "/downloads/7/download_verification",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 13268830,
+        "path": "runs/r1-cloud/vm06-current.tar.gz",
+        "sha256": "cb4ed8a32bc5ce5b67ebbd18dd17e00262bbd823207f82270a6a92f5ca47a4ee"
+      },
+      "pointer": "/downloads/8/archive",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 608438,
+        "path": "runs/r1-cloud/vm06-current.tar.gz.manifest.json",
+        "sha256": "d0a2ff25540f3026eb6d3c04dbf0f0676c89fbf635998704990f13a0500a3db1"
+      },
+      "pointer": "/downloads/8/manifest",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 86,
+        "path": "runs/r1-cloud/vm06-current.tar.gz.sha256",
+        "sha256": "cdd76e6f11a9d144472cea95d005a2f93aa604ce111508f05f0812e9a0713dc4"
+      },
+      "pointer": "/downloads/8/checksum_sidecar",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 582822,
+        "path": "runs/r1-cloud/vm06-river-diagnostics.tar.gz",
+        "sha256": "16908b41d812497625ed1fe3da78de576e13310064d8a36d71b7171f52025e8b"
+      },
+      "pointer": "/downloads/9/archive",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 60156,
+        "path": "runs/r1-cloud/vm06-river-diagnostics.tar.gz.manifest.json",
+        "sha256": "47d57da15a83686073291dcc6ca443663987587288cf7f257e0edaa6d1dd0588"
+      },
+      "pointer": "/downloads/9/manifest",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 96,
+        "path": "runs/r1-cloud/vm06-river-diagnostics.tar.gz.sha256",
+        "sha256": "fef5e5ec94289ebd56f3fe9dff12e7de3fe36bcbf0bd12b53f2b871b373866f8"
+      },
+      "pointer": "/downloads/9/checksum_sidecar",
+      "record": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 13268830,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-current.tar.gz",
+        "sha256": "cb4ed8a32bc5ce5b67ebbd18dd17e00262bbd823207f82270a6a92f5ca47a4ee"
+      },
+      "pointer": "/bundles/0",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1428178,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\pipeline\\evidence-vm06-current\\retention.json",
+        "sha256": "d9f9c72d1dd15f91194ca20c9dac00bbba96e63734fb652df794d978177c3762"
+      },
+      "pointer": "/bundles/0/retention",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 17934814,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-v3-results.tar.gz",
+        "sha256": "3c679810a39b3fac58d394f95387b0d98cec94ccc299f325e5922eefb9264e2d"
+      },
+      "pointer": "/bundles/1",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 750617,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\pipeline\\evidence-vm06-v3\\retention.json",
+        "sha256": "e1c6d08c433b4f118f52705c5fedfd0f9aa766bb81720d4e0b2e5988b23ce9cb"
+      },
+      "pointer": "/bundles/1/retention",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 544160,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-saved-audits.tar.gz",
+        "sha256": "378f3338a3c4ade87e01e749c33b4e5a232da2e5074385ffc70c64ab50d8d3bb"
+      },
+      "pointer": "/bundles/2",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 561963,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\saved-profile\\evidence-vm06-audits\\retention.json",
+        "sha256": "2bb1e8784fe16ebdf5f3603fad8659279b73e1c964b3cb6cba7d13be79cf5c3b"
+      },
+      "pointer": "/bundles/2/retention",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 6928478,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-recovery.tar.gz",
+        "sha256": "d40e55c982f8702640e744e550f5c7072a0777bb84cb547d9ee22bc53e2750a5"
+      },
+      "pointer": "/bundles/3",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 241793,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\saved-profile\\evidence-vm06-build\\retention.json",
+        "sha256": "cbefbe0acaa79a4314ebb32bceec5caec8d88d1e916a1bc62dc459a1316911b5"
+      },
+      "pointer": "/bundles/3/retention",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 105577,
+        "path": "/opt/r1/current-audit-plan/plan.json",
+        "sha256": "88c81719d79173785864cc9a61e7b6bde0fbbb6fadd466afb254da4c244cd5ce"
+      },
+      "pointer": "/evidence_roots/audit_plan",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 70251,
+        "path": "/opt/r1/current-audits/audits.json",
+        "sha256": "7bf9b1178145cb6227cc870bde4c3263235c621ac9707c71aa536cf4bdab492e"
+      },
+      "pointer": "/evidence_roots/audits",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 225510,
+        "path": "/opt/r1/candidate-v3/runs/r1-paired-current/comparison.json",
+        "sha256": "911b7fdb5c0ea098fa24f430dd2487f8aafd4bb6b18d7b2c6be63f583fa915c5"
+      },
+      "pointer": "/evidence_roots/comparison",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 13820,
+        "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-current/plan.json",
+        "sha256": "6bf01e38faae81b5f97b69414dfcc12aedcf07caf7cd9889c9fb152867061332"
+      },
+      "pointer": "/evidence_roots/plan",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 13808,
+        "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/plan.json",
+        "sha256": "7f3f3c60fec7d926b73f8b27d4f562a72fbc5ee47a18dcad73117131392a3d6a"
+      },
+      "pointer": "/original_source03_plan",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/recorded_runtime_identities_without_local_payload/1",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/recorded_runtime_identities_without_local_payload/2",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 18459,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\saved-profile\\vm06-build-verification.py",
+        "sha256": "c36d85eb7d0131b575902d73991f7fd97f10a7cb4e9748df44faf2c1778cfe17"
+      },
+      "pointer": "/source_scope/audit_build_verifier",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8813904,
+        "path": "/opt/r1/target/baseline/release/solvers",
+        "sha256": "77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8"
+      },
+      "pointer": "/source_scope/performance_baseline/binary",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/source_scope/performance_baseline/source_evidence",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868976,
+        "path": "/opt/r1/target/current-recovery/release/solvers",
+        "sha256": "5baae6ebe438bc0205968587a7447599a15832411aeab1558cfecc1dd7293031"
+      },
+      "pointer": "/source_scope/performance_candidate06/binary",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/source_scope/performance_candidate06/source_evidence",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\validation\\sources\\current-06.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/source_scope/quality_auditor_candidate06",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 35943,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\pipeline\\current-verification.py",
+        "sha256": "3272fc4a9c7a20736e6541dce0fcc79ab7e2e8eee84fbf279cda2f2f5b0bb345"
+      },
+      "pointer": "/verifier",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 17934814,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-v3-results.tar.gz",
+        "sha256": "3c679810a39b3fac58d394f95387b0d98cec94ccc299f325e5922eefb9264e2d"
+      },
+      "pointer": "/bundles/0",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 750617,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\pipeline\\evidence-vm06-v3\\retention.json",
+        "sha256": "e1c6d08c433b4f118f52705c5fedfd0f9aa766bb81720d4e0b2e5988b23ce9cb"
+      },
+      "pointer": "/bundles/0/retention",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 544160,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-saved-audits.tar.gz",
+        "sha256": "378f3338a3c4ade87e01e749c33b4e5a232da2e5074385ffc70c64ab50d8d3bb"
+      },
+      "pointer": "/bundles/1",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 561963,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\saved-profile\\evidence-vm06-audits\\retention.json",
+        "sha256": "2bb1e8784fe16ebdf5f3603fad8659279b73e1c964b3cb6cba7d13be79cf5c3b"
+      },
+      "pointer": "/bundles/1/retention",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 6928478,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-recovery.tar.gz",
+        "sha256": "d40e55c982f8702640e744e550f5c7072a0777bb84cb547d9ee22bc53e2750a5"
+      },
+      "pointer": "/bundles/2",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 241793,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\saved-profile\\evidence-vm06-build\\retention.json",
+        "sha256": "cbefbe0acaa79a4314ebb32bceec5caec8d88d1e916a1bc62dc459a1316911b5"
+      },
+      "pointer": "/bundles/2/retention",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/recorded_runtime_identities_without_local_payload/1",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/recorded_runtime_identities_without_local_payload/2",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 18459,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\saved-profile\\vm06-build-verification.py",
+        "sha256": "c36d85eb7d0131b575902d73991f7fd97f10a7cb4e9748df44faf2c1778cfe17"
+      },
+      "pointer": "/source_scope/audit_build_verifier",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8813904,
+        "path": "/opt/r1/target/baseline/release/solvers",
+        "sha256": "77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8"
+      },
+      "pointer": "/source_scope/performance_baseline/binary",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/source_scope/performance_baseline/source_evidence",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/source_scope/performance_candidate03/binary",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1195310,
+        "path": "/opt/r1/candidate-v3-source.tar.gz",
+        "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970"
+      },
+      "pointer": "/source_scope/performance_candidate03/source_evidence",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\validation\\sources\\current-06.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/source_scope/quality_auditor_candidate06",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 32825,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\pipeline\\vm06-comparison-verification.py",
+        "sha256": "b61af4afa21aac4c5e217f179548ea954babc88ebb72c7f5c7f8d74acce30a72"
+      },
+      "pointer": "/verifier",
+      "record": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "required": true
+    }
+  ]
+}

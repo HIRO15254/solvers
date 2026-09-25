@@ -1,0 +1,711 @@
+{
+  "schema": "solvers.r1-diagnostic-execution/v1",
+  "case_id": "HU-R0-002",
+  "source_id": "source-07:a6d346a033cf90f68adf131c7a14f5a754417cf0d952e1008d5736e7e9d6dd2a",
+  "state": "completed",
+  "started_utc": "2026-09-25T20:12:33.503864+00:00",
+  "limits": {
+    "timeout_seconds": 600,
+    "grace_seconds": 5,
+    "kill_wait_seconds": 5,
+    "poll_seconds": 0.1,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "disk_reserve_bytes": 10737418240
+  },
+  "total_seconds_limit": 1800.0,
+  "stages": [
+    {
+      "name": "input_check",
+      "argv": [
+        "/usr/bin/python3",
+        "/opt/r1/diagnostic-inputs07/check_diagnostic.py",
+        "--check-inputs",
+        "--output",
+        "/opt/r1/diagnostic-002-vm07/input-check.json"
+      ],
+      "state": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "stop_reason": "completed",
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "elapsed_seconds": 0.22513120899998285,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "sample_count": 3,
+        "max_sample_gap_seconds": 0.10637511000004451,
+        "sampled_peak_tree_resident_bytes": 22196224,
+        "root_os_peak_resident_bytes": 22896640,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1
+      },
+      "outputs": {
+        "stdout": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/input_check/stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/input_check/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "samples": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/input_check/supervisor.samples.jsonl",
+          "sha256": "6dd46a1eb868350f65eb2f6751f0dea2c8cde338da7605e4f3d0af70f004ad47",
+          "bytes": 942
+        }
+      },
+      "supervisor_record": {
+        "path": "/opt/r1/diagnostic-002-vm07/stages/input_check/supervisor.json",
+        "sha256": "bda1d41377612ee797f29ed0ef9e1234c780c18aa6f5ba5c9227a0d8b4cb50a8",
+        "bytes": 23727
+      }
+    },
+    {
+      "name": "config_validate",
+      "argv": [
+        "/opt/r1/target/codec-current/release/solvers",
+        "validate",
+        "/opt/r1/diagnostic-inputs07/diagnostic.toml"
+      ],
+      "state": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "stop_reason": "completed",
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "elapsed_seconds": 0.11742459400011285,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "sample_count": 2,
+        "max_sample_gap_seconds": 0.10615755399999216,
+        "sampled_peak_tree_resident_bytes": 0,
+        "root_os_peak_resident_bytes": 22945792,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 0
+      },
+      "outputs": {
+        "stdout": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/config_validate/stdout.log",
+          "sha256": "e19fb52c6e4f025f3de856c14d3db91d44d65010d097bf2a6ff717b7c5250dff",
+          "bytes": 142
+        },
+        "stderr": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/config_validate/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "samples": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/config_validate/supervisor.samples.jsonl",
+          "sha256": "610cbc7fcc0f7e2667b64da1c734d14427c550206253dcec0871b81cdb162773",
+          "bytes": 622
+        }
+      },
+      "supervisor_record": {
+        "path": "/opt/r1/diagnostic-002-vm07/stages/config_validate/supervisor.json",
+        "sha256": "e10309d1deb62137fd540e9826f5bb5dd18fe2d26c0c815f618a428f6fa9db14",
+        "bytes": 23631
+      }
+    },
+    {
+      "name": "solve",
+      "argv": [
+        "/opt/r1/target/codec-current/release/solvers",
+        "solve",
+        "/opt/r1/diagnostic-inputs07/diagnostic.toml",
+        "--out",
+        "/opt/r1/diagnostic-002-vm07/run",
+        "--sol-streets",
+        "full"
+      ],
+      "state": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "stop_reason": "completed",
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "elapsed_seconds": 19.341924739999968,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "sample_count": 183,
+        "max_sample_gap_seconds": 0.10812836900004186,
+        "sampled_peak_tree_resident_bytes": 17301504,
+        "root_os_peak_resident_bytes": 22962176,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1
+      },
+      "outputs": {
+        "stdout": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/solve/stdout.log",
+          "sha256": "a0413b9572e0c7df2c7a198ccb6b2d1b5de4eb1ddc81ac9cde8ae4d3be664749",
+          "bytes": 6865
+        },
+        "stderr": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/solve/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "samples": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/solve/supervisor.samples.jsonl",
+          "sha256": "609e511f2a26d2e2e53339ab8c5ea245b9c5f42bc0de35859c12dcc7226bb1ff",
+          "bytes": 56298
+        }
+      },
+      "supervisor_record": {
+        "path": "/opt/r1/diagnostic-002-vm07/stages/solve/supervisor.json",
+        "sha256": "1e09ebf9443a06f1ec8957af7a4c609807526bd218ca2cd25f77b86da5a97c60",
+        "bytes": 23775
+      }
+    },
+    {
+      "name": "export_tree",
+      "argv": [
+        "/opt/r1/target/codec-current/release/solvers",
+        "export",
+        "/opt/r1/diagnostic-002-vm07/run/solution.sol",
+        "tree",
+        "--node",
+        "all",
+        "--output",
+        "/opt/r1/diagnostic-002-vm07/tree.json"
+      ],
+      "state": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "stop_reason": "completed",
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "elapsed_seconds": 0.11788832999991428,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "sample_count": 2,
+        "max_sample_gap_seconds": 0.1067215989999113,
+        "sampled_peak_tree_resident_bytes": 0,
+        "root_os_peak_resident_bytes": 22962176,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 0
+      },
+      "outputs": {
+        "stdout": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/export_tree/stdout.log",
+          "sha256": "2a992ee5f3f29c7b17e1560773c5d2eb0bb4374bc608ac86b351aa62bbe9a9ff",
+          "bytes": 44
+        },
+        "stderr": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/export_tree/stderr.log",
+          "sha256": "f985b4a20f225ba84800c396e9e302c776ae85aedce5b07a5abc57beb4460c8e",
+          "bytes": 74
+        },
+        "samples": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/export_tree/supervisor.samples.jsonl",
+          "sha256": "1bf620f4e75e55e693bb021af4b66416819686ab93d4899aa27f53e940f768be",
+          "bytes": 621
+        }
+      },
+      "supervisor_record": {
+        "path": "/opt/r1/diagnostic-002-vm07/stages/export_tree/supervisor.json",
+        "sha256": "0592c3f1fdb9758a74f794771629b004d61e600b39d3b3c03045a0d03d474479",
+        "bytes": 23811
+      }
+    },
+    {
+      "name": "export_summary",
+      "argv": [
+        "/opt/r1/target/codec-current/release/solvers",
+        "export",
+        "/opt/r1/diagnostic-002-vm07/run/solution.sol",
+        "summary",
+        "--output",
+        "/opt/r1/diagnostic-002-vm07/summary.json"
+      ],
+      "state": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "stop_reason": "completed",
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "elapsed_seconds": 0.011401229999819407,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "sample_count": 1,
+        "max_sample_gap_seconds": 0.0,
+        "sampled_peak_tree_resident_bytes": 0,
+        "root_os_peak_resident_bytes": 22962176,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 0
+      },
+      "outputs": {
+        "stdout": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/export_summary/stdout.log",
+          "sha256": "ac1065f1024a36927a8776cc75e2566a78553a6f6b29ca0f98e75304122bdb49",
+          "bytes": 47
+        },
+        "stderr": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/export_summary/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "samples": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/export_summary/supervisor.samples.jsonl",
+          "sha256": "ac8052989f58c45458cd989336232928978aa40614ed294ec3e2fc72906fff76",
+          "bytes": 325
+        }
+      },
+      "supervisor_record": {
+        "path": "/opt/r1/diagnostic-002-vm07/stages/export_summary/supervisor.json",
+        "sha256": "32706ef97ef280bf0cc87158d5e5a65958506f48bbee3677623a311f082ab161",
+        "bytes": 23769
+      }
+    },
+    {
+      "name": "compare",
+      "argv": [
+        "/usr/bin/python3",
+        "/opt/r1/diagnostic-inputs07/check_diagnostic.py",
+        "--tree",
+        "/opt/r1/diagnostic-002-vm07/tree.json",
+        "--summary",
+        "/opt/r1/diagnostic-002-vm07/summary.json",
+        "--run-config",
+        "/opt/r1/diagnostic-002-vm07/run/run.toml",
+        "--source-id",
+        "source-07:a6d346a033cf90f68adf131c7a14f5a754417cf0d952e1008d5736e7e9d6dd2a",
+        "--output",
+        "/opt/r1/diagnostic-002-vm07/diagnostic-comparison.json"
+      ],
+      "state": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "stop_reason": "completed",
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "elapsed_seconds": 0.22448952700005975,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "sample_count": 3,
+        "max_sample_gap_seconds": 0.10622146899981999,
+        "sampled_peak_tree_resident_bytes": 21458944,
+        "root_os_peak_resident_bytes": 22962176,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1
+      },
+      "outputs": {
+        "stdout": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/compare/stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/compare/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "samples": {
+          "path": "/opt/r1/diagnostic-002-vm07/stages/compare/supervisor.samples.jsonl",
+          "sha256": "c0958fce1f0525c2836ebea731c842b7f32fa1a79d790bfbad552b76246859b3",
+          "bytes": 940
+        }
+      },
+      "supervisor_record": {
+        "path": "/opt/r1/diagnostic-002-vm07/stages/compare/supervisor.json",
+        "sha256": "23d695c78042e01795c27b0743cbb87d88555ad8b7dd28e6492f9e252671380a",
+        "bytes": 24276
+      }
+    }
+  ],
+  "concurrency_check": "point-in-time /proc check; root keeps other launchers stopped",
+  "artifacts": {
+    "input-check.json": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-002-vm07/input-check.json",
+      "sha256": "6a9e71a5c2449baf03ed5d16dfc68176e7f032434038206e45955e89314a6d22",
+      "bytes": 2311
+    },
+    "tree.json": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-002-vm07/tree.json",
+      "sha256": "e75a948abe94b148e2509da9712fbfc1bff7482f7c700ff2103e0964b5e248a7",
+      "bytes": 25853
+    },
+    "summary.json": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-002-vm07/summary.json",
+      "sha256": "319df332333795dd139f914c9a0569621a1d85de79058c3812faadbc82a36240",
+      "bytes": 396
+    },
+    "diagnostic-comparison.json": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-002-vm07/diagnostic-comparison.json",
+      "sha256": "1bae97c6b37a008e060a872b47f2f9770798d6473ce3daa1aff9220f62494a27",
+      "bytes": 4242
+    },
+    "run/run.toml": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-002-vm07/run/run.toml",
+      "sha256": "aff58dd05e997dee426b6e095c9bd4c5be1ef638463265a580d521c2a2d80b5e",
+      "bytes": 22528
+    },
+    "run/run.json": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-002-vm07/run/run.json",
+      "sha256": "5307dd780b0ee4ff606d9e2e57ffe0622ea8c12793ae2d2f67f29bbfac20aaa6",
+      "bytes": 175
+    },
+    "run/solution.sol": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-002-vm07/run/solution.sol",
+      "sha256": "0bb2bf5a1e3076378a40bb08771754f14a8ad4b20010d5175336c2b4d520ead9",
+      "bytes": 274352
+    },
+    "run/checkpoint.ckpt": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-002-vm07/run/checkpoint.ckpt",
+      "sha256": "b8075cfbef270922225acffce620913cc9e108920da69dd64c7cb0bff8f73ea3",
+      "bytes": 1551255
+    },
+    "run/progress.jsonl": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-002-vm07/run/progress.jsonl",
+      "sha256": "eabce02d68331c5679890218cde69a07b815f877fc9dc9c8f246e8fb8346dd7e",
+      "bytes": 13405
+    }
+  },
+  "runner": {
+    "path": "/home/PC_User/run-diagnostic.py",
+    "sha256": "b6897e38e38d978b6403838c797d329be5f855fb8522e7f67218383b3c59cbf6",
+    "bytes": 14883
+  },
+  "supervisor": {
+    "path": "/opt/r1/current/tools/run_supervised.py",
+    "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+    "bytes": 39015
+  },
+  "binary": {
+    "path": "/opt/r1/target/codec-current/release/solvers",
+    "sha256": "07715dd5e9cbaed45badf9ffad0cb85a1c464133b983de1255984893154443ce",
+    "bytes": 8868616
+  },
+  "input_archive": {
+    "path": "/home/PC_User/diagnostic-002-inputs.tar.gz",
+    "sha256": "1a03ea69897c995cc614d763767b3f4f95e0173c03bd52cdebfe6c48e8a11a19",
+    "bytes": 47521
+  },
+  "inputs": {
+    "build_diagnostic.py": {
+      "path": "/opt/r1/diagnostic-inputs07/build_diagnostic.py",
+      "sha256": "008f5dd5e9d9345726488c4caec7f15cb5f9bdf4a93a3bd1ce053c71e58fe850",
+      "bytes": 7581,
+      "archive_member": "HU-R0-002/build_diagnostic.py"
+    },
+    "check_diagnostic.py": {
+      "path": "/opt/r1/diagnostic-inputs07/check_diagnostic.py",
+      "sha256": "9095b305f3d8fed93b54d682f6261d8b957a716d1d097786c036cb459bb96470",
+      "bytes": 17464,
+      "archive_member": "HU-R0-002/check_diagnostic.py"
+    },
+    "check_menus.py": {
+      "path": "/opt/r1/diagnostic-inputs07/check_menus.py",
+      "sha256": "964e6e435e73270b897c1fe5d1bbb5edc34923a96be6c05f78cc480622c582d3",
+      "bytes": 12817,
+      "archive_member": "HU-R0-002/check_menus.py"
+    },
+    "check_ranges.py": {
+      "path": "/opt/r1/diagnostic-inputs07/check_ranges.py",
+      "sha256": "131d99387b77a72b84de7878fc3fc10a3f6969b77a834376330290cc68a856d1",
+      "bytes": 5948,
+      "archive_member": "HU-R0-002/check_ranges.py"
+    },
+    "diagnostic-input-check.json": {
+      "path": "/opt/r1/diagnostic-inputs07/diagnostic-input-check.json",
+      "sha256": "3f6cca731cd1c41e57a6a96e7c9756a22b296b3b4192e1594c58b15b7ce807e3",
+      "bytes": 2377,
+      "archive_member": "HU-R0-002/diagnostic-input-check.json"
+    },
+    "diagnostic.toml": {
+      "path": "/opt/r1/diagnostic-inputs07/diagnostic.toml",
+      "sha256": "908ff0b9be9143ab37b73c11fc102b24b3f7451c3a0da278917e617465eeb33d",
+      "bytes": 22876,
+      "archive_member": "HU-R0-002/diagnostic.toml"
+    },
+    "ip-range.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/ip-range.txt",
+      "sha256": "eb147ce4427bc29bbaee16504c9dc91234c663d483d8fa5fa68b255acfa7f6cd",
+      "bytes": 7081,
+      "archive_member": "HU-R0-002/ip-range.txt"
+    },
+    "menu-capture-01.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-01.json",
+      "sha256": "88aa853674f31e66c3c5757be058ee33c53c176ced60919d6a39564b8bc0324f",
+      "bytes": 1829,
+      "archive_member": "HU-R0-002/menu-capture-01.json"
+    },
+    "menu-capture-01.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-01.txt",
+      "sha256": "2619a068b3a919fba98a3b386fe4006064a910a6541568c017c4a0fb2edce01d",
+      "bytes": 1899,
+      "archive_member": "HU-R0-002/menu-capture-01.txt"
+    },
+    "menu-capture-02.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-02.json",
+      "sha256": "698201a29b0d1bd86ea05700cb9fea30f4726a066c5ee87272b9ff90f71b4164",
+      "bytes": 786,
+      "archive_member": "HU-R0-002/menu-capture-02.json"
+    },
+    "menu-capture-02.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-02.txt",
+      "sha256": "2f35b395c8645084c859c2e634699294c2828b1d735e933e918f1044cbe5f027",
+      "bytes": 50,
+      "archive_member": "HU-R0-002/menu-capture-02.txt"
+    },
+    "menu-capture-03.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-03.json",
+      "sha256": "0efeaea732bc5a329221fc31e284c9b24c856a2bef9f0c1af1b9d25a2bb547f5",
+      "bytes": 820,
+      "archive_member": "HU-R0-002/menu-capture-03.json"
+    },
+    "menu-capture-03.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-03.txt",
+      "sha256": "f6350406fceb75bd54c07b6ee2ec0cc169e4337dedc08720a245e07d2830378c",
+      "bytes": 168,
+      "archive_member": "HU-R0-002/menu-capture-03.txt"
+    },
+    "menu-capture-04.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-04.json",
+      "sha256": "c5f546d2453d5f246ef0c93c80e810d204810435da42aeb2f24803a9e27e7696",
+      "bytes": 735,
+      "archive_member": "HU-R0-002/menu-capture-04.json"
+    },
+    "menu-capture-04.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-04.txt",
+      "sha256": "81bcc541eed675223db903196d3b9bd2190eb2abfd8ccf5e946ce7d2e444d781",
+      "bytes": 174,
+      "archive_member": "HU-R0-002/menu-capture-04.txt"
+    },
+    "menu-capture-05.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-05.json",
+      "sha256": "e190ce878951b2cf92bc1b137f307b8d0560a7520808fa7bbbfda3fa87bf3f1f",
+      "bytes": 790,
+      "archive_member": "HU-R0-002/menu-capture-05.json"
+    },
+    "menu-capture-05.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-05.txt",
+      "sha256": "404fa3924d112aa5b861fbb3961eb4bb48a04934202d5a67accfc3bc21fd0fb0",
+      "bytes": 148,
+      "archive_member": "HU-R0-002/menu-capture-05.txt"
+    },
+    "menu-capture-06.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-06.json",
+      "sha256": "99fe018e84ae605a0aa95c6be94901fae907b571c9a951f3d5b19241b41d1466",
+      "bytes": 722,
+      "archive_member": "HU-R0-002/menu-capture-06.json"
+    },
+    "menu-capture-06.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-06.txt",
+      "sha256": "82f8a30b4c7159c5f8fb556166f0a4c92c94adaf6674ccbe84b7519e1f8251c1",
+      "bytes": 130,
+      "archive_member": "HU-R0-002/menu-capture-06.txt"
+    },
+    "menu-capture-07.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-07.json",
+      "sha256": "765fa2822b23320c6ce6f6f43136bdd2e694a899d00e2d17b260c19c01236bf0",
+      "bytes": 744,
+      "archive_member": "HU-R0-002/menu-capture-07.json"
+    },
+    "menu-capture-07.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-07.txt",
+      "sha256": "e5351e96a3a8c165168b376d875a78628d6a44d9f4041c8d4707239ebf450680",
+      "bytes": 54,
+      "archive_member": "HU-R0-002/menu-capture-07.txt"
+    },
+    "menu-capture-08.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-08.json",
+      "sha256": "c8f4461c013f4fbab95d52aef091a7f7e5174e15d1c4c2a345f78e310eaa3c82",
+      "bytes": 636,
+      "archive_member": "HU-R0-002/menu-capture-08.json"
+    },
+    "menu-capture-08.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-08.txt",
+      "sha256": "fdc91f5f5779fe7dc02a91262f6880e9097ac25c9f6249aff63aa779f5ce3db7",
+      "bytes": 101,
+      "archive_member": "HU-R0-002/menu-capture-08.txt"
+    },
+    "menu-capture-09.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-09.json",
+      "sha256": "14df3bce222c8a57c1e048d34e0b0606d55d1f0d964e0e8400e85efdb2d79139",
+      "bytes": 737,
+      "archive_member": "HU-R0-002/menu-capture-09.json"
+    },
+    "menu-capture-09.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-09.txt",
+      "sha256": "61f6a1fd208ca1e8830515a5922a410f6531f18a604474f85afcf8c42d4757fc",
+      "bytes": 85,
+      "archive_member": "HU-R0-002/menu-capture-09.txt"
+    },
+    "menu-capture-10.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-10.json",
+      "sha256": "c276f4209644d8b5829dc8d35d3eed88932d90991a9d92ba07671edf627a18f0",
+      "bytes": 701,
+      "archive_member": "HU-R0-002/menu-capture-10.json"
+    },
+    "menu-capture-10.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-10.txt",
+      "sha256": "1eba78fcafb168d33bec16bfff27ef313c5e72913327b6049576a327c060266f",
+      "bytes": 58,
+      "archive_member": "HU-R0-002/menu-capture-10.txt"
+    },
+    "menu-capture-11.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-11.json",
+      "sha256": "2fb27cace6766cd59c7a23c156227da97addaaaa1c2725fd8a89c8476bf1d183",
+      "bytes": 821,
+      "archive_member": "HU-R0-002/menu-capture-11.json"
+    },
+    "menu-capture-11.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-11.txt",
+      "sha256": "9d8b78f18c4473e4a09f63528a7534678512d96d90381218a3bda68a99d845ca",
+      "bytes": 32,
+      "archive_member": "HU-R0-002/menu-capture-11.txt"
+    },
+    "menu-capture-12.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-12.json",
+      "sha256": "91b257a82cfbfaad4a5d434b94e0ef4885fd8f5a9c9a871cc22bc16629c0307a",
+      "bytes": 989,
+      "archive_member": "HU-R0-002/menu-capture-12.json"
+    },
+    "menu-capture-12.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-12.txt",
+      "sha256": "417f28efc8932f806ab0ee06539b9de1fbcc4303eadb4d8ee22d91968835e6c7",
+      "bytes": 68,
+      "archive_member": "HU-R0-002/menu-capture-12.txt"
+    },
+    "menu-capture-13.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-13.json",
+      "sha256": "f426a88c5f06700cd0daa9decab6a02a13f66a0c6d98a12c21f709fe6d817bd4",
+      "bytes": 784,
+      "archive_member": "HU-R0-002/menu-capture-13.json"
+    },
+    "menu-capture-13.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-13.txt",
+      "sha256": "b572759b315649831b2af888beb749eb7f3d50bd43b47c57d3b3b3201aeb3f15",
+      "bytes": 66,
+      "archive_member": "HU-R0-002/menu-capture-13.txt"
+    },
+    "menu-capture-14.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-14.json",
+      "sha256": "5f58c6053f3c5138786810e1c56aae3f0e6e2f81f2a9aca3600f1229fe84a063",
+      "bytes": 849,
+      "archive_member": "HU-R0-002/menu-capture-14.json"
+    },
+    "menu-capture-14.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-14.txt",
+      "sha256": "3f415814c81cfdcf036fc31683b8897eaceb05758508ea3e33bb602889709147",
+      "bytes": 68,
+      "archive_member": "HU-R0-002/menu-capture-14.txt"
+    },
+    "menu-capture-15.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-15.json",
+      "sha256": "132d1ab09854bf1131b38ac82f03a02f133da462c1bbe1cf9552f6273fef77a7",
+      "bytes": 806,
+      "archive_member": "HU-R0-002/menu-capture-15.json"
+    },
+    "menu-capture-15.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-15.txt",
+      "sha256": "c032f4bf2bd0f84d291edac5467918b8a942d93e55eea7dfa381b161b7d6cacc",
+      "bytes": 78,
+      "archive_member": "HU-R0-002/menu-capture-15.txt"
+    },
+    "menu-capture-16.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-16.json",
+      "sha256": "99c3bf492f29e828808abcb5a57a1970b613a658e3a1067eb879c95f092c4228",
+      "bytes": 794,
+      "archive_member": "HU-R0-002/menu-capture-16.json"
+    },
+    "menu-capture-16.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-16.txt",
+      "sha256": "e10b16a17001d97496cca35d41a1754956192021c3f30008b18c62178f1f87f2",
+      "bytes": 60,
+      "archive_member": "HU-R0-002/menu-capture-16.txt"
+    },
+    "menu-capture-17.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-17.json",
+      "sha256": "88a2c2b36dfd6517a6730551c0418742d045b0b50f7d91314b7fc7812a0b76a7",
+      "bytes": 841,
+      "archive_member": "HU-R0-002/menu-capture-17.json"
+    },
+    "menu-capture-17.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-17.txt",
+      "sha256": "b38441b07b00f6e44f34b889c49ffbf696096f0822ffd8fcce3b6963d7f48698",
+      "bytes": 64,
+      "archive_member": "HU-R0-002/menu-capture-17.txt"
+    },
+    "menu-capture-18.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-18.json",
+      "sha256": "137a94148da46a443785d4faf115709f3c88b3b3e43de0038a492076d3608233",
+      "bytes": 717,
+      "archive_member": "HU-R0-002/menu-capture-18.json"
+    },
+    "menu-capture-18.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-18.txt",
+      "sha256": "989fb4ce813a51b05241888fb376163ef1ac12ddada42a4f326e2999efb76ba2",
+      "bytes": 64,
+      "archive_member": "HU-R0-002/menu-capture-18.txt"
+    },
+    "menu-capture-19.json": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-19.json",
+      "sha256": "519632b2b899e8ca53f0ea6c1a38332931dfd2ff4bca86c752f508244301ba14",
+      "bytes": 854,
+      "archive_member": "HU-R0-002/menu-capture-19.json"
+    },
+    "menu-capture-19.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/menu-capture-19.txt",
+      "sha256": "067bcac3fc25794067671729c35b1603c01d0a8b2ada6caae7358c05d8187c2e",
+      "bytes": 34,
+      "archive_member": "HU-R0-002/menu-capture-19.txt"
+    },
+    "observed.json": {
+      "path": "/opt/r1/diagnostic-inputs07/observed.json",
+      "sha256": "0f12b8aebaf833032332e2815868a4c3db8405edce64f32a8ae3ca3e1cd7b4df",
+      "bytes": 147034,
+      "archive_member": "HU-R0-002/observed.json"
+    },
+    "oop-range.txt": {
+      "path": "/opt/r1/diagnostic-inputs07/oop-range.txt",
+      "sha256": "04e626aaee3fabd74ec6038ff3a8c92ec602ceb22dc5c080e3304e475dae5eec",
+      "bytes": 7443,
+      "archive_member": "HU-R0-002/oop-range.txt"
+    },
+    "range-integrity.json": {
+      "path": "/opt/r1/diagnostic-inputs07/range-integrity.json",
+      "sha256": "38a0c065c5993b487bd9dc3458129ae1ad16553b3d7ffb48b568213e9065fd21",
+      "bytes": 1913,
+      "archive_member": "HU-R0-002/range-integrity.json"
+    },
+    "README.md": {
+      "path": "/opt/r1/diagnostic-inputs07/README.md",
+      "sha256": "3f0ded4fbe2d61b990d6c77a815cde3db2c1964297acccde865afafcd5371b32",
+      "bytes": 12888,
+      "archive_member": "HU-R0-002/README.md"
+    },
+    "test_check_diagnostic.py": {
+      "path": "/opt/r1/diagnostic-inputs07/test_check_diagnostic.py",
+      "sha256": "4d3d57e807913773979ee8011c52d2542df823c5f5415a10b7f67924a353876f",
+      "bytes": 12074,
+      "archive_member": "HU-R0-002/test_check_diagnostic.py"
+    },
+    "test_check_menus.py": {
+      "path": "/opt/r1/diagnostic-inputs07/test_check_menus.py",
+      "sha256": "e96174a1025fc3de2d944a01533827471beb0ebcdf9fb25b942d93a67b57feea",
+      "bytes": 3558,
+      "archive_member": "HU-R0-002/test_check_menus.py"
+    }
+  },
+  "seconds": 20.58060051999996,
+  "finished_utc": "2026-09-25T20:12:54.077142+00:00"
+}

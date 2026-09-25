@@ -1,0 +1,26 @@
+# River-only subgame: 1,326-combo full-width solve but a single street, so it
+# converges in ~seconds even in a debug build. Used by the CLI's inspect/report
+# integration tests, which must stay fast.
+schema = "solvers.postflop/v1"
+
+[game]
+board = "2c 7d 9h Js Qs"
+oop_range = "22+,A2s+,KTo+"
+ip_range = "55-22,QJs,A5s-A2s,KQo,T9s"
+pot = 10
+effective_stack = 50
+
+[game.tree]
+kind = "script"
+script = '''
+river {
+  replace bet [50]
+  replace raise [50]
+}
+'''
+
+# EV in solution.sol uses the original subgame baseline at every node.
+# With the default no-rake chip utility, its unit is chips.
+[run]
+iterations = 200
+check_every = 50 # positive stopping/checkpoint cadence

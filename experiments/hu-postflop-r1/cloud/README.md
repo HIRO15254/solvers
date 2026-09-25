@@ -169,10 +169,27 @@ source06のaudit exampleは保存profileの品質検査用であり、
 元の20:09:11 UTC終了期限より前の削除で、追加のVMや予約はない。
 実請求額は未確認のため、[budget.json](budget.json)のVM06分5 USDを含む合計15 USDの予約を保持する。
 
+## VM07: byte codecと002診断
+
+source07は`88ffa5d`をbaseとするdirty archiveで、production変更はSOL byte serdeだけ。
+[source manifest](source-07-manifest.json)、[通常検証](../validation/vm07-report.md)、
+[codec比較](../codec/vm07-report.md)、[002実測](../reference/vm07-002-report.md)を別々に照合する。
+codecは96 sampleの全保存bytesが一致し、11条件で読込み等の事前改善基準を満たしたが、
+Flop書込みはmedian約21%悪化した。外部24caseの品質認定や全solveの改善には読み替えない。
+
+5 bundleの一意の回収量はsidecar込み48,695,414 bytes。元codec bundleの容量制限で
+除外されたcanonical 1件はsupplementで追加回収し、元記録は書き換えずhash・bytes・元pathを照合した。
+全必須canonicalの独立byte比較が成功した後、VM07とauto-delete diskを削除した。
+[operation](cleanup-vm07/operations.json)のtarget IDは`841167209049583155`、
+削除完了は2026-09-25 20:32:24.560 UTC。
+[20:34:35 UTCの照合](cleanup-vm07/reconciliation.json)でinstance・disk・予約addressは空だった。
+実請求は未確認で、VM02/05/06/07の予約を合計20 USD保持する。予算残を仮定して追加起動しない。
+
 ## ローカル回収済み bundle の転送台帳
 
-[transfers.json](transfers.json)は実際にローカルへ到着した次の10 bundle、その manifest と SHA sidecar を記録する。
-2026-09-25 の棚卸しで archive / sidecar と全4,459 payloadを再照合し、未列挙 member / skip は0だった。
+[transfers.json](transfers.json)は実際にローカルへ到着した15 bundle、そのmanifestとSHA sidecarを記録する。
+既存10件4,459 payloadに、VM07の5件1,463 payloadを追加照合した。未回収payloadは0。
+collectorのskip原記録1件は保持し、supplementでの回収先を結び付けた。
 
 | bundle | archive bytes | sidecarを含む保持済み bytes | 内容 |
 |---|---:|---:|---|
@@ -186,7 +203,12 @@ source06のaudit exampleは保存profileの品質検査用であり、
 | VM06 phases | 24,168,476 | 25,068,553 | source03のphase on/offと校正、元の非計装比較とは別run |
 | VM06 current | 13,268,830 | 13,877,354 | 最終source06の検証・比較・保存profile campaign |
 | VM06 river diagnostics | 582,822 | 643,074 | HU-R0-017 / 019の診断、外部品質の受入根拠にはしない |
-| 合計 | **85,416,600** | **88,230,467** | 約0.082171 GiB |
+| VM07 checks | 2,562,647 | 2,578,685 | source07通常5検証、source archives |
+| VM07 build | 9,327,291 | 9,709,153 | 8 stagesとsource files、4 binaries |
+| VM07 diagnostic002 | 7,023,707 | 7,086,961 | 132 menuの診断と保存後profile監査 |
+| VM07 codec | 28,468,679 | 28,926,174 | 96 sample、事前計画、canonical、実行環境 |
+| VM07 codec supplement | 392,224 | 394,441 | canonical 1件の補完、終了後systemd照会（実制限の確認不能） |
+| 合計 | **133,191,148** | **136,925,881** | 約0.127522 GiB |
 
 これは確認できた一意の回収物の byte 合計であり、SCP 等の protocol overhead、再送・重複 download、
 未完了転送を含む通信総量でも、GCP の請求対象 byte 数でもない。展開後の payload は二重加算しない。

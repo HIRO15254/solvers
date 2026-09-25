@@ -1,0 +1,293 @@
+{
+  "schema": "r1.vm07-002-verification/v1",
+  "specific_evidence_verification": "verified",
+  "scope": "Pinned archives, compact copies, source manifests, 8 build + 6 diagnostic + 1 saved-profile stages; no new solve",
+  "bundles": [
+    {
+      "name": "checks",
+      "path": "runs\\r1-cloud\\evidence-vm07-checks.tar.gz",
+      "sha256": "92ec7553e89a2b822622395f902f16ab2cd65e67fdfcfc688a3f7cb6edfdf6fb",
+      "bytes": 2562647,
+      "payload_count": 25,
+      "all_payloads_verified": true,
+      "manifest_sha256": "73733ca1a05f216f18405f5e3459276926e785f81a57f74dcbdd5c7f91899143"
+    },
+    {
+      "name": "build",
+      "path": "runs\\r1-cloud\\evidence-vm07-build.tar.gz",
+      "sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+      "bytes": 9327291,
+      "payload_count": 617,
+      "all_payloads_verified": true,
+      "manifest_sha256": "5afcfdfface202b38d2cf72d9cabc2e5c170ff6a588244c44fb472f5077de17f"
+    },
+    {
+      "name": "diagnostic002",
+      "path": "runs\\r1-cloud\\evidence-vm07-diagnostic002.tar.gz",
+      "sha256": "86d83fb54a47d383dcfa09a008a3c067a09517bbcc0de3f5294511e1190999f8",
+      "bytes": 7023707,
+      "payload_count": 103,
+      "all_payloads_verified": true,
+      "manifest_sha256": "4b5a334c72670f38884427b4dfdba7fa50320632c5404881c1a28fa15d3194d1"
+    }
+  ],
+  "compact_copies": [
+    {
+      "path": "experiments\\hu-postflop-r1\\reference\\evidence-vm07-002",
+      "compact_files": 101,
+      "original_generic_readiness": false,
+      "compact_index_sha256": "9228bec9f49d638ec0c63fa63b7f5d05e2c07f4b99bb411e99146c30268470d8"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\validation\\vm07-complete",
+      "compact_files": 630,
+      "original_generic_readiness": false,
+      "compact_index_sha256": "ea53c710d5d3cc1673455d2edc984ab978d83eaeb5de7e67fc2a83f17c922a80"
+    }
+  ],
+  "source_manifests": {
+    "current": {
+      "source_archive_sha256": "a6d346a033cf90f68adf131c7a14f5a754417cf0d952e1008d5736e7e9d6dd2a",
+      "verified_source_files": 332,
+      "baseline_only_addition": null
+    },
+    "baseline": {
+      "source_archive_sha256": "3de4afef13082dca9e17c38c9cc5f5d1734855f017d812ecb04e9cdbe0f7da27",
+      "verified_source_files": 241,
+      "baseline_only_addition": "identical research example"
+    }
+  },
+  "source_id": "source-07:a6d346a033cf90f68adf131c7a14f5a754417cf0d952e1008d5736e7e9d6dd2a",
+  "build_boot_id": "0727ebb3-36dd-4fae-b978-c629114703ed",
+  "build_cpu": "AMD EPYC 7B12",
+  "compiler_version": "Rust 1.97.0",
+  "boot_binding_limit": "Pinned launcher checked equality to build boot before run; no separate per-stage boot observation",
+  "binaries": {
+    "binary": {
+      "path": "/opt/r1/target/codec-current/release/solvers",
+      "sha256": "07715dd5e9cbaed45badf9ffad0cb85a1c464133b983de1255984893154443ce",
+      "bytes": 8868616
+    },
+    "audit_binary": {
+      "path": "/opt/r1/target/codec-current/release/examples/hu_saved_profile_audit",
+      "sha256": "a5d7a8d57366a555e6c5f119c6ac7fdde4a4193266920e953d6387f5fb0ced0d",
+      "bytes": 4248672
+    }
+  },
+  "stages": [
+    {
+      "phase": "build",
+      "name": "toolchain",
+      "record_path": "/opt/r1/codec-build07/00-toolchain/supervisor.json",
+      "record_sha256": "7aa49b5fd0d34557205c2b48a4a18822297fc7b35ebdf5c8ca676863f4959acf",
+      "elapsed_seconds": 0.27247742800000196,
+      "sample_count": 2,
+      "verified_completion": true
+    },
+    {
+      "phase": "build",
+      "name": "fmt",
+      "record_path": "/opt/r1/codec-build07/01-fmt/supervisor.json",
+      "record_sha256": "08419df3d5a62ae1ac0440dd5dd1cd735a7de4deada4220e8243337fa10949e0",
+      "elapsed_seconds": 1.2985736410000186,
+      "sample_count": 6,
+      "verified_completion": true
+    },
+    {
+      "phase": "build",
+      "name": "clippy",
+      "record_path": "/opt/r1/codec-build07/02-clippy/supervisor.json",
+      "record_sha256": "2bb034cdaa344c85ec8fe7bae281beee74c780d706a809e8b75561db9f25caeb",
+      "elapsed_seconds": 36.719846802000006,
+      "sample_count": 142,
+      "verified_completion": true
+    },
+    {
+      "phase": "build",
+      "name": "workspace-tests",
+      "record_path": "/opt/r1/codec-build07/03-workspace-tests/supervisor.json",
+      "record_sha256": "5682935523d69d2b3052e197c3066bed9e4ddd7c4cdaad496df48ce64aa69b59",
+      "elapsed_seconds": 326.89442013300004,
+      "sample_count": 1265,
+      "verified_completion": true
+    },
+    {
+      "phase": "build",
+      "name": "python-tools",
+      "record_path": "/opt/r1/codec-build07/04-python-tools/supervisor.json",
+      "record_sha256": "87f01874787b1ee08c20362b5b34067e93facdc237473aa96cbd3e12ad43ce46",
+      "elapsed_seconds": 5.137209646999963,
+      "sample_count": 21,
+      "verified_completion": true
+    },
+    {
+      "phase": "build",
+      "name": "release-cli",
+      "record_path": "/opt/r1/codec-build07/05-release-cli/supervisor.json",
+      "record_sha256": "cf51eff13525aebd6ab7951cf5e026565b022b3851fe550df52ffa4443f93909",
+      "elapsed_seconds": 121.34964032599999,
+      "sample_count": 471,
+      "verified_completion": true
+    },
+    {
+      "phase": "build",
+      "name": "release-codec-current",
+      "record_path": "/opt/r1/codec-build07/06-release-codec-current/supervisor.json",
+      "record_sha256": "3837e3a387456174782ea7be74e7caf3daf984d50c6b96783fd7a58ac1ed7a02",
+      "elapsed_seconds": 15.73114522800006,
+      "sample_count": 62,
+      "verified_completion": true
+    },
+    {
+      "phase": "build",
+      "name": "release-codec-baseline",
+      "record_path": "/opt/r1/codec-build07/07-release-codec-baseline/supervisor.json",
+      "record_sha256": "9a167bd58e37a93ea1f3552d1e0a10419c88c04ad828b94746c60b46ffc4e92f",
+      "elapsed_seconds": 32.72642432800001,
+      "sample_count": 127,
+      "verified_completion": true
+    },
+    {
+      "phase": "diagnostic",
+      "name": "input_check",
+      "record_path": "/opt/r1/diagnostic-002-vm07/stages/input_check/supervisor.json",
+      "record_sha256": "bda1d41377612ee797f29ed0ef9e1234c780c18aa6f5ba5c9227a0d8b4cb50a8",
+      "elapsed_seconds": 0.22513120899998285,
+      "sample_count": 3,
+      "verified_completion": true
+    },
+    {
+      "phase": "diagnostic",
+      "name": "config_validate",
+      "record_path": "/opt/r1/diagnostic-002-vm07/stages/config_validate/supervisor.json",
+      "record_sha256": "e10309d1deb62137fd540e9826f5bb5dd18fe2d26c0c815f618a428f6fa9db14",
+      "elapsed_seconds": 0.11742459400011285,
+      "sample_count": 2,
+      "verified_completion": true
+    },
+    {
+      "phase": "diagnostic",
+      "name": "solve",
+      "record_path": "/opt/r1/diagnostic-002-vm07/stages/solve/supervisor.json",
+      "record_sha256": "1e09ebf9443a06f1ec8957af7a4c609807526bd218ca2cd25f77b86da5a97c60",
+      "elapsed_seconds": 19.341924739999968,
+      "sample_count": 183,
+      "verified_completion": true
+    },
+    {
+      "phase": "diagnostic",
+      "name": "export_tree",
+      "record_path": "/opt/r1/diagnostic-002-vm07/stages/export_tree/supervisor.json",
+      "record_sha256": "0592c3f1fdb9758a74f794771629b004d61e600b39d3b3c03045a0d03d474479",
+      "elapsed_seconds": 0.11788832999991428,
+      "sample_count": 2,
+      "verified_completion": true
+    },
+    {
+      "phase": "diagnostic",
+      "name": "export_summary",
+      "record_path": "/opt/r1/diagnostic-002-vm07/stages/export_summary/supervisor.json",
+      "record_sha256": "32706ef97ef280bf0cc87158d5e5a65958506f48bbee3677623a311f082ab161",
+      "elapsed_seconds": 0.011401229999819407,
+      "sample_count": 1,
+      "verified_completion": true
+    },
+    {
+      "phase": "diagnostic",
+      "name": "compare",
+      "record_path": "/opt/r1/diagnostic-002-vm07/stages/compare/supervisor.json",
+      "record_sha256": "23d695c78042e01795c27b0743cbb87d88555ad8b7dd28e6492f9e252671380a",
+      "elapsed_seconds": 0.22448952700005975,
+      "sample_count": 3,
+      "verified_completion": true
+    },
+    {
+      "phase": "saved-profile",
+      "name": "full-profile-audit",
+      "record_path": "/opt/r1/diagnostic-002-saved-audit07/supervisor.json",
+      "record_sha256": "a929695ba31e9c6be3bb831ba7e048b6d7cb0561f773f813701d12f884a3a6c3",
+      "elapsed_seconds": 0.27049354700011463,
+      "sample_count": 2,
+      "verified_completion": true
+    }
+  ],
+  "inputs": {
+    "archive_sha256": "1a03ea69897c995cc614d763767b3f4f95e0173c03bd52cdebfe6c48e8a11a19",
+    "observed_sha256": "0f12b8aebaf833032332e2815868a4c3db8405edce64f32a8ae3ca3e1cd7b4df",
+    "ranges": {
+      "oop": {
+        "positive_combos": 493,
+        "weight_sum": "197.3094037",
+        "sha256": "04e626aaee3fabd74ec6038ff3a8c92ec602ceb22dc5c080e3304e475dae5eec"
+      },
+      "ip": {
+        "positive_combos": 479,
+        "weight_sum": "53.1100486",
+        "sha256": "eb147ce4427bc29bbaee16504c9dc91234c663d483d8fa5fa68b255acfa7f6cd"
+      }
+    },
+    "compatible_joint_mass": "9361.53759450292671",
+    "original_config_sha256": "908ff0b9be9143ab37b73c11fc102b24b3f7451c3a0da278917e617465eeb33d",
+    "normalized_config_sha256": "aff58dd05e997dee426b6e095c9bd4c5be1ef638463265a580d521c2a2d80b5e",
+    "semantic_config_match": true
+  },
+  "actual_tree": {
+    "decision_nodes": 132,
+    "terminal_nodes": 261,
+    "public_nodes": 393,
+    "action_edges": 392,
+    "unobserved_frontier": 0,
+    "all_ordered_menus_actors_pots_stacks_match": true
+  },
+  "saved_profile_numerical_checks": {
+    "saved_minus_live_ev_chips": [
+      -1.9651374998375104e-06,
+      -2.5291989231845946e-06
+    ],
+    "saved_minus_live_nash_conv_chips": 5.0376354822301295e-05,
+    "numerical_check": "finite values, both signed BR gain identities, and exact f64 gain sum; no quality threshold"
+  },
+  "solution": {
+    "path": "/opt/r1/diagnostic-002-vm07/run/solution.sol",
+    "sha256": "0bb2bf5a1e3076378a40bb08771754f14a8ad4b20010d5175336c2b4d520ead9",
+    "bytes": 274352,
+    "locations": [
+      {
+        "bundle": "diagnostic002",
+        "member": "files/00000013"
+      }
+    ],
+    "unchanged_across_saved_audit": true,
+    "availability": "SOL bytes also in immutable compact evidence; large binaries only in ignored local bundles"
+  },
+  "complete_host_binary_retention": false,
+  "unretained_host_executables": [
+    {
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5",
+      "bytes": 42844376
+    },
+    {
+      "path": "/usr/bin/bash",
+      "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1",
+      "bytes": 1446024
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    }
+  ],
+  "unretained_boundary": "Within these three archives, before/after hashes agree but host executable bytes are absent; not independently rehashed here. Root reports a later codec bundle retains these bytes; that bundle is outside this verifier's scope.",
+  "outer_cgroup_limit": "Launcher documents systemd bounds; these bundles independently prove inner supervisor state/grace/cleanup only",
+  "artifact_header_binding": {
+    "config_blake3": "5051163eb9e8730170026359cc70af719c4231f83277f1996c452bf3b36e2652",
+    "iteration": 1000,
+    "SOL_checkpoint_saved_audit_agree": true,
+    "limit": "Header BLAKE3 values agree; this stdlib verifier does not recompute BLAKE3 or decompress/re-evaluate SOL frames"
+  },
+  "audit_limit": "Saved metrics are from the bound source07 executable; Python checks records and arithmetic, not a new EV/BR solve or independent scalar oracle",
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null
+}

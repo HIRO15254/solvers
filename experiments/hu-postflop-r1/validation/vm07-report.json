@@ -1,0 +1,556 @@
+{
+  "schema": "r1.vm07-scoped-validation/v1",
+  "status": "passed",
+  "quality_acceptance": "not_evaluated",
+  "scope": "VM07 source07 checks and eight codec-build stages only; no performance/solver/external acceptance",
+  "verifier": {
+    "path": "experiments/hu-postflop-r1/validation/verify-vm07.py",
+    "bytes": 26687,
+    "sha256": "eab9610b5e1f8cc23898e488949a18814aed2e18ec74724113b0ca0f665b3d28"
+  },
+  "immutable_index_sha256": "ea53c710d5d3cc1673455d2edc984ab978d83eaeb5de7e67fc2a83f17c922a80",
+  "compact_files_verified": 630,
+  "bundles": [
+    {
+      "label": "checks",
+      "path": "runs/r1-cloud/evidence-vm07-checks.tar.gz",
+      "bytes": 2562647,
+      "sha256": "92ec7553e89a2b822622395f902f16ab2cd65e67fdfcfc688a3f7cb6edfdf6fb",
+      "manifest_sha256": "73733ca1a05f216f18405f5e3459276926e785f81a57f74dcbdd5c7f91899143",
+      "verified_payloads": 25,
+      "skipped_payloads": 0,
+      "availability": "verified_local_ignored_bundle_not_git"
+    },
+    {
+      "label": "build",
+      "path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+      "bytes": 9327291,
+      "sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+      "manifest_sha256": "5afcfdfface202b38d2cf72d9cabc2e5c170ff6a588244c44fb472f5077de17f",
+      "verified_payloads": 617,
+      "skipped_payloads": 0,
+      "availability": "verified_local_ignored_bundle_not_git"
+    }
+  ],
+  "payloads_verified": 642,
+  "distinct_vm_paths": 621,
+  "result": {
+    "path": "/opt/r1/codec-build07/result.json",
+    "bytes": 120461,
+    "sha256": "d56eb5332655a07409b4becd575608d22b6cf80623223c81f77b06173412c9f0",
+    "locations": [
+      {
+        "bundle": "build",
+        "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+        "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+        "member": "files/00000275"
+      }
+    ]
+  },
+  "started_utc": "2026-09-25T19:59:44.057651+00:00",
+  "ended_utc": "2026-09-25T20:08:45.959563+00:00",
+  "elapsed_seconds": 541.8175922119999,
+  "boot_id": "0727ebb3-36dd-4fae-b978-c629114703ed",
+  "host": "solvers-r1-20260925-07",
+  "cpu": "AMD EPYC 7B12",
+  "logical_cpus": 8,
+  "rust_toolchain": "1.97.0",
+  "sources": {
+    "current": {
+      "path": "/opt/r1/source-07.tar.gz",
+      "bytes": 1314820,
+      "sha256": "a6d346a033cf90f68adf131c7a14f5a754417cf0d952e1008d5736e7e9d6dd2a",
+      "locations": [
+        {
+          "bundle": "checks",
+          "archive_path": "runs/r1-cloud/evidence-vm07-checks.tar.gz",
+          "archive_sha256": "92ec7553e89a2b822622395f902f16ab2cd65e67fdfcfc688a3f7cb6edfdf6fb",
+          "member": "files/00000003"
+        }
+      ],
+      "build_files_verified": 332
+    },
+    "codec_baseline": {
+      "path": "/opt/r1/codec-baseline-source.tar.gz",
+      "bytes": 1165415,
+      "sha256": "3de4afef13082dca9e17c38c9cc5f5d1734855f017d812ecb04e9cdbe0f7da27",
+      "locations": [
+        {
+          "bundle": "checks",
+          "archive_path": "runs/r1-cloud/evidence-vm07-checks.tar.gz",
+          "archive_sha256": "92ec7553e89a2b822622395f902f16ab2cd65e67fdfcfc688a3f7cb6edfdf6fb",
+          "member": "files/00000000"
+        }
+      ],
+      "archive_files_verified": 240,
+      "build_files_verified": 241,
+      "added_identical_benchmark_sha256": "ed972ffce351fcd31dfbab74771a06a059ef0edb43e44d65397e65f9a85cbcea"
+    },
+    "byte_difference_paths": [
+      "crates/formats/src/sol.rs",
+      "crates/formats/tests/sol_byte_serde.rs",
+      "crates/holdem/tests/oracle_river.rs"
+    ],
+    "production_difference_paths": [
+      "crates/formats/src/sol.rs"
+    ],
+    "new_test_paths": [
+      "crates/formats/tests/sol_byte_serde.rs"
+    ],
+    "test_line_endings_only": {
+      "path": "crates/holdem/tests/oracle_river.rs",
+      "current": {
+        "path": "crates/holdem/tests/oracle_river.rs",
+        "bytes": 17272,
+        "sha256": "aa4e32171e7b83f9ff9b34759733c0611a7aa77e8bf437f23a9e6cdad6de1861"
+      },
+      "baseline": {
+        "path": "crates/holdem/tests/oracle_river.rs",
+        "bytes": 16786,
+        "sha256": "05fbd787da6c12d286b7ba0967b2581bb603ea7b14194af7fb342b081b613de1"
+      },
+      "crlf_count_current": 486,
+      "after_crlf_to_lf_exact": true,
+      "baseline_matches_independently_inspected_git_blob": "88ffa5d:crates/holdem/tests/oracle_river.rs"
+    },
+    "baseline_is_original_r0_9632": false
+  },
+  "driver": {
+    "path": "/opt/r1/current/experiments/hu-postflop-r1/cloud/validate-codec.py",
+    "bytes": 9254,
+    "sha256": "4633572f7511d624feb60840c19313dada7f8ca4d251142cb35226579c2b7dc9"
+  },
+  "supervisor": {
+    "path": "/opt/r1/current/tools/run_supervised.py",
+    "bytes": 39015,
+    "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+  },
+  "build_isolation": {
+    "fresh_targets": [
+      "/opt/r1/target/codec-current",
+      "/opt/r1/target/codec-baseline"
+    ],
+    "evidence": "Pinned driver rejects existing targets and checks source/boot before and after each stage.",
+    "outer_systemd_configuration_retained": {
+      "path": "/home/PC_User/setup-codec-vm07.sh",
+      "bytes": 1216,
+      "sha256": "01b85c926f882b4c3601c28a342d8d8bbe09ea1358608005914c4d84a794f019",
+      "locations": [
+        {
+          "bundle": "checks",
+          "archive_path": "runs/r1-cloud/evidence-vm07-checks.tar.gz",
+          "archive_sha256": "92ec7553e89a2b822622395f902f16ab2cd65e67fdfcfc688a3f7cb6edfdf6fb",
+          "member": "files/00000012"
+        }
+      ]
+    },
+    "outer_systemd_runtime_properties_independently_observed": false
+  },
+  "stages": [
+    {
+      "name": "toolchain",
+      "status": "passed",
+      "argv": [
+        "/bin/bash",
+        "-euo",
+        "pipefail",
+        "-c",
+        "rustc -Vv; cargo -V; uname -a; lscpu; free -b"
+      ],
+      "cwd": "/opt/r1/current",
+      "record": {
+        "path": "/opt/r1/codec-build07/00-toolchain/supervisor.json",
+        "bytes": 4985,
+        "sha256": "7aa49b5fd0d34557205c2b48a4a18822297fc7b35ebdf5c8ca676863f4959acf",
+        "locations": [
+          {
+            "bundle": "checks",
+            "archive_path": "runs/r1-cloud/evidence-vm07-checks.tar.gz",
+            "archive_sha256": "92ec7553e89a2b822622395f902f16ab2cd65e67fdfcfc688a3f7cb6edfdf6fb",
+            "member": "files/00000016"
+          },
+          {
+            "bundle": "build",
+            "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+            "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+            "member": "files/00000246"
+          }
+        ]
+      },
+      "elapsed_seconds": 0.27247742800000196,
+      "cleanup_complete": true,
+      "output_hashes_verified": true
+    },
+    {
+      "name": "fmt",
+      "status": "passed",
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "cwd": "/opt/r1/current",
+      "record": {
+        "path": "/opt/r1/codec-build07/01-fmt/supervisor.json",
+        "bytes": 5086,
+        "sha256": "08419df3d5a62ae1ac0440dd5dd1cd735a7de4deada4220e8243337fa10949e0",
+        "locations": [
+          {
+            "bundle": "checks",
+            "archive_path": "runs/r1-cloud/evidence-vm07-checks.tar.gz",
+            "archive_sha256": "92ec7553e89a2b822622395f902f16ab2cd65e67fdfcfc688a3f7cb6edfdf6fb",
+            "member": "files/00000011"
+          },
+          {
+            "bundle": "build",
+            "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+            "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+            "member": "files/00000250"
+          }
+        ]
+      },
+      "elapsed_seconds": 1.2985736410000186,
+      "cleanup_complete": true,
+      "output_hashes_verified": true
+    },
+    {
+      "name": "clippy",
+      "status": "passed",
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "/opt/r1/current",
+      "record": {
+        "path": "/opt/r1/codec-build07/02-clippy/supervisor.json",
+        "bytes": 5239,
+        "sha256": "2bb034cdaa344c85ec8fe7bae281beee74c780d706a809e8b75561db9f25caeb",
+        "locations": [
+          {
+            "bundle": "checks",
+            "archive_path": "runs/r1-cloud/evidence-vm07-checks.tar.gz",
+            "archive_sha256": "92ec7553e89a2b822622395f902f16ab2cd65e67fdfcfc688a3f7cb6edfdf6fb",
+            "member": "files/00000007"
+          },
+          {
+            "bundle": "build",
+            "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+            "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+            "member": "files/00000254"
+          }
+        ]
+      },
+      "elapsed_seconds": 36.719846802000006,
+      "cleanup_complete": true,
+      "output_hashes_verified": true
+    },
+    {
+      "name": "workspace-tests",
+      "status": "passed",
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--locked",
+        "--workspace",
+        "--",
+        "--test-threads=2"
+      ],
+      "cwd": "/opt/r1/current",
+      "record": {
+        "path": "/opt/r1/codec-build07/03-workspace-tests/supervisor.json",
+        "bytes": 5218,
+        "sha256": "5682935523d69d2b3052e197c3066bed9e4ddd7c4cdaad496df48ce64aa69b59",
+        "locations": [
+          {
+            "bundle": "checks",
+            "archive_path": "runs/r1-cloud/evidence-vm07-checks.tar.gz",
+            "archive_sha256": "92ec7553e89a2b822622395f902f16ab2cd65e67fdfcfc688a3f7cb6edfdf6fb",
+            "member": "files/00000024"
+          },
+          {
+            "bundle": "build",
+            "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+            "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+            "member": "files/00000258"
+          }
+        ]
+      },
+      "elapsed_seconds": 326.89442013300004,
+      "cleanup_complete": true,
+      "output_hashes_verified": true
+    },
+    {
+      "name": "python-tools",
+      "status": "passed",
+      "argv": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/tests",
+        "-v"
+      ],
+      "cwd": "/opt/r1/current",
+      "record": {
+        "path": "/opt/r1/codec-build07/04-python-tools/supervisor.json",
+        "bytes": 4687,
+        "sha256": "87f01874787b1ee08c20362b5b34067e93facdc237473aa96cbd3e12ad43ce46",
+        "locations": [
+          {
+            "bundle": "checks",
+            "archive_path": "runs/r1-cloud/evidence-vm07-checks.tar.gz",
+            "archive_sha256": "92ec7553e89a2b822622395f902f16ab2cd65e67fdfcfc688a3f7cb6edfdf6fb",
+            "member": "files/00000020"
+          },
+          {
+            "bundle": "build",
+            "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+            "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+            "member": "files/00000262"
+          }
+        ]
+      },
+      "elapsed_seconds": 5.137209646999963,
+      "cleanup_complete": true,
+      "output_hashes_verified": true
+    },
+    {
+      "name": "release-cli",
+      "status": "passed",
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "--locked",
+        "--release",
+        "-p",
+        "cli",
+        "--bin",
+        "solvers",
+        "--example",
+        "hu_saved_profile_audit"
+      ],
+      "cwd": "/opt/r1/current",
+      "record": {
+        "path": "/opt/r1/codec-build07/05-release-cli/supervisor.json",
+        "bytes": 5322,
+        "sha256": "cf51eff13525aebd6ab7951cf5e026565b022b3851fe550df52ffa4443f93909",
+        "locations": [
+          {
+            "bundle": "build",
+            "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+            "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+            "member": "files/00000266"
+          }
+        ]
+      },
+      "elapsed_seconds": 121.34964032599999,
+      "cleanup_complete": true,
+      "output_hashes_verified": true
+    },
+    {
+      "name": "release-codec-current",
+      "status": "passed",
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "--locked",
+        "--release",
+        "-p",
+        "formats",
+        "--example",
+        "sol_codec_bench"
+      ],
+      "cwd": "/opt/r1/current",
+      "record": {
+        "path": "/opt/r1/codec-build07/06-release-codec-current/supervisor.json",
+        "bytes": 5289,
+        "sha256": "3837e3a387456174782ea7be74e7caf3daf984d50c6b96783fd7a58ac1ed7a02",
+        "locations": [
+          {
+            "bundle": "build",
+            "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+            "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+            "member": "files/00000270"
+          }
+        ]
+      },
+      "elapsed_seconds": 15.73114522800006,
+      "cleanup_complete": true,
+      "output_hashes_verified": true
+    },
+    {
+      "name": "release-codec-baseline",
+      "status": "passed",
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "--locked",
+        "--release",
+        "-p",
+        "formats",
+        "--example",
+        "sol_codec_bench"
+      ],
+      "cwd": "/opt/r1/baseline-codec",
+      "record": {
+        "path": "/opt/r1/codec-build07/07-release-codec-baseline/supervisor.json",
+        "bytes": 5331,
+        "sha256": "9a167bd58e37a93ea1f3552d1e0a10419c88c04ad828b94746c60b46ffc4e92f",
+        "locations": [
+          {
+            "bundle": "build",
+            "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+            "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+            "member": "files/00000274"
+          }
+        ]
+      },
+      "elapsed_seconds": 32.72642432800001,
+      "cleanup_complete": true,
+      "output_hashes_verified": true
+    }
+  ],
+  "workspace_tests": {
+    "summary_blocks": 54,
+    "passed": 901,
+    "failed": 0,
+    "ignored": 31,
+    "measured": 0,
+    "filtered_out": 0,
+    "compatibility_tests_passed": [
+      "byte_fields_have_literal_canonical_postcard_bytes",
+      "byte_fields_preserve_json_arrays_and_integer_validation",
+      "legacy_v1_payload_decodes_unchanged_but_container_is_still_rejected",
+      "truncated_byte_fields_and_excessive_declared_lengths_are_rejected",
+      "v3_chunks_keep_legacy_bytes_checksums_and_compression",
+      "byte_fields_match_legacy_sequence_bytes_at_varint_boundaries"
+    ],
+    "ignored_tests_executed": false
+  },
+  "python_tests": {
+    "run": 32,
+    "passed": 29,
+    "skipped": 3,
+    "failed": 0,
+    "skipped_names": [
+      "test_windows_job_assignment_failure_never_executes_workload (test_run_supervised.ProcessTests.test_windows_job_assignment_failure_never_executes_workload)",
+      "test_windows_job_kills_descendants_when_supervisor_is_killed (test_run_supervised.ProcessTests.test_windows_job_kills_descendants_when_supervisor_is_killed)",
+      "test_windows_job_kills_detached_descendant (test_run_supervised.ProcessTests.test_windows_job_kills_detached_descendant)"
+    ]
+  },
+  "binaries": [
+    {
+      "path": "/opt/r1/target/codec-current/release/solvers",
+      "bytes": 8868616,
+      "sha256": "07715dd5e9cbaed45badf9ffad0cb85a1c464133b983de1255984893154443ce",
+      "locations": [
+        {
+          "bundle": "build",
+          "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+          "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+          "member": "files/00000614"
+        }
+      ],
+      "availability": "verified_local_ignored_bundle_not_git"
+    },
+    {
+      "path": "/opt/r1/target/codec-current/release/examples/hu_saved_profile_audit",
+      "bytes": 4248672,
+      "sha256": "a5d7a8d57366a555e6c5f119c6ac7fdde4a4193266920e953d6387f5fb0ced0d",
+      "locations": [
+        {
+          "bundle": "build",
+          "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+          "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+          "member": "files/00000000"
+        }
+      ],
+      "availability": "verified_local_ignored_bundle_not_git"
+    },
+    {
+      "path": "/opt/r1/target/codec-current/release/examples/sol_codec_bench",
+      "bytes": 1709936,
+      "sha256": "0815e6c9d1781de101d573db9b58c91d2a87f94a9d766808a10fe9f010348cee",
+      "locations": [
+        {
+          "bundle": "build",
+          "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+          "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+          "member": "files/00000615"
+        }
+      ],
+      "availability": "verified_local_ignored_bundle_not_git"
+    },
+    {
+      "path": "/opt/r1/target/codec-baseline/release/examples/sol_codec_bench",
+      "bytes": 1710648,
+      "sha256": "2579d79209a1e7ea32d55257c885df55670f49f46148f6f8e375272b129eed23",
+      "locations": [
+        {
+          "bundle": "build",
+          "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+          "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+          "member": "files/00000242"
+        }
+      ],
+      "availability": "verified_local_ignored_bundle_not_git"
+    }
+  ],
+  "retained_rustc": {
+    "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+    "bytes": 646344,
+    "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0",
+    "locations": [
+      {
+        "bundle": "build",
+        "archive_path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+        "archive_sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac",
+        "member": "files/00000616"
+      }
+    ]
+  },
+  "runtime_identities_without_retained_bytes": [
+    {
+      "path": "/usr/bin/bash",
+      "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1",
+      "bytes": 1446024
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5",
+      "bytes": 42844376
+    }
+  ],
+  "generic_retainer": {
+    "ready": false,
+    "required_unresolved": 94,
+    "required_unresolved_by_historical_record": {
+      "cloud/preempted-05.json": 7,
+      "cloud/preempted-06.json": 16,
+      "cloud/transfers.json": 38,
+      "pipeline/current-report.json": 20,
+      "pipeline/vm06-comparison-report.json": 13
+    },
+    "other_optional_unresolved": 52,
+    "scope_disposition": "All 94 required references belong to five historical JSON files inside source07; none belongs to VM07 build/check records. No historical reference is repaired or certified here."
+  },
+  "limitations": [
+    "Raw bundles and retained binaries are local ignored evidence, not Git-backed; both bundles are required to rerun this verifier.",
+    "Ordinary workspace tests leave 31 ignored tests unexecuted; Python leaves three Windows-only tests skipped.",
+    "Cargo, Python and bash bytes were not retained; pre/post hashes are recorded and consistent, not independently rehashed here.",
+    "The scoped pass does not change generic retainer ready=false or certify historical runs, numerical quality or R1 acceptance."
+  ]
+}

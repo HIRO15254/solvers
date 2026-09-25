@@ -1,0 +1,179 @@
+   Compiling libc v0.2.186
+   Compiling serde_core v1.0.228
+   Compiling quickdiv v0.1.1
+   Compiling aya_base v0.1.0
+   Compiling cfg-if v1.0.4
+   Compiling miniphf v0.1.0
+   Compiling fastrand v2.4.1
+   Compiling aya_codegen v0.1.0
+   Compiling thiserror v2.0.18
+   Compiling crossbeam-utils v0.8.21
+   Compiling aya_poker v0.1.0
+   Compiling either v1.16.0
+   Compiling crossbeam-epoch v0.9.18
+   Compiling getrandom v0.2.17
+   Compiling crossbeam-deque v0.8.6
+   Compiling zerocopy v0.8.52
+   Compiling rayon-core v1.13.0
+   Compiling serde v1.0.228
+   Compiling rayon v1.12.0
+   Compiling rand_core v0.6.4
+   Compiling jobserver v0.1.34
+   Compiling cc v1.2.65
+   Compiling zmij v1.0.21
+   Compiling once_cell v1.21.4
+   Compiling memchr v2.8.2
+   Compiling itoa v1.0.18
+   Compiling scopeguard v1.2.0
+   Compiling lock_api v0.4.14
+   Compiling ppv-lite86 v0.2.21
+   Compiling byteorder v1.5.0
+   Compiling serde_json v1.0.150
+   Compiling rand_chacha v0.3.1
+   Compiling hash32 v0.2.1
+   Compiling spin v0.9.8
+   Compiling rand v0.8.6
+   Compiling stable_deref_trait v1.2.1
+   Compiling heapless v0.7.17
+   Compiling cobs v0.3.0
+   Compiling zstd-sys v2.0.16+zstd.1.5.7
+   Compiling postcard v1.1.3
+   Compiling utf8parse v0.2.2
+   Compiling anstyle-parse v1.0.0
+   Compiling anstyle-query v1.1.5
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling colorchoice v1.0.5
+   Compiling anstyle v1.0.14
+   Compiling strsim v0.11.1
+   Compiling cards v0.1.0 (/opt/r1/current/crates/cards)
+   Compiling anstream v1.0.0
+   Compiling clap_lex v1.1.0
+   Compiling blake3 v1.8.5
+   Compiling clap_builder v4.6.0
+   Compiling bitflags v2.13.0
+   Compiling engine v0.1.0 (/opt/r1/current/crates/engine)
+   Compiling hand-index v0.1.0 (/opt/r1/current/crates/hand-index)
+   Compiling game v0.1.0 (/opt/r1/current/crates/game)
+   Compiling linux-raw-sys v0.12.1
+   Compiling rustix v1.1.4
+   Compiling getrandom v0.4.3
+   Compiling clap v4.6.1
+   Compiling constant_time_eq v0.4.2
+   Compiling cpufeatures v0.3.0
+   Compiling arrayvec v0.7.8
+   Compiling arrayref v0.3.9
+   Compiling abstraction v0.1.0 (/opt/r1/current/crates/abstraction)
+   Compiling tempfile v3.27.0
+   Compiling holdem v0.1.0 (/opt/r1/current/crates/holdem)
+   Compiling rustc-hash v2.1.3
+   Compiling hashbrown v0.17.1
+   Compiling equivalent v1.0.2
+   Compiling toml_datetime v0.6.11
+   Compiling serde_spanned v0.6.9
+   Compiling toml_write v0.1.2
+   Compiling winnow v0.7.15
+   Compiling indexmap v2.14.0
+   Compiling anyhow v1.0.103
+   Compiling preflop v0.1.0 (/opt/r1/current/crates/preflop)
+   Compiling cfr-ref v0.1.0 (/opt/r1/current/crates/cfr-ref)
+   Compiling half v2.7.1
+   Compiling plotters-backend v0.3.7
+   Compiling ciborium-io v0.2.2
+   Compiling regex-syntax v0.8.11
+   Compiling ciborium-ll v0.2.2
+   Compiling plotters-svg v0.3.7
+   Compiling toml_edit v0.22.27
+   Compiling num-traits v0.2.19
+   Compiling itertools v0.10.5
+   Compiling toml v0.8.23
+   Compiling regex-automata v0.4.14
+   Compiling cast v0.3.0
+   Compiling same-file v1.0.6
+   Compiling walkdir v2.5.0
+   Compiling criterion-plot v0.5.0
+   Compiling regex v1.12.4
+   Compiling plotters v0.3.7
+   Compiling ciborium v0.2.2
+   Compiling tinytemplate v1.2.1
+   Compiling is-terminal v0.4.17
+   Compiling oorandom v11.1.5
+   Compiling anes v0.1.6
+   Compiling criterion v0.5.1
+   Compiling ring v0.17.14
+   Compiling ring v0.16.20
+   Compiling untrusted v0.9.0
+   Compiling zstd-safe v7.2.4
+   Compiling zstd v0.13.3
+   Compiling formats v0.1.0 (/opt/r1/current/crates/formats)
+   Compiling multiway v0.1.0 (/opt/r1/current/crates/multiway)
+   Compiling untrusted v0.7.1
+   Compiling spin v0.5.2
+   Compiling webpki v0.22.4
+   Compiling sct v0.7.1
+   Compiling rustls v0.20.9
+   Compiling log v0.4.33
+   Compiling cli v0.1.0 (/opt/r1/current/crates/cli)
+   Compiling base64 v0.13.1
+   Compiling rustls-pemfile v0.2.1
+   Compiling protocol v0.1.0 (/opt/r1/current/crates/protocol)
+   Compiling zeroize v1.9.0
+   Compiling ascii v1.1.0
+   Compiling chunked_transfer v1.5.0
+   Compiling httpdate v1.0.3
+   Compiling tiny_http v0.12.0
+   Compiling daemon v0.1.0 (/opt/r1/current/crates/daemon)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 01s
+     Running unittests src/lib.rs (/opt/r1/target/codec-current/debug/deps/abstraction-fc3bf44854809bce)
+     Running tests/extreme_k.rs (/opt/r1/target/codec-current/debug/deps/extreme_k-cfd74a8bb145b5ad)
+     Running tests/semantic_mapping.rs (/opt/r1/target/codec-current/debug/deps/semantic_mapping-971c6fff317795d1)
+     Running unittests src/lib.rs (/opt/r1/target/codec-current/debug/deps/cards-906daea84324eed4)
+     Running unittests src/lib.rs (/opt/r1/target/codec-current/debug/deps/cfr_ref-284c4b4f47398b7b)
+     Running unittests src/lib.rs (/opt/r1/target/codec-current/debug/deps/cli-575639a8111727d3)
+     Running unittests src/main.rs (/opt/r1/target/codec-current/debug/deps/solvers-2e42ffe82fa30ae2)
+     Running tests/cli_integration.rs (/opt/r1/target/codec-current/debug/deps/cli_integration-49e9fce406e1edbb)
+     Running tests/gtow_limp_reference.rs (/opt/r1/target/codec-current/debug/deps/gtow_limp_reference-7b7a81876ec59bfb)
+     Running tests/gtow_partial_reference.rs (/opt/r1/target/codec-current/debug/deps/gtow_partial_reference-944ba61c6361d002)
+     Running tests/gtow_simple_partial_reference.rs (/opt/r1/target/codec-current/debug/deps/gtow_simple_partial_reference-4c98c4cd252271c7)
+     Running tests/multiway_acceptance.rs (/opt/r1/target/codec-current/debug/deps/multiway_acceptance-fe36e1cfb8794224)
+     Running tests/postflop_contract.rs (/opt/r1/target/codec-current/debug/deps/postflop_contract-add4d7c07b1a369d)
+     Running tests/postflop_run_reuse.rs (/opt/r1/target/codec-current/debug/deps/postflop_run_reuse-745c0c0fbfb797e5)
+     Running unittests src/main.rs (/opt/r1/target/codec-current/debug/deps/solversd-ad50c179f7f9bdec)
+     Running tests/http_api.rs (/opt/r1/target/codec-current/debug/deps/http_api-91e11af25807d847)
+     Running unittests src/lib.rs (/opt/r1/target/codec-current/debug/deps/engine-df1209bd5293dbf5)
+     Running tests/dimension_changing_transitions.rs (/opt/r1/target/codec-current/debug/deps/dimension_changing_transitions-4a55cf3a7f8e80a0)
+     Running tests/parallel.rs (/opt/r1/target/codec-current/debug/deps/parallel-57361d314fc17a3e)
+     Running unittests src/lib.rs (/opt/r1/target/codec-current/debug/deps/formats-c8c0d5ff2214570c)
+     Running tests/sol_byte_serde.rs (/opt/r1/target/codec-current/debug/deps/sol_byte_serde-183fd89b4ff9ce6b)
+     Running tests/sol_v2_integrity.rs (/opt/r1/target/codec-current/debug/deps/sol_v2_integrity-503173fead734bcd)
+     Running unittests src/lib.rs (/opt/r1/target/codec-current/debug/deps/game-10172f80b9981bed)
+     Running tests/mccfr.rs (/opt/r1/target/codec-current/debug/deps/mccfr-fecba223fa4fb86f)
+     Running tests/oracle_diff.rs (/opt/r1/target/codec-current/debug/deps/oracle_diff-84cbc6119ffe8a77)
+     Running tests/r1_variants.rs (/opt/r1/target/codec-current/debug/deps/r1_variants-2e8247ef3ee0e445)
+     Running tests/storage_backends.rs (/opt/r1/target/codec-current/debug/deps/storage_backends-0b2d04f0dc26b083)
+     Running tests/toys.rs (/opt/r1/target/codec-current/debug/deps/toys-a889f6b2df9abbed)
+     Running unittests src/lib.rs (/opt/r1/target/codec-current/debug/deps/hand_index-433297381a9a0728)
+     Running unittests src/lib.rs (/opt/r1/target/codec-current/debug/deps/holdem-ad33cdcd5a0b1635)
+     Running tests/aggregate.rs (/opt/r1/target/codec-current/debug/deps/aggregate-cfdba23aa1e2b1cc)
+     Running tests/oracle_diff.rs (/opt/r1/target/codec-current/debug/deps/oracle_diff-8bb9a8bc2e94897c)
+     Running tests/oracle_river.rs (/opt/r1/target/codec-current/debug/deps/oracle_river-9023b1389f3ceb89)
+     Running tests/postflop.rs (/opt/r1/target/codec-current/debug/deps/postflop-7c65bbef7d8d3f77)
+     Running tests/rake_icm.rs (/opt/r1/target/codec-current/debug/deps/rake_icm-929f06784234ed73)
+     Running tests/river.rs (/opt/r1/target/codec-current/debug/deps/river-0fb3b0afdc93e78b)
+     Running tests/viewer.rs (/opt/r1/target/codec-current/debug/deps/viewer-961a563d84b2f322)
+     Running unittests src/lib.rs (/opt/r1/target/codec-current/debug/deps/multiway-264c563b13bf6c4b)
+     Running unittests src/lib.rs (/opt/r1/target/codec-current/debug/deps/preflop-bd350577e12c29cf)
+     Running tests/blueprint.rs (/opt/r1/target/codec-current/debug/deps/blueprint-ff5ed411c041b778)
+     Running tests/icm.rs (/opt/r1/target/codec-current/debug/deps/icm-879f60a0b60c13e8)
+     Running unittests src/lib.rs (/opt/r1/target/codec-current/debug/deps/protocol-afb2e846d9f5dc38)
+   Doc-tests abstraction
+   Doc-tests cards
+   Doc-tests cfr_ref
+   Doc-tests cli
+   Doc-tests engine
+   Doc-tests formats
+   Doc-tests game
+   Doc-tests hand_index
+   Doc-tests holdem
+   Doc-tests multiway
+   Doc-tests preflop
+   Doc-tests protocol

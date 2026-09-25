@@ -1,8 +1,8 @@
 {
   "schema": "solvers.r1-local-download-inventory/v1",
-  "verified_at_utc": "2026-09-25T18:42:31.741876+00:00",
-  "scope": "Ten completed evidence-bundle downloads and their two sidecars, independently rehashed locally before final inventory. Counts retained unique objects, not all bytes ever transmitted. VM06 final six bundles were downloaded before explicit VM deletion.",
-  "method": "Verify whole archive, sidecar and checksum hashes; embedded manifest byte equality; every included regular payload size/SHA-256; exact tar member sets.",
+  "verified_at_utc": "2026-09-25T20:32:17.175614+00:00",
+  "scope": "Fifteen completed evidence-bundle downloads and their two sidecars. Ten previous entries are preserved without reprocessing; five VM07 additions were independently streamed and verified at the latest verification time. Counts retained unique objects, not all bytes ever transmitted.",
+  "method": "Verify whole archive, sidecar and checksum hashes; embedded manifest byte equality; every included regular payload size/SHA-256; exact tar member sets. VM07 archive and payload hashing uses at most 1 MiB reads and never extracts or loads whole payloads into RAM.",
   "downloads": [
     {
       "reservation_id": "r1-20260925-05",
@@ -323,22 +323,234 @@
       "embedded_manifest_identical": true,
       "unlisted_tar_members": 0,
       "verified_at_utc": "2026-09-25T18:42:31.741876+00:00"
+    },
+    {
+      "reservation_id": "r1-20260925-07",
+      "direction": "GCP-to-local",
+      "scope": "VM07 source07 ordinary workspace/tool checks and input source archives; no external quality acceptance",
+      "archive": {
+        "path": "runs/r1-cloud/evidence-vm07-checks.tar.gz",
+        "bytes": 2562647,
+        "sha256": "92ec7553e89a2b822622395f902f16ab2cd65e67fdfcfc688a3f7cb6edfdf6fb"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/evidence-vm07-checks.tar.gz.manifest.json",
+        "bytes": 15944,
+        "sha256": "73733ca1a05f216f18405f5e3459276926e785f81a57f74dcbdd5c7f91899143"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/evidence-vm07-checks.tar.gz.sha256",
+        "bytes": 94,
+        "sha256": "190ac5400731b291121a2a7ce92567bfceed90df5b0bf7c3fd69808bfef06ff1"
+      },
+      "known_unique_download_bytes": 2578685,
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "verified_included_regular_payloads": 25,
+      "verified_payload_bytes": 3081869,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "excluded_directories": [],
+      "verification_method": "Whole-file SHA-256 and every tar payload streamed in at most 1 MiB chunks; exact included member set; embedded manifest byte equality; no archive extraction or whole-payload allocation.",
+      "verification_chunk_bytes": 1048576,
+      "verified_at_utc": "2026-09-25T20:32:03.015476+00:00"
+    },
+    {
+      "reservation_id": "r1-20260925-07",
+      "direction": "GCP-to-local",
+      "scope": "VM07 source07 eight-stage completed build, codec baseline sources, binaries and validation logs",
+      "archive": {
+        "path": "runs/r1-cloud/evidence-vm07-build.tar.gz",
+        "bytes": 9327291,
+        "sha256": "7c754fd93e2b503faa7d3fbbf0fbe6df039156404af1b2928ccd22589bec70ac"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/evidence-vm07-build.tar.gz.manifest.json",
+        "bytes": 381769,
+        "sha256": "5afcfdfface202b38d2cf72d9cabc2e5c170ff6a588244c44fb472f5077de17f"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/evidence-vm07-build.tar.gz.sha256",
+        "bytes": 93,
+        "sha256": "1e9902386e8b12bab232546e377722b5e1de7ba83d14f2aa5cf579ebbdf8fda7"
+      },
+      "known_unique_download_bytes": 9709153,
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "verified_included_regular_payloads": 617,
+      "verified_payload_bytes": 28081172,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "excluded_directories": [
+        {
+          "contents_inventoried": false,
+          "path": "/opt/r1/current/.cache",
+          "reason": "generated_cache_or_build_directory"
+        }
+      ],
+      "verification_method": "Whole-file SHA-256 and every tar payload streamed in at most 1 MiB chunks; exact included member set; embedded manifest byte equality; no archive extraction or whole-payload allocation.",
+      "verification_chunk_bytes": 1048576,
+      "verified_at_utc": "2026-09-25T20:32:03.380775+00:00"
+    },
+    {
+      "reservation_id": "r1-20260925-07",
+      "direction": "GCP-to-local",
+      "scope": "VM07 HU-R0-002 diagnostic-only run and saved-profile audit; no external reference quality acceptance",
+      "archive": {
+        "path": "runs/r1-cloud/evidence-vm07-diagnostic002.tar.gz",
+        "bytes": 7023707,
+        "sha256": "86d83fb54a47d383dcfa09a008a3c067a09517bbcc0de3f5294511e1190999f8"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/evidence-vm07-diagnostic002.tar.gz.manifest.json",
+        "bytes": 63153,
+        "sha256": "4b5a334c72670f38884427b4dfdba7fa50320632c5404881c1a28fa15d3194d1"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/evidence-vm07-diagnostic002.tar.gz.sha256",
+        "bytes": 101,
+        "sha256": "b784c223b81858fc2a51bb103c8a803413d167b2d4083b9863f7a3efb654a7ed"
+      },
+      "known_unique_download_bytes": 7086961,
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "verified_included_regular_payloads": 103,
+      "verified_payload_bytes": 15810358,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "excluded_directories": [],
+      "verification_method": "Whole-file SHA-256 and every tar payload streamed in at most 1 MiB chunks; exact included member set; embedded manifest byte equality; no archive extraction or whole-payload allocation.",
+      "verification_chunk_bytes": 1048576,
+      "verified_at_utc": "2026-09-25T20:32:03.560239+00:00"
+    },
+    {
+      "reservation_id": "r1-20260925-07",
+      "direction": "GCP-to-local",
+      "scope": "VM07 byte-serde codec comparison with fixed inputs, run records, canonical artifacts, retained runtime executables and build attestation",
+      "archive": {
+        "path": "runs/r1-cloud/evidence-vm07-codec.tar.gz",
+        "bytes": 28468679,
+        "sha256": "7377e41a5c34c1be38ab3bc765ef25435cbaadada0e875b15e75bc5da2baaf15"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/evidence-vm07-codec.tar.gz.manifest.json",
+        "bytes": 457402,
+        "sha256": "bd1767418751d8cb96e680701457d20fbe946d5813430c163e868b7f895dab84"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/evidence-vm07-codec.tar.gz.sha256",
+        "bytes": 93,
+        "sha256": "964758b1c083bb9c2c2bdbe73f709d6199aaeef066241911bf12c023ee4d719e"
+      },
+      "known_unique_download_bytes": 28926174,
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "verified_included_regular_payloads": 716,
+      "verified_payload_bytes": 1887973093,
+      "skipped_payloads": 1,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "excluded_directories": [],
+      "verification_method": "Whole-file SHA-256 and every tar payload streamed in at most 1 MiB chunks; exact included member set; embedded manifest byte equality; no archive extraction or whole-payload allocation.",
+      "verification_chunk_bytes": 1048576,
+      "verified_at_utc": "2026-09-25T20:32:16.437133+00:00",
+      "skipped_payload_recoveries": [
+        {
+          "original_manifest_entry": {
+            "archive_member": "files/00000235",
+            "availability_after_vm_removal": "removed-with-VM",
+            "bytes": 115060885,
+            "hash_scope": "file bytes",
+            "included": false,
+            "kind": "regular",
+            "mode": 420,
+            "mtime_ns": 1790367544676315178,
+            "original_path": "/opt/r1/codec-run07/flop-stream-write-3-candidate/output/canonical.bin",
+            "relative_path": "flop-stream-write-3-candidate/output/canonical.bin",
+            "root": "run",
+            "sha256": "88a2db6d80c6ae7747b3ae95f687154fca2102395624a8604dcda54764d13ae8",
+            "skip_reason": "capacity_limit",
+            "source_git_ref": null
+          },
+          "original_manifest_unchanged": true,
+          "current_local_availability": "verified-in-codec-supplement-bundle; original removed-with-VM note is superseded by this independently verified recovery record only",
+          "recovery_archive": {
+            "path": "runs/r1-cloud/evidence-vm07-codec-supplement.tar.gz",
+            "bytes": 392224,
+            "sha256": "55d3dfb0bc76a056b1009ac9d2f135d0c5bc8be4371ab4bf96531b97648804ca"
+          },
+          "recovery_manifest": {
+            "path": "runs/r1-cloud/evidence-vm07-codec-supplement.tar.gz.manifest.json",
+            "bytes": 2113,
+            "sha256": "016423d66d99ea4d664945896caa508faff2ead6b58c48c110299ea4c7119560"
+          },
+          "recovery_archive_member": "files/00000000",
+          "same_original_path_bytes_sha256": true
+        }
+      ]
+    },
+    {
+      "reservation_id": "r1-20260925-07",
+      "direction": "GCP-to-local",
+      "scope": "VM07 recovery of the one capacity-skipped canonical artifact and final systemd properties",
+      "archive": {
+        "path": "runs/r1-cloud/evidence-vm07-codec-supplement.tar.gz",
+        "bytes": 392224,
+        "sha256": "55d3dfb0bc76a056b1009ac9d2f135d0c5bc8be4371ab4bf96531b97648804ca"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/evidence-vm07-codec-supplement.tar.gz.manifest.json",
+        "bytes": 2113,
+        "sha256": "016423d66d99ea4d664945896caa508faff2ead6b58c48c110299ea4c7119560"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/evidence-vm07-codec-supplement.tar.gz.sha256",
+        "bytes": 104,
+        "sha256": "cacca551e8e91c99ec4cc33dc41566f3363de91f7bcd7d8cbaae44ae9457bc11"
+      },
+      "known_unique_download_bytes": 394441,
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "verified_included_regular_payloads": 2,
+      "verified_payload_bytes": 115061748,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "excluded_directories": [],
+      "verification_method": "Whole-file SHA-256 and every tar payload streamed in at most 1 MiB chunks; exact included member set; embedded manifest byte equality; no archive extraction or whole-payload allocation.",
+      "verification_chunk_bytes": 1048576,
+      "verified_at_utc": "2026-09-25T20:32:17.175282+00:00",
+      "recovers_skipped_payloads_from": [
+        {
+          "archive": {
+            "path": "runs/r1-cloud/evidence-vm07-codec.tar.gz",
+            "bytes": 28468679,
+            "sha256": "7377e41a5c34c1be38ab3bc765ef25435cbaadada0e875b15e75bc5da2baaf15"
+          },
+          "original_path": "/opt/r1/codec-run07/flop-stream-write-3-candidate/output/canonical.bin",
+          "bytes": 115060885,
+          "sha256": "88a2db6d80c6ae7747b3ae95f687154fca2102395624a8604dcda54764d13ae8",
+          "archive_member": "files/00000000"
+        }
+      ]
     }
   ],
   "totals": {
-    "downloaded_bundles": 10,
-    "archive_bytes": 85416600,
-    "manifest_bytes": 2812983,
-    "checksum_sidecar_bytes": 884,
-    "known_unique_download_bytes": 88230467,
-    "verified_included_regular_payloads": 4459,
-    "verified_payload_bytes": 920959412,
-    "skipped_payloads": 0,
-    "known_unique_download_gib": 0.08217102568596601,
+    "downloaded_bundles": 15,
+    "archive_bytes": 133191148,
+    "manifest_bytes": 3733364,
+    "checksum_sidecar_bytes": 1369,
+    "known_unique_download_bytes": 136925881,
+    "verified_included_regular_payloads": 5922,
+    "verified_payload_bytes": 2970967652,
+    "skipped_payloads": 1,
+    "known_unique_download_gib": 0.12752216402441263,
     "by_reservation_known_unique_bytes": {
       "r1-20260925-05": 21105656,
-      "r1-20260925-06": 67124811
-    }
+      "r1-20260925-06": 67124811,
+      "r1-20260925-07": 48695414
+    },
+    "skipped_payloads_recovered_in_download_inventory": 1,
+    "unrecovered_skipped_payloads": 0,
+    "skipped_payload_count_scope": "Sum of original collector skip records. The one codec skip is retained as a skip and separately resolved by the supplement; original manifests remain unchanged."
   },
   "excluded": [
     {

@@ -1,0 +1,20 @@
+{
+  "schema": "r1.reference-menu-transcription/v1",
+  "case_id": "HU-R0-002",
+  "source": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM.",
+  "root_batch_label": "batch11",
+  "data_file": "menu-capture-12.txt",
+  "bytes": 68,
+  "sha256": "417f28efc8932f806ab0ee06539b9de1fbcc4303eadb4d8ee22d91968835e6c7",
+  "observed_record_count": 2,
+  "acquisition_time": "After observed clock 2026-09-25T19:23:29Z and before final clock 2026-09-25T19:36:00Z; exact per-record times not supplied.",
+  "capture_after_observed_clock_utc": "2026-09-25T19:23:29Z",
+  "capture_before_observed_clock_utc": "2026-09-25T19:36:00Z",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "reobserved_menus": [
+    "X-R2-R7-R23.5-R50|BTN|74|F,C,Allin97.5(45%)",
+    "X-R2-R7-R23.5-R68|BTN|74|F,C,Allin97.5(21%)"
+  ],
+  "note": "The earlier URL-only R68 all-in observation remains excluded in batch01; this new full DOM observation is independently adopted."
+}

@@ -1,0 +1,347 @@
+{
+  "schema": "r1.reference-condition-audit/v1",
+  "reviewed_utc_date": "2026-09-25",
+  "purpose": "condition_evidence_only_not_calibration",
+  "quality_status": "not_evaluated",
+  "condition_match": "unverified",
+  "acceptance": null,
+  "comparison_threshold": null,
+  "scope": {
+    "case_ids": [
+      "HU-R0-001",
+      "HU-R0-002",
+      "HU-R0-017",
+      "HU-R0-019"
+    ],
+    "new_solver_execution_included": false,
+    "observed_or_config_modified": false,
+    "reference_policy_import_implemented": false
+  },
+  "local_sources": {
+    "measurement_protocol": {
+      "path": "docs/plans/hu-postflop-r0/measurement-protocol.md",
+      "bytes": 17568,
+      "sha256": "c611f96600dcba452b361d40a485cd14c3a57ddba21dde9711bc289eb6ade892"
+    },
+    "catalog": {
+      "path": "docs/plans/hu-postflop-r0/cases.csv",
+      "bytes": 23753,
+      "sha256": "5dbe4efdbca244c55cba7d32900381334aca8a73e9e13534f6350242000e7466"
+    },
+    "historical_001": {
+      "path": "experiments/hu-postflop-reference/cases/ks7h2d-flop/README.md",
+      "bytes": 6397,
+      "sha256": "4757262e827499cc46b9a49755e8c8bbffb683347aece0ea0871d37a21241f91"
+    },
+    "observed_002": {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-002/observed.json",
+      "bytes": 147034,
+      "sha256": "0f12b8aebaf833032332e2815868a4c3db8405edce64f32a8ae3ca3e1cd7b4df"
+    },
+    "observed_017": {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-017/observed.json",
+      "bytes": 18128,
+      "sha256": "de306599f10fe79456e60484ee79a210e365437e0bf1fc98690aedb6acedc76c"
+    },
+    "observed_019": {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/observed.json",
+      "bytes": 6319,
+      "sha256": "e38ffaf0b6fbcbbbe5779ae9d4236074df889ea75afd0ee4092e6cd48cf2aca2"
+    },
+    "diagnostic_002": {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-002/diagnostic.toml",
+      "bytes": 22876,
+      "sha256": "908ff0b9be9143ab37b73c11fc102b24b3f7451c3a0da278917e617465eeb33d"
+    },
+    "diagnostic_017": {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-017/diagnostic.toml",
+      "bytes": 10563,
+      "sha256": "597c43241721fa4743e3fbe7aa6e8fa67f7aebc67bcece988f18b4e63d192e1d"
+    },
+    "diagnostic_019": {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/diagnostic.toml",
+      "bytes": 4959,
+      "sha256": "c3ac2b24063ad5d3c3f35c6efdd34132452ffb09f8b12b00f3a25a118317e658"
+    },
+    "river_report": {
+      "path": "experiments/hu-postflop-r1/reference/vm06-river-report.json",
+      "bytes": 8088,
+      "sha256": "1e311ab652689315f4b0652f227e9b514d6fed960ddff6823db4a04d2ff3bbac"
+    },
+    "payoff": {
+      "path": "crates/game/src/payoff.rs",
+      "bytes": 11716,
+      "sha256": "bd9ecc083fbc575e888ad2d1173b3ad5ce78f0fb263778f8bd75a27242d772f9"
+    },
+    "terminal_builder": {
+      "path": "crates/holdem/src/postflop.rs",
+      "bytes": 67916,
+      "sha256": "e7c9f6719ba28147ab418b523b2a57cd9325d05734b3d546af7103183f1e9d13"
+    },
+    "ev_basis": {
+      "path": "crates/cli/src/postflop_setup.rs",
+      "bytes": 16987,
+      "sha256": "7f14fdf1c99676edb1418c89c80d56293af2b6e72606f1c5380e0e829c8111c3"
+    },
+    "saved_values": {
+      "path": "crates/cli/src/sol.rs",
+      "bytes": 92493,
+      "sha256": "da72112a4a999daa8d879f6c4c1a27d794ba6c6bdc50294f53502c6c50544f5f"
+    },
+    "comparison_contract": {
+      "path": "experiments/hu-postflop-r1/acceptance/external-contract.md",
+      "bytes": 9629,
+      "sha256": "f8bcffc305cd547e92fe577ddaf69acc54f8202857ef9294bddc3bcc73a32e65"
+    }
+  },
+  "official_sources": [
+    {
+      "id": "solution_series",
+      "url": "https://blog.gtowizard.com/status-and-info-about-our-solutions/",
+      "retrieved_utc_date": "2026-09-25",
+      "section": "6max Cash Game; FAQ accuracy/rake",
+      "observed_statement": "General 0.075-0.3% pot and Simple 0.2-0.3% pot; NL500 5% cap 0.6 BB/hand. FAQ also says General main spots 0.2%.",
+      "limit": "Series-level information; publication label 2021-03-29 does not identify the acquired solution version."
+    },
+    {
+      "id": "series_update",
+      "url": "https://blog.gtowizard.com/multitabling-new-solutions/",
+      "retrieved_utc_date": "2026-09-25",
+      "section": "Improved 6max General Cash Solutions",
+      "observed_statement": "2022-08-09 announcement describes many General spots re-solved to 0.075-0.3% dEV.",
+      "limit": "Does not identify these captured nodes or their residuals."
+    },
+    {
+      "id": "accuracy_definition",
+      "url": "https://blog.gtowizard.com/how-solvers-work/",
+      "retrieved_utc_date": "2026-09-25",
+      "section": "Accuracy",
+      "observed_statement": "Accuracy averages player best-response EV gains; targets are expressed relative to starting pot.",
+      "limit": "General definition does not supply captured-node precision or a calibrated EV margin."
+    },
+    {
+      "id": "conditional_accuracy",
+      "url": "https://blog.gtowizard.com/understanding-nash-distance/",
+      "retrieved_utc_date": "2026-09-25",
+      "section": "Solver Noise",
+      "observed_statement": "Describes whole-solution exploitability and lower accuracy in dominated zero-frequency lines stopped early.",
+      "limit": "A whole-solution residual is not an established conditional River bound."
+    },
+    {
+      "id": "river_resolve",
+      "url": "https://blog.gtowizard.com/gto-wizard-ai-benchmarks/",
+      "retrieved_utc_date": "2026-09-25",
+      "section": "Overview; Methodology",
+      "observed_statement": "Describes precomputed General/Simple CFR and real-time River re-solves to 0.1% Nash Distance.",
+      "limit": "No acquisition-specific completed solve/version/parameters/residual identity; 0.1% not adopted as a bound."
+    },
+    {
+      "id": "matched_rake",
+      "url": "https://help.gtowizard.com/how-to-build-custom-solutions/",
+      "retrieved_utc_date": "2026-09-25",
+      "section": "Preflop Tree Builder > Solution Setup > Rake",
+      "observed_statement": "Current custom preflop builder describes percentage of matched pot and a per-hand BB cap.",
+      "limit": "Not proof of historical General/Simple library settlement rules."
+    },
+    {
+      "id": "ev_relativity",
+      "url": "https://blog.gtowizard.com/what-is-expected-value-in-poker/",
+      "retrieved_utc_date": "2026-09-25",
+      "section": "EV Relativity; EV Units of Measurement",
+      "observed_statement": "Decision-relative fold=0 and earlier-stack-relative EV are different valid baselines.",
+      "limit": "Does not establish the exact baseline of every captured UI field."
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "HU-R0-001",
+      "evidence_kind": "catalog_and_historical_identity_audit",
+      "catalog_gametype": "Cash6m50zGeneral",
+      "catalog_rake": {
+        "rate": "0.05",
+        "cap_bb": "4"
+      },
+      "historical_gametype": "Cash6mGeneral_6mcEVR25",
+      "historical_rake": "none",
+      "historical_tree": "Single Size with documented approximated raise tree",
+      "historical_vs_catalog_condition_match": "mismatch",
+      "historical_results_reusable_as_same_game": false,
+      "source_refs": [
+        "catalog",
+        "historical_001"
+      ]
+    },
+    {
+      "case_id": "HU-R0-002",
+      "evidence_kind": "saved_observations_and_diagnostic_input",
+      "gametype": "Cash6m500zGeneral",
+      "starting_pot_bb": "5.5",
+      "stack_behind_bb": [
+        "97.5",
+        "97.5"
+      ],
+      "observed_decisions": 132,
+      "observed_terminal_edges": 261,
+      "observed_graph_closed": true,
+      "observed_root_ev_bb": [
+        "2.37",
+        "2.76"
+      ],
+      "reference_node_exploitability": null,
+      "reference_full_profile_obtained": false,
+      "menu_closure_certifies_utility": false,
+      "source_refs": [
+        "observed_002",
+        "diagnostic_002"
+      ]
+    },
+    {
+      "case_id": "HU-R0-017",
+      "evidence_kind": "saved_observations_and_source03_diagnostic",
+      "gametype": "Cash6m500zSimple",
+      "starting_pot_bb": "20.5",
+      "stack_behind_bb": [
+        "65",
+        "65"
+      ],
+      "observed_decisions": 28,
+      "observed_root_ev_bb": [
+        "7.68",
+        "12.22"
+      ],
+      "reference_node_exploitability": null,
+      "reference_full_profile_obtained": false,
+      "actual_tree_diagnostic_source": "source03",
+      "source_refs": [
+        "observed_017",
+        "diagnostic_017",
+        "river_report"
+      ]
+    },
+    {
+      "case_id": "HU-R0-019",
+      "evidence_kind": "saved_observations_and_source03_diagnostic",
+      "gametype": "Cash6m500zSimple",
+      "starting_pot_bb": "40.5",
+      "stack_behind_bb": [
+        "55",
+        "55"
+      ],
+      "observed_decisions": 12,
+      "observed_root_ev_bb": [
+        "16.58",
+        "23.32"
+      ],
+      "preview_accuracy": "0.2-0.3%",
+      "reference_node_exploitability": null,
+      "reference_full_profile_obtained": false,
+      "actual_tree_diagnostic_source": "source03",
+      "source_refs": [
+        "observed_019",
+        "diagnostic_019",
+        "river_report"
+      ]
+    }
+  ],
+  "rake": {
+    "implementation_fact": {
+      "source_refs": [
+        "payoff",
+        "terminal_builder"
+      ],
+      "formula": "min(rate * (starting_pot + own_subgame_contribution + opponent_subgame_contribution), cap)",
+      "uncalled_contribution_included": true,
+      "river_fold_exempt": false,
+      "additional_chip_rounding": false
+    },
+    "reference_settlement_verified": false,
+    "conditional_examples": [
+      {
+        "case_id": "HU-R0-002",
+        "line": "root bet 2 BB then opponent folds",
+        "unit": "BB",
+        "starting_pot": "5.5",
+        "uncalled_bet": "2",
+        "rate": "0.05",
+        "cap": "0.6",
+        "total_base": "7.5",
+        "matched_base": "5.5",
+        "total_rake": "0.375",
+        "matched_rake": "0.275",
+        "total_bettor_ev_start_basis": "5.125",
+        "matched_bettor_ev_start_basis": "5.225"
+      },
+      {
+        "case_id": "HU-R0-002",
+        "line": "root bet 8.5 BB then opponent folds",
+        "unit": "BB",
+        "starting_pot": "5.5",
+        "uncalled_bet": "8.5",
+        "rate": "0.05",
+        "cap": "0.6",
+        "total_base": "14",
+        "matched_base": "5.5",
+        "total_rake": "0.6",
+        "matched_rake": "0.275"
+      }
+    ],
+    "conditional_cap_equivalence": {
+      "case_ids": [
+        "HU-R0-017",
+        "HU-R0-019"
+      ],
+      "starting_pot_times_rate_bb": [
+        "1.025",
+        "2.025"
+      ],
+      "cap_bb": "0.6",
+      "required_assumptions": [
+        "Same 0.6 BB collected at every fold and showdown terminal",
+        "No different exemption, additional rounding, or previously collected rake adjustment"
+      ],
+      "certifies_reference_settlement": false,
+      "certifies_reference_constant_sum": false
+    }
+  },
+  "ev_basis": {
+    "implementation_fact": {
+      "source_refs": [
+        "ev_basis",
+        "saved_values",
+        "measurement_protocol"
+      ],
+      "public_chip_ev": "terminal pot proceeds minus contribution since original subgame start",
+      "root_chips_to_bb": "public_ev / 100",
+      "add_starting_pot_half_again": false,
+      "stored_per_hand_values_basis": "original_subgame_start_at_every_node",
+      "decision_relative_conversion_if_same_chip_utility_and_continuation": "original_subgame_ev + own_contribution_since_subgame_start",
+      "icm_offset": "utility units, never add chips",
+      "seat_gain_invariant_under_same_offset": true
+    },
+    "reference_exact_ui_basis_verified": false,
+    "reference_display_rounding_rule_verified": false,
+    "diagnostic_summary_profile": "presave_live_average_snapshot_not_stored_policy_BR",
+    "root_ev_sum_certifies_rake": false
+  },
+  "not_obtained": [
+    "Acquired solution/node version and completed solve identity",
+    "Solution-specific fold collection, uncalled handling, rounding and prior rake rules",
+    "Node-specific reference residual, metric and denominator tied to acquired profile",
+    "Full reference per-hand/action continuation policy",
+    "Exact UI EV baselines and rounding rules",
+    "Case-applicable independently justified numerical error and prospective external comparison margins"
+  ],
+  "interpretations": [
+    "Series accuracy is not adopted as a conditional River bound.",
+    "Observed menu closure and runtime menu agreement do not certify terminal utility or complete policy.",
+    "Small observed EV differences and display steps do not create acceptance thresholds.",
+    "Known historical game mismatch does not change the unverified status of the current catalog candidate."
+  ],
+  "calibration_eligibility": {
+    "eligible": false,
+    "reason": "This audit inventories unresolved reference conditions and is not an approved same-game or calibration record.",
+    "numeric_thresholds_created": false,
+    "missing_values_imputed": false
+  },
+  "profile_import_design_note": "Require complete node/seat/combo/action mapping and raw probabilities, provenance/precision, root ranges, compatible reach, chance, full menu and terminal utility. Distinguish missing, displayed zero and proven zero reach; do not impute a complete policy from aggregate frequencies. Reevaluate EV and BR only after fixing the same finite game."
+}

@@ -1,0 +1,64 @@
+# Small production-v1 fixture for tools/multiway_convergence_bench.py.
+# The benchmark runner rewrites only solver/run budget keys per variant.
+schema = "solvers.multiway-preflop/v1"
+
+[game]
+seat_count = 6
+button = 0
+
+[game.defaults]
+stack_bb = 2.0
+range = "random"
+
+[game.tree]
+kind = "standard"
+allow_limp = false
+
+[game.tree.max_aggressive_actions]
+preflop = 1
+flop = 1
+turn = 1
+river = 1
+
+[game.abstraction]
+kind = "ehs2-percentile"
+
+[game.abstraction.buckets]
+flop = 2
+turn = 2
+river = 2
+
+[game.information]
+recall = "current-street"
+
+[solver]
+kind = "range-vector"
+seed = 0
+opponent_exploration = 0.0
+batch_sweeps = 1
+
+[solver.discount]
+kind = "none"
+
+[solver.pruning]
+kind = "none"
+
+[run]
+max_sweeps = 4096
+
+[run.stop]
+target = 1000000000000.0
+check_every_sweeps = 4097
+confirmations = 1
+evaluation_samples = 256
+deviator_traversals = 2000
+
+[run.resources]
+threads = 1
+memory = "64MiB"
+
+[run.checkpoint]
+interval = "15m"
+
+[output]
+probability_encoding = "u16"

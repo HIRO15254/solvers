@@ -1,0 +1,14 @@
+[package]
+name = "game"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Variant-independent game layer: terminal payoff pipeline (rake, ICM), tree-builder scaffolding, toy games (Kuhn, Leduc)"
+
+[dependencies]
+cards = { workspace = true }
+engine = { workspace = true }
+
+[dev-dependencies]
+cfr-ref = { workspace = true }

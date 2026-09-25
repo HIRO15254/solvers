@@ -1,0 +1,47 @@
+{
+  "launcher": {
+    "path": "/home/PC_User/run-diagnostic-002-vm07.py",
+    "sha256": "58ef961fc7b5d9b2e2542af2c8e0c718f48f9ee7b95df17f7320ede6996ff2f4",
+    "bytes": 4612
+  },
+  "build_record": {
+    "path": "/opt/r1/codec-build07/result.json",
+    "sha256": "d56eb5332655a07409b4becd575608d22b6cf80623223c81f77b06173412c9f0",
+    "bytes": 120461
+  },
+  "source_archive": {
+    "path": "/opt/r1/source-07.tar.gz",
+    "sha256": "a6d346a033cf90f68adf131c7a14f5a754417cf0d952e1008d5736e7e9d6dd2a",
+    "bytes": 1314820
+  },
+  "runner": {
+    "path": "/home/PC_User/run-diagnostic.py",
+    "sha256": "b6897e38e38d978b6403838c797d329be5f855fb8522e7f67218383b3c59cbf6",
+    "bytes": 14883
+  },
+  "input_archive": {
+    "path": "/home/PC_User/diagnostic-002-inputs.tar.gz",
+    "sha256": "1a03ea69897c995cc614d763767b3f4f95e0173c03bd52cdebfe6c48e8a11a19",
+    "bytes": 47521
+  },
+  "binary": {
+    "path": "/opt/r1/target/codec-current/release/solvers",
+    "sha256": "07715dd5e9cbaed45badf9ffad0cb85a1c464133b983de1255984893154443ce",
+    "bytes": 8868616
+  },
+  "audit_binary": {
+    "path": "/opt/r1/target/codec-current/release/examples/hu_saved_profile_audit",
+    "sha256": "a5d7a8d57366a555e6c5f119c6ac7fdde4a4193266920e953d6387f5fb0ced0d",
+    "bytes": 4248672
+  },
+  "execution": {
+    "path": "/opt/r1/diagnostic-002-vm07/execution.json",
+    "sha256": "74a9a2007f66db9df9191d083b0aa0a158fce57b10d8d3f0bd26f6c19dcdf972",
+    "bytes": 28282
+  },
+  "comparison": {
+    "path": "/opt/r1/diagnostic-002-vm07/diagnostic-comparison.json",
+    "sha256": "1bae97c6b37a008e060a872b47f2f9770798d6473ce3daa1aff9220f62494a27",
+    "bytes": 4242
+  }
+}

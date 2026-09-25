@@ -6,6 +6,10 @@ T1-02/03/04と、それに接続するHU kernel・保存処理の検証範囲を
 
 ## Sourceと実行証拠の対応
 
+source07のbyte codec変更は[VM07通常検証](vm07-report.md)で、fmt/clippy、901 passed・31 ignored、
+Python 29 passed・3 Windows専用skip、比較用の新規release buildを照合した。
+以前のsnapshot証拠と区別し、[codec実測](../codec/vm07-report.md)の性能判定は別に読む。
+
 | 呼称 | Source manifest | Archive SHA-256 |
 |---|---|---|
 | snapshot01 | [initial/source-manifest.json](initial/source-manifest.json) | `e1eec592dcf180acc34f27c076d03a4b316694b86ca2cd9fc3cbf1dd5e5f211e` |

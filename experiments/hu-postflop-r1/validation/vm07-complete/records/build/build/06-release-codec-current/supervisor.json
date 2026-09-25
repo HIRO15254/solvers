@@ -1,0 +1,163 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T20:07:57.049267+00:00",
+  "argv": [
+    "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+    "build",
+    "--locked",
+    "--release",
+    "-p",
+    "formats",
+    "--example",
+    "sol_codec_bench"
+  ],
+  "cwd": "/opt/r1/current",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 1200.0,
+    "grace_seconds": 5.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.25,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "disk_reserve_bytes": 12884901888
+  },
+  "runtime": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-7.0.0-1011-gcp-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "logical_cpus": 8
+  },
+  "outputs": {
+    "stdout": {
+      "path": "/opt/r1/codec-build07/06-release-codec-current/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "path": "/opt/r1/codec-build07/06-release-codec-current/stderr.log",
+      "sha256": "092ac9cad8cdf9ba6e73d837c2a847c2b2fcd6eff4020c7f1a2362c336c991ca",
+      "bytes": 480
+    },
+    "samples": {
+      "path": "/opt/r1/codec-build07/06-release-codec-current/samples.jsonl",
+      "sha256": "f4929833f1edaf17a4d980900813658a5e4170e0b6eeddbf0e8c7c37c8067acf",
+      "bytes": 19615
+    }
+  },
+  "identity_before": [
+    {
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5",
+      "bytes": 42844376
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/current/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/current/Cargo.lock",
+      "sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1",
+      "bytes": 40970
+    },
+    {
+      "path": "/opt/r1/current/.cargo/config.toml",
+      "sha256": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21",
+      "bytes": 125
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5",
+      "bytes": 42844376
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/current/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/current/Cargo.lock",
+      "sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1",
+      "bytes": 40970
+    },
+    {
+      "path": "/opt/r1/current/.cargo/config.toml",
+      "sha256": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21",
+      "bytes": 125
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 62,
+    "max_sample_gap_seconds": 0.2624912400000312,
+    "sampled_peak_tree_resident_bytes": 726425600,
+    "root_os_peak_resident_bytes": 397864960,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "max_observed_processes": 4
+  },
+  "containment": {
+    "kind": "posix_session_process_group",
+    "limitations": [
+      "setsid/setpgid can escape this process group; use a systemd/cgroup wrapper",
+      "supervisor SIGKILL, host failure or power loss does not kill the group",
+      "resident memory is sampled /proc RSS; brief descendants may be missed",
+      "summed RSS can double-count shared pages; this is not cgroup memory.current",
+      "wait4 root peak can include reaped descendant high-water marks; it is not a simultaneous tree peak"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 67419480064,
+    "available_bytes": 66170892288
+  },
+  "resolved_argv": [
+    "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+    "build",
+    "--locked",
+    "--release",
+    "-p",
+    "formats",
+    "--example",
+    "sol_codec_bench"
+  ],
+  "disk_path": "/opt/r1",
+  "disk_free_before_bytes": 95009480704,
+  "started_at": "2026-09-25T20:07:57.097494+00:00",
+  "pid": 13965,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 397864960,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "elapsed_seconds": 15.725216337999996,
+    "at": "2026-09-25T20:08:12.828537+00:00",
+    "host_available_memory_bytes": 66064973824,
+    "disk_free_bytes": 94974803968
+  },
+  "elapsed_seconds": 15.73114522800006,
+  "ended_at": "2026-09-25T20:08:12.828682+00:00",
+  "supervisor_exit_code": 0
+}

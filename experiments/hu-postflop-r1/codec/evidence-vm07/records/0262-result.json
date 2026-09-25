@@ -1,0 +1,58 @@
+{
+  "canonical": {
+    "blake3": "312dc9100b5a64988af87ffe362274fed2417874e7b9bafdf6190e5d5599ef52",
+    "bytes": 14103,
+    "file": "canonical.bin"
+  },
+  "decoded_strategy_blocks": 1,
+  "decoded_value_blocks": 1,
+  "format_version": 3,
+  "input": {
+    "blake3": "4f9d73fb7f3b84425f06ece7bd38cd64d986186f556db284289b74448650bac5",
+    "bytes": 7609
+  },
+  "iterations": 64,
+  "metadata": {
+    "config_toml": "schema = \"solvers.postflop/v1\"\n\n[game]\nboard = \"2c 7d 9h Js Qs\"\noop_range = \"22+,A2s+,KTo+\"\nip_range = \"55-22,QJs,A5s-A2s,KQo,T9s\"\npot = 20\neffective_stack = 60\nmin_bet = 1\niso_merging = false\npreflop_aggressor = \"none\"\n\n[game.tree]\nkind = \"script\"\nscript = '''\nriver {\nreplace bet [50, 100]\nreplace raise [100]\n}'''\ninclude_allin = false\n\n[game.tree.max_aggressive_actions]\nflop = 2\nturn = 2\nriver = 2\n\n[game.tree.params]\n\n[rake]\nkind = \"none\"\n\n[utility]\nkind = \"chip-ev\"\n\n[algorithm]\nschedule = \"dcfr\"\nalpha = 1.5\nbeta = 0.0\ngamma = 3.0\npow4_reset = true\n\n[run]\niterations = 100\ncheck_every = 25\nstorage = \"f32\"\ntarget_nash_conv = 0.04\nthreads = 8\npar_chance_depth = 2\npar_min_children = 12\n",
+    "meta": {
+      "ev": [
+        13.871822359286634,
+        6.128177549428161
+      ],
+      "expl": [
+        0.012880653853740931,
+        0.016869405042389207
+      ],
+      "iterations": 100,
+      "nash_conv": 0.029750058896130138,
+      "storage": "f32",
+      "wall_secs": 0.152291424
+    },
+    "mode": "Full",
+    "node_count": 27,
+    "stored_nodes": 10
+  },
+  "operation": "read-repeat-chunk",
+  "raw_strategy_bytes": 7956,
+  "raw_value_bytes": 5304,
+  "rewritten": null,
+  "root_canonical": {
+    "blake3": "312dc9100b5a64988af87ffe362274fed2417874e7b9bafdf6190e5d5599ef52",
+    "bytes": 14103,
+    "file": "root-canonical.bin"
+  },
+  "schema": "r1.sol-codec-sample/v1",
+  "scope": "Codec bytes only; cached solve metrics are not recomputed quality values. Writer streams bounded groups from a fully decoded resident payload. Repeated root reads use one reader and re-decode the same chunk.",
+  "selected_srefs": [
+    0
+  ],
+  "solve_iterations": 100,
+  "status": "completed",
+  "timing": {
+    "open_seconds": 0.00010523,
+    "operation_seconds": 0.010307099,
+    "operation_seconds_per_iteration": 0.000161048421875,
+    "preparation_load_seconds": 0.0,
+    "validation_output_seconds": 0.000215271
+  }
+}

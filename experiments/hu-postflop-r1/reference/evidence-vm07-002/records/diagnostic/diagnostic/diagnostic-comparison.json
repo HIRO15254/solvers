@@ -1,0 +1,114 @@
+{
+  "case_id": "HU-R0-002",
+  "purpose": "diagnostic_only",
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "chips_per_bb": 100,
+  "observed_sha256": "0f12b8aebaf833032332e2815868a4c3db8405edce64f32a8ae3ca3e1cd7b4df",
+  "input_check": {
+    "config_sha256": "908ff0b9be9143ab37b73c11fc102b24b3f7451c3a0da278917e617465eeb33d",
+    "ranges": {
+      "oop": {
+        "positive_combos": 493,
+        "raw_weight_sum": "197.3094037",
+        "sha256": "04e626aaee3fabd74ec6038ff3a8c92ec602ceb22dc5c080e3304e475dae5eec"
+      },
+      "ip": {
+        "positive_combos": 479,
+        "raw_weight_sum": "53.1100486",
+        "sha256": "eb147ce4427bc29bbaee16504c9dc91234c663d483d8fa5fa68b255acfa7f6cd"
+      }
+    },
+    "dsl_runtime_validation": "not_performed_by_this_python_script"
+  },
+  "expected_counts_from_observed_graph": {
+    "decision_nodes": 132,
+    "decision_action_edges": 392,
+    "terminal_nodes": 261,
+    "public_nodes": 393
+  },
+  "rake_assumption": {
+    "rate": "0.05",
+    "cap_chips": 60,
+    "collection": "every fold/showdown terminal",
+    "base": "starting pot plus both actual River contributions, including an uncalled wager on a fold",
+    "rounding": "runtime floating-point percent-cap; no additional chip rounding",
+    "reference_semantics_verified": false,
+    "matched_pot_equivalent": false,
+    "example": "bet 2bb then fold: runtime base 7.5bb, rake 0.375bb; matched-pot base 5.5bb would give 0.275bb"
+  },
+  "generator_report": {
+    "schema": "r1.reference-diagnostic-generation/v1",
+    "case_id": "HU-R0-002",
+    "observed_sha256": "0f12b8aebaf833032332e2815868a4c3db8405edce64f32a8ae3ca3e1cd7b4df",
+    "observed_decisions": 132,
+    "dsl_predicate_states": 132,
+    "dsl_replace_rules": 66,
+    "predicate": [
+      "aggressions",
+      "pot",
+      "to_call",
+      "position"
+    ],
+    "state_alias_rule": "all observed histories sharing a predicate must have identical ordered menus",
+    "sizes": "only observed monetary targets multiplied exactly by 100; no percentage reconstruction",
+    "runtime_validation": "not_executed_by_generator",
+    "quality_status": "not_evaluated",
+    "acceptance": null
+  },
+  "source_id": "source-07:a6d346a033cf90f68adf131c7a14f5a754417cf0d952e1008d5736e7e9d6dd2a",
+  "source_id_provenance": "Caller-supplied identity; not proof of binary/export linkage. Retain supervisor and binary hashes separately.",
+  "run_config_check": {
+    "config_sha256": "aff58dd05e997dee426b6e095c9bd4c5be1ef638463265a580d521c2a2d80b5e",
+    "ranges": {
+      "oop": {
+        "positive_combos": 493,
+        "raw_weight_sum": "197.3094037",
+        "sha256": "04e626aaee3fabd74ec6038ff3a8c92ec602ceb22dc5c080e3304e475dae5eec"
+      },
+      "ip": {
+        "positive_combos": 479,
+        "raw_weight_sum": "53.1100486",
+        "sha256": "eb147ce4427bc29bbaee16504c9dc91234c663d483d8fa5fa68b255acfa7f6cd"
+      }
+    },
+    "dsl_runtime_validation": "not_performed_by_this_python_script"
+  },
+  "exports_sha256": {
+    "tree": "e75a948abe94b148e2509da9712fbfc1bff7482f7c700ff2103e0964b5e248a7",
+    "summary": "319df332333795dd139f914c9a0569621a1d85de79058c3812faadbc82a36240"
+  },
+  "tree_check": {
+    "status": "all_observed_menus_match",
+    "decision_nodes": 132,
+    "decision_action_edges": 392,
+    "terminal_nodes": 261,
+    "public_nodes": 393
+  },
+  "ev_diagnostic": {
+    "root_ev": {
+      "oop": {
+        "solver_ev_bb": "2.3464700955210503",
+        "reference_display_ev_bb": "2.37",
+        "signed_difference_bb": "-0.0235299044789497"
+      },
+      "ip": {
+        "solver_ev_bb": "2.7251926413778074",
+        "reference_display_ev_bb": "2.76",
+        "signed_difference_bb": "-0.0348073586221926"
+      }
+    },
+    "solver_iterations": 1000,
+    "solver_storage": "f32",
+    "solver_nash_conv_bb": "0.0043885694415867116",
+    "solver_mean_br_gain_pct_starting_pot": "0.03989608583260646909090909091",
+    "solver_evaluation_basis": "live average profile before artifact quantization",
+    "reference_ev_display_step_bb": 0.01,
+    "reference_exploitability": null,
+    "comparison_threshold": null,
+    "acceptance": null,
+    "condition_match": "unverified",
+    "quality_status": "not_evaluated"
+  }
+}

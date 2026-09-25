@@ -1,0 +1,284 @@
+{
+  "correctness": "pass",
+  "plan_sha256": "afa17b234bcf2a29588d3f4cf221147b055ffb8ebe2c57b0fc3e2298b7b667e5",
+  "rows": [
+    {
+      "baseline_median_seconds": 0.00070248,
+      "candidate_median_seconds": 0.00054958,
+      "candidate_over_baseline": 0.7823425577952398,
+      "case": "river",
+      "improvement_gate_met": true,
+      "operation": "decode-all",
+      "paired_faster_count": 3,
+      "raw_pairs_seconds": [
+        [
+          0.00082062,
+          0.000718829
+        ],
+        [
+          0.00070248,
+          0.00046354
+        ],
+        [
+          0.00064478,
+          0.00054958
+        ]
+      ]
+    },
+    {
+      "baseline_median_seconds": 0.00067923,
+      "candidate_median_seconds": 0.000452559,
+      "candidate_over_baseline": 0.6662824080208471,
+      "case": "river",
+      "improvement_gate_met": true,
+      "operation": "read-root",
+      "paired_faster_count": 3,
+      "raw_pairs_seconds": [
+        [
+          0.0007407000000000001,
+          0.000452559
+        ],
+        [
+          0.00067923,
+          0.0004431
+        ],
+        [
+          0.00066778,
+          0.0004894599999999999
+        ]
+      ]
+    },
+    {
+      "baseline_median_seconds": 0.023650459,
+      "candidate_median_seconds": 0.00972524,
+      "candidate_over_baseline": 0.4112072412632668,
+      "case": "river",
+      "improvement_gate_met": true,
+      "operation": "read-repeat-chunk",
+      "paired_faster_count": 3,
+      "raw_pairs_seconds": [
+        [
+          0.02670848,
+          0.00749895
+        ],
+        [
+          0.023650459,
+          0.010307099
+        ],
+        [
+          0.02240953,
+          0.00972524
+        ]
+      ]
+    },
+    {
+      "baseline_median_seconds": 0.010440639,
+      "candidate_median_seconds": 0.008355909,
+      "candidate_over_baseline": 0.8003254398509516,
+      "case": "river",
+      "improvement_gate_met": true,
+      "operation": "stream-write",
+      "paired_faster_count": 2,
+      "raw_pairs_seconds": [
+        [
+          0.00705962,
+          0.008355909
+        ],
+        [
+          0.01221238,
+          0.00957991
+        ],
+        [
+          0.010440639,
+          0.00609973
+        ]
+      ]
+    },
+    {
+      "baseline_median_seconds": 0.02011544,
+      "candidate_median_seconds": 0.01085516,
+      "candidate_over_baseline": 0.5396431795675363,
+      "case": "turn",
+      "improvement_gate_met": true,
+      "operation": "decode-all",
+      "paired_faster_count": 3,
+      "raw_pairs_seconds": [
+        [
+          0.02354185,
+          0.01085516
+        ],
+        [
+          0.02011544,
+          0.01167948
+        ],
+        [
+          0.01901606,
+          0.0105079
+        ]
+      ]
+    },
+    {
+      "baseline_median_seconds": 0.003264469,
+      "candidate_median_seconds": 0.002218151,
+      "candidate_over_baseline": 0.679482941942472,
+      "case": "turn",
+      "improvement_gate_met": true,
+      "operation": "read-root",
+      "paired_faster_count": 3,
+      "raw_pairs_seconds": [
+        [
+          0.00331585,
+          0.002218151
+        ],
+        [
+          0.003264469,
+          0.00158763
+        ],
+        [
+          0.00265499,
+          0.00242706
+        ]
+      ]
+    },
+    {
+      "baseline_median_seconds": 0.118180828,
+      "candidate_median_seconds": 0.02974292,
+      "candidate_over_baseline": 0.2516729701707624,
+      "case": "turn",
+      "improvement_gate_met": true,
+      "operation": "read-repeat-chunk",
+      "paired_faster_count": 3,
+      "raw_pairs_seconds": [
+        [
+          0.123587658,
+          0.03288613
+        ],
+        [
+          0.118180828,
+          0.02974292
+        ],
+        [
+          0.108013559,
+          0.02701419
+        ]
+      ]
+    },
+    {
+      "baseline_median_seconds": 0.02109039,
+      "candidate_median_seconds": 0.01121923,
+      "candidate_over_baseline": 0.5319593426200274,
+      "case": "turn",
+      "improvement_gate_met": true,
+      "operation": "stream-write",
+      "paired_faster_count": 3,
+      "raw_pairs_seconds": [
+        [
+          0.02312638,
+          0.01233453
+        ],
+        [
+          0.02109039,
+          0.01121923
+        ],
+        [
+          0.0182407,
+          0.01003262
+        ]
+      ]
+    },
+    {
+      "baseline_median_seconds": 0.354365324,
+      "candidate_median_seconds": 0.132866548,
+      "candidate_over_baseline": 0.3749422954261744,
+      "case": "flop",
+      "improvement_gate_met": true,
+      "operation": "decode-all",
+      "paired_faster_count": 3,
+      "raw_pairs_seconds": [
+        [
+          0.361624784,
+          0.118737598
+        ],
+        [
+          0.354365324,
+          0.132866548
+        ],
+        [
+          0.336747694,
+          0.148628447
+        ]
+      ]
+    },
+    {
+      "baseline_median_seconds": 0.0021648709999999996,
+      "candidate_median_seconds": 0.00114261,
+      "candidate_over_baseline": 0.5277958825260259,
+      "case": "flop",
+      "improvement_gate_met": true,
+      "operation": "read-root",
+      "paired_faster_count": 3,
+      "raw_pairs_seconds": [
+        [
+          0.0020889380000000003,
+          0.00105415
+        ],
+        [
+          0.0021648709999999996,
+          0.00114261
+        ],
+        [
+          0.00302199,
+          0.00158854
+        ]
+      ]
+    },
+    {
+      "baseline_median_seconds": 0.094088319,
+      "candidate_median_seconds": 0.02056725,
+      "candidate_over_baseline": 0.21859514782063433,
+      "case": "flop",
+      "improvement_gate_met": true,
+      "operation": "read-repeat-chunk",
+      "paired_faster_count": 3,
+      "raw_pairs_seconds": [
+        [
+          0.087448489,
+          0.02396932
+        ],
+        [
+          0.094088319,
+          0.020469759
+        ],
+        [
+          0.096578419,
+          0.02056725
+        ]
+      ]
+    },
+    {
+      "baseline_median_seconds": 0.303004095,
+      "candidate_median_seconds": 0.367827635,
+      "candidate_over_baseline": 1.2139361845918288,
+      "case": "flop",
+      "improvement_gate_met": false,
+      "operation": "stream-write",
+      "paired_faster_count": 1,
+      "raw_pairs_seconds": [
+        [
+          0.333512165,
+          0.367827635
+        ],
+        [
+          0.299654815,
+          0.547759332
+        ],
+        [
+          0.303004095,
+          0.114359159
+        ]
+      ]
+    }
+  ],
+  "schema": "r1.codec-comparison/v1",
+  "scope": "Descriptive codec microbenchmark only; no overall R1, solver quality or end-to-end speed acceptance"
+}

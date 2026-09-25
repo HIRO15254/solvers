@@ -1,0 +1,52 @@
+schema = "solvers.multiway-preflop/v1"
+
+[game]
+seat_count = 3
+button = 0
+
+[game.defaults]
+stack_bb = 2.0
+range = "random"
+
+[game.abstraction]
+kind = "ehs2-percentile"
+
+[game.abstraction.buckets]
+flop = 2
+turn = 2
+river = 2
+
+[game.information]
+recall = "current-street"
+
+[solver]
+kind = "range-vector"
+seed = 19
+opponent_exploration = 0.0
+batch_sweeps = 1
+
+[solver.discount]
+kind = "none"
+
+[solver.pruning]
+kind = "regret-based"
+
+[run]
+max_sweeps = 2
+
+[run.stop]
+target = 1000000.0
+check_every_sweeps = 1
+confirmations = 1
+evaluation_samples = 8
+deviator_traversals = 1
+
+[run.resources]
+memory = "64MiB"
+threads = 1
+
+[run.checkpoint]
+interval = "15m"
+
+[output]
+probability_encoding = "u16"

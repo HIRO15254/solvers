@@ -1,0 +1,12 @@
+{
+  "schema": "r1.codec-input-selection/v1",
+  "scope": "Source06 original candidate repetition 1 Full artifacts; not restore artifacts or source03 results",
+  "source06_archive_sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c",
+  "bundle": {"filename": "vm06-current.tar.gz", "bytes": 13268830, "sha256": "cb4ed8a32bc5ce5b67ebbd18dd17e00262bbd823207f82270a6a92f5ca47a4ee"},
+  "sidecar": {"bytes": 608438, "sha256": "d0a2ff25540f3026eb6d3c04dbf0f0676c89fbf635998704990f13a0500a3db1"},
+  "cases": {
+    "river": {"archive_member": "files/00000573", "original_path": "/opt/r1/candidate-v3/runs/r1-paired-current/river-1-candidate/run/solution.sol", "bytes": 7609, "sha256": "fc67f0f78c888bd163c62e9cc3625e7c00a18c7c5c468a075e226ed5ada669cc"},
+    "turn": {"archive_member": "files/00000803", "original_path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-1-candidate/run/solution.sol", "bytes": 24920, "sha256": "ee55a97544c793f2770893b12019a990649b564dfb2bf14e2b08a1ab7a0bcc2a"},
+    "flop": {"archive_member": "files/00000343", "original_path": "/opt/r1/candidate-v3/runs/r1-paired-current/flop-1-candidate/run/solution.sol", "bytes": 176833, "sha256": "5f9fc7a35a4a4e034d029844ced6251e1603c9de269b69b6c275ae7034d837f1"}
+  }
+}

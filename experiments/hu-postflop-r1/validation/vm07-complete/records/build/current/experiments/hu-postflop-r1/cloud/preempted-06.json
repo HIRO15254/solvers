@@ -1,0 +1,225 @@
+{
+  "schema": "solvers.r1-preemption-evidence/v1",
+  "instance": "solvers-r1-20260925-06",
+  "instance_id": "5209515640504390740",
+  "project": "solvers-abstraction-20260723",
+  "zone": "us-central1-b",
+  "operation_type": "compute.instances.preempted",
+  "operation_id": "systemevent-1790357520474-65c5218076025-20ecd92f-79ac2d33",
+  "first_event_utc": "2026-09-25T17:32:06.317259Z",
+  "last_stop_utc": "2026-09-25T17:32:27.860Z",
+  "termination_action": "STOP",
+  "state_after_stop": "TERMINATED",
+  "remote_event_provenance": "Parent task reported official GCP system event and instance describe tool output. This inventory agent did not query GCP.",
+  "launch_evidence": [
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260925-06.json",
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260925-06.json"
+  ],
+  "restart": {
+    "same_instance_id": true,
+    "last_start_utc": "2026-09-25T17:33:59.074Z",
+    "reported_state": "RUNNING",
+    "automatic_restart": false,
+    "boot_disk_retained": true,
+    "termination_time_utc": "2026-09-25T20:09:11Z",
+    "termination_time_unchanged": true,
+    "reservation_id": "r1-20260925-06",
+    "reservation_usd": 5,
+    "cumulative_held_reservations_usd_at_event": 15,
+    "new_vm_or_reservation": false,
+    "billing_usd": null,
+    "provenance": "Parent task instance describe and reservation report; reservation is not actual billing."
+  },
+  "cpu_change": {
+    "before": {
+      "vendor": "GenuineIntel",
+      "model_name": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+      "family": 6,
+      "model": 79,
+      "logical_cpus": 8,
+      "evidence": "experiments/hu-postflop-r1/validation/vm06-source06/checks/00-toolchain/stdout.log"
+    },
+    "after": {
+      "vendor": "AuthenticAMD",
+      "model_name": "AMD EPYC 7B12",
+      "family": 23,
+      "model": 49,
+      "provenance": "Locally retained recovery toolchain output and independently verified recovery build record; all new build toolchain checks match AMD identity and the same boot.",
+      "logical_cpus": 8,
+      "boot_id": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f",
+      "evidence": "experiments/hu-postflop-r1/saved-profile/evidence-vm06-build/records/recovery/recovery/00-toolchain/stdout.log"
+    },
+    "native_cache_preflight": {
+      "script": "experiments/hu-postflop-r1/cloud/build-comparison.sh",
+      "reported_result": "rejected changed CPU identity before compilation or native cache copy",
+      "provenance": "Parent task reported runtime rejection; local script confirms CPU model/vendor/family/model/flags equality gate precedes cache copy and cargo build.",
+      "same_cpu_performance_comparison_across_restart": false,
+      "old_native_cache_eligible_for_reuse": false
+    }
+  },
+  "evidence_availability": {
+    "safe_downloaded_before_preemption": {
+      "bundle": "runs/r1-cloud/vm06-checks-early.tar.gz",
+      "archive_bytes": 1373699,
+      "archive_sha256": "5f08982dcfab989ac0351030cd2f10fe042d6bdd0cfd4456fa2c288f6738402b",
+      "download_verified": true,
+      "verified_regular_payloads": 55,
+      "source06_required_checks": "completed with verified supervisor/output/source identities",
+      "retained_evidence": "experiments/hu-postflop-r1/validation/vm06-source06/README.md"
+    },
+    "prior_build_evidence": {
+      "scope": "/opt/r1/audit-pair-build; original pre-restart audit build",
+      "result_record_claim": {
+        "status": "completed",
+        "completed_stages": 14,
+        "ended_at_utc": "2026-09-25T17:31:29.267854Z",
+        "ended_before_preemption_event": true
+      },
+      "completion_marker_present": false,
+      "missing_marker": "/opt/r1/audit-pair-build/complete.json",
+      "damaged_log": {
+        "stage": "12-baseline-example-release",
+        "stream": "stderr",
+        "bytes_reported": 737,
+        "observation": "Trailing NUL bytes were present; original bytes must be retained without treating sanitized text as the original evidence.",
+        "nul_bytes": 63,
+        "first_nul_offset": 674,
+        "sha256": "4b0162522527188f55157003b635de6dd7dd9805558fa97c3e593d58f22045c6"
+      },
+      "excluded_from_certified_reuse": [
+        "12-baseline-example-release",
+        "13-baseline-final-verify"
+      ],
+      "completed_build_certified": false,
+      "calculation_interrupted_by_preemption": "not established; the earlier claim inferred from a stage-12-running snapshot is withdrawn",
+      "evidence_boundary": "A result JSON claiming completion is distinct from complete, internally consistent retained evidence. The damaged stderr and absent final marker prevent certification of the old baseline build. This record does not establish when or why the log bytes became damaged.",
+      "provenance": "The downloaded recovery bundle retains the original completed result claim and damaged original bytes. Local independent validation confirms the claim, absent original completion marker, and NUL corruption. Historical stages 12/13 remain excluded; no original record was sanitized or repaired.",
+      "additional_damaged_samples": {
+        "stage": "12-baseline-example-release",
+        "bytes": 114688,
+        "nul_bytes": 1178,
+        "first_nul_offset": 113510,
+        "sha256": "937758d22777cf0c610dce09c7164c8dfa61a4022289fba8339b51599afd5342",
+        "adopted_as_success_evidence": false
+      }
+    },
+    "recovery": {
+      "disk_retained": true,
+      "status": "completed-and-independently-verified",
+      "purpose": "saved_profile_quality_only",
+      "started_at_utc": "2026-09-25T17:56:43.274374+00:00",
+      "ended_at_utc": "2026-09-25T17:59:57.435872+00:00",
+      "fresh_verified_stages": 8,
+      "previous_boot_id": "1218b856-0cbd-4349-8ccc-a0ac7a7792ce",
+      "boot_id": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f",
+      "changed_cpu": true,
+      "native_cache_reused_from_prior_boot": false,
+      "historical_stage_success_exclusions": [
+        "12-baseline-example-release",
+        "13-baseline-final-verify"
+      ],
+      "historical_validated_stages": "00 through 11 only; prior source tests do not establish cross-CPU native binary compatibility",
+      "source06_archive": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "baseline_archive": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "current_example": {
+        "bytes": 4249752,
+        "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+        "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932"
+      },
+      "baseline_example": {
+        "bytes": 4227680,
+        "path": "/opt/r1/target/baseline-audit-recovery/release/examples/hu_saved_profile_audit",
+        "sha256": "9efa72cb9cbeed080cda824ee91fccac29dd3d1f17822eb2d5da97b30fe6bc92"
+      },
+      "result": {
+        "path": "experiments/hu-postflop-r1/saved-profile/evidence-vm06-build/records/recovery/recovery/result.json",
+        "bytes": 23430,
+        "sha256": "3fad2ecac424d18b67c12c4febe6a9928c4ee4bf647c485fa9fbfc789179c05a"
+      },
+      "complete": {
+        "path": "experiments/hu-postflop-r1/saved-profile/evidence-vm06-build/records/recovery/recovery/complete.json",
+        "bytes": 861,
+        "sha256": "ec99381d612c1b3dc44936c26470ca6bc9bf493e5bafbf0087e7288010cb2d13"
+      },
+      "independent_verification": {
+        "path": "experiments/hu-postflop-r1/saved-profile/vm06-build-report.json",
+        "bytes": 20720,
+        "sha256": "6f962edda89b1691d2714124a2d45ca13eec802d36ad4585af0129ae077893ce"
+      },
+      "acceptance_boundary": "All eight fresh stages have matching source/compiler/executable/log identities, successful cleanup and unchanged boot/CPU. Current source06 and baseline examples are quality-audit tools; source03 paired performance has separate binaries and evidence. Corrupted historical stages 12/13 are never adopted as successful build evidence."
+    }
+  },
+  "transfer_inventory": "experiments/hu-postflop-r1/cloud/transfers.json",
+  "billing_and_budget_boundary": "No actual charge is claimed. This provenance record does not modify budget.json, release prior reservations, extend the original deadline, or authorize a new VM.",
+  "explicit_cleanup": {
+    "status": "deleted-and-absence-verified",
+    "operation_id": "operation-1790361536355-65c530764dc04-894c9ce0-da0c5288",
+    "target_id": "5209515640504390740",
+    "completed_at_utc": "2026-09-25T18:39:47.045Z",
+    "reconciled_at_utc": "2026-09-25T18:40:38.6204118+00:00",
+    "before_absolute_deadline": true,
+    "first_predelete_check": "Missing disk projection rejected before deletion; subsequent explicit disk identity check passed",
+    "verified_target": "exact instance ID and single boot auto-delete disk checked before deletion",
+    "instances_remaining": 0,
+    "disks_remaining": 0,
+    "reserved_addresses_remaining": 0,
+    "evidence": {
+      "addresses-after.json": {
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/addresses-after.json",
+        "bytes": 4,
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "delete.log": {
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/delete.log",
+        "bytes": 154,
+        "sha256": "e87db45823d15b2ea117bd2442e7f6b37793c7ad6cc44779a62ad4385cda1e1f"
+      },
+      "disks-after.json": {
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/disks-after.json",
+        "bytes": 4,
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "instance-before.json": {
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/instance-before.json",
+        "bytes": 515,
+        "sha256": "5bcf897b06dd52313bbc13b5d2e4ff6d03e714101890dc9ec0b7d594a4920de7"
+      },
+      "instances-after.json": {
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/instances-after.json",
+        "bytes": 4,
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "operations.json": {
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/operations.json",
+        "bytes": 485,
+        "sha256": "4ade5a438f501da78d2cad3715c46a98d9315cd4c66894cf77d0c1297a5250e0"
+      },
+      "reconciliation.json": {
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/reconciliation.json",
+        "bytes": 343,
+        "sha256": "5307789b96ce0a32b00830e7732cef7dc80a83ddd3eac2c8134a41d77b4ecb0f"
+      },
+      "request.json": {
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/request.json",
+        "bytes": 431,
+        "sha256": "fae4c7b9a085a8bff0c8d52d418b74fc96191421f0bd2b85e0a960d26f013568"
+      },
+      "verified-target.json": {
+        "path": "experiments/hu-postflop-r1/cloud/cleanup-vm06/verified-target.json",
+        "bytes": 676,
+        "sha256": "b4e19104c9c6897f490fef056b157e6fec015e7cf53e147e351076e2e0c94db1"
+      }
+    },
+    "provenance": "Parent task performed GCP deletion and saved official operation/list outputs. This inventory agent independently checked the retained local records and identity correspondence; no fresh GCP query was made.",
+    "billing_usd": null,
+    "held_reservations_usd": 15
+  }
+}

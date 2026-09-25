@@ -1,0 +1,129 @@
+{
+  "schema": "r1.vm07-002-report/v1",
+  "case_id": "HU-R0-002",
+  "source_id": "source-07:a6d346a033cf90f68adf131c7a14f5a754417cf0d952e1008d5736e7e9d6dd2a",
+  "execution": {
+    "diagnostic_started_utc": "2026-09-25T20:12:33.503864+00:00",
+    "diagnostic_finished_utc": "2026-09-25T20:12:54.077142+00:00",
+    "saved_audit_finished_utc": "2026-09-25T20:12:54.414244+00:00",
+    "iterations": 1000,
+    "stop_basis": "iteration budget reached; internal 30s limit not reached; no quality target configured",
+    "solve_internal_wall_seconds": 19.185372992,
+    "solve_supervised_seconds": 19.341924739999968,
+    "solve_root_os_peak_resident_bytes": 22962176,
+    "memory_scope": "whole child wait4 peak, not solver allocation or phase peak",
+    "all_inner_stages_completed": true
+  },
+  "tree": {
+    "decision_nodes": 132,
+    "terminal_nodes": 261,
+    "public_nodes": 393,
+    "action_edges": 392,
+    "unobserved_frontier": 0,
+    "all_ordered_menus_actors_pots_stacks_match": true
+  },
+  "chips_per_bb": 100,
+  "rake_assumption": {
+    "rate": "0.05",
+    "cap_chips": 60,
+    "collection": "every fold/showdown terminal",
+    "base": "starting pot plus both actual River contributions, including an uncalled wager on a fold",
+    "rounding": "runtime floating-point percent-cap; no additional chip rounding",
+    "reference_semantics_verified": false,
+    "matched_pot_equivalent": false,
+    "example": "bet 2bb then fold: runtime base 7.5bb, rake 0.375bb; matched-pot base 5.5bb would give 0.275bb"
+  },
+  "live_profile": {
+    "basis": "pre-save average profile in header/summary",
+    "ev_chips": [
+      234.64700955210503,
+      272.51926413778074
+    ],
+    "br_gain_chips": [
+      0.2526258704341302,
+      0.18623107372454095
+    ],
+    "nash_conv_chips": 0.43885694415867116
+  },
+  "saved_profile": {
+    "basis": "Full stored quantized average strategy reloaded; same compiled diagnostic game",
+    "units": "chips",
+    "profile": "stored_quantized",
+    "ev": [
+      234.64700758696753,
+      272.5192616085818
+    ],
+    "br": [
+      234.89967033476717,
+      272.7055061812957
+    ],
+    "gains": [
+      0.2526627477996328,
+      0.18624457271386063
+    ],
+    "nash_conv": 0.43890732051349346,
+    "eval_seconds": 0.02644789
+  },
+  "quantization_difference": {
+    "saved_minus_live_ev_chips": [
+      -1.9651374998375104e-06,
+      -2.5291989231845946e-06
+    ],
+    "saved_minus_live_nash_conv_chips": 5.0376354822301295e-05,
+    "numerical_check": "finite values, both signed BR gain identities, and exact f64 gain sum; no quality threshold"
+  },
+  "reference_display": {
+    "view": "Root Ranges/Strategy/EV observations supplied by collecting root agent",
+    "oop_ev_bb": 2.37,
+    "ip_ev_bb": 2.76,
+    "oop_equity_percent": 47.1,
+    "ip_equity_percent": 52.9,
+    "oop_combos_rounded": 197.3,
+    "ip_combos_rounded": 53.1,
+    "oop_frequency_percent": {
+      "check": 57.2,
+      "bet_2": 37.2,
+      "bet_4": 0.9,
+      "bet_8_5": 4.7,
+      "allin_97_5": 0
+    },
+    "oop_action_combos_displayed": {
+      "check": 112.94,
+      "bet_2": 73.37,
+      "bet_4": 1.7,
+      "bet_8_5": 9.3,
+      "allin_97_5": 0
+    },
+    "ip_frequency_percent": null,
+    "frequency_sum_note": "Root frequencies sum to 100.0% as displayed; no renormalization. Action combo counts have mixed displayed decimal precision; do not infer exact per-action mass or a full profile."
+  },
+  "live_minus_reference_ev_bb": {
+    "oop": {
+      "solver_ev_bb": "2.3464700955210503",
+      "reference_display_ev_bb": "2.37",
+      "signed_difference_bb": "-0.0235299044789497"
+    },
+    "ip": {
+      "solver_ev_bb": "2.7251926413778074",
+      "reference_display_ev_bb": "2.76",
+      "signed_difference_bb": "-0.0348073586221926"
+    }
+  },
+  "saved_minus_reference_ev_bb": [
+    "-0.0235299241303247",
+    "-0.034807383914182"
+  ],
+  "saved_nash_conv_bb": 0.0043890732051349345,
+  "saved_mean_br_gain_percent_starting_pot": 0.03990066550122668,
+  "comparison_threshold": null,
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "why_not_certified": [
+    "Reference per-solution version and exploitability metric/denominator are unknown",
+    "Rake folding/uncalled-wager return/rounding conventions remain unverified; menu equality does not prove terminal utility equality",
+    "Reference EV is displayed to 0.01 BB, and full reference strategy/BR is unavailable",
+    "Close aggregate EV cannot establish equal finite-game semantics or equivalent exploitability"
+  ],
+  "provenance_limit": "3 host executable bytes are absent from these three scoped archives (root reports later codec-bundle retention); original generic readiness is preserved, not promoted to all-evidence success"
+}

@@ -4,6 +4,47 @@
   "authorization": "User R1 request: GCP Spot experiments, cumulative $20",
   "reservations": [
     {
+      "id": "r1-20260925-07",
+      "project": "solvers-abstraction-20260723",
+      "zone": "us-central1-b",
+      "instance": "solvers-r1-20260925-07",
+      "reserved_usd": 5,
+      "billed_usd": null,
+      "reservation_released": false,
+      "maximum_runtime_hours": 3,
+      "machine_type": "e2-highmem-8",
+      "disk_type": "pd-balanced",
+      "disk_gib": 100,
+      "maximum_download_gib": 2,
+      "pricing_checked_utc": "2026-09-25",
+      "conservative_compute_usd_hour": 0.37,
+      "disk_usd_gib_hour": 0.000137,
+      "ipv4_usd_hour": 0.0025,
+      "reserved_egress_usd_gib": 0.3,
+      "tax_price_delay_and_other_reserve_usd": 2.9,
+      "instance_termination_action": "STOP",
+      "explicit_disk_cleanup_hours": 24,
+      "note": "Final unreserved $5 of the cumulative $20 authorization. Current official on-demand compute price 0.36159864 rounded up to 0.37; no asserted live Spot quote. Compute/IP for 3.02 hours, disk for 24 hours, egress up to 2 GiB and 2.90 other reserve total 4.95375 USD. STOP recovery must stay within the original absolute deadline; explicitly delete VM/disk after evidence collection. No additional reservation until actual billing is reconciled.",
+      "purpose": "Wire-compatible SOL byte codec validation and paired codec measurements; HU-R0-002 exact generated-menu diagnostic; required workspace checks.",
+      "disposition": "All five evidence bundles downloaded and independently verified, including the one size-limited canonical payload in a supplement. Explicit delete completed 2026-09-25T20:32:24.560000+00:00; instance, disk and reserved address lists empty at 2026-09-25T20:34:35.914890+00:00. Actual billing unavailable; full $5 reservation remains held, cumulative held $20/$20.",
+      "events": [
+        {
+          "at": "2026-09-25T20:32:24.560000+00:00",
+          "event": "explicit_delete_and_absence_verification",
+          "operation_id": "operation-1790368292611-65c549a19275b-c378f14c-2f16d2d9",
+          "instance_id": "841167209049583155",
+          "operation_status": "DONE",
+          "reconciled_at_utc": "2026-09-25T20:34:35.914890+00:00",
+          "instances": [],
+          "disks": [],
+          "reserved_addresses": [],
+          "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm07/reconciliation.json",
+          "reservation_released": false,
+          "billed_usd": null
+        }
+      ]
+    },
+    {
       "id": "r1-20260925-01",
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-a",

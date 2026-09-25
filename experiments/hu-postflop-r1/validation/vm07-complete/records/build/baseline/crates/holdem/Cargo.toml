@@ -1,0 +1,26 @@
+[package]
+name = "holdem"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Mode A: exact postflop HU-NLHE solving (river-only slice so far)"
+
+[dependencies]
+cards = { workspace = true }
+engine = { workspace = true }
+game = { workspace = true }
+hand-index = { workspace = true }
+
+[dev-dependencies]
+cfr-ref = { workspace = true }
+rayon = { workspace = true }
+criterion = { workspace = true }
+
+[[bench]]
+name = "kernels"
+harness = false
+
+[[bench]]
+name = "solve"
+harness = false

@@ -1,0 +1,1329 @@
+use std::borrow::Cow;
+use std::collections::BTreeMap;
+use std::path::PathBuf;
+use std::str::FromStr;
+
+use anyhow::{Context, Result, anyhow, bail};
+use cards::Street;
+use cards::script::{POSTFLOP, PostflopVar, Script};
+use holdem::{PerStreet, StreetTree};
+use serde::{Deserialize, Serialize};
+
+/// Parses either the legacy shared solver schema or the dedicated Multiway
+/// Preflop v1 schema. Keeping routing here gives every caller one canonical
+/// parser while v1 stays absent from the legacy `GameSection` wire format.
+/// Parses a config in whichever family it declares.
+///
+/// Every family is a versioned contract with its own parser: Multiway
+/// Preflop in `multiway_v1`, the rest in `solver_config_v1`. This function
+/// is only the routing, so no caller has to know which module owns a file.
+pub fn parse_solve_config(raw: &str) -> anyhow::Result<SolveConfig> {
+    if crate::multiway_v1::has_v1_schema(raw)? {
+        return crate::multiway_v1::parse_and_lower(raw);
+    }
+    crate::solver_config_v1::parse_and_lower(raw)
+}
+/// Parses config text this tool produced, in any shape it has produced.
+///
+/// Three cases reach this, and a caller holding internal bytes cannot know
+/// which it has:
+///
+/// * a config in one of the current families, embedded in an artifact
+///   written after the families existed;
+/// * the *lowered* internal shape, which `multiway_v1` produces and which
+///   checkpoints and older artifacts carry;
+/// * the shape configs had before schemas, still readable in historical
+///   `.sol` and `.mwsol` files.
+///
+/// Only paths already holding internal bytes use this. A config a user
+/// wrote goes through [`parse_solve_config`], which requires a schema.
+pub(crate) fn parse_internal_config(raw: &str) -> anyhow::Result<SolveConfig> {
+    if crate::multiway_v1::has_v1_schema(raw)? {
+        return crate::multiway_v1::parse_and_lower(raw);
+    }
+    let declared = toml::from_str::<toml::Value>(raw)
+        .ok()
+        .and_then(|document| {
+            document
+                .get("schema")
+                .and_then(toml::Value::as_str)
+                .map(str::to_string)
+        });
+    if declared.is_some_and(|schema| crate::solver_config_v1::owns(&schema)) {
+        return crate::solver_config_v1::parse_and_lower(raw);
+    }
+    toml::from_str(raw).map_err(Into::into)
+}
+
+/// [`parse_solve_config`] with a base directory for the families that have a
+/// path-valued key: Multiway Preflop's `.mwtree` `source`, and postflop's
+/// `[game.tree] source`.
+pub fn parse_solve_config_at(
+    raw: &str,
+    config_path: &std::path::Path,
+) -> anyhow::Result<SolveConfig> {
+    if crate::multiway_v1::has_v1_schema(raw)? {
+        return crate::multiway_v1::parse_and_lower_at(raw, config_path);
+    }
+    crate::solver_config_v1::parse_and_lower_at(raw, config_path)
+}
+
+/// Replays solution artifacts written before full-recall regret pruning
+/// became a validation error.
+///
+/// Those runs set the pruning bit in metadata, but the full-recall sparse
+/// worker never read it. Solution inspection/evaluation can therefore
+/// preserve the historical algorithm exactly by lowering that one no-op bit
+/// to `false`. New solve configs never pass through this compatibility path.
+pub(crate) fn solution_artifact_compatible_config(
+    raw: &str,
+) -> anyhow::Result<(Cow<'_, str>, bool)> {
+    let mut document: toml::Value = toml::from_str(raw)?;
+    let is_v1 =
+        document.get("schema").and_then(toml::Value::as_str) == Some(crate::multiway_v1::SCHEMA);
+
+    let migrate_v1 = if is_v1 {
+        let recall = document
+            .get("game")
+            .and_then(toml::Value::as_table)
+            .and_then(|game| game.get("information"))
+            .and_then(toml::Value::as_table)
+            .and_then(|information| information.get("recall"))
+            .and_then(toml::Value::as_str);
+        let solver = document.get("solver");
+        let solver_shape_is_valid = solver.is_none() || solver.is_some_and(toml::Value::is_table);
+        let solver_kind = solver
+            .and_then(toml::Value::as_table)
+            .and_then(|solver| solver.get("kind"))
+            .and_then(toml::Value::as_str);
+        let solver_was_range_vector = matches!(solver_kind, None | Some("range-vector"));
+        let pruning = solver
+            .and_then(toml::Value::as_table)
+            .and_then(|solver| solver.get("pruning"));
+        let pruning_was_historical_default = pruning.is_none()
+            || pruning
+                .and_then(toml::Value::as_table)
+                .and_then(|pruning| pruning.get("kind"))
+                .and_then(toml::Value::as_str)
+                == Some("regret-based");
+        recall == Some("bucket-history")
+            && solver_shape_is_valid
+            && solver_was_range_vector
+            && pruning_was_historical_default
+    } else {
+        false
+    };
+
+    let migrate_legacy = if is_v1 {
+        false
+    } else {
+        let game = document.get("game").and_then(toml::Value::as_table);
+        let abstraction = game
+            .and_then(|game| game.get("abstraction"))
+            .and_then(toml::Value::as_table);
+        let recall = abstraction
+            .and_then(|abstraction| abstraction.get("recall"))
+            .and_then(toml::Value::as_str);
+        let algorithm = document.get("algorithm").and_then(toml::Value::as_table);
+        game.and_then(|game| game.get("kind"))
+            .and_then(toml::Value::as_str)
+            == Some("preflop-multiway")
+            && matches!(recall, None | Some("full"))
+            && algorithm
+                .and_then(|algorithm| algorithm.get("schedule"))
+                .and_then(toml::Value::as_str)
+                == Some("external-sampling-mccfr")
+            && algorithm
+                .and_then(|algorithm| algorithm.get("traverser_vector"))
+                .and_then(toml::Value::as_bool)
+                == Some(true)
+            && algorithm
+                .and_then(|algorithm| algorithm.get("prune"))
+                .and_then(toml::Value::as_bool)
+                == Some(true)
+    };
+
+    if migrate_v1 {
+        let root = document
+            .as_table_mut()
+            .expect("a TOML document always has a root table");
+        let solver = root
+            .entry("solver")
+            .or_insert_with(|| toml::Value::Table(toml::map::Map::new()))
+            .as_table_mut()
+            .expect("shape checked above");
+        let mut pruning = toml::map::Map::new();
+        pruning.insert("kind".into(), toml::Value::String("none".into()));
+        solver.insert("pruning".into(), toml::Value::Table(pruning));
+    } else if migrate_legacy {
+        document
+            .get_mut("algorithm")
+            .and_then(toml::Value::as_table_mut)
+            .expect("shape checked above")
+            .insert("prune".into(), toml::Value::Boolean(false));
+    } else {
+        return Ok((Cow::Borrowed(raw), false));
+    }
+
+    Ok((Cow::Owned(toml::to_string_pretty(&document)?), true))
+}
+
+/// One experiment = one TOML file. Unknown fields are rejected so typos
+/// fail loudly instead of silently running a different experiment.
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct SolveConfig {
+    /// The config family this file belongs to; see [`SCHEMA_TOY`] and its
+    /// siblings. Absent on a config lowered from another schema, whose
+    /// declaration lives in the source file rather than the lowered form.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub schema: Option<String>,
+    pub game: GameSection,
+    #[serde(default)]
+    pub rake: RakeSection,
+    #[serde(default)]
+    pub utility: UtilitySection,
+    #[serde(default)]
+    pub algorithm: AlgorithmSection,
+    pub run: RunSection,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(deny_unknown_fields, tag = "kind", rename_all = "kebab-case")]
+// This is a config struct deserialized once per run and then destructured
+// away; the size difference between variants never sits on a hot path, so
+// boxing `tree` to appease the lint would just add indirection for nothing.
+#[allow(clippy::large_enum_variant)]
+pub enum GameSection {
+    Kuhn,
+    Leduc,
+    Postflop {
+        /// Whitespace-separated cards, e.g. "Ks 7h 2d" (flop), "...  Js"
+        /// (turn), or "... Tc" (river). Board length picks the starting
+        /// street.
+        board: String,
+        /// Out-of-position player's range (acts first postflop), e.g.
+        /// "22+,A2s+,AA:0.5".
+        oop_range: String,
+        /// In-position player's range.
+        ip_range: String,
+        pot: u32,
+        effective_stack: u32,
+        /// Smallest legal opening bet, and the smallest legal raise
+        /// increment: the big blind's role in a game that has no blinds.
+        #[serde(default = "default_min_bet")]
+        min_bet: u32,
+        #[serde(default = "default_true")]
+        iso_merging: bool,
+        /// The side that last bet or raised before this subgame began, if
+        /// any -- exists only to define the tree script's `cbet`/`donk`
+        /// variables on the starting street. Kept as the raw declared
+        /// string (`"oop"` / `"ip"` / `"none"`); `postflop_setup` resolves
+        /// it to `Option<cards::Player>` at solve time, the same way
+        /// `board`/`oop_range`/`ip_range` stay strings here and are parsed
+        /// downstream.
+        #[serde(default = "default_preflop_aggressor")]
+        preflop_aggressor: String,
+        #[serde(default)]
+        tree: TreeSection,
+    },
+    Preflop {
+        /// Per-player starting stack, in big blinds.
+        effective_stack_bb: f64,
+        /// Small blind size, in big blinds (SB = `Player::P0`).
+        #[serde(default = "default_sb_bb")]
+        sb_bb: f64,
+        /// SB's (or BB's iso-raise) first-raise raise-to sizes, in big
+        /// blinds.
+        #[serde(default = "default_open_sizes_bb")]
+        open_sizes_bb: Vec<f64>,
+        /// Reraise-to factors per raise level (see `preflop::PreflopConfig`
+        /// docs); an empty outer list means sized reraises are never offered
+        /// (all-in only).
+        #[serde(default = "default_raise_factors")]
+        raise_factors: Vec<Vec<f64>>,
+        #[serde(default = "default_preflop_max_raises")]
+        max_raises: u32,
+        #[serde(default = "default_true")]
+        include_allin: bool,
+        #[serde(default = "default_true")]
+        allow_limp: bool,
+        /// SB's range spec (e.g. "22+,A2s+"); `None` is the full range.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        sb_range: Option<String>,
+        /// BB's range spec; `None` is the full range.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        bb_range: Option<String>,
+        /// Per-player equity-realization factors for non-all-in
+        /// continuations (see `preflop::EquityShowdown`).
+        #[serde(default = "default_equity_realization")]
+        equity_realization: [f64; 2],
+        /// Disk cache path for the exact 169x169 equity table; `None`
+        /// recomputes it in memory every run.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        equity_cache: Option<PathBuf>,
+        /// Optional bucketed blueprint postflop model. Absence of the whole
+        /// section keeps today's behavior: the 169-class trunk's
+        /// continuations resolve via `preflop::EquityShowdown`, with no
+        /// postflop betting tree at all.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        postflop: Option<PostflopSection>,
+    },
+    PreflopMultiway(multiway::MultiwayConfig),
+}
+
+/// `[game.postflop]`: extends the preflop trunk with a bucketed blueprint
+/// postflop model (`abstraction::Ehs2Abstraction` + `BlueprintArtifacts`,
+/// wired through `preflop::build_blueprint_game`).
+///
+/// Bucket-count defaults (50/20/8) are deliberately coarser on later
+/// streets: the deliverable of this model is preflop ranges, so turn/river
+/// fidelity is traded for tree storage and artifact build time.
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(deny_unknown_fields, rename_all = "kebab-case")]
+pub struct PostflopSection {
+    /// Postflop model kind. Validated at solve time (not parse time) so the
+    /// error message can name the one supported value; only `"bucketed"` is
+    /// implemented.
+    pub model: String,
+    #[serde(default = "default_flop_buckets")]
+    pub flop_buckets: u32,
+    #[serde(default = "default_turn_buckets")]
+    pub turn_buckets: u32,
+    #[serde(default = "default_river_buckets")]
+    pub river_buckets: u32,
+    /// Pot-fraction bet/raise sizes on the flop, same for both players.
+    #[serde(default)]
+    pub bets_flop: Vec<f64>,
+    /// Pot-fraction bet/raise sizes on the turn, same for both players.
+    #[serde(default)]
+    pub bets_turn: Vec<f64>,
+    /// Pot-fraction bet/raise sizes on the river, same for both players.
+    #[serde(default)]
+    pub bets_river: Vec<f64>,
+    #[serde(default = "default_postflop_max_raises")]
+    pub max_raises: u32,
+    #[serde(default = "default_true")]
+    pub include_allin: bool,
+    /// Disk cache path for the EHS² bucket abstraction.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub abstraction_cache: Option<PathBuf>,
+    /// Disk cache path for the derived blueprint artifacts (T1/T2/T3
+    /// transitions plus river bucket-vs-bucket equity).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub artifacts_cache: Option<PathBuf>,
+}
+
+fn default_flop_buckets() -> u32 {
+    50
+}
+fn default_turn_buckets() -> u32 {
+    20
+}
+fn default_river_buckets() -> u32 {
+    8
+}
+fn default_postflop_max_raises() -> u32 {
+    2
+}
+
+/// `[game.tree]`: the postflop betting grammar. Every node's menu comes from
+/// a tree script (`docs/solver-config-v1.jp.md`'s `[game.tree]` chapter);
+/// what stays here is only what a script cannot express or should not have
+/// to (`max_aggressive_actions`, `allin_threshold`) or that is shorter as a
+/// blanket default than as a script statement everywhere (`include_allin`).
+/// Named and shaped after Multiway Preflop's `[game.tree]` so one vocabulary
+/// covers both engines.
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
+#[serde(deny_unknown_fields)]
+pub struct TreeSection {
+    /// Tree frontend. `"none"` (the default) is a check-down tree with no
+    /// bets anywhere and takes neither `source` nor `script`. `"script"`
+    /// reads a tree script from one of them.
+    #[serde(default = "default_tree_kind")]
+    pub kind: String,
+    /// Path to the script file, relative to the config file's directory.
+    /// Exclusive with `script`. Resolved into `script` (and cleared) as
+    /// part of parsing a config with a known path, so nothing downstream of
+    /// that ever sees a path again -- `docs/app-architecture.md` R10, and
+    /// this contract's "正規化はインライン化" rule.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+    /// The script's own body. Exclusive with `source`; this is the only
+    /// form an effective config carries.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub script: Option<String>,
+    /// Always offer the all-in target, on every street, before any rule
+    /// runs.
+    #[serde(default)]
+    pub include_allin: bool,
+    /// Targets at or above this fraction of the all-in target collapse into
+    /// it, on every street. Finite, in `(0.0, 1.0]`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub allin_threshold: Option<f64>,
+    /// Bets plus raises allowed, per street -- a structural limit a script
+    /// cannot express (memory preflight needs it before the tree is built).
+    #[serde(default)]
+    pub max_aggressive_actions: MaxAggressiveActionsSection,
+    /// Overrides the script's own `param` defaults. Untouched by
+    /// normalization: this is the variable schema a GUI edits, and it must
+    /// survive alongside the (possibly templated) script body.
+    #[serde(default)]
+    pub params: BTreeMap<String, toml::Value>,
+}
+
+fn default_tree_kind() -> String {
+    "none".to_string()
+}
+
+/// `[game.tree.max_aggressive_actions]`: the bets-plus-raises cap per
+/// street, defaulting to 2 on all three the way `StreetTree::default` always
+/// has.
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct MaxAggressiveActionsSection {
+    #[serde(default = "default_max_aggressive_actions")]
+    pub flop: u32,
+    #[serde(default = "default_max_aggressive_actions")]
+    pub turn: u32,
+    #[serde(default = "default_max_aggressive_actions")]
+    pub river: u32,
+}
+
+impl Default for MaxAggressiveActionsSection {
+    fn default() -> Self {
+        MaxAggressiveActionsSection {
+            flop: default_max_aggressive_actions(),
+            turn: default_max_aggressive_actions(),
+            river: default_max_aggressive_actions(),
+        }
+    }
+}
+
+fn default_max_aggressive_actions() -> u32 {
+    2
+}
+
+impl TreeSection {
+    /// Resolves `source` (a path, relative to `base_dir`) into `script` (the
+    /// file's own text) and clears `source`, so nothing downstream of this
+    /// call ever sees a path again. A no-op when `source` is absent (`kind =
+    /// "none"`, or a `kind = "script"` config that already carries `script`
+    /// directly).
+    pub fn resolve_source_at(&mut self, base_dir: &std::path::Path) -> anyhow::Result<()> {
+        let Some(source) = self.source.take() else {
+            return Ok(());
+        };
+        let path = base_dir.join(&source);
+        let text = std::fs::read_to_string(&path).map_err(|error| {
+            anyhow::anyhow!("SLV004: reading tree script {}: {error}", path.display())
+        })?;
+        self.script = Some(text);
+        Ok(())
+    }
+
+    /// Compiles this tree's script against `[game.tree.params]`'s
+    /// overrides. `None` for `kind = "none"`: no script to compile, and
+    /// therefore no rules on any street. Assumes `source` (if any) has
+    /// already been resolved into `script` -- see [`Self::resolve_source_at`].
+    pub fn compiled_script(&self) -> anyhow::Result<Option<Script<PostflopVar>>> {
+        match self.kind.as_str() {
+            "none" => Ok(None),
+            "script" => {
+                let text = self.script.as_deref().ok_or_else(|| {
+                    anyhow::anyhow!(
+                        "[game.tree] kind = \"script\" has no script body; source was not \
+                         resolved before this config reached the tree builder"
+                    )
+                })?;
+                let overrides = param_overrides(&self.params)?;
+                Ok(Some(Script::compile(text, &overrides, &POSTFLOP)?))
+            }
+            other => anyhow::bail!("unknown [game.tree] kind {other:?}"),
+        }
+    }
+
+    /// Lowers the TOML surface onto the builder's per-street tree-script
+    /// rules: compiles the script once, then hands each street
+    /// [`StreetTree::from_script`] its own slice of the flat rule list, in
+    /// source order.
+    pub fn lower(&self) -> anyhow::Result<PerStreet<StreetTree>> {
+        let rules = self
+            .compiled_script()?
+            .map(|script| script.rules)
+            .unwrap_or_default();
+        let caps = self.max_aggressive_actions;
+        Ok(PerStreet {
+            flop: StreetTree::from_script(
+                Street::Flop,
+                &rules,
+                caps.flop,
+                self.include_allin,
+                self.allin_threshold,
+            ),
+            turn: StreetTree::from_script(
+                Street::Turn,
+                &rules,
+                caps.turn,
+                self.include_allin,
+                self.allin_threshold,
+            ),
+            river: StreetTree::from_script(
+                Street::River,
+                &rules,
+                caps.river,
+                self.include_allin,
+                self.allin_threshold,
+            ),
+        })
+    }
+}
+
+/// Converts `[game.tree.params]`'s TOML values into the single-token strings
+/// `cards::script::Script::compile`'s `overrides` expect -- the same
+/// scalar-only conversion Multiway Preflop's `.mwtree` `params` table uses
+/// (`crate::multiway_v1::lower_tree_script` reuses this directly).
+pub(crate) fn param_overrides(
+    params: &BTreeMap<String, toml::Value>,
+) -> anyhow::Result<BTreeMap<String, String>> {
+    params
+        .iter()
+        .map(|(name, value)| {
+            let text = match value {
+                toml::Value::String(value) => value.clone(),
+                toml::Value::Integer(value) => value.to_string(),
+                toml::Value::Float(value) if value.is_finite() => value.to_string(),
+                toml::Value::Boolean(value) => value.to_string(),
+                _ => anyhow::bail!(
+                    "[game.tree.params] {name:?} must be a scalar (string, number, or bool)"
+                ),
+            };
+            Ok((name.clone(), text))
+        })
+        .collect()
+}
+
+fn default_min_bet() -> u32 {
+    1
+}
+
+fn default_preflop_aggressor() -> String {
+    "none".to_string()
+}
+
+fn default_rake_when() -> String {
+    "flop_dealt".to_string()
+}
+
+/// One chip. Multiway Preflop lowers its own fixed `.001 BB` grid here
+/// instead, because its chip amounts are big blinds.
+fn default_rounding_unit() -> f64 {
+    1.0
+}
+
+#[derive(Deserialize, Serialize, Debug, Default)]
+#[serde(deny_unknown_fields, tag = "kind", rename_all = "kebab-case")]
+pub enum RakeSection {
+    #[default]
+    None,
+    PercentCap {
+        rate: f64,
+        cap: f64,
+        #[serde(default)]
+        no_flop_no_drop: bool,
+    },
+    /// Condition-based rake, shared verbatim with Multiway Preflop's
+    /// `[economics.rake]`. `cap` and `rounding_unit` are in the family's own
+    /// chip unit: chips for postflop, big blinds for a lowered multiway
+    /// config.
+    Generic {
+        rate: f64,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        cap: Option<f64>,
+        #[serde(default = "default_rake_when")]
+        when: String,
+        #[serde(default)]
+        allocation: multiway::RakeAllocation,
+        #[serde(default)]
+        rounding: multiway::RakeRounding,
+        #[serde(default = "default_rounding_unit")]
+        rounding_unit: f64,
+    },
+    GgPreflop {
+        rate: f64,
+        cap: f64,
+        exempt_pot: u32,
+    },
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct OutsidePlayerSection {
+    pub name: String,
+    pub stack_bb: f64,
+}
+
+#[derive(Deserialize, Serialize, Debug, Default)]
+#[serde(deny_unknown_fields, tag = "kind", rename_all = "kebab-case")]
+pub enum UtilitySection {
+    #[default]
+    ChipEv,
+    Icm {
+        payouts: [f64; 2],
+    },
+    TournamentIcm {
+        #[serde(default)]
+        outside_field: Vec<OutsidePlayerSection>,
+        payouts: Vec<f64>,
+        #[serde(default = "default_icm_samples")]
+        samples: u64,
+        #[serde(default)]
+        seed: u64,
+    },
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(deny_unknown_fields, tag = "schedule", rename_all = "kebab-case")]
+pub enum AlgorithmSection {
+    Vanilla,
+    CfrPlus,
+    Dcfr {
+        #[serde(default = "default_alpha")]
+        alpha: f64,
+        #[serde(default)]
+        beta: f64,
+        #[serde(default = "default_gamma")]
+        gamma: f64,
+        #[serde(default = "default_true")]
+        pow4_reset: bool,
+    },
+    LinearCfr,
+    HsDcfr {
+        #[serde(default = "default_gamma0")]
+        gamma0: f64,
+    },
+    ExternalSamplingMccfr {
+        #[serde(default)]
+        seed: u64,
+        #[serde(default = "default_exploration_epsilon")]
+        exploration_epsilon: f64,
+        #[serde(default = "default_discount_every")]
+        discount_every: u64,
+        #[serde(default = "default_discount_until")]
+        discount_until: u64,
+        /// Enables "vector-traverser" external sampling (see
+        /// `multiway::solver::SolverConfig::traverser_vector`): one
+        /// traversal updates every feasible hole combo of the sampled
+        /// traverser seat at once, instead of only the one combo the deal
+        /// sampler dealt it. Street recall uses the dense vector worker;
+        /// full recall uses weighted sparse scalar traversals. `false` (the
+        /// default) is the original algorithm, byte-identical to before this
+        /// field existed.
+        #[serde(default, skip_serializing_if = "is_false")]
+        traverser_vector: bool,
+        /// Enables Pluribus-style regret-based pruning (see
+        /// `multiway::solver::SolverConfig::prune`): in vector-traverser
+        /// mode with current-street recall, zero-probability actions whose
+        /// regret sits far below `prune_threshold` are skipped (with
+        /// probability `prune_skip_probability`) rather than descended into.
+        /// `false` (the default) is the original algorithm, byte-identical to
+        /// before this field existed. Requires `traverser_vector = true` and
+        /// current-street recall.
+        #[serde(default, skip_serializing_if = "is_false")]
+        prune: bool,
+        /// Regret threshold below which a zero-probability action becomes
+        /// prunable; must be finite and strictly negative. `None` (the
+        /// default) derives it from the game's stakes at solve time when
+        /// `prune` is enabled; ignored otherwise. See
+        /// `crate::session::build_multiway_session` for the derivation.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        prune_threshold: Option<f64>,
+        /// Probability that a prunable action is actually skipped on a
+        /// given traversal (see
+        /// `multiway::solver::SolverConfig::prune_skip_probability`). Omitted
+        /// from serialized output at its default (the GUI never exposes this
+        /// knob, so its exported configs always hit this default).
+        #[serde(
+            default = "default_prune_skip_probability",
+            skip_serializing_if = "is_default_prune_skip_probability"
+        )]
+        prune_skip_probability: f64,
+    },
+}
+
+impl Default for AlgorithmSection {
+    fn default() -> Self {
+        AlgorithmSection::Dcfr {
+            alpha: default_alpha(),
+            beta: 0.0,
+            gamma: default_gamma(),
+            pow4_reset: true,
+        }
+    }
+}
+
+fn default_alpha() -> f64 {
+    1.5
+}
+fn default_gamma() -> f64 {
+    3.0
+}
+fn default_exploration_epsilon() -> f64 {
+    0.06
+}
+fn default_discount_every() -> u64 {
+    100_000
+}
+fn default_discount_until() -> u64 {
+    10_000_000
+}
+fn default_icm_samples() -> u64 {
+    100_000
+}
+fn default_prune_skip_probability() -> f64 {
+    multiway::solver::DEFAULT_PRUNE_SKIP_PROBABILITY
+}
+fn is_default_prune_skip_probability(value: &f64) -> bool {
+    *value == default_prune_skip_probability()
+}
+/// `pub(crate)` (rather than private) so `bench` can build an `HsDcfr`
+/// section with the same default `gamma0` the config schema would use.
+pub(crate) fn default_gamma0() -> f64 {
+    30.0
+}
+fn default_true() -> bool {
+    true
+}
+
+fn is_false(value: &bool) -> bool {
+    !*value
+}
+
+fn default_sb_bb() -> f64 {
+    0.5
+}
+fn default_open_sizes_bb() -> Vec<f64> {
+    vec![2.5]
+}
+fn default_raise_factors() -> Vec<Vec<f64>> {
+    vec![vec![3.0]]
+}
+fn default_preflop_max_raises() -> u32 {
+    4
+}
+fn default_equity_realization() -> [f64; 2] {
+    [1.0, 1.0]
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct RunSection {
+    /// HU iteration budget. Multiway configs may omit this and set
+    /// `sweeps`; one sweep traverses once for every table seat.
+    #[serde(default)]
+    pub iterations: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sweeps: Option<u64>,
+    /// Multiway root seed; overrides the algorithm seed when present.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub seed: Option<u64>,
+    /// Exploitability check cadence, in iterations.
+    #[serde(default = "default_check_every")]
+    pub check_every: u64,
+    /// Cumulative solve-time budget in seconds, honoured by the heads-up
+    /// families at `check_every` boundaries. Multiway Preflop reads its own
+    /// `run.max_time` straight from the source text, so this stays `None`
+    /// on a lowered multiway config.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_time_secs: Option<u64>,
+    /// Storage backend for regrets/strategy sums. `f32` is the plain
+    /// backend; `i16` is the quantized backend (see `engine::I16Storage`),
+    /// trading precision for ~4x less memory on large postflop trees.
+    #[serde(default)]
+    pub storage: StorageKind,
+    /// Stop once NashConv (sum of per-player exploitabilities, in chips per
+    /// deal) drops below this.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub target_nash_conv: Option<f64>,
+    /// Worker count for deterministic parallel solve batches. Multiway uses
+    /// one local traversal delta per seat and merges in sample-id order;
+    /// defaults to rayon's available worker count when unset.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub threads: Option<usize>,
+    /// Overrides `ParConfig::chance_depth` (postflop only; default 2).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub par_chance_depth: Option<u32>,
+    /// Overrides `ParConfig::min_children` (postflop only; default 12).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub par_min_children: Option<usize>,
+    /// Hard cap for lazily visited multiway policy storage.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_memory_bytes: Option<u64>,
+    /// Multiway checkpoint cadence in completed sweeps.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub checkpoint_every: Option<u64>,
+    /// Held-out worlds used for multiway profile evaluation.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub evaluation_samples: Option<u64>,
+    /// Evaluation cadence in completed multiway sweeps.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub evaluation_cadence: Option<u64>,
+    /// Complete sweeps run per parallel drive iteration against the same
+    /// strategy snapshot (see `multiway::solver::SolverConfig::sweep_batch`).
+    /// `None` (the default) is `1`, bit-identical to a solver built before
+    /// this knob existed. Values above `1` trade slightly staler
+    /// within-batch updates for restored parallel efficiency on tables whose
+    /// per-seat traversal cost is imbalanced.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sweep_batch: Option<u64>,
+    /// Convergence-based stop threshold, in the run's own utility unit (bb
+    /// for `[utility] kind = "chip-ev"`; tournament-utility units, compared
+    /// as-is, for `kind = "tournament-icm"`). When set, `run.sweeps` becomes
+    /// a *safety cap* rather than a target: the drive loop additionally
+    /// evaluates the held-out average profile every
+    /// `stop_eval_period_secs` of wall time and stops early, with completion
+    /// status `"converged"`, once the maximum per-seat
+    /// `deviation_gain_lower_bound` upper confidence bound stays below this
+    /// threshold for `stop_confirmations` consecutive evaluations in a row.
+    /// `None` (the default) never runs this check, so `run.sweeps` behaves
+    /// exactly as before this field existed.
+    ///
+    /// Determinism note: this check fires on a *wall-clock* period, so the
+    /// exact sweep count a converged run stops at is machine-dependent (a
+    /// faster machine fits more sweeps into the same `stop_eval_period_secs`
+    /// window before the first check, and every check thereafter). The
+    /// stopped sweep count is always recorded in the run's artifacts. A
+    /// bit-reproducible run must use a fixed `run.sweeps` with
+    /// `stop_dev_gain` left unset.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_dev_gain: Option<f64>,
+    /// Consecutive passing stop-rule evaluations required before stopping.
+    /// Defaults to `2` when `stop_dev_gain` is set; ignored otherwise. Must
+    /// be positive when supplied.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_confirmations: Option<u32>,
+    /// Wall-clock period, in seconds, between stop-rule evaluations.
+    /// Defaults to `30.0` when `stop_dev_gain` is set; ignored otherwise.
+    /// Must be positive when supplied.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_eval_period_secs: Option<f64>,
+    /// Number of best-response training traversals per seat, run against the
+    /// frozen current average profile immediately before each stop-rule
+    /// evaluation (never before the ordinary `evaluation_cadence` rows).
+    /// `Some(0)` disables the burst (the stop rule falls back to the plain
+    /// regret-greedy heuristic, exactly as before this field existed).
+    /// Defaults to `2_000` when `stop_dev_gain` is set; ignored otherwise.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_br_traversals: Option<u64>,
+}
+
+fn default_check_every() -> u64 {
+    25
+}
+
+/// Which `engine::Storage` backend a solve uses. Chosen once from the
+/// config (`[run] storage = "f32" | "i16"`) and threaded through as a
+/// generic parameter, so the solve path never pays for a `dyn` indirection
+/// on the hot per-hand loop just to support both backends.
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[serde(rename_all = "kebab-case")]
+pub enum StorageKind {
+    #[default]
+    F32,
+    I16,
+}
+
+/// Rewrites a `[game.tree] script` value from serde's default
+/// `"""..."""` multi-line basic string into the TOML literal string
+/// `'''...'''` the contract writes -- see `docs/solver-config-v1.jp.md`'s
+/// "正規化 — script は展開せずインライン化する" section. A script body is bare
+/// tokens, comments, and the occasional quoted text literal
+/// (`high_card in ["A", "K"]`), but never a backslash, so the literal form
+/// never needs to escape anything; the one thing it cannot represent is the
+/// delimiter sequence `'''` itself; appearing inside the body (almost
+/// certainly inside a comment) is an explicit error rather than something to
+/// silently work around.
+///
+/// Shared by both families: postflop and Multiway Preflop write their
+/// script to the same `[game.tree] script` key and want the same literal
+/// form, so `code` is the only thing that differs (`SLV004` / `MWP004`).
+/// A no-op (including for the toy and preflop-hu families, and for a
+/// multiway config still on `kind = "standard"`) when the parsed document
+/// has no `[game.tree] script` string to rewrite.
+pub(crate) fn literalize_tree_script(code: &str, effective_toml: &str) -> Result<String> {
+    let mut document = toml_edit::DocumentMut::from_str(effective_toml)
+        .context("re-parsing the effective config as a TOML document")?;
+    // Checked read-only first: `Item::get_mut` auto-vivifies a missing key
+    // as `Item::None` (the machinery that lets `doc["a"]["b"] = v` create
+    // tables on the fly), so chaining `get_mut` alone would "find" a
+    // `[game.tree] script` on every config, toy and preflop-hu included.
+    // `Item::get` has no such side effect.
+    let has_script = document
+        .get("game")
+        .and_then(|game| game.get("tree"))
+        .and_then(|tree| tree.get("script"))
+        .is_some();
+    if !has_script {
+        return Ok(document.to_string());
+    }
+    let script_item = document
+        .get_mut("game")
+        .and_then(|game| game.get_mut("tree"))
+        .and_then(|tree| tree.get_mut("script"))
+        .expect("presence just checked above");
+    let text = script_item
+        .as_str()
+        .ok_or_else(|| anyhow!("[game.tree] script did not serialize as a string"))?
+        .to_string();
+    if text.contains("'''") {
+        bail!(
+            "{code}: [game.tree] script contains \"'''\", which cannot be written as a TOML \
+             literal string; rewrite the script to avoid that exact sequence"
+        );
+    }
+    let literal = format!("'''\n{text}'''");
+    *script_item = toml_edit::Item::Value(
+        toml_edit::Value::from_str(&literal).context("building the literal script value")?,
+    );
+    Ok(document.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// `SolveConfig` (and all its section types) must round-trip through
+    /// `toml::to_string`, so a UI can load a config, edit it, and export it
+    /// as a preset using the exact same schema the CLI parses.
+    #[test]
+    fn multiway_config_round_trips_through_toml_serialization() {
+        let raw = crate::test_fixtures::LOWERED_9MAX_ICM;
+        let original: SolveConfig = toml::from_str(raw).expect("parse original multiway config");
+        let serialized = toml::to_string(&original).expect("serialize SolveConfig back to TOML");
+        let reparsed: SolveConfig =
+            toml::from_str(&serialized).expect("re-parse the serialized config");
+
+        let SolveConfig {
+            game,
+            rake,
+            utility,
+            run,
+            ..
+        } = reparsed;
+        let GameSection::PreflopMultiway(game_config) = game else {
+            panic!("expected GameSection::PreflopMultiway after round-tripping");
+        };
+        let utility = crate::session::convert_utility(utility)
+            .expect("re-parsed utility section converts cleanly");
+        let rake = crate::session::convert_rake(rake);
+        game_config
+            .validate_economics(&utility, &rake)
+            .expect("re-parsed multiway config must still validate");
+        assert!(run.sweeps.is_some() || run.iterations > 0);
+    }
+
+    #[test]
+    fn traverser_vector_defaults_to_false_and_is_omitted_when_unset() {
+        let raw = crate::test_fixtures::LOWERED_9MAX_ICM;
+        let mut config: SolveConfig = toml::from_str(raw).expect("parse example multiway config");
+        let AlgorithmSection::ExternalSamplingMccfr {
+            traverser_vector, ..
+        } = &config.algorithm
+        else {
+            panic!("expected schedule = \"external-sampling-mccfr\"");
+        };
+        assert!(!traverser_vector);
+        let serialized = toml::to_string(&config).unwrap();
+        assert!(!serialized.contains("traverser_vector"));
+
+        let AlgorithmSection::ExternalSamplingMccfr {
+            traverser_vector, ..
+        } = &mut config.algorithm
+        else {
+            unreachable!("checked above");
+        };
+        *traverser_vector = true;
+        let serialized = toml::to_string(&config).unwrap();
+        assert!(serialized.contains("traverser_vector = true"));
+        let reparsed: SolveConfig =
+            toml::from_str(&serialized).expect("re-parse the serialized config");
+        let AlgorithmSection::ExternalSamplingMccfr {
+            traverser_vector, ..
+        } = reparsed.algorithm
+        else {
+            panic!("expected schedule = \"external-sampling-mccfr\"");
+        };
+        assert!(traverser_vector);
+    }
+
+    #[test]
+    fn preflop_config_minimal_applies_defaults() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+
+[run]
+iterations = 10
+"#;
+        let config: SolveConfig = toml::from_str(raw).expect("parse minimal preflop config");
+        match config.game {
+            GameSection::Preflop {
+                effective_stack_bb,
+                sb_bb,
+                open_sizes_bb,
+                raise_factors,
+                max_raises,
+                include_allin,
+                allow_limp,
+                sb_range,
+                bb_range,
+                equity_realization,
+                equity_cache,
+                postflop,
+            } => {
+                assert_eq!(effective_stack_bb, 100.0);
+                assert_eq!(sb_bb, 0.5);
+                assert_eq!(open_sizes_bb, vec![2.5]);
+                assert_eq!(raise_factors, vec![vec![3.0]]);
+                assert_eq!(max_raises, 4);
+                assert!(include_allin);
+                assert!(allow_limp);
+                assert_eq!(sb_range, None);
+                assert_eq!(bb_range, None);
+                assert_eq!(equity_realization, [1.0, 1.0]);
+                assert_eq!(equity_cache, None);
+                assert!(postflop.is_none());
+            }
+            other => panic!("expected GameSection::Preflop, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn preflop_config_fully_specified_overrides_every_default() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 10.0
+sb_bb = 0.5
+open_sizes_bb = []
+raise_factors = []
+max_raises = 1
+include_allin = true
+allow_limp = false
+sb_range = "22+,A2s+"
+bb_range = "QQ+"
+equity_realization = [0.9, 1.1]
+equity_cache = ".cache/preflop_equity.bin"
+
+[run]
+iterations = 10
+"#;
+        let config: SolveConfig =
+            toml::from_str(raw).expect("parse fully-specified preflop config");
+        match config.game {
+            GameSection::Preflop {
+                effective_stack_bb,
+                sb_bb,
+                open_sizes_bb,
+                raise_factors,
+                max_raises,
+                include_allin,
+                allow_limp,
+                sb_range,
+                bb_range,
+                equity_realization,
+                equity_cache,
+                postflop,
+            } => {
+                assert_eq!(effective_stack_bb, 10.0);
+                assert_eq!(sb_bb, 0.5);
+                assert_eq!(open_sizes_bb, Vec::<f64>::new());
+                assert_eq!(raise_factors, Vec::<Vec<f64>>::new());
+                assert_eq!(max_raises, 1);
+                assert!(include_allin);
+                assert!(!allow_limp);
+                assert_eq!(sb_range.as_deref(), Some("22+,A2s+"));
+                assert_eq!(bb_range.as_deref(), Some("QQ+"));
+                assert_eq!(equity_realization, [0.9, 1.1]);
+                assert_eq!(
+                    equity_cache,
+                    Some(PathBuf::from(".cache/preflop_equity.bin"))
+                );
+                assert!(postflop.is_none());
+            }
+            other => panic!("expected GameSection::Preflop, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn preflop_config_rejects_unknown_field() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+typo_field = 1
+
+[run]
+iterations = 10
+"#;
+        let result: Result<SolveConfig, _> = toml::from_str(raw);
+        assert!(
+            result.is_err(),
+            "an unknown field in a preflop config must fail to parse"
+        );
+    }
+
+    // --- [game.postflop] (bucketed blueprint model) -------------------------
+
+    #[test]
+    fn postflop_section_absent_by_default() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+
+[run]
+iterations = 10
+"#;
+        let config: SolveConfig =
+            toml::from_str(raw).expect("parse preflop config without [game.postflop]");
+        match config.game {
+            GameSection::Preflop { postflop, .. } => {
+                assert!(postflop.is_none());
+            }
+            other => panic!("expected GameSection::Preflop, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn postflop_section_parses_fully_specified() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+
+[game.postflop]
+model = "bucketed"
+flop-buckets = 40
+turn-buckets = 15
+river-buckets = 6
+bets-flop = [0.5]
+bets-turn = [0.75]
+bets-river = [0.75, 1.0]
+max-raises = 3
+include-allin = false
+abstraction-cache = ".cache/ehs2.bin"
+artifacts-cache = ".cache/blueprint.bin"
+
+[run]
+iterations = 10
+"#;
+        let config: SolveConfig =
+            toml::from_str(raw).expect("parse fully-specified [game.postflop]");
+        match config.game {
+            GameSection::Preflop { postflop, .. } => {
+                let section = postflop.expect("postflop section must be present");
+                assert_eq!(section.model, "bucketed");
+                assert_eq!(section.flop_buckets, 40);
+                assert_eq!(section.turn_buckets, 15);
+                assert_eq!(section.river_buckets, 6);
+                assert_eq!(section.bets_flop, vec![0.5]);
+                assert_eq!(section.bets_turn, vec![0.75]);
+                assert_eq!(section.bets_river, vec![0.75, 1.0]);
+                assert_eq!(section.max_raises, 3);
+                assert!(!section.include_allin);
+                assert_eq!(
+                    section.abstraction_cache,
+                    Some(PathBuf::from(".cache/ehs2.bin"))
+                );
+                assert_eq!(
+                    section.artifacts_cache,
+                    Some(PathBuf::from(".cache/blueprint.bin"))
+                );
+            }
+            other => panic!("expected GameSection::Preflop, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn postflop_section_defaults() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+
+[game.postflop]
+model = "bucketed"
+
+[run]
+iterations = 10
+"#;
+        let config: SolveConfig = toml::from_str(raw).expect("parse minimal [game.postflop]");
+        match config.game {
+            GameSection::Preflop { postflop, .. } => {
+                let section = postflop.expect("postflop section must be present");
+                assert_eq!(section.model, "bucketed");
+                assert_eq!(section.flop_buckets, 50);
+                assert_eq!(section.turn_buckets, 20);
+                assert_eq!(section.river_buckets, 8);
+                assert!(section.bets_flop.is_empty());
+                assert!(section.bets_turn.is_empty());
+                assert!(section.bets_river.is_empty());
+                assert_eq!(section.max_raises, 2);
+                assert!(section.include_allin);
+                assert_eq!(section.abstraction_cache, None);
+                assert_eq!(section.artifacts_cache, None);
+            }
+            other => panic!("expected GameSection::Preflop, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn postflop_section_rejects_unknown_field() {
+        let raw = r#"
+[game]
+kind = "preflop"
+effective_stack_bb = 100.0
+
+[game.postflop]
+model = "bucketed"
+typo_field = 1
+
+[run]
+iterations = 10
+"#;
+        let result: Result<SolveConfig, _> = toml::from_str(raw);
+        assert!(
+            result.is_err(),
+            "an unknown field in [game.postflop] must fail to parse"
+        );
+    }
+
+    fn parse_tree(toml: &str) -> TreeSection {
+        #[derive(Deserialize)]
+        #[serde(deny_unknown_fields)]
+        struct Wrapper {
+            tree: TreeSection,
+        }
+        toml::from_str::<Wrapper>(toml).unwrap().tree
+    }
+
+    /// `kind = "none"` (the default) is a check-down tree with no rules on
+    /// any street, and its structural defaults match the old
+    /// `StreetTree::default()` (`max_aggressive_actions = 2` on every
+    /// street, no all-in default).
+    #[test]
+    fn kind_none_is_the_default_and_lowers_to_an_empty_ruleset() {
+        let tree = parse_tree("[tree]\n");
+        assert_eq!(tree.kind, "none");
+        assert_eq!(tree.source, None);
+        assert_eq!(tree.script, None);
+        assert!(!tree.include_allin);
+        assert_eq!(tree.allin_threshold, None);
+        assert_eq!(tree.max_aggressive_actions.flop, 2);
+        assert_eq!(tree.max_aggressive_actions.turn, 2);
+        assert_eq!(tree.max_aggressive_actions.river, 2);
+
+        let streets = tree.lower().unwrap();
+        assert!(streets.flop.rules.is_empty());
+        assert!(streets.turn.rules.is_empty());
+        assert!(streets.river.rules.is_empty());
+    }
+
+    /// A `kind = "script"` tree compiles its `script` body once and hands
+    /// each street exactly the rules tagged for it, in source order.
+    #[test]
+    fn kind_script_lowers_each_streets_own_rules() {
+        let tree = parse_tree(
+            r#"
+            [tree]
+            kind = "script"
+            script = '''
+            flop { replace bet [33] }
+            turn, river { checkdown }
+            '''
+            "#,
+        );
+        let streets = tree.lower().unwrap();
+        assert_eq!(streets.flop.rules.len(), 1);
+        assert_eq!(streets.turn.rules.len(), 1);
+        assert_eq!(streets.river.rules.len(), 1);
+    }
+
+    /// `[game.tree.params]` overrides the script's own `param` defaults
+    /// without touching the script body.
+    #[test]
+    fn params_override_the_scripts_own_defaults() {
+        let tree = parse_tree(
+            r#"
+            [tree]
+            kind = "script"
+            script = '''
+            param cb = 33
+            flop { replace bet [cb] }
+            '''
+
+            [tree.params]
+            cb = 50
+            "#,
+        );
+        let script = tree.compiled_script().unwrap().unwrap();
+        assert_eq!(script.params[0].default, "50");
+    }
+
+    /// `[game.tree.max_aggressive_actions]` is per-street, defaulting to 2
+    /// on every street when the table (or a field in it) is omitted.
+    #[test]
+    fn max_aggressive_actions_defaults_to_two_per_street() {
+        let tree =
+            parse_tree("[tree]\nkind = \"none\"\n\n[tree.max_aggressive_actions]\nflop = 3\n");
+        assert_eq!(tree.max_aggressive_actions.flop, 3);
+        assert_eq!(tree.max_aggressive_actions.turn, 2);
+        assert_eq!(tree.max_aggressive_actions.river, 2);
+    }
+
+    #[test]
+    fn stop_rule_keys_round_trip_and_absent_keys_serialize_byte_identically() {
+        let raw = crate::test_fixtures::LOWERED_3MAX;
+        let baseline: SolveConfig = toml::from_str(raw).expect("parse example multiway config");
+        assert_eq!(baseline.run.stop_dev_gain, None);
+        assert_eq!(baseline.run.stop_confirmations, None);
+        assert_eq!(baseline.run.stop_eval_period_secs, None);
+        assert_eq!(baseline.run.stop_br_traversals, None);
+        let serialized = toml::to_string(&baseline).unwrap();
+        assert!(!serialized.contains("stop_dev_gain"));
+        assert!(!serialized.contains("stop_confirmations"));
+        assert!(!serialized.contains("stop_eval_period_secs"));
+        assert!(!serialized.contains("stop_br_traversals"));
+
+        // Splice the four new keys into the example's existing `[run]`
+        // table, right after its last key.
+        let anchor = "evaluation_cadence = 1\n";
+        let spliced = raw.replacen(
+            anchor,
+            &format!(
+                "{anchor}stop_dev_gain = 0.05\nstop_confirmations = 3\nstop_eval_period_secs = 5.0\nstop_br_traversals = 500\n"
+            ),
+            1,
+        );
+        assert_ne!(spliced, raw, "the splice anchor must have matched");
+
+        let config: SolveConfig = toml::from_str(&spliced).expect("parse config with stop rule");
+        assert_eq!(config.run.stop_dev_gain, Some(0.05));
+        assert_eq!(config.run.stop_confirmations, Some(3));
+        assert_eq!(config.run.stop_eval_period_secs, Some(5.0));
+        assert_eq!(config.run.stop_br_traversals, Some(500));
+
+        let reserialized = toml::to_string(&config).unwrap();
+        assert!(reserialized.contains("stop_dev_gain = 0.05"));
+        assert!(reserialized.contains("stop_confirmations = 3"));
+        assert!(reserialized.contains("stop_eval_period_secs = 5.0"));
+        assert!(reserialized.contains("stop_br_traversals = 500"));
+        let reparsed: SolveConfig = toml::from_str(&reserialized).unwrap();
+        assert_eq!(reparsed.run.stop_dev_gain, Some(0.05));
+        assert_eq!(reparsed.run.stop_confirmations, Some(3));
+        assert_eq!(reparsed.run.stop_eval_period_secs, Some(5.0));
+        assert_eq!(reparsed.run.stop_br_traversals, Some(500));
+    }
+}

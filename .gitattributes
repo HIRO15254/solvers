@@ -37,3 +37,6 @@ experiments/hu-postflop-r1/**/*.log -whitespace
 # Retain the exact adapter source used by the recorded build, including its EOF.
 experiments/hu-postflop-r1/saved-profile/audit_shared.rs.in whitespace=cr-at-eol,-blank-at-eof
 experiments/hu-postflop-r1/saved-profile/evidence-vm06-build/records/recovery/audit-tools/audit_shared.rs.in whitespace=cr-at-eol,-blank-at-eof
+# Preserve the original Cargo manifest EOF in both VM07 source snapshots.
+experiments/hu-postflop-r1/validation/vm07-complete/records/build/baseline/crates/multiway/Cargo.toml whitespace=cr-at-eol,-blank-at-eof
+experiments/hu-postflop-r1/validation/vm07-complete/records/build/current/crates/multiway/Cargo.toml whitespace=cr-at-eol,-blank-at-eof

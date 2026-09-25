@@ -1,0 +1,3155 @@
+{
+  "files": [
+    {
+      "bytes": 381769,
+      "path": "bundles/build/collector-manifest.json",
+      "sha256": "5afcfdfface202b38d2cf72d9cabc2e5c170ff6a588244c44fb472f5077de17f"
+    },
+    {
+      "bytes": 93,
+      "path": "bundles/build/collector.sha256",
+      "sha256": "1e9902386e8b12bab232546e377722b5e1de7ba83d14f2aa5cf579ebbdf8fda7"
+    },
+    {
+      "bytes": 15944,
+      "path": "bundles/checks/collector-manifest.json",
+      "sha256": "73733ca1a05f216f18405f5e3459276926e785f81a57f74dcbdd5c7f91899143"
+    },
+    {
+      "bytes": 94,
+      "path": "bundles/checks/collector.sha256",
+      "sha256": "190ac5400731b291121a2a7ce92567bfceed90df5b0bf7c3fd69808bfef06ff1"
+    },
+    {
+      "bytes": 125,
+      "path": "records/build/baseline/.cargo/config.toml",
+      "sha256": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21"
+    },
+    {
+      "bytes": 40970,
+      "path": "records/build/baseline/Cargo.lock",
+      "sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1"
+    },
+    {
+      "bytes": 1752,
+      "path": "records/build/baseline/Cargo.toml",
+      "sha256": "da9fc9f6aca8102a8b5f6449ee8fef83ec9d97d546649a154f801c19815ebe42"
+    },
+    {
+      "bytes": 300,
+      "path": "records/build/baseline/crates/abstraction/Cargo.toml",
+      "sha256": "22a4a8e067ae7edc82ee0d3adbb0493fc531badd89df0de7665e52d1588b9f60"
+    },
+    {
+      "bytes": 1740,
+      "path": "records/build/baseline/crates/abstraction/examples/build_blueprint.rs",
+      "sha256": "fccad326fa4a43cdd700815afd25655d7cb839508325331019addaa7be98f0e4"
+    },
+    {
+      "bytes": 57062,
+      "path": "records/build/baseline/crates/abstraction/src/blueprint.rs",
+      "sha256": "e7e310f344d50e7baf467acddc7bd54bdffa1206ffeb4de932972f727b63ce9a"
+    },
+    {
+      "bytes": 44483,
+      "path": "records/build/baseline/crates/abstraction/src/buckets.rs",
+      "sha256": "25c875e2c271da6c2578f6a6f034c83eb5021e895af7fc692ef076ef85f03d4b"
+    },
+    {
+      "bytes": 8243,
+      "path": "records/build/baseline/crates/abstraction/src/ehs.rs",
+      "sha256": "d4f378c9a809e15215ee8710f844cc3cbfeb541e967b70d55d057c55ab6b12d7"
+    },
+    {
+      "bytes": 2214,
+      "path": "records/build/baseline/crates/abstraction/src/lib.rs",
+      "sha256": "4ade923d95ce95b14c2a61f47d5ad1f2668f0db875c97d954370f974a420e381"
+    },
+    {
+      "bytes": 2693,
+      "path": "records/build/baseline/crates/abstraction/tests/extreme_k.rs",
+      "sha256": "c3480223cb60d6cf055d3e7a88da4e3c3bdba641ead537da78f5a5abc4af5be6"
+    },
+    {
+      "bytes": 4768,
+      "path": "records/build/baseline/crates/abstraction/tests/semantic_mapping.rs",
+      "sha256": "48ec7ac6b2def3c0324a783396f95f27436d89ba82e07de1043718c889510626"
+    },
+    {
+      "bytes": 370,
+      "path": "records/build/baseline/crates/cards/Cargo.toml",
+      "sha256": "c776279bb934cf40c4afb1d33f744da004d7d2b9bc7ffd0e0aa0a42c19ae9598"
+    },
+    {
+      "bytes": 13901,
+      "path": "records/build/baseline/crates/cards/src/board.rs",
+      "sha256": "9c688ec407ca28f22a056737734df626bdffdda30c92dca575879b6e56bdb0fa"
+    },
+    {
+      "bytes": 4422,
+      "path": "records/build/baseline/crates/cards/src/card.rs",
+      "sha256": "74eeb9bebfc2ed08783b8298754d964779c3114e0a53fd9a4cff364253ac5023"
+    },
+    {
+      "bytes": 1966,
+      "path": "records/build/baseline/crates/cards/src/eval.rs",
+      "sha256": "dfa7610718f196fc8eae95bc767af02bdadc6f20d32c648b02b7fb0f25f2afb4"
+    },
+    {
+      "bytes": 1101,
+      "path": "records/build/baseline/crates/cards/src/lib.rs",
+      "sha256": "23a55b676196703cdd248c9b8fb50a541a113c9f3cc6dc904f5a8151ca39e37f"
+    },
+    {
+      "bytes": 12197,
+      "path": "records/build/baseline/crates/cards/src/range.rs",
+      "sha256": "1ed908cfdc11908754db983eaabbe04dbbe0d405ffddf57fac9b1d18115f208b"
+    },
+    {
+      "bytes": 4127,
+      "path": "records/build/baseline/crates/cards/src/script/ast.rs",
+      "sha256": "c9012aed1c7b5c91e703f450f1afee82b2b81f1f372d303efe52509af8f2a355"
+    },
+    {
+      "bytes": 40254,
+      "path": "records/build/baseline/crates/cards/src/script/cond.rs",
+      "sha256": "49a649578fad2c3e47ad7e1ae4134cf5eef475ead2c11cd140affdf8a0e6b478"
+    },
+    {
+      "bytes": 14396,
+      "path": "records/build/baseline/crates/cards/src/script/lower.rs",
+      "sha256": "f73abd25b7f4be15aae86f749b4a2f81f45f74013034d51cbc8fc757039943a3"
+    },
+    {
+      "bytes": 1963,
+      "path": "records/build/baseline/crates/cards/src/script/mod.rs",
+      "sha256": "dcfe364cc022ac9788d2d3816ec760237bf9176e91ae520a2e4b41469d118edf"
+    },
+    {
+      "bytes": 38716,
+      "path": "records/build/baseline/crates/cards/src/script/parse.rs",
+      "sha256": "3981c7121131095f011a5d0e51933004f49f55e5beef20d60e9b4999fc13d210"
+    },
+    {
+      "bytes": 11301,
+      "path": "records/build/baseline/crates/cards/src/script/token.rs",
+      "sha256": "decbc911b73bd74d27f0493a691fa604ecb63e0b02ff8afc0a2162dbc0f64bbd"
+    },
+    {
+      "bytes": 2878,
+      "path": "records/build/baseline/crates/cards/src/set.rs",
+      "sha256": "ea987f8d7dd617fa29d452b29b8d739ad69d20e8f5da94b016135e5cc6ec576b"
+    },
+    {
+      "bytes": 19223,
+      "path": "records/build/baseline/crates/cards/src/sizing.rs",
+      "sha256": "1784b87a9d617015a5d0cbfa9f893f0f28f8725baeb64afd8102150d09aa5e05"
+    },
+    {
+      "bytes": 2621,
+      "path": "records/build/baseline/crates/cards/src/types.rs",
+      "sha256": "acec9488a59c72781764a521116c682712c0fc1ca786f1be46a70d2ce04bd7c9"
+    },
+    {
+      "bytes": 246,
+      "path": "records/build/baseline/crates/cfr-ref/Cargo.toml",
+      "sha256": "f2d20395907d6d17fa3640892289b192bebb821dbe352c1b5e34db4c352f0623"
+    },
+    {
+      "bytes": 9722,
+      "path": "records/build/baseline/crates/cfr-ref/src/games.rs",
+      "sha256": "314da3b3b7c5b6d25614b20e67481babba02e8b8e46061fa770add494d204eb1"
+    },
+    {
+      "bytes": 12206,
+      "path": "records/build/baseline/crates/cfr-ref/src/lib.rs",
+      "sha256": "14dd3f0694a1902e283038d1d6135272334e93d7c9b2a0d27d201e1713d306cb"
+    },
+    {
+      "bytes": 1748,
+      "path": "records/build/baseline/crates/cli/Cargo.toml",
+      "sha256": "140ee38ea38b9efe7c3cbd4aa95ef6d3c812f47999c970efe67b92ed9279310a"
+    },
+    {
+      "bytes": 5415,
+      "path": "records/build/baseline/crates/cli/examples/hu_saved_profile_audit.md",
+      "sha256": "79ea214f2d7d249caf2c3d4212751dc9ea19c677da184cb1a9cfaaae3dde7c68"
+    },
+    {
+      "bytes": 734,
+      "path": "records/build/baseline/crates/cli/examples/hu_saved_profile_audit.rs",
+      "sha256": "23ffbfa69846696c0e025bc8cbd5b2b68c3add006291827ba7dca3203ebbe317"
+    },
+    {
+      "bytes": 9733,
+      "path": "records/build/baseline/crates/cli/examples/mw_average_sampling_research.md",
+      "sha256": "0ab6f8523127fb481d111574ab6203c70b4978b6781217f9f77b27b6f3f0fc88"
+    },
+    {
+      "bytes": 19773,
+      "path": "records/build/baseline/crates/cli/examples/mw_average_sampling_research.rs",
+      "sha256": "9628d96f32c65272acf135b8d7f0aa42f398797b3e1562505f01791630ab92a4"
+    },
+    {
+      "bytes": 30537,
+      "path": "records/build/baseline/crates/cli/examples/mw_checkpoint_audit.md",
+      "sha256": "8db6b46e8f822ea1507fa4e6f9413201c6a04ddf040045811a733c9f8ff22d5f"
+    },
+    {
+      "bytes": 124219,
+      "path": "records/build/baseline/crates/cli/examples/mw_checkpoint_audit.rs",
+      "sha256": "f285e8566ce43a95cf3b5f646d1beaf7440b039160d13959bc0f622b84342527"
+    },
+    {
+      "bytes": 2360,
+      "path": "records/build/baseline/crates/cli/examples/mw_checkpoint_export_bench.md",
+      "sha256": "acaaa10b23e49f65aba1af934b328ce18974e1e7f61e425df5c0883c08171a4c"
+    },
+    {
+      "bytes": 12591,
+      "path": "records/build/baseline/crates/cli/examples/mw_checkpoint_export_bench.rs",
+      "sha256": "2107617d89dd50da9f55bcf0f66156cacf5c2a08ecdac37883ddca5bd3f14d1c"
+    },
+    {
+      "bytes": 1460,
+      "path": "records/build/baseline/crates/cli/examples/mw_checkpoint_load_bench.md",
+      "sha256": "06f58fc64a97c6386557d97b13d43490dffe9921291de995393d652204a2c667"
+    },
+    {
+      "bytes": 1556,
+      "path": "records/build/baseline/crates/cli/examples/mw_checkpoint_load_bench.rs",
+      "sha256": "b16dbc5c63cb4899587ad15b16f0d570cec07f1178ee96be61e1c1ca7e039fd3"
+    },
+    {
+      "bytes": 2091,
+      "path": "records/build/baseline/crates/cli/examples/mw_checkpoint_write_bench.md",
+      "sha256": "332ff71abdbcc31ae358aab79257b2210b223e4173296063ed5f8fee2d8eba86"
+    },
+    {
+      "bytes": 5741,
+      "path": "records/build/baseline/crates/cli/examples/mw_checkpoint_write_bench.rs",
+      "sha256": "d5e158046aaff5b5c92beb66e32c06faf3d8b02ca9174e4361211422283c1a17"
+    },
+    {
+      "bytes": 14866,
+      "path": "records/build/baseline/crates/cli/examples/mw_draw_abstraction_research.rs",
+      "sha256": "992be86ebddfcbabd930c0202a88c7e59192d538a5e67d432cc53198486ca9a0"
+    },
+    {
+      "bytes": 2083,
+      "path": "records/build/baseline/crates/cli/examples/mw_strategy_drift_bench.md",
+      "sha256": "cc2db6951581b9c6f1c8766aa2dbbc4362008712ae45c6661dcf8948c9e600a7"
+    },
+    {
+      "bytes": 7552,
+      "path": "records/build/baseline/crates/cli/examples/mw_strategy_drift_bench.rs",
+      "sha256": "dbf516c14521532677a73d1b338985ad5eff8f3294de32390424ecdc44f786d0"
+    },
+    {
+      "bytes": 1807,
+      "path": "records/build/baseline/crates/cli/examples/mw_tree_census.md",
+      "sha256": "bcdb1dccc269efa33cb95b510fcff142f2a8b9b646f1501073c07b043e3856df"
+    },
+    {
+      "bytes": 15302,
+      "path": "records/build/baseline/crates/cli/examples/mw_tree_census.rs",
+      "sha256": "42284106884060255f39354d7e2e6fdc1f66d6bd2b6252187a594d8acd97a4e5"
+    },
+    {
+      "bytes": 5976,
+      "path": "records/build/baseline/crates/cli/examples/mw_tree_initialization_bench.md",
+      "sha256": "42c492559989a6458a1d27a540a8e598462b64fa24ad018f83479166232690b6"
+    },
+    {
+      "bytes": 20097,
+      "path": "records/build/baseline/crates/cli/examples/mw_tree_initialization_bench.rs",
+      "sha256": "b05d3991a7d9f83c96ef2868377832b312d34d7bd8a4caf37975e65c4b93fde8"
+    },
+    {
+      "bytes": 5439,
+      "path": "records/build/baseline/crates/cli/src/cache.rs",
+      "sha256": "4e3e4168cb92dfa7c9f22cd1ce59d93f485c0ba0b23da1c1451002092d3e4698"
+    },
+    {
+      "bytes": 51599,
+      "path": "records/build/baseline/crates/cli/src/config.rs",
+      "sha256": "559ace7c307dab76725dd22ebff8a68f7f3ee8f98c2373228d02b711c3409ab6"
+    },
+    {
+      "bytes": 13110,
+      "path": "records/build/baseline/crates/cli/src/config_new.rs",
+      "sha256": "3f87773ca6bbd51728495e1515508b4917ff3629bfe0adcf7cf7eaeb917df073"
+    },
+    {
+      "bytes": 22727,
+      "path": "records/build/baseline/crates/cli/src/economics.rs",
+      "sha256": "8fa7793a12d22841a09eea10e82c808357212aa5adf1909249e19be648be7af2"
+    },
+    {
+      "bytes": 27453,
+      "path": "records/build/baseline/crates/cli/src/inspect.rs",
+      "sha256": "9eeb049d36c4ce38bc1d758ecc439eef6c01480dc61d0d1aae4fdd70fb9a03c7"
+    },
+    {
+      "bytes": 20003,
+      "path": "records/build/baseline/crates/cli/src/lib.rs",
+      "sha256": "b6bd79a48318989a9ef017a4c68764810705391d6a0ad4d031d7a6f987418d56"
+    },
+    {
+      "bytes": 684,
+      "path": "records/build/baseline/crates/cli/src/main.rs",
+      "sha256": "55e1f3981791253683cf2b0713fd22d89244c12f282d154f8da8dd080ad42923"
+    },
+    {
+      "bytes": 48244,
+      "path": "records/build/baseline/crates/cli/src/multiway_artifact.rs",
+      "sha256": "bc42304212b68e111959278f8bfd1abd0230146515b4ac7af3d4a355e9755cb4"
+    },
+    {
+      "bytes": 54823,
+      "path": "records/build/baseline/crates/cli/src/multiway_solve.rs",
+      "sha256": "37ccbe1b59458d5587c73c448f6d9df661779c5417102ef2c4963d55ef3ccd04"
+    },
+    {
+      "bytes": 92427,
+      "path": "records/build/baseline/crates/cli/src/multiway_v1.rs",
+      "sha256": "1e8e2758565bf69cbda1b0755538b02d1109f71266e13c257dcbfcb7b9292edb"
+    },
+    {
+      "bytes": 24998,
+      "path": "records/build/baseline/crates/cli/src/postflop_artifact.rs",
+      "sha256": "c386efbff2667d8ca8dfb9ccfd03f8d42487370fadf5461255323da6b824cd7e"
+    },
+    {
+      "bytes": 16987,
+      "path": "records/build/baseline/crates/cli/src/postflop_setup.rs",
+      "sha256": "7f14fdf1c99676edb1418c89c80d56293af2b6e72606f1c5380e0e829c8111c3"
+    },
+    {
+      "bytes": 5566,
+      "path": "records/build/baseline/crates/cli/src/preflop_setup.rs",
+      "sha256": "d211bc6bc181a87dc38b4197094bbb463fc45bf679cd0e3c75afb5d51def5bd4"
+    },
+    {
+      "bytes": 13938,
+      "path": "records/build/baseline/crates/cli/src/report.rs",
+      "sha256": "5de77699e11d63060be343961220e0568264461ebfe52a5f1494c40d902a790d"
+    },
+    {
+      "bytes": 13668,
+      "path": "records/build/baseline/crates/cli/src/resume.rs",
+      "sha256": "cf7e0ec04a9189d416194eeac0edd8241befc608cbeacf98b83c97813b999908"
+    },
+    {
+      "bytes": 16965,
+      "path": "records/build/baseline/crates/cli/src/run_dir.rs",
+      "sha256": "42ff81807de903f39941fc15fa9c31196016d0ccd79db283103a5d170acedf38"
+    },
+    {
+      "bytes": 14183,
+      "path": "records/build/baseline/crates/cli/src/runs.rs",
+      "sha256": "c3c430f2d05d2d205cf619987059f846b72088e0e07ed4b05c53994cfe2e9f43"
+    },
+    {
+      "bytes": 90717,
+      "path": "records/build/baseline/crates/cli/src/session.rs",
+      "sha256": "ba28d0c585d91bcd22b9665e960942d3a4ebbf41bc3959c61805fb2add9bb935"
+    },
+    {
+      "bytes": 92493,
+      "path": "records/build/baseline/crates/cli/src/sol.rs",
+      "sha256": "da72112a4a999daa8d879f6c4c1a27d794ba6c6bdc50294f53502c6c50544f5f"
+    },
+    {
+      "bytes": 50599,
+      "path": "records/build/baseline/crates/cli/src/solve.rs",
+      "sha256": "78ee5f3528303ca036246d00361253cfab495da848db682d7c590666f3fe31fe"
+    },
+    {
+      "bytes": 63131,
+      "path": "records/build/baseline/crates/cli/src/solver_config_v1.rs",
+      "sha256": "728a00f452e042b3e6fa1e7322e061a29581053aef9be91a55cf79863e64fee1"
+    },
+    {
+      "bytes": 5178,
+      "path": "records/build/baseline/crates/cli/src/test_fixtures.rs",
+      "sha256": "57e18ed0e48620b268585b60012a3d7d6d62895c56e311212200f6ad2d449a83"
+    },
+    {
+      "bytes": 9912,
+      "path": "records/build/baseline/crates/cli/src/validate.rs",
+      "sha256": "2acd61b9686ff06da0f081483ac77f1cb564b57c352e69bc5d224d8350a6cf7b"
+    },
+    {
+      "bytes": 58971,
+      "path": "records/build/baseline/crates/cli/tests/cli_integration.rs",
+      "sha256": "cd99d6861b0bc7c3263a2064c79e3e20f159e0044d031f132da09717cdb9271d"
+    },
+    {
+      "bytes": 2307,
+      "path": "records/build/baseline/crates/cli/tests/common/mod.rs",
+      "sha256": "a464ceecaaf4289e9c187535981e272f5df674717a1ece4ff3fba93cf425e23e"
+    },
+    {
+      "bytes": 6917,
+      "path": "records/build/baseline/crates/cli/tests/gtow_limp_reference.rs",
+      "sha256": "1c7c6b3c3369734b1ed5c57bd4ed77b454b7448c7c9b55002f3312478f2ddaf2"
+    },
+    {
+      "bytes": 5476,
+      "path": "records/build/baseline/crates/cli/tests/gtow_partial_reference.rs",
+      "sha256": "3db92a4d32f770c4135e1d1c5096e414972b8a1dd8e83f698158b521733cc131"
+    },
+    {
+      "bytes": 7926,
+      "path": "records/build/baseline/crates/cli/tests/gtow_simple_partial_reference.rs",
+      "sha256": "f0c8d9195965ff04d88b28df8f1aad84c557cda33eed3659ba1e0bc7182f5e3b"
+    },
+    {
+      "bytes": 4413,
+      "path": "records/build/baseline/crates/cli/tests/multiway_acceptance.rs",
+      "sha256": "5412a30f5d0d37d2e8035487e8ccd5a76b92d34d13ffc0f534f55113054e09f7"
+    },
+    {
+      "bytes": 12617,
+      "path": "records/build/baseline/crates/cli/tests/postflop_contract.rs",
+      "sha256": "a98c0c36069e726cabdb9b184a853cbefc546ce374a04f56bc4c93ad5179f338"
+    },
+    {
+      "bytes": 10509,
+      "path": "records/build/baseline/crates/cli/tests/postflop_run_reuse.rs",
+      "sha256": "7f055258050a8dead650f6a406d71b3babd7c41df702b2a8b5a311d13e1c1755"
+    },
+    {
+      "bytes": 684,
+      "path": "records/build/baseline/crates/daemon/Cargo.toml",
+      "sha256": "06289d88eb0ae0a2d0765a6ac0daf73349a2bf977ed000774130bcd68b9eb6e1"
+    },
+    {
+      "bytes": 17716,
+      "path": "records/build/baseline/crates/daemon/src/api.rs",
+      "sha256": "6575de4611733630f7aa16e443b0093a2fff8334b46313afb5e801b505aefe8d"
+    },
+    {
+      "bytes": 9802,
+      "path": "records/build/baseline/crates/daemon/src/http.rs",
+      "sha256": "c67096ca4d70d63038745baf575a52f3345c96372ed492d2a4534288caea8d66"
+    },
+    {
+      "bytes": 10761,
+      "path": "records/build/baseline/crates/daemon/src/jobs.rs",
+      "sha256": "602a00bd7234335195b48ba4d0fce024dd002c9a945f7a544dc74205e1df4aad"
+    },
+    {
+      "bytes": 3504,
+      "path": "records/build/baseline/crates/daemon/src/main.rs",
+      "sha256": "be31a250aef927a16239420abae5b673839381467d0c166242cb17f07ba3a2a2"
+    },
+    {
+      "bytes": 8614,
+      "path": "records/build/baseline/crates/daemon/src/runs.rs",
+      "sha256": "0afc2c9bcfe78f2117bc4f78e7b004b9d213ff7b5f286bd743f42a994f5ea36b"
+    },
+    {
+      "bytes": 3395,
+      "path": "records/build/baseline/crates/daemon/src/tls.rs",
+      "sha256": "c1bda6c2d84d2b178a2b112922f2c2f6220c7304b2423be5dc4fb23d25c47e0a"
+    },
+    {
+      "bytes": 17429,
+      "path": "records/build/baseline/crates/daemon/tests/http_api.rs",
+      "sha256": "58338a23cefcd17c28e0fce579eb3725c441b15ce40d4247d21c0b85fc1797ce"
+    },
+    {
+      "bytes": 3930,
+      "path": "records/build/baseline/crates/daemon/tests/support/solver_stub.rs",
+      "sha256": "f95dbbf614a2fcf854ada91a5d3c9d5dd4ae0ac94821de5ee13188d4a13aae4f"
+    },
+    {
+      "bytes": 8477,
+      "path": "records/build/baseline/crates/engine/benches/storage.rs",
+      "sha256": "3296860cb4d7de59ca9543725719b0c94dcca0fc97976747482f9c10327ed81c"
+    },
+    {
+      "bytes": 575,
+      "path": "records/build/baseline/crates/engine/Cargo.toml",
+      "sha256": "19aed9d523924499c7226490b044aa69a4935dc1bc24685a4f6c56aadd5e9df1"
+    },
+    {
+      "bytes": 1376,
+      "path": "records/build/baseline/crates/engine/src/lib.rs",
+      "sha256": "4d3f7a3b7551fbf1547dd45e0fb5170ebfdd45fd83a7ebefe132562d5cf885d8"
+    },
+    {
+      "bytes": 21267,
+      "path": "records/build/baseline/crates/engine/src/mccfr.rs",
+      "sha256": "1cb21e70898bf0fcc98e039202470e59da5b3c4a5c9776c8965eac5d832cac68"
+    },
+    {
+      "bytes": 18760,
+      "path": "records/build/baseline/crates/engine/src/reach.rs",
+      "sha256": "e4184dffabadaccb16d2672e6e3d24bba20fceec1013480d28d700b703210c3b"
+    },
+    {
+      "bytes": 6330,
+      "path": "records/build/baseline/crates/engine/src/schedule.rs",
+      "sha256": "c4dd446587d52c710d3a61a78ddd3d4a52550d331b9a24e1a68156ac84e4b6a9"
+    },
+    {
+      "bytes": 1117,
+      "path": "records/build/baseline/crates/engine/src/scratch.rs",
+      "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49"
+    },
+    {
+      "bytes": 42371,
+      "path": "records/build/baseline/crates/engine/src/solver.rs",
+      "sha256": "5cda51fce6b80a3c94f4fdb52056ba92a8c68dd34aad888a98c61ccafbadce33"
+    },
+    {
+      "bytes": 44287,
+      "path": "records/build/baseline/crates/engine/src/storage.rs",
+      "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+    },
+    {
+      "bytes": 16963,
+      "path": "records/build/baseline/crates/engine/src/tree.rs",
+      "sha256": "7ae394f060638995bd6c7d4cc8f91dbd8e44164605c3d2ab2529f3c0b761c05f"
+    },
+    {
+      "bytes": 15307,
+      "path": "records/build/baseline/crates/engine/tests/dimension_changing_transitions.rs",
+      "sha256": "aec4e6df5a69722980fc1dac57216c8b2b1325dc6a4099686132ef3045464008"
+    },
+    {
+      "bytes": 8362,
+      "path": "records/build/baseline/crates/engine/tests/parallel.rs",
+      "sha256": "1608fd42ff61cf4c7783d54bfa8133fbca2c635d7d7cf8c61637436e3ba0c3c5"
+    },
+    {
+      "bytes": 590,
+      "path": "records/build/baseline/crates/formats/Cargo.toml",
+      "sha256": "6a927b7a56b63de5e8f5665b3bf93d43d10cb5950754f892b403e351c10edab3"
+    },
+    {
+      "bytes": 8220,
+      "path": "records/build/baseline/crates/formats/examples/mwsol_rewrite_bench.rs",
+      "sha256": "aac3ae59378320eb0da55a955b6061c23e65f23b795bce1a68c3675ffa021b98"
+    },
+    {
+      "bytes": 9370,
+      "path": "records/build/baseline/crates/formats/examples/sol_codec_bench.rs",
+      "sha256": "ed972ffce351fcd31dfbab74771a06a059ef0edb43e44d65397e65f9a85cbcea"
+    },
+    {
+      "bytes": 12412,
+      "path": "records/build/baseline/crates/formats/src/checkpoint.rs",
+      "sha256": "fa40828f6ac2befa9bf8382fa57e524a7bd7176eea0e9f7cabd0274c68fc56c1"
+    },
+    {
+      "bytes": 1246,
+      "path": "records/build/baseline/crates/formats/src/hash.rs",
+      "sha256": "fe6cda51a15c2312e7045377af0c42d6842ef55e0982355c1b20fbdb158ae73e"
+    },
+    {
+      "bytes": 1870,
+      "path": "records/build/baseline/crates/formats/src/lib.rs",
+      "sha256": "32991b53ff117a75d943f3fe6d06ca2d59d382f92dff20b3d84f501c17a4792c"
+    },
+    {
+      "bytes": 3317,
+      "path": "records/build/baseline/crates/formats/src/metrics.rs",
+      "sha256": "f3fa4c61909a907d97dc1e04de95eaaaf29c3480433e272e185ffbc12c2c9d6c"
+    },
+    {
+      "bytes": 7421,
+      "path": "records/build/baseline/crates/formats/src/multiway.rs",
+      "sha256": "4c3eec8d59b645aa71e10beae3c3bc82962fb9333bf0ebb6be39d06b507f5a26"
+    },
+    {
+      "bytes": 94172,
+      "path": "records/build/baseline/crates/formats/src/mwsol.rs",
+      "sha256": "f3653f988f825d775e09299e0bd64d7018275043bf8de921ef4f23f79cd90282"
+    },
+    {
+      "bytes": 18729,
+      "path": "records/build/baseline/crates/formats/src/run.rs",
+      "sha256": "87a78c054dd95241e26c0097981cd2d9d7fbbfc81f5a0a907352b367244fbb9b"
+    },
+    {
+      "bytes": 21851,
+      "path": "records/build/baseline/crates/formats/src/sol.rs",
+      "sha256": "2b9af95d0a59f58204740c6241c06157f76780083eb65e1d97b95b9c3c8c07ba"
+    },
+    {
+      "bytes": 18669,
+      "path": "records/build/baseline/crates/formats/src/sol_indexed.rs",
+      "sha256": "100864cc30b62de759b46161e6c1eec02ec8c4e27d8b20a3679cb8cfa8b91d7e"
+    },
+    {
+      "bytes": 22068,
+      "path": "records/build/baseline/crates/formats/tests/sol_v2_integrity.rs",
+      "sha256": "6cc4c77b84b199eafa6a7a0c0a20f760f0fe0e065ccbad80cd454d5baa60af26"
+    },
+    {
+      "bytes": 389,
+      "path": "records/build/baseline/crates/game/Cargo.toml",
+      "sha256": "94c64d53d2ebc3896f20f104d2e9f32178e8695bf6bc41f7fcdbf3d6d4b09187"
+    },
+    {
+      "bytes": 651,
+      "path": "records/build/baseline/crates/game/src/lib.rs",
+      "sha256": "3667e422f0ccb31b507574c43c86f87b5930b8a345f19896aa55230e4c83e0be"
+    },
+    {
+      "bytes": 11716,
+      "path": "records/build/baseline/crates/game/src/payoff.rs",
+      "sha256": "bd9ecc083fbc575e888ad2d1173b3ad5ce78f0fb263778f8bd75a27242d772f9"
+    },
+    {
+      "bytes": 16941,
+      "path": "records/build/baseline/crates/game/src/r1/mod.rs",
+      "sha256": "f8c4d65cdda6e6ae8685af019aaaed61825f4f73f4e1f38ced2222023175d465"
+    },
+    {
+      "bytes": 4112,
+      "path": "records/build/baseline/crates/game/src/r1/settlement.rs",
+      "sha256": "657729d970e4d431685d7604a49cbb09a6a7d3d900c31279d943b414089728e7"
+    },
+    {
+      "bytes": 14756,
+      "path": "records/build/baseline/crates/game/src/toy.rs",
+      "sha256": "da123312ed67171641eab5b2675a43397a5e0d5c4f44c995342978839a4b6af8"
+    },
+    {
+      "bytes": 8618,
+      "path": "records/build/baseline/crates/game/tests/mccfr.rs",
+      "sha256": "2b332a3433a21926cfaeafe23851a7e4652ff524244d387aa9e525bef928cbc8"
+    },
+    {
+      "bytes": 3436,
+      "path": "records/build/baseline/crates/game/tests/oracle_diff.rs",
+      "sha256": "41e82ac556443de6822bcdcf08439d8c80ee3a044215f0142905125bfa72ff52"
+    },
+    {
+      "bytes": 22813,
+      "path": "records/build/baseline/crates/game/tests/r1_variants.rs",
+      "sha256": "12f736906d0220af367714ad44357a5dc6cc554e02661ea13a0b640ddf8f5704"
+    },
+    {
+      "bytes": 5339,
+      "path": "records/build/baseline/crates/game/tests/storage_backends.rs",
+      "sha256": "571ec9f19fc84046e80e6d77852388f6c832d3eee21c4344afc8669c31a675b5"
+    },
+    {
+      "bytes": 8141,
+      "path": "records/build/baseline/crates/game/tests/toys.rs",
+      "sha256": "bc3abd677f26af24fbc48699ee5f6dbffc57e8688238b1f536cd8f72f61797af"
+    },
+    {
+      "bytes": 249,
+      "path": "records/build/baseline/crates/hand-index/Cargo.toml",
+      "sha256": "aba9712b6e3e9dd725c858b8e1051900632b2345885db013f84095cee28f16ff"
+    },
+    {
+      "bytes": 12434,
+      "path": "records/build/baseline/crates/hand-index/src/lib.rs",
+      "sha256": "6c12d18fdcefad223205167d20d5f98678e25ab3e4f5a73f19a539e0d5842c29"
+    },
+    {
+      "bytes": 4740,
+      "path": "records/build/baseline/crates/holdem/benches/kernels.rs",
+      "sha256": "71ce44a604cc648a2a3a95b4aa0bd39c687222189a22fca629606960b3ce3ac0"
+    },
+    {
+      "bytes": 4089,
+      "path": "records/build/baseline/crates/holdem/benches/solve.rs",
+      "sha256": "4825dd96e023991cf56e22d0816a3e266c0ece217e98201b093823ffe3f34303"
+    },
+    {
+      "bytes": 546,
+      "path": "records/build/baseline/crates/holdem/Cargo.toml",
+      "sha256": "23b8886b502afe4aa5fc6008fb4dcdf3ae3a8b995f2838be9728151b451a6022"
+    },
+    {
+      "bytes": 2037,
+      "path": "records/build/baseline/crates/holdem/src/aggregate.rs",
+      "sha256": "45f3488891a5b9cc555e2bf6785509f051516d1907586b33f4d1987270a45aa6"
+    },
+    {
+      "bytes": 4527,
+      "path": "records/build/baseline/crates/holdem/src/equity.rs",
+      "sha256": "bb384beb2eea7bcc5192d0feb0313d5e78927630c4c2dc8e8575543867fa4130"
+    },
+    {
+      "bytes": 4863,
+      "path": "records/build/baseline/crates/holdem/src/kernel.rs",
+      "sha256": "7369d5f48610c8e8e6e8963b2a3483297401817b785f642db92fba5d40acb854"
+    },
+    {
+      "bytes": 1567,
+      "path": "records/build/baseline/crates/holdem/src/lib.rs",
+      "sha256": "37fb9748b6fd1ccd36b903ebc542b801f2a5b8bda4884008f801aae11b80fe29"
+    },
+    {
+      "bytes": 67916,
+      "path": "records/build/baseline/crates/holdem/src/postflop.rs",
+      "sha256": "e7c9f6719ba28147ab418b523b2a57cd9325d05734b3d546af7103183f1e9d13"
+    },
+    {
+      "bytes": 3657,
+      "path": "records/build/baseline/crates/holdem/src/river.rs",
+      "sha256": "70b9a783dd256e3e264bdf296a9ae81b525478ad194bb71839bc63e651571471"
+    },
+    {
+      "bytes": 19502,
+      "path": "records/build/baseline/crates/holdem/src/viewer.rs",
+      "sha256": "1b75e17452a40a8b6a82b9363a225ff08df42ff7f8abd5760fcd07a251fa3ad7"
+    },
+    {
+      "bytes": 7355,
+      "path": "records/build/baseline/crates/holdem/tests/aggregate.rs",
+      "sha256": "d549ba277c2bb5501fcb2c1a328d0cd23e5ededd1ffb36edc141a16b83b95f15"
+    },
+    {
+      "bytes": 12290,
+      "path": "records/build/baseline/crates/holdem/tests/oracle_diff.rs",
+      "sha256": "51e400e8bec89e9cf019dbeb2f61f043e0b41686926bf5177ea46eac2f4bd328"
+    },
+    {
+      "bytes": 16786,
+      "path": "records/build/baseline/crates/holdem/tests/oracle_river.rs",
+      "sha256": "05fbd787da6c12d286b7ba0967b2581bb603ea7b14194af7fb342b081b613de1"
+    },
+    {
+      "bytes": 98001,
+      "path": "records/build/baseline/crates/holdem/tests/postflop.rs",
+      "sha256": "39c9f0923e5bfa5e8e075ce76cd69a3f8cdcf0623658203a321657baecbb5137"
+    },
+    {
+      "bytes": 17484,
+      "path": "records/build/baseline/crates/holdem/tests/rake_icm.rs",
+      "sha256": "73557d7075406d23897d5392e24ed3b8c27cd43628bf3d6ce827e133eb88926d"
+    },
+    {
+      "bytes": 8242,
+      "path": "records/build/baseline/crates/holdem/tests/river.rs",
+      "sha256": "fcabc041d886bb05415c20b81979df339df3be7aa9521e86ebb521b4139946a6"
+    },
+    {
+      "bytes": 14912,
+      "path": "records/build/baseline/crates/holdem/tests/viewer.rs",
+      "sha256": "c56f2e017656359077646d21bf2b3b79538364d48e31ac2e8756b62b10fa656d"
+    },
+    {
+      "bytes": 1408,
+      "path": "records/build/baseline/crates/multiway/Cargo.toml",
+      "sha256": "8bd74cb32ca00e84f665eb3f87e5ada11e056f425a665ddfef95fbc5a91d6644"
+    },
+    {
+      "bytes": 17429,
+      "path": "records/build/baseline/crates/multiway/src/abstraction.rs",
+      "sha256": "ba3f580080ff84751eef8f9cb579b6ff5d20a37658fe5b0b4b1d2175f75c90cc"
+    },
+    {
+      "bytes": 57763,
+      "path": "records/build/baseline/crates/multiway/src/betting.rs",
+      "sha256": "60e23fa53821cc3218b8d42956504afafc35ce0a74bb3afd0e99e3db7c1cde96"
+    },
+    {
+      "bytes": 7752,
+      "path": "records/build/baseline/crates/multiway/src/checkpoint/stream.rs",
+      "sha256": "288ccae7a5ea6d3baae311732c2471d8c57f3b0c662eb4460eb32e1f2943c8b0"
+    },
+    {
+      "bytes": 50774,
+      "path": "records/build/baseline/crates/multiway/src/checkpoint.rs",
+      "sha256": "10485ea843b60b82255ed74c8c21e74acaf1600844594dd5d174fcacf84e9d8f"
+    },
+    {
+      "bytes": 70170,
+      "path": "records/build/baseline/crates/multiway/src/config.rs",
+      "sha256": "0061be144f076f4f894f246c7b9e0138f053ac0fed4b0cabd7a565150cb73019"
+    },
+    {
+      "bytes": 57418,
+      "path": "records/build/baseline/crates/multiway/src/holdem.rs",
+      "sha256": "839e3a7bfaa321fcd42be02f3db8ce4509b78673f92185ffd28acd794b175243"
+    },
+    {
+      "bytes": 42104,
+      "path": "records/build/baseline/crates/multiway/src/icm.rs",
+      "sha256": "49015202a384f4127afd65cbb52d4e98301793bf15df16fefc9ba881c820c156"
+    },
+    {
+      "bytes": 3786,
+      "path": "records/build/baseline/crates/multiway/src/lib.rs",
+      "sha256": "7a10f7fd5c60b7fb227b155789543d0de216b1d53054ebb08f9cf6811efda02d"
+    },
+    {
+      "bytes": 7594,
+      "path": "records/build/baseline/crates/multiway/src/rake_condition.rs",
+      "sha256": "956383163d79f5f45b53547894b1e20cc7f35c8f05088ecce8caa5f83c87a71c"
+    },
+    {
+      "bytes": 16201,
+      "path": "records/build/baseline/crates/multiway/src/research_draw_abstraction.rs",
+      "sha256": "2649f4d651d5799818caa8ab3401194b3f265d13409534b6fe3208402272e9b4"
+    },
+    {
+      "bytes": 25386,
+      "path": "records/build/baseline/crates/multiway/src/sampler.rs",
+      "sha256": "1a38f085c9ce7226de2516e7a33f4b3a66676cc95976244c296b683c4b1c15df"
+    },
+    {
+      "bytes": 23511,
+      "path": "records/build/baseline/crates/multiway/src/settlement.rs",
+      "sha256": "aad0f69aca4c57a0d683ffd568e273c638793e166b17e0bf33514b06240a5db0"
+    },
+    {
+      "bytes": 29247,
+      "path": "records/build/baseline/crates/multiway/src/solver/averaging.rs",
+      "sha256": "9760c833555115a30850f2c0af289c8b214c5568611ad52192ecf35c6ebff0ff"
+    },
+    {
+      "bytes": 16733,
+      "path": "records/build/baseline/crates/multiway/src/solver/averaging_continuation_tests.rs",
+      "sha256": "577a9ecc9bad49cdeef0e0fb8a47be95be7d6045f2e95d2c0883b64565f1aaf0"
+    },
+    {
+      "bytes": 24562,
+      "path": "records/build/baseline/crates/multiway/src/solver/conditioned.rs",
+      "sha256": "0fa05243a90e19886ae4693bc7906d299943817b9178a32b5cda701f8bfccbda"
+    },
+    {
+      "bytes": 19266,
+      "path": "records/build/baseline/crates/multiway/src/solver/counterfactual_proposal_tests.rs",
+      "sha256": "e3908cbe35712648a687e8e790e136bb08d8450ccd2a6a95decb54d2c8f077e5"
+    },
+    {
+      "bytes": 13039,
+      "path": "records/build/baseline/crates/multiway/src/solver/dense_merge_tests.rs",
+      "sha256": "50a9ebe8559902d8e7f3b56adb15a56811d67f9e0b8c5b7a1c379639bad513b4"
+    },
+    {
+      "bytes": 3279,
+      "path": "records/build/baseline/crates/multiway/src/solver/drift.rs",
+      "sha256": "045762c6d628a32937d9a76e16821ebc4f5fc862160f193941505aee255fec51"
+    },
+    {
+      "bytes": 7039,
+      "path": "records/build/baseline/crates/multiway/src/solver/drift_tests.rs",
+      "sha256": "3a671df8a5c8ba0e20f0e0ed362aa90f934dd63b83a642538c3f20ce3434e73b"
+    },
+    {
+      "bytes": 8413,
+      "path": "records/build/baseline/crates/multiway/src/solver/endpoint_counterfactual_tests.rs",
+      "sha256": "98fc41a89f560b8ac915a8331af6dc314bf308db70c4af8230857a600e66ed65"
+    },
+    {
+      "bytes": 61459,
+      "path": "records/build/baseline/crates/multiway/src/solver/endpoint_deviation.rs",
+      "sha256": "313f8d322c913c941188d2202944b7d3963bd323fb99f0075507a97ce5617e5d"
+    },
+    {
+      "bytes": 4611,
+      "path": "records/build/baseline/crates/multiway/src/solver/errors.rs",
+      "sha256": "012ce7efbb05635aaac2338c0653b2f50d242db20241d3213c37c43cbaeee4f0"
+    },
+    {
+      "bytes": 83468,
+      "path": "records/build/baseline/crates/multiway/src/solver/eval.rs",
+      "sha256": "78b27110cdf0623c91d6107b22212ca398956ad78eb49eecf5b6acaaa075250e"
+    },
+    {
+      "bytes": 149665,
+      "path": "records/build/baseline/crates/multiway/src/solver/mod.rs",
+      "sha256": "db7b612eefb666ca0005aeaec41b8a795a959fb9a151676bc92327ea2ca2a404"
+    },
+    {
+      "bytes": 28519,
+      "path": "records/build/baseline/crates/multiway/src/solver/preflop_census.rs",
+      "sha256": "2d6144da1037697a07f46c06e664e7dc18cc8fd127e69df48b32b8f5da974b12"
+    },
+    {
+      "bytes": 16716,
+      "path": "records/build/baseline/crates/multiway/src/solver/preflop_deviation.rs",
+      "sha256": "70d11e7d7fb0ffa614a1912f5c2f488fb156718e3744784851ad43b582f40221"
+    },
+    {
+      "bytes": 23077,
+      "path": "records/build/baseline/crates/multiway/src/solver/preflop_deviation_tests.rs",
+      "sha256": "49850b94bb2360adfa822d979f5488dd2c5c83e8c9dc8f35d8a45c2be460c3ca"
+    },
+    {
+      "bytes": 38325,
+      "path": "records/build/baseline/crates/multiway/src/solver/preflop_proposal.rs",
+      "sha256": "318feecdb725770a456d29e5e1f54ff5d63a039e53c692451959ba6d43ed0d68"
+    },
+    {
+      "bytes": 15533,
+      "path": "records/build/baseline/crates/multiway/src/solver/preflop_support_tests.rs",
+      "sha256": "c2e1b0f390750f59421f1b6e72dd762a44c7e1b5153eeb9924d0e5bcb1db859c"
+    },
+    {
+      "bytes": 17843,
+      "path": "records/build/baseline/crates/multiway/src/solver/raised_opponent_tests.rs",
+      "sha256": "daa7c020e541b42d0ad51a22e5033dbcd46bb27a855496ec85d330e70cca782c"
+    },
+    {
+      "bytes": 8345,
+      "path": "records/build/baseline/crates/multiway/src/solver/regret_sampling.rs",
+      "sha256": "12a8da885b169e50b5e89d53eafa057485aea698c8f3af6948d4ec9195314128"
+    },
+    {
+      "bytes": 21849,
+      "path": "records/build/baseline/crates/multiway/src/solver/research_diagnostics.rs",
+      "sha256": "52e6b0321855e4de0b746cc8c4cbc08c6fef5977d6b5ec7b6d7d5f55f08cb6d4"
+    },
+    {
+      "bytes": 11122,
+      "path": "records/build/baseline/crates/multiway/src/solver/snapshot.rs",
+      "sha256": "f08c803dbeafe3c6bd17a7e129a8bbb2df273233c5562434ebca8be574213297"
+    },
+    {
+      "bytes": 11865,
+      "path": "records/build/baseline/crates/multiway/src/solver/snapshot_tests.rs",
+      "sha256": "4eca39b8e62bad1dc2778049dc4f45533644029a50f80e7c6e02bc054354ecfb"
+    },
+    {
+      "bytes": 14632,
+      "path": "records/build/baseline/crates/multiway/src/solver/support.rs",
+      "sha256": "1aaf76e8b4530982f8ba68c3e37d7bcb37c80cccdad83a19c1969626e155a7ca"
+    },
+    {
+      "bytes": 217887,
+      "path": "records/build/baseline/crates/multiway/src/solver/tests.rs",
+      "sha256": "09ff47a78cf37e850f3a4b71364588c326d699df7dda772bce19c307d5108615"
+    },
+    {
+      "bytes": 50702,
+      "path": "records/build/baseline/crates/multiway/src/solver/workers.rs",
+      "sha256": "ec6c430763d2330f3101b99d0fe630fff1b75ca62f64f0b8e987dce5a1c7cf14"
+    },
+    {
+      "bytes": 63196,
+      "path": "records/build/baseline/crates/multiway/src/tree.rs",
+      "sha256": "919b8042fa6e3ac912f3cfdc02bd25371d42eb2986bda4625bd45bfccd5af2d8"
+    },
+    {
+      "bytes": 17749,
+      "path": "records/build/baseline/crates/multiway/src/tree_rules.rs",
+      "sha256": "242f64204fac357c491241badc56453f4df8662e4d94e4711311d7304c130932"
+    },
+    {
+      "bytes": 12741,
+      "path": "records/build/baseline/crates/multiway/src/types.rs",
+      "sha256": "9ba93a6f1f0cf5fdc6efae254028f8c9d8933c5a3d0fdfe5d88e2ab9f2135805"
+    },
+    {
+      "bytes": 470,
+      "path": "records/build/baseline/crates/preflop/Cargo.toml",
+      "sha256": "85dda8133a30f61b82e9d0a2fcea84ee2d704da2ec3bac9f246121e65a891eb5"
+    },
+    {
+      "bytes": 54537,
+      "path": "records/build/baseline/crates/preflop/src/bucketed.rs",
+      "sha256": "bfd84a64cf6592c2439f692e55aea0aa3ef89e9377d414a19b3e4f7ed9081e1c"
+    },
+    {
+      "bytes": 6579,
+      "path": "records/build/baseline/crates/preflop/src/classes.rs",
+      "sha256": "3726a73e21766dec81244b00bc80039d27fd0eae6a71e9b011b6c35b088606a7"
+    },
+    {
+      "bytes": 23352,
+      "path": "records/build/baseline/crates/preflop/src/equity.rs",
+      "sha256": "abca792fa20ae0e2edf6f3a98dcd17a8c57a2ddd92a149d48a9df4e4469a4acb"
+    },
+    {
+      "bytes": 6157,
+      "path": "records/build/baseline/crates/preflop/src/evaluator.rs",
+      "sha256": "fac921ebe074d328b6ded19820b6a612236eb059a01510cbd358e931e198adab"
+    },
+    {
+      "bytes": 3521,
+      "path": "records/build/baseline/crates/preflop/src/lib.rs",
+      "sha256": "b8d57d5edfc0c45ef230f56f67fb614c7a64aa65a97b4f3b89bb8b63034d70d0"
+    },
+    {
+      "bytes": 7586,
+      "path": "records/build/baseline/crates/preflop/src/model.rs",
+      "sha256": "70e44fe5532585cb7b336567f409a65ee01776fe08d99dc717bba0b9d36c5546"
+    },
+    {
+      "bytes": 36806,
+      "path": "records/build/baseline/crates/preflop/src/trunk.rs",
+      "sha256": "c5cfbb682d75223090d676e5f2aee7d502462eb78e626d446faed2fd6701fdf4"
+    },
+    {
+      "bytes": 10864,
+      "path": "records/build/baseline/crates/preflop/tests/blueprint.rs",
+      "sha256": "746dbbc2ac7e424a212ee610e471293cdfc266d33003a0a5fa716386c2370ed4"
+    },
+    {
+      "bytes": 3661,
+      "path": "records/build/baseline/crates/preflop/tests/icm.rs",
+      "sha256": "063419efa641f7aa8d3b7e948078da8cbb131f004a071f667b25e94eb438df04"
+    },
+    {
+      "bytes": 325,
+      "path": "records/build/baseline/crates/protocol/Cargo.toml",
+      "sha256": "832a99b760f726f4afc0d005bc2bff7f41f01c922895420460ef92ea5ee51285"
+    },
+    {
+      "bytes": 11485,
+      "path": "records/build/baseline/crates/protocol/src/lib.rs",
+      "sha256": "6a7049baa3ce38d14762563861eab183d7ef8520836bc7537db209f9117e3ac2"
+    },
+    {
+      "bytes": 17157,
+      "path": "records/build/baseline/docs/app-architecture.md",
+      "sha256": "759ec95a14e95bf11345bad576f2829eccd290d5854a59f2f4a2df906f5fc01c"
+    },
+    {
+      "bytes": 30515,
+      "path": "records/build/baseline/docs/architecture.md",
+      "sha256": "f716c7e08d7fd675a955a4dc93aeb7eece1ab90c013fb04a688164cc97d51bbd"
+    },
+    {
+      "bytes": 36642,
+      "path": "records/build/baseline/docs/cli-reference.jp.md",
+      "sha256": "1734ff0c3db9b5c4e3bae324afb33d4e05beb9a40a8590e8f2e5156816f4ffb5"
+    },
+    {
+      "bytes": 4538,
+      "path": "records/build/baseline/docs/decisions/2026-09-25-development-workflow.jp.md",
+      "sha256": "e2f5b82d2181b77f39c8f0cd7647f7070aec3f7a5a0d3db1322d56227feba8ea"
+    },
+    {
+      "bytes": 9331,
+      "path": "records/build/baseline/docs/development.md",
+      "sha256": "57ee4413cb2ab0ff641f7ba9a46c67f1ffc462b5e3734183d1b1bbf3443fa83b"
+    },
+    {
+      "bytes": 826,
+      "path": "records/build/baseline/docs/multiway-preflop-cli-spec.jp.md",
+      "sha256": "2a91ad90809321c37808dd2338f1559d9b7ddaa3dbe317b45a478aa0f29a771b"
+    },
+    {
+      "bytes": 43602,
+      "path": "records/build/baseline/docs/multiway-preflop-v1.jp.md",
+      "sha256": "1b2aa9cd55b5487a2f31bee570e2306abeb9b2ff89e3faa367a3661919d39db1"
+    },
+    {
+      "bytes": 27510,
+      "path": "records/build/baseline/docs/multiway-preflop-v1.md",
+      "sha256": "2c24b9287197df95939c2e77143702d9bdadf683773921ea9cde9ea811aed8e7"
+    },
+    {
+      "bytes": 30897,
+      "path": "records/build/baseline/docs/plans/hu-postflop-r0/asset-map.md",
+      "sha256": "96fe974ddabaf5af615d39e79eb20c4a3bea0fc478df3234b40240a02f615da2"
+    },
+    {
+      "bytes": 23753,
+      "path": "records/build/baseline/docs/plans/hu-postflop-r0/cases.csv",
+      "sha256": "5dbe4efdbca244c55cba7d32900381334aca8a73e9e13534f6350242000e7466"
+    },
+    {
+      "bytes": 8864,
+      "path": "records/build/baseline/docs/plans/hu-postflop-r0/coverage.md",
+      "sha256": "de35865bd8f63e44eaf485ed7f614eba92d3376be37960d6476dda8b84097784"
+    },
+    {
+      "bytes": 6136,
+      "path": "records/build/baseline/docs/plans/hu-postflop-r0/handoff.md",
+      "sha256": "eca6812364ee5e32a4c94195f4f2f3148a7c84dc53b1b3776507d9deb84a0c1a"
+    },
+    {
+      "bytes": 10823,
+      "path": "records/build/baseline/docs/plans/hu-postflop-r0/local-run-plan.md",
+      "sha256": "9ee1d1b819d772b77f8635ea8aa3ca5d1bf0b7c1de9cad850d8f43cbfc9a0a6c"
+    },
+    {
+      "bytes": 1414,
+      "path": "records/build/baseline/docs/plans/hu-postflop-r0/manifest-template.json",
+      "sha256": "fdde8be8b755793ce1de53fca362459d8e163c659f7e615817a997f19d0159fe"
+    },
+    {
+      "bytes": 17568,
+      "path": "records/build/baseline/docs/plans/hu-postflop-r0/measurement-protocol.md",
+      "sha256": "c611f96600dcba452b361d40a485cd14c3a57ddba21dde9711bc289eb6ade892"
+    },
+    {
+      "bytes": 8831,
+      "path": "records/build/baseline/docs/plans/hu-postflop-r0/provenance.md",
+      "sha256": "07e54d96eaebe8d6296126797713281ed3d96bf85b45bbadbe06aed85e981761"
+    },
+    {
+      "bytes": 2942,
+      "path": "records/build/baseline/docs/plans/hu-postflop-r0/result-template.json",
+      "sha256": "8ea40bcdefe8053ca02d0aa8c6dffe9173ba385a49b95ed7a000262cd58462b6"
+    },
+    {
+      "bytes": 21676,
+      "path": "records/build/baseline/docs/plans/r0-execution-plan.jp.md",
+      "sha256": "c3da5c01cca9d422d4e3a204bdf83e7b79075fff0ad3b75fdeaad323f24b5644"
+    },
+    {
+      "bytes": 16694,
+      "path": "records/build/baseline/docs/plans/r1-abstraction-contract.jp.md",
+      "sha256": "7bd75d30bdd55dd9a87dbdb3c5f0639f748c5fb485e955f5245405e0f37e2c8a"
+    },
+    {
+      "bytes": 21766,
+      "path": "records/build/baseline/docs/plans/r1-common-game-boundary.jp.md",
+      "sha256": "77f212d98f8762ee98e7bf66f222fd20d8b9e30bb9abe8db6f106bc5a3cd8f8d"
+    },
+    {
+      "bytes": 7606,
+      "path": "records/build/baseline/docs/plans/r1-execution-plan.jp.md",
+      "sha256": "83a39b2881767cb04d47dfbf600866ee1af213a8c2a2fac306136ab4eac3e394"
+    },
+    {
+      "bytes": 6011,
+      "path": "records/build/baseline/docs/plans/r1-oracle-fixtures.jp.md",
+      "sha256": "db296f6a796c10938726479b1db4c85b857ca8e14082fef9da34c43953903241"
+    },
+    {
+      "bytes": 8574,
+      "path": "records/build/baseline/docs/plans/r1-supervisor.jp.md",
+      "sha256": "e9dd523bb07410ef654083aaa46caf8a73cbf14740819b5288a36d158124f4e0"
+    },
+    {
+      "bytes": 43576,
+      "path": "records/build/baseline/docs/plans/solver-implementation-plan.jp.md",
+      "sha256": "08457345448b7fb284d56b0cb9485cfb73ca1702ce968324cf2688a6628e115d"
+    },
+    {
+      "bytes": 913,
+      "path": "records/build/baseline/docs/plans/task-template.md",
+      "sha256": "59e7d1000c0c101d6d84463ed22966d81c6e4503adb0e6f91c396430286af6ad"
+    },
+    {
+      "bytes": 44060,
+      "path": "records/build/baseline/docs/product-roadmap.jp.md",
+      "sha256": "768e378858ffe894353d2dc0776dcfeea25f16338560292b311124e1bd0dbb87"
+    },
+    {
+      "bytes": 3455,
+      "path": "records/build/baseline/docs/README.md",
+      "sha256": "dd18819050861d95db13ac67b737127f96ac9a7b0d040ea601b0d0d6d24eabdf"
+    },
+    {
+      "bytes": 26565,
+      "path": "records/build/baseline/docs/research/ai-development-structure-audit-2026-09-25.jp.md",
+      "sha256": "56755904d995ed4840d609cdc81f51cef2e2326d86687635cd6da321ef7716d8"
+    },
+    {
+      "bytes": 1016,
+      "path": "records/build/baseline/docs/research/README.md",
+      "sha256": "1fd4926d56818ced95c246460101dbe17ff8ec425b96e9bcafe364bb879db7cf"
+    },
+    {
+      "bytes": 8625,
+      "path": "records/build/baseline/docs/research/solver-cloud-cost-estimate-2026-09-20.jp.md",
+      "sha256": "1843584620bb7237a69adac49adf448366b9d8fdefbb50121364e79f4ba1b363"
+    },
+    {
+      "bytes": 20364,
+      "path": "records/build/baseline/docs/research/solver-roadmap-survey-2026-09-20.jp.md",
+      "sha256": "618119a2b1edcfe7af363d460f990cd6fa92fd79e29567fe8783169446d0084f"
+    },
+    {
+      "bytes": 57667,
+      "path": "records/build/baseline/docs/solver-config-v1.jp.md",
+      "sha256": "0b793d4e04006c323d52907bc93a37a4201844b2e96d6793d6fc4fb89e5dd50d"
+    },
+    {
+      "bytes": 6546,
+      "path": "records/build/baseline/docs/status.jp.md",
+      "sha256": "1939f6e770f1ff77cfcd2ecc2e9dd24c43174485a9d56d6a688f2b1a5eeeb619"
+    },
+    {
+      "bytes": 38833,
+      "path": "records/build/baseline/docs/user-guide.jp.md",
+      "sha256": "b265b452574be27befa8146678153df6f6dd93929c0e995b2c5b59f7a2712ffc"
+    },
+    {
+      "bytes": 12343,
+      "path": "records/build/baseline/docs/validation.jp.md",
+      "sha256": "4a254c92a8701d59ef01f654320de21a74d3ef8e85d03480c8a61a293740520a"
+    },
+    {
+      "bytes": 5418,
+      "path": "records/build/baseline/tools/check_docs.py",
+      "sha256": "9af1a436520b57adea611e214d4d7801c8d4ca5d78f591e72b995cd876905a9c"
+    },
+    {
+      "bytes": 2927,
+      "path": "records/build/baseline/tools/plot_convergence.py",
+      "sha256": "7f267e8f8f9ffd1ec96176df25c625e0e0f4088a18deb8dcc63c5e5ab7bc2a8c"
+    },
+    {
+      "bytes": 2171,
+      "path": "records/build/baseline/tools/README.md",
+      "sha256": "479e25496f3cf7c63968b16db1c501d93c73041caf4e0d5dffae890e44bb7bc5"
+    },
+    {
+      "bytes": 39015,
+      "path": "records/build/baseline/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+    },
+    {
+      "bytes": 4276,
+      "path": "records/build/baseline/tools/tests/test_check_docs.py",
+      "sha256": "52579c04f2b43fb1f0d81f8bce2d21ccc3c0864718dab8ec0d56d6036b30fdb3"
+    },
+    {
+      "bytes": 18060,
+      "path": "records/build/baseline/tools/tests/test_run_supervised.py",
+      "sha256": "7afdab6b42ac20c7e14bf6495c5481022e4f1bab13dc892d0c0b32fbd1a9f9d6"
+    },
+    {
+      "bytes": 2267,
+      "path": "records/build/baseline/tools/tests/test_workspace_audit.py",
+      "sha256": "cdb0b0c36fa66ce9b6883cee66ff1480e40a360d46c6791cec1007f1499ccf26"
+    },
+    {
+      "bytes": 2657,
+      "path": "records/build/baseline/tools/workspace_audit.py",
+      "sha256": "2e1ebfacfdaa1926b2a209de83a8eea2dbc793c943e54892d74282b65ccc2dc4"
+    },
+    {
+      "bytes": 631,
+      "path": "records/build/build/00-toolchain/samples.jsonl",
+      "sha256": "337f5f8cf9c82d5188a15ade9edca6d0b43d3a38eded740091ea3d8b12044a43"
+    },
+    {
+      "bytes": 0,
+      "path": "records/build/build/00-toolchain/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 3794,
+      "path": "records/build/build/00-toolchain/stdout.log",
+      "sha256": "718d0fa8f9b278239de3d34600fd3e598995b7794acd453cead44461ff3f41e1"
+    },
+    {
+      "bytes": 4985,
+      "path": "records/build/build/00-toolchain/supervisor.json",
+      "sha256": "7aa49b5fd0d34557205c2b48a4a18822297fc7b35ebdf5c8ca676863f4959acf"
+    },
+    {
+      "bytes": 1889,
+      "path": "records/build/build/01-fmt/samples.jsonl",
+      "sha256": "f2e6830dfdff7ca792c05735a2ae18c89bd0c45d79b7a01834d148be5507479f"
+    },
+    {
+      "bytes": 0,
+      "path": "records/build/build/01-fmt/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "path": "records/build/build/01-fmt/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 5086,
+      "path": "records/build/build/01-fmt/supervisor.json",
+      "sha256": "08419df3d5a62ae1ac0440dd5dd1cd735a7de4deada4220e8243337fa10949e0"
+    },
+    {
+      "bytes": 47966,
+      "path": "records/build/build/02-clippy/samples.jsonl",
+      "sha256": "c67c96b73ed20a94877e777c3383ef57336f6db0b39bca19960365c044916b22"
+    },
+    {
+      "bytes": 8687,
+      "path": "records/build/build/02-clippy/stderr.log",
+      "sha256": "c3872c0122632b1d15c35e7c530c3a155dcedc884245784f7f260321a8060c5a"
+    },
+    {
+      "bytes": 0,
+      "path": "records/build/build/02-clippy/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 5239,
+      "path": "records/build/build/02-clippy/supervisor.json",
+      "sha256": "2bb034cdaa344c85ec8fe7bae281beee74c780d706a809e8b75561db9f25caeb"
+    },
+    {
+      "bytes": 403866,
+      "path": "records/build/build/03-workspace-tests/samples.jsonl",
+      "sha256": "11551a8ef13aabf19b3b7fd318c45408434f0289786a684fc8c1b21257247ec4"
+    },
+    {
+      "bytes": 8920,
+      "path": "records/build/build/03-workspace-tests/stderr.log",
+      "sha256": "f40b145e78a438b469b02759546a7850240efcf5a803079b86c3b65c9543b886"
+    },
+    {
+      "bytes": 78726,
+      "path": "records/build/build/03-workspace-tests/stdout.log",
+      "sha256": "90eea8ebfa27c1132984f955fd795fe5c0edec248f771c6fb6e0a9e70a8dcd2d"
+    },
+    {
+      "bytes": 5218,
+      "path": "records/build/build/03-workspace-tests/supervisor.json",
+      "sha256": "5682935523d69d2b3052e197c3066bed9e4ddd7c4cdaad496df48ce64aa69b59"
+    },
+    {
+      "bytes": 6605,
+      "path": "records/build/build/04-python-tools/samples.jsonl",
+      "sha256": "1a3693c8dfa8f5424f79db86efbd840e886660de1c488483551ba1e0e0bf995b"
+    },
+    {
+      "bytes": 4839,
+      "path": "records/build/build/04-python-tools/stderr.log",
+      "sha256": "26786348495356e8addaf843d46875ea65462f9074c4473acb9f03b08a5953d0"
+    },
+    {
+      "bytes": 0,
+      "path": "records/build/build/04-python-tools/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 4687,
+      "path": "records/build/build/04-python-tools/supervisor.json",
+      "sha256": "87f01874787b1ee08c20362b5b34067e93facdc237473aa96cbd3e12ad43ce46"
+    },
+    {
+      "bytes": 153088,
+      "path": "records/build/build/05-release-cli/samples.jsonl",
+      "sha256": "c7f586d232e3d5642b0928af31343b7461ffd120f5e814e69b443cf24b87b031"
+    },
+    {
+      "bytes": 3323,
+      "path": "records/build/build/05-release-cli/stderr.log",
+      "sha256": "8a6d889162f6dae75bb382168cb73d6b217ba9a41f31844b52abe3d8fa74f32d"
+    },
+    {
+      "bytes": 0,
+      "path": "records/build/build/05-release-cli/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 5322,
+      "path": "records/build/build/05-release-cli/supervisor.json",
+      "sha256": "cf51eff13525aebd6ab7951cf5e026565b022b3851fe550df52ffa4443f93909"
+    },
+    {
+      "bytes": 19615,
+      "path": "records/build/build/06-release-codec-current/samples.jsonl",
+      "sha256": "f4929833f1edaf17a4d980900813658a5e4170e0b6eeddbf0e8c7c37c8067acf"
+    },
+    {
+      "bytes": 480,
+      "path": "records/build/build/06-release-codec-current/stderr.log",
+      "sha256": "092ac9cad8cdf9ba6e73d837c2a847c2b2fcd6eff4020c7f1a2362c336c991ca"
+    },
+    {
+      "bytes": 0,
+      "path": "records/build/build/06-release-codec-current/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 5289,
+      "path": "records/build/build/06-release-codec-current/supervisor.json",
+      "sha256": "3837e3a387456174782ea7be74e7caf3daf984d50c6b96783fd7a58ac1ed7a02"
+    },
+    {
+      "bytes": 43053,
+      "path": "records/build/build/07-release-codec-baseline/samples.jsonl",
+      "sha256": "c288599dca0fa7228c02d4e007902e129868e95156b1e51831596182b580bff2"
+    },
+    {
+      "bytes": 2177,
+      "path": "records/build/build/07-release-codec-baseline/stderr.log",
+      "sha256": "62a9e665219a4d198a5761b41f756b9f1320d9948ef340c1af492ded185e6547"
+    },
+    {
+      "bytes": 0,
+      "path": "records/build/build/07-release-codec-baseline/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 5331,
+      "path": "records/build/build/07-release-codec-baseline/supervisor.json",
+      "sha256": "9a167bd58e37a93ea1f3552d1e0a10419c88c04ad828b94746c60b46ffc4e92f"
+    },
+    {
+      "bytes": 120461,
+      "path": "records/build/build/result.json",
+      "sha256": "d56eb5332655a07409b4becd575608d22b6cf80623223c81f77b06173412c9f0"
+    },
+    {
+      "bytes": 125,
+      "path": "records/build/current/.cargo/config.toml",
+      "sha256": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21"
+    },
+    {
+      "bytes": 577,
+      "path": "records/build/current/.github/workflows/acceptance.yml",
+      "sha256": "697df5a991a3280acb84fa163e65777abdf46e96578b65adfc861cbe39a6d021"
+    },
+    {
+      "bytes": 2487,
+      "path": "records/build/current/.github/workflows/ci.yml",
+      "sha256": "70679a2d44bee8263b5a9a830c82ff65fdb248174cb41796a68b7cd3819c8e19"
+    },
+    {
+      "bytes": 4224,
+      "path": "records/build/current/AGENTS.md",
+      "sha256": "2c0c4f4d549cb86ebe6a0d416dafe21653f77b8eb871e3abe215ee73653e6787"
+    },
+    {
+      "bytes": 40970,
+      "path": "records/build/current/Cargo.lock",
+      "sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1"
+    },
+    {
+      "bytes": 1752,
+      "path": "records/build/current/Cargo.toml",
+      "sha256": "da9fc9f6aca8102a8b5f6449ee8fef83ec9d97d546649a154f801c19815ebe42"
+    },
+    {
+      "bytes": 300,
+      "path": "records/build/current/crates/abstraction/Cargo.toml",
+      "sha256": "22a4a8e067ae7edc82ee0d3adbb0493fc531badd89df0de7665e52d1588b9f60"
+    },
+    {
+      "bytes": 1740,
+      "path": "records/build/current/crates/abstraction/examples/build_blueprint.rs",
+      "sha256": "fccad326fa4a43cdd700815afd25655d7cb839508325331019addaa7be98f0e4"
+    },
+    {
+      "bytes": 57062,
+      "path": "records/build/current/crates/abstraction/src/blueprint.rs",
+      "sha256": "e7e310f344d50e7baf467acddc7bd54bdffa1206ffeb4de932972f727b63ce9a"
+    },
+    {
+      "bytes": 44483,
+      "path": "records/build/current/crates/abstraction/src/buckets.rs",
+      "sha256": "25c875e2c271da6c2578f6a6f034c83eb5021e895af7fc692ef076ef85f03d4b"
+    },
+    {
+      "bytes": 8243,
+      "path": "records/build/current/crates/abstraction/src/ehs.rs",
+      "sha256": "d4f378c9a809e15215ee8710f844cc3cbfeb541e967b70d55d057c55ab6b12d7"
+    },
+    {
+      "bytes": 2214,
+      "path": "records/build/current/crates/abstraction/src/lib.rs",
+      "sha256": "4ade923d95ce95b14c2a61f47d5ad1f2668f0db875c97d954370f974a420e381"
+    },
+    {
+      "bytes": 2693,
+      "path": "records/build/current/crates/abstraction/tests/extreme_k.rs",
+      "sha256": "c3480223cb60d6cf055d3e7a88da4e3c3bdba641ead537da78f5a5abc4af5be6"
+    },
+    {
+      "bytes": 4768,
+      "path": "records/build/current/crates/abstraction/tests/semantic_mapping.rs",
+      "sha256": "48ec7ac6b2def3c0324a783396f95f27436d89ba82e07de1043718c889510626"
+    },
+    {
+      "bytes": 370,
+      "path": "records/build/current/crates/cards/Cargo.toml",
+      "sha256": "c776279bb934cf40c4afb1d33f744da004d7d2b9bc7ffd0e0aa0a42c19ae9598"
+    },
+    {
+      "bytes": 13901,
+      "path": "records/build/current/crates/cards/src/board.rs",
+      "sha256": "9c688ec407ca28f22a056737734df626bdffdda30c92dca575879b6e56bdb0fa"
+    },
+    {
+      "bytes": 4422,
+      "path": "records/build/current/crates/cards/src/card.rs",
+      "sha256": "74eeb9bebfc2ed08783b8298754d964779c3114e0a53fd9a4cff364253ac5023"
+    },
+    {
+      "bytes": 1966,
+      "path": "records/build/current/crates/cards/src/eval.rs",
+      "sha256": "dfa7610718f196fc8eae95bc767af02bdadc6f20d32c648b02b7fb0f25f2afb4"
+    },
+    {
+      "bytes": 1101,
+      "path": "records/build/current/crates/cards/src/lib.rs",
+      "sha256": "23a55b676196703cdd248c9b8fb50a541a113c9f3cc6dc904f5a8151ca39e37f"
+    },
+    {
+      "bytes": 12197,
+      "path": "records/build/current/crates/cards/src/range.rs",
+      "sha256": "1ed908cfdc11908754db983eaabbe04dbbe0d405ffddf57fac9b1d18115f208b"
+    },
+    {
+      "bytes": 4127,
+      "path": "records/build/current/crates/cards/src/script/ast.rs",
+      "sha256": "c9012aed1c7b5c91e703f450f1afee82b2b81f1f372d303efe52509af8f2a355"
+    },
+    {
+      "bytes": 40254,
+      "path": "records/build/current/crates/cards/src/script/cond.rs",
+      "sha256": "49a649578fad2c3e47ad7e1ae4134cf5eef475ead2c11cd140affdf8a0e6b478"
+    },
+    {
+      "bytes": 14396,
+      "path": "records/build/current/crates/cards/src/script/lower.rs",
+      "sha256": "f73abd25b7f4be15aae86f749b4a2f81f45f74013034d51cbc8fc757039943a3"
+    },
+    {
+      "bytes": 1963,
+      "path": "records/build/current/crates/cards/src/script/mod.rs",
+      "sha256": "dcfe364cc022ac9788d2d3816ec760237bf9176e91ae520a2e4b41469d118edf"
+    },
+    {
+      "bytes": 38716,
+      "path": "records/build/current/crates/cards/src/script/parse.rs",
+      "sha256": "3981c7121131095f011a5d0e51933004f49f55e5beef20d60e9b4999fc13d210"
+    },
+    {
+      "bytes": 11301,
+      "path": "records/build/current/crates/cards/src/script/token.rs",
+      "sha256": "decbc911b73bd74d27f0493a691fa604ecb63e0b02ff8afc0a2162dbc0f64bbd"
+    },
+    {
+      "bytes": 2878,
+      "path": "records/build/current/crates/cards/src/set.rs",
+      "sha256": "ea987f8d7dd617fa29d452b29b8d739ad69d20e8f5da94b016135e5cc6ec576b"
+    },
+    {
+      "bytes": 19223,
+      "path": "records/build/current/crates/cards/src/sizing.rs",
+      "sha256": "1784b87a9d617015a5d0cbfa9f893f0f28f8725baeb64afd8102150d09aa5e05"
+    },
+    {
+      "bytes": 2621,
+      "path": "records/build/current/crates/cards/src/types.rs",
+      "sha256": "acec9488a59c72781764a521116c682712c0fc1ca786f1be46a70d2ce04bd7c9"
+    },
+    {
+      "bytes": 246,
+      "path": "records/build/current/crates/cfr-ref/Cargo.toml",
+      "sha256": "f2d20395907d6d17fa3640892289b192bebb821dbe352c1b5e34db4c352f0623"
+    },
+    {
+      "bytes": 9722,
+      "path": "records/build/current/crates/cfr-ref/src/games.rs",
+      "sha256": "314da3b3b7c5b6d25614b20e67481babba02e8b8e46061fa770add494d204eb1"
+    },
+    {
+      "bytes": 12206,
+      "path": "records/build/current/crates/cfr-ref/src/lib.rs",
+      "sha256": "14dd3f0694a1902e283038d1d6135272334e93d7c9b2a0d27d201e1713d306cb"
+    },
+    {
+      "bytes": 1748,
+      "path": "records/build/current/crates/cli/Cargo.toml",
+      "sha256": "140ee38ea38b9efe7c3cbd4aa95ef6d3c812f47999c970efe67b92ed9279310a"
+    },
+    {
+      "bytes": 5415,
+      "path": "records/build/current/crates/cli/examples/hu_saved_profile_audit.md",
+      "sha256": "79ea214f2d7d249caf2c3d4212751dc9ea19c677da184cb1a9cfaaae3dde7c68"
+    },
+    {
+      "bytes": 734,
+      "path": "records/build/current/crates/cli/examples/hu_saved_profile_audit.rs",
+      "sha256": "23ffbfa69846696c0e025bc8cbd5b2b68c3add006291827ba7dca3203ebbe317"
+    },
+    {
+      "bytes": 9733,
+      "path": "records/build/current/crates/cli/examples/mw_average_sampling_research.md",
+      "sha256": "0ab6f8523127fb481d111574ab6203c70b4978b6781217f9f77b27b6f3f0fc88"
+    },
+    {
+      "bytes": 19773,
+      "path": "records/build/current/crates/cli/examples/mw_average_sampling_research.rs",
+      "sha256": "9628d96f32c65272acf135b8d7f0aa42f398797b3e1562505f01791630ab92a4"
+    },
+    {
+      "bytes": 30537,
+      "path": "records/build/current/crates/cli/examples/mw_checkpoint_audit.md",
+      "sha256": "8db6b46e8f822ea1507fa4e6f9413201c6a04ddf040045811a733c9f8ff22d5f"
+    },
+    {
+      "bytes": 124219,
+      "path": "records/build/current/crates/cli/examples/mw_checkpoint_audit.rs",
+      "sha256": "f285e8566ce43a95cf3b5f646d1beaf7440b039160d13959bc0f622b84342527"
+    },
+    {
+      "bytes": 2360,
+      "path": "records/build/current/crates/cli/examples/mw_checkpoint_export_bench.md",
+      "sha256": "acaaa10b23e49f65aba1af934b328ce18974e1e7f61e425df5c0883c08171a4c"
+    },
+    {
+      "bytes": 12591,
+      "path": "records/build/current/crates/cli/examples/mw_checkpoint_export_bench.rs",
+      "sha256": "2107617d89dd50da9f55bcf0f66156cacf5c2a08ecdac37883ddca5bd3f14d1c"
+    },
+    {
+      "bytes": 1460,
+      "path": "records/build/current/crates/cli/examples/mw_checkpoint_load_bench.md",
+      "sha256": "06f58fc64a97c6386557d97b13d43490dffe9921291de995393d652204a2c667"
+    },
+    {
+      "bytes": 1556,
+      "path": "records/build/current/crates/cli/examples/mw_checkpoint_load_bench.rs",
+      "sha256": "b16dbc5c63cb4899587ad15b16f0d570cec07f1178ee96be61e1c1ca7e039fd3"
+    },
+    {
+      "bytes": 2091,
+      "path": "records/build/current/crates/cli/examples/mw_checkpoint_write_bench.md",
+      "sha256": "332ff71abdbcc31ae358aab79257b2210b223e4173296063ed5f8fee2d8eba86"
+    },
+    {
+      "bytes": 5741,
+      "path": "records/build/current/crates/cli/examples/mw_checkpoint_write_bench.rs",
+      "sha256": "d5e158046aaff5b5c92beb66e32c06faf3d8b02ca9174e4361211422283c1a17"
+    },
+    {
+      "bytes": 14866,
+      "path": "records/build/current/crates/cli/examples/mw_draw_abstraction_research.rs",
+      "sha256": "992be86ebddfcbabd930c0202a88c7e59192d538a5e67d432cc53198486ca9a0"
+    },
+    {
+      "bytes": 2083,
+      "path": "records/build/current/crates/cli/examples/mw_strategy_drift_bench.md",
+      "sha256": "cc2db6951581b9c6f1c8766aa2dbbc4362008712ae45c6661dcf8948c9e600a7"
+    },
+    {
+      "bytes": 7552,
+      "path": "records/build/current/crates/cli/examples/mw_strategy_drift_bench.rs",
+      "sha256": "dbf516c14521532677a73d1b338985ad5eff8f3294de32390424ecdc44f786d0"
+    },
+    {
+      "bytes": 1807,
+      "path": "records/build/current/crates/cli/examples/mw_tree_census.md",
+      "sha256": "bcdb1dccc269efa33cb95b510fcff142f2a8b9b646f1501073c07b043e3856df"
+    },
+    {
+      "bytes": 15302,
+      "path": "records/build/current/crates/cli/examples/mw_tree_census.rs",
+      "sha256": "42284106884060255f39354d7e2e6fdc1f66d6bd2b6252187a594d8acd97a4e5"
+    },
+    {
+      "bytes": 5976,
+      "path": "records/build/current/crates/cli/examples/mw_tree_initialization_bench.md",
+      "sha256": "42c492559989a6458a1d27a540a8e598462b64fa24ad018f83479166232690b6"
+    },
+    {
+      "bytes": 20097,
+      "path": "records/build/current/crates/cli/examples/mw_tree_initialization_bench.rs",
+      "sha256": "b05d3991a7d9f83c96ef2868377832b312d34d7bd8a4caf37975e65c4b93fde8"
+    },
+    {
+      "bytes": 5439,
+      "path": "records/build/current/crates/cli/src/cache.rs",
+      "sha256": "4e3e4168cb92dfa7c9f22cd1ce59d93f485c0ba0b23da1c1451002092d3e4698"
+    },
+    {
+      "bytes": 51599,
+      "path": "records/build/current/crates/cli/src/config.rs",
+      "sha256": "559ace7c307dab76725dd22ebff8a68f7f3ee8f98c2373228d02b711c3409ab6"
+    },
+    {
+      "bytes": 13110,
+      "path": "records/build/current/crates/cli/src/config_new.rs",
+      "sha256": "3f87773ca6bbd51728495e1515508b4917ff3629bfe0adcf7cf7eaeb917df073"
+    },
+    {
+      "bytes": 22727,
+      "path": "records/build/current/crates/cli/src/economics.rs",
+      "sha256": "8fa7793a12d22841a09eea10e82c808357212aa5adf1909249e19be648be7af2"
+    },
+    {
+      "bytes": 27453,
+      "path": "records/build/current/crates/cli/src/inspect.rs",
+      "sha256": "9eeb049d36c4ce38bc1d758ecc439eef6c01480dc61d0d1aae4fdd70fb9a03c7"
+    },
+    {
+      "bytes": 20003,
+      "path": "records/build/current/crates/cli/src/lib.rs",
+      "sha256": "b6bd79a48318989a9ef017a4c68764810705391d6a0ad4d031d7a6f987418d56"
+    },
+    {
+      "bytes": 684,
+      "path": "records/build/current/crates/cli/src/main.rs",
+      "sha256": "55e1f3981791253683cf2b0713fd22d89244c12f282d154f8da8dd080ad42923"
+    },
+    {
+      "bytes": 48244,
+      "path": "records/build/current/crates/cli/src/multiway_artifact.rs",
+      "sha256": "bc42304212b68e111959278f8bfd1abd0230146515b4ac7af3d4a355e9755cb4"
+    },
+    {
+      "bytes": 54823,
+      "path": "records/build/current/crates/cli/src/multiway_solve.rs",
+      "sha256": "37ccbe1b59458d5587c73c448f6d9df661779c5417102ef2c4963d55ef3ccd04"
+    },
+    {
+      "bytes": 92427,
+      "path": "records/build/current/crates/cli/src/multiway_v1.rs",
+      "sha256": "1e8e2758565bf69cbda1b0755538b02d1109f71266e13c257dcbfcb7b9292edb"
+    },
+    {
+      "bytes": 24998,
+      "path": "records/build/current/crates/cli/src/postflop_artifact.rs",
+      "sha256": "c386efbff2667d8ca8dfb9ccfd03f8d42487370fadf5461255323da6b824cd7e"
+    },
+    {
+      "bytes": 16987,
+      "path": "records/build/current/crates/cli/src/postflop_setup.rs",
+      "sha256": "7f14fdf1c99676edb1418c89c80d56293af2b6e72606f1c5380e0e829c8111c3"
+    },
+    {
+      "bytes": 5566,
+      "path": "records/build/current/crates/cli/src/preflop_setup.rs",
+      "sha256": "d211bc6bc181a87dc38b4197094bbb463fc45bf679cd0e3c75afb5d51def5bd4"
+    },
+    {
+      "bytes": 13938,
+      "path": "records/build/current/crates/cli/src/report.rs",
+      "sha256": "5de77699e11d63060be343961220e0568264461ebfe52a5f1494c40d902a790d"
+    },
+    {
+      "bytes": 13668,
+      "path": "records/build/current/crates/cli/src/resume.rs",
+      "sha256": "cf7e0ec04a9189d416194eeac0edd8241befc608cbeacf98b83c97813b999908"
+    },
+    {
+      "bytes": 16965,
+      "path": "records/build/current/crates/cli/src/run_dir.rs",
+      "sha256": "42ff81807de903f39941fc15fa9c31196016d0ccd79db283103a5d170acedf38"
+    },
+    {
+      "bytes": 14183,
+      "path": "records/build/current/crates/cli/src/runs.rs",
+      "sha256": "c3c430f2d05d2d205cf619987059f846b72088e0e07ed4b05c53994cfe2e9f43"
+    },
+    {
+      "bytes": 90717,
+      "path": "records/build/current/crates/cli/src/session.rs",
+      "sha256": "ba28d0c585d91bcd22b9665e960942d3a4ebbf41bc3959c61805fb2add9bb935"
+    },
+    {
+      "bytes": 92493,
+      "path": "records/build/current/crates/cli/src/sol.rs",
+      "sha256": "da72112a4a999daa8d879f6c4c1a27d794ba6c6bdc50294f53502c6c50544f5f"
+    },
+    {
+      "bytes": 50599,
+      "path": "records/build/current/crates/cli/src/solve.rs",
+      "sha256": "78ee5f3528303ca036246d00361253cfab495da848db682d7c590666f3fe31fe"
+    },
+    {
+      "bytes": 63131,
+      "path": "records/build/current/crates/cli/src/solver_config_v1.rs",
+      "sha256": "728a00f452e042b3e6fa1e7322e061a29581053aef9be91a55cf79863e64fee1"
+    },
+    {
+      "bytes": 5178,
+      "path": "records/build/current/crates/cli/src/test_fixtures.rs",
+      "sha256": "57e18ed0e48620b268585b60012a3d7d6d62895c56e311212200f6ad2d449a83"
+    },
+    {
+      "bytes": 9912,
+      "path": "records/build/current/crates/cli/src/validate.rs",
+      "sha256": "2acd61b9686ff06da0f081483ac77f1cb564b57c352e69bc5d224d8350a6cf7b"
+    },
+    {
+      "bytes": 58971,
+      "path": "records/build/current/crates/cli/tests/cli_integration.rs",
+      "sha256": "cd99d6861b0bc7c3263a2064c79e3e20f159e0044d031f132da09717cdb9271d"
+    },
+    {
+      "bytes": 2307,
+      "path": "records/build/current/crates/cli/tests/common/mod.rs",
+      "sha256": "a464ceecaaf4289e9c187535981e272f5df674717a1ece4ff3fba93cf425e23e"
+    },
+    {
+      "bytes": 6917,
+      "path": "records/build/current/crates/cli/tests/gtow_limp_reference.rs",
+      "sha256": "1c7c6b3c3369734b1ed5c57bd4ed77b454b7448c7c9b55002f3312478f2ddaf2"
+    },
+    {
+      "bytes": 5476,
+      "path": "records/build/current/crates/cli/tests/gtow_partial_reference.rs",
+      "sha256": "3db92a4d32f770c4135e1d1c5096e414972b8a1dd8e83f698158b521733cc131"
+    },
+    {
+      "bytes": 7926,
+      "path": "records/build/current/crates/cli/tests/gtow_simple_partial_reference.rs",
+      "sha256": "f0c8d9195965ff04d88b28df8f1aad84c557cda33eed3659ba1e0bc7182f5e3b"
+    },
+    {
+      "bytes": 4413,
+      "path": "records/build/current/crates/cli/tests/multiway_acceptance.rs",
+      "sha256": "5412a30f5d0d37d2e8035487e8ccd5a76b92d34d13ffc0f534f55113054e09f7"
+    },
+    {
+      "bytes": 12617,
+      "path": "records/build/current/crates/cli/tests/postflop_contract.rs",
+      "sha256": "a98c0c36069e726cabdb9b184a853cbefc546ce374a04f56bc4c93ad5179f338"
+    },
+    {
+      "bytes": 10509,
+      "path": "records/build/current/crates/cli/tests/postflop_run_reuse.rs",
+      "sha256": "7f055258050a8dead650f6a406d71b3babd7c41df702b2a8b5a311d13e1c1755"
+    },
+    {
+      "bytes": 684,
+      "path": "records/build/current/crates/daemon/Cargo.toml",
+      "sha256": "06289d88eb0ae0a2d0765a6ac0daf73349a2bf977ed000774130bcd68b9eb6e1"
+    },
+    {
+      "bytes": 17716,
+      "path": "records/build/current/crates/daemon/src/api.rs",
+      "sha256": "6575de4611733630f7aa16e443b0093a2fff8334b46313afb5e801b505aefe8d"
+    },
+    {
+      "bytes": 9802,
+      "path": "records/build/current/crates/daemon/src/http.rs",
+      "sha256": "c67096ca4d70d63038745baf575a52f3345c96372ed492d2a4534288caea8d66"
+    },
+    {
+      "bytes": 10761,
+      "path": "records/build/current/crates/daemon/src/jobs.rs",
+      "sha256": "602a00bd7234335195b48ba4d0fce024dd002c9a945f7a544dc74205e1df4aad"
+    },
+    {
+      "bytes": 3504,
+      "path": "records/build/current/crates/daemon/src/main.rs",
+      "sha256": "be31a250aef927a16239420abae5b673839381467d0c166242cb17f07ba3a2a2"
+    },
+    {
+      "bytes": 8614,
+      "path": "records/build/current/crates/daemon/src/runs.rs",
+      "sha256": "0afc2c9bcfe78f2117bc4f78e7b004b9d213ff7b5f286bd743f42a994f5ea36b"
+    },
+    {
+      "bytes": 3395,
+      "path": "records/build/current/crates/daemon/src/tls.rs",
+      "sha256": "c1bda6c2d84d2b178a2b112922f2c2f6220c7304b2423be5dc4fb23d25c47e0a"
+    },
+    {
+      "bytes": 17429,
+      "path": "records/build/current/crates/daemon/tests/http_api.rs",
+      "sha256": "58338a23cefcd17c28e0fce579eb3725c441b15ce40d4247d21c0b85fc1797ce"
+    },
+    {
+      "bytes": 3930,
+      "path": "records/build/current/crates/daemon/tests/support/solver_stub.rs",
+      "sha256": "f95dbbf614a2fcf854ada91a5d3c9d5dd4ae0ac94821de5ee13188d4a13aae4f"
+    },
+    {
+      "bytes": 8477,
+      "path": "records/build/current/crates/engine/benches/storage.rs",
+      "sha256": "3296860cb4d7de59ca9543725719b0c94dcca0fc97976747482f9c10327ed81c"
+    },
+    {
+      "bytes": 575,
+      "path": "records/build/current/crates/engine/Cargo.toml",
+      "sha256": "19aed9d523924499c7226490b044aa69a4935dc1bc24685a4f6c56aadd5e9df1"
+    },
+    {
+      "bytes": 1376,
+      "path": "records/build/current/crates/engine/src/lib.rs",
+      "sha256": "4d3f7a3b7551fbf1547dd45e0fb5170ebfdd45fd83a7ebefe132562d5cf885d8"
+    },
+    {
+      "bytes": 21267,
+      "path": "records/build/current/crates/engine/src/mccfr.rs",
+      "sha256": "1cb21e70898bf0fcc98e039202470e59da5b3c4a5c9776c8965eac5d832cac68"
+    },
+    {
+      "bytes": 18760,
+      "path": "records/build/current/crates/engine/src/reach.rs",
+      "sha256": "e4184dffabadaccb16d2672e6e3d24bba20fceec1013480d28d700b703210c3b"
+    },
+    {
+      "bytes": 6330,
+      "path": "records/build/current/crates/engine/src/schedule.rs",
+      "sha256": "c4dd446587d52c710d3a61a78ddd3d4a52550d331b9a24e1a68156ac84e4b6a9"
+    },
+    {
+      "bytes": 1117,
+      "path": "records/build/current/crates/engine/src/scratch.rs",
+      "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49"
+    },
+    {
+      "bytes": 42371,
+      "path": "records/build/current/crates/engine/src/solver.rs",
+      "sha256": "5cda51fce6b80a3c94f4fdb52056ba92a8c68dd34aad888a98c61ccafbadce33"
+    },
+    {
+      "bytes": 44287,
+      "path": "records/build/current/crates/engine/src/storage.rs",
+      "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+    },
+    {
+      "bytes": 16963,
+      "path": "records/build/current/crates/engine/src/tree.rs",
+      "sha256": "7ae394f060638995bd6c7d4cc8f91dbd8e44164605c3d2ab2529f3c0b761c05f"
+    },
+    {
+      "bytes": 15307,
+      "path": "records/build/current/crates/engine/tests/dimension_changing_transitions.rs",
+      "sha256": "aec4e6df5a69722980fc1dac57216c8b2b1325dc6a4099686132ef3045464008"
+    },
+    {
+      "bytes": 8362,
+      "path": "records/build/current/crates/engine/tests/parallel.rs",
+      "sha256": "1608fd42ff61cf4c7783d54bfa8133fbca2c635d7d7cf8c61637436e3ba0c3c5"
+    },
+    {
+      "bytes": 590,
+      "path": "records/build/current/crates/formats/Cargo.toml",
+      "sha256": "6a927b7a56b63de5e8f5665b3bf93d43d10cb5950754f892b403e351c10edab3"
+    },
+    {
+      "bytes": 8220,
+      "path": "records/build/current/crates/formats/examples/mwsol_rewrite_bench.rs",
+      "sha256": "aac3ae59378320eb0da55a955b6061c23e65f23b795bce1a68c3675ffa021b98"
+    },
+    {
+      "bytes": 9370,
+      "path": "records/build/current/crates/formats/examples/sol_codec_bench.rs",
+      "sha256": "ed972ffce351fcd31dfbab74771a06a059ef0edb43e44d65397e65f9a85cbcea"
+    },
+    {
+      "bytes": 12412,
+      "path": "records/build/current/crates/formats/src/checkpoint.rs",
+      "sha256": "fa40828f6ac2befa9bf8382fa57e524a7bd7176eea0e9f7cabd0274c68fc56c1"
+    },
+    {
+      "bytes": 1246,
+      "path": "records/build/current/crates/formats/src/hash.rs",
+      "sha256": "fe6cda51a15c2312e7045377af0c42d6842ef55e0982355c1b20fbdb158ae73e"
+    },
+    {
+      "bytes": 1870,
+      "path": "records/build/current/crates/formats/src/lib.rs",
+      "sha256": "32991b53ff117a75d943f3fe6d06ca2d59d382f92dff20b3d84f501c17a4792c"
+    },
+    {
+      "bytes": 3317,
+      "path": "records/build/current/crates/formats/src/metrics.rs",
+      "sha256": "f3fa4c61909a907d97dc1e04de95eaaaf29c3480433e272e185ffbc12c2c9d6c"
+    },
+    {
+      "bytes": 7421,
+      "path": "records/build/current/crates/formats/src/multiway.rs",
+      "sha256": "4c3eec8d59b645aa71e10beae3c3bc82962fb9333bf0ebb6be39d06b507f5a26"
+    },
+    {
+      "bytes": 94172,
+      "path": "records/build/current/crates/formats/src/mwsol.rs",
+      "sha256": "f3653f988f825d775e09299e0bd64d7018275043bf8de921ef4f23f79cd90282"
+    },
+    {
+      "bytes": 18729,
+      "path": "records/build/current/crates/formats/src/run.rs",
+      "sha256": "87a78c054dd95241e26c0097981cd2d9d7fbbfc81f5a0a907352b367244fbb9b"
+    },
+    {
+      "bytes": 23888,
+      "path": "records/build/current/crates/formats/src/sol.rs",
+      "sha256": "205652bda1bb3966381c5af3436f0636151c28d83cfca8bc66fbb5c6efad8515"
+    },
+    {
+      "bytes": 18669,
+      "path": "records/build/current/crates/formats/src/sol_indexed.rs",
+      "sha256": "100864cc30b62de759b46161e6c1eec02ec8c4e27d8b20a3679cb8cfa8b91d7e"
+    },
+    {
+      "bytes": 10128,
+      "path": "records/build/current/crates/formats/tests/sol_byte_serde.rs",
+      "sha256": "b601584860436ed7371d98bf229b1764af1e815511b78990803a097419fd8631"
+    },
+    {
+      "bytes": 22068,
+      "path": "records/build/current/crates/formats/tests/sol_v2_integrity.rs",
+      "sha256": "6cc4c77b84b199eafa6a7a0c0a20f760f0fe0e065ccbad80cd454d5baa60af26"
+    },
+    {
+      "bytes": 389,
+      "path": "records/build/current/crates/game/Cargo.toml",
+      "sha256": "94c64d53d2ebc3896f20f104d2e9f32178e8695bf6bc41f7fcdbf3d6d4b09187"
+    },
+    {
+      "bytes": 651,
+      "path": "records/build/current/crates/game/src/lib.rs",
+      "sha256": "3667e422f0ccb31b507574c43c86f87b5930b8a345f19896aa55230e4c83e0be"
+    },
+    {
+      "bytes": 11716,
+      "path": "records/build/current/crates/game/src/payoff.rs",
+      "sha256": "bd9ecc083fbc575e888ad2d1173b3ad5ce78f0fb263778f8bd75a27242d772f9"
+    },
+    {
+      "bytes": 16941,
+      "path": "records/build/current/crates/game/src/r1/mod.rs",
+      "sha256": "f8c4d65cdda6e6ae8685af019aaaed61825f4f73f4e1f38ced2222023175d465"
+    },
+    {
+      "bytes": 4112,
+      "path": "records/build/current/crates/game/src/r1/settlement.rs",
+      "sha256": "657729d970e4d431685d7604a49cbb09a6a7d3d900c31279d943b414089728e7"
+    },
+    {
+      "bytes": 14756,
+      "path": "records/build/current/crates/game/src/toy.rs",
+      "sha256": "da123312ed67171641eab5b2675a43397a5e0d5c4f44c995342978839a4b6af8"
+    },
+    {
+      "bytes": 8618,
+      "path": "records/build/current/crates/game/tests/mccfr.rs",
+      "sha256": "2b332a3433a21926cfaeafe23851a7e4652ff524244d387aa9e525bef928cbc8"
+    },
+    {
+      "bytes": 3436,
+      "path": "records/build/current/crates/game/tests/oracle_diff.rs",
+      "sha256": "41e82ac556443de6822bcdcf08439d8c80ee3a044215f0142905125bfa72ff52"
+    },
+    {
+      "bytes": 22813,
+      "path": "records/build/current/crates/game/tests/r1_variants.rs",
+      "sha256": "12f736906d0220af367714ad44357a5dc6cc554e02661ea13a0b640ddf8f5704"
+    },
+    {
+      "bytes": 5339,
+      "path": "records/build/current/crates/game/tests/storage_backends.rs",
+      "sha256": "571ec9f19fc84046e80e6d77852388f6c832d3eee21c4344afc8669c31a675b5"
+    },
+    {
+      "bytes": 8141,
+      "path": "records/build/current/crates/game/tests/toys.rs",
+      "sha256": "bc3abd677f26af24fbc48699ee5f6dbffc57e8688238b1f536cd8f72f61797af"
+    },
+    {
+      "bytes": 249,
+      "path": "records/build/current/crates/hand-index/Cargo.toml",
+      "sha256": "aba9712b6e3e9dd725c858b8e1051900632b2345885db013f84095cee28f16ff"
+    },
+    {
+      "bytes": 12434,
+      "path": "records/build/current/crates/hand-index/src/lib.rs",
+      "sha256": "6c12d18fdcefad223205167d20d5f98678e25ab3e4f5a73f19a539e0d5842c29"
+    },
+    {
+      "bytes": 4740,
+      "path": "records/build/current/crates/holdem/benches/kernels.rs",
+      "sha256": "71ce44a604cc648a2a3a95b4aa0bd39c687222189a22fca629606960b3ce3ac0"
+    },
+    {
+      "bytes": 4089,
+      "path": "records/build/current/crates/holdem/benches/solve.rs",
+      "sha256": "4825dd96e023991cf56e22d0816a3e266c0ece217e98201b093823ffe3f34303"
+    },
+    {
+      "bytes": 546,
+      "path": "records/build/current/crates/holdem/Cargo.toml",
+      "sha256": "23b8886b502afe4aa5fc6008fb4dcdf3ae3a8b995f2838be9728151b451a6022"
+    },
+    {
+      "bytes": 2037,
+      "path": "records/build/current/crates/holdem/src/aggregate.rs",
+      "sha256": "45f3488891a5b9cc555e2bf6785509f051516d1907586b33f4d1987270a45aa6"
+    },
+    {
+      "bytes": 4527,
+      "path": "records/build/current/crates/holdem/src/equity.rs",
+      "sha256": "bb384beb2eea7bcc5192d0feb0313d5e78927630c4c2dc8e8575543867fa4130"
+    },
+    {
+      "bytes": 4863,
+      "path": "records/build/current/crates/holdem/src/kernel.rs",
+      "sha256": "7369d5f48610c8e8e6e8963b2a3483297401817b785f642db92fba5d40acb854"
+    },
+    {
+      "bytes": 1567,
+      "path": "records/build/current/crates/holdem/src/lib.rs",
+      "sha256": "37fb9748b6fd1ccd36b903ebc542b801f2a5b8bda4884008f801aae11b80fe29"
+    },
+    {
+      "bytes": 67916,
+      "path": "records/build/current/crates/holdem/src/postflop.rs",
+      "sha256": "e7c9f6719ba28147ab418b523b2a57cd9325d05734b3d546af7103183f1e9d13"
+    },
+    {
+      "bytes": 3657,
+      "path": "records/build/current/crates/holdem/src/river.rs",
+      "sha256": "70b9a783dd256e3e264bdf296a9ae81b525478ad194bb71839bc63e651571471"
+    },
+    {
+      "bytes": 19502,
+      "path": "records/build/current/crates/holdem/src/viewer.rs",
+      "sha256": "1b75e17452a40a8b6a82b9363a225ff08df42ff7f8abd5760fcd07a251fa3ad7"
+    },
+    {
+      "bytes": 7355,
+      "path": "records/build/current/crates/holdem/tests/aggregate.rs",
+      "sha256": "d549ba277c2bb5501fcb2c1a328d0cd23e5ededd1ffb36edc141a16b83b95f15"
+    },
+    {
+      "bytes": 12290,
+      "path": "records/build/current/crates/holdem/tests/oracle_diff.rs",
+      "sha256": "51e400e8bec89e9cf019dbeb2f61f043e0b41686926bf5177ea46eac2f4bd328"
+    },
+    {
+      "bytes": 17272,
+      "path": "records/build/current/crates/holdem/tests/oracle_river.rs",
+      "sha256": "aa4e32171e7b83f9ff9b34759733c0611a7aa77e8bf437f23a9e6cdad6de1861"
+    },
+    {
+      "bytes": 98001,
+      "path": "records/build/current/crates/holdem/tests/postflop.rs",
+      "sha256": "39c9f0923e5bfa5e8e075ce76cd69a3f8cdcf0623658203a321657baecbb5137"
+    },
+    {
+      "bytes": 17484,
+      "path": "records/build/current/crates/holdem/tests/rake_icm.rs",
+      "sha256": "73557d7075406d23897d5392e24ed3b8c27cd43628bf3d6ce827e133eb88926d"
+    },
+    {
+      "bytes": 8242,
+      "path": "records/build/current/crates/holdem/tests/river.rs",
+      "sha256": "fcabc041d886bb05415c20b81979df339df3be7aa9521e86ebb521b4139946a6"
+    },
+    {
+      "bytes": 14912,
+      "path": "records/build/current/crates/holdem/tests/viewer.rs",
+      "sha256": "c56f2e017656359077646d21bf2b3b79538364d48e31ac2e8756b62b10fa656d"
+    },
+    {
+      "bytes": 1408,
+      "path": "records/build/current/crates/multiway/Cargo.toml",
+      "sha256": "8bd74cb32ca00e84f665eb3f87e5ada11e056f425a665ddfef95fbc5a91d6644"
+    },
+    {
+      "bytes": 17429,
+      "path": "records/build/current/crates/multiway/src/abstraction.rs",
+      "sha256": "ba3f580080ff84751eef8f9cb579b6ff5d20a37658fe5b0b4b1d2175f75c90cc"
+    },
+    {
+      "bytes": 57763,
+      "path": "records/build/current/crates/multiway/src/betting.rs",
+      "sha256": "60e23fa53821cc3218b8d42956504afafc35ce0a74bb3afd0e99e3db7c1cde96"
+    },
+    {
+      "bytes": 7752,
+      "path": "records/build/current/crates/multiway/src/checkpoint/stream.rs",
+      "sha256": "288ccae7a5ea6d3baae311732c2471d8c57f3b0c662eb4460eb32e1f2943c8b0"
+    },
+    {
+      "bytes": 50774,
+      "path": "records/build/current/crates/multiway/src/checkpoint.rs",
+      "sha256": "10485ea843b60b82255ed74c8c21e74acaf1600844594dd5d174fcacf84e9d8f"
+    },
+    {
+      "bytes": 70170,
+      "path": "records/build/current/crates/multiway/src/config.rs",
+      "sha256": "0061be144f076f4f894f246c7b9e0138f053ac0fed4b0cabd7a565150cb73019"
+    },
+    {
+      "bytes": 57418,
+      "path": "records/build/current/crates/multiway/src/holdem.rs",
+      "sha256": "839e3a7bfaa321fcd42be02f3db8ce4509b78673f92185ffd28acd794b175243"
+    },
+    {
+      "bytes": 42104,
+      "path": "records/build/current/crates/multiway/src/icm.rs",
+      "sha256": "49015202a384f4127afd65cbb52d4e98301793bf15df16fefc9ba881c820c156"
+    },
+    {
+      "bytes": 3786,
+      "path": "records/build/current/crates/multiway/src/lib.rs",
+      "sha256": "7a10f7fd5c60b7fb227b155789543d0de216b1d53054ebb08f9cf6811efda02d"
+    },
+    {
+      "bytes": 7594,
+      "path": "records/build/current/crates/multiway/src/rake_condition.rs",
+      "sha256": "956383163d79f5f45b53547894b1e20cc7f35c8f05088ecce8caa5f83c87a71c"
+    },
+    {
+      "bytes": 16201,
+      "path": "records/build/current/crates/multiway/src/research_draw_abstraction.rs",
+      "sha256": "2649f4d651d5799818caa8ab3401194b3f265d13409534b6fe3208402272e9b4"
+    },
+    {
+      "bytes": 25386,
+      "path": "records/build/current/crates/multiway/src/sampler.rs",
+      "sha256": "1a38f085c9ce7226de2516e7a33f4b3a66676cc95976244c296b683c4b1c15df"
+    },
+    {
+      "bytes": 23511,
+      "path": "records/build/current/crates/multiway/src/settlement.rs",
+      "sha256": "aad0f69aca4c57a0d683ffd568e273c638793e166b17e0bf33514b06240a5db0"
+    },
+    {
+      "bytes": 29247,
+      "path": "records/build/current/crates/multiway/src/solver/averaging.rs",
+      "sha256": "9760c833555115a30850f2c0af289c8b214c5568611ad52192ecf35c6ebff0ff"
+    },
+    {
+      "bytes": 16733,
+      "path": "records/build/current/crates/multiway/src/solver/averaging_continuation_tests.rs",
+      "sha256": "577a9ecc9bad49cdeef0e0fb8a47be95be7d6045f2e95d2c0883b64565f1aaf0"
+    },
+    {
+      "bytes": 24562,
+      "path": "records/build/current/crates/multiway/src/solver/conditioned.rs",
+      "sha256": "0fa05243a90e19886ae4693bc7906d299943817b9178a32b5cda701f8bfccbda"
+    },
+    {
+      "bytes": 19266,
+      "path": "records/build/current/crates/multiway/src/solver/counterfactual_proposal_tests.rs",
+      "sha256": "e3908cbe35712648a687e8e790e136bb08d8450ccd2a6a95decb54d2c8f077e5"
+    },
+    {
+      "bytes": 13039,
+      "path": "records/build/current/crates/multiway/src/solver/dense_merge_tests.rs",
+      "sha256": "50a9ebe8559902d8e7f3b56adb15a56811d67f9e0b8c5b7a1c379639bad513b4"
+    },
+    {
+      "bytes": 3279,
+      "path": "records/build/current/crates/multiway/src/solver/drift.rs",
+      "sha256": "045762c6d628a32937d9a76e16821ebc4f5fc862160f193941505aee255fec51"
+    },
+    {
+      "bytes": 7039,
+      "path": "records/build/current/crates/multiway/src/solver/drift_tests.rs",
+      "sha256": "3a671df8a5c8ba0e20f0e0ed362aa90f934dd63b83a642538c3f20ce3434e73b"
+    },
+    {
+      "bytes": 8413,
+      "path": "records/build/current/crates/multiway/src/solver/endpoint_counterfactual_tests.rs",
+      "sha256": "98fc41a89f560b8ac915a8331af6dc314bf308db70c4af8230857a600e66ed65"
+    },
+    {
+      "bytes": 61459,
+      "path": "records/build/current/crates/multiway/src/solver/endpoint_deviation.rs",
+      "sha256": "313f8d322c913c941188d2202944b7d3963bd323fb99f0075507a97ce5617e5d"
+    },
+    {
+      "bytes": 4611,
+      "path": "records/build/current/crates/multiway/src/solver/errors.rs",
+      "sha256": "012ce7efbb05635aaac2338c0653b2f50d242db20241d3213c37c43cbaeee4f0"
+    },
+    {
+      "bytes": 83468,
+      "path": "records/build/current/crates/multiway/src/solver/eval.rs",
+      "sha256": "78b27110cdf0623c91d6107b22212ca398956ad78eb49eecf5b6acaaa075250e"
+    },
+    {
+      "bytes": 149665,
+      "path": "records/build/current/crates/multiway/src/solver/mod.rs",
+      "sha256": "db7b612eefb666ca0005aeaec41b8a795a959fb9a151676bc92327ea2ca2a404"
+    },
+    {
+      "bytes": 28519,
+      "path": "records/build/current/crates/multiway/src/solver/preflop_census.rs",
+      "sha256": "2d6144da1037697a07f46c06e664e7dc18cc8fd127e69df48b32b8f5da974b12"
+    },
+    {
+      "bytes": 16716,
+      "path": "records/build/current/crates/multiway/src/solver/preflop_deviation.rs",
+      "sha256": "70d11e7d7fb0ffa614a1912f5c2f488fb156718e3744784851ad43b582f40221"
+    },
+    {
+      "bytes": 23077,
+      "path": "records/build/current/crates/multiway/src/solver/preflop_deviation_tests.rs",
+      "sha256": "49850b94bb2360adfa822d979f5488dd2c5c83e8c9dc8f35d8a45c2be460c3ca"
+    },
+    {
+      "bytes": 38325,
+      "path": "records/build/current/crates/multiway/src/solver/preflop_proposal.rs",
+      "sha256": "318feecdb725770a456d29e5e1f54ff5d63a039e53c692451959ba6d43ed0d68"
+    },
+    {
+      "bytes": 15533,
+      "path": "records/build/current/crates/multiway/src/solver/preflop_support_tests.rs",
+      "sha256": "c2e1b0f390750f59421f1b6e72dd762a44c7e1b5153eeb9924d0e5bcb1db859c"
+    },
+    {
+      "bytes": 17843,
+      "path": "records/build/current/crates/multiway/src/solver/raised_opponent_tests.rs",
+      "sha256": "daa7c020e541b42d0ad51a22e5033dbcd46bb27a855496ec85d330e70cca782c"
+    },
+    {
+      "bytes": 8345,
+      "path": "records/build/current/crates/multiway/src/solver/regret_sampling.rs",
+      "sha256": "12a8da885b169e50b5e89d53eafa057485aea698c8f3af6948d4ec9195314128"
+    },
+    {
+      "bytes": 21849,
+      "path": "records/build/current/crates/multiway/src/solver/research_diagnostics.rs",
+      "sha256": "52e6b0321855e4de0b746cc8c4cbc08c6fef5977d6b5ec7b6d7d5f55f08cb6d4"
+    },
+    {
+      "bytes": 11122,
+      "path": "records/build/current/crates/multiway/src/solver/snapshot.rs",
+      "sha256": "f08c803dbeafe3c6bd17a7e129a8bbb2df273233c5562434ebca8be574213297"
+    },
+    {
+      "bytes": 11865,
+      "path": "records/build/current/crates/multiway/src/solver/snapshot_tests.rs",
+      "sha256": "4eca39b8e62bad1dc2778049dc4f45533644029a50f80e7c6e02bc054354ecfb"
+    },
+    {
+      "bytes": 14632,
+      "path": "records/build/current/crates/multiway/src/solver/support.rs",
+      "sha256": "1aaf76e8b4530982f8ba68c3e37d7bcb37c80cccdad83a19c1969626e155a7ca"
+    },
+    {
+      "bytes": 217887,
+      "path": "records/build/current/crates/multiway/src/solver/tests.rs",
+      "sha256": "09ff47a78cf37e850f3a4b71364588c326d699df7dda772bce19c307d5108615"
+    },
+    {
+      "bytes": 50702,
+      "path": "records/build/current/crates/multiway/src/solver/workers.rs",
+      "sha256": "ec6c430763d2330f3101b99d0fe630fff1b75ca62f64f0b8e987dce5a1c7cf14"
+    },
+    {
+      "bytes": 63196,
+      "path": "records/build/current/crates/multiway/src/tree.rs",
+      "sha256": "919b8042fa6e3ac912f3cfdc02bd25371d42eb2986bda4625bd45bfccd5af2d8"
+    },
+    {
+      "bytes": 17749,
+      "path": "records/build/current/crates/multiway/src/tree_rules.rs",
+      "sha256": "242f64204fac357c491241badc56453f4df8662e4d94e4711311d7304c130932"
+    },
+    {
+      "bytes": 12741,
+      "path": "records/build/current/crates/multiway/src/types.rs",
+      "sha256": "9ba93a6f1f0cf5fdc6efae254028f8c9d8933c5a3d0fdfe5d88e2ab9f2135805"
+    },
+    {
+      "bytes": 470,
+      "path": "records/build/current/crates/preflop/Cargo.toml",
+      "sha256": "85dda8133a30f61b82e9d0a2fcea84ee2d704da2ec3bac9f246121e65a891eb5"
+    },
+    {
+      "bytes": 54537,
+      "path": "records/build/current/crates/preflop/src/bucketed.rs",
+      "sha256": "bfd84a64cf6592c2439f692e55aea0aa3ef89e9377d414a19b3e4f7ed9081e1c"
+    },
+    {
+      "bytes": 6579,
+      "path": "records/build/current/crates/preflop/src/classes.rs",
+      "sha256": "3726a73e21766dec81244b00bc80039d27fd0eae6a71e9b011b6c35b088606a7"
+    },
+    {
+      "bytes": 23352,
+      "path": "records/build/current/crates/preflop/src/equity.rs",
+      "sha256": "abca792fa20ae0e2edf6f3a98dcd17a8c57a2ddd92a149d48a9df4e4469a4acb"
+    },
+    {
+      "bytes": 6157,
+      "path": "records/build/current/crates/preflop/src/evaluator.rs",
+      "sha256": "fac921ebe074d328b6ded19820b6a612236eb059a01510cbd358e931e198adab"
+    },
+    {
+      "bytes": 3521,
+      "path": "records/build/current/crates/preflop/src/lib.rs",
+      "sha256": "b8d57d5edfc0c45ef230f56f67fb614c7a64aa65a97b4f3b89bb8b63034d70d0"
+    },
+    {
+      "bytes": 7586,
+      "path": "records/build/current/crates/preflop/src/model.rs",
+      "sha256": "70e44fe5532585cb7b336567f409a65ee01776fe08d99dc717bba0b9d36c5546"
+    },
+    {
+      "bytes": 36806,
+      "path": "records/build/current/crates/preflop/src/trunk.rs",
+      "sha256": "c5cfbb682d75223090d676e5f2aee7d502462eb78e626d446faed2fd6701fdf4"
+    },
+    {
+      "bytes": 10864,
+      "path": "records/build/current/crates/preflop/tests/blueprint.rs",
+      "sha256": "746dbbc2ac7e424a212ee610e471293cdfc266d33003a0a5fa716386c2370ed4"
+    },
+    {
+      "bytes": 3661,
+      "path": "records/build/current/crates/preflop/tests/icm.rs",
+      "sha256": "063419efa641f7aa8d3b7e948078da8cbb131f004a071f667b25e94eb438df04"
+    },
+    {
+      "bytes": 325,
+      "path": "records/build/current/crates/protocol/Cargo.toml",
+      "sha256": "832a99b760f726f4afc0d005bc2bff7f41f01c922895420460ef92ea5ee51285"
+    },
+    {
+      "bytes": 11485,
+      "path": "records/build/current/crates/protocol/src/lib.rs",
+      "sha256": "6a7049baa3ce38d14762563861eab183d7ef8520836bc7537db209f9117e3ac2"
+    },
+    {
+      "bytes": 17157,
+      "path": "records/build/current/docs/app-architecture.md",
+      "sha256": "759ec95a14e95bf11345bad576f2829eccd290d5854a59f2f4a2df906f5fc01c"
+    },
+    {
+      "bytes": 30515,
+      "path": "records/build/current/docs/architecture.md",
+      "sha256": "f716c7e08d7fd675a955a4dc93aeb7eece1ab90c013fb04a688164cc97d51bbd"
+    },
+    {
+      "bytes": 36642,
+      "path": "records/build/current/docs/cli-reference.jp.md",
+      "sha256": "1734ff0c3db9b5c4e3bae324afb33d4e05beb9a40a8590e8f2e5156816f4ffb5"
+    },
+    {
+      "bytes": 4538,
+      "path": "records/build/current/docs/decisions/2026-09-25-development-workflow.jp.md",
+      "sha256": "e2f5b82d2181b77f39c8f0cd7647f7070aec3f7a5a0d3db1322d56227feba8ea"
+    },
+    {
+      "bytes": 9331,
+      "path": "records/build/current/docs/development.md",
+      "sha256": "57ee4413cb2ab0ff641f7ba9a46c67f1ffc462b5e3734183d1b1bbf3443fa83b"
+    },
+    {
+      "bytes": 826,
+      "path": "records/build/current/docs/multiway-preflop-cli-spec.jp.md",
+      "sha256": "2a91ad90809321c37808dd2338f1559d9b7ddaa3dbe317b45a478aa0f29a771b"
+    },
+    {
+      "bytes": 43602,
+      "path": "records/build/current/docs/multiway-preflop-v1.jp.md",
+      "sha256": "1b2aa9cd55b5487a2f31bee570e2306abeb9b2ff89e3faa367a3661919d39db1"
+    },
+    {
+      "bytes": 27510,
+      "path": "records/build/current/docs/multiway-preflop-v1.md",
+      "sha256": "2c24b9287197df95939c2e77143702d9bdadf683773921ea9cde9ea811aed8e7"
+    },
+    {
+      "bytes": 30897,
+      "path": "records/build/current/docs/plans/hu-postflop-r0/asset-map.md",
+      "sha256": "96fe974ddabaf5af615d39e79eb20c4a3bea0fc478df3234b40240a02f615da2"
+    },
+    {
+      "bytes": 23753,
+      "path": "records/build/current/docs/plans/hu-postflop-r0/cases.csv",
+      "sha256": "5dbe4efdbca244c55cba7d32900381334aca8a73e9e13534f6350242000e7466"
+    },
+    {
+      "bytes": 8864,
+      "path": "records/build/current/docs/plans/hu-postflop-r0/coverage.md",
+      "sha256": "de35865bd8f63e44eaf485ed7f614eba92d3376be37960d6476dda8b84097784"
+    },
+    {
+      "bytes": 6136,
+      "path": "records/build/current/docs/plans/hu-postflop-r0/handoff.md",
+      "sha256": "eca6812364ee5e32a4c94195f4f2f3148a7c84dc53b1b3776507d9deb84a0c1a"
+    },
+    {
+      "bytes": 10823,
+      "path": "records/build/current/docs/plans/hu-postflop-r0/local-run-plan.md",
+      "sha256": "9ee1d1b819d772b77f8635ea8aa3ca5d1bf0b7c1de9cad850d8f43cbfc9a0a6c"
+    },
+    {
+      "bytes": 1414,
+      "path": "records/build/current/docs/plans/hu-postflop-r0/manifest-template.json",
+      "sha256": "fdde8be8b755793ce1de53fca362459d8e163c659f7e615817a997f19d0159fe"
+    },
+    {
+      "bytes": 17568,
+      "path": "records/build/current/docs/plans/hu-postflop-r0/measurement-protocol.md",
+      "sha256": "c611f96600dcba452b361d40a485cd14c3a57ddba21dde9711bc289eb6ade892"
+    },
+    {
+      "bytes": 8831,
+      "path": "records/build/current/docs/plans/hu-postflop-r0/provenance.md",
+      "sha256": "07e54d96eaebe8d6296126797713281ed3d96bf85b45bbadbe06aed85e981761"
+    },
+    {
+      "bytes": 2942,
+      "path": "records/build/current/docs/plans/hu-postflop-r0/result-template.json",
+      "sha256": "8ea40bcdefe8053ca02d0aa8c6dffe9173ba385a49b95ed7a000262cd58462b6"
+    },
+    {
+      "bytes": 21676,
+      "path": "records/build/current/docs/plans/r0-execution-plan.jp.md",
+      "sha256": "c3da5c01cca9d422d4e3a204bdf83e7b79075fff0ad3b75fdeaad323f24b5644"
+    },
+    {
+      "bytes": 16694,
+      "path": "records/build/current/docs/plans/r1-abstraction-contract.jp.md",
+      "sha256": "7bd75d30bdd55dd9a87dbdb3c5f0639f748c5fb485e955f5245405e0f37e2c8a"
+    },
+    {
+      "bytes": 21766,
+      "path": "records/build/current/docs/plans/r1-common-game-boundary.jp.md",
+      "sha256": "77f212d98f8762ee98e7bf66f222fd20d8b9e30bb9abe8db6f106bc5a3cd8f8d"
+    },
+    {
+      "bytes": 7606,
+      "path": "records/build/current/docs/plans/r1-execution-plan.jp.md",
+      "sha256": "83a39b2881767cb04d47dfbf600866ee1af213a8c2a2fac306136ab4eac3e394"
+    },
+    {
+      "bytes": 6011,
+      "path": "records/build/current/docs/plans/r1-oracle-fixtures.jp.md",
+      "sha256": "db296f6a796c10938726479b1db4c85b857ca8e14082fef9da34c43953903241"
+    },
+    {
+      "bytes": 8574,
+      "path": "records/build/current/docs/plans/r1-supervisor.jp.md",
+      "sha256": "e9dd523bb07410ef654083aaa46caf8a73cbf14740819b5288a36d158124f4e0"
+    },
+    {
+      "bytes": 43576,
+      "path": "records/build/current/docs/plans/solver-implementation-plan.jp.md",
+      "sha256": "08457345448b7fb284d56b0cb9485cfb73ca1702ce968324cf2688a6628e115d"
+    },
+    {
+      "bytes": 913,
+      "path": "records/build/current/docs/plans/task-template.md",
+      "sha256": "59e7d1000c0c101d6d84463ed22966d81c6e4503adb0e6f91c396430286af6ad"
+    },
+    {
+      "bytes": 44060,
+      "path": "records/build/current/docs/product-roadmap.jp.md",
+      "sha256": "768e378858ffe894353d2dc0776dcfeea25f16338560292b311124e1bd0dbb87"
+    },
+    {
+      "bytes": 3455,
+      "path": "records/build/current/docs/README.md",
+      "sha256": "dd18819050861d95db13ac67b737127f96ac9a7b0d040ea601b0d0d6d24eabdf"
+    },
+    {
+      "bytes": 26565,
+      "path": "records/build/current/docs/research/ai-development-structure-audit-2026-09-25.jp.md",
+      "sha256": "56755904d995ed4840d609cdc81f51cef2e2326d86687635cd6da321ef7716d8"
+    },
+    {
+      "bytes": 1016,
+      "path": "records/build/current/docs/research/README.md",
+      "sha256": "1fd4926d56818ced95c246460101dbe17ff8ec425b96e9bcafe364bb879db7cf"
+    },
+    {
+      "bytes": 8625,
+      "path": "records/build/current/docs/research/solver-cloud-cost-estimate-2026-09-20.jp.md",
+      "sha256": "1843584620bb7237a69adac49adf448366b9d8fdefbb50121364e79f4ba1b363"
+    },
+    {
+      "bytes": 20364,
+      "path": "records/build/current/docs/research/solver-roadmap-survey-2026-09-20.jp.md",
+      "sha256": "618119a2b1edcfe7af363d460f990cd6fa92fd79e29567fe8783169446d0084f"
+    },
+    {
+      "bytes": 57667,
+      "path": "records/build/current/docs/solver-config-v1.jp.md",
+      "sha256": "0b793d4e04006c323d52907bc93a37a4201844b2e96d6793d6fc4fb89e5dd50d"
+    },
+    {
+      "bytes": 6546,
+      "path": "records/build/current/docs/status.jp.md",
+      "sha256": "1939f6e770f1ff77cfcd2ecc2e9dd24c43174485a9d56d6a688f2b1a5eeeb619"
+    },
+    {
+      "bytes": 38833,
+      "path": "records/build/current/docs/user-guide.jp.md",
+      "sha256": "b265b452574be27befa8146678153df6f6dd93929c0e995b2c5b59f7a2712ffc"
+    },
+    {
+      "bytes": 12343,
+      "path": "records/build/current/docs/validation.jp.md",
+      "sha256": "4a254c92a8701d59ef01f654320de21a74d3ef8e85d03480c8a61a293740520a"
+    },
+    {
+      "bytes": 1551,
+      "path": "records/build/current/examples/3betpot_fast.toml",
+      "sha256": "185ed03d6ddb805a3e1c59390bf9f6d99381358430069535623fa83837d52f49"
+    },
+    {
+      "bytes": 967,
+      "path": "records/build/current/examples/bench_multiway/3max_2bb.toml",
+      "sha256": "88831d99a39040cd3af5a9742f0042c55d0c9cbfeafd6f0ab4f17255609b9acf"
+    },
+    {
+      "bytes": 8802,
+      "path": "records/build/current/examples/bench_multiway/6max_100bb_nl50_partial_reference.toml",
+      "sha256": "2b8ca5983d13fcfa4808d5f44f5118440fc17290372bf3ad9e362d879cc133a0"
+    },
+    {
+      "bytes": 9692,
+      "path": "records/build/current/examples/bench_multiway/6max_100bb_nl50_partial_reference_limp.toml",
+      "sha256": "b2fed93a072cadf2b17603d8365cb6cf725edde13807fcb2a20a953052cb3e9a"
+    },
+    {
+      "bytes": 8852,
+      "path": "records/build/current/examples/bench_multiway/6max_100bb_nl50_partial_simple_reference.toml",
+      "sha256": "57279091cd769b2605336d53fc1cddd29a812ae22d9ff1a55b8955d29ec3e126"
+    },
+    {
+      "bytes": 1755,
+      "path": "records/build/current/examples/bench_multiway/6max_20bb_checkdown.toml",
+      "sha256": "3e2a6a4a180afe8049ec71f1c150bc3f76f1f0fc0df56d5ff87dcfd74a439277"
+    },
+    {
+      "bytes": 967,
+      "path": "records/build/current/examples/bench_multiway/6max_2bb.toml",
+      "sha256": "362d240485088174213db25d07e629bdd530138a44a07aeab814062b829985df"
+    },
+    {
+      "bytes": 1228,
+      "path": "records/build/current/examples/bench_multiway/6max_position_selector.toml",
+      "sha256": "4d8d4146e35ba2dee661ec21b086ce967a0eb3844db96257f12a7a312c19fe6e"
+    },
+    {
+      "bytes": 1094,
+      "path": "records/build/current/examples/bench_multiway/README.md",
+      "sha256": "75d9c86bdbbdb5aaa0b1f742c14d715f343fb7cf7faa90a1ece32b90af07a08c"
+    },
+    {
+      "bytes": 217,
+      "path": "records/build/current/examples/kuhn.toml",
+      "sha256": "07928dade792f04d6c4a051ad3e519bd82883896065e543bad8d291b1f6d594b"
+    },
+    {
+      "bytes": 335,
+      "path": "records/build/current/examples/kuhn_i16.toml",
+      "sha256": "c8f7ccae93707496efacf0ab3b552fda49525eb405ae6bfbd9e02462c9ed3758"
+    },
+    {
+      "bytes": 1241,
+      "path": "records/build/current/examples/postflop_pio_tree.toml",
+      "sha256": "098ea877a0c920f8f6ea22c184736d6a95da6dae96ca5c04bdaad7d35c5503ab"
+    },
+    {
+      "bytes": 614,
+      "path": "records/build/current/examples/postflop_srp20.toml",
+      "sha256": "cf9b03f59921dbe1c0be16b9210c5f2d31df58dec659bf4d38a409ade3ebc98c"
+    },
+    {
+      "bytes": 484,
+      "path": "records/build/current/examples/preflop_hu_100bb.toml",
+      "sha256": "3b6ffbcd824175ad0b5fd02c7a2c0a646fb7b9668a817a680c4a64771a8a4b3d"
+    },
+    {
+      "bytes": 1456,
+      "path": "records/build/current/examples/preflop_hu_100bb_bucketed.toml",
+      "sha256": "fa1397993464f944d49e391483f8d3e70bfcb6381d3d13eafb7d3b507de6972a"
+    },
+    {
+      "bytes": 689,
+      "path": "records/build/current/examples/preflop_multiway_v1_3max_smoke.toml",
+      "sha256": "a2d77daaae8537f8d4212f54ec4fb53f16115166d1b735e7cbef267e991295de"
+    },
+    {
+      "bytes": 2129,
+      "path": "records/build/current/examples/preflop_multiway_v1_default.toml",
+      "sha256": "3426f5f7e5d4eddb3983371bc8cef53ad1ddddee84cb34b000c758ebe34e7558"
+    },
+    {
+      "bytes": 2231,
+      "path": "records/build/current/examples/preflop_multiway_v1_full_surface.toml",
+      "sha256": "a62d39108cec67a2bfc580b472ac1343a317fe6b41fa2f4dc3f81899c617627d"
+    },
+    {
+      "bytes": 1139,
+      "path": "records/build/current/examples/preflop_multiway_v1_production_smoke.toml",
+      "sha256": "8cb446c0b270516ed90b6c0ac884dc2bd6949fbfb568803098bb8e03ab2fae44"
+    },
+    {
+      "bytes": 448,
+      "path": "records/build/current/examples/pushfold_10bb.toml",
+      "sha256": "c39944a7dd3a52dcb36737532e51b7d55d0643d194df3ad229fa6f8489756c33"
+    },
+    {
+      "bytes": 669,
+      "path": "records/build/current/examples/river_small.toml",
+      "sha256": "942ddd7a4aa29d2053af0b4fd831f87c71e38bff1ef32981dc8b84c59557e3de"
+    },
+    {
+      "bytes": 474,
+      "path": "records/build/current/examples/turn_small.toml",
+      "sha256": "87300f216a0be3b52ac4db70add4bf5241ab94f6d5448306cdbc2cf7e14b76b0"
+    },
+    {
+      "bytes": 561,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/bootstrap.sh",
+      "sha256": "4f3d73b879ec052068d20c361683716baece083879117c8def20da9219d63893"
+    },
+    {
+      "bytes": 9756,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/budget.json",
+      "sha256": "d48353216bac2bcf457fec41ac64590fe6dde52187c658fa65348c8fb0ee049b"
+    },
+    {
+      "bytes": 934,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/build-and-validate.sh",
+      "sha256": "d74a9c1569fa3b1dab279b9f523663de3db8a5a8760c4f17f3eb389a6661a54d"
+    },
+    {
+      "bytes": 16036,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/build-audit-pair.sh",
+      "sha256": "be959f4f9c5d989c55284eba5f0b58fb149e7fddc38ffdaf51c50c6c5bd29068"
+    },
+    {
+      "bytes": 29523,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/build-audit-recovery.py",
+      "sha256": "25eb38011b3873e9f09b3820e06ff53bfba2aa8e05b9bf285ba5c80c4d947dba"
+    },
+    {
+      "bytes": 736,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/build-audit.sh",
+      "sha256": "a223b7ca85e8298080ccf8602cbef2decc9388675a71929d56d7f5c78e5558e1"
+    },
+    {
+      "bytes": 503,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/build-baseline.sh",
+      "sha256": "c9a39771b94728f2700118cd78d038525a8c861a982342fe8f2f1f16a506f71f"
+    },
+    {
+      "bytes": 868,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/build-candidate-v3.sh",
+      "sha256": "36ee4cef6be550a82277ecbbe735ebdc08cb92549106e19d25ba2a77d963ecdd"
+    },
+    {
+      "bytes": 6647,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/build-comparison.sh",
+      "sha256": "8ef132778fe8ae199a0a6982d1df9a07a6cc411eb367ff7aa677e9b44d0b6be3"
+    },
+    {
+      "bytes": 6286,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/build-phases.sh",
+      "sha256": "4e79364b383a86b4087787ecdf4aaad5e93ad51f41dde86712b436cc4857a2ce"
+    },
+    {
+      "bytes": 4,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/cleanup-vm06/addresses-after.json",
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    {
+      "bytes": 154,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/cleanup-vm06/delete.log",
+      "sha256": "e87db45823d15b2ea117bd2442e7f6b37793c7ad6cc44779a62ad4385cda1e1f"
+    },
+    {
+      "bytes": 4,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/cleanup-vm06/disks-after.json",
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    {
+      "bytes": 515,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/cleanup-vm06/instance-before.json",
+      "sha256": "5bcf897b06dd52313bbc13b5d2e4ff6d03e714101890dc9ec0b7d594a4920de7"
+    },
+    {
+      "bytes": 4,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/cleanup-vm06/instances-after.json",
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    {
+      "bytes": 485,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/cleanup-vm06/operations.json",
+      "sha256": "4ade5a438f501da78d2cad3715c46a98d9315cd4c66894cf77d0c1297a5250e0"
+    },
+    {
+      "bytes": 343,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/cleanup-vm06/reconciliation.json",
+      "sha256": "5307789b96ce0a32b00830e7732cef7dc80a83ddd3eac2c8134a41d77b4ecb0f"
+    },
+    {
+      "bytes": 431,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/cleanup-vm06/request.json",
+      "sha256": "fae4c7b9a085a8bff0c8d52d418b74fc96191421f0bd2b85e0a960d26f013568"
+    },
+    {
+      "bytes": 676,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/cleanup-vm06/verified-target.json",
+      "sha256": "b4e19104c9c6897f490fef056b157e6fec015e7cf53e147e351076e2e0c94db1"
+    },
+    {
+      "bytes": 15608,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/collect-evidence.py",
+      "sha256": "dd2dead105ad975ab59b31b3bf6e3b9b9bfcb757101377752157994df6e4692a"
+    },
+    {
+      "bytes": 634,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/create-result-r1-20260925-02.json",
+      "sha256": "5fa2c0941bb4541815577e09821dfe97abd6da1550485c1ceb762191ac8e4698"
+    },
+    {
+      "bytes": 737,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/create-result-r1-20260925-05.json",
+      "sha256": "60ef8479412072ef14d29dd27d5c9244876051ef2f4651ce82976444b7035603"
+    },
+    {
+      "bytes": 735,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/create-result-r1-20260925-06.json",
+      "sha256": "eaa050d79f4f3d696f11cbf4dd279a4e31d43adc6042dd3eebaa33b50003b253"
+    },
+    {
+      "bytes": 30180,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/create-result-r1-20260925-07.json",
+      "sha256": "611ca7b526eb5e10acf268acd7ba45aa2a95615fac67f579069a1b0518c41ab4"
+    },
+    {
+      "bytes": 1093,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/launch-01.json",
+      "sha256": "ebad67947bd71e461867f248f4710c1642054f80b7827c52b166074acf0948c2"
+    },
+    {
+      "bytes": 1093,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/launch-r1-20260925-02.json",
+      "sha256": "3620de30de7232e4eeb03825db887e080755056d71fd7f91a09f01ea65af8f57"
+    },
+    {
+      "bytes": 1093,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/launch-r1-20260925-03.json",
+      "sha256": "d1f2befe248e03a8d4d252fa140303c79290ee23e10556d2edc136dc730d9726"
+    },
+    {
+      "bytes": 1093,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/launch-r1-20260925-04.json",
+      "sha256": "b0a2ee1221022d313d304407c42e3179501a693a05377bf87759cad3197ff3bf"
+    },
+    {
+      "bytes": 1093,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/launch-r1-20260925-05.json",
+      "sha256": "34e72d10559a1a6dcf5165541b5b4423176e38bcf34794a1ae87269d9d4d61ce"
+    },
+    {
+      "bytes": 1091,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/launch-r1-20260925-06.json",
+      "sha256": "a6560bf77fd21d4089f3b7d2fcd64fb3469a4de66c90b49e44a2fa3b41877f64"
+    },
+    {
+      "bytes": 1091,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/launch-r1-20260925-07.json",
+      "sha256": "32bc441fbe6a45bb53d12b455a79ab36fcbf72b63b3db47ea4bb524fe5fecaad"
+    },
+    {
+      "bytes": 2483,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/pack-source.py",
+      "sha256": "8713e6fc27cf11385a0d549bba14f17cbb33e66e65ef4c3a27900a6f4e89c8e4"
+    },
+    {
+      "bytes": 372,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/pin-and-validate.sh",
+      "sha256": "32618cabc2b9f3d1bb463f8762fa40b12248f05d162b8dd6b9a9522b066147c5"
+    },
+    {
+      "bytes": 610,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-02.json",
+      "sha256": "245b31bcdb390ad0166293b61bbb6e52b8417cd3d49c27ee178a9440523f250f"
+    },
+    {
+      "bytes": 7246,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-05.json",
+      "sha256": "e2f74e8534a423baf02d7053c337de9c6e2cc784917287c80339ff87c1af9eef"
+    },
+    {
+      "bytes": 11394,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/preempted-06.json",
+      "sha256": "c21088b1faebe53ef7938e36f7e0eace0c848366eb2bd7088f0049e99e58f42d"
+    },
+    {
+      "bytes": 16118,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/README.md",
+      "sha256": "5791ab9f7758934dd0420d3480c69637fc75bf1d67e88b59f448277ea852b6fa"
+    },
+    {
+      "bytes": 33386,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/retain-comparison.py",
+      "sha256": "1df5df496fea8549ec8380d01fbda295f0b7651228ce781ec337bf1c624dd6cc"
+    },
+    {
+      "bytes": 929,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/run-comparison.sh",
+      "sha256": "e34c254fbe2a364f419722f93b80d04ab73e9462987f46f1774f7d683836db9e"
+    },
+    {
+      "bytes": 1634,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/run-current-comparison.sh",
+      "sha256": "e573c181110bd89a0adbae49461584caf075af336a63c842d2d910a76e7784c6"
+    },
+    {
+      "bytes": 14263,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/run-diagnostic.py",
+      "sha256": "933f1313e00e8ad06f765592c402ccc068668d6323c817cc69ebe2486db44504"
+    },
+    {
+      "bytes": 9957,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/run-ignored.py",
+      "sha256": "337ed855b03999b40507a94da97980445caf0c07b214f4f5cb64e08c8e7bc350"
+    },
+    {
+      "bytes": 1173,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/run-phases.sh",
+      "sha256": "13d92d90a35e118abbf6163f9e35ec3ac2bde03a2722eb539bfbc95ff1c2e615"
+    },
+    {
+      "bytes": 1905,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/run-river-diagnostics.sh",
+      "sha256": "8b1eb07fae7b5b29b688b2eac7861977e1ac7104032317bacaba64087615e73d"
+    },
+    {
+      "bytes": 900,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/run-saved-audits.sh",
+      "sha256": "bd75539d2a10da43a4459b4c1f3070743a9f50b3ac7a0d20b0e0d38e36480ec4"
+    },
+    {
+      "bytes": 6401,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/source-transfer-files.txt",
+      "sha256": "d356c7b595526e82283a19e390cc0cf324215bfe12ee5b09415a1929bfc46817"
+    },
+    {
+      "bytes": 16854,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/transfers.json",
+      "sha256": "54d41363d9b13b3708c4215369103b1c3555e4850bb28cb7be44f6d1bd9a4ea2"
+    },
+    {
+      "bytes": 9254,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/validate-codec.py",
+      "sha256": "4633572f7511d624feb60840c19313dada7f8ca4d251142cb35226579c2b7dc9"
+    },
+    {
+      "bytes": 1684,
+      "path": "records/build/current/experiments/hu-postflop-r1/cloud/validate-source.py",
+      "sha256": "476da763bc514c760ad0a82f19e1416618606a6bdb4f52b92c05ba33de40fba2"
+    },
+    {
+      "bytes": 678,
+      "path": "records/build/current/experiments/hu-postflop-r1/pipeline/configs/flop.toml",
+      "sha256": "c8cb6c07ed18bbcf60f81b1e8022850b0a70f3c584d03b4307d7f5b9c504e7ad"
+    },
+    {
+      "bytes": 559,
+      "path": "records/build/current/experiments/hu-postflop-r1/pipeline/configs/river.toml",
+      "sha256": "cbbe0b27cc7cc5d31a6b11ac9ba9a421bf6e7e755a4306254cc1071a2ab9d790"
+    },
+    {
+      "bytes": 548,
+      "path": "records/build/current/experiments/hu-postflop-r1/pipeline/configs/turn.toml",
+      "sha256": "726f664ac4417d1d5d6cee145885805fc90cdd719d9d2490fa1f6e49df7067d8"
+    },
+    {
+      "bytes": 40470,
+      "path": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.json",
+      "sha256": "f389b01ef53aad3a2a65b909c08e5da8fa17aff703dbbe8c4d006193d92b4f92"
+    },
+    {
+      "bytes": 10584,
+      "path": "records/build/current/experiments/hu-postflop-r1/pipeline/current-report.md",
+      "sha256": "f10ee3a90cba480f32a7028038c9a6fcd55d1caf93368b9917f242679cb3b528"
+    },
+    {
+      "bytes": 35943,
+      "path": "records/build/current/experiments/hu-postflop-r1/pipeline/current-verification.py",
+      "sha256": "3272fc4a9c7a20736e6541dce0fcc79ab7e2e8eee84fbf279cda2f2f5b0bb345"
+    },
+    {
+      "bytes": 9536,
+      "path": "records/build/current/experiments/hu-postflop-r1/pipeline/README.md",
+      "sha256": "588378284fed50dd42c6730ff41d02c042a0dac7a6fbb98dad4cd7a30094b140"
+    },
+    {
+      "bytes": 29831,
+      "path": "records/build/current/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e"
+    },
+    {
+      "bytes": 9616,
+      "path": "records/build/current/experiments/hu-postflop-r1/pipeline/test_run_campaign.py",
+      "sha256": "8de66494f9176f36ffe3c3fc721753112b25107291f0b826cf2bffa4f1ee2e71"
+    },
+    {
+      "bytes": 40243,
+      "path": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+      "sha256": "311318d5d4f0de55352ec729d7e13ee992d2eb5d454a559cc287f9eb9f8db5e1"
+    },
+    {
+      "bytes": 32825,
+      "path": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-comparison-verification.py",
+      "sha256": "b61af4afa21aac4c5e217f179548ea954babc88ebb72c7f5c7f8d74acce30a72"
+    },
+    {
+      "bytes": 9938,
+      "path": "records/build/current/experiments/hu-postflop-r1/pipeline/vm06-report.md",
+      "sha256": "8396a14d92fdcec03bceb6bf41085d81e264b95bf4d44981f91ce94ffa7312c1"
+    },
+    {
+      "bytes": 1898,
+      "path": "records/build/current/LICENSE-POLICY.md",
+      "sha256": "0178ebad00f178ebccecb89b2e9c891fbd59dafb54a9c598911e82dc63426833"
+    },
+    {
+      "bytes": 8176,
+      "path": "records/build/current/README.md",
+      "sha256": "42765d75fd40616e36023f1f151714961e5799f92404c0cf7a18f71f3ead7634"
+    },
+    {
+      "bytes": 5418,
+      "path": "records/build/current/tools/check_docs.py",
+      "sha256": "9af1a436520b57adea611e214d4d7801c8d4ca5d78f591e72b995cd876905a9c"
+    },
+    {
+      "bytes": 2927,
+      "path": "records/build/current/tools/plot_convergence.py",
+      "sha256": "7f267e8f8f9ffd1ec96176df25c625e0e0f4088a18deb8dcc63c5e5ab7bc2a8c"
+    },
+    {
+      "bytes": 2171,
+      "path": "records/build/current/tools/README.md",
+      "sha256": "479e25496f3cf7c63968b16db1c501d93c73041caf4e0d5dffae890e44bb7bc5"
+    },
+    {
+      "bytes": 39015,
+      "path": "records/build/current/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+    },
+    {
+      "bytes": 4276,
+      "path": "records/build/current/tools/tests/test_check_docs.py",
+      "sha256": "52579c04f2b43fb1f0d81f8bce2d21ccc3c0864718dab8ec0d56d6036b30fdb3"
+    },
+    {
+      "bytes": 18060,
+      "path": "records/build/current/tools/tests/test_run_supervised.py",
+      "sha256": "7afdab6b42ac20c7e14bf6495c5481022e4f1bab13dc892d0c0b32fbd1a9f9d6"
+    },
+    {
+      "bytes": 2267,
+      "path": "records/build/current/tools/tests/test_workspace_audit.py",
+      "sha256": "cdb0b0c36fa66ce9b6883cee66ff1480e40a360d46c6791cec1007f1499ccf26"
+    },
+    {
+      "bytes": 2657,
+      "path": "records/build/current/tools/workspace_audit.py",
+      "sha256": "2e1ebfacfdaa1926b2a209de83a8eea2dbc793c943e54892d74282b65ccc2dc4"
+    },
+    {
+      "bytes": 9254,
+      "path": "records/checks/build-driver/validate-codec.py",
+      "sha256": "4633572f7511d624feb60840c19313dada7f8ca4d251142cb35226579c2b7dc9"
+    },
+    {
+      "bytes": 47966,
+      "path": "records/checks/clippy/samples.jsonl",
+      "sha256": "c67c96b73ed20a94877e777c3383ef57336f6db0b39bca19960365c044916b22"
+    },
+    {
+      "bytes": 8687,
+      "path": "records/checks/clippy/stderr.log",
+      "sha256": "c3872c0122632b1d15c35e7c530c3a155dcedc884245784f7f260321a8060c5a"
+    },
+    {
+      "bytes": 0,
+      "path": "records/checks/clippy/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 5239,
+      "path": "records/checks/clippy/supervisor.json",
+      "sha256": "2bb034cdaa344c85ec8fe7bae281beee74c780d706a809e8b75561db9f25caeb"
+    },
+    {
+      "bytes": 1889,
+      "path": "records/checks/fmt/samples.jsonl",
+      "sha256": "f2e6830dfdff7ca792c05735a2ae18c89bd0c45d79b7a01834d148be5507479f"
+    },
+    {
+      "bytes": 0,
+      "path": "records/checks/fmt/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "path": "records/checks/fmt/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 5086,
+      "path": "records/checks/fmt/supervisor.json",
+      "sha256": "08419df3d5a62ae1ac0440dd5dd1cd735a7de4deada4220e8243337fa10949e0"
+    },
+    {
+      "bytes": 1216,
+      "path": "records/checks/setup/setup-codec-vm07.sh",
+      "sha256": "01b85c926f882b4c3601c28a342d8d8bbe09ea1358608005914c4d84a794f019"
+    },
+    {
+      "bytes": 631,
+      "path": "records/checks/toolchain/samples.jsonl",
+      "sha256": "337f5f8cf9c82d5188a15ade9edca6d0b43d3a38eded740091ea3d8b12044a43"
+    },
+    {
+      "bytes": 0,
+      "path": "records/checks/toolchain/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 3794,
+      "path": "records/checks/toolchain/stdout.log",
+      "sha256": "718d0fa8f9b278239de3d34600fd3e598995b7794acd453cead44461ff3f41e1"
+    },
+    {
+      "bytes": 4985,
+      "path": "records/checks/toolchain/supervisor.json",
+      "sha256": "7aa49b5fd0d34557205c2b48a4a18822297fc7b35ebdf5c8ca676863f4959acf"
+    },
+    {
+      "bytes": 6605,
+      "path": "records/checks/tools/samples.jsonl",
+      "sha256": "1a3693c8dfa8f5424f79db86efbd840e886660de1c488483551ba1e0e0bf995b"
+    },
+    {
+      "bytes": 4839,
+      "path": "records/checks/tools/stderr.log",
+      "sha256": "26786348495356e8addaf843d46875ea65462f9074c4473acb9f03b08a5953d0"
+    },
+    {
+      "bytes": 0,
+      "path": "records/checks/tools/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 4687,
+      "path": "records/checks/tools/supervisor.json",
+      "sha256": "87f01874787b1ee08c20362b5b34067e93facdc237473aa96cbd3e12ad43ce46"
+    },
+    {
+      "bytes": 403866,
+      "path": "records/checks/workspace/samples.jsonl",
+      "sha256": "11551a8ef13aabf19b3b7fd318c45408434f0289786a684fc8c1b21257247ec4"
+    },
+    {
+      "bytes": 8920,
+      "path": "records/checks/workspace/stderr.log",
+      "sha256": "f40b145e78a438b469b02759546a7850240efcf5a803079b86c3b65c9543b886"
+    },
+    {
+      "bytes": 78726,
+      "path": "records/checks/workspace/stdout.log",
+      "sha256": "90eea8ebfa27c1132984f955fd795fe5c0edec248f771c6fb6e0a9e70a8dcd2d"
+    },
+    {
+      "bytes": 5218,
+      "path": "records/checks/workspace/supervisor.json",
+      "sha256": "5682935523d69d2b3052e197c3066bed9e4ddd7c4cdaad496df48ce64aa69b59"
+    },
+    {
+      "bytes": 592698,
+      "path": "retention.json",
+      "sha256": "7fd8b69d77251af364ebe4dcc2c412e75cc8aee2a6111fc1a612f73014537251"
+    },
+    {
+      "bytes": 67032,
+      "path": "validation.json",
+      "sha256": "88a599791edbfae3032cc1c9e4c795273c2c5aee584dcb13319d3ba5cc4dcb1d"
+    }
+  ],
+  "schema": "r1.local-comparison-retention/v1"
+}

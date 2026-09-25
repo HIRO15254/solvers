@@ -1,0 +1,15 @@
+{
+  "schema": "r1.reference-menu-transcription/v1",
+  "case_id": "HU-R0-002",
+  "source": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM.",
+  "root_batch_label": "batch02; stored as local batch03 because local batch02 preserves the earlier two R53 reconnection observations",
+  "data_file": "menu-capture-03.txt",
+  "bytes": 168,
+  "sha256": "f6350406fceb75bd54c07b6ee2ec0cc169e4337dedc08720a245e07d2830378c",
+  "observed_record_count": 5,
+  "acquisition_time": "Approximately19:26Z, after observed clock2026-09-25T19:23:29Z; exact per-record times were not supplied.",
+  "capture_after_observed_clock_utc": "2026-09-25T19:23:29Z",
+  "url_observation": "Root reported common base URL and history verified at each step.",
+  "quality_status": "not_evaluated",
+  "acceptance": null
+}

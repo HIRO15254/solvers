@@ -1,0 +1,3 @@
+# Research builds target the local machine. CI overrides this via RUSTFLAGS.
+[build]
+rustflags = ["-C", "target-cpu=native"]

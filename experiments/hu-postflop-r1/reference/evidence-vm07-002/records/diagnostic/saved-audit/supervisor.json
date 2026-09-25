@@ -1,0 +1,147 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T20:12:54.125112+00:00",
+  "argv": [
+    "/opt/r1/target/codec-current/release/examples/hu_saved_profile_audit",
+    "--sol",
+    "/opt/r1/diagnostic-002-vm07/run/solution.sol",
+    "--threads",
+    "1"
+  ],
+  "cwd": "/opt/r1/current",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 600.0,
+    "grace_seconds": 5.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.25,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "disk_reserve_bytes": 10737418240
+  },
+  "runtime": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-7.0.0-1011-gcp-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "logical_cpus": 8
+  },
+  "outputs": {
+    "stdout": {
+      "path": "/opt/r1/diagnostic-002-saved-audit07/stdout.json",
+      "sha256": "f856f7341312b89ff76491c2d63131022d7d6afadb106f98079a66603d1916b2",
+      "bytes": 1566
+    },
+    "stderr": {
+      "path": "/opt/r1/diagnostic-002-saved-audit07/stderr.log",
+      "sha256": "f985b4a20f225ba84800c396e9e302c776ae85aedce5b07a5abc57beb4460c8e",
+      "bytes": 74
+    },
+    "samples": {
+      "path": "/opt/r1/diagnostic-002-saved-audit07/supervisor.samples.jsonl",
+      "sha256": "8395b8992f0215aef1352edade18a04e102597135b698295da7c61bee548bf84",
+      "bytes": 633
+    }
+  },
+  "identity_before": [
+    {
+      "path": "/opt/r1/target/codec-current/release/examples/hu_saved_profile_audit",
+      "sha256": "a5d7a8d57366a555e6c5f119c6ac7fdde4a4193266920e953d6387f5fb0ced0d",
+      "bytes": 4248672
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/current/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/diagnostic-002-vm07/run/solution.sol",
+      "sha256": "0bb2bf5a1e3076378a40bb08771754f14a8ad4b20010d5175336c2b4d520ead9",
+      "bytes": 274352
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "/opt/r1/target/codec-current/release/examples/hu_saved_profile_audit",
+      "sha256": "a5d7a8d57366a555e6c5f119c6ac7fdde4a4193266920e953d6387f5fb0ced0d",
+      "bytes": 4248672
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/current/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/diagnostic-002-vm07/run/solution.sol",
+      "sha256": "0bb2bf5a1e3076378a40bb08771754f14a8ad4b20010d5175336c2b4d520ead9",
+      "bytes": 274352
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 2,
+    "max_sample_gap_seconds": 0.25622168800009604,
+    "sampled_peak_tree_resident_bytes": 11161600,
+    "root_os_peak_resident_bytes": 28430336,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "max_observed_processes": 1
+  },
+  "containment": {
+    "kind": "posix_session_process_group",
+    "limitations": [
+      "setsid/setpgid can escape this process group; use a systemd/cgroup wrapper",
+      "supervisor SIGKILL, host failure or power loss does not kill the group",
+      "resident memory is sampled /proc RSS; brief descendants may be missed",
+      "summed RSS can double-count shared pages; this is not cgroup memory.current",
+      "wait4 root peak can include reaped descendant high-water marks; it is not a simultaneous tree peak"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 67419480064,
+    "available_bytes": 66216493056
+  },
+  "resolved_argv": [
+    "/opt/r1/target/codec-current/release/examples/hu_saved_profile_audit",
+    "--sol",
+    "/opt/r1/diagnostic-002-vm07/run/solution.sol",
+    "--threads",
+    "1"
+  ],
+  "disk_path": "/opt/r1",
+  "disk_free_before_bytes": 94782529536,
+  "started_at": "2026-09-25T20:12:54.143711+00:00",
+  "pid": 16169,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 28430336,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "elapsed_seconds": 0.2642215870000655,
+    "at": "2026-09-25T20:12:54.414086+00:00",
+    "host_available_memory_bytes": 66221240320,
+    "disk_free_bytes": 94782517248
+  },
+  "elapsed_seconds": 0.27049354700011463,
+  "ended_at": "2026-09-25T20:12:54.414244+00:00",
+  "supervisor_exit_code": 0
+}

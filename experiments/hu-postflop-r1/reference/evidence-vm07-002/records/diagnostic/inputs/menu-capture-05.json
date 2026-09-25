@@ -1,0 +1,16 @@
+{
+  "schema": "r1.reference-menu-transcription/v1",
+  "case_id": "HU-R0-002",
+  "source": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM.",
+  "root_batch_label": "batch04",
+  "data_file": "menu-capture-05.txt",
+  "bytes": 148,
+  "sha256": "404fa3924d112aa5b861fbb3961eb4bb48a04934202d5a67accfc3bc21fd0fb0",
+  "observed_record_count": 4,
+  "acquisition_time": "After observed clock2026-09-25T19:23:29Z; exact per-record times not supplied.",
+  "capture_after_observed_clock_utc": "2026-09-25T19:23:29Z",
+  "reobserved_menus": [],
+  "reobservation_notes": "Root also reverified R2-R10 BB95.5 and R2-R10-R23 BTN87.5 with the same previously recorded menus; no new percentage labels supplied.",
+  "quality_status": "not_evaluated",
+  "acceptance": null
+}

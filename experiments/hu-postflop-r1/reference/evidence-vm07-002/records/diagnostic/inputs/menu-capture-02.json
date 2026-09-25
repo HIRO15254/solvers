@@ -1,0 +1,20 @@
+{
+  "schema": "r1.reference-menu-transcription/v1",
+  "case_id": "HU-R0-002",
+  "source": "Collecting root agent transcribed reconnected AX observations; not raw full AX/DOM.",
+  "data_file": "menu-capture-02.txt",
+  "bytes": 50,
+  "sha256": "2f35b395c8645084c859c2e634699294c2828b1d735e933e918f1044cbe5f027",
+  "observed_record_count": 2,
+  "acquisition_time": "Observed after clock2026-09-25T19:23:29Z; exact per-node timestamps not recorded.",
+  "capture_after_observed_clock_utc": "2026-09-25T19:23:29Z",
+  "observed_current_url_query": "river_actions=R4-R11-R25-R53-RAI&history_spot=15",
+  "ancestor_menu": "R4-R11-R25-R53",
+  "record_extra_ui_labels": {
+    "R4-R11-R25-R53": {
+      "allin_97_5_percent": 40
+    }
+  },
+  "quality_status": "not_evaluated",
+  "acceptance": null
+}

@@ -1,0 +1,9 @@
+{
+  "requested_at_utc": "2026-09-25T20:31:30.2550114+00:00",
+  "project": "solvers-abstraction-20260723",
+  "zone": "us-central1-b",
+  "instance": "solvers-r1-20260925-07",
+  "instance_id": "841167209049583155",
+  "evidence": "All 5 raw bundles downloaded; codec exact full verification passed including missing canonical supplied by supplemental bundle",
+  "deadline_utc": "2026-09-25T22:51:53Z"
+}

@@ -1,0 +1,77 @@
+# Small selector smoke fixture.  It demonstrates how a later street can
+# distinguish the last preflop raiser by position; it is not a GTO Wizard match.
+schema = "solvers.multiway-preflop/v1"
+
+[game]
+seat_count = 6
+button = 0
+
+[game.defaults]
+stack_bb = 20.0
+range = "random"
+
+[game.tree]
+kind = "standard"
+allow_limp = true
+
+[[game.tree.rules]]
+street = "preflop"
+when = 'last_preflop_aggressor_position == "UTG"'
+effect = "remove"
+action = "call"
+
+[[game.tree.rules]]
+street = "postflop"
+when = 'last_preflop_aggressor_position == "UTG"'
+effect = "replace"
+action = "bet"
+sizes = ["33"]
+
+[game.tree.max_aggressive_actions]
+preflop = 2
+flop = 1
+turn = 1
+river = 1
+
+[game.abstraction]
+kind = "ehs2-percentile"
+
+[game.abstraction.buckets]
+flop = 2
+turn = 2
+river = 2
+
+[game.information]
+recall = "current-street"
+
+[solver]
+kind = "range-vector"
+seed = 0
+opponent_exploration = 0.0
+batch_sweeps = 1
+
+[solver.discount]
+kind = "none"
+
+[solver.pruning]
+kind = "none"
+
+[run]
+max_sweeps = 1
+
+[run.stop]
+target = 1000000000000.0
+check_every_sweeps = 1
+confirmations = 1
+evaluation_samples = 8
+deviator_traversals = 1
+
+[run.resources]
+threads = 1
+memory = "auto"
+
+[run.checkpoint]
+interval = "15m"
+
+[output]
+probability_encoding = "u16"

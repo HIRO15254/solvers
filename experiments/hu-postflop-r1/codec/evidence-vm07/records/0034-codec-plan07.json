@@ -1,0 +1,190 @@
+{
+  "build": {
+    "compiler": {
+      "bytes": 646344,
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+    },
+    "example": {
+      "bytes": 9370,
+      "path": "/opt/r1/current/crates/formats/examples/sol_codec_bench.rs",
+      "sha256": "ed972ffce351fcd31dfbab74771a06a059ef0edb43e44d65397e65f9a85cbcea"
+    },
+    "host": {
+      "boot_id": "0727ebb3-36dd-4fae-b978-c629114703ed",
+      "cpu": "AMD EPYC 7B12",
+      "flags": "fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid",
+      "logical_cpus": 8,
+      "machine": "x86_64",
+      "system": "Linux"
+    },
+    "issued_at": "2026-09-25T20:18:34.732538+00:00",
+    "schema": "r1.codec-build-attestation/v1",
+    "settings": {
+      "profile": "release",
+      "rustflags": "-C target-cpu=native (.cargo/config.toml); no env override",
+      "target": "x86_64-unknown-linux-gnu"
+    },
+    "sides": {
+      "baseline": {
+        "binary": {
+          "bytes": 1710648,
+          "path": "/opt/r1/target/codec-baseline/release/examples/sol_codec_bench",
+          "sha256": "2579d79209a1e7ea32d55257c885df55670f49f46148f6f8e375272b129eed23"
+        },
+        "revision": "88ffa5dd4583e5c8bae84e20e9b8390cb719e4f0",
+        "source": {
+          "bytes": 1165415,
+          "path": "/opt/r1/codec-baseline-source.tar.gz",
+          "sha256": "3de4afef13082dca9e17c38c9cc5f5d1734855f017d812ecb04e9cdbe0f7da27"
+        }
+      },
+      "candidate": {
+        "binary": {
+          "bytes": 1709936,
+          "path": "/opt/r1/target/codec-current/release/examples/sol_codec_bench",
+          "sha256": "0815e6c9d1781de101d573db9b58c91d2a87f94a9d766808a10fe9f010348cee"
+        },
+        "revision": "88ffa5dd4583e5c8bae84e20e9b8390cb719e4f0",
+        "source": {
+          "bytes": 1314820,
+          "path": "/opt/r1/source-07.tar.gz",
+          "sha256": "a6d346a033cf90f68adf131c7a14f5a754417cf0d952e1008d5736e7e9d6dd2a"
+        },
+        "source_note": "Dirty source07 snapshot on the stated base commit; the archive pins changes."
+      }
+    },
+    "status": "completed",
+    "validation_file": {
+      "bytes": 120461,
+      "path": "/opt/r1/codec-build07/result.json",
+      "sha256": "d56eb5332655a07409b4becd575608d22b6cf80623223c81f77b06173412c9f0"
+    },
+    "validation_stages": [
+      {
+        "bytes": 4985,
+        "path": "/opt/r1/codec-build07/00-toolchain/supervisor.json",
+        "sha256": "7aa49b5fd0d34557205c2b48a4a18822297fc7b35ebdf5c8ca676863f4959acf"
+      },
+      {
+        "bytes": 5086,
+        "path": "/opt/r1/codec-build07/01-fmt/supervisor.json",
+        "sha256": "08419df3d5a62ae1ac0440dd5dd1cd735a7de4deada4220e8243337fa10949e0"
+      },
+      {
+        "bytes": 5239,
+        "path": "/opt/r1/codec-build07/02-clippy/supervisor.json",
+        "sha256": "2bb034cdaa344c85ec8fe7bae281beee74c780d706a809e8b75561db9f25caeb"
+      },
+      {
+        "bytes": 5218,
+        "path": "/opt/r1/codec-build07/03-workspace-tests/supervisor.json",
+        "sha256": "5682935523d69d2b3052e197c3066bed9e4ddd7c4cdaad496df48ce64aa69b59"
+      },
+      {
+        "bytes": 4687,
+        "path": "/opt/r1/codec-build07/04-python-tools/supervisor.json",
+        "sha256": "87f01874787b1ee08c20362b5b34067e93facdc237473aa96cbd3e12ad43ce46"
+      },
+      {
+        "bytes": 5322,
+        "path": "/opt/r1/codec-build07/05-release-cli/supervisor.json",
+        "sha256": "cf51eff13525aebd6ab7951cf5e026565b022b3851fe550df52ffa4443f93909"
+      },
+      {
+        "bytes": 5289,
+        "path": "/opt/r1/codec-build07/06-release-codec-current/supervisor.json",
+        "sha256": "3837e3a387456174782ea7be74e7caf3daf984d50c6b96783fd7a58ac1ed7a02"
+      },
+      {
+        "bytes": 5331,
+        "path": "/opt/r1/codec-build07/07-release-codec-baseline/supervisor.json",
+        "sha256": "9a167bd58e37a93ea1f3552d1e0a10419c88c04ad828b94746c60b46ffc4e92f"
+      }
+    ]
+  },
+  "build_record": {
+    "bytes": 4271,
+    "path": "/opt/r1/codec-build-attestation07.json",
+    "sha256": "0076cfc094093a5c02df692be46ec67b2341318c22f7b044a4ef71b1e6aab841"
+  },
+  "cache": "warm input bytes: SHA-256 before each invocation and BLAKE3 before each timed phase; no cache eviction",
+  "example": {
+    "bytes": 9370,
+    "path": "/opt/r1/current/crates/formats/examples/sol_codec_bench.rs",
+    "sha256": "ed972ffce351fcd31dfbab74771a06a059ef0edb43e44d65397e65f9a85cbcea"
+  },
+  "host": {
+    "boot_id": "0727ebb3-36dd-4fae-b978-c629114703ed",
+    "cpu": "AMD EPYC 7B12",
+    "flags": "fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid",
+    "logical_cpus": 8,
+    "machine": "x86_64",
+    "system": "Linux"
+  },
+  "input_selection": {
+    "bytes": 1257,
+    "path": "/opt/r1/codec-tools07/inputs.json",
+    "sha256": "32fb23b2178fc86f61a05a10638abe84ef0406d0b4b7084bc04c22a04b05710b"
+  },
+  "inputs": {
+    "flop": {
+      "bytes": 176833,
+      "path": "/opt/r1/codec-inputs07/flop.sol",
+      "sha256": "5f9fc7a35a4a4e034d029844ced6251e1603c9de269b69b6c275ae7034d837f1"
+    },
+    "river": {
+      "bytes": 7609,
+      "path": "/opt/r1/codec-inputs07/river.sol",
+      "sha256": "fc67f0f78c888bd163c62e9cc3625e7c00a18c7c5c468a075e226ed5ada669cc"
+    },
+    "turn": {
+      "bytes": 24920,
+      "path": "/opt/r1/codec-inputs07/turn.sol",
+      "sha256": "ee55a97544c793f2770893b12019a990649b564dfb2bf14e2b08a1ab7a0bcc2a"
+    }
+  },
+  "issued_at": "2026-09-25T20:18:35.227662+00:00",
+  "iterations": {
+    "decode-all": 1,
+    "read-repeat-chunk": 64,
+    "read-root": 1,
+    "stream-write": 1
+  },
+  "limits": {
+    "campaign_seconds": 1800,
+    "disk_reserve_bytes": 2147483648,
+    "memory_limit_bytes": 4294967296,
+    "min_free_memory_bytes": 2147483648,
+    "timeout_seconds": 120
+  },
+  "order": "one warmup per side then 3 paired repeats; B/C, C/B, B/C; cases River/Turn/Flop; operations fixed",
+  "plan_sha256": "afa17b234bcf2a29588d3f4cf221147b055ffb8ebe2c57b0fc3e2298b7b667e5",
+  "python": {
+    "bytes": 8020928,
+    "path": "/usr/bin/python3.12",
+    "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+  },
+  "runner": {
+    "bytes": 30786,
+    "path": "/opt/r1/codec-tools07/run_codec.py",
+    "sha256": "6c8ca8e49f6c20320d4140a8b1322e0c62b3d37de1b26968e4270970d6eba79f"
+  },
+  "schema": "r1.codec-plan/v1",
+  "source_root": "/opt/r1/current",
+  "supervisor": {
+    "bytes": 39015,
+    "path": "/opt/r1/current/tools/run_supervised.py",
+    "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+  },
+  "thresholds": {
+    "correctness": "exact canonical metadata/float bits/all raw arrays; exact rewritten input and paired SOL bytes",
+    "per_case_operation_improvement": {
+      "median_candidate_over_baseline_max": 0.95,
+      "paired_faster_count_min": 2
+    },
+    "repetitions": 3,
+    "scope": "Descriptive codec microbenchmark only; no overall R1, solver quality or end-to-end speed acceptance",
+    "warmups_per_case_operation_side": 1
+  }
+}

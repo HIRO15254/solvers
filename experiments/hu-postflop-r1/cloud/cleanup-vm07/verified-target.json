@@ -1,0 +1,28 @@
+{
+  "observed_at_utc": "2026-09-25T20:30:37.4418803+00:00",
+  "id": "841167209049583155",
+  "name": "solvers-r1-20260925-07",
+  "status": "RUNNING",
+  "scheduling": {
+    "automaticRestart": false,
+    "instanceTerminationAction": "STOP",
+    "onHostMaintenance": "TERMINATE",
+    "preemptible": true,
+    "provisioningModel": "SPOT",
+    "terminationTime": "2026-09-25T22:51:53Z"
+  },
+  "disks": [
+    {
+      "source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260925-07",
+      "autoDelete": true,
+      "boot": true
+    }
+  ],
+  "labels": {
+    "campaign": "hu-postflop-r1",
+    "reservation": "r1-20260925-07"
+  },
+  "external_ips": [
+    "34.9.141.175"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "observed_at_utc": "2026-09-25T18:38:54.5680640+00:00",
+  "id": "5209515640504390740",
+  "name": "solvers-r1-20260925-06",
+  "status": "RUNNING",
+  "scheduling": {
+    "automaticRestart": false,
+    "instanceTerminationAction": "STOP",
+    "onHostMaintenance": "TERMINATE",
+    "preemptible": true,
+    "provisioningModel": "SPOT",
+    "terminationTime": "2026-09-25T20:09:11Z"
+  },
+  "disks": [
+    {
+      "source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260925-06",
+      "autoDelete": true,
+      "boot": true
+    }
+  ],
+  "external_ips": [
+    "34.42.163.215"
+  ]
+}

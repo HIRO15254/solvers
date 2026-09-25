@@ -1,0 +1,65 @@
+[package]
+name = "cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "solvers command-line interface"
+
+[features]
+default = []
+research-average-sampling = ["multiway/research-average-sampling"]
+research-regret-sampling = ["multiway/research-regret-sampling"]
+research-draw-abstraction = ["multiway/research-abstractions", "research-average-sampling"]
+
+[[bin]]
+name = "solvers"
+path = "src/main.rs"
+
+[[example]]
+name = "mw_average_sampling_research"
+path = "examples/mw_average_sampling_research.rs"
+required-features = ["research-average-sampling"]
+
+[[example]]
+name = "mw_draw_abstraction_research"
+path = "examples/mw_draw_abstraction_research.rs"
+required-features = ["research-draw-abstraction"]
+
+[[example]]
+name = "mw_tree_census"
+path = "examples/mw_tree_census.rs"
+
+[[example]]
+name = "mw_tree_initialization_bench"
+path = "examples/mw_tree_initialization_bench.rs"
+
+[dependencies]
+abstraction = { workspace = true }
+cards = { workspace = true }
+engine = { workspace = true, features = ["serde"] }
+formats = { workspace = true }
+game = { workspace = true }
+holdem = { workspace = true }
+preflop = { workspace = true }
+multiway = { workspace = true, default-features = false }
+anyhow = { workspace = true }
+blake3 = { workspace = true }
+clap = { workspace = true }
+rayon = { workspace = true }
+rand = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tempfile = { workspace = true }
+
+toml = { workspace = true }
+toml_edit = { workspace = true }
+
+[dev-dependencies]
+rand_chacha = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+libc = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { workspace = true }
