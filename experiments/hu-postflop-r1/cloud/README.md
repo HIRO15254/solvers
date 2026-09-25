@@ -185,6 +185,19 @@ Flop書込みはmedian約21%悪化した。外部24caseの品質認定や全solv
 [20:34:35 UTCの照合](cleanup-vm07/reconciliation.json)でinstance・disk・予約addressは空だった。
 実請求は未確認で、VM02/05/06/07の予約を合計20 USD保持する。予算残を仮定して追加起動しない。
 
+## 費用明細とローカル資源の追加観測
+
+2026-09-25 20:42–20:47 UTC頃に、認証済みBilling Reportsで対象projectと9月25日を
+選択した[費用観測](billing-observation-20260925.json)を追加した。表は「表示する結果がありません」、
+表示合計はJPY 0で、実験日のSKU明細は取得できていない。
+[Googleの説明](https://docs.cloud.google.com/billing/docs/how-to/view-history)では費用反映に通常1日、
+場合によって24時間超を要する。ゼロ請求や余剰予算の証拠には使わず、20 USDの予約を保持する。
+この照会でVM作成・課金設定変更は行っていない。
+
+同時期の[ローカルhost観測](host-probe-after-vm07.json)は空き物理RAM約3.58 GB、
+利用可能commit約1.44 GB、memory load 89%だった。この条件では追加の重いbuild/solveを行わず、
+参照入力の取得と軽い検証だけを進めた。恒久的なマシン容量不足の判断ではない。
+
 ## ローカル回収済み bundle の転送台帳
 
 [transfers.json](transfers.json)は実際にローカルへ到着した15 bundle、そのmanifestとSHA sidecarを記録する。

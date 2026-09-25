@@ -1,0 +1,33 @@
+{
+  "observed_at": "2026-09-26T05:42:59.5287368+09:00",
+  "os": "Microsoft Windows 10.0.26200",
+  "architecture": "X64",
+  "cpu": {
+    "model": "Intel(R) Core(TM) i7-10700KF CPU @ 3.80GHz",
+    "physical_cores": 8,
+    "logical_cores": 16
+  },
+  "memory": {
+    "available_page_file_bytes": 1442934784,
+    "total_physical_bytes": 34275098624,
+    "memory_load_percent": 89,
+    "available_physical_bytes": 3582177280,
+    "total_page_file_bytes": 42865033216
+  },
+  "disk": {
+    "total_bytes": 510949060608,
+    "volume": "C:\\",
+    "available_bytes": 57421041664
+  },
+  "power": {
+    "battery_flag": 128,
+    "scheme_raw": "電源設定の GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (バランス)",
+    "ac_line_status": 1,
+    "scheme_guid": "381b4222-f694-41f0-9685-ff5bb260df2e"
+  },
+  "gpu": {
+    "status": "not_applicable",
+    "reason": "CPU-only measurement"
+  },
+  "missing": []
+}

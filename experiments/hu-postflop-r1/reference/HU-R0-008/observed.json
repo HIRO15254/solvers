@@ -1,0 +1,345 @@
+{
+  "case_id": "HU-R0-008",
+  "captured_utc_date": "2026-09-25",
+  "capture_window_approximate_utc": [
+    "2026-09-25T20:47Z",
+    "2026-09-25T20:56Z"
+  ],
+  "capture_time_note": "Root supplied an approximate acquisition window, not exact per-seat or per-node timestamps. A directly observed clock reading at 20:52:38 UTC occurred after OOP Copy and before IP Copy.",
+  "mid_capture_clock_observed_utc": "2026-09-25T20:52:38Z",
+  "reference": "GTO Wizard existing solved library; collecting root observed UI and used Copy range controls",
+  "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gametype=Cash6mGeneral_6mcEVR25&depth=20&stratab=strategy_ev&history_spot=6&preflop_actions=F-F-F-R2.5-F-C&board=QsJsTd&gmfs_solution_tab=ai_sols&gmfft_sort_key=0&gmfft_sort_order=desc",
+  "url_provenance": "Actual Range-tab URL supplied by collecting root; catalog URL is retained separately without substituting for the observed URL.",
+  "catalog_url": "https://app.gtowizard.com/solutions?soltab=strategy&solution_type=gwiz&gametype=Cash6mGeneral_6mcEVR25&depth=20&stratab=strategy_ev&history_spot=6&preflop_actions=F-F-F-R2.5-F-C&board=QsJsTd&gmfs_solution_tab=ai_sols&gmfft_sort_key=0&gmfft_sort_order=desc",
+  "visible_solution": "Cash 20bb / 6max / cEV / With cold calls 2.5x",
+  "table_players": "6max",
+  "subgame_players": 2,
+  "street": "flop",
+  "board": [
+    "Qs",
+    "Js",
+    "Td"
+  ],
+  "seats": {
+    "oop": "BB",
+    "ip": "BTN"
+  },
+  "root_actor": "BB",
+  "pot_bb": 5.5,
+  "stacks_behind_bb": [
+    17.5,
+    17.5
+  ],
+  "preflop_actions": "F-F-F-R2.5-F-C",
+  "preflop": "UTG fold; HJ fold; CO fold; BTN raise to 2.5; SB fold; BB call",
+  "flop": "root before BB acts",
+  "root_ranges": {
+    "oop": "oop-range.txt",
+    "ip": "ip-range.txt",
+    "weights": "Copy-control raw text without reordering or renormalization; files add one final LF",
+    "reported_copy_raw_characters": {
+      "oop": 6881,
+      "ip": 4019
+    },
+    "reported_copy_raw_fnv1a32": {
+      "oop": "994cbe19",
+      "ip": "fb3c181e"
+    },
+    "file_writer": "Collecting root saved the raw texts directly; independent saving agent verifies the resulting file bytes."
+  },
+  "observed_menus": [
+    {
+      "history": "",
+      "source_history": "",
+      "actor": "BB",
+      "street": "flop",
+      "actions": [
+        "check",
+        "allin 17.5"
+      ],
+      "action_ui_percent_labels": {
+        "allin 17.5": 318
+      },
+      "remaining_stack_bb_displayed": 17.5,
+      "observation_surface": "Direct root decision-menu observation supplied by collecting root",
+      "action_order_basis": "Top decision-menu order directly observed through AX; action-panel frequency display order is preserved separately.",
+      "action_panel": [
+        {
+          "action": "allin 17.5",
+          "frequency_percent_displayed": 0,
+          "weighted_combos_displayed": 0.01
+        },
+        {
+          "action": "check",
+          "frequency_percent_displayed": 100,
+          "weighted_combos_displayed": 331.13
+        }
+      ]
+    },
+    {
+      "history": "check",
+      "source_history": "X",
+      "history_spot": 7,
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gametype=Cash6mGeneral_6mcEVR25&depth=20&stratab=strategy_ev&history_spot=7&preflop_actions=F-F-F-R2.5-F-C&board=QsJsTd&gmfs_solution_tab=ai_sols&gmfft_sort_key=0&gmfft_sort_order=desc&flop_actions=X",
+      "url_provenance": "Full URL reconstructed from the retained root URL and exact history_spot/flop_actions parameters supplied from actual UI by collecting root.",
+      "actor": "BTN",
+      "street": "flop",
+      "actions": [
+        "check",
+        "bet 2.6"
+      ],
+      "action_ui_percent_labels": {
+        "bet 2.6": 47
+      },
+      "action_panel": [
+        {
+          "action": "bet 2.6",
+          "frequency_percent_displayed": 75.5,
+          "weighted_combos_displayed": 252.94
+        },
+        {
+          "action": "check",
+          "frequency_percent_displayed": 24.5,
+          "weighted_combos_displayed": 82.1
+        }
+      ],
+      "observation_surface": "Collecting root individually navigated to and read this Flop decision node",
+      "observation_time_window": "additional Flop menu acquisition; approximate start 20:56Z, completed before observed 20:59:25Z clock",
+      "action_order_basis": "Top decision-menu order directly observed through AX; action-panel frequency display order is preserved separately.",
+      "remaining_stack_bb_displayed": 17.5
+    },
+    {
+      "history": "check/bet 2.6",
+      "source_history": "X-R2.6",
+      "history_spot": 8,
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gametype=Cash6mGeneral_6mcEVR25&depth=20&stratab=strategy_ev&history_spot=8&preflop_actions=F-F-F-R2.5-F-C&board=QsJsTd&gmfs_solution_tab=ai_sols&gmfft_sort_key=0&gmfft_sort_order=desc&flop_actions=X-R2.6",
+      "url_provenance": "Full URL reconstructed from the retained root URL and exact history_spot/flop_actions parameters supplied from actual UI by collecting root.",
+      "actor": "BB",
+      "street": "flop",
+      "actions": [
+        "fold",
+        "call",
+        "raise to 5.6"
+      ],
+      "action_ui_percent_labels": {
+        "raise to 5.6": 28
+      },
+      "action_panel": [
+        {
+          "action": "raise to 5.6",
+          "frequency_percent_displayed": 20.5,
+          "weighted_combos_displayed": 67.86
+        },
+        {
+          "action": "call",
+          "frequency_percent_displayed": 34.1,
+          "weighted_combos_displayed": 113.02
+        },
+        {
+          "action": "fold",
+          "frequency_percent_displayed": 45.4,
+          "weighted_combos_displayed": 150.25
+        }
+      ],
+      "observation_surface": "Collecting root individually navigated to and read this Flop decision node",
+      "observation_time_window": "additional Flop menu acquisition; approximate start 20:56Z, completed before observed 20:59:25Z clock",
+      "action_order_basis": "Top decision-menu order directly observed through AX; action-panel frequency display order is preserved separately.",
+      "remaining_stack_bb_displayed": 17.5
+    },
+    {
+      "history": "check/bet 2.6/raise to 5.6",
+      "source_history": "X-R2.6-R5.6",
+      "history_spot": 9,
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gametype=Cash6mGeneral_6mcEVR25&depth=20&stratab=strategy_ev&history_spot=9&preflop_actions=F-F-F-R2.5-F-C&board=QsJsTd&gmfs_solution_tab=ai_sols&gmfft_sort_key=0&gmfft_sort_order=desc&flop_actions=X-R2.6-R5.6",
+      "url_provenance": "Full URL reconstructed from the retained root URL and exact history_spot/flop_actions parameters supplied from actual UI by collecting root.",
+      "actor": "BTN",
+      "street": "flop",
+      "actions": [
+        "fold",
+        "call",
+        "allin 17.5"
+      ],
+      "action_ui_percent_labels": {
+        "allin 17.5": 71
+      },
+      "action_panel": [
+        {
+          "action": "allin 17.5",
+          "frequency_percent_displayed": 32.5,
+          "weighted_combos_displayed": 82.33
+        },
+        {
+          "action": "call",
+          "frequency_percent_displayed": 36.6,
+          "weighted_combos_displayed": 92.64
+        },
+        {
+          "action": "fold",
+          "frequency_percent_displayed": 30.8,
+          "weighted_combos_displayed": 77.98
+        }
+      ],
+      "observation_surface": "Collecting root individually navigated to and read this Flop decision node",
+      "observation_time_window": "additional Flop menu acquisition; approximate start 20:56Z, completed before observed 20:59:25Z clock",
+      "remaining_stack_bb_displayed": 14.9,
+      "action_order_basis": "Top decision-menu order directly observed through AX; action-panel frequency display order is preserved separately."
+    },
+    {
+      "history": "check/bet 2.6/raise to 5.6/allin 17.5",
+      "source_history": "X-R2.6-R5.6-R17.5",
+      "history_spot": 10,
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gametype=Cash6mGeneral_6mcEVR25&depth=20&stratab=strategy_ev&history_spot=10&preflop_actions=F-F-F-R2.5-F-C&board=QsJsTd&gmfs_solution_tab=ai_sols&gmfft_sort_key=0&gmfft_sort_order=desc&flop_actions=X-R2.6-R5.6-R17.5",
+      "url_provenance": "Full URL reconstructed from the retained root URL and exact history_spot/flop_actions parameters supplied from actual UI by collecting root.",
+      "actor": "BB",
+      "street": "flop",
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "action_ui_percent_labels": {},
+      "action_panel": [
+        {
+          "action": "call",
+          "frequency_percent_displayed": 83.9,
+          "weighted_combos_displayed": 56.97
+        },
+        {
+          "action": "fold",
+          "frequency_percent_displayed": 16.1,
+          "weighted_combos_displayed": 10.9
+        }
+      ],
+      "observation_surface": "Collecting root individually navigated to and read this Flop decision node",
+      "observation_time_window": "additional Flop menu acquisition; approximate start 20:56Z, completed before observed 20:59:25Z clock",
+      "action_order_basis": "Top decision-menu order directly observed through AX; action-panel frequency display order is preserved separately.",
+      "remaining_stack_bb_displayed": 11.9
+    },
+    {
+      "history": "allin 17.5",
+      "source_history": "R17.5",
+      "history_spot": 7,
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gametype=Cash6mGeneral_6mcEVR25&depth=20&stratab=strategy_ev&history_spot=7&preflop_actions=F-F-F-R2.5-F-C&board=QsJsTd&gmfs_solution_tab=ai_sols&gmfft_sort_key=0&gmfft_sort_order=desc&flop_actions=R17.5",
+      "url_provenance": "Full URL reconstructed from the retained root URL and exact history_spot/flop_actions parameters supplied from actual UI by collecting root.",
+      "actor": "BTN",
+      "street": "flop",
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "action_ui_percent_labels": {},
+      "action_panel": [
+        {
+          "action": "call",
+          "frequency_percent_displayed": 45.2,
+          "weighted_combos_displayed": 151.54
+        },
+        {
+          "action": "fold",
+          "frequency_percent_displayed": 54.8,
+          "weighted_combos_displayed": 183.5
+        }
+      ],
+      "observation_surface": "Collecting root individually navigated to and read this Flop decision node",
+      "observation_time_window": "additional Flop menu acquisition; approximate start 20:56Z, completed before observed 20:59:25Z clock",
+      "remaining_stack_bb_displayed": 17.5,
+      "opponent_stack_bb_displayed": 0,
+      "action_order_basis": "Top decision-menu order directly observed through AX; action-panel frequency display order is preserved separately."
+    }
+  ],
+  "next_node_previews": [
+    {
+      "history": "check",
+      "actor": "BTN",
+      "street": "flop",
+      "actions_displayed": [
+        "check",
+        "bet 2.6"
+      ],
+      "action_ui_percent_labels": {
+        "bet 2.6": 47
+      },
+      "observation_surface": "Initial history next-node preview; subsequently checked at the individual node. Preview and direct action-panel order are retained separately.",
+      "adopted_as_direct_menu": false,
+      "subsequent_individual_observation_history": "X"
+    }
+  ],
+  "tree_observation": "All six listed Flop decision nodes on this board were individually observed, including ordered top decision menus and their action panels. This does not include the full chance/Turn/River continuation tree or certify identical terminal utilities.",
+  "root_ui": {
+    "view": "Ranges",
+    "oop_ev_bb": 1.68,
+    "ip_ev_bb": 3.82,
+    "oop_equity_percent": 39.8,
+    "ip_equity_percent": 60.2,
+    "oop_eqr_percent": 76.7,
+    "ip_eqr_percent": 115.4,
+    "oop_ev_share_percent": 30.57,
+    "ip_ev_share_percent": 69.43,
+    "oop_combos_rounded": 331.1,
+    "ip_combos_rounded": 335,
+    "oop_frequency_percent": {
+      "check": 100,
+      "allin_17_5": 0
+    },
+    "oop_action_combos_displayed": {
+      "check": 331.13,
+      "allin_17_5": 0.01
+    },
+    "note": "Displayed all-in 0% coexists with 0.01 combos; neither value is replaced by an exact zero strategy assertion."
+  },
+  "root_ui_literal_text": {
+    "oop_combos": "331.1",
+    "ip_combos": "335",
+    "oop_ev": "1.68 BB",
+    "ip_ev": "3.82 BB",
+    "oop_equity": "39.8%",
+    "ip_equity": "60.2%",
+    "oop_eqr": "76.7%",
+    "ip_eqr": "115.4%",
+    "oop_ev_share": "30.57%",
+    "ip_ev_share": "69.43%",
+    "oop_check_frequency": "100%",
+    "oop_allin_frequency": "0%",
+    "oop_check_combos": "331.13",
+    "oop_allin_combos": "0.01"
+  },
+  "display_steps": {
+    "ev_bb": 0.01,
+    "frequency_percentage_points": null,
+    "equity_percentage_points": 0.1,
+    "eqr_percentage_points": 0.1,
+    "ev_share_percentage_points": 0.01,
+    "weighted_combos": 0.1,
+    "action_weighted_combos": 0.01,
+    "note": "Decimal resolution visible in the supplied values, not internal solver precision or a rounding rule. Weighted-combo step 0.1 is a notation-based inference from 331.1; IP literal 335 is retained without appending .0. Original 0%/100% root frequencies alone do not establish a finer step; additional Flop panels subsequently display one decimal place. No display step is a quality threshold.",
+    "additional_flop_action_panels_frequency_percentage_points": 0.1
+  },
+  "catalog_only": {
+    "source": "docs/plans/hu-postflop-r0/cases.csv HU-R0-008",
+    "catalog_checked_at": "2026-09-25T08:10:51Z",
+    "catalog_solution": "Cash 6max 20bb Single Size cEV With cold calls 2.5x",
+    "rake_description": "Catalog identifies Cash cEV preset as no rake and records that official GTO Wizard documentation describes cEV as no rake.",
+    "individual_solution_utility_version_precision_reconfirmed": false,
+    "note": "The current visible cEV label is observed; catalog description alone does not certify all finite-game or individual-solution conditions. Root EV sum is not used to certify rake semantics."
+  },
+  "reference_exploitability": null,
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "comparison_threshold": null,
+  "missing_fields": [
+    "Turn and River chance domains and every subsequent decision menu",
+    "individual solution version, internal precision and stopping condition",
+    "reference exploitability value, metric definition and denominator",
+    "full per-hand/action reference policy and action EVs",
+    "exact EV basis, utility convention and display rounding rule"
+  ],
+  "capture_scope": "HU-R0-008 root ranges/display values and six directly observed Flop decision nodes only; no solver run, diagnostic config, complete multi-street tree claim, or quality certification.",
+  "menu_capture_window_approximate_start_utc": [
+    "2026-09-25T20:56Z",
+    "2026-09-25T20:59:25Z"
+  ],
+  "menu_capture_window_note": "Start is approximate. The clock 20:59:25 UTC was directly observed after the root all-in response was captured; no exact per-node time is claimed.",
+  "menu_capture_completed_before_clock_utc": "2026-09-25T20:59:25Z",
+  "flop_menu_observation_count": 6,
+  "action_amount_convention": "Bet/raise/all-in amounts are street contribution totals (raise-to), not necessarily remaining stack. At X-R2.6-R5.6 the BTN remaining-stack display is 14.9 BB while all-in is labelled 17.5 BB."
+}

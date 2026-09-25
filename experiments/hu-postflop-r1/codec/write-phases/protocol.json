@@ -1,0 +1,38 @@
+{
+  "schema": "r1.sol-write-phase-protocol/v1",
+  "status": "prospective_preparation_not_executed",
+  "purpose": "Locate writer wall-time distribution; do not infer the cause of the historical VM07 regression without new evidence",
+  "source_revisions": {
+    "baseline": "88ffa5dd4583e5c8bae84e20e9b8390cb719e4f0",
+    "candidate": "2fecc099b9911511a0938fb2700bbb124bc1046e"
+  },
+  "input_selection": "../inputs.json",
+  "cases_in_order": ["river", "turn", "flop"],
+  "operation": "stream-write",
+  "iterations_per_process": 1,
+  "arms": ["baseline-plain", "baseline-off", "baseline-on", "candidate-plain", "candidate-off", "candidate-on"],
+  "excluded_warmup_order": ["baseline-plain", "baseline-off", "baseline-on", "candidate-plain", "candidate-off", "candidate-on"],
+  "measured_block_arm_indices": [[0,3,1,4,2,5],[4,1,5,2,3,0],[2,5,0,3,1,4],[3,0,4,1,5,2],[1,4,2,5,0,3],[5,2,3,0,4,1]],
+  "samples": {"warmup": 18, "measured": 108, "total": 126},
+  "cache": "Warm input, own-codec preload before timer; no drop_caches, eviction or cold-disk claim. Every output path is new on one filesystem.",
+  "limits": {"per_process_seconds": 60, "campaign_seconds": 1200, "memory_bytes": 4294967296, "min_free_memory_bytes": 2147483648, "disk_reserve_bytes": 4294967296},
+  "measurement_isolation": "Sequential only. No SCP/download/upload, builds, compression/collection, other benchmarks or solver work during all 126 samples. Collect after the final sample or after abort.",
+  "failure_policy": "Abort on first failure/timeout/resource stop, preserve all records; no retry, replacement, adaptive repetitions, threshold or input changes. Incomplete campaigns are not evaluated.",
+  "correctness_gate": "All outputs and canonical files byte-exact to original inputs and across all six arms, full readback succeeds, all supervised exits/cleanup/identity/host checks pass",
+  "calibration": {
+    "ratio_bounds": [0.95, 1.05],
+    "comparisons_per_case_and_codec": ["median(off)/median(plain)", "median(on)/median(off)"],
+    "rule": "Both ratios must fall within inclusive bounds for that case/codec's phase attribution to be eligible; otherwise publish durations and overhead only, attribution not_evaluated. Never correct phase values by dividing out overhead.",
+    "scope": "Prospective instrumentation budget, not an R1 acceptance target or a statistical equivalence test"
+  },
+  "primary_performance": "Compare candidate-plain with baseline-plain only; report six raw paired blocks, medians, min/max and ratios. Do not use on-arm speed as product performance or replace historical VM07 evidence.",
+  "required_before_execution": [
+    "Owner confirms machine availability, cloud authorization/budget/deadline separately; this protocol authorizes no spending",
+    "Freeze exact protocol/applier/runtime/validator/source-pin/example/input SHA256 and byte counts before all warmups",
+    "Four fresh release builds (plain and instrumented for both revisions), same compiler/Cargo/flags/target; record actual source manifests and successful build logs",
+    "Freeze all four binary hashes, source-copy manifests, supervisor/Python/compiler identities, Linux CPU model/features, boot_id, OS/kernel, filesystem/mount and outer cgroup limits",
+    "Dedicated finite runner must enforce the declared order, limits and before/after identity/CPU/boot checks; existing run_codec.py is frozen and must not be edited or passed an incompatible plan",
+    "No reuse of native target outputs across CPU or boot changes; preemption stops the campaign and requires a new complete prospective plan"
+  ],
+  "explicit_non_claims": ["cold storage performance", "physical disk latency or pure compression CPU", "phase-specific RSS", "solver speed or exploitability", "external-reference or overall R1 acceptance"]
+}

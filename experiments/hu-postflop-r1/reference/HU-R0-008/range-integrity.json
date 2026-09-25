@@ -1,0 +1,52 @@
+{
+  "case_id": "HU-R0-008",
+  "board": [
+    "Qs",
+    "Js",
+    "Td"
+  ],
+  "arithmetic": "Python Decimal, precision 100 with Inexact trap; original decimal weights, no renormalization",
+  "hash_scope": "entire ASCII file bytes including the single appended LF",
+  "copy_transfer_verification": "Raw character count and FNV-1a32 supplied by collecting root; independently recomputed before arithmetic",
+  "oop": {
+    "file": "oop-range.txt",
+    "file_bytes": 6882,
+    "copy_raw_characters": 6881,
+    "raw_fnv1a32": "994cbe19",
+    "positive_combos": 441,
+    "weight_sum": "331.142699076827",
+    "weight_min": "0.000099999997",
+    "weight_max": "1",
+    "sha256": "9610bc805b9c94f02633b6c718af62df94f836f41d4a41304e4753ccb7fd9464",
+    "duplicate_unordered_combos": 0,
+    "board_collisions": 0,
+    "invalid_weights": 0,
+    "displayed_weight_sum_difference": "0.042699076827",
+    "display_check_scope": "display-step consistency only; tie rule/internal precision unverified"
+  },
+  "ip": {
+    "file": "ip-range.txt",
+    "file_bytes": 4020,
+    "copy_raw_characters": 4019,
+    "raw_fnv1a32": "fb3c181e",
+    "positive_combos": 368,
+    "weight_sum": "335.040601001914",
+    "weight_min": "0.000099999997",
+    "weight_max": "1",
+    "sha256": "33732be9ce2c05b0926c9e12ae6cbaee8d99898732e21a05c7febdc2790f5639",
+    "duplicate_unordered_combos": 0,
+    "board_collisions": 0,
+    "invalid_weights": 0,
+    "displayed_weight_sum_difference": "0.040601001914",
+    "display_check_scope": "display-step consistency only; tie rule/internal precision unverified"
+  },
+  "joint": {
+    "positive_pair_product_count": 162288,
+    "compatible_positive_pairs": 146355,
+    "incompatible_positive_pairs": 15933,
+    "compatible_weight_sum": "100558.151565570741470606131382",
+    "unrestricted_product_weight_sum": "110946.248916096070379060046878",
+    "incompatible_weight_sum": "10388.097350525328908453915496",
+    "definition": "sum(w_oop*w_ip) over disjoint private cards, excluding observed board; no renormalization or future chance weights"
+  }
+}

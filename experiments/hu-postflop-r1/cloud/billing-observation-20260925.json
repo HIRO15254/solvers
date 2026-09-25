@@ -1,0 +1,36 @@
+{
+  "schema": "solvers.r1.billing-observation/v1",
+  "source": "Manual observation of the authenticated Google Cloud Billing Reports UI; not a billing export or final invoice",
+  "observed_window_utc": {
+    "start_approximate": "2026-09-25T20:42:00Z",
+    "end_approximate": "2026-09-25T20:47:00Z"
+  },
+  "project_id": "solvers-abstraction-20260723",
+  "project_number": "1010616757715",
+  "billing_account_id": "015A1D-8A8F19-EC7035",
+  "report_url": "https://console.cloud.google.com/billing/015A1D-8A8F19-EC7035/reports;timeRange=CUSTOM_RANGE;from=2026-09-25;to=2026-09-25;projects=1010616757715?project=solvers-abstraction-20260723",
+  "selected_projects": ["1010616757715"],
+  "displayed_date_start": "2026-09-25",
+  "displayed_date_end": "2026-09-25",
+  "report_timezone_verified": false,
+  "displayed_currency": "JPY",
+  "displayed_total": 0,
+  "displayed_table_message": "表示する結果がありません",
+  "sku_rows_available": false,
+  "billing_finality_verified": false,
+  "actual_r1_billed_usd": null,
+  "reservation_release_usd": 0,
+  "held_reservations_usd": 20,
+  "authorized_limit_usd": 20,
+  "decision": "No actual R1 cost reconciliation is possible from this empty report. Retain VM02/05/06/07 reservations; do not provision an additional VM from the displayed zero.",
+  "limitations": [
+    "The earlier monthly view displayed JPY 376 only through September 24; that amount is not attributed to September 25 R1 runs.",
+    "Google documents that usage costs usually arrive within one day and can take more than 24 hours. Missing rows are not proof of zero cost.",
+    "No currency conversion, per-instance allocation, tax adjustment or reservation release was performed.",
+    "The report timezone and date-boundary effects were not independently established. A later reconciliation must cover all R1 usage and associated charges."
+  ],
+  "official_delay_documentation": "https://docs.cloud.google.com/billing/docs/how-to/view-history",
+  "resource_cleanup_evidence": "cleanup-vm07/reconciliation.json",
+  "budget_evidence": "budget.json",
+  "local_resource_observation": "host-probe-after-vm07.json"
+}
