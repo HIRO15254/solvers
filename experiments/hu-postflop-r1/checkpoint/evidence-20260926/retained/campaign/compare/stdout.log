@@ -1,0 +1,165 @@
+{
+  "checks": {
+    "all_progress_numeric_fields_equal": true,
+    "config_bytes_exact": true,
+    "final_checkpoint_full_decoded_state_equal": true,
+    "final_checkpoint_raw_bytes_equal": true,
+    "final_full_sol_except_wall_equal": true,
+    "input_identities_unchanged": true,
+    "nonfinal_canceled_checkpoint": true,
+    "resumed_progress_prefix_exact": true
+  },
+  "comparison_exclusions": [
+    "SolMeta.wall_secs (validated finite/nonnegative and against its own run.json)",
+    "progress.elapsed_secs (validated finite/nonnegative/monotonic; copied prefix remains exact)",
+    "manifest run_id, pid, command paths, created/started/finished times",
+    "event unix_ms"
+  ],
+  "config_blake3": "20dcd7a523a599d0e70c4f68ccda47ae9a23d6b21850bc1d5f2ce704336fe9d5",
+  "interrupted_iteration": 20,
+  "live_profile_metadata": {
+    "ev": [
+      1.2295878728230796,
+      2.768844975365533
+    ],
+    "gains": [
+      0.00005250506930876142,
+      0.000055472056070982045
+    ],
+    "nash_conv": 0.00010797712537974347
+  },
+  "r1_acceptance": null,
+  "resumed_iterations": 980,
+  "runs": {
+    "interrupted": {
+      "directory": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run",
+      "files": [
+        {
+          "blake3": "20dcd7a523a599d0e70c4f68ccda47ae9a23d6b21850bc1d5f2ce704336fe9d5",
+          "bytes": 673,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\run.toml"
+        },
+        {
+          "blake3": "00e2b6c352655aa948d00864cefd4c097f407569a696850506b868158b857c83",
+          "bytes": 684,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\manifest.json"
+        },
+        {
+          "blake3": "78b713c0c16151230601890094cd6d8b2e3e6ede24f0bc6cc4bf1f5794c3b745",
+          "bytes": 406,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\events.jsonl"
+        },
+        {
+          "blake3": "0ab4622f37e937815af829755e44af87a4136f6aea1f179a2b1851d1b2c7a279",
+          "bytes": 267,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\progress.jsonl"
+        },
+        {
+          "blake3": "a030d0961585c997ec4df804fed202a9dd42e6d4dd11f227941ffd42dc3d02ee",
+          "bytes": 171,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\run.json"
+        },
+        {
+          "blake3": "7d2d2f469558392ba1dcce2bc24eade8ae075b2a31d0158611d7a1328ae56ea6",
+          "bytes": 10031,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\checkpoint.ckpt"
+        },
+        {
+          "blake3": "9e5f4c825ebb0479902074308880f6b47ed29455bb84cff3c5cd6ad6f7363269",
+          "bytes": 1206,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\solution.sol"
+        }
+      ]
+    },
+    "resumed": {
+      "directory": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run",
+      "files": [
+        {
+          "blake3": "20dcd7a523a599d0e70c4f68ccda47ae9a23d6b21850bc1d5f2ce704336fe9d5",
+          "bytes": 673,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\run.toml"
+        },
+        {
+          "blake3": "8a351f9f50e6b8114d7237360ddd1f88cb69bf559141093a6502155a383d37c3",
+          "bytes": 556,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\manifest.json"
+        },
+        {
+          "blake3": "19767ff28423bf0a8b7f7bc674f1c043fb1a14876832c4886a2e18b043358ca8",
+          "bytes": 8186,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\events.jsonl"
+        },
+        {
+          "blake3": "d38e256b9b959ecee184b24e6ec9febd23a0dcbfb4f05e1c63f6766617d0af61",
+          "bytes": 14290,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\progress.jsonl"
+        },
+        {
+          "blake3": "8b0c219c4ce523a867680b108f395853acc959973d756a2ce18e2848f179d9a8",
+          "bytes": 183,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\run.json"
+        },
+        {
+          "blake3": "042c6e845c542e830bd12f8dd95ff8f4d849f094f5451defab5aa42b27bcf078",
+          "bytes": 8109,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\checkpoint.ckpt"
+        },
+        {
+          "blake3": "4846a92e8fd6fcfa025793227f897af49a0ab43f3b2a7a1855b3b06a3254c33d",
+          "bytes": 1139,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\solution.sol"
+        }
+      ]
+    },
+    "straight": {
+      "directory": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run",
+      "files": [
+        {
+          "blake3": "20dcd7a523a599d0e70c4f68ccda47ae9a23d6b21850bc1d5f2ce704336fe9d5",
+          "bytes": 673,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\run.toml"
+        },
+        {
+          "blake3": "0a8d22a567ad319533879d680c29b6c1fbb18f2fd64637952ee751e9aeb4efbc",
+          "bytes": 682,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\manifest.json"
+        },
+        {
+          "blake3": "69fcd17dcfb2167ca33a5123563ee82cf5755c837a32f6347a8b49387d2849be",
+          "bytes": 8350,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\events.jsonl"
+        },
+        {
+          "blake3": "bda2819957b252227dfb88c2f036476e60080d269e3f9ff31084e724fb0cbe48",
+          "bytes": 14293,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\progress.jsonl"
+        },
+        {
+          "blake3": "18d29c1395e33436662ab417bb5e1a280bce86a12200fb2c7e5b0328c3d487ae",
+          "bytes": 184,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\run.json"
+        },
+        {
+          "blake3": "042c6e845c542e830bd12f8dd95ff8f4d849f094f5451defab5aa42b27bcf078",
+          "bytes": 8109,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\checkpoint.ckpt"
+        },
+        {
+          "blake3": "91833c69b787473df2f4a6a420facc8e4f3bfcf81583b2cb05586d0e18a9ce83",
+          "bytes": 1140,
+          "path": "\\\\?\\C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\solution.sol"
+        }
+      ]
+    }
+  },
+  "saved_profile_quality": "not_evaluated",
+  "schema": "r1.hu-checkpoint-audit/v1",
+  "scope_limits": [
+    "External controller must bind source/binary/config, signal delivery, process exit codes and resume input lineage.",
+    "The two final Full artifacts still require separate hu_saved_profile_audit for compiled-tree validation and stored-quantized EV/BR evaluation.",
+    "No training or artifact rewriting is performed. No external solution quality or performance conclusion."
+  ],
+  "source_storage": "f32",
+  "status": "pass",
+  "target_iteration": 1000
+}

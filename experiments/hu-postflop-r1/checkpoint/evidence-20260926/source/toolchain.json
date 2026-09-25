@@ -1,0 +1,23 @@
+{
+  "observed_at": "2026-09-25T22:35:33.752810+00:00",
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6\n",
+  "cargo": "cargo 1.97.0 (c980f4866 2026-06-30)\n",
+  "processor_identifier": "Intel64 Family 6 Model 165 Stepping 5, GenuineIntel",
+  "source_files_rechecked": 199,
+  "docs_check": {
+    "command": [
+      "python",
+      "tools/check_docs.py"
+    ],
+    "observed_exit": 0,
+    "observed_stdout": "Documentation check passed: 47 Markdown files."
+  },
+  "diff_check": {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "observed_exit": 0
+  }
+}

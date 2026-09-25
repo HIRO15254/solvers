@@ -1,0 +1,3 @@
+   Compiling cli v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\cli)
+    Finished `test` profile [unoptimized] target(s) in 2.64s
+     Running unittests examples\hu_checkpoint_audit.rs (target\r1-local-tests\debug\examples\hu_checkpoint_audit-517e73ff99939639.exe)

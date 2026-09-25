@@ -1,0 +1,10 @@
+test_comparator_status_checks_header_and_file_binding (test_run.ControllerTests.test_comparator_status_checks_header_and_file_binding) ... ok
+test_record_limits_count_last_and_time_fail_closed (test_run.ControllerTests.test_record_limits_count_last_and_time_fail_closed) ... ok
+test_record_pass_and_sigint_does_not_hide_resource_violation (test_run.ControllerTests.test_record_pass_and_sigint_does_not_hide_resource_violation) ... ok
+test_saved_binding_precedes_explicit_exclusions (test_run.ControllerTests.test_saved_binding_precedes_explicit_exclusions) ... ok
+test_trigger_first_failure_and_cleanup_disable (test_run.ControllerTests.test_trigger_first_failure_and_cleanup_disable) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.240s
+
+OK

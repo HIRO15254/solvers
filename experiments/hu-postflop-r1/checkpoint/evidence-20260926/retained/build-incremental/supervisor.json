@@ -1,0 +1,172 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T22:22:14.156656+00:00",
+  "argv": [
+    "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\cargo.exe",
+    "build",
+    "--locked",
+    "--offline",
+    "-p",
+    "cli",
+    "--bin",
+    "solvers",
+    "--example",
+    "hu_checkpoint_audit",
+    "--example",
+    "hu_saved_profile_audit"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 600.0,
+    "grace_seconds": 10.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.1,
+    "memory_limit_bytes": 629145600,
+    "min_free_memory_bytes": 3000000000,
+    "disk_reserve_bytes": 4294967296
+  },
+  "runtime": {
+    "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "logical_cpus": 16
+  },
+  "outputs": {
+    "stdout": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-incremental-20260926\\stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-incremental-20260926\\stderr.log",
+      "sha256": "c371070d21c8e8daa6618fcebecb9d85e2901843d18ddf131c1c8bdfd9241fc6",
+      "bytes": 145
+    },
+    "samples": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-incremental-20260926\\samples.jsonl",
+      "sha256": "6b42987c68500059ad44b74ee0753d9d438aec12c440400ca818a68823e5e72b",
+      "bytes": 134593
+    }
+  },
+  "identity_before": [
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\cargo.exe",
+      "sha256": "3cd119fe81dfedb9dce4573696bf65058f16b57c9e5babe415b71624315cbb7d",
+      "bytes": 31288320
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-incremental-20260926\\plan.json",
+      "sha256": "6bbf36c7f44fda10e7508e2662e3afe2069717250589a226894165dfc93ce7e6",
+      "bytes": 33502
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+      "sha256": "6d1c5543ed3a45cfbc1c1332d42d6550d883c14d3c2e323427e631c331cebeeb",
+      "bytes": 110592
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\cargo.exe",
+      "sha256": "3cd119fe81dfedb9dce4573696bf65058f16b57c9e5babe415b71624315cbb7d",
+      "bytes": 31288320
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-incremental-20260926\\plan.json",
+      "sha256": "6bbf36c7f44fda10e7508e2662e3afe2069717250589a226894165dfc93ce7e6",
+      "bytes": 33502
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+      "sha256": "6d1c5543ed3a45cfbc1c1332d42d6550d883c14d3c2e323427e631c331cebeeb",
+      "bytes": 110592
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 360,
+    "max_sample_gap_seconds": 0.1340598000679165,
+    "sampled_peak_tree_resident_bytes": 563462144,
+    "root_os_peak_resident_bytes": 52813824,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 619732992,
+    "max_observed_processes": 6
+  },
+  "containment": {
+    "kind": "windows_job_kill_on_close_suspended_assignment",
+    "limitations": [
+      "RAM trigger is sampled working set, not a hard allocation limit",
+      "summed working sets can double-count shared pages",
+      "Job membership can include the hidden console host",
+      "CTRL_BREAK covers the dedicated console; detached descendants require Job termination",
+      "job peak committed bytes are not resident working set bytes"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 34275098624,
+    "available_bytes": 3884257280,
+    "commit_available_bytes": 1616900096
+  },
+  "resolved_argv": [
+    "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\cargo.exe",
+    "build",
+    "--locked",
+    "--offline",
+    "-p",
+    "cli",
+    "--bin",
+    "solvers",
+    "--example",
+    "hu_checkpoint_audit",
+    "--example",
+    "hu_saved_profile_audit"
+  ],
+  "disk_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target",
+  "disk_free_before_bytes": 54745976832,
+  "started_at": "2026-09-25T22:22:14.406498+00:00",
+  "pid": 79352,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 52813824,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 619732992,
+    "elapsed_seconds": 36.282151099992916,
+    "at": "2026-09-25T22:22:50.688786+00:00",
+    "host_available_memory_bytes": 3705724928,
+    "disk_free_bytes": 54517379072
+  },
+  "elapsed_seconds": 36.28247879981063,
+  "ended_at": "2026-09-25T22:22:50.689749+00:00",
+  "supervisor_exit_code": 0
+}

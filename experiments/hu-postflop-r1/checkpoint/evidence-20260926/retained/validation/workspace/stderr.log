@@ -1,0 +1,64 @@
+   Compiling either v1.16.0
+   Compiling zerocopy v0.8.52
+   Compiling rayon v1.12.0
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_chacha v0.3.1
+   Compiling rand v0.8.6
+   Compiling windows-sys v0.61.2
+   Compiling engine v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\engine)
+   Compiling once_cell v1.21.4
+   Compiling game v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\game)
+   Compiling anstyle-wincon v3.0.11
+   Compiling anstyle-query v1.1.5
+   Compiling anstream v1.0.0
+   Compiling clap_builder v4.6.0
+   Compiling clap v4.6.1
+   Compiling tempfile v3.27.0
+   Compiling abstraction v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\abstraction)
+   Compiling formats v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\formats)
+   Compiling holdem v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\holdem)
+   Compiling preflop v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\preflop)
+   Compiling multiway v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\multiway)
+   Compiling cli v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\cli)
+   Compiling cfr-ref v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\cfr-ref)
+   Compiling winapi-util v0.1.11
+   Compiling half v2.7.1
+   Compiling regex-syntax v0.8.11
+   Compiling plotters-backend v0.3.7
+   Compiling ciborium-io v0.2.2
+   Compiling ciborium-ll v0.2.2
+   Compiling plotters-svg v0.3.7
+   Compiling regex-automata v0.4.14
+   Compiling same-file v1.0.6
+   Compiling num-traits v0.2.19
+   Compiling itertools v0.10.5
+   Compiling cast v0.3.0
+   Compiling criterion-plot v0.5.0
+   Compiling plotters v0.3.7
+   Compiling walkdir v2.5.0
+   Compiling regex v1.12.4
+   Compiling ciborium v0.2.2
+   Compiling tinytemplate v1.2.1
+   Compiling is-terminal v0.4.17
+   Compiling anes v0.1.6
+   Compiling oorandom v11.1.5
+   Compiling criterion v0.5.1
+   Compiling untrusted v0.9.0
+   Compiling ring v0.17.14
+   Compiling winapi v0.3.9
+   Compiling spin v0.5.2
+   Compiling untrusted v0.7.1
+   Compiling ring v0.16.20
+   Compiling webpki v0.22.4
+   Compiling sct v0.7.1
+   Compiling base64 v0.13.1
+   Compiling log v0.4.33
+   Compiling rustls v0.20.9
+   Compiling rustls-pemfile v0.2.1
+   Compiling protocol v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\protocol)
+   Compiling ascii v1.1.0
+   Compiling zeroize v1.9.0
+   Compiling httpdate v1.0.3
+   Compiling chunked_transfer v1.5.0
+   Compiling tiny_http v0.12.0
+   Compiling libc v0.2.186

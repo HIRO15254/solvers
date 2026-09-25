@@ -1394,6 +1394,78 @@ fn status_reports_a_canceled_heads_up_run_as_resumable() {
 #[cfg(unix)]
 #[ignore = "spawns and signals a solve; explicit release acceptance only"]
 fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
+    use std::time::{Duration, Instant};
+
+    // Keep ownership until reaped, including assertion failures and timeouts.
+    struct ChildGuard(std::process::Child);
+    impl Drop for ChildGuard {
+        fn drop(&mut self) {
+            if !matches!(self.0.try_wait(), Ok(Some(_))) {
+                let _ = self.0.kill();
+                let _ = self.0.wait();
+            }
+        }
+    }
+
+    fn wait_for_progress(child: &mut ChildGuard, run: &std::path::Path, previous: u64) {
+        let deadline = Instant::now() + Duration::from_secs(30);
+        loop {
+            assert!(
+                child.0.try_wait().expect("poll running child").is_none(),
+                "child exited before progress advanced past {previous}"
+            );
+            match std::fs::read_to_string(run.join("progress.jsonl")) {
+                Ok(progress) => {
+                    // A concurrent append may leave an incomplete final row.
+                    if let Some((complete_rows, _)) = progress.rsplit_once('\n') {
+                        let iteration = complete_rows.lines().last().map(|line| {
+                            serde_json::from_str::<serde_json::Value>(line)
+                                .expect("complete progress row")["iteration"]
+                                .as_u64()
+                                .expect("progress iteration")
+                        });
+                        if iteration.is_some_and(|iteration| iteration > previous) {
+                            return;
+                        }
+                    }
+                }
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+                Err(error) => panic!("read progress: {error}"),
+            }
+            assert!(
+                Instant::now() < deadline,
+                "timed out waiting for progress past {previous}"
+            );
+            std::thread::sleep(Duration::from_millis(50));
+        }
+    }
+
+    fn interrupt_and_wait(child: &mut ChildGuard) {
+        let result = unsafe { libc::kill(child.0.id() as libc::pid_t, libc::SIGINT) };
+        assert_eq!(
+            result,
+            0,
+            "send SIGINT: {}",
+            std::io::Error::last_os_error()
+        );
+        let deadline = Instant::now() + Duration::from_secs(30);
+        loop {
+            if let Some(status) = child.0.try_wait().expect("poll canceled child") {
+                assert_eq!(
+                    status.code(),
+                    Some(130),
+                    "cooperative SIGINT exit: {status}"
+                );
+                return;
+            }
+            assert!(
+                Instant::now() < deadline,
+                "timed out waiting for SIGINT exit"
+            );
+            std::thread::sleep(Duration::from_millis(50));
+        }
+    }
+
     let dir = temp_dir("hu-cancel-resume");
     let config = dir.join("long.toml");
     std::fs::write(
@@ -1403,21 +1475,20 @@ fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
     .unwrap();
     let run = dir.join("run");
 
-    let mut child = std::process::Command::new(env!("CARGO_BIN_EXE_solvers"))
-        .args([
-            "solve",
-            config.to_str().unwrap(),
-            "--out",
-            run.to_str().unwrap(),
-        ])
-        .stdout(std::process::Stdio::null())
-        .spawn()
-        .expect("spawn solve");
-    while !run.join("progress.jsonl").exists() {
-        std::thread::sleep(std::time::Duration::from_millis(50));
-    }
-    unsafe { libc::kill(child.id() as libc::pid_t, libc::SIGINT) };
-    assert!(child.wait().expect("wait for solve").success());
+    let mut child = ChildGuard(
+        std::process::Command::new(env!("CARGO_BIN_EXE_solvers"))
+            .args([
+                "solve",
+                config.to_str().unwrap(),
+                "--out",
+                run.to_str().unwrap(),
+            ])
+            .stdout(std::process::Stdio::null())
+            .spawn()
+            .expect("spawn solve"),
+    );
+    wait_for_progress(&mut child, &run, 0);
+    interrupt_and_wait(&mut child);
 
     let manifest: serde_json::Value =
         serde_json::from_str(&std::fs::read_to_string(run.join("manifest.json")).unwrap()).unwrap();
@@ -1426,14 +1497,15 @@ fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
 
     let before = last_progress_iteration(&run);
 
-    let mut resumed = std::process::Command::new(env!("CARGO_BIN_EXE_solvers"))
-        .args(["resume", run.to_str().unwrap()])
-        .stdout(std::process::Stdio::null())
-        .spawn()
-        .expect("spawn resume");
-    std::thread::sleep(std::time::Duration::from_millis(500));
-    unsafe { libc::kill(resumed.id() as libc::pid_t, libc::SIGINT) };
-    assert!(resumed.wait().expect("wait for resume").success());
+    let mut resumed = ChildGuard(
+        std::process::Command::new(env!("CARGO_BIN_EXE_solvers"))
+            .args(["resume", run.to_str().unwrap()])
+            .stdout(std::process::Stdio::null())
+            .spawn()
+            .expect("spawn resume"),
+    );
+    wait_for_progress(&mut resumed, &run, before);
+    interrupt_and_wait(&mut resumed);
 
     let after = last_progress_iteration(&run);
     assert!(

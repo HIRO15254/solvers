@@ -1,0 +1,202 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T22:32:30.730141+00:00",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/tests",
+    "-v"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 120.0,
+    "grace_seconds": 10.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.1,
+    "memory_limit_bytes": 536870912,
+    "min_free_memory_bytes": 3000000000,
+    "disk_reserve_bytes": 4294967296
+  },
+  "runtime": {
+    "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "logical_cpus": 16
+  },
+  "outputs": {
+    "stdout": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\tools\\stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\tools\\stderr.log",
+      "sha256": "cc5af990631dc3391ecf0b179cbfa30fef1166cbe80866cb74708c3c6016e897",
+      "bytes": 5905
+    },
+    "samples": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\tools\\samples.jsonl",
+      "sha256": "0edd0a0c05c21a9a50e101588cb078d3058a5a4a8be43097dfd026198c60843e",
+      "bytes": 50295
+    }
+  },
+  "identity_before": [
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\check_docs.py",
+      "sha256": "9af1a436520b57adea611e214d4d7801c8d4ca5d78f591e72b995cd876905a9c",
+      "bytes": 5418
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\plot_convergence.py",
+      "sha256": "7f267e8f8f9ffd1ec96176df25c625e0e0f4088a18deb8dcc63c5e5ab7bc2a8c",
+      "bytes": 2927
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_check_docs.py",
+      "sha256": "52579c04f2b43fb1f0d81f8bce2d21ccc3c0864718dab8ec0d56d6036b30fdb3",
+      "bytes": 4276
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_r1_diagnostic_archive.py",
+      "sha256": "1fbfeb8ff9c0fbab74a2f088a1f6bae93b32ca099ff3fb34d3f395de4e3b9297",
+      "bytes": 7100
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_run_supervised.py",
+      "sha256": "7afdab6b42ac20c7e14bf6495c5481022e4f1bab13dc892d0c0b32fbd1a9f9d6",
+      "bytes": 18060
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_workspace_audit.py",
+      "sha256": "cdb0b0c36fa66ce9b6883cee66ff1480e40a360d46c6791cec1007f1499ccf26",
+      "bytes": 2267
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\workspace_audit.py",
+      "sha256": "2e1ebfacfdaa1926b2a209de83a8eea2dbc793c943e54892d74282b65ccc2dc4",
+      "bytes": 2657
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\check_docs.py",
+      "sha256": "9af1a436520b57adea611e214d4d7801c8d4ca5d78f591e72b995cd876905a9c",
+      "bytes": 5418
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\plot_convergence.py",
+      "sha256": "7f267e8f8f9ffd1ec96176df25c625e0e0f4088a18deb8dcc63c5e5ab7bc2a8c",
+      "bytes": 2927
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_check_docs.py",
+      "sha256": "52579c04f2b43fb1f0d81f8bce2d21ccc3c0864718dab8ec0d56d6036b30fdb3",
+      "bytes": 4276
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_r1_diagnostic_archive.py",
+      "sha256": "1fbfeb8ff9c0fbab74a2f088a1f6bae93b32ca099ff3fb34d3f395de4e3b9297",
+      "bytes": 7100
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_run_supervised.py",
+      "sha256": "7afdab6b42ac20c7e14bf6495c5481022e4f1bab13dc892d0c0b32fbd1a9f9d6",
+      "bytes": 18060
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_workspace_audit.py",
+      "sha256": "cdb0b0c36fa66ce9b6883cee66ff1480e40a360d46c6791cec1007f1499ccf26",
+      "bytes": 2267
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\workspace_audit.py",
+      "sha256": "2e1ebfacfdaa1926b2a209de83a8eea2dbc793c943e54892d74282b65ccc2dc4",
+      "bytes": 2657
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 135,
+    "max_sample_gap_seconds": 0.10489859990775585,
+    "sampled_peak_tree_resident_bytes": 146014208,
+    "root_os_peak_resident_bytes": 37048320,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 72003584,
+    "max_observed_processes": 8
+  },
+  "containment": {
+    "kind": "windows_job_kill_on_close_suspended_assignment",
+    "limitations": [
+      "RAM trigger is sampled working set, not a hard allocation limit",
+      "summed working sets can double-count shared pages",
+      "Job membership can include the hidden console host",
+      "CTRL_BREAK covers the dedicated console; detached descendants require Job termination",
+      "job peak committed bytes are not resident working set bytes"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 34275098624,
+    "available_bytes": 4135620608,
+    "commit_available_bytes": 1703145472
+  },
+  "resolved_argv": [
+    "C:\\Python313\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/tests",
+    "-v"
+  ],
+  "disk_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs",
+  "disk_free_before_bytes": 53520900096,
+  "started_at": "2026-09-25T22:32:30.861223+00:00",
+  "pid": 31752,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 37048320,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 72003584,
+    "elapsed_seconds": 13.560522600077093,
+    "at": "2026-09-25T22:32:44.421877+00:00",
+    "host_available_memory_bytes": 4161957888,
+    "disk_free_bytes": 53517086720
+  },
+  "elapsed_seconds": 13.56084719998762,
+  "ended_at": "2026-09-25T22:32:44.422434+00:00",
+  "supervisor_exit_code": 0
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "r1.hu-checkpoint-protocol/v1",
+  "scope": "One fixed raked River, F32, one worker. Correctness only, no timing or external-quality claim.",
+  "config": "river.toml",
+  "target_iteration": 1000,
+  "check_every": 10,
+  "order": ["interrupted", "resumed", "straight", "compare", "audit-resumed", "audit-straight"],
+  "limits": {"campaign_seconds": 600, "solve_seconds": 60, "audit_seconds": 30, "grace_seconds": 15, "kill_wait_seconds": 5, "poll_seconds": 0.02},
+  "interrupt": "On the first published valid nonfinal checkpoint, raise SIGINT inside the existing supervisor. Its backend delivers real CTRL_BREAK to the dedicated contained console on Windows. Send once only. This campaign rejects Linux until finite outer containment validation is added.",
+  "required": [
+    "Freeze source, build record, exact three executables, config, tools and resource limits before execution",
+    "Interrupted child exit 130; supervisor interrupted/130 with one delivered graceful signal, no forced termination, clean containment, unchanged identities",
+    "Final interrupted iteration m satisfies 0 < m < 1000; canceled manifest and Stop event, checkpoint/SOL/progress agree",
+    "Resume into a fresh directory with no config/target/hash changes; original interrupted artifacts remain byte-identical",
+    "Resumed and straight checkpoints match all bytes and decoded solver state at iteration 1000",
+    "Full SOL config, all policy/value blocks and live metadata match exactly, excluding only wall_secs",
+    "Reevaluate both stored quantized profiles with one worker and compare saved-profile EV/BR/gains/NashConv exactly",
+    "Every stage finishes within its original finite limit; preserve the first failure and do not retry or adapt the target"
+  ],
+  "non_claims": ["I16", "chance/Turn/Flop", "multiple workers", "external reference quality", "performance improvement", "overall R1 acceptance"]
+}

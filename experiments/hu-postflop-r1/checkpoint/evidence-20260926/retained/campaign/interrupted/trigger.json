@@ -1,0 +1,10 @@
+{
+  "requested": true,
+  "observed_iteration": 10,
+  "header_hex": "534c5652434b5054010020dcd7a523a599d0e70c4f68ccda47ae9a23d6b21850bc1d5f2ce704336fe9d50a00000000000000",
+  "requested_at": "2026-09-25T22:30:46.914488+00:00",
+  "request": "SIGINT_to_supervisor",
+  "enabled": false,
+  "disabled_reason": "signal_requested",
+  "first_failure": null
+}

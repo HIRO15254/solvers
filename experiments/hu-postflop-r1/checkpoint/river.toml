@@ -1,0 +1,27 @@
+schema = "solvers.postflop/v1"
+
+[game]
+board = "Ks Qs 7h 2d 3c"
+oop_range = "AhAd,7c7d,JhJd"
+ip_range = "AcAs,KhKd,JcJs"
+pot = 5
+effective_stack = 8
+iso_merging = false
+
+[game.tree]
+kind = "script"
+script = '''river {
+replace bet [50, 100]
+replace raise [50, 100]
+}'''
+
+[run]
+iterations = 1000
+check_every = 10
+threads = 1
+storage = "f32"
+
+[rake]
+kind = "percent-cap"
+rate = 0.125
+cap = 1.5

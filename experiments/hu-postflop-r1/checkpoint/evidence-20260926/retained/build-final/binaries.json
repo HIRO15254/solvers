@@ -1,0 +1,25 @@
+{
+  "observed_at": "2026-09-25T22:30:14.945132+00:00",
+  "build_record": {
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-final-20260926\\supervisor.json",
+    "sha256": "ca78bea1d7b3c6099c0707e30622f6b98f1ceccd3519a4b7daed763c57ab7e73",
+    "bytes": 6134
+  },
+  "binaries": {
+    "solvers": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\solvers.exe",
+      "sha256": "4c2d057a74f6f58bd0a31f84bfd1c74ce91491108b203951047a3afcf7ea1bdf",
+      "bytes": 18114048
+    },
+    "comparator": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\examples\\hu_checkpoint_audit.exe",
+      "sha256": "7a5c89c576ce518888e9e95db85e71206843e51900970cf6e8007095faeb7007",
+      "bytes": 7455232
+    },
+    "saved_profile": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\examples\\hu_saved_profile_audit.exe",
+      "sha256": "aec44a3bbf6ea069658ea60a2e1a9f3bfc752700447f209bad44d33decc5e093",
+      "bytes": 8846336
+    }
+  }
+}

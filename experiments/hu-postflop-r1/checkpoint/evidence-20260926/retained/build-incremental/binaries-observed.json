@@ -1,0 +1,21 @@
+{
+  "observed_at": "2026-09-25T22:29:11.864548+00:00",
+  "scope": "Observed after successful targeted build, while later workspace verification is active; compare again before campaign.",
+  "binaries": {
+    "solvers": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\solvers.exe",
+      "sha256": "119abbac03ece207cfec556d9cf9fa0c8c8062e339fc25c90a59fc4ee1323883",
+      "bytes": 18114048
+    },
+    "comparator": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\examples\\hu_checkpoint_audit.exe",
+      "sha256": "1b84ad09c973a31c456f565f12bd18fd85a0b33bca4a9033d0ed0f24b2390849",
+      "bytes": 7455232
+    },
+    "saved_profile": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\examples\\hu_saved_profile_audit.exe",
+      "sha256": "9f8de12bded7f3d5533f66cd70ea4c97f1da9c865f1c78c8443fc955d2814a49",
+      "bytes": 8846336
+    }
+  }
+}

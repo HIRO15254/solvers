@@ -1,0 +1,71 @@
+{
+  "schema": "r1.hu-checkpoint-python-check/v1",
+  "started_at": "2026-09-25T22:30:36.793211+00:00",
+  "ended_at": "2026-09-25T22:30:37.221116+00:00",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "experiments/hu-postflop-r1/checkpoint",
+    "-p",
+    "test_run.py",
+    "-v"
+  ],
+  "returncode": 0,
+  "identity_before": [
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\checkpoint\\run.py",
+      "bytes": 27543,
+      "sha256": "da8601bc736da5d85ef896628b59dd8236195dd8c43aab0b2d22aaca01ac0895"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\checkpoint\\test_run.py",
+      "bytes": 9330,
+      "sha256": "d510c8163300bd57ff317808e8cce27d9dc1fe1bc417c892bfd02b4c09cb3e6c"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\checkpoint\\protocol.json",
+      "bytes": 1911,
+      "sha256": "47858155b083bc17526ec37d340b968a741b6ecfdf8be0bd89d5e834224198aa"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\checkpoint\\river.toml",
+      "bytes": 391,
+      "sha256": "ebeaa61605d76642655e54760ae866b137fe75c1431248be7d636634c1bd418a"
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\checkpoint\\run.py",
+      "bytes": 27543,
+      "sha256": "da8601bc736da5d85ef896628b59dd8236195dd8c43aab0b2d22aaca01ac0895"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\checkpoint\\test_run.py",
+      "bytes": 9330,
+      "sha256": "d510c8163300bd57ff317808e8cce27d9dc1fe1bc417c892bfd02b4c09cb3e6c"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\checkpoint\\protocol.json",
+      "bytes": 1911,
+      "sha256": "47858155b083bc17526ec37d340b968a741b6ecfdf8be0bd89d5e834224198aa"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\checkpoint\\river.toml",
+      "bytes": 391,
+      "sha256": "ebeaa61605d76642655e54760ae866b137fe75c1431248be7d636634c1bd418a"
+    }
+  ],
+  "stdout": {
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\stderr.log",
+    "bytes": 800,
+    "sha256": "ecc81bed30acec02c03c765c87636f3e952a56804a8954762294b6b8dfa95a80"
+  }
+}

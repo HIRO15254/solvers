@@ -42,3 +42,4 @@ experiments/hu-postflop-r1/validation/vm07-complete/records/build/baseline/crate
 experiments/hu-postflop-r1/validation/vm07-complete/records/build/current/crates/multiway/Cargo.toml whitespace=cr-at-eol,-blank-at-eof
 # Preserve the context-prefix spaces in the hashed original unified diff.
 experiments/hu-postflop-r1/validation/bet-refinement-20260926/oracle-river.patch -whitespace
+experiments/hu-postflop-r1/checkpoint/evidence-20260926/source/source.diff -whitespace

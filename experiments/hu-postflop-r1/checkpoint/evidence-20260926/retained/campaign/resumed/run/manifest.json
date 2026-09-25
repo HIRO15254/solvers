@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "run",
+  "state": "completed",
+  "gameKind": "postflop",
+  "configSchema": "solvers.postflop/v1",
+  "configHash": "20dcd7a523a599d0e70c4f68ccda47ae9a23d6b21850bc1d5f2ce704336fe9d5",
+  "cliVersion": "0.1.0",
+  "command": [
+    "resume",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run"
+  ],
+  "pid": 64204,
+  "createdUnixMs": 1790375450295,
+  "startedUnixMs": 1790375450295,
+  "finishedUnixMs": 1790375475804,
+  "failure": null,
+  "completion": "completed"
+}

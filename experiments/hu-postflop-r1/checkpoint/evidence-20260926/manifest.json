@@ -1,0 +1,953 @@
+{
+  "schema": "r1.hu-checkpoint-evidence/v1",
+  "created_at": "2026-09-25T22:35:33.857118+00:00",
+  "base_commit": "c87c5a5d7119f11cecd17d5e901747c600beb914",
+  "files": {
+    "retained/build-first/plan.json.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-20260926\\plan.json",
+      "encoding": "gzip",
+      "bytes": 11488,
+      "sha256": "f24397439afb494a0fda51c4064bbc5e437cb21b96b066d3594f7cc517be9da4",
+      "original_bytes": 32990,
+      "original_sha256": "7906dffccc10767dcf71d42cc6ea18eebb34dc995e10c39a5f23c8fa9dd74505"
+    },
+    "retained/build-first/samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-20260926\\samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 72050,
+      "sha256": "b0a6b233187e81010636f33cc92e66dd1932fba1432f436f30e5d905fdb3580e",
+      "original_bytes": 776282,
+      "original_sha256": "ee742608a52eb5e730d07f1b0aaf30917e5aac332272c1a34998f30781192476"
+    },
+    "retained/build-first/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-20260926\\stderr.log",
+      "encoding": "identity",
+      "bytes": 3623,
+      "sha256": "b9964476b74b80768b3e7c7db74efd86253c01355b98d4c3b63a3ba3546dd817",
+      "original_bytes": 3623,
+      "original_sha256": "b9964476b74b80768b3e7c7db74efd86253c01355b98d4c3b63a3ba3546dd817"
+    },
+    "retained/build-first/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-20260926\\stdout.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retained/build-first/supervisor.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-20260926\\supervisor.json",
+      "encoding": "identity",
+      "bytes": 6483,
+      "sha256": "873676b2f86d0cf09ede0a068c3d05f825f826301f99d10dd8dd7d8b0d7301f1",
+      "original_bytes": 6483,
+      "original_sha256": "873676b2f86d0cf09ede0a068c3d05f825f826301f99d10dd8dd7d8b0d7301f1"
+    },
+    "retained/build-incremental/binaries-observed.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-incremental-20260926\\binaries-observed.json",
+      "encoding": "identity",
+      "bytes": 1001,
+      "sha256": "7ce6afc0d7716c832f9ff81bc66c1ee94bc70acd19e031eaad135b08e30bbcb7",
+      "original_bytes": 1001,
+      "original_sha256": "7ce6afc0d7716c832f9ff81bc66c1ee94bc70acd19e031eaad135b08e30bbcb7"
+    },
+    "retained/build-incremental/plan.json.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-incremental-20260926\\plan.json",
+      "encoding": "gzip",
+      "bytes": 11766,
+      "sha256": "27881123123320e7f728b859b61aa76c981f15744f1c75972dbd6051f97170f3",
+      "original_bytes": 33502,
+      "original_sha256": "6bbf36c7f44fda10e7508e2662e3afe2069717250589a226894165dfc93ce7e6"
+    },
+    "retained/build-incremental/samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-incremental-20260926\\samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 13069,
+      "sha256": "56e57df90916b0e6d2e4a8dc52ca3c97a404d17ef7445a28be99360bfd770721",
+      "original_bytes": 134593,
+      "original_sha256": "6b42987c68500059ad44b74ee0753d9d438aec12c440400ca818a68823e5e72b"
+    },
+    "retained/build-incremental/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-incremental-20260926\\stderr.log",
+      "encoding": "identity",
+      "bytes": 145,
+      "sha256": "c371070d21c8e8daa6618fcebecb9d85e2901843d18ddf131c1c8bdfd9241fc6",
+      "original_bytes": 145,
+      "original_sha256": "c371070d21c8e8daa6618fcebecb9d85e2901843d18ddf131c1c8bdfd9241fc6"
+    },
+    "retained/build-incremental/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-incremental-20260926\\stdout.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retained/build-incremental/supervisor.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-incremental-20260926\\supervisor.json",
+      "encoding": "identity",
+      "bytes": 6165,
+      "sha256": "e1bab10f1883eb355f2f19806a4c5baa0c4152f9902321215da342b92b986d83",
+      "original_bytes": 6165,
+      "original_sha256": "e1bab10f1883eb355f2f19806a4c5baa0c4152f9902321215da342b92b986d83"
+    },
+    "retained/build-final/binaries.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-final-20260926\\binaries.json",
+      "encoding": "identity",
+      "bytes": 1120,
+      "sha256": "cf3e3bb130bacdd36b860002447e4024e223192f4c5de9347285547611123e7f",
+      "original_bytes": 1120,
+      "original_sha256": "cf3e3bb130bacdd36b860002447e4024e223192f4c5de9347285547611123e7f"
+    },
+    "retained/build-final/plan.json.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-final-20260926\\plan.json",
+      "encoding": "gzip",
+      "bytes": 11721,
+      "sha256": "ea0f97652c81ad829d38acee210d2bd636a4c826e15531397953f0ed084b87f3",
+      "original_bytes": 33442,
+      "original_sha256": "c2c142caefaa84c68236b39212af39c9a6c02a850705be8aeed97ccee44bfe7a"
+    },
+    "retained/build-final/samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-final-20260926\\samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 2815,
+      "sha256": "b21f093b00bb60ee87bc8e56be3dd44ba12f5d5b410d3d644b1e46c1d387678d",
+      "original_bytes": 25214,
+      "original_sha256": "1e456b16b4ab95b92bb5828f5f3a1ac733cd639d738737e06aefeac02112ece0"
+    },
+    "retained/build-final/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-final-20260926\\stderr.log",
+      "encoding": "identity",
+      "bytes": 144,
+      "sha256": "a47944eeb8f6a78fa6464c1a252c123ca0405f66f54154f1c5cae5e218f5a109",
+      "original_bytes": 144,
+      "original_sha256": "a47944eeb8f6a78fa6464c1a252c123ca0405f66f54154f1c5cae5e218f5a109"
+    },
+    "retained/build-final/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-final-20260926\\stdout.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retained/build-final/supervisor.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-final-20260926\\supervisor.json",
+      "encoding": "identity",
+      "bytes": 6134,
+      "sha256": "ca78bea1d7b3c6099c0707e30622f6b98f1ceccd3519a4b7daed763c57ab7e73",
+      "original_bytes": 6134,
+      "original_sha256": "ca78bea1d7b3c6099c0707e30622f6b98f1ceccd3519a4b7daed763c57ab7e73"
+    },
+    "retained/validation/clippy/samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\clippy\\samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 59299,
+      "sha256": "09eb24c0c51c87186cdbc22b89af6c09441c4897ec8feb2e64719893c1df6e93",
+      "original_bytes": 654599,
+      "original_sha256": "e64cb50bba6b6f6ab6ba5ab2b33d36eae4d20db99295657747cee180dbc99b44"
+    },
+    "retained/validation/clippy/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\clippy\\stderr.log",
+      "encoding": "identity",
+      "bytes": 4665,
+      "sha256": "c87125024033427a64473758ecaa22d6dee4f5ad9347ed8eb5717343fc81b55d",
+      "original_bytes": 4665,
+      "original_sha256": "c87125024033427a64473758ecaa22d6dee4f5ad9347ed8eb5717343fc81b55d"
+    },
+    "retained/validation/clippy/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\clippy\\stdout.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retained/validation/clippy/supervisor.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\clippy\\supervisor.json",
+      "encoding": "identity",
+      "bytes": 6505,
+      "sha256": "e6ab22e16454cf72e5c5a6b2962b8a4790392cecda967829976c93dbafc43eb8",
+      "original_bytes": 6505,
+      "original_sha256": "e6ab22e16454cf72e5c5a6b2962b8a4790392cecda967829976c93dbafc43eb8"
+    },
+    "retained/validation/comparator-tests/samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\comparator-tests\\samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 1535,
+      "sha256": "23cfabd0b8cb36c528bdd096fd0013722752825201171ce3d380240194cf209e",
+      "original_bytes": 11585,
+      "original_sha256": "8c9f233e049e606dfbb434c83706d4900bcbb977e598984b2001368b2b7547da"
+    },
+    "retained/validation/comparator-tests/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\comparator-tests\\stderr.log",
+      "encoding": "identity",
+      "bytes": 280,
+      "sha256": "2615d66f6e6554c49a0f0435f6a5d95c88c9a97d2ea6347b49aeece6d45e0cbf",
+      "original_bytes": 280,
+      "original_sha256": "2615d66f6e6554c49a0f0435f6a5d95c88c9a97d2ea6347b49aeece6d45e0cbf"
+    },
+    "retained/validation/comparator-tests/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\comparator-tests\\stdout.log",
+      "encoding": "identity",
+      "bytes": 247,
+      "sha256": "63a8fc08796941d7f95982c72c66c934cd2ceab5309a0344255a9c48464f9af5",
+      "original_bytes": 247,
+      "original_sha256": "63a8fc08796941d7f95982c72c66c934cd2ceab5309a0344255a9c48464f9af5"
+    },
+    "retained/validation/comparator-tests/supervisor.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\comparator-tests\\supervisor.json",
+      "encoding": "identity",
+      "bytes": 6576,
+      "sha256": "397bfd82c77f12348ad54f5c8cf3d2f80416a81abea2ea339ecc4eb3bee47830",
+      "original_bytes": 6576,
+      "original_sha256": "397bfd82c77f12348ad54f5c8cf3d2f80416a81abea2ea339ecc4eb3bee47830"
+    },
+    "retained/validation/fmt/samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\fmt\\samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 1162,
+      "sha256": "6ce4e001250697bbd91cf660649599e5080daf2c953786f33affc57301556580",
+      "original_bytes": 8597,
+      "original_sha256": "2125576945b9b7966cf89474834d4111aab96c8f72960bad160a17985adb8e78"
+    },
+    "retained/validation/fmt/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\fmt\\stderr.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retained/validation/fmt/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\fmt\\stdout.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retained/validation/fmt/supervisor.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\fmt\\supervisor.json",
+      "encoding": "identity",
+      "bytes": 6318,
+      "sha256": "d9aaa689ef5afa130eb620f45a861d3af00c08e4a26be976d71db5d6d3670ade",
+      "original_bytes": 6318,
+      "original_sha256": "d9aaa689ef5afa130eb620f45a861d3af00c08e4a26be976d71db5d6d3670ade"
+    },
+    "retained/validation/plan.json.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\plan.json",
+      "encoding": "gzip",
+      "bytes": 11255,
+      "sha256": "89abc69857fa4992c9a2112a4e3a06a4b9e85c5da5ac25e3c7058582eb276cfa",
+      "original_bytes": 32498,
+      "original_sha256": "db3fabf2fcfa482489a7a352f1a725a3c4b1181610ca4fe8ea1f0eed8b759f96"
+    },
+    "retained/validation/workspace/samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\workspace\\samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 47467,
+      "sha256": "f786a4fe228d3b4a60c127c3bd3e10f5e79db1ebd71fc5861421b05feb1fc249",
+      "original_bytes": 509151,
+      "original_sha256": "e8bfdae02ff09b34438a7a4c2c8bbb73c62ced16f700d4523cc4ce0688c71fca"
+    },
+    "retained/validation/workspace/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\workspace\\stderr.log",
+      "encoding": "identity",
+      "bytes": 2530,
+      "sha256": "882448437c2ff267f468f9a2dbca3ae67fb992c6ee3c1239671c7baa11ebc9fd",
+      "original_bytes": 2530,
+      "original_sha256": "882448437c2ff267f468f9a2dbca3ae67fb992c6ee3c1239671c7baa11ebc9fd"
+    },
+    "retained/validation/workspace/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\workspace\\stdout.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retained/validation/workspace/supervisor.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\workspace\\supervisor.json",
+      "encoding": "identity",
+      "bytes": 6836,
+      "sha256": "4cd0d45ca05c06350117e7e701fa8084471d64789f8045f402086ea21cbdb4c2",
+      "original_bytes": 6836,
+      "original_sha256": "4cd0d45ca05c06350117e7e701fa8084471d64789f8045f402086ea21cbdb4c2"
+    },
+    "retained/campaign/audit-resumed/samples.jsonl": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\audit-resumed\\samples.jsonl",
+      "encoding": "identity",
+      "bytes": 2472,
+      "sha256": "f2fb49b143b5dacba60da37b474b79b38f71bbbe991c5a8f619f05db7fc6dfef",
+      "original_bytes": 2472,
+      "original_sha256": "f2fb49b143b5dacba60da37b474b79b38f71bbbe991c5a8f619f05db7fc6dfef"
+    },
+    "retained/campaign/audit-resumed/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\audit-resumed\\stderr.log",
+      "encoding": "identity",
+      "bytes": 73,
+      "sha256": "b7b5b7afbaf31e5207cb3931c83c219a044d15135b2f7128b7d9728deaca1165",
+      "original_bytes": 73,
+      "original_sha256": "b7b5b7afbaf31e5207cb3931c83c219a044d15135b2f7128b7d9728deaca1165"
+    },
+    "retained/campaign/audit-resumed/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\audit-resumed\\stdout.log",
+      "encoding": "identity",
+      "bytes": 1642,
+      "sha256": "d14288f239c41de5cf55cddbccfa9a2ff9be876ac1373e71b4d4e123873b5d50",
+      "original_bytes": 1642,
+      "original_sha256": "d14288f239c41de5cf55cddbccfa9a2ff9be876ac1373e71b4d4e123873b5d50"
+    },
+    "retained/campaign/audit-resumed/supervisor.json.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\audit-resumed\\supervisor.json",
+      "encoding": "gzip",
+      "bytes": 28344,
+      "sha256": "26e1a399d7eb9b61e528e138e289f0845b50638cfd2539e1b8a3c43ae14e0f0b",
+      "original_bytes": 120978,
+      "original_sha256": "ba789dd98322775fb5ba8e5cdc6ff8b32e57ee67737bdb632b8674232c827d7c"
+    },
+    "retained/campaign/audit-straight/samples.jsonl": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\audit-straight\\samples.jsonl",
+      "encoding": "identity",
+      "bytes": 2841,
+      "sha256": "5f86c3d30db43ea01206ee3c6c6dd831c7e6fa5d84738dd192f70f8307220138",
+      "original_bytes": 2841,
+      "original_sha256": "5f86c3d30db43ea01206ee3c6c6dd831c7e6fa5d84738dd192f70f8307220138"
+    },
+    "retained/campaign/audit-straight/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\audit-straight\\stderr.log",
+      "encoding": "identity",
+      "bytes": 73,
+      "sha256": "b7b5b7afbaf31e5207cb3931c83c219a044d15135b2f7128b7d9728deaca1165",
+      "original_bytes": 73,
+      "original_sha256": "b7b5b7afbaf31e5207cb3931c83c219a044d15135b2f7128b7d9728deaca1165"
+    },
+    "retained/campaign/audit-straight/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\audit-straight\\stdout.log",
+      "encoding": "identity",
+      "bytes": 1632,
+      "sha256": "fcb347beb67a9d8aeff5d8d91cfd10b66bc85b718942d3dd5ec30841367aa5cb",
+      "original_bytes": 1632,
+      "original_sha256": "fcb347beb67a9d8aeff5d8d91cfd10b66bc85b718942d3dd5ec30841367aa5cb"
+    },
+    "retained/campaign/audit-straight/supervisor.json.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\audit-straight\\supervisor.json",
+      "encoding": "gzip",
+      "bytes": 28749,
+      "sha256": "e69695a7043ece4da13a5c666a711cc4c345d983cd989b03fb04d31a382a620c",
+      "original_bytes": 123024,
+      "original_sha256": "c9dab4a5b8619aa6b2f0127061c20a04088d13d8c4fd0571e9b3a61e627a296b"
+    },
+    "retained/campaign/compare/samples.jsonl": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\compare\\samples.jsonl",
+      "encoding": "identity",
+      "bytes": 2478,
+      "sha256": "f814274e8f3a77acc6bdccf2f099d0e75f89f645690e994f0d38f3c2628c310d",
+      "original_bytes": 2478,
+      "original_sha256": "f814274e8f3a77acc6bdccf2f099d0e75f89f645690e994f0d38f3c2628c310d"
+    },
+    "retained/campaign/compare/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\compare\\stderr.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retained/campaign/compare/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\compare\\stdout.log",
+      "encoding": "identity",
+      "bytes": 8145,
+      "sha256": "fc2e378745c7feaff645d281264c2b961694c3efb3d2dd469b9ca7086cb33229",
+      "original_bytes": 8145,
+      "original_sha256": "fc2e378745c7feaff645d281264c2b961694c3efb3d2dd469b9ca7086cb33229"
+    },
+    "retained/campaign/compare/supervisor.json.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\compare\\supervisor.json",
+      "encoding": "gzip",
+      "bytes": 28034,
+      "sha256": "957c2eb35887720bab688adb3db472586d16e776a7bd4c1b611a7cf9847c4bdb",
+      "original_bytes": 119431,
+      "original_sha256": "2227d2e67a8f8dda1baf032d384105a5cc14e614bc131f72238909255a9c6ffd"
+    },
+    "retained/campaign/interrupted/run/checkpoint.ckpt.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\checkpoint.ckpt",
+      "encoding": "gzip",
+      "bytes": 9906,
+      "sha256": "3eaece96a276ad741cc8550e59307dc936464c4621995e8c271e4f05dac38492",
+      "original_bytes": 10031,
+      "original_sha256": "4ea76e72700742a721b5d5a813cc3494bd6f723602db1b3a4916329d284fcf64"
+    },
+    "retained/campaign/interrupted/run/events.jsonl": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\events.jsonl",
+      "encoding": "identity",
+      "bytes": 406,
+      "sha256": "66fdeddc86fc6653bfb00d6aa5291a5e3df1b267cf445b463fea4d3dd203020d",
+      "original_bytes": 406,
+      "original_sha256": "66fdeddc86fc6653bfb00d6aa5291a5e3df1b267cf445b463fea4d3dd203020d"
+    },
+    "retained/campaign/interrupted/run/manifest.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\manifest.json",
+      "encoding": "identity",
+      "bytes": 684,
+      "sha256": "d57e055d11d53908fa6f3f179a9133e6df3a93f0526fcf05afcf03bb16e1f1a1",
+      "original_bytes": 684,
+      "original_sha256": "d57e055d11d53908fa6f3f179a9133e6df3a93f0526fcf05afcf03bb16e1f1a1"
+    },
+    "retained/campaign/interrupted/run/progress.jsonl": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\progress.jsonl",
+      "encoding": "identity",
+      "bytes": 267,
+      "sha256": "44b5a5c18e5513aa83353e6504e3b527a9bf214c998b198524f8db758281c9ec",
+      "original_bytes": 267,
+      "original_sha256": "44b5a5c18e5513aa83353e6504e3b527a9bf214c998b198524f8db758281c9ec"
+    },
+    "retained/campaign/interrupted/run/run.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\run.json",
+      "encoding": "identity",
+      "bytes": 171,
+      "sha256": "9fc46c7eba920dc722d6308b95fdbb076f129bfeb04c25ac9cb526cce18c2fa1",
+      "original_bytes": 171,
+      "original_sha256": "9fc46c7eba920dc722d6308b95fdbb076f129bfeb04c25ac9cb526cce18c2fa1"
+    },
+    "retained/campaign/interrupted/run/run.toml": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\run.toml",
+      "encoding": "identity",
+      "bytes": 673,
+      "sha256": "f72a3e4e8b7564cb485f909a216062b0cd1902c82619d00150d09ba341efefce",
+      "original_bytes": 673,
+      "original_sha256": "f72a3e4e8b7564cb485f909a216062b0cd1902c82619d00150d09ba341efefce"
+    },
+    "retained/campaign/interrupted/run/solution.sol": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run\\solution.sol",
+      "encoding": "identity",
+      "bytes": 1206,
+      "sha256": "6d26469166b0a49805830dc40c2f9934ae993ad9e413206c3167504fcb7f547e",
+      "original_bytes": 1206,
+      "original_sha256": "6d26469166b0a49805830dc40c2f9934ae993ad9e413206c3167504fcb7f547e"
+    },
+    "retained/campaign/interrupted/samples.jsonl": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\samples.jsonl",
+      "encoding": "identity",
+      "bytes": 7831,
+      "sha256": "e5b5c0b5ef08837eaf8e2d89ae3cd5408385dad4179fb110edc557fd89174cdb",
+      "original_bytes": 7831,
+      "original_sha256": "e5b5c0b5ef08837eaf8e2d89ae3cd5408385dad4179fb110edc557fd89174cdb"
+    },
+    "retained/campaign/interrupted/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\stderr.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retained/campaign/interrupted/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\stdout.log",
+      "encoding": "identity",
+      "bytes": 519,
+      "sha256": "b586cf6e28eef25748c1de36b27565e3370b53c4d4476f2cbccf7576972c4345",
+      "original_bytes": 519,
+      "original_sha256": "b586cf6e28eef25748c1de36b27565e3370b53c4d4476f2cbccf7576972c4345"
+    },
+    "retained/campaign/interrupted/supervisor.json.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\supervisor.json",
+      "encoding": "gzip",
+      "bytes": 25143,
+      "sha256": "b2d85dee8ed1667f1eaf4a17fefc3853644c0a2028e7c3af791e95e90343b609",
+      "original_bytes": 102268,
+      "original_sha256": "167abd219e69f42a18ec2eb73436d728c5634c3d70f11ac67cb3fa9fce0d1539"
+    },
+    "retained/campaign/interrupted/trigger.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\trigger.json",
+      "encoding": "identity",
+      "bytes": 349,
+      "sha256": "8b3292f0db1d81a968406901fc63ab38637067be19ffadc8dc71bae45edb1c6f",
+      "original_bytes": 349,
+      "original_sha256": "8b3292f0db1d81a968406901fc63ab38637067be19ffadc8dc71bae45edb1c6f"
+    },
+    "retained/campaign/plan.json.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\plan.json",
+      "encoding": "gzip",
+      "bytes": 13390,
+      "sha256": "a4319c9498455350ad00fe82291b3d91da47f68db9a52afd73a9b2e59830f012",
+      "original_bytes": 52265,
+      "original_sha256": "391e60b7ada3e472742b044ab150ed53a4f0893d70801bae3e66dcb1ee4efcf5"
+    },
+    "retained/campaign/result.json.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\result.json",
+      "encoding": "gzip",
+      "bytes": 3862,
+      "sha256": "9c0c6898a417d8c00404f5785613533c655694d0bdcc48da8bdc7298dbaec5a6",
+      "original_bytes": 19215,
+      "original_sha256": "9a8200d70298ee0442bb782ad0100fab23110a86b44af00923018f3fdf86381a"
+    },
+    "retained/campaign/resumed/run/checkpoint.ckpt": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\checkpoint.ckpt",
+      "encoding": "identity",
+      "bytes": 8109,
+      "sha256": "1913c3329dd7e7da3edff3fa072664d8cfec4a6c4e647dbf40b16d77a6a8d4e0",
+      "original_bytes": 8109,
+      "original_sha256": "1913c3329dd7e7da3edff3fa072664d8cfec4a6c4e647dbf40b16d77a6a8d4e0"
+    },
+    "retained/campaign/resumed/run/events.jsonl": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\events.jsonl",
+      "encoding": "identity",
+      "bytes": 8186,
+      "sha256": "d823fbc2f6ea3026e81653d788e61d90944676b0477d500564c6a4a855325985",
+      "original_bytes": 8186,
+      "original_sha256": "d823fbc2f6ea3026e81653d788e61d90944676b0477d500564c6a4a855325985"
+    },
+    "retained/campaign/resumed/run/manifest.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\manifest.json",
+      "encoding": "identity",
+      "bytes": 556,
+      "sha256": "f47f1992c75576a960b7a3c5050743eca87de20d03aa3ef5f7bc82647a87218c",
+      "original_bytes": 556,
+      "original_sha256": "f47f1992c75576a960b7a3c5050743eca87de20d03aa3ef5f7bc82647a87218c"
+    },
+    "retained/campaign/resumed/run/progress.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\progress.jsonl",
+      "encoding": "gzip",
+      "bytes": 4189,
+      "sha256": "20ce8a71b7364e5e089e26d03536d4efcf3f69895e82b4d068d2e822bbecc9e6",
+      "original_bytes": 14290,
+      "original_sha256": "760e914c35ca15b6dbe2c18ac9f87afd1aa0f9dee90515ecedcdddb835c3edd2"
+    },
+    "retained/campaign/resumed/run/run.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\run.json",
+      "encoding": "identity",
+      "bytes": 183,
+      "sha256": "128ed786174592e9bf6e3882487988f41162e05f545caf915167d82b25f7630f",
+      "original_bytes": 183,
+      "original_sha256": "128ed786174592e9bf6e3882487988f41162e05f545caf915167d82b25f7630f"
+    },
+    "retained/campaign/resumed/run/run.toml": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\run.toml",
+      "encoding": "identity",
+      "bytes": 673,
+      "sha256": "f72a3e4e8b7564cb485f909a216062b0cd1902c82619d00150d09ba341efefce",
+      "original_bytes": 673,
+      "original_sha256": "f72a3e4e8b7564cb485f909a216062b0cd1902c82619d00150d09ba341efefce"
+    },
+    "retained/campaign/resumed/run/solution.sol": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run\\solution.sol",
+      "encoding": "identity",
+      "bytes": 1139,
+      "sha256": "3551b765f05437b19daba9f5619e56cf4e93a7b26bf1a75901cf6816fe76ea29",
+      "original_bytes": 1139,
+      "original_sha256": "3551b765f05437b19daba9f5619e56cf4e93a7b26bf1a75901cf6816fe76ea29"
+    },
+    "retained/campaign/resumed/samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 27915,
+      "sha256": "a7dcb355965f6a7991a92b1df27086b21ef74591f31493020cf19e7c3944d6d6",
+      "original_bytes": 437541,
+      "original_sha256": "9d68c5af348f8fec55415bff069aa74bae901f55f4ea4d20054db161e1cee2e0"
+    },
+    "retained/campaign/resumed/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\stderr.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retained/campaign/resumed/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\stdout.log",
+      "encoding": "identity",
+      "bytes": 6975,
+      "sha256": "2b067e41593a1705f6cee0c775c69e4eeda315f0d1d6aa4ea7aaf833098d1e3a",
+      "original_bytes": 6975,
+      "original_sha256": "2b067e41593a1705f6cee0c775c69e4eeda315f0d1d6aa4ea7aaf833098d1e3a"
+    },
+    "retained/campaign/resumed/supervisor.json.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\supervisor.json",
+      "encoding": "gzip",
+      "bytes": 26204,
+      "sha256": "0cf69b138beeb2609df132522d69fc6eb32cec4316c4732649e32b8d7a8d82d3",
+      "original_bytes": 107999,
+      "original_sha256": "b8d7774efeaa5ea54b22aa1e0f74a03f75026f34c6ec9b00774f70cced2cbcfd"
+    },
+    "retained/campaign/straight/run/checkpoint.ckpt": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\checkpoint.ckpt",
+      "encoding": "identity",
+      "bytes": 8109,
+      "sha256": "1913c3329dd7e7da3edff3fa072664d8cfec4a6c4e647dbf40b16d77a6a8d4e0",
+      "original_bytes": 8109,
+      "original_sha256": "1913c3329dd7e7da3edff3fa072664d8cfec4a6c4e647dbf40b16d77a6a8d4e0"
+    },
+    "retained/campaign/straight/run/events.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\events.jsonl",
+      "encoding": "gzip",
+      "bytes": 1005,
+      "sha256": "0b0a0c0564a5b40e3d80c6328456c17db9c699df05bbf70a1d223199c4bb05f4",
+      "original_bytes": 8350,
+      "original_sha256": "faeeea4b0aee9c044469a5355dce81f223f84bfebce7bf90e46e6cb3cea1de3e"
+    },
+    "retained/campaign/straight/run/manifest.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\manifest.json",
+      "encoding": "identity",
+      "bytes": 682,
+      "sha256": "fabc287cacfce6d83929e91aa9fe60434d5d0dcc131cb0931b62206b518507f7",
+      "original_bytes": 682,
+      "original_sha256": "fabc287cacfce6d83929e91aa9fe60434d5d0dcc131cb0931b62206b518507f7"
+    },
+    "retained/campaign/straight/run/progress.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\progress.jsonl",
+      "encoding": "gzip",
+      "bytes": 4200,
+      "sha256": "0e643b7773bae419f990c00f71aea7730031dd69869e491717a6018378816bcf",
+      "original_bytes": 14293,
+      "original_sha256": "5326fd31356b3995293895bdc99dfd04a2ed8e5fc1042d619d0e2b29a0d4af07"
+    },
+    "retained/campaign/straight/run/run.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\run.json",
+      "encoding": "identity",
+      "bytes": 184,
+      "sha256": "de145f4b2d305c48e6bfacd09725868257ce70c89d12768816c335466271e617",
+      "original_bytes": 184,
+      "original_sha256": "de145f4b2d305c48e6bfacd09725868257ce70c89d12768816c335466271e617"
+    },
+    "retained/campaign/straight/run/run.toml": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\run.toml",
+      "encoding": "identity",
+      "bytes": 673,
+      "sha256": "f72a3e4e8b7564cb485f909a216062b0cd1902c82619d00150d09ba341efefce",
+      "original_bytes": 673,
+      "original_sha256": "f72a3e4e8b7564cb485f909a216062b0cd1902c82619d00150d09ba341efefce"
+    },
+    "retained/campaign/straight/run/solution.sol": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run\\solution.sol",
+      "encoding": "identity",
+      "bytes": 1140,
+      "sha256": "f06799074980a84ab70b366f7e42e379acb16c3aff05453a43e10598cbcdfac8",
+      "original_bytes": 1140,
+      "original_sha256": "f06799074980a84ab70b366f7e42e379acb16c3aff05453a43e10598cbcdfac8"
+    },
+    "retained/campaign/straight/samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 29479,
+      "sha256": "3dac0e4ae590f4b82c20cbcbb1a4b27848cae8630ef6703d8f08bbec0657a27e",
+      "original_bytes": 454748,
+      "original_sha256": "4a8a0cd03e53315680e557e113bfb72dc321561a71a26da84438206c17040887"
+    },
+    "retained/campaign/straight/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\stderr.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retained/campaign/straight/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\stdout.log",
+      "encoding": "identity",
+      "bytes": 7059,
+      "sha256": "2b9b4b862848bede61ce7fb9716506418e121c73f26a0dcd5dd8b2ff2924d603",
+      "original_bytes": 7059,
+      "original_sha256": "2b9b4b862848bede61ce7fb9716506418e121c73f26a0dcd5dd8b2ff2924d603"
+    },
+    "retained/campaign/straight/supervisor.json.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\supervisor.json",
+      "encoding": "gzip",
+      "bytes": 27202,
+      "sha256": "459895a461d36697fd69e7144b6cd4c9c646bdc2d33380b58a0af1938c13e857",
+      "original_bytes": 113599,
+      "original_sha256": "2f2f48c028e88bdd4411b805fd7e293f68c67e3116a3762b6ff3c2647ccf2ad2"
+    },
+    "retained/python/record.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\record.json",
+      "encoding": "identity",
+      "bytes": 2869,
+      "sha256": "449846ba03de95a8fc87647c0456ae61ea4246cf4104150cccde581f396faa9f",
+      "original_bytes": 2869,
+      "original_sha256": "449846ba03de95a8fc87647c0456ae61ea4246cf4104150cccde581f396faa9f"
+    },
+    "retained/python/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\stderr.log",
+      "encoding": "identity",
+      "bytes": 800,
+      "sha256": "ecc81bed30acec02c03c765c87636f3e952a56804a8954762294b6b8dfa95a80",
+      "original_bytes": 800,
+      "original_sha256": "ecc81bed30acec02c03c765c87636f3e952a56804a8954762294b6b8dfa95a80"
+    },
+    "retained/python/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\stdout.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retained/python/tools/samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\tools\\samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 5363,
+      "sha256": "e8ea08260e62c3cfdf97be9cbb907c8aae9670cf453aa1abce8a120bee9dd9c1",
+      "original_bytes": 50295,
+      "original_sha256": "0edd0a0c05c21a9a50e101588cb078d3058a5a4a8be43097dfd026198c60843e"
+    },
+    "retained/python/tools/stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\tools\\stderr.log",
+      "encoding": "identity",
+      "bytes": 5905,
+      "sha256": "cc5af990631dc3391ecf0b179cbfa30fef1166cbe80866cb74708c3c6016e897",
+      "original_bytes": 5905,
+      "original_sha256": "cc5af990631dc3391ecf0b179cbfa30fef1166cbe80866cb74708c3c6016e897"
+    },
+    "retained/python/tools/stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\tools\\stdout.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "retained/python/tools/supervisor.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\tools\\supervisor.json",
+      "encoding": "identity",
+      "bytes": 7514,
+      "sha256": "8d8c98fcfd2c9fc34f7668f0033f83e2beb0a1aa47ca44893bd20226d95a4938",
+      "original_bytes": 7514,
+      "original_sha256": "8d8c98fcfd2c9fc34f7668f0033f83e2beb0a1aa47ca44893bd20226d95a4938"
+    },
+    "source/crates/cli/src/main.rs": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cli\\src\\main.rs",
+      "encoding": "identity",
+      "bytes": 1104,
+      "sha256": "e4a3552b25e50c1715a53b1728110615f93d611574f836ba3f9280fa7ceac634",
+      "original_bytes": 1104,
+      "original_sha256": "e4a3552b25e50c1715a53b1728110615f93d611574f836ba3f9280fa7ceac634"
+    },
+    "source/crates/cli/tests/cli_integration.rs.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cli\\tests\\cli_integration.rs",
+      "encoding": "gzip",
+      "bytes": 15668,
+      "sha256": "f27995568741e6814ac52f5bfe68c85708a494d9f55e7ad58f76aae3d51d9722",
+      "original_bytes": 61601,
+      "original_sha256": "2473afa2b066d49734a9e967be2fc8de3049d14af103b44f107825787988e8bd"
+    },
+    "source/crates/cli/examples/hu_checkpoint_audit.rs.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cli\\examples\\hu_checkpoint_audit.rs",
+      "encoding": "gzip",
+      "bytes": 6509,
+      "sha256": "a0d46c062c55c67bce613def3277919b3d3013e72e7296d59b180accba743de6",
+      "original_bytes": 23196,
+      "original_sha256": "ef4cd6002e9f4bea85fbafd6446a9a4086d901d5eefaa73ae76510b054b3607e"
+    },
+    "source/experiments/hu-postflop-r1/checkpoint/run.py.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\checkpoint\\run.py",
+      "encoding": "gzip",
+      "bytes": 7789,
+      "sha256": "3e1e38ca57bed0e936d92f543962d41f62fb82edac1a942afe28d876dc9afc1f",
+      "original_bytes": 27543,
+      "original_sha256": "da8601bc736da5d85ef896628b59dd8236195dd8c43aab0b2d22aaca01ac0895"
+    },
+    "source/experiments/hu-postflop-r1/checkpoint/test_run.py.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\checkpoint\\test_run.py",
+      "encoding": "gzip",
+      "bytes": 2837,
+      "sha256": "b509c305efde53c04f4c52f0f8602f91a7ed1d8db389fd09615abf2ec57fd2fa",
+      "original_bytes": 9330,
+      "original_sha256": "d510c8163300bd57ff317808e8cce27d9dc1fe1bc417c892bfd02b4c09cb3e6c"
+    },
+    "source/experiments/hu-postflop-r1/checkpoint/protocol.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\checkpoint\\protocol.json",
+      "encoding": "identity",
+      "bytes": 1911,
+      "sha256": "47858155b083bc17526ec37d340b968a741b6ecfdf8be0bd89d5e834224198aa",
+      "original_bytes": 1911,
+      "original_sha256": "47858155b083bc17526ec37d340b968a741b6ecfdf8be0bd89d5e834224198aa"
+    },
+    "source/experiments/hu-postflop-r1/checkpoint/river.toml": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\checkpoint\\river.toml",
+      "encoding": "identity",
+      "bytes": 391,
+      "sha256": "ebeaa61605d76642655e54760ae866b137fe75c1431248be7d636634c1bd418a",
+      "original_bytes": 391,
+      "original_sha256": "ebeaa61605d76642655e54760ae866b137fe75c1431248be7d636634c1bd418a"
+    },
+    "source/source.diff": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-retention-20260926\\source.diff",
+      "encoding": "identity",
+      "bytes": 6582,
+      "sha256": "b538575dd0f6cc166e407538e0d36ff8995f5d04431d9cbb32d7ed841f83bed1",
+      "original_bytes": 6582,
+      "original_sha256": "b538575dd0f6cc166e407538e0d36ff8995f5d04431d9cbb32d7ed841f83bed1"
+    },
+    "source/toolchain.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-retention-20260926\\toolchain.json",
+      "encoding": "identity",
+      "bytes": 761,
+      "sha256": "938095b1b2baebcb94aa23f8ae02da449878ee68e7994dfb475efa39d93a48a8",
+      "original_bytes": 761,
+      "original_sha256": "938095b1b2baebcb94aa23f8ae02da449878ee68e7994dfb475efa39d93a48a8"
+    }
+  },
+  "checks": {
+    "retained/build-first": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-20260926\\supervisor.json",
+      "expected_outcome": [
+        "resource_exceeded",
+        "host_memory_reserve",
+        125,
+        3221225786
+      ],
+      "test_summaries": []
+    },
+    "retained/build-incremental": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-incremental-20260926\\supervisor.json",
+      "expected_outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "test_summaries": []
+    },
+    "retained/build-final": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-build-final-20260926\\supervisor.json",
+      "expected_outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "test_summaries": []
+    },
+    "retained/validation/clippy": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\clippy\\supervisor.json",
+      "expected_outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "test_summaries": []
+    },
+    "retained/validation/comparator-tests": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\comparator-tests\\supervisor.json",
+      "expected_outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "test_summaries": [
+        [
+          2,
+          0,
+          0
+        ]
+      ]
+    },
+    "retained/validation/fmt": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\fmt\\supervisor.json",
+      "expected_outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "test_summaries": []
+    },
+    "retained/validation/workspace": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-checks-20260926\\workspace\\supervisor.json",
+      "expected_outcome": [
+        "resource_exceeded",
+        "tree_memory_limit",
+        125,
+        3221225786
+      ],
+      "test_summaries": []
+    },
+    "retained/campaign/audit-resumed": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\audit-resumed\\supervisor.json",
+      "expected_outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "test_summaries": []
+    },
+    "retained/campaign/audit-straight": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\audit-straight\\supervisor.json",
+      "expected_outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "test_summaries": []
+    },
+    "retained/campaign/compare": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\compare\\supervisor.json",
+      "expected_outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "test_summaries": []
+    },
+    "retained/campaign/interrupted": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\supervisor.json",
+      "expected_outcome": [
+        "interrupted",
+        "signal:SIGINT",
+        130,
+        130
+      ],
+      "test_summaries": []
+    },
+    "retained/campaign/resumed": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\supervisor.json",
+      "expected_outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "test_summaries": []
+    },
+    "retained/campaign/straight": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\supervisor.json",
+      "expected_outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "test_summaries": []
+    },
+    "retained/python/tools": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\tools\\supervisor.json",
+      "expected_outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "test_summaries": []
+    }
+  },
+  "campaign_result": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\result.json",
+  "run_directories": {
+    "interrupted": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\interrupted\\run",
+    "resumed": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\resumed\\run",
+    "straight": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\straight\\run"
+  },
+  "saved_profile_reports": [
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\audit-resumed\\stdout.log",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-contrast-20260926\\audit-straight\\stdout.log"
+  ],
+  "binary_availability": "Hashes/build provenance retained; executable bytes remain only in ignored local Cargo target. Rebuild from recorded source/toolchain.",
+  "workspace_tests": "not_completed_resource_limited",
+  "r1_acceptance": null,
+  "python_check_record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-checkpoint-python-20260926\\record.json"
+}
