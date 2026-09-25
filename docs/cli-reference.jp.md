@@ -502,7 +502,7 @@ EV は元の subgame 開始基準を維持し、chip-EV は chip、ICM は prize
 
 レーキまたは外部 field を含む ICM の一般和設定では `validate` は
 `general-sum utilities, no Nash convergence guarantee` と表示する。
-`.sol` はindexed format version 2を使い、version 1は明示拒否する。旧artifactを使う場合は
+`.sol` はindexed format version 3を使い、version 1 / 2は明示拒否する。旧artifactを使う場合は
 新規solve、または自己完結したrun config/checkpointを保持して旧 `solution.sol` を退避した後の
 resumeで生成し直す。保存時のEVを暗黙補正しない。
 `export ... summary` は `--node root` / `all` ならmetadataだけを読み、treeや全nodeを復元しない。

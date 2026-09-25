@@ -1,0 +1,25 @@
+{
+  "schema": "r1.download-verification/v1",
+  "verified_at_utc": "2026-09-25T17:36:17.897934+00:00",
+  "bundle": {
+    "path": "runs/r1-cloud/vm06-checks-early.tar.gz",
+    "bytes": 1373699,
+    "sha256": "5f08982dcfab989ac0351030cd2f10fe042d6bdd0cfd4456fa2c288f6738402b"
+  },
+  "sidecar_manifest": {
+    "path": "runs/r1-cloud/vm06-checks-early.tar.gz.manifest.json",
+    "bytes": 34835,
+    "sha256": "7e145812888a968a7ed2ec11c7ef65a694819d7aaeaeb3c8d2fef2b5d49b466e"
+  },
+  "inner_manifest_identical_to_sidecar": true,
+  "expected_regular_payloads": 55,
+  "verified_regular_payloads": 55,
+  "unlisted_tar_members": 0,
+  "skipped_payloads": 0,
+  "payload_bytes": 2247080,
+  "retained_compact_payloads": 54,
+  "retained_source_archives": 1,
+  "supervisor_output_hash_sets_verified": 11,
+  "source_archive_files_verified": 302,
+  "verification": "Read all tar payloads, checked bytes/SHA-256, rehashed every retained file, checked every supervisor output hash and successful source06 before/after identity, matched source06 archive to local manifest and remote extracted-source inventory."
+}

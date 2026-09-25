@@ -1,0 +1,33 @@
+{
+  "schema": "r1.validation-summary/v1",
+  "source": {
+    "archive_path": "experiments/hu-postflop-r1/validation/sources/current-03.tar.gz",
+    "archive_sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970",
+    "archive_bytes": 1195310,
+    "source_manifest_path": "experiments/hu-postflop-r1/validation/chunked/source-manifest.json",
+    "source_manifest_sha256": "e0f78d6965f94020267dc61396402b4d095de01a4e26101d0dda76e496565fb1",
+    "verified_source_files": 293
+  },
+  "command_count": 5,
+  "all_recorded_exit_codes_zero": true,
+  "workspace_test_summary_lines": 53,
+  "workspace_tests": {
+    "passed": 894,
+    "failed": 0,
+    "ignored": 31,
+    "measured": 0,
+    "filtered_out": 0
+  },
+  "python_tools": {
+    "run": 32,
+    "passed": 29,
+    "skipped_windows_only": 3,
+    "status": "OK"
+  },
+  "pipeline_unittests": {
+    "run": 8,
+    "passed": 8,
+    "status": "OK",
+    "exit_code_recorded": false
+  }
+}

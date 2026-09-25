@@ -1,0 +1,57 @@
+{
+  "00-toolchain/stderr.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-build/00-toolchain/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "00-toolchain/stdout.log": {
+    "bytes": 3777,
+    "path": "/opt/r1/audit-pair-build/00-toolchain/stdout.log",
+    "sha256": "f0109f3804cb3c6c284e2f3f95ec1bb5439542b10aee97e2cb0262bafbb9d8fd"
+  },
+  "00-toolchain/supervisor.json": {
+    "bytes": 7864,
+    "path": "/opt/r1/audit-pair-build/00-toolchain/supervisor.json",
+    "sha256": "ddd4d3e93bca0dfc36ac390e10bf1953de50389cd72d4f582aef02fc284cd386"
+  },
+  "00-toolchain/supervisor.samples.jsonl": {
+    "bytes": 639,
+    "path": "/opt/r1/audit-pair-build/00-toolchain/supervisor.samples.jsonl",
+    "sha256": "c1994125bd834ce0428f29cdad92427d651cee3007913e6de4469f8f96e19110"
+  },
+  "01-fmt/stderr.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-build/01-fmt/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "01-fmt/stdout.log": {
+    "bytes": 162,
+    "path": "/opt/r1/audit-pair-build/01-fmt/stdout.log",
+    "sha256": "19be878b69c02e6ae4cb5b1d9952f787696f361db679ceb25af6b873bb913c89"
+  },
+  "01-fmt/supervisor.json": {
+    "bytes": 7704,
+    "path": "/opt/r1/audit-pair-build/01-fmt/supervisor.json",
+    "sha256": "2e79c61aae90476356ef972a2d112e7c121aae84a29bb8a2cca775741613a2a4"
+  },
+  "01-fmt/supervisor.samples.jsonl": {
+    "bytes": 621,
+    "path": "/opt/r1/audit-pair-build/01-fmt/supervisor.samples.jsonl",
+    "sha256": "06dcf4be183a702337801545b2b7462902bcbd569c2daad7c1c62eb41ca78279"
+  },
+  "baseline-source-files.json": {
+    "bytes": 27135,
+    "path": "/opt/r1/audit-pair-build/baseline-source-files.json",
+    "sha256": "ff778c0a7b5c1a4dd26e19fc661064dacc27e91381587803f0cd722bcbd7bd1c"
+  },
+  "current-source-files.json": {
+    "bytes": 43964,
+    "path": "/opt/r1/audit-pair-build/current-source-files.json",
+    "sha256": "a5b7a7e4899d0db130a8762f3a801ddef321f90412a1b7ea75729de1a4703e92"
+  },
+  "result.json": {
+    "bytes": 5020,
+    "path": "/opt/r1/audit-pair-build/result.json",
+    "sha256": "ab2520086573e74031a7de1b509ace0c4b1d70bcd5526cac7e38c999c0015b0c"
+  }
+}

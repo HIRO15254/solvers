@@ -1,0 +1,49 @@
+   Compiling zerocopy v0.8.52
+   Compiling zerocopy-derive v0.8.52
+   Compiling fastrand v2.4.1
+   Compiling either v1.16.0
+   Compiling aya_base v0.1.0
+   Compiling autocfg v1.5.1
+   Compiling aya_poker v0.1.0
+   Compiling rayon v1.12.0
+   Compiling num-traits v0.2.19
+   Compiling ciborium-io v0.2.2
+   Compiling regex-syntax v0.8.11
+   Compiling cards v0.1.0 (/opt/r1/current/crates/cards)
+   Compiling plotters-backend v0.3.7
+   Compiling plotters-svg v0.3.7
+   Compiling regex-automata v0.4.14
+   Compiling clap_builder v4.6.0
+   Compiling itertools v0.10.5
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_chacha v0.3.1
+   Compiling rand v0.8.6
+   Compiling half v2.7.1
+   Compiling cast v0.3.0
+   Compiling engine v0.1.0 (/opt/r1/current/crates/engine)
+   Compiling same-file v1.0.6
+   Compiling ciborium-ll v0.2.2
+   Compiling walkdir v2.5.0
+   Compiling ciborium v0.2.2
+   Compiling game v0.1.0 (/opt/r1/current/crates/game)
+   Compiling criterion-plot v0.5.0
+   Compiling plotters v0.3.7
+   Compiling clap v4.6.1
+   Compiling regex v1.12.4
+   Compiling tinytemplate v1.2.1
+   Compiling hand-index v0.1.0 (/opt/r1/current/crates/hand-index)
+   Compiling is-terminal v0.4.17
+   Compiling once_cell v1.21.4
+   Compiling oorandom v11.1.5
+   Compiling anes v0.1.6
+   Compiling holdem v0.1.0 (/opt/r1/current/crates/holdem)
+   Compiling cfr-ref v0.1.0 (/opt/r1/current/crates/cfr-ref)
+   Compiling criterion v0.5.1
+    Finished `release` profile [optimized] target(s) in 25.13s
+     Running tests/oracle_diff.rs (/opt/r1/target/candidate/release/deps/oracle_diff-1a7d9c32e6a6390f)
+
+running 1 test
+test multistreet_engine_matches_scalar_oracle ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 8.02s
+

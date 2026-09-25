@@ -1,0 +1,206 @@
++ export CARGO_HOME=/opt/r1/cargo
++ CARGO_HOME=/opt/r1/cargo
++ export RUSTUP_HOME=/opt/r1/rustup
++ RUSTUP_HOME=/opt/r1/rustup
++ export RUSTUP_TOOLCHAIN=1.97.0
++ RUSTUP_TOOLCHAIN=1.97.0
++ export PATH=/opt/r1/cargo/bin:/opt/r1/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/snap/bin
++ PATH=/opt/r1/cargo/bin:/opt/r1/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/snap/bin
++ export CARGO_BUILD_JOBS=4
++ CARGO_BUILD_JOBS=4
++ export CARGO_TARGET_DIR=/opt/r1/target/baseline
++ CARGO_TARGET_DIR=/opt/r1/target/baseline
++ cd /opt/r1/baseline
++ rustc -Vv
+rustc 1.97.0 (2d8144b78 2026-07-07)
+binary: rustc
+commit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3
+commit-date: 2026-07-07
+host: x86_64-unknown-linux-gnu
+release: 1.97.0
+LLVM version: 22.1.6
++ cargo -V
+cargo 1.97.0 (c980f4866 2026-06-30)
++ uname -a
+Linux solvers-r1-20260925-05 7.0.0-1011-gcp #11~24.04.1-Ubuntu SMP PREEMPT Tue Aug 11 20:14:48 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
++ lscpu
+Architecture:                            x86_64
+CPU op-mode(s):                          32-bit, 64-bit
+Address sizes:                           48 bits physical, 48 bits virtual
+Byte Order:                              Little Endian
+CPU(s):                                  8
+On-line CPU(s) list:                     0-7
+Vendor ID:                               AuthenticAMD
+BIOS Vendor ID:                          Google
+Model name:                              AMD EPYC 7B12
+BIOS Model name:                           CPU @ 2.0GHz
+BIOS CPU family:                         1
+CPU family:                              23
+Model:                                   49
+Thread(s) per core:                      2
+Core(s) per socket:                      4
+Socket(s):                               1
+Stepping:                                0
+BogoMIPS:                                4499.99
+Flags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid
+Hypervisor vendor:                       KVM
+Virtualization type:                     full
+L1d cache:                               128 KiB (4 instances)
+L1i cache:                               128 KiB (4 instances)
+L2 cache:                                2 MiB (4 instances)
+L3 cache:                                16 MiB (1 instance)
+NUMA node(s):                            1
+NUMA node0 CPU(s):                       0-7
+Vulnerability Gather data sampling:      Not affected
+Vulnerability Ghostwrite:                Not affected
+Vulnerability Indirect target selection: Not affected
+Vulnerability Itlb multihit:             Not affected
+Vulnerability L1tf:                      Not affected
+Vulnerability Mds:                       Not affected
+Vulnerability Meltdown:                  Not affected
+Vulnerability Mmio stale data:           Not affected
+Vulnerability Old microcode:             Not affected
+Vulnerability Reg file data sampling:    Not affected
+Vulnerability Retbleed:                  Mitigation; untrained return thunk; SMT enabled with STIBP protection
+Vulnerability Spec rstack overflow:      Mitigation; Safe RET
+Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl
+Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:                Mitigation; Retpolines; IBPB conditional; STIBP always-on; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected
+Vulnerability Srbds:                     Not affected
+Vulnerability Tsa:                       Not affected
+Vulnerability Tsx async abort:           Not affected
+Vulnerability Vmscape:                   Not affected
++ free -b
+               total        used        free      shared  buff/cache   available
+Mem:     67419480064  1329336320 59119452160      999424  7705292800 66090143744
+Swap:              0           0           0
++ sha256sum Cargo.lock .cargo/config.toml /opt/r1/baseline-source.tar.gz
+a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1  Cargo.lock
+144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21  .cargo/config.toml
+fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197  /opt/r1/baseline-source.tar.gz
++ /usr/bin/time -v cargo build --locked --release -p cli
+   Compiling libc v0.2.186
+   Compiling proc-macro2 v1.0.106
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.46
+   Compiling serde_core v1.0.228
+   Compiling serde v1.0.228
+   Compiling fastrand v2.4.1
+   Compiling quickdiv v0.1.1
+   Compiling aya_base v0.1.0
+   Compiling miniphf v0.1.0
+   Compiling cfg-if v1.0.4
+   Compiling thiserror v2.0.18
+   Compiling crossbeam-utils v0.8.21
+   Compiling syn v2.0.118
+   Compiling jobserver v0.1.34
+   Compiling aya_codegen v0.1.0
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.9
+   Compiling aya_poker v0.1.0
+   Compiling cc v1.2.65
+   Compiling zerocopy v0.8.52
+   Compiling crossbeam-epoch v0.9.18
+   Compiling rayon-core v1.13.0
+   Compiling crossbeam-deque v0.8.6
+   Compiling getrandom v0.2.17
+   Compiling semver v1.0.28
+   Compiling rustc_version v0.4.1
+   Compiling rand_core v0.6.4
+   Compiling serde_derive v1.0.228
+   Compiling thiserror-impl v2.0.18
+   Compiling scopeguard v1.2.0
+   Compiling pkg-config v0.3.33
+   Compiling either v1.16.0
+   Compiling rayon v1.12.0
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_chacha v0.3.1
+   Compiling zstd-sys v2.0.16+zstd.1.5.7
+   Compiling lock_api v0.4.14
+   Compiling heapless v0.7.17
+   Compiling cards v0.1.0 (/opt/r1/baseline/crates/cards)
+   Compiling byteorder v1.5.0
+   Compiling hash32 v0.2.1
+   Compiling spin v0.9.8
+   Compiling rand v0.8.6
+   Compiling stable_deref_trait v1.2.1
+   Compiling cobs v0.3.0
+   Compiling zstd-safe v7.2.4
+   Compiling getrandom v0.4.3
+   Compiling rustix v1.1.4
+   Compiling zmij v1.0.21
+   Compiling engine v0.1.0 (/opt/r1/baseline/crates/engine)
+   Compiling hand-index v0.1.0 (/opt/r1/baseline/crates/hand-index)
+   Compiling postcard v1.1.3
+   Compiling blake3 v1.8.5
+   Compiling serde_json v1.0.150
+   Compiling utf8parse v0.2.2
+   Compiling bitflags v2.13.0
+   Compiling linux-raw-sys v0.12.1
+   Compiling anstyle-parse v1.0.0
+   Compiling hashbrown v0.17.1
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling once_cell v1.21.4
+   Compiling arrayvec v0.7.8
+   Compiling anstyle v1.0.14
+   Compiling itoa v1.0.18
+   Compiling constant_time_eq v0.4.2
+   Compiling equivalent v1.0.2
+   Compiling colorchoice v1.0.5
+   Compiling memchr v2.8.2
+   Compiling anstyle-query v1.1.5
+   Compiling cpufeatures v0.3.0
+   Compiling arrayref v0.3.9
+   Compiling tempfile v3.27.0
+   Compiling anstream v1.0.0
+   Compiling indexmap v2.14.0
+   Compiling game v0.1.0 (/opt/r1/baseline/crates/game)
+   Compiling abstraction v0.1.0 (/opt/r1/baseline/crates/abstraction)
+   Compiling serde_spanned v0.6.9
+   Compiling toml_datetime v0.6.11
+   Compiling toml_write v0.1.2
+   Compiling rustc-hash v2.1.3
+   Compiling heck v0.5.0
+   Compiling winnow v0.7.15
+   Compiling anyhow v1.0.103
+   Compiling strsim v0.11.1
+   Compiling clap_lex v1.1.0
+   Compiling clap_builder v4.6.0
+   Compiling toml_edit v0.22.27
+   Compiling clap_derive v4.6.1
+   Compiling clap v4.6.1
+   Compiling toml v0.8.23
+   Compiling preflop v0.1.0 (/opt/r1/baseline/crates/preflop)
+   Compiling holdem v0.1.0 (/opt/r1/baseline/crates/holdem)
+   Compiling zstd v0.13.3
+   Compiling multiway v0.1.0 (/opt/r1/baseline/crates/multiway)
+   Compiling formats v0.1.0 (/opt/r1/baseline/crates/formats)
+   Compiling cli v0.1.0 (/opt/r1/baseline/crates/cli)
+    Finished `release` profile [optimized] target(s) in 1m 53s
+	Command being timed: "cargo build --locked --release -p cli"
+	User time (seconds): 213.02
+	System time (seconds): 11.39
+	Percent of CPU this job got: 198%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:53.20
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 934624
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 243
+	Minor (reclaiming a frame) page faults: 3180338
+	Voluntary context switches: 13079
+	Involuntary context switches: 1502
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 904920
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
++ sha256sum /opt/r1/target/baseline/release/solvers
+77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8  /opt/r1/target/baseline/release/solvers
++ date -u --iso-8601=seconds
+2026-09-25T16:16:54+00:00

@@ -11,8 +11,8 @@
 //! viewer re-solves the river lazily on demand), which is what keeps these
 //! files small for deep trees.
 //!
-//! Version 2 stores checked metadata and independently compressed, indexed
-//! strategy/value node frames. See `sol_indexed` for the binary layout.
+//! Version 3 stores checked metadata and independently compressed, indexed
+//! groups of strategy/value nodes. See `sol_indexed` for the binary layout.
 
 use serde::{Deserialize, Serialize};
 
@@ -383,16 +383,15 @@ mod tests {
         let path = directory.path().join("layout.sol");
         write_sol(&path, &sample_payload()).unwrap();
         let original = std::fs::read(&path).unwrap();
-        let mut legacy = original.clone();
-        legacy[8..10].copy_from_slice(&1u16.to_le_bytes());
-        std::fs::write(&path, legacy).unwrap();
-        assert!(matches!(
-            read_sol(&path),
-            Err(SolError::BadVersion {
-                found: 1,
-                expected: 2
-            })
-        ));
+        for version in [1u16, 2] {
+            let mut legacy = original.clone();
+            legacy[8..10].copy_from_slice(&version.to_le_bytes());
+            std::fs::write(&path, legacy).unwrap();
+            assert!(matches!(
+                read_sol(&path),
+                Err(SolError::BadVersion { found, expected: 3 }) if found == version
+            ));
+        }
         for (offset, value) in [(50, u64::MAX), (58, u64::MAX), (98, u64::MAX)] {
             let mut bytes = original.clone();
             bytes[offset..offset + 8].copy_from_slice(&value.to_le_bytes());

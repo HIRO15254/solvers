@@ -1,0 +1,37 @@
+{
+  "schema": "r1.download-verification/v1",
+  "verified_at_utc": "2026-09-25T16:57:15.178002+00:00",
+  "bundle_path": "runs/r1-cloud/vm05-v3-checks.tar.gz",
+  "bundle_bytes": 29508,
+  "bundle_sha256": "33905062c8c8cef0d53605febc8deb3c0fe911c0555260ac11613382768b8ed0",
+  "sidecar_manifest_path": "runs/r1-cloud/vm05-v3-checks.tar.gz.manifest.json",
+  "sidecar_manifest_sha256": "5e8c6c28372edda245596a45b548d6e18b060357ca98fc11c9cef4166ada9e59",
+  "inner_manifest_identical_to_sidecar": true,
+  "expected_regular_payloads": 15,
+  "verified_regular_payloads": 15,
+  "unlisted_tar_members": 0,
+  "skipped_payloads": 0,
+  "payload_bytes": 114665,
+  "retained_compact_payloads": 15,
+  "verification": "Every regular payload read from tar and checked against manifest bytes and SHA-256; written evidence files rehashed; both source archives checked against per-file source manifests.",
+  "bundle_availability": "downloaded-and-hash-verified-local-ignored-runs-path",
+  "source_archives": {
+    "candidate03": {
+      "archive_path": "experiments/hu-postflop-r1/validation/sources/current-03.tar.gz",
+      "archive_sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970",
+      "archive_bytes": 1195310,
+      "source_manifest_path": "experiments/hu-postflop-r1/validation/chunked/source-manifest.json",
+      "source_manifest_sha256": "e0f78d6965f94020267dc61396402b4d095de01a4e26101d0dda76e496565fb1",
+      "verified_source_files": 293
+    },
+    "source02": {
+      "archive_path": "experiments/hu-postflop-r1/validation/sources/current-02.tar.gz",
+      "archive_sha256": "5edec6bea4ce887847c3430b3c45e5c5251402f2780f3289e95409e40b4b8fc6",
+      "archive_bytes": 1181970,
+      "source_manifest_path": "experiments/hu-postflop-r1/validation/updated/source-manifest.json",
+      "source_manifest_sha256": "d167104639d83d98b78b847ab2f120b7faeabc381a317262bf95b65fbed8d7e9",
+      "verified_source_files": 284
+    }
+  },
+  "source_label": "source02"
+}

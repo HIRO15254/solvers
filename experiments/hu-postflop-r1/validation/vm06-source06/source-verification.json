@@ -1,0 +1,43 @@
+{
+  "schema": "r1.validation-source-verification/v1",
+  "source06": {
+    "path": "experiments/hu-postflop-r1/validation/sources/current-06.tar.gz",
+    "bytes": 1213908,
+    "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+  },
+  "source06_manifest": {
+    "path": "experiments/hu-postflop-r1/validation/sources/source-manifest-audit-formatted.json",
+    "bytes": 53177,
+    "sha256": "099acd4d9f43f53518842a0b4cabf969e1dd911a863709b97de3ea3783b4042a"
+  },
+  "verified_archive_files": 302,
+  "remote_extracted_inventory_matches_archive": true,
+  "remote_inventory": {
+    "path": "experiments/hu-postflop-r1/validation/vm06-source06/current-source-files.json",
+    "bytes": 44804,
+    "sha256": "cbd04399b4d3338bf5c2012391b73dcbf686cd7194953d910fad0f1abf79dc22"
+  },
+  "source04": {
+    "path": "experiments/hu-postflop-r1/validation/sources/current-04.tar.gz",
+    "bytes": 1204318,
+    "sha256": "3787c1479e71cfab6266d75865750a97ca370712032d22565215a985dc680472"
+  },
+  "product_changes_from_source04": [
+    "crates/cli/src/sol.rs"
+  ],
+  "product_diff": {
+    "path": "experiments/hu-postflop-r1/validation/vm06-source06/source04-to-source06-product.diff",
+    "bytes": 653,
+    "sha256": "9c0210f4ecb9c071238a7fb2a0bf6e47d8d6f3880edd302a74971c54c74111d9"
+  },
+  "current_product_files_checked": 187,
+  "current_product_mismatches": [],
+  "scope": "crates/**/*.rs, crates/**/Cargo.toml, root Cargo.toml/Cargo.lock/rust-toolchain.toml/.cargo/config.toml; later research/scripts/docs are not asserted identical",
+  "current_comparison_at_utc": "2026-09-25T17:36:17.830932+00:00",
+  "source05": {
+    "path": "experiments/hu-postflop-r1/validation/sources/current-05.tar.gz",
+    "bytes": 1213904,
+    "sha256": "9f0b828cbc2bfe010c72e5d204afc1f786d014257a2b19b68f3746b58b86e0dd"
+  },
+  "source05_execution_evidence": "not present in this bundle; unformatted intermediate archive was not used according to campaign operator"
+}

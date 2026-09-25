@@ -1,0 +1,49 @@
+{
+  "schema": "r1.validation-summary/v1",
+  "source": {
+    "archive_path": "experiments/hu-postflop-r1/validation/sources/current-02.tar.gz",
+    "archive_sha256": "5edec6bea4ce887847c3430b3c45e5c5251402f2780f3289e95409e40b4b8fc6",
+    "archive_bytes": 1181970,
+    "source_manifest_path": "experiments/hu-postflop-r1/validation/updated/source-manifest.json",
+    "source_manifest_sha256": "d167104639d83d98b78b847ab2f120b7faeabc381a317262bf95b65fbed8d7e9",
+    "verified_source_files": 284
+  },
+  "runner_sha256": "337ed855b03999b40507a94da97980445caf0c07b214f4f5cb64e08c8e7bc350",
+  "declared_source_file_hashes_match_source02_manifest": true,
+  "runtime_declared_source_file_count": 5,
+  "passed": 5,
+  "failed": 0,
+  "seconds_including_compile_and_runner": 54.330392114999995,
+  "tests": [
+    {
+      "test": "multistreet_engine_matches_scalar_oracle",
+      "command_seconds_including_compile": 33.222766542000045,
+      "status": "passed",
+      "log": "01-multistreet_engine_matches_scalar_oracle.log"
+    },
+    {
+      "test": "iso_quotient_matches_full_tree_per_hand",
+      "command_seconds_including_compile": 10.769878040999629,
+      "status": "passed",
+      "log": "02-iso_quotient_matches_full_tree_per_hand.log"
+    },
+    {
+      "test": "member_branch_matches_suit_permuted_rep_branch",
+      "command_seconds_including_compile": 0.9179585120000411,
+      "status": "passed",
+      "log": "03-member_branch_matches_suit_permuted_rep_branch.log"
+    },
+    {
+      "test": "i16_storage_matches_f32_on_small_turn_spot",
+      "command_seconds_including_compile": 1.4664805459997297,
+      "status": "passed",
+      "log": "04-i16_storage_matches_f32_on_small_turn_spot.log"
+    },
+    {
+      "test": "pure_hu_icm_postflop_solve_matches_chip_ev",
+      "command_seconds_including_compile": 7.919209760000285,
+      "status": "passed",
+      "log": "05-pure_hu_icm_postflop_solve_matches_chip_ev.log"
+    }
+  ]
+}

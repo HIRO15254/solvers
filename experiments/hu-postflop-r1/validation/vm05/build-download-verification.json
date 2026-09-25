@@ -1,0 +1,85 @@
+{
+  "archive_sha256": "3c715889d53ce83fe8c033b317337c40e302bdf05ad8d0245e95566a4f7d499e",
+  "archive_local_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build.tar.gz",
+  "availability": "downloaded and all included file hashes verified; source archives and compact logs also retained in Git evidence; binaries retained in local bundle",
+  "files": [
+    {
+      "root": "baseline-binary",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build\\files\\00000000",
+      "sha256": "77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8",
+      "bytes": 8813904
+    },
+    {
+      "root": "baseline-build",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build\\files\\00000001",
+      "sha256": "0b5ae8ec83d6c842228b95836a4335aa14b868d34f46788677960195799f2dd8",
+      "bytes": 9117
+    },
+    {
+      "root": "baseline-source",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build\\files\\00000002",
+      "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197",
+      "bytes": 871630
+    },
+    {
+      "root": "candidate-binary",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build\\files\\00000003",
+      "sha256": "6849f0642e47bbd115b1a03dec80cc3b1f3c3a07a99726010d564f97869bfc49",
+      "bytes": 8862696
+    },
+    {
+      "root": "candidate-build",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build\\files\\00000004",
+      "sha256": "b0542e58771fbc9c7ed7e2fca5913691acfa85b068b6b3157b92e633d715c5b0",
+      "bytes": 8549
+    },
+    {
+      "root": "candidate-source",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build\\files\\00000005",
+      "sha256": "5edec6bea4ce887847c3430b3c45e5c5251402f2780f3289e95409e40b4b8fc6",
+      "bytes": 1181970
+    },
+    {
+      "root": "pipeline-tests",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build\\files\\00000006",
+      "sha256": "04ad9e345d17564e50e873e362bb72248b99e2824187add03da5d8edc17f13f6",
+      "bytes": 1091
+    },
+    {
+      "root": "validation",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build\\files\\00000007",
+      "sha256": "a90721a3b031e0e1c8bfc34ece79b6608d2ae53166cfb77dad281a0eb5fa6bc8",
+      "bytes": 196
+    },
+    {
+      "root": "validation",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build\\files\\00000008",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "root": "validation",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build\\files\\00000009",
+      "sha256": "6877d2a09843387262596e0d67b49bc6bdfbadabd92c9052f6a0f81acaf8942f",
+      "bytes": 8687
+    },
+    {
+      "root": "validation",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build\\files\\00000010",
+      "sha256": "514f4a8edf431053b4adfa9f08d1ea3c0d7621db8ce91c6ef9cc1bbb219313b7",
+      "bytes": 86419
+    },
+    {
+      "root": "validation",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build\\files\\00000011",
+      "sha256": "5e2b6df5f59a4725579668c43538633b2b3119cfe8b39e07753d23e26f8d05f2",
+      "bytes": 4839
+    },
+    {
+      "root": "validation",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-build\\files\\00000012",
+      "sha256": "7aa58eb7c8b07c7a2c4ddf436a570feec41442bb44d83bd7765ae51eff49bf9a",
+      "bytes": 1663
+    }
+  ]
+}

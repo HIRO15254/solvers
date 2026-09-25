@@ -1,0 +1,13 @@
+test_all_configs_keep_fixed_quality_and_threads (test_run_campaign.CampaignTests.test_all_configs_keep_fixed_quality_and_threads) ... ok
+test_atomic_write_preserves_existing_record (test_run_campaign.CampaignTests.test_atomic_write_preserves_existing_record) ... ok
+test_deadline_refuses_new_process_without_shortening_stage (test_run_campaign.CampaignTests.test_deadline_refuses_new_process_without_shortening_stage) ... ok
+test_freeze_rejects_unreached_target_and_changed_inputs (test_run_campaign.CampaignTests.test_freeze_rejects_unreached_target_and_changed_inputs) ... ok
+test_pilot_freeze_and_three_alternating_pairs (test_run_campaign.CampaignTests.test_pilot_freeze_and_three_alternating_pairs) ... ok
+test_quality_is_strict_and_missing_is_not_zero (test_run_campaign.CampaignTests.test_quality_is_strict_and_missing_is_not_zero) ... ok
+test_supervisor_signal_stops_campaign (test_run_campaign.CampaignTests.test_supervisor_signal_stops_campaign) ... 2026-09-25T16:15:00Z signal: 
+ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.318s
+
+OK

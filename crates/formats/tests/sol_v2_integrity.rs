@@ -1,4 +1,5 @@
-//! Small public-API corruption fixtures for the documented v2 container.
+//! Small public-API corruption fixtures for the current v3 container.
+//! The target keeps its original name so existing validation commands apply.
 //! Offsets are deliberately specified here independently of the codec.
 
 use std::path::PathBuf;
@@ -9,7 +10,7 @@ use formats::{
 };
 
 const PREFIX_LEN: usize = 106;
-const ENTRY_LEN: usize = 60;
+const ENTRY_LEN: usize = 64;
 const METADATA_LENGTH: usize = 50;
 const METADATA_DECODED_LENGTH: usize = 58;
 const METADATA_DIGEST: usize = 66;
@@ -17,7 +18,7 @@ const DIRECTORY_COUNT: usize = 98;
 
 fn payload() -> SolPayload {
     SolPayload {
-        config_toml: "fixture = \"sol-v2-integrity\"\n".to_owned(),
+        config_toml: "fixture = \"sol-v3-integrity\"\n".to_owned(),
         meta: SolMeta {
             iterations: 7,
             expl: [0.1, 0.2],
@@ -61,6 +62,128 @@ fn fixture() -> (tempfile::TempDir, PathBuf, Vec<u8>) {
     (directory, path, bytes)
 }
 
+fn grouped_payload() -> SolPayload {
+    let mut result = payload();
+    let block = result.blocks[0].clone();
+    let value = result.values[0].clone();
+    result.node_count = 128;
+    result.blocks = (0..128)
+        .map(|sref| StrategyBlock {
+            sref,
+            ..block.clone()
+        })
+        .collect();
+    result.values = (0..128)
+        .map(|sref| ValueBlock {
+            sref,
+            ..value.clone()
+        })
+        .collect();
+    result
+}
+
+#[test]
+fn bounded_groups_round_trip_and_corruption_is_isolated_to_a_chunk() {
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory.path().join("groups.sol");
+    let expected = grouped_payload();
+    write_sol(&path, &expected).unwrap();
+    let original = std::fs::read(&path).unwrap();
+    assert_eq!(u64_at(&original, DIRECTORY_COUNT), 2);
+    assert!(
+        original.len() < 128 * ENTRY_LEN,
+        "do not retain a per-node directory"
+    );
+    assert_eq!(read_sol(&path).unwrap(), expected);
+    let mut reader = SolReader::open(&path).unwrap();
+    assert_eq!(reader.stored_srefs().len(), 128);
+    assert_eq!(
+        reader.stored_srefs().collect::<Vec<_>>(),
+        (0..128).collect::<Vec<_>>()
+    );
+    for sref in [127, 0, 64, 63, 65] {
+        assert_eq!(
+            reader.read_node(sref).unwrap().unwrap(),
+            (
+                expected.blocks[sref as usize].clone(),
+                expected.values[sref as usize].clone()
+            )
+        );
+    }
+    assert!(reader.read_node(128).unwrap().is_none());
+    drop(reader);
+
+    let mut damaged = original.clone();
+    *damaged.last_mut().unwrap() ^= 1;
+    std::fs::write(&path, damaged).unwrap();
+    let mut reader = SolReader::open(&path).unwrap();
+    assert_eq!(reader.metadata().stored_nodes, 128);
+    assert!(reader.read_node(63).unwrap().is_some());
+    assert!(reader.read_node(64).is_err());
+    assert!(reader.read_node(127).is_err());
+    assert!(read_sol(&path).is_err());
+    drop(reader);
+
+    // A correct checksum cannot conceal a bad ID elsewhere in the requested
+    // chunk. Read its first node while corrupting its final node.
+    let mut pairs: Vec<_> = expected.blocks[64..]
+        .iter()
+        .cloned()
+        .zip(expected.values[64..].iter().cloned())
+        .collect();
+    pairs[63].1.sref = 126;
+    let raw = postcard::to_allocvec(&pairs).unwrap();
+    std::fs::write(&path, replace_last_node(&original, &raw)).unwrap();
+    let mut reader = SolReader::open(&path).unwrap();
+    assert!(
+        matches!(reader.read_node(64), Err(SolError::InvalidLayout(message)) if message.contains("identity"))
+    );
+    drop(reader);
+
+    // A valid inner list with one missing node must fail its count check.
+    pairs.pop();
+    let raw = postcard::to_allocvec(&pairs).unwrap();
+    std::fs::write(&path, replace_last_node(&original, &raw)).unwrap();
+    let mut reader = SolReader::open(&path).unwrap();
+    assert!(
+        matches!(reader.read_node(64), Err(SolError::InvalidLayout(message)) if message.contains("count"))
+    );
+    drop(reader);
+
+    let mut count_mismatch = original;
+    let first = directory_start(&count_mismatch);
+    set_u32(&mut count_mismatch, first + 4, 62);
+    set_u32(&mut count_mismatch, first + 8, 63);
+    std::fs::write(&path, count_mismatch).unwrap();
+    assert!(SolReader::open(&path).is_err());
+}
+
+#[test]
+fn gapped_srefs_and_maximum_sref_have_exact_indices_without_overflow() {
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory.path().join("gaps.sol");
+    let mut expected = payload();
+    expected.blocks[1].sref = u32::MAX;
+    expected.values[1].sref = u32::MAX;
+    expected.node_count = u64::from(u32::MAX) + 1;
+    write_sol(&path, &expected).unwrap();
+    let original = std::fs::read(&path).unwrap();
+    let mut reader = SolReader::open(&path).unwrap();
+    assert_eq!(reader.stored_srefs().collect::<Vec<_>>(), [0, u32::MAX]);
+    assert!(reader.read_node(1).unwrap().is_none());
+    assert!(reader.read_node(u32::MAX - 1).unwrap().is_none());
+    assert_eq!(
+        reader.read_node(u32::MAX).unwrap().unwrap().0.sref,
+        u32::MAX
+    );
+    drop(reader);
+    let mut overflow = original;
+    let second = directory_start(&overflow) + ENTRY_LEN;
+    set_u32(&mut overflow, second + 8, 2);
+    std::fs::write(&path, overflow).unwrap();
+    assert!(SolReader::open(&path).is_err());
+}
+
 fn u64_at(bytes: &[u8], offset: usize) -> u64 {
     u64::from_le_bytes(bytes[offset..offset + 8].try_into().unwrap())
 }
@@ -82,13 +205,13 @@ fn directory_start(bytes: &[u8]) -> usize {
 /// earlier checksum or extent check.
 fn replace_last_node(original: &[u8], raw: &[u8]) -> Vec<u8> {
     let entry = directory_start(original) + ENTRY_LEN;
-    let offset = usize::try_from(u64_at(original, entry + 4)).unwrap();
+    let offset = usize::try_from(u64_at(original, entry + 16)).unwrap();
     let compressed = zstd::encode_all(raw, 0).unwrap();
     let mut bytes = original[..offset].to_vec();
     bytes.extend_from_slice(&compressed);
-    set_u64(&mut bytes, entry + 12, compressed.len() as u64);
-    set_u64(&mut bytes, entry + 20, raw.len() as u64);
-    bytes[entry + 28..entry + ENTRY_LEN].copy_from_slice(blake3::hash(raw).as_bytes());
+    set_u32(&mut bytes, entry + 24, compressed.len() as u32);
+    set_u32(&mut bytes, entry + 28, raw.len() as u32);
+    bytes[entry + 32..entry + ENTRY_LEN].copy_from_slice(blake3::hash(raw).as_bytes());
     bytes
 }
 
@@ -111,11 +234,11 @@ fn replace_meta(original: &[u8], meta: &SolMeta) -> Vec<u8> {
     let count = usize::try_from(u64_at(original, DIRECTORY_COUNT)).unwrap();
     for index in 0..count {
         let original_offset =
-            usize::try_from(u64_at(original, old_directory + index * ENTRY_LEN + 4)).unwrap();
+            usize::try_from(u64_at(original, old_directory + index * ENTRY_LEN + 16)).unwrap();
         let new_offset = new_directory + (original_offset - old_directory);
         set_u64(
             &mut bytes,
-            new_directory + index * ENTRY_LEN + 4,
+            new_directory + index * ENTRY_LEN + 16,
             new_offset as u64,
         );
     }
@@ -205,6 +328,7 @@ fn writer_and_metadata_reader_reject_srefs_outside_the_declared_tree() {
         let mut bytes = original.clone();
         let entry = directory_start(&bytes) + ENTRY_LEN;
         set_u32(&mut bytes, entry, sref);
+        set_u32(&mut bytes, entry + 4, sref);
         std::fs::write(&path, bytes).unwrap();
         assert!(matches!(
             SolReader::open(&path),
@@ -224,29 +348,25 @@ fn metadata_only_open_checks_every_directory_entry_and_extent() {
 
     let mut duplicate = original.clone();
     set_u32(&mut duplicate, second, 0);
+    set_u32(&mut duplicate, second + 4, 0);
     cases.push(("duplicate sref", duplicate));
     let mut descending = original.clone();
     set_u32(&mut descending, first, 2);
+    set_u32(&mut descending, first + 4, 2);
     set_u32(&mut descending, second, 1);
+    set_u32(&mut descending, second + 4, 1);
     cases.push(("descending sref", descending));
 
     for (name, offset, value) in [
         (
             "first frame gap",
-            first + 4,
-            u64_at(&original, first + 4) + 1,
+            first + 16,
+            u64_at(&original, first + 16) + 1,
         ),
         (
             "second frame overlap",
-            second + 4,
-            u64_at(&original, second + 4) - 1,
-        ),
-        ("empty compressed frame", second + 12, 0),
-        ("node extent overflow", second + 12, u64::MAX),
-        (
-            "node decoded size limit",
-            second + 20,
-            SOL_MAX_NODE_BYTES + 1,
+            second + 16,
+            u64_at(&original, second + 16) - 1,
         ),
         ("metadata extent overflow", METADATA_LENGTH, u64::MAX),
         (
@@ -257,6 +377,24 @@ fn metadata_only_open_checks_every_directory_entry_and_extent() {
     ] {
         let mut bytes = original.clone();
         set_u64(&mut bytes, offset, value);
+        cases.push((name, bytes));
+    }
+    for (name, offset, value) in [
+        ("empty chunk", second + 8, 0),
+        ("too many chunk nodes", second + 8, 65),
+        ("wrong chunk range", second + 4, 1),
+        ("nonzero reserved field", second + 12, 1),
+        ("empty compressed chunk", second + 24, 0),
+        ("excessive compressed chunk", second + 24, u32::MAX),
+        ("empty decoded chunk", second + 28, 0),
+        (
+            "decoded chunk limit",
+            second + 28,
+            SOL_MAX_NODE_BYTES as u32 + 1,
+        ),
+    ] {
+        let mut bytes = original.clone();
+        set_u32(&mut bytes, offset, value);
         cases.push((name, bytes));
     }
     let mut trailing = original;
@@ -308,6 +446,53 @@ fn metadata_hash_length_and_header_identity_are_verified_on_open() {
         std::fs::write(&path, bytes).unwrap();
         assert!(SolReader::open(&path).is_err());
     }
+    for compressed_len in [0, SOL_MAX_METADATA_BYTES + 1024 * 1024 + 1] {
+        let mut bytes = original.clone();
+        set_u64(&mut bytes, METADATA_LENGTH, compressed_len);
+        std::fs::write(&path, bytes).unwrap();
+        assert!(SolReader::open(&path).is_err());
+    }
+}
+
+#[test]
+fn compressed_sections_reject_trailing_bytes_and_concatenated_empty_frames() {
+    let (_directory, path, original) = fixture();
+    let directory = directory_start(&original);
+    let second = directory + ENTRY_LEN;
+    for suffix in [vec![0], zstd::encode_all(&[][..], 0).unwrap()] {
+        // The uncompressed length and checksum remain correct. The claimed
+        // compressed extent must still contain exactly one complete frame.
+        let mut bytes = original.clone();
+        bytes.extend_from_slice(&suffix);
+        let offset = u64_at(&original, second + 16) as usize;
+        let compressed_len = (bytes.len() - offset) as u32;
+        set_u32(&mut bytes, second + 24, compressed_len);
+        std::fs::write(&path, bytes).unwrap();
+        let mut reader = SolReader::open(&path).unwrap();
+        assert!(reader.read_node(0).unwrap().is_some());
+        assert!(reader.read_node(2).is_err());
+        drop(reader);
+
+        let mut bytes = original[..directory].to_vec();
+        bytes.extend_from_slice(&suffix);
+        bytes.extend_from_slice(&original[directory..]);
+        set_u64(
+            &mut bytes,
+            METADATA_LENGTH,
+            u64_at(&original, METADATA_LENGTH) + suffix.len() as u64,
+        );
+        for index in 0..2 {
+            let old_entry = directory + index * ENTRY_LEN;
+            let new_entry = old_entry + suffix.len();
+            set_u64(
+                &mut bytes,
+                new_entry + 16,
+                u64_at(&original, old_entry + 16) + suffix.len() as u64,
+            );
+        }
+        std::fs::write(&path, bytes).unwrap();
+        assert!(SolReader::open(&path).is_err());
+    }
 }
 
 #[test]
@@ -322,7 +507,7 @@ fn node_identity_and_trailing_decoded_bytes_are_checked_lazily() {
         } else {
             value.sref = 1;
         }
-        let raw = postcard::to_allocvec(&(strategy, value)).unwrap();
+        let raw = postcard::to_allocvec(std::slice::from_ref(&(strategy, value))).unwrap();
         std::fs::write(&path, replace_last_node(&original, &raw)).unwrap();
         let mut reader = SolReader::open(&path).unwrap();
         assert!(reader.read_node(0).unwrap().is_some());
@@ -332,7 +517,11 @@ fn node_identity_and_trailing_decoded_bytes_are_checked_lazily() {
         ));
         assert!(read_sol(&path).is_err());
     }
-    let mut raw = postcard::to_allocvec(&(&expected.blocks[1], &expected.values[1])).unwrap();
+    let mut raw = postcard::to_allocvec(std::slice::from_ref(&(
+        &expected.blocks[1],
+        &expected.values[1],
+    )))
+    .unwrap();
     raw.push(0);
     std::fs::write(&path, replace_last_node(&original, &raw)).unwrap();
     let mut reader = SolReader::open(&path).unwrap();
@@ -347,7 +536,7 @@ fn corrupt_node_digest_does_not_prevent_other_nodes_or_metadata_from_loading() {
     let (_directory, path, mut bytes) = fixture();
     let expected = payload();
     let second = directory_start(&bytes) + ENTRY_LEN;
-    bytes[second + 28] ^= 1;
+    bytes[second + 32] ^= 1;
     std::fs::write(&path, bytes).unwrap();
     let mut reader = SolReader::open(&path).unwrap();
     assert_eq!(reader.metadata().meta, expected.meta);

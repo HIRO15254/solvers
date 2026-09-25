@@ -1,0 +1,598 @@
+{
+  "schema": "r1.validation-summary/v1",
+  "source06_archive_sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c",
+  "coverage": "six completed required-check stages; subsequent audit builds/campaigns are outside this early bundle",
+  "stages": [
+    {
+      "stage": "00-toolchain",
+      "argv": [
+        "/bin/bash",
+        "-euo",
+        "pipefail",
+        "-c",
+        "rustc -Vv; cargo -V; rustup which rustc; rustup which cargo; uname -a; lscpu"
+      ],
+      "cwd": "/opt/r1/audit-source",
+      "state": "completed",
+      "stop_reason": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "started_at": "2026-09-25T17:19:26.429019+00:00",
+      "ended_at": "2026-09-25T17:19:26.699647+00:00",
+      "elapsed_seconds": 0.27057815899991056,
+      "supervisor": "checks/00-toolchain/supervisor.json"
+    },
+    {
+      "stage": "01-fmt",
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "cwd": "/opt/r1/audit-source",
+      "state": "completed",
+      "stop_reason": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "started_at": "2026-09-25T17:19:27.072157+00:00",
+      "ended_at": "2026-09-25T17:19:28.633551+00:00",
+      "elapsed_seconds": 1.561342141999944,
+      "supervisor": "checks/01-fmt/supervisor.json"
+    },
+    {
+      "stage": "02-clippy",
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "/opt/r1/audit-source",
+      "state": "completed",
+      "stop_reason": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "started_at": "2026-09-25T17:19:28.998603+00:00",
+      "ended_at": "2026-09-25T17:19:42.897012+00:00",
+      "elapsed_seconds": 13.898355804999937,
+      "supervisor": "checks/02-clippy/supervisor.json"
+    },
+    {
+      "stage": "03-workspace-test",
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--locked",
+        "--workspace",
+        "--",
+        "--test-threads=2"
+      ],
+      "cwd": "/opt/r1/audit-source",
+      "state": "completed",
+      "stop_reason": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "started_at": "2026-09-25T17:19:43.263009+00:00",
+      "ended_at": "2026-09-25T17:26:52.693405+00:00",
+      "elapsed_seconds": 429.43032914599985,
+      "supervisor": "checks/03-workspace-test/supervisor.json"
+    },
+    {
+      "stage": "04-tools-python",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/tests",
+        "-v"
+      ],
+      "cwd": "/opt/r1/audit-source",
+      "state": "completed",
+      "stop_reason": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "started_at": "2026-09-25T17:26:52.969637+00:00",
+      "ended_at": "2026-09-25T17:26:59.458723+00:00",
+      "elapsed_seconds": 6.489035205999926,
+      "supervisor": "checks/04-tools-python/supervisor.json"
+    },
+    {
+      "stage": "05-pipeline-python",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "experiments/hu-postflop-r1/pipeline",
+        "-p",
+        "test_run_campaign.py",
+        "-v"
+      ],
+      "cwd": "/opt/r1/audit-source",
+      "state": "completed",
+      "stop_reason": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "started_at": "2026-09-25T17:26:59.562053+00:00",
+      "ended_at": "2026-09-25T17:27:00.608374+00:00",
+      "elapsed_seconds": 1.0462706509999862,
+      "supervisor": "checks/05-pipeline-python/supervisor.json"
+    }
+  ],
+  "workspace_test": {
+    "result_lines": 53,
+    "totals": {
+      "passed": 895,
+      "failed": 0,
+      "ignored": 31,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    "per_result_line": [
+      {
+        "passed": 30,
+        "failed": 0,
+        "ignored": 3,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 93,
+        "failed": 0,
+        "ignored": 1,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 145,
+        "failed": 0,
+        "ignored": 2,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 25,
+        "failed": 0,
+        "ignored": 6,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 15,
+        "failed": 0,
+        "ignored": 1,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 15,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 20,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 57,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 13,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 2,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 1,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 1,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 1,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 29,
+        "failed": 0,
+        "ignored": 8,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 2,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 1,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 311,
+        "failed": 0,
+        "ignored": 1,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 24,
+        "failed": 0,
+        "ignored": 1,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0
+      }
+    ],
+    "ignored_log_lines": [
+      "test blueprint::tests::subset_artifact_build_invariants ... ignored, board-subset abstraction + artifact build (~1-2 min release, well under 2GB); CI runs it in release with --include-ignored; the FULL-street build stays user-invoked via load_or_build (turn-street scoring alone is minutes and the tables run to hundreds of MB — past the CI budget)",
+      "test buckets::tests::canonical_river_sets_count_pin ... ignored, expensive (2.6M sets x 24 perms); CI runs it in release with --include-ignored",
+      "test buckets::tests::flop_street_full_build_small_k ... ignored, full-street EHS² build; CI runs it in release with --include-ignored",
+      "test board::tests::turn_and_river_invariant_under_every_suit_permutation_exhaustive ... ignored",
+      "test session::tests::ehs2_table_backend_builds_a_session_and_caches_its_tables ... ignored, builds full EHS2 tables over every canonical board; CI runs it in release with --include-ignored",
+      "test sol::tests::river_resolve_accuracy ... ignored, slow unoptimized; CI runs it in release with --include-ignored",
+      "test a_canceled_heads_up_solve_closes_as_canceled_and_resumes ... ignored, spawns and signals a solve; explicit release acceptance only",
+      "test a_solve_records_a_complete_run_directory ... ignored, builds the full EHS2 tables; explicit release acceptance only",
+      "test inspect_sol_river_navigation_smoke ... ignored, solves twice; CI runs it in release with --include-ignored",
+      "test multiway_v1_u16_storage_writes_a_quantized_mwsol ... ignored, builds the full EHS2 tables; explicit release acceptance only",
+      "test preflop_pushfold_solve_smoke ... ignored, computes the exact preflop equity table; CI runs it in release with --include-ignored",
+      "test the_abstraction_cache_is_shared_across_runs ... ignored, builds the full EHS2 tables once; explicit release acceptance only",
+      "test jobs::tests::child_process_helper ... ignored, spawned explicitly by the queue test",
+      "test mccfr_matches_full_traversal_on_leduc ... ignored, 4M MCCFR iterations; CI runs it in release with --include-ignored",
+      "test pruning_converges_and_never_panics ... ignored, 300k MCCFR iterations; CI runs it in release with --include-ignored",
+      "test tests::canonical_river_count_is_134459 ... ignored, expensive (2.6M boards x 24 perms); CI runs it in release",
+      "test flop_equity_sanity_aa_vs_kk ... ignored, ~1,176 flop runouts; CI runs it in release",
+      "test multistreet_engine_matches_scalar_oracle ... ignored, 200-iteration turn-tree solve is slow unoptimized; CI runs it in release",
+      "test allin_runout_matches_direct_equity ... ignored, flop-starting trees run two chance deals (~6k nodes); CI runs it in release",
+      "test flop_solve_is_zero_sum ... ignored, flop-starting trees run two chance deals (~6k nodes); CI runs it in release",
+      "test i16_storage_matches_f32_on_small_turn_spot ... ignored, slow unoptimized; CI runs it in release with --include-ignored",
+      "test iso_on_off_converge_to_same_value ... ignored, two 2000-iteration turn-tree solves are slow unoptimized; CI runs it in release",
+      "test iso_quotient_matches_full_tree_per_hand ... ignored, slow unoptimized; CI runs it in release with --include-ignored",
+      "test member_branch_matches_suit_permuted_rep_branch ... ignored, slow unoptimized; CI runs it in release with --include-ignored",
+      "test no_bet_flop_value_full_ranges ... ignored, full-range enumeration is heavy; CI runs it in release",
+      "test smoke_solve_3bet_pot ... ignored, perf smoke; CI runs it in release",
+      "test pure_hu_icm_postflop_solve_matches_chip_ev ... ignored, slow unoptimized; CI runs it in release with --include-ignored",
+      "test rake_cap_level_changes_strategy ... ignored, slow unoptimized; CI runs it in release with --include-ignored",
+      "test clairvoyance_game_matches_closed_form ... ignored, 20k iterations is slow unoptimized; CI runs it in release",
+      "test sampler::tests::sampler_throughput_benchmark ... ignored, manual release-mode sampler throughput benchmark",
+      "test equity::tests::full_table_invariants_and_anchors ... ignored, full 2.6M-board enumeration; CI runs it in release with --include-ignored"
+    ]
+  },
+  "python": [
+    {
+      "stage": "04-tools-python",
+      "tests_run": 32,
+      "passed": 29,
+      "skipped": 3,
+      "framework_seconds": 6.065
+    },
+    {
+      "stage": "05-pipeline-python",
+      "tests_run": 8,
+      "passed": 8,
+      "skipped": 0,
+      "framework_seconds": 0.795
+    }
+  ],
+  "earlier_attempts": [
+    {
+      "directory": "earlier/proxy-failure",
+      "source": "source04",
+      "source_archive_sha256": "3787c1479e71cfab6266d75865750a97ca370712032d22565215a985dc680472",
+      "failed_stage": "01-fmt",
+      "cause": "Cargo rustup proxy symlink canonicalization changed executable argv[0]; rustup rejected --all before cargo fmt ran",
+      "workspace_tests_ran": false
+    },
+    {
+      "directory": "earlier/clippy-failure",
+      "source": "source04",
+      "source_archive_sha256": "3787c1479e71cfab6266d75865750a97ca370712032d22565215a985dc680472",
+      "failed_stage": "02-clippy",
+      "cause": "crates/cli/src/sol.rs test used .err().expect(); clippy::err_expect denied by -D warnings; fixed to expect_err and formatted in source06",
+      "workspace_tests_ran": false
+    }
+  ],
+  "not_claimed": [
+    "ignored Rust tests were not executed by the workspace command",
+    "Python Windows-only tests did not run on Linux",
+    "build/run wall times are not solver performance measurements",
+    "no saved-profile audit quality result is included in these early checks"
+  ]
+}

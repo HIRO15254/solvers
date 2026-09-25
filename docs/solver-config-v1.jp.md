@@ -703,7 +703,7 @@ bet と raise を同じ `r` で表すのは、両者が「到達額を宣言す�
 どれも黙って読み替えず、置換先を名指しする error にする。
 
 `.sol` artifact に埋め込まれた config が廃止 key を持つ場合は `SLV002` を返す。
-現行 `.sol` はformat version 2を使い、version 1は明示拒否する。移行手順は
+現行 `.sol` はformat version 3を使い、version 1 / 2は明示拒否する。移行手順は
 [`solution.sol`](#solutionsol)を参照する。
 
 ## `[algorithm]`
@@ -840,30 +840,36 @@ tree script の board 述語(`when paired { ... }`)はボードごとに root �
 
 ### `solution.sol`
 
-`SLVRSOLV` magic + format version **2** + config の blake3 hash + iteration の
-50 byte header に、metadata、node directory、個別圧縮したnode frameが続く。
+`SLVRSOLV` magic + format version **3** + config の blake3 hash + iteration の
+50 byte header に、metadata、chunk directory、個別圧縮したnode群が続く。
 複数byte整数はlittle endian。checkpoint `.ckpt` はversion 1のままである。
 
 | 順序 | binary layout |
 |---|---|
 | header | magic 8 byte、version u16、config hash 32 byte、iteration u64 |
-| metadata descriptor | 圧縮長u64、復元長u64、復元byte列のBLAKE3 32 byte、保存node数u64 |
+| metadata descriptor | 圧縮長u64、復元長u64、復元byte列のBLAKE3 32 byte、chunk数u64 |
 | metadata frame | zstd圧縮したpostcard `(config_toml, meta, mode, node_count, stored_nodes)` |
-| directory | 保存node数×60 byte。各entryは `sref:u32, offset:u64, compressed_len:u64, decoded_len:u64, digest:[u8;32]` |
-| node frames | directory順に連続配置。各frameはpostcard `(StrategyBlock, ValueBlock)` のzstd圧縮。digestは復元byte列のBLAKE3 |
+| directory | chunk数×64 byte。各entryは `first_sref:u32, last_sref:u32, count:u32, reserved:u32, offset:u64, compressed_len:u32, decoded_len:u32, digest:[u8;32]`。reservedは0 |
+| node chunks | directory順に連続配置。各chunkはpostcard `Vec<(StrategyBlock, ValueBlock)>` のzstd圧縮。digestは復元byte列のBLAKE3 |
 
-directoryは厳密なsref昇順・重複なし・隙間や重なりなし。最後のframe終端はfile終端に一致する。
-各srefは `node_count` 未満でなければならない。
-metadataのiteration・保存数はheader/descriptorと一致し、保存数は `node_count` 以下。
+各chunkは連続するsrefを1〜64個格納し、`last_sref = first_sref + count - 1` とする。
+directoryはsref区間の昇順・重複なしで、chunkのbyte領域は隙間や重なりなし。
+最後のchunk終端はfile終端に一致する。NoRivers等によるsrefの欠落はchunk境界で表現する。
+各srefは `node_count` 未満でなければならない。metadataのiterationはheaderと一致し、
+`stored_nodes` は全chunkのcountの和に一致し、`node_count` 以下とする。
 `meta.ev[2]`、`meta.expl[2]`、`meta.nash_conv`、`meta.wall_secs` は全て有限値とし、
 `wall_secs` は0以上、`meta.storage` は `f32` / `i16` のいずれかとする。writerとreaderの
 両方で検査し、metadataだけを読むsummaryでも違反を拒否する。EVや逸脱利得には、丸めによる
 微小な負値も含め、符号制約を設けない。
-metadata復元長は最大16 MiB、1 nodeの復元長は最大64 MiB。超過、整数overflow、切断、checksum不一致、
-node pairのsref不一致、postcard復元後の余剰byteは明示errorとする。全artifactの容量上限ではない。
+metadata復元長は最大16 MiB、圧縮長は最大17 MiB。
+1 chunkの復元長は最大64 MiB、圧縮長は最大65 MiB。
+各sectionは単一のzstd frameとし、圧縮領域内の余剰byteや連結frameも拒否する。
+decoderの最大windowは両sectionとも64 MiBとする。
+超過、整数overflow、切断、checksum不一致、node pairのsref不一致、chunk内の個数・sref区間の不一致、
+postcard復元後の余剰byteは明示errorとする。全artifactの容量上限ではない。
 
-writerは一時fileへnode単位で圧縮し、fsync後に置換する。全payloadの直列化bufferと全圧縮bufferを
-同時に保持しない。`SolReader` はmetadataとdirectoryを検証し、要求したnodeだけを復元する。
+writerは一時fileへchunk単位で圧縮し、fsync後に置換する。全payloadの直列化bufferと全圧縮bufferを
+同時に保持しない。`SolReader` はmetadataとdirectoryを検証し、要求したnodeを含むchunkを復元・検証する。
 `read_sol` / `inspect` / `compare` 等の全読込みは全nodeを検証し、query側で再構築treeとも照合する。
 `export summary` の `--node root` / `all`（既定root）はmetadata照会であり、tree/rank tableやnode frameを
 復元しない。その成功は未読nodeの内容検査や保存後profileのBR再評価を意味しない。
@@ -903,9 +909,9 @@ action node を落として artifact を大幅に小さくするが、river の�
 header の hash は `blake3(config_toml)` と一致しなければならない。`.sol` が
 記述している config から静かにずれることはない。config 本文をそのまま埋め込むので、
 契約を変えた後に古い `.sol` を開くと、その config が現行 parser の error を返す。
-version 1は明示拒否し、暗黙変換やEV補正をしない。新規solveで生成し直すか、
+version 1 / 2は明示拒否し、暗黙変換やEV補正をしない。新規solveで生成し直すか、
 自己完結した `run.toml` と整合するcheckpointを保持して旧 `solution.sol` を別の場所へ退避し、
-resumeでversion 2を生成する。既存artifactなしのresumeは `full` を使う。
+resumeでversion 3を生成する。既存artifactなしのresumeは `full` を使う。
 旧external-source runの未正規化identityを黙って別のhashへ変更してresumeしない。
 
 `resume` は同じ iteration の checkpoint / `.sol` / `run.json` を出力する。
@@ -967,7 +973,7 @@ solvers resume runs/my-run
 | **`no-rivers` は river の値を持たない** | river ノードを指す `export` は明示エラー | 既定の `full` なら全ノードが揃う。`no-rivers` は巨大ツリー向けの容量オプトイン |
 | **iso 併合の member remap は保留** | `inspect` は代表カードに `*` を付けて示す | 併合自体は厳密な商であり、戦略と EV は非併合 tree と一致する。表示のみの制限 |
 | **`.sol` は u16 量子化** | `storage` は情報用 | `f32` で解いた run でも artifact は u16 |
-| **開発中の artifact の値は自動補正しない** | `.sol` は format version 2。version 1 は明示拒否 | 新規 solve、または自己完結した run config/checkpoint を保持して旧 `.sol` を退避後の resume で生成し直す。廃止 key を含む config は parser が拒否 |
+| **開発中の artifact の値は自動補正しない** | `.sol` は format version 3。version 1 / 2 は明示拒否 | 新規 solve、または自己完結した run config/checkpoint を保持して旧 `.sol` を退避後の resume で生成し直す。廃止 key を含む config は parser が拒否 |
 
 ### Multiway Preflop との差
 

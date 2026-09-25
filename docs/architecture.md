@@ -210,7 +210,7 @@ source revision だけで dirty tree を識別できない場合は、source/bin
 | 用途 | 現在の所有箇所 | 意味 |
 |---|---|---|
 | HU checkpoint `.ckpt` | `formats::checkpoint` + CLI driver | 再開に必要な solver state。viewer artifact と互換扱いしない |
-| HU solution `.sol` | `formats::sol` / `sol_indexed` + CLI artifact query | v2のchecked metadataとsref directory、node別zstd frame。平均戦略(u16)と per-hand 値(i16/scale)。`Full` / `NoRivers` |
+| HU solution `.sol` | `formats::sol` / `sol_indexed` + CLI artifact query | v3のchecked metadataとsref区間directory。連続する最大64 node/64 MiBをzstd chunkとして保存。平均戦略(u16)と per-hand 値(i16/scale)。`Full` / `NoRivers` |
 | Multiway checkpoint `.mwckpt` | `multiway::checkpoint` | state と RNG / policy / history の復元。container と state の version を検査 |
 | Multiway solution `.mwsol` | `formats::mwsol` + CLI artifact query | 正式な平均 profile と metadata。保存 coverage と評価可能範囲を区別 |
 | run / progress / event | `formats::run`、`metrics`、`multiway` | lifecycle、定期測定、離散事象を別データとして保持 |

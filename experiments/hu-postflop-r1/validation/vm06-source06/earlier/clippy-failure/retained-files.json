@@ -1,0 +1,77 @@
+{
+  "00-toolchain/stderr.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-build/00-toolchain/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "00-toolchain/stdout.log": {
+    "bytes": 3777,
+    "path": "/opt/r1/audit-pair-build/00-toolchain/stdout.log",
+    "sha256": "f0109f3804cb3c6c284e2f3f95ec1bb5439542b10aee97e2cb0262bafbb9d8fd"
+  },
+  "00-toolchain/supervisor.json": {
+    "bytes": 7863,
+    "path": "/opt/r1/audit-pair-build/00-toolchain/supervisor.json",
+    "sha256": "f93e0f0b13e1398da1c147ced5dea336d3d01d64cb8f887ffb0b709813981b68"
+  },
+  "00-toolchain/supervisor.samples.jsonl": {
+    "bytes": 638,
+    "path": "/opt/r1/audit-pair-build/00-toolchain/supervisor.samples.jsonl",
+    "sha256": "6ed4da696ff1b6f38400045f84c47b5761637476766221f234c2162adf2b3232"
+  },
+  "01-fmt/stderr.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-build/01-fmt/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "01-fmt/stdout.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-build/01-fmt/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "01-fmt/supervisor.json": {
+    "bytes": 7903,
+    "path": "/opt/r1/audit-pair-build/01-fmt/supervisor.json",
+    "sha256": "57a62de60dff64f335a2823bb683c5d6040558b7a5cfa227b6c5bd9c69e18f57"
+  },
+  "01-fmt/supervisor.samples.jsonl": {
+    "bytes": 2203,
+    "path": "/opt/r1/audit-pair-build/01-fmt/supervisor.samples.jsonl",
+    "sha256": "5b8b085e4664d57a3797858f4a951a59ea75ef671d8cde3cd081647f760edbe1"
+  },
+  "02-clippy/stderr.log": {
+    "bytes": 9286,
+    "path": "/opt/r1/audit-pair-build/02-clippy/stderr.log",
+    "sha256": "b8e45390bf95901c3246ee7c75d08e8d66672300eb3a257bcae0723da72ada23"
+  },
+  "02-clippy/stdout.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-build/02-clippy/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "02-clippy/supervisor.json": {
+    "bytes": 8056,
+    "path": "/opt/r1/audit-pair-build/02-clippy/supervisor.json",
+    "sha256": "9c052c62d50fbac47365a397a0ad88b9d407c7dbf06b52d6b9717523141453bf"
+  },
+  "02-clippy/supervisor.samples.jsonl": {
+    "bytes": 51362,
+    "path": "/opt/r1/audit-pair-build/02-clippy/supervisor.samples.jsonl",
+    "sha256": "bff2938e34093adbffeb2b8b7a74b2d092208ebdeaa93b78037b0c739b726f7e"
+  },
+  "baseline-source-files.json": {
+    "bytes": 27135,
+    "path": "/opt/r1/audit-pair-build/baseline-source-files.json",
+    "sha256": "ff778c0a7b5c1a4dd26e19fc661064dacc27e91381587803f0cd722bcbd7bd1c"
+  },
+  "current-source-files.json": {
+    "bytes": 43964,
+    "path": "/opt/r1/audit-pair-build/current-source-files.json",
+    "sha256": "a5b7a7e4899d0db130a8762f3a801ddef321f90412a1b7ea75729de1a4703e92"
+  },
+  "result.json": {
+    "bytes": 5879,
+    "path": "/opt/r1/audit-pair-build/result.json",
+    "sha256": "21c4c6aeeb3dd40ae0bb18084bdb29d30228c25e5a8be48da211c38d0a0e722f"
+  }
+}

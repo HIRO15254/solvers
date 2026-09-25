@@ -1,0 +1,14 @@
+--- source04/crates/cli/src/sol.rs
++++ source06/crates/cli/src/sol.rs
+@@ -1992,9 +1992,8 @@
+             let trunk = load_sol(&spec.path, 0, None).unwrap();
+             assert!(trunk.blocks.len() < trunk.pf_game.game.tree.storage_refs.len());
+             drop(trunk);
+-            let error = audit_saved_full_profile(&spec.path, 1)
+-                .err()
+-                .expect("incomplete profile must fail");
++            let error =
++                audit_saved_full_profile(&spec.path, 1).expect_err("incomplete profile must fail");
+             assert!(error.to_string().contains("requires a Full artifact"));
+         }
+     }

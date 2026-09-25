@@ -13,6 +13,7 @@
 //! StrategyProvider`, never either concrete implementation.
 
 use std::collections::{HashMap, HashSet};
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
@@ -558,6 +559,238 @@ pub(crate) fn load_sol(
         board: board_cards,
         river_iterations,
         river_target,
+    })
+}
+
+// --- research-only saved-profile evaluation --------------------------------
+
+/// Identity of the immutable Full artifact used by a research audit.
+#[derive(Debug, serde::Serialize)]
+pub struct SavedProfileArtifact {
+    pub path: PathBuf,
+    pub blake3: String,
+    pub bytes: u64,
+    pub config_blake3: String,
+    pub format_version: u16,
+    pub mode: &'static str,
+    pub iterations: u64,
+    pub source_storage: String,
+    pub stored_nodes: u64,
+    pub node_count: u64,
+}
+
+/// Recomputed values for the stored, dequantized average policy, in OOP/IP order.
+/// EV and BR use the same subgame-start utility basis. Gains are BR minus EV;
+/// they are not clamped, and NashConv is their sum, also in general-sum games.
+#[derive(Debug, serde::Serialize)]
+pub struct SavedProfileValues {
+    pub profile: &'static str,
+    pub ev: [f64; 2],
+    pub br: [f64; 2],
+    pub gains: [f64; 2],
+    pub nash_conv: f64,
+}
+
+/// Research report consumed by `examples/hu_saved_profile_audit.rs`.
+/// This is separate from the main CLI/artifact contract. Stored value blocks
+/// and pre-save metrics never supply the recomputed evaluation below.
+#[derive(Debug, serde::Serialize)]
+pub struct SavedProfileAudit {
+    pub schema: &'static str,
+    pub artifact: SavedProfileArtifact,
+    pub threads: usize,
+    pub par_chance_depth: u32,
+    pub par_min_children: usize,
+    pub pot_chips: u32,
+    pub effective_stack_chips: u32,
+    pub rake: crate::config::RakeSection,
+    pub utility: crate::config::UtilitySection,
+    pub zero_sum_terminal_utility: bool,
+    pub value_basis: &'static str,
+    pub ev_offset: [f64; 2],
+    pub pre_save_metadata: SolMeta,
+    pub recomputed: SavedProfileValues,
+    /// Sum of the initial and final streaming file-hash passes.
+    pub input_hash_secs: f64,
+    /// Metadata preflight, full validated load, tree build and policy restore.
+    pub load_secs: f64,
+    /// Four value traversals: each seat's EV and BR, plus the common offset.
+    pub eval_secs: f64,
+}
+
+fn hash_artifact(path: &Path) -> Result<(blake3::Hash, u64)> {
+    let mut file = std::fs::File::open(path)
+        .with_context(|| format!("hashing saved profile {}", path.display()))?;
+    let mut hasher = blake3::Hasher::new();
+    let mut bytes = 0u64;
+    let mut buffer = [0u8; 64 * 1024];
+    loop {
+        let len = file.read(&mut buffer)?;
+        if len == 0 {
+            break;
+        }
+        hasher.update(&buffer[..len]);
+        bytes += len as u64;
+    }
+    Ok((hasher.finalize(), bytes))
+}
+
+#[derive(Debug)]
+struct ProfileEvaluation {
+    ev: PerPlayer<f64>,
+    br: PerPlayer<f64>,
+    nash_conv: f64,
+}
+
+fn evaluate_profile<S: Storage>(solver: &Solver<PostflopEvaluator, S>) -> ProfileEvaluation {
+    // Evaluate both seats independently, including in the zero-sum case.
+    let ev = PerPlayer::new(
+        solver.expected_value(Player::P0),
+        solver.expected_value(Player::P1),
+    );
+    let br = PerPlayer::new(
+        solver.best_response_value(Player::P0),
+        solver.best_response_value(Player::P1),
+    );
+    ProfileEvaluation {
+        ev,
+        br,
+        nash_conv: (br[Player::P0] - ev[Player::P0]) + (br[Player::P1] - ev[Player::P1]),
+    }
+}
+
+/// Only the stored average policy is restored. Zero regrets are never stepped,
+/// and absent river policies cannot turn into a uniform fallback. Keep this
+/// mutable solver private: the research API exposes evaluation results only.
+fn restore_full_artifact_profile(
+    loaded: LoadedSol,
+) -> Result<Solver<PostflopEvaluator, F32Storage>> {
+    if loaded.mode != StreetsStored::Full {
+        bail!("saved-profile evaluation requires a Full artifact");
+    }
+    let tree = &loaded.pf_game.game.tree;
+    if loaded.blocks.len() != tree.storage_refs.len() {
+        bail!("saved-profile evaluation requires every storage ref");
+    }
+    let mut strategy_sum = vec![0.0; tree.storage_len];
+    for sref in &tree.storage_refs {
+        let bytes = loaded
+            .blocks
+            .get(&sref.index)
+            .context("missing saved policy")?;
+        let policy = dequantize_probs(bytes, sref.num_actions as usize, sref.num_hands as usize)?;
+        strategy_sum[sref.offset..sref.offset + sref.len()].copy_from_slice(&policy);
+    }
+    let state = engine::SolverState {
+        iteration: loaded.meta.iterations,
+        storage: engine::StorageState::F32 {
+            regrets: vec![0.0; tree.storage_len],
+            strategy_sum,
+        },
+    };
+    let mut solver = Solver::new(
+        loaded.pf_game.game,
+        Box::<Dcfr>::default(),
+        Some(state.iteration),
+    );
+    solver.restore_state(state)?;
+    Ok(solver)
+}
+
+/// Re-evaluate a Full NLH HU postflop artifact's stored quantized profile.
+/// Runs validation, rebuilding and evaluation inside a dedicated Rayon pool.
+/// No training, river resolving, checkpoint state or stored EV reuse occurs.
+/// Positive `threads` is mandatory; hashes before/after reject a changed input.
+/// This computes unilateral gains against the fixed profile; it makes no
+/// zero-sum exploitability or equilibrium-convergence claim for raked/ICM games.
+pub fn audit_saved_full_profile(path: &Path, threads: usize) -> Result<SavedProfileAudit> {
+    if threads == 0 {
+        bail!("saved-profile audit threads must be positive");
+    }
+    postflop_setup::with_threads(Some(threads), || {
+        let hash_start = Instant::now();
+        let identity = hash_artifact(path)?;
+        let mut input_hash_secs = hash_start.elapsed().as_secs_f64();
+        let load_start = Instant::now();
+        let metadata = formats::SolReader::open(path)?.metadata().clone();
+        if metadata.mode != StreetsStored::Full {
+            bail!("saved-profile evaluation requires a Full artifact");
+        }
+        let config = crate::config::parse_internal_config(&metadata.config_toml)?;
+        let loaded = load_sol(path, 0, None)?;
+        let offset = postflop_setup::subgame_ev_offset(&loaded.config, loaded.utility.as_ref());
+        let pot_chips = loaded.config.pot.0;
+        let effective_stack_chips = loaded.config.effective_stack.0;
+        let zero_sum_terminal_utility = loaded.pf_game.game.zero_sum;
+        let mut solver = restore_full_artifact_profile(loaded)?;
+        postflop_setup::configure_solver(&mut solver, &config.run);
+        let load_secs = load_start.elapsed().as_secs_f64();
+
+        let eval_start = Instant::now();
+        let evaluated = evaluate_profile(&solver);
+        let ev = [
+            evaluated.ev[Player::P0] + offset[Player::P0],
+            evaluated.ev[Player::P1] + offset[Player::P1],
+        ];
+        let br = [
+            evaluated.br[Player::P0] + offset[Player::P0],
+            evaluated.br[Player::P1] + offset[Player::P1],
+        ];
+        let gains = [br[0] - ev[0], br[1] - ev[1]];
+        let nash_conv = gains.iter().sum::<f64>();
+        if ev
+            .into_iter()
+            .chain(br)
+            .chain(gains)
+            .chain([nash_conv, evaluated.nash_conv])
+            .any(|value| !value.is_finite())
+        {
+            bail!("saved-profile evaluation produced nonfinite values");
+        }
+        let eval_secs = eval_start.elapsed().as_secs_f64();
+        let hash_start = Instant::now();
+        if hash_artifact(path)? != identity {
+            bail!("saved-profile artifact changed during the audit");
+        }
+        input_hash_secs += hash_start.elapsed().as_secs_f64();
+        Ok(SavedProfileAudit {
+            schema: "solvers.research.hu-saved-profile-audit/v1",
+            artifact: SavedProfileArtifact {
+                path: path.to_owned(),
+                blake3: identity.0.to_hex().to_string(),
+                bytes: identity.1,
+                config_blake3: formats::config_hash_hex(&formats::config_hash(
+                    metadata.config_toml.as_bytes(),
+                )),
+                format_version: formats::SOL_FORMAT_VERSION,
+                mode: "full",
+                iterations: solver.iteration(),
+                source_storage: metadata.meta.storage.clone(),
+                stored_nodes: metadata.stored_nodes,
+                node_count: metadata.node_count,
+            },
+            threads,
+            par_chance_depth: config.run.par_chance_depth.unwrap_or(2),
+            par_min_children: config.run.par_min_children.unwrap_or(12),
+            pot_chips,
+            effective_stack_chips,
+            rake: config.rake,
+            utility: config.utility,
+            zero_sum_terminal_utility,
+            value_basis: "subgame_start_utility",
+            ev_offset: [offset[Player::P0], offset[Player::P1]],
+            pre_save_metadata: metadata.meta,
+            recomputed: SavedProfileValues {
+                profile: "stored_quantized",
+                ev,
+                br,
+                gains,
+                nash_conv,
+            },
+            input_hash_secs,
+            load_secs,
+            eval_secs,
+        })
     })
 }
 
@@ -1641,69 +1874,6 @@ check_every = 16
         assert_export_matches_node_queries::<engine::I16Storage>();
     }
 
-    #[derive(Debug)]
-    struct ProfileEvaluation {
-        ev: PerPlayer<f64>,
-        br: PerPlayer<f64>,
-        nash_conv: f64,
-    }
-
-    fn evaluate_profile<S: Storage>(solver: &Solver<PostflopEvaluator, S>) -> ProfileEvaluation {
-        // Evaluate both seats independently, including in the zero-sum case.
-        let ev = PerPlayer::new(
-            solver.expected_value(Player::P0),
-            solver.expected_value(Player::P1),
-        );
-        let br = PerPlayer::new(
-            solver.best_response_value(Player::P0),
-            solver.best_response_value(Player::P1),
-        );
-        ProfileEvaluation {
-            ev,
-            br,
-            nash_conv: (br[Player::P0] - ev[Player::P0]) + (br[Player::P1] - ev[Player::P1]),
-        }
-    }
-
-    /// Test-only evaluator input: the stored average policy is all that is
-    /// restored. Zero regrets are never stepped, and absent river policies
-    /// must not turn into the storage backend's uniform fallback.
-    fn restore_full_artifact_profile(
-        loaded: LoadedSol,
-    ) -> Result<Solver<PostflopEvaluator, F32Storage>> {
-        if loaded.mode != StreetsStored::Full {
-            bail!("saved-profile evaluation requires a Full artifact");
-        }
-        let tree = &loaded.pf_game.game.tree;
-        if loaded.blocks.len() != tree.storage_refs.len() {
-            bail!("saved-profile evaluation requires every storage ref");
-        }
-        let mut strategy_sum = vec![0.0; tree.storage_len];
-        for sref in &tree.storage_refs {
-            let bytes = loaded
-                .blocks
-                .get(&sref.index)
-                .context("missing saved policy")?;
-            let policy =
-                dequantize_probs(bytes, sref.num_actions as usize, sref.num_hands as usize)?;
-            strategy_sum[sref.offset..sref.offset + sref.len()].copy_from_slice(&policy);
-        }
-        let state = engine::SolverState {
-            iteration: loaded.meta.iterations,
-            storage: engine::StorageState::F32 {
-                regrets: vec![0.0; tree.storage_len],
-                strategy_sum,
-            },
-        };
-        let mut solver = Solver::new(
-            loaded.pf_game.game,
-            Box::<Dcfr>::default(),
-            Some(state.iteration),
-        );
-        solver.restore_state(state)?;
-        Ok(solver)
-    }
-
     /// A priori fixture tolerance, independent of the observed EV difference.
     /// Rounding A probabilities to multiples of 1/D has L1 error <= A/(2D);
     /// renormalization gives TV <= A/(2D-A). A coupling over at most L action
@@ -1768,21 +1938,46 @@ check_every = 16
                     <= value_tolerance
             );
         }
-        let saved = restore_full_artifact_profile(loaded).unwrap();
-        assert_eq!(saved.iteration(), source.iteration());
-        let after_quantization = evaluate_profile(&saved);
+        drop(loaded);
+        let audit = audit_saved_full_profile(&spec.path, 1).unwrap();
+        assert_eq!(audit.artifact.iterations, source.iteration());
+        assert_eq!(audit.artifact.source_storage, storage);
+        assert_eq!(audit.artifact.format_version, formats::SOL_FORMAT_VERSION);
+        assert_eq!(audit.artifact.mode, "full");
+        assert_eq!(audit.threads, 1);
+        assert_eq!(
+            audit.pre_save_metadata.ev,
+            [summary.ev[Player::P0], summary.ev[Player::P1]]
+        );
+        assert_eq!(audit.ev_offset, [offset[Player::P0], offset[Player::P1]]);
+        assert_eq!(audit.recomputed.profile, "stored_quantized");
+        let after_quantization = &audit.recomputed;
         for player in Player::BOTH {
             assert!(
-                (after_quantization.ev[player] - before_quantization.ev[player]).abs()
+                (after_quantization.ev[player.index()]
+                    - before_quantization.ev[player]
+                    - offset[player])
+                    .abs()
                     <= value_tolerance,
                 "{storage} {start_street:?} {player:?}: EV drift exceeds {value_tolerance}"
             );
             assert!(
-                (after_quantization.br[player] - before_quantization.br[player]).abs()
+                (after_quantization.br[player.index()]
+                    - before_quantization.br[player]
+                    - offset[player])
+                    .abs()
                     <= value_tolerance,
                 "{storage} {start_street:?} {player:?}: BR drift exceeds {value_tolerance}"
             );
+            assert_eq!(
+                after_quantization.gains[player.index()],
+                after_quantization.br[player.index()] - after_quantization.ev[player.index()]
+            );
         }
+        assert_eq!(
+            after_quantization.nash_conv,
+            after_quantization.gains.iter().sum::<f64>()
+        );
         assert!(
             (after_quantization.nash_conv - before_quantization.nash_conv).abs()
                 <= 4.0 * value_tolerance
@@ -1796,9 +1991,9 @@ check_every = 16
             export_sol(&spec, &source, &node_info, start_street, &summary).unwrap();
             let trunk = load_sol(&spec.path, 0, None).unwrap();
             assert!(trunk.blocks.len() < trunk.pf_game.game.tree.storage_refs.len());
-            let error = restore_full_artifact_profile(trunk)
-                .err()
-                .expect("incomplete profile must fail");
+            drop(trunk);
+            let error =
+                audit_saved_full_profile(&spec.path, 1).expect_err("incomplete profile must fail");
             assert!(error.to_string().contains("requires a Full artifact"));
         }
     }
@@ -1811,6 +2006,68 @@ check_every = 16
             assert_saved_full_profile_is_evaluated::<F32Storage>(raw, "f32");
             assert_saved_full_profile_is_evaluated::<I16Storage>(raw, "i16");
         }
+    }
+
+    #[test]
+    fn saved_profile_audit_ignores_recorded_values_and_rejects_other_games() {
+        let (solver, node_info, start_street, summary) =
+            build_and_solve::<F32Storage>(TINY_RIVER_TOML, 3);
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("audit.sol");
+        let spec = SolExportSpec {
+            path: path.clone(),
+            mode: SolStreets::Full,
+            config_toml: TINY_RIVER_TOML.to_owned(),
+            storage_name: "f32".to_owned(),
+        };
+        export_sol(&spec, &solver, &node_info, start_street, &summary).unwrap();
+        let original = audit_saved_full_profile(&path, 1).unwrap();
+        let mut payload = read_sol(&path).unwrap();
+        payload.meta.ev = [1234.0, 5678.0];
+        payload.meta.expl = [10.0, 20.0];
+        payload.meta.nash_conv = 30.0;
+        for value in &mut payload.values {
+            value.scale = 0.0;
+            value.values.fill(0);
+        }
+        write_sol(&path, &payload).unwrap();
+        let audit = audit_saved_full_profile(&path, 2).unwrap();
+        assert_ne!(audit.artifact.blake3, original.artifact.blake3);
+        assert_eq!(
+            audit.artifact.config_blake3,
+            original.artifact.config_blake3
+        );
+        assert_eq!(audit.artifact.iterations, 3);
+        assert_eq!(audit.threads, 2);
+        assert_eq!(audit.pre_save_metadata, payload.meta);
+        assert_eq!(audit.recomputed.ev, original.recomputed.ev);
+        assert_eq!(audit.recomputed.br, original.recomputed.br);
+        assert_eq!(audit.recomputed.gains, original.recomputed.gains);
+        assert_eq!(audit.recomputed.nash_conv, original.recomputed.nash_conv);
+        let bytes = std::fs::read(&path).unwrap();
+        assert_eq!(audit.artifact.bytes, bytes.len() as u64);
+        assert_eq!(
+            audit.artifact.blake3,
+            blake3::hash(&bytes).to_hex().to_string()
+        );
+        for seconds in [audit.input_hash_secs, audit.load_secs, audit.eval_secs] {
+            assert!(seconds.is_finite() && seconds >= 0.0);
+        }
+        let json = serde_json::to_value(&audit).unwrap();
+        assert_eq!(json["recomputed"]["profile"], "stored_quantized");
+        assert_eq!(json["pre_save_metadata"]["ev"][0], 1234.0);
+        let error = audit_saved_full_profile(&path, 0).unwrap_err();
+        assert!(error.to_string().contains("threads must be positive"));
+
+        payload.config_toml =
+            "schema = \"solvers.toy/v1\"\n[game]\nkind = \"kuhn\"\n[run]\niterations = 3\n"
+                .to_owned();
+        write_sol(&path, &payload).unwrap();
+        let error = audit_saved_full_profile(&path, 1).unwrap_err();
+        assert!(
+            error.to_string().contains("not kind = \"postflop\""),
+            "{error:#}"
+        );
     }
 
     #[test]
@@ -1885,7 +2142,7 @@ check_every = 16
                 }
                 _ => unreachable!(),
             }
-            // Re-encode through the real v2 writer: lengths/checksums and
+            // Re-encode through the real indexed writer: lengths/checksums and
             // frame identities are valid, but the semantic block is not.
             write_sol(&path, &payload).expect("reencode with valid frame checksums");
             read_sol(&path).expect("format framing itself remains valid");
@@ -1895,6 +2152,11 @@ check_every = 16
             assert!(
                 error.to_string().contains(expected_error),
                 "{damage}: {error}"
+            );
+            let audit_error = audit_saved_full_profile(&path, 1).unwrap_err();
+            assert!(
+                audit_error.to_string().contains(expected_error),
+                "saved-profile audit accepted {damage}: {audit_error}"
             );
         }
     }
