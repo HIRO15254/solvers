@@ -1,0 +1,9 @@
+COMMAND: python tools/check_docs.py
+Documentation check passed: 36 Markdown files.
+EXIT: 0
+
+COMMAND: git diff --check
+EXIT: 0
+
+COMMAND: git diff --cached --check
+EXIT: 0

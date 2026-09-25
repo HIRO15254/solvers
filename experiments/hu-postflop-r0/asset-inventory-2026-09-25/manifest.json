@@ -1,0 +1,200 @@
+{
+  "kind": "solvers-r0-02-asset-inventory-evidence",
+  "checked_on": "2026-09-25",
+  "timezone": "Asia/Tokyo",
+  "task": "SOL-2 / R0-02 / T0-02 / F0-01,F0-02",
+  "scope": "Three existing non-ignored test targets and a one-iteration River source-path persistence reproduction; not a reference quality or performance certification.",
+  "reproducibility": "verified",
+  "quality_status": "not-assessed",
+  "source": {
+    "revision": "753139e30a0c4a4fac9e97113ecd005d6355d7a9",
+    "tree": "9f840b6b56ca7dfb48e418a2c42c22f3f389cd70",
+    "working_tree_at_start": "clean",
+    "runtime_changes_during_check": false,
+    "added_reproduction_inputs": [
+      "source-path.toml",
+      "source-path.tree"
+    ],
+    "source_patch": null,
+    "source_availability": "Runtime source is the recorded Git revision. Added fixture and evidence files are retained in this change."
+  },
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "rustc_vv": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6",
+    "cargo": "cargo 1.97.0 (c980f4866 2026-06-30)",
+    "python": "3.13.7",
+    "build_profile": "test/debug",
+    "cargo_locked": true,
+    "test_threads": 1,
+    "cargo_build_jobs": null,
+    "rustflags_env": null,
+    "cargo_target_dir_env": null,
+    "cpu_ram_peak_rss": null,
+    "resource_limit_note": "Default compile concurrency; reproduction config threads=1, iterations=1, max_time=1s. No process-wide hard RSS/time cap or performance claim."
+  },
+  "tests": [
+    {
+      "command": "cargo test --locked -p holdem --test oracle_diff --test postflop -- --test-threads=1",
+      "exit_code": 0,
+      "targets": [
+        {
+          "name": "holdem/oracle_diff",
+          "passed": 2,
+          "failed": 0,
+          "ignored": 1
+        },
+        {
+          "name": "holdem/postflop",
+          "passed": 29,
+          "failed": 0,
+          "ignored": 8
+        }
+      ]
+    },
+    {
+      "command": "cargo test --locked -p cli --test postflop_contract -- --test-threads=1",
+      "exit_code": 0,
+      "targets": [
+        {
+          "name": "cli/postflop_contract",
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    }
+  ],
+  "reproduction": {
+    "log": "source-path-reproduction.log",
+    "expected_and_observed_exit_codes": [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "direct_run_toml_equals_input": true,
+    "direct_failure": "SLV004: external tree.source cannot be resolved by pathless saved-config parser",
+    "normalized_path": "validate --write-effective before solve; export summary and same-iteration resume succeeded",
+    "fixture_iterations": 1,
+    "fixture_range_combos_per_seat": 1,
+    "fresh_solves": 2,
+    "run_outputs": "runs/sol-2-inventory (ignored, reproducible scratch, not retained evidence)"
+  },
+  "not_run": [
+    "cargo fmt --all --check",
+    "cargo clippy --workspace --all-targets -- -D warnings",
+    "cargo test --workspace",
+    "release ignored tests",
+    "GTO Wizard comparison",
+    "24-case benchmark suite"
+  ],
+  "build_inputs": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "da9fc9f6aca8102a8b5f6449ee8fef83ec9d97d546649a154f801c19815ebe42",
+      "bytes": 1752,
+      "availability": "tracked-at-source-revision"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1",
+      "bytes": 40970,
+      "availability": "tracked-at-source-revision"
+    },
+    {
+      "path": ".cargo/config.toml",
+      "sha256": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21",
+      "bytes": 125,
+      "availability": "tracked-at-source-revision"
+    }
+  ],
+  "binaries": [
+    {
+      "path": "target/debug/solvers.exe",
+      "sha256": "ea5415555489092d4f636f6363c391d13aa8246ae777d95eea623f3df3671c7f",
+      "bytes": 19705856,
+      "availability": "local-cargo-output-rebuildable-not-retained"
+    },
+    {
+      "path": "target/debug/deps/oracle_diff-865ab2a81c40dcb9.exe",
+      "sha256": "6b8105b191fc393a2cbcc0359c1df5dd6453bcdbabba554255e61f6a717deebc",
+      "bytes": 2200576,
+      "availability": "local-cargo-output-rebuildable-not-retained"
+    },
+    {
+      "path": "target/debug/deps/postflop-dbf2ce15b648ad7a.exe",
+      "sha256": "780bdd7e059d4eb19ef46e2c4ae263444fd7d971b2e3944aa0ffc990060e8980",
+      "bytes": 2730496,
+      "availability": "local-cargo-output-rebuildable-not-retained"
+    },
+    {
+      "path": "target/debug/deps/postflop_contract-a32b48f6846c1cab.exe",
+      "sha256": "7a8d19121d19de661699800468f079468e67749cf31b8ded59f8e2a7f85e1d6a",
+      "bytes": 2431488,
+      "availability": "local-cargo-output-rebuildable-not-retained"
+    }
+  ],
+  "retained_files": [
+    {
+      "path": "experiments/hu-postflop-r0/asset-inventory-2026-09-25/checks.log",
+      "sha256": "00dce1cf578cbbc9fbb6dd4ac9fb12a0d320b0d4690a69d57d5b9d9d52076f37",
+      "bytes": 170,
+      "availability": "retained-in-git-change"
+    },
+    {
+      "path": "experiments/hu-postflop-r0/asset-inventory-2026-09-25/holdem-tests.log",
+      "sha256": "6adc3f6d07363223c4652f97608cb048627365f6eb4b5b7291480b0ead12baeb",
+      "bytes": 5982,
+      "availability": "retained-in-git-change"
+    },
+    {
+      "path": "experiments/hu-postflop-r0/asset-inventory-2026-09-25/postflop-contract-tests.log",
+      "sha256": "d7eb895f1123fbf138290dffee0fb4ed3ce5216131371a5368bd7254b6bf46f3",
+      "bytes": 3620,
+      "availability": "retained-in-git-change"
+    },
+    {
+      "path": "experiments/hu-postflop-r0/asset-inventory-2026-09-25/README.md",
+      "sha256": "11eff64b1700338dbf6a91e8be6bc9d391af3312157202ef3f33af9b0240d87f",
+      "bytes": 3667,
+      "availability": "retained-in-git-change"
+    },
+    {
+      "path": "experiments/hu-postflop-r0/asset-inventory-2026-09-25/source-path-reproduction.log",
+      "sha256": "eb3d8e52aa55f9d8c1cacfc7e0b1bd8d83879bf43883916c44faac4d5dffe32a",
+      "bytes": 2920,
+      "availability": "retained-in-git-change"
+    },
+    {
+      "path": "experiments/hu-postflop-r0/asset-inventory-2026-09-25/source-path.toml",
+      "sha256": "0d42e102d2bf0a5fd8ba65831c45555620a7c0d6454cd904ff30fb9636672fa5",
+      "bytes": 395,
+      "availability": "retained-in-git-change"
+    },
+    {
+      "path": "experiments/hu-postflop-r0/asset-inventory-2026-09-25/source-path.tree",
+      "sha256": "25d4a0360b06828fbb4920f63cf1181870890c2495eec75828314cf8c2335c5c",
+      "bytes": 29,
+      "availability": "retained-in-git-change"
+    }
+  ],
+  "documentation_checks": [
+    {
+      "command": "python tools/check_docs.py",
+      "exit_code": 0,
+      "markdown_files": 36
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 0
+    }
+  ],
+  "text_encoding": "UTF-8, retained text LF-normalized"
+}

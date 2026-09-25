@@ -1,0 +1,20 @@
+# SOL-2: tiny reproduction of external tree-source persistence.
+# Not an external-reference fixture or a convergence/performance experiment.
+schema = "solvers.postflop/v1"
+
+[game]
+board = "2c 7d 9h Js Qs"
+oop_range = "AsAh"
+ip_range = "KsKh"
+pot = 20
+effective_stack = 80
+
+[game.tree]
+kind = "script"
+source = "source-path.tree"
+
+[run]
+iterations = 1
+check_every = 1
+threads = 1
+max_time = "1s"

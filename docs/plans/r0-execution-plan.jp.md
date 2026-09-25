@@ -117,6 +117,8 @@ caseが足りない場合は許容された5〜10/20〜30件の中で調整す�
 **成果物案:** `docs/plans/hu-postflop-r0/asset-map.md`。
 各行に対象能力、規範、code、test/既存証拠、現在確認した内容、未確認、次作業を記録する。
 
+調査内容と検証証拠は[HU資産・契約対応表](hu-postflop-r0/asset-map.md)から参照する。
+
 ### 完了条件
 
 - [ ] 入力→tree→CFR/BR→保存→EV照会の対応と、既存assetの再利用範囲が分かる。
