@@ -1,6 +1,5 @@
 //! The bucketed blueprint game: the 169-class preflop trunk extended
-//! through aggregated bucket-space postflop streets (see
-//! `docs/research/blueprint-design.md`).
+//! through aggregated bucket-space postflop streets.
 //!
 //! Board cards never branch the public tree: each street boundary is one
 //! chance node with a single aggregated deal whose `ReachMap::Transition`

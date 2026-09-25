@@ -234,6 +234,16 @@ impl DealSampler {
         self.ranges.len()
     }
 
+    /// Unnormalized mass of the actual evaluation draw interval. The full
+    /// physical-deck fast path is exactly uniform, independently of range scale.
+    pub(crate) fn evaluation_combo_weight(&self, seat: usize, combo: usize) -> f64 {
+        if self.uniform_full {
+            1.0
+        } else {
+            self.ranges[seat].weight_of(combo)
+        }
+    }
+
     pub fn max_attempts(&self) -> u32 {
         self.max_attempts
     }

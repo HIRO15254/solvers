@@ -674,6 +674,16 @@ fn held_out_profile_evaluation_is_deterministic_and_read_only() {
     assert_eq!(solver.snapshot_state(), before);
     assert_eq!(a.samples, 128);
     assert_eq!(a.seats.len(), 2);
+    // This single-decision game visits seat 0 exactly once per baseline
+    // sample. Regret-greedy deviation replays must not inflate coverage.
+    assert_eq!(a.candidate_policy_coverage.len(), 2);
+    assert_eq!(a.candidate_policy_coverage[0].decision_visits, 128);
+    assert_eq!(a.candidate_policy_coverage[0].average_strategy_visits, 128);
+    assert_eq!(a.candidate_policy_coverage[0].regret_fallback_visits, 0);
+    assert_eq!(
+        a.candidate_policy_coverage[1],
+        CandidatePolicyCoverage::default()
+    );
     assert!(a.seats[0].mean > 0.8);
     let gains = a.deviation_gain_lower_bound.as_ref().unwrap();
     assert_eq!(gains.len(), 2);
@@ -704,7 +714,7 @@ fn held_out_profile_parallelism_is_bit_identical() {
         .collect::<Vec<_>>();
     let before = solver.snapshot_state();
 
-    for samples in [2, 257] {
+    for samples in [2, 257, 4097] {
         for trained in [None, Some(deviators.as_slice())] {
             let serial = solver
                 .evaluate_profile_with_threads(samples, 4040, trained, ProfileVariant::default(), 1)
@@ -846,6 +856,12 @@ fn reference_evaluation_falls_back_to_candidate_baseline_not_greedy() {
                 ..StreetVisitCounts::default()
             },
             uniform_fallback_visits_by_street: StreetVisitCounts::default(),
+            average_strategy_visits: 32,
+            average_strategy_visits_by_street: StreetVisitCounts {
+                preflop: 32,
+                ..StreetVisitCounts::default()
+            },
+            ..CandidatePolicyCoverage::default()
         }
     );
     assert_eq!(
@@ -953,6 +969,7 @@ fn reference_evaluation_reports_candidate_uniform_fallback_coverage() {
                 preflop: 16,
                 ..StreetVisitCounts::default()
             },
+            ..CandidatePolicyCoverage::default()
         }
     );
     assert_eq!(
@@ -1105,7 +1122,148 @@ fn reference_evaluation_attributes_coverage_to_each_street() {
 }
 
 #[test]
+fn reference_evaluation_distinguishes_average_mass_and_regret_fallback_by_street() {
+    let mut solver = four_street_solver(831);
+    solver.run_sweeps(1).unwrap();
+    assert_eq!(solver.policies.len(), 4);
+    for (key, column) in &mut solver.policies {
+        // The one-action policies are identical at every street, but only
+        // preflop and river have an observed average. A storage-only counter
+        // would conceal the missing flop and turn average samples.
+        column
+            .strategy_sum
+            .fill(if key.street == 0 || key.street == 3 {
+                1.0
+            } else {
+                0.0
+            });
+    }
+    let deviators = (0..2)
+        .map(|seat| DeviatorPolicy {
+            seat,
+            actions: FxHashMap::default(),
+        })
+        .collect::<Vec<_>>();
+    let before = solver.snapshot_state();
+    let samples = 7;
+    let average = solver
+        .evaluate_reference_deviators(samples, 4323, &deviators, ProfileVariant::default())
+        .unwrap();
+    let coverage = average.candidate_policy_coverage[0];
+    assert_eq!(coverage.decision_visits, 4 * samples);
+    assert_eq!(coverage.stored_strategy_visits, 4 * samples);
+    assert_eq!(coverage.average_strategy_visits, 2 * samples);
+    assert_eq!(coverage.regret_fallback_visits, 2 * samples);
+    assert_eq!(coverage.current_strategy_visits, 0);
+    assert_eq!(coverage.uniform_fallback_visits, 0);
+    assert_eq!(coverage.stored_strategy_fraction(), 1.0);
+    assert_eq!(coverage.average_strategy_fraction(), 0.5);
+    assert_eq!(
+        coverage.average_strategy_visits_by_street,
+        StreetVisitCounts {
+            preflop: samples,
+            river: samples,
+            ..StreetVisitCounts::default()
+        }
+    );
+    assert_eq!(
+        coverage.regret_fallback_visits_by_street,
+        StreetVisitCounts {
+            flop: samples,
+            turn: samples,
+            ..StreetVisitCounts::default()
+        }
+    );
+    assert_eq!(
+        coverage.stored_strategy_visits,
+        coverage.average_strategy_visits
+            + coverage.regret_fallback_visits
+            + coverage.current_strategy_visits
+    );
+    let current = solver
+        .evaluate_reference_deviators(
+            samples,
+            4323,
+            &deviators,
+            ProfileVariant {
+                use_current_strategy: true,
+                ..ProfileVariant::default()
+            },
+        )
+        .unwrap();
+    let current_coverage = current.candidate_policy_coverage[0];
+    assert_eq!(current_coverage.current_strategy_visits, 4 * samples);
+    assert_eq!(current_coverage.average_strategy_visits, 0);
+    assert_eq!(current_coverage.regret_fallback_visits, 0);
+    assert_eq!(
+        current_coverage.current_strategy_visits_by_street,
+        coverage.decision_visits_by_street
+    );
+    // Coverage bookkeeping consumes no random draws and changes no utilities
+    // or mutable solver state.
+    assert_eq!(current.worlds, average.worlds);
+    assert_eq!(current.evaluation.seats, average.evaluation.seats);
+    assert_eq!(
+        current.evaluation.deviation_gain_lower_bound,
+        average.evaluation.deviation_gain_lower_bound
+    );
+    assert_eq!(
+        average.evaluation.candidate_policy_coverage,
+        average.candidate_policy_coverage
+    );
+    assert_eq!(
+        current.evaluation.candidate_policy_coverage,
+        current.candidate_policy_coverage
+    );
+    assert_eq!(solver.snapshot_state(), before);
+    let json = serde_json::to_value(&average).unwrap();
+    assert_eq!(
+        json["candidate_policy_coverage"][0]["regret_fallback_visits_by_street"]["turn"],
+        samples
+    );
+}
+
+#[test]
+fn reference_evaluation_dense_zero_average_mass_is_regret_fallback() {
+    let mut solver = dense_dominated_solver(832);
+    solver.run_sweeps(1).unwrap();
+    solver.dense.as_mut().unwrap().arena.strategy_sum.fill(0.0);
+    let deviators = (0..2)
+        .map(|seat| DeviatorPolicy {
+            seat,
+            actions: FxHashMap::default(),
+        })
+        .collect::<Vec<_>>();
+    let before = solver.snapshot_state();
+    let reference = solver
+        .evaluate_reference_deviators(16, 4324, &deviators, ProfileVariant::default())
+        .unwrap();
+    let coverage = reference.candidate_policy_coverage[0];
+    assert_eq!(coverage.decision_visits, 16);
+    assert_eq!(coverage.stored_strategy_visits, 16);
+    assert_eq!(coverage.regret_fallback_visits, 16);
+    assert_eq!(coverage.average_strategy_visits, 0);
+    assert_eq!(coverage.uniform_fallback_visits, 0);
+    assert_eq!(coverage.average_strategy_fraction(), 0.0);
+    let ordinary = solver.evaluate_average_profile(16, 4324).unwrap();
+    assert_eq!(reference.evaluation.seats, ordinary.seats);
+    assert_eq!(
+        reference.candidate_policy_coverage,
+        ordinary.candidate_policy_coverage
+    );
+    assert_eq!(solver.snapshot_state(), before);
+}
+
+#[test]
 fn coverage_without_street_counters_deserializes_with_zero_defaults() {
+    let evaluation: ProfileEvaluation = serde_json::from_value(serde_json::json!({
+        "samples": 3,
+        "total_deal_attempts": 3,
+        "seats": [],
+        "deviation_gain_lower_bound": null
+    }))
+    .unwrap();
+    assert!(evaluation.candidate_policy_coverage.is_empty());
     let candidate: CandidatePolicyCoverage = serde_json::from_value(serde_json::json!({
         "decision_visits": 3,
         "stored_strategy_visits": 2,
@@ -1113,6 +1271,21 @@ fn coverage_without_street_counters_deserializes_with_zero_defaults() {
     }))
     .unwrap();
     assert_eq!(candidate.decision_visits, 3);
+    assert_eq!(candidate.average_strategy_visits, 0);
+    assert_eq!(candidate.current_strategy_visits, 0);
+    assert_eq!(candidate.regret_fallback_visits, 0);
+    assert_eq!(
+        candidate.average_strategy_visits_by_street,
+        StreetVisitCounts::default()
+    );
+    assert_eq!(
+        candidate.current_strategy_visits_by_street,
+        StreetVisitCounts::default()
+    );
+    assert_eq!(
+        candidate.regret_fallback_visits_by_street,
+        StreetVisitCounts::default()
+    );
     assert_eq!(
         candidate.decision_visits_by_street,
         StreetVisitCounts::default()
@@ -1129,6 +1302,233 @@ fn coverage_without_street_counters_deserializes_with_zero_defaults() {
         reference.trained_action_visits_by_street,
         StreetVisitCounts::default()
     );
+}
+
+#[test]
+fn prefix_coverage_counts_only_decisions_at_and_below_each_street() {
+    let mut solver = four_street_solver(840);
+    solver.run_sweeps(1).unwrap();
+    solver.policies.retain(|key, _| key.street != 1);
+    for (key, column) in &mut solver.policies {
+        column
+            .strategy_sum
+            .fill(if key.street == 2 { 0.0 } else { 1.0 });
+    }
+    let root = HistoryKey::ROOT;
+    let flop = root.child(0, 0);
+    let turn = flop.child(0, 0);
+    let river = turn.child(0, 0);
+    let before = solver.snapshot_state();
+    let samples = 17;
+    let result = solver
+        .evaluate_profile_with_prefixes(
+            samples,
+            551,
+            None,
+            ProfileVariant::default(),
+            2,
+            &[root, flop, turn, river],
+        )
+        .unwrap();
+    assert_eq!(
+        result.evaluation,
+        solver.evaluate_average_profile(samples, 551).unwrap()
+    );
+    assert_eq!(
+        result.prefixes[0].candidate_policy_coverage,
+        result.evaluation.candidate_policy_coverage
+    );
+    for (start, prefix) in result.prefixes.iter().enumerate() {
+        assert_eq!(prefix.reached_samples, samples);
+        let coverage = prefix.candidate_policy_coverage[0];
+        assert_eq!(coverage.decision_visits, (4 - start) as u64 * samples);
+        assert_eq!(
+            coverage.uniform_fallback_visits,
+            if start <= 1 { samples } else { 0 }
+        );
+        assert_eq!(
+            coverage.regret_fallback_visits,
+            if start <= 2 { samples } else { 0 }
+        );
+        for (street_index, street) in Street::ALL.into_iter().enumerate() {
+            assert_eq!(
+                prefix.trajectory_visits_by_street.get(street),
+                if street_index >= start { samples } else { 0 }
+            );
+        }
+        assert_eq!(
+            prefix.candidate_policy_coverage[1],
+            CandidatePolicyCoverage::default()
+        );
+    }
+    let mut expected_baseline = result.evaluation;
+    expected_baseline.deviation_gain_lower_bound = None;
+    let baseline = solver
+        .evaluate_profile_coverage(
+            samples,
+            551,
+            ProfileVariant::default(),
+            2,
+            &[root, flop, turn, river],
+        )
+        .unwrap();
+    assert_eq!(baseline.evaluation, expected_baseline);
+    assert_eq!(baseline.prefixes, result.prefixes);
+    assert_eq!(solver.snapshot_state(), before);
+}
+
+#[test]
+fn prefix_coverage_excludes_unreached_branches_and_all_deviation_trajectories() {
+    let mut solver = prefix_solver(841);
+    solver.run_sweeps(4).unwrap();
+    let root = HistoryKey::ROOT;
+    let left = root.child(1, 0);
+    let right = root.child(1, 1);
+    assert!(solver.history_entry(left).is_some());
+    assert!(solver.history_entry(right).is_some());
+    for (key, column) in &mut solver.policies {
+        if key.history == root {
+            column.strategy_sum = vec![1.0, 0.0];
+            column.regrets = vec![0.0, 1.0];
+        }
+    }
+    let samples = 257;
+    let result = solver
+        .evaluate_profile_with_prefixes(
+            samples,
+            552,
+            None,
+            ProfileVariant::default(),
+            2,
+            &[root, left, right],
+        )
+        .unwrap();
+    assert_eq!(result.prefixes[0].reached_samples, samples);
+    assert_eq!(
+        result.prefixes[0].trajectory_visits_by_street.preflop,
+        samples
+    );
+    assert_eq!(
+        result.prefixes[0]
+            .candidate_policy_coverage
+            .iter()
+            .map(|c| c.decision_visits)
+            .sum::<u64>(),
+        2 * samples
+    );
+    assert_eq!(result.prefixes[1].reached_samples, samples);
+    assert_eq!(
+        result.prefixes[1].candidate_policy_coverage[0].decision_visits,
+        samples
+    );
+    assert_eq!(
+        result.prefixes[1].candidate_policy_coverage[1].decision_visits,
+        0
+    );
+    // The regret-greedy deviation at player 1 takes right, but baseline
+    // average play never does: that trajectory must not enter these counts.
+    assert_eq!(result.prefixes[2].reached_samples, 0);
+    assert_eq!(
+        result.prefixes[2].trajectory_visits_by_street,
+        StreetVisitCounts::default()
+    );
+    assert!(
+        result.prefixes[2]
+            .candidate_policy_coverage
+            .iter()
+            .all(|c| *c == CandidatePolicyCoverage::default())
+    );
+}
+
+#[test]
+fn prefix_coverage_is_identical_across_threads_chunks_and_profile_variants() {
+    let mut solver = prefix_solver(842);
+    solver.run_sweeps(7).unwrap();
+    let prefixes = [
+        HistoryKey::ROOT,
+        HistoryKey::ROOT.child(1, 0),
+        HistoryKey::ROOT.child(1, 1),
+    ];
+    let deviators = (0..2)
+        .map(|seat| DeviatorPolicy {
+            seat,
+            actions: FxHashMap::default(),
+        })
+        .collect::<Vec<_>>();
+    let before = solver.snapshot_state();
+    for variant in [
+        ProfileVariant::default(),
+        ProfileVariant {
+            use_current_strategy: true,
+            ..ProfileVariant::default()
+        },
+        ProfileVariant {
+            purify_threshold: 0.2,
+            ..ProfileVariant::default()
+        },
+    ] {
+        let expected = solver
+            .evaluate_profile_with_threads(4097, 553, Some(&deviators), variant, 1)
+            .unwrap();
+        let serial = solver
+            .evaluate_profile_with_prefixes(4097, 553, Some(&deviators), variant, 1, &prefixes)
+            .unwrap();
+        assert_eq!(serial.evaluation, expected);
+        for threads in [2, 8] {
+            assert_eq!(
+                solver
+                    .evaluate_profile_with_prefixes(
+                        4097,
+                        553,
+                        Some(&deviators),
+                        variant,
+                        threads,
+                        &prefixes
+                    )
+                    .unwrap(),
+                serial
+            );
+            let baseline = solver
+                .evaluate_profile_coverage(4097, 553, variant, threads, &prefixes)
+                .unwrap();
+            assert_eq!(baseline.prefixes, serial.prefixes);
+            assert_eq!(baseline.evaluation.seats, serial.evaluation.seats);
+            assert_eq!(
+                baseline.evaluation.candidate_policy_coverage,
+                serial.evaluation.candidate_policy_coverage
+            );
+            assert!(baseline.evaluation.deviation_gain_lower_bound.is_none());
+        }
+    }
+    assert_eq!(solver.snapshot_state(), before);
+}
+
+#[test]
+fn prefix_coverage_rejects_unknown_duplicate_and_excessive_prefixes() {
+    let solver = prefix_solver(843);
+    let root = HistoryKey::ROOT;
+    for prefixes in [
+        vec![root, root],
+        vec![HistoryKey([255; 16])],
+        vec![root; 65],
+    ] {
+        assert!(matches!(
+            solver.evaluate_profile_coverage(2, 0, ProfileVariant::default(), 1, &prefixes),
+            Err(SolverError::InvalidState(_))
+        ));
+    }
+    assert!(matches!(
+        solver.evaluate_profile_coverage(0, 0, ProfileVariant::default(), 1, &[root]),
+        Err(SolverError::ZeroEvaluationSamples)
+    ));
+    assert!(matches!(
+        solver.evaluate_profile_coverage(2, 0, ProfileVariant::default(), 0, &[root]),
+        Err(SolverError::ZeroThreads)
+    ));
+    let empty = solver
+        .evaluate_profile_coverage(2, 0, ProfileVariant::default(), 1, &[])
+        .unwrap();
+    assert!(empty.prefixes.is_empty());
 }
 
 #[test]
@@ -1980,6 +2380,210 @@ struct DenseToyGame;
 struct ConditionalWeightGame {
     street_recall: bool,
     bucket_zero_combo: usize,
+}
+
+#[test]
+fn endpoint_deviation_override_changes_one_action_without_changing_prefix_weight() {
+    use super::conditioned::ForcedPrefixReplay;
+
+    let own = cards::combo_index("As".parse().unwrap(), "Ah".parse().unwrap());
+    let opponent = cards::combo_index("Ks".parse().unwrap(), "Kh".parse().unwrap());
+    let world = SampledWorld::new(
+        vec![own, opponent],
+        ["2c", "3d", "4h", "5s", "6c"].map(|c| c.parse().unwrap()),
+    )
+    .unwrap();
+    let mut solver = MultiwaySolver::new(
+        ConditionalWeightGame {
+            street_recall: false,
+            bucket_zero_combo: own,
+        },
+        DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
+        SolverConfig {
+            max_memory_bytes: 1 << 20,
+            max_traversal_depth: 8,
+            ..SolverConfig::default()
+        },
+    )
+    .unwrap();
+    let private = solver.game.bucket(&solver.game.root_state(), &world, 0);
+    let key = |history| InfoKey {
+        history,
+        player: 0,
+        street: private.street,
+        active_opponents: private.active_opponents,
+        bucket_path: private.bucket_path,
+    };
+    let column = |labels: [&str; 2], average: [f32; 2]| PolicyColumn {
+        action_labels: labels.map(str::to_string).to_vec(),
+        regrets: vec![1.0, 0.0],
+        strategy_sum: average.to_vec(),
+    };
+    solver
+        .policies
+        .insert(key(HistoryKey::ROOT), column(["left", "right"], [1.0, 0.0]));
+    for action in 0..2 {
+        solver.policies.insert(
+            key(HistoryKey::ROOT.child(0, action)),
+            column(["up", "down"], [0.0, 1.0]),
+        );
+    }
+    let right = solver
+        .policies
+        .get_mut(&key(HistoryKey::ROOT.child(0, 1)))
+        .unwrap();
+    right.strategy_sum = vec![1.0, 0.0];
+    right.regrets = vec![0.0, 1.0];
+    let before = solver.snapshot_state();
+    let mut ordinary_rng = evaluation_action_rng(971, 0, None);
+    let mut ordinary_coverage = vec![CandidatePolicyCoverage::default(); 2];
+    let ordinary = solver
+        .evaluate_world(
+            &world,
+            &mut ordinary_rng,
+            None,
+            None,
+            0.0,
+            false,
+            Some(&mut ordinary_coverage),
+            &mut [],
+            None,
+        )
+        .unwrap();
+    assert_eq!(ordinary, vec![-2.0, 2.0]);
+    let mut disabled = ForcedPrefixReplay {
+        actions: &[],
+        endpoint_action: None,
+        weight: 1.0,
+        skip_weight_actions: 0,
+        sources: [false; 3],
+    };
+    let mut disabled_rng = evaluation_action_rng(971, 0, None);
+    let mut disabled_coverage = vec![CandidatePolicyCoverage::default(); 2];
+    assert_eq!(
+        ordinary,
+        solver
+            .evaluate_world(
+                &world,
+                &mut disabled_rng,
+                None,
+                None,
+                0.0,
+                false,
+                Some(&mut disabled_coverage),
+                &mut [],
+                Some(&mut disabled)
+            )
+            .unwrap()
+    );
+    assert_eq!(disabled_coverage, ordinary_coverage);
+    assert_eq!(disabled.weight, 1.0);
+    assert_eq!(
+        disabled_rng.clone().next_u64(),
+        ordinary_rng.clone().next_u64()
+    );
+
+    // "right" has exactly zero baseline probability but remains a legal
+    // deviation. The same actor's later decision must still play "up" (0),
+    // unlike repeating the override (1) or regret-greedy fallback (1).
+    let mut candidate = ForcedPrefixReplay {
+        endpoint_action: Some(1),
+        ..disabled
+    };
+    let mut candidate_rng = evaluation_action_rng(971, 0, None);
+    let value = solver
+        .evaluate_world(
+            &world,
+            &mut candidate_rng,
+            None,
+            None,
+            0.0,
+            false,
+            None,
+            &mut [],
+            Some(&mut candidate),
+        )
+        .unwrap();
+    assert_eq!(value, vec![1.0, -1.0]);
+    assert_eq!(candidate.weight, 1.0);
+    assert_eq!(candidate.sources, [false; 3]);
+    assert_eq!(candidate_rng.next_u64(), ordinary_rng.next_u64());
+
+    // With a nonempty path, the override moves to precisely its endpoint.
+    let mut deeper = ForcedPrefixReplay {
+        actions: &[0],
+        endpoint_action: Some(0),
+        weight: 1.0,
+        skip_weight_actions: 0,
+        sources: [false; 3],
+    };
+    assert_eq!(
+        solver
+            .evaluate_world(
+                &world,
+                &mut evaluation_action_rng(972, 0, None),
+                None,
+                None,
+                0.0,
+                false,
+                None,
+                &mut [],
+                Some(&mut deeper)
+            )
+            .unwrap(),
+        vec![4.0, -4.0]
+    );
+    assert_eq!(deeper.weight, 1.0);
+    let mut invalid = ForcedPrefixReplay {
+        endpoint_action: Some(2),
+        ..deeper
+    };
+    assert!(
+        solver
+            .evaluate_world(
+                &world,
+                &mut evaluation_action_rng(972, 0, None),
+                None,
+                None,
+                0.0,
+                false,
+                None,
+                &mut [],
+                Some(&mut invalid)
+            )
+            .is_err()
+    );
+    assert_eq!(solver.snapshot_state(), before);
+
+    solver
+        .policies
+        .get_mut(&key(HistoryKey::ROOT))
+        .unwrap()
+        .strategy_sum = vec![0.0, 1.0];
+    let mut zero = ForcedPrefixReplay {
+        actions: &[0],
+        endpoint_action: Some(0),
+        weight: 1.0,
+        skip_weight_actions: 0,
+        sources: [false; 3],
+    };
+    assert_eq!(
+        solver
+            .evaluate_world(
+                &world,
+                &mut evaluation_action_rng(972, 0, None),
+                None,
+                None,
+                0.0,
+                false,
+                None,
+                &mut [],
+                Some(&mut zero)
+            )
+            .unwrap(),
+        vec![0.0; 2]
+    );
+    assert_eq!(zero.weight, 0.0);
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -3160,6 +3764,8 @@ fn consuming_average_sampling_research_api_is_repeatable_and_regret_identical() 
                 histories: vec![HistoryKey::ROOT, HistoryKey::ROOT.child(0, 0)],
                 evaluation_samples: 32,
                 evaluation_seeds: vec![9090],
+                coverage_samples: 32,
+                coverage_prefixes: vec![HistoryKey::ROOT, HistoryKey::ROOT.child(0, 0)],
             })
             .unwrap()
     };
@@ -3177,7 +3783,25 @@ fn consuming_average_sampling_research_api_is_repeatable_and_regret_identical() 
     );
     assert_eq!(enumerated_one.histories, enumerated_four.histories);
     assert_eq!(enumerated_one.evaluations, enumerated_four.evaluations);
-    assert_eq!(enumerated_four, repeated);
+    assert_eq!(
+        enumerated_one.coverage_evaluations,
+        enumerated_four.coverage_evaluations
+    );
+    assert_eq!(enumerated_four.metrics, repeated.metrics);
+    assert_eq!(enumerated_four.histories, repeated.histories);
+    assert_eq!(enumerated_four.evaluations, repeated.evaluations);
+    assert_eq!(
+        enumerated_four.coverage_evaluations,
+        repeated.coverage_evaluations
+    );
+    assert_eq!(
+        enumerated_four.current_regret_fingerprint,
+        repeated.current_regret_fingerprint
+    );
+    for result in [&uniform, &enumerated_one, &enumerated_four, &repeated] {
+        assert!(result.solve_elapsed_secs.is_finite());
+        assert!(result.solve_elapsed_secs >= 0.0);
+    }
     assert_eq!(
         uniform.current_regret_fingerprint,
         enumerated_four.current_regret_fingerprint
@@ -3196,6 +3820,52 @@ fn consuming_average_sampling_research_api_is_repeatable_and_regret_identical() 
 
 #[cfg(feature = "research-average-sampling")]
 #[test]
+fn postflop_continuation_rejects_full_recall_before_learning() {
+    let mut full = solver(925, 1 << 20);
+    let before = full.snapshot_state();
+    assert!(matches!(
+        full.run_average_sampling_research_inner(AverageSamplingResearchConfig {
+            variant: AverageSamplingResearchVariant::PostflopContinuation,
+            sweeps: 16,
+            threads: 2,
+            histories: vec![],
+            evaluation_samples: 0,
+            evaluation_seeds: vec![],
+            coverage_samples: 0,
+            coverage_prefixes: vec![],
+        }),
+        Err(SolverError::InvalidState(
+            "postflop continuation research requires preallocated current-street storage"
+        ))
+    ));
+    assert_eq!(full.snapshot_state(), before);
+    let (game, sampler, config) = initialization_holdem_fixture();
+    let mut sparse = MultiwaySolver::new(game, sampler, config).unwrap();
+    // Valid Street constructors always create dense storage. Exercise the
+    // defensive guard with an intentionally unavailable arena, not by
+    // claiming that the ordinary constructor creates sparse Street storage.
+    assert!(sparse.dense.is_some());
+    sparse.dense = None;
+    let before = sparse.snapshot_state();
+    assert!(
+        sparse
+            .run_average_sampling_research_inner(AverageSamplingResearchConfig {
+                variant: AverageSamplingResearchVariant::PostflopContinuation,
+                sweeps: 16,
+                threads: 2,
+                histories: vec![],
+                evaluation_samples: 0,
+                evaluation_seeds: vec![],
+                coverage_samples: 0,
+                coverage_prefixes: vec![],
+            })
+            .is_err()
+    );
+    assert_eq!(sparse.snapshot_state(), before);
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[test]
 fn consuming_average_sampling_research_api_rejects_nonfresh_solver() {
     let mut solver = dense_vector_toy_solver(921, 1);
     solver.run_sweeps(1).unwrap();
@@ -3207,6 +3877,8 @@ fn consuming_average_sampling_research_api_rejects_nonfresh_solver() {
             histories: vec![HistoryKey::ROOT],
             evaluation_samples: 0,
             evaluation_seeds: Vec::new(),
+            coverage_samples: 0,
+            coverage_prefixes: Vec::new(),
         }),
         Err(SolverError::InvalidState(
             "average-sampling research requires a fresh solver"
@@ -3241,6 +3913,8 @@ fn consuming_average_sampling_research_api_omits_zero_mass_fallbacks() {
             histories,
             evaluation_samples: 0,
             evaluation_seeds: Vec::new(),
+            coverage_samples: 0,
+            coverage_prefixes: Vec::new(),
         })
         .unwrap();
     let rows = result
@@ -3255,6 +3929,151 @@ fn consuming_average_sampling_research_api_omits_zero_mass_fallbacks() {
         row.status == AverageSamplingResearchRowStatus::ZeroAverageMassOmitted
             && row.actions.is_none()
     }));
+    assert!(result.coverage_evaluations.is_empty());
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[test]
+fn average_sampling_research_coverage_preserves_ordinary_baseline_and_state() {
+    let config = AverageSamplingResearchConfig {
+        variant: AverageSamplingResearchVariant::UniformOne,
+        sweeps: 20,
+        threads: 2,
+        histories: vec![HistoryKey::ROOT],
+        evaluation_samples: 32,
+        evaluation_seeds: vec![9090, 9091],
+        coverage_samples: 32,
+        coverage_prefixes: vec![HistoryKey::ROOT, HistoryKey::ROOT.child(0, 0)],
+    };
+    let mut ordinary = dense_vector_toy_solver(923, 2);
+    ordinary
+        .run_sweeps_with_threads(config.sweeps, config.threads)
+        .unwrap();
+    let result = dense_vector_toy_solver(923, 2)
+        .run_average_sampling_research(config.clone())
+        .unwrap();
+    assert_eq!(result.metrics, ordinary.metrics());
+    assert_eq!(
+        result.current_regret_fingerprint,
+        ordinary.research_regret_fingerprint()
+    );
+    assert_eq!(result.coverage_evaluations.len(), 2);
+    for (normal, coverage) in result.evaluations.iter().zip(&result.coverage_evaluations) {
+        let expected = ordinary
+            .evaluate_profile_with_threads(32, normal.seed, None, ProfileVariant::default(), 2)
+            .unwrap();
+        assert_eq!(normal.result, expected);
+        assert_eq!(coverage.seed, normal.seed);
+        let mut expected_baseline = expected;
+        expected_baseline.deviation_gain_lower_bound = None;
+        assert_eq!(coverage.result.evaluation, expected_baseline);
+        let root = &coverage.result.prefixes[0];
+        assert_eq!(root.history, HistoryKey::ROOT);
+        assert_eq!(root.reached_samples, 32);
+        assert_eq!(
+            root.candidate_policy_coverage,
+            normal.result.candidate_policy_coverage
+        );
+        assert!(coverage.result.prefixes[1].reached_samples <= root.reached_samples);
+    }
+    let mut disabled = config;
+    disabled.coverage_samples = 0;
+    disabled.coverage_prefixes.clear();
+    let disabled = dense_vector_toy_solver(923, 2)
+        .run_average_sampling_research(disabled)
+        .unwrap();
+    assert_eq!(disabled.metrics, result.metrics);
+    assert_eq!(
+        disabled.current_regret_fingerprint,
+        result.current_regret_fingerprint
+    );
+    assert_eq!(disabled.histories, result.histories);
+    assert_eq!(disabled.evaluations, result.evaluations);
+    assert!(disabled.coverage_evaluations.is_empty());
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[test]
+fn average_sampling_research_coverage_rejects_invalid_settings_before_solving() {
+    let base = AverageSamplingResearchConfig {
+        variant: AverageSamplingResearchVariant::UniformOne,
+        sweeps: 1,
+        threads: 1,
+        histories: vec![HistoryKey::ROOT],
+        evaluation_samples: 32,
+        evaluation_seeds: vec![9090],
+        coverage_samples: 32,
+        coverage_prefixes: vec![HistoryKey::ROOT],
+    };
+    for (samples, prefixes, error) in [
+        (
+            0,
+            vec![HistoryKey::ROOT],
+            "coverage prefixes require at least two coverage samples",
+        ),
+        (
+            1,
+            vec![HistoryKey::ROOT],
+            "average-sampling research coverage requires at least two samples",
+        ),
+        (
+            32,
+            Vec::new(),
+            "coverage samples require at least one coverage prefix",
+        ),
+        (
+            32,
+            vec![HistoryKey::ROOT; 2],
+            "evaluation prefixes must be unique",
+        ),
+        (
+            32,
+            vec![HistoryKey([255; 16])],
+            "unknown evaluation prefix history",
+        ),
+        (
+            32,
+            vec![HistoryKey::ROOT; 65],
+            "at most 64 evaluation prefixes are supported",
+        ),
+    ] {
+        let mut config = base.clone();
+        config.coverage_samples = samples;
+        config.coverage_prefixes = prefixes;
+        let mut solver = dense_vector_toy_solver(924, 1);
+        // Starting the sweep would fail with DepthLimit instead: these errors
+        // must be resolved before the consuming API does expensive work.
+        solver.config.max_traversal_depth = 0;
+        assert!(matches!(
+            solver.run_average_sampling_research(config),
+            Err(SolverError::InvalidState(message)) if message == error
+        ));
+    }
+    let mut disabled_evaluation = base;
+    disabled_evaluation.evaluation_samples = 0;
+    disabled_evaluation.evaluation_seeds.clear();
+    assert!(matches!(
+        dense_vector_toy_solver(924, 1).run_average_sampling_research(disabled_evaluation),
+        Err(SolverError::InvalidState(
+            "average-sampling research coverage requires ordinary evaluation"
+        ))
+    ));
+}
+
+#[cfg(feature = "research-average-sampling")]
+#[test]
+fn average_sampling_research_legacy_config_disables_coverage() {
+    let config: AverageSamplingResearchConfig = serde_json::from_value(serde_json::json!({
+        "variant": "uniform-one",
+        "sweeps": 1,
+        "threads": 1,
+        "histories": [],
+        "evaluation_samples": 0,
+        "evaluation_seeds": []
+    }))
+    .unwrap();
+    assert_eq!(config.coverage_samples, 0);
+    assert!(config.coverage_prefixes.is_empty());
 }
 
 #[test]
@@ -4580,3 +5399,973 @@ fn strategy_mass_differs_across_buckets_after_a_short_solve() {
         assert_eq!(probs, mass_probs);
     }
 }
+
+// Same real, three-seat, shallow-stack Holdem shape as the street-recall
+// smoke tests above; small buckets keep constructor/restore checks cheap.
+pub(super) fn initialization_holdem_fixture() -> (
+    crate::holdem::HoldemGame<crate::abstraction::FeatureHashAbstraction>,
+    DealSampler,
+    SolverConfig,
+) {
+    use crate::abstraction::{FeatureHashAbstraction, FeatureHashParams};
+    use crate::config::{
+        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RakeConfig,
+        SeatConfig, UtilityConfig,
+    };
+    let game_config = MultiwayConfig {
+        seats: (0..3)
+            .map(|_| SeatConfig {
+                name: None,
+                stack_bb: 6.0,
+                range: String::new(),
+                betting: None,
+            })
+            .collect(),
+        button: crate::types::SeatId(0),
+        blinds: BlindConfig::default(),
+        ante: AnteConfig::None,
+        betting: BettingConfig::default(),
+        forced_bets: None,
+        abstraction: AbstractionConfig {
+            flop_buckets: 4,
+            turn_buckets: 4,
+            river_buckets: 4,
+            recall: RecallMode::Street,
+            ..AbstractionConfig::default()
+        },
+    };
+    let game = crate::holdem::HoldemGame::new(
+        &game_config,
+        &UtilityConfig::ChipEv,
+        &RakeConfig::None,
+        FeatureHashAbstraction::new(FeatureHashParams {
+            flop_buckets: 4,
+            turn_buckets: 4,
+            river_buckets: 4,
+        })
+        .unwrap(),
+    )
+    .unwrap();
+    let sampler = game.deal_sampler().unwrap();
+    let config = SolverConfig {
+        seed: 4,
+        max_memory_bytes: 1 << 24,
+        max_traversal_depth: 64,
+        sweep_batch: 2,
+        ..SolverConfig::default()
+    };
+    (game, sampler, config)
+}
+
+fn assert_initialization_storage_equal<G: ExternalSamplingGame>(
+    actual: &MultiwaySolver<G>,
+    expected: &MultiwaySolver<G>,
+) {
+    assert_eq!(actual.snapshot_state(), expected.snapshot_state());
+    assert_eq!(
+        actual.policy_arena_allocation(),
+        expected.policy_arena_allocation()
+    );
+    let actual = actual.dense.as_ref().unwrap();
+    let expected = expected.dense.as_ref().unwrap();
+    assert_eq!(actual.tree, expected.tree);
+    assert!(actual.arena.pages_committed());
+    assert_eq!(actual.arena.regrets, expected.arena.regrets);
+    assert_eq!(actual.arena.strategy_sum, expected.arena.strategy_sum);
+    assert_eq!(actual.arena.touched_count(), expected.arena.touched_count());
+    for node in 0..actual.tree.nodes.len() as NodeId {
+        let buckets = actual.arena.bucket_count_of(node);
+        assert_eq!(buckets, expected.arena.bucket_count_of(node));
+        for bucket in 0..buckets {
+            let column = actual.arena.column_id(node, bucket).unwrap();
+            assert_eq!(column, expected.arena.column_id(node, bucket).unwrap());
+            assert_eq!(
+                actual.arena.slot_range(node, bucket).unwrap(),
+                expected.arena.slot_range(node, bucket).unwrap()
+            );
+            assert_eq!(
+                actual.arena.is_touched(column),
+                expected.arena.is_touched(column)
+            );
+        }
+    }
+}
+
+fn initialization_error<T>(result: Result<T, SolverError>) -> SolverError {
+    match result {
+        Ok(_) => panic!("expected initialization to reject this configuration"),
+        Err(error) => error,
+    }
+}
+
+#[test]
+fn parallel_initialization_holdem_matches_serial_tree_arena_and_checkpoint() {
+    let (game, sampler, config) = initialization_holdem_fixture();
+    let mut serial = MultiwaySolver::new_preallocated(game, sampler, config).unwrap();
+    let initial_state = serial.snapshot_state();
+    let allocation = serial.policy_arena_allocation().unwrap();
+    assert!(allocation.pages_committed);
+    for street in [Street::Preflop, Street::Flop, Street::Turn, Street::River] {
+        assert!(
+            serial
+                .dense
+                .as_ref()
+                .unwrap()
+                .tree
+                .nodes
+                .iter()
+                .any(|node| node.street == street)
+        );
+    }
+    serial.run_sweeps_with_threads(12, 2).unwrap();
+    let directory = tempfile::tempdir().unwrap();
+    let reference_path = directory.path().join("serial.mwckpt");
+    crate::checkpoint::MultiwayCheckpoint::capture(&serial)
+        .write_atomic(&reference_path)
+        .unwrap();
+    let expected_bytes = std::fs::read(reference_path).unwrap();
+
+    for threads in [1, 2, 8, 16] {
+        let (game, sampler, config) = initialization_holdem_fixture();
+        let mut parallel =
+            MultiwaySolver::new_preallocated_with_threads(game, sampler, config, threads).unwrap();
+        assert_eq!(parallel.snapshot_state(), initial_state);
+        assert_eq!(parallel.policy_arena_allocation().unwrap(), allocation);
+        parallel.run_sweeps_with_threads(12, 2).unwrap();
+        assert_initialization_storage_equal(&parallel, &serial);
+        let path = directory.path().join(format!("parallel-{threads}.mwckpt"));
+        crate::checkpoint::MultiwayCheckpoint::capture(&parallel)
+            .write_atomic(&path)
+            .unwrap();
+        assert_eq!(std::fs::read(path).unwrap(), expected_bytes);
+    }
+}
+
+#[test]
+fn parallel_initialization_resume_adopts_memory_and_preserves_continuation() {
+    let (game, sampler, config) = initialization_holdem_fixture();
+    let mut original = MultiwaySolver::new_preallocated(game, sampler, config).unwrap();
+    original.run_sweeps_with_threads(8, 2).unwrap();
+    let directory = tempfile::tempdir().unwrap();
+    let original_path = directory.path().join("original.mwckpt");
+    crate::checkpoint::MultiwayCheckpoint::capture(&original)
+        .write_atomic(&original_path)
+        .unwrap();
+    let state = crate::checkpoint::MultiwayCheckpoint::load(
+        &original_path,
+        original.configuration_fingerprint(),
+        original.abstraction_fingerprint(),
+    )
+    .unwrap()
+    .state;
+    let current_config = SolverConfig {
+        max_memory_bytes: original.policy_arena_allocation().unwrap().bytes,
+        ..config
+    };
+    assert!(current_config.max_memory_bytes < state.config.max_memory_bytes);
+    let mut expected_restored = state.clone();
+    expected_restored.config.max_memory_bytes = current_config.max_memory_bytes;
+    let (game, sampler, _) = initialization_holdem_fixture();
+    let mut serial = MultiwaySolver::from_state_with_config_preallocated(
+        game,
+        sampler,
+        state.clone(),
+        current_config,
+    )
+    .unwrap();
+    assert_eq!(serial.snapshot_state(), expected_restored);
+    serial.run_sweeps_with_threads(4, 2).unwrap();
+    original.run_sweeps_with_threads(4, 2).unwrap();
+    let mut uninterrupted = original.snapshot_state();
+    uninterrupted.config.max_memory_bytes = current_config.max_memory_bytes;
+    assert_eq!(serial.snapshot_state(), uninterrupted);
+    let serial_path = directory.path().join("serial-resumed.mwckpt");
+    crate::checkpoint::MultiwayCheckpoint::capture(&serial)
+        .write_atomic(&serial_path)
+        .unwrap();
+    let expected_bytes = std::fs::read(serial_path).unwrap();
+
+    for threads in [1, 2, 8, 16] {
+        let (game, sampler, _) = initialization_holdem_fixture();
+        let mut resumed = MultiwaySolver::from_state_with_config_preallocated_with_threads(
+            game,
+            sampler,
+            state.clone(),
+            current_config,
+            threads,
+        )
+        .unwrap();
+        assert_eq!(resumed.snapshot_state(), expected_restored);
+        assert!(resumed.policy_arena_allocation().unwrap().pages_committed);
+        resumed.run_sweeps_with_threads(4, 2).unwrap();
+        assert_initialization_storage_equal(&resumed, &serial);
+        let path = directory.path().join(format!("resumed-{threads}.mwckpt"));
+        crate::checkpoint::MultiwayCheckpoint::capture(&resumed)
+            .write_atomic(&path)
+            .unwrap();
+        assert_eq!(std::fs::read(path).unwrap(), expected_bytes);
+    }
+}
+
+#[test]
+fn parallel_initialization_preserves_exact_memory_and_depth_errors() {
+    let (game, _, config) = initialization_holdem_fixture();
+    let census = tree::preflight_arena_with_limits_and_depth(
+        &game,
+        tree::MAX_TREE_NODES,
+        u64::MAX,
+        config.max_traversal_depth,
+    )
+    .unwrap();
+    let exact_bytes = census.estimated_arena_bytes;
+    for threads in [1, 2, 8, 16] {
+        let (game, sampler, config) = initialization_holdem_fixture();
+        let exact = MultiwaySolver::new_preallocated_with_threads(
+            game,
+            sampler,
+            SolverConfig {
+                max_memory_bytes: exact_bytes,
+                ..config
+            },
+            threads,
+        )
+        .unwrap();
+        let allocation = exact.policy_arena_allocation().unwrap();
+        assert_eq!(allocation.bytes, exact_bytes);
+        assert_eq!(allocation.nodes as usize, census.node_count);
+        assert!(allocation.pages_committed);
+        for (max_memory_bytes, max_traversal_depth) in
+            [(exact_bytes - 1, 64), (exact_bytes, 1), (1, 1)]
+        {
+            let limited = SolverConfig {
+                max_memory_bytes,
+                max_traversal_depth,
+                ..config
+            };
+            let (game, sampler, _) = initialization_holdem_fixture();
+            let expected =
+                initialization_error(MultiwaySolver::new_preallocated(game, sampler, limited));
+            if max_memory_bytes == exact_bytes {
+                assert!(matches!(
+                    expected,
+                    SolverError::Tree(TreeError::DepthLimit { limit: 1 })
+                ));
+            } else {
+                assert!(matches!(
+                    expected,
+                    SolverError::Tree(TreeError::MemoryLimit { .. })
+                ));
+            }
+            let (game, sampler, _) = initialization_holdem_fixture();
+            let actual = initialization_error(MultiwaySolver::new_preallocated_with_threads(
+                game, sampler, limited, threads,
+            ));
+            assert_eq!(format!("{actual:?}"), format!("{expected:?}"));
+        }
+    }
+}
+
+#[test]
+fn parallel_initialization_rejects_zero_threads_and_insufficient_resume_memory() {
+    let (game, sampler, config) = initialization_holdem_fixture();
+    assert!(matches!(
+        MultiwaySolver::new_preallocated_with_threads(game, sampler, config, 0),
+        Err(SolverError::ZeroThreads)
+    ));
+    let (game, sampler, config) = initialization_holdem_fixture();
+    let original = MultiwaySolver::new_preallocated(game, sampler, config).unwrap();
+    let state = original.snapshot_state();
+    let (game, sampler, _) = initialization_holdem_fixture();
+    assert!(matches!(
+        MultiwaySolver::from_state_with_config_preallocated_with_threads(
+            game,
+            sampler,
+            state.clone(),
+            config,
+            0,
+        ),
+        Err(SolverError::ZeroThreads)
+    ));
+    let limited = SolverConfig {
+        max_memory_bytes: original.policy_arena_allocation().unwrap().bytes - 1,
+        ..config
+    };
+    let (game, sampler, _) = initialization_holdem_fixture();
+    let expected = initialization_error(MultiwaySolver::from_state_with_config_preallocated(
+        game,
+        sampler,
+        state.clone(),
+        limited,
+    ));
+    assert!(matches!(
+        expected,
+        SolverError::Tree(TreeError::MemoryLimit { .. })
+    ));
+    for threads in [1, 2, 8, 16] {
+        let (game, sampler, _) = initialization_holdem_fixture();
+        let actual = initialization_error(
+            MultiwaySolver::from_state_with_config_preallocated_with_threads(
+                game,
+                sampler,
+                state.clone(),
+                limited,
+                threads,
+            ),
+        );
+        assert_eq!(format!("{actual:?}"), format!("{expected:?}"));
+    }
+}
+
+#[test]
+fn parallel_initialization_uses_requested_pool_instead_of_ambient_pool() {
+    use std::sync::Arc;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    struct ObservedGame<G> {
+        inner: G,
+        observed_pool_sizes: Arc<AtomicUsize>,
+    }
+
+    impl<G: ExternalSamplingGame> ExternalSamplingGame for ObservedGame<G> {
+        type State = G::State;
+        type Actions = G::Actions;
+
+        fn num_players(&self) -> usize {
+            self.inner.num_players()
+        }
+
+        fn root_state(&self) -> Self::State {
+            self.inner.root_state()
+        }
+
+        fn actor(&self, state: &Self::State) -> Option<usize> {
+            self.inner.actor(state)
+        }
+
+        fn node_actions(&self, state: &Self::State) -> Self::Actions {
+            self.observed_pool_sizes
+                .fetch_or(1 << rayon::current_num_threads(), Ordering::Relaxed);
+            self.inner.node_actions(state)
+        }
+
+        fn num_actions_of(&self, actions: &Self::Actions) -> usize {
+            self.inner.num_actions_of(actions)
+        }
+
+        fn next_state_with(
+            &self,
+            state: &Self::State,
+            actions: &Self::Actions,
+            action_index: usize,
+        ) -> Self::State {
+            self.inner.next_state_with(state, actions, action_index)
+        }
+
+        fn write_action_label(&self, actions: &Self::Actions, index: usize, out: &mut String) {
+            self.inner.write_action_label(actions, index, out);
+        }
+
+        fn bucket(&self, state: &Self::State, world: &SampledWorld, actor: usize) -> PrivateInfo {
+            self.inner.bucket(state, world, actor)
+        }
+
+        fn terminal_utilities(
+            &self,
+            state: &Self::State,
+            world: &SampledWorld,
+            utilities: &mut [f64],
+        ) {
+            self.inner.terminal_utilities(state, world, utilities);
+        }
+
+        fn recall_mode(&self) -> RecallMode {
+            self.inner.recall_mode()
+        }
+
+        fn bucket_count(&self, street: Street, active_opponents: u8) -> u32 {
+            self.inner.bucket_count(street, active_opponents)
+        }
+
+        fn dense_node_context(&self, state: &Self::State) -> DenseNodeContext {
+            self.inner.dense_node_context(state)
+        }
+    }
+
+    let ambient = rayon::ThreadPoolBuilder::new()
+        .num_threads(8)
+        .build()
+        .unwrap();
+    ambient.install(|| {
+        for requested_threads in [1, 2] {
+            let seen = Arc::new(AtomicUsize::new(0));
+            let (inner, sampler, config) = initialization_holdem_fixture();
+            let game = ObservedGame {
+                inner,
+                observed_pool_sizes: Arc::clone(&seen),
+            };
+            let solver = MultiwaySolver::new_preallocated_with_threads(
+                game,
+                sampler,
+                config,
+                requested_threads,
+            )
+            .unwrap();
+            assert_eq!(seen.load(Ordering::Relaxed), 1 << requested_threads);
+            assert_eq!(rayon::current_num_threads(), 8);
+            let state = solver.snapshot_state();
+            seen.store(0, Ordering::Relaxed);
+            let (inner, sampler, _) = initialization_holdem_fixture();
+            let game = ObservedGame {
+                inner,
+                observed_pool_sizes: Arc::clone(&seen),
+            };
+            let resumed = MultiwaySolver::from_state_with_config_preallocated_with_threads(
+                game,
+                sampler,
+                state.clone(),
+                config,
+                requested_threads,
+            )
+            .unwrap();
+            assert_eq!(seen.load(Ordering::Relaxed), 1 << requested_threads);
+            assert_eq!(rayon::current_num_threads(), 8);
+            assert_eq!(resumed.snapshot_state(), state);
+        }
+    });
+}
+
+#[test]
+fn conditional_root_matches_baseline_and_is_deterministic_read_only() {
+    let mut solver = prefix_solver(992);
+    solver.run_sweeps(4).unwrap();
+    for column in solver.policies.values_mut() {
+        column.strategy_sum = vec![3.0, 7.0];
+        column.regrets = vec![4.0, 1.0];
+    }
+    let before = solver.snapshot_state();
+    for variant in [
+        ProfileVariant::default(),
+        ProfileVariant {
+            use_current_strategy: true,
+            purify_threshold: 0.0,
+        },
+        ProfileVariant {
+            use_current_strategy: false,
+            purify_threshold: 0.4,
+        },
+    ] {
+        let paths = vec![vec![], vec![0], vec![1]];
+        let one = solver
+            .evaluate_profile_conditioned(4097, 775, variant, 1, &paths)
+            .unwrap();
+        let baseline = solver
+            .evaluate_profile_coverage(4097, 775, variant, 1, &[])
+            .unwrap();
+        assert_eq!(
+            one.total_deal_attempts,
+            baseline.evaluation.total_deal_attempts
+        );
+        let root = &one.prefixes[0];
+        assert_eq!(root.reach_probability.mean, 1.0);
+        assert_eq!(root.reach_probability.stderr, 0.0);
+        assert!((root.effective_sample_size - 4097.0).abs() < 1e-10);
+        for (ours, ordinary) in root.seats.iter().zip(baseline.evaluation.seats) {
+            let ours = ours.unwrap();
+            assert_eq!(ours.mean, ordinary.mean);
+            assert!((ours.stderr - ordinary.stderr).abs() < 1e-14);
+        }
+        assert_eq!(
+            root.coverage_by_street[0].positive_weight_decision_visits,
+            8194
+        );
+        for threads in [2, 8] {
+            assert_eq!(
+                one,
+                solver
+                    .evaluate_profile_conditioned(4097, 775, variant, threads, &paths)
+                    .unwrap()
+            );
+        }
+        let reversed = solver
+            .evaluate_profile_conditioned(4097, 775, variant, 2, &[vec![1], vec![], vec![0]])
+            .unwrap();
+        assert_eq!(one.prefixes[0], reversed.prefixes[1]);
+        assert_eq!(one.prefixes[1], reversed.prefixes[2]);
+    }
+    assert_eq!(solver.snapshot_state(), before);
+}
+
+#[test]
+fn conditional_rare_and_zero_reach_are_distinct_and_exclude_prefix_decisions() {
+    let mut solver = prefix_solver(993);
+    solver.run_sweeps(4).unwrap();
+    for (key, column) in &mut solver.policies {
+        column.strategy_sum = if key.history == HistoryKey::ROOT {
+            vec![1e-9, 1.0]
+        } else {
+            vec![1.0, 0.0]
+        };
+        column.regrets = vec![0.0, 1.0];
+    }
+    let paths = [vec![0]];
+    let rare = solver
+        .evaluate_profile_conditioned(257, 778, ProfileVariant::default(), 2, &paths)
+        .unwrap();
+    let prefix = &rare.prefixes[0];
+    assert_eq!(prefix.positive_weight_samples, 257);
+    assert_eq!(prefix.reach_probability.mean, f64::from(1e-9_f32));
+    assert_eq!(prefix.seats[0].unwrap().mean, 1.0);
+    assert_eq!(
+        prefix.coverage_by_street[0].positive_weight_decision_visits,
+        257
+    );
+    assert_eq!(prefix.coverage_by_seat[1][0].average_fraction, None);
+    assert_eq!(
+        prefix.coverage_by_seat[0][0].average_fraction.unwrap().mean,
+        1.0
+    );
+    let zero = solver
+        .evaluate_profile_conditioned(
+            257,
+            778,
+            ProfileVariant {
+                use_current_strategy: true,
+                purify_threshold: 0.0,
+            },
+            2,
+            &paths,
+        )
+        .unwrap();
+    let prefix = &zero.prefixes[0];
+    assert_eq!(prefix.positive_weight_samples, 0);
+    assert_eq!(prefix.effective_sample_size, 0.0);
+    assert!(prefix.seats.iter().all(Option::is_none));
+    assert_eq!(prefix.coverage_by_street[0].trajectory_probability, None);
+    assert_eq!(prefix.coverage_by_street[0].average_fraction, None);
+}
+
+#[test]
+fn conditional_street_sources_and_path_validation() {
+    let mut solver = four_street_solver(994);
+    solver.run_sweeps(1).unwrap();
+    solver.policies.retain(|key, _| key.street != 1);
+    for (key, column) in &mut solver.policies {
+        column
+            .strategy_sum
+            .fill(if key.street == 2 { 0.0 } else { 1.0 });
+    }
+    let report = solver
+        .evaluate_profile_conditioned(
+            17,
+            774,
+            ProfileVariant::default(),
+            2,
+            &[vec![0], vec![0, 0, 0]],
+        )
+        .unwrap();
+    let flop = &report.prefixes[0];
+    assert_eq!(flop.coverage_by_street[0].average_fraction, None);
+    assert_eq!(
+        flop.coverage_by_street[1]
+            .uniform_fallback_fraction
+            .unwrap()
+            .mean,
+        1.0
+    );
+    assert_eq!(
+        flop.coverage_by_street[2]
+            .regret_fallback_fraction
+            .unwrap()
+            .mean,
+        1.0
+    );
+    assert_eq!(
+        flop.coverage_by_street[3].average_fraction.unwrap().mean,
+        1.0
+    );
+    let river = &report.prefixes[1];
+    assert_eq!(river.prefix_uniform_fallback_fraction.unwrap().mean, 1.0);
+    assert_eq!(river.prefix_regret_fallback_fraction.unwrap().mean, 1.0);
+    assert_eq!(river.prefix_current_fraction.unwrap().mean, 0.0);
+
+    assert_eq!(
+        river.coverage_by_street[2]
+            .trajectory_probability
+            .unwrap()
+            .mean,
+        0.0
+    );
+    assert_eq!(
+        river.coverage_by_street[3]
+            .trajectory_probability
+            .unwrap()
+            .mean,
+        1.0
+    );
+    for paths in [
+        vec![],
+        vec![vec![], vec![]],
+        vec![vec![1]],
+        vec![vec![0; 4]],
+        vec![vec![0; 5]],
+        vec![vec![0]; 65],
+    ] {
+        assert!(
+            solver
+                .evaluate_profile_conditioned(2, 0, ProfileVariant::default(), 1, &paths)
+                .is_err()
+        );
+    }
+    for (samples, threads) in [(0, 1), (1, 1), (2, 0)] {
+        assert!(
+            solver
+                .evaluate_profile_conditioned(
+                    samples,
+                    0,
+                    ProfileVariant::default(),
+                    threads,
+                    &[vec![]]
+                )
+                .is_err()
+        );
+    }
+    assert!(
+        solver
+            .evaluate_profile_conditioned(
+                2,
+                0,
+                ProfileVariant {
+                    purify_threshold: f32::NAN,
+                    use_current_strategy: false
+                },
+                1,
+                &[vec![]]
+            )
+            .is_err()
+    );
+}
+
+#[derive(Clone, Copy)]
+struct ConditionalWorldGame;
+
+impl ExternalSamplingGame for ConditionalWorldGame {
+    type State = PrefixState;
+    type Actions = PrefixState;
+    fn num_players(&self) -> usize {
+        2
+    }
+    fn root_state(&self) -> Self::State {
+        PrefixImportanceGame.root_state()
+    }
+    fn actor(&self, state: &Self::State) -> Option<usize> {
+        PrefixImportanceGame.actor(state)
+    }
+    fn node_actions(&self, state: &Self::State) -> Self::Actions {
+        *state
+    }
+    fn num_actions_of(&self, actions: &Self::Actions) -> usize {
+        PrefixImportanceGame.num_actions_of(actions)
+    }
+    fn next_state_with(
+        &self,
+        state: &Self::State,
+        actions: &Self::Actions,
+        index: usize,
+    ) -> Self::State {
+        PrefixImportanceGame.next_state_with(state, actions, index)
+    }
+    fn write_action_label(&self, actions: &Self::Actions, index: usize, out: &mut String) {
+        PrefixImportanceGame.write_action_label(actions, index, out);
+    }
+    fn bucket(&self, state: &Self::State, world: &SampledWorld, actor: usize) -> PrivateInfo {
+        let mut private = PrefixImportanceGame.bucket(state, world, actor);
+        private.bucket_path[0] = (world.hole_combo(0) % 2) as u32;
+        private
+    }
+    fn terminal_utilities(&self, _: &Self::State, world: &SampledWorld, utilities: &mut [f64]) {
+        utilities[0] = if world.hole_combo(0).is_multiple_of(2) {
+            1.0
+        } else {
+            5.0
+        };
+        utilities[1] = -utilities[0];
+    }
+}
+
+#[test]
+fn conditional_correlated_deals_match_independent_weighted_oracle() {
+    let config = prefix_solver(996).config;
+    let mut solver = MultiwaySolver::new(
+        ConditionalWorldGame,
+        DealSampler::new(vec![Range::full(); 2]).unwrap(),
+        config,
+    )
+    .unwrap();
+    solver.run_sweeps(8).unwrap();
+    for (key, column) in &mut solver.policies {
+        column.strategy_sum = if key.bucket_path[0] == 0 {
+            vec![1.0, 3.0]
+        } else {
+            vec![3.0, 1.0]
+        };
+    }
+    let n = 4097;
+    let report = solver
+        .evaluate_profile_conditioned(n, 779, ProfileVariant::default(), 8, &[vec![0]])
+        .unwrap();
+    let mut weighted = Vec::new();
+    let mut weights = Vec::new();
+    for id in 0..n {
+        let world = solver
+            .sampler
+            .sample_counted(&mut evaluation_deal_rng(779, id))
+            .unwrap()
+            .world;
+        let even = world.hole_combo(0).is_multiple_of(2);
+        let w = if even { 0.25 } else { 0.75 };
+        weights.push(w);
+        weighted.push(w * if even { 1.0 } else { 5.0 });
+    }
+    let den = weights.iter().sum::<f64>();
+    let mean = weighted.iter().sum::<f64>() / den;
+    let residual = weighted
+        .iter()
+        .zip(&weights)
+        .map(|(x, w)| (x - mean * w).powi(2))
+        .sum::<f64>();
+    let stderr = (n as f64 * residual / (n - 1) as f64).sqrt() / den;
+    let actual = report.prefixes[0].seats[0].unwrap();
+    assert!((actual.mean - mean).abs() < 1e-12);
+    assert!((actual.stderr - stderr).abs() < 1e-12);
+    assert!((actual.mean - 4.0).abs() < 0.1);
+    assert!(
+        (report.prefixes[0].effective_sample_size
+            - den.powi(2) / weights.iter().map(|w| w * w).sum::<f64>())
+        .abs()
+            < 1e-9
+    );
+}
+
+#[test]
+fn zero_target_exploration_touches_dense_column_without_regret_support() {
+    // Reuse the win/pass payoffs (1/0), so an omitted importance correction
+    // would produce nonzero descendant regrets. DenseToyGame's descendant
+    // actions have equal payoffs and would not detect that regression.
+    struct DensePrefixImportanceGame;
+
+    impl ExternalSamplingGame for DensePrefixImportanceGame {
+        type State = PrefixState;
+        type Actions = PrefixState;
+
+        fn num_players(&self) -> usize {
+            PrefixImportanceGame.num_players()
+        }
+        fn root_state(&self) -> Self::State {
+            PrefixImportanceGame.root_state()
+        }
+        fn actor(&self, state: &Self::State) -> Option<usize> {
+            PrefixImportanceGame.actor(state)
+        }
+        fn node_actions(&self, state: &Self::State) -> Self::Actions {
+            PrefixImportanceGame.node_actions(state)
+        }
+        fn num_actions_of(&self, actions: &Self::Actions) -> usize {
+            PrefixImportanceGame.num_actions_of(actions)
+        }
+        fn next_state_with(
+            &self,
+            state: &Self::State,
+            actions: &Self::Actions,
+            action_index: usize,
+        ) -> Self::State {
+            PrefixImportanceGame.next_state_with(state, actions, action_index)
+        }
+        fn write_action_label(&self, actions: &Self::Actions, index: usize, out: &mut String) {
+            PrefixImportanceGame.write_action_label(actions, index, out);
+        }
+        fn bucket(&self, state: &Self::State, world: &SampledWorld, actor: usize) -> PrivateInfo {
+            PrefixImportanceGame.bucket(state, world, actor)
+        }
+        fn terminal_utilities(
+            &self,
+            state: &Self::State,
+            world: &SampledWorld,
+            utilities: &mut [f64],
+        ) {
+            PrefixImportanceGame.terminal_utilities(state, world, utilities);
+        }
+        fn recall_mode(&self) -> RecallMode {
+            RecallMode::Street
+        }
+        fn bucket_count(&self, _street: Street, _active_opponents: u8) -> u32 {
+            1
+        }
+        fn dense_node_context(&self, _state: &Self::State) -> DenseNodeContext {
+            DenseNodeContext {
+                street: Street::Preflop,
+                active_opponents: 1,
+                bucket_active_opponents: 1,
+            }
+        }
+        fn bucket_for_combo(
+            &self,
+            _state: &Self::State,
+            _world: &SampledWorld,
+            _actor: usize,
+            _combo: usize,
+        ) -> BucketId {
+            0
+        }
+        fn terminal_utilities_for_combos(
+            &self,
+            state: &Self::State,
+            world: &SampledWorld,
+            traverser: usize,
+            combos: &[usize],
+            out: &mut Vec<f64>,
+        ) {
+            let mut utilities = [0.0; 2];
+            self.terminal_utilities(state, world, &mut utilities);
+            out.clear();
+            out.resize(combos.len(), utilities[traverser]);
+        }
+    }
+
+    let combos = [("As", "Ah"), ("Ks", "Kh")]
+        .map(|(first, second)| cards::combo_index(first.parse().unwrap(), second.parse().unwrap()));
+    let board = ["2c", "3d", "4h", "5s", "6c"].map(|card| card.parse().unwrap());
+    let world = SampledWorld::new(combos.to_vec(), board).unwrap();
+    let ranges = combos
+        .iter()
+        .map(|&combo| {
+            let mut range = Range::default();
+            range.set_weight(combo, 1.0);
+            range
+        })
+        .collect();
+    let sampler = DealSampler::new(ranges).unwrap();
+    let action_rng = ChaCha20Rng::seed_from_u64(73);
+    // With epsilon=1 the proposal stays exactly [1/2, 1/2] for both target
+    // policies below. The same draw must select the same public branch.
+    let (sampled_action, q) = sample_exploratory_action(&[0.5, 0.5], 1.0, &mut action_rng.clone());
+    assert_eq!(q, 0.5);
+
+    for traverser_vector in [false, true] {
+        let config = SolverConfig {
+            exploration_epsilon: 1.0,
+            traverser_vector,
+            discount_until: 0,
+            max_memory_bytes: 1 << 20,
+            max_traversal_depth: 16,
+            ..SolverConfig::default()
+        };
+        let mut solver =
+            MultiwaySolver::new(DensePrefixImportanceGame, sampler.clone(), config).unwrap();
+        let history = HistoryKey::ROOT.child(1, sampled_action);
+        let dense = solver.dense.as_ref().unwrap();
+        let node_id = dense.tree.by_history[&history];
+        let column = dense.arena.column_id(node_id, 0).unwrap();
+        let key = dense.info_key_for(node_id, 0);
+        assert!(solver.evaluation_policy(key).is_none());
+
+        let mut zero_target_delta = None;
+        for target_probability in [1.0, 0.0] {
+            let dense = solver.dense.as_mut().unwrap();
+            let root_range = dense.arena.slot_range(0, 0).unwrap();
+            let mut root_regrets = [1.0_f32; 2];
+            root_regrets[sampled_action] = target_probability as f32;
+            root_regrets[1 - sampled_action] = (1.0 - target_probability) as f32;
+            dense.arena.regrets[root_range].copy_from_slice(&root_regrets);
+            let mut rng = action_rng.clone();
+            let (delta, values) = if traverser_vector {
+                let mut worker = VectorTraversalWorker::new(
+                    &solver.game,
+                    dense,
+                    config,
+                    vec![combos[0]],
+                    vec![1.0],
+                )
+                .unwrap();
+                let values = worker
+                    .traverse(
+                        solver.game.root_state(),
+                        0,
+                        &world,
+                        0,
+                        &[0],
+                        1.0,
+                        &mut rng,
+                        0,
+                    )
+                    .unwrap();
+                (worker.finish(0, 0, 0), values)
+            } else {
+                let mut worker = DenseTraversalWorker::new(&solver.game, dense, config, 1.0);
+                let value = worker
+                    .traverse(
+                        solver.game.root_state(),
+                        0,
+                        &world,
+                        0,
+                        &mut [1.0; 2],
+                        1.0,
+                        &mut rng,
+                        0,
+                    )
+                    .unwrap();
+                (worker.finish(0, 0, 0), vec![value])
+            };
+            assert_eq!(delta.terminal_evaluations, 2);
+            assert_eq!(values, vec![target_probability]);
+            assert_eq!(delta.events.len(), 1);
+            let DenseEvent::AddRegret {
+                column: actual_column,
+                values,
+            } = &delta.events[0]
+            else {
+                panic!("regret traversal must not write average-strategy mass")
+            };
+            assert_eq!(*actual_column, column);
+            // Hero's unweighted differences are [+1/2, -1/2]. The positive
+            // control has rho=2; the zero-target branch has rho=0.
+            assert_eq!(values, &vec![target_probability, -target_probability]);
+            if target_probability == 0.0 {
+                zero_target_delta = Some(delta);
+            }
+        }
+
+        assert!(solver.evaluation_policy(key).is_none());
+        // Isolate this worker's regret-only event. The empty second-seat
+        // delta satisfies the ordered merge contract without adding an
+        // independent average pass that could also touch the descendant.
+        solver
+            .merge_sweep_dense(vec![
+                zero_target_delta.unwrap(),
+                DenseTraversalDelta {
+                    sample_id: 1,
+                    traverser: 1,
+                    deal_attempts: 0,
+                    terminal_evaluations: 0,
+                    hand_updates: 0,
+                    events: Vec::new(),
+                },
+            ])
+            .unwrap();
+        let dense = solver.dense.as_ref().unwrap();
+        assert!(dense.arena.is_touched(column));
+        assert_eq!(dense.arena.touched_count(), 1);
+        let owned = solver.policy(key).unwrap();
+        assert_eq!(owned.regrets, &[0.0, 0.0]);
+        assert_eq!(owned.strategy_sum, &[0.0, 0.0]);
+        let stored = solver.evaluation_policy(key).unwrap();
+        let (strategy, source) = stored.strategy(false).unwrap();
+        assert_eq!(source, CandidatePolicySource::RegretFallback);
+        assert_eq!(strategy, vec![0.5, 0.5]);
+    }
+}
+
+#[path = "snapshot_tests.rs"]
+mod snapshot_tests;
+
+#[path = "drift_tests.rs"]
+mod drift_tests;

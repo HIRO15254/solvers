@@ -61,6 +61,88 @@ regret-greedyとtrainedの2候補を比較する場合は、候補選択を考�
 仮定せず、共通乱数による分散削減をすべてのgameで保証するものではない。
 `max_sweeps`と`max_time`は安全budgetであり、到達自体は収束を意味しない。
 
+profile評価はbaselineの判断訪問について、seat別・street別に使用した戦略の出所も
+数える。平均質量が正の`averageStrategyVisits`、currentを明示指定した
+`currentStrategyVisits`、平均質量0からregret matchingへ代替した
+`regretFallbackVisits`、未保存columnの`uniformFallbackVisits`を区別する。
+従来の`storedStrategyVisits`は前3者の合計で、平均戦略の学習済み率ではない。
+各`...ByStreet`は`preflop`/`flop`/`turn`/`river`内訳である。
+これらは訪問回数であり、unique infoset数・3bet以降全体の網羅率・収束の証明ではない。
+未訪問の深いbranchについては、この集計だけで品質を判断しない。
+不正なpolicy値（非有限値、負の平均質量、正規化のoverflow）は評価errorにする。
+研究用checkpoint監査が提供するforced-prefixの条件付き評価は別診断とする。
+自己正規化された到達重み、ESS、対局単位のdelta標準誤差と共に報告し、
+通常のbaseline訪問数・停止評価・Nash収束判定には代入しない。v1 TOMLと
+checkpoint/artifact identityはこの診断の追加によって変更しない。
+Holdemの研究用preflop配札proposalを使う診断は、元rangeの確率と実proposalの
+確率の比を補正し、未知の正規化定数を条件付き比で相殺する。出力の相対重みを
+root到達確率と呼ばず、学習時のrange・配札・checkpoint identityは変更しない。
+研究exampleの通常fresh固定sweep監査とraw policy support出力は既存driverの診断に限定する。
+未保存列、保存済みゼロ/非正/正regret、平均質量を区別し、touched列数を学習更新数や
+収束保証として扱わない。v1のrun停止・保存契約に新しいmodeを追加するものではない。
+研究用のone-step endpoint逸脱診断は、rootを含むPreflop/Postflopの判断を対象とし、
+独立fit worldでown InfoKey別の行動を固定し、
+held-out worldで条件付き利得と誤差を測る。指定判断の最初の行動だけを変更し、以後は
+本人もbaselineに従う。prefix重みをcandidate行動確率で変えず、fitで未採用のkeyも
+baselineのまま分母へ含める。利得と採用keyの重みcoverage、ESSを併記し、少ない評価範囲や
+正の利得だけから全体のexploitability・Nash保証を主張しない。通常の停止判定へは代入しない。
+Preflop判断ではその直前までの部分prefix、Postflop判断では完全なPreflop trunkを
+配札proposalへ組み込む。rootは空prefixとする。endpoint自身の行動や後続行動を
+proposalへ含めない。既存のbaseline-only `preflop-proposal` 条件付き診断は引き続き
+Postflop判断だけを受け付ける。
+
+研究用の `opponents-prefix` endpoint診断は別targetとして出力する。Preflop判断に限定し、
+chanceと相手全seatのprefix確率で重み付けし、判断者本人の過去の行動確率を除く。
+fold済みseatのカードも配札・衝突検査に残す。全path/endpointで169 classへの正確なmappingと、
+class内の本人prefix確率の一定性を検証し、未対応のabstractionやPostflopは明示拒否する。
+本人の到達確率が0のkeyもsuffixを評価し、未採用keyを含む全target重みを分母へ残す。
+既存 `actual-prefix` のfit・出力・既定動作は維持する。新targetのfit/held-outは独立し、
+異なるtargetの集計利得・相対重み平均を直接順位付けしない。自己正規化した診断であり、
+不偏なCFR更新、root到達確率、通常の停止評価、Nash保証へは代入しない。
+監査exampleで複数endpointを指定した場合も、同じ復元stateを共有するだけで、各fit/held-outを
+独立に実施する。複数判断を同時に変更した戦略の利得とは解釈しない。
+`--endpoint-target both` は同じPreflop stateで両targetを独立評価する研究example専用指定である。
+最大8 pathの各targetへ全予算を適用するため、最大16 fitとなる。Postflopを拒否し、
+両集団の分母・table・利得は混合しない。既定と単独targetの出力は維持する。
+
+別のread-only `evaluate_preflop_deviation` 診断は
+`all-preflop-decisions-with-frozen-postflop` をscopeとし、各seatの本人Preflop判断を
+複数箇所変更できるtableを独立fitする。全seatのPostflop判断と未採用Preflop keyは
+指定variantのcandidate baselineに従い、各seatの逸脱は単独で評価する。
+fitは正のtraversal数をseatごとに適用し、8 fit visits以上のkeyだけを採用する。
+fit visit数は旧all-street診断も含めchecked u64とし、overflowを黙示飽和させない。
+held-outはseedごとに2 worlds以上、1〜64個の一意なseedをfit seedと分離する。
+未採用keyも含む全worldからsigned paired gainとseat別の近似95% CIを計算し、負値を保持する。
+fit/replay coverageとbaselineのstrategy sourceを併記し、CIをseat間の同時保証、full BR、
+exploitabilityやNash保証と扱わない。sample bufferは最大4096件で、fit tableは訪問key数に依存する。
+fit action tableのhashはbaseline identityではない。研究監査exampleでは4つの
+`--preflop-deviation-*` 予算/seed flagを全て明示した場合だけ `preflopDeviation` を出力する。
+追加の `--preflop-deviation-retention-gate` はこの診断の有効化を要求する任意flagである。
+API `evaluate_preflop_deviation_with_fit_mode` の `RetentionGated` に対応し、本人Preflop keyの
+8回目の訪問からlocal regret matchingを使い、それ未満の返却価値はcandidate baselineの
+行動確率で計算する。全本人行動の列挙とregret更新は続ける。JSON `fitMode` は既定の
+`local-regret-matching` または `retention-gated` を記録する。最終tableは従来通り純粋argmaxで、
+有限fitや後続方策の変化による損失まで防ぐ保証ではない。
+既定は無効で、通常評価・停止判定・学習default・v1 TOML・保存形式は変更しない。
+
+全Preflop support censusは未touched nodeも含む公開tree全体を対象とするread-only診断である。
+全expected bucketのraw bitsをfingerprintへ含め、touchedと数値regret/平均supportを区別する。
+これは訪問数・ESS・戦略品質や収束の証明ではなく、通常の停止判定へ代入しない。
+
+`research-regret-sampling` featureのレイズ後相手応答列挙は別のfresh研究候補とする。
+current-street dense range-vector、相手exploration 0、pruningなしに限定し、経路ごとに
+Preflopで1回以上のaggression後の最初の相手判断を最大1回列挙する。子孫regretと祖先への
+返却価値へ相手action確率をそれぞれ掛け、本人reachは掛けない。平均walkは通常のままとする。
+通常v1 TOML・default・state形式は変えず、variantは研究出力に記録する。研究variantの
+checkpoint/resume identityは未対応であり、監査exampleはfresh学習から保存を行わない。
+
+平均戦略の `PostflopContinuation` はfeature付き研究API/exampleだけのfresh専用候補とする。
+Street recallで公開postflop menuの一様全行動と一様check/callを50/50混合し、
+preflopとcheck/callなしでは一様を維持する。通常v1の平均walk、default、fingerprint、
+checkpoint/state形式は変えない。研究API内で同じsolverの学習後診断を追加しても、
+raw平均massや再開可能なstateをproductionへ返さず、生成前の不正要求を明示拒否する。
+
+
 閲覧用のEV、Postflop strategy、全Preflop Node snapshotは生成しない。
 
 ## 共通規則
@@ -365,7 +447,7 @@ river = 128
 - flop/turn/river bucket数は引き続き設定可能で既定128/128/128。各値は正で現行runtime
   幅へlower可能でなければならない。resource不足でも自動縮小しない。
 - この既定は2026-07-25のabstraction studyのTournament 6-max/50bb anchorに由来する
-  (`docs/validation/multiway-abstraction-optimization-2026-07-25.md`)。同studyの
+  (`experiments/multiway-abstraction-2026-07/README.md`)。同studyの
   Cash 6-max/100bb anchorは256が良好だったため、cash gameでは明示指定を推奨する。
   utility kindに応じて既定を変える条件付きdefaultは採らない。
 - postflop bucket数はpolicy arenaの大きさを変えない。arenaはpreflop decision node ×
@@ -480,8 +562,9 @@ productionの情報状態は`current-street`固定で、regret-based pruningは
 `range-vector + current-street`のdense workerに実装する。retired full-recall
 artifactは静的に読めるが、そのworkerをproduction solve/resumeで再生しない。
 `discount.kind="none"` と `pruning.kind="none"` のtableには追加fieldを置けない。
-thread数、batch、seed、exploration、discount、pruningはfingerprint/checkpoint互換性に
-関係する。
+batch、seed、exploration、discount、pruningはfingerprint/checkpoint互換性に
+関係する。thread数とmemory上限は運用設定であり、変更しても学習stateの互換性を
+変えない。thread数を変えた固定sweepの数値更新順序は同一である。
 
 ## `[run]`
 
@@ -511,6 +594,9 @@ durationは小文字suffixの `s`、`m`、`h` のみ。例:
 solver batchの境界で判定する。したがって、学習停止またはcheckpoint判定は最大で
 1 batchの実行時間だけ遅れる。checkpoint I/O、予定された品質評価、最終成果物の
 生成中は`max_time`による途中打切りを行わないため、processの終了時刻はさらに遅くなりうる。
+merge error時の巻き戻し単位は1 sweepであり、失敗したsweepのpolicyと進捗を変更しない。
+同じbatch内の先行する成功sweepは保持する。cooperative停止のbatch境界とは別の保証であり、
+batch全体やsolve呼出し全体のrollbackを意味しない。
 checkpointのために中断したrunは、その境界で保存して同じsolveを続行し、
 `check_every_sweeps`の品質評価を予定外に実行しない。
 
@@ -519,6 +605,10 @@ memoryは正のbytes整数、または整数+`KiB|MiB|GiB`。例:
 `"auto"`を6 GiBへ解決する。明示値は正のarena payload上限としてそのまま受理し、
 6 GiBを超える指定もできる。
 `threads="auto"` は `min(logical CPUs, seats * batch_sweeps)`。
+解決後のthread数をnew solve/resumeのpublic tree構築にも適用する。構築用のprivate
+poolを明示的に作り、ambient/global poolのthread数で上書きしない。事前確認は
+直列のまま維持し、成功後のtree materializationだけを分割する。1 threadは直列列挙を
+使い、複数threadも同じpreorder、history、node ID、arena配置を生成する。
 
 固定50M decision-node capはない。`current-street`はfull public treeやarenaを
 保持・確保する前のcount-only traversalで、2本の`f32` policy配列、touched bit、
@@ -526,7 +616,13 @@ dense index tableからarena bytesを累積する。設定memoryを厳密に超�
 node prefixでresource errorになる。任意のnode checkpointはbenchmark callerが
 明示した場合だけ適用される。
 
-preflight成功後、new solve/resumeは全policy arenaをfallible allocationする。
+preflight成功後、materializationは確認済みの正確なnode数を共有上限にする。
+並列frontierは最大64 task、planning prefixは深さ4までに制限する。merge中はsourceと
+転送先のnode領域が共存しうるため、arena上限とは別の一時memoryが必要である。
+並列列挙のerror時は、その一時領域を解放してから直列で再実行し、既存のerror優先順位と
+payloadを保持する。merge先の追加領域はfallible reservationする。
+
+new solve/resumeは全policy arenaをfallible allocationする。
 regret、strategy-sum、touched bitの全bufferへ4 KiB以下の間隔でwriteし、各bufferの
 最終要素にもwriteして全OS pageをfault-inする。返される
 `PolicyArenaAllocation`のnodes、columns、slots、bytesと
@@ -703,14 +799,21 @@ Setup preflightはtreeとresource estimateも実行する。
 v1 solve-time overrideは `--threads`、`--memory`、`--max-time` のみ。
 generic `--set` はなく、legacyの個別output flagはv1では拒否される。
 `resume`はrun directoryを受け取り、その中の`checkpoint.mwckpt`を使う。
+
+checkpoint読込みはchunkごとの検証・逐次復元を行い、全展開payloadの追加RAM
+bufferを作らない。復元state、solver arena、最大単一fieldの一時領域は別途必要で、
+`[run.resources].memory`はprocess RSS保証ではない。container version 5–7の読込み範囲、
+solver-state versionの拒否条件、保存形式とfingerprintはこの最適化では変わらない。
 range-vectorの条件付きregret weightと独立average走査はsolver state version 3で
-導入した。solver state version 4は、同一streetでもstreet開始時の相手人数が異なる
+導入した。solver state version 4は、同一streetでもbucket計算に使う相手人数が異なる
 counterfactual branchを正しく扱うため、range-vectorのcombo bucket cacheを
 `(street, bucket_active_opponents)`で分離する。version 3以前のcheckpointは、旧bucket
 更新と修正後の更新を1つの累積regret/averageへ混在させないためresumeを拒否する。
 旧solutionは静的参照のみ可能で、新しいsolveを開始する。成果物の
 algorithm fingerprintはsolver state versionとeffective algorithm設定を含むため、この
 境界をrun metadataとsolutionの双方で識別できる。
+Holdemの現在streetの人数記録は行動ごとに更新される。「street開始時の人数」とした
+以前の説明を訂正するもので、人数更新・bucket・cacheの実装やstate互換性は変更しない。
 
 ## run directory契約
 
@@ -726,6 +829,11 @@ algorithm fingerprintはsolver state versionとeffective algorithm設定を含�
 | `run.json` | 完了サマリ | 完了時に1度 |
 | `checkpoint.mwckpt` | 再開用state | checkpoint cadenceごと |
 | `solution.mwsol` | 閲覧用成果物 | 完了時に1度 |
+
+評価のある`progress.jsonl`行の`seats[i].candidatePolicyCoverage`と、
+`run.json`内の同じmetricsに上記戦略出所を保存する。未評価行およびこのfieldの
+ない旧JSONは`null`として扱う。JSON schema version 3への追加fieldであり、
+TOML、stop target、checkpoint state、`.mwsol`形式、fingerprintは変更しない。
 
 `.mwsol` format version 4 のstrategy indexは1 entry 91 byteの固定幅で、
 実装はindex全体を2 GiB以下、すなわち最大23,598,721 strategy blockに制限する。

@@ -2,8 +2,8 @@
 //! river equity, built from an [`Ehs2Abstraction`] by exact enumeration.
 //!
 //! These are the data a bucketed Mode B game feeds into
-//! `engine::SparseTransition` chance nodes and its showdown evaluator (see
-//! `docs/research/blueprint-design.md`). Everything here is engine-agnostic raw
+//! `engine::SparseTransition` chance nodes and its showdown evaluator.
+//! Everything here is engine-agnostic raw
 //! triples/matrices — the `preflop` crate converts them.
 //!
 //! Measure convention: `class_to_flop` rows sum to the class's full-range

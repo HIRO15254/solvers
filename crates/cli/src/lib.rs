@@ -209,7 +209,7 @@ enum Command {
         /// Run directory to create. Every artifact of the run lands here.
         #[arg(long)]
         out: std::path::PathBuf,
-        /// Override v1 worker threads for this invocation.
+        /// Override v1 worker threads, including Multiway tree construction.
         #[arg(long)]
         threads: Option<usize>,
         /// Override the v1 policy-arena budget (auto resolves to 6GiB).
@@ -241,7 +241,7 @@ enum Command {
         /// Fork the resumed run into a new, empty directory.
         #[arg(long)]
         out: Option<std::path::PathBuf>,
-        /// Override worker threads for this resume segment.
+        /// Override worker threads, including Multiway tree reconstruction.
         #[arg(long)]
         threads: Option<usize>,
         /// Override the memory budget for this resume segment.

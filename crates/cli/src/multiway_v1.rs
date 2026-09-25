@@ -1728,7 +1728,7 @@ fn one_u64() -> u64 {
     1
 }
 /// Promoted from the 2026-07-25 abstraction study's Tournament 6-max/50bb
-/// anchor (see `docs/validation/multiway-abstraction-optimization-2026-07-25.md`).
+/// anchor (see `experiments/multiway-abstraction-2026-07/README.md`).
 /// The Cash 6-max/100bb anchor measured better at 256; that stays an explicit
 /// override rather than a second, utility-conditional default.
 fn default_buckets() -> u32 {

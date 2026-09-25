@@ -16,7 +16,7 @@ pub use hash::{config_hash, config_hash_hex};
 pub use metrics::{MetricsRow, MetricsWriter};
 pub use multiway::{
     Estimate, MULTIWAY_SCHEMA_VERSION, MultiwayMetricsRow, MultiwayMetricsWriter,
-    MultiwaySeatMetrics,
+    MultiwayPolicyCoverage, MultiwaySeatMetrics, MultiwayStreetVisitCounts,
 };
 pub use mwsol::{
     MWSOL_FORMAT_VERSION, MWSOL_HEADER_LEN, MWSOL_MAX_PAGE_LIMIT, MWSOL_MIN_FORMAT_VERSION,

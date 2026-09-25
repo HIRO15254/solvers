@@ -598,8 +598,9 @@ pub fn build_research_multiway_session<A: MultiwayAbstraction>(
         prune_skip_probability,
     };
     let evaluation_seed = solver_config.seed ^ 0x6576_616c_7561_7465;
-    let solver = MultiwaySolver::new_preallocated(game, sampler, solver_config)
-        .context("initializing research multiway MCCFR")?;
+    let solver =
+        MultiwaySolver::new_preallocated_with_threads(game, sampler, solver_config, threads)
+            .context("initializing research multiway MCCFR")?;
     let allocation = solver
         .policy_arena_allocation()
         .ok_or_else(|| anyhow!("research solver returned without a preallocated policy arena"))?;
@@ -859,11 +860,12 @@ fn build_multiway_session_internal(
                 solver_config,
             ),
             SessionStoragePolicy::PreallocatedProduction => {
-                MultiwaySolver::from_state_with_config_preallocated(
+                MultiwaySolver::from_state_with_config_preallocated_with_threads(
                     game,
                     sampler,
                     checkpoint.state,
                     solver_config,
+                    threads,
                 )
             }
         }
@@ -886,7 +888,7 @@ fn build_multiway_session_internal(
                 MultiwaySolver::new(game, sampler, solver_config)
             }
             SessionStoragePolicy::PreallocatedProduction => {
-                MultiwaySolver::new_preallocated(game, sampler, solver_config)
+                MultiwaySolver::new_preallocated_with_threads(game, sampler, solver_config, threads)
             }
         }
         .context("initializing multiway MCCFR")?
@@ -1509,6 +1511,9 @@ pub fn metrics_row(
                     .and_then(|value| value.deviation_gain_lower_bound.as_ref())
                     .and_then(|values| values.get(seat))
                     .map(profile_estimate),
+                candidate_policy_coverage: evaluation
+                    .and_then(|value| value.candidate_policy_coverage.get(seat))
+                    .map(policy_coverage),
             })
             .collect(),
     }
@@ -1519,6 +1524,29 @@ fn profile_estimate(value: &multiway::solver::ProfileEstimate) -> Estimate {
         mean: value.mean,
         stderr: value.stderr,
         ci95: value.ci95,
+    }
+}
+
+fn policy_coverage(value: &multiway::CandidatePolicyCoverage) -> formats::MultiwayPolicyCoverage {
+    let by_street = |counts: multiway::StreetVisitCounts| formats::MultiwayStreetVisitCounts {
+        preflop: counts.preflop,
+        flop: counts.flop,
+        turn: counts.turn,
+        river: counts.river,
+    };
+    formats::MultiwayPolicyCoverage {
+        decision_visits: value.decision_visits,
+        stored_strategy_visits: value.stored_strategy_visits,
+        uniform_fallback_visits: value.uniform_fallback_visits,
+        average_strategy_visits: value.average_strategy_visits,
+        current_strategy_visits: value.current_strategy_visits,
+        regret_fallback_visits: value.regret_fallback_visits,
+        decision_visits_by_street: by_street(value.decision_visits_by_street),
+        stored_strategy_visits_by_street: by_street(value.stored_strategy_visits_by_street),
+        uniform_fallback_visits_by_street: by_street(value.uniform_fallback_visits_by_street),
+        average_strategy_visits_by_street: by_street(value.average_strategy_visits_by_street),
+        current_strategy_visits_by_street: by_street(value.current_strategy_visits_by_street),
+        regret_fallback_visits_by_street: by_street(value.regret_fallback_visits_by_street),
     }
 }
 
@@ -1720,6 +1748,42 @@ mod tests {
     }
 
     #[test]
+    fn progress_policy_coverage_reports_only_the_held_out_baseline() {
+        let session = build_multiway_session(crate::test_fixtures::LOWERED_3MAX, None).unwrap();
+        let evaluation = session.solver.evaluate_average_profile(16, 5041).unwrap();
+        let metrics = session.solver.metrics();
+        let row = metrics_row(&metrics, vec![0.0; 3], 1.0, Some(&evaluation));
+        let json = serde_json::to_value(&row).unwrap();
+        let mut total_visits = 0;
+        for (seat, expected) in evaluation.candidate_policy_coverage.iter().enumerate() {
+            let observed = row.seats[seat].candidate_policy_coverage.as_ref().unwrap();
+            total_visits += observed.decision_visits;
+            assert_eq!(observed.decision_visits, expected.decision_visits);
+            assert_eq!(observed.uniform_fallback_visits, observed.decision_visits);
+            assert_eq!(observed.stored_strategy_visits, 0);
+            assert_eq!(observed.average_strategy_visits, 0);
+            assert_eq!(observed.current_strategy_visits, 0);
+            assert_eq!(observed.regret_fallback_visits, 0);
+            assert_eq!(
+                observed.uniform_fallback_visits_by_street,
+                observed.decision_visits_by_street
+            );
+            assert_eq!(
+                json["seats"][seat]["candidatePolicyCoverage"]["uniformFallbackVisitsByStreet"]["flop"],
+                expected.uniform_fallback_visits_by_street.flop
+            );
+        }
+        assert!(total_visits > 0);
+        let without_evaluation = metrics_row(&metrics, vec![0.0; 3], 1.0, None);
+        assert!(
+            without_evaluation
+                .seats
+                .iter()
+                .all(|seat| seat.candidate_policy_coverage.is_none())
+        );
+    }
+
+    #[test]
     fn stop_checks_use_fresh_held_out_batches_and_resume_the_sequence() {
         let session = build_multiway_session(crate::test_fixtures::LOWERED_3MAX, None)
             .expect("build cheap frozen-profile fixture");
@@ -1879,6 +1943,67 @@ mod tests {
         })
         .unwrap_err();
         assert!(error.to_string().contains("tournament-icm"));
+    }
+
+    #[test]
+    fn production_session_initialization_and_resume_preserve_thread_independent_state() {
+        let base = crate::test_fixtures::LOWERED_3MAX.replace("sweeps = 2\n", "sweeps = 8\n");
+        let serial_raw = base.replace("[run]\n", "[run]\nthreads = 1\n");
+        let parallel_raw = base.replace("[run]\n", "[run]\nthreads = 8\n");
+        assert_ne!(serial_raw, base);
+        let build = |raw: &str, checkpoint: Option<&std::path::Path>| {
+            build_multiway_session_internal(
+                raw,
+                None,
+                checkpoint,
+                SessionStoragePolicy::PreallocatedProduction,
+                AbstractionPolicy::CheapBaseline,
+            )
+            .unwrap()
+        };
+        let mut serial = build(&serial_raw, None);
+        let mut parallel = build(&parallel_raw, None);
+        assert_eq!(serial.threads, 1);
+        assert_eq!(parallel.threads, 8);
+        assert_eq!(
+            serial.solver.policy_arena_allocation(),
+            parallel.solver.policy_arena_allocation()
+        );
+        assert!(
+            parallel
+                .solver
+                .policy_arena_allocation()
+                .unwrap()
+                .pages_committed
+        );
+        serial
+            .solver
+            .run_sweeps_with_threads(4, serial.threads)
+            .unwrap();
+        parallel
+            .solver
+            .run_sweeps_with_threads(4, parallel.threads)
+            .unwrap();
+        let checkpoint = MultiwayCheckpoint::capture(&serial.solver);
+        assert_eq!(checkpoint, MultiwayCheckpoint::capture(&parallel.solver));
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("parallel-construction.mwckpt");
+        checkpoint.write_atomic(&path).unwrap();
+        let mut resumed = build(&parallel_raw, Some(&path));
+        assert_eq!(resumed.threads, 8);
+        assert_eq!(checkpoint, MultiwayCheckpoint::capture(&resumed.solver));
+        serial
+            .solver
+            .run_sweeps_with_threads(2, serial.threads)
+            .unwrap();
+        resumed
+            .solver
+            .run_sweeps_with_threads(2, resumed.threads)
+            .unwrap();
+        assert_eq!(
+            MultiwayCheckpoint::capture(&serial.solver),
+            MultiwayCheckpoint::capture(&resumed.solver)
+        );
     }
 
     #[test]

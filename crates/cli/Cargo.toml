@@ -9,6 +9,7 @@ description = "solvers command-line interface"
 [features]
 default = []
 research-average-sampling = ["multiway/research-average-sampling"]
+research-regret-sampling = ["multiway/research-regret-sampling"]
 research-draw-abstraction = ["multiway/research-abstractions", "research-average-sampling"]
 
 [[bin]]
@@ -28,6 +29,10 @@ required-features = ["research-draw-abstraction"]
 [[example]]
 name = "mw_tree_census"
 path = "examples/mw_tree_census.rs"
+
+[[example]]
+name = "mw_tree_initialization_bench"
+path = "examples/mw_tree_initialization_bench.rs"
 
 [dependencies]
 abstraction = { workspace = true }

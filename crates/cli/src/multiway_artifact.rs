@@ -964,8 +964,13 @@ fn evaluate_prepared(
             .collect(),
     };
     let (game, sampler, config) = mw_session.solver.into_components();
-    let restored =
-        multiway::MultiwaySolver::from_state_with_config_preallocated(game, sampler, state, config);
+    let restored = multiway::MultiwaySolver::from_state_with_config_preallocated_with_threads(
+        game,
+        sampler,
+        state,
+        config,
+        mw_session.threads,
+    );
     mw_session.solver = restored.context("restoring the formal average profile")?;
     let deviators = if train_deviators {
         Some(session::train_deviators_parallel(

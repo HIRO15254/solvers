@@ -57,7 +57,8 @@ weight合計をcontext rootで一度だけ分母にする（root normalization�
 条件付き期待値への変更はsolver state version 3で導入されました。version 4では、
 range-vectorのcombo bucket cacheをstreetだけでなく
 `(street, bucket_active_opponents)`で識別します。同じstreetでもcounterfactual branchに
-よってstreet開始時の相手人数が異なり、抽象化bucketも異なるためです。
+よってbucket計算に使う相手人数が異なり、抽象化bucketも異なるためです。
+Holdemの現在streetの人数記録は行動ごとに更新され、street開始時に固定されません。
 `crates/multiway/src/solver/mod.rs` の `SOLVER_STATE_VERSION = 4` にこの境界を刻み、
 version 3以前のcheckpointを新しい更新則へ混ぜてresumeしないよう、loaderはstate
 version mismatchを拒否します。
@@ -90,6 +91,16 @@ checkpoint containerは現在 `crates/multiway/src/checkpoint.rs` の
 `CHECKPOINT_VERSION = 7` です。state version 4とcontainer version 7を同一視せず、
 どちらを変更したかをmetadataとmigration testに記録します。
 
+production checkpointは`MultiwayCheckpoint::write_solver_atomic`でlive policyを
+借用して保存し、全policyのowned snapshot複製を避けます。public-node整列・祖先indexと
+chunk stagingはarena予算の外に必要です。owned capture API、state/container形式、
+metadataと学習状態は変わりません。最終solution用のsnapshotはsolution出力時だけ作ります。
+
+productionのstrategy driftは`strategy_drift_refresh_compact`を使い、dense側の前回profileを
+column ID・action数・連続f32へ保持します。初出columnの寄与、resume時のbaselineと
+集計順は従来と同じです。これは実行時の補助領域の変更であり、checkpointやmetricの
+形式・定義は変わりません。layout不一致は明示errorとして伝播します。
+
 ### Operational timers at solver batch boundaries
 
 `run.max_time`、cooperative cancel、`run.checkpoint.interval` は
@@ -97,6 +108,9 @@ checkpoint containerは現在 `crates/multiway/src/checkpoint.rs` の
 1 batchの実行時間です。この上限は学習停止またはcheckpoint判定までであり、
 checkpoint I/O、予定された品質評価、最終snapshot/solution出力を途中で打ち切る
 hard deadlineではありません。そのためprocessの終了時刻はさらに遅くなりえます。
+merge error時の巻き戻し単位は1 sweepです。失敗したsweepのpolicyと進捗は変えず、
+同じbatch内でも先に成功したsweepは保持します。これはcooperative停止のbatch境界と
+別の保証であり、batch全体やsolve呼出し全体のrollbackではありません。
 checkpoint期限で中断した場合は、その完了済みbatchを保存し、
 品質評価cadenceに到達していなければ評価せずに同じsolveを続けます。中断前後で
 sample ID、batch snapshot、merge順を変えないため、checkpoint書込み頻度は学習状態を
@@ -127,6 +141,105 @@ Bonferroni補正の同時近似区間を使います。候補ごとの95%区間�
 またいだ主張は、この候補内区間を越える保証を持たないため、少なくとも2 seedで
 再実行し、候補ごとの補正済みenvelopeを報告します。
 
+通常およびreference評価の`candidate_policy_coverage`は、baseline rolloutだけを
+seat/street別に数えます。平均質量が正のaverage、current明示指定、平均質量0からの
+regret fallback、未保存columnのuniform fallbackを区別します。旧
+`stored_strategy_visits`は最初の3つの合計として保持し、平均学習coverageに読み替えません。
+sample-id順にcounterをmergeするのでthread数は集計を変えません。CLIの
+`session::metrics_row`はこれをformatsの`candidatePolicyCoverage`へ変換し、
+progress/run summaryへ保存します。旧JSONはdefault/Noneで読み込めますが、過去に
+測定していない内訳を0件の実測として扱いません。
+
+Rust APIの`evaluate_profile_with_prefixes`は通常評価と同一のbaseline/candidate
+出力に、指定した公開履歴以降のbaseline coverageを付加します。
+`evaluate_profile_coverage`は同じbaselineだけを再生し、逸脱利得をNoneにします。
+最大64個の既知・一意prefixを受け、sample数とは独立にbufferを制限します。
+CLIのcheckpoint監査exampleから`--coverage-prefix`で利用できますが、v1 TOML、
+通常の停止条件・評価出力・checkpoint identityは変更しません。
+
+Rust API `evaluate_profile_conditioned` は指定したaction-index prefixを強制し、
+そのbaseline経路確率で重み付けした条件付きutility/coverageを別枠で返します。
+通常評価とは別の自己正規化比であり、到達確率、重みESS、最大重み、対局単位の
+共分散を使ったdelta標準誤差を保持します。prefix自身のfallback使用割合と、
+以降のseat/street別source割合を区別します。0重みは条件付きの証拠に数えず、
+分母0はnullです。1..64個の一意な非終端prefix、2以上のsampleを要求します。
+研究exampleの `--condition-prefix` / `--condition-samples` から利用し、
+TOML/default、停止評価、state/fingerprint、artifactのwire形式には追加しません。
+`evaluate_profile_conditioned_preflop` はHoldem限定で、同じpreflop trunkを共有する
+postflop prefixへ、各seatのrangeとpreflop行動確率積から作る配札proposalを使います。
+f32への丸め・微小確率のfloor・実CDF区間をimportance補正し、強制preflop確率を
+二重に掛けません。fold済みseatも含む全tupleを衝突時に棄却します。
+新出力 `PreflopConditionalProfileEvaluation` の `relative_weight_mean` は絶対root
+到達確率ではありません。CLI exampleは `--condition-sampler preflop-proposal` で
+trunkごとに配札し、別の `preflopConditionalEvaluations` に保存します。
+研究exampleの `--fresh-sweeps` は新規solverに既存driverを適用して同じ監査を行い、
+`--checkpoint` とは排他です。`--support-node` は実bucket cardinalityを用いて未保存列も
+保持し、raw regretと平均質量を区別します。これらは研究用CLI診断であり、TOML/default、
+学習更新式、state/wire形式は変更しません。
+`evaluate_endpoint_deviation_preflop` はrootを含む1個のpreflop/postflop endpointで、独立fitから固定した
+own InfoKey別の行動だけをheld-out評価します。以後の本人を含む全判断はbaselineであり、
+candidate行動確率はprefix重みに入りません。全bucketと未採用keyを保持し、未採用keyの
+ゼロ利得も全prefix分母へ含めます。`--endpoint-prefix` と明示fit/held-out予算は研究example
+だけのoptionです。符号付き利得・delta誤差と採用key重みcoverageを分け、通常の停止評価や
+multiplayer全体の品質保証には用いません。
+
+`evaluate_endpoint_deviation_preflop_counterfactual` は別のPreflop専用研究APIです。
+同じ有界fit/held-out実装を、本人prefix確率を除いたproposalで使用します。
+返却wrapperのtarget/除外actor/proposal種別と169-class検証数・class別本人prefix確率により、
+既存actual-prefix集団と区別します。全path contextの全1326 comboを検証し、本人確率0でも
+prefixの再重み付けをせずsuffixを評価します。CLI監査exampleの `--endpoint-target opponents-prefix`
+に対応し、`endpointCounterfactualDeviation` へ出力します。既定actual-prefixの数値・JSONは
+維持し、異なるtarget間の集計利得の順位付けや学習更新への流用をしません。
+監査exampleでは最大8個の `--endpoint-prefix` を同じ復元solverで処理します。
+単数出力は従来どおり、複数出力はtarget別の複数形fieldの配列で分離し、重複historyを拒否します。
+各endpointのtable・予算は独立で、複数箇所を同時に変更する評価にはしません。
+`--endpoint-target both` は各Preflop pathでactual→opponentsの順に独立評価し、
+各targetへ全予算を与えます。最大8 path/16 fitで、Postflopを拒否します。
+
+`solver/preflop_deviation.rs` の `evaluate_preflop_deviation(variant, threads, config)` は
+各seatの全Preflop判断を変更できる独立tableをfitし、Postflopと未採用keyを指定candidate
+baselineへ固定します。scopeは `all-preflop-decisions-with-frozen-postflop` です。
+`eval.rs` のconst true経路でcandidate streetを判定し、reference keyは変更可能なPreflopだけに
+使います。旧all-streetのconst false経路は通常budgetの演算・RNGを維持します。
+fit visit数は両経路ともchecked u64で、8 visits以上のkeyを採用し、overflowはerrorにします。
+`PreflopDeviationConfig` は正のseat別fit traversals、2以上のheld-out samples、1〜64個の
+一意かつfitと異なるheld-out seedsを要求します。各seatは単独逸脱で、tableを合成しません。
+最大4096件のusize indexed Rayon結果をsample順にWelford集計し、全worldを分母とする
+signed paired gain・標準誤差・seat別95% CIを返します。未採用keyも残し、負値をclipしません。
+fit coverage、replayのtrained/fallback coverage、baselineだけのstrategy sourceを分離します。
+fit tableは訪問key数に比例し、4096 buffer上限はtableやsolver全体のmemory上限ではありません。
+`fitPolicyFingerprint` はsorted fit actionsのみのhashです。baseline identityは別に保持します。
+監査exampleの4つの明示 `--preflop-deviation-*` flagによりoptional `preflopDeviation` を
+追加し、省略時のJSON・通常評価/停止・学習default・state/wireを維持します。
+seat別CIは全seat/seedの同時保証ではなく、full BRやmultiway品質保証には使いません。
+
+`evaluate_preflop_deviation_with_fit_mode` は `PreflopDeviationFitMode` を受け取り、JSON
+`fitMode` に `local-regret-matching`（従来既定）/`retention-gated` を出します。後者は
+本人Preflop keyが8 visitsへ達するまでcandidate-keyのbaselineを返却価値に使い、8回目から
+local RMを有効にします。全本人行動の列挙とregret更新は続くため、本人reach 0の子も探索します。
+baseline期待値はf32確率を再正規化せず、replay samplerの累積区間と最終actionへの残余を使います。
+最終の純粋argmax抽出、閾値、独立held-outは同じで、負gainがなくなる保証はありません。
+監査exampleの任意 `--preflop-deviation-retention-gate` が選択し、4つの予算/seed指定を要求します。
+
+`preflop_support_census` は未touchedを含む全Preflop decisionの公開metadata、数値support、
+全expected列のraw-state fingerprintを返します。arenaを借用し、全policy snapshotや
+全bucketの値の保持を避けます。supportは訪問数・ESS・EV品質の代用ではありません。
+監査exampleの `--preflop-support-census` に対応します。
+
+`research-regret-sampling` はfresh dense/vector、exploration 0、pruningなしに限定した
+`run_raised_preflop_research` を公開します。公開BettingStateから対象を決め、レイズ後の最初の
+相手判断を各経路で一度列挙します。子孫へ渡す重みと返却価値へ相手確率を別々に適用し、
+通常の平均walkとconst falseのproduction経路を維持します。監査exampleの
+`--enumerate-raised-preflop` と研究metadataにだけ接続し、v1 config、state/defaultを変えません。
+研究variantを識別するcheckpoint/resumeは未対応で、exampleは保存を行いません。
+
+
+checkpointの`checkpoint/stream.rs`は所有型postcard decoderを使用し、検証済みの
+chunkからstateへ直接復元します。展開payload全体のbufferと同サイズの追加RAMを
+避けます。fieldがchunkを跨ぐ場合のみ再利用scratchを使い、早期codec終了後も
+残りchunkの検証を完了します。wire format、旧containerの読込み、state identity、
+再開する乱数列は維持します。
+
 **実装監査（2026-09-09、未解決）:** Preflop-onlyは規範仕様の契約です。
 現在の `session::make_public_tree` と `session::make_solution` はstreetでfilterせず、
 全streetの公開状態および正の平均質量を持つpolicy blockを出力します。
@@ -135,7 +248,7 @@ Bonferroni補正の同時近似区間を使います。候補ごとの95%区間�
 solver stateとも扱いません。checkpointからの監査は別の経路です。
 修正にはwriter、metadata、reader、評価、出力テストを同期し、一般postflop treeで
 Preflop-onlyの範囲と拒否境界を検証する必要があります。
-[ベンチマーク整理と修正優先度](validation/multiway-benchmarks-2026-09-09.md)に追跡します。
+修正の優先順位は[現行ロードマップ](product-roadmap.jp.md)に従います。
 
 CLIの `evaluate` は `.mwsol` に保存されたaverage policy blockを再評価します。
 現在のwriterは正の平均質量を持つPostflop blockも保存し得ますが、未訪問・平均質量0の
@@ -143,7 +256,7 @@ policy、raw regret、量子化前の値はartifactにありません。一般Po
 GTO Wizardの完全解、学習時の完全profile、またはcheckpoint監査と同一視しません。
 過去のbenchmarkに記録した `unknown-preflop-only-artifact` は当時の保守的な比較除外markerであり、
 現在のwriterがPreflopだけを保存する証拠ではありません。fixtureと結果の適用範囲は
-[ベンチマーク一覧](validation/multiway-benchmarks-2026-09-09.md)で管理します。
+[検証総括](../experiments/multiway-2026-09/quality-decision.md)に適用範囲を記録しています。
 
 ## File and test map
 
@@ -155,9 +268,8 @@ solver stateとworkerは `crates/multiway/src/solver/`、CLI lifecycleは
 
 回帰面は、library unit tests（`config.rs`、`solver/tests.rs`、`checkpoint.rs`）、
 CLI integration/acceptance（`crates/cli/tests/cli_integration.rs`、
-`multiway_acceptance.rs`）、template/help consistency（`config_new.rs` tests）、
-Python benchmark fixture tests（`tools/tests/test_multiway_convergence_bench.py`）
-です。canonical examplesは `examples/preflop_multiway_v1_*.toml`、benchmark例は
+`multiway_acceptance.rs`）、template/help consistency（`config_new.rs` tests）
+です。旧Python benchmark runnerの検証は実験アーカイブに移しました。canonical examplesは `examples/preflop_multiway_v1_*.toml`、benchmark例は
 `examples/bench_multiway/` に置きます。
 
 成果物の読み手は `crates/formats/src/run.rs` の event schemaを使い、artifactの
@@ -168,3 +280,41 @@ lifecycle event、`progress.jsonl` は固定schemaのmetricsです。
 
 仕様変更を完了扱いにする前に、canonical specの見出しとこの表を比較し、parser、
 runtime、tests、examples、help、artifact metadataの全対応を確認してください。
+
+### Average-sampling research diagnostics
+
+The feature-gated consuming `run_average_sampling_research` API additionally
+accepts `coverage_samples` / `coverage_prefixes`, both serde-defaulted to disabled,
+and reports separate baseline-only prefix evaluations plus sweep-only timing.
+The [research runner](../crates/cli/examples/mw_average_sampling_research.md)
+resolves paths across all streets and records decision context. It still
+requires fresh state and cannot return resumable solver state. This is not a
+v1 TOML/default/state-version change; raw average masses from different
+proposals remain incompatible with production artifacts.
+
+The research-only `PostflopContinuation` variant uses a fixed full-support
+50/50 uniform/check-call opponent proposal on postflop streets, with uniform
+preflop/C-empty behavior. It requires Street recall. The consuming Holdem
+`run_average_sampling_research_with_diagnostics` additionally evaluates up to
+eight independently fitted endpoints, separate root reach and up to 64 full
+support nodes before disposal. All requests are validated before sweeps;
+support exports raw regrets and normalized averages without experimental raw
+average masses. No production v1 option/default or state/format changed.
+
+The [tree initialization research benchmark](../crates/cli/examples/mw_tree_initialization_bench.md)
+measures the real core preflight, existing serial/parallel enumeration, arena
+layout/allocation and page commitment with a counts-only abstraction backend.
+`DenseArena::commit_pages` is doc-hidden public for this diagnostic; production
+behavior and resource checks are unchanged. The benchmark's explicit resource
+bounds and cash-only scope are not new v1 configuration settings.
+
+Production new/resume now uses the resolved run thread count for bounded
+parallel public-tree materialization through
+`new_preallocated_with_threads` and
+`from_state_with_config_preallocated_with_threads`. The private construction
+pool does not inherit ambient sizing. Serial non-retaining admission remains
+first, and its exact node count limits retained workers; ordered merge keeps
+node IDs/arena layout unchanged. Existing serial core constructors remain
+available without adding `Send` to every game state. There is no new TOML field,
+algorithm identity or checkpoint version. Normative operational/resource details
+are in the `[run]` section of the Japanese specification.

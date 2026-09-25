@@ -24,17 +24,61 @@ use crate::types::{MAX_SEATS, MIN_SEATS, Street};
 pub use crate::tree::DenseNodeContext;
 
 mod averaging;
+#[cfg(feature = "research-average-sampling")]
+mod research_diagnostics;
+#[cfg(feature = "research-average-sampling")]
+pub use research_diagnostics::{
+    AverageSamplingDiagnosticsConfig, AverageSamplingDiagnosticsResult,
+    AverageSamplingWithDiagnostics, ResearchPolicySupport, ResearchPolicySupportRow,
+};
+mod conditioned;
+mod endpoint_deviation;
+mod preflop_census;
+mod preflop_deviation;
+mod preflop_proposal;
+pub use preflop_census::{PreflopSupportCensus, PreflopSupportNode};
+pub use preflop_deviation::{
+    PreflopDeviationConfig, PreflopDeviationEvaluation, PreflopDeviationFitMode,
+    PreflopDeviationHeldOut,
+};
+#[cfg(any(test, feature = "research-regret-sampling"))]
+mod regret_sampling;
+pub use conditioned::{
+    ConditionalPrefixEvaluation, ConditionalProfileEvaluation, ConditionalStreetCoverage,
+    WeightedEstimate,
+};
+pub use endpoint_deviation::{
+    CounterfactualEndpointDeviationEvaluation, EndpointDeviationConfig,
+    EndpointDeviationEvaluation, EndpointDeviationFit, EndpointDeviationHeldOut,
+    EndpointDeviationRow, EndpointDeviationSampling,
+};
+pub use preflop_proposal::{
+    PreflopConditionalPrefixEvaluation, PreflopConditionalProfileEvaluation,
+    PreflopProposalMetadata,
+};
+#[cfg(feature = "research-regret-sampling")]
+pub use regret_sampling::RaisedPreflopResearchWork;
 mod drift;
 mod errors;
 mod eval;
+mod snapshot;
 mod support;
 mod workers;
 
+#[cfg(test)]
+mod dense_merge_tests;
+#[cfg(test)]
+mod preflop_deviation_tests;
+#[cfg(test)]
+mod preflop_support_tests;
+#[cfg(test)]
+mod raised_opponent_tests;
 #[cfg(test)]
 mod tests;
 
 pub use drift::{StrategyDriftError, StrategyDriftTracker};
 pub use errors::SolverError;
+pub(crate) use snapshot::SnapshotError;
 
 use averaging::*;
 use drift::StrategyDriftIdentity;
@@ -335,6 +379,87 @@ fn standard_error(sum_squared_error: f64, samples: u64) -> f64 {
         (sample_variance / samples as f64).sqrt()
     } else {
         0.0
+    }
+}
+
+/// Apply one event in place, replacing each successfully consumed delta with
+/// its old f32 slot value. On error, the count names only journaled slots.
+fn apply_dense_event_journaled(
+    arena: &mut DenseArena,
+    event: &mut DenseEvent,
+    regret_floor: Option<f32>,
+) -> Result<(), (usize, SolverError)> {
+    let (column, values, is_regret) = match event {
+        DenseEvent::AddRegret { column, values } => (*column, values, true),
+        DenseEvent::AddStrategy { column, values } => (*column, values, false),
+    };
+    let range = arena
+        .slot_range_for_column(column, values.len())
+        .map_err(|error| (0, SolverError::from(error)))?;
+    let targets = if is_regret {
+        &mut arena.regrets[range]
+    } else {
+        &mut arena.strategy_sum[range]
+    };
+    for (written, (target, value)) in targets.iter_mut().zip(values).enumerate() {
+        let previous = *target;
+        checked_add_f32(target, *value).map_err(|error| (written, error))?;
+        // A successful checked addition implies the previous value was finite.
+        // Widening f32 to f64 and back preserves all bits, including signed zero.
+        *value = f64::from(previous);
+        if is_regret
+            && let Some(floor) = regret_floor
+            && *target < floor
+        {
+            *target = floor;
+        }
+    }
+    Ok(())
+}
+
+/// Restore exactly the processed prefix, reversing overlaps as well as seats.
+/// The failing event's unprocessed suffix still contains original deltas.
+fn rollback_dense_events(
+    arena: &mut DenseArena,
+    deltas: &[DenseTraversalDelta],
+    failed_seat: usize,
+    failed_event: usize,
+    written: usize,
+) {
+    for seat in (0..=failed_seat).rev() {
+        let events = &deltas[seat].events;
+        let end = if seat == failed_seat {
+            failed_event + 1
+        } else {
+            events.len()
+        };
+        for event in (0..end).rev() {
+            let (column, values, is_regret) = match &events[event] {
+                DenseEvent::AddRegret { column, values } => (*column, values, true),
+                DenseEvent::AddStrategy { column, values } => (*column, values, false),
+            };
+            let count = if seat == failed_seat && event == failed_event {
+                written
+            } else {
+                values.len()
+            };
+            // An invalid column/shape or first-slot failure wrote nothing; do
+            // not resolve that unvalidated range, even during error recovery.
+            if count == 0 {
+                continue;
+            }
+            let range = arena
+                .slot_range_for_column(column, values.len())
+                .expect("journaled event range was validated before writing");
+            let targets = if is_regret {
+                &mut arena.regrets[range]
+            } else {
+                &mut arena.strategy_sum[range]
+            };
+            for slot in (0..count).rev() {
+                targets[slot] = values[slot] as f32;
+            }
+        }
     }
 }
 
@@ -687,10 +812,37 @@ pub struct ProfileEvaluation {
     /// no-deviation option). This is a candidate-policy diagnostic, not a
     /// best response, exploitability, or Nash-convergence claim.
     pub deviation_gain_lower_bound: Option<Vec<ProfileEstimate>>,
+    /// Baseline-profile strategy sources, indexed by acting seat. Candidate
+    /// deviation trajectories are excluded. Empty in older JSON reports.
+    #[serde(default)]
+    pub candidate_policy_coverage: Vec<CandidatePolicyCoverage>,
 }
 
-/// Reach-weighted coverage of the candidate profile on the unmodified
-/// baseline trajectories used by [`MultiwaySolver::evaluate_reference_deviators`].
+/// Ordinary profile evaluation with optional baseline-only branch diagnostics.
+/// The nested evaluation is identical to evaluating without the prefixes.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct PrefixProfileEvaluation {
+    pub evaluation: ProfileEvaluation,
+    pub prefixes: Vec<PrefixPolicyCoverage>,
+}
+
+/// Counts on sampled baseline trajectories at and below one public history.
+/// Nested prefixes overlap; their counts must not be added as disjoint strata.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PrefixPolicyCoverage {
+    pub history: HistoryKey,
+    /// Number of baseline trajectories that reached this exact history.
+    pub reached_samples: u64,
+    /// Trajectories with at least one decision on each street after reaching
+    /// the prefix. An all-in runout has no later decisions and is not counted.
+    pub trajectory_visits_by_street: StreetVisitCounts,
+    /// Decisions at/below the prefix, indexed by acting seat. Zero visits
+    /// mean unmeasured coverage, not a measured zero-quality policy.
+    pub candidate_policy_coverage: Vec<CandidatePolicyCoverage>,
+}
+
+/// Reach-weighted coverage of the candidate profile on unmodified held-out
+/// baseline trajectories, for both ordinary and reference-deviator evaluation.
 ///
 /// Each sampled decision is attributed to the acting seat. A stored strategy
 /// means the candidate solver had a policy column for that concrete
@@ -761,8 +913,22 @@ impl StreetVisitCounts {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CandidatePolicyCoverage {
     pub decision_visits: u64,
+    /// Visits to a stored column, including current-regret fallback when its
+    /// average mass is zero. This legacy counter measures storage coverage,
+    /// not average-policy coverage.
     pub stored_strategy_visits: u64,
     pub uniform_fallback_visits: u64,
+    /// Visits that used a stored, positive-mass average strategy.
+    #[serde(default)]
+    pub average_strategy_visits: u64,
+    /// Visits that explicitly requested the current strategy via
+    /// [`ProfileVariant::use_current_strategy`].
+    #[serde(default)]
+    pub current_strategy_visits: u64,
+    /// Visits requesting the average that instead used regret matching
+    /// because the stored column had zero average mass.
+    #[serde(default)]
+    pub regret_fallback_visits: u64,
     /// Decision visits attributed to the public street of the candidate
     /// information key. This sums to [`Self::decision_visits`].
     #[serde(default)]
@@ -775,9 +941,35 @@ pub struct CandidatePolicyCoverage {
     /// [`Self::uniform_fallback_visits`].
     #[serde(default)]
     pub uniform_fallback_visits_by_street: StreetVisitCounts,
+    #[serde(default)]
+    pub average_strategy_visits_by_street: StreetVisitCounts,
+    #[serde(default)]
+    pub current_strategy_visits_by_street: StreetVisitCounts,
+    #[serde(default)]
+    pub regret_fallback_visits_by_street: StreetVisitCounts,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum CandidatePolicySource {
+    Average,
+    Current,
+    RegretFallback,
+    UniformFallback,
 }
 
 impl CandidatePolicyCoverage {
+    /// Fraction of baseline decisions served by a stored average with
+    /// positive mass, excluding both forms of regret-matched strategy.
+    pub fn average_strategy_fraction(self) -> f64 {
+        if self.decision_visits == 0 {
+            0.0
+        } else {
+            self.average_strategy_visits as f64 / self.decision_visits as f64
+        }
+    }
+
+    /// Legacy storage coverage; use [`Self::average_strategy_fraction`] to
+    /// determine whether the requested average was actually observed.
     pub fn stored_strategy_fraction(self) -> f64 {
         if self.decision_visits == 0 {
             0.0
@@ -786,13 +978,13 @@ impl CandidatePolicyCoverage {
         }
     }
 
-    fn record(&mut self, street: u8, stored: bool) -> Result<(), SolverError> {
+    fn record(&mut self, street: u8, source: CandidatePolicySource) -> Result<(), SolverError> {
         self.decision_visits = self
             .decision_visits
             .checked_add(1)
             .ok_or(SolverError::CounterOverflow)?;
         self.decision_visits_by_street.checked_increment(street)?;
-        if stored {
+        if source != CandidatePolicySource::UniformFallback {
             self.stored_strategy_visits = self
                 .stored_strategy_visits
                 .checked_add(1)
@@ -806,6 +998,82 @@ impl CandidatePolicyCoverage {
                 .ok_or(SolverError::CounterOverflow)?;
             self.uniform_fallback_visits_by_street
                 .checked_increment(street)?;
+        }
+        let (count, by_street) = match source {
+            CandidatePolicySource::Average => (
+                &mut self.average_strategy_visits,
+                &mut self.average_strategy_visits_by_street,
+            ),
+            CandidatePolicySource::Current => (
+                &mut self.current_strategy_visits,
+                &mut self.current_strategy_visits_by_street,
+            ),
+            CandidatePolicySource::RegretFallback => (
+                &mut self.regret_fallback_visits,
+                &mut self.regret_fallback_visits_by_street,
+            ),
+            CandidatePolicySource::UniformFallback => return Ok(()),
+        };
+        *count = count.checked_add(1).ok_or(SolverError::CounterOverflow)?;
+        by_street.checked_increment(street)?;
+        Ok(())
+    }
+
+    fn checked_add_assign(&mut self, other: Self) -> Result<(), SolverError> {
+        for (target, value) in [
+            (&mut self.decision_visits, other.decision_visits),
+            (
+                &mut self.stored_strategy_visits,
+                other.stored_strategy_visits,
+            ),
+            (
+                &mut self.uniform_fallback_visits,
+                other.uniform_fallback_visits,
+            ),
+            (
+                &mut self.average_strategy_visits,
+                other.average_strategy_visits,
+            ),
+            (
+                &mut self.current_strategy_visits,
+                other.current_strategy_visits,
+            ),
+            (
+                &mut self.regret_fallback_visits,
+                other.regret_fallback_visits,
+            ),
+        ] {
+            *target = target
+                .checked_add(value)
+                .ok_or(SolverError::CounterOverflow)?;
+        }
+        for (target, value) in [
+            (
+                &mut self.decision_visits_by_street,
+                other.decision_visits_by_street,
+            ),
+            (
+                &mut self.stored_strategy_visits_by_street,
+                other.stored_strategy_visits_by_street,
+            ),
+            (
+                &mut self.uniform_fallback_visits_by_street,
+                other.uniform_fallback_visits_by_street,
+            ),
+            (
+                &mut self.average_strategy_visits_by_street,
+                other.average_strategy_visits_by_street,
+            ),
+            (
+                &mut self.current_strategy_visits_by_street,
+                other.current_strategy_visits_by_street,
+            ),
+            (
+                &mut self.regret_fallback_visits_by_street,
+                other.regret_fallback_visits_by_street,
+            ),
+        ] {
+            target.checked_add_assign(value)?;
         }
         Ok(())
     }
@@ -915,7 +1183,8 @@ pub struct ReferenceDeviationWorld {
 pub struct ReferenceDeviationEvaluation {
     pub evaluation: ProfileEvaluation,
     /// Candidate-policy coverage measured only on the unmodified baseline
-    /// replay, indexed by acting seat.
+    /// replay, indexed by acting seat. Retained for JSON compatibility;
+    /// identical to `evaluation.candidate_policy_coverage` in new reports.
     pub candidate_policy_coverage: Vec<CandidatePolicyCoverage>,
     pub coverage: Vec<ReferenceDeviationCoverage>,
     pub worlds: Vec<ReferenceDeviationWorld>,
@@ -957,7 +1226,7 @@ pub struct DeviatorTrainingResult {
 /// default (`purify_threshold: 0.0`, `use_current_strategy: false`) is the
 /// plain linear average profile, unpurified -- byte-identical to the
 /// pre-refactor `evaluate_average_profile`/`train_deviator` behavior.
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize)]
 pub struct ProfileVariant {
     /// Purification threshold (Ganzfried & Sandholm, AAMAS 2012): entries
     /// below the threshold are zeroed and the remainder renormalized;
@@ -980,6 +1249,8 @@ pub struct ProfileVariant {
 pub enum AverageSamplingResearchVariant {
     UniformOne,
     EnumerateFirstOpponent,
+    /// Fixed full-support postflop check/call proposal; Street recall only.
+    PostflopContinuation,
 }
 
 #[cfg(feature = "research-average-sampling")]
@@ -992,6 +1263,13 @@ pub struct AverageSamplingResearchConfig {
     /// Zero disables evaluation. Positive values must be at least two.
     pub evaluation_samples: u64,
     pub evaluation_seeds: Vec<u64>,
+    /// Zero disables additional baseline-only coverage. Positive values must
+    /// be at least two and require ordinary evaluation seeds and prefixes.
+    #[serde(default)]
+    pub coverage_samples: u64,
+    /// Known public histories, validated before any sweep is started.
+    #[serde(default)]
+    pub coverage_prefixes: Vec<HistoryKey>,
 }
 
 #[cfg(feature = "research-average-sampling")]
@@ -1028,10 +1306,20 @@ pub struct AverageSamplingResearchEvaluation {
 }
 
 #[cfg(feature = "research-average-sampling")]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct AverageSamplingResearchCoverageEvaluation {
+    pub seed: u64,
+    pub result: PrefixProfileEvaluation,
+}
+
+#[cfg(feature = "research-average-sampling")]
 #[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct AverageSamplingResearchResult {
     pub variant: AverageSamplingResearchVariant,
     pub threads: usize,
+    /// Sweep-driver wall time only, excluding result materialization,
+    /// fingerprinting and both evaluation passes. Not deterministic.
+    pub solve_elapsed_secs: f64,
     pub metrics: SolverMetrics,
     /// BLAKE3 over state version, game/config/abstraction identity, progress
     /// counters, and the exact raw regret arena (dense) or every canonical
@@ -1043,6 +1331,7 @@ pub struct AverageSamplingResearchResult {
     /// deliberately unavailable from this consuming API.
     pub histories: Vec<AverageSamplingResearchHistory>,
     pub evaluations: Vec<AverageSamplingResearchEvaluation>,
+    pub coverage_evaluations: Vec<AverageSamplingResearchCoverageEvaluation>,
 }
 
 /// Sparse external-sampling MCCFR state.  A policy column exists only after
@@ -1108,9 +1397,22 @@ pub fn configuration_fingerprint_for_setup<G: ExternalSamplingGame>(
     *hasher.finalize().as_bytes()
 }
 
+fn initialization_pool(threads: usize) -> Result<rayon::ThreadPool, SolverError> {
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(threads)
+        .build()
+        .map_err(|error| SolverError::ThreadPoolBuild(error.to_string()))
+}
+
 impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     pub fn new(game: G, sampler: DealSampler, config: SolverConfig) -> Result<Self, SolverError> {
-        Self::new_internal(game, sampler, config, false)
+        Self::new_internal(
+            game,
+            sampler,
+            config,
+            false,
+            tree::enumerate_tree_with_limits,
+        )
     }
 
     /// Constructs the production storage layout. Unlike [`Self::new`], this
@@ -1124,7 +1426,48 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         if !matches!(game.recall_mode(), RecallMode::Street) {
             return Err(SolverError::PreallocatedStorageRequiresStreetRecall);
         }
-        Self::new_internal(game, sampler, config, true)
+        Self::new_internal(
+            game,
+            sampler,
+            config,
+            true,
+            tree::enumerate_tree_with_limits,
+        )
+    }
+
+    /// Constructs page-committed production storage using an explicitly sized
+    /// private pool for public-tree materialization. Resource admission remains
+    /// serial and non-retaining; successful node/arena order is identical to
+    /// [`Self::new_preallocated`]. A one-thread pool uses serial enumeration.
+    ///
+    /// Threads are operational, not part of algorithm or checkpoint identity.
+    /// Parallel merge can temporarily retain source and destination node slots;
+    /// the policy-arena byte limit is not a whole-process memory limit.
+    pub fn new_preallocated_with_threads(
+        game: G,
+        sampler: DealSampler,
+        config: SolverConfig,
+        threads: usize,
+    ) -> Result<Self, SolverError>
+    where
+        G::State: Send,
+    {
+        if threads == 0 {
+            return Err(SolverError::ZeroThreads);
+        }
+        if !matches!(game.recall_mode(), RecallMode::Street) {
+            return Err(SolverError::PreallocatedStorageRequiresStreetRecall);
+        }
+        let pool = initialization_pool(threads)?;
+        pool.install(|| {
+            Self::new_internal(
+                game,
+                sampler,
+                config,
+                true,
+                tree::enumerate_tree_with_limits_parallel,
+            )
+        })
     }
 
     fn new_internal(
@@ -1132,6 +1475,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         sampler: DealSampler,
         config: SolverConfig,
         commit_pages: bool,
+        materialize: TreeMaterializer<G>,
     ) -> Result<Self, SolverError> {
         validate_setup(&game, &sampler, config)?;
         let dense = match game.recall_mode() {
@@ -1150,6 +1494,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 config.max_memory_bytes,
                 config.max_traversal_depth,
                 commit_pages,
+                materialize,
             )?),
         };
         Ok(Self {
@@ -1191,7 +1536,14 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         state: SolverState,
         current_config: SolverConfig,
     ) -> Result<Self, SolverError> {
-        Self::from_state_with_config_internal(game, sampler, state, current_config, false)
+        Self::from_state_with_config_internal(
+            game,
+            sampler,
+            state,
+            current_config,
+            false,
+            tree::enumerate_tree_with_limits,
+        )
     }
 
     /// Production resume counterpart of [`Self::new_preallocated`]. The full
@@ -1206,7 +1558,48 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         if !matches!(game.recall_mode(), RecallMode::Street) {
             return Err(SolverError::PreallocatedStorageRequiresStreetRecall);
         }
-        Self::from_state_with_config_internal(game, sampler, state, current_config, true)
+        Self::from_state_with_config_internal(
+            game,
+            sampler,
+            state,
+            current_config,
+            true,
+            tree::enumerate_tree_with_limits,
+        )
+    }
+
+    /// Restores production storage using the same bounded private-pool
+    /// materialization as [`Self::new_preallocated_with_threads`]. State version,
+    /// configuration/counter checks and serial admission precede retained tree
+    /// construction; policy validation precedes page commitment and replay.
+    /// Changing construction threads does not change checkpoint compatibility.
+    pub fn from_state_with_config_preallocated_with_threads(
+        game: G,
+        sampler: DealSampler,
+        state: SolverState,
+        current_config: SolverConfig,
+        threads: usize,
+    ) -> Result<Self, SolverError>
+    where
+        G::State: Send,
+    {
+        if threads == 0 {
+            return Err(SolverError::ZeroThreads);
+        }
+        if !matches!(game.recall_mode(), RecallMode::Street) {
+            return Err(SolverError::PreallocatedStorageRequiresStreetRecall);
+        }
+        let pool = initialization_pool(threads)?;
+        pool.install(|| {
+            Self::from_state_with_config_internal(
+                game,
+                sampler,
+                state,
+                current_config,
+                true,
+                tree::enumerate_tree_with_limits_parallel,
+            )
+        })
     }
 
     fn from_state_with_config_internal(
@@ -1215,6 +1608,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         mut state: SolverState,
         current_config: SolverConfig,
         commit_pages: bool,
+        materialize: TreeMaterializer<G>,
     ) -> Result<Self, SolverError> {
         validate_setup(&game, &sampler, current_config)?;
         if state.schema_version != SOLVER_STATE_VERSION {
@@ -1244,7 +1638,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         }
 
         if matches!(game.recall_mode(), RecallMode::Street) {
-            return Self::from_state_dense(game, sampler, state, commit_pages);
+            return Self::from_state_dense(game, sampler, state, commit_pages, materialize);
         }
         #[cfg(not(any(feature = "research-abstractions", test)))]
         return Err(SolverError::PreallocatedStorageRequiresStreetRecall);
@@ -1323,12 +1717,14 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         sampler: DealSampler,
         mut state: SolverState,
         commit_pages: bool,
+        materialize: TreeMaterializer<G>,
     ) -> Result<Self, SolverError> {
         let mut dense_storage = DenseStorage::build(
             &game,
             state.config.max_memory_bytes,
             state.config.max_traversal_depth,
             false,
+            materialize,
         )?;
         state.histories.sort_unstable_by_key(|entry| entry.key);
         state.policies.sort_unstable_by_key(|entry| entry.key);
@@ -1505,9 +1901,9 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// `should_continue` is polled once per *batch* rather than once per
     /// sweep, so cancellation granularity coarsens to whole batches: a
     /// `sweep_batch = 8` run can overshoot a requested stopping point by up
-    /// to 7 extra sweeps versus `sweep_batch = 1`. Batches are committed as a
-    /// whole -- there is no partial-batch commit -- matching `merge_sweep`'s
-    /// existing all-or-nothing-per-sweep contract.
+    /// to 7 extra sweeps versus `sweep_batch = 1`. Cooperative cancellation
+    /// never interrupts a batch. A merge error instead rolls back only the
+    /// failing sweep; earlier successful sweeps in that batch stay committed.
     pub fn run_sweeps_with_threads_until<F>(
         &mut self,
         sweeps: u64,
@@ -1549,9 +1945,33 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         &mut self,
         sweeps: u64,
         threads: usize,
+        should_continue: F,
+        after_batch: O,
+        average_sampling: AverageOpponentSampling,
+    ) -> Result<u64, SolverError>
+    where
+        F: FnMut() -> bool,
+        O: FnMut(&Self),
+    {
+        self.run_sweeps_with_sampling::<false, _, _>(
+            sweeps,
+            threads,
+            should_continue,
+            after_batch,
+            average_sampling,
+            &[],
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn run_sweeps_with_sampling<const ENUMERATE_RAISED: bool, F, O>(
+        &mut self,
+        sweeps: u64,
+        threads: usize,
         mut should_continue: F,
         mut after_batch: O,
         average_sampling: AverageOpponentSampling,
+        raised_preflop_nodes: &[bool],
     ) -> Result<u64, SolverError>
     where
         F: FnMut() -> bool,
@@ -1604,11 +2024,12 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                             .and_then(|value| value.checked_add(1))
                             .ok_or(SolverError::CounterOverflow)?
                             as f64;
-                        self.generate_traversal_delta_with_average_sampling(
+                        self.generate_traversal_delta_with_sampling::<ENUMERATE_RAISED>(
                             sample_id,
                             traverser,
                             linear_weight,
                             average_sampling,
+                            raised_preflop_nodes,
                         )
                     })
                     .collect::<Vec<_>>()
@@ -1659,12 +2080,30 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         )
     }
 
+    #[cfg(test)]
     fn generate_traversal_delta_with_average_sampling(
         &self,
         sample_id: u64,
         traverser: usize,
         linear_weight: f64,
         average_sampling: AverageOpponentSampling,
+    ) -> Result<AnyTraversalDelta, SolverError> {
+        self.generate_traversal_delta_with_sampling::<false>(
+            sample_id,
+            traverser,
+            linear_weight,
+            average_sampling,
+            &[],
+        )
+    }
+
+    fn generate_traversal_delta_with_sampling<const ENUMERATE_RAISED: bool>(
+        &self,
+        sample_id: u64,
+        traverser: usize,
+        linear_weight: f64,
+        average_sampling: AverageOpponentSampling,
+        raised_preflop_nodes: &[bool],
     ) -> Result<AnyTraversalDelta, SolverError> {
         let mut deal_rng = traversal_deal_rng(self.config.seed, sample_id, traverser);
         let sample = self.sampler.sample_counted(&mut deal_rng)?;
@@ -1802,8 +2241,9 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                             self.config,
                             regret_combos,
                             weights,
-                        )?;
-                        worker.traverse(
+                        )?
+                        .with_raised_preflop_nodes(raised_preflop_nodes);
+                        worker.traverse_with_sampling::<ENUMERATE_RAISED>(
                             self.game.root_state(),
                             0,
                             &sample.world,
@@ -1891,6 +2331,21 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         mut self,
         config: AverageSamplingResearchConfig,
     ) -> Result<AverageSamplingResearchResult, SolverError> {
+        self.run_average_sampling_research_inner(config)
+    }
+
+    #[cfg(feature = "research-average-sampling")]
+    fn run_average_sampling_research_inner(
+        &mut self,
+        config: AverageSamplingResearchConfig,
+    ) -> Result<AverageSamplingResearchResult, SolverError> {
+        if config.variant == AverageSamplingResearchVariant::PostflopContinuation
+            && (self.game.recall_mode() != RecallMode::Street || self.dense.is_none())
+        {
+            return Err(SolverError::InvalidState(
+                "postflop continuation research requires preallocated current-street storage",
+            ));
+        }
         if self.completed_sweeps != 0 || self.traversals != 0 || self.next_sample_id != 0 {
             return Err(SolverError::InvalidState(
                 "average-sampling research requires a fresh solver",
@@ -1923,12 +2378,42 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             }
             (_, false) => {}
         }
+        match (config.coverage_samples, config.coverage_prefixes.is_empty()) {
+            (0, true) => {}
+            (0, false) => {
+                return Err(SolverError::InvalidState(
+                    "coverage prefixes require at least two coverage samples",
+                ));
+            }
+            (1, _) => {
+                return Err(SolverError::InvalidState(
+                    "average-sampling research coverage requires at least two samples",
+                ));
+            }
+            (_, true) => {
+                return Err(SolverError::InvalidState(
+                    "coverage samples require at least one coverage prefix",
+                ));
+            }
+            (_, false) => {
+                if config.evaluation_samples == 0 {
+                    return Err(SolverError::InvalidState(
+                        "average-sampling research coverage requires ordinary evaluation",
+                    ));
+                }
+            }
+        }
+        self.validate_evaluation_prefixes(&config.coverage_prefixes)?;
         let internal_variant = match config.variant {
             AverageSamplingResearchVariant::UniformOne => AverageOpponentSampling::UniformOne,
             AverageSamplingResearchVariant::EnumerateFirstOpponent => {
                 AverageOpponentSampling::EnumerateFirst
             }
+            AverageSamplingResearchVariant::PostflopContinuation => {
+                AverageOpponentSampling::PostflopContinuation
+            }
         };
+        let solve_started = std::time::Instant::now();
         self.run_sweeps_with_threads_until_observed_sampling(
             config.sweeps,
             config.threads,
@@ -1936,6 +2421,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             |_| {},
             internal_variant,
         )?;
+        let solve_elapsed_secs = solve_started.elapsed().as_secs_f64();
 
         let histories = config
             .histories
@@ -1983,7 +2469,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             })
             .collect::<Result<Vec<_>, SolverError>>()?;
         let mut evaluations = Vec::with_capacity(config.evaluation_seeds.len());
-        for seed in config.evaluation_seeds {
+        for &seed in &config.evaluation_seeds {
             evaluations.push(AverageSamplingResearchEvaluation {
                 seed,
                 result: self.evaluate_profile_with_threads(
@@ -1995,13 +2481,31 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 )?,
             });
         }
+        let mut coverage_evaluations = Vec::new();
+        if config.coverage_samples > 0 {
+            coverage_evaluations.reserve(config.evaluation_seeds.len());
+            for &seed in &config.evaluation_seeds {
+                coverage_evaluations.push(AverageSamplingResearchCoverageEvaluation {
+                    seed,
+                    result: self.evaluate_profile_coverage(
+                        config.coverage_samples,
+                        seed,
+                        ProfileVariant::default(),
+                        config.threads,
+                        &config.coverage_prefixes,
+                    )?,
+                });
+            }
+        }
         Ok(AverageSamplingResearchResult {
             variant: config.variant,
             threads: config.threads,
+            solve_elapsed_secs,
             metrics: self.metrics(),
             current_regret_fingerprint: self.research_regret_fingerprint(),
             histories,
             evaluations,
+            coverage_evaluations,
         })
     }
 
@@ -2261,23 +2765,22 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// There is nothing to "ensure" (no `EnsurePolicy`/`EnsureHistory`
     /// bookkeeping): every column already exists; only its touched bit and
     /// values change.
-    fn merge_sweep_dense(&mut self, deltas: Vec<DenseTraversalDelta>) -> Result<(), SolverError> {
+    fn merge_sweep_dense(
+        &mut self,
+        mut deltas: Vec<DenseTraversalDelta>,
+    ) -> Result<(), SolverError> {
         let num_players = self.game.num_players();
         if deltas.len() != num_players {
             return Err(SolverError::InvalidState(
                 "parallel sweep did not produce one delta per seat",
             ));
         }
-        let dense = self
-            .dense
-            .as_mut()
-            .expect("merge_sweep_dense only called when dense storage exists");
-
         let mut total_deal_attempts = self.total_deal_attempts;
         let mut terminal_evaluations = self.terminal_evaluations;
         let mut hand_updates = self.hand_updates;
 
-        for (seat, delta) in deltas.into_iter().enumerate() {
+        // Validate all identities and counters before changing any arena slot.
+        for (seat, delta) in deltas.iter().enumerate() {
             let expected_sample_id = self
                 .next_sample_id
                 .checked_add(seat as u64)
@@ -2296,58 +2799,59 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             hand_updates = hand_updates
                 .checked_add(delta.hand_updates)
                 .ok_or(SolverError::CounterOverflow)?;
-            for event in delta.events {
-                match event {
-                    DenseEvent::AddRegret { column, values } => {
-                        let range = dense.arena.slot_range_for_column(column, values.len())?;
-                        dense.arena.touched_set(column);
-                        // Regret floor, Pluribus-style: only meaningful once
-                        // pruning is enabled (it exists to bound how long a
-                        // heavily-pruned action needs to recover once it
-                        // stops being a pruning candidate, and to keep the
-                        // ever-more-negative accumulation from overflowing
-                        // f32); 5% more negative than `prune_threshold` so a
-                        // floored regret still satisfies the "below
-                        // threshold" pruning test.
-                        let floor = self
-                            .config
-                            .prune
-                            .then_some((1.05 * self.config.prune_threshold) as f32);
-                        for (target, value) in dense.arena.regrets[range].iter_mut().zip(values) {
-                            checked_add_f32(target, value)?;
-                            if let Some(floor) = floor
-                                && *target < floor
-                            {
-                                *target = floor;
-                            }
-                        }
-                    }
-                    DenseEvent::AddStrategy { column, values } => {
-                        let range = dense.arena.slot_range_for_column(column, values.len())?;
-                        dense.arena.touched_set(column);
-                        for (target, value) in
-                            dense.arena.strategy_sum[range].iter_mut().zip(values)
-                        {
-                            checked_add_f32(target, value)?;
-                        }
-                    }
-                }
-            }
         }
 
         let added = num_players as u64;
-        self.traversals = self
+        let traversals = self
             .traversals
             .checked_add(added)
             .ok_or(SolverError::CounterOverflow)?;
-        self.next_sample_id = self
+        let next_sample_id = self
             .next_sample_id
             .checked_add(added)
             .ok_or(SolverError::CounterOverflow)?;
-        self.completed_sweeps = self
+        let completed_sweeps = self
             .completed_sweeps
             .checked_add(1)
             .ok_or(SolverError::CounterOverflow)?;
+
+        let dense = self
+            .dense
+            .as_mut()
+            .expect("merge_sweep_dense only called when dense storage exists");
+        // Keep the existing per-addition regret floor and rounding order. The
+        // consumed f64 delta slots become an exact journal of old f32 values;
+        // no arena copy or additional event-sized allocation is necessary.
+        let floor = self
+            .config
+            .prune
+            .then_some((1.05 * self.config.prune_threshold) as f32);
+        for seat in 0..deltas.len() {
+            for event in 0..deltas[seat].events.len() {
+                if let Err((written, error)) = apply_dense_event_journaled(
+                    &mut dense.arena,
+                    &mut deltas[seat].events[event],
+                    floor,
+                ) {
+                    rollback_dense_events(&mut dense.arena, &deltas, seat, event, written);
+                    return Err(error);
+                }
+            }
+        }
+        // Every column was validated above. Defer these infallible writes so
+        // rollback never needs to clear bits or restore touched_count.
+        for delta in &deltas {
+            for event in &delta.events {
+                let column = match event {
+                    DenseEvent::AddRegret { column, .. }
+                    | DenseEvent::AddStrategy { column, .. } => *column,
+                };
+                dense.arena.touched_set(column);
+            }
+        }
+        self.traversals = traversals;
+        self.next_sample_id = next_sample_id;
+        self.completed_sweeps = completed_sweeps;
         self.total_deal_attempts = total_deal_attempts;
         self.terminal_evaluations = terminal_evaluations;
         self.hand_updates = hand_updates;

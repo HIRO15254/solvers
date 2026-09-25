@@ -11,6 +11,41 @@ use super::*;
 pub(super) enum AverageOpponentSampling {
     UniformOne,
     EnumerateFirst,
+    PostflopContinuation,
+}
+
+fn is_continuation(label: &str) -> bool {
+    label == "check" || label.starts_with("call:")
+}
+
+/// Card-independent public proposal. A fair mixture of two exact integer
+/// uniform draws avoids a rounded categorical CDF: q(a)=1/(2|A|)+1[a in C]/(2|C|).
+/// It is a fixed scalar for each exact history, so it cancels only when the
+/// expected accumulated average vector is normalized, not as a claim that a
+/// finite-sample normalized ratio is unbiased. No inverse-q update is added.
+fn postflop_continuation_action(
+    street: Street,
+    labels: &[String],
+    rng: &mut impl Rng,
+) -> Result<usize, SolverError> {
+    if labels.is_empty() {
+        return Err(SolverError::InvalidActionLabels(
+            "empty average proposal menu",
+        ));
+    }
+    validate_action_labels(labels)?;
+    let continuations = labels.iter().filter(|label| is_continuation(label)).count();
+    if street == Street::Preflop || continuations == 0 || !rng.gen_bool(0.5) {
+        return Ok(rng.gen_range(0..labels.len()));
+    }
+    let chosen = rng.gen_range(0..continuations);
+    Ok(labels
+        .iter()
+        .enumerate()
+        .filter(|(_, label)| is_continuation(label))
+        .nth(chosen)
+        .expect("chosen continuation is in range")
+        .0)
 }
 
 /// Independent average-policy traversal for sparse, full-recall storage.
@@ -162,6 +197,11 @@ impl<'a, G: ExternalSamplingGame> SparseAverageStrategyWorker<'a, G> {
         rng: &mut ChaCha20Rng,
         depth: u32,
     ) -> Result<(), SolverError> {
+        if self.opponent_sampling == AverageOpponentSampling::PostflopContinuation {
+            return Err(SolverError::InvalidState(
+                "continuation averaging requires Street recall",
+            ));
+        }
         self.traverse_inner(
             state, world, averager, history, own_reach, rng, depth, false,
         )
@@ -375,6 +415,36 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
         Ok(node)
     }
 
+    fn continuation_action(
+        &self,
+        state: &G::State,
+        node: &tree::TreeNode,
+        actions: &G::Actions,
+        rng: &mut ChaCha20Rng,
+    ) -> Result<usize, SolverError> {
+        let context = self.game.dense_node_context(state);
+        if context.street != node.street
+            || context.active_opponents != node.active_opponents
+            || context.bucket_active_opponents != node.bucket_active_opponents
+        {
+            return Err(SolverError::InvalidState(
+                "average proposal public context differs from dense tree",
+            ));
+        }
+        let mut label = String::new();
+        for (action, expected) in node.action_labels.iter().enumerate() {
+            label.clear();
+            self.game.write_action_label(actions, action, &mut label);
+            if label != *expected {
+                return Err(SolverError::InvalidActionLabels(
+                    "average proposal public menu differs from dense tree",
+                ));
+            }
+        }
+        // Neither the world nor any private bucket/strategy enters this path.
+        postflop_continuation_action(node.street, &node.action_labels, rng)
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub(super) fn traverse_scalar(
         &mut self,
@@ -386,6 +456,13 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
         rng: &mut ChaCha20Rng,
         depth: u32,
     ) -> Result<(), SolverError> {
+        if self.opponent_sampling == AverageOpponentSampling::PostflopContinuation
+            && self.game.recall_mode() != RecallMode::Street
+        {
+            return Err(SolverError::InvalidState(
+                "continuation averaging requires Street recall",
+            ));
+        }
         self.traverse_scalar_inner(
             state, node_id, world, averager, own_reach, rng, depth, false,
         )
@@ -489,7 +566,12 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
             }
             *rng = selected_final_rng.expect("discarded action has a known dense child");
         } else {
-            let action = rng.gen_range(0..num_actions);
+            let action = if self.opponent_sampling == AverageOpponentSampling::PostflopContinuation
+            {
+                self.continuation_action(&state, node, &actions, rng)?
+            } else {
+                rng.gen_range(0..num_actions)
+            };
             let Child::Decision(child_id) = node.children[action] else {
                 return Ok(());
             };
@@ -521,6 +603,13 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
         rng: &mut ChaCha20Rng,
         depth: u32,
     ) -> Result<(), SolverError> {
+        if self.opponent_sampling == AverageOpponentSampling::PostflopContinuation
+            && self.game.recall_mode() != RecallMode::Street
+        {
+            return Err(SolverError::InvalidState(
+                "continuation averaging requires Street recall",
+            ));
+        }
         self.traverse_vector_inner(
             state, node_id, world, averager, combos, weights, own_reach, rng, depth, false,
         )
@@ -666,7 +755,12 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
             }
             *rng = selected_final_rng.expect("discarded action has a known dense child");
         } else {
-            let action = rng.gen_range(0..num_actions);
+            let action = if self.opponent_sampling == AverageOpponentSampling::PostflopContinuation
+            {
+                self.continuation_action(&state, node, &actions, rng)?
+            } else {
+                rng.gen_range(0..num_actions)
+            };
             let Child::Decision(child_id) = node.children[action] else {
                 return Ok(());
             };
@@ -687,3 +781,7 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
         Ok(())
     }
 }
+
+#[cfg(test)]
+#[path = "averaging_continuation_tests.rs"]
+mod continuation_tests;

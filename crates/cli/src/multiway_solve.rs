@@ -1,6 +1,5 @@
 use std::borrow::Cow;
 use std::cell::Cell;
-use std::collections::HashMap;
 use std::io::Write;
 use std::path::{Component, Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -8,7 +7,7 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, anyhow};
 use formats::{MULTIWAY_SCHEMA_VERSION, MultiwayMetricsRow, MultiwayMetricsWriter};
-use multiway::solver::InfoKey;
+use multiway::solver::StrategyDriftTracker;
 use multiway::{ExternalSamplingGame, HoldemGame, MultiwaySolver};
 use serde::Serialize;
 
@@ -382,8 +381,11 @@ fn run_inner(
     // Seeds `prior` with the current averages (the drift result is
     // discarded), so a resumed run's first drift row measures movement since
     // the checkpoint rather than since an empty profile.
-    let mut prior: HashMap<InfoKey, Vec<f32>> = HashMap::new();
-    mw_session.solver.strategy_drift_refresh(&mut prior);
+    let mut prior = StrategyDriftTracker::new();
+    mw_session
+        .solver
+        .strategy_drift_refresh_compact(&mut prior)
+        .context("seeding multiway strategy drift")?;
     let mut last_row = MultiwayMetricsRow::sampling(mw_session.game_config.seats.len());
     let is_v1 = crate::multiway_v1::has_v1_schema(raw_config).unwrap_or(false);
     let checkpoint_interval = if is_v1 {
@@ -579,7 +581,10 @@ fn run_inner(
             )?;
 
             let now = mw_session.solver.metrics();
-            let drift = mw_session.solver.strategy_drift_refresh(&mut prior);
+            let drift = mw_session
+                .solver
+                .strategy_drift_refresh_compact(&mut prior)
+                .context("refreshing multiway strategy drift")?;
             last_row = session::metrics_row(
                 &now,
                 drift,
@@ -618,7 +623,10 @@ fn run_inner(
                 .solver
                 .evaluate_average_profile(mw_session.evaluation_samples, mw_session.evaluation_seed)
                 .context("evaluating held-out multiway profile")?;
-            let drift = mw_session.solver.strategy_drift_refresh(&mut prior);
+            let drift = mw_session
+                .solver
+                .strategy_drift_refresh_compact(&mut prior)
+                .context("refreshing multiway strategy drift")?;
             last_row = session::metrics_row(
                 &now,
                 drift,
@@ -730,7 +738,10 @@ fn run_inner(
                     .context("evaluating final held-out multiway profile")?,
             )
         };
-        let drift = mw_session.solver.strategy_drift_refresh(&mut prior);
+        let drift = mw_session
+            .solver
+            .strategy_drift_refresh_compact(&mut prior)
+            .context("refreshing final multiway strategy drift")?;
         last_row = session::metrics_row(
             &final_metrics,
             drift,
@@ -763,16 +774,19 @@ fn run_inner(
             .context("writing final multiway metrics")?;
     }
 
-    // Drift is final. Release the previous-profile map before materializing
-    // snapshot/solution copies; it can contain every touched policy column.
+    // Drift is final. Release the previous profile before solution staging.
+    // The stored block count is already available from the final metrics;
+    // cancellation/resource stops and runs without a solution need no copy.
     drop(prior);
-    let snapshot = mw_session.solver.snapshot_state();
+    let strategy_blocks = usize::try_from(final_metrics.infosets)
+        .context("strategy block count exceeds the platform address space")?;
     if let Some(path) = mwsol_path
         && !matches!(
             status,
             CompletionStatus::ResourceLimit | CompletionStatus::Cancelled
         )
     {
+        let snapshot = mw_session.solver.snapshot_state();
         let solution = session::make_solution(
             &mw_session.config_toml,
             mw_session.solver.abstraction_fingerprint(),
@@ -855,7 +869,7 @@ fn run_inner(
             0.0
         },
         seats: last_row.seats,
-        strategy_blocks: snapshot.policies.len(),
+        strategy_blocks,
         config_hash: formats::config_hash_hex(&mw_session.config_hash),
         effective_config,
         game_fingerprint,
@@ -1030,9 +1044,7 @@ fn write_checkpoint<A: multiway::MultiwayAbstraction>(
         cumulative_solve_millis: cumulative_before
             .saturating_add(started.elapsed().as_millis().min(u128::from(u64::MAX)) as u64),
     };
-    multiway::checkpoint::MultiwayCheckpoint::capture(solver)
-        .with_runtime_metadata(raw_config, runtime)
-        .write_atomic(path)
+    multiway::checkpoint::MultiwayCheckpoint::write_solver_atomic(solver, path, raw_config, runtime)
         .with_context(|| format!("writing {}", path.display()))
 }
 

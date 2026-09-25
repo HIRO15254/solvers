@@ -290,6 +290,8 @@ fn run<A: MultiwayAbstraction>(
             histories,
             evaluation_samples,
             evaluation_seeds,
+            coverage_samples: 0,
+            coverage_prefixes: Vec::new(),
         })?;
     let output = Output {
         schema_version: "solvers.multiway-draw-abstraction-research/v1",

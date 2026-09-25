@@ -149,7 +149,7 @@ pub fn build_postflop_config(
 /// chips behind them, with the pot dead on the table — so the reported
 /// number answers "what does this player take out of this spot, net of what
 /// they still have to put in". That is the basis PioSOLVER and GTO Wizard
-/// report and the one `docs/validation/gto-wizard-validation.md` compares
+/// report and the one `experiments/hu-postflop-reference/README.md` compares
 /// against.
 ///
 /// It goes through the utility model rather than adding chips directly,

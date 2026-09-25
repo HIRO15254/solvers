@@ -65,9 +65,13 @@ machine 資源なので config には書かない。config に local path を書
 ### シグナル
 
 1 回目の SIGINT(Ctrl-C)は cooperative cancel で、checkpoint を書いてから
-`130` で終了する。2 回目は即時終了する。cancel は評価境界で効くので、
-`check_every`(multiway は `check_every_sweeps`)が大きいと反応まで最大 1 chunk
-かかる。
+`130` で終了する。2 回目は即時終了する。Multiwayのcancelは完了したsolver batchの
+境界で確認するため、判定の遅れは最大1 batchであり、品質評価の
+`check_every_sweeps`間隔には依存しない。判定後のcheckpoint I/Oや成果物出力は
+別途時間を要する。heads-up系のcancelは評価境界で確認し、`check_every`が大きいと
+反応まで最大1 chunkかかる。
+Multiwayのmerge errorは失敗した1 sweepのみを巻き戻し、同じbatch内の先行する
+成功sweepは保持する。cooperative cancelの境界とbatch全体のrollbackを混同しない。
 
 ---
 
@@ -387,6 +391,98 @@ deviationの2候補を比較するCIは候補選択を考慮した近似区間�
 `stderr`だけから再構築しない。Nash/exploitability保証ではない。
 同一sampleのbaselineとdeviator候補はphysical worldと行動乱数列を共有し、
 共通履歴での行動ノイズを揃えたpaired gainから標準誤差を計算する。
+評価JSONの`candidate_policy_coverage`はbaselineの判断訪問をseat/street別に数える。
+`average_strategy_visits`は正の平均質量、`current_strategy_visits`はcurrentの明示指定、
+`regret_fallback_visits`は平均質量0からの代替、`uniform_fallback_visits`は未保存column。
+`stored_strategy_visits`は前3者の合計である。各`*_by_street`がstreet内訳を持つ。
+`solve`/`resume`のprogressとrun summaryでは同じ値をcamelCaseの
+`seats[].candidatePolicyCoverage`として出力し、未評価時はnullとする。
+訪問されなかった深いbranchの品質やNash収束をこのcoverageだけから判断しない。
+
+完全checkpointから深い履歴以降を調べる場合は、別の研究用
+[`mw_checkpoint_audit`](../crates/cli/examples/mw_checkpoint_audit.md) exampleの
+`--coverage-prefix`と`--coverage-samples`を使える。これらは`solvers evaluate`の
+optionではない。baseline-onlyの枝別監査は逸脱利得をnullとして出力する。
+同exampleの `--condition-prefix PATH`（最大64個、一意な判断node）と
+`--condition-samples N`（2以上、既定0で無効）で、経路確率を重みにした
+条件付き監査を追加できる。両optionを組で指定し、`conditionalEvaluations`に
+各評価seedの到達確率・ESS・条件付きutility/coverageとdelta標準誤差を保存する。
+forced経路の訪問を通常のbaseline到達として扱わない。
+同exampleの `--condition-sampler preflop-proposal` はpostflop判断prefixのみを受け、
+同じpreflop経路ごとにgroup化する。`--condition-samples` はseed・groupごとの予算。
+出力は `preflopConditionalEvaluations` となり、相対重み平均を絶対到達確率に
+読み替えない。既定の `root` は従来の配札と出力を維持する。
+同exampleでは `--checkpoint PATH` の代わりに `--fresh-sweeps N`（1以上）で、
+新規solverを通常driverで固定sweep数だけ学習してから監査できる。両者は排他で、
+一方を必須とする。checkpoint/solutionは書かず、研究loopの予算はこのflagと外部timeoutで
+管理する（configのrun停止・保存scheduleは駆動しない）。`freshTraining`に実config、
+metrics、solve時間を残す。`--support-node PATH`（最大64個、一意）では全streetの
+判断nodeについて、未保存bucketを含むraw regret/平均質量を`policySupport`に出力する。
+未保存、保存済み全ゼロ、非正、正regretと平均質量を区別し、訪問回数や品質の証明と扱わない。
+`--preflop-support-census` は全materialized Preflop判断を、未使用nodeも含めて
+`preflopSupportCensus` に集計する。actor・レイズ回数・残存人数・limp/flat数、
+expected/stored bucket数、非ゼロ/正regret・正平均質量のbucket数、未使用列を含む
+raw f32 bitsとtouchedのfingerprintを出す。arenaを借用し、全stateの複製は行わない。
+集計時間は別fieldに記録する。これは数値supportの監査であり、訪問数・ESS・品質ではない。
+`--enumerate-raised-preflop` は `research-regret-sampling` featureと `--fresh-sweeps` が
+必要な研究flag。freshのdense current-street vector solver、pruning無効、opponent exploration 0
+に限り、各pathの最初のレイズ後opponent判断を列挙する。子のregret重みはα×σ、
+戻り値はΣσV、本人reachは掛けず、平均walkは従来どおり。variant情報を `freshTraining` に残す。
+通常flag省略時の学習を維持し、研究方式のcheckpoint保存・resume identityは未実装とする。
+同exampleの `--endpoint-prefix PATH` はrootを含むpreflop/postflop判断（各1〜8行動）の
+独立fit/held-out診断を追加する。最大8個まで反復指定でき、復元済みsolverを共有する。
+解決後のhistory重複は拒否し、各tableは他のendpointから独立にfit/評価する。
+`--endpoint-fit-samples N`、`--endpoint-fit-seed S`、
+`--endpoint-samples M`、`--endpoint-seeds T,U` を全て明示する。N/Mは2以上、
+held-out seedは1〜64個、一意かつfit seedと異なる値。`--endpoint-min-fit-ess` は
+既定64、有限かつ2以上。これらは `--endpoint-prefix` と組でのみ使用できる。
+`endpointDeviation` はown InfoKey別に一度fitしたtableと全bucket、各held-out seedの
+符号付き条件付き利得・誤差・ESS・採用key重みcoverageを記録する。未採用keyはbaselineを
+維持して分母へ含め、endpoint以降の本人を含む全seatもbaselineへ従う。endpoint行動の
+確率はprefix重みに掛けない。preflop判断では直前までの部分prefixを配札proposalへ
+組み込み、rootでは空prefixを使う。baseline-onlyの `--condition-sampler preflop-proposal`
+は従来どおりpostflop限定。通常の停止評価・TOML・checkpoint形式は変更しない。
+
+同監査exampleの `--endpoint-target actual-prefix|opponents-prefix|both` は `--endpoint-prefix` 必須、
+既定 `actual-prefix`。`opponents-prefix` はPreflop限定で、判断者本人の過去の行動確率を除いた配札targetを使い、
+別の `endpointCounterfactualDeviation` を出力する。target・除外actor・proposal種別・
+検証した169-class context数・class別本人prefix確率・独立fit/held-out結果を保持する。
+本人到達確率0のkeyも評価し、fit未採用keyを全分母へ残す。Postflop、terminal、
+不正なclass mappingは拒否する。本人の行動確率を含む既存targetとは集計対象が異なるので、
+集計利得や相対重み平均を直接順位付けしない。省略時の既存JSONには新fieldを追加しない。
+複数endpointでは単数fieldの代わりに `endpointDeviations` または
+`endpointCounterfactualDeviations` を要求順の配列で出力する。予算はendpointごとに適用する。
+複数判断を同時に変更する戦略ではなく、各判断の最初の1行動だけを変えた別々の診断である。
+`both` もPreflop限定で、各endpointをactual-prefix、opponents-prefixの順に独立実行し、
+両方のfield群を出す。指定budgetは各targetへ全量適用するため、最大8 endpointで16 fitとなる。
+fit/held-out sampleをtarget間でpoolせず、異なる母集団の利得を混同しない。
+
+同監査exampleには、各seatの複数Preflop判断を変更できるread-only診断もある。
+次の4 flagを全て明示する。既定は無効で、endpoint指定やresearch featureは不要。
+
+| flag | 制約 |
+|---|---|
+| `--preflop-deviation-fit-traversals N` | seatごとのfit traversal数、1以上 |
+| `--preflop-deviation-fit-seed S` | 一度だけ行うfitのseed |
+| `--preflop-deviation-samples M` | held-out seedごとのphysical world数、2以上 |
+| `--preflop-deviation-seeds T,U` | 1〜64個、一意で、全てSと異なる |
+| `--preflop-deviation-retention-gate` | 任意。上記4 flag必須。8訪問未満の本人Preflop keyはfit中もbaselineの価値を返す |
+
+`preflopDeviation` のscopeは `all-preflop-decisions-with-frozen-postflop`。
+各seatのtableを別々にfitし、本人のPreflop判断だけを変更する。全seatのPostflop判断と
+fitで未採用のPreflop keyはcandidate baselineへ従う。採用閾値は8 fit visitsで、ESSではない。
+fit visit数は旧all-street診断も含めchecked u64で数え、overflowは明示errorとする。
+CLIはunpurified averageを使い、`evaluate_preflop_deviation` APIは指定variantを使う。
+任意のretention gateは8回目からlocal RMへ切り替えるが、全本人行動の列挙・regret更新は
+最初から続ける。`fitMode` は既定 `local-regret-matching` /選択時 `retention-gated`。
+対応APIは `evaluate_preflop_deviation_with_fit_mode`。最終純粋argmaxは同じで、利得改善保証ではない。
+独立held-outの `heldOut[].gains` は未採用keyを含む全worldのsigned paired差で、負値も保持する。
+seat別の平均・標準誤差・近似95% CI、replayの `coverage` とbaselineだけの
+`candidatePolicyCoverage` を出す。CIはseat/seed全体の同時保証やfull BR保証ではない。
+最大4096 sampleを順序付きでbufferし、fit tableの大きさは訪問したkey数に依存する。
+`fitPolicyFingerprint` は採用action tableだけのhashで、baseline identityではない。
+4つの予算/seed flagを省略した場合は診断のfieldを出さず、通常評価・停止・TOML/default・保存形式は変更しない。
+
 規範契約のPreflop-only exportには未解決の実装差分があり、現在のwriterは正の平均質量を
 持つPostflop blockも保存し得る。未訪問・平均質量0のpolicy、raw regret、量子化前の値は
 保存されないため、学習時の完全profileとは同等ではない。完全stateの評価にはcheckpointを使う。
@@ -466,3 +562,60 @@ flag、既定値、possible value、exit code、endpoint のいずれかを変�
 
 `crates/cli/src/config_new.rs` の `the_cli_reference_covers_every_command` が
 コマンド名と flag の網羅を機械的に検査する。
+
+### 平均戦略サンプリング研究 example
+
+`mw_average_sampling_research`（feature `research-average-sampling`）の
+`--node` は全 street の decision path に対応する。
+`--coverage-prefix PATH` を最大 64 個指定すると別枠の baseline-only 評価を追加する。
+`--coverage-samples N` は prefix 必須、2 以上、既定は `--evaluation-samples`。
+評価 seed は `--evaluation-seeds` と共通で、prefix と `--skip-evaluation` は併用不可。
+`result.solve_elapsed_secs` は sweep のみ、`constructionElapsedSecs` は session
+構築の時間である。詳細・JSON・制約は
+[example ガイド](../crates/cli/examples/mw_average_sampling_research.md) を参照。
+これらは research example の flag であり、`solvers solve/evaluate` の flag ではない。
+
+`--variant postflop-continuation` は Street recall限定の研究用平均walkで、
+postflopの相手nodeにおいて一様な全合法行動と一様なcheck/callを50/50で混ぜる。
+preflopやcheck/callがないnodeでは一様を維持する。fresh専用でdefaultは変更しない。
+`--support-node PATH`（最大64）で全bucketのraw regretと正規化平均戦略を出力できる。
+`--endpoint-prefix PATH`（rootを含むpreflop/postflop判断、最大8）は `--endpoint-fit-samples` / `--endpoint-fit-seed` /
+`--endpoint-samples` / `--endpoint-seeds` 必須。sample数は2以上、held-out seedは
+1〜64個で重複不可、fit seedと別。`--endpoint-min-fit-ess` は有限かつ2以上、既定64。
+`--root-samples`（2以上）と `--root-seeds` は対でendpoint必須。root seedも1〜64個で
+重複不可、fit/held-outと別とする。これらの診断は `--skip-evaluation` と併用可能で、
+同じ学習済みsolverを消費する前に実行する。raw平均massや再開可能stateは返さない。
+
+### Tree 構築の研究 benchmark
+
+`mw_tree_initialization_bench` は cash Multiway v1 の実 public game を使い、
+preflight・列挙・arena 確保・page commit を分けて測る example である。
+`--config` と `--source-revision` は必須。`--mode serial|parallel`（既定 serial）、
+`--threads`（1、範囲 1–64）、`--arena-limit-bytes`（1 GiB）、
+`--max-nodes`（2,000,000）、`--max-depth`（512）を受け付ける。
+config の run resource/stop 設定に代わり、この明示的な benchmark 上限を使う。
+EHS の読み込みや solver 学習は含まない。失敗 phase は JSON と非ゼロ終了で報告する。
+[詳細ガイド](../crates/cli/examples/mw_tree_initialization_bench.md) を参照。
+benchmark専用のflagは `solvers` 本体には追加しない。通常のMultiway new/resumeは
+既存の `run.resources.threads`（または `--threads` override）をTree構築にも適用する。
+1 threadは直列、複数threadは順序を維持して分割する。資源上限の事前確認は直列のまま、
+thread数変更によるsolver state/checkpointの互換性変更はない。
+
+### Checkpoint書込み研究 benchmark
+
+`mw_checkpoint_write_bench`は同じproduction stateをowned captureとborrowed writerで
+保存し、準備・圧縮・fsync・一時state破棄を含む時間を比較する。`--config`、`--memory`、
+`--source-revision`、`--mode owned|borrowed`、新規の`--output`と、`--checkpoint`または
+正の`--sweeps`が必要。`--threads`の既定は8、`--cache-dir`は任意である。
+checkpoint指定時は再学習せず、fresh指定時は研究予算で通常driverを実行する。
+これは保存処理の比較であり、通常CLIのflag/defaultを変えない。
+[計測範囲と再現手順](../crates/cli/examples/mw_checkpoint_write_bench.md)を参照。
+
+### Strategy drift研究 benchmark
+
+`mw_strategy_drift_bench`は同じcheckpointを復元し、前回profileの初回保存と
+変化のない2回目の更新を別々に計測する。`--config`、`--checkpoint`、新規`--output`、
+`--mode legacy|compact`、`--memory`、`--source-revision`が必要。`--threads`は既定8、
+許容1..64、`--cache-dir`は任意。追加学習は実施しない。tracker破棄後に共通writerで
+checkpointを保存する。保持payload容量とprocess全体のpeakは別の量として扱う。
+[計測範囲と再現手順](../crates/cli/examples/mw_strategy_drift_bench.md)を参照。

@@ -6,9 +6,11 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
+mod stream;
+
 use crate::solver::{
     ExternalSamplingGame, HistoryEntry, MultiwaySolver, PolicyEntry, SOLVER_STATE_VERSION,
-    SolverConfig, SolverState,
+    SnapshotError, SolverConfig, SolverState,
 };
 
 const CHECKPOINT_MAGIC: &[u8; 8] = b"SLVRMWCP";
@@ -74,8 +76,8 @@ struct CheckpointPayloadV7 {
 }
 
 #[derive(Serialize)]
-struct CheckpointPayloadV7Ref<'a> {
-    state: &'a SolverState,
+struct CheckpointPayloadV7Ref<'a, S: ?Sized> {
+    state: &'a S,
     config_toml: &'a str,
     runtime: CheckpointRuntimeState,
 }
@@ -148,17 +150,11 @@ impl MultiwayCheckpoint {
         abstraction_fingerprint: [u8; 32],
     ) -> Self {
         Self {
-            header: MultiwayCheckpointHeader {
-                version: CHECKPOINT_VERSION,
+            header: empty_header(
                 configuration_fingerprint,
                 abstraction_fingerprint,
-                next_sample_id: state.next_sample_id,
-                payload_len: 0,
-                uncompressed_len: 0,
-                payload_checksum: [0; 32],
-                chunk_count: 0,
-                chunk_table_checksum: [0; 32],
-            },
+                state.next_sample_id,
+            ),
             state,
             config_toml: None,
             runtime: CheckpointRuntimeState::default(),
@@ -199,6 +195,50 @@ impl MultiwayCheckpoint {
             });
         }
 
+        Self::write_payload_atomic(
+            &self.header,
+            &self.state,
+            self.config_toml.as_deref().unwrap_or(""),
+            self.runtime,
+            path,
+        )
+    }
+
+    /// Atomically saves a live solver without cloning its policy columns.
+    ///
+    /// The solver stays immutably borrowed until writing completes. Sorting
+    /// scratch contains node IDs for dense storage or references for sparse
+    /// storage; action labels, regrets and strategy sums remain in the solver.
+    /// Payload and container bytes match [`Self::capture`] followed by
+    /// [`Self::with_runtime_metadata`] and [`Self::write_atomic`].
+    pub fn write_solver_atomic<G: ExternalSamplingGame>(
+        solver: &MultiwaySolver<G>,
+        path: &Path,
+        config_toml: &str,
+        runtime: CheckpointRuntimeState,
+    ) -> Result<(), CheckpointError> {
+        let state = solver.snapshot_state_ref().map_err(|error| match error {
+            SnapshotError::AllocationFailed { requested } => {
+                CheckpointError::AllocationFailed { requested }
+            }
+            SnapshotError::LengthOverflow => CheckpointError::LengthOverflow,
+            SnapshotError::InconsistentState(reason) => CheckpointError::InvalidSnapshot(reason),
+        })?;
+        let header = empty_header(
+            solver.configuration_fingerprint(),
+            solver.abstraction_fingerprint(),
+            state.next_sample_id(),
+        );
+        Self::write_payload_atomic(&header, &state, config_toml, runtime, path)
+    }
+
+    fn write_payload_atomic<S: Serialize + ?Sized>(
+        source_header: &MultiwayCheckpointHeader,
+        state: &S,
+        config_toml: &str,
+        runtime: CheckpointRuntimeState,
+        path: &Path,
+    ) -> Result<(), CheckpointError> {
         let parent = path
             .parent()
             .filter(|parent| !parent.as_os_str().is_empty());
@@ -211,9 +251,9 @@ impl MultiwayCheckpoint {
         {
             let writer = BufWriter::new(raw_file.as_file_mut());
             let payload = CheckpointPayloadV7Ref {
-                state: &self.state,
-                config_toml: self.config_toml.as_deref().unwrap_or(""),
-                runtime: self.runtime,
+                state,
+                config_toml,
+                runtime,
             };
             let mut writer = postcard::to_io(&payload, writer)?;
             writer.flush()?;
@@ -277,7 +317,7 @@ impl MultiwayCheckpoint {
         debug_assert_eq!(remaining, 0);
 
         let chunk_table = encode_chunk_table(&chunks);
-        let mut header = self.header.clone();
+        let mut header = source_header.clone();
         header.version = CHECKPOINT_VERSION;
         header.payload_len = payload_len;
         header.uncompressed_len = uncompressed_len;
@@ -414,78 +454,35 @@ impl MultiwayCheckpoint {
             });
         }
 
-        let expected_raw_len = usize::try_from(header.uncompressed_len)
-            .map_err(|_| CheckpointError::LengthOverflow)?;
-        let mut raw = Vec::new();
-        try_reserve_u8(&mut raw, expected_raw_len)?;
-        let mut decoded_chunk = Vec::new();
-        try_reserve_u8(
-            &mut decoded_chunk,
-            CHUNK_UNCOMPRESSED_BYTES
-                .checked_add(1)
-                .ok_or(CheckpointError::LengthOverflow)?,
-        )?;
-        let mut payload_hasher = blake3::Hasher::new();
-        for (index, chunk) in chunks.iter().enumerate() {
-            let compressed_len = usize::try_from(chunk.compressed_len)
-                .map_err(|_| CheckpointError::LengthOverflow)?;
-            let mut compressed = vec![0u8; compressed_len];
-            file.read_exact(&mut compressed)?;
-            payload_hasher.update(&compressed);
-            if *blake3::hash(&compressed).as_bytes() != chunk.checksum {
-                return Err(CheckpointError::ChunkChecksumMismatch {
-                    index: index as u32,
-                });
-            }
-
-            decoded_chunk.clear();
-            let read_limit = chunk
-                .uncompressed_len
-                .checked_add(1)
-                .ok_or(CheckpointError::LengthOverflow)?;
-            let decoder = zstd::stream::read::Decoder::new(compressed.as_slice())?;
-            decoder.take(read_limit).read_to_end(&mut decoded_chunk)?;
-            let actual = decoded_chunk.len() as u64;
-            if actual != chunk.uncompressed_len {
-                return Err(CheckpointError::ChunkDecodedLengthMismatch {
-                    index: index as u32,
-                    declared: chunk.uncompressed_len,
-                    actual,
-                });
-            }
-            raw.extend_from_slice(&decoded_chunk);
-        }
-        if *payload_hasher.finalize().as_bytes() != header.payload_checksum {
-            return Err(CheckpointError::ChecksumMismatch);
-        }
-        if raw.len() != expected_raw_len {
-            return Err(CheckpointError::UncompressedLengthMismatch {
-                declared: header.uncompressed_len,
-                actual: raw.len() as u64,
-            });
-        }
-
-        let (state, config_toml, runtime) = match header.version {
-            7 => {
-                let payload: CheckpointPayloadV7 = postcard::from_bytes(&raw)?;
-                (payload.state, Some(payload.config_toml), payload.runtime)
-            }
-            6 => (
-                postcard::from_bytes(&raw)?,
-                None,
-                CheckpointRuntimeState::default(),
-            ),
-            5 => {
-                let legacy: SolverStateV5 = postcard::from_bytes(&raw)?;
-                (legacy.into(), None, CheckpointRuntimeState::default())
-            }
-            other => {
-                // `decode_header` already rejected anything outside
-                // `MIN_SUPPORTED_CHECKPOINT_VERSION..=CHECKPOINT_VERSION`,
-                // and every version in that range is handled above.
-                unreachable!("unhandled supported checkpoint version {other}")
-            }
-        };
+        // Decode directly from verified chunks instead of retaining the full
+        // uncompressed payload alongside the owned SolverState. Even an early
+        // codec failure must finish framing/integrity checks before returning.
+        let mut reader = stream::PayloadReader::new(&mut file, &chunks, &header);
+        let decoded = (|| -> Result<_, CheckpointError> {
+            Ok(match header.version {
+                7 => {
+                    let payload: CheckpointPayloadV7 = stream::decode_owned(&mut reader)?;
+                    (payload.state, Some(payload.config_toml), payload.runtime)
+                }
+                6 => (
+                    stream::decode_owned(&mut reader)?,
+                    None,
+                    CheckpointRuntimeState::default(),
+                ),
+                5 => {
+                    let legacy: SolverStateV5 = stream::decode_owned(&mut reader)?;
+                    (legacy.into(), None, CheckpointRuntimeState::default())
+                }
+                other => {
+                    // `decode_header` already rejected anything outside
+                    // `MIN_SUPPORTED_CHECKPOINT_VERSION..=CHECKPOINT_VERSION`,
+                    // and every version in that range is handled above.
+                    unreachable!("unhandled supported checkpoint version {other}")
+                }
+            })
+        })();
+        reader.finish()?;
+        let (state, config_toml, runtime) = decoded?;
         if state.schema_version != SOLVER_STATE_VERSION {
             return Err(CheckpointError::SolverStateVersion {
                 found: state.schema_version,
@@ -504,6 +501,24 @@ impl MultiwayCheckpoint {
             config_toml: config_toml.filter(|value| !value.is_empty()),
             runtime,
         })
+    }
+}
+
+fn empty_header(
+    configuration_fingerprint: [u8; 32],
+    abstraction_fingerprint: [u8; 32],
+    next_sample_id: u64,
+) -> MultiwayCheckpointHeader {
+    MultiwayCheckpointHeader {
+        version: CHECKPOINT_VERSION,
+        configuration_fingerprint,
+        abstraction_fingerprint,
+        next_sample_id,
+        payload_len: 0,
+        uncompressed_len: 0,
+        payload_checksum: [0; 32],
+        chunk_count: 0,
+        chunk_table_checksum: [0; 32],
     }
 }
 
@@ -694,6 +709,8 @@ pub enum CheckpointError {
     SolverStateVersion { found: u16, expected: u16 },
     #[error("checkpoint sample id differs between header ({header}) and state ({state})")]
     SampleIdMismatch { header: u64, state: u64 },
+    #[error("solver snapshot is inconsistent: {0}")]
+    InvalidSnapshot(&'static str),
     #[error("io error: {0}")]
     Io(#[from] std::io::Error),
     #[error("checkpoint codec error: {0}")]
@@ -962,7 +979,7 @@ mod tests {
     /// [`MultiwayCheckpoint::write_atomic`] produces. This lets tests
     /// synthesize an on-disk legacy-version checkpoint directly, since
     /// production code always writes the current [`CHECKPOINT_VERSION`].
-    fn write_checkpoint_with_version(
+    pub(super) fn write_checkpoint_with_version(
         raw: &[u8],
         version: u16,
         configuration_fingerprint: [u8; 32],
@@ -1088,6 +1105,95 @@ mod tests {
         let reloaded = MultiwayCheckpoint::load(&upgraded_path, [3; 32], [7; 32]).unwrap();
         assert_eq!(reloaded.header.version, CHECKPOINT_VERSION);
         assert_eq!(reloaded.state, loaded.state);
+    }
+
+    #[test]
+    fn checkpoint_version_6_streams_owned_fields_across_chunks() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("legacy-v6.mwckpt");
+        let expected = multi_chunk_state();
+        write_checkpoint_with_version(
+            &postcard::to_allocvec(&expected).unwrap(),
+            6,
+            [1; 32],
+            [2; 32],
+            expected.next_sample_id,
+            &path,
+        );
+        let loaded = MultiwayCheckpoint::load_unchecked(&path).unwrap();
+        assert_eq!(loaded.state, expected);
+        assert_eq!(loaded.config_toml, None);
+    }
+
+    #[test]
+    fn streaming_decode_checks_unconsumed_chunks_even_after_codec_failure() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("trailing.mwckpt");
+        for invalid_codec in [false, true] {
+            let mut raw = postcard::to_allocvec(&state()).unwrap();
+            if invalid_codec {
+                // Invalid varint at the start makes the codec stop before
+                // it could read a later corrupt chunk.
+                raw[..16].fill(0xff);
+            }
+            raw.resize(CHUNK_UNCOMPRESSED_BYTES + 1024, 0);
+            write_checkpoint_with_version(&raw, 6, [1; 32], [2; 32], 6, &path);
+            if !invalid_codec {
+                // Preserve the slice decoder's treatment of decoded tails.
+                assert_eq!(
+                    MultiwayCheckpoint::load_unchecked(&path).unwrap().state,
+                    state()
+                );
+            }
+            let (_, chunks, payload_start) = read_layout(&path);
+            let mut bytes = std::fs::read(&path).unwrap();
+            bytes[(payload_start + chunks[1].compressed_offset) as usize] ^= 1;
+            std::fs::write(&path, bytes).unwrap();
+            assert!(matches!(
+                MultiwayCheckpoint::load_unchecked(&path),
+                Err(CheckpointError::ChunkChecksumMismatch { index: 1 })
+            ));
+        }
+    }
+
+    #[test]
+    fn streaming_decode_checks_whole_payload_checksum() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("checksum.mwckpt");
+        MultiwayCheckpoint::new(state(), [1; 32], [2; 32])
+            .write_atomic(&path)
+            .unwrap();
+        let (mut header, _, _) = read_layout(&path);
+        header.payload_checksum[0] ^= 1;
+        let mut bytes = std::fs::read(&path).unwrap();
+        bytes[..HEADER_LEN].copy_from_slice(&encode_header(&header));
+        std::fs::write(&path, bytes).unwrap();
+        assert!(matches!(
+            MultiwayCheckpoint::load_unchecked(&path),
+            Err(CheckpointError::ChecksumMismatch)
+        ));
+    }
+
+    #[test]
+    fn streaming_payload_spans_numeric_and_string_boundaries_with_bounded_staging() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("fields.mwckpt");
+        // Float values cross chunk boundaries; owned strings exercise both
+        // contiguous and spanning temporary borrows, including UTF-8.
+        let expected = (
+            vec![0.125f64; CHUNK_UNCOMPRESSED_BYTES / 8 + 20],
+            "日本語".repeat(CHUNK_UNCOMPRESSED_BYTES / 9 + 20),
+            vec![String::new(), "tail".to_string()],
+        );
+        let raw = postcard::to_allocvec(&expected).unwrap();
+        write_checkpoint_with_version(&raw, 6, [1; 32], [2; 32], 0, &path);
+        let (header, chunks, payload_start) = read_layout(&path);
+        let mut file = File::open(&path).unwrap();
+        file.seek(SeekFrom::Start(payload_start)).unwrap();
+        let mut reader = stream::PayloadReader::new(&mut file, &chunks, &header);
+        let actual: (Vec<f64>, String, Vec<String>) = stream::decode_owned(&mut reader).unwrap();
+        reader.finish().unwrap();
+        assert_eq!(actual, expected);
     }
 
     #[test]

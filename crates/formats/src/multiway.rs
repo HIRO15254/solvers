@@ -25,6 +25,34 @@ pub struct Estimate {
     pub ci95: [f64; 2],
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiwayStreetVisitCounts {
+    pub preflop: u64,
+    pub flop: u64,
+    pub turn: u64,
+    pub river: u64,
+}
+
+/// Strategy sources on held-out baseline trajectories only. These are
+/// decision-visit counts, not unique infosets or action-value accuracy.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiwayPolicyCoverage {
+    pub decision_visits: u64,
+    pub stored_strategy_visits: u64,
+    pub uniform_fallback_visits: u64,
+    pub average_strategy_visits: u64,
+    pub current_strategy_visits: u64,
+    pub regret_fallback_visits: u64,
+    pub decision_visits_by_street: MultiwayStreetVisitCounts,
+    pub stored_strategy_visits_by_street: MultiwayStreetVisitCounts,
+    pub uniform_fallback_visits_by_street: MultiwayStreetVisitCounts,
+    pub average_strategy_visits_by_street: MultiwayStreetVisitCounts,
+    pub current_strategy_visits_by_street: MultiwayStreetVisitCounts,
+    pub regret_fallback_visits_by_street: MultiwayStreetVisitCounts,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MultiwaySeatMetrics {
@@ -33,6 +61,9 @@ pub struct MultiwaySeatMetrics {
     pub average_positive_regret: f64,
     pub strategy_drift_l1: f64,
     pub deviation_gain_lower_bound: Option<Estimate>,
+    /// None for older rows and rows without a held-out profile evaluation.
+    #[serde(default)]
+    pub candidate_policy_coverage: Option<MultiwayPolicyCoverage>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -75,6 +106,7 @@ impl MultiwayMetricsRow {
                     average_positive_regret: 0.0,
                     strategy_drift_l1: 0.0,
                     deviation_gain_lower_bound: None,
+                    candidate_policy_coverage: None,
                 })
                 .collect(),
         }
@@ -142,6 +174,25 @@ mod tests {
         assert_eq!(
             serde_json::from_str::<MultiwayMetricsRow>(&json).unwrap(),
             row
+        );
+    }
+
+    #[test]
+    fn progress_rows_without_policy_coverage_remain_readable() {
+        let row = MultiwayMetricsRow::sampling(3);
+        let mut json = serde_json::to_value(&row).unwrap();
+        for seat in json["seats"].as_array_mut().unwrap() {
+            seat.as_object_mut()
+                .unwrap()
+                .remove("candidatePolicyCoverage");
+        }
+        let restored: MultiwayMetricsRow = serde_json::from_value(json).unwrap();
+        assert_eq!(restored, row);
+        assert!(
+            restored
+                .seats
+                .iter()
+                .all(|seat| seat.candidate_policy_coverage.is_none())
         );
     }
 

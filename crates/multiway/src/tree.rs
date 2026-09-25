@@ -190,7 +190,7 @@ enum ParallelPlanChild<S> {
     Terminal,
 }
 
-/// Research materializer that preserves the serial preorder while enumerating
+/// Materializer that preserves the serial preorder while enumerating
 /// bounded, independent public subtrees on the current Rayon pool.
 ///
 /// One-thread pools use [`enumerate_tree_with_limits`] directly. Multi-thread
@@ -202,12 +202,16 @@ enum ParallelPlanChild<S> {
 /// action-label or child buffers. The merge can temporarily retain at most
 /// `2 * max_nodes` `TreeNode` slots (source slices plus the exactly-sized
 /// destination), in addition to the bounded prefix and active worker `Vec`
-/// capacity. This function is therefore an internal timing experiment rather
-/// than a process-RSS guarantee.
+/// capacity. Production callers first run non-retaining resource admission,
+/// supply its exact node count, and select an explicitly sized private pool.
+/// Neither this allowance nor the arena budget is a process-RSS guarantee.
 ///
 /// If planning, a worker, or ordered merge encounters an error, the serial
-/// oracle is rerun. That preserves the existing depth-first error priority and
-/// exact error payload rather than exposing scheduler order.
+/// oracle is rerun after all parallel state and node buffers are released.
+/// That preserves the existing depth-first error priority and exact error
+/// payload rather than exposing scheduler order. The merge destination uses
+/// fallible reservation; allocation failure takes the same released-state
+/// serial retry path.
 #[doc(hidden)]
 pub fn enumerate_tree_with_limits_parallel<G: ExternalSamplingGame>(
     game: &G,
@@ -222,9 +226,27 @@ where
         return enumerate_tree_with_limits(game, max_nodes, max_depth);
     }
     let max_nodes = max_nodes.min(MAX_TREE_NODES);
+    // Keep every parallel allocation inside the attempt. In particular, a
+    // serial retry must not coexist with completed subtrees or a partial
+    // destination from a failed ordered merge.
+    match enumerate_tree_parallel_attempt(game, max_nodes, max_depth, threads) {
+        Ok(Some(tree)) => Ok(tree),
+        Ok(None) | Err(_) => enumerate_tree_with_limits(game, max_nodes, max_depth),
+    }
+}
+
+fn enumerate_tree_parallel_attempt<G: ExternalSamplingGame>(
+    game: &G,
+    max_nodes: usize,
+    max_depth: u32,
+    threads: usize,
+) -> Result<Option<PublicTree>, TreeError>
+where
+    G::State: Send,
+{
     let root = game.root_state();
     if game.actor(&root).is_none() {
-        return enumerate_tree_with_limits(game, max_nodes, max_depth);
+        return Err(TreeError::RootIsTerminal);
     }
 
     let target_tasks = threads
@@ -243,21 +265,20 @@ where
             frontier_count,
             MAX_PARALLEL_FRONTIER_TASKS,
             max_depth,
-        ) {
-            Ok(Some(next_count)) => frontier_count = next_count,
-            Ok(None) => break,
-            Err(_) => return enumerate_tree_with_limits(game, max_nodes, max_depth),
+        )? {
+            Some(next_count) => frontier_count = next_count,
+            None => break,
         }
     }
 
     let prefix_nodes = count_parallel_prefix_nodes(&plan);
     if prefix_nodes > max_nodes {
-        return enumerate_tree_with_limits(game, max_nodes, max_depth);
+        return Err(TreeError::TooManyNodes { limit: max_nodes });
     }
     let mut tasks = Vec::with_capacity(frontier_count);
     extract_parallel_frontiers(&mut plan, &mut tasks);
     if tasks.len() <= 1 {
-        return enumerate_tree_with_limits(game, max_nodes, max_depth);
+        return Ok(None);
     }
 
     let parallel_nodes_remaining = AtomicUsize::new(max_nodes - prefix_nodes);
@@ -285,33 +306,44 @@ where
             Ok(nodes.into_boxed_slice())
         })
         .collect();
-    if results.iter().any(Result::is_err) {
-        return enumerate_tree_with_limits(game, max_nodes, max_depth);
-    }
-
-    let mut subtree_nodes: Vec<Option<Box<[TreeNode]>>> =
-        results.into_iter().map(|result| result.ok()).collect();
-    let total_nodes = subtree_nodes.iter().try_fold(prefix_nodes, |total, nodes| {
-        total.checked_add(nodes.as_ref().map_or(0, |nodes| nodes.len()))
-    });
-    let Some(total_nodes) = total_nodes else {
-        return enumerate_tree_with_limits(game, max_nodes, max_depth);
-    };
+    let mut subtree_nodes: Vec<Option<Box<[TreeNode]>>> = results
+        .into_iter()
+        .map(|result| result.map(Some))
+        .collect::<Result<_, _>>()?;
+    let total_nodes = subtree_nodes
+        .iter()
+        .try_fold(prefix_nodes, |total, nodes| {
+            total.checked_add(nodes.as_ref().map_or(0, |nodes| nodes.len()))
+        })
+        .ok_or(TreeError::SizeOverflow)?;
     if total_nodes > max_nodes || total_nodes > MAX_TREE_NODES {
-        return enumerate_tree_with_limits(game, max_nodes, max_depth);
+        return Err(TreeError::TooManyNodes { limit: max_nodes });
     }
 
-    let mut nodes = Vec::with_capacity(total_nodes);
-    if merge_parallel_plan(&mut plan, None, 0, &mut subtree_nodes, &mut nodes).is_err()
-        || nodes.len() != total_nodes
-    {
-        return enumerate_tree_with_limits(game, max_nodes, max_depth);
+    let mut nodes = reserve_parallel_merge_nodes(total_nodes)?;
+    merge_parallel_plan(&mut plan, None, 0, &mut subtree_nodes, &mut nodes)?;
+    if nodes.len() != total_nodes {
+        return Err(TreeError::SizeOverflow);
     }
     let mut by_history = FxHashMap::default();
     for (index, node) in nodes.iter().enumerate() {
         by_history.insert(node.history, index as NodeId);
     }
-    Ok(PublicTree { nodes, by_history })
+    Ok(Some(PublicTree { nodes, by_history }))
+}
+
+fn reserve_parallel_merge_nodes(total_nodes: usize) -> Result<Vec<TreeNode>, TreeError> {
+    let requested_bytes = total_nodes
+        .checked_mul(std::mem::size_of::<TreeNode>())
+        .ok_or(TreeError::SizeOverflow)?;
+    let mut nodes = Vec::new();
+    nodes
+        .try_reserve_exact(total_nodes)
+        .map_err(|_| TreeError::AllocationFailed {
+            buffer: "parallel-tree-merge",
+            requested_bytes,
+        })?;
+    Ok(nodes)
 }
 
 fn expand_one_parallel_frontier<G: ExternalSamplingGame>(
@@ -886,7 +918,8 @@ impl DenseArena {
     /// This does not claim that the whole process fits the solver payload
     /// limit. The public tree, abstraction tables, worker scratch, and
     /// allocator overhead remain additional process memory.
-    pub(crate) fn commit_pages(&mut self) {
+    #[doc(hidden)]
+    pub fn commit_pages(&mut self) {
         commit_slice_pages(&mut self.regrets);
         commit_slice_pages(&mut self.strategy_sum);
         commit_slice_pages(&mut self.touched);
@@ -1220,6 +1253,144 @@ mod tests {
                 ..
             })
         ));
+    }
+
+    #[test]
+    fn impossible_parallel_merge_reservation_returns_a_typed_error() {
+        // The byte product fits usize, but exceeds Vec's isize::MAX bound.
+        // This fails deterministically without requesting physical memory.
+        let node_count = usize::MAX / std::mem::size_of::<TreeNode>();
+        let expected_bytes = node_count * std::mem::size_of::<TreeNode>();
+        assert!(matches!(
+            reserve_parallel_merge_nodes(node_count),
+            Err(TreeError::AllocationFailed {
+                buffer: "parallel-tree-merge",
+                requested_bytes,
+            }) if requested_bytes == expected_bytes
+        ));
+    }
+
+    #[test]
+    fn parallel_fallback_releases_planning_states_before_serial_root() {
+        use std::sync::Arc;
+
+        #[derive(Clone)]
+        struct TrackedState {
+            depth: u8,
+            branch: usize,
+            lifetime: Arc<()>,
+        }
+
+        struct TrackedGame {
+            lifetime: Arc<()>,
+            root_calls: AtomicUsize,
+        }
+
+        impl ExternalSamplingGame for TrackedGame {
+            type State = TrackedState;
+            type Actions = (u8, usize);
+
+            fn num_players(&self) -> usize {
+                2
+            }
+
+            fn root_state(&self) -> Self::State {
+                assert_eq!(
+                    Arc::strong_count(&self.lifetime),
+                    1,
+                    "serial fallback retained states from the parallel attempt"
+                );
+                self.root_calls.fetch_add(1, Ordering::Relaxed);
+                TrackedState {
+                    depth: 0,
+                    branch: 0,
+                    lifetime: Arc::clone(&self.lifetime),
+                }
+            }
+
+            fn actor(&self, state: &Self::State) -> Option<usize> {
+                (state.depth < 2).then_some(0)
+            }
+
+            fn node_actions(&self, state: &Self::State) -> Self::Actions {
+                (state.depth, state.branch)
+            }
+
+            fn num_actions_of(&self, _actions: &Self::Actions) -> usize {
+                2
+            }
+
+            fn next_state_with(
+                &self,
+                state: &Self::State,
+                _actions: &Self::Actions,
+                action_index: usize,
+            ) -> Self::State {
+                TrackedState {
+                    depth: state.depth + 1,
+                    branch: action_index,
+                    lifetime: Arc::clone(&state.lifetime),
+                }
+            }
+
+            fn write_action_label(&self, actions: &Self::Actions, index: usize, out: &mut String) {
+                // Fail while both children of the expanded root are still
+                // retained in the plan. Serial enumeration must report the
+                // first child's global node id, not the planner's local 0.
+                if *actions != (1, 0) {
+                    out.push(if index == 0 { 'a' } else { 'b' });
+                }
+            }
+
+            fn bucket(
+                &self,
+                _state: &Self::State,
+                _world: &crate::sampler::SampledWorld,
+                _actor: usize,
+            ) -> crate::solver::PrivateInfo {
+                unreachable!("public enumeration does not inspect cards")
+            }
+
+            fn terminal_utilities(
+                &self,
+                _state: &Self::State,
+                _world: &crate::sampler::SampledWorld,
+                _utilities: &mut [f64],
+            ) {
+                unreachable!("public enumeration does not settle terminals")
+            }
+
+            fn dense_node_context(&self, _state: &Self::State) -> DenseNodeContext {
+                DenseNodeContext {
+                    street: Street::Preflop,
+                    active_opponents: 1,
+                    bucket_active_opponents: 1,
+                }
+            }
+        }
+
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(2)
+            .build()
+            .unwrap();
+        for max_nodes in [0, MAX_TREE_NODES] {
+            let game = TrackedGame {
+                lifetime: Arc::new(()),
+                root_calls: AtomicUsize::new(0),
+            };
+            let error = pool
+                .install(|| enumerate_tree_with_limits_parallel(&game, max_nodes, 4))
+                .unwrap_err();
+            if max_nodes == 0 {
+                // Resource error takes precedence over the planner's label
+                // error when replayed in the canonical serial order.
+                assert!(matches!(error, TreeError::TooManyNodes { limit: 0 }));
+            } else {
+                assert!(matches!(error, TreeError::EmptyActionLabel { node: 1 }));
+            }
+            assert_eq!(game.root_calls.load(Ordering::Relaxed), 2);
+            assert_eq!(Arc::strong_count(&game.lifetime), 1);
+        }
     }
 
     #[derive(Clone, Copy, Debug)]

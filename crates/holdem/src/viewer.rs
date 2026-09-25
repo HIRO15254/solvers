@@ -22,8 +22,8 @@
 //! silently shipping a viewer that mis-renders river strategies.
 //!
 //! This equivalence licenses the standard "small save" viewer-artifact
-//! trick (see `docs/research/solver-survey.jp.md` on PioSOLVER's small/very-small
-//! saves): a solved trunk's checkpoint can omit river regrets/strategies
+//! trick (see `docs/architecture.md` on compact viewer artifacts): a solved
+//! trunk's checkpoint can omit river regrets/strategies
 //! entirely and re-solve the river on demand when a viewer navigates there,
 //! using [`river_entry_state`] + [`river_resolve_config`] to reconstruct an
 //! equivalent subgame and running a fresh (short) solve on it. That said, a
