@@ -1,0 +1,26 @@
+   Compiling toml_edit v0.22.27
+   Compiling anyhow v1.0.103
+   Compiling preflop v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\preflop)
+   Compiling toml v0.8.23
+   Compiling multiway v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\multiway)
+   Compiling cli v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\cli)
+   Compiling criterion v0.5.1
+   Compiling untrusted v0.9.0
+   Compiling ring v0.17.14
+   Compiling winapi v0.3.9
+   Compiling untrusted v0.7.1
+   Compiling spin v0.5.2
+   Compiling ring v0.16.20
+   Compiling sct v0.7.1
+   Compiling webpki v0.22.4
+   Compiling base64 v0.13.1
+   Compiling log v0.4.33
+   Compiling rustls v0.20.9
+   Compiling rustls-pemfile v0.2.1
+   Compiling protocol v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\crates\protocol)
+   Compiling zeroize v1.9.0
+   Compiling httpdate v1.0.3
+   Compiling chunked_transfer v1.5.0
+   Compiling ascii v1.1.0
+   Compiling tiny_http v0.12.0
+   Compiling libc v0.2.186

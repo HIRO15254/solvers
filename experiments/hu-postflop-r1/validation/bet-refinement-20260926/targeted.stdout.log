@@ -1,0 +1,11 @@
+
+running 4 tests
+test coarse_bet_profile_lifts_completely_and_expanded_br_uses_the_fine_domain ... bet refinement P0: coarse EV=-3.612158764368 BR=-0.366379310345; lifted EV=-3.612158764368 expanded BR=-0.366379310345
+bet refinement P1: coarse EV=3.612158764368 BR=9.551005747126; lifted EV=3.612158764368 expanded BR=12.776580459770
+ok
+test raised_and_raked_average_profiles_match_independent_oracle ... ok
+test raised_and_raked_uniform_profiles_match_independent_oracle ... ok
+test river_fixture_has_hand_checked_settlements_and_short_raise ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.76s
+

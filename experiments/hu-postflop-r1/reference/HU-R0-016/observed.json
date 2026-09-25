@@ -1,0 +1,144 @@
+{
+  "case_id": "HU-R0-016",
+  "captured_utc_date": "2026-09-25",
+  "recorded_at_utc": "2026-09-25T21:40:44Z",
+  "reference": "GTO Wizard existing solved library; visible UI and native Copy range controls",
+  "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zSimple&depth=75&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=9&preflop_actions=F-F-F-R2.5-F-R10-C&board=KhKc5s2d&flop_actions=X-X",
+  "visible_solution": "Cash 75bb / 6max NL500 / Simple GTO",
+  "table_players": "6max",
+  "subgame_players": 2,
+  "street": "turn",
+  "board": [
+    "Kh",
+    "Kc",
+    "5s",
+    "2d"
+  ],
+  "seats": {
+    "oop": "BB",
+    "ip": "BTN"
+  },
+  "root_actor": "BB",
+  "pot_bb": 20.5,
+  "stacks_behind_bb": [
+    65,
+    65
+  ],
+  "preflop_actions": "F-F-F-R2.5-F-R10-C",
+  "preflop": "UTG fold; HJ fold; CO fold; BTN raise to 2.5; SB fold; BB raise to 10; BTN call",
+  "flop_actions": "X-X",
+  "root_ranges": {
+    "oop": "oop-range.txt",
+    "ip": "ip-range.txt",
+    "weights": "Whole range Copy text, unrenormalized; file adds one LF",
+    "reported_copy_raw_characters": {
+      "oop": 7361,
+      "ip": 4994
+    },
+    "reported_copy_raw_fnv1a32": {
+      "oop": "d7747077",
+      "ip": "eef01878"
+    }
+  },
+  "observed_menus": [
+    {
+      "history": "",
+      "actor": "BB",
+      "street": "turn",
+      "actions": [
+        "check",
+        "bet 6.75",
+        "bet 13.55",
+        "bet 26.65",
+        "allin 65"
+      ],
+      "percentages": [
+        null,
+        33,
+        66,
+        130,
+        317
+      ]
+    },
+    {
+      "history": "X",
+      "actor": "BTN",
+      "street": "turn",
+      "actions": [
+        "check",
+        "bet 6.75",
+        "bet 13.55",
+        "bet 26.65",
+        "allin 65"
+      ],
+      "percentages": [
+        null,
+        33,
+        66,
+        130,
+        317
+      ],
+      "url_history_spot": 10
+    }
+  ],
+  "tree_observation": "BB root and the actually selected BTN node after BB check only. Subsequent bet responses and River chance/menus unobserved.",
+  "root_ui": {
+    "view": "Ranges",
+    "oop_ev_bb": 8.14,
+    "ip_ev_bb": 11.76,
+    "oop_ev_share_percent": 40.92,
+    "ip_ev_share_percent": 59.08,
+    "oop_equity_percent": 43.9,
+    "ip_equity_percent": 56.1,
+    "oop_eqr_percent": 90.6,
+    "ip_eqr_percent": 102.2,
+    "oop_combos_rounded": 39.5,
+    "ip_combos_rounded": 103.3,
+    "oop_frequency_percent": {
+      "check": 77.3,
+      "bet_6_75": 4.5,
+      "bet_13_55": 13.5,
+      "bet_26_65": 4.7,
+      "allin_65": 0
+    },
+    "oop_action_weighted_combos_rounded": {
+      "check": 30.52,
+      "bet_6_75": 1.77,
+      "bet_13_55": 5.35,
+      "bet_26_65": 1.84,
+      "allin_65": 0
+    },
+    "zero_display_note": "Rounded 0%/0 combos does not establish an exactly zero strategy probability."
+  },
+  "display_steps": {
+    "ev_bb": 0.01,
+    "ev_share_percentage_points": 0.01,
+    "frequency_percentage_points": 0.1,
+    "equity_percentage_points": 0.1,
+    "eqr_percentage_points": 0.1,
+    "weighted_combos": 0.1,
+    "action_weighted_combos": 0.01
+  },
+  "rake_catalog_only": {
+    "source": "docs/plans/hu-postflop-r0/cases.csv HU-R0-016",
+    "catalog_checked_at": "2026-09-25T06:11:52.699Z",
+    "rake_percent": 5,
+    "rake_cap_bb": 0.6,
+    "reconfirmed_in_this_capture": false,
+    "note": "Catalog only; solution-specific collection/rounding conditions remain unverified"
+  },
+  "reference_exploitability": null,
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "comparison_threshold": null,
+  "missing_fields": [
+    "all subsequent Turn response menus",
+    "River chance domain and every River decision menu",
+    "current solution-specific rake collection/uncalled contributions/rounding",
+    "reference solver version, internal precision, stopping metric and value",
+    "complete per-hand/action reference profile and action EVs",
+    "exact EV basis and display rounding rule"
+  ],
+  "capture_scope": "HU-R0-016 only; no solve or comparison threshold issued."
+}

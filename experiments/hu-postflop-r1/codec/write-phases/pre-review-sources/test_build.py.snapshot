@@ -1,0 +1,258 @@
+"""Fake build execution only: producer truthfulness and existing consumer shape."""
+import datetime as dt
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import shutil
+import unittest
+import uuid
+from unittest.mock import patch
+from types import SimpleNamespace
+
+HERE = Path(__file__).resolve().parent
+SPEC = importlib.util.spec_from_file_location("writer_build_test", HERE / "build.py")
+B = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(B)
+R = B.R
+
+
+def dump(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value), encoding="utf-8")
+    return R.identity(path)
+
+
+def blob(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(data)
+    return R.identity(path)
+
+
+def pin(raw):
+    return {"bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}
+
+
+class FakeExecution:
+    def __init__(self, case):
+        self.case = case
+        self.calls = []
+        self.fail_label = None
+        self.change_source = False
+        self.change_boot = False
+
+    def __call__(self, config, stage, argv, cwd, refs, timeout):
+        self.calls.append({"label": stage.name, "argv": argv, "timeout": timeout, "environment": dict(os.environ)})
+        fail = self.fail_label is not None and self.fail_label in stage.name
+        before = R.now()
+        stdout = b""
+        if "-version" in stage.name:
+            name = stage.name.split("-", 1)[1].removesuffix("-version")
+            stdout = (name + " 0.0 synthetic\n" + ("host: fake-host\n" if name == "rustc" else "")).encode()
+        elif "copy-" in stage.name and not fail:
+            get = lambda flag: argv[argv.index(flag) + 1]
+            role, mode = get("--role"), get("--mode")
+            source, out = Path(get("--source")), Path(get("--out"))
+            expected = self.case.pins["roles"][role]
+            files = {name: (source / name).read_bytes() for name in expected["files"]}
+            files[B.EXAMPLE] = Path(get("--example")).read_bytes()
+            original = {name: pin(raw) for name, raw in files.items()}
+            if mode == "instrumented":
+                for name in ("crates/formats/src/sol_indexed.rs", "crates/formats/src/lib.rs", B.EXAMPLE):
+                    files[name] += b"\n// synthetic instrumentation\n"
+            for name, raw in files.items():
+                blob(out / name, raw)
+            artifact_names = ("apply.py", "runtime.rs.inc", "source-pins.json", "protocol.json", "validate.py")
+            manifest = {"schema": "r1.write-phase-source-copy/v1", "role": role, "mode": mode,
+                        "revision": expected["revision"], "output_path": str(out), "source_path": str(source),
+                        "before": original, "after": {name: pin(raw) for name, raw in files.items()}, "formatter": None,
+                        "instrumentation": {name: pin((self.case.package / name).read_bytes()) for name in artifact_names}}
+            dump(out / "r1-write-phase-source.json", manifest)
+            blob(out / "instrumentation.patch", b"synthetic patch\n")
+        elif "build-" in stage.name and not fail:
+            target = Path(argv[argv.index("--target-dir") + 1])
+            blob(target / config["target"] / "release/examples/sol_codec_bench", b"synthetic executable bytes " + stage.name.encode())
+        outputs = {"stdout": blob(stage / "stdout.log", stdout), "stderr": blob(stage / "stderr.log", b"fake failed\n" if fail else b""),
+                   "samples": blob(stage / "supervisor.samples.jsonl", b'{"test_only": true}\n')}
+        record = {"schema": "solvers.supervised-run/v1", "synthetic_test_only": True,
+                  "state": "failed" if fail else "completed", "stop_reason": "child_failed" if fail else "completed",
+                  "errors": [], "shell": False, "child_exit_code": int(fail), "supervisor_exit_code": int(fail),
+                  "cleanup_complete": True, "identity_unchanged": True, "identity_before": refs, "identity_after": refs,
+                  "forced": False, "stop_requested_at": None,
+                  "limits": {"timeout_seconds": timeout, "grace_seconds": 5, "kill_wait_seconds": 5, "poll_seconds": 0.05,
+                             "memory_limit_bytes": B.LIMITS["memory_bytes"], "min_free_memory_bytes": B.LIMITS["min_free_memory_bytes"],
+                             "disk_reserve_bytes": B.LIMITS["disk_reserve_bytes"]},
+                  "argv": argv, "resolved_argv": argv, "cwd": str(cwd), "created_at": before, "started_at": before,
+                  "ended_at": R.now(), "outputs": outputs}
+        dump(stage / "supervisor.json", record)
+        if stage.name.endswith("build-candidate-instrumented"):
+            if self.change_source:
+                with (cwd / "crates/formats/src/lib.rs").open("ab") as stream:
+                    stream.write(b"changed after final build")
+            if self.change_boot:
+                self.case.boot = "different-boot"
+        return int(fail)
+
+
+class BuildProducerChecks(unittest.TestCase):
+    def setUp(self):
+        scratch = HERE.parents[3] / "runs"
+        scratch.mkdir(exist_ok=True)
+        self.root = (scratch / ("test-writer-build-" + uuid.uuid4().hex)).resolve()
+        self.assertEqual(self.root.parent, scratch.resolve())
+        self.root.mkdir()
+        def cleanup():
+            self.assertEqual(self.root.resolve().parent, scratch.resolve())
+            shutil.rmtree(self.root)
+        self.addCleanup(cleanup)
+        self.package = self.root / "package"
+        self.package.mkdir()
+        self.addCleanup(patch.stopall)
+        patch.object(B, "HERE", self.package).start()
+        patch.dict(os.environ, {}, clear=True).start()
+        self.boot = "synthetic-boot"
+        self.pins = {"roles": {}}
+        sources = {}
+        example_raw = b"synthetic benchmark\n"
+        for role in ("baseline", "candidate"):
+            sources[role] = self.root / ("original-" + role)
+            files = {"Cargo.toml": b"workspace\n", "Cargo.lock": b"locked\n",
+                     "crates/formats/src/lib.rs": (role + " library\n").encode(),
+                     "crates/formats/src/sol_indexed.rs": (role + " writer\n").encode()}
+            if role == "candidate":
+                files[B.EXAMPLE] = example_raw
+            for name, raw in files.items():
+                blob(sources[role] / name, raw)
+            self.pins["roles"][role] = {"revision": role + "-synthetic", "files": {name: pin(raw) for name, raw in files.items()}}
+        for name in ("run.py", "apply.py", "runtime.rs.inc", "validate.py"):
+            blob(self.package / name, ("synthetic " + name).encode())
+        dump(self.package / "source-pins.json", self.pins)
+        dump(self.package / "protocol.json", {"synthetic_test_only": True})
+        inputs, selected = self.root / "inputs", {"cases": {}}
+        for case in ("river", "turn", "flop"):
+            raw = ("synthetic " + case).encode()
+            blob(inputs / (case + ".sol"), raw)
+            selected["cases"][case] = pin(raw)
+        dump(self.package.parent / "inputs.json", selected)
+        cache = self.root / "cargo-cache"
+        cache.mkdir()
+        # The fake fixture does not inherit the real repository's Cargo config.
+        patch.object(B, "cargo_config_paths", return_value=[cache / "config", cache / "config.toml"]).start()
+        budget = blob(self.root / "budget.json", b"synthetic owner preflight")
+        ctl = blob(self.root / "systemctl", b"synthetic systemctl")
+        owner = dump(self.root / "owner.json", {"schema": "r1.write-phase-build-owner/v1", "resources_authorized": True,
+                     "budget_record": budget, "systemctl": ctl, "systemd_unit": "synthetic.service",
+                     "deadline_utc": (dt.datetime.now(dt.timezone.utc) + dt.timedelta(seconds=3200)).isoformat()})
+        self.config = {"sources": sources, "out": self.root / "new-report", "targets": self.root / "new-targets",
+                       "cargo_home": cache, "inputs": inputs, "target": "fake-host", "rustflags": "-C target-cpu=native",
+                       "example": blob(self.root / "example.rs", example_raw), "owner": owner}
+        self.config.update({name: blob(self.root / name, ("synthetic " + name).encode()) for name in ("cargo", "rustc", "rustfmt", "supervisor")})
+        self.fake = FakeExecution(self)
+
+    def run_build(self, **kwargs):
+        return B.execute(self.config, invoke=self.fake, host=lambda: {"boot_id": self.boot, "synthetic_test_only": True},
+                         containment=lambda _: {"synthetic_finite_controls": True}, **kwargs)
+
+    def test_four_fresh_copies_complete_and_existing_consumer_accepts(self):
+        state = self.run_build()
+        self.assertEqual(state["status"], "completed", state.get("first_failure"))
+        self.assertEqual(len(state["stages"]), 11)
+        self.assertEqual(set(state["copies"]), set(B.KEYS))
+        self.assertEqual([x["label"] for x in self.fake.calls[7:]], [f"{i + 7:02d}-build-{k}" for i, k in enumerate(B.KEYS)])
+        for item in self.fake.calls:
+            self.assertEqual(item["environment"]["CARGO_NET_OFFLINE"], "true")
+            self.assertEqual(item["environment"]["RUSTC"], self.config["rustc"]["path"])
+        self.assertNotIn("RUSTFLAGS", os.environ)
+        self.assertEqual(R.read(self.config["out"] / "result.json"), state)
+        self.assertEqual(list(self.config["out"].glob(".validation-pending-*")), [])
+
+    def test_first_build_failure_stops_without_retry_and_preserves_record(self):
+        self.fake.fail_label = "build-baseline-plain"
+        state = self.run_build()
+        self.assertEqual(state["status"], "failed")
+        self.assertEqual(state["copies"], {})
+        self.assertEqual(len(self.fake.calls), 8)
+        self.assertTrue(state["first_failure"]["available_stage_files"])
+        self.assertNotIn("RUSTFLAGS", os.environ)
+
+    def test_copy_failure_never_runs_cargo(self):
+        self.fake.fail_label = "copy-baseline-instrumented"
+        state = self.run_build()
+        self.assertEqual(state["status"], "failed")
+        self.assertEqual(len(self.fake.calls), 5)
+        self.assertFalse(any("build-" in x["label"] for x in self.fake.calls))
+
+    def test_final_source_change_rejects_all_prior_successes(self):
+        self.fake.change_source = True
+        state = self.run_build()
+        self.assertEqual(state["status"], "failed")
+        self.assertEqual(len(state["copies"]), 3)
+        self.assertIn("changed/missing identity", state["first_failure"]["reason"])
+
+    def test_final_boot_change_rejects_all_prior_successes(self):
+        self.fake.change_boot = True
+        state = self.run_build()
+        self.assertEqual(state["status"], "failed")
+        self.assertIn("CPU/boot", state["first_failure"]["reason"])
+
+    def test_campaign_deadline_does_not_start_a_stage(self):
+        values = iter([0, 3001])
+        state = self.run_build(clock=lambda: next(values))
+        self.assertEqual(state["status"], "failed")
+        self.assertEqual(self.fake.calls, [])
+
+    def test_existing_target_rejected_without_deleting_it(self):
+        self.config["targets"].mkdir()
+        sentinel = self.config["targets"] / "keep"
+        sentinel.write_bytes(b"keep")
+        with self.assertRaisesRegex(ValueError, "fresh"):
+            self.run_build()
+        self.assertEqual(sentinel.read_bytes(), b"keep")
+
+    def test_inherited_wrapper_rejected_before_child_execution(self):
+        os.environ["RUSTC_WRAPPER"] = "/unrecorded/wrapper"
+        state = self.run_build()
+        self.assertEqual(state["status"], "failed")
+        self.assertEqual(self.fake.calls, [])
+        self.assertIn("overrides", state["first_failure"]["reason"])
+
+    def test_late_consumer_rejection_never_leaves_completed_public_result(self):
+        with patch.object(R, "verify_build", side_effect=ValueError("synthetic consumer rejection")):
+            state = self.run_build()
+        self.assertEqual(state["status"], "failed")
+        self.assertEqual(len(state["copies"]), 4)
+        self.assertEqual(R.read(self.config["out"] / "result.json")["status"], "failed")
+        self.assertEqual(list(self.config["out"].glob(".validation-pending-*")), [])
+
+    def test_tool_rejects_elf_hardlink_proxy_by_bytes(self):
+        directory = self.root / "proxy"
+        cargo = directory / "cargo"
+        blob(cargo, b"\x7fELFsynthetic rustup")
+        blob(directory / "rustup", b"\x7fELFsynthetic rustup")
+        with patch.object(os, "access", return_value=True):
+            with self.assertRaisesRegex(ValueError, "hard-link proxy"):
+                B.tool(cargo, "cargo")
+
+    def test_supervisor_api_preserves_exact_child_command_and_limits(self):
+        called = []
+        fake_supervisor = SimpleNamespace(main=lambda args: called.append(args) or 0)
+        child = [self.config["cargo"]["path"], "build", "--release", "--locked", "-p", "formats", "--example", "sol_codec_bench",
+                 "--target", "fake-host", "--target-dir", str(self.config["targets"] / "baseline-plain")]
+        with patch.object(R, "load", return_value=fake_supervisor):
+            self.assertEqual(B.supervise(self.config, self.root / "stage", child, self.root, [self.config["rustc"]], 600), 0)
+        args = called[0]
+        self.assertEqual(args[args.index("--") + 1:], child)
+        self.assertEqual(args[args.index("--timeout-seconds") + 1], "600")
+        self.assertEqual(args[args.index("--memory-limit-bytes") + 1], str(4 * 1024**3))
+        self.assertIn(self.config["rustc"]["path"], args)
+
+    def test_local_cargo_cache_config_rejected(self):
+        (self.config["cargo_home"] / "config.toml").write_text("[build]\nrustc-wrapper='untracked'\n")
+        state = self.run_build()
+        self.assertEqual(state["status"], "failed")
+        self.assertEqual(self.fake.calls, [])
+
+
+if __name__ == "__main__":
+    unittest.main()

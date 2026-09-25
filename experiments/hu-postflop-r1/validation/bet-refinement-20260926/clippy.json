@@ -1,0 +1,166 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T21:16:57.867025+00:00",
+  "argv": [
+    "C:/Users/PC_User/.rustup/toolchains/stable-x86_64-pc-windows-msvc/bin/cargo.exe",
+    "clippy",
+    "--locked",
+    "--offline",
+    "--workspace",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 600.0,
+    "grace_seconds": 1.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.1,
+    "memory_limit_bytes": 629145600,
+    "min_free_memory_bytes": 3000000000,
+    "disk_reserve_bytes": 4294967296
+  },
+  "runtime": {
+    "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "logical_cpus": 16
+  },
+  "outputs": {
+    "stdout": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\clippy.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\clippy.stderr.log",
+      "sha256": "0462f5b8f8c5af06a7e2d604d33b6cec9cc9d1ec68149a38e6571e596ede4140",
+      "bytes": 4898
+    },
+    "samples": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\clippy.samples.jsonl",
+      "sha256": "3e36bf13293ed03465a4baf6bfc5c6ff40d0aa2d1a52beb3a7554c6f4158246f",
+      "bytes": 913640
+    }
+  },
+  "identity_before": [
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\cargo.exe",
+      "sha256": "3cd119fe81dfedb9dce4573696bf65058f16b57c9e5babe415b71624315cbb7d",
+      "bytes": 31288320
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\tests\\oracle_river.rs",
+      "sha256": "a989104360e85e6b57635017314203cee39f7cf7d4af9b9fa19b9260cc129f0f",
+      "bytes": 25769
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\Cargo.lock",
+      "sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1",
+      "bytes": 40970
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\cargo.exe",
+      "sha256": "3cd119fe81dfedb9dce4573696bf65058f16b57c9e5babe415b71624315cbb7d",
+      "bytes": 31288320
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\tests\\oracle_river.rs",
+      "sha256": "a989104360e85e6b57635017314203cee39f7cf7d4af9b9fa19b9260cc129f0f",
+      "bytes": 25769
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\Cargo.lock",
+      "sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1",
+      "bytes": 40970
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 2326,
+    "max_sample_gap_seconds": 0.12260019988752902,
+    "sampled_peak_tree_resident_bytes": 562180096,
+    "root_os_peak_resident_bytes": 14323712,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 576430080,
+    "max_observed_processes": 8
+  },
+  "containment": {
+    "kind": "windows_job_kill_on_close_suspended_assignment",
+    "limitations": [
+      "RAM trigger is sampled working set, not a hard allocation limit",
+      "summed working sets can double-count shared pages",
+      "Job membership can include the hidden console host",
+      "CTRL_BREAK covers the dedicated console; detached descendants require Job termination",
+      "job peak committed bytes are not resident working set bytes"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 34275098624,
+    "available_bytes": 3706904576,
+    "commit_available_bytes": 1626673152
+  },
+  "resolved_argv": [
+    "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\cargo.exe",
+    "clippy",
+    "--locked",
+    "--offline",
+    "--workspace",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "disk_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks",
+  "disk_free_before_bytes": 56937459712,
+  "started_at": "2026-09-25T21:16:58.082019+00:00",
+  "pid": 80348,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 14323712,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 576430080,
+    "elapsed_seconds": 235.12349399994127,
+    "at": "2026-09-25T21:20:53.205678+00:00",
+    "host_available_memory_bytes": 3741843456,
+    "disk_free_bytes": 56527556608
+  },
+  "elapsed_seconds": 235.1238925999496,
+  "ended_at": "2026-09-25T21:20:53.206320+00:00",
+  "supervisor_exit_code": 0
+}

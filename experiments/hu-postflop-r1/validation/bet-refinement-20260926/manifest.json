@@ -1,0 +1,304 @@
+{
+  "schema": "r1.bet-refinement-retention/v1",
+  "created_at": "2026-09-25T21:29:08.494641+00:00",
+  "base_commit": "86390feacdb3703ac8fe47d52f84d155cbdb0e3c",
+  "files": {
+    "targeted-launch-error.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\attempt01\\record.json",
+      "encoding": "identity",
+      "bytes": 5870,
+      "sha256": "050a13b817f66308ecb540c0f171c977f3f4a730a3fad8bd8c72d35c1e1d6ca0",
+      "original_bytes": 5870,
+      "original_sha256": "050a13b817f66308ecb540c0f171c977f3f4a730a3fad8bd8c72d35c1e1d6ca0"
+    },
+    "targeted-launch-error.stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\attempt01\\record.stdout.log",
+      "encoding": "identity",
+      "bytes": 171,
+      "sha256": "20944a8e68c8a1fd3345f4c3db5859e874c755c7feca5515a998ecde15d7bab5",
+      "original_bytes": 171,
+      "original_sha256": "20944a8e68c8a1fd3345f4c3db5859e874c755c7feca5515a998ecde15d7bab5"
+    },
+    "targeted-launch-error.stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\attempt01\\record.stderr.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "targeted-launch-error.samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\attempt01\\record.samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 301,
+      "sha256": "e849ba3ff311d313b015f21217c8806423785c96f4fd3a8833419693e9a88226",
+      "original_bytes": 689,
+      "original_sha256": "cc72f751b76413bd7992d0150eb9a579e8fab031ca58d2c412e58e35887640e1"
+    },
+    "targeted.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\attempt02\\record.json",
+      "encoding": "identity",
+      "bytes": 6055,
+      "sha256": "2df70081033129e35f5e9fa9b31e0e6099c9286c01d3513d321a32d71cf1e389",
+      "original_bytes": 6055,
+      "original_sha256": "2df70081033129e35f5e9fa9b31e0e6099c9286c01d3513d321a32d71cf1e389"
+    },
+    "targeted.stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\attempt02\\record.stdout.log",
+      "encoding": "identity",
+      "bytes": 646,
+      "sha256": "7a75592b203ba1cb6bd9c46922e34d8311a097e818cb1bd7a1f87716a07e6071",
+      "original_bytes": 646,
+      "original_sha256": "7a75592b203ba1cb6bd9c46922e34d8311a097e818cb1bd7a1f87716a07e6071"
+    },
+    "targeted.stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\attempt02\\record.stderr.log",
+      "encoding": "identity",
+      "bytes": 2645,
+      "sha256": "2bfd8cb7c339ccb2715cb2e7eaa9cebc6b81eadd85d66639238af8b0951f8e54",
+      "original_bytes": 2645,
+      "original_sha256": "2bfd8cb7c339ccb2715cb2e7eaa9cebc6b81eadd85d66639238af8b0951f8e54"
+    },
+    "targeted.samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\attempt02\\record.samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 43903,
+      "sha256": "b9acca6d08c3c82c28c8892c270ba517a7b7bd703fbcf44ff8000f178e72a543",
+      "original_bytes": 460530,
+      "original_sha256": "8462b66838b5d1d46a5fc837c6f6c16f5256805138135bcdccbe9fbde3922813"
+    },
+    "fmt.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\fmt.json",
+      "encoding": "identity",
+      "bytes": 5789,
+      "sha256": "e033e3f61779abddefb1039c2addf6f30312f5dc1f71ebf93a7a590084e0a5a6",
+      "original_bytes": 5789,
+      "original_sha256": "e033e3f61779abddefb1039c2addf6f30312f5dc1f71ebf93a7a590084e0a5a6"
+    },
+    "fmt.stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\fmt.stdout.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "fmt.stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\fmt.stderr.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "fmt.samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\fmt.samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 1124,
+      "sha256": "ef3c4594910e916a8522b9fec1cff38e05bbca5b30de3c2118af984370f95d6d",
+      "original_bytes": 8657,
+      "original_sha256": "85637fa558cfae3d69dce587ac2d72ac86d9596bf2b53fa074d6c8a44de15cca"
+    },
+    "clippy.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\clippy.json",
+      "encoding": "identity",
+      "bytes": 5975,
+      "sha256": "15a8396616bdbd1576f676fc1c2d8fd3dfbd89ed143684288d38f336b024b7db",
+      "original_bytes": 5975,
+      "original_sha256": "15a8396616bdbd1576f676fc1c2d8fd3dfbd89ed143684288d38f336b024b7db"
+    },
+    "clippy.stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\clippy.stdout.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "clippy.stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\clippy.stderr.log",
+      "encoding": "identity",
+      "bytes": 4898,
+      "sha256": "0462f5b8f8c5af06a7e2d604d33b6cec9cc9d1ec68149a38e6571e596ede4140",
+      "original_bytes": 4898,
+      "original_sha256": "0462f5b8f8c5af06a7e2d604d33b6cec9cc9d1ec68149a38e6571e596ede4140"
+    },
+    "clippy.samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\clippy.samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 80682,
+      "sha256": "19d3998ddd9da9cd243cf533a1d6bd1bc97daac85045d606027ee393112e94ac",
+      "original_bytes": 913640,
+      "original_sha256": "3e36bf13293ed03465a4baf6bfc5c6ff40d0aa2d1a52beb3a7554c6f4158246f"
+    },
+    "workspace-command-stop.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test.json",
+      "encoding": "identity",
+      "bytes": 5858,
+      "sha256": "64d1bfe7b993cb463637fefc3bf619101f63233b1abd945d69e6ed2dc7300ab0",
+      "original_bytes": 5858,
+      "original_sha256": "64d1bfe7b993cb463637fefc3bf619101f63233b1abd945d69e6ed2dc7300ab0"
+    },
+    "workspace-command-stop.stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test.stdout.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace-command-stop.stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test.stderr.log",
+      "encoding": "identity",
+      "bytes": 1955,
+      "sha256": "b19c02438ba864168b497b8e3adc71e17d6f702d23d5713e775b06edcd1dad0b",
+      "original_bytes": 1955,
+      "original_sha256": "b19c02438ba864168b497b8e3adc71e17d6f702d23d5713e775b06edcd1dad0b"
+    },
+    "workspace-command-stop.samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test.samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 17616,
+      "sha256": "eafbdf31c5fe569d52776c595911c5255db32d27bf674bc619c8ef054be71274",
+      "original_bytes": 179101,
+      "original_sha256": "dcd31a9cf20946a3a829243c257cb5e3fdbfc327685348ee10d2d9c5f732d610"
+    },
+    "workspace-memory-stop.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test-serial.json",
+      "encoding": "identity",
+      "bytes": 6309,
+      "sha256": "b66c4bbe7ff8180bcd50e6230e6539e3b9d3ced8c0815d2d29020a8c3e1e158c",
+      "original_bytes": 6309,
+      "original_sha256": "b66c4bbe7ff8180bcd50e6230e6539e3b9d3ced8c0815d2d29020a8c3e1e158c"
+    },
+    "workspace-memory-stop.stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test-serial.stdout.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace-memory-stop.stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test-serial.stderr.log",
+      "encoding": "identity",
+      "bytes": 993,
+      "sha256": "739ce96f826e3d326201a22d9f018847a64bdc14c3677af469f310295eb7c7d1",
+      "original_bytes": 993,
+      "original_sha256": "739ce96f826e3d326201a22d9f018847a64bdc14c3677af469f310295eb7c7d1"
+    },
+    "workspace-memory-stop.samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test-serial.samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 30448,
+      "sha256": "62d71a69712e37b940f8dbb3bb0f9b96bd04ad5c97ef0b6d1839ba2f1953131c",
+      "original_bytes": 321850,
+      "original_sha256": "f551496fb583d41d49832be17cfaa4be62e5113239f3c04091ab8ef9de5f73e5"
+    },
+    "workspace-preflight-stop.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test-serial-768m.json",
+      "encoding": "identity",
+      "bytes": 5959,
+      "sha256": "9c3c81830debc039cb66011c13c834ddb51c9c5166a011a2963d3f105a3a3680",
+      "original_bytes": 5959,
+      "original_sha256": "9c3c81830debc039cb66011c13c834ddb51c9c5166a011a2963d3f105a3a3680"
+    },
+    "workspace-preflight-stop.stdout.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test-serial-768m.stdout.log",
+      "encoding": "identity",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace-preflight-stop.stderr.log": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test-serial-768m.stderr.log",
+      "encoding": "identity",
+      "bytes": 94,
+      "sha256": "0c5a49b9f66472152baecfd9096e96e2a337340e4f3dc86fb0d4839f765fc90f",
+      "original_bytes": 94,
+      "original_sha256": "0c5a49b9f66472152baecfd9096e96e2a337340e4f3dc86fb0d4839f765fc90f"
+    },
+    "workspace-preflight-stop.samples.jsonl.gz": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test-serial-768m.samples.jsonl",
+      "encoding": "gzip",
+      "bytes": 8136,
+      "sha256": "f60dbe2bba7a19ad3a9a0c9800b9c930eb6270c96afb6db40f2488f90624d70d",
+      "original_bytes": 75096,
+      "original_sha256": "c465b8816546eea873a23f0fa6efbcd91cb74e886f92dec4795c8a2773f98740"
+    },
+    "plan.json": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\plan.json",
+      "encoding": "identity",
+      "bytes": 32469,
+      "sha256": "1643392cc2db640b06fc04c8e2af6e89caf3935174d03c8b26d65f19371e69f5",
+      "original_bytes": 32469,
+      "original_sha256": "1643392cc2db640b06fc04c8e2af6e89caf3935174d03c8b26d65f19371e69f5"
+    },
+    "oracle-river.patch": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\oracle-river.patch",
+      "encoding": "identity",
+      "bytes": 14282,
+      "sha256": "1ae39332828b1aad2faf62dd7b71c08bb7ce57e2d123b0730e182ae214453a42",
+      "original_bytes": 14282,
+      "original_sha256": "1ae39332828b1aad2faf62dd7b71c08bb7ce57e2d123b0730e182ae214453a42"
+    },
+    "oracle_river.rs.snapshot": {
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\tests\\oracle_river.rs",
+      "encoding": "identity",
+      "bytes": 25769,
+      "sha256": "a989104360e85e6b57635017314203cee39f7cf7d4af9b9fa19b9260cc129f0f",
+      "original_bytes": 25769,
+      "original_sha256": "a989104360e85e6b57635017314203cee39f7cf7d4af9b9fa19b9260cc129f0f"
+    }
+  },
+  "checks": {
+    "targeted-launch-error": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\attempt01\\record.json",
+      "expected_stop_reason": "child_failed",
+      "expected_exit_code": 1,
+      "expected_child_exit_code": 1
+    },
+    "targeted": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\attempt02\\record.json",
+      "expected_stop_reason": "completed",
+      "expected_exit_code": 0,
+      "expected_child_exit_code": 0
+    },
+    "fmt": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\fmt.json",
+      "expected_stop_reason": "completed",
+      "expected_exit_code": 0,
+      "expected_child_exit_code": 0
+    },
+    "clippy": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\clippy.json",
+      "expected_stop_reason": "completed",
+      "expected_exit_code": 0,
+      "expected_child_exit_code": 0
+    },
+    "workspace-command-stop": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test.json",
+      "expected_stop_reason": "child_failed",
+      "expected_exit_code": 1,
+      "expected_child_exit_code": 3221225786
+    },
+    "workspace-memory-stop": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test-serial.json",
+      "expected_stop_reason": "tree_memory_limit",
+      "expected_exit_code": 125,
+      "expected_child_exit_code": 3221225786
+    },
+    "workspace-preflight-stop": {
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-local-bet-refinement\\checks\\test-serial-768m.json",
+      "expected_stop_reason": "child_failed",
+      "expected_exit_code": 1,
+      "expected_child_exit_code": 3221225786
+    }
+  },
+  "source_closure_verified_after": {
+    "at": "2026-09-25T21:29:08.672773+00:00",
+    "files": 198,
+    "changed": []
+  }
+}

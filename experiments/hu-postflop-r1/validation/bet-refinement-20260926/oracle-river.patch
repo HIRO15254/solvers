@@ -1,0 +1,362 @@
+diff --git a/crates/holdem/tests/oracle_river.rs b/crates/holdem/tests/oracle_river.rs
+index ea5138e..c38acf3 100644
+--- a/crates/holdem/tests/oracle_river.rs
++++ b/crates/holdem/tests/oracle_river.rs
+@@ -7,35 +7,45 @@ use std::collections::{BTreeSet, HashMap};
+ 
+ use cards::{Card, Chips, PerPlayer, Player, Range, combo_index};
+ use cfr_ref::{RefGame, RefStrategy, best_response_value, expected_value};
+-use engine::{Dcfr, F32Storage, NodeKind, ParConfig, PublicTree, Solver};
++use engine::{Dcfr, F32Storage, NodeKind, ParConfig, PublicTree, Solver, StorageState};
+ use game::{ChipEv, NoRake, PayoffPipeline, PercentCapRake, RakeModel};
+ use holdem::{PerStreet, PostflopConfig, PostflopNodeInfo, StreetTree, build_postflop_game};
+ 
+-const POT: u32 = 5;
+-const MAX_AGGRESSIONS: u32 = 3;
+ const TOLERANCE: f64 = 1e-4;
+ 
+ #[derive(Clone, Copy)]
+ struct Fixture {
+     name: &'static str,
++    pot: u32,
+     stack: u32,
++    max_aggressions: u32,
++    percentages: &'static [u32],
+     rake: Option<(f64, f64)>,
+ }
+ 
+ const FIXTURES: [Fixture; 3] = [
+     Fixture {
+         name: "river-raised-no-rake",
++        pot: 5,
+         stack: 40,
++        max_aggressions: 3,
++        percentages: &[50, 100],
+         rake: None,
+     },
+     Fixture {
+         name: "river-short-allin-capped-rake",
++        pot: 5,
+         stack: 8,
++        max_aggressions: 3,
++        percentages: &[50, 100],
+         rake: Some((0.125, 1.5)),
+     },
+     Fixture {
+         name: "river-raised-uncapped-rake",
++        pot: 5,
+         stack: 40,
++        max_aggressions: 3,
++        percentages: &[50, 100],
+         rake: Some((0.125, 100.0)),
+     },
+ ];
+@@ -55,7 +65,7 @@ impl Hand {
+     }
+ }
+ 
+-#[derive(Clone, Copy, Debug)]
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+ enum Action {
+     Check,
+     Fold,
+@@ -138,16 +148,19 @@ impl RiverOracle {
+         } else {
+             vec![Action::Fold, Action::Call]
+         };
+-        if state.aggressions == MAX_AGGRESSIONS || facing == self.fixture.stack {
++        if state.aggressions == self.fixture.max_aggressions || facing == self.fixture.stack {
+             return actions;
+         }
+         // Half-pot rounds up at odd integer pots; pot-sized wagers are exact.
+         // Both sizes are raises ABOVE the matched contribution. A full raise
+         // must repeat the last increment, but a smaller all-in is legal.
+-        let pot_after_call = POT + 2 * facing;
++        let pot_after_call = self.fixture.pot + 2 * facing;
+         let minimum = facing + state.last_increment.max(1);
+-        let targets: BTreeSet<_> = [pot_after_call.div_ceil(2), pot_after_call]
+-            .into_iter()
++        let targets: BTreeSet<_> = self
++            .fixture
++            .percentages
++            .iter()
++            .map(|percent| (pot_after_call * percent).div_ceil(100))
+             .map(|increment| (facing + increment).max(minimum).min(self.fixture.stack))
+             .collect();
+         actions.extend(targets.into_iter().map(Action::Wager));
+@@ -188,7 +201,7 @@ impl RiverOracle {
+ 
+     fn rake(&self, state: &State) -> f64 {
+         self.fixture.rake.map_or(0.0, |(rate, cap)| {
+-            ((POT + state.invested[0] + state.invested[1]) as f64 * rate).min(cap)
++            ((self.fixture.pot + state.invested[0] + state.invested[1]) as f64 * rate).min(cap)
+         })
+     }
+ 
+@@ -209,16 +222,26 @@ impl RiverOracle {
+             Some(rake) => rake,
+             None => &NoRake,
+         };
++        let fractions: Vec<_> = self
++            .fixture
++            .percentages
++            .iter()
++            .map(|p| f64::from(*p) / 100.0)
++            .collect();
+         build_postflop_game(
+             &PostflopConfig {
+                 board: self.board.clone(),
+                 ranges: PerPlayer::new(range(&self.hands[0]), range(&self.hands[1])),
+-                pot: Chips(POT),
++                pot: Chips(self.fixture.pot),
+                 effective_stack: Chips(self.fixture.stack),
+                 streets: PerStreet {
+                     flop: StreetTree::pot_fractions(&[], &[], 0),
+                     turn: StreetTree::pot_fractions(&[], &[], 0),
+-                    river: StreetTree::pot_fractions(&[0.5, 1.0], &[0.5, 1.0], MAX_AGGRESSIONS),
++                    river: StreetTree::pot_fractions(
++                        &fractions,
++                        &fractions,
++                        self.fixture.max_aggressions,
++                    ),
+                 },
+                 iso_merging: false,
+                 ..Default::default()
+@@ -256,7 +279,8 @@ impl RiverOracle {
+             let labels: Vec<_> = actions.iter().map(|a| a.label(facing)).collect();
+             assert_eq!(metadata.actions, labels, "{}", state.history);
+             assert_eq!(node.num_children as usize, actions.len());
+-            for (p, initial) in [(Player::P0, POT / 2), (Player::P1, POT - POT / 2)] {
++            let pot = oracle.fixture.pot;
++            for (p, initial) in [(Player::P0, pot / 2), (Player::P1, pot - pot / 2)] {
+                 assert_eq!(metadata.contrib[p].0, initial + state.invested[p.index()]);
+             }
+             for (a, action) in actions.into_iter().enumerate() {
+@@ -340,8 +364,13 @@ impl RefGame for RiverOracle {
+                 }
+             }
+         };
+-        let initial_share = if player == 0 { POT / 2 } else { POT - POT / 2 };
+-        let pot = POT + state.invested[0] + state.invested[1];
++        let initial = self.fixture.pot;
++        let initial_share = if player == 0 {
++            initial / 2
++        } else {
++            initial - initial / 2
++        };
++        let pot = initial + state.invested[0] + state.invested[1];
+         share * (pot as f64 - self.rake(state)) - (initial_share + state.invested[player]) as f64
+     }
+ 
+@@ -484,3 +513,211 @@ fn river_fixture_has_hand_checked_settlements_and_short_raise() {
+         }
+     }
+ }
++
++// T1-04's fixed bet-menu contrast. This is a test adapter, not a general
++// migration API: it never transports by storage index or action position.
++fn refinement_fixture(percentages: &'static [u32]) -> Fixture {
++    Fixture {
++        name: "river-bet-refinement",
++        pot: 10,
++        stack: 30,
++        max_aggressions: 2,
++        percentages,
++        rake: None,
++    }
++}
++
++fn all_infosets(oracle: &RiverOracle) -> HashMap<String, (State, Vec<Action>)> {
++    fn visit(oracle: &RiverOracle, state: State, out: &mut HashMap<String, (State, Vec<Action>)>) {
++        if oracle.is_terminal(&state) {
++            return;
++        }
++        let actions = oracle.actions(&state);
++        let entry = out
++            .entry(oracle.infoset_key(&state))
++            .or_insert_with(|| (state.clone(), actions.clone()));
++        assert_eq!(entry.1, actions, "opponent cards cannot change my menu");
++        for action in actions {
++            visit(oracle, oracle.apply(&state, action), out);
++        }
++    }
++    let mut result = HashMap::new();
++    for (root, _) in oracle.initial_states() {
++        visit(oracle, root, &mut result);
++    }
++    result
++}
++
++fn evaluate_in_engine(oracle: &RiverOracle, profile: &CompleteProfile) -> [[f64; 2]; 2] {
++    let game = oracle.engine_game();
++    oracle.assert_tree_matches(&game.game.tree, &game.node_info);
++    let mut solver = Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(1));
++    let mut state = solver.state();
++    let StorageState::F32 { strategy_sum, .. } = &mut state.storage else {
++        unreachable!()
++    };
++    let tree = &solver.game().tree;
++    for (id, node) in tree.nodes.iter().enumerate() {
++        if node.kind != NodeKind::Action {
++            continue;
++        }
++        let r = tree.storage_ref(node);
++        let metadata = &game.node_info[tree.tags[id] as usize];
++        // The production layout includes zero-weight and board-blocked hands.
++        // Define them too; the finite scalar game's support excludes them.
++        strategy_sum[r.offset..r.offset + r.len()].fill(1.0 / f32::from(r.num_actions));
++        for hand in &oracle.hands[node.player.index()] {
++            if hand.cards.iter().any(|card| oracle.board.contains(card)) {
++                continue;
++            }
++            let key = format!(
++                "{}|{}|{}",
++                node.player.index(),
++                hand.combo(),
++                metadata.history
++            );
++            let sigma = profile.strategy(&key, r.num_actions as usize);
++            for (a, probability) in sigma.into_iter().enumerate() {
++                strategy_sum[r.offset + a * r.num_hands as usize + hand.combo()] =
++                    probability as f32;
++            }
++        }
++    }
++    solver.restore_state(state).unwrap();
++    let mut values = [[0.0; 2]; 2];
++    for player in Player::BOTH {
++        let expected = [
++            expected_value(oracle, profile, player.index()),
++            best_response_value(oracle, profile, player.index()),
++        ];
++        let actual = [
++            solver.expected_value(player),
++            solver.best_response_value(player),
++        ];
++        for (actual, expected) in actual.into_iter().zip(expected) {
++            assert!(
++                (actual - expected).abs() < TOLERANCE,
++                "{player:?}: {actual} != {expected}"
++            );
++        }
++        values[player.index()] = actual;
++    }
++    values
++}
++
++#[test]
++fn coarse_bet_profile_lifts_completely_and_expanded_br_uses_the_fine_domain() {
++    let coarse = RiverOracle::new(refinement_fixture(&[50]));
++    let fine = RiverOracle::new(refinement_fixture(&[50, 100]));
++    let root = fine.initial_states()[0].0.clone();
++    assert_eq!(coarse.actions(&root), [Action::Check, Action::Wager(5)]);
++    assert_eq!(
++        fine.actions(&root),
++        [Action::Check, Action::Wager(5), Action::Wager(10)]
++    );
++    let bet5 = fine.apply(&root, Action::Wager(5));
++    assert_eq!(
++        coarse.actions(&bet5),
++        [Action::Fold, Action::Call, Action::Wager(15)]
++    );
++    assert_eq!(
++        fine.actions(&bet5),
++        [
++            Action::Fold,
++            Action::Call,
++            Action::Wager(15),
++            Action::Wager(25)
++        ]
++    );
++    let bet10 = fine.apply(&root, Action::Wager(10));
++    assert_eq!(
++        fine.actions(&bet10),
++        [
++            Action::Fold,
++            Action::Call,
++            Action::Wager(25),
++            Action::Wager(30)
++        ]
++    );
++
++    let coarse_infosets = all_infosets(&coarse);
++    let fine_infosets = all_infosets(&fine);
++    assert_eq!(coarse_infosets.len(), 21); // 6 public decisions, 3/4 live private hands.
++    assert_eq!(fine_infosets.len(), 49); // 14 public decisions, all legal private worlds.
++    let mut coarse_profile = CompleteProfile(HashMap::new());
++    for (key, (state, actions)) in &coarse_infosets {
++        let mut sigma = match actions.len() {
++            2 => vec![0.25, 0.75],
++            3 => vec![0.25, 0.5, 0.25],
++            _ => panic!("unexpected fixed coarse menu"),
++        };
++        // Same own hand/history gets the same policy in every opponent world.
++        if state.hands[state.actor] % 2 == 1 {
++            sigma.reverse();
++        }
++        coarse_profile.0.insert(key.clone(), sigma);
++    }
++
++    let mut lifted = CompleteProfile(HashMap::new());
++    let mut added_history_infosets = 0;
++    for (key, (_, fine_actions)) in &fine_infosets {
++        let sigma = if let Some((_, coarse_actions)) = coarse_infosets.get(key) {
++            let mut result = vec![0.0; fine_actions.len()];
++            for (action, probability) in coarse_actions.iter().zip(&coarse_profile.0[key]) {
++                let position = fine_actions
++                    .iter()
++                    .position(|candidate| candidate == action)
++                    .unwrap();
++                result[position] = *probability;
++            }
++            result
++        } else {
++            added_history_infosets += 1;
++            // Explicitly selected completion, including both seats after the
++            // first added action. Own-profile zero reach is not an omission.
++            vec![1.0 / fine_actions.len() as f64; fine_actions.len()]
++        };
++        assert!(sigma.iter().all(|p| p.is_finite() && *p >= 0.0));
++        assert!((sigma.iter().sum::<f64>() - 1.0).abs() < 1e-12);
++        lifted.0.insert(key.clone(), sigma);
++    }
++    assert_eq!(added_history_infosets, 28);
++    assert_eq!(lifted.0.len(), fine_infosets.len());
++
++    // Restore every original row by concrete action meaning, not new indices.
++    let mut restored = CompleteProfile(HashMap::new());
++    for (key, (_, coarse_actions)) in &coarse_infosets {
++        let fine_actions = &fine_infosets[key].1;
++        let sigma: Vec<_> = coarse_actions
++            .iter()
++            .map(|action| {
++                lifted.0[key][fine_actions
++                    .iter()
++                    .position(|candidate| candidate == action)
++                    .unwrap()]
++            })
++            .collect();
++        for (a, action) in fine_actions.iter().enumerate() {
++            if !coarse_actions.contains(action) {
++                assert_eq!(lifted.0[key][a], 0.0);
++            }
++        }
++        restored.0.insert(key.clone(), sigma);
++    }
++    assert_eq!(restored.0, coarse_profile.0);
++    let coarse_values = evaluate_in_engine(&coarse, &coarse_profile);
++    let fine_values = evaluate_in_engine(&fine, &lifted);
++    for player in 0..2 {
++        let coarse_ev = expected_value(&coarse, &coarse_profile, player);
++        let fine_ev = expected_value(&fine, &lifted, player);
++        let coarse_br = best_response_value(&coarse, &coarse_profile, player);
++        let fine_br = best_response_value(&fine, &lifted, player);
++        assert!((coarse_ev - fine_ev).abs() < 1e-12);
++        assert!(fine_br + 1e-12 >= coarse_br);
++        assert!((coarse_values[player][0] - fine_values[player][0]).abs() < TOLERANCE);
++        assert!(fine_values[player][1] + TOLERANCE >= coarse_values[player][1]);
++        println!(
++            "bet refinement P{player}: coarse EV={coarse_ev:.12} BR={coarse_br:.12}; lifted EV={fine_ev:.12} expanded BR={fine_br:.12}"
++        );
++    }
++}

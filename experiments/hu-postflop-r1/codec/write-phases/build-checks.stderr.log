@@ -1,0 +1,17 @@
+test_campaign_deadline_does_not_start_a_stage (test_build.BuildProducerChecks.test_campaign_deadline_does_not_start_a_stage) ... ok
+test_copy_failure_never_runs_cargo (test_build.BuildProducerChecks.test_copy_failure_never_runs_cargo) ... ok
+test_existing_target_rejected_without_deleting_it (test_build.BuildProducerChecks.test_existing_target_rejected_without_deleting_it) ... ok
+test_final_boot_change_rejects_all_prior_successes (test_build.BuildProducerChecks.test_final_boot_change_rejects_all_prior_successes) ... ok
+test_final_source_change_rejects_all_prior_successes (test_build.BuildProducerChecks.test_final_source_change_rejects_all_prior_successes) ... ok
+test_first_build_failure_stops_without_retry_and_preserves_record (test_build.BuildProducerChecks.test_first_build_failure_stops_without_retry_and_preserves_record) ... ok
+test_four_fresh_copies_complete_and_existing_consumer_accepts (test_build.BuildProducerChecks.test_four_fresh_copies_complete_and_existing_consumer_accepts) ... ok
+test_inherited_wrapper_rejected_before_child_execution (test_build.BuildProducerChecks.test_inherited_wrapper_rejected_before_child_execution) ... ok
+test_late_consumer_rejection_never_leaves_completed_public_result (test_build.BuildProducerChecks.test_late_consumer_rejection_never_leaves_completed_public_result) ... ok
+test_local_cargo_cache_config_rejected (test_build.BuildProducerChecks.test_local_cargo_cache_config_rejected) ... ok
+test_supervisor_api_preserves_exact_child_command_and_limits (test_build.BuildProducerChecks.test_supervisor_api_preserves_exact_child_command_and_limits) ... ok
+test_tool_rejects_elf_hardlink_proxy_by_bytes (test_build.BuildProducerChecks.test_tool_rejects_elf_hardlink_proxy_by_bytes) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 17.314s
+
+OK

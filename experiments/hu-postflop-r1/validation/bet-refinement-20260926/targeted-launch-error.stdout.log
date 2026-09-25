@@ -1,0 +1,7 @@
+error: unexpected argument '--locked' found
+
+  tip: to pass '--locked' as a value, use '-- --locked'
+
+Usage: rustup[EXE] <+toolchain>
+
+For more information, try '--help'.

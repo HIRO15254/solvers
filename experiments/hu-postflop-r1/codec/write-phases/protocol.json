@@ -16,6 +16,7 @@
   "samples": {"warmup": 18, "measured": 108, "total": 126},
   "cache": "Warm input, own-codec preload before timer; no drop_caches, eviction or cold-disk claim. Every output path is new on one filesystem.",
   "limits": {"per_process_seconds": 60, "campaign_seconds": 1200, "memory_bytes": 4294967296, "min_free_memory_bytes": 2147483648, "disk_reserve_bytes": 4294967296},
+  "runner_monitor": {"poll_seconds": 0.05, "max_gap_seconds": 1.0, "minimum_start_free_disk_bytes": 10737418240, "outer_runtime_max_seconds": 1500, "outer_stop_max_seconds": 15, "outer_pids_max": 512, "outer_swap_bytes": 0, "isolation_assurance": "sampled process inventory plus operator dedicated-window declaration"},
   "measurement_isolation": "Sequential only. No SCP/download/upload, builds, compression/collection, other benchmarks or solver work during all 126 samples. Collect after the final sample or after abort.",
   "failure_policy": "Abort on first failure/timeout/resource stop, preserve all records; no retry, replacement, adaptive repetitions, threshold or input changes. Incomplete campaigns are not evaluated.",
   "correctness_gate": "All outputs and canonical files byte-exact to original inputs and across all six arms, full readback succeeds, all supervised exits/cleanup/identity/host checks pass",

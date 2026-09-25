@@ -93,8 +93,16 @@ rootは粗`check,bet-to-5`、密`check,bet-to-5,bet-to-10`。
 粗木でのBR gainは密木のgainではない。密木のBR値は、このlift済み同一profileに対して
 比較する場合に限り、粗menuへ制限したdeviation以上になる。
 独立にsolveした粗/密profile間には、その単調性もEV改善も保証しない。
-このbet対照の自動policy transportとBR比較は移行対象であり、以下のEHS2 testだけで
-実行済みとはしない。
+[oracle_river.rs](../../crates/holdem/tests/oracle_river.rs)の
+`coarse_bet_profile_lifts_completely_and_expanded_br_uses_the_fine_domain`は、この固定対照を
+test専用adapterで表現する。粗い6公開判断点/21情報集合から密な14公開判断点/49情報集合へ、
+具体的actionの効果で写し、新しい28情報集合には上記の一様補完を明示する。
+共通actionの確率・追加actionの0・全元行の復元を検査し、両compiled treeのEV/BRを
+凍結`cfr-ref`による独立scalar評価に照合する。元のboard/rangeは同ファイルの
+11互換worldを用い、本人の手札と公開履歴でpolicyを識別する。
+これは指定された有限対照の検査であり、任意の保存profileを移植する公開APIや、
+独立にsolveした粗/密解の比較、参照24caseの品質認定を実装するものではない。
+test追加と実行成功は区別し、実行記録は実験索引から辿る。
 
 ## 4. ハンド抽象化と戦略の復元
 
@@ -178,11 +186,12 @@ Rake等の一般和は両seatを別計算し、零和の`NashConv/2`保証へ読
 |---|---|
 | NLHE iso有無 | [holdem postflop tests](../../crates/holdem/tests/postflop.rs)の`asymmetric_ranges_suppress_iso_merging`、`iso_quotient_matches_full_tree_per_hand`、`member_branch_matches_suit_permuted_rep_branch`。ignoredの実行範囲も記録 |
 | EHS2粗密/復元/coverage | `cargo test --locked -p abstraction --test semantic_mapping`。本票の有限domainのみ。test追加を実行成功の証拠としない |
+| ベット粗密/完全profile復元/拡張BR | `cargo test --locked -p holdem --test oracle_river`。pot10/stack30の上記固定対照。compiled menuと独立全worldを照合し、同じlift済みprofileの評価domainを区別 |
 | Joint chance/recall | R1-DRAW-01の独立列挙・記憶反例、R1-STUD-01の360 world。`cargo test --locked -p game --test r1_variants` |
 | NLHE独立評価 | [HU oracle fixture](r1-oracle-fixtures.jp.md)。抽象化されたGAの残差とは別に保つ |
 | NLHE draw特徴の細分化 | [研究adapterの既存tests](../../crates/multiway/src/research_draw_abstraction.rs)。base/feature fingerprint、suit不変性、batchとscalarの一致。交換Drawの証拠には数えない |
 
-元ゲームへのaction transport/拡張BRの自動化、任意のbucket migration、共通semantic IDの
+任意の元ゲームへのaction transport/拡張BRの公開API、任意のbucket migration、共通semantic IDの
 artifact保存、未知domainの自動認定は、本票だけでは実装完了としない。
 T1-05/T1-06のNLHE exact比較は同一G0・同一評価domainで行い、これら未実装機能へ依存して
 別ゲームの数字を同等Exploitabilityとして比較しない。公開契約やartifactを拡張する変更は

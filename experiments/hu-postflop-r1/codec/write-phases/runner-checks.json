@@ -1,0 +1,118 @@
+{
+  "schema": "r1.write-phase-runner-preparation-checks/v1",
+  "started_at": "2026-09-25T21:31:54.974976+00:00",
+  "elapsed_seconds": 15.807680999860168,
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\codec\\write-phases",
+    "-v"
+  ],
+  "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "files_before": {
+    "apply.py": {
+      "bytes": 11898,
+      "sha256": "49a8a9c1bab0fd25dcc56a26875df2e2f51ab4ce4286c840fe57aa8111f11d01"
+    },
+    "protocol.json": {
+      "bytes": 4112,
+      "sha256": "48706566e82ecde9cb6089cc40458c66398377c317231302f29ebffbd785371d"
+    },
+    "retain.py": {
+      "bytes": 26862,
+      "sha256": "12fa09d58c95f9ead64ae24cab79b8480b8b24d0b1cf19d598adb5c818871284"
+    },
+    "run.py": {
+      "bytes": 43235,
+      "sha256": "1a929dc37db0db2c64ba5a4e0f2bab3eb7080ceb473f532376ee2741f11e9f63"
+    },
+    "runtime.rs.inc": {
+      "bytes": 6986,
+      "sha256": "7488540ebb8fe4876178160c13fb86b2313f8425fa41fe425ac69fe7c031d62a"
+    },
+    "source-pins.json": {
+      "bytes": 67017,
+      "sha256": "2a78141bfe7694957ec09689843bd0231f470b327e9933552d53fe7c52de1292"
+    },
+    "test_retain.py": {
+      "bytes": 21565,
+      "sha256": "4050eb49d5c79e2e28a28f82dbc21b2014c82e2b693c154eab7f691daa9dfa7e"
+    },
+    "test_run.py": {
+      "bytes": 10750,
+      "sha256": "d1f292aad327a931ba338e83b15d40a116a06cae2766fce30ec5b6e4936d12d1"
+    },
+    "test_write_phases.py": {
+      "bytes": 10415,
+      "sha256": "70fd30058226a8611ebd3b920bb6247ef375de35c18fcd363e7d7576a33e92da"
+    },
+    "validate.py": {
+      "bytes": 6916,
+      "sha256": "3bd05ea963f91854f4dc3bb8856849d566bd88d78a516a08198213a6ae805e50"
+    }
+  },
+  "files_after": {
+    "apply.py": {
+      "bytes": 11898,
+      "sha256": "49a8a9c1bab0fd25dcc56a26875df2e2f51ab4ce4286c840fe57aa8111f11d01"
+    },
+    "protocol.json": {
+      "bytes": 4112,
+      "sha256": "48706566e82ecde9cb6089cc40458c66398377c317231302f29ebffbd785371d"
+    },
+    "retain.py": {
+      "bytes": 26862,
+      "sha256": "12fa09d58c95f9ead64ae24cab79b8480b8b24d0b1cf19d598adb5c818871284"
+    },
+    "run.py": {
+      "bytes": 43235,
+      "sha256": "1a929dc37db0db2c64ba5a4e0f2bab3eb7080ceb473f532376ee2741f11e9f63"
+    },
+    "runtime.rs.inc": {
+      "bytes": 6986,
+      "sha256": "7488540ebb8fe4876178160c13fb86b2313f8425fa41fe425ac69fe7c031d62a"
+    },
+    "source-pins.json": {
+      "bytes": 67017,
+      "sha256": "2a78141bfe7694957ec09689843bd0231f470b327e9933552d53fe7c52de1292"
+    },
+    "test_retain.py": {
+      "bytes": 21565,
+      "sha256": "4050eb49d5c79e2e28a28f82dbc21b2014c82e2b693c154eab7f691daa9dfa7e"
+    },
+    "test_run.py": {
+      "bytes": 10750,
+      "sha256": "d1f292aad327a931ba338e83b15d40a116a06cae2766fce30ec5b6e4936d12d1"
+    },
+    "test_write_phases.py": {
+      "bytes": 10415,
+      "sha256": "70fd30058226a8611ebd3b920bb6247ef375de35c18fcd363e7d7576a33e92da"
+    },
+    "validate.py": {
+      "bytes": 6916,
+      "sha256": "3bd05ea963f91854f4dc3bb8856849d566bd88d78a516a08198213a6ae805e50"
+    }
+  },
+  "identity_unchanged": true,
+  "exit_code": 0,
+  "logs": {
+    "stdout": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-write-phases-checks-20260926\\stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retained_path": "experiments/hu-postflop-r1/codec/write-phases/runner-checks.stdout.log"
+    },
+    "stderr": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-write-phases-checks-20260926\\stderr.log",
+      "bytes": 7080,
+      "sha256": "7d4cc97fbb3fd7b32ae2c1dd01aa0f6b6aed55daa44a9277ba9baab91368d23c",
+      "retained_path": "experiments/hu-postflop-r1/codec/write-phases/runner-checks.stderr.log"
+    }
+  },
+  "scope": "Synthetic runner/retainer tests and source patch/rustfmt checks only. No real campaign, build, VM, Linux containment or performance acceptance.",
+  "test_count": 51
+}

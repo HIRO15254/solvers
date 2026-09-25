@@ -1,0 +1,142 @@
+{
+  "schema": "r1.write-phase-reviewed-preparation-checks/v1",
+  "started_at": "2026-09-25T22:01:46.315580+00:00",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\codec\\write-phases",
+    "-v"
+  ],
+  "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "files_before": {
+    "apply.py": {
+      "bytes": 11898,
+      "sha256": "49a8a9c1bab0fd25dcc56a26875df2e2f51ab4ce4286c840fe57aa8111f11d01"
+    },
+    "build.py": {
+      "bytes": 20749,
+      "sha256": "4dc8aed5f405fb5669c334fb1dc5031205cfef700ba2364c3ece3a58e9b8d6e1"
+    },
+    "retain.py": {
+      "bytes": 26862,
+      "sha256": "12fa09d58c95f9ead64ae24cab79b8480b8b24d0b1cf19d598adb5c818871284"
+    },
+    "run.py": {
+      "bytes": 50449,
+      "sha256": "dc5e1c8e02880c4349bab0fc0f5e887b4102e538e8a573db0a5378671bc26734"
+    },
+    "test_build.py": {
+      "bytes": 18386,
+      "sha256": "14fdca76bf61bed40b6c7723eda84691c4e5c392da5624fa27285468feb52e88"
+    },
+    "test_retain.py": {
+      "bytes": 21565,
+      "sha256": "4050eb49d5c79e2e28a28f82dbc21b2014c82e2b693c154eab7f691daa9dfa7e"
+    },
+    "test_run.py": {
+      "bytes": 10750,
+      "sha256": "d1f292aad327a931ba338e83b15d40a116a06cae2766fce30ec5b6e4936d12d1"
+    },
+    "test_write_phases.py": {
+      "bytes": 10415,
+      "sha256": "70fd30058226a8611ebd3b920bb6247ef375de35c18fcd363e7d7576a33e92da"
+    },
+    "validate.py": {
+      "bytes": 6916,
+      "sha256": "3bd05ea963f91854f4dc3bb8856849d566bd88d78a516a08198213a6ae805e50"
+    },
+    "runtime.rs.inc": {
+      "bytes": 6986,
+      "sha256": "7488540ebb8fe4876178160c13fb86b2313f8425fa41fe425ac69fe7c031d62a"
+    },
+    "source-pins.json": {
+      "bytes": 67017,
+      "sha256": "2a78141bfe7694957ec09689843bd0231f470b327e9933552d53fe7c52de1292"
+    },
+    "protocol.json": {
+      "bytes": 4112,
+      "sha256": "48706566e82ecde9cb6089cc40458c66398377c317231302f29ebffbd785371d"
+    },
+    "../inputs.json": {
+      "bytes": 1257,
+      "sha256": "32fb23b2178fc86f61a05a10638abe84ef0406d0b4b7084bc04c22a04b05710b"
+    }
+  },
+  "elapsed_seconds": 71.74183989991434,
+  "exit_code": 0,
+  "files_after": {
+    "apply.py": {
+      "bytes": 11898,
+      "sha256": "49a8a9c1bab0fd25dcc56a26875df2e2f51ab4ce4286c840fe57aa8111f11d01"
+    },
+    "build.py": {
+      "bytes": 20749,
+      "sha256": "4dc8aed5f405fb5669c334fb1dc5031205cfef700ba2364c3ece3a58e9b8d6e1"
+    },
+    "retain.py": {
+      "bytes": 26862,
+      "sha256": "12fa09d58c95f9ead64ae24cab79b8480b8b24d0b1cf19d598adb5c818871284"
+    },
+    "run.py": {
+      "bytes": 50449,
+      "sha256": "dc5e1c8e02880c4349bab0fc0f5e887b4102e538e8a573db0a5378671bc26734"
+    },
+    "test_build.py": {
+      "bytes": 18386,
+      "sha256": "14fdca76bf61bed40b6c7723eda84691c4e5c392da5624fa27285468feb52e88"
+    },
+    "test_retain.py": {
+      "bytes": 21565,
+      "sha256": "4050eb49d5c79e2e28a28f82dbc21b2014c82e2b693c154eab7f691daa9dfa7e"
+    },
+    "test_run.py": {
+      "bytes": 10750,
+      "sha256": "d1f292aad327a931ba338e83b15d40a116a06cae2766fce30ec5b6e4936d12d1"
+    },
+    "test_write_phases.py": {
+      "bytes": 10415,
+      "sha256": "70fd30058226a8611ebd3b920bb6247ef375de35c18fcd363e7d7576a33e92da"
+    },
+    "validate.py": {
+      "bytes": 6916,
+      "sha256": "3bd05ea963f91854f4dc3bb8856849d566bd88d78a516a08198213a6ae805e50"
+    },
+    "runtime.rs.inc": {
+      "bytes": 6986,
+      "sha256": "7488540ebb8fe4876178160c13fb86b2313f8425fa41fe425ac69fe7c031d62a"
+    },
+    "source-pins.json": {
+      "bytes": 67017,
+      "sha256": "2a78141bfe7694957ec09689843bd0231f470b327e9933552d53fe7c52de1292"
+    },
+    "protocol.json": {
+      "bytes": 4112,
+      "sha256": "48706566e82ecde9cb6089cc40458c66398377c317231302f29ebffbd785371d"
+    },
+    "../inputs.json": {
+      "bytes": 1257,
+      "sha256": "32fb23b2178fc86f61a05a10638abe84ef0406d0b4b7084bc04c22a04b05710b"
+    }
+  },
+  "identity_unchanged": true,
+  "logs": {
+    "stdout": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-write-phases-reviewed-checks-20260926\\stdout.log",
+      "retained_path": "experiments/hu-postflop-r1/codec/write-phases/reviewed-checks.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-write-phases-reviewed-checks-20260926\\stderr.log",
+      "retained_path": "experiments/hu-postflop-r1/codec/write-phases/reviewed-checks.stderr.log",
+      "bytes": 9694,
+      "sha256": "b6fac1311a538a13d17503c68e0d6f18e8af02bf63e2e6ffe56eb3fdd7815c11"
+    }
+  },
+  "test_count": 69,
+  "scope": "Synthetic build/runner/retainer tests and source patch/rustfmt checks after finite-build evidence acceptance review. No real Rust build, VM, Linux containment, campaign, performance or R1 acceptance."
+}

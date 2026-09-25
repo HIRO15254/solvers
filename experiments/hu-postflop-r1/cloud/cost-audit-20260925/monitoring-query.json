@@ -1,0 +1,92 @@
+{
+  "schema": "solvers.r1.monitoring-cost-query/v1",
+  "started_at": "2026-09-25T21:43:21.337966+00:00",
+  "project": "solvers-abstraction-20260723",
+  "status": "completed",
+  "requests": [
+    {
+      "vm": "02",
+      "instance_id": "7774326211091312507",
+      "page": 0,
+      "requested_at": "2026-09-25T21:43:23.144813+00:00",
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fnetwork%2Fsent_bytes_count%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%227774326211091312507%22&interval.startTime=2026-09-25T15%3A10%3A00Z&interval.endTime=2026-09-25T20%3A45%3A00Z&view=FULL&pageSize=1000",
+      "http_status": 200,
+      "completed_at": "2026-09-25T21:43:23.943780+00:00",
+      "response": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cost-audit-20260925\\vm02-page00.json",
+        "bytes": 9305,
+        "sha256": "f960d85393e2b55e37a7223dcf5a802a15ee1dbdaeed5d94c867d1ff6c54fe93"
+      },
+      "series_count": 1,
+      "point_count": 39
+    },
+    {
+      "vm": "05",
+      "instance_id": "1627891813360280286",
+      "page": 0,
+      "requested_at": "2026-09-25T21:43:23.944727+00:00",
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fnetwork%2Fsent_bytes_count%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%221627891813360280286%22&interval.startTime=2026-09-25T15%3A10%3A00Z&interval.endTime=2026-09-25T20%3A45%3A00Z&view=FULL&pageSize=1000",
+      "http_status": 200,
+      "completed_at": "2026-09-25T21:43:24.574246+00:00",
+      "response": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cost-audit-20260925\\vm05-page00.json",
+        "bytes": 13540,
+        "sha256": "5506f91f1fb39ca4c8fba831365529fbee81fd2988c05888a467685e2a6ebf6e"
+      },
+      "series_count": 1,
+      "point_count": 58
+    },
+    {
+      "vm": "06",
+      "instance_id": "5209515640504390740",
+      "page": 0,
+      "requested_at": "2026-09-25T21:43:24.578716+00:00",
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fnetwork%2Fsent_bytes_count%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%225209515640504390740%22&interval.startTime=2026-09-25T15%3A10%3A00Z&interval.endTime=2026-09-25T20%3A45%3A00Z&view=FULL&pageSize=1000",
+      "http_status": 200,
+      "completed_at": "2026-09-25T21:43:25.126114+00:00",
+      "response": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cost-audit-20260925\\vm06-page00.json",
+        "bytes": 20231,
+        "sha256": "62dbf0afe4a437207c875671c3e3001dcf9ee29828f6aa2d7eb3fc99fec82ce2"
+      },
+      "series_count": 1,
+      "point_count": 88
+    },
+    {
+      "vm": "07",
+      "instance_id": "841167209049583155",
+      "page": 0,
+      "requested_at": "2026-09-25T21:43:25.128251+00:00",
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fnetwork%2Fsent_bytes_count%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%22841167209049583155%22&interval.startTime=2026-09-25T15%3A10%3A00Z&interval.endTime=2026-09-25T20%3A45%3A00Z&view=FULL&pageSize=1000",
+      "http_status": 200,
+      "completed_at": "2026-09-25T21:43:25.588258+00:00",
+      "response": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cost-audit-20260925\\vm07-page00.json",
+        "bytes": 9757,
+        "sha256": "b9de6181fc20876c7c9ea1b33a3cfe7b2488221b5335bb07376705fda20c2316"
+      },
+      "series_count": 1,
+      "point_count": 41
+    }
+  ],
+  "scope": "Read-only existing authentication and Monitoring timeseries.list",
+  "credential_material_retained": false,
+  "budget_changed": false,
+  "authentication": {
+    "method": "existing gcloud auth print-access-token",
+    "argv": [
+      "C:\\Python313\\python.exe",
+      "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\lib\\gcloud.py",
+      "auth",
+      "print-access-token",
+      "--quiet"
+    ],
+    "returncode": 0,
+    "stderr_bytes": 0
+  },
+  "ended_at": "2026-09-25T21:43:25.589174+00:00"
+}

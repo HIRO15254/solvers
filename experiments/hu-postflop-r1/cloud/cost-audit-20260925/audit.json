@@ -1,0 +1,342 @@
+{
+  "schema": "solvers.r1.cost-evidence-audit/v1",
+  "evidence_cutoff_utc": "2026-09-25T21:43:25.589174+00:00",
+  "scope": "Four R1 Spot instances only; read-only Monitoring evidence; not actual billing or authorization",
+  "project": "solvers-abstraction-20260723",
+  "acquisition": {
+    "http_200_responses": 4,
+    "points": 226,
+    "sandbox_auth_probe": "Permission denied opening private credentials DB; no permissions changed",
+    "escalated_existing_auth_probe": "Succeeded; token kept in memory only; no authentication/IAM/configuration changes"
+  },
+  "later_billing_ui_observation": {
+    "provenance": "Reported by root task; not independently retrieved by this audit agent",
+    "approximate_observation_window_utc": [
+      "2026-09-25T21:44:00Z",
+      "2026-09-25T21:45:04Z"
+    ],
+    "root_clock_immediately_after_utc": "2026-09-25T21:45:04Z",
+    "project_number": "1010616757715",
+    "displayed_date": "2026-09-25",
+    "currency": "JPY",
+    "displayed_subtotal": 0,
+    "displayed_filtered_total": 0,
+    "displayed_tax": "—",
+    "table_message": "表示する結果がありません",
+    "sku_rows_available": false,
+    "actual_r1_billed_usd": null,
+    "billing_finality_verified": false,
+    "auth_iam_settings_changed": false,
+    "reservation_release_usd": 0
+  },
+  "vms": [
+    {
+      "vm": "02",
+      "instance_id": "7774326211091312507",
+      "creation_utc": "2026-09-26T00:21:57.044000+09:00",
+      "delete_completed_utc": "2026-09-25T16:02:58.126Z",
+      "absence_or_deletion_utc_for_cost": "2026-09-25T16:02:58.126Z",
+      "point_count": 39,
+      "observed_sent_bytes": 1671689,
+      "first_start": "2026-09-25T15:22:00.001000+00:00",
+      "last_end": "2026-09-25T16:02:00+00:00",
+      "one_millisecond_representation_seams": 37,
+      "intervals_without_points": [
+        {
+          "after_previous_end": "2026-09-25T15:28:00+00:00",
+          "next_start": "2026-09-25T15:29:00.001000+00:00",
+          "literal_gap_seconds": 60.001,
+          "filled_bytes": null
+        }
+      ],
+      "creation_to_first_point_uncovered_seconds": 2.957,
+      "last_point_to_deletion_uncovered_seconds": 58.126,
+      "missing_bytes": null,
+      "observed_byte_sum_is_total_cost_upper_bound": false,
+      "cost_envelope_seconds": 2468,
+      "conditional_compute_disk_ip_usd": "0.2647615555555555555555555556"
+    },
+    {
+      "vm": "05",
+      "instance_id": "1627891813360280286",
+      "creation_utc": "2026-09-25T09:07:13.911000-07:00",
+      "delete_completed_utc": "2026-09-25T17:05:35.714153Z",
+      "absence_or_deletion_utc_for_cost": "2026-09-25T17:05:35.714153Z",
+      "point_count": 58,
+      "observed_sent_bytes": 24119782,
+      "first_start": "2026-09-25T16:07:00.001000+00:00",
+      "last_end": "2026-09-25T17:05:00+00:00",
+      "one_millisecond_representation_seams": 57,
+      "intervals_without_points": [],
+      "creation_to_first_point_uncovered_seconds": 0,
+      "last_point_to_deletion_uncovered_seconds": 35.714153,
+      "missing_bytes": null,
+      "observed_byte_sum_is_total_cost_upper_bound": false,
+      "cost_envelope_seconds": 3506,
+      "conditional_compute_disk_ip_usd": "0.3761158888888888888888888889"
+    },
+    {
+      "vm": "06",
+      "instance_id": "5209515640504390740",
+      "creation_utc": "2026-09-25T10:09:15.956000-07:00",
+      "delete_completed_utc": "2026-09-25T18:39:47.045Z",
+      "absence_or_deletion_utc_for_cost": "2026-09-25T18:40:38.6204118Z",
+      "point_count": 88,
+      "observed_sent_bytes": 71803661,
+      "first_start": "2026-09-25T17:09:00.001000+00:00",
+      "last_end": "2026-09-25T18:39:00+00:00",
+      "one_millisecond_representation_seams": 86,
+      "intervals_without_points": [
+        {
+          "after_previous_end": "2026-09-25T17:31:00+00:00",
+          "next_start": "2026-09-25T17:33:00.001000+00:00",
+          "literal_gap_seconds": 120.001,
+          "filled_bytes": null
+        }
+      ],
+      "creation_to_first_point_uncovered_seconds": 0,
+      "last_point_to_deletion_uncovered_seconds": 47.045,
+      "missing_bytes": null,
+      "observed_byte_sum_is_total_cost_upper_bound": false,
+      "cost_envelope_seconds": 5487,
+      "conditional_compute_disk_ip_usd": "0.5886331666666666666666666668"
+    },
+    {
+      "vm": "07",
+      "instance_id": "841167209049583155",
+      "creation_utc": "2026-09-25T12:51:56.533000-07:00",
+      "delete_completed_utc": "2026-09-25T20:32:24.560Z",
+      "absence_or_deletion_utc_for_cost": "2026-09-25T20:34:35.914890Z",
+      "point_count": 41,
+      "observed_sent_bytes": 52365773,
+      "first_start": "2026-09-25T19:52:00.001000+00:00",
+      "last_end": "2026-09-25T20:33:00+00:00",
+      "one_millisecond_representation_seams": 40,
+      "intervals_without_points": [],
+      "creation_to_first_point_uncovered_seconds": 3.468,
+      "last_point_to_deletion_uncovered_seconds": 0,
+      "missing_bytes": null,
+      "observed_byte_sum_is_total_cost_upper_bound": false,
+      "cost_envelope_seconds": 2563,
+      "conditional_compute_disk_ip_usd": "0.2749529444444444444444444444"
+    }
+  ],
+  "observed_sent_bytes_sum": 149960905,
+  "observed_sent_gib_sum": "0.1396619761362671852111816406",
+  "observed_bytes_at_reserved_rate_usd_not_total_charge": "0.04189859284088015556335449218",
+  "conditional_arithmetic": {
+    "compute_usd_hour": "0.37",
+    "disk_gib": 100,
+    "disk_usd_gib_hour": "0.000137",
+    "ipv4_usd_hour": "0.0025",
+    "total_seconds": 14024,
+    "compute_disk_ip_usd": "1.504463555555555555555555556",
+    "egress_condition": "Unproven assumption: total billable egress <= 2 GiB per VM, including retries and traffic not in bundle inventory",
+    "egress_usd_if_condition": "2.40",
+    "subtotal_usd_if_condition": "3.904463555555555555555555556",
+    "original_other_reserves_usd": "12.50",
+    "total_with_original_reserves_if_condition": "16.40446355555555555555555556",
+    "conditional_spare_not_releasable_usd": "3.59553644444444444444444444",
+    "tax_fx": "Actual account JPY conversion rate and tax assessment not retained; existing other reserves remain assumptions, not measured charges"
+  },
+  "decision": {
+    "release_usd": 0,
+    "held_reservations_usd": "20",
+    "billed_r1_usd": null,
+    "rigorous_incurred_cost_upper_bound_usd": null,
+    "new_vm_allowed_by_existing_policy": false,
+    "reason": "Missing edge/interior DELTA intervals, no historical actual Spot SKU/JPY tax-FX reconciliation, and existing policy prohibits release of unbilled reservations. Do not zero-fill missing network bytes."
+  },
+  "limitations": [
+    "Network DELTAs measure sent traffic, not a billable destination/SKU breakdown.",
+    "A 1ms TimeInterval representation seam is distinguished from absent minute observations; raw timestamps are retained.",
+    "VM06 STOP/restart overlaps the 17:31-17:33 gap; that does not prove the whole gap had zero traffic.",
+    "No-data billing is not zero; known unique compressed files are not total network usage.",
+    "No free-tier credits, speculative tax/FX reduction, or assumed Spot discount was used."
+  ],
+  "official_sources_checked_utc_date": "2026-09-25",
+  "official_sources": [
+    {
+      "topic": "on_demand",
+      "url": "https://cloud.google.com/products/compute/pricing/general-purpose",
+      "finding": "Iowa e2-highmem-8: USD 0.36159864/hour; use recorded rounded rate 0.37. Current page is not a historical invoice."
+    },
+    {
+      "topic": "spot",
+      "url": "https://cloud.google.com/spot-vms/pricing",
+      "finding": "Variable discounted prices can change daily; no historical Spot SKU quote retained; do not apply an assumed minimum 60% discount."
+    },
+    {
+      "topic": "disk",
+      "url": "https://cloud.google.com/compute/disks-image-pricing",
+      "finding": "Iowa balanced space USD 0.000136986/GiB/hour, per-second prorating and allocated space charged until deletion; recorded rate rounds to 0.000137."
+    },
+    {
+      "topic": "network",
+      "url": "https://cloud.google.com/vpc/network-pricing",
+      "finding": "Spot IPv4 USD 0.0025/hour; Iowa Premium internet highest listed destination tier 0.23/GiB; recorded envelope uses 0.30/GiB without free-tier credit. Ephemeral IPv4 released on stop/deletion."
+    },
+    {
+      "topic": "tax",
+      "url": "https://support.google.com/cloud/answer/6293117?hl=en",
+      "finding": "Japan customer invoices add consumption tax; published prices exclude tax. Account-specific tax evidence is not retained."
+    },
+    {
+      "topic": "fx",
+      "url": "https://docs.cloud.google.com/billing/docs/how-to/export-data-bigquery-tables/pricing-data",
+      "finding": "Billing currency_conversion_rate includes non-USD surcharge; USD cost can be recovered as cost divided by that rate. The observed account displays JPY; no actual rate retained."
+    },
+    {
+      "topic": "billing_delay",
+      "url": "https://docs.cloud.google.com/billing/docs/how-to/view-history",
+      "finding": "Costs usually arrive within a day but can take more than 24 hours; no-data is not zero."
+    },
+    {
+      "topic": "sent_bytes",
+      "url": "https://docs.cloud.google.com/monitoring/api/metrics_gcp_c",
+      "finding": "compute.googleapis.com/instance/network/sent_bytes_count is DELTA INT64 By, sampled every 60s; visibility delay up to 240s."
+    },
+    {
+      "topic": "intervals",
+      "url": "https://docs.cloud.google.com/go/docs/reference/cloud.google.com/go/monitoring/latest/apiv3/v2/monitoringpb",
+      "finding": "TimeInterval write intervals are closed; next interval starts at least 1ms after prior end. The repeated exact 1ms seams are recorded separately, not treated as missing minute samples."
+    },
+    {
+      "topic": "physical_bandwidth",
+      "url": "https://docs.cloud.google.com/compute/docs/general-purpose-machines",
+      "finding": "e2-highmem-8 maximum egress up to 16 Gbps; this deliberately loose physical envelope is not an observed Internet transfer rate."
+    }
+  ],
+  "source_files": [
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\cost-audit-20260925\\collect-monitoring.py",
+      "bytes": 5969,
+      "sha256": "c14671b8ce040d2293d3abb9db80adbe604253c5b56743f82de085110f6ddb99"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\cost-audit-20260925\\monitoring-query.json",
+      "bytes": 4988,
+      "sha256": "974345bd1aafcf77b2650d2abcd1a5e695105ebfcf21d09d080792c4fa1a31eb"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\cost-audit-20260925\\analyze.py",
+      "bytes": 12191,
+      "sha256": "015e9ad8e3d55ee0e6aabda7f2cce12297ad483a2b9b2e77079be11e61d59b79"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\cost-audit-20260925\\vm02-page00.json",
+      "bytes": 9305,
+      "sha256": "f960d85393e2b55e37a7223dcf5a802a15ee1dbdaeed5d94c867d1ff6c54fe93"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\launch-r1-20260925-02.json",
+      "bytes": 1093,
+      "sha256": "3620de30de7232e4eeb03825db887e080755056d71fd7f91a09f01ea65af8f57"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\create-result-r1-20260925-02.json",
+      "bytes": 634,
+      "sha256": "5fa2c0941bb4541815577e09821dfe97abd6da1550485c1ceb762191ac8e4698"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\cost-audit-20260925\\vm05-page00.json",
+      "bytes": 13540,
+      "sha256": "5506f91f1fb39ca4c8fba831365529fbee81fd2988c05888a467685e2a6ebf6e"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\launch-r1-20260925-05.json",
+      "bytes": 1093,
+      "sha256": "34e72d10559a1a6dcf5165541b5b4423176e38bcf34794a1ae87269d9d4d61ce"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\create-result-r1-20260925-05.json",
+      "bytes": 737,
+      "sha256": "60ef8479412072ef14d29dd27d5c9244876051ef2f4651ce82976444b7035603"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\cost-audit-20260925\\vm06-page00.json",
+      "bytes": 20231,
+      "sha256": "62dbf0afe4a437207c875671c3e3001dcf9ee29828f6aa2d7eb3fc99fec82ce2"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\launch-r1-20260925-06.json",
+      "bytes": 1091,
+      "sha256": "a6560bf77fd21d4089f3b7d2fcd64fb3469a4de66c90b49e44a2fa3b41877f64"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\create-result-r1-20260925-06.json",
+      "bytes": 735,
+      "sha256": "eaa050d79f4f3d696f11cbf4dd279a4e31d43adc6042dd3eebaa33b50003b253"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\cost-audit-20260925\\vm07-page00.json",
+      "bytes": 9757,
+      "sha256": "b9de6181fc20876c7c9ea1b33a3cfe7b2488221b5335bb07376705fda20c2316"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\launch-r1-20260925-07.json",
+      "bytes": 1091,
+      "sha256": "32bc441fbe6a45bb53d12b455a79ab36fcbf72b63b3db47ea4bb524fe5fecaad"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\create-result-r1-20260925-07.json",
+      "bytes": 30180,
+      "sha256": "611ca7b526eb5e10acf268acd7ba45aa2a95615fac67f579069a1b0518c41ab4"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\budget.json",
+      "bytes": 10999,
+      "sha256": "591666cdec28ac308997ee174cc330e302e1d7f6d41455571032ba6298952436"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\README.md",
+      "bytes": 18925,
+      "sha256": "e2f1beeb8878478b2959c35e5dabbecd2393ce6a0cab548860adf6d7666d1078"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\transfers.json",
+      "bytes": 27655,
+      "sha256": "7681c48a4501203b73a84aa79068d9ee0a33a8d9f255f9b210cf6a5ce45e07eb"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\billing-observation-20260925.json",
+      "bytes": 2129,
+      "sha256": "3a3b3ce290a5ca5d0e953852809ef494f9f8cd57938440e12f8f4c3cb02b009e"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\preempted-02.json",
+      "bytes": 610,
+      "sha256": "245b31bcdb390ad0166293b61bbb6e52b8417cd3d49c27ee178a9440523f250f"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\preempted-05.json",
+      "bytes": 7246,
+      "sha256": "e2f74e8534a423baf02d7053c337de9c6e2cc784917287c80339ff87c1af9eef"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\preempted-06.json",
+      "bytes": 11394,
+      "sha256": "c21088b1faebe53ef7938e36f7e0eace0c848366eb2bd7088f0049e99e58f42d"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\cleanup-vm06\\reconciliation.json",
+      "bytes": 343,
+      "sha256": "5307789b96ce0a32b00830e7732cef7dc80a83ddd3eac2c8134a41d77b4ecb0f"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\cleanup-vm07\\reconciliation.json",
+      "bytes": 544,
+      "sha256": "4a69df1dcee04cd3e9e5df26880aa6158e561593cf937dba10a693cee43342d3"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\cleanup-vm06\\operations.json",
+      "bytes": 485,
+      "sha256": "4ade5a438f501da78d2cad3715c46a98d9315cd4c66894cf77d0c1297a5250e0"
+    },
+    {
+      "path": "experiments\\hu-postflop-r1\\cloud\\cleanup-vm07\\operations.json",
+      "bytes": 904,
+      "sha256": "9dac1c27c6c0072b2e8c1fefefae7ab8758e1d004c15670a15eb4c4a8813354a"
+    }
+  ]
+}

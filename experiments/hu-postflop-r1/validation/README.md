@@ -10,6 +10,10 @@ source07のbyte codec変更は[VM07通常検証](vm07-report.md)で、fmt/clippy
 Python 29 passed・3 Windows専用skip、比較用の新規release buildを照合した。
 以前のsnapshot証拠と区別し、[codec実測](../codec/vm07-report.md)の性能判定は別に読む。
 
+追加した固定bet対照は[2026-09-26ローカル記録](bet-refinement-20260926/README.md)で
+個別4 tests・fmt/clippyが成功した。全workspaceは資源停止で未完了であり、VM07の901 testsを
+この追加sourceの検証結果へ流用しない。
+
 | 呼称 | Source manifest | Archive SHA-256 |
 |---|---|---|
 | snapshot01 | [initial/source-manifest.json](initial/source-manifest.json) | `e1eec592dcf180acc34f27c076d03a4b316694b86ca2cd9fc3cbf1dd5e5f211e` |
@@ -62,13 +66,15 @@ chance lowering、hidden action一般、実Hi/Lo ranker、任意ゲームのlega
 |---|---|
 | Lossless/lossy/保存量子化を区別 | G0/GA、action/private/chance map、recall、lift/off-tree方針、評価domainを契約で特定。単にbucket数やroot EVが一致しても同型としない |
 | 粗密private写像の細分化と復元 | `nested_river_buckets_lift_a_coarse_policy_but_are_not_lossless`。固定Riverの2/4 EHS2 bucket、1081 live comboでparent関係、固定相手`AcAd`の990 worldでlift前後EV一致。同じbucketの勝ち/負け混在も要求 |
+| 粗密bet写像・完全profileの復元 | `coarse_bet_profile_lifts_completely_and_expanded_br_uses_the_fine_domain`。pot10/stack30の固定Riverで21→49情報集合。追加action確率0、新規28情報集合の一様補完、元profile復元、両compiled treeと独立scalar EV/BRを照合 |
 | Domain/contentの識別 | `canonical_table_content_depends_on_coverage_not_only_bucket_counts`。suit全置換でtable bytes一致、別board coverageで不一致。既存postcard bytesをversion独立semantic IDと呼ばない |
 | 完全記憶・joint mass | T1-03のStud/Draw tests。Draw mapの行和4/3を個別に1へ正規化せず、joint blocker後の3候補を評価 |
 | NLHE suit quotient | 通常の`asymmetric_ranges_suppress_iso_merging`と、下記の2つのignored iso testで限定domainを照合 |
 
 EHS2 testsは[semantic_mapping.rs](../../../crates/abstraction/tests/semantic_mapping.rs)にある。
 人工fold/showdown policyの復元を検査するもので、NLHE betting solveや独立rankerの検証ではない。
-共通semantic ID codec/保存、粗bet menuから密menuへの自動policy transportと拡張BR、任意bucket migration、
+固定bet対照は[oracle_river.rs](../../../crates/holdem/tests/oracle_river.rs)のtest専用adapterであり、
+任意の保存profileを移植する公開APIではない。共通semantic ID codec/保存、一般的なaction transport、任意bucket migration、
 current-card近似Draw solver、未知domainの自動認定は未実装。GA内の残差を元ゲームG0のExploitabilityと呼ばない。
 
 ## 変更した評価・保存処理への接続

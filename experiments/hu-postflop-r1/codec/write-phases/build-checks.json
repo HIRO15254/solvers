@@ -1,0 +1,105 @@
+{
+  "schema": "r1.write-phase-build-preparation-checks/v1",
+  "started_at": "2026-09-25T21:51:30.857529+00:00",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\codec\\write-phases",
+    "-p",
+    "test_build.py",
+    "-v"
+  ],
+  "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "files_before": {
+    "build.py": {
+      "bytes": 20749,
+      "sha256": "4dc8aed5f405fb5669c334fb1dc5031205cfef700ba2364c3ece3a58e9b8d6e1"
+    },
+    "test_build.py": {
+      "bytes": 13920,
+      "sha256": "9948a916e6b42a71884ba1599564f7ba5951219c02b31b9524acb6c23ada7302"
+    },
+    "run.py": {
+      "bytes": 43235,
+      "sha256": "1a929dc37db0db2c64ba5a4e0f2bab3eb7080ceb473f532376ee2741f11e9f63"
+    },
+    "apply.py": {
+      "bytes": 11898,
+      "sha256": "49a8a9c1bab0fd25dcc56a26875df2e2f51ab4ce4286c840fe57aa8111f11d01"
+    },
+    "runtime.rs.inc": {
+      "bytes": 6986,
+      "sha256": "7488540ebb8fe4876178160c13fb86b2313f8425fa41fe425ac69fe7c031d62a"
+    },
+    "source-pins.json": {
+      "bytes": 67017,
+      "sha256": "2a78141bfe7694957ec09689843bd0231f470b327e9933552d53fe7c52de1292"
+    },
+    "protocol.json": {
+      "bytes": 4112,
+      "sha256": "48706566e82ecde9cb6089cc40458c66398377c317231302f29ebffbd785371d"
+    },
+    "validate.py": {
+      "bytes": 6916,
+      "sha256": "3bd05ea963f91854f4dc3bb8856849d566bd88d78a516a08198213a6ae805e50"
+    }
+  },
+  "elapsed_seconds": 17.662202199921012,
+  "exit_code": 0,
+  "files_after": {
+    "build.py": {
+      "bytes": 20749,
+      "sha256": "4dc8aed5f405fb5669c334fb1dc5031205cfef700ba2364c3ece3a58e9b8d6e1"
+    },
+    "test_build.py": {
+      "bytes": 13920,
+      "sha256": "9948a916e6b42a71884ba1599564f7ba5951219c02b31b9524acb6c23ada7302"
+    },
+    "run.py": {
+      "bytes": 43235,
+      "sha256": "1a929dc37db0db2c64ba5a4e0f2bab3eb7080ceb473f532376ee2741f11e9f63"
+    },
+    "apply.py": {
+      "bytes": 11898,
+      "sha256": "49a8a9c1bab0fd25dcc56a26875df2e2f51ab4ce4286c840fe57aa8111f11d01"
+    },
+    "runtime.rs.inc": {
+      "bytes": 6986,
+      "sha256": "7488540ebb8fe4876178160c13fb86b2313f8425fa41fe425ac69fe7c031d62a"
+    },
+    "source-pins.json": {
+      "bytes": 67017,
+      "sha256": "2a78141bfe7694957ec09689843bd0231f470b327e9933552d53fe7c52de1292"
+    },
+    "protocol.json": {
+      "bytes": 4112,
+      "sha256": "48706566e82ecde9cb6089cc40458c66398377c317231302f29ebffbd785371d"
+    },
+    "validate.py": {
+      "bytes": 6916,
+      "sha256": "3bd05ea963f91854f4dc3bb8856849d566bd88d78a516a08198213a6ae805e50"
+    }
+  },
+  "identity_unchanged": true,
+  "logs": {
+    "stdout": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-write-build-checks-20260926-complete\\stdout.log",
+      "retained_path": "experiments/hu-postflop-r1/codec/write-phases/build-checks.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-write-build-checks-20260926-complete\\stderr.log",
+      "retained_path": "experiments/hu-postflop-r1/codec/write-phases/build-checks.stderr.log",
+      "bytes": 1857,
+      "sha256": "50b7474409ea1ffff141dfaa5a6b66e93d271651633fa17117859e9f317490f5"
+    }
+  },
+  "test_count": 12,
+  "scope": "Synthetic build producer tests using a fake execution backend. No real Rust compilation, VM, Linux containment, campaign or performance acceptance.",
+  "prior_pretest_setup_failure": "A root capture wrapper first tried to hash nonexistent tools/run_supervised_linux.py and failed before starting tests or creating evidence. The build suite uses a fake execution backend."
+}

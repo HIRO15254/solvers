@@ -1,0 +1,21 @@
+{
+  "schema": "r1.write-phase-pre-review-source-snapshot/v1",
+  "captured_at": "2026-09-25T21:55:39.468632+00:00",
+  "records": [
+    "../runner-checks.json",
+    "../build-checks.json"
+  ],
+  "scope": "Exact pre-review source for the retained 51-test and 12-test checks. Build containment acceptance was subsequently strengthened; current validation is recorded separately. Other pinned files were unchanged.",
+  "files": {
+    "run.py": {
+      "retained_path": "run.py.snapshot",
+      "bytes": 43235,
+      "sha256": "1a929dc37db0db2c64ba5a4e0f2bab3eb7080ceb473f532376ee2741f11e9f63"
+    },
+    "test_build.py": {
+      "retained_path": "test_build.py.snapshot",
+      "bytes": 13920,
+      "sha256": "9948a916e6b42a71884ba1599564f7ba5951219c02b31b9524acb6c23ada7302"
+    }
+  }
+}
