@@ -1,0 +1,28 @@
+# Historical evidence is hashed by original bytes, including its original line endings.
+# Keep these exact paths exempt from core.autocrlf and text normalization.
+# Recognize original CRLF; preserve trailing blank lines in original test logs.
+experiments/multiway-2026-09/quality-evidence/config.toml -text whitespace=cr-at-eol
+experiments/multiway-2026-09/quality-evidence/evidence/calibration/enumerated-job.json -text
+experiments/multiway-2026-09/quality-evidence/evidence/calibration/experiment-preexecution.json -text
+experiments/multiway-2026-09/quality-evidence/evidence/calibration/experiment.json -text
+experiments/multiway-2026-09/quality-evidence/evidence/calibration/ordinary-job.json -text
+experiments/multiway-2026-09/quality-evidence/evidence/calibration/validate.py -text
+experiments/multiway-2026-09/quality-evidence/evidence/pilot/enumerated-job.json -text
+experiments/multiway-2026-09/quality-evidence/evidence/pilot/experiment-preexecution.json -text
+experiments/multiway-2026-09/quality-evidence/evidence/pilot/experiment.json -text
+experiments/multiway-2026-09/quality-evidence/evidence/pilot/ordinary-job.json -text
+experiments/multiway-2026-09/quality-evidence/evidence/pilot/validate_run.py -text
+experiments/multiway-2026-09/quality-evidence/evidence/source/source-manifest.json -text
+experiments/multiway-2026-09/quality-evidence/evidence/source/verification/clippy.log -text
+experiments/multiway-2026-09/quality-evidence/evidence/source/verification/fmt.log -text
+experiments/multiway-2026-09/quality-evidence/evidence/source/verification/release-build.log -text
+experiments/multiway-2026-09/quality-evidence/evidence/source/verification/research-clippy.log -text
+experiments/multiway-2026-09/quality-evidence/evidence/source/verification/research-core-tests.log -text -whitespace
+experiments/multiway-2026-09/quality-evidence/evidence/source/verification/research-example-tests.log -text -whitespace
+experiments/multiway-2026-09/quality-evidence/evidence/source/verification/verification.json -text
+experiments/multiway-2026-09/quality-evidence/evidence/source/verification/workspace-tests.log -text -whitespace
+experiments/multiway-2026-09/scripts/run_average_sampling_measurement.ps1 -text whitespace=cr-at-eol
+experiments/multiway-2026-09/scripts/summarize_raised_opponent.py -text
+experiments/multiway-2026-09/scripts/summarize_whole_preflop_deviation.py -text
+experiments/multiway-2026-09/whole-preflop-deviation-20260910/result.json -text
+experiments/multiway-2026-09/whole-preflop-fit-calibration-20260910/result.json -text

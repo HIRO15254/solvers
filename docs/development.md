@@ -1,215 +1,142 @@
 # 開発・検証ガイド
 
-この文書は、開発時の検証、benchmark、残タスクをまとめる。
+作業の選択・担当・状態は[Linear管理先](status.jp.md)、目標と受入条件は[ロードマップ](product-roadmap.jp.md)、
+実施手順は[作業票](plans/r0-execution-plan.jp.md)を参照する。この文書は環境・変更・検証・引継ぎを扱う。
 
-## 必須検証
+## 環境準備
 
-通常の変更は最低限次を通す。
+Rust stableのedition 2024対応toolchain、rustfmt、clippy、Python 3.11以上を使う。
+Pythonの文書検査と共通testは標準ライブラリだけで動く。Rust依存はCargo.lockを使用し、意図しない更新を混ぜない。
+CIの正確なコマンドは[通常CI](../.github/workflows/ci.yml)と[重い受入](../.github/workflows/acceptance.yml)にある。
+再現性が必要な実行では`rustc -Vv`、`cargo -V`、OS、CPU/RAM、Cargo.lockとビルド設定を記録する。
 
-```sh
+```text
+rustup component add rustfmt clippy
+cargo metadata --no-deps --format-version 1
+python --version
+```
+
+`.cargo/config.toml`はローカルCPU向けの`target-cpu=native`を設定する。共有配布・CIではportableなRUSTFLAGSを使う。
+異なるCPUで得た性能値やISAをそのまま比較しない。現行CIはstableを追うため、受入証拠には実際のtoolchain版を残す。
+
+## 作業開始と並行開発
+
+1. Linear Issueと対応する規範・作業票を読む。既存実装があることと、受入が完了したことを分ける。
+2. `git status --short`で既存の変更を確認する。無関係な差分をrevert・format・commitしない。
+3. 編集範囲と成果物を決め、並行作業が同じファイルを変更する場合は担当を調整する。競合を避ける必要がある場合はworktreeを使う。
+4. 契約変更ならAGENTSの同期対象を確認する。規範未対応の挙動を黙って近似・無視しない。
+5. 終了時に必要な検証を行い、成果物・source・結果・残る制限を証拠として保存し、Linearの状態・残件・次作業を更新する。
+
+作業票を追加する場合は[最小テンプレート](plans/task-template.md)を使う。全将来機能を先に細分化しない。
+Linearを読めない場合の扱いは[状態管理手順](status.jp.md)に従う。
+
+## 必須検証と追加検証
+
+通常のコード変更では、最低限次を通す。
+
+```text
 cargo fmt --all --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 ```
 
-Production EHS² table buildや大規模solveとして`#[ignore]`された
-acceptance testは、release acceptance時に明示実行する。
+| 変更 | 追加で確認すること |
+|---|---|
+| 文書・配置 | `python tools/check_docs.py`。説明を実装へ照合。移動した文書の参照を更新 |
+| 共通Pythonツール | `python -m unittest discover -s tools/tests -v` |
+| 保存したMultiway品質根拠 | `python experiments/multiway-2026-09/quality-evidence/verify.py`。solverの再計算とは区別 |
+| config/CLI/default | family規範・CLI reference・template・parse/normalize・help・拒否fixture・metadataの同期 |
+| CFR/BR/カード意味論 | production toy、独立oracle、storage、次元遷移。多street等のignored試験は変更影響と受入範囲に応じ明示実行 |
+| checkpoint/solution | 保存→読込→再開、破損検出、version/identity、旧形式の明示拒否、保存後の値 |
+| 研究feature | 明示したfeatureのcompileと該当する小規模test。production品質認定とは区別 |
+| CLI/daemon/OS処理 | CLI checkpoint/resume、daemon HTTP、対象OSの停止・子プロセス処理 |
+| 品質・性能の主張 | [品質検証ガイド](validation.jp.md)、対応する固定条件と基準測定 |
 
-Multiway v1のTOML surfaceを変える場合は、parser/runtimeだけでなく
-`docs/multiway-preflop-v1.jp.md`、template、examples、fingerprint、
-checkpoint/solution metadataを同じchange setで更新する。
+文書だけの編集で重いsolverを回す必要はない。逆に、文章の修正に見えてdefaultや公開契約を変える場合は契約変更として扱う。
+`check_docs.py`はファイル参照と入口を調べる軽量検査で、見出しアンカー・外部URL・本文の意味を保証しない。
 
-## Workspace成果物の境界
+研究featureの明示compile:
 
-- `target/` はCargo build専用であり、研究結果や保存対象のrunを置かない。
-- `runs/` はsolver・benchmarkの実行結果を置くignored領域とする。保存対象のrunは
-  config、source revision、status、対応するvalidation reportを特定できるmetadataを持つ。
-- `.cache/` は再生成可能なmachine-local cache専用とする。script、source snapshot、
-  検証証拠は置かない。
-- 再現可能な入力と検証結果は`docs/validation/`、検討中のplan/designは
-  `docs/research/`に置く。Python testは`tools/tests/`へ集約する。
-- 一時directoryはrepository rootへ作らない。runnerの既定出力先は
-  `runs/benchmarks/`以下とする。
+```text
+cargo check -p cli -p multiway --all-targets --features cli/research-average-sampling,cli/research-regret-sampling,cli/research-draw-abstraction
+cargo test -p multiway --features research-average-sampling --lib average_sampling_research
+cargo test -p multiway --features research-regret-sampling --lib solver::regret_sampling::tests
+```
 
-## 現行roadmap
+Production EHS² table buildや大規模solve等のignored acceptanceは、対応領域の受入前に担当者が対象sourceで実行し、結果を保存する。
+すべてを毎PRで実行する必要はない。全体のrelease acceptanceは次で実行できる。
 
-アプリケーション層の再設計は`docs/app-architecture.md`を正本とし、Phase 0〜3で進める。
+```text
+cargo test --workspace --release -- --include-ignored
+```
 
-- Phase 0(完了): GUI削除、legacy受理経路の削除、研究ラインの削除、`crates/cli`への集約。
-  full-recall/sparse storageの削除だけはPhase 1へ送った(理由はapp-architecture.md §9)。
-- Phase 1(完了): run directory契約の確立。manifest/events、
-  `status`/`watch`/`runs ls`、run directoryを受け取る`resume`、
-  全kindのschema必須化と`--out`一本化。
-- Phase 2(完了): `crates/protocol`と`solversd`。job 投入・監視・cancel・resume・
-  queue・bearer token・TLS・artifact/solution view まで動作。
-- Phase 3: Web GUI(純client)。設計は`app-architecture.md` §8に記録済み、未着手。
-  着手条件はTS型生成の手段のみ(同 §8.6)。Postflop/HU schemaは格上げ済み。
-- Viewer/研究workflow: postflopのartifact queryは`export`(6 view、`--node all`)と
-  `compare`で閉じた。`.sol`は戦略とper-hand値の両方を持つので、`strategy.json`と
-  `solve --history`はpostflopから削除済み。Python/WASM境界の必要性は引き続き実測で判断する。
+失敗は「変更による不具合」「既存差分」「環境制約」「未判定」を根拠付きで区別する。未実行を成功と記録しない。
+Windowsで並列compileがメモリ割当やページングファイル不足（OS error 1455）に失敗した場合は、
+その実行だけ`CARGO_BUILD_JOBS=1`として再試行する。test自体の資源競合には`-- --test-threads=1`を使える。
+コンパイル並列数とtest並列数は別の制御であり、制限付きの実行条件も検証記録へ残す。
 
-現時点でpostflopに残る制約は`docs/solver-config-v1.jp.md`「サポート範囲と制約」に
-列挙してある。大きいものは2つ: 非対称スタック不可、`evaluate`非対応。条件ルールは
-`.tree` scriptとして実装済みで、`[game.tree]`章が規範である。Multiwayの`.mwtree`
-scriptも同じ`cards::script`フロントエンド(入れ子、`if`/`else`、`param`/`define`、
-インライン化正規化)へ揃え済み(`docs/multiway-preflop-v1.jp.md`)。
+## 成果物とsourceの記録
 
-完了済みmilestoneの時系列日誌は現行文書へ追記せず、Git履歴と
-`docs/validation/`の再現可能な証拠から参照する。
+- `target/`: Cargo出力のみ。研究証拠・source snapshotを置かない。
+- `runs/`: 新規solver・benchmark実行のignored作業領域。保存対象は選定してexperimentsへ。
+- `.cache/`: 再生成可能なmachine-local cacheやtest用の一時データ。固有の証拠・source snapshotを置かない。
+- `docs/plans/`: 受け入れた作業の手順・成果物・完了条件。状態はLinear。
+- `docs/research/`: 日付付きの調査・未採用案・費用概算。
+- `experiments/<campaign>/<experiment>/`: 採否・品質認定に必要なmanifest、config、集計、検証器、報告。
+- 共通Python testは`tools/tests/`、実験だけの検証は当該実験の近くに置く。
+
+実験manifestには次を記録する。存在しない情報は未取得として残し、HEADで代用しない。
+
+| 種別 | 必要な情報 |
+|---|---|
+| 対象 | 作業/要件ID、問い、採用domain、case、configとhash、seed |
+| source | commit、dirty有無、差分と必要な未追跡入力を含むsnapshotの場所/hash、source manifest |
+| binary/環境 | binary hash、ビルドコマンド、toolchain、依存lock、OS、CPU/RAM、必要ならGPU |
+| 実行 | 完全な引数、計測区間、threads、資源枠、停止理由 |
+| 結果 | 生出力または保存先、集計、判定、制限、検証器と実行結果 |
+| 保持 | 保存物のhash/size/場所、利用可能性、歴史的結果か現在再検証できるか |
+
+config・manifest・小さい結果・検証器はignored outputから分離する。大きな保持物は外部保存も可だが、保存先とhashと利用可能性を追跡対象へ残す。
+未追跡・ignoredの固有資料はGit履歴にあると仮定しない。削除前に消費者と代替証拠を確認する。
+元の測定記録を移動したときは保存hashを改変せず、新しい検証結果と歴史的な検証成功を区別する。
 
 ## Benchmarking
 
-Two complementary layers: a criterion micro/macro-bench suite for fast local
-A/B iteration on the hot code paths, and a "bench bar" recipe (a single real
-solve, timed and measured for peak memory) against the roadmap's M3 exit
-criteria. Both live in the tree so a solver change and its benchmark evidence
-travel in the same PR.
+Criterionは小さいhot pathのA/Bに使う。現行suiteはengineのstorage/reach/transitionとholdemのterminal kernel・turn solveを含む。
 
-## Criterion suite
-
-`cargo bench -p engine -p holdem` runs everything below. Each bench file also
-answers to `cargo bench -p <crate> -- --test`, which runs one iteration per
-bench as a compile+smoke-test check (useful in CI or a constrained sandbox
-that can't afford a full measured run, or that SIGILLs on this repo's
-`target-cpu=native` release codegen -- see "Assembly audit" below).
-
-**`crates/engine/benches/storage.rs`** -- per-node `StorageOps` micro-benches
-at a realistic postflop node shape (`A = 3` actions, `H = 1,326` hands, one
-node), for both backends:
-
-- `f32/update_regrets`, `f32/regret_matching`, `f32/accumulate_strategy`,
-  `f32/average_strategy`
-- `i16/update_regrets`, `i16/regret_matching`, `i16/accumulate_strategy`,
-  `i16/average_strategy`
-
-plus the tree's reach-map primitives at the same 1,326-dim scale:
-
-- `tree/map_reach_mask`, `tree/accumulate_values_mask` (a single-mask chance
-  deal, `PublicTree::map_reach_into`/`accumulate_values`)
-- `tree/transition_forward` (`SparseTransition::apply_forward` directly, at
-  the ~2,550-entry size a merged suit-isomorphism class produces)
-
-**`crates/holdem/benches/kernels.rs`** -- `PostflopEvaluator::eval`'s two
-terminal kernels over a real river subgame with full-ish ranges on both
-sides (`kernel::showdown_kernel`'s sorted-rank sweep, `kernel::fold_kernel`'s
-inclusion-exclusion fold):
-
-- `kernels/fold`, `kernels/showdown`
-
-**`crates/holdem/benches/solve.rs`** -- a turn-start macro-bench
-(`Solver::run(5)` from a fixed snapshot, via `iter_batched` +
-`restore_state` so every sample starts from identical state):
-
-- `solve/sequential` (`ParConfig { chance_depth: 0, min_children: usize::MAX
-  }`), `solve/parallel` (`ParConfig::default()`)
-
-### A/B workflow
-
-Save a baseline before a change, make the change, then diff against it:
-
-```sh
+```text
 cargo bench -p engine -p holdem -- --save-baseline main
-# ...make the solver change...
 cargo bench -p engine -p holdem -- --baseline main
 ```
 
-Criterion prints a per-bench regressed/improved verdict with confidence
-intervals; `target/criterion/<group>/<bench>/report/index.html` has the full
-plots. Re-run `--save-baseline main` (on `main`, before starting a new round
-of changes) whenever the baseline itself should move.
+baselineは変更前のsource・CPU・threads・ビルド条件と対応付ける。名前がmainでも、その時点のcommitが自動保存されるわけではない。
+`target/criterion/`は再生成可能な出力であり、採用根拠として残す結果は条件とともにexperimentsへ保存する。
 
-## Bench bar
+実solveの計測はビルドを先に済ませ、毎回新しいrun directoryを指定する。
 
-Historical M3 exit criteria, measured on
-`examples/3betpot_fast.toml` (a 100bb 3-bet-pot flop spot, calibrated with
-`holdem::memory_usage` to ~1.29 GB of f32 storage -- see that file's header
-comment) at `target_nash_conv = 0.2`, i.e. 0.1% of the 200-chip-x10-unit pot:
-
-- wall clock <= 45 s @ 6 threads
-- <= 1.3 GB peak RSS with `storage = "f32"`
-- <= 700 MB peak RSS with `storage = "i16"`
-
-One command per backend, from a clean release build:
-
-```sh
+```text
 cargo build --release -p cli
-/usr/bin/time -v target/release/solvers solve examples/3betpot_fast.toml
 ```
 
-`examples/3betpot_fast.toml` defaults to `storage = "f32"` (the
-`[run].storage` field's default, see `cli::config::StorageKind`). There is no
-`--storage` CLI override -- `solve` only overrides `iterations` from the
-command line -- so the i16 variant means editing the config: copy the file
-(e.g. `examples/3betpot_fast_i16.toml`) and add `storage = "i16"` to its
-`[run]` section, then run the same command against the copy:
+Linuxの例（wall clockとpeak RSS）:
 
 ```sh
-/usr/bin/time -v target/release/solvers solve examples/3betpot_fast_i16.toml
+/usr/bin/time -v target/release/solvers solve examples/river_small.toml --out runs/benchmarks/river-baseline
 ```
 
-What to record from `/usr/bin/time -v`'s output: "Elapsed (wall clock)
-time" against the <=45s bar, and "Maximum resident set size (kbytes)"
-(divide by 2^20 for GB) against the <=1.3/<=700MB bars. `solve` also prints
-its own `tree: ... storage=... MiB (f32) / ... MiB (i16)` preflight line
-before building -- that's the static storage-array estimate from
-`holdem::memory_usage`, a lower bound on RSS (it excludes the tree/node/
-rank-table allocations, the solver's scratch pool, and process overhead), not
-a substitute for the `/usr/bin/time -v` measurement above.
+Windows PowerShellの例（wall clockのみ。同名runがあれば別名へ変える）:
 
-**Sandbox note**: this repo's `.cargo/config.toml` builds release with
-`-C target-cpu=native`. On this development sandbox that has previously
-SIGILL'd at least one release binary (the `solvers` CLI on a kuhn+checkpoint
-path); if the bench-bar command SIGILLs here, that's a sandbox artifact --
-re-run on real target hardware (or a debug build, `cargo run -p cli --`,
-which reproduces the preflight estimate line but not the timing) before
-treating a bar miss as a real regression.
-
-## Assembly audit
-
-Audited 2026-07 on the linked release `solvers` binary. **Methodology
-matters here**: this workspace builds release with `lto = "thin"`, and
-`cargo-show-asm` (which relies on `--emit asm` of a single crate) therefore
-dumps *pre-LTO* codegen — in that view every hot loop looks scalar, because
-with thin LTO the full optimization pipeline (including loop vectorization)
-runs at link time. Auditing the rlib output produces false "not vectorized"
-verdicts; a micro-experiment confirmed the identical loop shape vectorizes
-with plain `rustc -O` but not with `-C lto=thin --emit asm`. The
-authoritative view is the linked artifact:
-
-```sh
-cargo build --release -p cli
-nm target/release/solvers | grep <function>      # find the mangled symbol
-objdump -d target/release/solvers --disassemble="<mangled>" | grep -cE "vmulps|vfmadd|vaddps"
+```powershell
+Measure-Command { & ./target/release/solvers.exe solve examples/river_small.toml --out runs/benchmarks/river-baseline }
 ```
 
-Packed-SIMD instruction counts (`vmulps`/`vfmaddNNNps`/`vaddps`/`vmaxps`) in
-the post-LTO symbols, on this sandbox's `target-cpu=native` codegen:
+Windowsのpeak working setは別途プロセス計測で取得し、取得方法とサンプリング間隔を記録する。未計測のRSSを静的storage見積もりで代用しない。
+Linux RSSとWindows working setも定義を明記して扱う。初期化・CFR・BR・保存を比較する場合は[検証ガイド](validation.jp.md)の区間に分ける。
+旧M3/M5の所要時間・容量目標は過去条件の記録であり、現在のR1/R2受入条件ではない。
 
-| Function | Verdict | Notes |
-| --- | --- | --- |
-| `cfr_pass` (all 4 monomorphizations) | vectorized | 20–55 packed ops each; the f64 discount factors are hoisted out of the loops (≤3 `vcvtsd2ss` per symbol, none inside a loop body) — the F32 `update_regrets`/`accumulate_strategy`/regret-matching loops are inlined here |
-| `value_pass` | vectorized | 8 packed ops in the sampled monomorphization |
-| `update_regrets_i16_impl` | vectorized | 38 packed ops including packed int↔float converts |
-| `accumulate_strategy_i16_impl` | vectorized | outlined post-LTO, packed body |
-| `PublicTree::map_reach_into` (Mask arm) | vectorized | 5 packed ops |
-| `PublicTree::accumulate_values` (Mask arm) | vectorized | 35 packed ops |
-| `normalize_columns` / `normalize_columns_i16` | scalar | strided per-hand column access (stride `num_hands` across an action-major layout); query-layer only — runs at exploitability checks and strategy exports, not in the per-iteration hot loop, so not worth restructuring |
-| `SparseTransition::apply_forward` | scalar | sparse gather-scatter over an entry list — inherently irregular, out of SIMD scope by design |
-| `PostflopEvaluator::eval` → `showdown_kernel` | scalar (f64) | sorted-rank sweep with loop-carried prefix sums and per-card `[f64; 52]` inclusion-exclusion bookkeeping — algorithmically sequential, out of SIMD scope by design |
-| `PostflopEvaluator::eval` → fold kernel | scalar (f64) | same per-card bookkeeping structure |
+## 性能判断で残す理由
 
-**`wide` SIMD decision**: no `wide` code lands. The evidence
-gate was "audit shows scalar AND micro-benches show the op is material AND a
-`wide` rewrite beats the baseline" — the audit shows every material
-per-iteration loop already auto-vectorizes post-LTO, and the remaining scalar
-functions are either algorithmically irregular (kernels, sparse transitions)
-or off the hot path (`normalize_columns`). Zero SIMD code is the documented,
-correct outcome; re-run this audit (on real hardware, via the objdump recipe
-above) if a future storage-layout or kernel change moves the needle.
-
-**Sandbox note**: `-C target-cpu=native` codegen is specific to whatever CPU
-this sandbox virtualizes (its codegen includes AVX-512 mask registers); a
-disassembly here is not necessarily what ships on real solving hardware.
-Vectorized-vs-scalar verdicts are robust to that (the blockers are type
-mixes and access patterns, not lane widths), but instruction mixes and lane
-widths should be re-checked on target hardware.
+現在の方針はLLVMの自動vectorizationを活かし、手書きSIMDは実測で必要と分かった箇所だけ検討する。
+thin LTOでは単一crateのpre-LTO assemblyから最終binaryのvectorizationを断定しない。
+必要な監査は対象CPUのlinked binaryで行い、scalar命令の存在だけで最適化課題とせず、hot pathの寄与とA/B差を確認する。
+Rustのmodule分割は責務・編集範囲を小さくするために行い、ファイル行数だけを理由に公開APIや形式versionを変えない。

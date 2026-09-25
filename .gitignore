@@ -5,6 +5,9 @@
 *.mwckpt
 *.mwsol
 /runs
+/experiments/**/output/
+/experiments/**/output-*/
+/experiments/**/.cache/
 /.cache
 __pycache__/
 .pytest_cache/

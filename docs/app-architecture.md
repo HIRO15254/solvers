@@ -1,510 +1,292 @@
-<!-- アプリケーション層(CLI / daemon / GUI)の目標設計。2026-08 のGUI再設計で確定した
-     境界と段階計画を記述する。solver コア(crates/*)の設計は architecture.md を参照。
-     本書は Phase 0 時点では「目標設計 + 現状との差分」であり、各 Phase の完了時に
-     architecture.md §9 と README のレイアウト記述を本書に合わせて更新する。 -->
-
-# アプリケーション設計: CLI コア + ジョブ daemon + Web GUI
+# アプリケーション設計: CLI とジョブ daemon
 
 ## 0. 本書の位置づけ
 
-| 文書 | 範囲 |
-|------|------|
-| `architecture.md` | solver コア(engine / game / holdem / preflop / multiway / formats)の設計 |
-| **本書** | アプリケーション層の境界。実行体・ジョブ・監視・リモート接続・GUI の責務分割 |
-| `multiway-preflop-v1.jp.md` | Multiway Preflop v1 の正規仕様(config contract) |
-| `user-guide.jp.md` | 利用者向け操作手順 |
+本書は現在の `solvers` / `solversd`、run directory、HTTP protocol の境界と、その理由を記す。
+Web GUI は §8 の設計案であり、現行の実行体に含めない。
+公開オプションと family 別の対応は [CLI reference](cli-reference.jp.md)、config の正本は
+[文書索引](README.md)に示す規範仕様、solver core は [architecture.md](architecture.md) を参照する。
 
-## 1. 目標像
+作業状態は Linear で管理し、管理先と運用は [status.jp.md](status.jp.md) を参照する。
+プロダクトの優先順位・受入条件は [product-roadmap.jp.md](product-roadmap.jp.md)、
+設計と依存関係は [実装計画](plans/solver-implementation-plan.jp.md)に置く。
+本書に完了 Phase や次の作業の一覧を複製しない。
 
-1. **設定ファイルを入力として動く CLI** が Preflop / Postflop の両方を解く。これが唯一の実行体。
-2. **GUI(Web 技術)** が設定の作成・実行・閲覧を担う。
-3. **実行場所をリモートにできる。** ローカル実行とリモート実行の意味論は同一。
-4. **走っているジョブにあとから接続して監視できる。** クライアントが落ちても解き続け、再接続で欠落なく追いつける。
+## 1. 利用モデル
 
-(4) が設計を最も強く規定する。「あとから接続できる」は、**ジョブの状態がどのクライアントのメモリにも依存していない**ことを要求するためである。
+CLI は設定を入力し、計算・保存・query を行う。daemon は CLI を子プロセスとして起動し、
+job の投入、queue、監視、cancel/resume、成果物の配信を担う。
+ローカルとリモートは同じ CLI / HTTP protocol を使い、client の接続や寿命に計算を依存させない。
 
-## 2. 現状診断(2026-08)
+「後から接続して監視できる」ため、永続 job 状態を client のメモリに置かない。
+run directory が計算の identity と再接続の基盤になる。
 
-同一の「config → solve → 進捗 → 成果物」が 3 系統に実装されていた。
+## 2. 境界を分ける理由
 
-| 経路 | 実装 | 行数 |
-|------|------|------|
-| CLI 直接実行 | `solve.rs` → `multiway_solve.rs` | 2,595 |
-| Bridge(loopback HTTP) | `bridge.rs` | 2,516 |
-| Desktop Local(Tauri in-process) | `desktop/local_backend.rs` | 3,959 |
+solver を GUI/daemon のプロセス内で動かすと、job 管理、cancel、進捗、checkpoint の実装が
+CLI と重複する。CLI 子プロセスへ集約することで計算のコードパスを一つにし、
+大きな arena とプロセス障害を job 単位に分離する。
 
-加えて config 検証が Rust と TypeScript(`ui/src/lib/setup-config.ts`)で二重化し、GUI 専用フィクスチャが
-`examples/` に混入していた。
-
-**根本原因は GUI がソルバーを自プロセス内で実行したこと。** in-process にした時点でジョブ管理・キャンセル・
-進捗配信・checkpoint 制御を GUI 側に作り直す必要が生じ、6,475 行の重複が発生した。さらに in-process では
-ジョブ状態がプロセスメモリにあるため、目標 (4) は原理的に実現できない。
+代償はプロセス起動とファイル経由の進捗伝達である。長時間計算と再接続の要件に対しては、
+run directory と append-only event がこの境界を単純に保つ。
 
 ## 3. レイヤと 3 つの境界
 
-```
-┌──────────────────────────────────────────────┐
-│  Web GUI (static SPA)                        │  ソルバー知識ゼロの純クライアント
-└───────────────┬──────────────────────────────┘
-                │ ① protocol: versioned JSON over HTTP(local / remote 共通)
-┌───────────────┴──────────────────────────────┐
-│  solversd (job daemon)                       │  ジョブ生命周期・キュー・認証・イベント配信
-└───────────────┬──────────────────────────────┘
-                │ ② run directory + child process(spawn / adopt)
-┌───────────────┴──────────────────────────────┐
-│  solvers CLI                                 │  唯一の実行体。config → run directory
-└───────────────┬──────────────────────────────┘
-                │ ③ Rust API(現状のまま)
-┌───────────────┴──────────────────────────────┐
-│  crates/* solver core                        │
-└──────────────────────────────────────────────┘
+```text
+将来の Web GUI (static SPA / pure client)
+    │ ① protocol: versioned JSON over HTTP (local / remote 共通)
+solversd (crates/daemon)
+    │ ② run directory + CLI child process
+solvers (crates/cli)
+    │ ③ Rust API
+solver core + formats
 ```
 
-依存は上から下への一方向のみ。下位層は上位層の存在を知らない。
+domain crate は HTTP、job、画面状態を知らない。`protocol` は request/response を定義し、
+run の型を `formats` から再利用する。現在の `formats` は HU checkpoint のため engine へ依存するため、
+独立 DTO crate とみなさない。workspace 全体の依存は [architecture.md §2](architecture.md#2-レイヤ構成と-workspace)。
 
 ## 4. 決定事項
 
+以下の R 番号はアプリケーション境界の識別子であり、product roadmap の R0〜R7 とは別である。
+
 ### R1. ソルバーを実行するのは CLI プロセスだけ
 
-daemon は `solvers solve --out <run-dir>` を**子プロセスとして起動**し、自身では解かない。
+daemon は `solvers solve --out <run-dir>` や `resume` を起動し、自身では解かない。
+プロセス管理と solver の cancel/checkpoint 処理を分け、local/remote で同じ solver を実行する。
 
-- ジョブ制御の再実装が構造的に発生しない(§2 の重複の再発防止)
-- 6 GiB の policy arena が daemon プロセスに同居しない。OOM がジョブ単位で隔離される
-- ローカル実行とリモート実行が同一コードパスになる
-- 代償: プロセス起動コストと、進捗が IPC ではなくファイル経由になること(R3 で解決)
+### R2. 永続状態は run directory。daemon は job DB を持たない
 
-### R2. 永続状態は run directory のみ。daemon は DB を持たない
+job id は run directory 名であり、再起動時は runs root から job を読み直す。
+manifest が `running` のまま owning process が消えた run は `interrupted` として報告する。
+pid の判定は実行 host で行う。中断した計算の再開は checkpoint と明示的な resume 要求を使う。
 
-job id = run directory 名。daemon を再起動しても runs root を走査すれば全ジョブが復元でき、
-manifest の pid 生存確認で `running` / `interrupted` を判定できる。中断ジョブは既存の checkpoint から
-そのまま resume できる。
+### R3. 監視は追記専用 event の offset で再開する
 
-### R3. 監視は「追記専用ファイルの tail」
+client は既読の byte offset を保持し、切断後はその位置から読み直す。
+`seq` の連続性で欠落を検出し、書込み途中の最終行は完成後に読む。
+数値の時系列と離散 event は別ファイルにする。
 
-クライアントは読んだバイトオフセットを保持するだけでよく、切断・再接続時に欠落なく再開できる。
-これにより「あとから接続して監視」が特別機能ではなくなる。
+### R4. config の検証・正規化は Rust 実装へ集約する
 
-### R4. config の検証・正規化は Rust 実装ひとつだけ
+CLI の parser/normalizer を daemon も呼び出し、既定値とエラーの意味を複製しない。
+将来 GUI は TOML を組み立て、返された診断と effective config を表示する。
+TypeScript の wire 型生成は §8.4 の設計条件であり、現行の実装機能ではない。
+規範・実装・test・文書の同期規則は [AGENTS.md](../AGENTS.md) に従う。
 
-GUI は TOML を組み立てて送るのみ。正規化・既定値展開・エラーコード(MWP001 等)はサーバ応答を
-そのまま表示する。TypeScript 側の型は Rust から生成し、手書きしない。
+### R5. GUI 専用の solver 経路を作らない
 
-根拠: CLAUDE.md の「仕様・実装・テスト・ドキュメントを同一変更セットで更新する」規約は、
-実装が 1 つでなければ守れない。
+計算・監視・成果物の意味は CLI でも確認できることを保つ。
+`status` / `watch` / `runs ls` は run directory を読み、daemon の solution view は
+`solvers export` へ委譲する。HTTP transport 固有の認証や queue と solver の機能を区別する。
 
-### R5. GUI 専用の特権経路を作らない
+### R6. production config は schema 必須、solve の出力は run directory
 
-daemon が提供する操作はすべて CLI からも実行できること(`solvers status` / `watch` / `runs ls`)。
-プロトコルの正しさを GUI なしで CLI テストとして検証できる状態を維持する。
+公開 family は `solvers.multiway-preflop/v1`、`solvers.postflop/v1`、
+`solvers.preflop-hu/v1`、`solvers.toy/v1`。family は schema が決め、toy の game 選択を除き
+利用者が内部の `game.kind` を指定する方式ではない。
 
-### R6. config は schema 宣言必須、出力は run directory のみ
+`solve --out` と `resume` が run directory の lifecycle を共有する。
+`--sol-streets` は保存範囲の選択であり、独立した出力先ではない。
+`--history` / `strategy.json` は toy と HU preflop の表面で、postflop は戦略と値を
+`solution.sol` に保存して `export` で読む。詳細・override の可否は CLI reference と規範仕様へ置く。
 
-すべての production config は `schema = "solvers.<family>/v1"` を宣言する。schema を持たない TOML は
-一律で拒否する。出力先は `--out <run-dir>` のみとし、`--output` / `--metrics` / `--checkpoint` / `--sol` /
-`--iterations` は廃止する(Phase 1 で実施済み)。`--sol-streets` は「何を書き出すか」を
-選ぶ入力であって出力先ではないため残す。`--history` は artifact を持たない family
-(`solvers.toy/v1` と `solvers.preflop-hu/v1`)にだけ残り、postflop では削除した。
-postflop は戦略も per-hand 値も `solution.sol` に入れ、`solvers export` が読む。
+lowered config は内部 IR として残るが、schema なしの手書き lowered TOML を公開 family として
+受理しない。既存構造体を使うことと、retired input を再び受け付けることを区別する。
 
-過去互換は考慮しない。schema なし config を受理する経路は削除する。ただし現在 v1 config は
-`GameSection::PreflopMultiway` に lower されてから解かれるため、**内部表現としての既存 struct は残る**。
-削除対象は「legacy TOML を利用者入力として受理する経路」であって、内部 IR ではない。
+### R7. remote は同じ daemon を別 host で動かす
 
-schema は toy game(kuhn / leduc)を含む全 kind に必須とする。パーサの分岐が 1 本になり、
-クライアントは schema 文字列だけで kind を判定できる。family は 4 つ:
+loopback でも bearer token を要求する。非 loopback bind は TLS なしでは拒否し、
+TLS を使わない remote 接続では SSH tunnel 等を介して loopback へ到達する。
+将来の GUI が選ぶものは URL と token の接続 profile であり、local 専用 in-process solver は追加しない。
 
-| schema | game.kind | 位置づけ |
-|---|---|---|
-| `solvers.multiway-preflop/v1` | `preflop-multiway` | 正規化契約。専用仕様書を持つ |
-| `solvers.postflop/v1` | (schema が決める) | 正規化契約。`solver-config-v1.jp.md` |
-| `solvers.preflop-hu/v1` | (schema が決める) | 同上 |
-| `solvers.toy/v1` | `kuhn` / `leduc` | 同上 |
+### R8. production と研究経路を区別する
 
-後者 3 つは 2026-08 に版マーカーから正規化契約へ格上げした。Multiway と同様に
-正規化・effective config・error code(`SLV###`)を持つ。schema が family を決めるので
-`[game] kind` は持たない(toy だけは 2 game を含むため残す)。
-
-lowered 形状(`kind = "preflop-multiway"` を持つ共有 struct)は利用者が書く config
-family ではないため、schema 宣言を要求しない。手書きは全入口が MWP003 で拒否する。
-
-### R11. queued run はディスク上に存在する
-
-daemon は状態を持たない(R2)。したがって「slot 待ち」も run directory として存在
-しなければならず、daemon を再起動したら待ち行列ごと復元できる必要がある。
-
-そのため daemon は job を受理した時点で run directory を作り、`run.toml` と
-`state = "queued"` の manifest を書く。daemon 起動時は runs root を走査し、
-`queued` のまま残っていた run を再投入する。`interrupted`(前の daemon が実行中に
-死んだ run)は**再開しない** — checkpoint からの再実行にはコストがあり、それを
-払うかは要求した者が決めることである。報告だけして待つ。CLI 側の `solve --out` は空 directory だけを
-受け付けていたが、**用意済みの queued directory であれば引き取る**(`create_or_adopt`)。
-引き取り可能なのは「manifest が queued で、中身が `manifest.json` / `run.toml` /
-`stdout.log` だけ」の場合に限る。それ以外の populated directory は従来どおり拒否する。
-
-同時実行数は固定 slot 数の FIFO とし、既定は 1。1 run が sweep 0 の前に数 GiB の
-policy arena を確保するため、律速は CPU ではなくメモリであり、その予算を知って
-いるのは operator だけである。ヒューリスティックではなく flag にした理由がこれ。
-
-### R7. リモートは「同じ daemon を別ホストで動かす」だけ
-
-local = loopback + token、remote = TLS + token。GUI 側の分岐は接続プロファイル(URL とトークン)のみ。
-「ローカル専用の in-process 経路」は作らない。
-
-**非 loopback への bind は TLS なしでは拒否する。** token は「誰が要求しているか」を
-証明するだけで、「誰が聞いているか」には何もしない。平文接続では token 自体が header で
-ネットワークを流れるため、経路上の第三者がそれを取って run の投入・cancel・solution の
-取得までできてしまう。警告ではなく起動拒否とし、代替(SSH tunnel 越しの loopback)を
-error message で示す。
-
-### R8. 抽象化最適化の研究ラインは打ち切る
-
-`experiment` サブコマンド、`research-abstractions` feature、RolloutKMeans 抽象化、研究専用 example、
-`experiments/` ディレクトリを削除する。
-
-`docs/validation/multiway-abstraction-optimization-2026-07-25.md` の暫定値を production default へ
-昇格させた(2026-08 実施)。単一の既定は **F/T/R = 128**(Tournament 6-max/50bb anchor 由来)とし、
-Cash 6-max/100bb anchor の 256 は既定にせず明示指定の推奨に留める。utility kind で既定を切り替える
-条件付き default は正規化を説明不能にするため採らない。「6--9 max 全 stack は測定なし」という
-LIMITATION は解消していないので、そのまま記載を残す。
-
-bucket 数は policy arena の大きさを変えない(arena は preflop decision node × 169 class × action)。
-64 → 128 の引き上げは arena byte 上限に影響しないことを `validate --resources` で実測確認した。
-
-抽象化の質の測定手段は production 表面の `solvers evaluate`(`.mwsol` を訓練済み deviation で再評価)と
-`solvers compare`(2 つの `.mwsol` 比較)が担う。研究を再開する場合は git 履歴から復元する。
+production の公開 schema は規範仕様で定義する。研究用 example や feature が存在することは、
+同じ機能を production config から利用できることを意味しない。
+`experiment` CLI namespace は持たず、研究の入出力・制約は対応する example の説明と実験証拠へ置く。
+研究結果の採用には通常の契約・identity・検証の更新を伴わせる。
 
 ### R9. キャッシュは machine スコープ、config は run スコープ
 
-抽象化キャッシュの置き場所は config に書かない。解決順は
-`--cache-dir` > `SOLVERS_CACHE_DIR` > OS の user cache directory とする。
+cache root の解決順は `--cache-dir`、`SOLVERS_CACHE_DIR`、OS の user cache directory。
+[cli/src/cache.rs](../crates/cli/src/cache.rs) が EHS²、preflop equity、blueprint の場所を決める。
+cache は再生成可能な計算資産であり、run directory ごとに複製しない。
 
-根拠は 3 つの実測である。
+EHS² の名前は format version と bucket 数を含み、異なる設定を併存させる。
+[Ehs2Abstraction::save](../crates/abstraction/src/buckets.rs) は writer ごとに一意の
+pid/nonce を含む一時ファイルを書いて rename する。同じ内容を並列に構築することの抑止と、
+ファイルを壊さず保存することは別問題であり、前者の lock/coalescing は実装済みとは扱わない。
 
-- v1 config は `artifact_cache` に `None` を渡しており、**毎 run で EHS² を
-  再構築している**(3-max smoke で 113–136 秒)。共有できていない。
-- 構築済みキャッシュの実体は **543 MB**。run directory ごとに置く選択肢は
-  最初から成立しない。
-- キャッシュ内容は `Ehs2Params{flop,turn,river}` と street 集合だけで決まる。
-  つまり machine に 1 つあれば足り、run や config に紐づける理由がない。
+現行は bucket id を保存する単層 cache を使う。score 層を加える案は、新しい bucket 数を初めて使う際の
+計算を減らす一方、追加容量・形式・bit 同一性の検証を要する。多くの bucket 数を継続して比較する
+実運用が生じた場合に、再計算コストとともに見直す。
 
-config に書かないことは R10 の前提でもある。config が machine 固有の path を
-持つ限り、その config を別 host へ送れない。
+### R10. remote へ送る config は self-contained
 
-ファイル名は content-addressed にする: `ehs2/v{CACHE_VERSION}-f{K}-t{K}-r{K}.postcard`。
-固定名 1 つだと、K=128 の run と K=256 の run(cash 推奨値)が互いの成果物を
-上書きし続ける。既存の `load` は params 不一致を拒否するので破損はしないが、
-毎回 2 分の再構築を繰り返す。
+受信 host の filesystem で `game.tree.source` を解決すると、同じ config が別ゲームを指し得る。
+local `validate --write-effective` は config file の directory を基準に script を解決し、
+本文を inline にして `params` を保持する。run の `run.toml` もこの effective config を使う。
 
-**同時実行**: 現行の `Ehs2Abstraction::save` は temp + rename で atomic だが、
-temp 名を出力ファイル名から作る(`.ehs2.postcard.tmp`)。共有キャッシュに同じ
-key を書く run が 2 つ走ると同一 temp path へ交互に書き込む。temp 名に pid と
-nonce を入れて一意にする。内容は決定的なので、rename の勝者はどちらでもよい。
+daemon は config text を受け取り、path を含む入力を解決せず拒否する。
+client は source を解決した effective config を送る。`POST /v1/validate` は受信 host の
+任意ファイルを読み込む API ではない。cache path も config に埋め込まず、machine 設定として渡す。
 
-同じ key を複数 run が同時に構築する無駄(113 秒 × N)は、`O_EXCL` の lock file で
-1 本に絞る。lock 保持者が構築し、他は最終ファイルの出現を待つ。stale lock は
-時間で諦めて自前構築へ落とす。CLI 単独では滅多に競合しないので、これは daemon が
-複数 job を捌く Phase 2 で入れる。
+### R11. queued run もディスク上に存在する
 
-キャッシュ hit / 構築時間は `events.jsonl` に `Notice` として残す。GUI と daemon が
-「なぜ最初の 2 分が無反応なのか」を説明できる必要がある。
+job 受理時に `run.toml` と `queued` manifest を書く。起動時は queued run を再投入するが、
+interrupted run を自動 resume しない。計算の再実行は明示要求を受けて行う。
 
-### R10. remote へ送る config は self-contained でなければならない
-
-daemon は config を**テキストとして**受け取る。受信側の filesystem を基準に相対
-path を解決してはならない。送信側と受信側で別のファイルを指すため、同じ config が
-host によって別のゲームになる。
-
-v1 で path 値を持つキーは `game.tree.source`(mwtree script)ただ 1 つである。
-そして **effective config は既に self-contained である**: `materialize_effective_at`
-が script の `source`(path)を解決するため、`validate --write-effective` の出力と
-run directory の `run.toml` には `source` が残らない。script ファイルを削除したうえで
-effective config を再 parse し、game fingerprint が一致することを確認するテストが
-両 family にある。
-
-解決の**手段**は postflop と Multiway で同じである。どちらも script 本文をそのまま
-config へ**インライン化**する(`params` が正規化を生き延びて GUI が編集できる変数
-として残り、書いた形と `run.toml` の形が一致する)。Multiway もかつては lowering 済み
-rule 列へ展開していたが、`params` を失わずに GUI 編集を可能にするため、postflop と
-同じインライン化へ揃えた。どちらの family でも path は残らないので、この規則
-(path 値キーを remote 投入で拒否する)は変わらない。
-
-したがって規則はこうなる。
-
-- **remote 投入の wire format は effective config とする。** client は
-  `validate --write-effective` 相当を通してから送る。
-- daemon は path 値キーを含む config を**解決せず拒否する**。「解決できなかった」
-  ではなく「self-contained でない」を理由として返す。
-- ローカルの `solve config.toml` は従来どおり config file の directory 基準で
-  解決する。手元の利便性を捨てる理由はない。
-
-R9 によって cache path が config から消えるので、この規則の対象は
-`game.tree.source` だけになる。legacy/HU family の `equity_cache` /
-`abstraction_cache` / `artifacts_cache` も同じ理由で machine スコープへ移す。
+CLI の `create_or_adopt` は absent/empty directory と、引き取り可能な queued directory を受け付ける。
+queued の場合は manifest の状態と、`manifest.json` / `run.toml` / `stdout.log` に限定された内容を確認し、
+任意の既存 run を上書きしない。同時実行は固定 slot 数の FIFO で管理し、operator が memory 予算に
+合わせて指定する。設定値の既定は CLI reference を参照する。
 
 ## 5. run directory 契約
 
 ### 5.1 レイアウト
 
-```
+```text
 <runs-root>/<run-id>/
-├── run.toml           # 実行に使った effective config(正規化済み・そのまま再実行可能)
-├── manifest.json      # 実行メタデータと state。状態遷移時のみ atomic 書き換え
-├── progress.jsonl     # 定期サンプル(既存 MultiwayMetricsRow)。追記専用
-├── events.jsonl       # 離散事象(状態遷移・警告・停止理由・失敗)。追記専用
-├── run.json           # 完了サマリ(既存 ResultV2)
-├── checkpoint.mwckpt  # resume 用チェックポイント
-├── solution.mwsol     # 閲覧用成果物
-└── stdout.log         # 子プロセスの生ログ(Phase 2 で daemon が書く)
+├── run.toml             # 実行した effective config
+├── manifest.json        # identity / state。atomic replacement
+├── progress.jsonl       # family別の定期数値サンプル
+├── events.jsonl         # state / notice / checkpoint / stop / failure。追記専用
+├── run.json             # 結果サマリ
+├── checkpoint.mwckpt    # Multiway の再開用 state
+├── solution.mwsol       # Multiway の閲覧用 artifact
+├── checkpoint.ckpt      # HU系の再開用 state (Multiwayとは別形式)
+├── solution.sol         # HU postflop の戦略・値
+├── strategy.json        # toy / HU preflop の指定履歴の平均戦略
+└── stdout.log           # daemon が起動した child の stdout/stderr
 ```
 
-`stdout.log` 以外は Phase 1 で実装済みである。`stdout.log` は子プロセスを起動する
-側の責務なので、daemon を書く Phase 2 で入る。
-
-`progress.jsonl` と `events.jsonl` を分けるのは、前者が時系列グラフ用の定期数値サンプル、後者が
-不定期の離散事象であり、混ぜると既存 progress 行のスキーマが壊れ、クライアント側にフィルタが
-必要になるため。
-
-EHS² 等の抽象化キャッシュは run directory の外、machine スコープの cache root に置く(R9)。
-実体が 543 MB あるため run ごとの複製は成立しない。
+これは family 別のファイルをまとめた図であり、すべての run が全ファイルを生成するわけではない。
+定数と DTO は [formats/src/run.rs](../crates/formats/src/run.rs)、lifecycle は
+[cli/src/run_dir.rs](../crates/cli/src/run_dir.rs) が所有する。
+進捗と event を分けることで、時系列 schema を保ち、読取り側に event の除外処理を要求しない。
 
 ### 5.2 state 遷移
 
-```
+```text
 queued ──spawn──▶ running ──正常終了──▶ completed
-                     │
-                     ├── 非ゼロ終了 ─────▶ failed
-                     ├── cancel ─────────▶ canceled     (checkpoint 保存済み)
-                     └── pid 消滅 ───────▶ interrupted  (resume 候補)
+                     ├── 失敗 ──────▶ failed
+                     ├── cancel ────▶ canceled
+                     └── pid 消滅 ──▶ interrupted
 ```
 
-`interrupted` は「manifest が running のまま pid が消えている」状態を daemon 起動時の走査で
-判定した結果を指す。checkpoint があれば resume できる。
+`interrupted` は owning process が正常な終了状態を書けなかったことを reader が判断した状態。
+cancel は solver の協調停止を使い、checkpoint の存在と状態を確認して resumable を判断する。
 
 ### 5.3 manifest.json
 
-```json
-{
-  "schemaVersion": 1,
-  "runId": "20260820T120311Z-6max-cash",
-  "state": "running",
-  "gameKind": "preflop-multiway",
-  "configSchema": "solvers.multiway-preflop/v1",
-  "configHash": "blake3:...",
-  "cliVersion": "0.1.0",
-  "command": ["solve", "--out", "..."],
-  "pid": 41234,
-  "createdUnixMs": 0,
-  "startedUnixMs": 0,
-  "finishedUnixMs": null
-}
-```
-
-規則: 状態遷移時のみ一時ファイルへ書いて rename する。読み手が壊れた JSON を観測しない。
+`RunManifest` は schema version、run id、game/config identity、CLI version、command、pid、
+開始/終了時刻、failure/completion を持つ。状態遷移時に一時ファイルへ書き、rename で置き換える。
+wire name と optional field を変更するときは `formats` / `protocol` と reader の互換性を検証する。
 
 ### 5.4 events.jsonl
 
 ```json
-{"seq":12,"unixMs":0,"level":"info","kind":"state","state":"running"}
-{"seq":13,"unixMs":0,"level":"warn","kind":"resource","message":"policy arena at 92% of 6GiB"}
-{"seq":14,"unixMs":0,"level":"info","kind":"checkpoint","sweeps":12000}
-{"seq":15,"unixMs":0,"level":"info","kind":"stop","reason":"converged","confirmations":3}
+{"seq":0,"unixMs":0,"level":"info","kind":"state","state":"running"}
+{"seq":1,"unixMs":0,"level":"info","kind":"notice","message":"cache loaded"}
+{"seq":2,"unixMs":0,"level":"info","kind":"checkpoint","sweeps":12000}
+{"seq":3,"unixMs":0,"level":"info","kind":"stop","reason":"target-reached"}
 ```
 
-規則: 1 行 1 JSON、追記のみ、`seq` は 0 から単調増加、既存行は決して書き換えない。
-読み手はバイトオフセットで再開し、`seq` の連続性で欠落を検出する。
+1 行 1 JSON、追記のみ、`seq` は 0 から単調増加する。resume は既存 event の続きへ書く。
+reader は byte offset を保持し、未完了の最終行を次回へ残す。
 
-## 6. CLI 表面(Phase 1 完了時)
+## 6. CLI 表面
 
-```
-solvers config new --template <name> [--out PATH]
-solvers validate <config> [--format json] [--show-effective]
-solvers solve    <config> --out <run-dir>
-solvers resume   <run-dir> [--out <fork-dir>]
-solvers status   <run-dir> [--format json]
-solvers watch    <run-dir> [--from <offset>] [--format json]
-solvers runs ls  <runs-root> [--format json]
-solvers inspect | evaluate | export | compare | report
-```
+`config new` / `validate` が入力、`solve` / `resume` が計算、`status` / `watch` / `runs ls` が監視、
+`inspect` / `evaluate` / `export` / `compare` / `report` が閲覧・評価を担う。
+family によって対応する操作が異なるため、ここで共通対応を仮定しない。
+全コマンド・引数は [cli-reference.jp.md](cli-reference.jp.md) を参照する。
 
-`experiment` namespace は R8 により存在しない。
+## 7. daemon protocol
 
-`solve` / `resume` の production 経路は run directory のみを出力先とする(R6)。
+型定義は [crates/protocol](../crates/protocol/src/lib.rs)、routing は
+[daemon/src/http.rs](../crates/daemon/src/http.rs) にある。
 
-## 7. daemon プロトコル草案(Phase 2 で確定)
-
-```
-GET  /v1                               protocol version、CLI version、同時実行数
-POST /v1/validate                      正規化 config + 診断。self-contained 化にも使う
-POST /v1/runs                          run 作成(self-contained config TOML)→ run_id
-GET  /v1/runs                          一覧(state と進捗要約)
-GET  /v1/runs/{id}                     manifest + 最新 progress
-GET  /v1/runs/{id}/events?from=OFFSET  event page。offset で再開する
-POST /v1/runs/{id}/cancel              SIGINT 相当(checkpoint 保存して終了)
-POST /v1/runs/{id}/resume              停止した run の再開
-GET  /v1/runs/{id}/artifacts           run が産んだ file の一覧(名前と byte 数)
-GET  /v1/runs/{id}/artifacts/{name}    成果物ダウンロード
-GET  /v1/runs/{id}/solution/{view}     .mwsol の view (?format=csv 可)
+```text
+GET  /v1                              protocol/CLI version、同時実行数
+POST /v1/validate                      self-contained config の検証・正規化
+POST /v1/runs                          run の作成・投入
+GET  /v1/runs                          run 一覧
+GET  /v1/runs/{id}                     state と進捗の要約
+GET  /v1/runs/{id}/events?from=OFFSET   event page
+POST /v1/runs/{id}/cancel              協調停止
+POST /v1/runs/{id}/resume              明示的な再開
+GET  /v1/runs/{id}/artifacts            契約上の artifact 一覧
+GET  /v1/runs/{id}/artifacts/{name}     artifact download
+GET  /v1/runs/{id}/solution/{view}      Multiway .mwsol の CLI export への委譲
 ```
 
-artifact の `{name}` は run directory 契約が定める名前の allow-list に限る。
-directory listing をそのまま出すと、solver が置いた任意の file — 将来の cache や
-scratch — まで取得できてしまい、run directory が汎用の file share になる。
+artifact の名前は run directory 契約の allow-list に限る。任意の directory listing を
+file share として公開しない。solution view の意味は CLI と共有するが、現行の HTTP query は
+`solution.mwsol` を対象とする。HU postflop の CLI `export` 対応は、この endpoint への接続まで
+完了したことを意味しない。event は SSE ではなく `nextOffset` と `terminal` を持つ page として返す。
 
-solution view は `solvers export` へ委譲する。view の意味の実装を 1 つに保つことで、
-daemon と CLI が同じ solve について違う数字を出す余地をなくす(R4、R5)。
+認証 token は明示 `--token`、`SOLVERSD_TOKEN`、新規乱数の順で選び、起動時に表示する。
+自動的に client の設定 directory へ保存する動作は持たない。TLS と bind の条件は R7 に従う。
 
-event の配信は SSE ではなく offset 付き page とした。読み手が保持するのは
-`nextOffset` だけで、これは `solvers watch --from` と同じ contract である。同じ
-append-only file を同じ規約で読むので、実装も理解も 1 つで済む。SSE は「毎回
-polling するより安い」以上の利点がないため、必要になってから足す。
+## 8. GUI 設計案
 
-`POST /v1/runs` は path 値キーを含む config を拒否する(R10)。client は
-`POST /v1/validate` の正規化結果、つまり effective config を送る。
-
-型定義は `crates/protocol` に隔離する。`formats` は成果物フォーマット専用のまま維持する。
-認証は bearer token(daemon 起動時に生成し、ローカルは設定ディレクトリに保存)。
-同時実行数は daemon がキューで制限する(1 run あたり数 GiB の arena を確保するため)。
-
-## 8. GUI 設計(Phase 3、未着手)
-
-本章は実装前の設計記録である。着手条件は §8.6 に置いた。
+本章は将来の client の設計条件である。範囲と着手順はロードマップ・Linear に従う。
 
 ### 8.1 責務
 
-**担うもの:** config の組み立て UI、run の一覧と状態表示、進捗の可視化、成果物
-(戦略・EV)の閲覧、接続プロファイル(URL + token)の管理。
+config の組み立て、run 一覧、進捗、戦略/EV、接続 profile を UI として提供する。
+編集 draft や表示選択は client state として持てるが、job の永続状態や計算結果の正本にはしない。
+validation/normalization、solver 実行、job lifecycle は Rust/daemon へ委譲する。
 
-**担わないもの:** config の検証・正規化(R4)、ソルバー実行(R1)、ジョブ状態の保持
-(R2)、ローカル専用経路(R7)。
+### 8.2 画面と必要な API
 
-GUI は daemon の純クライアントである。**GUI が持ってよい状態は、接続プロファイルと
-「どの run のどのオフセットまで読んだか」だけ**で、それ以外は必ずサーバへ問い合わせる。
-旧構成が壊れたのは、この境界を越えて GUI 側に job 状態を持たせたためである(§2)。
-
-### 8.2 画面と、必要な API
-
-| 画面 | 役割 | 使う endpoint |
+| 画面 | 役割 | endpoint |
 |---|---|---|
-| Connect | URL と token の管理、接続確認 | `GET /v1` |
-| Setup | config の組み立て・検証・resource 見積り | `POST /v1/validate`(`resources: true`) |
-| Runs | run 一覧、state、進捗、投入 | `GET /v1/runs`、`POST /v1/runs` |
-| Run detail | 1 run の進捗・event・cancel・resume | `GET /v1/runs/{id}`、`/events?from=`、`/cancel`、`/resume` |
-| Results | 戦略・EV・tree の閲覧、成果物取得 | `/solution/{view}`、`/artifacts`、`/artifacts/{name}` |
+| Connect | URL/token、接続確認 | `GET /v1` |
+| Setup | config 組立、診断、resource 見積り | `POST /v1/validate` |
+| Runs | 一覧、状態、投入 | `GET /v1/runs`、`POST /v1/runs` |
+| Run detail | 進捗/event、cancel/resume | `GET /v1/runs/{id}`、`/events`、`/cancel`、`/resume` |
+| Results | tree/hand/action と値、保存範囲の表示 | `/solution/{view}`、`/artifacts` |
 
-Setup 画面は**自前で config を検証しない**。TOML を組み立てて `POST /v1/validate` へ
-投げ、返ってきた診断と正規化結果をそのまま表示する。投入するのはその正規化結果
-(effective config)であり、これが R10 を満たす唯一の方法でもある。
+Setup は独自 parser で意味を再定義せず、診断と effective config を server から受け取る。
+値の単位、未計算領域、保存時の値と再計算、solver の品質認定範囲を表示で区別する。
 
 ### 8.3 event の追い方
 
-run detail は `GET /v1/runs/{id}/events?from=OFFSET` を polling し、`nextOffset` だけを
-保持する。再接続時はその値から再開すれば、切断していた時間の長さに関係なく取りこぼしが
-ない。`seq` の連続性が欠落の検出手段である。
-
-`terminal: true` を受け取ったら polling を止める。進捗の数値(sweeps、elapsed)は event
-ではなく `GET /v1/runs/{id}` から取る。両者は更新頻度も意味も違う(§5.1)。
-
-polling 間隔は 1--2 秒で始めてよい。SSE を足すのは、この頻度が実測で問題になってから
-判断する(§7)。
+`events?from=OFFSET` を polling し、`nextOffset` を保存する。再接続はその位置から行う。
+`terminal: true` なら監視の終了を判断し、再開された run には再接続する。
+sweeps/elapsed 等の数値は run summary から取得する。polling 間隔や SSE の追加は実測で判断する。
 
 ### 8.4 型の生成
 
-TypeScript の型は `crates/protocol` から生成し、手書きしない(R4)。旧構成では
-`setup-config.ts` が Rust と別に config を解釈しており、仕様変更のたびに二重更新が
-必要だった。生成手段と drift 検出は未決(§10)。
+TypeScript の wire 型は `protocol` から生成し、手書きの別仕様を作らない。
+生成物の配置・生成手段・drift 検出は UI 導入時に決定する。設定を編集する UI の型と、
+server の正規化・検証規則を混同しない。
 
 ### 8.5 配布
 
-静的 SPA として配れる。Tauri は「daemon を同梱起動して SPA をホストするだけ」の薄い
-シェルとして後付け可能だが必須ではなく、**GUI が Tauri の有無で挙動を変えてはならない**。
-ローカルもリモートも同じ HTTP クライアントを使う(R7)。
+静的 SPA を基本案とする。desktop shell が必要なら daemon の起動と SPA の表示を担当する薄い層にし、
+local/remote の計算コードパスを変えない。PyO3/WASM を UI 導入の一律の前提にはしない。
 
-### 8.6 着手条件
+### 8.6 接続前に確認する条件
 
-**CLI と protocol の表面が落ち着いてから着手する。** GUI は CLI 表面の投影であり、
-土台が動いている間に作ると、旧構成と同じく二重実装と drift を招く。具体的には、
-着手前に次を確定させる。
+対象 family の config/normalizer、query と保存契約、protocol 型生成、認証/TLS、
+品質・未対応の表示を揃える。どの条件が完了したかは本書のチェックリストに複製せず、
+[status.jp.md](status.jp.md) から辿る Linear の課題と、対応する repository の受入証拠で確認する。
+GUI 全機能の完成を HU 検証や通常の教師生成の前提にしない。
 
-1. ~~Postflop / HU の config schema~~(格上げ済み)。4 family すべてが
-   `POST /v1/validate` を通り、effective config と error code を返す。
-2. **TypeScript 型の生成手段**(§10)。手書きに逃げる余地を残さないため、最初の 1 行を
-   書く前に決める。
-3. ~~TLS~~(実装済み)。remote profile を UI に出せる状態になっている。
+## 9. 研究経路と test 基盤の扱い
 
-旧 SPA(2026-08 に削除)の画面構成とコンポーネントは、tag `pre-gui-removal` 以前の
-Git 履歴に残っている。`strategy-matrix`、`betting-tree-editor`、`table-range-editor` は
-UX 資産として参照する価値があるが、config を TS 側で解釈する構造は再導入しない。
+Multiway production は current-street recall / dense arena を使い、full-recall の公開入力は拒否する。
+一方で sparse storage は toy test と研究 feature に用途が残る。削除は単純な不要ファイル整理ではなく、
+独立 test の移植と研究利用の確認を伴う。現在の feature と entry point は
+[Multiway 実装 map](multiway-preflop-v1.md) と各 crate の `Cargo.toml` を参照する。
 
-## 9. 段階計画
+## 10. 変更時の参照先
 
-| Phase | 内容 | 完了条件 |
-|-------|------|----------|
-| **0**(完了) | 表面の刈り込み: GUI 削除、legacy 受理経路の削除、研究ライン削除(R8)、`crates/cli` へ集約、CI 簡素化、文書同期 | Multiway Preflop の production 表面が schema 付き config のみになる |
-| **1**(完了) | run directory 契約の確立: manifest/events 導入、`status`/`watch`/`runs ls`、run directory を受け取る `resume`、全 kind の schema 必須化、全 kind の `--out` 一本化 | GUI なしで長時間ランを投入・監視・再開できる |
-| **2**(完了) | `crates/protocol` + `solversd`(子プロセス管理・キュー・認証・TLS・event page・artifact/solution view) | リモートホスト上の run を CLI から投入・監視・再開できる |
-| **3**(未着手) | Web GUI(純クライアント SPA)。設計は §8、着手条件は §8.6 | ローカル / リモートを同一 UI で扱える |
-
-Phase 1 と 2 の順序が重要である。run directory 契約を確定させてから daemon を書くことで、
-daemon が独自のジョブ状態を持つ誘惑を構造的に断てる。Phase 0 で表面を先に刈り込むのは、
-刈り込む前に run directory 契約を設計すると、消える予定の経路まで契約に含めてしまうためである。
-
-### full-recall / sparse ストレージの扱い(Phase 0 で判明)
-
-`recall = "full"` のsparse policy storageは、production configが既にMWP002で拒否する
-retired pathである。しかしこれは単なる遺物ではなく、`multiway` crateのtoy game 7本中
-5本が動いているストレージでもある。dense arenaは事前に列挙可能なpublic treeを要求する
-ため、toy gameをdenseへ移すにはtree列挙契約への移植が必要になる。
-
-したがって削除は「不要コードの除去」ではなく「hot coreのテスト基盤の移植」であり、
-Phase 1でschemaとrun directory契約を確定させる際に、移植コストと得られる単純化を
-比較して判断する。それまで`multiway`の`research-abstractions` featureが唯一の
-利用者であり、いかなるbinaryもこれを有効化しない。
-
-### EHS² キャッシュを 2 層にするか — 測って、やらないと決めた
-
-現在のキャッシュは **bucket id を保存している**。しかし高価な計算は bucket 化では
-なく、その手前の E[HS²] score sweep である。`build_table` は score を出してから
-weighted equal-frequency threshold を取り、第 2 pass で id へ量子化する。第 2 pass は
-score に対して決定的で安い。
-
-つまり K を変えると、K に依存しない 2 分の計算までやり直している。K=128 と K=256 を
-併用する運用(cash 推奨値が 256)では毎回これを払う。
-
-- **案 A(単層)**: 現状のまま、file 名を content-addressed にするだけ。K ごとに
-  543 MB と 2 分。実装は小さく、bucket id は 1 bit も変わらない。
-- **案 B(2 層)**: K 非依存の score 層(f32、約 1.1 GB)を 1 度だけ作り、K ごとの
-  bucket 層はそこから導出する。score が同一なら threshold も id も同一になるので
-  **bit 単位で現行と一致する**(fingerprint が変わらない)。
-- **案 C(却下)**: score を量子化して 1 ファイルに畳む。tie の構造が変わって
-  bucket 境界が動きうるため、abstraction fingerprint が変わる。artifact の同一性を
-  壊すので採らない。
-
-**実測(2026-08、3-max smoke、K=2)**:
-
-| street | boards | sweep | derive |
-|---|---|---|---|
-| flop | 1,755 | 39.37 s | 0.05 s |
-| turn | 63,193 | 59.84 s | 2.60 s |
-| river | 134,459 | 2.42 s | 4.08 s |
-| 合計 | | **101.6 s** | **6.7 s** |
-
-sweep が 94%。K を変えるたびに K 非依存の 100 秒を払い直している、という推測は
-正しかった。
-
-**それでも結論は A である。** 案 A を実装した時点で、K ごとの構築は **1 度きり**に
-なる(実測 106.7 s → 0.36 s)。B が節約するのは「新しい K を初めて使うときの 100 秒」
-だけで、その代わりに f32 score 層(bucket 層の 2 倍のサイズ)と、format 変更と、
-bucket id が 1 bit も変わらないことの証明を抱えることになる。K を常用するのは
-せいぜい 2 値なので、割に合わない。
-
-B は「K を多数試す実験を再開する」場合にのみ再検討する。その研究ラインは R8 で
-打ち切っているので、当面は起きない。
-
-## 10. 未決事項
-
-GUI(Phase 3)の着手前に決めるべきものを先に挙げる。理由は §8.6。
-
-- **生成された TypeScript 型の配置とドリフト検出手段**。手書きに逃げる余地を残さない。
-GUI とは独立に残っているもの。
-
-- full-recall/sparse storage を削除するか、toy game を dense 契約へ移植するか(§9 の注記)
+- 公開 contract / default: family の規範仕様と [CLI reference](cli-reference.jp.md)。
+- 設計の依存関係: [実装計画](plans/solver-implementation-plan.jp.md)。
+- 作業状態の管理先: [status.jp.md](status.jp.md) 経由の Linear。
+- 検証手順と受入証拠: [development.md](development.md)、[validation.jp.md](validation.jp.md)。

@@ -1,0 +1,73 @@
+{
+  "binarySha256": "63757d48f8d2011297eb43647b326d5ba0925d28b837d3d7eac5445ac9d50596",
+  "checks": [
+    {
+      "command": "cargo fmt --all --check",
+      "elapsedSecs": 1.1509229000657797,
+      "exitCode": 0,
+      "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "elapsedSecs": 2.184414500137791,
+      "exitCode": 0,
+      "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/clippy.log",
+      "sha256": "7b5df51634ae52bbadc7121c6c2c7b94b5f57f158fbcc18dcccd501dafd58de6"
+    },
+    {
+      "command": "cargo clippy -p cli --examples --features research-draw-abstraction,research-regret-sampling -- -D warnings",
+      "elapsedSecs": 0.7889105998910964,
+      "exitCode": 0,
+      "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/research-clippy.log",
+      "sha256": "df291c8b0fc6924d3e2d51fa2f77abedb9b018beaf130e8d61c90c5bb0a18dc9"
+    },
+    {
+      "command": "cargo test --workspace",
+      "elapsedSecs": 149.16229290002957,
+      "exitCode": 0,
+      "failed": 0,
+      "ignored": 30,
+      "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/workspace-tests.log",
+      "passed": 836,
+      "sha256": "d874ca0afe4d1e9bd6469c006ac3227ceeeefb512c2610306b221d229876cfd7",
+      "suites": 48
+    },
+    {
+      "command": "cargo test -p cli --examples --features research-draw-abstraction,research-regret-sampling",
+      "elapsedSecs": 3.887503799982369,
+      "exitCode": 0,
+      "failed": 0,
+      "ignored": 0,
+      "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/research-example-tests.log",
+      "passed": 43,
+      "sha256": "f0217f77994a7b0a1d154ba172cbd5d2e8774dc488175451d8e5eeaefb22ff0c",
+      "suites": 9
+    },
+    {
+      "command": "cargo test -p multiway --features research-average-sampling,research-regret-sampling --lib",
+      "elapsedSecs": 9.629858999978751,
+      "exitCode": 0,
+      "failed": 0,
+      "ignored": 1,
+      "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/research-core-tests.log",
+      "passed": 315,
+      "sha256": "77f34449a4e3c596e7f65ed1813b2e964d9e45218f4e03e0c559d11f4733e42f",
+      "suites": 1
+    },
+    {
+      "command": "cargo build --release -p cli --example mw_checkpoint_audit --features research-regret-sampling",
+      "elapsedSecs": 37.403493399964646,
+      "exitCode": 0,
+      "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/release-build.log",
+      "sha256": "88be412d4b9e7bec9f2514785d336997cc6f15edc25c90c651146800b4ec4be1"
+    }
+  ],
+  "completedUtc": "2026-09-10T05:21:24.464910+00:00",
+  "createdUtc": "2026-09-10T05:18:00.148672+00:00",
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6",
+  "sourceFiles": 180,
+  "sourceManifestSha256": "89edf90ae36556a239cf58e61d5501dc563d637469e3ab21b2de5055dbbdf35b",
+  "sourceZipSha256": "f7e73146a7aae9882661b7ba646fd1c7610f4cadfa04b38447b45e3548cb2f9d",
+  "status": "passed"
+}

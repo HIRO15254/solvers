@@ -1,0 +1,236 @@
+{
+  "schema": "solvers.checkpoint-streaming-validation/v1",
+  "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+  "sourceFilesSha256": {
+    "crates/multiway/src/checkpoint.rs": "250491a9ed6facbd4e39d448daf6893255f3a350b748ffd78e579a205cd159e8",
+    "crates/multiway/src/checkpoint/stream.rs": "288ccae7a5ea6d3baae311732c2471d8c57f3b0c662eb4460eb32e1f2943c8b0",
+    "crates/cli/examples/mw_checkpoint_load_bench.rs": "b16dbc5c63cb4899587ad15b16f0d570cec07f1178ee96be61e1c1ca7e039fd3",
+    "tools/run_checkpoint_load_bench.ps1": "172cca10938473fc23d48096c42e3e24b903bc6337a78f49bc5f620446a7204a"
+  },
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6\n",
+  "status": "complete",
+  "excludedMeasurements": {
+    "baseline-1": "Overlapped initial debug build; retained but excluded from comparison"
+  },
+  "records": [
+    {
+      "arm": "streaming-1",
+      "measurement": {
+        "schemaVersion": "solvers.checkpoint-load-measurement/v1",
+        "startedUtc": "2026-09-09T16:03:47.0712353Z",
+        "binary": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\checkpoint-streaming-20260910\\streaming.exe",
+        "binarySha256": "f8bd90ac8b44638a47e1a714d17b888c5ba23f2ad71ce261b3eb1724669ef422",
+        "checkpoint": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\multiway-convergence-round5-20260909\\cloud-k256-extension\\k256-extension\\sweeps-262144\\run\\checkpoint.mwckpt",
+        "checkpointSha256": "a54a47dabf9c3677a0fdffd8d7e5f65c9ac3134be4c57c73af9999c0cb3920f5",
+        "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+        "sourceStatus": [
+          " M crates/cli/src/session.rs",
+          " M crates/formats/src/lib.rs",
+          " M crates/formats/src/multiway.rs",
+          " M crates/multiway/src/checkpoint.rs",
+          " M crates/multiway/src/solver/eval.rs",
+          " M crates/multiway/src/solver/mod.rs",
+          " M crates/multiway/src/solver/tests.rs",
+          " M docs/architecture.md",
+          " M docs/cli-reference.jp.md",
+          " M docs/multiway-preflop-v1.jp.md",
+          " M docs/multiway-preflop-v1.md",
+          " M docs/user-guide.jp.md",
+          " M tools/README.md",
+          "?? crates/cli/examples/mw_checkpoint_load_bench.md",
+          "?? crates/cli/examples/mw_checkpoint_load_bench.rs",
+          "?? crates/multiway/src/checkpoint/",
+          "?? tools/run_checkpoint_load_bench.ps1"
+        ],
+        "timeoutSeconds": 300,
+        "timedOut": false,
+        "exitCode": 0,
+        "wallSeconds": 49.8667936,
+        "observedPeakWorkingSetBytes": 7470997504,
+        "peakMethod": "Windows process lifetime PeakWorkingSet64 queried every 50 ms; final unsampled interval may be omitted. Includes decoded-state digest and disposal.",
+        "validationReport": "docs/validation/multiway-checkpoint-streaming-2026-09-10.md"
+      },
+      "result": {
+        "checkpoint": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\multiway-convergence-round5-20260909\\cloud-k256-extension\\k256-extension\\sweeps-262144\\run\\checkpoint.mwckpt",
+        "decodedCheckpointJsonBlake3": "22cbcb11200cdd6d82e524dfd87a70e794e229971dc38335fde72562de3983a6",
+        "loadSecs": 12.1039215,
+        "policyCount": 22368024,
+        "schemaVersion": "solvers.multiway-checkpoint-load-bench/v1",
+        "sweeps": 262144,
+        "uncompressedBytes": 1839947172
+      }
+    },
+    {
+      "arm": "baseline-2",
+      "measurement": {
+        "schemaVersion": "solvers.checkpoint-load-measurement/v1",
+        "startedUtc": "2026-09-09T16:05:05.3350142Z",
+        "binary": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\checkpoint-streaming-20260910\\baseline.exe",
+        "binarySha256": "d851296d34369d2ed3d975fa4b86e91ab037c7bda1d26fe42106f4d9fed3f245",
+        "checkpoint": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\multiway-convergence-round5-20260909\\cloud-k256-extension\\k256-extension\\sweeps-262144\\run\\checkpoint.mwckpt",
+        "checkpointSha256": "a54a47dabf9c3677a0fdffd8d7e5f65c9ac3134be4c57c73af9999c0cb3920f5",
+        "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+        "sourceStatus": [
+          " M crates/cli/src/session.rs",
+          " M crates/formats/src/lib.rs",
+          " M crates/formats/src/multiway.rs",
+          " M crates/multiway/src/checkpoint.rs",
+          " M crates/multiway/src/solver/eval.rs",
+          " M crates/multiway/src/solver/mod.rs",
+          " M crates/multiway/src/solver/tests.rs",
+          " M docs/architecture.md",
+          " M docs/cli-reference.jp.md",
+          " M docs/multiway-preflop-v1.jp.md",
+          " M docs/multiway-preflop-v1.md",
+          " M docs/user-guide.jp.md",
+          " M tools/README.md",
+          "?? crates/cli/examples/mw_checkpoint_load_bench.md",
+          "?? crates/cli/examples/mw_checkpoint_load_bench.rs",
+          "?? crates/multiway/src/checkpoint/",
+          "?? docs/validation/gtowizard-simple-deep-preflop-2026-09-10.json",
+          "?? tools/run_checkpoint_load_bench.ps1"
+        ],
+        "timeoutSeconds": 300,
+        "timedOut": false,
+        "exitCode": 0,
+        "wallSeconds": 48.0256635,
+        "observedPeakWorkingSetBytes": 9307660288,
+        "peakMethod": "Windows process lifetime PeakWorkingSet64 queried every 50 ms; final unsampled interval may be omitted. Includes decoded-state digest and disposal.",
+        "validationReport": "docs/validation/multiway-checkpoint-streaming-2026-09-10.md"
+      },
+      "result": {
+        "checkpoint": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\multiway-convergence-round5-20260909\\cloud-k256-extension\\k256-extension\\sweeps-262144\\run\\checkpoint.mwckpt",
+        "decodedCheckpointJsonBlake3": "22cbcb11200cdd6d82e524dfd87a70e794e229971dc38335fde72562de3983a6",
+        "loadSecs": 9.9598883,
+        "policyCount": 22368024,
+        "schemaVersion": "solvers.multiway-checkpoint-load-bench/v1",
+        "sweeps": 262144,
+        "uncompressedBytes": 1839947172
+      }
+    },
+    {
+      "arm": "streaming-2",
+      "measurement": {
+        "schemaVersion": "solvers.checkpoint-load-measurement/v1",
+        "startedUtc": "2026-09-09T16:05:54.2517380Z",
+        "binary": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\checkpoint-streaming-20260910\\streaming.exe",
+        "binarySha256": "f8bd90ac8b44638a47e1a714d17b888c5ba23f2ad71ce261b3eb1724669ef422",
+        "checkpoint": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\multiway-convergence-round5-20260909\\cloud-k256-extension\\k256-extension\\sweeps-262144\\run\\checkpoint.mwckpt",
+        "checkpointSha256": "a54a47dabf9c3677a0fdffd8d7e5f65c9ac3134be4c57c73af9999c0cb3920f5",
+        "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+        "sourceStatus": [
+          " M crates/cli/src/session.rs",
+          " M crates/formats/src/lib.rs",
+          " M crates/formats/src/multiway.rs",
+          " M crates/multiway/src/checkpoint.rs",
+          " M crates/multiway/src/solver/eval.rs",
+          " M crates/multiway/src/solver/mod.rs",
+          " M crates/multiway/src/solver/tests.rs",
+          " M docs/architecture.md",
+          " M docs/cli-reference.jp.md",
+          " M docs/multiway-preflop-v1.jp.md",
+          " M docs/multiway-preflop-v1.md",
+          " M docs/user-guide.jp.md",
+          " M tools/README.md",
+          "?? crates/cli/examples/mw_checkpoint_load_bench.md",
+          "?? crates/cli/examples/mw_checkpoint_load_bench.rs",
+          "?? crates/multiway/src/checkpoint/",
+          "?? docs/validation/gtowizard-simple-deep-preflop-2026-09-10.json",
+          "?? tools/run_checkpoint_load_bench.ps1"
+        ],
+        "timeoutSeconds": 300,
+        "timedOut": false,
+        "exitCode": 0,
+        "wallSeconds": 48.2672994,
+        "observedPeakWorkingSetBytes": 7470985216,
+        "peakMethod": "Windows process lifetime PeakWorkingSet64 queried every 50 ms; final unsampled interval may be omitted. Includes decoded-state digest and disposal.",
+        "validationReport": "docs/validation/multiway-checkpoint-streaming-2026-09-10.md"
+      },
+      "result": {
+        "checkpoint": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\multiway-convergence-round5-20260909\\cloud-k256-extension\\k256-extension\\sweeps-262144\\run\\checkpoint.mwckpt",
+        "decodedCheckpointJsonBlake3": "22cbcb11200cdd6d82e524dfd87a70e794e229971dc38335fde72562de3983a6",
+        "loadSecs": 10.8203148,
+        "policyCount": 22368024,
+        "schemaVersion": "solvers.multiway-checkpoint-load-bench/v1",
+        "sweeps": 262144,
+        "uncompressedBytes": 1839947172
+      }
+    },
+    {
+      "arm": "baseline-3",
+      "measurement": {
+        "schemaVersion": "solvers.checkpoint-load-measurement/v1",
+        "startedUtc": "2026-09-09T16:06:43.3789807Z",
+        "binary": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\checkpoint-streaming-20260910\\baseline.exe",
+        "binarySha256": "d851296d34369d2ed3d975fa4b86e91ab037c7bda1d26fe42106f4d9fed3f245",
+        "checkpoint": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\multiway-convergence-round5-20260909\\cloud-k256-extension\\k256-extension\\sweeps-262144\\run\\checkpoint.mwckpt",
+        "checkpointSha256": "a54a47dabf9c3677a0fdffd8d7e5f65c9ac3134be4c57c73af9999c0cb3920f5",
+        "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+        "sourceStatus": [
+          " M crates/cli/src/session.rs",
+          " M crates/formats/src/lib.rs",
+          " M crates/formats/src/multiway.rs",
+          " M crates/multiway/src/checkpoint.rs",
+          " M crates/multiway/src/solver/eval.rs",
+          " M crates/multiway/src/solver/mod.rs",
+          " M crates/multiway/src/solver/tests.rs",
+          " M docs/architecture.md",
+          " M docs/cli-reference.jp.md",
+          " M docs/multiway-preflop-v1.jp.md",
+          " M docs/multiway-preflop-v1.md",
+          " M docs/user-guide.jp.md",
+          " M docs/validation/README.md",
+          " M tools/README.md",
+          "?? crates/cli/examples/mw_checkpoint_load_bench.md",
+          "?? crates/cli/examples/mw_checkpoint_load_bench.rs",
+          "?? crates/multiway/src/checkpoint/",
+          "?? docs/validation/gtowizard-simple-deep-preflop-2026-09-10.json",
+          "?? tools/run_checkpoint_load_bench.ps1"
+        ],
+        "timeoutSeconds": 300,
+        "timedOut": false,
+        "exitCode": 0,
+        "wallSeconds": 47.7085732,
+        "observedPeakWorkingSetBytes": 9307656192,
+        "peakMethod": "Windows process lifetime PeakWorkingSet64 queried every 50 ms; final unsampled interval may be omitted. Includes decoded-state digest and disposal.",
+        "validationReport": "docs/validation/multiway-checkpoint-streaming-2026-09-10.md"
+      },
+      "result": {
+        "checkpoint": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\multiway-convergence-round5-20260909\\cloud-k256-extension\\k256-extension\\sweeps-262144\\run\\checkpoint.mwckpt",
+        "decodedCheckpointJsonBlake3": "22cbcb11200cdd6d82e524dfd87a70e794e229971dc38335fde72562de3983a6",
+        "loadSecs": 9.4943365,
+        "policyCount": 22368024,
+        "schemaVersion": "solvers.multiway-checkpoint-load-bench/v1",
+        "sweeps": 262144,
+        "uncompressedBytes": 1839947172
+      }
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "medianLoadSeconds": 9.7271124,
+      "medianObservedPeakBytes": 9307658240.0,
+      "loadSecondsRange": [
+        9.4943365,
+        9.9598883
+      ]
+    },
+    "streaming": {
+      "medianLoadSeconds": 11.46211815,
+      "medianObservedPeakBytes": 7470991360.0,
+      "loadSecondsRange": [
+        10.8203148,
+        12.1039215
+      ]
+    }
+  },
+  "allDecodedStatesMatch": true,
+  "memoryReductionFraction": 0.19732856886674854,
+  "loadTimeRatio": 1.178368017007802,
+  "limitations": [
+    "Two retained measurements per arm, warm filesystem, one Windows host; not a general timing guarantee.",
+    "Peak observations include state JSON digest and disposal, sampled every 50 ms from Windows lifetime peak; final interval may be omitted.",
+    "No strategy change or quality improvement is inferred from resource measurements.",
+    "No additional GCP resources were started."
+  ]
+}

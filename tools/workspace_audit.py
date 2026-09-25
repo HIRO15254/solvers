@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SIZE_ROOTS = ("target", "runs", ".cache", ".git", "docs", "crates", "tools", "examples")
+SIZE_ROOTS = ("target", "runs", ".cache", ".git", "docs", "crates", "tools", "examples", "experiments")
 
 
 def tree_size(path: Path) -> tuple[int, int, int]:

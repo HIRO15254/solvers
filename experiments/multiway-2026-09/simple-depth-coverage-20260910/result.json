@@ -1,0 +1,2280 @@
+{
+  "schema": "solvers.depth-coverage-validation/v1",
+  "status": "complete",
+  "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+  "sourceFilesSha256": {
+    "crates/multiway/src/solver/mod.rs": "1c8c95a045011ad706947e0935390bed4e33db8bbb02dd72b7f815dd37bca839",
+    "crates/multiway/src/solver/eval.rs": "22f34c621abbb1049bcc443fad003d36281235cd0e6e0cafe75a2f6ec1a71dc9",
+    "crates/multiway/src/solver/tests.rs": "e730c9cea470913d01626d4ab034b5bd1dd261bf7646505711cd8b2a89ba1ec6",
+    "crates/formats/src/multiway.rs": "4c3eec8d59b645aa71e10beae3c3bc82962fb9333bf0ebb6be39d06b507f5a26",
+    "crates/formats/src/lib.rs": "8917266b25fadcd25cce094a26e15b0031c9af055ce0366be201567a97aac5a5",
+    "crates/cli/src/session.rs": "31fa89df7f34733814c6a6281a873d3815b0c29356c956f7ac0671ded879b611",
+    "crates/cli/examples/mw_checkpoint_audit.rs": "256e51938306c270f2e85c8ef793aa2b140592b045c96e9647125b11b81a6c1d"
+  },
+  "baseConfig": "examples/bench_multiway/6max_100bb_nl50_partial_simple_reference.toml",
+  "baseConfigSha256": "57279091cd769b2605336d53fc1cddd29a812ae22d9ff1a55b8955d29ec3e126",
+  "initialConfigOverrides": {
+    "run.max_sweeps": 1024,
+    "run.stop.check_every_sweeps": 1024,
+    "run.stop.evaluation_samples": 512,
+    "run.stop.deviator_traversals": 1024
+  },
+  "referenceArtifact": "docs/validation/gtowizard-simple-deep-preflop-2026-09-10.json",
+  "referenceSha256": "5437c2a05ae8e75cc6d73f9ee928f975dc9fabd0378ffae07e81822419a1c0c7",
+  "runs": [
+    {
+      "directory": "runs/simple-depth-coverage-20260910/run",
+      "solveExecution": {
+        "status": "complete",
+        "purpose": "End-to-end average-source coverage and deep-node diagnostic, not a convergence/GTOW certification",
+        "createdUtc": "2026-09-09T16:07:40.281384+00:00",
+        "baseConfig": "examples\\bench_multiway\\6max_100bb_nl50_partial_simple_reference.toml",
+        "baseConfigSha256": "57279091cd769b2605336d53fc1cddd29a812ae22d9ff1a55b8955d29ec3e126",
+        "configSha256": "4ce17c841accb565869f0845d4ee0ec7e2ad37223e8837d7996f276ce2bf3677",
+        "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f plus current validated changes",
+        "binarySha256": "6fa3aeaf6e11e6dcb968dd567e9a8938460cc6165d08aef7866b743233efc68c",
+        "validationReport": "docs/validation/multiway-depth-coverage-2026-09-10.md",
+        "command": [
+          "target/release/solvers.exe",
+          "solve",
+          "runs\\simple-depth-coverage-20260910\\config.toml",
+          "--out",
+          "runs\\simple-depth-coverage-20260910\\run",
+          "--cache-dir",
+          ".cache/bench-ehs"
+        ],
+        "timeoutSeconds": 300,
+        "startedUtc": "2026-09-09T16:08:01.521546+00:00",
+        "exitCode": 0,
+        "wallSeconds": 106.59120500017889
+      },
+      "runSummarySha256": "2ced1f3a35fd5a97a23d7aa00672c7db56062296e5355b10e7e35551576c3d3e",
+      "runSummary": {
+        "status": "sweep-limit",
+        "sweeps": 1024,
+        "traversals": 6144,
+        "infosets": 538910,
+        "memoryBytes": 545720720,
+        "elapsedSecs": 44.508608100000004,
+        "preallocatedNodes": 966141,
+        "preallocatedColumns": 31854277,
+        "preallocatedSlots": 64818941
+      },
+      "finalProgressCoverageByStreet": {
+        "preflop": {
+          "decisionVisits": 3510,
+          "storedStrategyVisits": 3498,
+          "averageStrategyVisits": 3449,
+          "currentStrategyVisits": 0,
+          "regretFallbackVisits": 49,
+          "uniformFallbackVisits": 12
+        },
+        "flop": {
+          "decisionVisits": 178,
+          "storedStrategyVisits": 167,
+          "averageStrategyVisits": 151,
+          "currentStrategyVisits": 0,
+          "regretFallbackVisits": 16,
+          "uniformFallbackVisits": 11
+        },
+        "turn": {
+          "decisionVisits": 79,
+          "storedStrategyVisits": 64,
+          "averageStrategyVisits": 50,
+          "currentStrategyVisits": 0,
+          "regretFallbackVisits": 14,
+          "uniformFallbackVisits": 15
+        },
+        "river": {
+          "decisionVisits": 29,
+          "storedStrategyVisits": 22,
+          "averageStrategyVisits": 9,
+          "currentStrategyVisits": 0,
+          "regretFallbackVisits": 13,
+          "uniformFallbackVisits": 7
+        }
+      },
+      "pilotAudit": {
+        "rawArtifact": "runs/simple-depth-coverage-20260910/audit.json",
+        "execution": {
+          "status": "complete",
+          "command": [
+            "target/release/examples/mw_checkpoint_audit.exe",
+            "--config",
+            "runs\\simple-depth-coverage-20260910\\config.toml",
+            "--checkpoint",
+            "runs\\simple-depth-coverage-20260910\\run\\checkpoint.mwckpt",
+            "--evaluation-seeds",
+            "101,202",
+            "--samples",
+            "512",
+            "--br-traversals",
+            "256",
+            "--node-frequency-samples",
+            "4096",
+            "--threads",
+            "8",
+            "--cache-dir",
+            ".cache/bench-ehs",
+            "--node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+            "--node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+            "--node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in"
+          ],
+          "timeoutSeconds": 300,
+          "startedUtc": "2026-09-09T16:10:36.048081+00:00",
+          "binarySha256": "3f1315c38b1e04e29cd3a6602b6a6c11d6c77ebb171bb55a4b60d21276c76342",
+          "checkpointSha256": "eb38f6f7d151ae9cb78d455bbed9be0568284334684c76427421a693f2c92240",
+          "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f plus current validated changes",
+          "validationReport": "docs/validation/multiway-depth-coverage-2026-09-10.md",
+          "exitCode": 0,
+          "wallSeconds": 65.0944447000511,
+          "outputSha256": "a4e8191a3cfdf1b2eb3da494ceea6a6c18a32cea565edf78dfe5cd8987347068"
+        },
+        "sweeps": 1024,
+        "configurationFingerprint": "2c6c182d19e9fe0d5166ce4d403a746fc00925ea5d57abe07bf56d9b7c254cc0",
+        "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+        "solverStateVersion": 4,
+        "policyArena": {
+          "nodes": 966141,
+          "columns": 31854277,
+          "slots": 64818941,
+          "bytes": 545720720,
+          "pages_committed": true
+        },
+        "deviatorTraining": {
+          "seed": 7093782259666545012,
+          "traversalsPerSeat": 256,
+          "elapsedSecs": 0.2736805,
+          "coverage": [
+            {
+              "traversals": 256,
+              "visited_infosets": 762,
+              "retained_infosets": 0,
+              "total_visits": 826,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 905,
+              "retained_infosets": 0,
+              "total_visits": 927,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 988,
+              "retained_infosets": 0,
+              "total_visits": 1039,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 729,
+              "retained_infosets": 0,
+              "total_visits": 883,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 748,
+              "retained_infosets": 0,
+              "total_visits": 860,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 546,
+              "retained_infosets": 0,
+              "total_visits": 615,
+              "retained_visits": 0
+            }
+          ]
+        },
+        "fixedSeedEvaluations": [
+          {
+            "seed": 101,
+            "samples": 512,
+            "perSeatEv": [
+              {
+                "mean": 1.8808593749999993,
+                "stderr": 2.476413102658209,
+                "ci95": [
+                  -2.972910306210091,
+                  6.734629056210089
+                ]
+              },
+              {
+                "mean": -4.033128906249994,
+                "stderr": 2.2575387058237006,
+                "ci95": [
+                  -8.457904769664447,
+                  0.3916469571644594
+                ]
+              },
+              {
+                "mean": 1.0239843750000002,
+                "stderr": 2.6380243950155635,
+                "ci95": [
+                  -4.146543439230504,
+                  6.194512189230505
+                ]
+              },
+              {
+                "mean": -1.0551757812500004,
+                "stderr": 1.8970262080725853,
+                "ci95": [
+                  -4.773347149072268,
+                  2.6629955865722668
+                ]
+              },
+              {
+                "mean": 0.8056640624999996,
+                "stderr": 1.8407305559618548,
+                "ci95": [
+                  -2.8021678271852357,
+                  4.413495952185235
+                ]
+              },
+              {
+                "mean": -0.46206054687499987,
+                "stderr": 1.9797115127130738,
+                "ci95": [
+                  -4.342295111792624,
+                  3.4181740180426248
+                ]
+              }
+            ],
+            "deviationGainLowerBound": [
+              {
+                "mean": 3.254541015625002,
+                "stderr": 1.8335471099754193,
+                "ci95": [
+                  0.0,
+                  7.364253507923907
+                ]
+              },
+              {
+                "mean": 2.818480468750001,
+                "stderr": 1.8905837460037598,
+                "ci95": [
+                  0.0,
+                  7.056034877042828
+                ]
+              },
+              {
+                "mean": 0.5324902343749995,
+                "stderr": 2.179792321196468,
+                "ci95": [
+                  0.0,
+                  5.418276743104763
+                ]
+              },
+              {
+                "mean": 0.1024414062499998,
+                "stderr": 1.3593694724540684,
+                "ci95": [
+                  0.0,
+                  3.1493321418085487
+                ]
+              },
+              {
+                "mean": 1.3183105468750014,
+                "stderr": 1.4313094395184522,
+                "ci95": [
+                  0.0,
+                  4.52644752461166
+                ]
+              },
+              {
+                "mean": 0.0,
+                "stderr": 1.2889103430190088,
+                "ci95": [
+                  0.0,
+                  1.995614033467807
+                ]
+              }
+            ],
+            "coverageByStreet": {
+              "preflop": {
+                "decisionVisits": 3514,
+                "storedStrategyVisits": 3491,
+                "averageStrategyVisits": 3452,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 39,
+                "uniformFallbackVisits": 23
+              },
+              "flop": {
+                "decisionVisits": 176,
+                "storedStrategyVisits": 160,
+                "averageStrategyVisits": 142,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 18,
+                "uniformFallbackVisits": 16
+              },
+              "turn": {
+                "decisionVisits": 78,
+                "storedStrategyVisits": 64,
+                "averageStrategyVisits": 47,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 17,
+                "uniformFallbackVisits": 14
+              },
+              "river": {
+                "decisionVisits": 37,
+                "storedStrategyVisits": 26,
+                "averageStrategyVisits": 16,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 10,
+                "uniformFallbackVisits": 11
+              }
+            }
+          },
+          {
+            "seed": 202,
+            "samples": 512,
+            "perSeatEv": [
+              {
+                "mean": -1.331445312500006,
+                "stderr": 2.3398675963275317,
+                "ci95": [
+                  -5.917585801301968,
+                  3.254695176301956
+                ]
+              },
+              {
+                "mean": 0.5357421874999984,
+                "stderr": 2.4461692262129042,
+                "ci95": [
+                  -4.258749495877294,
+                  5.330233870877291
+                ]
+              },
+              {
+                "mean": -5.036947265624994,
+                "stderr": 2.489916466188826,
+                "ci95": [
+                  -9.917183539355092,
+                  -0.15671099189489546
+                ]
+              },
+              {
+                "mean": -1.0276855468749992,
+                "stderr": 1.7416453576627384,
+                "ci95": [
+                  -4.441310447893967,
+                  2.385939354143968
+                ]
+              },
+              {
+                "mean": 1.2833984375000003,
+                "stderr": 1.8196170578822624,
+                "ci95": [
+                  -2.283050995949234,
+                  4.849847870949235
+                ]
+              },
+              {
+                "mean": 3.8522363281250023,
+                "stderr": 2.282012368226496,
+                "ci95": [
+                  -0.6205079135989298,
+                  8.324980569848934
+                ]
+              }
+            ],
+            "deviationGainLowerBound": [
+              {
+                "mean": 4.1104003906250055,
+                "stderr": 1.510058169208557,
+                "ci95": [
+                  0.7257560101609455,
+                  7.4950447710890655
+                ]
+              },
+              {
+                "mean": 0.7660156250000009,
+                "stderr": 1.9541714245926378,
+                "ci95": [
+                  0.0,
+                  5.146095456081939
+                ]
+              },
+              {
+                "mean": 3.125531250000002,
+                "stderr": 1.9591576287946337,
+                "ci95": [
+                  0.0,
+                  7.516787159180295
+                ]
+              },
+              {
+                "mean": 3.463623046875,
+                "stderr": 1.5671364711796278,
+                "ci95": [
+                  0.0,
+                  6.9762027333770185
+                ]
+              },
+              {
+                "mean": 0.0,
+                "stderr": 1.3007978038106993,
+                "ci95": [
+                  0.0,
+                  1.1127761662113034
+                ]
+              },
+              {
+                "mean": 0.0,
+                "stderr": 1.971110752371593,
+                "ci95": [
+                  0.0,
+                  1.7739851403656908
+                ]
+              }
+            ],
+            "coverageByStreet": {
+              "preflop": {
+                "decisionVisits": 3472,
+                "storedStrategyVisits": 3460,
+                "averageStrategyVisits": 3420,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 40,
+                "uniformFallbackVisits": 12
+              },
+              "flop": {
+                "decisionVisits": 210,
+                "storedStrategyVisits": 171,
+                "averageStrategyVisits": 158,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 13,
+                "uniformFallbackVisits": 39
+              },
+              "turn": {
+                "decisionVisits": 76,
+                "storedStrategyVisits": 58,
+                "averageStrategyVisits": 45,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 13,
+                "uniformFallbackVisits": 18
+              },
+              "river": {
+                "decisionVisits": 39,
+                "storedStrategyVisits": 29,
+                "averageStrategyVisits": 20,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 9,
+                "uniformFallbackVisits": 10
+              }
+            }
+          }
+        ],
+        "nodes": [
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+            "history": "5ebdea819e7b37aee4f9590419b75ca9",
+            "actor": 1,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:7000",
+              "raise-to:21000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 4096,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 4096,
+              "conditionalActionRates": {
+                "call:7000": {
+                  "estimate": 0.04903781003821451,
+                  "standardError": 0.007547103486875909
+                },
+                "fold": {
+                  "estimate": 0.027954445563209883,
+                  "standardError": 0.0030368449364408033
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.7092155112688371,
+                  "standardError": 0.021064511432304873
+                },
+                "raise-to:21000": {
+                  "estimate": 0.21379223312973836,
+                  "standardError": 0.018871661797549396
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.0030934618254952156,
+                "standardError": 0.0002598447563943677
+              },
+              "effectiveSampleSize": 137.0221486626776,
+              "fallbackReachWeightFraction": {
+                "any": 0.0023992316573138075,
+                "currentRegret": 0.0023992316573138075,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "handStatuses": {
+              "average-observed": 162,
+              "current-regret-fallback-omitted": 7
+            }
+          },
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+            "history": "5c4d807237a5b958777fc1e112b6216a",
+            "actor": 2,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:11000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 4096,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 4096,
+              "conditionalActionRates": {
+                "call:11000": {
+                  "estimate": 0.27246111214120494,
+                  "standardError": 0.03048650379161865
+                },
+                "fold": {
+                  "estimate": 0.14548659143019643,
+                  "standardError": 0.02411892590079761
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.5820522964285987,
+                  "standardError": 0.036033023092601674
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.0006613581117742191,
+                "standardError": 7.130739842771531e-05
+              },
+              "effectiveSampleSize": 84.27170693160748,
+              "fallbackReachWeightFraction": {
+                "any": 0.0679586377927377,
+                "currentRegret": 0.0679586377927377,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "handStatuses": {
+              "average-observed": 77,
+              "current-regret-fallback-omitted": 92
+            }
+          },
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+            "history": "f2b9810547e1fdd6d50aef60c84ddfe6",
+            "actor": 1,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:79000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 4096,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 4096,
+              "conditionalActionRates": {
+                "call:79000:all-in": {
+                  "estimate": 0.9718124455678447,
+                  "standardError": 0.008065095565464142
+                },
+                "fold": {
+                  "estimate": 0.02818755443215525,
+                  "standardError": 0.008065095565464373
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.0003849450077198661,
+                "standardError": 5.2229395344779555e-05
+              },
+              "effectiveSampleSize": 53.622901051383636,
+              "fallbackReachWeightFraction": {
+                "any": 0.08133652060774141,
+                "currentRegret": 0.08133652060774141,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "handStatuses": {
+              "average-observed": 54,
+              "current-regret-fallback-omitted": 115
+            }
+          }
+        ]
+      },
+      "mainAudit": {
+        "rawArtifact": "runs/simple-depth-coverage-20260910/audit-131072.json",
+        "execution": {
+          "binarySha256": "3f1315c38b1e04e29cd3a6602b6a6c11d6c77ebb171bb55a4b60d21276c76342",
+          "checkpointSha256": "eb38f6f7d151ae9cb78d455bbed9be0568284334684c76427421a693f2c92240",
+          "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f plus current validated changes",
+          "validationReport": "docs/validation/multiway-depth-coverage-2026-09-10.md",
+          "status": "complete",
+          "command": [
+            "target/release/examples/mw_checkpoint_audit.exe",
+            "--config",
+            "runs\\simple-depth-coverage-20260910\\config.toml",
+            "--checkpoint",
+            "runs\\simple-depth-coverage-20260910\\run\\checkpoint.mwckpt",
+            "--evaluation-seeds",
+            "101,202",
+            "--samples",
+            "512",
+            "--br-traversals",
+            "256",
+            "--node-frequency-samples",
+            "131072",
+            "--threads",
+            "8",
+            "--cache-dir",
+            ".cache/bench-ehs",
+            "--node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+            "--node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+            "--node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in"
+          ],
+          "timeoutSeconds": 300,
+          "startedUtc": "2026-09-09T16:22:23.635843+00:00",
+          "purpose": "Improve effective sample size at deep nodes, keeping both training checkpoints fixed",
+          "exitCode": 0,
+          "wallSeconds": 175.37743339990266,
+          "outputSha256": "bfef5368b74528cb1834428d301b9b482ce99683941d72c58f05be449566e3fb"
+        },
+        "sweeps": 1024,
+        "configurationFingerprint": "2c6c182d19e9fe0d5166ce4d403a746fc00925ea5d57abe07bf56d9b7c254cc0",
+        "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+        "solverStateVersion": 4,
+        "policyArena": {
+          "nodes": 966141,
+          "columns": 31854277,
+          "slots": 64818941,
+          "bytes": 545720720,
+          "pages_committed": true
+        },
+        "deviatorTraining": {
+          "seed": 7093782259666545012,
+          "traversalsPerSeat": 256,
+          "elapsedSecs": 0.2983414,
+          "coverage": [
+            {
+              "traversals": 256,
+              "visited_infosets": 762,
+              "retained_infosets": 0,
+              "total_visits": 826,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 905,
+              "retained_infosets": 0,
+              "total_visits": 927,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 988,
+              "retained_infosets": 0,
+              "total_visits": 1039,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 729,
+              "retained_infosets": 0,
+              "total_visits": 883,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 748,
+              "retained_infosets": 0,
+              "total_visits": 860,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 546,
+              "retained_infosets": 0,
+              "total_visits": 615,
+              "retained_visits": 0
+            }
+          ]
+        },
+        "fixedSeedEvaluations": [
+          {
+            "seed": 101,
+            "samples": 512,
+            "perSeatEv": [
+              {
+                "mean": 1.8808593749999993,
+                "stderr": 2.476413102658209,
+                "ci95": [
+                  -2.972910306210091,
+                  6.734629056210089
+                ]
+              },
+              {
+                "mean": -4.033128906249994,
+                "stderr": 2.2575387058237006,
+                "ci95": [
+                  -8.457904769664447,
+                  0.3916469571644594
+                ]
+              },
+              {
+                "mean": 1.0239843750000002,
+                "stderr": 2.6380243950155635,
+                "ci95": [
+                  -4.146543439230504,
+                  6.194512189230505
+                ]
+              },
+              {
+                "mean": -1.0551757812500004,
+                "stderr": 1.8970262080725853,
+                "ci95": [
+                  -4.773347149072268,
+                  2.6629955865722668
+                ]
+              },
+              {
+                "mean": 0.8056640624999996,
+                "stderr": 1.8407305559618548,
+                "ci95": [
+                  -2.8021678271852357,
+                  4.413495952185235
+                ]
+              },
+              {
+                "mean": -0.46206054687499987,
+                "stderr": 1.9797115127130738,
+                "ci95": [
+                  -4.342295111792624,
+                  3.4181740180426248
+                ]
+              }
+            ],
+            "deviationGainLowerBound": [
+              {
+                "mean": 3.254541015625002,
+                "stderr": 1.8335471099754193,
+                "ci95": [
+                  0.0,
+                  7.364253507923907
+                ]
+              },
+              {
+                "mean": 2.818480468750001,
+                "stderr": 1.8905837460037598,
+                "ci95": [
+                  0.0,
+                  7.056034877042828
+                ]
+              },
+              {
+                "mean": 0.5324902343749995,
+                "stderr": 2.179792321196468,
+                "ci95": [
+                  0.0,
+                  5.418276743104763
+                ]
+              },
+              {
+                "mean": 0.1024414062499998,
+                "stderr": 1.3593694724540684,
+                "ci95": [
+                  0.0,
+                  3.1493321418085487
+                ]
+              },
+              {
+                "mean": 1.3183105468750014,
+                "stderr": 1.4313094395184522,
+                "ci95": [
+                  0.0,
+                  4.52644752461166
+                ]
+              },
+              {
+                "mean": 0.0,
+                "stderr": 1.2889103430190088,
+                "ci95": [
+                  0.0,
+                  1.995614033467807
+                ]
+              }
+            ],
+            "coverageByStreet": {
+              "preflop": {
+                "decisionVisits": 3514,
+                "storedStrategyVisits": 3491,
+                "averageStrategyVisits": 3452,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 39,
+                "uniformFallbackVisits": 23
+              },
+              "flop": {
+                "decisionVisits": 176,
+                "storedStrategyVisits": 160,
+                "averageStrategyVisits": 142,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 18,
+                "uniformFallbackVisits": 16
+              },
+              "turn": {
+                "decisionVisits": 78,
+                "storedStrategyVisits": 64,
+                "averageStrategyVisits": 47,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 17,
+                "uniformFallbackVisits": 14
+              },
+              "river": {
+                "decisionVisits": 37,
+                "storedStrategyVisits": 26,
+                "averageStrategyVisits": 16,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 10,
+                "uniformFallbackVisits": 11
+              }
+            }
+          },
+          {
+            "seed": 202,
+            "samples": 512,
+            "perSeatEv": [
+              {
+                "mean": -1.331445312500006,
+                "stderr": 2.3398675963275317,
+                "ci95": [
+                  -5.917585801301968,
+                  3.254695176301956
+                ]
+              },
+              {
+                "mean": 0.5357421874999984,
+                "stderr": 2.4461692262129042,
+                "ci95": [
+                  -4.258749495877294,
+                  5.330233870877291
+                ]
+              },
+              {
+                "mean": -5.036947265624994,
+                "stderr": 2.489916466188826,
+                "ci95": [
+                  -9.917183539355092,
+                  -0.15671099189489546
+                ]
+              },
+              {
+                "mean": -1.0276855468749992,
+                "stderr": 1.7416453576627384,
+                "ci95": [
+                  -4.441310447893967,
+                  2.385939354143968
+                ]
+              },
+              {
+                "mean": 1.2833984375000003,
+                "stderr": 1.8196170578822624,
+                "ci95": [
+                  -2.283050995949234,
+                  4.849847870949235
+                ]
+              },
+              {
+                "mean": 3.8522363281250023,
+                "stderr": 2.282012368226496,
+                "ci95": [
+                  -0.6205079135989298,
+                  8.324980569848934
+                ]
+              }
+            ],
+            "deviationGainLowerBound": [
+              {
+                "mean": 4.1104003906250055,
+                "stderr": 1.510058169208557,
+                "ci95": [
+                  0.7257560101609455,
+                  7.4950447710890655
+                ]
+              },
+              {
+                "mean": 0.7660156250000009,
+                "stderr": 1.9541714245926378,
+                "ci95": [
+                  0.0,
+                  5.146095456081939
+                ]
+              },
+              {
+                "mean": 3.125531250000002,
+                "stderr": 1.9591576287946337,
+                "ci95": [
+                  0.0,
+                  7.516787159180295
+                ]
+              },
+              {
+                "mean": 3.463623046875,
+                "stderr": 1.5671364711796278,
+                "ci95": [
+                  0.0,
+                  6.9762027333770185
+                ]
+              },
+              {
+                "mean": 0.0,
+                "stderr": 1.3007978038106993,
+                "ci95": [
+                  0.0,
+                  1.1127761662113034
+                ]
+              },
+              {
+                "mean": 0.0,
+                "stderr": 1.971110752371593,
+                "ci95": [
+                  0.0,
+                  1.7739851403656908
+                ]
+              }
+            ],
+            "coverageByStreet": {
+              "preflop": {
+                "decisionVisits": 3472,
+                "storedStrategyVisits": 3460,
+                "averageStrategyVisits": 3420,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 40,
+                "uniformFallbackVisits": 12
+              },
+              "flop": {
+                "decisionVisits": 210,
+                "storedStrategyVisits": 171,
+                "averageStrategyVisits": 158,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 13,
+                "uniformFallbackVisits": 39
+              },
+              "turn": {
+                "decisionVisits": 76,
+                "storedStrategyVisits": 58,
+                "averageStrategyVisits": 45,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 13,
+                "uniformFallbackVisits": 18
+              },
+              "river": {
+                "decisionVisits": 39,
+                "storedStrategyVisits": 29,
+                "averageStrategyVisits": 20,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 9,
+                "uniformFallbackVisits": 10
+              }
+            }
+          }
+        ],
+        "nodes": [
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+            "history": "5ebdea819e7b37aee4f9590419b75ca9",
+            "actor": 1,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:7000",
+              "raise-to:21000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 131072,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 131072,
+              "conditionalActionRates": {
+                "call:7000": {
+                  "estimate": 0.04801494254282576,
+                  "standardError": 0.000957924849462038
+                },
+                "fold": {
+                  "estimate": 0.028994505614959913,
+                  "standardError": 0.0006534505397955042
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.6944942289774194,
+                  "standardError": 0.0037970884433855185
+                },
+                "raise-to:21000": {
+                  "estimate": 0.22849632286479488,
+                  "standardError": 0.003806870522848629
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.0030604774982081187,
+                "standardError": 4.661582343563572e-05
+              },
+              "effectiveSampleSize": 4173.138273025111,
+              "fallbackReachWeightFraction": {
+                "any": 0.003110997493642542,
+                "currentRegret": 0.003110997493642542,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "handStatuses": {
+              "average-observed": 162,
+              "current-regret-fallback-omitted": 7
+            }
+          },
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+            "history": "5c4d807237a5b958777fc1e112b6216a",
+            "actor": 2,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:11000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 131072,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 131072,
+              "conditionalActionRates": {
+                "call:11000": {
+                  "estimate": 0.26873977757848727,
+                  "standardError": 0.007792534368255932
+                },
+                "fold": {
+                  "estimate": 0.16673929186844394,
+                  "standardError": 0.006879471256492618
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.5645209305530688,
+                  "standardError": 0.008040232508755935
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.0006993078545510019,
+                "standardError": 1.6947305518505072e-05
+              },
+              "effectiveSampleSize": 1680.867178896623,
+              "fallbackReachWeightFraction": {
+                "any": 0.06418152978975013,
+                "currentRegret": 0.06418152978975013,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "handStatuses": {
+              "average-observed": 77,
+              "current-regret-fallback-omitted": 92
+            }
+          },
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+            "history": "f2b9810547e1fdd6d50aef60c84ddfe6",
+            "actor": 1,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:79000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 131072,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 131072,
+              "conditionalActionRates": {
+                "call:79000:all-in": {
+                  "estimate": 0.9752304897683266,
+                  "standardError": 0.0014120975868247738
+                },
+                "fold": {
+                  "estimate": 0.02476951023167348,
+                  "standardError": 0.0014120975868248077
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.0003947739207942017,
+                "standardError": 1.1196968132177501e-05
+              },
+              "effectiveSampleSize": 1231.4021829959997,
+              "fallbackReachWeightFraction": {
+                "any": 0.07865704141639948,
+                "currentRegret": 0.07865704141639948,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "handStatuses": {
+              "average-observed": 54,
+              "current-regret-fallback-omitted": 115
+            }
+          }
+        ]
+      }
+    },
+    {
+      "directory": "runs/simple-depth-coverage-20260910/extended-32768",
+      "solveExecution": {
+        "status": "complete",
+        "purpose": "Same-state compute scaling at balanced deep nodes; diagnostic, not convergence certification",
+        "command": [
+          "target/release/solvers.exe",
+          "resume",
+          "runs\\simple-depth-coverage-20260910\\run",
+          "--out",
+          "runs\\simple-depth-coverage-20260910\\extended-32768",
+          "--max-sweeps",
+          "32768",
+          "--max-time",
+          "5m",
+          "--evaluation-cadence",
+          "32768",
+          "--cache-dir",
+          ".cache/bench-ehs"
+        ],
+        "timeoutSeconds": 600,
+        "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f plus validated working changes",
+        "binarySha256": "6fa3aeaf6e11e6dcb968dd567e9a8938460cc6165d08aef7866b743233efc68c",
+        "parentCheckpointSha256": "eb38f6f7d151ae9cb78d455bbed9be0568284334684c76427421a693f2c92240",
+        "startedUtc": "2026-09-09T16:15:34.644910+00:00",
+        "validationReport": "docs/validation/multiway-depth-coverage-2026-09-10.md",
+        "exitCode": 0,
+        "wallSeconds": 245.60653769993223
+      },
+      "runSummarySha256": "6be6b71711e66ec45ef7f37c017753a2ed0e5e1390ddd668c32c7afc05982590",
+      "runSummary": {
+        "status": "sweep-limit",
+        "sweeps": 32768,
+        "traversals": 196608,
+        "infosets": 1994775,
+        "memoryBytes": 545720720,
+        "elapsedSecs": 183.1511372,
+        "preallocatedNodes": 966141,
+        "preallocatedColumns": 31854277,
+        "preallocatedSlots": 64818941
+      },
+      "finalProgressCoverageByStreet": {
+        "preflop": {
+          "decisionVisits": 3143,
+          "storedStrategyVisits": 3143,
+          "averageStrategyVisits": 3143,
+          "currentStrategyVisits": 0,
+          "regretFallbackVisits": 0,
+          "uniformFallbackVisits": 0
+        },
+        "flop": {
+          "decisionVisits": 208,
+          "storedStrategyVisits": 208,
+          "averageStrategyVisits": 208,
+          "currentStrategyVisits": 0,
+          "regretFallbackVisits": 0,
+          "uniformFallbackVisits": 0
+        },
+        "turn": {
+          "decisionVisits": 182,
+          "storedStrategyVisits": 181,
+          "averageStrategyVisits": 179,
+          "currentStrategyVisits": 0,
+          "regretFallbackVisits": 2,
+          "uniformFallbackVisits": 1
+        },
+        "river": {
+          "decisionVisits": 110,
+          "storedStrategyVisits": 110,
+          "averageStrategyVisits": 102,
+          "currentStrategyVisits": 0,
+          "regretFallbackVisits": 8,
+          "uniformFallbackVisits": 0
+        }
+      },
+      "pilotAudit": {
+        "rawArtifact": "runs/simple-depth-coverage-20260910/extension-audit.json",
+        "execution": {
+          "timeoutSeconds": 300,
+          "binarySha256": "3f1315c38b1e04e29cd3a6602b6a6c11d6c77ebb171bb55a4b60d21276c76342",
+          "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f plus current validated changes",
+          "validationReport": "docs/validation/multiway-depth-coverage-2026-09-10.md",
+          "status": "complete",
+          "command": [
+            "target/release/examples/mw_checkpoint_audit.exe",
+            "--config",
+            "runs\\simple-depth-coverage-20260910\\extended-32768\\run.toml",
+            "--checkpoint",
+            "runs\\simple-depth-coverage-20260910\\extended-32768\\checkpoint.mwckpt",
+            "--evaluation-seeds",
+            "101,202",
+            "--samples",
+            "512",
+            "--br-traversals",
+            "256",
+            "--node-frequency-samples",
+            "4096",
+            "--threads",
+            "8",
+            "--cache-dir",
+            ".cache/bench-ehs",
+            "--node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+            "--node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+            "--node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in"
+          ],
+          "startedUtc": "2026-09-09T16:20:17.234244+00:00",
+          "checkpointSha256": "9a18c0927daf7d1b036558b7c87fa658a3055b6366e263385d776ca3bca0bd0a",
+          "exitCode": 0,
+          "wallSeconds": 65.9660871999804,
+          "outputSha256": "371c88cf962142223dca250af30a518f93e4453db4d89d903cdc9036ce203942"
+        },
+        "sweeps": 32768,
+        "configurationFingerprint": "2c6c182d19e9fe0d5166ce4d403a746fc00925ea5d57abe07bf56d9b7c254cc0",
+        "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+        "solverStateVersion": 4,
+        "policyArena": {
+          "nodes": 966141,
+          "columns": 31854277,
+          "slots": 64818941,
+          "bytes": 545720720,
+          "pages_committed": true
+        },
+        "deviatorTraining": {
+          "seed": 7093782259666545012,
+          "traversalsPerSeat": 256,
+          "elapsedSecs": 0.4070299,
+          "coverage": [
+            {
+              "traversals": 256,
+              "visited_infosets": 567,
+              "retained_infosets": 0,
+              "total_visits": 631,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 818,
+              "retained_infosets": 0,
+              "total_visits": 877,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 1919,
+              "retained_infosets": 0,
+              "total_visits": 2361,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 730,
+              "retained_infosets": 0,
+              "total_visits": 911,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 696,
+              "retained_infosets": 0,
+              "total_visits": 840,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 565,
+              "retained_infosets": 0,
+              "total_visits": 669,
+              "retained_visits": 0
+            }
+          ]
+        },
+        "fixedSeedEvaluations": [
+          {
+            "seed": 101,
+            "samples": 512,
+            "perSeatEv": [
+              {
+                "mean": 1.4648925781250004,
+                "stderr": 0.6793703452276209,
+                "ci95": [
+                  0.1333267014788635,
+                  2.7964584547711375
+                ]
+              },
+              {
+                "mean": -0.3408203125000001,
+                "stderr": 0.3005417282954967,
+                "ci95": [
+                  -0.9298820999591736,
+                  0.24824147495917337
+                ]
+              },
+              {
+                "mean": -1.2421777343749998,
+                "stderr": 0.5250260038815338,
+                "ci95": [
+                  -2.271228701982806,
+                  -0.21312676676719366
+                ]
+              },
+              {
+                "mean": -0.20141601562499975,
+                "stderr": 0.20602311301160112,
+                "ci95": [
+                  -0.605221317127738,
+                  0.20238928587773844
+                ]
+              },
+              {
+                "mean": -0.14971679687499995,
+                "stderr": 0.21234489160736225,
+                "ci95": [
+                  -0.5659127844254299,
+                  0.2664791906754301
+                ]
+              },
+              {
+                "mean": 0.2076953125000004,
+                "stderr": 0.610302847424793,
+                "ci95": [
+                  -0.9884982684525939,
+                  1.4038888934525948
+                ]
+              }
+            ],
+            "deviationGainLowerBound": [
+              {
+                "mean": 0.0,
+                "stderr": 0.2868983041602659,
+                "ci95": [
+                  0.0,
+                  0.6243526870698201
+                ]
+              },
+              {
+                "mean": 0.13691406249999996,
+                "stderr": 0.22746018826828682,
+                "ci95": [
+                  0.0,
+                  0.646743328484538
+                ]
+              },
+              {
+                "mean": 0.0,
+                "stderr": 0.4138003570784763,
+                "ci95": [
+                  0.0,
+                  0.7900897766056961
+                ]
+              },
+              {
+                "mean": 0.12719726562499994,
+                "stderr": 0.03886087411699313,
+                "ci95": [
+                  0.040094502379171545,
+                  0.21430002887082833
+                ]
+              },
+              {
+                "mean": 0.02415039062499997,
+                "stderr": 0.1114963478626167,
+                "ci95": [
+                  0.0,
+                  0.27405830472426906
+                ]
+              },
+              {
+                "mean": 0.03791015624999983,
+                "stderr": 0.4557812874280688,
+                "ci95": [
+                  0.0,
+                  1.0594983338912733
+                ]
+              }
+            ],
+            "coverageByStreet": {
+              "preflop": {
+                "decisionVisits": 3121,
+                "storedStrategyVisits": 3121,
+                "averageStrategyVisits": 3121,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 0,
+                "uniformFallbackVisits": 0
+              },
+              "flop": {
+                "decisionVisits": 234,
+                "storedStrategyVisits": 234,
+                "averageStrategyVisits": 234,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 0,
+                "uniformFallbackVisits": 0
+              },
+              "turn": {
+                "decisionVisits": 184,
+                "storedStrategyVisits": 184,
+                "averageStrategyVisits": 184,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 0,
+                "uniformFallbackVisits": 0
+              },
+              "river": {
+                "decisionVisits": 135,
+                "storedStrategyVisits": 135,
+                "averageStrategyVisits": 127,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 8,
+                "uniformFallbackVisits": 0
+              }
+            }
+          },
+          {
+            "seed": 202,
+            "samples": 512,
+            "perSeatEv": [
+              {
+                "mean": 1.0296679687500006,
+                "stderr": 0.8324869859369292,
+                "ci95": [
+                  -0.6020065236863805,
+                  2.661342461186382
+                ]
+              },
+              {
+                "mean": 0.024023437499999793,
+                "stderr": 0.6203898265160143,
+                "ci95": [
+                  -1.1919406224713882,
+                  1.2399874974713876
+                ]
+              },
+              {
+                "mean": -1.1751953124999999,
+                "stderr": 0.4678549060775757,
+                "ci95": [
+                  -2.092190928412048,
+                  -0.2581996965879515
+                ]
+              },
+              {
+                "mean": -0.44819335937500066,
+                "stderr": 0.40097249079071245,
+                "ci95": [
+                  -1.234099441324797,
+                  0.33771272257479573
+                ]
+              },
+              {
+                "mean": 0.27436523437499993,
+                "stderr": 0.4007563974844113,
+                "ci95": [
+                  -0.5111173046944462,
+                  1.059847773444446
+                ]
+              },
+              {
+                "mean": 0.08315429687500031,
+                "stderr": 0.35061412870660924,
+                "ci95": [
+                  -0.6040493953899538,
+                  0.7703579891399545
+                ]
+              }
+            ],
+            "deviationGainLowerBound": [
+              {
+                "mean": 0.6812207031249998,
+                "stderr": 0.5685332938922673,
+                "ci95": [
+                  0.0,
+                  1.9555312280551278
+                ]
+              },
+              {
+                "mean": 0.0,
+                "stderr": 0.6242650809826066,
+                "ci95": [
+                  0.0,
+                  1.0463957212644144
+                ]
+              },
+              {
+                "mean": 0.2272949218749998,
+                "stderr": 0.4858751313968874,
+                "ci95": [
+                  0.0,
+                  1.3163354413879833
+                ]
+              },
+              {
+                "mean": 0.2060546874999999,
+                "stderr": 0.07606471782609439,
+                "ci95": [
+                  0.03556322896459191,
+                  0.37654614603540787
+                ]
+              },
+              {
+                "mean": 0.0,
+                "stderr": 0.4353399383369436,
+                "ci95": [
+                  0.0,
+                  0.6854389065384254
+                ]
+              },
+              {
+                "mean": 0.1041796875,
+                "stderr": 0.3040653468838953,
+                "ci95": [
+                  0.0,
+                  0.7857117560055629
+                ]
+              }
+            ],
+            "coverageByStreet": {
+              "preflop": {
+                "decisionVisits": 3117,
+                "storedStrategyVisits": 3117,
+                "averageStrategyVisits": 3117,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 0,
+                "uniformFallbackVisits": 0
+              },
+              "flop": {
+                "decisionVisits": 212,
+                "storedStrategyVisits": 212,
+                "averageStrategyVisits": 212,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 0,
+                "uniformFallbackVisits": 0
+              },
+              "turn": {
+                "decisionVisits": 142,
+                "storedStrategyVisits": 141,
+                "averageStrategyVisits": 139,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 2,
+                "uniformFallbackVisits": 1
+              },
+              "river": {
+                "decisionVisits": 93,
+                "storedStrategyVisits": 90,
+                "averageStrategyVisits": 83,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 7,
+                "uniformFallbackVisits": 3
+              }
+            }
+          }
+        ],
+        "nodes": [
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+            "history": "5ebdea819e7b37aee4f9590419b75ca9",
+            "actor": 1,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:7000",
+              "raise-to:21000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 4096,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 4096,
+              "conditionalActionRates": {
+                "call:7000": {
+                  "estimate": 0.25112278951094635,
+                  "standardError": 0.0377754828780131
+                },
+                "fold": {
+                  "estimate": 0.5716325785383842,
+                  "standardError": 0.03997942125389534
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.08916598562962823,
+                  "standardError": 0.018876033665820784
+                },
+                "raise-to:21000": {
+                  "estimate": 0.08807864632104119,
+                  "standardError": 0.022788137728093003
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.01009624022160943,
+                "standardError": 0.0009023488950117397
+              },
+              "effectiveSampleSize": 121.50615865117037,
+              "fallbackReachWeightFraction": {
+                "any": 1.3661483806727051e-07,
+                "currentRegret": 1.3661483806727051e-07,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "handStatuses": {
+              "average-observed": 167,
+              "current-regret-fallback-omitted": 2
+            }
+          },
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+            "history": "5c4d807237a5b958777fc1e112b6216a",
+            "actor": 2,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:11000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 4096,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 4096,
+              "conditionalActionRates": {
+                "call:11000": {
+                  "estimate": 0.04181632490529546,
+                  "standardError": 0.015456484164933143
+                },
+                "fold": {
+                  "estimate": 0.49973989990283507,
+                  "standardError": 0.14055939695624697
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.45844377519186946,
+                  "standardError": 0.15027267685213197
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.0008892631716514076,
+                "standardError": 0.0002513973877982836
+              },
+              "effectiveSampleSize": 12.477286898003435,
+              "fallbackReachWeightFraction": {
+                "any": 3.573035823955109e-05,
+                "currentRegret": 3.573035823955109e-05,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "handStatuses": {
+              "average-observed": 120,
+              "current-regret-fallback-omitted": 49
+            }
+          },
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+            "history": "f2b9810547e1fdd6d50aef60c84ddfe6",
+            "actor": 1,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:79000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 4096,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 4096,
+              "conditionalActionRates": {
+                "call:79000:all-in": {
+                  "estimate": 0.8013243382507171,
+                  "standardError": 0.14175627931194112
+                },
+                "fold": {
+                  "estimate": 0.19867566174928272,
+                  "standardError": 0.14175627931194085
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.0004076771655509667,
+                "standardError": 0.0002369818659168268
+              },
+              "effectiveSampleSize": 2.9579773335868844,
+              "fallbackReachWeightFraction": {
+                "any": 6.029315435405671e-05,
+                "currentRegret": 6.029315435405671e-05,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "handStatuses": {
+              "average-observed": 90,
+              "current-regret-fallback-omitted": 79
+            }
+          }
+        ]
+      },
+      "mainAudit": {
+        "rawArtifact": "runs/simple-depth-coverage-20260910/extension-audit-131072.json",
+        "execution": {
+          "binarySha256": "3f1315c38b1e04e29cd3a6602b6a6c11d6c77ebb171bb55a4b60d21276c76342",
+          "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f plus current validated changes",
+          "validationReport": "docs/validation/multiway-depth-coverage-2026-09-10.md",
+          "checkpointSha256": "9a18c0927daf7d1b036558b7c87fa658a3055b6366e263385d776ca3bca0bd0a",
+          "status": "complete",
+          "command": [
+            "target/release/examples/mw_checkpoint_audit.exe",
+            "--config",
+            "runs\\simple-depth-coverage-20260910\\extended-32768\\run.toml",
+            "--checkpoint",
+            "runs\\simple-depth-coverage-20260910\\extended-32768\\checkpoint.mwckpt",
+            "--evaluation-seeds",
+            "101,202",
+            "--samples",
+            "512",
+            "--br-traversals",
+            "256",
+            "--node-frequency-samples",
+            "131072",
+            "--threads",
+            "8",
+            "--cache-dir",
+            ".cache/bench-ehs",
+            "--node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+            "--node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+            "--node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in"
+          ],
+          "timeoutSeconds": 300,
+          "startedUtc": "2026-09-09T16:25:19.015773+00:00",
+          "purpose": "Improve effective sample size at deep nodes, keeping both training checkpoints fixed",
+          "exitCode": 0,
+          "wallSeconds": 168.31698399991728,
+          "outputSha256": "ce3a9483487b24b357f20e348062b63601cc14b7c3139fd0c8985562af7fd1ab"
+        },
+        "sweeps": 32768,
+        "configurationFingerprint": "2c6c182d19e9fe0d5166ce4d403a746fc00925ea5d57abe07bf56d9b7c254cc0",
+        "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+        "solverStateVersion": 4,
+        "policyArena": {
+          "nodes": 966141,
+          "columns": 31854277,
+          "slots": 64818941,
+          "bytes": 545720720,
+          "pages_committed": true
+        },
+        "deviatorTraining": {
+          "seed": 7093782259666545012,
+          "traversalsPerSeat": 256,
+          "elapsedSecs": 0.4675738,
+          "coverage": [
+            {
+              "traversals": 256,
+              "visited_infosets": 567,
+              "retained_infosets": 0,
+              "total_visits": 631,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 818,
+              "retained_infosets": 0,
+              "total_visits": 877,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 1919,
+              "retained_infosets": 0,
+              "total_visits": 2361,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 730,
+              "retained_infosets": 0,
+              "total_visits": 911,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 696,
+              "retained_infosets": 0,
+              "total_visits": 840,
+              "retained_visits": 0
+            },
+            {
+              "traversals": 256,
+              "visited_infosets": 565,
+              "retained_infosets": 0,
+              "total_visits": 669,
+              "retained_visits": 0
+            }
+          ]
+        },
+        "fixedSeedEvaluations": [
+          {
+            "seed": 101,
+            "samples": 512,
+            "perSeatEv": [
+              {
+                "mean": 1.4648925781250004,
+                "stderr": 0.6793703452276209,
+                "ci95": [
+                  0.1333267014788635,
+                  2.7964584547711375
+                ]
+              },
+              {
+                "mean": -0.3408203125000001,
+                "stderr": 0.3005417282954967,
+                "ci95": [
+                  -0.9298820999591736,
+                  0.24824147495917337
+                ]
+              },
+              {
+                "mean": -1.2421777343749998,
+                "stderr": 0.5250260038815338,
+                "ci95": [
+                  -2.271228701982806,
+                  -0.21312676676719366
+                ]
+              },
+              {
+                "mean": -0.20141601562499975,
+                "stderr": 0.20602311301160112,
+                "ci95": [
+                  -0.605221317127738,
+                  0.20238928587773844
+                ]
+              },
+              {
+                "mean": -0.14971679687499995,
+                "stderr": 0.21234489160736225,
+                "ci95": [
+                  -0.5659127844254299,
+                  0.2664791906754301
+                ]
+              },
+              {
+                "mean": 0.2076953125000004,
+                "stderr": 0.610302847424793,
+                "ci95": [
+                  -0.9884982684525939,
+                  1.4038888934525948
+                ]
+              }
+            ],
+            "deviationGainLowerBound": [
+              {
+                "mean": 0.0,
+                "stderr": 0.2868983041602659,
+                "ci95": [
+                  0.0,
+                  0.6243526870698201
+                ]
+              },
+              {
+                "mean": 0.13691406249999996,
+                "stderr": 0.22746018826828682,
+                "ci95": [
+                  0.0,
+                  0.646743328484538
+                ]
+              },
+              {
+                "mean": 0.0,
+                "stderr": 0.4138003570784763,
+                "ci95": [
+                  0.0,
+                  0.7900897766056961
+                ]
+              },
+              {
+                "mean": 0.12719726562499994,
+                "stderr": 0.03886087411699313,
+                "ci95": [
+                  0.040094502379171545,
+                  0.21430002887082833
+                ]
+              },
+              {
+                "mean": 0.02415039062499997,
+                "stderr": 0.1114963478626167,
+                "ci95": [
+                  0.0,
+                  0.27405830472426906
+                ]
+              },
+              {
+                "mean": 0.03791015624999983,
+                "stderr": 0.4557812874280688,
+                "ci95": [
+                  0.0,
+                  1.0594983338912733
+                ]
+              }
+            ],
+            "coverageByStreet": {
+              "preflop": {
+                "decisionVisits": 3121,
+                "storedStrategyVisits": 3121,
+                "averageStrategyVisits": 3121,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 0,
+                "uniformFallbackVisits": 0
+              },
+              "flop": {
+                "decisionVisits": 234,
+                "storedStrategyVisits": 234,
+                "averageStrategyVisits": 234,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 0,
+                "uniformFallbackVisits": 0
+              },
+              "turn": {
+                "decisionVisits": 184,
+                "storedStrategyVisits": 184,
+                "averageStrategyVisits": 184,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 0,
+                "uniformFallbackVisits": 0
+              },
+              "river": {
+                "decisionVisits": 135,
+                "storedStrategyVisits": 135,
+                "averageStrategyVisits": 127,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 8,
+                "uniformFallbackVisits": 0
+              }
+            }
+          },
+          {
+            "seed": 202,
+            "samples": 512,
+            "perSeatEv": [
+              {
+                "mean": 1.0296679687500006,
+                "stderr": 0.8324869859369292,
+                "ci95": [
+                  -0.6020065236863805,
+                  2.661342461186382
+                ]
+              },
+              {
+                "mean": 0.024023437499999793,
+                "stderr": 0.6203898265160143,
+                "ci95": [
+                  -1.1919406224713882,
+                  1.2399874974713876
+                ]
+              },
+              {
+                "mean": -1.1751953124999999,
+                "stderr": 0.4678549060775757,
+                "ci95": [
+                  -2.092190928412048,
+                  -0.2581996965879515
+                ]
+              },
+              {
+                "mean": -0.44819335937500066,
+                "stderr": 0.40097249079071245,
+                "ci95": [
+                  -1.234099441324797,
+                  0.33771272257479573
+                ]
+              },
+              {
+                "mean": 0.27436523437499993,
+                "stderr": 0.4007563974844113,
+                "ci95": [
+                  -0.5111173046944462,
+                  1.059847773444446
+                ]
+              },
+              {
+                "mean": 0.08315429687500031,
+                "stderr": 0.35061412870660924,
+                "ci95": [
+                  -0.6040493953899538,
+                  0.7703579891399545
+                ]
+              }
+            ],
+            "deviationGainLowerBound": [
+              {
+                "mean": 0.6812207031249998,
+                "stderr": 0.5685332938922673,
+                "ci95": [
+                  0.0,
+                  1.9555312280551278
+                ]
+              },
+              {
+                "mean": 0.0,
+                "stderr": 0.6242650809826066,
+                "ci95": [
+                  0.0,
+                  1.0463957212644144
+                ]
+              },
+              {
+                "mean": 0.2272949218749998,
+                "stderr": 0.4858751313968874,
+                "ci95": [
+                  0.0,
+                  1.3163354413879833
+                ]
+              },
+              {
+                "mean": 0.2060546874999999,
+                "stderr": 0.07606471782609439,
+                "ci95": [
+                  0.03556322896459191,
+                  0.37654614603540787
+                ]
+              },
+              {
+                "mean": 0.0,
+                "stderr": 0.4353399383369436,
+                "ci95": [
+                  0.0,
+                  0.6854389065384254
+                ]
+              },
+              {
+                "mean": 0.1041796875,
+                "stderr": 0.3040653468838953,
+                "ci95": [
+                  0.0,
+                  0.7857117560055629
+                ]
+              }
+            ],
+            "coverageByStreet": {
+              "preflop": {
+                "decisionVisits": 3117,
+                "storedStrategyVisits": 3117,
+                "averageStrategyVisits": 3117,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 0,
+                "uniformFallbackVisits": 0
+              },
+              "flop": {
+                "decisionVisits": 212,
+                "storedStrategyVisits": 212,
+                "averageStrategyVisits": 212,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 0,
+                "uniformFallbackVisits": 0
+              },
+              "turn": {
+                "decisionVisits": 142,
+                "storedStrategyVisits": 141,
+                "averageStrategyVisits": 139,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 2,
+                "uniformFallbackVisits": 1
+              },
+              "river": {
+                "decisionVisits": 93,
+                "storedStrategyVisits": 90,
+                "averageStrategyVisits": 83,
+                "currentStrategyVisits": 0,
+                "regretFallbackVisits": 7,
+                "uniformFallbackVisits": 3
+              }
+            }
+          }
+        ],
+        "nodes": [
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+            "history": "5ebdea819e7b37aee4f9590419b75ca9",
+            "actor": 1,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:7000",
+              "raise-to:21000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 131072,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 131072,
+              "conditionalActionRates": {
+                "call:7000": {
+                  "estimate": 0.2346346876760751,
+                  "standardError": 0.005755413377114282
+                },
+                "fold": {
+                  "estimate": 0.5730846515004935,
+                  "standardError": 0.006570536216688407
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.08956931769740342,
+                  "standardError": 0.003751545978742524
+                },
+                "raise-to:21000": {
+                  "estimate": 0.10271134312602806,
+                  "standardError": 0.0034783300231381645
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.010440523518450012,
+                "standardError": 0.0001562544923368364
+              },
+              "effectiveSampleSize": 4317.538022772434,
+              "fallbackReachWeightFraction": {
+                "any": 1.5106519894336334e-07,
+                "currentRegret": 1.5106519894336334e-07,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "handStatuses": {
+              "average-observed": 167,
+              "current-regret-fallback-omitted": 2
+            }
+          },
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+            "history": "5c4d807237a5b958777fc1e112b6216a",
+            "actor": 2,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:11000",
+              "raise-to:100000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 131072,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 131072,
+              "conditionalActionRates": {
+                "call:11000": {
+                  "estimate": 0.09483429792772174,
+                  "standardError": 0.006777817794265885
+                },
+                "fold": {
+                  "estimate": 0.5943618250403773,
+                  "standardError": 0.0184910423296643
+                },
+                "raise-to:100000:all-in": {
+                  "estimate": 0.3108038770319008,
+                  "standardError": 0.018438731430158006
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.001072360193518885,
+                "standardError": 4.0433504244187153e-05
+              },
+              "effectiveSampleSize": 699.6446280663945,
+              "fallbackReachWeightFraction": {
+                "any": 2.242446116507469e-05,
+                "currentRegret": 2.242446116507469e-05,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "handStatuses": {
+              "average-observed": 120,
+              "current-regret-fallback-omitted": 49
+            }
+          },
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+            "history": "f2b9810547e1fdd6d50aef60c84ddfe6",
+            "actor": 1,
+            "activeOpponents": 1,
+            "actions": [
+              "fold",
+              "call:79000:all-in"
+            ],
+            "frequency": {
+              "sampleCount": 131072,
+              "seed": 7957689452303118949,
+              "totalDealAttempts": 131072,
+              "conditionalActionRates": {
+                "call:79000:all-in": {
+                  "estimate": 0.6819601422494049,
+                  "standardError": 0.030800864372983832
+                },
+                "fold": {
+                  "estimate": 0.31803985775059507,
+                  "standardError": 0.030800864372983832
+                }
+              },
+              "reachProbabilityEstimate": {
+                "estimate": 0.00033329370572034894,
+                "standardError": 2.6472254303664833e-05
+              },
+              "effectiveSampleSize": 158.32546485754497,
+              "fallbackReachWeightFraction": {
+                "any": 6.243347826123983e-05,
+                "currentRegret": 6.243347826123983e-05,
+                "uniform": 0.0,
+                "categoriesMayOverlap": true
+              },
+              "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+            },
+            "handStatuses": {
+              "average-observed": 90,
+              "current-regret-fallback-omitted": 79
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "verification": {
+    "required": [
+      "cargo fmt --all --check",
+      "cargo clippy --workspace --all-targets -- -D warnings",
+      "cargo test --workspace"
+    ],
+    "workspaceTestsPassed": 744,
+    "workspaceTestsIgnored": 30,
+    "optionalCliFeature": "research-draw-abstraction",
+    "optionalCliExampleTestsPassed": 19,
+    "threadDeterminismSamples": 4097,
+    "threadCounts": [
+      1,
+      2,
+      8
+    ],
+    "fixedSeedEvaluationsUnchangedByNodeWorldCount": true,
+    "inputCheckpointsUnchangedAfterAudits": true,
+    "configurationAbstractionAndArenaMatchAcrossCheckpoints": true
+  },
+  "additionalCloudResourcesStarted": false,
+  "limitations": [
+    "One training seed; no algorithm/default promotion or equilibrium certificate.",
+    "Positive average mass is not a convergence or low-variance certificate.",
+    "Baseline street coverage does not isolate rare 3bet/postflop branches.",
+    "Node conditional rates use each checkpoint own preceding ranges, self-normalized reach ratios, and delta-method standard errors.",
+    "Reference percentages are rounded and full tree, abstraction, and rake equivalence is not established.",
+    "All three individually audited nodes are preflop heads-up continuations, not multi-player postflop strategy validation.",
+    "End-to-end process timing includes initialization, evaluation, serialization and disposal.",
+    "Audit deviator training used 256 traversals per seat and retained zero infosets in all seats at both checkpoints; trained-candidate replay falls back entirely to the main regret-greedy candidate, not an independent strong best response."
+  ]
+}

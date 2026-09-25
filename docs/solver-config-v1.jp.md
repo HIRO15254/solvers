@@ -112,7 +112,7 @@ ev_oop + ev_ip = pot − E[rake]      (レーキなしなら pot)
 ```
 
 `ev_ip = -ev_oop` **ではない**。PioSOLVER / GTO Wizard と同じ基準なので、
-外部ツールの EV と直接突き合わせられる(`docs/validation/gto-wizard-validation.md`)。
+外部ツールの EV と直接突き合わせられる（[過去のGTO Wizard比較手順](../experiments/hu-postflop-reference/procedure-2026-07.md)）。
 
 内部の solve payoff は「pot が積まれる前」を基準にしており、レーキなし chip-EV では
 厳密に零和である。報告時はこれを「両者が手元 stack だけを持ち、pot は場のデッドマネー」

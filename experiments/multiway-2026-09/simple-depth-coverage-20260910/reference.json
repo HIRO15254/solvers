@@ -1,0 +1,120 @@
+{
+  "schema": "gtowizard-simple-deep-preflop-reference/v1",
+  "captured_date": "2026-09-10",
+  "captured_timezone": "Asia/Tokyo",
+  "solution": {
+    "gametype": "Cash6m50zSimple",
+    "game": "Cash 6max NL50",
+    "depth_bb": 100,
+    "bet_sizes": "Simple",
+    "opening": "GTO",
+    "threebet": "GTO",
+    "rake_rate": 0.05,
+    "rake_cap_bb": 4,
+    "verification": "Active 100 / Simple / NL50 / GTO / GTO library row, screenshot and preview; loaded action histories and acting seats verified after each transition."
+  },
+  "capture_method": "Read-only Actions panel aggregate frequencies and combo counts. Library preview and loaded history confirmed in the connected in-app browser. No new solve or credits used.",
+  "nodes": [
+    {
+      "id": "sb-vs-bb-3bet-10",
+      "actor_position": "SB",
+      "history": [
+        "fold",
+        "fold",
+        "fold",
+        "fold",
+        "raise-to:3000",
+        "raise-to:10000"
+      ],
+      "source_url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zSimple&depth=100&soltab=range&preflop_actions=F-F-F-F-R3-R10&history_spot=6",
+      "actions": [
+        {
+          "label": "raise-to:100000:all-in",
+          "ui_percent": 3.9,
+          "ui_combos": 22.26
+        },
+        {
+          "label": "raise-to:21000",
+          "ui_percent": 18.9,
+          "ui_combos": 107.67
+        },
+        {
+          "label": "call:7000",
+          "ui_percent": 13.5,
+          "ui_combos": 76.65
+        },
+        {
+          "label": "fold",
+          "ui_percent": 63.7,
+          "ui_combos": 363.08
+        }
+      ]
+    },
+    {
+      "id": "bb-vs-sb-4bet-21",
+      "actor_position": "BB",
+      "history": [
+        "fold",
+        "fold",
+        "fold",
+        "fold",
+        "raise-to:3000",
+        "raise-to:10000",
+        "raise-to:21000"
+      ],
+      "source_url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zSimple&depth=100&soltab=range&preflop_actions=F-F-F-F-R3-R10-R21&history_spot=7",
+      "actions": [
+        {
+          "label": "raise-to:100000:all-in",
+          "ui_percent": 25,
+          "ui_combos": 60.5
+        },
+        {
+          "label": "call:11000",
+          "ui_percent": 30.4,
+          "ui_combos": 73.5
+        },
+        {
+          "label": "fold",
+          "ui_percent": 44.5,
+          "ui_combos": 107.62
+        }
+      ]
+    },
+    {
+      "id": "sb-vs-bb-5bet-jam",
+      "actor_position": "SB",
+      "history": [
+        "fold",
+        "fold",
+        "fold",
+        "fold",
+        "raise-to:3000",
+        "raise-to:10000",
+        "raise-to:21000",
+        "raise-to:100000:all-in"
+      ],
+      "source_url": "https://app.gtowizard.com/solutions?gametype=Cash6m50zSimple&depth=100&soltab=range&preflop_actions=F-F-F-F-R3-R10-R21-RAI&history_spot=8",
+      "actions": [
+        {
+          "label": "call:79000:all-in",
+          "ui_percent": 47.4,
+          "ui_combos": 51.05
+        },
+        {
+          "label": "fold",
+          "ui_percent": 52.6,
+          "ui_combos": 56.62
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "UI percentages and combo counts are rounded; sums can differ from 100%. They are reference observations, not training targets.",
+    "Labels translate displayed raise-to BB sizes and additional call amounts to the repository's millibb convention. This does not certify equivalence of the entire game tree.",
+    "No hand-specific tables or action EVs were captured. These aggregates must not be compared with unweighted averages across all 169 classes.",
+    "Rake timing, allocation and rounding, later postflop tree and abstraction remain unmatched/unverified.",
+    "The selected library's broad description conflicts with its observed all-in menu; observed legal menus take precedence.",
+    "No solver quality improvement or equilibrium certificate is established by collecting this reference."
+  ]
+}

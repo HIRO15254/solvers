@@ -1,0 +1,65 @@
+{
+  "baseRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+  "broaderGoalComplete": false,
+  "cases": [
+    {
+      "job": "runs/whole-preflop-fit-calibration-20260910/ordinary-job.json",
+      "jobSha256": "7fb71e98533b94218ab035be54946598db516829349942f1b5fee853aa745bc6",
+      "name": "ordinary",
+      "oldJob": "runs/whole-preflop-deviation-20260910/ordinary-job.json",
+      "oldJobSha256": "de38604eb931d284c11769481456059f904630223f101831ed446486563a874e",
+      "oldOutput": "runs/whole-preflop-deviation-20260910/ordinary/stdout.json",
+      "oldOutputSha256": "b47836d97c1e8c4918f08b4612f322b4940249f583ee6835719b70f54dd7f0a8"
+    },
+    {
+      "job": "runs/whole-preflop-fit-calibration-20260910/enumerated-job.json",
+      "jobSha256": "e79af02289242d1e08bf5166077f5a0a7d17f03e746408afa3829ffe3866f945",
+      "name": "enumerated",
+      "oldJob": "runs/whole-preflop-deviation-20260910/enumerated-job.json",
+      "oldJobSha256": "229563a1c4298e30aae7c3b93dd8e4ba4603ca7aeaa594197e2a4ce1e6ce5489",
+      "oldOutput": "runs/whole-preflop-deviation-20260910/enumerated/stdout.json",
+      "oldOutputSha256": "e1fa597220ff95feb2e81c77d08750cf2379f90839a99f808c4532459c3bd5f9"
+    }
+  ],
+  "cloudResourcesStarted": false,
+  "config": "runs/preflop-proposal-20260910/config.toml",
+  "configSha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+  "createdUtc": "2026-09-10T05:32:44.628474+00:00",
+  "diagnostic": {
+    "fitSeed": 2601,
+    "fitTraversalsPerSeat": 131072,
+    "heldOutSamples": 32768,
+    "heldOutSeeds": [
+      2801,
+      2802
+    ]
+  },
+  "helper": "tools/summarize_whole_preflop_deviation.py",
+  "helperDependency": "tools/summarize_raised_opponent.py",
+  "helperDependencySha256": "082a10fa9aef9aee7edf159f5836ed870e082b41957ea01ebb7ffcc4528720b1",
+  "helperSha256": "11af08607224353c334b306c37cfa654ccf0517b893e925e65d7126e55da9e02",
+  "implementation": {
+    "binary": "runs/whole-preflop-deviation-20260910/candidate-v3/audit.exe",
+    "binarySha256": "63757d48f8d2011297eb43647b326d5ba0925d28b837d3d7eac5445ac9d50596",
+    "sourceManifest": "runs/whole-preflop-deviation-20260910/candidate-v3/source-manifest.json",
+    "sourceManifestSha256": "89edf90ae36556a239cf58e61d5501dc563d637469e3ab21b2de5055dbbdf35b",
+    "sourceZip": "runs/whole-preflop-deviation-20260910/candidate-v3/source.zip",
+    "sourceZipSha256": "f7e73146a7aae9882661b7ba646fd1c7610f4cadfa04b38447b45e3548cb2f9d",
+    "verification": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/verification.json",
+    "verificationSha256": "96f97f904781dc1854e3ac6d186f35d2c799bb1c70d1e9385181655e7375dc61"
+  },
+  "plan": "docs/research/active/multiway-preflop-fit-calibration-2026-09-10.md",
+  "planSha256": "66eb424cb73775d4102bf879b16f596673840e634385f507c0a1d85b417e803e",
+  "previousExperiment": "runs/whole-preflop-deviation-20260910/experiment.json",
+  "previousExperimentSha256": "21b658dfa41d2685b98f654dc3d14646e0f73dd41fbc6b9cf7075b8f193c5b74",
+  "runner": "tools/run_average_sampling_measurement.ps1",
+  "runnerSha256": "1cd3e737e0821f2760ad601fbb67a4d3996a64fedfe311b4e08b3fc687f6c7e7",
+  "schemaVersion": "solvers.preflop-fit-calibration/v1",
+  "sidecars": {
+    "prepare.py": "49e21783d495cb42f85506eb6f925184c967e0bb0cc8c5bd3dbe55d7f9f9182f",
+    "run.ps1": "ea0f921f3be716ea6c1b9d3dce2da0e6dd4c64fe1cb2715e709d3f4944da63a9",
+    "validate.py": "78afcc15a9fe43252b5be31bb4328a0392d3114e3c5b37850eed1841c211f9bd"
+  },
+  "status": "ready",
+  "validationReport": "docs/validation/multiway-preflop-fit-calibration-2026-09-10.md"
+}

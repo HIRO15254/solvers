@@ -6,10 +6,23 @@ project contract recorded here.
 
 ## Start here
 
-- Workspace and solver architecture: `docs/architecture.md`.
-- Development workflow and current roadmap: `docs/development.md`.
-- Documentation map and source-of-truth order: `docs/README.md`.
-- License and clean-room boundaries: `LICENSE-POLICY.md`.
+Read `docs/README.md` for document authority and `docs/status.jp.md` for the
+Linear project and task mapping. Linear is the sole authority for task status,
+assignees, blockers, and next actions; do not maintain a Markdown status mirror.
+Specifications, acceptance criteria, and validation evidence stay in Git.
+
+Read the relevant route rather than every long document for every change:
+
+| Change | Read next |
+|---|---|
+| Choose work / acceptance | `docs/product-roadmap.jp.md`, the applicable `docs/plans/` ticket |
+| Solver / game semantics | `docs/architecture.md`, affected crate and oracle tests |
+| Config / CLI / artifacts | Family specification below, implementation map, CLI reference and fixtures |
+| Daemon / viewer | `docs/app-architecture.md`, protocol and daemon tests |
+| Quality / measurement | `docs/validation.jp.md`, experiment manifest and validator |
+| Development / handoff | `docs/development.md` |
+| External references | `LICENSE-POLICY.md` |
+
 - `crates/cfr-ref` is a frozen differential-testing oracle. Do not optimize it
   or share implementation code between it and `engine`/`game`.
 
@@ -55,13 +68,20 @@ and CI.
 
 - `target/` is reserved for Cargo build output. Do not place research reports,
   solver runs, source snapshots, or irreplaceable artifacts there.
-- `runs/` contains ignored solver and benchmark executions. A retained run
-  must carry enough metadata to identify its config, source revision, status,
-  and corresponding validation report.
+- `runs/` is an ignored scratch area for new solver and benchmark executions.
+  Retain a run only after recording its config, source revision, status, and
+  validation report under a per-experiment directory in `experiments/`.
 - `.cache/` contains ignored, reproducible machine-local caches only. Scripts,
   source snapshots, and durable evidence belong in tracked locations.
 - Keep temporary directories out of the repository root.
 - Keep current normative and architectural documents at `docs/` root. Put
-  reproducible evidence under `docs/validation/` and exploratory plans or
-  design work under `docs/research/`.
-- Put Python tests under `tools/tests/`; do not add new `tools/test_*.py` files.
+  accepted execution plans under `docs/plans/` and dated surveys or unaccepted
+  proposals under `docs/research/`. Keep selected experiment evidence under
+  `experiments/<campaign>/<experiment>/`, indexed by `experiments/README.md`.
+  Keep manifests, configs, compact results and validators outside ignored
+  output directories. Large retained artifacts need a location, hash and
+  availability record; ignored or untracked files are not Git-backed evidence.
+- Put general Python tests under `tools/tests/` and experiment-only tests beside
+  their campaign scripts; do not add new `tools/test_*.py` files.
+- Preserve existing unrelated working-tree changes. Coordinate edit ownership
+  for parallel tasks; use isolated worktrees when those edits would conflict.

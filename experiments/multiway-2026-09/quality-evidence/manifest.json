@@ -1,0 +1,286 @@
+{
+  "format": "retained-evidence-manifest",
+  "version": 1,
+  "retained_on": "2026-09-25",
+  "purpose": "Source identities and numerical summaries supporting the dormant Multiway quality decision.",
+  "decision": "experiments/multiway-2026-09/quality-decision.md",
+  "solver_reproducibility": "historical-only",
+  "retained_check": "python experiments/multiway-2026-09/quality-evidence/verify.py",
+  "config_sha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+  "source": {
+    "base_revision": "93c95533dbaca2e8388e82235af5519071fd880f",
+    "working_tree": "uncommitted",
+    "source_manifest_sha256": "89edf90ae36556a239cf58e61d5501dc563d637469e3ab21b2de5055dbbdf35b",
+    "source_zip_sha256": "f7e73146a7aae9882661b7ba646fd1c7610f4cadfa04b38447b45e3548cb2f9d",
+    "binary_sha256": "63757d48f8d2011297eb43647b326d5ba0925d28b837d3d7eac5445ac9d50596"
+  },
+  "limitations": [
+    "No solver or historical full validator was rerun when retaining this evidence.",
+    "The original run used uncommitted sources; the base revision alone is insufficient to reconstruct it.",
+    "Raw outputs, executable and full source archive remain local-only ignored outputs and are not required by the retained-summary check.",
+    "Historical validators require old path layouts and prior-experiment inputs; source hash checks do not establish strategic quality."
+  ],
+  "local_only_inputs": [
+    {
+      "path": "experiments/multiway-2026-09/whole-preflop-deviation-20260910/output/candidate-v3/source.zip",
+      "sha256": "f7e73146a7aae9882661b7ba646fd1c7610f4cadfa04b38447b45e3548cb2f9d",
+      "role": "original source snapshot"
+    },
+    {
+      "path": "experiments/multiway-2026-09/whole-preflop-deviation-20260910/output/candidate-v3/audit.exe",
+      "sha256": "63757d48f8d2011297eb43647b326d5ba0925d28b837d3d7eac5445ac9d50596",
+      "role": "original executable"
+    },
+    {
+      "path": "experiments/multiway-2026-09/whole-preflop-deviation-20260910/output/ordinary/stdout.json",
+      "sha256": "b47836d97c1e8c4918f08b4612f322b4940249f583ee6835719b70f54dd7f0a8",
+      "role": "full raw output; includes complete preflop census"
+    },
+    {
+      "path": "experiments/multiway-2026-09/whole-preflop-deviation-20260910/output/enumerated/stdout.json",
+      "sha256": "e1fa597220ff95feb2e81c77d08750cf2379f90839a99f808c4532459c3bd5f9",
+      "role": "full raw output; includes complete preflop census"
+    },
+    {
+      "path": "experiments/multiway-2026-09/whole-preflop-fit-calibration-20260910/output/ordinary/stdout.json",
+      "sha256": "84c2a3441a2db56bccc4232f27ef21513deb1989682486e5e8898661ab6aaaee",
+      "role": "full raw output; includes complete preflop census"
+    },
+    {
+      "path": "experiments/multiway-2026-09/whole-preflop-fit-calibration-20260910/output/enumerated/stdout.json",
+      "sha256": "8f8fef6df55ff0e89c429fd85bf9042b0e80c44b668cc718e33b51f735811d8d",
+      "role": "full raw output; includes complete preflop census"
+    }
+  ],
+  "experiments": [
+    {
+      "id": "pilot",
+      "result": "experiments/multiway-2026-09/whole-preflop-deviation-20260910/result.json",
+      "provenance": "experiments/multiway-2026-09/quality-evidence/evidence/pilot/experiment.json",
+      "preexecution": "experiments/multiway-2026-09/quality-evidence/evidence/pilot/experiment-preexecution.json",
+      "jobs": {
+        "ordinary": "experiments/multiway-2026-09/quality-evidence/evidence/pilot/ordinary-job.json",
+        "enumerated": "experiments/multiway-2026-09/quality-evidence/evidence/pilot/enumerated-job.json"
+      },
+      "diagnostic": {
+        "fitTraversalsPerSeat": 8192,
+        "fitSeed": 2601,
+        "heldOutSamples": 32768,
+        "heldOutSeeds": [
+          2701,
+          2702
+        ]
+      },
+      "expected_counts": {
+        "total": 24,
+        "negative_means": 24,
+        "positive_means": 0,
+        "pointwise_lower_above_zero": 0,
+        "pointwise_upper_below_zero": 22
+      }
+    },
+    {
+      "id": "calibration",
+      "result": "experiments/multiway-2026-09/whole-preflop-fit-calibration-20260910/result.json",
+      "provenance": "experiments/multiway-2026-09/quality-evidence/evidence/calibration/experiment.json",
+      "preexecution": "experiments/multiway-2026-09/quality-evidence/evidence/calibration/experiment-preexecution.json",
+      "jobs": {
+        "ordinary": "experiments/multiway-2026-09/quality-evidence/evidence/calibration/ordinary-job.json",
+        "enumerated": "experiments/multiway-2026-09/quality-evidence/evidence/calibration/enumerated-job.json"
+      },
+      "diagnostic": {
+        "fitTraversalsPerSeat": 131072,
+        "fitSeed": 2601,
+        "heldOutSamples": 32768,
+        "heldOutSeeds": [
+          2801,
+          2802
+        ]
+      },
+      "expected_counts": {
+        "total": 24,
+        "negative_means": 18,
+        "positive_means": 6,
+        "pointwise_lower_above_zero": 2,
+        "pointwise_upper_below_zero": 8
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/config.toml",
+      "bytes": 9180,
+      "sha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+      "role": "common solver configuration",
+      "original_path": "runs/preflop-proposal-20260910/config.toml"
+    },
+    {
+      "path": "experiments/multiway-2026-09/whole-preflop-deviation-20260910/result.json",
+      "bytes": 118516,
+      "sha256": "ae1f0f84333167e127e69fa06c37f46347a76423dd471c69d484a67b211441f1",
+      "role": "original published numerical summary",
+      "original_path": "experiments/multiway-2026-09/whole-preflop-deviation-20260910/result.json"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/pilot/experiment.json",
+      "bytes": 5733,
+      "sha256": "21b658dfa41d2685b98f654dc3d14646e0f73dd41fbc6b9cf7075b8f193c5b74",
+      "role": "historical execution declaration or validator",
+      "original_path": "runs/whole-preflop-deviation-20260910/experiment.json"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/pilot/experiment-preexecution.json",
+      "bytes": 5566,
+      "sha256": "3ef362b915fdbeb6bf269d1ea3e314b72327d400a5a65d583735b65173eedd79",
+      "role": "historical execution declaration or validator",
+      "original_path": "runs/whole-preflop-deviation-20260910/experiment-preexecution.json"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/pilot/ordinary-job.json",
+      "bytes": 1542,
+      "sha256": "de38604eb931d284c11769481456059f904630223f101831ed446486563a874e",
+      "role": "historical execution declaration or validator",
+      "original_path": "runs/whole-preflop-deviation-20260910/ordinary-job.json"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/pilot/enumerated-job.json",
+      "bytes": 1576,
+      "sha256": "229563a1c4298e30aae7c3b93dd8e4ba4603ca7aeaa594197e2a4ce1e6ce5489",
+      "role": "historical execution declaration or validator",
+      "original_path": "runs/whole-preflop-deviation-20260910/enumerated-job.json"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/pilot/validate_run.py",
+      "bytes": 7717,
+      "sha256": "cfaeefa3e553c8a6e04609ab0173d1dcae111969cc5a9a9f2dd21458ccf6cfa1",
+      "role": "historical execution declaration or validator",
+      "original_path": "runs/whole-preflop-deviation-20260910/validate_run.py"
+    },
+    {
+      "path": "experiments/multiway-2026-09/whole-preflop-fit-calibration-20260910/result.json",
+      "bytes": 138069,
+      "sha256": "eeb54ff86f30efa88f3ccb4c72944c280b6913d1fd942157501ab6909e17464b",
+      "role": "original published numerical summary",
+      "original_path": "experiments/multiway-2026-09/whole-preflop-fit-calibration-20260910/result.json"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/calibration/experiment.json",
+      "bytes": 3749,
+      "sha256": "9f575b3319f827f208977146cabbc753fea9afd46335e5731970d7a18ce2c87a",
+      "role": "historical execution declaration or validator",
+      "original_path": "runs/whole-preflop-fit-calibration-20260910/experiment.json"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/calibration/experiment-preexecution.json",
+      "bytes": 3583,
+      "sha256": "4a7d7a021e3fff49a11a127770e334c96aeda777769b780550561b30d5f3f960",
+      "role": "historical execution declaration or validator",
+      "original_path": "runs/whole-preflop-fit-calibration-20260910/experiment-preexecution.json"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/calibration/ordinary-job.json",
+      "bytes": 1544,
+      "sha256": "7fb71e98533b94218ab035be54946598db516829349942f1b5fee853aa745bc6",
+      "role": "historical execution declaration or validator",
+      "original_path": "runs/whole-preflop-fit-calibration-20260910/ordinary-job.json"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/calibration/enumerated-job.json",
+      "bytes": 1578,
+      "sha256": "e79af02289242d1e08bf5166077f5a0a7d17f03e746408afa3829ffe3866f945",
+      "role": "historical execution declaration or validator",
+      "original_path": "runs/whole-preflop-fit-calibration-20260910/enumerated-job.json"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/calibration/validate.py",
+      "bytes": 8130,
+      "sha256": "78afcc15a9fe43252b5be31bb4328a0392d3114e3c5b37850eed1841c211f9bd",
+      "role": "historical execution declaration or validator",
+      "original_path": "runs/whole-preflop-fit-calibration-20260910/validate.py"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/source/source-manifest.json",
+      "bytes": 26456,
+      "sha256": "89edf90ae36556a239cf58e61d5501dc563d637469e3ab21b2de5055dbbdf35b",
+      "role": "180 original source file identities",
+      "original_path": "runs/whole-preflop-deviation-20260910/candidate-v3/source-manifest.json"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/source/verification/verification.json",
+      "bytes": 3309,
+      "sha256": "96f97f904781dc1854e3ac6d186f35d2c799bb1c70d1e9385181655e7375dc61",
+      "role": "historical verification record; not current test evidence",
+      "original_path": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/verification.json"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/source/verification/fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "historical verification record; not current test evidence",
+      "original_path": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/fmt.log"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/source/verification/clippy.log",
+      "bytes": 156,
+      "sha256": "7b5df51634ae52bbadc7121c6c2c7b94b5f57f158fbcc18dcccd501dafd58de6",
+      "role": "historical verification record; not current test evidence",
+      "original_path": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/clippy.log"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/source/verification/research-clippy.log",
+      "bytes": 156,
+      "sha256": "df291c8b0fc6924d3e2d51fa2f77abedb9b018beaf130e8d61c90c5bb0a18dc9",
+      "role": "historical verification record; not current test evidence",
+      "original_path": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/research-clippy.log"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/source/verification/workspace-tests.log",
+      "bytes": 76248,
+      "sha256": "d874ca0afe4d1e9bd6469c006ac3227ceeeefb512c2610306b221d229876cfd7",
+      "role": "historical verification record; not current test evidence",
+      "original_path": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/workspace-tests.log"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/source/verification/research-example-tests.log",
+      "bytes": 5498,
+      "sha256": "f0217f77994a7b0a1d154ba172cbd5d2e8774dc488175451d8e5eeaefb22ff0c",
+      "role": "historical verification record; not current test evidence",
+      "original_path": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/research-example-tests.log"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/source/verification/research-core-tests.log",
+      "bytes": 29307,
+      "sha256": "77f34449a4e3c596e7f65ed1813b2e964d9e45218f4e03e0c559d11f4733e42f",
+      "role": "historical verification record; not current test evidence",
+      "original_path": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/research-core-tests.log"
+    },
+    {
+      "path": "experiments/multiway-2026-09/quality-evidence/evidence/source/verification/release-build.log",
+      "bytes": 147,
+      "sha256": "88be412d4b9e7bec9f2514785d336997cc6f15edc25c90c651146800b4ec4be1",
+      "role": "historical verification record; not current test evidence",
+      "original_path": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/release-build.log"
+    },
+    {
+      "path": "experiments/multiway-2026-09/scripts/summarize_whole_preflop_deviation.py",
+      "bytes": 10272,
+      "sha256": "11af08607224353c334b306c37cfa654ccf0517b893e925e65d7126e55da9e02",
+      "role": "historical shared validator or runner",
+      "original_path": "tools/summarize_whole_preflop_deviation.py"
+    },
+    {
+      "path": "experiments/multiway-2026-09/scripts/summarize_raised_opponent.py",
+      "bytes": 21102,
+      "sha256": "082a10fa9aef9aee7edf159f5836ed870e082b41957ea01ebb7ffcc4528720b1",
+      "role": "historical shared validator or runner",
+      "original_path": "tools/summarize_raised_opponent.py"
+    },
+    {
+      "path": "experiments/multiway-2026-09/scripts/run_average_sampling_measurement.ps1",
+      "bytes": 5529,
+      "sha256": "1cd3e737e0821f2760ad601fbb67a4d3996a64fedfe311b4e08b3fc687f6c7e7",
+      "role": "historical shared validator or runner",
+      "original_path": "tools/run_average_sampling_measurement.ps1"
+    }
+  ]
+}

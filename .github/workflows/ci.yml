@@ -11,6 +11,22 @@ env:
   RUSTFLAGS: "-D warnings"
 
 jobs:
+  documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Shared tooling tests
+        run: python -m unittest discover -s tools/tests -v
+      - name: Documentation entrypoints and local links
+        run: python tools/check_docs.py
+      - name: Retained Multiway evidence consistency
+        run: python experiments/multiway-2026-09/quality-evidence/verify.py
+      - name: Retained evidence validator tests
+        run: python -B -m unittest discover -s experiments/multiway-2026-09/quality-evidence/tests -v
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -25,3 +41,29 @@ jobs:
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Test (debug)
         run: cargo test --workspace
+
+  research-features:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Compile research examples and feature paths
+        run: cargo check -p cli -p multiway --all-targets --features cli/research-average-sampling,cli/research-regret-sampling,cli/research-draw-abstraction
+      - name: Average-sampling API smoke
+        run: cargo test -p multiway --features research-average-sampling --lib average_sampling_research
+      - name: Regret-sampling smoke
+        run: cargo test -p multiway --features research-regret-sampling --lib solver::regret_sampling::tests
+
+  windows-smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: CLI checkpoint and metrics
+        run: cargo test -p cli --test cli_integration solve_checkpoint_and_metrics_smoke -- --exact
+      - name: CLI resume equivalence
+        run: cargo test -p cli --test cli_integration resume_equivalence_kuhn -- --exact
+      - name: Daemon HTTP and child-process smoke
+        run: cargo test -p daemon --test http_api

@@ -1,0 +1,5114 @@
+{
+  "schemaVersion": "solvers.multiway-production-initialization-evidence/v1",
+  "status": "complete",
+  "dateJapan": "2026-09-10",
+  "report": "docs/validation/multiway-production-initialization-2026-09-10.md",
+  "retainedRoot": "runs/production-initialization-20260910",
+  "source": {
+    "gitRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+    "manifestSha256": "fcc52d588112b95c1bb3f7223812a60861e59bea865e4af1b6cab2e4b73a9560",
+    "sourceZipSha256": "d0cb6500335b58b0b4d6c5805347ece2f6405fd4005adaedd35991dea25fb5b7",
+    "sourceFileCount": 159,
+    "binarySha256": {
+      "research.exe": "81457b7697485bc36b8fc0e59b97137fa65a9abc709ffbf96cc97208c9913e7a",
+      "audit.exe": "065c3a74c19098c44fc31fa72c4b3837b9fa2863c0dc2a4b0a188e008ecbb534"
+    },
+    "identityNote": "Research output sourceRevision is the manifest SHA256; process metadata sourceRevision is the Git base revision. The source manifest/ZIP binds dirty-worktree code."
+  },
+  "inputs": {
+    "freshConfigSha256": "ffac8f4eca263de09e88c1fad13e8ea593b370703993db419030106d7e037108",
+    "restoreConfigSha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+    "restoreConfigDifference": "Only run.max_sweeps is raised from 4096 to 65536 before any restore measurement, so the production session accepts the existing 32768-sweep checkpoint. No training is resumed by the audit.",
+    "checkpoint": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\simple-depth-coverage-20260910\\extended-32768\\checkpoint.mwckpt",
+    "checkpointSha256": "9a18c0927daf7d1b036558b7c87fa658a3055b6366e263385d776ca3bca0bd0a",
+    "harnessSha256": "1cd3e737e0821f2760ad601fbb67a4d3996a64fedfe311b4e08b3fc687f6c7e7",
+    "environment": {
+      "rustcVerbose": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6",
+      "cargo": "cargo 1.97.0 (c980f4866 2026-06-30)",
+      "processorIdentifier": "Intel64 Family 6 Model 165 Stepping 5, GenuineIntel",
+      "logicalProcessors": 16,
+      "platform": "Windows x86_64-pc-windows-msvc",
+      "osVersionObserved": "Microsoft Windows NT 10.0.26200.0",
+      "measurement": "Local processes, one at a time; release target-cpu=native from archived .cargo/config.toml; warm shared EHS cache."
+    }
+  },
+  "cases": [
+    {
+      "case": "fresh1-first",
+      "kind": "fresh",
+      "threads": 1,
+      "repeat": "first",
+      "startedUtc": "2026-09-09T18:51:28.5471439Z",
+      "constructionSeconds": 60.2885421,
+      "solveSeconds": 19.0525483,
+      "processSeconds": 86.283012,
+      "observedPeakWorkingSetBytes": 1397317632,
+      "ehsLoadSecondsRounded": 0.88,
+      "stderrSha256": "2de3aefa2648e82af5b43f5e694d852dd25c159828f54cf09243ca3997cefc91",
+      "stdoutSha256": "0ba629f2911fb426f2386e10ad986ce6b725cd647cbfdf986ed52ef0a96f8075",
+      "measurementSha256": "5348abc464ea2be9ed321b107bbb683c58bc6bd009f7ace1f5ff80ea122fe456",
+      "jobSha256": "110d12905a4c5f331dbf6d5f76fcfe745935ff1362324d1913563433cc78a536",
+      "binarySha256": "81457b7697485bc36b8fc0e59b97137fa65a9abc709ffbf96cc97208c9913e7a",
+      "configSha256": "ffac8f4eca263de09e88c1fad13e8ea593b370703993db419030106d7e037108",
+      "configurationFingerprint": "2c6c182d19e9fe0d5166ce4d403a746fc00925ea5d57abe07bf56d9b7c254cc0",
+      "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+      "solverStateVersion": 4,
+      "arguments": [
+        "--config",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\production-initialization-20260910\\config.toml",
+        "--threads",
+        "1",
+        "--memory",
+        "8GiB",
+        "--cache-dir",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\.cache\\bench-ehs",
+        "--variant",
+        "uniform-one",
+        "--sweeps",
+        "1024",
+        "--skip-evaluation",
+        "--source-revision",
+        "fcc52d588112b95c1bb3f7223812a60861e59bea865e4af1b6cab2e4b73a9560",
+        "--node",
+        "root",
+        "--node",
+        "fold",
+        "--node",
+        "fold/fold",
+        "--node",
+        "fold/fold/fold",
+        "--node",
+        "fold/fold/fold/fold",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000/check/check",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000/check/check/check/check",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000/check/check/check/check",
+        "--node",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500",
+        "--node",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500/check/check/check",
+        "--node",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500/check/check/check/check/check/check"
+      ],
+      "measurementSchema": "solvers.average-sampling-measurement/v1"
+    },
+    {
+      "case": "fresh8-first",
+      "kind": "fresh",
+      "threads": 8,
+      "repeat": "first",
+      "startedUtc": "2026-09-09T18:52:55.1627819Z",
+      "constructionSeconds": 45.9251982,
+      "solveSeconds": 3.7923086,
+      "processSeconds": 56.6377447,
+      "observedPeakWorkingSetBytes": 1404751872,
+      "ehsLoadSecondsRounded": 0.64,
+      "stderrSha256": "f747c18f8e1d4b52b7a3582b242974cb50a4ce0e544f44d3276991a9ff69140b",
+      "stdoutSha256": "6dfd12b0bb4483b932d6776c40259ddd0aa9b3a96108e0057e1caec80b78d315",
+      "measurementSha256": "71f6b22b57ec5f7fd9964c49ad233658fb5d41e321a9d1fd212c2d1a17c06e3e",
+      "jobSha256": "7e9543d7eb1cd674724ed22b087febe3b58a0e028c1c791977be9dbf416f077c",
+      "binarySha256": "81457b7697485bc36b8fc0e59b97137fa65a9abc709ffbf96cc97208c9913e7a",
+      "configSha256": "ffac8f4eca263de09e88c1fad13e8ea593b370703993db419030106d7e037108",
+      "configurationFingerprint": "2c6c182d19e9fe0d5166ce4d403a746fc00925ea5d57abe07bf56d9b7c254cc0",
+      "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+      "solverStateVersion": 4,
+      "arguments": [
+        "--config",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\production-initialization-20260910\\config.toml",
+        "--threads",
+        "8",
+        "--memory",
+        "8GiB",
+        "--cache-dir",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\.cache\\bench-ehs",
+        "--variant",
+        "uniform-one",
+        "--sweeps",
+        "1024",
+        "--skip-evaluation",
+        "--source-revision",
+        "fcc52d588112b95c1bb3f7223812a60861e59bea865e4af1b6cab2e4b73a9560",
+        "--node",
+        "root",
+        "--node",
+        "fold",
+        "--node",
+        "fold/fold",
+        "--node",
+        "fold/fold/fold",
+        "--node",
+        "fold/fold/fold/fold",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000/check/check",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000/check/check/check/check",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000/check/check/check/check",
+        "--node",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500",
+        "--node",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500/check/check/check",
+        "--node",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500/check/check/check/check/check/check"
+      ],
+      "measurementSchema": "solvers.average-sampling-measurement/v1"
+    },
+    {
+      "case": "restore8-first",
+      "kind": "restore",
+      "threads": 8,
+      "repeat": "first",
+      "startedUtc": "2026-09-09T18:55:01.5895961Z",
+      "constructionSeconds": 46.0623451,
+      "solveSeconds": null,
+      "processSeconds": 47.5078699,
+      "observedPeakWorkingSetBytes": 1949962240,
+      "ehsLoadSecondsRounded": 0.64,
+      "stderrSha256": "f747c18f8e1d4b52b7a3582b242974cb50a4ce0e544f44d3276991a9ff69140b",
+      "stdoutSha256": "f77e97b8ccf71398a54fc1b09016ba3877b4daad4b3777bcea10be60538076f8",
+      "measurementSha256": "9e18f97740c52ca78a6ca2cfc2e7a16f9deb5f3606637284506c0f9469217374",
+      "jobSha256": "b3cbe97457e3f6cc1f842fc8f46a86b13a1b3c106b3867c5f2d4e197bfdfbc13",
+      "binarySha256": "065c3a74c19098c44fc31fa72c4b3837b9fa2863c0dc2a4b0a188e008ecbb534",
+      "configSha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+      "configurationFingerprint": "2c6c182d19e9fe0d5166ce4d403a746fc00925ea5d57abe07bf56d9b7c254cc0",
+      "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+      "solverStateVersion": 4,
+      "arguments": [
+        "--config",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\production-initialization-20260910\\restore-config.toml",
+        "--threads",
+        "8",
+        "--memory",
+        "8GiB",
+        "--cache-dir",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\.cache\\bench-ehs",
+        "--checkpoint",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\simple-depth-coverage-20260910\\extended-32768\\checkpoint.mwckpt",
+        "--samples",
+        "128",
+        "--evaluation-seeds",
+        "101,202",
+        "--br-traversals",
+        "1",
+        "--node-frequency-samples",
+        "4096",
+        "--node",
+        "root",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+        "--coverage-prefix",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+        "--coverage-prefix",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000",
+        "--coverage-prefix",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+        "--coverage-prefix",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500",
+        "--coverage-samples",
+        "8192"
+      ],
+      "measurementSchema": "solvers.checkpoint-audit-measurement/v1"
+    },
+    {
+      "case": "restore1-first",
+      "kind": "restore",
+      "threads": 1,
+      "repeat": "first",
+      "startedUtc": "2026-09-09T18:55:49.3367537Z",
+      "constructionSeconds": 61.3534392,
+      "solveSeconds": null,
+      "processSeconds": 66.4048881,
+      "observedPeakWorkingSetBytes": 1946222592,
+      "ehsLoadSecondsRounded": 0.65,
+      "stderrSha256": "d1adfcf709f25505e46c2cdc6e45e22eaa2293a52479437019b71095a7f225d6",
+      "stdoutSha256": "ec2f8a6c086bed8e34e0df06015cf04373dd85946beb2789653fdb36cc4babf8",
+      "measurementSha256": "324401aa45b862785bf4f1c2925ccf51bc7e5cd9823a0e51e04d5ddf83b60144",
+      "jobSha256": "b0995be20dde9bee1667d135d7d6cf2e66a5316c278ad706ffffca307daa6669",
+      "binarySha256": "065c3a74c19098c44fc31fa72c4b3837b9fa2863c0dc2a4b0a188e008ecbb534",
+      "configSha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+      "configurationFingerprint": "2c6c182d19e9fe0d5166ce4d403a746fc00925ea5d57abe07bf56d9b7c254cc0",
+      "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+      "solverStateVersion": 4,
+      "arguments": [
+        "--config",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\production-initialization-20260910\\restore-config.toml",
+        "--threads",
+        "1",
+        "--memory",
+        "8GiB",
+        "--cache-dir",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\.cache\\bench-ehs",
+        "--checkpoint",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\simple-depth-coverage-20260910\\extended-32768\\checkpoint.mwckpt",
+        "--samples",
+        "128",
+        "--evaluation-seeds",
+        "101,202",
+        "--br-traversals",
+        "1",
+        "--node-frequency-samples",
+        "4096",
+        "--node",
+        "root",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+        "--coverage-prefix",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+        "--coverage-prefix",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000",
+        "--coverage-prefix",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+        "--coverage-prefix",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500",
+        "--coverage-samples",
+        "8192"
+      ],
+      "measurementSchema": "solvers.checkpoint-audit-measurement/v1"
+    },
+    {
+      "case": "fresh8-repeat",
+      "kind": "fresh",
+      "threads": 8,
+      "repeat": "repeat",
+      "startedUtc": "2026-09-09T18:58:19.0034981Z",
+      "constructionSeconds": 45.9350019,
+      "solveSeconds": 3.952312,
+      "processSeconds": 56.7858774,
+      "observedPeakWorkingSetBytes": 1404940288,
+      "ehsLoadSecondsRounded": 0.64,
+      "stderrSha256": "f747c18f8e1d4b52b7a3582b242974cb50a4ce0e544f44d3276991a9ff69140b",
+      "stdoutSha256": "c0ef8b2e91e53c06a019d84d17a56ed0f7a0e571091a25f0dc6290710f292662",
+      "measurementSha256": "e18d956338405ee863ad35bfcce8a29038563b2be6c508113cece4508095b056",
+      "jobSha256": "7e9543d7eb1cd674724ed22b087febe3b58a0e028c1c791977be9dbf416f077c",
+      "binarySha256": "81457b7697485bc36b8fc0e59b97137fa65a9abc709ffbf96cc97208c9913e7a",
+      "configSha256": "ffac8f4eca263de09e88c1fad13e8ea593b370703993db419030106d7e037108",
+      "configurationFingerprint": "2c6c182d19e9fe0d5166ce4d403a746fc00925ea5d57abe07bf56d9b7c254cc0",
+      "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+      "solverStateVersion": 4,
+      "arguments": [
+        "--config",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\production-initialization-20260910\\config.toml",
+        "--threads",
+        "8",
+        "--memory",
+        "8GiB",
+        "--cache-dir",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\.cache\\bench-ehs",
+        "--variant",
+        "uniform-one",
+        "--sweeps",
+        "1024",
+        "--skip-evaluation",
+        "--source-revision",
+        "fcc52d588112b95c1bb3f7223812a60861e59bea865e4af1b6cab2e4b73a9560",
+        "--node",
+        "root",
+        "--node",
+        "fold",
+        "--node",
+        "fold/fold",
+        "--node",
+        "fold/fold/fold",
+        "--node",
+        "fold/fold/fold/fold",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000/check/check",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000/check/check/check/check",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000/check/check/check/check",
+        "--node",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500",
+        "--node",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500/check/check/check",
+        "--node",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500/check/check/check/check/check/check"
+      ],
+      "measurementSchema": "solvers.average-sampling-measurement/v1"
+    },
+    {
+      "case": "fresh1-repeat",
+      "kind": "fresh",
+      "threads": 1,
+      "repeat": "repeat",
+      "startedUtc": "2026-09-09T18:59:16.0933707Z",
+      "constructionSeconds": 59.5827302,
+      "solveSeconds": 18.8571695,
+      "processSeconds": 85.3349868,
+      "observedPeakWorkingSetBytes": 1397374976,
+      "ehsLoadSecondsRounded": 0.65,
+      "stderrSha256": "d1adfcf709f25505e46c2cdc6e45e22eaa2293a52479437019b71095a7f225d6",
+      "stdoutSha256": "5dac4923d5c6c7e0586fe45cfed0d5e3f1e6cce378a7e0170cbcad654ab50b20",
+      "measurementSha256": "f0ff70845c6a0df8115c9ed60b3f4ff907c2102fbb02964e35499cb357076efb",
+      "jobSha256": "110d12905a4c5f331dbf6d5f76fcfe745935ff1362324d1913563433cc78a536",
+      "binarySha256": "81457b7697485bc36b8fc0e59b97137fa65a9abc709ffbf96cc97208c9913e7a",
+      "configSha256": "ffac8f4eca263de09e88c1fad13e8ea593b370703993db419030106d7e037108",
+      "configurationFingerprint": "2c6c182d19e9fe0d5166ce4d403a746fc00925ea5d57abe07bf56d9b7c254cc0",
+      "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+      "solverStateVersion": 4,
+      "arguments": [
+        "--config",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\production-initialization-20260910\\config.toml",
+        "--threads",
+        "1",
+        "--memory",
+        "8GiB",
+        "--cache-dir",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\.cache\\bench-ehs",
+        "--variant",
+        "uniform-one",
+        "--sweeps",
+        "1024",
+        "--skip-evaluation",
+        "--source-revision",
+        "fcc52d588112b95c1bb3f7223812a60861e59bea865e4af1b6cab2e4b73a9560",
+        "--node",
+        "root",
+        "--node",
+        "fold",
+        "--node",
+        "fold/fold",
+        "--node",
+        "fold/fold/fold",
+        "--node",
+        "fold/fold/fold/fold",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000/check/check",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000/check/check/check/check",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000/check/check/check/check",
+        "--node",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500",
+        "--node",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500/check/check/check",
+        "--node",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500/check/check/check/check/check/check"
+      ],
+      "measurementSchema": "solvers.average-sampling-measurement/v1"
+    },
+    {
+      "case": "restore1-repeat",
+      "kind": "restore",
+      "threads": 1,
+      "repeat": "repeat",
+      "startedUtc": "2026-09-09T19:00:41.7264923Z",
+      "constructionSeconds": 61.5258954,
+      "solveSeconds": null,
+      "processSeconds": 66.5044767,
+      "observedPeakWorkingSetBytes": 1946169344,
+      "ehsLoadSecondsRounded": 0.64,
+      "stderrSha256": "f747c18f8e1d4b52b7a3582b242974cb50a4ce0e544f44d3276991a9ff69140b",
+      "stdoutSha256": "f0a65997d66ca2f33dfe1f708f576a38b20ec9c927f07e87305b1f335feda524",
+      "measurementSha256": "8a35189ecac27b4eefaf81644da31f64a478294eea145582574d99909505c1b2",
+      "jobSha256": "b0995be20dde9bee1667d135d7d6cf2e66a5316c278ad706ffffca307daa6669",
+      "binarySha256": "065c3a74c19098c44fc31fa72c4b3837b9fa2863c0dc2a4b0a188e008ecbb534",
+      "configSha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+      "configurationFingerprint": "2c6c182d19e9fe0d5166ce4d403a746fc00925ea5d57abe07bf56d9b7c254cc0",
+      "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+      "solverStateVersion": 4,
+      "arguments": [
+        "--config",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\production-initialization-20260910\\restore-config.toml",
+        "--threads",
+        "1",
+        "--memory",
+        "8GiB",
+        "--cache-dir",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\.cache\\bench-ehs",
+        "--checkpoint",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\simple-depth-coverage-20260910\\extended-32768\\checkpoint.mwckpt",
+        "--samples",
+        "128",
+        "--evaluation-seeds",
+        "101,202",
+        "--br-traversals",
+        "1",
+        "--node-frequency-samples",
+        "4096",
+        "--node",
+        "root",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+        "--coverage-prefix",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+        "--coverage-prefix",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000",
+        "--coverage-prefix",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+        "--coverage-prefix",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500",
+        "--coverage-samples",
+        "8192"
+      ],
+      "measurementSchema": "solvers.checkpoint-audit-measurement/v1"
+    },
+    {
+      "case": "restore8-repeat",
+      "kind": "restore",
+      "threads": 8,
+      "repeat": "repeat",
+      "startedUtc": "2026-09-09T19:01:48.4503632Z",
+      "constructionSeconds": 46.0789226,
+      "solveSeconds": null,
+      "processSeconds": 47.3696104,
+      "observedPeakWorkingSetBytes": 1949847552,
+      "ehsLoadSecondsRounded": 0.64,
+      "stderrSha256": "f747c18f8e1d4b52b7a3582b242974cb50a4ce0e544f44d3276991a9ff69140b",
+      "stdoutSha256": "3e91ed1a76fdc7a1ce4a50a5be2cbf02efc18bf9190d91082766bbf310500fe2",
+      "measurementSha256": "9793125daecf08f07e873514d1752a219f754506087ab6beb93903143cb46ed0",
+      "jobSha256": "b3cbe97457e3f6cc1f842fc8f46a86b13a1b3c106b3867c5f2d4e197bfdfbc13",
+      "binarySha256": "065c3a74c19098c44fc31fa72c4b3837b9fa2863c0dc2a4b0a188e008ecbb534",
+      "configSha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+      "configurationFingerprint": "2c6c182d19e9fe0d5166ce4d403a746fc00925ea5d57abe07bf56d9b7c254cc0",
+      "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+      "solverStateVersion": 4,
+      "arguments": [
+        "--config",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\production-initialization-20260910\\restore-config.toml",
+        "--threads",
+        "8",
+        "--memory",
+        "8GiB",
+        "--cache-dir",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\.cache\\bench-ehs",
+        "--checkpoint",
+        "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\simple-depth-coverage-20260910\\extended-32768\\checkpoint.mwckpt",
+        "--samples",
+        "128",
+        "--evaluation-seeds",
+        "101,202",
+        "--br-traversals",
+        "1",
+        "--node-frequency-samples",
+        "4096",
+        "--node",
+        "root",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+        "--node",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+        "--coverage-prefix",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+        "--coverage-prefix",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000",
+        "--coverage-prefix",
+        "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+        "--coverage-prefix",
+        "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500",
+        "--coverage-samples",
+        "8192"
+      ],
+      "measurementSchema": "solvers.checkpoint-audit-measurement/v1"
+    }
+  ],
+  "groupMedians": {
+    "fresh1": {
+      "n": 2,
+      "constructionSecondsMedian": 59.93563615,
+      "processSecondsMedian": 85.8089994,
+      "observedPeakWorkingSetBytesMedian": 1397346304.0,
+      "solveSecondsMedian": 18.9548589
+    },
+    "fresh8": {
+      "n": 2,
+      "constructionSecondsMedian": 45.93010005,
+      "processSecondsMedian": 56.711811049999994,
+      "observedPeakWorkingSetBytesMedian": 1404846080.0,
+      "solveSecondsMedian": 3.8723103
+    },
+    "restore1": {
+      "n": 2,
+      "constructionSecondsMedian": 61.439667299999996,
+      "processSecondsMedian": 66.4546824,
+      "observedPeakWorkingSetBytesMedian": 1946195968.0
+    },
+    "restore8": {
+      "n": 2,
+      "constructionSecondsMedian": 46.07063385,
+      "processSecondsMedian": 47.43874015,
+      "observedPeakWorkingSetBytesMedian": 1949904896.0
+    }
+  },
+  "comparisons": {
+    "fresh": {
+      "constructionTimeReduction": 0.23367627341017216,
+      "constructionSpeedup": 1.3049315391160354,
+      "constructionSecondsSaved": 14.0055361,
+      "observedPeakDifferenceBytes": 7499776.0,
+      "observedPeakFractionIncrease": 0.005367156286549379
+    },
+    "restore": {
+      "constructionTimeReduction": 0.25014838337186107,
+      "constructionSpeedup": 1.3335971781946732,
+      "constructionSecondsSaved": 15.369033449999996,
+      "observedPeakDifferenceBytes": 3708928.0,
+      "observedPeakFractionIncrease": 0.0019057320336612893
+    }
+  },
+  "identity": {
+    "fresh": {
+      "identicalNonTimingResults": true,
+      "cases": 4,
+      "canonicalSha256": "0bc7f9d1417575eaa598fa7852940c62dc59594bb99def9d8389afdecc06a8fa"
+    },
+    "restore": {
+      "identicalNonTimingResults": true,
+      "cases": 4,
+      "canonicalSha256": "9fdeb4f49c360b22d2febff06f853fba7f778a46e04738b5a2090c0dad57e5a6"
+    }
+  },
+  "freshNodeContexts": [
+    {
+      "requested": "root",
+      "history": "00000000000000000000000000000000",
+      "actor": 3,
+      "street": "preflop",
+      "activeOpponents": 5
+    },
+    {
+      "requested": "fold",
+      "history": "aa682c5b05922f0463f8ec1733821d42",
+      "actor": 4,
+      "street": "preflop",
+      "activeOpponents": 4
+    },
+    {
+      "requested": "fold/fold",
+      "history": "76edbf1ab7ec6e4cf36eb73924ab45d3",
+      "actor": 5,
+      "street": "preflop",
+      "activeOpponents": 3
+    },
+    {
+      "requested": "fold/fold/fold",
+      "history": "48eb85a77a6e45460986c07bdde524e6",
+      "actor": 0,
+      "street": "preflop",
+      "activeOpponents": 2
+    },
+    {
+      "requested": "fold/fold/fold/fold",
+      "history": "9f19fd2c6bb3147c16fd33531d8d9261",
+      "actor": 1,
+      "street": "preflop",
+      "activeOpponents": 1
+    },
+    {
+      "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+      "history": "5ebdea819e7b37aee4f9590419b75ca9",
+      "actor": 1,
+      "street": "preflop",
+      "activeOpponents": 1
+    },
+    {
+      "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+      "history": "5c4d807237a5b958777fc1e112b6216a",
+      "actor": 2,
+      "street": "preflop",
+      "activeOpponents": 1
+    },
+    {
+      "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+      "history": "f2b9810547e1fdd6d50aef60c84ddfe6",
+      "actor": 1,
+      "street": "preflop",
+      "activeOpponents": 1
+    },
+    {
+      "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000",
+      "history": "db223ec7c534cd69b31a74708fe3c2d1",
+      "actor": 1,
+      "street": "flop",
+      "activeOpponents": 1
+    },
+    {
+      "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000/check/check",
+      "history": "daeed8de09f49ff4c6984cdd9e5f2e39",
+      "actor": 1,
+      "street": "turn",
+      "activeOpponents": 1
+    },
+    {
+      "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000/check/check/check/check",
+      "history": "ec8364fd529395a077b26a599dc8e0e3",
+      "actor": 1,
+      "street": "river",
+      "activeOpponents": 1
+    },
+    {
+      "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000",
+      "history": "3af3563e1f8871f32ac66690c928108d",
+      "actor": 1,
+      "street": "flop",
+      "activeOpponents": 1
+    },
+    {
+      "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000/check/check/check/check",
+      "history": "ed77eafa3320231678ae9993ae01581a",
+      "actor": 1,
+      "street": "river",
+      "activeOpponents": 1
+    },
+    {
+      "requested": "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500",
+      "history": "4151089d6b7f0776d6f34d48604f54da",
+      "actor": 3,
+      "street": "flop",
+      "activeOpponents": 2
+    },
+    {
+      "requested": "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500/check/check/check",
+      "history": "a5a18c4c4fedb8a40b213700c4831a2a",
+      "actor": 3,
+      "street": "turn",
+      "activeOpponents": 2
+    },
+    {
+      "requested": "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500/check/check/check/check/check/check",
+      "history": "86599afe4e294e3e6fcd0d7b5a993b0a",
+      "actor": 3,
+      "street": "river",
+      "activeOpponents": 2
+    }
+  ],
+  "normalization": "Fresh: remove result.threads and result.solve_elapsed_secs; compare full result and node contexts. Restore: recursively remove only constructionElapsedSecs, elapsedSecs, frequencyElapsedSecs. Canonical SHA256 uses sorted-key compact UTF-8 JSON. Config/source/model/binary identities and all operational argument changes are separately checked. Stderr contains only the expected EHS cache-load timing.",
+  "verification": {
+    "status": "complete",
+    "sourceManifestSha256": "fcc52d588112b95c1bb3f7223812a60861e59bea865e4af1b6cab2e4b73a9560",
+    "sourceFileCount": 159,
+    "checks": [
+      {
+        "command": "cargo fmt --all --check",
+        "status": "pass",
+        "log": "runs/production-initialization-20260910/verification/fmt.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": "cargo clippy --workspace --all-targets -- -D warnings",
+        "status": "pass",
+        "log": "runs/production-initialization-20260910/verification/clippy.log",
+        "sha256": "8e93cfa52c042a8e229d6fd93f8ba35e4146c559907b366b7e664183e94ad42b"
+      },
+      {
+        "command": "cargo test --workspace",
+        "status": "pass",
+        "log": "runs/production-initialization-20260910/verification/workspace-tests.log",
+        "sha256": "af19c33ce62326f6098ca66050b0cf58eea88118992797b403a130c3b95c06b6",
+        "suites": 48,
+        "passed": 756,
+        "failed": 0,
+        "ignored": 30
+      },
+      {
+        "command": "cargo clippy -p cli --all-targets --features research-draw-abstraction -- -D warnings",
+        "status": "pass",
+        "log": "runs/production-initialization-20260910/verification/research-clippy.log",
+        "sha256": "2948841ee7ec3d7016e4dd9aa8e0a34eec5f6a1633998acab67a70340beff5dc"
+      },
+      {
+        "command": "cargo test -p cli --examples --features research-draw-abstraction",
+        "status": "pass",
+        "log": "runs/production-initialization-20260910/verification/research-example-tests.log",
+        "sha256": "64421907882ec9d201e44a5d21f63b82242568132ee32ed2feb2ea4721c88293",
+        "suites": 7,
+        "passed": 29,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "command": "cargo test -p multiway --features research-average-sampling average_sampling_research",
+        "status": "pass",
+        "log": "runs/production-initialization-20260910/verification/research-core-tests.log",
+        "sha256": "818ee698dc330c7b01f0edd5db74df238f78b1a03c70411d5373c9358c8d6b09",
+        "suites": 1,
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "command": "cargo test -p cli production_session_initialization_and_resume_preserve_thread_independent_state",
+        "status": "pass",
+        "log": "runs/production-initialization-20260910/verification/cli-initialization-test.log",
+        "sha256": "24a567ad81291f88a292fabb4fe37520c45a70c4981f0b4fe1773501504277c2",
+        "suites": 8,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "command": "cargo build --release -p cli --example mw_average_sampling_research --example mw_checkpoint_audit --features research-average-sampling",
+        "status": "pass",
+        "log": "runs/production-initialization-20260910/verification/release-build.log",
+        "sha256": "6ff0477ccdba9879f12bacb9d2a38189c82531dbffeab667ddd2259115eb500b"
+      }
+    ],
+    "focusedCoreInitializationTestsIncluded": 5,
+    "cliInitializationTestsIncluded": 1,
+    "harnessParse": "pass",
+    "earlierTestAuthoringFailures": [
+      "cli-initialization-test-first-attempt.log: test helper argument order, corrected before final checks",
+      "cli-initialization-test-second-attempt.log: test target below restored sweeps, corrected before final checks"
+    ]
+  },
+  "decision": "Adopt configured private-pool ordered public-tree materialization in production new/resume, research-session construction and formal-profile reconstruction. Keep serial admission and existing serial core APIs; no algorithm/state/wire identity changes.",
+  "limitations": [
+    "Two repeated observations per kind/thread count on one local 16-logical-CPU Windows machine, warm EHS cache, one Simple K32 tree. No confidence interval or cross-machine scaling guarantee.",
+    "Process time includes existing thread-dependent solving/evaluation and cannot all be attributed to new initialization.",
+    "Observed Windows lifetime peak working set is polled every 50ms; final unsampled interval may be omitted. Arena bytes are not a process RAM guarantee; temporary tree merge storage remains.",
+    "Fresh large-tree equality covers the full raw regret fingerprint, counters and 16 exported histories; core small real-Holdem tests separately cover every tree/arena/state field and checkpoint bytes.",
+    "Restored diagnostics are exact across tested threads but tiny deviator budgets are not strong BR/convergence evidence.",
+    "No equilibrium, exploitability, abstraction fidelity or balanced strategy-quality improvement is claimed from initialization speedup.",
+    "Serial preflight still costs about 30 seconds in the earlier phase benchmark; repeated formal-profile reconstruction and larger-machine scaling remain opportunities."
+  ],
+  "cloudResourcesStarted": false,
+  "freshOutputSummary": {
+    "variant": "uniform-one",
+    "metrics": {
+      "sweeps": 1024,
+      "traversals": 6144,
+      "infosets": 538910,
+      "memory_bytes": 545720720,
+      "total_deal_attempts": 6144,
+      "mean_deal_attempts": 1.0,
+      "hand_updates": 4091904,
+      "average_positive_regret": [
+        52.70606265452692,
+        81.10016414840774,
+        82.37999041622092,
+        52.25078876738709,
+        52.5966414172021,
+        46.293969345177224
+      ]
+    },
+    "current_regret_fingerprint": "017c15d608eea38398824545c5cb1608d5e0c1723f26690af60873a5970a0fba",
+    "evaluations": [],
+    "coverage_evaluations": [],
+    "histories": [
+      {
+        "history": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "reportedStrategyRows": 169,
+        "statusCounts": {
+          "average-observed": 169
+        },
+        "strategyRowsCanonicalSha256": "5f4a0c4bb4d39463185c00bd12a50c471eee0ccd929030dad259435d7a70e2e8"
+      },
+      {
+        "history": [
+          170,
+          104,
+          44,
+          91,
+          5,
+          146,
+          47,
+          4,
+          99,
+          248,
+          236,
+          23,
+          51,
+          130,
+          29,
+          66
+        ],
+        "reportedStrategyRows": 169,
+        "statusCounts": {
+          "average-observed": 169
+        },
+        "strategyRowsCanonicalSha256": "0bd0e3e37e4c198c1f4e732c3d32ba7d0af3942fd2281fefd0430e895cdfe21b"
+      },
+      {
+        "history": [
+          118,
+          237,
+          191,
+          26,
+          183,
+          236,
+          110,
+          76,
+          243,
+          110,
+          183,
+          57,
+          36,
+          171,
+          69,
+          211
+        ],
+        "reportedStrategyRows": 169,
+        "statusCounts": {
+          "average-observed": 169
+        },
+        "strategyRowsCanonicalSha256": "f140aecb6d167650fc7cf2f35bc7282beac0ba6bd13ba38b128bcbb7abee3fdc"
+      },
+      {
+        "history": [
+          72,
+          235,
+          133,
+          167,
+          122,
+          110,
+          69,
+          70,
+          9,
+          134,
+          192,
+          123,
+          221,
+          229,
+          36,
+          230
+        ],
+        "reportedStrategyRows": 169,
+        "statusCounts": {
+          "average-observed": 169
+        },
+        "strategyRowsCanonicalSha256": "247408609d033fbfb63832393def915bfa1949a249238e85e577f7ed6162b939"
+      },
+      {
+        "history": [
+          159,
+          25,
+          253,
+          44,
+          107,
+          179,
+          20,
+          124,
+          22,
+          253,
+          51,
+          83,
+          29,
+          141,
+          146,
+          97
+        ],
+        "reportedStrategyRows": 169,
+        "statusCounts": {
+          "average-observed": 169
+        },
+        "strategyRowsCanonicalSha256": "b953367945bf5af6bb76d489a023b6619e098ea0f9e8dfd495f3fb569c00eb4a"
+      },
+      {
+        "history": [
+          94,
+          189,
+          234,
+          129,
+          158,
+          123,
+          55,
+          174,
+          228,
+          249,
+          89,
+          4,
+          25,
+          183,
+          92,
+          169
+        ],
+        "reportedStrategyRows": 169,
+        "statusCounts": {
+          "average-observed": 162,
+          "zero-average-mass-omitted": 7
+        },
+        "strategyRowsCanonicalSha256": "feab50ca965d3b7c72c45e3205c15d639b183d490b71e872c7abecd6ba6c3cdd"
+      },
+      {
+        "history": [
+          92,
+          77,
+          128,
+          114,
+          55,
+          165,
+          185,
+          88,
+          119,
+          127,
+          193,
+          225,
+          18,
+          182,
+          33,
+          106
+        ],
+        "reportedStrategyRows": 169,
+        "statusCounts": {
+          "average-observed": 77,
+          "zero-average-mass-omitted": 92
+        },
+        "strategyRowsCanonicalSha256": "3454b891103360918b4d062d1d5bc832707de7ac47196ff70a3fef4adb173897"
+      },
+      {
+        "history": [
+          242,
+          185,
+          129,
+          5,
+          71,
+          225,
+          253,
+          214,
+          213,
+          10,
+          239,
+          96,
+          200,
+          77,
+          223,
+          230
+        ],
+        "reportedStrategyRows": 169,
+        "statusCounts": {
+          "average-observed": 54,
+          "zero-average-mass-omitted": 115
+        },
+        "strategyRowsCanonicalSha256": "a7013ba8b9d5f605e842adbab7ebde65aa2b2284b1606297611ff097b5bd5f4d"
+      },
+      {
+        "history": [
+          219,
+          34,
+          62,
+          199,
+          197,
+          52,
+          205,
+          105,
+          179,
+          26,
+          116,
+          112,
+          143,
+          227,
+          194,
+          209
+        ],
+        "reportedStrategyRows": 32,
+        "statusCounts": {
+          "average-observed": 31,
+          "zero-average-mass-omitted": 1
+        },
+        "strategyRowsCanonicalSha256": "647f96e666116a9bfb80db53fcc7dad1c5b4cbb6d78fdadeffc6867dad5b68e0"
+      },
+      {
+        "history": [
+          218,
+          238,
+          216,
+          222,
+          9,
+          244,
+          159,
+          244,
+          198,
+          152,
+          76,
+          221,
+          158,
+          95,
+          46,
+          57
+        ],
+        "reportedStrategyRows": 31,
+        "statusCounts": {
+          "average-observed": 22,
+          "zero-average-mass-omitted": 9
+        },
+        "strategyRowsCanonicalSha256": "4bba93dfe293079763f1cfb0ac45ac554d9cf659d54b5b08985742d89d65700a"
+      },
+      {
+        "history": [
+          236,
+          131,
+          100,
+          253,
+          82,
+          147,
+          149,
+          160,
+          119,
+          178,
+          106,
+          89,
+          157,
+          200,
+          224,
+          227
+        ],
+        "reportedStrategyRows": 0,
+        "statusCounts": {},
+        "strategyRowsCanonicalSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "history": [
+          58,
+          243,
+          86,
+          62,
+          31,
+          136,
+          113,
+          243,
+          42,
+          198,
+          102,
+          144,
+          201,
+          40,
+          16,
+          141
+        ],
+        "reportedStrategyRows": 32,
+        "statusCounts": {
+          "average-observed": 30,
+          "zero-average-mass-omitted": 2
+        },
+        "strategyRowsCanonicalSha256": "c5af7344f05eb1c1d8639d408d0402c4cc329c9c962e34f44ba7aa7abf3ff3e2"
+      },
+      {
+        "history": [
+          237,
+          119,
+          234,
+          250,
+          51,
+          32,
+          35,
+          22,
+          120,
+          174,
+          153,
+          147,
+          174,
+          1,
+          88,
+          26
+        ],
+        "reportedStrategyRows": 0,
+        "statusCounts": {},
+        "strategyRowsCanonicalSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "history": [
+          65,
+          81,
+          8,
+          157,
+          107,
+          127,
+          7,
+          118,
+          214,
+          243,
+          77,
+          72,
+          96,
+          79,
+          84,
+          218
+        ],
+        "reportedStrategyRows": 32,
+        "statusCounts": {
+          "average-observed": 32
+        },
+        "strategyRowsCanonicalSha256": "e90e62e531ccb0fee483213300f219ee5a4de9b11ef1a5633f84966370aa21eb"
+      },
+      {
+        "history": [
+          165,
+          161,
+          140,
+          76,
+          79,
+          237,
+          184,
+          164,
+          11,
+          33,
+          55,
+          0,
+          196,
+          131,
+          26,
+          42
+        ],
+        "reportedStrategyRows": 0,
+        "statusCounts": {},
+        "strategyRowsCanonicalSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "history": [
+          134,
+          89,
+          154,
+          254,
+          78,
+          41,
+          78,
+          62,
+          111,
+          205,
+          13,
+          123,
+          90,
+          153,
+          59,
+          10
+        ],
+        "reportedStrategyRows": 0,
+        "statusCounts": {},
+        "strategyRowsCanonicalSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    ]
+  },
+  "restoreOutputSummary": {
+    "schemaVersion": "solvers.multiway-checkpoint-audit/v1",
+    "checkpoint": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\simple-depth-coverage-20260910\\extended-32768\\checkpoint.mwckpt",
+    "config": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\production-initialization-20260910\\restore-config.toml",
+    "sweeps": 32768,
+    "solverStateVersion": 4,
+    "configurationFingerprint": "2c6c182d19e9fe0d5166ce4d403a746fc00925ea5d57abe07bf56d9b7c254cc0",
+    "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+    "policyArena": {
+      "nodes": 966141,
+      "columns": 31854277,
+      "slots": 64818941,
+      "bytes": 545720720,
+      "pages_committed": true
+    },
+    "evaluationSamplesPerSeed": 128,
+    "evaluationSeeds": [
+      101,
+      202
+    ],
+    "deviatorTraining": {
+      "seed": 7093782259666545012,
+      "traversalsPerSeat": 1,
+      "coverage": [
+        {
+          "traversals": 1,
+          "visited_infosets": 1,
+          "retained_infosets": 0,
+          "total_visits": 1,
+          "retained_visits": 0
+        },
+        {
+          "traversals": 1,
+          "visited_infosets": 1,
+          "retained_infosets": 0,
+          "total_visits": 1,
+          "retained_visits": 0
+        },
+        {
+          "traversals": 1,
+          "visited_infosets": 18,
+          "retained_infosets": 0,
+          "total_visits": 18,
+          "retained_visits": 0
+        },
+        {
+          "traversals": 1,
+          "visited_infosets": 1,
+          "retained_infosets": 0,
+          "total_visits": 1,
+          "retained_visits": 0
+        },
+        {
+          "traversals": 1,
+          "visited_infosets": 1,
+          "retained_infosets": 0,
+          "total_visits": 1,
+          "retained_visits": 0
+        },
+        {
+          "traversals": 1,
+          "visited_infosets": 4,
+          "retained_infosets": 0,
+          "total_visits": 4,
+          "retained_visits": 0
+        }
+      ]
+    },
+    "evaluations": [
+      {
+        "seed": 101,
+        "result": {
+          "samples": 128,
+          "total_deal_attempts": 128,
+          "seats": [
+            {
+              "mean": 3.8716796875000004,
+              "stderr": 2.2431262973510457,
+              "ci95": [
+                -0.5248478553080496,
+                8.26820723030805
+              ]
+            },
+            {
+              "mean": -1.046875,
+              "stderr": 0.8161215001619393,
+              "ci95": [
+                -2.6464731403174007,
+                0.5527231403174009
+              ]
+            },
+            {
+              "mean": -1.7954296874999998,
+              "stderr": 0.969767442637996,
+              "ci95": [
+                -3.696173875070472,
+                0.10531450007047227
+              ]
+            },
+            {
+              "mean": -0.8027343749999994,
+              "stderr": 0.7950728538620678,
+              "ci95": [
+                -2.3610771685696523,
+                0.7556084185696536
+              ]
+            },
+            {
+              "mean": 0.06816406250000005,
+              "stderr": 0.11594633566058944,
+              "ci95": [
+                -0.15909075539475526,
+                0.29541888039475533
+              ]
+            },
+            {
+              "mean": -0.5702734375000001,
+              "stderr": 0.8009809022210149,
+              "ci95": [
+                -2.1401960058531895,
+                0.9996491308531891
+              ]
+            }
+          ],
+          "deviation_gain_lower_bound": [
+            {
+              "mean": 0.0,
+              "stderr": 0.36534491062578783,
+              "ci95": [
+                0.0,
+                0.18529033267664063
+              ]
+            },
+            {
+              "mean": 0.5742187500000001,
+              "stderr": 0.7960913110990899,
+              "ci95": [
+                0.0,
+                2.3585778146975005
+              ]
+            },
+            {
+              "mean": 1.485273437499999,
+              "stderr": 1.0029896367640387,
+              "ci95": [
+                0.0,
+                3.7333744093429155
+              ]
+            },
+            {
+              "mean": 0.009765624999999995,
+              "stderr": 0.04526027432131432,
+              "ci95": [
+                0.0,
+                0.11121200386379392
+              ]
+            },
+            {
+              "mean": 0.12500000000000006,
+              "stderr": 0.05113139242518809,
+              "ci95": [
+                0.01039409701818346,
+                0.23960590298181667
+              ]
+            },
+            {
+              "mean": 0.36363281249999996,
+              "stderr": 0.19558546645613747,
+              "ci95": [
+                0.0,
+                0.8020180770147864
+              ]
+            }
+          ],
+          "candidate_policy_coverage": [
+            {
+              "decision_visits": 154,
+              "stored_strategy_visits": 154,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 154,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 0,
+              "decision_visits_by_street": {
+                "preflop": 135,
+                "flop": 9,
+                "turn": 6,
+                "river": 4
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 135,
+                "flop": 9,
+                "turn": 6,
+                "river": 4
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 135,
+                "flop": 9,
+                "turn": 6,
+                "river": 4
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              }
+            },
+            {
+              "decision_visits": 145,
+              "stored_strategy_visits": 145,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 145,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 0,
+              "decision_visits_by_street": {
+                "preflop": 129,
+                "flop": 5,
+                "turn": 6,
+                "river": 5
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 129,
+                "flop": 5,
+                "turn": 6,
+                "river": 5
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 129,
+                "flop": 5,
+                "turn": 6,
+                "river": 5
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              }
+            },
+            {
+              "decision_visits": 182,
+              "stored_strategy_visits": 182,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 182,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 0,
+              "decision_visits_by_street": {
+                "preflop": 108,
+                "flop": 27,
+                "turn": 27,
+                "river": 20
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 108,
+                "flop": 27,
+                "turn": 27,
+                "river": 20
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 108,
+                "flop": 27,
+                "turn": 27,
+                "river": 20
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              }
+            },
+            {
+              "decision_visits": 135,
+              "stored_strategy_visits": 135,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 135,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 0,
+              "decision_visits_by_street": {
+                "preflop": 132,
+                "flop": 1,
+                "turn": 1,
+                "river": 1
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 132,
+                "flop": 1,
+                "turn": 1,
+                "river": 1
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 132,
+                "flop": 1,
+                "turn": 1,
+                "river": 1
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              }
+            },
+            {
+              "decision_visits": 146,
+              "stored_strategy_visits": 146,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 146,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 0,
+              "decision_visits_by_street": {
+                "preflop": 134,
+                "flop": 5,
+                "turn": 4,
+                "river": 3
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 134,
+                "flop": 5,
+                "turn": 4,
+                "river": 3
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 134,
+                "flop": 5,
+                "turn": 4,
+                "river": 3
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              }
+            },
+            {
+              "decision_visits": 155,
+              "stored_strategy_visits": 155,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 154,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 1,
+              "decision_visits_by_street": {
+                "preflop": 139,
+                "flop": 6,
+                "turn": 6,
+                "river": 4
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 139,
+                "flop": 6,
+                "turn": 6,
+                "river": 4
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 139,
+                "flop": 6,
+                "turn": 6,
+                "river": 3
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 1
+              }
+            }
+          ]
+        }
+      },
+      {
+        "seed": 202,
+        "result": {
+          "samples": 128,
+          "total_deal_attempts": 128,
+          "seats": [
+            {
+              "mean": 0.283203125,
+              "stderr": 0.17285691897896213,
+              "ci95": [
+                -0.05559643619876575,
+                0.6220026861987658
+              ]
+            },
+            {
+              "mean": 2.1402343750000004,
+              "stderr": 2.319472825620061,
+              "ci95": [
+                -2.405932363215319,
+                6.68640111321532
+              ]
+            },
+            {
+              "mean": -2.352968749999999,
+              "stderr": 1.1062558185229732,
+              "ci95": [
+                -4.521230154305027,
+                -0.18470734569497171
+              ]
+            },
+            {
+              "mean": -1.1578125000000001,
+              "stderr": 0.8293491059624878,
+              "ci95": [
+                -2.783336747686476,
+                0.46771174768647583
+              ]
+            },
+            {
+              "mean": 0.28886718750000007,
+              "stderr": 0.2435044140297162,
+              "ci95": [
+                -0.1884014639982437,
+                0.7661358389982438
+              ]
+            },
+            {
+              "mean": 0.5906640625000007,
+              "stderr": 1.1079856004621027,
+              "ci95": [
+                -1.5809877144057207,
+                2.762315839405722
+              ]
+            }
+          ],
+          "deviation_gain_lower_bound": [
+            {
+              "mean": 0.0,
+              "stderr": 0.16880584531425244,
+              "ci95": [
+                0.0,
+                0.31058798418736544
+              ]
+            },
+            {
+              "mean": 0.0,
+              "stderr": 2.319205800780772,
+              "ci95": [
+                0.0,
+                3.0474866318700227
+              ]
+            },
+            {
+              "mean": 1.4728906249999998,
+              "stderr": 1.1278681813502236,
+              "ci95": [
+                0.0,
+                4.000894366678391
+              ]
+            },
+            {
+              "mean": 0.38085937499999994,
+              "stderr": 0.2324513386588433,
+              "ci95": [
+                0.0,
+                0.9018758054699314
+              ]
+            },
+            {
+              "mean": 0.0,
+              "stderr": 0.21784321221416822,
+              "ci95": [
+                0.0,
+                0.31776596335683666
+              ]
+            },
+            {
+              "mean": 0.0,
+              "stderr": 0.9073180695925444,
+              "ci95": [
+                0.0,
+                1.9422564711847286
+              ]
+            }
+          ],
+          "candidate_policy_coverage": [
+            {
+              "decision_visits": 146,
+              "stored_strategy_visits": 146,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 146,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 0,
+              "decision_visits_by_street": {
+                "preflop": 132,
+                "flop": 6,
+                "turn": 5,
+                "river": 3
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 132,
+                "flop": 6,
+                "turn": 5,
+                "river": 3
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 132,
+                "flop": 6,
+                "turn": 5,
+                "river": 3
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              }
+            },
+            {
+              "decision_visits": 141,
+              "stored_strategy_visits": 141,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 141,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 0,
+              "decision_visits_by_street": {
+                "preflop": 130,
+                "flop": 5,
+                "turn": 3,
+                "river": 3
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 130,
+                "flop": 5,
+                "turn": 3,
+                "river": 3
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 130,
+                "flop": 5,
+                "turn": 3,
+                "river": 3
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              }
+            },
+            {
+              "decision_visits": 163,
+              "stored_strategy_visits": 163,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 163,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 0,
+              "decision_visits_by_street": {
+                "preflop": 112,
+                "flop": 25,
+                "turn": 19,
+                "river": 7
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 112,
+                "flop": 25,
+                "turn": 19,
+                "river": 7
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 112,
+                "flop": 25,
+                "turn": 19,
+                "river": 7
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              }
+            },
+            {
+              "decision_visits": 146,
+              "stored_strategy_visits": 146,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 146,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 0,
+              "decision_visits_by_street": {
+                "preflop": 136,
+                "flop": 4,
+                "turn": 2,
+                "river": 4
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 136,
+                "flop": 4,
+                "turn": 2,
+                "river": 4
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 136,
+                "flop": 4,
+                "turn": 2,
+                "river": 4
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              }
+            },
+            {
+              "decision_visits": 144,
+              "stored_strategy_visits": 144,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 142,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 2,
+              "decision_visits_by_street": {
+                "preflop": 134,
+                "flop": 5,
+                "turn": 3,
+                "river": 2
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 134,
+                "flop": 5,
+                "turn": 3,
+                "river": 2
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 134,
+                "flop": 5,
+                "turn": 2,
+                "river": 1
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 1,
+                "river": 1
+              }
+            },
+            {
+              "decision_visits": 147,
+              "stored_strategy_visits": 147,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 147,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 0,
+              "decision_visits_by_street": {
+                "preflop": 137,
+                "flop": 6,
+                "turn": 4,
+                "river": 0
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 137,
+                "flop": 6,
+                "turn": 4,
+                "river": 0
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 137,
+                "flop": 6,
+                "turn": 4,
+                "river": 0
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "nodes": [
+      {
+        "requested": "root",
+        "history": "00000000000000000000000000000000",
+        "actor": 3,
+        "activeOpponents": 5,
+        "actions": [
+          "fold",
+          "raise-to:2000"
+        ],
+        "frequency": {
+          "sampleCount": 4096,
+          "seed": 7957689452303118949,
+          "totalDealAttempts": 4096,
+          "conditionalActionRates": {
+            "fold": {
+              "estimate": 0.8511244302010998,
+              "standardError": 0.005158642165470785
+            },
+            "raise-to:2000": {
+              "estimate": 0.1488755697989002,
+              "standardError": 0.005158642165470788
+            }
+          },
+          "reachProbabilityEstimate": {
+            "estimate": 1.0,
+            "standardError": 0.0
+          },
+          "effectiveSampleSize": 4096.0,
+          "fallbackReachWeightFraction": {
+            "any": 0.0,
+            "currentRegret": 0.0,
+            "uniform": 0.0,
+            "categoriesMayOverlap": true
+          },
+          "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+        },
+        "reportedHandRows": 169,
+        "handRowsCanonicalSha256": "180ac4867b9bd5dc7de6d312a2161a301aa3e2fd082589df9430df2ff307d6f9"
+      },
+      {
+        "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+        "history": "5ebdea819e7b37aee4f9590419b75ca9",
+        "actor": 1,
+        "activeOpponents": 1,
+        "actions": [
+          "fold",
+          "call:7000",
+          "raise-to:21000",
+          "raise-to:100000:all-in"
+        ],
+        "frequency": {
+          "sampleCount": 4096,
+          "seed": 7957689452303118949,
+          "totalDealAttempts": 4096,
+          "conditionalActionRates": {
+            "call:7000": {
+              "estimate": 0.25112278951094635,
+              "standardError": 0.0377754828780131
+            },
+            "fold": {
+              "estimate": 0.5716325785383842,
+              "standardError": 0.03997942125389534
+            },
+            "raise-to:100000:all-in": {
+              "estimate": 0.08916598562962823,
+              "standardError": 0.018876033665820784
+            },
+            "raise-to:21000": {
+              "estimate": 0.08807864632104119,
+              "standardError": 0.022788137728093003
+            }
+          },
+          "reachProbabilityEstimate": {
+            "estimate": 0.01009624022160943,
+            "standardError": 0.0009023488950117397
+          },
+          "effectiveSampleSize": 121.50615865117037,
+          "fallbackReachWeightFraction": {
+            "any": 1.3661483806727051e-07,
+            "currentRegret": 1.3661483806727051e-07,
+            "uniform": 0.0,
+            "categoriesMayOverlap": true
+          },
+          "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+        },
+        "reportedHandRows": 169,
+        "handRowsCanonicalSha256": "1eb9b02cf8fb9b85617e0b42b6f1cb87862266b165e33fcec220ad70d62cdf96"
+      },
+      {
+        "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+        "history": "5c4d807237a5b958777fc1e112b6216a",
+        "actor": 2,
+        "activeOpponents": 1,
+        "actions": [
+          "fold",
+          "call:11000",
+          "raise-to:100000:all-in"
+        ],
+        "frequency": {
+          "sampleCount": 4096,
+          "seed": 7957689452303118949,
+          "totalDealAttempts": 4096,
+          "conditionalActionRates": {
+            "call:11000": {
+              "estimate": 0.04181632490529546,
+              "standardError": 0.015456484164933143
+            },
+            "fold": {
+              "estimate": 0.49973989990283507,
+              "standardError": 0.14055939695624697
+            },
+            "raise-to:100000:all-in": {
+              "estimate": 0.45844377519186946,
+              "standardError": 0.15027267685213197
+            }
+          },
+          "reachProbabilityEstimate": {
+            "estimate": 0.0008892631716514076,
+            "standardError": 0.0002513973877982836
+          },
+          "effectiveSampleSize": 12.477286898003435,
+          "fallbackReachWeightFraction": {
+            "any": 3.573035823955109e-05,
+            "currentRegret": 3.573035823955109e-05,
+            "uniform": 0.0,
+            "categoriesMayOverlap": true
+          },
+          "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+        },
+        "reportedHandRows": 169,
+        "handRowsCanonicalSha256": "b4f18161a4cdea6f4e845a409e56ea251955a65b33b2e96072c33385121aadd5"
+      },
+      {
+        "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+        "history": "f2b9810547e1fdd6d50aef60c84ddfe6",
+        "actor": 1,
+        "activeOpponents": 1,
+        "actions": [
+          "fold",
+          "call:79000:all-in"
+        ],
+        "frequency": {
+          "sampleCount": 4096,
+          "seed": 7957689452303118949,
+          "totalDealAttempts": 4096,
+          "conditionalActionRates": {
+            "call:79000:all-in": {
+              "estimate": 0.8013243382507171,
+              "standardError": 0.14175627931194112
+            },
+            "fold": {
+              "estimate": 0.19867566174928272,
+              "standardError": 0.14175627931194085
+            }
+          },
+          "reachProbabilityEstimate": {
+            "estimate": 0.0004076771655509667,
+            "standardError": 0.0002369818659168268
+          },
+          "effectiveSampleSize": 2.9579773335868844,
+          "fallbackReachWeightFraction": {
+            "any": 6.029315435405671e-05,
+            "currentRegret": 6.029315435405671e-05,
+            "uniform": 0.0,
+            "categoriesMayOverlap": true
+          },
+          "estimator": "self-normalized reach-weighted ratio; action-rate standard errors use a first-order delta method and the ratio estimate is not claimed unbiased"
+        },
+        "reportedHandRows": 169,
+        "handRowsCanonicalSha256": "4ce18841691b3adc0ff581117c995a5a931761fef279687bce25904ae5c6bbbd"
+      }
+    ],
+    "coverageEvaluations": [
+      {
+        "seed": 101,
+        "result": {
+          "samples": 8192,
+          "total_deal_attempts": 8192,
+          "seats": [
+            {
+              "mean": 0.45217858886718837,
+              "stderr": 0.17063678745893968,
+              "ci95": [
+                0.11773048544766662,
+                0.7866266922867101
+              ]
+            },
+            {
+              "mean": -0.4258143310546873,
+              "stderr": 0.1477955350311945,
+              "ci95": [
+                -0.7154935797158285,
+                -0.1361350823935461
+              ]
+            },
+            {
+              "mean": -0.8192597656249978,
+              "stderr": 0.15776064597859352,
+              "ci95": [
+                -1.128470631743041,
+                -0.5100488995069545
+              ]
+            },
+            {
+              "mean": 0.09306433105468785,
+              "stderr": 0.11036511253871038,
+              "ci95": [
+                -0.12325128952118448,
+                0.3093799516305602
+              ]
+            },
+            {
+              "mean": 0.2659012451171861,
+              "stderr": 0.12007685720218128,
+              "ci95": [
+                0.030550605000910808,
+                0.5012518852334614
+              ]
+            },
+            {
+              "mean": 0.18600878906250076,
+              "stderr": 0.13547925372225425,
+              "ci95": [
+                -0.07953054823311759,
+                0.45154812635811914
+              ]
+            }
+          ],
+          "deviation_gain_lower_bound": null,
+          "candidate_policy_coverage": [
+            {
+              "decision_visits": 9463,
+              "stored_strategy_visits": 9461,
+              "uniform_fallback_visits": 2,
+              "average_strategy_visits": 9442,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 19,
+              "decision_visits_by_street": {
+                "preflop": 8596,
+                "flop": 393,
+                "turn": 275,
+                "river": 199
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 8596,
+                "flop": 393,
+                "turn": 274,
+                "river": 198
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 1,
+                "river": 1
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 8596,
+                "flop": 393,
+                "turn": 267,
+                "river": 186
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 7,
+                "river": 12
+              }
+            },
+            {
+              "decision_visits": 9298,
+              "stored_strategy_visits": 9298,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 9296,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 2,
+              "decision_visits_by_street": {
+                "preflop": 8362,
+                "flop": 410,
+                "turn": 298,
+                "river": 228
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 8362,
+                "flop": 410,
+                "turn": 298,
+                "river": 228
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 8362,
+                "flop": 410,
+                "turn": 298,
+                "river": 226
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 2
+              }
+            },
+            {
+              "decision_visits": 11130,
+              "stored_strategy_visits": 11128,
+              "uniform_fallback_visits": 2,
+              "average_strategy_visits": 11117,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 11,
+              "decision_visits_by_street": {
+                "preflop": 7213,
+                "flop": 1727,
+                "turn": 1285,
+                "river": 905
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 7213,
+                "flop": 1727,
+                "turn": 1284,
+                "river": 904
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 1,
+                "river": 1
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 7212,
+                "flop": 1727,
+                "turn": 1283,
+                "river": 895
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 1,
+                "flop": 0,
+                "turn": 1,
+                "river": 9
+              }
+            },
+            {
+              "decision_visits": 8802,
+              "stored_strategy_visits": 8802,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 8798,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 4,
+              "decision_visits_by_street": {
+                "preflop": 8442,
+                "flop": 176,
+                "turn": 108,
+                "river": 76
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 8442,
+                "flop": 176,
+                "turn": 108,
+                "river": 76
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 8442,
+                "flop": 176,
+                "turn": 107,
+                "river": 73
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 1,
+                "river": 3
+              }
+            },
+            {
+              "decision_visits": 9302,
+              "stored_strategy_visits": 9302,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 9284,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 18,
+              "decision_visits_by_street": {
+                "preflop": 8666,
+                "flop": 284,
+                "turn": 212,
+                "river": 140
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 8666,
+                "flop": 284,
+                "turn": 212,
+                "river": 140
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 8666,
+                "flop": 283,
+                "turn": 209,
+                "river": 126
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 1,
+                "turn": 3,
+                "river": 14
+              }
+            },
+            {
+              "decision_visits": 9672,
+              "stored_strategy_visits": 9671,
+              "uniform_fallback_visits": 1,
+              "average_strategy_visits": 9623,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 48,
+              "decision_visits_by_street": {
+                "preflop": 8683,
+                "flop": 426,
+                "turn": 328,
+                "river": 235
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 8683,
+                "flop": 426,
+                "turn": 328,
+                "river": 234
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 1
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 8683,
+                "flop": 426,
+                "turn": 323,
+                "river": 191
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 5,
+                "river": 43
+              }
+            }
+          ]
+        },
+        "prefixes": [
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+            "history": "5ebdea819e7b37aee4f9590419b75ca9",
+            "reachedSamples": 90,
+            "reachedFraction": 0.010986328125,
+            "trajectoryVisitsByStreet": {
+              "preflop": 90,
+              "flop": 19,
+              "turn": 14,
+              "river": 12
+            },
+            "candidatePolicyCoverage": [
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 158,
+                "stored_strategy_visits": 158,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 158,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 93,
+                  "flop": 24,
+                  "turn": 21,
+                  "river": 20
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 93,
+                  "flop": 24,
+                  "turn": 21,
+                  "river": 20
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 93,
+                  "flop": 24,
+                  "turn": 21,
+                  "river": 20
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 65,
+                "stored_strategy_visits": 65,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 62,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 3,
+                "decision_visits_by_street": {
+                  "preflop": 20,
+                  "flop": 19,
+                  "turn": 14,
+                  "river": 12
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 20,
+                  "flop": 19,
+                  "turn": 14,
+                  "river": 12
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 20,
+                  "flop": 19,
+                  "turn": 13,
+                  "river": 10
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 1,
+                  "river": 2
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              }
+            ]
+          },
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000",
+            "history": "db223ec7c534cd69b31a74708fe3c2d1",
+            "reachedSamples": 19,
+            "reachedFraction": 0.0023193359375,
+            "trajectoryVisitsByStreet": {
+              "preflop": 0,
+              "flop": 19,
+              "turn": 14,
+              "river": 12
+            },
+            "candidatePolicyCoverage": [
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 65,
+                "stored_strategy_visits": 65,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 65,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 24,
+                  "turn": 21,
+                  "river": 20
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 24,
+                  "turn": 21,
+                  "river": 20
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 24,
+                  "turn": 21,
+                  "river": 20
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 45,
+                "stored_strategy_visits": 45,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 42,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 3,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 19,
+                  "turn": 14,
+                  "river": 12
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 19,
+                  "turn": 14,
+                  "river": 12
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 19,
+                  "turn": 13,
+                  "river": 10
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 1,
+                  "river": 2
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              }
+            ]
+          },
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+            "history": "5c4d807237a5b958777fc1e112b6216a",
+            "reachedSamples": 12,
+            "reachedFraction": 0.00146484375,
+            "trajectoryVisitsByStreet": {
+              "preflop": 12,
+              "flop": 0,
+              "turn": 0,
+              "river": 0
+            },
+            "candidatePolicyCoverage": [
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 3,
+                "stored_strategy_visits": 3,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 3,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 3,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 3,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 3,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 12,
+                "stored_strategy_visits": 12,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 12,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 12,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 12,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 12,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              }
+            ]
+          },
+          {
+            "requested": "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500",
+            "history": "4151089d6b7f0776d6f34d48604f54da",
+            "reachedSamples": 0,
+            "reachedFraction": 0.0,
+            "trajectoryVisitsByStreet": {
+              "preflop": 0,
+              "flop": 0,
+              "turn": 0,
+              "river": 0
+            },
+            "candidatePolicyCoverage": [
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "seed": 202,
+        "result": {
+          "samples": 8192,
+          "total_deal_attempts": 8192,
+          "seats": [
+            {
+              "mean": 0.5557257080078124,
+              "stderr": 0.16145868720647016,
+              "ci95": [
+                0.23926668108313087,
+                0.8721847349324939
+              ]
+            },
+            {
+              "mean": -0.3911942138671887,
+              "stderr": 0.12339749640648112,
+              "ci95": [
+                -0.6330533068238917,
+                -0.14933512091048573
+              ]
+            },
+            {
+              "mean": -0.6356552734375012,
+              "stderr": 0.15651518413364904,
+              "ci95": [
+                -0.9424250343394533,
+                -0.32888551253554904
+              ]
+            },
+            {
+              "mean": 0.0625671386718749,
+              "stderr": 0.09113115980445279,
+              "ci95": [
+                -0.11604993454485256,
+                0.24118421188860234
+              ]
+            },
+            {
+              "mean": 0.2501990966796887,
+              "stderr": 0.10439469722975762,
+              "ci95": [
+                0.045585490109363774,
+                0.45481270325001366
+              ]
+            },
+            {
+              "mean": -0.07474304199218741,
+              "stderr": 0.12017226021390537,
+              "ci95": [
+                -0.31028067201144194,
+                0.1607945880270671
+              ]
+            }
+          ],
+          "deviation_gain_lower_bound": null,
+          "candidate_policy_coverage": [
+            {
+              "decision_visits": 9388,
+              "stored_strategy_visits": 9386,
+              "uniform_fallback_visits": 2,
+              "average_strategy_visits": 9369,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 17,
+              "decision_visits_by_street": {
+                "preflop": 8586,
+                "flop": 378,
+                "turn": 254,
+                "river": 170
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 8586,
+                "flop": 378,
+                "turn": 254,
+                "river": 168
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 2
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 8586,
+                "flop": 377,
+                "turn": 252,
+                "river": 154
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 1,
+                "turn": 2,
+                "river": 14
+              }
+            },
+            {
+              "decision_visits": 9235,
+              "stored_strategy_visits": 9235,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 9232,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 3,
+              "decision_visits_by_street": {
+                "preflop": 8335,
+                "flop": 387,
+                "turn": 287,
+                "river": 226
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 8335,
+                "flop": 387,
+                "turn": 287,
+                "river": 226
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 8335,
+                "flop": 387,
+                "turn": 287,
+                "river": 223
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 3
+              }
+            },
+            {
+              "decision_visits": 10823,
+              "stored_strategy_visits": 10822,
+              "uniform_fallback_visits": 1,
+              "average_strategy_visits": 10807,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 15,
+              "decision_visits_by_street": {
+                "preflop": 7230,
+                "flop": 1593,
+                "turn": 1186,
+                "river": 814
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 7230,
+                "flop": 1593,
+                "turn": 1186,
+                "river": 813
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 1
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 7230,
+                "flop": 1593,
+                "turn": 1183,
+                "river": 801
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 3,
+                "river": 12
+              }
+            },
+            {
+              "decision_visits": 8801,
+              "stored_strategy_visits": 8801,
+              "uniform_fallback_visits": 0,
+              "average_strategy_visits": 8796,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 5,
+              "decision_visits_by_street": {
+                "preflop": 8474,
+                "flop": 166,
+                "turn": 98,
+                "river": 63
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 8474,
+                "flop": 166,
+                "turn": 98,
+                "river": 63
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 8474,
+                "flop": 166,
+                "turn": 98,
+                "river": 58
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 5
+              }
+            },
+            {
+              "decision_visits": 9184,
+              "stored_strategy_visits": 9183,
+              "uniform_fallback_visits": 1,
+              "average_strategy_visits": 9170,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 13,
+              "decision_visits_by_street": {
+                "preflop": 8678,
+                "flop": 237,
+                "turn": 163,
+                "river": 106
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 8678,
+                "flop": 237,
+                "turn": 162,
+                "river": 106
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 1,
+                "river": 0
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 8678,
+                "flop": 237,
+                "turn": 157,
+                "river": 98
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 5,
+                "river": 8
+              }
+            },
+            {
+              "decision_visits": 9612,
+              "stored_strategy_visits": 9610,
+              "uniform_fallback_visits": 2,
+              "average_strategy_visits": 9564,
+              "current_strategy_visits": 0,
+              "regret_fallback_visits": 46,
+              "decision_visits_by_street": {
+                "preflop": 8650,
+                "flop": 421,
+                "turn": 313,
+                "river": 228
+              },
+              "stored_strategy_visits_by_street": {
+                "preflop": 8650,
+                "flop": 420,
+                "turn": 313,
+                "river": 227
+              },
+              "uniform_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 1,
+                "turn": 0,
+                "river": 1
+              },
+              "average_strategy_visits_by_street": {
+                "preflop": 8650,
+                "flop": 419,
+                "turn": 312,
+                "river": 183
+              },
+              "current_strategy_visits_by_street": {
+                "preflop": 0,
+                "flop": 0,
+                "turn": 0,
+                "river": 0
+              },
+              "regret_fallback_visits_by_street": {
+                "preflop": 0,
+                "flop": 1,
+                "turn": 1,
+                "river": 44
+              }
+            }
+          ]
+        },
+        "prefixes": [
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+            "history": "5ebdea819e7b37aee4f9590419b75ca9",
+            "reachedSamples": 73,
+            "reachedFraction": 0.0089111328125,
+            "trajectoryVisitsByStreet": {
+              "preflop": 73,
+              "flop": 15,
+              "turn": 10,
+              "river": 6
+            },
+            "candidatePolicyCoverage": [
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 120,
+                "stored_strategy_visits": 120,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 120,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 75,
+                  "flop": 23,
+                  "turn": 14,
+                  "river": 8
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 75,
+                  "flop": 23,
+                  "turn": 14,
+                  "river": 8
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 75,
+                  "flop": 23,
+                  "turn": 14,
+                  "river": 8
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 46,
+                "stored_strategy_visits": 46,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 43,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 3,
+                "decision_visits_by_street": {
+                  "preflop": 15,
+                  "flop": 15,
+                  "turn": 10,
+                  "river": 6
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 15,
+                  "flop": 15,
+                  "turn": 10,
+                  "river": 6
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 15,
+                  "flop": 15,
+                  "turn": 9,
+                  "river": 4
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 1,
+                  "river": 2
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              }
+            ]
+          },
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000",
+            "history": "db223ec7c534cd69b31a74708fe3c2d1",
+            "reachedSamples": 14,
+            "reachedFraction": 0.001708984375,
+            "trajectoryVisitsByStreet": {
+              "preflop": 0,
+              "flop": 14,
+              "turn": 10,
+              "river": 6
+            },
+            "candidatePolicyCoverage": [
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 44,
+                "stored_strategy_visits": 44,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 44,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 22,
+                  "turn": 14,
+                  "river": 8
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 22,
+                  "turn": 14,
+                  "river": 8
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 22,
+                  "turn": 14,
+                  "river": 8
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 30,
+                "stored_strategy_visits": 30,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 27,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 3,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 14,
+                  "turn": 10,
+                  "river": 6
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 14,
+                  "turn": 10,
+                  "river": 6
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 14,
+                  "turn": 9,
+                  "river": 4
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 1,
+                  "river": 2
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              }
+            ]
+          },
+          {
+            "requested": "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+            "history": "5c4d807237a5b958777fc1e112b6216a",
+            "reachedSamples": 6,
+            "reachedFraction": 0.000732421875,
+            "trajectoryVisitsByStreet": {
+              "preflop": 6,
+              "flop": 1,
+              "turn": 0,
+              "river": 0
+            },
+            "candidatePolicyCoverage": [
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 3,
+                "stored_strategy_visits": 3,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 3,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 2,
+                  "flop": 1,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 2,
+                  "flop": 1,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 2,
+                  "flop": 1,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 7,
+                "stored_strategy_visits": 7,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 7,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 6,
+                  "flop": 1,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 6,
+                  "flop": 1,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 6,
+                  "flop": 1,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              }
+            ]
+          },
+          {
+            "requested": "raise-to:2000/raise-to:6500/call:6500/fold/fold/fold/call:4500",
+            "history": "4151089d6b7f0776d6f34d48604f54da",
+            "reachedSamples": 0,
+            "reachedFraction": 0.0,
+            "trajectoryVisitsByStreet": {
+              "preflop": 0,
+              "flop": 0,
+              "turn": 0,
+              "river": 0
+            },
+            "candidatePolicyCoverage": [
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              },
+              {
+                "decision_visits": 0,
+                "stored_strategy_visits": 0,
+                "uniform_fallback_visits": 0,
+                "average_strategy_visits": 0,
+                "current_strategy_visits": 0,
+                "regret_fallback_visits": 0,
+                "decision_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "stored_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "uniform_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "average_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "current_strategy_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                },
+                "regret_fallback_visits_by_street": {
+                  "preflop": 0,
+                  "flop": 0,
+                  "turn": 0,
+                  "river": 0
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "interpretation": "Held-out gains cover two fixed candidate deviations per seat; the trained candidate is used where it retained an action and otherwise falls back to the main regret-greedy candidate. Deviator coverage in this document is training coverage, not held-out replay coverage. Node conditional action rates are self-normalized reach-weighted ratio estimates, are not claimed finite-sample unbiased, and represent a composite policy whenever their fallback reach-weight fraction is positive. These results are diagnostics, not a full best response, exploitability, or Nash certificate. Evaluation seeds are reported separately and are not selected or pooled."
+  },
+  "retention": "Full stdout/stderr remains under the retained run for every case, identified by SHA256. This tracked evidence summarizes per-hand rows with counts/statuses/content hashes; full-output canonical equality hashes were computed before summarization."
+}

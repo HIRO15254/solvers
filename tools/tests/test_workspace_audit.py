@@ -12,7 +12,7 @@ SPEC = importlib.util.spec_from_file_location("workspace_audit", MODULE)
 audit = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
 SPEC.loader.exec_module(audit)
-TEST_TEMP_ROOT = Path(__file__).parents[2] / "target/tool-tests"
+TEST_TEMP_ROOT = Path(__file__).parents[2] / ".cache/tool-tests"
 
 
 @contextmanager
@@ -23,7 +23,8 @@ def workspace_fixture():
     try:
         yield root
     finally:
-        shutil.rmtree(root, ignore_errors=True)
+        assert root.resolve().is_relative_to(TEST_TEMP_ROOT.resolve())
+        shutil.rmtree(root)
 
 
 class WorkspaceAuditTests(unittest.TestCase):
@@ -43,6 +44,16 @@ class WorkspaceAuditTests(unittest.TestCase):
             self.assertEqual(result["schema"], "solvers.workspace-audit/v1")
             self.assertEqual(result["root_temp_directories"], ["tmp-generated"])
             self.assertEqual(result["sizes"]["docs"]["bytes"], 0)
+
+    def test_collect_includes_experiment_evidence(self):
+        with workspace_fixture() as root:
+            evidence = root / "experiments/campaign/case"
+            evidence.mkdir(parents=True)
+            (evidence / "report.md").write_bytes(b"evidence")
+            with mock.patch.object(audit, "git_summary", return_value={"branch": "main"}):
+                result = audit.collect(root)
+            self.assertEqual(result["sizes"]["experiments"]["files"], 1)
+            self.assertEqual(result["sizes"]["experiments"]["bytes"], 8)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,3689 @@
+{
+  "assessment": {
+    "negativeMeans": 18,
+    "pointwiseLowerAboveZero": 2,
+    "pointwiseUpperBelowZero": 8,
+    "positiveMeans": 6,
+    "total": 24
+  },
+  "evaluatorImprovementDoesNotChangeProductionStrategy": true,
+  "previousSummarySha256": "ac80a7b41823dd778c342d9b56c111d6cf43ad48133c2152743f6390b3e678c8",
+  "renderScriptSha256": "550795a3de13f5447906f392d8cdbccd0e6b7010b0b4b59757389d9cd1c902dd",
+  "retainedSummarySha256": "75c0cf6ae4790c8d3549bb81b322787e8bebd2741995780e3afa25bfda717637",
+  "summary": {
+    "arms": {
+      "enumerated": {
+        "constructionElapsedSecs": 45.5137419,
+        "diagnostic": {
+          "config": {
+            "fitSeed": 2601,
+            "fitTraversalsPerSeat": 131072,
+            "heldOutSamples": 32768,
+            "heldOutSeeds": [
+              2801,
+              2802
+            ]
+          },
+          "fitCoverage": [
+            {
+              "retained_infosets": 2005,
+              "retained_visits": 153063,
+              "total_visits": 181395,
+              "traversals": 131072,
+              "visited_infosets": 16666
+            },
+            {
+              "retained_infosets": 2396,
+              "retained_visits": 146017,
+              "total_visits": 168548,
+              "traversals": 131072,
+              "visited_infosets": 13968
+            },
+            {
+              "retained_infosets": 2357,
+              "retained_visits": 110812,
+              "total_visits": 132269,
+              "traversals": 131072,
+              "visited_infosets": 13453
+            },
+            {
+              "retained_infosets": 1924,
+              "retained_visits": 172939,
+              "total_visits": 195055,
+              "traversals": 131072,
+              "visited_infosets": 13830
+            },
+            {
+              "retained_infosets": 1692,
+              "retained_visits": 155662,
+              "total_visits": 180048,
+              "traversals": 131072,
+              "visited_infosets": 14591
+            },
+            {
+              "retained_infosets": 1865,
+              "retained_visits": 154028,
+              "total_visits": 179429,
+              "traversals": 131072,
+              "visited_infosets": 16060
+            }
+          ],
+          "fitElapsedSecs": 91.6664543,
+          "fitPolicyFingerprint": "79417227b27767d78c6d80fec002585c1567546589bddf5a5565fd734b1302e9",
+          "heldOut": [
+            {
+              "baseline": [
+                {
+                  "ci95": [
+                    0.06503858292049877,
+                    0.47898369491153436
+                  ],
+                  "mean": 0.2720111389160166,
+                  "stderr": 0.10559824285485603
+                },
+                {
+                  "ci95": [
+                    -0.740410545336101,
+                    -0.324555885327964
+                  ],
+                  "mean": -0.5324832153320325,
+                  "stderr": 0.10608537245105536
+                },
+                {
+                  "ci95": [
+                    -1.0400754462804647,
+                    -0.5869332207117206
+                  ],
+                  "mean": -0.8135043334960926,
+                  "stderr": 0.11559750652263878
+                },
+                {
+                  "ci95": [
+                    -0.01958678431371602,
+                    0.36019390101293475
+                  ],
+                  "mean": 0.17030355834960936,
+                  "stderr": 0.09688282788945173
+                },
+                {
+                  "ci95": [
+                    0.023846451252488493,
+                    0.37599259904047977
+                  ],
+                  "mean": 0.19991952514648412,
+                  "stderr": 0.0898332009663243
+                },
+                {
+                  "ci95": [
+                    0.08726522804168244,
+                    0.48211782859894126
+                  ],
+                  "mean": 0.28469152832031186,
+                  "stderr": 0.10072770422379053
+                }
+              ],
+              "candidatePolicyCoverage": [
+                {
+                  "average_strategy_visits": 39603,
+                  "average_strategy_visits_by_street": {
+                    "flop": 2389,
+                    "preflop": 34403,
+                    "river": 1047,
+                    "turn": 1764
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 39945,
+                  "decision_visits_by_street": {
+                    "flop": 2423,
+                    "preflop": 34408,
+                    "river": 1281,
+                    "turn": 1833
+                  },
+                  "regret_fallback_visits": 316,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 27,
+                    "preflop": 4,
+                    "river": 226,
+                    "turn": 59
+                  },
+                  "stored_strategy_visits": 39919,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 2416,
+                    "preflop": 34407,
+                    "river": 1273,
+                    "turn": 1823
+                  },
+                  "uniform_fallback_visits": 26,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 7,
+                    "preflop": 1,
+                    "river": 8,
+                    "turn": 10
+                  }
+                },
+                {
+                  "average_strategy_visits": 41404,
+                  "average_strategy_visits_by_street": {
+                    "flop": 3221,
+                    "preflop": 34124,
+                    "river": 1537,
+                    "turn": 2522
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 42067,
+                  "decision_visits_by_street": {
+                    "flop": 3234,
+                    "preflop": 34127,
+                    "river": 1941,
+                    "turn": 2765
+                  },
+                  "regret_fallback_visits": 647,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 9,
+                    "preflop": 3,
+                    "river": 400,
+                    "turn": 235
+                  },
+                  "stored_strategy_visits": 42051,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 3230,
+                    "preflop": 34127,
+                    "river": 1937,
+                    "turn": 2757
+                  },
+                  "uniform_fallback_visits": 16,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 4,
+                    "preflop": 0,
+                    "river": 4,
+                    "turn": 8
+                  }
+                },
+                {
+                  "average_strategy_visits": 44345,
+                  "average_strategy_visits_by_street": {
+                    "flop": 8032,
+                    "preflop": 26145,
+                    "river": 4122,
+                    "turn": 6046
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 44822,
+                  "decision_visits_by_street": {
+                    "flop": 8053,
+                    "preflop": 26159,
+                    "river": 4473,
+                    "turn": 6137
+                  },
+                  "regret_fallback_visits": 461,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 17,
+                    "preflop": 11,
+                    "river": 350,
+                    "turn": 83
+                  },
+                  "stored_strategy_visits": 44806,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 8049,
+                    "preflop": 26156,
+                    "river": 4472,
+                    "turn": 6129
+                  },
+                  "uniform_fallback_visits": 16,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 4,
+                    "preflop": 3,
+                    "river": 1,
+                    "turn": 8
+                  }
+                },
+                {
+                  "average_strategy_visits": 37246,
+                  "average_strategy_visits_by_street": {
+                    "flop": 1422,
+                    "preflop": 34346,
+                    "river": 536,
+                    "turn": 942
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 37415,
+                  "decision_visits_by_street": {
+                    "flop": 1442,
+                    "preflop": 34358,
+                    "river": 631,
+                    "turn": 984
+                  },
+                  "regret_fallback_visits": 155,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 18,
+                    "preflop": 9,
+                    "river": 92,
+                    "turn": 36
+                  },
+                  "stored_strategy_visits": 37401,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 1440,
+                    "preflop": 34355,
+                    "river": 628,
+                    "turn": 978
+                  },
+                  "uniform_fallback_visits": 14,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 2,
+                    "preflop": 3,
+                    "river": 3,
+                    "turn": 6
+                  }
+                },
+                {
+                  "average_strategy_visits": 34978,
+                  "average_strategy_visits_by_street": {
+                    "flop": 602,
+                    "preflop": 33733,
+                    "river": 226,
+                    "turn": 417
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35163,
+                  "decision_visits_by_street": {
+                    "flop": 653,
+                    "preflop": 33741,
+                    "river": 304,
+                    "turn": 465
+                  },
+                  "regret_fallback_visits": 164,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 42,
+                    "preflop": 7,
+                    "river": 75,
+                    "turn": 40
+                  },
+                  "stored_strategy_visits": 35142,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 644,
+                    "preflop": 33740,
+                    "river": 301,
+                    "turn": 457
+                  },
+                  "uniform_fallback_visits": 21,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 9,
+                    "preflop": 1,
+                    "river": 3,
+                    "turn": 8
+                  }
+                },
+                {
+                  "average_strategy_visits": 35582,
+                  "average_strategy_visits_by_street": {
+                    "flop": 925,
+                    "preflop": 33858,
+                    "river": 210,
+                    "turn": 589
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35946,
+                  "decision_visits_by_street": {
+                    "flop": 967,
+                    "preflop": 33860,
+                    "river": 442,
+                    "turn": 677
+                  },
+                  "regret_fallback_visits": 353,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 36,
+                    "preflop": 2,
+                    "river": 231,
+                    "turn": 84
+                  },
+                  "stored_strategy_visits": 35935,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 961,
+                    "preflop": 33860,
+                    "river": 441,
+                    "turn": 673
+                  },
+                  "uniform_fallback_visits": 11,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 6,
+                    "preflop": 0,
+                    "river": 1,
+                    "turn": 4
+                  }
+                }
+              ],
+              "coverage": [
+                {
+                  "baseline_fallback_visits": 5369,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1901,
+                    "preflop": 1253,
+                    "river": 892,
+                    "turn": 1323
+                  },
+                  "decision_visits": 38538,
+                  "decision_visits_by_street": {
+                    "flop": 1901,
+                    "preflop": 34422,
+                    "river": 892,
+                    "turn": 1323
+                  },
+                  "trained_action_visits": 33169,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 33169,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 7828,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 2454,
+                    "preflop": 2120,
+                    "river": 1272,
+                    "turn": 1982
+                  },
+                  "decision_visits": 39852,
+                  "decision_visits_by_street": {
+                    "flop": 2454,
+                    "preflop": 34144,
+                    "river": 1272,
+                    "turn": 1982
+                  },
+                  "trained_action_visits": 32024,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 32024,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 22525,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 8906,
+                    "preflop": 2764,
+                    "river": 4457,
+                    "turn": 6398
+                  },
+                  "decision_visits": 46313,
+                  "decision_visits_by_street": {
+                    "flop": 8906,
+                    "preflop": 26552,
+                    "river": 4457,
+                    "turn": 6398
+                  },
+                  "trained_action_visits": 23788,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 23788,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 1278,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 475,
+                    "preflop": 270,
+                    "river": 219,
+                    "turn": 314
+                  },
+                  "decision_visits": 34428,
+                  "decision_visits_by_street": {
+                    "flop": 475,
+                    "preflop": 33420,
+                    "river": 219,
+                    "turn": 314
+                  },
+                  "trained_action_visits": 33150,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 33150,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 2005,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 671,
+                    "preflop": 531,
+                    "river": 321,
+                    "turn": 482
+                  },
+                  "decision_visits": 35245,
+                  "decision_visits_by_street": {
+                    "flop": 671,
+                    "preflop": 33771,
+                    "river": 321,
+                    "turn": 482
+                  },
+                  "trained_action_visits": 33240,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 33240,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 1800,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 604,
+                    "preflop": 533,
+                    "river": 255,
+                    "turn": 408
+                  },
+                  "decision_visits": 34804,
+                  "decision_visits_by_street": {
+                    "flop": 604,
+                    "preflop": 33537,
+                    "river": 255,
+                    "turn": 408
+                  },
+                  "trained_action_visits": 33004,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 33004,
+                    "river": 0,
+                    "turn": 0
+                  }
+                }
+              ],
+              "deviating": [
+                {
+                  "ci95": [
+                    -0.16580290201143794,
+                    0.28505448892550067
+                  ],
+                  "mean": 0.059625793457031374,
+                  "stderr": 0.11501464054513741
+                },
+                {
+                  "ci95": [
+                    -1.1184142334016838,
+                    -0.6461278808561373
+                  ],
+                  "mean": -0.8822710571289105,
+                  "stderr": 0.12048121238406799
+                },
+                {
+                  "ci95": [
+                    -1.2941433875767876,
+                    -0.7852010338099267
+                  ],
+                  "mean": -1.0396722106933571,
+                  "stderr": 0.12983223310379102
+                },
+                {
+                  "ci95": [
+                    0.12931474671443363,
+                    0.3974374505511882
+                  ],
+                  "mean": 0.2633760986328109,
+                  "stderr": 0.0683986489379476
+                },
+                {
+                  "ci95": [
+                    0.08261978038400078,
+                    0.4018674022331854
+                  ],
+                  "mean": 0.24224359130859308,
+                  "stderr": 0.08144071985948587
+                },
+                {
+                  "ci95": [
+                    -0.2682311964663286,
+                    0.13477141863429803
+                  ],
+                  "mean": -0.06672988891601526,
+                  "stderr": 0.10280678956648638
+                }
+              ],
+              "elapsedSecs": 9.0453175,
+              "gains": [
+                {
+                  "ci95": [
+                    -0.4056086515669798,
+                    -0.01916203935098848
+                  ],
+                  "mean": -0.21238534545898413,
+                  "stderr": 0.09858331944285492
+                },
+                {
+                  "ci95": [
+                    -0.5355503634697119,
+                    -0.16402532012403875
+                  ],
+                  "mean": -0.34978784179687533,
+                  "stderr": 0.0947767967718554
+                },
+                {
+                  "ci95": [
+                    -0.42346800367871534,
+                    -0.02886775071581338
+                  ],
+                  "mean": -0.22616787719726436,
+                  "stderr": 0.10066332983747499
+                },
+                {
+                  "ci95": [
+                    -0.04855858452784599,
+                    0.23470366509425244
+                  ],
+                  "mean": 0.09307254028320323,
+                  "stderr": 0.07226077796482104
+                },
+                {
+                  "ci95": [
+                    -0.12002377261891907,
+                    0.20467190494313786
+                  ],
+                  "mean": 0.04232406616210939,
+                  "stderr": 0.08283052999032064
+                },
+                {
+                  "ci95": [
+                    -0.5549695689854061,
+                    -0.14787326548724988
+                  ],
+                  "mean": -0.35142141723632797,
+                  "stderr": 0.1038510978311623
+                }
+              ],
+              "samples": 32768,
+              "seed": 2801,
+              "totalDealAttempts": 32768
+            },
+            {
+              "baseline": [
+                {
+                  "ci95": [
+                    -0.08740547759409796,
+                    0.3029433804261302
+                  ],
+                  "mean": 0.10776895141601613,
+                  "stderr": 0.0995787903112827
+                },
+                {
+                  "ci95": [
+                    -0.8222649313483879,
+                    -0.4100855325188018
+                  ],
+                  "mean": -0.6161752319335948,
+                  "stderr": 0.10514780582387398
+                },
+                {
+                  "ci95": [
+                    -0.7461212384127909,
+                    -0.2816478045559623
+                  ],
+                  "mean": -0.5138845214843766,
+                  "stderr": 0.11848812088184402
+                },
+                {
+                  "ci95": [
+                    -0.024973973085004236,
+                    0.3493422592178186
+                  ],
+                  "mean": 0.16218414306640716,
+                  "stderr": 0.09548883477112827
+                },
+                {
+                  "ci95": [
+                    -0.0010052210738374645,
+                    0.35471158093711774
+                  ],
+                  "mean": 0.17685317993164013,
+                  "stderr": 0.09074408214565183
+                },
+                {
+                  "ci95": [
+                    0.07005251217028033,
+                    0.4526357812867503
+                  ],
+                  "mean": 0.2613441467285153,
+                  "stderr": 0.09759777273379336
+                }
+              ],
+              "candidatePolicyCoverage": [
+                {
+                  "average_strategy_visits": 39490,
+                  "average_strategy_visits_by_street": {
+                    "flop": 2399,
+                    "preflop": 34363,
+                    "river": 1001,
+                    "turn": 1727
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 39820,
+                  "decision_visits_by_street": {
+                    "flop": 2423,
+                    "preflop": 34369,
+                    "river": 1227,
+                    "turn": 1801
+                  },
+                  "regret_fallback_visits": 302,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 21,
+                    "preflop": 4,
+                    "river": 219,
+                    "turn": 58
+                  },
+                  "stored_strategy_visits": 39792,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 2420,
+                    "preflop": 34367,
+                    "river": 1220,
+                    "turn": 1785
+                  },
+                  "uniform_fallback_visits": 28,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 3,
+                    "preflop": 2,
+                    "river": 7,
+                    "turn": 16
+                  }
+                },
+                {
+                  "average_strategy_visits": 41464,
+                  "average_strategy_visits_by_street": {
+                    "flop": 3252,
+                    "preflop": 34095,
+                    "river": 1562,
+                    "turn": 2555
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 42181,
+                  "decision_visits_by_street": {
+                    "flop": 3262,
+                    "preflop": 34099,
+                    "river": 1998,
+                    "turn": 2822
+                  },
+                  "regret_fallback_visits": 707,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 8,
+                    "preflop": 4,
+                    "river": 432,
+                    "turn": 263
+                  },
+                  "stored_strategy_visits": 42171,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 3260,
+                    "preflop": 34099,
+                    "river": 1994,
+                    "turn": 2818
+                  },
+                  "uniform_fallback_visits": 10,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 2,
+                    "preflop": 0,
+                    "river": 4,
+                    "turn": 4
+                  }
+                },
+                {
+                  "average_strategy_visits": 44275,
+                  "average_strategy_visits_by_street": {
+                    "flop": 8035,
+                    "preflop": 26222,
+                    "river": 4008,
+                    "turn": 6010
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 44794,
+                  "decision_visits_by_street": {
+                    "flop": 8056,
+                    "preflop": 26231,
+                    "river": 4405,
+                    "turn": 6102
+                  },
+                  "regret_fallback_visits": 501,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 21,
+                    "preflop": 5,
+                    "river": 391,
+                    "turn": 84
+                  },
+                  "stored_strategy_visits": 44776,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 8056,
+                    "preflop": 26227,
+                    "river": 4399,
+                    "turn": 6094
+                  },
+                  "uniform_fallback_visits": 18,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 4,
+                    "river": 6,
+                    "turn": 8
+                  }
+                },
+                {
+                  "average_strategy_visits": 37122,
+                  "average_strategy_visits_by_street": {
+                    "flop": 1359,
+                    "preflop": 34365,
+                    "river": 501,
+                    "turn": 897
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 37289,
+                  "decision_visits_by_street": {
+                    "flop": 1371,
+                    "preflop": 34375,
+                    "river": 608,
+                    "turn": 935
+                  },
+                  "regret_fallback_visits": 150,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 12,
+                    "preflop": 8,
+                    "river": 100,
+                    "turn": 30
+                  },
+                  "stored_strategy_visits": 37272,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 1371,
+                    "preflop": 34373,
+                    "river": 601,
+                    "turn": 927
+                  },
+                  "uniform_fallback_visits": 17,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 2,
+                    "river": 7,
+                    "turn": 8
+                  }
+                },
+                {
+                  "average_strategy_visits": 34928,
+                  "average_strategy_visits_by_street": {
+                    "flop": 576,
+                    "preflop": 33745,
+                    "river": 206,
+                    "turn": 401
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35090,
+                  "decision_visits_by_street": {
+                    "flop": 612,
+                    "preflop": 33750,
+                    "river": 283,
+                    "turn": 445
+                  },
+                  "regret_fallback_visits": 136,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 31,
+                    "preflop": 4,
+                    "river": 68,
+                    "turn": 33
+                  },
+                  "stored_strategy_visits": 35064,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 607,
+                    "preflop": 33749,
+                    "river": 274,
+                    "turn": 434
+                  },
+                  "uniform_fallback_visits": 26,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 5,
+                    "preflop": 1,
+                    "river": 9,
+                    "turn": 11
+                  }
+                },
+                {
+                  "average_strategy_visits": 35607,
+                  "average_strategy_visits_by_street": {
+                    "flop": 923,
+                    "preflop": 33871,
+                    "river": 218,
+                    "turn": 595
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35910,
+                  "decision_visits_by_street": {
+                    "flop": 949,
+                    "preflop": 33878,
+                    "river": 405,
+                    "turn": 678
+                  },
+                  "regret_fallback_visits": 286,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 21,
+                    "preflop": 6,
+                    "river": 180,
+                    "turn": 79
+                  },
+                  "stored_strategy_visits": 35893,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 944,
+                    "preflop": 33877,
+                    "river": 398,
+                    "turn": 674
+                  },
+                  "uniform_fallback_visits": 17,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 5,
+                    "preflop": 1,
+                    "river": 7,
+                    "turn": 4
+                  }
+                }
+              ],
+              "coverage": [
+                {
+                  "baseline_fallback_visits": 5206,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1856,
+                    "preflop": 1220,
+                    "river": 833,
+                    "turn": 1297
+                  },
+                  "decision_visits": 38302,
+                  "decision_visits_by_street": {
+                    "flop": 1856,
+                    "preflop": 34316,
+                    "river": 833,
+                    "turn": 1297
+                  },
+                  "trained_action_visits": 33096,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 33096,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 7888,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 2482,
+                    "preflop": 2190,
+                    "river": 1257,
+                    "turn": 1959
+                  },
+                  "decision_visits": 39877,
+                  "decision_visits_by_street": {
+                    "flop": 2482,
+                    "preflop": 34179,
+                    "river": 1257,
+                    "turn": 1959
+                  },
+                  "trained_action_visits": 31989,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 31989,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 22456,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 8862,
+                    "preflop": 2796,
+                    "river": 4431,
+                    "turn": 6367
+                  },
+                  "decision_visits": 46348,
+                  "decision_visits_by_street": {
+                    "flop": 8862,
+                    "preflop": 26688,
+                    "river": 4431,
+                    "turn": 6367
+                  },
+                  "trained_action_visits": 23892,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 23892,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 1202,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 445,
+                    "preflop": 238,
+                    "river": 207,
+                    "turn": 312
+                  },
+                  "decision_visits": 34360,
+                  "decision_visits_by_street": {
+                    "flop": 445,
+                    "preflop": 33396,
+                    "river": 207,
+                    "turn": 312
+                  },
+                  "trained_action_visits": 33158,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 33158,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 2004,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 651,
+                    "preflop": 598,
+                    "river": 292,
+                    "turn": 463
+                  },
+                  "decision_visits": 35167,
+                  "decision_visits_by_street": {
+                    "flop": 651,
+                    "preflop": 33761,
+                    "river": 292,
+                    "turn": 463
+                  },
+                  "trained_action_visits": 33163,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 33163,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 1903,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 634,
+                    "preflop": 593,
+                    "river": 243,
+                    "turn": 433
+                  },
+                  "decision_visits": 34875,
+                  "decision_visits_by_street": {
+                    "flop": 634,
+                    "preflop": 33565,
+                    "river": 243,
+                    "turn": 433
+                  },
+                  "trained_action_visits": 32972,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 32972,
+                    "river": 0,
+                    "turn": 0
+                  }
+                }
+              ],
+              "deviating": [
+                {
+                  "ci95": [
+                    -0.29065321433241303,
+                    0.1364615639417872
+                  ],
+                  "mean": -0.0770958251953129,
+                  "stderr": 0.10895785160056129
+                },
+                {
+                  "ci95": [
+                    -0.9673446497252958,
+                    -0.5003741613098556
+                  ],
+                  "mean": -0.7338594055175757,
+                  "stderr": 0.11912512459577557
+                },
+                {
+                  "ci95": [
+                    -1.117965166679015,
+                    -0.5983245672076998
+                  ],
+                  "mean": -0.8581448669433573,
+                  "stderr": 0.1325613774161518
+                },
+                {
+                  "ci95": [
+                    0.1867047117726278,
+                    0.4440692140086262
+                  ],
+                  "mean": 0.315386962890627,
+                  "stderr": 0.06565420975408123
+                },
+                {
+                  "ci95": [
+                    0.001607090532593336,
+                    0.31364559501428335
+                  ],
+                  "mean": 0.15762634277343834,
+                  "stderr": 0.07960165930655358
+                },
+                {
+                  "ci95": [
+                    -0.04082817135286482,
+                    0.34896965084504916
+                  ],
+                  "mean": 0.15407073974609217,
+                  "stderr": 0.09943821994844744
+                }
+              ],
+              "elapsedSecs": 10.5284076,
+              "gains": [
+                {
+                  "ci95": [
+                    -0.37900483341390556,
+                    0.009275280191250707
+                  ],
+                  "mean": -0.18486477661132744,
+                  "stderr": 0.09905104938907049
+                },
+                {
+                  "ci95": [
+                    -0.3092074650505596,
+                    0.07383911788259015
+                  ],
+                  "mean": -0.11768417358398472,
+                  "stderr": 0.09771596503396678
+                },
+                {
+                  "ci95": [
+                    -0.5390077767662436,
+                    -0.14951291415172793
+                  ],
+                  "mean": -0.34426034545898576,
+                  "stderr": 0.09936093434043768
+                },
+                {
+                  "ci95": [
+                    0.009364871410847075,
+                    0.29704076823759235
+                  ],
+                  "mean": 0.1532028198242197,
+                  "stderr": 0.07338670837416972
+                },
+                {
+                  "ci95": [
+                    -0.17590763131034903,
+                    0.1374539569939433
+                  ],
+                  "mean": -0.019226837158202868,
+                  "stderr": 0.07993918068987049
+                },
+                {
+                  "ci95": [
+                    -0.3026692741761655,
+                    0.08812246021132325
+                  ],
+                  "mean": -0.10727340698242113,
+                  "stderr": 0.0996917689764002
+                }
+              ],
+              "samples": 32768,
+              "seed": 2802,
+              "totalDealAttempts": 32768
+            }
+          ],
+          "maxBufferedSamples": 4096,
+          "minFitVisits": 8,
+          "schemaVersion": "solvers.multiway-preflop-deviation/v1",
+          "scope": "all-preflop-decisions-with-frozen-postflop",
+          "variant": {
+            "purify_threshold": 0.0,
+            "use_current_strategy": false
+          }
+        },
+        "measurement": {
+          "arguments": [
+            "--config",
+            "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\preflop-proposal-20260910\\config.toml",
+            "--fresh-sweeps",
+            "8192",
+            "--threads",
+            "8",
+            "--memory",
+            "8GiB",
+            "--cache-dir",
+            "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\.cache\\bench-ehs",
+            "--samples",
+            "128",
+            "--evaluation-seeds",
+            "101,202",
+            "--br-traversals",
+            "1",
+            "--node",
+            "root",
+            "--node-frequency-samples",
+            "0",
+            "--support-node",
+            "root",
+            "--support-node",
+            "fold/fold/fold/fold",
+            "--support-node",
+            "fold/fold/fold/fold/raise-to:3000",
+            "--support-node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+            "--support-node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+            "--support-node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+            "--preflop-support-census",
+            "--enumerate-raised-preflop",
+            "--preflop-deviation-fit-traversals",
+            "131072",
+            "--preflop-deviation-fit-seed",
+            "2601",
+            "--preflop-deviation-samples",
+            "32768",
+            "--preflop-deviation-seeds",
+            "2801,2802"
+          ],
+          "binary": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\whole-preflop-deviation-20260910\\candidate-v3\\audit.exe",
+          "binarySha256": "63757d48f8d2011297eb43647b326d5ba0925d28b837d3d7eac5445ac9d50596",
+          "configSha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+          "exitCode": 0,
+          "job": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\whole-preflop-fit-calibration-20260910\\enumerated-job.json",
+          "jobSha256": "e79af02289242d1e08bf5166077f5a0a7d17f03e746408afa3829ffe3866f945",
+          "observedPeakWorkingSetBytes": 1435156480,
+          "peakMethod": "Windows lifetime PeakWorkingSet64 queried every 50 ms; final unsampled interval may be omitted. Whole process covers all phases executed by the child binary, including JSON and disposal.",
+          "schemaVersion": "solvers.checkpoint-audit-measurement/v1",
+          "sourceManifestSha256": "89edf90ae36556a239cf58e61d5501dc563d637469e3ab21b2de5055dbbdf35b",
+          "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+          "sourceStatus": [
+            " M crates/cli/Cargo.toml",
+            " M crates/cli/examples/mw_average_sampling_research.md",
+            " M crates/cli/examples/mw_average_sampling_research.rs",
+            " M crates/cli/examples/mw_checkpoint_audit.md",
+            " M crates/cli/examples/mw_checkpoint_audit.rs",
+            " M crates/cli/examples/mw_draw_abstraction_research.rs",
+            " M crates/cli/src/lib.rs",
+            " M crates/cli/src/multiway_artifact.rs",
+            " M crates/cli/src/multiway_solve.rs",
+            " M crates/cli/src/session.rs",
+            " M crates/formats/src/lib.rs",
+            " M crates/formats/src/multiway.rs",
+            " M crates/multiway/Cargo.toml",
+            " M crates/multiway/src/checkpoint.rs",
+            " M crates/multiway/src/lib.rs",
+            " M crates/multiway/src/sampler.rs",
+            " M crates/multiway/src/solver/averaging.rs",
+            " M crates/multiway/src/solver/eval.rs",
+            " M crates/multiway/src/solver/mod.rs",
+            " M crates/multiway/src/solver/tests.rs",
+            " M crates/multiway/src/solver/workers.rs",
+            " M crates/multiway/src/tree.rs",
+            " M docs/architecture.md",
+            " M docs/cli-reference.jp.md",
+            " M docs/multiway-preflop-v1.jp.md",
+            " M docs/multiway-preflop-v1.md",
+            " M docs/research/active/multiway-average-sampling-design-2026-09-09.md",
+            " M docs/research/active/multiway-initialization-next-2026-09-09.md",
+            " M docs/user-guide.jp.md",
+            " M docs/validation/README.md",
+            " M tools/README.md",
+            "?? crates/cli/examples/mw_checkpoint_load_bench.md",
+            "?? crates/cli/examples/mw_checkpoint_load_bench.rs",
+            "?? crates/cli/examples/mw_checkpoint_write_bench.md",
+            "?? crates/cli/examples/mw_checkpoint_write_bench.rs",
+            "?? crates/cli/examples/mw_strategy_drift_bench.md",
+            "?? crates/cli/examples/mw_strategy_drift_bench.rs",
+            "?? crates/cli/examples/mw_tree_initialization_bench.md",
+            "?? crates/cli/examples/mw_tree_initialization_bench.rs",
+            "?? crates/multiway/src/checkpoint/",
+            "?? crates/multiway/src/solver/averaging_continuation_tests.rs",
+            "?? crates/multiway/src/solver/conditioned.rs",
+            "?? crates/multiway/src/solver/counterfactual_proposal_tests.rs",
+            "?? crates/multiway/src/solver/dense_merge_tests.rs",
+            "?? crates/multiway/src/solver/drift_tests.rs",
+            "?? crates/multiway/src/solver/endpoint_counterfactual_tests.rs",
+            "?? crates/multiway/src/solver/endpoint_deviation.rs",
+            "?? crates/multiway/src/solver/preflop_census.rs",
+            "?? crates/multiway/src/solver/preflop_deviation.rs",
+            "?? crates/multiway/src/solver/preflop_deviation_tests.rs",
+            "?? crates/multiway/src/solver/preflop_proposal.rs",
+            "?? crates/multiway/src/solver/raised_opponent_tests.rs",
+            "?? crates/multiway/src/solver/regret_sampling.rs",
+            "?? crates/multiway/src/solver/research_diagnostics.rs",
+            "?? crates/multiway/src/solver/snapshot.rs",
+            "?? crates/multiway/src/solver/snapshot_tests.rs",
+            "?? docs/research/active/balanced-endpoint-plan-2026-09-10.md",
+            "?? docs/research/active/multiway-checkpoint-write-2026-09-10.md",
+            "?? docs/research/active/multiway-dense-merge-2026-09-10.md",
+            "?? docs/research/active/multiway-depth-next-2026-09-10.md",
+            "?? docs/research/active/multiway-endpoint-deviation-2026-09-10.md",
+            "?? docs/research/active/multiway-opponent-exploration-2026-09-10.md",
+            "?? docs/research/active/multiway-postflop-average-proposal-2026-09-10.md",
+            "?? docs/research/active/multiway-preflop-counterfactual-diagnostics-2026-09-10.md",
+            "?? docs/research/active/multiway-preflop-endpoint-cohort-next-2026-09-10.json",
+            "?? docs/research/active/multiway-preflop-fit-calibration-2026-09-10.md",
+            "?? docs/research/active/multiway-preflop-quality-2026-09-10.md",
+            "?? docs/research/active/multiway-preflop-seed29-2026-09-10.md",
+            "?? docs/research/active/multiway-production-drift-2026-09-10.md",
+            "?? docs/research/active/multiway-raised-opponent-enumeration-2026-09-10.md",
+            "?? docs/research/active/multiway-whole-preflop-evaluation-next-2026-09-10.md",
+            "?? docs/research/active/multiway-whole-preflop-pilot-2026-09-10.md",
+            "?? docs/validation/gtowizard-simple-deep-preflop-2026-09-10.json",
+            "?? docs/validation/multiway-average-continuation-2026-09-10.json",
+            "?? docs/validation/multiway-average-continuation-2026-09-10.md",
+            "?? docs/validation/multiway-average-depth-2026-09-10.json",
+            "?? docs/validation/multiway-average-depth-2026-09-10.md",
+            "?? docs/validation/multiway-balanced-endpoint-2026-09-10.json",
+            "?? docs/validation/multiway-balanced-endpoint-2026-09-10.md",
+            "?? docs/validation/multiway-checkpoint-streaming-2026-09-10.json",
+            "?? docs/validation/multiway-checkpoint-streaming-2026-09-10.md",
+            "?? docs/validation/multiway-checkpoint-write-2026-09-10.json",
+            "?? docs/validation/multiway-checkpoint-write-2026-09-10.md",
+            "?? docs/validation/multiway-conditional-depth-2026-09-10.json",
+            "?? docs/validation/multiway-conditional-depth-2026-09-10.md",
+            "?? docs/validation/multiway-deep-prefix-audit-2026-09-10.json",
+            "?? docs/validation/multiway-deep-prefix-audit-2026-09-10.md",
+            "?? docs/validation/multiway-dense-merge-2026-09-10.json",
+            "?? docs/validation/multiway-dense-merge-2026-09-10.md",
+            "?? docs/validation/multiway-depth-coverage-2026-09-10.json",
+            "?? docs/validation/multiway-depth-coverage-2026-09-10.md",
+            "?? docs/validation/multiway-endpoint-deviation-2026-09-10.json",
+            "?? docs/validation/multiway-endpoint-deviation-2026-09-10.md",
+            "?? docs/validation/multiway-initialization-phases-2026-09-10.json",
+            "?? docs/validation/multiway-initialization-phases-2026-09-10.md",
+            "?? docs/validation/multiway-opponent-exploration-2026-09-10.json",
+            "?? docs/validation/multiway-opponent-exploration-2026-09-10.md",
+            "?? docs/validation/multiway-preflop-counterfactual-2026-09-10.json",
+            "?? docs/validation/multiway-preflop-counterfactual-2026-09-10.md",
+            "?? docs/validation/multiway-preflop-discount-2026-09-10.json",
+            "?? docs/validation/multiway-preflop-discount-2026-09-10.md",
+            "?? docs/validation/multiway-preflop-discount-seed11-2026-09-10.json",
+            "?? docs/validation/multiway-preflop-discount-seed11-2026-09-10.md",
+            "?? docs/validation/multiway-preflop-discount-seed29-2026-09-10.json",
+            "?? docs/validation/multiway-preflop-discount-seed29-2026-09-10.md",
+            "?? docs/validation/multiway-preflop-endpoint-2026-09-10.json",
+            "?? docs/validation/multiway-preflop-endpoint-2026-09-10.md",
+            "?? docs/validation/multiway-preflop-proposal-2026-09-10.json",
+            "?? docs/validation/multiway-preflop-proposal-2026-09-10.md",
+            "?? docs/validation/multiway-production-drift-2026-09-10.json",
+            "?? docs/validation/multiway-production-drift-2026-09-10.md",
+            "?? docs/validation/multiway-production-initialization-2026-09-10.json",
+            "?? docs/validation/multiway-production-initialization-2026-09-10.md",
+            "?? docs/validation/multiway-raised-opponent-2026-09-10.full.json.gz",
+            "?? docs/validation/multiway-raised-opponent-2026-09-10.json",
+            "?? docs/validation/multiway-raised-opponent-2026-09-10.md",
+            "?? docs/validation/multiway-storage-coverage-erratum-2026-09-10.md",
+            "?? docs/validation/multiway-whole-preflop-deviation-2026-09-10.json",
+            "?? docs/validation/multiway-whole-preflop-deviation-2026-09-10.md",
+            "?? tools/run_average_sampling_measurement.ps1",
+            "?? tools/run_checkpoint_load_bench.ps1",
+            "?? tools/run_checkpoint_write_bench.ps1",
+            "?? tools/summarize_average_continuation.py",
+            "?? tools/summarize_average_depth.py",
+            "?? tools/summarize_balanced_endpoint.py",
+            "?? tools/summarize_checkpoint_write.py",
+            "?? tools/summarize_conditional_depth.py",
+            "?? tools/summarize_dense_merge.py",
+            "?? tools/summarize_endpoint_deviation.py",
+            "?? tools/summarize_opponent_exploration.py",
+            "?? tools/summarize_preflop_counterfactual.py",
+            "?? tools/summarize_preflop_discount.py",
+            "?? tools/summarize_preflop_discount_seed.py",
+            "?? tools/summarize_preflop_discount_seed29.py",
+            "?? tools/summarize_preflop_endpoint.py",
+            "?? tools/summarize_preflop_proposal.py",
+            "?? tools/summarize_raised_opponent.py",
+            "?? tools/summarize_strategy_drift.py",
+            "?? tools/summarize_whole_preflop_deviation.py",
+            "?? tools/tests/test_summarize_average_continuation.py",
+            "?? tools/tests/test_summarize_average_depth.py",
+            "?? tools/tests/test_summarize_balanced_endpoint.py",
+            "?? tools/tests/test_summarize_checkpoint_write.py",
+            "?? tools/tests/test_summarize_dense_merge.py",
+            "?? tools/tests/test_summarize_preflop_counterfactual.py",
+            "?? tools/tests/test_summarize_preflop_discount.py",
+            "?? tools/tests/test_summarize_preflop_discount_seed.py",
+            "?? tools/tests/test_summarize_preflop_discount_seed29.py",
+            "?? tools/tests/test_summarize_preflop_endpoint.py",
+            "?? tools/tests/test_summarize_raised_opponent.py",
+            "?? tools/tests/test_summarize_strategy_drift.py",
+            "?? tools/tests/test_summarize_whole_preflop_deviation.py"
+          ],
+          "startedUtc": "2026-09-10T05:36:04.7247602Z",
+          "stdoutSha256": "8f8fef6df55ff0e89c429fd85bf9042b0e80c44b668cc718e33b51f735811d8d",
+          "timedOut": false,
+          "timeoutSeconds": 600,
+          "validationReport": "docs/validation/multiway-preflop-fit-calibration-2026-09-10.md",
+          "wallSeconds": 192.6824478
+        },
+        "measurementSha256": "d8630f0149a4f2719ad618aea6e29fef46bcdfd6f31c6ba3e6f85a920db7a5db",
+        "normalizedOldOutputSha256": "a53ee6bec443f9950972bf6694ab6593f02e573cd42ea148edc6229754ab8542",
+        "oldOutputExactlyReplayed": true,
+        "rows": [
+          {
+            "baseline": {
+              "ci95": [
+                0.06503858292049877,
+                0.47898369491153436
+              ],
+              "mean": 0.2720111389160166,
+              "stderr": 0.10559824285485603
+            },
+            "deviating": {
+              "ci95": [
+                -0.16580290201143794,
+                0.28505448892550067
+              ],
+              "mean": 0.059625793457031374,
+              "stderr": 0.11501464054513741
+            },
+            "gain": {
+              "ci95": [
+                -0.4056086515669798,
+                -0.01916203935098848
+              ],
+              "mean": -0.21238534545898413,
+              "stderr": 0.09858331944285492
+            },
+            "position": "BTN",
+            "preflopDecisionVisits": 34422,
+            "preflopTrainedActionVisits": 33169,
+            "preflopTrainedVisitFraction": 0.9635988611934229,
+            "seat": 0,
+            "seed": 2801
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.740410545336101,
+                -0.324555885327964
+              ],
+              "mean": -0.5324832153320325,
+              "stderr": 0.10608537245105536
+            },
+            "deviating": {
+              "ci95": [
+                -1.1184142334016838,
+                -0.6461278808561373
+              ],
+              "mean": -0.8822710571289105,
+              "stderr": 0.12048121238406799
+            },
+            "gain": {
+              "ci95": [
+                -0.5355503634697119,
+                -0.16402532012403875
+              ],
+              "mean": -0.34978784179687533,
+              "stderr": 0.0947767967718554
+            },
+            "position": "SB",
+            "preflopDecisionVisits": 34144,
+            "preflopTrainedActionVisits": 32024,
+            "preflopTrainedVisitFraction": 0.9379100281162137,
+            "seat": 1,
+            "seed": 2801
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -1.0400754462804647,
+                -0.5869332207117206
+              ],
+              "mean": -0.8135043334960926,
+              "stderr": 0.11559750652263878
+            },
+            "deviating": {
+              "ci95": [
+                -1.2941433875767876,
+                -0.7852010338099267
+              ],
+              "mean": -1.0396722106933571,
+              "stderr": 0.12983223310379102
+            },
+            "gain": {
+              "ci95": [
+                -0.42346800367871534,
+                -0.02886775071581338
+              ],
+              "mean": -0.22616787719726436,
+              "stderr": 0.10066332983747499
+            },
+            "position": "BB",
+            "preflopDecisionVisits": 26552,
+            "preflopTrainedActionVisits": 23788,
+            "preflopTrainedVisitFraction": 0.8959023802350106,
+            "seat": 2,
+            "seed": 2801
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.01958678431371602,
+                0.36019390101293475
+              ],
+              "mean": 0.17030355834960936,
+              "stderr": 0.09688282788945173
+            },
+            "deviating": {
+              "ci95": [
+                0.12931474671443363,
+                0.3974374505511882
+              ],
+              "mean": 0.2633760986328109,
+              "stderr": 0.0683986489379476
+            },
+            "gain": {
+              "ci95": [
+                -0.04855858452784599,
+                0.23470366509425244
+              ],
+              "mean": 0.09307254028320323,
+              "stderr": 0.07226077796482104
+            },
+            "position": "UTG",
+            "preflopDecisionVisits": 33420,
+            "preflopTrainedActionVisits": 33150,
+            "preflopTrainedVisitFraction": 0.9919210053859964,
+            "seat": 3,
+            "seed": 2801
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.023846451252488493,
+                0.37599259904047977
+              ],
+              "mean": 0.19991952514648412,
+              "stderr": 0.0898332009663243
+            },
+            "deviating": {
+              "ci95": [
+                0.08261978038400078,
+                0.4018674022331854
+              ],
+              "mean": 0.24224359130859308,
+              "stderr": 0.08144071985948587
+            },
+            "gain": {
+              "ci95": [
+                -0.12002377261891907,
+                0.20467190494313786
+              ],
+              "mean": 0.04232406616210939,
+              "stderr": 0.08283052999032064
+            },
+            "position": "HJ",
+            "preflopDecisionVisits": 33771,
+            "preflopTrainedActionVisits": 33240,
+            "preflopTrainedVisitFraction": 0.984276450208759,
+            "seat": 4,
+            "seed": 2801
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.08726522804168244,
+                0.48211782859894126
+              ],
+              "mean": 0.28469152832031186,
+              "stderr": 0.10072770422379053
+            },
+            "deviating": {
+              "ci95": [
+                -0.2682311964663286,
+                0.13477141863429803
+              ],
+              "mean": -0.06672988891601526,
+              "stderr": 0.10280678956648638
+            },
+            "gain": {
+              "ci95": [
+                -0.5549695689854061,
+                -0.14787326548724988
+              ],
+              "mean": -0.35142141723632797,
+              "stderr": 0.1038510978311623
+            },
+            "position": "CO",
+            "preflopDecisionVisits": 33537,
+            "preflopTrainedActionVisits": 33004,
+            "preflopTrainedVisitFraction": 0.9841071055848764,
+            "seat": 5,
+            "seed": 2801
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.08740547759409796,
+                0.3029433804261302
+              ],
+              "mean": 0.10776895141601613,
+              "stderr": 0.0995787903112827
+            },
+            "deviating": {
+              "ci95": [
+                -0.29065321433241303,
+                0.1364615639417872
+              ],
+              "mean": -0.0770958251953129,
+              "stderr": 0.10895785160056129
+            },
+            "gain": {
+              "ci95": [
+                -0.37900483341390556,
+                0.009275280191250707
+              ],
+              "mean": -0.18486477661132744,
+              "stderr": 0.09905104938907049
+            },
+            "position": "BTN",
+            "preflopDecisionVisits": 34316,
+            "preflopTrainedActionVisits": 33096,
+            "preflopTrainedVisitFraction": 0.9644480708707308,
+            "seat": 0,
+            "seed": 2802
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.8222649313483879,
+                -0.4100855325188018
+              ],
+              "mean": -0.6161752319335948,
+              "stderr": 0.10514780582387398
+            },
+            "deviating": {
+              "ci95": [
+                -0.9673446497252958,
+                -0.5003741613098556
+              ],
+              "mean": -0.7338594055175757,
+              "stderr": 0.11912512459577557
+            },
+            "gain": {
+              "ci95": [
+                -0.3092074650505596,
+                0.07383911788259015
+              ],
+              "mean": -0.11768417358398472,
+              "stderr": 0.09771596503396678
+            },
+            "position": "SB",
+            "preflopDecisionVisits": 34179,
+            "preflopTrainedActionVisits": 31989,
+            "preflopTrainedVisitFraction": 0.9359255683314316,
+            "seat": 1,
+            "seed": 2802
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.7461212384127909,
+                -0.2816478045559623
+              ],
+              "mean": -0.5138845214843766,
+              "stderr": 0.11848812088184402
+            },
+            "deviating": {
+              "ci95": [
+                -1.117965166679015,
+                -0.5983245672076998
+              ],
+              "mean": -0.8581448669433573,
+              "stderr": 0.1325613774161518
+            },
+            "gain": {
+              "ci95": [
+                -0.5390077767662436,
+                -0.14951291415172793
+              ],
+              "mean": -0.34426034545898576,
+              "stderr": 0.09936093434043768
+            },
+            "position": "BB",
+            "preflopDecisionVisits": 26688,
+            "preflopTrainedActionVisits": 23892,
+            "preflopTrainedVisitFraction": 0.8952338129496403,
+            "seat": 2,
+            "seed": 2802
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.024973973085004236,
+                0.3493422592178186
+              ],
+              "mean": 0.16218414306640716,
+              "stderr": 0.09548883477112827
+            },
+            "deviating": {
+              "ci95": [
+                0.1867047117726278,
+                0.4440692140086262
+              ],
+              "mean": 0.315386962890627,
+              "stderr": 0.06565420975408123
+            },
+            "gain": {
+              "ci95": [
+                0.009364871410847075,
+                0.29704076823759235
+              ],
+              "mean": 0.1532028198242197,
+              "stderr": 0.07338670837416972
+            },
+            "position": "UTG",
+            "preflopDecisionVisits": 33396,
+            "preflopTrainedActionVisits": 33158,
+            "preflopTrainedVisitFraction": 0.9928733980117379,
+            "seat": 3,
+            "seed": 2802
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.0010052210738374645,
+                0.35471158093711774
+              ],
+              "mean": 0.17685317993164013,
+              "stderr": 0.09074408214565183
+            },
+            "deviating": {
+              "ci95": [
+                0.001607090532593336,
+                0.31364559501428335
+              ],
+              "mean": 0.15762634277343834,
+              "stderr": 0.07960165930655358
+            },
+            "gain": {
+              "ci95": [
+                -0.17590763131034903,
+                0.1374539569939433
+              ],
+              "mean": -0.019226837158202868,
+              "stderr": 0.07993918068987049
+            },
+            "position": "HJ",
+            "preflopDecisionVisits": 33761,
+            "preflopTrainedActionVisits": 33163,
+            "preflopTrainedVisitFraction": 0.9822872545244513,
+            "seat": 4,
+            "seed": 2802
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.07005251217028033,
+                0.4526357812867503
+              ],
+              "mean": 0.2613441467285153,
+              "stderr": 0.09759777273379336
+            },
+            "deviating": {
+              "ci95": [
+                -0.04082817135286482,
+                0.34896965084504916
+              ],
+              "mean": 0.15407073974609217,
+              "stderr": 0.09943821994844744
+            },
+            "gain": {
+              "ci95": [
+                -0.3026692741761655,
+                0.08812246021132325
+              ],
+              "mean": -0.10727340698242113,
+              "stderr": 0.0996917689764002
+            },
+            "position": "CO",
+            "preflopDecisionVisits": 33565,
+            "preflopTrainedActionVisits": 32972,
+            "preflopTrainedVisitFraction": 0.9823327871294503,
+            "seat": 5,
+            "seed": 2802
+          }
+        ],
+        "solveElapsedSecs": 35.1506487
+      },
+      "ordinary": {
+        "constructionElapsedSecs": 45.6461698,
+        "diagnostic": {
+          "config": {
+            "fitSeed": 2601,
+            "fitTraversalsPerSeat": 131072,
+            "heldOutSamples": 32768,
+            "heldOutSeeds": [
+              2801,
+              2802
+            ]
+          },
+          "fitCoverage": [
+            {
+              "retained_infosets": 2285,
+              "retained_visits": 154472,
+              "total_visits": 183439,
+              "traversals": 131072,
+              "visited_infosets": 17605
+            },
+            {
+              "retained_infosets": 2795,
+              "retained_visits": 155664,
+              "total_visits": 178877,
+              "traversals": 131072,
+              "visited_infosets": 14922
+            },
+            {
+              "retained_infosets": 2608,
+              "retained_visits": 102341,
+              "total_visits": 126112,
+              "traversals": 131072,
+              "visited_infosets": 14596
+            },
+            {
+              "retained_infosets": 2004,
+              "retained_visits": 179872,
+              "total_visits": 203586,
+              "traversals": 131072,
+              "visited_infosets": 15154
+            },
+            {
+              "retained_infosets": 1946,
+              "retained_visits": 163892,
+              "total_visits": 189307,
+              "traversals": 131072,
+              "visited_infosets": 16045
+            },
+            {
+              "retained_infosets": 2121,
+              "retained_visits": 154573,
+              "total_visits": 183172,
+              "traversals": 131072,
+              "visited_infosets": 17077
+            }
+          ],
+          "fitElapsedSecs": 100.2682829,
+          "fitPolicyFingerprint": "c43024203c906ba5f600c58086bf4d64b2a6a1bbde724c51cef45966f47db80f",
+          "heldOut": [
+            {
+              "baseline": [
+                {
+                  "ci95": [
+                    0.09305658002446288,
+                    0.567956115288035
+                  ],
+                  "mean": 0.330506347656249,
+                  "stderr": 0.1211478406284623
+                },
+                {
+                  "ci95": [
+                    -0.7691080914627538,
+                    -0.277769044767722
+                  ],
+                  "mean": -0.5234385681152379,
+                  "stderr": 0.125341593544651
+                },
+                {
+                  "ci95": [
+                    -1.0023021592122945,
+                    -0.49342623434239025
+                  ],
+                  "mean": -0.7478641967773424,
+                  "stderr": 0.12981528695660824
+                },
+                {
+                  "ci95": [
+                    -0.028645711065050705,
+                    0.37053548157286137
+                  ],
+                  "mean": 0.17094488525390533,
+                  "stderr": 0.10183193689742655
+                },
+                {
+                  "ci95": [
+                    0.0255837553729783,
+                    0.40095072949030575
+                  ],
+                  "mean": 0.21326724243164202,
+                  "stderr": 0.09575688115237946
+                },
+                {
+                  "ci95": [
+                    -0.08261743928518425,
+                    0.34956342317190237
+                  ],
+                  "mean": 0.13347299194335907,
+                  "stderr": 0.11025022001456292
+                }
+              ],
+              "candidatePolicyCoverage": [
+                {
+                  "average_strategy_visits": 36607,
+                  "average_strategy_visits_by_street": {
+                    "flop": 1314,
+                    "preflop": 33962,
+                    "river": 464,
+                    "turn": 867
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 36889,
+                  "decision_visits_by_street": {
+                    "flop": 1347,
+                    "preflop": 33965,
+                    "river": 624,
+                    "turn": 953
+                  },
+                  "regret_fallback_visits": 262,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 28,
+                    "preflop": 3,
+                    "river": 156,
+                    "turn": 75
+                  },
+                  "stored_strategy_visits": 36869,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 1342,
+                    "preflop": 33965,
+                    "river": 620,
+                    "turn": 942
+                  },
+                  "uniform_fallback_visits": 20,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 5,
+                    "preflop": 0,
+                    "river": 4,
+                    "turn": 11
+                  }
+                },
+                {
+                  "average_strategy_visits": 40070,
+                  "average_strategy_visits_by_street": {
+                    "flop": 2528,
+                    "preflop": 34413,
+                    "river": 1243,
+                    "turn": 1886
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 40350,
+                  "decision_visits_by_street": {
+                    "flop": 2536,
+                    "preflop": 34418,
+                    "river": 1416,
+                    "turn": 1980
+                  },
+                  "regret_fallback_visits": 268,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 5,
+                    "preflop": 3,
+                    "river": 169,
+                    "turn": 91
+                  },
+                  "stored_strategy_visits": 40338,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 2533,
+                    "preflop": 34416,
+                    "river": 1412,
+                    "turn": 1977
+                  },
+                  "uniform_fallback_visits": 12,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 3,
+                    "preflop": 2,
+                    "river": 4,
+                    "turn": 3
+                  }
+                },
+                {
+                  "average_strategy_visits": 35436,
+                  "average_strategy_visits_by_street": {
+                    "flop": 5111,
+                    "preflop": 24202,
+                    "river": 2399,
+                    "turn": 3724
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35837,
+                  "decision_visits_by_street": {
+                    "flop": 5130,
+                    "preflop": 24213,
+                    "river": 2669,
+                    "turn": 3825
+                  },
+                  "regret_fallback_visits": 376,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 12,
+                    "preflop": 4,
+                    "river": 264,
+                    "turn": 96
+                  },
+                  "stored_strategy_visits": 35812,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 5123,
+                    "preflop": 24206,
+                    "river": 2663,
+                    "turn": 3820
+                  },
+                  "uniform_fallback_visits": 25,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 7,
+                    "preflop": 7,
+                    "river": 6,
+                    "turn": 5
+                  }
+                },
+                {
+                  "average_strategy_visits": 36571,
+                  "average_strategy_visits_by_street": {
+                    "flop": 1059,
+                    "preflop": 34453,
+                    "river": 381,
+                    "turn": 678
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 36686,
+                  "decision_visits_by_street": {
+                    "flop": 1071,
+                    "preflop": 34458,
+                    "river": 465,
+                    "turn": 692
+                  },
+                  "regret_fallback_visits": 100,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 6,
+                    "preflop": 5,
+                    "river": 81,
+                    "turn": 8
+                  },
+                  "stored_strategy_visits": 36671,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 1065,
+                    "preflop": 34458,
+                    "river": 462,
+                    "turn": 686
+                  },
+                  "uniform_fallback_visits": 15,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 6,
+                    "preflop": 0,
+                    "river": 3,
+                    "turn": 6
+                  }
+                },
+                {
+                  "average_strategy_visits": 35744,
+                  "average_strategy_visits_by_street": {
+                    "flop": 870,
+                    "preflop": 34043,
+                    "river": 287,
+                    "turn": 544
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35972,
+                  "decision_visits_by_street": {
+                    "flop": 905,
+                    "preflop": 34048,
+                    "river": 403,
+                    "turn": 616
+                  },
+                  "regret_fallback_visits": 203,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 27,
+                    "preflop": 4,
+                    "river": 106,
+                    "turn": 66
+                  },
+                  "stored_strategy_visits": 35947,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 897,
+                    "preflop": 34047,
+                    "river": 393,
+                    "turn": 610
+                  },
+                  "uniform_fallback_visits": 25,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 8,
+                    "preflop": 1,
+                    "river": 10,
+                    "turn": 6
+                  }
+                },
+                {
+                  "average_strategy_visits": 34950,
+                  "average_strategy_visits_by_street": {
+                    "flop": 573,
+                    "preflop": 33914,
+                    "river": 134,
+                    "turn": 329
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35190,
+                  "decision_visits_by_street": {
+                    "flop": 620,
+                    "preflop": 33918,
+                    "river": 263,
+                    "turn": 389
+                  },
+                  "regret_fallback_visits": 221,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 35,
+                    "preflop": 3,
+                    "river": 125,
+                    "turn": 58
+                  },
+                  "stored_strategy_visits": 35171,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 608,
+                    "preflop": 33917,
+                    "river": 259,
+                    "turn": 387
+                  },
+                  "uniform_fallback_visits": 19,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 12,
+                    "preflop": 1,
+                    "river": 4,
+                    "turn": 2
+                  }
+                }
+              ],
+              "coverage": [
+                {
+                  "baseline_fallback_visits": 3822,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1252,
+                    "preflop": 1245,
+                    "river": 513,
+                    "turn": 812
+                  },
+                  "decision_visits": 36641,
+                  "decision_visits_by_street": {
+                    "flop": 1252,
+                    "preflop": 34064,
+                    "river": 513,
+                    "turn": 812
+                  },
+                  "trained_action_visits": 32819,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 32819,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 7880,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 2542,
+                    "preflop": 2003,
+                    "river": 1381,
+                    "turn": 1954
+                  },
+                  "decision_visits": 40199,
+                  "decision_visits_by_street": {
+                    "flop": 2542,
+                    "preflop": 34322,
+                    "river": 1381,
+                    "turn": 1954
+                  },
+                  "trained_action_visits": 32319,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 32319,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 20451,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 8104,
+                    "preflop": 2900,
+                    "river": 3864,
+                    "turn": 5583
+                  },
+                  "decision_visits": 42027,
+                  "decision_visits_by_street": {
+                    "flop": 8104,
+                    "preflop": 24476,
+                    "river": 3864,
+                    "turn": 5583
+                  },
+                  "trained_action_visits": 21576,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 21576,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 1218,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 413,
+                    "preflop": 349,
+                    "river": 190,
+                    "turn": 266
+                  },
+                  "decision_visits": 34469,
+                  "decision_visits_by_street": {
+                    "flop": 413,
+                    "preflop": 33600,
+                    "river": 190,
+                    "turn": 266
+                  },
+                  "trained_action_visits": 33251,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 33251,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 1758,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 627,
+                    "preflop": 450,
+                    "river": 265,
+                    "turn": 416
+                  },
+                  "decision_visits": 34977,
+                  "decision_visits_by_street": {
+                    "flop": 627,
+                    "preflop": 33669,
+                    "river": 265,
+                    "turn": 416
+                  },
+                  "trained_action_visits": 33219,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 33219,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 1835,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 589,
+                    "preflop": 723,
+                    "river": 201,
+                    "turn": 322
+                  },
+                  "decision_visits": 34946,
+                  "decision_visits_by_street": {
+                    "flop": 589,
+                    "preflop": 33834,
+                    "river": 201,
+                    "turn": 322
+                  },
+                  "trained_action_visits": 33111,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 33111,
+                    "river": 0,
+                    "turn": 0
+                  }
+                }
+              ],
+              "deviating": [
+                {
+                  "ci95": [
+                    -0.3136428545105503,
+                    0.18663791066289917
+                  ],
+                  "mean": -0.06350247192382555,
+                  "stderr": 0.12762264417690036
+                },
+                {
+                  "ci95": [
+                    -0.8681813179545229,
+                    -0.3639021171040745
+                  ],
+                  "mean": -0.6160417175292987,
+                  "stderr": 0.12864265327817562
+                },
+                {
+                  "ci95": [
+                    -1.211775176402872,
+                    -0.6614193426400978
+                  ],
+                  "mean": -0.9365972595214849,
+                  "stderr": 0.1403968963680546
+                },
+                {
+                  "ci95": [
+                    0.1409529597281585,
+                    0.4574830143929345
+                  ],
+                  "mean": 0.2992179870605465,
+                  "stderr": 0.08074746292468775
+                },
+                {
+                  "ci95": [
+                    0.030783359086896667,
+                    0.3300747952099792
+                  ],
+                  "mean": 0.18042907714843792,
+                  "stderr": 0.07634985615384758
+                },
+                {
+                  "ci95": [
+                    -0.019157455858241218,
+                    0.37769139140511254
+                  ],
+                  "mean": 0.17926696777343568,
+                  "stderr": 0.10123695083248821
+                }
+              ],
+              "elapsedSecs": 9.1710404,
+              "gains": [
+                {
+                  "ci95": [
+                    -0.6231097306207334,
+                    -0.16490790853941623
+                  ],
+                  "mean": -0.3940088195800748,
+                  "stderr": 0.11688821991870335
+                },
+                {
+                  "ci95": [
+                    -0.29484624663887327,
+                    0.1096399478107496
+                  ],
+                  "mean": -0.09260314941406184,
+                  "stderr": 0.10318525368612828
+                },
+                {
+                  "ci95": [
+                    -0.3899873636917388,
+                    0.01252123820345985
+                  ],
+                  "mean": -0.18873306274413948,
+                  "stderr": 0.1026807657895915
+                },
+                {
+                  "ci95": [
+                    -0.01667942193422589,
+                    0.27322562554750907
+                  ],
+                  "mean": 0.1282731018066416,
+                  "stderr": 0.07395536925554463
+                },
+                {
+                  "ci95": [
+                    -0.19615534536214133,
+                    0.13047901479573829
+                  ],
+                  "mean": -0.03283816528320153,
+                  "stderr": 0.08332509187701011
+                },
+                {
+                  "ci95": [
+                    -0.14202143773510664,
+                    0.2336093893952629
+                  ],
+                  "mean": 0.045793975830078125,
+                  "stderr": 0.09582419059448204
+                }
+              ],
+              "samples": 32768,
+              "seed": 2801,
+              "totalDealAttempts": 32768
+            },
+            {
+              "baseline": [
+                {
+                  "ci95": [
+                    0.04778705469978661,
+                    0.5137644589720877
+                  ],
+                  "mean": 0.28077575683593714,
+                  "stderr": 0.11887178680415843
+                },
+                {
+                  "ci95": [
+                    -0.8656657322999046,
+                    -0.36682065686025717
+                  ],
+                  "mean": -0.6162431945800809,
+                  "stderr": 0.12725639679582845
+                },
+                {
+                  "ci95": [
+                    -1.0441344885741315,
+                    -0.532503511914151
+                  ],
+                  "mean": -0.7883190002441413,
+                  "stderr": 0.13051810629081134
+                },
+                {
+                  "ci95": [
+                    0.036149839771216274,
+                    0.43588562165456723
+                  ],
+                  "mean": 0.23601773071289175,
+                  "stderr": 0.10197341374575279
+                },
+                {
+                  "ci95": [
+                    0.04261890881498284,
+                    0.4190515013412641
+                  ],
+                  "mean": 0.2308352050781235,
+                  "stderr": 0.09602872258323503
+                },
+                {
+                  "ci95": [
+                    0.028118345718091242,
+                    0.4344643569186233
+                  ],
+                  "mean": 0.23129135131835726,
+                  "stderr": 0.10365969673482961
+                }
+              ],
+              "candidatePolicyCoverage": [
+                {
+                  "average_strategy_visits": 36430,
+                  "average_strategy_visits_by_street": {
+                    "flop": 1292,
+                    "preflop": 33916,
+                    "river": 412,
+                    "turn": 810
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 36720,
+                  "decision_visits_by_street": {
+                    "flop": 1320,
+                    "preflop": 33922,
+                    "river": 578,
+                    "turn": 900
+                  },
+                  "regret_fallback_visits": 259,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 20,
+                    "preflop": 5,
+                    "river": 156,
+                    "turn": 78
+                  },
+                  "stored_strategy_visits": 36689,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 1312,
+                    "preflop": 33921,
+                    "river": 568,
+                    "turn": 888
+                  },
+                  "uniform_fallback_visits": 31,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 8,
+                    "preflop": 1,
+                    "river": 10,
+                    "turn": 12
+                  }
+                },
+                {
+                  "average_strategy_visits": 40210,
+                  "average_strategy_visits_by_street": {
+                    "flop": 2636,
+                    "preflop": 34428,
+                    "river": 1254,
+                    "turn": 1892
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 40429,
+                  "decision_visits_by_street": {
+                    "flop": 2640,
+                    "preflop": 34433,
+                    "river": 1383,
+                    "turn": 1973
+                  },
+                  "regret_fallback_visits": 207,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 2,
+                    "preflop": 4,
+                    "river": 124,
+                    "turn": 77
+                  },
+                  "stored_strategy_visits": 40417,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 2638,
+                    "preflop": 34432,
+                    "river": 1378,
+                    "turn": 1969
+                  },
+                  "uniform_fallback_visits": 12,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 2,
+                    "preflop": 1,
+                    "river": 5,
+                    "turn": 4
+                  }
+                },
+                {
+                  "average_strategy_visits": 35348,
+                  "average_strategy_visits_by_street": {
+                    "flop": 5155,
+                    "preflop": 24226,
+                    "river": 2362,
+                    "turn": 3605
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35729,
+                  "decision_visits_by_street": {
+                    "flop": 5175,
+                    "preflop": 24240,
+                    "river": 2601,
+                    "turn": 3713
+                  },
+                  "regret_fallback_visits": 350,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 12,
+                    "preflop": 7,
+                    "river": 230,
+                    "turn": 101
+                  },
+                  "stored_strategy_visits": 35698,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 5167,
+                    "preflop": 24233,
+                    "river": 2592,
+                    "turn": 3706
+                  },
+                  "uniform_fallback_visits": 31,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 8,
+                    "preflop": 7,
+                    "river": 9,
+                    "turn": 7
+                  }
+                },
+                {
+                  "average_strategy_visits": 36543,
+                  "average_strategy_visits_by_street": {
+                    "flop": 1034,
+                    "preflop": 34520,
+                    "river": 366,
+                    "turn": 623
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 36696,
+                  "decision_visits_by_street": {
+                    "flop": 1046,
+                    "preflop": 34535,
+                    "river": 460,
+                    "turn": 655
+                  },
+                  "regret_fallback_visits": 135,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 9,
+                    "preflop": 12,
+                    "river": 87,
+                    "turn": 27
+                  },
+                  "stored_strategy_visits": 36678,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 1043,
+                    "preflop": 34532,
+                    "river": 453,
+                    "turn": 650
+                  },
+                  "uniform_fallback_visits": 18,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 3,
+                    "preflop": 3,
+                    "river": 7,
+                    "turn": 5
+                  }
+                },
+                {
+                  "average_strategy_visits": 35777,
+                  "average_strategy_visits_by_street": {
+                    "flop": 877,
+                    "preflop": 34078,
+                    "river": 274,
+                    "turn": 548
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 36032,
+                  "decision_visits_by_street": {
+                    "flop": 910,
+                    "preflop": 34087,
+                    "river": 408,
+                    "turn": 627
+                  },
+                  "regret_fallback_visits": 212,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 20,
+                    "preflop": 6,
+                    "river": 122,
+                    "turn": 64
+                  },
+                  "stored_strategy_visits": 35989,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 897,
+                    "preflop": 34084,
+                    "river": 396,
+                    "turn": 612
+                  },
+                  "uniform_fallback_visits": 43,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 13,
+                    "preflop": 3,
+                    "river": 12,
+                    "turn": 15
+                  }
+                },
+                {
+                  "average_strategy_visits": 34976,
+                  "average_strategy_visits_by_street": {
+                    "flop": 584,
+                    "preflop": 33935,
+                    "river": 119,
+                    "turn": 338
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35203,
+                  "decision_visits_by_street": {
+                    "flop": 630,
+                    "preflop": 33940,
+                    "river": 241,
+                    "turn": 392
+                  },
+                  "regret_fallback_visits": 207,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 37,
+                    "preflop": 4,
+                    "river": 118,
+                    "turn": 48
+                  },
+                  "stored_strategy_visits": 35183,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 621,
+                    "preflop": 33939,
+                    "river": 237,
+                    "turn": 386
+                  },
+                  "uniform_fallback_visits": 20,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 9,
+                    "preflop": 1,
+                    "river": 4,
+                    "turn": 6
+                  }
+                }
+              ],
+              "coverage": [
+                {
+                  "baseline_fallback_visits": 3750,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1235,
+                    "preflop": 1272,
+                    "river": 474,
+                    "turn": 769
+                  },
+                  "decision_visits": 36514,
+                  "decision_visits_by_street": {
+                    "flop": 1235,
+                    "preflop": 34036,
+                    "river": 474,
+                    "turn": 769
+                  },
+                  "trained_action_visits": 32764,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 32764,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 7857,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 2517,
+                    "preflop": 2011,
+                    "river": 1348,
+                    "turn": 1981
+                  },
+                  "decision_visits": 40127,
+                  "decision_visits_by_street": {
+                    "flop": 2517,
+                    "preflop": 34281,
+                    "river": 1348,
+                    "turn": 1981
+                  },
+                  "trained_action_visits": 32270,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 32270,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 20309,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 8047,
+                    "preflop": 2938,
+                    "river": 3768,
+                    "turn": 5556
+                  },
+                  "decision_visits": 41895,
+                  "decision_visits_by_street": {
+                    "flop": 8047,
+                    "preflop": 24524,
+                    "river": 3768,
+                    "turn": 5556
+                  },
+                  "trained_action_visits": 21586,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 21586,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 1296,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 456,
+                    "preflop": 354,
+                    "river": 202,
+                    "turn": 284
+                  },
+                  "decision_visits": 34537,
+                  "decision_visits_by_street": {
+                    "flop": 456,
+                    "preflop": 33595,
+                    "river": 202,
+                    "turn": 284
+                  },
+                  "trained_action_visits": 33241,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 33241,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 1799,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 620,
+                    "preflop": 495,
+                    "river": 264,
+                    "turn": 420
+                  },
+                  "decision_visits": 35030,
+                  "decision_visits_by_street": {
+                    "flop": 620,
+                    "preflop": 33726,
+                    "river": 264,
+                    "turn": 420
+                  },
+                  "trained_action_visits": 33231,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 33231,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 1881,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 590,
+                    "preflop": 761,
+                    "river": 194,
+                    "turn": 336
+                  },
+                  "decision_visits": 34980,
+                  "decision_visits_by_street": {
+                    "flop": 590,
+                    "preflop": 33860,
+                    "river": 194,
+                    "turn": 336
+                  },
+                  "trained_action_visits": 33099,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 33099,
+                    "river": 0,
+                    "turn": 0
+                  }
+                }
+              ],
+              "deviating": [
+                {
+                  "ci95": [
+                    -0.44824000973383077,
+                    0.04228255123773267
+                  ],
+                  "mean": -0.20297872924804905,
+                  "stderr": 0.1251333063702968
+                },
+                {
+                  "ci95": [
+                    -0.938779846784044,
+                    -0.43867053163391656
+                  ],
+                  "mean": -0.6887251892089803,
+                  "stderr": 0.12757890692605292
+                },
+                {
+                  "ci95": [
+                    -1.3114722379372856,
+                    -0.7683795687033473
+                  ],
+                  "mean": -1.0399259033203165,
+                  "stderr": 0.13854404827396388
+                },
+                {
+                  "ci95": [
+                    0.2517793657561568,
+                    0.5608106610993117
+                  ],
+                  "mean": 0.4062950134277342,
+                  "stderr": 0.07883451411815175
+                },
+                {
+                  "ci95": [
+                    0.0269281838094364,
+                    0.3472147605265001
+                  ],
+                  "mean": 0.18707147216796824,
+                  "stderr": 0.08170575936659788
+                },
+                {
+                  "ci95": [
+                    -0.09711233098346325,
+                    0.2985716815694014
+                  ],
+                  "mean": 0.10072967529296908,
+                  "stderr": 0.10093979912062874
+                }
+              ],
+              "elapsedSecs": 9.860866,
+              "gains": [
+                {
+                  "ci95": [
+                    -0.7161276086980208,
+                    -0.2513813634699472
+                  ],
+                  "mean": -0.483754486083984,
+                  "stderr": 0.11855771561940653
+                },
+                {
+                  "ci95": [
+                    -0.2724964374585676,
+                    0.1275324482007562
+                  ],
+                  "mean": -0.07248199462890569,
+                  "stderr": 0.10204818511717445
+                },
+                {
+                  "ci95": [
+                    -0.457621737013035,
+                    -0.045592069139304275
+                  ],
+                  "mean": -0.2516069030761696,
+                  "stderr": 0.1051096091514619
+                },
+                {
+                  "ci95": [
+                    0.028621175140810085,
+                    0.31193339028887623
+                  ],
+                  "mean": 0.17027728271484316,
+                  "stderr": 0.07227352427246586
+                },
+                {
+                  "ci95": [
+                    -0.2092699353399605,
+                    0.12174246951964793
+                  ],
+                  "mean": -0.043763732910156276,
+                  "stderr": 0.08444194001520623
+                },
+                {
+                  "ci95": [
+                    -0.31427959232584846,
+                    0.053156240275067906
+                  ],
+                  "mean": -0.1305616760253903,
+                  "stderr": 0.0937336307655399
+                }
+              ],
+              "samples": 32768,
+              "seed": 2802,
+              "totalDealAttempts": 32768
+            }
+          ],
+          "maxBufferedSamples": 4096,
+          "minFitVisits": 8,
+          "schemaVersion": "solvers.multiway-preflop-deviation/v1",
+          "scope": "all-preflop-decisions-with-frozen-postflop",
+          "variant": {
+            "purify_threshold": 0.0,
+            "use_current_strategy": false
+          }
+        },
+        "measurement": {
+          "arguments": [
+            "--config",
+            "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\preflop-proposal-20260910\\config.toml",
+            "--fresh-sweeps",
+            "8192",
+            "--threads",
+            "8",
+            "--memory",
+            "8GiB",
+            "--cache-dir",
+            "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\.cache\\bench-ehs",
+            "--samples",
+            "128",
+            "--evaluation-seeds",
+            "101,202",
+            "--br-traversals",
+            "1",
+            "--node",
+            "root",
+            "--node-frequency-samples",
+            "0",
+            "--support-node",
+            "root",
+            "--support-node",
+            "fold/fold/fold/fold",
+            "--support-node",
+            "fold/fold/fold/fold/raise-to:3000",
+            "--support-node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+            "--support-node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+            "--support-node",
+            "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in",
+            "--preflop-support-census",
+            "--preflop-deviation-fit-traversals",
+            "131072",
+            "--preflop-deviation-fit-seed",
+            "2601",
+            "--preflop-deviation-samples",
+            "32768",
+            "--preflop-deviation-seeds",
+            "2801,2802"
+          ],
+          "binary": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\whole-preflop-deviation-20260910\\candidate-v3\\audit.exe",
+          "binarySha256": "63757d48f8d2011297eb43647b326d5ba0925d28b837d3d7eac5445ac9d50596",
+          "configSha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+          "exitCode": 0,
+          "job": "C:\\Users\\PC_User\\Documents\\Programming\\solvers\\runs\\whole-preflop-fit-calibration-20260910\\ordinary-job.json",
+          "jobSha256": "7fb71e98533b94218ab035be54946598db516829349942f1b5fee853aa745bc6",
+          "observedPeakWorkingSetBytes": 1440387072,
+          "peakMethod": "Windows lifetime PeakWorkingSet64 queried every 50 ms; final unsampled interval may be omitted. Whole process covers all phases executed by the child binary, including JSON and disposal.",
+          "schemaVersion": "solvers.checkpoint-audit-measurement/v1",
+          "sourceManifestSha256": "89edf90ae36556a239cf58e61d5501dc563d637469e3ab21b2de5055dbbdf35b",
+          "sourceRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+          "sourceStatus": [
+            " M crates/cli/Cargo.toml",
+            " M crates/cli/examples/mw_average_sampling_research.md",
+            " M crates/cli/examples/mw_average_sampling_research.rs",
+            " M crates/cli/examples/mw_checkpoint_audit.md",
+            " M crates/cli/examples/mw_checkpoint_audit.rs",
+            " M crates/cli/examples/mw_draw_abstraction_research.rs",
+            " M crates/cli/src/lib.rs",
+            " M crates/cli/src/multiway_artifact.rs",
+            " M crates/cli/src/multiway_solve.rs",
+            " M crates/cli/src/session.rs",
+            " M crates/formats/src/lib.rs",
+            " M crates/formats/src/multiway.rs",
+            " M crates/multiway/Cargo.toml",
+            " M crates/multiway/src/checkpoint.rs",
+            " M crates/multiway/src/lib.rs",
+            " M crates/multiway/src/sampler.rs",
+            " M crates/multiway/src/solver/averaging.rs",
+            " M crates/multiway/src/solver/eval.rs",
+            " M crates/multiway/src/solver/mod.rs",
+            " M crates/multiway/src/solver/tests.rs",
+            " M crates/multiway/src/solver/workers.rs",
+            " M crates/multiway/src/tree.rs",
+            " M docs/architecture.md",
+            " M docs/cli-reference.jp.md",
+            " M docs/multiway-preflop-v1.jp.md",
+            " M docs/multiway-preflop-v1.md",
+            " M docs/research/active/multiway-average-sampling-design-2026-09-09.md",
+            " M docs/research/active/multiway-initialization-next-2026-09-09.md",
+            " M docs/user-guide.jp.md",
+            " M docs/validation/README.md",
+            " M tools/README.md",
+            "?? crates/cli/examples/mw_checkpoint_load_bench.md",
+            "?? crates/cli/examples/mw_checkpoint_load_bench.rs",
+            "?? crates/cli/examples/mw_checkpoint_write_bench.md",
+            "?? crates/cli/examples/mw_checkpoint_write_bench.rs",
+            "?? crates/cli/examples/mw_strategy_drift_bench.md",
+            "?? crates/cli/examples/mw_strategy_drift_bench.rs",
+            "?? crates/cli/examples/mw_tree_initialization_bench.md",
+            "?? crates/cli/examples/mw_tree_initialization_bench.rs",
+            "?? crates/multiway/src/checkpoint/",
+            "?? crates/multiway/src/solver/averaging_continuation_tests.rs",
+            "?? crates/multiway/src/solver/conditioned.rs",
+            "?? crates/multiway/src/solver/counterfactual_proposal_tests.rs",
+            "?? crates/multiway/src/solver/dense_merge_tests.rs",
+            "?? crates/multiway/src/solver/drift_tests.rs",
+            "?? crates/multiway/src/solver/endpoint_counterfactual_tests.rs",
+            "?? crates/multiway/src/solver/endpoint_deviation.rs",
+            "?? crates/multiway/src/solver/preflop_census.rs",
+            "?? crates/multiway/src/solver/preflop_deviation.rs",
+            "?? crates/multiway/src/solver/preflop_deviation_tests.rs",
+            "?? crates/multiway/src/solver/preflop_proposal.rs",
+            "?? crates/multiway/src/solver/raised_opponent_tests.rs",
+            "?? crates/multiway/src/solver/regret_sampling.rs",
+            "?? crates/multiway/src/solver/research_diagnostics.rs",
+            "?? crates/multiway/src/solver/snapshot.rs",
+            "?? crates/multiway/src/solver/snapshot_tests.rs",
+            "?? docs/research/active/balanced-endpoint-plan-2026-09-10.md",
+            "?? docs/research/active/multiway-checkpoint-write-2026-09-10.md",
+            "?? docs/research/active/multiway-dense-merge-2026-09-10.md",
+            "?? docs/research/active/multiway-depth-next-2026-09-10.md",
+            "?? docs/research/active/multiway-endpoint-deviation-2026-09-10.md",
+            "?? docs/research/active/multiway-opponent-exploration-2026-09-10.md",
+            "?? docs/research/active/multiway-postflop-average-proposal-2026-09-10.md",
+            "?? docs/research/active/multiway-preflop-counterfactual-diagnostics-2026-09-10.md",
+            "?? docs/research/active/multiway-preflop-endpoint-cohort-next-2026-09-10.json",
+            "?? docs/research/active/multiway-preflop-fit-calibration-2026-09-10.md",
+            "?? docs/research/active/multiway-preflop-quality-2026-09-10.md",
+            "?? docs/research/active/multiway-preflop-seed29-2026-09-10.md",
+            "?? docs/research/active/multiway-production-drift-2026-09-10.md",
+            "?? docs/research/active/multiway-raised-opponent-enumeration-2026-09-10.md",
+            "?? docs/research/active/multiway-whole-preflop-evaluation-next-2026-09-10.md",
+            "?? docs/research/active/multiway-whole-preflop-pilot-2026-09-10.md",
+            "?? docs/validation/gtowizard-simple-deep-preflop-2026-09-10.json",
+            "?? docs/validation/multiway-average-continuation-2026-09-10.json",
+            "?? docs/validation/multiway-average-continuation-2026-09-10.md",
+            "?? docs/validation/multiway-average-depth-2026-09-10.json",
+            "?? docs/validation/multiway-average-depth-2026-09-10.md",
+            "?? docs/validation/multiway-balanced-endpoint-2026-09-10.json",
+            "?? docs/validation/multiway-balanced-endpoint-2026-09-10.md",
+            "?? docs/validation/multiway-checkpoint-streaming-2026-09-10.json",
+            "?? docs/validation/multiway-checkpoint-streaming-2026-09-10.md",
+            "?? docs/validation/multiway-checkpoint-write-2026-09-10.json",
+            "?? docs/validation/multiway-checkpoint-write-2026-09-10.md",
+            "?? docs/validation/multiway-conditional-depth-2026-09-10.json",
+            "?? docs/validation/multiway-conditional-depth-2026-09-10.md",
+            "?? docs/validation/multiway-deep-prefix-audit-2026-09-10.json",
+            "?? docs/validation/multiway-deep-prefix-audit-2026-09-10.md",
+            "?? docs/validation/multiway-dense-merge-2026-09-10.json",
+            "?? docs/validation/multiway-dense-merge-2026-09-10.md",
+            "?? docs/validation/multiway-depth-coverage-2026-09-10.json",
+            "?? docs/validation/multiway-depth-coverage-2026-09-10.md",
+            "?? docs/validation/multiway-endpoint-deviation-2026-09-10.json",
+            "?? docs/validation/multiway-endpoint-deviation-2026-09-10.md",
+            "?? docs/validation/multiway-initialization-phases-2026-09-10.json",
+            "?? docs/validation/multiway-initialization-phases-2026-09-10.md",
+            "?? docs/validation/multiway-opponent-exploration-2026-09-10.json",
+            "?? docs/validation/multiway-opponent-exploration-2026-09-10.md",
+            "?? docs/validation/multiway-preflop-counterfactual-2026-09-10.json",
+            "?? docs/validation/multiway-preflop-counterfactual-2026-09-10.md",
+            "?? docs/validation/multiway-preflop-discount-2026-09-10.json",
+            "?? docs/validation/multiway-preflop-discount-2026-09-10.md",
+            "?? docs/validation/multiway-preflop-discount-seed11-2026-09-10.json",
+            "?? docs/validation/multiway-preflop-discount-seed11-2026-09-10.md",
+            "?? docs/validation/multiway-preflop-discount-seed29-2026-09-10.json",
+            "?? docs/validation/multiway-preflop-discount-seed29-2026-09-10.md",
+            "?? docs/validation/multiway-preflop-endpoint-2026-09-10.json",
+            "?? docs/validation/multiway-preflop-endpoint-2026-09-10.md",
+            "?? docs/validation/multiway-preflop-proposal-2026-09-10.json",
+            "?? docs/validation/multiway-preflop-proposal-2026-09-10.md",
+            "?? docs/validation/multiway-production-drift-2026-09-10.json",
+            "?? docs/validation/multiway-production-drift-2026-09-10.md",
+            "?? docs/validation/multiway-production-initialization-2026-09-10.json",
+            "?? docs/validation/multiway-production-initialization-2026-09-10.md",
+            "?? docs/validation/multiway-raised-opponent-2026-09-10.full.json.gz",
+            "?? docs/validation/multiway-raised-opponent-2026-09-10.json",
+            "?? docs/validation/multiway-raised-opponent-2026-09-10.md",
+            "?? docs/validation/multiway-storage-coverage-erratum-2026-09-10.md",
+            "?? docs/validation/multiway-whole-preflop-deviation-2026-09-10.json",
+            "?? docs/validation/multiway-whole-preflop-deviation-2026-09-10.md",
+            "?? tools/run_average_sampling_measurement.ps1",
+            "?? tools/run_checkpoint_load_bench.ps1",
+            "?? tools/run_checkpoint_write_bench.ps1",
+            "?? tools/summarize_average_continuation.py",
+            "?? tools/summarize_average_depth.py",
+            "?? tools/summarize_balanced_endpoint.py",
+            "?? tools/summarize_checkpoint_write.py",
+            "?? tools/summarize_conditional_depth.py",
+            "?? tools/summarize_dense_merge.py",
+            "?? tools/summarize_endpoint_deviation.py",
+            "?? tools/summarize_opponent_exploration.py",
+            "?? tools/summarize_preflop_counterfactual.py",
+            "?? tools/summarize_preflop_discount.py",
+            "?? tools/summarize_preflop_discount_seed.py",
+            "?? tools/summarize_preflop_discount_seed29.py",
+            "?? tools/summarize_preflop_endpoint.py",
+            "?? tools/summarize_preflop_proposal.py",
+            "?? tools/summarize_raised_opponent.py",
+            "?? tools/summarize_strategy_drift.py",
+            "?? tools/summarize_whole_preflop_deviation.py",
+            "?? tools/tests/test_summarize_average_continuation.py",
+            "?? tools/tests/test_summarize_average_depth.py",
+            "?? tools/tests/test_summarize_balanced_endpoint.py",
+            "?? tools/tests/test_summarize_checkpoint_write.py",
+            "?? tools/tests/test_summarize_dense_merge.py",
+            "?? tools/tests/test_summarize_preflop_counterfactual.py",
+            "?? tools/tests/test_summarize_preflop_discount.py",
+            "?? tools/tests/test_summarize_preflop_discount_seed.py",
+            "?? tools/tests/test_summarize_preflop_discount_seed29.py",
+            "?? tools/tests/test_summarize_preflop_endpoint.py",
+            "?? tools/tests/test_summarize_raised_opponent.py",
+            "?? tools/tests/test_summarize_strategy_drift.py",
+            "?? tools/tests/test_summarize_whole_preflop_deviation.py"
+          ],
+          "startedUtc": "2026-09-10T05:32:46.4256753Z",
+          "stdoutSha256": "84c2a3441a2db56bccc4232f27ef21513deb1989682486e5e8898661ab6aaaee",
+          "timedOut": false,
+          "timeoutSeconds": 600,
+          "validationReport": "docs/validation/multiway-preflop-fit-calibration-2026-09-10.md",
+          "wallSeconds": 197.3516789
+        },
+        "measurementSha256": "848bd9882ee95dc49141a4f4ab048ad7ca2dbe9c82a5fc28dcddfccd72fe3aab",
+        "normalizedOldOutputSha256": "130f20dfa6b8faf68f303c5518873f5f938141e307860e8ccf8b2b658b7b618c",
+        "oldOutputExactlyReplayed": true,
+        "rows": [
+          {
+            "baseline": {
+              "ci95": [
+                0.09305658002446288,
+                0.567956115288035
+              ],
+              "mean": 0.330506347656249,
+              "stderr": 0.1211478406284623
+            },
+            "deviating": {
+              "ci95": [
+                -0.3136428545105503,
+                0.18663791066289917
+              ],
+              "mean": -0.06350247192382555,
+              "stderr": 0.12762264417690036
+            },
+            "gain": {
+              "ci95": [
+                -0.6231097306207334,
+                -0.16490790853941623
+              ],
+              "mean": -0.3940088195800748,
+              "stderr": 0.11688821991870335
+            },
+            "position": "BTN",
+            "preflopDecisionVisits": 34064,
+            "preflopTrainedActionVisits": 32819,
+            "preflopTrainedVisitFraction": 0.9634511507750118,
+            "seat": 0,
+            "seed": 2801
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.7691080914627538,
+                -0.277769044767722
+              ],
+              "mean": -0.5234385681152379,
+              "stderr": 0.125341593544651
+            },
+            "deviating": {
+              "ci95": [
+                -0.8681813179545229,
+                -0.3639021171040745
+              ],
+              "mean": -0.6160417175292987,
+              "stderr": 0.12864265327817562
+            },
+            "gain": {
+              "ci95": [
+                -0.29484624663887327,
+                0.1096399478107496
+              ],
+              "mean": -0.09260314941406184,
+              "stderr": 0.10318525368612828
+            },
+            "position": "SB",
+            "preflopDecisionVisits": 34322,
+            "preflopTrainedActionVisits": 32319,
+            "preflopTrainedVisitFraction": 0.9416409300157333,
+            "seat": 1,
+            "seed": 2801
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -1.0023021592122945,
+                -0.49342623434239025
+              ],
+              "mean": -0.7478641967773424,
+              "stderr": 0.12981528695660824
+            },
+            "deviating": {
+              "ci95": [
+                -1.211775176402872,
+                -0.6614193426400978
+              ],
+              "mean": -0.9365972595214849,
+              "stderr": 0.1403968963680546
+            },
+            "gain": {
+              "ci95": [
+                -0.3899873636917388,
+                0.01252123820345985
+              ],
+              "mean": -0.18873306274413948,
+              "stderr": 0.1026807657895915
+            },
+            "position": "BB",
+            "preflopDecisionVisits": 24476,
+            "preflopTrainedActionVisits": 21576,
+            "preflopTrainedVisitFraction": 0.8815165876777251,
+            "seat": 2,
+            "seed": 2801
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.028645711065050705,
+                0.37053548157286137
+              ],
+              "mean": 0.17094488525390533,
+              "stderr": 0.10183193689742655
+            },
+            "deviating": {
+              "ci95": [
+                0.1409529597281585,
+                0.4574830143929345
+              ],
+              "mean": 0.2992179870605465,
+              "stderr": 0.08074746292468775
+            },
+            "gain": {
+              "ci95": [
+                -0.01667942193422589,
+                0.27322562554750907
+              ],
+              "mean": 0.1282731018066416,
+              "stderr": 0.07395536925554463
+            },
+            "position": "UTG",
+            "preflopDecisionVisits": 33600,
+            "preflopTrainedActionVisits": 33251,
+            "preflopTrainedVisitFraction": 0.9896130952380953,
+            "seat": 3,
+            "seed": 2801
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.0255837553729783,
+                0.40095072949030575
+              ],
+              "mean": 0.21326724243164202,
+              "stderr": 0.09575688115237946
+            },
+            "deviating": {
+              "ci95": [
+                0.030783359086896667,
+                0.3300747952099792
+              ],
+              "mean": 0.18042907714843792,
+              "stderr": 0.07634985615384758
+            },
+            "gain": {
+              "ci95": [
+                -0.19615534536214133,
+                0.13047901479573829
+              ],
+              "mean": -0.03283816528320153,
+              "stderr": 0.08332509187701011
+            },
+            "position": "HJ",
+            "preflopDecisionVisits": 33669,
+            "preflopTrainedActionVisits": 33219,
+            "preflopTrainedVisitFraction": 0.9866345896819032,
+            "seat": 4,
+            "seed": 2801
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.08261743928518425,
+                0.34956342317190237
+              ],
+              "mean": 0.13347299194335907,
+              "stderr": 0.11025022001456292
+            },
+            "deviating": {
+              "ci95": [
+                -0.019157455858241218,
+                0.37769139140511254
+              ],
+              "mean": 0.17926696777343568,
+              "stderr": 0.10123695083248821
+            },
+            "gain": {
+              "ci95": [
+                -0.14202143773510664,
+                0.2336093893952629
+              ],
+              "mean": 0.045793975830078125,
+              "stderr": 0.09582419059448204
+            },
+            "position": "CO",
+            "preflopDecisionVisits": 33834,
+            "preflopTrainedActionVisits": 33111,
+            "preflopTrainedVisitFraction": 0.9786309629366909,
+            "seat": 5,
+            "seed": 2801
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.04778705469978661,
+                0.5137644589720877
+              ],
+              "mean": 0.28077575683593714,
+              "stderr": 0.11887178680415843
+            },
+            "deviating": {
+              "ci95": [
+                -0.44824000973383077,
+                0.04228255123773267
+              ],
+              "mean": -0.20297872924804905,
+              "stderr": 0.1251333063702968
+            },
+            "gain": {
+              "ci95": [
+                -0.7161276086980208,
+                -0.2513813634699472
+              ],
+              "mean": -0.483754486083984,
+              "stderr": 0.11855771561940653
+            },
+            "position": "BTN",
+            "preflopDecisionVisits": 34036,
+            "preflopTrainedActionVisits": 32764,
+            "preflopTrainedVisitFraction": 0.9626278058526266,
+            "seat": 0,
+            "seed": 2802
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.8656657322999046,
+                -0.36682065686025717
+              ],
+              "mean": -0.6162431945800809,
+              "stderr": 0.12725639679582845
+            },
+            "deviating": {
+              "ci95": [
+                -0.938779846784044,
+                -0.43867053163391656
+              ],
+              "mean": -0.6887251892089803,
+              "stderr": 0.12757890692605292
+            },
+            "gain": {
+              "ci95": [
+                -0.2724964374585676,
+                0.1275324482007562
+              ],
+              "mean": -0.07248199462890569,
+              "stderr": 0.10204818511717445
+            },
+            "position": "SB",
+            "preflopDecisionVisits": 34281,
+            "preflopTrainedActionVisits": 32270,
+            "preflopTrainedVisitFraction": 0.9413377672763338,
+            "seat": 1,
+            "seed": 2802
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -1.0441344885741315,
+                -0.532503511914151
+              ],
+              "mean": -0.7883190002441413,
+              "stderr": 0.13051810629081134
+            },
+            "deviating": {
+              "ci95": [
+                -1.3114722379372856,
+                -0.7683795687033473
+              ],
+              "mean": -1.0399259033203165,
+              "stderr": 0.13854404827396388
+            },
+            "gain": {
+              "ci95": [
+                -0.457621737013035,
+                -0.045592069139304275
+              ],
+              "mean": -0.2516069030761696,
+              "stderr": 0.1051096091514619
+            },
+            "position": "BB",
+            "preflopDecisionVisits": 24524,
+            "preflopTrainedActionVisits": 21586,
+            "preflopTrainedVisitFraction": 0.8801989887457184,
+            "seat": 2,
+            "seed": 2802
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.036149839771216274,
+                0.43588562165456723
+              ],
+              "mean": 0.23601773071289175,
+              "stderr": 0.10197341374575279
+            },
+            "deviating": {
+              "ci95": [
+                0.2517793657561568,
+                0.5608106610993117
+              ],
+              "mean": 0.4062950134277342,
+              "stderr": 0.07883451411815175
+            },
+            "gain": {
+              "ci95": [
+                0.028621175140810085,
+                0.31193339028887623
+              ],
+              "mean": 0.17027728271484316,
+              "stderr": 0.07227352427246586
+            },
+            "position": "UTG",
+            "preflopDecisionVisits": 33595,
+            "preflopTrainedActionVisits": 33241,
+            "preflopTrainedVisitFraction": 0.9894627176663194,
+            "seat": 3,
+            "seed": 2802
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.04261890881498284,
+                0.4190515013412641
+              ],
+              "mean": 0.2308352050781235,
+              "stderr": 0.09602872258323503
+            },
+            "deviating": {
+              "ci95": [
+                0.0269281838094364,
+                0.3472147605265001
+              ],
+              "mean": 0.18707147216796824,
+              "stderr": 0.08170575936659788
+            },
+            "gain": {
+              "ci95": [
+                -0.2092699353399605,
+                0.12174246951964793
+              ],
+              "mean": -0.043763732910156276,
+              "stderr": 0.08444194001520623
+            },
+            "position": "HJ",
+            "preflopDecisionVisits": 33726,
+            "preflopTrainedActionVisits": 33231,
+            "preflopTrainedVisitFraction": 0.9853228962818004,
+            "seat": 4,
+            "seed": 2802
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.028118345718091242,
+                0.4344643569186233
+              ],
+              "mean": 0.23129135131835726,
+              "stderr": 0.10365969673482961
+            },
+            "deviating": {
+              "ci95": [
+                -0.09711233098346325,
+                0.2985716815694014
+              ],
+              "mean": 0.10072967529296908,
+              "stderr": 0.10093979912062874
+            },
+            "gain": {
+              "ci95": [
+                -0.31427959232584846,
+                0.053156240275067906
+              ],
+              "mean": -0.1305616760253903,
+              "stderr": 0.0937336307655399
+            },
+            "position": "CO",
+            "preflopDecisionVisits": 33860,
+            "preflopTrainedActionVisits": 33099,
+            "preflopTrainedVisitFraction": 0.9775251033668045,
+            "seat": 5,
+            "seed": 2802
+          }
+        ],
+        "solveElapsedSecs": 31.6085851
+      }
+    },
+    "cloudResourcesStarted": false,
+    "provenance": {
+      "baseRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+      "broaderGoalComplete": false,
+      "cases": [
+        {
+          "job": "runs/whole-preflop-fit-calibration-20260910/ordinary-job.json",
+          "jobSha256": "7fb71e98533b94218ab035be54946598db516829349942f1b5fee853aa745bc6",
+          "name": "ordinary",
+          "oldJob": "runs/whole-preflop-deviation-20260910/ordinary-job.json",
+          "oldJobSha256": "de38604eb931d284c11769481456059f904630223f101831ed446486563a874e",
+          "oldOutput": "runs/whole-preflop-deviation-20260910/ordinary/stdout.json",
+          "oldOutputSha256": "b47836d97c1e8c4918f08b4612f322b4940249f583ee6835719b70f54dd7f0a8"
+        },
+        {
+          "job": "runs/whole-preflop-fit-calibration-20260910/enumerated-job.json",
+          "jobSha256": "e79af02289242d1e08bf5166077f5a0a7d17f03e746408afa3829ffe3866f945",
+          "name": "enumerated",
+          "oldJob": "runs/whole-preflop-deviation-20260910/enumerated-job.json",
+          "oldJobSha256": "229563a1c4298e30aae7c3b93dd8e4ba4603ca7aeaa594197e2a4ce1e6ce5489",
+          "oldOutput": "runs/whole-preflop-deviation-20260910/enumerated/stdout.json",
+          "oldOutputSha256": "e1fa597220ff95feb2e81c77d08750cf2379f90839a99f808c4532459c3bd5f9"
+        }
+      ],
+      "cloudResourcesStarted": false,
+      "completedUtc": "2026-09-10T05:49:06.628488+00:00",
+      "config": "runs/preflop-proposal-20260910/config.toml",
+      "configSha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+      "createdUtc": "2026-09-10T05:32:44.628474+00:00",
+      "diagnostic": {
+        "fitSeed": 2601,
+        "fitTraversalsPerSeat": 131072,
+        "heldOutSamples": 32768,
+        "heldOutSeeds": [
+          2801,
+          2802
+        ]
+      },
+      "helper": "tools/summarize_whole_preflop_deviation.py",
+      "helperDependency": "tools/summarize_raised_opponent.py",
+      "helperDependencySha256": "082a10fa9aef9aee7edf159f5836ed870e082b41957ea01ebb7ffcc4528720b1",
+      "helperSha256": "11af08607224353c334b306c37cfa654ccf0517b893e925e65d7126e55da9e02",
+      "implementation": {
+        "binary": "runs/whole-preflop-deviation-20260910/candidate-v3/audit.exe",
+        "binarySha256": "63757d48f8d2011297eb43647b326d5ba0925d28b837d3d7eac5445ac9d50596",
+        "sourceManifest": "runs/whole-preflop-deviation-20260910/candidate-v3/source-manifest.json",
+        "sourceManifestSha256": "89edf90ae36556a239cf58e61d5501dc563d637469e3ab21b2de5055dbbdf35b",
+        "sourceZip": "runs/whole-preflop-deviation-20260910/candidate-v3/source.zip",
+        "sourceZipSha256": "f7e73146a7aae9882661b7ba646fd1c7610f4cadfa04b38447b45e3548cb2f9d",
+        "verification": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/verification.json",
+        "verificationSha256": "96f97f904781dc1854e3ac6d186f35d2c799bb1c70d1e9385181655e7375dc61"
+      },
+      "plan": "docs/research/active/multiway-preflop-fit-calibration-2026-09-10.md",
+      "planSha256": "66eb424cb73775d4102bf879b16f596673840e634385f507c0a1d85b417e803e",
+      "preexecutionSha256": "4a7d7a021e3fff49a11a127770e334c96aeda777769b780550561b30d5f3f960",
+      "previousExperiment": "runs/whole-preflop-deviation-20260910/experiment.json",
+      "previousExperimentSha256": "21b658dfa41d2685b98f654dc3d14646e0f73dd41fbc6b9cf7075b8f193c5b74",
+      "runner": "tools/run_average_sampling_measurement.ps1",
+      "runnerSha256": "1cd3e737e0821f2760ad601fbb67a4d3996a64fedfe311b4e08b3fc687f6c7e7",
+      "schemaVersion": "solvers.preflop-fit-calibration/v1",
+      "sidecars": {
+        "prepare.py": "49e21783d495cb42f85506eb6f925184c967e0bb0cc8c5bd3dbe55d7f9f9182f",
+        "run.ps1": "ea0f921f3be716ea6c1b9d3dce2da0e6dd4c64fe1cb2715e709d3f4944da63a9",
+        "validate.py": "78afcc15a9fe43252b5be31bb4328a0392d3114e3c5b37850eed1841c211f9bd"
+      },
+      "status": "completed-fit-calibration",
+      "validationReport": "docs/validation/multiway-preflop-fit-calibration-2026-09-10.md"
+    },
+    "schemaVersion": "solvers.preflop-fit-calibration-summary/v1",
+    "status": "passed-fit-calibration-validation",
+    "strategicImprovementEstablished": false
+  }
+}

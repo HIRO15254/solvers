@@ -9,28 +9,32 @@ For three or more players, results are regret-minimized approximations rather th
 
 ## Status
 
-Active development. See the [documentation portal](docs/README.md) and
-[development guide](docs/development.md) for current boundaries and remaining work.
+Active development. The [product roadmap](docs/product-roadmap.jp.md) defines
+priorities and acceptance criteria. Task state is managed in Linear; see
+[status and task management](docs/status.jp.md) for the project and workflow.
 
 ## Documentation
 
 - [docs/README.md](docs/README.md) — documentation map and source-of-truth hierarchy
+- [AGENTS.md](AGENTS.md) — shared entrypoint for AI development
+- [docs/product-roadmap.jp.md](docs/product-roadmap.jp.md) — product priorities and acceptance criteria
 - [docs/user-guide.jp.md](docs/user-guide.jp.md) — CLI usage and operational interpretation
+- [docs/solver-config-v1.jp.md](docs/solver-config-v1.jp.md) — normative Postflop, HU Preflop, and toy config contracts
 - [docs/multiway-preflop-v1.jp.md](docs/multiway-preflop-v1.jp.md) — normative Multiway Preflop v1 contract and complete TOML reference
 - [docs/architecture.md](docs/architecture.md) — solver, workspace, and CLI architecture
-- [docs/app-architecture.md](docs/app-architecture.md) — target design for the CLI core, job daemon, and future Web GUI
-- [docs/development.md](docs/development.md) — tests, benchmarks, change workflow, and current roadmap
+- [docs/app-architecture.md](docs/app-architecture.md) — current CLI/daemon boundaries and proposed Web GUI
+- [docs/development.md](docs/development.md) — setup, tests, benchmarks, and change workflow
+- [docs/validation.jp.md](docs/validation.jp.md) — correctness and HU acceptance evidence
 - [LICENSE-POLICY.md](LICENSE-POLICY.md) — clean-room policy for AGPL references
 
 ## Workspace layout
 
-The project ships **one application** containing both a preflop solver (HU +
-2–9 player multiway) and a postflop solver (exact, fixed flop), selected by
-the config's `game.kind`. The CLI is the only execution surface: a config file
-goes in, a run directory comes out. A job daemon and a Web GUI are planned as
-clients of that CLI rather than as second execution paths — see
-[docs/app-architecture.md](docs/app-architecture.md) for the target design and
-its phases.
+The project has 13 Rust workspace crates. The `solvers` CLI selects the
+config family through its `schema`, runs the solver, and writes a run directory.
+`solversd` manages CLI child processes locally or remotely. The exact HU
+postflop path can start on the flop, turn, or river; the sampled Multiway
+Preflop path is a separate engine. A Web GUI remains a proposed client of
+the daemon — see [docs/app-architecture.md](docs/app-architecture.md).
 
 ```
 crates/
@@ -39,17 +43,23 @@ crates/
 │               # compare / report
 ├── protocol    # versioned wire types for the job daemon
 ├── daemon      # `solversd`: creates run directories and spawns the CLI
-├── cards       # card/chip/street types, range parser, hand-evaluator wrapper
+├── cards       # card/chip/street types, range parser, evaluator, tree-script front end
 ├── hand-index  # suit-isomorphism board canonicalization
 ├── cfr-ref     # frozen scalar CFR oracle for differential testing
 ├── engine      # hot core: public tree, storage, discount schedules, vector CFR, best response
-├── game        # terminal payoff pipeline (rake/ICM), tree builder scaffolding, toy games
+├── game        # terminal payoff pipeline (rake/ICM), compiled-tree toy games
 ├── abstraction # heads-up blueprint abstraction
 ├── preflop     # exact/bucketed heads-up preflop path
 ├── multiway    # generative 2–9 seat NLHE + external-sampling MCCFR
-├── formats     # versioned HU and multiway metrics/checkpoints/solution artifacts
+├── formats     # run/metrics/solutions + HU checkpoint; depends on engine snapshots
 └── holdem      # Mode A: exact multi-street postflop solving, aggregation/equity helpers
 ```
+
+Current specifications and architecture live in `docs/`; actionable plans in
+`docs/plans/`; reusable helpers and their tests in `tools/`; accepted experiment
+evidence in `experiments/`. New solver runs belong in ignored `runs/`, machine
+caches in ignored cache directories, and Cargo output in `target/`.
+Examples are runnable inputs; regression fixtures are retained with their tests.
 
 ## Quick start
 
@@ -68,9 +78,9 @@ cargo run -p cli --release -- solve examples/preflop_multiway_v1_3max_smoke.toml
     --out runs/v1-smoke
 
 # Abstraction tables are cached per machine, not per run: the first solve
-# builds them (~107s), later ones load them (~0.4s).
+# builds them, later ones load compatible cached tables.
 cargo run -p cli --release -- --cache-dir ~/.cache/solvers \
-    solve examples/preflop_multiway_v1_3max_smoke.toml --out runs/v1-smoke
+    solve examples/preflop_multiway_v1_3max_smoke.toml --out runs/v1-cached
 
 # Size the public tree and policy arena before committing to a long run:
 cargo run -p cli --release -- validate examples/preflop_multiway_v1_default.toml \
@@ -108,10 +118,12 @@ cargo run -p cli --release -- report examples/river_small.toml \
 ## Running solves through a daemon
 
 `solversd` accepts a config over HTTP, prepares a run directory, and spawns
-`solvers` into it. It never solves anything itself and keeps no state of its
-own, so a restart finds every run by reading the runs root again.
+`solvers` into it. Durable job state lives in the run directory, so a restart
+finds every run by reading the runs root again. HTTP solution views currently
+read Multiway `.mwsol` artifacts; HU postflop views use the CLI `export` command.
 
 ```bash
+cargo build --release -p cli -p daemon
 cargo run -p daemon --release -- --runs runs --max-concurrent 1
 ```
 

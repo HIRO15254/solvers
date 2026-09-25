@@ -1,0 +1,3405 @@
+{
+  "assessment": {
+    "negativeMeanRows": 24,
+    "nextStep": "Calibrate fitting strength on separately held-out seeds before comparing learned profile quality.",
+    "pointwiseUpperBelowZeroRows": 22,
+    "totalRows": 24,
+    "usablePositiveDeviationFound": false
+  },
+  "provenance": {
+    "baseRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+    "broaderGoalComplete": false,
+    "cacheDir": ".cache/bench-ehs",
+    "cases": [
+      {
+        "job": "runs/whole-preflop-deviation-20260910/ordinary-job.json",
+        "jobSha256": "de38604eb931d284c11769481456059f904630223f101831ed446486563a874e",
+        "name": "ordinary",
+        "oldJob": "runs/raised-opponent-20260910/ordinary-job.json",
+        "oldJobSha256": "3f67b49efa3d5cbb5ae81e89cd8af91b58a85a8fa3d8e9cac996d91caa01522f",
+        "oldMeasurement": "runs/raised-opponent-20260910/ordinary/measurement.json",
+        "oldMeasurementSha256": "e44316e6ee9257f00a6e801ff4258955cad290462e59bd421c54088afd754803",
+        "oldOutput": "runs/raised-opponent-20260910/ordinary/stdout.json",
+        "oldOutputSha256": "52781401ce3fd9085b27917d2b0db60916f7f19df2b691791795ef81aa8a307b"
+      },
+      {
+        "job": "runs/whole-preflop-deviation-20260910/enumerated-job.json",
+        "jobSha256": "229563a1c4298e30aae7c3b93dd8e4ba4603ca7aeaa594197e2a4ce1e6ce5489",
+        "name": "enumerated",
+        "oldJob": "runs/raised-opponent-20260910/enumerated-job.json",
+        "oldJobSha256": "e9dbcb64acd40892ad984f319bca7fb9b87c1f92db81f6d61d09ffd523270618",
+        "oldMeasurement": "runs/raised-opponent-20260910/enumerated/measurement.json",
+        "oldMeasurementSha256": "ede7158a9434a654b6057f93f283a849dd13cc0510bd7cb465d0f79202fd3cc6",
+        "oldOutput": "runs/raised-opponent-20260910/enumerated/stdout.json",
+        "oldOutputSha256": "630ec431351bf44be19c6a6664ae6f1b9184ec32f2ba5954c7b86ee94043781f"
+      }
+    ],
+    "cloudResourcesStarted": false,
+    "completedUtc": "2026-09-10T05:28:25.007417+00:00",
+    "config": "runs/preflop-proposal-20260910/config.toml",
+    "configSha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+    "createdUtc": "2026-09-10T05:22:16.041245+00:00",
+    "diagnostic": {
+      "fitSeed": 2601,
+      "fitTraversalsPerSeat": 8192,
+      "heldOutSamples": 32768,
+      "heldOutSeeds": [
+        2701,
+        2702
+      ]
+    },
+    "documentation": {
+      "crates/cli/examples/mw_checkpoint_audit.md": "f8a2afdbfe28232d557b8af111d1fa72d5bab2530947c9f421890e98725b1b76",
+      "docs/architecture.md": "09c1deb27ee3bbf861c71b9e26665c3fbc193fc839c95848a52fa67690c39c20",
+      "docs/cli-reference.jp.md": "f8681a42b7fc9776ab9b89cf028542a5e306983d5fdb4e61e02e985e616004a4",
+      "docs/multiway-preflop-v1.jp.md": "bdb2839b7e4746372b725f876ed8af8ab01ee4044897afca09afc926655a5653",
+      "docs/multiway-preflop-v1.md": "f1cd80f9de1582349030509b68d4892cbae6091bbd47907d97ce5d7bc19acd0b",
+      "docs/user-guide.jp.md": "c7f761c29584851f781b940d8479822283886b8db356faab6090b4d34a633775"
+    },
+    "implementation": {
+      "binary": "runs/whole-preflop-deviation-20260910/candidate-v3/audit.exe",
+      "binarySha256": "63757d48f8d2011297eb43647b326d5ba0925d28b837d3d7eac5445ac9d50596",
+      "sourceManifest": "runs/whole-preflop-deviation-20260910/candidate-v3/source-manifest.json",
+      "sourceManifestSha256": "89edf90ae36556a239cf58e61d5501dc563d637469e3ab21b2de5055dbbdf35b",
+      "sourceZip": "runs/whole-preflop-deviation-20260910/candidate-v3/source.zip",
+      "sourceZipSha256": "f7e73146a7aae9882661b7ba646fd1c7610f4cadfa04b38447b45e3548cb2f9d",
+      "verification": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/verification.json",
+      "verificationSha256": "96f97f904781dc1854e3ac6d186f35d2c799bb1c70d1e9385181655e7375dc61"
+    },
+    "memory": "8GiB",
+    "plan": "docs/research/active/multiway-whole-preflop-pilot-2026-09-10.md",
+    "planSha256": "08d41b6adee1c00aae7d209f6d16a6e1b70ac095d553e97f110ba9eaf3e30a55",
+    "preexecutionSha256": "3ef362b915fdbeb6bf269d1ea3e314b72327d400a5a65d583735b65173eedd79",
+    "previousExperiment": "runs/raised-opponent-20260910/experiment.json",
+    "previousExperimentSha256": "c14a3395cfe8707f9cfd28726baacb7cd3e57d118989174ca6eb56e76eb327d5",
+    "runner": "tools/run_average_sampling_measurement.ps1",
+    "runnerSha256": "1cd3e737e0821f2760ad601fbb67a4d3996a64fedfe311b4e08b3fc687f6c7e7",
+    "schemaVersion": "solvers.whole-preflop-deviation-pilot/v1",
+    "sidecars": {
+      "finalize_verified_source.py": "a93e9700aa613ec9e4ffa62353899808f97e7e30bfd5d6ce23f72322a9387a7a",
+      "prepare_experiment.py": "e8f1d210451a4bbc859412b6419fecf1e68b5d2d1d6c26212b4617fd63e48e6a",
+      "python-tests.log": "eba7f8f77e149d115ff980c26daa3ff111da56fb9dfbac2b134945d7fb74eabb",
+      "run_pilot.ps1": "722eda8b1b74bd39b1eb3d1424d91f47dbf992d0a27c63124c66a55054dc2231",
+      "validate_run.py": "cfaeefa3e553c8a6e04609ab0173d1dcae111969cc5a9a9f2dd21458ccf6cfa1",
+      "verify_final.py": "82af8602a8fd9006b6ffdee12d5857f412286ff945a1c6c249bc6a761262f74a",
+      "verify_source.py": "a68608e6235438d76be048cafc31a9f584a2b40e7f4ad2d4cfd26f98d84aebb0"
+    },
+    "status": "completed-diagnostic-pilot",
+    "summarizer": "tools/summarize_whole_preflop_deviation.py",
+    "summarizerDependency": "tools/summarize_raised_opponent.py",
+    "summarizerDependencySha256": "082a10fa9aef9aee7edf159f5836ed870e082b41957ea01ebb7ffcc4528720b1",
+    "summarizerSha256": "11af08607224353c334b306c37cfa654ccf0517b893e925e65d7126e55da9e02",
+    "summarizerTests": "tools/tests/test_summarize_whole_preflop_deviation.py",
+    "summarizerTestsSha256": "6a76e95f149b936f07b13c0c8d47f977f9f26bbb68f128b9885adca821187dbc",
+    "supportNodes": [
+      "root",
+      "fold/fold/fold/fold",
+      "fold/fold/fold/fold/raise-to:3000",
+      "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+      "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+      "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in"
+    ],
+    "sweeps": 8192,
+    "threads": 8,
+    "timeoutSeconds": 600,
+    "validationReport": "docs/validation/multiway-whole-preflop-deviation-2026-09-10.md"
+  },
+  "renderScriptSha256": "3495cda27c2a3726a3e3b94730bed5dc21a9ff04fcae9393f598e4e2229f7079",
+  "retainedSummarySha256": "ac80a7b41823dd778c342d9b56c111d6cf43ad48133c2152743f6390b3e678c8",
+  "summary": {
+    "arms": {
+      "enumerated": {
+        "constructionElapsedSecs": 45.16705,
+        "diagnostic": {
+          "config": {
+            "fitSeed": 2601,
+            "fitTraversalsPerSeat": 8192,
+            "heldOutSamples": 32768,
+            "heldOutSeeds": [
+              2701,
+              2702
+            ]
+          },
+          "fitCoverage": [
+            {
+              "retained_infosets": 294,
+              "retained_visits": 6674,
+              "total_visits": 11383,
+              "traversals": 8192,
+              "visited_infosets": 3180
+            },
+            {
+              "retained_infosets": 356,
+              "retained_visits": 5856,
+              "total_visits": 10472,
+              "traversals": 8192,
+              "visited_infosets": 2972
+            },
+            {
+              "retained_infosets": 263,
+              "retained_visits": 3260,
+              "total_visits": 8367,
+              "traversals": 8192,
+              "visited_infosets": 3076
+            },
+            {
+              "retained_infosets": 173,
+              "retained_visits": 8225,
+              "total_visits": 12210,
+              "traversals": 8192,
+              "visited_infosets": 2743
+            },
+            {
+              "retained_infosets": 239,
+              "retained_visits": 7790,
+              "total_visits": 11306,
+              "traversals": 8192,
+              "visited_infosets": 2676
+            },
+            {
+              "retained_infosets": 266,
+              "retained_visits": 7235,
+              "total_visits": 11294,
+              "traversals": 8192,
+              "visited_infosets": 2882
+            }
+          ],
+          "fitElapsedSecs": 5.8245845,
+          "fitPolicyFingerprint": "c46c2e938db27d0a07dcf9bc7827414f6b5b913cfdd271227f99edef0df017a9",
+          "heldOut": [
+            {
+              "baseline": [
+                {
+                  "ci95": [
+                    0.026500844596570816,
+                    0.42247645032530784
+                  ],
+                  "mean": 0.22448864746093933,
+                  "stderr": 0.10101418513488189
+                },
+                {
+                  "ci95": [
+                    -0.6718367463282695,
+                    -0.2554238127537648
+                  ],
+                  "mean": -0.46363027954101715,
+                  "stderr": 0.10622778917716957
+                },
+                {
+                  "ci95": [
+                    -0.8434016743444858,
+                    -0.3933390483117639
+                  ],
+                  "mean": -0.6183703613281248,
+                  "stderr": 0.11481189439610252
+                },
+                {
+                  "ci95": [
+                    -0.006508644422730248,
+                    0.35697452577038696
+                  ],
+                  "mean": 0.17523294067382836,
+                  "stderr": 0.09272529851865235
+                },
+                {
+                  "ci95": [
+                    -0.16182474446833567,
+                    0.1682591316753676
+                  ],
+                  "mean": 0.0032171936035159713,
+                  "stderr": 0.08420507044482227
+                },
+                {
+                  "ci95": [
+                    0.08651023295752688,
+                    0.4562018642104372
+                  ],
+                  "mean": 0.27135604858398205,
+                  "stderr": 0.09430908960533427
+                }
+              ],
+              "candidatePolicyCoverage": [
+                {
+                  "average_strategy_visits": 39417,
+                  "average_strategy_visits_by_street": {
+                    "flop": 2393,
+                    "preflop": 34312,
+                    "river": 1009,
+                    "turn": 1703
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 39785,
+                  "decision_visits_by_street": {
+                    "flop": 2427,
+                    "preflop": 34322,
+                    "river": 1247,
+                    "turn": 1789
+                  },
+                  "regret_fallback_visits": 343,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 27,
+                    "preflop": 9,
+                    "river": 232,
+                    "turn": 75
+                  },
+                  "stored_strategy_visits": 39760,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 2420,
+                    "preflop": 34321,
+                    "river": 1241,
+                    "turn": 1778
+                  },
+                  "uniform_fallback_visits": 25,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 7,
+                    "preflop": 1,
+                    "river": 6,
+                    "turn": 11
+                  }
+                },
+                {
+                  "average_strategy_visits": 41342,
+                  "average_strategy_visits_by_street": {
+                    "flop": 3238,
+                    "preflop": 34015,
+                    "river": 1501,
+                    "turn": 2588
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 42089,
+                  "decision_visits_by_street": {
+                    "flop": 3246,
+                    "preflop": 34018,
+                    "river": 1958,
+                    "turn": 2867
+                  },
+                  "regret_fallback_visits": 730,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 6,
+                    "preflop": 1,
+                    "river": 452,
+                    "turn": 271
+                  },
+                  "stored_strategy_visits": 42072,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 3244,
+                    "preflop": 34016,
+                    "river": 1953,
+                    "turn": 2859
+                  },
+                  "uniform_fallback_visits": 17,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 2,
+                    "preflop": 2,
+                    "river": 5,
+                    "turn": 8
+                  }
+                },
+                {
+                  "average_strategy_visits": 44274,
+                  "average_strategy_visits_by_street": {
+                    "flop": 8111,
+                    "preflop": 26117,
+                    "river": 4042,
+                    "turn": 6004
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 44726,
+                  "decision_visits_by_street": {
+                    "flop": 8128,
+                    "preflop": 26126,
+                    "river": 4372,
+                    "turn": 6100
+                  },
+                  "regret_fallback_visits": 424,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 12,
+                    "preflop": 3,
+                    "river": 326,
+                    "turn": 83
+                  },
+                  "stored_strategy_visits": 44698,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 8123,
+                    "preflop": 26120,
+                    "river": 4368,
+                    "turn": 6087
+                  },
+                  "uniform_fallback_visits": 28,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 5,
+                    "preflop": 6,
+                    "river": 4,
+                    "turn": 13
+                  }
+                },
+                {
+                  "average_strategy_visits": 37229,
+                  "average_strategy_visits_by_street": {
+                    "flop": 1412,
+                    "preflop": 34308,
+                    "river": 538,
+                    "turn": 971
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 37386,
+                  "decision_visits_by_street": {
+                    "flop": 1432,
+                    "preflop": 34317,
+                    "river": 639,
+                    "turn": 998
+                  },
+                  "regret_fallback_visits": 150,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 20,
+                    "preflop": 8,
+                    "river": 98,
+                    "turn": 24
+                  },
+                  "stored_strategy_visits": 37379,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 1432,
+                    "preflop": 34316,
+                    "river": 636,
+                    "turn": 995
+                  },
+                  "uniform_fallback_visits": 7,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 1,
+                    "river": 3,
+                    "turn": 3
+                  }
+                },
+                {
+                  "average_strategy_visits": 34989,
+                  "average_strategy_visits_by_street": {
+                    "flop": 645,
+                    "preflop": 33683,
+                    "river": 230,
+                    "turn": 431
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35148,
+                  "decision_visits_by_street": {
+                    "flop": 668,
+                    "preflop": 33693,
+                    "river": 300,
+                    "turn": 487
+                  },
+                  "regret_fallback_visits": 135,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 19,
+                    "preflop": 8,
+                    "river": 62,
+                    "turn": 46
+                  },
+                  "stored_strategy_visits": 35124,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 664,
+                    "preflop": 33691,
+                    "river": 292,
+                    "turn": 477
+                  },
+                  "uniform_fallback_visits": 24,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 4,
+                    "preflop": 2,
+                    "river": 8,
+                    "turn": 10
+                  }
+                },
+                {
+                  "average_strategy_visits": 35554,
+                  "average_strategy_visits_by_street": {
+                    "flop": 940,
+                    "preflop": 33784,
+                    "river": 213,
+                    "turn": 617
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35886,
+                  "decision_visits_by_street": {
+                    "flop": 968,
+                    "preflop": 33786,
+                    "river": 436,
+                    "turn": 696
+                  },
+                  "regret_fallback_visits": 319,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 25,
+                    "preflop": 2,
+                    "river": 219,
+                    "turn": 73
+                  },
+                  "stored_strategy_visits": 35873,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 965,
+                    "preflop": 33786,
+                    "river": 432,
+                    "turn": 690
+                  },
+                  "uniform_fallback_visits": 13,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 3,
+                    "preflop": 0,
+                    "river": 4,
+                    "turn": 6
+                  }
+                }
+              ],
+              "coverage": [
+                {
+                  "baseline_fallback_visits": 13344,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1921,
+                    "preflop": 9195,
+                    "river": 890,
+                    "turn": 1338
+                  },
+                  "decision_visits": 38557,
+                  "decision_visits_by_street": {
+                    "flop": 1921,
+                    "preflop": 34408,
+                    "river": 890,
+                    "turn": 1338
+                  },
+                  "trained_action_visits": 25213,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 25213,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 17966,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 2519,
+                    "preflop": 12098,
+                    "river": 1296,
+                    "turn": 2053
+                  },
+                  "decision_visits": 39978,
+                  "decision_visits_by_street": {
+                    "flop": 2519,
+                    "preflop": 34110,
+                    "river": 1296,
+                    "turn": 2053
+                  },
+                  "trained_action_visits": 22012,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 22012,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 34825,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 9002,
+                    "preflop": 14769,
+                    "river": 4546,
+                    "turn": 6508
+                  },
+                  "decision_visits": 46584,
+                  "decision_visits_by_street": {
+                    "flop": 9002,
+                    "preflop": 26528,
+                    "river": 4546,
+                    "turn": 6508
+                  },
+                  "trained_action_visits": 11759,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 11759,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 4527,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1348,
+                    "preflop": 1763,
+                    "river": 560,
+                    "turn": 856
+                  },
+                  "decision_visits": 37295,
+                  "decision_visits_by_street": {
+                    "flop": 1348,
+                    "preflop": 34531,
+                    "river": 560,
+                    "turn": 856
+                  },
+                  "trained_action_visits": 32768,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 32768,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 7103,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1508,
+                    "preflop": 4040,
+                    "river": 574,
+                    "turn": 981
+                  },
+                  "decision_visits": 37861,
+                  "decision_visits_by_street": {
+                    "flop": 1508,
+                    "preflop": 34798,
+                    "river": 574,
+                    "turn": 981
+                  },
+                  "trained_action_visits": 30758,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 30758,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 8679,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1293,
+                    "preflop": 6030,
+                    "river": 499,
+                    "turn": 857
+                  },
+                  "decision_visits": 36980,
+                  "decision_visits_by_street": {
+                    "flop": 1293,
+                    "preflop": 34331,
+                    "river": 499,
+                    "turn": 857
+                  },
+                  "trained_action_visits": 28301,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 28301,
+                    "river": 0,
+                    "turn": 0
+                  }
+                }
+              ],
+              "deviating": [
+                {
+                  "ci95": [
+                    -0.9515782583058657,
+                    -0.42465178319803776
+                  ],
+                  "mean": -0.6881150207519517,
+                  "stderr": 0.1344200191601602
+                },
+                {
+                  "ci95": [
+                    -1.422712112307522,
+                    -0.90956584179403
+                  ],
+                  "mean": -1.166138977050776,
+                  "stderr": 0.13090466084527858
+                },
+                {
+                  "ci95": [
+                    -1.2702973156074968,
+                    -0.7564075183768656
+                  ],
+                  "mean": -1.0133524169921813,
+                  "stderr": 0.1310943360282223
+                },
+                {
+                  "ci95": [
+                    -0.034061465715457456,
+                    0.3042961458912382
+                  ],
+                  "mean": 0.13511734008789036,
+                  "stderr": 0.08631571724660603
+                },
+                {
+                  "ci95": [
+                    -0.7203365233586264,
+                    -0.3023341919734083
+                  ],
+                  "mean": -0.5113353576660173,
+                  "stderr": 0.10663324780235157
+                },
+                {
+                  "ci95": [
+                    -1.0648891145991772,
+                    -0.5030544889164394
+                  ],
+                  "mean": -0.7839718017578083,
+                  "stderr": 0.1433251596129433
+                }
+              ],
+              "elapsedSecs": 11.2396586,
+              "gains": [
+                {
+                  "ci95": [
+                    -1.1094751924561805,
+                    -0.7157321439696052
+                  ],
+                  "mean": -0.9126036682128928,
+                  "stderr": 0.10044465522616716
+                },
+                {
+                  "ci95": [
+                    -0.8842817430807999,
+                    -0.5207356519387432
+                  ],
+                  "mean": -0.7025086975097715,
+                  "stderr": 0.09274134978113693
+                },
+                {
+                  "ci95": [
+                    -0.5438182112369554,
+                    -0.2461459000911711
+                  ],
+                  "mean": -0.39498205566406325,
+                  "stderr": 0.07593681406780212
+                },
+                {
+                  "ci95": [
+                    -0.21013055793995783,
+                    0.12989935676808162
+                  ],
+                  "mean": -0.040115600585938105,
+                  "stderr": 0.0867423251806223
+                },
+                {
+                  "ci95": [
+                    -0.7074778778861515,
+                    -0.32162722465291327
+                  ],
+                  "mean": -0.5145525512695324,
+                  "stderr": 0.09843128909011178
+                },
+                {
+                  "ci95": [
+                    -1.2902492058919204,
+                    -0.8204064947917049
+                  ],
+                  "mean": -1.0553278503418126,
+                  "stderr": 0.11985783446434067
+                }
+              ],
+              "samples": 32768,
+              "seed": 2701,
+              "totalDealAttempts": 32768
+            },
+            {
+              "baseline": [
+                {
+                  "ci95": [
+                    -0.014376930318554193,
+                    0.3718603897912089
+                  ],
+                  "mean": 0.17874172973632735,
+                  "stderr": 0.09852992859942936
+                },
+                {
+                  "ci95": [
+                    -0.7907803816723884,
+                    -0.39816932535885236
+                  ],
+                  "mean": -0.5944748535156203,
+                  "stderr": 0.10015588171263673
+                },
+                {
+                  "ci95": [
+                    -0.8284722292699302,
+                    -0.38271960422617246
+                  ],
+                  "mean": -0.6055959167480514,
+                  "stderr": 0.11371240434789738
+                },
+                {
+                  "ci95": [
+                    -0.028636885952224134,
+                    0.326362288784253
+                  ],
+                  "mean": 0.14886270141601443,
+                  "stderr": 0.09056101396338702
+                },
+                {
+                  "ci95": [
+                    0.0393717689727163,
+                    0.3990369224335325
+                  ],
+                  "mean": 0.21920434570312441,
+                  "stderr": 0.0917513146583715
+                },
+                {
+                  "ci95": [
+                    0.04271637912656018,
+                    0.4354229641351562
+                  ],
+                  "mean": 0.23906967163085818,
+                  "stderr": 0.10018025127770307
+                }
+              ],
+              "candidatePolicyCoverage": [
+                {
+                  "average_strategy_visits": 39458,
+                  "average_strategy_visits_by_street": {
+                    "flop": 2388,
+                    "preflop": 34336,
+                    "river": 1009,
+                    "turn": 1725
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 39783,
+                  "decision_visits_by_street": {
+                    "flop": 2418,
+                    "preflop": 34345,
+                    "river": 1229,
+                    "turn": 1791
+                  },
+                  "regret_fallback_visits": 305,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 25,
+                    "preflop": 7,
+                    "river": 215,
+                    "turn": 58
+                  },
+                  "stored_strategy_visits": 39763,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 2413,
+                    "preflop": 34343,
+                    "river": 1224,
+                    "turn": 1783
+                  },
+                  "uniform_fallback_visits": 20,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 5,
+                    "preflop": 2,
+                    "river": 5,
+                    "turn": 8
+                  }
+                },
+                {
+                  "average_strategy_visits": 41402,
+                  "average_strategy_visits_by_street": {
+                    "flop": 3282,
+                    "preflop": 33962,
+                    "river": 1581,
+                    "turn": 2577
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 42152,
+                  "decision_visits_by_street": {
+                    "flop": 3295,
+                    "preflop": 33966,
+                    "river": 2046,
+                    "turn": 2845
+                  },
+                  "regret_fallback_visits": 736,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 12,
+                    "preflop": 3,
+                    "river": 458,
+                    "turn": 263
+                  },
+                  "stored_strategy_visits": 42138,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 3294,
+                    "preflop": 33965,
+                    "river": 2039,
+                    "turn": 2840
+                  },
+                  "uniform_fallback_visits": 14,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 1,
+                    "preflop": 1,
+                    "river": 7,
+                    "turn": 5
+                  }
+                },
+                {
+                  "average_strategy_visits": 44714,
+                  "average_strategy_visits_by_street": {
+                    "flop": 8147,
+                    "preflop": 26162,
+                    "river": 4178,
+                    "turn": 6227
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 45185,
+                  "decision_visits_by_street": {
+                    "flop": 8162,
+                    "preflop": 26177,
+                    "river": 4529,
+                    "turn": 6317
+                  },
+                  "regret_fallback_visits": 455,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 13,
+                    "preflop": 10,
+                    "river": 345,
+                    "turn": 87
+                  },
+                  "stored_strategy_visits": 45169,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 8160,
+                    "preflop": 26172,
+                    "river": 4523,
+                    "turn": 6314
+                  },
+                  "uniform_fallback_visits": 16,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 2,
+                    "preflop": 5,
+                    "river": 6,
+                    "turn": 3
+                  }
+                },
+                {
+                  "average_strategy_visits": 37322,
+                  "average_strategy_visits_by_street": {
+                    "flop": 1450,
+                    "preflop": 34293,
+                    "river": 566,
+                    "turn": 1013
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 37488,
+                  "decision_visits_by_street": {
+                    "flop": 1469,
+                    "preflop": 34303,
+                    "river": 673,
+                    "turn": 1043
+                  },
+                  "regret_fallback_visits": 158,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 18,
+                    "preflop": 9,
+                    "river": 103,
+                    "turn": 28
+                  },
+                  "stored_strategy_visits": 37480,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 1468,
+                    "preflop": 34302,
+                    "river": 669,
+                    "turn": 1041
+                  },
+                  "uniform_fallback_visits": 8,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 1,
+                    "preflop": 1,
+                    "river": 4,
+                    "turn": 2
+                  }
+                },
+                {
+                  "average_strategy_visits": 34948,
+                  "average_strategy_visits_by_street": {
+                    "flop": 606,
+                    "preflop": 33748,
+                    "river": 197,
+                    "turn": 397
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35119,
+                  "decision_visits_by_street": {
+                    "flop": 645,
+                    "preflop": 33751,
+                    "river": 277,
+                    "turn": 446
+                  },
+                  "regret_fallback_visits": 148,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 33,
+                    "preflop": 2,
+                    "river": 74,
+                    "turn": 39
+                  },
+                  "stored_strategy_visits": 35096,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 639,
+                    "preflop": 33750,
+                    "river": 271,
+                    "turn": 436
+                  },
+                  "uniform_fallback_visits": 23,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 6,
+                    "preflop": 1,
+                    "river": 6,
+                    "turn": 10
+                  }
+                },
+                {
+                  "average_strategy_visits": 35727,
+                  "average_strategy_visits_by_street": {
+                    "flop": 1006,
+                    "preflop": 33825,
+                    "river": 243,
+                    "turn": 653
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 36108,
+                  "decision_visits_by_street": {
+                    "flop": 1057,
+                    "preflop": 33829,
+                    "river": 476,
+                    "turn": 746
+                  },
+                  "regret_fallback_visits": 360,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 47,
+                    "preflop": 3,
+                    "river": 228,
+                    "turn": 82
+                  },
+                  "stored_strategy_visits": 36087,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 1053,
+                    "preflop": 33828,
+                    "river": 471,
+                    "turn": 735
+                  },
+                  "uniform_fallback_visits": 21,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 4,
+                    "preflop": 1,
+                    "river": 5,
+                    "turn": 11
+                  }
+                }
+              ],
+              "coverage": [
+                {
+                  "baseline_fallback_visits": 13346,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1959,
+                    "preflop": 9246,
+                    "river": 842,
+                    "turn": 1299
+                  },
+                  "decision_visits": 38441,
+                  "decision_visits_by_street": {
+                    "flop": 1959,
+                    "preflop": 34341,
+                    "river": 842,
+                    "turn": 1299
+                  },
+                  "trained_action_visits": 25095,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 25095,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 17883,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 2499,
+                    "preflop": 12138,
+                    "river": 1252,
+                    "turn": 1994
+                  },
+                  "decision_visits": 39800,
+                  "decision_visits_by_street": {
+                    "flop": 2499,
+                    "preflop": 34055,
+                    "river": 1252,
+                    "turn": 1994
+                  },
+                  "trained_action_visits": 21917,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 21917,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 35264,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 9090,
+                    "preflop": 14710,
+                    "river": 4725,
+                    "turn": 6739
+                  },
+                  "decision_visits": 47138,
+                  "decision_visits_by_street": {
+                    "flop": 9090,
+                    "preflop": 26584,
+                    "river": 4725,
+                    "turn": 6739
+                  },
+                  "trained_action_visits": 11874,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 11874,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 4582,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1381,
+                    "preflop": 1717,
+                    "river": 596,
+                    "turn": 888
+                  },
+                  "decision_visits": 37350,
+                  "decision_visits_by_street": {
+                    "flop": 1381,
+                    "preflop": 34485,
+                    "river": 596,
+                    "turn": 888
+                  },
+                  "trained_action_visits": 32768,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 32768,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 7121,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1435,
+                    "preflop": 4181,
+                    "river": 570,
+                    "turn": 935
+                  },
+                  "decision_visits": 37854,
+                  "decision_visits_by_street": {
+                    "flop": 1435,
+                    "preflop": 34914,
+                    "river": 570,
+                    "turn": 935
+                  },
+                  "trained_action_visits": 30733,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 30733,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 8583,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1268,
+                    "preflop": 5986,
+                    "river": 508,
+                    "turn": 821
+                  },
+                  "decision_visits": 36891,
+                  "decision_visits_by_street": {
+                    "flop": 1268,
+                    "preflop": 34294,
+                    "river": 508,
+                    "turn": 821
+                  },
+                  "trained_action_visits": 28308,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 28308,
+                    "river": 0,
+                    "turn": 0
+                  }
+                }
+              ],
+              "deviating": [
+                {
+                  "ci95": [
+                    -0.8041591272575297,
+                    -0.28773351190263424
+                  ],
+                  "mean": -0.545946319580082,
+                  "stderr": 0.1317412284068611
+                },
+                {
+                  "ci95": [
+                    -1.4490233127088816,
+                    -0.9602236355333174
+                  ],
+                  "mean": -1.2046234741210995,
+                  "stderr": 0.124693795197848
+                },
+                {
+                  "ci95": [
+                    -1.293117681655029,
+                    -0.7767418764504352
+                  ],
+                  "mean": -1.034929779052732,
+                  "stderr": 0.13172852173586574
+                },
+                {
+                  "ci95": [
+                    -0.0856667359227669,
+                    0.24342430428214168
+                  ],
+                  "mean": 0.0788787841796874,
+                  "stderr": 0.08395179597063995
+                },
+                {
+                  "ci95": [
+                    -0.556086904604158,
+                    -0.11044483367709171
+                  ],
+                  "mean": -0.33326586914062484,
+                  "stderr": 0.11368420176710874
+                },
+                {
+                  "ci95": [
+                    -1.1011116173824027,
+                    -0.5207072302738511
+                  ],
+                  "mean": -0.8109094238281269,
+                  "stderr": 0.14806234365014073
+                }
+              ],
+              "elapsedSecs": 9.8871512,
+              "gains": [
+                {
+                  "ci95": [
+                    -0.9214720721050887,
+                    -0.5279040265277243
+                  ],
+                  "mean": -0.7246880493164065,
+                  "stderr": 0.1004000116268787
+                },
+                {
+                  "ci95": [
+                    -0.7857839752979713,
+                    -0.4345132659129668
+                  ],
+                  "mean": -0.610148620605469,
+                  "stderr": 0.08960987484311338
+                },
+                {
+                  "ci95": [
+                    -0.5831717181511183,
+                    -0.27549600645825045
+                  ],
+                  "mean": -0.4293338623046844,
+                  "stderr": 0.07848870196246631
+                },
+                {
+                  "ci95": [
+                    -0.2255236027497453,
+                    0.08555576827708859
+                  ],
+                  "mean": -0.06998391723632837,
+                  "stderr": 0.07935698240480457
+                },
+                {
+                  "ci95": [
+                    -0.7521233591935034,
+                    -0.35281707049399536
+                  ],
+                  "mean": -0.5524702148437494,
+                  "stderr": 0.10186384915803776
+                },
+                {
+                  "ci95": [
+                    -1.2872233493431398,
+                    -0.8127348415748155
+                  ],
+                  "mean": -1.0499790954589776,
+                  "stderr": 0.12104298667559292
+                }
+              ],
+              "samples": 32768,
+              "seed": 2702,
+              "totalDealAttempts": 32768
+            }
+          ],
+          "maxBufferedSamples": 4096,
+          "minFitVisits": 8,
+          "schemaVersion": "solvers.multiway-preflop-deviation/v1",
+          "scope": "all-preflop-decisions-with-frozen-postflop",
+          "variant": {
+            "purify_threshold": 0.0,
+            "use_current_strategy": false
+          }
+        },
+        "normalizedOldOutputSha256": "a53ee6bec443f9950972bf6694ab6593f02e573cd42ea148edc6229754ab8542",
+        "oldOutputExactlyReplayed": true,
+        "rows": [
+          {
+            "baseline": {
+              "ci95": [
+                0.026500844596570816,
+                0.42247645032530784
+              ],
+              "mean": 0.22448864746093933,
+              "stderr": 0.10101418513488189
+            },
+            "deviating": {
+              "ci95": [
+                -0.9515782583058657,
+                -0.42465178319803776
+              ],
+              "mean": -0.6881150207519517,
+              "stderr": 0.1344200191601602
+            },
+            "gain": {
+              "ci95": [
+                -1.1094751924561805,
+                -0.7157321439696052
+              ],
+              "mean": -0.9126036682128928,
+              "stderr": 0.10044465522616716
+            },
+            "position": "BTN",
+            "preflopDecisionVisits": 34408,
+            "preflopTrainedActionVisits": 25213,
+            "preflopTrainedVisitFraction": 0.7327656358986282,
+            "seat": 0,
+            "seed": 2701
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.6718367463282695,
+                -0.2554238127537648
+              ],
+              "mean": -0.46363027954101715,
+              "stderr": 0.10622778917716957
+            },
+            "deviating": {
+              "ci95": [
+                -1.422712112307522,
+                -0.90956584179403
+              ],
+              "mean": -1.166138977050776,
+              "stderr": 0.13090466084527858
+            },
+            "gain": {
+              "ci95": [
+                -0.8842817430807999,
+                -0.5207356519387432
+              ],
+              "mean": -0.7025086975097715,
+              "stderr": 0.09274134978113693
+            },
+            "position": "SB",
+            "preflopDecisionVisits": 34110,
+            "preflopTrainedActionVisits": 22012,
+            "preflopTrainedVisitFraction": 0.645323951920258,
+            "seat": 1,
+            "seed": 2701
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.8434016743444858,
+                -0.3933390483117639
+              ],
+              "mean": -0.6183703613281248,
+              "stderr": 0.11481189439610252
+            },
+            "deviating": {
+              "ci95": [
+                -1.2702973156074968,
+                -0.7564075183768656
+              ],
+              "mean": -1.0133524169921813,
+              "stderr": 0.1310943360282223
+            },
+            "gain": {
+              "ci95": [
+                -0.5438182112369554,
+                -0.2461459000911711
+              ],
+              "mean": -0.39498205566406325,
+              "stderr": 0.07593681406780212
+            },
+            "position": "BB",
+            "preflopDecisionVisits": 26528,
+            "preflopTrainedActionVisits": 11759,
+            "preflopTrainedVisitFraction": 0.44326749095295537,
+            "seat": 2,
+            "seed": 2701
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.006508644422730248,
+                0.35697452577038696
+              ],
+              "mean": 0.17523294067382836,
+              "stderr": 0.09272529851865235
+            },
+            "deviating": {
+              "ci95": [
+                -0.034061465715457456,
+                0.3042961458912382
+              ],
+              "mean": 0.13511734008789036,
+              "stderr": 0.08631571724660603
+            },
+            "gain": {
+              "ci95": [
+                -0.21013055793995783,
+                0.12989935676808162
+              ],
+              "mean": -0.040115600585938105,
+              "stderr": 0.0867423251806223
+            },
+            "position": "UTG",
+            "preflopDecisionVisits": 34531,
+            "preflopTrainedActionVisits": 32768,
+            "preflopTrainedVisitFraction": 0.948944426746981,
+            "seat": 3,
+            "seed": 2701
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.16182474446833567,
+                0.1682591316753676
+              ],
+              "mean": 0.0032171936035159713,
+              "stderr": 0.08420507044482227
+            },
+            "deviating": {
+              "ci95": [
+                -0.7203365233586264,
+                -0.3023341919734083
+              ],
+              "mean": -0.5113353576660173,
+              "stderr": 0.10663324780235157
+            },
+            "gain": {
+              "ci95": [
+                -0.7074778778861515,
+                -0.32162722465291327
+              ],
+              "mean": -0.5145525512695324,
+              "stderr": 0.09843128909011178
+            },
+            "position": "HJ",
+            "preflopDecisionVisits": 34798,
+            "preflopTrainedActionVisits": 30758,
+            "preflopTrainedVisitFraction": 0.8839013736421634,
+            "seat": 4,
+            "seed": 2701
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.08651023295752688,
+                0.4562018642104372
+              ],
+              "mean": 0.27135604858398205,
+              "stderr": 0.09430908960533427
+            },
+            "deviating": {
+              "ci95": [
+                -1.0648891145991772,
+                -0.5030544889164394
+              ],
+              "mean": -0.7839718017578083,
+              "stderr": 0.1433251596129433
+            },
+            "gain": {
+              "ci95": [
+                -1.2902492058919204,
+                -0.8204064947917049
+              ],
+              "mean": -1.0553278503418126,
+              "stderr": 0.11985783446434067
+            },
+            "position": "CO",
+            "preflopDecisionVisits": 34331,
+            "preflopTrainedActionVisits": 28301,
+            "preflopTrainedVisitFraction": 0.8243569951355917,
+            "seat": 5,
+            "seed": 2701
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.014376930318554193,
+                0.3718603897912089
+              ],
+              "mean": 0.17874172973632735,
+              "stderr": 0.09852992859942936
+            },
+            "deviating": {
+              "ci95": [
+                -0.8041591272575297,
+                -0.28773351190263424
+              ],
+              "mean": -0.545946319580082,
+              "stderr": 0.1317412284068611
+            },
+            "gain": {
+              "ci95": [
+                -0.9214720721050887,
+                -0.5279040265277243
+              ],
+              "mean": -0.7246880493164065,
+              "stderr": 0.1004000116268787
+            },
+            "position": "BTN",
+            "preflopDecisionVisits": 34341,
+            "preflopTrainedActionVisits": 25095,
+            "preflopTrainedVisitFraction": 0.7307591508692234,
+            "seat": 0,
+            "seed": 2702
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.7907803816723884,
+                -0.39816932535885236
+              ],
+              "mean": -0.5944748535156203,
+              "stderr": 0.10015588171263673
+            },
+            "deviating": {
+              "ci95": [
+                -1.4490233127088816,
+                -0.9602236355333174
+              ],
+              "mean": -1.2046234741210995,
+              "stderr": 0.124693795197848
+            },
+            "gain": {
+              "ci95": [
+                -0.7857839752979713,
+                -0.4345132659129668
+              ],
+              "mean": -0.610148620605469,
+              "stderr": 0.08960987484311338
+            },
+            "position": "SB",
+            "preflopDecisionVisits": 34055,
+            "preflopTrainedActionVisits": 21917,
+            "preflopTrainedVisitFraction": 0.6435765673175745,
+            "seat": 1,
+            "seed": 2702
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.8284722292699302,
+                -0.38271960422617246
+              ],
+              "mean": -0.6055959167480514,
+              "stderr": 0.11371240434789738
+            },
+            "deviating": {
+              "ci95": [
+                -1.293117681655029,
+                -0.7767418764504352
+              ],
+              "mean": -1.034929779052732,
+              "stderr": 0.13172852173586574
+            },
+            "gain": {
+              "ci95": [
+                -0.5831717181511183,
+                -0.27549600645825045
+              ],
+              "mean": -0.4293338623046844,
+              "stderr": 0.07848870196246631
+            },
+            "position": "BB",
+            "preflopDecisionVisits": 26584,
+            "preflopTrainedActionVisits": 11874,
+            "preflopTrainedVisitFraction": 0.44665964489918747,
+            "seat": 2,
+            "seed": 2702
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.028636885952224134,
+                0.326362288784253
+              ],
+              "mean": 0.14886270141601443,
+              "stderr": 0.09056101396338702
+            },
+            "deviating": {
+              "ci95": [
+                -0.0856667359227669,
+                0.24342430428214168
+              ],
+              "mean": 0.0788787841796874,
+              "stderr": 0.08395179597063995
+            },
+            "gain": {
+              "ci95": [
+                -0.2255236027497453,
+                0.08555576827708859
+              ],
+              "mean": -0.06998391723632837,
+              "stderr": 0.07935698240480457
+            },
+            "position": "UTG",
+            "preflopDecisionVisits": 34485,
+            "preflopTrainedActionVisits": 32768,
+            "preflopTrainedVisitFraction": 0.9502102363346383,
+            "seat": 3,
+            "seed": 2702
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.0393717689727163,
+                0.3990369224335325
+              ],
+              "mean": 0.21920434570312441,
+              "stderr": 0.0917513146583715
+            },
+            "deviating": {
+              "ci95": [
+                -0.556086904604158,
+                -0.11044483367709171
+              ],
+              "mean": -0.33326586914062484,
+              "stderr": 0.11368420176710874
+            },
+            "gain": {
+              "ci95": [
+                -0.7521233591935034,
+                -0.35281707049399536
+              ],
+              "mean": -0.5524702148437494,
+              "stderr": 0.10186384915803776
+            },
+            "position": "HJ",
+            "preflopDecisionVisits": 34914,
+            "preflopTrainedActionVisits": 30733,
+            "preflopTrainedVisitFraction": 0.8802486108724294,
+            "seat": 4,
+            "seed": 2702
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.04271637912656018,
+                0.4354229641351562
+              ],
+              "mean": 0.23906967163085818,
+              "stderr": 0.10018025127770307
+            },
+            "deviating": {
+              "ci95": [
+                -1.1011116173824027,
+                -0.5207072302738511
+              ],
+              "mean": -0.8109094238281269,
+              "stderr": 0.14806234365014073
+            },
+            "gain": {
+              "ci95": [
+                -1.2872233493431398,
+                -0.8127348415748155
+              ],
+              "mean": -1.0499790954589776,
+              "stderr": 0.12104298667559292
+            },
+            "position": "CO",
+            "preflopDecisionVisits": 34294,
+            "preflopTrainedActionVisits": 28308,
+            "preflopTrainedVisitFraction": 0.8254505161252698,
+            "seat": 5,
+            "seed": 2702
+          }
+        ],
+        "solveElapsedSecs": 36.4652654
+      },
+      "ordinary": {
+        "constructionElapsedSecs": 45.1025574,
+        "diagnostic": {
+          "config": {
+            "fitSeed": 2601,
+            "fitTraversalsPerSeat": 8192,
+            "heldOutSamples": 32768,
+            "heldOutSeeds": [
+              2701,
+              2702
+            ]
+          },
+          "fitCoverage": [
+            {
+              "retained_infosets": 287,
+              "retained_visits": 6492,
+              "total_visits": 11448,
+              "traversals": 8192,
+              "visited_infosets": 3349
+            },
+            {
+              "retained_infosets": 342,
+              "retained_visits": 5788,
+              "total_visits": 11201,
+              "traversals": 8192,
+              "visited_infosets": 3310
+            },
+            {
+              "retained_infosets": 217,
+              "retained_visits": 2455,
+              "total_visits": 7948,
+              "traversals": 8192,
+              "visited_infosets": 3270
+            },
+            {
+              "retained_infosets": 179,
+              "retained_visits": 8275,
+              "total_visits": 12694,
+              "traversals": 8192,
+              "visited_infosets": 2851
+            },
+            {
+              "retained_infosets": 240,
+              "retained_visits": 7834,
+              "total_visits": 11839,
+              "traversals": 8192,
+              "visited_infosets": 2912
+            },
+            {
+              "retained_infosets": 269,
+              "retained_visits": 7182,
+              "total_visits": 11509,
+              "traversals": 8192,
+              "visited_infosets": 3174
+            }
+          ],
+          "fitElapsedSecs": 5.4522846,
+          "fitPolicyFingerprint": "c9b2967abc0b53c7b941c6bd0e4ca3191b12cae910badaa1f276c05643ef59e9",
+          "heldOut": [
+            {
+              "baseline": [
+                {
+                  "ci95": [
+                    0.09730220876153972,
+                    0.580512122293145
+                  ],
+                  "mean": 0.33890716552734235,
+                  "stderr": 0.12326783508459317
+                },
+                {
+                  "ci95": [
+                    -0.9018573983640381,
+                    -0.39654518952659473
+                  ],
+                  "mean": -0.6492012939453164,
+                  "stderr": 0.1289061757238376
+                },
+                {
+                  "ci95": [
+                    -1.0294621463853395,
+                    -0.527723461524822
+                  ],
+                  "mean": -0.7785928039550807,
+                  "stderr": 0.1279945624644177
+                },
+                {
+                  "ci95": [
+                    0.12608760174093525,
+                    0.5144179524582824
+                  ],
+                  "mean": 0.3202527770996088,
+                  "stderr": 0.09906386497891509
+                },
+                {
+                  "ci95": [
+                    -0.06763727652093737,
+                    0.3192808922435928
+                  ],
+                  "mean": 0.1258218078613277,
+                  "stderr": 0.09870361448074749
+                },
+                {
+                  "ci95": [
+                    0.003946203613001825,
+                    0.4253099609377773
+                  ],
+                  "mean": 0.21462808227538957,
+                  "stderr": 0.10749075441958558
+                }
+              ],
+              "candidatePolicyCoverage": [
+                {
+                  "average_strategy_visits": 36427,
+                  "average_strategy_visits_by_street": {
+                    "flop": 1285,
+                    "preflop": 33921,
+                    "river": 404,
+                    "turn": 817
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 36713,
+                  "decision_visits_by_street": {
+                    "flop": 1320,
+                    "preflop": 33927,
+                    "river": 574,
+                    "turn": 892
+                  },
+                  "regret_fallback_visits": 268,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 30,
+                    "preflop": 4,
+                    "river": 169,
+                    "turn": 65
+                  },
+                  "stored_strategy_visits": 36695,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 1315,
+                    "preflop": 33925,
+                    "river": 573,
+                    "turn": 882
+                  },
+                  "uniform_fallback_visits": 18,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 5,
+                    "preflop": 2,
+                    "river": 1,
+                    "turn": 10
+                  }
+                },
+                {
+                  "average_strategy_visits": 40025,
+                  "average_strategy_visits_by_street": {
+                    "flop": 2540,
+                    "preflop": 34397,
+                    "river": 1218,
+                    "turn": 1870
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 40281,
+                  "decision_visits_by_street": {
+                    "flop": 2551,
+                    "preflop": 34400,
+                    "river": 1377,
+                    "turn": 1953
+                  },
+                  "regret_fallback_visits": 247,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 8,
+                    "preflop": 3,
+                    "river": 153,
+                    "turn": 83
+                  },
+                  "stored_strategy_visits": 40272,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 2548,
+                    "preflop": 34400,
+                    "river": 1371,
+                    "turn": 1953
+                  },
+                  "uniform_fallback_visits": 9,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 3,
+                    "preflop": 0,
+                    "river": 6,
+                    "turn": 0
+                  }
+                },
+                {
+                  "average_strategy_visits": 35539,
+                  "average_strategy_visits_by_street": {
+                    "flop": 5140,
+                    "preflop": 24323,
+                    "river": 2421,
+                    "turn": 3655
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35872,
+                  "decision_visits_by_street": {
+                    "flop": 5155,
+                    "preflop": 24333,
+                    "river": 2634,
+                    "turn": 3750
+                  },
+                  "regret_fallback_visits": 304,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 8,
+                    "preflop": 8,
+                    "river": 205,
+                    "turn": 83
+                  },
+                  "stored_strategy_visits": 35843,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 5148,
+                    "preflop": 24331,
+                    "river": 2626,
+                    "turn": 3738
+                  },
+                  "uniform_fallback_visits": 29,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 7,
+                    "preflop": 2,
+                    "river": 8,
+                    "turn": 12
+                  }
+                },
+                {
+                  "average_strategy_visits": 36554,
+                  "average_strategy_visits_by_street": {
+                    "flop": 1065,
+                    "preflop": 34452,
+                    "river": 377,
+                    "turn": 660
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 36726,
+                  "decision_visits_by_street": {
+                    "flop": 1083,
+                    "preflop": 34460,
+                    "river": 498,
+                    "turn": 685
+                  },
+                  "regret_fallback_visits": 150,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 11,
+                    "preflop": 6,
+                    "river": 114,
+                    "turn": 19
+                  },
+                  "stored_strategy_visits": 36704,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 1076,
+                    "preflop": 34458,
+                    "river": 491,
+                    "turn": 679
+                  },
+                  "uniform_fallback_visits": 22,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 7,
+                    "preflop": 2,
+                    "river": 7,
+                    "turn": 6
+                  }
+                },
+                {
+                  "average_strategy_visits": 35713,
+                  "average_strategy_visits_by_street": {
+                    "flop": 818,
+                    "preflop": 34092,
+                    "river": 267,
+                    "turn": 536
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35929,
+                  "decision_visits_by_street": {
+                    "flop": 847,
+                    "preflop": 34098,
+                    "river": 384,
+                    "turn": 600
+                  },
+                  "regret_fallback_visits": 180,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 15,
+                    "preflop": 4,
+                    "river": 110,
+                    "turn": 51
+                  },
+                  "stored_strategy_visits": 35893,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 833,
+                    "preflop": 34096,
+                    "river": 377,
+                    "turn": 587
+                  },
+                  "uniform_fallback_visits": 36,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 14,
+                    "preflop": 2,
+                    "river": 7,
+                    "turn": 13
+                  }
+                },
+                {
+                  "average_strategy_visits": 34961,
+                  "average_strategy_visits_by_street": {
+                    "flop": 580,
+                    "preflop": 33918,
+                    "river": 128,
+                    "turn": 335
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35187,
+                  "decision_visits_by_street": {
+                    "flop": 629,
+                    "preflop": 33920,
+                    "river": 247,
+                    "turn": 391
+                  },
+                  "regret_fallback_visits": 195,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 34,
+                    "preflop": 1,
+                    "river": 112,
+                    "turn": 48
+                  },
+                  "stored_strategy_visits": 35156,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 614,
+                    "preflop": 33919,
+                    "river": 240,
+                    "turn": 383
+                  },
+                  "uniform_fallback_visits": 31,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 15,
+                    "preflop": 1,
+                    "river": 7,
+                    "turn": 8
+                  }
+                }
+              ],
+              "coverage": [
+                {
+                  "baseline_fallback_visits": 12380,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1467,
+                    "preflop": 9560,
+                    "river": 517,
+                    "turn": 836
+                  },
+                  "decision_visits": 37086,
+                  "decision_visits_by_street": {
+                    "flop": 1467,
+                    "preflop": 34266,
+                    "river": 517,
+                    "turn": 836
+                  },
+                  "trained_action_visits": 24706,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 24706,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 17771,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 2202,
+                    "preflop": 12905,
+                    "river": 1058,
+                    "turn": 1606
+                  },
+                  "decision_visits": 39280,
+                  "decision_visits_by_street": {
+                    "flop": 2202,
+                    "preflop": 34414,
+                    "river": 1058,
+                    "turn": 1606
+                  },
+                  "trained_action_visits": 21509,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 21509,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 29558,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 6131,
+                    "preflop": 16242,
+                    "river": 2923,
+                    "turn": 4262
+                  },
+                  "decision_visits": 37840,
+                  "decision_visits_by_street": {
+                    "flop": 6131,
+                    "preflop": 24524,
+                    "river": 2923,
+                    "turn": 4262
+                  },
+                  "trained_action_visits": 8282,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 8282,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 4658,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1225,
+                    "preflop": 2206,
+                    "river": 496,
+                    "turn": 731
+                  },
+                  "decision_visits": 37450,
+                  "decision_visits_by_street": {
+                    "flop": 1225,
+                    "preflop": 34998,
+                    "river": 496,
+                    "turn": 731
+                  },
+                  "trained_action_visits": 32792,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 32792,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 6939,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1399,
+                    "preflop": 4097,
+                    "river": 536,
+                    "turn": 907
+                  },
+                  "decision_visits": 37819,
+                  "decision_visits_by_street": {
+                    "flop": 1399,
+                    "preflop": 34977,
+                    "river": 536,
+                    "turn": 907
+                  },
+                  "trained_action_visits": 30880,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 30880,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 8503,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 961,
+                    "preflop": 6660,
+                    "river": 325,
+                    "turn": 557
+                  },
+                  "decision_visits": 36562,
+                  "decision_visits_by_street": {
+                    "flop": 961,
+                    "preflop": 34719,
+                    "river": 325,
+                    "turn": 557
+                  },
+                  "trained_action_visits": 28059,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 28059,
+                    "river": 0,
+                    "turn": 0
+                  }
+                }
+              ],
+              "deviating": [
+                {
+                  "ci95": [
+                    -0.6060807223265834,
+                    -0.03405105257575547
+                  ],
+                  "mean": -0.32006588745116943,
+                  "stderr": 0.1459259361609255
+                },
+                {
+                  "ci95": [
+                    -1.662289421084685,
+                    -1.0949448318449975
+                  ],
+                  "mean": -1.3786171264648412,
+                  "stderr": 0.14473076256114478
+                },
+                {
+                  "ci95": [
+                    -1.3883306130558584,
+                    -0.8398606711238373
+                  ],
+                  "mean": -1.1140956420898478,
+                  "stderr": 0.13991580151327065
+                },
+                {
+                  "ci95": [
+                    -0.29694457734465635,
+                    0.11915710175871881
+                  ],
+                  "mean": -0.08889373779296876,
+                  "stderr": 0.10614838752637121
+                },
+                {
+                  "ci95": [
+                    -0.39748094245940413,
+                    0.04125413581877943
+                  ],
+                  "mean": -0.17811340332031236,
+                  "stderr": 0.11192221384647541
+                },
+                {
+                  "ci95": [
+                    -1.0784848746612858,
+                    -0.5159205818816732
+                  ],
+                  "mean": -0.7972027282714795,
+                  "stderr": 0.1435112991784726
+                }
+              ],
+              "elapsedSecs": 11.2826659,
+              "gains": [
+                {
+                  "ci95": [
+                    -0.8725192283339246,
+                    -0.44542687762311706
+                  ],
+                  "mean": -0.6589730529785208,
+                  "stderr": 0.10895213028336928
+                },
+                {
+                  "ci95": [
+                    -0.9102320405628321,
+                    -0.5485996244762232
+                  ],
+                  "mean": -0.7294158325195277,
+                  "stderr": 0.09225316736903291
+                },
+                {
+                  "ci95": [
+                    -0.4692692449995245,
+                    -0.20173643127000815
+                  ],
+                  "mean": -0.33550283813476633,
+                  "stderr": 0.06824816676773376
+                },
+                {
+                  "ci95": [
+                    -0.6155666588906338,
+                    -0.2027263708945206
+                  ],
+                  "mean": -0.4091465148925772,
+                  "stderr": 0.10531639999900846
+                },
+                {
+                  "ci95": [
+                    -0.5009271770862576,
+                    -0.10694324527702512
+                  ],
+                  "mean": -0.30393521118164135,
+                  "stderr": 0.10050610505337564
+                },
+                {
+                  "ci95": [
+                    -1.2484685692070518,
+                    -0.7751930518866879
+                  ],
+                  "mean": -1.0118308105468699,
+                  "stderr": 0.12073355033682755
+                }
+              ],
+              "samples": 32768,
+              "seed": 2701,
+              "totalDealAttempts": 32768
+            },
+            {
+              "baseline": [
+                {
+                  "ci95": [
+                    -0.04475149979449261,
+                    0.41742142166949175
+                  ],
+                  "mean": 0.18633496093749957,
+                  "stderr": 0.11790125547550621
+                },
+                {
+                  "ci95": [
+                    -0.9080704707669761,
+                    -0.4131607914400598
+                  ],
+                  "mean": -0.660615631103518,
+                  "stderr": 0.12625246921605007
+                },
+                {
+                  "ci95": [
+                    -0.9966826405802072,
+                    -0.499412024947141
+                  ],
+                  "mean": -0.7480473327636741,
+                  "stderr": 0.12685474888598627
+                },
+                {
+                  "ci95": [
+                    0.10280789409983573,
+                    0.5039469887126683
+                  ],
+                  "mean": 0.303377441406252,
+                  "stderr": 0.10233140168694707
+                },
+                {
+                  "ci95": [
+                    0.1370288280590494,
+                    0.5379744068042327
+                  ],
+                  "mean": 0.33750161743164103,
+                  "stderr": 0.1022820353941794
+                },
+                {
+                  "ci95": [
+                    -0.05936255856116418,
+                    0.3769295141275695
+                  ],
+                  "mean": 0.15878347778320265,
+                  "stderr": 0.11129899813488103
+                }
+              ],
+              "candidatePolicyCoverage": [
+                {
+                  "average_strategy_visits": 36399,
+                  "average_strategy_visits_by_street": {
+                    "flop": 1284,
+                    "preflop": 33911,
+                    "river": 413,
+                    "turn": 791
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 36719,
+                  "decision_visits_by_street": {
+                    "flop": 1326,
+                    "preflop": 33913,
+                    "river": 582,
+                    "turn": 898
+                  },
+                  "regret_fallback_visits": 295,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 35,
+                    "preflop": 2,
+                    "river": 160,
+                    "turn": 98
+                  },
+                  "stored_strategy_visits": 36694,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 1319,
+                    "preflop": 33913,
+                    "river": 573,
+                    "turn": 889
+                  },
+                  "uniform_fallback_visits": 25,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 7,
+                    "preflop": 0,
+                    "river": 9,
+                    "turn": 9
+                  }
+                },
+                {
+                  "average_strategy_visits": 40020,
+                  "average_strategy_visits_by_street": {
+                    "flop": 2526,
+                    "preflop": 34340,
+                    "river": 1257,
+                    "turn": 1897
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 40281,
+                  "decision_visits_by_street": {
+                    "flop": 2536,
+                    "preflop": 34346,
+                    "river": 1389,
+                    "turn": 2010
+                  },
+                  "regret_fallback_visits": 252,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 7,
+                    "preflop": 4,
+                    "river": 131,
+                    "turn": 110
+                  },
+                  "stored_strategy_visits": 40272,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 2533,
+                    "preflop": 34344,
+                    "river": 1388,
+                    "turn": 2007
+                  },
+                  "uniform_fallback_visits": 9,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 3,
+                    "preflop": 2,
+                    "river": 1,
+                    "turn": 3
+                  }
+                },
+                {
+                  "average_strategy_visits": 35468,
+                  "average_strategy_visits_by_street": {
+                    "flop": 5115,
+                    "preflop": 24193,
+                    "river": 2443,
+                    "turn": 3717
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35834,
+                  "decision_visits_by_street": {
+                    "flop": 5130,
+                    "preflop": 24206,
+                    "river": 2685,
+                    "turn": 3813
+                  },
+                  "regret_fallback_visits": 341,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 12,
+                    "preflop": 6,
+                    "river": 233,
+                    "turn": 90
+                  },
+                  "stored_strategy_visits": 35809,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 5127,
+                    "preflop": 24199,
+                    "river": 2676,
+                    "turn": 3807
+                  },
+                  "uniform_fallback_visits": 25,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 3,
+                    "preflop": 7,
+                    "river": 9,
+                    "turn": 6
+                  }
+                },
+                {
+                  "average_strategy_visits": 36589,
+                  "average_strategy_visits_by_street": {
+                    "flop": 1070,
+                    "preflop": 34442,
+                    "river": 396,
+                    "turn": 681
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 36731,
+                  "decision_visits_by_street": {
+                    "flop": 1080,
+                    "preflop": 34447,
+                    "river": 502,
+                    "turn": 702
+                  },
+                  "regret_fallback_visits": 128,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 7,
+                    "preflop": 4,
+                    "river": 101,
+                    "turn": 16
+                  },
+                  "stored_strategy_visits": 36717,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 1077,
+                    "preflop": 34446,
+                    "river": 497,
+                    "turn": 697
+                  },
+                  "uniform_fallback_visits": 14,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 3,
+                    "preflop": 1,
+                    "river": 5,
+                    "turn": 5
+                  }
+                },
+                {
+                  "average_strategy_visits": 35772,
+                  "average_strategy_visits_by_street": {
+                    "flop": 879,
+                    "preflop": 34128,
+                    "river": 237,
+                    "turn": 528
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35970,
+                  "decision_visits_by_street": {
+                    "flop": 906,
+                    "preflop": 34134,
+                    "river": 341,
+                    "turn": 589
+                  },
+                  "regret_fallback_visits": 168,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 17,
+                    "preflop": 5,
+                    "river": 98,
+                    "turn": 48
+                  },
+                  "stored_strategy_visits": 35940,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 896,
+                    "preflop": 34133,
+                    "river": 335,
+                    "turn": 576
+                  },
+                  "uniform_fallback_visits": 30,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 10,
+                    "preflop": 1,
+                    "river": 6,
+                    "turn": 13
+                  }
+                },
+                {
+                  "average_strategy_visits": 35069,
+                  "average_strategy_visits_by_street": {
+                    "flop": 633,
+                    "preflop": 33929,
+                    "river": 140,
+                    "turn": 367
+                  },
+                  "current_strategy_visits": 0,
+                  "current_strategy_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 0,
+                    "river": 0,
+                    "turn": 0
+                  },
+                  "decision_visits": 35301,
+                  "decision_visits_by_street": {
+                    "flop": 676,
+                    "preflop": 33932,
+                    "river": 270,
+                    "turn": 423
+                  },
+                  "regret_fallback_visits": 210,
+                  "regret_fallback_visits_by_street": {
+                    "flop": 32,
+                    "preflop": 2,
+                    "river": 125,
+                    "turn": 51
+                  },
+                  "stored_strategy_visits": 35279,
+                  "stored_strategy_visits_by_street": {
+                    "flop": 665,
+                    "preflop": 33931,
+                    "river": 265,
+                    "turn": 418
+                  },
+                  "uniform_fallback_visits": 22,
+                  "uniform_fallback_visits_by_street": {
+                    "flop": 11,
+                    "preflop": 1,
+                    "river": 5,
+                    "turn": 5
+                  }
+                }
+              ],
+              "coverage": [
+                {
+                  "baseline_fallback_visits": 12393,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1444,
+                    "preflop": 9580,
+                    "river": 521,
+                    "turn": 848
+                  },
+                  "decision_visits": 37056,
+                  "decision_visits_by_street": {
+                    "flop": 1444,
+                    "preflop": 34243,
+                    "river": 521,
+                    "turn": 848
+                  },
+                  "trained_action_visits": 24663,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 24663,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 17998,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 2242,
+                    "preflop": 12930,
+                    "river": 1092,
+                    "turn": 1734
+                  },
+                  "decision_visits": 39490,
+                  "decision_visits_by_street": {
+                    "flop": 2242,
+                    "preflop": 34422,
+                    "river": 1092,
+                    "turn": 1734
+                  },
+                  "trained_action_visits": 21492,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 21492,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 29610,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 6051,
+                    "preflop": 16213,
+                    "river": 2985,
+                    "turn": 4361
+                  },
+                  "decision_visits": 37808,
+                  "decision_visits_by_street": {
+                    "flop": 6051,
+                    "preflop": 24411,
+                    "river": 2985,
+                    "turn": 4361
+                  },
+                  "trained_action_visits": 8198,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 8198,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 4743,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1212,
+                    "preflop": 2276,
+                    "river": 504,
+                    "turn": 751
+                  },
+                  "decision_visits": 37518,
+                  "decision_visits_by_street": {
+                    "flop": 1212,
+                    "preflop": 35051,
+                    "river": 504,
+                    "turn": 751
+                  },
+                  "trained_action_visits": 32775,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 32775,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 7226,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1489,
+                    "preflop": 4270,
+                    "river": 533,
+                    "turn": 934
+                  },
+                  "decision_visits": 38118,
+                  "decision_visits_by_street": {
+                    "flop": 1489,
+                    "preflop": 35162,
+                    "river": 533,
+                    "turn": 934
+                  },
+                  "trained_action_visits": 30892,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 30892,
+                    "river": 0,
+                    "turn": 0
+                  }
+                },
+                {
+                  "baseline_fallback_visits": 8488,
+                  "baseline_fallback_visits_by_street": {
+                    "flop": 1046,
+                    "preflop": 6544,
+                    "river": 328,
+                    "turn": 570
+                  },
+                  "decision_visits": 36598,
+                  "decision_visits_by_street": {
+                    "flop": 1046,
+                    "preflop": 34654,
+                    "river": 328,
+                    "turn": 570
+                  },
+                  "trained_action_visits": 28110,
+                  "trained_action_visits_by_street": {
+                    "flop": 0,
+                    "preflop": 28110,
+                    "river": 0,
+                    "turn": 0
+                  }
+                }
+              ],
+              "deviating": [
+                {
+                  "ci95": [
+                    -0.9086903142024535,
+                    -0.33912865552410254
+                  ],
+                  "mean": -0.623909484863278,
+                  "stderr": 0.14529634149957932
+                },
+                {
+                  "ci95": [
+                    -1.5856220183056473,
+                    -1.0192237458545212
+                  ],
+                  "mean": -1.3024228820800843,
+                  "stderr": 0.14448935521712397
+                },
+                {
+                  "ci95": [
+                    -1.22848941291656,
+                    -0.6765761998764002
+                  ],
+                  "mean": -0.9525328063964801,
+                  "stderr": 0.14079418700004082
+                },
+                {
+                  "ci95": [
+                    -0.3419045953001236,
+                    0.08544652645246728
+                  ],
+                  "mean": -0.1282290344238282,
+                  "stderr": 0.10901814330423239
+                },
+                {
+                  "ci95": [
+                    -0.38275618644551107,
+                    0.0690365819533228
+                  ],
+                  "mean": -0.15685980224609414,
+                  "stderr": 0.11525325724460048
+                },
+                {
+                  "ci95": [
+                    -1.2492279186753974,
+                    -0.6811757068128995
+                  ],
+                  "mean": -0.9652018127441484,
+                  "stderr": 0.14491127853635147
+                }
+              ],
+              "elapsedSecs": 10.7197949,
+              "gains": [
+                {
+                  "ci95": [
+                    -1.024263844413181,
+                    -0.5962250471883915
+                  ],
+                  "mean": -0.8102444458007864,
+                  "stderr": 0.10919357072060959
+                },
+                {
+                  "ci95": [
+                    -0.8206946522706343,
+                    -0.46291984968249367
+                  ],
+                  "mean": -0.641807250976564,
+                  "stderr": 0.09126908229289304
+                },
+                {
+                  "ci95": [
+                    -0.34380657044600105,
+                    -0.06516437681962509
+                  ],
+                  "mean": -0.20448547363281305,
+                  "stderr": 0.07108219225162651
+                },
+                {
+                  "ci95": [
+                    -0.6384614991790702,
+                    -0.22475145248108713
+                  ],
+                  "mean": -0.4316064758300787,
+                  "stderr": 0.10553827721887325
+                },
+                {
+                  "ci95": [
+                    -0.6935904973215101,
+                    -0.2951323420339524
+                  ],
+                  "mean": -0.49436141967773123,
+                  "stderr": 0.10164748859376471
+                },
+                {
+                  "ci95": [
+                    -1.3500212977054957,
+                    -0.8979492833491838
+                  ],
+                  "mean": -1.1239852905273398,
+                  "stderr": 0.11532449345824286
+                }
+              ],
+              "samples": 32768,
+              "seed": 2702,
+              "totalDealAttempts": 32768
+            }
+          ],
+          "maxBufferedSamples": 4096,
+          "minFitVisits": 8,
+          "schemaVersion": "solvers.multiway-preflop-deviation/v1",
+          "scope": "all-preflop-decisions-with-frozen-postflop",
+          "variant": {
+            "purify_threshold": 0.0,
+            "use_current_strategy": false
+          }
+        },
+        "normalizedOldOutputSha256": "130f20dfa6b8faf68f303c5518873f5f938141e307860e8ccf8b2b658b7b618c",
+        "oldOutputExactlyReplayed": true,
+        "rows": [
+          {
+            "baseline": {
+              "ci95": [
+                0.09730220876153972,
+                0.580512122293145
+              ],
+              "mean": 0.33890716552734235,
+              "stderr": 0.12326783508459317
+            },
+            "deviating": {
+              "ci95": [
+                -0.6060807223265834,
+                -0.03405105257575547
+              ],
+              "mean": -0.32006588745116943,
+              "stderr": 0.1459259361609255
+            },
+            "gain": {
+              "ci95": [
+                -0.8725192283339246,
+                -0.44542687762311706
+              ],
+              "mean": -0.6589730529785208,
+              "stderr": 0.10895213028336928
+            },
+            "position": "BTN",
+            "preflopDecisionVisits": 34266,
+            "preflopTrainedActionVisits": 24706,
+            "preflopTrainedVisitFraction": 0.7210062452576899,
+            "seat": 0,
+            "seed": 2701
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.9018573983640381,
+                -0.39654518952659473
+              ],
+              "mean": -0.6492012939453164,
+              "stderr": 0.1289061757238376
+            },
+            "deviating": {
+              "ci95": [
+                -1.662289421084685,
+                -1.0949448318449975
+              ],
+              "mean": -1.3786171264648412,
+              "stderr": 0.14473076256114478
+            },
+            "gain": {
+              "ci95": [
+                -0.9102320405628321,
+                -0.5485996244762232
+              ],
+              "mean": -0.7294158325195277,
+              "stderr": 0.09225316736903291
+            },
+            "position": "SB",
+            "preflopDecisionVisits": 34414,
+            "preflopTrainedActionVisits": 21509,
+            "preflopTrainedVisitFraction": 0.6250072644853839,
+            "seat": 1,
+            "seed": 2701
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -1.0294621463853395,
+                -0.527723461524822
+              ],
+              "mean": -0.7785928039550807,
+              "stderr": 0.1279945624644177
+            },
+            "deviating": {
+              "ci95": [
+                -1.3883306130558584,
+                -0.8398606711238373
+              ],
+              "mean": -1.1140956420898478,
+              "stderr": 0.13991580151327065
+            },
+            "gain": {
+              "ci95": [
+                -0.4692692449995245,
+                -0.20173643127000815
+              ],
+              "mean": -0.33550283813476633,
+              "stderr": 0.06824816676773376
+            },
+            "position": "BB",
+            "preflopDecisionVisits": 24524,
+            "preflopTrainedActionVisits": 8282,
+            "preflopTrainedVisitFraction": 0.3377099983689447,
+            "seat": 2,
+            "seed": 2701
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.12608760174093525,
+                0.5144179524582824
+              ],
+              "mean": 0.3202527770996088,
+              "stderr": 0.09906386497891509
+            },
+            "deviating": {
+              "ci95": [
+                -0.29694457734465635,
+                0.11915710175871881
+              ],
+              "mean": -0.08889373779296876,
+              "stderr": 0.10614838752637121
+            },
+            "gain": {
+              "ci95": [
+                -0.6155666588906338,
+                -0.2027263708945206
+              ],
+              "mean": -0.4091465148925772,
+              "stderr": 0.10531639999900846
+            },
+            "position": "UTG",
+            "preflopDecisionVisits": 34998,
+            "preflopTrainedActionVisits": 32792,
+            "preflopTrainedVisitFraction": 0.9369678267329562,
+            "seat": 3,
+            "seed": 2701
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.06763727652093737,
+                0.3192808922435928
+              ],
+              "mean": 0.1258218078613277,
+              "stderr": 0.09870361448074749
+            },
+            "deviating": {
+              "ci95": [
+                -0.39748094245940413,
+                0.04125413581877943
+              ],
+              "mean": -0.17811340332031236,
+              "stderr": 0.11192221384647541
+            },
+            "gain": {
+              "ci95": [
+                -0.5009271770862576,
+                -0.10694324527702512
+              ],
+              "mean": -0.30393521118164135,
+              "stderr": 0.10050610505337564
+            },
+            "position": "HJ",
+            "preflopDecisionVisits": 34977,
+            "preflopTrainedActionVisits": 30880,
+            "preflopTrainedVisitFraction": 0.8828658832947366,
+            "seat": 4,
+            "seed": 2701
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.003946203613001825,
+                0.4253099609377773
+              ],
+              "mean": 0.21462808227538957,
+              "stderr": 0.10749075441958558
+            },
+            "deviating": {
+              "ci95": [
+                -1.0784848746612858,
+                -0.5159205818816732
+              ],
+              "mean": -0.7972027282714795,
+              "stderr": 0.1435112991784726
+            },
+            "gain": {
+              "ci95": [
+                -1.2484685692070518,
+                -0.7751930518866879
+              ],
+              "mean": -1.0118308105468699,
+              "stderr": 0.12073355033682755
+            },
+            "position": "CO",
+            "preflopDecisionVisits": 34719,
+            "preflopTrainedActionVisits": 28059,
+            "preflopTrainedVisitFraction": 0.8081741985656269,
+            "seat": 5,
+            "seed": 2701
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.04475149979449261,
+                0.41742142166949175
+              ],
+              "mean": 0.18633496093749957,
+              "stderr": 0.11790125547550621
+            },
+            "deviating": {
+              "ci95": [
+                -0.9086903142024535,
+                -0.33912865552410254
+              ],
+              "mean": -0.623909484863278,
+              "stderr": 0.14529634149957932
+            },
+            "gain": {
+              "ci95": [
+                -1.024263844413181,
+                -0.5962250471883915
+              ],
+              "mean": -0.8102444458007864,
+              "stderr": 0.10919357072060959
+            },
+            "position": "BTN",
+            "preflopDecisionVisits": 34243,
+            "preflopTrainedActionVisits": 24663,
+            "preflopTrainedVisitFraction": 0.7202347925123382,
+            "seat": 0,
+            "seed": 2702
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.9080704707669761,
+                -0.4131607914400598
+              ],
+              "mean": -0.660615631103518,
+              "stderr": 0.12625246921605007
+            },
+            "deviating": {
+              "ci95": [
+                -1.5856220183056473,
+                -1.0192237458545212
+              ],
+              "mean": -1.3024228820800843,
+              "stderr": 0.14448935521712397
+            },
+            "gain": {
+              "ci95": [
+                -0.8206946522706343,
+                -0.46291984968249367
+              ],
+              "mean": -0.641807250976564,
+              "stderr": 0.09126908229289304
+            },
+            "position": "SB",
+            "preflopDecisionVisits": 34422,
+            "preflopTrainedActionVisits": 21492,
+            "preflopTrainedVisitFraction": 0.6243681366567893,
+            "seat": 1,
+            "seed": 2702
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.9966826405802072,
+                -0.499412024947141
+              ],
+              "mean": -0.7480473327636741,
+              "stderr": 0.12685474888598627
+            },
+            "deviating": {
+              "ci95": [
+                -1.22848941291656,
+                -0.6765761998764002
+              ],
+              "mean": -0.9525328063964801,
+              "stderr": 0.14079418700004082
+            },
+            "gain": {
+              "ci95": [
+                -0.34380657044600105,
+                -0.06516437681962509
+              ],
+              "mean": -0.20448547363281305,
+              "stderr": 0.07108219225162651
+            },
+            "position": "BB",
+            "preflopDecisionVisits": 24411,
+            "preflopTrainedActionVisits": 8198,
+            "preflopTrainedVisitFraction": 0.33583220679201997,
+            "seat": 2,
+            "seed": 2702
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.10280789409983573,
+                0.5039469887126683
+              ],
+              "mean": 0.303377441406252,
+              "stderr": 0.10233140168694707
+            },
+            "deviating": {
+              "ci95": [
+                -0.3419045953001236,
+                0.08544652645246728
+              ],
+              "mean": -0.1282290344238282,
+              "stderr": 0.10901814330423239
+            },
+            "gain": {
+              "ci95": [
+                -0.6384614991790702,
+                -0.22475145248108713
+              ],
+              "mean": -0.4316064758300787,
+              "stderr": 0.10553827721887325
+            },
+            "position": "UTG",
+            "preflopDecisionVisits": 35051,
+            "preflopTrainedActionVisits": 32775,
+            "preflopTrainedVisitFraction": 0.9350660466177855,
+            "seat": 3,
+            "seed": 2702
+          },
+          {
+            "baseline": {
+              "ci95": [
+                0.1370288280590494,
+                0.5379744068042327
+              ],
+              "mean": 0.33750161743164103,
+              "stderr": 0.1022820353941794
+            },
+            "deviating": {
+              "ci95": [
+                -0.38275618644551107,
+                0.0690365819533228
+              ],
+              "mean": -0.15685980224609414,
+              "stderr": 0.11525325724460048
+            },
+            "gain": {
+              "ci95": [
+                -0.6935904973215101,
+                -0.2951323420339524
+              ],
+              "mean": -0.49436141967773123,
+              "stderr": 0.10164748859376471
+            },
+            "position": "HJ",
+            "preflopDecisionVisits": 35162,
+            "preflopTrainedActionVisits": 30892,
+            "preflopTrainedVisitFraction": 0.8785620840680279,
+            "seat": 4,
+            "seed": 2702
+          },
+          {
+            "baseline": {
+              "ci95": [
+                -0.05936255856116418,
+                0.3769295141275695
+              ],
+              "mean": 0.15878347778320265,
+              "stderr": 0.11129899813488103
+            },
+            "deviating": {
+              "ci95": [
+                -1.2492279186753974,
+                -0.6811757068128995
+              ],
+              "mean": -0.9652018127441484,
+              "stderr": 0.14491127853635147
+            },
+            "gain": {
+              "ci95": [
+                -1.3500212977054957,
+                -0.8979492833491838
+              ],
+              "mean": -1.1239852905273398,
+              "stderr": 0.11532449345824286
+            },
+            "position": "CO",
+            "preflopDecisionVisits": 34654,
+            "preflopTrainedActionVisits": 28110,
+            "preflopTrainedVisitFraction": 0.8111617706469672,
+            "seat": 5,
+            "seed": 2702
+          }
+        ],
+        "solveElapsedSecs": 32.4687588
+      }
+    },
+    "configuration": {
+      "fitSeed": 2601,
+      "fitTraversalsPerSeat": 8192,
+      "heldOutSamples": 32768,
+      "heldOutSeeds": [
+        2701,
+        2702
+      ]
+    },
+    "interpretation": "Signed fixed-candidate root gains, frozen postflop. Pointwise intervals; no full BR, simultaneous guarantee or production promotion. One training seed and equal sweeps, not equal compute; rare branches need separate endpoint evaluation.",
+    "schemaVersion": "solvers.whole-preflop-deviation-pilot-summary/v1",
+    "sweeps": 8192,
+    "trainingSeeds": [
+      0
+    ]
+  },
+  "validation": {
+    "cloudResourcesStarted": false,
+    "measurements": [
+      {
+        "constructionSeconds": 45.1025574,
+        "fitSeconds": 5.4522846,
+        "heldOutSeconds": [
+          11.2826659,
+          10.7197949
+        ],
+        "measurementSha256": "b39ef521401e067c2486b3c09713cd0546a04c5e3c90bce4c940e928b4babeac",
+        "name": "ordinary",
+        "peakWorkingSetBytes": 1437986816,
+        "solveSeconds": 32.4687588,
+        "stdoutSha256": "b47836d97c1e8c4918f08b4612f322b4940249f583ee6835719b70f54dd7f0a8",
+        "wallSeconds": 105.8158419
+      },
+      {
+        "constructionSeconds": 45.16705,
+        "fitSeconds": 5.8245845,
+        "heldOutSeconds": [
+          11.2396586,
+          9.8871512
+        ],
+        "measurementSha256": "98256107392cfa9f40e95bb740b9c16bef06d613e1357bcb009322aaac105a0d",
+        "name": "enumerated",
+        "peakWorkingSetBytes": 1440112640,
+        "solveSeconds": 36.4652654,
+        "stdoutSha256": "e1fa597220ff95feb2e81c77d08750cf2379f90839a99f808c4532459c3bd5f9",
+        "wallSeconds": 109.3635876
+      }
+    ],
+    "preexecutionSha256": "3ef362b915fdbeb6bf269d1ea3e314b72327d400a5a65d583735b65173eedd79",
+    "sourceFiles": 180,
+    "status": "passed-pilot-validation",
+    "strategicImprovementEstablished": false,
+    "summarySha256": "ac80a7b41823dd778c342d9b56c111d6cf43ad48133c2152743f6390b3e678c8",
+    "verification": {
+      "binarySha256": "63757d48f8d2011297eb43647b326d5ba0925d28b837d3d7eac5445ac9d50596",
+      "checks": [
+        {
+          "command": "cargo fmt --all --check",
+          "elapsedSecs": 1.1509229000657797,
+          "exitCode": 0,
+          "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/fmt.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "command": "cargo clippy --workspace --all-targets -- -D warnings",
+          "elapsedSecs": 2.184414500137791,
+          "exitCode": 0,
+          "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/clippy.log",
+          "sha256": "7b5df51634ae52bbadc7121c6c2c7b94b5f57f158fbcc18dcccd501dafd58de6"
+        },
+        {
+          "command": "cargo clippy -p cli --examples --features research-draw-abstraction,research-regret-sampling -- -D warnings",
+          "elapsedSecs": 0.7889105998910964,
+          "exitCode": 0,
+          "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/research-clippy.log",
+          "sha256": "df291c8b0fc6924d3e2d51fa2f77abedb9b018beaf130e8d61c90c5bb0a18dc9"
+        },
+        {
+          "command": "cargo test --workspace",
+          "elapsedSecs": 149.16229290002957,
+          "exitCode": 0,
+          "failed": 0,
+          "ignored": 30,
+          "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/workspace-tests.log",
+          "passed": 836,
+          "sha256": "d874ca0afe4d1e9bd6469c006ac3227ceeeefb512c2610306b221d229876cfd7",
+          "suites": 48
+        },
+        {
+          "command": "cargo test -p cli --examples --features research-draw-abstraction,research-regret-sampling",
+          "elapsedSecs": 3.887503799982369,
+          "exitCode": 0,
+          "failed": 0,
+          "ignored": 0,
+          "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/research-example-tests.log",
+          "passed": 43,
+          "sha256": "f0217f77994a7b0a1d154ba172cbd5d2e8774dc488175451d8e5eeaefb22ff0c",
+          "suites": 9
+        },
+        {
+          "command": "cargo test -p multiway --features research-average-sampling,research-regret-sampling --lib",
+          "elapsedSecs": 9.629858999978751,
+          "exitCode": 0,
+          "failed": 0,
+          "ignored": 1,
+          "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/research-core-tests.log",
+          "passed": 315,
+          "sha256": "77f34449a4e3c596e7f65ed1813b2e964d9e45218f4e03e0c559d11f4733e42f",
+          "suites": 1
+        },
+        {
+          "command": "cargo build --release -p cli --example mw_checkpoint_audit --features research-regret-sampling",
+          "elapsedSecs": 37.403493399964646,
+          "exitCode": 0,
+          "log": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/release-build.log",
+          "sha256": "88be412d4b9e7bec9f2514785d336997cc6f15edc25c90c651146800b4ec4be1"
+        }
+      ],
+      "completedUtc": "2026-09-10T05:21:24.464910+00:00",
+      "createdUtc": "2026-09-10T05:18:00.148672+00:00",
+      "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6",
+      "sourceFiles": 180,
+      "sourceManifestSha256": "89edf90ae36556a239cf58e61d5501dc563d637469e3ab21b2de5055dbbdf35b",
+      "sourceZipSha256": "f7e73146a7aae9882661b7ba646fd1c7610f4cadfa04b38447b45e3548cb2f9d",
+      "status": "passed"
+    }
+  }
+}

@@ -1,0 +1,246 @@
+{
+  "broaderGoalComplete": false,
+  "cases": [
+    {
+      "case": "legacy-1",
+      "constructionSeconds": 44.1560954,
+      "finishedUnixSeconds": 1789011838.7812312,
+      "implementation": "legacy",
+      "measurementSha256": "0abe74242b9bff228cc168d912f7b61ab0472efb552f452dd84748f7e20f9729",
+      "normalizedOutputSha256": "968ddfae3d07b5338a18723d48e6fbd2c66066939cc7912f9d559122f727b808",
+      "peakMethod": "Windows lifetime PeakWorkingSet64 queried every 50 ms; final unsampled interval may be omitted. Whole process covers all phases executed by the child binary, including JSON and disposal.",
+      "peakWorkingSetBytes": 1404948480,
+      "startedUnixSeconds": 1789011761.775121,
+      "stdoutSha256": "928f9d8566a1fcd73bb5d1b2ed5d469dc78bef451d00e319654dc9cfbf0bf376",
+      "trainSeconds": 32.2550067,
+      "wallSeconds": 77.0061101
+    },
+    {
+      "case": "transactional-1",
+      "constructionSeconds": 45.8276019,
+      "finishedUnixSeconds": 1789011917.40214,
+      "implementation": "transactional",
+      "measurementSha256": "d96522c7d2e22f1704bd92e1a9047a83f2a27abbbb23bf53932ddb535226c01d",
+      "normalizedOutputSha256": "968ddfae3d07b5338a18723d48e6fbd2c66066939cc7912f9d559122f727b808",
+      "peakMethod": "Windows lifetime PeakWorkingSet64 queried every 50 ms; final unsampled interval may be omitted. Whole process covers all phases executed by the child binary, including JSON and disposal.",
+      "peakWorkingSetBytes": 1405464576,
+      "startedUnixSeconds": 1789011839.28329,
+      "stdoutSha256": "4394e0d5fbe44d348ad3401b90354bad26063e6288f947850e41155a4c37edea",
+      "trainSeconds": 31.8147172,
+      "wallSeconds": 78.11885
+    },
+    {
+      "case": "transactional-2",
+      "constructionSeconds": 46.1098032,
+      "finishedUnixSeconds": 1789011995.983068,
+      "implementation": "transactional",
+      "measurementSha256": "4ae108a886dcddfc3f954a554462490705ee2dd095939295d9a5a0f8d75e6014",
+      "normalizedOutputSha256": "968ddfae3d07b5338a18723d48e6fbd2c66066939cc7912f9d559122f727b808",
+      "peakMethod": "Windows lifetime PeakWorkingSet64 queried every 50 ms; final unsampled interval may be omitted. Whole process covers all phases executed by the child binary, including JSON and disposal.",
+      "peakWorkingSetBytes": 1404932096,
+      "startedUnixSeconds": 1789011917.805926,
+      "stdoutSha256": "8f59b749b651064a9a66fbb1312fe5f4fcc4b5c35b4efa49a6bf8c4e91eebb4e",
+      "trainSeconds": 31.558697,
+      "wallSeconds": 78.177142
+    },
+    {
+      "case": "legacy-2",
+      "constructionSeconds": 45.6392796,
+      "finishedUnixSeconds": 1789012074.932665,
+      "implementation": "legacy",
+      "measurementSha256": "1d0fe7b0f037663e08875424f75e0267574fdd34194215b4ec04a90165777551",
+      "normalizedOutputSha256": "968ddfae3d07b5338a18723d48e6fbd2c66066939cc7912f9d559122f727b808",
+      "peakMethod": "Windows lifetime PeakWorkingSet64 queried every 50 ms; final unsampled interval may be omitted. Whole process covers all phases executed by the child binary, including JSON and disposal.",
+      "peakWorkingSetBytes": 1404809216,
+      "startedUnixSeconds": 1789011996.37887,
+      "stdoutSha256": "01c3ac5e22ef7cfafb51f04b5c110394b9790dbea9aaf2943ded383323d4a21b",
+      "trainSeconds": 32.4449282,
+      "wallSeconds": 78.553795
+    },
+    {
+      "case": "legacy-3",
+      "constructionSeconds": 45.9186242,
+      "finishedUnixSeconds": 1789012153.4179692,
+      "implementation": "legacy",
+      "measurementSha256": "304f4686527c0d24877b45686ce3f1653957fa5a8e8b125380468b53f671a308",
+      "normalizedOutputSha256": "968ddfae3d07b5338a18723d48e6fbd2c66066939cc7912f9d559122f727b808",
+      "peakMethod": "Windows lifetime PeakWorkingSet64 queried every 50 ms; final unsampled interval may be omitted. Whole process covers all phases executed by the child binary, including JSON and disposal.",
+      "peakWorkingSetBytes": 1405505536,
+      "startedUnixSeconds": 1789012075.336541,
+      "stdoutSha256": "b8bf01d33bf18b697c7f67d457195e51471821a9332c01199ad2041bab191504",
+      "trainSeconds": 31.62519,
+      "wallSeconds": 78.0814283
+    },
+    {
+      "case": "transactional-3",
+      "constructionSeconds": 45.1669928,
+      "finishedUnixSeconds": 1789012231.6199718,
+      "implementation": "transactional",
+      "measurementSha256": "efeadd9c080b6e9e89ed1ff6d3fe059a0f4d25bfea202bc10c30007c0ed150c5",
+      "normalizedOutputSha256": "968ddfae3d07b5338a18723d48e6fbd2c66066939cc7912f9d559122f727b808",
+      "peakMethod": "Windows lifetime PeakWorkingSet64 queried every 50 ms; final unsampled interval may be omitted. Whole process covers all phases executed by the child binary, including JSON and disposal.",
+      "peakWorkingSetBytes": 1404264448,
+      "startedUnixSeconds": 1789012153.803515,
+      "stdoutSha256": "88d060a663906c329205c1c0fe696ded80c4c159a5220453597383eff117fc33",
+      "trainSeconds": 32.1635163,
+      "wallSeconds": 77.8164568
+    }
+  ],
+  "comparison": {
+    "completeProductionStateEqualityClaim": false,
+    "exportedOutputExactlyMatches": true,
+    "independentLearningSeeds": 1,
+    "medians": {
+      "legacy": {
+        "constructionSeconds": 45.6392796,
+        "peakWorkingSetBytes": 1404948480,
+        "trainSeconds": 32.2550067,
+        "wallSeconds": 78.0814283
+      },
+      "transactional": {
+        "constructionSeconds": 45.8276019,
+        "peakWorkingSetBytes": 1404932096,
+        "trainSeconds": 31.8147172,
+        "wallSeconds": 78.11885
+      }
+    },
+    "timingRepeatsPerImplementation": 3,
+    "transactionalToLegacyRatios": {
+      "constructionSeconds": 1.0041263206091446,
+      "peakWorkingSetBytes": 0.9999883383624145,
+      "trainSeconds": 0.9863497315596589,
+      "wallSeconds": 1.0004792650546326
+    }
+  },
+  "evidence": {
+    "addedCompiledFiles": [
+      "crates/multiway/src/solver/dense_merge_tests.rs"
+    ],
+    "changedCompiledFiles": [
+      "crates/multiway/src/solver/mod.rs",
+      "docs/cli-reference.jp.md",
+      "docs/multiway-preflop-v1.jp.md"
+    ],
+    "sourceFiles": {
+      "legacy": 174,
+      "transactional": 175
+    }
+  },
+  "experiment": {
+    "addedCompiledFiles": [
+      "crates/multiway/src/solver/dense_merge_tests.rs"
+    ],
+    "baseRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+    "broaderGoalComplete": false,
+    "cacheDir": ".cache/bench-ehs",
+    "cases": [
+      {
+        "implementation": "legacy",
+        "job": "runs/dense-merge-20260910/legacy-1-job.json",
+        "jobSha256": "576b13517299a96543127ec66da654a5e5b9c9022e578d5e18ec23713af4a583",
+        "name": "legacy-1"
+      },
+      {
+        "implementation": "transactional",
+        "job": "runs/dense-merge-20260910/transactional-1-job.json",
+        "jobSha256": "1dbea0c6a399909e5d4e2fbbd75be1193600db297e809a0cb5e335a96818bc02",
+        "name": "transactional-1"
+      },
+      {
+        "implementation": "transactional",
+        "job": "runs/dense-merge-20260910/transactional-2-job.json",
+        "jobSha256": "1dbea0c6a399909e5d4e2fbbd75be1193600db297e809a0cb5e335a96818bc02",
+        "name": "transactional-2"
+      },
+      {
+        "implementation": "legacy",
+        "job": "runs/dense-merge-20260910/legacy-2-job.json",
+        "jobSha256": "576b13517299a96543127ec66da654a5e5b9c9022e578d5e18ec23713af4a583",
+        "name": "legacy-2"
+      },
+      {
+        "implementation": "legacy",
+        "job": "runs/dense-merge-20260910/legacy-3-job.json",
+        "jobSha256": "576b13517299a96543127ec66da654a5e5b9c9022e578d5e18ec23713af4a583",
+        "name": "legacy-3"
+      },
+      {
+        "implementation": "transactional",
+        "job": "runs/dense-merge-20260910/transactional-3-job.json",
+        "jobSha256": "1dbea0c6a399909e5d4e2fbbd75be1193600db297e809a0cb5e335a96818bc02",
+        "name": "transactional-3"
+      }
+    ],
+    "changedCompiledFiles": [
+      "crates/multiway/src/solver/mod.rs",
+      "docs/cli-reference.jp.md",
+      "docs/multiway-preflop-v1.jp.md"
+    ],
+    "cloudResourcesStarted": false,
+    "completedUtc": "2026-09-10T03:50:49.841817+00:00",
+    "config": "runs/preflop-proposal-20260910/config.toml",
+    "configSha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+    "createdUtc": "2026-09-10T03:42:39.898153+00:00",
+    "implementations": {
+      "legacy": {
+        "binary": "runs/preflop-counterfactual-20260910/audit.exe",
+        "binarySha256": "45b54fb52dfecf94089cb1b865802499b2277056cab2455c3f6472c82e1e23a2",
+        "sourceManifest": "runs/preflop-counterfactual-20260910/source-manifest.json",
+        "sourceManifestSha256": "9627a594fdf2ac0f43d878ef3ee7444ca915a61cbca6757666d32f9b88459b00",
+        "sourceZip": "runs/preflop-counterfactual-20260910/source.zip",
+        "sourceZipSha256": "c59a6c8829db9f61be1eecd31b82165a198d299bd700ed55cdae90a338f8e1c7",
+        "verification": "runs/preflop-counterfactual-20260910/verification/verification.json",
+        "verificationSha256": "6f905018d4957e746f7893b84500c893d6590623f5874ba9982c3d4678e1f6ad"
+      },
+      "transactional": {
+        "binary": "runs/dense-merge-20260910/candidate-v2/audit.exe",
+        "binarySha256": "2f58403fd2c73076c827772b90091c86e1c2c08adafdaaa66e784f5eca594c83",
+        "sourceManifest": "runs/dense-merge-20260910/candidate-v2/source-manifest.json",
+        "sourceManifestSha256": "76db9d1f29d76b6ca66595c2c354104cdd9b9d0b928f15264760d50413e9ec2d",
+        "sourceZip": "runs/dense-merge-20260910/candidate-v2/source.zip",
+        "sourceZipSha256": "77ee3a03971a65b01231ce18f9d6e263e98ea7c02ea6beebd631aa1cdfcd3e88",
+        "verification": "runs/dense-merge-20260910/candidate-v2/verification/verification.json",
+        "verificationSha256": "09603a51aab1f4759c858f93d03a0c19878e5fb3116381a01425f80d8c717eb3"
+      }
+    },
+    "memory": "8GiB",
+    "plan": "docs/research/active/multiway-dense-merge-2026-09-10.md",
+    "planSha256": "999ae10ec80d081b045f1dd2d5eccc432e5948a2ac664e8c6182d8e5aee70f79",
+    "preexecutionSha256": "a4185a9d4cfab379e63475551c92880bb0a8e31b2255707bcdb94226bd0be60e",
+    "regressionEvidence": {
+      "focusedPassed": 7,
+      "postFixLog": "runs/dense-merge-20260910/focused-final.log",
+      "postFixLogSha256": "d4e09ae2b996582afedf6e9009418cd0433dbc7aec8e138b2323b18cf0312fa2",
+      "preFixLog": "runs/dense-merge-20260910/pre-fix-late-slot.log",
+      "preFixLogSha256": "bfba3dbd765f2eeaff7a461cf00fc711801eadf73514cf0c91476489816131df"
+    },
+    "runner": "tools/run_average_sampling_measurement.ps1",
+    "runnerSha256": "1cd3e737e0821f2760ad601fbb67a4d3996a64fedfe311b4e08b3fc687f6c7e7",
+    "status": "completed-cost-screen",
+    "summarizerSha256": "eb1cabb55307ca4392203e57231b7cf4c4cc779925a35feb3940527e25302b90",
+    "supersededCandidate": {
+      "reason": "All seven gates passed, but an independent review identified incorrect existing batch-atomicity Rustdoc. Candidate v2 corrects that wording and synchronizes the normative, implementation, CLI and user guides; learning and rollback code are unchanged. No v1 solver timing measurements were started.",
+      "verification": "runs/dense-merge-20260910/candidate-v1/verification/verification.json",
+      "verificationSha256": "1f1ec6170dd73e9c0d90535204d2e02e789acf85303e943bd26688da28b118cd"
+    },
+    "supportNodes": [
+      "root",
+      "fold/fold/fold/fold",
+      "fold/fold/fold/fold/raise-to:3000",
+      "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+      "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+      "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in"
+    ],
+    "sweeps": 8192,
+    "testScriptSha256": "418cd4603abcd8126a888441036553d7df680946d7d0cb7cd4d61cf6900a606f",
+    "threads": 8,
+    "timeoutSeconds": 600,
+    "validationReport": "docs/validation/multiway-dense-merge-2026-09-10.md",
+    "validatorTestLog": "runs/dense-merge-20260910/validator-tests-final.log",
+    "validatorTestLogSha256": "1abefc45ad99d15c3643200fb37f406355b16d87c632c2a9759b00d0ae0e926c"
+  },
+  "experimentSha256": "604f5c61a511f3c44f2b434156396d73a238f5b7368ef3f8903a5d3e34fb2207",
+  "interpretation": "Error-path correctness is established separately by full-state regression tests. This screen compares normal exported learning outputs and costs at fixed sweeps, one training seed and three timing replicates. It does not claim complete production-state or checkpoint byte identity, better strategy quality, whole-call rollback, a process memory cap, or a timing confidence interval.",
+  "schemaVersion": "solvers.dense-merge-summary/v1",
+  "status": "completed-cost-screen"
+}

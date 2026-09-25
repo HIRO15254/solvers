@@ -1,0 +1,96 @@
+{
+  "baseRevision": "93c95533dbaca2e8388e82235af5519071fd880f",
+  "broaderGoalComplete": false,
+  "cacheDir": ".cache/bench-ehs",
+  "cases": [
+    {
+      "job": "runs/whole-preflop-deviation-20260910/ordinary-job.json",
+      "jobSha256": "de38604eb931d284c11769481456059f904630223f101831ed446486563a874e",
+      "name": "ordinary",
+      "oldJob": "runs/raised-opponent-20260910/ordinary-job.json",
+      "oldJobSha256": "3f67b49efa3d5cbb5ae81e89cd8af91b58a85a8fa3d8e9cac996d91caa01522f",
+      "oldMeasurement": "runs/raised-opponent-20260910/ordinary/measurement.json",
+      "oldMeasurementSha256": "e44316e6ee9257f00a6e801ff4258955cad290462e59bd421c54088afd754803",
+      "oldOutput": "runs/raised-opponent-20260910/ordinary/stdout.json",
+      "oldOutputSha256": "52781401ce3fd9085b27917d2b0db60916f7f19df2b691791795ef81aa8a307b"
+    },
+    {
+      "job": "runs/whole-preflop-deviation-20260910/enumerated-job.json",
+      "jobSha256": "229563a1c4298e30aae7c3b93dd8e4ba4603ca7aeaa594197e2a4ce1e6ce5489",
+      "name": "enumerated",
+      "oldJob": "runs/raised-opponent-20260910/enumerated-job.json",
+      "oldJobSha256": "e9dbcb64acd40892ad984f319bca7fb9b87c1f92db81f6d61d09ffd523270618",
+      "oldMeasurement": "runs/raised-opponent-20260910/enumerated/measurement.json",
+      "oldMeasurementSha256": "ede7158a9434a654b6057f93f283a849dd13cc0510bd7cb465d0f79202fd3cc6",
+      "oldOutput": "runs/raised-opponent-20260910/enumerated/stdout.json",
+      "oldOutputSha256": "630ec431351bf44be19c6a6664ae6f1b9184ec32f2ba5954c7b86ee94043781f"
+    }
+  ],
+  "cloudResourcesStarted": false,
+  "config": "runs/preflop-proposal-20260910/config.toml",
+  "configSha256": "3f551c252d54d7375ec5c9d4da118b8e267aa79ce85ecdd7b85738d5dc4fc89a",
+  "createdUtc": "2026-09-10T05:22:16.041245+00:00",
+  "diagnostic": {
+    "fitSeed": 2601,
+    "fitTraversalsPerSeat": 8192,
+    "heldOutSamples": 32768,
+    "heldOutSeeds": [
+      2701,
+      2702
+    ]
+  },
+  "documentation": {
+    "crates/cli/examples/mw_checkpoint_audit.md": "f8a2afdbfe28232d557b8af111d1fa72d5bab2530947c9f421890e98725b1b76",
+    "docs/architecture.md": "09c1deb27ee3bbf861c71b9e26665c3fbc193fc839c95848a52fa67690c39c20",
+    "docs/cli-reference.jp.md": "f8681a42b7fc9776ab9b89cf028542a5e306983d5fdb4e61e02e985e616004a4",
+    "docs/multiway-preflop-v1.jp.md": "bdb2839b7e4746372b725f876ed8af8ab01ee4044897afca09afc926655a5653",
+    "docs/multiway-preflop-v1.md": "f1cd80f9de1582349030509b68d4892cbae6091bbd47907d97ce5d7bc19acd0b",
+    "docs/user-guide.jp.md": "c7f761c29584851f781b940d8479822283886b8db356faab6090b4d34a633775"
+  },
+  "implementation": {
+    "binary": "runs/whole-preflop-deviation-20260910/candidate-v3/audit.exe",
+    "binarySha256": "63757d48f8d2011297eb43647b326d5ba0925d28b837d3d7eac5445ac9d50596",
+    "sourceManifest": "runs/whole-preflop-deviation-20260910/candidate-v3/source-manifest.json",
+    "sourceManifestSha256": "89edf90ae36556a239cf58e61d5501dc563d637469e3ab21b2de5055dbbdf35b",
+    "sourceZip": "runs/whole-preflop-deviation-20260910/candidate-v3/source.zip",
+    "sourceZipSha256": "f7e73146a7aae9882661b7ba646fd1c7610f4cadfa04b38447b45e3548cb2f9d",
+    "verification": "runs/whole-preflop-deviation-20260910/candidate-v3/verification/verification.json",
+    "verificationSha256": "96f97f904781dc1854e3ac6d186f35d2c799bb1c70d1e9385181655e7375dc61"
+  },
+  "memory": "8GiB",
+  "plan": "docs/research/active/multiway-whole-preflop-pilot-2026-09-10.md",
+  "planSha256": "08d41b6adee1c00aae7d209f6d16a6e1b70ac095d553e97f110ba9eaf3e30a55",
+  "previousExperiment": "runs/raised-opponent-20260910/experiment.json",
+  "previousExperimentSha256": "c14a3395cfe8707f9cfd28726baacb7cd3e57d118989174ca6eb56e76eb327d5",
+  "runner": "tools/run_average_sampling_measurement.ps1",
+  "runnerSha256": "1cd3e737e0821f2760ad601fbb67a4d3996a64fedfe311b4e08b3fc687f6c7e7",
+  "schemaVersion": "solvers.whole-preflop-deviation-pilot/v1",
+  "sidecars": {
+    "finalize_verified_source.py": "a93e9700aa613ec9e4ffa62353899808f97e7e30bfd5d6ce23f72322a9387a7a",
+    "prepare_experiment.py": "e8f1d210451a4bbc859412b6419fecf1e68b5d2d1d6c26212b4617fd63e48e6a",
+    "python-tests.log": "eba7f8f77e149d115ff980c26daa3ff111da56fb9dfbac2b134945d7fb74eabb",
+    "run_pilot.ps1": "722eda8b1b74bd39b1eb3d1424d91f47dbf992d0a27c63124c66a55054dc2231",
+    "validate_run.py": "cfaeefa3e553c8a6e04609ab0173d1dcae111969cc5a9a9f2dd21458ccf6cfa1",
+    "verify_final.py": "82af8602a8fd9006b6ffdee12d5857f412286ff945a1c6c249bc6a761262f74a",
+    "verify_source.py": "a68608e6235438d76be048cafc31a9f584a2b40e7f4ad2d4cfd26f98d84aebb0"
+  },
+  "status": "ready",
+  "summarizer": "tools/summarize_whole_preflop_deviation.py",
+  "summarizerDependency": "tools/summarize_raised_opponent.py",
+  "summarizerDependencySha256": "082a10fa9aef9aee7edf159f5836ed870e082b41957ea01ebb7ffcc4528720b1",
+  "summarizerSha256": "11af08607224353c334b306c37cfa654ccf0517b893e925e65d7126e55da9e02",
+  "summarizerTests": "tools/tests/test_summarize_whole_preflop_deviation.py",
+  "summarizerTestsSha256": "6a76e95f149b936f07b13c0c8d47f977f9f26bbb68f128b9885adca821187dbc",
+  "supportNodes": [
+    "root",
+    "fold/fold/fold/fold",
+    "fold/fold/fold/fold/raise-to:3000",
+    "fold/fold/fold/fold/raise-to:3000/raise-to:10000",
+    "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000",
+    "fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/raise-to:100000:all-in"
+  ],
+  "sweeps": 8192,
+  "threads": 8,
+  "timeoutSeconds": 600,
+  "validationReport": "docs/validation/multiway-whole-preflop-deviation-2026-09-10.md"
+}
