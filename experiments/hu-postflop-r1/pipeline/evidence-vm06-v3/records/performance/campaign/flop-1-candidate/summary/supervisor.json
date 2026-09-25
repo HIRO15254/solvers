@@ -1,0 +1,185 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T18:05:58.522226+00:00",
+  "argv": [
+    "/opt/r1/target/candidate-v3/release/solvers",
+    "export",
+    "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-candidate/run/solution.sol",
+    "summary"
+  ],
+  "cwd": "/opt/r1/candidate-v3",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 600.0,
+    "grace_seconds": 5.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.001,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "disk_reserve_bytes": 10737418240
+  },
+  "runtime": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-7.0.0-1011-gcp-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "logical_cpus": 8
+  },
+  "outputs": {
+    "stdout": {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-candidate/summary/stdout.log",
+      "sha256": "a0ba01620fa22d6f9c1579fb608e202099f7726ca235a917e013cf2f3e0e4254",
+      "bytes": 389
+    },
+    "stderr": {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-candidate/summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "samples": {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-candidate/summary/supervisor.samples.jsonl",
+      "sha256": "6d7842ad91d256a13fc992a5cd5cf0fd51b753bbfb6777654ed3e6399b811eb4",
+      "bytes": 325
+    }
+  },
+  "identity_before": [
+    {
+      "path": "/opt/r1/target/candidate-v3/release/solvers",
+      "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521",
+      "bytes": 8868960
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e",
+      "bytes": 29831
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-candidate/run/solution.sol",
+      "sha256": "4f958653de4efd7f7496d3b0bdbf67c0ded33bd5a71638dcc67f2c99f894d99e",
+      "bytes": 176835
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/flop.toml",
+      "sha256": "d0fb4ed3f7d3ca9dd04b4599ca37435d70b37520c596e2724d104a672b76cd62",
+      "bytes": 677
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/plan.json",
+      "sha256": "7f3f3c60fec7d926b73f8b27d4f562a72fbc5ee47a18dcad73117131392a3d6a",
+      "bytes": 13808
+    },
+    {
+      "path": "/opt/r1/candidate-v3-source.tar.gz",
+      "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970",
+      "bytes": 1195310
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "/opt/r1/target/candidate-v3/release/solvers",
+      "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521",
+      "bytes": 8868960
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e",
+      "bytes": 29831
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-candidate/run/solution.sol",
+      "sha256": "4f958653de4efd7f7496d3b0bdbf67c0ded33bd5a71638dcc67f2c99f894d99e",
+      "bytes": 176835
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/flop.toml",
+      "sha256": "d0fb4ed3f7d3ca9dd04b4599ca37435d70b37520c596e2724d104a672b76cd62",
+      "bytes": 677
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/plan.json",
+      "sha256": "7f3f3c60fec7d926b73f8b27d4f562a72fbc5ee47a18dcad73117131392a3d6a",
+      "bytes": 13808
+    },
+    {
+      "path": "/opt/r1/candidate-v3-source.tar.gz",
+      "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970",
+      "bytes": 1195310
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 1,
+    "max_sample_gap_seconds": 0.0,
+    "sampled_peak_tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 26484736,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "max_observed_processes": 0
+  },
+  "containment": {
+    "kind": "posix_session_process_group",
+    "limitations": [
+      "setsid/setpgid can escape this process group; use a systemd/cgroup wrapper",
+      "supervisor SIGKILL, host failure or power loss does not kill the group",
+      "resident memory is sampled /proc RSS; brief descendants may be missed",
+      "summed RSS can double-count shared pages; this is not cgroup memory.current",
+      "wait4 root peak can include reaped descendant high-water marks; it is not a simultaneous tree peak"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 67419471872,
+    "available_bytes": 65959034880
+  },
+  "resolved_argv": [
+    "/opt/r1/target/candidate-v3/release/solvers",
+    "export",
+    "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-candidate/run/solution.sol",
+    "summary"
+  ],
+  "disk_path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-candidate/summary",
+  "disk_free_before_bytes": 93553524736,
+  "started_at": "2026-09-25T18:05:58.563644+00:00",
+  "pid": 6407,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 26484736,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "elapsed_seconds": 0.013906348000091384,
+    "at": "2026-09-25T18:05:58.586150+00:00",
+    "host_available_memory_bytes": 65963888640,
+    "disk_free_bytes": 93553516544
+  },
+  "elapsed_seconds": 0.022715397000183657,
+  "ended_at": "2026-09-25T18:05:58.586425+00:00",
+  "supervisor_exit_code": 0
+}

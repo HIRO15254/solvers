@@ -1,0 +1,17 @@
+{
+  "board": "Kh Kc 5s 2d 3s",
+  "pot": 2050,
+  "effective_stack": 6500,
+  "min_bet": 100,
+  "iterations": 2200,
+  "ev_oop": 768.1475763687281,
+  "ev_ip": 1221.8524277866543,
+  "expl_oop": 0.05330985691244905,
+  "expl_ip": 0.04061340187936935,
+  "nash_conv": 0.0939232587918184,
+  "storage": "f32",
+  "wall_secs": 8.174326022,
+  "streets_stored": "full",
+  "nodes": 81,
+  "stored_nodes": 28
+}

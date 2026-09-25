@@ -1,0 +1,9 @@
+tree: nodes=27 terminals=17 rank_tables=1 storage=0.3 MiB (f32) / 0.1 MiB (i16)
+game=postflop schedule=dcfr iterations=100
+iter=      25 expl_p0=2.173e-1 expl_p1=1.815e-1 nash_conv=3.988e-1
+iter=      50 expl_p0=4.135e-2 expl_p1=3.103e-2 nash_conv=7.238e-2
+iter=      75 expl_p0=2.936e-2 expl_p1=3.361e-2 nash_conv=6.296e-2
+iter=     100 expl_p0=1.288e-2 expl_p1=1.687e-2 nash_conv=2.975e-2
+target nash_conv 4.000e-2 reached
+done: iterations=100 wall=0.11s ev_p0=13.871822 ev_p1=6.128178 nash_conv=2.975e-2
+sol: wrote /opt/r1/current/runs/r1-paired/river-2-candidate/run/solution.sol (9.2 KB, 10 blocks, mode=Full)

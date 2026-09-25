@@ -1,0 +1,12 @@
+{
+  "oop": {
+    "positive_combos": 130,
+    "weight_sum": "24.7467024",
+    "sha256": "e0d201e994569ac6e582603390a98737c59cf6333c630cb8729f6b4f287c2f84"
+  },
+  "ip": {
+    "positive_combos": 115,
+    "weight_sum": "0.4475484",
+    "sha256": "ac682a2f4646bf9b4c8424f86021879b74fdc7f51177175e3242904d2a831b94"
+  }
+}

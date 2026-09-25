@@ -1,0 +1,13 @@
+{
+  "instance": "solvers-r1-20260925-02",
+  "instance_id": "7774326211091312507",
+  "zone": "us-central1-b",
+  "operation_id": "7207833755759355335",
+  "operation_type": "compute.instances.preempted",
+  "start_utc": "2026-09-25T16:02:48.562Z",
+  "end_utc": "2026-09-25T16:02:58.126Z",
+  "reconciliation": "gcloud filtered instance and disk lists both empty",
+  "source_archive_retained_locally": true,
+  "remote_raw_logs_retained": false,
+  "validation03": "Not valid evidence of snapshot02; stale Cargo binary reused due archive mtime. Subsequent rebuild dispatch timed out during preemption."
+}

@@ -1,0 +1,142 @@
+//! Research-only wall-time instrumentation, injected into a pinned source copy.
+use std::path::{Path, PathBuf};
+use std::sync::{Mutex, atomic::{AtomicBool, Ordering}};
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
+
+use anyhow::{Context, Result};
+use serde::Serialize;
+
+const SOURCE_VERSION: &str = "@@SOURCE_VERSION@@";
+const PATCH_ID: &str = "@@PATCH_ID@@";
+static ENABLED: AtomicBool = AtomicBool::new(false);
+static TRACE: Mutex<Option<Trace>> = Mutex::new(None);
+
+#[derive(Serialize)]
+struct Span {
+    phase: &'static str,
+    start_ns: u64,
+    end_ns: u64,
+    status: &'static str,
+    iteration: Option<u64>,
+}
+
+struct Trace {
+    origin: Instant,
+    started_unix_ns: String,
+    phase: &'static str,
+    phase_start: u64,
+    iteration: Option<u64>,
+    spans: Vec<Span>,
+}
+
+impl Trace {
+    fn close(&mut self, end: u64, status: &'static str) {
+        self.spans.push(Span {
+            phase: self.phase,
+            start_ns: self.phase_start,
+            end_ns: end,
+            status,
+            iteration: self.iteration,
+        });
+    }
+
+    fn record(&self, status: &str, total: Option<u64>, error: Option<String>) -> serde_json::Value {
+        let updates: Vec<_> = self.spans.iter().filter(|s| s.phase == "cfr_updates").collect();
+        let envelope = updates.first().zip(updates.last()).map(|(first, last)| {
+            serde_json::json!({"start_ns": first.start_ns, "end_ns": last.end_ns,
+                "duration_ns": last.end_ns - first.start_ns,
+                "add_to_leaf_sum": false})
+        });
+        serde_json::json!({
+            "schema": "r1.phase/v1", "source_version": SOURCE_VERSION,
+            "instrumentation_id": PATCH_ID, "pid": std::process::id(),
+            "started_unix_ns": self.started_unix_ns, "status": status,
+            "total_ns": total, "spans": self.spans,
+            "leaf_sum_ns": total.map(|_| self.spans.iter().map(|s| s.end_ns - s.start_ns).sum::<u64>()),
+            "cfr_inclusive_envelope": envelope, "command_error": error,
+            "scope": "main_impl entry through dispatch return; excludes final phase JSON persistence and process startup/exit",
+            "forced_termination": "initial record only; phase durations are unavailable unless final snapshot was written",
+            "active_phase_at_initial_snapshot": "overhead",
+            "failed_span_policy": "status=error/panic is elapsed failed work, not a completed phase",
+        })
+    }
+}
+
+fn atomic_json(path: &Path, value: &serde_json::Value, initial: bool) -> Result<()> {
+    use std::io::Write;
+    let parent = path.parent().filter(|p| !p.as_os_str().is_empty()).unwrap_or_else(|| Path::new("."));
+    let mut file = tempfile::NamedTempFile::new_in(parent)?;
+    serde_json::to_writer_pretty(file.as_file_mut(), value)?;
+    file.write_all(b"\n")?;
+    file.as_file_mut().sync_all()?;
+    if initial {
+        file.persist_noclobber(path).map_err(|e| e.error)?;
+    } else {
+        file.persist(path).map_err(|e| e.error)?;
+    }
+    Ok(())
+}
+
+pub(crate) struct Session { output: PathBuf }
+
+impl Session {
+    pub(crate) fn start() -> Result<Option<Self>> {
+        let Some(output) = std::env::var_os("R1_PHASE_OUTPUT") else { return Ok(None) };
+        anyhow::ensure!(!output.is_empty(), "R1_PHASE_OUTPUT must not be empty");
+        let output = PathBuf::from(output);
+        let mut slot = TRACE.lock().unwrap_or_else(|e| e.into_inner());
+        anyhow::ensure!(slot.is_none(), "phase session already active");
+        let trace = Trace {
+            origin: Instant::now(),
+            started_unix_ns: SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos().to_string(),
+            phase: "overhead", phase_start: 0, iteration: None, spans: Vec::new(),
+        };
+        atomic_json(&output, &trace.record("running", None, None), true)
+            .with_context(|| format!("creating phase record {}", output.display()))?;
+        *slot = Some(trace);
+        ENABLED.store(true, Ordering::Release);
+        Ok(Some(Self { output }))
+    }
+
+    pub(crate) fn finish(self, result: &Result<()>) -> Result<()> {
+        ENABLED.store(false, Ordering::Release);
+        let mut trace = TRACE.lock().unwrap_or_else(|e| e.into_inner()).take()
+            .expect("active phase session");
+        let end = u64::try_from(trace.origin.elapsed().as_nanos()).expect("phase duration fits u64");
+        trace.close(end, if result.is_ok() { "complete" } else { "error" });
+        let value = trace.record(if result.is_ok() { "completed" } else { "error" }, Some(end),
+            result.as_ref().err().map(|e| format!("{e:#}")));
+        atomic_json(&self.output, &value, false)
+            .with_context(|| format!("finalizing phase record {}", self.output.display()))
+    }
+}
+
+fn change(phase: &'static str, iteration: Option<u64>, previous_status: &'static str) {
+    if !ENABLED.load(Ordering::Acquire) { return; }
+    let mut slot = TRACE.lock().unwrap_or_else(|e| e.into_inner());
+    if let Some(trace) = slot.as_mut() {
+        let end = u64::try_from(trace.origin.elapsed().as_nanos()).expect("phase duration fits u64");
+        trace.close(end, previous_status);
+        trace.phase = phase;
+        trace.phase_start = end;
+        trace.iteration = iteration;
+    }
+}
+
+pub(crate) fn switch(phase: &'static str) { change(phase, None, "complete"); }
+
+pub(crate) fn measure<T>(phase: &'static str, iteration: Option<u64>, action: impl FnOnce() -> T) -> T {
+    if !ENABLED.load(Ordering::Acquire) { return action(); }
+    change(phase, iteration, "complete");
+    let result = action();
+    switch("overhead");
+    result
+}
+
+pub(crate) fn measure_result<T, E>(phase: &'static str, iteration: Option<u64>, action: impl FnOnce() -> std::result::Result<T, E>) -> std::result::Result<T, E> {
+    if !ENABLED.load(Ordering::Acquire) { return action(); }
+    change(phase, iteration, "complete");
+    let result = action();
+    change("overhead", None, if result.is_ok() { "complete" } else { "error" });
+    result
+}

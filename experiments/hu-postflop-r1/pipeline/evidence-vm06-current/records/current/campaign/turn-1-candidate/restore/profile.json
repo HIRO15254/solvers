@@ -1,0 +1,86 @@
+{
+  "ev": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.08049780600003942,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.0576035280000724,
+      "root_os_peak_resident_bytes": 26144768,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 2,
+      "sampled_peak_tree_resident_bytes": 13324288
+    },
+    "record": {
+      "bytes": 6406,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-1-candidate/restore/ev/supervisor.json",
+      "sha256": "40196a88a6cd87175ad454c4a06703492c6ad7de808bf2bed84233cc4e8ae69f"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 1729196,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-1-candidate/restore/ev/stdout.log",
+      "sha256": "0048a5c0526dd92b14d9654ffc7a2d775474df01594a014ede251a40790715be"
+    },
+    "stop_reason": "completed"
+  },
+  "strategy": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.07857763499987414,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.05746704600005614,
+      "root_os_peak_resident_bytes": 26144768,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 2,
+      "sampled_peak_tree_resident_bytes": 14127104
+    },
+    "record": {
+      "bytes": 6443,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-1-candidate/restore/strategy/supervisor.json",
+      "sha256": "49f3140d9aa2f4bb2ff240af24d2f2db4ec9a260b898e84f9878421c4fd6fff9"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 1201396,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-1-candidate/restore/strategy/stdout.log",
+      "sha256": "c5e9aa8c05bfde689e99591fc32ea820ce2d8e875bdc016b07aed3528da031ef"
+    },
+    "stop_reason": "completed"
+  },
+  "tree": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.07786742899997989,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.05740494100018623,
+      "root_os_peak_resident_bytes": 26144768,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 2,
+      "sampled_peak_tree_resident_bytes": 14184448
+    },
+    "record": {
+      "bytes": 6417,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-1-candidate/restore/tree/supervisor.json",
+      "sha256": "511ba5f183d2076b4d3b393063af31b829c0e25e173bd31ae6864439eab3a4df"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 96635,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-1-candidate/restore/tree/stdout.log",
+      "sha256": "e89730aac015ef2232cf19bfe6ba0d17d1f729bd2740fb094dd0dfd32da9f284"
+    },
+    "stop_reason": "completed"
+  }
+}

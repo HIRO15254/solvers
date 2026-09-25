@@ -1,0 +1,760 @@
+{
+  "cases": [
+    {
+      "case": "river",
+      "measurements": {
+        "baseline": {
+          "checkpoint.ckpt_bytes": {
+            "max": 81323,
+            "median": 81323,
+            "min": 81323,
+            "n": 3,
+            "values": [
+              81323,
+              81323,
+              81323
+            ]
+          },
+          "solution.sol_bytes": {
+            "max": 7473,
+            "median": 7473,
+            "min": 7472,
+            "n": 3,
+            "values": [
+              7472,
+              7473,
+              7473
+            ]
+          },
+          "solve": {
+            "elapsed_seconds": {
+              "max": 0.1815105240000321,
+              "median": 0.18109319400002732,
+              "min": 0.1790887649999604,
+              "n": 3,
+              "values": [
+                0.18109319400002732,
+                0.1790887649999604,
+                0.1815105240000321
+              ]
+            },
+            "root_os_peak_resident_bytes": {
+              "max": 25698304,
+              "median": 25669632,
+              "min": 24449024,
+              "n": 3,
+              "values": [
+                24449024,
+                25669632,
+                25698304
+              ]
+            },
+            "root_os_peak_sources": [
+              "wait4.ru_maxrss_linux_kib"
+            ],
+            "sampled_peak_tree_resident_bytes": {
+              "max": 11386880,
+              "median": 11276288,
+              "min": 11231232,
+              "n": 3,
+              "values": [
+                11276288,
+                11231232,
+                11386880
+              ]
+            }
+          },
+          "summary_read": {
+            "elapsed_seconds": {
+              "max": 0.012985899000000245,
+              "median": 0.011411818999931711,
+              "min": 0.010554258999945887,
+              "n": 3,
+              "values": [
+                0.011411818999931711,
+                0.010554258999945887,
+                0.012985899000000245
+              ]
+            },
+            "root_os_peak_resident_bytes": {
+              "max": 25702400,
+              "median": 25669632,
+              "min": 24551424,
+              "n": 3,
+              "values": [
+                24551424,
+                25669632,
+                25702400
+              ]
+            },
+            "root_os_peak_sources": [
+              "wait4.ru_maxrss_linux_kib"
+            ],
+            "sampled_peak_tree_resident_bytes": {
+              "max": 0,
+              "median": 0,
+              "min": 0,
+              "n": 3,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        "candidate": {
+          "checkpoint.ckpt_bytes": {
+            "max": 81330,
+            "median": 81330,
+            "min": 81330,
+            "n": 3,
+            "values": [
+              81330,
+              81330,
+              81330
+            ]
+          },
+          "solution.sol_bytes": {
+            "max": 9468,
+            "median": 9468,
+            "min": 9465,
+            "n": 3,
+            "values": [
+              9465,
+              9468,
+              9468
+            ]
+          },
+          "solve": {
+            "elapsed_seconds": {
+              "max": 0.18301133299996764,
+              "median": 0.1796072039999217,
+              "min": 0.17903180400003293,
+              "n": 3,
+              "values": [
+                0.17903180400003293,
+                0.1796072039999217,
+                0.18301133299996764
+              ]
+            },
+            "root_os_peak_resident_bytes": {
+              "max": 25739264,
+              "median": 25690112,
+              "min": 25096192,
+              "n": 3,
+              "values": [
+                25096192,
+                25690112,
+                25739264
+              ]
+            },
+            "root_os_peak_sources": [
+              "wait4.ru_maxrss_linux_kib"
+            ],
+            "sampled_peak_tree_resident_bytes": {
+              "max": 10805248,
+              "median": 10776576,
+              "min": 10522624,
+              "n": 3,
+              "values": [
+                10776576,
+                10522624,
+                10805248
+              ]
+            }
+          },
+          "summary_read": {
+            "elapsed_seconds": {
+              "max": 0.012018468999940524,
+              "median": 0.011227629000018169,
+              "min": 0.010591428999987329,
+              "n": 3,
+              "values": [
+                0.011227629000018169,
+                0.010591428999987329,
+                0.012018468999940524
+              ]
+            },
+            "root_os_peak_resident_bytes": {
+              "max": 25763840,
+              "median": 25690112,
+              "min": 25202688,
+              "n": 3,
+              "values": [
+                25202688,
+                25690112,
+                25763840
+              ]
+            },
+            "root_os_peak_sources": [
+              "wait4.ru_maxrss_linux_kib"
+            ],
+            "sampled_peak_tree_resident_bytes": {
+              "max": 0,
+              "median": 0,
+              "min": 0,
+              "n": 3,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      },
+      "pairs": [
+        {
+          "checks": {
+            "artifact_version": true,
+            "both_completed": true,
+            "checkpoint_restore": true,
+            "internal_target": true,
+            "presave_consistency": true,
+            "same_fixed_iteration": true,
+            "same_presave_summary": true,
+            "same_saved_exports": true
+          },
+          "repetition": 1,
+          "status": "pass"
+        },
+        {
+          "checks": {
+            "artifact_version": true,
+            "both_completed": true,
+            "internal_target": true,
+            "presave_consistency": true,
+            "same_fixed_iteration": true,
+            "same_presave_summary": true,
+            "same_saved_exports": true
+          },
+          "repetition": 2,
+          "status": "pass"
+        },
+        {
+          "checks": {
+            "artifact_version": true,
+            "both_completed": true,
+            "internal_target": true,
+            "presave_consistency": true,
+            "same_fixed_iteration": true,
+            "same_presave_summary": true,
+            "same_saved_exports": true
+          },
+          "repetition": 3,
+          "status": "pass"
+        }
+      ],
+      "performance_comparison_eligible": true
+    },
+    {
+      "case": "turn",
+      "measurements": {
+        "baseline": {
+          "checkpoint.ckpt_bytes": {
+            "max": 356281,
+            "median": 356281,
+            "min": 356281,
+            "n": 3,
+            "values": [
+              356281,
+              356281,
+              356281
+            ]
+          },
+          "solution.sol_bytes": {
+            "max": 21336,
+            "median": 21335,
+            "min": 21334,
+            "n": 3,
+            "values": [
+              21334,
+              21335,
+              21336
+            ]
+          },
+          "solve": {
+            "elapsed_seconds": {
+              "max": 1.719429042999991,
+              "median": 1.5343938290000096,
+              "min": 1.5330076640000243,
+              "n": 3,
+              "values": [
+                1.5330076640000243,
+                1.719429042999991,
+                1.5343938290000096
+              ]
+            },
+            "root_os_peak_resident_bytes": {
+              "max": 51908608,
+              "median": 51736576,
+              "min": 51490816,
+              "n": 3,
+              "values": [
+                51490816,
+                51736576,
+                51908608
+              ]
+            },
+            "root_os_peak_sources": [
+              "wait4.ru_maxrss_linux_kib"
+            ],
+            "sampled_peak_tree_resident_bytes": {
+              "max": 52363264,
+              "median": 52224000,
+              "min": 48660480,
+              "n": 3,
+              "values": [
+                48660480,
+                52363264,
+                52224000
+              ]
+            }
+          },
+          "summary_read": {
+            "elapsed_seconds": {
+              "max": 0.04349987600005534,
+              "median": 0.03855753699997422,
+              "min": 0.03837445699991804,
+              "n": 3,
+              "values": [
+                0.03855753699997422,
+                0.04349987600005534,
+                0.03837445699991804
+              ]
+            },
+            "root_os_peak_resident_bytes": {
+              "max": 26284032,
+              "median": 26169344,
+              "min": 25911296,
+              "n": 3,
+              "values": [
+                25911296,
+                26169344,
+                26284032
+              ]
+            },
+            "root_os_peak_sources": [
+              "wait4.ru_maxrss_linux_kib"
+            ],
+            "sampled_peak_tree_resident_bytes": {
+              "max": 17457152,
+              "median": 17420288,
+              "min": 17068032,
+              "n": 3,
+              "values": [
+                17420288,
+                17457152,
+                17068032
+              ]
+            }
+          }
+        },
+        "candidate": {
+          "checkpoint.ckpt_bytes": {
+            "max": 356288,
+            "median": 356288,
+            "min": 356288,
+            "n": 3,
+            "values": [
+              356288,
+              356288,
+              356288
+            ]
+          },
+          "solution.sol_bytes": {
+            "max": 141514,
+            "median": 141512,
+            "min": 141511,
+            "n": 3,
+            "values": [
+              141511,
+              141514,
+              141512
+            ]
+          },
+          "solve": {
+            "elapsed_seconds": {
+              "max": 1.4856832719999602,
+              "median": 1.4853929419999758,
+              "min": 1.4251882870000827,
+              "n": 3,
+              "values": [
+                1.4853929419999758,
+                1.4856832719999602,
+                1.4251882870000827
+              ]
+            },
+            "root_os_peak_resident_bytes": {
+              "max": 35463168,
+              "median": 35192832,
+              "min": 35078144,
+              "n": 3,
+              "values": [
+                35192832,
+                35463168,
+                35078144
+              ]
+            },
+            "root_os_peak_sources": [
+              "wait4.ru_maxrss_linux_kib"
+            ],
+            "sampled_peak_tree_resident_bytes": {
+              "max": 35872768,
+              "median": 35762176,
+              "min": 34820096,
+              "n": 3,
+              "values": [
+                35872768,
+                34820096,
+                35762176
+              ]
+            }
+          },
+          "summary_read": {
+            "elapsed_seconds": {
+              "max": 0.012086539000051744,
+              "median": 0.010951340000019627,
+              "min": 0.01076316000001043,
+              "n": 3,
+              "values": [
+                0.012086539000051744,
+                0.01076316000001043,
+                0.010951340000019627
+              ]
+            },
+            "root_os_peak_resident_bytes": {
+              "max": 26312704,
+              "median": 26198016,
+              "min": 26152960,
+              "n": 3,
+              "values": [
+                26152960,
+                26198016,
+                26312704
+              ]
+            },
+            "root_os_peak_sources": [
+              "wait4.ru_maxrss_linux_kib"
+            ],
+            "sampled_peak_tree_resident_bytes": {
+              "max": 0,
+              "median": 0,
+              "min": 0,
+              "n": 3,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      },
+      "pairs": [
+        {
+          "checks": {
+            "artifact_version": true,
+            "both_completed": true,
+            "checkpoint_restore": true,
+            "internal_target": true,
+            "presave_consistency": true,
+            "same_fixed_iteration": true,
+            "same_presave_summary": true,
+            "same_saved_exports": true
+          },
+          "repetition": 1,
+          "status": "pass"
+        },
+        {
+          "checks": {
+            "artifact_version": true,
+            "both_completed": true,
+            "internal_target": true,
+            "presave_consistency": true,
+            "same_fixed_iteration": true,
+            "same_presave_summary": true,
+            "same_saved_exports": true
+          },
+          "repetition": 2,
+          "status": "pass"
+        },
+        {
+          "checks": {
+            "artifact_version": true,
+            "both_completed": true,
+            "internal_target": true,
+            "presave_consistency": true,
+            "same_fixed_iteration": true,
+            "same_presave_summary": true,
+            "same_saved_exports": true
+          },
+          "repetition": 3,
+          "status": "pass"
+        }
+      ],
+      "performance_comparison_eligible": true
+    },
+    {
+      "case": "flop",
+      "measurements": {
+        "baseline": {
+          "checkpoint.ckpt_bytes": {
+            "max": 34538,
+            "median": 34538,
+            "min": 34538,
+            "n": 3,
+            "values": [
+              34538,
+              34538,
+              34538
+            ]
+          },
+          "solution.sol_bytes": {
+            "max": 131744,
+            "median": 131744,
+            "min": 131743,
+            "n": 3,
+            "values": [
+              131744,
+              131743,
+              131744
+            ]
+          },
+          "solve": {
+            "elapsed_seconds": {
+              "max": 10.383421885999951,
+              "median": 9.850490946999798,
+              "min": 9.826156749999996,
+              "n": 3,
+              "values": [
+                9.826156749999996,
+                10.383421885999951,
+                9.850490946999798
+              ]
+            },
+            "root_os_peak_resident_bytes": {
+              "max": 732524544,
+              "median": 730783744,
+              "min": 730267648,
+              "n": 3,
+              "values": [
+                730267648,
+                730783744,
+                732524544
+              ]
+            },
+            "root_os_peak_sources": [
+              "wait4.ru_maxrss_linux_kib"
+            ],
+            "sampled_peak_tree_resident_bytes": {
+              "max": 728432640,
+              "median": 725487616,
+              "min": 719228928,
+              "n": 3,
+              "values": [
+                719228928,
+                728432640,
+                725487616
+              ]
+            }
+          },
+          "summary_read": {
+            "elapsed_seconds": {
+              "max": 0.5134015389999149,
+              "median": 0.4835299619999205,
+              "min": 0.4821547420000343,
+              "n": 3,
+              "values": [
+                0.4821547420000343,
+                0.4835299619999205,
+                0.5134015389999149
+              ]
+            },
+            "root_os_peak_resident_bytes": {
+              "max": 236679168,
+              "median": 236617728,
+              "min": 236425216,
+              "n": 3,
+              "values": [
+                236425216,
+                236617728,
+                236679168
+              ]
+            },
+            "root_os_peak_sources": [
+              "wait4.ru_maxrss_linux_kib"
+            ],
+            "sampled_peak_tree_resident_bytes": {
+              "max": 235548672,
+              "median": 235167744,
+              "min": 234274816,
+              "n": 3,
+              "values": [
+                234274816,
+                235548672,
+                235167744
+              ]
+            }
+          }
+        },
+        "candidate": {
+          "checkpoint.ckpt_bytes": {
+            "max": 34545,
+            "median": 34545,
+            "min": 34545,
+            "n": 3,
+            "values": [
+              34545,
+              34545,
+              34545
+            ]
+          },
+          "solution.sol_bytes": {
+            "max": 1784574,
+            "median": 1784573,
+            "min": 1784572,
+            "n": 3,
+            "values": [
+              1784574,
+              1784573,
+              1784572
+            ]
+          },
+          "solve": {
+            "elapsed_seconds": {
+              "max": 8.701255336000031,
+              "median": 8.59710582799994,
+              "min": 8.400524611000037,
+              "n": 3,
+              "values": [
+                8.701255336000031,
+                8.400524611000037,
+                8.59710582799994
+              ]
+            },
+            "root_os_peak_resident_bytes": {
+              "max": 450899968,
+              "median": 449806336,
+              "min": 438562816,
+              "n": 3,
+              "values": [
+                449806336,
+                450899968,
+                438562816
+              ]
+            },
+            "root_os_peak_sources": [
+              "wait4.ru_maxrss_linux_kib"
+            ],
+            "sampled_peak_tree_resident_bytes": {
+              "max": 448520192,
+              "median": 447303680,
+              "min": 435716096,
+              "n": 3,
+              "values": [
+                448520192,
+                447303680,
+                435716096
+              ]
+            }
+          },
+          "summary_read": {
+            "elapsed_seconds": {
+              "max": 0.011302079000188314,
+              "median": 0.01106879899998603,
+              "min": 0.010796819999995932,
+              "n": 3,
+              "values": [
+                0.010796819999995932,
+                0.01106879899998603,
+                0.011302079000188314
+              ]
+            },
+            "root_os_peak_resident_bytes": {
+              "max": 26451968,
+              "median": 26337280,
+              "min": 26312704,
+              "n": 3,
+              "values": [
+                26312704,
+                26337280,
+                26451968
+              ]
+            },
+            "root_os_peak_sources": [
+              "wait4.ru_maxrss_linux_kib"
+            ],
+            "sampled_peak_tree_resident_bytes": {
+              "max": 0,
+              "median": 0,
+              "min": 0,
+              "n": 3,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      },
+      "pairs": [
+        {
+          "checks": {
+            "artifact_version": true,
+            "both_completed": true,
+            "checkpoint_restore": true,
+            "internal_target": true,
+            "presave_consistency": true,
+            "same_fixed_iteration": true,
+            "same_presave_summary": true,
+            "same_saved_exports": true
+          },
+          "repetition": 1,
+          "status": "pass"
+        },
+        {
+          "checks": {
+            "artifact_version": true,
+            "both_completed": true,
+            "internal_target": true,
+            "presave_consistency": true,
+            "same_fixed_iteration": true,
+            "same_presave_summary": true,
+            "same_saved_exports": true
+          },
+          "repetition": 2,
+          "status": "pass"
+        },
+        {
+          "checks": {
+            "artifact_version": true,
+            "both_completed": true,
+            "internal_target": true,
+            "presave_consistency": true,
+            "same_fixed_iteration": true,
+            "same_presave_summary": true,
+            "same_saved_exports": true
+          },
+          "repetition": 3,
+          "status": "pass"
+        }
+      ],
+      "performance_comparison_eligible": true
+    }
+  ],
+  "kind": "analysis",
+  "limits": [
+    "synthetic fixtures, not external R0 reference certification",
+    "export equality covers positive-own-reach rows; zero-reach rows are omitted",
+    "exported EV is presave_snapshot; exported strategy is stored_quantized",
+    "no cold cache claim; process time includes startup and shutdown",
+    "internal phase spans unavailable; summary.wall_secs is not total time",
+    "resume check restores completed cap, not interrupted continuation"
+  ],
+  "quality_status": "not_evaluated",
+  "saved_profile_br": "not_evaluated",
+  "schema": "solvers.r1-pipeline/v1"
+}

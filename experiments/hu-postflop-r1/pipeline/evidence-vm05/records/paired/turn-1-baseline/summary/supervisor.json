@@ -1,0 +1,185 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T16:24:14.927693+00:00",
+  "argv": [
+    "/opt/r1/target/baseline/release/solvers",
+    "export",
+    "/opt/r1/current/runs/r1-paired/turn-1-baseline/run/solution.sol",
+    "summary"
+  ],
+  "cwd": "/opt/r1/current",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 600.0,
+    "grace_seconds": 5.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.001,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "disk_reserve_bytes": 10737418240
+  },
+  "runtime": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-7.0.0-1011-gcp-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "logical_cpus": 8
+  },
+  "outputs": {
+    "stdout": {
+      "path": "/opt/r1/current/runs/r1-paired/turn-1-baseline/summary/stdout.log",
+      "sha256": "9d30d6e20f1c0791f7a43f0f19cf84fcd3e4cfdcc5ea57dfdc4167de901ba1c8",
+      "bytes": 389
+    },
+    "stderr": {
+      "path": "/opt/r1/current/runs/r1-paired/turn-1-baseline/summary/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd",
+      "bytes": 75
+    },
+    "samples": {
+      "path": "/opt/r1/current/runs/r1-paired/turn-1-baseline/summary/supervisor.samples.jsonl",
+      "sha256": "7993a7dbeb00c6e25b3aecd51c4875f49ac62442302ec47032ab8bc2abe807f7",
+      "bytes": 1551
+    }
+  },
+  "identity_before": [
+    {
+      "path": "/opt/r1/target/baseline/release/solvers",
+      "sha256": "77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8",
+      "bytes": 8813904
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/current/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/current/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "8876065d1cc89ba94064dc2d3da4832059aac49ddab153d3688ab6711b6e28ca",
+      "bytes": 29443
+    },
+    {
+      "path": "/opt/r1/current/runs/r1-paired/turn-1-baseline/run/solution.sol",
+      "sha256": "c0c45eb297d7adb67e74687bcf258ae50f1613ea87e1911fd730405dd1042b58",
+      "bytes": 21334
+    },
+    {
+      "path": "/opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/turn.toml",
+      "sha256": "8326ab75af8a7f1c52a48e8d2edafa7e61649024e69ca5d8c08a9972eaeb9297",
+      "bytes": 548
+    },
+    {
+      "path": "/opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/plan.json",
+      "sha256": "3314b9a3e61cf19803c2d50325ea7dda2f0858d658e26485d3724f1cba62e7e6",
+      "bytes": 13763
+    },
+    {
+      "path": "/opt/r1/baseline-source.tar.gz",
+      "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197",
+      "bytes": 871630
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "/opt/r1/target/baseline/release/solvers",
+      "sha256": "77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8",
+      "bytes": 8813904
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/current/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/current/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "8876065d1cc89ba94064dc2d3da4832059aac49ddab153d3688ab6711b6e28ca",
+      "bytes": 29443
+    },
+    {
+      "path": "/opt/r1/current/runs/r1-paired/turn-1-baseline/run/solution.sol",
+      "sha256": "c0c45eb297d7adb67e74687bcf258ae50f1613ea87e1911fd730405dd1042b58",
+      "bytes": 21334
+    },
+    {
+      "path": "/opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/turn.toml",
+      "sha256": "8326ab75af8a7f1c52a48e8d2edafa7e61649024e69ca5d8c08a9972eaeb9297",
+      "bytes": 548
+    },
+    {
+      "path": "/opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/plan.json",
+      "sha256": "3314b9a3e61cf19803c2d50325ea7dda2f0858d658e26485d3724f1cba62e7e6",
+      "bytes": 13763
+    },
+    {
+      "path": "/opt/r1/baseline-source.tar.gz",
+      "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197",
+      "bytes": 871630
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 5,
+    "max_sample_gap_seconds": 0.00702619899993806,
+    "sampled_peak_tree_resident_bytes": 17420288,
+    "root_os_peak_resident_bytes": 25911296,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "max_observed_processes": 1
+  },
+  "containment": {
+    "kind": "posix_session_process_group",
+    "limitations": [
+      "setsid/setpgid can escape this process group; use a systemd/cgroup wrapper",
+      "supervisor SIGKILL, host failure or power loss does not kill the group",
+      "resident memory is sampled /proc RSS; brief descendants may be missed",
+      "summed RSS can double-count shared pages; this is not cgroup memory.current",
+      "wait4 root peak can include reaped descendant high-water marks; it is not a simultaneous tree peak"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 67419480064,
+    "available_bytes": 66151489536
+  },
+  "resolved_argv": [
+    "/opt/r1/target/baseline/release/solvers",
+    "export",
+    "/opt/r1/current/runs/r1-paired/turn-1-baseline/run/solution.sol",
+    "summary"
+  ],
+  "disk_path": "/opt/r1/current/runs/r1-paired/turn-1-baseline/summary",
+  "disk_free_before_bytes": 92812169216,
+  "started_at": "2026-09-25T16:24:14.951348+00:00",
+  "pid": 22681,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 25911296,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "elapsed_seconds": 0.03319818699992538,
+    "at": "2026-09-25T16:24:14.989815+00:00",
+    "host_available_memory_bytes": 66151235584,
+    "disk_free_bytes": 92812152832
+  },
+  "elapsed_seconds": 0.03855753699997422,
+  "ended_at": "2026-09-25T16:24:14.989951+00:00",
+  "supervisor_exit_code": 0
+}

@@ -1,0 +1,20 @@
+tree: nodes=33 terminals=21 rank_tables=1 storage=0.3 MiB (f32) / 0.2 MiB (i16)
+game=postflop schedule=dcfr iterations=10000
+iter=     100 expl_p0=6.175e0 expl_p1=2.316e0 nash_conv=8.490e0
+iter=     200 expl_p0=1.399e0 expl_p1=1.090e0 nash_conv=2.490e0
+iter=     300 expl_p0=1.067e0 expl_p1=6.511e-1 nash_conv=1.718e0
+iter=     400 expl_p0=6.012e-1 expl_p1=2.710e-1 nash_conv=8.722e-1
+iter=     500 expl_p0=3.835e-1 expl_p1=2.593e-1 nash_conv=6.428e-1
+iter=     600 expl_p0=2.488e-1 expl_p1=2.133e-1 nash_conv=4.621e-1
+iter=     700 expl_p0=1.330e-1 expl_p1=1.749e-1 nash_conv=3.078e-1
+iter=     800 expl_p0=1.232e-1 expl_p1=1.141e-1 nash_conv=2.373e-1
+iter=     900 expl_p0=9.120e-2 expl_p1=9.363e-2 nash_conv=1.848e-1
+iter=    1000 expl_p0=8.639e-2 expl_p1=6.016e-2 nash_conv=1.466e-1
+iter=    1100 expl_p0=2.277e-1 expl_p1=1.644e-1 nash_conv=3.921e-1
+iter=    1200 expl_p0=1.039e-1 expl_p1=9.648e-2 nash_conv=2.004e-1
+iter=    1300 expl_p0=9.338e-2 expl_p1=7.872e-2 nash_conv=1.721e-1
+iter=    1400 expl_p0=6.553e-2 expl_p1=5.046e-2 nash_conv=1.160e-1
+iter=    1500 expl_p0=3.726e-2 expl_p1=4.638e-2 nash_conv=8.363e-2
+target nash_conv 1.000e-1 reached
+done: iterations=1500 wall=1.82s ev_p0=1658.488656 ev_p1=2331.511339 nash_conv=8.363e-2
+sol: wrote /opt/r1/diagnostic-019/run/solution.sol (10.6 KB, 12 blocks, mode=Full)

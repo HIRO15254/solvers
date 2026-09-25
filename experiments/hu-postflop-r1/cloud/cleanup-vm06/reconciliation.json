@@ -1,0 +1,10 @@
+{
+  "held_reservations_usd": 15,
+  "disks": [],
+  "first_predelete_check": "Missing disk projection rejected before deletion; subsequent explicit disk identity check passed",
+  "instances": [],
+  "reserved_addresses": [],
+  "authorized_limit_usd": 20,
+  "billed_usd": null,
+  "verified_at_utc": "2026-09-25T18:40:38.6204118+00:00"
+}

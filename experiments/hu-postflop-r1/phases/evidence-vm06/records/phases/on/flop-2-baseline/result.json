@@ -1,0 +1,305 @@
+{
+  "artifacts": {
+    "checkpoint.ckpt": {
+      "bytes": 34538,
+      "header": {
+        "embedded_config_blake3": "9d9fc768e4fd84ace9ffd9e2a991fd19ac94de28496bbf92579506a31966181c",
+        "iteration": 50,
+        "version": 1
+      },
+      "path": "/opt/r1/phase-on/flop-2-baseline/run/checkpoint.ckpt",
+      "sha256": "edbdbc1c39897bd8ec77cdada36b39ab0fe4bd329dfd0724ff796a2f1540d02b"
+    },
+    "progress.jsonl": {
+      "bytes": 685,
+      "path": "/opt/r1/phase-on/flop-2-baseline/run/progress.jsonl",
+      "sha256": "6bce9bb5545910e3232ddcea62cfe9d0bc61c332a86c96c926e981b2df842f1d"
+    },
+    "run.json": {
+      "bytes": 176,
+      "path": "/opt/r1/phase-on/flop-2-baseline/run/run.json",
+      "sha256": "6bde16d46ef0c88deabc9cd1d302a7d0eb93f09eb9d09ab5f5f07a32e577780f"
+    },
+    "run.toml": {
+      "bytes": 677,
+      "path": "/opt/r1/phase-on/flop-2-baseline/run/run.toml",
+      "sha256": "d0fb4ed3f7d3ca9dd04b4599ca37435d70b37520c596e2724d104a672b76cd62"
+    },
+    "solution.sol": {
+      "bytes": 131744,
+      "header": {
+        "embedded_config_blake3": "9d9fc768e4fd84ace9ffd9e2a991fd19ac94de28496bbf92579506a31966181c",
+        "iteration": 50,
+        "version": 1
+      },
+      "path": "/opt/r1/phase-on/flop-2-baseline/run/solution.sol",
+      "sha256": "71cf94e5a6e71da51e03b4085eefe5b0682147d892ec749911eec0811978dd0a"
+    }
+  },
+  "case": "flop",
+  "expected_iterations": 50,
+  "expected_sol_version": 1,
+  "internal_target": {
+    "exploitability_pct_pot": 0.09174731042649986,
+    "g_i": [
+      0.013658099704318527,
+      0.023040824466281418
+    ],
+    "inequality": "<",
+    "nash_conv": 0.036698924170599945,
+    "scope": "internal finite synthetic game only",
+    "source": "run.json final live solver result",
+    "status": "pass",
+    "strategy_kind": "live_average",
+    "target_nash_conv": 0.04
+  },
+  "live_final": {
+    "g_i": [
+      0.013658099704318527,
+      0.023040824466281418
+    ],
+    "iterations": 50,
+    "nash_conv": 0.036698924170599945,
+    "pot": 20
+  },
+  "missing_fields": [
+    "saved_quantized_profile_br",
+    "monotonic_internal_phase_spans",
+    "external_reference_condition_match_and_thresholds"
+  ],
+  "phase_timings": {
+    "br_final": null,
+    "cfr": null,
+    "initialization": null,
+    "persistence": null,
+    "return": null
+  },
+  "presave_consistency": "pass",
+  "profile": {
+    "ev": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 1.6031412370002727,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.061845516999710526,
+        "root_os_peak_resident_bytes": 244785152,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 28,
+        "sampled_peak_tree_resident_bytes": 244842496
+      },
+      "record": {
+        "bytes": 8951,
+        "path": "/opt/r1/phase-on/flop-2-baseline/ev/supervisor.json",
+        "sha256": "e6d3bc0e068df3ea244bab0560dbd5df28aaa816bb2fc22a6eb56b403c8fcb6c"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 8842530,
+        "path": "/opt/r1/phase-on/flop-2-baseline/ev/stdout.log",
+        "sha256": "dddca33638c5bbb60e48ff6da2214e84d6da424b35fd7d590011224b058213bf"
+      },
+      "stop_reason": "completed"
+    },
+    "strategy": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 1.649497565999809,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.06119434799984447,
+        "root_os_peak_resident_bytes": 236724224,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 29,
+        "sampled_peak_tree_resident_bytes": 231243776
+      },
+      "record": {
+        "bytes": 8985,
+        "path": "/opt/r1/phase-on/flop-2-baseline/strategy/supervisor.json",
+        "sha256": "8130113c95eea1819e2726fa1dbd9cb5b22093e8dcf1639bf059ebfaae5944ba"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 5175171,
+        "path": "/opt/r1/phase-on/flop-2-baseline/strategy/stdout.log",
+        "sha256": "78a31c55bf72e3c9136f1c58c109d664b4e3d62b13d864f1aed208a86fc15240"
+      },
+      "stop_reason": "completed"
+    },
+    "tree": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.8229924180000125,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.05910827800016705,
+        "root_os_peak_resident_bytes": 236580864,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 15,
+        "sampled_peak_tree_resident_bytes": 229376000
+      },
+      "record": {
+        "bytes": 8962,
+        "path": "/opt/r1/phase-on/flop-2-baseline/tree/supervisor.json",
+        "sha256": "cfec0021ad816590699a8dc857a043397a00cdd4afe60faa33d234475ad3fafe"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 2255517,
+        "path": "/opt/r1/phase-on/flop-2-baseline/tree/stdout.log",
+        "sha256": "2c51b83cce1d6e620fe72b3f8f9bd47ea23f8b6ed7238854477c33a32bac2c43"
+      },
+      "stop_reason": "completed"
+    }
+  },
+  "quality_status": "not_evaluated",
+  "repetition": 2,
+  "resume": null,
+  "run_status": "completed",
+  "saved_profile_br": "not_evaluated",
+  "solve": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 11.419379428999946,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.07465180700000928,
+      "root_os_peak_resident_bytes": 730763264,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 188,
+      "sampled_peak_tree_resident_bytes": 731131904
+    },
+    "r1_phase": {
+      "mode": "on",
+      "record": {
+        "bytes": 7371,
+        "path": "/opt/r1/phase-on/flop-2-baseline/solve/phase.json",
+        "sha256": "e44eb80bf1169dccc62d8c07a78b381a1f6103b54f982a379c67de9eb9c0a2a4"
+      },
+      "status": "validated",
+      "summary": {
+        "cfr_inclusive_envelope": {
+          "add_to_leaf_sum": false,
+          "duration_ns": 8147171019,
+          "end_ns": 8268778033,
+          "start_ns": 121607014
+        },
+        "instrumentation_id": "aa81ca3e10c1beba324a8d42483294ca54a8b3fe852970a9f924da44fd2e5a3a",
+        "leaves": {
+          "cfr_updates": {
+            "calls": 5,
+            "duration_ns": 6105964019
+          },
+          "checkpoint": {
+            "calls": 6,
+            "duration_ns": 2232441620
+          },
+          "final_ev_br": {
+            "calls": 1,
+            "duration_ns": 320491688
+          },
+          "initialization": {
+            "calls": 1,
+            "duration_ns": 100183745
+          },
+          "input_preparation": {
+            "calls": 1,
+            "duration_ns": 12469269
+          },
+          "overhead": {
+            "calls": 21,
+            "duration_ns": 93030547
+          },
+          "periodic_ev_br": {
+            "calls": 5,
+            "duration_ns": 795323840
+          },
+          "sol_preparation": {
+            "calls": 1,
+            "duration_ns": 1390266785
+          },
+          "sol_serialization_and_write": {
+            "calls": 1,
+            "duration_ns": 329548057
+          },
+          "summary_publish": {
+            "calls": 1,
+            "duration_ns": 48240
+          }
+        },
+        "source_version": "baseline9632",
+        "total_ns": 11379767810
+      }
+    },
+    "record": {
+      "bytes": 9189,
+      "path": "/opt/r1/phase-on/flop-2-baseline/solve/supervisor.json",
+      "sha256": "31c125675d29c3d9b0dca5f57ec18352278d5f435594890e925d9d6e7968e91f"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 680,
+      "path": "/opt/r1/phase-on/flop-2-baseline/solve/stdout.log",
+      "sha256": "ea654f90f2de115836473f946519120ea24b1c9972e69bf959ec1c04acc11bab"
+    },
+    "stop_reason": "completed"
+  },
+  "summary": {
+    "board": "Ks 7h 2d",
+    "effective_stack": 60,
+    "ev_ip": 11.950607829623753,
+    "ev_oop": 8.049393706851536,
+    "expl_ip": 0.023040824466281418,
+    "expl_oop": 0.013658099704318527,
+    "iterations": 50,
+    "min_bet": 1,
+    "nash_conv": 0.036698924170599945,
+    "nodes": 21618,
+    "pot": 20,
+    "storage": "f32",
+    "stored_nodes": 14410,
+    "streets_stored": "full",
+    "wall_secs": 8.653374288
+  },
+  "summary_read": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.8795997669999451,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.016823388999910094,
+      "root_os_peak_resident_bytes": 236576768,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 87,
+      "sampled_peak_tree_resident_bytes": 232357888
+    },
+    "record": {
+      "bytes": 9359,
+      "path": "/opt/r1/phase-on/flop-2-baseline/summary/supervisor.json",
+      "sha256": "406d4d5762042a5d52db6c6ffc7adf19e79cffa69d81f41112f04af6aa00fe33"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 389,
+      "path": "/opt/r1/phase-on/flop-2-baseline/summary/stdout.log",
+      "sha256": "6b52b7efb8b478c862936c05fd5943c054decd25af61abcae4fc7d01b5b6e24f"
+    },
+    "stop_reason": "completed"
+  },
+  "version": "baseline"
+}

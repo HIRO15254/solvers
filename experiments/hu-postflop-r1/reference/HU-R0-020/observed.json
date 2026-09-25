@@ -1,0 +1,140 @@
+{
+  "case_id": "HU-R0-020",
+  "captured_utc_interval_minute_precision": [
+    "2026-09-25T18:21Z",
+    "2026-09-25T18:24Z"
+  ],
+  "reference": "GTO Wizard existing solved library; root agent observed UI and used Copy range controls",
+  "url": "https://app.gtowizard.com/solutions?soltab=strategy&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zSimple&depth=75&gmfft_sort_key=0&gmfft_sort_order=desc&gmff_favorite=false&stratab=strategy_ev&history_spot=8&preflop_actions=F-R2-F-R7-F-F-R18-C&board=AcKd3s",
+  "url_provenance": "R0 cases.csv URL; collecting root agent confirmed this Flop root visually. Saving agent received raw text and observations from root; its separate CUA environment had no browser connection.",
+  "visible_solution": "Cash 6max 75bb Simple NL500 GTO/GTO",
+  "table_players": "6max",
+  "subgame_players": 2,
+  "street": "flop",
+  "board": [
+    "Ac",
+    "Kd",
+    "3s"
+  ],
+  "seats": {
+    "oop": "HJ",
+    "ip": "BTN"
+  },
+  "root_actor": "HJ",
+  "pot_bb": 37.5,
+  "stacks_behind_bb": [
+    57,
+    57
+  ],
+  "preflop_actions": "F-R2-F-R7-F-F-R18-C",
+  "preflop": "UTG fold; HJ raise to 2; CO fold; BTN raise to 7; SB fold; BB fold; HJ raise to 18; BTN call",
+  "flop": "Ac Kd 3s; root before HJ acts",
+  "root_ranges": {
+    "oop": "oop-range.txt",
+    "ip": "ip-range.txt",
+    "weights": "Copy-control raw text, unrenormalized; one final LF added to each file",
+    "reported_copy_raw_characters": {
+      "oop": 1003,
+      "ip": 1133
+    },
+    "reported_copy_raw_fnv1a32": {
+      "oop": "c1a2bbdc",
+      "ip": "0909bf7b"
+    },
+    "transfer_verification": "Collecting root agent supplied the raw strings with clipboard character counts and FNV-1a 32-bit. Saving agent independently matched both values before writing and recomputed them from saved files, excluding the final LF."
+  },
+  "observed_menus": [
+    {
+      "history": "",
+      "actor": "HJ",
+      "street": "flop",
+      "actions": [
+        "check",
+        "bet 3.75",
+        "bet 9.4",
+        "bet 18.75",
+        "bet 28.1",
+        "allin 57"
+      ],
+      "action_ui_percent_labels": {
+        "bet 3.75": 10,
+        "bet 9.4": 25,
+        "bet 18.75": 50,
+        "bet 28.1": 75,
+        "allin 57": 152
+      },
+      "observation_surface": "Top menu"
+    },
+    {
+      "history": "check",
+      "actor": "BTN",
+      "street": "flop",
+      "actions": [
+        "check",
+        "bet 3.75",
+        "bet 9.4",
+        "bet 18.75",
+        "bet 28.1",
+        "allin 57"
+      ],
+      "action_ui_percent_labels": {
+        "bet 3.75": 10,
+        "bet 9.4": 25,
+        "bet 18.75": 50,
+        "bet 28.1": 75,
+        "allin 57": 152
+      },
+      "observation_surface": "Top menu"
+    }
+  ],
+  "tree_observation": "Only the two unopened Flop decision menus were observed. Responses to bets, raises, check/check chance children, and all Turn/River descendants remain unobserved; no complete-tree claim. UI amount and percent labels are preserved as displayed and not lowered into a solver tree.",
+  "root_ui": {
+    "view": "Ranges / root action frequencies",
+    "oop_ev_bb": 24.58,
+    "ip_ev_bb": 12.32,
+    "oop_equity_percent": 61.1,
+    "ip_equity_percent": 38.9,
+    "oop_combos_rounded": 52.3,
+    "ip_combos_rounded": 42.5,
+    "oop_frequency_percent": {
+      "check": 20,
+      "bet_3_75": 32.9,
+      "bet_9_4": 11.9,
+      "bet_18_75": 34.4,
+      "bet_28_1": 0.7,
+      "allin_57": 0
+    },
+    "ip_frequency_percent": null,
+    "frequency_sum_note": "Displayed HJ frequencies sum to 99.9%; preserve them without renormalization. No BTN action frequencies were supplied."
+  },
+  "display_steps": {
+    "ev_bb": 0.01,
+    "frequency_percentage_points": 0.1,
+    "equity_percentage_points": 0.1,
+    "weighted_combos": 0.1
+  },
+  "rake_catalog_only": {
+    "source": "docs/plans/hu-postflop-r0/cases.csv HU-R0-020",
+    "catalog_checked_at": "2026-09-25T06:15:52.059Z",
+    "rake_percent": 5,
+    "rake_cap_bb": 0.6,
+    "reconfirmed_in_this_capture": false,
+    "note": "Current library rake collection, rounding, uncalled handling and version remain unverified."
+  },
+  "reference_exploitability": null,
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "comparison_threshold": null,
+  "missing_fields": [
+    "complete Flop response/raise menus and all Turn/River descendants",
+    "precise action-size lowering and full public-tree identity",
+    "reference rake collection rules, uncalled contribution handling and rounding",
+    "reference solver version and internal precision",
+    "node-specific convergence metric and stopping conditions",
+    "full per-hand/action profile and EVs",
+    "root BTN action frequencies",
+    "exact EV basis and display rounding rule"
+  ],
+  "capture_scope": "Partial root input/menu observation only. No new solve, diagnostic config, solver comparison, or reference acceptance."
+}

@@ -1,0 +1,92 @@
+{
+  "case_id": "HU-R0-007",
+  "captured_utc_date": "2026-09-25",
+  "checked_utc_interval_minute_precision": ["2026-09-25T16:45Z", "2026-09-25T16:49Z"],
+  "reference": "GTO Wizard existing solved library; user-accessible UI and Copy range controls",
+  "url": "https://app.gtowizard.com/solutions?soltab=strategy&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=20&gmfft_sort_key=0&gmfft_sort_order=desc&gmff_favorite=false&stratab=strategy_ev&history_spot=8&preflop_actions=F-F-F-R2-F-C&board=As7d2c4h&flop_actions=X-X",
+  "url_provenance": "HU-R0-007 source_url from docs/plans/hu-postflop-r0/cases.csv, retained verbatim; capture was in the Range tab",
+  "visible_solution": "Cash 6max 20bb General NL50 GTO/GTO",
+  "table_players": "6max",
+  "subgame_players": 2,
+  "street": "turn",
+  "board": ["As", "7d", "2c", "4h"],
+  "seats": {"oop": "BB", "ip": "BTN"},
+  "root_actor": "BB",
+  "pot_bb": 4.5,
+  "stacks_behind_bb": [18, 18],
+  "preflop_actions": "F-F-F-R2-F-C",
+  "preflop": "UTG fold; HJ fold; CO fold; BTN raise to 2; SB fold; BB call",
+  "flop_actions": "X-X",
+  "flop": "check/check",
+  "turn": "root before BB acts",
+  "root_ranges": {
+    "oop": "oop-range.txt",
+    "ip": "ip-range.txt",
+    "weights": "copy-control text, unrenormalized; file adds one final LF"
+  },
+  "observed_menus": [
+    {
+      "history": "",
+      "actor": "BB",
+      "street": "turn",
+      "actions": ["check", "bet 1", "bet 1.5", "bet 2.25", "bet 3.4", "bet 5.6", "bet 7.9", "bet 11.25", "allin 18"]
+    },
+    {
+      "history": "check",
+      "actor": "BTN",
+      "street": "turn",
+      "actions": ["check", "bet 1", "bet 1.5", "bet 2.25", "bet 3.4", "bet 5.6", "bet 7.9", "bet 11.25", "allin 18"]
+    }
+  ],
+  "tree_observation": "Only the two unopened Turn menus are recorded. All subsequent Turn responses and all River chance/decision menus are unobserved; this is not a complete public tree.",
+  "root_ui": {
+    "view": "Ranges",
+    "oop_ev_bb": 1.01,
+    "ip_ev_bb": 3.08,
+    "oop_equity_percent": 33.9,
+    "ip_equity_percent": 66.1,
+    "oop_combos_rounded": 315.5,
+    "ip_combos_rounded": 5.3,
+    "oop_frequency_percent": {
+      "check": 89.1,
+      "bet_1": 3.2,
+      "bet_1_5": 1.9,
+      "bet_2_25": 1.3,
+      "bet_3_4": 1.3,
+      "bet_5_6": 0.9,
+      "bet_7_9": 0.7,
+      "bet_11_25": 0.8,
+      "allin_18": 0.8
+    }
+  },
+  "display_steps": {
+    "ev_bb": 0.01,
+    "frequency_percentage_points": 0.1,
+    "equity_percentage_points": 0.1,
+    "weighted_combos": 0.1
+  },
+  "rake_catalog_only": {
+    "source": "docs/plans/hu-postflop-r0/cases.csv HU-R0-007",
+    "catalog_checked_at": "2026-09-25T06:02:54.555Z",
+    "rake_percent": 5,
+    "rake_cap_bb": 4,
+    "reconfirmed_in_this_capture": false,
+    "note": "R0 catalog information only; current solution collection conditions and version are unverified"
+  },
+  "reference_exploitability": null,
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "comparison_threshold": null,
+  "missing_fields": [
+    "all subsequent Turn response menus",
+    "River chance domain and all River decision menus",
+    "current solution rake preset reconfirmation",
+    "rake collection on folds, uncalled contribution handling and rounding",
+    "reference solver version and internal precision",
+    "reference accuracy metric value and stopping conditions for this solution",
+    "full per-hand/action reference profile and action EVs",
+    "exact EV basis and display rounding rule"
+  ],
+  "capture_scope": "This record covers HU-R0-007 only; it makes no acquisition claim for HU-R0-023 or the remaining R0 catalog cases."
+}

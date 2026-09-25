@@ -1,0 +1,1 @@
+valid: schema=solvers.postflop/v1 game_kind=postflop profile=vector CFR average profile; general-sum utilities, no Nash convergence guarantee

@@ -1,0 +1,37 @@
+{
+  "case_id": "HU-R0-017",
+  "purpose": "diagnostic_only",
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "chips_per_bb": 100,
+  "observed_sha256": "de306599f10fe79456e60484ee79a210e365437e0bf1fc98690aedb6acedc76c",
+  "input_check": {
+    "config_sha256": "597c43241721fa4743e3fbe7aa6e8fa67f7aebc67bcece988f18b4e63d192e1d",
+    "ranges": {
+      "oop": {
+        "positive_combos": 352,
+        "raw_weight_sum": "30.5171114",
+        "sha256": "f1f77d65d20c7103a65b10ca936baa3077aeeff4766d8724850481b94921f35b"
+      },
+      "ip": {
+        "positive_combos": 232,
+        "raw_weight_sum": "53.4459435",
+        "sha256": "d259fb6476ddf1d3bd31c8c6ef278cea02c764ebeecef93a0677fd3b7e203661"
+      }
+    },
+    "dsl_runtime_validation": "not_performed_by_this_python_script"
+  },
+  "expected_counts_from_observed_graph": {
+    "decision_nodes": 28,
+    "decision_action_edges": 80,
+    "terminal_nodes": 53,
+    "public_nodes": 81
+  },
+  "tree_check": {
+    "status": "not_executed"
+  },
+  "ev_diagnostic": {
+    "status": "not_executed"
+  }
+}

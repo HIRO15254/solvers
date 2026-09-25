@@ -1,0 +1,2156 @@
+{
+  "ended_at": "2026-09-25T18:30:22Z",
+  "kind": "saved_profile_audits",
+  "plan": {
+    "bytes": 105577,
+    "path": "/opt/r1/current-audit-plan/plan.json",
+    "sha256": "88c81719d79173785864cc9a61e7b6bde0fbbb6fadd466afb254da4c244cd5ce"
+  },
+  "runs": [
+    {
+      "case": "river",
+      "effective_config_sha256": "705eee3eaaa599c81790e6cf99ad59ec22852fba517e32fd0add3a8772ae0e0d",
+      "repetition": 1,
+      "report": {
+        "artifact": {
+          "blake3": "3d8ae7756b220b1e7978f27df837c081659378889968620be06ff5c667d9ffb3",
+          "bytes": 7473,
+          "config_blake3": "33ceafd2eb06127f2630af97d60681c37b8a9cdcdf3af5317bef205c2d174422",
+          "format_version": 1,
+          "iterations": 100,
+          "mode": "full",
+          "node_count": 27,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/river-1-baseline/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 10
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.001941211,
+        "input_hash_secs": 0.0002397,
+        "load_secs": 0.003752909,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            13.871822359286634,
+            6.128177549428161
+          ],
+          "expl": [
+            0.012880653853740931,
+            0.016869405042389207
+          ],
+          "iterations": 100,
+          "nash_conv": 0.029750058896130138,
+          "storage": "f32",
+          "wall_secs": 0.143098723
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            13.884700453991274,
+            6.145047224108368
+          ],
+          "ev": [
+            13.87182247648117,
+            6.128177443380661
+          ],
+          "gains": [
+            0.012877977510102667,
+            0.016869780727707173
+          ],
+          "nash_conv": 0.02974775823780984,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.020870689000275888,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 0,
+          "max_sample_gap_seconds": 0.0,
+          "root_os_peak_resident_bytes": 24866816,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 1,
+          "sampled_peak_tree_resident_bytes": 0
+        },
+        "record": {
+          "bytes": 7850,
+          "path": "/opt/r1/current-audits/river-1-baseline/supervisor.json",
+          "sha256": "6070d9cda08e2a1a417b6286f82be9628f4a7114c4a8dd89c33c248b585b52d1"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1507,
+          "path": "/opt/r1/current-audits/river-1-baseline/stdout.log",
+          "sha256": "287dbaf3d073c1f606648f06917ebcee8db86c3934c6c4ccad4b1fd0e1c9e3b3"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.0743693955945246,
+        "gain_roundoff_lower_bounds": [
+          -1.1388470045399128e-10,
+          -1.0614504722410837e-10
+        ],
+        "gains": [
+          0.012877977510102667,
+          0.016869780727707173
+        ],
+        "inequality": "<",
+        "nash_conv": 0.02974775823780984,
+        "nash_conv_roundoff_lower_bound": -2.2002974767809966e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "baseline"
+    },
+    {
+      "case": "river",
+      "effective_config_sha256": "705eee3eaaa599c81790e6cf99ad59ec22852fba517e32fd0add3a8772ae0e0d",
+      "repetition": 1,
+      "report": {
+        "artifact": {
+          "blake3": "4f9d73fb7f3b84425f06ece7bd38cd64d986186f556db284289b74448650bac5",
+          "bytes": 7609,
+          "config_blake3": "1cb01bc0d6fb3dfcd2d6df5e0fb04edab1f1232bc7a445dbc725265fe835eefb",
+          "format_version": 3,
+          "iterations": 100,
+          "mode": "full",
+          "node_count": 27,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/river-1-candidate/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 10
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.00271364,
+        "input_hash_secs": 0.00023549999999999998,
+        "load_secs": 0.00422132,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            13.871822359286634,
+            6.128177549428161
+          ],
+          "expl": [
+            0.012880653853740931,
+            0.016869405042389207
+          ],
+          "iterations": 100,
+          "nash_conv": 0.029750058896130138,
+          "storage": "f32",
+          "wall_secs": 0.152291424
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            13.884700453991274,
+            6.145047224108368
+          ],
+          "ev": [
+            13.87182247648117,
+            6.128177443380661
+          ],
+          "gains": [
+            0.012877977510102667,
+            0.016869780727707173
+          ],
+          "nash_conv": 0.02974775823780984,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.0228874489998816,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 0,
+          "max_sample_gap_seconds": 0.0,
+          "root_os_peak_resident_bytes": 25305088,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 1,
+          "sampled_peak_tree_resident_bytes": 0
+        },
+        "record": {
+          "bytes": 7829,
+          "path": "/opt/r1/current-audits/river-1-candidate/supervisor.json",
+          "sha256": "824ac2c074f0d94b302a0e21ba903e964f6cbb2aa7a47803af7770ce0f7dedaf"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1519,
+          "path": "/opt/r1/current-audits/river-1-candidate/stdout.log",
+          "sha256": "0dd876f38b6cb7465753f1dfd7802b9cb6254a638b9d60e31425f326ffcfab3e"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.0743693955945246,
+        "gain_roundoff_lower_bounds": [
+          -1.1388470045399128e-10,
+          -1.0614504722410837e-10
+        ],
+        "gains": [
+          0.012877977510102667,
+          0.016869780727707173
+        ],
+        "inequality": "<",
+        "nash_conv": 0.02974775823780984,
+        "nash_conv_roundoff_lower_bound": -2.2002974767809966e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "candidate"
+    },
+    {
+      "case": "river",
+      "effective_config_sha256": "705eee3eaaa599c81790e6cf99ad59ec22852fba517e32fd0add3a8772ae0e0d",
+      "repetition": 2,
+      "report": {
+        "artifact": {
+          "blake3": "12b4e995d3de3ea9e83c7fba478fea74621d03827cd18a01d0514f30ea764396",
+          "bytes": 7472,
+          "config_blake3": "33ceafd2eb06127f2630af97d60681c37b8a9cdcdf3af5317bef205c2d174422",
+          "format_version": 1,
+          "iterations": 100,
+          "mode": "full",
+          "node_count": 27,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/river-2-baseline/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 10
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.00197347,
+        "input_hash_secs": 0.00014522,
+        "load_secs": 0.00341009,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            13.871822359286634,
+            6.128177549428161
+          ],
+          "expl": [
+            0.012880653853740931,
+            0.016869405042389207
+          ],
+          "iterations": 100,
+          "nash_conv": 0.029750058896130138,
+          "storage": "f32",
+          "wall_secs": 0.143993324
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            13.884700453991274,
+            6.145047224108368
+          ],
+          "ev": [
+            13.87182247648117,
+            6.128177443380661
+          ],
+          "gains": [
+            0.012877977510102667,
+            0.016869780727707173
+          ],
+          "nash_conv": 0.02974775823780984,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.020789747999970132,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 0,
+          "max_sample_gap_seconds": 0.0,
+          "root_os_peak_resident_bytes": 25305088,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 1,
+          "sampled_peak_tree_resident_bytes": 0
+        },
+        "record": {
+          "bytes": 7850,
+          "path": "/opt/r1/current-audits/river-2-baseline/supervisor.json",
+          "sha256": "a241f879749217906ae54e80077daf6886e96f36ca2ef90a50b369278547637c"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1506,
+          "path": "/opt/r1/current-audits/river-2-baseline/stdout.log",
+          "sha256": "75ba390c8a58ff620cd91dee0fc05520f27c1232591391561d256da38169fee6"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.0743693955945246,
+        "gain_roundoff_lower_bounds": [
+          -1.1388470045399128e-10,
+          -1.0614504722410837e-10
+        ],
+        "gains": [
+          0.012877977510102667,
+          0.016869780727707173
+        ],
+        "inequality": "<",
+        "nash_conv": 0.02974775823780984,
+        "nash_conv_roundoff_lower_bound": -2.2002974767809966e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "baseline"
+    },
+    {
+      "case": "river",
+      "effective_config_sha256": "705eee3eaaa599c81790e6cf99ad59ec22852fba517e32fd0add3a8772ae0e0d",
+      "repetition": 2,
+      "report": {
+        "artifact": {
+          "blake3": "8895fd211141e9fed617301ce29be5cb216cbac6bbb578fbee3ffe7b09b81e86",
+          "bytes": 7609,
+          "config_blake3": "1cb01bc0d6fb3dfcd2d6df5e0fb04edab1f1232bc7a445dbc725265fe835eefb",
+          "format_version": 3,
+          "iterations": 100,
+          "mode": "full",
+          "node_count": 27,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/river-2-candidate/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 10
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.002327559,
+        "input_hash_secs": 0.00023123000000000002,
+        "load_secs": 0.00381304,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            13.871822359286634,
+            6.128177549428161
+          ],
+          "expl": [
+            0.012880653853740931,
+            0.016869405042389207
+          ],
+          "iterations": 100,
+          "nash_conv": 0.029750058896130138,
+          "storage": "f32",
+          "wall_secs": 0.153423464
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            13.884700453991274,
+            6.145047224108368
+          ],
+          "ev": [
+            13.87182247648117,
+            6.128177443380661
+          ],
+          "gains": [
+            0.012877977510102667,
+            0.016869780727707173
+          ],
+          "nash_conv": 0.02974775823780984,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.01959889900035705,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 0,
+          "max_sample_gap_seconds": 0.0,
+          "root_os_peak_resident_bytes": 25305088,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 1,
+          "sampled_peak_tree_resident_bytes": 0
+        },
+        "record": {
+          "bytes": 7831,
+          "path": "/opt/r1/current-audits/river-2-candidate/supervisor.json",
+          "sha256": "6d52860039d1f07dfebc7122eafd0b7fed9cf510f5d04f3c188acf8b11ba2f5d"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1520,
+          "path": "/opt/r1/current-audits/river-2-candidate/stdout.log",
+          "sha256": "7dccb6a36de3d75c1d989aa1ce9ca86573bdfaba02c2837f8a72f54f5d64bfb1"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.0743693955945246,
+        "gain_roundoff_lower_bounds": [
+          -1.1388470045399128e-10,
+          -1.0614504722410837e-10
+        ],
+        "gains": [
+          0.012877977510102667,
+          0.016869780727707173
+        ],
+        "inequality": "<",
+        "nash_conv": 0.02974775823780984,
+        "nash_conv_roundoff_lower_bound": -2.2002974767809966e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "candidate"
+    },
+    {
+      "case": "river",
+      "effective_config_sha256": "705eee3eaaa599c81790e6cf99ad59ec22852fba517e32fd0add3a8772ae0e0d",
+      "repetition": 3,
+      "report": {
+        "artifact": {
+          "blake3": "6e3ee20e804299e7b1a43f78a6fe617600165bf5367f4dc5da3616d4dbf75058",
+          "bytes": 7472,
+          "config_blake3": "33ceafd2eb06127f2630af97d60681c37b8a9cdcdf3af5317bef205c2d174422",
+          "format_version": 1,
+          "iterations": 100,
+          "mode": "full",
+          "node_count": 27,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/river-3-baseline/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 10
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.00182273,
+        "input_hash_secs": 0.00025518000000000003,
+        "load_secs": 0.00332809,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            13.871822359286634,
+            6.128177549428161
+          ],
+          "expl": [
+            0.012880653853740931,
+            0.016869405042389207
+          ],
+          "iterations": 100,
+          "nash_conv": 0.029750058896130138,
+          "storage": "f32",
+          "wall_secs": 0.168835223
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            13.884700453991274,
+            6.145047224108368
+          ],
+          "ev": [
+            13.87182247648117,
+            6.128177443380661
+          ],
+          "gains": [
+            0.012877977510102667,
+            0.016869780727707173
+          ],
+          "nash_conv": 0.02974775823780984,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.01957465899977251,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 0,
+          "max_sample_gap_seconds": 0.0,
+          "root_os_peak_resident_bytes": 25305088,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 1,
+          "sampled_peak_tree_resident_bytes": 0
+        },
+        "record": {
+          "bytes": 7849,
+          "path": "/opt/r1/current-audits/river-3-baseline/supervisor.json",
+          "sha256": "d8d5668d141c6b4b6e1e9c5c389fb4df1a1cbb020429aeb428eb8b65de6668e5"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1518,
+          "path": "/opt/r1/current-audits/river-3-baseline/stdout.log",
+          "sha256": "7c8f221cdccfa97d50fa6c13125d3d4d6d8aefeecbeecfd19c528dad522dce64"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.0743693955945246,
+        "gain_roundoff_lower_bounds": [
+          -1.1388470045399128e-10,
+          -1.0614504722410837e-10
+        ],
+        "gains": [
+          0.012877977510102667,
+          0.016869780727707173
+        ],
+        "inequality": "<",
+        "nash_conv": 0.02974775823780984,
+        "nash_conv_roundoff_lower_bound": -2.2002974767809966e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "baseline"
+    },
+    {
+      "case": "river",
+      "effective_config_sha256": "705eee3eaaa599c81790e6cf99ad59ec22852fba517e32fd0add3a8772ae0e0d",
+      "repetition": 3,
+      "report": {
+        "artifact": {
+          "blake3": "19770771af9bd467a1a373c5599e338d416d8b9b43f34b9d90bda2189d45af9c",
+          "bytes": 7609,
+          "config_blake3": "1cb01bc0d6fb3dfcd2d6df5e0fb04edab1f1232bc7a445dbc725265fe835eefb",
+          "format_version": 3,
+          "iterations": 100,
+          "mode": "full",
+          "node_count": 27,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/river-3-candidate/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 10
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.002253271,
+        "input_hash_secs": 0.000235659,
+        "load_secs": 0.004064279,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            13.871822359286634,
+            6.128177549428161
+          ],
+          "expl": [
+            0.012880653853740931,
+            0.016869405042389207
+          ],
+          "iterations": 100,
+          "nash_conv": 0.029750058896130138,
+          "storage": "f32",
+          "wall_secs": 0.164514804
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            13.884700453991274,
+            6.145047224108368
+          ],
+          "ev": [
+            13.87182247648117,
+            6.128177443380661
+          ],
+          "gains": [
+            0.012877977510102667,
+            0.016869780727707173
+          ],
+          "nash_conv": 0.02974775823780984,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.0207711590001054,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 0,
+          "max_sample_gap_seconds": 0.0,
+          "root_os_peak_resident_bytes": 25305088,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 1,
+          "sampled_peak_tree_resident_bytes": 0
+        },
+        "record": {
+          "bytes": 7830,
+          "path": "/opt/r1/current-audits/river-3-candidate/supervisor.json",
+          "sha256": "95e26c1ba11b1d05f3707faaea5630f159041d394948f5c2460b4a7eb36c999a"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1510,
+          "path": "/opt/r1/current-audits/river-3-candidate/stdout.log",
+          "sha256": "8cf1f881a50031f2f21f2642cf0dbed8061666a99dec98c11e36a99f30365373"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.0743693955945246,
+        "gain_roundoff_lower_bounds": [
+          -1.1388470045399128e-10,
+          -1.0614504722410837e-10
+        ],
+        "gains": [
+          0.012877977510102667,
+          0.016869780727707173
+        ],
+        "inequality": "<",
+        "nash_conv": 0.02974775823780984,
+        "nash_conv_roundoff_lower_bound": -2.2002974767809966e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "candidate"
+    },
+    {
+      "case": "turn",
+      "effective_config_sha256": "d3b0b3c3ef05550255c5c804d8356e0e4f6cbf74fd452a833442837a7f06816e",
+      "repetition": 1,
+      "report": {
+        "artifact": {
+          "blake3": "7d300efeeb38bac97a111daea60728f2da3a03df3bb2900545ec26f1619a7a3e",
+          "bytes": 21335,
+          "config_blake3": "6092004a96a42674f88226ca5f6095680033a3b84c80fe742431b7aad68e1ed4",
+          "format_version": 1,
+          "iterations": 100,
+          "mode": "full",
+          "node_count": 1305,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-1-baseline/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 580
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.033118158,
+        "input_hash_secs": 0.00025039,
+        "load_secs": 0.056986906,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            18.791926466388468,
+            1.208072568163459
+          ],
+          "expl": [
+            0.014560711236647705,
+            0.014267273891119814
+          ],
+          "iterations": 100,
+          "nash_conv": 0.02882798512776752,
+          "storage": "f32",
+          "wall_secs": 1.9138844320000001
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            18.80648516431267,
+            1.2223522986894775
+          ],
+          "ev": [
+            18.791926937338747,
+            1.2080722855932926
+          ],
+          "gains": [
+            0.014558226973921506,
+            0.014280013096184874
+          ],
+          "nash_conv": 0.02883824007010638,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.15019509099965944,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.06586623600014718,
+          "root_os_peak_resident_bytes": 25305088,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 3,
+          "sampled_peak_tree_resident_bytes": 25141248
+        },
+        "record": {
+          "bytes": 7860,
+          "path": "/opt/r1/current-audits/turn-1-baseline/supervisor.json",
+          "sha256": "f7ab5eb621100055d139584fcc65320fe8eb1c63019185786d6f79d43c2c6c4b"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1519,
+          "path": "/opt/r1/current-audits/turn-1-baseline/stdout.log",
+          "sha256": "326aacf3e35c1a278d11c8a9928b88892ba8d26110eb3d6e614900edb7acf412"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.07209560017526595,
+        "gain_roundoff_lower_bounds": [
+          -1.1880648516431266e-10,
+          -1.0122235229868948e-10
+        ],
+        "gains": [
+          0.014558226973921506,
+          0.014280013096184874
+        ],
+        "inequality": "<",
+        "nash_conv": 0.02883824007010638,
+        "nash_conv_roundoff_lower_bound": -2.2002883746300213e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "baseline"
+    },
+    {
+      "case": "turn",
+      "effective_config_sha256": "d3b0b3c3ef05550255c5c804d8356e0e4f6cbf74fd452a833442837a7f06816e",
+      "repetition": 1,
+      "report": {
+        "artifact": {
+          "blake3": "d081952622d5dab74514e37b662c587ee5535e28e556e98c47bc11469a22d9fe",
+          "bytes": 24920,
+          "config_blake3": "ed7063d8134ffe4efb925229674c1a7ce25c676a6565eb7f4d9042b2b9b95fb1",
+          "format_version": 3,
+          "iterations": 100,
+          "mode": "full",
+          "node_count": 1305,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-1-candidate/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 580
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.038061018,
+        "input_hash_secs": 0.00023999,
+        "load_secs": 0.056789857,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            18.791926466388468,
+            1.208072568163459
+          ],
+          "expl": [
+            0.014560711236647705,
+            0.014267273891119814
+          ],
+          "iterations": 100,
+          "nash_conv": 0.02882798512776752,
+          "storage": "f32",
+          "wall_secs": 1.711669701
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            18.80648516431267,
+            1.2223522986894775
+          ],
+          "ev": [
+            18.791926937338747,
+            1.2080722855932926
+          ],
+          "gains": [
+            0.014558226973921506,
+            0.014280013096184874
+          ],
+          "nash_conv": 0.02883824007010638,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.14762314100016738,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.06275266600005125,
+          "root_os_peak_resident_bytes": 26021888,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 3,
+          "sampled_peak_tree_resident_bytes": 26681344
+        },
+        "record": {
+          "bytes": 7843,
+          "path": "/opt/r1/current-audits/turn-1-candidate/supervisor.json",
+          "sha256": "2db7ac166b0106ad79ca66181c6ed01823c8eeecfc29290d9ebb1b2c4fe20d93"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1513,
+          "path": "/opt/r1/current-audits/turn-1-candidate/stdout.log",
+          "sha256": "d7c3b0c2e635a075fa4fc00879ddca93c6794f55d3c4b81a378e8a403fb88bbb"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.07209560017526595,
+        "gain_roundoff_lower_bounds": [
+          -1.1880648516431266e-10,
+          -1.0122235229868948e-10
+        ],
+        "gains": [
+          0.014558226973921506,
+          0.014280013096184874
+        ],
+        "inequality": "<",
+        "nash_conv": 0.02883824007010638,
+        "nash_conv_roundoff_lower_bound": -2.2002883746300213e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "candidate"
+    },
+    {
+      "case": "turn",
+      "effective_config_sha256": "d3b0b3c3ef05550255c5c804d8356e0e4f6cbf74fd452a833442837a7f06816e",
+      "repetition": 2,
+      "report": {
+        "artifact": {
+          "blake3": "1c0dfc9087cf80f5a2dbde1ff41e714c94b8676deb24f357eca44eafba3ae996",
+          "bytes": 21333,
+          "config_blake3": "6092004a96a42674f88226ca5f6095680033a3b84c80fe742431b7aad68e1ed4",
+          "format_version": 1,
+          "iterations": 100,
+          "mode": "full",
+          "node_count": 1305,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-2-baseline/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 580
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.030855538,
+        "input_hash_secs": 0.00029934,
+        "load_secs": 0.061693547,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            18.791926466388468,
+            1.208072568163459
+          ],
+          "expl": [
+            0.014560711236647705,
+            0.014267273891119814
+          ],
+          "iterations": 100,
+          "nash_conv": 0.02882798512776752,
+          "storage": "f32",
+          "wall_secs": 2.033612727
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            18.80648516431267,
+            1.2223522986894775
+          ],
+          "ev": [
+            18.791926937338747,
+            1.2080722855932926
+          ],
+          "gains": [
+            0.014558226973921506,
+            0.014280013096184874
+          ],
+          "nash_conv": 0.02883824007010638,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.1455914810003378,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.06306062700014081,
+          "root_os_peak_resident_bytes": 25305088,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 3,
+          "sampled_peak_tree_resident_bytes": 25124864
+        },
+        "record": {
+          "bytes": 7859,
+          "path": "/opt/r1/current-audits/turn-2-baseline/supervisor.json",
+          "sha256": "6254d2ecf78b0dc28ad32759f3bd64ebbae13ccab4ea7893e4ec0e36a82a7125"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1512,
+          "path": "/opt/r1/current-audits/turn-2-baseline/stdout.log",
+          "sha256": "0584d5ce0c6f66c7ca05f22caff403db7d017f9c9befbdf3bac8e7c5f3957640"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.07209560017526595,
+        "gain_roundoff_lower_bounds": [
+          -1.1880648516431266e-10,
+          -1.0122235229868948e-10
+        ],
+        "gains": [
+          0.014558226973921506,
+          0.014280013096184874
+        ],
+        "inequality": "<",
+        "nash_conv": 0.02883824007010638,
+        "nash_conv_roundoff_lower_bound": -2.2002883746300213e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "baseline"
+    },
+    {
+      "case": "turn",
+      "effective_config_sha256": "d3b0b3c3ef05550255c5c804d8356e0e4f6cbf74fd452a833442837a7f06816e",
+      "repetition": 2,
+      "report": {
+        "artifact": {
+          "blake3": "96403214fd93be3665c56863c52a7bc826067318d26fe96fc65d21fe04e2bdd5",
+          "bytes": 24919,
+          "config_blake3": "ed7063d8134ffe4efb925229674c1a7ce25c676a6565eb7f4d9042b2b9b95fb1",
+          "format_version": 3,
+          "iterations": 100,
+          "mode": "full",
+          "node_count": 1305,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-2-candidate/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 580
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.029972568,
+        "input_hash_secs": 0.00024911,
+        "load_secs": 0.043661388,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            18.791926466388468,
+            1.208072568163459
+          ],
+          "expl": [
+            0.014560711236647705,
+            0.014267273891119814
+          ],
+          "iterations": 100,
+          "nash_conv": 0.02882798512776752,
+          "storage": "f32",
+          "wall_secs": 1.8083695340000001
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            18.80648516431267,
+            1.2223522986894775
+          ],
+          "ev": [
+            18.791926937338747,
+            1.2080722855932926
+          ],
+          "gains": [
+            0.014558226973921506,
+            0.014280013096184874
+          ],
+          "nash_conv": 0.02883824007010638,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.13487435200022446,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.058428716999969765,
+          "root_os_peak_resident_bytes": 26079232,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 3,
+          "sampled_peak_tree_resident_bytes": 22593536
+        },
+        "record": {
+          "bytes": 7844,
+          "path": "/opt/r1/current-audits/turn-2-candidate/supervisor.json",
+          "sha256": "8d2a15431f855892b790ea05181b1b76e3285c7d9601c39c2735e852d2fdfa27"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1520,
+          "path": "/opt/r1/current-audits/turn-2-candidate/stdout.log",
+          "sha256": "4c3a16be2198eca48fc6edd5050bda0019c0a53f7134cfbc2193d77b0378aefb"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.07209560017526595,
+        "gain_roundoff_lower_bounds": [
+          -1.1880648516431266e-10,
+          -1.0122235229868948e-10
+        ],
+        "gains": [
+          0.014558226973921506,
+          0.014280013096184874
+        ],
+        "inequality": "<",
+        "nash_conv": 0.02883824007010638,
+        "nash_conv_roundoff_lower_bound": -2.2002883746300213e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "candidate"
+    },
+    {
+      "case": "turn",
+      "effective_config_sha256": "d3b0b3c3ef05550255c5c804d8356e0e4f6cbf74fd452a833442837a7f06816e",
+      "repetition": 3,
+      "report": {
+        "artifact": {
+          "blake3": "6cc60a7ab7d9ea0a3fbf2ad8c7fb95e53407471c9f58b05f7bebea9ff37e2c6d",
+          "bytes": 21335,
+          "config_blake3": "6092004a96a42674f88226ca5f6095680033a3b84c80fe742431b7aad68e1ed4",
+          "format_version": 1,
+          "iterations": 100,
+          "mode": "full",
+          "node_count": 1305,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-3-baseline/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 580
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.025277389,
+        "input_hash_secs": 0.0002278,
+        "load_secs": 0.057554116,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            18.791926466388468,
+            1.208072568163459
+          ],
+          "expl": [
+            0.014560711236647705,
+            0.014267273891119814
+          ],
+          "iterations": 100,
+          "nash_conv": 0.02882798512776752,
+          "storage": "f32",
+          "wall_secs": 1.8899699129999998
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            18.80648516431267,
+            1.2223522986894775
+          ],
+          "ev": [
+            18.791926937338747,
+            1.2080722855932926
+          ],
+          "gains": [
+            0.014558226973921506,
+            0.014280013096184874
+          ],
+          "nash_conv": 0.02883824007010638,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.13650082200001634,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.05812948599987067,
+          "root_os_peak_resident_bytes": 25329664,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 3,
+          "sampled_peak_tree_resident_bytes": 25001984
+        },
+        "record": {
+          "bytes": 7861,
+          "path": "/opt/r1/current-audits/turn-3-baseline/supervisor.json",
+          "sha256": "c322ec889372d4b2a2f70a0e7a7392aa1146e3109e78297a09679c704128f599"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1518,
+          "path": "/opt/r1/current-audits/turn-3-baseline/stdout.log",
+          "sha256": "e7babfeac83dc171294fb6d2adac32f9a00f0b89cf329e44ca49742de54a0bfe"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.07209560017526595,
+        "gain_roundoff_lower_bounds": [
+          -1.1880648516431266e-10,
+          -1.0122235229868948e-10
+        ],
+        "gains": [
+          0.014558226973921506,
+          0.014280013096184874
+        ],
+        "inequality": "<",
+        "nash_conv": 0.02883824007010638,
+        "nash_conv_roundoff_lower_bound": -2.2002883746300213e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "baseline"
+    },
+    {
+      "case": "turn",
+      "effective_config_sha256": "d3b0b3c3ef05550255c5c804d8356e0e4f6cbf74fd452a833442837a7f06816e",
+      "repetition": 3,
+      "report": {
+        "artifact": {
+          "blake3": "817d787de82414fe849692c67df8da48d18ee1a14c2f0d86bb6244a15c5dab37",
+          "bytes": 24921,
+          "config_blake3": "ed7063d8134ffe4efb925229674c1a7ce25c676a6565eb7f4d9042b2b9b95fb1",
+          "format_version": 3,
+          "iterations": 100,
+          "mode": "full",
+          "node_count": 1305,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-3-candidate/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 580
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.027364398,
+        "input_hash_secs": 0.00023851,
+        "load_secs": 0.038190488,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            18.791926466388468,
+            1.208072568163459
+          ],
+          "expl": [
+            0.014560711236647705,
+            0.014267273891119814
+          ],
+          "iterations": 100,
+          "nash_conv": 0.02882798512776752,
+          "storage": "f32",
+          "wall_secs": 1.773600488
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            18.80648516431267,
+            1.2223522986894775
+          ],
+          "ev": [
+            18.791926937338747,
+            1.2080722855932926
+          ],
+          "gains": [
+            0.014558226973921506,
+            0.014280013096184874
+          ],
+          "nash_conv": 0.02883824007010638,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.13534373199991023,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.05874260600012349,
+          "root_os_peak_resident_bytes": 25939968,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 3,
+          "sampled_peak_tree_resident_bytes": 13983744
+        },
+        "record": {
+          "bytes": 7842,
+          "path": "/opt/r1/current-audits/turn-3-candidate/supervisor.json",
+          "sha256": "cac93f0af3e099d196c1d446d6e387671b68d8901542f6e083a8096be668bf6f"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1513,
+          "path": "/opt/r1/current-audits/turn-3-candidate/stdout.log",
+          "sha256": "1313b145059ca2311d985b4a54e3c51f944584bcd0548a643f79cfcaf2292aee"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.07209560017526595,
+        "gain_roundoff_lower_bounds": [
+          -1.1880648516431266e-10,
+          -1.0122235229868948e-10
+        ],
+        "gains": [
+          0.014558226973921506,
+          0.014280013096184874
+        ],
+        "inequality": "<",
+        "nash_conv": 0.02883824007010638,
+        "nash_conv_roundoff_lower_bound": -2.2002883746300213e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "candidate"
+    },
+    {
+      "case": "flop",
+      "effective_config_sha256": "373e50c084493180f8445d501f79d1aa5fdd869b9aadd1e2e12f3eeaa9062467",
+      "repetition": 1,
+      "report": {
+        "artifact": {
+          "blake3": "ec61ceb3c5a028b569a9697fb53c84d2c5d96308b126d1815103e7a496bf09e8",
+          "bytes": 131744,
+          "config_blake3": "9d9fc768e4fd84ace9ffd9e2a991fd19ac94de28496bbf92579506a31966181c",
+          "format_version": 1,
+          "iterations": 50,
+          "mode": "full",
+          "node_count": 21618,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/flop-1-baseline/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 14410
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.250762115,
+        "input_hash_secs": 0.00039983,
+        "load_secs": 1.17580554,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            8.049393706851536,
+            11.950607829623753
+          ],
+          "expl": [
+            0.013658099704318527,
+            0.023040824466281418
+          ],
+          "iterations": 50,
+          "nash_conv": 0.036698924170599945,
+          "storage": "f32",
+          "wall_secs": 9.501100239
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            8.063050905863443,
+            11.973651144239637
+          ],
+          "ev": [
+            8.049393865797255,
+            11.950607935587565
+          ],
+          "gains": [
+            0.013657040066188841,
+            0.023043208652072877
+          ],
+          "nash_conv": 0.03670024871826172,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 1.4867193420000149,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.06723837599975013,
+          "root_os_peak_resident_bytes": 301096960,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 26,
+          "sampled_peak_tree_resident_bytes": 272912384
+        },
+        "record": {
+          "bytes": 7866,
+          "path": "/opt/r1/current-audits/flop-1-baseline/supervisor.json",
+          "sha256": "6f454f84f01d5edff9e441693bc0c0d8159859488058f1dcc93a909bd2de8517"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1513,
+          "path": "/opt/r1/current-audits/flop-1-baseline/stdout.log",
+          "sha256": "e88bb48e094788388b380a92e9898bc3d4e6e2657a8b038317a71df46400ce5b"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.0917506217956543,
+        "gain_roundoff_lower_bounds": [
+          -1.0806305090586344e-10,
+          -1.1197365114423964e-10
+        ],
+        "gains": [
+          0.013657040066188841,
+          0.023043208652072877
+        ],
+        "inequality": "<",
+        "nash_conv": 0.03670024871826172,
+        "nash_conv_roundoff_lower_bound": -2.2003670205010307e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "baseline"
+    },
+    {
+      "case": "flop",
+      "effective_config_sha256": "373e50c084493180f8445d501f79d1aa5fdd869b9aadd1e2e12f3eeaa9062467",
+      "repetition": 1,
+      "report": {
+        "artifact": {
+          "blake3": "326efaad406cc67c077e7a260c5ac3df0a414c31b26b68432801b37f21283544",
+          "bytes": 176833,
+          "config_blake3": "c2ab0b1fdc5e4d18b0009fb53305c31e14fe3a0dbd787a8c8e72b8cc1df8b5ec",
+          "format_version": 3,
+          "iterations": 50,
+          "mode": "full",
+          "node_count": 21618,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/flop-1-candidate/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 14410
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.258781695,
+        "input_hash_secs": 0.00036759,
+        "load_secs": 0.941922154,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            8.049393706851536,
+            11.950607829623753
+          ],
+          "expl": [
+            0.013658099704318527,
+            0.023040824466281418
+          ],
+          "iterations": 50,
+          "nash_conv": 0.036698924170599945,
+          "storage": "f32",
+          "wall_secs": 8.10341611
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            8.063050905863443,
+            11.973651144239637
+          ],
+          "ev": [
+            8.049393865797255,
+            11.950607935587565
+          ],
+          "gains": [
+            0.013657040066188841,
+            0.023043208652072877
+          ],
+          "nash_conv": 0.03670024871826172,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 1.2495564660002856,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.06485227700022733,
+          "root_os_peak_resident_bytes": 379879424,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 22,
+          "sampled_peak_tree_resident_bytes": 359202816
+        },
+        "record": {
+          "bytes": 7848,
+          "path": "/opt/r1/current-audits/flop-1-candidate/supervisor.json",
+          "sha256": "d64fefbd1dfd9e5fad46b3fda1489ca3b91e382d8a1e1742787e43134531856f"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1514,
+          "path": "/opt/r1/current-audits/flop-1-candidate/stdout.log",
+          "sha256": "bfb91ec5d168021b4160679f66f11a39b80a268bb68fc1856ea587a9ab006a1c"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.0917506217956543,
+        "gain_roundoff_lower_bounds": [
+          -1.0806305090586344e-10,
+          -1.1197365114423964e-10
+        ],
+        "gains": [
+          0.013657040066188841,
+          0.023043208652072877
+        ],
+        "inequality": "<",
+        "nash_conv": 0.03670024871826172,
+        "nash_conv_roundoff_lower_bound": -2.2003670205010307e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "candidate"
+    },
+    {
+      "case": "flop",
+      "effective_config_sha256": "373e50c084493180f8445d501f79d1aa5fdd869b9aadd1e2e12f3eeaa9062467",
+      "repetition": 2,
+      "report": {
+        "artifact": {
+          "blake3": "77cc8d865f15e9fe4551bc5955e7af49d7860df027963db41b31ec64f08110d3",
+          "bytes": 131743,
+          "config_blake3": "9d9fc768e4fd84ace9ffd9e2a991fd19ac94de28496bbf92579506a31966181c",
+          "format_version": 1,
+          "iterations": 50,
+          "mode": "full",
+          "node_count": 21618,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/flop-2-baseline/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 14410
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.237555495,
+        "input_hash_secs": 0.000503549,
+        "load_secs": 1.080634597,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            8.049393706851536,
+            11.950607829623753
+          ],
+          "expl": [
+            0.013658099704318527,
+            0.023040824466281418
+          ],
+          "iterations": 50,
+          "nash_conv": 0.036698924170599945,
+          "storage": "f32",
+          "wall_secs": 10.508134448
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            8.063050905863443,
+            11.973651144239637
+          ],
+          "ev": [
+            8.049393865797255,
+            11.950607935587565
+          ],
+          "gains": [
+            0.013657040066188841,
+            0.023043208652072877
+          ],
+          "nash_conv": 0.03670024871826172,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 1.4054344360001778,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.06086597700004859,
+          "root_os_peak_resident_bytes": 301170688,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 25,
+          "sampled_peak_tree_resident_bytes": 287326208
+        },
+        "record": {
+          "bytes": 7866,
+          "path": "/opt/r1/current-audits/flop-2-baseline/supervisor.json",
+          "sha256": "48ac1a239ddf5f36951450b1ea54329dc36c74bb0fc52aa15d27b8f39d975cdd"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1516,
+          "path": "/opt/r1/current-audits/flop-2-baseline/stdout.log",
+          "sha256": "a975f77d5bd59b9063141eee15505b4905de7cc2686c1af88a58cab39653b9be"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.0917506217956543,
+        "gain_roundoff_lower_bounds": [
+          -1.0806305090586344e-10,
+          -1.1197365114423964e-10
+        ],
+        "gains": [
+          0.013657040066188841,
+          0.023043208652072877
+        ],
+        "inequality": "<",
+        "nash_conv": 0.03670024871826172,
+        "nash_conv_roundoff_lower_bound": -2.2003670205010307e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "baseline"
+    },
+    {
+      "case": "flop",
+      "effective_config_sha256": "373e50c084493180f8445d501f79d1aa5fdd869b9aadd1e2e12f3eeaa9062467",
+      "repetition": 2,
+      "report": {
+        "artifact": {
+          "blake3": "d828d9badc30ffa5071b38f2d2cfdbaab87443da2f2a29ccce562582b3fa1fb7",
+          "bytes": 176833,
+          "config_blake3": "c2ab0b1fdc5e4d18b0009fb53305c31e14fe3a0dbd787a8c8e72b8cc1df8b5ec",
+          "format_version": 3,
+          "iterations": 50,
+          "mode": "full",
+          "node_count": 21618,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/flop-2-candidate/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 14410
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.380009337,
+        "input_hash_secs": 0.00058731,
+        "load_secs": 0.994041791,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            8.049393706851536,
+            11.950607829623753
+          ],
+          "expl": [
+            0.013658099704318527,
+            0.023040824466281418
+          ],
+          "iterations": 50,
+          "nash_conv": 0.036698924170599945,
+          "storage": "f32",
+          "wall_secs": 8.393857433
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            8.063050905863443,
+            11.973651144239637
+          ],
+          "ev": [
+            8.049393865797255,
+            11.950607935587565
+          ],
+          "gains": [
+            0.013657040066188841,
+            0.023043208652072877
+          ],
+          "nash_conv": 0.03670024871826172,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 1.4366951749998407,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.07497190599997339,
+          "root_os_peak_resident_bytes": 379555840,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 24,
+          "sampled_peak_tree_resident_bytes": 377839616
+        },
+        "record": {
+          "bytes": 7846,
+          "path": "/opt/r1/current-audits/flop-2-candidate/supervisor.json",
+          "sha256": "fb57658ac428305cfadd24ecbd65858e2c02542904ef9e04c5bae4b3970f27d9"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1515,
+          "path": "/opt/r1/current-audits/flop-2-candidate/stdout.log",
+          "sha256": "b640833bd650e3c64cf387232689b1dc93f2aeff64621c40f3838c0a743b8603"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.0917506217956543,
+        "gain_roundoff_lower_bounds": [
+          -1.0806305090586344e-10,
+          -1.1197365114423964e-10
+        ],
+        "gains": [
+          0.013657040066188841,
+          0.023043208652072877
+        ],
+        "inequality": "<",
+        "nash_conv": 0.03670024871826172,
+        "nash_conv_roundoff_lower_bound": -2.2003670205010307e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "candidate"
+    },
+    {
+      "case": "flop",
+      "effective_config_sha256": "373e50c084493180f8445d501f79d1aa5fdd869b9aadd1e2e12f3eeaa9062467",
+      "repetition": 3,
+      "report": {
+        "artifact": {
+          "blake3": "a3ab4d47fe944d450623f48a0203ba8f1fa424e25364467778d2d5d685517a48",
+          "bytes": 131744,
+          "config_blake3": "9d9fc768e4fd84ace9ffd9e2a991fd19ac94de28496bbf92579506a31966181c",
+          "format_version": 1,
+          "iterations": 50,
+          "mode": "full",
+          "node_count": 21618,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/flop-3-baseline/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 14410
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.260899454,
+        "input_hash_secs": 0.00043168,
+        "load_secs": 1.19169622,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            8.049393706851536,
+            11.950607829623753
+          ],
+          "expl": [
+            0.013658099704318527,
+            0.023040824466281418
+          ],
+          "iterations": 50,
+          "nash_conv": 0.036698924170599945,
+          "storage": "f32",
+          "wall_secs": 9.085264132
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            8.063050905863443,
+            11.973651144239637
+          ],
+          "ev": [
+            8.049393865797255,
+            11.950607935587565
+          ],
+          "gains": [
+            0.013657040066188841,
+            0.023043208652072877
+          ],
+          "nash_conv": 0.03670024871826172,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 1.4981263219997345,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.07186009599990939,
+          "root_os_peak_resident_bytes": 301072384,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 26,
+          "sampled_peak_tree_resident_bytes": 301510656
+        },
+        "record": {
+          "bytes": 7866,
+          "path": "/opt/r1/current-audits/flop-3-baseline/supervisor.json",
+          "sha256": "c2e3f87cf7f97a8886d7cb30f83b4ae7b840e57b926c7f59a701a659f87cf602"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1513,
+          "path": "/opt/r1/current-audits/flop-3-baseline/stdout.log",
+          "sha256": "08ecbb972a5945cc94602485f3f952dd862d9bb6363c8edca196326bc1d3e653"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.0917506217956543,
+        "gain_roundoff_lower_bounds": [
+          -1.0806305090586344e-10,
+          -1.1197365114423964e-10
+        ],
+        "gains": [
+          0.013657040066188841,
+          0.023043208652072877
+        ],
+        "inequality": "<",
+        "nash_conv": 0.03670024871826172,
+        "nash_conv_roundoff_lower_bound": -2.2003670205010307e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "baseline"
+    },
+    {
+      "case": "flop",
+      "effective_config_sha256": "373e50c084493180f8445d501f79d1aa5fdd869b9aadd1e2e12f3eeaa9062467",
+      "repetition": 3,
+      "report": {
+        "artifact": {
+          "blake3": "f00938520faf7cc3f24eaa07853ea3a810c974840d337e1dc405b7e2be823276",
+          "bytes": 176833,
+          "config_blake3": "c2ab0b1fdc5e4d18b0009fb53305c31e14fe3a0dbd787a8c8e72b8cc1df8b5ec",
+          "format_version": 3,
+          "iterations": 50,
+          "mode": "full",
+          "node_count": 21618,
+          "path": "/opt/r1/candidate-v3/runs/r1-paired-current/flop-3-candidate/run/solution.sol",
+          "source_storage": "f32",
+          "stored_nodes": 14410
+        },
+        "effective_stack_chips": 60,
+        "ev_offset": [
+          10.0,
+          10.0
+        ],
+        "eval_secs": 0.218437846,
+        "input_hash_secs": 0.00034711,
+        "load_secs": 0.900524316,
+        "par_chance_depth": 2,
+        "par_min_children": 12,
+        "pot_chips": 20,
+        "pre_save_metadata": {
+          "ev": [
+            8.049393706851536,
+            11.950607829623753
+          ],
+          "expl": [
+            0.013658099704318527,
+            0.023040824466281418
+          ],
+          "iterations": 50,
+          "nash_conv": 0.036698924170599945,
+          "storage": "f32",
+          "wall_secs": 8.152878837
+        },
+        "rake": {
+          "kind": "none"
+        },
+        "recomputed": {
+          "br": [
+            8.063050905863443,
+            11.973651144239637
+          ],
+          "ev": [
+            8.049393865797255,
+            11.950607935587565
+          ],
+          "gains": [
+            0.013657040066188841,
+            0.023043208652072877
+          ],
+          "nash_conv": 0.03670024871826172,
+          "profile": "stored_quantized"
+        },
+        "schema": "solvers.research.hu-saved-profile-audit/v1",
+        "threads": 8,
+        "utility": {
+          "kind": "chip-ev"
+        },
+        "value_basis": "subgame_start_utility",
+        "zero_sum_terminal_utility": true
+      },
+      "run_status": "completed",
+      "stage": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 1.1842784499999652,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.0599920069998916,
+          "root_os_peak_resident_bytes": 379736064,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 21,
+          "sampled_peak_tree_resident_bytes": 367616000
+        },
+        "record": {
+          "bytes": 7846,
+          "path": "/opt/r1/current-audits/flop-3-candidate/supervisor.json",
+          "sha256": "57524ddf9b397dec8cdbdfaba4681b61a04781a1fa272c65214f5a586e715090"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 1515,
+          "path": "/opt/r1/current-audits/flop-3-candidate/stdout.log",
+          "sha256": "bddc81babf04e111cb83e934ae630e0eb5aa1d1dcda8afb4546cb4fe308c4379"
+        },
+        "stop_reason": "completed"
+      },
+      "validation": {
+        "exploitability_pct_pot": 0.0917506217956543,
+        "gain_roundoff_lower_bounds": [
+          -1.0806305090586344e-10,
+          -1.1197365114423964e-10
+        ],
+        "gains": [
+          0.013657040066188841,
+          0.023043208652072877
+        ],
+        "inequality": "<",
+        "nash_conv": 0.03670024871826172,
+        "nash_conv_roundoff_lower_bound": -2.2003670205010307e-10,
+        "pre_save_metadata_used_for_quality": false,
+        "quality_status": "pass",
+        "status": "valid",
+        "strategy_kind": "stored_quantized",
+        "target_nash_conv": 0.04
+      },
+      "version": "candidate"
+    }
+  ],
+  "schema": "r1.saved-profile-campaign/v1",
+  "started_at": "2026-09-25T18:30:09Z",
+  "state": "completed"
+}

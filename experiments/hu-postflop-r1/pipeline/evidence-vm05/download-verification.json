@@ -1,0 +1,21 @@
+{
+  "archive_bytes": 11950377,
+  "archive_local_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm05-pipeline.tar.gz",
+  "archive_sha256_actual": "3730bdb23b8cd53d7de70d567bfa897a8f6e3337582622757868c82b86b8cb7e",
+  "archive_sha256_expected": "3730bdb23b8cd53d7de70d567bfa897a8f6e3337582622757868c82b86b8cb7e",
+  "artifact_availability": "All original 747 regular files remain in the local raw bundle. 629 compact members are also copied below this evidence directory. The ignored raw bundle must be retained separately from Git.",
+  "binary_source_evidence": "../../validation/vm05/build-download-verification.json",
+  "bundle_only_file_bytes": 169133895,
+  "bundle_only_file_count": 118,
+  "compact_content_check": "Each destination byte stream equals the verified archive member; existing top-level JSON files matched and were not overwritten.",
+  "compact_file_bytes": 2244291,
+  "compact_file_count": 629,
+  "embedded_manifest_matches_sidecar": true,
+  "expected_file_count": 747,
+  "schema": "solvers.r1-download-verification/v1",
+  "skipped_or_mismatched_bundle_members": 0,
+  "source_manifest_sha256": "7a415c4453dc3b1a086fb26245d3a055d1e75c7903938cd709d795c20bedc954",
+  "verified_at_utc": "2026-09-25T16:35:49.128928+00:00",
+  "verified_file_count": 747,
+  "verified_uncompressed_file_bytes": 171378186
+}

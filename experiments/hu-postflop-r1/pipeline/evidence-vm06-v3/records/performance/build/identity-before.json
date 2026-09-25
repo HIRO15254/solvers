@@ -1,0 +1,173 @@
+{
+  "boot_id": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f",
+  "cache_seed": "/opt/r1/target/current-recovery/release",
+  "compiler_binaries": [
+    {
+      "bytes": 646344,
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+    },
+    {
+      "bytes": 42844376,
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+    }
+  ],
+  "cpu": {
+    "Architecture": "x86_64",
+    "CPU family": "23",
+    "CPU op-mode(s)": "32-bit, 64-bit",
+    "Flags": [
+      "3dnowprefetch",
+      "abm",
+      "adx",
+      "aes",
+      "apic",
+      "arat",
+      "avx",
+      "avx2",
+      "bmi1",
+      "bmi2",
+      "clflush",
+      "clflushopt",
+      "clwb",
+      "clzero",
+      "cmov",
+      "cmp_legacy",
+      "constant_tsc",
+      "cpuid",
+      "cr8_legacy",
+      "cx16",
+      "cx8",
+      "de",
+      "extd_apicid",
+      "f16c",
+      "fma",
+      "fpu",
+      "fsgsbase",
+      "fxsr",
+      "fxsr_opt",
+      "ht",
+      "hypervisor",
+      "ibpb",
+      "ibrs",
+      "lahf_lm",
+      "lm",
+      "mca",
+      "mce",
+      "misalignsse",
+      "mmx",
+      "mmxext",
+      "movbe",
+      "msr",
+      "mtrr",
+      "nonstop_tsc",
+      "nopl",
+      "nx",
+      "osvw",
+      "pae",
+      "pat",
+      "pclmulqdq",
+      "pdpe1gb",
+      "pge",
+      "pni",
+      "popcnt",
+      "pse",
+      "pse36",
+      "rdpid",
+      "rdrand",
+      "rdseed",
+      "rdtscp",
+      "rep_good",
+      "sep",
+      "sha_ni",
+      "smap",
+      "smep",
+      "ssbd",
+      "sse",
+      "sse2",
+      "sse4_1",
+      "sse4_2",
+      "sse4a",
+      "ssse3",
+      "stibp",
+      "syscall",
+      "topoext",
+      "tsc",
+      "tsc_adjust",
+      "tsc_known_freq",
+      "umip",
+      "vme",
+      "vmmcall",
+      "x2apic",
+      "xgetbv1",
+      "xsave",
+      "xsavec",
+      "xsaveerptr",
+      "xsaveopt",
+      "xtopology"
+    ],
+    "Model": "49",
+    "Model name": "AMD EPYC 7B12",
+    "Stepping": "0",
+    "Vendor ID": "AuthenticAMD"
+  },
+  "inputs": [
+    {
+      "bytes": 6647,
+      "path": "/home/PC_User/build-comparison.sh",
+      "sha256": "8ef132778fe8ae199a0a6982d1df9a07a6cc411eb367ff7aa677e9b44d0b6be3"
+    },
+    {
+      "bytes": 861,
+      "path": "/opt/r1/audit-pair-recovery/complete.json",
+      "sha256": "ec99381d612c1b3dc44936c26470ca6bc9bf493e5bafbf0087e7288010cb2d13"
+    },
+    {
+      "bytes": 23430,
+      "path": "/opt/r1/audit-pair-recovery/result.json",
+      "sha256": "3fad2ecac424d18b67c12c4febe6a9928c4ee4bf647c485fa9fbfc789179c05a"
+    },
+    {
+      "bytes": 4249752,
+      "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+      "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932"
+    },
+    {
+      "bytes": 646344,
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+    },
+    {
+      "bytes": 42844376,
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+    },
+    {
+      "bytes": 871630,
+      "path": "/opt/r1/baseline-source.tar.gz",
+      "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+    },
+    {
+      "bytes": 1195310,
+      "path": "/opt/r1/candidate-v3-source.tar.gz",
+      "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970"
+    }
+  ],
+  "old_targets_reused": false,
+  "recorded_at_utc": "2026-09-25T18:01:14.544314+00:00",
+  "schema": "r1.comparison-build-identity/v1",
+  "sources": {
+    "baseline": {
+      "bytes": 871630,
+      "path": "/opt/r1/baseline-source.tar.gz",
+      "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+    },
+    "candidate-v3": {
+      "bytes": 1195310,
+      "path": "/opt/r1/candidate-v3-source.tar.gz",
+      "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970"
+    }
+  },
+  "state": "before"
+}

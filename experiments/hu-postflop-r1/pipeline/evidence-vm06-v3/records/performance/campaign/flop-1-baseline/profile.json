@@ -1,0 +1,86 @@
+{
+  "ev": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 1.5554439170000478,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.058565249999901425,
+      "root_os_peak_resident_bytes": 244760576,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 28,
+      "sampled_peak_tree_resident_bytes": 236576768
+    },
+    "record": {
+      "bytes": 6263,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-baseline/ev/supervisor.json",
+      "sha256": "e213e6f9b76925aee25c358b672106eb3c7c8a5a9536418ef8c6a6d49474c341"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 8842530,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-baseline/ev/stdout.log",
+      "sha256": "dddca33638c5bbb60e48ff6da2214e84d6da424b35fd7d590011224b058213bf"
+    },
+    "stop_reason": "completed"
+  },
+  "strategy": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 1.5085514779998448,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.05953411999985292,
+      "root_os_peak_resident_bytes": 237060096,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 27,
+      "sampled_peak_tree_resident_bytes": 231657472
+    },
+    "record": {
+      "bytes": 6298,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-baseline/strategy/supervisor.json",
+      "sha256": "c45ea96866aa1f755239fe1455f74f6845b88c473f376c76ed2f76fe0a554970"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 5175171,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-baseline/strategy/stdout.log",
+      "sha256": "78a31c55bf72e3c9136f1c58c109d664b4e3d62b13d864f1aed208a86fc15240"
+    },
+    "stop_reason": "completed"
+  },
+  "tree": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.6506790460000502,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.05894834900004753,
+      "root_os_peak_resident_bytes": 236490752,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 12,
+      "sampled_peak_tree_resident_bytes": 235835392
+    },
+    "record": {
+      "bytes": 6274,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-baseline/tree/supervisor.json",
+      "sha256": "251e409332180315908b9a8081b2f8e45d100c27fe704667ee4123196864e6ad"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 2255517,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-baseline/tree/stdout.log",
+      "sha256": "2c51b83cce1d6e620fe72b3f8f9bd47ea23f8b6ed7238854477c33a32bac2c43"
+    },
+    "stop_reason": "completed"
+  }
+}

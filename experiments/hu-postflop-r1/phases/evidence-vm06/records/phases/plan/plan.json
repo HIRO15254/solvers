@@ -1,0 +1,209 @@
+{
+  "baseline": {
+    "binary": {
+      "bytes": 8846520,
+      "path": "/opt/r1/target/phase-baseline/release/solvers",
+      "sha256": "69643569c66f634a85990ff7c7fa9727bda4329184f3c88e20e4f905780ac832"
+    },
+    "instrumented": true,
+    "revision": "9632d8b",
+    "sol_version": 1,
+    "source_evidence": {
+      "bytes": 38923,
+      "path": "/opt/r1/phase-baseline/r1-phase-source-manifest.json",
+      "sha256": "1047dca0daa06664bb313be8260d666721feec8ecae0b46e93cf9421c0e6e7fc"
+    }
+  },
+  "cache_policy": "warm/uncontrolled OS caches; no cache eviction or cold-start claim",
+  "campaign_seconds": 3600,
+  "candidate": {
+    "binary": {
+      "bytes": 8902104,
+      "path": "/opt/r1/target/phase-candidate/release/solvers",
+      "sha256": "2b257ca992d6c98f653144eea5f9d137b5f2cf2bc9c4afcbd4850e715673af5d"
+    },
+    "instrumented": true,
+    "sol_version": 3,
+    "source_evidence": {
+      "bytes": 40806,
+      "path": "/opt/r1/phase-candidate/r1-phase-source-manifest.json",
+      "sha256": "e434aeded22aea5096ac2364751894982270e07824053788e57e0b41b986a6c6"
+    }
+  },
+  "cases": [
+    {
+      "case": "river",
+      "config": {
+        "bytes": 559,
+        "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/river.toml",
+        "sha256": "fe93d87a93ac4c2f8f1554bfdb89c970672b02f55f79962fee5c43b182b246ee"
+      },
+      "iterations": 100,
+      "target_nash_conv": 0.04
+    },
+    {
+      "case": "turn",
+      "config": {
+        "bytes": 548,
+        "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/turn.toml",
+        "sha256": "8326ab75af8a7f1c52a48e8d2edafa7e61649024e69ca5d8c08a9972eaeb9297"
+      },
+      "iterations": 100,
+      "target_nash_conv": 0.04
+    },
+    {
+      "case": "flop",
+      "config": {
+        "bytes": 677,
+        "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/flop.toml",
+        "sha256": "d0fb4ed3f7d3ca9dd04b4599ca37435d70b37520c596e2724d104a672b76cd62"
+      },
+      "iterations": 50,
+      "target_nash_conv": 0.04
+    }
+  ],
+  "created_at": "2026-09-25T18:19:46Z",
+  "host": {
+    "boot_id": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f",
+    "cpuinfo": "processor\t: 0\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 0\ncpu cores\t: 4\napicid\t\t: 0\ninitial apicid\t: 0\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 1\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 1\ncpu cores\t: 4\napicid\t\t: 2\ninitial apicid\t: 2\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 2\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 2\ncpu cores\t: 4\napicid\t\t: 4\ninitial apicid\t: 4\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 3\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 3\ncpu cores\t: 4\napicid\t\t: 6\ninitial apicid\t: 6\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 4\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 0\ncpu cores\t: 4\napicid\t\t: 1\ninitial apicid\t: 1\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 5\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 1\ncpu cores\t: 4\napicid\t\t: 3\ninitial apicid\t: 3\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 6\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 2\ncpu cores\t: 4\napicid\t\t: 5\ninitial apicid\t: 5\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 7\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 3\ncpu cores\t: 4\napicid\t\t: 7\ninitial apicid\t: 7\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:",
+    "hostname": "solvers-r1-20260925-06",
+    "logical_cpus": 8,
+    "machine": "x86_64",
+    "platform": "Linux-7.0.0-1011-gcp-x86_64-with-glibc2.39",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "rayon_num_threads": "8"
+  },
+  "kind": "frozen_plan",
+  "limits": {
+    "disk_reserve_bytes": 10737418240,
+    "grace_seconds": 5,
+    "kill_wait_seconds": 5,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "poll_seconds": 0.05,
+    "timeout_seconds": 600
+  },
+  "order": [
+    "baseline",
+    "candidate",
+    "baseline",
+    "candidate",
+    "baseline",
+    "candidate"
+  ],
+  "phase_research": {
+    "comparison_scope": "three alternating pairs per case in each mode; modes run as separate campaigns",
+    "instrumentation_files": {
+      "applier": {
+        "bytes": 9760,
+        "path": "/opt/r1/phase-tools/apply_instrumentation.py",
+        "sha256": "098e65c6fde9293aefe4f95fb6e27d9d4c42da957995dec076eae35dff12b6cd"
+      },
+      "module_template": {
+        "bytes": 5985,
+        "path": "/opt/r1/phase-tools/r1_phase.rs.in",
+        "sha256": "652471a902a2f695a87db027c42d624311995b85f6c5f649da536c3264de7a33"
+      },
+      "source_versions": {
+        "bytes": 40762,
+        "path": "/opt/r1/phase-tools/source-versions.json",
+        "sha256": "e4db9890e947a34835a966221ce23b318a4e2786844dd96c86779059f303b64f"
+      },
+      "validator": {
+        "bytes": 3027,
+        "path": "/opt/r1/phase-tools/validate_phase.py",
+        "sha256": "a0ce8de48d6d975d7bd41ef0eeb1fe3663035b88e540756f21857fcbb8e2f2d8"
+      },
+      "wrapper": {
+        "bytes": 19216,
+        "path": "/opt/r1/phase-tools/run_phases.py",
+        "sha256": "b2f877703c75d53f6da6556fb091000ee30a5e0512e12a005728b01fe7fe7b28"
+      }
+    },
+    "instrumentation_id": "aa81ca3e10c1beba324a8d42483294ca54a8b3fe852970a9f924da44fd2e5a3a",
+    "instrumented_pilot_performed": false,
+    "modes": [
+      "on",
+      "off"
+    ],
+    "original_pilot": {
+      "bytes": 28883,
+      "path": "/opt/r1/candidate-v3/runs/r1-pilot/pilot.json",
+      "sha256": "6f0f1d073b7fa3b6c589b79853bb17636195d159652ab2823b70c5ee1a5f877b"
+    },
+    "original_plan": {
+      "bytes": 13808,
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/plan.json",
+      "sha256": "7f3f3c60fec7d926b73f8b27d4f562a72fbc5ee47a18dcad73117131392a3d6a"
+    },
+    "original_versions": {
+      "baseline": {
+        "binary": {
+          "bytes": 8813904,
+          "path": "/opt/r1/target/baseline/release/solvers",
+          "sha256": "77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8"
+        },
+        "revision": "9632d8b",
+        "sol_version": 1,
+        "source_evidence": {
+          "bytes": 871630,
+          "path": "/opt/r1/baseline-source.tar.gz",
+          "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+        }
+      },
+      "candidate": {
+        "binary": {
+          "bytes": 8868960,
+          "path": "/opt/r1/target/candidate-v3/release/solvers",
+          "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+        },
+        "sol_version": 3,
+        "source_evidence": {
+          "bytes": 1195310,
+          "path": "/opt/r1/candidate-v3-source.tar.gz",
+          "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970"
+        }
+      }
+    },
+    "phase_scope": "solve stages only; export and resume have R1_PHASE_OUTPUT unset",
+    "pilot_scope": "conditions inherited from original uninstrumented pilot; no new pilot claimed",
+    "schema": "r1.phase-campaign/v1"
+  },
+  "pilot": {
+    "bytes": 28883,
+    "path": "/opt/r1/candidate-v3/runs/r1-pilot/pilot.json",
+    "sha256": "6f0f1d073b7fa3b6c589b79853bb17636195d159652ab2823b70c5ee1a5f877b"
+  },
+  "profile_equality": "exact JSON export bytes, all stored nodes with positive own reach",
+  "quality_scope": "internal synthetic game; not R0 external reference certification",
+  "repetitions_per_binary": 3,
+  "resume_scope": "restore completed iteration cap; no additional CFR iterations",
+  "runner": {
+    "bytes": 29831,
+    "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+    "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e"
+  },
+  "schema": "solvers.r1-pipeline/v1",
+  "summary_equality_fields": [
+    "board",
+    "pot",
+    "effective_stack",
+    "min_bet",
+    "iterations",
+    "ev_oop",
+    "ev_ip",
+    "expl_oop",
+    "expl_ip",
+    "nash_conv",
+    "storage",
+    "streets_stored",
+    "nodes",
+    "stored_nodes"
+  ],
+  "summary_poll_seconds": 0.001,
+  "supervisor": {
+    "bytes": 39015,
+    "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+    "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+  }
+}

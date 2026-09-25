@@ -1,0 +1,91 @@
+{
+  "audit-source.tar.gz": {
+    "bytes": 1213908,
+    "path": "/opt/r1/audit-source.tar.gz",
+    "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+  },
+  "baseline-source.tar.gz": {
+    "bytes": 871630,
+    "path": "/opt/r1/baseline-source.tar.gz",
+    "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+  },
+  "compiler_binaries": [
+    {
+      "bytes": 646344,
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+    },
+    {
+      "bytes": 42844376,
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+    }
+  ],
+  "current_example": {
+    "bytes": 4283728,
+    "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+    "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+  },
+  "immutable_inputs": [
+    {
+      "bytes": 16036,
+      "path": "/home/PC_User/build-audit-pair.sh",
+      "sha256": "be959f4f9c5d989c55284eba5f0b58fb149e7fddc38ffdaf51c50c6c5bd29068"
+    },
+    {
+      "bytes": 1213908,
+      "path": "/opt/r1/audit-source.tar.gz",
+      "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+    },
+    {
+      "bytes": 871630,
+      "path": "/opt/r1/baseline-source.tar.gz",
+      "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+    },
+    {
+      "bytes": 8327,
+      "path": "/opt/r1/audit-tools/apply_baseline_audit.py",
+      "sha256": "def24ee3feabfb6467165f99cb7da5e5f4674f6ab19f8ee8a06f357e20d0ea03"
+    },
+    {
+      "bytes": 19599,
+      "path": "/opt/r1/audit-tools/source-pins.json",
+      "sha256": "b97d29d7e581bd05d1a331966fc3180ab26ece84f2dc9131a2bb34ae61c746eb"
+    },
+    {
+      "bytes": 8949,
+      "path": "/opt/r1/audit-tools/audit_shared.rs.in",
+      "sha256": "61811547059257d2d3b8bbe1335ceaa8b41d07114719e7cbf8b4f8e20519ee90"
+    },
+    {
+      "bytes": 734,
+      "path": "/opt/r1/audit-tools/audit_example.rs.in",
+      "sha256": "23ffbfa69846696c0e025bc8cbd5b2b68c3add006291827ba7dca3203ebbe317"
+    },
+    {
+      "bytes": 4550,
+      "path": "/opt/r1/audit-tools/baseline_adapter.rs.in",
+      "sha256": "af3475238198741c858d4bb12f31ea4c0a2516824885ae1512667dfd8f761b10"
+    },
+    {
+      "bytes": 6152,
+      "path": "/opt/r1/audit-tools/test_apply_baseline_audit.py",
+      "sha256": "3fb2fe442ab4cccd02a6535db65e62cbd43680aa7d420bdc0fc78874ba352ab1"
+    },
+    {
+      "bytes": 6803,
+      "path": "/opt/r1/audit-tools/README.md",
+      "sha256": "5d87bbf801c5f9b8ced67bbe0b20f17213a36ff47e62ef0095f98e5182f0a14a"
+    },
+    {
+      "bytes": 39015,
+      "path": "/opt/r1/audit-source/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+    }
+  ],
+  "source06_solvers_not_paired_benchmark": {
+    "bytes": 9039176,
+    "path": "/opt/r1/target/current/release/solvers",
+    "sha256": "8def6f2d0bf88f94cc92b7b5a8dfee46684e6fdaca7ccd5be4ac186f6994fefc"
+  }
+}

@@ -1,0 +1,102 @@
++ rustc -Vv
+rustc 1.97.0 (2d8144b78 2026-07-07)
+binary: rustc
+commit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3
+commit-date: 2026-07-07
+host: x86_64-unknown-linux-gnu
+release: 1.97.0
+LLVM version: 22.1.6
++ cargo -V
+cargo 1.97.0 (c980f4866 2026-06-30)
++ uname -a
+Linux solvers-r1-20260925-06 7.0.0-1011-gcp #11~24.04.1-Ubuntu SMP PREEMPT Tue Aug 11 20:14:48 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
++ lscpu
+Architecture:                            x86_64
+CPU op-mode(s):                          32-bit, 64-bit
+Address sizes:                           48 bits physical, 48 bits virtual
+Byte Order:                              Little Endian
+CPU(s):                                  8
+On-line CPU(s) list:                     0-7
+Vendor ID:                               AuthenticAMD
+BIOS Vendor ID:                          Google
+Model name:                              AMD EPYC 7B12
+BIOS Model name:                           CPU @ 2.0GHz
+BIOS CPU family:                         1
+CPU family:                              23
+Model:                                   49
+Thread(s) per core:                      2
+Core(s) per socket:                      4
+Socket(s):                               1
+Stepping:                                0
+BogoMIPS:                                4499.99
+Flags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid
+Hypervisor vendor:                       KVM
+Virtualization type:                     full
+L1d cache:                               128 KiB (4 instances)
+L1i cache:                               128 KiB (4 instances)
+L2 cache:                                2 MiB (4 instances)
+L3 cache:                                16 MiB (1 instance)
+NUMA node(s):                            1
+NUMA node0 CPU(s):                       0-7
+Vulnerability Gather data sampling:      Not affected
+Vulnerability Ghostwrite:                Not affected
+Vulnerability Indirect target selection: Not affected
+Vulnerability Itlb multihit:             Not affected
+Vulnerability L1tf:                      Not affected
+Vulnerability Mds:                       Not affected
+Vulnerability Meltdown:                  Not affected
+Vulnerability Mmio stale data:           Not affected
+Vulnerability Old microcode:             Not affected
+Vulnerability Reg file data sampling:    Not affected
+Vulnerability Retbleed:                  Mitigation; untrained return thunk; SMT enabled with STIBP protection
+Vulnerability Spec rstack overflow:      Mitigation; Safe RET
+Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl
+Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:                Mitigation; Retpolines; IBPB conditional; STIBP always-on; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected
+Vulnerability Srbds:                     Not affected
+Vulnerability Tsa:                       Not affected
+Vulnerability Tsx async abort:           Not affected
+Vulnerability Vmscape:                   Not affected
++ sha256sum Cargo.lock .cargo/config.toml /opt/r1/baseline-source.tar.gz
+a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1  Cargo.lock
+144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21  .cargo/config.toml
+fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197  /opt/r1/baseline-source.tar.gz
++ /usr/bin/time -v cargo build --locked --release -p cli --bin solvers
+   Compiling cards v0.1.0 (/opt/r1/baseline/crates/cards)
+   Compiling hand-index v0.1.0 (/opt/r1/baseline/crates/hand-index)
+   Compiling engine v0.1.0 (/opt/r1/baseline/crates/engine)
+   Compiling abstraction v0.1.0 (/opt/r1/baseline/crates/abstraction)
+   Compiling game v0.1.0 (/opt/r1/baseline/crates/game)
+   Compiling holdem v0.1.0 (/opt/r1/baseline/crates/holdem)
+   Compiling preflop v0.1.0 (/opt/r1/baseline/crates/preflop)
+   Compiling multiway v0.1.0 (/opt/r1/baseline/crates/multiway)
+   Compiling formats v0.1.0 (/opt/r1/baseline/crates/formats)
+   Compiling cli v0.1.0 (/opt/r1/baseline/crates/cli)
+    Finished `release` profile [optimized] target(s) in 1m 27s
+	Command being timed: "cargo build --locked --release -p cli --bin solvers"
+	User time (seconds): 126.06
+	System time (seconds): 3.56
+	Percent of CPU this job got: 147%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:27.68
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 888404
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 37
+	Minor (reclaiming a frame) page faults: 1081412
+	Voluntary context switches: 1821
+	Involuntary context switches: 599
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 264008
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
++ sha256sum /opt/r1/target/baseline/release/solvers
+77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8  /opt/r1/target/baseline/release/solvers
++ date -u --iso-8601=seconds
+2026-09-25T18:02:42+00:00

@@ -1,0 +1,249 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T18:34:49.525054+00:00",
+  "argv": [
+    "/opt/r1/target/candidate-v3/release/solvers",
+    "export",
+    "/opt/r1/diagnostic-017/run/solution.sol",
+    "summary",
+    "--output",
+    "/opt/r1/diagnostic-017/summary.json"
+  ],
+  "cwd": "/opt/r1/candidate-v3",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 600.0,
+    "grace_seconds": 5.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.1,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "disk_reserve_bytes": 10737418240
+  },
+  "runtime": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-7.0.0-1011-gcp-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "logical_cpus": 8
+  },
+  "outputs": {
+    "stdout": {
+      "path": "/opt/r1/diagnostic-017/stages/export_summary/stdout.log",
+      "sha256": "a13baa273d163ee609d7f4a71e196503069f82ebde90637032738c1e047944b5",
+      "bytes": 42
+    },
+    "stderr": {
+      "path": "/opt/r1/diagnostic-017/stages/export_summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "samples": {
+      "path": "/opt/r1/diagnostic-017/stages/export_summary/supervisor.samples.jsonl",
+      "sha256": "62aedb5ef78abd71650bf9c11fc39dc219c43635fefc18a4fda108e0363338c6",
+      "bytes": 325
+    }
+  },
+  "identity_before": [
+    {
+      "path": "/opt/r1/target/candidate-v3/release/solvers",
+      "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521",
+      "bytes": 8868960
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/home/PC_User/run-diagnostic.py",
+      "sha256": "933f1313e00e8ad06f765592c402ccc068668d6323c817cc69ebe2486db44504",
+      "bytes": 14263
+    },
+    {
+      "path": "/home/PC_User/diagnostic017-input.tar.gz",
+      "sha256": "da6c44d7d09cf97342a5f82d9698ae4eaa511d21b4eabe3e6b05ccef962264b2",
+      "bytes": 23974
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/check_diagnostic.py",
+      "sha256": "727231d94dae4c25d6305353f50d945b5d3fe1d525ba53c1e3343df18d3c67e5",
+      "bytes": 14500
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/check_ranges.py",
+      "sha256": "7457b5c7e8fd415cfd75344b6dcca45dda3f71c0d5c22ce34f681ea62b9a603e",
+      "bytes": 5948
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/diagnostic.toml",
+      "sha256": "597c43241721fa4743e3fbe7aa6e8fa67f7aebc67bcece988f18b4e63d192e1d",
+      "bytes": 10563
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/ip-range.txt",
+      "sha256": "d259fb6476ddf1d3bd31c8c6ef278cea02c764ebeecef93a0677fd3b7e203661",
+      "bytes": 3585
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/observed.json",
+      "sha256": "de306599f10fe79456e60484ee79a210e365437e0bf1fc98690aedb6acedc76c",
+      "bytes": 18128
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/oop-range.txt",
+      "sha256": "f1f77d65d20c7103a65b10ca936baa3077aeeff4766d8724850481b94921f35b",
+      "bytes": 5493
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/range-integrity.json",
+      "sha256": "44abc4f3bab480732d00f413ffe1d4fa388fe9bd93da78277a52e7e32646c530",
+      "bytes": 1831
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/README.md",
+      "sha256": "f3ed91154abbc4cd55a6a8cd91099340b17f440b32743070756a4eadfce11fbc",
+      "bytes": 10930
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/test_check_diagnostic.py",
+      "sha256": "053cd3268ffcf19ab9aa120553962d57d30357743286bdfb8e7a0ac8d3d3dcee",
+      "bytes": 6973
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "/opt/r1/target/candidate-v3/release/solvers",
+      "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521",
+      "bytes": 8868960
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/home/PC_User/run-diagnostic.py",
+      "sha256": "933f1313e00e8ad06f765592c402ccc068668d6323c817cc69ebe2486db44504",
+      "bytes": 14263
+    },
+    {
+      "path": "/home/PC_User/diagnostic017-input.tar.gz",
+      "sha256": "da6c44d7d09cf97342a5f82d9698ae4eaa511d21b4eabe3e6b05ccef962264b2",
+      "bytes": 23974
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/check_diagnostic.py",
+      "sha256": "727231d94dae4c25d6305353f50d945b5d3fe1d525ba53c1e3343df18d3c67e5",
+      "bytes": 14500
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/check_ranges.py",
+      "sha256": "7457b5c7e8fd415cfd75344b6dcca45dda3f71c0d5c22ce34f681ea62b9a603e",
+      "bytes": 5948
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/diagnostic.toml",
+      "sha256": "597c43241721fa4743e3fbe7aa6e8fa67f7aebc67bcece988f18b4e63d192e1d",
+      "bytes": 10563
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/ip-range.txt",
+      "sha256": "d259fb6476ddf1d3bd31c8c6ef278cea02c764ebeecef93a0677fd3b7e203661",
+      "bytes": 3585
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/observed.json",
+      "sha256": "de306599f10fe79456e60484ee79a210e365437e0bf1fc98690aedb6acedc76c",
+      "bytes": 18128
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/oop-range.txt",
+      "sha256": "f1f77d65d20c7103a65b10ca936baa3077aeeff4766d8724850481b94921f35b",
+      "bytes": 5493
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/range-integrity.json",
+      "sha256": "44abc4f3bab480732d00f413ffe1d4fa388fe9bd93da78277a52e7e32646c530",
+      "bytes": 1831
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/README.md",
+      "sha256": "f3ed91154abbc4cd55a6a8cd91099340b17f440b32743070756a4eadfce11fbc",
+      "bytes": 10930
+    },
+    {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-017/test_check_diagnostic.py",
+      "sha256": "053cd3268ffcf19ab9aa120553962d57d30357743286bdfb8e7a0ac8d3d3dcee",
+      "bytes": 6973
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 1,
+    "max_sample_gap_seconds": 0.0,
+    "sampled_peak_tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 22552576,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "max_observed_processes": 0
+  },
+  "containment": {
+    "kind": "posix_session_process_group",
+    "limitations": [
+      "setsid/setpgid can escape this process group; use a systemd/cgroup wrapper",
+      "supervisor SIGKILL, host failure or power loss does not kill the group",
+      "resident memory is sampled /proc RSS; brief descendants may be missed",
+      "summed RSS can double-count shared pages; this is not cgroup memory.current",
+      "wait4 root peak can include reaped descendant high-water marks; it is not a simultaneous tree peak"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 67419471872,
+    "available_bytes": 66329907200
+  },
+  "resolved_argv": [
+    "/opt/r1/target/candidate-v3/release/solvers",
+    "export",
+    "/opt/r1/diagnostic-017/run/solution.sol",
+    "summary",
+    "--output",
+    "/opt/r1/diagnostic-017/summary.json"
+  ],
+  "disk_path": "/opt/r1/diagnostic-017",
+  "disk_free_before_bytes": 92316426240,
+  "started_at": "2026-09-25T18:34:49.567560+00:00",
+  "pid": 10836,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 22552576,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "elapsed_seconds": 0.014691049000248313,
+    "at": "2026-09-25T18:34:49.589804+00:00",
+    "host_available_memory_bytes": 66329911296,
+    "disk_free_bytes": 92316413952
+  },
+  "elapsed_seconds": 0.022391079000044556,
+  "ended_at": "2026-09-25T18:34:49.589995+00:00",
+  "supervisor_exit_code": 0
+}

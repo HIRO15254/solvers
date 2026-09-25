@@ -1,0 +1,305 @@
+{
+  "artifacts": {
+    "checkpoint.ckpt": {
+      "bytes": 81330,
+      "header": {
+        "embedded_config_blake3": "1cb01bc0d6fb3dfcd2d6df5e0fb04edab1f1232bc7a445dbc725265fe835eefb",
+        "iteration": 100,
+        "version": 1
+      },
+      "path": "/opt/r1/phase-on/river-2-candidate/run/checkpoint.ckpt",
+      "sha256": "4368dea0bba411e864429201167ddfef78bd6c12c642c93636fddb10a1eabe26"
+    },
+    "progress.jsonl": {
+      "bytes": 550,
+      "path": "/opt/r1/phase-on/river-2-candidate/run/progress.jsonl",
+      "sha256": "ae95c7e28a7c87287d6f5e4c27b86379c7ca49eb7aa0e9a50887791e5567665c"
+    },
+    "run.json": {
+      "bytes": 177,
+      "path": "/opt/r1/phase-on/river-2-candidate/run/run.json",
+      "sha256": "97511d092fc6955b4acac950b24f3e046f3da618dba728f2bbf074e8c87b724f"
+    },
+    "run.toml": {
+      "bytes": 693,
+      "path": "/opt/r1/phase-on/river-2-candidate/run/run.toml",
+      "sha256": "db2a7c2c6ba87ffaf87291250538bb79b5cea60bc7e9fa09c9ecc3e47c5a0cab"
+    },
+    "solution.sol": {
+      "bytes": 7609,
+      "header": {
+        "embedded_config_blake3": "1cb01bc0d6fb3dfcd2d6df5e0fb04edab1f1232bc7a445dbc725265fe835eefb",
+        "iteration": 100,
+        "version": 3
+      },
+      "path": "/opt/r1/phase-on/river-2-candidate/run/solution.sol",
+      "sha256": "63c2212ff3969cbac1b7af0960ace419dae8cb920cb095f0402718a8f9b58c3d"
+    }
+  },
+  "case": "river",
+  "expected_iterations": 100,
+  "expected_sol_version": 3,
+  "internal_target": {
+    "exploitability_pct_pot": 0.07437514724032535,
+    "g_i": [
+      0.012880653853740931,
+      0.016869405042389207
+    ],
+    "inequality": "<",
+    "nash_conv": 0.029750058896130138,
+    "scope": "internal finite synthetic game only",
+    "source": "run.json final live solver result",
+    "status": "pass",
+    "strategy_kind": "live_average",
+    "target_nash_conv": 0.04
+  },
+  "live_final": {
+    "g_i": [
+      0.012880653853740931,
+      0.016869405042389207
+    ],
+    "iterations": 100,
+    "nash_conv": 0.029750058896130138,
+    "pot": 20
+  },
+  "missing_fields": [
+    "saved_quantized_profile_br",
+    "monotonic_internal_phase_spans",
+    "external_reference_condition_match_and_thresholds"
+  ],
+  "phase_timings": {
+    "br_final": null,
+    "cfr": null,
+    "initialization": null,
+    "persistence": null,
+    "return": null
+  },
+  "presave_consistency": "pass",
+  "profile": {
+    "ev": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.021818999000061012,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 0,
+        "max_sample_gap_seconds": 0.0,
+        "root_os_peak_resident_bytes": 25608192,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 1,
+        "sampled_peak_tree_resident_bytes": 0
+      },
+      "record": {
+        "bytes": 8941,
+        "path": "/opt/r1/phase-on/river-2-candidate/ev/supervisor.json",
+        "sha256": "9b688941d886dfd92ba17b40af87daa4e3e11d91da7c35c8326172d2abc2ee54"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 136727,
+        "path": "/opt/r1/phase-on/river-2-candidate/ev/stdout.log",
+        "sha256": "2c1fa0b29271c1fb51c81b44d82f5bba0dccd4c048c1e0f095a00be9c83de88a"
+      },
+      "stop_reason": "completed"
+    },
+    "strategy": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.02232255900025848,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 0,
+        "max_sample_gap_seconds": 0.0,
+        "root_os_peak_resident_bytes": 25591808,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 1,
+        "sampled_peak_tree_resident_bytes": 0
+      },
+      "record": {
+        "bytes": 8976,
+        "path": "/opt/r1/phase-on/river-2-candidate/strategy/supervisor.json",
+        "sha256": "0bf7555546c9fea7a4d3375b158d0061f7484e8005caf003e574e995dfe0241e"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 105272,
+        "path": "/opt/r1/phase-on/river-2-candidate/strategy/stdout.log",
+        "sha256": "89714baf73bed349c976ac0787c5e6d98cc74094d9fe0fba23eb6c8e9b884d12"
+      },
+      "stop_reason": "completed"
+    },
+    "tree": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.021658089000084146,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 0,
+        "max_sample_gap_seconds": 0.0,
+        "root_os_peak_resident_bytes": 25559040,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 1,
+        "sampled_peak_tree_resident_bytes": 0
+      },
+      "record": {
+        "bytes": 8951,
+        "path": "/opt/r1/phase-on/river-2-candidate/tree/supervisor.json",
+        "sha256": "c9bef2cf8a788a220ff4530d0d0f73de442bea4db2770b07985201fc7ebc1727"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 1723,
+        "path": "/opt/r1/phase-on/river-2-candidate/tree/stdout.log",
+        "sha256": "a1b301055e7a45c6f23188e7a30ef2f1803949dc98abb0ed30ee0a40fa14d2b8"
+      },
+      "stop_reason": "completed"
+    }
+  },
+  "quality_status": "not_evaluated",
+  "repetition": 2,
+  "resume": null,
+  "run_status": "completed",
+  "saved_profile_br": "not_evaluated",
+  "solve": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.25938309000002846,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.057837697000195476,
+      "root_os_peak_resident_bytes": 25542656,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 5,
+      "sampled_peak_tree_resident_bytes": 10887168
+    },
+    "r1_phase": {
+      "mode": "on",
+      "record": {
+        "bytes": 6080,
+        "path": "/opt/r1/phase-on/river-2-candidate/solve/phase.json",
+        "sha256": "96eb343d662ceaf48c9bc118db9fc8fc0be3f2e91331c30c07f4931b268a6cf3"
+      },
+      "status": "validated",
+      "summary": {
+        "cfr_inclusive_envelope": {
+          "add_to_leaf_sum": false,
+          "duration_ns": 150588954,
+          "end_ns": 179296333,
+          "start_ns": 28707379
+        },
+        "instrumentation_id": "aa81ca3e10c1beba324a8d42483294ca54a8b3fe852970a9f924da44fd2e5a3a",
+        "leaves": {
+          "cfr_updates": {
+            "calls": 4,
+            "duration_ns": 103422066
+          },
+          "checkpoint": {
+            "calls": 4,
+            "duration_ns": 51005167
+          },
+          "final_ev_br": {
+            "calls": 1,
+            "duration_ns": 604710
+          },
+          "initialization": {
+            "calls": 1,
+            "duration_ns": 1702390
+          },
+          "input_preparation": {
+            "calls": 1,
+            "duration_ns": 12696790
+          },
+          "overhead": {
+            "calls": 17,
+            "duration_ns": 21266650
+          },
+          "periodic_ev_br": {
+            "calls": 4,
+            "duration_ns": 6442460
+          },
+          "sol_preparation": {
+            "calls": 1,
+            "duration_ns": 2140620
+          },
+          "sol_serialization_and_write": {
+            "calls": 1,
+            "duration_ns": 7909949
+          },
+          "summary_publish": {
+            "calls": 1,
+            "duration_ns": 10160
+          }
+        },
+        "source_version": "candidate03",
+        "total_ns": 207200962
+      }
+    },
+    "record": {
+      "bytes": 9204,
+      "path": "/opt/r1/phase-on/river-2-candidate/solve/supervisor.json",
+      "sha256": "678115b32fdc284e0e714785421886b196a5123a5267033870beb87b25a5f157"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 601,
+      "path": "/opt/r1/phase-on/river-2-candidate/solve/stdout.log",
+      "sha256": "98d0cc4069818a3fb6b3738daa7c8886e29239d96e853b8b4822380bbd7322fa"
+    },
+    "stop_reason": "completed"
+  },
+  "summary": {
+    "board": "2c 7d 9h Js Qs",
+    "effective_stack": 60,
+    "ev_ip": 6.128177549428161,
+    "ev_oop": 13.871822359286634,
+    "expl_ip": 0.016869405042389207,
+    "expl_oop": 0.012880653853740931,
+    "iterations": 100,
+    "min_bet": 1,
+    "nash_conv": 0.029750058896130138,
+    "nodes": 27,
+    "pot": 20,
+    "storage": "f32",
+    "stored_nodes": 10,
+    "streets_stored": "full",
+    "wall_secs": 0.161281114
+  },
+  "summary_read": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.023466398999971716,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 0,
+      "max_sample_gap_seconds": 0.0,
+      "root_os_peak_resident_bytes": 25542656,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 1,
+      "sampled_peak_tree_resident_bytes": 0
+    },
+    "record": {
+      "bytes": 9350,
+      "path": "/opt/r1/phase-on/river-2-candidate/summary/supervisor.json",
+      "sha256": "3aabade2a7e92e2e8a274d135d7dd3954d2256459898af1941a8e774f0a05bf8"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 390,
+      "path": "/opt/r1/phase-on/river-2-candidate/summary/stdout.log",
+      "sha256": "9cb423ba4c65e6c32434ff66887b78c39e45032acbe01563eca4ef5299cb40f3"
+    },
+    "stop_reason": "completed"
+  },
+  "version": "candidate"
+}

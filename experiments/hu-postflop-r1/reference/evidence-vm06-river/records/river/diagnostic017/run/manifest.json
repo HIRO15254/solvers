@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "runId": "run",
+  "state": "completed",
+  "gameKind": "postflop",
+  "configSchema": "solvers.postflop/v1",
+  "configHash": "340930c91b623668f2a8fbb46ab0d5db22cc517910a247483de8b6c01f7babb8",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/opt/r1/river-diagnostic-inputs/HU-R0-017/diagnostic.toml",
+    "--out",
+    "/opt/r1/diagnostic-017/run"
+  ],
+  "pid": 10823,
+  "createdUnixMs": 1790361280958,
+  "startedUnixMs": 1790361280958,
+  "finishedUnixMs": 1790361289157,
+  "failure": null,
+  "completion": "completed"
+}

@@ -1,0 +1,62 @@
+{
+  "mode": "on",
+  "record": {
+    "bytes": 7072,
+    "path": "/opt/r1/phase-on/flop-1-candidate/solve/phase.json",
+    "sha256": "e7fa16c2e9127e00bedc7355851dc41c0e3733f13c21e50a9ff0a17c3df68932"
+  },
+  "status": "validated",
+  "summary": {
+    "cfr_inclusive_envelope": {
+      "add_to_leaf_sum": false,
+      "duration_ns": 8588075892,
+      "end_ns": 8713004277,
+      "start_ns": 124928385
+    },
+    "instrumentation_id": "aa81ca3e10c1beba324a8d42483294ca54a8b3fe852970a9f924da44fd2e5a3a",
+    "leaves": {
+      "cfr_updates": {
+        "calls": 5,
+        "duration_ns": 7263435615
+      },
+      "checkpoint": {
+        "calls": 5,
+        "duration_ns": 702272792
+      },
+      "final_ev_br": {
+        "calls": 1,
+        "duration_ns": 71980788
+      },
+      "initialization": {
+        "calls": 1,
+        "duration_ns": 102226286
+      },
+      "input_preparation": {
+        "calls": 1,
+        "duration_ns": 9329740
+      },
+      "overhead": {
+        "calls": 20,
+        "duration_ns": 65641026
+      },
+      "periodic_ev_br": {
+        "calls": 5,
+        "duration_ns": 941667404
+      },
+      "sol_preparation": {
+        "calls": 1,
+        "duration_ns": 1255871060
+      },
+      "sol_serialization_and_write": {
+        "calls": 1,
+        "duration_ns": 295200768
+      },
+      "summary_publish": {
+        "calls": 1,
+        "duration_ns": 35329
+      }
+    },
+    "source_version": "candidate03",
+    "total_ns": 10707660808
+  }
+}

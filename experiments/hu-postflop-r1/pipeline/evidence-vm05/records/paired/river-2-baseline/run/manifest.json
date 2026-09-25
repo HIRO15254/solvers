@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "runId": "run",
+  "state": "completed",
+  "gameKind": "postflop",
+  "configSchema": "solvers.postflop/v1",
+  "configHash": "33ceafd2eb06127f2630af97d60681c37b8a9cdcdf3af5317bef205c2d174422",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/river.toml",
+    "--out",
+    "/opt/r1/current/runs/r1-paired/river-2-baseline/run"
+  ],
+  "pid": 22620,
+  "createdUnixMs": 1790353450892,
+  "startedUnixMs": 1790353450892,
+  "finishedUnixMs": 1790353451020,
+  "failure": null,
+  "completion": "completed"
+}

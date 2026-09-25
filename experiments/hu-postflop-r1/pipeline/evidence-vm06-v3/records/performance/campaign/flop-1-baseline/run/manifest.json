@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "runId": "run",
+  "state": "completed",
+  "gameKind": "postflop",
+  "configSchema": "solvers.postflop/v1",
+  "configHash": "9d9fc768e4fd84ace9ffd9e2a991fd19ac94de28496bbf92579506a31966181c",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/flop.toml",
+    "--out",
+    "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-1-baseline/run"
+  ],
+  "pid": 6372,
+  "createdUnixMs": 1790359522608,
+  "startedUnixMs": 1790359522608,
+  "finishedUnixMs": 1790359534781,
+  "failure": null,
+  "completion": "completed"
+}

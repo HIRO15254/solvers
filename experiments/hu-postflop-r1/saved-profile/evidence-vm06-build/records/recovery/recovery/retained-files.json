@@ -1,0 +1,182 @@
+{
+  "00-toolchain/stderr.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-recovery/00-toolchain/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "00-toolchain/stdout.log": {
+    "bytes": 3723,
+    "path": "/opt/r1/audit-pair-recovery/00-toolchain/stdout.log",
+    "sha256": "fdd073980265a82fa0e669a97e37616c535eb39946accab80c30444200ae02a4"
+  },
+  "00-toolchain/supervisor.json": {
+    "bytes": 34022,
+    "path": "/opt/r1/audit-pair-recovery/00-toolchain/supervisor.json",
+    "sha256": "680042627fc1a4c4ca8a7462241d58c5e2a639fe72024dd2a005be55a4c3211c"
+  },
+  "00-toolchain/supervisor.samples.jsonl": {
+    "bytes": 1888,
+    "path": "/opt/r1/audit-pair-recovery/00-toolchain/supervisor.samples.jsonl",
+    "sha256": "e869696ae6c4cf24e491558b3b6fafa66032872fec7dbad41b93ad2bcd176016"
+  },
+  "01-baseline-pre-verify/stderr.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-recovery/01-baseline-pre-verify/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "01-baseline-pre-verify/stdout.log": {
+    "bytes": 300,
+    "path": "/opt/r1/audit-pair-recovery/01-baseline-pre-verify/stdout.log",
+    "sha256": "c22c8151971687fec157ad5693e4cd5c437afbcadfb35c4955843f003612c0a9"
+  },
+  "01-baseline-pre-verify/supervisor.json": {
+    "bytes": 33836,
+    "path": "/opt/r1/audit-pair-recovery/01-baseline-pre-verify/supervisor.json",
+    "sha256": "750ee964c47a87a574f5edd16b78ae982bc692d2d4322e0797fa0a04fe764273"
+  },
+  "01-baseline-pre-verify/supervisor.samples.jsonl": {
+    "bytes": 940,
+    "path": "/opt/r1/audit-pair-recovery/01-baseline-pre-verify/supervisor.samples.jsonl",
+    "sha256": "062432be27216b0e9b9a008eb03d3610ffd236138fa85e0d1b9ddcad31a21870"
+  },
+  "06-current-release/stderr.log": {
+    "bytes": 3373,
+    "path": "/opt/r1/audit-pair-recovery/06-current-release/stderr.log",
+    "sha256": "c28a89fff070846ce138a9ec981554d3dc4fe29bb9063328ae7160bf48215ca3"
+  },
+  "06-current-release/stdout.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-recovery/06-current-release/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "06-current-release/supervisor.json": {
+    "bytes": 33901,
+    "path": "/opt/r1/audit-pair-recovery/06-current-release/supervisor.json",
+    "sha256": "e4fde401ce90c20c5d25e1ef3f3a41573bed128a9739f807e486ab29c3e3f936"
+  },
+  "06-current-release/supervisor.samples.jsonl": {
+    "bytes": 148835,
+    "path": "/opt/r1/audit-pair-recovery/06-current-release/supervisor.samples.jsonl",
+    "sha256": "b0c17c4e29fdcd2b9544c1c4c10951ae89ad13054f135846a1adc22bfd1a85ac"
+  },
+  "06-current-toolchain-check/stderr.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-recovery/06-current-toolchain-check/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "06-current-toolchain-check/stdout.log": {
+    "bytes": 3723,
+    "path": "/opt/r1/audit-pair-recovery/06-current-toolchain-check/stdout.log",
+    "sha256": "fdd073980265a82fa0e669a97e37616c535eb39946accab80c30444200ae02a4"
+  },
+  "06-current-toolchain-check/supervisor.json": {
+    "bytes": 34854,
+    "path": "/opt/r1/audit-pair-recovery/06-current-toolchain-check/supervisor.json",
+    "sha256": "a7f405706b9f51ff7236a128362d9765199082591a7ad3e32224178a61aead55"
+  },
+  "06-current-toolchain-check/supervisor.samples.jsonl": {
+    "bytes": 632,
+    "path": "/opt/r1/audit-pair-recovery/06-current-toolchain-check/supervisor.samples.jsonl",
+    "sha256": "d9d1f4d5900f3bff8a8e71ea74bde37afd81e7c67fc9c6c218b9d0c2ee859081"
+  },
+  "07-seed-baseline-cache/stderr.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-recovery/07-seed-baseline-cache/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "07-seed-baseline-cache/stdout.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-recovery/07-seed-baseline-cache/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "07-seed-baseline-cache/supervisor.json": {
+    "bytes": 35081,
+    "path": "/opt/r1/audit-pair-recovery/07-seed-baseline-cache/supervisor.json",
+    "sha256": "af38c04cf9a631b20966c51a3050046717b77a5e457f2750645f32e2d8838b48"
+  },
+  "07-seed-baseline-cache/supervisor.samples.jsonl": {
+    "bytes": 631,
+    "path": "/opt/r1/audit-pair-recovery/07-seed-baseline-cache/supervisor.samples.jsonl",
+    "sha256": "9f67ee555db4a2e6d33d319a48d7c27ae05dfc490fba929290ad51d8eb26b435"
+  },
+  "12-baseline-example-release/stderr.log": {
+    "bytes": 737,
+    "path": "/opt/r1/audit-pair-recovery/12-baseline-example-release/stderr.log",
+    "sha256": "391ffdd2f7caad9565b7c10d517e00ace2c1c79be04d20d6338264909299a10c"
+  },
+  "12-baseline-example-release/stdout.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-recovery/12-baseline-example-release/stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "12-baseline-example-release/supervisor.json": {
+    "bytes": 34659,
+    "path": "/opt/r1/audit-pair-recovery/12-baseline-example-release/supervisor.json",
+    "sha256": "4caa8f4499b6a67db3860fa64f076ed8fa19ded94447024fea0998feaa1c2de3"
+  },
+  "12-baseline-example-release/supervisor.samples.jsonl": {
+    "bytes": 84367,
+    "path": "/opt/r1/audit-pair-recovery/12-baseline-example-release/supervisor.samples.jsonl",
+    "sha256": "5e6c5839aa6c1897939a0ca5501222a7ce7613b35e5865ded1fd63dcfcb514ca"
+  },
+  "13-baseline-final-verify/stderr.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-recovery/13-baseline-final-verify/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "13-baseline-final-verify/stdout.log": {
+    "bytes": 300,
+    "path": "/opt/r1/audit-pair-recovery/13-baseline-final-verify/stdout.log",
+    "sha256": "c22c8151971687fec157ad5693e4cd5c437afbcadfb35c4955843f003612c0a9"
+  },
+  "13-baseline-final-verify/supervisor.json": {
+    "bytes": 34630,
+    "path": "/opt/r1/audit-pair-recovery/13-baseline-final-verify/supervisor.json",
+    "sha256": "f9cfa2b830f31a9b2361aa0261020c14cde8634122984a481494733d77b1e528"
+  },
+  "13-baseline-final-verify/supervisor.samples.jsonl": {
+    "bytes": 632,
+    "path": "/opt/r1/audit-pair-recovery/13-baseline-final-verify/supervisor.samples.jsonl",
+    "sha256": "59589851c8e20f150c7e866b38b6c5f389cadb2fbca9fc266a32c6150378c831"
+  },
+  "14-final-toolchain/stderr.log": {
+    "bytes": 0,
+    "path": "/opt/r1/audit-pair-recovery/14-final-toolchain/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "14-final-toolchain/stdout.log": {
+    "bytes": 3723,
+    "path": "/opt/r1/audit-pair-recovery/14-final-toolchain/stdout.log",
+    "sha256": "fdd073980265a82fa0e669a97e37616c535eb39946accab80c30444200ae02a4"
+  },
+  "14-final-toolchain/supervisor.json": {
+    "bytes": 34828,
+    "path": "/opt/r1/audit-pair-recovery/14-final-toolchain/supervisor.json",
+    "sha256": "4c471b043cb7e935e4f88c78f6928c63377f97b0a2d9a687d81e678313e65b8e"
+  },
+  "14-final-toolchain/supervisor.samples.jsonl": {
+    "bytes": 630,
+    "path": "/opt/r1/audit-pair-recovery/14-final-toolchain/supervisor.samples.jsonl",
+    "sha256": "e4d2395dbea64389ab4ae5da7672a59f23df5c177569e979e883bb5db4ee0787"
+  },
+  "cache-seed.json": {
+    "bytes": 2573,
+    "path": "/opt/r1/audit-pair-recovery/cache-seed.json",
+    "sha256": "305c2d3c09c4b05008b28129d7836b29889034234790e1f77c1ade26003e3254"
+  },
+  "current-build-complete.json": {
+    "bytes": 3759,
+    "path": "/opt/r1/audit-pair-recovery/current-build-complete.json",
+    "sha256": "5931edca92ba86e05cce57837beaf6554215aad73597a00e7f92b23b1da8e2aa"
+  },
+  "prior-evidence-files.json": {
+    "bytes": 13791,
+    "path": "/opt/r1/audit-pair-recovery/prior-evidence-files.json",
+    "sha256": "206e8f6583864d4aff1c5769a0950e715f768d350cbccef671be3df125dd4c8e"
+  },
+  "result.json": {
+    "bytes": 23430,
+    "path": "/opt/r1/audit-pair-recovery/result.json",
+    "sha256": "3fad2ecac424d18b67c12c4febe6a9928c4ee4bf647c485fa9fbfc789179c05a"
+  }
+}

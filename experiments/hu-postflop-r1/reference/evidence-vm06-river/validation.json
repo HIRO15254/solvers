@@ -1,0 +1,799 @@
+{
+  "boot_source_policy": "all observations retain their record/pointer; never attribute old validation or native binaries to another boot/source",
+  "distinct_boot_ids": [],
+  "multiple_boots_observed": false,
+  "problems": [
+    {
+      "count": 52,
+      "reason": "required_linked_evidence_missing"
+    }
+  ],
+  "provenance_observations": [
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/binary",
+      "record": "records/river/diagnostic017/execution.json",
+      "value": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/binary",
+      "record": "records/river/diagnostic019/execution.json",
+      "value": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      }
+    }
+  ],
+  "quality_acceptance": "not_evaluated_by_retainer",
+  "ready": false,
+  "reports": [],
+  "required_scopes": [],
+  "unresolved_references": [
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/supervisor",
+      "record": "records/river/diagnostic017/execution.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/binary",
+      "record": "records/river/diagnostic017/execution.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/river/diagnostic017/stages/compare/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/river/diagnostic017/stages/compare/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_before/3",
+      "record": "records/river/diagnostic017/stages/compare/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/river/diagnostic017/stages/compare/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/river/diagnostic017/stages/compare/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_after/3",
+      "record": "records/river/diagnostic017/stages/compare/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/river/diagnostic017/stages/config_validate/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/river/diagnostic017/stages/config_validate/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/river/diagnostic017/stages/config_validate/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/river/diagnostic017/stages/config_validate/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/river/diagnostic017/stages/config_validate/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/river/diagnostic017/stages/config_validate/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/river/diagnostic017/stages/export_summary/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/river/diagnostic017/stages/export_summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/river/diagnostic017/stages/export_summary/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/river/diagnostic017/stages/export_summary/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/river/diagnostic017/stages/export_summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/river/diagnostic017/stages/export_summary/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/river/diagnostic017/stages/export_tree/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/river/diagnostic017/stages/export_tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/river/diagnostic017/stages/export_tree/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/river/diagnostic017/stages/export_tree/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/river/diagnostic017/stages/export_tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/river/diagnostic017/stages/export_tree/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/river/diagnostic017/stages/input_check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/river/diagnostic017/stages/input_check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_before/3",
+      "record": "records/river/diagnostic017/stages/input_check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/river/diagnostic017/stages/input_check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/river/diagnostic017/stages/input_check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_after/3",
+      "record": "records/river/diagnostic017/stages/input_check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/river/diagnostic017/stages/solve/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/river/diagnostic017/stages/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/river/diagnostic017/stages/solve/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/river/diagnostic017/stages/solve/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/river/diagnostic017/stages/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/river/diagnostic017/stages/solve/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/supervisor",
+      "record": "records/river/diagnostic019/execution.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/binary",
+      "record": "records/river/diagnostic019/execution.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/river/diagnostic019/stages/compare/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/river/diagnostic019/stages/compare/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_before/3",
+      "record": "records/river/diagnostic019/stages/compare/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/river/diagnostic019/stages/compare/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/river/diagnostic019/stages/compare/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_after/3",
+      "record": "records/river/diagnostic019/stages/compare/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/river/diagnostic019/stages/config_validate/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/river/diagnostic019/stages/config_validate/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/river/diagnostic019/stages/config_validate/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/river/diagnostic019/stages/config_validate/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/river/diagnostic019/stages/config_validate/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/river/diagnostic019/stages/config_validate/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/river/diagnostic019/stages/export_summary/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/river/diagnostic019/stages/export_summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/river/diagnostic019/stages/export_summary/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/river/diagnostic019/stages/export_summary/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/river/diagnostic019/stages/export_summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/river/diagnostic019/stages/export_summary/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/river/diagnostic019/stages/export_tree/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/river/diagnostic019/stages/export_tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/river/diagnostic019/stages/export_tree/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/river/diagnostic019/stages/export_tree/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/river/diagnostic019/stages/export_tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/river/diagnostic019/stages/export_tree/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/river/diagnostic019/stages/input_check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/river/diagnostic019/stages/input_check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_before/3",
+      "record": "records/river/diagnostic019/stages/input_check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/river/diagnostic019/stages/input_check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/river/diagnostic019/stages/input_check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_after/3",
+      "record": "records/river/diagnostic019/stages/input_check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/river/diagnostic019/stages/solve/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/river/diagnostic019/stages/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/river/diagnostic019/stages/solve/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/river/diagnostic019/stages/solve/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/river/diagnostic019/stages/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/river/diagnostic019/stages/solve/supervisor.json",
+      "required": true
+    }
+  ]
+}

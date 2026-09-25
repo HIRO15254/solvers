@@ -1,0 +1,14 @@
+{
+  "attempted_at_utc": "2026-09-25T18:38:54.6099454+00:00",
+  "collected_bundles": [
+    "vm06-recovery",
+    "vm06-v3-results",
+    "vm06-saved-audits",
+    "vm06-phases",
+    "vm06-current",
+    "vm06-river-diagnostics"
+  ],
+  "instance": "solvers-r1-20260925-06",
+  "instance_id": "5209515640504390740",
+  "reason": "Experiments complete; downloaded bundles and every included payload verified before deletion"
+}

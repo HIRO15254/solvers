@@ -1,0 +1,4520 @@
+{
+  "files": [
+    {
+      "bytes": 608438,
+      "path": "bundles/current/collector-manifest.json",
+      "sha256": "d0a2ff25540f3026eb6d3c04dbf0f0676c89fbf635998704990f13a0500a3db1"
+    },
+    {
+      "bytes": 86,
+      "path": "bundles/current/collector.sha256",
+      "sha256": "cdd76e6f11a9d144472cea95d005a2f93aa604ce111508f05f0812e9a0713dc4"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/flop-1-baseline/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/flop-1-baseline/artifact/stdout.log",
+      "sha256": "a371d9cad46cd015976a8ca17ee43baee4370ecc6017a81e95b62c921c7ca451"
+    },
+    {
+      "bytes": 6885,
+      "path": "records/current/audit-plan/hashes/flop-1-baseline/artifact/supervisor.json",
+      "sha256": "c26a32a5e29d78d4c8baf73e42b1d391cd65fa550fe7e2f6602f968654f022c7"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/flop-1-baseline/artifact/supervisor.samples.jsonl",
+      "sha256": "90b3f85a2a884914a0d532d821ce064a4283a93ae425983646b1bbc626f26971"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/flop-1-baseline/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/flop-1-baseline/run_config/stdout.log",
+      "sha256": "46fd24eca6d0e65d9ed306bcc5189e4d0f1097f2d358900cdf5ea0a3010a250a"
+    },
+    {
+      "bytes": 6872,
+      "path": "records/current/audit-plan/hashes/flop-1-baseline/run_config/supervisor.json",
+      "sha256": "76f6a0f7a373fcf16ca43a086d266b2b89f36208f76e88ab77ea86d9c4ebf53e"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/flop-1-baseline/run_config/supervisor.samples.jsonl",
+      "sha256": "c8fdbc516f2f73c047fd9a259dc5ddd078e7e07a7e6a4112905089ca4645425c"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/flop-1-candidate/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/flop-1-candidate/artifact/stdout.log",
+      "sha256": "31d26ed7b7092fc15a5369f45fdeb9ddd4f0a084fb7eeaef20b90bbde1cb0592"
+    },
+    {
+      "bytes": 6894,
+      "path": "records/current/audit-plan/hashes/flop-1-candidate/artifact/supervisor.json",
+      "sha256": "4f4c0fb8d0ba315ef3db8c1c7dd4c1b6c10cc40a5e967a05680eb1e6c5ee7bd3"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/audit-plan/hashes/flop-1-candidate/artifact/supervisor.samples.jsonl",
+      "sha256": "db65bdf3ca0adf763fb69b97a00bc39e818ea161327a329aeffb3573e8bdaa43"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/flop-1-candidate/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/flop-1-candidate/run_config/stdout.log",
+      "sha256": "4eef9149d2602e7226e6f0bcbe58e02e114d5929bb3e999a196d84cdadbafdde"
+    },
+    {
+      "bytes": 6881,
+      "path": "records/current/audit-plan/hashes/flop-1-candidate/run_config/supervisor.json",
+      "sha256": "6387040e3ac065bc787206d84ec3880ec1881455dc4da0523bb5d1a7415eecbc"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/flop-1-candidate/run_config/supervisor.samples.jsonl",
+      "sha256": "dfbd00705f7b186f55b0564207861fb74a48d3ee5b1638f12affb6a1a0a55720"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/flop-2-baseline/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/flop-2-baseline/artifact/stdout.log",
+      "sha256": "58cd8f2e8d73d7d0a63f667fa1c35eb7fbf4dac7b6c21d2d038d1c6061924dcb"
+    },
+    {
+      "bytes": 6886,
+      "path": "records/current/audit-plan/hashes/flop-2-baseline/artifact/supervisor.json",
+      "sha256": "5f74dcaa694d5e8117c5b5f8baad962bf4d35a9c55bc93487ed461885b8c3ed2"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/audit-plan/hashes/flop-2-baseline/artifact/supervisor.samples.jsonl",
+      "sha256": "c08b75b1b6da72e6329014f746f3e531507319bef2be7d938d02f71fa18f3a9e"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/flop-2-baseline/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/flop-2-baseline/run_config/stdout.log",
+      "sha256": "46fd24eca6d0e65d9ed306bcc5189e4d0f1097f2d358900cdf5ea0a3010a250a"
+    },
+    {
+      "bytes": 6872,
+      "path": "records/current/audit-plan/hashes/flop-2-baseline/run_config/supervisor.json",
+      "sha256": "e1382d4f64112230b138714f0fffc90d388c8f64b47da97ec7d7fad2c5c0f4c4"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/audit-plan/hashes/flop-2-baseline/run_config/supervisor.samples.jsonl",
+      "sha256": "7ea03bbd151899a24639a3054a562c0d5b311576fe518c82b4b0747767e42bb6"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/flop-2-candidate/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/flop-2-candidate/artifact/stdout.log",
+      "sha256": "698f06bac6fbb41ac9f1834cda7fa92dae333ce7028ad2e0a4d8db974ffd5187"
+    },
+    {
+      "bytes": 6893,
+      "path": "records/current/audit-plan/hashes/flop-2-candidate/artifact/supervisor.json",
+      "sha256": "99cf9d52076fc510f5412abb8b323a7105723523edd28addbd3a469412597a61"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/audit-plan/hashes/flop-2-candidate/artifact/supervisor.samples.jsonl",
+      "sha256": "ef0dd26f32744def9e36074ff84874f5772a047591b807410201d52f66658e96"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/flop-2-candidate/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/flop-2-candidate/run_config/stdout.log",
+      "sha256": "4eef9149d2602e7226e6f0bcbe58e02e114d5929bb3e999a196d84cdadbafdde"
+    },
+    {
+      "bytes": 6880,
+      "path": "records/current/audit-plan/hashes/flop-2-candidate/run_config/supervisor.json",
+      "sha256": "dee5f1ed03030dbb9800f2741af59920b39a3397b80464b3bdccd4dd0b4a12cf"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/audit-plan/hashes/flop-2-candidate/run_config/supervisor.samples.jsonl",
+      "sha256": "19d41b2aa963a58817bc0662d8faadf70da22db71936872838078f12035c742e"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/flop-3-baseline/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/flop-3-baseline/artifact/stdout.log",
+      "sha256": "de61a5abede9e00e5b212a4e680edde37f6b1f96fb1c88d7e5d7936d2be99d5f"
+    },
+    {
+      "bytes": 6886,
+      "path": "records/current/audit-plan/hashes/flop-3-baseline/artifact/supervisor.json",
+      "sha256": "a5682c368a1a3618424bba9105fdad0d946a5639c1aee16a19bd6e9ef2f8b805"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/flop-3-baseline/artifact/supervisor.samples.jsonl",
+      "sha256": "d7ca2b59fbbe14cd58c99ad08240324ba252ff4fcdf0a08c4cc9b451dc8d69d6"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/flop-3-baseline/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/flop-3-baseline/run_config/stdout.log",
+      "sha256": "46fd24eca6d0e65d9ed306bcc5189e4d0f1097f2d358900cdf5ea0a3010a250a"
+    },
+    {
+      "bytes": 6873,
+      "path": "records/current/audit-plan/hashes/flop-3-baseline/run_config/supervisor.json",
+      "sha256": "01f7e12464734abc59c3e2690e53c45ceaa472865eceb9efc8f43a47c06c1c6c"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/flop-3-baseline/run_config/supervisor.samples.jsonl",
+      "sha256": "8f03ce7f7d630881d85ce74fc02526787bd924401616e2f92d3cf7091f43106c"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/flop-3-candidate/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/flop-3-candidate/artifact/stdout.log",
+      "sha256": "35a891d647a55031e8dbee3b509afdf1cf840ab611b6686a88297e962becc749"
+    },
+    {
+      "bytes": 6895,
+      "path": "records/current/audit-plan/hashes/flop-3-candidate/artifact/supervisor.json",
+      "sha256": "699c3933d4f671e0c503a6af7e48c4130864546a543ff2857649eb67b40087be"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/flop-3-candidate/artifact/supervisor.samples.jsonl",
+      "sha256": "f85fe951855180de977c0859854870647348c9e10940cde4ec2ce77718e6180d"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/flop-3-candidate/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/flop-3-candidate/run_config/stdout.log",
+      "sha256": "4eef9149d2602e7226e6f0bcbe58e02e114d5929bb3e999a196d84cdadbafdde"
+    },
+    {
+      "bytes": 6880,
+      "path": "records/current/audit-plan/hashes/flop-3-candidate/run_config/supervisor.json",
+      "sha256": "887d1ca0c1a2a99c1ad1c1f059dfdc3c2caa93c9b4022613364aacce7166516f"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/audit-plan/hashes/flop-3-candidate/run_config/supervisor.samples.jsonl",
+      "sha256": "57e919285ce85bc70a9ddb5e4b759f321981b88cfbe27485d7acfbb5b8ae6fe4"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/river-1-baseline/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/river-1-baseline/artifact/stdout.log",
+      "sha256": "14f1d08710581587c79789d3c0a37489015797c7e3b0a6aadf307cab39f43508"
+    },
+    {
+      "bytes": 6890,
+      "path": "records/current/audit-plan/hashes/river-1-baseline/artifact/supervisor.json",
+      "sha256": "0d541591d02b3c0ea182fe78dd0def37a830e753b684337648706f4d78080a1c"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/river-1-baseline/artifact/supervisor.samples.jsonl",
+      "sha256": "9f162ebb612595536e4e26f63fd962ff683a77c6df1dc82f6fe84936ff128992"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/river-1-baseline/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/river-1-baseline/run_config/stdout.log",
+      "sha256": "1eb811d343087d7042b89214a3e25f99eb63d493db8f71c8258d75b4e64691b3"
+    },
+    {
+      "bytes": 6880,
+      "path": "records/current/audit-plan/hashes/river-1-baseline/run_config/supervisor.json",
+      "sha256": "031e46c3cc7dda34bcd6df3b1c70ea7ad35277ecafd54b75956079e3599d76a5"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/river-1-baseline/run_config/supervisor.samples.jsonl",
+      "sha256": "2e5bd8b739eda21727468468109906a9ebd7a5c8aec83c651396d6df83c24d97"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/river-1-candidate/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/river-1-candidate/artifact/stdout.log",
+      "sha256": "ba7bf5bbabd5cc59607d4a8acdac5882d2fafb99c46b1e53869a9d6f8b8b88dd"
+    },
+    {
+      "bytes": 6898,
+      "path": "records/current/audit-plan/hashes/river-1-candidate/artifact/supervisor.json",
+      "sha256": "5fac99b86016a1ef391c8534304ca750a2e1b7d83aee8eac9a81144801b9b8ea"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/river-1-candidate/artifact/supervisor.samples.jsonl",
+      "sha256": "fdfc68e49fc8c23d9a08093b6acaca3bfc8ffa7658d8acb704f717084cce98c8"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/river-1-candidate/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/river-1-candidate/run_config/stdout.log",
+      "sha256": "b373fdba79f439bed935a7840d698c04cb86e240bb3873f2816b05ea898dc1de"
+    },
+    {
+      "bytes": 6889,
+      "path": "records/current/audit-plan/hashes/river-1-candidate/run_config/supervisor.json",
+      "sha256": "e726a6545c2d98293bce2fc81825dbe351caa8a9b47e52cd50eb0ec955dae57f"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/river-1-candidate/run_config/supervisor.samples.jsonl",
+      "sha256": "2509a2e3cd7c0057da6046fad418f126f38570c557c8a76de11ea71404ed8dd1"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/river-2-baseline/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/river-2-baseline/artifact/stdout.log",
+      "sha256": "0b2928c71c49a2c9037f4d17d9c810d3077d3cd3077641685c4fe3c74df72fa0"
+    },
+    {
+      "bytes": 6891,
+      "path": "records/current/audit-plan/hashes/river-2-baseline/artifact/supervisor.json",
+      "sha256": "68bf1438d4aa7762a41fad5fa7545ad35f9526b1644bb000229fc9c4c24491c4"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/river-2-baseline/artifact/supervisor.samples.jsonl",
+      "sha256": "386a716f320a68aab6ca14d902014d4beb11e242ae8ab927b328e99d2d15901f"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/river-2-baseline/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/river-2-baseline/run_config/stdout.log",
+      "sha256": "1eb811d343087d7042b89214a3e25f99eb63d493db8f71c8258d75b4e64691b3"
+    },
+    {
+      "bytes": 6881,
+      "path": "records/current/audit-plan/hashes/river-2-baseline/run_config/supervisor.json",
+      "sha256": "26304991a69413be8b47532b685091c9f0eb64e24bb0edb0d152a63b4a7b08e5"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/river-2-baseline/run_config/supervisor.samples.jsonl",
+      "sha256": "c1e3209fb20f65713dcb4670a6e47d565b5b669dd42382544b4f53f0808f2905"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/river-2-candidate/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/river-2-candidate/artifact/stdout.log",
+      "sha256": "8de8d15e4ebac1c050143b3bba07a4cc955c3f8f840dfa4c229e60e47c94a2b8"
+    },
+    {
+      "bytes": 6899,
+      "path": "records/current/audit-plan/hashes/river-2-candidate/artifact/supervisor.json",
+      "sha256": "d50be8027255ab54a96262d1928121874a1f44b545cad4a3447e61eaeb3b41d9"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/river-2-candidate/artifact/supervisor.samples.jsonl",
+      "sha256": "a2a17443b912ae07fcccebf5992813566f5a1557d2e0c2162c05c6fa694233ea"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/river-2-candidate/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/river-2-candidate/run_config/stdout.log",
+      "sha256": "b373fdba79f439bed935a7840d698c04cb86e240bb3873f2816b05ea898dc1de"
+    },
+    {
+      "bytes": 6887,
+      "path": "records/current/audit-plan/hashes/river-2-candidate/run_config/supervisor.json",
+      "sha256": "ab8c3cffadd2422b08ed2f8085a82e261dd042816bb31c8213aaa33b27d041cf"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/river-2-candidate/run_config/supervisor.samples.jsonl",
+      "sha256": "077f7a8d06b022004e857e0605829788f96ff4d456b8e71fa3da90cbbf1bae3e"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/river-3-baseline/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/river-3-baseline/artifact/stdout.log",
+      "sha256": "fb0b261ae9b0123b74c44bd0656777de3fa3a713ae772405c5ae7fe8581effcb"
+    },
+    {
+      "bytes": 6890,
+      "path": "records/current/audit-plan/hashes/river-3-baseline/artifact/supervisor.json",
+      "sha256": "2977d0a669440d230b203d6ec79120d00169a2fd00afb810af9110fa4b36b4c4"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/river-3-baseline/artifact/supervisor.samples.jsonl",
+      "sha256": "61acbae5bc36746af3a9c4b91b0c889c94c4eac324c3f249b971e0599b466fb1"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/river-3-baseline/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/river-3-baseline/run_config/stdout.log",
+      "sha256": "1eb811d343087d7042b89214a3e25f99eb63d493db8f71c8258d75b4e64691b3"
+    },
+    {
+      "bytes": 6880,
+      "path": "records/current/audit-plan/hashes/river-3-baseline/run_config/supervisor.json",
+      "sha256": "9c9c435b0d594f6509662e84eb1e11eb1240119266aed78d05633aba4be08873"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/audit-plan/hashes/river-3-baseline/run_config/supervisor.samples.jsonl",
+      "sha256": "0c005864ca0e46a003acdaec61527bde2b0ac2472d6afc8541ba135f251eef3b"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/river-3-candidate/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/river-3-candidate/artifact/stdout.log",
+      "sha256": "cdac8e47cda5db1ffb15cf0f88735e83a92cfa556cbddad8abcbf33698a68bc9"
+    },
+    {
+      "bytes": 6899,
+      "path": "records/current/audit-plan/hashes/river-3-candidate/artifact/supervisor.json",
+      "sha256": "f1689fafef04c255d8df30c5dd1d0aa8340999a19d8bb5c820173194d7859028"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/river-3-candidate/artifact/supervisor.samples.jsonl",
+      "sha256": "58606407b52b9a9aa75ee22a2f384fa098767e91757ef793b74bcc6f2ea9eaf0"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/river-3-candidate/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/river-3-candidate/run_config/stdout.log",
+      "sha256": "b373fdba79f439bed935a7840d698c04cb86e240bb3873f2816b05ea898dc1de"
+    },
+    {
+      "bytes": 6888,
+      "path": "records/current/audit-plan/hashes/river-3-candidate/run_config/supervisor.json",
+      "sha256": "25aa22f28b2578f9238e4a3cf4d3a36bdb87c5005e67662b1e5e49447d4c3a50"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/audit-plan/hashes/river-3-candidate/run_config/supervisor.samples.jsonl",
+      "sha256": "3ffd6f606f5c363df72d973a8d306f7d71ef1593d969abc36abc85575367ce47"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/tool-version/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 12,
+      "path": "records/current/audit-plan/hashes/tool-version/stdout.log",
+      "sha256": "b661f982adc56fd4814c528209d607fd2f8302093d1337b73aaa00c97a44423d"
+    },
+    {
+      "bytes": 6222,
+      "path": "records/current/audit-plan/hashes/tool-version/supervisor.json",
+      "sha256": "8b9dd25ad2c8ffa316243c69269c9818a5c08a2e4401583231970e9b4c95849f"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/tool-version/supervisor.samples.jsonl",
+      "sha256": "f5cc5e6686109de868b88b8f15302ce3cacc7cd449e205b05f0dadf3ef7cb340"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/turn-1-baseline/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/turn-1-baseline/artifact/stdout.log",
+      "sha256": "d33400bbcfc0d1279c91b7709510d31c6e964c354b711ea6332d0f6e1f17ce68"
+    },
+    {
+      "bytes": 6885,
+      "path": "records/current/audit-plan/hashes/turn-1-baseline/artifact/supervisor.json",
+      "sha256": "03efab9c7a779477969e863a331af324b10a86ed0fb614107c77fd52a136b27e"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/turn-1-baseline/artifact/supervisor.samples.jsonl",
+      "sha256": "f703f6f9f864057b98736d9b327971d5a07fd5a46f862898ed2689ce7cd860f3"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/turn-1-baseline/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/turn-1-baseline/run_config/stdout.log",
+      "sha256": "155d016d79d9953954b125325a049c01e9466cc94d09fd3da98dce2e59f25194"
+    },
+    {
+      "bytes": 6873,
+      "path": "records/current/audit-plan/hashes/turn-1-baseline/run_config/supervisor.json",
+      "sha256": "3ddb13de835a025d603a0570ec1adb0eabaada7cdc0e85d9e30f67381456160f"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/turn-1-baseline/run_config/supervisor.samples.jsonl",
+      "sha256": "1091b960ee51e1cad0e3f0c1903553710f0aadd2bb57c2c5daace8b0d6b2f38e"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/turn-1-candidate/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/turn-1-candidate/artifact/stdout.log",
+      "sha256": "9f625cf0ef9b9b719f198154a20ebea328ba24588efa57e5fe0180db3bf6d7a2"
+    },
+    {
+      "bytes": 6893,
+      "path": "records/current/audit-plan/hashes/turn-1-candidate/artifact/supervisor.json",
+      "sha256": "0397a819a1c27f5bc8ca86ee5f84dbe7140cd8212036ada12ebb3302fb2d6579"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/turn-1-candidate/artifact/supervisor.samples.jsonl",
+      "sha256": "07c61ff1bc7d6e949b1a576e554fc2895e6d8863044b3a02504476e2528295db"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/turn-1-candidate/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/turn-1-candidate/run_config/stdout.log",
+      "sha256": "90ffdd1ad4dc93ff6c0e8952f98c7fa4fa6297870da0ca75b751f2750abae9ec"
+    },
+    {
+      "bytes": 6881,
+      "path": "records/current/audit-plan/hashes/turn-1-candidate/run_config/supervisor.json",
+      "sha256": "0e79161261f9c896323d08aa49d5b54635b7c3d444e96f910eea91d9293a7876"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/turn-1-candidate/run_config/supervisor.samples.jsonl",
+      "sha256": "760bb03ff70a2773370bd7483bd2550de3f79919deeed94fd73b095844ee9bc5"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/turn-2-baseline/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/turn-2-baseline/artifact/stdout.log",
+      "sha256": "0a9d185cee6f03298abd726507a13efc3058650f1884b1de763dd22d39a7a557"
+    },
+    {
+      "bytes": 6885,
+      "path": "records/current/audit-plan/hashes/turn-2-baseline/artifact/supervisor.json",
+      "sha256": "04c4c12299a45f2d435e6655f389656345180c70120a0682498ab8703fb3950e"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/turn-2-baseline/artifact/supervisor.samples.jsonl",
+      "sha256": "263858cc75f35dee03d72ec11f1530ca4230009fdf0d1791f0ad76198b218114"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/turn-2-baseline/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/turn-2-baseline/run_config/stdout.log",
+      "sha256": "155d016d79d9953954b125325a049c01e9466cc94d09fd3da98dce2e59f25194"
+    },
+    {
+      "bytes": 6871,
+      "path": "records/current/audit-plan/hashes/turn-2-baseline/run_config/supervisor.json",
+      "sha256": "0c8caa9fd460ffd6ff5f667e9fb382cf214801d072472bc51392122a5454f708"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/audit-plan/hashes/turn-2-baseline/run_config/supervisor.samples.jsonl",
+      "sha256": "bd65913d544664be56b5805ad48bd0236898deb3fe6fad24c4f7e678c362f0a7"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/turn-2-candidate/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/turn-2-candidate/artifact/stdout.log",
+      "sha256": "e5895f9e73a546bb38ddbb4733b58a11d8550b95fb5e35b55f4d239180c3e70f"
+    },
+    {
+      "bytes": 6892,
+      "path": "records/current/audit-plan/hashes/turn-2-candidate/artifact/supervisor.json",
+      "sha256": "635d673add1632059632f82fc7b0efd86a27874f9df717716d8aa676ca29ae74"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/audit-plan/hashes/turn-2-candidate/artifact/supervisor.samples.jsonl",
+      "sha256": "fed28c4389db3cfa7c4c9af33ba82c459d7cc45172e68897233286eb514688f3"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/turn-2-candidate/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/turn-2-candidate/run_config/stdout.log",
+      "sha256": "90ffdd1ad4dc93ff6c0e8952f98c7fa4fa6297870da0ca75b751f2750abae9ec"
+    },
+    {
+      "bytes": 6880,
+      "path": "records/current/audit-plan/hashes/turn-2-candidate/run_config/supervisor.json",
+      "sha256": "713e0eec3036268c1da3b79019d2e9bcc11a7a38b9e4f5d60405382610a635fc"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/audit-plan/hashes/turn-2-candidate/run_config/supervisor.samples.jsonl",
+      "sha256": "cad5fc23678fce54644d483702f02d6d1589f3fdec61bd073063eea08b013348"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/turn-3-baseline/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/turn-3-baseline/artifact/stdout.log",
+      "sha256": "a3b3792990548cf623ee67da8b75cdeee55c4f569dc7538f5653b8898609e7d3"
+    },
+    {
+      "bytes": 6884,
+      "path": "records/current/audit-plan/hashes/turn-3-baseline/artifact/supervisor.json",
+      "sha256": "e28e1c4073fc8c1a48ec7f95ef8c5cb1389417e1097d35613b2a282d046a361f"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/turn-3-baseline/artifact/supervisor.samples.jsonl",
+      "sha256": "c78b07c552e9d418abb6b9c60e3748b842c6ab25dd98bc6306f19f9bc71dde78"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/turn-3-baseline/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/turn-3-baseline/run_config/stdout.log",
+      "sha256": "155d016d79d9953954b125325a049c01e9466cc94d09fd3da98dce2e59f25194"
+    },
+    {
+      "bytes": 6873,
+      "path": "records/current/audit-plan/hashes/turn-3-baseline/run_config/supervisor.json",
+      "sha256": "f8379648b279abc1e7fd2c78431acb5bbb82ab9d9c4f807b9bfbf28d54a07ae1"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/turn-3-baseline/run_config/supervisor.samples.jsonl",
+      "sha256": "40f4e5996c83cd76938a228f49d296cf0595c0217cf00cbd67d94e2fb2c744ad"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/turn-3-candidate/artifact/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/turn-3-candidate/artifact/stdout.log",
+      "sha256": "b898018fddb3104a05b15459e5e6ed60fc686b2ff9b1806c98fe4b4fbd0477a7"
+    },
+    {
+      "bytes": 6893,
+      "path": "records/current/audit-plan/hashes/turn-3-candidate/artifact/supervisor.json",
+      "sha256": "d7df9360b2de8bf8a758c0f971b1adf35bad277bc9ca1c988d23b1b63e60b5e2"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/turn-3-candidate/artifact/supervisor.samples.jsonl",
+      "sha256": "15fad48272e31b6f726725120c213979d2d6f1d440becc4e23d419453e498000"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/audit-plan/hashes/turn-3-candidate/run_config/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 65,
+      "path": "records/current/audit-plan/hashes/turn-3-candidate/run_config/stdout.log",
+      "sha256": "90ffdd1ad4dc93ff6c0e8952f98c7fa4fa6297870da0ca75b751f2750abae9ec"
+    },
+    {
+      "bytes": 6881,
+      "path": "records/current/audit-plan/hashes/turn-3-candidate/run_config/supervisor.json",
+      "sha256": "6e7bd4ed1a2f6304dfa6bdc1be913a11edec9e972cf9d7135a7aa69404397cf5"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audit-plan/hashes/turn-3-candidate/run_config/supervisor.samples.jsonl",
+      "sha256": "84d5b8386227f34cf9cea1551428e3fca4e83d26de3c572b2dabad602af91d68"
+    },
+    {
+      "bytes": 105577,
+      "path": "records/current/audit-plan/plan.json",
+      "sha256": "88c81719d79173785864cc9a61e7b6bde0fbbb6fadd466afb254da4c244cd5ce"
+    },
+    {
+      "bytes": 146,
+      "path": "records/current/audit-plan/preparation.json",
+      "sha256": "e38beba9c434b448e9faab18dacee53043abede44905252f02c77fdff427b505"
+    },
+    {
+      "bytes": 6556,
+      "path": "records/current/audits/analysis.json",
+      "sha256": "ef65b3257a0eb847e0e072abcd1e34509fa6b89a9a974f1727a00ac7267bf732"
+    },
+    {
+      "bytes": 70251,
+      "path": "records/current/audits/audits.json",
+      "sha256": "7bf9b1178145cb6227cc870bde4c3263235c621ac9707c71aa536cf4bdab492e"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/audits/flop-1-baseline/stderr.log",
+      "sha256": "40ce91b3a7b25dcd34aa263e75c4cf9f2db9851617145f0e050becf9401da875"
+    },
+    {
+      "bytes": 1513,
+      "path": "records/current/audits/flop-1-baseline/stdout.log",
+      "sha256": "e88bb48e094788388b380a92e9898bc3d4e6e2657a8b038317a71df46400ce5b"
+    },
+    {
+      "bytes": 7866,
+      "path": "records/current/audits/flop-1-baseline/supervisor.json",
+      "sha256": "6f454f84f01d5edff9e441693bc0c0d8159859488058f1dcc93a909bd2de8517"
+    },
+    {
+      "bytes": 8053,
+      "path": "records/current/audits/flop-1-baseline/supervisor.samples.jsonl",
+      "sha256": "36591bf8327447cdfc1436de95ba48535ba3637ac9e6ac50f37618e8f5287b3d"
+    },
+    {
+      "bytes": 3410,
+      "path": "records/current/audits/flop-1-baseline/validation.json",
+      "sha256": "e58f40b69af119b776893e0b695875c3843e14023c5931139d3f409b05724dec"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/audits/flop-1-candidate/stderr.log",
+      "sha256": "270b3a4d0eb3e34c9a7851bb1875ed68039bac1766bcf4e30495f00b85cf5442"
+    },
+    {
+      "bytes": 1514,
+      "path": "records/current/audits/flop-1-candidate/stdout.log",
+      "sha256": "bfb91ec5d168021b4160679f66f11a39b80a268bb68fc1856ea587a9ab006a1c"
+    },
+    {
+      "bytes": 7848,
+      "path": "records/current/audits/flop-1-candidate/supervisor.json",
+      "sha256": "d64fefbd1dfd9e5fad46b3fda1489ca3b91e382d8a1e1742787e43134531856f"
+    },
+    {
+      "bytes": 6808,
+      "path": "records/current/audits/flop-1-candidate/supervisor.samples.jsonl",
+      "sha256": "57182b0cec3c512f5518d1c6351e6e17a5254e27722bbcdb7f1cfb8db5bb97b7"
+    },
+    {
+      "bytes": 3414,
+      "path": "records/current/audits/flop-1-candidate/validation.json",
+      "sha256": "2a54d444961b54e8d3c81244214ee991b21bc873dc794ace78bb4016c05912f2"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/audits/flop-2-baseline/stderr.log",
+      "sha256": "95085afa3b0280cd9303bb444377c8d98b27eb62bfea5abc46efc1fdf2046cbf"
+    },
+    {
+      "bytes": 1516,
+      "path": "records/current/audits/flop-2-baseline/stdout.log",
+      "sha256": "a975f77d5bd59b9063141eee15505b4905de7cc2686c1af88a58cab39653b9be"
+    },
+    {
+      "bytes": 7866,
+      "path": "records/current/audits/flop-2-baseline/supervisor.json",
+      "sha256": "48ac1a239ddf5f36951450b1ea54329dc36c74bb0fc52aa15d27b8f39d975cdd"
+    },
+    {
+      "bytes": 7730,
+      "path": "records/current/audits/flop-2-baseline/supervisor.samples.jsonl",
+      "sha256": "a58b58b0b778a95b3b1f92342a23bd9427348f4874e0684a65fed148dc0667fb"
+    },
+    {
+      "bytes": 3413,
+      "path": "records/current/audits/flop-2-baseline/validation.json",
+      "sha256": "9e2612b0530bdf5926fb7d238129a50771889acd2b127cc97a3013ab1b02f176"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/audits/flop-2-candidate/stderr.log",
+      "sha256": "270b3a4d0eb3e34c9a7851bb1875ed68039bac1766bcf4e30495f00b85cf5442"
+    },
+    {
+      "bytes": 1515,
+      "path": "records/current/audits/flop-2-candidate/stdout.log",
+      "sha256": "b640833bd650e3c64cf387232689b1dc93f2aeff64621c40f3838c0a743b8603"
+    },
+    {
+      "bytes": 7846,
+      "path": "records/current/audits/flop-2-candidate/supervisor.json",
+      "sha256": "fb57658ac428305cfadd24ecbd65858e2c02542904ef9e04c5bae4b3970f27d9"
+    },
+    {
+      "bytes": 7425,
+      "path": "records/current/audits/flop-2-candidate/supervisor.samples.jsonl",
+      "sha256": "fdf317e00a7478a98ed991dbc799cb33c8aef3aa7e12e43fd2b5b30d839a4f41"
+    },
+    {
+      "bytes": 3415,
+      "path": "records/current/audits/flop-2-candidate/validation.json",
+      "sha256": "174748967db906f6471453999e7d1cb05a068d202df2dea575763fd436a7ce1c"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/audits/flop-3-baseline/stderr.log",
+      "sha256": "40ce91b3a7b25dcd34aa263e75c4cf9f2db9851617145f0e050becf9401da875"
+    },
+    {
+      "bytes": 1513,
+      "path": "records/current/audits/flop-3-baseline/stdout.log",
+      "sha256": "08ecbb972a5945cc94602485f3f952dd862d9bb6363c8edca196326bc1d3e653"
+    },
+    {
+      "bytes": 7866,
+      "path": "records/current/audits/flop-3-baseline/supervisor.json",
+      "sha256": "c2e3f87cf7f97a8886d7cb30f83b4ae7b840e57b926c7f59a701a659f87cf602"
+    },
+    {
+      "bytes": 8049,
+      "path": "records/current/audits/flop-3-baseline/supervisor.samples.jsonl",
+      "sha256": "c18d2afcc0a57416d6b5ef8ea1da45101aa789711dc6378730f5d0a03978f116"
+    },
+    {
+      "bytes": 3410,
+      "path": "records/current/audits/flop-3-baseline/validation.json",
+      "sha256": "9c774e9b922832a49f96a9bf3ce66a764d97ee3a01e35bd19c38a74eaeea4f83"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/audits/flop-3-candidate/stderr.log",
+      "sha256": "40ce91b3a7b25dcd34aa263e75c4cf9f2db9851617145f0e050becf9401da875"
+    },
+    {
+      "bytes": 1515,
+      "path": "records/current/audits/flop-3-candidate/stdout.log",
+      "sha256": "bddc81babf04e111cb83e934ae630e0eb5aa1d1dcda8afb4546cb4fe308c4379"
+    },
+    {
+      "bytes": 7846,
+      "path": "records/current/audits/flop-3-candidate/supervisor.json",
+      "sha256": "57524ddf9b397dec8cdbdfaba4681b61a04781a1fa272c65214f5a586e715090"
+    },
+    {
+      "bytes": 6500,
+      "path": "records/current/audits/flop-3-candidate/supervisor.samples.jsonl",
+      "sha256": "6ad5f63e9bb8d32bf351552bce3f5f027623787c9674f19ba400f435a930ba25"
+    },
+    {
+      "bytes": 3414,
+      "path": "records/current/audits/flop-3-candidate/validation.json",
+      "sha256": "c01c4d2a35ade03be8ebd432388d9db109c836d170ee8906f64e2dbe922eeb36"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/audits/river-1-baseline/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1507,
+      "path": "records/current/audits/river-1-baseline/stdout.log",
+      "sha256": "287dbaf3d073c1f606648f06917ebcee8db86c3934c6c4ccad4b1fd0e1c9e3b3"
+    },
+    {
+      "bytes": 7850,
+      "path": "records/current/audits/river-1-baseline/supervisor.json",
+      "sha256": "6070d9cda08e2a1a417b6286f82be9628f4a7114c4a8dd89c33c248b585b52d1"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audits/river-1-baseline/supervisor.samples.jsonl",
+      "sha256": "beccb8f2074dfa9f7fcb5eb3dffb26be0101cd87d895556ca2f617a0a8b406e5"
+    },
+    {
+      "bytes": 3383,
+      "path": "records/current/audits/river-1-baseline/validation.json",
+      "sha256": "f653b5cc19f5003e1e8d9905f5d995e100ad48ecaa944113e43b247eb8b199f4"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/audits/river-1-candidate/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1519,
+      "path": "records/current/audits/river-1-candidate/stdout.log",
+      "sha256": "0dd876f38b6cb7465753f1dfd7802b9cb6254a638b9d60e31425f326ffcfab3e"
+    },
+    {
+      "bytes": 7829,
+      "path": "records/current/audits/river-1-candidate/supervisor.json",
+      "sha256": "824ac2c074f0d94b302a0e21ba903e964f6cbb2aa7a47803af7770ce0f7dedaf"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/audits/river-1-candidate/supervisor.samples.jsonl",
+      "sha256": "8dc8e5b94f82a9c2d00a2224ca72fdfde87ffe327b2c0f9cae258ec0954f61c8"
+    },
+    {
+      "bytes": 3396,
+      "path": "records/current/audits/river-1-candidate/validation.json",
+      "sha256": "b7f5a93f9d5ebe102d572591f326434cfd4eb73d1c9e19ed7c955221156d0ddf"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/audits/river-2-baseline/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1506,
+      "path": "records/current/audits/river-2-baseline/stdout.log",
+      "sha256": "75ba390c8a58ff620cd91dee0fc05520f27c1232591391561d256da38169fee6"
+    },
+    {
+      "bytes": 7850,
+      "path": "records/current/audits/river-2-baseline/supervisor.json",
+      "sha256": "a241f879749217906ae54e80077daf6886e96f36ca2ef90a50b369278547637c"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audits/river-2-baseline/supervisor.samples.jsonl",
+      "sha256": "8e28c86c3803bbb2782cd270a2c90a67f84c8c3fd18ced9ac1decd06bc4f4175"
+    },
+    {
+      "bytes": 3382,
+      "path": "records/current/audits/river-2-baseline/validation.json",
+      "sha256": "ba41554cb7e25cd7439b263ca16006689cb29ef14864e512beeb2d0af8a457fc"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/audits/river-2-candidate/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1520,
+      "path": "records/current/audits/river-2-candidate/stdout.log",
+      "sha256": "7dccb6a36de3d75c1d989aa1ce9ca86573bdfaba02c2837f8a72f54f5d64bfb1"
+    },
+    {
+      "bytes": 7831,
+      "path": "records/current/audits/river-2-candidate/supervisor.json",
+      "sha256": "6d52860039d1f07dfebc7122eafd0b7fed9cf510f5d04f3c188acf8b11ba2f5d"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audits/river-2-candidate/supervisor.samples.jsonl",
+      "sha256": "e68a4f69748440b8155860e0cf8b97d26211eddf74ba384a07a8e5a8b4042936"
+    },
+    {
+      "bytes": 3398,
+      "path": "records/current/audits/river-2-candidate/validation.json",
+      "sha256": "8888d192e654fc96b0812d0ada50d180b8c01035d5b80b1535a789864c93ee41"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/audits/river-3-baseline/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1518,
+      "path": "records/current/audits/river-3-baseline/stdout.log",
+      "sha256": "7c8f221cdccfa97d50fa6c13125d3d4d6d8aefeecbeecfd19c528dad522dce64"
+    },
+    {
+      "bytes": 7849,
+      "path": "records/current/audits/river-3-baseline/supervisor.json",
+      "sha256": "d8d5668d141c6b4b6e1e9c5c389fb4df1a1cbb020429aeb428eb8b65de6668e5"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audits/river-3-baseline/supervisor.samples.jsonl",
+      "sha256": "f38de2cf76fda451850964a22a56f71ff9a290b59f1e532a3894da41706577ea"
+    },
+    {
+      "bytes": 3393,
+      "path": "records/current/audits/river-3-baseline/validation.json",
+      "sha256": "fcfeed3ebad48da00de3730f8c59e335a96588af1d4df8e02ee4f6cabad65145"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/audits/river-3-candidate/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1510,
+      "path": "records/current/audits/river-3-candidate/stdout.log",
+      "sha256": "8cf1f881a50031f2f21f2642cf0dbed8061666a99dec98c11e36a99f30365373"
+    },
+    {
+      "bytes": 7830,
+      "path": "records/current/audits/river-3-candidate/supervisor.json",
+      "sha256": "95e26c1ba11b1d05f3707faaea5630f159041d394948f5c2460b4a7eb36c999a"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/audits/river-3-candidate/supervisor.samples.jsonl",
+      "sha256": "c6457183913a8ae84cd36f62ba42a032e9911764ef51f79c84eef87b91278860"
+    },
+    {
+      "bytes": 3387,
+      "path": "records/current/audits/river-3-candidate/validation.json",
+      "sha256": "4edcc00bfb908069c1445705ca0632201a14898d1e73db4881c50eb24b8ba345"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/audits/turn-1-baseline/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 1519,
+      "path": "records/current/audits/turn-1-baseline/stdout.log",
+      "sha256": "326aacf3e35c1a278d11c8a9928b88892ba8d26110eb3d6e614900edb7acf412"
+    },
+    {
+      "bytes": 7860,
+      "path": "records/current/audits/turn-1-baseline/supervisor.json",
+      "sha256": "f7ab5eb621100055d139584fcc65320fe8eb1c63019185786d6f79d43c2c6c4b"
+    },
+    {
+      "bytes": 942,
+      "path": "records/current/audits/turn-1-baseline/supervisor.samples.jsonl",
+      "sha256": "2588390fe99c6b16fc3e5c38eafc16a33ec7a2afe9c331f1224b5b09cd9c5da7"
+    },
+    {
+      "bytes": 3415,
+      "path": "records/current/audits/turn-1-baseline/validation.json",
+      "sha256": "1cbb6d5817795aadaf5264eb112410ad8a6a872185feb34ece9fe54762002014"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/audits/turn-1-candidate/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 1513,
+      "path": "records/current/audits/turn-1-candidate/stdout.log",
+      "sha256": "d7c3b0c2e635a075fa4fc00879ddca93c6794f55d3c4b81a378e8a403fb88bbb"
+    },
+    {
+      "bytes": 7843,
+      "path": "records/current/audits/turn-1-candidate/supervisor.json",
+      "sha256": "2db7ac166b0106ad79ca66181c6ed01823c8eeecfc29290d9ebb1b2c4fe20d93"
+    },
+    {
+      "bytes": 941,
+      "path": "records/current/audits/turn-1-candidate/supervisor.samples.jsonl",
+      "sha256": "8787ce86130e87a3c4d2e5400903dfd025b9c32003c01af84b5ef5316a42e733"
+    },
+    {
+      "bytes": 3412,
+      "path": "records/current/audits/turn-1-candidate/validation.json",
+      "sha256": "8667e0f5a648436233ce3dc129b6d00bbafca5857967422e6ee1343c32d75fea"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/audits/turn-2-baseline/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 1512,
+      "path": "records/current/audits/turn-2-baseline/stdout.log",
+      "sha256": "0584d5ce0c6f66c7ca05f22caff403db7d017f9c9befbdf3bac8e7c5f3957640"
+    },
+    {
+      "bytes": 7859,
+      "path": "records/current/audits/turn-2-baseline/supervisor.json",
+      "sha256": "6254d2ecf78b0dc28ad32759f3bd64ebbae13ccab4ea7893e4ec0e36a82a7125"
+    },
+    {
+      "bytes": 942,
+      "path": "records/current/audits/turn-2-baseline/supervisor.samples.jsonl",
+      "sha256": "1815d27008e40ef14abd3756185b84feda2c21d280634b67ea24dfcc40459d51"
+    },
+    {
+      "bytes": 3407,
+      "path": "records/current/audits/turn-2-baseline/validation.json",
+      "sha256": "5bddeab843e8dd6e54aad95718d4d77d0cdeab261a569a35959960ec3bd99dd2"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/audits/turn-2-candidate/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 1520,
+      "path": "records/current/audits/turn-2-candidate/stdout.log",
+      "sha256": "4c3a16be2198eca48fc6edd5050bda0019c0a53f7134cfbc2193d77b0378aefb"
+    },
+    {
+      "bytes": 7844,
+      "path": "records/current/audits/turn-2-candidate/supervisor.json",
+      "sha256": "8d2a15431f855892b790ea05181b1b76e3285c7d9601c39c2735e852d2fdfa27"
+    },
+    {
+      "bytes": 941,
+      "path": "records/current/audits/turn-2-candidate/supervisor.samples.jsonl",
+      "sha256": "17a6f850d2f4ddb313078c03c456462d4400cf2a0cf8d4ce48f5e9b027404b7a"
+    },
+    {
+      "bytes": 3420,
+      "path": "records/current/audits/turn-2-candidate/validation.json",
+      "sha256": "9ee7f05eb5182dc7d89486f822ab1516d94283b30db54eecd7c20478989db60e"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/audits/turn-3-baseline/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 1518,
+      "path": "records/current/audits/turn-3-baseline/stdout.log",
+      "sha256": "e7babfeac83dc171294fb6d2adac32f9a00f0b89cf329e44ca49742de54a0bfe"
+    },
+    {
+      "bytes": 7861,
+      "path": "records/current/audits/turn-3-baseline/supervisor.json",
+      "sha256": "c322ec889372d4b2a2f70a0e7a7392aa1146e3109e78297a09679c704128f599"
+    },
+    {
+      "bytes": 943,
+      "path": "records/current/audits/turn-3-baseline/supervisor.samples.jsonl",
+      "sha256": "503bced60e612341c813d8804ad06881039e1c2638bd0fcf7f88cffdd8da1e54"
+    },
+    {
+      "bytes": 3414,
+      "path": "records/current/audits/turn-3-baseline/validation.json",
+      "sha256": "4ebe66e281d33249d7c14545481dd73874d1dad286af4adbccaf9583a97edbf2"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/audits/turn-3-candidate/stderr.log",
+      "sha256": "9faa1db92fc5ad9f1dc5690f3fa84b49048f7d306a5fe65cb7a2db51f4633ddd"
+    },
+    {
+      "bytes": 1513,
+      "path": "records/current/audits/turn-3-candidate/stdout.log",
+      "sha256": "1313b145059ca2311d985b4a54e3c51f944584bcd0548a643f79cfcaf2292aee"
+    },
+    {
+      "bytes": 7842,
+      "path": "records/current/audits/turn-3-candidate/supervisor.json",
+      "sha256": "cac93f0af3e099d196c1d446d6e387671b68d8901542f6e083a8096be668bf6f"
+    },
+    {
+      "bytes": 930,
+      "path": "records/current/audits/turn-3-candidate/supervisor.samples.jsonl",
+      "sha256": "a89a9ac5490cf5d3e50d39a5e79bfd390016a9a8cb9f40cac4b31de69149cd45"
+    },
+    {
+      "bytes": 3412,
+      "path": "records/current/audits/turn-3-candidate/validation.json",
+      "sha256": "b1937af30b47a4388315c2c7de162f3b997d6c79d2da3227f95b8f8ff509aab5"
+    },
+    {
+      "bytes": 20648,
+      "path": "records/current/campaign/analysis.json",
+      "sha256": "af4fdaba57bf5bc7fe31f6c817620b0a596b9ce209d39e8a28f206cfccc5ae94"
+    },
+    {
+      "bytes": 225510,
+      "path": "records/current/campaign/comparison.json",
+      "sha256": "911b7fdb5c0ea098fa24f430dd2487f8aafd4bb6b18d7b2c6be63f583fa915c5"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-baseline/ev/stderr.log",
+      "sha256": "95085afa3b0280cd9303bb444377c8d98b27eb62bfea5abc46efc1fdf2046cbf"
+    },
+    {
+      "bytes": 6312,
+      "path": "records/current/campaign/flop-1-baseline/ev/supervisor.json",
+      "sha256": "f9b608f4aa47b5a7ca4e9b48b7d4c0908fee145eb1512425f4459f386b402d7b"
+    },
+    {
+      "bytes": 8965,
+      "path": "records/current/campaign/flop-1-baseline/ev/supervisor.samples.jsonl",
+      "sha256": "7e46ea520f5d7223848e3a84a831482450d240b61605cdf821cf846412995cd2"
+    },
+    {
+      "bytes": 3217,
+      "path": "records/current/campaign/flop-1-baseline/profile.json",
+      "sha256": "4101bb62c41ac755c99150bf0a69c3f2a7842cbc3b2c8149d4e578410fb073a5"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-baseline/restore/ev/stderr.log",
+      "sha256": "95085afa3b0280cd9303bb444377c8d98b27eb62bfea5abc46efc1fdf2046cbf"
+    },
+    {
+      "bytes": 6376,
+      "path": "records/current/campaign/flop-1-baseline/restore/ev/supervisor.json",
+      "sha256": "e446308f690fdff57c0b1ac4da019cf2cea035ff17627045b9016d948e81b65d"
+    },
+    {
+      "bytes": 8361,
+      "path": "records/current/campaign/flop-1-baseline/restore/ev/supervisor.samples.jsonl",
+      "sha256": "9aacc5b22fea1bcc1fb10b6262916922374112cc99958dc07dc5221cc92a62de"
+    },
+    {
+      "bytes": 3262,
+      "path": "records/current/campaign/flop-1-baseline/restore/profile.json",
+      "sha256": "27fa8edfa99841e897cfae6e877e2bcd9472b94e6480df6eb676ebdf0079b8f2"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/flop-1-baseline/restore/resume/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 395,
+      "path": "records/current/campaign/flop-1-baseline/restore/resume/stdout.log",
+      "sha256": "0ef631770484c72aa5a42818eda67f95b3a99c11949387697f21fa2ca455da64"
+    },
+    {
+      "bytes": 6019,
+      "path": "records/current/campaign/flop-1-baseline/restore/resume/supervisor.json",
+      "sha256": "c3ad81b50c64fc64a9627bc122828e492aa755b0f3a8b233602964ed7e4a509a"
+    },
+    {
+      "bytes": 17606,
+      "path": "records/current/campaign/flop-1-baseline/restore/resume/supervisor.samples.jsonl",
+      "sha256": "1d1ce13aede252066d7f2adf2b6a7792b35e3a06ad64c829a1e7d8e86d2ebd7f"
+    },
+    {
+      "bytes": 34538,
+      "path": "records/current/campaign/flop-1-baseline/restore/run/checkpoint.ckpt",
+      "sha256": "edbdbc1c39897bd8ec77cdada36b39ab0fe4bd329dfd0724ff796a2f1540d02b"
+    },
+    {
+      "bytes": 244,
+      "path": "records/current/campaign/flop-1-baseline/restore/run/events.jsonl",
+      "sha256": "b45bd3a5bab4fecf0c5ae9f7d038798dad6969739703ec9afe8998e138841f39"
+    },
+    {
+      "bytes": 522,
+      "path": "records/current/campaign/flop-1-baseline/restore/run/manifest.json",
+      "sha256": "0c373297850b311c3de1c4e31099db7ff77aaea774dfc5257481aa8fd84afc6f"
+    },
+    {
+      "bytes": 692,
+      "path": "records/current/campaign/flop-1-baseline/restore/run/progress.jsonl",
+      "sha256": "ac19e2b99b66f831dbdad5af0f6f08d64db57323c1cfcd6818c5f42656ae0b59"
+    },
+    {
+      "bytes": 176,
+      "path": "records/current/campaign/flop-1-baseline/restore/run/run.json",
+      "sha256": "09454bb0bb27f62fa4dc4fecf8d1164b372b76dd9ad558cf5078d7e02a05bc6b"
+    },
+    {
+      "bytes": 677,
+      "path": "records/current/campaign/flop-1-baseline/restore/run/run.toml",
+      "sha256": "d0fb4ed3f7d3ca9dd04b4599ca37435d70b37520c596e2724d104a672b76cd62"
+    },
+    {
+      "bytes": 131744,
+      "path": "records/current/campaign/flop-1-baseline/restore/run/solution.sol",
+      "sha256": "c5a9a2a7c6541bd37edce4f6b7dd04bb05da65130b2c7ec1ea17e3379b3b5667"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-baseline/restore/strategy/stderr.log",
+      "sha256": "95085afa3b0280cd9303bb444377c8d98b27eb62bfea5abc46efc1fdf2046cbf"
+    },
+    {
+      "bytes": 6411,
+      "path": "records/current/campaign/flop-1-baseline/restore/strategy/supervisor.json",
+      "sha256": "04cb5f40fff1b76494c052efed6ddb88c9102a8d2561f5ae3791207c74e5578b"
+    },
+    {
+      "bytes": 8660,
+      "path": "records/current/campaign/flop-1-baseline/restore/strategy/supervisor.samples.jsonl",
+      "sha256": "823512a59005e8523ac95e5421a78221c70f408db666e5b2dea7d2a7075cc882"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-baseline/restore/summary/stderr.log",
+      "sha256": "cac1ea46d93872f6dd6fa5f0f2c4b4e39ccc2eb5142e9a49abbce33e707dd087"
+    },
+    {
+      "bytes": 389,
+      "path": "records/current/campaign/flop-1-baseline/restore/summary/stdout.log",
+      "sha256": "b2b4ede3657f84e57ca18d6f7707e50066117be022453f2842c42b408ee9c362"
+    },
+    {
+      "bytes": 6355,
+      "path": "records/current/campaign/flop-1-baseline/restore/summary/supervisor.json",
+      "sha256": "3d9d7f1faa670d6bbd6044fc2218e88d5456a9b246c9ed6c870867caed38602a"
+    },
+    {
+      "bytes": 20396,
+      "path": "records/current/campaign/flop-1-baseline/restore/summary/supervisor.samples.jsonl",
+      "sha256": "b9dcbb3340d01e935938833e06912a6e5d49f5b1ee669d2514f16adeba598e42"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-baseline/restore/tree/stderr.log",
+      "sha256": "daade4ca79ef06539a1ad3124b501a4fe22e3cdfa434d23216e52e7e42a95933"
+    },
+    {
+      "bytes": 6388,
+      "path": "records/current/campaign/flop-1-baseline/restore/tree/supervisor.json",
+      "sha256": "bfa22c9f0c643ca5ddd164e5b1e94fdadf0a0cb661364977267c6704b90cc1d1"
+    },
+    {
+      "bytes": 3728,
+      "path": "records/current/campaign/flop-1-baseline/restore/tree/supervisor.samples.jsonl",
+      "sha256": "e9321c6c1a13a587726010eb20dbcc16cb3bf96f25e32108752a8df0ec1358c5"
+    },
+    {
+      "bytes": 15107,
+      "path": "records/current/campaign/flop-1-baseline/result.json",
+      "sha256": "3bf05e4d195f4c0947c31c8b86fc8b164434dcb19d683002943a854e20e671d0"
+    },
+    {
+      "bytes": 34538,
+      "path": "records/current/campaign/flop-1-baseline/run/checkpoint.ckpt",
+      "sha256": "edbdbc1c39897bd8ec77cdada36b39ab0fe4bd329dfd0724ff796a2f1540d02b"
+    },
+    {
+      "bytes": 644,
+      "path": "records/current/campaign/flop-1-baseline/run/events.jsonl",
+      "sha256": "6f5ff421ee1178274e16c4cfb25f21874b3cf23d739ec31508e898c5cb117f2c"
+    },
+    {
+      "bytes": 620,
+      "path": "records/current/campaign/flop-1-baseline/run/manifest.json",
+      "sha256": "446a7a258454088ab6d901cfd170ad234fa69a03e80f17793996d9a1da05d43c"
+    },
+    {
+      "bytes": 692,
+      "path": "records/current/campaign/flop-1-baseline/run/progress.jsonl",
+      "sha256": "ac19e2b99b66f831dbdad5af0f6f08d64db57323c1cfcd6818c5f42656ae0b59"
+    },
+    {
+      "bytes": 176,
+      "path": "records/current/campaign/flop-1-baseline/run/run.json",
+      "sha256": "7e6e80ef96260c595e35b70161fb611a357cb93d2f73c20c56e00d019d1720b7"
+    },
+    {
+      "bytes": 677,
+      "path": "records/current/campaign/flop-1-baseline/run/run.toml",
+      "sha256": "d0fb4ed3f7d3ca9dd04b4599ca37435d70b37520c596e2724d104a672b76cd62"
+    },
+    {
+      "bytes": 131744,
+      "path": "records/current/campaign/flop-1-baseline/run/solution.sol",
+      "sha256": "2da9f535c736ba259fa86d62335800f34c6a3b86c692759caaa4c6ca791311f2"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/flop-1-baseline/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 707,
+      "path": "records/current/campaign/flop-1-baseline/solve/stdout.log",
+      "sha256": "a71df8f854e876178faf048acc26cb8f9d7bdfd4170ac43587fbb466bc5c80f5"
+    },
+    {
+      "bytes": 6518,
+      "path": "records/current/campaign/flop-1-baseline/solve/supervisor.json",
+      "sha256": "dbf6404a47d1b8f9efdfdda465a9af432d919011908cb901ff15cd847e7003e5"
+    },
+    {
+      "bytes": 61693,
+      "path": "records/current/campaign/flop-1-baseline/solve/supervisor.samples.jsonl",
+      "sha256": "bba0577c576799dcf34b0e7f6a1709f8799ab02fc640c6548052b3c830ee2c22"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-baseline/strategy/stderr.log",
+      "sha256": "95085afa3b0280cd9303bb444377c8d98b27eb62bfea5abc46efc1fdf2046cbf"
+    },
+    {
+      "bytes": 6349,
+      "path": "records/current/campaign/flop-1-baseline/strategy/supervisor.json",
+      "sha256": "a2b6f15e4e3fc5a84daa14633e74919bcd1f45bd67076b664ef8bfa030f0c52b"
+    },
+    {
+      "bytes": 8661,
+      "path": "records/current/campaign/flop-1-baseline/strategy/supervisor.samples.jsonl",
+      "sha256": "44b7463af1850de57104571c716fa75f4f132738a119e81a2f789fd66991cafd"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-baseline/summary/stderr.log",
+      "sha256": "daade4ca79ef06539a1ad3124b501a4fe22e3cdfa434d23216e52e7e42a95933"
+    },
+    {
+      "bytes": 389,
+      "path": "records/current/campaign/flop-1-baseline/summary/stdout.log",
+      "sha256": "dfce60447b49e80b3dfae98cb9b2f99819aa35d0a3ca3eb6cbd26051788172db"
+    },
+    {
+      "bytes": 6731,
+      "path": "records/current/campaign/flop-1-baseline/summary/supervisor.json",
+      "sha256": "149258a1bac257fca8caee466ad1f329b2eb48a4a36e41591446ffb67d99cf2e"
+    },
+    {
+      "bytes": 17333,
+      "path": "records/current/campaign/flop-1-baseline/summary/supervisor.samples.jsonl",
+      "sha256": "2f3dc401f042a0ef9e61616e3378fb1e4e8053909620349e08ca8994efc6e331"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-baseline/tree/stderr.log",
+      "sha256": "95085afa3b0280cd9303bb444377c8d98b27eb62bfea5abc46efc1fdf2046cbf"
+    },
+    {
+      "bytes": 6325,
+      "path": "records/current/campaign/flop-1-baseline/tree/supervisor.json",
+      "sha256": "f2e975dcf662639c74c0879af5ba7d152d86f9d09f9b460ef9ad1de006a5c239"
+    },
+    {
+      "bytes": 3416,
+      "path": "records/current/campaign/flop-1-baseline/tree/supervisor.samples.jsonl",
+      "sha256": "d7addc80f19c5025e89a4ade3ced6d0945e0df51510667b829a352d03a6d7a73"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-candidate/ev/stderr.log",
+      "sha256": "daade4ca79ef06539a1ad3124b501a4fe22e3cdfa434d23216e52e7e42a95933"
+    },
+    {
+      "bytes": 6348,
+      "path": "records/current/campaign/flop-1-candidate/ev/supervisor.json",
+      "sha256": "adbf81e21625666319e202515bebe8cbc7a5e61a8c65a4f3c7b34f37563df11a"
+    },
+    {
+      "bytes": 9593,
+      "path": "records/current/campaign/flop-1-candidate/ev/supervisor.samples.jsonl",
+      "sha256": "db45ec1ab2c6917399c3bbbd66ab89f8eaa376bbc2203782c078eef440c02274"
+    },
+    {
+      "bytes": 3221,
+      "path": "records/current/campaign/flop-1-candidate/profile.json",
+      "sha256": "f9aa4a9a602ac98a818e40dd253c530d63c546ebe0457b067267830a94632609"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-candidate/restore/ev/stderr.log",
+      "sha256": "95085afa3b0280cd9303bb444377c8d98b27eb62bfea5abc46efc1fdf2046cbf"
+    },
+    {
+      "bytes": 6412,
+      "path": "records/current/campaign/flop-1-candidate/restore/ev/supervisor.json",
+      "sha256": "621e89125a6c8ec33dd25fb4438c551a9e6a0df406d47c3c1658163af881bbc5"
+    },
+    {
+      "bytes": 9594,
+      "path": "records/current/campaign/flop-1-candidate/restore/ev/supervisor.samples.jsonl",
+      "sha256": "22f29d442ef55d56530eaa51a0ad30f21d09a634e653daed2da40d213b338be2"
+    },
+    {
+      "bytes": 3268,
+      "path": "records/current/campaign/flop-1-candidate/restore/profile.json",
+      "sha256": "cfd13c1b71e71332ec4bfb8cae2c4d6df1c533756146fef812e5b3dafd7c4740"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/flop-1-candidate/restore/resume/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 396,
+      "path": "records/current/campaign/flop-1-candidate/restore/resume/stdout.log",
+      "sha256": "f760ca071e4fbfe950bd1d4122a715a3b1e040e7f745cd01bb726e274f4b77a3"
+    },
+    {
+      "bytes": 6055,
+      "path": "records/current/campaign/flop-1-candidate/restore/resume/supervisor.json",
+      "sha256": "544c7947b82e10cc0ccb2e3fa91548ee8d377a2a4fcb16b6c2cae55c8ebc7967"
+    },
+    {
+      "bytes": 15747,
+      "path": "records/current/campaign/flop-1-candidate/restore/resume/supervisor.samples.jsonl",
+      "sha256": "b4442a6df7913efa787de119a17e27aac42d77e8ac0cd29107ebbaaaa0e16bb4"
+    },
+    {
+      "bytes": 34545,
+      "path": "records/current/campaign/flop-1-candidate/restore/run/checkpoint.ckpt",
+      "sha256": "eba21d600c9e53d34840e6c4a9083f6379f9d4f78a0611d57e42c41a8c99918a"
+    },
+    {
+      "bytes": 244,
+      "path": "records/current/campaign/flop-1-candidate/restore/run/events.jsonl",
+      "sha256": "8c66b4a9b9d8a02c397cdec9eb5635f0d026d1f9b77d808e7c275fd10ac721f9"
+    },
+    {
+      "bytes": 523,
+      "path": "records/current/campaign/flop-1-candidate/restore/run/manifest.json",
+      "sha256": "c1613ebf4f0016bf008fc6247ee72c561f4eb09e60f5320397b7623809512501"
+    },
+    {
+      "bytes": 692,
+      "path": "records/current/campaign/flop-1-candidate/restore/run/progress.jsonl",
+      "sha256": "e0943d2aefdba3aeb821f8ab1918faa9185b0c6ab7ff0ab96288a187c6bd6049"
+    },
+    {
+      "bytes": 176,
+      "path": "records/current/campaign/flop-1-candidate/restore/run/run.json",
+      "sha256": "d03ba8ac62b44ad8db263b38475686d6617749c240eb792b3890ee7ae80aa1c6"
+    },
+    {
+      "bytes": 715,
+      "path": "records/current/campaign/flop-1-candidate/restore/run/run.toml",
+      "sha256": "76650e60cdc4a58bbbdc3e7b6a547d6df992fef5b8b4909ebf8fabee288211cc"
+    },
+    {
+      "bytes": 176835,
+      "path": "records/current/campaign/flop-1-candidate/restore/run/solution.sol",
+      "sha256": "d7037b7bdb5fa7ffd77de103269bc6f8e2d2a8b9a1c85c8ecf9ba00fa44c3935"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-candidate/restore/strategy/stderr.log",
+      "sha256": "95085afa3b0280cd9303bb444377c8d98b27eb62bfea5abc46efc1fdf2046cbf"
+    },
+    {
+      "bytes": 6449,
+      "path": "records/current/campaign/flop-1-candidate/restore/strategy/supervisor.json",
+      "sha256": "06f9ebd2e8abd45225ca15820aae1a8655750b90d0af09838f79520082022e48"
+    },
+    {
+      "bytes": 9282,
+      "path": "records/current/campaign/flop-1-candidate/restore/strategy/supervisor.samples.jsonl",
+      "sha256": "a3180862091da0c577000f27710757106c11412edd13078e6b13937bb7483f6d"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/flop-1-candidate/restore/summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 389,
+      "path": "records/current/campaign/flop-1-candidate/restore/summary/stdout.log",
+      "sha256": "39e159ca639f7b8778d2868c2a6be4d2bb7cca7b3e03e18bd22541c305cc2de2"
+    },
+    {
+      "bytes": 6364,
+      "path": "records/current/campaign/flop-1-candidate/restore/summary/supervisor.json",
+      "sha256": "cbf57e7cc5c556c106aa7f49efd97b289d9ca99ca38fefbf6c7c2d99f09a1764"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/flop-1-candidate/restore/summary/supervisor.samples.jsonl",
+      "sha256": "d7ab4f6004b30739cd7cf6b65f816ee3dc0dffac38980557e67a56261c80f7e2"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-candidate/restore/tree/stderr.log",
+      "sha256": "40ce91b3a7b25dcd34aa263e75c4cf9f2db9851617145f0e050becf9401da875"
+    },
+    {
+      "bytes": 6423,
+      "path": "records/current/campaign/flop-1-candidate/restore/tree/supervisor.json",
+      "sha256": "571fe222976a71776a6ff098e96cb89b2760fb65a75c069321f40e34c141ad81"
+    },
+    {
+      "bytes": 4022,
+      "path": "records/current/campaign/flop-1-candidate/restore/tree/supervisor.samples.jsonl",
+      "sha256": "ce267dd696641760c4d2955959adb7d32930964d79e3c69d4f6e81495d538691"
+    },
+    {
+      "bytes": 15080,
+      "path": "records/current/campaign/flop-1-candidate/result.json",
+      "sha256": "93cb538d797d9fa6460026aaff5dc9f66c1bc26cce15035d274949c6f594fcc7"
+    },
+    {
+      "bytes": 34545,
+      "path": "records/current/campaign/flop-1-candidate/run/checkpoint.ckpt",
+      "sha256": "eba21d600c9e53d34840e6c4a9083f6379f9d4f78a0611d57e42c41a8c99918a"
+    },
+    {
+      "bytes": 564,
+      "path": "records/current/campaign/flop-1-candidate/run/events.jsonl",
+      "sha256": "ee1d54a1f178b1e1eb7b55a6e9103a5ae82bc494b75317fe666890f983a574e2"
+    },
+    {
+      "bytes": 621,
+      "path": "records/current/campaign/flop-1-candidate/run/manifest.json",
+      "sha256": "66c67d397f1e61f381d8464661ceb805bf6597b50d60748c27ba29b76d273195"
+    },
+    {
+      "bytes": 692,
+      "path": "records/current/campaign/flop-1-candidate/run/progress.jsonl",
+      "sha256": "e0943d2aefdba3aeb821f8ab1918faa9185b0c6ab7ff0ab96288a187c6bd6049"
+    },
+    {
+      "bytes": 175,
+      "path": "records/current/campaign/flop-1-candidate/run/run.json",
+      "sha256": "288acbfb555a50311d44ec66bff3e5a71d1d97bca15873f8a5485c9ae6fb39bf"
+    },
+    {
+      "bytes": 715,
+      "path": "records/current/campaign/flop-1-candidate/run/run.toml",
+      "sha256": "76650e60cdc4a58bbbdc3e7b6a547d6df992fef5b8b4909ebf8fabee288211cc"
+    },
+    {
+      "bytes": 176833,
+      "path": "records/current/campaign/flop-1-candidate/run/solution.sol",
+      "sha256": "5f9fc7a35a4a4e034d029844ced6251e1603c9de269b69b6c275ae7034d837f1"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/flop-1-candidate/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 708,
+      "path": "records/current/campaign/flop-1-candidate/solve/stdout.log",
+      "sha256": "95f4ba301a268c5f5b771da91313561329d459699a4483a407a5c512e2e11d8a"
+    },
+    {
+      "bytes": 6551,
+      "path": "records/current/campaign/flop-1-candidate/solve/supervisor.json",
+      "sha256": "e2683fc50fb27d53d8e179cab193bba27acfab47c17cc79b3e93b3855761d8f8"
+    },
+    {
+      "bytes": 52419,
+      "path": "records/current/campaign/flop-1-candidate/solve/supervisor.samples.jsonl",
+      "sha256": "9c831e322bd8d3fdd99653f0b908a94d502c42c09119f9f2046e1b530bd8f7a1"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-candidate/strategy/stderr.log",
+      "sha256": "270b3a4d0eb3e34c9a7851bb1875ed68039bac1766bcf4e30495f00b85cf5442"
+    },
+    {
+      "bytes": 6386,
+      "path": "records/current/campaign/flop-1-candidate/strategy/supervisor.json",
+      "sha256": "bb5a35c37c2ad97dea88da1f81c6664c915b7727f39d65d6ba152bd6e9803084"
+    },
+    {
+      "bytes": 10496,
+      "path": "records/current/campaign/flop-1-candidate/strategy/supervisor.samples.jsonl",
+      "sha256": "7ea4918182a6dcfc1149a70af78c3a2cc40244bc96bd01b96231454a8ccc4e3e"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/flop-1-candidate/summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 388,
+      "path": "records/current/campaign/flop-1-candidate/summary/stdout.log",
+      "sha256": "5c207b746a3103364be73f5811b9cf861279f10799208209f9e8f0df9103459b"
+    },
+    {
+      "bytes": 6741,
+      "path": "records/current/campaign/flop-1-candidate/summary/supervisor.json",
+      "sha256": "256490ff85fcfe025d89a0f9a383edc02c6c94e9340676e71400a773944a588f"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/flop-1-candidate/summary/supervisor.samples.jsonl",
+      "sha256": "83e1b000a7b0f905eb6ee4c916ba707292440fb95528bdb37d3fb75da4fee4cb"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-1-candidate/tree/stderr.log",
+      "sha256": "40ce91b3a7b25dcd34aa263e75c4cf9f2db9851617145f0e050becf9401da875"
+    },
+    {
+      "bytes": 6361,
+      "path": "records/current/campaign/flop-1-candidate/tree/supervisor.json",
+      "sha256": "ae7b9f3103c9aa101a4b95a4725a33b85a60e5c4fd1061fc3557a552c97e213d"
+    },
+    {
+      "bytes": 4030,
+      "path": "records/current/campaign/flop-1-candidate/tree/supervisor.samples.jsonl",
+      "sha256": "bbb1945c74d2632dd623f34213b07d6835053a80924d3d41e1a4d2ac42d7daa5"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-2-baseline/ev/stderr.log",
+      "sha256": "95085afa3b0280cd9303bb444377c8d98b27eb62bfea5abc46efc1fdf2046cbf"
+    },
+    {
+      "bytes": 6314,
+      "path": "records/current/campaign/flop-2-baseline/ev/supervisor.json",
+      "sha256": "d181383e75cd061123a8c2d9005f288ee8de94cee69674907f74f159a24cce70"
+    },
+    {
+      "bytes": 8363,
+      "path": "records/current/campaign/flop-2-baseline/ev/supervisor.samples.jsonl",
+      "sha256": "45983953455bf5cdf0c66909aa94fc9aa53d69ee03a0044e6d0c18c66782563d"
+    },
+    {
+      "bytes": 3219,
+      "path": "records/current/campaign/flop-2-baseline/profile.json",
+      "sha256": "c500bd906f44f16300023266394f8df1899758f54fca42f9ddbee6ab24b2e5ca"
+    },
+    {
+      "bytes": 8639,
+      "path": "records/current/campaign/flop-2-baseline/result.json",
+      "sha256": "8dccda66f20801677aa3743d6a746dbf77414bb43d8cabf7ec3eea7d1c9d1a72"
+    },
+    {
+      "bytes": 34538,
+      "path": "records/current/campaign/flop-2-baseline/run/checkpoint.ckpt",
+      "sha256": "edbdbc1c39897bd8ec77cdada36b39ab0fe4bd329dfd0724ff796a2f1540d02b"
+    },
+    {
+      "bytes": 644,
+      "path": "records/current/campaign/flop-2-baseline/run/events.jsonl",
+      "sha256": "255dee04647a77d31278ba582a40881d005510a4aebfb84709cd7749cfb0ff86"
+    },
+    {
+      "bytes": 620,
+      "path": "records/current/campaign/flop-2-baseline/run/manifest.json",
+      "sha256": "2cda6e2e846479a6f92f48930c683a02499a2cc22a29c88ef30f035b18b84d91"
+    },
+    {
+      "bytes": 686,
+      "path": "records/current/campaign/flop-2-baseline/run/progress.jsonl",
+      "sha256": "0db0a32c68cf0cb0428268bc9bc2404d8b7a561a1b3812f44c29dbeacae50e35"
+    },
+    {
+      "bytes": 177,
+      "path": "records/current/campaign/flop-2-baseline/run/run.json",
+      "sha256": "e7593db60e8a43e727d174646f4141bf61c9ce0040e4ba2c9e8bcc1136c1a4fe"
+    },
+    {
+      "bytes": 677,
+      "path": "records/current/campaign/flop-2-baseline/run/run.toml",
+      "sha256": "d0fb4ed3f7d3ca9dd04b4599ca37435d70b37520c596e2724d104a672b76cd62"
+    },
+    {
+      "bytes": 131743,
+      "path": "records/current/campaign/flop-2-baseline/run/solution.sol",
+      "sha256": "2ccea99881d29eb7db2bc5f570826930f358efef9287a1ee72285d5d4c920604"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/flop-2-baseline/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 708,
+      "path": "records/current/campaign/flop-2-baseline/solve/stdout.log",
+      "sha256": "8e34d23069145eddb9154eb8408118b825077bce836785e5e742f9fa96e15c28"
+    },
+    {
+      "bytes": 6517,
+      "path": "records/current/campaign/flop-2-baseline/solve/supervisor.json",
+      "sha256": "ec7d143d31d91e5c5b972a4c2b64a378748be70272419694b049eb3180add159"
+    },
+    {
+      "bytes": 65060,
+      "path": "records/current/campaign/flop-2-baseline/solve/supervisor.samples.jsonl",
+      "sha256": "a0ed26af1d8399d12f059c7ac6d1c813efc08cf84e24568ad95d8e72b45b149a"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-2-baseline/strategy/stderr.log",
+      "sha256": "40ce91b3a7b25dcd34aa263e75c4cf9f2db9851617145f0e050becf9401da875"
+    },
+    {
+      "bytes": 6350,
+      "path": "records/current/campaign/flop-2-baseline/strategy/supervisor.json",
+      "sha256": "8880749fd2ff9ebecdf682056774e733105534418958f2440fd4bda831156dab"
+    },
+    {
+      "bytes": 8671,
+      "path": "records/current/campaign/flop-2-baseline/strategy/supervisor.samples.jsonl",
+      "sha256": "ecbb5030d80af75f63babb533a688de83c4692422f004a7458438ef96b0b30df"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-2-baseline/summary/stderr.log",
+      "sha256": "95085afa3b0280cd9303bb444377c8d98b27eb62bfea5abc46efc1fdf2046cbf"
+    },
+    {
+      "bytes": 390,
+      "path": "records/current/campaign/flop-2-baseline/summary/stdout.log",
+      "sha256": "c3481f053ddbd203a126a93fd9318a01f85c0405943d7db1fb4d02efbc078d13"
+    },
+    {
+      "bytes": 6732,
+      "path": "records/current/campaign/flop-2-baseline/summary/supervisor.json",
+      "sha256": "c1ec51b25e58e8cc30dab33a16bdc34df3317f6a33852280cd52b089a221f144"
+    },
+    {
+      "bytes": 20106,
+      "path": "records/current/campaign/flop-2-baseline/summary/supervisor.samples.jsonl",
+      "sha256": "f5b5068d5e0ded3d6d91f4dc896eaa8f80f4accc1cfc157244f7ac8328ab5bda"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-2-baseline/tree/stderr.log",
+      "sha256": "40ce91b3a7b25dcd34aa263e75c4cf9f2db9851617145f0e050becf9401da875"
+    },
+    {
+      "bytes": 6326,
+      "path": "records/current/campaign/flop-2-baseline/tree/supervisor.json",
+      "sha256": "24859836388199e9006a72a88476e566628d55ba98fbbfdf8fd42c80b470bc7a"
+    },
+    {
+      "bytes": 3721,
+      "path": "records/current/campaign/flop-2-baseline/tree/supervisor.samples.jsonl",
+      "sha256": "de4ea0cb062ab49c2835ce6328f85e3455474e2949672f65f4462e19e7486f11"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-2-candidate/ev/stderr.log",
+      "sha256": "daade4ca79ef06539a1ad3124b501a4fe22e3cdfa434d23216e52e7e42a95933"
+    },
+    {
+      "bytes": 6350,
+      "path": "records/current/campaign/flop-2-candidate/ev/supervisor.json",
+      "sha256": "f4bbbfda10475ceab21aa5aa8fe8ce7e3fc9e53a7aa509088991a8157a0790b2"
+    },
+    {
+      "bytes": 9892,
+      "path": "records/current/campaign/flop-2-candidate/ev/supervisor.samples.jsonl",
+      "sha256": "a544193c50ac716cb8604bbf6123d6db5b5ddb9d4cee3f5c1e4f848eff1650f7"
+    },
+    {
+      "bytes": 3223,
+      "path": "records/current/campaign/flop-2-candidate/profile.json",
+      "sha256": "457de2cb45efee69e0b1c40345945bb18505c7090dadd5b3da412d6e1ac305ee"
+    },
+    {
+      "bytes": 8626,
+      "path": "records/current/campaign/flop-2-candidate/result.json",
+      "sha256": "a30dc1a214379a3541dd91e0c75561e755710ff5ae7a74e8fba5005a87cc736a"
+    },
+    {
+      "bytes": 34545,
+      "path": "records/current/campaign/flop-2-candidate/run/checkpoint.ckpt",
+      "sha256": "eba21d600c9e53d34840e6c4a9083f6379f9d4f78a0611d57e42c41a8c99918a"
+    },
+    {
+      "bytes": 564,
+      "path": "records/current/campaign/flop-2-candidate/run/events.jsonl",
+      "sha256": "993625134a2e60a64bbc3c9ac627c9dc844cc35093e48a97ce5edb67b32bb6e0"
+    },
+    {
+      "bytes": 621,
+      "path": "records/current/campaign/flop-2-candidate/run/manifest.json",
+      "sha256": "e3c5096f7a861848287ecaee07cb228cc62cdbeef35c766fc57b7d78aecd0459"
+    },
+    {
+      "bytes": 684,
+      "path": "records/current/campaign/flop-2-candidate/run/progress.jsonl",
+      "sha256": "4d0cd283abfd0b8a8b0b634b53b8be468229171ba7a5836e88600690fe545db5"
+    },
+    {
+      "bytes": 176,
+      "path": "records/current/campaign/flop-2-candidate/run/run.json",
+      "sha256": "96a32dc522b0b3c28277720bd7d52499f2da107eb5b61118c89f85b99e5eb478"
+    },
+    {
+      "bytes": 715,
+      "path": "records/current/campaign/flop-2-candidate/run/run.toml",
+      "sha256": "76650e60cdc4a58bbbdc3e7b6a547d6df992fef5b8b4909ebf8fabee288211cc"
+    },
+    {
+      "bytes": 176833,
+      "path": "records/current/campaign/flop-2-candidate/run/solution.sol",
+      "sha256": "d3cefd8b7fc7851f5e736999bbb969b70e3364be9eceb5793f4655b133b74541"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/flop-2-candidate/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 708,
+      "path": "records/current/campaign/flop-2-candidate/solve/stdout.log",
+      "sha256": "56e6f77eb8e4e251e6bd57778dd58f40fa7271511a39e905d1f2c6f6d8abba65"
+    },
+    {
+      "bytes": 6551,
+      "path": "records/current/campaign/flop-2-candidate/solve/supervisor.json",
+      "sha256": "d573771ee3e265f5da10abd3b9779f35dddcf3aeef15aa959d2c67cf77541bce"
+    },
+    {
+      "bytes": 51486,
+      "path": "records/current/campaign/flop-2-candidate/solve/supervisor.samples.jsonl",
+      "sha256": "a668e635875d8ffa24c3ea0734ef5acc855c66b6f6f1486bdc78aafb2e3a78ed"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-2-candidate/strategy/stderr.log",
+      "sha256": "95085afa3b0280cd9303bb444377c8d98b27eb62bfea5abc46efc1fdf2046cbf"
+    },
+    {
+      "bytes": 6384,
+      "path": "records/current/campaign/flop-2-candidate/strategy/supervisor.json",
+      "sha256": "64aec60724fc0b70429e3961698d44df75f908d9fe3523c945a02c978d8c2a03"
+    },
+    {
+      "bytes": 9898,
+      "path": "records/current/campaign/flop-2-candidate/strategy/supervisor.samples.jsonl",
+      "sha256": "c820e39b275ef8a16e4c10899a7d22d687f5f3bb2a787344d5afdddb5afe865f"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/flop-2-candidate/summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 389,
+      "path": "records/current/campaign/flop-2-candidate/summary/stdout.log",
+      "sha256": "729ae516416309a62dc674f973a55f36dc97ddf96eb7b1eca886a46cceb83f8c"
+    },
+    {
+      "bytes": 6741,
+      "path": "records/current/campaign/flop-2-candidate/summary/supervisor.json",
+      "sha256": "5bf2365e40756d584984ab4dfdf7033632fc6e4abe32806cb5bb5af89bdc92bb"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/flop-2-candidate/summary/supervisor.samples.jsonl",
+      "sha256": "483ea7ac29a907ce474981323571ca5d034b184cac156498e4390353e81a6bc0"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-2-candidate/tree/stderr.log",
+      "sha256": "cac1ea46d93872f6dd6fa5f0f2c4b4e39ccc2eb5142e9a49abbce33e707dd087"
+    },
+    {
+      "bytes": 6362,
+      "path": "records/current/campaign/flop-2-candidate/tree/supervisor.json",
+      "sha256": "4827821a22c358e4eac22413530c02fc6ac311943cec0b0d9d18aee3f9542e8d"
+    },
+    {
+      "bytes": 5266,
+      "path": "records/current/campaign/flop-2-candidate/tree/supervisor.samples.jsonl",
+      "sha256": "3dbb3d518b0145ba40bf83fcffe1c823cdc8815dce3c6d14220200662a4ea6c5"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-3-baseline/ev/stderr.log",
+      "sha256": "40ce91b3a7b25dcd34aa263e75c4cf9f2db9851617145f0e050becf9401da875"
+    },
+    {
+      "bytes": 6314,
+      "path": "records/current/campaign/flop-3-baseline/ev/supervisor.json",
+      "sha256": "50894ff845f2aa7ed80f1d7dbe1051e3301daec0cb6144992e927856391af521"
+    },
+    {
+      "bytes": 9289,
+      "path": "records/current/campaign/flop-3-baseline/ev/supervisor.samples.jsonl",
+      "sha256": "2a527b834195bf8c04924b449a86086686b171414c75ff5c13cfc21d88daa71f"
+    },
+    {
+      "bytes": 3217,
+      "path": "records/current/campaign/flop-3-baseline/profile.json",
+      "sha256": "fc0a1ddc3aabada4b32c37fea353f7afcc3e21226efd5a47a8dd521b3cf5049d"
+    },
+    {
+      "bytes": 8636,
+      "path": "records/current/campaign/flop-3-baseline/result.json",
+      "sha256": "6c2c674fc4cd531f27f24668fdc810af2649793eb6d32eadfa58dd086ea20ed9"
+    },
+    {
+      "bytes": 34538,
+      "path": "records/current/campaign/flop-3-baseline/run/checkpoint.ckpt",
+      "sha256": "edbdbc1c39897bd8ec77cdada36b39ab0fe4bd329dfd0724ff796a2f1540d02b"
+    },
+    {
+      "bytes": 644,
+      "path": "records/current/campaign/flop-3-baseline/run/events.jsonl",
+      "sha256": "36e131d87e4f2cfa00e0327729321b472ddeea5741cb83f25ea4f975bfd99126"
+    },
+    {
+      "bytes": 620,
+      "path": "records/current/campaign/flop-3-baseline/run/manifest.json",
+      "sha256": "c278ea1666171ca09881e7228c348490119b4489ed9177abf6d96759a3b1b8ca"
+    },
+    {
+      "bytes": 683,
+      "path": "records/current/campaign/flop-3-baseline/run/progress.jsonl",
+      "sha256": "5dd25e7cd24c2d22d7dc2d97da57399bf87cbea2c87a47ab6117558c3e4f78ea"
+    },
+    {
+      "bytes": 176,
+      "path": "records/current/campaign/flop-3-baseline/run/run.json",
+      "sha256": "1ea082eaace8015d1047722b32b8feaad931811fd79f6216aeda3922bad291e4"
+    },
+    {
+      "bytes": 677,
+      "path": "records/current/campaign/flop-3-baseline/run/run.toml",
+      "sha256": "d0fb4ed3f7d3ca9dd04b4599ca37435d70b37520c596e2724d104a672b76cd62"
+    },
+    {
+      "bytes": 131744,
+      "path": "records/current/campaign/flop-3-baseline/run/solution.sol",
+      "sha256": "792367457528f89b36cc8fc42c33d42e4430dde7485b82012e6f7e38052112d5"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/flop-3-baseline/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 707,
+      "path": "records/current/campaign/flop-3-baseline/solve/stdout.log",
+      "sha256": "f0234383eb53a595022d1228fd69a7ac26fa5cf587f5c17694e4bab2411f8a94"
+    },
+    {
+      "bytes": 6518,
+      "path": "records/current/campaign/flop-3-baseline/solve/supervisor.json",
+      "sha256": "ee6a5cc71f8679e405a9dca0aba6d7f8f2002e878cefb1566410c6a5fb3fa284"
+    },
+    {
+      "bytes": 60751,
+      "path": "records/current/campaign/flop-3-baseline/solve/supervisor.samples.jsonl",
+      "sha256": "e82ddae09b1351e58b9c86c5909e05bf5e930f257c8495e6919d45b176b393c6"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-3-baseline/strategy/stderr.log",
+      "sha256": "40ce91b3a7b25dcd34aa263e75c4cf9f2db9851617145f0e050becf9401da875"
+    },
+    {
+      "bytes": 6348,
+      "path": "records/current/campaign/flop-3-baseline/strategy/supervisor.json",
+      "sha256": "cb91c69d420c319f12f4ab28e5775286d961397f1188ef203830284005a6a782"
+    },
+    {
+      "bytes": 8668,
+      "path": "records/current/campaign/flop-3-baseline/strategy/supervisor.samples.jsonl",
+      "sha256": "ce67569cd898d4eb0e63aa50deaabd6d57f7e150f7d4055d92649dd9ebfb041b"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-3-baseline/summary/stderr.log",
+      "sha256": "95085afa3b0280cd9303bb444377c8d98b27eb62bfea5abc46efc1fdf2046cbf"
+    },
+    {
+      "bytes": 389,
+      "path": "records/current/campaign/flop-3-baseline/summary/stdout.log",
+      "sha256": "349e622a7fea4b35ce6843465a573f3d943e5b268a4a3fb1b241fe555678167e"
+    },
+    {
+      "bytes": 6732,
+      "path": "records/current/campaign/flop-3-baseline/summary/supervisor.json",
+      "sha256": "582db319159e1bbd4f0e2d3ac3af38b644846e3ca00dee467283ed2c117d2cbb"
+    },
+    {
+      "bytes": 20103,
+      "path": "records/current/campaign/flop-3-baseline/summary/supervisor.samples.jsonl",
+      "sha256": "e5cc32036f9915f641000e2a6790438ca4445682118b0edf2f08a28e3844549b"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-3-baseline/tree/stderr.log",
+      "sha256": "95085afa3b0280cd9303bb444377c8d98b27eb62bfea5abc46efc1fdf2046cbf"
+    },
+    {
+      "bytes": 6325,
+      "path": "records/current/campaign/flop-3-baseline/tree/supervisor.json",
+      "sha256": "89070aeab6ac0f72cb3935ff12842ea8b6f2ebb69a731ebb871ebd857028792c"
+    },
+    {
+      "bytes": 3110,
+      "path": "records/current/campaign/flop-3-baseline/tree/supervisor.samples.jsonl",
+      "sha256": "9e45189de0bba61078232bc21942fa7d41996be4db05496b07fbafab68af09f4"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-3-candidate/ev/stderr.log",
+      "sha256": "270b3a4d0eb3e34c9a7851bb1875ed68039bac1766bcf4e30495f00b85cf5442"
+    },
+    {
+      "bytes": 6350,
+      "path": "records/current/campaign/flop-3-candidate/ev/supervisor.json",
+      "sha256": "064e6b6a1630b4213a068b3dded81caec5b5a4fb89978d7a203ab2dce5779ad7"
+    },
+    {
+      "bytes": 10204,
+      "path": "records/current/campaign/flop-3-candidate/ev/supervisor.samples.jsonl",
+      "sha256": "2ef5c5703c4fde242e7d37e9e9ec45b39f0002c0e43ea9cb721f505fd703b79a"
+    },
+    {
+      "bytes": 3222,
+      "path": "records/current/campaign/flop-3-candidate/profile.json",
+      "sha256": "b93ddcae47ccbaa5eefb19c1fd7e46b1326252d4d5558a7b900467040a982666"
+    },
+    {
+      "bytes": 8624,
+      "path": "records/current/campaign/flop-3-candidate/result.json",
+      "sha256": "a45910d955da12548f8240222c9c50abd64b2031a1d642bbbb0aa3eb99ae52ab"
+    },
+    {
+      "bytes": 34545,
+      "path": "records/current/campaign/flop-3-candidate/run/checkpoint.ckpt",
+      "sha256": "eba21d600c9e53d34840e6c4a9083f6379f9d4f78a0611d57e42c41a8c99918a"
+    },
+    {
+      "bytes": 564,
+      "path": "records/current/campaign/flop-3-candidate/run/events.jsonl",
+      "sha256": "4dd66387558f1449025e8a7d0453854d205703a4d92df8fdd0ee1429b0a65971"
+    },
+    {
+      "bytes": 621,
+      "path": "records/current/campaign/flop-3-candidate/run/manifest.json",
+      "sha256": "529282070d4bb31c672a837b21e4cf97febfb1af1f756b75d17731823b1c1c7c"
+    },
+    {
+      "bytes": 692,
+      "path": "records/current/campaign/flop-3-candidate/run/progress.jsonl",
+      "sha256": "90b69896fd131c0eb53cce4d5e67aed2f51638a6f081d97b5f7b3c2df6a79f36"
+    },
+    {
+      "bytes": 176,
+      "path": "records/current/campaign/flop-3-candidate/run/run.json",
+      "sha256": "90ace35f8c74f52f5db478c460a2e5d04203568c98cd3b403c5f19529c07c48b"
+    },
+    {
+      "bytes": 715,
+      "path": "records/current/campaign/flop-3-candidate/run/run.toml",
+      "sha256": "76650e60cdc4a58bbbdc3e7b6a547d6df992fef5b8b4909ebf8fabee288211cc"
+    },
+    {
+      "bytes": 176833,
+      "path": "records/current/campaign/flop-3-candidate/run/solution.sol",
+      "sha256": "45653cd60a073ce8212ef734f7fda7280e8692c664ed00ee445bd64950be1033"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/flop-3-candidate/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 708,
+      "path": "records/current/campaign/flop-3-candidate/solve/stdout.log",
+      "sha256": "6b542db1b1ecc265ff32753993abcc5b9e49a375af09c4092a63be20f55bfe4f"
+    },
+    {
+      "bytes": 6551,
+      "path": "records/current/campaign/flop-3-candidate/solve/supervisor.json",
+      "sha256": "275ec44d202482cd44b9c5c2d378554845527d45bd50fc487e1a4be74d4704e6"
+    },
+    {
+      "bytes": 51769,
+      "path": "records/current/campaign/flop-3-candidate/solve/supervisor.samples.jsonl",
+      "sha256": "3afb1ca968cb58e08f78ce9be5f696faded921428b8ba55e7aff3ad9f58621a1"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-3-candidate/strategy/stderr.log",
+      "sha256": "cac1ea46d93872f6dd6fa5f0f2c4b4e39ccc2eb5142e9a49abbce33e707dd087"
+    },
+    {
+      "bytes": 6386,
+      "path": "records/current/campaign/flop-3-candidate/strategy/supervisor.json",
+      "sha256": "58e66598d9ebf5eb1140102c674281799cc95e5fd2fdb5c198995d794f323ecb"
+    },
+    {
+      "bytes": 10209,
+      "path": "records/current/campaign/flop-3-candidate/strategy/supervisor.samples.jsonl",
+      "sha256": "bb007789021a96fc587052bdcb464929ffaeb20e9777a5b8aaaa5a0fadda081e"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/flop-3-candidate/summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 389,
+      "path": "records/current/campaign/flop-3-candidate/summary/stdout.log",
+      "sha256": "bdeb98d7678072d9d93481c76707b8bf220c24ddee020f7f0da6dd1357c13572"
+    },
+    {
+      "bytes": 6739,
+      "path": "records/current/campaign/flop-3-candidate/summary/supervisor.json",
+      "sha256": "eb3f8033070fe043a673104ef5926858d3081a5c777cbd22309bf11eebe59157"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/campaign/flop-3-candidate/summary/supervisor.samples.jsonl",
+      "sha256": "c8c3b3636fa9309391e32ce1e552b9d5eeb8bc8835069d63c8e32b27f3b8fbd3"
+    },
+    {
+      "bytes": 76,
+      "path": "records/current/campaign/flop-3-candidate/tree/stderr.log",
+      "sha256": "270b3a4d0eb3e34c9a7851bb1875ed68039bac1766bcf4e30495f00b85cf5442"
+    },
+    {
+      "bytes": 6361,
+      "path": "records/current/campaign/flop-3-candidate/tree/supervisor.json",
+      "sha256": "b34161aac390cb3edc350ab9f8649ce308c7090fff18dcce6ae17a8aa9ae3c6e"
+    },
+    {
+      "bytes": 5260,
+      "path": "records/current/campaign/flop-3-candidate/tree/supervisor.samples.jsonl",
+      "sha256": "dcaa532d162b45dd908b4742529207b0f794f2322c056038ce2d1d2133b5aa71"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-baseline/ev/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 136727,
+      "path": "records/current/campaign/river-1-baseline/ev/stdout.log",
+      "sha256": "2c1fa0b29271c1fb51c81b44d82f5bba0dccd4c048c1e0f095a00be9c83de88a"
+    },
+    {
+      "bytes": 6290,
+      "path": "records/current/campaign/river-1-baseline/ev/supervisor.json",
+      "sha256": "fa74d68d0e9a432c7c0a59a2a2c282c8ae1e7a93bbf9ea1eaef565d1107770fb"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/campaign/river-1-baseline/ev/supervisor.samples.jsonl",
+      "sha256": "a184d4857e356465c18856ed6d788bb2aeb38b7e4742630576786df217455d81"
+    },
+    {
+      "bytes": 3143,
+      "path": "records/current/campaign/river-1-baseline/profile.json",
+      "sha256": "4cac1c2a844b0333b37d492d9958365b2600c9168a9e7a424790ab351f458d38"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-baseline/restore/ev/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 136727,
+      "path": "records/current/campaign/river-1-baseline/restore/ev/stdout.log",
+      "sha256": "2c1fa0b29271c1fb51c81b44d82f5bba0dccd4c048c1e0f095a00be9c83de88a"
+    },
+    {
+      "bytes": 6353,
+      "path": "records/current/campaign/river-1-baseline/restore/ev/supervisor.json",
+      "sha256": "9bde2b6bb2b4722e59f1c45c51535dad605af9deac31a0d346b93dcfec5fa487"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-1-baseline/restore/ev/supervisor.samples.jsonl",
+      "sha256": "162978c0bae69947e10640c5c99087ad08acaddf27de2ba13384b17feefc7950"
+    },
+    {
+      "bytes": 3190,
+      "path": "records/current/campaign/river-1-baseline/restore/profile.json",
+      "sha256": "6570628a50aed0a3c983be9f9d7a0facf4dbeed6c707b202a6ca1588a619c3c0"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/river-1-baseline/restore/resume/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 384,
+      "path": "records/current/campaign/river-1-baseline/restore/resume/stdout.log",
+      "sha256": "dcc17882d38589cd1a77760855f279a96336b517743409ecd111227cdc22655d"
+    },
+    {
+      "bytes": 6021,
+      "path": "records/current/campaign/river-1-baseline/restore/resume/supervisor.json",
+      "sha256": "246b738f5a43988e79ba7f1be5baae2ea28e81ce241deedb4da4c06e99b38fe7"
+    },
+    {
+      "bytes": 632,
+      "path": "records/current/campaign/river-1-baseline/restore/resume/supervisor.samples.jsonl",
+      "sha256": "f59431020bad3f6382cbaddd1529fa85f4365e135967f3b0c7d1578a205a2920"
+    },
+    {
+      "bytes": 81323,
+      "path": "records/current/campaign/river-1-baseline/restore/run/checkpoint.ckpt",
+      "sha256": "8c03adb9f9a58dd28d827d19d57b7595bb0eebd5452f54aac033188eb4a6611e"
+    },
+    {
+      "bytes": 245,
+      "path": "records/current/campaign/river-1-baseline/restore/run/events.jsonl",
+      "sha256": "049181dd21c91327f39e243f4b89c236dacc6eaec00dc9221e5c4a65bf952dd0"
+    },
+    {
+      "bytes": 522,
+      "path": "records/current/campaign/river-1-baseline/restore/run/manifest.json",
+      "sha256": "066d227bb37ffcbac6015ac43b0ecbde5b5fce0b87d7ac25f2ad0487983ba437"
+    },
+    {
+      "bytes": 550,
+      "path": "records/current/campaign/river-1-baseline/restore/run/progress.jsonl",
+      "sha256": "adcffd9c7393a45a8fa01efda349878cc8e6f1a5fedfde821ba4fd1bcb70ebde"
+    },
+    {
+      "bytes": 177,
+      "path": "records/current/campaign/river-1-baseline/restore/run/run.json",
+      "sha256": "723fc5cd66131d17fe3a83d8e7fd35a239160ef1d8ef9ae074429066ef2823d9"
+    },
+    {
+      "bytes": 559,
+      "path": "records/current/campaign/river-1-baseline/restore/run/run.toml",
+      "sha256": "fe93d87a93ac4c2f8f1554bfdb89c970672b02f55f79962fee5c43b182b246ee"
+    },
+    {
+      "bytes": 7472,
+      "path": "records/current/campaign/river-1-baseline/restore/run/solution.sol",
+      "sha256": "2b274ece7b13d8aff018a606a9e94b318e62d7a4e30d7df558ce675f7dce8b50"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-baseline/restore/strategy/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 105272,
+      "path": "records/current/campaign/river-1-baseline/restore/strategy/stdout.log",
+      "sha256": "89714baf73bed349c976ac0787c5e6d98cc74094d9fe0fba23eb6c8e9b884d12"
+    },
+    {
+      "bytes": 6391,
+      "path": "records/current/campaign/river-1-baseline/restore/strategy/supervisor.json",
+      "sha256": "7fd4738acde118d3d6372739894acc0ce23ebdae38f8e3d1f255d02c431d4d87"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-1-baseline/restore/strategy/supervisor.samples.jsonl",
+      "sha256": "936a95b5897c490c9a3e13831c2f7862e2199e1e986fe2e91ae80d7fc1415b0b"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-baseline/restore/summary/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 390,
+      "path": "records/current/campaign/river-1-baseline/restore/summary/stdout.log",
+      "sha256": "f2452107f751b8ab25f3b39f0d7658009b7851aff7efd9da3b34e012fcb1b1f0"
+    },
+    {
+      "bytes": 6333,
+      "path": "records/current/campaign/river-1-baseline/restore/summary/supervisor.json",
+      "sha256": "337962fac65a6aa24f2176d2c4d4eae7cd7cba0d093dec33994c7a4e777eea73"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-1-baseline/restore/summary/supervisor.samples.jsonl",
+      "sha256": "94e9be57e5977be609472e4077468901b3dc49d0c54b0fde8a7bcbc49878e5f0"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-baseline/restore/tree/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1723,
+      "path": "records/current/campaign/river-1-baseline/restore/tree/stdout.log",
+      "sha256": "a1b301055e7a45c6f23188e7a30ef2f1803949dc98abb0ed30ee0a40fa14d2b8"
+    },
+    {
+      "bytes": 6364,
+      "path": "records/current/campaign/river-1-baseline/restore/tree/supervisor.json",
+      "sha256": "ccb11c7ac6db76ae7d7e9a6f01cb30a20b7d87ae1406e666aa9bc5a516bf7cc4"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-1-baseline/restore/tree/supervisor.samples.jsonl",
+      "sha256": "ab8e2ded16a26081060f92d9a0498e5fb6a322be3d854aca26b66a8f9a0e3341"
+    },
+    {
+      "bytes": 14926,
+      "path": "records/current/campaign/river-1-baseline/result.json",
+      "sha256": "cfb5f9203b82b65eb85bc842b1458056ab73fc60b303a1507630f1dbeb43695e"
+    },
+    {
+      "bytes": 81323,
+      "path": "records/current/campaign/river-1-baseline/run/checkpoint.ckpt",
+      "sha256": "8c03adb9f9a58dd28d827d19d57b7595bb0eebd5452f54aac033188eb4a6611e"
+    },
+    {
+      "bytes": 566,
+      "path": "records/current/campaign/river-1-baseline/run/events.jsonl",
+      "sha256": "fe3419420e2175b7705d79fbf5614e5e8e94ef51cf1de1b239cdd71881c2bef3"
+    },
+    {
+      "bytes": 621,
+      "path": "records/current/campaign/river-1-baseline/run/manifest.json",
+      "sha256": "1127f7f972ddf0f6287235bc9b80f0929d278f7211ed199792940f617ca42f7c"
+    },
+    {
+      "bytes": 550,
+      "path": "records/current/campaign/river-1-baseline/run/progress.jsonl",
+      "sha256": "adcffd9c7393a45a8fa01efda349878cc8e6f1a5fedfde821ba4fd1bcb70ebde"
+    },
+    {
+      "bytes": 177,
+      "path": "records/current/campaign/river-1-baseline/run/run.json",
+      "sha256": "64cb9afc1bf28f1e23b0b6725e5151fb670b283a48d0e02cd3799d254a0ac6f3"
+    },
+    {
+      "bytes": 559,
+      "path": "records/current/campaign/river-1-baseline/run/run.toml",
+      "sha256": "fe93d87a93ac4c2f8f1554bfdb89c970672b02f55f79962fee5c43b182b246ee"
+    },
+    {
+      "bytes": 7473,
+      "path": "records/current/campaign/river-1-baseline/run/solution.sol",
+      "sha256": "5fa23d7157de79e72147b3efb2fc086c434e89e383639236b11b9ec88d8f2db3"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/river-1-baseline/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 627,
+      "path": "records/current/campaign/river-1-baseline/solve/stdout.log",
+      "sha256": "fadb7b7232e72384b0a6067f9ccf925e62d7aba7df9be34454aed9ab8dbbbc8f"
+    },
+    {
+      "bytes": 6524,
+      "path": "records/current/campaign/river-1-baseline/solve/supervisor.json",
+      "sha256": "f3244457e931830a94eaf07e42040cb0c6d1c3180492c2a09e571c571ea57c10"
+    },
+    {
+      "bytes": 1543,
+      "path": "records/current/campaign/river-1-baseline/solve/supervisor.samples.jsonl",
+      "sha256": "9bca3831f6c0dc523f9b683bdbc8622ea056f9280aa7a249ec2003c411f91cd4"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-baseline/strategy/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 105272,
+      "path": "records/current/campaign/river-1-baseline/strategy/stdout.log",
+      "sha256": "89714baf73bed349c976ac0787c5e6d98cc74094d9fe0fba23eb6c8e9b884d12"
+    },
+    {
+      "bytes": 6325,
+      "path": "records/current/campaign/river-1-baseline/strategy/supervisor.json",
+      "sha256": "009f39bbf1e5a91ed98d46bedb696e005e972828b123d20e0f7bd7784f9e79f7"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/campaign/river-1-baseline/strategy/supervisor.samples.jsonl",
+      "sha256": "f10286ec22c187655aa5cb3e4de0507e192d7eb1d05ff5a19863d6e12605c581"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-baseline/summary/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 390,
+      "path": "records/current/campaign/river-1-baseline/summary/stdout.log",
+      "sha256": "4a705f2fcb4abcd44ab6d9f12761868fd23386499c69f57451172feb29f21da2"
+    },
+    {
+      "bytes": 6711,
+      "path": "records/current/campaign/river-1-baseline/summary/supervisor.json",
+      "sha256": "481842df27c228214aa4c3485924d79e42a2855a5b09d4aeac91cd7885cab3cb"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-1-baseline/summary/supervisor.samples.jsonl",
+      "sha256": "d027ea05c9916336bb35e5728a8a9b12a3f8120c2c71d4866805388534387f07"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-baseline/tree/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1723,
+      "path": "records/current/campaign/river-1-baseline/tree/stdout.log",
+      "sha256": "a1b301055e7a45c6f23188e7a30ef2f1803949dc98abb0ed30ee0a40fa14d2b8"
+    },
+    {
+      "bytes": 6298,
+      "path": "records/current/campaign/river-1-baseline/tree/supervisor.json",
+      "sha256": "d399cedd152ee3366238633fb1648cb361fe8f199b4d955175184fdde3537eb6"
+    },
+    {
+      "bytes": 323,
+      "path": "records/current/campaign/river-1-baseline/tree/supervisor.samples.jsonl",
+      "sha256": "546937aca64ccc8b8fdc49d0ba73873e0282ca324f22c0adfd9569bcfff9f9ca"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-candidate/ev/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 136727,
+      "path": "records/current/campaign/river-1-candidate/ev/stdout.log",
+      "sha256": "2c1fa0b29271c1fb51c81b44d82f5bba0dccd4c048c1e0f095a00be9c83de88a"
+    },
+    {
+      "bytes": 6325,
+      "path": "records/current/campaign/river-1-candidate/ev/supervisor.json",
+      "sha256": "78d041ef1c27d074254f801b1b5a2856b9a82fa5a35107f29539fc30d1e1ad4d"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/campaign/river-1-candidate/ev/supervisor.samples.jsonl",
+      "sha256": "810203302bdbdc883a290feff3ad50760b2559c70ec1264f6d072ee8a2653cb6"
+    },
+    {
+      "bytes": 3147,
+      "path": "records/current/campaign/river-1-candidate/profile.json",
+      "sha256": "00782dd50a736b9a10333338694746cef58da758df68907ba73d5571a0727bb3"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-candidate/restore/ev/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 136727,
+      "path": "records/current/campaign/river-1-candidate/restore/ev/stdout.log",
+      "sha256": "2c1fa0b29271c1fb51c81b44d82f5bba0dccd4c048c1e0f095a00be9c83de88a"
+    },
+    {
+      "bytes": 6391,
+      "path": "records/current/campaign/river-1-candidate/restore/ev/supervisor.json",
+      "sha256": "890cf67caa8dfece041faaab07e929613aacc4e939863b91071a643fb9aedd9e"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-1-candidate/restore/ev/supervisor.samples.jsonl",
+      "sha256": "d2e7c1ba045e294e71cb413051832d8958cca6fffcaa851941c7888ca8872afc"
+    },
+    {
+      "bytes": 3198,
+      "path": "records/current/campaign/river-1-candidate/restore/profile.json",
+      "sha256": "66532ad80e0dcf292dac0d1f7190720c3360967e284ab8ccd55692bf3f59dac7"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/river-1-candidate/restore/resume/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 385,
+      "path": "records/current/campaign/river-1-candidate/restore/resume/stdout.log",
+      "sha256": "e8917c981d4fe480ca1e0e7a1b5e23847fe547d284c93afa8960364fbb8a68c5"
+    },
+    {
+      "bytes": 6057,
+      "path": "records/current/campaign/river-1-candidate/restore/resume/supervisor.json",
+      "sha256": "46163e2465f85d5b3620de90b8652649b32daf28b4cc2bf087c5b93306194e2a"
+    },
+    {
+      "bytes": 632,
+      "path": "records/current/campaign/river-1-candidate/restore/resume/supervisor.samples.jsonl",
+      "sha256": "28a82ac735c69a4df1b23cda1a58f7da1a2198803d799efa3f257e166da5b2be"
+    },
+    {
+      "bytes": 81330,
+      "path": "records/current/campaign/river-1-candidate/restore/run/checkpoint.ckpt",
+      "sha256": "4368dea0bba411e864429201167ddfef78bd6c12c642c93636fddb10a1eabe26"
+    },
+    {
+      "bytes": 245,
+      "path": "records/current/campaign/river-1-candidate/restore/run/events.jsonl",
+      "sha256": "b32879fbd52784a01a8a96e06330601bd3b3c580b7cba34a663125199f2e73ec"
+    },
+    {
+      "bytes": 523,
+      "path": "records/current/campaign/river-1-candidate/restore/run/manifest.json",
+      "sha256": "8fd1d890aa22a0bf6272668f479d9c41b255b7681906d4f664ae46edbc9e6573"
+    },
+    {
+      "bytes": 550,
+      "path": "records/current/campaign/river-1-candidate/restore/run/progress.jsonl",
+      "sha256": "865977514fdf6f50856e7c0958e52c8fe327c06437656b42cfe129c45aa89df5"
+    },
+    {
+      "bytes": 177,
+      "path": "records/current/campaign/river-1-candidate/restore/run/run.json",
+      "sha256": "10ad5d5fab8366f4f6b5e99ac85dee4ebfadae7120e31f37bbe591fe2c65c8e9"
+    },
+    {
+      "bytes": 693,
+      "path": "records/current/campaign/river-1-candidate/restore/run/run.toml",
+      "sha256": "db2a7c2c6ba87ffaf87291250538bb79b5cea60bc7e9fa09c9ecc3e47c5a0cab"
+    },
+    {
+      "bytes": 7609,
+      "path": "records/current/campaign/river-1-candidate/restore/run/solution.sol",
+      "sha256": "8fe7504c869522dc26a592bf9fc22587dc38fb8f86fd5de1aec9a0a10f9bbf46"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-candidate/restore/strategy/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 105272,
+      "path": "records/current/campaign/river-1-candidate/restore/strategy/stdout.log",
+      "sha256": "89714baf73bed349c976ac0787c5e6d98cc74094d9fe0fba23eb6c8e9b884d12"
+    },
+    {
+      "bytes": 6427,
+      "path": "records/current/campaign/river-1-candidate/restore/strategy/supervisor.json",
+      "sha256": "8aa40cfe06ab09b0e418cea0325aaed49ef466c308b9b0d8096b9aef5dc11bb3"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-1-candidate/restore/strategy/supervisor.samples.jsonl",
+      "sha256": "e45a6f6a191cb66fed516dc1bf755d128a08260689d9953078bb92c817663271"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/river-1-candidate/restore/summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 390,
+      "path": "records/current/campaign/river-1-candidate/restore/summary/stdout.log",
+      "sha256": "8d59ca15a2cebf1d423a768383344e49321b1d491bc0c5a11777c358194ae6d6"
+    },
+    {
+      "bytes": 6368,
+      "path": "records/current/campaign/river-1-candidate/restore/summary/supervisor.json",
+      "sha256": "4576246e1d6865bde203bc1b19ab825ba1bd4bb858f275f879826f840fda5b88"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-1-candidate/restore/summary/supervisor.samples.jsonl",
+      "sha256": "4241a43ed0a97defcb390b584931515d2bb4a15a24f8d2c888a3c2118e977ca4"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-candidate/restore/tree/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1723,
+      "path": "records/current/campaign/river-1-candidate/restore/tree/stdout.log",
+      "sha256": "a1b301055e7a45c6f23188e7a30ef2f1803949dc98abb0ed30ee0a40fa14d2b8"
+    },
+    {
+      "bytes": 6400,
+      "path": "records/current/campaign/river-1-candidate/restore/tree/supervisor.json",
+      "sha256": "74b50cf0b86108234bbdb390ce89f96f5728997432f3a11e8dd9044ed9ad1cb7"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-1-candidate/restore/tree/supervisor.samples.jsonl",
+      "sha256": "d39ec67a2b67a16f507a2b2c8ab4313c154d8b36f781ca86b64fb7ffe3067d3d"
+    },
+    {
+      "bytes": 14951,
+      "path": "records/current/campaign/river-1-candidate/result.json",
+      "sha256": "5dfd00fff9565815d0458c85776d17bfb9310993688212ec522df2c08173eac6"
+    },
+    {
+      "bytes": 81330,
+      "path": "records/current/campaign/river-1-candidate/run/checkpoint.ckpt",
+      "sha256": "4368dea0bba411e864429201167ddfef78bd6c12c642c93636fddb10a1eabe26"
+    },
+    {
+      "bytes": 485,
+      "path": "records/current/campaign/river-1-candidate/run/events.jsonl",
+      "sha256": "d5ec24e6ac65789411d81994384c75839355a2d2df03a2364bd2a48358eeaef4"
+    },
+    {
+      "bytes": 622,
+      "path": "records/current/campaign/river-1-candidate/run/manifest.json",
+      "sha256": "af0db776b492a7c30faaeba78fe45798d1ea5cdd77cdbaf21913dd240185d406"
+    },
+    {
+      "bytes": 550,
+      "path": "records/current/campaign/river-1-candidate/run/progress.jsonl",
+      "sha256": "865977514fdf6f50856e7c0958e52c8fe327c06437656b42cfe129c45aa89df5"
+    },
+    {
+      "bytes": 177,
+      "path": "records/current/campaign/river-1-candidate/run/run.json",
+      "sha256": "7b5705a66177676fca0ec6308adce7b6818ffeb499b361590fd5ae63a5ef0e6b"
+    },
+    {
+      "bytes": 693,
+      "path": "records/current/campaign/river-1-candidate/run/run.toml",
+      "sha256": "db2a7c2c6ba87ffaf87291250538bb79b5cea60bc7e9fa09c9ecc3e47c5a0cab"
+    },
+    {
+      "bytes": 7609,
+      "path": "records/current/campaign/river-1-candidate/run/solution.sol",
+      "sha256": "fc67f0f78c888bd163c62e9cc3625e7c00a18c7c5c468a075e226ed5ada669cc"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/river-1-candidate/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 628,
+      "path": "records/current/campaign/river-1-candidate/solve/stdout.log",
+      "sha256": "10ae71e98b1449cd0a7bb37b0da9c5aac3a156e5708015ac563d56fa5cdc650c"
+    },
+    {
+      "bytes": 6557,
+      "path": "records/current/campaign/river-1-candidate/solve/supervisor.json",
+      "sha256": "ade842ab48695aa7d6df915e79c9dfa99f60754d3ddf487271137b45eb4ea76e"
+    },
+    {
+      "bytes": 1543,
+      "path": "records/current/campaign/river-1-candidate/solve/supervisor.samples.jsonl",
+      "sha256": "dadbbbf217dccac0819326ddded39be6a738dcd5dd28da0674a6a9f8d4a56a9a"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-candidate/strategy/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 105272,
+      "path": "records/current/campaign/river-1-candidate/strategy/stdout.log",
+      "sha256": "89714baf73bed349c976ac0787c5e6d98cc74094d9fe0fba23eb6c8e9b884d12"
+    },
+    {
+      "bytes": 6361,
+      "path": "records/current/campaign/river-1-candidate/strategy/supervisor.json",
+      "sha256": "6896227d4ade0154d83e8ddf44d67e4d2d375b4d48975a35adf08ff1ccb0f48c"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-1-candidate/strategy/supervisor.samples.jsonl",
+      "sha256": "37c5a7557878f8eac0df1f6b308b60489416eaf73a596228c997bc607ea1d5c8"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/river-1-candidate/summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 390,
+      "path": "records/current/campaign/river-1-candidate/summary/stdout.log",
+      "sha256": "a05c0d054bf0b2faa7f8fba48b5469de34574115dc46dfc59f2c2469a708009e"
+    },
+    {
+      "bytes": 6746,
+      "path": "records/current/campaign/river-1-candidate/summary/supervisor.json",
+      "sha256": "51273af1cf5282b02275b323fb2a672fba04026d781e0a718d2fc0bba61db000"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-1-candidate/summary/supervisor.samples.jsonl",
+      "sha256": "b47fd7b89335cc9482d7e354e5c6ce9763a23148fffd891bfb9736a5c7377843"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-1-candidate/tree/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1723,
+      "path": "records/current/campaign/river-1-candidate/tree/stdout.log",
+      "sha256": "a1b301055e7a45c6f23188e7a30ef2f1803949dc98abb0ed30ee0a40fa14d2b8"
+    },
+    {
+      "bytes": 6335,
+      "path": "records/current/campaign/river-1-candidate/tree/supervisor.json",
+      "sha256": "fcf2b4d85aa4adfb4e49840edb80404c65516ddbd564b5d7ed9f0bfd7adac3b2"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/campaign/river-1-candidate/tree/supervisor.samples.jsonl",
+      "sha256": "dec2a99a2bb625de3a6659b35ba8d125d35fe2f3f4234616eab76c717fdd4209"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-2-baseline/ev/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 136727,
+      "path": "records/current/campaign/river-2-baseline/ev/stdout.log",
+      "sha256": "2c1fa0b29271c1fb51c81b44d82f5bba0dccd4c048c1e0f095a00be9c83de88a"
+    },
+    {
+      "bytes": 6291,
+      "path": "records/current/campaign/river-2-baseline/ev/supervisor.json",
+      "sha256": "5b941c016f6345ee9c21d119e234dd7b1309a0d5c1f083cb8d180756eb77ac41"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-2-baseline/ev/supervisor.samples.jsonl",
+      "sha256": "86ec076327c2a3c1f00d4d1e22482c2d5aa7697525e7905436ea9cf80b8c9513"
+    },
+    {
+      "bytes": 3143,
+      "path": "records/current/campaign/river-2-baseline/profile.json",
+      "sha256": "f95ef0f3326773b94b7ff9e84aa01abefa1397ebdaef1fb3f7c63a51e6bc8c5d"
+    },
+    {
+      "bytes": 8546,
+      "path": "records/current/campaign/river-2-baseline/result.json",
+      "sha256": "80ce5f208091cc9c6c76ea952669555dcfd6897d71cd83f37a2b1f551e22eaf2"
+    },
+    {
+      "bytes": 81323,
+      "path": "records/current/campaign/river-2-baseline/run/checkpoint.ckpt",
+      "sha256": "8c03adb9f9a58dd28d827d19d57b7595bb0eebd5452f54aac033188eb4a6611e"
+    },
+    {
+      "bytes": 566,
+      "path": "records/current/campaign/river-2-baseline/run/events.jsonl",
+      "sha256": "4e3f59f727e3c5a15e209dcc0349a424e079851cf87db994c9fa1852ea7f2091"
+    },
+    {
+      "bytes": 621,
+      "path": "records/current/campaign/river-2-baseline/run/manifest.json",
+      "sha256": "3743f961be856050dd02ef5a0b140697563e3aa77aea44ec529cb8b70d98d006"
+    },
+    {
+      "bytes": 550,
+      "path": "records/current/campaign/river-2-baseline/run/progress.jsonl",
+      "sha256": "38b376506a010a38906af8af2ee6b578e7e9eb4134859fc9131ebe6faa8ac4b6"
+    },
+    {
+      "bytes": 177,
+      "path": "records/current/campaign/river-2-baseline/run/run.json",
+      "sha256": "9f7533010d93c127632fdf804f05e39b55172b4e83073f65b4a593e3a3d6291f"
+    },
+    {
+      "bytes": 559,
+      "path": "records/current/campaign/river-2-baseline/run/run.toml",
+      "sha256": "fe93d87a93ac4c2f8f1554bfdb89c970672b02f55f79962fee5c43b182b246ee"
+    },
+    {
+      "bytes": 7472,
+      "path": "records/current/campaign/river-2-baseline/run/solution.sol",
+      "sha256": "f8645bbac383d25075fd627ceb46860c66135e2e31aa44abe85bb5c9e95f8ffd"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/river-2-baseline/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 627,
+      "path": "records/current/campaign/river-2-baseline/solve/stdout.log",
+      "sha256": "d0a682b8b5bea306c8071f563f611c5a3238406d78b5fdcb6605daf3b4b187fc"
+    },
+    {
+      "bytes": 6520,
+      "path": "records/current/campaign/river-2-baseline/solve/supervisor.json",
+      "sha256": "2c65a08f3965cb5b5e561167ba5aea4e1ed6066aaf1791ba894273c0be2e3e1c"
+    },
+    {
+      "bytes": 1542,
+      "path": "records/current/campaign/river-2-baseline/solve/supervisor.samples.jsonl",
+      "sha256": "29357c681bc63fd49790ec6b1cca390bc897d5eac0cf17fd8c3ccfb2cb676203"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-2-baseline/strategy/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 105272,
+      "path": "records/current/campaign/river-2-baseline/strategy/stdout.log",
+      "sha256": "89714baf73bed349c976ac0787c5e6d98cc74094d9fe0fba23eb6c8e9b884d12"
+    },
+    {
+      "bytes": 6326,
+      "path": "records/current/campaign/river-2-baseline/strategy/supervisor.json",
+      "sha256": "02d84b0e5ee29201bc8b4c591033e85bdeb277bbd5dedbff97941ae94a2e8d09"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-2-baseline/strategy/supervisor.samples.jsonl",
+      "sha256": "b6fd918cc633cf3b62865d050e3bf1b138cdd6335a5c37cffd93d7ae98e57521"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-2-baseline/summary/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 390,
+      "path": "records/current/campaign/river-2-baseline/summary/stdout.log",
+      "sha256": "ed68870b8d58beba23226518123669f609f219adf0bbb4ec27943ae09f80ffc1"
+    },
+    {
+      "bytes": 6710,
+      "path": "records/current/campaign/river-2-baseline/summary/supervisor.json",
+      "sha256": "570dad99e58588e954cd9968938e982c960899fbe5855e7103abf6134be23f26"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/campaign/river-2-baseline/summary/supervisor.samples.jsonl",
+      "sha256": "215f0bab771cc623facae5c6af09a748221e82d56bdbe37097c8ede4aab4af74"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-2-baseline/tree/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1723,
+      "path": "records/current/campaign/river-2-baseline/tree/stdout.log",
+      "sha256": "a1b301055e7a45c6f23188e7a30ef2f1803949dc98abb0ed30ee0a40fa14d2b8"
+    },
+    {
+      "bytes": 6300,
+      "path": "records/current/campaign/river-2-baseline/tree/supervisor.json",
+      "sha256": "8a9364fccf4cf9dea15cc1f3d1aef6797e3a8b4dc496ac389bdf1656b1082b04"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-2-baseline/tree/supervisor.samples.jsonl",
+      "sha256": "37fdc8a5684b21718456fdab306efbdbc3ea3aba935e012003478a33a198ce90"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-2-candidate/ev/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 136727,
+      "path": "records/current/campaign/river-2-candidate/ev/stdout.log",
+      "sha256": "2c1fa0b29271c1fb51c81b44d82f5bba0dccd4c048c1e0f095a00be9c83de88a"
+    },
+    {
+      "bytes": 6327,
+      "path": "records/current/campaign/river-2-candidate/ev/supervisor.json",
+      "sha256": "c0300f5c041233dce4eafc3b0febceb59e25e59d5784598531f9638d4dfa133b"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-2-candidate/ev/supervisor.samples.jsonl",
+      "sha256": "fd9b2d5c65e3090d6e1384ed5a3c0d898624553e77ad2eb81f89ff5b660b31e9"
+    },
+    {
+      "bytes": 3149,
+      "path": "records/current/campaign/river-2-candidate/profile.json",
+      "sha256": "2e6627e2d825970b06b9d246e5f7eb8bb9faadb184026c71cb725e49360cf6bd"
+    },
+    {
+      "bytes": 8563,
+      "path": "records/current/campaign/river-2-candidate/result.json",
+      "sha256": "73633472252d407c033ef8c8e414fd868cb628e9e776a56642cc476529f08315"
+    },
+    {
+      "bytes": 81330,
+      "path": "records/current/campaign/river-2-candidate/run/checkpoint.ckpt",
+      "sha256": "4368dea0bba411e864429201167ddfef78bd6c12c642c93636fddb10a1eabe26"
+    },
+    {
+      "bytes": 485,
+      "path": "records/current/campaign/river-2-candidate/run/events.jsonl",
+      "sha256": "c974ff076939637b96cca7aeaa7595debfca6c46badbceb96238fa731ba0154f"
+    },
+    {
+      "bytes": 622,
+      "path": "records/current/campaign/river-2-candidate/run/manifest.json",
+      "sha256": "f1fd1f3223ece9f72faa4bf6362a097028171f3f47a74f99a9be3cc6c3ef3af5"
+    },
+    {
+      "bytes": 550,
+      "path": "records/current/campaign/river-2-candidate/run/progress.jsonl",
+      "sha256": "14fb52416886fbc250e5fc657b44a97de838f12f20ec152f8a72a22e18aa9ff4"
+    },
+    {
+      "bytes": 177,
+      "path": "records/current/campaign/river-2-candidate/run/run.json",
+      "sha256": "b5ceb92accad84fb914c33cf3dd2316bbd0caae3d7873ab2910058744c741c5e"
+    },
+    {
+      "bytes": 693,
+      "path": "records/current/campaign/river-2-candidate/run/run.toml",
+      "sha256": "db2a7c2c6ba87ffaf87291250538bb79b5cea60bc7e9fa09c9ecc3e47c5a0cab"
+    },
+    {
+      "bytes": 7609,
+      "path": "records/current/campaign/river-2-candidate/run/solution.sol",
+      "sha256": "3e50027411bd713a03a9b435e33d4666b3dcf5e7569d16e08b7b1b536b6ceb11"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/river-2-candidate/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 628,
+      "path": "records/current/campaign/river-2-candidate/solve/stdout.log",
+      "sha256": "7d026129ccae3727aff018093715c001045a6596e8012a14ca1c721022b7d6bf"
+    },
+    {
+      "bytes": 6557,
+      "path": "records/current/campaign/river-2-candidate/solve/supervisor.json",
+      "sha256": "b22e1c2eb050ae2afaea52ab2b8ef1e12227aa89e4b8aad440bc913a3275367e"
+    },
+    {
+      "bytes": 1246,
+      "path": "records/current/campaign/river-2-candidate/solve/supervisor.samples.jsonl",
+      "sha256": "8cd6d74a9351af1a397684fa652caa33951b32d741920e53421c21f7a2bf0b8b"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-2-candidate/strategy/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 105272,
+      "path": "records/current/campaign/river-2-candidate/strategy/stdout.log",
+      "sha256": "89714baf73bed349c976ac0787c5e6d98cc74094d9fe0fba23eb6c8e9b884d12"
+    },
+    {
+      "bytes": 6362,
+      "path": "records/current/campaign/river-2-candidate/strategy/supervisor.json",
+      "sha256": "ceaf6b5a8a54055516b00d3196e4190922d9408f99156139512cc8708e8da2fa"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-2-candidate/strategy/supervisor.samples.jsonl",
+      "sha256": "1120bba4080ca812f251ce0f6afd2b0ec3dc3249734c022cb1a9536351b86810"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/river-2-candidate/summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 390,
+      "path": "records/current/campaign/river-2-candidate/summary/stdout.log",
+      "sha256": "9d85bc84ab61689d30775bc734edea22cd8d4119b5efa097ba643ebf596aa2ae"
+    },
+    {
+      "bytes": 6746,
+      "path": "records/current/campaign/river-2-candidate/summary/supervisor.json",
+      "sha256": "3606dc7d74b818afac40f1b566366b1123347a24e83992905b6103eb9a876bc2"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-2-candidate/summary/supervisor.samples.jsonl",
+      "sha256": "ded6b39c99c8e1d0c3dbf77c19e9e6513fd07b2571949ef5aa156953f758aaa7"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-2-candidate/tree/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1723,
+      "path": "records/current/campaign/river-2-candidate/tree/stdout.log",
+      "sha256": "a1b301055e7a45c6f23188e7a30ef2f1803949dc98abb0ed30ee0a40fa14d2b8"
+    },
+    {
+      "bytes": 6336,
+      "path": "records/current/campaign/river-2-candidate/tree/supervisor.json",
+      "sha256": "611e7db5f423d63350d1454bcec3aa41242de9887951adaddb00fe0623b94ccf"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-2-candidate/tree/supervisor.samples.jsonl",
+      "sha256": "567bbcb33cf80327a7b28c5d2898c6cf3b1198f7649637a61189715da3823d0c"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-3-baseline/ev/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 136727,
+      "path": "records/current/campaign/river-3-baseline/ev/stdout.log",
+      "sha256": "2c1fa0b29271c1fb51c81b44d82f5bba0dccd4c048c1e0f095a00be9c83de88a"
+    },
+    {
+      "bytes": 6290,
+      "path": "records/current/campaign/river-3-baseline/ev/supervisor.json",
+      "sha256": "d06d85e2a7c8a72449b94d1f1e8d527c32254dd27603c6dfd0251adf210b69ca"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-3-baseline/ev/supervisor.samples.jsonl",
+      "sha256": "bef48df4f53deeaffafded8bd52616b922e5dd0f599a1e5e12667caa016370b6"
+    },
+    {
+      "bytes": 3142,
+      "path": "records/current/campaign/river-3-baseline/profile.json",
+      "sha256": "c3d24c707e582f93820a674f5e9b4bc917e62b720c2fd41011c2aa22cc951638"
+    },
+    {
+      "bytes": 8546,
+      "path": "records/current/campaign/river-3-baseline/result.json",
+      "sha256": "5ad85fb8d58dd5038a85f1c8b9b01d171efbc703a8f82af4766719eec3b70eab"
+    },
+    {
+      "bytes": 81323,
+      "path": "records/current/campaign/river-3-baseline/run/checkpoint.ckpt",
+      "sha256": "8c03adb9f9a58dd28d827d19d57b7595bb0eebd5452f54aac033188eb4a6611e"
+    },
+    {
+      "bytes": 566,
+      "path": "records/current/campaign/river-3-baseline/run/events.jsonl",
+      "sha256": "1c0b3f718dbc154c8c9eb01d45037bd07077c6ca43b35bee7ecc35634a39a26f"
+    },
+    {
+      "bytes": 621,
+      "path": "records/current/campaign/river-3-baseline/run/manifest.json",
+      "sha256": "6b88c44d13c0f094a586a1519f093574aea20ea034c8c3bf62861b30a6ac6fdc"
+    },
+    {
+      "bytes": 550,
+      "path": "records/current/campaign/river-3-baseline/run/progress.jsonl",
+      "sha256": "50c450d8feb33996268306a396e660612731b8f43be80d89446b245c801bd5cc"
+    },
+    {
+      "bytes": 177,
+      "path": "records/current/campaign/river-3-baseline/run/run.json",
+      "sha256": "d463bc1e16686dc9b83e24e2c8ec89e5b295fa815512f414b3c1139d0c89f54c"
+    },
+    {
+      "bytes": 559,
+      "path": "records/current/campaign/river-3-baseline/run/run.toml",
+      "sha256": "fe93d87a93ac4c2f8f1554bfdb89c970672b02f55f79962fee5c43b182b246ee"
+    },
+    {
+      "bytes": 7472,
+      "path": "records/current/campaign/river-3-baseline/run/solution.sol",
+      "sha256": "c888f50b21442ecbc4950e882a9dd5982c0e2b57a95449d047a830c9d9945140"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/river-3-baseline/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 627,
+      "path": "records/current/campaign/river-3-baseline/solve/stdout.log",
+      "sha256": "1efa1662e977c763d073ce6dee4fd86d97849d584a7f25ad8013dddeea39ec6d"
+    },
+    {
+      "bytes": 6524,
+      "path": "records/current/campaign/river-3-baseline/solve/supervisor.json",
+      "sha256": "9372f1019ca83ea8eaa367b7ed0286441bfc714626ecd8b2a1dd1b991491f61d"
+    },
+    {
+      "bytes": 1554,
+      "path": "records/current/campaign/river-3-baseline/solve/supervisor.samples.jsonl",
+      "sha256": "b86f5344bece3027d59f909d9de1244b0c6661098fc6658203add40d89f82bf4"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-3-baseline/strategy/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 105272,
+      "path": "records/current/campaign/river-3-baseline/strategy/stdout.log",
+      "sha256": "89714baf73bed349c976ac0787c5e6d98cc74094d9fe0fba23eb6c8e9b884d12"
+    },
+    {
+      "bytes": 6325,
+      "path": "records/current/campaign/river-3-baseline/strategy/supervisor.json",
+      "sha256": "5a7734b89257197266522cf0211b223abe0e6d7c3beda2260b95444af8640cea"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-3-baseline/strategy/supervisor.samples.jsonl",
+      "sha256": "e665b8c67a605e452503f5f922f2fe2502afac5030573cd68ae7d9bbbbbdd109"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-3-baseline/summary/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 390,
+      "path": "records/current/campaign/river-3-baseline/summary/stdout.log",
+      "sha256": "96243287b2b187a7f63f7c5eadf9bee8f0384f5f4da35eede144f9da5bac584a"
+    },
+    {
+      "bytes": 6709,
+      "path": "records/current/campaign/river-3-baseline/summary/supervisor.json",
+      "sha256": "7dd7930035e211f422396dd08cdb32d43b22b7987fd09f3919db93d3485709c7"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/campaign/river-3-baseline/summary/supervisor.samples.jsonl",
+      "sha256": "afe55cf7e12909cc33fa00a2385a927f8480ed570a4f33eb4031fae301f5fbbb"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-3-baseline/tree/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1723,
+      "path": "records/current/campaign/river-3-baseline/tree/stdout.log",
+      "sha256": "a1b301055e7a45c6f23188e7a30ef2f1803949dc98abb0ed30ee0a40fa14d2b8"
+    },
+    {
+      "bytes": 6301,
+      "path": "records/current/campaign/river-3-baseline/tree/supervisor.json",
+      "sha256": "74b4050ed4240576341384606f770596e913f3c868641dc7b87ddfeaabffa173"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-3-baseline/tree/supervisor.samples.jsonl",
+      "sha256": "482992bc1d165da72f8b12fa6b54a36428c8137749378df6936765cfb768b495"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-3-candidate/ev/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 136727,
+      "path": "records/current/campaign/river-3-candidate/ev/stdout.log",
+      "sha256": "2c1fa0b29271c1fb51c81b44d82f5bba0dccd4c048c1e0f095a00be9c83de88a"
+    },
+    {
+      "bytes": 6327,
+      "path": "records/current/campaign/river-3-candidate/ev/supervisor.json",
+      "sha256": "da178cf702357fd342fcb97f1d1a3df1dc8419af94265d7d66283046bcf74fdf"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-3-candidate/ev/supervisor.samples.jsonl",
+      "sha256": "31db676a60d931935f152ed0bd9d55d09b7f02c6c98305e68b8fef2eb19fdbeb"
+    },
+    {
+      "bytes": 3150,
+      "path": "records/current/campaign/river-3-candidate/profile.json",
+      "sha256": "aec87f272045c60dee02edb307c3a302ef73a4698aded6b17e58cea9c862686d"
+    },
+    {
+      "bytes": 8564,
+      "path": "records/current/campaign/river-3-candidate/result.json",
+      "sha256": "33e51200fc4c80b843b3a9d5aa74189b68cc19bb91c80cd8ff9894ab2fb9e915"
+    },
+    {
+      "bytes": 81330,
+      "path": "records/current/campaign/river-3-candidate/run/checkpoint.ckpt",
+      "sha256": "4368dea0bba411e864429201167ddfef78bd6c12c642c93636fddb10a1eabe26"
+    },
+    {
+      "bytes": 485,
+      "path": "records/current/campaign/river-3-candidate/run/events.jsonl",
+      "sha256": "76b8b93dfe8ebedfad5c17dd042e8814fd100cf0de606c8d606db024f1025722"
+    },
+    {
+      "bytes": 622,
+      "path": "records/current/campaign/river-3-candidate/run/manifest.json",
+      "sha256": "120598e6cbffb8e4623622611c23a9ebbddeda9491bc52983d8b0f0c3d1e20ec"
+    },
+    {
+      "bytes": 550,
+      "path": "records/current/campaign/river-3-candidate/run/progress.jsonl",
+      "sha256": "f24c2677ef8e4d1bb4b95d6e5ea808e7295017b64e2a7cee3ba243a3c0336698"
+    },
+    {
+      "bytes": 177,
+      "path": "records/current/campaign/river-3-candidate/run/run.json",
+      "sha256": "ad2aee7d3fb451db3d8bf01b256876530857a36e0a7c61251639863b49bc9fab"
+    },
+    {
+      "bytes": 693,
+      "path": "records/current/campaign/river-3-candidate/run/run.toml",
+      "sha256": "db2a7c2c6ba87ffaf87291250538bb79b5cea60bc7e9fa09c9ecc3e47c5a0cab"
+    },
+    {
+      "bytes": 7609,
+      "path": "records/current/campaign/river-3-candidate/run/solution.sol",
+      "sha256": "09c14dda795b2373a0f3f79f5781edaebea48ae7ebf382cde5fa9fb716f7c3b4"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/river-3-candidate/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 628,
+      "path": "records/current/campaign/river-3-candidate/solve/stdout.log",
+      "sha256": "223d3711873e23b6f43fff4415ee5417bb7a520b8fe277179a4c7c4614a69e1d"
+    },
+    {
+      "bytes": 6558,
+      "path": "records/current/campaign/river-3-candidate/solve/supervisor.json",
+      "sha256": "91e3722d7af361ceb2962133ac38232e91dc648dbbe78b00a92a57c4c2288aad"
+    },
+    {
+      "bytes": 1554,
+      "path": "records/current/campaign/river-3-candidate/solve/supervisor.samples.jsonl",
+      "sha256": "fc32422b37c4e881cf498071fe11d08f2777c9f206447e1ed81da99d26ad078d"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-3-candidate/strategy/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 105272,
+      "path": "records/current/campaign/river-3-candidate/strategy/stdout.log",
+      "sha256": "89714baf73bed349c976ac0787c5e6d98cc74094d9fe0fba23eb6c8e9b884d12"
+    },
+    {
+      "bytes": 6362,
+      "path": "records/current/campaign/river-3-candidate/strategy/supervisor.json",
+      "sha256": "90c92ae3b1139bbeee2958bd5a52a8b6970f8241414a13767fa3d16bd1465905"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-3-candidate/strategy/supervisor.samples.jsonl",
+      "sha256": "13872c9b2ab6ae4cc7709ec08ef3e7cdb6fc827870a9ef985e53c9180dc4afca"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/river-3-candidate/summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 390,
+      "path": "records/current/campaign/river-3-candidate/summary/stdout.log",
+      "sha256": "3af4e35ac0e02439331e025ca7bee22dde437f39ca1387a60ecec26cb8f33294"
+    },
+    {
+      "bytes": 6745,
+      "path": "records/current/campaign/river-3-candidate/summary/supervisor.json",
+      "sha256": "9b461233a814ea26bffa789341680cca87944d551f8b6431fcefa46cb2fa94a3"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-3-candidate/summary/supervisor.samples.jsonl",
+      "sha256": "b28d3444b8cead71252817aeb61df25bf10b5e2764d5f7c2a4bf7b2824b306b9"
+    },
+    {
+      "bytes": 73,
+      "path": "records/current/campaign/river-3-candidate/tree/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973"
+    },
+    {
+      "bytes": 1723,
+      "path": "records/current/campaign/river-3-candidate/tree/stdout.log",
+      "sha256": "a1b301055e7a45c6f23188e7a30ef2f1803949dc98abb0ed30ee0a40fa14d2b8"
+    },
+    {
+      "bytes": 6337,
+      "path": "records/current/campaign/river-3-candidate/tree/supervisor.json",
+      "sha256": "3931831d233deb6ea4470abc7af9da92ca6d6972fa62cf8b56f30694b0d26a49"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/river-3-candidate/tree/supervisor.samples.jsonl",
+      "sha256": "df6e10cb373dfe99141273f4f8dcacde1743509ba3892e4a1e0bbc7bbaf153c1"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-baseline/ev/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6308,
+      "path": "records/current/campaign/turn-1-baseline/ev/supervisor.json",
+      "sha256": "4b735bd75733760608c587ae25cef8ce7a93bf1075330fd69dfe84c6b4642f43"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-1-baseline/ev/supervisor.samples.jsonl",
+      "sha256": "708227e877490bfbb8d26d8df40edc808c7df1f741a62a1a7426bb29dbf0d949"
+    },
+    {
+      "bytes": 3208,
+      "path": "records/current/campaign/turn-1-baseline/profile.json",
+      "sha256": "1bc287d2cc1fd6d1de5e4c9a2699a70c059a371dcda9daa70867c9ac3c3f9aed"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-baseline/restore/ev/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6370,
+      "path": "records/current/campaign/turn-1-baseline/restore/ev/supervisor.json",
+      "sha256": "e0e61bb38d55b56f943dda6c29d73b6c00487cbd1e312a674a71b499259531b2"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-1-baseline/restore/ev/supervisor.samples.jsonl",
+      "sha256": "6a2fa992f390faba775111b49176f00b7bd0b856b6b3f7d8ab36fc497ee43ca1"
+    },
+    {
+      "bytes": 3255,
+      "path": "records/current/campaign/turn-1-baseline/restore/profile.json",
+      "sha256": "4deb620a4bbd579e92e850a18ff9fdfa845aadc75cafe4e43a430e7b6f62c5d2"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/turn-1-baseline/restore/resume/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 390,
+      "path": "records/current/campaign/turn-1-baseline/restore/resume/stdout.log",
+      "sha256": "0101f6570b592d49352d639cdf126f57301c7aadf8a96919cf7e86f30560cd4d"
+    },
+    {
+      "bytes": 6015,
+      "path": "records/current/campaign/turn-1-baseline/restore/resume/supervisor.json",
+      "sha256": "8c1c2f0e4b99e5a83f03db68df4c3f87cc70df5294830526d03bc4c06322fd94"
+    },
+    {
+      "bytes": 1864,
+      "path": "records/current/campaign/turn-1-baseline/restore/resume/supervisor.samples.jsonl",
+      "sha256": "406d22f618c2684ae31406edf65b0b7652c4abffb41fcdc5cf7d2739b498bfab"
+    },
+    {
+      "bytes": 356281,
+      "path": "records/current/campaign/turn-1-baseline/restore/run/checkpoint.ckpt",
+      "sha256": "20b728f870f0da771442c2f8ce6d16f21c957e0f412b8af951cf7f1a31be0aa0"
+    },
+    {
+      "bytes": 245,
+      "path": "records/current/campaign/turn-1-baseline/restore/run/events.jsonl",
+      "sha256": "d8e115185646e786deee362787968a3a7b4a88932c1f0bde54d92dba3b4e077a"
+    },
+    {
+      "bytes": 521,
+      "path": "records/current/campaign/turn-1-baseline/restore/run/manifest.json",
+      "sha256": "391d7956ea36e87245407984b9ffe494880da982eb4797fd148bd953b4ae1212"
+    },
+    {
+      "bytes": 545,
+      "path": "records/current/campaign/turn-1-baseline/restore/run/progress.jsonl",
+      "sha256": "7e6a4794b9c27f94d95d42e67dbd49be3db81bc5e3384cdf8da990f547195981"
+    },
+    {
+      "bytes": 176,
+      "path": "records/current/campaign/turn-1-baseline/restore/run/run.json",
+      "sha256": "58d85eb5e77ceb5fe07a904c4a3b446df276f14b39b1063634122f971ec8486b"
+    },
+    {
+      "bytes": 548,
+      "path": "records/current/campaign/turn-1-baseline/restore/run/run.toml",
+      "sha256": "8326ab75af8a7f1c52a48e8d2edafa7e61649024e69ca5d8c08a9972eaeb9297"
+    },
+    {
+      "bytes": 21335,
+      "path": "records/current/campaign/turn-1-baseline/restore/run/solution.sol",
+      "sha256": "9ec7722f7ebd8873d7f9e7512ed656d7c55ee3f9b199664cf59ee39961daf77e"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-baseline/restore/strategy/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6407,
+      "path": "records/current/campaign/turn-1-baseline/restore/strategy/supervisor.json",
+      "sha256": "685a7d0778c93cbfd99646c18183f6f86691ad1aee13ca4e1d5cd7572ba27d67"
+    },
+    {
+      "bytes": 632,
+      "path": "records/current/campaign/turn-1-baseline/restore/strategy/supervisor.samples.jsonl",
+      "sha256": "0b6978b8ab23f91bd3d271464c9df0552d343694a879fafabffd92d49e8e905d"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-baseline/restore/summary/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 389,
+      "path": "records/current/campaign/turn-1-baseline/restore/summary/stdout.log",
+      "sha256": "2d751ebc3e2bf6f5d02d20c6c05e41e464ccc461c23f9f1b245372514243881f"
+    },
+    {
+      "bytes": 6350,
+      "path": "records/current/campaign/turn-1-baseline/restore/summary/supervisor.json",
+      "sha256": "034b6955ba15f92d391169c898daf42c64e3c995eb6399b2d6404e41850e2caa"
+    },
+    {
+      "bytes": 1240,
+      "path": "records/current/campaign/turn-1-baseline/restore/summary/supervisor.samples.jsonl",
+      "sha256": "cb27f054e396a3224345c4405c06027e1f2d689de927e68a400f442c413ecd25"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-baseline/restore/tree/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 96635,
+      "path": "records/current/campaign/turn-1-baseline/restore/tree/stdout.log",
+      "sha256": "e89730aac015ef2232cf19bfe6ba0d17d1f729bd2740fb094dd0dfd32da9f284"
+    },
+    {
+      "bytes": 6380,
+      "path": "records/current/campaign/turn-1-baseline/restore/tree/supervisor.json",
+      "sha256": "ac03406ed389fbb1ace71e4f3e77df8e9ff1fab716022d4c7e5676020d16c64c"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-1-baseline/restore/tree/supervisor.samples.jsonl",
+      "sha256": "da8399290fbce7aa116f428bfc970e8eb5d1df052a9a053be5a90585a3f60893"
+    },
+    {
+      "bytes": 15092,
+      "path": "records/current/campaign/turn-1-baseline/result.json",
+      "sha256": "9e075cc809760807a88fe5d406d041d09bc8b229f57f707d2de4f12f723efe65"
+    },
+    {
+      "bytes": 356281,
+      "path": "records/current/campaign/turn-1-baseline/run/checkpoint.ckpt",
+      "sha256": "20b728f870f0da771442c2f8ce6d16f21c957e0f412b8af951cf7f1a31be0aa0"
+    },
+    {
+      "bytes": 566,
+      "path": "records/current/campaign/turn-1-baseline/run/events.jsonl",
+      "sha256": "40a6e799398f454c8c177ca395e0f837663b7e09b1f3ccd339fab9cc9301c267"
+    },
+    {
+      "bytes": 619,
+      "path": "records/current/campaign/turn-1-baseline/run/manifest.json",
+      "sha256": "8c8ddbec8398ec9bc21673686665ca3a156d81d777f2afb53d2d012038764bbf"
+    },
+    {
+      "bytes": 545,
+      "path": "records/current/campaign/turn-1-baseline/run/progress.jsonl",
+      "sha256": "7e6a4794b9c27f94d95d42e67dbd49be3db81bc5e3384cdf8da990f547195981"
+    },
+    {
+      "bytes": 183,
+      "path": "records/current/campaign/turn-1-baseline/run/run.json",
+      "sha256": "23c790177daf186a6735151e365619aa75bb722a2e66f877beb70712f567525a"
+    },
+    {
+      "bytes": 548,
+      "path": "records/current/campaign/turn-1-baseline/run/run.toml",
+      "sha256": "8326ab75af8a7f1c52a48e8d2edafa7e61649024e69ca5d8c08a9972eaeb9297"
+    },
+    {
+      "bytes": 21335,
+      "path": "records/current/campaign/turn-1-baseline/run/solution.sol",
+      "sha256": "f258b4ba3d530fa5945abff53d495078d53d2516c04d7069a21af25e743367c3"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/turn-1-baseline/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-1-baseline/solve/stdout.log",
+      "sha256": "b6656d270fb770c6b2dc5a708ed5530355f72d90e47136a33958a61b6b370b85"
+    },
+    {
+      "bytes": 6513,
+      "path": "records/current/campaign/turn-1-baseline/solve/supervisor.json",
+      "sha256": "8ba27e1c26c1f7f1edcebc8d36d7813f1b941482367519b40448688a1ab75dfc"
+    },
+    {
+      "bytes": 11064,
+      "path": "records/current/campaign/turn-1-baseline/solve/supervisor.samples.jsonl",
+      "sha256": "b4bd6f14a91aae470d738a7022dd7206286f4f6bd064d2a2b2cbd6ea2b9262a1"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-baseline/strategy/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6341,
+      "path": "records/current/campaign/turn-1-baseline/strategy/supervisor.json",
+      "sha256": "de46f99172a23e82bf52e4e0bdddbb78c2d5ae895611e0db744d4b8a2c001f45"
+    },
+    {
+      "bytes": 632,
+      "path": "records/current/campaign/turn-1-baseline/strategy/supervisor.samples.jsonl",
+      "sha256": "a1d5aedbbc71c5b0b31e80d60130f4bcc62eb805924c8ecf6ed51b5048d4c19e"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-baseline/summary/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 396,
+      "path": "records/current/campaign/turn-1-baseline/summary/stdout.log",
+      "sha256": "fb289f8d1cd61e2dc560cd78a34d9ad957e29b497e6e5cf2a0d14300d3129610"
+    },
+    {
+      "bytes": 6726,
+      "path": "records/current/campaign/turn-1-baseline/summary/supervisor.json",
+      "sha256": "b58777e69772a8410ea6c0140c0a982b736aa1865aba9596d6efcf6bcde867f1"
+    },
+    {
+      "bytes": 1238,
+      "path": "records/current/campaign/turn-1-baseline/summary/supervisor.samples.jsonl",
+      "sha256": "b796f6e8876592e756faecbac6d4a2438cb7a238a3ac07bac76f9f820bad4d5e"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-baseline/tree/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 96635,
+      "path": "records/current/campaign/turn-1-baseline/tree/stdout.log",
+      "sha256": "e89730aac015ef2232cf19bfe6ba0d17d1f729bd2740fb094dd0dfd32da9f284"
+    },
+    {
+      "bytes": 6317,
+      "path": "records/current/campaign/turn-1-baseline/tree/supervisor.json",
+      "sha256": "6afffc6fba6c5374688cbeb4ce350b05bd975dd84ee1dc6d82688425ce2eff5e"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-1-baseline/tree/supervisor.samples.jsonl",
+      "sha256": "bf0b86006eff19b3b0be8a5b25dea427f974b3e646306711eb403e4e2c0f2e04"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-candidate/ev/stderr.log",
+      "sha256": "9faa1db92fc5ad9f1dc5690f3fa84b49048f7d306a5fe65cb7a2db51f4633ddd"
+    },
+    {
+      "bytes": 6344,
+      "path": "records/current/campaign/turn-1-candidate/ev/supervisor.json",
+      "sha256": "81c0f1c6dacc4590ddc2b6a274b4eb2640d9f8a76f6eb34f5a5a830b4b42d796"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-1-candidate/ev/supervisor.samples.jsonl",
+      "sha256": "5ac1f83ffe8c6e80db7815ced97a46cad605215db416f59a55b285b162d1d2a5"
+    },
+    {
+      "bytes": 3216,
+      "path": "records/current/campaign/turn-1-candidate/profile.json",
+      "sha256": "bd60639d0597e9442a86a19eb0dd095f420126629eb99e55fb466b12248789ce"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-candidate/restore/ev/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6406,
+      "path": "records/current/campaign/turn-1-candidate/restore/ev/supervisor.json",
+      "sha256": "40196a88a6cd87175ad454c4a06703492c6ad7de808bf2bed84233cc4e8ae69f"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-1-candidate/restore/ev/supervisor.samples.jsonl",
+      "sha256": "e2c2397fa79a1c58a0e71aa1a1dffb0ace6c01dceabdc3e0b9b2dca7066c701a"
+    },
+    {
+      "bytes": 3261,
+      "path": "records/current/campaign/turn-1-candidate/restore/profile.json",
+      "sha256": "4f2639a0deaf1a591288527563f932a8fd539af4f6b07aeb53179ee3eca19d72"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/turn-1-candidate/restore/resume/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 391,
+      "path": "records/current/campaign/turn-1-candidate/restore/resume/stdout.log",
+      "sha256": "1cae3d4b1696aa5652c79ed56a1eb93d1ced1d005a6a25f1f816f17472d7ed50"
+    },
+    {
+      "bytes": 6048,
+      "path": "records/current/campaign/turn-1-candidate/restore/resume/supervisor.json",
+      "sha256": "5dd55d407531afc015bde3de3d988c9ca1f80c291ed4f51ed44aa208a09ef52b"
+    },
+    {
+      "bytes": 1556,
+      "path": "records/current/campaign/turn-1-candidate/restore/resume/supervisor.samples.jsonl",
+      "sha256": "02212960110223c58211ba26e2d60976c62ed970e4fd6e7b5b45094a622bc180"
+    },
+    {
+      "bytes": 356288,
+      "path": "records/current/campaign/turn-1-candidate/restore/run/checkpoint.ckpt",
+      "sha256": "f22f9aa8b736d833128cfbc3c967507016ce82bad4027b874601428c8ecf84b3"
+    },
+    {
+      "bytes": 245,
+      "path": "records/current/campaign/turn-1-candidate/restore/run/events.jsonl",
+      "sha256": "dbcf358c92868fa8f9251804fac10370fabbcc1dd91843007855d6cc4b62a36f"
+    },
+    {
+      "bytes": 522,
+      "path": "records/current/campaign/turn-1-candidate/restore/run/manifest.json",
+      "sha256": "ad0ff0eba2c2cf09554262997e5e2e70d0ab50458c51e31bf49da42724a6f0ea"
+    },
+    {
+      "bytes": 552,
+      "path": "records/current/campaign/turn-1-candidate/restore/run/progress.jsonl",
+      "sha256": "b653554c4f6902c2ffa659c1e4deecd199f63a5bff2807e82b53984868460843"
+    },
+    {
+      "bytes": 183,
+      "path": "records/current/campaign/turn-1-candidate/restore/run/run.json",
+      "sha256": "8ac2b664cbc85a9da9be61c5550e2e764595b8ebadf055fd4ae86808b2ddec14"
+    },
+    {
+      "bytes": 675,
+      "path": "records/current/campaign/turn-1-candidate/restore/run/run.toml",
+      "sha256": "a8ad2ff9c5591d51bd0ace7a675d09e68bf5e9bc39e720b57dd27ce58e595a1d"
+    },
+    {
+      "bytes": 24920,
+      "path": "records/current/campaign/turn-1-candidate/restore/run/solution.sol",
+      "sha256": "cfa050380707f265cbfc689b2d9026801f72874f584b246a04e2425621082e19"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-candidate/restore/strategy/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6443,
+      "path": "records/current/campaign/turn-1-candidate/restore/strategy/supervisor.json",
+      "sha256": "49f3140d9aa2f4bb2ff240af24d2f2db4ec9a260b898e84f9878421c4fd6fff9"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-1-candidate/restore/strategy/supervisor.samples.jsonl",
+      "sha256": "14d88c4ccb9aa2afc6ba1d5fee09d6fbdcf4c029fa72ebd859873e3d3be505d3"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/turn-1-candidate/restore/summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 396,
+      "path": "records/current/campaign/turn-1-candidate/restore/summary/stdout.log",
+      "sha256": "f3db9779e1abaa85d298e57d115756678bdd7b12e434aeb8c74c2af1aaa6bd93"
+    },
+    {
+      "bytes": 6361,
+      "path": "records/current/campaign/turn-1-candidate/restore/summary/supervisor.json",
+      "sha256": "fcbbf19ee4054f636f508079475e85d70a4afc8536550ffc5bc3b375a35940de"
+    },
+    {
+      "bytes": 324,
+      "path": "records/current/campaign/turn-1-candidate/restore/summary/supervisor.samples.jsonl",
+      "sha256": "af7978dcb7c53cf8761f952e11a079308787460894f194a41824cc80b4e30461"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-candidate/restore/tree/stderr.log",
+      "sha256": "9faa1db92fc5ad9f1dc5690f3fa84b49048f7d306a5fe65cb7a2db51f4633ddd"
+    },
+    {
+      "bytes": 96635,
+      "path": "records/current/campaign/turn-1-candidate/restore/tree/stdout.log",
+      "sha256": "e89730aac015ef2232cf19bfe6ba0d17d1f729bd2740fb094dd0dfd32da9f284"
+    },
+    {
+      "bytes": 6417,
+      "path": "records/current/campaign/turn-1-candidate/restore/tree/supervisor.json",
+      "sha256": "511ba5f183d2076b4d3b393063af31b829c0e25e173bd31ae6864439eab3a4df"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-1-candidate/restore/tree/supervisor.samples.jsonl",
+      "sha256": "8ea2bd2f8944c7873a311fcd2c1586e0104ee41694b6d801598835e304a1b151"
+    },
+    {
+      "bytes": 15069,
+      "path": "records/current/campaign/turn-1-candidate/result.json",
+      "sha256": "fcd36b2035e87577d754e96c633692e60f32770cbaed2ad713627aed82fd2906"
+    },
+    {
+      "bytes": 356288,
+      "path": "records/current/campaign/turn-1-candidate/run/checkpoint.ckpt",
+      "sha256": "f22f9aa8b736d833128cfbc3c967507016ce82bad4027b874601428c8ecf84b3"
+    },
+    {
+      "bytes": 485,
+      "path": "records/current/campaign/turn-1-candidate/run/events.jsonl",
+      "sha256": "a784acc5aaa65c473b9b07543dea814977a4f8562d7ce1a9fea2a1e4571a5e54"
+    },
+    {
+      "bytes": 620,
+      "path": "records/current/campaign/turn-1-candidate/run/manifest.json",
+      "sha256": "139db3234d98cca501dfb31e31b80a0ce4d6b30eb75be6a082f2852a3d7f1524"
+    },
+    {
+      "bytes": 552,
+      "path": "records/current/campaign/turn-1-candidate/run/progress.jsonl",
+      "sha256": "b653554c4f6902c2ffa659c1e4deecd199f63a5bff2807e82b53984868460843"
+    },
+    {
+      "bytes": 176,
+      "path": "records/current/campaign/turn-1-candidate/run/run.json",
+      "sha256": "188ba0e560575b70525300f8e24d06b0dba62c3065ec10602ef48c27c93b512f"
+    },
+    {
+      "bytes": 675,
+      "path": "records/current/campaign/turn-1-candidate/run/run.toml",
+      "sha256": "a8ad2ff9c5591d51bd0ace7a675d09e68bf5e9bc39e720b57dd27ce58e595a1d"
+    },
+    {
+      "bytes": 24920,
+      "path": "records/current/campaign/turn-1-candidate/run/solution.sol",
+      "sha256": "ee55a97544c793f2770893b12019a990649b564dfb2bf14e2b08a1ab7a0bcc2a"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/turn-1-candidate/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 634,
+      "path": "records/current/campaign/turn-1-candidate/solve/stdout.log",
+      "sha256": "12d0845ac5706d9472efd896e52b85b47e43a80b8371a6e75ed45f590f4fdf71"
+    },
+    {
+      "bytes": 6544,
+      "path": "records/current/campaign/turn-1-candidate/solve/supervisor.json",
+      "sha256": "5d557c41b5212648ee77ea8610f7483fea575c7c8f4dc4f4499de589901fd466"
+    },
+    {
+      "bytes": 9531,
+      "path": "records/current/campaign/turn-1-candidate/solve/supervisor.samples.jsonl",
+      "sha256": "7e5a3e28bab67254ce9c6ecc673607ef27daf1ad603b239cc9912b1904add459"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-candidate/strategy/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6379,
+      "path": "records/current/campaign/turn-1-candidate/strategy/supervisor.json",
+      "sha256": "a0bfb0547859e6cf0aebc712a6c60929c2ef2e76e8424d1d8dbcbac54b875e1f"
+    },
+    {
+      "bytes": 632,
+      "path": "records/current/campaign/turn-1-candidate/strategy/supervisor.samples.jsonl",
+      "sha256": "06bf1dd1bab87869e18e3d9518fb16357d79998cf53fd35e2cad4f8cbcffcec2"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/turn-1-candidate/summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 389,
+      "path": "records/current/campaign/turn-1-candidate/summary/stdout.log",
+      "sha256": "073f8003c215f376180cc8f8835958289f8229b750bb0d8c9cea7484031ca227"
+    },
+    {
+      "bytes": 6737,
+      "path": "records/current/campaign/turn-1-candidate/summary/supervisor.json",
+      "sha256": "c35aa45fb2eea9d982391521090078ae62aed2bf71bf168243c23318fcdc6537"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/turn-1-candidate/summary/supervisor.samples.jsonl",
+      "sha256": "0c0badfccdf53d63a4e3a808bdf55465ea3987a843437743e93fcdb1a522b3bb"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-1-candidate/tree/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 96635,
+      "path": "records/current/campaign/turn-1-candidate/tree/stdout.log",
+      "sha256": "e89730aac015ef2232cf19bfe6ba0d17d1f729bd2740fb094dd0dfd32da9f284"
+    },
+    {
+      "bytes": 6354,
+      "path": "records/current/campaign/turn-1-candidate/tree/supervisor.json",
+      "sha256": "44b8ca9cc4d7c61eae847aa1cd909e04185a6c0231c8bdb7cca3ca1d8e5febe8"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-1-candidate/tree/supervisor.samples.jsonl",
+      "sha256": "3df99a0fdf17b01c8e1bd3cbd3b54a6705d2fc4b8de3c9f10dd9153b682c3f88"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-2-baseline/ev/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6307,
+      "path": "records/current/campaign/turn-2-baseline/ev/supervisor.json",
+      "sha256": "34ff161c76e5319c26419541d1b2129402b62240c261b32303fceda91b33ee7e"
+    },
+    {
+      "bytes": 935,
+      "path": "records/current/campaign/turn-2-baseline/ev/supervisor.samples.jsonl",
+      "sha256": "170b0950da18b55a96527e676cf93b5f23bce0f298db95c6cc6fbee67fa77fe5"
+    },
+    {
+      "bytes": 3210,
+      "path": "records/current/campaign/turn-2-baseline/profile.json",
+      "sha256": "fedfbcd551d1c4ddb7141201ed5c2a4e01351cca2a324ff1246d5f5f7af0c7c1"
+    },
+    {
+      "bytes": 8626,
+      "path": "records/current/campaign/turn-2-baseline/result.json",
+      "sha256": "a9c8a34cb01df07c8b7252bb36c4fc3ed9bce5c9d28181b5616b08b1a5305ec4"
+    },
+    {
+      "bytes": 356281,
+      "path": "records/current/campaign/turn-2-baseline/run/checkpoint.ckpt",
+      "sha256": "20b728f870f0da771442c2f8ce6d16f21c957e0f412b8af951cf7f1a31be0aa0"
+    },
+    {
+      "bytes": 566,
+      "path": "records/current/campaign/turn-2-baseline/run/events.jsonl",
+      "sha256": "197f30ab433cb0510b85c69d00a62739bfbc8bb6488cc70902a43be550f0798e"
+    },
+    {
+      "bytes": 619,
+      "path": "records/current/campaign/turn-2-baseline/run/manifest.json",
+      "sha256": "49df0fef389bdd7907d410a50b91e6ce919572795595b0153aff58d4975ad826"
+    },
+    {
+      "bytes": 542,
+      "path": "records/current/campaign/turn-2-baseline/run/progress.jsonl",
+      "sha256": "4d3b4798f57e1ccdc6db1d3193504085b0db8ce37ece0ddf8953c03bab2ef66a"
+    },
+    {
+      "bytes": 176,
+      "path": "records/current/campaign/turn-2-baseline/run/run.json",
+      "sha256": "dd3ec9e16985a396fd4c42645b6bc01adfff08f58fa2acd60dfd0c6b64df3fb3"
+    },
+    {
+      "bytes": 548,
+      "path": "records/current/campaign/turn-2-baseline/run/run.toml",
+      "sha256": "8326ab75af8a7f1c52a48e8d2edafa7e61649024e69ca5d8c08a9972eaeb9297"
+    },
+    {
+      "bytes": 21333,
+      "path": "records/current/campaign/turn-2-baseline/run/solution.sol",
+      "sha256": "04ba040159380466835a433fe444b12837291f8dc7bfa1f51a66431efba2eb3a"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/turn-2-baseline/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-2-baseline/solve/stdout.log",
+      "sha256": "4bd8d958b845e9905af1361cb92301d96d3b5b30b75c8a8e725008e388a7555d"
+    },
+    {
+      "bytes": 6513,
+      "path": "records/current/campaign/turn-2-baseline/solve/supervisor.json",
+      "sha256": "999928d615e75298530388f01eb0ee50f691f0c0e6d1b533561472d374acb2d0"
+    },
+    {
+      "bytes": 11369,
+      "path": "records/current/campaign/turn-2-baseline/solve/supervisor.samples.jsonl",
+      "sha256": "d1d5f0ce69059868837a36c578a9582226f4e56f36163c826a9a6a347a077035"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-2-baseline/strategy/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6345,
+      "path": "records/current/campaign/turn-2-baseline/strategy/supervisor.json",
+      "sha256": "bd0beb5c2d5a559e709364584d8faa761cf94faaaa9886d4cc196943424713cd"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-2-baseline/strategy/supervisor.samples.jsonl",
+      "sha256": "12fd3ba0046062a248810283e96443a63437853dd95eb0b61e6a8b0b3657e460"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-2-baseline/summary/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 389,
+      "path": "records/current/campaign/turn-2-baseline/summary/stdout.log",
+      "sha256": "b146ebbc3a5e35d7a7ab75f0c87a68bab6c363a40110816b715b5f6022d2261a"
+    },
+    {
+      "bytes": 6728,
+      "path": "records/current/campaign/turn-2-baseline/summary/supervisor.json",
+      "sha256": "f300c885cca3c40c22b765f8312d0f0dd5e9cf3caa6367a3843887817a11129a"
+    },
+    {
+      "bytes": 1246,
+      "path": "records/current/campaign/turn-2-baseline/summary/supervisor.samples.jsonl",
+      "sha256": "7fc6a54b109304c34fccb0c3b3588786d625a294e7da99f615cb6218f5f79bae"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-2-baseline/tree/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 96635,
+      "path": "records/current/campaign/turn-2-baseline/tree/stdout.log",
+      "sha256": "e89730aac015ef2232cf19bfe6ba0d17d1f729bd2740fb094dd0dfd32da9f284"
+    },
+    {
+      "bytes": 6318,
+      "path": "records/current/campaign/turn-2-baseline/tree/supervisor.json",
+      "sha256": "051bb78543d0f3670dc5a068b9d4f502da7bc0b342905cd8c5efa29787f786a7"
+    },
+    {
+      "bytes": 632,
+      "path": "records/current/campaign/turn-2-baseline/tree/supervisor.samples.jsonl",
+      "sha256": "ededbec00470774aa0d7e9b8b5749b929c7f645801b927bada4389cbe3aa4eff"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-2-candidate/ev/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6344,
+      "path": "records/current/campaign/turn-2-candidate/ev/supervisor.json",
+      "sha256": "26c29de34d02586aab5db8d36c7cae2775cba175912e8d0ecf6aab3d23e925f2"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-2-candidate/ev/supervisor.samples.jsonl",
+      "sha256": "23354b0aba4806ab705c6e057db962c928ebfbc8e6600c6fc68e4a3483b230ae"
+    },
+    {
+      "bytes": 3212,
+      "path": "records/current/campaign/turn-2-candidate/profile.json",
+      "sha256": "9523145d5bdc25377a3442a041bbe1b249452172b5243056c004efd5f89cc1dc"
+    },
+    {
+      "bytes": 8621,
+      "path": "records/current/campaign/turn-2-candidate/result.json",
+      "sha256": "45299f83776f05379871a8efd95bcaa3988798dda31f73d1a0674b7aa0a8b03d"
+    },
+    {
+      "bytes": 356288,
+      "path": "records/current/campaign/turn-2-candidate/run/checkpoint.ckpt",
+      "sha256": "f22f9aa8b736d833128cfbc3c967507016ce82bad4027b874601428c8ecf84b3"
+    },
+    {
+      "bytes": 485,
+      "path": "records/current/campaign/turn-2-candidate/run/events.jsonl",
+      "sha256": "cc47cd488e4397304079b0e4721fa648bfd37b56ecadb7b25dc036580540d04b"
+    },
+    {
+      "bytes": 621,
+      "path": "records/current/campaign/turn-2-candidate/run/manifest.json",
+      "sha256": "74eec6b2abbb5bcc32a9015fe5210aa8931e4695fd1ef4447d53e23f9dfe13a8"
+    },
+    {
+      "bytes": 545,
+      "path": "records/current/campaign/turn-2-candidate/run/progress.jsonl",
+      "sha256": "6263b02f2dc70ae74c6ca4ba5b6f51ecea756367455109349dfd25104f120880"
+    },
+    {
+      "bytes": 183,
+      "path": "records/current/campaign/turn-2-candidate/run/run.json",
+      "sha256": "8e38367de28b8fe8dbbe2fc29b9b763c99208c0b34a6028ad53be43a172326a6"
+    },
+    {
+      "bytes": 675,
+      "path": "records/current/campaign/turn-2-candidate/run/run.toml",
+      "sha256": "a8ad2ff9c5591d51bd0ace7a675d09e68bf5e9bc39e720b57dd27ce58e595a1d"
+    },
+    {
+      "bytes": 24919,
+      "path": "records/current/campaign/turn-2-candidate/run/solution.sol",
+      "sha256": "788e234cab7a7339da15c211bd9bbabc75029e3fd6d16cc397adb536adb75ca7"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/turn-2-candidate/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 634,
+      "path": "records/current/campaign/turn-2-candidate/solve/stdout.log",
+      "sha256": "c17638834fc53ce1f1a090b67386edd173cfcdca47ac0a3c35a4f650ba8df86f"
+    },
+    {
+      "bytes": 6546,
+      "path": "records/current/campaign/turn-2-candidate/solve/supervisor.json",
+      "sha256": "d15340e24c0fd9b596ad8b001cca526dd09becb453d042e0b6fb161bdaac5bc7"
+    },
+    {
+      "bytes": 9860,
+      "path": "records/current/campaign/turn-2-candidate/solve/supervisor.samples.jsonl",
+      "sha256": "700e447757097c11e467a6afd066fe774128277f6aef1800a9f276930be4b3e2"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-2-candidate/strategy/stderr.log",
+      "sha256": "9faa1db92fc5ad9f1dc5690f3fa84b49048f7d306a5fe65cb7a2db51f4633ddd"
+    },
+    {
+      "bytes": 6379,
+      "path": "records/current/campaign/turn-2-candidate/strategy/supervisor.json",
+      "sha256": "4a0d4c0b1ef04507e3a4273e3c409337fb7236d535a620d307c1f22fccf3c04f"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-2-candidate/strategy/supervisor.samples.jsonl",
+      "sha256": "9fd1b18d5ed59c0c26c991eb9d51f87f8d02f1c219dbd5b4161a7caa0132d707"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/turn-2-candidate/summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 396,
+      "path": "records/current/campaign/turn-2-candidate/summary/stdout.log",
+      "sha256": "8ea0b50b64d8f3f8cec45ca035906e72047471417460cd262176dab8645abc81"
+    },
+    {
+      "bytes": 6739,
+      "path": "records/current/campaign/turn-2-candidate/summary/supervisor.json",
+      "sha256": "d9acad53a46e25dfcbc45589e9d64c063b1cfdac405e1f8bfa58d4d4c4011f6b"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/turn-2-candidate/summary/supervisor.samples.jsonl",
+      "sha256": "daf9cb4f9390ce296e7a523ce2e19716811b27e23f72b5216bc0502832fefe75"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-2-candidate/tree/stderr.log",
+      "sha256": "9faa1db92fc5ad9f1dc5690f3fa84b49048f7d306a5fe65cb7a2db51f4633ddd"
+    },
+    {
+      "bytes": 96635,
+      "path": "records/current/campaign/turn-2-candidate/tree/stdout.log",
+      "sha256": "e89730aac015ef2232cf19bfe6ba0d17d1f729bd2740fb094dd0dfd32da9f284"
+    },
+    {
+      "bytes": 6352,
+      "path": "records/current/campaign/turn-2-candidate/tree/supervisor.json",
+      "sha256": "d71329504d6f341e2caf61f8d458b96cde51dd234ca4b65c43b7264eddf09699"
+    },
+    {
+      "bytes": 632,
+      "path": "records/current/campaign/turn-2-candidate/tree/supervisor.samples.jsonl",
+      "sha256": "77620a8a3aac260db741422411f0f05aece7b04a22d58538cfaa71b863c72479"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-3-baseline/ev/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6308,
+      "path": "records/current/campaign/turn-3-baseline/ev/supervisor.json",
+      "sha256": "1c7bcfc018767a570a8e24f3b0773f8d94a033be985d9383d786c573b401541e"
+    },
+    {
+      "bytes": 942,
+      "path": "records/current/campaign/turn-3-baseline/ev/supervisor.samples.jsonl",
+      "sha256": "8d5dd0bbd1ab484b3eb61efe4645d3fa80b70c4cae63fb46084c83273815e0db"
+    },
+    {
+      "bytes": 3206,
+      "path": "records/current/campaign/turn-3-baseline/profile.json",
+      "sha256": "9244acd43f2a7c677ef4d472a08a501fd1f09608e4417815a400d57fc448dacb"
+    },
+    {
+      "bytes": 8628,
+      "path": "records/current/campaign/turn-3-baseline/result.json",
+      "sha256": "cf59fe625ded817b5d4dc64790dfbf9f119f445a425d006b4bc277266d637732"
+    },
+    {
+      "bytes": 356281,
+      "path": "records/current/campaign/turn-3-baseline/run/checkpoint.ckpt",
+      "sha256": "20b728f870f0da771442c2f8ce6d16f21c957e0f412b8af951cf7f1a31be0aa0"
+    },
+    {
+      "bytes": 566,
+      "path": "records/current/campaign/turn-3-baseline/run/events.jsonl",
+      "sha256": "c1e87162cb7ee9871cd181e2222fd7499d34011f7dc362eae3775a8a5c47aff2"
+    },
+    {
+      "bytes": 620,
+      "path": "records/current/campaign/turn-3-baseline/run/manifest.json",
+      "sha256": "8a37b5b32b8a6f94ced658282e8c8fe23fb810f485a79344b2a66b95108b73a9"
+    },
+    {
+      "bytes": 552,
+      "path": "records/current/campaign/turn-3-baseline/run/progress.jsonl",
+      "sha256": "333f683de530fa0518beab88c9df826f24d4c7784c6ee084b2e9e3c4745e848c"
+    },
+    {
+      "bytes": 183,
+      "path": "records/current/campaign/turn-3-baseline/run/run.json",
+      "sha256": "bbb58e74d351077b73e9277ad90aaee207e6b2c4859e1c59e246760401e194d5"
+    },
+    {
+      "bytes": 548,
+      "path": "records/current/campaign/turn-3-baseline/run/run.toml",
+      "sha256": "8326ab75af8a7f1c52a48e8d2edafa7e61649024e69ca5d8c08a9972eaeb9297"
+    },
+    {
+      "bytes": 21335,
+      "path": "records/current/campaign/turn-3-baseline/run/solution.sol",
+      "sha256": "dcc49ad4c35768ff35a812ddf3c8d87b09a2bed50d8ecd06c9b5dbd7a4b796b9"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/turn-3-baseline/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-3-baseline/solve/stdout.log",
+      "sha256": "c3022a428df218876a3bf4dd71b7862caec1e7a7fd8e4e0311cb72cca946a8a1"
+    },
+    {
+      "bytes": 6514,
+      "path": "records/current/campaign/turn-3-baseline/solve/supervisor.json",
+      "sha256": "6ab2f8207b1c0e0d42f93c352620ead00a27be5ee6391d997cc75d8e2ac14193"
+    },
+    {
+      "bytes": 10791,
+      "path": "records/current/campaign/turn-3-baseline/solve/supervisor.samples.jsonl",
+      "sha256": "6e1944be38cbd6faf4d978f67f8808f87f4d71114afe176c4749055bc4ce3bbd"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-3-baseline/strategy/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6343,
+      "path": "records/current/campaign/turn-3-baseline/strategy/supervisor.json",
+      "sha256": "c9ea87d8b2527e4bead8c7f533257bf563825a0d9dcc6f81b1c8362535acaa56"
+    },
+    {
+      "bytes": 634,
+      "path": "records/current/campaign/turn-3-baseline/strategy/supervisor.samples.jsonl",
+      "sha256": "a7374aab7cb7f577a4b5c6cf69380f3143cf2138bb850bd1e9bd63702d876a36"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-3-baseline/summary/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 396,
+      "path": "records/current/campaign/turn-3-baseline/summary/stdout.log",
+      "sha256": "ee8701ff83fb0853099457711903537c728a200434bf440679aaa29540cde3f2"
+    },
+    {
+      "bytes": 6727,
+      "path": "records/current/campaign/turn-3-baseline/summary/supervisor.json",
+      "sha256": "e65e68bb2d0331eb3a4e7044d20a77974d55720d58d8431b87b888f469a0a218"
+    },
+    {
+      "bytes": 1240,
+      "path": "records/current/campaign/turn-3-baseline/summary/supervisor.samples.jsonl",
+      "sha256": "99370cd5e397b5dde4dd0147290e95228d9c388f3ecf97bcbe8a98e9eee16ca3"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-3-baseline/tree/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 96635,
+      "path": "records/current/campaign/turn-3-baseline/tree/stdout.log",
+      "sha256": "e89730aac015ef2232cf19bfe6ba0d17d1f729bd2740fb094dd0dfd32da9f284"
+    },
+    {
+      "bytes": 6317,
+      "path": "records/current/campaign/turn-3-baseline/tree/supervisor.json",
+      "sha256": "b2e24966a68a6406fdf649d755e45a25a996e278e9ff998e7a5cc349f32c4066"
+    },
+    {
+      "bytes": 634,
+      "path": "records/current/campaign/turn-3-baseline/tree/supervisor.samples.jsonl",
+      "sha256": "d0c4ed59038cb3e85063f5bc2859dc5e8ffa563bb94a53d4647d1799d6a7e28f"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-3-candidate/ev/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6345,
+      "path": "records/current/campaign/turn-3-candidate/ev/supervisor.json",
+      "sha256": "faf4ccab7f7a5ca76023670b92129bc2a185f5eeaca7912636c8447d3f0a510e"
+    },
+    {
+      "bytes": 943,
+      "path": "records/current/campaign/turn-3-candidate/ev/supervisor.samples.jsonl",
+      "sha256": "7d334d3604e8768ecec40722710d4a60c4d6808b8fc8dc3ad0ebed444887c51b"
+    },
+    {
+      "bytes": 3216,
+      "path": "records/current/campaign/turn-3-candidate/profile.json",
+      "sha256": "09cff2b0cd0ff758a3c87a6bb8023649a9a316cde647f706a20283464e1588c3"
+    },
+    {
+      "bytes": 8617,
+      "path": "records/current/campaign/turn-3-candidate/result.json",
+      "sha256": "77202af9f939b902539aa8c2b543717f92def48ca622380fa6495689b9af1709"
+    },
+    {
+      "bytes": 356288,
+      "path": "records/current/campaign/turn-3-candidate/run/checkpoint.ckpt",
+      "sha256": "f22f9aa8b736d833128cfbc3c967507016ce82bad4027b874601428c8ecf84b3"
+    },
+    {
+      "bytes": 485,
+      "path": "records/current/campaign/turn-3-candidate/run/events.jsonl",
+      "sha256": "7b51600ed9866f66626883df24591f4173b6b8badf61918bb885487dc542e2d4"
+    },
+    {
+      "bytes": 621,
+      "path": "records/current/campaign/turn-3-candidate/run/manifest.json",
+      "sha256": "5cfb561e7a641b96ecd4eec6dbb9150f65bb61742965fc224b58459bee1ee25c"
+    },
+    {
+      "bytes": 552,
+      "path": "records/current/campaign/turn-3-candidate/run/progress.jsonl",
+      "sha256": "cbad0688b06d74a80d9565b5dc3d2cf50b3318959a2a6b017a92a074eef3d059"
+    },
+    {
+      "bytes": 176,
+      "path": "records/current/campaign/turn-3-candidate/run/run.json",
+      "sha256": "4487e842318f6376e4f5ca39dea37fd5533c9d7bd5b73535b98232cd5e6fad6a"
+    },
+    {
+      "bytes": 675,
+      "path": "records/current/campaign/turn-3-candidate/run/run.toml",
+      "sha256": "a8ad2ff9c5591d51bd0ace7a675d09e68bf5e9bc39e720b57dd27ce58e595a1d"
+    },
+    {
+      "bytes": 24921,
+      "path": "records/current/campaign/turn-3-candidate/run/solution.sol",
+      "sha256": "09f87a0aa6dac2a5dae27cec070dd8b9555d31ee4f181b3397d27547f302ebe8"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/turn-3-candidate/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 634,
+      "path": "records/current/campaign/turn-3-candidate/solve/stdout.log",
+      "sha256": "116faa46d164a2bebf71c094f20bfa028e6e32a8cbaf3863acde259368124867"
+    },
+    {
+      "bytes": 6547,
+      "path": "records/current/campaign/turn-3-candidate/solve/supervisor.json",
+      "sha256": "7ecfaa6099766701165915af935c2e9d9f0b91e8216b3943b7b59fd93731b056"
+    },
+    {
+      "bytes": 9871,
+      "path": "records/current/campaign/turn-3-candidate/solve/supervisor.samples.jsonl",
+      "sha256": "a7c9aa60a1f4d8298765388d58c64f0ac203cd8ac85ebea43fc5ff14a3bfd2b9"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-3-candidate/strategy/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 6380,
+      "path": "records/current/campaign/turn-3-candidate/strategy/supervisor.json",
+      "sha256": "f78479a11d3dd3f5ea87fd6cf76189b21252304a7b5fb206fc455a211aefe8f3"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-3-candidate/strategy/supervisor.samples.jsonl",
+      "sha256": "6b1b78803420a708b5a31f67b2a2b5494ece065b03de5ac86ebb4b9292060a9a"
+    },
+    {
+      "bytes": 0,
+      "path": "records/current/campaign/turn-3-candidate/summary/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 389,
+      "path": "records/current/campaign/turn-3-candidate/summary/stdout.log",
+      "sha256": "3591d77f3bca55fa003bf5654b1bb99427dde3da94fa323dbbce8b86685e0260"
+    },
+    {
+      "bytes": 6738,
+      "path": "records/current/campaign/turn-3-candidate/summary/supervisor.json",
+      "sha256": "c03946db98b535a5cf1f79dd8ad60c4710dc2ad912fe131e87a47108f48e8404"
+    },
+    {
+      "bytes": 325,
+      "path": "records/current/campaign/turn-3-candidate/summary/supervisor.samples.jsonl",
+      "sha256": "9c63840f5b9d7ae022d15e412feb9e79993f2def1795387ed2e27f2ec256e0b6"
+    },
+    {
+      "bytes": 75,
+      "path": "records/current/campaign/turn-3-candidate/tree/stderr.log",
+      "sha256": "b88812c3aa3f33019d487a9902dcb59e9e038cd94f332a597cb955641e801dfd"
+    },
+    {
+      "bytes": 96635,
+      "path": "records/current/campaign/turn-3-candidate/tree/stdout.log",
+      "sha256": "e89730aac015ef2232cf19bfe6ba0d17d1f729bd2740fb094dd0dfd32da9f284"
+    },
+    {
+      "bytes": 6354,
+      "path": "records/current/campaign/turn-3-candidate/tree/supervisor.json",
+      "sha256": "a7fae83dfae7f2dd3634ff0555e41c2311993c108ed4be368f7ea150b5e2b06d"
+    },
+    {
+      "bytes": 633,
+      "path": "records/current/campaign/turn-3-candidate/tree/supervisor.samples.jsonl",
+      "sha256": "0ed2549c65c3361b5db44d48c841b2d875684001b24b12d5d9bd58e0159b5d60"
+    },
+    {
+      "bytes": 677,
+      "path": "records/current/frozen/flop.toml",
+      "sha256": "d0fb4ed3f7d3ca9dd04b4599ca37435d70b37520c596e2724d104a672b76cd62"
+    },
+    {
+      "bytes": 13820,
+      "path": "records/current/frozen/plan.json",
+      "sha256": "6bf01e38faae81b5f97b69414dfcc12aedcf07caf7cd9889c9fb152867061332"
+    },
+    {
+      "bytes": 559,
+      "path": "records/current/frozen/river.toml",
+      "sha256": "fe93d87a93ac4c2f8f1554bfdb89c970672b02f55f79962fee5c43b182b246ee"
+    },
+    {
+      "bytes": 548,
+      "path": "records/current/frozen/turn.toml",
+      "sha256": "8326ab75af8a7f1c52a48e8d2edafa7e61649024e69ca5d8c08a9972eaeb9297"
+    },
+    {
+      "bytes": 1634,
+      "path": "records/current/run-script/run-current-comparison.sh",
+      "sha256": "e573c181110bd89a0adbae49461584caf075af336a63c842d2d910a76e7784c6"
+    },
+    {
+      "bytes": 1428178,
+      "path": "retention.json",
+      "sha256": "d9f9c72d1dd15f91194ca20c9dac00bbba96e63734fb652df794d978177c3762"
+    },
+    {
+      "bytes": 596192,
+      "path": "validation.json",
+      "sha256": "71fd5145923b58a36c6f5d3de90b5f064018f5247c236a797fce8edd00cb8e9a"
+    }
+  ],
+  "schema": "r1.local-comparison-retention/v1"
+}

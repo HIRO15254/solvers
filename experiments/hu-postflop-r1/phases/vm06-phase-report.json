@@ -1,0 +1,2588 @@
+{
+  "schema": "r1.vm06-source03-phase-verification/v1",
+  "status": "pass",
+  "scope": "source03 phase calibration, not final source06 performance acceptance",
+  "verifier": {
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\phases\\vm06-phase-verification.py",
+    "bytes": 32519,
+    "sha256": "dc84879f6d5989f262d65c285ccbece25777c83885f21756d4847bfc5c83ea54"
+  },
+  "bundles": {
+    "phases": {
+      "archive": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-phases.tar.gz",
+        "bytes": 24168476,
+        "sha256": "eef21251eec733ee51b2bf6ab79c0776df1fc5b40a0b837c77a00f29ac42749d"
+      },
+      "payloads_verified": 1461,
+      "payload_bytes": 346296182
+    },
+    "original": {
+      "archive": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-v3-results.tar.gz",
+        "bytes": 17934814,
+        "sha256": "3c679810a39b3fac58d394f95387b0d98cec94ccc299f325e5922eefb9264e2d"
+      },
+      "payloads_verified": 763,
+      "payload_bytes": 184493300
+    }
+  },
+  "compact": {
+    "phases": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\phases\\evidence-vm06",
+      "compact_payload_files_verified": 1378,
+      "compact_files_including_metadata_verified": 1383,
+      "generic_readiness": false,
+      "generic_problems": [
+        {
+          "count": 2079,
+          "reason": "required_linked_evidence_missing"
+        }
+      ],
+      "cross_bundle_dependencies_resolved_by_this_verifier": true
+    },
+    "original": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\pipeline\\evidence-vm06-v3",
+      "compact_payload_files_verified": 718,
+      "compact_files_including_metadata_verified": 723,
+      "generic_readiness": false,
+      "generic_problems": [
+        {
+          "count": 6,
+          "reason": "required_linked_evidence_missing"
+        }
+      ],
+      "cross_bundle_dependencies_resolved_by_this_verifier": true
+    }
+  },
+  "boot_id": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f",
+  "cpu_model": "AMD EPYC 7B12",
+  "source_proof": {
+    "baseline": {
+      "original_source": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "instrumented_binary": {
+        "bytes": 8846520,
+        "path": "/opt/r1/target/phase-baseline/release/solvers",
+        "sha256": "69643569c66f634a85990ff7c7fa9727bda4329184f3c88e20e4f905780ac832"
+      },
+      "manifest": {
+        "bytes": 38923,
+        "path": "/opt/r1/phase-baseline/r1-phase-source-manifest.json",
+        "sha256": "1047dca0daa06664bb313be8260d666721feec8ecae0b46e93cf9421c0e6e7fc"
+      },
+      "before_files_verified": 178
+    },
+    "candidate": {
+      "original_source": {
+        "bytes": 1195310,
+        "path": "/opt/r1/candidate-v3-source.tar.gz",
+        "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970"
+      },
+      "instrumented_binary": {
+        "bytes": 8902104,
+        "path": "/opt/r1/target/phase-candidate/release/solvers",
+        "sha256": "2b257ca992d6c98f653144eea5f9d137b5f2cf2bc9c4afcbd4850e715673af5d"
+      },
+      "manifest": {
+        "bytes": 40806,
+        "path": "/opt/r1/phase-candidate/r1-phase-source-manifest.json",
+        "sha256": "e434aeded22aea5096ac2364751894982270e07824053788e57e0b41b986a6c6"
+      },
+      "before_files_verified": 186
+    }
+  },
+  "instrumentation_id": "aa81ca3e10c1beba324a8d42483294ca54a8b3fe852970a9f924da44fd2e5a3a",
+  "supervisor_stages_verified": 360,
+  "unretained_system_identities_observed_before_after_only": [
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    }
+  ],
+  "coverage": {
+    "on": 18,
+    "off": 18,
+    "original": 18
+  },
+  "phase_records_verified": 18,
+  "leaf_names": [
+    "cfr_updates",
+    "checkpoint",
+    "final_ev_br",
+    "initialization",
+    "input_preparation",
+    "overhead",
+    "periodic_ev_br",
+    "sol_preparation",
+    "sol_serialization_and_write",
+    "summary_publish"
+  ],
+  "calibration_output_equivalence": [
+    {
+      "case": "flop",
+      "version": "baseline",
+      "repetition": 1,
+      "status": "pass"
+    },
+    {
+      "case": "flop",
+      "version": "baseline",
+      "repetition": 2,
+      "status": "pass"
+    },
+    {
+      "case": "flop",
+      "version": "baseline",
+      "repetition": 3,
+      "status": "pass"
+    },
+    {
+      "case": "flop",
+      "version": "candidate",
+      "repetition": 1,
+      "status": "pass"
+    },
+    {
+      "case": "flop",
+      "version": "candidate",
+      "repetition": 2,
+      "status": "pass"
+    },
+    {
+      "case": "flop",
+      "version": "candidate",
+      "repetition": 3,
+      "status": "pass"
+    },
+    {
+      "case": "river",
+      "version": "baseline",
+      "repetition": 1,
+      "status": "pass"
+    },
+    {
+      "case": "river",
+      "version": "baseline",
+      "repetition": 2,
+      "status": "pass"
+    },
+    {
+      "case": "river",
+      "version": "baseline",
+      "repetition": 3,
+      "status": "pass"
+    },
+    {
+      "case": "river",
+      "version": "candidate",
+      "repetition": 1,
+      "status": "pass"
+    },
+    {
+      "case": "river",
+      "version": "candidate",
+      "repetition": 2,
+      "status": "pass"
+    },
+    {
+      "case": "river",
+      "version": "candidate",
+      "repetition": 3,
+      "status": "pass"
+    },
+    {
+      "case": "turn",
+      "version": "baseline",
+      "repetition": 1,
+      "status": "pass"
+    },
+    {
+      "case": "turn",
+      "version": "baseline",
+      "repetition": 2,
+      "status": "pass"
+    },
+    {
+      "case": "turn",
+      "version": "baseline",
+      "repetition": 3,
+      "status": "pass"
+    },
+    {
+      "case": "turn",
+      "version": "candidate",
+      "repetition": 1,
+      "status": "pass"
+    },
+    {
+      "case": "turn",
+      "version": "candidate",
+      "repetition": 2,
+      "status": "pass"
+    },
+    {
+      "case": "turn",
+      "version": "candidate",
+      "repetition": 3,
+      "status": "pass"
+    }
+  ],
+  "original_record_mutation": false,
+  "saved_quantized_profile_br": "not_evaluated_by_phase_campaign",
+  "external_reference_acceptance": null,
+  "cases": [
+    {
+      "case": "river",
+      "version": "baseline",
+      "external_solve_seconds": {
+        "on": {
+          "values": [
+            0.2531036360001053,
+            0.2589618500001052,
+            0.26101325999979963
+          ],
+          "n": 3,
+          "median": 0.2589618500001052,
+          "min": 0.2531036360001053,
+          "max": 0.26101325999979963
+        },
+        "off": {
+          "values": [
+            0.19603080200022305,
+            0.19810788199993112,
+            0.2602767200000926
+          ],
+          "n": 3,
+          "median": 0.19810788199993112,
+          "min": 0.19603080200022305,
+          "max": 0.2602767200000926
+        },
+        "original": {
+          "values": [
+            0.19624054600012641,
+            0.25311338699998487,
+            0.19181609599991134
+          ],
+          "n": 3,
+          "median": 0.19624054600012641,
+          "min": 0.19181609599991134,
+          "max": 0.25311338699998487
+        }
+      },
+      "on_over_off_median_ratio": 1.3071759052988876,
+      "off_over_original_median_ratio": 1.0095155462918632,
+      "phase_total_ns": {
+        "values": [
+          180684473,
+          221639681,
+          203972942
+        ],
+        "n": 3,
+        "median": 203972942,
+        "min": 180684473,
+        "max": 221639681
+      },
+      "leaves": {
+        "cfr_updates": {
+          "duration_ns": {
+            "values": [
+              90560186,
+              106026166,
+              99275135
+            ],
+            "n": 3,
+            "median": 99275135,
+            "min": 90560186,
+            "max": 106026166
+          },
+          "calls": {
+            "values": [
+              4,
+              4,
+              4
+            ],
+            "n": 3,
+            "median": 4,
+            "min": 4,
+            "max": 4
+          }
+        },
+        "checkpoint": {
+          "duration_ns": {
+            "values": [
+              47454909,
+              63051748,
+              52879677
+            ],
+            "n": 3,
+            "median": 52879677,
+            "min": 47454909,
+            "max": 63051748
+          },
+          "calls": {
+            "values": [
+              5,
+              5,
+              5
+            ],
+            "n": 3,
+            "median": 5,
+            "min": 5,
+            "max": 5
+          }
+        },
+        "final_ev_br": {
+          "duration_ns": {
+            "values": [
+              2618449,
+              2220299,
+              3017990
+            ],
+            "n": 3,
+            "median": 2618449,
+            "min": 2220299,
+            "max": 3017990
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "initialization": {
+          "duration_ns": {
+            "values": [
+              2374450,
+              1690280,
+              1390030
+            ],
+            "n": 3,
+            "median": 1690280,
+            "min": 1390030,
+            "max": 2374450
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "input_preparation": {
+          "duration_ns": {
+            "values": [
+              10412540,
+              9691580,
+              8980230
+            ],
+            "n": 3,
+            "median": 9691580,
+            "min": 8980230,
+            "max": 10412540
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "overhead": {
+          "duration_ns": {
+            "values": [
+              13457099,
+              24578159,
+              21417311
+            ],
+            "n": 3,
+            "median": 21417311,
+            "min": 13457099,
+            "max": 24578159
+          },
+          "calls": {
+            "values": [
+              18,
+              18,
+              18
+            ],
+            "n": 3,
+            "median": 18,
+            "min": 18,
+            "max": 18
+          }
+        },
+        "periodic_ev_br": {
+          "duration_ns": {
+            "values": [
+              4945540,
+              4997610,
+              5604440
+            ],
+            "n": 3,
+            "median": 4997610,
+            "min": 4945540,
+            "max": 5604440
+          },
+          "calls": {
+            "values": [
+              4,
+              4,
+              4
+            ],
+            "n": 3,
+            "median": 4,
+            "min": 4,
+            "max": 4
+          }
+        },
+        "sol_preparation": {
+          "duration_ns": {
+            "values": [
+              1948100,
+              1798580,
+              1683109
+            ],
+            "n": 3,
+            "median": 1798580,
+            "min": 1683109,
+            "max": 1948100
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "sol_serialization_and_write": {
+          "duration_ns": {
+            "values": [
+              6893940,
+              7572799,
+              9686070
+            ],
+            "n": 3,
+            "median": 7572799,
+            "min": 6893940,
+            "max": 9686070
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "summary_publish": {
+          "duration_ns": {
+            "values": [
+              19260,
+              12460,
+              38950
+            ],
+            "n": 3,
+            "median": 19260,
+            "min": 12460,
+            "max": 38950
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        }
+      },
+      "cfr_inclusive_ns_nonadditive": {
+        "values": [
+          123895905,
+          154988304,
+          133144455
+        ],
+        "n": 3,
+        "median": 133144455,
+        "min": 123895905,
+        "max": 154988304
+      },
+      "external_minus_internal_ns": {
+        "values": [
+          72419163.00010532,
+          37322169.00010517,
+          57040317.99979964
+        ],
+        "n": 3,
+        "median": 57040317.99979964,
+        "min": 37322169.00010517,
+        "max": 72419163.00010532
+      },
+      "memory_bytes": {
+        "on": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              24133632,
+              25542656,
+              25612288
+            ],
+            "n": 3,
+            "median": 25542656,
+            "min": 24133632,
+            "max": 25612288
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              10858496,
+              11005952,
+              11235328
+            ],
+            "n": 3,
+            "median": 11005952,
+            "min": 10858496,
+            "max": 11235328
+          }
+        },
+        "off": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              24117248,
+              25595904,
+              25657344
+            ],
+            "n": 3,
+            "median": 25595904,
+            "min": 24117248,
+            "max": 25657344
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              11128832,
+              10997760,
+              10944512
+            ],
+            "n": 3,
+            "median": 10997760,
+            "min": 10944512,
+            "max": 11128832
+          }
+        },
+        "original": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              24584192,
+              25923584,
+              25939968
+            ],
+            "n": 3,
+            "median": 25923584,
+            "min": 24584192,
+            "max": 25939968
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              11059200,
+              11087872,
+              11157504
+            ],
+            "n": 3,
+            "median": 11087872,
+            "min": 11059200,
+            "max": 11157504
+          }
+        }
+      }
+    },
+    {
+      "case": "river",
+      "version": "candidate",
+      "external_solve_seconds": {
+        "on": {
+          "values": [
+            0.26231539899981726,
+            0.25938309000002846,
+            0.24939867999955823
+          ],
+          "n": 3,
+          "median": 0.25938309000002846,
+          "min": 0.24939867999955823,
+          "max": 0.26231539899981726
+        },
+        "off": {
+          "values": [
+            0.25477613099974405,
+            0.19505749199970523,
+            0.20706945099982477
+          ],
+          "n": 3,
+          "median": 0.20706945099982477,
+          "min": 0.19505749199970523,
+          "max": 0.25477613099974405
+        },
+        "original": {
+          "values": [
+            0.1952259749998575,
+            0.18787846700001865,
+            0.19438885600015965
+          ],
+          "n": 3,
+          "median": 0.19438885600015965,
+          "min": 0.18787846700001865,
+          "max": 0.1952259749998575
+        }
+      },
+      "on_over_off_median_ratio": 1.252638130577011,
+      "off_over_original_median_ratio": 1.0652331376426984,
+      "phase_total_ns": {
+        "values": [
+          211246992,
+          207200962,
+          202576041
+        ],
+        "n": 3,
+        "median": 207200962,
+        "min": 202576041,
+        "max": 211246992
+      },
+      "leaves": {
+        "cfr_updates": {
+          "duration_ns": {
+            "values": [
+              104405296,
+              103422066,
+              105947857
+            ],
+            "n": 3,
+            "median": 104405296,
+            "min": 103422066,
+            "max": 105947857
+          },
+          "calls": {
+            "values": [
+              4,
+              4,
+              4
+            ],
+            "n": 3,
+            "median": 4,
+            "min": 4,
+            "max": 4
+          }
+        },
+        "checkpoint": {
+          "duration_ns": {
+            "values": [
+              47072029,
+              51005167,
+              47903836
+            ],
+            "n": 3,
+            "median": 47903836,
+            "min": 47072029,
+            "max": 51005167
+          },
+          "calls": {
+            "values": [
+              4,
+              4,
+              4
+            ],
+            "n": 3,
+            "median": 4,
+            "min": 4,
+            "max": 4
+          }
+        },
+        "final_ev_br": {
+          "duration_ns": {
+            "values": [
+              618540,
+              604710,
+              652600
+            ],
+            "n": 3,
+            "median": 618540,
+            "min": 604710,
+            "max": 652600
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "initialization": {
+          "duration_ns": {
+            "values": [
+              1503509,
+              1702390,
+              1573110
+            ],
+            "n": 3,
+            "median": 1573110,
+            "min": 1503509,
+            "max": 1702390
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "input_preparation": {
+          "duration_ns": {
+            "values": [
+              14474630,
+              12696790,
+              9199590
+            ],
+            "n": 3,
+            "median": 12696790,
+            "min": 9199590,
+            "max": 14474630
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "overhead": {
+          "duration_ns": {
+            "values": [
+              26592619,
+              21266650,
+              20690958
+            ],
+            "n": 3,
+            "median": 21266650,
+            "min": 20690958,
+            "max": 26592619
+          },
+          "calls": {
+            "values": [
+              17,
+              17,
+              17
+            ],
+            "n": 3,
+            "median": 17,
+            "min": 17,
+            "max": 17
+          }
+        },
+        "periodic_ev_br": {
+          "duration_ns": {
+            "values": [
+              5339419,
+              6442460,
+              6896950
+            ],
+            "n": 3,
+            "median": 6442460,
+            "min": 5339419,
+            "max": 6896950
+          },
+          "calls": {
+            "values": [
+              4,
+              4,
+              4
+            ],
+            "n": 3,
+            "median": 4,
+            "min": 4,
+            "max": 4
+          }
+        },
+        "sol_preparation": {
+          "duration_ns": {
+            "values": [
+              1826120,
+              2140620,
+              2010250
+            ],
+            "n": 3,
+            "median": 2010250,
+            "min": 1826120,
+            "max": 2140620
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "sol_serialization_and_write": {
+          "duration_ns": {
+            "values": [
+              9397630,
+              7909949,
+              7687660
+            ],
+            "n": 3,
+            "median": 7909949,
+            "min": 7687660,
+            "max": 9397630
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "summary_publish": {
+          "duration_ns": {
+            "values": [
+              17200,
+              10160,
+              13230
+            ],
+            "n": 3,
+            "median": 13230,
+            "min": 10160,
+            "max": 17200
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        }
+      },
+      "cfr_inclusive_ns_nonadditive": {
+        "values": [
+          144230564,
+          150588954,
+          150689494
+        ],
+        "n": 3,
+        "median": 150588954,
+        "min": 144230564,
+        "max": 150689494
+      },
+      "external_minus_internal_ns": {
+        "values": [
+          51068406.99981725,
+          52182128.00002846,
+          46822638.99955824
+        ],
+        "n": 3,
+        "median": 51068406.99981725,
+        "min": 46822638.99955824,
+        "max": 52182128.00002846
+      },
+      "memory_bytes": {
+        "on": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              25178112,
+              25542656,
+              25780224
+            ],
+            "n": 3,
+            "median": 25542656,
+            "min": 25178112,
+            "max": 25780224
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              10866688,
+              10887168,
+              10977280
+            ],
+            "n": 3,
+            "median": 10887168,
+            "min": 10866688,
+            "max": 10977280
+          }
+        },
+        "off": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              25182208,
+              25616384,
+              25792512
+            ],
+            "n": 3,
+            "median": 25616384,
+            "min": 25182208,
+            "max": 25792512
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              10567680,
+              10641408,
+              10571776
+            ],
+            "n": 3,
+            "median": 10571776,
+            "min": 10567680,
+            "max": 10641408
+          }
+        },
+        "original": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              25243648,
+              25927680,
+              25985024
+            ],
+            "n": 3,
+            "median": 25927680,
+            "min": 25243648,
+            "max": 25985024
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              10317824,
+              10387456,
+              10747904
+            ],
+            "n": 3,
+            "median": 10387456,
+            "min": 10317824,
+            "max": 10747904
+          }
+        }
+      }
+    },
+    {
+      "case": "turn",
+      "version": "baseline",
+      "external_solve_seconds": {
+        "on": {
+          "values": [
+            1.9736739820000366,
+            2.785282391999772,
+            2.1704127049997624
+          ],
+          "n": 3,
+          "median": 2.1704127049997624,
+          "min": 1.9736739820000366,
+          "max": 2.785282391999772
+        },
+        "off": {
+          "values": [
+            1.8923766349998914,
+            1.9044560449997334,
+            1.9351188760001605
+          ],
+          "n": 3,
+          "median": 1.9044560449997334,
+          "min": 1.8923766349998914,
+          "max": 1.9351188760001605
+        },
+        "original": {
+          "values": [
+            1.6667079080000349,
+            2.2236566309998125,
+            2.0955554039999242
+          ],
+          "n": 3,
+          "median": 2.0955554039999242,
+          "min": 1.6667079080000349,
+          "max": 2.2236566309998125
+        }
+      },
+      "on_over_off_median_ratio": 1.139649670937964,
+      "off_over_original_median_ratio": 0.9088072982296593,
+      "phase_total_ns": {
+        "values": [
+          1943684004,
+          2751362553,
+          2082726939
+        ],
+        "n": 3,
+        "median": 2082726939,
+        "min": 1943684004,
+        "max": 2751362553
+      },
+      "leaves": {
+        "cfr_updates": {
+          "duration_ns": {
+            "values": [
+              1440810164,
+              2079667518,
+              1589507107
+            ],
+            "n": 3,
+            "median": 1589507107,
+            "min": 1440810164,
+            "max": 2079667518
+          },
+          "calls": {
+            "values": [
+              4,
+              4,
+              4
+            ],
+            "n": 3,
+            "median": 4,
+            "min": 4,
+            "max": 4
+          }
+        },
+        "checkpoint": {
+          "duration_ns": {
+            "values": [
+              273793120,
+              370335106,
+              251827381
+            ],
+            "n": 3,
+            "median": 273793120,
+            "min": 251827381,
+            "max": 370335106
+          },
+          "calls": {
+            "values": [
+              5,
+              5,
+              5
+            ],
+            "n": 3,
+            "median": 5,
+            "min": 5,
+            "max": 5
+          }
+        },
+        "final_ev_br": {
+          "duration_ns": {
+            "values": [
+              29461348,
+              32733018,
+              42082438
+            ],
+            "n": 3,
+            "median": 32733018,
+            "min": 29461348,
+            "max": 42082438
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "initialization": {
+          "duration_ns": {
+            "values": [
+              8944779,
+              8032240,
+              7509130
+            ],
+            "n": 3,
+            "median": 8032240,
+            "min": 7509130,
+            "max": 8944779
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "input_preparation": {
+          "duration_ns": {
+            "values": [
+              8756420,
+              15507770,
+              9997730
+            ],
+            "n": 3,
+            "median": 9997730,
+            "min": 8756420,
+            "max": 15507770
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "overhead": {
+          "duration_ns": {
+            "values": [
+              20250421,
+              23739258,
+              24690118
+            ],
+            "n": 3,
+            "median": 23739258,
+            "min": 20250421,
+            "max": 24690118
+          },
+          "calls": {
+            "values": [
+              18,
+              18,
+              18
+            ],
+            "n": 3,
+            "median": 18,
+            "min": 18,
+            "max": 18
+          }
+        },
+        "periodic_ev_br": {
+          "duration_ns": {
+            "values": [
+              79946896,
+              113339866,
+              78118848
+            ],
+            "n": 3,
+            "median": 79946896,
+            "min": 78118848,
+            "max": 113339866
+          },
+          "calls": {
+            "values": [
+              4,
+              4,
+              4
+            ],
+            "n": 3,
+            "median": 4,
+            "min": 4,
+            "max": 4
+          }
+        },
+        "sol_preparation": {
+          "duration_ns": {
+            "values": [
+              58851357,
+              77694377,
+              56060068
+            ],
+            "n": 3,
+            "median": 58851357,
+            "min": 56060068,
+            "max": 77694377
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "sol_serialization_and_write": {
+          "duration_ns": {
+            "values": [
+              22834089,
+              30257769,
+              22898549
+            ],
+            "n": 3,
+            "median": 22898549,
+            "min": 22834089,
+            "max": 30257769
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "summary_publish": {
+          "duration_ns": {
+            "values": [
+              35410,
+              55631,
+              35570
+            ],
+            "n": 3,
+            "median": 35570,
+            "min": 35410,
+            "max": 55631
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        }
+      },
+      "cfr_inclusive_ns_nonadditive": {
+        "values": [
+          1686290514,
+          2421340976,
+          1807507019
+        ],
+        "n": 3,
+        "median": 1807507019,
+        "min": 1686290514,
+        "max": 2421340976
+      },
+      "external_minus_internal_ns": {
+        "values": [
+          29989978.000036716,
+          33919838.999771595,
+          87685765.99976254
+        ],
+        "n": 3,
+        "median": 33919838.999771595,
+        "min": 29989978.000036716,
+        "max": 87685765.99976254
+      },
+      "memory_bytes": {
+        "on": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              51417088,
+              51548160,
+              51396608
+            ],
+            "n": 3,
+            "median": 51417088,
+            "min": 51396608,
+            "max": 51548160
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              51539968,
+              51949568,
+              52056064
+            ],
+            "n": 3,
+            "median": 51949568,
+            "min": 51539968,
+            "max": 52056064
+          }
+        },
+        "off": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              51097600,
+              50995200,
+              51310592
+            ],
+            "n": 3,
+            "median": 51097600,
+            "min": 50995200,
+            "max": 51310592
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              51658752,
+              51728384,
+              51728384
+            ],
+            "n": 3,
+            "median": 51728384,
+            "min": 51658752,
+            "max": 51728384
+          }
+        },
+        "original": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              51208192,
+              51462144,
+              51159040
+            ],
+            "n": 3,
+            "median": 51208192,
+            "min": 51159040,
+            "max": 51462144
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              51740672,
+              51822592,
+              51847168
+            ],
+            "n": 3,
+            "median": 51822592,
+            "min": 51740672,
+            "max": 51847168
+          }
+        }
+      }
+    },
+    {
+      "case": "turn",
+      "version": "candidate",
+      "external_solve_seconds": {
+        "on": {
+          "values": [
+            2.193780363999849,
+            1.9899055720002252,
+            2.213000522999664
+          ],
+          "n": 3,
+          "median": 2.193780363999849,
+          "min": 1.9899055720002252,
+          "max": 2.213000522999664
+        },
+        "off": {
+          "values": [
+            1.7164515419999589,
+            1.7082099029998972,
+            1.9708231720001095
+          ],
+          "n": 3,
+          "median": 1.7164515419999589,
+          "min": 1.7082099029998972,
+          "max": 1.9708231720001095
+        },
+        "original": {
+          "values": [
+            1.8409816380001303,
+            2.2067645439999524,
+            1.9748488239999915
+          ],
+          "n": 3,
+          "median": 1.9748488239999915,
+          "min": 1.8409816380001303,
+          "max": 2.2067645439999524
+        }
+      },
+      "on_over_off_median_ratio": 1.2780904734681415,
+      "off_over_original_median_ratio": 0.8691559177291063,
+      "phase_total_ns": {
+        "values": [
+          2167254905,
+          1943994793,
+          2188383005
+        ],
+        "n": 3,
+        "median": 2167254905,
+        "min": 1943994793,
+        "max": 2188383005
+      },
+      "leaves": {
+        "cfr_updates": {
+          "duration_ns": {
+            "values": [
+              1729940332,
+              1611880976,
+              1796179531
+            ],
+            "n": 3,
+            "median": 1729940332,
+            "min": 1611880976,
+            "max": 1796179531
+          },
+          "calls": {
+            "values": [
+              4,
+              4,
+              4
+            ],
+            "n": 3,
+            "median": 4,
+            "min": 4,
+            "max": 4
+          }
+        },
+        "checkpoint": {
+          "duration_ns": {
+            "values": [
+              174609983,
+              126540186,
+              170603305
+            ],
+            "n": 3,
+            "median": 170603305,
+            "min": 126540186,
+            "max": 174609983
+          },
+          "calls": {
+            "values": [
+              4,
+              4,
+              4
+            ],
+            "n": 3,
+            "median": 4,
+            "min": 4,
+            "max": 4
+          }
+        },
+        "final_ev_br": {
+          "duration_ns": {
+            "values": [
+              8682080,
+              6587490,
+              8016910
+            ],
+            "n": 3,
+            "median": 8016910,
+            "min": 6587490,
+            "max": 8682080
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "initialization": {
+          "duration_ns": {
+            "values": [
+              6952040,
+              8139009,
+              7567420
+            ],
+            "n": 3,
+            "median": 7567420,
+            "min": 6952040,
+            "max": 8139009
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "input_preparation": {
+          "duration_ns": {
+            "values": [
+              8875880,
+              13274110,
+              10514900
+            ],
+            "n": 3,
+            "median": 10514900,
+            "min": 8875880,
+            "max": 13274110
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "overhead": {
+          "duration_ns": {
+            "values": [
+              26863028,
+              18354148,
+              20903038
+            ],
+            "n": 3,
+            "median": 20903038,
+            "min": 18354148,
+            "max": 26863028
+          },
+          "calls": {
+            "values": [
+              17,
+              17,
+              17
+            ],
+            "n": 3,
+            "median": 17,
+            "min": 17,
+            "max": 17
+          }
+        },
+        "periodic_ev_br": {
+          "duration_ns": {
+            "values": [
+              102546536,
+              80780146,
+              95589264
+            ],
+            "n": 3,
+            "median": 95589264,
+            "min": 80780146,
+            "max": 102546536
+          },
+          "calls": {
+            "values": [
+              4,
+              4,
+              4
+            ],
+            "n": 3,
+            "median": 4,
+            "min": 4,
+            "max": 4
+          }
+        },
+        "sol_preparation": {
+          "duration_ns": {
+            "values": [
+              70052907,
+              53434118,
+              55695258
+            ],
+            "n": 3,
+            "median": 55695258,
+            "min": 53434118,
+            "max": 70052907
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "sol_serialization_and_write": {
+          "duration_ns": {
+            "values": [
+              38630369,
+              24964920,
+              23253279
+            ],
+            "n": 3,
+            "median": 24964920,
+            "min": 23253279,
+            "max": 38630369
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "summary_publish": {
+          "duration_ns": {
+            "values": [
+              101750,
+              39690,
+              60100
+            ],
+            "n": 3,
+            "median": 60100,
+            "min": 39690,
+            "max": 101750
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        }
+      },
+      "cfr_inclusive_ns_nonadditive": {
+        "values": [
+          1909290465,
+          1773454810,
+          2004443612
+        ],
+        "n": 3,
+        "median": 1909290465,
+        "min": 1773454810,
+        "max": 2004443612
+      },
+      "external_minus_internal_ns": {
+        "values": [
+          26525458.99984932,
+          45910779.000225306,
+          24617517.999664307
+        ],
+        "n": 3,
+        "median": 26525458.99984932,
+        "min": 24617517.999664307,
+        "max": 45910779.000225306
+      },
+      "memory_bytes": {
+        "on": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              36585472,
+              37036032,
+              36720640
+            ],
+            "n": 3,
+            "median": 36720640,
+            "min": 36585472,
+            "max": 37036032
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              37109760,
+              37511168,
+              35721216
+            ],
+            "n": 3,
+            "median": 37109760,
+            "min": 35721216,
+            "max": 37511168
+          }
+        },
+        "off": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              36605952,
+              36503552,
+              36532224
+            ],
+            "n": 3,
+            "median": 36532224,
+            "min": 36503552,
+            "max": 36605952
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              32665600,
+              37326848,
+              37105664
+            ],
+            "n": 3,
+            "median": 37105664,
+            "min": 32665600,
+            "max": 37326848
+          }
+        },
+        "original": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              36900864,
+              36515840,
+              36880384
+            ],
+            "n": 3,
+            "median": 36880384,
+            "min": 36515840,
+            "max": 36900864
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              34623488,
+              36216832,
+              31985664
+            ],
+            "n": 3,
+            "median": 34623488,
+            "min": 31985664,
+            "max": 36216832
+          }
+        }
+      }
+    },
+    {
+      "case": "flop",
+      "version": "baseline",
+      "external_solve_seconds": {
+        "on": {
+          "values": [
+            11.681305958000394,
+            11.419379428999946,
+            10.617384111999854
+          ],
+          "n": 3,
+          "median": 11.419379428999946,
+          "min": 10.617384111999854,
+          "max": 11.681305958000394
+        },
+        "off": {
+          "values": [
+            10.388432501999887,
+            10.693003151000084,
+            10.381802579000123
+          ],
+          "n": 3,
+          "median": 10.388432501999887,
+          "min": 10.381802579000123,
+          "max": 10.693003151000084
+        },
+        "original": {
+          "values": [
+            12.225236040000027,
+            12.628793637999934,
+            12.155711281999857
+          ],
+          "n": 3,
+          "median": 12.225236040000027,
+          "min": 12.155711281999857,
+          "max": 12.628793637999934
+        }
+      },
+      "on_over_off_median_ratio": 1.0992398927173652,
+      "off_over_original_median_ratio": 0.8497531228034976,
+      "phase_total_ns": {
+        "values": [
+          11610638801,
+          11379767810,
+          10566122963
+        ],
+        "n": 3,
+        "median": 11379767810,
+        "min": 10566122963,
+        "max": 11610638801
+      },
+      "leaves": {
+        "cfr_updates": {
+          "duration_ns": {
+            "values": [
+              6496101323,
+              6105964019,
+              5706007975
+            ],
+            "n": 3,
+            "median": 6105964019,
+            "min": 5706007975,
+            "max": 6496101323
+          },
+          "calls": {
+            "values": [
+              5,
+              5,
+              5
+            ],
+            "n": 3,
+            "median": 5,
+            "min": 5,
+            "max": 5
+          }
+        },
+        "checkpoint": {
+          "duration_ns": {
+            "values": [
+              2032506748,
+              2232441620,
+              2111015057
+            ],
+            "n": 3,
+            "median": 2111015057,
+            "min": 2032506748,
+            "max": 2232441620
+          },
+          "calls": {
+            "values": [
+              6,
+              6,
+              6
+            ],
+            "n": 3,
+            "median": 6,
+            "min": 6,
+            "max": 6
+          }
+        },
+        "final_ev_br": {
+          "duration_ns": {
+            "values": [
+              233488511,
+              320491688,
+              299868548
+            ],
+            "n": 3,
+            "median": 299868548,
+            "min": 233488511,
+            "max": 320491688
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "initialization": {
+          "duration_ns": {
+            "values": [
+              171094333,
+              100183745,
+              101238235
+            ],
+            "n": 3,
+            "median": 101238235,
+            "min": 100183745,
+            "max": 171094333
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "input_preparation": {
+          "duration_ns": {
+            "values": [
+              17948100,
+              12469269,
+              8265860
+            ],
+            "n": 3,
+            "median": 12469269,
+            "min": 8265860,
+            "max": 17948100
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "overhead": {
+          "duration_ns": {
+            "values": [
+              87175546,
+              93030547,
+              81421806
+            ],
+            "n": 3,
+            "median": 87175546,
+            "min": 81421806,
+            "max": 93030547
+          },
+          "calls": {
+            "values": [
+              21,
+              21,
+              21
+            ],
+            "n": 3,
+            "median": 21,
+            "min": 21,
+            "max": 21
+          }
+        },
+        "periodic_ev_br": {
+          "duration_ns": {
+            "values": [
+              805932118,
+              795323840,
+              774550030
+            ],
+            "n": 3,
+            "median": 795323840,
+            "min": 774550030,
+            "max": 805932118
+          },
+          "calls": {
+            "values": [
+              5,
+              5,
+              5
+            ],
+            "n": 3,
+            "median": 5,
+            "min": 5,
+            "max": 5
+          }
+        },
+        "sol_preparation": {
+          "duration_ns": {
+            "values": [
+              1473619513,
+              1390266785,
+              1195422423
+            ],
+            "n": 3,
+            "median": 1390266785,
+            "min": 1195422423,
+            "max": 1473619513
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "sol_serialization_and_write": {
+          "duration_ns": {
+            "values": [
+              292740249,
+              329548057,
+              288286849
+            ],
+            "n": 3,
+            "median": 292740249,
+            "min": 288286849,
+            "max": 329548057
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "summary_publish": {
+          "duration_ns": {
+            "values": [
+              32360,
+              48240,
+              46180
+            ],
+            "n": 3,
+            "median": 46180,
+            "min": 32360,
+            "max": 48240
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        }
+      },
+      "cfr_inclusive_ns_nonadditive": {
+        "values": [
+          8515507433,
+          8147171019,
+          7584831970
+        ],
+        "n": 3,
+        "median": 8147171019,
+        "min": 7584831970,
+        "max": 8515507433
+      },
+      "external_minus_internal_ns": {
+        "values": [
+          70667157.00039291,
+          39611618.999946594,
+          51261148.99985504
+        ],
+        "n": 3,
+        "median": 51261148.99985504,
+        "min": 39611618.999946594,
+        "max": 70667157.00039291
+      },
+      "memory_bytes": {
+        "on": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              730640384,
+              730763264,
+              729964544
+            ],
+            "n": 3,
+            "median": 730640384,
+            "min": 729964544,
+            "max": 730763264
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              731226112,
+              731131904,
+              730484736
+            ],
+            "n": 3,
+            "median": 731131904,
+            "min": 730484736,
+            "max": 731226112
+          }
+        },
+        "off": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              730689536,
+              730738688,
+              731000832
+            ],
+            "n": 3,
+            "median": 730738688,
+            "min": 730689536,
+            "max": 731000832
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              731676672,
+              731316224,
+              731402240
+            ],
+            "n": 3,
+            "median": 731402240,
+            "min": 731316224,
+            "max": 731676672
+          }
+        },
+        "original": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              730992640,
+              732401664,
+              731521024
+            ],
+            "n": 3,
+            "median": 731521024,
+            "min": 730992640,
+            "max": 732401664
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              731619328,
+              733188096,
+              732164096
+            ],
+            "n": 3,
+            "median": 732164096,
+            "min": 731619328,
+            "max": 733188096
+          }
+        }
+      }
+    },
+    {
+      "case": "flop",
+      "version": "candidate",
+      "external_solve_seconds": {
+        "on": {
+          "values": [
+            10.750100986999769,
+            9.589961150999898,
+            9.444627766999929
+          ],
+          "n": 3,
+          "median": 9.589961150999898,
+          "min": 9.444627766999929,
+          "max": 10.750100986999769
+        },
+        "off": {
+          "values": [
+            10.40147128100034,
+            9.533362404999934,
+            9.885615642000175
+          ],
+          "n": 3,
+          "median": 9.885615642000175,
+          "min": 9.533362404999934,
+          "max": 10.40147128100034
+        },
+        "original": {
+          "values": [
+            10.511472100999981,
+            10.149984351000057,
+            10.144495829999869
+          ],
+          "n": 3,
+          "median": 10.149984351000057,
+          "min": 10.144495829999869,
+          "max": 10.511472100999981
+        }
+      },
+      "on_over_off_median_ratio": 0.970092455370796,
+      "off_over_original_median_ratio": 0.9739537816160442,
+      "phase_total_ns": {
+        "values": [
+          10707660808,
+          9514995914,
+          9409902778
+        ],
+        "n": 3,
+        "median": 9514995914,
+        "min": 9409902778,
+        "max": 10707660808
+      },
+      "leaves": {
+        "cfr_updates": {
+          "duration_ns": {
+            "values": [
+              7263435615,
+              6345184140,
+              6292385152
+            ],
+            "n": 3,
+            "median": 6345184140,
+            "min": 6292385152,
+            "max": 7263435615
+          },
+          "calls": {
+            "values": [
+              5,
+              5,
+              5
+            ],
+            "n": 3,
+            "median": 5,
+            "min": 5,
+            "max": 5
+          }
+        },
+        "checkpoint": {
+          "duration_ns": {
+            "values": [
+              702272792,
+              601074898,
+              595402357
+            ],
+            "n": 3,
+            "median": 601074898,
+            "min": 595402357,
+            "max": 702272792
+          },
+          "calls": {
+            "values": [
+              5,
+              5,
+              5
+            ],
+            "n": 3,
+            "median": 5,
+            "min": 5,
+            "max": 5
+          }
+        },
+        "final_ev_br": {
+          "duration_ns": {
+            "values": [
+              71980788,
+              58820097,
+              59405328
+            ],
+            "n": 3,
+            "median": 59405328,
+            "min": 58820097,
+            "max": 71980788
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "initialization": {
+          "duration_ns": {
+            "values": [
+              102226286,
+              97613126,
+              92883466
+            ],
+            "n": 3,
+            "median": 97613126,
+            "min": 92883466,
+            "max": 102226286
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "input_preparation": {
+          "duration_ns": {
+            "values": [
+              9329740,
+              10015080,
+              9341520
+            ],
+            "n": 3,
+            "median": 9341520,
+            "min": 9329740,
+            "max": 10015080
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "overhead": {
+          "duration_ns": {
+            "values": [
+              65641026,
+              63071445,
+              74943475
+            ],
+            "n": 3,
+            "median": 65641026,
+            "min": 63071445,
+            "max": 74943475
+          },
+          "calls": {
+            "values": [
+              20,
+              20,
+              20
+            ],
+            "n": 3,
+            "median": 20,
+            "min": 20,
+            "max": 20
+          }
+        },
+        "periodic_ev_br": {
+          "duration_ns": {
+            "values": [
+              941667404,
+              836476657,
+              839791547
+            ],
+            "n": 3,
+            "median": 839791547,
+            "min": 836476657,
+            "max": 941667404
+          },
+          "calls": {
+            "values": [
+              5,
+              5,
+              5
+            ],
+            "n": 3,
+            "median": 5,
+            "min": 5,
+            "max": 5
+          }
+        },
+        "sol_preparation": {
+          "duration_ns": {
+            "values": [
+              1255871060,
+              1157929494,
+              1172931685
+            ],
+            "n": 3,
+            "median": 1172931685,
+            "min": 1157929494,
+            "max": 1255871060
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "sol_serialization_and_write": {
+          "duration_ns": {
+            "values": [
+              295200768,
+              344772837,
+              272782799
+            ],
+            "n": 3,
+            "median": 295200768,
+            "min": 272782799,
+            "max": 344772837
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        },
+        "summary_publish": {
+          "duration_ns": {
+            "values": [
+              35329,
+              38140,
+              35449
+            ],
+            "n": 3,
+            "median": 35449,
+            "min": 35329,
+            "max": 38140
+          },
+          "calls": {
+            "values": [
+              1,
+              1,
+              1
+            ],
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1
+          }
+        }
+      },
+      "cfr_inclusive_ns_nonadditive": {
+        "values": [
+          8588075892,
+          7507427764,
+          7421645027
+        ],
+        "n": 3,
+        "median": 7507427764,
+        "min": 7421645027,
+        "max": 8588075892
+      },
+      "external_minus_internal_ns": {
+        "values": [
+          42440178.99976921,
+          74965236.999897,
+          34724988.99992943
+        ],
+        "n": 3,
+        "median": 42440178.99976921,
+        "min": 34724988.99992943,
+        "max": 74965236.999897
+      },
+      "memory_bytes": {
+        "on": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              447475712,
+              451964928,
+              436178944
+            ],
+            "n": 3,
+            "median": 447475712,
+            "min": 436178944,
+            "max": 451964928
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              444387328,
+              448720896,
+              433623040
+            ],
+            "n": 3,
+            "median": 444387328,
+            "min": 433623040,
+            "max": 448720896
+          }
+        },
+        "off": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              449449984,
+              440266752,
+              443727872
+            ],
+            "n": 3,
+            "median": 443727872,
+            "min": 440266752,
+            "max": 449449984
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              449126400,
+              437575680,
+              440729600
+            ],
+            "n": 3,
+            "median": 440729600,
+            "min": 437575680,
+            "max": 449126400
+          }
+        },
+        "original": {
+          "root_os_peak_resident_bytes": {
+            "values": [
+              450326528,
+              436871168,
+              449589248
+            ],
+            "n": 3,
+            "median": 449589248,
+            "min": 436871168,
+            "max": 450326528
+          },
+          "sampled_peak_tree_resident_bytes": {
+            "values": [
+              444739584,
+              434782208,
+              445841408
+            ],
+            "n": 3,
+            "median": 444739584,
+            "min": 434782208,
+            "max": 445841408
+          }
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Three repetitions in separate mode campaigns; warm caches and order/noise are uncontrolled.",
+    "Internal monotonic leaf partition excludes process startup/shutdown and phase file final publication; external minus internal is not a leaf.",
+    "Medians of individual leaves need not sum to the median total; CFR inclusive envelope overlaps leaves and must not be added.",
+    "RSS is invocation-wide, not phase memory. wait4 root high-water may include fork/pre-exec or reaped descendant effects; sampled tree RSS misses short peaks.",
+    "Source manifests/build identity bind recorded outputs; this is not a new build, solver run, independent oracle, or saved-profile BR audit.",
+    "Compact files await Git commit; raw exports/SOL/CKPT/binaries require the pinned local bundles."
+  ]
+}

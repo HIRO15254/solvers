@@ -1,0 +1,41 @@
+{
+  "case_id": "HU-R0-007",
+  "board": ["As", "7d", "2c", "4h"],
+  "arithmetic": "Python Decimal, precision 80; original decimal weights without renormalization",
+  "hash_scope": "entire UTF-8 file bytes including the single appended LF",
+  "oop": {
+    "file": "oop-range.txt",
+    "file_bytes": 5148,
+    "copy_raw_characters": 5147,
+    "positive_combos": 399,
+    "weight_sum": "315.475864460761",
+    "weight_min": "0.055",
+    "weight_max": "1",
+    "sha256": "ea24d847ef7e8ac3d9fa6a291f339ccd2168d6bb1ecb1663de3f5f252b20f7e6",
+    "duplicate_unordered_combos": 0,
+    "board_collisions": 0,
+    "nonfinite_or_nonpositive_weights": 0
+  },
+  "ip": {
+    "file": "ip-range.txt",
+    "file_bytes": 8142,
+    "copy_raw_characters": 8141,
+    "positive_combos": 390,
+    "weight_sum": "5.348340247394",
+    "weight_min": "0.000920000044",
+    "weight_max": "0.12800000608",
+    "sha256": "2f1b128232aee0a575ceb0f4523442644fe520d7eff91e73ca92b88640319332",
+    "duplicate_unordered_combos": 0,
+    "board_collisions": 0,
+    "nonfinite_or_nonpositive_weights": 0
+  },
+  "joint": {
+    "positive_pair_product_count": 155610,
+    "compatible_positive_pairs": 140586,
+    "incompatible_positive_pairs": 15024,
+    "compatible_weight_sum": "1526.818142052398473219561799",
+    "unrestricted_product_weight_sum": "1687.272262976902499145506834",
+    "incompatible_weight_sum": "160.454120924504025925945035",
+    "definition": "sum(w_oop * w_ip) over disjoint private-card sets; both ranges already disjoint from As 7d 2c 4h; no renormalization or future River chance weights"
+  }
+}

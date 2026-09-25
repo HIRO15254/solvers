@@ -1,0 +1,217 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T18:12:54.182073+00:00",
+  "argv": [
+    "/opt/r1/target/baseline-audit-recovery/release/examples/hu_saved_profile_audit",
+    "--sol",
+    "/opt/r1/candidate-v3/runs/r1-paired-v3/river-2-baseline/run/solution.sol",
+    "--threads",
+    "8"
+  ],
+  "cwd": "/opt/r1/candidate-v3",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 600.0,
+    "grace_seconds": 5.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.05,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "disk_reserve_bytes": 10737418240
+  },
+  "runtime": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-7.0.0-1011-gcp-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "logical_cpus": 8
+  },
+  "outputs": {
+    "stdout": {
+      "path": "/opt/r1/saved-audits/river-2-baseline/stdout.log",
+      "sha256": "ebb25c448fde4e5d3a976442f1fc9f2104d83ec4ea7f58b910a752e9fd27fc26",
+      "bytes": 1501
+    },
+    "stderr": {
+      "path": "/opt/r1/saved-audits/river-2-baseline/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973",
+      "bytes": 73
+    },
+    "samples": {
+      "path": "/opt/r1/saved-audits/river-2-baseline/supervisor.samples.jsonl",
+      "sha256": "75db9aabe973064ee67f89a88c05c5609253ec949e8154f703dc0efbc744497e",
+      "bytes": 324
+    }
+  },
+  "identity_before": [
+    {
+      "path": "/opt/r1/target/baseline-audit-recovery/release/examples/hu_saved_profile_audit",
+      "sha256": "9efa72cb9cbeed080cda824ee91fccac29dd3d1f17822eb2d5da97b30fe6bc92",
+      "bytes": 4227680
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e",
+      "bytes": 29831
+    },
+    {
+      "path": "/opt/r1/saved-profile-tools/run_audits.py",
+      "sha256": "a8ec5bda06945e2da042a36f210dfc009e23ebc31f34ecd1cb29c9d1ef2617a3",
+      "bytes": 28182
+    },
+    {
+      "path": "/opt/r1/saved-audit-plan/plan.json",
+      "sha256": "fb6a1a05418e021cef8d9bf0f5af218718f4a50d4804470abd010c610205c71c",
+      "bytes": 105146
+    },
+    {
+      "path": "/opt/r1/audit-pair-recovery/result.json",
+      "sha256": "3fad2ecac424d18b67c12c4febe6a9928c4ee4bf647c485fa9fbfc789179c05a",
+      "bytes": 23430
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/river-2-baseline/run/solution.sol",
+      "sha256": "352588d3b2183db3ebaae83b07bf1244fdc623e4c7158a479944bc977cff29ff",
+      "bytes": 7473
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/river-2-baseline/run/run.toml",
+      "sha256": "fe93d87a93ac4c2f8f1554bfdb89c970672b02f55f79962fee5c43b182b246ee",
+      "bytes": 559
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/river.toml",
+      "sha256": "fe93d87a93ac4c2f8f1554bfdb89c970672b02f55f79962fee5c43b182b246ee",
+      "bytes": 559
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/comparison.json",
+      "sha256": "bdaa90e2a55d967d19d002f6a747d38b84612d25c20930319430c515c1cf0c5f",
+      "bytes": 223860
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "/opt/r1/target/baseline-audit-recovery/release/examples/hu_saved_profile_audit",
+      "sha256": "9efa72cb9cbeed080cda824ee91fccac29dd3d1f17822eb2d5da97b30fe6bc92",
+      "bytes": 4227680
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e",
+      "bytes": 29831
+    },
+    {
+      "path": "/opt/r1/saved-profile-tools/run_audits.py",
+      "sha256": "a8ec5bda06945e2da042a36f210dfc009e23ebc31f34ecd1cb29c9d1ef2617a3",
+      "bytes": 28182
+    },
+    {
+      "path": "/opt/r1/saved-audit-plan/plan.json",
+      "sha256": "fb6a1a05418e021cef8d9bf0f5af218718f4a50d4804470abd010c610205c71c",
+      "bytes": 105146
+    },
+    {
+      "path": "/opt/r1/audit-pair-recovery/result.json",
+      "sha256": "3fad2ecac424d18b67c12c4febe6a9928c4ee4bf647c485fa9fbfc789179c05a",
+      "bytes": 23430
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/river-2-baseline/run/solution.sol",
+      "sha256": "352588d3b2183db3ebaae83b07bf1244fdc623e4c7158a479944bc977cff29ff",
+      "bytes": 7473
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/river-2-baseline/run/run.toml",
+      "sha256": "fe93d87a93ac4c2f8f1554bfdb89c970672b02f55f79962fee5c43b182b246ee",
+      "bytes": 559
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/river.toml",
+      "sha256": "fe93d87a93ac4c2f8f1554bfdb89c970672b02f55f79962fee5c43b182b246ee",
+      "bytes": 559
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/comparison.json",
+      "sha256": "bdaa90e2a55d967d19d002f6a747d38b84612d25c20930319430c515c1cf0c5f",
+      "bytes": 223860
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 1,
+    "max_sample_gap_seconds": 0.0,
+    "sampled_peak_tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 25391104,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "max_observed_processes": 0
+  },
+  "containment": {
+    "kind": "posix_session_process_group",
+    "limitations": [
+      "setsid/setpgid can escape this process group; use a systemd/cgroup wrapper",
+      "supervisor SIGKILL, host failure or power loss does not kill the group",
+      "resident memory is sampled /proc RSS; brief descendants may be missed",
+      "summed RSS can double-count shared pages; this is not cgroup memory.current",
+      "wait4 root peak can include reaped descendant high-water marks; it is not a simultaneous tree peak"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 67419471872,
+    "available_bytes": 66380271616
+  },
+  "resolved_argv": [
+    "/opt/r1/target/baseline-audit-recovery/release/examples/hu_saved_profile_audit",
+    "--sol",
+    "/opt/r1/candidate-v3/runs/r1-paired-v3/river-2-baseline/run/solution.sol",
+    "--threads",
+    "8"
+  ],
+  "disk_path": "/opt/r1/saved-audits/river-2-baseline",
+  "disk_free_before_bytes": 93434028032,
+  "started_at": "2026-09-25T18:12:54.216574+00:00",
+  "pid": 7072,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 25391104,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "elapsed_seconds": 0.01555452000002333,
+    "at": "2026-09-25T18:12:54.239173+00:00",
+    "host_available_memory_bytes": 66380283904,
+    "disk_free_bytes": 93434015744
+  },
+  "elapsed_seconds": 0.02281425900036993,
+  "ended_at": "2026-09-25T18:12:54.239447+00:00",
+  "supervisor_exit_code": 0
+}

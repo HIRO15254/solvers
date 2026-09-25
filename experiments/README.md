@@ -9,6 +9,14 @@
 | 現行sourceの限定検証 | [SOL-2 HU資産棚卸し](hu-postflop-r0/asset-inventory-2026-09-25/README.md) | 通常39 testsの成功・9 ignoredの区別、外部tree source保存差分の小ケース再現。品質・性能認定とは分離 |
 | R0準備時の環境観測 | [HU Postflop readiness](hu-postflop-r0/readiness/README.md) | SOL-3のsource候補、toolchain、CPU/RAM/disk。測定runの成功証拠ではない |
 | R0完了範囲の照合 | [HU Postflop R0-06 readiness報告](hu-postflop-r0/readiness/report-2026-09-25.jp.md) | 先行成果物の版、候補24件・日常8件、R1への未決事項。品質・性能の認定ではない |
+| R1の実験資源と費用 | [HU Postflop Spot実験](hu-postflop-r1/cloud/README.md) | VM予約・source転送対象・自動削除期限と料金根拠。計算結果は別途検証する |
+| R1の限定検証の対応表 | [HU Postflop検証](hu-postflop-r1/validation/README.md) | 独立oracle、Stud/Draw、抽象化、保存契約に対応するtestsとsourceの識別。外部24case認定とは分離 |
+| R1の比較手順 | [HU pipeline比較](hu-postflop-r1/pipeline/README.md) | 基準pilotで条件を固定し、同一VMで交互比較する測定器と範囲 |
+| R1の最終source実測 | [source06比較](hu-postflop-r1/pipeline/current-report.md) | 同一AMD bootの交互3組、保存後profileの独立BR再評価、改善と容量増の両方 |
+| R1の工程別診断 | [source03 phase比較](hu-postflop-r1/phases/vm06-report.md) | 別instrumented buildのon/off較正、重複しない工程時間、元の性能実測との区別 |
+| R1の参照取得 | [HU-R0-019](hu-postflop-r1/reference/HU-R0-019/README.md) | Riverの両range・表示値・継続menuの観測と未確認条件 |
+| R1の参照診断 | [River 017 / 019](hu-postflop-r1/reference/vm06-river-report.md) | 全menuと実exportの照合。参照条件未確認のため外部品質は未認定 |
+| R1の追加参照入力 | [Turn 007](hu-postflop-r1/reference/HU-R0-007/README.md)、[Flop 020](hu-postflop-r1/reference/HU-R0-020/README.md) | 両rangeとroot観測。全後続木は欠測として保持 |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |
 

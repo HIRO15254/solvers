@@ -1,0 +1,10 @@
+tree: nodes=21618 terminals=7058 rank_tables=1176 storage=145.8 MiB (f32) / 73.0 MiB (i16)
+game=postflop schedule=dcfr iterations=50
+iter=      10 expl_p0=2.932e-1 expl_p1=1.438e-1 nash_conv=4.371e-1
+iter=      20 expl_p0=1.790e-1 expl_p1=8.793e-2 nash_conv=2.669e-1
+iter=      30 expl_p0=2.616e-2 expl_p1=3.791e-2 nash_conv=6.407e-2
+iter=      40 expl_p0=2.168e-2 expl_p1=2.714e-2 nash_conv=4.881e-2
+iter=      50 expl_p0=1.366e-2 expl_p1=2.304e-2 nash_conv=3.670e-2
+target nash_conv 4.000e-2 reached
+done: iterations=50 wall=6.54s ev_p0=8.049394 ev_p1=11.950608 nash_conv=3.670e-2
+sol: wrote /opt/r1/current/runs/r1-paired/flop-2-candidate/run/solution.sol (1.70 MB, 14410 blocks, mode=Full)

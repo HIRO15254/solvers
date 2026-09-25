@@ -1,0 +1,20 @@
+{
+  "elapsed_seconds": 0.01297624000005726,
+  "ended_utc": "2026-09-25T17:51:05.723020+00:00",
+  "error": "ValueError: expected exactly interrupted stage 12 after 12 completed stages",
+  "identities": {},
+  "purpose": "saved_profile_quality_only",
+  "recovery": {
+    "cgroup": {
+      "effective_memory_max_bytes": 51539607552,
+      "path": "/sys/fs/cgroup/system.slice/r1-audit-recovery02.service"
+    },
+    "deadline_utc": "2026-09-25T20:09:11Z",
+    "kind": "spot_stop_changed_cpu_fresh_release_rebuild",
+    "original_evidence_modified": false
+  },
+  "schema": "r1.audit-pair-build/v1",
+  "stages": [],
+  "started_utc": "2026-09-25T17:51:05.710068+00:00",
+  "status": "failed"
+}

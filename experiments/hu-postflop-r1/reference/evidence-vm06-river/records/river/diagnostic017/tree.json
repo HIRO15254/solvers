@@ -1,0 +1,334 @@
+[
+  {
+    "history": "",
+    "street": "river",
+    "actor": "oop",
+    "pot": 2050,
+    "actions": [
+      "check",
+      "bet 700",
+      "bet 2050",
+      "bet 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "x",
+    "street": "river",
+    "actor": "ip",
+    "pot": 2050,
+    "actions": [
+      "check",
+      "bet 700",
+      "bet 2050",
+      "bet 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "r700",
+    "street": "river",
+    "actor": "ip",
+    "pot": 2750,
+    "actions": [
+      "fold",
+      "call",
+      "raise to 1900",
+      "raise to 2600",
+      "raise to 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "r2050",
+    "street": "river",
+    "actor": "ip",
+    "pot": 4100,
+    "actions": [
+      "fold",
+      "call",
+      "raise to 4200",
+      "raise to 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "r6500",
+    "street": "river",
+    "actor": "ip",
+    "pot": 8550,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  },
+  {
+    "history": "xr700",
+    "street": "river",
+    "actor": "oop",
+    "pot": 2750,
+    "actions": [
+      "fold",
+      "call",
+      "raise to 1900",
+      "raise to 2600",
+      "raise to 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "xr2050",
+    "street": "river",
+    "actor": "oop",
+    "pot": 4100,
+    "actions": [
+      "fold",
+      "call",
+      "raise to 4200",
+      "raise to 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "xr6500",
+    "street": "river",
+    "actor": "oop",
+    "pot": 8550,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  },
+  {
+    "history": "xr700r1900",
+    "street": "river",
+    "actor": "ip",
+    "pot": 4650,
+    "actions": [
+      "fold",
+      "call",
+      "raise to 3950",
+      "raise to 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "xr700r2600",
+    "street": "river",
+    "actor": "ip",
+    "pot": 5350,
+    "actions": [
+      "fold",
+      "call",
+      "raise to 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "xr700r6500",
+    "street": "river",
+    "actor": "ip",
+    "pot": 9250,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  },
+  {
+    "history": "xr700r1900r3950",
+    "street": "river",
+    "actor": "oop",
+    "pot": 7900,
+    "actions": [
+      "fold",
+      "call",
+      "raise to 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "xr700r1900r6500",
+    "street": "river",
+    "actor": "oop",
+    "pot": 10450,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  },
+  {
+    "history": "xr700r1900r3950r6500",
+    "street": "river",
+    "actor": "ip",
+    "pot": 12500,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  },
+  {
+    "history": "xr700r2600r6500",
+    "street": "river",
+    "actor": "oop",
+    "pot": 11150,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  },
+  {
+    "history": "xr2050r4200",
+    "street": "river",
+    "actor": "ip",
+    "pot": 8300,
+    "actions": [
+      "fold",
+      "call",
+      "raise to 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "xr2050r6500",
+    "street": "river",
+    "actor": "ip",
+    "pot": 10600,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  },
+  {
+    "history": "xr2050r4200r6500",
+    "street": "river",
+    "actor": "oop",
+    "pot": 12750,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  },
+  {
+    "history": "r700r1900",
+    "street": "river",
+    "actor": "oop",
+    "pot": 4650,
+    "actions": [
+      "fold",
+      "call",
+      "raise to 3950",
+      "raise to 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "r700r2600",
+    "street": "river",
+    "actor": "oop",
+    "pot": 5350,
+    "actions": [
+      "fold",
+      "call",
+      "raise to 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "r700r6500",
+    "street": "river",
+    "actor": "oop",
+    "pot": 9250,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  },
+  {
+    "history": "r700r1900r3950",
+    "street": "river",
+    "actor": "ip",
+    "pot": 7900,
+    "actions": [
+      "fold",
+      "call",
+      "raise to 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "r700r1900r6500",
+    "street": "river",
+    "actor": "ip",
+    "pot": 10450,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  },
+  {
+    "history": "r700r1900r3950r6500",
+    "street": "river",
+    "actor": "oop",
+    "pot": 12500,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  },
+  {
+    "history": "r700r2600r6500",
+    "street": "river",
+    "actor": "ip",
+    "pot": 11150,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  },
+  {
+    "history": "r2050r4200",
+    "street": "river",
+    "actor": "oop",
+    "pot": 8300,
+    "actions": [
+      "fold",
+      "call",
+      "raise to 6500"
+    ],
+    "stored": true
+  },
+  {
+    "history": "r2050r6500",
+    "street": "river",
+    "actor": "oop",
+    "pot": 10600,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  },
+  {
+    "history": "r2050r4200r6500",
+    "street": "river",
+    "actor": "ip",
+    "pot": 12750,
+    "actions": [
+      "fold",
+      "call"
+    ],
+    "stored": true
+  }
+]

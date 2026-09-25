@@ -1,0 +1,621 @@
+{
+  "binaries": {
+    "baseline_example": {
+      "archive_member": "files/00000008",
+      "availability": "verified ignored local bundle; not Git bytes",
+      "bytes": 4227680,
+      "path": "/opt/r1/target/baseline-audit-recovery/release/examples/hu_saved_profile_audit",
+      "sha256": "9efa72cb9cbeed080cda824ee91fccac29dd3d1f17822eb2d5da97b30fe6bc92"
+    },
+    "current_example": {
+      "archive_member": "files/00000009",
+      "availability": "verified ignored local bundle; not Git bytes",
+      "bytes": 4249752,
+      "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+      "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932"
+    },
+    "source06_solvers_not_paired_benchmark": {
+      "archive_member": "files/00000010",
+      "availability": "verified ignored local bundle; not Git bytes",
+      "bytes": 8868976,
+      "path": "/opt/r1/target/current-recovery/release/solvers",
+      "sha256": "5baae6ebe438bc0205968587a7447599a15832411aeab1558cfecc1dd7293031"
+    }
+  },
+  "boot_id": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f",
+  "bundle": {
+    "bytes": 6928478,
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-recovery.tar.gz",
+    "sha256": "d40e55c982f8702640e744e550f5c7072a0777bb84cb547d9ee22bc53e2750a5"
+  },
+  "cpu": {
+    "current": {
+      "Architecture": "x86_64",
+      "CPU family": "23",
+      "CPU op-mode(s)": "32-bit, 64-bit",
+      "Flags": [
+        "3dnowprefetch",
+        "abm",
+        "adx",
+        "aes",
+        "apic",
+        "arat",
+        "avx",
+        "avx2",
+        "bmi1",
+        "bmi2",
+        "clflush",
+        "clflushopt",
+        "clwb",
+        "clzero",
+        "cmov",
+        "cmp_legacy",
+        "constant_tsc",
+        "cpuid",
+        "cr8_legacy",
+        "cx16",
+        "cx8",
+        "de",
+        "extd_apicid",
+        "f16c",
+        "fma",
+        "fpu",
+        "fsgsbase",
+        "fxsr",
+        "fxsr_opt",
+        "ht",
+        "hypervisor",
+        "ibpb",
+        "ibrs",
+        "lahf_lm",
+        "lm",
+        "mca",
+        "mce",
+        "misalignsse",
+        "mmx",
+        "mmxext",
+        "movbe",
+        "msr",
+        "mtrr",
+        "nonstop_tsc",
+        "nopl",
+        "nx",
+        "osvw",
+        "pae",
+        "pat",
+        "pclmulqdq",
+        "pdpe1gb",
+        "pge",
+        "pni",
+        "popcnt",
+        "pse",
+        "pse36",
+        "rdpid",
+        "rdrand",
+        "rdseed",
+        "rdtscp",
+        "rep_good",
+        "sep",
+        "sha_ni",
+        "smap",
+        "smep",
+        "ssbd",
+        "sse",
+        "sse2",
+        "sse4_1",
+        "sse4_2",
+        "sse4a",
+        "ssse3",
+        "stibp",
+        "syscall",
+        "topoext",
+        "tsc",
+        "tsc_adjust",
+        "tsc_known_freq",
+        "umip",
+        "vme",
+        "vmmcall",
+        "x2apic",
+        "xgetbv1",
+        "xsave",
+        "xsavec",
+        "xsaveerptr",
+        "xsaveopt",
+        "xtopology"
+      ],
+      "Model": "49",
+      "Model name": "AMD EPYC 7B12",
+      "Stepping": "0",
+      "Vendor ID": "AuthenticAMD"
+    },
+    "previous": {
+      "Architecture": "x86_64",
+      "CPU family": "6",
+      "CPU op-mode(s)": "32-bit, 64-bit",
+      "Flags": [
+        "3dnowprefetch",
+        "abm",
+        "adx",
+        "aes",
+        "apic",
+        "arat",
+        "arch_capabilities",
+        "avx",
+        "avx2",
+        "bmi1",
+        "bmi2",
+        "clflush",
+        "cmov",
+        "constant_tsc",
+        "cpuid",
+        "cx16",
+        "cx8",
+        "de",
+        "erms",
+        "f16c",
+        "fma",
+        "fpu",
+        "fsgsbase",
+        "fxsr",
+        "hle",
+        "ht",
+        "hypervisor",
+        "ibpb",
+        "ibrs",
+        "invpcid",
+        "lahf_lm",
+        "lm",
+        "mca",
+        "mce",
+        "md_clear",
+        "mmx",
+        "movbe",
+        "msr",
+        "mtrr",
+        "nonstop_tsc",
+        "nopl",
+        "nx",
+        "pae",
+        "pat",
+        "pcid",
+        "pclmulqdq",
+        "pdpe1gb",
+        "pge",
+        "pni",
+        "popcnt",
+        "pse",
+        "pse36",
+        "pti",
+        "rdrand",
+        "rdseed",
+        "rdtscp",
+        "rep_good",
+        "rtm",
+        "sep",
+        "smap",
+        "smep",
+        "ss",
+        "ssbd",
+        "sse",
+        "sse2",
+        "sse4_1",
+        "sse4_2",
+        "ssse3",
+        "stibp",
+        "syscall",
+        "tsc",
+        "tsc_adjust",
+        "tsc_known_freq",
+        "vme",
+        "x2apic",
+        "xsave",
+        "xsaveopt",
+        "xtopology"
+      ],
+      "Model": "79",
+      "Model name": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+      "Stepping": "0",
+      "Vendor ID": "GenuineIntel"
+    },
+    "unchanged_across_new_build": true
+  },
+  "ended_utc": "2026-09-25T17:59:57.435872+00:00",
+  "historical_stage_success_excluded": [
+    "12-baseline-example-release",
+    "13-baseline-final-verify"
+  ],
+  "limits": [
+    "Runtime/compiler and historical input hashes are recorded, but their missing payloads are not independently rehashed here.",
+    "Workspace tests from the old Intel boot are not recertified on the AMD boot.",
+    "General retention readiness remains false; this scoped verification does not modify it.",
+    "Source06 solvers binary is excluded from the source03 paired performance campaign.",
+    "No saved policy was evaluated by this build verification."
+  ],
+  "previous_boot_id": "1218b856-0cbd-4349-8ccc-a0ac7a7792ce",
+  "recorded_input_identities_without_payload_in_this_bundle": [
+    {
+      "bytes": 1446024,
+      "path": "/usr/bin/bash",
+      "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1"
+    },
+    {
+      "bytes": 8020928,
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+    },
+    {
+      "bytes": 39015,
+      "path": "/opt/r1/audit-source/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+    },
+    {
+      "bytes": 646344,
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+    },
+    {
+      "bytes": 42844376,
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+    },
+    {
+      "bytes": 4283728,
+      "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+      "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+    },
+    {
+      "bytes": 141848,
+      "path": "/usr/bin/cp",
+      "sha256": "95cdd604fdf0a292e349d27d1a80170ca0913bd3bbd9d2c0fcfc6c8adaebe2f0"
+    }
+  ],
+  "retained_but_not_semantically_adopted_historical_damage": [
+    {
+      "adopted_as_success_evidence": false,
+      "error": "NUL in evidence; refusing repair: /opt/r1/audit-pair-build/12-baseline-example-release/stderr.log",
+      "first_nul_offset": 674,
+      "identity": {
+        "bytes": 737,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/stderr.log",
+        "sha256": "4b0162522527188f55157003b635de6dd7dd9805558fa97c3e593d58f22045c6"
+      },
+      "nul_bytes": 63,
+      "text_status": "corrupted"
+    },
+    {
+      "adopted_as_success_evidence": false,
+      "first_nul_offset": null,
+      "identity": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "nul_bytes": 0,
+      "text_status": "parseable"
+    },
+    {
+      "adopted_as_success_evidence": false,
+      "error": "NUL in evidence; refusing repair: /opt/r1/audit-pair-build/12-baseline-example-release/supervisor.samples.jsonl",
+      "first_nul_offset": 113510,
+      "identity": {
+        "bytes": 114688,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/supervisor.samples.jsonl",
+        "sha256": "937758d22777cf0c610dce09c7164c8dfa61a4022289fba8339b51599afd5342"
+      },
+      "nul_bytes": 1178,
+      "text_status": "corrupted"
+    },
+    {
+      "adopted_as_success_evidence": false,
+      "first_nul_offset": null,
+      "identity": {
+        "bytes": 8517,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/supervisor.json",
+        "sha256": "77a65dda5f61ba5960a9487c8c757110568e78abbbbfb963c90be3ae30e6d129"
+      },
+      "nul_bytes": 0,
+      "text_status": "parseable"
+    },
+    {
+      "adopted_as_success_evidence": false,
+      "first_nul_offset": null,
+      "identity": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "nul_bytes": 0,
+      "text_status": "parseable"
+    },
+    {
+      "adopted_as_success_evidence": false,
+      "first_nul_offset": null,
+      "identity": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "nul_bytes": 0,
+      "text_status": "parseable"
+    },
+    {
+      "adopted_as_success_evidence": false,
+      "first_nul_offset": null,
+      "identity": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/supervisor.samples.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "nul_bytes": 0,
+      "text_status": "parseable"
+    },
+    {
+      "adopted_as_success_evidence": false,
+      "first_nul_offset": null,
+      "identity": {
+        "bytes": 8076,
+        "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/supervisor.json",
+        "sha256": "9b55a9a35d12b7fe507a26fc2bac48d211c8f948d163c84a221bad1accf9bb13"
+      },
+      "nul_bytes": 0,
+      "text_status": "parseable"
+    }
+  ],
+  "schema": "r1.vm06-recovery-build-verification/v1",
+  "scope": "eight new recovery stages and resulting binaries only; no solver quality/performance acceptance",
+  "source_archives": {
+    "baseline_9632": {
+      "bytes": 871630,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\build-source-9632d8b.tar.gz",
+      "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+    },
+    "candidate_source06": {
+      "bytes": 1213908,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\validation\\sources\\current-06.tar.gz",
+      "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+    }
+  },
+  "stages": [
+    {
+      "elapsed_seconds": 1.3079259340001954,
+      "ended_utc": "2026-09-25T17:56:46.471506+00:00",
+      "name": "00-toolchain",
+      "record": {
+        "bytes": 34022,
+        "path": "/opt/r1/audit-pair-recovery/00-toolchain/supervisor.json",
+        "sha256": "680042627fc1a4c4ca8a7462241d58c5e2a639fe72024dd2a005be55a4c3211c"
+      },
+      "sample_count": 6,
+      "samples": {
+        "bytes": 1888,
+        "path": "/opt/r1/audit-pair-recovery/00-toolchain/supervisor.samples.jsonl",
+        "sha256": "e869696ae6c4cf24e491558b3b6fafa66032872fec7dbad41b93ad2bcd176016"
+      },
+      "started_utc": "2026-09-25T17:56:45.163519+00:00",
+      "status": "verified_completed",
+      "stderr": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-recovery/00-toolchain/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 3723,
+        "path": "/opt/r1/audit-pair-recovery/00-toolchain/stdout.log",
+        "sha256": "fdd073980265a82fa0e669a97e37616c535eb39946accab80c30444200ae02a4"
+      },
+      "supervised_input_count": 81
+    },
+    {
+      "elapsed_seconds": 0.5311519499998667,
+      "ended_utc": "2026-09-25T17:56:47.206862+00:00",
+      "name": "01-baseline-pre-verify",
+      "record": {
+        "bytes": 33836,
+        "path": "/opt/r1/audit-pair-recovery/01-baseline-pre-verify/supervisor.json",
+        "sha256": "750ee964c47a87a574f5edd16b78ae982bc692d2d4322e0797fa0a04fe764273"
+      },
+      "sample_count": 3,
+      "samples": {
+        "bytes": 940,
+        "path": "/opt/r1/audit-pair-recovery/01-baseline-pre-verify/supervisor.samples.jsonl",
+        "sha256": "062432be27216b0e9b9a008eb03d3610ffd236138fa85e0d1b9ddcad31a21870"
+      },
+      "started_utc": "2026-09-25T17:56:46.675654+00:00",
+      "status": "verified_completed",
+      "stderr": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-recovery/01-baseline-pre-verify/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 300,
+        "path": "/opt/r1/audit-pair-recovery/01-baseline-pre-verify/stdout.log",
+        "sha256": "c22c8151971687fec157ad5693e4cd5c437afbcadfb35c4955843f003612c0a9"
+      },
+      "supervised_input_count": 80
+    },
+    {
+      "elapsed_seconds": 118.92792689700013,
+      "ended_utc": "2026-09-25T17:58:46.334174+00:00",
+      "name": "06-current-release",
+      "record": {
+        "bytes": 33901,
+        "path": "/opt/r1/audit-pair-recovery/06-current-release/supervisor.json",
+        "sha256": "e4fde401ce90c20c5d25e1ef3f3a41573bed128a9739f807e486ab29c3e3f936"
+      },
+      "sample_count": 462,
+      "samples": {
+        "bytes": 148835,
+        "path": "/opt/r1/audit-pair-recovery/06-current-release/supervisor.samples.jsonl",
+        "sha256": "b0c17c4e29fdcd2b9544c1c4c10951ae89ad13054f135846a1adc22bfd1a85ac"
+      },
+      "started_utc": "2026-09-25T17:56:47.406214+00:00",
+      "status": "verified_completed",
+      "stderr": {
+        "bytes": 3373,
+        "path": "/opt/r1/audit-pair-recovery/06-current-release/stderr.log",
+        "sha256": "c28a89fff070846ce138a9ec981554d3dc4fe29bb9063328ae7160bf48215ca3"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-recovery/06-current-release/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "supervised_input_count": 80
+    },
+    {
+      "elapsed_seconds": 0.27257303900000807,
+      "ended_utc": "2026-09-25T17:58:46.834815+00:00",
+      "name": "06-current-toolchain-check",
+      "record": {
+        "bytes": 34854,
+        "path": "/opt/r1/audit-pair-recovery/06-current-toolchain-check/supervisor.json",
+        "sha256": "a7f405706b9f51ff7236a128362d9765199082591a7ad3e32224178a61aead55"
+      },
+      "sample_count": 2,
+      "samples": {
+        "bytes": 632,
+        "path": "/opt/r1/audit-pair-recovery/06-current-toolchain-check/supervisor.samples.jsonl",
+        "sha256": "d9d1f4d5900f3bff8a8e71ea74bde37afd81e7c67fc9c6c218b9d0c2ee859081"
+      },
+      "started_utc": "2026-09-25T17:58:46.562201+00:00",
+      "status": "verified_completed",
+      "stderr": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-recovery/06-current-toolchain-check/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 3723,
+        "path": "/opt/r1/audit-pair-recovery/06-current-toolchain-check/stdout.log",
+        "sha256": "fdd073980265a82fa0e669a97e37616c535eb39946accab80c30444200ae02a4"
+      },
+      "supervised_input_count": 83
+    },
+    {
+      "elapsed_seconds": 0.2727363129999958,
+      "ended_utc": "2026-09-25T17:58:47.346371+00:00",
+      "name": "07-seed-baseline-cache",
+      "record": {
+        "bytes": 35081,
+        "path": "/opt/r1/audit-pair-recovery/07-seed-baseline-cache/supervisor.json",
+        "sha256": "af38c04cf9a631b20966c51a3050046717b77a5e457f2750645f32e2d8838b48"
+      },
+      "sample_count": 2,
+      "samples": {
+        "bytes": 631,
+        "path": "/opt/r1/audit-pair-recovery/07-seed-baseline-cache/supervisor.samples.jsonl",
+        "sha256": "9f67ee555db4a2e6d33d319a48d7c27ae05dfc490fba929290ad51d8eb26b435"
+      },
+      "started_utc": "2026-09-25T17:58:47.073596+00:00",
+      "status": "verified_completed",
+      "stderr": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-recovery/07-seed-baseline-cache/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-recovery/07-seed-baseline-cache/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "supervised_input_count": 83
+    },
+    {
+      "elapsed_seconds": 68.58877170000005,
+      "ended_utc": "2026-09-25T17:59:56.184065+00:00",
+      "name": "12-baseline-example-release",
+      "record": {
+        "bytes": 34659,
+        "path": "/opt/r1/audit-pair-recovery/12-baseline-example-release/supervisor.json",
+        "sha256": "4caa8f4499b6a67db3860fa64f076ed8fa19ded94447024fea0998feaa1c2de3"
+      },
+      "sample_count": 268,
+      "samples": {
+        "bytes": 84367,
+        "path": "/opt/r1/audit-pair-recovery/12-baseline-example-release/supervisor.samples.jsonl",
+        "sha256": "5e6c5839aa6c1897939a0ca5501222a7ce7613b35e5865ded1fd63dcfcb514ca"
+      },
+      "started_utc": "2026-09-25T17:58:47.595258+00:00",
+      "status": "verified_completed",
+      "stderr": {
+        "bytes": 737,
+        "path": "/opt/r1/audit-pair-recovery/12-baseline-example-release/stderr.log",
+        "sha256": "391ffdd2f7caad9565b7c10d517e00ace2c1c79be04d20d6338264909299a10c"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-recovery/12-baseline-example-release/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "supervised_input_count": 82
+    },
+    {
+      "elapsed_seconds": 0.272492881999824,
+      "ended_utc": "2026-09-25T17:59:56.683483+00:00",
+      "name": "13-baseline-final-verify",
+      "record": {
+        "bytes": 34630,
+        "path": "/opt/r1/audit-pair-recovery/13-baseline-final-verify/supervisor.json",
+        "sha256": "f9cfa2b830f31a9b2361aa0261020c14cde8634122984a481494733d77b1e528"
+      },
+      "sample_count": 2,
+      "samples": {
+        "bytes": 632,
+        "path": "/opt/r1/audit-pair-recovery/13-baseline-final-verify/supervisor.samples.jsonl",
+        "sha256": "59589851c8e20f150c7e866b38b6c5f389cadb2fbca9fc266a32c6150378c831"
+      },
+      "started_utc": "2026-09-25T17:59:56.410955+00:00",
+      "status": "verified_completed",
+      "stderr": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-recovery/13-baseline-final-verify/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 300,
+        "path": "/opt/r1/audit-pair-recovery/13-baseline-final-verify/stdout.log",
+        "sha256": "c22c8151971687fec157ad5693e4cd5c437afbcadfb35c4955843f003612c0a9"
+      },
+      "supervised_input_count": 82
+    },
+    {
+      "elapsed_seconds": 0.27209864199994627,
+      "ended_utc": "2026-09-25T17:59:57.177642+00:00",
+      "name": "14-final-toolchain",
+      "record": {
+        "bytes": 34828,
+        "path": "/opt/r1/audit-pair-recovery/14-final-toolchain/supervisor.json",
+        "sha256": "4c471b043cb7e935e4f88c78f6928c63377f97b0a2d9a687d81e678313e65b8e"
+      },
+      "sample_count": 2,
+      "samples": {
+        "bytes": 630,
+        "path": "/opt/r1/audit-pair-recovery/14-final-toolchain/supervisor.samples.jsonl",
+        "sha256": "e4d2395dbea64389ab4ae5da7672a59f23df5c177569e979e883bb5db4ee0787"
+      },
+      "started_utc": "2026-09-25T17:59:56.905508+00:00",
+      "status": "verified_completed",
+      "stderr": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-recovery/14-final-toolchain/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 3723,
+        "path": "/opt/r1/audit-pair-recovery/14-final-toolchain/stdout.log",
+        "sha256": "fdd073980265a82fa0e669a97e37616c535eb39946accab80c30444200ae02a4"
+      },
+      "supervised_input_count": 83
+    }
+  ],
+  "started_utc": "2026-09-25T17:56:43.274374+00:00",
+  "status": "verified_completed",
+  "verified_bundle_payloads": 118,
+  "verified_recovery_retained_files": 36,
+  "verifier": {
+    "bytes": 18459,
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\saved-profile\\vm06-build-verification.py",
+    "sha256": "c36d85eb7d0131b575902d73991f7fd97f10a7cb4e9748df44faf2c1778cfe17"
+  }
+}

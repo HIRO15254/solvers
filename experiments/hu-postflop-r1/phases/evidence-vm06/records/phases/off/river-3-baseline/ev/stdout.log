@@ -1,0 +1,8381 @@
+[
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "2h2d",
+    "weight": 1.0,
+    "ev": 27.847391
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "2s2d",
+    "weight": 1.0,
+    "ev": 27.847391
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "2s2h",
+    "weight": 1.0,
+    "ev": 27.847391
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "ev": 4.292392
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "ev": 4.240109
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "ev": 4.233138
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "ev": 4.258408
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "ev": 4.2435946
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "ev": 4.234881
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "ev": 7.018923
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "ev": 6.967512
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "ev": 6.9596696
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "ev": 6.984068
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "ev": 6.970126
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "ev": 6.9640265
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "ev": 9.74284
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "ev": 9.695786
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "ev": 9.688815
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "ev": 9.712342
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "ev": 9.697529
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "ev": 9.691429
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6d6c",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6h6c",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6h6d",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6s6c",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6s6d",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6s6h",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7h7c",
+    "weight": 1.0,
+    "ev": 28.30225
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7s7c",
+    "weight": 1.0,
+    "ev": 28.30225
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7s7h",
+    "weight": 1.0,
+    "ev": 28.30225
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8d8c",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8h8c",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8h8d",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8s8c",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8s8d",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8s8h",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9d9c",
+    "weight": 1.0,
+    "ev": 28.552334
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9s9c",
+    "weight": 1.0,
+    "ev": 28.529678
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9s9d",
+    "weight": 1.0,
+    "ev": 28.520094
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "TdTc",
+    "weight": 1.0,
+    "ev": 12.444973
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "ThTc",
+    "weight": 1.0,
+    "ev": 12.666303
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "ThTd",
+    "weight": 1.0,
+    "ev": 12.666303
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "TsTc",
+    "weight": 1.0,
+    "ev": 12.436259
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "TsTd",
+    "weight": 1.0,
+    "ev": 12.431031
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "TsTh",
+    "weight": 1.0,
+    "ev": 12.655846
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JdJc",
+    "weight": 1.0,
+    "ev": 27.778553
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JhJc",
+    "weight": 1.0,
+    "ev": 27.77594
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JhJd",
+    "weight": 1.0,
+    "ev": 27.776812
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QdQc",
+    "weight": 1.0,
+    "ev": 27.373363
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QhQc",
+    "weight": 1.0,
+    "ev": 27.373363
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QhQd",
+    "weight": 1.0,
+    "ev": 27.372494
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcTd",
+    "weight": 1.0,
+    "ev": 27.657433
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcTh",
+    "weight": 1.0,
+    "ev": 27.746313
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcTs",
+    "weight": 1.0,
+    "ev": 27.660046
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcJd",
+    "weight": 1.0,
+    "ev": 14.444778
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcJh",
+    "weight": 1.0,
+    "ev": 14.444778
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcQd",
+    "weight": 1.0,
+    "ev": 17.681934
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcQh",
+    "weight": 1.0,
+    "ev": 17.682806
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdTc",
+    "weight": 1.0,
+    "ev": 27.691416
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdTh",
+    "weight": 1.0,
+    "ev": 27.746313
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdTs",
+    "weight": 1.0,
+    "ev": 27.66266
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdJc",
+    "weight": 1.0,
+    "ev": 14.444778
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdJh",
+    "weight": 1.0,
+    "ev": 14.444778
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdQc",
+    "weight": 1.0,
+    "ev": 17.681063
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdQh",
+    "weight": 1.0,
+    "ev": 17.682806
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdKc",
+    "weight": 1.0,
+    "ev": 19.594603
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhTc",
+    "weight": 1.0,
+    "ev": 27.675732
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhTd",
+    "weight": 1.0,
+    "ev": 27.639133
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhTs",
+    "weight": 1.0,
+    "ev": 27.647848
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhJc",
+    "weight": 1.0,
+    "ev": 14.443907
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhJd",
+    "weight": 1.0,
+    "ev": 14.443907
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhQc",
+    "weight": 1.0,
+    "ev": 17.681063
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhQd",
+    "weight": 1.0,
+    "ev": 17.681934
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhKc",
+    "weight": 1.0,
+    "ev": 19.595474
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhKd",
+    "weight": 1.0,
+    "ev": 19.595474
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KsTc",
+    "weight": 1.0,
+    "ev": 27.569424
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KsTd",
+    "weight": 1.0,
+    "ev": 27.565067
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KsTh",
+    "weight": 1.0,
+    "ev": 27.61125
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KsJc",
+    "weight": 1.0,
+    "ev": 14.966731
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KsJd",
+    "weight": 1.0,
+    "ev": 14.966731
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KsJh",
+    "weight": 1.0,
+    "ev": 14.966731
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KsQc",
+    "weight": 1.0,
+    "ev": 17.85534
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KsQd",
+    "weight": 1.0,
+    "ev": 17.85534
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KsQh",
+    "weight": 1.0,
+    "ev": 17.85534
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KsKc",
+    "weight": 1.0,
+    "ev": 19.145844
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KsKd",
+    "weight": 1.0,
+    "ev": 19.145844
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KsKh",
+    "weight": 1.0,
+    "ev": 19.145844
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "ev": 2.1636233
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "ev": 2.3274417
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "ev": 2.5200155
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac6c",
+    "weight": 1.0,
+    "ev": 2.44682
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac7c",
+    "weight": 1.0,
+    "ev": 11.0298605
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac8c",
+    "weight": 1.0,
+    "ev": 2.4076083
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac9c",
+    "weight": 1.0,
+    "ev": 12.203603
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AcTc",
+    "weight": 1.0,
+    "ev": 2.5313435
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AcJc",
+    "weight": 1.0,
+    "ev": 13.049707
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AcQc",
+    "weight": 1.0,
+    "ev": 20.931292
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AcKc",
+    "weight": 1.0,
+    "ev": 3.4358304
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad2d",
+    "weight": 1.0,
+    "ev": 3.0803094
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "ev": 1.7854468
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "ev": 1.9344518
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "ev": 2.1235402
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad6d",
+    "weight": 1.0,
+    "ev": 2.0738719
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad8d",
+    "weight": 1.0,
+    "ev": 2.272545
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad9d",
+    "weight": 1.0,
+    "ev": 12.038913
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AdTd",
+    "weight": 1.0,
+    "ev": 2.2812588
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AdJd",
+    "weight": 1.0,
+    "ev": 12.898088
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AdQd",
+    "weight": 1.0,
+    "ev": 20.953075
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AdKd",
+    "weight": 1.0,
+    "ev": 3.0681102
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AdAc",
+    "weight": 1.0,
+    "ev": 21.385277
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah2h",
+    "weight": 1.0,
+    "ev": 3.062882
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "ev": 1.7758616
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "ev": 1.9327091
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "ev": 2.1235402
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah6h",
+    "weight": 1.0,
+    "ev": 2.0730004
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah7h",
+    "weight": 1.0,
+    "ev": 10.650813
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah8h",
+    "weight": 1.0,
+    "ev": 2.1252828
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhTh",
+    "weight": 1.0,
+    "ev": 2.1252828
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhJh",
+    "weight": 1.0,
+    "ev": 12.897217
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhQh",
+    "weight": 1.0,
+    "ev": 20.953075
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhKh",
+    "weight": 1.0,
+    "ev": 3.0681102
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhAc",
+    "weight": 1.0,
+    "ev": 21.385277
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhAd",
+    "weight": 1.0,
+    "ev": 21.417519
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As2s",
+    "weight": 1.0,
+    "ev": 3.0663674
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As3s",
+    "weight": 1.0,
+    "ev": 1.7758616
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As4s",
+    "weight": 1.0,
+    "ev": 1.9318377
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As5s",
+    "weight": 1.0,
+    "ev": 2.1226687
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As6s",
+    "weight": 1.0,
+    "ev": 2.072129
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As7s",
+    "weight": 1.0,
+    "ev": 10.722265
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As8s",
+    "weight": 1.0,
+    "ev": 2.207192
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As9s",
+    "weight": 1.0,
+    "ev": 12.029327
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AsTs",
+    "weight": 1.0,
+    "ev": 2.2037065
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AsKs",
+    "weight": 1.0,
+    "ev": 3.5918064
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AsAc",
+    "weight": 1.0,
+    "ev": 21.385277
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AsAd",
+    "weight": 1.0,
+    "ev": 21.417519
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AsAh",
+    "weight": 1.0,
+    "ev": 21.416647
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "2h2d",
+    "weight": 1.0,
+    "ev": 21.44453
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "2s2d",
+    "weight": 1.0,
+    "ev": 21.443659
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "2s2h",
+    "weight": 1.0,
+    "ev": 21.440174
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "ev": 0.8330342
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "ev": 0.8330342
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "ev": 0.8330342
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "ev": 0.8330342
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "ev": 0.8330342
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "ev": 0.8330342
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "ev": 1.7636623
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "ev": 1.7636623
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "ev": 1.7645338
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "ev": 1.7645338
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "ev": 1.7645338
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "ev": 1.7645338
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "ev": 2.6960332
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "ev": 2.6960332
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "ev": 2.6969047
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "ev": 2.6960332
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "ev": 2.6969047
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "ev": 2.6969047
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Tc9c",
+    "weight": 1.0,
+    "ev": 6.6224475
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Td9d",
+    "weight": 1.0,
+    "ev": 6.638132
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ts9s",
+    "weight": 1.0,
+    "ev": 6.63029
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QcJc",
+    "weight": 1.0,
+    "ev": 21.258928
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QdJd",
+    "weight": 1.0,
+    "ev": 21.258928
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QhJh",
+    "weight": 1.0,
+    "ev": 21.260672
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcQd",
+    "weight": 1.0,
+    "ev": 14.6626215
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcQh",
+    "weight": 1.0,
+    "ev": 14.660879
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdQc",
+    "weight": 1.0,
+    "ev": 14.6652355
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdQh",
+    "weight": 1.0,
+    "ev": 14.664365
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhQc",
+    "weight": 1.0,
+    "ev": 14.658265
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhQd",
+    "weight": 1.0,
+    "ev": 14.659136
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KsQc",
+    "weight": 1.0,
+    "ev": 14.457849
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KsQd",
+    "weight": 1.0,
+    "ev": 14.45872
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KsQh",
+    "weight": 1.0,
+    "ev": 14.457849
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "ev": -0.015684744
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "ev": -0.010456496
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "ev": -0.0034854987
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad2d",
+    "weight": 1.0,
+    "ev": 0.49145532
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "ev": -0.007842372
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "ev": -0.002614124
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "ev": 0.0034854987
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah2h",
+    "weight": 1.0,
+    "ev": 0.49145532
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "ev": -0.002614124
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "ev": 0.004356873
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "ev": 0.010456496
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As2s",
+    "weight": 1.0,
+    "ev": 0.5507088
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As3s",
+    "weight": 1.0,
+    "ev": -0.002614124
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As4s",
+    "weight": 1.0,
+    "ev": 0.004356873
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As5s",
+    "weight": 1.0,
+    "ev": 0.013070621
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "2h2d",
+    "weight": 0.14386205,
+    "ev": 27.849134
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "2s2d",
+    "weight": 0.14383154,
+    "ev": 27.849134
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "2s2h",
+    "weight": 0.14392309,
+    "ev": 27.849134
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "ev": 4.292392
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "ev": 4.240109
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "ev": 4.233138
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "ev": 4.258408
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "ev": 4.2435946
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "ev": 4.234881
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "ev": 7.018923
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "ev": 6.967512
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "ev": 6.9596696
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "ev": 6.984068
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "ev": 6.970126
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "ev": 6.9640265
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "ev": 9.74284
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "ev": 9.695786
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "ev": 9.688815
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "ev": 9.712342
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "ev": 9.697529
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "ev": 9.691429
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "6d6c",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "6h6c",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "6h6d",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "6s6c",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "6s6d",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "6s6h",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "7h7c",
+    "weight": 0.4763409,
+    "ev": 28.355404
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "7s7c",
+    "weight": 0.4763409,
+    "ev": 28.355404
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "7s7h",
+    "weight": 0.4763409,
+    "ev": 28.355404
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "8d8c",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "8h8c",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "8h8d",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "8s8c",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "8s8d",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "8s8h",
+    "weight": 1.0,
+    "ev": 11.4603195
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "9d9c",
+    "weight": 1.0,
+    "ev": 28.552334
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "9s9c",
+    "weight": 1.0,
+    "ev": 28.529678
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "9s9d",
+    "weight": 1.0,
+    "ev": 28.520094
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "TdTc",
+    "weight": 0.8675364,
+    "ev": 12.463272
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "ThTc",
+    "weight": 0.42253757,
+    "ev": 12.660203
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "ThTd",
+    "weight": 0.40399787,
+    "ev": 12.653232
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "TsTc",
+    "weight": 0.87653923,
+    "ev": 12.452816
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "TsTd",
+    "weight": 0.85859466,
+    "ev": 12.44933
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "TsTh",
+    "weight": 0.39592585,
+    "ev": 12.63929
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "JdJc",
+    "weight": 0.0987579,
+    "ev": 27.838678
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "JhJc",
+    "weight": 0.08618296,
+    "ev": 27.819508
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "JhJd",
+    "weight": 0.08673228,
+    "ev": 27.82038
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KcTd",
+    "weight": 0.38199437,
+    "ev": 27.663532
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KcTh",
+    "weight": 0.013656616,
+    "ev": 27.583366
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KcTs",
+    "weight": 0.3508606,
+    "ev": 27.640005
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KcQd",
+    "weight": 0.05291829,
+    "ev": 17.646208
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KcQh",
+    "weight": 0.06878767,
+    "ev": 17.667122
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KdTc",
+    "weight": 0.3625849,
+    "ev": 27.680088
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KdTh",
+    "weight": 0.014572366,
+    "ev": 27.591208
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KdTs",
+    "weight": 0.35479292,
+    "ev": 27.647848
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KdQc",
+    "weight": 0.049866483,
+    "ev": 17.643595
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KdQh",
+    "weight": 0.06395056,
+    "ev": 17.665379
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KdKc",
+    "weight": 0.0018463416,
+    "ev": 19.420328
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KhTc",
+    "weight": 0.26689556,
+    "ev": 27.613863
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KhTd",
+    "weight": 0.2896512,
+    "ev": 27.604279
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KhTs",
+    "weight": 0.25781643,
+    "ev": 27.581623
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KhJc",
+    "weight": 0.008834974,
+    "ev": 14.384653
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KhJd",
+    "weight": 0.008712902,
+    "ev": 14.382911
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KhQc",
+    "weight": 0.08215457,
+    "ev": 17.658407
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KhQd",
+    "weight": 0.08038453,
+    "ev": 17.659279
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KhKc",
+    "weight": 0.00036621653,
+    "ev": 19.35236
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KhKd",
+    "weight": 0.00044251163,
+    "ev": 19.359331
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KsTc",
+    "weight": 0.28062868,
+    "ev": 27.523241
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KsTd",
+    "weight": 0.25986114,
+    "ev": 27.513655
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KsTh",
+    "weight": 0.0025940337,
+    "ev": 27.435232
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KsQc",
+    "weight": 0.00010681315,
+    "ev": 17.525087
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KsQd",
+    "weight": 0.00009155413,
+    "ev": 17.525087
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KsQh",
+    "weight": 0.00006103609,
+    "ev": 17.542515
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KsKc",
+    "weight": 0.012130923,
+    "ev": 19.07962
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KsKd",
+    "weight": 0.015899658,
+    "ev": 19.087461
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "KsKh",
+    "weight": 0.0025940337,
+    "ev": 19.018623
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "Ac7c",
+    "weight": 1.0,
+    "ev": 11.0298605
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "Ac8c",
+    "weight": 0.17276001,
+    "ev": 2.2795162
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "AcJc",
+    "weight": 0.00028992142,
+    "ev": 12.790909
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "Ad2d",
+    "weight": 0.22024873,
+    "ev": 3.1238782
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "Ad8d",
+    "weight": 0.9989166,
+    "ev": 2.2734165
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "AdTd",
+    "weight": 0.4702678,
+    "ev": 2.3222134
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "AdJd",
+    "weight": 0.0007476921,
+    "ev": 12.660203
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "AdAc",
+    "weight": 0.001373312,
+    "ev": 21.218845
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "Ah2h",
+    "weight": 0.20650034,
+    "ev": 3.0454545
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "Ah7h",
+    "weight": 1.0,
+    "ev": 10.650813
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "Ah8h",
+    "weight": 0.73871976,
+    "ev": 2.1400962
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "AhTh",
+    "weight": 0.73871976,
+    "ev": 2.1400962
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "AhJh",
+    "weight": 0.0058594644,
+    "ev": 12.756054
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "AhQh",
+    "weight": 0.00028992142,
+    "ev": 20.752659
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "AhAc",
+    "weight": 0.007568475,
+    "ev": 21.288555
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "AhAd",
+    "weight": 0.0128786145,
+    "ev": 21.34955
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "As2s",
+    "weight": 0.1983215,
+    "ev": 3.0611393
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "As7s",
+    "weight": 1.0,
+    "ev": 10.722265
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "As8s",
+    "weight": 0.9670558,
+    "ev": 2.211549
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "AsTs",
+    "weight": 0.13037309,
+    "ev": 2.2594745
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "AsAc",
+    "weight": 0.00343328,
+    "ev": 21.251085
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "AsAd",
+    "weight": 0.006729229,
+    "ev": 21.310339
+  },
+  {
+    "history": "x",
+    "seat": "oop",
+    "combo": "AsAh",
+    "weight": 0.028625926,
+    "ev": 21.382664
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "2h2d",
+    "weight": 1.0,
+    "ev": 16.983963
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "2s2d",
+    "weight": 1.0,
+    "ev": 16.98745
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "2s2h",
+    "weight": 1.0,
+    "ev": 16.983963
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "ev": 2.3657823
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "ev": 2.3657823
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "ev": 2.3657823
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "ev": 2.3657823
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "ev": 2.3657823
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "ev": 2.3657823
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "ev": 5.023475
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "ev": 5.023475
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "ev": 5.023475
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "ev": 5.023475
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "ev": 5.023475
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "ev": 5.023475
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "ev": 7.6811676
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "ev": 7.6811676
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "ev": 7.6811676
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "ev": 7.6811676
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "ev": 7.6811676
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "ev": 7.6811676
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Tc9c",
+    "weight": 1.0,
+    "ev": 16.790518
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Td9d",
+    "weight": 1.0,
+    "ev": 16.750435
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Ts9s",
+    "weight": 1.0,
+    "ev": 16.787905
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "QcJc",
+    "weight": 1.0,
+    "ev": 16.888113
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "QdJd",
+    "weight": 1.0,
+    "ev": 16.888113
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "QhJh",
+    "weight": 1.0,
+    "ev": 16.882013
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "KcQd",
+    "weight": 1.0,
+    "ev": 17.15214
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "KcQh",
+    "weight": 1.0,
+    "ev": 17.146912
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "KdQc",
+    "weight": 1.0,
+    "ev": 17.13994
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "KdQh",
+    "weight": 1.0,
+    "ev": 17.135584
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "KhQc",
+    "weight": 1.0,
+    "ev": 17.207035
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "KhQd",
+    "weight": 1.0,
+    "ev": 17.207907
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "KsQc",
+    "weight": 1.0,
+    "ev": 16.96305
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "KsQd",
+    "weight": 1.0,
+    "ev": 16.963923
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "KsQh",
+    "weight": 1.0,
+    "ev": 16.96218
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "ev": -0.04095461
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "ev": -0.026141241
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "ev": -0.007842372
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Ad2d",
+    "weight": 1.0,
+    "ev": 1.2251529
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "ev": -0.020912992
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "ev": -0.0069709974
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "ev": 0.009585122
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Ah2h",
+    "weight": 1.0,
+    "ev": 1.251294
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "ev": -0.0060996227
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "ev": 0.010456496
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "ev": 0.028755365
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "As2s",
+    "weight": 1.0,
+    "ev": 1.4020419
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "As3s",
+    "weight": 1.0,
+    "ev": -0.0069709974
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "As4s",
+    "weight": 1.0,
+    "ev": 0.012199245
+  },
+  {
+    "history": "x",
+    "seat": "ip",
+    "combo": "As5s",
+    "weight": 1.0,
+    "ev": 0.033983614
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "TdTc",
+    "weight": 0.13246357,
+    "ev": 12.328757
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "ThTc",
+    "weight": 0.57746243,
+    "ev": 12.671105
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "ThTd",
+    "weight": 0.59600216,
+    "ev": 12.674486
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "TsTc",
+    "weight": 0.12346075,
+    "ev": 12.320304
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "TsTd",
+    "weight": 0.14140536,
+    "ev": 12.323686
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "TsTh",
+    "weight": 0.6040742,
+    "ev": 12.667724
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "JdJc",
+    "weight": 0.03546251,
+    "ev": 27.698072
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "JhJc",
+    "weight": 0.033600368,
+    "ev": 27.698072
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "JhJd",
+    "weight": 0.028152896,
+    "ev": 27.698072
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "QdQc",
+    "weight": 1.0,
+    "ev": 27.373476
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "QhQc",
+    "weight": 1.0,
+    "ev": 27.37263
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "QhQd",
+    "weight": 1.0,
+    "ev": 27.37263
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KcTd",
+    "weight": 0.37154192,
+    "ev": 27.6389
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KcTh",
+    "weight": 0.3366089,
+    "ev": 27.698072
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KcTs",
+    "weight": 0.38868713,
+    "ev": 27.6482
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KcJd",
+    "weight": 1.0,
+    "ev": 14.444552
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KcJh",
+    "weight": 1.0,
+    "ev": 14.444552
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KcQd",
+    "weight": 0.9470817,
+    "ev": 17.683758
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KcQh",
+    "weight": 0.9312123,
+    "ev": 17.683758
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KdTc",
+    "weight": 0.3210193,
+    "ev": 27.643127
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KdTh",
+    "weight": 0.3364004,
+    "ev": 27.698072
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KdTs",
+    "weight": 0.38685262,
+    "ev": 27.6482
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KdJc",
+    "weight": 1.0,
+    "ev": 14.444552
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KdJh",
+    "weight": 1.0,
+    "ev": 14.444552
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KdQc",
+    "weight": 0.9501335,
+    "ev": 17.683758
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KdQh",
+    "weight": 0.93604946,
+    "ev": 17.683758
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KhTc",
+    "weight": 0.3665675,
+    "ev": 27.643127
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KhTd",
+    "weight": 0.4155095,
+    "ev": 27.6389
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KhTs",
+    "weight": 0.43378347,
+    "ev": 27.6482
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KhJc",
+    "weight": 0.99116504,
+    "ev": 14.444552
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KhJd",
+    "weight": 0.9912871,
+    "ev": 14.444552
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KhQc",
+    "weight": 0.9178454,
+    "ev": 17.683758
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KhQd",
+    "weight": 0.91961545,
+    "ev": 17.683758
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KsTc",
+    "weight": 0.71772337,
+    "ev": 27.588182
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KsTd",
+    "weight": 0.739971,
+    "ev": 27.583956
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KsTh",
+    "weight": 0.72883195,
+    "ev": 27.644817
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KsJc",
+    "weight": 1.0,
+    "ev": 14.96695
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KsJd",
+    "weight": 1.0,
+    "ev": 14.96695
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KsJh",
+    "weight": 1.0,
+    "ev": 14.96695
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KsQc",
+    "weight": 0.9998932,
+    "ev": 17.855354
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KsQd",
+    "weight": 0.99990845,
+    "ev": 17.855354
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KsQh",
+    "weight": 0.99993896,
+    "ev": 17.855354
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KsKc",
+    "weight": 0.031189442,
+    "ev": 18.988062
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KsKd",
+    "weight": 0.031234741,
+    "ev": 18.988062
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "KsKh",
+    "weight": 0.030457009,
+    "ev": 18.988062
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "ev": 2.1631327
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "ev": 2.3271215
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "ev": 2.5206962
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ac6c",
+    "weight": 0.17729458,
+    "ev": 2.3871381
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ac8c",
+    "weight": 0.28503418,
+    "ev": 2.3871381
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ac9c",
+    "weight": 1.0,
+    "ev": 12.203652
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "AcTc",
+    "weight": 0.36560616,
+    "ev": 2.650873
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "AcJc",
+    "weight": 0.9997101,
+    "ev": 13.049801
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "ev": 1.7852818
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "ev": 1.9349005
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "ev": 2.1242487
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ad6d",
+    "weight": 0.16704051,
+    "ev": 2.0126686
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ad9d",
+    "weight": 1.0,
+    "ev": 12.038817
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "AdTd",
+    "weight": 0.008987564,
+    "ev": 2.2738674
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "AdJd",
+    "weight": 0.9992523,
+    "ev": 12.898492
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "ev": 1.7759835
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "ev": 1.93321
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "ev": 2.1234033
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ah6h",
+    "weight": 0.17633326,
+    "ev": 2.0126686
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "Ah8h",
+    "weight": 0.014297703,
+    "ev": 2.0126686
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "AhTh",
+    "weight": 0.014297703,
+    "ev": 2.0126686
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "AhJh",
+    "weight": 0.9941405,
+    "ev": 12.898492
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "As3s",
+    "weight": 1.0,
+    "ev": 1.7759835
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "As4s",
+    "weight": 1.0,
+    "ev": 1.9315194
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "As5s",
+    "weight": 1.0,
+    "ev": 2.1234033
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "As6s",
+    "weight": 0.19304189,
+    "ev": 2.0126686
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "As8s",
+    "weight": 0.00053406577,
+    "ev": 2.0126686
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "As9s",
+    "weight": 1.0,
+    "ev": 12.029519
+  },
+  {
+    "history": "r10",
+    "seat": "oop",
+    "combo": "AsTs",
+    "weight": 0.11491569,
+    "ev": 2.2738674
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "2h2d",
+    "weight": 1.0,
+    "ev": 22.774178
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "2s2d",
+    "weight": 1.0,
+    "ev": 22.774178
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "2s2h",
+    "weight": 1.0,
+    "ev": 22.774178
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "ev": 0.0076077348
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "ev": 0.0076077348
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "ev": 0.0084530385
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "ev": 0.0076077348
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "ev": 0.0084530385
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "ev": 0.0076077348
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "ev": 0.009298342
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "ev": 0.009298342
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "ev": 0.009298342
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "ev": 0.0084530385
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "ev": 0.009298342
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "ev": 0.009298342
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "ev": 0.010143647
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "ev": 0.010143647
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "ev": 0.010143647
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "ev": 0.010143647
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "ev": 0.010143647
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "ev": 0.010143647
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Tc9c",
+    "weight": 1.0,
+    "ev": 1.8469889
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Td9d",
+    "weight": 1.0,
+    "ev": 2.114105
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Ts9s",
+    "weight": 1.0,
+    "ev": 1.9627956
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "QcJc",
+    "weight": 1.0,
+    "ev": 23.272905
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "QdJd",
+    "weight": 1.0,
+    "ev": 23.26868
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "QhJh",
+    "weight": 1.0,
+    "ev": 23.266144
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "KcQd",
+    "weight": 1.0,
+    "ev": 21.803768
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "KcQh",
+    "weight": 1.0,
+    "ev": 21.807995
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "KdQc",
+    "weight": 1.0,
+    "ev": 21.762348
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "KdQh",
+    "weight": 1.0,
+    "ev": 21.766575
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "KhQc",
+    "weight": 1.0,
+    "ev": 21.900133
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "KhQd",
+    "weight": 1.0,
+    "ev": 21.899288
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "KsQc",
+    "weight": 1.0,
+    "ev": 22.948309
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "KsQd",
+    "weight": 1.0,
+    "ev": 22.947464
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "KsQh",
+    "weight": 1.0,
+    "ev": 22.947464
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Ad2d",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Ah2h",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "As2s",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "As3s",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "As4s",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r10",
+    "seat": "ip",
+    "combo": "As5s",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "2h2d",
+    "weight": 0.85613793,
+    "ev": 27.847387
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "2s2d",
+    "weight": 0.85616845,
+    "ev": 27.847387
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "2s2h",
+    "weight": 0.8560769,
+    "ev": 27.847387
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "7h7c",
+    "weight": 0.5236591,
+    "ev": 28.254385
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "7s7c",
+    "weight": 0.5236591,
+    "ev": 28.254385
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "7s7h",
+    "weight": 0.5236591,
+    "ev": 28.254385
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "JdJc",
+    "weight": 0.8657796,
+    "ev": 27.774956
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "JhJc",
+    "weight": 0.88021666,
+    "ev": 27.774956
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "JhJd",
+    "weight": 0.88511485,
+    "ev": 27.774956
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KcTd",
+    "weight": 0.24646372,
+    "ev": 27.67493
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KcTh",
+    "weight": 0.6497345,
+    "ev": 27.774956
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KcTs",
+    "weight": 0.26045227,
+    "ev": 27.704248
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KdTc",
+    "weight": 0.31639582,
+    "ev": 27.752537
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KdTh",
+    "weight": 0.6490272,
+    "ev": 27.774956
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KdTs",
+    "weight": 0.25835446,
+    "ev": 27.704248
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KdKc",
+    "weight": 0.9981537,
+    "ev": 19.595352
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KhTc",
+    "weight": 0.36653697,
+    "ev": 27.752537
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KhTd",
+    "weight": 0.29483932,
+    "ev": 27.67493
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KhTs",
+    "weight": 0.3084001,
+    "ev": 27.704248
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KhKc",
+    "weight": 0.9996338,
+    "ev": 19.595352
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KhKd",
+    "weight": 0.9995575,
+    "ev": 19.595352
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KsTc",
+    "weight": 0.0016479744,
+    "ev": 27.492128
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KsTd",
+    "weight": 0.00016784924,
+    "ev": 27.412798
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KsTh",
+    "weight": 0.26857406,
+    "ev": 27.520582
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KsKc",
+    "weight": 0.95667964,
+    "ev": 19.151278
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KsKd",
+    "weight": 0.9528656,
+    "ev": 19.151278
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "KsKh",
+    "weight": 0.966949,
+    "ev": 19.151278
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "Ac6c",
+    "weight": 0.82270545,
+    "ev": 2.4592273
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "Ac8c",
+    "weight": 0.5422058,
+    "ev": 2.4592273
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AcTc",
+    "weight": 0.6343938,
+    "ev": 2.4626765
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AcQc",
+    "weight": 1.0,
+    "ev": 20.931026
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AcKc",
+    "weight": 1.0,
+    "ev": 3.4361925
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "Ad2d",
+    "weight": 0.7797513,
+    "ev": 3.0679984
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "Ad6d",
+    "weight": 0.8329595,
+    "ev": 2.0858595
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "Ad8d",
+    "weight": 0.0010833906,
+    "ev": 2.0858595
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AdTd",
+    "weight": 0.5207446,
+    "ev": 2.2445192
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AdQd",
+    "weight": 1.0,
+    "ev": 20.952583
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AdKd",
+    "weight": 1.0,
+    "ev": 3.0679984
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AdAc",
+    "weight": 0.9986267,
+    "ev": 21.385448
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "Ah2h",
+    "weight": 0.79349965,
+    "ev": 3.0679984
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "Ah6h",
+    "weight": 0.82366675,
+    "ev": 2.0858595
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "Ah8h",
+    "weight": 0.24698253,
+    "ev": 2.0858595
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AhTh",
+    "weight": 0.24698253,
+    "ev": 2.0858595
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AhQh",
+    "weight": 0.9997101,
+    "ev": 20.952583
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AhKh",
+    "weight": 1.0,
+    "ev": 3.0679984
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AhAc",
+    "weight": 0.9924315,
+    "ev": 21.385448
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AhAd",
+    "weight": 0.9871214,
+    "ev": 21.418215
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "As2s",
+    "weight": 0.8016785,
+    "ev": 3.0679984
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "As6s",
+    "weight": 0.80695814,
+    "ev": 2.0858595
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "As8s",
+    "weight": 0.032410163,
+    "ev": 2.0858595
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AsTs",
+    "weight": 0.7547112,
+    "ev": 2.1832974
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AsKs",
+    "weight": 1.0,
+    "ev": 3.5922656
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AsAc",
+    "weight": 0.9965667,
+    "ev": 21.385448
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AsAd",
+    "weight": 0.99327075,
+    "ev": 21.418215
+  },
+  {
+    "history": "r20",
+    "seat": "oop",
+    "combo": "AsAh",
+    "weight": 0.9713741,
+    "ev": 21.418215
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "2h2d",
+    "weight": 1.0,
+    "ev": 26.073675
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "2s2d",
+    "weight": 1.0,
+    "ev": 26.070225
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "2s2h",
+    "weight": 1.0,
+    "ev": 26.06419
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "ev": 0.0077605355
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "ev": 0.0077605355
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "ev": 0.0077605355
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "ev": 0.0077605355
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "ev": 0.0077605355
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "ev": 0.0077605355
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "ev": 0.008622817
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "ev": 0.008622817
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "ev": 0.008622817
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "ev": 0.008622817
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "ev": 0.008622817
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "ev": 0.008622817
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "ev": 0.013796507
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "ev": 0.013796507
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "ev": 0.013796507
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "ev": 0.013796507
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "ev": 0.013796507
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "ev": 0.013796507
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Tc9c",
+    "weight": 1.0,
+    "ev": -0.122444004
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Td9d",
+    "weight": 1.0,
+    "ev": -0.14486332
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Ts9s",
+    "weight": 1.0,
+    "ev": -0.18625285
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "QcJc",
+    "weight": 1.0,
+    "ev": 25.22174
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "QdJd",
+    "weight": 1.0,
+    "ev": 25.227776
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "QhJh",
+    "weight": 1.0,
+    "ev": 25.246746
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "KcQd",
+    "weight": 1.0,
+    "ev": 2.0099788
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "KcQh",
+    "weight": 1.0,
+    "ev": 2.0091164
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "KdQc",
+    "weight": 1.0,
+    "ev": 2.053955
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "KdQh",
+    "weight": 1.0,
+    "ev": 2.0530927
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "KhQc",
+    "weight": 1.0,
+    "ev": 1.888397
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "KhQd",
+    "weight": 1.0,
+    "ev": 1.888397
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "KsQc",
+    "weight": 1.0,
+    "ev": 1.3606806
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "KsQd",
+    "weight": 1.0,
+    "ev": 1.3606806
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "KsQh",
+    "weight": 1.0,
+    "ev": 1.3606806
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Ad2d",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Ah2h",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "As2s",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "As3s",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "As4s",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20",
+    "seat": "ip",
+    "combo": "As5s",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "2h2d",
+    "weight": 0.14386205,
+    "ev": 42.945415
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "2s2d",
+    "weight": 0.14383154,
+    "ev": 42.945415
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "2s2h",
+    "weight": 0.14392309,
+    "ev": 42.945415
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "ev": -0.0027062458
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "ev": -0.00947186
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "ev": 0.020296844
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "ev": -0.028415581
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "ev": -0.01894372
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "ev": 0.086599864
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "ev": -0.0027062458
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "ev": -0.00947186
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "ev": 0.024356212
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "ev": -0.031121826
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "ev": -0.017590597
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "ev": 0.09607173
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "ev": -0.0027062458
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "ev": -0.017590597
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "ev": 0.016237475
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "ev": -0.039240565
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "ev": -0.024356212
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "ev": 0.06900927
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "6d6c",
+    "weight": 1.0,
+    "ev": 1.3801854
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "6h6c",
+    "weight": 1.0,
+    "ev": 1.3801854
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "6h6d",
+    "weight": 1.0,
+    "ev": 1.3801854
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "6s6c",
+    "weight": 1.0,
+    "ev": 1.3801854
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "6s6d",
+    "weight": 1.0,
+    "ev": 1.3801854
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "6s6h",
+    "weight": 1.0,
+    "ev": 1.3801854
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "7h7c",
+    "weight": 0.4763409,
+    "ev": 44.326954
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "7s7c",
+    "weight": 0.4763409,
+    "ev": 44.326954
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "7s7h",
+    "weight": 0.4763409,
+    "ev": 44.326954
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "8d8c",
+    "weight": 1.0,
+    "ev": 1.3801854
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "8h8c",
+    "weight": 1.0,
+    "ev": 1.3801854
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "8h8d",
+    "weight": 1.0,
+    "ev": 1.3801854
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "8s8c",
+    "weight": 1.0,
+    "ev": 1.3801854
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "8s8d",
+    "weight": 1.0,
+    "ev": 1.3801854
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "8s8h",
+    "weight": 1.0,
+    "ev": 1.3801854
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "9d9c",
+    "weight": 1.0,
+    "ev": 44.27824
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "9s9c",
+    "weight": 1.0,
+    "ev": 44.272827
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "9s9d",
+    "weight": 1.0,
+    "ev": 44.270123
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "TdTc",
+    "weight": 0.8675364,
+    "ev": 1.959322
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "ThTc",
+    "weight": 0.42253757,
+    "ev": 2.2312996
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "ThTd",
+    "weight": 0.40399787,
+    "ev": 2.193412
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "TsTc",
+    "weight": 0.87653923,
+    "ev": 1.8889595
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "TsTd",
+    "weight": 0.85859466,
+    "ev": 1.860544
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "TsTh",
+    "weight": 0.39592585,
+    "ev": 2.1135778
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "JdJc",
+    "weight": 0.0987579,
+    "ev": 43.213333
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "JhJc",
+    "weight": 0.08618296,
+    "ev": 43.172737
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "JhJd",
+    "weight": 0.08673228,
+    "ev": 43.175446
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KcTd",
+    "weight": 0.38199437,
+    "ev": 43.912895
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KcTh",
+    "weight": 0.013656616,
+    "ev": 43.946724
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KcTs",
+    "weight": 0.3508606,
+    "ev": 43.90613
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KcQd",
+    "weight": 0.05291829,
+    "ev": 15.207748
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KcQh",
+    "weight": 0.06878767,
+    "ev": 15.290289
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KdTc",
+    "weight": 0.3625849,
+    "ev": 43.94131
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KdTh",
+    "weight": 0.014572366,
+    "ev": 43.968376
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KdTs",
+    "weight": 0.35479292,
+    "ev": 43.929134
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KdQc",
+    "weight": 0.049866483,
+    "ev": 15.200982
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KdQh",
+    "weight": 0.06395056,
+    "ev": 15.284876
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KdKc",
+    "weight": 0.0018463416,
+    "ev": 22.043724
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KhTc",
+    "weight": 0.26689556,
+    "ev": 43.735638
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KhTd",
+    "weight": 0.2896512,
+    "ev": 43.73158
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KhTs",
+    "weight": 0.25781643,
+    "ev": 43.72346
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KhJc",
+    "weight": 0.008834974,
+    "ev": 5.22982
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KhJd",
+    "weight": 0.008712902,
+    "ev": 5.2257605
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KhQc",
+    "weight": 0.08215457,
+    "ev": 15.253755
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KhQd",
+    "weight": 0.08038453,
+    "ev": 15.255107
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KhKc",
+    "weight": 0.00036621653,
+    "ev": 21.80828
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KhKd",
+    "weight": 0.00044251163,
+    "ev": 21.83399
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KsTc",
+    "weight": 0.28062868,
+    "ev": 44.310715
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KsTd",
+    "weight": 0.25986114,
+    "ev": 44.306656
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KsTh",
+    "weight": 0.0025940337,
+    "ev": 44.337776
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KsQc",
+    "weight": 0.00010681315,
+    "ev": 14.517655
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KsQd",
+    "weight": 0.00009155413,
+    "ev": 14.517655
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KsQh",
+    "weight": 0.00006103609,
+    "ev": 14.596136
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KsKc",
+    "weight": 0.012130923,
+    "ev": 20.992348
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KsKd",
+    "weight": 0.015899658,
+    "ev": 21.020763
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "KsKh",
+    "weight": 0.0025940337,
+    "ev": 20.769083
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "Ac7c",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "Ac8c",
+    "weight": 0.17276001,
+    "ev": 0.0
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "AcJc",
+    "weight": 0.00028992142,
+    "ev": 1.3017042
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "Ad2d",
+    "weight": 0.22024873,
+    "ev": 0.91877043
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "Ad8d",
+    "weight": 0.9989166,
+    "ev": 0.0
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "AdTd",
+    "weight": 0.4702678,
+    "ev": 0.0
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "AdJd",
+    "weight": 0.0007476921,
+    "ev": 1.5303819
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "AdAc",
+    "weight": 0.001373312,
+    "ev": 27.36691
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "Ah2h",
+    "weight": 0.20650034,
+    "ev": 1.0703202
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "Ah7h",
+    "weight": 1.0,
+    "ev": -0.0040593687
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "Ah8h",
+    "weight": 0.73871976,
+    "ev": -0.0040593687
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "AhTh",
+    "weight": 0.73871976,
+    "ev": -0.0040593687
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "AhJh",
+    "weight": 0.0058594644,
+    "ev": 2.1622903
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "AhQh",
+    "weight": 0.00028992142,
+    "ev": 25.91095
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "AhAc",
+    "weight": 0.007568475,
+    "ev": 27.421036
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "AhAd",
+    "weight": 0.0128786145,
+    "ev": 27.442684
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "As2s",
+    "weight": 0.1983215,
+    "ev": 0.9106517
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "As7s",
+    "weight": 1.0,
+    "ev": -0.0027062458
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "As8s",
+    "weight": 0.9670558,
+    "ev": -0.0027062458
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "AsTs",
+    "weight": 0.13037309,
+    "ev": -0.0027062458
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "AsAc",
+    "weight": 0.00343328,
+    "ev": 27.39262
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "AsAd",
+    "weight": 0.006729229,
+    "ev": 27.41427
+  },
+  {
+    "history": "xr10",
+    "seat": "oop",
+    "combo": "AsAh",
+    "weight": 0.028625926,
+    "ev": 27.467041
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "2h2d",
+    "weight": 0.60291445,
+    "ev": 17.011461
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "2s2d",
+    "weight": 0.6204013,
+    "ev": 17.014168
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "2s2h",
+    "weight": 0.55698484,
+    "ev": 17.016872
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "Tc9c",
+    "weight": 0.1182269,
+    "ev": 16.796314
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "Td9d",
+    "weight": 0.13476768,
+    "ev": 16.746248
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "Ts9s",
+    "weight": 0.17500305,
+    "ev": 16.792255
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "QcJc",
+    "weight": 0.48584726,
+    "ev": 16.901857
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "QdJd",
+    "weight": 0.48599985,
+    "ev": 16.900505
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "QhJh",
+    "weight": 0.49639124,
+    "ev": 16.892385
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "KcQd",
+    "weight": 0.99942017,
+    "ev": 17.152185
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "KcQh",
+    "weight": 0.9992981,
+    "ev": 17.146772
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "KdQc",
+    "weight": 0.9993744,
+    "ev": 17.140007
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "KdQh",
+    "weight": 0.9992523,
+    "ev": 17.135948
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "KhQc",
+    "weight": 0.9999542,
+    "ev": 17.207664
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "KhQd",
+    "weight": 0.9999542,
+    "ev": 17.207664
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "KsQc",
+    "weight": 0.95399404,
+    "ev": 16.965454
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "KsQd",
+    "weight": 0.953933,
+    "ev": 16.965454
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "KsQh",
+    "weight": 0.9443046,
+    "ev": 16.964102
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "Ac3c",
+    "weight": 0.48529792,
+    "ev": -0.08389362
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "Ac4c",
+    "weight": 0.48612192,
+    "ev": -0.054124914
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "Ac5c",
+    "weight": 0.482887,
+    "ev": -0.016237475
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "Ad3d",
+    "weight": 0.44411382,
+    "ev": -0.0473593
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "Ad4d",
+    "weight": 0.44305247,
+    "ev": -0.016237475
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "Ad5d",
+    "weight": 0.43962768,
+    "ev": 0.020296844
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "Ah3h",
+    "weight": 0.33672082,
+    "ev": -0.017590597
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "Ah4h",
+    "weight": 0.33426413,
+    "ev": 0.03247495
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "Ah5h",
+    "weight": 0.34721905,
+    "ev": 0.08389362
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "As3s",
+    "weight": 0.39295033,
+    "ev": -0.017590597
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "As4s",
+    "weight": 0.39032578,
+    "ev": 0.031121826
+  },
+  {
+    "history": "xr10",
+    "seat": "ip",
+    "combo": "As5s",
+    "weight": 0.40080872,
+    "ev": 0.08524674
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "2h2d",
+    "weight": 0.14386205,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "2s2d",
+    "weight": 0.14383154,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "2s2h",
+    "weight": 0.14392309,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "ev": -1.8335519
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "ev": -1.7798393
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "ev": -0.104983665
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "ev": -1.7188023
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "ev": -0.070802934
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "ev": 0.18311104
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "ev": -1.3037506
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "ev": -1.3745536
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "ev": 0.15869623
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "ev": -1.2768943
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "ev": 0.21485029
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "ev": 0.4150517
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "ev": -0.15869623
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "ev": -0.30762655
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "ev": 0.32227543
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "ev": -0.23438212
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "ev": 0.38331243
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "ev": 0.35401466
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "6d6c",
+    "weight": 1.0,
+    "ev": 1.3672291
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "6h6c",
+    "weight": 1.0,
+    "ev": 1.3672291
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "6h6d",
+    "weight": 1.0,
+    "ev": 1.3672291
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "6s6c",
+    "weight": 1.0,
+    "ev": 1.3672291
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "6s6d",
+    "weight": 1.0,
+    "ev": 1.3672291
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "6s6h",
+    "weight": 1.0,
+    "ev": 1.3672291
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "7h7c",
+    "weight": 0.4763409,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "7s7c",
+    "weight": 0.4763409,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "7s7h",
+    "weight": 0.4763409,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "8d8c",
+    "weight": 1.0,
+    "ev": 1.3672291
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "8h8c",
+    "weight": 1.0,
+    "ev": 1.3672291
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "8h8d",
+    "weight": 1.0,
+    "ev": 1.3672291
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "8s8c",
+    "weight": 1.0,
+    "ev": 1.3672291
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "8s8d",
+    "weight": 1.0,
+    "ev": 1.3672291
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "8s8h",
+    "weight": 1.0,
+    "ev": 1.3672291
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "9d9c",
+    "weight": 1.0,
+    "ev": 56.03442
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "9s9c",
+    "weight": 1.0,
+    "ev": 49.198273
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "9s9d",
+    "weight": 1.0,
+    "ev": 50.64363
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "TdTc",
+    "weight": 0.8675364,
+    "ev": 33.751026
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "ThTc",
+    "weight": 0.42253757,
+    "ev": 40.704365
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "ThTd",
+    "weight": 0.40399787,
+    "ev": 41.173126
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "TsTc",
+    "weight": 0.87653923,
+    "ev": 32.532726
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "TsTd",
+    "weight": 0.85859466,
+    "ev": 32.93069
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "TsTh",
+    "weight": 0.39592585,
+    "ev": 39.77904
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "JdJc",
+    "weight": 0.0987579,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "JhJc",
+    "weight": 0.08618296,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "JhJd",
+    "weight": 0.08673228,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KcTd",
+    "weight": 0.38199437,
+    "ev": 60.311893
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KcTh",
+    "weight": 0.013656616,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KcTs",
+    "weight": 0.3508606,
+    "ev": 55.92211
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KcQd",
+    "weight": 0.05291829,
+    "ev": 49.278843
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KcQh",
+    "weight": 0.06878767,
+    "ev": 49.32279
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KdTc",
+    "weight": 0.3625849,
+    "ev": 59.669785
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KdTh",
+    "weight": 0.014572366,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KdTs",
+    "weight": 0.35479292,
+    "ev": 55.92211
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KdQc",
+    "weight": 0.049866483,
+    "ev": 49.247105
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KdQh",
+    "weight": 0.06395056,
+    "ev": 49.31058
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KdKc",
+    "weight": 0.0018463416,
+    "ev": 57.086697
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KhTc",
+    "weight": 0.26689556,
+    "ev": 59.669785
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KhTd",
+    "weight": 0.2896512,
+    "ev": 60.311893
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KhTs",
+    "weight": 0.25781643,
+    "ev": 55.92211
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KhJc",
+    "weight": 0.008834974,
+    "ev": 43.927116
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KhJd",
+    "weight": 0.008712902,
+    "ev": 43.927116
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KhQc",
+    "weight": 0.08215457,
+    "ev": 49.25443
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KhQd",
+    "weight": 0.08038453,
+    "ev": 49.269077
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KhKc",
+    "weight": 0.00036621653,
+    "ev": 56.439705
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KhKd",
+    "weight": 0.00044251163,
+    "ev": 56.427498
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KsTc",
+    "weight": 0.28062868,
+    "ev": 59.669785
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KsTd",
+    "weight": 0.25986114,
+    "ev": 60.311893
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KsTh",
+    "weight": 0.0025940337,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KsQc",
+    "weight": 0.00010681315,
+    "ev": 48.07519
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KsQd",
+    "weight": 0.00009155413,
+    "ev": 48.092285
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KsQh",
+    "weight": 0.00006103609,
+    "ev": 48.109375
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KsKc",
+    "weight": 0.012130923,
+    "ev": 54.2497
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KsKd",
+    "weight": 0.015899658,
+    "ev": 54.25458
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "KsKh",
+    "weight": 0.0025940337,
+    "ev": 53.680832
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "Ac7c",
+    "weight": 1.0,
+    "ev": -0.14648883
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "Ac8c",
+    "weight": 0.17276001,
+    "ev": -0.16602068
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "AcJc",
+    "weight": 0.00028992142,
+    "ev": 35.247654
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "Ad2d",
+    "weight": 0.22024873,
+    "ev": -2.0337532
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "Ad8d",
+    "weight": 0.9989166,
+    "ev": 0.06591997
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "AdTd",
+    "weight": 0.4702678,
+    "ev": 0.11230811
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "AdJd",
+    "weight": 0.0007476921,
+    "ev": 30.755331
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "AdAc",
+    "weight": 0.001373312,
+    "ev": 79.99999
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "Ah2h",
+    "weight": 0.20650034,
+    "ev": -2.2754598
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "Ah7h",
+    "weight": 1.0,
+    "ev": -0.60060424
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "Ah8h",
+    "weight": 0.73871976,
+    "ev": -0.5468916
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "AhTh",
+    "weight": 0.73871976,
+    "ev": -0.5468916
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "AhJh",
+    "weight": 0.0058594644,
+    "ev": 34.4029
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "AhQh",
+    "weight": 0.00028992142,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "AhAc",
+    "weight": 0.007568475,
+    "ev": 76.89687
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "AhAd",
+    "weight": 0.0128786145,
+    "ev": 63.98632
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "As2s",
+    "weight": 0.1983215,
+    "ev": -2.2608109
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "As7s",
+    "weight": 1.0,
+    "ev": -0.37842947
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "As8s",
+    "weight": 0.9670558,
+    "ev": -0.2661214
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "AsTs",
+    "weight": 0.13037309,
+    "ev": 0.76662487
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "AsAc",
+    "weight": 0.00343328,
+    "ev": 76.89687
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "AsAd",
+    "weight": 0.006729229,
+    "ev": 63.98632
+  },
+  {
+    "history": "xr20",
+    "seat": "oop",
+    "combo": "AsAh",
+    "weight": 0.028625926,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20",
+    "seat": "ip",
+    "combo": "Tc9c",
+    "weight": 0.00065613794,
+    "ev": 16.282234
+  },
+  {
+    "history": "xr20",
+    "seat": "ip",
+    "combo": "Td9d",
+    "weight": 0.00053406577,
+    "ev": 16.245611
+  },
+  {
+    "history": "xr20",
+    "seat": "ip",
+    "combo": "Ts9s",
+    "weight": 0.0012054443,
+    "ev": 16.311531
+  },
+  {
+    "history": "xr20",
+    "seat": "ip",
+    "combo": "Ac3c",
+    "weight": 0.000686656,
+    "ev": -0.16602068
+  },
+  {
+    "history": "xr20",
+    "seat": "ip",
+    "combo": "Ac4c",
+    "weight": 0.0006408789,
+    "ev": -0.15381327
+  },
+  {
+    "history": "xr20",
+    "seat": "ip",
+    "combo": "Ac5c",
+    "weight": 0.00025940337,
+    "ev": -0.16846216
+  },
+  {
+    "history": "xr20",
+    "seat": "ip",
+    "combo": "Ad3d",
+    "weight": 0.00010681315,
+    "ev": -0.28077027
+  },
+  {
+    "history": "xr20",
+    "seat": "ip",
+    "combo": "Ad4d",
+    "weight": 0.00009155553,
+    "ev": -0.2661214
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "2h2d",
+    "weight": 0.14386205,
+    "ev": 42.945415
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "2s2d",
+    "weight": 0.14383154,
+    "ev": 42.945415
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "2s2h",
+    "weight": 0.14392309,
+    "ev": 42.945415
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "3d3c",
+    "weight": 0.009384299,
+    "ev": -0.2597996
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "3h3c",
+    "weight": 0.023514153,
+    "ev": -0.0649499
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "3h3d",
+    "weight": 0.039398793,
+    "ev": 0.0081187375
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "3s3c",
+    "weight": 0.015015107,
+    "ev": -0.16778724
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "3s3d",
+    "weight": 0.021438599,
+    "ev": -0.09201235
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "3s3h",
+    "weight": 0.12419318,
+    "ev": 0.100131094
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "4d4c",
+    "weight": 0.010376135,
+    "ev": -0.2597996
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "4h4c",
+    "weight": 0.027985046,
+    "ev": -0.06224365
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "4h4d",
+    "weight": 0.05510033,
+    "ev": 0.014884352
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "4s4c",
+    "weight": 0.01608301,
+    "ev": -0.16372786
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "4s4d",
+    "weight": 0.026596475,
+    "ev": -0.086599864
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "4s4h",
+    "weight": 0.13162433,
+    "ev": 0.10960295
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "5d5c",
+    "weight": 0.012451362,
+    "ev": -0.24762149
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "5h5c",
+    "weight": 0.0402533,
+    "ev": -0.07983425
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "5h5d",
+    "weight": 0.077178955,
+    "ev": -0.0027062458
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "5s5c",
+    "weight": 0.019119555,
+    "ev": -0.1772591
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "5s5d",
+    "weight": 0.040299077,
+    "ev": -0.09877797
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "5s5h",
+    "weight": 0.16435744,
+    "ev": 0.067656144
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "6d6c",
+    "weight": 0.118989855,
+    "ev": 1.3463572
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "6h6c",
+    "weight": 0.118989855,
+    "ev": 1.3463572
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "6h6d",
+    "weight": 0.118989855,
+    "ev": 1.3463572
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "6s6c",
+    "weight": 0.118989855,
+    "ev": 1.3463572
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "6s6d",
+    "weight": 0.118989855,
+    "ev": 1.3463572
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "6s6h",
+    "weight": 0.118989855,
+    "ev": 1.3463572
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "7h7c",
+    "weight": 0.4763409,
+    "ev": 44.326954
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "7s7c",
+    "weight": 0.4763409,
+    "ev": 44.326954
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "7s7h",
+    "weight": 0.4763409,
+    "ev": 44.326954
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "8d8c",
+    "weight": 0.118989855,
+    "ev": 1.3463572
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "8h8c",
+    "weight": 0.118989855,
+    "ev": 1.3463572
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "8h8d",
+    "weight": 0.118989855,
+    "ev": 1.3463572
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "8s8c",
+    "weight": 0.118989855,
+    "ev": 1.3463572
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "8s8d",
+    "weight": 0.118989855,
+    "ev": 1.3463572
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "8s8h",
+    "weight": 0.118989855,
+    "ev": 1.3463572
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "9d9c",
+    "weight": 1.0,
+    "ev": 44.27824
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "9s9c",
+    "weight": 1.0,
+    "ev": 44.272827
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "9s9d",
+    "weight": 1.0,
+    "ev": 44.270123
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "TdTc",
+    "weight": 0.113421105,
+    "ev": 1.9728532
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "ThTc",
+    "weight": 0.15699042,
+    "ev": 2.3273714
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "ThTd",
+    "weight": 0.13764963,
+    "ev": 2.2840714
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "TsTc",
+    "weight": 0.096942954,
+    "ev": 1.8686627
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "TsTd",
+    "weight": 0.07610554,
+    "ev": 1.8240097
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "TsTh",
+    "weight": 0.12307624,
+    "ev": 2.1812341
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "JdJc",
+    "weight": 0.0987579,
+    "ev": 43.213333
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "JhJc",
+    "weight": 0.08618296,
+    "ev": 43.172737
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "JhJd",
+    "weight": 0.08673228,
+    "ev": 43.175446
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KcTd",
+    "weight": 0.38199437,
+    "ev": 43.912895
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KcTh",
+    "weight": 0.013656616,
+    "ev": 43.946724
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KcTs",
+    "weight": 0.3508606,
+    "ev": 43.90613
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KcQd",
+    "weight": 0.05291506,
+    "ev": 15.207748
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KcQh",
+    "weight": 0.068781376,
+    "ev": 15.290289
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KdTc",
+    "weight": 0.3625849,
+    "ev": 43.94131
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KdTh",
+    "weight": 0.014572366,
+    "ev": 43.968376
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KdTs",
+    "weight": 0.35479292,
+    "ev": 43.929134
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KdQc",
+    "weight": 0.049866483,
+    "ev": 15.200982
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KdQh",
+    "weight": 0.06394373,
+    "ev": 15.284876
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KdKc",
+    "weight": 0.0018463416,
+    "ev": 22.043724
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KhTc",
+    "weight": 0.26689556,
+    "ev": 43.735638
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KhTd",
+    "weight": 0.2896512,
+    "ev": 43.73158
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KhTs",
+    "weight": 0.25781643,
+    "ev": 43.72346
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KhJc",
+    "weight": 0.008798709,
+    "ev": 5.233879
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KhJd",
+    "weight": 0.008677803,
+    "ev": 5.228467
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KhQc",
+    "weight": 0.08215457,
+    "ev": 15.253755
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KhQd",
+    "weight": 0.08038453,
+    "ev": 15.255107
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KhKc",
+    "weight": 0.00036621653,
+    "ev": 21.80828
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KhKd",
+    "weight": 0.00044251163,
+    "ev": 21.83399
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KsTc",
+    "weight": 0.28062868,
+    "ev": 44.310715
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KsTd",
+    "weight": 0.25986114,
+    "ev": 44.306656
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KsTh",
+    "weight": 0.0025940337,
+    "ev": 44.337776
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KsQc",
+    "weight": 0.00010681315,
+    "ev": 14.517655
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KsQd",
+    "weight": 0.00009155413,
+    "ev": 14.517655
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KsQh",
+    "weight": 0.00006103609,
+    "ev": 14.596136
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KsKc",
+    "weight": 0.012130923,
+    "ev": 20.992348
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KsKd",
+    "weight": 0.015899658,
+    "ev": 21.020763
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "KsKh",
+    "weight": 0.0025940337,
+    "ev": 20.769083
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "AcJc",
+    "weight": 0.00028992142,
+    "ev": 1.3017042
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "Ad2d",
+    "weight": 0.18156952,
+    "ev": 1.1149733
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "AdJd",
+    "weight": 0.0007476921,
+    "ev": 1.5303819
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "AdAc",
+    "weight": 0.001373312,
+    "ev": 27.36691
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "Ah2h",
+    "weight": 0.20593946,
+    "ev": 1.0716733
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "Ah7h",
+    "weight": 0.008712902,
+    "ev": -0.42352745
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "Ah8h",
+    "weight": 0.006943639,
+    "ev": -0.42352745
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "AhTh",
+    "weight": 0.006943639,
+    "ev": -0.42352745
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "AhJh",
+    "weight": 0.0058594644,
+    "ev": 2.1622903
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "AhQh",
+    "weight": 0.00028992142,
+    "ev": 25.91095
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "AhAc",
+    "weight": 0.007568475,
+    "ev": 27.421036
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "AhAd",
+    "weight": 0.0128786145,
+    "ev": 27.442684
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "As2s",
+    "weight": 0.1968417,
+    "ev": 0.9174173
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "As7s",
+    "weight": 0.002777142,
+    "ev": -0.73203945
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "As8s",
+    "weight": 0.0028332146,
+    "ev": -0.73203945
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "AsTs",
+    "weight": 0.0004993308,
+    "ev": -0.68873954
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "AsAc",
+    "weight": 0.00343328,
+    "ev": 27.39262
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "AsAd",
+    "weight": 0.006729229,
+    "ev": 27.41427
+  },
+  {
+    "history": "xr10r50",
+    "seat": "oop",
+    "combo": "AsAh",
+    "weight": 0.028625926,
+    "ev": 27.467041
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "2h2d",
+    "weight": 0.60291445,
+    "ev": -10.1944275
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "2s2d",
+    "weight": 0.6204013,
+    "ev": -10.157893
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "2s2h",
+    "weight": 0.55698484,
+    "ev": -10.217431
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "Tc9c",
+    "weight": 0.1182269,
+    "ev": -10.24314
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "Td9d",
+    "weight": 0.13476768,
+    "ev": -10.281028
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "Ts9s",
+    "weight": 0.17500305,
+    "ev": -10.276968
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "QcJc",
+    "weight": 0.48584726,
+    "ev": -9.527338
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "QdJd",
+    "weight": 0.48599985,
+    "ev": -9.535457
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "QhJh",
+    "weight": 0.49639124,
+    "ev": -9.53681
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "KcQd",
+    "weight": 0.99942017,
+    "ev": -9.931922
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "KcQh",
+    "weight": 0.9992981,
+    "ev": -9.917038
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "KdQc",
+    "weight": 0.9993744,
+    "ev": -9.9441
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "KdQh",
+    "weight": 0.9992523,
+    "ev": -9.933275
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "KhQc",
+    "weight": 0.9999542,
+    "ev": -9.896741
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "KhQd",
+    "weight": 0.9999542,
+    "ev": -9.8994465
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "KsQc",
+    "weight": 0.95399404,
+    "ev": -10.133537
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "KsQd",
+    "weight": 0.953933,
+    "ev": -10.134891
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "KsQh",
+    "weight": 0.9443046,
+    "ev": -10.138949
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "Ac3c",
+    "weight": 0.48529792,
+    "ev": -9.999578
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "Ac4c",
+    "weight": 0.48612192,
+    "ev": -9.999578
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "Ac5c",
+    "weight": 0.482887,
+    "ev": -9.999578
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "Ad3d",
+    "weight": 0.44411382,
+    "ev": -9.999578
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "Ad4d",
+    "weight": 0.44305247,
+    "ev": -9.999578
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "Ad5d",
+    "weight": 0.43962768,
+    "ev": -9.999578
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "Ah3h",
+    "weight": 0.33672082,
+    "ev": -9.999578
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "Ah4h",
+    "weight": 0.33426413,
+    "ev": -9.999578
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "Ah5h",
+    "weight": 0.34721905,
+    "ev": -9.999578
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "As3s",
+    "weight": 0.39295033,
+    "ev": -9.999578
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "As4s",
+    "weight": 0.39032578,
+    "ev": -9.999578
+  },
+  {
+    "history": "xr10r50",
+    "seat": "ip",
+    "combo": "As5s",
+    "weight": 0.40080872,
+    "ev": -9.999578
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "2h2d",
+    "weight": 0.14386205,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "2s2d",
+    "weight": 0.14383154,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "2s2h",
+    "weight": 0.14392309,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "3d3c",
+    "weight": 0.046387427,
+    "ev": -30.56001
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "3h3c",
+    "weight": 0.055252917,
+    "ev": -28.409067
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "3h3d",
+    "weight": 0.059266042,
+    "ev": -18.577225
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "3s3c",
+    "weight": 0.053147174,
+    "ev": -28.409067
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "3s3d",
+    "weight": 0.057175554,
+    "ev": -18.577225
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "3s3h",
+    "weight": 0.064989164,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "4d4c",
+    "weight": 0.03482162,
+    "ev": -29.195225
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "4h4c",
+    "weight": 0.047027588,
+    "ev": -27.351906
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "4h4d",
+    "weight": 0.05130005,
+    "ev": -18.406322
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "4s4c",
+    "weight": 0.043442436,
+    "ev": -27.351906
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "4s4d",
+    "weight": 0.047821775,
+    "ev": -18.406322
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "4s4h",
+    "weight": 0.058442947,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "5d5c",
+    "weight": 0.037048906,
+    "ev": -20.935696
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "5h5c",
+    "weight": 0.049089022,
+    "ev": -20.935696
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "5h5d",
+    "weight": 0.05300984,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "5s5c",
+    "weight": 0.0455787,
+    "ev": -20.935696
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "5s5d",
+    "weight": 0.04956206,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "5s5h",
+    "weight": 0.06007477,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "6d6c",
+    "weight": 0.08333079,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "6h6c",
+    "weight": 0.08333079,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "6h6d",
+    "weight": 0.08333079,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "6s6c",
+    "weight": 0.08333079,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "6s6d",
+    "weight": 0.08333079,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "6s6h",
+    "weight": 0.08333079,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "7h7c",
+    "weight": 0.4763409,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "7s7c",
+    "weight": 0.4763409,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "7s7h",
+    "weight": 0.4763409,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "8d8c",
+    "weight": 0.08333079,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "8h8c",
+    "weight": 0.08333079,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "8h8d",
+    "weight": 0.08333079,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "8s8c",
+    "weight": 0.08333079,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "8s8d",
+    "weight": 0.08333079,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "8s8h",
+    "weight": 0.08333079,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "9d9c",
+    "weight": 1.0,
+    "ev": 56.03442
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "9s9c",
+    "weight": 1.0,
+    "ev": 49.198273
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "9s9d",
+    "weight": 1.0,
+    "ev": 50.64363
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "TdTc",
+    "weight": 0.094014555,
+    "ev": 56.03442
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "ThTc",
+    "weight": 0.06676397,
+    "ev": 59.669785
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "ThTd",
+    "weight": 0.06528941,
+    "ev": 60.311893
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "TsTc",
+    "weight": 0.08978863,
+    "ev": 49.198273
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "TsTd",
+    "weight": 0.09057077,
+    "ev": 50.64363
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "TsTh",
+    "weight": 0.061181672,
+    "ev": 55.92211
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "JdJc",
+    "weight": 0.0987579,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "JhJc",
+    "weight": 0.08618296,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "JhJd",
+    "weight": 0.08673228,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KcTd",
+    "weight": 0.38199437,
+    "ev": 60.311893
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KcTh",
+    "weight": 0.013656616,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KcTs",
+    "weight": 0.3508606,
+    "ev": 55.92211
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KcQd",
+    "weight": 0.021500805,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KcQh",
+    "weight": 0.028086068,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KdTc",
+    "weight": 0.3625849,
+    "ev": 59.669785
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KdTh",
+    "weight": 0.014572366,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KdTs",
+    "weight": 0.35479292,
+    "ev": 55.92211
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KdQc",
+    "weight": 0.02019465,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KdQh",
+    "weight": 0.026076918,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KdKc",
+    "weight": 0.0013816502,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KhTc",
+    "weight": 0.26689556,
+    "ev": 59.669785
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KhTd",
+    "weight": 0.2896512,
+    "ev": 60.311893
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KhTs",
+    "weight": 0.25781643,
+    "ev": 55.92211
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KhJc",
+    "weight": 0.001519478,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KhJd",
+    "weight": 0.0014987494,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KhQc",
+    "weight": 0.03329432,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KhQd",
+    "weight": 0.032630954,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KhKc",
+    "weight": 0.0002636636,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KhKd",
+    "weight": 0.0003183302,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KsTc",
+    "weight": 0.28062868,
+    "ev": 59.669785
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KsTd",
+    "weight": 0.25986114,
+    "ev": 60.311893
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KsTh",
+    "weight": 0.0025940337,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KsQc",
+    "weight": 0.000037776994,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KsQd",
+    "weight": 0.00003245013,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KsQh",
+    "weight": 0.000021677195,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KsKc",
+    "weight": 0.007570836,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KsKd",
+    "weight": 0.0099248225,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "KsKh",
+    "weight": 0.0015542827,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "Ac7c",
+    "weight": 0.00010681315,
+    "ev": -52.24036
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "Ac8c",
+    "weight": 0.000034269935,
+    "ev": -52.24036
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "AcJc",
+    "weight": 0.00005594571,
+    "ev": 76.89687
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "Ad2d",
+    "weight": 0.030811163,
+    "ev": -19.966427
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "Ad8d",
+    "weight": 0.0019967663,
+    "ev": -19.966427
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "AdTd",
+    "weight": 0.0049513206,
+    "ev": -13.740652
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "AdJd",
+    "weight": 0.00014927829,
+    "ev": 63.98632
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "AdAc",
+    "weight": 0.001373312,
+    "ev": 79.99999
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "Ah2h",
+    "weight": 0.044085547,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "Ah7h",
+    "weight": 0.049515527,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "Ah8h",
+    "weight": 0.034999996,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "AhTh",
+    "weight": 0.034999996,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "AhJh",
+    "weight": 0.0012589779,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "AhQh",
+    "weight": 0.00028992142,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "AhAc",
+    "weight": 0.007568475,
+    "ev": 76.89687
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "AhAd",
+    "weight": 0.0128786145,
+    "ev": 63.98632
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "As2s",
+    "weight": 0.0419787,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "As7s",
+    "weight": 0.035355154,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "As8s",
+    "weight": 0.02871581,
+    "ev": -17.085482
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "AsTs",
+    "weight": 0.0057094796,
+    "ev": 0.19775993
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "AsAc",
+    "weight": 0.00343328,
+    "ev": 76.89687
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "AsAd",
+    "weight": 0.006729229,
+    "ev": 63.98632
+  },
+  {
+    "history": "xr20r60",
+    "seat": "oop",
+    "combo": "AsAh",
+    "weight": 0.028625926,
+    "ev": 62.833942
+  },
+  {
+    "history": "xr20r60",
+    "seat": "ip",
+    "combo": "Tc9c",
+    "weight": 0.00065613794,
+    "ev": -19.775991
+  },
+  {
+    "history": "xr20r60",
+    "seat": "ip",
+    "combo": "Td9d",
+    "weight": 0.00053406577,
+    "ev": -19.732046
+  },
+  {
+    "history": "xr20r60",
+    "seat": "ip",
+    "combo": "Ts9s",
+    "weight": 0.0012054443,
+    "ev": -19.619738
+  },
+  {
+    "history": "xr20r60",
+    "seat": "ip",
+    "combo": "Ac3c",
+    "weight": 0.000686656,
+    "ev": -20.000608
+  },
+  {
+    "history": "xr20r60",
+    "seat": "ip",
+    "combo": "Ac4c",
+    "weight": 0.0006408789,
+    "ev": -20.000608
+  },
+  {
+    "history": "xr20r60",
+    "seat": "ip",
+    "combo": "Ac5c",
+    "weight": 0.00025940337,
+    "ev": -20.000608
+  },
+  {
+    "history": "xr20r60",
+    "seat": "ip",
+    "combo": "Ad3d",
+    "weight": 0.00010681315,
+    "ev": -20.000608
+  },
+  {
+    "history": "xr20r60",
+    "seat": "ip",
+    "combo": "Ad4d",
+    "weight": 0.00009155553,
+    "ev": -20.000608
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "TdTc",
+    "weight": 0.13246357,
+    "ev": -10.012817
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "ThTc",
+    "weight": 0.57746243,
+    "ev": -10.014954
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "ThTd",
+    "weight": 0.59600216,
+    "ev": -10.025636
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "TsTc",
+    "weight": 0.12346075,
+    "ev": -10.006409
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "TsTd",
+    "weight": 0.14140536,
+    "ev": -10.010681
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "TsTh",
+    "weight": 0.6040742,
+    "ev": -9.997864
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "JdJc",
+    "weight": 0.03546251,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "JhJc",
+    "weight": 0.033600368,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "JhJd",
+    "weight": 0.028152896,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "QdQc",
+    "weight": 1.0,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "QhQc",
+    "weight": 1.0,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "QhQd",
+    "weight": 1.0,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KcTd",
+    "weight": 0.37154192,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KcTh",
+    "weight": 0.3366089,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KcTs",
+    "weight": 0.38868713,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KcJd",
+    "weight": 1.0,
+    "ev": -9.972228
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KcJh",
+    "weight": 1.0,
+    "ev": -9.972228
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KcQd",
+    "weight": 0.9470817,
+    "ev": -9.910275
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KcQh",
+    "weight": 0.9312123,
+    "ev": -9.910275
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KdTc",
+    "weight": 0.3210193,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KdTh",
+    "weight": 0.3364004,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KdTs",
+    "weight": 0.38685262,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KdJc",
+    "weight": 1.0,
+    "ev": -9.972228
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KdJh",
+    "weight": 1.0,
+    "ev": -9.972228
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KdQc",
+    "weight": 0.9501335,
+    "ev": -9.910275
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KdQh",
+    "weight": 0.93604946,
+    "ev": -9.910275
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KhTc",
+    "weight": 0.3665675,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KhTd",
+    "weight": 0.4155095,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KhTs",
+    "weight": 0.43378347,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KhJc",
+    "weight": 0.99116504,
+    "ev": -9.972228
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KhJd",
+    "weight": 0.9912871,
+    "ev": -9.972228
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KhQc",
+    "weight": 0.9178454,
+    "ev": -9.910275
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KhQd",
+    "weight": 0.91961545,
+    "ev": -9.910275
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KsTc",
+    "weight": 0.71772337,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KsTd",
+    "weight": 0.739971,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KsTh",
+    "weight": 0.72883195,
+    "ev": 70.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KsJc",
+    "weight": 1.0,
+    "ev": -9.940184
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KsJd",
+    "weight": 1.0,
+    "ev": -9.940184
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KsJh",
+    "weight": 1.0,
+    "ev": -9.940184
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KsQc",
+    "weight": 0.9998932,
+    "ev": -9.92523
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KsQd",
+    "weight": 0.99990845,
+    "ev": -9.923094
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KsQh",
+    "weight": 0.99993896,
+    "ev": -9.923094
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KsKc",
+    "weight": 0.031189442,
+    "ev": -9.938047
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KsKd",
+    "weight": 0.031234741,
+    "ev": -9.938047
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "KsKh",
+    "weight": 0.030457009,
+    "ev": -9.940184
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ac6c",
+    "weight": 0.17729458,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ac8c",
+    "weight": 0.28503418,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ac9c",
+    "weight": 1.0,
+    "ev": -10.006409
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "AcTc",
+    "weight": 0.36560616,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "AcJc",
+    "weight": 0.9997101,
+    "ev": -9.980773
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ad6d",
+    "weight": 0.16704051,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ad9d",
+    "weight": 1.0,
+    "ev": -10.008545
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "AdTd",
+    "weight": 0.008987564,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "AdJd",
+    "weight": 0.9992523,
+    "ev": -9.982909
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ah6h",
+    "weight": 0.17633326,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "Ah8h",
+    "weight": 0.014297703,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "AhTh",
+    "weight": 0.014297703,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "AhJh",
+    "weight": 0.9941405,
+    "ev": -9.985046
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "As3s",
+    "weight": 1.0,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "As4s",
+    "weight": 1.0,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "As5s",
+    "weight": 1.0,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "As6s",
+    "weight": 0.19304189,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "As8s",
+    "weight": 0.00053406577,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "As9s",
+    "weight": 1.0,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "oop",
+    "combo": "AsTs",
+    "weight": 0.11491569,
+    "ev": -10.0
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "2h2d",
+    "weight": 0.6384832,
+    "ev": 22.760094
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "2s2d",
+    "weight": 0.6384832,
+    "ev": 22.760094
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "2s2h",
+    "weight": 0.6384832,
+    "ev": 22.760094
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "3d3c",
+    "weight": 0.05600061,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "3h3c",
+    "weight": 0.054383155,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "3h3d",
+    "weight": 0.055984497,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "3s3c",
+    "weight": 0.054535743,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "3s3d",
+    "weight": 0.056122683,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "3s3h",
+    "weight": 0.054551,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "4d4c",
+    "weight": 0.04979019,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "4h4c",
+    "weight": 0.04976043,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "4h4d",
+    "weight": 0.04978943,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "4s4c",
+    "weight": 0.04975967,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "4s4d",
+    "weight": 0.04977569,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "4s4h",
+    "weight": 0.049745172,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "5d5c",
+    "weight": 0.05154419,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "5h5c",
+    "weight": 0.051515244,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "5h5d",
+    "weight": 0.051544975,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "5s5c",
+    "weight": 0.051514458,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "5s5d",
+    "weight": 0.051529717,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "5s5h",
+    "weight": 0.051513672,
+    "ev": 0.032044433
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "Tc9c",
+    "weight": 0.008346685,
+    "ev": 1.6705832
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "Td9d",
+    "weight": 0.013366903,
+    "ev": 1.986755
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "Ts9s",
+    "weight": 0.0023651484,
+    "ev": 1.6599017
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "KsQc",
+    "weight": 0.0017547875,
+    "ev": 22.768639
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "KsQd",
+    "weight": 0.0019531548,
+    "ev": 22.772911
+  },
+  {
+    "history": "r10r50",
+    "seat": "ip",
+    "combo": "KsQh",
+    "weight": 0.0024109255,
+    "ev": 22.777184
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "2h2d",
+    "weight": 0.85613793,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "2s2d",
+    "weight": 0.85616845,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "2s2h",
+    "weight": 0.8560769,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "7h7c",
+    "weight": 0.5236591,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "7s7c",
+    "weight": 0.5236591,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "7s7h",
+    "weight": 0.5236591,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "JdJc",
+    "weight": 0.8657796,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "JhJc",
+    "weight": 0.88021666,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "JhJd",
+    "weight": 0.88511485,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KcTd",
+    "weight": 0.24646372,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KcTh",
+    "weight": 0.6497345,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KcTs",
+    "weight": 0.26045227,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KdTc",
+    "weight": 0.31639582,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KdTh",
+    "weight": 0.6490272,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KdTs",
+    "weight": 0.25835446,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KdKc",
+    "weight": 0.9981537,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KhTc",
+    "weight": 0.36653697,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KhTd",
+    "weight": 0.29483932,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KhTs",
+    "weight": 0.3084001,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KhKc",
+    "weight": 0.9996338,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KhKd",
+    "weight": 0.9995575,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KsTc",
+    "weight": 0.0016479744,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KsTd",
+    "weight": 0.00016784924,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KsTh",
+    "weight": 0.26857406,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KsKc",
+    "weight": 0.95667964,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KsKd",
+    "weight": 0.9528656,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "KsKh",
+    "weight": 0.966949,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "Ac6c",
+    "weight": 0.82270545,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "Ac8c",
+    "weight": 0.5422058,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AcTc",
+    "weight": 0.6343938,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AcQc",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AcKc",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "Ad2d",
+    "weight": 0.7797513,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "Ad6d",
+    "weight": 0.8329595,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "Ad8d",
+    "weight": 0.0010833906,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AdTd",
+    "weight": 0.5207446,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AdQd",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AdKd",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AdAc",
+    "weight": 0.9986267,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "Ah2h",
+    "weight": 0.79349965,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "Ah6h",
+    "weight": 0.82366675,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "Ah8h",
+    "weight": 0.24698253,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AhTh",
+    "weight": 0.24698253,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AhQh",
+    "weight": 0.9997101,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AhKh",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AhAc",
+    "weight": 0.9924315,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AhAd",
+    "weight": 0.9871214,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "As2s",
+    "weight": 0.8016785,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "As6s",
+    "weight": 0.80695814,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "As8s",
+    "weight": 0.032410163,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AsTs",
+    "weight": 0.7547112,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AsKs",
+    "weight": 1.0,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AsAc",
+    "weight": 0.9965667,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AsAd",
+    "weight": 0.99327075,
+    "ev": 0.0
+  },
+  {
+    "history": "r20r60",
+    "seat": "oop",
+    "combo": "AsAh",
+    "weight": 0.9713741,
+    "ev": 0.0
+  }
+]

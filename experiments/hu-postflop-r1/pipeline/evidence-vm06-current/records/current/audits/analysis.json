@@ -1,0 +1,270 @@
+{
+  "campaign_state": "completed",
+  "external_reference_acceptance": "not_evaluated",
+  "kind": "saved_profile_analysis",
+  "pair_tolerance": {
+    "absolute": 1e-10,
+    "formula": "abs(a-b) <= absolute + relative * max(abs(a), abs(b))",
+    "relative": 1e-12,
+    "scope": "numeric record equivalence only; never relaxes NC target or implies external acceptance"
+  },
+  "pairs": [
+    {
+      "absolute_differences": {
+        "br": [
+          0.0,
+          0.0
+        ],
+        "ev": [
+          0.0,
+          0.0
+        ],
+        "gains": [
+          0.0,
+          0.0
+        ],
+        "nash_conv": [
+          0.0
+        ]
+      },
+      "both_saved_profile_targets_pass": true,
+      "case": "river",
+      "exact_values": true,
+      "raw_config_hash_equal": false,
+      "repetition": 1,
+      "same_effective_conditions": true,
+      "scope": "numeric comparison of stored policies in this finite synthetic game; not external acceptance",
+      "status": "exact",
+      "within_predeclared_record_tolerance": true
+    },
+    {
+      "absolute_differences": {
+        "br": [
+          0.0,
+          0.0
+        ],
+        "ev": [
+          0.0,
+          0.0
+        ],
+        "gains": [
+          0.0,
+          0.0
+        ],
+        "nash_conv": [
+          0.0
+        ]
+      },
+      "both_saved_profile_targets_pass": true,
+      "case": "river",
+      "exact_values": true,
+      "raw_config_hash_equal": false,
+      "repetition": 2,
+      "same_effective_conditions": true,
+      "scope": "numeric comparison of stored policies in this finite synthetic game; not external acceptance",
+      "status": "exact",
+      "within_predeclared_record_tolerance": true
+    },
+    {
+      "absolute_differences": {
+        "br": [
+          0.0,
+          0.0
+        ],
+        "ev": [
+          0.0,
+          0.0
+        ],
+        "gains": [
+          0.0,
+          0.0
+        ],
+        "nash_conv": [
+          0.0
+        ]
+      },
+      "both_saved_profile_targets_pass": true,
+      "case": "river",
+      "exact_values": true,
+      "raw_config_hash_equal": false,
+      "repetition": 3,
+      "same_effective_conditions": true,
+      "scope": "numeric comparison of stored policies in this finite synthetic game; not external acceptance",
+      "status": "exact",
+      "within_predeclared_record_tolerance": true
+    },
+    {
+      "absolute_differences": {
+        "br": [
+          0.0,
+          0.0
+        ],
+        "ev": [
+          0.0,
+          0.0
+        ],
+        "gains": [
+          0.0,
+          0.0
+        ],
+        "nash_conv": [
+          0.0
+        ]
+      },
+      "both_saved_profile_targets_pass": true,
+      "case": "turn",
+      "exact_values": true,
+      "raw_config_hash_equal": false,
+      "repetition": 1,
+      "same_effective_conditions": true,
+      "scope": "numeric comparison of stored policies in this finite synthetic game; not external acceptance",
+      "status": "exact",
+      "within_predeclared_record_tolerance": true
+    },
+    {
+      "absolute_differences": {
+        "br": [
+          0.0,
+          0.0
+        ],
+        "ev": [
+          0.0,
+          0.0
+        ],
+        "gains": [
+          0.0,
+          0.0
+        ],
+        "nash_conv": [
+          0.0
+        ]
+      },
+      "both_saved_profile_targets_pass": true,
+      "case": "turn",
+      "exact_values": true,
+      "raw_config_hash_equal": false,
+      "repetition": 2,
+      "same_effective_conditions": true,
+      "scope": "numeric comparison of stored policies in this finite synthetic game; not external acceptance",
+      "status": "exact",
+      "within_predeclared_record_tolerance": true
+    },
+    {
+      "absolute_differences": {
+        "br": [
+          0.0,
+          0.0
+        ],
+        "ev": [
+          0.0,
+          0.0
+        ],
+        "gains": [
+          0.0,
+          0.0
+        ],
+        "nash_conv": [
+          0.0
+        ]
+      },
+      "both_saved_profile_targets_pass": true,
+      "case": "turn",
+      "exact_values": true,
+      "raw_config_hash_equal": false,
+      "repetition": 3,
+      "same_effective_conditions": true,
+      "scope": "numeric comparison of stored policies in this finite synthetic game; not external acceptance",
+      "status": "exact",
+      "within_predeclared_record_tolerance": true
+    },
+    {
+      "absolute_differences": {
+        "br": [
+          0.0,
+          0.0
+        ],
+        "ev": [
+          0.0,
+          0.0
+        ],
+        "gains": [
+          0.0,
+          0.0
+        ],
+        "nash_conv": [
+          0.0
+        ]
+      },
+      "both_saved_profile_targets_pass": true,
+      "case": "flop",
+      "exact_values": true,
+      "raw_config_hash_equal": false,
+      "repetition": 1,
+      "same_effective_conditions": true,
+      "scope": "numeric comparison of stored policies in this finite synthetic game; not external acceptance",
+      "status": "exact",
+      "within_predeclared_record_tolerance": true
+    },
+    {
+      "absolute_differences": {
+        "br": [
+          0.0,
+          0.0
+        ],
+        "ev": [
+          0.0,
+          0.0
+        ],
+        "gains": [
+          0.0,
+          0.0
+        ],
+        "nash_conv": [
+          0.0
+        ]
+      },
+      "both_saved_profile_targets_pass": true,
+      "case": "flop",
+      "exact_values": true,
+      "raw_config_hash_equal": false,
+      "repetition": 2,
+      "same_effective_conditions": true,
+      "scope": "numeric comparison of stored policies in this finite synthetic game; not external acceptance",
+      "status": "exact",
+      "within_predeclared_record_tolerance": true
+    },
+    {
+      "absolute_differences": {
+        "br": [
+          0.0,
+          0.0
+        ],
+        "ev": [
+          0.0,
+          0.0
+        ],
+        "gains": [
+          0.0,
+          0.0
+        ],
+        "nash_conv": [
+          0.0
+        ]
+      },
+      "both_saved_profile_targets_pass": true,
+      "case": "flop",
+      "exact_values": true,
+      "raw_config_hash_equal": false,
+      "repetition": 3,
+      "same_effective_conditions": true,
+      "scope": "numeric comparison of stored policies in this finite synthetic game; not external acceptance",
+      "status": "exact",
+      "within_predeclared_record_tolerance": true
+    }
+  ],
+  "performance_scope": "audit adapter timing/RSS are diagnostic only; excluded from original solve performance",
+  "runs": 18,
+  "saved_profile_comparison_eligible": true,
+  "saved_profile_quality": "pass",
+  "schema": "r1.saved-profile-campaign/v1"
+}

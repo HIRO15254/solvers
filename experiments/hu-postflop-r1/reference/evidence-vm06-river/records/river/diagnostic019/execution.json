@@ -1,0 +1,451 @@
+{
+  "schema": "solvers.r1-diagnostic-execution/v1",
+  "case_id": "HU-R0-019",
+  "source_id": "source-archive-sha256:ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970",
+  "state": "completed",
+  "started_utc": "2026-09-25T18:34:37.376282+00:00",
+  "limits": {
+    "timeout_seconds": 600,
+    "grace_seconds": 5,
+    "kill_wait_seconds": 5,
+    "poll_seconds": 0.1,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "disk_reserve_bytes": 10737418240
+  },
+  "total_seconds_limit": 1800.0,
+  "stages": [
+    {
+      "name": "input_check",
+      "argv": [
+        "/usr/bin/python3",
+        "/opt/r1/river-diagnostic-inputs/HU-R0-019/check_diagnostic.py",
+        "--check-inputs",
+        "--output",
+        "/opt/r1/diagnostic-019/input-check.json"
+      ],
+      "state": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "stop_reason": "completed",
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "elapsed_seconds": 0.12797010300027978,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "sample_count": 2,
+        "max_sample_gap_seconds": 0.10780085400028838,
+        "sampled_peak_tree_resident_bytes": 10469376,
+        "root_os_peak_resident_bytes": 22511616,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1
+      },
+      "outputs": {
+        "stdout": {
+          "path": "/opt/r1/diagnostic-019/stages/input_check/stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr": {
+          "path": "/opt/r1/diagnostic-019/stages/input_check/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "samples": {
+          "path": "/opt/r1/diagnostic-019/stages/input_check/supervisor.samples.jsonl",
+          "sha256": "ec02a97b72604b05025f464f2eb1222933840449344dd7a6e02e57ea485afe9b",
+          "bytes": 634
+        }
+      },
+      "supervisor_record": {
+        "path": "/opt/r1/diagnostic-019/stages/input_check/supervisor.json",
+        "sha256": "3aeac696e7c8b25a46ce2f3b2d74fba6ec8f19f4ac8b74274df9fb7c220cdeec",
+        "bytes": 8348
+      }
+    },
+    {
+      "name": "config_validate",
+      "argv": [
+        "/opt/r1/target/candidate-v3/release/solvers",
+        "validate",
+        "/opt/r1/river-diagnostic-inputs/HU-R0-019/diagnostic.toml"
+      ],
+      "state": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "stop_reason": "completed",
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "elapsed_seconds": 0.019410909000271204,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "sample_count": 1,
+        "max_sample_gap_seconds": 0.0,
+        "sampled_peak_tree_resident_bytes": 0,
+        "root_os_peak_resident_bytes": 22552576,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 0
+      },
+      "outputs": {
+        "stdout": {
+          "path": "/opt/r1/diagnostic-019/stages/config_validate/stdout.log",
+          "sha256": "e19fb52c6e4f025f3de856c14d3db91d44d65010d097bf2a6ff717b7c5250dff",
+          "bytes": 142
+        },
+        "stderr": {
+          "path": "/opt/r1/diagnostic-019/stages/config_validate/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "samples": {
+          "path": "/opt/r1/diagnostic-019/stages/config_validate/supervisor.samples.jsonl",
+          "sha256": "a6a8d05e084ba868ac70c85a4bacaa43ae522dcbd48c27c6c635cf9b578adfe1",
+          "bytes": 325
+        }
+      },
+      "supervisor_record": {
+        "path": "/opt/r1/diagnostic-019/stages/config_validate/supervisor.json",
+        "sha256": "1b1310da5c3d105b8d6e59668c494a7f8320400dd5152d77fadc86fab1025da5",
+        "bytes": 8246
+      }
+    },
+    {
+      "name": "solve",
+      "argv": [
+        "/opt/r1/target/candidate-v3/release/solvers",
+        "solve",
+        "/opt/r1/river-diagnostic-inputs/HU-R0-019/diagnostic.toml",
+        "--out",
+        "/opt/r1/diagnostic-019/run"
+      ],
+      "state": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "stop_reason": "completed",
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "elapsed_seconds": 1.9613583299997117,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "sample_count": 19,
+        "max_sample_gap_seconds": 0.1095027440001104,
+        "sampled_peak_tree_resident_bytes": 10690560,
+        "root_os_peak_resident_bytes": 22585344,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1
+      },
+      "outputs": {
+        "stdout": {
+          "path": "/opt/r1/diagnostic-019/stages/solve/stdout.log",
+          "sha256": "fbbbe9cd380aa547e07315e55c9b0a0b2d5dc5185e3d47f20e72d74498c4816e",
+          "bytes": 1327
+        },
+        "stderr": {
+          "path": "/opt/r1/diagnostic-019/stages/solve/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "samples": {
+          "path": "/opt/r1/diagnostic-019/stages/solve/supervisor.samples.jsonl",
+          "sha256": "701effd53b2bf9e9b78db36c73078ce49a69c5c3605df8c76cac9c62131f3c75",
+          "bytes": 5860
+        }
+      },
+      "supervisor_record": {
+        "path": "/opt/r1/diagnostic-019/stages/solve/supervisor.json",
+        "sha256": "ee5d168c5edfd9aa9a3e3afac728b2b30438c318dc293ab80be97b25bfceb05d",
+        "bytes": 8325
+      }
+    },
+    {
+      "name": "export_tree",
+      "argv": [
+        "/opt/r1/target/candidate-v3/release/solvers",
+        "export",
+        "/opt/r1/diagnostic-019/run/solution.sol",
+        "tree",
+        "--node",
+        "all",
+        "--output",
+        "/opt/r1/diagnostic-019/tree.json"
+      ],
+      "state": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "stop_reason": "completed",
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "elapsed_seconds": 0.022354169000209367,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "sample_count": 1,
+        "max_sample_gap_seconds": 0.0,
+        "sampled_peak_tree_resident_bytes": 0,
+        "root_os_peak_resident_bytes": 22630400,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 0
+      },
+      "outputs": {
+        "stdout": {
+          "path": "/opt/r1/diagnostic-019/stages/export_tree/stdout.log",
+          "sha256": "52df5d285cc6d5a97e68ee8fa29c4ea5d239c970d3fd29df66107d4e2d5c9965",
+          "bytes": 39
+        },
+        "stderr": {
+          "path": "/opt/r1/diagnostic-019/stages/export_tree/stderr.log",
+          "sha256": "667c37a83d6b4801143cb67d4551b28a5d4dea3a802e80a87200ff792202321c",
+          "bytes": 73
+        },
+        "samples": {
+          "path": "/opt/r1/diagnostic-019/stages/export_tree/supervisor.samples.jsonl",
+          "sha256": "bc318e6cffc6ec31f7906b4ca35b99ebf0ef8db256271e17dbdf4b069887f95a",
+          "bytes": 324
+        }
+      },
+      "supervisor_record": {
+        "path": "/opt/r1/diagnostic-019/stages/export_tree/supervisor.json",
+        "sha256": "38c294a78b79393554e0d449f3259e8a4be009c28f3e8aae3d16a6cf8daee8a2",
+        "bytes": 8379
+      }
+    },
+    {
+      "name": "export_summary",
+      "argv": [
+        "/opt/r1/target/candidate-v3/release/solvers",
+        "export",
+        "/opt/r1/diagnostic-019/run/solution.sol",
+        "summary",
+        "--output",
+        "/opt/r1/diagnostic-019/summary.json"
+      ],
+      "state": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "stop_reason": "completed",
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "elapsed_seconds": 0.024641589000111708,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "sample_count": 1,
+        "max_sample_gap_seconds": 0.0,
+        "sampled_peak_tree_resident_bytes": 0,
+        "root_os_peak_resident_bytes": 22630400,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 0
+      },
+      "outputs": {
+        "stdout": {
+          "path": "/opt/r1/diagnostic-019/stages/export_summary/stdout.log",
+          "sha256": "4a037c55f9c218a3d0a1ec22e21b3b2908a587e7e6d771dc134c089eec660144",
+          "bytes": 42
+        },
+        "stderr": {
+          "path": "/opt/r1/diagnostic-019/stages/export_summary/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "samples": {
+          "path": "/opt/r1/diagnostic-019/stages/export_summary/supervisor.samples.jsonl",
+          "sha256": "f393239a1e38a659a98abd255de24d1e60ed331283b4d24e72cbecb8f3a7ca71",
+          "bytes": 325
+        }
+      },
+      "supervisor_record": {
+        "path": "/opt/r1/diagnostic-019/stages/export_summary/supervisor.json",
+        "sha256": "135571b5297777fb65e7f32c5746fffb76c7e99baafcc320aafa9c65ac5f3f7b",
+        "bytes": 8350
+      }
+    },
+    {
+      "name": "compare",
+      "argv": [
+        "/usr/bin/python3",
+        "/opt/r1/river-diagnostic-inputs/HU-R0-019/check_diagnostic.py",
+        "--tree",
+        "/opt/r1/diagnostic-019/tree.json",
+        "--summary",
+        "/opt/r1/diagnostic-019/summary.json",
+        "--run-config",
+        "/opt/r1/diagnostic-019/run/run.toml",
+        "--source-id",
+        "source-archive-sha256:ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970",
+        "--output",
+        "/opt/r1/diagnostic-019/diagnostic-comparison.json"
+      ],
+      "state": "completed",
+      "child_exit_code": 0,
+      "supervisor_exit_code": 0,
+      "stop_reason": "completed",
+      "cleanup_complete": true,
+      "identity_unchanged": true,
+      "elapsed_seconds": 0.1276520419996814,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "sample_count": 2,
+        "max_sample_gap_seconds": 0.10700884400012001,
+        "sampled_peak_tree_resident_bytes": 11313152,
+        "root_os_peak_resident_bytes": 22638592,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1
+      },
+      "outputs": {
+        "stdout": {
+          "path": "/opt/r1/diagnostic-019/stages/compare/stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr": {
+          "path": "/opt/r1/diagnostic-019/stages/compare/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "samples": {
+          "path": "/opt/r1/diagnostic-019/stages/compare/supervisor.samples.jsonl",
+          "sha256": "57885073fe1baefe1c984e95d05892036e040a67e602ef0ea99e7a2c7894fded",
+          "bytes": 634
+        }
+      },
+      "supervisor_record": {
+        "path": "/opt/r1/diagnostic-019/stages/compare/supervisor.json",
+        "sha256": "91bc4ee3970ca54492df307e147f566dc39d72a0f3c65793c995f81ca0e3735e",
+        "bytes": 8891
+      }
+    }
+  ],
+  "concurrency_check": "point-in-time /proc check; root keeps other launchers stopped",
+  "artifacts": {
+    "input-check.json": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-019/input-check.json",
+      "sha256": "422afc1c218f20e4873cfd199e40772c6c2b873450a3f5b12d76c8186773b7af",
+      "bytes": 1093
+    },
+    "tree.json": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-019/tree.json",
+      "sha256": "42d7859fe1e23f5331324edd6447bd52ed4c4ae70d5406f2f321d1fbdaa5303b",
+      "bytes": 2177
+    },
+    "summary.json": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-019/summary.json",
+      "sha256": "30f9a6214de738428871330fc7c3690d9fa89ccd61d9d8e5e4f1036781611bae",
+      "bytes": 395
+    },
+    "diagnostic-comparison.json": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-019/diagnostic-comparison.json",
+      "sha256": "0176b8ff80a242323f86388e7f8df8f88746660a5e7082bd07a340e7097615e3",
+      "bytes": 2893
+    },
+    "run/run.toml": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-019/run/run.toml",
+      "sha256": "ae9cdf0cd551ef789286cbfbd8860a2c06c16498c093857b6dfec2566e2de459",
+      "bytes": 4440
+    },
+    "run/run.json": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-019/run/run.json",
+      "sha256": "a060e1b523b9038ca7491f0fce3c3781aaece1351ba95705b32b6321cdc4c7dd",
+      "bytes": 175
+    },
+    "run/solution.sol": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-019/run/solution.sol",
+      "sha256": "986af722a0ef15c5d7a5b58715a1c0026ba8dbac99edff6a2986b02e98b24a8b",
+      "bytes": 10895
+    },
+    "run/checkpoint.ckpt": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-019/run/checkpoint.ckpt",
+      "sha256": "0b073b9a0b3e5f42c75807405077b1534742b0794bfabdc91cdf57f9bd891b11",
+      "bytes": 109551
+    },
+    "run/progress.jsonl": {
+      "status": "present",
+      "path": "/opt/r1/diagnostic-019/run/progress.jsonl",
+      "sha256": "8e630fbe2aedfb38317f41e338fcc7cc148cddaf0d5076d6e7f2d151e21dd318",
+      "bytes": 2037
+    }
+  },
+  "runner": {
+    "path": "/home/PC_User/run-diagnostic.py",
+    "sha256": "933f1313e00e8ad06f765592c402ccc068668d6323c817cc69ebe2486db44504",
+    "bytes": 14263
+  },
+  "supervisor": {
+    "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+    "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+    "bytes": 39015
+  },
+  "binary": {
+    "path": "/opt/r1/target/candidate-v3/release/solvers",
+    "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521",
+    "bytes": 8868960
+  },
+  "input_archive": {
+    "path": "/home/PC_User/diagnostic-input.tar.gz",
+    "sha256": "9bfc777776a0b85ec073498d75a9c6d23d35ed949610a3ee83a7c4ca73f83a7a",
+    "bytes": 12691
+  },
+  "inputs": {
+    "diagnostic.toml": {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-019/diagnostic.toml",
+      "sha256": "c3ac2b24063ad5d3c3f35c6efdd34132452ffb09f8b12b00f3a25a118317e658",
+      "bytes": 4959,
+      "archive_member": "HU-R0-019/diagnostic.toml"
+    },
+    "observed.json": {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-019/observed.json",
+      "sha256": "e38ffaf0b6fbcbbbe5779ae9d4236074df889ea75afd0ee4092e6cd48cf2aca2",
+      "bytes": 6319,
+      "archive_member": "HU-R0-019/observed.json"
+    },
+    "oop-range.txt": {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-019/oop-range.txt",
+      "sha256": "e0d201e994569ac6e582603390a98737c59cf6333c630cb8729f6b4f287c2f84",
+      "bytes": 1831,
+      "archive_member": "HU-R0-019/oop-range.txt"
+    },
+    "ip-range.txt": {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-019/ip-range.txt",
+      "sha256": "ac682a2f4646bf9b4c8424f86021879b74fdc7f51177175e3242904d2a831b94",
+      "bytes": 1818,
+      "archive_member": "HU-R0-019/ip-range.txt"
+    },
+    "range-integrity.json": {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-019/range-integrity.json",
+      "sha256": "c45c9d90f38db030d494bd28d1d65615e78984365f77592754362f2633b90115",
+      "bytes": 327,
+      "archive_member": "HU-R0-019/range-integrity.json"
+    },
+    "check_diagnostic.py": {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-019/check_diagnostic.py",
+      "sha256": "b60b77f209d345278bee4a74a026d1af8ce6ca3bad95989ffc0140a7002c550b",
+      "bytes": 12369,
+      "archive_member": "HU-R0-019/check_diagnostic.py"
+    },
+    "README.md": {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-019/README.md",
+      "sha256": "b458b08ff9c97f2a85a785cc338acb99b6e9f1677f5f33faa26ef2a0f2fd1e1f",
+      "bytes": 5948,
+      "archive_member": "HU-R0-019/README.md"
+    },
+    "test_check_diagnostic.py": {
+      "path": "/opt/r1/river-diagnostic-inputs/HU-R0-019/test_check_diagnostic.py",
+      "sha256": "674719a0041c85dd601b8bb238257e6cbab0518af769783a8d6253a3d75fe207",
+      "bytes": 4233,
+      "archive_member": "HU-R0-019/test_check_diagnostic.py"
+    }
+  },
+  "seconds": 3.0348554299998796,
+  "finished_utc": "2026-09-25T18:34:40.401800+00:00"
+}

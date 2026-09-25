@@ -1,0 +1,11 @@
+   Compiling cards v0.1.0 (/opt/r1/baseline-audit/crates/cards)
+   Compiling engine v0.1.0 (/opt/r1/baseline-audit/crates/engine)
+   Compiling hand-index v0.1.0 (/opt/r1/baseline-audit/crates/hand-index)
+   Compiling abstraction v0.1.0 (/opt/r1/baseline-audit/crates/abstraction)
+   Compiling game v0.1.0 (/opt/r1/baseline-audit/crates/game)
+   Compiling formats v0.1.0 (/opt/r1/baseline-audit/crates/formats)
+   Compiling multiway v0.1.0 (/opt/r1/baseline-audit/crates/multiway)
+   Compiling preflop v0.1.0 (/opt/r1/baseline-audit/crates/preflop)
+   Compiling holdem v0.1.0 (/opt/r1/baseline-audit/crates/holdem)
+   Compiling cli v0.1.0 (/opt/r1/baseline-audit/crates/cli)
+    Finished `release` profile [optimized] target(s) in 1m 08s

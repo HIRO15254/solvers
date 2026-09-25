@@ -1,0 +1,17 @@
+{
+  "board": "Qs 7h 2c 4d 9s",
+  "pot": 4050,
+  "effective_stack": 5500,
+  "min_bet": 100,
+  "iterations": 1500,
+  "ev_oop": 1658.4886560610382,
+  "ev_ip": 2331.5113388898817,
+  "expl_oop": 0.03725560021450747,
+  "expl_ip": 0.04637883640265272,
+  "nash_conv": 0.08363443661716019,
+  "storage": "f32",
+  "wall_secs": 1.818324238,
+  "streets_stored": "full",
+  "nodes": 33,
+  "stored_nodes": 12
+}

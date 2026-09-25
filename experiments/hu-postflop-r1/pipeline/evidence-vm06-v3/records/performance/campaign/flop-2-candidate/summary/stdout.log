@@ -1,0 +1,17 @@
+{
+  "board": "Ks 7h 2d",
+  "pot": 20,
+  "effective_stack": 60,
+  "min_bet": 1,
+  "iterations": 50,
+  "ev_oop": 8.049393706851536,
+  "ev_ip": 11.950607829623753,
+  "expl_oop": 0.013658099704318527,
+  "expl_ip": 0.023040824466281418,
+  "nash_conv": 0.036698924170599945,
+  "storage": "f32",
+  "wall_secs": 8.16014748,
+  "streets_stored": "full",
+  "nodes": 21618,
+  "stored_nodes": 14410
+}

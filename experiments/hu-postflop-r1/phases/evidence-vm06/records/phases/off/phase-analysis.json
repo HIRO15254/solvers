@@ -1,0 +1,138 @@
+{
+  "campaign_state": "completed",
+  "cases": [
+    {
+      "case": "river",
+      "versions": {
+        "baseline": {
+          "external_minus_internal_ns": null,
+          "external_solve_seconds": {
+            "max": 0.2602767200000926,
+            "median": 0.19810788199993112,
+            "min": 0.19603080200022305,
+            "n": 3,
+            "values": [
+              0.19603080200022305,
+              0.19810788199993112,
+              0.2602767200000926
+            ]
+          },
+          "leaves": {},
+          "phase_total_ns": null,
+          "runs": 3,
+          "validated_phase_records": 0
+        },
+        "candidate": {
+          "external_minus_internal_ns": null,
+          "external_solve_seconds": {
+            "max": 0.25477613099974405,
+            "median": 0.20706945099982477,
+            "min": 0.19505749199970523,
+            "n": 3,
+            "values": [
+              0.25477613099974405,
+              0.19505749199970523,
+              0.20706945099982477
+            ]
+          },
+          "leaves": {},
+          "phase_total_ns": null,
+          "runs": 3,
+          "validated_phase_records": 0
+        }
+      }
+    },
+    {
+      "case": "turn",
+      "versions": {
+        "baseline": {
+          "external_minus_internal_ns": null,
+          "external_solve_seconds": {
+            "max": 1.9351188760001605,
+            "median": 1.9044560449997334,
+            "min": 1.8923766349998914,
+            "n": 3,
+            "values": [
+              1.8923766349998914,
+              1.9044560449997334,
+              1.9351188760001605
+            ]
+          },
+          "leaves": {},
+          "phase_total_ns": null,
+          "runs": 3,
+          "validated_phase_records": 0
+        },
+        "candidate": {
+          "external_minus_internal_ns": null,
+          "external_solve_seconds": {
+            "max": 1.9708231720001095,
+            "median": 1.7164515419999589,
+            "min": 1.7082099029998972,
+            "n": 3,
+            "values": [
+              1.7164515419999589,
+              1.7082099029998972,
+              1.9708231720001095
+            ]
+          },
+          "leaves": {},
+          "phase_total_ns": null,
+          "runs": 3,
+          "validated_phase_records": 0
+        }
+      }
+    },
+    {
+      "case": "flop",
+      "versions": {
+        "baseline": {
+          "external_minus_internal_ns": null,
+          "external_solve_seconds": {
+            "max": 10.693003151000084,
+            "median": 10.388432501999887,
+            "min": 10.381802579000123,
+            "n": 3,
+            "values": [
+              10.388432501999887,
+              10.693003151000084,
+              10.381802579000123
+            ]
+          },
+          "leaves": {},
+          "phase_total_ns": null,
+          "runs": 3,
+          "validated_phase_records": 0
+        },
+        "candidate": {
+          "external_minus_internal_ns": null,
+          "external_solve_seconds": {
+            "max": 10.40147128100034,
+            "median": 9.885615642000175,
+            "min": 9.533362404999934,
+            "n": 3,
+            "values": [
+              10.40147128100034,
+              9.533362404999934,
+              9.885615642000175
+            ]
+          },
+          "leaves": {},
+          "phase_total_ns": null,
+          "runs": 3,
+          "validated_phase_records": 0
+        }
+      }
+    }
+  ],
+  "kind": "phase_analysis",
+  "limitations": [
+    "leaf ns only; inclusive CFR envelope is not additive",
+    "total excludes final phase JSON and process startup/exit",
+    "external minus internal is a scope difference, not a measured phase",
+    "existing pipeline phase_timings nulls remain unchanged"
+  ],
+  "mode": "off",
+  "saved_profile_br": "not_evaluated",
+  "schema": "r1.phase-campaign/v1"
+}

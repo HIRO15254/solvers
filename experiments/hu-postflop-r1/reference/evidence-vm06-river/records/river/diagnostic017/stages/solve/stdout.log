@@ -1,0 +1,27 @@
+tree: nodes=81 terminals=53 rank_tables=1 storage=0.8 MiB (f32) / 0.4 MiB (i16)
+game=postflop schedule=dcfr iterations=10000
+iter=     100 expl_p0=5.684e0 expl_p1=4.658e0 nash_conv=1.034e1
+iter=     200 expl_p0=2.045e0 expl_p1=1.963e0 nash_conv=4.008e0
+iter=     300 expl_p0=1.263e0 expl_p1=1.531e0 nash_conv=2.794e0
+iter=     400 expl_p0=7.936e-1 expl_p1=7.280e-1 nash_conv=1.522e0
+iter=     500 expl_p0=5.004e-1 expl_p1=4.178e-1 nash_conv=9.181e-1
+iter=     600 expl_p0=3.275e-1 expl_p1=3.788e-1 nash_conv=7.063e-1
+iter=     700 expl_p0=2.707e-1 expl_p1=2.974e-1 nash_conv=5.681e-1
+iter=     800 expl_p0=2.240e-1 expl_p1=2.072e-1 nash_conv=4.312e-1
+iter=     900 expl_p0=1.878e-1 expl_p1=1.727e-1 nash_conv=3.605e-1
+iter=    1000 expl_p0=1.567e-1 expl_p1=1.426e-1 nash_conv=2.993e-1
+iter=    1100 expl_p0=2.776e-1 expl_p1=3.513e-1 nash_conv=6.289e-1
+iter=    1200 expl_p0=1.571e-1 expl_p1=2.008e-1 nash_conv=3.579e-1
+iter=    1300 expl_p0=1.233e-1 expl_p1=1.563e-1 nash_conv=2.796e-1
+iter=    1400 expl_p0=9.162e-2 expl_p1=1.499e-1 nash_conv=2.415e-1
+iter=    1500 expl_p0=9.213e-2 expl_p1=1.225e-1 nash_conv=2.147e-1
+iter=    1600 expl_p0=8.587e-2 expl_p1=1.014e-1 nash_conv=1.873e-1
+iter=    1700 expl_p0=8.010e-2 expl_p1=7.789e-2 nash_conv=1.580e-1
+iter=    1800 expl_p0=7.392e-2 expl_p1=6.530e-2 nash_conv=1.392e-1
+iter=    1900 expl_p0=6.058e-2 expl_p1=5.552e-2 nash_conv=1.161e-1
+iter=    2000 expl_p0=5.319e-2 expl_p1=5.440e-2 nash_conv=1.076e-1
+iter=    2100 expl_p0=5.461e-2 expl_p1=5.022e-2 nash_conv=1.048e-1
+iter=    2200 expl_p0=5.331e-2 expl_p1=4.061e-2 nash_conv=9.392e-2
+target nash_conv 1.000e-1 reached
+done: iterations=2200 wall=8.17s ev_p0=768.147576 ev_p1=1221.852428 nash_conv=9.392e-2
+sol: wrote /opt/r1/diagnostic-017/run/solution.sol (35.5 KB, 28 blocks, mode=Full)

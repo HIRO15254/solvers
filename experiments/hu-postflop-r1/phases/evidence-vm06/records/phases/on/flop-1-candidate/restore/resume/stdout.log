@@ -1,0 +1,5 @@
+resuming from checkpoint: iteration=50 target=50
+tree: nodes=21618 terminals=7058 rank_tables=1176 storage=145.8 MiB (f32) / 73.0 MiB (i16)
+game=postflop schedule=dcfr iterations=50
+done: iterations=50 wall=8.77s ev_p0=8.049394 ev_p1=11.950608 nash_conv=3.670e-2
+sol: wrote /opt/r1/phase-on/flop-1-candidate/restore/run/solution.sol (172.7 KB, 14410 blocks, mode=Full)

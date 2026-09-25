@@ -1,0 +1,179 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T18:27:48.713036+00:00",
+  "argv": [
+    "/opt/r1/target/current-recovery/release/solvers",
+    "export",
+    "/opt/r1/candidate-v3/runs/r1-paired-current/river-1-candidate/restore/run/solution.sol",
+    "tree",
+    "--node",
+    "all"
+  ],
+  "cwd": "/opt/r1/candidate-v3",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 600.0,
+    "grace_seconds": 5.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.05,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "disk_reserve_bytes": 10737418240
+  },
+  "runtime": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-7.0.0-1011-gcp-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "logical_cpus": 8
+  },
+  "outputs": {
+    "stdout": {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/river-1-candidate/restore/tree/stdout.log",
+      "sha256": "a1b301055e7a45c6f23188e7a30ef2f1803949dc98abb0ed30ee0a40fa14d2b8",
+      "bytes": 1723
+    },
+    "stderr": {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/river-1-candidate/restore/tree/stderr.log",
+      "sha256": "b7d72f7dc5eefb825df09931ebe5f0b85ac29e0d5dc49e509afc591c7dc7f973",
+      "bytes": 73
+    },
+    "samples": {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/river-1-candidate/restore/tree/supervisor.samples.jsonl",
+      "sha256": "d39ec67a2b67a16f507a2b2c8ab4313c154d8b36f781ca86b64fb7ffe3067d3d",
+      "bytes": 325
+    }
+  },
+  "identity_before": [
+    {
+      "path": "/opt/r1/target/current-recovery/release/solvers",
+      "sha256": "5baae6ebe438bc0205968587a7447599a15832411aeab1558cfecc1dd7293031",
+      "bytes": 8868976
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e",
+      "bytes": 29831
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/river-1-candidate/restore/run/solution.sol",
+      "sha256": "8fe7504c869522dc26a592bf9fc22587dc38fb8f86fd5de1aec9a0a10f9bbf46",
+      "bytes": 7609
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-current/plan.json",
+      "sha256": "6bf01e38faae81b5f97b69414dfcc12aedcf07caf7cd9889c9fb152867061332",
+      "bytes": 13820
+    },
+    {
+      "path": "/opt/r1/audit-source.tar.gz",
+      "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c",
+      "bytes": 1213908
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "/opt/r1/target/current-recovery/release/solvers",
+      "sha256": "5baae6ebe438bc0205968587a7447599a15832411aeab1558cfecc1dd7293031",
+      "bytes": 8868976
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e",
+      "bytes": 29831
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/river-1-candidate/restore/run/solution.sol",
+      "sha256": "8fe7504c869522dc26a592bf9fc22587dc38fb8f86fd5de1aec9a0a10f9bbf46",
+      "bytes": 7609
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-current/plan.json",
+      "sha256": "6bf01e38faae81b5f97b69414dfcc12aedcf07caf7cd9889c9fb152867061332",
+      "bytes": 13820
+    },
+    {
+      "path": "/opt/r1/audit-source.tar.gz",
+      "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c",
+      "bytes": 1213908
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 1,
+    "max_sample_gap_seconds": 0.0,
+    "sampled_peak_tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 25501696,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "max_observed_processes": 0
+  },
+  "containment": {
+    "kind": "posix_session_process_group",
+    "limitations": [
+      "setsid/setpgid can escape this process group; use a systemd/cgroup wrapper",
+      "supervisor SIGKILL, host failure or power loss does not kill the group",
+      "resident memory is sampled /proc RSS; brief descendants may be missed",
+      "summed RSS can double-count shared pages; this is not cgroup memory.current",
+      "wait4 root peak can include reaped descendant high-water marks; it is not a simultaneous tree peak"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 67419471872,
+    "available_bytes": 66343243776
+  },
+  "resolved_argv": [
+    "/opt/r1/target/current-recovery/release/solvers",
+    "export",
+    "/opt/r1/candidate-v3/runs/r1-paired-current/river-1-candidate/restore/run/solution.sol",
+    "tree",
+    "--node",
+    "all"
+  ],
+  "disk_path": "/opt/r1/candidate-v3/runs/r1-paired-current/river-1-candidate/restore/tree",
+  "disk_free_before_bytes": 92497588224,
+  "started_at": "2026-09-25T18:27:48.745740+00:00",
+  "pid": 9880,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 25501696,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "elapsed_seconds": 0.013736960000187537,
+    "at": "2026-09-25T18:27:48.765832+00:00",
+    "host_available_memory_bytes": 66343247872,
+    "disk_free_bytes": 92497575936
+  },
+  "elapsed_seconds": 0.02023619999999937,
+  "ended_at": "2026-09-25T18:27:48.766025+00:00",
+  "supervisor_exit_code": 0
+}

@@ -1,0 +1,305 @@
+{
+  "artifacts": {
+    "checkpoint.ckpt": {
+      "bytes": 356281,
+      "header": {
+        "embedded_config_blake3": "6092004a96a42674f88226ca5f6095680033a3b84c80fe742431b7aad68e1ed4",
+        "iteration": 100,
+        "version": 1
+      },
+      "path": "/opt/r1/phase-on/turn-3-baseline/run/checkpoint.ckpt",
+      "sha256": "20b728f870f0da771442c2f8ce6d16f21c957e0f412b8af951cf7f1a31be0aa0"
+    },
+    "progress.jsonl": {
+      "bytes": 544,
+      "path": "/opt/r1/phase-on/turn-3-baseline/run/progress.jsonl",
+      "sha256": "3deb55787bd0c67cde109d441b34e1a1734cc689ffe0b8d7fc4752cc5faa9058"
+    },
+    "run.json": {
+      "bytes": 176,
+      "path": "/opt/r1/phase-on/turn-3-baseline/run/run.json",
+      "sha256": "70f6178feaa9829d6e86d45ea401ba0bcde975159f278a77533b604f584e1b18"
+    },
+    "run.toml": {
+      "bytes": 548,
+      "path": "/opt/r1/phase-on/turn-3-baseline/run/run.toml",
+      "sha256": "8326ab75af8a7f1c52a48e8d2edafa7e61649024e69ca5d8c08a9972eaeb9297"
+    },
+    "solution.sol": {
+      "bytes": 21336,
+      "header": {
+        "embedded_config_blake3": "6092004a96a42674f88226ca5f6095680033a3b84c80fe742431b7aad68e1ed4",
+        "iteration": 100,
+        "version": 1
+      },
+      "path": "/opt/r1/phase-on/turn-3-baseline/run/solution.sol",
+      "sha256": "7a1f2221e80ce382971055e527f218a4365f42e9d0c704c677592895fa5c431a"
+    }
+  },
+  "case": "turn",
+  "expected_iterations": 100,
+  "expected_sol_version": 1,
+  "internal_target": {
+    "exploitability_pct_pot": 0.0720699628194188,
+    "g_i": [
+      0.014560711236647705,
+      0.014267273891119814
+    ],
+    "inequality": "<",
+    "nash_conv": 0.02882798512776752,
+    "scope": "internal finite synthetic game only",
+    "source": "run.json final live solver result",
+    "status": "pass",
+    "strategy_kind": "live_average",
+    "target_nash_conv": 0.04
+  },
+  "live_final": {
+    "g_i": [
+      0.014560711236647705,
+      0.014267273891119814
+    ],
+    "iterations": 100,
+    "nash_conv": 0.02882798512776752,
+    "pot": 20
+  },
+  "missing_fields": [
+    "saved_quantized_profile_br",
+    "monotonic_internal_phase_spans",
+    "external_reference_condition_match_and_thresholds"
+  ],
+  "phase_timings": {
+    "br_final": null,
+    "cfr": null,
+    "initialization": null,
+    "persistence": null,
+    "return": null
+  },
+  "presave_consistency": "pass",
+  "profile": {
+    "ev": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.07854254699986996,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.05817442800025674,
+        "root_os_peak_resident_bytes": 26333184,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 2,
+        "sampled_peak_tree_resident_bytes": 17371136
+      },
+      "record": {
+        "bytes": 8945,
+        "path": "/opt/r1/phase-on/turn-3-baseline/ev/supervisor.json",
+        "sha256": "b6996a0ce1a72d10921f23cc52bc366612eb68e4b1db7ef0464ebc6c6c32a750"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 1729196,
+        "path": "/opt/r1/phase-on/turn-3-baseline/ev/stdout.log",
+        "sha256": "0048a5c0526dd92b14d9654ffc7a2d775474df01594a014ede251a40790715be"
+      },
+      "stop_reason": "completed"
+    },
+    "strategy": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.08249396600012915,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.05901356799995483,
+        "root_os_peak_resident_bytes": 26333184,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 2,
+        "sampled_peak_tree_resident_bytes": 17199104
+      },
+      "record": {
+        "bytes": 8981,
+        "path": "/opt/r1/phase-on/turn-3-baseline/strategy/supervisor.json",
+        "sha256": "b7233d3a7fdeba8525d9b516896dc36553548cef66c544ccd1de9e2fecdc16d6"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 1201396,
+        "path": "/opt/r1/phase-on/turn-3-baseline/strategy/stdout.log",
+        "sha256": "c5e9aa8c05bfde689e99591fc32ea820ce2d8e875bdc016b07aed3528da031ef"
+      },
+      "stop_reason": "completed"
+    },
+    "tree": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.08033360700028425,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.05758237800000643,
+        "root_os_peak_resident_bytes": 26333184,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 2,
+        "sampled_peak_tree_resident_bytes": 18018304
+      },
+      "record": {
+        "bytes": 8955,
+        "path": "/opt/r1/phase-on/turn-3-baseline/tree/supervisor.json",
+        "sha256": "8016387911959f08ef030c53a3134dcea55ff322a1d5cb8ee21e7a7395badf1f"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 96635,
+        "path": "/opt/r1/phase-on/turn-3-baseline/tree/stdout.log",
+        "sha256": "e89730aac015ef2232cf19bfe6ba0d17d1f729bd2740fb094dd0dfd32da9f284"
+      },
+      "stop_reason": "completed"
+    }
+  },
+  "quality_status": "not_evaluated",
+  "repetition": 3,
+  "resume": null,
+  "run_status": "completed",
+  "saved_profile_br": "not_evaluated",
+  "solve": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 2.1704127049997624,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.06829013700007636,
+      "root_os_peak_resident_bytes": 51396608,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 36,
+      "sampled_peak_tree_resident_bytes": 52056064
+    },
+    "r1_phase": {
+      "mode": "on",
+      "record": {
+        "bytes": 6447,
+        "path": "/opt/r1/phase-on/turn-3-baseline/solve/phase.json",
+        "sha256": "458de3eea569ccd69d34d67e4ea2aee442c867a2d7ae7d338fdd57881be5ee86"
+      },
+      "status": "validated",
+      "summary": {
+        "cfr_inclusive_envelope": {
+          "add_to_leaf_sum": false,
+          "duration_ns": 1807507019,
+          "end_ns": 1838941228,
+          "start_ns": 31434209
+        },
+        "instrumentation_id": "aa81ca3e10c1beba324a8d42483294ca54a8b3fe852970a9f924da44fd2e5a3a",
+        "leaves": {
+          "cfr_updates": {
+            "calls": 4,
+            "duration_ns": 1589507107
+          },
+          "checkpoint": {
+            "calls": 5,
+            "duration_ns": 251827381
+          },
+          "final_ev_br": {
+            "calls": 1,
+            "duration_ns": 42082438
+          },
+          "initialization": {
+            "calls": 1,
+            "duration_ns": 7509130
+          },
+          "input_preparation": {
+            "calls": 1,
+            "duration_ns": 9997730
+          },
+          "overhead": {
+            "calls": 18,
+            "duration_ns": 24690118
+          },
+          "periodic_ev_br": {
+            "calls": 4,
+            "duration_ns": 78118848
+          },
+          "sol_preparation": {
+            "calls": 1,
+            "duration_ns": 56060068
+          },
+          "sol_serialization_and_write": {
+            "calls": 1,
+            "duration_ns": 22898549
+          },
+          "summary_publish": {
+            "calls": 1,
+            "duration_ns": 35570
+          }
+        },
+        "source_version": "baseline9632",
+        "total_ns": 2082726939
+      }
+    },
+    "record": {
+      "bytes": 9185,
+      "path": "/opt/r1/phase-on/turn-3-baseline/solve/supervisor.json",
+      "sha256": "e88fd096813f48af4523b8e850e551770f3332d735484335a1aebcfbaa5f86f6"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 606,
+      "path": "/opt/r1/phase-on/turn-3-baseline/solve/stdout.log",
+      "sha256": "b9c8335a592120c84b1ac7b5ddf8319b0c97d1fa2fa7b738256320ef45b1f186"
+    },
+    "stop_reason": "completed"
+  },
+  "summary": {
+    "board": "2c 7d 9h Js",
+    "effective_stack": 60,
+    "ev_ip": 1.208072568163459,
+    "ev_oop": 18.791926466388468,
+    "expl_ip": 0.014267273891119814,
+    "expl_oop": 0.014560711236647705,
+    "iterations": 100,
+    "min_bet": 1,
+    "nash_conv": 0.02882798512776752,
+    "nodes": 1305,
+    "pot": 20,
+    "storage": "f32",
+    "stored_nodes": 580,
+    "streets_stored": "full",
+    "wall_secs": 1.874409946
+  },
+  "summary_read": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.05272446700018918,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.010316619999684917,
+      "root_os_peak_resident_bytes": 26333184,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 4,
+      "sampled_peak_tree_resident_bytes": 17514496
+    },
+    "record": {
+      "bytes": 9354,
+      "path": "/opt/r1/phase-on/turn-3-baseline/summary/supervisor.json",
+      "sha256": "65f071faa7c4adb106c0fa82b8390f5054ccfeefa3b1f1aac90f3092b0c894e7"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 389,
+      "path": "/opt/r1/phase-on/turn-3-baseline/summary/stdout.log",
+      "sha256": "f623fffab9cdef5484eb13123f676c8f05525127fa4bd0a31eae9220ff894cc7"
+    },
+    "stop_reason": "completed"
+  },
+  "version": "baseline"
+}

@@ -1,0 +1,6 @@
+2026-09-25T16:21:07Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/configs/river.toml --out /opt/r1/current/runs/r1-pilot/river/run --sol-streets full
+2026-09-25T16:21:07Z summary: export /opt/r1/current/runs/r1-pilot/river/run/solution.sol summary
+2026-09-25T16:21:08Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/configs/turn.toml --out /opt/r1/current/runs/r1-pilot/turn/run --sol-streets full
+2026-09-25T16:21:09Z summary: export /opt/r1/current/runs/r1-pilot/turn/run/solution.sol summary
+2026-09-25T16:21:09Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/configs/flop.toml --out /opt/r1/current/runs/r1-pilot/flop/run --sol-streets full
+2026-09-25T16:21:19Z summary: export /opt/r1/current/runs/r1-pilot/flop/run/solution.sol summary

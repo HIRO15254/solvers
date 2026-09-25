@@ -1,0 +1,305 @@
+{
+  "artifacts": {
+    "checkpoint.ckpt": {
+      "bytes": 34545,
+      "header": {
+        "embedded_config_blake3": "c2ab0b1fdc5e4d18b0009fb53305c31e14fe3a0dbd787a8c8e72b8cc1df8b5ec",
+        "iteration": 50,
+        "version": 1
+      },
+      "path": "/opt/r1/phase-on/flop-3-candidate/run/checkpoint.ckpt",
+      "sha256": "eba21d600c9e53d34840e6c4a9083f6379f9d4f78a0611d57e42c41a8c99918a"
+    },
+    "progress.jsonl": {
+      "bytes": 689,
+      "path": "/opt/r1/phase-on/flop-3-candidate/run/progress.jsonl",
+      "sha256": "c83bf5206095b757944fad1fd26eb1b078aabbd929ffcd03bfa68fb718cb3071"
+    },
+    "run.json": {
+      "bytes": 176,
+      "path": "/opt/r1/phase-on/flop-3-candidate/run/run.json",
+      "sha256": "e42dcd4de2cb2c83c73f0fd6646218f1816a405e6b47961ad770fcf291c41a3b"
+    },
+    "run.toml": {
+      "bytes": 715,
+      "path": "/opt/r1/phase-on/flop-3-candidate/run/run.toml",
+      "sha256": "76650e60cdc4a58bbbdc3e7b6a547d6df992fef5b8b4909ebf8fabee288211cc"
+    },
+    "solution.sol": {
+      "bytes": 176833,
+      "header": {
+        "embedded_config_blake3": "c2ab0b1fdc5e4d18b0009fb53305c31e14fe3a0dbd787a8c8e72b8cc1df8b5ec",
+        "iteration": 50,
+        "version": 3
+      },
+      "path": "/opt/r1/phase-on/flop-3-candidate/run/solution.sol",
+      "sha256": "6d98c29a0cfe066f8021fa013057672901f0d55fa51ba1e955389b8da188da1f"
+    }
+  },
+  "case": "flop",
+  "expected_iterations": 50,
+  "expected_sol_version": 3,
+  "internal_target": {
+    "exploitability_pct_pot": 0.09174731042649986,
+    "g_i": [
+      0.013658099704318527,
+      0.023040824466281418
+    ],
+    "inequality": "<",
+    "nash_conv": 0.036698924170599945,
+    "scope": "internal finite synthetic game only",
+    "source": "run.json final live solver result",
+    "status": "pass",
+    "strategy_kind": "live_average",
+    "target_nash_conv": 0.04
+  },
+  "live_final": {
+    "g_i": [
+      0.013658099704318527,
+      0.023040824466281418
+    ],
+    "iterations": 50,
+    "nash_conv": 0.036698924170599945,
+    "pot": 20
+  },
+  "missing_fields": [
+    "saved_quantized_profile_br",
+    "monotonic_internal_phase_spans",
+    "external_reference_condition_match_and_thresholds"
+  ],
+  "phase_timings": {
+    "br_final": null,
+    "cfr": null,
+    "initialization": null,
+    "persistence": null,
+    "return": null
+  },
+  "presave_consistency": "pass",
+  "profile": {
+    "ev": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 1.6442120159999831,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.06232546699993691,
+        "root_os_peak_resident_bytes": 320679936,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 29,
+        "sampled_peak_tree_resident_bytes": 311222272
+      },
+      "record": {
+        "bytes": 8962,
+        "path": "/opt/r1/phase-on/flop-3-candidate/ev/supervisor.json",
+        "sha256": "f6d759d87aa22028545c73636398d942982d4b4a52b8c50778639b13378a8282"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 8842530,
+        "path": "/opt/r1/phase-on/flop-3-candidate/ev/stdout.log",
+        "sha256": "dddca33638c5bbb60e48ff6da2214e84d6da424b35fd7d590011224b058213bf"
+      },
+      "stop_reason": "completed"
+    },
+    "strategy": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 1.5039734510000926,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.058175796999876184,
+        "root_os_peak_resident_bytes": 315076608,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 27,
+        "sampled_peak_tree_resident_bytes": 309387264
+      },
+      "record": {
+        "bytes": 8999,
+        "path": "/opt/r1/phase-on/flop-3-candidate/strategy/supervisor.json",
+        "sha256": "0b3dfe3a1fca0ce16a848e8f1ffea64952279b312dceaf8740ec7280c4d99fc4"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 5175171,
+        "path": "/opt/r1/phase-on/flop-3-candidate/strategy/stdout.log",
+        "sha256": "78a31c55bf72e3c9136f1c58c109d664b4e3d62b13d864f1aed208a86fc15240"
+      },
+      "stop_reason": "completed"
+    },
+    "tree": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.7593263310000111,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.05896093799992741,
+        "root_os_peak_resident_bytes": 309833728,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 14,
+        "sampled_peak_tree_resident_bytes": 303722496
+      },
+      "record": {
+        "bytes": 8974,
+        "path": "/opt/r1/phase-on/flop-3-candidate/tree/supervisor.json",
+        "sha256": "4a62ce647d13b1f4c1b5c46acaf062aeb21eccec7648ba262d8c44c03cdc98ba"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 2255517,
+        "path": "/opt/r1/phase-on/flop-3-candidate/tree/stdout.log",
+        "sha256": "2c51b83cce1d6e620fe72b3f8f9bd47ea23f8b6ed7238854477c33a32bac2c43"
+      },
+      "stop_reason": "completed"
+    }
+  },
+  "quality_status": "not_evaluated",
+  "repetition": 3,
+  "resume": null,
+  "run_status": "completed",
+  "saved_profile_br": "not_evaluated",
+  "solve": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 9.444627766999929,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.06850870700009182,
+      "root_os_peak_resident_bytes": 436178944,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 158,
+      "sampled_peak_tree_resident_bytes": 433623040
+    },
+    "r1_phase": {
+      "mode": "on",
+      "record": {
+        "bytes": 7061,
+        "path": "/opt/r1/phase-on/flop-3-candidate/solve/phase.json",
+        "sha256": "e823ba6f3a2a4f4eb632f20b8ce250bcd24ef9658f21bd97500ea9aabefcf81b"
+      },
+      "status": "validated",
+      "summary": {
+        "cfr_inclusive_envelope": {
+          "add_to_leaf_sum": false,
+          "duration_ns": 7421645027,
+          "end_ns": 7532988172,
+          "start_ns": 111343145
+        },
+        "instrumentation_id": "aa81ca3e10c1beba324a8d42483294ca54a8b3fe852970a9f924da44fd2e5a3a",
+        "leaves": {
+          "cfr_updates": {
+            "calls": 5,
+            "duration_ns": 6292385152
+          },
+          "checkpoint": {
+            "calls": 5,
+            "duration_ns": 595402357
+          },
+          "final_ev_br": {
+            "calls": 1,
+            "duration_ns": 59405328
+          },
+          "initialization": {
+            "calls": 1,
+            "duration_ns": 92883466
+          },
+          "input_preparation": {
+            "calls": 1,
+            "duration_ns": 9341520
+          },
+          "overhead": {
+            "calls": 20,
+            "duration_ns": 74943475
+          },
+          "periodic_ev_br": {
+            "calls": 5,
+            "duration_ns": 839791547
+          },
+          "sol_preparation": {
+            "calls": 1,
+            "duration_ns": 1172931685
+          },
+          "sol_serialization_and_write": {
+            "calls": 1,
+            "duration_ns": 272782799
+          },
+          "summary_publish": {
+            "calls": 1,
+            "duration_ns": 35449
+          }
+        },
+        "source_version": "candidate03",
+        "total_ns": 9409902778
+      }
+    },
+    "record": {
+      "bytes": 9197,
+      "path": "/opt/r1/phase-on/flop-3-candidate/solve/supervisor.json",
+      "sha256": "d9aa2e84c9d44d8e69e69a000cb48b48c6532f633c91bf530fc44d10f672fcf1"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 681,
+      "path": "/opt/r1/phase-on/flop-3-candidate/solve/stdout.log",
+      "sha256": "156172ad9fd6aa87366791d327434f022009a37a6b967785a51c097d9ecb9b42"
+    },
+    "stop_reason": "completed"
+  },
+  "summary": {
+    "board": "Ks 7h 2d",
+    "effective_stack": 60,
+    "ev_ip": 11.950607829623753,
+    "ev_oop": 8.049393706851536,
+    "expl_ip": 0.023040824466281418,
+    "expl_oop": 0.013658099704318527,
+    "iterations": 50,
+    "min_bet": 1,
+    "nash_conv": 0.036698924170599945,
+    "nodes": 21618,
+    "pot": 20,
+    "storage": "f32",
+    "stored_nodes": 14410,
+    "streets_stored": "full",
+    "wall_secs": 7.727965885
+  },
+  "summary_read": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.019419648999701167,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 0,
+      "max_sample_gap_seconds": 0.0,
+      "root_os_peak_resident_bytes": 27172864,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 1,
+      "sampled_peak_tree_resident_bytes": 0
+    },
+    "record": {
+      "bytes": 9344,
+      "path": "/opt/r1/phase-on/flop-3-candidate/summary/supervisor.json",
+      "sha256": "d6f7e297c6d24879bbe75f41d8b7ce37a0dde23c66dc4831939d0a84c5bfee74"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 389,
+      "path": "/opt/r1/phase-on/flop-3-candidate/summary/stdout.log",
+      "sha256": "fddca46d52c65b92e70205b0deb52df143407f7e3ba3cf1b23bf77de8565776a"
+    },
+    "stop_reason": "completed"
+  },
+  "version": "candidate"
+}

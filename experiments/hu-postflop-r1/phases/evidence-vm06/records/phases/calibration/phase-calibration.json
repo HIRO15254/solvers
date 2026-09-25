@@ -1,0 +1,2240 @@
+{
+  "cases": [
+    {
+      "case": "river",
+      "external_solve_seconds": {
+        "off": {
+          "max": 0.2602767200000926,
+          "median": 0.19810788199993112,
+          "min": 0.19603080200022305,
+          "n": 3,
+          "values": [
+            0.19603080200022305,
+            0.19810788199993112,
+            0.2602767200000926
+          ]
+        },
+        "on": {
+          "max": 0.26101325999979963,
+          "median": 0.2589618500001052,
+          "min": 0.2531036360001053,
+          "n": 3,
+          "values": [
+            0.2531036360001053,
+            0.2589618500001052,
+            0.26101325999979963
+          ]
+        },
+        "original": {
+          "max": 0.25311338699998487,
+          "median": 0.19624054600012641,
+          "min": 0.19181609599991134,
+          "n": 3,
+          "values": [
+            0.19624054600012641,
+            0.25311338699998487,
+            0.19181609599991134
+          ]
+        }
+      },
+      "off_over_original_median_ratio": 1.0095155462918632,
+      "on_over_off_median_ratio": 1.3071759052988876,
+      "version": "baseline"
+    },
+    {
+      "case": "river",
+      "external_solve_seconds": {
+        "off": {
+          "max": 0.25477613099974405,
+          "median": 0.20706945099982477,
+          "min": 0.19505749199970523,
+          "n": 3,
+          "values": [
+            0.25477613099974405,
+            0.19505749199970523,
+            0.20706945099982477
+          ]
+        },
+        "on": {
+          "max": 0.26231539899981726,
+          "median": 0.25938309000002846,
+          "min": 0.24939867999955823,
+          "n": 3,
+          "values": [
+            0.26231539899981726,
+            0.25938309000002846,
+            0.24939867999955823
+          ]
+        },
+        "original": {
+          "max": 0.1952259749998575,
+          "median": 0.19438885600015965,
+          "min": 0.18787846700001865,
+          "n": 3,
+          "values": [
+            0.1952259749998575,
+            0.18787846700001865,
+            0.19438885600015965
+          ]
+        }
+      },
+      "off_over_original_median_ratio": 1.0652331376426984,
+      "on_over_off_median_ratio": 1.252638130577011,
+      "version": "candidate"
+    },
+    {
+      "case": "turn",
+      "external_solve_seconds": {
+        "off": {
+          "max": 1.9351188760001605,
+          "median": 1.9044560449997334,
+          "min": 1.8923766349998914,
+          "n": 3,
+          "values": [
+            1.8923766349998914,
+            1.9044560449997334,
+            1.9351188760001605
+          ]
+        },
+        "on": {
+          "max": 2.785282391999772,
+          "median": 2.1704127049997624,
+          "min": 1.9736739820000366,
+          "n": 3,
+          "values": [
+            1.9736739820000366,
+            2.785282391999772,
+            2.1704127049997624
+          ]
+        },
+        "original": {
+          "max": 2.2236566309998125,
+          "median": 2.0955554039999242,
+          "min": 1.6667079080000349,
+          "n": 3,
+          "values": [
+            1.6667079080000349,
+            2.2236566309998125,
+            2.0955554039999242
+          ]
+        }
+      },
+      "off_over_original_median_ratio": 0.9088072982296593,
+      "on_over_off_median_ratio": 1.139649670937964,
+      "version": "baseline"
+    },
+    {
+      "case": "turn",
+      "external_solve_seconds": {
+        "off": {
+          "max": 1.9708231720001095,
+          "median": 1.7164515419999589,
+          "min": 1.7082099029998972,
+          "n": 3,
+          "values": [
+            1.7164515419999589,
+            1.7082099029998972,
+            1.9708231720001095
+          ]
+        },
+        "on": {
+          "max": 2.213000522999664,
+          "median": 2.193780363999849,
+          "min": 1.9899055720002252,
+          "n": 3,
+          "values": [
+            2.193780363999849,
+            1.9899055720002252,
+            2.213000522999664
+          ]
+        },
+        "original": {
+          "max": 2.2067645439999524,
+          "median": 1.9748488239999915,
+          "min": 1.8409816380001303,
+          "n": 3,
+          "values": [
+            1.8409816380001303,
+            2.2067645439999524,
+            1.9748488239999915
+          ]
+        }
+      },
+      "off_over_original_median_ratio": 0.8691559177291063,
+      "on_over_off_median_ratio": 1.2780904734681415,
+      "version": "candidate"
+    },
+    {
+      "case": "flop",
+      "external_solve_seconds": {
+        "off": {
+          "max": 10.693003151000084,
+          "median": 10.388432501999887,
+          "min": 10.381802579000123,
+          "n": 3,
+          "values": [
+            10.388432501999887,
+            10.693003151000084,
+            10.381802579000123
+          ]
+        },
+        "on": {
+          "max": 11.681305958000394,
+          "median": 11.419379428999946,
+          "min": 10.617384111999854,
+          "n": 3,
+          "values": [
+            11.681305958000394,
+            11.419379428999946,
+            10.617384111999854
+          ]
+        },
+        "original": {
+          "max": 12.628793637999934,
+          "median": 12.225236040000027,
+          "min": 12.155711281999857,
+          "n": 3,
+          "values": [
+            12.225236040000027,
+            12.628793637999934,
+            12.155711281999857
+          ]
+        }
+      },
+      "off_over_original_median_ratio": 0.8497531228034976,
+      "on_over_off_median_ratio": 1.0992398927173652,
+      "version": "baseline"
+    },
+    {
+      "case": "flop",
+      "external_solve_seconds": {
+        "off": {
+          "max": 10.40147128100034,
+          "median": 9.885615642000175,
+          "min": 9.533362404999934,
+          "n": 3,
+          "values": [
+            10.40147128100034,
+            9.533362404999934,
+            9.885615642000175
+          ]
+        },
+        "on": {
+          "max": 10.750100986999769,
+          "median": 9.589961150999898,
+          "min": 9.444627766999929,
+          "n": 3,
+          "values": [
+            10.750100986999769,
+            9.589961150999898,
+            9.444627766999929
+          ]
+        },
+        "original": {
+          "max": 10.511472100999981,
+          "median": 10.149984351000057,
+          "min": 10.144495829999869,
+          "n": 3,
+          "values": [
+            10.511472100999981,
+            10.149984351000057,
+            10.144495829999869
+          ]
+        }
+      },
+      "off_over_original_median_ratio": 0.9739537816160442,
+      "on_over_off_median_ratio": 0.970092455370796,
+      "version": "candidate"
+    }
+  ],
+  "caveat": "separate mode campaigns with warm/uncontrolled caches; differences include order/noise, not solely instrumentation cost",
+  "comparisons": [
+    {
+      "case": "flop",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 1,
+      "status": "pass",
+      "version": "baseline"
+    },
+    {
+      "case": "flop",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 2,
+      "status": "pass",
+      "version": "baseline"
+    },
+    {
+      "case": "flop",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 3,
+      "status": "pass",
+      "version": "baseline"
+    },
+    {
+      "case": "flop",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 1,
+      "status": "pass",
+      "version": "candidate"
+    },
+    {
+      "case": "flop",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 2,
+      "status": "pass",
+      "version": "candidate"
+    },
+    {
+      "case": "flop",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 3,
+      "status": "pass",
+      "version": "candidate"
+    },
+    {
+      "case": "river",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 1,
+      "status": "pass",
+      "version": "baseline"
+    },
+    {
+      "case": "river",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 2,
+      "status": "pass",
+      "version": "baseline"
+    },
+    {
+      "case": "river",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 3,
+      "status": "pass",
+      "version": "baseline"
+    },
+    {
+      "case": "river",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 1,
+      "status": "pass",
+      "version": "candidate"
+    },
+    {
+      "case": "river",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 2,
+      "status": "pass",
+      "version": "candidate"
+    },
+    {
+      "case": "river",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 3,
+      "status": "pass",
+      "version": "candidate"
+    },
+    {
+      "case": "turn",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 1,
+      "status": "pass",
+      "version": "baseline"
+    },
+    {
+      "case": "turn",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 2,
+      "status": "pass",
+      "version": "baseline"
+    },
+    {
+      "case": "turn",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 3,
+      "status": "pass",
+      "version": "baseline"
+    },
+    {
+      "case": "turn",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 1,
+      "status": "pass",
+      "version": "candidate"
+    },
+    {
+      "case": "turn",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 2,
+      "status": "pass",
+      "version": "candidate"
+    },
+    {
+      "case": "turn",
+      "checks": {
+        "live_final_equal": true,
+        "off_phase_disabled": true,
+        "on_phase_validated": true,
+        "run_config_equal": true,
+        "saved_export_equal": true,
+        "summary_equal": true
+      },
+      "repetition": 3,
+      "status": "pass",
+      "version": "candidate"
+    }
+  ],
+  "eligible": true,
+  "kind": "calibration",
+  "original_pipeline_comparison_eligible": {
+    "off": true,
+    "on": true,
+    "original": true
+  },
+  "phase_analysis_on": {
+    "campaign_state": "completed",
+    "cases": [
+      {
+        "case": "river",
+        "versions": {
+          "baseline": {
+            "external_minus_internal_ns": {
+              "max": 72419163.00010532,
+              "median": 57040317.99979964,
+              "min": 37322169.00010517,
+              "n": 3,
+              "values": [
+                72419163.00010532,
+                37322169.00010517,
+                57040317.99979964
+              ]
+            },
+            "external_solve_seconds": {
+              "max": 0.26101325999979963,
+              "median": 0.2589618500001052,
+              "min": 0.2531036360001053,
+              "n": 3,
+              "values": [
+                0.2531036360001053,
+                0.2589618500001052,
+                0.26101325999979963
+              ]
+            },
+            "leaves": {
+              "cfr_updates": {
+                "calls": {
+                  "max": 4,
+                  "median": 4,
+                  "min": 4,
+                  "n": 3,
+                  "values": [
+                    4,
+                    4,
+                    4
+                  ]
+                },
+                "duration_ns": {
+                  "max": 106026166,
+                  "median": 99275135,
+                  "min": 90560186,
+                  "n": 3,
+                  "values": [
+                    90560186,
+                    106026166,
+                    99275135
+                  ]
+                }
+              },
+              "checkpoint": {
+                "calls": {
+                  "max": 5,
+                  "median": 5,
+                  "min": 5,
+                  "n": 3,
+                  "values": [
+                    5,
+                    5,
+                    5
+                  ]
+                },
+                "duration_ns": {
+                  "max": 63051748,
+                  "median": 52879677,
+                  "min": 47454909,
+                  "n": 3,
+                  "values": [
+                    47454909,
+                    63051748,
+                    52879677
+                  ]
+                }
+              },
+              "final_ev_br": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 3017990,
+                  "median": 2618449,
+                  "min": 2220299,
+                  "n": 3,
+                  "values": [
+                    2618449,
+                    2220299,
+                    3017990
+                  ]
+                }
+              },
+              "initialization": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 2374450,
+                  "median": 1690280,
+                  "min": 1390030,
+                  "n": 3,
+                  "values": [
+                    2374450,
+                    1690280,
+                    1390030
+                  ]
+                }
+              },
+              "input_preparation": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 10412540,
+                  "median": 9691580,
+                  "min": 8980230,
+                  "n": 3,
+                  "values": [
+                    10412540,
+                    9691580,
+                    8980230
+                  ]
+                }
+              },
+              "overhead": {
+                "calls": {
+                  "max": 18,
+                  "median": 18,
+                  "min": 18,
+                  "n": 3,
+                  "values": [
+                    18,
+                    18,
+                    18
+                  ]
+                },
+                "duration_ns": {
+                  "max": 24578159,
+                  "median": 21417311,
+                  "min": 13457099,
+                  "n": 3,
+                  "values": [
+                    13457099,
+                    24578159,
+                    21417311
+                  ]
+                }
+              },
+              "periodic_ev_br": {
+                "calls": {
+                  "max": 4,
+                  "median": 4,
+                  "min": 4,
+                  "n": 3,
+                  "values": [
+                    4,
+                    4,
+                    4
+                  ]
+                },
+                "duration_ns": {
+                  "max": 5604440,
+                  "median": 4997610,
+                  "min": 4945540,
+                  "n": 3,
+                  "values": [
+                    4945540,
+                    4997610,
+                    5604440
+                  ]
+                }
+              },
+              "sol_preparation": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 1948100,
+                  "median": 1798580,
+                  "min": 1683109,
+                  "n": 3,
+                  "values": [
+                    1948100,
+                    1798580,
+                    1683109
+                  ]
+                }
+              },
+              "sol_serialization_and_write": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 9686070,
+                  "median": 7572799,
+                  "min": 6893940,
+                  "n": 3,
+                  "values": [
+                    6893940,
+                    7572799,
+                    9686070
+                  ]
+                }
+              },
+              "summary_publish": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 38950,
+                  "median": 19260,
+                  "min": 12460,
+                  "n": 3,
+                  "values": [
+                    19260,
+                    12460,
+                    38950
+                  ]
+                }
+              }
+            },
+            "phase_total_ns": {
+              "max": 221639681,
+              "median": 203972942,
+              "min": 180684473,
+              "n": 3,
+              "values": [
+                180684473,
+                221639681,
+                203972942
+              ]
+            },
+            "runs": 3,
+            "validated_phase_records": 3
+          },
+          "candidate": {
+            "external_minus_internal_ns": {
+              "max": 52182128.00002846,
+              "median": 51068406.99981725,
+              "min": 46822638.99955824,
+              "n": 3,
+              "values": [
+                51068406.99981725,
+                52182128.00002846,
+                46822638.99955824
+              ]
+            },
+            "external_solve_seconds": {
+              "max": 0.26231539899981726,
+              "median": 0.25938309000002846,
+              "min": 0.24939867999955823,
+              "n": 3,
+              "values": [
+                0.26231539899981726,
+                0.25938309000002846,
+                0.24939867999955823
+              ]
+            },
+            "leaves": {
+              "cfr_updates": {
+                "calls": {
+                  "max": 4,
+                  "median": 4,
+                  "min": 4,
+                  "n": 3,
+                  "values": [
+                    4,
+                    4,
+                    4
+                  ]
+                },
+                "duration_ns": {
+                  "max": 105947857,
+                  "median": 104405296,
+                  "min": 103422066,
+                  "n": 3,
+                  "values": [
+                    104405296,
+                    103422066,
+                    105947857
+                  ]
+                }
+              },
+              "checkpoint": {
+                "calls": {
+                  "max": 4,
+                  "median": 4,
+                  "min": 4,
+                  "n": 3,
+                  "values": [
+                    4,
+                    4,
+                    4
+                  ]
+                },
+                "duration_ns": {
+                  "max": 51005167,
+                  "median": 47903836,
+                  "min": 47072029,
+                  "n": 3,
+                  "values": [
+                    47072029,
+                    51005167,
+                    47903836
+                  ]
+                }
+              },
+              "final_ev_br": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 652600,
+                  "median": 618540,
+                  "min": 604710,
+                  "n": 3,
+                  "values": [
+                    618540,
+                    604710,
+                    652600
+                  ]
+                }
+              },
+              "initialization": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 1702390,
+                  "median": 1573110,
+                  "min": 1503509,
+                  "n": 3,
+                  "values": [
+                    1503509,
+                    1702390,
+                    1573110
+                  ]
+                }
+              },
+              "input_preparation": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 14474630,
+                  "median": 12696790,
+                  "min": 9199590,
+                  "n": 3,
+                  "values": [
+                    14474630,
+                    12696790,
+                    9199590
+                  ]
+                }
+              },
+              "overhead": {
+                "calls": {
+                  "max": 17,
+                  "median": 17,
+                  "min": 17,
+                  "n": 3,
+                  "values": [
+                    17,
+                    17,
+                    17
+                  ]
+                },
+                "duration_ns": {
+                  "max": 26592619,
+                  "median": 21266650,
+                  "min": 20690958,
+                  "n": 3,
+                  "values": [
+                    26592619,
+                    21266650,
+                    20690958
+                  ]
+                }
+              },
+              "periodic_ev_br": {
+                "calls": {
+                  "max": 4,
+                  "median": 4,
+                  "min": 4,
+                  "n": 3,
+                  "values": [
+                    4,
+                    4,
+                    4
+                  ]
+                },
+                "duration_ns": {
+                  "max": 6896950,
+                  "median": 6442460,
+                  "min": 5339419,
+                  "n": 3,
+                  "values": [
+                    5339419,
+                    6442460,
+                    6896950
+                  ]
+                }
+              },
+              "sol_preparation": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 2140620,
+                  "median": 2010250,
+                  "min": 1826120,
+                  "n": 3,
+                  "values": [
+                    1826120,
+                    2140620,
+                    2010250
+                  ]
+                }
+              },
+              "sol_serialization_and_write": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 9397630,
+                  "median": 7909949,
+                  "min": 7687660,
+                  "n": 3,
+                  "values": [
+                    9397630,
+                    7909949,
+                    7687660
+                  ]
+                }
+              },
+              "summary_publish": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 17200,
+                  "median": 13230,
+                  "min": 10160,
+                  "n": 3,
+                  "values": [
+                    17200,
+                    10160,
+                    13230
+                  ]
+                }
+              }
+            },
+            "phase_total_ns": {
+              "max": 211246992,
+              "median": 207200962,
+              "min": 202576041,
+              "n": 3,
+              "values": [
+                211246992,
+                207200962,
+                202576041
+              ]
+            },
+            "runs": 3,
+            "validated_phase_records": 3
+          }
+        }
+      },
+      {
+        "case": "turn",
+        "versions": {
+          "baseline": {
+            "external_minus_internal_ns": {
+              "max": 87685765.99976254,
+              "median": 33919838.999771595,
+              "min": 29989978.000036716,
+              "n": 3,
+              "values": [
+                29989978.000036716,
+                33919838.999771595,
+                87685765.99976254
+              ]
+            },
+            "external_solve_seconds": {
+              "max": 2.785282391999772,
+              "median": 2.1704127049997624,
+              "min": 1.9736739820000366,
+              "n": 3,
+              "values": [
+                1.9736739820000366,
+                2.785282391999772,
+                2.1704127049997624
+              ]
+            },
+            "leaves": {
+              "cfr_updates": {
+                "calls": {
+                  "max": 4,
+                  "median": 4,
+                  "min": 4,
+                  "n": 3,
+                  "values": [
+                    4,
+                    4,
+                    4
+                  ]
+                },
+                "duration_ns": {
+                  "max": 2079667518,
+                  "median": 1589507107,
+                  "min": 1440810164,
+                  "n": 3,
+                  "values": [
+                    1440810164,
+                    2079667518,
+                    1589507107
+                  ]
+                }
+              },
+              "checkpoint": {
+                "calls": {
+                  "max": 5,
+                  "median": 5,
+                  "min": 5,
+                  "n": 3,
+                  "values": [
+                    5,
+                    5,
+                    5
+                  ]
+                },
+                "duration_ns": {
+                  "max": 370335106,
+                  "median": 273793120,
+                  "min": 251827381,
+                  "n": 3,
+                  "values": [
+                    273793120,
+                    370335106,
+                    251827381
+                  ]
+                }
+              },
+              "final_ev_br": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 42082438,
+                  "median": 32733018,
+                  "min": 29461348,
+                  "n": 3,
+                  "values": [
+                    29461348,
+                    32733018,
+                    42082438
+                  ]
+                }
+              },
+              "initialization": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 8944779,
+                  "median": 8032240,
+                  "min": 7509130,
+                  "n": 3,
+                  "values": [
+                    8944779,
+                    8032240,
+                    7509130
+                  ]
+                }
+              },
+              "input_preparation": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 15507770,
+                  "median": 9997730,
+                  "min": 8756420,
+                  "n": 3,
+                  "values": [
+                    8756420,
+                    15507770,
+                    9997730
+                  ]
+                }
+              },
+              "overhead": {
+                "calls": {
+                  "max": 18,
+                  "median": 18,
+                  "min": 18,
+                  "n": 3,
+                  "values": [
+                    18,
+                    18,
+                    18
+                  ]
+                },
+                "duration_ns": {
+                  "max": 24690118,
+                  "median": 23739258,
+                  "min": 20250421,
+                  "n": 3,
+                  "values": [
+                    20250421,
+                    23739258,
+                    24690118
+                  ]
+                }
+              },
+              "periodic_ev_br": {
+                "calls": {
+                  "max": 4,
+                  "median": 4,
+                  "min": 4,
+                  "n": 3,
+                  "values": [
+                    4,
+                    4,
+                    4
+                  ]
+                },
+                "duration_ns": {
+                  "max": 113339866,
+                  "median": 79946896,
+                  "min": 78118848,
+                  "n": 3,
+                  "values": [
+                    79946896,
+                    113339866,
+                    78118848
+                  ]
+                }
+              },
+              "sol_preparation": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 77694377,
+                  "median": 58851357,
+                  "min": 56060068,
+                  "n": 3,
+                  "values": [
+                    58851357,
+                    77694377,
+                    56060068
+                  ]
+                }
+              },
+              "sol_serialization_and_write": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 30257769,
+                  "median": 22898549,
+                  "min": 22834089,
+                  "n": 3,
+                  "values": [
+                    22834089,
+                    30257769,
+                    22898549
+                  ]
+                }
+              },
+              "summary_publish": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 55631,
+                  "median": 35570,
+                  "min": 35410,
+                  "n": 3,
+                  "values": [
+                    35410,
+                    55631,
+                    35570
+                  ]
+                }
+              }
+            },
+            "phase_total_ns": {
+              "max": 2751362553,
+              "median": 2082726939,
+              "min": 1943684004,
+              "n": 3,
+              "values": [
+                1943684004,
+                2751362553,
+                2082726939
+              ]
+            },
+            "runs": 3,
+            "validated_phase_records": 3
+          },
+          "candidate": {
+            "external_minus_internal_ns": {
+              "max": 45910779.000225306,
+              "median": 26525458.99984932,
+              "min": 24617517.999664307,
+              "n": 3,
+              "values": [
+                26525458.99984932,
+                45910779.000225306,
+                24617517.999664307
+              ]
+            },
+            "external_solve_seconds": {
+              "max": 2.213000522999664,
+              "median": 2.193780363999849,
+              "min": 1.9899055720002252,
+              "n": 3,
+              "values": [
+                2.193780363999849,
+                1.9899055720002252,
+                2.213000522999664
+              ]
+            },
+            "leaves": {
+              "cfr_updates": {
+                "calls": {
+                  "max": 4,
+                  "median": 4,
+                  "min": 4,
+                  "n": 3,
+                  "values": [
+                    4,
+                    4,
+                    4
+                  ]
+                },
+                "duration_ns": {
+                  "max": 1796179531,
+                  "median": 1729940332,
+                  "min": 1611880976,
+                  "n": 3,
+                  "values": [
+                    1729940332,
+                    1611880976,
+                    1796179531
+                  ]
+                }
+              },
+              "checkpoint": {
+                "calls": {
+                  "max": 4,
+                  "median": 4,
+                  "min": 4,
+                  "n": 3,
+                  "values": [
+                    4,
+                    4,
+                    4
+                  ]
+                },
+                "duration_ns": {
+                  "max": 174609983,
+                  "median": 170603305,
+                  "min": 126540186,
+                  "n": 3,
+                  "values": [
+                    174609983,
+                    126540186,
+                    170603305
+                  ]
+                }
+              },
+              "final_ev_br": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 8682080,
+                  "median": 8016910,
+                  "min": 6587490,
+                  "n": 3,
+                  "values": [
+                    8682080,
+                    6587490,
+                    8016910
+                  ]
+                }
+              },
+              "initialization": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 8139009,
+                  "median": 7567420,
+                  "min": 6952040,
+                  "n": 3,
+                  "values": [
+                    6952040,
+                    8139009,
+                    7567420
+                  ]
+                }
+              },
+              "input_preparation": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 13274110,
+                  "median": 10514900,
+                  "min": 8875880,
+                  "n": 3,
+                  "values": [
+                    8875880,
+                    13274110,
+                    10514900
+                  ]
+                }
+              },
+              "overhead": {
+                "calls": {
+                  "max": 17,
+                  "median": 17,
+                  "min": 17,
+                  "n": 3,
+                  "values": [
+                    17,
+                    17,
+                    17
+                  ]
+                },
+                "duration_ns": {
+                  "max": 26863028,
+                  "median": 20903038,
+                  "min": 18354148,
+                  "n": 3,
+                  "values": [
+                    26863028,
+                    18354148,
+                    20903038
+                  ]
+                }
+              },
+              "periodic_ev_br": {
+                "calls": {
+                  "max": 4,
+                  "median": 4,
+                  "min": 4,
+                  "n": 3,
+                  "values": [
+                    4,
+                    4,
+                    4
+                  ]
+                },
+                "duration_ns": {
+                  "max": 102546536,
+                  "median": 95589264,
+                  "min": 80780146,
+                  "n": 3,
+                  "values": [
+                    102546536,
+                    80780146,
+                    95589264
+                  ]
+                }
+              },
+              "sol_preparation": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 70052907,
+                  "median": 55695258,
+                  "min": 53434118,
+                  "n": 3,
+                  "values": [
+                    70052907,
+                    53434118,
+                    55695258
+                  ]
+                }
+              },
+              "sol_serialization_and_write": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 38630369,
+                  "median": 24964920,
+                  "min": 23253279,
+                  "n": 3,
+                  "values": [
+                    38630369,
+                    24964920,
+                    23253279
+                  ]
+                }
+              },
+              "summary_publish": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 101750,
+                  "median": 60100,
+                  "min": 39690,
+                  "n": 3,
+                  "values": [
+                    101750,
+                    39690,
+                    60100
+                  ]
+                }
+              }
+            },
+            "phase_total_ns": {
+              "max": 2188383005,
+              "median": 2167254905,
+              "min": 1943994793,
+              "n": 3,
+              "values": [
+                2167254905,
+                1943994793,
+                2188383005
+              ]
+            },
+            "runs": 3,
+            "validated_phase_records": 3
+          }
+        }
+      },
+      {
+        "case": "flop",
+        "versions": {
+          "baseline": {
+            "external_minus_internal_ns": {
+              "max": 70667157.00039291,
+              "median": 51261148.99985504,
+              "min": 39611618.999946594,
+              "n": 3,
+              "values": [
+                70667157.00039291,
+                39611618.999946594,
+                51261148.99985504
+              ]
+            },
+            "external_solve_seconds": {
+              "max": 11.681305958000394,
+              "median": 11.419379428999946,
+              "min": 10.617384111999854,
+              "n": 3,
+              "values": [
+                11.681305958000394,
+                11.419379428999946,
+                10.617384111999854
+              ]
+            },
+            "leaves": {
+              "cfr_updates": {
+                "calls": {
+                  "max": 5,
+                  "median": 5,
+                  "min": 5,
+                  "n": 3,
+                  "values": [
+                    5,
+                    5,
+                    5
+                  ]
+                },
+                "duration_ns": {
+                  "max": 6496101323,
+                  "median": 6105964019,
+                  "min": 5706007975,
+                  "n": 3,
+                  "values": [
+                    6496101323,
+                    6105964019,
+                    5706007975
+                  ]
+                }
+              },
+              "checkpoint": {
+                "calls": {
+                  "max": 6,
+                  "median": 6,
+                  "min": 6,
+                  "n": 3,
+                  "values": [
+                    6,
+                    6,
+                    6
+                  ]
+                },
+                "duration_ns": {
+                  "max": 2232441620,
+                  "median": 2111015057,
+                  "min": 2032506748,
+                  "n": 3,
+                  "values": [
+                    2032506748,
+                    2232441620,
+                    2111015057
+                  ]
+                }
+              },
+              "final_ev_br": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 320491688,
+                  "median": 299868548,
+                  "min": 233488511,
+                  "n": 3,
+                  "values": [
+                    233488511,
+                    320491688,
+                    299868548
+                  ]
+                }
+              },
+              "initialization": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 171094333,
+                  "median": 101238235,
+                  "min": 100183745,
+                  "n": 3,
+                  "values": [
+                    171094333,
+                    100183745,
+                    101238235
+                  ]
+                }
+              },
+              "input_preparation": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 17948100,
+                  "median": 12469269,
+                  "min": 8265860,
+                  "n": 3,
+                  "values": [
+                    17948100,
+                    12469269,
+                    8265860
+                  ]
+                }
+              },
+              "overhead": {
+                "calls": {
+                  "max": 21,
+                  "median": 21,
+                  "min": 21,
+                  "n": 3,
+                  "values": [
+                    21,
+                    21,
+                    21
+                  ]
+                },
+                "duration_ns": {
+                  "max": 93030547,
+                  "median": 87175546,
+                  "min": 81421806,
+                  "n": 3,
+                  "values": [
+                    87175546,
+                    93030547,
+                    81421806
+                  ]
+                }
+              },
+              "periodic_ev_br": {
+                "calls": {
+                  "max": 5,
+                  "median": 5,
+                  "min": 5,
+                  "n": 3,
+                  "values": [
+                    5,
+                    5,
+                    5
+                  ]
+                },
+                "duration_ns": {
+                  "max": 805932118,
+                  "median": 795323840,
+                  "min": 774550030,
+                  "n": 3,
+                  "values": [
+                    805932118,
+                    795323840,
+                    774550030
+                  ]
+                }
+              },
+              "sol_preparation": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 1473619513,
+                  "median": 1390266785,
+                  "min": 1195422423,
+                  "n": 3,
+                  "values": [
+                    1473619513,
+                    1390266785,
+                    1195422423
+                  ]
+                }
+              },
+              "sol_serialization_and_write": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 329548057,
+                  "median": 292740249,
+                  "min": 288286849,
+                  "n": 3,
+                  "values": [
+                    292740249,
+                    329548057,
+                    288286849
+                  ]
+                }
+              },
+              "summary_publish": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 48240,
+                  "median": 46180,
+                  "min": 32360,
+                  "n": 3,
+                  "values": [
+                    32360,
+                    48240,
+                    46180
+                  ]
+                }
+              }
+            },
+            "phase_total_ns": {
+              "max": 11610638801,
+              "median": 11379767810,
+              "min": 10566122963,
+              "n": 3,
+              "values": [
+                11610638801,
+                11379767810,
+                10566122963
+              ]
+            },
+            "runs": 3,
+            "validated_phase_records": 3
+          },
+          "candidate": {
+            "external_minus_internal_ns": {
+              "max": 74965236.999897,
+              "median": 42440178.99976921,
+              "min": 34724988.99992943,
+              "n": 3,
+              "values": [
+                42440178.99976921,
+                74965236.999897,
+                34724988.99992943
+              ]
+            },
+            "external_solve_seconds": {
+              "max": 10.750100986999769,
+              "median": 9.589961150999898,
+              "min": 9.444627766999929,
+              "n": 3,
+              "values": [
+                10.750100986999769,
+                9.589961150999898,
+                9.444627766999929
+              ]
+            },
+            "leaves": {
+              "cfr_updates": {
+                "calls": {
+                  "max": 5,
+                  "median": 5,
+                  "min": 5,
+                  "n": 3,
+                  "values": [
+                    5,
+                    5,
+                    5
+                  ]
+                },
+                "duration_ns": {
+                  "max": 7263435615,
+                  "median": 6345184140,
+                  "min": 6292385152,
+                  "n": 3,
+                  "values": [
+                    7263435615,
+                    6345184140,
+                    6292385152
+                  ]
+                }
+              },
+              "checkpoint": {
+                "calls": {
+                  "max": 5,
+                  "median": 5,
+                  "min": 5,
+                  "n": 3,
+                  "values": [
+                    5,
+                    5,
+                    5
+                  ]
+                },
+                "duration_ns": {
+                  "max": 702272792,
+                  "median": 601074898,
+                  "min": 595402357,
+                  "n": 3,
+                  "values": [
+                    702272792,
+                    601074898,
+                    595402357
+                  ]
+                }
+              },
+              "final_ev_br": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 71980788,
+                  "median": 59405328,
+                  "min": 58820097,
+                  "n": 3,
+                  "values": [
+                    71980788,
+                    58820097,
+                    59405328
+                  ]
+                }
+              },
+              "initialization": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 102226286,
+                  "median": 97613126,
+                  "min": 92883466,
+                  "n": 3,
+                  "values": [
+                    102226286,
+                    97613126,
+                    92883466
+                  ]
+                }
+              },
+              "input_preparation": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 10015080,
+                  "median": 9341520,
+                  "min": 9329740,
+                  "n": 3,
+                  "values": [
+                    9329740,
+                    10015080,
+                    9341520
+                  ]
+                }
+              },
+              "overhead": {
+                "calls": {
+                  "max": 20,
+                  "median": 20,
+                  "min": 20,
+                  "n": 3,
+                  "values": [
+                    20,
+                    20,
+                    20
+                  ]
+                },
+                "duration_ns": {
+                  "max": 74943475,
+                  "median": 65641026,
+                  "min": 63071445,
+                  "n": 3,
+                  "values": [
+                    65641026,
+                    63071445,
+                    74943475
+                  ]
+                }
+              },
+              "periodic_ev_br": {
+                "calls": {
+                  "max": 5,
+                  "median": 5,
+                  "min": 5,
+                  "n": 3,
+                  "values": [
+                    5,
+                    5,
+                    5
+                  ]
+                },
+                "duration_ns": {
+                  "max": 941667404,
+                  "median": 839791547,
+                  "min": 836476657,
+                  "n": 3,
+                  "values": [
+                    941667404,
+                    836476657,
+                    839791547
+                  ]
+                }
+              },
+              "sol_preparation": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 1255871060,
+                  "median": 1172931685,
+                  "min": 1157929494,
+                  "n": 3,
+                  "values": [
+                    1255871060,
+                    1157929494,
+                    1172931685
+                  ]
+                }
+              },
+              "sol_serialization_and_write": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 344772837,
+                  "median": 295200768,
+                  "min": 272782799,
+                  "n": 3,
+                  "values": [
+                    295200768,
+                    344772837,
+                    272782799
+                  ]
+                }
+              },
+              "summary_publish": {
+                "calls": {
+                  "max": 1,
+                  "median": 1,
+                  "min": 1,
+                  "n": 3,
+                  "values": [
+                    1,
+                    1,
+                    1
+                  ]
+                },
+                "duration_ns": {
+                  "max": 38140,
+                  "median": 35449,
+                  "min": 35329,
+                  "n": 3,
+                  "values": [
+                    35329,
+                    38140,
+                    35449
+                  ]
+                }
+              }
+            },
+            "phase_total_ns": {
+              "max": 10707660808,
+              "median": 9514995914,
+              "min": 9409902778,
+              "n": 3,
+              "values": [
+                10707660808,
+                9514995914,
+                9409902778
+              ]
+            },
+            "runs": 3,
+            "validated_phase_records": 3
+          }
+        }
+      }
+    ],
+    "kind": "phase_analysis",
+    "limitations": [
+      "leaf ns only; inclusive CFR envelope is not additive",
+      "total excludes final phase JSON and process startup/exit",
+      "external minus internal is a scope difference, not a measured phase",
+      "existing pipeline phase_timings nulls remain unchanged"
+    ],
+    "mode": "on",
+    "saved_profile_br": "not_evaluated",
+    "schema": "r1.phase-campaign/v1"
+  },
+  "plan": {
+    "bytes": 16912,
+    "path": "/opt/r1/phase-plan/plan.json",
+    "sha256": "c703c6f9d84100da5a6a6d969983492b43b10eccb941b4d818732c02800751b9"
+  },
+  "reports": {
+    "off": {
+      "bytes": 219429,
+      "path": "/opt/r1/phase-off/comparison.json",
+      "sha256": "9cadc4ece00a6c16ff0b118d94a7b2a28f069a85599159e6cd8eea38d5e71e6b"
+    },
+    "on": {
+      "bytes": 251961,
+      "path": "/opt/r1/phase-on/comparison.json",
+      "sha256": "4705ae4d03123549e442b73ec4333a43d3988e632d00925208fddc8668e92a15"
+    },
+    "original": {
+      "bytes": 223860,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/comparison.json",
+      "sha256": "bdaa90e2a55d967d19d002f6a747d38b84612d25c20930319430c515c1cf0c5f"
+    }
+  },
+  "saved_profile_br": "not_evaluated",
+  "schema": "r1.phase-campaign/v1"
+}

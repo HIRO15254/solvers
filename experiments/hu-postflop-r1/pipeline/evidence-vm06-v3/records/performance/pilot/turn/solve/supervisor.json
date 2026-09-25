@@ -1,0 +1,171 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T18:04:46.081946+00:00",
+  "argv": [
+    "/opt/r1/target/baseline/release/solvers",
+    "solve",
+    "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/configs/turn.toml",
+    "--out",
+    "/opt/r1/candidate-v3/runs/r1-pilot/turn/run",
+    "--sol-streets",
+    "full"
+  ],
+  "cwd": "/opt/r1/candidate-v3",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 600.0,
+    "grace_seconds": 5.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.05,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "disk_reserve_bytes": 10737418240
+  },
+  "runtime": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-7.0.0-1011-gcp-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "logical_cpus": 8
+  },
+  "outputs": {
+    "stdout": {
+      "path": "/opt/r1/candidate-v3/runs/r1-pilot/turn/solve/stdout.log",
+      "sha256": "34d125cf645f17b509953c2b32d4bd1b7dccce0bc1fc0dd05046fa0bebd3650c",
+      "bytes": 613
+    },
+    "stderr": {
+      "path": "/opt/r1/candidate-v3/runs/r1-pilot/turn/solve/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "samples": {
+      "path": "/opt/r1/candidate-v3/runs/r1-pilot/turn/solve/supervisor.samples.jsonl",
+      "sha256": "9af7ad8b53b43202346e50494fa5c12db25f61c45ed1748b350761be5a0d678e",
+      "bytes": 8613
+    }
+  },
+  "identity_before": [
+    {
+      "path": "/opt/r1/target/baseline/release/solvers",
+      "sha256": "77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8",
+      "bytes": 8813904
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e",
+      "bytes": 29831
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/configs/turn.toml",
+      "sha256": "726f664ac4417d1d5d6cee145885805fc90cdd719d9d2490fa1f6e49df7067d8",
+      "bytes": 548
+    },
+    {
+      "path": "/opt/r1/baseline-source.tar.gz",
+      "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197",
+      "bytes": 871630
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "/opt/r1/target/baseline/release/solvers",
+      "sha256": "77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8",
+      "bytes": 8813904
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e",
+      "bytes": 29831
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/configs/turn.toml",
+      "sha256": "726f664ac4417d1d5d6cee145885805fc90cdd719d9d2490fa1f6e49df7067d8",
+      "bytes": 548
+    },
+    {
+      "path": "/opt/r1/baseline-source.tar.gz",
+      "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197",
+      "bytes": 871630
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 28,
+    "max_sample_gap_seconds": 0.05976385000008122,
+    "sampled_peak_tree_resident_bytes": 51650560,
+    "root_os_peak_resident_bytes": 51220480,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "max_observed_processes": 1
+  },
+  "containment": {
+    "kind": "posix_session_process_group",
+    "limitations": [
+      "setsid/setpgid can escape this process group; use a systemd/cgroup wrapper",
+      "supervisor SIGKILL, host failure or power loss does not kill the group",
+      "resident memory is sampled /proc RSS; brief descendants may be missed",
+      "summed RSS can double-count shared pages; this is not cgroup memory.current",
+      "wait4 root peak can include reaped descendant high-water marks; it is not a simultaneous tree peak"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 67419471872,
+    "available_bytes": 66352656384
+  },
+  "resolved_argv": [
+    "/opt/r1/target/baseline/release/solvers",
+    "solve",
+    "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/configs/turn.toml",
+    "--out",
+    "/opt/r1/candidate-v3/runs/r1-pilot/turn/run",
+    "--sol-streets",
+    "full"
+  ],
+  "disk_path": "/opt/r1/candidate-v3/runs/r1-pilot/turn/solve",
+  "disk_free_before_bytes": 93620690944,
+  "started_at": "2026-09-25T18:04:46.109101+00:00",
+  "pid": 6130,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 51220480,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "elapsed_seconds": 1.5995952220000618,
+    "at": "2026-09-25T18:04:47.714288+00:00",
+    "host_available_memory_bytes": 66350006272,
+    "disk_free_bytes": 93620269056
+  },
+  "elapsed_seconds": 1.6052915499999472,
+  "ended_at": "2026-09-25T18:04:47.714442+00:00",
+  "supervisor_exit_code": 0
+}

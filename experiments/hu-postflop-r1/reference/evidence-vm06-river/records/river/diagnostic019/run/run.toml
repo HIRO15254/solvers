@@ -1,0 +1,54 @@
+schema = "solvers.postflop/v1"
+
+[game]
+board = "Qs 7h 2c 4d 9s"
+oop_range = "5c4c: 0.122045,5h4h: 0.122815,5s4s: 0.12243,6c5c: 0.10927,6d5d: 0.08379,6h5h: 0.11123,6s5s: 0.09555,7c6c: 0.184525,7d6d: 0.20207,7d7c: 0.09345,7s6s: 0.186945,7s7c: 0.10584,7s7d: 0.09975,8c7c: 0.192395,8d7d: 0.15617,8d8c: 0.1161,8h8c: 0.117,8h8d: 0.117,8s7s: 0.118335,8s8c: 0.11655,8s8d: 0.12465,8s8h: 0.1233,9c7c: 0.024584,9c8c: 0.26754,9d7d: 0.026376,9d8d: 0.34476,9d9c: 0.127218,9h8h: 0.31434,9h9c: 0.132344,9h9d: 0.12582,Tc9c: 0.3819,Td9d: 0.38927,TdTc: 0.12243,Th9h: 0.35108,ThTc: 0.131285,ThTd: 0.12474,TsTc: 0.142065,TsTd: 0.13167,TsTh: 0.14014,JcTc: 0.114245,JdTd: 0.15987,JdJc: 0.07546,JhTh: 0.093075,JhJc: 0.09408,JhJd: 0.08232,JsTs: 0.09855,JsJc: 0.09359,JsJd: 0.08281,JsJh: 0.10241,QcJc: 0.00969,QdJd: 0.00153,QhTh: 0.000449,QhJh: 0.01785,Kc6c: 0.0705,Kc7c: 0.15477,Kc8c: 0.036936,Kc9c: 0.271875,KcTc: 0.12804,KcJc: 0.252,KcQc: 0.199,Kd6d: 0.070594,Kd7d: 0.14861,Kd8d: 0.054432,Kd9d: 0.353075,KdTd: 0.137445,KdJd: 0.463,KdQd: 0.152,Kh6h: 0.08413,Kh8h: 0.053676,Kh9h: 0.34365,KhTh: 0.160875,KhJh: 0.338,KhQh: 0.183,Ks6s: 0.08507,Ks7s: 0.20328,Ks8s: 0.066528,KsTs: 0.1617,KsJs: 0.364,Ac4c: 0.138624,Ac6c: 0.21648,Ac7c: 0.034928,Ac8c: 0.3476,AcTc: 0.9074251,AcJc: 0.853,AcJd: 0.105294,AcJh: 0.079788,AcJs: 0.080442,AcQc: 0.104715,AcQd: 0.13199,AcQh: 0.12931,Ad6d: 0.21582,Ad7d: 0.050622,Ad8d: 0.3884,AdTd: 0.8991001,AdJc: 0.04251,AdJd: 0.9390001,AdJh: 0.039458,AdJs: 0.037932,AdQc: 0.13869,AdQd: 0.125775,AdQh: 0.14539,AdAc: 0.086,Ah4h: 0.128896,Ah6h: 0.21604,Ah8h: 0.356,AhTh: 0.90465,AhJc: 0.070087,AhJd: 0.097664,AhJh: 0.724,AhJs: 0.062893,AhQc: 0.14606,AhQd: 0.15276,AhQh: 0.132795,AhAc: 0.1336,AhAd: 0.1072,As4s: 0.148808,As6s: 0.21604,As7s: 0.052038,As8s: 0.3752,AsTs: 0.9111251,AsJc: 0.078153,AsJd: 0.097882,AsJh: 0.076191,AsJs: 0.751,AsQc: 0.15075,AsQd: 0.15611,AsQh: 0.15678,AsAc: 0.1328,AsAd: 0.0996,AsAh: 0.2124"
+ip_range = "5d5c: 0.0016442,5h5c: 0.0010534,5h5d: 0.0016293,5s5c: 0.0010127,5s5d: 0.0015712,5s5h: 0.0010033,6d6c: 0.000794,6h6c: 0.0067511,6h6d: 0.0051531,6s6c: 0.0028158,6s6d: 0.0010401,6s6h: 0.0071933,8d8c: 0.0025736,8h8c: 0.0029225,8h8d: 0.0025572,8s8c: 0.0063258,8s8d: 0.0044559,8s8h: 0.003527,9d9c: 0.0000173,9h9c: 0.0004617,TsTc: 0.0002574,TsTh: 0.0019152,JdJc: 0.0033466,JhJc: 0.0060768,JhJd: 0.003564,JsJc: 0.0084269,JsJd: 0.005928,JsJh: 0.0080813,Qc8c: 0.0021017,Qc9c: 0.0000399,Qd8d: 0.0000903,QdQc: 0.0168075,Qh8h: 0.0000113,Qh9h: 0.0001275,QhQc: 0.0159534,QhQd: 0.0194789,Kc5c: 0.0000686,Kc7c: 0.0000239,KcTd: 0.0003239,KcTh: 0.0004937,KcTs: 0.0012587,KcJd: 0.0001595,KcJh: 0.000257,KcJs: 0.0003715,Kd7d: 0.0000702,KdTc: 0.0010104,KdTh: 0.0015649,KdTs: 0.0030162,KdJc: 0.0008794,KdJh: 0.0008166,KdJs: 0.0014994,Kh5h: 0.0000406,KhTc: 0.0005472,KhTd: 0.0007162,KhTs: 0.0017642,KhJc: 0.0001367,KhJd: 0.0004998,KhJs: 0.0001546,KhKc: 0.0004139,Ks5s: 0.0000126,Ks7s: 0.0001466,KsTc: 0.0002482,KsTd: 0.0002472,KsTh: 0.0003494,KsJc: 0.0000532,KsJd: 0.000252,KsJh: 0.0000614,KsKc: 0.0008544,KsKh: 0.0001602,Ac6c: 0.000036,AcTd: 0.0008687,AcTh: 0.0022968,AcTs: 0.0032981,AcJd: 0.0054025,AcJh: 0.0020592,AcJs: 0.0013608,AcKc: 0.040188,AcKd: 0.0002971,AcKh: 0.000303,AcKs: 0.0001166,Ad2d: 0.0183559,AdTc: 0.002745,AdTh: 0.0029878,AdTs: 0.003564,AdJc: 0.003946,AdJh: 0.0035802,AdJs: 0.0032994,AdKc: 0.000104,AdKd: 0.02177,AdKh: 0.0014728,AdKs: 0.000583,Ah2h: 0.020597,Ah6h: 0.0000104,AhTc: 0.0028235,AhTd: 0.0016038,AhTs: 0.0030983,AhJc: 0.0023902,AhJd: 0.003659,AhJs: 0.0020196,AhKc: 0.0000825,AhKd: 0.0007608,AhKh: 0.03783,AhKs: 0.0001283,As2s: 0.0184675,AsTc: 0.0029923,AsTd: 0.0015188,AsTh: 0.0031257,AsJc: 0.0022444,AsJd: 0.003843,AsJh: 0.0024354,AsKc: 0.0000586,AsKd: 0.0001614,AsKh: 0.0001002,AsKs: 0.053742,AsAc: 0.0000393"
+pot = 4050
+effective_stack = 5500
+min_bet = 100
+iso_merging = false
+preflop_aggressor = "ip"
+
+[game.tree]
+kind = "script"
+script = '''
+river {
+  replace bet [1350c, a]
+  when aggressions == 1 { replace raise [3700c, a] }
+  when aggressions == 2 { replace raise [a] }
+}
+'''
+include_allin = false
+
+[game.tree.max_aggressive_actions]
+flop = 0
+turn = 0
+river = 3
+
+[game.tree.params]
+
+[rake]
+kind = "percent-cap"
+rate = 0.05
+cap = 60.0
+no_flop_no_drop = false
+
+[utility]
+kind = "chip-ev"
+
+[algorithm]
+schedule = "dcfr"
+alpha = 1.5
+beta = 0.0
+gamma = 3.0
+pow4_reset = true
+
+[run]
+iterations = 10000
+max_time = "30s"
+check_every = 100
+storage = "f32"
+target_nash_conv = 0.1
+threads = 1
+par_chance_depth = 0

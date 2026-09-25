@@ -1,0 +1,65 @@
+{
+  "schema": "solvers.research.hu-saved-profile-audit/v1",
+  "artifact": {
+    "path": "/opt/r1/candidate-v3/runs/r1-paired-current/turn-3-baseline/run/solution.sol",
+    "blake3": "6cc60a7ab7d9ea0a3fbf2ad8c7fb95e53407471c9f58b05f7bebea9ff37e2c6d",
+    "bytes": 21335,
+    "config_blake3": "6092004a96a42674f88226ca5f6095680033a3b84c80fe742431b7aad68e1ed4",
+    "format_version": 1,
+    "mode": "full",
+    "iterations": 100,
+    "source_storage": "f32",
+    "stored_nodes": 580,
+    "node_count": 1305
+  },
+  "threads": 8,
+  "par_chance_depth": 2,
+  "par_min_children": 12,
+  "pot_chips": 20,
+  "effective_stack_chips": 60,
+  "rake": {
+    "kind": "none"
+  },
+  "utility": {
+    "kind": "chip-ev"
+  },
+  "zero_sum_terminal_utility": true,
+  "value_basis": "subgame_start_utility",
+  "ev_offset": [
+    10.0,
+    10.0
+  ],
+  "pre_save_metadata": {
+    "iterations": 100,
+    "expl": [
+      0.014560711236647705,
+      0.014267273891119814
+    ],
+    "ev": [
+      18.791926466388468,
+      1.208072568163459
+    ],
+    "nash_conv": 0.02882798512776752,
+    "storage": "f32",
+    "wall_secs": 1.8899699129999998
+  },
+  "recomputed": {
+    "profile": "stored_quantized",
+    "ev": [
+      18.791926937338747,
+      1.2080722855932926
+    ],
+    "br": [
+      18.80648516431267,
+      1.2223522986894775
+    ],
+    "gains": [
+      0.014558226973921506,
+      0.014280013096184874
+    ],
+    "nash_conv": 0.02883824007010638
+  },
+  "input_hash_secs": 0.0002278,
+  "load_secs": 0.057554116,
+  "eval_secs": 0.025277389
+}

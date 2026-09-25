@@ -1,0 +1,26 @@
+{
+  "compiler_binaries": [
+    {
+      "bytes": 646344,
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+    },
+    {
+      "bytes": 42844376,
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+    }
+  ],
+  "copied_directories": [
+    "/opt/r1/target/current/release/deps",
+    "/opt/r1/target/current/release/build",
+    "/opt/r1/target/current/release/.fingerprint"
+  ],
+  "copy_mode": "reflink_auto_no_hardlinks",
+  "destination": "/opt/r1/target/baseline-audit/release",
+  "from_current_source_archive": {
+    "bytes": 1213908,
+    "path": "/opt/r1/audit-source.tar.gz",
+    "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+  }
+}

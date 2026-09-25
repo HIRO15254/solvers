@@ -1,0 +1,454 @@
+{
+  "case_id": "HU-R0-017",
+  "captured_utc_date": "2026-09-25",
+  "capture_time_precision": "date; exact browser acquisition interval not recorded here",
+  "reference": "GTO Wizard existing solved library; user-accessible UI and Copy range controls",
+  "url": "https://app.gtowizard.com/solutions?soltab=strategy&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zSimple&depth=75&gmfft_sort_key=0&gmfft_sort_order=desc&gmff_favorite=false&stratab=strategy_ev&history_spot=11&preflop_actions=F-F-F-R2.5-F-R10-C&board=KhKc5s2d3s&flop_actions=X-X&turn_actions=X-X",
+  "url_provenance": "HU-R0-017 source_url from docs/plans/hu-postflop-r0/cases.csv, retained verbatim; this agent received the browser observations from the collecting root agent",
+  "visible_solution": "Cash 6max 75bb Simple NL500 GTO/GTO",
+  "table_players": "6max",
+  "subgame_players": 2,
+  "street": "river",
+  "board": ["Kh", "Kc", "5s", "2d", "3s"],
+  "seats": {"oop": "BB", "ip": "BTN"},
+  "root_actor": "BB",
+  "pot_bb": 20.5,
+  "stacks_behind_bb": [65, 65],
+  "preflop_actions": "F-F-F-R2.5-F-R10-C",
+  "preflop": "UTG fold; HJ fold; CO fold; BTN raise to 2.5; SB fold; BB raise to 10; BTN call",
+  "flop_actions": "X-X",
+  "flop": "Kh Kc 5s; check/check",
+  "turn_actions": "X-X",
+  "turn": "2d; check/check",
+  "river": "3s; root before BB acts",
+  "root_ranges": {
+    "oop": "oop-range.txt",
+    "ip": "ip-range.txt",
+    "weights": "copy-control text, unrenormalized; file adds one final LF",
+    "reported_copy_raw_characters": {"oop": 5492, "ip": 3584},
+    "reported_copy_raw_fnv1a32": {"oop": "a57cfbc7", "ip": "f8ea9c1a"},
+    "transfer_verification": "Collecting root agent matched character counts and FNV-1a 32-bit between CUA clipboard variables and saved raw text; final LF is excluded from those transfer checks."
+  },
+  "observed_menus": [
+    {
+      "history": "",
+      "actor": "BB",
+      "street": "river",
+      "actions": ["check", "bet 7", "bet 20.5", "allin 65"]
+    },
+    {
+      "history": "check",
+      "actor": "BTN",
+      "street": "river",
+      "actions": ["check", "bet 7", "bet 20.5", "allin 65"]
+    },
+    {
+      "history": "bet 7",
+      "actor": "BTN",
+      "street": "river",
+      "actions": ["fold", "call", "raise 19", "raise 26", "allin 65"]
+    },
+    {
+      "history": "bet 7/raise 19",
+      "actor": "BB",
+      "street": "river",
+      "actions": ["fold", "call", "raise 39.5", "allin 65"],
+      "observed_utc_minute_precision": "2026-09-25T17:26Z",
+      "incoming_action_displayed_frequency_percent": 0,
+      "incoming_action": "BTN raise 19",
+      "strategy_observation": "Menu only; the displayed zero frequency is not a replacement for a stored branch profile."
+    },
+    {
+      "history": "bet 7/raise 19/raise 39.5",
+      "actor": "BTN",
+      "street": "river",
+      "actions": ["fold", "call", "allin 65"],
+      "observed_utc_minute_precision": "2026-09-25T17:26Z",
+      "incoming_action_displayed_frequency_percent": 0,
+      "incoming_action": "BB raise 39.5",
+      "strategy_observation": "Menu only; the displayed zero frequency is not a replacement for a stored branch profile."
+    },
+    {
+      "history": "bet 7/raise 19/raise 39.5/allin 65",
+      "actor": "BB",
+      "street": "river",
+      "actions": ["fold", "call"],
+      "observed_utc_minute_precision": "2026-09-25T17:26Z",
+      "strategy_status": "unavailable",
+      "ev_status": "unavailable",
+      "ui_note": "no solution for this spot; no meaningful range shown",
+      "strategy_observation": "Menu visible, strategy and EV unavailable. Do not fill the missing profile from a zero-frequency ancestor or a uniform fallback."
+    },
+    {
+      "history": "bet 7/raise 26",
+      "actor": "BB",
+      "street": "river",
+      "actions": ["fold", "call", "allin 65"],
+      "allin_ui_percent_label": 54,
+      "incoming_action": "BTN raise 26",
+      "incoming_action_displayed_frequency_percent": 19.5,
+      "verified_live_url_fields": {"history_spot": "13", "river_actions": "R7-R26"},
+      "strategy_status": "unavailable",
+      "ev_status": "unavailable",
+      "ui_note": "There is no solution for this spot; no meaningful range shown, including after reload.",
+      "strategy_observation": "The parent displays BTN raise 26 frequency 19.5%, while this child provides only its menu. The relationship is unresolved; do not infer zero reach or fill a missing strategy/EV."
+    },
+    {
+      "history": "bet 20.5",
+      "actor": "BTN",
+      "street": "river",
+      "actions": ["fold", "call", "raise 42", "allin 65"],
+      "action_ui_percent_labels": {"raise 42": 35, "allin 65": 72},
+      "observed_utc_interval_minute_precision": ["2026-09-25T17:31Z", "2026-09-25T17:37Z"],
+      "strategy_observation": "Menu only; no branch strategy/EV stored."
+    },
+    {
+      "history": "bet 20.5/raise 42",
+      "actor": "BB",
+      "street": "river",
+      "actions": ["fold", "call", "allin 65"],
+      "action_ui_percent_labels": {"allin 65": 22},
+      "observed_utc_interval_minute_precision": ["2026-09-25T17:31Z", "2026-09-25T17:37Z"],
+      "strategy_observation": "Menu only; no branch strategy/EV stored."
+    },
+    {
+      "history": "bet 20.5/raise 42/allin 65",
+      "actor": "BTN",
+      "street": "river",
+      "actions": ["fold", "call"],
+      "observed_utc_interval_minute_precision": ["2026-09-25T17:31Z", "2026-09-25T17:37Z"],
+      "strategy_observation": "Menu only; no branch strategy/EV stored."
+    },
+    {
+      "history": "allin 65",
+      "actor": "BTN",
+      "street": "river",
+      "actions": ["fold", "call"],
+      "observed_utc_interval_minute_precision": ["2026-09-25T17:52Z", "2026-09-25T17:55Z"],
+      "observation_surface": "top menu after direct root all-in navigation",
+      "ui_note": "A duplicate Call label appeared below the top menu; only the top menu was retained.",
+      "strategy_observation": "No frequencies or EV adopted from this view."
+    },
+    {
+      "history": "check/bet 7",
+      "actor": "BB",
+      "street": "river",
+      "actions": ["fold", "call", "raise 19", "raise 26", "allin 65"],
+      "observed_utc_interval_minute_precision": ["2026-09-25T17:52Z", "2026-09-25T17:55Z"],
+      "observation_surface": "screenshot",
+      "strategy_observation": "Menu observed; loaded strategy statistics have not been read."
+    },
+    {
+      "history": "check/bet 7/raise 19",
+      "actor": "BTN",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call",
+        "raise 39.5",
+        "allin 65"
+      ],
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:54Z",
+        "2026-09-25T17:57Z"
+      ],
+      "observation_surface": "Screenshot top menu matched against the live URL and updated tree.",
+      "strategy_observation": "Menu only. Aborting overlay appeared during transitions and statistics could retain the previous node; no frequencies or EV adopted from this view."
+    },
+    {
+      "history": "check/bet 7/raise 19/raise 39.5",
+      "actor": "BB",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call",
+        "allin 65"
+      ],
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:54Z",
+        "2026-09-25T17:57Z"
+      ],
+      "observation_surface": "Screenshot top menu matched against the live URL and updated tree.",
+      "strategy_observation": "Menu only. Aborting overlay appeared during transitions and statistics could retain the previous node; no frequencies or EV adopted from this view."
+    },
+    {
+      "history": "check/bet 7/raise 19/raise 39.5/allin 65",
+      "actor": "BTN",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:54Z",
+        "2026-09-25T17:57Z"
+      ],
+      "observation_surface": "Screenshot top menu matched against the live URL and updated tree.",
+      "strategy_observation": "Menu only. Aborting overlay appeared during transitions and statistics could retain the previous node; no frequencies or EV adopted from this view."
+    },
+    {
+      "history": "check/bet 7/raise 19/allin 65",
+      "actor": "BB",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:54Z",
+        "2026-09-25T17:57Z"
+      ],
+      "observation_surface": "Screenshot top menu matched against the live URL and updated tree.",
+      "strategy_observation": "Menu only. Aborting overlay appeared during transitions and statistics could retain the previous node; no frequencies or EV adopted from this view."
+    },
+    {
+      "history": "check/bet 7/raise 26",
+      "actor": "BTN",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call",
+        "allin 65"
+      ],
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:54Z",
+        "2026-09-25T17:57Z"
+      ],
+      "observation_surface": "Screenshot top menu matched against the live URL and updated tree.",
+      "strategy_observation": "Menu only. Aborting overlay appeared during transitions and statistics could retain the previous node; no frequencies or EV adopted from this view."
+    },
+    {
+      "history": "check/bet 7/raise 26/allin 65",
+      "actor": "BB",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:54Z",
+        "2026-09-25T17:57Z"
+      ],
+      "observation_surface": "Screenshot top menu matched against the live URL and updated tree.",
+      "strategy_observation": "Menu only. Aborting overlay appeared during transitions and statistics could retain the previous node; no frequencies or EV adopted from this view."
+    },
+    {
+      "history": "check/bet 7/allin 65",
+      "actor": "BTN",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:54Z",
+        "2026-09-25T17:57Z"
+      ],
+      "observation_surface": "Screenshot top menu matched against the live URL and updated tree.",
+      "strategy_observation": "Menu only. Aborting overlay appeared during transitions and statistics could retain the previous node; no frequencies or EV adopted from this view."
+    },
+    {
+      "history": "check/bet 20.5",
+      "actor": "BB",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call",
+        "raise 42",
+        "allin 65"
+      ],
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:54Z",
+        "2026-09-25T17:57Z"
+      ],
+      "observation_surface": "Screenshot top menu matched against the live URL and updated tree.",
+      "strategy_observation": "Menu only. Aborting overlay appeared during transitions and statistics could retain the previous node; no frequencies or EV adopted from this view."
+    },
+    {
+      "history": "check/bet 20.5/raise 42",
+      "actor": "BTN",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call",
+        "allin 65"
+      ],
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:54Z",
+        "2026-09-25T17:57Z"
+      ],
+      "observation_surface": "Screenshot top menu matched against the live URL and updated tree.",
+      "strategy_observation": "Menu only. Aborting overlay appeared during transitions and statistics could retain the previous node; no frequencies or EV adopted from this view."
+    },
+    {
+      "history": "check/bet 20.5/raise 42/allin 65",
+      "actor": "BB",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:54Z",
+        "2026-09-25T17:57Z"
+      ],
+      "observation_surface": "Screenshot top menu matched against the live URL and updated tree.",
+      "strategy_observation": "Menu only. Aborting overlay appeared during transitions and statistics could retain the previous node; no frequencies or EV adopted from this view."
+    },
+    {
+      "history": "check/bet 20.5/allin 65",
+      "actor": "BTN",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:54Z",
+        "2026-09-25T17:57Z"
+      ],
+      "observation_surface": "Screenshot top menu matched against the live URL and updated tree.",
+      "strategy_observation": "Menu only. Aborting overlay appeared during transitions and statistics could retain the previous node; no frequencies or EV adopted from this view."
+    },
+    {
+      "history": "check/allin 65",
+      "actor": "BB",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:54Z",
+        "2026-09-25T17:57Z"
+      ],
+      "observation_surface": "Screenshot top menu matched against the live URL and updated tree.",
+      "strategy_observation": "Menu only. Aborting overlay appeared during transitions and statistics could retain the previous node; no frequencies or EV adopted from this view."
+    },
+    {
+      "history": "bet 20.5/allin 65",
+      "actor": "BB",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "call_remaining_bb": 44.5,
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:58Z",
+        "2026-09-25T18:00Z"
+      ],
+      "observation_surface": "Top menu matched against the live URL.",
+      "strategy_observation": "Menu only; loading statistics not adopted."
+    },
+    {
+      "history": "bet 7/allin 65",
+      "actor": "BB",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "call_remaining_bb": 58,
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:58Z",
+        "2026-09-25T18:00Z"
+      ],
+      "observation_surface": "Top menu matched against the live URL.",
+      "strategy_observation": "Menu only; loading statistics not adopted."
+    },
+    {
+      "history": "bet 7/raise 26/allin 65",
+      "actor": "BTN",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "call_remaining_bb": 39,
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:58Z",
+        "2026-09-25T18:00Z"
+      ],
+      "observation_surface": "Top menu matched against the live URL.",
+      "strategy_observation": "Menu only; loading statistics not adopted."
+    },
+    {
+      "history": "bet 7/raise 19/allin 65",
+      "actor": "BTN",
+      "street": "river",
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "call_remaining_bb": 46,
+      "observed_utc_interval_minute_precision": [
+        "2026-09-25T17:58Z",
+        "2026-09-25T18:00Z"
+      ],
+      "observation_surface": "Top menu matched against the live URL.",
+      "strategy_observation": "Menu only; loading statistics not adopted."
+    }
+  ],
+  "tree_observation": "All 28 decision menus were observed individually and their action graph is closed. This certifies only the recorded menu topology; no complete per-hand strategy/EV profile or identical reference-game semantics is claimed. Raise UI amounts are interpreted as street cumulative raise-to targets only for the diagnostic fixture; exact reference lowering/settlement semantics remain unverified. Displayed frequencies and missing branch strategies are preserved without imputation. Root ranges were copied before navigating these branches.",
+  "unobserved_menu_frontier": {
+    "basis": "Aggressive actions in already observed menus whose child menu is not yet stored. This is an acquisition checklist, not inferred child actions or a claim that no further descendants exist.",
+    "histories": []
+  },
+  "root_ui": {
+    "view": "Ranges",
+    "oop_ev_bb": 7.68,
+    "ip_ev_bb": 12.22,
+    "oop_equity_percent": 38.5,
+    "ip_equity_percent": 61.5,
+    "oop_combos_rounded": 30.5,
+    "ip_combos_rounded": 53.4,
+    "oop_frequency_percent": {
+      "check": 71.2,
+      "bet_7": 14.4,
+      "bet_20_5": 5.5,
+      "allin_65": 8.8
+    },
+    "frequency_sum_note": "Displayed frequencies sum to 99.9%; retain each displayed value without renormalizing."
+  },
+  "auxiliary_node_ui": [
+    {
+      "history": "check",
+      "actor": "BTN",
+      "observed_utc_interval_minute_precision": ["2026-09-25T17:52Z", "2026-09-25T17:55Z"],
+      "frequency_percent": {"check": 62.8, "bet_7": 3.7, "bet_20_5": 33.5, "allin_65": 0},
+      "oop_ev_bb": 4.89,
+      "ip_ev_bb": 15.01,
+      "scope": "Raw auxiliary displayed values after BB checks. These are not River-root values and are not used for quality or condition acceptance. Exact EV basis remains unverified."
+    }
+  ],
+  "display_steps": {
+    "ev_bb": 0.01,
+    "frequency_percentage_points": 0.1,
+    "equity_percentage_points": 0.1,
+    "weighted_combos": 0.1
+  },
+  "rake_catalog_only": {
+    "source": "docs/plans/hu-postflop-r0/cases.csv HU-R0-017",
+    "catalog_checked_at": "2026-09-25T06:12:34.827Z",
+    "rake_percent": 5,
+    "rake_cap_bb": 0.6,
+    "reconfirmed_in_this_capture": false,
+    "note": "R0 catalog information only; current solution collection conditions and version are unverified"
+  },
+  "reference_exploitability": null,
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "comparison_threshold": null,
+  "missing_fields": [
+    "precise action-size lowering semantics and complete public-tree identity",
+    "current solution rake preset reconfirmation",
+    "rake collection on folds, uncalled contribution handling and rounding",
+    "reference solver version and internal precision",
+    "reference accuracy metric value and stopping conditions for this solution",
+    "full per-hand/action reference profile and action EVs",
+    "exact EV basis and display rounding rule"
+  ],
+  "capture_scope": "HU-R0-017 root ranges and 28 closed decision menus only. Reference conditions/precision and full strategy/EV remain incomplete; no solver comparison or reference acceptance is claimed."
+}

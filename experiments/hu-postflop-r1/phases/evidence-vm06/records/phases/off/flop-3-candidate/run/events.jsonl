@@ -1,0 +1,7 @@
+{"seq":0,"unixMs":1790360646114,"level":"info","kind":"state","state":"running"}
+{"seq":1,"unixMs":1790360648139,"level":"info","kind":"checkpoint","sweeps":10}
+{"seq":2,"unixMs":1790360649649,"level":"info","kind":"checkpoint","sweeps":20}
+{"seq":3,"unixMs":1790360651246,"level":"info","kind":"checkpoint","sweeps":30}
+{"seq":4,"unixMs":1790360652798,"level":"info","kind":"checkpoint","sweeps":40}
+{"seq":5,"unixMs":1790360654394,"level":"info","kind":"checkpoint","sweeps":50}
+{"seq":6,"unixMs":1790360655943,"level":"info","kind":"state","state":"completed"}

@@ -1,0 +1,2880 @@
+{
+  "boot_source_policy": "all observations retain their record/pointer; never attribute old validation or native binaries to another boot/source",
+  "distinct_boot_ids": [
+    "159efb96-10fb-4ce4-bb0f-bc2b27ee618f"
+  ],
+  "multiple_boots_observed": false,
+  "problems": [
+    {
+      "count": 6,
+      "reason": "required_linked_evidence_missing"
+    }
+  ],
+  "provenance_observations": [
+    {
+      "kind": "boot_id",
+      "pointer": "/boot_id",
+      "record": "records/performance/build/identity-after.json",
+      "value": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f"
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/compiler_binaries/0",
+      "record": "records/performance/build/identity-after.json",
+      "value": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/compiler_binaries/1",
+      "record": "records/performance/build/identity-after.json",
+      "value": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/sources/baseline",
+      "record": "records/performance/build/identity-after.json",
+      "value": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/sources/candidate-v3",
+      "record": "records/performance/build/identity-after.json",
+      "value": {
+        "bytes": 1195310,
+        "path": "/opt/r1/candidate-v3-source.tar.gz",
+        "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970"
+      }
+    },
+    {
+      "kind": "boot_id",
+      "pointer": "/boot_id",
+      "record": "records/performance/build/identity-before.json",
+      "value": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f"
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/compiler_binaries/0",
+      "record": "records/performance/build/identity-before.json",
+      "value": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/compiler_binaries/1",
+      "record": "records/performance/build/identity-before.json",
+      "value": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/sources/baseline",
+      "record": "records/performance/build/identity-before.json",
+      "value": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/sources/candidate-v3",
+      "record": "records/performance/build/identity-before.json",
+      "value": {
+        "bytes": 1195310,
+        "path": "/opt/r1/candidate-v3-source.tar.gz",
+        "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970"
+      }
+    },
+    {
+      "kind": "boot_id",
+      "pointer": "/host/boot_id",
+      "record": "records/performance/campaign/comparison.json",
+      "value": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f"
+    },
+    {
+      "kind": "hostname",
+      "pointer": "/host/hostname",
+      "record": "records/performance/campaign/comparison.json",
+      "value": "solvers-r1-20260925-06"
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/baseline/binary",
+      "record": "records/performance/pilot/pilot.json",
+      "value": {
+        "bytes": 8813904,
+        "path": "/opt/r1/target/baseline/release/solvers",
+        "sha256": "77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/baseline/source_evidence",
+      "record": "records/performance/pilot/pilot.json",
+      "value": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      }
+    },
+    {
+      "kind": "boot_id",
+      "pointer": "/host/boot_id",
+      "record": "records/performance/pilot/pilot.json",
+      "value": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f"
+    },
+    {
+      "kind": "hostname",
+      "pointer": "/host/hostname",
+      "record": "records/performance/pilot/pilot.json",
+      "value": "solvers-r1-20260925-06"
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/baseline/binary",
+      "record": "records/performance/pipeline/frozen/vm06-v3/plan.json",
+      "value": {
+        "bytes": 8813904,
+        "path": "/opt/r1/target/baseline/release/solvers",
+        "sha256": "77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/baseline/source_evidence",
+      "record": "records/performance/pipeline/frozen/vm06-v3/plan.json",
+      "value": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/candidate/binary",
+      "record": "records/performance/pipeline/frozen/vm06-v3/plan.json",
+      "value": {
+        "bytes": 8868960,
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/candidate/source_evidence",
+      "record": "records/performance/pipeline/frozen/vm06-v3/plan.json",
+      "value": {
+        "bytes": 1195310,
+        "path": "/opt/r1/candidate-v3-source.tar.gz",
+        "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970"
+      }
+    },
+    {
+      "kind": "boot_id",
+      "pointer": "/host/boot_id",
+      "record": "records/performance/pipeline/frozen/vm06-v3/plan.json",
+      "value": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f"
+    },
+    {
+      "kind": "hostname",
+      "pointer": "/host/hostname",
+      "record": "records/performance/pipeline/frozen/vm06-v3/plan.json",
+      "value": "solvers-r1-20260925-06"
+    }
+  ],
+  "quality_acceptance": "not_evaluated_by_retainer",
+  "ready": false,
+  "reports": [
+    {
+      "all_18_unique_original_cases": true,
+      "phase_modes": [],
+      "record": "records/performance/campaign/comparison.json",
+      "runs": 18,
+      "scope": "performance",
+      "state": "completed"
+    }
+  ],
+  "required_scopes": [
+    "performance"
+  ],
+  "unresolved_references": [
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/compiler_binaries/0",
+      "record": "records/performance/build/identity-after.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/compiler_binaries/1",
+      "record": "records/performance/build/identity-after.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 861,
+        "path": "/opt/r1/audit-pair-recovery/complete.json",
+        "sha256": "ec99381d612c1b3dc44936c26470ca6bc9bf493e5bafbf0087e7288010cb2d13"
+      },
+      "pointer": "/inputs/1",
+      "record": "records/performance/build/identity-after.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 23430,
+        "path": "/opt/r1/audit-pair-recovery/result.json",
+        "sha256": "3fad2ecac424d18b67c12c4febe6a9928c4ee4bf647c485fa9fbfc789179c05a"
+      },
+      "pointer": "/inputs/2",
+      "record": "records/performance/build/identity-after.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 4249752,
+        "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+        "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932"
+      },
+      "pointer": "/inputs/3",
+      "record": "records/performance/build/identity-after.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/inputs/4",
+      "record": "records/performance/build/identity-after.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/inputs/5",
+      "record": "records/performance/build/identity-after.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/compiler_binaries/0",
+      "record": "records/performance/build/identity-before.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/compiler_binaries/1",
+      "record": "records/performance/build/identity-before.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 861,
+        "path": "/opt/r1/audit-pair-recovery/complete.json",
+        "sha256": "ec99381d612c1b3dc44936c26470ca6bc9bf493e5bafbf0087e7288010cb2d13"
+      },
+      "pointer": "/inputs/1",
+      "record": "records/performance/build/identity-before.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 23430,
+        "path": "/opt/r1/audit-pair-recovery/result.json",
+        "sha256": "3fad2ecac424d18b67c12c4febe6a9928c4ee4bf647c485fa9fbfc789179c05a"
+      },
+      "pointer": "/inputs/2",
+      "record": "records/performance/build/identity-before.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 4249752,
+        "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+        "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932"
+      },
+      "pointer": "/inputs/3",
+      "record": "records/performance/build/identity-before.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/inputs/4",
+      "record": "records/performance/build/identity-before.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/inputs/5",
+      "record": "records/performance/build/identity-before.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-baseline/restore/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-baseline/restore/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-baseline/restore/resume/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-baseline/restore/resume/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-baseline/restore/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-baseline/restore/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-baseline/restore/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-baseline/restore/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-baseline/restore/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-baseline/restore/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-candidate/restore/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-candidate/restore/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-candidate/restore/resume/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-candidate/restore/resume/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-candidate/restore/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-candidate/restore/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-candidate/restore/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-candidate/restore/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-candidate/restore/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-candidate/restore/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-1-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-1-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-2-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-2-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-2-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-2-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-2-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-2-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-2-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-2-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-2-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-2-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-2-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-2-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-2-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-2-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-2-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-2-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-2-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-2-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-2-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-2-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-3-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-3-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-3-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-3-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-3-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-3-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-3-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-3-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-3-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-3-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-3-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-3-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-3-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-3-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-3-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-3-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-3-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-3-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/flop-3-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/flop-3-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-baseline/restore/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-baseline/restore/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-baseline/restore/resume/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-baseline/restore/resume/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-baseline/restore/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-baseline/restore/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-baseline/restore/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-baseline/restore/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-baseline/restore/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-baseline/restore/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-candidate/restore/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-candidate/restore/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-candidate/restore/resume/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-candidate/restore/resume/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-candidate/restore/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-candidate/restore/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-candidate/restore/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-candidate/restore/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-candidate/restore/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-candidate/restore/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-1-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-1-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-2-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-2-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-2-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-2-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-2-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-2-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-2-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-2-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-2-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-2-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-2-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-2-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-2-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-2-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-2-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-2-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-2-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-2-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-2-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-2-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-3-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-3-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-3-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-3-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-3-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-3-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-3-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-3-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-3-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-3-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-3-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-3-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-3-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-3-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-3-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-3-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-3-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-3-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/river-3-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/river-3-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-baseline/restore/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-baseline/restore/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-baseline/restore/resume/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-baseline/restore/resume/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-baseline/restore/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-baseline/restore/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-baseline/restore/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-baseline/restore/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-baseline/restore/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-baseline/restore/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-candidate/restore/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-candidate/restore/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-candidate/restore/resume/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-candidate/restore/resume/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-candidate/restore/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-candidate/restore/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-candidate/restore/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-candidate/restore/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-candidate/restore/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-candidate/restore/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-1-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-1-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-2-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-2-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-2-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-2-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-2-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-2-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-2-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-2-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-2-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-2-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-2-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-2-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-2-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-2-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-2-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-2-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-2-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-2-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-2-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-2-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-3-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-3-baseline/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-3-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-3-baseline/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-3-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-3-baseline/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-3-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-3-baseline/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-3-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-3-baseline/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-3-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-3-candidate/ev/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-3-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-3-candidate/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-3-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-3-candidate/strategy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-3-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-3-candidate/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/campaign/turn-3-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/campaign/turn-3-candidate/tree/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/pilot/flop/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/pilot/flop/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/pilot/flop/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/pilot/flop/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/pilot/river/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/pilot/river/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/pilot/river/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/pilot/river/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/pilot/turn/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/pilot/turn/solve/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/performance/pilot/turn/summary/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/performance/pilot/turn/summary/supervisor.json",
+      "required": false
+    }
+  ]
+}

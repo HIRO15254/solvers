@@ -1,0 +1,53 @@
+schema = "solvers.postflop/v1"
+
+[game]
+board = "Ks 7h 2d"
+oop_range = "AhAd,7c7d,QhQd"
+ip_range = "AcAs,KhKd,JcJs"
+pot = 20
+effective_stack = 60
+min_bet = 1
+iso_merging = false
+preflop_aggressor = "none"
+
+[game.tree]
+kind = "script"
+script = '''
+flop {
+replace bet [50]
+replace raise []
+}
+turn, river {
+replace bet []
+replace raise []
+}'''
+include_allin = false
+
+[game.tree.max_aggressive_actions]
+flop = 1
+turn = 1
+river = 1
+
+[game.tree.params]
+
+[rake]
+kind = "none"
+
+[utility]
+kind = "chip-ev"
+
+[algorithm]
+schedule = "dcfr"
+alpha = 1.5
+beta = 0.0
+gamma = 3.0
+pow4_reset = true
+
+[run]
+iterations = 50
+check_every = 10
+storage = "f32"
+target_nash_conv = 0.04
+threads = 8
+par_chance_depth = 2
+par_min_children = 12

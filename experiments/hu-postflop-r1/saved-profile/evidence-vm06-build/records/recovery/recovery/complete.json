@@ -1,0 +1,24 @@
+{
+  "baseline_example": {
+    "bytes": 4227680,
+    "path": "/opt/r1/target/baseline-audit-recovery/release/examples/hu_saved_profile_audit",
+    "sha256": "9efa72cb9cbeed080cda824ee91fccac29dd3d1f17822eb2d5da97b30fe6bc92"
+  },
+  "changed_boot": true,
+  "current_example": {
+    "bytes": 4249752,
+    "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+    "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932"
+  },
+  "result": {
+    "bytes": 23430,
+    "path": "/opt/r1/audit-pair-recovery/result.json",
+    "sha256": "3fad2ecac424d18b67c12c4febe6a9928c4ee4bf647c485fa9fbfc789179c05a"
+  },
+  "retained_files": {
+    "bytes": 8149,
+    "path": "/opt/r1/audit-pair-recovery/retained-files.json",
+    "sha256": "867b858927de98aaad22be1511c432286559b47d106b5c6406c4a59a135767ff"
+  },
+  "status": "completed"
+}

@@ -1,0 +1,25 @@
+[
+  {
+    "creationTimestamp": "2026-09-25T09:07:13.911-07:00",
+    "disks": [
+      {
+        "autoDelete": true,
+        "boot": true,
+        "diskSizeGb": "100",
+        "source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260925-05",
+        "type": "PERSISTENT"
+      }
+    ],
+    "id": "1627891813360280286",
+    "name": "solvers-r1-20260925-05",
+    "scheduling": {
+      "automaticRestart": false,
+      "instanceTerminationAction": "DELETE",
+      "onHostMaintenance": "TERMINATE",
+      "preemptible": true,
+      "provisioningModel": "SPOT",
+      "terminationTime": "2026-09-25T19:07:09Z"
+    },
+    "status": "RUNNING"
+  }
+]

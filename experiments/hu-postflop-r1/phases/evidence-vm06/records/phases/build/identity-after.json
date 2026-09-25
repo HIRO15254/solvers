@@ -1,0 +1,165 @@
+{
+  "before_record": {
+    "bytes": 2758,
+    "path": "/opt/r1/phase-build/identity-before.json",
+    "sha256": "b274793a6ca4f62c01eb90f84dc95df9651df6287e2c5c8a3150fc6d9040a580"
+  },
+  "boot_id": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f",
+  "cache_copy": "reflink-auto; no hardlinks",
+  "comparison_build": {
+    "bytes": 82987,
+    "path": "/opt/r1/comparison-build/identity-after.json",
+    "sha256": "c62120cda3eb1e9704a06b7e04b2dc74923c1749cbbc85c3a606f5e810a98f96"
+  },
+  "cpu": {
+    "Architecture": "x86_64",
+    "CPU family": "23",
+    "CPU op-mode(s)": "32-bit, 64-bit",
+    "Flags": [
+      "3dnowprefetch",
+      "abm",
+      "adx",
+      "aes",
+      "apic",
+      "arat",
+      "avx",
+      "avx2",
+      "bmi1",
+      "bmi2",
+      "clflush",
+      "clflushopt",
+      "clwb",
+      "clzero",
+      "cmov",
+      "cmp_legacy",
+      "constant_tsc",
+      "cpuid",
+      "cr8_legacy",
+      "cx16",
+      "cx8",
+      "de",
+      "extd_apicid",
+      "f16c",
+      "fma",
+      "fpu",
+      "fsgsbase",
+      "fxsr",
+      "fxsr_opt",
+      "ht",
+      "hypervisor",
+      "ibpb",
+      "ibrs",
+      "lahf_lm",
+      "lm",
+      "mca",
+      "mce",
+      "misalignsse",
+      "mmx",
+      "mmxext",
+      "movbe",
+      "msr",
+      "mtrr",
+      "nonstop_tsc",
+      "nopl",
+      "nx",
+      "osvw",
+      "pae",
+      "pat",
+      "pclmulqdq",
+      "pdpe1gb",
+      "pge",
+      "pni",
+      "popcnt",
+      "pse",
+      "pse36",
+      "rdpid",
+      "rdrand",
+      "rdseed",
+      "rdtscp",
+      "rep_good",
+      "sep",
+      "sha_ni",
+      "smap",
+      "smep",
+      "ssbd",
+      "sse",
+      "sse2",
+      "sse4_1",
+      "sse4_2",
+      "sse4a",
+      "ssse3",
+      "stibp",
+      "syscall",
+      "topoext",
+      "tsc",
+      "tsc_adjust",
+      "tsc_known_freq",
+      "umip",
+      "vme",
+      "vmmcall",
+      "x2apic",
+      "xgetbv1",
+      "xsave",
+      "xsavec",
+      "xsaveerptr",
+      "xsaveopt",
+      "xtopology"
+    ],
+    "Model": "49",
+    "Model name": "AMD EPYC 7B12",
+    "Stepping": "0",
+    "Vendor ID": "AuthenticAMD"
+  },
+  "inputs": [
+    {
+      "bytes": 6286,
+      "path": "/home/PC_User/build-phases.sh",
+      "sha256": "4e79364b383a86b4087787ecdf4aaad5e93ad51f41dde86712b436cc4857a2ce"
+    },
+    {
+      "bytes": 9760,
+      "path": "/opt/r1/phase-tools/apply_instrumentation.py",
+      "sha256": "098e65c6fde9293aefe4f95fb6e27d9d4c42da957995dec076eae35dff12b6cd"
+    },
+    {
+      "bytes": 5985,
+      "path": "/opt/r1/phase-tools/r1_phase.rs.in",
+      "sha256": "652471a902a2f695a87db027c42d624311995b85f6c5f649da536c3264de7a33"
+    },
+    {
+      "bytes": 40762,
+      "path": "/opt/r1/phase-tools/source-versions.json",
+      "sha256": "e4db9890e947a34835a966221ce23b318a4e2786844dd96c86779059f303b64f"
+    }
+  ],
+  "old_phase_targets_reused": false,
+  "recorded_at_utc": "2026-09-25T18:18:59.438061+00:00",
+  "schema": "r1.phase-build-identity/v1",
+  "state": "completed",
+  "versions": {
+    "baseline": {
+      "binary": {
+        "bytes": 8846520,
+        "path": "/opt/r1/target/phase-baseline/release/solvers",
+        "sha256": "69643569c66f634a85990ff7c7fa9727bda4329184f3c88e20e4f905780ac832"
+      },
+      "source_manifest": {
+        "bytes": 38923,
+        "path": "/opt/r1/phase-baseline/r1-phase-source-manifest.json",
+        "sha256": "1047dca0daa06664bb313be8260d666721feec8ecae0b46e93cf9421c0e6e7fc"
+      }
+    },
+    "candidate": {
+      "binary": {
+        "bytes": 8902104,
+        "path": "/opt/r1/target/phase-candidate/release/solvers",
+        "sha256": "2b257ca992d6c98f653144eea5f9d137b5f2cf2bc9c4afcbd4850e715673af5d"
+      },
+      "source_manifest": {
+        "bytes": 40806,
+        "path": "/opt/r1/phase-candidate/r1-phase-source-manifest.json",
+        "sha256": "e434aeded22aea5096ac2364751894982270e07824053788e57e0b41b986a6c6"
+      }
+    }
+  }
+}

@@ -1,0 +1,268 @@
+{
+  "active_phase_at_initial_snapshot": "overhead",
+  "cfr_inclusive_envelope": {
+    "add_to_leaf_sum": false,
+    "duration_ns": 150689494,
+    "end_ns": 174326093,
+    "start_ns": 23636599
+  },
+  "command_error": null,
+  "failed_span_policy": "status=error/panic is elapsed failed work, not a completed phase",
+  "forced_termination": "initial record only; phase durations are unavailable unless final snapshot was written",
+  "instrumentation_id": "aa81ca3e10c1beba324a8d42483294ca54a8b3fe852970a9f924da44fd2e5a3a",
+  "leaf_sum_ns": 202576041,
+  "pid": 8592,
+  "schema": "r1.phase/v1",
+  "scope": "main_impl entry through dispatch return; excludes final phase JSON persistence and process startup/exit",
+  "source_version": "candidate03",
+  "spans": [
+    {
+      "end_ns": 12863199,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 0,
+      "status": "complete"
+    },
+    {
+      "end_ns": 22062789,
+      "iteration": null,
+      "phase": "input_preparation",
+      "start_ns": 12863199,
+      "status": "complete"
+    },
+    {
+      "end_ns": 23635899,
+      "iteration": null,
+      "phase": "initialization",
+      "start_ns": 22062789,
+      "status": "complete"
+    },
+    {
+      "end_ns": 23636599,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 23635899,
+      "status": "complete"
+    },
+    {
+      "end_ns": 47016538,
+      "iteration": 25,
+      "phase": "cfr_updates",
+      "start_ns": 23636599,
+      "status": "complete"
+    },
+    {
+      "end_ns": 47020548,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 47016538,
+      "status": "complete"
+    },
+    {
+      "end_ns": 48310758,
+      "iteration": 25,
+      "phase": "periodic_ev_br",
+      "start_ns": 47020548,
+      "status": "complete"
+    },
+    {
+      "end_ns": 48381538,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 48310758,
+      "status": "complete"
+    },
+    {
+      "end_ns": 59986247,
+      "iteration": 25,
+      "phase": "checkpoint",
+      "start_ns": 48381538,
+      "status": "complete"
+    },
+    {
+      "end_ns": 60033637,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 59986247,
+      "status": "complete"
+    },
+    {
+      "end_ns": 92444306,
+      "iteration": 50,
+      "phase": "cfr_updates",
+      "start_ns": 60033637,
+      "status": "complete"
+    },
+    {
+      "end_ns": 92445836,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 92444306,
+      "status": "complete"
+    },
+    {
+      "end_ns": 95728346,
+      "iteration": 50,
+      "phase": "periodic_ev_br",
+      "start_ns": 92445836,
+      "status": "complete"
+    },
+    {
+      "end_ns": 95803356,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 95728346,
+      "status": "complete"
+    },
+    {
+      "end_ns": 113363345,
+      "iteration": 50,
+      "phase": "checkpoint",
+      "start_ns": 95803356,
+      "status": "complete"
+    },
+    {
+      "end_ns": 113390875,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 113363345,
+      "status": "complete"
+    },
+    {
+      "end_ns": 141444254,
+      "iteration": 75,
+      "phase": "cfr_updates",
+      "start_ns": 113390875,
+      "status": "complete"
+    },
+    {
+      "end_ns": 141449034,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 141444254,
+      "status": "complete"
+    },
+    {
+      "end_ns": 142618584,
+      "iteration": 75,
+      "phase": "periodic_ev_br",
+      "start_ns": 141449034,
+      "status": "complete"
+    },
+    {
+      "end_ns": 142684934,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 142618584,
+      "status": "complete"
+    },
+    {
+      "end_ns": 152197863,
+      "iteration": 75,
+      "phase": "checkpoint",
+      "start_ns": 142684934,
+      "status": "complete"
+    },
+    {
+      "end_ns": 152222223,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 152197863,
+      "status": "complete"
+    },
+    {
+      "end_ns": 174326093,
+      "iteration": 100,
+      "phase": "cfr_updates",
+      "start_ns": 152222223,
+      "status": "complete"
+    },
+    {
+      "end_ns": 174328273,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 174326093,
+      "status": "complete"
+    },
+    {
+      "end_ns": 175482953,
+      "iteration": 100,
+      "phase": "periodic_ev_br",
+      "start_ns": 174328273,
+      "status": "complete"
+    },
+    {
+      "end_ns": 175542163,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 175482953,
+      "status": "complete"
+    },
+    {
+      "end_ns": 184768372,
+      "iteration": 100,
+      "phase": "checkpoint",
+      "start_ns": 175542163,
+      "status": "complete"
+    },
+    {
+      "end_ns": 184806572,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 184768372,
+      "status": "complete"
+    },
+    {
+      "end_ns": 185459172,
+      "iteration": null,
+      "phase": "final_ev_br",
+      "start_ns": 184806572,
+      "status": "complete"
+    },
+    {
+      "end_ns": 185472402,
+      "iteration": null,
+      "phase": "summary_publish",
+      "start_ns": 185459172,
+      "status": "complete"
+    },
+    {
+      "end_ns": 185472682,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 185472402,
+      "status": "complete"
+    },
+    {
+      "end_ns": 187482932,
+      "iteration": null,
+      "phase": "sol_preparation",
+      "start_ns": 185472682,
+      "status": "complete"
+    },
+    {
+      "end_ns": 187483782,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 187482932,
+      "status": "complete"
+    },
+    {
+      "end_ns": 195171442,
+      "iteration": 100,
+      "phase": "sol_serialization_and_write",
+      "start_ns": 187483782,
+      "status": "complete"
+    },
+    {
+      "end_ns": 202576041,
+      "iteration": null,
+      "phase": "overhead",
+      "start_ns": 195171442,
+      "status": "complete"
+    }
+  ],
+  "started_unix_ns": "1790360393588662827",
+  "status": "completed",
+  "total_ns": 202576041
+}

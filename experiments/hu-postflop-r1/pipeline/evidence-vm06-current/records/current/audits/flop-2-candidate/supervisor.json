@@ -1,0 +1,217 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T18:30:17.807455+00:00",
+  "argv": [
+    "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+    "--sol",
+    "/opt/r1/candidate-v3/runs/r1-paired-current/flop-2-candidate/run/solution.sol",
+    "--threads",
+    "8"
+  ],
+  "cwd": "/opt/r1/candidate-v3",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 600.0,
+    "grace_seconds": 5.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.05,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "disk_reserve_bytes": 10737418240
+  },
+  "runtime": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-7.0.0-1011-gcp-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "logical_cpus": 8
+  },
+  "outputs": {
+    "stdout": {
+      "path": "/opt/r1/current-audits/flop-2-candidate/stdout.log",
+      "sha256": "b640833bd650e3c64cf387232689b1dc93f2aeff64621c40f3838c0a743b8603",
+      "bytes": 1515
+    },
+    "stderr": {
+      "path": "/opt/r1/current-audits/flop-2-candidate/stderr.log",
+      "sha256": "270b3a4d0eb3e34c9a7851bb1875ed68039bac1766bcf4e30495f00b85cf5442",
+      "bytes": 76
+    },
+    "samples": {
+      "path": "/opt/r1/current-audits/flop-2-candidate/supervisor.samples.jsonl",
+      "sha256": "fdf317e00a7478a98ed991dbc799cb33c8aef3aa7e12e43fd2b5b30d839a4f41",
+      "bytes": 7425
+    }
+  },
+  "identity_before": [
+    {
+      "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+      "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932",
+      "bytes": 4249752
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e",
+      "bytes": 29831
+    },
+    {
+      "path": "/opt/r1/saved-profile-tools/run_audits.py",
+      "sha256": "a8ec5bda06945e2da042a36f210dfc009e23ebc31f34ecd1cb29c9d1ef2617a3",
+      "bytes": 28182
+    },
+    {
+      "path": "/opt/r1/current-audit-plan/plan.json",
+      "sha256": "88c81719d79173785864cc9a61e7b6bde0fbbb6fadd466afb254da4c244cd5ce",
+      "bytes": 105577
+    },
+    {
+      "path": "/opt/r1/audit-pair-recovery/result.json",
+      "sha256": "3fad2ecac424d18b67c12c4febe6a9928c4ee4bf647c485fa9fbfc789179c05a",
+      "bytes": 23430
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/flop-2-candidate/run/solution.sol",
+      "sha256": "d3cefd8b7fc7851f5e736999bbb969b70e3364be9eceb5793f4655b133b74541",
+      "bytes": 176833
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/flop-2-candidate/run/run.toml",
+      "sha256": "76650e60cdc4a58bbbdc3e7b6a547d6df992fef5b8b4909ebf8fabee288211cc",
+      "bytes": 715
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-current/flop.toml",
+      "sha256": "d0fb4ed3f7d3ca9dd04b4599ca37435d70b37520c596e2724d104a672b76cd62",
+      "bytes": 677
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/comparison.json",
+      "sha256": "911b7fdb5c0ea098fa24f430dd2487f8aafd4bb6b18d7b2c6be63f583fa915c5",
+      "bytes": 225510
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+      "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932",
+      "bytes": 4249752
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e",
+      "bytes": 29831
+    },
+    {
+      "path": "/opt/r1/saved-profile-tools/run_audits.py",
+      "sha256": "a8ec5bda06945e2da042a36f210dfc009e23ebc31f34ecd1cb29c9d1ef2617a3",
+      "bytes": 28182
+    },
+    {
+      "path": "/opt/r1/current-audit-plan/plan.json",
+      "sha256": "88c81719d79173785864cc9a61e7b6bde0fbbb6fadd466afb254da4c244cd5ce",
+      "bytes": 105577
+    },
+    {
+      "path": "/opt/r1/audit-pair-recovery/result.json",
+      "sha256": "3fad2ecac424d18b67c12c4febe6a9928c4ee4bf647c485fa9fbfc789179c05a",
+      "bytes": 23430
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/flop-2-candidate/run/solution.sol",
+      "sha256": "d3cefd8b7fc7851f5e736999bbb969b70e3364be9eceb5793f4655b133b74541",
+      "bytes": 176833
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/flop-2-candidate/run/run.toml",
+      "sha256": "76650e60cdc4a58bbbdc3e7b6a547d6df992fef5b8b4909ebf8fabee288211cc",
+      "bytes": 715
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-current/flop.toml",
+      "sha256": "d0fb4ed3f7d3ca9dd04b4599ca37435d70b37520c596e2724d104a672b76cd62",
+      "bytes": 677
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-current/comparison.json",
+      "sha256": "911b7fdb5c0ea098fa24f430dd2487f8aafd4bb6b18d7b2c6be63f583fa915c5",
+      "bytes": 225510
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 24,
+    "max_sample_gap_seconds": 0.07497190599997339,
+    "sampled_peak_tree_resident_bytes": 377839616,
+    "root_os_peak_resident_bytes": 379555840,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "max_observed_processes": 1
+  },
+  "containment": {
+    "kind": "posix_session_process_group",
+    "limitations": [
+      "setsid/setpgid can escape this process group; use a systemd/cgroup wrapper",
+      "supervisor SIGKILL, host failure or power loss does not kill the group",
+      "resident memory is sampled /proc RSS; brief descendants may be missed",
+      "summed RSS can double-count shared pages; this is not cgroup memory.current",
+      "wait4 root peak can include reaped descendant high-water marks; it is not a simultaneous tree peak"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 67419471872,
+    "available_bytes": 65387073536
+  },
+  "resolved_argv": [
+    "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+    "--sol",
+    "/opt/r1/candidate-v3/runs/r1-paired-current/flop-2-candidate/run/solution.sol",
+    "--threads",
+    "8"
+  ],
+  "disk_path": "/opt/r1/current-audits/flop-2-candidate",
+  "disk_free_before_bytes": 92331507712,
+  "started_at": "2026-09-25T18:30:17.839740+00:00",
+  "pid": 10620,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 379555840,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "elapsed_seconds": 1.42754557499984,
+    "at": "2026-09-25T18:30:19.276227+00:00",
+    "host_available_memory_bytes": 65124720640,
+    "disk_free_bytes": 92331487232
+  },
+  "elapsed_seconds": 1.4366951749998407,
+  "ended_at": "2026-09-25T18:30:19.276479+00:00",
+  "supervisor_exit_code": 0
+}

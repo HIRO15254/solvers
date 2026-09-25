@@ -1,0 +1,3 @@
+{"seq":0,"unixMs":1790353455450,"level":"info","kind":"state","state":"running"}
+{"seq":1,"unixMs":1790353455523,"level":"info","kind":"checkpoint","sweeps":100}
+{"seq":2,"unixMs":1790353455604,"level":"info","kind":"state","state":"completed"}

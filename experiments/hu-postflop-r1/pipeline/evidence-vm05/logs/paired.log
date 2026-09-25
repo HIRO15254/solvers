@@ -1,0 +1,120 @@
+2026-09-25T16:24:08Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/river.toml --out /opt/r1/current/runs/r1-paired/river-1-baseline/run --sol-streets full
+2026-09-25T16:24:09Z summary: export /opt/r1/current/runs/r1-paired/river-1-baseline/run/solution.sol summary
+2026-09-25T16:24:09Z tree: export /opt/r1/current/runs/r1-paired/river-1-baseline/run/solution.sol tree --node all
+2026-09-25T16:24:09Z strategy: export /opt/r1/current/runs/r1-paired/river-1-baseline/run/solution.sol strategy --node all
+2026-09-25T16:24:09Z ev: export /opt/r1/current/runs/r1-paired/river-1-baseline/run/solution.sol ev --node all
+2026-09-25T16:24:09Z resume: resume /opt/r1/current/runs/r1-paired/river-1-baseline/run --out /opt/r1/current/runs/r1-paired/river-1-baseline/restore/run
+2026-09-25T16:24:09Z summary: export /opt/r1/current/runs/r1-paired/river-1-baseline/restore/run/solution.sol summary
+2026-09-25T16:24:09Z tree: export /opt/r1/current/runs/r1-paired/river-1-baseline/restore/run/solution.sol tree --node all
+2026-09-25T16:24:09Z strategy: export /opt/r1/current/runs/r1-paired/river-1-baseline/restore/run/solution.sol strategy --node all
+2026-09-25T16:24:09Z ev: export /opt/r1/current/runs/r1-paired/river-1-baseline/restore/run/solution.sol ev --node all
+2026-09-25T16:24:09Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/river.toml --out /opt/r1/current/runs/r1-paired/river-1-candidate/run --sol-streets full
+2026-09-25T16:24:10Z summary: export /opt/r1/current/runs/r1-paired/river-1-candidate/run/solution.sol summary
+2026-09-25T16:24:10Z tree: export /opt/r1/current/runs/r1-paired/river-1-candidate/run/solution.sol tree --node all
+2026-09-25T16:24:10Z strategy: export /opt/r1/current/runs/r1-paired/river-1-candidate/run/solution.sol strategy --node all
+2026-09-25T16:24:10Z ev: export /opt/r1/current/runs/r1-paired/river-1-candidate/run/solution.sol ev --node all
+2026-09-25T16:24:10Z resume: resume /opt/r1/current/runs/r1-paired/river-1-candidate/run --out /opt/r1/current/runs/r1-paired/river-1-candidate/restore/run
+2026-09-25T16:24:10Z summary: export /opt/r1/current/runs/r1-paired/river-1-candidate/restore/run/solution.sol summary
+2026-09-25T16:24:10Z tree: export /opt/r1/current/runs/r1-paired/river-1-candidate/restore/run/solution.sol tree --node all
+2026-09-25T16:24:10Z strategy: export /opt/r1/current/runs/r1-paired/river-1-candidate/restore/run/solution.sol strategy --node all
+2026-09-25T16:24:10Z ev: export /opt/r1/current/runs/r1-paired/river-1-candidate/restore/run/solution.sol ev --node all
+2026-09-25T16:24:10Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/river.toml --out /opt/r1/current/runs/r1-paired/river-2-baseline/run --sol-streets full
+2026-09-25T16:24:11Z summary: export /opt/r1/current/runs/r1-paired/river-2-baseline/run/solution.sol summary
+2026-09-25T16:24:11Z tree: export /opt/r1/current/runs/r1-paired/river-2-baseline/run/solution.sol tree --node all
+2026-09-25T16:24:11Z strategy: export /opt/r1/current/runs/r1-paired/river-2-baseline/run/solution.sol strategy --node all
+2026-09-25T16:24:11Z ev: export /opt/r1/current/runs/r1-paired/river-2-baseline/run/solution.sol ev --node all
+2026-09-25T16:24:11Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/river.toml --out /opt/r1/current/runs/r1-paired/river-2-candidate/run --sol-streets full
+2026-09-25T16:24:11Z summary: export /opt/r1/current/runs/r1-paired/river-2-candidate/run/solution.sol summary
+2026-09-25T16:24:11Z tree: export /opt/r1/current/runs/r1-paired/river-2-candidate/run/solution.sol tree --node all
+2026-09-25T16:24:11Z strategy: export /opt/r1/current/runs/r1-paired/river-2-candidate/run/solution.sol strategy --node all
+2026-09-25T16:24:11Z ev: export /opt/r1/current/runs/r1-paired/river-2-candidate/run/solution.sol ev --node all
+2026-09-25T16:24:12Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/river.toml --out /opt/r1/current/runs/r1-paired/river-3-baseline/run --sol-streets full
+2026-09-25T16:24:12Z summary: export /opt/r1/current/runs/r1-paired/river-3-baseline/run/solution.sol summary
+2026-09-25T16:24:12Z tree: export /opt/r1/current/runs/r1-paired/river-3-baseline/run/solution.sol tree --node all
+2026-09-25T16:24:12Z strategy: export /opt/r1/current/runs/r1-paired/river-3-baseline/run/solution.sol strategy --node all
+2026-09-25T16:24:12Z ev: export /opt/r1/current/runs/r1-paired/river-3-baseline/run/solution.sol ev --node all
+2026-09-25T16:24:12Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/river.toml --out /opt/r1/current/runs/r1-paired/river-3-candidate/run --sol-streets full
+2026-09-25T16:24:12Z summary: export /opt/r1/current/runs/r1-paired/river-3-candidate/run/solution.sol summary
+2026-09-25T16:24:13Z tree: export /opt/r1/current/runs/r1-paired/river-3-candidate/run/solution.sol tree --node all
+2026-09-25T16:24:13Z strategy: export /opt/r1/current/runs/r1-paired/river-3-candidate/run/solution.sol strategy --node all
+2026-09-25T16:24:13Z ev: export /opt/r1/current/runs/r1-paired/river-3-candidate/run/solution.sol ev --node all
+2026-09-25T16:24:13Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/turn.toml --out /opt/r1/current/runs/r1-paired/turn-1-baseline/run --sol-streets full
+2026-09-25T16:24:14Z summary: export /opt/r1/current/runs/r1-paired/turn-1-baseline/run/solution.sol summary
+2026-09-25T16:24:15Z tree: export /opt/r1/current/runs/r1-paired/turn-1-baseline/run/solution.sol tree --node all
+2026-09-25T16:24:15Z strategy: export /opt/r1/current/runs/r1-paired/turn-1-baseline/run/solution.sol strategy --node all
+2026-09-25T16:24:15Z ev: export /opt/r1/current/runs/r1-paired/turn-1-baseline/run/solution.sol ev --node all
+2026-09-25T16:24:15Z resume: resume /opt/r1/current/runs/r1-paired/turn-1-baseline/run --out /opt/r1/current/runs/r1-paired/turn-1-baseline/restore/run
+2026-09-25T16:24:15Z summary: export /opt/r1/current/runs/r1-paired/turn-1-baseline/restore/run/solution.sol summary
+2026-09-25T16:24:15Z tree: export /opt/r1/current/runs/r1-paired/turn-1-baseline/restore/run/solution.sol tree --node all
+2026-09-25T16:24:15Z strategy: export /opt/r1/current/runs/r1-paired/turn-1-baseline/restore/run/solution.sol strategy --node all
+2026-09-25T16:24:15Z ev: export /opt/r1/current/runs/r1-paired/turn-1-baseline/restore/run/solution.sol ev --node all
+2026-09-25T16:24:16Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/turn.toml --out /opt/r1/current/runs/r1-paired/turn-1-candidate/run --sol-streets full
+2026-09-25T16:24:17Z summary: export /opt/r1/current/runs/r1-paired/turn-1-candidate/run/solution.sol summary
+2026-09-25T16:24:17Z tree: export /opt/r1/current/runs/r1-paired/turn-1-candidate/run/solution.sol tree --node all
+2026-09-25T16:24:17Z strategy: export /opt/r1/current/runs/r1-paired/turn-1-candidate/run/solution.sol strategy --node all
+2026-09-25T16:24:18Z ev: export /opt/r1/current/runs/r1-paired/turn-1-candidate/run/solution.sol ev --node all
+2026-09-25T16:24:18Z resume: resume /opt/r1/current/runs/r1-paired/turn-1-candidate/run --out /opt/r1/current/runs/r1-paired/turn-1-candidate/restore/run
+2026-09-25T16:24:18Z summary: export /opt/r1/current/runs/r1-paired/turn-1-candidate/restore/run/solution.sol summary
+2026-09-25T16:24:18Z tree: export /opt/r1/current/runs/r1-paired/turn-1-candidate/restore/run/solution.sol tree --node all
+2026-09-25T16:24:18Z strategy: export /opt/r1/current/runs/r1-paired/turn-1-candidate/restore/run/solution.sol strategy --node all
+2026-09-25T16:24:18Z ev: export /opt/r1/current/runs/r1-paired/turn-1-candidate/restore/run/solution.sol ev --node all
+2026-09-25T16:24:18Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/turn.toml --out /opt/r1/current/runs/r1-paired/turn-2-baseline/run --sol-streets full
+2026-09-25T16:24:20Z summary: export /opt/r1/current/runs/r1-paired/turn-2-baseline/run/solution.sol summary
+2026-09-25T16:24:20Z tree: export /opt/r1/current/runs/r1-paired/turn-2-baseline/run/solution.sol tree --node all
+2026-09-25T16:24:20Z strategy: export /opt/r1/current/runs/r1-paired/turn-2-baseline/run/solution.sol strategy --node all
+2026-09-25T16:24:21Z ev: export /opt/r1/current/runs/r1-paired/turn-2-baseline/run/solution.sol ev --node all
+2026-09-25T16:24:21Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/turn.toml --out /opt/r1/current/runs/r1-paired/turn-2-candidate/run --sol-streets full
+2026-09-25T16:24:22Z summary: export /opt/r1/current/runs/r1-paired/turn-2-candidate/run/solution.sol summary
+2026-09-25T16:24:22Z tree: export /opt/r1/current/runs/r1-paired/turn-2-candidate/run/solution.sol tree --node all
+2026-09-25T16:24:22Z strategy: export /opt/r1/current/runs/r1-paired/turn-2-candidate/run/solution.sol strategy --node all
+2026-09-25T16:24:23Z ev: export /opt/r1/current/runs/r1-paired/turn-2-candidate/run/solution.sol ev --node all
+2026-09-25T16:24:23Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/turn.toml --out /opt/r1/current/runs/r1-paired/turn-3-baseline/run --sol-streets full
+2026-09-25T16:24:24Z summary: export /opt/r1/current/runs/r1-paired/turn-3-baseline/run/solution.sol summary
+2026-09-25T16:24:24Z tree: export /opt/r1/current/runs/r1-paired/turn-3-baseline/run/solution.sol tree --node all
+2026-09-25T16:24:24Z strategy: export /opt/r1/current/runs/r1-paired/turn-3-baseline/run/solution.sol strategy --node all
+2026-09-25T16:24:25Z ev: export /opt/r1/current/runs/r1-paired/turn-3-baseline/run/solution.sol ev --node all
+2026-09-25T16:24:25Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/turn.toml --out /opt/r1/current/runs/r1-paired/turn-3-candidate/run --sol-streets full
+2026-09-25T16:24:26Z summary: export /opt/r1/current/runs/r1-paired/turn-3-candidate/run/solution.sol summary
+2026-09-25T16:24:26Z tree: export /opt/r1/current/runs/r1-paired/turn-3-candidate/run/solution.sol tree --node all
+2026-09-25T16:24:26Z strategy: export /opt/r1/current/runs/r1-paired/turn-3-candidate/run/solution.sol strategy --node all
+2026-09-25T16:24:27Z ev: export /opt/r1/current/runs/r1-paired/turn-3-candidate/run/solution.sol ev --node all
+2026-09-25T16:24:27Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/flop.toml --out /opt/r1/current/runs/r1-paired/flop-1-baseline/run --sol-streets full
+2026-09-25T16:24:37Z summary: export /opt/r1/current/runs/r1-paired/flop-1-baseline/run/solution.sol summary
+2026-09-25T16:24:37Z tree: export /opt/r1/current/runs/r1-paired/flop-1-baseline/run/solution.sol tree --node all
+2026-09-25T16:24:38Z strategy: export /opt/r1/current/runs/r1-paired/flop-1-baseline/run/solution.sol strategy --node all
+2026-09-25T16:24:39Z ev: export /opt/r1/current/runs/r1-paired/flop-1-baseline/run/solution.sol ev --node all
+2026-09-25T16:24:40Z resume: resume /opt/r1/current/runs/r1-paired/flop-1-baseline/run --out /opt/r1/current/runs/r1-paired/flop-1-baseline/restore/run
+2026-09-25T16:24:43Z summary: export /opt/r1/current/runs/r1-paired/flop-1-baseline/restore/run/solution.sol summary
+2026-09-25T16:24:44Z tree: export /opt/r1/current/runs/r1-paired/flop-1-baseline/restore/run/solution.sol tree --node all
+2026-09-25T16:24:44Z strategy: export /opt/r1/current/runs/r1-paired/flop-1-baseline/restore/run/solution.sol strategy --node all
+2026-09-25T16:24:46Z ev: export /opt/r1/current/runs/r1-paired/flop-1-baseline/restore/run/solution.sol ev --node all
+2026-09-25T16:24:47Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/flop.toml --out /opt/r1/current/runs/r1-paired/flop-1-candidate/run --sol-streets full
+2026-09-25T16:24:56Z summary: export /opt/r1/current/runs/r1-paired/flop-1-candidate/run/solution.sol summary
+2026-09-25T16:24:56Z tree: export /opt/r1/current/runs/r1-paired/flop-1-candidate/run/solution.sol tree --node all
+2026-09-25T16:24:57Z strategy: export /opt/r1/current/runs/r1-paired/flop-1-candidate/run/solution.sol strategy --node all
+2026-09-25T16:24:59Z ev: export /opt/r1/current/runs/r1-paired/flop-1-candidate/run/solution.sol ev --node all
+2026-09-25T16:25:00Z resume: resume /opt/r1/current/runs/r1-paired/flop-1-candidate/run --out /opt/r1/current/runs/r1-paired/flop-1-candidate/restore/run
+2026-09-25T16:25:03Z summary: export /opt/r1/current/runs/r1-paired/flop-1-candidate/restore/run/solution.sol summary
+2026-09-25T16:25:03Z tree: export /opt/r1/current/runs/r1-paired/flop-1-candidate/restore/run/solution.sol tree --node all
+2026-09-25T16:25:04Z strategy: export /opt/r1/current/runs/r1-paired/flop-1-candidate/restore/run/solution.sol strategy --node all
+2026-09-25T16:25:06Z ev: export /opt/r1/current/runs/r1-paired/flop-1-candidate/restore/run/solution.sol ev --node all
+2026-09-25T16:25:07Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/flop.toml --out /opt/r1/current/runs/r1-paired/flop-2-baseline/run --sol-streets full
+2026-09-25T16:25:18Z summary: export /opt/r1/current/runs/r1-paired/flop-2-baseline/run/solution.sol summary
+2026-09-25T16:25:18Z tree: export /opt/r1/current/runs/r1-paired/flop-2-baseline/run/solution.sol tree --node all
+2026-09-25T16:25:19Z strategy: export /opt/r1/current/runs/r1-paired/flop-2-baseline/run/solution.sol strategy --node all
+2026-09-25T16:25:20Z ev: export /opt/r1/current/runs/r1-paired/flop-2-baseline/run/solution.sol ev --node all
+2026-09-25T16:25:22Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/flop.toml --out /opt/r1/current/runs/r1-paired/flop-2-candidate/run --sol-streets full
+2026-09-25T16:25:30Z summary: export /opt/r1/current/runs/r1-paired/flop-2-candidate/run/solution.sol summary
+2026-09-25T16:25:30Z tree: export /opt/r1/current/runs/r1-paired/flop-2-candidate/run/solution.sol tree --node all
+2026-09-25T16:25:31Z strategy: export /opt/r1/current/runs/r1-paired/flop-2-candidate/run/solution.sol strategy --node all
+2026-09-25T16:25:33Z ev: export /opt/r1/current/runs/r1-paired/flop-2-candidate/run/solution.sol ev --node all
+2026-09-25T16:25:34Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/flop.toml --out /opt/r1/current/runs/r1-paired/flop-3-baseline/run --sol-streets full
+2026-09-25T16:25:44Z summary: export /opt/r1/current/runs/r1-paired/flop-3-baseline/run/solution.sol summary
+2026-09-25T16:25:45Z tree: export /opt/r1/current/runs/r1-paired/flop-3-baseline/run/solution.sol tree --node all
+2026-09-25T16:25:45Z strategy: export /opt/r1/current/runs/r1-paired/flop-3-baseline/run/solution.sol strategy --node all
+2026-09-25T16:25:47Z ev: export /opt/r1/current/runs/r1-paired/flop-3-baseline/run/solution.sol ev --node all
+2026-09-25T16:25:48Z solve: solve /opt/r1/current/experiments/hu-postflop-r1/pipeline/frozen/vm05/flop.toml --out /opt/r1/current/runs/r1-paired/flop-3-candidate/run --sol-streets full
+2026-09-25T16:25:57Z summary: export /opt/r1/current/runs/r1-paired/flop-3-candidate/run/solution.sol summary
+2026-09-25T16:25:57Z tree: export /opt/r1/current/runs/r1-paired/flop-3-candidate/run/solution.sol tree --node all
+2026-09-25T16:25:58Z strategy: export /opt/r1/current/runs/r1-paired/flop-3-candidate/run/solution.sol strategy --node all
+2026-09-25T16:25:59Z ev: export /opt/r1/current/runs/r1-paired/flop-3-candidate/run/solution.sol ev --node all

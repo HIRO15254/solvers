@@ -34,3 +34,6 @@ experiments/hu-postflop-r0/asset-inventory-2026-09-25/*.log whitespace=-blank-at
 # Preserve Windows-authored manifests and unmodified Linux process output.
 experiments/hu-postflop-r1/** -text whitespace=cr-at-eol
 experiments/hu-postflop-r1/**/*.log -whitespace
+# Retain the exact adapter source used by the recorded build, including its EOF.
+experiments/hu-postflop-r1/saved-profile/audit_shared.rs.in whitespace=cr-at-eol,-blank-at-eof
+experiments/hu-postflop-r1/saved-profile/evidence-vm06-build/records/recovery/audit-tools/audit_shared.rs.in whitespace=cr-at-eol,-blank-at-eof

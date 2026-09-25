@@ -1,0 +1,113 @@
+// Research-only compatibility with the baseline revision's native v1 loader.
+// This file is included in cli::sol only in a disposable baseline source copy.
+use std::io::Read;
+
+struct BaselineAuditMetadata {
+    config_toml: String,
+    meta: SolMeta,
+    mode: StreetsStored,
+    stored_nodes: u64,
+}
+
+fn read_baseline_audit_metadata(path: &Path) -> Result<BaselineAuditMetadata> {
+    let mut header = [0u8; 50];
+    std::fs::File::open(path)?.read_exact(&mut header)?;
+    if &header[..8] != b"SLVRSOLV" || u16::from_le_bytes(header[8..10].try_into()?) != 1 {
+        bail!("baseline saved-profile audit requires native .sol v1");
+    }
+    // The old codec validates config hash and performs its own version check.
+    // This full-payload preflight is intentionally not a performance metric.
+    let payload = read_sol(path)?;
+    let iteration = u64::from_le_bytes(header[42..50].try_into()?);
+    if iteration != payload.meta.iterations {
+        bail!("baseline artifact header and metadata iterations disagree");
+    }
+    if payload
+        .meta
+        .ev
+        .into_iter()
+        .chain(payload.meta.expl)
+        .chain([payload.meta.nash_conv, payload.meta.wall_secs])
+        .any(|value| !value.is_finite())
+        || payload.meta.wall_secs < 0.0
+        || !matches!(payload.meta.storage.as_str(), "f32" | "i16")
+    {
+        bail!("baseline artifact metadata has invalid metrics or storage");
+    }
+    let strategy_keys: HashSet<_> = payload.blocks.iter().map(|block| block.sref).collect();
+    let value_keys: HashSet<_> = payload.values.iter().map(|block| block.sref).collect();
+    if strategy_keys.len() != payload.blocks.len()
+        || value_keys.len() != payload.values.len()
+        || strategy_keys != value_keys
+    {
+        bail!("baseline strategy and value blocks must cover the same unique nodes");
+    }
+    if payload.values.iter().any(|value| {
+        !value.scale.is_finite() || value.scale < 0.0 || !value.values.len().is_multiple_of(2)
+    }) {
+        bail!("baseline value block has an invalid scale or length");
+    }
+    Ok(BaselineAuditMetadata {
+        config_toml: payload.config_toml,
+        meta: payload.meta,
+        mode: payload.mode,
+        stored_nodes: payload.blocks.len() as u64,
+    })
+}
+
+fn validate_baseline_audit_shapes(loaded: &LoadedSol) -> Result<()> {
+    let tree = &loaded.pf_game.game.tree;
+    let roots = &loaded.pf_game.game.root_ranges;
+    let dims = PerPlayer::new(
+        u32::try_from(roots[Player::P0].len())?,
+        u32::try_from(roots[Player::P1].len())?,
+    );
+    if tree.root_dims != dims {
+        bail!("baseline rebuilt root dimensions disagree with ranges");
+    }
+    let mut pending = vec![(0, dims)];
+    while let Some((id, dims)) = pending.pop() {
+        let node = tree.node(id);
+        if node.kind == NodeKind::Action {
+            let sref = tree.storage_ref(node);
+            let expected_strategy = usize::from(sref.num_actions)
+                .checked_mul(usize::try_from(sref.num_hands)?)
+                .and_then(|len| len.checked_mul(2))
+                .context("baseline strategy shape overflow")?;
+            let expected_values = usize::try_from(dims[Player::P0])?
+                .checked_add(usize::try_from(dims[Player::P1])?)
+                .context("baseline value shape overflow")?;
+            let strategy = loaded
+                .blocks
+                .get(&node.aux)
+                .context("missing baseline policy")?;
+            let values = loaded
+                .values
+                .get(&node.aux)
+                .context("missing baseline values")?;
+            if sref.num_hands != dims[node.player]
+                || strategy.len() != expected_strategy
+                || values.len() != expected_values
+                || values.iter().any(|value| !value.is_finite())
+            {
+                bail!(
+                    "baseline policy/value shape or finite-value check failed at sref {}",
+                    node.aux
+                );
+            }
+        }
+        for (position, child) in tree.children(id).enumerate() {
+            let child_dims = if node.kind == NodeKind::Chance {
+                let deal = tree.deal(node, position);
+                PerPlayer::new(
+                    tree.mapped_dim(deal.maps[Player::P0], dims[Player::P0]),
+                    tree.mapped_dim(deal.maps[Player::P1], dims[Player::P1]),
+                )
+            } else {
+                dims
+            };
+            pending.push((child, child_dims));
+        }
+    }
+    Ok(())
+}

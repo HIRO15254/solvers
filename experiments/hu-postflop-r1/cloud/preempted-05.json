@@ -1,0 +1,129 @@
+{
+  "schema": "solvers.r1-preemption-evidence/v1",
+  "instance": "solvers-r1-20260925-05",
+  "instance_id": "1627891813360280286",
+  "project": "solvers-abstraction-20260723",
+  "zone": "us-central1-b",
+  "operation_type": "compute.instances.preempted",
+  "operation_id": "systemevent-1790355925894-65c51b8fc0561-b75e619e-000e48ce",
+  "first_event_utc": "2026-09-25T17:05:26.126964Z",
+  "last_event_utc": "2026-09-25T17:05:35.714153Z",
+  "remote_event_provenance": "Parent task reported official GCP Logging system_event output for this instance. This inventory agent did not query GCP independently.",
+  "reconciliation": {
+    "reported_by": "parent task tool output",
+    "filtered_instance_list": [],
+    "filtered_disk_list": [],
+    "scope": "same project; names matching solvers-r1-",
+    "ssh_scp_result": "resource not found",
+    "independently_queried_by_inventory_agent": false
+  },
+  "lost_bundle": {
+    "label": "v3-results",
+    "archive_sha256_reported": "4ad690c136da5571e2b2e3f22743b71d428a990865c5a5fe1c942b0ba69ecf45",
+    "archive_bytes_reported": 13341355,
+    "manifest_sha256_reported": "378add60b0fb2b015ea4c71cceaab00e94de3678467858e88c3b632adbd554c0",
+    "total_output_bytes_reported": 13815133,
+    "included_files_reported": 740,
+    "skipped_files_reported": 0,
+    "provenance": "Parent task collector output, session 44789; remote collection completed, local download did not complete before preemption.",
+    "availability": "lost-with-deleted-VM-disk",
+    "download_verified": false,
+    "retained_local_payload_files": 0,
+    "affected_scope": [
+      "candidate .sol v3 paired performance results and raw artifacts",
+      "HU-R0-019 diagnostic execution, exports and comparison results"
+    ],
+    "formal_performance_or_diagnostic_acceptance_evidence": false,
+    "note": "A remote collector hash and tool-visible metrics do not replace the lost payload. The input files and source archives retained below do not reconstruct the original run measurements."
+  },
+  "provisional_observations": {
+    "v3_performance": "Tool-observed only; raw results were not formally retained. Do not treat them as Git-backed measurements or certify performance acceptance from them.",
+    "HU-R0-019_diagnostic": "Tool-observed only; diagnostic run artifacts and result report were not formally retained. Reference UI observations and diagnostic inputs remain local, but do not establish a retained successful run."
+  },
+  "local_inventory": {
+    "rechecked_utc": "2026-09-25T17:09:32Z",
+    "method": "Independently read the three local archives, recomputed SHA-256, compared embedded and sidecar manifests, and verified every included regular payload byte count/hash with no unlisted tar members. Rehashed selected compact evidence files against retention records.",
+    "retained_bundles": [
+      {
+        "scope": "baseline and source02 candidate build/binaries plus initial VM05 validation",
+        "path": "runs/r1-cloud/vm05-build.tar.gz",
+        "bytes": 8635436,
+        "sha256": "3c715889d53ce83fe8c033b317337c40e302bdf05ad8d0245e95566a4f7d499e",
+        "manifest_sha256": "9749c3f50f600bdcb97c0184d0fe675cb3069877ded2f39330fb66b6f77e61ce",
+        "verified_regular_payloads": 13,
+        "verified_payload_bytes": 19850761,
+        "download_record": "experiments/hu-postflop-r1/validation/vm05/build-download-verification.json",
+        "availability": "downloaded-and-reverified-local-ignored-bundle"
+      },
+      {
+        "scope": "candidate 1 (.sol v2), source02: baseline pilot, frozen configs and paired pipeline",
+        "path": "runs/r1-cloud/vm05-pipeline.tar.gz",
+        "bytes": 11950377,
+        "sha256": "3730bdb23b8cd53d7de70d567bfa897a8f6e3337582622757868c82b86b8cb7e",
+        "manifest_sha256": "7a415c4453dc3b1a086fb26245d3a055d1e75c7903938cd709d795c20bedc954",
+        "verified_regular_payloads": 747,
+        "verified_payload_bytes": 171378186,
+        "compact_evidence_directory": "experiments/hu-postflop-r1/pipeline/evidence-vm05",
+        "reverified_compact_files": 629,
+        "reverified_compact_bytes": 2244291,
+        "download_record": "experiments/hu-postflop-r1/pipeline/evidence-vm05/download-verification.json",
+        "availability": "downloaded-and-reverified-local-ignored-bundle; selected compact files also present in repository evidence tree"
+      },
+      {
+        "scope": "source03/v3 ordinary validation and five source02 ignored tests; no v3 performance or HU-R0-019 diagnostic results",
+        "path": "runs/r1-cloud/vm05-v3-checks.tar.gz",
+        "bytes": 29508,
+        "sha256": "33905062c8c8cef0d53605febc8deb3c0fe911c0555260ac11613382768b8ed0",
+        "manifest_sha256": "5e8c6c28372edda245596a45b548d6e18b060357ca98fc11c9cef4166ada9e59",
+        "verified_regular_payloads": 15,
+        "verified_payload_bytes": 114665,
+        "compact_evidence": [
+          {
+            "directory": "experiments/hu-postflop-r1/validation/vm05-v3",
+            "reverified_files": 7,
+            "reverified_bytes": 92236
+          },
+          {
+            "directory": "experiments/hu-postflop-r1/validation/vm05-ignored-source2",
+            "reverified_files": 8,
+            "reverified_bytes": 22429
+          }
+        ],
+        "download_record": "experiments/hu-postflop-r1/validation/vm05-v3/download-verification.json",
+        "availability": "downloaded-and-reverified-local-ignored-bundle; all 15 payloads also present in repository evidence tree"
+      }
+    ],
+    "source_archives_present": [
+      {
+        "path": "experiments/hu-postflop-r1/validation/sources/current-01.tar.gz",
+        "bytes": 1160505,
+        "sha256": "e1eec592dcf180acc34f27c076d03a4b316694b86ca2cd9fc3cbf1dd5e5f211e"
+      },
+      {
+        "path": "experiments/hu-postflop-r1/validation/sources/current-02.tar.gz",
+        "bytes": 1181970,
+        "sha256": "5edec6bea4ce887847c3430b3c45e5c5251402f2780f3289e95409e40b4b8fc6"
+      },
+      {
+        "path": "experiments/hu-postflop-r1/validation/sources/current-03.tar.gz",
+        "bytes": 1195310,
+        "sha256": "ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970"
+      },
+      {
+        "path": "experiments/hu-postflop-r1/validation/sources/current-04.tar.gz",
+        "bytes": 1204318,
+        "sha256": "3787c1479e71cfab6266d75865750a97ca370712032d22565215a985dc680472"
+      }
+    ],
+    "reference_inputs_present": [
+      "experiments/hu-postflop-r1/reference/HU-R0-019",
+      "experiments/hu-postflop-r1/reference/HU-R0-007"
+    ],
+    "not_found": ["local v3-results bundle", "HU-R0-019 diagnostic-comparison.json"],
+    "git_boundary": "Raw bundles are ignored local files and do not come back from Git alone. Compact file presence was verified; this inventory does not assert that pending repository changes have already been committed."
+  },
+  "documentation_review": {
+    "scope": "Current docs and experiments/hu-postflop-r1 Markdown, excluding temporary test directories",
+    "finding": "No claim that the lost v3 performance or HU-R0-019 diagnostic results were retained was found. pipeline/evidence-vm05 is explicitly candidate 1/.sol v2; validation/vm05-v3 explicitly covers regression checks, not performance or external-reference acceptance."
+  }
+}

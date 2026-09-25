@@ -1,0 +1,243 @@
+{
+  "artifacts": {
+    "checkpoint.ckpt": {
+      "bytes": 34538,
+      "header": {
+        "embedded_config_blake3": "9d9fc768e4fd84ace9ffd9e2a991fd19ac94de28496bbf92579506a31966181c",
+        "iteration": 50,
+        "version": 1
+      },
+      "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/run/checkpoint.ckpt",
+      "sha256": "edbdbc1c39897bd8ec77cdada36b39ab0fe4bd329dfd0724ff796a2f1540d02b"
+    },
+    "progress.jsonl": {
+      "bytes": 685,
+      "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/run/progress.jsonl",
+      "sha256": "55a5e3bd9f537fdd4b04edd1b9289514b37f8a92ab50bbacc3c07a0bbe2192d4"
+    },
+    "run.json": {
+      "bytes": 176,
+      "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/run/run.json",
+      "sha256": "104acb8662a5f53b94adffcea94493da50bf630398bf1a17316f825c266a60c0"
+    },
+    "run.toml": {
+      "bytes": 677,
+      "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/run/run.toml",
+      "sha256": "d0fb4ed3f7d3ca9dd04b4599ca37435d70b37520c596e2724d104a672b76cd62"
+    },
+    "solution.sol": {
+      "bytes": 131744,
+      "header": {
+        "embedded_config_blake3": "9d9fc768e4fd84ace9ffd9e2a991fd19ac94de28496bbf92579506a31966181c",
+        "iteration": 50,
+        "version": 1
+      },
+      "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/run/solution.sol",
+      "sha256": "45a2b160b06bd49b10e5778e50678089a1381d805a87ca873e146512f8702c51"
+    }
+  },
+  "case": "flop",
+  "expected_iterations": 50,
+  "expected_sol_version": 1,
+  "internal_target": {
+    "exploitability_pct_pot": 0.09174731042649986,
+    "g_i": [
+      0.013658099704318527,
+      0.023040824466281418
+    ],
+    "inequality": "<",
+    "nash_conv": 0.036698924170599945,
+    "scope": "internal finite synthetic game only",
+    "source": "run.json final live solver result",
+    "status": "pass",
+    "strategy_kind": "live_average",
+    "target_nash_conv": 0.04
+  },
+  "live_final": {
+    "g_i": [
+      0.013658099704318527,
+      0.023040824466281418
+    ],
+    "iterations": 50,
+    "nash_conv": 0.036698924170599945,
+    "pot": 20
+  },
+  "missing_fields": [
+    "saved_quantized_profile_br",
+    "monotonic_internal_phase_spans",
+    "external_reference_condition_match_and_thresholds"
+  ],
+  "phase_timings": {
+    "br_final": null,
+    "cfr": null,
+    "initialization": null,
+    "persistence": null,
+    "return": null
+  },
+  "presave_consistency": "pass",
+  "profile": {
+    "ev": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 1.4087673679998716,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.05654859600008422,
+        "root_os_peak_resident_bytes": 245039104,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 26,
+        "sampled_peak_tree_resident_bytes": 234205184
+      },
+      "record": {
+        "bytes": 6158,
+        "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/ev/supervisor.json",
+        "sha256": "355565ee02bb9b87ddf46269e88208f667c50cb61a6286849dafa67f72a7f5f2"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 8842530,
+        "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/ev/stdout.log",
+        "sha256": "dddca33638c5bbb60e48ff6da2214e84d6da424b35fd7d590011224b058213bf"
+      },
+      "stop_reason": "completed"
+    },
+    "strategy": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 1.3530114330001197,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.056535434999887,
+        "root_os_peak_resident_bytes": 237072384,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 25,
+        "sampled_peak_tree_resident_bytes": 231444480
+      },
+      "record": {
+        "bytes": 6192,
+        "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/strategy/supervisor.json",
+        "sha256": "a0660ccc925a734024fcd29f5f2cd4ba285d186d516e1f70e9f2e819956ccec1"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 5175171,
+        "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/strategy/stdout.log",
+        "sha256": "78a31c55bf72e3c9136f1c58c109d664b4e3d62b13d864f1aed208a86fc15240"
+      },
+      "stop_reason": "completed"
+    },
+    "tree": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.5161050690001048,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.05635154600008718,
+        "root_os_peak_resident_bytes": 236679168,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 10,
+        "sampled_peak_tree_resident_bytes": 228155392
+      },
+      "record": {
+        "bytes": 6170,
+        "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/tree/supervisor.json",
+        "sha256": "2a8fa46c833fce4156c98f98a9c8b108b6dc4072354d611e79e084c21fcfd1a4"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 2255517,
+        "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/tree/stdout.log",
+        "sha256": "2c51b83cce1d6e620fe72b3f8f9bd47ea23f8b6ed7238854477c33a32bac2c43"
+      },
+      "stop_reason": "completed"
+    }
+  },
+  "quality_status": "not_evaluated",
+  "repetition": 3,
+  "resume": null,
+  "run_status": "completed",
+  "saved_profile_br": "not_evaluated",
+  "solve": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 9.850490946999798,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.062379704000022684,
+      "root_os_peak_resident_bytes": 732524544,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 170,
+      "sampled_peak_tree_resident_bytes": 725487616
+    },
+    "record": {
+      "bytes": 6336,
+      "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/solve/supervisor.json",
+      "sha256": "0dc19d36268b04ee81f4150bbd53087ead515207ba736d3af65544343559df34"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 694,
+      "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/solve/stdout.log",
+      "sha256": "a0587f13f9e3951e53f967ed42d6f5c448a01791e606fabe39ffb49d1a77d6b6"
+    },
+    "stop_reason": "completed"
+  },
+  "summary": {
+    "board": "Ks 7h 2d",
+    "effective_stack": 60,
+    "ev_ip": 11.950607829623753,
+    "ev_oop": 8.049393706851536,
+    "expl_ip": 0.023040824466281418,
+    "expl_oop": 0.013658099704318527,
+    "iterations": 50,
+    "min_bet": 1,
+    "nash_conv": 0.036698924170599945,
+    "nodes": 21618,
+    "pot": 20,
+    "storage": "f32",
+    "stored_nodes": 14410,
+    "streets_stored": "full",
+    "wall_secs": 7.605147496
+  },
+  "summary_read": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.5134015389999149,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.0075435700000525685,
+      "root_os_peak_resident_bytes": 236679168,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 75,
+      "sampled_peak_tree_resident_bytes": 235167744
+    },
+    "record": {
+      "bytes": 6552,
+      "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/summary/supervisor.json",
+      "sha256": "479a6e025f2f7991b93bc2409917b5d8842aceae010cfe6feedeb0ee0e336568"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 389,
+      "path": "/opt/r1/current/runs/r1-paired/flop-3-baseline/summary/stdout.log",
+      "sha256": "c3955ed257d23c0a9fb8c52f369e5a5788207f1d6ad5f2f127e0a80bdcf9f3c3"
+    },
+    "stop_reason": "completed"
+  },
+  "version": "baseline"
+}

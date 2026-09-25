@@ -1,0 +1,34 @@
+# Synthetic narrow-range fixture. Later streets check down, with all runouts.
+# Narrow ranges do not shrink the solver's 1,326-hand storage dimensions.
+schema = "solvers.postflop/v1"
+[game]
+board = "Ks 7h 2d"
+oop_range = "AhAd,7c7d,QhQd"
+ip_range = "AcAs,KhKd,JcJs"
+pot = 20
+effective_stack = 60
+iso_merging = false
+[game.tree]
+kind = "script"
+script = '''flop {
+replace bet [50]
+replace raise []
+}
+turn, river {
+replace bet []
+replace raise []
+}'''
+[game.tree.max_aggressive_actions]
+flop = 1
+turn = 1
+river = 1
+[algorithm]
+schedule = "dcfr"
+[run]
+iterations = 50
+check_every = 10
+target_nash_conv = 0.04
+threads = 8
+storage = "f32"
+par_chance_depth = 2
+par_min_children = 12

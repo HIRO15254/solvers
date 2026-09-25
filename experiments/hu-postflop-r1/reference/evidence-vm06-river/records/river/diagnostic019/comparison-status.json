@@ -1,0 +1,15 @@
+{
+  "schema": "solvers.r1-diagnostic-comparison-status/v1",
+  "case_id": "HU-R0-019",
+  "state": "menus_matched_ev_diagnostic_only",
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "comparison_threshold": null,
+  "reason": "legacy reference rake/accuracy conditions remain uncertified",
+  "report": {
+    "path": "/opt/r1/diagnostic-019/diagnostic-comparison.json",
+    "sha256": "0176b8ff80a242323f86388e7f8df8f88746660a5e7082bd07a340e7097615e3",
+    "bytes": 2893
+  }
+}

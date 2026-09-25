@@ -1,0 +1,305 @@
+{
+  "artifacts": {
+    "checkpoint.ckpt": {
+      "bytes": 81323,
+      "header": {
+        "embedded_config_blake3": "33ceafd2eb06127f2630af97d60681c37b8a9cdcdf3af5317bef205c2d174422",
+        "iteration": 100,
+        "version": 1
+      },
+      "path": "/opt/r1/phase-on/river-3-baseline/run/checkpoint.ckpt",
+      "sha256": "8c03adb9f9a58dd28d827d19d57b7595bb0eebd5452f54aac033188eb4a6611e"
+    },
+    "progress.jsonl": {
+      "bytes": 550,
+      "path": "/opt/r1/phase-on/river-3-baseline/run/progress.jsonl",
+      "sha256": "6403c72904bcb137b61d43bf1af593c1ec8172800432fddb3d33438de88f7c9e"
+    },
+    "run.json": {
+      "bytes": 177,
+      "path": "/opt/r1/phase-on/river-3-baseline/run/run.json",
+      "sha256": "2ccc892868156e43166e33c7591c2812e2bfb2aa7e750c489f817ef53e139bee"
+    },
+    "run.toml": {
+      "bytes": 559,
+      "path": "/opt/r1/phase-on/river-3-baseline/run/run.toml",
+      "sha256": "fe93d87a93ac4c2f8f1554bfdb89c970672b02f55f79962fee5c43b182b246ee"
+    },
+    "solution.sol": {
+      "bytes": 7472,
+      "header": {
+        "embedded_config_blake3": "33ceafd2eb06127f2630af97d60681c37b8a9cdcdf3af5317bef205c2d174422",
+        "iteration": 100,
+        "version": 1
+      },
+      "path": "/opt/r1/phase-on/river-3-baseline/run/solution.sol",
+      "sha256": "bb03ef533c9c87e61b6793785e14a3e942bc7ecfb51ca4c3c0fa724a2427c02d"
+    }
+  },
+  "case": "river",
+  "expected_iterations": 100,
+  "expected_sol_version": 1,
+  "internal_target": {
+    "exploitability_pct_pot": 0.07437514724032535,
+    "g_i": [
+      0.012880653853740931,
+      0.016869405042389207
+    ],
+    "inequality": "<",
+    "nash_conv": 0.029750058896130138,
+    "scope": "internal finite synthetic game only",
+    "source": "run.json final live solver result",
+    "status": "pass",
+    "strategy_kind": "live_average",
+    "target_nash_conv": 0.04
+  },
+  "live_final": {
+    "g_i": [
+      0.012880653853740931,
+      0.016869405042389207
+    ],
+    "iterations": 100,
+    "nash_conv": 0.029750058896130138,
+    "pot": 20
+  },
+  "missing_fields": [
+    "saved_quantized_profile_br",
+    "monotonic_internal_phase_spans",
+    "external_reference_condition_match_and_thresholds"
+  ],
+  "phase_timings": {
+    "br_final": null,
+    "cfr": null,
+    "initialization": null,
+    "persistence": null,
+    "return": null
+  },
+  "presave_consistency": "pass",
+  "profile": {
+    "ev": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.022444650000124966,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 0,
+        "max_sample_gap_seconds": 0.0,
+        "root_os_peak_resident_bytes": 25731072,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 1,
+        "sampled_peak_tree_resident_bytes": 0
+      },
+      "record": {
+        "bytes": 8928,
+        "path": "/opt/r1/phase-on/river-3-baseline/ev/supervisor.json",
+        "sha256": "881289ebf92ad947e4993cc96c5c1ac9a7a75c2fa4eafb77e98cae8f646c8d84"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 136727,
+        "path": "/opt/r1/phase-on/river-3-baseline/ev/stdout.log",
+        "sha256": "2c1fa0b29271c1fb51c81b44d82f5bba0dccd4c048c1e0f095a00be9c83de88a"
+      },
+      "stop_reason": "completed"
+    },
+    "strategy": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.020925168999838206,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 0,
+        "max_sample_gap_seconds": 0.0,
+        "root_os_peak_resident_bytes": 25681920,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 1,
+        "sampled_peak_tree_resident_bytes": 0
+      },
+      "record": {
+        "bytes": 8965,
+        "path": "/opt/r1/phase-on/river-3-baseline/strategy/supervisor.json",
+        "sha256": "15da54568be4f4476f0c76da4910e788ff7e25f5e719cf89a5ad1683d142e4b1"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 105272,
+        "path": "/opt/r1/phase-on/river-3-baseline/strategy/stdout.log",
+        "sha256": "89714baf73bed349c976ac0787c5e6d98cc74094d9fe0fba23eb6c8e9b884d12"
+      },
+      "stop_reason": "completed"
+    },
+    "tree": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.02465452800015555,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 0,
+        "max_sample_gap_seconds": 0.0,
+        "root_os_peak_resident_bytes": 25665536,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 1,
+        "sampled_peak_tree_resident_bytes": 0
+      },
+      "record": {
+        "bytes": 8937,
+        "path": "/opt/r1/phase-on/river-3-baseline/tree/supervisor.json",
+        "sha256": "3871c5802f99fc18b914dbdde33a8daed5e184b1a98310c9c36e0dd84b041f77"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 1723,
+        "path": "/opt/r1/phase-on/river-3-baseline/tree/stdout.log",
+        "sha256": "a1b301055e7a45c6f23188e7a30ef2f1803949dc98abb0ed30ee0a40fa14d2b8"
+      },
+      "stop_reason": "completed"
+    }
+  },
+  "quality_status": "not_evaluated",
+  "repetition": 3,
+  "resume": null,
+  "run_status": "completed",
+  "saved_profile_br": "not_evaluated",
+  "solve": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.26101325999979963,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.05934791800018502,
+      "root_os_peak_resident_bytes": 25612288,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 5,
+      "sampled_peak_tree_resident_bytes": 11235328
+    },
+    "r1_phase": {
+      "mode": "on",
+      "record": {
+        "bytes": 6366,
+        "path": "/opt/r1/phase-on/river-3-baseline/solve/phase.json",
+        "sha256": "cd7f3cb94dde04d88f15d8557c402f59bec4da2cb62d9ce1715e70d815757ab8"
+      },
+      "status": "validated",
+      "summary": {
+        "cfr_inclusive_envelope": {
+          "add_to_leaf_sum": false,
+          "duration_ns": 133144455,
+          "end_ns": 155621814,
+          "start_ns": 22477359
+        },
+        "instrumentation_id": "aa81ca3e10c1beba324a8d42483294ca54a8b3fe852970a9f924da44fd2e5a3a",
+        "leaves": {
+          "cfr_updates": {
+            "calls": 4,
+            "duration_ns": 99275135
+          },
+          "checkpoint": {
+            "calls": 5,
+            "duration_ns": 52879677
+          },
+          "final_ev_br": {
+            "calls": 1,
+            "duration_ns": 3017990
+          },
+          "initialization": {
+            "calls": 1,
+            "duration_ns": 1390030
+          },
+          "input_preparation": {
+            "calls": 1,
+            "duration_ns": 8980230
+          },
+          "overhead": {
+            "calls": 18,
+            "duration_ns": 21417311
+          },
+          "periodic_ev_br": {
+            "calls": 4,
+            "duration_ns": 5604440
+          },
+          "sol_preparation": {
+            "calls": 1,
+            "duration_ns": 1683109
+          },
+          "sol_serialization_and_write": {
+            "calls": 1,
+            "duration_ns": 9686070
+          },
+          "summary_publish": {
+            "calls": 1,
+            "duration_ns": 38950
+          }
+        },
+        "source_version": "baseline9632",
+        "total_ns": 203972942
+      }
+    },
+    "record": {
+      "bytes": 9195,
+      "path": "/opt/r1/phase-on/river-3-baseline/solve/supervisor.json",
+      "sha256": "f654d6efef134d0c2d66667efd2f3850202c0bc41885853561b315d016dca40c"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 600,
+      "path": "/opt/r1/phase-on/river-3-baseline/solve/stdout.log",
+      "sha256": "0ba6350c01371e57c6e5613f51c8a53703e3eeccf4d20195f8056820b3f0fcd7"
+    },
+    "stop_reason": "completed"
+  },
+  "summary": {
+    "board": "2c 7d 9h Js Qs",
+    "effective_stack": 60,
+    "ev_ip": 6.128177549428161,
+    "ev_oop": 13.871822359286634,
+    "expl_ip": 0.016869405042389207,
+    "expl_oop": 0.012880653853740931,
+    "iterations": 100,
+    "min_bet": 1,
+    "nash_conv": 0.029750058896130138,
+    "nodes": 27,
+    "pot": 20,
+    "storage": "f32",
+    "stored_nodes": 10,
+    "streets_stored": "full",
+    "wall_secs": 0.145855574
+  },
+  "summary_read": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.024732778999805305,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 0,
+      "max_sample_gap_seconds": 0.0,
+      "root_os_peak_resident_bytes": 25612288,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 1,
+      "sampled_peak_tree_resident_bytes": 0
+    },
+    "record": {
+      "bytes": 9339,
+      "path": "/opt/r1/phase-on/river-3-baseline/summary/supervisor.json",
+      "sha256": "e3b8835e0b760abc0569916969694b18156b24ae17e7e7185d113b9efaf508ea"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 390,
+      "path": "/opt/r1/phase-on/river-3-baseline/summary/stdout.log",
+      "sha256": "9d324836837441384ce6d587adccf0f29b848fca20d8c255000de58000c64359"
+    },
+    "stop_reason": "completed"
+  },
+  "version": "baseline"
+}

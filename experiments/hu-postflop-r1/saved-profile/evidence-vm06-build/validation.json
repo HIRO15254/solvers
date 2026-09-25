@@ -1,0 +1,3851 @@
+{
+  "boot_source_policy": "all observations retain their record/pointer; never attribute old validation or native binaries to another boot/source",
+  "distinct_boot_ids": [
+    "1218b856-0cbd-4349-8ccc-a0ac7a7792ce",
+    "159efb96-10fb-4ce4-bb0f-bc2b27ee618f"
+  ],
+  "multiple_boots_observed": true,
+  "problems": [
+    {
+      "error_type": "UnicodeDecodeError",
+      "reason": "invalid_structured_evidence",
+      "record": "records/recovery/historical/12-baseline-example-release/supervisor.samples.jsonl#L359"
+    },
+    {
+      "count": 188,
+      "reason": "required_linked_evidence_missing"
+    }
+  ],
+  "provenance_observations": [
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/compiler_binaries/0",
+      "record": "records/recovery/historical/cache-seed.json",
+      "value": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/compiler_binaries/1",
+      "record": "records/recovery/historical/cache-seed.json",
+      "value": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/from_current_source_archive",
+      "record": "records/recovery/historical/cache-seed.json",
+      "value": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/audit-source.tar.gz",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "value": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/baseline-source.tar.gz",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "value": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/compiler_binaries/0",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "value": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/compiler_binaries/1",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "value": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/current_example",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "value": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source06_solvers_not_paired_benchmark",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "value": {
+        "bytes": 9039176,
+        "path": "/opt/r1/target/current/release/solvers",
+        "sha256": "8def6f2d0bf88f94cc92b7b5a8dfee46684e6fdaca7ccd5be4ac186f6994fefc"
+      }
+    },
+    {
+      "kind": "boot_id",
+      "pointer": "/boot_id",
+      "record": "records/recovery/historical/result.json",
+      "value": "1218b856-0cbd-4349-8ccc-a0ac7a7792ce"
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/audit-source.tar.gz",
+      "record": "records/recovery/historical/result.json",
+      "value": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/baseline-source.tar.gz",
+      "record": "records/recovery/historical/result.json",
+      "value": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/baseline_example",
+      "record": "records/recovery/historical/result.json",
+      "value": {
+        "bytes": 4261392,
+        "path": "/opt/r1/target/baseline-audit/release/examples/hu_saved_profile_audit",
+        "sha256": "1beaeabaa532e14b5c69f47b103814e6e70571f3a142800f17c42110471434b1"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/compiler_binaries/0",
+      "record": "records/recovery/historical/result.json",
+      "value": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/compiler_binaries/1",
+      "record": "records/recovery/historical/result.json",
+      "value": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/current_example",
+      "record": "records/recovery/historical/result.json",
+      "value": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/source06_solvers_not_paired_benchmark",
+      "record": "records/recovery/historical/result.json",
+      "value": {
+        "bytes": 9039176,
+        "path": "/opt/r1/target/current/release/solvers",
+        "sha256": "8def6f2d0bf88f94cc92b7b5a8dfee46684e6fdaca7ccd5be4ac186f6994fefc"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/09-baseline-source-check/stderr.log",
+      "record": "records/recovery/historical/retained-files.json",
+      "value": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-build/09-baseline-source-check/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/09-baseline-source-check/stdout.log",
+      "record": "records/recovery/historical/retained-files.json",
+      "value": {
+        "bytes": 299,
+        "path": "/opt/r1/audit-pair-build/09-baseline-source-check/stdout.log",
+        "sha256": "017823d7e1b55a1f94632861f83865995c0cf035d60f38476091283d5b7efe9f"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/09-baseline-source-check/supervisor.json",
+      "record": "records/recovery/historical/retained-files.json",
+      "value": {
+        "bytes": 7683,
+        "path": "/opt/r1/audit-pair-build/09-baseline-source-check/supervisor.json",
+        "sha256": "e1154116e2083caf247adba21d65a40a4c1175f1de52c8bfe2a6e477f3486f7c"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/09-baseline-source-check/supervisor.samples.jsonl",
+      "record": "records/recovery/historical/retained-files.json",
+      "value": {
+        "bytes": 632,
+        "path": "/opt/r1/audit-pair-build/09-baseline-source-check/supervisor.samples.jsonl",
+        "sha256": "2cb1255ba59de3733b4066958d7367de95538be604b0d45339c8e28cfd970112"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/12-baseline-example-release/stderr.log",
+      "record": "records/recovery/historical/retained-files.json",
+      "value": {
+        "bytes": 737,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/stderr.log",
+        "sha256": "b49c5f241fa25fda2b8e09d456722ac50d3128f0f5026baa2a56ea2014d91354"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/12-baseline-example-release/stdout.log",
+      "record": "records/recovery/historical/retained-files.json",
+      "value": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/12-baseline-example-release/supervisor.json",
+      "record": "records/recovery/historical/retained-files.json",
+      "value": {
+        "bytes": 8517,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/supervisor.json",
+        "sha256": "77a65dda5f61ba5960a9487c8c757110568e78abbbbfb963c90be3ae30e6d129"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/12-baseline-example-release/supervisor.samples.jsonl",
+      "record": "records/recovery/historical/retained-files.json",
+      "value": {
+        "bytes": 118866,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/supervisor.samples.jsonl",
+        "sha256": "717028d2bd7c418d930e570aeecfa12111dc5946952cec77b1c7b9c44eef6c04"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/baseline-source-files.json",
+      "record": "records/recovery/historical/retained-files.json",
+      "value": {
+        "bytes": 27135,
+        "path": "/opt/r1/audit-pair-build/baseline-source-files.json",
+        "sha256": "ff778c0a7b5c1a4dd26e19fc661064dacc27e91381587803f0cd722bcbd7bd1c"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/current-source-files.json",
+      "record": "records/recovery/historical/retained-files.json",
+      "value": {
+        "bytes": 44804,
+        "path": "/opt/r1/audit-pair-build/current-source-files.json",
+        "sha256": "cbd04399b4d3338bf5c2012391b73dcbf686cd7194953d910fad0f1abf79dc22"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/compiler_binaries/0",
+      "record": "records/recovery/recovery/cache-seed.json",
+      "value": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/compiler_binaries/1",
+      "record": "records/recovery/recovery/cache-seed.json",
+      "value": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/from_current_source_archive",
+      "record": "records/recovery/recovery/cache-seed.json",
+      "value": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/baseline_example",
+      "record": "records/recovery/recovery/complete.json",
+      "value": {
+        "bytes": 4227680,
+        "path": "/opt/r1/target/baseline-audit-recovery/release/examples/hu_saved_profile_audit",
+        "sha256": "9efa72cb9cbeed080cda824ee91fccac29dd3d1f17822eb2d5da97b30fe6bc92"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/current_example",
+      "record": "records/recovery/recovery/complete.json",
+      "value": {
+        "bytes": 4249752,
+        "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+        "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/audit-source.tar.gz",
+      "record": "records/recovery/recovery/current-build-complete.json",
+      "value": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/baseline-source.tar.gz",
+      "record": "records/recovery/recovery/current-build-complete.json",
+      "value": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/compiler_binaries/0",
+      "record": "records/recovery/recovery/current-build-complete.json",
+      "value": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/compiler_binaries/1",
+      "record": "records/recovery/recovery/current-build-complete.json",
+      "value": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/current_example",
+      "record": "records/recovery/recovery/current-build-complete.json",
+      "value": {
+        "bytes": 4249752,
+        "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+        "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/source06_solvers_not_paired_benchmark",
+      "record": "records/recovery/recovery/current-build-complete.json",
+      "value": {
+        "bytes": 8868976,
+        "path": "/opt/r1/target/current-recovery/release/solvers",
+        "sha256": "5baae6ebe438bc0205968587a7447599a15832411aeab1558cfecc1dd7293031"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/09-baseline-source-check/stderr.log",
+      "record": "records/recovery/recovery/prior-evidence-files.json",
+      "value": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-build/09-baseline-source-check/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/09-baseline-source-check/stdout.log",
+      "record": "records/recovery/recovery/prior-evidence-files.json",
+      "value": {
+        "bytes": 299,
+        "path": "/opt/r1/audit-pair-build/09-baseline-source-check/stdout.log",
+        "sha256": "017823d7e1b55a1f94632861f83865995c0cf035d60f38476091283d5b7efe9f"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/09-baseline-source-check/supervisor.json",
+      "record": "records/recovery/recovery/prior-evidence-files.json",
+      "value": {
+        "bytes": 7683,
+        "path": "/opt/r1/audit-pair-build/09-baseline-source-check/supervisor.json",
+        "sha256": "e1154116e2083caf247adba21d65a40a4c1175f1de52c8bfe2a6e477f3486f7c"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/09-baseline-source-check/supervisor.samples.jsonl",
+      "record": "records/recovery/recovery/prior-evidence-files.json",
+      "value": {
+        "bytes": 632,
+        "path": "/opt/r1/audit-pair-build/09-baseline-source-check/supervisor.samples.jsonl",
+        "sha256": "2cb1255ba59de3733b4066958d7367de95538be604b0d45339c8e28cfd970112"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/12-baseline-example-release/stderr.log",
+      "record": "records/recovery/recovery/prior-evidence-files.json",
+      "value": {
+        "bytes": 737,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/stderr.log",
+        "sha256": "4b0162522527188f55157003b635de6dd7dd9805558fa97c3e593d58f22045c6"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/12-baseline-example-release/stdout.log",
+      "record": "records/recovery/recovery/prior-evidence-files.json",
+      "value": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/12-baseline-example-release/supervisor.json",
+      "record": "records/recovery/recovery/prior-evidence-files.json",
+      "value": {
+        "bytes": 8517,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/supervisor.json",
+        "sha256": "77a65dda5f61ba5960a9487c8c757110568e78abbbbfb963c90be3ae30e6d129"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/12-baseline-example-release/supervisor.samples.jsonl",
+      "record": "records/recovery/recovery/prior-evidence-files.json",
+      "value": {
+        "bytes": 114688,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/supervisor.samples.jsonl",
+        "sha256": "937758d22777cf0c610dce09c7164c8dfa61a4022289fba8339b51599afd5342"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/baseline-source-files.json",
+      "record": "records/recovery/recovery/prior-evidence-files.json",
+      "value": {
+        "bytes": 27135,
+        "path": "/opt/r1/audit-pair-build/baseline-source-files.json",
+        "sha256": "ff778c0a7b5c1a4dd26e19fc661064dacc27e91381587803f0cd722bcbd7bd1c"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/current-source-files.json",
+      "record": "records/recovery/recovery/prior-evidence-files.json",
+      "value": {
+        "bytes": 44804,
+        "path": "/opt/r1/audit-pair-build/current-source-files.json",
+        "sha256": "cbd04399b4d3338bf5c2012391b73dcbf686cd7194953d910fad0f1abf79dc22"
+      }
+    },
+    {
+      "kind": "boot_id",
+      "pointer": "/boot_id",
+      "record": "records/recovery/recovery/result.json",
+      "value": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f"
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/audit-source.tar.gz",
+      "record": "records/recovery/recovery/result.json",
+      "value": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/baseline-source.tar.gz",
+      "record": "records/recovery/recovery/result.json",
+      "value": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/baseline_example",
+      "record": "records/recovery/recovery/result.json",
+      "value": {
+        "bytes": 4227680,
+        "path": "/opt/r1/target/baseline-audit-recovery/release/examples/hu_saved_profile_audit",
+        "sha256": "9efa72cb9cbeed080cda824ee91fccac29dd3d1f17822eb2d5da97b30fe6bc92"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/compiler_binaries/0",
+      "record": "records/recovery/recovery/result.json",
+      "value": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/compiler_binaries/1",
+      "record": "records/recovery/recovery/result.json",
+      "value": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/current_example",
+      "record": "records/recovery/recovery/result.json",
+      "value": {
+        "bytes": 4249752,
+        "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+        "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/identities/source06_solvers_not_paired_benchmark",
+      "record": "records/recovery/recovery/result.json",
+      "value": {
+        "bytes": 8868976,
+        "path": "/opt/r1/target/current-recovery/release/solvers",
+        "sha256": "5baae6ebe438bc0205968587a7447599a15832411aeab1558cfecc1dd7293031"
+      }
+    },
+    {
+      "kind": "previous_boot_id",
+      "pointer": "/recovery/previous_boot_id",
+      "record": "records/recovery/recovery/result.json",
+      "value": "1218b856-0cbd-4349-8ccc-a0ac7a7792ce"
+    },
+    {
+      "kind": "native_cpu_compatibility",
+      "pointer": "/recovery/native_cpu_compatibility",
+      "record": "records/recovery/recovery/result.json",
+      "value": {
+        "current": {
+          "Architecture": "x86_64",
+          "CPU family": "23",
+          "CPU op-mode(s)": "32-bit, 64-bit",
+          "Flags": [
+            "3dnowprefetch",
+            "abm",
+            "adx",
+            "aes",
+            "apic",
+            "arat",
+            "avx",
+            "avx2",
+            "bmi1",
+            "bmi2",
+            "clflush",
+            "clflushopt",
+            "clwb",
+            "clzero",
+            "cmov",
+            "cmp_legacy",
+            "constant_tsc",
+            "cpuid",
+            "cr8_legacy",
+            "cx16",
+            "cx8",
+            "de",
+            "extd_apicid",
+            "f16c",
+            "fma",
+            "fpu",
+            "fsgsbase",
+            "fxsr",
+            "fxsr_opt",
+            "ht",
+            "hypervisor",
+            "ibpb",
+            "ibrs",
+            "lahf_lm",
+            "lm",
+            "mca",
+            "mce",
+            "misalignsse",
+            "mmx",
+            "mmxext",
+            "movbe",
+            "msr",
+            "mtrr",
+            "nonstop_tsc",
+            "nopl",
+            "nx",
+            "osvw",
+            "pae",
+            "pat",
+            "pclmulqdq",
+            "pdpe1gb",
+            "pge",
+            "pni",
+            "popcnt",
+            "pse",
+            "pse36",
+            "rdpid",
+            "rdrand",
+            "rdseed",
+            "rdtscp",
+            "rep_good",
+            "sep",
+            "sha_ni",
+            "smap",
+            "smep",
+            "ssbd",
+            "sse",
+            "sse2",
+            "sse4_1",
+            "sse4_2",
+            "sse4a",
+            "ssse3",
+            "stibp",
+            "syscall",
+            "topoext",
+            "tsc",
+            "tsc_adjust",
+            "tsc_known_freq",
+            "umip",
+            "vme",
+            "vmmcall",
+            "x2apic",
+            "xgetbv1",
+            "xsave",
+            "xsavec",
+            "xsaveerptr",
+            "xsaveopt",
+            "xtopology"
+          ],
+          "Model": "49",
+          "Model name": "AMD EPYC 7B12",
+          "Stepping": "0",
+          "Vendor ID": "AuthenticAMD"
+        },
+        "previous": {
+          "Architecture": "x86_64",
+          "CPU family": "6",
+          "CPU op-mode(s)": "32-bit, 64-bit",
+          "Flags": [
+            "3dnowprefetch",
+            "abm",
+            "adx",
+            "aes",
+            "apic",
+            "arat",
+            "arch_capabilities",
+            "avx",
+            "avx2",
+            "bmi1",
+            "bmi2",
+            "clflush",
+            "cmov",
+            "constant_tsc",
+            "cpuid",
+            "cx16",
+            "cx8",
+            "de",
+            "erms",
+            "f16c",
+            "fma",
+            "fpu",
+            "fsgsbase",
+            "fxsr",
+            "hle",
+            "ht",
+            "hypervisor",
+            "ibpb",
+            "ibrs",
+            "invpcid",
+            "lahf_lm",
+            "lm",
+            "mca",
+            "mce",
+            "md_clear",
+            "mmx",
+            "movbe",
+            "msr",
+            "mtrr",
+            "nonstop_tsc",
+            "nopl",
+            "nx",
+            "pae",
+            "pat",
+            "pcid",
+            "pclmulqdq",
+            "pdpe1gb",
+            "pge",
+            "pni",
+            "popcnt",
+            "pse",
+            "pse36",
+            "pti",
+            "rdrand",
+            "rdseed",
+            "rdtscp",
+            "rep_good",
+            "rtm",
+            "sep",
+            "smap",
+            "smep",
+            "ss",
+            "ssbd",
+            "sse",
+            "sse2",
+            "sse4_1",
+            "sse4_2",
+            "ssse3",
+            "stibp",
+            "syscall",
+            "tsc",
+            "tsc_adjust",
+            "tsc_known_freq",
+            "vme",
+            "x2apic",
+            "xsave",
+            "xsaveopt",
+            "xtopology"
+          ],
+          "Model": "79",
+          "Model name": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+          "Stepping": "0",
+          "Vendor ID": "GenuineIntel"
+        },
+        "status": "changed_fresh_rebuild_required"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/recovery/historical_baseline_example_claim",
+      "record": "records/recovery/recovery/result.json",
+      "value": {
+        "bytes": 4261392,
+        "path": "/opt/r1/target/baseline-audit/release/examples/hu_saved_profile_audit",
+        "sha256": "1beaeabaa532e14b5c69f47b103814e6e70571f3a142800f17c42110471434b1"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/recovery/historical_current_example",
+      "record": "records/recovery/recovery/result.json",
+      "value": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/recovery/historical_source06_solvers",
+      "record": "records/recovery/recovery/result.json",
+      "value": {
+        "bytes": 9039176,
+        "path": "/opt/r1/target/current/release/solvers",
+        "sha256": "8def6f2d0bf88f94cc92b7b5a8dfee46684e6fdaca7ccd5be4ac186f6994fefc"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/12-baseline-example-release/stderr.log",
+      "record": "records/recovery/recovery/retained-files.json",
+      "value": {
+        "bytes": 737,
+        "path": "/opt/r1/audit-pair-recovery/12-baseline-example-release/stderr.log",
+        "sha256": "391ffdd2f7caad9565b7c10d517e00ace2c1c79be04d20d6338264909299a10c"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/12-baseline-example-release/stdout.log",
+      "record": "records/recovery/recovery/retained-files.json",
+      "value": {
+        "bytes": 0,
+        "path": "/opt/r1/audit-pair-recovery/12-baseline-example-release/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/12-baseline-example-release/supervisor.json",
+      "record": "records/recovery/recovery/retained-files.json",
+      "value": {
+        "bytes": 34659,
+        "path": "/opt/r1/audit-pair-recovery/12-baseline-example-release/supervisor.json",
+        "sha256": "4caa8f4499b6a67db3860fa64f076ed8fa19ded94447024fea0998feaa1c2de3"
+      }
+    },
+    {
+      "kind": "source_or_binary_identity",
+      "pointer": "/12-baseline-example-release/supervisor.samples.jsonl",
+      "record": "records/recovery/recovery/retained-files.json",
+      "value": {
+        "bytes": 84367,
+        "path": "/opt/r1/audit-pair-recovery/12-baseline-example-release/supervisor.samples.jsonl",
+        "sha256": "5e6c5839aa6c1897939a0ca5501222a7ce7613b35e5865ded1fd63dcfcb514ca"
+      }
+    }
+  ],
+  "quality_acceptance": "not_evaluated_by_retainer",
+  "ready": false,
+  "reports": [],
+  "required_scopes": [],
+  "unresolved_references": [
+    {
+      "identity": {
+        "bytes": 551,
+        "path": "/opt/r1/audit-pair-recovery/result.json",
+        "sha256": "7cabf29984e4eef2fbded40a4fa54d996cb9352fea6d54e240d4b6ba5190fe81"
+      },
+      "pointer": "/result.json",
+      "record": "records/recovery/failed-cgroup/retained-files.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 686,
+        "path": "/opt/r1/audit-pair-recovery/result.json",
+        "sha256": "0084190719a7586e328e59d84aa51bd4e972804cf3fbfc235dc4ad61c9e7d970"
+      },
+      "pointer": "/result.json",
+      "record": "records/recovery/failed-shape/retained-files.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1446024,
+        "path": "/usr/bin/bash",
+        "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/historical/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/5",
+      "record": "records/recovery/historical/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1446024,
+        "path": "/usr/bin/bash",
+        "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/historical/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/5",
+      "record": "records/recovery/historical/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/01-fmt/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/01-fmt/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/historical/01-fmt/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/01-fmt/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/5",
+      "record": "records/recovery/historical/01-fmt/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/01-fmt/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/01-fmt/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/historical/01-fmt/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/01-fmt/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/5",
+      "record": "records/recovery/historical/01-fmt/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/02-clippy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/02-clippy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/historical/02-clippy/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/02-clippy/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/5",
+      "record": "records/recovery/historical/02-clippy/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/02-clippy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/02-clippy/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/historical/02-clippy/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/02-clippy/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/5",
+      "record": "records/recovery/historical/02-clippy/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/03-workspace-test/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/03-workspace-test/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/historical/03-workspace-test/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/03-workspace-test/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/5",
+      "record": "records/recovery/historical/03-workspace-test/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/03-workspace-test/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/03-workspace-test/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/historical/03-workspace-test/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/03-workspace-test/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/5",
+      "record": "records/recovery/historical/03-workspace-test/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/04-tools-python/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/04-tools-python/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/3",
+      "record": "records/recovery/historical/04-tools-python/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/04-tools-python/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/04-tools-python/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/04-tools-python/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/3",
+      "record": "records/recovery/historical/04-tools-python/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/04-tools-python/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/05-pipeline-python/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/05-pipeline-python/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/3",
+      "record": "records/recovery/historical/05-pipeline-python/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/05-pipeline-python/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/05-pipeline-python/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/05-pipeline-python/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/3",
+      "record": "records/recovery/historical/05-pipeline-python/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/05-pipeline-python/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/06-current-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/06-current-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/historical/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/5",
+      "record": "records/recovery/historical/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/06-current-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/06-current-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/historical/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/5",
+      "record": "records/recovery/historical/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 141848,
+        "path": "/usr/bin/cp",
+        "sha256": "95cdd604fdf0a292e349d27d1a80170ca0913bd3bbd9d2c0fcfc6c8adaebe2f0"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/07-seed-baseline-cache/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/07-seed-baseline-cache/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/historical/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/5",
+      "record": "records/recovery/historical/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 141848,
+        "path": "/usr/bin/cp",
+        "sha256": "95cdd604fdf0a292e349d27d1a80170ca0913bd3bbd9d2c0fcfc6c8adaebe2f0"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/07-seed-baseline-cache/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/07-seed-baseline-cache/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/historical/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/5",
+      "record": "records/recovery/historical/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 440264,
+        "path": "/usr/bin/tar",
+        "sha256": "3ee2c3c0b4dd9aacebfd2f0fbae44bad36348203acff78a44888dd58c05f811c"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/08-extract-baseline/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/08-extract-baseline/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/historical/08-extract-baseline/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/08-extract-baseline/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/5",
+      "record": "records/recovery/historical/08-extract-baseline/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 440264,
+        "path": "/usr/bin/tar",
+        "sha256": "3ee2c3c0b4dd9aacebfd2f0fbae44bad36348203acff78a44888dd58c05f811c"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/08-extract-baseline/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/08-extract-baseline/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/historical/08-extract-baseline/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/08-extract-baseline/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/5",
+      "record": "records/recovery/historical/08-extract-baseline/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/09-baseline-source-check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/09-baseline-source-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/3",
+      "record": "records/recovery/historical/09-baseline-source-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/09-baseline-source-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/09-baseline-source-check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/09-baseline-source-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/3",
+      "record": "records/recovery/historical/09-baseline-source-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/09-baseline-source-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/10-baseline-adapter-apply/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/10-baseline-adapter-apply/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/3",
+      "record": "records/recovery/historical/10-baseline-adapter-apply/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/10-baseline-adapter-apply/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/10-baseline-adapter-apply/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/10-baseline-adapter-apply/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/3",
+      "record": "records/recovery/historical/10-baseline-adapter-apply/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/10-baseline-adapter-apply/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/11-baseline-adapter-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/11-baseline-adapter-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/3",
+      "record": "records/recovery/historical/11-baseline-adapter-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/11-baseline-adapter-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/11-baseline-adapter-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/11-baseline-adapter-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/3",
+      "record": "records/recovery/historical/11-baseline-adapter-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/11-baseline-adapter-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 737,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/stderr.log",
+        "sha256": "b49c5f241fa25fda2b8e09d456722ac50d3128f0f5026baa2a56ea2014d91354"
+      },
+      "pointer": "/outputs/stderr",
+      "record": "records/recovery/historical/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 118866,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/supervisor.samples.jsonl",
+        "sha256": "717028d2bd7c418d930e570aeecfa12111dc5946952cec77b1c7b9c44eef6c04"
+      },
+      "pointer": "/outputs/samples",
+      "record": "records/recovery/historical/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/12-baseline-example-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/12-baseline-example-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/historical/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/5",
+      "record": "records/recovery/historical/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/12-baseline-example-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/12-baseline-example-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/historical/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/5",
+      "record": "records/recovery/historical/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 300,
+        "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/stdout.log",
+        "sha256": "c22c8151971687fec157ad5693e4cd5c437afbcadfb35c4955843f003612c0a9"
+      },
+      "pointer": "/outputs/stdout",
+      "record": "records/recovery/historical/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 633,
+        "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/supervisor.samples.jsonl",
+        "sha256": "5cbbb1254f773abb44e7b437e0c75854d443407d7fd21dc911934b84d74da66d"
+      },
+      "pointer": "/outputs/samples",
+      "record": "records/recovery/historical/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/historical/13-baseline-final-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/historical/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/3",
+      "record": "records/recovery/historical/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/4",
+      "record": "records/recovery/historical/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/historical/13-baseline-final-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/historical/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/3",
+      "record": "records/recovery/historical/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/4",
+      "record": "records/recovery/historical/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/compiler_binaries/0",
+      "record": "records/recovery/historical/cache-seed.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/compiler_binaries/1",
+      "record": "records/recovery/historical/cache-seed.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/from_current_source_archive",
+      "record": "records/recovery/historical/cache-seed.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/audit-source.tar.gz",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/baseline-source.tar.gz",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/compiler_binaries/0",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/compiler_binaries/1",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/current_example",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/immutable_inputs/1",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/immutable_inputs/2",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/immutable_inputs/10",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 9039176,
+        "path": "/opt/r1/target/current/release/solvers",
+        "sha256": "8def6f2d0bf88f94cc92b7b5a8dfee46684e6fdaca7ccd5be4ac186f6994fefc"
+      },
+      "pointer": "/source06_solvers_not_paired_benchmark",
+      "record": "records/recovery/historical/current-build-complete.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identities/audit-source.tar.gz",
+      "record": "records/recovery/historical/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identities/baseline-source.tar.gz",
+      "record": "records/recovery/historical/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 4261392,
+        "path": "/opt/r1/target/baseline-audit/release/examples/hu_saved_profile_audit",
+        "sha256": "1beaeabaa532e14b5c69f47b103814e6e70571f3a142800f17c42110471434b1"
+      },
+      "pointer": "/identities/baseline_example",
+      "record": "records/recovery/historical/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identities/compiler_binaries/0",
+      "record": "records/recovery/historical/result.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identities/compiler_binaries/1",
+      "record": "records/recovery/historical/result.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identities/current_example",
+      "record": "records/recovery/historical/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identities/immutable_inputs/1",
+      "record": "records/recovery/historical/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identities/immutable_inputs/2",
+      "record": "records/recovery/historical/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identities/immutable_inputs/10",
+      "record": "records/recovery/historical/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 9039176,
+        "path": "/opt/r1/target/current/release/solvers",
+        "sha256": "8def6f2d0bf88f94cc92b7b5a8dfee46684e6fdaca7ccd5be4ac186f6994fefc"
+      },
+      "pointer": "/identities/source06_solvers_not_paired_benchmark",
+      "record": "records/recovery/historical/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 737,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/stderr.log",
+        "sha256": "b49c5f241fa25fda2b8e09d456722ac50d3128f0f5026baa2a56ea2014d91354"
+      },
+      "pointer": "/12-baseline-example-release/stderr.log",
+      "record": "records/recovery/historical/retained-files.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 118866,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/supervisor.samples.jsonl",
+        "sha256": "717028d2bd7c418d930e570aeecfa12111dc5946952cec77b1c7b9c44eef6c04"
+      },
+      "pointer": "/12-baseline-example-release/supervisor.samples.jsonl",
+      "record": "records/recovery/historical/retained-files.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 300,
+        "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/stdout.log",
+        "sha256": "c22c8151971687fec157ad5693e4cd5c437afbcadfb35c4955843f003612c0a9"
+      },
+      "pointer": "/13-baseline-final-verify/stdout.log",
+      "record": "records/recovery/historical/retained-files.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 633,
+        "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/supervisor.samples.jsonl",
+        "sha256": "5cbbb1254f773abb44e7b437e0c75854d443407d7fd21dc911934b84d74da66d"
+      },
+      "pointer": "/13-baseline-final-verify/supervisor.samples.jsonl",
+      "record": "records/recovery/historical/retained-files.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1446024,
+        "path": "/usr/bin/bash",
+        "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/67",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/68",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_before/77",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/78",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_before/79",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1446024,
+        "path": "/usr/bin/bash",
+        "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/67",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/68",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_after/77",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/78",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_after/79",
+      "record": "records/recovery/recovery/00-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/66",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/67",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_before/76",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/77",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_before/78",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/66",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/67",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_after/76",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/77",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_after/78",
+      "record": "records/recovery/recovery/01-baseline-pre-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/67",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/68",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_before/77",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_before/78",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/67",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/68",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_after/77",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_after/78",
+      "record": "records/recovery/recovery/06-current-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1446024,
+        "path": "/usr/bin/bash",
+        "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/67",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/68",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_before/77",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/78",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_before/79",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1446024,
+        "path": "/usr/bin/bash",
+        "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/67",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/68",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_after/77",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/78",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_after/79",
+      "record": "records/recovery/recovery/06-current-toolchain-check/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 141848,
+        "path": "/usr/bin/cp",
+        "sha256": "95cdd604fdf0a292e349d27d1a80170ca0913bd3bbd9d2c0fcfc6c8adaebe2f0"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/67",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/68",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_before/77",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/78",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_before/79",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 141848,
+        "path": "/usr/bin/cp",
+        "sha256": "95cdd604fdf0a292e349d27d1a80170ca0913bd3bbd9d2c0fcfc6c8adaebe2f0"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/67",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/68",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_after/77",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/78",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_after/79",
+      "record": "records/recovery/recovery/07-seed-baseline-cache/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/67",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/68",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_before/77",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_before/78",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/67",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/68",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_after/77",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_after/78",
+      "record": "records/recovery/recovery/12-baseline-example-release/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/66",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/67",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_before/76",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/77",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_before/78",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/66",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/67",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_after/76",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/77",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_after/78",
+      "record": "records/recovery/recovery/13-baseline-final-verify/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1446024,
+        "path": "/usr/bin/bash",
+        "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1"
+      },
+      "pointer": "/identity_before/0",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_before/1",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_before/2",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_before/67",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_before/68",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_before/77",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_before/78",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_before/79",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1446024,
+        "path": "/usr/bin/bash",
+        "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1"
+      },
+      "pointer": "/identity_after/0",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 8020928,
+        "path": "/usr/bin/python3.12",
+        "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f"
+      },
+      "pointer": "/identity_after/1",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identity_after/2",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identity_after/67",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identity_after/68",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identity_after/77",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identity_after/78",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/identity_after/79",
+      "record": "records/recovery/recovery/14-final-toolchain/supervisor.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/compiler_binaries/0",
+      "record": "records/recovery/recovery/cache-seed.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/compiler_binaries/1",
+      "record": "records/recovery/recovery/cache-seed.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/from_current_source_archive",
+      "record": "records/recovery/recovery/cache-seed.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/audit-source.tar.gz",
+      "record": "records/recovery/recovery/current-build-complete.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/baseline-source.tar.gz",
+      "record": "records/recovery/recovery/current-build-complete.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/compiler_binaries/0",
+      "record": "records/recovery/recovery/current-build-complete.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/compiler_binaries/1",
+      "record": "records/recovery/recovery/current-build-complete.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/immutable_inputs/1",
+      "record": "records/recovery/recovery/current-build-complete.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/immutable_inputs/2",
+      "record": "records/recovery/recovery/current-build-complete.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/immutable_inputs/10",
+      "record": "records/recovery/recovery/current-build-complete.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identities/audit-source.tar.gz",
+      "record": "records/recovery/recovery/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identities/baseline-source.tar.gz",
+      "record": "records/recovery/recovery/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      "pointer": "/identities/compiler_binaries/0",
+      "record": "records/recovery/recovery/result.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      },
+      "pointer": "/identities/compiler_binaries/1",
+      "record": "records/recovery/recovery/result.json",
+      "required": false
+    },
+    {
+      "identity": {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      "pointer": "/identities/immutable_inputs/1",
+      "record": "records/recovery/recovery/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      "pointer": "/identities/immutable_inputs/2",
+      "record": "records/recovery/recovery/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "pointer": "/identities/immutable_inputs/10",
+      "record": "records/recovery/recovery/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 4261392,
+        "path": "/opt/r1/target/baseline-audit/release/examples/hu_saved_profile_audit",
+        "sha256": "1beaeabaa532e14b5c69f47b103814e6e70571f3a142800f17c42110471434b1"
+      },
+      "pointer": "/recovery/historical_baseline_example_claim",
+      "record": "records/recovery/recovery/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 4283728,
+        "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+        "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+      },
+      "pointer": "/recovery/historical_current_example",
+      "record": "records/recovery/recovery/result.json",
+      "required": true
+    },
+    {
+      "identity": {
+        "bytes": 9039176,
+        "path": "/opt/r1/target/current/release/solvers",
+        "sha256": "8def6f2d0bf88f94cc92b7b5a8dfee46684e6fdaca7ccd5be4ac186f6994fefc"
+      },
+      "pointer": "/recovery/historical_source06_solvers",
+      "record": "records/recovery/recovery/result.json",
+      "required": true
+    }
+  ]
+}

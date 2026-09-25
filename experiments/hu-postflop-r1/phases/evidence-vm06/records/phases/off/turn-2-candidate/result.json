@@ -1,0 +1,249 @@
+{
+  "artifacts": {
+    "checkpoint.ckpt": {
+      "bytes": 356288,
+      "header": {
+        "embedded_config_blake3": "ed7063d8134ffe4efb925229674c1a7ce25c676a6565eb7f4d9042b2b9b95fb1",
+        "iteration": 100,
+        "version": 1
+      },
+      "path": "/opt/r1/phase-off/turn-2-candidate/run/checkpoint.ckpt",
+      "sha256": "f22f9aa8b736d833128cfbc3c967507016ce82bad4027b874601428c8ecf84b3"
+    },
+    "progress.jsonl": {
+      "bytes": 544,
+      "path": "/opt/r1/phase-off/turn-2-candidate/run/progress.jsonl",
+      "sha256": "62af7f0f279a775af341c10ae11308762a9291e457bf09a09e0784fd9e2cb659"
+    },
+    "run.json": {
+      "bytes": 176,
+      "path": "/opt/r1/phase-off/turn-2-candidate/run/run.json",
+      "sha256": "6874107b857d69ec938450df4e6840a81ba5e12580971607fa448ffe87f01b7e"
+    },
+    "run.toml": {
+      "bytes": 675,
+      "path": "/opt/r1/phase-off/turn-2-candidate/run/run.toml",
+      "sha256": "a8ad2ff9c5591d51bd0ace7a675d09e68bf5e9bc39e720b57dd27ce58e595a1d"
+    },
+    "solution.sol": {
+      "bytes": 24920,
+      "header": {
+        "embedded_config_blake3": "ed7063d8134ffe4efb925229674c1a7ce25c676a6565eb7f4d9042b2b9b95fb1",
+        "iteration": 100,
+        "version": 3
+      },
+      "path": "/opt/r1/phase-off/turn-2-candidate/run/solution.sol",
+      "sha256": "fb230edc5fc5f51c2154e14646930b8f51f64cae85b5b8faabb81ee19bbc2c22"
+    }
+  },
+  "case": "turn",
+  "expected_iterations": 100,
+  "expected_sol_version": 3,
+  "internal_target": {
+    "exploitability_pct_pot": 0.0720699628194188,
+    "g_i": [
+      0.014560711236647705,
+      0.014267273891119814
+    ],
+    "inequality": "<",
+    "nash_conv": 0.02882798512776752,
+    "scope": "internal finite synthetic game only",
+    "source": "run.json final live solver result",
+    "status": "pass",
+    "strategy_kind": "live_average",
+    "target_nash_conv": 0.04
+  },
+  "live_final": {
+    "g_i": [
+      0.014560711236647705,
+      0.014267273891119814
+    ],
+    "iterations": 100,
+    "nash_conv": 0.02882798512776752,
+    "pot": 20
+  },
+  "missing_fields": [
+    "saved_quantized_profile_br",
+    "monotonic_internal_phase_spans",
+    "external_reference_condition_match_and_thresholds"
+  ],
+  "phase_timings": {
+    "br_final": null,
+    "cfr": null,
+    "initialization": null,
+    "persistence": null,
+    "return": null
+  },
+  "presave_consistency": "pass",
+  "profile": {
+    "ev": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.0797126060001574,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.058583158000146796,
+        "root_os_peak_resident_bytes": 26193920,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 2,
+        "sampled_peak_tree_resident_bytes": 14778368
+      },
+      "record": {
+        "bytes": 8965,
+        "path": "/opt/r1/phase-off/turn-2-candidate/ev/supervisor.json",
+        "sha256": "6a24ae8945dd4b60bb1a5a08ed5e6659d8ba1e4ba622477b1e9df891608e47ab"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 1729196,
+        "path": "/opt/r1/phase-off/turn-2-candidate/ev/stdout.log",
+        "sha256": "0048a5c0526dd92b14d9654ffc7a2d775474df01594a014ede251a40790715be"
+      },
+      "stop_reason": "completed"
+    },
+    "strategy": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.07918680700004188,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.05730775799975163,
+        "root_os_peak_resident_bytes": 26189824,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 2,
+        "sampled_peak_tree_resident_bytes": 13463552
+      },
+      "record": {
+        "bytes": 9001,
+        "path": "/opt/r1/phase-off/turn-2-candidate/strategy/supervisor.json",
+        "sha256": "387ce8d231caebf2edeaa0aa2bbefd9bcf463210ddede9191c4df2068ff77079"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 1201396,
+        "path": "/opt/r1/phase-off/turn-2-candidate/strategy/stdout.log",
+        "sha256": "c5e9aa8c05bfde689e99591fc32ea820ce2d8e875bdc016b07aed3528da031ef"
+      },
+      "stop_reason": "completed"
+    },
+    "tree": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.07697893700014902,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.05760301700001946,
+        "root_os_peak_resident_bytes": 26189824,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 2,
+        "sampled_peak_tree_resident_bytes": 14008320
+      },
+      "record": {
+        "bytes": 8975,
+        "path": "/opt/r1/phase-off/turn-2-candidate/tree/supervisor.json",
+        "sha256": "daef7f7b8ba090feccc9fda8732a98829008628dec5706c9bafe8830ed949b66"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 96635,
+        "path": "/opt/r1/phase-off/turn-2-candidate/tree/stdout.log",
+        "sha256": "e89730aac015ef2232cf19bfe6ba0d17d1f729bd2740fb094dd0dfd32da9f284"
+      },
+      "stop_reason": "completed"
+    }
+  },
+  "quality_status": "not_evaluated",
+  "repetition": 2,
+  "resume": null,
+  "run_status": "completed",
+  "saved_profile_br": "not_evaluated",
+  "solve": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 1.7082099029998972,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.06377551700006734,
+      "root_os_peak_resident_bytes": 36503552,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 29,
+      "sampled_peak_tree_resident_bytes": 37326848
+    },
+    "r1_phase": {
+      "mode": "off",
+      "record": null,
+      "status": "disabled",
+      "summary": null
+    },
+    "record": {
+      "bytes": 9200,
+      "path": "/opt/r1/phase-off/turn-2-candidate/solve/supervisor.json",
+      "sha256": "93c9e2ddd616f2f196cf565f736ea95105d26a2748266930e8a70914c9330ac8"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 608,
+      "path": "/opt/r1/phase-off/turn-2-candidate/solve/stdout.log",
+      "sha256": "5a5581028fc3fabe4ba00b88a50f418005faf231620f367c37fc3302639cfcdb"
+    },
+    "stop_reason": "completed"
+  },
+  "summary": {
+    "board": "2c 7d 9h Js",
+    "effective_stack": 60,
+    "ev_ip": 1.208072568163459,
+    "ev_oop": 18.791926466388468,
+    "expl_ip": 0.014267273891119814,
+    "expl_oop": 0.014560711236647705,
+    "iterations": 100,
+    "min_bet": 1,
+    "nash_conv": 0.02882798512776752,
+    "nodes": 1305,
+    "pot": 20,
+    "storage": "f32",
+    "stored_nodes": 580,
+    "streets_stored": "full",
+    "wall_secs": 1.549232109
+  },
+  "summary_read": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.019366879000244808,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 0,
+      "max_sample_gap_seconds": 0.0,
+      "root_os_peak_resident_bytes": 26189824,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 1,
+      "sampled_peak_tree_resident_bytes": 0
+    },
+    "record": {
+      "bytes": 9350,
+      "path": "/opt/r1/phase-off/turn-2-candidate/summary/supervisor.json",
+      "sha256": "3cbc6aa1e3e46033403ffcc306df5798ab33044be64b966fa8ef51bab886085b"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 389,
+      "path": "/opt/r1/phase-off/turn-2-candidate/summary/stdout.log",
+      "sha256": "5699a3a91e51a43359e261425c076749fcfb8e97e3f869269a829534d0c28ed5"
+    },
+    "stop_reason": "completed"
+  },
+  "version": "candidate"
+}

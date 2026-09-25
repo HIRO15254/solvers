@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "run",
+  "state": "completed",
+  "gameKind": "postflop",
+  "configSchema": "solvers.postflop/v1",
+  "configHash": "6092004a96a42674f88226ca5f6095680033a3b84c80fe742431b7aad68e1ed4",
+  "cliVersion": "0.1.0",
+  "command": [
+    "resume",
+    "/opt/r1/phase-on/turn-1-baseline/restore/run"
+  ],
+  "pid": 8665,
+  "createdUnixMs": 1790360397468,
+  "startedUnixMs": 1790360397468,
+  "finishedUnixMs": 1790360397679,
+  "failure": null,
+  "completion": "completed"
+}

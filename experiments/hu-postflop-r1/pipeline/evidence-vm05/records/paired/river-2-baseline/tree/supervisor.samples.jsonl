@@ -1,0 +1,1 @@
+{"pids": [], "tree_resident_bytes": 0, "root_os_peak_resident_bytes": 25669632, "root_os_peak_source": "wait4.ru_maxrss_linux_kib", "job_os_peak_commit_bytes": null, "elapsed_seconds": 0.005238578999978927, "at": "2026-09-25T16:24:11.197811+00:00", "host_available_memory_bytes": 66166718464, "disk_free_bytes": 92814434304}

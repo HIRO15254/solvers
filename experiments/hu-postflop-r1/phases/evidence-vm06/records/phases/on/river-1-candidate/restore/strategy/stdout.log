@@ -1,0 +1,7051 @@
+[
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "2h2d",
+    "weight": 1.0,
+    "probabilities": [
+      0.14386205,
+      0.0,
+      0.85613793
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "2s2d",
+    "weight": 1.0,
+    "probabilities": [
+      0.14383154,
+      0.0,
+      0.85616845
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "2s2h",
+    "weight": 1.0,
+    "probabilities": [
+      0.14392309,
+      0.0,
+      0.8560769
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "6d6c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "6h6c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "6h6d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "6s6c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "6s6d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "6s6h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "7h7c",
+    "weight": 1.0,
+    "probabilities": [
+      0.4763409,
+      0.0,
+      0.5236591
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "7s7c",
+    "weight": 1.0,
+    "probabilities": [
+      0.4763409,
+      0.0,
+      0.5236591
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "7s7h",
+    "weight": 1.0,
+    "probabilities": [
+      0.4763409,
+      0.0,
+      0.5236591
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "8d8c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "8h8c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "8h8d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "8s8c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "8s8d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "8s8h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "9d9c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "9s9c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "9s9d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "TdTc",
+    "weight": 1.0,
+    "probabilities": [
+      0.8675364,
+      0.13246357,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "ThTc",
+    "weight": 1.0,
+    "probabilities": [
+      0.42253757,
+      0.57746243,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "ThTd",
+    "weight": 1.0,
+    "probabilities": [
+      0.40399787,
+      0.59600216,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "TsTc",
+    "weight": 1.0,
+    "probabilities": [
+      0.87653923,
+      0.12346075,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "TsTd",
+    "weight": 1.0,
+    "probabilities": [
+      0.85859466,
+      0.14140536,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "TsTh",
+    "weight": 1.0,
+    "probabilities": [
+      0.39592585,
+      0.6040742,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "JdJc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0987579,
+      0.03546251,
+      0.8657796
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "JhJc",
+    "weight": 1.0,
+    "probabilities": [
+      0.08618296,
+      0.033600368,
+      0.88021666
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "JhJd",
+    "weight": 1.0,
+    "probabilities": [
+      0.08673228,
+      0.028152896,
+      0.88511485
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "QdQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "QhQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "QhQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KcTd",
+    "weight": 1.0,
+    "probabilities": [
+      0.38199437,
+      0.37154192,
+      0.24646372
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KcTh",
+    "weight": 1.0,
+    "probabilities": [
+      0.013656616,
+      0.3366089,
+      0.6497345
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KcTs",
+    "weight": 1.0,
+    "probabilities": [
+      0.3508606,
+      0.38868713,
+      0.26045227
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KcJd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KcJh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KcQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.05291829,
+      0.9470817,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KcQh",
+    "weight": 1.0,
+    "probabilities": [
+      0.06878767,
+      0.9312123,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KdTc",
+    "weight": 1.0,
+    "probabilities": [
+      0.3625849,
+      0.3210193,
+      0.31639582
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KdTh",
+    "weight": 1.0,
+    "probabilities": [
+      0.014572366,
+      0.3364004,
+      0.6490272
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KdTs",
+    "weight": 1.0,
+    "probabilities": [
+      0.35479292,
+      0.38685262,
+      0.25835446
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KdJc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KdJh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KdQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.049866483,
+      0.9501335,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KdQh",
+    "weight": 1.0,
+    "probabilities": [
+      0.06395056,
+      0.93604946,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KdKc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0018463416,
+      0.0,
+      0.9981537
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KhTc",
+    "weight": 1.0,
+    "probabilities": [
+      0.26689556,
+      0.3665675,
+      0.36653697
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KhTd",
+    "weight": 1.0,
+    "probabilities": [
+      0.2896512,
+      0.4155095,
+      0.29483932
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KhTs",
+    "weight": 1.0,
+    "probabilities": [
+      0.25781643,
+      0.43378347,
+      0.3084001
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KhJc",
+    "weight": 1.0,
+    "probabilities": [
+      0.008834974,
+      0.99116504,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KhJd",
+    "weight": 1.0,
+    "probabilities": [
+      0.008712902,
+      0.9912871,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KhQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.08215457,
+      0.9178454,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KhQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.08038453,
+      0.91961545,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KhKc",
+    "weight": 1.0,
+    "probabilities": [
+      0.00036621653,
+      0.0,
+      0.9996338
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KhKd",
+    "weight": 1.0,
+    "probabilities": [
+      0.00044251163,
+      0.0,
+      0.9995575
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KsTc",
+    "weight": 1.0,
+    "probabilities": [
+      0.28062868,
+      0.71772337,
+      0.0016479744
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KsTd",
+    "weight": 1.0,
+    "probabilities": [
+      0.25986114,
+      0.739971,
+      0.00016784924
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KsTh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0025940337,
+      0.72883195,
+      0.26857406
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KsJc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KsJd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KsJh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KsQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.00010681315,
+      0.9998932,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KsQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.00009155413,
+      0.99990845,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KsQh",
+    "weight": 1.0,
+    "probabilities": [
+      0.00006103609,
+      0.99993896,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KsKc",
+    "weight": 1.0,
+    "probabilities": [
+      0.012130923,
+      0.031189442,
+      0.95667964
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KsKd",
+    "weight": 1.0,
+    "probabilities": [
+      0.015899658,
+      0.031234741,
+      0.9528656
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "KsKh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0025940337,
+      0.030457009,
+      0.966949
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ac6c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.17729458,
+      0.82270545
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ac7c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ac8c",
+    "weight": 1.0,
+    "probabilities": [
+      0.17276001,
+      0.28503418,
+      0.5422058
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ac9c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AcTc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.36560616,
+      0.6343938
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AcJc",
+    "weight": 1.0,
+    "probabilities": [
+      0.00028992142,
+      0.9997101,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AcQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AcKc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ad2d",
+    "weight": 1.0,
+    "probabilities": [
+      0.22024873,
+      0.0,
+      0.7797513
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ad6d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.16704051,
+      0.8329595
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ad8d",
+    "weight": 1.0,
+    "probabilities": [
+      0.9989166,
+      0.0,
+      0.0010833906
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ad9d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AdTd",
+    "weight": 1.0,
+    "probabilities": [
+      0.4702678,
+      0.008987564,
+      0.5207446
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AdJd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0007476921,
+      0.9992523,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AdQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AdKd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AdAc",
+    "weight": 1.0,
+    "probabilities": [
+      0.001373312,
+      0.0,
+      0.9986267
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ah2h",
+    "weight": 1.0,
+    "probabilities": [
+      0.20650034,
+      0.0,
+      0.79349965
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ah6h",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.17633326,
+      0.82366675
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ah7h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "Ah8h",
+    "weight": 1.0,
+    "probabilities": [
+      0.73871976,
+      0.014297703,
+      0.24698253
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AhTh",
+    "weight": 1.0,
+    "probabilities": [
+      0.73871976,
+      0.014297703,
+      0.24698253
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AhJh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0058594644,
+      0.9941405,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AhQh",
+    "weight": 1.0,
+    "probabilities": [
+      0.00028992142,
+      0.0,
+      0.9997101
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AhKh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AhAc",
+    "weight": 1.0,
+    "probabilities": [
+      0.007568475,
+      0.0,
+      0.9924315
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AhAd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0128786145,
+      0.0,
+      0.9871214
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "As2s",
+    "weight": 1.0,
+    "probabilities": [
+      0.1983215,
+      0.0,
+      0.8016785
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "As3s",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "As4s",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "As5s",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "As6s",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.19304189,
+      0.80695814
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "As7s",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "As8s",
+    "weight": 1.0,
+    "probabilities": [
+      0.9670558,
+      0.00053406577,
+      0.032410163
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "As9s",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AsTs",
+    "weight": 1.0,
+    "probabilities": [
+      0.13037309,
+      0.11491569,
+      0.7547112
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AsKs",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AsAc",
+    "weight": 1.0,
+    "probabilities": [
+      0.00343328,
+      0.0,
+      0.9965667
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AsAd",
+    "weight": 1.0,
+    "probabilities": [
+      0.006729229,
+      0.0,
+      0.99327075
+    ]
+  },
+  {
+    "history": "",
+    "actor": "oop",
+    "combo": "AsAh",
+    "weight": 1.0,
+    "probabilities": [
+      0.028625926,
+      0.0,
+      0.9713741
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "2h2d",
+    "weight": 1.0,
+    "probabilities": [
+      0.39708552,
+      0.60291445,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "2s2d",
+    "weight": 1.0,
+    "probabilities": [
+      0.37959868,
+      0.6204013,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "2s2h",
+    "weight": 1.0,
+    "probabilities": [
+      0.4430152,
+      0.55698484,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Tc9c",
+    "weight": 1.0,
+    "probabilities": [
+      0.881117,
+      0.1182269,
+      0.00065613794
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Td9d",
+    "weight": 1.0,
+    "probabilities": [
+      0.86469823,
+      0.13476768,
+      0.00053406577
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Ts9s",
+    "weight": 1.0,
+    "probabilities": [
+      0.8237915,
+      0.17500305,
+      0.0012054443
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "QcJc",
+    "weight": 1.0,
+    "probabilities": [
+      0.51415277,
+      0.48584726,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "QdJd",
+    "weight": 1.0,
+    "probabilities": [
+      0.5140002,
+      0.48599985,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "QhJh",
+    "weight": 1.0,
+    "probabilities": [
+      0.50360876,
+      0.49639124,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "KcQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.00057984283,
+      0.99942017,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "KcQh",
+    "weight": 1.0,
+    "probabilities": [
+      0.000701915,
+      0.9992981,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "KdQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0006256199,
+      0.9993744,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "KdQh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0007476921,
+      0.9992523,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "KhQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.000045777066,
+      0.9999542,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "KhQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.000045777066,
+      0.9999542,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "KsQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.04600595,
+      0.95399404,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "KsQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.04606699,
+      0.953933,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "KsQh",
+    "weight": 1.0,
+    "probabilities": [
+      0.05569543,
+      0.9443046,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.51401544,
+      0.48529792,
+      0.000686656
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.5132372,
+      0.48612192,
+      0.0006408789
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.5168536,
+      0.482887,
+      0.00025940337
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Ad2d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "probabilities": [
+      0.55577934,
+      0.44411382,
+      0.00010681315
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "probabilities": [
+      0.556856,
+      0.44305247,
+      0.00009155553
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "probabilities": [
+      0.5603723,
+      0.43962768,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Ah2h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "probabilities": [
+      0.6632792,
+      0.33672082,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "probabilities": [
+      0.66573584,
+      0.33426413,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "probabilities": [
+      0.65278095,
+      0.34721905,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "As2s",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "As3s",
+    "weight": 1.0,
+    "probabilities": [
+      0.60704964,
+      0.39295033,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "As4s",
+    "weight": 1.0,
+    "probabilities": [
+      0.6096742,
+      0.39032578,
+      0.0
+    ]
+  },
+  {
+    "history": "x",
+    "actor": "ip",
+    "combo": "As5s",
+    "weight": 1.0,
+    "probabilities": [
+      0.59919125,
+      0.40080872,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "2h2d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.36151674,
+      0.6384832
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "2s2d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.36151674,
+      0.6384832
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "2s2h",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.36151674,
+      0.6384832
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.52025634,
+      0.42374304,
+      0.05600061
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.52707714,
+      0.4185397,
+      0.054383155
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "probabilities": [
+      0.50697327,
+      0.43704224,
+      0.055984497
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.52703136,
+      0.4184329,
+      0.054535743
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "probabilities": [
+      0.50693524,
+      0.4369421,
+      0.056122683
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "probabilities": [
+      0.51364917,
+      0.4317998,
+      0.054551
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.44153506,
+      0.50867474,
+      0.04979019
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.4430372,
+      0.5072024,
+      0.04976043
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "probabilities": [
+      0.43637085,
+      0.5138397,
+      0.04978943
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.44376287,
+      0.5064775,
+      0.04975967
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "probabilities": [
+      0.43710136,
+      0.513123,
+      0.04977569
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "probabilities": [
+      0.438612,
+      0.5116428,
+      0.049745172
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.34594727,
+      0.60250854,
+      0.05154419
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.3463851,
+      0.60209966,
+      0.051515244
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "probabilities": [
+      0.3458152,
+      0.6026398,
+      0.051544975
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.3465629,
+      0.60192263,
+      0.051514458
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "probabilities": [
+      0.34599832,
+      0.60247195,
+      0.051529717
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "probabilities": [
+      0.34643555,
+      0.6020508,
+      0.051513672
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Tc9c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.9916533,
+      0.008346685
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Td9d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.9866331,
+      0.013366903
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Ts9s",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.9976348,
+      0.0023651484
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "QcJc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "QdJd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "QhJh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "KcQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "KcQh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "KdQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "KdQh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "KhQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "KhQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "KsQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.99824524,
+      0.0017547875
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "KsQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.9980468,
+      0.0019531548
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "KsQh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.99758905,
+      0.0024109255
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Ad2d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Ah2h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "As2s",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "As3s",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "As4s",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10",
+    "actor": "ip",
+    "combo": "As5s",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "2h2d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "2s2d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "2s2h",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.81901276,
+      0.18098725,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.8196384,
+      0.18036164,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "probabilities": [
+      0.81643397,
+      0.18356603,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.8190433,
+      0.18095674,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "probabilities": [
+      0.815671,
+      0.18432899,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "probabilities": [
+      0.8164492,
+      0.18355078,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.7939269,
+      0.20607309,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.79504085,
+      0.20495918,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "probabilities": [
+      0.7876555,
+      0.21234454,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.79063094,
+      0.20936903,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "probabilities": [
+      0.7833372,
+      0.21666285,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "probabilities": [
+      0.7844053,
+      0.21559472,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.6608682,
+      0.33913177,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.66056305,
+      0.33943695,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "probabilities": [
+      0.65415424,
+      0.34584573,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.6594797,
+      0.34052032,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "probabilities": [
+      0.6530861,
+      0.34691387,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "probabilities": [
+      0.65278095,
+      0.34721905,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Tc9c",
+    "weight": 1.0,
+    "probabilities": [
+      0.5577783,
+      0.4422217,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Td9d",
+    "weight": 1.0,
+    "probabilities": [
+      0.37059587,
+      0.6294041,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Ts9s",
+    "weight": 1.0,
+    "probabilities": [
+      0.44078737,
+      0.5592126,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "QcJc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "QdJd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "QhJh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "KcQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "KcQh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "KdQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "KdQh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "KhQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "KhQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "KsQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "KsQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "KsQh",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Ad2d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Ah2h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "As2s",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "As3s",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "As4s",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20",
+    "actor": "ip",
+    "combo": "As5s",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "2h2d",
+    "weight": 0.14386205,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "2s2d",
+    "weight": 0.14383154,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "2s2h",
+    "weight": 0.14392309,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.9888609,
+      0.0017547875,
+      0.009384299
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.6542458,
+      0.32224002,
+      0.023514153
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "probabilities": [
+      0.55632865,
+      0.40427253,
+      0.039398793
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.7753075,
+      0.20967741,
+      0.015015107
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "probabilities": [
+      0.6578522,
+      0.32070923,
+      0.021438599
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "probabilities": [
+      0.34624246,
+      0.5295644,
+      0.12419318
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.9888304,
+      0.00079346914,
+      0.010376135
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.632517,
+      0.33949798,
+      0.027985046
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "probabilities": [
+      0.52994585,
+      0.41495383,
+      0.05510033
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.75207144,
+      0.23184557,
+      0.01608301
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "probabilities": [
+      0.6357824,
+      0.33762112,
+      0.026596475
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "probabilities": [
+      0.3197223,
+      0.54865336,
+      0.13162433
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.9866331,
+      0.0009155413,
+      0.012451362
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.6068513,
+      0.3528954,
+      0.0402533
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "probabilities": [
+      0.50398254,
+      0.4188385,
+      0.077178955
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.7223621,
+      0.25851834,
+      0.019119555
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "probabilities": [
+      0.60825515,
+      0.3514458,
+      0.040299077
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "probabilities": [
+      0.29543445,
+      0.54020816,
+      0.16435744
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "6d6c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.8810102,
+      0.118989855
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "6h6c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.8810102,
+      0.118989855
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "6h6d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.8810102,
+      0.118989855
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "6s6c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.8810102,
+      0.118989855
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "6s6d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.8810102,
+      0.118989855
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "6s6h",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.8810102,
+      0.118989855
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "7h7c",
+    "weight": 0.4763409,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "7s7c",
+    "weight": 0.4763409,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "7s7h",
+    "weight": 0.4763409,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "8d8c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.8810102,
+      0.118989855
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "8h8c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.8810102,
+      0.118989855
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "8h8d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.8810102,
+      0.118989855
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "8s8c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.8810102,
+      0.118989855
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "8s8d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.8810102,
+      0.118989855
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "8s8h",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.8810102,
+      0.118989855
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "9d9c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "9s9c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "9s9d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "TdTc",
+    "weight": 0.8675364,
+    "probabilities": [
+      0.0,
+      0.8692607,
+      0.1307393
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "ThTc",
+    "weight": 0.42253757,
+    "probabilities": [
+      0.0,
+      0.6284581,
+      0.37154192
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "ThTd",
+    "weight": 0.40399787,
+    "probabilities": [
+      0.0,
+      0.6592813,
+      0.3407187
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "TsTc",
+    "weight": 0.87653923,
+    "probabilities": [
+      0.0,
+      0.8894026,
+      0.110597394
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "TsTd",
+    "weight": 0.85859466,
+    "probabilities": [
+      0.0,
+      0.9113603,
+      0.08863966
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "TsTh",
+    "weight": 0.39592585,
+    "probabilities": [
+      0.0,
+      0.6891432,
+      0.3108568
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "JdJc",
+    "weight": 0.0987579,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "JhJc",
+    "weight": 0.08618296,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "JhJd",
+    "weight": 0.08673228,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KcTd",
+    "weight": 0.38199437,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KcTh",
+    "weight": 0.013656616,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KcTs",
+    "weight": 0.3508606,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KcQd",
+    "weight": 0.05291829,
+    "probabilities": [
+      0.0,
+      0.00006103609,
+      0.99993896
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KcQh",
+    "weight": 0.06878767,
+    "probabilities": [
+      0.0,
+      0.00009155413,
+      0.99990845
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KdTc",
+    "weight": 0.3625849,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KdTh",
+    "weight": 0.014572366,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KdTs",
+    "weight": 0.35479292,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KdQc",
+    "weight": 0.049866483,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KdQh",
+    "weight": 0.06395056,
+    "probabilities": [
+      0.0,
+      0.00010681315,
+      0.9998932
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KdKc",
+    "weight": 0.0018463416,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KhTc",
+    "weight": 0.26689556,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KhTd",
+    "weight": 0.2896512,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KhTs",
+    "weight": 0.25781643,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KhJc",
+    "weight": 0.008834974,
+    "probabilities": [
+      0.0,
+      0.004104677,
+      0.9958953
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KhJd",
+    "weight": 0.008712902,
+    "probabilities": [
+      0.0,
+      0.004028382,
+      0.9959716
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KhQc",
+    "weight": 0.08215457,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KhQd",
+    "weight": 0.08038453,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KhKc",
+    "weight": 0.00036621653,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KhKd",
+    "weight": 0.00044251163,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KsTc",
+    "weight": 0.28062868,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KsTd",
+    "weight": 0.25986114,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KsTh",
+    "weight": 0.0025940337,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KsQc",
+    "weight": 0.00010681315,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KsQd",
+    "weight": 0.00009155413,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KsQh",
+    "weight": 0.00006103609,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KsKc",
+    "weight": 0.012130923,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KsKd",
+    "weight": 0.015899658,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "KsKh",
+    "weight": 0.0025940337,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "Ac7c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "Ac8c",
+    "weight": 0.17276001,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "AcJc",
+    "weight": 0.00028992142,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "Ad2d",
+    "weight": 0.22024873,
+    "probabilities": [
+      0.17561609,
+      0.0,
+      0.8243839
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "Ad8d",
+    "weight": 0.9989166,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "AdTd",
+    "weight": 0.4702678,
+    "probabilities": [
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "AdJd",
+    "weight": 0.0007476921,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "AdAc",
+    "weight": 0.001373312,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "Ah2h",
+    "weight": 0.20650034,
+    "probabilities": [
+      0.00019836728,
+      0.0025177386,
+      0.9972839
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "Ah7h",
+    "weight": 1.0,
+    "probabilities": [
+      0.9900816,
+      0.0012054627,
+      0.008712902
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "Ah8h",
+    "weight": 0.73871976,
+    "probabilities": [
+      0.9888609,
+      0.0017395285,
+      0.0093995575
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "AhTh",
+    "weight": 0.73871976,
+    "probabilities": [
+      0.9888609,
+      0.0017395285,
+      0.0093995575
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "AhJh",
+    "weight": 0.0058594644,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "AhQh",
+    "weight": 0.00028992142,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "AhAc",
+    "weight": 0.007568475,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "AhAd",
+    "weight": 0.0128786145,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "As2s",
+    "weight": 0.1983215,
+    "probabilities": [
+      0.0057679103,
+      0.0016937514,
+      0.99253833
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "As7s",
+    "weight": 1.0,
+    "probabilities": [
+      0.99722284,
+      0.0,
+      0.002777142
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "As8s",
+    "weight": 0.9670558,
+    "probabilities": [
+      0.99707025,
+      0.0,
+      0.0029297322
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "AsTs",
+    "weight": 0.13037309,
+    "probabilities": [
+      0.99617,
+      0.0,
+      0.0038300145
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "AsAc",
+    "weight": 0.00343328,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "AsAd",
+    "weight": 0.006729229,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10",
+    "actor": "oop",
+    "combo": "AsAh",
+    "weight": 0.028625926,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "2h2d",
+    "weight": 0.14386205,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "2s2d",
+    "weight": 0.14383154,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "2s2h",
+    "weight": 0.14392309,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.7756924,
+      0.17792019,
+      0.046387427
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.74412143,
+      0.20062561,
+      0.055252917
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "probabilities": [
+      0.7357595,
+      0.20497444,
+      0.059266042
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "probabilities": [
+      0.7469596,
+      0.19989319,
+      0.053147174
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "probabilities": [
+      0.7385519,
+      0.20427252,
+      0.057175554
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "probabilities": [
+      0.7101352,
+      0.22487564,
+      0.064989164
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.77561265,
+      0.18956572,
+      0.03482162
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.73550415,
+      0.21746826,
+      0.047027588
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "probabilities": [
+      0.72639465,
+      0.2223053,
+      0.05130005
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "probabilities": [
+      0.74041355,
+      0.21614404,
+      0.043442436
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "probabilities": [
+      0.7311513,
+      0.22102693,
+      0.047821775
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "probabilities": [
+      0.6956847,
+      0.24587238,
+      0.058442947
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.783444,
+      0.17950714,
+      0.037048906
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.7415693,
+      0.20934172,
+      0.049089022
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "probabilities": [
+      0.7333486,
+      0.21364157,
+      0.05300984
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "probabilities": [
+      0.7448692,
+      0.20955215,
+      0.0455787
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "probabilities": [
+      0.7365795,
+      0.21385846,
+      0.04956206
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "probabilities": [
+      0.6996872,
+      0.24023804,
+      0.06007477
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "6d6c",
+    "weight": 1.0,
+    "probabilities": [
+      0.4312418,
+      0.4854274,
+      0.08333079
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "6h6c",
+    "weight": 1.0,
+    "probabilities": [
+      0.4312418,
+      0.4854274,
+      0.08333079
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "6h6d",
+    "weight": 1.0,
+    "probabilities": [
+      0.4312418,
+      0.4854274,
+      0.08333079
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "6s6c",
+    "weight": 1.0,
+    "probabilities": [
+      0.4312418,
+      0.4854274,
+      0.08333079
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "6s6d",
+    "weight": 1.0,
+    "probabilities": [
+      0.4312418,
+      0.4854274,
+      0.08333079
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "6s6h",
+    "weight": 1.0,
+    "probabilities": [
+      0.4312418,
+      0.4854274,
+      0.08333079
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "7h7c",
+    "weight": 0.4763409,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "7s7c",
+    "weight": 0.4763409,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "7s7h",
+    "weight": 0.4763409,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "8d8c",
+    "weight": 1.0,
+    "probabilities": [
+      0.4312418,
+      0.4854274,
+      0.08333079
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "8h8c",
+    "weight": 1.0,
+    "probabilities": [
+      0.4312418,
+      0.4854274,
+      0.08333079
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "8h8d",
+    "weight": 1.0,
+    "probabilities": [
+      0.4312418,
+      0.4854274,
+      0.08333079
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "8s8c",
+    "weight": 1.0,
+    "probabilities": [
+      0.4312418,
+      0.4854274,
+      0.08333079
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "8s8d",
+    "weight": 1.0,
+    "probabilities": [
+      0.4312418,
+      0.4854274,
+      0.08333079
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "8s8h",
+    "weight": 1.0,
+    "probabilities": [
+      0.4312418,
+      0.4854274,
+      0.08333079
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "9d9c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "9s9c",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "9s9d",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "TdTc",
+    "weight": 0.8675364,
+    "probabilities": [
+      0.19967955,
+      0.69195086,
+      0.108369574
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "ThTc",
+    "weight": 0.42253757,
+    "probabilities": [
+      0.060105287,
+      0.78188753,
+      0.15800717
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "ThTd",
+    "weight": 0.40399787,
+    "probabilities": [
+      0.05275044,
+      0.78564125,
+      0.1616083
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "TsTc",
+    "weight": 0.87653923,
+    "probabilities": [
+      0.2102115,
+      0.68735313,
+      0.10243538
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "TsTd",
+    "weight": 0.85859466,
+    "probabilities": [
+      0.20482497,
+      0.6896878,
+      0.10548723
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "TsTh",
+    "weight": 0.39592585,
+    "probabilities": [
+      0.06701762,
+      0.77845424,
+      0.15452811
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "JdJc",
+    "weight": 0.0987579,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "JhJc",
+    "weight": 0.08618296,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "JhJd",
+    "weight": 0.08673228,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KcTd",
+    "weight": 0.38199437,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KcTh",
+    "weight": 0.013656616,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KcTs",
+    "weight": 0.3508606,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KcQd",
+    "weight": 0.05291829,
+    "probabilities": [
+      0.0,
+      0.593698,
+      0.40630198
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KcQh",
+    "weight": 0.06878767,
+    "probabilities": [
+      0.0,
+      0.59169906,
+      0.4083009
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KdTc",
+    "weight": 0.3625849,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KdTh",
+    "weight": 0.014572366,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KdTs",
+    "weight": 0.35479292,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KdQc",
+    "weight": 0.049866483,
+    "probabilities": [
+      0.0,
+      0.59502554,
+      0.40497443
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KdQh",
+    "weight": 0.06395056,
+    "probabilities": [
+      0.0,
+      0.5922332,
+      0.40776685
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KdKc",
+    "weight": 0.0018463416,
+    "probabilities": [
+      0.0,
+      0.2516823,
+      0.7483177
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KhTc",
+    "weight": 0.26689556,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KhTd",
+    "weight": 0.2896512,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KhTs",
+    "weight": 0.25781643,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KhJc",
+    "weight": 0.008834974,
+    "probabilities": [
+      0.0,
+      0.82801557,
+      0.17198443
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KhJd",
+    "weight": 0.008712902,
+    "probabilities": [
+      0.0,
+      0.82798505,
+      0.17201495
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KhQc",
+    "weight": 0.08215457,
+    "probabilities": [
+      0.0,
+      0.5947356,
+      0.40526435
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KhQd",
+    "weight": 0.08038453,
+    "probabilities": [
+      0.0,
+      0.59406424,
+      0.40593576
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KhKc",
+    "weight": 0.00036621653,
+    "probabilities": [
+      0.0,
+      0.28003356,
+      0.7199664
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KhKd",
+    "weight": 0.00044251163,
+    "probabilities": [
+      0.0,
+      0.28062868,
+      0.7193713
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KsTc",
+    "weight": 0.28062868,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KsTd",
+    "weight": 0.25986114,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KsTh",
+    "weight": 0.0025940337,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KsQc",
+    "weight": 0.00010681315,
+    "probabilities": [
+      0.0,
+      0.64632636,
+      0.3536736
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KsQd",
+    "weight": 0.00009155413,
+    "probabilities": [
+      0.0,
+      0.6455634,
+      0.35443655
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KsQh",
+    "weight": 0.00006103609,
+    "probabilities": [
+      0.0,
+      0.64484626,
+      0.35515374
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KsKc",
+    "weight": 0.012130923,
+    "probabilities": [
+      0.0,
+      0.375906,
+      0.624094
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KsKd",
+    "weight": 0.015899658,
+    "probabilities": [
+      0.0,
+      0.37578392,
+      0.6242161
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "KsKh",
+    "weight": 0.0025940337,
+    "probabilities": [
+      0.0,
+      0.40082398,
+      0.599176
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "Ac7c",
+    "weight": 1.0,
+    "probabilities": [
+      0.99072254,
+      0.009170672,
+      0.00010681315
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "Ac8c",
+    "weight": 0.17276001,
+    "probabilities": [
+      0.98957807,
+      0.010223545,
+      0.00019836728
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "AcJc",
+    "weight": 0.00028992142,
+    "probabilities": [
+      0.29677725,
+      0.5102542,
+      0.19296853
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "Ad2d",
+    "weight": 0.22024873,
+    "probabilities": [
+      0.67134094,
+      0.18876648,
+      0.13989258
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "Ad8d",
+    "weight": 0.9989166,
+    "probabilities": [
+      0.9718929,
+      0.026108187,
+      0.0019989319
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "AdTd",
+    "weight": 0.4702678,
+    "probabilities": [
+      0.9563592,
+      0.03311208,
+      0.010528726
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "AdJd",
+    "weight": 0.0007476921,
+    "probabilities": [
+      0.3508713,
+      0.4494766,
+      0.19965209
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "AdAc",
+    "weight": 0.001373312,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "Ah2h",
+    "weight": 0.20650034,
+    "probabilities": [
+      0.5477073,
+      0.2388037,
+      0.21348898
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "Ah7h",
+    "weight": 1.0,
+    "probabilities": [
+      0.9076371,
+      0.042847335,
+      0.049515527
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "Ah8h",
+    "weight": 0.73871976,
+    "probabilities": [
+      0.9071183,
+      0.045502402,
+      0.047379263
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "AhTh",
+    "weight": 0.73871976,
+    "probabilities": [
+      0.9071183,
+      0.045502402,
+      0.047379263
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "AhJh",
+    "weight": 0.0058594644,
+    "probabilities": [
+      0.26256198,
+      0.52257574,
+      0.21486229
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "AhQh",
+    "weight": 0.00028992142,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "AhAc",
+    "weight": 0.007568475,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "AhAd",
+    "weight": 0.0128786145,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "As2s",
+    "weight": 0.1983215,
+    "probabilities": [
+      0.55252075,
+      0.23580933,
+      0.21166992
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "As7s",
+    "weight": 1.0,
+    "probabilities": [
+      0.92524606,
+      0.039398793,
+      0.035355154
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "As8s",
+    "weight": 0.9670558,
+    "probabilities": [
+      0.92838943,
+      0.041916534,
+      0.029694056
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "AsTs",
+    "weight": 0.13037309,
+    "probabilities": [
+      0.90923935,
+      0.046967268,
+      0.04379339
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "AsAc",
+    "weight": 0.00343328,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "AsAd",
+    "weight": 0.006729229,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20",
+    "actor": "oop",
+    "combo": "AsAh",
+    "weight": 0.028625926,
+    "probabilities": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "2h2d",
+    "weight": 0.60291445,
+    "probabilities": [
+      0.3089494,
+      0.6910506
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "2s2d",
+    "weight": 0.6204013,
+    "probabilities": [
+      0.26886398,
+      0.731136
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "2s2h",
+    "weight": 0.55698484,
+    "probabilities": [
+      0.44173342,
+      0.5582666
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "Tc9c",
+    "weight": 0.1182269,
+    "probabilities": [
+      0.5591058,
+      0.4408942
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "Td9d",
+    "weight": 0.13476768,
+    "probabilities": [
+      0.55838865,
+      0.44161135
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "Ts9s",
+    "weight": 0.17500305,
+    "probabilities": [
+      0.5649958,
+      0.4350042
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "QcJc",
+    "weight": 0.48584726,
+    "probabilities": [
+      0.16714732,
+      0.83285266
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "QdJd",
+    "weight": 0.48599985,
+    "probabilities": [
+      0.16922255,
+      0.83077747
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "QhJh",
+    "weight": 0.49639124,
+    "probabilities": [
+      0.14586098,
+      0.85413903
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "KcQd",
+    "weight": 0.99942017,
+    "probabilities": [
+      0.57265586,
+      0.42734417
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "KcQh",
+    "weight": 0.9992981,
+    "probabilities": [
+      0.56317997,
+      0.43682003
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "KdQc",
+    "weight": 0.9993744,
+    "probabilities": [
+      0.5767758,
+      0.42322424
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "KdQh",
+    "weight": 0.9992523,
+    "probabilities": [
+      0.567895,
+      0.43210497
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "KhQc",
+    "weight": 0.9999542,
+    "probabilities": [
+      0.5326619,
+      0.46733806
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "KhQd",
+    "weight": 0.9999542,
+    "probabilities": [
+      0.5332113,
+      0.46678874
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "KsQc",
+    "weight": 0.95399404,
+    "probabilities": [
+      0.6471962,
+      0.35280386
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "KsQd",
+    "weight": 0.953933,
+    "probabilities": [
+      0.64721143,
+      0.3527886
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "KsQh",
+    "weight": 0.9443046,
+    "probabilities": [
+      0.63514155,
+      0.36485848
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "Ac3c",
+    "weight": 0.48529792,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "Ac4c",
+    "weight": 0.48612192,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "Ac5c",
+    "weight": 0.482887,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "Ad3d",
+    "weight": 0.44411382,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "Ad4d",
+    "weight": 0.44305247,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "Ad5d",
+    "weight": 0.43962768,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "Ah3h",
+    "weight": 0.33672082,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "Ah4h",
+    "weight": 0.33426413,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "Ah5h",
+    "weight": 0.34721905,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "As3s",
+    "weight": 0.39295033,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "As4s",
+    "weight": 0.39032578,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr10r50",
+    "actor": "ip",
+    "combo": "As5s",
+    "weight": 0.40080872,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr20r60",
+    "actor": "ip",
+    "combo": "Tc9c",
+    "weight": 0.00065613794,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20r60",
+    "actor": "ip",
+    "combo": "Td9d",
+    "weight": 0.00053406577,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20r60",
+    "actor": "ip",
+    "combo": "Ts9s",
+    "weight": 0.0012054443,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "xr20r60",
+    "actor": "ip",
+    "combo": "Ac3c",
+    "weight": 0.000686656,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr20r60",
+    "actor": "ip",
+    "combo": "Ac4c",
+    "weight": 0.0006408789,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr20r60",
+    "actor": "ip",
+    "combo": "Ac5c",
+    "weight": 0.00025940337,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr20r60",
+    "actor": "ip",
+    "combo": "Ad3d",
+    "weight": 0.00010681315,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "xr20r60",
+    "actor": "ip",
+    "combo": "Ad4d",
+    "weight": 0.00009155553,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "TdTc",
+    "weight": 0.13246357,
+    "probabilities": [
+      0.9745937,
+      0.025406271
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "ThTc",
+    "weight": 0.57746243,
+    "probabilities": [
+      0.9082628,
+      0.09173724
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "ThTd",
+    "weight": 0.59600216,
+    "probabilities": [
+      0.91079575,
+      0.089204244
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "TsTc",
+    "weight": 0.12346075,
+    "probabilities": [
+      0.96748304,
+      0.032516975
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "TsTd",
+    "weight": 0.14140536,
+    "probabilities": [
+      0.97112995,
+      0.02887007
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "TsTh",
+    "weight": 0.6040742,
+    "probabilities": [
+      0.8690165,
+      0.13098344
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "JdJc",
+    "weight": 0.03546251,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "JhJc",
+    "weight": 0.033600368,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "JhJd",
+    "weight": 0.028152896,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "QdQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "QhQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "QhQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KcTd",
+    "weight": 0.37154192,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KcTh",
+    "weight": 0.3366089,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KcTs",
+    "weight": 0.38868713,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KcJd",
+    "weight": 1.0,
+    "probabilities": [
+      0.6185092,
+      0.3814908
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KcJh",
+    "weight": 1.0,
+    "probabilities": [
+      0.6158389,
+      0.38416114
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KcQd",
+    "weight": 0.9470817,
+    "probabilities": [
+      0.52124816,
+      0.4787518
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KcQh",
+    "weight": 0.9312123,
+    "probabilities": [
+      0.5177234,
+      0.48227665
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KdTc",
+    "weight": 0.3210193,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KdTh",
+    "weight": 0.3364004,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KdTs",
+    "weight": 0.38685262,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KdJc",
+    "weight": 1.0,
+    "probabilities": [
+      0.62441444,
+      0.37558556
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KdJh",
+    "weight": 1.0,
+    "probabilities": [
+      0.61600673,
+      0.3839933
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KdQc",
+    "weight": 0.9501335,
+    "probabilities": [
+      0.52666515,
+      0.47333485
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KdQh",
+    "weight": 0.93604946,
+    "probabilities": [
+      0.5176776,
+      0.48232242
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KhTc",
+    "weight": 0.3665675,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KhTd",
+    "weight": 0.4155095,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KhTs",
+    "weight": 0.43378347,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KhJc",
+    "weight": 0.99116504,
+    "probabilities": [
+      0.62072176,
+      0.37927824
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KhJd",
+    "weight": 0.9912871,
+    "probabilities": [
+      0.61501485,
+      0.38498512
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KhQc",
+    "weight": 0.9178454,
+    "probabilities": [
+      0.5275654,
+      0.47243458
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KhQd",
+    "weight": 0.91961545,
+    "probabilities": [
+      0.5220417,
+      0.47795835
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KsTc",
+    "weight": 0.71772337,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KsTd",
+    "weight": 0.739971,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KsTh",
+    "weight": 0.72883195,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KsJc",
+    "weight": 1.0,
+    "probabilities": [
+      0.6289616,
+      0.37103838
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KsJd",
+    "weight": 1.0,
+    "probabilities": [
+      0.623209,
+      0.37679103
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KsJh",
+    "weight": 1.0,
+    "probabilities": [
+      0.6205234,
+      0.3794766
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KsQc",
+    "weight": 0.9998932,
+    "probabilities": [
+      0.52785534,
+      0.47214466
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KsQd",
+    "weight": 0.99990845,
+    "probabilities": [
+      0.52239263,
+      0.4776074
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KsQh",
+    "weight": 0.99993896,
+    "probabilities": [
+      0.51891357,
+      0.48108643
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KsKc",
+    "weight": 0.031189442,
+    "probabilities": [
+      0.6152743,
+      0.38472572
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KsKd",
+    "weight": 0.031234741,
+    "probabilities": [
+      0.6149233,
+      0.38507667
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "KsKh",
+    "weight": 0.030457009,
+    "probabilities": [
+      0.62227815,
+      0.37772182
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ac6c",
+    "weight": 0.17729458,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ac8c",
+    "weight": 0.28503418,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ac9c",
+    "weight": 1.0,
+    "probabilities": [
+      0.95490956,
+      0.04509041
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "AcTc",
+    "weight": 0.36560616,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "AcJc",
+    "weight": 0.9997101,
+    "probabilities": [
+      0.7354543,
+      0.26454565
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ad6d",
+    "weight": 0.16704051,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ad9d",
+    "weight": 1.0,
+    "probabilities": [
+      0.9706111,
+      0.029388877
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "AdTd",
+    "weight": 0.008987564,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "AdJd",
+    "weight": 0.9992523,
+    "probabilities": [
+      0.76893264,
+      0.23106737
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ah6h",
+    "weight": 0.17633326,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "Ah8h",
+    "weight": 0.014297703,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "AhTh",
+    "weight": 0.014297703,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "AhJh",
+    "weight": 0.9941405,
+    "probabilities": [
+      0.7882048,
+      0.21179523
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "As3s",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "As4s",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "As5s",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "As6s",
+    "weight": 0.19304189,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "As8s",
+    "weight": 0.00053406577,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "As9s",
+    "weight": 1.0,
+    "probabilities": [
+      0.93785,
+      0.062149998
+    ]
+  },
+  {
+    "history": "r10r50",
+    "actor": "oop",
+    "combo": "AsTs",
+    "weight": 0.11491569,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "2h2d",
+    "weight": 0.85613793,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "2s2d",
+    "weight": 0.85616845,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "2s2h",
+    "weight": 0.8560769,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "7h7c",
+    "weight": 0.5236591,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "7s7c",
+    "weight": 0.5236591,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "7s7h",
+    "weight": 0.5236591,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "JdJc",
+    "weight": 0.8657796,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "JhJc",
+    "weight": 0.88021666,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "JhJd",
+    "weight": 0.88511485,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KcTd",
+    "weight": 0.24646372,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KcTh",
+    "weight": 0.6497345,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KcTs",
+    "weight": 0.26045227,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KdTc",
+    "weight": 0.31639582,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KdTh",
+    "weight": 0.6490272,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KdTs",
+    "weight": 0.25835446,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KdKc",
+    "weight": 0.9981537,
+    "probabilities": [
+      0.46137178,
+      0.5386282
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KhTc",
+    "weight": 0.36653697,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KhTd",
+    "weight": 0.29483932,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KhTs",
+    "weight": 0.3084001,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KhKc",
+    "weight": 0.9996338,
+    "probabilities": [
+      0.46138704,
+      0.53861296
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KhKd",
+    "weight": 0.9995575,
+    "probabilities": [
+      0.46138704,
+      0.53861296
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KsTc",
+    "weight": 0.0016479744,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KsTd",
+    "weight": 0.00016784924,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KsTh",
+    "weight": 0.26857406,
+    "probabilities": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KsKc",
+    "weight": 0.95667964,
+    "probabilities": [
+      0.46890974,
+      0.53109026
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KsKd",
+    "weight": 0.9528656,
+    "probabilities": [
+      0.46894026,
+      0.53105974
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "KsKh",
+    "weight": 0.966949,
+    "probabilities": [
+      0.46878767,
+      0.53121233
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "Ac6c",
+    "weight": 0.82270545,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "Ac8c",
+    "weight": 0.5422058,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AcTc",
+    "weight": 0.6343938,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AcQc",
+    "weight": 1.0,
+    "probabilities": [
+      0.49497214,
+      0.50502783
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AcKc",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "Ad2d",
+    "weight": 0.7797513,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "Ad6d",
+    "weight": 0.8329595,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "Ad8d",
+    "weight": 0.0010833906,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AdTd",
+    "weight": 0.5207446,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AdQd",
+    "weight": 1.0,
+    "probabilities": [
+      0.50974286,
+      0.4902571
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AdKd",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AdAc",
+    "weight": 0.9986267,
+    "probabilities": [
+      0.5901579,
+      0.40984207
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "Ah2h",
+    "weight": 0.79349965,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "Ah6h",
+    "weight": 0.82366675,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "Ah8h",
+    "weight": 0.24698253,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AhTh",
+    "weight": 0.24698253,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AhQh",
+    "weight": 0.9997101,
+    "probabilities": [
+      0.5116808,
+      0.48831922
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AhKh",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AhAc",
+    "weight": 0.9924315,
+    "probabilities": [
+      0.5925536,
+      0.4074464
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AhAd",
+    "weight": 0.9871214,
+    "probabilities": [
+      0.61309224,
+      0.38690776
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "As2s",
+    "weight": 0.8016785,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "As6s",
+    "weight": 0.80695814,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "As8s",
+    "weight": 0.032410163,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AsTs",
+    "weight": 0.7547112,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AsKs",
+    "weight": 1.0,
+    "probabilities": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AsAc",
+    "weight": 0.9965667,
+    "probabilities": [
+      0.57897305,
+      0.42102695
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AsAd",
+    "weight": 0.99327075,
+    "probabilities": [
+      0.59815365,
+      0.40184635
+    ]
+  },
+  {
+    "history": "r20r60",
+    "actor": "oop",
+    "combo": "AsAh",
+    "weight": 0.9713741,
+    "probabilities": [
+      0.60065615,
+      0.39934385
+    ]
+  }
+]

@@ -1,0 +1,62 @@
+{
+  "mode": "on",
+  "record": {
+    "bytes": 6080,
+    "path": "/opt/r1/phase-on/river-1-candidate/solve/phase.json",
+    "sha256": "29f27879af6ff99af69c94642ae1f0c83ec427b023d32f40e06f7609164a22ea"
+  },
+  "status": "validated",
+  "summary": {
+    "cfr_inclusive_envelope": {
+      "add_to_leaf_sum": false,
+      "duration_ns": 144230564,
+      "end_ns": 177728514,
+      "start_ns": 33497950
+    },
+    "instrumentation_id": "aa81ca3e10c1beba324a8d42483294ca54a8b3fe852970a9f924da44fd2e5a3a",
+    "leaves": {
+      "cfr_updates": {
+        "calls": 4,
+        "duration_ns": 104405296
+      },
+      "checkpoint": {
+        "calls": 4,
+        "duration_ns": 47072029
+      },
+      "final_ev_br": {
+        "calls": 1,
+        "duration_ns": 618540
+      },
+      "initialization": {
+        "calls": 1,
+        "duration_ns": 1503509
+      },
+      "input_preparation": {
+        "calls": 1,
+        "duration_ns": 14474630
+      },
+      "overhead": {
+        "calls": 17,
+        "duration_ns": 26592619
+      },
+      "periodic_ev_br": {
+        "calls": 4,
+        "duration_ns": 5339419
+      },
+      "sol_preparation": {
+        "calls": 1,
+        "duration_ns": 1826120
+      },
+      "sol_serialization_and_write": {
+        "calls": 1,
+        "duration_ns": 9397630
+      },
+      "summary_publish": {
+        "calls": 1,
+        "duration_ns": 17200
+      }
+    },
+    "source_version": "candidate03",
+    "total_ns": 211246992
+  }
+}

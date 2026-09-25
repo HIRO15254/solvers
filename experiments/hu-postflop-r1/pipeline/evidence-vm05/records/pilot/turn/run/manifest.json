@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "runId": "run",
+  "state": "completed",
+  "gameKind": "postflop",
+  "configSchema": "solvers.postflop/v1",
+  "configHash": "5357416907598178a2fec594477a1d10938e5a48b24fb16ac4b1843eb2bb93ca",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/opt/r1/current/experiments/hu-postflop-r1/pipeline/configs/turn.toml",
+    "--out",
+    "/opt/r1/current/runs/r1-pilot/turn/run"
+  ],
+  "pid": 22095,
+  "createdUnixMs": 1790353268035,
+  "startedUnixMs": 1790353268035,
+  "finishedUnixMs": 1790353269485,
+  "failure": null,
+  "completion": "completed"
+}

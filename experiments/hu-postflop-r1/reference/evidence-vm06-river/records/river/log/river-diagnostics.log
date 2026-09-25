@@ -1,0 +1,29 @@
++ cd /opt/r1/candidate-v3
++ test -f /opt/r1/comparison-complete
++ python3 -
++ mkdir /opt/r1/river-diagnostic-inputs
++ tar --no-same-owner -xzf /home/PC_User/diagnostic-input.tar.gz -C /opt/r1/river-diagnostic-inputs
++ tar --no-same-owner -xzf /home/PC_User/diagnostic017-input.tar.gz -C /opt/r1/river-diagnostic-inputs
++ for number in 019 017
++ '[' 019 = 019 ']'
++ archive=/home/PC_User/diagnostic-input.tar.gz
++ digest=9bfc777776a0b85ec073498d75a9c6d23d35ed949610a3ee83a7c4ca73f83a7a
++ python3 /home/PC_User/run-diagnostic.py --case-id HU-R0-019 --input-dir /opt/r1/river-diagnostic-inputs/HU-R0-019 --input-archive /home/PC_User/diagnostic-input.tar.gz --input-archive-sha256 9bfc777776a0b85ec073498d75a9c6d23d35ed949610a3ee83a7c4ca73f83a7a --binary-sha256 a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521 --source-id source-archive-sha256:ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970 --output /opt/r1/diagnostic-019
+{"stage": "input_check", "state": "completed"}
+{"stage": "config_validate", "state": "completed"}
+{"stage": "solve", "state": "completed"}
+{"stage": "export_tree", "state": "completed"}
+{"stage": "export_summary", "state": "completed"}
+{"stage": "compare", "state": "completed"}
++ for number in 019 017
++ '[' 017 = 019 ']'
++ archive=/home/PC_User/diagnostic017-input.tar.gz
++ digest=da6c44d7d09cf97342a5f82d9698ae4eaa511d21b4eabe3e6b05ccef962264b2
++ python3 /home/PC_User/run-diagnostic.py --case-id HU-R0-017 --input-dir /opt/r1/river-diagnostic-inputs/HU-R0-017 --input-archive /home/PC_User/diagnostic017-input.tar.gz --input-archive-sha256 da6c44d7d09cf97342a5f82d9698ae4eaa511d21b4eabe3e6b05ccef962264b2 --binary-sha256 a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521 --source-id source-archive-sha256:ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970 --output /opt/r1/diagnostic-017
+{"stage": "input_check", "state": "completed"}
+{"stage": "config_validate", "state": "completed"}
+{"stage": "solve", "state": "completed"}
+{"stage": "export_tree", "state": "completed"}
+{"stage": "export_summary", "state": "completed"}
+{"stage": "compare", "state": "completed"}
++ date -u --iso-8601=seconds

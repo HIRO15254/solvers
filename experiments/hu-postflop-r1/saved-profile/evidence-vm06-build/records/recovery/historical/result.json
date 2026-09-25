@@ -1,0 +1,492 @@
+{
+  "boot_id": "1218b856-0cbd-4349-8ccc-a0ac7a7792ce",
+  "cargo_environment": {
+    "CARGO_BUILD_JOBS": "4",
+    "CARGO_HOME": "/opt/r1/cargo",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTUP_HOME": "/opt/r1/rustup",
+    "RUSTUP_TOOLCHAIN": "1.97.0"
+  },
+  "cgroup": "0::/system.slice/r1-audit-pair-build03.service\n",
+  "dispatch_budget_seconds": 7200,
+  "elapsed_seconds": 723.1855452059999,
+  "ended_utc": "2026-09-25T17:31:29.267854+00:00",
+  "identities": {
+    "audit-source.tar.gz": {
+      "bytes": 1213908,
+      "path": "/opt/r1/audit-source.tar.gz",
+      "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+    },
+    "baseline-source.tar.gz": {
+      "bytes": 871630,
+      "path": "/opt/r1/baseline-source.tar.gz",
+      "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+    },
+    "baseline_adapter_manifest": {
+      "bytes": 39316,
+      "path": "/opt/r1/baseline-audit/r1-saved-profile-source-manifest.json",
+      "sha256": "9cccbde9ac207059a77a8abb903c0df8b9d79cf1cdc30631919dd418e04ab50f"
+    },
+    "baseline_example": {
+      "bytes": 4261392,
+      "path": "/opt/r1/target/baseline-audit/release/examples/hu_saved_profile_audit",
+      "sha256": "1beaeabaa532e14b5c69f47b103814e6e70571f3a142800f17c42110471434b1"
+    },
+    "compiler_binaries": [
+      {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      }
+    ],
+    "current_example": {
+      "bytes": 4283728,
+      "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+      "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+    },
+    "immutable_inputs": [
+      {
+        "bytes": 16036,
+        "path": "/home/PC_User/build-audit-pair.sh",
+        "sha256": "be959f4f9c5d989c55284eba5f0b58fb149e7fddc38ffdaf51c50c6c5bd29068"
+      },
+      {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      {
+        "bytes": 8327,
+        "path": "/opt/r1/audit-tools/apply_baseline_audit.py",
+        "sha256": "def24ee3feabfb6467165f99cb7da5e5f4674f6ab19f8ee8a06f357e20d0ea03"
+      },
+      {
+        "bytes": 19599,
+        "path": "/opt/r1/audit-tools/source-pins.json",
+        "sha256": "b97d29d7e581bd05d1a331966fc3180ab26ece84f2dc9131a2bb34ae61c746eb"
+      },
+      {
+        "bytes": 8949,
+        "path": "/opt/r1/audit-tools/audit_shared.rs.in",
+        "sha256": "61811547059257d2d3b8bbe1335ceaa8b41d07114719e7cbf8b4f8e20519ee90"
+      },
+      {
+        "bytes": 734,
+        "path": "/opt/r1/audit-tools/audit_example.rs.in",
+        "sha256": "23ffbfa69846696c0e025bc8cbd5b2b68c3add006291827ba7dca3203ebbe317"
+      },
+      {
+        "bytes": 4550,
+        "path": "/opt/r1/audit-tools/baseline_adapter.rs.in",
+        "sha256": "af3475238198741c858d4bb12f31ea4c0a2516824885ae1512667dfd8f761b10"
+      },
+      {
+        "bytes": 6152,
+        "path": "/opt/r1/audit-tools/test_apply_baseline_audit.py",
+        "sha256": "3fb2fe442ab4cccd02a6535db65e62cbd43680aa7d420bdc0fc78874ba352ab1"
+      },
+      {
+        "bytes": 6803,
+        "path": "/opt/r1/audit-tools/README.md",
+        "sha256": "5d87bbf801c5f9b8ced67bbe0b20f17213a36ff47e62ef0095f98e5182f0a14a"
+      },
+      {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      {
+        "bytes": 39316,
+        "path": "/opt/r1/baseline-audit/r1-saved-profile-source-manifest.json",
+        "sha256": "9cccbde9ac207059a77a8abb903c0df8b9d79cf1cdc30631919dd418e04ab50f"
+      }
+    ],
+    "source06_solvers_not_paired_benchmark": {
+      "bytes": 9039176,
+      "path": "/opt/r1/target/current/release/solvers",
+      "sha256": "8def6f2d0bf88f94cc92b7b5a8dfee46684e6fdaca7ccd5be4ac186f6994fefc"
+    }
+  },
+  "outer_cgroup_required": true,
+  "purpose": "saved_profile_quality_only",
+  "schema": "r1.audit-pair-build/v1",
+  "stages": [
+    {
+      "argv": [
+        "/bin/bash",
+        "-euo",
+        "pipefail",
+        "-c",
+        "rustc -Vv; cargo -V; rustup which rustc; rustup which cargo; uname -a; lscpu"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "00-toolchain",
+      "record": {
+        "bytes": 7864,
+        "path": "/opt/r1/audit-pair-build/00-toolchain/supervisor.json",
+        "sha256": "f6251afebd3278d8efde61e7ebf88fdfdceb6b7024ce293e97979e866896a29e"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "01-fmt",
+      "record": {
+        "bytes": 7902,
+        "path": "/opt/r1/audit-pair-build/01-fmt/supervisor.json",
+        "sha256": "e373bd6978a30758dbedd0d63c5d4fdac2bc6bad9558c2a7e8620d27919f444f"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "02-clippy",
+      "record": {
+        "bytes": 8052,
+        "path": "/opt/r1/audit-pair-build/02-clippy/supervisor.json",
+        "sha256": "55b7b70c96c58934743c6990d5993cb5cb829a85765671a63cd0befa09e8b1b5"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 1800
+    },
+    {
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--locked",
+        "--workspace",
+        "--",
+        "--test-threads=2"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "03-workspace-test",
+      "record": {
+        "bytes": 8032,
+        "path": "/opt/r1/audit-pair-build/03-workspace-test/supervisor.json",
+        "sha256": "0b696244e73c520374f7ae21cecf7769a4fb77957035c323f6861c0ca985ee7f"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 1800
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/tests",
+        "-v"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "04-tools-python",
+      "record": {
+        "bytes": 7494,
+        "path": "/opt/r1/audit-pair-build/04-tools-python/supervisor.json",
+        "sha256": "a9467422d25f0fe9f418cc33bed0eca3f2bcf520529640851e0404124ec91dd5"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "experiments/hu-postflop-r1/pipeline",
+        "-p",
+        "test_run_campaign.py",
+        "-v"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "05-pipeline-python",
+      "record": {
+        "bytes": 7630,
+        "path": "/opt/r1/audit-pair-build/05-pipeline-python/supervisor.json",
+        "sha256": "dfd7730a7d01781694c9753b1a84a9ad8d67da1fb21757dfeb691cce437a678a"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "--locked",
+        "--release",
+        "-p",
+        "cli",
+        "--bin",
+        "solvers",
+        "--example",
+        "hu_saved_profile_audit"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "06-current-release",
+      "record": {
+        "bytes": 8151,
+        "path": "/opt/r1/audit-pair-build/06-current-release/supervisor.json",
+        "sha256": "61035b91b9554597d45192e1b95da0ff712d7a19465151ad711c533ced1d7ab1"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 1800
+    },
+    {
+      "argv": [
+        "cp",
+        "-a",
+        "--reflink=auto",
+        "/opt/r1/target/current/release/deps",
+        "/opt/r1/target/current/release/build",
+        "/opt/r1/target/current/release/.fingerprint",
+        "/opt/r1/target/baseline-audit/release"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "07-seed-baseline-cache",
+      "record": {
+        "bytes": 8065,
+        "path": "/opt/r1/audit-pair-build/07-seed-baseline-cache/supervisor.json",
+        "sha256": "2887b6eea9c1588e4843ae31e47baefca5d4f932e05b948cbd03d92d1f766838"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "tar",
+        "--touch",
+        "--no-same-owner",
+        "-xzf",
+        "/opt/r1/baseline-source.tar.gz",
+        "-C",
+        "/opt/r1/baseline-audit"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "08-extract-baseline",
+      "record": {
+        "bytes": 7885,
+        "path": "/opt/r1/audit-pair-build/08-extract-baseline/supervisor.json",
+        "sha256": "49948e8e96c5621316691fa5d609468e2eca49231021d2bf93d190271278e65f"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "python3",
+        "/opt/r1/audit-tools/apply_baseline_audit.py",
+        "--root",
+        "/opt/r1/baseline-audit",
+        "--reference-root",
+        "/opt/r1/audit-source",
+        "--check"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "09-baseline-source-check",
+      "record": {
+        "bytes": 7683,
+        "path": "/opt/r1/audit-pair-build/09-baseline-source-check/supervisor.json",
+        "sha256": "e1154116e2083caf247adba21d65a40a4c1175f1de52c8bfe2a6e477f3486f7c"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 120
+    },
+    {
+      "argv": [
+        "python3",
+        "/opt/r1/audit-tools/apply_baseline_audit.py",
+        "--root",
+        "/opt/r1/baseline-audit",
+        "--reference-root",
+        "/opt/r1/audit-source",
+        "--apply"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "10-baseline-adapter-apply",
+      "record": {
+        "bytes": 7685,
+        "path": "/opt/r1/audit-pair-build/10-baseline-adapter-apply/supervisor.json",
+        "sha256": "e027cf5230e69a42e5af8f88a04497dfa5c6ad9b82ba0f8a8e65171c474098b2"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 120
+    },
+    {
+      "argv": [
+        "python3",
+        "/opt/r1/audit-tools/apply_baseline_audit.py",
+        "--root",
+        "/opt/r1/baseline-audit",
+        "--reference-root",
+        "/opt/r1/audit-source",
+        "--verify"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "11-baseline-adapter-verify",
+      "record": {
+        "bytes": 7691,
+        "path": "/opt/r1/audit-pair-build/11-baseline-adapter-verify/supervisor.json",
+        "sha256": "58dbb920455d5f9cb27603a26dab546e4953bf306e15dcfeecf87534539db82e"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 120
+    },
+    {
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "--locked",
+        "--release",
+        "-p",
+        "cli",
+        "--example",
+        "hu_saved_profile_audit"
+      ],
+      "cargo_target_dir": "/opt/r1/target/baseline-audit",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/baseline-audit",
+      "identity_unchanged": true,
+      "name": "12-baseline-example-release",
+      "record": {
+        "bytes": 8517,
+        "path": "/opt/r1/audit-pair-build/12-baseline-example-release/supervisor.json",
+        "sha256": "77a65dda5f61ba5960a9487c8c757110568e78abbbbfb963c90be3ae30e6d129"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 1800
+    },
+    {
+      "argv": [
+        "python3",
+        "/opt/r1/audit-tools/apply_baseline_audit.py",
+        "--root",
+        "/opt/r1/baseline-audit",
+        "--reference-root",
+        "/opt/r1/audit-source",
+        "--verify"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "13-baseline-final-verify",
+      "record": {
+        "bytes": 8076,
+        "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/supervisor.json",
+        "sha256": "9b55a9a35d12b7fe507a26fc2bac48d211c8f948d163c84a221bad1accf9bb13"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 120
+    }
+  ],
+  "started_utc": "2026-09-25T17:19:26.082340+00:00",
+  "status": "completed"
+}

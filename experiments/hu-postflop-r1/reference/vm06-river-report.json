@@ -1,0 +1,181 @@
+{
+  "schema": "solvers.r1-river-diagnostic-verification/v1",
+  "status": "verified_diagnostic_only",
+  "verifier": {
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\vm06-river-verification.py",
+    "bytes": 7759,
+    "sha256": "ad6468bd4810358bc04fb0992e08035a6cb8d820537c2e19eb71be2a4bc9788e"
+  },
+  "shared_evidence_verifier": {
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\pipeline\\vm06-comparison-verification.py",
+    "bytes": 32825,
+    "sha256": "b61af4afa21aac4c5e217f179548ea954babc88ebb72c7f5c7f8d74acce30a72"
+  },
+  "bundles": [
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-v3-results.tar.gz",
+      "bytes": 17934814,
+      "sha256": "3c679810a39b3fac58d394f95387b0d98cec94ccc299f325e5922eefb9264e2d",
+      "payloads_verified": 763,
+      "compact_index_files_verified": 722,
+      "retention": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\pipeline\\evidence-vm06-v3\\retention.json",
+        "bytes": 750617,
+        "sha256": "e1c6d08c433b4f118f52705c5fedfd0f9aa766bb81720d4e0b2e5988b23ce9cb"
+      },
+      "generic_ready_unchanged": false
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-saved-audits.tar.gz",
+      "bytes": 544160,
+      "sha256": "378f3338a3c4ade87e01e749c33b4e5a232da2e5074385ffc70c64ab50d8d3bb",
+      "payloads_verified": 247,
+      "compact_index_files_verified": 250,
+      "retention": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\saved-profile\\evidence-vm06-audits\\retention.json",
+        "bytes": 561963,
+        "sha256": "2bb1e8784fe16ebdf5f3603fad8659279b73e1c964b3cb6cba7d13be79cf5c3b"
+      },
+      "generic_ready_unchanged": false
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-recovery.tar.gz",
+      "bytes": 6928478,
+      "sha256": "d40e55c982f8702640e744e550f5c7072a0777bb84cb547d9ee22bc53e2750a5",
+      "payloads_verified": 118,
+      "compact_index_files_verified": 118,
+      "retention": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\saved-profile\\evidence-vm06-build\\retention.json",
+        "bytes": 241793,
+        "sha256": "cbefbe0acaa79a4314ebb32bceec5caec8d88d1e916a1bc62dc459a1316911b5"
+      },
+      "generic_ready_unchanged": false
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-cloud\\vm06-river-diagnostics.tar.gz",
+      "bytes": 582822,
+      "sha256": "16908b41d812497625ed1fe3da78de576e13310064d8a36d71b7171f52025e8b",
+      "payloads_verified": 97,
+      "compact_index_files_verified": 98,
+      "retention": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\evidence-vm06-river\\retention.json",
+        "bytes": 108405,
+        "sha256": "4572779304cfacca59b703148912b09a81a951dfe02281785a1a6dd30d015435"
+      },
+      "generic_ready_unchanged": false
+    }
+  ],
+  "verified_supervisor_stages": 12,
+  "cases": [
+    {
+      "case": "HU-R0-019",
+      "tree": {
+        "status": "all_observed_menus_match",
+        "decision_nodes": 12,
+        "decision_action_edges": 32,
+        "terminal_nodes": 21,
+        "public_nodes": 33
+      },
+      "ev_diagnostic": {
+        "root_ev": {
+          "oop": {
+            "solver_ev_bb": "16.584886560610382",
+            "reference_display_ev_bb": "16.58",
+            "signed_difference_bb": "0.004886560610382"
+          },
+          "ip": {
+            "solver_ev_bb": "23.315113388898817",
+            "reference_display_ev_bb": "23.32",
+            "signed_difference_bb": "-0.004886611101183"
+          }
+        },
+        "solver_iterations": 1500,
+        "solver_storage": "f32",
+        "solver_nash_conv_bb": "0.0008363443661716019",
+        "solver_mean_br_gain_pct_starting_pot": "0.001032523908853829506172839506",
+        "solver_evaluation_basis": "live average profile before artifact quantization",
+        "reference_ev_display_step_bb": "0.01",
+        "reference_exploitability": null,
+        "comparison_threshold": null,
+        "acceptance": null,
+        "condition_match": "unverified",
+        "quality_status": "not_evaluated"
+      },
+      "execution": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\evidence-vm06-river\\records\\river\\diagnostic019\\execution.json",
+        "bytes": 16892,
+        "sha256": "86a0acf86364f15aec049af887d133d66f561213e05662a06588fb7c6acb1666"
+      },
+      "checker": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-019\\check_diagnostic.py",
+        "bytes": 12369,
+        "sha256": "b60b77f209d345278bee4a74a026d1af8ce6ca3bad95989ffc0140a7002c550b"
+      },
+      "source_id": "source-archive-sha256:ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970",
+      "binary": {
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521",
+        "bytes": 8868960
+      }
+    },
+    {
+      "case": "HU-R0-017",
+      "tree": {
+        "status": "all_observed_menus_match",
+        "decision_nodes": 28,
+        "decision_action_edges": 80,
+        "terminal_nodes": 53,
+        "public_nodes": 81
+      },
+      "ev_diagnostic": {
+        "root_ev": {
+          "oop": {
+            "solver_ev_bb": "7.681475763687281",
+            "reference_display_ev_bb": "7.68",
+            "signed_difference_bb": "0.001475763687281"
+          },
+          "ip": {
+            "solver_ev_bb": "12.218524277866543",
+            "reference_display_ev_bb": "12.22",
+            "signed_difference_bb": "-0.001475722133457"
+          }
+        },
+        "solver_iterations": 2200,
+        "solver_storage": "f32",
+        "solver_nash_conv_bb": "0.000939232587918184",
+        "solver_mean_br_gain_pct_starting_pot": "0.002290811190044351219512195122",
+        "solver_evaluation_basis": "live average profile before artifact quantization",
+        "reference_ev_display_step_bb": "0.01",
+        "reference_exploitability": null,
+        "comparison_threshold": null,
+        "acceptance": null,
+        "condition_match": "unverified",
+        "quality_status": "not_evaluated"
+      },
+      "execution": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\evidence-vm06-river\\records\\river\\diagnostic017\\execution.json",
+        "bytes": 17162,
+        "sha256": "ea5814d59f2a560a22b1df4e661f148986451a6c427ffe6edbd8940d31ad189d"
+      },
+      "checker": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-017\\check_diagnostic.py",
+        "bytes": 14500,
+        "sha256": "727231d94dae4c25d6305353f50d945b5d3fe1d525ba53c1e3343df18d3c67e5"
+      },
+      "source_id": "source-archive-sha256:ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970",
+      "binary": {
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521",
+        "bytes": 8868960
+      }
+    }
+  ],
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "limitations": [
+    "Source03 diagnostic, not final source06 performance or 24-case acceptance.",
+    "Rake collection semantics, reference solve version and accuracy remain unverified.",
+    "EV is live average-profile metadata; no saved-policy BR audit in these diagnostics.",
+    "Rounded reference EV agreement cannot establish identical finite games."
+  ]
+}

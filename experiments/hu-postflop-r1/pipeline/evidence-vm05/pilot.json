@@ -1,0 +1,527 @@
+{
+  "baseline": {
+    "binary": {
+      "bytes": 8813904,
+      "path": "/opt/r1/target/baseline/release/solvers",
+      "sha256": "77418ab6791041efd01378fbfa4d73e3fcd8153a6b7924d748f31727e54cdeb8"
+    },
+    "revision": "9632d8b",
+    "sol_version": 1,
+    "source_evidence": {
+      "bytes": 871630,
+      "path": "/opt/r1/baseline-source.tar.gz",
+      "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+    }
+  },
+  "campaign_seconds": 1800,
+  "cases": [
+    {
+      "artifacts": {
+        "checkpoint.ckpt": {
+          "bytes": 81323,
+          "header": {
+            "embedded_config_blake3": "1595e45ed44ef67fb68cb6dc897976a1347e3e69b183aeace0cdbdc0e3f71283",
+            "iteration": 100,
+            "version": 1
+          },
+          "path": "/opt/r1/current/runs/r1-pilot/river/run/checkpoint.ckpt",
+          "sha256": "6a1026be41d9da7cd0430528f013a57505229f8a785dab86c99f5bcbaa70242e"
+        },
+        "progress.jsonl": {
+          "bytes": 549,
+          "path": "/opt/r1/current/runs/r1-pilot/river/run/progress.jsonl",
+          "sha256": "34d75d98d214ec2710d91b915684a2d1b09804922804342907fbfca9e8cad615"
+        },
+        "run.json": {
+          "bytes": 177,
+          "path": "/opt/r1/current/runs/r1-pilot/river/run/run.json",
+          "sha256": "2a86a183cb8484bb869e70c0dae3ce0507e4eece456428c2fa47eaf1d692c4a0"
+        },
+        "run.toml": {
+          "bytes": 559,
+          "path": "/opt/r1/current/runs/r1-pilot/river/run/run.toml",
+          "sha256": "cbbe0b27cc7cc5d31a6b11ac9ba9a421bf6e7e755a4306254cc1071a2ab9d790"
+        },
+        "solution.sol": {
+          "bytes": 7475,
+          "header": {
+            "embedded_config_blake3": "1595e45ed44ef67fb68cb6dc897976a1347e3e69b183aeace0cdbdc0e3f71283",
+            "iteration": 100,
+            "version": 1
+          },
+          "path": "/opt/r1/current/runs/r1-pilot/river/run/solution.sol",
+          "sha256": "17ea907893c24957e5ad6378e7cb4523487813a2c0c36120f1774b4f890a80dd"
+        }
+      },
+      "case": "river",
+      "config": {
+        "bytes": 559,
+        "path": "/opt/r1/current/experiments/hu-postflop-r1/pipeline/configs/river.toml",
+        "sha256": "cbbe0b27cc7cc5d31a6b11ac9ba9a421bf6e7e755a4306254cc1071a2ab9d790"
+      },
+      "internal_target": {
+        "exploitability_pct_pot": 0.07437514724032535,
+        "g_i": [
+          0.012880653853740931,
+          0.016869405042389207
+        ],
+        "inequality": "<",
+        "nash_conv": 0.029750058896130138,
+        "scope": "internal finite synthetic game only",
+        "source": "run.json final live solver result",
+        "status": "pass",
+        "strategy_kind": "live_average",
+        "target_nash_conv": 0.04
+      },
+      "live_final": {
+        "g_i": [
+          0.012880653853740931,
+          0.016869405042389207
+        ],
+        "iterations": 100,
+        "nash_conv": 0.029750058896130138,
+        "pot": 20
+      },
+      "missing_fields": [
+        "saved_quantized_profile_br",
+        "monotonic_internal_phase_spans",
+        "external_reference_condition_match_and_thresholds"
+      ],
+      "phase_timings": {
+        "br_final": null,
+        "cfr": null,
+        "initialization": null,
+        "persistence": null,
+        "return": null
+      },
+      "presave_consistency": "pass",
+      "quality_status": "not_evaluated",
+      "run_status": "completed",
+      "saved_profile_br": "not_evaluated",
+      "solve": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.18125560399994356,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.056503687999907015,
+          "root_os_peak_resident_bytes": 24551424,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 4,
+          "sampled_peak_tree_resident_bytes": 11210752
+        },
+        "record": {
+          "bytes": 5838,
+          "path": "/opt/r1/current/runs/r1-pilot/river/solve/supervisor.json",
+          "sha256": "90661bf1070cb57e41f9f6d956fa7fbcdf778e5dbfe1f39271a063e6366851b2"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 602,
+          "path": "/opt/r1/current/runs/r1-pilot/river/solve/stdout.log",
+          "sha256": "c1c53cc6a2e5679f9cd19bdee1cd37319fadc498c2d31d95e62ec6088de64bba"
+        },
+        "stop_reason": "completed"
+      },
+      "summary": {
+        "board": "2c 7d 9h Js Qs",
+        "effective_stack": 60,
+        "ev_ip": 6.128177549428161,
+        "ev_oop": 13.871822359286634,
+        "expl_ip": 0.016869405042389207,
+        "expl_oop": 0.012880653853740931,
+        "iterations": 100,
+        "min_bet": 1,
+        "nash_conv": 0.029750058896130138,
+        "nodes": 27,
+        "pot": 20,
+        "storage": "f32",
+        "stored_nodes": 10,
+        "streets_stored": "full",
+        "wall_secs": 0.116716657
+      },
+      "summary_read": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.012386068999944655,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 0,
+          "max_sample_gap_seconds": 0.0,
+          "root_os_peak_resident_bytes": 24768512,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 1,
+          "sampled_peak_tree_resident_bytes": 0
+        },
+        "record": {
+          "bytes": 6010,
+          "path": "/opt/r1/current/runs/r1-pilot/river/summary/supervisor.json",
+          "sha256": "bdce121b0aed20b7d334ba8bcb43412bda13f6fe3f67f65a6c59cf3d9d4d4aa0"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 390,
+          "path": "/opt/r1/current/runs/r1-pilot/river/summary/stdout.log",
+          "sha256": "157dbc926bf7b55e116c3348971ac9c328ab45781deb26c6d7c3885acd5f91d1"
+        },
+        "stop_reason": "completed"
+      },
+      "target_nash_conv": 0.04
+    },
+    {
+      "artifacts": {
+        "checkpoint.ckpt": {
+          "bytes": 356281,
+          "header": {
+            "embedded_config_blake3": "5357416907598178a2fec594477a1d10938e5a48b24fb16ac4b1843eb2bb93ca",
+            "iteration": 100,
+            "version": 1
+          },
+          "path": "/opt/r1/current/runs/r1-pilot/turn/run/checkpoint.ckpt",
+          "sha256": "522b67b3254393ab028ca9cf0aefe7439f214370998bc94f29194cb7aa833bd6"
+        },
+        "progress.jsonl": {
+          "bytes": 544,
+          "path": "/opt/r1/current/runs/r1-pilot/turn/run/progress.jsonl",
+          "sha256": "6439b5ad0954060a180ef18ea2629fcc1bce23b0f1534419cf357a61e376cbec"
+        },
+        "run.json": {
+          "bytes": 176,
+          "path": "/opt/r1/current/runs/r1-pilot/turn/run/run.json",
+          "sha256": "eb97f946a41c032155b290f8c380da6a0c0a191cf9b0146542a4a78bbe31b4fc"
+        },
+        "run.toml": {
+          "bytes": 548,
+          "path": "/opt/r1/current/runs/r1-pilot/turn/run/run.toml",
+          "sha256": "726f664ac4417d1d5d6cee145885805fc90cdd719d9d2490fa1f6e49df7067d8"
+        },
+        "solution.sol": {
+          "bytes": 21334,
+          "header": {
+            "embedded_config_blake3": "5357416907598178a2fec594477a1d10938e5a48b24fb16ac4b1843eb2bb93ca",
+            "iteration": 100,
+            "version": 1
+          },
+          "path": "/opt/r1/current/runs/r1-pilot/turn/run/solution.sol",
+          "sha256": "08e35f019b55012796d96ab3cf9040a26209ae19898ff6365765ed9efa632a9d"
+        }
+      },
+      "case": "turn",
+      "config": {
+        "bytes": 548,
+        "path": "/opt/r1/current/experiments/hu-postflop-r1/pipeline/configs/turn.toml",
+        "sha256": "726f664ac4417d1d5d6cee145885805fc90cdd719d9d2490fa1f6e49df7067d8"
+      },
+      "internal_target": {
+        "exploitability_pct_pot": 0.0720699628194188,
+        "g_i": [
+          0.014560711236647705,
+          0.014267273891119814
+        ],
+        "inequality": "<",
+        "nash_conv": 0.02882798512776752,
+        "scope": "internal finite synthetic game only",
+        "source": "run.json final live solver result",
+        "status": "pass",
+        "strategy_kind": "live_average",
+        "target_nash_conv": 0.04
+      },
+      "live_final": {
+        "g_i": [
+          0.014560711236647705,
+          0.014267273891119814
+        ],
+        "iterations": 100,
+        "nash_conv": 0.02882798512776752,
+        "pot": 20
+      },
+      "missing_fields": [
+        "saved_quantized_profile_br",
+        "monotonic_internal_phase_spans",
+        "external_reference_condition_match_and_thresholds"
+      ],
+      "phase_timings": {
+        "br_final": null,
+        "cfr": null,
+        "initialization": null,
+        "persistence": null,
+        "return": null
+      },
+      "presave_consistency": "pass",
+      "quality_status": "not_evaluated",
+      "run_status": "completed",
+      "saved_profile_br": "not_evaluated",
+      "solve": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 1.4728420559999904,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.05990188800001306,
+          "root_os_peak_resident_bytes": 51556352,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 26,
+          "sampled_peak_tree_resident_bytes": 51949568
+        },
+        "record": {
+          "bytes": 5826,
+          "path": "/opt/r1/current/runs/r1-pilot/turn/solve/supervisor.json",
+          "sha256": "5e4fb77a8a94b57cb86d741f9bddca7a84835d462299493e1685ff823f08db72"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 608,
+          "path": "/opt/r1/current/runs/r1-pilot/turn/solve/stdout.log",
+          "sha256": "bcba821613942d4a968ecac234c1762177bcae9d62f7749ee1854c56ad7db21c"
+        },
+        "stop_reason": "completed"
+      },
+      "summary": {
+        "board": "2c 7d 9h Js",
+        "effective_stack": 60,
+        "ev_ip": 1.208072568163459,
+        "ev_oop": 18.791926466388468,
+        "expl_ip": 0.014267273891119814,
+        "expl_oop": 0.014560711236647705,
+        "iterations": 100,
+        "min_bet": 1,
+        "nash_conv": 0.02882798512776752,
+        "nodes": 1305,
+        "pot": 20,
+        "storage": "f32",
+        "stored_nodes": 580,
+        "streets_stored": "full",
+        "wall_secs": 1.294936761
+      },
+      "summary_read": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.038774708000005376,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.007272848999946291,
+          "root_os_peak_resident_bytes": 24834048,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 5,
+          "sampled_peak_tree_resident_bytes": 16564224
+        },
+        "record": {
+          "bytes": 6026,
+          "path": "/opt/r1/current/runs/r1-pilot/turn/summary/supervisor.json",
+          "sha256": "0b6fc526129b77b0026630c1eb887e75423ca0eb1eca1b4d0a4735493d976e26"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 389,
+          "path": "/opt/r1/current/runs/r1-pilot/turn/summary/stdout.log",
+          "sha256": "08ca7ad2dd091aafcf6af6265012ad4db80aa0617ce8d05dd41bc19a086df757"
+        },
+        "stop_reason": "completed"
+      },
+      "target_nash_conv": 0.04
+    },
+    {
+      "artifacts": {
+        "checkpoint.ckpt": {
+          "bytes": 34538,
+          "header": {
+            "embedded_config_blake3": "3ec7d3769cce2d048db30749800a21b83030c77cf32d1e759eae0d8971fb87e1",
+            "iteration": 50,
+            "version": 1
+          },
+          "path": "/opt/r1/current/runs/r1-pilot/flop/run/checkpoint.ckpt",
+          "sha256": "01f2e7f240a3b0aa99036c72f50a9b84aa82e8e5b9c3212109327de4aaa96cd2"
+        },
+        "progress.jsonl": {
+          "bytes": 692,
+          "path": "/opt/r1/current/runs/r1-pilot/flop/run/progress.jsonl",
+          "sha256": "822eef436c81d33260db275ee88c88a2250fa9737f1b6a31886a5d5c7d370e24"
+        },
+        "run.json": {
+          "bytes": 176,
+          "path": "/opt/r1/current/runs/r1-pilot/flop/run/run.json",
+          "sha256": "89fb26bd820a22aacc4f62b68f5bdebcd1e44b861d169fef5feb126fe1447c82"
+        },
+        "run.toml": {
+          "bytes": 678,
+          "path": "/opt/r1/current/runs/r1-pilot/flop/run/run.toml",
+          "sha256": "c8cb6c07ed18bbcf60f81b1e8022850b0a70f3c584d03b4307d7f5b9c504e7ad"
+        },
+        "solution.sol": {
+          "bytes": 131752,
+          "header": {
+            "embedded_config_blake3": "3ec7d3769cce2d048db30749800a21b83030c77cf32d1e759eae0d8971fb87e1",
+            "iteration": 50,
+            "version": 1
+          },
+          "path": "/opt/r1/current/runs/r1-pilot/flop/run/solution.sol",
+          "sha256": "c34e5dbdc617c8c60e8bc6fc96d68c23e12a9960a27a3cd78da70892f2c6722e"
+        }
+      },
+      "case": "flop",
+      "config": {
+        "bytes": 678,
+        "path": "/opt/r1/current/experiments/hu-postflop-r1/pipeline/configs/flop.toml",
+        "sha256": "c8cb6c07ed18bbcf60f81b1e8022850b0a70f3c584d03b4307d7f5b9c504e7ad"
+      },
+      "internal_target": {
+        "exploitability_pct_pot": 0.09174731042649986,
+        "g_i": [
+          0.013658099704318527,
+          0.023040824466281418
+        ],
+        "inequality": "<",
+        "nash_conv": 0.036698924170599945,
+        "scope": "internal finite synthetic game only",
+        "source": "run.json final live solver result",
+        "status": "pass",
+        "strategy_kind": "live_average",
+        "target_nash_conv": 0.04
+      },
+      "live_final": {
+        "g_i": [
+          0.013658099704318527,
+          0.023040824466281418
+        ],
+        "iterations": 50,
+        "nash_conv": 0.036698924170599945,
+        "pot": 20
+      },
+      "missing_fields": [
+        "saved_quantized_profile_br",
+        "monotonic_internal_phase_spans",
+        "external_reference_condition_match_and_thresholds"
+      ],
+      "phase_timings": {
+        "br_final": null,
+        "cfr": null,
+        "initialization": null,
+        "persistence": null,
+        "return": null
+      },
+      "presave_consistency": "pass",
+      "quality_status": "not_evaluated",
+      "run_status": "completed",
+      "saved_profile_br": "not_evaluated",
+      "solve": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 9.909703092000086,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.06818426799998178,
+          "root_os_peak_resident_bytes": 730030080,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 165,
+          "sampled_peak_tree_resident_bytes": 730894336
+        },
+        "record": {
+          "bytes": 5829,
+          "path": "/opt/r1/current/runs/r1-pilot/flop/solve/supervisor.json",
+          "sha256": "9e9bf00ec9569e3741ecc78c39cebd5ad4f18dff5e1765c47c1b336ede79c6a6"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 683,
+          "path": "/opt/r1/current/runs/r1-pilot/flop/solve/stdout.log",
+          "sha256": "3ba2ffae2342956bc5aae754bec9dd6c40eec10a4f107ff50cf1afff0c2765e6"
+        },
+        "stop_reason": "completed"
+      },
+      "summary": {
+        "board": "Ks 7h 2d",
+        "effective_stack": 60,
+        "ev_ip": 11.950607829623753,
+        "ev_oop": 8.049393706851536,
+        "expl_ip": 0.023040824466281418,
+        "expl_oop": 0.013658099704318527,
+        "iterations": 50,
+        "min_bet": 1,
+        "nash_conv": 0.036698924170599945,
+        "nodes": 21618,
+        "pot": 20,
+        "storage": "f32",
+        "stored_nodes": 14410,
+        "streets_stored": "full",
+        "wall_secs": 7.693550188
+      },
+      "summary_read": {
+        "cleanup_complete": true,
+        "elapsed_seconds": 0.5023164450000195,
+        "exit_code": 0,
+        "identity_unchanged": true,
+        "measurement": {
+          "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+          "job_os_peak_commit_bytes": null,
+          "max_observed_processes": 1,
+          "max_sample_gap_seconds": 0.007535379000046305,
+          "root_os_peak_resident_bytes": 236847104,
+          "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+          "sample_count": 74,
+          "sampled_peak_tree_resident_bytes": 235737088
+        },
+        "record": {
+          "bytes": 6030,
+          "path": "/opt/r1/current/runs/r1-pilot/flop/summary/supervisor.json",
+          "sha256": "37b87282f1fd5d3909c55945de9059b899fc0b84bc4f042e5f4dcf724b8e89f5"
+        },
+        "state": "completed",
+        "stdout": {
+          "bytes": 389,
+          "path": "/opt/r1/current/runs/r1-pilot/flop/summary/stdout.log",
+          "sha256": "5d48c5a017adf36f02ca84836faf92a7688603a68becbfea58ad17e5a154f7bd"
+        },
+        "stop_reason": "completed"
+      },
+      "target_nash_conv": 0.04
+    }
+  ],
+  "created_at": "2026-09-25T16:21:07Z",
+  "ended_at": "2026-09-25T16:21:20Z",
+  "host": {
+    "boot_id": "ec714a24-deec-4fad-8eaf-4d73b4d78117",
+    "cpuinfo": "processor\t: 0\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 0\ncpu cores\t: 4\napicid\t\t: 0\ninitial apicid\t: 0\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 1\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 1\ncpu cores\t: 4\napicid\t\t: 2\ninitial apicid\t: 2\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 2\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 2\ncpu cores\t: 4\napicid\t\t: 4\ninitial apicid\t: 4\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 3\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 3\ncpu cores\t: 4\napicid\t\t: 6\ninitial apicid\t: 6\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 4\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 0\ncpu cores\t: 4\napicid\t\t: 1\ninitial apicid\t: 1\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 5\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 1\ncpu cores\t: 4\napicid\t\t: 3\ninitial apicid\t: 3\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 6\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 2\ncpu cores\t: 4\napicid\t\t: 5\ninitial apicid\t: 5\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 7\nvendor_id\t: AuthenticAMD\ncpu family\t: 23\nmodel\t\t: 49\nmodel name\t: AMD EPYC 7B12\nstepping\t: 0\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 2249.998\ncache size\t: 512 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 3\ncpu cores\t: 4\napicid\t\t: 7\ninitial apicid\t: 7\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 13\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nbugs\t\t: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass retbleed smt_rsb srso ibpb_no_ret spectre_v2_user\nbogomips\t: 4499.99\nTLB size\t: 3072 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management:",
+    "hostname": "solvers-r1-20260925-05",
+    "logical_cpus": 8,
+    "machine": "x86_64",
+    "platform": "Linux-7.0.0-1011-gcp-x86_64-with-glibc2.39",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "rayon_num_threads": "8"
+  },
+  "kind": "pilot",
+  "limits": {
+    "disk_reserve_bytes": 10737418240,
+    "grace_seconds": 5,
+    "kill_wait_seconds": 5,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "poll_seconds": 0.05,
+    "timeout_seconds": 600
+  },
+  "runner": {
+    "bytes": 29443,
+    "path": "/opt/r1/current/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+    "sha256": "8876065d1cc89ba94064dc2d3da4832059aac49ddab153d3688ab6711b6e28ca"
+  },
+  "schema": "solvers.r1-pipeline/v1",
+  "state": "completed",
+  "supervisor": {
+    "bytes": 39015,
+    "path": "/opt/r1/current/tools/run_supervised.py",
+    "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+  }
+}

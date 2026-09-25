@@ -1,0 +1,5 @@
+resuming from checkpoint: iteration=100 target=100
+tree: nodes=1305 terminals=722 rank_tables=48 storage=11.7 MiB (f32) / 5.9 MiB (i16)
+game=postflop schedule=dcfr iterations=100
+done: iterations=100 wall=1.65s ev_p0=18.791926 ev_p1=1.208073 nash_conv=2.883e-2
+sol: wrote /opt/r1/phase-off/turn-1-baseline/restore/run/solution.sol (20.8 KB, 580 blocks, mode=Full)

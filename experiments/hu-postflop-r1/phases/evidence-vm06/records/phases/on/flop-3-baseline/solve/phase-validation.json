@@ -1,0 +1,62 @@
+{
+  "mode": "on",
+  "record": {
+    "bytes": 7373,
+    "path": "/opt/r1/phase-on/flop-3-baseline/solve/phase.json",
+    "sha256": "041d568220b2608288eb8c7eae5b013c734908eae821faecfb020e2e8798a6d5"
+  },
+  "status": "validated",
+  "summary": {
+    "cfr_inclusive_envelope": {
+      "add_to_leaf_sum": false,
+      "duration_ns": 7584831970,
+      "end_ns": 7706193955,
+      "start_ns": 121361985
+    },
+    "instrumentation_id": "aa81ca3e10c1beba324a8d42483294ca54a8b3fe852970a9f924da44fd2e5a3a",
+    "leaves": {
+      "cfr_updates": {
+        "calls": 5,
+        "duration_ns": 5706007975
+      },
+      "checkpoint": {
+        "calls": 6,
+        "duration_ns": 2111015057
+      },
+      "final_ev_br": {
+        "calls": 1,
+        "duration_ns": 299868548
+      },
+      "initialization": {
+        "calls": 1,
+        "duration_ns": 101238235
+      },
+      "input_preparation": {
+        "calls": 1,
+        "duration_ns": 8265860
+      },
+      "overhead": {
+        "calls": 21,
+        "duration_ns": 81421806
+      },
+      "periodic_ev_br": {
+        "calls": 5,
+        "duration_ns": 774550030
+      },
+      "sol_preparation": {
+        "calls": 1,
+        "duration_ns": 1195422423
+      },
+      "sol_serialization_and_write": {
+        "calls": 1,
+        "duration_ns": 288286849
+      },
+      "summary_publish": {
+        "calls": 1,
+        "duration_ns": 46180
+      }
+    },
+    "source_version": "baseline9632",
+    "total_ns": 10566122963
+  }
+}

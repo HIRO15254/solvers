@@ -1,0 +1,48 @@
+{
+  "case_id": "HU-R0-020",
+  "board": [
+    "Ac",
+    "Kd",
+    "3s"
+  ],
+  "arithmetic": "Python Decimal, precision 80; original decimal weights without renormalization",
+  "hash_scope": "entire UTF-8 file bytes including the single appended LF",
+  "copy_transfer_verification": "Root supplied raw clipboard text, character counts and FNV-1a 32-bit; saving agent matched both and independently recomputes them from file bytes excluding final LF.",
+  "oop": {
+    "file": "oop-range.txt",
+    "file_bytes": 1004,
+    "copy_raw_characters": 1003,
+    "raw_fnv1a32": "c1a2bbdc",
+    "positive_combos": 92,
+    "weight_sum": "52.295",
+    "weight_min": "0.115",
+    "weight_max": "1",
+    "sha256": "2240f9b837477a06ed57e568af9cbeab2d2c59438d16eeb8a1ce7787395244de",
+    "duplicate_unordered_combos": 0,
+    "board_collisions": 0,
+    "nonfinite_or_nonpositive_weights": 0
+  },
+  "ip": {
+    "file": "ip-range.txt",
+    "file_bytes": 1134,
+    "copy_raw_characters": 1133,
+    "raw_fnv1a32": "0909bf7b",
+    "positive_combos": 102,
+    "weight_sum": "42.506",
+    "weight_min": "0.065",
+    "weight_max": "1",
+    "sha256": "e5b803f8f57e366bb78dd1bfa2845b67ec753c257441030ebeecd3868301b815",
+    "duplicate_unordered_combos": 0,
+    "board_collisions": 0,
+    "nonfinite_or_nonpositive_weights": 0
+  },
+  "joint": {
+    "positive_pair_product_count": 9384,
+    "compatible_positive_pairs": 8211,
+    "incompatible_positive_pairs": 1173,
+    "compatible_weight_sum": "1855.567965",
+    "unrestricted_product_weight_sum": "2222.851270",
+    "incompatible_weight_sum": "367.283305",
+    "definition": "sum(w_oop * w_ip) over disjoint private-card sets; both ranges already disjoint from Ac Kd 3s; no renormalization or future chance weights"
+  }
+}

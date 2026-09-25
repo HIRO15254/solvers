@@ -1,0 +1,9 @@
+{
+  "mode": "verify",
+  "patch_id": "51fc3e4cf049d69fd7862093dade868a29630b3605a3cff915101de3cf4de04e",
+  "build_input_diff": [],
+  "manifest": "/opt/r1/baseline-audit/r1-saved-profile-source-manifest.json",
+  "baseline_identity": {
+    "git_commit": "9632d8b244990cb5b95ff7d0cacc84ee95a7ee0e"
+  }
+}

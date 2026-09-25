@@ -1,0 +1,363 @@
+{
+  "schema": "solvers.r1-local-download-inventory/v1",
+  "verified_at_utc": "2026-09-25T18:42:31.741876+00:00",
+  "scope": "Ten completed evidence-bundle downloads and their two sidecars, independently rehashed locally before final inventory. Counts retained unique objects, not all bytes ever transmitted. VM06 final six bundles were downloaded before explicit VM deletion.",
+  "method": "Verify whole archive, sidecar and checksum hashes; embedded manifest byte equality; every included regular payload size/SHA-256; exact tar member sets.",
+  "downloads": [
+    {
+      "reservation_id": "r1-20260925-05",
+      "direction": "GCP-to-local",
+      "scope": "baseline/source02 build, binaries and initial validation",
+      "archive": {
+        "path": "runs/r1-cloud/vm05-build.tar.gz",
+        "bytes": 8635436,
+        "sha256": "3c715889d53ce83fe8c033b317337c40e302bdf05ad8d0245e95566a4f7d499e"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/vm05-build.tar.gz.manifest.json",
+        "bytes": 8647,
+        "sha256": "9749c3f50f600bdcb97c0184d0fe675cb3069877ded2f39330fb66b6f77e61ce"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/vm05-build.tar.gz.sha256",
+        "bytes": 84,
+        "sha256": "bc8a4969d189f9c3d3ce42df94901582f65fcab44796119a739aa5a3770c9564"
+      },
+      "known_unique_download_bytes": 8644167,
+      "download_verification": {
+        "path": "experiments/hu-postflop-r1/validation/vm05/build-download-verification.json",
+        "bytes": 3900,
+        "sha256": "9fae8925543d4bd5ec0057dfefd1f3531fb0f9e8ce64d4c1a3d42c15c445c5eb"
+      },
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "verified_included_regular_payloads": 13,
+      "verified_payload_bytes": 19850761,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "verified_at_utc": "2026-09-25T18:36:21.851693+00:00"
+    },
+    {
+      "reservation_id": "r1-20260925-05",
+      "direction": "GCP-to-local",
+      "scope": "candidate1 .sol v2 baseline pilot and paired pipeline; not candidate v3 performance",
+      "archive": {
+        "path": "runs/r1-cloud/vm05-pipeline.tar.gz",
+        "bytes": 11950377,
+        "sha256": "3730bdb23b8cd53d7de70d567bfa897a8f6e3337582622757868c82b86b8cb7e"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/vm05-pipeline.tar.gz.manifest.json",
+        "bytes": 471531,
+        "sha256": "7a415c4453dc3b1a086fb26245d3a055d1e75c7903938cd709d795c20bedc954"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/vm05-pipeline.tar.gz.sha256",
+        "bytes": 87,
+        "sha256": "e810141f1a49d7fc7e8a6d355c4400dd50ab391c888fd4fea39ddfe11e7920e9"
+      },
+      "known_unique_download_bytes": 12421995,
+      "download_verification": {
+        "path": "experiments/hu-postflop-r1/pipeline/evidence-vm05/download-verification.json",
+        "bytes": 1345,
+        "sha256": "273020d2aa3f0a007bca97b1fd2b01e4967d91df83d2b668a6697644a37b456e"
+      },
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "verified_included_regular_payloads": 747,
+      "verified_payload_bytes": 171378186,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "verified_at_utc": "2026-09-25T18:36:21.851693+00:00"
+    },
+    {
+      "reservation_id": "r1-20260925-05",
+      "direction": "GCP-to-local",
+      "scope": "source03/v3 ordinary validation and source02 five ignored tests; no v3 performance or diagnostic results",
+      "archive": {
+        "path": "runs/r1-cloud/vm05-v3-checks.tar.gz",
+        "bytes": 29508,
+        "sha256": "33905062c8c8cef0d53605febc8deb3c0fe911c0555260ac11613382768b8ed0"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/vm05-v3-checks.tar.gz.manifest.json",
+        "bytes": 9898,
+        "sha256": "5e8c6c28372edda245596a45b548d6e18b060357ca98fc11c9cef4166ada9e59"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/vm05-v3-checks.tar.gz.sha256",
+        "bytes": 88,
+        "sha256": "28340ef656c1fad1cc26257dbadb03a31f1e2e8ae10a63cb4b74721202702d35"
+      },
+      "known_unique_download_bytes": 39494,
+      "download_verification": {
+        "path": "experiments/hu-postflop-r1/validation/vm05-v3/download-verification.json",
+        "bytes": 2010,
+        "sha256": "8c19f3188312afb83c866455bb994c03925b28e1cc1eb5b36ff51ddb8b58c816"
+      },
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "verified_included_regular_payloads": 15,
+      "verified_payload_bytes": 114665,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "verified_at_utc": "2026-09-25T18:36:21.851693+00:00"
+    },
+    {
+      "reservation_id": "r1-20260925-06",
+      "direction": "GCP-to-local",
+      "scope": "source06 six completed required-check stages, two earlier source04 failures and source archive; no completed audit build claim",
+      "archive": {
+        "path": "runs/r1-cloud/vm06-checks-early.tar.gz",
+        "bytes": 1373699,
+        "sha256": "5f08982dcfab989ac0351030cd2f10fe042d6bdd0cfd4456fa2c288f6738402b"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/vm06-checks-early.tar.gz.manifest.json",
+        "bytes": 34835,
+        "sha256": "7e145812888a968a7ed2ec11c7ef65a694819d7aaeaeb3c8d2fef2b5d49b466e"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/vm06-checks-early.tar.gz.sha256",
+        "bytes": 91,
+        "sha256": "144544a52e290c26dc7397ad48e66590c72f371c4fb5e00aa4459594775af1b6"
+      },
+      "known_unique_download_bytes": 1408625,
+      "download_verification": {
+        "path": "experiments/hu-postflop-r1/validation/vm06-source06/download-verification.json",
+        "bytes": 1118,
+        "sha256": "73025922b67d4fa15a028333faea7331dc94df542dd46602aeb20202067fdb19"
+      },
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "verified_included_regular_payloads": 55,
+      "verified_payload_bytes": 2247080,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "verified_at_utc": "2026-09-25T18:36:21.851693+00:00"
+    },
+    {
+      "reservation_id": "r1-20260925-06",
+      "direction": "GCP-to-local",
+      "scope": "source06 recovery quality-audit builds on AMD after CPU-changing restart; historical stage12/13 excluded",
+      "archive": {
+        "path": "runs/r1-cloud/vm06-recovery.tar.gz",
+        "bytes": 6928478,
+        "sha256": "d40e55c982f8702640e744e550f5c7072a0777bb84cb547d9ee22bc53e2750a5"
+      },
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "download_verification": {
+        "path": "experiments/hu-postflop-r1/saved-profile/vm06-build-report.json",
+        "bytes": 20720,
+        "sha256": "6f962edda89b1691d2714124a2d45ca13eec802d36ad4585af0129ae077893ce"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/vm06-recovery.tar.gz.manifest.json",
+        "bytes": 74438,
+        "sha256": "7e30d99d92eb1c87cb7958f2bd24fe90cb640a8268eab23e863425f8f03e683e"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/vm06-recovery.tar.gz.sha256",
+        "bytes": 87,
+        "sha256": "8ee08043e77b49307b5e3d41ea894e07a471a6579102dfed16fc0b0eae5f6e51"
+      },
+      "verified_at_utc": "2026-09-25T18:36:21.851693+00:00",
+      "verified_included_regular_payloads": 118,
+      "verified_payload_bytes": 19276203,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "known_unique_download_bytes": 7003003
+    },
+    {
+      "reservation_id": "r1-20260925-06",
+      "direction": "GCP-to-local",
+      "scope": "source03 .sol v3 baseline/candidate paired performance and artifacts on the post-restart AMD CPU",
+      "archive": {
+        "path": "runs/r1-cloud/vm06-v3-results.tar.gz",
+        "bytes": 17934814,
+        "sha256": "3c679810a39b3fac58d394f95387b0d98cec94ccc299f325e5922eefb9264e2d"
+      },
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "download_verification": {
+        "path": "experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+        "bytes": 40243,
+        "sha256": "311318d5d4f0de55352ec729d7e13ee992d2eb5d454a559cc287f9eb9f8db5e1"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/vm06-v3-results.tar.gz.manifest.json",
+        "bytes": 488801,
+        "sha256": "753a6ce6e72337a715766db6aa4684bb0583bd4c7ce5580c8dab93be0001863c"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/vm06-v3-results.tar.gz.sha256",
+        "bytes": 89,
+        "sha256": "d107534e77e068e884f68f2e929b485449d4cdba60202647b90825729bb31bd9"
+      },
+      "verified_at_utc": "2026-09-25T18:36:21.851693+00:00",
+      "verified_included_regular_payloads": 763,
+      "verified_payload_bytes": 184493300,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "known_unique_download_bytes": 18423704
+    },
+    {
+      "reservation_id": "r1-20260925-06",
+      "direction": "GCP-to-local",
+      "scope": "all 18 saved source03 paired policies independently audited using source06 current and baseline adapter examples; quality-only audit timing",
+      "archive": {
+        "path": "runs/r1-cloud/vm06-saved-audits.tar.gz",
+        "bytes": 544160,
+        "sha256": "378f3338a3c4ade87e01e749c33b4e5a232da2e5074385ffc70c64ab50d8d3bb"
+      },
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "download_verification": {
+        "path": "experiments/hu-postflop-r1/pipeline/vm06-comparison-report.json",
+        "bytes": 40243,
+        "sha256": "311318d5d4f0de55352ec729d7e13ee992d2eb5d454a559cc287f9eb9f8db5e1"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/vm06-saved-audits.tar.gz.manifest.json",
+        "bytes": 156247,
+        "sha256": "3d7e526e4b53db20f263675c4b905fd8d873fd6823001e221f56d772ded9d4ea"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/vm06-saved-audits.tar.gz.sha256",
+        "bytes": 91,
+        "sha256": "823a65eccbac0892f8b84001bfc2845985780aaa1cf5af26df183571034cf78b"
+      },
+      "verified_at_utc": "2026-09-25T18:36:21.851693+00:00",
+      "verified_included_regular_payloads": 247,
+      "verified_payload_bytes": 1888130,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "known_unique_download_bytes": 700498
+    },
+    {
+      "reservation_id": "r1-20260925-06",
+      "direction": "GCP-to-local",
+      "scope": "source03 instrumentation phase-on/off campaigns and calibration; separate from original uninstrumented performance",
+      "archive": {
+        "path": "runs/r1-cloud/vm06-phases.tar.gz",
+        "bytes": 24168476,
+        "sha256": "eef21251eec733ee51b2bf6ab79c0776df1fc5b40a0b837c77a00f29ac42749d"
+      },
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "manifest": {
+        "path": "runs/r1-cloud/vm06-phases.tar.gz.manifest.json",
+        "bytes": 899992,
+        "sha256": "0bff7c90e09114e87ea91d90bd3218aa77e6bca78b0fb4da5f0c6bcc0eec0b92"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/vm06-phases.tar.gz.sha256",
+        "bytes": 85,
+        "sha256": "d01c5088a96292b4c287367506beab8977e1ff7ea2056a8b4308b57bd77d7e29"
+      },
+      "verified_at_utc": "2026-09-25T18:36:21.851693+00:00",
+      "verified_included_regular_payloads": 1461,
+      "verified_payload_bytes": 346296182,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "known_unique_download_bytes": 25068553,
+      "download_verification": {
+        "path": "experiments/hu-postflop-r1/phases/vm06-phase-report.json",
+        "bytes": 59782,
+        "sha256": "2bfdf9fcce753f5f0fc5df4c2809fd03e6fa37752f7049cd836e3dc0abc68c3a"
+      }
+    },
+    {
+      "reservation_id": "r1-20260925-06",
+      "direction": "GCP-to-local",
+      "scope": "final source06 current candidate validation/performance and saved-profile campaign; distinct from source03 comparison",
+      "archive": {
+        "path": "runs/r1-cloud/vm06-current.tar.gz",
+        "bytes": 13268830,
+        "sha256": "cb4ed8a32bc5ce5b67ebbd18dd17e00262bbd823207f82270a6a92f5ca47a4ee"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/vm06-current.tar.gz.manifest.json",
+        "bytes": 608438,
+        "sha256": "d0a2ff25540f3026eb6d3c04dbf0f0676c89fbf635998704990f13a0500a3db1"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/vm06-current.tar.gz.sha256",
+        "bytes": 86,
+        "sha256": "cdd76e6f11a9d144472cea95d005a2f93aa604ce111508f05f0812e9a0713dc4"
+      },
+      "known_unique_download_bytes": 13877354,
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "verified_included_regular_payloads": 943,
+      "verified_payload_bytes": 174567342,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "verified_at_utc": "2026-09-25T18:42:31.741876+00:00"
+    },
+    {
+      "reservation_id": "r1-20260925-06",
+      "direction": "GCP-to-local",
+      "scope": "HU-R0-017 and HU-R0-019 diagnostic-only runs on source03; no external quality acceptance",
+      "archive": {
+        "path": "runs/r1-cloud/vm06-river-diagnostics.tar.gz",
+        "bytes": 582822,
+        "sha256": "16908b41d812497625ed1fe3da78de576e13310064d8a36d71b7171f52025e8b"
+      },
+      "manifest": {
+        "path": "runs/r1-cloud/vm06-river-diagnostics.tar.gz.manifest.json",
+        "bytes": 60156,
+        "sha256": "47d57da15a83686073291dcc6ca443663987587288cf7f257e0edaa6d1dd0588"
+      },
+      "checksum_sidecar": {
+        "path": "runs/r1-cloud/vm06-river-diagnostics.tar.gz.sha256",
+        "bytes": 96,
+        "sha256": "fef5e5ec94289ebd56f3fe9dff12e7de3fe36bcbf0bd12b53f2b871b373866f8"
+      },
+      "known_unique_download_bytes": 643074,
+      "local_availability": "present-and-byte-hash-verified; raw archive is ignored local storage, selected evidence is retained under experiments",
+      "verified_included_regular_payloads": 97,
+      "verified_payload_bytes": 847563,
+      "skipped_payloads": 0,
+      "embedded_manifest_identical": true,
+      "unlisted_tar_members": 0,
+      "verified_at_utc": "2026-09-25T18:42:31.741876+00:00"
+    }
+  ],
+  "totals": {
+    "downloaded_bundles": 10,
+    "archive_bytes": 85416600,
+    "manifest_bytes": 2812983,
+    "checksum_sidecar_bytes": 884,
+    "known_unique_download_bytes": 88230467,
+    "verified_included_regular_payloads": 4459,
+    "verified_payload_bytes": 920959412,
+    "skipped_payloads": 0,
+    "known_unique_download_gib": 0.08217102568596601,
+    "by_reservation_known_unique_bytes": {
+      "r1-20260925-05": 21105656,
+      "r1-20260925-06": 67124811
+    }
+  },
+  "excluded": [
+    {
+      "object": "VM05 v3-results",
+      "reported_archive_bytes": 13341355,
+      "reported_archive_sha256": "4ad690c136da5571e2b2e3f22743b71d428a990865c5a5fe1c942b0ba69ecf45",
+      "availability": "lost-with-deleted-VM-disk; no verified local download",
+      "counted_in_download_totals": false
+    },
+    {
+      "object": "locally produced source/tool archives",
+      "reason": "Local presence does not establish GCP-to-local transfer; uploads are outside this download inventory."
+    }
+  ],
+  "accounting_limits": [
+    "No claim of actual billed egress or total network traffic. SSH/SCP overhead, retries, partial interrupted downloads and repeated downloads are not reconstructed from retained file sizes.",
+    "Expanded archive payload bytes are a validation inventory, not added to compressed transfer byte totals.",
+    "A local raw bundle under ignored runs/ is not reproducible from Git alone. Refer to each download verification and experiment retention manifest for selected Git evidence.",
+    "Existing budget reservation limits remain in budget.json; this inventory does not release reservations or authorize additional spending."
+  ],
+  "billing_usd": null
+}

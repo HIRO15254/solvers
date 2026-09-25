@@ -1,0 +1,243 @@
+{
+  "artifacts": {
+    "checkpoint.ckpt": {
+      "bytes": 34538,
+      "header": {
+        "embedded_config_blake3": "9d9fc768e4fd84ace9ffd9e2a991fd19ac94de28496bbf92579506a31966181c",
+        "iteration": 50,
+        "version": 1
+      },
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/run/checkpoint.ckpt",
+      "sha256": "edbdbc1c39897bd8ec77cdada36b39ab0fe4bd329dfd0724ff796a2f1540d02b"
+    },
+    "progress.jsonl": {
+      "bytes": 699,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/run/progress.jsonl",
+      "sha256": "98398fdb714dd48eed05bab3212d82b2f379c4c16ac587f2219befac315cd583"
+    },
+    "run.json": {
+      "bytes": 176,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/run/run.json",
+      "sha256": "3c91072d2ff064e8a75c2e029b1bf06ee336cdaf28eb4fd7f18723c53b452eb9"
+    },
+    "run.toml": {
+      "bytes": 677,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/run/run.toml",
+      "sha256": "d0fb4ed3f7d3ca9dd04b4599ca37435d70b37520c596e2724d104a672b76cd62"
+    },
+    "solution.sol": {
+      "bytes": 131744,
+      "header": {
+        "embedded_config_blake3": "9d9fc768e4fd84ace9ffd9e2a991fd19ac94de28496bbf92579506a31966181c",
+        "iteration": 50,
+        "version": 1
+      },
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/run/solution.sol",
+      "sha256": "c8cf606affea6ee34cf349ee2b79908fd13b3268d2217fd4d13687d3280579a0"
+    }
+  },
+  "case": "flop",
+  "expected_iterations": 50,
+  "expected_sol_version": 1,
+  "internal_target": {
+    "exploitability_pct_pot": 0.09174731042649986,
+    "g_i": [
+      0.013658099704318527,
+      0.023040824466281418
+    ],
+    "inequality": "<",
+    "nash_conv": 0.036698924170599945,
+    "scope": "internal finite synthetic game only",
+    "source": "run.json final live solver result",
+    "status": "pass",
+    "strategy_kind": "live_average",
+    "target_nash_conv": 0.04
+  },
+  "live_final": {
+    "g_i": [
+      0.013658099704318527,
+      0.023040824466281418
+    ],
+    "iterations": 50,
+    "nash_conv": 0.036698924170599945,
+    "pot": 20
+  },
+  "missing_fields": [
+    "saved_quantized_profile_br",
+    "monotonic_internal_phase_spans",
+    "external_reference_condition_match_and_thresholds"
+  ],
+  "phase_timings": {
+    "br_final": null,
+    "cfr": null,
+    "initialization": null,
+    "persistence": null,
+    "return": null
+  },
+  "presave_consistency": "pass",
+  "profile": {
+    "ev": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 1.8374162560000968,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.062035158999833584,
+        "root_os_peak_resident_bytes": 245121024,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 32,
+        "sampled_peak_tree_resident_bytes": 235597824
+      },
+      "record": {
+        "bytes": 6262,
+        "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/ev/supervisor.json",
+        "sha256": "45614d743af25fdd1c86a96111ce43ed5f8cdac2cb4834e9a8d1e888072588e2"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 8842530,
+        "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/ev/stdout.log",
+        "sha256": "dddca33638c5bbb60e48ff6da2214e84d6da424b35fd7d590011224b058213bf"
+      },
+      "stop_reason": "completed"
+    },
+    "strategy": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 1.7007311180000215,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.05916318000004139,
+        "root_os_peak_resident_bytes": 237084672,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 30,
+        "sampled_peak_tree_resident_bytes": 237125632
+      },
+      "record": {
+        "bytes": 6298,
+        "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/strategy/supervisor.json",
+        "sha256": "5df770e46296ef578982f59d00ad02cce7e579a6e72ba75a7fd0a87bb2d2bd96"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 5175171,
+        "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/strategy/stdout.log",
+        "sha256": "78a31c55bf72e3c9136f1c58c109d664b4e3d62b13d864f1aed208a86fc15240"
+      },
+      "stop_reason": "completed"
+    },
+    "tree": {
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.6500631649998923,
+      "exit_code": 0,
+      "identity_unchanged": true,
+      "measurement": {
+        "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+        "job_os_peak_commit_bytes": null,
+        "max_observed_processes": 1,
+        "max_sample_gap_seconds": 0.05836546000000453,
+        "root_os_peak_resident_bytes": 236675072,
+        "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+        "sample_count": 12,
+        "sampled_peak_tree_resident_bytes": 227356672
+      },
+      "record": {
+        "bytes": 6273,
+        "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/tree/supervisor.json",
+        "sha256": "0f929782ff0d79821650a356d1c45a3a9e7a12b4bff88148cde10f61f39cd917"
+      },
+      "state": "completed",
+      "stdout": {
+        "bytes": 2255517,
+        "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/tree/stdout.log",
+        "sha256": "2c51b83cce1d6e620fe72b3f8f9bd47ea23f8b6ed7238854477c33a32bac2c43"
+      },
+      "stop_reason": "completed"
+    }
+  },
+  "quality_status": "not_evaluated",
+  "repetition": 3,
+  "resume": null,
+  "run_status": "completed",
+  "saved_profile_br": "not_evaluated",
+  "solve": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 12.155711281999857,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.07609468000009656,
+      "root_os_peak_resident_bytes": 731521024,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 201,
+      "sampled_peak_tree_resident_bytes": 732164096
+    },
+    "record": {
+      "bytes": 6456,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/solve/supervisor.json",
+      "sha256": "beb1a65cfeed01b4b0770304b1d81e1db34df051ddea6d0241486be42a28eacf"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 702,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/solve/stdout.log",
+      "sha256": "56e9e2b8c62a821d7df734c415139948ebe6f7121a41dc9ebe79354d0d24cc1b"
+    },
+    "stop_reason": "completed"
+  },
+  "summary": {
+    "board": "Ks 7h 2d",
+    "effective_stack": 60,
+    "ev_ip": 11.950607829623753,
+    "ev_oop": 8.049393706851536,
+    "expl_ip": 0.023040824466281418,
+    "expl_oop": 0.013658099704318527,
+    "iterations": 50,
+    "min_bet": 1,
+    "nash_conv": 0.036698924170599945,
+    "nodes": 21618,
+    "pot": 20,
+    "storage": "f32",
+    "stored_nodes": 14410,
+    "streets_stored": "full",
+    "wall_secs": 9.511546132
+  },
+  "summary_read": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.5431247160001931,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.01322558900005788,
+      "root_os_peak_resident_bytes": 236806144,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 62,
+      "sampled_peak_tree_resident_bytes": 236498944
+    },
+    "record": {
+      "bytes": 6670,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/summary/supervisor.json",
+      "sha256": "6dc0a59aec25ac5bbfe01d49a16e66d55a435d675a9419016409ed3855c9e666"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 389,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/flop-3-baseline/summary/stdout.log",
+      "sha256": "aefcf30863e61cb3d7b2345e848f9f7f2e65c4441ed1bec91689672922a6dccf"
+    },
+    "stop_reason": "completed"
+  },
+  "version": "baseline"
+}

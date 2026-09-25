@@ -1,0 +1,119 @@
+{
+  "case": "turn",
+  "effective_config_sha256": "d3b0b3c3ef05550255c5c804d8356e0e4f6cbf74fd452a833442837a7f06816e",
+  "repetition": 2,
+  "report": {
+    "artifact": {
+      "blake3": "09b658c6451fb0c7be840ba4fc871c10688fd395151283735f6856fa8508ad73",
+      "bytes": 24921,
+      "config_blake3": "ed7063d8134ffe4efb925229674c1a7ce25c676a6565eb7f4d9042b2b9b95fb1",
+      "format_version": 3,
+      "iterations": 100,
+      "mode": "full",
+      "node_count": 1305,
+      "path": "/opt/r1/candidate-v3/runs/r1-paired-v3/turn-2-candidate/run/solution.sol",
+      "source_storage": "f32",
+      "stored_nodes": 580
+    },
+    "effective_stack_chips": 60,
+    "ev_offset": [
+      10.0,
+      10.0
+    ],
+    "eval_secs": 0.030960899,
+    "input_hash_secs": 0.00030091,
+    "load_secs": 0.045004629,
+    "par_chance_depth": 2,
+    "par_min_children": 12,
+    "pot_chips": 20,
+    "pre_save_metadata": {
+      "ev": [
+        18.791926466388468,
+        1.208072568163459
+      ],
+      "expl": [
+        0.014560711236647705,
+        0.014267273891119814
+      ],
+      "iterations": 100,
+      "nash_conv": 0.02882798512776752,
+      "storage": "f32",
+      "wall_secs": 2.045282292
+    },
+    "rake": {
+      "kind": "none"
+    },
+    "recomputed": {
+      "br": [
+        18.80648516431267,
+        1.2223522986894775
+      ],
+      "ev": [
+        18.791926937338747,
+        1.2080722855932926
+      ],
+      "gains": [
+        0.014558226973921506,
+        0.014280013096184874
+      ],
+      "nash_conv": 0.02883824007010638,
+      "profile": "stored_quantized"
+    },
+    "schema": "solvers.research.hu-saved-profile-audit/v1",
+    "threads": 8,
+    "utility": {
+      "kind": "chip-ev"
+    },
+    "value_basis": "subgame_start_utility",
+    "zero_sum_terminal_utility": true
+  },
+  "run_status": "completed",
+  "stage": {
+    "cleanup_complete": true,
+    "elapsed_seconds": 0.14020138700016105,
+    "exit_code": 0,
+    "identity_unchanged": true,
+    "measurement": {
+      "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+      "job_os_peak_commit_bytes": null,
+      "max_observed_processes": 1,
+      "max_sample_gap_seconds": 0.059025230999850464,
+      "root_os_peak_resident_bytes": 25980928,
+      "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+      "sample_count": 3,
+      "sampled_peak_tree_resident_bytes": 20557824
+    },
+    "record": {
+      "bytes": 7781,
+      "path": "/opt/r1/saved-audits/turn-2-candidate/supervisor.json",
+      "sha256": "b877e88be9e0da9c29298dfe99b303f98c3b75d3d4a431f6cceec0f8cb98a9b3"
+    },
+    "state": "completed",
+    "stdout": {
+      "bytes": 1508,
+      "path": "/opt/r1/saved-audits/turn-2-candidate/stdout.log",
+      "sha256": "7ba29e39aae5b5239239e5ce28c8bab2caee702df38ae19fbf89868ae22c0c33"
+    },
+    "stop_reason": "completed"
+  },
+  "validation": {
+    "exploitability_pct_pot": 0.07209560017526595,
+    "gain_roundoff_lower_bounds": [
+      -1.1880648516431266e-10,
+      -1.0122235229868948e-10
+    ],
+    "gains": [
+      0.014558226973921506,
+      0.014280013096184874
+    ],
+    "inequality": "<",
+    "nash_conv": 0.02883824007010638,
+    "nash_conv_roundoff_lower_bound": -2.2002883746300213e-10,
+    "pre_save_metadata_used_for_quality": false,
+    "quality_status": "pass",
+    "status": "valid",
+    "strategy_kind": "stored_quantized",
+    "target_nash_conv": 0.04
+  },
+  "version": "candidate"
+}

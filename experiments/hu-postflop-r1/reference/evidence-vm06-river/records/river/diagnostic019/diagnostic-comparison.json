@@ -1,0 +1,84 @@
+{
+  "case_id": "HU-R0-019",
+  "purpose": "diagnostic_only",
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "chips_per_bb": 100,
+  "observed_sha256": "e38ffaf0b6fbcbbbe5779ae9d4236074df889ea75afd0ee4092e6cd48cf2aca2",
+  "input_check": {
+    "config_sha256": "c3ac2b24063ad5d3c3f35c6efdd34132452ffb09f8b12b00f3a25a118317e658",
+    "ranges": {
+      "oop": {
+        "positive_combos": 130,
+        "raw_weight_sum": "24.7467024",
+        "sha256": "e0d201e994569ac6e582603390a98737c59cf6333c630cb8729f6b4f287c2f84"
+      },
+      "ip": {
+        "positive_combos": 115,
+        "raw_weight_sum": "0.4475484",
+        "sha256": "ac682a2f4646bf9b4c8424f86021879b74fdc7f51177175e3242904d2a831b94"
+      }
+    },
+    "dsl_runtime_validation": "not_performed_by_this_python_script"
+  },
+  "expected_counts_from_observed_graph": {
+    "decision_nodes": 12,
+    "decision_action_edges": 32,
+    "terminal_nodes": 21,
+    "public_nodes": 33
+  },
+  "source_id": "source-archive-sha256:ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970",
+  "run_config_check": {
+    "config_sha256": "ae9cdf0cd551ef789286cbfbd8860a2c06c16498c093857b6dfec2566e2de459",
+    "ranges": {
+      "oop": {
+        "positive_combos": 130,
+        "raw_weight_sum": "24.7467024",
+        "sha256": "e0d201e994569ac6e582603390a98737c59cf6333c630cb8729f6b4f287c2f84"
+      },
+      "ip": {
+        "positive_combos": 115,
+        "raw_weight_sum": "0.4475484",
+        "sha256": "ac682a2f4646bf9b4c8424f86021879b74fdc7f51177175e3242904d2a831b94"
+      }
+    },
+    "dsl_runtime_validation": "not_performed_by_this_python_script"
+  },
+  "exports_sha256": {
+    "tree": "42d7859fe1e23f5331324edd6447bd52ed4c4ae70d5406f2f321d1fbdaa5303b",
+    "summary": "30f9a6214de738428871330fc7c3690d9fa89ccd61d9d8e5e4f1036781611bae"
+  },
+  "tree_check": {
+    "status": "all_observed_menus_match",
+    "decision_nodes": 12,
+    "decision_action_edges": 32,
+    "terminal_nodes": 21,
+    "public_nodes": 33
+  },
+  "ev_diagnostic": {
+    "root_ev": {
+      "oop": {
+        "solver_ev_bb": "16.584886560610382",
+        "reference_display_ev_bb": "16.58",
+        "signed_difference_bb": "0.004886560610382"
+      },
+      "ip": {
+        "solver_ev_bb": "23.315113388898817",
+        "reference_display_ev_bb": "23.32",
+        "signed_difference_bb": "-0.004886611101183"
+      }
+    },
+    "solver_iterations": 1500,
+    "solver_storage": "f32",
+    "solver_nash_conv_bb": "0.0008363443661716019",
+    "solver_mean_br_gain_pct_starting_pot": "0.001032523908853829506172839506",
+    "solver_evaluation_basis": "live average profile before artifact quantization",
+    "reference_ev_display_step_bb": "0.01",
+    "reference_exploitability": null,
+    "comparison_threshold": null,
+    "acceptance": null,
+    "condition_match": "unverified",
+    "quality_status": "not_evaluated"
+  }
+}

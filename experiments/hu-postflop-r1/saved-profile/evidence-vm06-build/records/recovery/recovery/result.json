@@ -1,0 +1,735 @@
+{
+  "boot_id": "159efb96-10fb-4ce4-bb0f-bc2b27ee618f",
+  "elapsed_seconds": 194.161520246,
+  "ended_utc": "2026-09-25T17:59:57.435872+00:00",
+  "identities": {
+    "audit-source.tar.gz": {
+      "bytes": 1213908,
+      "path": "/opt/r1/audit-source.tar.gz",
+      "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+    },
+    "baseline-source.tar.gz": {
+      "bytes": 871630,
+      "path": "/opt/r1/baseline-source.tar.gz",
+      "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+    },
+    "baseline_adapter_manifest": {
+      "bytes": 39316,
+      "path": "/opt/r1/baseline-audit/r1-saved-profile-source-manifest.json",
+      "sha256": "9cccbde9ac207059a77a8abb903c0df8b9d79cf1cdc30631919dd418e04ab50f"
+    },
+    "baseline_example": {
+      "bytes": 4227680,
+      "path": "/opt/r1/target/baseline-audit-recovery/release/examples/hu_saved_profile_audit",
+      "sha256": "9efa72cb9cbeed080cda824ee91fccac29dd3d1f17822eb2d5da97b30fe6bc92"
+    },
+    "compiler_binaries": [
+      {
+        "bytes": 646344,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0"
+      },
+      {
+        "bytes": 42844376,
+        "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5"
+      }
+    ],
+    "current_example": {
+      "bytes": 4249752,
+      "path": "/opt/r1/target/current-recovery/release/examples/hu_saved_profile_audit",
+      "sha256": "ea6f85928453001514472bcabf466d4f9026e4d5bcea199fb559d4afe0f87932"
+    },
+    "immutable_inputs": [
+      {
+        "bytes": 16036,
+        "path": "/home/PC_User/build-audit-pair.sh",
+        "sha256": "be959f4f9c5d989c55284eba5f0b58fb149e7fddc38ffdaf51c50c6c5bd29068"
+      },
+      {
+        "bytes": 1213908,
+        "path": "/opt/r1/audit-source.tar.gz",
+        "sha256": "f241167a9c765b839cbe560ec66c9c490a0b0193d8f23ba8de768c65eaaf043c"
+      },
+      {
+        "bytes": 871630,
+        "path": "/opt/r1/baseline-source.tar.gz",
+        "sha256": "fdd8c1c014a94c70b56efbd79a36c18f6f1634c20aaf9062660ee3a6133a0197"
+      },
+      {
+        "bytes": 8327,
+        "path": "/opt/r1/audit-tools/apply_baseline_audit.py",
+        "sha256": "def24ee3feabfb6467165f99cb7da5e5f4674f6ab19f8ee8a06f357e20d0ea03"
+      },
+      {
+        "bytes": 19599,
+        "path": "/opt/r1/audit-tools/source-pins.json",
+        "sha256": "b97d29d7e581bd05d1a331966fc3180ab26ece84f2dc9131a2bb34ae61c746eb"
+      },
+      {
+        "bytes": 8949,
+        "path": "/opt/r1/audit-tools/audit_shared.rs.in",
+        "sha256": "61811547059257d2d3b8bbe1335ceaa8b41d07114719e7cbf8b4f8e20519ee90"
+      },
+      {
+        "bytes": 734,
+        "path": "/opt/r1/audit-tools/audit_example.rs.in",
+        "sha256": "23ffbfa69846696c0e025bc8cbd5b2b68c3add006291827ba7dca3203ebbe317"
+      },
+      {
+        "bytes": 4550,
+        "path": "/opt/r1/audit-tools/baseline_adapter.rs.in",
+        "sha256": "af3475238198741c858d4bb12f31ea4c0a2516824885ae1512667dfd8f761b10"
+      },
+      {
+        "bytes": 6152,
+        "path": "/opt/r1/audit-tools/test_apply_baseline_audit.py",
+        "sha256": "3fb2fe442ab4cccd02a6535db65e62cbd43680aa7d420bdc0fc78874ba352ab1"
+      },
+      {
+        "bytes": 6803,
+        "path": "/opt/r1/audit-tools/README.md",
+        "sha256": "5d87bbf801c5f9b8ced67bbe0b20f17213a36ff47e62ef0095f98e5182f0a14a"
+      },
+      {
+        "bytes": 39015,
+        "path": "/opt/r1/audit-source/tools/run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      {
+        "bytes": 39316,
+        "path": "/opt/r1/baseline-audit/r1-saved-profile-source-manifest.json",
+        "sha256": "9cccbde9ac207059a77a8abb903c0df8b9d79cf1cdc30631919dd418e04ab50f"
+      }
+    ],
+    "recovery_script": {
+      "bytes": 29523,
+      "path": "/home/PC_User/build-audit-recovery.py",
+      "sha256": "25eb38011b3873e9f09b3820e06ff53bfba2aa8e05b9bf285ba5c80c4d947dba"
+    },
+    "source06_solvers_not_paired_benchmark": {
+      "bytes": 8868976,
+      "path": "/opt/r1/target/current-recovery/release/solvers",
+      "sha256": "5baae6ebe438bc0205968587a7447599a15832411aeab1558cfecc1dd7293031"
+    }
+  },
+  "purpose": "saved_profile_quality_only",
+  "recovery": {
+    "cgroup": {
+      "effective_memory_max_bytes": 51539607552,
+      "path": "/sys/fs/cgroup/system.slice/r1-audit-recovery03.service"
+    },
+    "changed_boot": true,
+    "deadline_utc": "2026-09-25T20:09:11Z",
+    "historical_baseline_example_claim": {
+      "bytes": 4261392,
+      "path": "/opt/r1/target/baseline-audit/release/examples/hu_saved_profile_audit",
+      "sha256": "1beaeabaa532e14b5c69f47b103814e6e70571f3a142800f17c42110471434b1"
+    },
+    "historical_current_example": {
+      "bytes": 4283728,
+      "path": "/opt/r1/target/current/release/examples/hu_saved_profile_audit",
+      "sha256": "b877c4a647987b8f18f3c1083db31e33cc0ef93414adc91059dbd7ded1d14896"
+    },
+    "historical_source06_solvers": {
+      "bytes": 9039176,
+      "path": "/opt/r1/target/current/release/solvers",
+      "sha256": "8def6f2d0bf88f94cc92b7b5a8dfee46684e6fdaca7ccd5be4ac186f6994fefc"
+    },
+    "kind": "spot_stop_changed_cpu_fresh_release_rebuild",
+    "native_cache_reused_from_prior_boot": false,
+    "native_cpu_compatibility": {
+      "current": {
+        "Architecture": "x86_64",
+        "CPU family": "23",
+        "CPU op-mode(s)": "32-bit, 64-bit",
+        "Flags": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "Model": "49",
+        "Model name": "AMD EPYC 7B12",
+        "Stepping": "0",
+        "Vendor ID": "AuthenticAMD"
+      },
+      "previous": {
+        "Architecture": "x86_64",
+        "CPU family": "6",
+        "CPU op-mode(s)": "32-bit, 64-bit",
+        "Flags": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "Model": "79",
+        "Model name": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+        "Stepping": "0",
+        "Vendor ID": "GenuineIntel"
+      },
+      "status": "changed_fresh_rebuild_required"
+    },
+    "original_evidence_modified": false,
+    "previous_boot_id": "1218b856-0cbd-4349-8ccc-a0ac7a7792ce",
+    "prior_build_status": "completed",
+    "prior_completion_marker_present": false,
+    "prior_current_build_complete": {
+      "bytes": 3148,
+      "path": "/opt/r1/audit-pair-build/current-build-complete.json",
+      "sha256": "e473de61ec7fec08d5872d2ec7cd03cf5982267129fe2a33ab87aba4bcc24d8c"
+    },
+    "prior_evidence_assessment": {
+      "excluded_stage_claims": [
+        {
+          "argv": [
+            "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "build",
+            "--locked",
+            "--release",
+            "-p",
+            "cli",
+            "--example",
+            "hu_saved_profile_audit"
+          ],
+          "cargo_target_dir": "/opt/r1/target/baseline-audit",
+          "child_exit_code": 0,
+          "cleanup_complete": true,
+          "cwd": "/opt/r1/baseline-audit",
+          "identity_unchanged": true,
+          "name": "12-baseline-example-release",
+          "record": {
+            "bytes": 8517,
+            "path": "/opt/r1/audit-pair-build/12-baseline-example-release/supervisor.json",
+            "sha256": "77a65dda5f61ba5960a9487c8c757110568e78abbbbfb963c90be3ae30e6d129"
+          },
+          "status": "completed",
+          "stop_reason": "completed",
+          "supervisor_exit_code": 0,
+          "timeout_seconds": 1800
+        },
+        {
+          "argv": [
+            "python3",
+            "/opt/r1/audit-tools/apply_baseline_audit.py",
+            "--root",
+            "/opt/r1/baseline-audit",
+            "--reference-root",
+            "/opt/r1/audit-source",
+            "--verify"
+          ],
+          "cargo_target_dir": "/opt/r1/target/current",
+          "child_exit_code": 0,
+          "cleanup_complete": true,
+          "cwd": "/opt/r1/audit-source",
+          "identity_unchanged": true,
+          "name": "13-baseline-final-verify",
+          "record": {
+            "bytes": 8076,
+            "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/supervisor.json",
+            "sha256": "9b55a9a35d12b7fe507a26fc2bac48d211c8f948d163c84a221bad1accf9bb13"
+          },
+          "status": "completed",
+          "stop_reason": "completed",
+          "supervisor_exit_code": 0,
+          "timeout_seconds": 120
+        }
+      ],
+      "excluded_stage_names": [
+        "12-baseline-example-release",
+        "13-baseline-final-verify"
+      ],
+      "excluded_stage_success_accepted": false,
+      "excluded_text_evidence": [
+        {
+          "adopted_as_success_evidence": false,
+          "error": "NUL in evidence; refusing repair: /opt/r1/audit-pair-build/12-baseline-example-release/stderr.log",
+          "first_nul_offset": 674,
+          "identity": {
+            "bytes": 737,
+            "path": "/opt/r1/audit-pair-build/12-baseline-example-release/stderr.log",
+            "sha256": "4b0162522527188f55157003b635de6dd7dd9805558fa97c3e593d58f22045c6"
+          },
+          "nul_bytes": 63,
+          "text_status": "corrupted"
+        },
+        {
+          "adopted_as_success_evidence": false,
+          "first_nul_offset": null,
+          "identity": {
+            "bytes": 0,
+            "path": "/opt/r1/audit-pair-build/12-baseline-example-release/stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "nul_bytes": 0,
+          "text_status": "parseable"
+        },
+        {
+          "adopted_as_success_evidence": false,
+          "error": "NUL in evidence; refusing repair: /opt/r1/audit-pair-build/12-baseline-example-release/supervisor.samples.jsonl",
+          "first_nul_offset": 113510,
+          "identity": {
+            "bytes": 114688,
+            "path": "/opt/r1/audit-pair-build/12-baseline-example-release/supervisor.samples.jsonl",
+            "sha256": "937758d22777cf0c610dce09c7164c8dfa61a4022289fba8339b51599afd5342"
+          },
+          "nul_bytes": 1178,
+          "text_status": "corrupted"
+        },
+        {
+          "adopted_as_success_evidence": false,
+          "first_nul_offset": null,
+          "identity": {
+            "bytes": 8517,
+            "path": "/opt/r1/audit-pair-build/12-baseline-example-release/supervisor.json",
+            "sha256": "77a65dda5f61ba5960a9487c8c757110568e78abbbbfb963c90be3ae30e6d129"
+          },
+          "nul_bytes": 0,
+          "text_status": "parseable"
+        },
+        {
+          "adopted_as_success_evidence": false,
+          "first_nul_offset": null,
+          "identity": {
+            "bytes": 0,
+            "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "nul_bytes": 0,
+          "text_status": "parseable"
+        },
+        {
+          "adopted_as_success_evidence": false,
+          "first_nul_offset": null,
+          "identity": {
+            "bytes": 0,
+            "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "nul_bytes": 0,
+          "text_status": "parseable"
+        },
+        {
+          "adopted_as_success_evidence": false,
+          "first_nul_offset": null,
+          "identity": {
+            "bytes": 0,
+            "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/supervisor.samples.jsonl",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "nul_bytes": 0,
+          "text_status": "parseable"
+        },
+        {
+          "adopted_as_success_evidence": false,
+          "first_nul_offset": null,
+          "identity": {
+            "bytes": 8076,
+            "path": "/opt/r1/audit-pair-build/13-baseline-final-verify/supervisor.json",
+            "sha256": "9b55a9a35d12b7fe507a26fc2bac48d211c8f948d163c84a221bad1accf9bb13"
+          },
+          "nul_bytes": 0,
+          "text_status": "parseable"
+        }
+      ],
+      "exclusion_reason": "Old baseline release/final-verify are unnecessary for the fresh CPU rebuild. Their prior result statuses are historical claims only; corrupted bytes are retained without repair.",
+      "verified_completed_stages": [
+        "00-toolchain",
+        "01-fmt",
+        "02-clippy",
+        "03-workspace-test",
+        "04-tools-python",
+        "05-pipeline-python",
+        "06-current-release",
+        "07-seed-baseline-cache",
+        "08-extract-baseline",
+        "09-baseline-source-check",
+        "10-baseline-adapter-apply",
+        "11-baseline-adapter-verify"
+      ]
+    },
+    "prior_evidence_files": {
+      "bytes": 13791,
+      "path": "/opt/r1/audit-pair-recovery/prior-evidence-files.json",
+      "sha256": "206e8f6583864d4aff1c5769a0950e715f768d350cbccef671be3df125dd4c8e"
+    },
+    "prior_result": {
+      "bytes": 15735,
+      "path": "/opt/r1/audit-pair-build/result.json",
+      "sha256": "48949edb9a888253841246aa08fbefabada7985053264e72942cdc570e491209"
+    },
+    "prior_result_claimed_completed_stage_count": 14,
+    "prior_verified_completed_stage_count": 12,
+    "validation_reused": "Stages 00..05 passed against the exact source06 archive on the prior CPU; these tests are not rerun or attributed to the new CPU."
+  },
+  "schema": "r1.audit-pair-build/v1",
+  "stages": [
+    {
+      "argv": [
+        "/bin/bash",
+        "-euo",
+        "pipefail",
+        "-c",
+        "rustc -Vv; cargo -V; rustup which rustc; rustup which cargo; uname -a; lscpu"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current-recovery",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "00-toolchain",
+      "record": {
+        "bytes": 34022,
+        "path": "/opt/r1/audit-pair-recovery/00-toolchain/supervisor.json",
+        "sha256": "680042627fc1a4c4ca8a7462241d58c5e2a639fe72024dd2a005be55a4c3211c"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "argv": [
+        "python3",
+        "/opt/r1/audit-tools/apply_baseline_audit.py",
+        "--root",
+        "/opt/r1/baseline-audit",
+        "--reference-root",
+        "/opt/r1/audit-source",
+        "--verify"
+      ],
+      "cargo_target_dir": "/opt/r1/target/baseline-audit-recovery",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "01-baseline-pre-verify",
+      "record": {
+        "bytes": 33836,
+        "path": "/opt/r1/audit-pair-recovery/01-baseline-pre-verify/supervisor.json",
+        "sha256": "750ee964c47a87a574f5edd16b78ae982bc692d2d4322e0797fa0a04fe764273"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 120
+    },
+    {
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "--locked",
+        "--release",
+        "-p",
+        "cli",
+        "--bin",
+        "solvers",
+        "--example",
+        "hu_saved_profile_audit"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current-recovery",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "06-current-release",
+      "record": {
+        "bytes": 33901,
+        "path": "/opt/r1/audit-pair-recovery/06-current-release/supervisor.json",
+        "sha256": "e4fde401ce90c20c5d25e1ef3f3a41573bed128a9739f807e486ab29c3e3f936"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 1800
+    },
+    {
+      "argv": [
+        "/bin/bash",
+        "-euo",
+        "pipefail",
+        "-c",
+        "rustc -Vv; cargo -V; rustup which rustc; rustup which cargo; uname -a; lscpu"
+      ],
+      "cargo_target_dir": "/opt/r1/target/current-recovery",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "06-current-toolchain-check",
+      "record": {
+        "bytes": 34854,
+        "path": "/opt/r1/audit-pair-recovery/06-current-toolchain-check/supervisor.json",
+        "sha256": "a7f405706b9f51ff7236a128362d9765199082591a7ad3e32224178a61aead55"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "argv": [
+        "cp",
+        "-a",
+        "--reflink=auto",
+        "/opt/r1/target/current-recovery/release/deps",
+        "/opt/r1/target/current-recovery/release/build",
+        "/opt/r1/target/current-recovery/release/.fingerprint",
+        "/opt/r1/target/baseline-audit-recovery/release"
+      ],
+      "cargo_target_dir": "/opt/r1/target/baseline-audit-recovery",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "07-seed-baseline-cache",
+      "record": {
+        "bytes": 35081,
+        "path": "/opt/r1/audit-pair-recovery/07-seed-baseline-cache/supervisor.json",
+        "sha256": "af38c04cf9a631b20966c51a3050046717b77a5e457f2750645f32e2d8838b48"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "--locked",
+        "--release",
+        "-p",
+        "cli",
+        "--example",
+        "hu_saved_profile_audit"
+      ],
+      "cargo_target_dir": "/opt/r1/target/baseline-audit-recovery",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/baseline-audit",
+      "identity_unchanged": true,
+      "name": "12-baseline-example-release",
+      "record": {
+        "bytes": 34659,
+        "path": "/opt/r1/audit-pair-recovery/12-baseline-example-release/supervisor.json",
+        "sha256": "4caa8f4499b6a67db3860fa64f076ed8fa19ded94447024fea0998feaa1c2de3"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 1800
+    },
+    {
+      "argv": [
+        "python3",
+        "/opt/r1/audit-tools/apply_baseline_audit.py",
+        "--root",
+        "/opt/r1/baseline-audit",
+        "--reference-root",
+        "/opt/r1/audit-source",
+        "--verify"
+      ],
+      "cargo_target_dir": "/opt/r1/target/baseline-audit-recovery",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "13-baseline-final-verify",
+      "record": {
+        "bytes": 34630,
+        "path": "/opt/r1/audit-pair-recovery/13-baseline-final-verify/supervisor.json",
+        "sha256": "f9cfa2b830f31a9b2361aa0261020c14cde8634122984a481494733d77b1e528"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 120
+    },
+    {
+      "argv": [
+        "/bin/bash",
+        "-euo",
+        "pipefail",
+        "-c",
+        "rustc -Vv; cargo -V; rustup which rustc; rustup which cargo; uname -a; lscpu"
+      ],
+      "cargo_target_dir": "/opt/r1/target/baseline-audit-recovery",
+      "child_exit_code": 0,
+      "cleanup_complete": true,
+      "cwd": "/opt/r1/audit-source",
+      "identity_unchanged": true,
+      "name": "14-final-toolchain",
+      "record": {
+        "bytes": 34828,
+        "path": "/opt/r1/audit-pair-recovery/14-final-toolchain/supervisor.json",
+        "sha256": "4c471b043cb7e935e4f88c78f6928c63377f97b0a2d9a687d81e678313e65b8e"
+      },
+      "status": "completed",
+      "stop_reason": "completed",
+      "supervisor_exit_code": 0,
+      "timeout_seconds": 60
+    }
+  ],
+  "started_utc": "2026-09-25T17:56:43.274374+00:00",
+  "status": "completed"
+}

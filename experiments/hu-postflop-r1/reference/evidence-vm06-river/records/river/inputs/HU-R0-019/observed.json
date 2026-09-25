@@ -1,0 +1,274 @@
+{
+  "case_id": "HU-R0-019",
+  "captured_utc_date": "2026-09-25",
+  "reference": "GTO Wizard existing solved library; user-accessible UI and Copy range controls",
+  "url": "https://app.gtowizard.com/solutions?soltab=strategy&solution_type=gwiz&gametype=Cash6m500zSimple&depth=75&history_spot=12&preflop_actions=F-F-F-R2.5-F-R10-R20-C&board=Qs7h2c4d9s&flop_actions=X-X&turn_actions=X-X",
+  "visible_solution": "Cash 75bb / 6max / NL500 / Simple / GTO",
+  "board": [
+    "Qs",
+    "7h",
+    "2c",
+    "4d",
+    "9s"
+  ],
+  "seats": {
+    "oop": "BB",
+    "ip": "BTN"
+  },
+  "pot_bb": 40.5,
+  "stacks_behind_bb": [
+    55,
+    55
+  ],
+  "preflop": "BTN open 2.5; BB raise to 10; BTN raise to 20; BB call (others fold)",
+  "flop": "check/check",
+  "turn": "check/check",
+  "root_ranges": {
+    "oop": "oop-range.txt",
+    "ip": "ip-range.txt",
+    "weights": "copy-control text, unrenormalized"
+  },
+  "observed_menus": [
+    {
+      "history": "",
+      "actor": "BB",
+      "actions": [
+        "check",
+        "bet 13.5",
+        "allin 55"
+      ]
+    },
+    {
+      "history": "check",
+      "actor": "BTN",
+      "actions": [
+        "check",
+        "bet 13.5",
+        "allin 55"
+      ]
+    },
+    {
+      "history": "bet 13.5",
+      "actor": "BTN",
+      "actions": [
+        "fold",
+        "call",
+        "raise to 37",
+        "allin 55"
+      ]
+    },
+    {
+      "history": "bet 13.5 / raise to 37",
+      "actor": "BB",
+      "actions": [
+        "fold",
+        "call",
+        "allin 55"
+      ]
+    },
+    {
+      "history": "bet 13.5 / raise to 37 / allin 55",
+      "actor": "BTN",
+      "actions": [
+        "fold",
+        "call"
+      ]
+    },
+    {
+      "history": "check / bet 13.5",
+      "actor": "BB",
+      "actions": [
+        "fold",
+        "call",
+        "raise to 37",
+        "allin 55"
+      ]
+    },
+    {
+      "history": "check / bet 13.5 / raise to 37",
+      "actor": "BTN",
+      "actions": [
+        "fold",
+        "call",
+        "allin 55"
+      ]
+    },
+    {
+      "history": "check / bet 13.5 / raise to 37 / allin 55",
+      "actor": "BB",
+      "actions": [
+        "fold",
+        "call"
+      ]
+    },
+    {
+      "history": "allin 55",
+      "actor": "BTN",
+      "actions": [
+        "fold",
+        "call"
+      ]
+    },
+    {
+      "history": "bet 13.5 / allin 55",
+      "actor": "BB",
+      "actions": [
+        "fold",
+        "call"
+      ]
+    },
+    {
+      "history": "check / allin 55",
+      "actor": "BB",
+      "actions": [
+        "fold",
+        "call"
+      ]
+    },
+    {
+      "history": "check / bet 13.5 / allin 55",
+      "actor": "BTN",
+      "actions": [
+        "fold",
+        "call"
+      ]
+    }
+  ],
+  "root_ui": {
+    "oop_ev_bb": 16.58,
+    "ip_ev_bb": 23.32,
+    "oop_combos_rounded": 24.7,
+    "ip_combos_rounded": 0.4,
+    "oop_frequency_percent": {
+      "allin_55": 36.6,
+      "bet_13_5": 24.2,
+      "check": 39.2
+    }
+  },
+  "root_aa_action_order": [
+    "allin 55",
+    "bet 13.5",
+    "check"
+  ],
+  "root_aa_actions": [
+    {
+      "combo": "AsAh",
+      "ev_bb": [
+        39.38,
+        39.1,
+        39.86
+      ],
+      "frequency_percent": [
+        0,
+        0,
+        100
+      ]
+    },
+    {
+      "combo": "AsAd",
+      "ev_bb": [
+        39.76,
+        39.56,
+        39.76
+      ],
+      "frequency_percent": [
+        83.2,
+        0,
+        16.8
+      ]
+    },
+    {
+      "combo": "AhAd",
+      "ev_bb": [
+        40.25,
+        39.81,
+        39.68
+      ],
+      "frequency_percent": [
+        100,
+        0,
+        0
+      ]
+    },
+    {
+      "combo": "AsAc",
+      "ev_bb": [
+        41.08,
+        40.83,
+        41.08
+      ],
+      "frequency_percent": [
+        30.5,
+        0,
+        69.5
+      ]
+    },
+    {
+      "combo": "AhAc",
+      "ev_bb": [
+        41.52,
+        41.02,
+        40.95
+      ],
+      "frequency_percent": [
+        100,
+        0,
+        0
+      ]
+    },
+    {
+      "combo": "AdAc",
+      "ev_bb": [
+        41.77,
+        41.36,
+        40.82
+      ],
+      "frequency_percent": [
+        100,
+        0,
+        0
+      ]
+    }
+  ],
+  "display_steps": {
+    "ev_bb": 0.01,
+    "frequency_percentage_points": 0.1
+  },
+  "reference_exploitability": null,
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "missing_fields": [
+    "rake_rounding_and_collection",
+    "reference_solver_version",
+    "reference_accuracy_and_stopping",
+    "full_reference_profile",
+    "internal_precision_and_exact_EV_basis"
+  ],
+  "solution_preview": {
+    "selected_row": "75 / Simple / NL500 / GTO / GTO",
+    "rake_percent": 5,
+    "rake_cap_bb": 0.6,
+    "accuracy_label": "0.2-0.3%",
+    "accuracy_metric_and_denominator": "Official How Solvers Work defines mean player BR gain / starting pot. The library preview is not a measured accuracy for this individual river node.",
+    "description": "Solutions with only 3bet or fold vs open, no 4bet allin and no limping BvB. Less postflop sizes"
+  },
+  "official_documentation": [
+    {
+      "url": "https://blog.gtowizard.com/status-and-info-about-our-solutions/",
+      "observation": "6max Simple lists 75BB, NL500 5% rake, cap 0.6BB, accuracy 0.2-0.3% pot."
+    },
+    {
+      "url": "https://blog.gtowizard.com/how-solvers-work/",
+      "observation": "Accuracy is mean player BR gain divided by starting pot."
+    },
+    {
+      "url": "https://blog.gtowizard.com/gto-wizard-ai-benchmarks/",
+      "observation": "General/Simple are precomputed CFR; article also describes real-time river resolves at 0.1% Nash Distance, so preview is not an individual river accuracy certificate."
+    },
+    {
+      "url": "https://help.gtowizard.com/how-to-build-custom-solutions/",
+      "observation": "Current custom builder uses matched pot at hand end and cap per hand. This does not certify the legacy library implementation."
+    }
+  ],
+  "tree_observation": "All 12 nonterminal decision menus observed manually on the fixed river; Fold/Call and Check/Check terminate. Amounts are total street contribution for raises, BB units."
+}

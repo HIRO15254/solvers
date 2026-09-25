@@ -1,0 +1,16 @@
+{
+  "elapsed_seconds": 0.006759409000096639,
+  "ended_utc": "2026-09-25T17:43:36.360522+00:00",
+  "error": "FileNotFoundError: [Errno 2] No such file or directory: '/sys/fs/cgroup/memory.max'",
+  "identities": {},
+  "purpose": "saved_profile_quality_only",
+  "recovery": {
+    "deadline_utc": "2026-09-25T20:09:11Z",
+    "kind": "spot_stop_changed_cpu_fresh_release_rebuild",
+    "original_evidence_modified": false
+  },
+  "schema": "r1.audit-pair-build/v1",
+  "stages": [],
+  "started_utc": "2026-09-25T17:43:36.353785+00:00",
+  "status": "failed"
+}

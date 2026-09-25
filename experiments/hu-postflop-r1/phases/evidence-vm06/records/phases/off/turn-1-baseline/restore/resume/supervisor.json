@@ -1,0 +1,247 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-25T18:22:17.413425+00:00",
+  "argv": [
+    "/opt/r1/target/phase-baseline/release/solvers",
+    "resume",
+    "/opt/r1/phase-off/turn-1-baseline/run",
+    "--out",
+    "/opt/r1/phase-off/turn-1-baseline/restore/run"
+  ],
+  "cwd": "/opt/r1/candidate-v3",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 600.0,
+    "grace_seconds": 5.0,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.05,
+    "memory_limit_bytes": 42949672960,
+    "min_free_memory_bytes": 8589934592,
+    "disk_reserve_bytes": 10737418240
+  },
+  "runtime": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-7.0.0-1011-gcp-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "logical_cpus": 8
+  },
+  "outputs": {
+    "stdout": {
+      "path": "/opt/r1/phase-off/turn-1-baseline/restore/resume/stdout.log",
+      "sha256": "90a4320878c48591341514c617e8f5f75c80fc82348b4eff6b8115b390bc69ec",
+      "bytes": 364
+    },
+    "stderr": {
+      "path": "/opt/r1/phase-off/turn-1-baseline/restore/resume/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "samples": {
+      "path": "/opt/r1/phase-off/turn-1-baseline/restore/resume/supervisor.samples.jsonl",
+      "sha256": "ebb7250df25e013fadbf0477e5a1583298cc369a9f41a7273403d7d280a98f3b",
+      "bytes": 1857
+    }
+  },
+  "identity_before": [
+    {
+      "path": "/opt/r1/target/phase-baseline/release/solvers",
+      "sha256": "69643569c66f634a85990ff7c7fa9727bda4329184f3c88e20e4f905780ac832",
+      "bytes": 8846520
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e",
+      "bytes": 29831
+    },
+    {
+      "path": "/opt/r1/phase-plan/plan.json",
+      "sha256": "c703c6f9d84100da5a6a6d969983492b43b10eccb941b4d818732c02800751b9",
+      "bytes": 16912
+    },
+    {
+      "path": "/opt/r1/phase-baseline/r1-phase-source-manifest.json",
+      "sha256": "1047dca0daa06664bb313be8260d666721feec8ecae0b46e93cf9421c0e6e7fc",
+      "bytes": 38923
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/plan.json",
+      "sha256": "7f3f3c60fec7d926b73f8b27d4f562a72fbc5ee47a18dcad73117131392a3d6a",
+      "bytes": 13808
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-pilot/pilot.json",
+      "sha256": "6f0f1d073b7fa3b6c589b79853bb17636195d159652ab2823b70c5ee1a5f877b",
+      "bytes": 28883
+    },
+    {
+      "path": "/opt/r1/phase-tools/apply_instrumentation.py",
+      "sha256": "098e65c6fde9293aefe4f95fb6e27d9d4c42da957995dec076eae35dff12b6cd",
+      "bytes": 9760
+    },
+    {
+      "path": "/opt/r1/phase-tools/r1_phase.rs.in",
+      "sha256": "652471a902a2f695a87db027c42d624311995b85f6c5f649da536c3264de7a33",
+      "bytes": 5985
+    },
+    {
+      "path": "/opt/r1/phase-tools/source-versions.json",
+      "sha256": "e4db9890e947a34835a966221ce23b318a4e2786844dd96c86779059f303b64f",
+      "bytes": 40762
+    },
+    {
+      "path": "/opt/r1/phase-tools/validate_phase.py",
+      "sha256": "a0ce8de48d6d975d7bd41ef0eeb1fe3663035b88e540756f21857fcbb8e2f2d8",
+      "bytes": 3027
+    },
+    {
+      "path": "/opt/r1/phase-tools/run_phases.py",
+      "sha256": "b2f877703c75d53f6da6556fb091000ee30a5e0512e12a005728b01fe7fe7b28",
+      "bytes": 19216
+    },
+    {
+      "path": "/opt/r1/phase-candidate/r1-phase-source-manifest.json",
+      "sha256": "e434aeded22aea5096ac2364751894982270e07824053788e57e0b41b986a6c6",
+      "bytes": 40806
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "/opt/r1/target/phase-baseline/release/solvers",
+      "sha256": "69643569c66f634a85990ff7c7fa9727bda4329184f3c88e20e4f905780ac832",
+      "bytes": 8846520
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/candidate-v3/tools/run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "sha256": "39cd41ddf3ba9cea9247a12093dc509cb3ce299c9a31ee5f3e97e04ce6e8030e",
+      "bytes": 29831
+    },
+    {
+      "path": "/opt/r1/phase-plan/plan.json",
+      "sha256": "c703c6f9d84100da5a6a6d969983492b43b10eccb941b4d818732c02800751b9",
+      "bytes": 16912
+    },
+    {
+      "path": "/opt/r1/phase-baseline/r1-phase-source-manifest.json",
+      "sha256": "1047dca0daa06664bb313be8260d666721feec8ecae0b46e93cf9421c0e6e7fc",
+      "bytes": 38923
+    },
+    {
+      "path": "/opt/r1/candidate-v3/experiments/hu-postflop-r1/pipeline/frozen/vm06-v3/plan.json",
+      "sha256": "7f3f3c60fec7d926b73f8b27d4f562a72fbc5ee47a18dcad73117131392a3d6a",
+      "bytes": 13808
+    },
+    {
+      "path": "/opt/r1/candidate-v3/runs/r1-pilot/pilot.json",
+      "sha256": "6f0f1d073b7fa3b6c589b79853bb17636195d159652ab2823b70c5ee1a5f877b",
+      "bytes": 28883
+    },
+    {
+      "path": "/opt/r1/phase-tools/apply_instrumentation.py",
+      "sha256": "098e65c6fde9293aefe4f95fb6e27d9d4c42da957995dec076eae35dff12b6cd",
+      "bytes": 9760
+    },
+    {
+      "path": "/opt/r1/phase-tools/r1_phase.rs.in",
+      "sha256": "652471a902a2f695a87db027c42d624311995b85f6c5f649da536c3264de7a33",
+      "bytes": 5985
+    },
+    {
+      "path": "/opt/r1/phase-tools/source-versions.json",
+      "sha256": "e4db9890e947a34835a966221ce23b318a4e2786844dd96c86779059f303b64f",
+      "bytes": 40762
+    },
+    {
+      "path": "/opt/r1/phase-tools/validate_phase.py",
+      "sha256": "a0ce8de48d6d975d7bd41ef0eeb1fe3663035b88e540756f21857fcbb8e2f2d8",
+      "bytes": 3027
+    },
+    {
+      "path": "/opt/r1/phase-tools/run_phases.py",
+      "sha256": "b2f877703c75d53f6da6556fb091000ee30a5e0512e12a005728b01fe7fe7b28",
+      "bytes": 19216
+    },
+    {
+      "path": "/opt/r1/phase-candidate/r1-phase-source-manifest.json",
+      "sha256": "e434aeded22aea5096ac2364751894982270e07824053788e57e0b41b986a6c6",
+      "bytes": 40806
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 6,
+    "max_sample_gap_seconds": 0.059455137999975705,
+    "sampled_peak_tree_resident_bytes": 53858304,
+    "root_os_peak_resident_bytes": 53346304,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "max_observed_processes": 1
+  },
+  "containment": {
+    "kind": "posix_session_process_group",
+    "limitations": [
+      "setsid/setpgid can escape this process group; use a systemd/cgroup wrapper",
+      "supervisor SIGKILL, host failure or power loss does not kill the group",
+      "resident memory is sampled /proc RSS; brief descendants may be missed",
+      "summed RSS can double-count shared pages; this is not cgroup memory.current",
+      "wait4 root peak can include reaped descendant high-water marks; it is not a simultaneous tree peak"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 67419471872,
+    "available_bytes": 66061238272
+  },
+  "resolved_argv": [
+    "/opt/r1/target/phase-baseline/release/solvers",
+    "resume",
+    "/opt/r1/phase-off/turn-1-baseline/run",
+    "--out",
+    "/opt/r1/phase-off/turn-1-baseline/restore/run"
+  ],
+  "disk_path": "/opt/r1/phase-off/turn-1-baseline/restore/resume",
+  "disk_free_before_bytes": 92683497472,
+  "started_at": "2026-09-25T18:22:17.446878+00:00",
+  "pid": 9071,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 53346304,
+    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+    "job_os_peak_commit_bytes": null,
+    "elapsed_seconds": 0.3074355869998726,
+    "at": "2026-09-25T18:22:17.763238+00:00",
+    "host_available_memory_bytes": 66089574400,
+    "disk_free_bytes": 92683079680
+  },
+  "elapsed_seconds": 0.3165331270001843,
+  "ended_at": "2026-09-25T18:22:17.763472+00:00",
+  "supervisor_exit_code": 0
+}
