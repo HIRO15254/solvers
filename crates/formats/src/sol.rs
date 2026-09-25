@@ -11,17 +11,12 @@
 //! viewer re-solves the river lazily on demand), which is what keeps these
 //! files small for deep trees.
 //!
-//! The on-disk layout mirrors `checkpoint.rs` exactly: a fixed 50-byte
-//! little-endian header (magic + format version + config hash + iteration)
-//! followed by a zstd-compressed postcard encoding of the payload, written
-//! atomically via temp-file-then-rename.
-
-use std::io::Write;
-use std::path::Path;
+//! Version 2 stores checked metadata and independently compressed, indexed
+//! strategy/value node frames. See `sol_indexed` for the binary layout.
 
 use serde::{Deserialize, Serialize};
 
-use crate::hash::{config_hash, config_hash_hex};
+pub use crate::sol_indexed::{read_sol, write_sol};
 
 /// Fixed header layout, all multi-byte fields little-endian: magic (8
 /// bytes) + format version (u16) + config hash (32 bytes) + iteration
@@ -29,9 +24,6 @@ use crate::hash::{config_hash, config_hash_hex};
 /// can share tooling that only needs to peek progress/identity without
 /// paying for a zstd decompression.
 pub const HEADER_LEN: usize = 8 + 2 + 32 + 8;
-
-const MAGIC: &[u8; 8] = b"SLVRSOLV";
-const FORMAT_VERSION: u16 = 1;
 
 /// Errors from reading or writing a `.sol` file.
 #[derive(Debug, thiserror::Error)]
@@ -47,18 +39,12 @@ pub enum SolError {
         header_hash: String,
         computed_hash: String,
     },
+    #[error("invalid .sol layout: {0}")]
+    InvalidLayout(String),
     #[error(".sol I/O error: {0}")]
     Io(#[from] std::io::Error),
     #[error(".sol payload codec error: {0}")]
     Codec(#[from] postcard::Error),
-}
-
-/// Just the header, for cheap identity/progress checks without
-/// decompressing the (potentially large) payload.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct SolHeader {
-    pub config_hash: [u8; 32],
-    pub iteration: u64,
 }
 
 /// Cached solve metadata: results a viewer wants to display immediately
@@ -139,7 +125,7 @@ pub struct ValueBlock {
 /// The full decoded `.sol` contents.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SolPayload {
-    /// Full original config TOML text, kept verbatim (not just its hash)
+    /// Self-contained effective config TOML text (not just its hash)
     /// so the viewer can rebuild the exact same tree deterministically.
     /// The header's config hash MUST equal `blake3(config_toml.as_bytes())`
     /// — `write_sol` derives it from this field and `read_sol` verifies it,
@@ -147,104 +133,14 @@ pub struct SolPayload {
     pub config_toml: String,
     pub meta: SolMeta,
     pub mode: StreetsStored,
+    /// Number of nodes in the complete compiled public tree.
+    pub node_count: u64,
     /// One entry per stored action node, ascending by `sref`.
     pub blocks: Vec<StrategyBlock>,
     /// Per-hand values for the same nodes as `blocks`, ascending by
     /// `sref`. The two lists always cover the same node set: a reader that
     /// found a strategy for a node can always find its values too.
     pub values: Vec<ValueBlock>,
-}
-
-fn parse_header(buf: &[u8; HEADER_LEN]) -> Result<SolHeader, SolError> {
-    if &buf[0..8] != MAGIC {
-        return Err(SolError::BadMagic);
-    }
-    let version = u16::from_le_bytes([buf[8], buf[9]]);
-    if version != FORMAT_VERSION {
-        return Err(SolError::BadVersion {
-            found: version,
-            expected: FORMAT_VERSION,
-        });
-    }
-    let mut config_hash = [0u8; 32];
-    config_hash.copy_from_slice(&buf[10..42]);
-    let iteration = u64::from_le_bytes(buf[42..50].try_into().expect("8-byte slice"));
-    Ok(SolHeader {
-        config_hash,
-        iteration,
-    })
-}
-
-fn build_header(config_hash: [u8; 32], iteration: u64) -> [u8; HEADER_LEN] {
-    let mut buf = [0u8; HEADER_LEN];
-    buf[0..8].copy_from_slice(MAGIC);
-    buf[8..10].copy_from_slice(&FORMAT_VERSION.to_le_bytes());
-    buf[10..42].copy_from_slice(&config_hash);
-    buf[42..50].copy_from_slice(&iteration.to_le_bytes());
-    buf
-}
-
-/// Reads and fully decodes a `.sol` file (header + zstd-decompressed,
-/// postcard-decoded `SolPayload`), verifying that the header hash matches
-/// `blake3` of the embedded config TOML.
-pub fn read_sol(path: &Path) -> Result<SolPayload, SolError> {
-    let bytes = std::fs::read(path)?;
-    if bytes.len() < HEADER_LEN {
-        return Err(SolError::Truncated {
-            expected: HEADER_LEN,
-            actual: bytes.len(),
-        });
-    }
-    let header_buf: [u8; HEADER_LEN] = bytes[..HEADER_LEN]
-        .try_into()
-        .expect("sliced to HEADER_LEN");
-    let header = parse_header(&header_buf)?;
-    let payload = zstd::decode_all(&bytes[HEADER_LEN..])?;
-    let payload: SolPayload = postcard::from_bytes(&payload)?;
-
-    let computed = config_hash(payload.config_toml.as_bytes());
-    if computed != header.config_hash {
-        return Err(SolError::HashMismatch {
-            header_hash: config_hash_hex(&header.config_hash),
-            computed_hash: config_hash_hex(&computed),
-        });
-    }
-
-    Ok(payload)
-}
-
-/// Writes a `.sol` file atomically: header+payload go to a temp file in
-/// `path`'s directory, `fsync`ed, then renamed into place. The header's
-/// config hash and iteration are derived from `payload` itself (from
-/// `config_toml` and `meta.iterations` respectively) so caller and header
-/// can never disagree.
-pub fn write_sol(path: &Path, payload: &SolPayload) -> Result<(), SolError> {
-    let hash = config_hash(payload.config_toml.as_bytes());
-    let compressed_payload = postcard::to_allocvec(payload)?;
-    let compressed = zstd::encode_all(compressed_payload.as_slice(), 0)?;
-
-    let mut buf = Vec::with_capacity(HEADER_LEN + compressed.len());
-    buf.extend_from_slice(&build_header(hash, payload.meta.iterations));
-    buf.extend_from_slice(&compressed);
-
-    let dir = path
-        .parent()
-        .filter(|p| !p.as_os_str().is_empty())
-        .unwrap_or_else(|| Path::new("."));
-    let tmp_name = format!(
-        ".{}.tmp",
-        path.file_name()
-            .and_then(|n| n.to_str())
-            .unwrap_or("solve.sol")
-    );
-    let tmp_path = dir.join(tmp_name);
-    {
-        let mut file = std::fs::File::create(&tmp_path)?;
-        file.write_all(&buf)?;
-        file.sync_all()?;
-    }
-    std::fs::rename(&tmp_path, path)?;
-    Ok(())
 }
 
 /// Quantizes an already-normalized probability slice (values in `[0, 1]`,
@@ -377,6 +273,7 @@ mod tests {
                 wall_secs: 12.5,
             },
             mode: StreetsStored::NoRivers,
+            node_count: 100,
             blocks: vec![
                 StrategyBlock {
                     sref: 3,
@@ -451,6 +348,85 @@ mod tests {
     }
 
     #[test]
+    fn indexed_reads_are_independent_and_detect_damaged_node_frames() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("indexed.sol");
+        let payload = sample_payload();
+        write_sol(&path, &payload).unwrap();
+        let mut reader = crate::SolReader::open(&path).unwrap();
+        assert_eq!(reader.metadata().node_count, 100);
+        assert_eq!(reader.stored_srefs().collect::<Vec<_>>(), [3, 9]);
+        assert_eq!(
+            reader.read_node(3).unwrap().unwrap(),
+            (payload.blocks[0].clone(), payload.values[0].clone())
+        );
+        assert!(reader.read_node(4).unwrap().is_none());
+        drop(reader);
+        let mut bytes = std::fs::read(&path).unwrap();
+        *bytes.last_mut().unwrap() ^= 1;
+        std::fs::write(&path, bytes).unwrap();
+        let mut reader = crate::SolReader::open(&path).unwrap();
+        assert!(
+            reader.read_node(3).is_ok(),
+            "another node is still readable"
+        );
+        assert!(reader.read_node(9).is_err());
+        assert!(
+            read_sol(&path).is_err(),
+            "full validation must inspect every frame"
+        );
+    }
+
+    #[test]
+    fn indexed_layout_rejects_legacy_and_invalid_directory_extents() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("layout.sol");
+        write_sol(&path, &sample_payload()).unwrap();
+        let original = std::fs::read(&path).unwrap();
+        let mut legacy = original.clone();
+        legacy[8..10].copy_from_slice(&1u16.to_le_bytes());
+        std::fs::write(&path, legacy).unwrap();
+        assert!(matches!(
+            read_sol(&path),
+            Err(SolError::BadVersion {
+                found: 1,
+                expected: 2
+            })
+        ));
+        for (offset, value) in [(50, u64::MAX), (58, u64::MAX), (98, u64::MAX)] {
+            let mut bytes = original.clone();
+            bytes[offset..offset + 8].copy_from_slice(&value.to_le_bytes());
+            std::fs::write(&path, bytes).unwrap();
+            assert!(crate::SolReader::open(&path).is_err());
+        }
+        let mut bytes = original.clone();
+        bytes.extend_from_slice(b"trailing");
+        std::fs::write(&path, bytes).unwrap();
+        assert!(crate::SolReader::open(&path).is_err());
+        let mut bytes = original;
+        bytes[42] ^= 1;
+        std::fs::write(&path, bytes).unwrap();
+        assert!(crate::SolReader::open(&path).is_err());
+    }
+
+    #[test]
+    fn indexed_writer_rejects_mismatched_nodes_and_preserves_old_file() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("atomic.sol");
+        let mut payload = sample_payload();
+        write_sol(&path, &payload).unwrap();
+        let original = std::fs::read(&path).unwrap();
+        payload.values[1].sref = 10;
+        assert!(write_sol(&path, &payload).is_err());
+        assert_eq!(std::fs::read(&path).unwrap(), original);
+        payload.blocks.clear();
+        payload.values.clear();
+        write_sol(&path, &payload).unwrap();
+        assert_eq!(read_sol(&path).unwrap(), payload);
+        assert_eq!(std::fs::read_dir(directory.path()).unwrap().count(), 1);
+    }
+
+    #[test]
     fn quantize_dequantize_round_trip() {
         // 3 actions x 5 hands, action-major, each column sums to 1.0.
         // Includes a uniform column and a one-hot column.
@@ -509,7 +485,7 @@ mod tests {
         match read_sol(&path) {
             Err(SolError::BadVersion { found, expected }) => {
                 assert_eq!(found, 99);
-                assert_eq!(expected, FORMAT_VERSION);
+                assert_eq!(expected, crate::sol_indexed::SOL_FORMAT_VERSION);
             }
             other => panic!("expected BadVersion, got {other:?}"),
         }

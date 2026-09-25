@@ -90,8 +90,12 @@ pub trait Storage: StorageOps + Send + Sync {
     fn bytes_for(len: usize, num_refs: usize) -> u64;
 
     /// Owned, backend-tagged snapshot of this backend's contents, for
-    /// checkpointing.
+    /// retention after the backend is changed or dropped.
     fn state(&self) -> StorageState;
+
+    /// Borrows the checkpoint contents without copying any storage arena.
+    /// The backend cannot be mutated while this view is in use.
+    fn state_ref(&self) -> StorageStateRef<'_>;
 
     /// Restores this backend's contents from a snapshot previously produced
     /// by [`Storage::state`]. Fails if `state` is the wrong backend variant
@@ -123,6 +127,24 @@ pub enum StorageState {
         strategy_sum: Vec<i16>,
         regret_scales: Vec<f32>,
         strategy_scales: Vec<f32>,
+    },
+}
+
+/// Borrowed serialization view with the same wire representation as
+/// [`StorageState`]. Variant order and field order are part of the checkpoint
+/// contract and must remain aligned with that owned, deserializable type.
+#[derive(Clone, Copy, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+pub enum StorageStateRef<'a> {
+    F32 {
+        regrets: &'a [f32],
+        strategy_sum: &'a [f32],
+    },
+    I16 {
+        regrets: &'a [i16],
+        strategy_sum: &'a [i16],
+        regret_scales: &'a [f32],
+        strategy_scales: &'a [f32],
     },
 }
 
@@ -318,6 +340,13 @@ impl Storage for F32Storage {
         StorageState::F32 {
             regrets: self.regrets.clone(),
             strategy_sum: self.strategy_sum.clone(),
+        }
+    }
+
+    fn state_ref(&self) -> StorageStateRef<'_> {
+        StorageStateRef::F32 {
+            regrets: &self.regrets,
+            strategy_sum: &self.strategy_sum,
         }
     }
 
@@ -703,6 +732,15 @@ impl Storage for I16Storage {
         }
     }
 
+    fn state_ref(&self) -> StorageStateRef<'_> {
+        StorageStateRef::I16 {
+            regrets: &self.regrets,
+            strategy_sum: &self.strategy_sum,
+            regret_scales: &self.regret_scales,
+            strategy_scales: &self.strategy_scales,
+        }
+    }
+
     fn restore_state(&mut self, state: StorageState) -> Result<(), StateMismatch> {
         match state {
             StorageState::I16 {
@@ -1050,6 +1088,47 @@ mod tests {
         for (a, b) in avg_f32.iter().zip(&avg_i16) {
             assert!((a - b).abs() < 1e-3, "avg {a} vs {b}");
         }
+    }
+
+    #[test]
+    fn checkpoint_views_borrow_original_arenas() {
+        let f32_backend = F32Storage::new(6, 2);
+        let StorageStateRef::F32 {
+            regrets,
+            strategy_sum,
+        } = f32_backend.state_ref()
+        else {
+            panic!("wrong checkpoint backend");
+        };
+        assert!(std::ptr::eq(regrets, f32_backend.regrets.as_slice()));
+        assert!(std::ptr::eq(
+            strategy_sum,
+            f32_backend.strategy_sum.as_slice()
+        ));
+
+        let i16_backend = I16Storage::new(6, 2);
+        let StorageStateRef::I16 {
+            regrets,
+            strategy_sum,
+            regret_scales,
+            strategy_scales,
+        } = i16_backend.state_ref()
+        else {
+            panic!("wrong checkpoint backend");
+        };
+        assert!(std::ptr::eq(regrets, i16_backend.regrets.as_slice()));
+        assert!(std::ptr::eq(
+            strategy_sum,
+            i16_backend.strategy_sum.as_slice()
+        ));
+        assert!(std::ptr::eq(
+            regret_scales,
+            i16_backend.regret_scales.as_slice()
+        ));
+        assert!(std::ptr::eq(
+            strategy_scales,
+            i16_backend.strategy_scales.as_slice()
+        ));
     }
 
     #[test]

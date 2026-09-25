@@ -513,9 +513,12 @@ EV は **subgame 開始基準** で、「この spot から自分が持ち帰る
 ### HU Postflop の結果を再開・比較するとき
 
 ハンド別 EV は常に元の config の subgame 開始基準であり、後続ノードでそれまでの
-投入額を足し戻さない。chip-EV は chip、ICM は prize 単位である。開発中のため
-`.sol` の format version は 1 に据え置く。修正前に生成した EV は読み込み時には
-補正されないので、修正後の値は solve または `solvers resume RUN` で生成し直す。
+投入額を足し戻さない。chip-EV は chip、ICM は prize 単位である。
+`.sol` はversion 2で、要約とノード別データを分けて保存する。`export ... summary` は既定の
+root指定ならtreeを再構築せずに要約を読める。これは全nodeの破損検査や保存後戦略の再評価ではない。
+旧version 1は読み込めないため新規solveで生成し直す。自己完結したrun configとcheckpointがある場合は、
+旧 `solution.sol` を別の場所へ退避してから `solvers resume RUN` でversion 2を生成できる。
+保存時のEVを読込み時に暗黙補正することはない。
 
 再開すると `solution.sol` と `run.json` も最新 iteration に更新される。fork も同様。
 `max_time` は保存済み solve 時間を含む累積予算で、上限済みなら反復を追加しない。

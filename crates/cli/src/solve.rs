@@ -55,7 +55,17 @@ pub fn run(
                 "--threads, --memory, and --max-time are Multiway Preflop v1 overrides"
             ));
         }
-        source_raw.to_owned()
+        let document: toml::Value = toml::from_str(source_raw).context("parsing config")?;
+        if document.get("schema").and_then(toml::Value::as_str)
+            == Some(crate::solver_config_v1::SCHEMA_POSTFLOP)
+        {
+            // Resolve external tree sources once, before the run gets its
+            // identity. All durable artifacts carry this same self-contained
+            // config and remain usable after the original files are removed.
+            crate::solver_config_v1::normalized_toml_at(source_raw, config_path)?
+        } else {
+            source_raw.to_owned()
+        }
     };
     let raw = effective_raw.as_str();
     if is_multiway_v1 && histories.iter().any(|history| !history.is_empty()) {
@@ -121,8 +131,8 @@ pub fn run(
             crate::multiway_v1::SCHEMA
         ));
     }
-    // Hashed from the raw file bytes rather than the parsed struct, so
-    // `resume` re-derives the same stamp from the run directory's copy.
+    // Hash the exact bytes saved as run.toml. For postflop this is the
+    // normalized, inlined config, so resume never depends on a source file.
     let config_hash = formats::config_hash(raw.as_bytes());
     if matches!(config.game, GameSection::PreflopMultiway(_)) {
         let mut recorder = crate::run_dir::RunRecorder::start(
@@ -525,6 +535,53 @@ fn run_with_storage_impl<S: Storage>(
     })
 }
 
+/// Last evaluation of one exact solver iteration, before any further update.
+/// The zero-sum exploitability path needs only P0's EV; the independently
+/// evaluated P1 EV is retained when the game is general-sum.
+struct RootEvaluation {
+    completed_iter: u64,
+    ev_p0: f64,
+    ev_p1: Option<f64>,
+    expl: PerPlayer<f64>,
+}
+
+impl RootEvaluation {
+    fn measure<E: TerminalEvaluator, S: Storage>(solver: &Solver<E, S>) -> Self {
+        let ev_p0 = solver.expected_value(Player::P0);
+        let ev_p1 = (!solver.game().zero_sum).then(|| solver.expected_value(Player::P1));
+        // Keep the same values and call order as Solver::exploitability.
+        let expl = PerPlayer::new(
+            solver.best_response_value(Player::P0) - ev_p0,
+            solver.best_response_value(Player::P1) - ev_p1.unwrap_or(-ev_p0),
+        );
+        Self {
+            completed_iter: solver.iteration(),
+            ev_p0,
+            ev_p1,
+            expl,
+        }
+    }
+
+    fn ev<E: TerminalEvaluator, S: Storage>(&self, solver: &Solver<E, S>) -> PerPlayer<f64> {
+        assert_eq!(self.completed_iter, solver.iteration());
+        PerPlayer::new(
+            self.ev_p0,
+            // Final reports have always evaluated both EVs independently,
+            // including zero-sum games. Preserve that rounding behavior.
+            self.ev_p1
+                .unwrap_or_else(|| solver.expected_value(Player::P1)),
+        )
+    }
+}
+
+/// Evidence produced during this invocation of the convergence loop. A
+/// zero-step resume (or an already exhausted time budget) leaves it empty.
+#[derive(Default)]
+pub(crate) struct RunLoopResult {
+    evaluation: Option<RootEvaluation>,
+    checkpoint_iteration: Option<u64>,
+}
+
 /// Convergence loop shared by every game: run a chunk of iterations, report
 /// exploitability, and stop early once `target_nash_conv` or `max_time` is
 /// hit. Both stop conditions are evaluated only at `check_every` marks, so
@@ -540,11 +597,12 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
     solver: &mut Solver<E, S>,
     run: &RunSection,
     hooks: &mut RunHooks<'_>,
-) -> Result<()> {
+) -> Result<RunLoopResult> {
     if run.check_every == 0 {
         return Err(anyhow!("SLV004: run.check_every must be positive"));
     }
     hooks.start = Instant::now();
+    let mut result = RunLoopResult::default();
     if run
         .max_time_secs
         .is_some_and(|limit| hooks.elapsed_before >= Duration::from_secs(limit))
@@ -555,14 +613,16 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
                 reason: "time-limit".to_string(),
             });
         }
-        return Ok(());
+        return Ok(result);
     }
     let mut remaining = run.iterations.saturating_sub(solver.iteration());
     while remaining > 0 {
         let chunk = run.check_every.min(remaining);
         solver.run(chunk);
         remaining -= chunk;
-        let expl = solver.exploitability();
+        let evaluation = RootEvaluation::measure(solver);
+        let expl = evaluation.expl;
+        result.evaluation = Some(evaluation);
         let nash_conv = expl[Player::P0] + expl[Player::P1];
         hooks.log(format_args!(
             "iter={:>8} expl_p0={:.3e} expl_p1={:.3e} nash_conv={:.3e}",
@@ -585,6 +645,9 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
             })?;
         }
         checkpoint_now(solver, hooks)?;
+        if hooks.checkpoint.is_some() {
+            result.checkpoint_iteration = Some(solver.iteration());
+        }
 
         if hooks
             .cancel
@@ -628,13 +691,13 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
             break;
         }
     }
-    Ok(())
+    Ok(result)
 }
 
-/// Writes a checkpoint right now if `hooks` configures one — used both at
-/// every `run_loop` exploitability check and once more after the loop
-/// finishes, so the final solver state is always saved even when the run
-/// converges (or hits its iteration cap) between two `check_every` marks.
+/// Writes a checkpoint right now if `hooks` configures one. Every nonempty
+/// loop finishes at an evaluation/checkpoint mark, including a partial final
+/// chunk. Callers can use RunLoopResult to avoid saving that state twice;
+/// zero-step runs still need a final save.
 fn checkpoint_now<E: TerminalEvaluator, S: Storage>(
     solver: &Solver<E, S>,
     hooks: &mut RunHooks<'_>,
@@ -642,7 +705,7 @@ fn checkpoint_now<E: TerminalEvaluator, S: Storage>(
     let Some((path, hash)) = hooks.checkpoint else {
         return Ok(());
     };
-    formats::write_checkpoint(path, hash, &solver.state())?;
+    formats::write_checkpoint_ref(path, hash, &solver.state_ref())?;
     if let Some(events) = hooks.events.as_deref_mut() {
         let _ = events.info(formats::RunEventPayload::Checkpoint {
             sweeps: solver.iteration(),
@@ -681,10 +744,19 @@ pub(crate) fn print_done<E: TerminalEvaluator, S: Storage>(
     ev: PerPlayer<f64>,
 ) -> RunSummary {
     let expl = solver.exploitability();
+    print_summary(solver.iteration(), elapsed, ev, expl)
+}
+
+fn print_summary(
+    iterations: u64,
+    elapsed: Duration,
+    ev: PerPlayer<f64>,
+    expl: PerPlayer<f64>,
+) -> RunSummary {
     let nash_conv = expl[Player::P0] + expl[Player::P1];
     println!(
         "done: iterations={} wall={:.2}s ev_p0={:.6} ev_p1={:.6} nash_conv={:.3e}",
-        solver.iteration(),
+        iterations,
         elapsed.as_secs_f64(),
         ev[Player::P0],
         ev[Player::P1],
@@ -692,7 +764,7 @@ pub(crate) fn print_done<E: TerminalEvaluator, S: Storage>(
     );
     RunSummary {
         canceled: false,
-        iterations: solver.iteration(),
+        iterations,
         wall: elapsed,
         ev,
         expl_p0: expl[Player::P0],
@@ -767,7 +839,7 @@ fn solve_postflop<S: Storage>(
     sol: Option<SolExportSpec>,
     hooks: &mut RunHooks<'_>,
 ) -> Result<RunSummary> {
-    let config = postflop_setup::build_postflop_config(
+    let mut config = postflop_setup::build_postflop_config(
         board,
         oop_range,
         ip_range,
@@ -778,6 +850,10 @@ fn solve_postflop<S: Storage>(
         tree.lower()?,
         preflop_aggressor,
     )?;
+    // Solve/export uses structural node IDs and storage refs. Human-readable
+    // histories/actions are rebuilt by artifact readers and are never used
+    // here, so avoid allocating them for every node in large flop trees.
+    config.track_node_info = false;
 
     // Cheap dry run before committing to the (possibly very large) real
     // build, so an oversized config fails fast with a size estimate instead
@@ -812,14 +888,21 @@ fn solve_postflop<S: Storage>(
         schedule_name, run.iterations
     );
     let start = Instant::now();
-    run_loop(&mut solver, run, hooks)?;
+    let result = run_loop(&mut solver, run, hooks)?;
     let elapsed = hooks.elapsed_before + start.elapsed();
-    let summary = print_done(
-        &solver,
+    let evaluation = result
+        .evaluation
+        .filter(|value| value.completed_iter == solver.iteration())
+        .unwrap_or_else(|| RootEvaluation::measure(&solver));
+    let summary = print_summary(
+        solver.iteration(),
         elapsed,
-        postflop_setup::subgame_ev(solver_ev(&solver), ev_offset),
+        postflop_setup::subgame_ev(evaluation.ev(&solver), ev_offset),
+        evaluation.expl,
     );
-    checkpoint_now(&solver, hooks)?;
+    if result.checkpoint_iteration != Some(solver.iteration()) {
+        checkpoint_now(&solver, hooks)?;
+    }
 
     if let Some(spec) = &sol {
         let start_street = crate::sol::start_street_from_board_len(config.board.len());
@@ -1307,5 +1390,74 @@ fn export_preflop<E: TerminalEvaluator, S: Storage>(
         exploitability: [expl[Player::P0], expl[Player::P1]],
         class_labels: (0..NUM_CLASSES).map(preflop::class_label).collect(),
         entries: out,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn postflop_zero_step_and_cancellation_still_save_final_state() {
+        let raw = r#"
+schema = "solvers.postflop/v1"
+[game]
+board = "2c 7d 9h Js Qs"
+oop_range = "AsAh"
+ip_range = "KsKh"
+pot = 5
+effective_stack = 8
+[game.tree]
+kind = "none"
+[run]
+iterations = 7
+check_every = 3
+threads = 1
+"#;
+        for (iterations, cancel, expected_iteration) in [(0, false, 0), (7, true, 3)] {
+            let directory = tempfile::tempdir().unwrap();
+            let path = directory.path().join("checkpoint.ckpt");
+            let mut config = crate::config::parse_solve_config(raw).unwrap();
+            // Public input rejects zero iterations. The internal no-step
+            // path is still needed when resuming a completed checkpoint.
+            config.run.iterations = iterations;
+            let cancel = std::sync::atomic::AtomicBool::new(cancel);
+            let mut events = formats::RunEventLog::create_or_append(directory.path()).unwrap();
+            let summary = run_with_storage_sol::<F32Storage>(
+                config,
+                None,
+                &[],
+                None,
+                Some((&path, formats::config_hash(raw.as_bytes()))),
+                None,
+                None,
+                Some(&mut events),
+                Some(&cancel),
+            )
+            .unwrap();
+            assert_eq!(summary.iterations, expected_iteration);
+            assert_eq!(
+                summary.canceled,
+                cancel.load(std::sync::atomic::Ordering::SeqCst)
+            );
+            assert_eq!(summary.ev, PerPlayer::new(5.0, 0.0));
+            assert_eq!(summary.nash_conv, 0.0);
+            assert_eq!(
+                formats::read_checkpoint(&path).unwrap().iteration,
+                expected_iteration
+            );
+            let (events, _) =
+                formats::read_events(&directory.path().join(formats::RUN_EVENTS_FILE), 0).unwrap();
+            assert_eq!(
+                events
+                    .iter()
+                    .filter(|event| matches!(
+                        event.payload,
+                        formats::RunEventPayload::Checkpoint { .. }
+                    ))
+                    .count(),
+                1
+            );
+        }
     }
 }

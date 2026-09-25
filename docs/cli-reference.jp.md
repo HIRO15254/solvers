@@ -502,8 +502,12 @@ EV は元の subgame 開始基準を維持し、chip-EV は chip、ICM は prize
 
 レーキまたは外部 field を含む ICM の一般和設定では `validate` は
 `general-sum utilities, no Nash convergence guarantee` と表示する。
-`.sol` の format version は開発中のため 1 に据え置く。EV 修正前の artifact の値は
-読み込み時に補正されないため、修正後の値は solve / resume で生成し直す。
+`.sol` はindexed format version 2を使い、version 1は明示拒否する。旧artifactを使う場合は
+新規solve、または自己完結したrun config/checkpointを保持して旧 `solution.sol` を退避した後の
+resumeで生成し直す。保存時のEVを暗黙補正しない。
+`export ... summary` は `--node root` / `all` ならmetadataだけを読み、treeや全nodeを復元しない。
+未読nodeの破損検査や保存後profileのBR評価は行わない。
+postflop `solve` は外部tree sourceをインライン化したeffective TOMLをrun/artifact/hashへ共通利用する。
 
 ## `solversd`(job daemon)
 

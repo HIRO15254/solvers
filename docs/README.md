@@ -9,6 +9,7 @@
 | 目標・優先順位・段階別受入・利用者決定 | [プロダクトロードマップ](product-roadmap.jp.md) |
 | 担当・進捗・依存・ブロッカー・次の一手 | [Linear管理先](status.jp.md)。Markdownへ状態を複製しない |
 | 要件・作業依存・成果物・完了条件 | [全体実行計画](plans/solver-implementation-plan.jp.md)、[R0作業票](plans/r0-execution-plan.jp.md) |
+| R1の実行・性能比較・許可済み資源枠 | [R1実行票](plans/r1-execution-plan.jp.md) |
 | 品質指標・条件照合・測定・判定方法 | [品質検証ガイド](validation.jp.md) |
 | 現行solverの構造・実装境界 | [architecture.md](architecture.md) |
 | 現行CLI・daemon・protocolとviewer境界 | [app-architecture.md](app-architecture.md) |

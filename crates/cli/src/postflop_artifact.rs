@@ -40,6 +40,18 @@ pub fn export(
     node: &str,
     output: Option<&Path>,
 ) -> Result<()> {
+    // Summary is a metadata query. A specific history still takes the full
+    // path below so existing invalid-node diagnostics remain meaningful.
+    if matches!(view, ExportView::Summary) && matches!(node, "" | "root" | "all") {
+        let reader = formats::SolReader::open(path)
+            .with_context(|| format!("reading {}", path.display()))?;
+        let summary = metadata_summary(reader.metadata())?;
+        let rendered = match format {
+            ExportFormat::Json => to_json(&summary)?,
+            ExportFormat::Csv => summary_csv(&summary),
+        };
+        return write_rendered(rendered, output);
+    }
     let loaded = load_sol(path, 0, None)?;
     let selection = resolve_selection(&loaded, node)?;
 
@@ -62,6 +74,10 @@ pub fn export(
         (ExportView::Range, ExportFormat::Csv) => range_csv(&range_rows(&loaded)),
     };
 
+    write_rendered(rendered, output)
+}
+
+fn write_rendered(rendered: String, output: Option<&Path>) -> Result<()> {
     match output {
         Some(path) => {
             std::fs::write(path, rendered)
@@ -178,6 +194,66 @@ struct Summary {
     streets_stored: String,
     nodes: usize,
     stored_nodes: usize,
+}
+
+fn metadata_summary(metadata: &formats::SolMetadata) -> Result<Summary> {
+    let config = crate::config::parse_internal_config(&metadata.config_toml)
+        .context(".sol artifact's embedded config failed to parse")?;
+    crate::economics::build_rake(&config.rake)?;
+    crate::economics::build_utility(&config.utility)?;
+    let crate::config::GameSection::Postflop {
+        board,
+        oop_range,
+        ip_range,
+        pot,
+        effective_stack,
+        iso_merging,
+        min_bet,
+        preflop_aggressor,
+        tree,
+    } = config.game
+    else {
+        bail!(".sol artifact's embedded config is not kind = \"postflop\"");
+    };
+    // Preserve config/range/economics validation without constructing a tree
+    // or rank tables and without reading any node frame.
+    let config = crate::postflop_setup::build_postflop_config(
+        &board,
+        &oop_range,
+        &ip_range,
+        pot,
+        effective_stack,
+        iso_merging,
+        min_bet,
+        tree.lower()?,
+        &preflop_aggressor,
+    )?;
+    Ok(Summary {
+        board: config
+            .board
+            .iter()
+            .map(cards::Card::to_string)
+            .collect::<Vec<_>>()
+            .join(" "),
+        pot,
+        effective_stack,
+        min_bet,
+        iterations: metadata.meta.iterations,
+        ev_oop: metadata.meta.ev[0],
+        ev_ip: metadata.meta.ev[1],
+        expl_oop: metadata.meta.expl[0],
+        expl_ip: metadata.meta.expl[1],
+        nash_conv: metadata.meta.nash_conv,
+        storage: metadata.meta.storage.clone(),
+        wall_secs: metadata.meta.wall_secs,
+        streets_stored: match metadata.mode {
+            StreetsStored::Full => "full".into(),
+            StreetsStored::NoRivers => "no-rivers".into(),
+        },
+        nodes: usize::try_from(metadata.node_count).context("node count exceeds address space")?,
+        stored_nodes: usize::try_from(metadata.stored_nodes)
+            .context("stored count exceeds address space")?,
+    })
 }
 
 fn summary(loaded: &LoadedSol) -> Summary {

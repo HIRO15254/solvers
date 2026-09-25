@@ -42,6 +42,8 @@ R0〜R7のProjectは既存のものを使う。同名Projectや既存作業のIs
 | T1-04 | [SOL-11](https://linear.app/sapphire2/issue/SOL-11/t1-04-抽象化の識別子写像評価範囲を定義する) | 同上 |
 | T1-05 | [SOL-12](https://linear.app/sapphire2/issue/SOL-12/t1-05-huの基準測定と保存後照合を行う) | 同上 |
 | T1-06 | [SOL-13](https://linear.app/sapphire2/issue/SOL-13/t1-06-hu比較の閾値と受入範囲を固定する) | 同上 |
+| T1-07 | [SOL-14](https://linear.app/sapphire2/issue/SOL-14/t1-07-hu-postflopの入出力と成果物の読込みを最適化する) | [R1実行票](plans/r1-execution-plan.jp.md) |
+| T1-08 | [SOL-15](https://linear.app/sapphire2/issue/SOL-15/t1-08-同等exploitabilityでhuの時間とメモリを削減する) | 同上 |
 
 設計・受入上の必須前提はGitの作業票で定義する。Linearのblocked-byは実行時の待ち関係を表す。
 必須前提が変わった場合は作業票を更新し、その影響をLinearの待ち関係へ反映する。

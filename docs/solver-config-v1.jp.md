@@ -190,6 +190,9 @@ cb = 40
 
 `validate --write-effective` と `run.toml` では、`source`(path)が `script`(本文)へ
 置き換わる。rule 列へは展開しない。
+`solve` 自体も同じ正規化を実行し、postflop の `run.toml`、checkpoint の config hash、
+`solution.sol` の `config_toml` を同じ effective TOML に揃える。
+hash は入力fileの元byte列ではなく、この保存済み本文の BLAKE3 である。
 
 ```toml
 [game.tree]
@@ -700,7 +703,8 @@ bet と raise を同じ `r` で表すのは、両者が「到達額を宣言す�
 どれも黙って読み替えず、置換先を名指しする error にする。
 
 `.sol` artifact に埋め込まれた config が廃止 key を持つ場合は `SLV002` を返す。
-開発中のため、今回の修正では artifact format version を変更しない。
+現行 `.sol` はformat version 2を使い、version 1は明示拒否する。移行手順は
+[`solution.sol`](#solutionsol)を参照する。
 
 ## `[algorithm]`
 
@@ -836,14 +840,40 @@ tree script の board 述語(`when paired { ... }`)はボードごとに root �
 
 ### `solution.sol`
 
-`SLVRSOLV` magic + format version(現在 1)+ config の blake3 hash + iteration の
-50 byte header に、zstd 圧縮した payload が続く。
+`SLVRSOLV` magic + format version **2** + config の blake3 hash + iteration の
+50 byte header に、metadata、node directory、個別圧縮したnode frameが続く。
+複数byte整数はlittle endian。checkpoint `.ckpt` はversion 1のままである。
+
+| 順序 | binary layout |
+|---|---|
+| header | magic 8 byte、version u16、config hash 32 byte、iteration u64 |
+| metadata descriptor | 圧縮長u64、復元長u64、復元byte列のBLAKE3 32 byte、保存node数u64 |
+| metadata frame | zstd圧縮したpostcard `(config_toml, meta, mode, node_count, stored_nodes)` |
+| directory | 保存node数×60 byte。各entryは `sref:u32, offset:u64, compressed_len:u64, decoded_len:u64, digest:[u8;32]` |
+| node frames | directory順に連続配置。各frameはpostcard `(StrategyBlock, ValueBlock)` のzstd圧縮。digestは復元byte列のBLAKE3 |
+
+directoryは厳密なsref昇順・重複なし・隙間や重なりなし。最後のframe終端はfile終端に一致する。
+各srefは `node_count` 未満でなければならない。
+metadataのiteration・保存数はheader/descriptorと一致し、保存数は `node_count` 以下。
+`meta.ev[2]`、`meta.expl[2]`、`meta.nash_conv`、`meta.wall_secs` は全て有限値とし、
+`wall_secs` は0以上、`meta.storage` は `f32` / `i16` のいずれかとする。writerとreaderの
+両方で検査し、metadataだけを読むsummaryでも違反を拒否する。EVや逸脱利得には、丸めによる
+微小な負値も含め、符号制約を設けない。
+metadata復元長は最大16 MiB、1 nodeの復元長は最大64 MiB。超過、整数overflow、切断、checksum不一致、
+node pairのsref不一致、postcard復元後の余剰byteは明示errorとする。全artifactの容量上限ではない。
+
+writerは一時fileへnode単位で圧縮し、fsync後に置換する。全payloadの直列化bufferと全圧縮bufferを
+同時に保持しない。`SolReader` はmetadataとdirectoryを検証し、要求したnodeだけを復元する。
+`read_sol` / `inspect` / `compare` 等の全読込みは全nodeを検証し、query側で再構築treeとも照合する。
+`export summary` の `--node root` / `all`（既定root）はmetadata照会であり、tree/rank tableやnode frameを
+復元しない。その成功は未読nodeの内容検査や保存後profileのBR再評価を意味しない。
 
 | payload field | 内容 |
 |---|---|
 | `config_toml` | 生成時の config 本文。viewer が同じ tree を決定的に再構築するため hash ではなく本文を持つ |
 | `meta` | `iterations` / `expl[2]` / `ev[2]` / `nash_conv` / `storage` / `wall_secs` |
 | `mode` | `no-rivers` か `full` |
+| `node_count` | 完全なcompiled public treeのnode数。全読込み時は再構築値と一致を検査 |
 | `blocks` | action node ごとの u16 固定小数戦略。`sref` 昇順 |
 | `values` | 同じ node 集合の per-hand 値。`sref` 昇順。OOP の全ハンド、続けて IP の全ハンド。block ごとの `scale` に対する `i16` |
 
@@ -873,9 +903,10 @@ action node を落として artifact を大幅に小さくするが、river の�
 header の hash は `blake3(config_toml)` と一致しなければならない。`.sol` が
 記述している config から静かにずれることはない。config 本文をそのまま埋め込むので、
 契約を変えた後に古い `.sol` を開くと、その config が現行 parser の error を返す。
-開発中のため format version は 1 に据え置く。EV 修正前に生成した artifact の値は
-読み込み時には補正されない。修正後の値が必要な場合は solve または checkpoint からの
-resume で生成し直す。
+version 1は明示拒否し、暗黙変換やEV補正をしない。新規solveで生成し直すか、
+自己完結した `run.toml` と整合するcheckpointを保持して旧 `solution.sol` を別の場所へ退避し、
+resumeでversion 2を生成する。既存artifactなしのresumeは `full` を使う。
+旧external-source runの未正規化identityを黙って別のhashへ変更してresumeしない。
 
 `resume` は同じ iteration の checkpoint / `.sol` / `run.json` を出力する。
 既存の `.sol` があれば `full` / `no-rivers` を継承し、
@@ -936,7 +967,7 @@ solvers resume runs/my-run
 | **`no-rivers` は river の値を持たない** | river ノードを指す `export` は明示エラー | 既定の `full` なら全ノードが揃う。`no-rivers` は巨大ツリー向けの容量オプトイン |
 | **iso 併合の member remap は保留** | `inspect` は代表カードに `*` を付けて示す | 併合自体は厳密な商であり、戦略と EV は非併合 tree と一致する。表示のみの制限 |
 | **`.sol` は u16 量子化** | `storage` は情報用 | `f32` で解いた run でも artifact は u16 |
-| **開発中の artifact の値は自動補正しない** | format version は 1 のまま | EV 修正前の値は solve / resume で生成し直す。廃止 key を含む config は parser が拒否 |
+| **開発中の artifact の値は自動補正しない** | `.sol` は format version 2。version 1 は明示拒否 | 新規 solve、または自己完結した run config/checkpoint を保持して旧 `.sol` を退避後の resume で生成し直す。廃止 key を含む config は parser が拒否 |
 
 ### Multiway Preflop との差
 

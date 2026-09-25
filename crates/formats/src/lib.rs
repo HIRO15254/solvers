@@ -10,8 +10,16 @@ mod multiway;
 mod mwsol;
 mod run;
 mod sol;
+mod sol_indexed;
 
-pub use checkpoint::{Checkpoint, CheckpointError, HEADER_LEN, read_checkpoint, write_checkpoint};
+pub use sol_indexed::{
+    SOL_FORMAT_VERSION, SOL_MAX_METADATA_BYTES, SOL_MAX_NODE_BYTES, SolMetadata, SolReader,
+};
+
+pub use checkpoint::{
+    Checkpoint, CheckpointError, HEADER_LEN, read_checkpoint, write_checkpoint,
+    write_checkpoint_ref,
+};
 pub use hash::{config_hash, config_hash_hex};
 pub use metrics::{MetricsRow, MetricsWriter};
 pub use multiway::{

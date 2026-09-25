@@ -136,6 +136,51 @@ fn bit_pattern(values: &[f32]) -> Vec<u32> {
 }
 
 #[test]
+fn selected_value_recording_preserves_ancestor_values_and_storage() {
+    for par in [
+        ParConfig::default(),
+        ParConfig {
+            chance_depth: 0,
+            min_children: usize::MAX,
+        },
+    ] {
+        let solver = solve(par, 3);
+        let tree = &solver.game().tree;
+        let before = solver.storage().snapshot();
+        // Retain selected upper action nodes while skipping their descendants:
+        // recording must not prune the value computation beneath them.
+        let include = |id| tree.storage_ref(tree.node(id)).index.is_multiple_of(3);
+        for player in Player::BOTH {
+            let all = solver.expected_values_everywhere(player);
+            let selected = solver.expected_values_where(player, include);
+            let none = solver.expected_values_where(player, |_| false);
+            assert!(none.iter().all(Option::is_none));
+            let mut kept = 0;
+            let mut dropped = 0;
+            for id in 0..tree.nodes.len() as engine::NodeId {
+                let node = tree.node(id);
+                if node.kind != engine::NodeKind::Action {
+                    continue;
+                }
+                let index = node.aux as usize;
+                if include(id) {
+                    kept += 1;
+                    assert_eq!(
+                        bit_pattern(selected[index].as_ref().unwrap()),
+                        bit_pattern(all[index].as_ref().unwrap()),
+                    );
+                } else {
+                    dropped += 1;
+                    assert!(selected[index].is_none());
+                }
+            }
+            assert!(kept > 0 && dropped > 0);
+        }
+        assert_eq!(solver.storage().snapshot(), before);
+    }
+}
+
+#[test]
 fn parallel_chance_fanout_is_bitwise_deterministic() {
     // Root has 16 >= min_children(12) deals, chance_depth 2: this
     // parallelizes at the root.

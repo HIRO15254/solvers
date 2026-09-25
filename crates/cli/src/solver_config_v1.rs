@@ -227,11 +227,19 @@ pub struct PostflopGame {
     /// tree script's `cbet`/`donk` variables on the starting street.
     #[serde(default = "default_preflop_aggressor")]
     pub preflop_aggressor: String,
-    /// The betting tree. `kind = "none"` (the default) is a check-down: a
-    /// config that offers no bets says so rather than failing to mention
-    /// them.
-    #[serde(default)]
+    /// The betting tree. An omitted section means `kind = "none"`, a
+    /// check-down tree; normalization writes that choice explicitly.
+    #[serde(default = "default_postflop_tree")]
     pub tree: TreeSection,
+}
+
+fn default_postflop_tree() -> TreeSection {
+    // TreeSection's derived Rust Default does not apply serde's default
+    // for its kind field. Keep this family default local to postflop.
+    TreeSection {
+        kind: "none".to_owned(),
+        ..TreeSection::default()
+    }
 }
 
 fn default_preflop_aggressor() -> String {
@@ -1313,6 +1321,41 @@ iterations = 100
             format!("{:?}", from_source.game),
             format!("{:?}", from_effective.game)
         );
+    }
+
+    #[test]
+    fn omitted_postflop_tree_normalizes_like_explicit_none() {
+        let omitted = r#"
+schema = "solvers.postflop/v1"
+[game]
+board = "2c 7d 9h Js Qs"
+oop_range = "AsAh"
+ip_range = "KsKh"
+pot = 5
+effective_stack = 8
+[run]
+iterations = 3
+"#;
+        let explicit = omitted.replace("[run]", "[game.tree]\nkind = \"none\"\n[run]");
+        let empty_section = omitted.replace("[run]", "[game.tree]\n[run]");
+        let effective = normalized_toml(omitted).expect("tree section is optional");
+        assert_eq!(effective, normalized_toml(&explicit).unwrap());
+        assert_eq!(effective, normalized_toml(&empty_section).unwrap());
+        assert_eq!(effective, normalized_toml(&effective).unwrap());
+        let parsed: toml::Value = toml::from_str(&effective).unwrap();
+        assert_eq!(parsed["game"]["tree"]["kind"].as_str(), Some("none"));
+        let GameSection::Postflop { tree, .. } = parse_and_lower(omitted).unwrap().game else {
+            panic!("postflop family must lower to postflop");
+        };
+        assert_eq!(tree.kind, "none");
+        assert!(tree.source.is_none() && tree.script.is_none());
+
+        // An explicit invalid value is not a request for the default.
+        let invalid = omitted.replace("[run]", "[game.tree]\nkind = \"\"\n[run]");
+        let error = normalized_toml(&invalid).unwrap_err().to_string();
+        assert!(error.contains("SLV004"), "{error}");
+        assert!(error.contains("unknown [game.tree] kind"), "{error}");
+        assert!(parse_and_lower(&invalid).is_err());
     }
 
     #[test]

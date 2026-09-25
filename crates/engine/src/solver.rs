@@ -5,7 +5,9 @@ use rayon::prelude::*;
 
 use crate::schedule::{DiscountSchedule, Discounts};
 use crate::scratch::Scratch;
-use crate::storage::{StateMismatch, Storage, StorageRef, StorageSpan, StorageState, StorageView};
+use crate::storage::{
+    StateMismatch, Storage, StorageRef, StorageSpan, StorageState, StorageStateRef, StorageView,
+};
 use crate::tree::{NodeId, NodeKind, PublicTree};
 
 /// Variant-owned terminal evaluation — the only variant code on the hot
@@ -70,6 +72,16 @@ impl Default for ParConfig {
 pub struct SolverState {
     pub iteration: u64,
     pub storage: StorageState,
+}
+
+/// Serialization view of the current iteration and borrowed storage arenas.
+/// Its field order and wire representation match [`SolverState`], which remains
+/// the owned representation used when reading and restoring a checkpoint.
+#[derive(Clone, Copy, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+pub struct SolverStateRef<'a> {
+    pub iteration: u64,
+    pub storage: StorageStateRef<'a>,
 }
 
 /// Vector-form CFR solver with alternating updates.
@@ -140,12 +152,21 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         &self.storage
     }
 
-    /// Snapshots the iteration count and storage backend contents for a
-    /// checkpoint.
+    /// Copies the iteration count and storage backend contents into an owned
+    /// snapshot. Use [`Self::state_ref`] when writing a checkpoint immediately.
     pub fn state(&self) -> SolverState {
         SolverState {
             iteration: self.iteration,
             storage: self.storage.state(),
+        }
+    }
+
+    /// Borrows the complete checkpoint state without cloning storage. The
+    /// immutable borrow prevents stepping or restoring while it is serialized.
+    pub fn state_ref(&self) -> SolverStateRef<'_> {
+        SolverStateRef {
+            iteration: self.iteration,
+            storage: self.storage.state_ref(),
         }
     }
 
@@ -291,6 +312,20 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     ///
     /// Entries are `None` for storage refs the pass never reached.
     pub fn expected_values_everywhere(&self, p: Player) -> Vec<Option<Vec<f32>>> {
+        self.expected_values_where(p, |_| true)
+    }
+
+    /// Per-hand values at selected action nodes, indexed by `StorageRef::index`.
+    ///
+    /// Every downstream value is still computed: `include` controls only which
+    /// completed action-node vectors are copied into the result. Unselected
+    /// entries stay `None`, saving their allocation without changing values at
+    /// selected ancestors. The predicate may run concurrently at chance branches.
+    pub fn expected_values_where(
+        &self,
+        p: Player,
+        include: impl Fn(NodeId) -> bool + Sync,
+    ) -> Vec<Option<Vec<f32>>> {
         let recorded = Mutex::new(vec![None; self.game.tree.storage_refs.len()]);
         let ctx = ValueCtx {
             tree: &self.game.tree,
@@ -312,9 +347,11 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             }
         };
         let record = |node: NodeId, values: &[f32]| {
-            let sref = ctx.tree.storage_ref(ctx.tree.node(node));
-            recorded.lock().expect("value recorder mutex")[sref.index as usize] =
-                Some(values.to_vec());
+            if include(node) {
+                let sref = ctx.tree.storage_ref(ctx.tree.node(node));
+                recorded.lock().expect("value recorder mutex")[sref.index as usize] =
+                    Some(values.to_vec());
+            }
         };
         let mut scratch = Scratch::new();
         let mut out = scratch.take(self.game.tree.root_dims[p] as usize);

@@ -6,6 +6,7 @@
 //! tree-building path so the correctness harness exercises real code.
 
 mod payoff;
+pub mod r1;
 mod toy;
 
 pub use payoff::{

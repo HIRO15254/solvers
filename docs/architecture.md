@@ -210,7 +210,7 @@ source revision だけで dirty tree を識別できない場合は、source/bin
 | 用途 | 現在の所有箇所 | 意味 |
 |---|---|---|
 | HU checkpoint `.ckpt` | `formats::checkpoint` + CLI driver | 再開に必要な solver state。viewer artifact と互換扱いしない |
-| HU solution `.sol` | `formats::sol` + CLI artifact query | 平均戦略(u16)と per-hand 値(i16/scale)、config、metadata。`Full` / `NoRivers` |
+| HU solution `.sol` | `formats::sol` / `sol_indexed` + CLI artifact query | v2のchecked metadataとsref directory、node別zstd frame。平均戦略(u16)と per-hand 値(i16/scale)。`Full` / `NoRivers` |
 | Multiway checkpoint `.mwckpt` | `multiway::checkpoint` | state と RNG / policy / history の復元。container と state の version を検査 |
 | Multiway solution `.mwsol` | `formats::mwsol` + CLI artifact query | 正式な平均 profile と metadata。保存 coverage と評価可能範囲を区別 |
 | run / progress / event | `formats::run`、`metrics`、`multiway` | lifecycle、定期測定、離散事象を別データとして保持 |
@@ -218,6 +218,8 @@ source revision だけで dirty tree を識別できない場合は、source/bin
 `.sol` は戦略だけのファイルではない。保存対象 node の値も持ち、`NoRivers` の再 solve で
 元の per-hand 値を上書き解釈しない。`export` / `compare` / `report` と対話 `inspect` が現在の
 query 表面であり、完全なコマンド・family 対応は [CLI reference](cli-reference.jp.md) に置く。
+summaryのroot/all照会はmetadataだけを復元する。全読込み時は各nodeのchecksumと再構築treeを照合する。
+checkpointはpostcardをbuffer経由でzstd/fileへ逐次書き、従来のv1復元byte列を維持する。
 共通 `NodeQuery/NodeReport`、UPI 互換 protocol、`solvers bench`、PyO3/WASM adapter は
 現行の公開 API として扱わない。benchmark は Cargo bench と検証用 runner で行う。
 
@@ -375,7 +377,7 @@ f64集計は既存方式と同じである。sparse側は従来mapを使い、tr
 
 | 接続点 | 設計で確認すること |
 |---|---|
-| 共通ゲーム記述 | 配札・観測・交換・情報集合・行動・精算を小さい Stud/Draw 等で検証する。既存 HU hot path には compiled tree と専用 kernel を維持 |
+| 共通ゲーム記述 | [T1-02の設計](plans/r1-common-game-boundary.jp.md)で cold path の観測・私的履歴・phase・精算と HU lowering の適格条件を定義。Stud/Draw/split pot の縮小fixtureで検証し、既存 HU hot path には compiled tree と専用 kernel を維持 |
 | NN leaf / 学習 / 局所探索 | 3係数の `PostflopModel` を前提にせず、range 条件付き value、教師の品質・単位・抽象化・horizon、batch 推論の境界を設計 |
 | ICM / Nodelock / profile | legal action、戦略制約、主観評価、客観 EV を分離し、適用 horizon と教師の条件を保存 |
 | subgame re-solve / action translation | 履歴・到達 range・境界値・安全性を検証し、HU の保証を Multiway へ流用しない |

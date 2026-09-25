@@ -46,6 +46,11 @@ R0の着手順・手順・成果物・完了条件は[R0実行計画・作業票
 現行契約は[HU等の規範](solver-config-v1.jp.md)と[Multiway規範](multiway-preflop-v1.jp.md)が正本。
 実装時には規範、実装guide、parser/runtime、CLI、user guide、test、例、metadataを同じ変更で同期する。
 
+2026-09-25に、R1でNLH HU Postflopの入出力形式と同等Exploitabilityに必要な時間・メモリを改善すること、
+他ゲームへの拡張性を残すこと、開発中の破壊的仕様変更を許容することを確認した。
+実行マシンの競合を避けるためのGCP Spot VM実験も累計$20以内で許可された。
+このR1限定の支出許可は、後続の学習・教師大量生成の予算を意味しない。[R1実行票](plans/r1-execution-plan.jp.md)を参照する。
+
 ## 2. ヒアリングと決定台帳
 
 未回答を合意に置き換えない。確認済みの方針と、詳細を詰めるための提案を分ける。

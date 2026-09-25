@@ -127,41 +127,50 @@ fn compatible_reach(opp_reach: &[f32]) -> Vec<f32> {
         .collect()
 }
 
-/// Walks the tree once carrying both players' reach, calling `visit` at
-/// every action node.
+/// Walks included subtrees carrying both players' reach, calling `visit` at
+/// each action node with the same strategy used to propagate the reach.
 ///
 /// `engine::reach_at` answers one node by re-walking the path to it, which
 /// is the right shape for a viewer but quadratic when every node needs an
 /// answer. Only the current path's reaches are alive at a time, so this
-/// stays linear in memory as well as in work.
+/// stays bounded by path depth in memory. `include` must retain all ancestors
+/// of a retained node: a rejected child prunes its entire subtree before any
+/// reach vector is allocated or mapped for it.
 fn walk_reaches<F>(
     tree: &engine::PublicTree,
     node_id: NodeId,
     reach: &PerPlayer<Vec<f32>>,
     strategy: &dyn Fn(NodeId) -> Vec<f32>,
+    include: &dyn Fn(NodeId) -> bool,
     visit: &mut F,
 ) where
-    F: FnMut(NodeId, &PerPlayer<Vec<f32>>),
+    F: FnMut(NodeId, &PerPlayer<Vec<f32>>, &[f32]),
 {
     let node = *tree.node(node_id);
     match node.kind {
         NodeKind::Terminal => {}
         NodeKind::Action => {
-            visit(node_id, reach);
             let sref = tree.storage_ref(&node);
             let num_hands = sref.num_hands as usize;
             let sigma = strategy(node_id);
+            visit(node_id, reach, &sigma);
             for (position, child) in tree.children(node_id).enumerate() {
+                if !include(child) || tree.node(child).kind == NodeKind::Terminal {
+                    continue;
+                }
                 let column = &sigma[position * num_hands..(position + 1) * num_hands];
                 let mut next = reach.clone();
                 for (r, &c) in next[node.player].iter_mut().zip(column) {
                     *r *= c;
                 }
-                walk_reaches(tree, child, &next, strategy, visit);
+                walk_reaches(tree, child, &next, strategy, include, visit);
             }
         }
         NodeKind::Chance => {
             for (position, child) in tree.children(node_id).enumerate() {
+                if !include(child) || tree.node(child).kind == NodeKind::Terminal {
+                    continue;
+                }
                 let deal = *tree.deal(&node, position);
                 let mut next = PerPlayer::new(Vec::new(), Vec::new());
                 for player in Player::BOTH {
@@ -171,7 +180,7 @@ fn walk_reaches<F>(
                     tree.map_reach_into(map, &reach[player], &mut mapped);
                     next[player] = mapped;
                 }
-                walk_reaches(tree, child, &next, strategy, visit);
+                walk_reaches(tree, child, &next, strategy, include, visit);
             }
         }
     }
@@ -185,10 +194,9 @@ fn walk_reaches<F>(
 /// store nothing at all -- this forces `Full` instead, printing a note only
 /// when that actually overrides the caller's requested mode.
 ///
-/// `summary` supplies the iteration count and exploitability from the just-
-/// finished run; `solver` is queried directly (rather than trusting anything
-/// cached in `summary`) for both players' expected value, since a raked
-/// (general-sum) game's `ev[1]` is never just `-ev[0]`.
+/// `summary` supplies the final iteration count, root EV and exploitability.
+/// Both players' per-node values are computed independently, since a raked
+/// (general-sum) game's values need not sum to zero.
 pub(crate) fn export_sol<S: Storage>(
     spec: &SolExportSpec,
     solver: &Solver<PostflopEvaluator, S>,
@@ -211,45 +219,27 @@ pub(crate) fn export_sol<S: Storage>(
         spec.mode
     };
 
-    // One value pass per player records every action node's per-hand
-    // values, so storing them costs two walks of the tree rather than one
-    // walk per node.
-    let recorded = PerPlayer::new(
-        solver.expected_values_everywhere(Player::P0),
-        solver.expected_values_everywhere(Player::P1),
+    // Downstream river values still contribute to every retained trunk
+    // node, but no-rivers need not keep copies of the river vectors.
+    let include = |id: NodeId| mode == SolStreets::Full || streets[id as usize] != Street::River;
+    let mut recorded = PerPlayer::new(
+        solver.expected_values_where(Player::P0, include),
+        solver.expected_values_where(Player::P1, include),
     );
 
-    // Reaches for every node in one walk, so a node's counterfactual values
-    // can be turned into per-hand chips where they are produced.
-    let mut reaches: Vec<Option<PerPlayer<Vec<f32>>>> = vec![None; tree.nodes.len()];
-    {
-        let strategy = |id: NodeId| solver.average_strategy_at(id);
-        let roots = &solver.game().root_ranges;
-        let root_reach = PerPlayer::new(roots[Player::P0].clone(), roots[Player::P1].clone());
-        walk_reaches(tree, 0, &root_reach, &strategy, &mut |id, reach| {
-            reaches[id as usize] = Some(reach.clone());
-        });
-    }
-
+    // Quantize while the current path's reach is alive. Consume each saved
+    // CFV after use instead of retaining reaches/CFVs for the whole export.
+    let strategy = |id: NodeId| solver.average_strategy_at(id);
+    let roots = &solver.game().root_ranges;
     let mut blocks = Vec::new();
     let mut values = Vec::new();
-    for id in 0..tree.nodes.len() as NodeId {
+    let mut visit = |id: NodeId, reach: &PerPlayer<Vec<f32>>, avg: &[f32]| {
         let node = tree.node(id);
-        if node.kind != NodeKind::Action {
-            continue;
-        }
-        if mode == SolStreets::NoRivers && streets[id as usize] == Street::River {
-            continue;
-        }
-        let avg = solver.average_strategy_at(id);
         blocks.push(StrategyBlock {
             sref: node.aux,
-            probs: quantize_probs(&avg),
+            probs: quantize_probs(avg),
         });
-        let reach = reaches[id as usize]
-            .as_ref()
-            .expect("every action node is visited by the reach walk");
-        let mut per_node = Vec::new();
+        let mut per_node = Vec::with_capacity(reach[Player::P0].len() + reach[Player::P1].len());
         for player in Player::BOTH {
             // A counterfactual value is opponent-reach-weighted, so it has
             // to be divided by the reach that could be facing this hand
@@ -261,8 +251,8 @@ pub(crate) fn export_sol<S: Storage>(
             // adding chips at all would mix units for ICM.
             let offset = ev_offset[player] as f32;
             let per_hand = recorded[player][node.aux as usize]
-                .as_ref()
-                .expect("every action node is recorded by the value pass");
+                .take()
+                .expect("every retained action node is recorded by the value pass");
             let own = &reach[player];
             per_node.extend(per_hand.iter().zip(&compatible).zip(own).map(
                 |((value, &facing), &here)| {
@@ -288,10 +278,9 @@ pub(crate) fn export_sol<S: Storage>(
             scale,
             values: bytes,
         });
-    }
-    // Ascending by construction (node ids walked in order and `aux` assigned
-    // in build order), but sorted explicitly to make that guarantee robust
-    // to any future change in how `aux` is assigned.
+    };
+    walk_reaches(tree, 0, roots, &strategy, &include, &mut visit);
+    // Keep the on-disk sref ordering independent of tree traversal order.
     blocks.sort_by_key(|b| b.sref);
     values.sort_by_key(|b| b.sref);
     let block_count = blocks.len();
@@ -312,6 +301,7 @@ pub(crate) fn export_sol<S: Storage>(
         config_toml: spec.config_toml.clone(),
         meta,
         mode: mode.into(),
+        node_count: tree.nodes.len() as u64,
         blocks,
         values,
     };
@@ -420,6 +410,13 @@ pub(crate) fn load_sol(
         utility: utility.as_ref(),
     };
     let pf_game = build_postflop_game(&pf_config, pipeline);
+    if payload.node_count != pf_game.game.tree.nodes.len() as u64 {
+        bail!(
+            "artifact node count {} does not match the rebuilt tree's {} nodes",
+            payload.node_count,
+            pf_game.game.tree.nodes.len(),
+        );
+    }
     eprintln!(
         "tree rebuilt in {:.2}s ({} nodes)",
         build_start.elapsed().as_secs_f64(),
@@ -430,28 +427,86 @@ pub(crate) fn load_sol(
     let streets = node_streets(&pf_game.game.tree, start_street);
     let parents = parent_array(&pf_game.game.tree);
 
-    let expected: HashSet<u32> = pf_game
-        .game
-        .tree
-        .nodes
-        .iter()
-        .enumerate()
-        .filter(|(id, node)| {
-            node.kind == NodeKind::Action
-                && (payload.mode == StreetsStored::Full || streets[*id] != Street::River)
-        })
-        .map(|(_, node)| node.aux)
-        .collect();
+    // Derive shapes from the rebuilt game, never from the untrusted block
+    // lengths. Carry both private dimensions through chance maps: a value
+    // block holds H0 + H1 entries, not twice the acting player's dimension.
+    let tree = &pf_game.game.tree;
+    let roots = &pf_game.game.root_ranges;
+    let root_dims = PerPlayer::new(
+        u32::try_from(roots[Player::P0].len()).context("OOP range dimension exceeds u32")?,
+        u32::try_from(roots[Player::P1].len()).context("IP range dimension exceeds u32")?,
+    );
+    if root_dims != tree.root_dims {
+        bail!("rebuilt tree's root dimensions do not match its ranges");
+    }
+    let mut expected = HashMap::new();
+    let mut pending = vec![(0, root_dims)];
+    while let Some((id, dims)) = pending.pop() {
+        if payload.mode == StreetsStored::NoRivers && streets[id as usize] == Street::River {
+            continue;
+        }
+        let node = tree.node(id);
+        if node.kind == NodeKind::Action {
+            let sref = tree.storage_ref(node);
+            if sref.num_hands != dims[node.player] {
+                bail!(
+                    "rebuilt tree's private dimension disagrees at sref {}",
+                    node.aux
+                );
+            }
+            let strategy_bytes = usize::from(sref.num_actions)
+                .checked_mul(usize::try_from(sref.num_hands)?)
+                .and_then(|len| len.checked_mul(2))
+                .context("strategy block length overflow")?;
+            let value_len = usize::try_from(dims[Player::P0])?
+                .checked_add(usize::try_from(dims[Player::P1])?)
+                .context("value block length overflow")?;
+            let value_bytes = value_len
+                .checked_mul(2)
+                .context("value block byte length overflow")?;
+            expected.insert(node.aux, (strategy_bytes, value_len, value_bytes));
+        }
+        for (position, child) in tree.children(id).enumerate() {
+            let child_dims = if node.kind == NodeKind::Chance {
+                let deal = tree.deal(node, position);
+                PerPlayer::new(
+                    tree.mapped_dim(deal.maps[Player::P0], dims[Player::P0]),
+                    tree.mapped_dim(deal.maps[Player::P1], dims[Player::P1]),
+                )
+            } else {
+                dims
+            };
+            pending.push((child, child_dims));
+        }
+    }
 
     let stored_len = payload.blocks.len();
     let got: HashSet<u32> = payload.blocks.iter().map(|b| b.sref).collect();
-    if got.len() != stored_len || got != expected {
+    if got.len() != stored_len
+        || got.len() != expected.len()
+        || !got.iter().all(|sref| expected.contains_key(sref))
+    {
         return Err(anyhow!(
             "artifact does not match the rebuilt tree: {stored_len} stored block(s) vs {} \
              expected action node(s) for mode {:?}",
             expected.len(),
             payload.mode,
         ));
+    }
+
+    let value_keys: HashSet<u32> = payload.values.iter().map(|b| b.sref).collect();
+    if value_keys.len() != payload.values.len() || value_keys != got {
+        bail!("artifact strategy and value blocks must cover exactly the same nodes");
+    }
+    for block in &payload.blocks {
+        let (strategy_bytes, _, _) = expected[&block.sref];
+        if block.probs.len() != strategy_bytes {
+            bail!(
+                "strategy block length mismatch for sref {}: expected {strategy_bytes} bytes, got {}",
+                block.sref,
+                block.probs.len(),
+            );
+        }
     }
 
     let blocks: HashMap<u32, Vec<u8>> = payload
@@ -466,20 +521,28 @@ pub(crate) fn load_sol(
         .values
         .into_iter()
         .map(|b| {
-            let len = b.values.len() / 2;
+            let (_, len, value_bytes) = expected[&b.sref];
+            if b.values.len() != value_bytes {
+                bail!(
+                    "value block length mismatch for sref {}: expected {value_bytes} bytes, got {}",
+                    b.sref,
+                    b.values.len(),
+                );
+            }
+            if !b.scale.is_finite() || b.scale < 0.0 {
+                bail!(
+                    "value block scale must be finite and nonnegative for sref {}",
+                    b.sref
+                );
+            }
             let restored = dequantize_values(&b.values, b.scale, len)
                 .with_context(|| format!("decoding stored values for sref {}", b.sref))?;
+            if restored.iter().any(|value| !value.is_finite()) {
+                bail!("nonfinite decoded value for sref {}", b.sref);
+            }
             Ok((b.sref, restored))
         })
         .collect::<Result<_>>()?;
-    if values.len() != blocks.len() {
-        return Err(anyhow!(
-            "artifact stores {} strategy block(s) but {} value block(s); \
-             the two must cover the same nodes",
-            blocks.len(),
-            values.len(),
-        ));
-    }
 
     Ok(LoadedSol {
         pf_game,
@@ -1466,6 +1529,372 @@ check_every = 16
             assert!(
                 saw_river,
                 "{mode:?}: fixture has no river action node to check"
+            );
+        }
+    }
+
+    /// Point queries rebuild each selected node's reach independently and
+    /// evaluate its subtree. Their quantized bytes must match the batched
+    /// export, including unreachable hands and the common trunk of both modes.
+    fn assert_export_matches_node_queries<S: Storage>() {
+        let (solver, _node_info, start_street, summary) = build_and_solve::<S>(TINY_TURN_TOML, 1);
+        let internal = crate::solve::solver_ev(&solver);
+        let offset = PerPlayer::new(
+            summary.ev[Player::P0] - internal[Player::P0],
+            summary.ev[Player::P1] - internal[Player::P1],
+        );
+        let tree = &solver.game().tree;
+        let streets = node_streets(tree, start_street);
+        let full_path = temp_path("point-query-full.sol");
+        let mut spec = SolExportSpec {
+            path: full_path.clone(),
+            mode: SolStreets::Full,
+            config_toml: TINY_TURN_TOML.to_string(),
+            storage_name: "f32".into(),
+        };
+        super::export_sol(&spec, &solver, offset, start_street, &summary).expect("full export");
+        let full = read_sol(&full_path).expect("full payload");
+        let _ = std::fs::remove_file(&full_path);
+        let roots = &solver.game().root_ranges;
+        let root_slices =
+            PerPlayer::new(roots[Player::P0].as_slice(), roots[Player::P1].as_slice());
+        let mut nodes: Vec<_> = (0..tree.nodes.len() as NodeId)
+            .filter(|&id| tree.node(id).kind == NodeKind::Action)
+            .collect();
+        nodes.sort_by_key(|&id| tree.node(id).aux);
+        assert_eq!(full.blocks.len(), nodes.len());
+        assert_eq!(full.values.len(), nodes.len());
+        let mut retained = vec![false; tree.storage_refs.len()];
+        for ((id, block), value_block) in nodes.iter().zip(&full.blocks).zip(&full.values) {
+            let id = *id;
+            let sref = tree.node(id).aux;
+            assert_eq!(block.sref, sref);
+            assert_eq!(value_block.sref, sref);
+            assert_eq!(block.probs, quantize_probs(&solver.average_strategy_at(id)));
+            let reach = reach_at(tree, root_slices, id, |source, _, out| {
+                out.copy_from_slice(&solver.average_strategy_at(source));
+            });
+            let reach_slices =
+                PerPlayer::new(reach[Player::P0].as_slice(), reach[Player::P1].as_slice());
+            let mut expected = Vec::new();
+            for player in Player::BOTH {
+                let cfvs = solver.expected_values_at(id, player, reach_slices);
+                let facing = compatible_reach(&reach[player.opponent()]);
+                expected.extend(cfvs.iter().zip(&facing).zip(&reach[player]).map(
+                    |((&cfv, &opponent), &own)| {
+                        if own > 0.0 && opponent > 0.0 {
+                            cfv / opponent + offset[player] as f32
+                        } else {
+                            0.0
+                        }
+                    },
+                ));
+            }
+            let (scale, bytes) = quantize_values(&expected);
+            assert_eq!(value_block.scale.to_bits(), scale.to_bits(), "node {id}");
+            assert_eq!(value_block.values, bytes, "node {id}");
+            retained[sref as usize] = streets[id as usize] != Street::River;
+        }
+
+        let trunk_path = temp_path("point-query-trunk.sol");
+        spec.path = trunk_path.clone();
+        spec.mode = SolStreets::NoRivers;
+        super::export_sol(&spec, &solver, offset, start_street, &summary).expect("trunk export");
+        let trunk = read_sol(&trunk_path).expect("trunk payload");
+        let _ = std::fs::remove_file(&trunk_path);
+        assert_eq!(
+            trunk.blocks,
+            full.blocks
+                .into_iter()
+                .filter(|block| retained[block.sref as usize])
+                .collect::<Vec<_>>()
+        );
+        assert_eq!(
+            trunk.values,
+            full.values
+                .into_iter()
+                .filter(|block| retained[block.sref as usize])
+                .collect::<Vec<_>>()
+        );
+
+        // No-rivers must never request a river strategy for reach propagation.
+        let include = |id: NodeId| streets[id as usize] != Street::River;
+        let strategy = |id: NodeId| {
+            assert!(include(id));
+            solver.average_strategy_at(id)
+        };
+        let mut visited = 0;
+        walk_reaches(tree, 0, roots, &strategy, &include, &mut |_, _, _| {
+            visited += 1;
+        });
+        assert_eq!(visited, trunk.blocks.len());
+        assert!(visited < nodes.len());
+    }
+
+    #[test]
+    fn exported_values_match_point_queries_f32() {
+        assert_export_matches_node_queries::<F32Storage>();
+    }
+
+    #[test]
+    fn exported_values_match_point_queries_i16() {
+        assert_export_matches_node_queries::<engine::I16Storage>();
+    }
+
+    #[derive(Debug)]
+    struct ProfileEvaluation {
+        ev: PerPlayer<f64>,
+        br: PerPlayer<f64>,
+        nash_conv: f64,
+    }
+
+    fn evaluate_profile<S: Storage>(solver: &Solver<PostflopEvaluator, S>) -> ProfileEvaluation {
+        // Evaluate both seats independently, including in the zero-sum case.
+        let ev = PerPlayer::new(
+            solver.expected_value(Player::P0),
+            solver.expected_value(Player::P1),
+        );
+        let br = PerPlayer::new(
+            solver.best_response_value(Player::P0),
+            solver.best_response_value(Player::P1),
+        );
+        ProfileEvaluation {
+            ev,
+            br,
+            nash_conv: (br[Player::P0] - ev[Player::P0]) + (br[Player::P1] - ev[Player::P1]),
+        }
+    }
+
+    /// Test-only evaluator input: the stored average policy is all that is
+    /// restored. Zero regrets are never stepped, and absent river policies
+    /// must not turn into the storage backend's uniform fallback.
+    fn restore_full_artifact_profile(
+        loaded: LoadedSol,
+    ) -> Result<Solver<PostflopEvaluator, F32Storage>> {
+        if loaded.mode != StreetsStored::Full {
+            bail!("saved-profile evaluation requires a Full artifact");
+        }
+        let tree = &loaded.pf_game.game.tree;
+        if loaded.blocks.len() != tree.storage_refs.len() {
+            bail!("saved-profile evaluation requires every storage ref");
+        }
+        let mut strategy_sum = vec![0.0; tree.storage_len];
+        for sref in &tree.storage_refs {
+            let bytes = loaded
+                .blocks
+                .get(&sref.index)
+                .context("missing saved policy")?;
+            let policy =
+                dequantize_probs(bytes, sref.num_actions as usize, sref.num_hands as usize)?;
+            strategy_sum[sref.offset..sref.offset + sref.len()].copy_from_slice(&policy);
+        }
+        let state = engine::SolverState {
+            iteration: loaded.meta.iterations,
+            storage: engine::StorageState::F32 {
+                regrets: vec![0.0; tree.storage_len],
+                strategy_sum,
+            },
+        };
+        let mut solver = Solver::new(
+            loaded.pf_game.game,
+            Box::<Dcfr>::default(),
+            Some(state.iteration),
+        );
+        solver.restore_state(state)?;
+        Ok(solver)
+    }
+
+    /// A priori fixture tolerance, independent of the observed EV difference.
+    /// Rounding A probabilities to multiples of 1/D has L1 error <= A/(2D);
+    /// renormalization gives TV <= A/(2D-A). A coupling over at most L action
+    /// decisions bounds EV drift by payoff_span * L * TV. The same bound
+    /// applies to each fixed response, hence also their maximum (BR).
+    fn saved_profile_value_tolerance(tree: &engine::PublicTree, payoff_span: f64) -> f64 {
+        let max_actions = tree
+            .storage_refs
+            .iter()
+            .map(|sref| sref.num_actions)
+            .max()
+            .unwrap() as f64;
+        let mut longest = 0;
+        let mut pending = vec![(0, 0u32)];
+        while let Some((id, depth)) = pending.pop() {
+            let depth = depth + u32::from(tree.node(id).kind == NodeKind::Action);
+            longest = longest.max(depth);
+            pending.extend(tree.children(id).map(|child| (child, depth)));
+        }
+        let epsilon = f32::EPSILON as f64;
+        // Cover f32 probability conversion/normalization in both profiles.
+        let node_tv = max_actions / (2.0 * 65_535.0 - max_actions) + 4.0 * max_actions * epsilon;
+        // Fixed numerical allowance for these small chip-EV fixtures' f32
+        // terminal/chance reductions; not a bound for arbitrary game sizes.
+        payoff_span * (f64::from(longest) * node_tv + 256.0 * epsilon)
+    }
+
+    fn assert_saved_full_profile_is_evaluated<S: Storage>(raw: &str, storage: &str) {
+        let (source, node_info, start_street, summary) = build_and_solve::<S>(raw, 3);
+        let before_quantization = evaluate_profile(&source);
+        let directory = tempfile::tempdir().unwrap();
+        let mut spec = SolExportSpec {
+            path: directory.path().join("saved-profile.sol"),
+            mode: SolStreets::Full,
+            config_toml: raw.to_owned(),
+            storage_name: storage.to_owned(),
+        };
+        export_sol(&spec, &source, &node_info, start_street, &summary).unwrap();
+        let loaded = load_sol(&spec.path, 0, None).unwrap();
+        let offset = postflop_setup::subgame_ev_offset(&loaded.config, loaded.utility.as_ref());
+        let payoff_span =
+            f64::from(loaded.config.pot.0) + 2.0 * f64::from(loaded.config.effective_stack.0);
+        let value_tolerance = saved_profile_value_tolerance(&loaded.pf_game.game.tree, payoff_span);
+
+        // Metadata remains an exact record of the live, pre-quantization
+        // solve. It is not used as the saved profile's evaluation result.
+        assert_eq!(
+            loaded.meta.ev,
+            [summary.ev[Player::P0], summary.ev[Player::P1]]
+        );
+        assert_eq!(loaded.meta.expl, [summary.expl_p0, summary.expl_p1]);
+        assert_eq!(loaded.meta.nash_conv, summary.nash_conv);
+        for player in Player::BOTH {
+            assert_eq!(
+                loaded.meta.ev[player.index()],
+                before_quantization.ev[player] + offset[player]
+            );
+            assert!(
+                (loaded.meta.expl[player.index()]
+                    - (before_quantization.br[player] - before_quantization.ev[player]))
+                    .abs()
+                    <= value_tolerance
+            );
+        }
+        let saved = restore_full_artifact_profile(loaded).unwrap();
+        assert_eq!(saved.iteration(), source.iteration());
+        let after_quantization = evaluate_profile(&saved);
+        for player in Player::BOTH {
+            assert!(
+                (after_quantization.ev[player] - before_quantization.ev[player]).abs()
+                    <= value_tolerance,
+                "{storage} {start_street:?} {player:?}: EV drift exceeds {value_tolerance}"
+            );
+            assert!(
+                (after_quantization.br[player] - before_quantization.br[player]).abs()
+                    <= value_tolerance,
+                "{storage} {start_street:?} {player:?}: BR drift exceeds {value_tolerance}"
+            );
+        }
+        assert!(
+            (after_quantization.nash_conv - before_quantization.nash_conv).abs()
+                <= 4.0 * value_tolerance
+        );
+        println!(
+            "saved-profile {storage} {start_street:?}: before={before_quantization:?}, after={after_quantization:?}, value_tolerance={value_tolerance}"
+        );
+
+        if start_street == Street::Turn {
+            spec.mode = SolStreets::NoRivers;
+            export_sol(&spec, &source, &node_info, start_street, &summary).unwrap();
+            let trunk = load_sol(&spec.path, 0, None).unwrap();
+            assert!(trunk.blocks.len() < trunk.pf_game.game.tree.storage_refs.len());
+            let error = restore_full_artifact_profile(trunk)
+                .err()
+                .expect("incomplete profile must fail");
+            assert!(error.to_string().contains("requires a Full artifact"));
+        }
+    }
+
+    #[test]
+    fn full_artifact_profiles_are_reevaluated_after_u16_quantization() {
+        let raked_river =
+            format!("{TINY_RIVER_TOML}\n[rake]\nkind = \"percent-cap\"\nrate = 0.125\ncap = 1.5\n");
+        for raw in [raked_river.as_str(), TINY_TURN_TOML] {
+            assert_saved_full_profile_is_evaluated::<F32Storage>(raw, "f32");
+            assert_saved_full_profile_is_evaluated::<I16Storage>(raw, "i16");
+        }
+    }
+
+    #[test]
+    fn load_rejects_metadata_node_count_disagreement() {
+        let (solver, node_info, start_street, summary) =
+            build_and_solve::<F32Storage>(TINY_RIVER_TOML, 0);
+        let path = temp_path("node-count.sol");
+        let spec = SolExportSpec {
+            path: path.clone(),
+            mode: SolStreets::Full,
+            config_toml: TINY_RIVER_TOML.to_string(),
+            storage_name: "f32".into(),
+        };
+        export_sol(&spec, &solver, &node_info, start_street, &summary).expect("export");
+        let mut payload = read_sol(&path).expect("payload");
+        let _ = std::fs::remove_file(&path);
+        payload.node_count += 1;
+        let corrupt_path = temp_path("node-count-mismatch.sol");
+        write_sol(&corrupt_path, &payload).expect("mismatched metadata");
+        let error = load_sol(&corrupt_path, 0, None)
+            .err()
+            .expect("node count mismatch must fail");
+        let _ = std::fs::remove_file(&corrupt_path);
+        assert!(error.to_string().contains("node count"), "{error}");
+    }
+
+    #[test]
+    fn load_rejects_reencoded_block_shape_and_scale_errors() {
+        let (solver, node_info, start_street, summary) =
+            build_and_solve::<F32Storage>(TINY_RIVER_TOML, 0);
+        let directory = tempfile::tempdir().expect("temporary directory");
+        let path = directory.path().join("block-shape.sol");
+        let spec = SolExportSpec {
+            path: path.clone(),
+            mode: SolStreets::Full,
+            config_toml: TINY_RIVER_TOML.to_string(),
+            storage_name: "f32".into(),
+        };
+        export_sol(&spec, &solver, &node_info, start_street, &summary).expect("export");
+        let valid = read_sol(&path).expect("valid payload");
+        load_sol(&path, 0, None).expect("valid shapes and zero scales are accepted");
+
+        for (damage, expected_error) in [
+            ("short-strategy", "strategy block length mismatch"),
+            ("short-values", "value block length mismatch"),
+            ("nan-scale", "scale must be finite and nonnegative"),
+            ("infinite-scale", "scale must be finite and nonnegative"),
+            ("negative-scale", "scale must be finite and nonnegative"),
+            ("overflow-values", "nonfinite decoded value"),
+            ("missing-node", "artifact does not match the rebuilt tree"),
+        ] {
+            let mut payload = valid.clone();
+            match damage {
+                "short-strategy" => {
+                    let probs = &mut payload.blocks[0].probs;
+                    probs.truncate(probs.len() - 2);
+                }
+                "short-values" => {
+                    let values = &mut payload.values[0].values;
+                    values.truncate(values.len() - 2);
+                }
+                "nan-scale" => payload.values[0].scale = f32::NAN,
+                "infinite-scale" => payload.values[0].scale = f32::INFINITY,
+                "negative-scale" => payload.values[0].scale = -1.0,
+                "overflow-values" => {
+                    payload.values[0].scale = f32::MAX;
+                    payload.values[0].values[..2].copy_from_slice(&2i16.to_le_bytes());
+                }
+                "missing-node" => {
+                    payload.blocks.pop();
+                    payload.values.pop();
+                }
+                _ => unreachable!(),
+            }
+            // Re-encode through the real v2 writer: lengths/checksums and
+            // frame identities are valid, but the semantic block is not.
+            write_sol(&path, &payload).expect("reencode with valid frame checksums");
+            read_sol(&path).expect("format framing itself remains valid");
+            let error = load_sol(&path, 0, None)
+                .err()
+                .unwrap_or_else(|| panic!("{damage} must fail during full load"));
+            assert!(
+                error.to_string().contains(expected_error),
+                "{damage}: {error}"
             );
         }
     }
