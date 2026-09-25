@@ -12,7 +12,7 @@
 
 `daily+extended`の8件は拡張24件に含まれる。日常のstreet配分はFlop 4・Turn 3・River 1。V8ではsqueeze後Riverの`HU-R0-022`より、dead moneyのないSB limp・BB check Flopの`HU-R0-023`を日常代表に選んだ。このため当初案のFlop 3・Turn 3・River 2から変更した。別streetへ進んだ場合も、開始boardとPostflop履歴が異なる問題として別IDにした。同一問題内の複数hand/actionを件数に算入していない。
 
-**SOL-1の候補選定・基本条件確認・多様性・R1引き渡しの受入条件を満たす。** Cash cEV（rakeなし）を含む24件が確認済みである。rakeありのcash解について、各solutionの徴収条件とutilityの厳密な対応はR1で確認する。本台帳の全行の`comparison_scope`は`pending`であり、同条件比較を認定していない。全数値転記、固定fixture化、新規solve、credits消費は行っていない。
+**SOL-1の候補選定・基本条件確認・多様性・R1引き渡しの受入条件を満たす。** Cash cEV（rakeなし）を含む24件が確認済みである。rakeありのcash解について、各solutionの徴収条件とutilityの厳密な対応はR1で確認する。SOL-4の[測定仕様](measurement-protocol.md) §1で`comparison_scope`を同一ゲーム候補21件・参考比較3件へ暫定区分した。これはSOL-1の閲覧事実や、同条件比較を認定するものではない。全数値転記、固定fixture化、新規solve、credits消費は行っていない。
 
 ## 多様性表
 

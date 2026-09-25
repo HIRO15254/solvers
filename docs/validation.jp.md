@@ -71,6 +71,10 @@ rangeや木の全条件を再現できるケースを数値照合用に採用し
 
 ## 4. 比較・品質指標
 
+R0-04で固定した式、候補区分、欠測処理、時間区間、結果形式は
+[HU Postflop測定仕様](plans/hu-postflop-r0/measurement-protocol.md)を参照する。
+同一ゲームの認定、参照値取得、閾値校正、実測はR1で行う。
+
 ### 外部解との一致
 
 同じ条件に揃えたうえで、range全体のEV、hand/action EV、action頻度を比較する。
