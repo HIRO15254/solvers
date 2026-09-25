@@ -1,0 +1,381 @@
+{
+  "acceptance_gates": [
+    {
+      "id": "external_fixture_condition_match",
+      "reason": "The selected 24 external candidates do not yet have complete, confirmed ranges/full continuation/rake/utility/reference precision evidence.",
+      "status": "not_evaluated"
+    },
+    {
+      "id": "external_threshold_calibration",
+      "reason": "No issued external comparison threshold version; provisional 0.1%/0.02% are not adopted globally.",
+      "status": "not_evaluated"
+    },
+    {
+      "id": "external_suite_quality",
+      "reason": "Synthetic comparisons and diagnostic external runs do not certify the daily/extended reference suites.",
+      "status": "not_evaluated"
+    },
+    {
+      "id": "formal_t1_06_certification",
+      "reason": "No overall R1 scope/threshold/quality/cost certification is issued by this index.",
+      "status": "not_evaluated"
+    }
+  ],
+  "checkpoint_scope": {
+    "additional_source06_regression": "raked River F32 iteration3 -> resume -> iteration6, checkpoint events and recomputed EV/BR/quantized policy agreement",
+    "measured_pipeline": "six completed-cap restore/republish checks, zero additional iterations",
+    "not_claimed": "signal-interrupted HU continuation equals uninterrupted same-K profile; general operational job/cancel/resume acceptance",
+    "ownership_boundary": "R1 F1-04/T1-05 measures saved/resumed values and resources; R2 F2-04/T2-04 explicitly owns operational interruption/resume. Existing 3->6 regression is distinct from the measured zero-step roundtrips."
+  },
+  "external_threshold_version": null,
+  "first_history": {
+    "comparison_created_at": "2026-09-25T16:24:08Z",
+    "pilot_created_at": "2026-09-25T16:21:07Z",
+    "plan_created_at": "2026-09-25T16:22:24Z"
+  },
+  "formal_overall_quality_status": "not_evaluated",
+  "future_external_records": [],
+  "future_record_policy": "Attach hash-pinned JSON evidence without changing this historical index conclusions. A separately issued reviewed criterion/acceptance version is required to promote missing gates; no automatic promotion.",
+  "new_thresholds_issued": false,
+  "performance_acceptance_threshold": null,
+  "publication_kind": "retrospective_evidence_index",
+  "publication_note": "Published after measurement to index existing predeclared criteria; not a backdated threshold version or overall acceptance. No Linear task status is maintained here.",
+  "published_at_utc": "2026-09-25T18:56:37.016089+00:00",
+  "r1_complete": false,
+  "references": {
+    "audit_plan": {
+      "bytes": 105577,
+      "path": "experiments/hu-postflop-r1/pipeline/evidence-vm06-current/records/current/audit-plan/plan.json",
+      "sha256": "88c81719d79173785864cc9a61e7b6bde0fbbb6fadd466afb254da4c244cd5ce"
+    },
+    "audits": {
+      "bytes": 70251,
+      "path": "experiments/hu-postflop-r1/pipeline/evidence-vm06-current/records/current/audits/audits.json",
+      "sha256": "7bf9b1178145cb6227cc870bde4c3263235c621ac9707c71aa536cf4bdab492e"
+    },
+    "boundary_design": {
+      "bytes": 21766,
+      "path": "docs/plans/r1-common-game-boundary.jp.md",
+      "sha256": "77f212d98f8762ee98e7bf66f222fd20d8b9e30bb9abe8db6f106bc5a3cd8f8d"
+    },
+    "checkpoint_wire_test_source": {
+      "bytes": 12412,
+      "path": "crates/formats/src/checkpoint.rs",
+      "sha256": "fa40828f6ac2befa9bf8382fa57e524a7bd7176eea0e9f7cabd0274c68fc56c1"
+    },
+    "current_comparison": {
+      "bytes": 225510,
+      "path": "experiments/hu-postflop-r1/pipeline/evidence-vm06-current/records/current/campaign/comparison.json",
+      "sha256": "911b7fdb5c0ea098fa24f430dd2487f8aafd4bb6b18d7b2c6be63f583fa915c5"
+    },
+    "current_plan": {
+      "bytes": 13820,
+      "path": "experiments/hu-postflop-r1/pipeline/evidence-vm06-current/records/current/frozen/plan.json",
+      "sha256": "6bf01e38faae81b5f97b69414dfcc12aedcf07caf7cd9889c9fb152867061332"
+    },
+    "current_report": {
+      "bytes": 40470,
+      "path": "experiments/hu-postflop-r1/pipeline/current-report.json",
+      "sha256": "f389b01ef53aad3a2a65b909c08e5da8fa17aff703dbbe8c4d006193d92b4f92"
+    },
+    "current_verifier": {
+      "bytes": 35943,
+      "path": "experiments/hu-postflop-r1/pipeline/current-verification.py",
+      "sha256": "3272fc4a9c7a20736e6541dce0fcc79ab7e2e8eee84fbf279cda2f2f5b0bb345"
+    },
+    "first_comparison": {
+      "bytes": 221347,
+      "path": "experiments/hu-postflop-r1/pipeline/evidence-vm05/comparison.json",
+      "sha256": "970c8bca7555a75aab8ae2715f088a29e0a9c37e40ff85f0c4a0e47081229f8b"
+    },
+    "first_config_flop": {
+      "bytes": 678,
+      "path": "experiments/hu-postflop-r1/acceptance/predeclared-source02/configs/flop.toml",
+      "sha256": "c8cb6c07ed18bbcf60f81b1e8022850b0a70f3c584d03b4307d7f5b9c504e7ad"
+    },
+    "first_config_river": {
+      "bytes": 559,
+      "path": "experiments/hu-postflop-r1/acceptance/predeclared-source02/configs/river.toml",
+      "sha256": "cbbe0b27cc7cc5d31a6b11ac9ba9a421bf6e7e755a4306254cc1071a2ab9d790"
+    },
+    "first_config_turn": {
+      "bytes": 548,
+      "path": "experiments/hu-postflop-r1/acceptance/predeclared-source02/configs/turn.toml",
+      "sha256": "726f664ac4417d1d5d6cee145885805fc90cdd719d9d2490fa1f6e49df7067d8"
+    },
+    "first_pilot": {
+      "bytes": 28724,
+      "path": "experiments/hu-postflop-r1/pipeline/evidence-vm05/pilot.json",
+      "sha256": "1c85b181bdbb350b16456ab45e4d13521b73c05c7754fc51775532ec330e118a"
+    },
+    "first_plan": {
+      "bytes": 13763,
+      "path": "experiments/hu-postflop-r1/pipeline/evidence-vm05/plan.json",
+      "sha256": "3314b9a3e61cf19803c2d50325ea7dda2f0858d658e26485d3724f1cba62e7e6"
+    },
+    "first_readme": {
+      "bytes": 9427,
+      "path": "experiments/hu-postflop-r1/acceptance/predeclared-source02/README.md",
+      "sha256": "f8f6e1cdee5afb0c35dff1e838350933eccb55316cd2a120d2c1de1f75eed604"
+    },
+    "first_runner": {
+      "bytes": 29443,
+      "path": "experiments/hu-postflop-r1/acceptance/predeclared-source02/run_campaign.py",
+      "sha256": "8876065d1cc89ba94064dc2d3da4832059aac49ddab153d3688ab6711b6e28ca"
+    },
+    "hu_resume_test_source": {
+      "bytes": 10509,
+      "path": "crates/cli/tests/postflop_run_reuse.rs",
+      "sha256": "7f055258050a8dead650f6a406d71b3babd7c41df702b2a8b5a311d13e1c1755"
+    },
+    "implementation_plan": {
+      "bytes": 43576,
+      "path": "docs/plans/solver-implementation-plan.jp.md",
+      "sha256": "08457345448b7fb284d56b0cb9485cfb73ca1702ce968324cf2688a6628e115d"
+    },
+    "measurement_protocol": {
+      "bytes": 17568,
+      "path": "docs/plans/hu-postflop-r0/measurement-protocol.md",
+      "sha256": "c611f96600dcba452b361d40a485cd14c3a57ddba21dde9711bc289eb6ade892"
+    },
+    "phase_readme": {
+      "bytes": 9325,
+      "path": "experiments/hu-postflop-r1/phases/vm06-report.md",
+      "sha256": "319f7a118f4956133be10c64ae9719b44db0ea7ac3a88969af76c7d0c7114fb6"
+    },
+    "phase_report": {
+      "bytes": 59782,
+      "path": "experiments/hu-postflop-r1/phases/vm06-phase-report.json",
+      "sha256": "2bfdf9fcce753f5f0fc5df4c2809fd03e6fa37752f7049cd836e3dc0abc68c3a"
+    },
+    "r1_execution_plan": {
+      "bytes": 7606,
+      "path": "docs/plans/r1-execution-plan.jp.md",
+      "sha256": "83a39b2881767cb04d47dfbf600866ee1af213a8c2a2fac306136ab4eac3e394"
+    },
+    "river_reference_report": {
+      "bytes": 8088,
+      "path": "experiments/hu-postflop-r1/reference/vm06-river-report.json",
+      "sha256": "1e311ab652689315f4b0652f227e9b514d6fed960ddff6823db4a04d2ff3bbac"
+    },
+    "source02_manifest": {
+      "bytes": 49699,
+      "path": "experiments/hu-postflop-r1/validation/updated/source-manifest.json",
+      "sha256": "d167104639d83d98b78b847ab2f120b7faeabc381a317262bf95b65fbed8d7e9"
+    },
+    "source03_plan": {
+      "bytes": 13808,
+      "path": "experiments/hu-postflop-r1/pipeline/evidence-vm06-v3/records/performance/pipeline/frozen/vm06-v3/plan.json",
+      "sha256": "7f3f3c60fec7d926b73f8b27d4f562a72fbc5ee47a18dcad73117131392a3d6a"
+    },
+    "source06_identity": {
+      "bytes": 1999,
+      "path": "experiments/hu-postflop-r1/validation/vm06-source06/source-verification.json",
+      "sha256": "dd41a6580b4031f09cc104fdabb131e017e123eab60512b5c006736356ae1042"
+    },
+    "source06_manifest": {
+      "bytes": 53177,
+      "path": "experiments/hu-postflop-r1/validation/sources/source-manifest-audit-formatted.json",
+      "sha256": "099acd4d9f43f53518842a0b4cabf969e1dd911a863709b97de3ea3783b4042a"
+    },
+    "source06_test_record": {
+      "bytes": 8032,
+      "path": "experiments/hu-postflop-r1/validation/vm06-source06/checks/03-workspace-test/supervisor.json",
+      "sha256": "0b696244e73c520374f7ae21cecf7769a4fb77957035c323f6861c0ca985ee7f"
+    },
+    "source06_test_stdout": {
+      "bytes": 78188,
+      "path": "experiments/hu-postflop-r1/validation/vm06-source06/checks/03-workspace-test/stdout.log",
+      "sha256": "f9b6cb1e19a2d7fcbc336acbc2f7bd133cfa1a83d0088a6ff052c20b968dc8b3"
+    },
+    "source06_test_summary": {
+      "bytes": 17763,
+      "path": "experiments/hu-postflop-r1/validation/vm06-source06/summary.json",
+      "sha256": "b44cfdda66fe89757ccdfab25fb14f80302999e4ea3c911ef01ee103eba11508"
+    },
+    "variants_test_source": {
+      "bytes": 22813,
+      "path": "crates/game/tests/r1_variants.rs",
+      "sha256": "12f736906d0220af367714ad44357a5dc6cc554e02661ea13a0b640ddf8f5704"
+    }
+  },
+  "required_regression_tests": [
+    "resumed_early_stop_evaluates_the_new_iteration",
+    "final_partial_chunk_reuses_checkpoint_and_preserves_results",
+    "checkpoint::tests::borrowed_f32_writer_preserves_owned_v1_payload",
+    "checkpoint::tests::borrowed_i16_writer_preserves_owned_v1_payload",
+    "resume_equivalence_kuhn",
+    "stud_ev_and_br_match_independent_physical_deals",
+    "draw_ev_and_br_match_independent_private_replacement",
+    "unsupported_recall_and_hidden_action_lowerings_are_explicit_errors"
+  ],
+  "requirement_evidence": [
+    {
+      "evidence": [
+        "source06_test_stdout",
+        "river_reference_report"
+      ],
+      "requirement": "F1-01",
+      "supported_observations": [
+        "Independent HU oracle regressions passed; selected River external diagnostics retained."
+      ],
+      "unclaimed_or_missing": [
+        "Complete daily/extended external fixtures, exact condition confirmation and calibrated external comparisons remain outside this evidence."
+      ],
+      "work_items": [
+        "T1-01"
+      ]
+    },
+    {
+      "evidence": [
+        "boundary_design",
+        "variants_test_source",
+        "source06_test_stdout"
+      ],
+      "requirement": "F1-02",
+      "supported_observations": [
+        "Boundary design and11 Stud/Draw/split/utility prototype tests have source06 execution evidence."
+      ],
+      "unclaimed_or_missing": [
+        "Prototype scope is not a production general-game compiler or full variant solver."
+      ],
+      "work_items": [
+        "T1-02",
+        "T1-03"
+      ]
+    },
+    {
+      "evidence": [
+        "boundary_design",
+        "variants_test_source",
+        "implementation_plan"
+      ],
+      "requirement": "F1-03",
+      "supported_observations": [
+        "Explicit recall/mapping boundary and lossy-collapse rejection are documented/tested."
+      ],
+      "unclaimed_or_missing": [
+        "Separate coarse/fine abstraction artifact and its acceptance must be reviewed independently; this index does not certify T1-04."
+      ],
+      "work_items": [
+        "T1-04"
+      ]
+    },
+    {
+      "evidence": [
+        "current_report",
+        "phase_report",
+        "source06_test_stdout",
+        "hu_resume_test_source",
+        "checkpoint_wire_test_source"
+      ],
+      "requirement": "F1-04",
+      "supported_observations": [
+        "Source06 whole-process and saved-profile measurements; source03 phase instrumentation is separate; six zero-step resumes and3->6 HU regression."
+      ],
+      "unclaimed_or_missing": [
+        "Synthetic and phase source scopes remain separate; no phase memory measurements or general interrupted-run equivalence claim."
+      ],
+      "work_items": [
+        "T1-05"
+      ]
+    },
+    {
+      "evidence": [
+        "first_plan",
+        "first_pilot",
+        "first_comparison",
+        "measurement_protocol"
+      ],
+      "requirement": "F1-05",
+      "supported_observations": [
+        "Original synthetic internal target, equality rules, conditions and validator identity were fixed before candidate comparison."
+      ],
+      "unclaimed_or_missing": [
+        "This index is issued retrospectively; no external tolerance or formal overall acceptance is backdated."
+      ],
+      "work_items": [
+        "T1-06"
+      ]
+    },
+    {
+      "evidence": [
+        "current_report",
+        "source06_test_stdout",
+        "source06_identity"
+      ],
+      "requirement": "F1-06",
+      "supported_observations": [
+        "Self-contained input, artifact/roundtrip regressions and measured summary/time/size/memory evidence exist."
+      ],
+      "unclaimed_or_missing": [
+        "SOL size increases; broad format/product acceptance is not inferred from these3fixtures."
+      ],
+      "work_items": [
+        "T1-07"
+      ]
+    },
+    {
+      "evidence": [
+        "current_report",
+        "current_plan",
+        "audits"
+      ],
+      "requirement": "F1-07",
+      "supported_observations": [
+        "Exact saved-profile quality for9pairs; measured source06 time/memory comparison at identical fixed conditions."
+      ],
+      "unclaimed_or_missing": [
+        "No posthoc minimum percentage; single VM/3repetitions and synthetic game scope."
+      ],
+      "work_items": [
+        "T1-08"
+      ]
+    }
+  ],
+  "schema": "r1.retrospective-criterion-index/v1",
+  "source02_archive": {
+    "availability": "ignored local retained archive; selected original criteria copies are Git-backed here",
+    "bytes": 1181970,
+    "path": "experiments/hu-postflop-r1/validation/sources/current-02.tar.gz",
+    "sha256": "5edec6bea4ce887847c3430b3c45e5c5251402f2780f3289e95409e40b4b8fc6"
+  },
+  "source02_members": [
+    {
+      "archive_member": "experiments/hu-postflop-r1/pipeline/README.md",
+      "reference": "first_readme"
+    },
+    {
+      "archive_member": "experiments/hu-postflop-r1/pipeline/run_campaign.py",
+      "reference": "first_runner"
+    },
+    {
+      "archive_member": "experiments/hu-postflop-r1/pipeline/configs/river.toml",
+      "reference": "first_config_river"
+    },
+    {
+      "archive_member": "experiments/hu-postflop-r1/pipeline/configs/turn.toml",
+      "reference": "first_config_turn"
+    },
+    {
+      "archive_member": "experiments/hu-postflop-r1/pipeline/configs/flop.toml",
+      "reference": "first_config_flop"
+    }
+  ],
+  "synthetic_criterion": {
+    "derived_constant_sum_exploitability_pct_pot_strict_upper_bound": 0.1,
+    "equality": "Exact paired tree/strategy/EV export bytes and summary numeric fields; full saved-policy audit exact EV/BR/gain/NC.",
+    "external_acceptance": false,
+    "metric": "nash_conv",
+    "operator": "<",
+    "scope": "Only three exact finite no-rake chip-EV Full/F32 fixtures with fixed inputs. Not unabstracted NLHE, raked/general-sum, or external-reference acceptance.",
+    "starting_pot_chips": 20,
+    "strategy_kinds": [
+      "live_average",
+      "stored_quantized separately evaluated by later pre-frozen audit plan"
+    ],
+    "unit": "chips",
+    "value": 0.04
+  },
+  "validator_sha256": "56191cc4fd7dd87310d06ccd15fabd9536e518c6675c6c33c6187d39951b6501"
+}

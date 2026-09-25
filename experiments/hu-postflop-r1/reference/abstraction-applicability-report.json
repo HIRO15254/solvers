@@ -1,0 +1,410 @@
+{
+  "schema": "solvers.r1-offline-abstraction-applicability/v1",
+  "status": "verified_input_domain_only",
+  "checker": {
+    "path": "experiments/hu-postflop-r1/reference/abstraction-applicability.py",
+    "bytes": 20419,
+    "sha256": "a4bd577e28f7689a867dc78a5177c62157e5a1a6662e531409fdec02bb219316"
+  },
+  "contract_and_source_files": [
+    {
+      "path": "docs/plans/r1-abstraction-contract.jp.md",
+      "bytes": 16694,
+      "sha256": "7bd75d30bdd55dd9a87dbdb3c5f0639f748c5fb485e955f5245405e0f37e2c8a"
+    },
+    {
+      "path": "docs/plans/r1-common-game-boundary.jp.md",
+      "bytes": 21766,
+      "sha256": "77f212d98f8762ee98e7bf66f222fd20d8b9e30bb9abe8db6f106bc5a3cd8f8d"
+    },
+    {
+      "path": "docs/plans/solver-implementation-plan.jp.md",
+      "bytes": 43576,
+      "sha256": "08457345448b7fb284d56b0cb9485cfb73ca1702ce968324cf2688a6628e115d"
+    },
+    {
+      "path": "docs/plans/r1-execution-plan.jp.md",
+      "bytes": 7606,
+      "sha256": "83a39b2881767cb04d47dfbf600866ee1af213a8c2a2fac306136ab4eac3e394"
+    },
+    {
+      "path": "crates/abstraction/tests/semantic_mapping.rs",
+      "bytes": 4768,
+      "sha256": "48ec7ac6b2def3c0324a783396f95f27436d89ba82e07de1043718c889510626"
+    },
+    {
+      "path": "crates/game/tests/r1_variants.rs",
+      "bytes": 22813,
+      "sha256": "12f736906d0220af367714ad44357a5dc6cc554e02661ea13a0b640ddf8f5704"
+    },
+    {
+      "path": "crates/cards/src/card.rs",
+      "bytes": 4422,
+      "sha256": "74eeb9bebfc2ed08783b8298754d964779c3114e0a53fd9a4cff364253ac5023"
+    },
+    {
+      "path": "crates/cards/src/range.rs",
+      "bytes": 12197,
+      "sha256": "1ed908cfdc11908754db983eaabbe04dbbe0d405ffddf57fac9b1d18115f208b"
+    },
+    {
+      "path": "crates/holdem/src/postflop.rs",
+      "bytes": 67916,
+      "sha256": "e7c9f6719ba28147ab418b523b2a57cd9325d05734b3d546af7103183f1e9d13"
+    }
+  ],
+  "self_tests": {
+    "negative_cases_rejected": 8,
+    "positive_controls": [
+      "layout bijection",
+      "joint blockers",
+      "exact/f32 weights",
+      "full recall"
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "HU-R0-017",
+      "scope": "captured restricted River diagnostic input domain",
+      "status": "applicable_to_identity_representation_with_boundaries",
+      "inputs": [
+        {
+          "path": "experiments/hu-postflop-r1/reference/HU-R0-017/observed.json",
+          "bytes": 18128,
+          "sha256": "de306599f10fe79456e60484ee79a210e365437e0bf1fc98690aedb6acedc76c"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/reference/HU-R0-017/oop-range.txt",
+          "bytes": 5493,
+          "sha256": "f1f77d65d20c7103a65b10ca936baa3077aeeff4766d8724850481b94921f35b"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/reference/HU-R0-017/ip-range.txt",
+          "bytes": 3585,
+          "sha256": "d259fb6476ddf1d3bd31c8c6ef278cea02c764ebeecef93a0677fd3b7e203661"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/reference/HU-R0-017/range-integrity.json",
+          "bytes": 1831,
+          "sha256": "44abc4f3bab480732d00f413ffe1d4fa388fe9bd93da78277a52e7e32646c530"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/reference/HU-R0-017/diagnostic.toml",
+          "bytes": 10563,
+          "sha256": "597c43241721fa4743e3fbe7aa6e8fa67f7aebc67bcece988f18b4e63d192e1d"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/reference/HU-R0-017/check_diagnostic.py",
+          "bytes": 14500,
+          "sha256": "727231d94dae4c25d6305353f50d945b5d3fe1d525ba53c1e3343df18d3c67e5"
+        }
+      ],
+      "retained_actual_tree": {
+        "path": "experiments/hu-postflop-r1/reference/evidence-vm06-river/records/river/diagnostic017/tree.json",
+        "bytes": 5251,
+        "sha256": "5b61955a85ba9be6d266ca51ecfb8d38585556011dce3c873acc3e10e4d223d0"
+      },
+      "retained_execution": {
+        "path": "experiments/hu-postflop-r1/reference/evidence-vm06-river/records/river/diagnostic017/execution.json",
+        "bytes": 17162,
+        "sha256": "ea5814d59f2a560a22b1df4e661f148986451a6c427ffe6edbd8940d31ad189d"
+      },
+      "recorded_runtime_source_id": "source-archive-sha256:ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970",
+      "recorded_runtime_binary": {
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521",
+        "bytes": 8868960
+      },
+      "runtime_evidence_boundary": "Tree hash/closure only here; source/build/execution proof is vm06-river-verification.py",
+      "ordered_board": [
+        "Kh",
+        "Kc",
+        "5s",
+        "2d",
+        "3s"
+      ],
+      "hand_layout": {
+        "physical_unordered_hands": 1326,
+        "board_live_hands_per_seat": 1081,
+        "positive_input_combos": [
+          352,
+          232
+        ],
+        "zero_weight_live_combos": [
+          729,
+          849
+        ],
+        "private_map": "identity on physical unordered pair; no rank-class, bucket or suit quotient",
+        "zero_weight_boundary": "Zero root mass is not proof of safe infoset deletion or BR coverage",
+        "layout_codec": "4*rank+suit; high*(high-1)/2+low; offline checked, not a semantic ID"
+      },
+      "joint_chance": {
+        "positive_pair_product_count": 81664,
+        "compatible_positive_pairs": 72304,
+        "incompatible_positive_pairs": 9360,
+        "compatible_weight_sum": {
+          "numerator": "135345025728126031",
+          "denominator": "100000000000000",
+          "approximate": 1353.4502572812603
+        },
+        "unrestricted_product_weight_sum": {
+          "numerator": "16310158116676059",
+          "denominator": "10000000000000",
+          "approximate": 1631.015811667606
+        },
+        "normalized_joint_mass": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "normalization_rule": "P(a,b)=w_oop(a)*w_ip(b)*disjoint(a,b)/Z; both hands also avoid board",
+        "independent_marginals_then_mask_mass": {
+          "numerator": "135345025728126031",
+          "denominator": "163101581166760590",
+          "approximate": 0.8298204392619878
+        },
+        "joint_numerators_sha256": "6f2e124def842bc5db1b0c38ade717ba2acd39ddc9187dfbffb86bfd3c9decbd",
+        "joint_numerators_denominator_before_normalization": "100000000000000",
+        "layout_reverse_roundtrip_worlds": 72304,
+        "postroot_chance": "none: fixed River root; not a Turn/Flop chance-map test",
+        "input_f32_representation": {
+          "rounding": "IEEE754 nearest-even; exact midpoint check per copied decimal",
+          "positive_support_unchanged": true,
+          "weights_rounded": [
+            352,
+            232
+          ],
+          "compatible_weight_sum": {
+            "numerator": "51131905023683785069332375",
+            "denominator": "37778931862957161709568",
+            "approximate": 1353.4502565918076
+          },
+          "joint_total_variation_from_copied_decimal": {
+            "numerator": "4968330091863726927433710625411998",
+            "denominator": "329545190521837073555583449965448429931125",
+            "approximate": 1.5076324081672508e-08
+          },
+          "max_joint_probability_absolute_difference": {
+            "numerator": "186426276861710381262144015853744",
+            "denominator": "6920449000958578544667252449274417028553625",
+            "approximate": 2.693846552960476e-11
+          },
+          "boundary": "Root input conversion only, not regret/storage/profile quantization or runtime evaluator error"
+        }
+      },
+      "actions_and_recall": {
+        "observed_and_actual_tree": {
+          "status": "all_observed_menus_match",
+          "decision_nodes": 28,
+          "decision_action_edges": 80,
+          "terminal_nodes": 53,
+          "public_nodes": 81
+        },
+        "closure": {
+          "decision_nodes": 28,
+          "decision_action_edges": 80,
+          "terminal_nodes": 53,
+          "public_nodes": 81
+        },
+        "offline_infosets_including_zero_weight_hands": 30268,
+        "key_definition": "fixed ordered board/root context + actor + full postroot public action history + own physical hand",
+        "opponent_private_cards_in_key": false,
+        "future_cards_in_key": false,
+        "own_history_projection_consistent": true,
+        "history_forgetting_negative_control_rejected": true,
+        "scope": "No new private observations/replacements after River root; prior streets fixed, not merged or reconstructed",
+        "lossy_hand_or_chance_abstraction": false,
+        "action_boundary": "Finite captured menu defines local G0; action restriction versus all-legal NLHE remains. No off-tree transport/BR comparison."
+      },
+      "runtime_semantic_ids_implemented": false,
+      "quality_status": "not_evaluated",
+      "acceptance": null
+    },
+    {
+      "case_id": "HU-R0-019",
+      "scope": "captured restricted River diagnostic input domain",
+      "status": "applicable_to_identity_representation_with_boundaries",
+      "inputs": [
+        {
+          "path": "experiments/hu-postflop-r1/reference/HU-R0-019/observed.json",
+          "bytes": 6319,
+          "sha256": "e38ffaf0b6fbcbbbe5779ae9d4236074df889ea75afd0ee4092e6cd48cf2aca2"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/reference/HU-R0-019/oop-range.txt",
+          "bytes": 1831,
+          "sha256": "e0d201e994569ac6e582603390a98737c59cf6333c630cb8729f6b4f287c2f84"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/reference/HU-R0-019/ip-range.txt",
+          "bytes": 1818,
+          "sha256": "ac682a2f4646bf9b4c8424f86021879b74fdc7f51177175e3242904d2a831b94"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/reference/HU-R0-019/range-integrity.json",
+          "bytes": 327,
+          "sha256": "c45c9d90f38db030d494bd28d1d65615e78984365f77592754362f2633b90115"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/reference/HU-R0-019/diagnostic.toml",
+          "bytes": 4959,
+          "sha256": "c3ac2b24063ad5d3c3f35c6efdd34132452ffb09f8b12b00f3a25a118317e658"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/reference/HU-R0-019/check_diagnostic.py",
+          "bytes": 12369,
+          "sha256": "b60b77f209d345278bee4a74a026d1af8ce6ca3bad95989ffc0140a7002c550b"
+        }
+      ],
+      "retained_actual_tree": {
+        "path": "experiments/hu-postflop-r1/reference/evidence-vm06-river/records/river/diagnostic019/tree.json",
+        "bytes": 2177,
+        "sha256": "42d7859fe1e23f5331324edd6447bd52ed4c4ae70d5406f2f321d1fbdaa5303b"
+      },
+      "retained_execution": {
+        "path": "experiments/hu-postflop-r1/reference/evidence-vm06-river/records/river/diagnostic019/execution.json",
+        "bytes": 16892,
+        "sha256": "86a0acf86364f15aec049af887d133d66f561213e05662a06588fb7c6acb1666"
+      },
+      "recorded_runtime_source_id": "source-archive-sha256:ac5d493a129cd97be9322598867fa3ab5795ba6d3241a93e2719beaa2dd89970",
+      "recorded_runtime_binary": {
+        "path": "/opt/r1/target/candidate-v3/release/solvers",
+        "sha256": "a74e873ba0629c072884edf344ca41fb6ccd291d0a869f4d5e9b75f9dfbb0521",
+        "bytes": 8868960
+      },
+      "runtime_evidence_boundary": "Tree hash/closure only here; source/build/execution proof is vm06-river-verification.py",
+      "ordered_board": [
+        "Qs",
+        "7h",
+        "2c",
+        "4d",
+        "9s"
+      ],
+      "hand_layout": {
+        "physical_unordered_hands": 1326,
+        "board_live_hands_per_seat": 1081,
+        "positive_input_combos": [
+          130,
+          115
+        ],
+        "zero_weight_live_combos": [
+          951,
+          966
+        ],
+        "private_map": "identity on physical unordered pair; no rank-class, bucket or suit quotient",
+        "zero_weight_boundary": "Zero root mass is not proof of safe infoset deletion or BR coverage",
+        "layout_codec": "4*rank+suit; high*(high-1)/2+low; offline checked, not a semantic ID"
+      },
+      "joint_chance": {
+        "positive_pair_product_count": 14950,
+        "compatible_positive_pairs": 13132,
+        "incompatible_positive_pairs": 1818,
+        "compatible_weight_sum": {
+          "numerator": "473190512020633",
+          "denominator": "50000000000000",
+          "approximate": 9.46381024041266
+        },
+        "unrestricted_product_weight_sum": {
+          "numerator": "17305229788119",
+          "denominator": "1562500000000",
+          "approximate": 11.07534706439616
+        },
+        "normalized_joint_mass": {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        "normalization_rule": "P(a,b)=w_oop(a)*w_ip(b)*disjoint(a,b)/Z; both hands also avoid board",
+        "independent_marginals_then_mask_mass": {
+          "numerator": "473190512020633",
+          "denominator": "553767353219808",
+          "approximate": 0.8544933341940952
+        },
+        "joint_numerators_sha256": "e71738e195216004bf0546b90eeb481a48a267944812be878eac45df92165fc1",
+        "joint_numerators_denominator_before_normalization": "100000000000000",
+        "layout_reverse_roundtrip_worlds": 13132,
+        "postroot_chance": "none: fixed River root; not a Turn/Flop chance-map test",
+        "input_f32_representation": {
+          "rounding": "IEEE754 nearest-even; exact midpoint check per copied decimal",
+          "positive_support_unchanged": true,
+          "weights_rounded": [
+            130,
+            115
+          ],
+          "compatible_weight_sum": {
+            "numerator": "44691580088301192136433",
+            "denominator": "4722366482869645213696",
+            "approximate": 9.463810199911341
+          },
+          "joint_total_variation_from_copied_decimal": {
+            "numerator": "576996151951931407971974003237",
+            "denominator": "42295263329988735378422047242094044178",
+            "approximate": 1.3642098583243059e-08
+          },
+          "max_joint_probability_absolute_difference": {
+            "numerator": "695538978868409969913380584",
+            "denominator": "3021090237856338241315860517292431727",
+            "approximate": 2.3022780655566928e-10
+          },
+          "boundary": "Root input conversion only, not regret/storage/profile quantization or runtime evaluator error"
+        }
+      },
+      "actions_and_recall": {
+        "observed_and_actual_tree": {
+          "status": "all_observed_menus_match",
+          "decision_nodes": 12,
+          "decision_action_edges": 32,
+          "terminal_nodes": 21,
+          "public_nodes": 33
+        },
+        "closure": {
+          "decision_nodes": 12,
+          "decision_action_edges": 32,
+          "terminal_nodes": 21,
+          "public_nodes": 33
+        },
+        "offline_infosets_including_zero_weight_hands": 12972,
+        "key_definition": "fixed ordered board/root context + actor + full postroot public action history + own physical hand",
+        "opponent_private_cards_in_key": false,
+        "future_cards_in_key": false,
+        "own_history_projection_consistent": true,
+        "history_forgetting_negative_control_rejected": true,
+        "scope": "No new private observations/replacements after River root; prior streets fixed, not merged or reconstructed",
+        "lossy_hand_or_chance_abstraction": false,
+        "action_boundary": "Finite captured menu defines local G0; action restriction versus all-legal NLHE remains. No off-tree transport/BR comparison."
+      },
+      "runtime_semantic_ids_implemented": false,
+      "quality_status": "not_evaluated",
+      "acceptance": null
+    }
+  ],
+  "partial_cases_excluded": [
+    {
+      "case_id": "HU-R0-007",
+      "observed": {
+        "path": "experiments/hu-postflop-r1/reference/HU-R0-007/observed.json",
+        "bytes": 3661,
+        "sha256": "06fadf588cf216f2e632a2d8981dbb5da32a83c4a7185be5257e9b605f322d2a"
+      },
+      "reason": "Turn root: only two unopened menus; responses and River chance/tree unknown"
+    },
+    {
+      "case_id": "HU-R0-020",
+      "observed": {
+        "path": "experiments/hu-postflop-r1/reference/HU-R0-020/observed.json",
+        "bytes": 4911,
+        "sha256": "b1f7180ace4a0ed22a4fbe376eb478dedf7ad946cb8389952204a907a115fbbb"
+      },
+      "reason": "Flop root: only two unopened menus; responses and Turn/River chance/tree unknown"
+    }
+  ],
+  "missing_applicability_evidence": [
+    "Shared game/action/private/chance/layout/profile/evaluation semantic codec and persisted IDs are not implemented.",
+    "No external full profile, lossless suit quotient transport, coarse/dense betting lift, off-tree continuation, or expanded-action BR test on these captured cases.",
+    "No saved F32/I16 policy BR re-evaluation for017/019; input f32 distribution drift is not saved-policy quality.",
+    "River identity/recall checks do not exercise future public chance, private replacement, hidden action, Stud/Draw/split utility, or abstract recall.",
+    "External rake collection, solver version/accuracy and complete reference policies remain unverified; no equal-G0 or external quality acceptance.",
+    "Two restricted River fixtures do not establish the 24-case acceptance or arbitrary abstraction/domain applicability."
+  ],
+  "runtime_semantic_ids_implemented": false,
+  "quality_status": "not_evaluated",
+  "acceptance": null
+}

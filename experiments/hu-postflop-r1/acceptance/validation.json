@@ -1,0 +1,20 @@
+{
+  "continued_hu_regression": "raked River F32 3 to 6 iterations; no signal/interruption equivalence claim",
+  "formal_overall_quality_status": "not_evaluated",
+  "future_attachments_verified": 0,
+  "historical_internal_criterion_predeclared": true,
+  "index_sha256": "313ab6e49d0d62b55a6642fc6f401194594fc29912a7d949c150116e7dc8a9a9",
+  "missing_acceptance_gates": [
+    "external_fixture_condition_match",
+    "external_suite_quality",
+    "external_threshold_calibration",
+    "formal_t1_06_certification"
+  ],
+  "r1_complete": false,
+  "references_verified": 31,
+  "saved_profile_pairs_exact": 9,
+  "schema": "r1.acceptance-index-validation/v1",
+  "scope": "hashes and scoped gates only; does not replay raw-bundle or solver verification",
+  "status": "index_consistent",
+  "validator_sha256": "56191cc4fd7dd87310d06ccd15fabd9536e518c6675c6c33c6187d39951b6501"
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "r1.reference-menu-transcription/v1",
+  "case_id": "HU-R0-002",
+  "source": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+  "data_file": "menu-capture-01.txt",
+  "bytes": 1899,
+  "sha256": "2619a068b3a919fba98a3b386fe4006064a910a6541568c017c4a0fb2edce01d",
+  "observed_record_count": 84,
+  "root_and_check_menus_previously_recorded": 2,
+  "notation": "history|acting player remaining stack displayed in BB|ordered raises following Fold,Call; RAI=all-in97.5BB, numeric raises=raise-to BB, -=no raises; X counts in actor parity",
+  "actor_rule": "BB if the number of path tokens is even; BTN if odd, as supplied by collecting root agent",
+  "acquisition_time": "Root menus before19:06Z; detailed menu acquisition began approximately19:06Z and all batch01 observations preceded the observed clock2026-09-25T19:23:29Z. Exact per-node timestamps were not recorded.",
+  "lost_capture_boundary": "Browser kernel reset during a60-second call; 123+ in-memory captures were lost. Only the explicitly retransmitted84 lines in this file plus the previous2menus are retained; no lost observation is inferred.",
+  "excluded_unconfirmed_records": [
+    {
+      "history": "X-R2-R7-R23.5-R68-RAI",
+      "remaining_stack_bb_proposed": "29.5",
+      "proposed_actions": [
+        "fold",
+        "call"
+      ],
+      "reason": "Collecting root retracted this line: only current URL was seen, not a full menu/title. Excluded pending recapture."
+    }
+  ],
+  "record_warnings": {
+    "R8.5-R27.5-R58-RAI": "Screenshot showed BB39.5, Fold/Call, and warning: Selected line is rarely used in GTO. Solution may be inaccurate."
+  },
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "capture_completed_before_observed_clock_utc": "2026-09-25T19:23:29Z"
+}

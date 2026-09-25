@@ -1,0 +1,24 @@
+{
+  "schema": "r1.reference-menu-transcription/v1",
+  "case_id": "HU-R0-002",
+  "source": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM.",
+  "root_batch_label": "batch10",
+  "data_file": "menu-capture-11.txt",
+  "bytes": 32,
+  "sha256": "9d8b78f18c4473e4a09f63528a7534678512d96d90381218a3bda68a99d845ca",
+  "observed_record_count": 1,
+  "acquisition_time": "After observed clock2026-09-25T19:23:29Z; exact per-record times not supplied.",
+  "capture_after_observed_clock_utc": "2026-09-25T19:23:29Z",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "supplemental_action_labels": [
+    {
+      "history": "X-R2-R7-R17-R37",
+      "actor": "BTN",
+      "remaining_stack_bb": 80.5,
+      "action_ui_percent_labels": {
+        "allin 97.5": 76
+      }
+    }
+  ]
+}

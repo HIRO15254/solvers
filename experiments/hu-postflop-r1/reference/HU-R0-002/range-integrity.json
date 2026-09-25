@@ -1,0 +1,50 @@
+{
+  "case_id": "HU-R0-002",
+  "board": [
+    "Ks",
+    "7h",
+    "2d",
+    "3c",
+    "8d"
+  ],
+  "arithmetic": "Python Decimal, precision 80, Inexact trapped; original decimal weights without renormalization",
+  "hash_scope": "entire UTF-8 file bytes including the single appended LF",
+  "copy_transfer_verification": "Root supplied raw clipboard text, character counts and FNV-1a 32-bit; saving agent matched both and independently recomputes them from file bytes excluding final LF. Initial stale HU-R0-020 clipboard rejected before adopted capture.",
+  "oop": {
+    "file": "oop-range.txt",
+    "file_bytes": 7443,
+    "copy_raw_characters": 7442,
+    "raw_fnv1a32": "5ef09043",
+    "positive_combos": 493,
+    "weight_sum": "197.3094037",
+    "weight_min": "0.0012948",
+    "weight_max": "0.988",
+    "sha256": "04e626aaee3fabd74ec6038ff3a8c92ec602ceb22dc5c080e3304e475dae5eec",
+    "duplicate_unordered_combos": 0,
+    "board_collisions": 0,
+    "nonfinite_or_nonpositive_weights": 0
+  },
+  "ip": {
+    "file": "ip-range.txt",
+    "file_bytes": 7081,
+    "copy_raw_characters": 7080,
+    "raw_fnv1a32": "8557635a",
+    "positive_combos": 479,
+    "weight_sum": "53.1100486",
+    "weight_min": "0.000014",
+    "weight_max": "0.9770001",
+    "sha256": "eb147ce4427bc29bbaee16504c9dc91234c663d483d8fa5fa68b255acfa7f6cd",
+    "duplicate_unordered_combos": 0,
+    "board_collisions": 0,
+    "nonfinite_or_nonpositive_weights": 0
+  },
+  "joint": {
+    "positive_pair_product_count": 236147,
+    "compatible_positive_pairs": 213595,
+    "incompatible_positive_pairs": 22552,
+    "compatible_weight_sum": "9361.53759450292671",
+    "unrestricted_product_weight_sum": "10479.11201974401982",
+    "incompatible_weight_sum": "1117.57442524109311",
+    "definition": "sum(w_oop * w_ip) over disjoint private-card sets; both ranges already disjoint from Ks 7h 2d 3c 8d; no renormalization or future chance weights"
+  }
+}

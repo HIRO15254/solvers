@@ -1,0 +1,2574 @@
+{
+  "case_id": "HU-R0-002",
+  "capture_time_note": "Root supplied an approximate 18:53-19:00Z interval only. Acquisition completed before the subsequently observed clock 19:02:08Z; exact original per-seat timestamps were not recorded.",
+  "reference": "GTO Wizard existing solved library; root agent observed UI and used Copy range controls",
+  "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=10&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X",
+  "catalog_url": "https://app.gtowizard.com/solutions?soltab=strategy&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&gmff_favorite=false&stratab=strategy_ev&history_spot=10&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X",
+  "url_provenance": "Capture URL supplied by root. It uses soltab=range and is retained as supplied; the separate catalog URL is not substituted for the observed URL. Saving agent received data from root and did not operate the browser.",
+  "visible_solution": "Cash 100bb / 6max / NL500 / General / GTO",
+  "table_players": "6max",
+  "subgame_players": 2,
+  "street": "river",
+  "board": [
+    "Ks",
+    "7h",
+    "2d",
+    "3c",
+    "8d"
+  ],
+  "seats": {
+    "oop": "BB",
+    "ip": "BTN"
+  },
+  "root_actor": "BB",
+  "pot_bb": 5.5,
+  "stacks_behind_bb": [
+    97.5,
+    97.5
+  ],
+  "preflop_actions": "F-F-F-R2.5-F-C",
+  "preflop": "UTG fold; HJ fold; CO fold; BTN raise to 2.5; SB fold; BB call",
+  "flop_actions": "X-X",
+  "flop": "Ks 7h 2d; check/check",
+  "turn_actions": "X-X",
+  "turn": "3c; check/check",
+  "river": "8d; root before BB acts",
+  "root_ranges": {
+    "oop": "oop-range.txt",
+    "ip": "ip-range.txt",
+    "weights": "Copy-control raw text, unrenormalized; one final LF added to each file",
+    "reported_copy_raw_characters": {
+      "oop": 7442,
+      "ip": 7080
+    },
+    "reported_copy_raw_fnv1a32": {
+      "oop": "5ef09043",
+      "ip": "8557635a"
+    },
+    "copy_controls": {
+      "oop": "Strategy view: Copy, then Whole Range",
+      "ip": "EV view: Copy directly"
+    },
+    "rejected_clipboard": "An initial stale clipboard value from HU-R0-020 was detected and rejected by the collecting root agent; it is not an input to this fixture. Only the subsequent strings with the recorded counts and checksums are adopted.",
+    "transfer_verification": "Root supplied raw text, character counts and FNV-1a 32-bit; check_ranges.py compares file text excluding the appended final LF. SHA-256 covers the entire retained file."
+  },
+  "observed_menus": [
+    {
+      "history": "",
+      "actor": "BB",
+      "street": "river",
+      "actions": [
+        "check",
+        "bet 2",
+        "bet 4",
+        "bet 8.5",
+        "allin 97.5"
+      ],
+      "action_ui_percent_labels": {
+        "bet 2": 36,
+        "bet 4": 73,
+        "bet 8.5": 155,
+        "allin 97.5": 1773
+      },
+      "observation_surface": "Root agent observed top decision menu; after-check menu was displayed directly, not inferred by symmetry",
+      "source_history": "",
+      "remaining_stack_bb_displayed": 97.5
+    },
+    {
+      "history": "check",
+      "actor": "BTN",
+      "street": "river",
+      "actions": [
+        "check",
+        "bet 2",
+        "bet 4",
+        "bet 8.5",
+        "allin 97.5"
+      ],
+      "action_ui_percent_labels": {
+        "bet 2": 36,
+        "bet 4": 73,
+        "bet 8.5": 155,
+        "allin 97.5": 1773
+      },
+      "observation_surface": "Root agent observed top decision menu; after-check menu was displayed directly, not inferred by symmetry",
+      "source_history": "X",
+      "remaining_stack_bb_displayed": 97.5
+    },
+    {
+      "history": "bet 2",
+      "source_history": "R2",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 97.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 7",
+        "raise to 10",
+        "raise to 14",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=11&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 4",
+      "source_history": "R4",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 97.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 11",
+        "raise to 15.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=11&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 8.5",
+      "source_history": "R8.5",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 97.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 20",
+        "raise to 27.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 3,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=11&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R8.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "allin 97.5",
+      "source_history": "RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 97.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 4,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=11&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2",
+      "source_history": "X-R2",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 97.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 7",
+        "raise to 10",
+        "raise to 14",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 5,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 4",
+      "source_history": "X-R4",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 97.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 11",
+        "raise to 15.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 6,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 8.5",
+      "source_history": "X-R8.5",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 97.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 20",
+        "raise to 27.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 7,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R8.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/allin 97.5",
+      "source_history": "X-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 97.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 8,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 7",
+      "source_history": "X-R2-R7",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 95.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 17",
+        "raise to 23.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 9,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 10",
+      "source_history": "X-R2-R10",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 95.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 23",
+        "raise to 31.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 10,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R10",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 14",
+      "source_history": "X-R2-R14",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 95.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 31",
+        "raise to 42.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 11,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R14",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/allin 97.5",
+      "source_history": "X-R2-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 95.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 12,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 7/raise to 17",
+      "source_history": "X-R2-R7-R17",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 90.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 37",
+        "raise to 50.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 13,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7-R17",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 7/raise to 23.5",
+      "source_history": "X-R2-R7-R23.5",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 90.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 50",
+        "raise to 68",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 14,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7-R23.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 7/allin 97.5",
+      "source_history": "X-R2-R7-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 90.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 15,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 7",
+      "source_history": "R2-R7",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 95.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 17",
+        "raise to 23.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 16,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 10",
+      "source_history": "R2-R10",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 95.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 23",
+        "raise to 31.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 17,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R10",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 14",
+      "source_history": "R2-R14",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 95.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 31",
+        "raise to 42.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 18,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R14",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 2/allin 97.5",
+      "source_history": "R2-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 95.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 19,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 4/raise to 11",
+      "source_history": "R4-R11",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 93.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 25",
+        "raise to 34.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 20,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R11",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 4/raise to 15.5",
+      "source_history": "R4-R15.5",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 93.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 34",
+        "raise to 46.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 21,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R15.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 4/allin 97.5",
+      "source_history": "R4-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 93.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 22,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 8.5/raise to 20",
+      "source_history": "R8.5-R20",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 89.0,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 43",
+        "raise to 58.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 23,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R8.5-R20",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 8.5/raise to 27.5",
+      "source_history": "R8.5-R27.5",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 89.0,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 58",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 24,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R8.5-R27.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 8.5/allin 97.5",
+      "source_history": "R8.5-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 89.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 25,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R8.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 4/raise to 11",
+      "source_history": "X-R4-R11",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 93.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 25",
+        "raise to 34.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 26,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R11",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 4/raise to 15.5",
+      "source_history": "X-R4-R15.5",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 93.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 34",
+        "raise to 46.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 27,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R15.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 4/allin 97.5",
+      "source_history": "X-R4-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 93.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 28,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 8.5/raise to 20",
+      "source_history": "X-R8.5-R20",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 89.0,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 43",
+        "raise to 58.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 29,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R8.5-R20",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 8.5/raise to 27.5",
+      "source_history": "X-R8.5-R27.5",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 89.0,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 58",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 30,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R8.5-R27.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-19.json",
+          "literal": "X-R8.5-R27.5|BTN|89|F,C,Raise58(50%),Allin97.5(116%)",
+          "action_ui_percent_labels": {
+            "raise to 58": 50.0,
+            "allin 97.5": 116.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "check/bet 8.5/allin 97.5",
+      "source_history": "X-R8.5-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 89.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 31,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R8.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 10/raise to 23",
+      "source_history": "X-R2-R10-R23",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 87.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 49",
+        "raise to 67",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 32,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R10-R23",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 10/raise to 31.5",
+      "source_history": "X-R2-R10-R31.5",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 87.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 66",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 33,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R10-R31.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 10/allin 97.5",
+      "source_history": "X-R2-R10-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 87.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 34,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R10-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 14/raise to 31",
+      "source_history": "X-R2-R14-R31",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 83.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 65",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 35,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R14-R31",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 14/raise to 42.5",
+      "source_history": "X-R2-R14-R42.5",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 83.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 36,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R14-R42.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 14/allin 97.5",
+      "source_history": "X-R2-R14-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 83.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 37,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R14-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 7/raise to 17/raise to 37",
+      "source_history": "X-R2-R7-R17-R37",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 80.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 38,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7-R17-R37",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-11.json",
+          "scope": "Only the supplied action labels, not a newly complete menu capture",
+          "action_ui_percent_labels": {
+            "allin 97.5": 76
+          }
+        }
+      ]
+    },
+    {
+      "history": "check/bet 2/raise to 7/raise to 17/raise to 50.5",
+      "source_history": "X-R2-R7-R17-R50.5",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 80.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 39,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7-R17-R50.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 7/raise to 17/allin 97.5",
+      "source_history": "X-R2-R7-R17-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 80.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 40,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7-R17-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 7/raise to 23.5/raise to 50",
+      "source_history": "X-R2-R7-R23.5-R50",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 74.0,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 41,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7-R23.5-R50",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-12.json",
+          "literal": "X-R2-R7-R23.5-R50|BTN|74|F,C,Allin97.5(45%)",
+          "action_ui_percent_labels": {
+            "allin 97.5": 45.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "check/bet 2/raise to 7/raise to 23.5/raise to 68",
+      "source_history": "X-R2-R7-R23.5-R68",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 74.0,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 42,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7-R23.5-R68",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-12.json",
+          "literal": "X-R2-R7-R23.5-R68|BTN|74|F,C,Allin97.5(21%)",
+          "action_ui_percent_labels": {
+            "allin 97.5": 21.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "check/bet 2/raise to 7/raise to 23.5/allin 97.5",
+      "source_history": "X-R2-R7-R23.5-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 74.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 43,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7-R23.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 7/raise to 17",
+      "source_history": "R2-R7-R17",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 90.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 37",
+        "raise to 50.5",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 44,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7-R17",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 7/raise to 23.5",
+      "source_history": "R2-R7-R23.5",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 90.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 50",
+        "raise to 68",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 45,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7-R23.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-04.json",
+          "literal": "R2-R7-R23.5|BTN|90.5|F,C,Raise50(50%),Raise68(85%),Allin97.5(141%)",
+          "action_ui_percent_labels": {
+            "raise to 50": 50.0,
+            "raise to 68": 85.0,
+            "allin 97.5": 141.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 2/raise to 7/allin 97.5",
+      "source_history": "R2-R7-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 90.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 46,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 10/raise to 23",
+      "source_history": "R2-R10-R23",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 87.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 49",
+        "raise to 67",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 47,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R10-R23",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 10/raise to 31.5",
+      "source_history": "R2-R10-R31.5",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 87.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 66",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 48,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R10-R31.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-06.json",
+          "literal": "R2-R10-R31.5|BTN|87.5|F,C,Raise66(50%),Allin97.5(96%)",
+          "action_ui_percent_labels": {
+            "raise to 66": 50.0,
+            "allin 97.5": 96.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 2/raise to 10/allin 97.5",
+      "source_history": "R2-R10-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 87.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 49,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R10-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 14/raise to 31",
+      "source_history": "R2-R14-R31",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 83.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 65",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 50,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R14-R31",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-07.json",
+          "literal": "R2-R14-R31|BTN|83.5|F,C,Raise65(50%),Allin97.5(99%)",
+          "action_ui_percent_labels": {
+            "raise to 65": 50.0,
+            "allin 97.5": 99.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 2/raise to 14/raise to 42.5",
+      "source_history": "R2-R14-R42.5",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 83.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 51,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R14-R42.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-07.json",
+          "literal": "R2-R14-R42.5|BTN|83.5|F,C,Allin97.5(61%)",
+          "action_ui_percent_labels": {
+            "allin 97.5": 61.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 2/raise to 14/allin 97.5",
+      "source_history": "R2-R14-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 83.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 52,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R14-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 4/raise to 11/raise to 25",
+      "source_history": "R4-R11-R25",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 86.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 53",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 53,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R11-R25",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 4/raise to 11/raise to 34.5",
+      "source_history": "R4-R11-R34.5",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 86.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 54,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R11-R34.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 4/raise to 11/allin 97.5",
+      "source_history": "R4-R11-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 86.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 55,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R11-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 4/raise to 15.5/raise to 34",
+      "source_history": "R4-R15.5-R34",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 82.0,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 56,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R15.5-R34",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 4/raise to 15.5/raise to 46.5",
+      "source_history": "R4-R15.5-R46.5",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 82.0,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 57,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R15.5-R46.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 4/raise to 15.5/allin 97.5",
+      "source_history": "R4-R15.5-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 82.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 58,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R15.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 8.5/raise to 20/raise to 43",
+      "source_history": "R8.5-R20-R43",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 77.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 59,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R8.5-R20-R43",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 8.5/raise to 20/raise to 58.5",
+      "source_history": "R8.5-R20-R58.5",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 77.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 60,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R8.5-R20-R58.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 8.5/raise to 20/allin 97.5",
+      "source_history": "R8.5-R20-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 77.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 61,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R8.5-R20-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 8.5/raise to 27.5/raise to 58",
+      "source_history": "R8.5-R27.5-R58",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 70.0,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 62,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R8.5-R27.5-R58",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 8.5/raise to 27.5/allin 97.5",
+      "source_history": "R8.5-R27.5-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 70.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 63,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=13&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R8.5-R27.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 4/raise to 11/raise to 25",
+      "source_history": "X-R4-R11-R25",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 86.5,
+      "actions": [
+        "fold",
+        "call",
+        "raise to 53",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 64,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R11-R25",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-15.json",
+          "literal": "X-R4-R11-R25|BB|86.5|F,C,Raise53(50%),Allin97.5(131%)",
+          "action_ui_percent_labels": {
+            "raise to 53": 50.0,
+            "allin 97.5": 131.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "check/bet 4/raise to 11/raise to 34.5",
+      "source_history": "X-R4-R11-R34.5",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 86.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 65,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R11-R34.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-16.json",
+          "literal": "X-R4-R11-R34.5|BB|86.5|F,C,Allin97.5(85%)",
+          "action_ui_percent_labels": {
+            "allin 97.5": 85.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "check/bet 4/raise to 11/allin 97.5",
+      "source_history": "X-R4-R11-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 86.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 66,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R11-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 4/raise to 15.5/raise to 34",
+      "source_history": "X-R4-R15.5-R34",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 82.0,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 67,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R15.5-R34",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-17.json",
+          "literal": "X-R4-R15.5-R34|BB|82|F,C,Allin97.5(86%)",
+          "action_ui_percent_labels": {
+            "allin 97.5": 86.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "check/bet 4/raise to 15.5/raise to 46.5",
+      "source_history": "X-R4-R15.5-R46.5",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 82.0,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 68,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R15.5-R46.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-17.json",
+          "literal": "X-R4-R15.5-R46.5|BB|82|F,C,Allin97.5(52%)",
+          "action_ui_percent_labels": {
+            "allin 97.5": 52.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "check/bet 4/raise to 15.5/allin 97.5",
+      "source_history": "X-R4-R15.5-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 82.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 69,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R15.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 8.5/raise to 20/raise to 43",
+      "source_history": "X-R8.5-R20-R43",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 77.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 70,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R8.5-R20-R43",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 8.5/raise to 20/raise to 58.5",
+      "source_history": "X-R8.5-R20-R58.5",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 77.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 71,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R8.5-R20-R58.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 8.5/raise to 20/allin 97.5",
+      "source_history": "X-R8.5-R20-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 77.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 72,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R8.5-R20-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 8.5/raise to 27.5/raise to 58",
+      "source_history": "X-R8.5-R27.5-R58",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 70.0,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 73,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R8.5-R27.5-R58",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-19.json",
+          "literal": "X-R8.5-R27.5-R58|BB|70|F,C,Allin97.5(33%)",
+          "action_ui_percent_labels": {
+            "allin 97.5": 33.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "check/bet 8.5/raise to 27.5/allin 97.5",
+      "source_history": "X-R8.5-R27.5-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 70.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 74,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R8.5-R27.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 10/raise to 23/raise to 49",
+      "source_history": "X-R2-R10-R23-R49",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 74.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 75,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R10-R23-R49",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 10/raise to 23/raise to 67",
+      "source_history": "X-R2-R10-R23-R67",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 74.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 76,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R10-R23-R67",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 10/raise to 23/allin 97.5",
+      "source_history": "X-R2-R10-R23-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 74.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 77,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R10-R23-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 10/raise to 31.5/raise to 66",
+      "source_history": "X-R2-R10-R31.5-R66",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 66.0,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 78,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R10-R31.5-R66",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-14.json",
+          "literal": "X-R2-R10-R31.5-R66|BTN|66|F,C,Allin97.5(23%)",
+          "action_ui_percent_labels": {
+            "allin 97.5": 23.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "check/bet 2/raise to 10/raise to 31.5/allin 97.5",
+      "source_history": "X-R2-R10-R31.5-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 66.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 79,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R10-R31.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 14/raise to 31/raise to 65",
+      "source_history": "X-R2-R14-R31-R65",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 66.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 80,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R14-R31-R65",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "additional_menu_observations": [
+        {
+          "source_transcription": "menu-capture-14.json",
+          "literal": "X-R2-R14-R31-R65|BTN|66.5|F,C,Allin97.5(24%)",
+          "action_ui_percent_labels": {
+            "allin 97.5": 24.0
+          }
+        }
+      ]
+    },
+    {
+      "history": "check/bet 2/raise to 14/raise to 31/allin 97.5",
+      "source_history": "X-R2-R14-R31-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 66.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 81,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R14-R31-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 14/raise to 42.5/allin 97.5",
+      "source_history": "X-R2-R14-R42.5-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 55.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 82,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R14-R42.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 7/raise to 17/raise to 50.5/allin 97.5",
+      "source_history": "X-R2-R7-R17-R50.5-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 47.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 83,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=16&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7-R17-R50.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM."
+    },
+    {
+      "history": "bet 8.5/raise to 27.5/raise to 58/allin 97.5",
+      "source_history": "R8.5-R27.5-R58-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 39.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-01.txt",
+      "source_line": 84,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R8.5-R27.5-R58-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit UI tool outputs into a literal list; this file is not the raw full DOM.",
+      "reference_warning": "Screenshot showed BB39.5, Fold/Call, and warning: Selected line is rarely used in GTO. Solution may be inaccurate."
+    },
+    {
+      "history": "bet 4/raise to 11/raise to 25/raise to 53",
+      "source_history": "R4-R11-R25-R53",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 72.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-02.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R11-R25-R53",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed reconnected AX observations; not raw full AX/DOM.",
+      "extra_ui_labels": {
+        "allin_97_5_percent": 40
+      }
+    },
+    {
+      "history": "bet 4/raise to 11/raise to 25/raise to 53/allin 97.5",
+      "source_history": "R4-R11-R25-R53-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 44.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-02.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R11-R25-R53-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed reconnected AX observations; not raw full AX/DOM."
+    },
+    {
+      "history": "bet 2/raise to 7/raise to 17/raise to 37",
+      "source_history": "R2-R7-R17-R37",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 80.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-03.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7-R17-R37",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM.",
+      "action_ui_percent_labels": {
+        "allin 97.5": 76.0
+      }
+    },
+    {
+      "history": "bet 2/raise to 7/raise to 17/raise to 37/allin 97.5",
+      "source_history": "R2-R7-R17-R37-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 60.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-03.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7-R17-R37-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 7/raise to 17/raise to 50.5",
+      "source_history": "R2-R7-R17-R50.5",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 80.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-03.txt",
+      "source_line": 3,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7-R17-R50.5",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM.",
+      "action_ui_percent_labels": {
+        "allin 97.5": 44.0
+      }
+    },
+    {
+      "history": "bet 2/raise to 7/raise to 17/raise to 50.5/allin 97.5",
+      "source_history": "R2-R7-R17-R50.5-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 47.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-03.txt",
+      "source_line": 4,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7-R17-R50.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 7/raise to 17/allin 97.5",
+      "source_history": "R2-R7-R17-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 80.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-03.txt",
+      "source_line": 5,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7-R17-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 7/raise to 23.5/raise to 50",
+      "source_history": "R2-R7-R23.5-R50",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 74.0,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-04.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7-R23.5-R50",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM.",
+      "action_ui_percent_labels": {
+        "allin 97.5": 45.0
+      }
+    },
+    {
+      "history": "bet 2/raise to 7/raise to 23.5/raise to 50/allin 97.5",
+      "source_history": "R2-R7-R23.5-R50-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 47.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-04.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7-R23.5-R50-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 7/raise to 23.5/raise to 68",
+      "source_history": "R2-R7-R23.5-R68",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 74.0,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-04.txt",
+      "source_line": 3,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7-R23.5-R68",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM.",
+      "action_ui_percent_labels": {
+        "allin 97.5": 21.0
+      }
+    },
+    {
+      "history": "bet 2/raise to 7/raise to 23.5/raise to 68/allin 97.5",
+      "source_history": "R2-R7-R23.5-R68-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 29.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-04.txt",
+      "source_line": 4,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7-R23.5-R68-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 7/raise to 23.5/allin 97.5",
+      "source_history": "R2-R7-R23.5-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 74.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-04.txt",
+      "source_line": 5,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7-R23.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 10/raise to 23/raise to 49",
+      "source_history": "R2-R10-R23-R49",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 74.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-05.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R10-R23-R49",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM.",
+      "action_ui_percent_labels": {
+        "allin 97.5": 47.0
+      }
+    },
+    {
+      "history": "bet 2/raise to 10/raise to 23/raise to 49/allin 97.5",
+      "source_history": "R2-R10-R23-R49-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 48.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-05.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R10-R23-R49-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 10/raise to 23/raise to 67",
+      "source_history": "R2-R10-R23-R67",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 74.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-05.txt",
+      "source_line": 3,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R10-R23-R67",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM.",
+      "action_ui_percent_labels": {
+        "allin 97.5": 22.0
+      }
+    },
+    {
+      "history": "bet 2/raise to 10/raise to 23/raise to 67/allin 97.5",
+      "source_history": "R2-R10-R23-R67-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 30.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-05.txt",
+      "source_line": 4,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R10-R23-R67-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 10/raise to 23/allin 97.5",
+      "source_history": "R2-R10-R23-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 74.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-06.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R10-R23-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 10/raise to 31.5/raise to 66",
+      "source_history": "R2-R10-R31.5-R66",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 66.0,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-06.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R10-R31.5-R66",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM.",
+      "action_ui_percent_labels": {
+        "allin 97.5": 23.0
+      }
+    },
+    {
+      "history": "bet 2/raise to 10/raise to 31.5/raise to 66/allin 97.5",
+      "source_history": "R2-R10-R31.5-R66-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 31.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-06.txt",
+      "source_line": 3,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R10-R31.5-R66-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 10/raise to 31.5/allin 97.5",
+      "source_history": "R2-R10-R31.5-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 66.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-06.txt",
+      "source_line": 4,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R10-R31.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed explicit DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 14/raise to 31/allin 97.5",
+      "source_history": "R2-R14-R31-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 66.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-07.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R14-R31-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 14/raise to 42.5/allin 97.5",
+      "source_history": "R2-R14-R42.5-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 55.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-07.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R14-R42.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 2/raise to 14/raise to 31/raise to 65",
+      "source_history": "R2-R14-R31-R65",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 66.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-08.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R14-R31-R65",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM.",
+      "action_ui_percent_labels": {
+        "allin 97.5": 24.0
+      }
+    },
+    {
+      "history": "bet 2/raise to 14/raise to 31/raise to 65/allin 97.5",
+      "source_history": "R2-R14-R31-R65-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 32.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-08.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R14-R31-R65-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 4/raise to 11/raise to 25/allin 97.5",
+      "source_history": "R4-R11-R25-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 72.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-08.txt",
+      "source_line": 3,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R11-R25-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 4/raise to 11/raise to 34.5/allin 97.5",
+      "source_history": "R4-R11-R34.5-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 63.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-09.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R11-R34.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 4/raise to 15.5/raise to 34/allin 97.5",
+      "source_history": "R4-R15.5-R34-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 63.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-09.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R15.5-R34-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 4/raise to 15.5/raise to 46.5/allin 97.5",
+      "source_history": "R4-R15.5-R46.5-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 51.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-09.txt",
+      "source_line": 3,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R4-R15.5-R46.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 8.5/raise to 20/raise to 43/allin 97.5",
+      "source_history": "R8.5-R20-R43-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 54.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-10.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R8.5-R20-R43-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "bet 8.5/raise to 20/raise to 58.5/allin 97.5",
+      "source_history": "R8.5-R20-R58.5-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 39.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-10.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=14&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R8.5-R20-R58.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 7/raise to 17/raise to 37/allin 97.5",
+      "source_history": "X-R2-R7-R17-R37-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 60.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-11.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=16&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7-R17-R37-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 7/raise to 23.5/raise to 50/allin 97.5",
+      "source_history": "X-R2-R7-R23.5-R50-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 47.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-12.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=16&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7-R23.5-R50-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 7/raise to 23.5/raise to 68/allin 97.5",
+      "source_history": "X-R2-R7-R23.5-R68-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 29.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-12.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=16&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R7-R23.5-R68-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 10/raise to 23/raise to 49/allin 97.5",
+      "source_history": "X-R2-R10-R23-R49-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 48.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-13.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=16&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R10-R23-R49-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 10/raise to 23/raise to 67/allin 97.5",
+      "source_history": "X-R2-R10-R23-R67-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 30.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-13.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=16&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R10-R23-R67-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 10/raise to 31.5/raise to 66/allin 97.5",
+      "source_history": "X-R2-R10-R31.5-R66-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 31.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-14.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=16&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R10-R31.5-R66-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 2/raise to 14/raise to 31/raise to 65/allin 97.5",
+      "source_history": "X-R2-R14-R31-R65-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 32.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-14.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=16&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R2-R14-R31-R65-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 4/raise to 11/raise to 25/raise to 53",
+      "source_history": "X-R4-R11-R25-R53",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 72.5,
+      "actions": [
+        "fold",
+        "call",
+        "allin 97.5"
+      ],
+      "source_transcription": "menu-capture-15.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R11-R25-R53",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM.",
+      "action_ui_percent_labels": {
+        "allin 97.5": 40.0
+      }
+    },
+    {
+      "history": "check/bet 4/raise to 11/raise to 25/raise to 53/allin 97.5",
+      "source_history": "X-R4-R11-R25-R53-RAI",
+      "actor": "BB",
+      "street": "river",
+      "remaining_stack_bb_displayed": 44.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-15.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=16&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R11-R25-R53-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 4/raise to 11/raise to 25/allin 97.5",
+      "source_history": "X-R4-R11-R25-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 72.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-16.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R11-R25-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 4/raise to 11/raise to 34.5/allin 97.5",
+      "source_history": "X-R4-R11-R34.5-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 63.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-16.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R11-R34.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 4/raise to 15.5/raise to 34/allin 97.5",
+      "source_history": "X-R4-R15.5-R34-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 63.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-17.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R15.5-R34-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 4/raise to 15.5/raise to 46.5/allin 97.5",
+      "source_history": "X-R4-R15.5-R46.5-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 51.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-17.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R4-R15.5-R46.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 8.5/raise to 20/raise to 43/allin 97.5",
+      "source_history": "X-R8.5-R20-R43-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 54.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-18.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R8.5-R20-R43-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 8.5/raise to 20/raise to 58.5/allin 97.5",
+      "source_history": "X-R8.5-R20-R58.5-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 39.0,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-18.txt",
+      "source_line": 2,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R8.5-R20-R58.5-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    },
+    {
+      "history": "check/bet 8.5/raise to 27.5/raise to 58/allin 97.5",
+      "source_history": "X-R8.5-R27.5-R58-RAI",
+      "actor": "BTN",
+      "street": "river",
+      "remaining_stack_bb_displayed": 39.5,
+      "actions": [
+        "fold",
+        "call"
+      ],
+      "source_transcription": "menu-capture-19.txt",
+      "source_line": 1,
+      "source_url_from_observed_history": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=15&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=X-R8.5-R27.5-R58-RAI",
+      "source_url_provenance": "Constructed from captured base URL and root-transcribed observed history; not an independently saved full DOM URL for every record.",
+      "observation_surface": "Collecting root agent transcribed successful fresh DOM tool-output records; not raw full DOM."
+    }
+  ],
+  "tree_observation": "132 observed decision menus are retained (130 explicit retranscribed tool-output records plus root and after-check). Every nonterminal child in these observed menus has a retained menu; no unobserved frontier remains. Lost browser-memory observations are not adopted. Retracted observations require explicit recapture. Menu closure alone does not certify complete branch policies, game conditions or reference quality.",
+  "unobserved_menu_frontier": [],
+  "root_ui": {
+    "view": "Root Ranges/Strategy/EV observations supplied by collecting root agent",
+    "oop_ev_bb": 2.37,
+    "ip_ev_bb": 2.76,
+    "oop_equity_percent": 47.1,
+    "ip_equity_percent": 52.9,
+    "oop_combos_rounded": 197.3,
+    "ip_combos_rounded": 53.1,
+    "oop_frequency_percent": {
+      "check": 57.2,
+      "bet_2": 37.2,
+      "bet_4": 0.9,
+      "bet_8_5": 4.7,
+      "allin_97_5": 0
+    },
+    "oop_action_combos_displayed": {
+      "check": 112.94,
+      "bet_2": 73.37,
+      "bet_4": 1.7,
+      "bet_8_5": 9.3,
+      "allin_97_5": 0
+    },
+    "ip_frequency_percent": null,
+    "frequency_sum_note": "Root frequencies sum to 100.0% as displayed; no renormalization. Action combo counts have mixed displayed decimal precision; do not infer exact per-action mass or a full profile."
+  },
+  "display_steps": {
+    "ev_bb": 0.01,
+    "frequency_percentage_points": 0.1,
+    "equity_percentage_points": 0.1,
+    "weighted_combos": 0.1,
+    "action_weighted_combos": "Mixed display precision retained verbatim; no universal rounding step inferred"
+  },
+  "rake_catalog_only": {
+    "source": "docs/plans/hu-postflop-r0/cases.csv HU-R0-002",
+    "catalog_checked_at": "2026-09-25T05:52:40.229Z",
+    "rake_percent": 5,
+    "rake_cap_bb": 0.6,
+    "reconfirmed_in_this_capture": false,
+    "note": "Current collection rules, uncalled contribution handling, rounding and version remain unverified."
+  },
+  "reference_exploitability": null,
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "comparison_threshold": null,
+  "missing_fields": [
+    "all River response/raise menus and complete public-tree identity",
+    "reference rake collection rules, uncalled contribution handling and rounding",
+    "reference solver version and internal precision",
+    "node-specific accuracy metric, denominator and stopping conditions",
+    "full per-hand/action profile and EVs",
+    "root BTN action frequencies",
+    "exact EV basis and display rounding rule"
+  ],
+  "historical_evidence_policy": "The older Ks7h2d3c8d acquisition is a navigation/reference aid only. Its ranges, tree estimates, EV transforms and historical pass labels are not adopted as current evidence.",
+  "capture_scope": "Root inputs and partial decision-menu acquisition only. No diagnostic config, solver execution, full-game certification or reference quality acceptance.",
+  "estimated_capture_utc_interval": [
+    "2026-09-25T18:53Z",
+    "2026-09-25T19:00Z"
+  ],
+  "capture_completed_before_observed_clock_utc": "2026-09-25T19:02:08Z",
+  "menu_capture_batches": [
+    "menu-capture-01.json",
+    "menu-capture-02.json",
+    "menu-capture-03.json",
+    "menu-capture-04.json",
+    "menu-capture-05.json",
+    "menu-capture-06.json",
+    "menu-capture-07.json",
+    "menu-capture-08.json",
+    "menu-capture-09.json",
+    "menu-capture-10.json",
+    "menu-capture-11.json",
+    "menu-capture-12.json",
+    "menu-capture-13.json",
+    "menu-capture-14.json",
+    "menu-capture-15.json",
+    "menu-capture-16.json",
+    "menu-capture-17.json",
+    "menu-capture-18.json",
+    "menu-capture-19.json"
+  ],
+  "menu_capture_time_bounds": {
+    "initial_root_menus": "Before approximately 19:06 UTC on 2026-09-25; exact node timestamps not recorded.",
+    "local_batch01": "Before observed clock 2026-09-25T19:23:29Z; start approximately 19:06 UTC only.",
+    "local_batches02_through19": {
+      "after_observed_clock_utc": "2026-09-25T19:23:29Z",
+      "before_observed_clock_utc": "2026-09-25T19:36:00Z",
+      "last_clock_provenance": "Root observed the final clock directly after the final successful capture. Exact per-record times not supplied."
+    }
+  },
+  "menu_integrity_summary": {
+    "observed_menu_count": 132,
+    "observed_terminal_edge_count": 261,
+    "observed_public_node_count_if_terminal_edges_are_leaves": 393,
+    "menu_graph_closed": true,
+    "unobserved_frontier_count": 0,
+    "scope": "Observed River decision menus and their fold/call/check-check endpoints only; no utility, complete policy, rake or reference-quality certification."
+  }
+}
