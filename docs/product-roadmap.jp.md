@@ -298,6 +298,8 @@ ICMの10,000人入力を受け付けることと、同じ範囲を数分で解�
 | **R6: Multiway Postflop（低優先）** | 複数人が残る任意Postflop局面を高速に解ける | 小3人ゲーム→River→Turn/Flopから人数を広げる案。joint belief/card removal、side pot、独立deviator、品質確認済み教師 | 採用した人数・条件で時間・品質・coverageを同時に満たす。制限を表示し、少人数の認定を全人数へ流用しない |
 | **R7: 特殊大会と追加の精密化** | PKO等のbounty形式、将来handのモデル、特殊ルールへ拡張 | bounty精算と継続価値、FGS、追加variantの境界。PKOは低優先、他は必要性と費用で選ぶ | 各方式のutility・理論条件・実証範囲を個別に認定。通常MTT/サテライトやHUの完成条件に一括して含めない |
 
+R0の対象表・測定計画・初回ローカル枠を照合する証拠は[readiness報告](../experiments/hu-postflop-r0/readiness/report-2026-09-25.jp.md)、R1の入口と未決事項の判断時期は[引継ぎ](plans/hu-postflop-r0/handoff.md)を参照する。候補24件の基本条件確認は、同一ゲームfixtureや品質の認定を含まない。
+
 主工程は**R1の汎用境界と検証→R2のHU Postflop厳密CFR→R3の教師生成とHU高速近似**とする。
 R4でICM・相手モデルを統合し、R5で共通基盤から対象を広げる。Multiway PostflopとPKOは低優先のR6/R7へ置く。
 学習の入出力設計や小ゲームの予備研究は先にできるが、未認定のCFR出力を正解として大量生成しない。

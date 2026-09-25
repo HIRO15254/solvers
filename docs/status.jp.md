@@ -36,6 +36,12 @@ R0〜R7のProjectは既存のものを使う。同名Projectや既存作業のIs
 | R0-04 | [SOL-4](https://linear.app/sapphire2/issue/SOL-4/r0-04-huの測定仕様と暫定判定を固定する) | 同 §6 |
 | R0-05 | [SOL-5](https://linear.app/sapphire2/issue/SOL-5/r0-05-初回ローカル実行の資源枠を決める) | 同 §7 |
 | R0-06 | [SOL-6](https://linear.app/sapphire2/issue/SOL-6/r0-06-r0完了を確認しr1へ引き渡す) | 同 §8 |
+| T1-01 | [SOL-8](https://linear.app/sapphire2/issue/SOL-8/t1-01-hu参照条件値を取得し固定fixtureを作る) | [R1作業](plans/solver-implementation-plan.jp.md#5-r1-hu検証と汎用ゲーム境界)、[R0引継ぎ](plans/hu-postflop-r0/handoff.md) |
+| T1-02 | [SOL-9](https://linear.app/sapphire2/issue/SOL-9/t1-02-共通ゲーム境界を設計する) | 同上 |
+| T1-03 | [SOL-10](https://linear.app/sapphire2/issue/SOL-10/t1-03-縮小studdrawで共通境界を検証する) | 同上 |
+| T1-04 | [SOL-11](https://linear.app/sapphire2/issue/SOL-11/t1-04-抽象化の識別子写像評価範囲を定義する) | 同上 |
+| T1-05 | [SOL-12](https://linear.app/sapphire2/issue/SOL-12/t1-05-huの基準測定と保存後照合を行う) | 同上 |
+| T1-06 | [SOL-13](https://linear.app/sapphire2/issue/SOL-13/t1-06-hu比較の閾値と受入範囲を固定する) | 同上 |
 
 設計・受入上の必須前提はGitの作業票で定義する。Linearのblocked-byは実行時の待ち関係を表す。
 必須前提が変わった場合は作業票を更新し、その影響をLinearの待ち関係へ反映する。

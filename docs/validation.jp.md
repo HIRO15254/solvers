@@ -137,6 +137,8 @@ T3-00でvalue誤差、action順位・選択損失、continuationを含む評価�
 - T1-05/T1-06: 基準測定と比較前に固定する受入版。
 - T3-00: 後続方式の評価研究と指標選定。
 
+R0で確認した候補件数・多様性と準備成果物の版は[readiness報告](../experiments/hu-postflop-r0/readiness/report-2026-09-25.jp.md)を参照する。[R1引継ぎ](plans/hu-postflop-r0/handoff.md)は参照条件の取得、測定器と監視器、閾値校正の順序を定める。候補区分は同一ゲーム認定ではなく、閾値版のない観測を品質合格へ変換しない。
+
 case台帳にはID、suite、条件、参照、確認不足、source、入力・出力へのリンクを残す。
 再現入力・集計・検証器・報告は`experiments/<campaign>/<experiment>/`の追跡対象へまとめる。
 大型出力だけをignored領域へ分け、保持する場合は場所・hash・利用可能性を記録する。

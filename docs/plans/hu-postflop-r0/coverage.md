@@ -44,7 +44,7 @@
 
 確認済み24件では画面の履歴ツリーで開始nodeのbet/check/all-inと後続分岐を閲覧でき、Strategy + EV表示で頻度・EV欄を確認できたため、`tree_access`、`frequency_access`、`ev_access`を`取得可能`とした。`HU-R0-008`ではFlop後の複数decision nodeもたどった。`HU-R0-001`ではRanges tabのCopy機能を直接確認し、`range_access=取得可能`。他23件の両者combo range抽出は個別に試していないため`要確認`。いずれも全数値転記の完了を意味しない。
 
-R1は各行の`source_url`からsolutionと開始spotを再確認し、両者combo range重み・正規化、card removal、pot/dead money、rake/utility、全Preflop/Postflop履歴、各nodeと後続streetのbet/raise/all-in menu、hand/combo別action頻度・EV、EV基準点・表示精度・参照版を取得する。`missing_fields`と`next_action`は行ごとの取得項目と比較障害を示す。`same_game_candidate`はR1の完全再現認定ではないが、現時点ではその候補区分にも進めていない。[検証計画](../../validation.jp.md)の固定情報とEV基準に従って監査する。
+R1は各行の`source_url`からsolutionと開始spotを再確認し、両者combo range重み・正規化、card removal、pot/dead money、rake/utility、全Preflop/Postflop履歴、各nodeと後続streetのbet/raise/all-in menu、hand/combo別action頻度・EV、EV基準点・表示精度・参照版を取得する。`missing_fields`と`next_action`は行ごとの取得項目と比較障害を示す。`same_game_candidate`はR1で照合する候補区分であり、完全再現の認定ではない。[検証計画](../../validation.jp.md)の固定情報とEV基準に従って監査する。
 
 GTO WizardのMTT ChipEV 20bb（8max）は画面上で`preflop only`と表示され、Postflop候補に算入しなかった。HU SnG 20bb Generalはライブラリー上にあるが、現在のログインではPostflop戦略・EVにアクセスできない。Cash 6max cEV Single Sizeの既存Postflop解を確認できたため、`HU-R0-008`をこちらへ差し替えた。画面の`AI solve`は別の新規solveへのリンクであり、既存のSingle Size Postflop解の不在を意味しない。
 
