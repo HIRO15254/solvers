@@ -1,0 +1,24 @@
+test_all_passed_but_final_comparison_failed_is_explicit (test_check_run.PortableFlowTests.test_all_passed_but_final_comparison_failed_is_explicit) ... ok
+test_claimed_sample_must_equal_rederived_value (test_check_run.PortableFlowTests.test_claimed_sample_must_equal_rederived_value) ... ok
+test_completed_relocated_evidence_rederives_samples_and_summary (test_check_run.PortableFlowTests.test_completed_relocated_evidence_rederives_samples_and_summary) ... ok
+test_failed_prefix_never_computes_success_summary (test_check_run.PortableFlowTests.test_failed_prefix_never_computes_success_summary) ... ok
+test_final_quality_completion_must_fit_work_deadline (test_check_run.PortableFlowTests.test_final_quality_completion_must_fit_work_deadline) ... ok
+test_metadata_bytes_environment_and_summary_tampering_rejected (test_check_run.PortableFlowTests.test_metadata_bytes_environment_and_summary_tampering_rejected) ... ok
+test_prepare_failure_only_claims_available_payload_integrity (test_check_run.PortableFlowTests.test_prepare_failure_only_claims_available_payload_integrity) ... ok
+test_unbuilt_binary_and_future_identity_are_rejected (test_check_run.PortableFlowTests.test_unbuilt_binary_and_future_identity_are_rejected) ... ok
+test_duplicate_json_key_is_not_silently_overwritten (test_check_run.RetentionTests.test_duplicate_json_key_is_not_silently_overwritten) ... ok
+test_identity_version_payload_is_also_verified (test_check_run.RetentionTests.test_identity_version_payload_is_also_verified) ... ok
+test_invalid_pin_types_and_hash_paths_are_rejected (test_check_run.RetentionTests.test_invalid_pin_types_and_hash_paths_are_rejected) ... ok
+test_modified_or_missing_payload_is_rejected (test_check_run.RetentionTests.test_modified_or_missing_payload_is_rejected) ... ok
+test_restored_cas_reads_original_identifier_without_execution (test_check_run.RetentionTests.test_restored_cas_reads_original_identifier_without_execution) ... ok
+test_pinned_source_copies_match_and_extra_retained_source_is_rejected (test_check_run.SourceBindingTests.test_pinned_source_copies_match_and_extra_retained_source_is_rejected) ... ok
+test_completed_requires_every_stage_and_record (test_check_run.SuffixTests.test_completed_requires_every_stage_and_record) ... ok
+test_first_failure_has_only_skipped_suffix_and_keeps_counts (test_check_run.SuffixTests.test_first_failure_has_only_skipped_suffix_and_keeps_counts) ... ok
+test_preflight_and_final_comparison_failures_have_no_success_summary (test_check_run.SuffixTests.test_preflight_and_final_comparison_failures_have_no_success_summary) ... ok
+test_reordered_or_nonterminal_or_false_completion_rejected (test_check_run.SuffixTests.test_reordered_or_nonterminal_or_false_completion_rejected) ... ok
+test_skipped_stage_cannot_hide_executed_record (test_check_run.SuffixTests.test_skipped_stage_cannot_hide_executed_record) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.741s
+
+OK

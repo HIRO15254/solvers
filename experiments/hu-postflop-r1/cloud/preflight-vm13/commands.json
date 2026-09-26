@@ -1,0 +1,263 @@
+[
+  {
+    "label": "project-billing",
+    "argv": [
+      "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+      "billing",
+      "projects",
+      "describe",
+      "solvers-abstraction-20260723",
+      "--project=solvers-abstraction-20260723",
+      "--quiet",
+      "--format=json"
+    ],
+    "started_at_utc": "2026-09-26T22:28:11.884860+00:00",
+    "timeout_seconds": 90,
+    "environment_overrides": {
+      "CLOUDSDK_PYTHON": "C:/Python313/python.exe",
+      "CLOUDSDK_ENCODING": "utf-8",
+      "PYTHONIOENCODING": "utf-8"
+    },
+    "stdout": {
+      "path": "project-billing.stdout.log",
+      "bytes": 209,
+      "sha256": "8814f1a26710f4c3fbd81b282bd6e22b6adf9096fe0b12e52dbbc292fb55505e"
+    },
+    "stderr": {
+      "path": "project-billing.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ended_at_utc": "2026-09-26T22:28:14.413215+00:00",
+    "exit_code": 0,
+    "valid_json": true
+  },
+  {
+    "label": "billing-account",
+    "argv": [
+      "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+      "billing",
+      "accounts",
+      "describe",
+      "015A1D-8A8F19-EC7035",
+      "--project=solvers-abstraction-20260723",
+      "--quiet",
+      "--format=json"
+    ],
+    "started_at_utc": "2026-09-26T22:28:11.885164+00:00",
+    "timeout_seconds": 90,
+    "environment_overrides": {
+      "CLOUDSDK_PYTHON": "C:/Python313/python.exe",
+      "CLOUDSDK_ENCODING": "utf-8",
+      "PYTHONIOENCODING": "utf-8"
+    },
+    "stdout": {
+      "path": "billing-account.stdout.log",
+      "bytes": 175,
+      "sha256": "c5bdf5b0e3546e27c07958337800d5f2a97433afe709c3cb464037d4771514cf"
+    },
+    "stderr": {
+      "path": "billing-account.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ended_at_utc": "2026-09-26T22:28:15.283231+00:00",
+    "exit_code": 0,
+    "valid_json": true
+  },
+  {
+    "label": "regional-quota",
+    "argv": [
+      "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+      "compute",
+      "regions",
+      "describe",
+      "us-central1",
+      "--project=solvers-abstraction-20260723",
+      "--quiet",
+      "--format=json"
+    ],
+    "started_at_utc": "2026-09-26T22:28:11.885494+00:00",
+    "timeout_seconds": 90,
+    "environment_overrides": {
+      "CLOUDSDK_PYTHON": "C:/Python313/python.exe",
+      "CLOUDSDK_ENCODING": "utf-8",
+      "PYTHONIOENCODING": "utf-8"
+    },
+    "stdout": {
+      "path": "regional-quota.stdout.log",
+      "bytes": 12068,
+      "sha256": "b8794f4470295c72590ce4e5295d0da15a98a540e8b104d4c13423b34c322e8e"
+    },
+    "stderr": {
+      "path": "regional-quota.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ended_at_utc": "2026-09-26T22:28:15.828042+00:00",
+    "exit_code": 0,
+    "valid_json": true
+  },
+  {
+    "label": "project-quota",
+    "argv": [
+      "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+      "compute",
+      "project-info",
+      "describe",
+      "--format=json(name,quotas)",
+      "--project=solvers-abstraction-20260723",
+      "--quiet"
+    ],
+    "started_at_utc": "2026-09-26T22:28:14.413907+00:00",
+    "timeout_seconds": 90,
+    "environment_overrides": {
+      "CLOUDSDK_PYTHON": "C:/Python313/python.exe",
+      "CLOUDSDK_ENCODING": "utf-8",
+      "PYTHONIOENCODING": "utf-8"
+    },
+    "stdout": {
+      "path": "project-quota.stdout.log",
+      "bytes": 4745,
+      "sha256": "32c2ad145e3a28e30d398ecad8178cc396df02014d9e0757555c797231a7ac66"
+    },
+    "stderr": {
+      "path": "project-quota.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ended_at_utc": "2026-09-26T22:28:17.228306+00:00",
+    "exit_code": 0,
+    "valid_json": true
+  },
+  {
+    "label": "instances",
+    "argv": [
+      "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+      "compute",
+      "instances",
+      "list",
+      "--format=json(name,id,zone,machineType,status,creationTimestamp,scheduling)",
+      "--project=solvers-abstraction-20260723",
+      "--quiet"
+    ],
+    "started_at_utc": "2026-09-26T22:28:15.283821+00:00",
+    "timeout_seconds": 90,
+    "environment_overrides": {
+      "CLOUDSDK_PYTHON": "C:/Python313/python.exe",
+      "CLOUDSDK_ENCODING": "utf-8",
+      "PYTHONIOENCODING": "utf-8"
+    },
+    "stdout": {
+      "path": "instances.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "stderr": {
+      "path": "instances.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ended_at_utc": "2026-09-26T22:28:17.999570+00:00",
+    "exit_code": 0,
+    "valid_json": true
+  },
+  {
+    "label": "reserved-addresses",
+    "argv": [
+      "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+      "compute",
+      "addresses",
+      "list",
+      "--format=json(name,id,region,status,users)",
+      "--project=solvers-abstraction-20260723",
+      "--quiet"
+    ],
+    "started_at_utc": "2026-09-26T22:28:15.828745+00:00",
+    "timeout_seconds": 90,
+    "environment_overrides": {
+      "CLOUDSDK_PYTHON": "C:/Python313/python.exe",
+      "CLOUDSDK_ENCODING": "utf-8",
+      "PYTHONIOENCODING": "utf-8"
+    },
+    "stdout": {
+      "path": "reserved-addresses.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "stderr": {
+      "path": "reserved-addresses.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ended_at_utc": "2026-09-26T22:28:18.698631+00:00",
+    "exit_code": 0,
+    "valid_json": true
+  },
+  {
+    "label": "disks",
+    "argv": [
+      "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+      "compute",
+      "disks",
+      "list",
+      "--format=json(name,id,zone,sizeGb,type,users,status)",
+      "--project=solvers-abstraction-20260723",
+      "--quiet"
+    ],
+    "started_at_utc": "2026-09-26T22:28:17.230077+00:00",
+    "timeout_seconds": 90,
+    "environment_overrides": {
+      "CLOUDSDK_PYTHON": "C:/Python313/python.exe",
+      "CLOUDSDK_ENCODING": "utf-8",
+      "PYTHONIOENCODING": "utf-8"
+    },
+    "stdout": {
+      "path": "disks.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "stderr": {
+      "path": "disks.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ended_at_utc": "2026-09-26T22:28:19.835173+00:00",
+    "exit_code": 0,
+    "valid_json": true
+  },
+  {
+    "label": "machine-e2-standard-4",
+    "argv": [
+      "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+      "compute",
+      "machine-types",
+      "describe",
+      "e2-standard-4",
+      "--zone=us-central1-b",
+      "--project=solvers-abstraction-20260723",
+      "--quiet",
+      "--format=json"
+    ],
+    "started_at_utc": "2026-09-26T22:28:18.000174+00:00",
+    "timeout_seconds": 90,
+    "environment_overrides": {
+      "CLOUDSDK_PYTHON": "C:/Python313/python.exe",
+      "CLOUDSDK_ENCODING": "utf-8",
+      "PYTHONIOENCODING": "utf-8"
+    },
+    "stdout": {
+      "path": "machine-e2-standard-4.stdout.log",
+      "bytes": 539,
+      "sha256": "893cca6ae3f00fb60306653816ee85f8b376a7393200c4f1d0c8a0d8b7efc627"
+    },
+    "stderr": {
+      "path": "machine-e2-standard-4.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ended_at_utc": "2026-09-26T22:28:21.366525+00:00",
+    "exit_code": 0,
+    "valid_json": true
+  }
+]

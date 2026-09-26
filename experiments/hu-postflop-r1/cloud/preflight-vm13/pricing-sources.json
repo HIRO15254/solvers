@@ -1,0 +1,92 @@
+[
+  {
+    "source": "https://cloud.google.com/products/compute/pricing/general-purpose",
+    "final_url": "https://cloud.google.com/products/compute/pricing/general-purpose",
+    "retrieved_at_utc": "2026-09-26T22:28:22.446391+00:00",
+    "response_bytes": 35801285,
+    "response_sha256": "9a276a129a4c0ec66ad1855131af9272eb4a3ed1bfb61a2060dc05105c9cc94e",
+    "retained": [
+      {
+        "path": "pricing-compute-e2-standard-4-row.html",
+        "bytes": 739,
+        "sha256": "27d15a273c29ecc264b02b1eef346ded94c18b661df4022ab45088bf3b94f22c"
+      },
+      {
+        "path": "pricing-compute-e2-standard-4-header.html",
+        "bytes": 6156,
+        "sha256": "0eaf29d999d51db71eba961ac83ed0759f97e85be48a16011ccef9c5b6505aa4"
+      },
+      {
+        "path": "pricing-compute-e2-standard-4-region.html",
+        "bytes": 304,
+        "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+      }
+    ],
+    "extraction": "Exact first matching HTML row, prior table header and prior Iowa label. Full response is not retained."
+  },
+  {
+    "source": "https://cloud.google.com/compute/disks-image-pricing",
+    "final_url": "https://cloud.google.com/compute/disks-image-pricing",
+    "retrieved_at_utc": "2026-09-26T22:28:12.449424+00:00",
+    "response_bytes": 3902526,
+    "response_sha256": "37e3c54308de333d82149f0e88e14ea30337946579e5d1bcc1c326c078f6d6e2",
+    "retained": [
+      {
+        "path": "pricing-disk-balanced-row.html",
+        "bytes": 243,
+        "sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319"
+      },
+      {
+        "path": "pricing-disk-balanced-header.html",
+        "bytes": 316,
+        "sha256": "6d20d457c99d6bdf26cff89c6462a3eccb864216f96720ddac3312547cb64565"
+      },
+      {
+        "path": "pricing-disk-balanced-region.html",
+        "bytes": 304,
+        "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+      }
+    ],
+    "extraction": "Exact first matching HTML row, prior table header and prior Iowa label. Full response is not retained."
+  },
+  {
+    "source": "https://cloud.google.com/vpc/network-pricing",
+    "final_url": "https://cloud.google.com/vpc/network-pricing",
+    "retrieved_at_utc": "2026-09-26T22:28:12.127346+00:00",
+    "response_bytes": 3808937,
+    "response_sha256": "9f5a2bd997ff12a4fd1bd5555d8c389f9d8b4e7aad1b08fdf14a5811559de130",
+    "retained": [
+      {
+        "path": "pricing-network-spot-ipv4-row.html",
+        "bytes": 288,
+        "sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7"
+      },
+      {
+        "path": "pricing-network-spot-ipv4-header.html",
+        "bytes": 315,
+        "sha256": "93345396f548060461bc900f409d21bf02ea0c2123b5849d1269035dea74151e"
+      },
+      {
+        "path": "pricing-network-spot-ipv4-region.html",
+        "bytes": 304,
+        "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+      },
+      {
+        "path": "pricing-network-asia-egress-row.html",
+        "bytes": 791,
+        "sha256": "7682738cbbb76f8367ad699c94767ae312761d1401b69c034cf6e31a1d419cd4"
+      },
+      {
+        "path": "pricing-network-asia-egress-header.html",
+        "bytes": 316,
+        "sha256": "654fa3b64513f4092f73efbf07280024104f26e28e2a01ed800794e177b97c35"
+      },
+      {
+        "path": "pricing-network-asia-egress-region.html",
+        "bytes": 304,
+        "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+      }
+    ],
+    "extraction": "Exact first matching HTML row, prior table header and prior Iowa label. Full response is not retained."
+  }
+]

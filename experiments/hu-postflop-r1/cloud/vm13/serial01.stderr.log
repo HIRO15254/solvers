@@ -1,0 +1,2 @@
+
+Specify --start=86900 in the next get-serial-port-output invocation to get only the new output starting from here.

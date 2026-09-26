@@ -1,0 +1,15 @@
+{
+  "schema": "r1.current-phases-package/v1",
+  "archive": "phase-deployment01.tar.gz",
+  "bytes": 30474924,
+  "sha256": "3b8f7e6edf6c3ead01f6e6009829569a41a77a8e2bdff1eaaf6345275f11782c",
+  "members": 262,
+  "manifest": {
+    "bytes": 45783,
+    "sha256": "18a0a4f9c6cd72eb36aeb9e01134cc93b89de98a3058ef86e5e0149969963d9a"
+  },
+  "packer": {
+    "bytes": 3996,
+    "sha256": "6d030e0bfbe8ef214036d4fb0cb9674bf612fb2c657b7a041b1ccf5f860b02e7"
+  }
+}

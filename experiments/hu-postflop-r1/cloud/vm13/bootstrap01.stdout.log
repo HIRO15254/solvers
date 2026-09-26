@@ -1,0 +1,8 @@
+2026-09-26T22:49:08+00:00
+d65ffd75-d2ca-4e08-8452-4c12027b4a2a
+Sep 26 22:49:06 solvers-r1-20260926-13 google_metadata_script_runner[1214]: startup-script: info: downloading installer
+Sep 26 22:49:06 solvers-r1-20260926-13 google_metadata_script_runner[1214]: startup-script: info: profile set to minimal
+Sep 26 22:49:06 solvers-r1-20260926-13 google_metadata_script_runner[1214]: startup-script: info: default host tuple is x86_64-unknown-linux-gnu
+Sep 26 22:49:06 solvers-r1-20260926-13 google_metadata_script_runner[1214]: startup-script: info: syncing channel updates for 1.97.0-x86_64-unknown-linux-gnu
+Sep 26 22:49:07 solvers-r1-20260926-13 google_metadata_script_runner[1214]: startup-script: info: latest update on 2026-07-09 for version 1.97.0 (2d8144b78 2026-07-07)
+Sep 26 22:49:07 solvers-r1-20260926-13 google_metadata_script_runner[1214]: startup-script: info: downloading 5 components

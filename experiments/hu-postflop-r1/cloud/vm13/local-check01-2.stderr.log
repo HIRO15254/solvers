@@ -1,0 +1,30 @@
+test_deadline_chronology_rejected (test_install.DeadlineTests.test_deadline_chronology_rejected) ... ok
+test_explicit_utc_only (test_install.DeadlineTests.test_explicit_utc_only) ... ok
+test_maximum_work_lifetime_and_recovery_bounds_are_inclusive (test_install.DeadlineTests.test_maximum_work_lifetime_and_recovery_bounds_are_inclusive) ... ok
+test_remaining_window_is_strict_and_fraction_floor_conservative (test_install.DeadlineTests.test_remaining_window_is_strict_and_fraction_floor_conservative) ... ok
+test_work_stop_and_recovery_limit_violations (test_install.DeadlineTests.test_work_stop_and_recovery_limit_violations) ... ok
+test_archive_replaced_between_initial_pin_and_extract_is_rejected (test_install.InstallerTests.test_archive_replaced_between_initial_pin_and_extract_is_rejected) ... ok
+test_changed_compressed_archive_rejected (test_install.InstallerTests.test_changed_compressed_archive_rejected) ... ok
+test_changed_extracted_control_size_and_same_size_hash_rejected (test_install.InstallerTests.test_changed_extracted_control_size_and_same_size_hash_rejected) ... ok
+test_complete_install_and_verify_only_package (test_install.InstallerTests.test_complete_install_and_verify_only_package) ... ok
+test_duplicate_and_file_directory_collision_rejected (test_install.InstallerTests.test_duplicate_and_file_directory_collision_rejected) ... ok
+test_existing_destination_never_modified (test_install.InstallerTests.test_existing_destination_never_modified) ... ok
+test_initial_package_may_not_hide_unlisted_reference_member (test_install.InstallerTests.test_initial_package_may_not_hide_unlisted_reference_member) ... ok
+test_manifest_consistent_changed_historical_archive_still_rejected (test_install.InstallerTests.test_manifest_consistent_changed_historical_archive_still_rejected) ... ok
+test_manifest_duplicate_path_or_manifest_self_entry_rejected (test_install.InstallerTests.test_manifest_duplicate_path_or_manifest_self_entry_rejected) ... ok
+test_manifest_unsafe_path_and_duplicate_json_keys_rejected (test_install.InstallerTests.test_manifest_unsafe_path_and_duplicate_json_keys_rejected) ... ok
+test_member_total_bound_inclusive_and_oversize_rejected (test_install.InstallerTests.test_member_total_bound_inclusive_and_oversize_rejected) ... ok
+test_missing_and_unlisted_package_files_rejected (test_install.InstallerTests.test_missing_and_unlisted_package_files_rejected) ... ok
+test_negative_size_and_member_count_bound (test_install.InstallerTests.test_negative_size_and_member_count_bound) ... ok
+test_nested_proof_uses_same_safe_regular_only_extractor (test_install.InstallerTests.test_nested_proof_uses_same_safe_regular_only_extractor) ... ok
+test_nonregular_types_rejected_before_writes (test_install.InstallerTests.test_nonregular_types_rejected_before_writes) ... ok
+test_outer_sha_and_size_bound_before_extract (test_install.InstallerTests.test_outer_sha_and_size_bound_before_extract) ... ok
+test_post_install_only_exact_reference_subtree_is_exempt (test_install.InstallerTests.test_post_install_only_exact_reference_subtree_is_exempt) ... ok
+test_safe_name_rejects_empty_nonstring_control_and_dot (test_install.InstallerTests.test_safe_name_rejects_empty_nonstring_control_and_dot) ... ok
+test_unsafe_member_names_rejected_before_destination_created (test_install.InstallerTests.test_unsafe_member_names_rejected_before_destination_created) ... ok
+test_wrong_schema_revision_and_source_closure_rejected (test_install.InstallerTests.test_wrong_schema_revision_and_source_closure_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 25 tests in 0.795s
+
+OK

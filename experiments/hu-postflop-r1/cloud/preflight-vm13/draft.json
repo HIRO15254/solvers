@@ -1,0 +1,121 @@
+{
+  "schema": "solvers.r1.vm13-preflight/v1",
+  "generated_at_utc": "2026-09-26T22:30:26.260215+00:00",
+  "observation_start_at_utc": "2026-09-26T22:28:11.884860+00:00",
+  "observation_end_at_utc": "2026-09-26T22:28:21.366525+00:00",
+  "cloud_mutations_performed": false,
+  "budget_modified": false,
+  "project": "solvers-abstraction-20260723",
+  "zone": "us-central1-b",
+  "billing": {
+    "billingAccountName": "billingAccounts/015A1D-8A8F19-EC7035",
+    "billingEnabled": true,
+    "name": "projects/solvers-abstraction-20260723/billingInfo",
+    "projectId": "solvers-abstraction-20260723",
+    "account": {
+      "currencyCode": "JPY",
+      "displayName": "趣味",
+      "masterBillingAccount": "",
+      "name": "billingAccounts/015A1D-8A8F19-EC7035",
+      "open": true,
+      "parent": ""
+    },
+    "cumulative_actual_cost": null
+  },
+  "project_instances": [],
+  "project_disks": [],
+  "regional_quota": [
+    {
+      "limit": 200.0,
+      "metric": "CPUS",
+      "usage": 0.0
+    },
+    {
+      "limit": 8.0,
+      "metric": "IN_USE_ADDRESSES",
+      "usage": 0.0
+    },
+    {
+      "limit": 500.0,
+      "metric": "SSD_TOTAL_GB",
+      "usage": 0.0
+    },
+    {
+      "limit": 24.0,
+      "metric": "INSTANCES",
+      "usage": 0.0
+    },
+    {
+      "limit": 0.0,
+      "metric": "PREEMPTIBLE_CPUS",
+      "usage": 0.0
+    },
+    {
+      "limit": 200.0,
+      "metric": "N2_CPUS",
+      "usage": 0.0
+    },
+    {
+      "limit": 24.0,
+      "metric": "E2_CPUS",
+      "usage": 0.0
+    }
+  ],
+  "global_cpu_quota": [
+    {
+      "limit": 32.0,
+      "metric": "CPUS_ALL_REGIONS",
+      "usage": 0.0
+    }
+  ],
+  "machine_types": [
+    {
+      "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+      "description": "Efficient Instance, 4 vCPUs, 16 GB RAM",
+      "guestCpus": 4,
+      "id": "335004",
+      "imageSpaceGb": 0,
+      "isSharedCpu": false,
+      "kind": "compute#machineType",
+      "maximumPersistentDisks": 128,
+      "maximumPersistentDisksSizeGb": "263168",
+      "memoryMb": 16384,
+      "name": "e2-standard-4",
+      "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/machineTypes/e2-standard-4",
+      "zone": "us-central1-b"
+    }
+  ],
+  "quota_interpretation": "4-vCPU request is below regional CPUS=200, E2_CPUS=24 and project CPUS_ALL_REGIONS=32, all usage0. PREEMPTIBLE_CPUS=0 is retained without treating it as an independent positive allowance. Spot quota application and zone capacity are not guaranteed by this read-only check.",
+  "estimate_usd": {
+    "compute": "0.1428",
+    "disk": "0.131520",
+    "ipv4": "0.002550",
+    "download": "0.30",
+    "other_tax_delay_margin": "1",
+    "total": "1.576870"
+  },
+  "proposed_new_reservation_usd": 2,
+  "prior_held_usd": 38,
+  "proposed_total_held_usd": 40,
+  "authorized_total_usd": 40,
+  "proposed_unreserved_usd": 0,
+  "limits": {
+    "initial_absolute_stop_max_hours": 1,
+    "measurement_deadline_min_minutes_before_stop": 15,
+    "estimate_compute_hours_including_rounding_margin": 1.02,
+    "boot_disk_gib": 40,
+    "disk_type": "pd-balanced",
+    "boot_disk_auto_delete": true,
+    "disk_budget_hours": 24,
+    "download_max_gib": 1,
+    "deadline_extension_allowed": false,
+    "separate_parallel_vm_allowed": false
+  },
+  "sources": [
+    "https://docs.cloud.google.com/compute/resource-usage",
+    "https://docs.cloud.google.com/compute/docs/instances/spot",
+    "https://cloud.google.com/products/compute/pricing/general-purpose",
+    "https://cloud.google.com/compute/disks-image-pricing",
+    "https://cloud.google.com/vpc/network-pricing"
+  ]
+}

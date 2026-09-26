@@ -1,0 +1,35 @@
+test_completed_and_failed_proofs_use_trusted_phase_checker (__main__.Evidence.test_completed_and_failed_proofs_use_trusted_phase_checker) ... ok
+test_corrupt_archive_fails_before_checker (__main__.Evidence.test_corrupt_archive_fails_before_checker) ... ok
+test_failed_prepare_may_omit_plan_only_with_explicit_partial_provenance (__main__.Evidence.test_failed_prepare_may_omit_plan_only_with_explicit_partial_provenance) ... ok
+test_missing_or_ambiguous_launch_metadata_is_rejected (__main__.Evidence.test_missing_or_ambiguous_launch_metadata_is_rejected) ... ok
+test_modified_or_extra_extracted_bytes_fail_before_checker (__main__.Evidence.test_modified_or_extra_extracted_bytes_fail_before_checker) ... ok
+test_nonterminal_wrong_schema_or_unverified_payload_is_rejected (__main__.Evidence.test_nonterminal_wrong_schema_or_unverified_payload_is_rejected) ... ok
+test_plan_launch_and_preserved_metadata_must_be_identical (__main__.Evidence.test_plan_launch_and_preserved_metadata_must_be_identical) ... ok
+test_proof_launch_must_match_original_instance_and_fixed_unit (__main__.Evidence.test_proof_launch_must_match_original_instance_and_fixed_unit) ... ok
+test_raw_preserved_failure_remains_failed_without_quality_claim (__main__.Evidence.test_raw_preserved_failure_remains_failed_without_quality_claim) ... ok
+test_trusted_checker_failure_is_not_accepted (__main__.Evidence.test_trusted_checker_failure_is_not_accepted) ... ok
+test_unexpected_missing_files_or_retention_issues_rejected (__main__.Evidence.test_unexpected_missing_files_or_retention_issues_rejected) ... ok
+test_correct_live_identity_and_disk (__main__.Guards.test_correct_live_identity_and_disk) ... ok
+test_disk_requires_exact_size_link_and_sole_user (__main__.Guards.test_disk_requires_exact_size_link_and_sole_user) ... ok
+test_launch_rejects_missing_extra_or_different_source_disk (__main__.Guards.test_launch_rejects_missing_extra_or_different_source_disk) ... ok
+test_launch_rejects_wrong_name_id_or_optional_location (__main__.Guards.test_launch_rejects_wrong_name_id_or_optional_location) ... ok
+test_launch_requires_single_instance_array (__main__.Guards.test_launch_requires_single_instance_array) ... ok
+test_live_instance_must_match_preserved_launch_id (__main__.Guards.test_live_instance_must_match_preserved_launch_id) ... ok
+test_live_instance_rejects_disk_policy_and_size_changes (__main__.Guards.test_live_instance_rejects_disk_policy_and_size_changes) ... ok
+test_minimal_original_launch_array_is_accepted (__main__.Guards.test_minimal_original_launch_array_is_accepted) ... ok
+test_requested_json_filter_is_not_overridden (__main__.Guards.test_requested_json_filter_is_not_overridden) ... ok
+test_absence_readback_error_does_not_skip_remaining_reads_or_retry_delete (__main__.Sequence.test_absence_readback_error_does_not_skip_remaining_reads_or_retry_delete) ... ok
+test_default_inspect_never_deletes (__main__.Sequence.test_default_inspect_never_deletes) ... ok
+test_delete_once_then_every_readback_and_preserve_terminal_failure (__main__.Sequence.test_delete_once_then_every_readback_and_preserve_terminal_failure) ... ok
+test_delete_requires_evidence_before_cloud (__main__.Sequence.test_delete_requires_evidence_before_cloud) ... ok
+test_every_requested_proof_is_verified_before_any_cloud_call (__main__.Sequence.test_every_requested_proof_is_verified_before_any_cloud_call) ... ok
+test_invalid_launch_prevents_cloud_calls (__main__.Sequence.test_invalid_launch_prevents_cloud_calls) ... ok
+test_launch_changed_after_validation_prevents_cloud_calls (__main__.Sequence.test_launch_changed_after_validation_prevents_cloud_calls) ... ok
+test_live_id_mismatch_prevents_disk_read_and_delete (__main__.Sequence.test_live_id_mismatch_prevents_disk_read_and_delete) ... ok
+test_unverified_proof_prevents_cloud_calls (__main__.Sequence.test_unverified_proof_prevents_cloud_calls) ... ok
+test_wrong_operation_id_cannot_certify_absence (__main__.Sequence.test_wrong_operation_id_cannot_certify_absence) ... ok
+
+----------------------------------------------------------------------
+Ran 30 tests in 1.033s
+
+OK

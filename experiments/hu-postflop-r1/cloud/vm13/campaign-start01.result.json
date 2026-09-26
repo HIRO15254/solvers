@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260926-13",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:oBB8DJK3k6ZsJrRBM5FtbmNka4YM01NNWpwmb/a0xwg",
+    "--command=sudo python3 -B /opt/r1/phase-deployment01/start.py --instance-created-utc 2026-09-26T22:47:48.384000+00:00 --instance-id 6526324704760165755 --work-deadline-utc 2026-09-26T23:32:45+00:00 --stop-deadline-utc 2026-09-26T23:47:45Z"
+  ],
+  "started_utc": "2026-09-26T22:51:47.615022+00:00",
+  "timeout_seconds": 60,
+  "stdout": {
+    "bytes": 1080,
+    "sha256": "2fb0b8b4fbb0177717332ecc05cd66dc35991a7a9599865c89ad2487164bcad0"
+  },
+  "stderr": {
+    "bytes": 105,
+    "sha256": "2cd983e633c09c7cbadeaa6784748765c6a0b72ccc41444ad162d95ae7e8e475"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-26T22:51:53.516007+00:00"
+}

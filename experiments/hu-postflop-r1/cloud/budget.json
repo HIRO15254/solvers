@@ -23,6 +23,63 @@
   ],
   "reservations": [
     {
+      "id": "r1-20260926-13",
+      "project": "solvers-abstraction-20260723",
+      "zone": "us-central1-b",
+      "instance": "solvers-r1-20260926-13",
+      "reserved_usd": 2,
+      "billed_usd": null,
+      "reservation_released": false,
+      "maximum_runtime_hours": 1,
+      "machine_type": "e2-standard-4",
+      "provisioning_model": "SPOT",
+      "disk_type": "pd-balanced",
+      "disk_gib": 40,
+      "maximum_download_gib": 1,
+      "conservative_compute_usd_hour": 0.14,
+      "disk_usd_gib_hour": 0.000137,
+      "ipv4_usd_hour": 0.0025,
+      "reserved_egress_usd_gib": 0.3,
+      "tax_price_delay_and_other_reserve_usd": 1,
+      "instance_termination_action": "STOP",
+      "explicit_disk_cleanup_hours": 24,
+      "auto_restart": false,
+      "reserved_at_utc": "2026-09-26T22:47:22.220525+00:00",
+      "pricing_checked_utc": "2026-09-26",
+      "purpose": "Current 11e4062 fixed 4-arm phase attribution, two fresh builds, 48 solve + 96 codec + 144 quality stages; four-CPU finite single-boot campaign.",
+      "pricing_sources": [
+        "https://cloud.google.com/products/compute/pricing/general-purpose",
+        "https://cloud.google.com/compute/disks-image-pricing",
+        "https://cloud.google.com/vpc/network-pricing"
+      ],
+      "preflight_evidence": "experiments/hu-postflop-r1/cloud/preflight-vm13/",
+      "note": "One instance, no resize or auto restart, work ends15min before absolute STOP<=1h. Conservative1.02h compute/IP,40GiB disk24h,<=1GiB egress and1USD margin=1.57687<2. Prior invoices unknown and fully held; cumulative40/40,0unreserved. No further reservation until actual billing reconciliation or explicit new authorization.",
+      "absolute_deadline_utc": "2026-09-26T23:47:45Z",
+      "measurement_deadline_utc": "2026-09-26T23:32:45+00:00",
+      "events": [
+        {
+          "event": "instance_created_running",
+          "at": "2026-09-26T15:47:48.384-07:00",
+          "instance_id": "6526324704760165755",
+          "absolute_stop_deadline_utc": "2026-09-26T23:47:45Z",
+          "boot_disk_source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260926-13",
+          "boot_disk_auto_delete": true,
+          "evidence": "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-13.json"
+        },
+        {
+          "event": "finite_campaign_dispatched",
+          "at": "2026-09-26T22:51:52.646763+00:00",
+          "instance_id": "6526324704760165755",
+          "boot_id": "d65ffd75-d2ca-4e08-8452-4c12027b4a2a",
+          "unit": "solvers-r1-vm13-current-phases",
+          "measurement_deadline_utc": "2026-09-26T23:32:45+00:00",
+          "runtime_max_seconds": 2432,
+          "evidence": "experiments/hu-postflop-r1/cloud/vm13/campaign-start01.stdout.log",
+          "reservation_delta_usd": 0
+        }
+      ]
+    },
+    {
       "id": "r1-20260926-12",
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260926-13",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:oBB8DJK3k6ZsJrRBM5FtbmNka4YM01NNWpwmb/a0xwg",
+    "--command=printf \"%s\\n\" \"4e7899c4b15a8a0e71281011bf75e831f97cf316ded796bc81c21b8889b17f4b  /tmp/install.py\" | sha256sum -c - && sudo python3 -B /tmp/install.py --archive /tmp/phase-deployment01.tar.gz --sha256 3b8f7e6edf6c3ead01f6e6009829569a41a77a8e2bdff1eaaf6345275f11782c --destination /opt/r1/phase-deployment01 > /tmp/current-phase-installation01.json && sudo mv /tmp/current-phase-installation01.json /opt/r1/current-phase-installation01.json && cat /opt/r1/current-phase-installation01.json && test -f /opt/r1/bootstrap-complete && cat /opt/r1/bootstrap-complete"
+  ],
+  "started_utc": "2026-09-26T22:50:26.473875+00:00",
+  "timeout_seconds": 120
+}

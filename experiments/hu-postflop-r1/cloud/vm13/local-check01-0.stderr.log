@@ -1,0 +1,17 @@
+test_build_command_is_one_offline_fresh_target_per_copy (test_runner.RunnerTests.test_build_command_is_one_offline_fresh_target_per_copy) ... ok
+test_deadline_lifetime_and_recovery (test_runner.RunnerTests.test_deadline_lifetime_and_recovery) ... ok
+test_environment_clears_contamination_and_restores_even_error (test_runner.RunnerTests.test_environment_clears_contamination_and_restores_even_error) ... ok
+test_environment_modes_and_quality_exclusion (test_runner.RunnerTests.test_environment_modes_and_quality_exclusion) ... ok
+test_first_semantic_failure_is_terminal (test_runner.RunnerTests.test_first_semantic_failure_is_terminal) ... ok
+test_fixed_codec_input_and_own_quality_input (test_runner.RunnerTests.test_fixed_codec_input_and_own_quality_input) ... ok
+test_fixed_counts_and_full_order (test_runner.RunnerTests.test_fixed_counts_and_full_order) ... ok
+test_no_resume_or_second_execution (test_runner.RunnerTests.test_no_resume_or_second_execution) ... ok
+test_reset_memory_calibration_thresholds_not_trusted_pass_flag (test_runner.RunnerTests.test_reset_memory_calibration_thresholds_not_trusted_pass_flag) ... ok
+test_stage_full_timeout_and_tail_strict_boundary (test_runner.RunnerTests.test_stage_full_timeout_and_tail_strict_boundary) ... ok
+test_success_requires_caller_final_quality_not_loop_alone (test_runner.RunnerTests.test_success_requires_caller_final_quality_not_loop_alone) ... ok
+test_textual_runtime_is_finite_and_convertible (test_runner.RunnerTests.test_textual_runtime_is_finite_and_convertible) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.008s
+
+OK

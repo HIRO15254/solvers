@@ -1,0 +1,16 @@
+/tmp/install.py: OK
+{
+  "schema": "r1.current-phases-install/v1",
+  "archive": {
+    "bytes": 30474924,
+    "sha256": "3b8f7e6edf6c3ead01f6e6009829569a41a77a8e2bdff1eaaf6345275f11782c"
+  },
+  "manifest": {
+    "bytes": 45783,
+    "sha256": "18a0a4f9c6cd72eb36aeb9e01134cc93b89de98a3058ef86e5e0149969963d9a"
+  },
+  "files": 261,
+  "source_revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+  "status": "installed_not_executed"
+}
+2026-09-26T22:49:20+00:00

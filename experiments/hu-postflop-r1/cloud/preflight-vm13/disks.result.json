@@ -1,0 +1,32 @@
+{
+  "label": "disks",
+  "argv": [
+    "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+    "compute",
+    "disks",
+    "list",
+    "--format=json(name,id,zone,sizeGb,type,users,status)",
+    "--project=solvers-abstraction-20260723",
+    "--quiet"
+  ],
+  "started_at_utc": "2026-09-26T22:28:17.230077+00:00",
+  "timeout_seconds": 90,
+  "environment_overrides": {
+    "CLOUDSDK_PYTHON": "C:/Python313/python.exe",
+    "CLOUDSDK_ENCODING": "utf-8",
+    "PYTHONIOENCODING": "utf-8"
+  },
+  "stdout": {
+    "path": "disks.stdout.log",
+    "bytes": 4,
+    "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+  },
+  "stderr": {
+    "path": "disks.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "ended_at_utc": "2026-09-26T22:28:19.835173+00:00",
+  "exit_code": 0,
+  "valid_json": true
+}

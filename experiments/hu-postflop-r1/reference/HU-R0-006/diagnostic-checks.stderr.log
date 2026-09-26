@@ -1,0 +1,18 @@
+test_all_observed_menus_and_raw_ranges_match (__main__.DiagnosticChecks.test_all_observed_menus_and_raw_ranges_match) ... ok
+test_condition_amount_and_missing_rule_mutations_rejected (__main__.DiagnosticChecks.test_condition_amount_and_missing_rule_mutations_rejected) ... ok
+test_config_shape_limits_and_no_quality_target (__main__.DiagnosticChecks.test_config_shape_limits_and_no_quality_target) ... ok
+test_embedded_raw_range_mutations_rejected (__main__.DiagnosticChecks.test_embedded_raw_range_mutations_rejected) ... ok
+test_fraction_rake_on_independent_terminals (__main__.DiagnosticChecks.test_fraction_rake_on_independent_terminals) ... ok
+test_hand_transcribed_raise_to_and_call_contributions (__main__.DiagnosticChecks.test_hand_transcribed_raise_to_and_call_contributions) ... ok
+test_hidden_tree_or_wrong_cap_rejected (__main__.DiagnosticChecks.test_hidden_tree_or_wrong_cap_rejected) ... ok
+test_independent_half_bb_bfs_matches_config_dfs_and_capture (__main__.DiagnosticChecks.test_independent_half_bb_bfs_matches_config_dfs_and_capture) ... ok
+test_invalid_target_is_not_silently_clamped (__main__.DiagnosticChecks.test_invalid_target_is_not_silently_clamped) ... ok
+test_missing_reordered_or_wrong_observation_rejected (__main__.DiagnosticChecks.test_missing_reordered_or_wrong_observation_rejected) ... ok
+test_no_native_or_external_acceptance_claim (__main__.DiagnosticChecks.test_no_native_or_external_acceptance_claim) ... ok
+test_selector_collision_resolved_only_by_allin_legality (__main__.DiagnosticChecks.test_selector_collision_resolved_only_by_allin_legality) ... ok
+test_unsupported_dsl_is_rejected (__main__.DiagnosticChecks.test_unsupported_dsl_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.770s
+
+OK

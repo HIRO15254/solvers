@@ -1,0 +1,41 @@
+{
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\test_cleanup.py"
+  ],
+  "started_utc": "2026-09-26T22:51:01.623743+00:00",
+  "ended_utc": "2026-09-26T22:51:02.929341+00:00",
+  "exit_code": 0,
+  "before": {
+    "cleanup.py": {
+      "bytes": 15346,
+      "sha256": "88168cf245efa7aac3a2bfb12d50cace146d97347c581728cb26a4242a0ae8e3"
+    },
+    "test_cleanup.py": {
+      "bytes": 20393,
+      "sha256": "76961f8f7b9cd28f269774a452c515591e24e7a6dabca2bc04d7962291771e40"
+    }
+  },
+  "after": {
+    "cleanup.py": {
+      "bytes": 15346,
+      "sha256": "88168cf245efa7aac3a2bfb12d50cace146d97347c581728cb26a4242a0ae8e3"
+    },
+    "test_cleanup.py": {
+      "bytes": 20393,
+      "sha256": "76961f8f7b9cd28f269774a452c515591e24e7a6dabca2bc04d7962291771e40"
+    }
+  },
+  "mock_cloud_only": true,
+  "stdout": {
+    "path": "local-check01.stdout.log",
+    "bytes": 805,
+    "sha256": "8d494376f6cbf39ccf8471b592a39cf2edc68871955b8b98f395c96b28930e0f"
+  },
+  "stderr": {
+    "path": "local-check01.stderr.log",
+    "bytes": 4124,
+    "sha256": "12f935009ae88d64bd92480baaa0e47ab507f210fa51da42dd002a8118795701"
+  }
+}

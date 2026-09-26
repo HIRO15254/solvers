@@ -1,0 +1,242 @@
+{
+  "schema": "r1.vm13-local-checks/v1",
+  "started_utc": "2026-09-26T22:46:26.730547+00:00",
+  "before": {
+    "experiments/hu-postflop-r1/cloud/vm13/capture-command.py": {
+      "bytes": 2173,
+      "sha256": "52fe1da901159425fe161c42820521279cea405a7a8f4ee533e0b61618e4a1f4"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/collect.py": {
+      "bytes": 7958,
+      "sha256": "cd071ba724ff077a7161a9a3c53789716d265bb8b6927e8b3af0b4dbc7efa1f6"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/install.py": {
+      "bytes": 6200,
+      "sha256": "4e7899c4b15a8a0e71281011bf75e831f97cf316ded796bc81c21b8889b17f4b"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/pack.py": {
+      "bytes": 3996,
+      "sha256": "6d030e0bfbe8ef214036d4fb0cb9674bf612fb2c657b7a041b1ccf5f860b02e7"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/run.py": {
+      "bytes": 3390,
+      "sha256": "e8863b0e818771dff47f9cd736923515878b4910148b9e1e67eb10e06f7f4ff7"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/start.py": {
+      "bytes": 5248,
+      "sha256": "e2d1da89b7521a389f6d96249c836895813b48d12e30b22e6e250442f6f4ebbc"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/test_install.py": {
+      "bytes": 20967,
+      "sha256": "00517c55d1b95169417d3b7803faa709b677ac2c3dfa95b6dd2c8583ac7de0a2"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/fetch.sh": {
+      "bytes": 874,
+      "sha256": "d8b784487615e1321ce68bd116007e5f9cf74628616c84a280c2ef4f1dd44e07"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/recover.sh": {
+      "bytes": 2121,
+      "sha256": "4c50d23839f42692670d93decb3a33b5b4d585b8581a5a589e33fad707bcfe98"
+    },
+    "experiments/hu-postflop-r1/current-phases/check_run.py": {
+      "bytes": 21435,
+      "sha256": "ec8d8e879cbd283ca0b308aa891eea17635229b83624172775e0ccd6fc03f115"
+    },
+    "experiments/hu-postflop-r1/current-phases/prepare.py": {
+      "bytes": 10559,
+      "sha256": "76b8f47ac54e9a0be33cd2cf268267cdccfbbc2991e808aa035c32c849e2e6c5"
+    },
+    "experiments/hu-postflop-r1/current-phases/runner.py": {
+      "bytes": 32093,
+      "sha256": "b0761936c290f3419f2e73d47071a17cab4f795db30aaea814b9d0ac26ebadfc"
+    },
+    "experiments/hu-postflop-r1/current-phases/test_check_run.py": {
+      "bytes": 19689,
+      "sha256": "2d0314fd153e1bdcb1a2b0fd4827dc4216aa92e7e92e10e36fa5fe2c45177f44"
+    },
+    "experiments/hu-postflop-r1/current-phases/test_prepare.py": {
+      "bytes": 5154,
+      "sha256": "d4d0534ffc3751c285488670d6adff03e4d793cdcced23cb6db75aa75fe7979d"
+    },
+    "experiments/hu-postflop-r1/current-phases/test_runner.py": {
+      "bytes": 7803,
+      "sha256": "17d0c1591c64bcbe37a5e1796d015e7098c088a50384813b7c816daee740bbfc"
+    },
+    "experiments/hu-postflop-r1/current-phases/test_validate.py": {
+      "bytes": 10096,
+      "sha256": "9f0ba0f9e91861274065567ec8a1047c4b10289c4f4be1d9ec31da97b51d84ac"
+    },
+    "experiments/hu-postflop-r1/current-phases/validate.py": {
+      "bytes": 7462,
+      "sha256": "36b143bf493fb48c8f6660cb9a9161f22fb333cc5d263cffa3542edea9fe23a8"
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "experiments/hu-postflop-r1/current-phases",
+        "-p",
+        "test_runner.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "local-check01-0.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "local-check01-0.stderr.log",
+        "bytes": 1650,
+        "sha256": "cc399cfea500bdcf557e3fa62a82494ec61428fb7dffb484dcbd364c22e8de4f"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "experiments/hu-postflop-r1/current-phases",
+        "-p",
+        "test_check_run.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "local-check01-1.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "local-check01-1.stderr.log",
+        "bytes": 2989,
+        "sha256": "54b857c0edf96d8ce57aee59a7b129e04948140eceaffc4f7ed33b3ab1b03f37"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "experiments/hu-postflop-r1/cloud/vm13",
+        "-p",
+        "test_install.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "local-check01-2.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "local-check01-2.stderr.log",
+        "bytes": 3661,
+        "sha256": "0a21d6b861ccb5eae8ca998067691b6a5cbf8e7ef136c1553f0bed6c59bde7d7"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "local-check01-3.stdout.log",
+        "bytes": 48,
+        "sha256": "78525ba6a5f5b6be950c80a401fdf487286a0b6c1ce0004597612ea7fe650692"
+      },
+      "stderr": {
+        "path": "local-check01-3.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "heavy_local_work": false,
+  "after": {
+    "experiments/hu-postflop-r1/cloud/vm13/capture-command.py": {
+      "bytes": 2173,
+      "sha256": "52fe1da901159425fe161c42820521279cea405a7a8f4ee533e0b61618e4a1f4"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/collect.py": {
+      "bytes": 7958,
+      "sha256": "cd071ba724ff077a7161a9a3c53789716d265bb8b6927e8b3af0b4dbc7efa1f6"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/install.py": {
+      "bytes": 6200,
+      "sha256": "4e7899c4b15a8a0e71281011bf75e831f97cf316ded796bc81c21b8889b17f4b"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/pack.py": {
+      "bytes": 3996,
+      "sha256": "6d030e0bfbe8ef214036d4fb0cb9674bf612fb2c657b7a041b1ccf5f860b02e7"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/run.py": {
+      "bytes": 3390,
+      "sha256": "e8863b0e818771dff47f9cd736923515878b4910148b9e1e67eb10e06f7f4ff7"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/start.py": {
+      "bytes": 5248,
+      "sha256": "e2d1da89b7521a389f6d96249c836895813b48d12e30b22e6e250442f6f4ebbc"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/test_install.py": {
+      "bytes": 20967,
+      "sha256": "00517c55d1b95169417d3b7803faa709b677ac2c3dfa95b6dd2c8583ac7de0a2"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/fetch.sh": {
+      "bytes": 874,
+      "sha256": "d8b784487615e1321ce68bd116007e5f9cf74628616c84a280c2ef4f1dd44e07"
+    },
+    "experiments/hu-postflop-r1/cloud/vm13/recover.sh": {
+      "bytes": 2121,
+      "sha256": "4c50d23839f42692670d93decb3a33b5b4d585b8581a5a589e33fad707bcfe98"
+    },
+    "experiments/hu-postflop-r1/current-phases/check_run.py": {
+      "bytes": 21435,
+      "sha256": "ec8d8e879cbd283ca0b308aa891eea17635229b83624172775e0ccd6fc03f115"
+    },
+    "experiments/hu-postflop-r1/current-phases/prepare.py": {
+      "bytes": 10559,
+      "sha256": "76b8f47ac54e9a0be33cd2cf268267cdccfbbc2991e808aa035c32c849e2e6c5"
+    },
+    "experiments/hu-postflop-r1/current-phases/runner.py": {
+      "bytes": 32093,
+      "sha256": "b0761936c290f3419f2e73d47071a17cab4f795db30aaea814b9d0ac26ebadfc"
+    },
+    "experiments/hu-postflop-r1/current-phases/test_check_run.py": {
+      "bytes": 19689,
+      "sha256": "2d0314fd153e1bdcb1a2b0fd4827dc4216aa92e7e92e10e36fa5fe2c45177f44"
+    },
+    "experiments/hu-postflop-r1/current-phases/test_prepare.py": {
+      "bytes": 5154,
+      "sha256": "d4d0534ffc3751c285488670d6adff03e4d793cdcced23cb6db75aa75fe7979d"
+    },
+    "experiments/hu-postflop-r1/current-phases/test_runner.py": {
+      "bytes": 7803,
+      "sha256": "17d0c1591c64bcbe37a5e1796d015e7098c088a50384813b7c816daee740bbfc"
+    },
+    "experiments/hu-postflop-r1/current-phases/test_validate.py": {
+      "bytes": 10096,
+      "sha256": "9f0ba0f9e91861274065567ec8a1047c4b10289c4f4be1d9ec31da97b51d84ac"
+    },
+    "experiments/hu-postflop-r1/current-phases/validate.py": {
+      "bytes": 7462,
+      "sha256": "36b143bf493fb48c8f6660cb9a9161f22fb333cc5d263cffa3542edea9fe23a8"
+    }
+  },
+  "ended_utc": "2026-09-26T22:46:29.434284+00:00",
+  "passed": true
+}

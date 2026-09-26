@@ -1,0 +1,34 @@
+{
+  "label": "machine-e2-standard-4",
+  "argv": [
+    "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+    "compute",
+    "machine-types",
+    "describe",
+    "e2-standard-4",
+    "--zone=us-central1-b",
+    "--project=solvers-abstraction-20260723",
+    "--quiet",
+    "--format=json"
+  ],
+  "started_at_utc": "2026-09-26T22:28:18.000174+00:00",
+  "timeout_seconds": 90,
+  "environment_overrides": {
+    "CLOUDSDK_PYTHON": "C:/Python313/python.exe",
+    "CLOUDSDK_ENCODING": "utf-8",
+    "PYTHONIOENCODING": "utf-8"
+  },
+  "stdout": {
+    "path": "machine-e2-standard-4.stdout.log",
+    "bytes": 539,
+    "sha256": "893cca6ae3f00fb60306653816ee85f8b376a7393200c4f1d0c8a0d8b7efc627"
+  },
+  "stderr": {
+    "path": "machine-e2-standard-4.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "ended_at_utc": "2026-09-26T22:28:21.366525+00:00",
+  "exit_code": 0,
+  "valid_json": true
+}
