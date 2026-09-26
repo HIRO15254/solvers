@@ -1,0 +1,151 @@
+{
+  "schema": "solvers.r1.vm12-preflight/v1",
+  "generated_at_utc": "2026-09-26T20:22:01.764277+00:00",
+  "observation_start_at_utc": "2026-09-26T20:17:35.302105+00:00",
+  "observation_end_at_utc": "2026-09-26T20:17:44.926709+00:00",
+  "cloud_mutations_performed": false,
+  "budget_modified": false,
+  "project": "solvers-abstraction-20260723",
+  "zone": "us-central1-b",
+  "billing": {
+    "billingAccountName": "billingAccounts/015A1D-8A8F19-EC7035",
+    "billingEnabled": true,
+    "name": "projects/solvers-abstraction-20260723/billingInfo",
+    "projectId": "solvers-abstraction-20260723",
+    "account": {
+      "currencyCode": "JPY",
+      "displayName": "趣味",
+      "masterBillingAccount": "",
+      "name": "billingAccounts/015A1D-8A8F19-EC7035",
+      "open": true,
+      "parent": ""
+    },
+    "cumulative_actual_cost": null
+  },
+  "project_instances": [],
+  "project_disks": [],
+  "regional_quota": [
+    {
+      "limit": 200.0,
+      "metric": "CPUS",
+      "usage": 0.0
+    },
+    {
+      "limit": 8.0,
+      "metric": "IN_USE_ADDRESSES",
+      "usage": 0.0
+    },
+    {
+      "limit": 500.0,
+      "metric": "SSD_TOTAL_GB",
+      "usage": 0.0
+    },
+    {
+      "limit": 24.0,
+      "metric": "INSTANCES",
+      "usage": 0.0
+    },
+    {
+      "limit": 0.0,
+      "metric": "PREEMPTIBLE_CPUS",
+      "usage": 0.0
+    },
+    {
+      "limit": 200.0,
+      "metric": "N2_CPUS",
+      "usage": 0.0
+    },
+    {
+      "limit": 24.0,
+      "metric": "E2_CPUS",
+      "usage": 0.0
+    }
+  ],
+  "global_cpu_quota": [
+    {
+      "limit": 32.0,
+      "metric": "CPUS_ALL_REGIONS",
+      "usage": 0.0
+    }
+  ],
+  "machine_types": [
+    {
+      "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+      "description": "Efficient Instance, 4 vCPUs, 16 GB RAM",
+      "guestCpus": 4,
+      "id": "335004",
+      "imageSpaceGb": 0,
+      "isSharedCpu": false,
+      "kind": "compute#machineType",
+      "maximumPersistentDisks": 128,
+      "maximumPersistentDisksSizeGb": "263168",
+      "memoryMb": 16384,
+      "name": "e2-standard-4",
+      "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/machineTypes/e2-standard-4",
+      "zone": "us-central1-b"
+    },
+    {
+      "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+      "description": "Efficient Instance, 32 vCPUs, 32 GB RAM",
+      "guestCpus": 32,
+      "id": "337032",
+      "imageSpaceGb": 0,
+      "isSharedCpu": false,
+      "kind": "compute#machineType",
+      "maximumPersistentDisks": 128,
+      "maximumPersistentDisksSizeGb": "524288",
+      "memoryMb": 32768,
+      "name": "e2-highcpu-32",
+      "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/machineTypes/e2-highcpu-32",
+      "zone": "us-central1-b"
+    },
+    {
+      "creationTimestamp": "1969-12-31T16:00:00.000-08:00",
+      "description": "32 vCPUs 32 GB RAM",
+      "guestCpus": 32,
+      "id": "903032",
+      "imageSpaceGb": 0,
+      "isSharedCpu": false,
+      "kind": "compute#machineType",
+      "maximumPersistentDisks": 128,
+      "maximumPersistentDisksSizeGb": "524288",
+      "memoryMb": 32768,
+      "name": "n2-highcpu-32",
+      "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/machineTypes/n2-highcpu-32",
+      "zone": "us-central1-b"
+    }
+  ],
+  "quota_interpretation": "Official E2 ordinary quota maps to CPUS, while API also returns E2_CPUS=24; application of the latter is unresolved. N2 ordinary/global quota has room. No capacity or launch guarantee.",
+  "estimate_usd": {
+    "compute": "1.1730",
+    "disk": "0.131520",
+    "ipv4": "0.002550",
+    "download": "0.30",
+    "other_tax_delay_margin": "1",
+    "total": "2.607070"
+  },
+  "proposed_new_reservation_usd": 3,
+  "prior_held_usd": 35,
+  "proposed_total_held_usd": 38,
+  "authorized_total_usd": 40,
+  "proposed_unreserved_usd": 2,
+  "limits": {
+    "initial_absolute_stop_max_hours": 1,
+    "measurement_deadline_min_minutes_before_stop": 15,
+    "estimate_compute_hours_including_rounding_margin": 1.02,
+    "boot_disk_gib": 40,
+    "disk_type": "pd-balanced",
+    "boot_disk_auto_delete": true,
+    "disk_budget_hours": 24,
+    "download_max_gib": 1,
+    "deadline_extension_allowed": false,
+    "separate_parallel_vm_allowed": false
+  },
+  "sources": [
+    "https://docs.cloud.google.com/compute/resource-usage",
+    "https://docs.cloud.google.com/compute/docs/instances/spot",
+    "https://cloud.google.com/products/compute/pricing/general-purpose",
+    "https://cloud.google.com/compute/disks-image-pricing",
+    "https://cloud.google.com/vpc/network-pricing"
+  ]
+}

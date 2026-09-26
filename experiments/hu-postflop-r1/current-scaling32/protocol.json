@@ -1,0 +1,29 @@
+{
+  "schema": "r1.current-scaling32-protocol/v1",
+  "scope": "Current production closure 11e4062, compact F32 internal quality endpoints on one 32-logical-CPU boot. Not a full worker curve, old/new comparison, I16, external-reference or R1 certification.",
+  "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+  "logical_cpus": 32,
+  "threads": [1, 16, 32],
+  "warmup_blocks": 1,
+  "measured_blocks": 3,
+  "cases": {
+    "river": {"file": "river.toml", "iterations": 1000, "check_every": 100, "target_nash_conv": 0.439},
+    "turn": {"file": "turn.toml", "iterations": 1000, "check_every": 100, "target_nash_conv": 0.00228},
+    "flop": {"file": "flop.toml", "iterations": 50, "check_every": 5, "target_nash_conv": 0.0367}
+  },
+  "config_directory": "experiments/hu-postflop-r1/range-scaling/configs",
+  "order": "Case order river,turn,flop; block0 warmup then blocks1,2,3 measured. Rotate [1,16,32] left by (case-index + block) modulo3. Each measured worker occupies each ordinal position once within each case. All36 runs retained; warmups must pass every correctness check but never enter performance statistics. No pilot or count selection.",
+  "quality": "First check with finite unclamped NashConv <= the fixed case target, within unchanged exact-mass04 caps/cadences. Full stopping trajectory numeric bits, final EV/BR/NC bits, retained hand IDs, all-node strategy/CFV canonical bytes and complete compact F32 state bytes must agree across workers and repeats. No old/new equivalence or external accuracy claim. The River input has nonzero rake; its NC is an internal diagnostic, not zero-sum certification.",
+  "foundation": {
+    "plan": {"bytes": 17733, "sha256": "8763df23d4c86a295ffb4728409d19311f36c0dcb38aaa58e9d77fb3b823a2eb"},
+    "source_manifest": {"bytes": 68137, "sha256": "1a84947f6daa9ca1c57d5f48e4914e176643dbe9c787262ded95dcf6aba042d6"},
+    "source_archive": {"bytes": 1400466, "sha256": "51068bb8464b57b91d11fe1ce1be848f14cd83e26865661afeeee3c70a3e9cd7"},
+    "workspace": {"summary_count": 56, "passed": 958, "ignored": 31},
+    "reuse": "Verify the original eight exact-mass04 validation stages and raw identities. This is historical source-identical validation, not a workspace rerun on the new host. Preserve original dirty-base manifest; all current production/Cargo pins must equal 11e4062. The unchanged full snapshot also contains the validated research benchmark."
+  },
+  "limits": {"build_timeout_seconds": 1200, "sample_timeout_seconds": 300, "rss_bytes": 10737418240, "outer_memory_max_bytes": 12884901888, "min_free_bytes": 1073741824, "disk_reserve_bytes": 4294967296, "poll_seconds": 0.02, "grace_seconds": 5, "kill_wait_seconds": 5},
+  "build": {"toolchain": "1.97.0", "jobs": 2, "rustflags": "-C target-cpu=native", "fresh_target": true},
+  "maximum_campaign_seconds": 3600,
+  "measurement": "Single fresh release benchmark binary built on the same32-CPU boot and unchanged host/cgroup as every sample. Full affinity, CPU quota unlimited or >=32, outerMemoryMax<=12GiB, swap0, CPUWeight100. Solve timer includes all stopping EV/BR checks; setup and final query/capture/output remain separate. Report all medians, speedups and32/16 slowdowns; no forced speedup threshold. Native RSS may inherit parent highwater; native and sampled RSS are separate descriptive counters, with no memory reduction claim.",
+  "failure": "Every sample must fit300s+20s before the fixed absolute deadline; build must fit1200s+20s. No retries, resumed execution, replacement, target changes or timeout successes. Any process, identity, containment, quality or artifact failure stops execution, retains available rawbytes and marks the exact remaining suffix skipped. VM lifecycle/reservation/deletion and an earlier recovery margin remain caller obligations."
+}

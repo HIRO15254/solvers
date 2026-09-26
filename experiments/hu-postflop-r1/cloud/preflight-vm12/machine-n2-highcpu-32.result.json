@@ -1,0 +1,34 @@
+{
+  "label": "machine-n2-highcpu-32",
+  "argv": [
+    "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+    "compute",
+    "machine-types",
+    "describe",
+    "n2-highcpu-32",
+    "--zone=us-central1-b",
+    "--project=solvers-abstraction-20260723",
+    "--quiet",
+    "--format=json"
+  ],
+  "started_at_utc": "2026-09-26T20:17:41.406007+00:00",
+  "timeout_seconds": 90,
+  "environment_overrides": {
+    "CLOUDSDK_PYTHON": "C:/Python313/python.exe",
+    "CLOUDSDK_ENCODING": "utf-8",
+    "PYTHONIOENCODING": "utf-8"
+  },
+  "stdout": {
+    "path": "machine-n2-highcpu-32.stdout.log",
+    "bytes": 520,
+    "sha256": "1e1470ec9bb200f7aa0e2079813b391b64f2d32277441d8056bcfa0be84d1942"
+  },
+  "stderr": {
+    "path": "machine-n2-highcpu-32.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "ended_at_utc": "2026-09-26T20:17:44.919617+00:00",
+  "exit_code": 0,
+  "valid_json": true
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "r1.current-scaling32-local-checks/v1",
+  "started_at": "2026-09-26T20:23:55.737082+00:00",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\current-scaling32\\test_run.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.3960969999898225,
+  "stdout": "",
+  "stderr": "test_command_and_build_use_fixed_stopping_and_target (__main__.Tests.test_command_and_build_use_fixed_stopping_and_target) ... ok\ntest_host_accepts_unlimited_and_exact_thirty_two_cpu_quota (__main__.Tests.test_host_accepts_unlimited_and_exact_thirty_two_cpu_quota) ... ok\ntest_host_rejects_memory_swap_quota_and_cpu_weight (__main__.Tests.test_host_rejects_memory_swap_quota_and_cpu_weight) ... ok\ntest_host_rejects_wrong_cpu_count_affinity_or_topology (__main__.Tests.test_host_rejects_wrong_cpu_count_affinity_or_topology) ... ok\ntest_measured_order_rotates_each_worker_through_every_position (__main__.Tests.test_measured_order_rotates_each_worker_through_every_position) ... ok\ntest_record_rejects_deadline_source_identity_and_command_drift (__main__.Tests.test_record_rejects_deadline_source_identity_and_command_drift) ... ok\ntest_same_solution_rejects_raw_state_or_canonical_change (__main__.Tests.test_same_solution_rejects_raw_state_or_canonical_change) ... ok\ntest_same_solution_rejects_signed_zero_trajectory_drift (__main__.Tests.test_same_solution_rejects_signed_zero_trajectory_drift) ... ok\ntest_sample_accepts_every_selected_worker_and_preserves_raw_bytes (__main__.Tests.test_sample_accepts_every_selected_worker_and_preserves_raw_bytes) ... ok\ntest_sample_rejects_target_miss_even_when_cap_is_complete (__main__.Tests.test_sample_rejects_target_miss_even_when_cap_is_complete) ... ok\ntest_sample_rejects_wrong_worker_quality_bits_and_input (__main__.Tests.test_sample_rejects_wrong_worker_quality_bits_and_input) ... ok\ntest_schedule_counts_and_case_controls (__main__.Tests.test_schedule_counts_and_case_controls) ... ok\ntest_stopping_rejects_cadence_target_change_and_continuation (__main__.Tests.test_stopping_rejects_cadence_target_change_and_continuation) ... ok\ntest_suffix_accepts_complete_and_single_failure (__main__.Tests.test_suffix_accepts_complete_and_single_failure) ... ok\ntest_suffix_rejects_missing_stage_or_reordered_stage (__main__.Tests.test_suffix_rejects_missing_stage_or_reordered_stage) ... ok\ntest_suffix_rejects_pass_after_failure_or_pending (__main__.Tests.test_suffix_rejects_pass_after_failure_or_pending) ... ok\ntest_summary_can_report_thirty_two_as_fastest (__main__.Tests.test_summary_can_report_thirty_two_as_fastest) ... ok\ntest_summary_excludes_warmups_and_reports_slowdown (__main__.Tests.test_summary_excludes_warmups_and_reports_slowdown) ... ok\ntest_summary_rejects_missing_measured_sample (__main__.Tests.test_summary_rejects_missing_measured_sample) ... ok\n\n----------------------------------------------------------------------\nRan 19 tests in 0.024s\n\nOK\n",
+  "files": {
+    "protocol.json": {
+      "bytes": 3787,
+      "sha256": "fc57d1ded8950ae16073f85ce4dbd1f5f7565427aa8ec32c0ec13f3b37495f95"
+    },
+    "README.md": {
+      "bytes": 7692,
+      "sha256": "e8c1d5d9af31ee01d2860d0fa2603a169884d5e0c575b1b400a93ae2dfb2e738"
+    },
+    "run.py": {
+      "bytes": 33958,
+      "sha256": "9427383aa3b37b3c9850f4a5e3b904a7ee467d4959536e1e5a77b4dc03a365bb"
+    },
+    "source-pins.json": {
+      "bytes": 37027,
+      "sha256": "e184c4f3c3d6558bcad8fd6a9679ab0c092c1c29303e1e9da999b10318059838"
+    },
+    "test_run.py": {
+      "bytes": 20156,
+      "sha256": "7d2e6e3fd7d2ba42bb4b779d83e42b7ee76781f224968a88d4dfe0e8d2e854c6"
+    }
+  },
+  "scope": "19 in-memory tests; no Rust/native compile, solver, cloud or actual32-worker measurement. Source-identical historical foundation was separately rechecked against original exact-proof04 raw records."
+}
