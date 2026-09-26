@@ -1,0 +1,56 @@
+{
+  "schema": "r1.019-payoff-source-pins/v1",
+  "reviewed_at_git_head": "40f4a09d13ae74dc965f2ca6ef0a1140e3e7ae57",
+  "runtime_semantics_reviewed": [
+    "PostflopConfig::starting_share",
+    "child_step",
+    "Builder::terminal",
+    "PercentCapRake::rake",
+    "PayoffPipeline::bake",
+    "subgame_ev_offset",
+    "sol: original subgame value basis"
+  ],
+  "note": "Hashes bind the actual reviewed working-tree bytes. Script does not execute Rust or certify external rules. Future changes require a new semantics review, not automatic repinning.",
+  "files": [
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/observed.json",
+      "bytes": 6319,
+      "sha256": "e38ffaf0b6fbcbbbe5779ae9d4236074df889ea75afd0ee4092e6cd48cf2aca2"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/diagnostic.toml",
+      "bytes": 4959,
+      "sha256": "c3ac2b24063ad5d3c3f35c6efdd34132452ffb09f8b12b00f3a25a118317e658"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/oop-range.txt",
+      "bytes": 1831,
+      "sha256": "e0d201e994569ac6e582603390a98737c59cf6333c630cb8729f6b4f287c2f84"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/ip-range.txt",
+      "bytes": 1818,
+      "sha256": "ac682a2f4646bf9b4c8424f86021879b74fdc7f51177175e3242904d2a831b94"
+    },
+    {
+      "path": "crates/game/src/payoff.rs",
+      "bytes": 11716,
+      "sha256": "bd9ecc083fbc575e888ad2d1173b3ad5ce78f0fb263778f8bd75a27242d772f9"
+    },
+    {
+      "path": "crates/holdem/src/postflop.rs",
+      "bytes": 73444,
+      "sha256": "70ecaa0bbc39ca1fff1d3c7c29a1e499dea87e5b8e58d2486b3e0ebc157f891f"
+    },
+    {
+      "path": "crates/cli/src/postflop_setup.rs",
+      "bytes": 16987,
+      "sha256": "7f14fdf1c99676edb1418c89c80d56293af2b6e72606f1c5380e0e829c8111c3"
+    },
+    {
+      "path": "crates/cli/src/sol.rs",
+      "bytes": 107562,
+      "sha256": "ecf67faeb73e223897698b5601b2051165253cd96b8054863fa3830cfdc5a910"
+    }
+  ]
+}

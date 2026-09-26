@@ -1,0 +1,92 @@
+{
+  "schema": "r1.019-payoff-verification/v1",
+  "tests": {
+    "argv": [
+      "C:\\Python313\\python.exe",
+      "-B",
+      "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\payoff-audit-20260927\\test_audit.py"
+    ],
+    "exit_code": 0,
+    "test_count": 10,
+    "wall_seconds": 0.21970420004799962,
+    "stdout": {
+      "path": "tests.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "path": "tests.stderr.log",
+      "bytes": 1398,
+      "sha256": "13b735de67cccb8e708b095970537771560187bb2129b7d65f87263918c145fa"
+    }
+  },
+  "initial_test_failure": {
+    "exit_code": 1,
+    "failure_count": 1,
+    "cause": "Test compared Decimal display strings (3990.0 versus 3990); fixed to compare numeric values. No arithmetic correction was made.",
+    "stderr": {
+      "path": "tests-initial.stderr.log",
+      "bytes": 2301,
+      "sha256": "d5227f5b1e8308a6be4983bd8144929122dade927849c1844eb8799f1e7667b5"
+    }
+  },
+  "generation_argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\payoff-audit-20260927\\audit.py"
+  ],
+  "generation_exit_code": 0,
+  "check_argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\payoff-audit-20260927\\audit.py",
+    "--check",
+    "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\payoff-audit-20260927\\terminal-table.json"
+  ],
+  "check_exit_code": 0,
+  "check_stdout": {
+    "status": "verified",
+    "bytes": 87546,
+    "sha256": "1f535e23e8f8cacc1cc01a98dce4af1559bead0f5eae260c303707c2a65d4d8e",
+    "counts": {
+      "decision_nodes": 12,
+      "action_edges": 32,
+      "terminal_nodes": 21,
+      "public_nodes": 33,
+      "showdown": 11,
+      "fold": 10
+    }
+  },
+  "files": [
+    {
+      "path": "audit.py",
+      "bytes": 12056,
+      "sha256": "9daedc5197407ec236c39597a7942cfc508c916c61b0dc113efe8bb96bab0bd9"
+    },
+    {
+      "path": "test_audit.py",
+      "bytes": 6638,
+      "sha256": "c0a85aa8cd75f4736e9133f984617c148e1a5ba96854a96e984e2b32c27ae1e2"
+    },
+    {
+      "path": "source-pins.json",
+      "bytes": 2001,
+      "sha256": "053abf2b7c4f4d92cc84422cb101d63bc86de93a86b5aa6aafe770ceb319a868"
+    },
+    {
+      "path": "terminal-table.json",
+      "bytes": 87546,
+      "sha256": "1f535e23e8f8cacc1cc01a98dce4af1559bead0f5eae260c303707c2a65d4d8e"
+    }
+  ],
+  "python": {
+    "executable": "C:\\Python313\\python.exe",
+    "version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "scope": "offline arithmetic and retained graph only; no Rust solver or external quality acceptance",
+  "report": {
+    "path": "README.jp.md",
+    "bytes": 4856,
+    "sha256": "9f4708e8240b49d69714761964c499c3f7f603101e93ea876363c8e419ef2809"
+  }
+}

@@ -1,0 +1,28 @@
+test_all_terminal_histories_against_hand_written_contributions (__main__.PayoffAuditTests.test_all_terminal_histories_against_hand_written_contributions) ... ok
+test_decision_origin_uses_pre_action_contribution_not_final_payment (__main__.PayoffAuditTests.test_decision_origin_uses_pre_action_contribution_not_final_payment) ... ok
+test_outcome_values_from_independent_simplified_formulas (__main__.PayoffAuditTests.test_outcome_values_from_independent_simplified_formulas) ... FAIL
+test_pins_and_nonacceptance_scope (__main__.PayoffAuditTests.test_pins_and_nonacceptance_scope) ... ok
+test_refund_is_not_lost_from_matched_payoff (__main__.PayoffAuditTests.test_refund_is_not_lost_from_matched_payoff) ... ok
+test_reject_changed_actor (__main__.PayoffAuditTests.test_reject_changed_actor) ... ok
+test_reject_changed_economics_and_fractional_chip (__main__.PayoffAuditTests.test_reject_changed_economics_and_fractional_chip) ... ok
+test_reject_impossible_actions (__main__.PayoffAuditTests.test_reject_impossible_actions) ... ok
+test_reject_missing_or_duplicate_decision (__main__.PayoffAuditTests.test_reject_missing_or_duplicate_decision) ... ok
+test_reject_terminal_with_decision_child_and_orphan (__main__.PayoffAuditTests.test_reject_terminal_with_decision_child_and_orphan) ... ok
+
+======================================================================
+FAIL: test_outcome_values_from_independent_simplified_formulas (__main__.PayoffAuditTests.test_outcome_values_from_independent_simplified_formulas)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\reference\HU-R0-019\payoff-audit-20260927\test_audit.py", line 64, in test_outcome_values_from_independent_simplified_formulas
+    self.assertEqual(value["public_subgame_utility"]["chips"], audit.vector(want))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'BB': '3990.0', 'BTN': '0.0'} != {'BB': '3990', 'BTN': '0'}
+- {'BB': '3990.0', 'BTN': '0.0'}
+?             --           --
+
++ {'BB': '3990', 'BTN': '0'}
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.062s
+
+FAILED (failures=1)

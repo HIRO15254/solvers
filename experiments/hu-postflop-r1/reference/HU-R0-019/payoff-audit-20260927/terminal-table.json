@@ -1,0 +1,3756 @@
+{
+  "schema": "r1.019-offline-payoff-audit/v1",
+  "case_id": "HU-R0-019",
+  "scope": "retained_graph_and_current_diagnostic_arithmetic_only",
+  "source_pins": {
+    "path": "experiments/hu-postflop-r1/reference/HU-R0-019/payoff-audit-20260927/source-pins.json",
+    "bytes": 2001,
+    "sha256": "053abf2b7c4f4d92cc84422cb101d63bc86de93a86b5aa6aafe770ceb319a868"
+  },
+  "sources": [
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/observed.json",
+      "bytes": 6319,
+      "sha256": "e38ffaf0b6fbcbbbe5779ae9d4236074df889ea75afd0ee4092e6cd48cf2aca2"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/diagnostic.toml",
+      "bytes": 4959,
+      "sha256": "c3ac2b24063ad5d3c3f35c6efdd34132452ffb09f8b12b00f3a25a118317e658"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/oop-range.txt",
+      "bytes": 1831,
+      "sha256": "e0d201e994569ac6e582603390a98737c59cf6333c630cb8729f6b4f287c2f84"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/ip-range.txt",
+      "bytes": 1818,
+      "sha256": "ac682a2f4646bf9b4c8424f86021879b74fdc7f51177175e3242904d2a831b94"
+    },
+    {
+      "path": "crates/game/src/payoff.rs",
+      "bytes": 11716,
+      "sha256": "bd9ecc083fbc575e888ad2d1173b3ad5ce78f0fb263778f8bd75a27242d772f9"
+    },
+    {
+      "path": "crates/holdem/src/postflop.rs",
+      "bytes": 73444,
+      "sha256": "70ecaa0bbc39ca1fff1d3c7c29a1e499dea87e5b8e58d2486b3e0ebc157f891f"
+    },
+    {
+      "path": "crates/cli/src/postflop_setup.rs",
+      "bytes": 16987,
+      "sha256": "7f14fdf1c99676edb1418c89c80d56293af2b6e72606f1c5380e0e829c8111c3"
+    },
+    {
+      "path": "crates/cli/src/sol.rs",
+      "bytes": 107562,
+      "sha256": "ecf67faeb73e223897698b5601b2051165253cd96b8054863fa3830cfdc5a910"
+    }
+  ],
+  "auditor": {
+    "path": "experiments/hu-postflop-r1/reference/HU-R0-019/payoff-audit-20260927/audit.py",
+    "bytes": 12056,
+    "sha256": "9daedc5197407ec236c39597a7942cfc508c916c61b0dc113efe8bb96bab0bd9"
+  },
+  "tests": {
+    "path": "experiments/hu-postflop-r1/reference/HU-R0-019/payoff-audit-20260927/test_audit.py",
+    "bytes": 6638,
+    "sha256": "c0a85aa8cd75f4736e9133f984617c148e1a5ba96854a96e984e2b32c27ae1e2"
+  },
+  "calculation": "exact Decimal and integer chips; not runtime floating-point replay",
+  "chips_per_bb": 100,
+  "seat_order": [
+    "BB",
+    "BTN"
+  ],
+  "root_pot_chips": 4050,
+  "root_stacks_behind_chips": [
+    5500,
+    5500
+  ],
+  "rake_assumption": {
+    "rate": "0.05",
+    "cap_chips": "60",
+    "cap_bb": "0.6",
+    "all_fold_and_showdown_terminals": true,
+    "additional_rounding": false,
+    "prior_rake_adjustment": false,
+    "external_rule_confirmed": false
+  },
+  "formula": {
+    "total_pot": "P + c_BB + c_BTN",
+    "solver": "outcome_share_i * (total_pot - total_rake) - (starting_share_i + c_i)",
+    "public_subgame": "solver_i + starting_share_i",
+    "decision_origin": "public_i + own_contribution_before_last_action_i",
+    "matched": "matched_pot=P+2*min(c); refund_i=c_i-min(c); public_i=refund_i+share_i*(matched_pot-matched_rake)-c_i",
+    "note": "starting shares 2025/2025 are solver bookkeeping, not actual preflop investments"
+  },
+  "checks": {
+    "source_hashes": "passed",
+    "graph_and_action_arithmetic": "passed",
+    "all_terminal_conditional_matched_total_payoffs_equal": true,
+    "all_outcomes_solver_sum_chips": "-60",
+    "all_outcomes_public_sum_chips": "3990",
+    "all_fold_last_actor_decision_value_chips": "0"
+  },
+  "external_conditions_confirmed": false,
+  "external_quality_evaluated": false,
+  "limitations": [
+    "No external settlement, precision, version or EV-field origin is certified.",
+    "No full reference policy, root EV/BR, reach or NashConv is calculated.",
+    "Showdown win/tie/lose rows are outcome constants, not hand probabilities or strategy EVs.",
+    "Observed menus are input; this script does not parse Rust DSL or build a solver tree.",
+    "Matched/total equivalence requires the stated all-terminal rake/refund assumptions.",
+    "Runtime source hashes bind manually reviewed semantics; Python does not execute Rust."
+  ],
+  "counts": {
+    "decision_nodes": 12,
+    "action_edges": 32,
+    "terminal_nodes": 21,
+    "public_nodes": 33,
+    "showdown": 11,
+    "fold": 10
+  },
+  "terminals": [
+    {
+      "history": "check / check",
+      "parent_history": "check",
+      "last_actor": "BTN",
+      "last_action": "check",
+      "kind": "showdown",
+      "folder": null,
+      "winner_if_fold": null,
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "terminal_pot_chips": 4050,
+      "terminal_pot_bb": "40.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 4050,
+      "matched_pot_bb": "40.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "win_BB",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "1965.0",
+              "BTN": "-2025.0"
+            },
+            "bb": {
+              "BB": "19.65",
+              "BTN": "-20.25"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "3990.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "39.9",
+              "BTN": "0.0"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "3990.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "39.9",
+              "BTN": "0.0"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "3990.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "39.9",
+              "BTN": "0.0"
+            }
+          }
+        },
+        {
+          "outcome": "tie",
+          "pot_shares": {
+            "BB": "0.5",
+            "BTN": "0.5"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-30.00",
+              "BTN": "-30.00"
+            },
+            "bb": {
+              "BB": "-0.30",
+              "BTN": "-0.30"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          }
+        },
+        {
+          "outcome": "win_BTN",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-2025.0",
+              "BTN": "1965.0"
+            },
+            "bb": {
+              "BB": "-20.25",
+              "BTN": "19.65"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "3990.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "39.9"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "3990.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "39.9"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "3990.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "39.9"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "check / bet 13.5 / fold",
+      "parent_history": "check / bet 13.5",
+      "last_actor": "BB",
+      "last_action": "fold",
+      "kind": "fold",
+      "folder": "BB",
+      "winner_if_fold": "BTN",
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "0",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "13.5"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "0",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "13.5"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "3375"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "33.75"
+        }
+      },
+      "terminal_pot_chips": 5400,
+      "terminal_pot_bb": "54",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "13.5"
+        }
+      },
+      "matched_pot_chips": 4050,
+      "matched_pot_bb": "40.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "0",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "13.5"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "fold",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-2025.0",
+              "BTN": "1965.0"
+            },
+            "bb": {
+              "BB": "-20.25",
+              "BTN": "19.65"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "3990.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "39.9"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "5340.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "53.4"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "3990.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "39.9"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "check / bet 13.5 / call",
+      "parent_history": "check / bet 13.5",
+      "last_actor": "BB",
+      "last_action": "call",
+      "kind": "showdown",
+      "folder": null,
+      "winner_if_fold": null,
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "0",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "13.5"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "13.5"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "3375",
+          "BTN": "3375"
+        },
+        "bb": {
+          "BB": "33.75",
+          "BTN": "33.75"
+        }
+      },
+      "terminal_pot_chips": 6750,
+      "terminal_pot_bb": "67.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 6750,
+      "matched_pot_bb": "67.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "0",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "13.5"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "win_BB",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "3315.0",
+              "BTN": "-3375.0"
+            },
+            "bb": {
+              "BB": "33.15",
+              "BTN": "-33.75"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "5340.0",
+              "BTN": "-1350.0"
+            },
+            "bb": {
+              "BB": "53.4",
+              "BTN": "-13.5"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "5340.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "53.4",
+              "BTN": "0.0"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "5340.0",
+              "BTN": "-1350.0"
+            },
+            "bb": {
+              "BB": "53.4",
+              "BTN": "-13.5"
+            }
+          }
+        },
+        {
+          "outcome": "tie",
+          "pot_shares": {
+            "BB": "0.5",
+            "BTN": "0.5"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-30.00",
+              "BTN": "-30.00"
+            },
+            "bb": {
+              "BB": "-0.30",
+              "BTN": "-0.30"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "3345.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "33.45"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          }
+        },
+        {
+          "outcome": "win_BTN",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-3375.0",
+              "BTN": "3315.0"
+            },
+            "bb": {
+              "BB": "-33.75",
+              "BTN": "33.15"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "-1350.0",
+              "BTN": "5340.0"
+            },
+            "bb": {
+              "BB": "-13.5",
+              "BTN": "53.4"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "-1350.0",
+              "BTN": "6690.0"
+            },
+            "bb": {
+              "BB": "-13.5",
+              "BTN": "66.9"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "-1350.0",
+              "BTN": "5340.0"
+            },
+            "bb": {
+              "BB": "-13.5",
+              "BTN": "53.4"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "check / bet 13.5 / raise to 37 / fold",
+      "parent_history": "check / bet 13.5 / raise to 37",
+      "last_actor": "BTN",
+      "last_action": "fold",
+      "kind": "fold",
+      "folder": "BTN",
+      "winner_if_fold": "BB",
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "3700",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "37",
+          "BTN": "13.5"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "3700",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "37",
+          "BTN": "13.5"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "5725",
+          "BTN": "3375"
+        },
+        "bb": {
+          "BB": "57.25",
+          "BTN": "33.75"
+        }
+      },
+      "terminal_pot_chips": 9100,
+      "terminal_pot_bb": "91",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "2350",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "23.5",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 6750,
+      "matched_pot_bb": "67.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "3700",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "37",
+          "BTN": "13.5"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "fold",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "3315.0",
+              "BTN": "-3375.0"
+            },
+            "bb": {
+              "BB": "33.15",
+              "BTN": "-33.75"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "5340.0",
+              "BTN": "-1350.0"
+            },
+            "bb": {
+              "BB": "53.4",
+              "BTN": "-13.5"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "9040.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "90.4",
+              "BTN": "0.0"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "5340.0",
+              "BTN": "-1350.0"
+            },
+            "bb": {
+              "BB": "53.4",
+              "BTN": "-13.5"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "check / bet 13.5 / raise to 37 / call",
+      "parent_history": "check / bet 13.5 / raise to 37",
+      "last_actor": "BTN",
+      "last_action": "call",
+      "kind": "showdown",
+      "folder": null,
+      "winner_if_fold": null,
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "3700",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "37",
+          "BTN": "13.5"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "3700",
+          "BTN": "3700"
+        },
+        "bb": {
+          "BB": "37",
+          "BTN": "37"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "5725",
+          "BTN": "5725"
+        },
+        "bb": {
+          "BB": "57.25",
+          "BTN": "57.25"
+        }
+      },
+      "terminal_pot_chips": 11450,
+      "terminal_pot_bb": "114.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 11450,
+      "matched_pot_bb": "114.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "3700",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "37",
+          "BTN": "13.5"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "win_BB",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "5665.0",
+              "BTN": "-5725.0"
+            },
+            "bb": {
+              "BB": "56.65",
+              "BTN": "-57.25"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "7690.0",
+              "BTN": "-3700.0"
+            },
+            "bb": {
+              "BB": "76.9",
+              "BTN": "-37.0"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "11390.0",
+              "BTN": "-2350.0"
+            },
+            "bb": {
+              "BB": "113.9",
+              "BTN": "-23.5"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "7690.0",
+              "BTN": "-3700.0"
+            },
+            "bb": {
+              "BB": "76.9",
+              "BTN": "-37.0"
+            }
+          }
+        },
+        {
+          "outcome": "tie",
+          "pot_shares": {
+            "BB": "0.5",
+            "BTN": "0.5"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-30.00",
+              "BTN": "-30.00"
+            },
+            "bb": {
+              "BB": "-0.30",
+              "BTN": "-0.30"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "5695.00",
+              "BTN": "3345.00"
+            },
+            "bb": {
+              "BB": "56.95",
+              "BTN": "33.45"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          }
+        },
+        {
+          "outcome": "win_BTN",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-5725.0",
+              "BTN": "5665.0"
+            },
+            "bb": {
+              "BB": "-57.25",
+              "BTN": "56.65"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "-3700.0",
+              "BTN": "7690.0"
+            },
+            "bb": {
+              "BB": "-37.0",
+              "BTN": "76.9"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "9040.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "90.4"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "-3700.0",
+              "BTN": "7690.0"
+            },
+            "bb": {
+              "BB": "-37.0",
+              "BTN": "76.9"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "check / bet 13.5 / raise to 37 / allin 55 / fold",
+      "parent_history": "check / bet 13.5 / raise to 37 / allin 55",
+      "last_actor": "BB",
+      "last_action": "fold",
+      "kind": "fold",
+      "folder": "BB",
+      "winner_if_fold": "BTN",
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "3700",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "37",
+          "BTN": "55"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "3700",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "37",
+          "BTN": "55"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "5725",
+          "BTN": "7525"
+        },
+        "bb": {
+          "BB": "57.25",
+          "BTN": "75.25"
+        }
+      },
+      "terminal_pot_chips": 13250,
+      "terminal_pot_bb": "132.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "1800"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "18"
+        }
+      },
+      "matched_pot_chips": 11450,
+      "matched_pot_bb": "114.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "3700",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "37",
+          "BTN": "55"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "fold",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-5725.0",
+              "BTN": "5665.0"
+            },
+            "bb": {
+              "BB": "-57.25",
+              "BTN": "56.65"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "-3700.0",
+              "BTN": "7690.0"
+            },
+            "bb": {
+              "BB": "-37.0",
+              "BTN": "76.9"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "13190.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "131.9"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "-3700.0",
+              "BTN": "7690.0"
+            },
+            "bb": {
+              "BB": "-37.0",
+              "BTN": "76.9"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "check / bet 13.5 / raise to 37 / allin 55 / call",
+      "parent_history": "check / bet 13.5 / raise to 37 / allin 55",
+      "last_actor": "BB",
+      "last_action": "call",
+      "kind": "showdown",
+      "folder": null,
+      "winner_if_fold": null,
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "3700",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "37",
+          "BTN": "55"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "55"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "7525",
+          "BTN": "7525"
+        },
+        "bb": {
+          "BB": "75.25",
+          "BTN": "75.25"
+        }
+      },
+      "terminal_pot_chips": 15050,
+      "terminal_pot_bb": "150.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 15050,
+      "matched_pot_bb": "150.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "3700",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "37",
+          "BTN": "55"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "win_BB",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "7465.0",
+              "BTN": "-7525.0"
+            },
+            "bb": {
+              "BB": "74.65",
+              "BTN": "-75.25"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "-5500.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "-55.0"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "13190.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "131.9",
+              "BTN": "0.0"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "-5500.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "-55.0"
+            }
+          }
+        },
+        {
+          "outcome": "tie",
+          "pot_shares": {
+            "BB": "0.5",
+            "BTN": "0.5"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-30.00",
+              "BTN": "-30.00"
+            },
+            "bb": {
+              "BB": "-0.30",
+              "BTN": "-0.30"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "5695.00",
+              "BTN": "7495.00"
+            },
+            "bb": {
+              "BB": "56.95",
+              "BTN": "74.95"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          }
+        },
+        {
+          "outcome": "win_BTN",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-7525.0",
+              "BTN": "7465.0"
+            },
+            "bb": {
+              "BB": "-75.25",
+              "BTN": "74.65"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "-5500.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "-55.0",
+              "BTN": "94.9"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "-1800.0",
+              "BTN": "14990.0"
+            },
+            "bb": {
+              "BB": "-18.0",
+              "BTN": "149.9"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "-5500.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "-55.0",
+              "BTN": "94.9"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "check / bet 13.5 / allin 55 / fold",
+      "parent_history": "check / bet 13.5 / allin 55",
+      "last_actor": "BTN",
+      "last_action": "fold",
+      "kind": "fold",
+      "folder": "BTN",
+      "winner_if_fold": "BB",
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "13.5"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "13.5"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "7525",
+          "BTN": "3375"
+        },
+        "bb": {
+          "BB": "75.25",
+          "BTN": "33.75"
+        }
+      },
+      "terminal_pot_chips": 10900,
+      "terminal_pot_bb": "109",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "4150",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "41.5",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 6750,
+      "matched_pot_bb": "67.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "13.5"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "fold",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "3315.0",
+              "BTN": "-3375.0"
+            },
+            "bb": {
+              "BB": "33.15",
+              "BTN": "-33.75"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "5340.0",
+              "BTN": "-1350.0"
+            },
+            "bb": {
+              "BB": "53.4",
+              "BTN": "-13.5"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "10840.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "108.4",
+              "BTN": "0.0"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "5340.0",
+              "BTN": "-1350.0"
+            },
+            "bb": {
+              "BB": "53.4",
+              "BTN": "-13.5"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "check / bet 13.5 / allin 55 / call",
+      "parent_history": "check / bet 13.5 / allin 55",
+      "last_actor": "BTN",
+      "last_action": "call",
+      "kind": "showdown",
+      "folder": null,
+      "winner_if_fold": null,
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "13.5"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "55"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "7525",
+          "BTN": "7525"
+        },
+        "bb": {
+          "BB": "75.25",
+          "BTN": "75.25"
+        }
+      },
+      "terminal_pot_chips": 15050,
+      "terminal_pot_bb": "150.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 15050,
+      "matched_pot_bb": "150.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "13.5"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "win_BB",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "7465.0",
+              "BTN": "-7525.0"
+            },
+            "bb": {
+              "BB": "74.65",
+              "BTN": "-75.25"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "-5500.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "-55.0"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "14990.0",
+              "BTN": "-4150.0"
+            },
+            "bb": {
+              "BB": "149.9",
+              "BTN": "-41.5"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "-5500.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "-55.0"
+            }
+          }
+        },
+        {
+          "outcome": "tie",
+          "pot_shares": {
+            "BB": "0.5",
+            "BTN": "0.5"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-30.00",
+              "BTN": "-30.00"
+            },
+            "bb": {
+              "BB": "-0.30",
+              "BTN": "-0.30"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "7495.00",
+              "BTN": "3345.00"
+            },
+            "bb": {
+              "BB": "74.95",
+              "BTN": "33.45"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          }
+        },
+        {
+          "outcome": "win_BTN",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-7525.0",
+              "BTN": "7465.0"
+            },
+            "bb": {
+              "BB": "-75.25",
+              "BTN": "74.65"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "-5500.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "-55.0",
+              "BTN": "94.9"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "10840.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "108.4"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "-5500.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "-55.0",
+              "BTN": "94.9"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "check / allin 55 / fold",
+      "parent_history": "check / allin 55",
+      "last_actor": "BB",
+      "last_action": "fold",
+      "kind": "fold",
+      "folder": "BB",
+      "winner_if_fold": "BTN",
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "0",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "55"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "0",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "55"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "7525"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "75.25"
+        }
+      },
+      "terminal_pot_chips": 9550,
+      "terminal_pot_bb": "95.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "55"
+        }
+      },
+      "matched_pot_chips": 4050,
+      "matched_pot_bb": "40.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "0",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "55"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "fold",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-2025.0",
+              "BTN": "1965.0"
+            },
+            "bb": {
+              "BB": "-20.25",
+              "BTN": "19.65"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "3990.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "39.9"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "94.9"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "3990.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "39.9"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "check / allin 55 / call",
+      "parent_history": "check / allin 55",
+      "last_actor": "BB",
+      "last_action": "call",
+      "kind": "showdown",
+      "folder": null,
+      "winner_if_fold": null,
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "0",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "55"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "55"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "7525",
+          "BTN": "7525"
+        },
+        "bb": {
+          "BB": "75.25",
+          "BTN": "75.25"
+        }
+      },
+      "terminal_pot_chips": 15050,
+      "terminal_pot_bb": "150.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 15050,
+      "matched_pot_bb": "150.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "0",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "55"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "win_BB",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "7465.0",
+              "BTN": "-7525.0"
+            },
+            "bb": {
+              "BB": "74.65",
+              "BTN": "-75.25"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "-5500.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "-55.0"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "0.0"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "-5500.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "-55.0"
+            }
+          }
+        },
+        {
+          "outcome": "tie",
+          "pot_shares": {
+            "BB": "0.5",
+            "BTN": "0.5"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-30.00",
+              "BTN": "-30.00"
+            },
+            "bb": {
+              "BB": "-0.30",
+              "BTN": "-0.30"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "7495.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "74.95"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          }
+        },
+        {
+          "outcome": "win_BTN",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-7525.0",
+              "BTN": "7465.0"
+            },
+            "bb": {
+              "BB": "-75.25",
+              "BTN": "74.65"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "-5500.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "-55.0",
+              "BTN": "94.9"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "-5500.0",
+              "BTN": "14990.0"
+            },
+            "bb": {
+              "BB": "-55.0",
+              "BTN": "149.9"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "-5500.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "-55.0",
+              "BTN": "94.9"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 13.5 / fold",
+      "parent_history": "bet 13.5",
+      "last_actor": "BTN",
+      "last_action": "fold",
+      "kind": "fold",
+      "folder": "BTN",
+      "winner_if_fold": "BB",
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "0"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "0"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "3375",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "33.75",
+          "BTN": "20.25"
+        }
+      },
+      "terminal_pot_chips": 5400,
+      "terminal_pot_bb": "54",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 4050,
+      "matched_pot_bb": "40.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "0"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "fold",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "1965.0",
+              "BTN": "-2025.0"
+            },
+            "bb": {
+              "BB": "19.65",
+              "BTN": "-20.25"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "3990.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "39.9",
+              "BTN": "0.0"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "5340.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "53.4",
+              "BTN": "0.0"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "3990.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "39.9",
+              "BTN": "0.0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 13.5 / call",
+      "parent_history": "bet 13.5",
+      "last_actor": "BTN",
+      "last_action": "call",
+      "kind": "showdown",
+      "folder": null,
+      "winner_if_fold": null,
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "0"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "1350"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "13.5"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "3375",
+          "BTN": "3375"
+        },
+        "bb": {
+          "BB": "33.75",
+          "BTN": "33.75"
+        }
+      },
+      "terminal_pot_chips": 6750,
+      "terminal_pot_bb": "67.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 6750,
+      "matched_pot_bb": "67.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "0"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "win_BB",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "3315.0",
+              "BTN": "-3375.0"
+            },
+            "bb": {
+              "BB": "33.15",
+              "BTN": "-33.75"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "5340.0",
+              "BTN": "-1350.0"
+            },
+            "bb": {
+              "BB": "53.4",
+              "BTN": "-13.5"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "6690.0",
+              "BTN": "-1350.0"
+            },
+            "bb": {
+              "BB": "66.9",
+              "BTN": "-13.5"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "5340.0",
+              "BTN": "-1350.0"
+            },
+            "bb": {
+              "BB": "53.4",
+              "BTN": "-13.5"
+            }
+          }
+        },
+        {
+          "outcome": "tie",
+          "pot_shares": {
+            "BB": "0.5",
+            "BTN": "0.5"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-30.00",
+              "BTN": "-30.00"
+            },
+            "bb": {
+              "BB": "-0.30",
+              "BTN": "-0.30"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "3345.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "33.45",
+              "BTN": "19.95"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          }
+        },
+        {
+          "outcome": "win_BTN",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-3375.0",
+              "BTN": "3315.0"
+            },
+            "bb": {
+              "BB": "-33.75",
+              "BTN": "33.15"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "-1350.0",
+              "BTN": "5340.0"
+            },
+            "bb": {
+              "BB": "-13.5",
+              "BTN": "53.4"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "5340.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "53.4"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "-1350.0",
+              "BTN": "5340.0"
+            },
+            "bb": {
+              "BB": "-13.5",
+              "BTN": "53.4"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 13.5 / raise to 37 / fold",
+      "parent_history": "bet 13.5 / raise to 37",
+      "last_actor": "BB",
+      "last_action": "fold",
+      "kind": "fold",
+      "folder": "BB",
+      "winner_if_fold": "BTN",
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "3700"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "37"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "3700"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "37"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "3375",
+          "BTN": "5725"
+        },
+        "bb": {
+          "BB": "33.75",
+          "BTN": "57.25"
+        }
+      },
+      "terminal_pot_chips": 9100,
+      "terminal_pot_bb": "91",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "2350"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "23.5"
+        }
+      },
+      "matched_pot_chips": 6750,
+      "matched_pot_bb": "67.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "3700"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "37"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "fold",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-3375.0",
+              "BTN": "3315.0"
+            },
+            "bb": {
+              "BB": "-33.75",
+              "BTN": "33.15"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "-1350.0",
+              "BTN": "5340.0"
+            },
+            "bb": {
+              "BB": "-13.5",
+              "BTN": "53.4"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "9040.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "90.4"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "-1350.0",
+              "BTN": "5340.0"
+            },
+            "bb": {
+              "BB": "-13.5",
+              "BTN": "53.4"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 13.5 / raise to 37 / call",
+      "parent_history": "bet 13.5 / raise to 37",
+      "last_actor": "BB",
+      "last_action": "call",
+      "kind": "showdown",
+      "folder": null,
+      "winner_if_fold": null,
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "3700"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "37"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "3700",
+          "BTN": "3700"
+        },
+        "bb": {
+          "BB": "37",
+          "BTN": "37"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "5725",
+          "BTN": "5725"
+        },
+        "bb": {
+          "BB": "57.25",
+          "BTN": "57.25"
+        }
+      },
+      "terminal_pot_chips": 11450,
+      "terminal_pot_bb": "114.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 11450,
+      "matched_pot_bb": "114.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "3700"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "37"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "win_BB",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "5665.0",
+              "BTN": "-5725.0"
+            },
+            "bb": {
+              "BB": "56.65",
+              "BTN": "-57.25"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "7690.0",
+              "BTN": "-3700.0"
+            },
+            "bb": {
+              "BB": "76.9",
+              "BTN": "-37.0"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "9040.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "90.4",
+              "BTN": "0.0"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "7690.0",
+              "BTN": "-3700.0"
+            },
+            "bb": {
+              "BB": "76.9",
+              "BTN": "-37.0"
+            }
+          }
+        },
+        {
+          "outcome": "tie",
+          "pot_shares": {
+            "BB": "0.5",
+            "BTN": "0.5"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-30.00",
+              "BTN": "-30.00"
+            },
+            "bb": {
+              "BB": "-0.30",
+              "BTN": "-0.30"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "3345.00",
+              "BTN": "5695.00"
+            },
+            "bb": {
+              "BB": "33.45",
+              "BTN": "56.95"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          }
+        },
+        {
+          "outcome": "win_BTN",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-5725.0",
+              "BTN": "5665.0"
+            },
+            "bb": {
+              "BB": "-57.25",
+              "BTN": "56.65"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "-3700.0",
+              "BTN": "7690.0"
+            },
+            "bb": {
+              "BB": "-37.0",
+              "BTN": "76.9"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "-2350.0",
+              "BTN": "11390.0"
+            },
+            "bb": {
+              "BB": "-23.5",
+              "BTN": "113.9"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "-3700.0",
+              "BTN": "7690.0"
+            },
+            "bb": {
+              "BB": "-37.0",
+              "BTN": "76.9"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 13.5 / raise to 37 / allin 55 / fold",
+      "parent_history": "bet 13.5 / raise to 37 / allin 55",
+      "last_actor": "BTN",
+      "last_action": "fold",
+      "kind": "fold",
+      "folder": "BTN",
+      "winner_if_fold": "BB",
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "3700"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "37"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "3700"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "37"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "7525",
+          "BTN": "5725"
+        },
+        "bb": {
+          "BB": "75.25",
+          "BTN": "57.25"
+        }
+      },
+      "terminal_pot_chips": 13250,
+      "terminal_pot_bb": "132.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "1800",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "18",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 11450,
+      "matched_pot_bb": "114.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "3700"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "37"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "fold",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "5665.0",
+              "BTN": "-5725.0"
+            },
+            "bb": {
+              "BB": "56.65",
+              "BTN": "-57.25"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "7690.0",
+              "BTN": "-3700.0"
+            },
+            "bb": {
+              "BB": "76.9",
+              "BTN": "-37.0"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "13190.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "131.9",
+              "BTN": "0.0"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "7690.0",
+              "BTN": "-3700.0"
+            },
+            "bb": {
+              "BB": "76.9",
+              "BTN": "-37.0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 13.5 / raise to 37 / allin 55 / call",
+      "parent_history": "bet 13.5 / raise to 37 / allin 55",
+      "last_actor": "BTN",
+      "last_action": "call",
+      "kind": "showdown",
+      "folder": null,
+      "winner_if_fold": null,
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "3700"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "37"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "55"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "7525",
+          "BTN": "7525"
+        },
+        "bb": {
+          "BB": "75.25",
+          "BTN": "75.25"
+        }
+      },
+      "terminal_pot_chips": 15050,
+      "terminal_pot_bb": "150.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 15050,
+      "matched_pot_bb": "150.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "3700"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "37"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "win_BB",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "7465.0",
+              "BTN": "-7525.0"
+            },
+            "bb": {
+              "BB": "74.65",
+              "BTN": "-75.25"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "-5500.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "-55.0"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "14990.0",
+              "BTN": "-1800.0"
+            },
+            "bb": {
+              "BB": "149.9",
+              "BTN": "-18.0"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "-5500.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "-55.0"
+            }
+          }
+        },
+        {
+          "outcome": "tie",
+          "pot_shares": {
+            "BB": "0.5",
+            "BTN": "0.5"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-30.00",
+              "BTN": "-30.00"
+            },
+            "bb": {
+              "BB": "-0.30",
+              "BTN": "-0.30"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "7495.00",
+              "BTN": "5695.00"
+            },
+            "bb": {
+              "BB": "74.95",
+              "BTN": "56.95"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          }
+        },
+        {
+          "outcome": "win_BTN",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-7525.0",
+              "BTN": "7465.0"
+            },
+            "bb": {
+              "BB": "-75.25",
+              "BTN": "74.65"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "-5500.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "-55.0",
+              "BTN": "94.9"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "13190.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "131.9"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "-5500.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "-55.0",
+              "BTN": "94.9"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 13.5 / allin 55 / fold",
+      "parent_history": "bet 13.5 / allin 55",
+      "last_actor": "BB",
+      "last_action": "fold",
+      "kind": "fold",
+      "folder": "BB",
+      "winner_if_fold": "BTN",
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "55"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "55"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "3375",
+          "BTN": "7525"
+        },
+        "bb": {
+          "BB": "33.75",
+          "BTN": "75.25"
+        }
+      },
+      "terminal_pot_chips": 10900,
+      "terminal_pot_bb": "109",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "4150"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "41.5"
+        }
+      },
+      "matched_pot_chips": 6750,
+      "matched_pot_bb": "67.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "55"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "fold",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-3375.0",
+              "BTN": "3315.0"
+            },
+            "bb": {
+              "BB": "-33.75",
+              "BTN": "33.15"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "-1350.0",
+              "BTN": "5340.0"
+            },
+            "bb": {
+              "BB": "-13.5",
+              "BTN": "53.4"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "10840.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "108.4"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "-1350.0",
+              "BTN": "5340.0"
+            },
+            "bb": {
+              "BB": "-13.5",
+              "BTN": "53.4"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 13.5 / allin 55 / call",
+      "parent_history": "bet 13.5 / allin 55",
+      "last_actor": "BB",
+      "last_action": "call",
+      "kind": "showdown",
+      "folder": null,
+      "winner_if_fold": null,
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "55"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "55"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "7525",
+          "BTN": "7525"
+        },
+        "bb": {
+          "BB": "75.25",
+          "BTN": "75.25"
+        }
+      },
+      "terminal_pot_chips": 15050,
+      "terminal_pot_bb": "150.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 15050,
+      "matched_pot_bb": "150.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "1350",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "13.5",
+          "BTN": "55"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "win_BB",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "7465.0",
+              "BTN": "-7525.0"
+            },
+            "bb": {
+              "BB": "74.65",
+              "BTN": "-75.25"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "-5500.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "-55.0"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "10840.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "108.4",
+              "BTN": "0.0"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "-5500.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "-55.0"
+            }
+          }
+        },
+        {
+          "outcome": "tie",
+          "pot_shares": {
+            "BB": "0.5",
+            "BTN": "0.5"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-30.00",
+              "BTN": "-30.00"
+            },
+            "bb": {
+              "BB": "-0.30",
+              "BTN": "-0.30"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "3345.00",
+              "BTN": "7495.00"
+            },
+            "bb": {
+              "BB": "33.45",
+              "BTN": "74.95"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          }
+        },
+        {
+          "outcome": "win_BTN",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-7525.0",
+              "BTN": "7465.0"
+            },
+            "bb": {
+              "BB": "-75.25",
+              "BTN": "74.65"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "-5500.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "-55.0",
+              "BTN": "94.9"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "-4150.0",
+              "BTN": "14990.0"
+            },
+            "bb": {
+              "BB": "-41.5",
+              "BTN": "149.9"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "-5500.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "-55.0",
+              "BTN": "94.9"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "allin 55 / fold",
+      "parent_history": "allin 55",
+      "last_actor": "BTN",
+      "last_action": "fold",
+      "kind": "fold",
+      "folder": "BTN",
+      "winner_if_fold": "BB",
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "0"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "0"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "7525",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "75.25",
+          "BTN": "20.25"
+        }
+      },
+      "terminal_pot_chips": 9550,
+      "terminal_pot_bb": "95.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 4050,
+      "matched_pot_bb": "40.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "0"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "fold",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "1965.0",
+              "BTN": "-2025.0"
+            },
+            "bb": {
+              "BB": "19.65",
+              "BTN": "-20.25"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "3990.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "39.9",
+              "BTN": "0.0"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "0.0"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "3990.0",
+              "BTN": "0.0"
+            },
+            "bb": {
+              "BB": "39.9",
+              "BTN": "0.0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "history": "allin 55 / call",
+      "parent_history": "allin 55",
+      "last_actor": "BTN",
+      "last_action": "call",
+      "kind": "showdown",
+      "folder": null,
+      "winner_if_fold": null,
+      "contribution_before_last_action": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "0"
+        }
+      },
+      "contribution_from_root": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "5500"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "55"
+        }
+      },
+      "descriptor_contribution_including_artificial_starting_share": {
+        "chips": {
+          "BB": "7525",
+          "BTN": "7525"
+        },
+        "bb": {
+          "BB": "75.25",
+          "BTN": "75.25"
+        }
+      },
+      "terminal_pot_chips": 15050,
+      "terminal_pot_bb": "150.5",
+      "uncalled_refund_if_matched": {
+        "chips": {
+          "BB": "0",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "0",
+          "BTN": "0"
+        }
+      },
+      "matched_pot_chips": 15050,
+      "matched_pot_bb": "150.5",
+      "total_base_rake_chips": "60.0",
+      "matched_base_rake_chips": "60.0",
+      "public_minus_solver_offset": {
+        "chips": {
+          "BB": "2025",
+          "BTN": "2025"
+        },
+        "bb": {
+          "BB": "20.25",
+          "BTN": "20.25"
+        }
+      },
+      "decision_origin_minus_public_offset": {
+        "chips": {
+          "BB": "5500",
+          "BTN": "0"
+        },
+        "bb": {
+          "BB": "55",
+          "BTN": "0"
+        }
+      },
+      "outcomes": [
+        {
+          "outcome": "win_BB",
+          "pot_shares": {
+            "BB": "1",
+            "BTN": "0"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "7465.0",
+              "BTN": "-7525.0"
+            },
+            "bb": {
+              "BB": "74.65",
+              "BTN": "-75.25"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "-5500.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "-55.0"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "14990.0",
+              "BTN": "-5500.0"
+            },
+            "bb": {
+              "BB": "149.9",
+              "BTN": "-55.0"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "9490.0",
+              "BTN": "-5500.0"
+            },
+            "bb": {
+              "BB": "94.9",
+              "BTN": "-55.0"
+            }
+          }
+        },
+        {
+          "outcome": "tie",
+          "pot_shares": {
+            "BB": "0.5",
+            "BTN": "0.5"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-30.00",
+              "BTN": "-30.00"
+            },
+            "bb": {
+              "BB": "-0.30",
+              "BTN": "-0.30"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "7495.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "74.95",
+              "BTN": "19.95"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "1995.00",
+              "BTN": "1995.00"
+            },
+            "bb": {
+              "BB": "19.95",
+              "BTN": "19.95"
+            }
+          }
+        },
+        {
+          "outcome": "win_BTN",
+          "pot_shares": {
+            "BB": "0",
+            "BTN": "1"
+          },
+          "solver_utility": {
+            "chips": {
+              "BB": "-7525.0",
+              "BTN": "7465.0"
+            },
+            "bb": {
+              "BB": "-75.25",
+              "BTN": "74.65"
+            }
+          },
+          "public_subgame_utility": {
+            "chips": {
+              "BB": "-5500.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "-55.0",
+              "BTN": "94.9"
+            }
+          },
+          "decision_origin_utility": {
+            "chips": {
+              "BB": "0.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "0.0",
+              "BTN": "94.9"
+            }
+          },
+          "conditional_matched_public_utility": {
+            "chips": {
+              "BB": "-5500.0",
+              "BTN": "9490.0"
+            },
+            "bb": {
+              "BB": "-55.0",
+              "BTN": "94.9"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

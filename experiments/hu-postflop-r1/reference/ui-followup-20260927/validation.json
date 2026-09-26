@@ -1,0 +1,17 @@
+{
+  "schema": "r1.reference-ui-followup-validation/v1",
+  "changes": "Observation transcription, offline arithmetic evidence and experiment index only; production Rust source unchanged from 11e4062",
+  "checks": [
+    {"command": "python -B tools/check_docs.py", "exit_code": 0, "markdown_files": 49},
+    {"command": "python -B -m unittest discover -s tools/tests -v", "exit_code": 0, "tests": 39, "reported_seconds": 12.262},
+    {"command": "python -B experiments/hu-postflop-r1/reference/HU-R0-019/payoff-audit-20260927/audit.py --check experiments/hu-postflop-r1/reference/HU-R0-019/payoff-audit-20260927/terminal-table.json", "exit_code": 0, "bytes": 87546, "sha256": "1f535e23e8f8cacc1cc01a98dce4af1559bead0f5eae260c303707c2a65d4d8e"},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "git diff 11e4062 --stat -- crates Cargo.toml Cargo.lock", "exit_code": 0, "output_empty": true}
+  ],
+  "arithmetic_tests": "../HU-R0-019/payoff-audit-20260927/verification.json",
+  "copy_arithmetic": "derived-check.json",
+  "rust_tests_rerun": false,
+  "cloud_instance_created": false,
+  "acceptance": null,
+  "quality_status": "not_evaluated"
+}

@@ -1,0 +1,72 @@
+{
+  "schema": "r1.reference-ui-derived-check/v1",
+  "scope": "File identity and arithmetic only; does not independently certify manual UI transcription or export semantics",
+  "source_files": [
+    {
+      "path": "../HU-R0-019/oop-range.txt",
+      "bytes": 1831,
+      "sha256": "e0d201e994569ac6e582603390a98737c59cf6333c630cb8729f6b4f287c2f84"
+    },
+    {
+      "path": "../HU-R0-019/profile-20260927/root-bet13_5.txt",
+      "bytes": 2205,
+      "sha256": "481f79ab2c5f43edb6e0629ac12715a226cc379f2aae734de7dc362f61863931"
+    },
+    {
+      "path": "../HU-R0-019/profile-20260927/betraise-whole.txt",
+      "bytes": 2018,
+      "sha256": "acbbc31bd2cce62f561ad22ba5ee5062598d2f85fe62d54e3b7aa8c20161fc08"
+    },
+    {
+      "path": "../HU-R0-019/profile-20260927/betraise-allin55.txt",
+      "bytes": 2286,
+      "sha256": "f7545200929392db437c6df1cd1fd1bcb5a1432e8d4025d537f52569a00e03d6"
+    },
+    {
+      "path": "../HU-R0-019/profile-20260927/betraise-call.txt",
+      "bytes": 1905,
+      "sha256": "668bdbcd8cb1f77d208cb9925e52bc26e729e252576b0e31f3e4e2bc421bf2e9"
+    },
+    {
+      "path": "../HU-R0-019/profile-20260927/betraise-fold.txt",
+      "bytes": 2175,
+      "sha256": "297a819dd439965635fa01b8a0e61f2257b4a681ec5684699e22861a74c200fd"
+    },
+    {
+      "path": "../HU-R0-019/profile-20260927/betraisejam-whole.txt",
+      "bytes": 34,
+      "sha256": "17fb26dd5fb3ed0b5923248c15ac7a74d6fcff4d626ca86fcf3fbf4d9d6ae117"
+    },
+    {
+      "path": "../HU-R0-019/profile-20260927/root-capture-manifest.json",
+      "bytes": 21660,
+      "sha256": "0378f1a709789a99e42513aeb84be5ad6bce24644e552bd8c7074c004128d247"
+    }
+  ],
+  "child_whole_recopy": {
+    "characters": 2017,
+    "fnv1a32": "9f2bfa6b",
+    "length_and_checksum_match": true
+  },
+  "root_Tc9c_bet_percent": "0.2798773815134852055511914114",
+  "child_Tc9c_copy_ratio_percent": {
+    "allin 55": "8.557224273631840796019900498",
+    "call": "58.66099596019900497512437811",
+    "fold": "32.78178274626865671641791045"
+  },
+  "new_jam_copy_characters": 16,
+  "jam_copy_changed": true,
+  "external_acceptance": null,
+  "manual_evidence": [
+    {
+      "path": "observations.json",
+      "bytes": 5009,
+      "sha256": "4d5285945c83a55dcd75e0cac53a633c5478421a11f1b89334f962123da50f09"
+    },
+    {
+      "path": "README.jp.md",
+      "bytes": 3185,
+      "sha256": "a0661d61a5990c89f524a05b219ea951dd065affde9d530ace7424bb4e12817e"
+    }
+  ]
+}
