@@ -1,0 +1,87 @@
+{
+  "schema": "r1.current32-deployment-local-checks/v1",
+  "checked_at_utc": "2026-09-26T20:33:11.438806+00:00",
+  "scope": "Local synthetic installer tests and Bash parse-only checks; no cloud actions, no C/Rust compilation, no deployment-script execution. Earlier sandbox MSYS/temp ACL errors were retried outside sandbox.",
+  "files": {
+    "install-inputs.py": {
+      "bytes": 7560,
+      "sha256": "0e964023296a9daeecdc0bc1add701fd7df4a507e40ad109ac3dc0486556c50f"
+    },
+    "fetch-dependencies.sh": {
+      "bytes": 800,
+      "sha256": "a5743e2872762e822fd54b6cb4474605c92321a9b3c9c73d8aa1db12b1f8b68a"
+    },
+    "run-current32.sh": {
+      "bytes": 1689,
+      "sha256": "44bc17bb485ad9d07dc3f34612d4aaee7fada365179cdd18b6a5bca27d26585c"
+    },
+    "start-current32.py": {
+      "bytes": 4767,
+      "sha256": "b2df327cbb7dacb7e92c887a0595fd1463b420ebc3f48cb1425997e8e083e593"
+    },
+    "recover-current32.sh": {
+      "bytes": 2922,
+      "sha256": "860b9cefa1d38c3626cc54100a0bb5581ee6f61de0eea531f17b6232de1db1d6"
+    },
+    "test_install_inputs.py": {
+      "bytes": 9553,
+      "sha256": "d2973396c090b7321190bd8e3a1e0bdf02697e35d68d137aa792780be9b73c49"
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\vm12\\test_install_inputs.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.3695453000254929,
+      "stdout": "",
+      "stderr": ".......................\r\n----------------------------------------------------------------------\r\nRan 23 tests in 0.113s\r\n\r\nOK\r\n",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "57b8f1ba96508937d320c37faef3363963ff625f9c56b9a5c3f66d3e9733c07f"
+    },
+    {
+      "argv": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "experiments\\hu-postflop-r1\\cloud\\vm12\\fetch-dependencies.sh"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.07069310010410845,
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "experiments\\hu-postflop-r1\\cloud\\vm12\\run-current32.sh"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.064657999901101,
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "experiments\\hu-postflop-r1\\cloud\\vm12\\recover-current32.sh"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.061591099947690964,
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "python_ast": "passed",
+  "line_endings": "LF"
+}

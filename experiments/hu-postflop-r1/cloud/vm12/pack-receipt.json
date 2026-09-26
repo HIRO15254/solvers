@@ -1,0 +1,15 @@
+{
+  "schema": "r1.current32-deployment-package/v1",
+  "archive": "current32-deployment01.tar.gz",
+  "bytes": 8218634,
+  "sha256": "8570765f3689e2304e76696efd2a044976ad01e998d2075eb7b98211357a315a",
+  "members": 17,
+  "manifest": {
+    "bytes": 2752,
+    "sha256": "ceebbd5148d6e13afbdfaf1feef0a625fd57e6abc4fd4131a731cc171b014802"
+  },
+  "packer": {
+    "bytes": 3058,
+    "sha256": "a3c2990b49ece9ae71f8d2b89c8cc85a1397b50f9282a4bc155a18d2a81d4f0d"
+  }
+}

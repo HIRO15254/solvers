@@ -1,0 +1,28 @@
+{
+  "schema": "r1.vm12-cleanup-local-checks/v1",
+  "started_at_utc": "2026-09-26T20:31:18.983851+00:00",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\cleanup-vm12\\test_cleanup.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.7368169999681413,
+  "stdout": "{\"status\": \"deletion_not_fully_reconciled\", \"receipt\": \"C:\\\\Users\\\\PC_User\\\\.codex\\\\worktrees\\\\ce71\\\\solvers\\\\.cache\\\\vm12-cleanup-test-4c10822516994ed988c024fcc1618fb7\\\\receipt\\\\reconciliation.json\"}\n{\"status\": \"read_only_identity_verified\", \"receipt\": \"C:\\\\Users\\\\PC_User\\\\.codex\\\\worktrees\\\\ce71\\\\solvers\\\\.cache\\\\vm12-cleanup-test-0d20baf15e594f9eb76e173e39bb6d64\\\\receipt\\\\reconciliation.json\"}\n{\"status\": \"deleted_and_absence_verified\", \"receipt\": \"C:\\\\Users\\\\PC_User\\\\.codex\\\\worktrees\\\\ce71\\\\solvers\\\\.cache\\\\vm12-cleanup-test-b9bb7f0162cd4b2f94a463b10ac8f022\\\\receipt\\\\reconciliation.json\"}\n{\"status\": \"deletion_not_fully_reconciled\", \"receipt\": \"C:\\\\Users\\\\PC_User\\\\.codex\\\\worktrees\\\\ce71\\\\solvers\\\\.cache\\\\vm12-cleanup-test-a3325c34e37a493abff3017bd6c81d60\\\\receipt\\\\reconciliation.json\"}\n",
+  "stderr": "test_completed_and_failed_proofs_use_trusted_checker_and_foundation (__main__.Evidence.test_completed_and_failed_proofs_use_trusted_checker_and_foundation) ... ok\ntest_corrupt_archive_fails_before_checker (__main__.Evidence.test_corrupt_archive_fails_before_checker) ... ok\ntest_modified_or_extra_extracted_bytes_fail_before_checker (__main__.Evidence.test_modified_or_extra_extracted_bytes_fail_before_checker) ... ok\ntest_nonterminal_wrong_schema_or_unverified_payload_is_rejected (__main__.Evidence.test_nonterminal_wrong_schema_or_unverified_payload_is_rejected) ... ok\ntest_wrong_fixed_foundation_bytes_fail_before_checker (__main__.Evidence.test_wrong_fixed_foundation_bytes_fail_before_checker) ... ok\ntest_wrong_foundation_checker_failure_is_not_accepted (__main__.Evidence.test_wrong_foundation_checker_failure_is_not_accepted) ... ok\ntest_correct_live_identity_and_disk (__main__.Guards.test_correct_live_identity_and_disk) ... ok\ntest_disk_requires_exact_size_link_and_sole_user (__main__.Guards.test_disk_requires_exact_size_link_and_sole_user) ... ok\ntest_launch_rejects_missing_extra_or_different_source_disk (__main__.Guards.test_launch_rejects_missing_extra_or_different_source_disk) ... ok\ntest_launch_rejects_wrong_name_id_or_optional_location (__main__.Guards.test_launch_rejects_wrong_name_id_or_optional_location) ... ok\ntest_launch_requires_single_instance_array (__main__.Guards.test_launch_requires_single_instance_array) ... ok\ntest_live_instance_must_match_preserved_launch_id (__main__.Guards.test_live_instance_must_match_preserved_launch_id) ... ok\ntest_live_instance_rejects_disk_policy_and_size_changes (__main__.Guards.test_live_instance_rejects_disk_policy_and_size_changes) ... ok\ntest_minimal_original_launch_array_is_accepted (__main__.Guards.test_minimal_original_launch_array_is_accepted) ... ok\ntest_requested_json_filter_is_not_overridden (__main__.Guards.test_requested_json_filter_is_not_overridden) ... ok\ntest_absence_readback_error_does_not_skip_remaining_reads_or_retry_delete (__main__.Sequence.test_absence_readback_error_does_not_skip_remaining_reads_or_retry_delete) ... ok\ntest_default_inspect_never_deletes (__main__.Sequence.test_default_inspect_never_deletes) ... ok\ntest_delete_once_then_every_readback_and_preserve_terminal_failure (__main__.Sequence.test_delete_once_then_every_readback_and_preserve_terminal_failure) ... ok\ntest_delete_requires_evidence_and_foundation_before_cloud (__main__.Sequence.test_delete_requires_evidence_and_foundation_before_cloud) ... ok\ntest_failed_proof_or_wrong_foundation_prevents_cloud_calls (__main__.Sequence.test_failed_proof_or_wrong_foundation_prevents_cloud_calls) ... ok\ntest_invalid_launch_prevents_cloud_calls (__main__.Sequence.test_invalid_launch_prevents_cloud_calls) ... ok\ntest_launch_changed_after_validation_prevents_cloud_calls (__main__.Sequence.test_launch_changed_after_validation_prevents_cloud_calls) ... ok\ntest_live_id_mismatch_prevents_disk_read_and_delete (__main__.Sequence.test_live_id_mismatch_prevents_disk_read_and_delete) ... ok\ntest_wrong_operation_id_cannot_certify_absence (__main__.Sequence.test_wrong_operation_id_cannot_certify_absence) ... ok\n\n----------------------------------------------------------------------\nRan 24 tests in 0.458s\n\nOK\n",
+  "scope": "Synthetic local fixtures only; all gcloud and verification subprocess paths mocked; no cloud operation.",
+  "files": {
+    "cleanup.py": {
+      "bytes": 14656,
+      "sha256": "51ac3e9405c5cf8b4af11da95027cb7dc52a217b7c6de6ec7dd96dcbf9538462"
+    },
+    "test_cleanup.py": {
+      "bytes": 16600,
+      "sha256": "5431e3af2df25477b76ea43960a01d0aaba24fbd41f5155cf9b1e2c10bc5a963"
+    },
+    "README.md": {
+      "bytes": 4181,
+      "sha256": "66e179ad77b6c38a955747e467da07abb16e101c7b6e3cb4fe977ce320adc835"
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "schema": "r1.current32-deployment-inputs/v1",
+  "created_utc": "2026-09-26T20:33:27.987886+00:00",
+  "files": [
+    {
+      "path": "bundle-final-proof.py",
+      "bytes": 18294,
+      "sha256": "022431d2599f56def0691a8d59c1fb626ade76656ed548a0749d62f2f4ff0ab9"
+    },
+    {
+      "path": "controls/current-scaling32/README.md",
+      "bytes": 7692,
+      "sha256": "e8c1d5d9af31ee01d2860d0fa2603a169884d5e0c575b1b400a93ae2dfb2e738"
+    },
+    {
+      "path": "controls/current-scaling32/freeze.json",
+      "bytes": 1703,
+      "sha256": "473acacb678124d1f76569c5e356bda7fd7a6b08794fb8a47dd770d05444ee71"
+    },
+    {
+      "path": "controls/current-scaling32/local-checks.json",
+      "bytes": 3894,
+      "sha256": "6eda637ffb4234f51f4b153735a7ff4b56ec6e7a615ed008a4e4a730740d9ece"
+    },
+    {
+      "path": "controls/current-scaling32/protocol.json",
+      "bytes": 3787,
+      "sha256": "fc57d1ded8950ae16073f85ce4dbd1f5f7565427aa8ec32c0ec13f3b37495f95"
+    },
+    {
+      "path": "controls/current-scaling32/run.py",
+      "bytes": 33958,
+      "sha256": "9427383aa3b37b3c9850f4a5e3b904a7ee467d4959536e1e5a77b4dc03a365bb"
+    },
+    {
+      "path": "controls/current-scaling32/source-pins.json",
+      "bytes": 37027,
+      "sha256": "e184c4f3c3d6558bcad8fd6a9679ab0c092c1c29303e1e9da999b10318059838"
+    },
+    {
+      "path": "controls/current-scaling32/test_run.py",
+      "bytes": 20156,
+      "sha256": "7d2e6e3fd7d2ba42bb4b779d83e42b7ee76781f224968a88d4dfe0e8d2e854c6"
+    },
+    {
+      "path": "controls/exact-mass/run.py",
+      "bytes": 41516,
+      "sha256": "62200fe9df43a111f6088d4f6e824234876baff6caf0c065fd42365a84869129"
+    },
+    {
+      "path": "controls/showdown-kernel/run.py",
+      "bytes": 41166,
+      "sha256": "6d21fe34f9f66327bb7f3ff1c50d977687018af45c3593d56726f78e8da44a60"
+    },
+    {
+      "path": "exact-proof04.tar.gz",
+      "bytes": 8231258,
+      "sha256": "b7361b4adc579dc87c36e8c9cd37b1c307465db90fa6432eb1bc24d67163da37"
+    },
+    {
+      "path": "fetch-dependencies.sh",
+      "bytes": 800,
+      "sha256": "a5743e2872762e822fd54b6cb4474605c92321a9b3c9c73d8aa1db12b1f8b68a"
+    },
+    {
+      "path": "install-inputs.py",
+      "bytes": 7560,
+      "sha256": "0e964023296a9daeecdc0bc1add701fd7df4a507e40ad109ac3dc0486556c50f"
+    },
+    {
+      "path": "recover-current32.sh",
+      "bytes": 2922,
+      "sha256": "860b9cefa1d38c3626cc54100a0bb5581ee6f61de0eea531f17b6232de1db1d6"
+    },
+    {
+      "path": "run-current32.sh",
+      "bytes": 1689,
+      "sha256": "44bc17bb485ad9d07dc3f34612d4aaee7fada365179cdd18b6a5bca27d26585c"
+    },
+    {
+      "path": "start-current32.py",
+      "bytes": 4767,
+      "sha256": "b2df327cbb7dacb7e92c887a0595fd1463b420ebc3f48cb1425997e8e083e593"
+    }
+  ]
+}
