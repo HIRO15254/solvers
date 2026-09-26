@@ -1,0 +1,18 @@
+2026-09-26T20:44:05+00:00
+MainPID=1877
+ExecMainStatus=0
+ActiveState=active
+Sep 26 20:43:41 solvers-r1-20260926-12 bash[3942]: {"stage": "river-b0-t32", "status": "passed"}
+Sep 26 20:43:43 solvers-r1-20260926-12 bash[3942]: {"stage": "river-b1-t16", "status": "passed"}
+Sep 26 20:43:45 solvers-r1-20260926-12 bash[3942]: {"stage": "river-b1-t32", "status": "passed"}
+Sep 26 20:43:53 solvers-r1-20260926-12 bash[3942]: {"stage": "river-b1-t1", "status": "passed"}
+Sep 26 20:43:56 solvers-r1-20260926-12 bash[3942]: {"stage": "river-b2-t32", "status": "passed"}
+Sep 26 20:44:04 solvers-r1-20260926-12 bash[3942]: {"stage": "river-b2-t1", "status": "passed"}
+/opt/r1/current32-proof01/build-stages/release-example/supervisor.stdout.log
+/opt/r1/current32-proof01/build-stages/release-example/supervisor.stderr.log
+/opt/r1/current32-proof01/build-stages/release-example/supervisor.samples.jsonl
+/opt/r1/current32-proof01/build-stages/release-example/supervisor.json
+/opt/r1/current32-proof01/build-stages/toolchain/supervisor.stdout.log
+/opt/r1/current32-proof01/build-stages/toolchain/supervisor.stderr.log
+/opt/r1/current32-proof01/build-stages/toolchain/supervisor.samples.jsonl
+/opt/r1/current32-proof01/build-stages/toolchain/supervisor.json

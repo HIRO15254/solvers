@@ -30,6 +30,7 @@
 | R1の現行形式・全工程比較の固定手順 | [Final pipeline](hu-postflop-r1/final-pipeline/README.md) | SOL3/CKPT1対SOL4/CKPT2、同じ内部NC目標、保存後BR、時間・OSメモリ・codecの事前固定判定。手順の検査とLinux実測結果を区別する |
 | R1の現行形式・全工程比較の実測 | [VM11 proof02](hu-postflop-r1/final-pipeline/proof02/report.jp.md) | 9 build・156測定process成功。3 synthetic例で旧新の品質一致、時間と対象I/Oの事前判定通過。OSメモリはcounter整合条件不成立で判定不能。先行prepare失敗は別保持 |
 | R1のnative processメモリ比較 | [追加測定の結果](hu-postflop-r1/focused-memory/proof03/report.jp.md)、[検証結果](hu-postflop-r1/focused-memory/proof03/verification.json) | Python親の履歴を分離する校正に合格、99工程で元の品質・内容と一致。新最大/旧最小のRSS比はTurn0.341・限定Flop0.054で10%削減基準通過、River0.958は未達。proof02の判定は変更しない |
+| R1の現行版32 vCPU上のworker比較 | [Current32 proof01](hu-postflop-r1/current-scaling32/proof01/report.jp.md)、[全数値](hu-postflop-r1/current-scaling32/proof01/report.json) | 36実行で1/16/32 workersの停止軌跡・品質bits・全state一致。32は対直列3.71〜4.60倍だが16より17〜42%遅い。16 core/32 logicalの同一VM上、内部3ケースの記述比較。VM/disk削除確認済み |
 | R1の受入証拠の範囲 | [事前条件の監査](hu-postflop-r1/acceptance/audit.jp.md)、[将来の外部比較器](hu-postflop-r1/acceptance/external-contract.md) | 既存の事前条件と測定後索引を区別。将来の閾値発行・校正・欠測の検査であり、総合受入の認定ではない |
 | R1の実入力への境界適用 | [抽象化の適用確認](hu-postflop-r1/reference/abstraction-applicability.md) | 017/019のhand identity・joint重み・完全記憶の検査と、未実装・未評価の範囲 |
 | R1の工程別診断 | [source03 phase比較](hu-postflop-r1/phases/vm06-report.md) | 別instrumented buildのon/off較正、重複しない工程時間、元の性能実測との区別 |

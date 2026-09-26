@@ -1,0 +1,726 @@
+{
+  "schema": "r1.current-scaling32-historical-scheduling-audit/v1",
+  "recorded_at_utc": "2026-09-26T20:41:18.530374+00:00",
+  "scope": "Read-only reconstruction of historical source06 River scheduling. No runtime profiling, new solve, production change or amendment to current32 frozen controls.",
+  "pins": {
+    "retention_manifest": {
+      "path": "experiments/hu-postflop-r1/action-scaling/source06/measurement-proof/manifest.json",
+      "bytes": 139232,
+      "sha256": "0bccf9d79d22e19460e3dfaaeb41f10f762f382201374a607a2389a645e561e5"
+    },
+    "source06_manifest": {
+      "path": "experiments/hu-postflop-r1/range-scaling/source06/source-candidate-manifest.json",
+      "bytes": 69991,
+      "sha256": "4861e346bfdb4f831d12dc6eca9992d49d650a863e9e427ff456c6c2ab601cf6"
+    },
+    "source06_archive_declared": {
+      "bytes": 1385391,
+      "sha256": "ab9c4a8d32d83de2827319019c77361a1f36192c194185469700d90d9f6a3fab"
+    },
+    "canonical": {
+      "original_path": "/opt/r1/action06/stages/river-b0-t1-new/bench/canonical.bin",
+      "blob": "experiments/hu-postflop-r1/action-scaling/source06/measurement-proof/blobs/ccfbf8d976402613d2b0c3cd87bcadb0e1dfe4480bcc9a627806e4bec5a119f5.gz",
+      "encoded": {
+        "bytes": 609097,
+        "sha256": "bb19fafdb29c0f6907eb942e6682be7898816c28cb3ad7c3ea9aa13fb9899f4e"
+      },
+      "decoded": {
+        "bytes": 1286526,
+        "sha256": "ccfbf8d976402613d2b0c3cd87bcadb0e1dfe4480bcc9a627806e4bec5a119f5"
+      }
+    },
+    "benchmark_report": {
+      "original_path": "/opt/r1/action06/stages/river-b0-t1-new/bench/result.json",
+      "blob": "experiments/hu-postflop-r1/action-scaling/source06/measurement-proof/blobs/497641214270b5252264600aaf803ed3ec7d4d608e20343e4a46d8f2af8dc714.gz",
+      "encoded": {
+        "bytes": 4590,
+        "sha256": "6fc87499744972baeef864d7f9f28f399d4837f6d980eb7b160bff6760bd005c"
+      },
+      "decoded": {
+        "bytes": 22876,
+        "sha256": "497641214270b5252264600aaf803ed3ec7d4d608e20343e4a46d8f2af8dc714"
+      }
+    },
+    "portable_verification": {
+      "path": "experiments/hu-postflop-r1/action-scaling/source06/verification.json",
+      "bytes": 85003,
+      "sha256": "923fce6240549cccbb42dfb1d7f0bd05cde4ece18538e34c0d935ad5cf87de41"
+    },
+    "code": [
+      {
+        "path": "crates/engine/src/solver.rs",
+        "bytes": 56116,
+        "sha256": "e116e2554915768e0ccef89e86dccb0ffb89d0a2ff309343c0992fc8d7b02e4b",
+        "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+        "source06_pin": {
+          "bytes": 56116,
+          "sha256": "e116e2554915768e0ccef89e86dccb0ffb89d0a2ff309343c0992fc8d7b02e4b"
+        },
+        "same_as_source06": true
+      },
+      {
+        "path": "crates/engine/src/tree.rs",
+        "bytes": 16936,
+        "sha256": "2e6c1a3560bd12a7b2a04573e28505ae00fdaaf8fcb797cb3b0bb964a98879b2",
+        "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+        "source06_pin": {
+          "bytes": 16936,
+          "sha256": "2e6c1a3560bd12a7b2a04573e28505ae00fdaaf8fcb797cb3b0bb964a98879b2"
+        },
+        "same_as_source06": true
+      },
+      {
+        "path": "crates/engine/src/scratch.rs",
+        "bytes": 1117,
+        "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49",
+        "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+        "source06_pin": {
+          "bytes": 1117,
+          "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49"
+        },
+        "same_as_source06": true
+      },
+      {
+        "path": "crates/engine/src/storage.rs",
+        "bytes": 44287,
+        "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5",
+        "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+        "source06_pin": {
+          "bytes": 44287,
+          "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+        },
+        "same_as_source06": true
+      },
+      {
+        "path": "crates/engine/tests/parallel.rs",
+        "bytes": 23642,
+        "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d",
+        "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+        "source06_pin": {
+          "bytes": 23642,
+          "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d"
+        },
+        "same_as_source06": true
+      },
+      {
+        "path": "crates/cli/examples/hu_scaling_bench.rs",
+        "bytes": 23926,
+        "sha256": "b86c5da08ae892b27ddcc8d662c6b8b411aa3e4b25effecec93cc1bdac565ac1",
+        "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+        "source06_pin": {
+          "bytes": 20709,
+          "sha256": "304f10932cad07b43be995f08df9d47d37a579a92fd9ec489a03ba99e8883824"
+        },
+        "same_as_source06": false
+      },
+      {
+        "path": "crates/holdem/src/kernel.rs",
+        "bytes": 18270,
+        "sha256": "d59724dd4d9a1c797bebf83422c06b75c90020796bfbf8f492417910770bb076",
+        "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+        "source06_pin": {
+          "bytes": 6768,
+          "sha256": "f48e780d558dd64b9da6375a99ee832261d800a1ff82c5af9d562d89b5e3ff37"
+        },
+        "same_as_source06": false
+      },
+      {
+        "path": "crates/holdem/src/compatibility.rs",
+        "bytes": 3715,
+        "sha256": "330cf4368b3bcc324712f39d2fac62895bbcde764d10fae22c7c0708bedf5069",
+        "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+        "source06_pin": null,
+        "same_as_source06": false
+      },
+      {
+        "path": "crates/holdem/src/mass.rs",
+        "bytes": 10960,
+        "sha256": "6937d14f2424501109c182bcb433125206e39cbd24e6bcb8b5c3b5be1f627639",
+        "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+        "source06_pin": null,
+        "same_as_source06": false
+      }
+    ]
+  },
+  "source_equivalence": {
+    "current_revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+    "engine_files_compared": 12,
+    "all_engine_files_equal_source06": true,
+    "terminal_kernel_equal": false
+  },
+  "input": {
+    "iterations": 1000,
+    "root_dims": [
+      493,
+      479
+    ],
+    "nodes": 393,
+    "action_nodes": 132,
+    "chance_nodes": 0,
+    "storage_elements": 190512
+  },
+  "calculation": {
+    "canonical_layout": "HUCAN001; <QIId header at8, two u16 support counts each followed by count*(u16combo+f32weight); nodes are <BBHI kind/player/childcount/firstchild.",
+    "subtree_elements": "Reverse node order: own=(child_count*root_dims[player]) for action, otherwise0; W[node]=own+sum(W[child]) over contiguous direct-child IDs. No chance/mapped dimensions in this input. No storage padding: tree.rs assigns exactly actions*seat_dimension.",
+    "grain": "clamp(ceil(W[root]/(4*workers)),4096,65536), computed with integer division.",
+    "fork": "Action node has at least2 direct children with W[child]>=grain; below[node]=fork[node] or any below[child]. All direct children of a fork enter the parallel iterator, including terminal/short children.",
+    "same_plan_16_32": true
+  },
+  "plans": [
+    {
+      "workers": 2,
+      "grain": 23814,
+      "fork_nodes": [
+        0
+      ],
+      "fork_count": 1,
+      "protected_view_node_count": 1,
+      "parallel_iterator_child_entries_per_full_traversal": 5,
+      "child_entries_below_grain": 3,
+      "fork_details": [
+        {
+          "node": 0,
+          "subtree_elements": 190512,
+          "child_elements": [
+            95256,
+            51995,
+            22835,
+            17003,
+            958
+          ]
+        }
+      ]
+    },
+    {
+      "workers": 4,
+      "grain": 11907,
+      "fork_nodes": [
+        0,
+        1,
+        2,
+        7
+      ],
+      "fork_count": 4,
+      "protected_view_node_count": 4,
+      "parallel_iterator_child_entries_per_full_traversal": 22,
+      "child_entries_below_grain": 11,
+      "fork_details": [
+        {
+          "node": 0,
+          "subtree_elements": 190512,
+          "child_elements": [
+            95256,
+            51995,
+            22835,
+            17003,
+            958
+          ]
+        },
+        {
+          "node": 1,
+          "subtree_elements": 95256,
+          "child_elements": [
+            0,
+            52009,
+            22849,
+            17017,
+            986
+          ]
+        },
+        {
+          "node": 2,
+          "subtree_elements": 51995,
+          "child_elements": [
+            0,
+            0,
+            19933,
+            17017,
+            11185,
+            986
+          ]
+        },
+        {
+          "node": 7,
+          "subtree_elements": 52009,
+          "child_elements": [
+            0,
+            0,
+            19919,
+            17003,
+            11171,
+            958
+          ]
+        }
+      ]
+    },
+    {
+      "workers": 8,
+      "grain": 5954,
+      "fork_nodes": [
+        0,
+        1,
+        2,
+        3,
+        7,
+        8,
+        13,
+        204
+      ],
+      "fork_count": 8,
+      "protected_view_node_count": 8,
+      "parallel_iterator_child_entries_per_full_traversal": 42,
+      "child_entries_below_grain": 21,
+      "fork_details": [
+        {
+          "node": 0,
+          "subtree_elements": 190512,
+          "child_elements": [
+            95256,
+            51995,
+            22835,
+            17003,
+            958
+          ]
+        },
+        {
+          "node": 1,
+          "subtree_elements": 95256,
+          "child_elements": [
+            0,
+            52009,
+            22849,
+            17017,
+            986
+          ]
+        },
+        {
+          "node": 2,
+          "subtree_elements": 51995,
+          "child_elements": [
+            0,
+            0,
+            19933,
+            17017,
+            11185,
+            986
+          ]
+        },
+        {
+          "node": 3,
+          "subtree_elements": 22835,
+          "child_elements": [
+            0,
+            0,
+            11185,
+            8269,
+            986
+          ]
+        },
+        {
+          "node": 7,
+          "subtree_elements": 52009,
+          "child_elements": [
+            0,
+            0,
+            19919,
+            17003,
+            11171,
+            958
+          ]
+        },
+        {
+          "node": 8,
+          "subtree_elements": 22849,
+          "child_elements": [
+            0,
+            0,
+            11171,
+            8255,
+            958
+          ]
+        },
+        {
+          "node": 13,
+          "subtree_elements": 19919,
+          "child_elements": [
+            0,
+            0,
+            8269,
+            8269,
+            986
+          ]
+        },
+        {
+          "node": 204,
+          "subtree_elements": 19933,
+          "child_elements": [
+            0,
+            0,
+            8255,
+            8255,
+            958
+          ]
+        }
+      ]
+    },
+    {
+      "workers": 16,
+      "grain": 4096,
+      "fork_nodes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        7,
+        8,
+        9,
+        13,
+        14,
+        204,
+        205
+      ],
+      "fork_count": 12,
+      "protected_view_node_count": 12,
+      "parallel_iterator_child_entries_per_full_traversal": 62,
+      "child_entries_below_grain": 33,
+      "fork_details": [
+        {
+          "node": 0,
+          "subtree_elements": 190512,
+          "child_elements": [
+            95256,
+            51995,
+            22835,
+            17003,
+            958
+          ]
+        },
+        {
+          "node": 1,
+          "subtree_elements": 95256,
+          "child_elements": [
+            0,
+            52009,
+            22849,
+            17017,
+            986
+          ]
+        },
+        {
+          "node": 2,
+          "subtree_elements": 51995,
+          "child_elements": [
+            0,
+            0,
+            19933,
+            17017,
+            11185,
+            986
+          ]
+        },
+        {
+          "node": 3,
+          "subtree_elements": 22835,
+          "child_elements": [
+            0,
+            0,
+            11185,
+            8269,
+            986
+          ]
+        },
+        {
+          "node": 4,
+          "subtree_elements": 17003,
+          "child_elements": [
+            0,
+            0,
+            8269,
+            5353,
+            986
+          ]
+        },
+        {
+          "node": 7,
+          "subtree_elements": 52009,
+          "child_elements": [
+            0,
+            0,
+            19919,
+            17003,
+            11171,
+            958
+          ]
+        },
+        {
+          "node": 8,
+          "subtree_elements": 22849,
+          "child_elements": [
+            0,
+            0,
+            11171,
+            8255,
+            958
+          ]
+        },
+        {
+          "node": 9,
+          "subtree_elements": 17017,
+          "child_elements": [
+            0,
+            0,
+            8255,
+            5339,
+            958
+          ]
+        },
+        {
+          "node": 13,
+          "subtree_elements": 19919,
+          "child_elements": [
+            0,
+            0,
+            8269,
+            8269,
+            986
+          ]
+        },
+        {
+          "node": 14,
+          "subtree_elements": 17003,
+          "child_elements": [
+            0,
+            0,
+            8269,
+            5353,
+            986
+          ]
+        },
+        {
+          "node": 204,
+          "subtree_elements": 19933,
+          "child_elements": [
+            0,
+            0,
+            8255,
+            8255,
+            958
+          ]
+        },
+        {
+          "node": 205,
+          "subtree_elements": 17017,
+          "child_elements": [
+            0,
+            0,
+            8255,
+            5339,
+            958
+          ]
+        }
+      ]
+    },
+    {
+      "workers": 32,
+      "grain": 4096,
+      "fork_nodes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        7,
+        8,
+        9,
+        13,
+        14,
+        204,
+        205
+      ],
+      "fork_count": 12,
+      "protected_view_node_count": 12,
+      "parallel_iterator_child_entries_per_full_traversal": 62,
+      "child_entries_below_grain": 33,
+      "fork_details": [
+        {
+          "node": 0,
+          "subtree_elements": 190512,
+          "child_elements": [
+            95256,
+            51995,
+            22835,
+            17003,
+            958
+          ]
+        },
+        {
+          "node": 1,
+          "subtree_elements": 95256,
+          "child_elements": [
+            0,
+            52009,
+            22849,
+            17017,
+            986
+          ]
+        },
+        {
+          "node": 2,
+          "subtree_elements": 51995,
+          "child_elements": [
+            0,
+            0,
+            19933,
+            17017,
+            11185,
+            986
+          ]
+        },
+        {
+          "node": 3,
+          "subtree_elements": 22835,
+          "child_elements": [
+            0,
+            0,
+            11185,
+            8269,
+            986
+          ]
+        },
+        {
+          "node": 4,
+          "subtree_elements": 17003,
+          "child_elements": [
+            0,
+            0,
+            8269,
+            5353,
+            986
+          ]
+        },
+        {
+          "node": 7,
+          "subtree_elements": 52009,
+          "child_elements": [
+            0,
+            0,
+            19919,
+            17003,
+            11171,
+            958
+          ]
+        },
+        {
+          "node": 8,
+          "subtree_elements": 22849,
+          "child_elements": [
+            0,
+            0,
+            11171,
+            8255,
+            958
+          ]
+        },
+        {
+          "node": 9,
+          "subtree_elements": 17017,
+          "child_elements": [
+            0,
+            0,
+            8255,
+            5339,
+            958
+          ]
+        },
+        {
+          "node": 13,
+          "subtree_elements": 19919,
+          "child_elements": [
+            0,
+            0,
+            8269,
+            8269,
+            986
+          ]
+        },
+        {
+          "node": 14,
+          "subtree_elements": 17003,
+          "child_elements": [
+            0,
+            0,
+            8269,
+            5353,
+            986
+          ]
+        },
+        {
+          "node": 204,
+          "subtree_elements": 19933,
+          "child_elements": [
+            0,
+            0,
+            8255,
+            8255,
+            958
+          ]
+        },
+        {
+          "node": 205,
+          "subtree_elements": 17017,
+          "child_elements": [
+            0,
+            0,
+            8255,
+            5339,
+            958
+          ]
+        }
+      ]
+    }
+  ],
+  "historical_measurement": {
+    "cpu": "AMD EPYC7B12",
+    "physical_cores": 16,
+    "logical_cpus": 32,
+    "boot_id": "80fe06e6-3580-42ac-9af7-02c050425389",
+    "median_run_seconds": {
+      "1": 6.384069722,
+      "2": 3.392822455,
+      "4": 2.013032116,
+      "8": 1.361861799,
+      "16": 1.133695913,
+      "32": 1.437554811
+    },
+    "ratio_32_over_16": 1.2680250449134327,
+    "timing_scope": "1000 fixed CFR iterations; initialization, EV/BR queries, canonical capture and output excluded. Current32 target mode includes periodic EV/BR checks and must not be mixed with these times."
+  },
+  "limitations": [
+    "Parallel iterator child entry counts are not measured Rayon task/job counts or live concurrency.",
+    "Storage work excludes terminal evaluator work; a terminal with zero storage can still evaluate hundreds of hands.",
+    "No profiles, allocator counts, hardware counters or affinity isolation were collected; SMT/cache/scheduling explanations remain hypotheses.",
+    "The source06 terminal bridge differs from the current prepared/exact-mass kernel.",
+    "This audit changes none of the seven frozen current32 files and does not alter their prospective36-run protocol."
+  ],
+  "proposal_only": {
+    "scope": "Fixed adjacent-child chunks of2 at already eligible chance-free action forks; all other scheduling gates unchanged.",
+    "preserve": [
+      "Child-index output slots, action order and final ordered reduction",
+      "StorageSpan/ancestor isolation",
+      "CFR and EV/BR action helpers use the same chunk rule",
+      "Single-worker and no-fork small-tree paths unchanged; chance and kernel paths unchanged"
+    ],
+    "risks": [
+      "Chunking can group two expensive children and reduce useful load balance.",
+      "Scratch reuse across chunks is not per-worker persistent caching.",
+      "No guaranteed advantage for32 over16; no implicit worker cap or default change."
+    ],
+    "acceptance_before_adoption": [
+      "Independent candidate benchmark with protocol fixed before candidate outcomes; do not amend current32 baseline.",
+      "Exact canonical/state/quality trajectory bits against unchanged implementation at1/16/32.",
+      "F32/I16 tests include odd child count, partial final chunk, zero-work terminal child, asymmetric seats, deep single-child ancestors and small/no-fork trees.",
+      "Preserve the existing small-tree, deep-action and mapped-chance regression coverage."
+    ]
+  }
+}

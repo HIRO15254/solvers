@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "solvers-r1-20260926-12:/tmp/current32-recovery*.json",
+    "E:\\codex-work\\solvers\\r1-current32-recovery01",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--scp-flag=-batch",
+    "--scp-flag=-hostkey",
+    "--scp-flag=SHA256:NMEGHBw1WIbJUFmtQg29kM2BD2n9GHEXeqF6opzcZ3U"
+  ],
+  "started_utc": "2026-09-26T20:45:49.362236+00:00",
+  "timeout_seconds": 240,
+  "exit_code": 0,
+  "ended_utc": "2026-09-26T20:45:57.572704+00:00",
+  "stdout": {
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm12\\current32-download-records.stdout.log",
+    "bytes": 142,
+    "sha256": "89aa6c840928e7c2b895938306750ae29d2b3719777b960964920fd9fb3abfc1"
+  },
+  "stderr": {
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm12\\current32-download-records.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-scaling32\\run.py",
+    "--phase",
+    "check",
+    "--out",
+    "E:\\codex-work\\solvers\\r1-current32-recovery01\\proof",
+    "--foundation-proof",
+    "E:\\codex-work\\solvers\\r1-exact-proof04"
+  ],
+  "ended_at_utc": "2026-09-26T20:46:29.960458+00:00",
+  "exit_code": 0,
+  "label": "proof-0-verification",
+  "started_at_utc": "2026-09-26T20:46:26.348601+00:00",
+  "stderr": {
+    "bytes": 0,
+    "path": "E:\\codex-work\\solvers\\r1-vm12-cleanup\\proof-0-verification.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "bytes": 35845,
+    "path": "E:\\codex-work\\solvers\\r1-vm12-cleanup\\proof-0-verification.stdout.log",
+    "sha256": "bb99f059a04cf66b08d5e3eae7b90d4112506f9c919fe07eb2f188b96aef03db"
+  },
+  "timeout_seconds": 180
+}

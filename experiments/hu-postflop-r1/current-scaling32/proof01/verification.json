@@ -1,0 +1,1087 @@
+{
+  "schema": "r1.current-scaling32-verification/v1",
+  "status": "completed",
+  "payload_integrity": "verified",
+  "provenance_complete": true,
+  "historical_validation": {
+    "scope": "reused historical source-identical validation; not a workspace rerun",
+    "mode": "full-validation",
+    "stages": 8,
+    "tests": {
+      "workspace-tests": {
+        "summary_count": 56,
+        "passed": 958,
+        "ignored": 31
+      },
+      "release-oracle": {
+        "summary_count": 1,
+        "passed": 3,
+        "ignored": 0
+      },
+      "release-river-resolve": {
+        "summary_count": 1,
+        "passed": 1,
+        "ignored": 0
+      }
+    },
+    "full_workspace_validated": true
+  },
+  "build_stages_passed": 2,
+  "samples_passed": 36,
+  "warmups_passed": 9,
+  "summary": {
+    "cases": {
+      "river": {
+        "workers": {
+          "1": {
+            "run_seconds": [
+              6.530043132,
+              6.513602266,
+              6.5263063
+            ],
+            "median_seconds": 6.5263063,
+            "iterations": [
+              1000,
+              1000,
+              1000
+            ],
+            "quality": {
+              "deviation_gains": [
+                0.2526258704341302,
+                0.18623107372454095
+              ],
+              "exploitability_nash_conv_over_two": 0.21942847207933558,
+              "nash_conv": 0.43885694415867116,
+              "nash_conv_f64_bits_hex": "3fdc163b6fb22ce8",
+              "solver_br": [
+                -40.10036457746083,
+                -2.2945047884947285
+              ],
+              "solver_br_f64_bits_hex": [
+                "c0440cd8bf18ef81",
+                "c0025b255398cd53"
+              ],
+              "solver_ev": [
+                -40.35299044789496,
+                -2.4807358622192694
+              ],
+              "solver_ev_f64_bits_hex": [
+                "c0442d2eca7ec12f",
+                "c003d88c0b31f810"
+              ],
+              "subgame_br": [
+                234.89963542253918,
+                272.70549521150525
+              ],
+              "subgame_ev": [
+                234.64700955210503,
+                272.51926413778074
+              ]
+            },
+            "full_process_seconds": [
+              6.628866090999992,
+              6.63684668999997,
+              6.633985101999997
+            ],
+            "memory": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 191,
+                "max_sample_gap_seconds": 0.03565740199999823,
+                "sampled_peak_tree_resident_bytes": 8048640,
+                "root_os_peak_resident_bytes": 82595840,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 192,
+                "max_sample_gap_seconds": 0.03560799899997846,
+                "sampled_peak_tree_resident_bytes": 8097792,
+                "root_os_peak_resident_bytes": 82743296,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 191,
+                "max_sample_gap_seconds": 0.035758163000025434,
+                "sampled_peak_tree_resident_bytes": 7938048,
+                "root_os_peak_resident_bytes": 82919424,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ],
+            "phase_sampled_rss": [
+              8015872,
+              8056832,
+              7905280
+            ],
+            "speedup_over_one": 1.0,
+            "efficiency": 1.0
+          },
+          "16": {
+            "run_seconds": [
+              0.997750767,
+              1.051836813,
+              1.015996256
+            ],
+            "median_seconds": 1.015996256,
+            "iterations": [
+              1000,
+              1000,
+              1000
+            ],
+            "quality": {
+              "deviation_gains": [
+                0.2526258704341302,
+                0.18623107372454095
+              ],
+              "exploitability_nash_conv_over_two": 0.21942847207933558,
+              "nash_conv": 0.43885694415867116,
+              "nash_conv_f64_bits_hex": "3fdc163b6fb22ce8",
+              "solver_br": [
+                -40.10036457746083,
+                -2.2945047884947285
+              ],
+              "solver_br_f64_bits_hex": [
+                "c0440cd8bf18ef81",
+                "c0025b255398cd53"
+              ],
+              "solver_ev": [
+                -40.35299044789496,
+                -2.4807358622192694
+              ],
+              "solver_ev_f64_bits_hex": [
+                "c0442d2eca7ec12f",
+                "c003d88c0b31f810"
+              ],
+              "subgame_br": [
+                234.89963542253918,
+                272.70549521150525
+              ],
+              "subgame_ev": [
+                234.64700955210503,
+                272.51926413778074
+              ]
+            },
+            "full_process_seconds": [
+              1.0778683759999979,
+              1.1513573290000068,
+              1.0818713010000351
+            ],
+            "memory": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 29,
+                "max_sample_gap_seconds": 0.04262496699999474,
+                "sampled_peak_tree_resident_bytes": 10469376,
+                "root_os_peak_resident_bytes": 82452480,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 29,
+                "max_sample_gap_seconds": 0.04370105700002114,
+                "sampled_peak_tree_resident_bytes": 10620928,
+                "root_os_peak_resident_bytes": 82837504,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 31,
+                "max_sample_gap_seconds": 0.04291523599999891,
+                "sampled_peak_tree_resident_bytes": 10600448,
+                "root_os_peak_resident_bytes": 83005440,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ],
+            "phase_sampled_rss": [
+              10469376,
+              10620928,
+              10600448
+            ],
+            "speedup_over_one": 6.423553493882166,
+            "efficiency": 0.4014720933676354
+          },
+          "32": {
+            "run_seconds": [
+              1.4376132529999999,
+              1.443310464,
+              1.442531973
+            ],
+            "median_seconds": 1.442531973,
+            "iterations": [
+              1000,
+              1000,
+              1000
+            ],
+            "quality": {
+              "deviation_gains": [
+                0.2526258704341302,
+                0.18623107372454095
+              ],
+              "exploitability_nash_conv_over_two": 0.21942847207933558,
+              "nash_conv": 0.43885694415867116,
+              "nash_conv_f64_bits_hex": "3fdc163b6fb22ce8",
+              "solver_br": [
+                -40.10036457746083,
+                -2.2945047884947285
+              ],
+              "solver_br_f64_bits_hex": [
+                "c0440cd8bf18ef81",
+                "c0025b255398cd53"
+              ],
+              "solver_ev": [
+                -40.35299044789496,
+                -2.4807358622192694
+              ],
+              "solver_ev_f64_bits_hex": [
+                "c0442d2eca7ec12f",
+                "c003d88c0b31f810"
+              ],
+              "subgame_br": [
+                234.89963542253918,
+                272.70549521150525
+              ],
+              "subgame_ev": [
+                234.64700955210503,
+                272.51926413778074
+              ]
+            },
+            "full_process_seconds": [
+              1.5142315880000012,
+              1.5179717509999762,
+              1.5185936799999808
+            ],
+            "memory": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 37,
+                "max_sample_gap_seconds": 0.043075999999985015,
+                "sampled_peak_tree_resident_bytes": 12627968,
+                "root_os_peak_resident_bytes": 82526208,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 37,
+                "max_sample_gap_seconds": 0.04313402699997937,
+                "sampled_peak_tree_resident_bytes": 12607488,
+                "root_os_peak_resident_bytes": 82657280,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 37,
+                "max_sample_gap_seconds": 0.04340543199998592,
+                "sampled_peak_tree_resident_bytes": 12419072,
+                "root_os_peak_resident_bytes": 83087360,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ],
+            "phase_sampled_rss": [
+              12615680,
+              12603392,
+              12419072
+            ],
+            "speedup_over_one": 4.524202182103037,
+            "efficiency": 0.14138131819071992
+          }
+        },
+        "ratio_32_over_16": 1.4198201661483287,
+        "32_slower_than16": true,
+        "fastest_observed_workers": 16
+      },
+      "turn": {
+        "workers": {
+          "1": {
+            "run_seconds": [
+              1.306563337,
+              1.3129655009999999,
+              1.308860468
+            ],
+            "median_seconds": 1.308860468,
+            "iterations": [
+              1000,
+              1000,
+              1000
+            ],
+            "quality": {
+              "deviation_gains": [
+                0.0007286542727626966,
+                0.0015467420036401336
+              ],
+              "exploitability_nash_conv_over_two": 0.001137698138201415,
+              "nash_conv": 0.00227539627640283,
+              "nash_conv_f64_bits_hex": "3f62a3da12f68000",
+              "solver_br": [
+                8.79284065152392,
+                -8.790564360441985
+              ],
+              "solver_br_f64_bits_hex": [
+                "402195ef35ba7819",
+                "c02194c4da12f685"
+              ],
+              "solver_ev": [
+                8.792111997251157,
+                -8.792111102445626
+              ],
+              "solver_ev_f64_bits_hex": [
+                "4021958fb425ed09",
+                "c021958f961f9add"
+              ],
+              "subgame_br": [
+                18.792840651523917,
+                1.2094356395580146
+              ],
+              "subgame_ev": [
+                18.792111997251155,
+                1.2078888975543745
+              ]
+            },
+            "full_process_seconds": [
+              1.3723031619999801,
+              1.3832107549999932,
+              1.3773121389999687
+            ],
+            "memory": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 40,
+                "max_sample_gap_seconds": 0.03522896900000205,
+                "sampled_peak_tree_resident_bytes": 6193152,
+                "root_os_peak_resident_bytes": 83398656,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 40,
+                "max_sample_gap_seconds": 0.035583422000001974,
+                "sampled_peak_tree_resident_bytes": 6144000,
+                "root_os_peak_resident_bytes": 83496960,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 40,
+                "max_sample_gap_seconds": 0.03541104699996822,
+                "sampled_peak_tree_resident_bytes": 6307840,
+                "root_os_peak_resident_bytes": 83509248,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ],
+            "phase_sampled_rss": [
+              6193152,
+              6144000,
+              6307840
+            ],
+            "speedup_over_one": 1.0,
+            "efficiency": 1.0
+          },
+          "16": {
+            "run_seconds": [
+              0.250175722,
+              0.248256044,
+              0.249637924
+            ],
+            "median_seconds": 0.249637924,
+            "iterations": [
+              1000,
+              1000,
+              1000
+            ],
+            "quality": {
+              "deviation_gains": [
+                0.0007286542727626966,
+                0.0015467420036401336
+              ],
+              "exploitability_nash_conv_over_two": 0.001137698138201415,
+              "nash_conv": 0.00227539627640283,
+              "nash_conv_f64_bits_hex": "3f62a3da12f68000",
+              "solver_br": [
+                8.79284065152392,
+                -8.790564360441985
+              ],
+              "solver_br_f64_bits_hex": [
+                "402195ef35ba7819",
+                "c02194c4da12f685"
+              ],
+              "solver_ev": [
+                8.792111997251157,
+                -8.792111102445626
+              ],
+              "solver_ev_f64_bits_hex": [
+                "4021958fb425ed09",
+                "c021958f961f9add"
+              ],
+              "subgame_br": [
+                18.792840651523917,
+                1.2094356395580146
+              ],
+              "subgame_ev": [
+                18.792111997251155,
+                1.2078888975543745
+              ]
+            },
+            "full_process_seconds": [
+              0.3206248749999645,
+              0.3168995820000191,
+              0.30888683400002037
+            ],
+            "memory": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 9,
+                "max_sample_gap_seconds": 0.044046670000000177,
+                "sampled_peak_tree_resident_bytes": 6979584,
+                "root_os_peak_resident_bytes": 83398656,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 9,
+                "max_sample_gap_seconds": 0.04394600900002388,
+                "sampled_peak_tree_resident_bytes": 6938624,
+                "root_os_peak_resident_bytes": 83496960,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 9,
+                "max_sample_gap_seconds": 0.04340950700003532,
+                "sampled_peak_tree_resident_bytes": 6909952,
+                "root_os_peak_resident_bytes": 83496960,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ],
+            "phase_sampled_rss": [
+              6979584,
+              6938624,
+              6909952
+            ],
+            "speedup_over_one": 5.24303538111461,
+            "efficiency": 0.3276897113196631
+          },
+          "32": {
+            "run_seconds": [
+              0.357593083,
+              0.353110447,
+              0.35312975
+            ],
+            "median_seconds": 0.35312975,
+            "iterations": [
+              1000,
+              1000,
+              1000
+            ],
+            "quality": {
+              "deviation_gains": [
+                0.0007286542727626966,
+                0.0015467420036401336
+              ],
+              "exploitability_nash_conv_over_two": 0.001137698138201415,
+              "nash_conv": 0.00227539627640283,
+              "nash_conv_f64_bits_hex": "3f62a3da12f68000",
+              "solver_br": [
+                8.79284065152392,
+                -8.790564360441985
+              ],
+              "solver_br_f64_bits_hex": [
+                "402195ef35ba7819",
+                "c02194c4da12f685"
+              ],
+              "solver_ev": [
+                8.792111997251157,
+                -8.792111102445626
+              ],
+              "solver_ev_f64_bits_hex": [
+                "4021958fb425ed09",
+                "c021958f961f9add"
+              ],
+              "subgame_br": [
+                18.792840651523917,
+                1.2094356395580146
+              ],
+              "subgame_ev": [
+                18.792111997251155,
+                1.2078888975543745
+              ]
+            },
+            "full_process_seconds": [
+              0.4037819999999783,
+              0.4013117659999921,
+              0.40425496000000294
+            ],
+            "memory": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 10,
+                "max_sample_gap_seconds": 0.04320581399997536,
+                "sampled_peak_tree_resident_bytes": 7544832,
+                "root_os_peak_resident_bytes": 83345408,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 10,
+                "max_sample_gap_seconds": 0.04343263100003014,
+                "sampled_peak_tree_resident_bytes": 7540736,
+                "root_os_peak_resident_bytes": 83496960,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 10,
+                "max_sample_gap_seconds": 0.04356053899999779,
+                "sampled_peak_tree_resident_bytes": 7606272,
+                "root_os_peak_resident_bytes": 83496960,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ],
+            "phase_sampled_rss": [
+              7532544,
+              7520256,
+              7499776
+            ],
+            "speedup_over_one": 3.7064576632243527,
+            "efficiency": 0.11582680197576102
+          }
+        },
+        "ratio_32_over_16": 1.414567724093075,
+        "32_slower_than16": true,
+        "fastest_observed_workers": 16
+      },
+      "flop": {
+        "workers": {
+          "1": {
+            "run_seconds": [
+              0.495168426,
+              0.497814227,
+              0.49475246
+            ],
+            "median_seconds": 0.495168426,
+            "iterations": [
+              45,
+              45,
+              45
+            ],
+            "quality": {
+              "deviation_gains": [
+                0.009175353580050949,
+                0.019158999125162834
+              ],
+              "exploitability_nash_conv_over_two": 0.014167176352606892,
+              "nash_conv": 0.028334352705213783,
+              "nash_conv_f64_bits_hex": "3f9d03ae38e38e40",
+              "solver_br": [
+                -1.9410858154296875,
+                1.9694203270806208
+              ],
+              "solver_br_f64_bits_hex": [
+                "bfff0eb000000000",
+                "3fff82bee38e38e4"
+              ],
+              "solver_ev": [
+                -1.9502611690097384,
+                1.950261327955458
+              ],
+              "solver_ev_f64_bits_hex": [
+                "bfff34450e38e38e",
+                "3fff344538e38e39"
+              ],
+              "subgame_br": [
+                8.058914184570312,
+                11.96942032708062
+              ],
+              "subgame_ev": [
+                8.049738830990261,
+                11.950261327955458
+              ]
+            },
+            "full_process_seconds": [
+              0.6107584579999639,
+              0.6124571619999983,
+              0.6104503010000144
+            ],
+            "memory": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 18,
+                "max_sample_gap_seconds": 0.03516265100000737,
+                "sampled_peak_tree_resident_bytes": 14565376,
+                "root_os_peak_resident_bytes": 83718144,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 18,
+                "max_sample_gap_seconds": 0.03537919600000805,
+                "sampled_peak_tree_resident_bytes": 14651392,
+                "root_os_peak_resident_bytes": 83730432,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 18,
+                "max_sample_gap_seconds": 0.035286713000004966,
+                "sampled_peak_tree_resident_bytes": 14647296,
+                "root_os_peak_resident_bytes": 83738624,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ],
+            "phase_sampled_rss": [
+              14241792,
+              14327808,
+              14323712
+            ],
+            "speedup_over_one": 1.0,
+            "efficiency": 1.0
+          },
+          "16": {
+            "run_seconds": [
+              0.091920775,
+              0.090782609,
+              0.092479141
+            ],
+            "median_seconds": 0.091920775,
+            "iterations": [
+              45,
+              45,
+              45
+            ],
+            "quality": {
+              "deviation_gains": [
+                0.009175353580050949,
+                0.019158999125162834
+              ],
+              "exploitability_nash_conv_over_two": 0.014167176352606892,
+              "nash_conv": 0.028334352705213783,
+              "nash_conv_f64_bits_hex": "3f9d03ae38e38e40",
+              "solver_br": [
+                -1.9410858154296875,
+                1.9694203270806208
+              ],
+              "solver_br_f64_bits_hex": [
+                "bfff0eb000000000",
+                "3fff82bee38e38e4"
+              ],
+              "solver_ev": [
+                -1.9502611690097384,
+                1.950261327955458
+              ],
+              "solver_ev_f64_bits_hex": [
+                "bfff34450e38e38e",
+                "3fff344538e38e39"
+              ],
+              "subgame_br": [
+                8.058914184570312,
+                11.96942032708062
+              ],
+              "subgame_ev": [
+                8.049738830990261,
+                11.950261327955458
+              ]
+            },
+            "full_process_seconds": [
+              0.19455928000002132,
+              0.21672257599999512,
+              0.19492610199995397
+            ],
+            "memory": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 6,
+                "max_sample_gap_seconds": 0.0352522160000035,
+                "sampled_peak_tree_resident_bytes": 16297984,
+                "root_os_peak_resident_bytes": 83730432,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 6,
+                "max_sample_gap_seconds": 0.04374820000003865,
+                "sampled_peak_tree_resident_bytes": 16412672,
+                "root_os_peak_resident_bytes": 83730432,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 6,
+                "max_sample_gap_seconds": 0.03571445099998982,
+                "sampled_peak_tree_resident_bytes": 16326656,
+                "root_os_peak_resident_bytes": 83783680,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ],
+            "phase_sampled_rss": [
+              15736832,
+              15872000,
+              15753216
+            ],
+            "speedup_over_one": 5.3869043858692445,
+            "efficiency": 0.3366815241168278
+          },
+          "32": {
+            "run_seconds": [
+              0.108953518,
+              0.106009437,
+              0.107624839
+            ],
+            "median_seconds": 0.107624839,
+            "iterations": [
+              45,
+              45,
+              45
+            ],
+            "quality": {
+              "deviation_gains": [
+                0.009175353580050949,
+                0.019158999125162834
+              ],
+              "exploitability_nash_conv_over_two": 0.014167176352606892,
+              "nash_conv": 0.028334352705213783,
+              "nash_conv_f64_bits_hex": "3f9d03ae38e38e40",
+              "solver_br": [
+                -1.9410858154296875,
+                1.9694203270806208
+              ],
+              "solver_br_f64_bits_hex": [
+                "bfff0eb000000000",
+                "3fff82bee38e38e4"
+              ],
+              "solver_ev": [
+                -1.9502611690097384,
+                1.950261327955458
+              ],
+              "solver_ev_f64_bits_hex": [
+                "bfff34450e38e38e",
+                "3fff344538e38e39"
+              ],
+              "subgame_br": [
+                8.058914184570312,
+                11.96942032708062
+              ],
+              "subgame_ev": [
+                8.049738830990261,
+                11.950261327955458
+              ]
+            },
+            "full_process_seconds": [
+              0.2180164140000329,
+              0.2172501759999932,
+              0.21722621800000752
+            ],
+            "memory": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 6,
+                "max_sample_gap_seconds": 0.04324135499996373,
+                "sampled_peak_tree_resident_bytes": 17477632,
+                "root_os_peak_resident_bytes": 83730432,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 6,
+                "max_sample_gap_seconds": 0.04312218200004736,
+                "sampled_peak_tree_resident_bytes": 17141760,
+                "root_os_peak_resident_bytes": 83730432,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 6,
+                "max_sample_gap_seconds": 0.04294728499996836,
+                "sampled_peak_tree_resident_bytes": 17321984,
+                "root_os_peak_resident_bytes": 83730432,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ],
+            "phase_sampled_rss": [
+              16982016,
+              17072128,
+              17248256
+            ],
+            "speedup_over_one": 4.600874952296095,
+            "efficiency": 0.14377734225925298
+          }
+        },
+        "ratio_32_over_16": 1.1708434681931261,
+        "32_slower_than16": true,
+        "fastest_observed_workers": 16
+      }
+    },
+    "scope": "three endpoint worker counts; descriptive only, not optimal-worker search or external quality",
+    "timing_scope": "solve plus every stopping EV/BR check, excluding initialization and post-stop capture",
+    "memory_claim": null,
+    "speedup_required": false,
+    "r1_certification": false
+  },
+  "host": {
+    "machine": "x86_64",
+    "logical_cpus": 32,
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31
+    ],
+    "topology": [
+      {
+        "cpu": 0,
+        "core": "0",
+        "socket": "0"
+      },
+      {
+        "cpu": 1,
+        "core": "1",
+        "socket": "0"
+      },
+      {
+        "cpu": 2,
+        "core": "2",
+        "socket": "0"
+      },
+      {
+        "cpu": 3,
+        "core": "3",
+        "socket": "0"
+      },
+      {
+        "cpu": 4,
+        "core": "4",
+        "socket": "0"
+      },
+      {
+        "cpu": 5,
+        "core": "5",
+        "socket": "0"
+      },
+      {
+        "cpu": 6,
+        "core": "6",
+        "socket": "0"
+      },
+      {
+        "cpu": 7,
+        "core": "7",
+        "socket": "0"
+      },
+      {
+        "cpu": 8,
+        "core": "8",
+        "socket": "0"
+      },
+      {
+        "cpu": 9,
+        "core": "9",
+        "socket": "0"
+      },
+      {
+        "cpu": 10,
+        "core": "10",
+        "socket": "0"
+      },
+      {
+        "cpu": 11,
+        "core": "11",
+        "socket": "0"
+      },
+      {
+        "cpu": 12,
+        "core": "12",
+        "socket": "0"
+      },
+      {
+        "cpu": 13,
+        "core": "13",
+        "socket": "0"
+      },
+      {
+        "cpu": 14,
+        "core": "14",
+        "socket": "0"
+      },
+      {
+        "cpu": 15,
+        "core": "15",
+        "socket": "0"
+      },
+      {
+        "cpu": 16,
+        "core": "0",
+        "socket": "0"
+      },
+      {
+        "cpu": 17,
+        "core": "1",
+        "socket": "0"
+      },
+      {
+        "cpu": 18,
+        "core": "2",
+        "socket": "0"
+      },
+      {
+        "cpu": 19,
+        "core": "3",
+        "socket": "0"
+      },
+      {
+        "cpu": 20,
+        "core": "4",
+        "socket": "0"
+      },
+      {
+        "cpu": 21,
+        "core": "5",
+        "socket": "0"
+      },
+      {
+        "cpu": 22,
+        "core": "6",
+        "socket": "0"
+      },
+      {
+        "cpu": 23,
+        "core": "7",
+        "socket": "0"
+      },
+      {
+        "cpu": 24,
+        "core": "8",
+        "socket": "0"
+      },
+      {
+        "cpu": 25,
+        "core": "9",
+        "socket": "0"
+      },
+      {
+        "cpu": 26,
+        "core": "10",
+        "socket": "0"
+      },
+      {
+        "cpu": 27,
+        "core": "11",
+        "socket": "0"
+      },
+      {
+        "cpu": 28,
+        "core": "12",
+        "socket": "0"
+      },
+      {
+        "cpu": 29,
+        "core": "13",
+        "socket": "0"
+      },
+      {
+        "cpu": 30,
+        "core": "14",
+        "socket": "0"
+      },
+      {
+        "cpu": 31,
+        "core": "15",
+        "socket": "0"
+      }
+    ],
+    "boot_id": "735f9ef6-e1d7-414e-a760-3963d9f0b68c",
+    "cpu_models": [
+      "Intel(R) Xeon(R) CPU @ 2.20GHz"
+    ],
+    "cgroup": {
+      "path": "/sys/fs/cgroup/system.slice/solvers-r1-vm12-current32.service",
+      "memory_max": "12884901888",
+      "swap_max": "0",
+      "cpu_weight": "100",
+      "cpu_limits": {
+        "/sys/fs/cgroup/system.slice/solvers-r1-vm12-current32.service": "max 100000",
+        "/sys/fs/cgroup/system.slice": "max 100000"
+      }
+    }
+  },
+  "tool_retention": "compiler/Python identities only; measured binary and all raw outputs retained"
+}

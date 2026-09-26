@@ -77,10 +77,34 @@
           "absolute_stop_deadline_utc": "2026-09-26T21:34:03Z",
           "evidence": "experiments/hu-postflop-r1/cloud/vm12/campaign-start01.stdout.log",
           "reservation_delta_usd": 0
+        },
+        {
+          "event": "current32_completed_recovered_and_verified",
+          "at": "2026-09-26T20:45:03Z",
+          "build_stages_passed": 2,
+          "samples_passed": 36,
+          "warmups_passed": 9,
+          "archive_bytes": 5262188,
+          "archive_sha256": "d2809e7a66faf627704c690722d3f8011f45af5af44173a8695d55cea90c1798",
+          "local_verification_ended_utc": "2026-09-26T20:46:29.960458+00:00",
+          "evidence": "experiments/hu-postflop-r1/current-scaling32/proof01/report.jp.md",
+          "reservation_delta_usd": 0
+        },
+        {
+          "event": "instance_and_auto_delete_disk_deleted_absence_verified",
+          "at": "2026-09-26T13:47:28.759-07:00",
+          "instance_id": "4952839753420870319",
+          "disk_id": "5551647169025774255",
+          "operation_id": "8412797885897609665",
+          "absence_verified_utc": "2026-09-26T20:47:41.047498+00:00",
+          "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm12/run01/reconciliation.json",
+          "billed_usd": null,
+          "reservation_released": false
         }
       ],
       "absolute_deadline_utc": "2026-09-26T21:34:03Z",
-      "measurement_deadline_utc": "2026-09-26T21:19:03Z"
+      "measurement_deadline_utc": "2026-09-26T21:19:03Z",
+      "disposition": "All36 current-source F32 endpoint runs plus2 fresh build stages passed; all raw bytes recovered and trusted locally verified. Same VM resized4->32; full worker/quality/state agreement. 16workers fastest among1/16/32 for all3 cases;32 slower16. VM and sole40GiB autoDelete disk explicitly deleted and named resources verified absent. Original STOP not extended. Invoice unknown; full3USD held, cumulative38/40,2unreserved."
     },
     {
       "id": "r1-20260926-11",

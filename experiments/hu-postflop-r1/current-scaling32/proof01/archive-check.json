@@ -1,0 +1,12 @@
+{
+  "schema": "r1.final-pipeline-recovery/v1",
+  "status": "bytes_verified",
+  "archive": "E:\\codex-work\\solvers\\r1-current32-recovery01\\current32-proof01.tar.gz",
+  "bytes": 5262188,
+  "sha256": "d2809e7a66faf627704c690722d3f8011f45af5af44173a8695d55cea90c1798",
+  "original_files": 540,
+  "archive_files": 198,
+  "retention_issue_count": 0,
+  "missing_required_files": [],
+  "scope": "Recovery-byte integrity only; campaign verification is separate"
+}

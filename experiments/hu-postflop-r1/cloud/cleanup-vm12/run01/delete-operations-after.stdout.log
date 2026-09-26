@@ -1,0 +1,13 @@
+[
+  {
+    "endTime": "2026-09-26T13:47:28.759-07:00",
+    "id": "8412797885897609665",
+    "name": "operation-1790455598381-65c68eded7a90-268bee4d-fe552d06",
+    "operationType": "delete",
+    "startTime": "2026-09-26T13:46:38.610-07:00",
+    "status": "DONE",
+    "targetId": "4952839753420870319",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260926-12",
+    "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+  }
+]

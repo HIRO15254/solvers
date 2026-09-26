@@ -1,0 +1,1180 @@
+{
+  "schema": "r1.current-scaling32-report/v1",
+  "status": "completed",
+  "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+  "build_stages_passed": 2,
+  "samples_passed": 36,
+  "warmups_passed": 9,
+  "measured_samples": 27,
+  "host": {
+    "machine": "x86_64",
+    "logical_cpus": 32,
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31
+    ],
+    "topology": [
+      {
+        "cpu": 0,
+        "core": "0",
+        "socket": "0"
+      },
+      {
+        "cpu": 1,
+        "core": "1",
+        "socket": "0"
+      },
+      {
+        "cpu": 2,
+        "core": "2",
+        "socket": "0"
+      },
+      {
+        "cpu": 3,
+        "core": "3",
+        "socket": "0"
+      },
+      {
+        "cpu": 4,
+        "core": "4",
+        "socket": "0"
+      },
+      {
+        "cpu": 5,
+        "core": "5",
+        "socket": "0"
+      },
+      {
+        "cpu": 6,
+        "core": "6",
+        "socket": "0"
+      },
+      {
+        "cpu": 7,
+        "core": "7",
+        "socket": "0"
+      },
+      {
+        "cpu": 8,
+        "core": "8",
+        "socket": "0"
+      },
+      {
+        "cpu": 9,
+        "core": "9",
+        "socket": "0"
+      },
+      {
+        "cpu": 10,
+        "core": "10",
+        "socket": "0"
+      },
+      {
+        "cpu": 11,
+        "core": "11",
+        "socket": "0"
+      },
+      {
+        "cpu": 12,
+        "core": "12",
+        "socket": "0"
+      },
+      {
+        "cpu": 13,
+        "core": "13",
+        "socket": "0"
+      },
+      {
+        "cpu": 14,
+        "core": "14",
+        "socket": "0"
+      },
+      {
+        "cpu": 15,
+        "core": "15",
+        "socket": "0"
+      },
+      {
+        "cpu": 16,
+        "core": "0",
+        "socket": "0"
+      },
+      {
+        "cpu": 17,
+        "core": "1",
+        "socket": "0"
+      },
+      {
+        "cpu": 18,
+        "core": "2",
+        "socket": "0"
+      },
+      {
+        "cpu": 19,
+        "core": "3",
+        "socket": "0"
+      },
+      {
+        "cpu": 20,
+        "core": "4",
+        "socket": "0"
+      },
+      {
+        "cpu": 21,
+        "core": "5",
+        "socket": "0"
+      },
+      {
+        "cpu": 22,
+        "core": "6",
+        "socket": "0"
+      },
+      {
+        "cpu": 23,
+        "core": "7",
+        "socket": "0"
+      },
+      {
+        "cpu": 24,
+        "core": "8",
+        "socket": "0"
+      },
+      {
+        "cpu": 25,
+        "core": "9",
+        "socket": "0"
+      },
+      {
+        "cpu": 26,
+        "core": "10",
+        "socket": "0"
+      },
+      {
+        "cpu": 27,
+        "core": "11",
+        "socket": "0"
+      },
+      {
+        "cpu": 28,
+        "core": "12",
+        "socket": "0"
+      },
+      {
+        "cpu": 29,
+        "core": "13",
+        "socket": "0"
+      },
+      {
+        "cpu": 30,
+        "core": "14",
+        "socket": "0"
+      },
+      {
+        "cpu": 31,
+        "core": "15",
+        "socket": "0"
+      }
+    ],
+    "boot_id": "735f9ef6-e1d7-414e-a760-3963d9f0b68c",
+    "cpu_models": [
+      "Intel(R) Xeon(R) CPU @ 2.20GHz"
+    ],
+    "cgroup": {
+      "path": "/sys/fs/cgroup/system.slice/solvers-r1-vm12-current32.service",
+      "memory_max": "12884901888",
+      "swap_max": "0",
+      "cpu_weight": "100",
+      "cpu_limits": {
+        "/sys/fs/cgroup/system.slice/solvers-r1-vm12-current32.service": "max 100000",
+        "/sys/fs/cgroup/system.slice": "max 100000"
+      }
+    }
+  },
+  "binary": {
+    "path": "/opt/r1/target/current32-proof01/release/examples/hu_scaling_bench",
+    "bytes": 3943680,
+    "sha256": "750f2000779f0bc92cc5585d7a87ebc3fd2b8b61fb71640390f86e5ea4cb924d"
+  },
+  "cases": {
+    "river": {
+      "workers": {
+        "1": {
+          "run_seconds": [
+            6.530043132,
+            6.513602266,
+            6.5263063
+          ],
+          "median_seconds": 6.5263063,
+          "iterations": [
+            1000,
+            1000,
+            1000
+          ],
+          "speedup_over_one": 1.0,
+          "efficiency": 1.0
+        },
+        "16": {
+          "run_seconds": [
+            0.997750767,
+            1.051836813,
+            1.015996256
+          ],
+          "median_seconds": 1.015996256,
+          "iterations": [
+            1000,
+            1000,
+            1000
+          ],
+          "speedup_over_one": 6.423553493882166,
+          "efficiency": 0.4014720933676354
+        },
+        "32": {
+          "run_seconds": [
+            1.4376132529999999,
+            1.443310464,
+            1.442531973
+          ],
+          "median_seconds": 1.442531973,
+          "iterations": [
+            1000,
+            1000,
+            1000
+          ],
+          "speedup_over_one": 4.524202182103037,
+          "efficiency": 0.14138131819071992
+        }
+      },
+      "ratio_32_over_16": 1.4198201661483287,
+      "32_slower_than16": true,
+      "fastest_observed_workers": 16,
+      "stopping_controls": {
+        "file": "river.toml",
+        "iterations": 1000,
+        "check_every": 100,
+        "target_nash_conv": 0.439
+      },
+      "quality": {
+        "deviation_gains": [
+          0.2526258704341302,
+          0.18623107372454095
+        ],
+        "exploitability_nash_conv_over_two": 0.21942847207933558,
+        "nash_conv": 0.43885694415867116,
+        "nash_conv_f64_bits_hex": "3fdc163b6fb22ce8",
+        "solver_br": [
+          -40.10036457746083,
+          -2.2945047884947285
+        ],
+        "solver_br_f64_bits_hex": [
+          "c0440cd8bf18ef81",
+          "c0025b255398cd53"
+        ],
+        "solver_ev": [
+          -40.35299044789496,
+          -2.4807358622192694
+        ],
+        "solver_ev_f64_bits_hex": [
+          "c0442d2eca7ec12f",
+          "c003d88c0b31f810"
+        ],
+        "subgame_br": [
+          234.89963542253918,
+          272.70549521150525
+        ],
+        "subgame_ev": [
+          234.64700955210503,
+          272.51926413778074
+        ]
+      },
+      "trajectory_f64_bits": [
+        {
+          "iterations": 100,
+          "solver_ev": [
+            "c04560bd768dcef8",
+            "bf832f331c294bc4"
+          ],
+          "solver_br": [
+            "c041d904b7dbe3b3",
+            "4013eb790328d8d4"
+          ],
+          "nash_conv": [
+            "4028196b492323d1"
+          ]
+        },
+        {
+          "iterations": 200,
+          "solver_ev": [
+            "c044b43f1148a81a",
+            "bff2d2a7fac2fda0"
+          ],
+          "solver_br": [
+            "c043491d8708d169",
+            "3ff066e6b2e902f9"
+          ],
+          "nash_conv": [
+            "4014276ffd69b5ae"
+          ]
+        },
+        {
+          "iterations": 300,
+          "solver_ev": [
+            "c0445843b1f6baea",
+            "c000b4e541549626"
+          ],
+          "solver_br": [
+            "c0435ff357300b77",
+            "bfe59a7b57174861"
+          ],
+          "nash_conv": [
+            "400ad34c17f9bb3e"
+          ]
+        },
+        {
+          "iterations": 400,
+          "solver_ev": [
+            "c0443f94f077a723",
+            "c002c346b0a6f4ec"
+          ],
+          "solver_br": [
+            "c043b3256c2b33e2",
+            "bff663e372de1924"
+          ],
+          "nash_conv": [
+            "4000584d3bff1c6a"
+          ]
+        },
+        {
+          "iterations": 500,
+          "solver_ev": [
+            "c0443b57355f0470",
+            "c00378904e3c7f85"
+          ],
+          "solver_br": [
+            "c043e7744750a281",
+            "bffb6c67917341d2"
+          ],
+          "nash_conv": [
+            "3ff60116ccd1fb18"
+          ]
+        },
+        {
+          "iterations": 600,
+          "solver_ev": [
+            "c04437c195528462",
+            "c003983d8bca210d"
+          ],
+          "solver_br": [
+            "c043f569c40cc497",
+            "bffff89f4bec4012"
+          ],
+          "nash_conv": [
+            "3fef05abe8bff6d0"
+          ]
+        },
+        {
+          "iterations": 700,
+          "solver_ev": [
+            "c0443296cd9f386a",
+            "c003c93a3d62a175"
+          ],
+          "solver_br": [
+            "c043fbef470a6753",
+            "c001541380ab0e5c"
+          ],
+          "nash_conv": [
+            "3fe77e7c98129224"
+          ]
+        },
+        {
+          "iterations": 800,
+          "solver_ev": [
+            "c044302a8f95ff5e",
+            "c003e800cc6a0fb3"
+          ],
+          "solver_br": [
+            "c0440337fdd1c77b",
+            "c001c8376d628860"
+          ],
+          "nash_conv": [
+            "3fe3bbc9ed2c160c"
+          ]
+        },
+        {
+          "iterations": 900,
+          "solver_ev": [
+            "c0442e933c38d67b",
+            "c003e63aa3869472"
+          ],
+          "solver_br": [
+            "c04409de9b98bd9f",
+            "c0020f70e810ad69"
+          ],
+          "nash_conv": [
+            "3fe0884f15ddd324"
+          ]
+        },
+        {
+          "iterations": 1000,
+          "solver_ev": [
+            "c0442d2eca7ec12f",
+            "c003d88c0b31f810"
+          ],
+          "solver_br": [
+            "c0440cd8bf18ef81",
+            "c0025b255398cd53"
+          ],
+          "nash_conv": [
+            "3fdc163b6fb22ce8"
+          ]
+        }
+      ],
+      "root_dims": [
+        493,
+        479
+      ],
+      "rake": {
+        "cap": 60.0,
+        "kind": "percent-cap",
+        "no_flop_no_drop": false,
+        "rate": 0.05
+      },
+      "utility": {
+        "kind": "chip-ev"
+      },
+      "canonical_and_state": {
+        "canonical.bin": {
+          "bytes": 1286526,
+          "sha256": "ccfbf8d976402613d2b0c3cd87bcadb0e1dfe4480bcc9a627806e4bec5a119f5"
+        },
+        "state.bin": {
+          "bytes": 1534036,
+          "sha256": "59010cb9b0cd119270caa521767b49c245c2cad9fdb95b7bbde3fa7739fcbd66"
+        }
+      },
+      "warmups_passed": 3,
+      "measured_passed": 9,
+      "worker_repeat_agreement": true
+    },
+    "turn": {
+      "workers": {
+        "1": {
+          "run_seconds": [
+            1.306563337,
+            1.3129655009999999,
+            1.308860468
+          ],
+          "median_seconds": 1.308860468,
+          "iterations": [
+            1000,
+            1000,
+            1000
+          ],
+          "speedup_over_one": 1.0,
+          "efficiency": 1.0
+        },
+        "16": {
+          "run_seconds": [
+            0.250175722,
+            0.248256044,
+            0.249637924
+          ],
+          "median_seconds": 0.249637924,
+          "iterations": [
+            1000,
+            1000,
+            1000
+          ],
+          "speedup_over_one": 5.24303538111461,
+          "efficiency": 0.3276897113196631
+        },
+        "32": {
+          "run_seconds": [
+            0.357593083,
+            0.353110447,
+            0.35312975
+          ],
+          "median_seconds": 0.35312975,
+          "iterations": [
+            1000,
+            1000,
+            1000
+          ],
+          "speedup_over_one": 3.7064576632243527,
+          "efficiency": 0.11582680197576102
+        }
+      },
+      "ratio_32_over_16": 1.414567724093075,
+      "32_slower_than16": true,
+      "fastest_observed_workers": 16,
+      "stopping_controls": {
+        "file": "turn.toml",
+        "iterations": 1000,
+        "check_every": 100,
+        "target_nash_conv": 0.00228
+      },
+      "quality": {
+        "deviation_gains": [
+          0.0007286542727626966,
+          0.0015467420036401336
+        ],
+        "exploitability_nash_conv_over_two": 0.001137698138201415,
+        "nash_conv": 0.00227539627640283,
+        "nash_conv_f64_bits_hex": "3f62a3da12f68000",
+        "solver_br": [
+          8.79284065152392,
+          -8.790564360441985
+        ],
+        "solver_br_f64_bits_hex": [
+          "402195ef35ba7819",
+          "c02194c4da12f685"
+        ],
+        "solver_ev": [
+          8.792111997251157,
+          -8.792111102445626
+        ],
+        "solver_ev_f64_bits_hex": [
+          "4021958fb425ed09",
+          "c021958f961f9add"
+        ],
+        "subgame_br": [
+          18.792840651523917,
+          1.2094356395580146
+        ],
+        "subgame_ev": [
+          18.792111997251155,
+          1.2078888975543745
+        ]
+      },
+      "trajectory_f64_bits": [
+        {
+          "iterations": 100,
+          "solver_ev": [
+            "4021957762c3f35c",
+            "c021957783291620"
+          ],
+          "solver_br": [
+            "40219cebe3291620",
+            "c0218e29587e6b75"
+          ],
+          "nash_conv": [
+            "3f9d85561f9ade00"
+          ]
+        },
+        {
+          "iterations": 200,
+          "solver_ev": [
+            "4021958c522c3f36",
+            "c021958c6b74f033"
+          ],
+          "solver_br": [
+            "402197cf8ca4587e",
+            "c0218ee487e6b74f"
+          ],
+          "nash_conv": [
+            "3f91d63c0ca45800"
+          ]
+        },
+        {
+          "iterations": 300,
+          "solver_ev": [
+            "4021958fd22c3f36",
+            "c021958fd87e6b75"
+          ],
+          "solver_br": [
+            "40219a968b0fcd6f",
+            "c021942e04bda12f"
+          ],
+          "nash_conv": [
+            "3f89a2329161fc00"
+          ]
+        },
+        {
+          "iterations": 400,
+          "solver_ev": [
+            "40219590a781948b",
+            "c02195909ed097b4"
+          ],
+          "solver_br": [
+            "402196c2948b0fcd",
+            "c02193f8bb425ed1"
+          ],
+          "nash_conv": [
+            "3f764e84bda12800"
+          ]
+        },
+        {
+          "iterations": 500,
+          "solver_ev": [
+            "402195905097b426",
+            "c02195908e38e38e"
+          ],
+          "solver_br": [
+            "40219677c587e6b7",
+            "c02194377b425ed1"
+          ],
+          "nash_conv": [
+            "3f72043f35ba7000"
+          ]
+        },
+        {
+          "iterations": 600,
+          "solver_ev": [
+            "40219590425ed098",
+            "c0219590497b425f"
+          ],
+          "solver_br": [
+            "4021966cc0000000",
+            "c021940bf8e38e39"
+          ],
+          "nash_conv": [
+            "3f730671c71c7000"
+          ]
+        },
+        {
+          "iterations": 700,
+          "solver_ev": [
+            "4021958fba781949",
+            "c02195900587e6b7"
+          ],
+          "solver_br": [
+            "4021961b4d6e9e06",
+            "c02194208ca4587e"
+          ],
+          "nash_conv": [
+            "3f6fb0bda12f6000"
+          ]
+        },
+        {
+          "iterations": 800,
+          "solver_ev": [
+            "4021959001948b10",
+            "c021958fe12f684c"
+          ],
+          "solver_br": [
+            "4021960e3425ed09",
+            "c02194c30a4587e7"
+          ],
+          "nash_conv": [
+            "3f64b097b425e000"
+          ]
+        },
+        {
+          "iterations": 900,
+          "solver_ev": [
+            "4021958fb74f0329",
+            "c021958faf684bda"
+          ],
+          "solver_br": [
+            "402195dfe2c3f35c",
+            "c02194ad5a12f685"
+          ],
+          "nash_conv": [
+            "3f63280ca4588000"
+          ]
+        },
+        {
+          "iterations": 1000,
+          "solver_ev": [
+            "4021958fb425ed09",
+            "c021958f961f9add"
+          ],
+          "solver_br": [
+            "402195ef35ba7819",
+            "c02194c4da12f685"
+          ],
+          "nash_conv": [
+            "3f62a3da12f68000"
+          ]
+        }
+      ],
+      "root_dims": [
+        19,
+        20
+      ],
+      "rake": {
+        "kind": "none"
+      },
+      "utility": {
+        "kind": "chip-ev"
+      },
+      "canonical_and_state": {
+        "canonical.bin": {
+          "bytes": 202256,
+          "sha256": "b24560f6ef21c68d2d41a8ee18d9612ee85fa5154e272d4d2bd2ab457e1c5775"
+        },
+        "state.bin": {
+          "bytes": 196454,
+          "sha256": "fb01ef55554c69123801a25cfa5fa1985c79666d0f02c7b3d40e3ae7b5c8208a"
+        }
+      },
+      "warmups_passed": 3,
+      "measured_passed": 9,
+      "worker_repeat_agreement": true
+    },
+    "flop": {
+      "workers": {
+        "1": {
+          "run_seconds": [
+            0.495168426,
+            0.497814227,
+            0.49475246
+          ],
+          "median_seconds": 0.495168426,
+          "iterations": [
+            45,
+            45,
+            45
+          ],
+          "speedup_over_one": 1.0,
+          "efficiency": 1.0
+        },
+        "16": {
+          "run_seconds": [
+            0.091920775,
+            0.090782609,
+            0.092479141
+          ],
+          "median_seconds": 0.091920775,
+          "iterations": [
+            45,
+            45,
+            45
+          ],
+          "speedup_over_one": 5.3869043858692445,
+          "efficiency": 0.3366815241168278
+        },
+        "32": {
+          "run_seconds": [
+            0.108953518,
+            0.106009437,
+            0.107624839
+          ],
+          "median_seconds": 0.107624839,
+          "iterations": [
+            45,
+            45,
+            45
+          ],
+          "speedup_over_one": 4.600874952296095,
+          "efficiency": 0.14377734225925298
+        }
+      },
+      "ratio_32_over_16": 1.1708434681931261,
+      "32_slower_than16": true,
+      "fastest_observed_workers": 16,
+      "stopping_controls": {
+        "file": "flop.toml",
+        "iterations": 50,
+        "check_every": 5,
+        "target_nash_conv": 0.0367
+      },
+      "quality": {
+        "deviation_gains": [
+          0.009175353580050949,
+          0.019158999125162834
+        ],
+        "exploitability_nash_conv_over_two": 0.014167176352606892,
+        "nash_conv": 0.028334352705213783,
+        "nash_conv_f64_bits_hex": "3f9d03ae38e38e40",
+        "solver_br": [
+          -1.9410858154296875,
+          1.9694203270806208
+        ],
+        "solver_br_f64_bits_hex": [
+          "bfff0eb000000000",
+          "3fff82bee38e38e4"
+        ],
+        "solver_ev": [
+          -1.9502611690097384,
+          1.950261327955458
+        ],
+        "solver_ev_f64_bits_hex": [
+          "bfff34450e38e38e",
+          "3fff344538e38e39"
+        ],
+        "subgame_br": [
+          8.058914184570312,
+          11.96942032708062
+        ],
+        "subgame_ev": [
+          8.049738830990261,
+          11.950261327955458
+        ]
+      },
+      "trajectory_f64_bits": [
+        {
+          "iterations": 5,
+          "solver_ev": [
+            "c002f66a0e38e38e",
+            "4002f66c1c71c71c"
+          ],
+          "solver_br": [
+            "bff8db62aaaaaaab",
+            "4003fceca38e38e4"
+          ],
+          "nash_conv": [
+            "3fee3ce500000002"
+          ]
+        },
+        {
+          "iterations": 10,
+          "solver_ev": [
+            "bfffefe18e38e38e",
+            "3fffefe280000000"
+          ],
+          "solver_br": [
+            "bffb3ec99c71c71c",
+            "40011e83471c71c7"
+          ],
+          "nash_conv": [
+            "3fdbf8f000000000"
+          ]
+        },
+        {
+          "iterations": 15,
+          "solver_ev": [
+            "bfff50619c71c71c",
+            "3fff50630e38e38e"
+          ],
+          "solver_br": [
+            "bffd9530a38e38e4",
+            "3fffe90755555555"
+          ],
+          "nash_conv": [
+            "3fc29ea9fffffff8"
+          ]
+        },
+        {
+          "iterations": 20,
+          "solver_ev": [
+            "bfff7a89638e38e4",
+            "3fff7a890e38e38e"
+          ],
+          "solver_br": [
+            "bffc9d47638e38e4",
+            "4000715918e38e39"
+          ],
+          "nash_conv": [
+            "3fd115ac8e38e390"
+          ]
+        },
+        {
+          "iterations": 25,
+          "solver_ev": [
+            "bfff3bf0471c71c7",
+            "3fff3befd5555555"
+          ],
+          "solver_br": [
+            "bffe95bbb8e38e39",
+            "4000516fb8e38e39"
+          ],
+          "nash_conv": [
+            "3fc0692155555558"
+          ]
+        },
+        {
+          "iterations": 30,
+          "solver_ev": [
+            "bfff3634f1c71c72",
+            "3fff36349c71c71c"
+          ],
+          "solver_br": [
+            "bffecb0fc71c71c7",
+            "3fffd17c38e38e39"
+          ],
+          "nash_conv": [
+            "3fb066cc71c71c80"
+          ]
+        },
+        {
+          "iterations": 35,
+          "solver_ev": [
+            "bfff379700000000",
+            "3fff3798e38e38e4"
+          ],
+          "solver_br": [
+            "bffefc9180000000",
+            "3fffcfe1638e38e4"
+          ],
+          "nash_conv": [
+            "3faa69c000000000"
+          ]
+        },
+        {
+          "iterations": 40,
+          "solver_ev": [
+            "bfff361f9c71c71c",
+            "3fff3620d5555555"
+          ],
+          "solver_br": [
+            "bffedd56471c71c7",
+            "3fffa546f1c71c72"
+          ],
+          "nash_conv": [
+            "3fa8fdee38e38e40"
+          ]
+        },
+        {
+          "iterations": 45,
+          "solver_ev": [
+            "bfff34450e38e38e",
+            "3fff344538e38e39"
+          ],
+          "solver_br": [
+            "bfff0eb000000000",
+            "3fff82bee38e38e4"
+          ],
+          "nash_conv": [
+            "3f9d03ae38e38e40"
+          ]
+        }
+      ],
+      "root_dims": [
+        3,
+        3
+      ],
+      "rake": {
+        "kind": "none"
+      },
+      "utility": {
+        "kind": "chip-ev"
+      },
+      "canonical_and_state": {
+        "canonical.bin": {
+          "bytes": 972815,
+          "sha256": "96aad2732a2a0fbb329b915d1df1f76df77ab4a44b09b137d49318981014f54a"
+        },
+        "state.bin": {
+          "bytes": 655841,
+          "sha256": "e486c54f8e1874dd07df3d9e8de68670b54e06fe99750aab383a10ef05948654"
+        }
+      },
+      "warmups_passed": 3,
+      "measured_passed": 9,
+      "worker_repeat_agreement": true
+    }
+  },
+  "input_pins": {
+    "plan.json": {
+      "path": "E:\\codex-work\\solvers\\r1-current32-recovery01\\proof\\plan.json",
+      "bytes": 16751,
+      "sha256": "ec20b875374de6a51c713c971f4852350484fdfda7728ff89c7a40dec255fde8"
+    },
+    "build.json": {
+      "path": "E:\\codex-work\\solvers\\r1-current32-recovery01\\proof\\build.json",
+      "bytes": 19449,
+      "sha256": "e2b6fd7984aa28a2271c6f49c49a0bd254969582031aed883400e1c7844ee8ab"
+    },
+    "result.json": {
+      "path": "E:\\codex-work\\solvers\\r1-current32-recovery01\\proof\\result.json",
+      "bytes": 1011465,
+      "sha256": "3b8ce16f9c5c46f83b3f97c64d4f62b4e9cef4b594fca07ab48c7a69f0ff4516"
+    },
+    "retention.json": {
+      "path": "E:\\codex-work\\solvers\\r1-current32-recovery01\\proof\\retention.json",
+      "bytes": 93665,
+      "sha256": "eb658bde7ba1d55da4f93f631bb5a7f44943893b7a1a18120e6ef10b1bcd71f8"
+    },
+    "verification": {
+      "path": "E:\\codex-work\\solvers\\r1-vm12-cleanup\\proof-0-verification.stdout.log",
+      "bytes": 35845,
+      "sha256": "bb99f059a04cf66b08d5e3eae7b90d4112506f9c919fe07eb2f188b96aef03db"
+    },
+    "protocol": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-scaling32\\protocol.json",
+      "bytes": 3787,
+      "sha256": "fc57d1ded8950ae16073f85ce4dbd1f5f7565427aa8ec32c0ec13f3b37495f95"
+    }
+  },
+  "benchmark_report_pins": {
+    "river-b0-t1": {
+      "bytes": 26793,
+      "sha256": "2f3acf75ba370c8cd322def6c93627b22f0e13d05f9940f11cd51123fd1e8186"
+    },
+    "river-b0-t16": {
+      "bytes": 26798,
+      "sha256": "8f00843f7be63335b39f4764b3e221621a722b416fc09d4ee82ac9b11c72836b"
+    },
+    "river-b0-t32": {
+      "bytes": 26798,
+      "sha256": "f2c3746c66422416b388487ef4de2f36ea5065c3f03972f4a474135e493f1a54"
+    },
+    "river-b1-t16": {
+      "bytes": 26798,
+      "sha256": "c2a534ddfbcd2ea706e7f55854737aad85352ccbe89d2f81aa83e38b708eba26"
+    },
+    "river-b1-t32": {
+      "bytes": 26810,
+      "sha256": "94b8ed9346d90ee2098b56e1dd4a18c0994a58f0a7f4e695c205af02dd6dc97a"
+    },
+    "river-b1-t1": {
+      "bytes": 26797,
+      "sha256": "ded978b56a1e6f18a46ca0a5d6213805a93d81ed39ac546d17c4d3adece3b7ac"
+    },
+    "river-b2-t32": {
+      "bytes": 26792,
+      "sha256": "8134cc4342b02ff0c82a0cf4532ef04cbf3335f67621ce0cd21cc438e633b5f1"
+    },
+    "river-b2-t1": {
+      "bytes": 26797,
+      "sha256": "9bdc9e32fac246098256fa34c3a5281ad955b97158031b03d8f773789d820aa1"
+    },
+    "river-b2-t16": {
+      "bytes": 26795,
+      "sha256": "f659be30af74906f9ff482f93710293ed54826298a303c218643ad27e663fca2"
+    },
+    "river-b3-t1": {
+      "bytes": 26786,
+      "sha256": "d86a28fbe2844d8661f1f99bf1c8deb0dc45e2c72d524de426605fca1e56b179"
+    },
+    "river-b3-t16": {
+      "bytes": 26797,
+      "sha256": "55d190bf02f2ce57462e8cc20862dcfdabe2f3b282b7d9f12d875f3178dab2f3"
+    },
+    "river-b3-t32": {
+      "bytes": 26792,
+      "sha256": "2720f729be3426a88cda620db91deac8fd563ea0aa4b638e43cb17118a1fcf93"
+    },
+    "turn-b0-t16": {
+      "bytes": 8368,
+      "sha256": "4c3ec5272c2edd6236e3ad49d3a2b6f17bb82d4147082ee97aefe727036cfd4c"
+    },
+    "turn-b0-t32": {
+      "bytes": 8372,
+      "sha256": "ee8d4daa21bbbab3a467eb524949ff472599e1c30c1e504b8c9f2c026d902722"
+    },
+    "turn-b0-t1": {
+      "bytes": 8367,
+      "sha256": "4d48873cdb411214b09fd8590f1962cc2d416e52cf4936903bb48afbc4f14a83"
+    },
+    "turn-b1-t32": {
+      "bytes": 8370,
+      "sha256": "91ddc76bc12ccd3dcd2bab85f3a5b81e08612ea989146b1668958703ca016fe5"
+    },
+    "turn-b1-t1": {
+      "bytes": 8372,
+      "sha256": "0002cc56eb934f540a2be37d3d8b1ff7cf3c3b5e35aac132335d3b6a6fd0bbc0"
+    },
+    "turn-b1-t16": {
+      "bytes": 8373,
+      "sha256": "12ee3f756a75915781e4d54f357707fd105070f5a032de187632e299d3b8cbf5"
+    },
+    "turn-b2-t1": {
+      "bytes": 8384,
+      "sha256": "493628a757a0a06799ae7b846b9bbe72cfdb362ee4be4d971670fd565ec73915"
+    },
+    "turn-b2-t16": {
+      "bytes": 8369,
+      "sha256": "b1f25c6d145e979f5847a00ae464d6f5cdacc31e81948a4af8e66bcb6c0a547b"
+    },
+    "turn-b2-t32": {
+      "bytes": 8368,
+      "sha256": "31239f2f251b0c9f7bad081cd9e54ae119612f4617f60520a81e139ba41f20ef"
+    },
+    "turn-b3-t16": {
+      "bytes": 8364,
+      "sha256": "41fbf68f7beef238176503255b6b8038760ea634be193c4478a3913b833e8649"
+    },
+    "turn-b3-t32": {
+      "bytes": 8370,
+      "sha256": "f66eb8402a46ea109f336badd0ac36260a1b065b36d17519343baf14f184d035"
+    },
+    "turn-b3-t1": {
+      "bytes": 8365,
+      "sha256": "da50631daa8d31679b8f1d6c051982317f3050169274aa3f0f6f5198ed62eedd"
+    },
+    "flop-b0-t32": {
+      "bytes": 7188,
+      "sha256": "8ed9a076ec7666d38fbeb1d42b40c8e75b5a6d43c690c5b8c02f016322bbe9e9"
+    },
+    "flop-b0-t1": {
+      "bytes": 7189,
+      "sha256": "5ecf36ca293b2f72789630fe73280e1f214f1c4a0f3866f2b609c4f8fdfc3259"
+    },
+    "flop-b0-t16": {
+      "bytes": 7191,
+      "sha256": "6a1b041066a2fd5d176d2392ee1e7b37ecad33f4ab52ce6bdfe83fb6db56a2af"
+    },
+    "flop-b1-t1": {
+      "bytes": 7188,
+      "sha256": "3bee5ba22ef9238ccc74cafa5a92d708ce038e48e5d65448c0ed50243001229b"
+    },
+    "flop-b1-t16": {
+      "bytes": 7185,
+      "sha256": "343d22182bb7c0c2fb59c1d6ff17e684eca5b819b9be00eda7833f02857675e3"
+    },
+    "flop-b1-t32": {
+      "bytes": 7187,
+      "sha256": "950f2738f966bbb69f3e888d0b9b84edb9c25f9ccda12279eee527b89bcf267e"
+    },
+    "flop-b2-t16": {
+      "bytes": 7188,
+      "sha256": "ebc9c0266e06dad8d1e6b5c4bd218246d55cdce997d362db890ddcfd9c5f7b07"
+    },
+    "flop-b2-t32": {
+      "bytes": 7185,
+      "sha256": "20fa92af6a743cf9c74856deaafd6edf0fbca8e7b960dd170a567db6e73fffef"
+    },
+    "flop-b2-t1": {
+      "bytes": 7184,
+      "sha256": "26867258dfcf38530e712243847c5f968d515b98ceaf5990394531adf83405df"
+    },
+    "flop-b3-t32": {
+      "bytes": 7186,
+      "sha256": "ae38a429918cee22ad1cb5884a0f53f4b93b0fa007e520d3b73a98cdc7eeab20"
+    },
+    "flop-b3-t1": {
+      "bytes": 7184,
+      "sha256": "4ea1b7d890fd7428b626952158b5cb3d129a4a135a6399ca53a71a9e965e4d8f"
+    },
+    "flop-b3-t16": {
+      "bytes": 7188,
+      "sha256": "03342592fb1c6e8b50a6efe4e08de3d715af49aa35de80f44a3857efe154675d"
+    }
+  },
+  "timing_scope": "CFR plus every stopping EV/BR check through first passing target; setup and post-stop capture excluded",
+  "agreement_basis": "Trusted checker compared original canonical/state/config bytes, final solver EV/BR/NashConv bits and stopping-trajectory f64 bits across all 12 runs per case. Other derived/subgame quality fields use numeric equality. This helper rechecks raw report hashes, statistics, trajectory bits and retained artifact pins; it does not rehash the large canonical payloads.",
+  "limitations": [
+    "Caller-supplied verification must be the trusted portable-check output for this proof.",
+    "Three measured runs per worker are descriptive; no confidence interval or general optimal-worker conclusion.",
+    "Same 32-logical-CPU host with workers 1/16/32; this does not compare three separately sized VMs or imply 32 physical cores.",
+    "River has nonzero rake and unconfirmed external-reference assumptions; NashConv is an internal diagnostic, not zero-sum certification.",
+    "Flop has three combos per player, one flop bet size and later streets check down; no general full-range Flop claim.",
+    "Bit agreement concerns these retained inputs and runs, not all games/platforms. Reported BLAKE3 was syntax-checked, not independently recomputed.",
+    "Current-source endpoint comparison only; no old/new, I16, external accuracy or overall R1 certification."
+  ],
+  "memory_claim": null,
+  "speedup_required": false,
+  "external_certification": false,
+  "r1_certification": false
+}

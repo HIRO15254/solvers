@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260926-12",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:NMEGHBw1WIbJUFmtQg29kM2BD2n9GHEXeqF6opzcZ3U",
+    "--command=date -u --iso-8601=seconds; sudo systemctl show solvers-r1-vm12-current32 -p ActiveState -p MainPID -p ExecMainStatus; sudo journalctl -u solvers-r1-vm12-current32 -n 10 --no-pager; sudo find /opt/r1/current32-proof01/build-stages -name stderr.log -exec tail -n 3 {} +"
+  ],
+  "started_utc": "2026-09-26T20:42:55.549928+00:00",
+  "timeout_seconds": 60
+}
