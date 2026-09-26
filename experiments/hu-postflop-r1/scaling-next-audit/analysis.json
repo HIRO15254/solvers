@@ -1,0 +1,756 @@
+{
+  "schema": "r1.scaling-next-readonly-audit/v1",
+  "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+  "scope": "Static source/topology and existing timing decomposition only; no new solver, benchmark, profiler or cloud execution.",
+  "archive": {
+    "path": "experiments/hu-postflop-r1/current-scaling32/proof01/current32-proof01.tar.gz",
+    "bytes": 5262188,
+    "sha256": "d2809e7a66faf627704c690722d3f8011f45af5af44173a8695d55cea90c1798"
+  },
+  "input_pins": {
+    "experiments/hu-postflop-r1/current-scaling32/proof01/current32-proof01.tar.gz.manifest.json": {
+      "bytes": 226578,
+      "sha256": "5c1abaa49fdb9b0564d738581147fa7e30f859a9e8b43f354082e25aaf23141a"
+    },
+    "experiments/hu-postflop-r1/current-scaling32/proof01/report.json": {
+      "bytes": 29619,
+      "sha256": "4ebd29b0df919df2211e9fadcf8d548edf7d58f06dffbfe044de3d66b8724ece"
+    },
+    "experiments/hu-postflop-r1/current-scaling32/protocol.json": {
+      "bytes": 3787,
+      "sha256": "fc57d1ded8950ae16073f85ce4dbd1f5f7565427aa8ec32c0ec13f3b37495f95"
+    }
+  },
+  "code_pins": {
+    "crates/engine/src/solver.rs": {
+      "bytes": 56116,
+      "sha256": "e116e2554915768e0ccef89e86dccb0ffb89d0a2ff309343c0992fc8d7b02e4b",
+      "equals_measured_revision": true
+    },
+    "crates/engine/src/scratch.rs": {
+      "bytes": 1117,
+      "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49",
+      "equals_measured_revision": true
+    },
+    "crates/engine/src/storage.rs": {
+      "bytes": 44287,
+      "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5",
+      "equals_measured_revision": true
+    },
+    "crates/engine/src/tree.rs": {
+      "bytes": 16936,
+      "sha256": "2e6c1a3560bd12a7b2a04573e28505ae00fdaaf8fcb797cb3b0bb964a98879b2",
+      "equals_measured_revision": true
+    },
+    "crates/engine/tests/parallel.rs": {
+      "bytes": 23642,
+      "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d",
+      "equals_measured_revision": true
+    },
+    "crates/holdem/src/kernel.rs": {
+      "bytes": 18270,
+      "sha256": "d59724dd4d9a1c797bebf83422c06b75c90020796bfbf8f492417910770bb076",
+      "equals_measured_revision": true
+    },
+    "crates/holdem/src/postflop.rs": {
+      "bytes": 73444,
+      "sha256": "70ecaa0bbc39ca1fff1d3c7c29a1e499dea87e5b8e58d2486b3e0ebc157f891f",
+      "equals_measured_revision": true
+    },
+    "crates/holdem/src/mass.rs": {
+      "bytes": 10960,
+      "sha256": "6937d14f2424501109c182bcb433125206e39cbd24e6bcb8b5c3b5be1f627639",
+      "equals_measured_revision": true
+    },
+    "crates/cli/examples/hu_scaling_bench.rs": {
+      "bytes": 23926,
+      "sha256": "b86c5da08ae892b27ddcc8d662c6b8b411aa3e4b25effecec93cc1bdac565ac1",
+      "equals_measured_revision": true
+    }
+  },
+  "cases": {
+    "river": {
+      "workers": {
+        "1": {
+          "samples": [
+            {
+              "block": 1,
+              "iterations": 1000,
+              "solve_seconds": 6.358169957,
+              "quality_seconds": 0.17181770600000001,
+              "run_seconds": 6.530043132,
+              "other_seconds": 5.546899999997468e-05,
+              "quality_fraction": 0.026311879190815735
+            },
+            {
+              "block": 2,
+              "iterations": 1000,
+              "solve_seconds": 6.342406507,
+              "quality_seconds": 0.17113821499999998,
+              "run_seconds": 6.513602266,
+              "other_seconds": 5.754400000063109e-05,
+              "quality_fraction": 0.026273973756935555
+            },
+            {
+              "block": 3,
+              "iterations": 1000,
+              "solve_seconds": 6.354476649,
+              "quality_seconds": 0.17177430900000001,
+              "run_seconds": 6.5263063,
+              "other_seconds": 5.534199999945866e-05,
+              "quality_fraction": 0.026320295294751953
+            }
+          ],
+          "medians": {
+            "solve_seconds": 6.354476649,
+            "quality_seconds": 0.17177430900000001,
+            "run_seconds": 6.5263063,
+            "other_seconds": 5.546899999997468e-05,
+            "quality_fraction": 0.026311879190815735
+          }
+        },
+        "16": {
+          "samples": [
+            {
+              "block": 1,
+              "iterations": 1000,
+              "solve_seconds": 0.973780648,
+              "quality_seconds": 0.023912119,
+              "run_seconds": 0.997750767,
+              "other_seconds": 5.80000000000129e-05,
+              "quality_fraction": 0.023966024172447465
+            },
+            {
+              "block": 2,
+              "iterations": 1000,
+              "solve_seconds": 1.026185842,
+              "quality_seconds": 0.025601498,
+              "run_seconds": 1.051836813,
+              "other_seconds": 4.947299999991106e-05,
+              "quality_fraction": 0.02433980032223877
+            },
+            {
+              "block": 3,
+              "iterations": 1000,
+              "solve_seconds": 0.9904657290000001,
+              "quality_seconds": 0.025473396,
+              "run_seconds": 1.015996256,
+              "other_seconds": 5.7130999999915194e-05,
+              "quality_fraction": 0.02507233255001286
+            }
+          ],
+          "medians": {
+            "solve_seconds": 0.9904657290000001,
+            "quality_seconds": 0.025473396,
+            "run_seconds": 1.015996256,
+            "other_seconds": 5.7130999999915194e-05,
+            "quality_fraction": 0.02433980032223877
+          }
+        },
+        "32": {
+          "samples": [
+            {
+              "block": 1,
+              "iterations": 1000,
+              "solve_seconds": 1.402556291,
+              "quality_seconds": 0.03500067,
+              "run_seconds": 1.4376132529999999,
+              "other_seconds": 5.6291999999860676e-05,
+              "quality_fraction": 0.024346374052243103
+            },
+            {
+              "block": 2,
+              "iterations": 1000,
+              "solve_seconds": 1.4095581080000001,
+              "quality_seconds": 0.033691094,
+              "run_seconds": 1.443310464,
+              "other_seconds": 6.126199999993004e-05,
+              "quality_fraction": 0.02334292921747985
+            },
+            {
+              "block": 3,
+              "iterations": 1000,
+              "solve_seconds": 1.40827311,
+              "quality_seconds": 0.03420307,
+              "run_seconds": 1.442531973,
+              "other_seconds": 5.579299999980414e-05,
+              "quality_fraction": 0.02371044152932616
+            }
+          ],
+          "medians": {
+            "solve_seconds": 1.40827311,
+            "quality_seconds": 0.03420307,
+            "run_seconds": 1.442531973,
+            "other_seconds": 5.6291999999860676e-05,
+            "quality_fraction": 0.02371044152932616
+          }
+        }
+      },
+      "warmups_checked": 3,
+      "ratio32_over16_solve_seconds": 1.4218292150520233,
+      "ratio32_over16_quality_seconds": 1.34269769134826,
+      "ratio32_over16_run_seconds": 1.4198201661483287,
+      "static_scheduling": {
+        "root_dims": [
+          493,
+          479
+        ],
+        "nodes": 393,
+        "action_nodes": 132,
+        "terminal_nodes": 261,
+        "storage_elements": 190512,
+        "action_plans": {
+          "16": {
+            "grain": 4096,
+            "enabled": true,
+            "fork_nodes": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              7,
+              8,
+              9,
+              13,
+              14,
+              204,
+              205
+            ],
+            "child_items_per_traversal": 62,
+            "child_items_below_grain": 33
+          },
+          "32": {
+            "grain": 4096,
+            "enabled": true,
+            "fork_nodes": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              7,
+              8,
+              9,
+              13,
+              14,
+              204,
+              205
+            ],
+            "child_items_per_traversal": 62,
+            "child_items_below_grain": 33
+          }
+        },
+        "chance_nodes": 0,
+        "eligible_chance_nodes_per_traversal": 0,
+        "chance_child_items_per_traversal": 0,
+        "eligible_chance_histogram": {},
+        "chance_child_storage_elements_min_max": [],
+        "chance_child_items_zero_storage": 0,
+        "limits": "Static iterator input counts, not Rayon job/steal counts or CPU time. Terminal work is absent from storage elements. Current HU compact dimensions stay fixed through chance masks."
+      },
+      "stopping_controls": {
+        "file": "river.toml",
+        "iterations": 1000,
+        "check_every": 100,
+        "target_nash_conv": 0.439
+      }
+    },
+    "turn": {
+      "workers": {
+        "1": {
+          "samples": [
+            {
+              "block": 1,
+              "iterations": 1000,
+              "solve_seconds": 1.28340284,
+              "quality_seconds": 0.023111724,
+              "run_seconds": 1.306563337,
+              "other_seconds": 4.8773000000112976e-05,
+              "quality_fraction": 0.017688942698382174
+            },
+            {
+              "block": 2,
+              "iterations": 1000,
+              "solve_seconds": 1.289582835,
+              "quality_seconds": 0.023326259,
+              "run_seconds": 1.3129655009999999,
+              "other_seconds": 5.640699999983137e-05,
+              "quality_fraction": 0.01776608675721785
+            },
+            {
+              "block": 3,
+              "iterations": 1000,
+              "solve_seconds": 1.285575034,
+              "quality_seconds": 0.023235089,
+              "run_seconds": 1.308860468,
+              "other_seconds": 5.03449999999378e-05,
+              "quality_fraction": 0.01775215125528568
+            }
+          ],
+          "medians": {
+            "solve_seconds": 1.285575034,
+            "quality_seconds": 0.023235089,
+            "run_seconds": 1.308860468,
+            "other_seconds": 5.03449999999378e-05,
+            "quality_fraction": 0.01775215125528568
+          }
+        },
+        "16": {
+          "samples": [
+            {
+              "block": 1,
+              "iterations": 1000,
+              "solve_seconds": 0.24576309699999999,
+              "quality_seconds": 0.004363599,
+              "run_seconds": 0.250175722,
+              "other_seconds": 4.902600000000323e-05,
+              "quality_fraction": 0.01744213613181858
+            },
+            {
+              "block": 2,
+              "iterations": 1000,
+              "solve_seconds": 0.24393792,
+              "quality_seconds": 0.004276048,
+              "run_seconds": 0.248256044,
+              "other_seconds": 4.207600000000634e-05,
+              "quality_fraction": 0.017224346006254734
+            },
+            {
+              "block": 3,
+              "iterations": 1000,
+              "solve_seconds": 0.245239538,
+              "quality_seconds": 0.0043581769999999995,
+              "run_seconds": 0.249637924,
+              "other_seconds": 4.020900000000459e-05,
+              "quality_fraction": 0.017457992480341245
+            }
+          ],
+          "medians": {
+            "solve_seconds": 0.245239538,
+            "quality_seconds": 0.0043581769999999995,
+            "run_seconds": 0.249637924,
+            "other_seconds": 4.207600000000634e-05,
+            "quality_fraction": 0.01744213613181858
+          }
+        },
+        "32": {
+          "samples": [
+            {
+              "block": 1,
+              "iterations": 1000,
+              "solve_seconds": 0.351329353,
+              "quality_seconds": 0.006196758,
+              "run_seconds": 0.357593083,
+              "other_seconds": 6.697199999996725e-05,
+              "quality_fraction": 0.01732907680431839
+            },
+            {
+              "block": 2,
+              "iterations": 1000,
+              "solve_seconds": 0.34690915899999997,
+              "quality_seconds": 0.006129643,
+              "run_seconds": 0.353110447,
+              "other_seconds": 7.164500000002728e-05,
+              "quality_fraction": 0.017358996461523554
+            },
+            {
+              "block": 3,
+              "iterations": 1000,
+              "solve_seconds": 0.346856157,
+              "quality_seconds": 0.006205434,
+              "run_seconds": 0.35312975,
+              "other_seconds": 6.815900000002161e-05,
+              "quality_fraction": 0.01757267406668512
+            }
+          ],
+          "medians": {
+            "solve_seconds": 0.34690915899999997,
+            "quality_seconds": 0.006196758,
+            "run_seconds": 0.35312975,
+            "other_seconds": 6.815900000002161e-05,
+            "quality_fraction": 0.017358996461523554
+          }
+        }
+      },
+      "warmups_checked": 3,
+      "ratio32_over16_solve_seconds": 1.414572714616678,
+      "ratio32_over16_quality_seconds": 1.4218692815826435,
+      "ratio32_over16_run_seconds": 1.414567724093075,
+      "static_scheduling": {
+        "root_dims": [
+          19,
+          20
+        ],
+        "nodes": 1305,
+        "action_nodes": 580,
+        "terminal_nodes": 722,
+        "storage_elements": 22620,
+        "action_plans": {
+          "16": {
+            "grain": null,
+            "enabled": false,
+            "fork_nodes": [],
+            "child_items_per_traversal": 0,
+            "child_items_below_grain": 0
+          },
+          "32": {
+            "grain": null,
+            "enabled": false,
+            "fork_nodes": [],
+            "child_items_per_traversal": 0,
+            "child_items_below_grain": 0
+          }
+        },
+        "chance_nodes": 3,
+        "eligible_chance_nodes_per_traversal": 3,
+        "chance_child_items_per_traversal": 144,
+        "eligible_chance_histogram": {
+          "depth1/children48": 3
+        },
+        "chance_child_storage_elements_min_max": [
+          156,
+          156
+        ],
+        "chance_child_items_zero_storage": 0,
+        "limits": "Static iterator input counts, not Rayon job/steal counts or CPU time. Terminal work is absent from storage elements. Current HU compact dimensions stay fixed through chance masks."
+      },
+      "stopping_controls": {
+        "file": "turn.toml",
+        "iterations": 1000,
+        "check_every": 100,
+        "target_nash_conv": 0.00228
+      }
+    },
+    "flop": {
+      "workers": {
+        "1": {
+          "samples": [
+            {
+              "block": 1,
+              "iterations": 45,
+              "solve_seconds": 0.374813329,
+              "quality_seconds": 0.120304064,
+              "run_seconds": 0.495168426,
+              "other_seconds": 5.103300000001976e-05,
+              "quality_fraction": 0.2429558463002647
+            },
+            {
+              "block": 2,
+              "iterations": 45,
+              "solve_seconds": 0.373401713,
+              "quality_seconds": 0.124362063,
+              "run_seconds": 0.497814227,
+              "other_seconds": 5.045099999997915e-05,
+              "quality_fraction": 0.24981620904940507
+            },
+            {
+              "block": 3,
+              "iterations": 45,
+              "solve_seconds": 0.374302413,
+              "quality_seconds": 0.120397457,
+              "run_seconds": 0.49475246,
+              "other_seconds": 5.259000000000513e-05,
+              "quality_fraction": 0.24334887996312338
+            }
+          ],
+          "medians": {
+            "solve_seconds": 0.374302413,
+            "quality_seconds": 0.120397457,
+            "run_seconds": 0.495168426,
+            "other_seconds": 5.103300000001976e-05,
+            "quality_fraction": 0.24334887996312338
+          }
+        },
+        "16": {
+          "samples": [
+            {
+              "block": 1,
+              "iterations": 45,
+              "solve_seconds": 0.070823543,
+              "quality_seconds": 0.021061365,
+              "run_seconds": 0.091920775,
+              "other_seconds": 3.5866999999994986e-05,
+              "quality_fraction": 0.2291251895994132
+            },
+            {
+              "block": 2,
+              "iterations": 45,
+              "solve_seconds": 0.069583508,
+              "quality_seconds": 0.02115883,
+              "run_seconds": 0.090782609,
+              "other_seconds": 4.0270999999997975e-05,
+              "quality_fraction": 0.23307140247533534
+            },
+            {
+              "block": 3,
+              "iterations": 45,
+              "solve_seconds": 0.071306694,
+              "quality_seconds": 0.021135974000000002,
+              "run_seconds": 0.092479141,
+              "other_seconds": 3.6472999999995204e-05,
+              "quality_fraction": 0.22854855453296222
+            }
+          ],
+          "medians": {
+            "solve_seconds": 0.070823543,
+            "quality_seconds": 0.021135974000000002,
+            "run_seconds": 0.091920775,
+            "other_seconds": 3.6472999999995204e-05,
+            "quality_fraction": 0.2291251895994132
+          }
+        },
+        "32": {
+          "samples": [
+            {
+              "block": 1,
+              "iterations": 45,
+              "solve_seconds": 0.083920402,
+              "quality_seconds": 0.024973252,
+              "run_seconds": 0.108953518,
+              "other_seconds": 5.986399999999281e-05,
+              "quality_fraction": 0.2292101481294069
+            },
+            {
+              "block": 2,
+              "iterations": 45,
+              "solve_seconds": 0.080428016,
+              "quality_seconds": 0.025527777,
+              "run_seconds": 0.106009437,
+              "other_seconds": 5.364399999999159e-05,
+              "quality_fraction": 0.24080664629885737
+            },
+            {
+              "block": 3,
+              "iterations": 45,
+              "solve_seconds": 0.082107896,
+              "quality_seconds": 0.02546078,
+              "run_seconds": 0.107624839,
+              "other_seconds": 5.6163000000001434e-05,
+              "quality_fraction": 0.2365697383296434
+            }
+          ],
+          "medians": {
+            "solve_seconds": 0.082107896,
+            "quality_seconds": 0.02546078,
+            "run_seconds": 0.107624839,
+            "other_seconds": 5.6163000000001434e-05,
+            "quality_fraction": 0.2365697383296434
+          }
+        }
+      },
+      "warmups_checked": 3,
+      "ratio32_over16_solve_seconds": 1.1593305350453873,
+      "ratio32_over16_quality_seconds": 1.2046182494357722,
+      "ratio32_over16_run_seconds": 1.1708434681931261,
+      "static_scheduling": {
+        "root_dims": [
+          3,
+          3
+        ],
+        "nodes": 21618,
+        "action_nodes": 14410,
+        "terminal_nodes": 7058,
+        "storage_elements": 43242,
+        "action_plans": {
+          "16": {
+            "grain": null,
+            "enabled": false,
+            "fork_nodes": [],
+            "child_items_per_traversal": 0,
+            "child_items_below_grain": 0
+          },
+          "32": {
+            "grain": null,
+            "enabled": false,
+            "fork_nodes": [],
+            "child_items_per_traversal": 0,
+            "child_items_below_grain": 0
+          }
+        },
+        "chance_nodes": 150,
+        "eligible_chance_nodes_per_traversal": 150,
+        "chance_child_items_per_traversal": 7203,
+        "eligible_chance_histogram": {
+          "depth1/children49": 3,
+          "depth2/children48": 147
+        },
+        "chance_child_storage_elements_min_max": [
+          6,
+          294
+        ],
+        "chance_child_items_zero_storage": 0,
+        "limits": "Static iterator input counts, not Rayon job/steal counts or CPU time. Terminal work is absent from storage elements. Current HU compact dimensions stay fixed through chance masks."
+      },
+      "stopping_controls": {
+        "file": "flop.toml",
+        "iterations": 50,
+        "check_every": 5,
+        "target_nash_conv": 0.0367
+      }
+    }
+  },
+  "raw_pins": {
+    "/opt/r1/current32-proof01/stages/river-b0-t1/bench/result.json": {
+      "bytes": 26793,
+      "sha256": "2f3acf75ba370c8cd322def6c93627b22f0e13d05f9940f11cd51123fd1e8186"
+    },
+    "/opt/r1/current32-proof01/stages/river-b1-t1/bench/result.json": {
+      "bytes": 26797,
+      "sha256": "ded978b56a1e6f18a46ca0a5d6213805a93d81ed39ac546d17c4d3adece3b7ac"
+    },
+    "/opt/r1/current32-proof01/stages/river-b2-t1/bench/result.json": {
+      "bytes": 26797,
+      "sha256": "9bdc9e32fac246098256fa34c3a5281ad955b97158031b03d8f773789d820aa1"
+    },
+    "/opt/r1/current32-proof01/stages/river-b3-t1/bench/result.json": {
+      "bytes": 26786,
+      "sha256": "d86a28fbe2844d8661f1f99bf1c8deb0dc45e2c72d524de426605fca1e56b179"
+    },
+    "/opt/r1/current32-proof01/stages/river-b0-t16/bench/result.json": {
+      "bytes": 26798,
+      "sha256": "8f00843f7be63335b39f4764b3e221621a722b416fc09d4ee82ac9b11c72836b"
+    },
+    "/opt/r1/current32-proof01/stages/river-b1-t16/bench/result.json": {
+      "bytes": 26798,
+      "sha256": "c2a534ddfbcd2ea706e7f55854737aad85352ccbe89d2f81aa83e38b708eba26"
+    },
+    "/opt/r1/current32-proof01/stages/river-b2-t16/bench/result.json": {
+      "bytes": 26795,
+      "sha256": "f659be30af74906f9ff482f93710293ed54826298a303c218643ad27e663fca2"
+    },
+    "/opt/r1/current32-proof01/stages/river-b3-t16/bench/result.json": {
+      "bytes": 26797,
+      "sha256": "55d190bf02f2ce57462e8cc20862dcfdabe2f3b282b7d9f12d875f3178dab2f3"
+    },
+    "/opt/r1/current32-proof01/stages/river-b0-t32/bench/result.json": {
+      "bytes": 26798,
+      "sha256": "f2c3746c66422416b388487ef4de2f36ea5065c3f03972f4a474135e493f1a54"
+    },
+    "/opt/r1/current32-proof01/stages/river-b1-t32/bench/result.json": {
+      "bytes": 26810,
+      "sha256": "94b8ed9346d90ee2098b56e1dd4a18c0994a58f0a7f4e695c205af02dd6dc97a"
+    },
+    "/opt/r1/current32-proof01/stages/river-b2-t32/bench/result.json": {
+      "bytes": 26792,
+      "sha256": "8134cc4342b02ff0c82a0cf4532ef04cbf3335f67621ce0cd21cc438e633b5f1"
+    },
+    "/opt/r1/current32-proof01/stages/river-b3-t32/bench/result.json": {
+      "bytes": 26792,
+      "sha256": "2720f729be3426a88cda620db91deac8fd563ea0aa4b638e43cb17118a1fcf93"
+    },
+    "/opt/r1/current32-proof01/stages/river-b0-t1/bench/canonical.bin": {
+      "bytes": 1286526,
+      "sha256": "ccfbf8d976402613d2b0c3cd87bcadb0e1dfe4480bcc9a627806e4bec5a119f5"
+    },
+    "/opt/r1/current32-proof01/stages/turn-b0-t1/bench/result.json": {
+      "bytes": 8367,
+      "sha256": "4d48873cdb411214b09fd8590f1962cc2d416e52cf4936903bb48afbc4f14a83"
+    },
+    "/opt/r1/current32-proof01/stages/turn-b1-t1/bench/result.json": {
+      "bytes": 8372,
+      "sha256": "0002cc56eb934f540a2be37d3d8b1ff7cf3c3b5e35aac132335d3b6a6fd0bbc0"
+    },
+    "/opt/r1/current32-proof01/stages/turn-b2-t1/bench/result.json": {
+      "bytes": 8384,
+      "sha256": "493628a757a0a06799ae7b846b9bbe72cfdb362ee4be4d971670fd565ec73915"
+    },
+    "/opt/r1/current32-proof01/stages/turn-b3-t1/bench/result.json": {
+      "bytes": 8365,
+      "sha256": "da50631daa8d31679b8f1d6c051982317f3050169274aa3f0f6f5198ed62eedd"
+    },
+    "/opt/r1/current32-proof01/stages/turn-b0-t16/bench/result.json": {
+      "bytes": 8368,
+      "sha256": "4c3ec5272c2edd6236e3ad49d3a2b6f17bb82d4147082ee97aefe727036cfd4c"
+    },
+    "/opt/r1/current32-proof01/stages/turn-b1-t16/bench/result.json": {
+      "bytes": 8373,
+      "sha256": "12ee3f756a75915781e4d54f357707fd105070f5a032de187632e299d3b8cbf5"
+    },
+    "/opt/r1/current32-proof01/stages/turn-b2-t16/bench/result.json": {
+      "bytes": 8369,
+      "sha256": "b1f25c6d145e979f5847a00ae464d6f5cdacc31e81948a4af8e66bcb6c0a547b"
+    },
+    "/opt/r1/current32-proof01/stages/turn-b3-t16/bench/result.json": {
+      "bytes": 8364,
+      "sha256": "41fbf68f7beef238176503255b6b8038760ea634be193c4478a3913b833e8649"
+    },
+    "/opt/r1/current32-proof01/stages/turn-b0-t32/bench/result.json": {
+      "bytes": 8372,
+      "sha256": "ee8d4daa21bbbab3a467eb524949ff472599e1c30c1e504b8c9f2c026d902722"
+    },
+    "/opt/r1/current32-proof01/stages/turn-b1-t32/bench/result.json": {
+      "bytes": 8370,
+      "sha256": "91ddc76bc12ccd3dcd2bab85f3a5b81e08612ea989146b1668958703ca016fe5"
+    },
+    "/opt/r1/current32-proof01/stages/turn-b2-t32/bench/result.json": {
+      "bytes": 8368,
+      "sha256": "31239f2f251b0c9f7bad081cd9e54ae119612f4617f60520a81e139ba41f20ef"
+    },
+    "/opt/r1/current32-proof01/stages/turn-b3-t32/bench/result.json": {
+      "bytes": 8370,
+      "sha256": "f66eb8402a46ea109f336badd0ac36260a1b065b36d17519343baf14f184d035"
+    },
+    "/opt/r1/current32-proof01/stages/turn-b0-t1/bench/canonical.bin": {
+      "bytes": 202256,
+      "sha256": "b24560f6ef21c68d2d41a8ee18d9612ee85fa5154e272d4d2bd2ab457e1c5775"
+    },
+    "/opt/r1/current32-proof01/stages/flop-b0-t1/bench/result.json": {
+      "bytes": 7189,
+      "sha256": "5ecf36ca293b2f72789630fe73280e1f214f1c4a0f3866f2b609c4f8fdfc3259"
+    },
+    "/opt/r1/current32-proof01/stages/flop-b1-t1/bench/result.json": {
+      "bytes": 7188,
+      "sha256": "3bee5ba22ef9238ccc74cafa5a92d708ce038e48e5d65448c0ed50243001229b"
+    },
+    "/opt/r1/current32-proof01/stages/flop-b2-t1/bench/result.json": {
+      "bytes": 7184,
+      "sha256": "26867258dfcf38530e712243847c5f968d515b98ceaf5990394531adf83405df"
+    },
+    "/opt/r1/current32-proof01/stages/flop-b3-t1/bench/result.json": {
+      "bytes": 7184,
+      "sha256": "4ea1b7d890fd7428b626952158b5cb3d129a4a135a6399ca53a71a9e965e4d8f"
+    },
+    "/opt/r1/current32-proof01/stages/flop-b0-t16/bench/result.json": {
+      "bytes": 7191,
+      "sha256": "6a1b041066a2fd5d176d2392ee1e7b37ecad33f4ab52ce6bdfe83fb6db56a2af"
+    },
+    "/opt/r1/current32-proof01/stages/flop-b1-t16/bench/result.json": {
+      "bytes": 7185,
+      "sha256": "343d22182bb7c0c2fb59c1d6ff17e684eca5b819b9be00eda7833f02857675e3"
+    },
+    "/opt/r1/current32-proof01/stages/flop-b2-t16/bench/result.json": {
+      "bytes": 7188,
+      "sha256": "ebc9c0266e06dad8d1e6b5c4bd218246d55cdce997d362db890ddcfd9c5f7b07"
+    },
+    "/opt/r1/current32-proof01/stages/flop-b3-t16/bench/result.json": {
+      "bytes": 7188,
+      "sha256": "03342592fb1c6e8b50a6efe4e08de3d715af49aa35de80f44a3857efe154675d"
+    },
+    "/opt/r1/current32-proof01/stages/flop-b0-t32/bench/result.json": {
+      "bytes": 7188,
+      "sha256": "8ed9a076ec7666d38fbeb1d42b40c8e75b5a6d43c690c5b8c02f016322bbe9e9"
+    },
+    "/opt/r1/current32-proof01/stages/flop-b1-t32/bench/result.json": {
+      "bytes": 7187,
+      "sha256": "950f2738f966bbb69f3e888d0b9b84edb9c25f9ccda12279eee527b89bcf267e"
+    },
+    "/opt/r1/current32-proof01/stages/flop-b2-t32/bench/result.json": {
+      "bytes": 7185,
+      "sha256": "20fa92af6a743cf9c74856deaafd6edf0fbca8e7b960dd170a567db6e73fffef"
+    },
+    "/opt/r1/current32-proof01/stages/flop-b3-t32/bench/result.json": {
+      "bytes": 7186,
+      "sha256": "ae38a429918cee22ad1cb5884a0f53f4b93b0fa007e520d3b73a98cdc7eeab20"
+    },
+    "/opt/r1/current32-proof01/stages/flop-b0-t1/bench/canonical.bin": {
+      "bytes": 972815,
+      "sha256": "96aad2732a2a0fbb329b915d1df1f76df77ab4a44b09b137d49318981014f54a"
+    }
+  },
+  "limitations": [
+    "Source-identical inspection; no timing attribution to allocator, scheduler, SMT or bandwidth.",
+    "Existing reports contain wall-clock solve and EV/BR slices, not CPU profiles or allocation counters.",
+    "No external reference accuracy, I16 performance or monotone scaling claim."
+  ]
+}

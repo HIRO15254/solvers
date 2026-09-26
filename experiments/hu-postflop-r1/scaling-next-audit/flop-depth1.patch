@@ -1,0 +1,9 @@
+--- experiments/hu-postflop-r1/range-scaling/configs/flop.toml
++++ experiments/hu-postflop-r1/scaling-next-audit/flop-depth1.toml
+@@ -29,5 +29,5 @@
+ check_every = 50
+ threads = 1
+ storage = "f32"
+-par_chance_depth = 2
++par_chance_depth = 1
+ par_min_children = 12

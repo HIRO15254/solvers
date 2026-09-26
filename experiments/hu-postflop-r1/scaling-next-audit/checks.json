@@ -1,0 +1,75 @@
+{
+  "schema": "r1.scaling-next-light-checks/v1",
+  "scope": "Offline bytes/topology/config only; no Cargo/native/solver/cloud execution",
+  "source_before": {
+    "analyze.py": {
+      "bytes": 10791,
+      "sha256": "b036643ab58c50030cb00709e378738d6d7a10f50c70ac2ccfd89fbc6563e612"
+    },
+    "prepare.py": {
+      "bytes": 6843,
+      "sha256": "21bd8e1ea4c3626eec8bea120192740b8747cad33c20c58bb9d31f9578b4441a"
+    },
+    "test_prepare.py": {
+      "bytes": 1614,
+      "sha256": "348b4709277d619ae6de8b2695c4c69787f6cb56af43ca0fc9e69cf5ad89c37a"
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\scaling-next-audit\\analyze.py"
+      ],
+      "started_utc": "2026-09-26T23:37:03.848576+00:00",
+      "elapsed_seconds": 0.8850889001041651,
+      "exit_code": 0,
+      "stdout": {
+        "path": "analysis.stdout.log",
+        "bytes": 2804,
+        "sha256": "2a0f5a5ec26b2e882fb96818866aa9a8bf2179e7521b95819213d9302582013e"
+      },
+      "stderr": {
+        "path": "analysis.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\scaling-next-audit\\prepare.py"
+      ],
+      "started_utc": "2026-09-26T23:37:04.741090+00:00",
+      "elapsed_seconds": 0.20296750008128583,
+      "exit_code": 1,
+      "stdout": {
+        "path": "preparation.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "preparation.stderr.log",
+        "bytes": 526,
+        "sha256": "f8ce8cf6e3e4e873db88ba9ed3826170f55bfff53c9249d7cd909750093757e3"
+      }
+    }
+  ],
+  "source_after": {
+    "analyze.py": {
+      "bytes": 10791,
+      "sha256": "b036643ab58c50030cb00709e378738d6d7a10f50c70ac2ccfd89fbc6563e612"
+    },
+    "prepare.py": {
+      "bytes": 6843,
+      "sha256": "21bd8e1ea4c3626eec8bea120192740b8747cad33c20c58bb9d31f9578b4441a"
+    },
+    "test_prepare.py": {
+      "bytes": 1614,
+      "sha256": "348b4709277d619ae6de8b2695c4c69787f6cb56af43ca0fc9e69cf5ad89c37a"
+    }
+  },
+  "all_passed": false
+}

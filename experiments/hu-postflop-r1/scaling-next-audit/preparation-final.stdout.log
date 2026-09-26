@@ -1,0 +1,22 @@
+{
+  "execution": "not_run",
+  "candidate": {
+    "path": "flop-depth1.toml",
+    "bytes": 671,
+    "sha256": "259a1e4967b80cfffe1440ba47d3ffc3468a02d087ebe7b1a20b11c763154136"
+  },
+  "static_forks": {
+    "0": {
+      "forks": 0,
+      "child_items": 0
+    },
+    "1": {
+      "forks": 3,
+      "child_items": 147
+    },
+    "2": {
+      "forks": 150,
+      "child_items": 7203
+    }
+  }
+}

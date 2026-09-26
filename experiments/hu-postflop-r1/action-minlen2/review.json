@@ -1,0 +1,57 @@
+{
+  "schema": "solvers.r1.action-minlen2-review/v1",
+  "started_utc": "2026-09-26T23:37:27.903795+00:00",
+  "ended_utc": "2026-09-26T23:37:28.095254+00:00",
+  "commands": [
+    {
+      "argv": [
+        "rustfmt",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "rustfmt 1.9.0-stable (2d8144b788 2026-07-07)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--check",
+        ".cache/action-minlen2-review/solver.rs"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "source_and_candidate_single_insertion_verified": true,
+  "production_source_unchanged": true,
+  "python_syntax": "passed",
+  "candidate_sha256": "5e0a5a0a83ab784d19663c4ec27a406f530e6f767338ddadb925b37e3f065512",
+  "pins": {
+    "crates/engine/src/solver.rs": {
+      "bytes": 56116,
+      "sha256": "e116e2554915768e0ccef89e86dccb0ffb89d0a2ff309343c0992fc8d7b02e4b"
+    },
+    "experiments/hu-postflop-r1/action-minlen2/prepare.py": {
+      "bytes": 2734,
+      "sha256": "8a7b1179ca6045567ce082833fe25c023aa814303e76770ca0a629ce5790e822"
+    },
+    "experiments/hu-postflop-r1/action-minlen2/candidate.patch": {
+      "bytes": 416,
+      "sha256": "24379e5cefb407bb383f19e4429ce507b9572489c1421f3a3f7ba257535a9ede"
+    },
+    "experiments/hu-postflop-r1/action-minlen2/manifest.json": {
+      "bytes": 554,
+      "sha256": "b9e509c6c4c7efbcccfb07daf19018393bd28656e3acb34f2985fdb12927fdb3"
+    },
+    "Cargo.lock": {
+      "bytes": 40970,
+      "sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1"
+    }
+  },
+  "rust_compile": null,
+  "runtime_quality": null,
+  "performance": null
+}

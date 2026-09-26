@@ -11,6 +11,7 @@
 | R0完了範囲の照合 | [HU Postflop R0-06 readiness報告](hu-postflop-r0/readiness/report-2026-09-25.jp.md) | 先行成果物の版、候補24件・日常8件、R1への未決事項。品質・性能の認定ではない |
 | R1の実験資源と費用 | [HU Postflop Spot実験](hu-postflop-r1/cloud/README.md) | VM予約・source転送対象・自動削除期限と料金根拠。計算結果は別途検証する |
 | R1の費用証拠監査 | [9月25日UTCの4 VM](hu-postflop-r1/cloud/cost-audit-20260925/README.md) | 実時間・単価と226点の送信量。欠測・請求未反映を保持し、予約解放を認定しない |
+| R1の追加請求観測 | [9月26日23時台UTCの表示](hu-postflop-r1/cloud/billing-observation-20260926-2330.json) | 趣味アカウントの対象project、14 SKUと約238 JPYの割引表示。26日分は予測のため実請求未精算、40 USD予約を保持 |
 | R1の限定検証の対応表 | [HU Postflop検証](hu-postflop-r1/validation/README.md) | 独立oracle、Stud/Draw、抽象化、保存契約に対応するtestsとsourceの識別。外部24case認定とは分離 |
 | R1の固定ベット粗密対照 | [完全profileの移植・復元](hu-postflop-r1/validation/bet-refinement-20260926/README.md) | 21→49情報集合のEV保存と拡張BRを個別4 testsで照合。fmt/clippy成功 |
 | R1の比較手順 | [HU pipeline比較](hu-postflop-r1/pipeline/README.md) | 基準pilotで条件を固定し、同一VMで交互比較する測定器と範囲 |
@@ -31,10 +32,12 @@
 | R1の現行形式・全工程比較の実測 | [VM11 proof02](hu-postflop-r1/final-pipeline/proof02/report.jp.md) | 9 build・156測定process成功。3 synthetic例で旧新の品質一致、時間と対象I/Oの事前判定通過。OSメモリはcounter整合条件不成立で判定不能。先行prepare失敗は別保持 |
 | R1のnative processメモリ比較 | [追加測定の結果](hu-postflop-r1/focused-memory/proof03/report.jp.md)、[検証結果](hu-postflop-r1/focused-memory/proof03/verification.json) | Python親の履歴を分離する校正に合格、99工程で元の品質・内容と一致。新最大/旧最小のRSS比はTurn0.341・限定Flop0.054で10%削減基準通過、River0.958は未達。proof02の判定は変更しない |
 | R1の現行版32 vCPU上のworker比較 | [Current32 proof01](hu-postflop-r1/current-scaling32/proof01/report.jp.md)、[全数値](hu-postflop-r1/current-scaling32/proof01/report.json) | 36実行で1/16/32 workersの停止軌跡・品質bits・全state一致。32は対直列3.71〜4.60倍だが16より17〜42%遅い。16 core/32 logicalの同一VM上、内部3ケースの記述比較。VM/disk削除確認済み |
+| R1の並列化の追加切分け | [VM12 rawと現行sourceの監査](hu-postflop-r1/scaling-next-audit/README.md)、[CFR最小job長の研究候補](hu-postflop-r1/action-minlen2/README.jp.md) | RiverのCFR側減速と狭いFlopのchance分割を分離。Flop depth1入力とCFR action min_len2差分を個別準備、ビルド・性能・全state一致は未認定 |
 | R1の受入証拠の範囲 | [事前条件の監査](hu-postflop-r1/acceptance/audit.jp.md)、[将来の外部比較器](hu-postflop-r1/acceptance/external-contract.md) | 既存の事前条件と測定後索引を区別。将来の閾値発行・校正・欠測の検査であり、総合受入の認定ではない |
 | R1の実入力への境界適用 | [抽象化の適用確認](hu-postflop-r1/reference/abstraction-applicability.md) | 017/019のhand identity・joint重み・完全記憶の検査と、未実装・未評価の範囲 |
 | R1の工程別診断 | [source03 phase比較](hu-postflop-r1/phases/vm06-report.md) | 別instrumented buildのon/off較正、重複しない工程時間、元の性能実測との区別 |
 | R1の現行版工程計測 | [固定計画とrunner](hu-postflop-r1/current-phases/runner-README.md)、[VM13停止証拠](hu-postflop-r1/current-phases/proof01/README.jp.md)、[カウンタ調査](hu-postflop-r1/current-phases/vm13-hwm-observation.jp.md) | 2buildと事前校正成功後、Flop memory warmupでVmHWMが36KiB低下し固定計画を停止。44 passed・1 failed・252 skipped、raw完全回収・独立検証済み。工程性能は未認定 |
+| R1の出力生成メモリの代替方式 | [単一窓の研究prototype](hu-postflop-r1/phase-memory-v2/README.jp.md) | cgroup計上peakとRSS観測値を分離し、同一FDでSOL生成全体だけをreset/readする案。合成検証のみで、Linux校正・実測・runner統合は未実施 |
 | R1の参照取得 | [HU-R0-019](hu-postflop-r1/reference/HU-R0-019/README.md) | Riverの両range・表示値・継続menuの観測と未確認条件 |
 | R1の参照診断 | [River 017 / 019](hu-postflop-r1/reference/vm06-river-report.md) | 全menuと実exportの照合。参照条件未確認のため外部品質は未認定 |
 | R1の追加参照入力 | [Turn 007](hu-postflop-r1/reference/HU-R0-007/README.md)、[Flop 020](hu-postflop-r1/reference/HU-R0-020/README.md) | 両rangeとroot観測。全後続木は欠測として保持 |

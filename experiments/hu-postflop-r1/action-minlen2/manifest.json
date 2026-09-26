@@ -1,0 +1,12 @@
+{
+  "schema": "solvers.r1.action-minlen2-preparation/v1",
+  "source_path": "crates/engine/src/solver.rs",
+  "source_sha256": "e116e2554915768e0ccef89e86dccb0ffb89d0a2ff309343c0992fc8d7b02e4b",
+  "candidate_sha256": "5e0a5a0a83ab784d19663c4ec27a406f530e6f767338ddadb925b37e3f065512",
+  "candidate_bytes": 56141,
+  "patch_sha256": "24379e5cefb407bb383f19e4429ce507b9572489c1421f3a3f7ba257535a9ede",
+  "edit": "CFR action child iterator only: with_min_len(2)",
+  "rust_compile": "not_run",
+  "performance": null,
+  "production_adopted": false
+}

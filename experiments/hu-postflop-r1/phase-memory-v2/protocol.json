@@ -1,0 +1,65 @@
+{
+  "schema": "r1.phase-memory-v2-design/v1",
+  "state": "offline_prototype_only",
+  "linux_calibration": "not_run",
+  "execution_authorized": false,
+  "unreserved_budget_usd": 0,
+  "production_revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+  "scope": "Prospective SOL generation charge attribution on an instrumented research copy; no production change and no repair/reclassification of VM13 failed evidence.",
+  "primary_metric": "Absolute cgroup v2 memory.peak in bytes for a reset window, including its descendants, anonymous memory, file cache and accounted kernel memory. Not process RSS, heap allocation bytes, physical memory, or incremental memory attributable only to this phase.",
+  "secondary_metrics": [
+    "Bounded external smaps_rollup Rss snapshots with read-start/read-end timestamps. Maximum observed RSS only, no guarantee of catching transients and no strict mathematical lower/upper bound on instantaneous RSS during a non-atomic walk.",
+    "Unreset wait4 child ru_maxrss in KiB for the full process lifetime from the separately calibrated native launcher. Not a phase counter, process-tree sum or subtraction baseline.",
+    "memory.current and complete memory.stat at boundaries, with read timestamps. Diagnostic decomposition only: not atomically sampled, do not sum overlapping stat fields or infer component peaks from total peak."
+  ],
+  "isolation": {
+    "solver": "Fresh non-root cgroup v2 domain leaf for each process, configured before exec or any solver allocation; no process migration midrun, no children or unrelated tasks, same identity throughout.",
+    "observer": "External observer/native supervisor in a sibling cgroup. Pin target boot_id/pid/starttime/cgroup inode/membership; retain /proc/pid/cgroup and cgroup.procs before/after and each boundary. Do not charge Python observer data to the solver leaf.",
+    "limits": "Future owner must enforce the parent unit memory.max=12GiB, memory.swap.max=0, CPUWeight=100 and absolute deadlines independently of the recorder. Verify effective limits and no OOM/events violations. Prototype does not create/migrate/kill any processes.",
+    "history": "Fresh unique regular output path on fixed disk filesystem, never tmpfs; record mount options. Retain cache/charge provenance for input/binaries and page-cache limitations. No drop_caches/reclaim/posix_fadvise/midrun cgroup moves. Existing shared file-page charges may belong elsewhere; the metric is only this cgroup's accounted charge."
+  },
+  "windows": {
+    "order": [["begin", "generation"], ["begin", "preparation"], ["end", "preparation"], ["begin", "serialization_write"], ["end", "serialization_write"], ["end", "generation"]],
+    "generation": "Start immediately before constructing SOL payload; end after write_sol returns, before payload/solver are destroyed. Includes both leaves and their observer/transition gap. One exclusively owned memory.peak FD, one reset at generation entry and one read at generation exit. No other FD may reset this cgroup during the window.",
+    "preparation": "Payload creation up to the source anchor immediately before write_sol. Boundary snapshots/labels only; cgroup and exact RSS leaf peaks remain null/not_measured.",
+    "serialization_write": "Exact write_sol call through return. Boundary snapshots/labels only; cgroup and exact RSS leaf peaks remain null/not_measured. Does not claim disk durability beyond that API's own contract.",
+    "boundary": "Memory-only cooperative BEGIN/END handshake: solver waits; observer captures diagnostics, resets/reads the same FD, records all syscall brackets, then ACKs. At END solver waits before freeing payload/performing the next phase while observer reads the peak and ACKs. No external stop-signal scheduling used as a precise source boundary.",
+    "fd_rules": "O_RDWR with close-on-exec; keep the original open file description exclusively owned throughout its window. Seek offset0 before reset/write and final read. Any permission, unsupported write, short I/O, malformed bytes or inode identity change is first-failure terminal, not fallback. No arbitrary paths from untrusted proof are opened. Never reset via another FD to measure overlapping windows; upstream v7.0 source raises a peer-watermark preservation concern and actual-kernel behavior is uncalibrated.",
+    "interval_difference": "Kernel counter window begins during reset write and ends during final read, each bracketed with monotonic timestamps; it encloses source action plus ACK/boundary/observer effects. Diagnostics may precede reset or follow end read and are not simultaneous with peak. Stop-handler read cost/ACK wait are not solver performance times. On forced termination no inferred final marker/window is synthesized."
+  },
+  "future_finite_screen": {
+    "case": "Only final-pipeline/configs/flop.toml, the existing synthetic narrow three-combo case, 1worker/F32/Full/current source; exact config/source/binary hashes frozen before execution. This is a method screen, not general Flop or 24-case acceptance.",
+    "arms": ["plain", "counter_only", "counter_plus_smaps"],
+    "order": [["plain", "counter_only", "counter_plus_smaps"], ["counter_plus_smaps", "plain", "counter_only"], ["counter_only", "counter_plus_smaps", "plain"], ["plain", "counter_plus_smaps", "counter_only"]],
+    "warmup_block": 0,
+    "solve_processes": 12,
+    "build_copies_max": 2,
+    "build_seconds_each_max": 900,
+    "calibration_supervised_stages_max": 4,
+    "calibration_seconds_each_max": 10,
+    "quality_processes_max": 12,
+    "quality_seconds_each_max": 30,
+    "sample_seconds_max": 30,
+    "work_seconds_max": 2700,
+    "lifetime_seconds_max": 3600,
+    "recovery_reserve_seconds": 900,
+    "smaps_period_ms": 10,
+    "smaps_reads_max_per_process": 128,
+    "smaps_read_gap_ms_max": 100,
+    "smaps_policy": "Only sample during generation. Retain every read duration/gap and raw text; assign a sample only to windows wholly containing its read interval. Missing samples stay null. If more than128 reads or a gap/read>100ms occurs, terminate the screen; no increased frequency, longer timeout or replacement.",
+    "quality": "All12 outputs/checkpoints/live stopping and own-arm saved-profile quality must match plain canonical values under the already reviewed retained helper and configuration. Retain artifacts and all failures; metric data do not become eligible before all12 audits complete. No live-reference/external certification inferred.",
+    "reporting": "Nonwarmup3 raw values/median/max per arm; no averaging peaks across metrics, no baseline subtraction or correction factors. memory.current/stat/RSS and cgroup peak remain separate columns. Memory-arm durations are observer diagnostics only. Plain whole ru_maxrss is an unreset lifetime counter only."
+  },
+  "required_linux_calibrations": [
+    "Independent feature probe on the actual pinned kernel: one memory.peak FD, touch/unmap128MiB history, then reset once and verify collapse using the same FD. No other resetter/overlap window. No existence-only feature inference. Bound baseline jitter to8MiB, history-to-reset separation>=96MiB; use diagnostic reads before the one target reset only to characterize the probe history.",
+    "In a fresh isolated child, start the generation window once, touch1MiB then64MiB and release both before final peak read. Retain current/stat/smaps snapshots at markers, but do not reset at markers. End generation charge peak >= baseline+48MiB, despite final current returning near baseline. A known short-lived gap allocation must also remain in this single window's peak. These are method screens, not exact allocation-byte equality.",
+    "Fresh-output file-cache probe writes64MiB to a unique regular disk file without mapping it. Capture memory.stat file/anon/kernel and smaps Rss; demonstrate why charge and RSS differ without requiring equality or summing component counters. Diagnostic-only values must be reported even if pagecache allocation lands elsewhere; then attribution qualification fails.",
+    "No-work handshake plus bounded synthetic short-lived/held allocation probes: quantify observer read/ACK durations and show smaps can miss a transient. Reuse or rerun the pinned native launcher calibration before full-process ru_maxrss claims; if not available, omit that metric explicitly. Calibration raw must be checked before solver samples."
+  ],
+  "stop": "First stage/probe/identity/deadline/resource/quality failure terminates the fixed prefix; retain all raw and skipped counts. No retry or adaptive repetitions. Each next stage must fit its full timeout+20s in the absolute work deadline. Deadline/stop/deletion supervision must live outside this prototype; forced stop omits unclosed windows. Never rescue VM13 by replacing its counter semantics.",
+  "not_implemented": [
+    "Source-pinned cooperative Rust boundary hooks/ACK transport and independent generated-source review.",
+    "Linux cgroup feature/calibration probes, actual sampler and a finite process supervisor with forced-stop recovery.",
+    "Integration with retained quality helpers, portable complete proof checker, source/binary/environment/host freeze, archive collector and resource approval."
+  ]
+}

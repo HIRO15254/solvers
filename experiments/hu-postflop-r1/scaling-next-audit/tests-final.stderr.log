@@ -1,0 +1,9 @@
+test_fanout_boundary (__main__.PreparationTests.test_fanout_boundary) ... ok
+test_one_byte_only (__main__.PreparationTests.test_one_byte_only) ... ok
+test_rejects_absent_or_duplicate_control (__main__.PreparationTests.test_rejects_absent_or_duplicate_control) ... ok
+test_small_chance_still_consumes_depth (__main__.PreparationTests.test_small_chance_still_consumes_depth) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.002s
+
+OK

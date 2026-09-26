@@ -1,0 +1,147 @@
+{
+  "schema": "r1.scaling-next-config-preparation/v1",
+  "execution": "not_run",
+  "scope": "Limited Flop only; config-only scheduling discriminator, not a production default or performance result.",
+  "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+  "archive": {
+    "bytes": 5262188,
+    "sha256": "d2809e7a66faf627704c690722d3f8011f45af5af44173a8695d55cea90c1798"
+  },
+  "retained_pins_verified": {
+    "plan": {
+      "original_path": "/opt/r1/current32-proof01/plan.json",
+      "bytes": 16751,
+      "sha256": "ec20b875374de6a51c713c971f4852350484fdfda7728ff89c7a40dec255fde8"
+    },
+    "config": {
+      "original_path": "/opt/r1/current32-proof01/stages/flop-b0-t1/bench/config.original.toml",
+      "bytes": 671,
+      "sha256": "808bf9fd91404c6820971f75970c73f0695fcbf98667b250007470f7a665646c",
+      "bound_original_path": "/opt/r1/current32/source/experiments/hu-postflop-r1/range-scaling/configs/flop.toml"
+    },
+    "canonical": {
+      "original_path": "/opt/r1/current32-proof01/stages/flop-b0-t1/bench/canonical.bin",
+      "bytes": 972815,
+      "sha256": "96aad2732a2a0fbb329b915d1df1f76df77ab4a44b09b137d49318981014f54a"
+    },
+    "binary": {
+      "original_path": "/opt/r1/current32-proof01/payload/750f2000779f0bc92cc5585d7a87ebc3fd2b8b61fb71640390f86e5ea4cb924d",
+      "bytes": 3943680,
+      "sha256": "750f2000779f0bc92cc5585d7a87ebc3fd2b8b61fb71640390f86e5ea4cb924d",
+      "bound_original_path": "/opt/r1/target/current32-proof01/release/examples/hu_scaling_bench"
+    },
+    "retention": {
+      "original_path": "/opt/r1/current32-proof01/retention.json",
+      "bytes": 93665,
+      "sha256": "eb658bde7ba1d55da4f93f631bb5a7f44943893b7a1a18120e6ef10b1bcd71f8"
+    }
+  },
+  "source_manifest": {
+    "path": "/opt/r1/current32/source-candidate-manifest.json",
+    "bytes": 68137,
+    "sha256": "1a84947f6daa9ca1c57d5f48e4914e176643dbe9c787262ded95dcf6aba042d6"
+  },
+  "source_archive": {
+    "path": "/opt/r1/current32/source-candidate.tar.gz",
+    "bytes": 1400466,
+    "sha256": "51068bb8464b57b91d11fe1ce1be848f14cd83e26865661afeeee3c70a3e9cd7"
+  },
+  "source_identity_scope": "Selected live code files equal the measured Git revision; full historical source closure is referenced through VM12's retained foundation proof, not re-executed here.",
+  "current_code_pins": {
+    "crates/engine/src/solver.rs": {
+      "bytes": 56116,
+      "sha256": "e116e2554915768e0ccef89e86dccb0ffb89d0a2ff309343c0992fc8d7b02e4b",
+      "equals_measured_revision": true
+    },
+    "crates/engine/src/scratch.rs": {
+      "bytes": 1117,
+      "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49",
+      "equals_measured_revision": true
+    },
+    "crates/engine/src/storage.rs": {
+      "bytes": 44287,
+      "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5",
+      "equals_measured_revision": true
+    },
+    "crates/engine/src/tree.rs": {
+      "bytes": 16936,
+      "sha256": "2e6c1a3560bd12a7b2a04573e28505ae00fdaaf8fcb797cb3b0bb964a98879b2",
+      "equals_measured_revision": true
+    },
+    "crates/engine/tests/parallel.rs": {
+      "bytes": 23642,
+      "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d",
+      "equals_measured_revision": true
+    },
+    "crates/holdem/src/kernel.rs": {
+      "bytes": 18270,
+      "sha256": "d59724dd4d9a1c797bebf83422c06b75c90020796bfbf8f492417910770bb076",
+      "equals_measured_revision": true
+    },
+    "crates/holdem/src/postflop.rs": {
+      "bytes": 73444,
+      "sha256": "70ecaa0bbc39ca1fff1d3c7c29a1e499dea87e5b8e58d2486b3e0ebc157f891f",
+      "equals_measured_revision": true
+    },
+    "crates/holdem/src/mass.rs": {
+      "bytes": 10960,
+      "sha256": "6937d14f2424501109c182bcb433125206e39cbd24e6bcb8b5c3b5be1f627639",
+      "equals_measured_revision": true
+    },
+    "crates/cli/examples/hu_scaling_bench.rs": {
+      "bytes": 23926,
+      "sha256": "b86c5da08ae892b27ddcc8d662c6b8b411aa3e4b25effecec93cc1bdac565ac1",
+      "equals_measured_revision": true
+    }
+  },
+  "candidate": {
+    "path": "flop-depth1.toml",
+    "bytes": 671,
+    "sha256": "259a1e4967b80cfffe1440ba47d3ffc3468a02d087ebe7b1a20b11c763154136"
+  },
+  "patch": {
+    "path": "flop-depth1.patch",
+    "bytes": 263,
+    "sha256": "3751c8f9fc2feea210f85530e53778bd1bde53df43ed352da50158a0f832fd33"
+  },
+  "change": {
+    "field": "run.par_chance_depth",
+    "old": 2,
+    "new": 1,
+    "differing_bytes": 1,
+    "all_other_config_bytes_and_parsed_fields_equal": true
+  },
+  "independent_static_fork_check": {
+    "0": {
+      "forks": 0,
+      "child_items": 0
+    },
+    "1": {
+      "forks": 3,
+      "child_items": 147
+    },
+    "2": {
+      "forks": 150,
+      "child_items": 7203
+    }
+  },
+  "fixed_future_quality_controls": {
+    "iterations": 50,
+    "check_every": 5,
+    "target_nash_conv": 0.0367,
+    "layout": "compact",
+    "storage": "f32",
+    "workers": [
+      1,
+      16,
+      32
+    ],
+    "note": "Benchmark flags preserve VM12 stopping controls; literal config check_every=50 was overridden there too. This preparation is not authorization or an executable deployment."
+  },
+  "required_future_agreement": "Same input/game/ranges, exact stopping-trajectory EV/BR/NC bits, canonical strategy/CFV bytes and full state bytes across both depths/workers; no outcome has been measured.",
+  "no_extrapolation": [
+    "River has no chance nodes.",
+    "Turn has only depth-one chance nodes.",
+    "Wide Flop trees may benefit from inner fanout; this candidate does not change their default."
+  ]
+}

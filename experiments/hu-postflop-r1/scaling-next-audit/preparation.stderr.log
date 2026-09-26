@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\scaling-next-audit\prepare.py", line 126, in <module>
+    result = prepare()
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\scaling-next-audit\prepare.py", line 66, in prepare
+    members = {entries[p]["archive_member"] for p in names.values()}
+               ~~~~~~~^^^
+KeyError: '/opt/r1/current32/source/experiments/hu-postflop-r1/range-scaling/configs/flop.toml'

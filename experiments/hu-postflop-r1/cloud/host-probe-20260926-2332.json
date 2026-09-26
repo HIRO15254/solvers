@@ -1,0 +1,26 @@
+{
+  "schema": "solvers.r1.local-host-observation/v1",
+  "observation_window_utc": ["2026-09-26T23:31:04Z", "2026-09-26T23:38:04Z"],
+  "source": "Manual transcription of successful read-only Win32 GlobalMemoryStatusEx and PowerShell Get-Process/Stopwatch tool outputs",
+  "memory": {
+    "memory_load_percent": 85,
+    "physical_total_bytes": 34275098624,
+    "physical_available_bytes": 5014134784,
+    "commit_limit_bytes": 42865033216,
+    "commit_available_bytes": 2202021888
+  },
+  "competing_process_sample": {
+    "name": "gpp",
+    "pid": 46508,
+    "elapsed_seconds": 3.0430902,
+    "cpu_seconds_delta": 35.6875,
+    "working_set_bytes": 945643520,
+    "method": "Copy TotalProcessorTime.TotalSeconds to numeric scalars before and after the wait; elapsed wall time uses Stopwatch ticks"
+  },
+  "unsuccessful_probes": [
+    "Win32_OperatingSystem and Win32_Processor CIM queries returned Access denied; no values inferred from them.",
+    "An earlier Process.CPU subtraction returned a negative delta because the live Process objects did not provide reliable before/after snapshots. That result is discarded; the scalar snapshot sample is recorded above."
+  ],
+  "decision": "No local Cargo build, workspace tests or solver execution during the competing computation and limited commit headroom. Lightweight Python, source analysis and rustfmt only.",
+  "limitations": "One short host observation, not a permanent capacity or sustained-load assessment. No other process was interrupted or modified."
+}

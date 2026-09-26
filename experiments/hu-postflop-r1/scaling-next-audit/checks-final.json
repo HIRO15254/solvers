@@ -1,0 +1,96 @@
+{
+  "schema": "r1.scaling-next-light-checks/v1",
+  "scope": "Offline bytes/topology/config only; no Cargo/native/solver/cloud execution",
+  "source_before": {
+    "analyze.py": {
+      "bytes": 10791,
+      "sha256": "b036643ab58c50030cb00709e378738d6d7a10f50c70ac2ccfd89fbc6563e612"
+    },
+    "prepare.py": {
+      "bytes": 7327,
+      "sha256": "bc8558532ff96f25bfdbf52e9a12ecd94f5bba073539370dc313edc2e04311e4"
+    },
+    "test_prepare.py": {
+      "bytes": 1614,
+      "sha256": "348b4709277d619ae6de8b2695c4c69787f6cb56af43ca0fc9e69cf5ad89c37a"
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\scaling-next-audit\\analyze.py"
+      ],
+      "started_utc": "2026-09-26T23:38:18.183038+00:00",
+      "elapsed_seconds": 0.9184107000473887,
+      "exit_code": 0,
+      "stdout": {
+        "path": "analysis-final.stdout.log",
+        "bytes": 2804,
+        "sha256": "2a0f5a5ec26b2e882fb96818866aa9a8bf2179e7521b95819213d9302582013e"
+      },
+      "stderr": {
+        "path": "analysis-final.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\scaling-next-audit\\prepare.py"
+      ],
+      "started_utc": "2026-09-26T23:38:19.102656+00:00",
+      "elapsed_seconds": 0.41029100003652275,
+      "exit_code": 0,
+      "stdout": {
+        "path": "preparation-final.stdout.log",
+        "bytes": 412,
+        "sha256": "8c9b4506c2fc8edd2aa85e8cdadf29c7ecb1a5677d7465939eeaed897d07c5a5"
+      },
+      "stderr": {
+        "path": "preparation-final.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\scaling-next-audit\\test_prepare.py",
+        "-v"
+      ],
+      "started_utc": "2026-09-26T23:38:19.519586+00:00",
+      "elapsed_seconds": 0.17813740018755198,
+      "exit_code": 0,
+      "stdout": {
+        "path": "tests-final.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "tests-final.stderr.log",
+        "bytes": 487,
+        "sha256": "c198756c82796659837b52e770663ceb874ff76b509151715c23232420fc585d"
+      }
+    }
+  ],
+  "source_after": {
+    "analyze.py": {
+      "bytes": 10791,
+      "sha256": "b036643ab58c50030cb00709e378738d6d7a10f50c70ac2ccfd89fbc6563e612"
+    },
+    "prepare.py": {
+      "bytes": 7327,
+      "sha256": "bc8558532ff96f25bfdbf52e9a12ecd94f5bba073539370dc313edc2e04311e4"
+    },
+    "test_prepare.py": {
+      "bytes": 1614,
+      "sha256": "348b4709277d619ae6de8b2695c4c69787f6cb56af43ca0fc9e69cf5ad89c37a"
+    }
+  },
+  "all_passed": true
+}

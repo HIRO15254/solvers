@@ -1,0 +1,27 @@
+--- prepare.py.initial
++++ prepare.py
+@@ -59,9 +59,10 @@
+     entries = {e["original_path"]: e for e in manifest["files"]}
+     names = {
+         "plan": "/opt/r1/current32-proof01/plan.json",
+-        "config": "/opt/r1/current32/source/" + ORIGINAL,
++        "config": "/opt/r1/current32-proof01/stages/flop-b0-t1/bench/config.original.toml",
+         "canonical": "/opt/r1/current32-proof01/stages/flop-b0-t1/bench/canonical.bin",
+-        "binary": "/opt/r1/target/current32-proof01/release/examples/hu_scaling_bench",
++        "binary": "/opt/r1/current32-proof01/payload/750f2000779f0bc92cc5585d7a87ebc3fd2b8b61fb71640390f86e5ea4cb924d",
++        "retention": "/opt/r1/current32-proof01/retention.json",
+     }
+     members = {entries[p]["archive_member"] for p in names.values()}
+     blobs = {}
+@@ -83,6 +84,11 @@
+     assert all(pins["config"][f] == plan["inputs"]["flop"][f] for f in ("bytes", "sha256"))
+     published = json.loads((proof / "report.json").read_bytes())
+     assert all(pins["binary"][f] == published["binary"][f] for f in ("bytes", "sha256"))
++    retained = json.loads(raw["retention"])["files"]
++    for name, original_path in (("binary", published["binary"]["path"]),
++                               ("config", plan["inputs"]["flop"]["path"])):
++        assert all(pins[name][f] == retained[original_path][f] for f in ("bytes", "sha256"))
++        pins[name]["bound_original_path"] = original_path
+     dims, nodes = analyze.topology(raw["canonical"])
+     assert dims == [3, 3]
+     static = {}

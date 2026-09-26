@@ -1,0 +1,10 @@
+--- a/crates/engine/src/solver.rs
++++ b/crates/engine/src/solver.rs
+@@ -960,6 +960,7 @@
+         .par_iter_mut()
+         .zip(children.par_chunks_mut(my_reach.len()))
+         .enumerate()
++        .with_min_len(2)
+         .for_each_init(Scratch::new, |scratch, (a, (view, child_out))| {
+             let mut next = scratch.take(reach.len());
+             let row = &sigma[a * reach.len()..(a + 1) * reach.len()];

@@ -1,0 +1,19 @@
+{
+  "schema": "r1.scaling-next-tooling-repair/v1",
+  "initial_source": {
+    "bytes": 6843,
+    "sha256": "21bd8e1ea4c3626eec8bea120192740b8747cad33c20c58bb9d31f9578b4441a"
+  },
+  "current_source": {
+    "bytes": 7327,
+    "sha256": "bc8558532ff96f25bfdbf52e9a12ecd94f5bba073539370dc313edc2e04311e4"
+  },
+  "patch": {
+    "path": "prepare-repair.patch",
+    "bytes": 1528,
+    "sha256": "ba805e55c0b68fda3cf17ab06fd11f4a972deb8c8408fd01c9750abe25834c1b"
+  },
+  "scope": "Initial collector-alias lookup KeyError before candidate file generation. Patch uses the already retained config.original.toml and binary CAS, then binds their identities to the original paths through retention.json. No native experiment or performance run occurred.",
+  "reconstruction": "Reverse this plain unified diff against final prepare.py; reconstructed original bytes were checked against checks.json source_before and source_after.",
+  "source_before_after_equal_initial": true
+}

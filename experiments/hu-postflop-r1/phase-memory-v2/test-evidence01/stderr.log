@@ -1,0 +1,19 @@
+test_bad_order_is_terminal_and_retains_partial_raw (test_prototype.PrototypeTests.test_bad_order_is_terminal_and_retains_partial_raw) ... ok
+test_failed_seek_oserror_and_malformed_read_are_terminal (test_prototype.PrototypeTests.test_failed_seek_oserror_and_malformed_read_are_terminal) ... ok
+test_finish_requires_all_windows_and_success (test_prototype.PrototypeTests.test_finish_requires_all_windows_and_success) ... ok
+test_identity_and_deadline_are_terminal (test_prototype.PrototypeTests.test_identity_and_deadline_are_terminal) ... ok
+test_live_mode_rejected (test_prototype.PrototypeTests.test_live_mode_rejected) ... ok
+test_malformed_fd_raw_survives_terminal_adapter_error (test_prototype.PrototypeTests.test_malformed_fd_raw_survives_terminal_adapter_error) ... ok
+test_malformed_peak_is_retained_not_replaced_or_clamped (test_prototype.PrototypeTests.test_malformed_peak_is_retained_not_replaced_or_clamped) ... ok
+test_one_reset_read_generation_leaf_peaks_are_missing (test_prototype.PrototypeTests.test_one_reset_read_generation_leaf_peaks_are_missing) ... ok
+test_parsers_reject_units_duplicates_missing_and_overflow (test_prototype.PrototypeTests.test_parsers_reject_units_duplicates_missing_and_overflow) ... ok
+test_same_fd_offset_reset_read_and_history (test_prototype.PrototypeTests.test_same_fd_offset_reset_read_and_history) ... ok
+test_sample_is_not_used_as_cgroup_or_exact_peak (test_prototype.PrototypeTests.test_sample_is_not_used_as_cgroup_or_exact_peak) ... ok
+test_sample_limit_and_negative_clock (test_prototype.PrototypeTests.test_sample_limit_and_negative_clock) ... ok
+test_samples_only_wholly_contained_in_window (test_prototype.PrototypeTests.test_samples_only_wholly_contained_in_window) ... ok
+test_short_write_and_changed_fd_fail (test_prototype.PrototypeTests.test_short_write_and_changed_fd_fail) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.005s
+
+OK
