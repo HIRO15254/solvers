@@ -127,6 +127,28 @@
           "evidence": "experiments/hu-postflop-r1/cloud/vm11/capture-final02.json",
           "deployment_metadata_sha256": "53732572b9e73a280d14e578df883e03d0393c51e7c730cb803f1fea6b34140b",
           "experiment_complete": false
+        },
+        {
+          "at": "2026-09-26T19:36:51Z",
+          "event": "final_pipeline02_completed_then_locally_verified",
+          "campaign": "final-proof02",
+          "service_unit": "solvers-r1-vm11-final02.service",
+          "instance_id": "570856080701499920",
+          "boot_id": "7d1d9913-8d5d-420b-934e-2129e2ce25e6",
+          "build_processes_passed": 9,
+          "measurement_processes_passed": 156,
+          "screens": {
+            "time": true,
+            "io": true,
+            "memory": null
+          },
+          "archive_bytes": 32221395,
+          "archive_sha256": "27f772cdf4e9c8293f470d0e8b09df2a03f8b8e3fa873444bc1ee4d817005b84",
+          "local_verification_ended_utc": "2026-09-26T19:41:57.378791+00:00",
+          "evidence": "experiments/hu-postflop-r1/final-pipeline/proof02/report-command.json",
+          "reservation_delta_usd": 0,
+          "reservation_released": false,
+          "billed_usd": null
         }
       ],
       "note": "3.02h at rounded on-demand compute/IP +40GiB disk up to24h +1GiB transfer +$1 margin =1.86187<3. Protocol frozen before candidate execution. Absolute3h STOP, no automatic restart/extension. Reserve20min for recovery, then explicit VM/disk deletion. Actual billing unknown; held35/40."

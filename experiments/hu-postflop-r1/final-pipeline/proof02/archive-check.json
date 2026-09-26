@@ -1,0 +1,12 @@
+{
+  "schema": "r1.final-pipeline-recovery/v1",
+  "status": "bytes_verified",
+  "archive": "E:\\codex-work\\solvers\\r1-final-recovery02\\final-proof02.tar.gz",
+  "bytes": 32221395,
+  "sha256": "27f772cdf4e9c8293f470d0e8b09df2a03f8b8e3fa873444bc1ee4d817005b84",
+  "original_files": 2113,
+  "archive_files": 999,
+  "retention_issue_count": 0,
+  "missing_required_files": [],
+  "scope": "Recovery-byte integrity only; campaign verification is separate"
+}

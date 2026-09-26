@@ -134,3 +134,17 @@ The recovery packer and readable report have [21 separate lightweight checks](su
 After recovery, `report.py --out PROOF --json-target NEW.json --markdown-target NEW.md`
 revalidates original bytes with the trusted runner before rendering. A failed
 proof reports only its failure and stage counts, without performance claims.
+
+## Retained VM11 results
+
+[Proof02 report](proof02/report.jp.md) records all9 build and156 measurement
+processes passing on the same4-vCPU boot. Fixed-quality CLI time and eligible
+I/O screens passed for these three synthetic cases at one worker. The OS-memory
+screen is null because native and sampled counters failed the prospective
+consistency condition; it is not converted to a memory pass. The full archive,
+original verification and independent local report are linked from
+[proof02 retention](proof02/README.jp.md).
+
+[Proof01](proof01/README.jp.md) separately retains the earlier host-identity
+guard failure before any measured sample. Neither attempt establishes external
+24-case acceptance or completes R1.

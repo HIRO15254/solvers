@@ -28,6 +28,7 @@
 | R1のterminal事前計算採用根拠 | [Showdown/Foldの新旧32回比較](hu-postflop-r1/showdown-kernel/report.jp.md) | 既存O(n)走査のカード・local indexを事前計算。1 workerでRiver28.27%、Turn25.37%短縮、全出力一致。933通常＋release4 tests成功。先行Spot中断・prepare失敗を保持し、RSS削減や32-thread効果は認定しない |
 | R1の互換weight数値修正と費用比較 | [exact massの方式](hu-postflop-r1/exact-mass/README.jp.md)・[候補04実測](hu-postflop-r1/exact-mass/report04.jp.md) | O(n)整数経路。32実行の新旧品質・state一致、時間比の幾何平均1.048770で固定修正費用guard成立（速度向上ではない）。候補01/03の不合格履歴を保持し、外部品質やR1全体の認定とは分離 |
 | R1の現行形式・全工程比較の固定手順 | [Final pipeline](hu-postflop-r1/final-pipeline/README.md) | SOL3/CKPT1対SOL4/CKPT2、同じ内部NC目標、保存後BR、時間・OSメモリ・codecの事前固定判定。手順の検査とLinux実測結果を区別する |
+| R1の現行形式・全工程比較の実測 | [VM11 proof02](hu-postflop-r1/final-pipeline/proof02/report.jp.md) | 9 build・156測定process成功。3 synthetic例で旧新の品質一致、時間と対象I/Oの事前判定通過。OSメモリはcounter整合条件不成立で判定不能。先行prepare失敗は別保持 |
 | R1の受入証拠の範囲 | [事前条件の監査](hu-postflop-r1/acceptance/audit.jp.md)、[将来の外部比較器](hu-postflop-r1/acceptance/external-contract.md) | 既存の事前条件と測定後索引を区別。将来の閾値発行・校正・欠測の検査であり、総合受入の認定ではない |
 | R1の実入力への境界適用 | [抽象化の適用確認](hu-postflop-r1/reference/abstraction-applicability.md) | 017/019のhand identity・joint重み・完全記憶の検査と、未実装・未評価の範囲 |
 | R1の工程別診断 | [source03 phase比較](hu-postflop-r1/phases/vm06-report.md) | 別instrumented buildのon/off較正、重複しない工程時間、元の性能実測との区別 |

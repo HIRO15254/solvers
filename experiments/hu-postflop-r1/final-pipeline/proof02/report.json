@@ -1,0 +1,497 @@
+{
+  "schema": "r1.final-pipeline-readable-report/v1",
+  "status": "completed",
+  "verification": {
+    "schema": "r1.final-pipeline-verification/v1",
+    "status": "completed",
+    "build_status": "completed",
+    "processes_passed": 156,
+    "payload_integrity": "verified",
+    "limitations": [
+      "BLAKE3 report strings are bound to native output, not independently recomputed by Python",
+      "source-after is recorded live inventory verification",
+      "OS RSS counter bound, not exact physical or per-phase peak",
+      "census does not enumerate terminal evaluator internals or infer public card IDs from sparse masks"
+    ]
+  },
+  "input_sha256": {
+    "plan.json": "ebaa98ea8d510ecab92885241532ba8284b08207f975d79569035a2ed5e88761",
+    "build.json": "3fa456fee56e1067826c9ab14bc8961d816cc33e08a44e25d529ef59f79faf9a",
+    "result.json": "83fd9b4ef17990caa71901011766a3e29741f44cd4d1e08331c178c1787d86dc"
+  },
+  "stage_counts": {
+    "build": {
+      "passed": 9
+    },
+    "measurement": {
+      "passed": 156
+    }
+  },
+  "failures": [],
+  "performance": {
+    "cases": {
+      "river": {
+        "solve_seconds": {
+          "old": [
+            0.1761200739999822,
+            0.17717717799996535,
+            0.1791028009999991
+          ],
+          "new": [
+            0.0638095639999392,
+            0.0638967299998967,
+            0.06438740599992343
+          ]
+        },
+        "solve_medians_seconds": {
+          "old": 0.17717717799996535,
+          "new": 0.0638967299998967
+        },
+        "solve_new_over_old": 0.3606374744263576,
+        "paired_new_faster": 3,
+        "single_case_speed_claim_eligible": false,
+        "iterations": {
+          "old": [
+            100,
+            100,
+            100
+          ],
+          "new": [
+            100,
+            100,
+            100
+          ]
+        },
+        "artifact_bytes": {
+          "old": {
+            "solution.sol": [
+              7605,
+              7605,
+              7608
+            ],
+            "checkpoint.ckpt": [
+              81330,
+              81330,
+              81330
+            ]
+          },
+          "new": {
+            "solution.sol": [
+              4685,
+              4682,
+              4684
+            ],
+            "checkpoint.ckpt": [
+              11157,
+              11157,
+              11157
+            ]
+          }
+        },
+        "quality": {
+          "unit": "chips",
+          "target_strictly_below": 0.04,
+          "negative_roundoff_allowance": 1e-06,
+          "live_nash_conv": {
+            "old": [
+              0.029750058896130138,
+              0.029750058896130138,
+              0.029750058896130138
+            ],
+            "new": [
+              0.029750058896130138,
+              0.029750058896130138,
+              0.029750058896130138
+            ]
+          },
+          "saved_nash_conv": {
+            "old": [
+              0.02974775823780984,
+              0.02974775823780984,
+              0.02974775823780984
+            ],
+            "new": [
+              0.02974775823780984,
+              0.02974775823780984,
+              0.02974775823780984
+            ]
+          },
+          "saved_minus_live": {
+            "old": [
+              -2.3006583202977993e-06,
+              -2.3006583202977993e-06,
+              -2.3006583202977993e-06
+            ],
+            "new": [
+              -2.3006583202977993e-06,
+              -2.3006583202977993e-06,
+              -2.3006583202977993e-06
+            ]
+          }
+        },
+        "memory": {
+          "os_rss_bound_new_over_old": 9.530143912874369,
+          "new_native_os_peak_bytes": [
+            100360192,
+            100360192,
+            100360192
+          ],
+          "old_sampled_os_peak_bytes": [
+            10539008,
+            10530816,
+            10952704
+          ],
+          "meaning": "max(new native OS peaks) / min(old sampled OS peaks), conditional on verified root-only observations; not a physical, median, population or phase memory ratio. An unmet bound is inconclusive."
+        },
+        "io": {
+          "decode-all": {
+            "medians_seconds": {
+              "old": 0.00082893,
+              "new": 0.000234215
+            },
+            "new_over_old": 0.282550999481259,
+            "regression_screen": null,
+            "interpretation": "descriptive_only_below_10ms"
+          },
+          "read-root": {
+            "medians_seconds": {
+              "old": 0.0008337980000000001,
+              "new": 0.00022506799999999998
+            },
+            "new_over_old": 0.2699310864262087,
+            "regression_screen": null,
+            "interpretation": "descriptive_only_below_10ms"
+          },
+          "stream-write": {
+            "medians_seconds": {
+              "old": 0.003798987,
+              "new": 0.00438666
+            },
+            "new_over_old": 1.1546920271114378,
+            "regression_screen": null,
+            "interpretation": "descriptive_only_below_10ms"
+          }
+        }
+      },
+      "turn": {
+        "solve_seconds": {
+          "old": [
+            5.239978541000028,
+            5.247207516000117,
+            5.224493004999886
+          ],
+          "new": [
+            0.19682022699998925,
+            0.19759970499990231,
+            0.19487254299997403
+          ]
+        },
+        "solve_medians_seconds": {
+          "old": 5.239978541000028,
+          "new": 0.19682022699998925
+        },
+        "solve_new_over_old": 0.037561265844883965,
+        "paired_new_faster": 3,
+        "single_case_speed_claim_eligible": true,
+        "iterations": {
+          "old": [
+            100,
+            100,
+            100
+          ],
+          "new": [
+            100,
+            100,
+            100
+          ]
+        },
+        "artifact_bytes": {
+          "old": {
+            "solution.sol": [
+              24919,
+              24919,
+              24916
+            ],
+            "checkpoint.ckpt": [
+              356288,
+              356288,
+              356288
+            ]
+          },
+          "new": {
+            "solution.sol": [
+              12489,
+              12489,
+              12490
+            ],
+            "checkpoint.ckpt": [
+              20637,
+              20637,
+              20637
+            ]
+          }
+        },
+        "quality": {
+          "unit": "chips",
+          "target_strictly_below": 0.04,
+          "negative_roundoff_allowance": 1e-06,
+          "live_nash_conv": {
+            "old": [
+              0.02882798512776752,
+              0.02882798512776752,
+              0.02882798512776752
+            ],
+            "new": [
+              0.02882798512776752,
+              0.02882798512776752,
+              0.02882798512776752
+            ]
+          },
+          "saved_nash_conv": {
+            "old": [
+              0.02883824007010638,
+              0.02883824007010638,
+              0.02883824007010638
+            ],
+            "new": [
+              0.02883824007010638,
+              0.02883824007010638,
+              0.02883824007010638
+            ]
+          },
+          "saved_minus_live": {
+            "old": [
+              1.0254942338860928e-05,
+              1.0254942338860928e-05,
+              1.0254942338860928e-05
+            ],
+            "new": [
+              1.0254942338860928e-05,
+              1.0254942338860928e-05,
+              1.0254942338860928e-05
+            ]
+          }
+        },
+        "memory": {
+          "os_rss_bound_new_over_old": 3.422545048191088,
+          "new_native_os_peak_bytes": [
+            100360192,
+            100360192,
+            100360192
+          ],
+          "old_sampled_os_peak_bytes": [
+            29323264,
+            29491200,
+            31682560
+          ],
+          "meaning": "max(new native OS peaks) / min(old sampled OS peaks), conditional on verified root-only observations; not a physical, median, population or phase memory ratio. An unmet bound is inconclusive."
+        },
+        "io": {
+          "decode-all": {
+            "medians_seconds": {
+              "old": 0.023295153,
+              "new": 0.001058663
+            },
+            "new_over_old": 0.045445634119681465,
+            "regression_screen": true,
+            "interpretation": "eligible_regression_screen"
+          },
+          "read-root": {
+            "medians_seconds": {
+              "old": 0.003400831,
+              "new": 0.00022268199999999998
+            },
+            "new_over_old": 0.06547870211721782,
+            "regression_screen": null,
+            "interpretation": "descriptive_only_below_10ms"
+          },
+          "stream-write": {
+            "medians_seconds": {
+              "old": 0.018333028,
+              "new": 0.004389069
+            },
+            "new_over_old": 0.23940775086363253,
+            "regression_screen": true,
+            "interpretation": "eligible_regression_screen"
+          }
+        }
+      },
+      "flop": {
+        "solve_seconds": {
+          "old": [
+            34.84876689800012,
+            34.75130657700015,
+            34.76617639699998
+          ],
+          "new": [
+            0.6038747119998789,
+            0.561914083999909,
+            0.562089922000041
+          ]
+        },
+        "solve_medians_seconds": {
+          "old": 34.76617639699998,
+          "new": 0.562089922000041
+        },
+        "solve_new_over_old": 0.016167723352187344,
+        "paired_new_faster": 3,
+        "single_case_speed_claim_eligible": true,
+        "iterations": {
+          "old": [
+            50,
+            50,
+            50
+          ],
+          "new": [
+            50,
+            50,
+            50
+          ]
+        },
+        "artifact_bytes": {
+          "old": {
+            "solution.sol": [
+              176832,
+              176831,
+              176832
+            ],
+            "checkpoint.ckpt": [
+              34545,
+              34545,
+              34545
+            ]
+          },
+          "new": {
+            "solution.sol": [
+              81335,
+              81334,
+              81336
+            ],
+            "checkpoint.ckpt": [
+              1531,
+              1531,
+              1531
+            ]
+          }
+        },
+        "quality": {
+          "unit": "chips",
+          "target_strictly_below": 0.04,
+          "negative_roundoff_allowance": 1e-06,
+          "live_nash_conv": {
+            "old": [
+              0.036698924170599945,
+              0.036698924170599945,
+              0.036698924170599945
+            ],
+            "new": [
+              0.036698924170599945,
+              0.036698924170599945,
+              0.036698924170599945
+            ]
+          },
+          "saved_nash_conv": {
+            "old": [
+              0.03670024871826172,
+              0.03670024871826172,
+              0.03670024871826172
+            ],
+            "new": [
+              0.03670024871826172,
+              0.03670024871826172,
+              0.03670024871826172
+            ]
+          },
+          "saved_minus_live": {
+            "old": [
+              1.3245476617740337e-06,
+              1.3245476617740337e-06,
+              1.3245476617740337e-06
+            ],
+            "new": [
+              1.3245476617740337e-06,
+              1.3245476617740337e-06,
+              1.3245476617740337e-06
+            ]
+          }
+        },
+        "memory": {
+          "os_rss_bound_new_over_old": null,
+          "new_native_os_peak_bytes": [
+            100360192,
+            100360192,
+            100360192
+          ],
+          "old_sampled_os_peak_bytes": [
+            337960960,
+            337981440,
+            338046976
+          ],
+          "meaning": "max(new native OS peaks) / min(old sampled OS peaks), conditional on verified root-only observations; not a physical, median, population or phase memory ratio. An unmet bound is inconclusive."
+        },
+        "io": {
+          "decode-all": {
+            "medians_seconds": {
+              "old": 0.423194389,
+              "new": 0.006961171
+            },
+            "new_over_old": 0.01644910986756963,
+            "regression_screen": true,
+            "interpretation": "eligible_regression_screen"
+          },
+          "read-root": {
+            "medians_seconds": {
+              "old": 0.0026820359999999996,
+              "new": 0.000201857
+            },
+            "new_over_old": 0.07526259901060241,
+            "regression_screen": null,
+            "interpretation": "descriptive_only_below_10ms"
+          },
+          "stream-write": {
+            "medians_seconds": {
+              "old": 0.227240853,
+              "new": 0.015499053
+            },
+            "new_over_old": 0.06820539878892287,
+            "regression_screen": true,
+            "interpretation": "eligible_regression_screen"
+          }
+        }
+      }
+    },
+    "revisions": {
+      "old": "88ffa5dd4583e5c8bae84e20e9b8390cb719e4f0",
+      "new": "11e4062ba1735e58b60d12999cb23ed10fd1a163"
+    },
+    "versions": {
+      "old": {
+        "sol": 3,
+        "checkpoint": 1
+      },
+      "new": {
+        "sol": 4,
+        "checkpoint": 2
+      }
+    },
+    "measured_repetitions_per_arm": 3,
+    "warmups_excluded": 1,
+    "solve_geomean_new_over_old": 0.060277233841645114,
+    "screens": {
+      "time": true,
+      "flop_memory": null,
+      "io": true
+    },
+    "guard": {
+      "turn_flop_solve_median_ratio_max": 0.95,
+      "all_case_solve_geomean_ratio_max": 1.0,
+      "flop_os_rss_bound_ratio_max": 0.9,
+      "io_regression_ratio_max": 1.1,
+      "io_eligibility_old_seconds": 0.01,
+      "single_case_speed_claim_old_seconds": 1.0
+    },
+    "phase_timings": null,
+    "timing_scope": "Solve is the entire CLI process. Codec decode/write uses operation time; read-root includes open time. Sub-10ms old codec medians are descriptive only."
+  },
+  "scope": "Three synthetic no-rake HU games, one worker, F32 Full artifacts; no overall R1 certification."
+}
