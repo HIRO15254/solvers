@@ -1,0 +1,443 @@
+{
+  "schema": "r1.showdown-kernel-firstboot-audit/v1",
+  "outcome": "container_verified_execution_evidence_incomplete",
+  "complete_validation_accepted": false,
+  "boot_id": "02dcc8e8-f1c9-4ec6-a657-f0f9b12c0f0f",
+  "bundle": {
+    "bytes": 4557773,
+    "sha256": "a17f29921feb237c7266342796bd9f100d472d1ed7904d9ceb1d552af48fa141"
+  },
+  "external_manifest": {
+    "bytes": 31652,
+    "sha256": "80d0fd55d9cc4d4931ce4bc24aa345947e4b3454192e943d9f9616b817500e25"
+  },
+  "collector": {
+    "included_files_verified": 48,
+    "skipped_files": 0,
+    "internal_manifest_bytes_equal_external": true,
+    "archive_exact_file_set": true
+  },
+  "sources": {
+    "new": {
+      "manifest": {
+        "path": "/opt/r1/kernel-new/source-candidate-manifest.json",
+        "bytes": 66442,
+        "sha256": "7b750fe10b3328c9d46c27c8ed7e688492ccd18db998f8cc63ac7b8c61e0635c"
+      },
+      "archive": {
+        "path": "/opt/r1/kernel-new/source-candidate.tar.gz",
+        "bytes": 1372873,
+        "sha256": "a159aebe99e10410ad9e72f523fae5fc8127ee94f30d9d13c3fbb651b0addc13"
+      },
+      "files": 362,
+      "directories": 2,
+      "base_commit": "d8135a12c22c9d5e70216380298bda480e63ad05",
+      "dirty": true,
+      "changed_paths": [
+        "crates/holdem/src/kernel.rs",
+        "crates/holdem/src/kernel_tests.rs",
+        "crates/holdem/src/postflop.rs",
+        "docs/architecture.md",
+        "experiments/hu-postflop-r1/cloud/budget.json"
+      ]
+    },
+    "old": {
+      "manifest": {
+        "path": "/opt/r1/kernel-old/source-candidate-manifest.json",
+        "bytes": 66068,
+        "sha256": "07cb59711c021c3f4ac480ab199d8e982702d6e3a238e967af13ec9f8ed34d09"
+      },
+      "archive": {
+        "path": "/opt/r1/kernel-old/source-candidate.tar.gz",
+        "bytes": 1368704,
+        "sha256": "f8aa610da21e9a6115d485f362b637c78befd56ce38f67da1b63cfa382bd3d6b"
+      },
+      "files": 361,
+      "directories": 2,
+      "base_commit": "d8135a12c22c9d5e70216380298bda480e63ad05",
+      "dirty": false,
+      "changed_paths": []
+    }
+  },
+  "runs": {
+    "new": {
+      "recorded_status": "completed",
+      "mode": "full-validation",
+      "stages": [
+        {
+          "label": "toolchain",
+          "argv": [
+            "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "-Vv"
+          ],
+          "record": {
+            "path": "/opt/r1/kernel-new/validation/stages/toolchain/supervisor.json",
+            "bytes": 5964,
+            "sha256": "89d6c37e1b3069c4c34d74637f2cdaccb8897755bf79ef8b5e7a86d2c11c9eb1"
+          },
+          "recorded_state": "completed",
+          "child_exit": 0,
+          "recorded_elapsed_seconds": 0.11820247699998276,
+          "outputs": {
+            "stdout": "matched",
+            "stderr": "matched",
+            "samples": "matched"
+          },
+          "raw_test_counts": null
+        },
+        {
+          "label": "fmt",
+          "argv": [
+            "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "fmt",
+            "--all",
+            "--check"
+          ],
+          "record": {
+            "path": "/opt/r1/kernel-new/validation/stages/fmt/supervisor.json",
+            "bytes": 6003,
+            "sha256": "93df40038b0343154cd7fc1a7fdb5b338a4984fd21c033f3f4d922591620b021"
+          },
+          "recorded_state": "completed",
+          "child_exit": 0,
+          "recorded_elapsed_seconds": 1.4993216729999972,
+          "outputs": {
+            "stdout": "matched",
+            "stderr": "matched",
+            "samples": "matched"
+          },
+          "raw_test_counts": null
+        },
+        {
+          "label": "clippy",
+          "argv": [
+            "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "clippy",
+            "--workspace",
+            "--all-targets",
+            "--target-dir",
+            "/opt/r1/target/kernel-new",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "record": {
+            "path": "/opt/r1/kernel-new/validation/stages/clippy/supervisor.json",
+            "bytes": 6217,
+            "sha256": "089c9adc4346e721f2edfa29be726a1daa6686549892c168985677aac97d899d"
+          },
+          "recorded_state": "completed",
+          "child_exit": 0,
+          "recorded_elapsed_seconds": 67.468071888,
+          "outputs": {
+            "stdout": "matched",
+            "stderr": "matched",
+            "samples": "matched"
+          },
+          "raw_test_counts": null
+        },
+        {
+          "label": "workspace-tests",
+          "argv": [
+            "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--workspace",
+            "--no-fail-fast",
+            "--target-dir",
+            "/opt/r1/target/kernel-new"
+          ],
+          "record": {
+            "path": "/opt/r1/kernel-new/validation/stages/workspace-tests/supervisor.json",
+            "bytes": 6178,
+            "sha256": "add9b96c7ee235817ba0f315507b715f2702e5a7aaea028d3b2e595effac03a8"
+          },
+          "recorded_state": "completed",
+          "child_exit": 0,
+          "recorded_elapsed_seconds": 465.790978116,
+          "outputs": {
+            "stdout": "matched",
+            "stderr": "matched",
+            "samples": "matched"
+          },
+          "raw_test_counts": {
+            "passed": 933,
+            "failed": 0,
+            "ignored": 31,
+            "measured": 0,
+            "filtered_out": 0,
+            "summary_rows": 56,
+            "unique_passed_names": 933,
+            "kernel_test_names": [
+              "kernel::tests::compact_kernel_rank_entry_stays_eight_bytes",
+              "kernel::tests::compact_kernels_match_old_bits_and_pairwise_after_public_card_masks",
+              "kernel::tests::compact_kernels_match_old_bits_and_pairwise_on_asymmetric_overlapping_support",
+              "kernel::tests::compact_kernels_preserve_historical_tiny_reach_rounding_bits",
+              "kernel::tests::compact_kernels_remove_identical_and_shared_card_only_opponents",
+              "kernel::tests::compact_kernels_match_old_bits_and_pairwise_with_full_support"
+            ]
+          }
+        },
+        {
+          "label": "docs",
+          "argv": [
+            "/usr/bin/python3",
+            "-B",
+            "tools/check_docs.py"
+          ],
+          "record": {
+            "path": "/opt/r1/kernel-new/validation/stages/docs/supervisor.json",
+            "bytes": 5901,
+            "sha256": "ece0970213448ba9f75f3deaa523d7f37f86a46cb94e4f6d3eb51d6b6843664a"
+          },
+          "recorded_state": "completed",
+          "child_exit": 0,
+          "recorded_elapsed_seconds": 0.11513395700001183,
+          "outputs": {
+            "stdout": "matched",
+            "stderr": "matched",
+            "samples": "matched"
+          },
+          "raw_test_counts": null
+        },
+        {
+          "label": "release-example",
+          "argv": [
+            "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "build",
+            "--release",
+            "-p",
+            "cli",
+            "--example",
+            "hu_scaling_bench",
+            "--target-dir",
+            "/opt/r1/target/kernel-new"
+          ],
+          "record": {
+            "path": "/opt/r1/kernel-new/validation/stages/release-example/supervisor.json",
+            "bytes": 6257,
+            "sha256": "257b4052ea9099c762c4c7bff86388f6bce0288974d3c7d1d5d5a25179e61576"
+          },
+          "recorded_state": "completed",
+          "child_exit": 0,
+          "recorded_elapsed_seconds": 175.66337948800003,
+          "outputs": {
+            "stdout": "matched",
+            "stderr": "matched",
+            "samples": "matched"
+          },
+          "raw_test_counts": null
+        },
+        {
+          "label": "release-oracle",
+          "argv": [
+            "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--release",
+            "-p",
+            "holdem",
+            "--test",
+            "oracle_diff",
+            "--target-dir",
+            "/opt/r1/target/kernel-new",
+            "--",
+            "--include-ignored"
+          ],
+          "record": {
+            "path": "/opt/r1/kernel-new/validation/stages/release-oracle/supervisor.json",
+            "bytes": 6316,
+            "sha256": "1bf8a0e6ba9c6c9157265000ea8e66936178a8bd0fa339f96d30338a0744a628"
+          },
+          "recorded_state": "completed",
+          "child_exit": 0,
+          "recorded_elapsed_seconds": 47.88621041700003,
+          "outputs": {
+            "stdout": "matched",
+            "stderr": "matched",
+            "samples": "matched"
+          },
+          "raw_test_counts": {
+            "passed": 3,
+            "failed": 0,
+            "ignored": 0,
+            "measured": 0,
+            "filtered_out": 0,
+            "summary_rows": 1,
+            "test_names": [
+              "multistreet_engine_matches_scalar_oracle_early_iterates",
+              "uniform_profiles_agree_between_engine_and_oracle",
+              "multistreet_engine_matches_scalar_oracle"
+            ]
+          }
+        },
+        {
+          "label": "release-river-resolve",
+          "argv": [
+            "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--release",
+            "-p",
+            "cli",
+            "--lib",
+            "--target-dir",
+            "/opt/r1/target/kernel-new",
+            "sol::tests::river_resolve_accuracy",
+            "--",
+            "--exact",
+            "--ignored"
+          ],
+          "record": {
+            "path": "/opt/r1/kernel-new/validation/stages/release-river-resolve/supervisor.json",
+            "bytes": 6386,
+            "sha256": "b52e421f6004b3760896329c2b4a3f5d38bb9a1b244b0a4e390e3933215e8c79"
+          },
+          "recorded_state": "completed",
+          "child_exit": 0,
+          "recorded_elapsed_seconds": 107.717419501,
+          "outputs": {
+            "stdout": "MISMATCH",
+            "stderr": "matched",
+            "samples": "matched"
+          },
+          "raw_test_counts": null
+        }
+      ],
+      "binary": {
+        "path": "/opt/r1/target/kernel-new/release/examples/hu_scaling_bench",
+        "bytes": 3900568,
+        "sha256": "54b85c3886de32e45510b9bee2ff71e0f9440c07e3ee9e224c034da54e94145a"
+      }
+    },
+    "old": {
+      "recorded_status": "running",
+      "mode": "release-build-only",
+      "stages": [
+        {
+          "label": "toolchain",
+          "argv": [
+            "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "-Vv"
+          ],
+          "record": {
+            "path": "/opt/r1/kernel-old/validation/stages/toolchain/supervisor.json",
+            "bytes": 5965,
+            "sha256": "3081e10ad419e76742088d0e50890ab16337e732f3b5b236750d2b4cb7953b5f"
+          },
+          "recorded_state": "completed",
+          "child_exit": 0,
+          "recorded_elapsed_seconds": 0.11748273800003517,
+          "outputs": {
+            "stdout": "MISMATCH",
+            "stderr": "matched",
+            "samples": "MISMATCH"
+          },
+          "raw_test_counts": null
+        },
+        {
+          "label": "release-example",
+          "argv": [
+            "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "build",
+            "--release",
+            "-p",
+            "cli",
+            "--example",
+            "hu_scaling_bench",
+            "--target-dir",
+            "/opt/r1/target/kernel-old"
+          ],
+          "record": {
+            "path": "/opt/r1/kernel-old/validation/stages/release-example/supervisor.json",
+            "bytes": 4100,
+            "sha256": "c719031b82ce644749c386b68b79cdfa698531fa361da594beaf2af33dfe47ca"
+          },
+          "recorded_state": "running",
+          "child_exit": null,
+          "recorded_elapsed_seconds": null,
+          "outputs": {
+            "stdout": "no_final_process_pin",
+            "stderr": "no_final_process_pin",
+            "samples": "no_final_process_pin"
+          },
+          "raw_test_counts": null
+        }
+      ],
+      "binary": null
+    }
+  },
+  "process_output_pin_mismatches": [
+    {
+      "role": "new",
+      "stage": "release-river-resolve",
+      "output": "stdout",
+      "path": "/opt/r1/kernel-new/validation/stages/release-river-resolve/supervisor.stdout.log",
+      "expected": {
+        "bytes": 161,
+        "sha256": "d183c878fd10c0019a90f6290cbd4a7d487d9bc1d88fb35a724bf523a2c3ee66"
+      },
+      "collected": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "role": "old",
+      "stage": "toolchain",
+      "output": "stdout",
+      "path": "/opt/r1/kernel-old/validation/stages/toolchain/supervisor.stdout.log",
+      "expected": {
+        "bytes": 196,
+        "sha256": "a90721a3b031e0e1c8bfc34ece79b6608d2ae53166cfb77dad281a0eb5fa6bc8"
+      },
+      "collected": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "role": "old",
+      "stage": "toolchain",
+      "output": "samples",
+      "path": "/opt/r1/kernel-old/validation/stages/toolchain/supervisor.samples.jsonl",
+      "expected": {
+        "bytes": 634,
+        "sha256": "e0022e526a7b3a4f09b64bc82421f8b1f41ba7edbd1b935ab4eca78e0ca211a1"
+      },
+      "collected": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "identity_only_tools": [
+    {
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "sha256": "df13f58759c0662831983e3a6501c63c1fc12ea60ec4e1d1ac35e5fe43c500c0",
+      "bytes": 646344
+    },
+    {
+      "path": "/usr/bin/python3.12",
+      "sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+      "bytes": 8020928
+    },
+    {
+      "path": "/opt/r1/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "sha256": "eff12bab37b9d9e01324db4583eaf55b2cd82ac3008a7e59876e4cd2e9a028f5",
+      "bytes": 42844376
+    }
+  ],
+  "runner_reconstruction": {
+    "path": "/tmp/r1-kernel-old/validate.py",
+    "bytes": 7499,
+    "sha256": "0f84890a1860498040fec55b160bdc07c7c1135f10fa8ea8475d8185739bb07a",
+    "matches_both_verified_source_archives": "experiments/hu-postflop-r1/range-scaling/validate.py",
+    "provenance": "operator reports /tmp lost on reboot; restored from frozen source before collection"
+  },
+  "limitations": [
+    "No retained source code or binary was executed by this verifier.",
+    "Collector inventory equality does not establish process-output pin equality.",
+    "Empty output cause is unknown; mismatches were observed after Spot interruption and recovery.",
+    "Source archives are verified; source-after filesystem equality is a runner assertion, not an independent snapshot.",
+    "Old build has no terminal result or retained binary. New release-river-resolve raw test count is unavailable.",
+    "First-boot timings must not be combined with later-boot performance measurements."
+  ]
+}

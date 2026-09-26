@@ -1,0 +1,270 @@
+{
+  "schema": "r1.showdown-kernel-verification/v1",
+  "status": "completed",
+  "payload_integrity": "verified",
+  "builds": {
+    "old": {
+      "mode": "release-build-only",
+      "stages": 2,
+      "tests": {},
+      "full_workspace_validated": false
+    },
+    "new": {
+      "mode": "full-validation",
+      "stages": 8,
+      "tests": {
+        "workspace-tests": {
+          "summary_count": 56,
+          "passed": 933,
+          "ignored": 31
+        },
+        "release-oracle": {
+          "summary_count": 1,
+          "passed": 3,
+          "ignored": 0
+        },
+        "release-river-resolve": {
+          "summary_count": 1,
+          "passed": 1,
+          "ignored": 0
+        }
+      },
+      "full_workspace_validated": true
+    }
+  },
+  "samples_passed": 32,
+  "failed_records": [],
+  "summary": {
+    "cases": {
+      "river": {
+        "run_seconds": {
+          "old": [
+            8.763098226,
+            8.791128739,
+            8.758821479
+          ],
+          "new": [
+            6.285461408,
+            6.258375799,
+            6.292203861
+          ]
+        },
+        "medians": {
+          "old": 8.763098226,
+          "new": 6.285461408
+        },
+        "new_over_old": 0.7172647442603252,
+        "paired_new_faster": 3,
+        "memory_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": [
+              52080640,
+              52080640,
+              52080640
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              8081408,
+              7983104,
+              8097792
+            ]
+          },
+          "new": {
+            "root_os_peak_resident_bytes": [
+              52080640,
+              52080640,
+              52080640
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              7938048,
+              7979008,
+              7950336
+            ]
+          }
+        },
+        "memory_medians_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": 52080640,
+            "sampled_peak_tree_resident_bytes": 8081408
+          },
+          "new": {
+            "root_os_peak_resident_bytes": 52080640,
+            "sampled_peak_tree_resident_bytes": 7950336
+          }
+        }
+      },
+      "turn": {
+        "run_seconds": {
+          "old": [
+            1.727956732,
+            1.7313617529999998,
+            1.73145696
+          ],
+          "new": [
+            1.292089334,
+            1.289026457,
+            1.298379927
+          ]
+        },
+        "medians": {
+          "old": 1.7313617529999998,
+          "new": 1.292089334
+        },
+        "new_over_old": 0.7462850162660374,
+        "paired_new_faster": 3,
+        "memory_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": [
+              52080640,
+              52080640,
+              52080640
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              6299648,
+              6266880,
+              6168576
+            ]
+          },
+          "new": {
+            "root_os_peak_resident_bytes": [
+              52080640,
+              52080640,
+              52080640
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              6303744,
+              6316032,
+              6225920
+            ]
+          }
+        },
+        "memory_medians_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": 52080640,
+            "sampled_peak_tree_resident_bytes": 6266880
+          },
+          "new": {
+            "root_os_peak_resident_bytes": 52080640,
+            "sampled_peak_tree_resident_bytes": 6303744
+          }
+        }
+      },
+      "flop": {
+        "run_seconds": {
+          "old": [
+            0.454520247,
+            0.454137315,
+            0.453815835
+          ],
+          "new": [
+            0.406425719,
+            0.410626748,
+            0.406163567
+          ]
+        },
+        "medians": {
+          "old": 0.454137315,
+          "new": 0.406425719
+        },
+        "new_over_old": 0.8949401548296027,
+        "paired_new_faster": 3,
+        "memory_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": [
+              52080640,
+              52080640,
+              52080640
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              14667776,
+              14680064,
+              14696448
+            ]
+          },
+          "new": {
+            "root_os_peak_resident_bytes": [
+              52080640,
+              52080640,
+              52080640
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              14278656,
+              14262272,
+              14385152
+            ]
+          }
+        },
+        "memory_medians_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": 52080640,
+            "sampled_peak_tree_resident_bytes": 14680064
+          },
+          "new": {
+            "root_os_peak_resident_bytes": 52080640,
+            "sampled_peak_tree_resident_bytes": 14278656
+          }
+        }
+      },
+      "narrow-river": {
+        "run_seconds": {
+          "old": [
+            0.093140636,
+            0.092674434,
+            0.092597328
+          ],
+          "new": [
+            0.065148919,
+            0.064023814,
+            0.065203039
+          ]
+        },
+        "medians": {
+          "old": 0.092674434,
+          "new": 0.065148919
+        },
+        "new_over_old": 0.7029869640207352,
+        "paired_new_faster": 3,
+        "memory_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": [
+              52080640,
+              52080640,
+              52080640
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              5455872,
+              5558272,
+              5660672
+            ]
+          },
+          "new": {
+            "root_os_peak_resident_bytes": [
+              52080640,
+              52080640,
+              52080640
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              5431296,
+              5386240,
+              5472256
+            ]
+          }
+        },
+        "memory_medians_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": 52080640,
+            "sampled_peak_tree_resident_bytes": 5558272
+          },
+          "new": {
+            "root_os_peak_resident_bytes": 52080640,
+            "sampled_peak_tree_resident_bytes": 5431296
+          }
+        }
+      }
+    },
+    "geometric_mean_new_over_old": 0.7617831605803252,
+    "descriptive_guard_pass": true,
+    "r1_certification": false
+  },
+  "source_after_scope": "Recorded live rehash, not independent post-run filesystem snapshot",
+  "tool_retention": "Compiler/Python identities only; measured binaries and raw outputs retained"
+}

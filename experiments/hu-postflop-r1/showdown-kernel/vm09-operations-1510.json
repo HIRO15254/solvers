@@ -1,0 +1,23 @@
+[
+  {
+    "endTime": "2026-09-26T08:04:51.159-07:00",
+    "insertTime": "2026-09-26T08:04:30.301-07:00",
+    "operationType": "start",
+    "status": "DONE",
+    "targetId": "5775064646140191983"
+  },
+  {
+    "endTime": "2026-09-26T08:01:42.258-07:00",
+    "insertTime": "2026-09-26T08:01:42.258-07:00",
+    "operationType": "compute.instances.preempted",
+    "status": "DONE",
+    "targetId": "5775064646140191983"
+  },
+  {
+    "endTime": "2026-09-26T07:43:19.737-07:00",
+    "insertTime": "2026-09-26T07:43:12.335-07:00",
+    "operationType": "insert",
+    "status": "DONE",
+    "targetId": "5775064646140191983"
+  }
+]

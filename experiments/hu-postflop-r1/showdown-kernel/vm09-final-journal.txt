@@ -1,0 +1,347 @@
+2026-09-26T15:08:30+00:00 solvers-r1-20260926-09 systemd[1]: Started r1-kernel-build-r2.service - /bin/bash /tmp/build-pair-r2.sh.
+2026-09-26T15:08:30+00:00 solvers-r1-20260926-09 bash[1744]: {"source": "/opt/r1/kernel-old-r2/source", "source_archive": {"bytes": 1368704, "sha256": "f8aa610da21e9a6115d485f362b637c78befd56ce38f67da1b63cfa382bd3d6b"}, "source_manifest": {"bytes": 66068, "sha256": "07cb59711c021c3f4ac480ab199d8e982702d6e3a238e967af13ec9f8ed34d09"}, "setup_script": {"bytes": 2614, "sha256": "7c43058d6b14d12bffd7395df284712a03ccd5905f504c26c674418274886dfd"}, "boot_id": "ac2eeb5d-385c-4ea1-95b6-1b545ce65a85"}
+2026-09-26T15:08:30+00:00 solvers-r1-20260926-09 bash[1745]: {"source": "/opt/r1/kernel-new-r2/source", "source_archive": {"bytes": 1372873, "sha256": "a159aebe99e10410ad9e72f523fae5fc8127ee94f30d9d13c3fbb651b0addc13"}, "source_manifest": {"bytes": 66442, "sha256": "7b750fe10b3328c9d46c27c8ed7e688492ccd18db998f8cc63ac7b8c61e0635c"}, "setup_script": {"bytes": 2614, "sha256": "7c43058d6b14d12bffd7395df284712a03ccd5905f504c26c674418274886dfd"}, "boot_id": "ac2eeb5d-385c-4ea1-95b6-1b545ce65a85"}
+2026-09-26T15:08:33+00:00 solvers-r1-20260926-09 bash[1746]: {"stage": "toolchain", "status": "passed"}
+2026-09-26T15:08:36+00:00 solvers-r1-20260926-09 bash[1746]: {"stage": "fmt", "status": "passed"}
+2026-09-26T15:09:56+00:00 solvers-r1-20260926-09 bash[1746]: {"stage": "clippy", "status": "passed"}
+2026-09-26T15:17:59+00:00 solvers-r1-20260926-09 bash[1746]: {"stage": "workspace-tests", "status": "passed"}
+2026-09-26T15:18:00+00:00 solvers-r1-20260926-09 bash[1746]: {"stage": "docs", "status": "passed"}
+2026-09-26T15:18:51+00:00 solvers-r1-20260926-09 systemd[1]: Started r1-kernel-measure.service - /bin/bash /opt/r1/kernel-control/await-measure.sh.
+2026-09-26T15:21:09+00:00 solvers-r1-20260926-09 bash[1746]: {"stage": "release-example", "status": "passed"}
+2026-09-26T15:22:01+00:00 solvers-r1-20260926-09 bash[1746]: {"stage": "release-oracle", "status": "passed"}
+2026-09-26T15:23:56+00:00 solvers-r1-20260926-09 bash[1746]: {"stage": "release-river-resolve", "status": "passed"}
+2026-09-26T15:23:57+00:00 solvers-r1-20260926-09 bash[12549]: {"stage": "toolchain", "status": "passed"}
+2026-09-26T15:27:07+00:00 solvers-r1-20260926-09 bash[12549]: {"stage": "release-example", "status": "passed"}
+2026-09-26T15:27:07+00:00 solvers-r1-20260926-09 systemd[1]: r1-kernel-build-r2.service: Deactivated successfully.
+2026-09-26T15:27:07+00:00 solvers-r1-20260926-09 systemd[1]: r1-kernel-build-r2.service: Consumed 30min 89ms CPU time, 2.8G memory peak, 0B memory swap peak.
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]: Traceback (most recent call last):
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]:   File "/opt/r1/kernel-control/run.py", line 698, in <module>
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]:     main()
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]:   File "/opt/r1/kernel-control/run.py", line 690, in main
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]:     prepare(args)
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]:   File "/opt/r1/kernel-control/run.py", line 588, in prepare
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]:     check(out)
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]:   File "/opt/r1/kernel-control/run.py", line 438, in check
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]:     host_record(plan["host"], protocol)
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]:   File "/opt/r1/kernel-control/run.py", line 251, in host_record
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]:     require(cg["cpu_limits"], "CPU quota records missing")
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]:   File "/opt/r1/kernel-control/run.py", line 39, in require
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]:     raise ValueError(message)
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 bash[14360]: ValueError: CPU quota records missing
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 systemd[1]: r1-kernel-measure.service: Main process exited, code=exited, status=1/FAILURE
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 systemd[1]: r1-kernel-measure.service: Failed with result 'exit-code'.
+2026-09-26T15:27:11+00:00 solvers-r1-20260926-09 systemd[1]: r1-kernel-measure.service: Consumed 2.483s CPU time, 2.2M memory peak, 0B memory swap peak.
+2026-09-26T15:29:28+00:00 solvers-r1-20260926-09 systemd[1]: Started r1-kernel-measure02.service - /bin/bash /opt/r1/kernel-control/measure-pair02.sh.
+2026-09-26T15:29:29+00:00 solvers-r1-20260926-09 bash[14609]: {"status": "ready", "output": "/opt/r1/kernel-proof02"}
+2026-09-26T15:29:40+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "river-b0-old", "run_seconds": 8.714967672, "status": "passed"}
+2026-09-26T15:29:47+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "river-b0-new", "run_seconds": 6.236442942, "status": "passed"}
+2026-09-26T15:29:54+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "river-b1-new", "run_seconds": 6.285461408, "status": "passed"}
+2026-09-26T15:30:04+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "river-b1-old", "run_seconds": 8.763098226, "status": "passed"}
+2026-09-26T15:30:14+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "river-b2-old", "run_seconds": 8.791128739, "status": "passed"}
+2026-09-26T15:30:21+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "river-b2-new", "run_seconds": 6.258375799, "status": "passed"}
+2026-09-26T15:30:29+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "river-b3-new", "run_seconds": 6.292203861, "status": "passed"}
+2026-09-26T15:30:39+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "river-b3-old", "run_seconds": 8.758821479, "status": "passed"}
+2026-09-26T15:30:41+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "turn-b0-new", "run_seconds": 1.292417956, "status": "passed"}
+2026-09-26T15:30:44+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "turn-b0-old", "run_seconds": 1.725729629, "status": "passed"}
+2026-09-26T15:30:46+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "turn-b1-old", "run_seconds": 1.727956732, "status": "passed"}
+2026-09-26T15:30:48+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "turn-b1-new", "run_seconds": 1.292089334, "status": "passed"}
+2026-09-26T15:30:51+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "turn-b2-new", "run_seconds": 1.289026457, "status": "passed"}
+2026-09-26T15:30:53+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "turn-b2-old", "run_seconds": 1.7313617529999998, "status": "passed"}
+2026-09-26T15:30:56+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "turn-b3-old", "run_seconds": 1.73145696, "status": "passed"}
+2026-09-26T15:30:58+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "turn-b3-new", "run_seconds": 1.298379927, "status": "passed"}
+2026-09-26T15:31:00+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "flop-b0-old", "run_seconds": 0.456496209, "status": "passed"}
+2026-09-26T15:31:02+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "flop-b0-new", "run_seconds": 0.40280616, "status": "passed"}
+2026-09-26T15:31:03+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "flop-b1-new", "run_seconds": 0.406425719, "status": "passed"}
+2026-09-26T15:31:05+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "flop-b1-old", "run_seconds": 0.454520247, "status": "passed"}
+2026-09-26T15:31:06+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "flop-b2-old", "run_seconds": 0.454137315, "status": "passed"}
+2026-09-26T15:31:08+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "flop-b2-new", "run_seconds": 0.410626748, "status": "passed"}
+2026-09-26T15:31:09+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "flop-b3-new", "run_seconds": 0.406163567, "status": "passed"}
+2026-09-26T15:31:11+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "flop-b3-old", "run_seconds": 0.453815835, "status": "passed"}
+2026-09-26T15:31:12+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "narrow-river-b0-new", "run_seconds": 0.06514343, "status": "passed"}
+2026-09-26T15:31:13+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "narrow-river-b0-old", "run_seconds": 0.092344429, "status": "passed"}
+2026-09-26T15:31:14+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "narrow-river-b1-old", "run_seconds": 0.093140636, "status": "passed"}
+2026-09-26T15:31:15+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "narrow-river-b1-new", "run_seconds": 0.065148919, "status": "passed"}
+2026-09-26T15:31:16+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "narrow-river-b2-new", "run_seconds": 0.064023814, "status": "passed"}
+2026-09-26T15:31:17+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "narrow-river-b2-old", "run_seconds": 0.092674434, "status": "passed"}
+2026-09-26T15:31:18+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "narrow-river-b3-old", "run_seconds": 0.092597328, "status": "passed"}
+2026-09-26T15:31:19+00:00 solvers-r1-20260926-09 bash[14610]: {"stage": "narrow-river-b3-new", "run_seconds": 0.065203039, "status": "passed"}
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]: {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:   "schema": "r1.showdown-kernel-verification/v1",
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:   "status": "completed",
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:   "payload_integrity": "verified",
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:   "builds": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:     "old": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       "mode": "release-build-only",
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       "stages": 2,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       "tests": {},
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       "full_workspace_validated": false
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:     },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:     "new": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       "mode": "full-validation",
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       "stages": 8,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       "tests": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "workspace-tests": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "summary_count": 56,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "passed": 933,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "ignored": 31
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "release-oracle": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "summary_count": 1,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "passed": 3,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "ignored": 0
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "release-river-resolve": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "summary_count": 1,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "passed": 1,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "ignored": 0
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       "full_workspace_validated": true
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:     }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:   },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:   "samples_passed": 32,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:   "failed_records": [],
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:   "summary": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:     "cases": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       "river": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "run_seconds": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             8.763098226,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             8.791128739,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             8.758821479
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           ],
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             6.285461408,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             6.258375799,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             6.292203861
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           ]
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "medians": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": 8.763098226,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": 6.285461408
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "new_over_old": 0.7172647442603252,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "paired_new_faster": 3,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "memory_bytes": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ],
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               8081408,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               7983104,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               8097792
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ]
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ],
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               7938048,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               7979008,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               7950336
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ]
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "memory_medians_bytes": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": 52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": 8081408
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": 52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": 7950336
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       "turn": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "run_seconds": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             1.727956732,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             1.7313617529999998,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             1.73145696
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           ],
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             1.292089334,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             1.289026457,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             1.298379927
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           ]
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "medians": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": 1.7313617529999998,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": 1.292089334
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "new_over_old": 0.7462850162660374,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "paired_new_faster": 3,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "memory_bytes": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ],
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               6299648,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               6266880,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               6168576
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ]
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ],
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               6303744,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               6316032,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               6225920
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ]
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "memory_medians_bytes": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": 52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": 6266880
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": 52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": 6303744
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       "flop": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "run_seconds": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             0.454520247,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             0.454137315,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             0.453815835
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           ],
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             0.406425719,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             0.410626748,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             0.406163567
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           ]
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "medians": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": 0.454137315,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": 0.406425719
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "new_over_old": 0.8949401548296027,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "paired_new_faster": 3,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "memory_bytes": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ],
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               14667776,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               14680064,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               14696448
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ]
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ],
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               14278656,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               14262272,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               14385152
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ]
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "memory_medians_bytes": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": 52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": 14680064
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": 52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": 14278656
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       "narrow-river": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "run_seconds": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             0.093140636,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             0.092674434,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             0.092597328
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           ],
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             0.065148919,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             0.064023814,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             0.065203039
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           ]
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "medians": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": 0.092674434,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": 0.065148919
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "new_over_old": 0.7029869640207352,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "paired_new_faster": 3,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "memory_bytes": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ],
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               5455872,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               5558272,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               5660672
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ]
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               52080640
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ],
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": [
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               5431296,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               5386240,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:               5472256
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             ]
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         "memory_medians_bytes": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "old": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": 52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": 5558272
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           "new": {
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "root_os_peak_resident_bytes": 52080640,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:             "sampled_peak_tree_resident_bytes": 5431296
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:           }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:         }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:       }
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:     },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:     "geometric_mean_new_over_old": 0.7617831605803252,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:     "descriptive_guard_pass": true,
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:     "r1_certification": false
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:   },
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:   "source_after_scope": "Recorded live rehash, not independent post-run filesystem snapshot",
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]:   "tool_retention": "Compiler/Python identities only; measured binaries and raw outputs retained"
+2026-09-26T15:31:26+00:00 solvers-r1-20260926-09 bash[14686]: }
+2026-09-26T15:31:27+00:00 solvers-r1-20260926-09 bash[14687]: {
+2026-09-26T15:31:27+00:00 solvers-r1-20260926-09 bash[14687]:   "archive": "/opt/r1/kernel-proof02.tar.gz",
+2026-09-26T15:31:27+00:00 solvers-r1-20260926-09 bash[14687]:   "bytes": 8089211,
+2026-09-26T15:31:27+00:00 solvers-r1-20260926-09 bash[14687]:   "sha256": "28707ceba11324ddc8aef84a740e3c334ec59b19dac0e1c5ec9ed7f29c3bab69",
+2026-09-26T15:31:27+00:00 solvers-r1-20260926-09 bash[14687]:   "original_bytes": 20654757,
+2026-09-26T15:31:27+00:00 solvers-r1-20260926-09 bash[14687]:   "members": 194,
+2026-09-26T15:31:27+00:00 solvers-r1-20260926-09 bash[14687]:   "selected": "plan/result/retention/verification and every CAS payload; stages are duplicate originals"
+2026-09-26T15:31:27+00:00 solvers-r1-20260926-09 bash[14687]: }
+2026-09-26T15:31:27+00:00 solvers-r1-20260926-09 systemd[1]: r1-kernel-measure02.service: Deactivated successfully.
+2026-09-26T15:31:27+00:00 solvers-r1-20260926-09 systemd[1]: r1-kernel-measure02.service: Consumed 1min 58.402s CPU time.

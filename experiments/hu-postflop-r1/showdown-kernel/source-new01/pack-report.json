@@ -1,0 +1,15 @@
+{
+  "local_root": "E:\\codex-work\\solvers\\r1-showdown-new01\\source-candidate",
+  "archive": "E:\\codex-work\\solvers\\r1-showdown-new01\\source-candidate.tar.gz",
+  "manifest": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\showdown-kernel\\source-new01\\source-candidate-manifest.json",
+  "archive_bytes": 1372873,
+  "archive_sha256": "a159aebe99e10410ad9e72f523fae5fc8127ee94f30d9d13c3fbb651b0addc13",
+  "file_count": 362,
+  "original_bytes": 5462152,
+  "docs_check": {
+    "exit_code": 0,
+    "stdout": "Documentation check passed: 47 Markdown files.\r\n",
+    "stderr": ""
+  },
+  "exact_materialized_and_archive_file_sets": true
+}

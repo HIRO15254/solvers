@@ -416,11 +416,11 @@ pub struct PostflopEvaluator {
     terminals: Vec<PostflopTerminal>,
     /// Showdown rank tables, deduped by completed 5-card board (see
     /// [`Builder::rank_table_id`]).
-    rank_tables: Vec<Vec<(HandRank, u32)>>,
+    rank_tables: Vec<Vec<kernel::RankEntry>>,
     /// Union of initial-support combos disjoint from the *starting* board, used by
     /// every fold terminal regardless of street or runout — see the
     /// invariant documented on [`kernel::fold_kernel`].
-    fold_combos: Vec<(HandRank, u32)>,
+    fold_combos: Vec<kernel::RankEntry>,
 }
 
 impl PostflopEvaluator {
@@ -455,41 +455,14 @@ impl TerminalEvaluator for PostflopEvaluator {
                 term.payoffs.win_p0[Player::P1],
             ),
         };
-        // The explicit dense differential path keeps the historical kernels
-        // without the local/global bridge; no compact root can have 1,326
-        // board-disjoint hands.
-        if out.len() == NUM_COMBOS && opp_reach.len() == NUM_COMBOS {
-            match term.kind {
-                TerminalKind::Fold { .. } => {
-                    kernel::fold_kernel(&self.fold_combos, u_win, opp_reach, out)
-                }
-                TerminalKind::Showdown => kernel::showdown_kernel(
-                    &self.rank_tables[term.table as usize],
-                    u_win,
-                    u_tie,
-                    u_lose,
-                    opp_reach,
-                    out,
-                ),
-            }
-            return;
-        }
         match term.kind {
             TerminalKind::Fold { .. } => {
-                kernel::fold_kernel_compact(
-                    &self.fold_combos,
-                    u_win,
-                    &self.hands,
-                    p,
-                    opp_reach,
-                    out,
-                );
+                kernel::fold_kernel_compact(&self.fold_combos, u_win, p, opp_reach, out);
             }
             TerminalKind::Showdown => {
                 kernel::showdown_kernel_compact(
                     &self.rank_tables[term.table as usize],
                     [u_win, u_tie, u_lose],
-                    &self.hands,
                     p,
                     opp_reach,
                     out,
@@ -1135,35 +1108,20 @@ fn build_with_hands(
         ..
     } = builder;
 
-    let mut evaluator = PostflopEvaluator {
-        hands,
-        deal_cards: Vec::new(),
-        terminals,
-        rank_tables,
-        fold_combos,
-    };
-
     // Joint compatible weight, via the same inclusion-exclusion the fold
     // kernel uses. Only the pair-compat sum — no live-count denominators
     // (the 1/45, 1/44 deal weights already live on the chance branches).
     let mut ip_reach = [0.0; NUM_COMBOS];
-    for (&combo, &weight) in evaluator
-        .hands
-        .combos(Player::P1)
-        .iter()
-        .zip(&ranges[Player::P1])
-    {
+    for (&combo, &weight) in hands.combos(Player::P1).iter().zip(&ranges[Player::P1]) {
         ip_reach[combo as usize] = weight;
     }
-    let (all_total, all_card) = kernel::compat_sums(&evaluator.fold_combos, &ip_reach);
-    let normalizer: f64 = evaluator
-        .fold_combos
+    let (all_total, all_card) = kernel::compat_sums(&fold_combos, &ip_reach);
+    let normalizer: f64 = fold_combos
         .iter()
         .map(|&(_, combo)| {
             let idx = combo as usize;
             let (c1, c2) = combo_cards(idx);
-            let own = evaluator
-                .hands
+            let own = hands
                 .index(Player::P0, idx)
                 .map_or(0.0, |local| ranges[Player::P0][local]);
             own as f64
@@ -1171,6 +1129,25 @@ fn build_with_hands(
         })
         .sum();
     assert!(normalizer > 0.0, "ranges share no compatible combos");
+
+    // Prepare card numbers and seat-local indices once, after sorting by
+    // (rank, global combo). Dense diagnostic games use the same mapping with
+    // identity local indices. The cold reporting API retains global kernels.
+    let prepare = |table: Vec<(HandRank, u32)>| {
+        table
+            .into_iter()
+            .map(|(rank, combo)| kernel::RankEntry::new(rank, combo, &hands))
+            .collect()
+    };
+    let rank_tables = rank_tables.into_iter().map(prepare).collect();
+    let fold_combos = prepare(fold_combos);
+    let mut evaluator = PostflopEvaluator {
+        hands,
+        deal_cards: Vec::new(),
+        terminals,
+        rank_tables,
+        fold_combos,
+    };
 
     let mut tree = PublicTree::compile(TreeSpec {
         root,
@@ -1773,14 +1750,14 @@ mod tests {
         assert!(
             evaluator.rank_tables[0]
                 .windows(2)
-                .all(|pair| pair[0] <= pair[1])
+                .all(|pair| pair[0].rank <= pair[1].rank)
         );
         for table in &evaluator.rank_tables {
-            assert!(table.iter().all(|&(_, combo)| {
-                Player::BOTH
-                    .into_iter()
-                    .any(|p| evaluator.hands.index(p, combo as usize).is_some())
-            }));
+            assert!(
+                table
+                    .iter()
+                    .all(|&entry| { Player::BOTH.into_iter().any(|p| entry.index(p).is_some()) })
+            );
         }
     }
 

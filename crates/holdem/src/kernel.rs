@@ -15,67 +15,130 @@
 //! correct, because every "dead" combo the superset drags in contributes
 //! zero.
 
-use cards::{HandRank, NUM_COMBOS, Player, combo_cards};
+use cards::{HandRank, Player, combo_cards};
 
 use crate::hands::PostflopHands;
 
-/// Bridge seat-local vectors to the historical global-combo kernels. Rank
-/// tables retain global combo ids and their ordering, so the floating-point
-/// sums below are unchanged. The two full-width buffers live only on the
-/// stack for this call; tree storage and evaluator state remain compact.
-fn with_global_combos(
-    hands: &PostflopHands,
-    player: Player,
-    opp_reach: &[f32],
-    out: &mut [f32],
-    evaluate: impl FnOnce(&[f32], &mut [f32]),
-) {
-    assert_eq!(opp_reach.len(), hands.len(player.opponent()));
-    assert_eq!(out.len(), hands.len(player));
-    let mut global_reach = [0.0; NUM_COMBOS];
-    for (&combo, &reach) in hands.combos(player.opponent()).iter().zip(opp_reach) {
-        global_reach[combo as usize] = reach;
+/// A build-time prepared entry in the root support union. The two cards and
+/// both seat-local indices replace the historical global combo id at the same
+/// eight-byte footprint. Tables retain (rank, global combo) order; local IDs
+/// stay fixed across subsequent public deals.
+#[derive(Clone, Copy, Debug)]
+#[repr(C)]
+pub(crate) struct RankEntry {
+    pub(crate) rank: HandRank,
+    cards: [u8; 2],
+    indices: [u16; 2],
+}
+
+const ABSENT: u16 = u16::MAX;
+const _: () = assert!(std::mem::size_of::<RankEntry>() == 8);
+
+impl RankEntry {
+    pub(crate) fn new(rank: HandRank, combo: u32, hands: &PostflopHands) -> Self {
+        let (a, b) = combo_cards(combo as usize);
+        Self {
+            rank,
+            cards: [a.index() as u8, b.index() as u8],
+            indices: Player::BOTH
+                .map(|p| hands.index(p, combo as usize).map_or(ABSENT, |i| i as u16)),
+        }
     }
-    let mut global_out = [0.0; NUM_COMBOS];
-    evaluate(&global_reach, &mut global_out);
-    for (&combo, value) in hands.combos(player).iter().zip(out) {
-        *value = global_out[combo as usize];
+
+    pub(crate) fn index(self, player: Player) -> Option<usize> {
+        let index = self.indices[player.index()];
+        (index != ABSENT).then_some(index as usize)
+    }
+
+    fn reach(self, opponent: Player, reach: &[f32]) -> f64 {
+        self.index(opponent).map_or(0.0, |i| reach[i] as f64)
     }
 }
 
+fn compact_compat_sums(
+    sorted: &[RankEntry],
+    opponent: Player,
+    opp_reach: &[f32],
+) -> (f64, [f64; 52]) {
+    let mut total = 0.0;
+    let mut per_card = [0.0; 52];
+    for &entry in sorted {
+        let r = entry.reach(opponent, opp_reach);
+        if r != 0.0 {
+            total += r;
+            per_card[entry.cards[0] as usize] += r;
+            per_card[entry.cards[1] as usize] += r;
+        }
+    }
+    (total, per_card)
+}
+
 /// Showdown evaluation with seat-local reach and CFV indices.
+/// The linear equal-rank sweep and every floating-point accumulation order
+/// match `showdown_kernel`, without expanding either vector to 1,326 hands.
 pub(crate) fn showdown_kernel_compact(
-    sorted: &[(HandRank, u32)],
+    sorted: &[RankEntry],
     utilities: [f64; 3],
-    hands: &PostflopHands,
     player: Player,
     opp_reach: &[f32],
     out: &mut [f32],
 ) {
-    with_global_combos(hands, player, opp_reach, out, |reach, values| {
-        showdown_kernel(
-            sorted,
-            utilities[0],
-            utilities[1],
-            utilities[2],
-            reach,
-            values,
-        );
-    });
+    let opponent = player.opponent();
+    let (all_total, all_card) = compact_compat_sums(sorted, opponent, opp_reach);
+    let mut below_total = 0.0;
+    let mut below_card = [0.0; 52];
+    let mut group_start = 0;
+    while group_start < sorted.len() {
+        let rank = sorted[group_start].rank;
+        let mut group_end = group_start;
+        while group_end < sorted.len() && sorted[group_end].rank == rank {
+            group_end += 1;
+        }
+        let group = &sorted[group_start..group_end];
+        let (group_total, group_card) = compact_compat_sums(group, opponent, opp_reach);
+        for &entry in group {
+            let Some(index) = entry.index(player) else {
+                continue;
+            };
+            let [a, b] = entry.cards.map(usize::from);
+            let own_reach = entry.reach(opponent, opp_reach);
+            let win = below_total - below_card[a] - below_card[b];
+            let tie = group_total - group_card[a] - group_card[b] + own_reach;
+            let compat = all_total - all_card[a] - all_card[b] + own_reach;
+            let lose = compat - win - tie;
+            out[index] = (utilities[0] * win + utilities[1] * tie + utilities[2] * lose) as f32;
+        }
+        below_total += group_total;
+        // Keep combo-wise additions, rather than adding the aggregated group
+        // card sums, to preserve the historical floating-point order.
+        for &entry in group {
+            let r = entry.reach(opponent, opp_reach);
+            if r != 0.0 {
+                below_card[entry.cards[0] as usize] += r;
+                below_card[entry.cards[1] as usize] += r;
+            }
+        }
+        group_start = group_end;
+    }
 }
 
 /// Fold evaluation with seat-local reach and CFV indices.
 pub(crate) fn fold_kernel_compact(
-    sorted: &[(HandRank, u32)],
+    sorted: &[RankEntry],
     utility: f64,
-    hands: &PostflopHands,
     player: Player,
     opp_reach: &[f32],
     out: &mut [f32],
 ) {
-    with_global_combos(hands, player, opp_reach, out, |reach, values| {
-        fold_kernel(sorted, utility, reach, values);
-    });
+    let opponent = player.opponent();
+    let (all_total, all_card) = compact_compat_sums(sorted, opponent, opp_reach);
+    for &entry in sorted {
+        if let Some(index) = entry.index(player) {
+            let [a, b] = entry.cards.map(usize::from);
+            let compat = all_total - all_card[a] - all_card[b] + entry.reach(opponent, opp_reach);
+            out[index] = (utility * compat) as f32;
+        }
+    }
 }
 
 /// Sum of `opp_reach` over combos disjoint from hand `h`, via
@@ -176,3 +239,7 @@ pub(crate) fn fold_kernel(sorted: &[(HandRank, u32)], u: f64, opp_reach: &[f32],
         out[combo as usize] = (u * compat) as f32;
     }
 }
+
+#[cfg(test)]
+#[path = "kernel_tests.rs"]
+mod tests;

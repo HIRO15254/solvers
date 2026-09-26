@@ -6,6 +6,7 @@ They are decision inputs, not current execution instructions or public contracts
 - [Roadmap survey](solver-roadmap-survey-2026-09-20.jp.md): code gaps and external research as of 2026-09-20.
 - [Cloud cost estimate](solver-cloud-cost-estimate-2026-09-20.jp.md): dated prices and resource assumptions; revisit before spending.
 - [Structure audit](ai-development-structure-audit-2026-09-25.jp.md): pre-reorganization findings and proposal. The adopted workflow is in [the migration decision](../decisions/2026-09-25-development-workflow.jp.md).
+- [Exact postflop weight proposal](2026-09-27-postflop-exact-weight-proposal.jp.md): unaccepted linear card-removal arithmetic for very different f32 reaches; proof, fallback and validation boundaries. This is separate from the adopted prepared-index optimization.
 
 Accepted execution plans are in [plans](../plans/solver-implementation-plan.jp.md),
 including [R0 work tickets](../plans/r0-execution-plan.jp.md).

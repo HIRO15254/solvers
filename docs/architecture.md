@@ -142,7 +142,11 @@ HU Postflopの`PostflopHands`は、席ごとの初期rangeでweight > 0かつ開
 global combo昇順でlocal IDへ写す。後続dealは番号を変えず、席別のmask/疎同型遷移を使う。
 regret/strategy arenaとreach/CFVは席別次元、順位表とfold表はroot supportの和集合だけを保持する。
 正の微小weight、compatible root pair normalizer、配札分母45/44は変えない。
-terminal kernelへの接続は一時stack配列でglobal combo順を保ち、永続の全手札bufferを持たない。
+terminal順位表はbuild時に役強さを計算し、同一の完成boardで共有する。`(rank, global combo)`順の
+各8-byte entryに役強さ、2枚のカード番号、両席のlocal ID（席に無い場合はsentinel）を保持し、
+評価中のカード逆引きと全1,326手札への一時展開を省く。showdownは同順位groupの和と
+strict-below累積からカード除去を行う線形走査で、reachの加算順はglobal combo表と同じ。
+表に無いboard衝突手札のCFVはcallerがゼロにし、fold表は開始boardのsupport和集合を共有する。
 `evaluator.hands()`がreporting境界のglobal/local変換を提供する。chanceの代表カードは
 `tree.deals`と対応する明示metadataを保持するため、疎なmaskからカードを推定しない。
 `I16Storage`の量子化scaleはnode内の保持列に依存するため、初期weightがゼロの列を除く

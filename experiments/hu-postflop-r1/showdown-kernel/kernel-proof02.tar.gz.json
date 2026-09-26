@@ -1,0 +1,8 @@
+{
+  "archive": "/opt/r1/kernel-proof02.tar.gz",
+  "bytes": 8089211,
+  "sha256": "28707ceba11324ddc8aef84a740e3c334ec59b19dac0e1c5ec9ed7f29c3bab69",
+  "original_bytes": 20654757,
+  "members": 194,
+  "selected": "plan/result/retention/verification and every CAS payload; stages are duplicate originals"
+}

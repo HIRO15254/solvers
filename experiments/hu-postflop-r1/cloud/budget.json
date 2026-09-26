@@ -23,6 +23,71 @@
   ],
   "reservations": [
     {
+      "id": "r1-20260926-09",
+      "project": "solvers-abstraction-20260723",
+      "zone": "us-central1-b",
+      "instance": "solvers-r1-20260926-09",
+      "reserved_usd": 3,
+      "billed_usd": null,
+      "reservation_released": false,
+      "maximum_runtime_hours": 4,
+      "machine_type": "e2-standard-4",
+      "disk_type": "pd-balanced",
+      "disk_gib": 40,
+      "maximum_download_gib": 1,
+      "pricing_checked_utc": "2026-09-26",
+      "conservative_compute_usd_hour": 0.14,
+      "disk_usd_gib_hour": 0.000137,
+      "ipv4_usd_hour": 0.0025,
+      "reserved_egress_usd_gib": 0.3,
+      "tax_price_delay_and_other_reserve_usd": 1,
+      "instance_termination_action": "STOP",
+      "explicit_disk_cleanup_hours": 24,
+      "purpose": "Prepared showdown/fold card and seat-local indices; old/new fresh release builds and full workspace validation on a small Spot VM.",
+      "pricing_sources": [
+        "https://cloud.google.com/products/compute/pricing/general-purpose",
+        "https://cloud.google.com/compute/disks-image-pricing",
+        "https://cloud.google.com/vpc/network-pricing"
+      ],
+      "note": "4.02h compute/IP at rounded on-demand price + 40GiB disk up to 24h + 1GiB egress + $1 margin = $2.00437 < $3. No asserted Spot invoice. Full held reservation grows $26 to $29/$40. Absolute STOP deadline fixed at launch, no automatic restart or extension. Explicit VM and disk deletion after evidence recovery.",
+      "events": [
+        {
+          "at": "2026-09-26T14:43:19.656Z",
+          "event": "initial_running",
+          "instance_id": "5775064646140191983",
+          "boot_id": "02dcc8e8-f1c9-4ec6-a657-f0f9b12c0f0f",
+          "absolute_stop_deadline_utc": "2026-09-26T18:43:07Z"
+        },
+        {
+          "at": "2026-09-26T15:01:42.258Z",
+          "event": "compute.instances.preempted",
+          "last_stop": "2026-09-26T15:01:55.386Z",
+          "new_validation": "Process records completed before stop, but recovered raw validation evidence failed three hashes; old build interrupted; no performance samples started. Fresh same-boot validation subsequently supersedes it.",
+          "evidence": "../showdown-kernel/vm09-operations-1510.json"
+        },
+        {
+          "at": "2026-09-26T15:04:51.102Z",
+          "event": "manual_restart_same_reservation_and_deadline",
+          "boot_id": "ac2eeb5d-385c-4ea1-95b6-1b545ce65a85",
+          "absolute_stop_deadline_utc": "2026-09-26T18:43:07Z",
+          "fresh_targets": "new full validation and old release build in kernel-new-r2 and kernel-old-r2; source archives unchanged"
+        },
+        {
+          "at": "2026-09-26T15:38:37.2805183+00:00",
+          "event": "explicit_delete_and_absence_verification",
+          "instance_id": "5775064646140191983",
+          "disk_id": "2452169262360061167",
+          "evidence": "../showdown-kernel/cleanup.json",
+          "instances": [],
+          "disks": [],
+          "reserved_addresses": [],
+          "reservation_released": false,
+          "billed_usd": null
+        }
+      ],
+      "disposition": "VM09 and its 40GiB disk explicitly deleted after the 8,089,211-byte proof was downloaded and independently verified. Project instance, disk and reserved-address lists empty at 2026-09-26T15:38:37.2805183Z. Final same-boot validation: 933 workspace tests plus four selected release tests, 32 old/new sample output identities. First boot raw-evidence failure and first preparation CPU-quota failure retained separately. Invoice unknown; full $3 reservation held, cumulative $29/$40."
+    },
+    {
       "id": "r1-20260926-08-scale32",
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
@@ -80,11 +145,11 @@
           "note": "Old/new fresh build same newboot; previous completed Intelbaseline retained separately. Fullvalidation bound04:25Z, no deadline/budget extension."
         },
         {
-          "at": "2026-09-26T04:00:40.671000+00:00",
+          "at": "2026-09-26T13:00:40.671+09:00",
           "event": "explicit_delete_and_absence_verification",
           "operation_id": "operation-1790395190812-65c5add5b1f30-1405c0d3-0848aa19",
           "instance_id": "1635613034982056517",
-          "reconciled_at_utc": "2026-09-26T04:01:25.6238650Z",
+          "reconciled_at_utc": "2026-09-26T04:01:25.623865Z",
           "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm08/reconciliation.json",
           "reservation_released": false,
           "billed_usd": null
@@ -122,7 +187,7 @@
       ],
       "events": [
         {
-          "at": "2026-09-26T02:06:33.653402+00:00",
+          "at": "2026-09-26T11:06:33.653402+09:00",
           "event": "reserve_additional_1_usd_for_planned_resize",
           "from_machine": "e2-standard-2",
           "to_machine": "e2-standard-4",
@@ -132,11 +197,11 @@
           "note": "Reserve $3 covers all 6.02 hours at rounded-up $0.14/h plus IPv4, 40 GiB disk for24h, <=1GiB egress at $0.30/GiB and $1 other margin. Existing reservation extended by $1, no new deadline."
         },
         {
-          "at": "2026-09-26T04:00:40.671000+00:00",
+          "at": "2026-09-26T13:00:40.671+09:00",
           "event": "explicit_delete_and_absence_verification",
           "operation_id": "operation-1790395190812-65c5add5b1f30-1405c0d3-0848aa19",
           "instance_id": "1635613034982056517",
-          "reconciled_at_utc": "2026-09-26T04:01:25.6238650Z",
+          "reconciled_at_utc": "2026-09-26T04:01:25.623865Z",
           "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm08/reconciliation.json",
           "reservation_released": false,
           "billed_usd": null
@@ -170,12 +235,12 @@
       "disposition": "All five evidence bundles downloaded and independently verified, including the one size-limited canonical payload in a supplement. Explicit delete completed 2026-09-25T20:32:24.560000+00:00; instance, disk and reserved address lists empty at 2026-09-25T20:34:35.914890+00:00. Actual billing unavailable; full $5 reservation remains held, cumulative held $20/$20.",
       "events": [
         {
-          "at": "2026-09-25T20:32:24.560000+00:00",
+          "at": "2026-09-26T05:32:24.56+09:00",
           "event": "explicit_delete_and_absence_verification",
           "operation_id": "operation-1790368292611-65c549a19275b-c378f14c-2f16d2d9",
           "instance_id": "841167209049583155",
           "operation_status": "DONE",
-          "reconciled_at_utc": "2026-09-25T20:34:35.914890+00:00",
+          "reconciled_at_utc": "2026-09-26T05:34:35.91489+09:00",
           "instances": [],
           "disks": [],
           "reserved_addresses": [],
@@ -324,7 +389,7 @@
           "event": "compute.instances.preempted",
           "operation_id": "systemevent-1790357520474-65c5218076025-20ecd92f-79ac2d33",
           "instance_id": "5209515640504390740",
-          "last_stop": "2026-09-25T17:32:27.860Z",
+          "last_stop": "2026-09-25T17:32:27.86Z",
           "state": "TERMINATED",
           "action": "STOP",
           "restart_attempt": "within original reservation; unchanged absolute termination time 2026-09-25T20:09:11Z; no new VM or reservation"
@@ -335,7 +400,7 @@
           "operation_id": "operation-1790361536355-65c530764dc04-894c9ce0-da0c5288",
           "instance_id": "5209515640504390740",
           "operation_status": "DONE",
-          "reconciled_at_utc": "2026-09-25T18:40:38.6204118+00:00",
+          "reconciled_at_utc": "2026-09-26T03:40:38.6204118+09:00",
           "instances": [],
           "disks": [],
           "reserved_addresses": [],

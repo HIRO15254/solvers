@@ -1,0 +1,499 @@
+{
+  "schema": "r1.showdown-kernel-independent-audit/v1",
+  "outcome": "verified",
+  "gating_issues": [],
+  "method": "Independent standard-library reads of retained payloads, archive exact sets, raw benchmark reports/binaries/supervisor samples/test stdout; separately reran trusted portable verify.py successfully. No solver/build/VM operation.",
+  "evidence": {
+    "plan.json": {
+      "bytes": 13749,
+      "sha256": "866c86882792281b66dd02d553f8c7f94e5daefbc37fd2b70d21150c09cbd181"
+    },
+    "result.json": {
+      "bytes": 432361,
+      "sha256": "c524f9780d87089cbbb4aa5ab2cbd8659ab5664c7eb6a0a5ce28874a99837ea0"
+    },
+    "retention.json": {
+      "bytes": 93676,
+      "sha256": "abf5865b999b2cba68cd09106da97245b41b3235f0fa2c683a306f86fe471c5a"
+    },
+    "verification.json": {
+      "bytes": 6751,
+      "sha256": "f3722d17aec8289d2866905cfe93e7c2a5614636944e96b913976c7bf1c6494c"
+    }
+  },
+  "retained_paths": 347,
+  "unique_payloads": 190,
+  "unique_payload_bytes": 20108220,
+  "host": {
+    "boot_id": "ac2eeb5d-385c-4ea1-95b6-1b545ce65a85",
+    "machine": "x86_64",
+    "logical_cpus": 4,
+    "affinity": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "topology": [
+      {
+        "cpu": 0,
+        "core": "0",
+        "socket": "0"
+      },
+      {
+        "cpu": 1,
+        "core": "1",
+        "socket": "0"
+      },
+      {
+        "cpu": 2,
+        "core": "0",
+        "socket": "0"
+      },
+      {
+        "cpu": 3,
+        "core": "1",
+        "socket": "0"
+      }
+    ],
+    "cpu_models": [
+      "Intel(R) Xeon(R) CPU @ 2.20GHz"
+    ],
+    "cgroup": {
+      "path": "/sys/fs/cgroup/system.slice/r1-kernel-measure02.service",
+      "memory_max": "12884901888",
+      "swap_max": "0",
+      "cpu_limits": {
+        "/sys/fs/cgroup/system.slice/r1-kernel-measure02.service": "400000 100000",
+        "/sys/fs/cgroup/system.slice": "max 100000"
+      }
+    }
+  },
+  "source": {
+    "old": {
+      "base_commit": "d8135a12c22c9d5e70216380298bda480e63ad05",
+      "dirty": false,
+      "file_count": 361,
+      "archive": {
+        "path": "/opt/r1/kernel-old-r2/source-candidate.tar.gz",
+        "bytes": 1368704,
+        "sha256": "f8aa610da21e9a6115d485f362b637c78befd56ce38f67da1b63cfa382bd3d6b"
+      },
+      "manifest": {
+        "path": "/opt/r1/kernel-old-r2/source-candidate-manifest.json",
+        "bytes": 66068,
+        "sha256": "07cb59711c021c3f4ac480ab199d8e982702d6e3a238e967af13ec9f8ed34d09"
+      },
+      "binary": {
+        "path": "/opt/r1/target/kernel-old-r2/release/examples/hu_scaling_bench",
+        "bytes": 3899504,
+        "sha256": "eb3b59e16012090113ea214d2f9e959fef25103b6691e07396524b5b04a02f45"
+      }
+    },
+    "new": {
+      "base_commit": "d8135a12c22c9d5e70216380298bda480e63ad05",
+      "dirty": true,
+      "file_count": 362,
+      "archive": {
+        "path": "/opt/r1/kernel-new-r2/source-candidate.tar.gz",
+        "bytes": 1372873,
+        "sha256": "a159aebe99e10410ad9e72f523fae5fc8127ee94f30d9d13c3fbb651b0addc13"
+      },
+      "manifest": {
+        "path": "/opt/r1/kernel-new-r2/source-candidate-manifest.json",
+        "bytes": 66442,
+        "sha256": "7b750fe10b3328c9d46c27c8ed7e688492ccd18db998f8cc63ac7b8c61e0635c"
+      },
+      "binary": {
+        "path": "/opt/r1/target/kernel-new-r2/release/examples/hu_scaling_bench",
+        "bytes": 3900568,
+        "sha256": "54b85c3886de32e45510b9bee2ff71e0f9440c07e3ee9e224c034da54e94145a"
+      }
+    }
+  },
+  "builds": {
+    "old": {
+      "mode": "release-build-only",
+      "boot_id": "ac2eeb5d-385c-4ea1-95b6-1b545ce65a85",
+      "stages": [
+        {
+          "label": "toolchain",
+          "status": "completed"
+        },
+        {
+          "label": "release-example",
+          "status": "completed"
+        }
+      ]
+    },
+    "new": {
+      "mode": "full-validation",
+      "boot_id": "ac2eeb5d-385c-4ea1-95b6-1b545ce65a85",
+      "stages": [
+        {
+          "label": "toolchain",
+          "status": "completed"
+        },
+        {
+          "label": "fmt",
+          "status": "completed"
+        },
+        {
+          "label": "clippy",
+          "status": "completed"
+        },
+        {
+          "label": "workspace-tests",
+          "status": "completed",
+          "summaries": 56,
+          "passed": 933,
+          "failed": 0,
+          "ignored": 31,
+          "test_targets": 44,
+          "doc_targets": 12,
+          "kernel_test_lines": [
+            "test kernel::tests::compact_kernel_rank_entry_stays_eight_bytes ... ok",
+            "test kernel::tests::compact_kernels_match_old_bits_and_pairwise_after_public_card_masks ... ok",
+            "test kernel::tests::compact_kernels_match_old_bits_and_pairwise_on_asymmetric_overlapping_support ... ok",
+            "test kernel::tests::compact_kernels_preserve_historical_tiny_reach_rounding_bits ... ok",
+            "test kernel::tests::compact_kernels_remove_identical_and_shared_card_only_opponents ... ok",
+            "test kernel::tests::compact_kernels_match_old_bits_and_pairwise_with_full_support ... ok"
+          ]
+        },
+        {
+          "label": "docs",
+          "status": "completed"
+        },
+        {
+          "label": "release-example",
+          "status": "completed"
+        },
+        {
+          "label": "release-oracle",
+          "status": "completed",
+          "summaries": 1,
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0,
+          "test_targets": 1,
+          "doc_targets": 0
+        },
+        {
+          "label": "release-river-resolve",
+          "status": "completed",
+          "summaries": 1,
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "test_targets": 1,
+          "doc_targets": 0
+        }
+      ]
+    }
+  },
+  "measurement_started_at": "2026-09-26T15:29:31.063237+00:00",
+  "measurement_ended_at": "2026-09-26T15:31:19.374903+00:00",
+  "cases": {
+    "river": {
+      "samples": 8,
+      "warmups": 2,
+      "measured": 6,
+      "iterations": 1000,
+      "all_original_bytes_and_metadata_equal": true,
+      "canonical_sha256": "ccfbf8d976402613d2b0c3cd87bcadb0e1dfe4480bcc9a627806e4bec5a119f5",
+      "state_sha256": "59010cb9b0cd119270caa521767b49c245c2cad9fdb95b7bbde3fa7739fcbd66",
+      "quality_bits": {
+        "nash_conv_f64_bits_hex": "3fdc163b6fb22ce8",
+        "solver_br_f64_bits_hex": [
+          "c0440cd8bf18ef81",
+          "c0025b255398cd53"
+        ],
+        "solver_ev_f64_bits_hex": [
+          "c0442d2eca7ec12f",
+          "c003d88c0b31f810"
+        ]
+      },
+      "counts": {
+        "action_nodes": 132,
+        "deals": 0,
+        "f32_storage_payload_bytes": 1524096,
+        "nodes": 393,
+        "normalizer": 9361.537572225396,
+        "retained_support_counts": [
+          493,
+          479
+        ],
+        "root_dims": [
+          493,
+          479
+        ],
+        "root_subtree_has_chance": false,
+        "storage_elements_per_buffer": 190512
+      },
+      "timing": {
+        "old": {
+          "raw_run_seconds": [
+            8.763098226,
+            8.791128739,
+            8.758821479
+          ],
+          "phase_medians_seconds": {
+            "prepare": 0.001107653,
+            "build": 0.000758365,
+            "solver_init": 3.2921e-05,
+            "run": 8.763098226
+          },
+          "sampled_full_rss_median_bytes": 8081408,
+          "full_process_median_seconds": 8.941442451000057
+        },
+        "new": {
+          "raw_run_seconds": [
+            6.285461408,
+            6.258375799,
+            6.292203861
+          ],
+          "phase_medians_seconds": {
+            "prepare": 0.001088136,
+            "build": 0.000764304,
+            "solver_init": 3.027e-05,
+            "run": 6.285461408
+          },
+          "sampled_full_rss_median_bytes": 7950336,
+          "full_process_median_seconds": 6.392119520000051
+        }
+      },
+      "new_over_old_run_median": 0.7172647442603252,
+      "new_faster_pairs": 3
+    },
+    "turn": {
+      "samples": 8,
+      "warmups": 2,
+      "measured": 6,
+      "iterations": 1000,
+      "all_original_bytes_and_metadata_equal": true,
+      "canonical_sha256": "b24560f6ef21c68d2d41a8ee18d9612ee85fa5154e272d4d2bd2ab457e1c5775",
+      "state_sha256": "fb01ef55554c69123801a25cfa5fa1985c79666d0f02c7b3d40e3ae7b5c8208a",
+      "quality_bits": {
+        "nash_conv_f64_bits_hex": "3f62a3da12f68000",
+        "solver_br_f64_bits_hex": [
+          "402195ef35ba7819",
+          "c02194c4da12f685"
+        ],
+        "solver_ev_f64_bits_hex": [
+          "4021958fb425ed09",
+          "c021958f961f9add"
+        ]
+      },
+      "counts": {
+        "action_nodes": 580,
+        "deals": 144,
+        "f32_storage_payload_bytes": 180960,
+        "nodes": 1305,
+        "normalizer": 324.0,
+        "retained_support_counts": [
+          19,
+          20
+        ],
+        "root_dims": [
+          19,
+          20
+        ],
+        "root_subtree_has_chance": true,
+        "storage_elements_per_buffer": 22620
+      },
+      "timing": {
+        "old": {
+          "raw_run_seconds": [
+            1.727956732,
+            1.7313617529999998,
+            1.73145696
+          ],
+          "phase_medians_seconds": {
+            "prepare": 9.7112e-05,
+            "build": 0.002219723,
+            "solver_init": 1.8837e-05,
+            "run": 1.7313617529999998
+          },
+          "sampled_full_rss_median_bytes": 6266880,
+          "full_process_median_seconds": 1.8224404330001107
+        },
+        "new": {
+          "raw_run_seconds": [
+            1.292089334,
+            1.289026457,
+            1.298379927
+          ],
+          "phase_medians_seconds": {
+            "prepare": 8.7917e-05,
+            "build": 0.002329269,
+            "solver_init": 1.9286e-05,
+            "run": 1.292089334
+          },
+          "sampled_full_rss_median_bytes": 6303744,
+          "full_process_median_seconds": 1.399058162999836
+        }
+      },
+      "new_over_old_run_median": 0.7462850162660374,
+      "new_faster_pairs": 3
+    },
+    "flop": {
+      "samples": 8,
+      "warmups": 2,
+      "measured": 6,
+      "iterations": 50,
+      "all_original_bytes_and_metadata_equal": true,
+      "canonical_sha256": "b9adfd9c08b5ca65f9feb9dec853afbfd7c50c2d7c0a2e7a75167456cff339ec",
+      "state_sha256": "36b6e0ec5f9a2937dab1a72b97e8fb50eab1fe6ca773e04a0fc6ab572719f607",
+      "quality_bits": {
+        "nash_conv_f64_bits_hex": "3fa2ca0000000000",
+        "solver_br_f64_bits_hex": [
+          "bffefdbd638e38e4",
+          "3fff940f00000000"
+        ],
+        "solver_ev_f64_bits_hex": [
+          "bfff35aef1c71c72",
+          "3fff35b08e38e38e"
+        ]
+      },
+      "counts": {
+        "action_nodes": 14410,
+        "deals": 7203,
+        "f32_storage_payload_bytes": 345936,
+        "nodes": 21618,
+        "normalizer": 9.0,
+        "retained_support_counts": [
+          3,
+          3
+        ],
+        "root_dims": [
+          3,
+          3
+        ],
+        "root_subtree_has_chance": true,
+        "storage_elements_per_buffer": 43242
+      },
+      "timing": {
+        "old": {
+          "raw_run_seconds": [
+            0.454520247,
+            0.454137315,
+            0.453815835
+          ],
+          "phase_medians_seconds": {
+            "prepare": 0.000117346,
+            "build": 0.026504802,
+            "solver_init": 5.5016e-05,
+            "run": 0.454137315
+          },
+          "sampled_full_rss_median_bytes": 14680064,
+          "full_process_median_seconds": 0.6549314820001655
+        },
+        "new": {
+          "raw_run_seconds": [
+            0.406425719,
+            0.410626748,
+            0.406163567
+          ],
+          "phase_medians_seconds": {
+            "prepare": 0.000100901,
+            "build": 0.026473606,
+            "solver_init": 5.2382e-05,
+            "run": 0.406425719
+          },
+          "sampled_full_rss_median_bytes": 14278656,
+          "full_process_median_seconds": 0.5490911179999785
+        }
+      },
+      "new_over_old_run_median": 0.8949401548296027,
+      "new_faster_pairs": 3
+    },
+    "narrow-river": {
+      "samples": 8,
+      "warmups": 2,
+      "measured": 6,
+      "iterations": 10000,
+      "all_original_bytes_and_metadata_equal": true,
+      "canonical_sha256": "9e4e863e95db52a36670d76ab9bd101709714e2e4268f924f5d5dd391dce3c3d",
+      "state_sha256": "23a1bd9422432f976fbec07bf9b4f749403f6777a6e889beab2d10c61f29ea11",
+      "quality_bits": {
+        "nash_conv_f64_bits_hex": "0000000000000000",
+        "solver_br_f64_bits_hex": [
+          "4024000000000000",
+          "c024000000000000"
+        ],
+        "solver_ev_f64_bits_hex": [
+          "4024000000000000",
+          "c024000000000000"
+        ]
+      },
+      "counts": {
+        "action_nodes": 10,
+        "deals": 0,
+        "f32_storage_payload_bytes": 312,
+        "nodes": 27,
+        "normalizer": 2.0,
+        "retained_support_counts": [
+          2,
+          1
+        ],
+        "root_dims": [
+          2,
+          1
+        ],
+        "root_subtree_has_chance": false,
+        "storage_elements_per_buffer": 39
+      },
+      "timing": {
+        "old": {
+          "raw_run_seconds": [
+            0.093140636,
+            0.092674434,
+            0.092597328
+          ],
+          "phase_medians_seconds": {
+            "prepare": 8.2845e-05,
+            "build": 0.000865544,
+            "solver_init": 1.942e-06,
+            "run": 0.092674434
+          },
+          "sampled_full_rss_median_bytes": 5558272,
+          "full_process_median_seconds": 0.2308011620000343
+        },
+        "new": {
+          "raw_run_seconds": [
+            0.065148919,
+            0.064023814,
+            0.065203039
+          ],
+          "phase_medians_seconds": {
+            "prepare": 9.7231e-05,
+            "build": 0.000852991,
+            "solver_init": 1.479e-06,
+            "run": 0.065148919
+          },
+          "sampled_full_rss_median_bytes": 5431296,
+          "full_process_median_seconds": 0.12483089100010147
+        }
+      },
+      "new_over_old_run_median": 0.7029869640207352,
+      "new_faster_pairs": 3
+    }
+  },
+  "geometric_mean_new_over_old_run_median": 0.7617831605803252,
+  "all_case_ratios_le_1_05": true,
+  "geomean_le_0_95": true,
+  "memory": {
+    "native_peak_distinct_bytes": [
+      52080640
+    ],
+    "native_samples": 32,
+    "memory_reduction_claim_supported": false,
+    "interpretation": "Constant native high-water mark in all 32 processes is not a solver-memory estimate. Fork/exec launcher influence is plausible but not diagnosed; sampled full-process RSS is a different metric and varies by case/arm. No memory claim."
+  },
+  "limits": [
+    "Four F32 fixtures, one worker, one guest boot with two reported physical cores/four logical CPUs; three measured pairs per fixture are descriptive, not confidence intervals.",
+    "Flop and narrow River solve medians are below one second; the protocol nevertheless included all four fixtures prospectively.",
+    "Build/initialization timings are separate from solver run; source-after is recorded live hashing, not an independent filesystem snapshot.",
+    "No I16, tiny-weight cancellation, external-reference or overall R1 acceptance claim."
+  ]
+}

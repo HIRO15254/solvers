@@ -1,0 +1,24 @@
+{
+  "schema": "r1.showdown-kernel-protocol/v1",
+  "scope": "Prospective old d8135a1 versus prepared-card/seat-local terminal kernels. F32 compact, one worker, four fixed fixtures. Descriptive implementation screen, not R1 acceptance or tiny-weight cancellation repair.",
+  "old_revision": "d8135a12c22c9d5e70216380298bda480e63ad05",
+  "logical_cpus": 4,
+  "threads": 1,
+  "layout": "compact",
+  "cases": {
+    "river": {"file": "river.toml", "iterations": 1000},
+    "turn": {"file": "turn.toml", "iterations": 1000},
+    "flop": {"file": "flop.toml", "iterations": 50},
+    "narrow-river": {"file": "narrow-river.toml", "iterations": 10000}
+  },
+  "config_directory": "experiments/hu-postflop-r1/range-scaling/configs",
+  "warmup_blocks": 1,
+  "measured_blocks": 3,
+  "order": "Case order river, turn, flop, narrow-river. Within each case run blocks 0..3; block zero is warmup. Old precedes new when (case-index + block) is even; otherwise new precedes old. Total 32 processes, 24 measured. Each case's three measured pairs cannot perfectly balance order; across cases each order occurs six times. No pilot, iteration adjustment, retry or case replacement.",
+  "guard": {"geometric_mean_new_over_old_max": 0.95, "every_case_new_over_old_max": 1.05},
+  "correctness": "All eight outputs per case must have identical original canonical.bin and state.bin bytes (also SHA256), all quality fields including EV/BR/NashConv bits, global combo IDs, counts/tree topology, normalized config, algorithm, rake and utility. All warmups count for correctness and remain retained; only measured blocks enter timing summaries. F32 only.",
+  "limits": {"sample_timeout_seconds": 300, "rss_bytes": 10737418240, "outer_memory_max_bytes": 12884901888, "min_free_bytes": 1073741824, "disk_reserve_bytes": 4294967296, "poll_seconds": 0.1, "grace_seconds": 5, "kill_wait_seconds": 5},
+  "measurement": "Old/new release builds and all samples must share one Linux x86_64 boot with four logical CPUs, full affinity, unrestricted or at least four-CPU quota, <=12GiB outer cgroup and swap.max=0. RAYON_NUM_THREADS=1 and explicit --threads 1. No concurrent build, transfer or experiment. Solver run_seconds alone defines timing guards; setup/query/artifact time is excluded. Native wait4 peak RSS covers the full process; sampled summed process-tree RSS is separate and may miss peaks. Neither is solve-only RSS. Three pairs and short fixtures yield descriptive guardrails, not confidence intervals or cross-host performance guarantees.",
+  "retention": "Self-contained original-byte payloads plus a path/SHA256 index. Source archives are read and verified without executing retained code. Compiler/Python binaries are identity-only; benchmark binaries, source archives, manifests, runner/protocol, build records, raw logs/samples and benchmark artifacts are retained. Source-after means recorded live rehash, not an independent filesystem snapshot.",
+  "failure": "No automatic retry. On any execution, identity, quality or deadline failure stop, mark the exact remaining schedule skipped, retain raw evidence and report no adoption guard. Require at least timeout+20 seconds before starting a process. Prepare and measure are separate; external service must enforce the absolute deadline. A failed prepare cannot be resumed. Protocol and all counts/thresholds freeze before measurement."
+}
