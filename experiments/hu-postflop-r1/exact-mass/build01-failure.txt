@@ -1,0 +1,6 @@
+Started r1-exact-build01.service - /bin/bash /opt/r1/exact-control/build-pair01.sh.
+/opt/r1/exact-control/build-pair01.sh: line 2: set: pipefail
+: invalid option name
+r1-exact-build01.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+r1-exact-build01.service: Failed with result 'exit-code'.
+source-directories-not-created

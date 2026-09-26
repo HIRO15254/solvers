@@ -500,6 +500,11 @@ postflop の `--history` は solve / resume とも拒否する。
 `inspect` の `eq` は現在の board と両者の到達レンジを使う。`range` は root range、
 `ev` は run 全体の root summary である。ハンド別 EV は `export ... ev --node ...` を使う。
 EV は元の subgame 開始基準を維持し、chip-EV は chip、ICM は prize 単位。
+Postflopのカード除去massは減算終了まで厳密に保持してf64へ丸め、per-hand EVの分母にも使う。
+SOLの条件付きEVでは分母をf32へ戻し、除算もf32で行う。
+`eq`は勝ち・引分けの分子をf64で保持して最後に比を取る。solverのreach/CFVのf32丸めと
+保存量子化は別に残り、極小reachの条件付きEV全体の相対精度を保証しない。
+保存済みの値をこの数値修正で暗黙に更新することはない。
 
 レーキまたは外部 field を含む ICM の一般和設定では `validate` は
 `general-sum utilities, no Nash convergence guarantee` と表示する。

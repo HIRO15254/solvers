@@ -1,0 +1,221 @@
+{
+  "schema": "r1.exact-mass-primitive-checks/v1",
+  "source_manifest": {
+    "path": "../source-new04/source-candidate-manifest.json",
+    "bytes": 68137,
+    "sha256": "1a84947f6daa9ca1c57d5f48e4914e176643dbe9c787262ded95dcf6aba042d6"
+  },
+  "source_archive": {
+    "sha256": "51068bb8464b57b91d11fe1ce1be848f14cd83e26865661afeeee3c70a3e9cd7",
+    "bytes": 1400466,
+    "availability": "Candidate04 source pack; retained separately by the main experiment, no duplicate source copied here."
+  },
+  "source_pins": [
+    {
+      "source_path": "tools/run_supervised.py",
+      "original_pin": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+        "bytes": 39015
+      }
+    },
+    {
+      "source_path": "crates/holdem/src/mass.rs",
+      "original_pin": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\mass.rs",
+        "sha256": "6937d14f2424501109c182bcb433125206e39cbd24e6bcb8b5c3b5be1f627639",
+        "bytes": 10960
+      }
+    },
+    {
+      "source_path": "crates/holdem/src/mass_tests.rs",
+      "original_pin": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\mass_tests.rs",
+        "sha256": "e888687425723d0e552d200865f1aea3dec42b06f75b20a29ac8d94d9c33584b",
+        "bytes": 27700
+      }
+    }
+  ],
+  "tool_identities_only": [
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+      "sha256": "6d1c5543ed3a45cfbc1c1332d42d6550d883c14d3c2e323427e631c331cebeeb",
+      "bytes": 110592
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\clippy-driver.exe",
+      "sha256": "4ff747c4e2a55d05bfd42b6ea1849c558d4533e44ef44e009706b2be473c5450",
+      "bytes": 14025216
+    }
+  ],
+  "raw_files": [
+    {
+      "path": "success/compile.json",
+      "bytes": 6223,
+      "sha256": "751c20d1609367f3461a25c93be71eb216284c97dd8c5e87565c84b2a5953052",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\compile.json"
+    },
+    {
+      "path": "success/compile.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\compile.stdout.log"
+    },
+    {
+      "path": "success/compile.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\compile.stderr.log"
+    },
+    {
+      "path": "success/compile.samples.jsonl",
+      "bytes": 6565,
+      "sha256": "5c503d97cde58b8d4be8272bef99add9e03ac28913fbd87ac10f63e2d77f5f12",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\compile.samples.jsonl"
+    },
+    {
+      "path": "success/test.json",
+      "bytes": 5888,
+      "sha256": "1aac4ac24324989572b16f59df0d5b3c34675e131c439b356fb6066c77724ad2",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\test.json"
+    },
+    {
+      "path": "success/test.stdout.log",
+      "bytes": 1607,
+      "sha256": "c26a60795051ac6f9dee3ce0637c4bb2bf5069bcc7f6c6cff8e1ae138ede696e",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\test.stdout.log"
+    },
+    {
+      "path": "success/test.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\test.stderr.log"
+    },
+    {
+      "path": "success/test.samples.jsonl",
+      "bytes": 2118,
+      "sha256": "0e2dc033d4d913347863cdd2a6b5b6f6a2219e247996ab2e9be47a8aad5da193",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\test.samples.jsonl"
+    },
+    {
+      "path": "success/clippy.json",
+      "bytes": 6169,
+      "sha256": "7fd475d6f7a5f6d335d4c9789315421970562e9f25c730a601ca150af8070945",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\clippy.json"
+    },
+    {
+      "path": "success/clippy.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\clippy.stdout.log"
+    },
+    {
+      "path": "success/clippy.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\clippy.stderr.log"
+    },
+    {
+      "path": "success/clippy.samples.jsonl",
+      "bytes": 2131,
+      "sha256": "b6171c4394130858cddfb97c1783d2c083b1becc15cc63f50b628a76148a8e03",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\clippy.samples.jsonl"
+    },
+    {
+      "path": "mass-tests.exe.gz",
+      "bytes": 370178,
+      "sha256": "2090e65d5158418a7a0115b0c2ad255dc5c39f333a57e3e891cfd358ca6881b0",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\mass-tests.exe",
+      "encoding": "gzip",
+      "original": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\mass-tests.exe",
+        "sha256": "d55c156efc784b7be94497a705fff548005756e065229772816f9c00247cd4c2",
+        "bytes": 926208
+      }
+    },
+    {
+      "path": "success/invocation.json",
+      "bytes": 1067,
+      "sha256": "922148406fa033c467403f7ebb50add55a82cc3a1e24f9c1d5d954309f13cb2a",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\invocation.json"
+    },
+    {
+      "path": "failed-compile/compile.json",
+      "bytes": 6178,
+      "sha256": "2409bbd2ce59016c03c9dfc0cc53282e6c4ce722f71bd3d1aabfdf1233376f00",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927\\compile.json"
+    },
+    {
+      "path": "failed-compile/compile.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927\\compile.stdout.log"
+    },
+    {
+      "path": "failed-compile/compile.stderr.log",
+      "bytes": 528,
+      "sha256": "3994304c4eb62d2865c91648de9c96950a8cb83eee2ec8449904fd1af7c7c66a",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927\\compile.stderr.log"
+    },
+    {
+      "path": "failed-compile/compile.samples.jsonl",
+      "bytes": 1773,
+      "sha256": "323d93a8ef8b6db9a94b63332d9a89b3bee2bb1e2e933151a6f9b2e9b93460bb",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927\\compile.samples.jsonl"
+    },
+    {
+      "path": "failed-compile/invocation.json",
+      "bytes": 1043,
+      "sha256": "89e25da83e442168f9ed6101fd4bcbb2ba040a5e303c46781f79f38443baa079",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927\\invocation.json"
+    }
+  ],
+  "binary": {
+    "retained_path": "mass-tests.exe.gz",
+    "original_pin": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\mass-tests.exe",
+      "sha256": "d55c156efc784b7be94497a705fff548005756e065229772816f9c00247cd4c2",
+      "bytes": 926208
+    }
+  },
+  "results": [
+    {
+      "stage": "compile",
+      "supervisor_exit_code": 0,
+      "elapsed_seconds": 1.9463520999997854,
+      "raw_record": "success/compile.json"
+    },
+    {
+      "stage": "test",
+      "supervisor_exit_code": 0,
+      "elapsed_seconds": 0.63413570006378,
+      "raw_record": "success/test.json"
+    },
+    {
+      "stage": "clippy",
+      "supervisor_exit_code": 0,
+      "elapsed_seconds": 0.5663050001021475,
+      "raw_record": "success/clippy.json"
+    }
+  ],
+  "tests": {
+    "passed": 19,
+    "failed": 0,
+    "ignored": 0
+  },
+  "initial_attempt": {
+    "status": "failed",
+    "record": "failed-compile/compile.json",
+    "reason": "Standalone -D warnings rejected MassScale::WIDE unused in the isolated mass module. No Rust tests ran in this attempt. Final tests explicitly verify zero-scale equality to WIDE; the successful rerun also includes the requested raw-bit analysis optimization."
+  },
+  "limitations": [
+    "Standalone Windows mass module validation, not workspace/Linux validation or performance evidence.",
+    "Tool executables and dependent DLLs are not bundled; original executable identity pins are preserved.",
+    "Source bytes are not duplicated; source pins are bound to the candidate04 manifest."
+  ]
+}

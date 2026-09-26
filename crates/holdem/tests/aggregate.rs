@@ -124,6 +124,29 @@ fn river_equity_golden_full_house_kicker() {
     }
 }
 
+#[test]
+fn river_equity_retains_half_tie_with_minimum_subnormal_reach() {
+    let board = parse_board("As Ks Qs Js Ts");
+    let own: Range = "2c3c".parse().unwrap();
+    let blocked: Range = "2c4c".parse().unwrap();
+    let legal: Range = "4d5d".parse().unwrap();
+    let own_combo = own.weights().iter().position(|&w| w > 0.0).unwrap();
+    let blocked_combo = blocked.weights().iter().position(|&w| w > 0.0).unwrap();
+    let legal_combo = legal.weights().iter().position(|&w| w > 0.0).unwrap();
+    for tiny in [1e-20f32, f32::from_bits(1)] {
+        for blocked_weight in [0.0, 1.0] {
+            let mut opponent = vec![0.0; NUM_COMBOS];
+            opponent[legal_combo] = tiny;
+            opponent[blocked_combo] = blocked_weight;
+            let equity = range_equity(&board, &PerPlayer::new(own.weights().to_vec(), opponent));
+            // The only compatible pair plays the royal flush on the board.
+            // Computing 0.5*tiny in f32 before division would incorrectly give 0.
+            assert_eq!(equity[Player::P0][own_combo], 0.5);
+            assert_eq!(equity[Player::P1][legal_combo], 0.5);
+        }
+    }
+}
+
 /// Turn smoke test: KK is a big favorite over both AA and QQ preflop, but
 /// postflop on this dry board KK is drawing thin against AA (needs to spike
 /// a King) and is a solid favorite over QQ (needs a Queen to catch up).

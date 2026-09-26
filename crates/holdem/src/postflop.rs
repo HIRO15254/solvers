@@ -419,7 +419,7 @@ pub struct PostflopEvaluator {
     rank_tables: Vec<Vec<kernel::RankEntry>>,
     /// Union of initial-support combos disjoint from the *starting* board, used by
     /// every fold terminal regardless of street or runout — see the
-    /// invariant documented on [`kernel::fold_kernel`].
+    /// invariant documented in [`kernel`].
     fold_combos: Vec<kernel::RankEntry>,
 }
 
@@ -1108,25 +1108,14 @@ fn build_with_hands(
         ..
     } = builder;
 
-    // Joint compatible weight, via the same inclusion-exclusion the fold
-    // kernel uses. Only the pair-compat sum — no live-count denominators
-    // (the 1/45, 1/44 deal weights already live on the chance branches).
-    let mut ip_reach = [0.0; NUM_COMBOS];
-    for (&combo, &weight) in hands.combos(Player::P1).iter().zip(&ranges[Player::P1]) {
-        ip_reach[combo as usize] = weight;
-    }
-    let (all_total, all_card) = kernel::compat_sums(&fold_combos, &ip_reach);
-    let normalizer: f64 = fold_combos
+    // Joint compatible weight, with the same exact card-removal masses used
+    // by terminal evaluation and reporting. Positive f32 pairs cannot underflow
+    // this f64 product. The 1/45, 1/44 deal weights live on chance branches.
+    let compatible = crate::compatible_reach(&hands, Player::P0, &ranges[Player::P1]);
+    let normalizer: f64 = ranges[Player::P0]
         .iter()
-        .map(|&(_, combo)| {
-            let idx = combo as usize;
-            let (c1, c2) = combo_cards(idx);
-            let own = hands
-                .index(Player::P0, idx)
-                .map_or(0.0, |local| ranges[Player::P0][local]);
-            own as f64
-                * (all_total - all_card[c1.index()] - all_card[c2.index()] + ip_reach[idx] as f64)
-        })
+        .zip(compatible)
+        .map(|(&own, opposing)| own as f64 * opposing)
         .sum();
     assert!(normalizer > 0.0, "ranges share no compatible combos");
 

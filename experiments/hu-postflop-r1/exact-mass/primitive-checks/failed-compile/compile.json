@@ -1,0 +1,172 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "failed",
+  "created_at": "2026-09-26T17:15:03.074230+00:00",
+  "argv": [
+    "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+    "--edition=2024",
+    "--test",
+    "crates/holdem/src/mass.rs",
+    "-C",
+    "codegen-units=1",
+    "-C",
+    "debuginfo=0",
+    "-D",
+    "warnings",
+    "-o",
+    "runs\\r1-mass-analysis-20260927\\mass-tests.exe"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 45.0,
+    "grace_seconds": 2.0,
+    "kill_wait_seconds": 2.0,
+    "poll_seconds": 0.1,
+    "memory_limit_bytes": 300000000,
+    "min_free_memory_bytes": 3221225472,
+    "disk_reserve_bytes": 1073741824
+  },
+  "runtime": {
+    "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "logical_cpus": 16
+  },
+  "outputs": {
+    "stdout": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927\\compile.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927\\compile.stderr.log",
+      "sha256": "3994304c4eb62d2865c91648de9c96950a8cb83eee2ec8449904fd1af7c7c66a",
+      "bytes": 528
+    },
+    "samples": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927\\compile.samples.jsonl",
+      "sha256": "323d93a8ef8b6db9a94b63332d9a89b3bee2bb1e2e933151a6f9b2e9b93460bb",
+      "bytes": 1773
+    }
+  },
+  "identity_before": [
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+      "sha256": "6d1c5543ed3a45cfbc1c1332d42d6550d883c14d3c2e323427e631c331cebeeb",
+      "bytes": 110592
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\mass.rs",
+      "sha256": "e703124cc67a234bb3116638eb3a722231fd29360726b6e0c7e4636634ff72c3",
+      "bytes": 10574
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\mass_tests.rs",
+      "sha256": "9f830ca6ca5d1d0b990fc88ce5cc5922eca9c17facc3bae0a631e08b6034a5d3",
+      "bytes": 24007
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+      "sha256": "6d1c5543ed3a45cfbc1c1332d42d6550d883c14d3c2e323427e631c331cebeeb",
+      "bytes": 110592
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\mass.rs",
+      "sha256": "e703124cc67a234bb3116638eb3a722231fd29360726b6e0c7e4636634ff72c3",
+      "bytes": 10574
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\mass_tests.rs",
+      "sha256": "9f830ca6ca5d1d0b990fc88ce5cc5922eca9c17facc3bae0a631e08b6034a5d3",
+      "bytes": 24007
+    }
+  ],
+  "identity_unchanged": true,
+  "stop_reason": "child_failed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 1,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 5,
+    "max_sample_gap_seconds": 0.13402540003880858,
+    "sampled_peak_tree_resident_bytes": 88928256,
+    "root_os_peak_resident_bytes": 79183872,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 121847808,
+    "max_observed_processes": 2
+  },
+  "containment": {
+    "kind": "windows_job_kill_on_close_suspended_assignment",
+    "limitations": [
+      "RAM trigger is sampled working set, not a hard allocation limit",
+      "summed working sets can double-count shared pages",
+      "Job membership can include the hidden console host",
+      "CTRL_BREAK covers the dedicated console; detached descendants require Job termination",
+      "job peak committed bytes are not resident working set bytes"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 34275098624,
+    "available_bytes": 5572509696,
+    "commit_available_bytes": 2639261696
+  },
+  "resolved_argv": [
+    "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+    "--edition=2024",
+    "--test",
+    "crates/holdem/src/mass.rs",
+    "-C",
+    "codegen-units=1",
+    "-C",
+    "debuginfo=0",
+    "-D",
+    "warnings",
+    "-o",
+    "runs\\r1-mass-analysis-20260927\\mass-tests.exe"
+  ],
+  "disk_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927",
+  "disk_free_before_bytes": 47793176576,
+  "started_at": "2026-09-26T17:15:03.234587+00:00",
+  "pid": 51140,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 79183872,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 121847808,
+    "elapsed_seconds": 0.49055629991926253,
+    "at": "2026-09-26T17:15:03.725270+00:00",
+    "host_available_memory_bytes": 5567184896,
+    "disk_free_bytes": 47793106944
+  },
+  "elapsed_seconds": 0.49084029998630285,
+  "ended_at": "2026-09-26T17:15:03.727159+00:00",
+  "supervisor_exit_code": 1
+}

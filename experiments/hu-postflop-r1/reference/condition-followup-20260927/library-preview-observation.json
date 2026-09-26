@@ -1,0 +1,83 @@
+{
+  "schema": "solvers.r1-reference-library-preview-observation/v1",
+  "case": "HU-R0-019",
+  "capture_date_utc": "2026-09-26",
+  "recorded_after_utc": "2026-09-26T16:58:17Z",
+  "observed_at_utc": null,
+  "time_provenance": "Root checked the UTC clock after this navigation. Individual UI-tool timestamps and the exact observation start were not retained. The previously estimated 17:00 endpoint was corrected and is not used.",
+  "related_capture": {
+    "path": "../HU-R0-019/observed.json",
+    "sha256": "e38ffaf0b6fbcbbbe5779ae9d4236074df889ea75afd0ee4092e6cd48cf2aca2",
+    "role": "Source of the existing navigation URL, not newly acquired raw UI bytes"
+  },
+  "provenance": {
+    "observer": "root agent",
+    "browser_context": "Temporary IAB tab 6",
+    "acquisition_mode": "Read-only UI navigation",
+    "record_type": "Manual transcription of UI tool displays communicated by root",
+    "writer_independently_observed_ui": false,
+    "original_ax_archive_retained_in_this_record": false,
+    "original_ax_archive_path": null,
+    "original_ax_archive_sha256": null,
+    "screenshot_binary_retained_in_this_record": false,
+    "screenshot_path": null,
+    "screenshot_sha256": null,
+    "display_transcription_is_byte_exact": false,
+    "tab_cleanup": "Root closed temporary tab 6 and retained the original tab 3."
+  },
+  "navigation_url": "https://app.gtowizard.com/solutions?soltab=strategy&solution_type=gwiz&gametype=Cash6m500zSimple&depth=75&history_spot=12&preflop_actions=F-F-F-R2.5-F-R10-R20-C&board=Qs7h2c4d9s&flop_actions=X-X&turn_actions=X-X",
+  "current_dom_url_independently_retained": false,
+  "observed_solution": {
+    "format": "Cash",
+    "stack_depth_bb": 75,
+    "table_size": "6max",
+    "stakes_label": "NL500",
+    "library": "Simple",
+    "mode_label": "GTO",
+    "board": "Qs7h2c4d9s",
+    "flop_history": "X-X",
+    "turn_history": "X-X",
+    "river_actor": "BB",
+    "river_pot_bb": 40.5,
+    "remaining_stacks_bb": {"BB": 55, "BTN": 55},
+    "river_menu": ["Check", "Bet 13.5", "Allin 55"]
+  },
+  "library_navigation": {
+    "entry_control": "Change",
+    "selected_row_class_reported": "gmf-row-active",
+    "selected_row_text": "75 Simple NL500 GTO GTO -",
+    "preview_format": "Cash 6max",
+    "description": "Solutions with only 3bet or fold vs open, no 4bet allin and no limping BvB. Less postflop sizes",
+    "available_spots_text": "all available spots",
+    "reports_labels": ["FLOP", "TURN"],
+    "rake_display": "5% 0.6BB CAP",
+    "rake_percent": 5,
+    "rake_cap_bb": 0.6,
+    "postflop_sizings_display": "3-6",
+    "accuracy_display": "0.2-0.3%",
+    "accuracy_metric_or_denominator_explained_in_this_view": false,
+    "accuracy_value_click": "No new displayed content reported; only accessibility icon identifiers changed."
+  },
+  "scoped_findings": {
+    "confirmed": "This navigation again displayed the saved 019 root conditions and the selected 75bb Simple NL500 library preview's rake and accuracy labels.",
+    "not_obtained_in_this_navigation": [
+      "an individual-node residual or stopping record",
+      "an explanation of the accuracy metric or its denominator in the inspected UI",
+      "a timestamped solution version identifier",
+      "rake rounding and exclusion rules"
+    ],
+    "limits": [
+      "The generic library Accuracy label is not a measured error bound for this River node.",
+      "The Reports FLOP/TURN labels do not prove that no River information is available elsewhere.",
+      "Clicking the Accuracy value exposed no additional explanation on this finite path; this does not establish impossibility across the entire UI.",
+      "This observation does not bind the earlier capture to the same underlying solver version or certify complete rake settlement semantics.",
+      "No internal precision, display-rounding mode, complete external strategy profile or external quality acceptance is inferred."
+    ]
+  },
+  "case_level_assessment": {
+    "condition_match": "unverified",
+    "quality_status": "not_evaluated",
+    "acceptance": null,
+    "comparison_threshold": null
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "r1.exact-mass-candidate-repair/v1",
+  "failure_archive": {
+    "path": "experiments/hu-postflop-r1/exact-mass/exact-new02.validation-failure.tar.gz",
+    "bytes": 1451453,
+    "sha256": "28320cabefcce24e70ad83011ac5b09b748a83ce4dc32582cd29f0f489e0bea9"
+  },
+  "source02_manifest": {
+    "path": "experiments/hu-postflop-r1/exact-mass/source-new02/source-candidate-manifest.json",
+    "bytes": 68137,
+    "sha256": "fac38ff318a7a78a1d7a81158af07901ff66c1cf86b03eadb8ae84482200f0d7"
+  },
+  "source03_manifest": {
+    "path": "experiments/hu-postflop-r1/exact-mass/source-new03/source-candidate-manifest.json",
+    "bytes": 68137,
+    "sha256": "03855612736b0978dabccca1c7e2d394e52262c33a0997fe53f9bfa188a549cb"
+  },
+  "changed_source_paths": [
+    "crates/holdem/src/kernel_tests.rs"
+  ],
+  "repair": "Add explicit crate::mass test imports for MassWidth, classify_integer_mass and f64_mass_is_exact. Algorithm unchanged from source02.",
+  "failure_stages": [
+    {
+      "label": "toolchain",
+      "status": "passed"
+    },
+    {
+      "label": "fmt",
+      "status": "passed"
+    },
+    {
+      "label": "clippy",
+      "status": "failed"
+    }
+  ],
+  "validation03_dispatch": {
+    "vm": "solvers-r1-20260926-10",
+    "unit": "r1-exact-build04",
+    "invocation_id": "b520f5bf6bdd446bbc5c14387c9605d1",
+    "observed_start_utc": "2026-09-26T16:49:27Z",
+    "script": {
+      "path": "experiments/hu-postflop-r1/exact-mass/build-new03.sh",
+      "bytes": 306,
+      "sha256": "d63cb5e11fa66c3f885f9badeacd3294b82b280392695780b75ea865c83131cb"
+    }
+  }
+}

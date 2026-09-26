@@ -1,0 +1,14 @@
+{
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\exact-mass\\diagnostic\\test_driver.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 8.383971452713013,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "928f2d50b79bc4f0ec8243ea9ebe26fe029cf2f16be869f92aaca3da38f55d05",
+  "script_sha256": "dd63913ccc6f27e047f2590566cc108a08b72e2d391a74a00efdff13ce725e50",
+  "test_sha256": "0f716fc8ba5fc379f3cca005098ce02d90bc2661abcfa67d2fa92e0946c2dab5",
+  "scope": "Python real candidate archive and synthetic supervisor/helper integration; no build or solver"
+}

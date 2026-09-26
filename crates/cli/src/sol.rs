@@ -104,34 +104,15 @@ fn human_size(bytes: u64) -> String {
 /// A counterfactual value `v[h]` is `sum over opponent hands o of
 /// reach(o) * payoff(h, o)`, so turning it into a per-hand utility value
 /// means dividing by the reach that could actually be facing `h`. Hands
-/// sharing a card with `h` cannot, which is the usual inclusion-exclusion:
-/// total, minus the reach through each of `h`'s two cards, plus the one
-/// combo that is both of them and was therefore subtracted twice.
+/// sharing a card with `h` cannot. Use the evaluator's exact card-removal
+/// mass before the existing f32 value/serialization boundary: subtracting
+/// rounded card totals here could erase a small but legal opponent range.
+/// A positive sum of f32 reaches cannot round below the smallest positive
+/// f32. This does not recover CFVs already rounded by the f32 value pass.
 fn compatible_reach(hands: &PostflopHands, player: Player, opp_reach: &[f32]) -> Vec<f32> {
-    let opponent = player.opponent();
-    assert_eq!(opp_reach.len(), hands.len(opponent));
-    let total: f64 = opp_reach.iter().map(|&r| r as f64).sum();
-    let mut per_card = [0.0f64; 52];
-    for (local, &reach) in opp_reach.iter().enumerate() {
-        if reach == 0.0 {
-            continue;
-        }
-        let (hi, lo) = cards::combo_cards(hands.combo(opponent, local));
-        per_card[hi.index()] += reach as f64;
-        per_card[lo.index()] += reach as f64;
-    }
-    hands
-        .combos(player)
-        .iter()
-        .map(|&combo| {
-            let combo = combo as usize;
-            let (hi, lo) = cards::combo_cards(combo);
-            let overlap = hands
-                .index(opponent, combo)
-                .map_or(0.0, |index| opp_reach[index]);
-            let compatible = total - per_card[hi.index()] - per_card[lo.index()] + overlap as f64;
-            compatible.max(0.0) as f32
-        })
+    holdem::compatible_reach(hands, player, opp_reach)
+        .into_iter()
+        .map(|mass| mass as f32)
         .collect()
 }
 
@@ -1385,6 +1366,223 @@ check_every = 16
         reach[Player::P1].fill(0.0);
         reach[Player::P1][at(Player::P1, "As", "Kh")] = 1.0;
         assert!(!has_compatible_reach(&hands, &reach));
+    }
+
+    fn tiny_compatible_config(board: &str, weight: f32) -> String {
+        format!(
+            r#"
+schema = "solvers.postflop/v1"
+[game]
+board = "{board}"
+oop_range = "AsAh"
+ip_range = "AsKh:1,KcKd:{weight}"
+pot = 2
+effective_stack = 20
+iso_merging = false
+[game.tree]
+kind = "none"
+[run]
+iterations = 1
+check_every = 1
+"#
+        )
+    }
+
+    /// The only legal private deal is AA versus KK: the weight-one AK
+    /// shares As with AA. On this river AA wins the two-chip pot without
+    /// wagering. Its internal payoff is +1, so even minsubnormal CFV is
+    /// representable before normalization. This expectation is independent
+    /// of the card-total implementation and the artifact's own metadata.
+    fn assert_tiny_compatible_full_sol_roundtrip(
+        solver: &Solver<PostflopEvaluator, F32Storage>,
+        raw: &str,
+        weight: f32,
+    ) {
+        let hands = solver.game().evaluator.hands();
+        assert_eq!([hands.len(Player::P0), hands.len(Player::P1)], [1, 2]);
+        let legal = hands
+            .index(
+                Player::P1,
+                cards::combo_index("Kc".parse().unwrap(), "Kd".parse().unwrap()),
+            )
+            .unwrap();
+        let roots = &solver.game().root_ranges;
+        assert_eq!(roots[Player::P1][legal].to_bits(), weight.to_bits());
+        assert_eq!(solver.game().normalizer, f64::from(weight));
+        let reach = PerPlayer::new(roots[Player::P0].as_slice(), roots[Player::P1].as_slice());
+        let cfv = solver.expected_values_at(0, Player::P0, reach);
+        assert_eq!(cfv, vec![weight]);
+        let offset = PerPlayer::new(1.0, 1.0);
+        let ev = postflop_setup::subgame_ev(crate::solve::solver_ev(solver), offset);
+        assert_eq!([ev[Player::P0], ev[Player::P1]], [2.0, 0.0]);
+        let expl = solver.exploitability();
+        let summary = RunSummary {
+            canceled: false,
+            iterations: solver.iteration(),
+            wall: std::time::Duration::ZERO,
+            ev,
+            expl_p0: expl[Player::P0],
+            expl_p1: expl[Player::P1],
+            nash_conv: expl[Player::P0] + expl[Player::P1],
+        };
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("tiny-compatible-full.sol");
+        super::export_sol(
+            &SolExportSpec {
+                path: path.clone(),
+                mode: SolStreets::Full,
+                config_toml: raw.into(),
+                storage_name: "f32".into(),
+            },
+            solver,
+            offset,
+            Street::River,
+            &summary,
+        )
+        .unwrap();
+        let payload = read_sol(&path).unwrap();
+        let loaded = load_sol(&path, 1, None).unwrap();
+        assert_eq!(loaded.mode, StreetsStored::Full);
+        assert_eq!(
+            loaded.pf_game.game.root_ranges[Player::P1][legal].to_bits(),
+            weight.to_bits()
+        );
+        assert_eq!(loaded.meta.ev, [2.0, 0.0]);
+        assert_eq!(
+            payload.values.len(),
+            2,
+            "check/check must retain both action nodes"
+        );
+        assert!(
+            loaded
+                .values
+                .contains_key(&loaded.pf_game.game.tree.node(0).aux)
+        );
+        for block in &payload.values {
+            let stored = &loaded.values[&block.sref];
+            assert_eq!(stored.len(), 3, "P1 follows P0's one hand, not its own two");
+            assert!(block.scale > 0.0);
+            // i16 nearest rounding contributes <= scale/2; allow another
+            // four f32 epsilons at peak=2 for normalization and decoding.
+            let tolerance = f64::from(block.scale) * 0.5 + 8.0 * f64::from(f32::EPSILON);
+            for (&actual, expected) in stored.iter().zip([2.0, 0.0, 0.0]) {
+                assert!((f64::from(actual) - expected).abs() <= tolerance);
+            }
+        }
+    }
+
+    #[test]
+    fn tiny_compatible_reach_survives_full_sol_roundtrip() {
+        for weight in [1e-20, f32::from_bits(1)] {
+            let raw = tiny_compatible_config("2c 7d 9h Js Qs", weight);
+            let (solver, _, _, _) = build_and_solve::<F32Storage>(&raw, 1);
+            assert_tiny_compatible_full_sol_roundtrip(&solver, &raw, weight);
+        }
+    }
+
+    #[test]
+    fn tiny_compatible_reach_survives_saved_lazy_river() {
+        for weight in [1e-20, f32::from_bits(1)] {
+            let raw = tiny_compatible_config("2c 7d 9h Js", weight);
+            let (solver, info, street, summary) = build_and_solve::<F32Storage>(&raw, 1);
+            let directory = tempfile::tempdir().unwrap();
+            let path = directory.path().join("tiny-compatible-trunk.sol");
+            export_sol(
+                &SolExportSpec {
+                    path: path.clone(),
+                    mode: SolStreets::NoRivers,
+                    config_toml: raw,
+                    storage_name: "f32".into(),
+                },
+                &solver,
+                &info,
+                street,
+                &summary,
+            )
+            .unwrap();
+            let loaded = load_sol(&path, 1, None).unwrap();
+            let tree = &loaded.pf_game.game.tree;
+            let entry = (0..tree.nodes.len() as NodeId)
+                .find(|&id| {
+                    let node = tree.node(id);
+                    let parent = loaded.parents[id as usize];
+                    if node.kind != NodeKind::Action
+                        || parent == NodeId::MAX
+                        || tree.node(parent).kind != NodeKind::Chance
+                    {
+                        return false;
+                    }
+                    let position = tree.children(parent).position(|child| child == id).unwrap();
+                    loaded
+                        .pf_game
+                        .game
+                        .evaluator
+                        .deal_card(tree.node(parent).aux as usize + position)
+                        == "Qs".parse::<Card>().unwrap()
+                })
+                .expect("Qs river entry");
+            assert!(!loaded.blocks.contains_key(&tree.node(entry).aux));
+            let mut provider = SolProvider::new(&loaded);
+            assert_eq!(provider.average_strategy(entry).unwrap(), vec![1.0]);
+            assert_eq!(provider.river_solves.len(), 1);
+            let fresh = &provider.river_solves[&entry];
+            assert_eq!(fresh.map[&entry], 0);
+            // Reach reconstruction uses the saved single-action policy,
+            // preserving tiny reach despite the blocked weight-one hand.
+            // This checks the reached river, not tiny CFVs averaged over
+            // the trunk's chance branches (which can underflow in f32).
+            assert_tiny_compatible_full_sol_roundtrip(
+                &fresh.solver,
+                &tiny_compatible_config("2c 7d 9h Js Qs", weight),
+                weight,
+            );
+        }
+    }
+
+    #[test]
+    fn minsubnormal_cfv_rounding_precedes_sol_normalization() {
+        // Shared royal flush, odd pot: OOP's exact internal utility is
+        // half a chip. Half the minimum f32 subnormal rounds to zero in
+        // the engine's CFV output; an exact positive denominator cannot
+        // restore it. Keep this limitation distinct from card cancellation
+        // and from subsequent i16 serialization error.
+        let weight = f32::from_bits(1);
+        let raw = tiny_compatible_config("Ts Js Qs Ks As", weight)
+            .replace("AsAh", "2c3c")
+            .replace("AsKh:1,KcKd:", "2c4c:1,5d6d:")
+            .replace("pot = 2", "pot = 1");
+        let (solver, info, street, summary) = build_and_solve::<F32Storage>(&raw, 1);
+        let roots = &solver.game().root_ranges;
+        let facing = holdem::compatible_reach(
+            solver.game().evaluator.hands(),
+            Player::P0,
+            &roots[Player::P1],
+        );
+        assert_eq!(facing, vec![f64::from(weight)]);
+        let exact_cfv = f64::from(weight) * 0.5;
+        assert!(exact_cfv > 0.0);
+        assert_eq!(exact_cfv as f32, 0.0);
+        let reach = PerPlayer::new(roots[Player::P0].as_slice(), roots[Player::P1].as_slice());
+        assert_eq!(solver.expected_values_at(0, Player::P0, reach), vec![0.0]);
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("minsubnormal-cfv-rounding.sol");
+        export_sol(
+            &SolExportSpec {
+                path: path.clone(),
+                mode: SolStreets::Full,
+                config_toml: raw,
+                storage_name: "f32".into(),
+            },
+            &solver,
+            &info,
+            street,
+            &summary,
+        )
+        .unwrap();
+        let loaded = load_sol(&path, 1, None).unwrap();
+        let root = loaded.pf_game.game.tree.node(0);
+        assert_eq!(loaded.values[&root.aux][0], 0.0);
+        assert_eq!(exact_cfv / facing[0], 0.5);
     }
 
     #[test]

@@ -145,7 +145,21 @@ regret/strategy arenaとreach/CFVは席別次元、順位表とfold表はroot su
 terminal順位表はbuild時に役強さを計算し、同一の完成boardで共有する。`(rank, global combo)`順の
 各8-byte entryに役強さ、2枚のカード番号、両席のlocal ID（席に無い場合はsentinel）を保持し、
 評価中のカード逆引きと全1,326手札への一時展開を省く。showdownは同順位groupの和と
-strict-below累積からカード除去を行う線形走査で、reachの加算順はglobal combo表と同じ。
+strict-below累積からカード除去を行う線形走査である。非zero reachの個数Nとf32指数差Dから
+`D + 24 + bit_length(N) <= 53`を満たす場合は、従来のf64加算順でmassが厳密になる。
+N=0も同じfloat経路とする。その他は整数でカード除去・win/tie/loseの減算を終えてから、
+各massをf64へ一度丸める。compact terminalでは最小指数を共通の単位へ移し、同じ十分条件の
+bit上限が64/128以下ならu64/u128、それ以外は`2^-149`単位の5×u64を使う。
+最初の走査で得たbit上限と最小shiftを幅の選択にも使い、bucketには整数だけを保持する。
+f64判定が偽の場合だけ共通単位のscaleを構築し、同じreachの再走査を避ける。
+共通単位の2冪をf64へ掛ける操作は正規数の範囲で追加の丸めを生じない。
+root normalizer・表示用equityの整数経路とtest用global kernelは5×u64を維持する。
+52枚・最大1,326 handというNLHE固有の上限はholdem内に置き、汎用engineへ持ち込まない。
+全経路がO(n)。整数scratchは別stack frameへ分離する。
+root normalizerとCLIのper-hand EV分母は共通`compatible_reach`を使い、
+equityはf32中間分子を作らずf64の和から最後に比を取る。
+SOLの条件付きEV分母はf32へ戻し、除算もf32で行う。
+CFVの最終f32化、上流reachの乗算underflow、保存量子化の丸めはこのmass保証の対象外。
 表に無いboard衝突手札のCFVはcallerがゼロにし、fold表は開始boardのsupport和集合を共有する。
 `evaluator.hands()`がreporting境界のglobal/local変換を提供する。chanceの代表カードは
 `tree.deals`と対応する明示metadataを保持するため、疎なmaskからカードを推定しない。

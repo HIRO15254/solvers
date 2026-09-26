@@ -1,0 +1,9 @@
+test_counter_identities_and_rejections (__main__.Tests.test_counter_identities_and_rejections) ... ok
+test_portable_helper_integration_and_baseline_counter_identity_tampering (__main__.Tests.test_portable_helper_integration_and_baseline_counter_identity_tampering) ... ok
+test_real_candidate_source_patch_and_portable_archive_binding (__main__.Tests.test_real_candidate_source_patch_and_portable_archive_binding) ... ok
+test_supervised_commands_keep_all_frozen_targets (__main__.Tests.test_supervised_commands_keep_all_frozen_targets) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 8.023s
+
+OK

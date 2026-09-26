@@ -1,0 +1,936 @@
+{
+  "schema": "r1.exact-mass-verification/v1",
+  "status": "completed",
+  "payload_integrity": "verified",
+  "builds": {
+    "old": {
+      "mode": "release-build-only",
+      "stages": 2,
+      "tests": {},
+      "full_workspace_validated": false
+    },
+    "new": {
+      "mode": "full-validation",
+      "stages": 8,
+      "tests": {
+        "workspace-tests": {
+          "summary_count": 56,
+          "passed": 951,
+          "ignored": 31
+        },
+        "release-oracle": {
+          "summary_count": 1,
+          "passed": 3,
+          "ignored": 0
+        },
+        "release-river-resolve": {
+          "summary_count": 1,
+          "passed": 1,
+          "ignored": 0
+        }
+      },
+      "full_workspace_validated": true
+    }
+  },
+  "samples_passed": 32,
+  "failed_records": [],
+  "summary": {
+    "cases": {
+      "river": {
+        "run_seconds": {
+          "old": [
+            6.100750178,
+            6.119776439,
+            6.122460129
+          ],
+          "new": [
+            8.8796448,
+            8.847378501,
+            8.910035591
+          ]
+        },
+        "medians": {
+          "old": 6.119776439,
+          "new": 8.8796448
+        },
+        "new_over_old": 1.4509753564545202,
+        "paired_new_faster": 0,
+        "memory_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": [
+              53022720,
+              53022720,
+              53022720
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              7999488,
+              7921664,
+              8073216
+            ]
+          },
+          "new": {
+            "root_os_peak_resident_bytes": [
+              53022720,
+              53022720,
+              53022720
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              8015872,
+              8122368,
+              7905280
+            ]
+          }
+        },
+        "memory_medians_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": 53022720,
+            "sampled_peak_tree_resident_bytes": 7999488
+          },
+          "new": {
+            "root_os_peak_resident_bytes": 53022720,
+            "sampled_peak_tree_resident_bytes": 8015872
+          }
+        },
+        "target_nash_conv": 0.439,
+        "iterations": {
+          "old": [
+            1000,
+            1000,
+            1000
+          ],
+          "new": [
+            1000,
+            1000,
+            1000
+          ]
+        },
+        "final_quality": {
+          "old": {
+            "deviation_gains": [
+              0.2526258704341302,
+              0.18623107372454095
+            ],
+            "exploitability_nash_conv_over_two": 0.21942847207933558,
+            "nash_conv": 0.43885694415867116,
+            "nash_conv_f64_bits_hex": "3fdc163b6fb22ce8",
+            "solver_br": [
+              -40.10036457746083,
+              -2.2945047884947285
+            ],
+            "solver_br_f64_bits_hex": [
+              "c0440cd8bf18ef81",
+              "c0025b255398cd53"
+            ],
+            "solver_ev": [
+              -40.35299044789496,
+              -2.4807358622192694
+            ],
+            "solver_ev_f64_bits_hex": [
+              "c0442d2eca7ec12f",
+              "c003d88c0b31f810"
+            ],
+            "subgame_br": [
+              234.89963542253918,
+              272.70549521150525
+            ],
+            "subgame_ev": [
+              234.64700955210503,
+              272.51926413778074
+            ]
+          },
+          "new": {
+            "deviation_gains": [
+              0.2526258704341302,
+              0.18623107372454095
+            ],
+            "exploitability_nash_conv_over_two": 0.21942847207933558,
+            "nash_conv": 0.43885694415867116,
+            "nash_conv_f64_bits_hex": "3fdc163b6fb22ce8",
+            "solver_br": [
+              -40.10036457746083,
+              -2.2945047884947285
+            ],
+            "solver_br_f64_bits_hex": [
+              "c0440cd8bf18ef81",
+              "c0025b255398cd53"
+            ],
+            "solver_ev": [
+              -40.35299044789496,
+              -2.4807358622192694
+            ],
+            "solver_ev_f64_bits_hex": [
+              "c0442d2eca7ec12f",
+              "c003d88c0b31f810"
+            ],
+            "subgame_br": [
+              234.89963542253918,
+              272.70549521150525
+            ],
+            "subgame_ev": [
+              234.64700955210503,
+              272.51926413778074
+            ]
+          }
+        },
+        "quality_delta_new_minus_old": {
+          "solver_ev": [
+            0.0,
+            0.0
+          ],
+          "solver_br": [
+            0.0,
+            0.0
+          ],
+          "nash_conv": 0.0
+        },
+        "final_artifact_sha256": {
+          "old": {
+            "canonical.bin": "ccfbf8d976402613d2b0c3cd87bcadb0e1dfe4480bcc9a627806e4bec5a119f5",
+            "state.bin": "59010cb9b0cd119270caa521767b49c245c2cad9fdb95b7bbde3fa7739fcbd66"
+          },
+          "new": {
+            "canonical.bin": "ccfbf8d976402613d2b0c3cd87bcadb0e1dfe4480bcc9a627806e4bec5a119f5",
+            "state.bin": "59010cb9b0cd119270caa521767b49c245c2cad9fdb95b7bbde3fa7739fcbd66"
+          }
+        },
+        "timed_components_seconds": {
+          "old": {
+            "solve_seconds": [
+              5.982395234,
+              6.000346584,
+              6.003139482
+            ],
+            "quality_seconds": [
+              0.118290913,
+              0.119359535,
+              0.119244765
+            ]
+          },
+          "new": {
+            "solve_seconds": [
+              8.51175067,
+              8.481419840000001,
+              8.541597604
+            ],
+            "quality_seconds": [
+              0.367825066,
+              0.365888985,
+              0.368369543
+            ]
+          }
+        },
+        "setup_seconds": {
+          "old": {
+            "build_seconds": [
+              0.00076399,
+              0.000732127,
+              0.00077368
+            ],
+            "solver_init_seconds": [
+              3.2715e-05,
+              2.9528e-05,
+              2.6336e-05
+            ]
+          },
+          "new": {
+            "build_seconds": [
+              0.000763901,
+              0.000819338,
+              0.000999899
+            ],
+            "solver_init_seconds": [
+              3.4378e-05,
+              1.7277e-05,
+              3.2917e-05
+            ]
+          }
+        },
+        "run_phase_sampled_peak_tree_resident_bytes": {
+          "old": [
+            7999488,
+            7888896,
+            8040448
+          ],
+          "new": [
+            8003584,
+            8081408,
+            7901184
+          ]
+        }
+      },
+      "turn": {
+        "run_seconds": {
+          "old": [
+            1.287134672,
+            1.285937197,
+            1.278269123
+          ],
+          "new": [
+            1.439160261,
+            1.456167069,
+            1.447778855
+          ]
+        },
+        "medians": {
+          "old": 1.285937197,
+          "new": 1.447778855
+        },
+        "new_over_old": 1.1258550249402266,
+        "paired_new_faster": 0,
+        "memory_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": [
+              53022720,
+              53022720,
+              53022720
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              6266880,
+              6332416,
+              6189056
+            ]
+          },
+          "new": {
+            "root_os_peak_resident_bytes": [
+              53022720,
+              53022720,
+              53022720
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              6152192,
+              6279168,
+              6213632
+            ]
+          }
+        },
+        "memory_medians_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": 53022720,
+            "sampled_peak_tree_resident_bytes": 6266880
+          },
+          "new": {
+            "root_os_peak_resident_bytes": 53022720,
+            "sampled_peak_tree_resident_bytes": 6213632
+          }
+        },
+        "target_nash_conv": 0.00228,
+        "iterations": {
+          "old": [
+            1000,
+            1000,
+            1000
+          ],
+          "new": [
+            1000,
+            1000,
+            1000
+          ]
+        },
+        "final_quality": {
+          "old": {
+            "deviation_gains": [
+              0.0007286542727626966,
+              0.0015467420036401336
+            ],
+            "exploitability_nash_conv_over_two": 0.001137698138201415,
+            "nash_conv": 0.00227539627640283,
+            "nash_conv_f64_bits_hex": "3f62a3da12f68000",
+            "solver_br": [
+              8.79284065152392,
+              -8.790564360441985
+            ],
+            "solver_br_f64_bits_hex": [
+              "402195ef35ba7819",
+              "c02194c4da12f685"
+            ],
+            "solver_ev": [
+              8.792111997251157,
+              -8.792111102445626
+            ],
+            "solver_ev_f64_bits_hex": [
+              "4021958fb425ed09",
+              "c021958f961f9add"
+            ],
+            "subgame_br": [
+              18.792840651523917,
+              1.2094356395580146
+            ],
+            "subgame_ev": [
+              18.792111997251155,
+              1.2078888975543745
+            ]
+          },
+          "new": {
+            "deviation_gains": [
+              0.0007286542727626966,
+              0.0015467420036401336
+            ],
+            "exploitability_nash_conv_over_two": 0.001137698138201415,
+            "nash_conv": 0.00227539627640283,
+            "nash_conv_f64_bits_hex": "3f62a3da12f68000",
+            "solver_br": [
+              8.79284065152392,
+              -8.790564360441985
+            ],
+            "solver_br_f64_bits_hex": [
+              "402195ef35ba7819",
+              "c02194c4da12f685"
+            ],
+            "solver_ev": [
+              8.792111997251157,
+              -8.792111102445626
+            ],
+            "solver_ev_f64_bits_hex": [
+              "4021958fb425ed09",
+              "c021958f961f9add"
+            ],
+            "subgame_br": [
+              18.792840651523917,
+              1.2094356395580146
+            ],
+            "subgame_ev": [
+              18.792111997251155,
+              1.2078888975543745
+            ]
+          }
+        },
+        "quality_delta_new_minus_old": {
+          "solver_ev": [
+            0.0,
+            0.0
+          ],
+          "solver_br": [
+            0.0,
+            0.0
+          ],
+          "nash_conv": 0.0
+        },
+        "final_artifact_sha256": {
+          "old": {
+            "canonical.bin": "b24560f6ef21c68d2d41a8ee18d9612ee85fa5154e272d4d2bd2ab457e1c5775",
+            "state.bin": "fb01ef55554c69123801a25cfa5fa1985c79666d0f02c7b3d40e3ae7b5c8208a"
+          },
+          "new": {
+            "canonical.bin": "b24560f6ef21c68d2d41a8ee18d9612ee85fa5154e272d4d2bd2ab457e1c5775",
+            "state.bin": "fb01ef55554c69123801a25cfa5fa1985c79666d0f02c7b3d40e3ae7b5c8208a"
+          }
+        },
+        "timed_components_seconds": {
+          "old": {
+            "solve_seconds": [
+              1.264306073,
+              1.263089945,
+              1.255543407
+            ],
+            "quality_seconds": [
+              0.022768427,
+              0.022786709,
+              0.022671707
+            ]
+          },
+          "new": {
+            "solve_seconds": [
+              1.413401697,
+              1.430127916,
+              1.421861501
+            ],
+            "quality_seconds": [
+              0.02570601,
+              0.025977407,
+              0.025858209
+            ]
+          }
+        },
+        "setup_seconds": {
+          "old": {
+            "build_seconds": [
+              0.002071765,
+              0.002043302,
+              0.002099646
+            ],
+            "solver_init_seconds": [
+              1.6868e-05,
+              1.8212e-05,
+              1.7701e-05
+            ]
+          },
+          "new": {
+            "build_seconds": [
+              0.002109775,
+              0.00209818,
+              0.002094427
+            ],
+            "solver_init_seconds": [
+              2.0592e-05,
+              2.1124e-05,
+              1.7221e-05
+            ]
+          }
+        },
+        "run_phase_sampled_peak_tree_resident_bytes": {
+          "old": [
+            6266880,
+            6332416,
+            6189056
+          ],
+          "new": [
+            6152192,
+            6279168,
+            6213632
+          ]
+        }
+      },
+      "flop": {
+        "run_seconds": {
+          "old": [
+            0.501766693,
+            0.500252507,
+            0.497438076
+          ],
+          "new": [
+            0.514556688,
+            0.508214697,
+            0.509493475
+          ]
+        },
+        "medians": {
+          "old": 0.500252507,
+          "new": 0.509493475
+        },
+        "new_over_old": 1.0184726070748107,
+        "paired_new_faster": 0,
+        "memory_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": [
+              53022720,
+              53022720,
+              53022720
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              14217216,
+              14262272,
+              14274560
+            ]
+          },
+          "new": {
+            "root_os_peak_resident_bytes": [
+              53022720,
+              53022720,
+              53022720
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              14282752,
+              14331904,
+              14315520
+            ]
+          }
+        },
+        "memory_medians_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": 53022720,
+            "sampled_peak_tree_resident_bytes": 14262272
+          },
+          "new": {
+            "root_os_peak_resident_bytes": 53022720,
+            "sampled_peak_tree_resident_bytes": 14315520
+          }
+        },
+        "target_nash_conv": 0.0367,
+        "iterations": {
+          "old": [
+            45,
+            45,
+            45
+          ],
+          "new": [
+            45,
+            45,
+            45
+          ]
+        },
+        "final_quality": {
+          "old": {
+            "deviation_gains": [
+              0.009175353580050949,
+              0.019158999125162834
+            ],
+            "exploitability_nash_conv_over_two": 0.014167176352606892,
+            "nash_conv": 0.028334352705213783,
+            "nash_conv_f64_bits_hex": "3f9d03ae38e38e40",
+            "solver_br": [
+              -1.9410858154296875,
+              1.9694203270806208
+            ],
+            "solver_br_f64_bits_hex": [
+              "bfff0eb000000000",
+              "3fff82bee38e38e4"
+            ],
+            "solver_ev": [
+              -1.9502611690097384,
+              1.950261327955458
+            ],
+            "solver_ev_f64_bits_hex": [
+              "bfff34450e38e38e",
+              "3fff344538e38e39"
+            ],
+            "subgame_br": [
+              8.058914184570312,
+              11.96942032708062
+            ],
+            "subgame_ev": [
+              8.049738830990261,
+              11.950261327955458
+            ]
+          },
+          "new": {
+            "deviation_gains": [
+              0.009175353580050949,
+              0.019158999125162834
+            ],
+            "exploitability_nash_conv_over_two": 0.014167176352606892,
+            "nash_conv": 0.028334352705213783,
+            "nash_conv_f64_bits_hex": "3f9d03ae38e38e40",
+            "solver_br": [
+              -1.9410858154296875,
+              1.9694203270806208
+            ],
+            "solver_br_f64_bits_hex": [
+              "bfff0eb000000000",
+              "3fff82bee38e38e4"
+            ],
+            "solver_ev": [
+              -1.9502611690097384,
+              1.950261327955458
+            ],
+            "solver_ev_f64_bits_hex": [
+              "bfff34450e38e38e",
+              "3fff344538e38e39"
+            ],
+            "subgame_br": [
+              8.058914184570312,
+              11.96942032708062
+            ],
+            "subgame_ev": [
+              8.049738830990261,
+              11.950261327955458
+            ]
+          }
+        },
+        "quality_delta_new_minus_old": {
+          "solver_ev": [
+            0.0,
+            0.0
+          ],
+          "solver_br": [
+            0.0,
+            0.0
+          ],
+          "nash_conv": 0.0
+        },
+        "final_artifact_sha256": {
+          "old": {
+            "canonical.bin": "96aad2732a2a0fbb329b915d1df1f76df77ab4a44b09b137d49318981014f54a",
+            "state.bin": "e486c54f8e1874dd07df3d9e8de68670b54e06fe99750aab383a10ef05948654"
+          },
+          "new": {
+            "canonical.bin": "96aad2732a2a0fbb329b915d1df1f76df77ab4a44b09b137d49318981014f54a",
+            "state.bin": "e486c54f8e1874dd07df3d9e8de68670b54e06fe99750aab383a10ef05948654"
+          }
+        },
+        "timed_components_seconds": {
+          "old": {
+            "solve_seconds": [
+              0.38078934,
+              0.380384801,
+              0.378006204
+            ],
+            "quality_seconds": [
+              0.120896145,
+              0.119793102,
+              0.119367893
+            ]
+          },
+          "new": {
+            "solve_seconds": [
+              0.38979964,
+              0.384145597,
+              0.38549053899999997
+            ],
+            "quality_seconds": [
+              0.124692161,
+              0.12400243799999999,
+              0.12394195
+            ]
+          }
+        },
+        "setup_seconds": {
+          "old": {
+            "build_seconds": [
+              0.026064942,
+              0.026383002,
+              0.02586316
+            ],
+            "solver_init_seconds": [
+              4.2359e-05,
+              5.5779e-05,
+              4.7091e-05
+            ]
+          },
+          "new": {
+            "build_seconds": [
+              0.026131917,
+              0.026839593,
+              0.027474566
+            ],
+            "solver_init_seconds": [
+              4.8006e-05,
+              4.1934e-05,
+              5.0986e-05
+            ]
+          }
+        },
+        "run_phase_sampled_peak_tree_resident_bytes": {
+          "old": [
+            14217216,
+            14262272,
+            14274560
+          ],
+          "new": [
+            14282752,
+            14331904,
+            14315520
+          ]
+        }
+      },
+      "narrow-river": {
+        "run_seconds": {
+          "old": [
+            0.006768253,
+            0.00674105,
+            0.006768397
+          ],
+          "new": [
+            0.007039362,
+            0.007111407,
+            0.007067143
+          ]
+        },
+        "medians": {
+          "old": 0.006768253,
+          "new": 0.007067143
+        },
+        "new_over_old": 1.0441605832406087,
+        "paired_new_faster": 0,
+        "memory_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": [
+              53022720,
+              53022720,
+              53022720
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              5472256,
+              5459968,
+              5500928
+            ]
+          },
+          "new": {
+            "root_os_peak_resident_bytes": [
+              53022720,
+              53022720,
+              53022720
+            ],
+            "sampled_peak_tree_resident_bytes": [
+              5505024,
+              5505024,
+              5455872
+            ]
+          }
+        },
+        "memory_medians_bytes": {
+          "old": {
+            "root_os_peak_resident_bytes": 53022720,
+            "sampled_peak_tree_resident_bytes": 5472256
+          },
+          "new": {
+            "root_os_peak_resident_bytes": 53022720,
+            "sampled_peak_tree_resident_bytes": 5505024
+          }
+        },
+        "target_nash_conv": 0.0,
+        "iterations": {
+          "old": [
+            1000,
+            1000,
+            1000
+          ],
+          "new": [
+            1000,
+            1000,
+            1000
+          ]
+        },
+        "final_quality": {
+          "old": {
+            "deviation_gains": [
+              -9.5367431640625e-07,
+              0.0
+            ],
+            "exploitability_nash_conv_over_two": -4.76837158203125e-07,
+            "nash_conv": -9.5367431640625e-07,
+            "nash_conv_f64_bits_hex": "beb0000000000000",
+            "solver_br": [
+              10.0,
+              -10.000000953674316
+            ],
+            "solver_br_f64_bits_hex": [
+              "4024000000000000",
+              "c024000020000000"
+            ],
+            "solver_ev": [
+              10.000000953674316,
+              -10.000000953674316
+            ],
+            "solver_ev_f64_bits_hex": [
+              "4024000020000000",
+              "c024000020000000"
+            ],
+            "subgame_br": [
+              20.0,
+              -9.5367431640625e-07
+            ],
+            "subgame_ev": [
+              20.000000953674316,
+              -9.5367431640625e-07
+            ]
+          },
+          "new": {
+            "deviation_gains": [
+              -9.5367431640625e-07,
+              0.0
+            ],
+            "exploitability_nash_conv_over_two": -4.76837158203125e-07,
+            "nash_conv": -9.5367431640625e-07,
+            "nash_conv_f64_bits_hex": "beb0000000000000",
+            "solver_br": [
+              10.0,
+              -10.000000953674316
+            ],
+            "solver_br_f64_bits_hex": [
+              "4024000000000000",
+              "c024000020000000"
+            ],
+            "solver_ev": [
+              10.000000953674316,
+              -10.000000953674316
+            ],
+            "solver_ev_f64_bits_hex": [
+              "4024000020000000",
+              "c024000020000000"
+            ],
+            "subgame_br": [
+              20.0,
+              -9.5367431640625e-07
+            ],
+            "subgame_ev": [
+              20.000000953674316,
+              -9.5367431640625e-07
+            ]
+          }
+        },
+        "quality_delta_new_minus_old": {
+          "solver_ev": [
+            0.0,
+            0.0
+          ],
+          "solver_br": [
+            0.0,
+            0.0
+          ],
+          "nash_conv": 0.0
+        },
+        "final_artifact_sha256": {
+          "old": {
+            "canonical.bin": "12dcc57da05fabc5b025ead8c275196edca13c21cbf41f28fed1494fce3da3f7",
+            "state.bin": "aa451c32bfbf681f3365a3f679af14157aeb09015dbb9d5fe53534893db46988"
+          },
+          "new": {
+            "canonical.bin": "12dcc57da05fabc5b025ead8c275196edca13c21cbf41f28fed1494fce3da3f7",
+            "state.bin": "aa451c32bfbf681f3365a3f679af14157aeb09015dbb9d5fe53534893db46988"
+          }
+        },
+        "timed_components_seconds": {
+          "old": {
+            "solve_seconds": [
+              0.00672078,
+              0.006706054,
+              0.006729599
+            ],
+            "quality_seconds": [
+              4.1144e-05,
+              2.9431e-05,
+              3.2663e-05
+            ]
+          },
+          "new": {
+            "solve_seconds": [
+              0.007002703,
+              0.007071575,
+              0.007027589
+            ],
+            "quality_seconds": [
+              3.1448e-05,
+              3.3673e-05,
+              3.316e-05
+            ]
+          }
+        },
+        "setup_seconds": {
+          "old": {
+            "build_seconds": [
+              0.000698666,
+              0.00063469,
+              0.000686965
+            ],
+            "solver_init_seconds": [
+              1.4e-06,
+              1.329e-06,
+              1.256e-06
+            ]
+          },
+          "new": {
+            "build_seconds": [
+              0.000648882,
+              0.000696577,
+              0.000704624
+            ],
+            "solver_init_seconds": [
+              1e-06,
+              1.17e-06,
+              1.94e-06
+            ]
+          }
+        },
+        "run_phase_sampled_peak_tree_resident_bytes": {
+          "old": [
+            5472256,
+            5459968,
+            5500928
+          ],
+          "new": [
+            5505024,
+            5505024,
+            5455872
+          ]
+        }
+      }
+    },
+    "geometric_mean_new_over_old": 1.1480605360511063,
+    "numerical_fix_cost_guard_pass": false,
+    "timing_scope": "Solve plus all stopping EV/BR checks and loop overhead, through first passing check; post-stop queries/capture excluded",
+    "memory_claim": "None: native peak can include pre-exec parent RSS; sampled phase metrics can miss peaks",
+    "r1_certification": false
+  },
+  "source_after_scope": "Recorded live rehash, not independent post-run filesystem snapshot",
+  "tool_retention": "Compiler/Python identities only; measured binaries and raw outputs retained"
+}

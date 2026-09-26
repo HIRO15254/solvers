@@ -1,0 +1,14 @@
+error: associated constant `WIDE` is never used
+   --> crates/holdem/src/mass.rs:193:22
+    |
+191 | impl MassScale {
+    | -------------- associated constant in this implementation
+192 |     /// The fixed binary32 quantum; wide accumulators ignore the scale.
+193 |     pub(crate) const WIDE: Self = Self {
+    |                      ^^^^
+    |
+    = note: `-D dead-code` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[expect(dead_code)]` or `#[allow(dead_code)]`
+
+error: aborting due to 1 previous error
+

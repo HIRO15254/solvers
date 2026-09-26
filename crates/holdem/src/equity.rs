@@ -69,9 +69,6 @@ pub fn range_equity(board: &[Card], ranges: &PerPlayer<Vec<f32>>) -> PerPlayer<V
 
     let mut numerator = PerPlayer::new(vec![0.0f64; NUM_COMBOS], vec![0.0f64; NUM_COMBOS]);
     let mut denominator = PerPlayer::new(vec![0.0f64; NUM_COMBOS], vec![0.0f64; NUM_COMBOS]);
-    let mut num_out = vec![0.0f32; NUM_COMBOS];
-    let mut denom_out = vec![0.0f32; NUM_COMBOS];
-
     for missing in runouts(board) {
         let mut board5 = [board[0]; 5];
         board5[..board.len()].copy_from_slice(board);
@@ -80,14 +77,12 @@ pub fn range_equity(board: &[Card], ranges: &PerPlayer<Vec<f32>>) -> PerPlayer<V
 
         for p in Player::BOTH {
             let opp = p.opponent();
-            num_out.fill(0.0);
-            kernel::showdown_kernel(&sorted, 1.0, 0.5, 0.0, &ranges[opp], &mut num_out);
-            denom_out.fill(0.0);
-            kernel::fold_kernel(&sorted, 1.0, &ranges[opp], &mut denom_out);
-            for combo in 0..NUM_COMBOS {
-                numerator[p][combo] += num_out[combo] as f64;
-                denominator[p][combo] += denom_out[combo] as f64;
-            }
+            kernel::equity_mass_f64(
+                &sorted,
+                &ranges[opp],
+                &mut numerator[p],
+                &mut denominator[p],
+            );
         }
     }
 

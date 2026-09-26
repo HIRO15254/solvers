@@ -1,0 +1,213 @@
+{
+  "algorithm": {
+    "alpha": 1.5,
+    "beta": 0.0,
+    "gamma": 3.0,
+    "pow4_reset": true,
+    "schedule": "dcfr"
+  },
+  "canonical": {
+    "format": "hu-scaling-rawbits/v1",
+    "global_combos": [
+      [
+        702,
+        739,
+        740,
+        860,
+        901,
+        902,
+        943,
+        944,
+        945,
+        1172,
+        1221,
+        1224,
+        1271,
+        1273,
+        1274,
+        1322,
+        1323,
+        1324,
+        1325
+      ],
+      [
+        560,
+        593,
+        594,
+        627,
+        628,
+        629,
+        986,
+        1031,
+        1034,
+        1077,
+        1079,
+        1080,
+        1124,
+        1125,
+        1126,
+        1127,
+        1168,
+        1217,
+        1267,
+        1318
+      ]
+    ],
+    "strategy_and_cfv": {
+      "blake3": "14021bc71045696fad238069c0b7bb7d475bd0ef94160e092533707e8ddb20f7",
+      "bytes": 202256,
+      "file": "canonical.bin"
+    },
+    "support_order": "P0 then P1; ascending global combo id among positive, starting-board-compatible root weights",
+    "supported_state": {
+      "blake3": "639ba9bc1ab8b80909d93c80cbd5dd09e07e241de7170ae461099627bd3870df",
+      "bytes": 196454,
+      "file": "state.bin"
+    },
+    "union_global_combos": [
+      560,
+      593,
+      594,
+      627,
+      628,
+      629,
+      702,
+      739,
+      740,
+      860,
+      901,
+      902,
+      943,
+      944,
+      945,
+      986,
+      1031,
+      1034,
+      1077,
+      1079,
+      1080,
+      1124,
+      1125,
+      1126,
+      1127,
+      1168,
+      1172,
+      1217,
+      1221,
+      1224,
+      1267,
+      1271,
+      1273,
+      1274,
+      1318,
+      1322,
+      1323,
+      1324,
+      1325
+    ]
+  },
+  "config": "/opt/r1/kernel-new-r2/source/experiments/hu-postflop-r1/range-scaling/configs/turn.toml",
+  "configured_run": {
+    "check_every": 1000,
+    "iterations": 1000,
+    "par_chance_depth": 2,
+    "par_min_children": 12,
+    "storage": "f32",
+    "threads": 1
+  },
+  "counts": {
+    "action_nodes": 580,
+    "deals": 144,
+    "f32_storage_payload_bytes": 180960,
+    "nodes": 1305,
+    "normalizer": 324.0,
+    "retained_support_counts": [
+      19,
+      20
+    ],
+    "root_dims": [
+      19,
+      20
+    ],
+    "root_subtree_has_chance": true,
+    "storage_elements_per_buffer": 22620
+  },
+  "execution_policy": "Fixed explicit iterations and threads; configured early stops/checkpoints/check cadence are not used. Configured chance thresholds are retained.",
+  "iterations": 1000,
+  "layout": "compact",
+  "quality": {
+    "deviation_gains": [
+      0.0007286542727626966,
+      0.0015467420036401336
+    ],
+    "exploitability_nash_conv_over_two": 0.001137698138201415,
+    "nash_conv": 0.00227539627640283,
+    "nash_conv_f64_bits_hex": "3f62a3da12f68000",
+    "solver_br": [
+      8.79284065152392,
+      -8.790564360441985
+    ],
+    "solver_br_f64_bits_hex": [
+      "402195ef35ba7819",
+      "c02194c4da12f685"
+    ],
+    "solver_ev": [
+      8.792111997251157,
+      -8.792111102445626
+    ],
+    "solver_ev_f64_bits_hex": [
+      "4021958fb425ed09",
+      "c021958f961f9add"
+    ],
+    "subgame_br": [
+      18.792840651523917,
+      1.2094356395580146
+    ],
+    "subgame_ev": [
+      18.792111997251155,
+      1.2078888975543745
+    ]
+  },
+  "rake": {
+    "kind": "none"
+  },
+  "resources": {
+    "cfv_capture": "One player's all-node vectors are captured at a time in the measured layout, then streamed and released before the other player. Capture is outside run and EV/BR timers.",
+    "measurement": "external supervisor",
+    "rss_scope": "Full process, including build, solve, EV/BR, and subsequent all-node CFV capture/output. Not solve-only RSS."
+  },
+  "schema": "r1.hu-scaling-bench/v1",
+  "status": "completed",
+  "storage": "f32",
+  "threads": 1,
+  "timing": {
+    "br_seconds": [
+      0.000545004,
+      0.000538099
+    ],
+    "build_seconds": 0.002277764,
+    "canonical_finish_seconds": 0.005459201,
+    "cfv_capture_seconds": [
+      0.00069312,
+      0.00065123
+    ],
+    "cfv_write_seconds": [
+      0.000373232,
+      0.000383795
+    ],
+    "ev_seconds": [
+      0.000643997,
+      0.000608828
+    ],
+    "pool_build_seconds": 0.000115704,
+    "prepare_seconds": 0.000088101,
+    "process_elapsed_seconds": 1.326994281,
+    "run_seconds": 1.292089334,
+    "solver_init_seconds": 0.000018323,
+    "state_write_seconds": 0.00649465,
+    "strategy_write_seconds": 0.001000855
+  },
+  "utility": {
+    "kind": "chip-ev"
+  }
+}

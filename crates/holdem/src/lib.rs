@@ -16,14 +16,17 @@
 //! reach-weighted re-solve — see its module doc for the design contract.
 
 mod aggregate;
+mod compatibility;
 mod equity;
 mod hands;
 mod kernel;
+mod mass;
 mod postflop;
 mod river;
 mod viewer;
 
 pub use aggregate::{class_average, class_of_combo, class_weights};
+pub use compatibility::compatible_reach;
 pub use equity::range_equity;
 pub use hands::PostflopHands;
 pub use postflop::{

@@ -1,0 +1,25 @@
+{
+  "schema": "r1.exact-mass-python-writer-transcript/v1",
+  "evidence_kind": "transcript-only",
+  "source": "Parent task handoff of writer_hotpath_audit execution result",
+  "reported_execution_locator": "session10669 chunked50fb",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments/hu-postflop-r1/exact-mass/test_run.py"
+  ],
+  "reported_exit_code": 0,
+  "reported_tests": 26,
+  "reported_seconds": 49.579,
+  "reported_summary": "Ran 26 tests in 49.579s; OK",
+  "reported_source_sha256": {
+    "experiments/hu-postflop-r1/exact-mass/run.py": "62200fe9df43a111f6088d4f6e824234876baff6caf0c065fd42365a84869129",
+    "experiments/hu-postflop-r1/exact-mass/test_run.py": "11b86fc4bbfe123f827ed28f7a29d64d0f477ea60b9853d44eb7b368584176f9"
+  },
+  "source_hashes_independently_matched_to_local_files": true,
+  "raw_stdout_retained": false,
+  "raw_stderr_retained": false,
+  "independently_rerun_for_this_record": false,
+  "history": "An earlier negative test expected a later metadata-error regex, but validation correctly failed earlier at same-arm stopping-trajectory comparison. The test expectation was corrected before the reported complete 26-test success.",
+  "limits": "This is an execution claim preserved from the task transcript, not original stdout/stderr or an independently observed rerun. It must not be presented as raw-log-backed evidence."
+}

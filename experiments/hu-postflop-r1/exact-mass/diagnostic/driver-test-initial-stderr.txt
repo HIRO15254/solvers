@@ -1,0 +1,33 @@
+test_counter_identities_and_rejections (__main__.Tests.test_counter_identities_and_rejections) ... ok
+test_portable_helper_integration_and_baseline_counter_identity_tampering (__main__.Tests.test_portable_helper_integration_and_baseline_counter_identity_tampering) ... ERROR
+test_supervised_commands_keep_all_frozen_targets (__main__.Tests.test_supervised_commands_keep_all_frozen_targets) ... ok
+
+======================================================================
+ERROR: test_portable_helper_integration_and_baseline_counter_identity_tampering (__main__.Tests.test_portable_helper_integration_and_baseline_counter_identity_tampering)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\exact-mass\diagnostic\test_driver.py", line 116, in test_portable_helper_integration_and_baseline_counter_identity_tampering
+    self.assertEqual(driver.check(p.out)["cases_exact"], 4)
+                     ~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\exact-mass\diagnostic\run_diagnostic.py", line 153, in check
+    record = core.record_bytes(store, row["record"], list(plan["tools"].values()))
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\showdown-kernel\run.py", line 273, in record_bytes
+    store.verify(row)
+    ~~~~~~~~~~~~^^^^^
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\showdown-kernel\run.py", line 152, in verify
+    require(self.pin(pin["path"]) == pin, "retained pin differs: " + pin["path"])
+            ~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\showdown-kernel\run.py", line 146, in pin
+    return {"path": path, **digest(self.data(path))}
+                                   ~~~~~~~~~^^^^^^
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\showdown-kernel\run.py", line 142, in data
+    require(path in self.entries, "required original bytes missing: " + path)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\showdown-kernel\run.py", line 39, in require
+    raise ValueError(message)
+ValueError: required original bytes missing: /opt/new/source/experiments/hu-postflop-r1/range-scaling/configs/river.toml
+
+----------------------------------------------------------------------
+Ran 3 tests in 3.059s
+
+FAILED (errors=1)

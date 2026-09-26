@@ -1,0 +1,20 @@
+{
+  "schema": "r1.exact-mass-primitive-checks-verification/v1",
+  "status": "verified",
+  "manifest_sha256": "a9ebc629ebf067f009b5b1f26377510dcb6628ea77aa30a5c95bbc8883f8215e",
+  "raw_file_count": 19,
+  "stored_bytes": 411468,
+  "tests": {
+    "passed": 19,
+    "failed": 0,
+    "ignored": 0
+  },
+  "checks": [
+    "Original raw record/output bytes and SHA-256 match",
+    "All successful source/tool identities unchanged before/after",
+    "Source pins agree with candidate04 manifest",
+    "Raw sample counts/peak/last empty PIDs match records",
+    "Retained gzip reproduces exact tested binary bytes",
+    "Initial compile failure is retained separately and excluded from successful tests"
+  ]
+}

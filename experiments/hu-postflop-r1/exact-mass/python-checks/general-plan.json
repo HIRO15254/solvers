@@ -1,0 +1,491 @@
+{
+  "schema": "r1.exact-mass-python-general-check/v1",
+  "started_at": "2026-09-26T16:23:58.515171+00:00",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/tests",
+    "-v"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "python": {
+    "path": "C:\\Python313\\python.exe",
+    "bytes": 105816,
+    "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca"
+  },
+  "python_version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "environment": {
+    "TEMP": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\exact-mass-python-e5789d48232e4b3692a28b1665988e3c",
+    "TMP": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\exact-mass-python-e5789d48232e4b3692a28b1665988e3c",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "git_head": "db9b8742290ad06d472bf2836e017a11434341c6",
+  "source_files": [
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\run-diagnostic.py",
+      "bytes": 14883,
+      "sha256": "b6897e38e38d978b6403838c797d329be5f855fb8522e7f67218383b3c59cbf6"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\check_docs.py",
+      "bytes": 5418,
+      "sha256": "9af1a436520b57adea611e214d4d7801c8d4ca5d78f591e72b995cd876905a9c"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\plot_convergence.py",
+      "bytes": 2927,
+      "sha256": "7f267e8f8f9ffd1ec96176df25c625e0e0f4088a18deb8dcc63c5e5ab7bc2a8c"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "bytes": 39015,
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_check_docs.py",
+      "bytes": 4276,
+      "sha256": "52579c04f2b43fb1f0d81f8bce2d21ccc3c0864718dab8ec0d56d6036b30fdb3"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_r1_diagnostic_archive.py",
+      "bytes": 7100,
+      "sha256": "1fbfeb8ff9c0fbab74a2f088a1f6bae93b32ca099ff3fb34d3f395de4e3b9297"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_run_supervised.py",
+      "bytes": 18060,
+      "sha256": "7afdab6b42ac20c7e14bf6495c5481022e4f1bab13dc892d0c0b32fbd1a9f9d6"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_workspace_audit.py",
+      "bytes": 2267,
+      "sha256": "cdb0b0c36fa66ce9b6883cee66ff1480e40a360d46c6791cec1007f1499ccf26"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\workspace_audit.py",
+      "bytes": 2657,
+      "sha256": "2e1ebfacfdaa1926b2a209de83a8eea2dbc793c943e54892d74282b65ccc2dc4"
+    }
+  ],
+  "fixture_inputs": [
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\build_diagnostic.py",
+      "bytes": 7581,
+      "sha256": "008f5dd5e9d9345726488c4caec7f15cb5f9bdf4a93a3bd1ce053c71e58fe850"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\check_diagnostic.py",
+      "bytes": 17464,
+      "sha256": "9095b305f3d8fed93b54d682f6261d8b957a716d1d097786c036cb459bb96470"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\check_menus.py",
+      "bytes": 12817,
+      "sha256": "964e6e435e73270b897c1fe5d1bbb5edc34923a96be6c05f78cc480622c582d3"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\check_ranges.py",
+      "bytes": 5948,
+      "sha256": "131d99387b77a72b84de7878fc3fc10a3f6969b77a834376330290cc68a856d1"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\diagnostic-input-check.json",
+      "bytes": 2377,
+      "sha256": "3f6cca731cd1c41e57a6a96e7c9756a22b296b3b4192e1594c58b15b7ce807e3"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\diagnostic.toml",
+      "bytes": 22876,
+      "sha256": "908ff0b9be9143ab37b73c11fc102b24b3f7451c3a0da278917e617465eeb33d"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\ip-range.txt",
+      "bytes": 7081,
+      "sha256": "eb147ce4427bc29bbaee16504c9dc91234c663d483d8fa5fa68b255acfa7f6cd"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-01.json",
+      "bytes": 1829,
+      "sha256": "88aa853674f31e66c3c5757be058ee33c53c176ced60919d6a39564b8bc0324f"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-01.txt",
+      "bytes": 1899,
+      "sha256": "2619a068b3a919fba98a3b386fe4006064a910a6541568c017c4a0fb2edce01d"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-02.json",
+      "bytes": 786,
+      "sha256": "698201a29b0d1bd86ea05700cb9fea30f4726a066c5ee87272b9ff90f71b4164"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-02.txt",
+      "bytes": 50,
+      "sha256": "2f35b395c8645084c859c2e634699294c2828b1d735e933e918f1044cbe5f027"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-03.json",
+      "bytes": 820,
+      "sha256": "0efeaea732bc5a329221fc31e284c9b24c856a2bef9f0c1af1b9d25a2bb547f5"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-03.txt",
+      "bytes": 168,
+      "sha256": "f6350406fceb75bd54c07b6ee2ec0cc169e4337dedc08720a245e07d2830378c"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-04.json",
+      "bytes": 735,
+      "sha256": "c5f546d2453d5f246ef0c93c80e810d204810435da42aeb2f24803a9e27e7696"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-04.txt",
+      "bytes": 174,
+      "sha256": "81bcc541eed675223db903196d3b9bd2190eb2abfd8ccf5e946ce7d2e444d781"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-05.json",
+      "bytes": 790,
+      "sha256": "e190ce878951b2cf92bc1b137f307b8d0560a7520808fa7bbbfda3fa87bf3f1f"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-05.txt",
+      "bytes": 148,
+      "sha256": "404fa3924d112aa5b861fbb3961eb4bb48a04934202d5a67accfc3bc21fd0fb0"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-06.json",
+      "bytes": 722,
+      "sha256": "99fe018e84ae605a0aa95c6be94901fae907b571c9a951f3d5b19241b41d1466"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-06.txt",
+      "bytes": 130,
+      "sha256": "82f8a30b4c7159c5f8fb556166f0a4c92c94adaf6674ccbe84b7519e1f8251c1"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-07.json",
+      "bytes": 744,
+      "sha256": "765fa2822b23320c6ce6f6f43136bdd2e694a899d00e2d17b260c19c01236bf0"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-07.txt",
+      "bytes": 54,
+      "sha256": "e5351e96a3a8c165168b376d875a78628d6a44d9f4041c8d4707239ebf450680"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-08.json",
+      "bytes": 636,
+      "sha256": "c8f4461c013f4fbab95d52aef091a7f7e5174e15d1c4c2a345f78e310eaa3c82"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-08.txt",
+      "bytes": 101,
+      "sha256": "fdc91f5f5779fe7dc02a91262f6880e9097ac25c9f6249aff63aa779f5ce3db7"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-09.json",
+      "bytes": 737,
+      "sha256": "14df3bce222c8a57c1e048d34e0b0606d55d1f0d964e0e8400e85efdb2d79139"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-09.txt",
+      "bytes": 85,
+      "sha256": "61f6a1fd208ca1e8830515a5922a410f6531f18a604474f85afcf8c42d4757fc"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-10.json",
+      "bytes": 701,
+      "sha256": "c276f4209644d8b5829dc8d35d3eed88932d90991a9d92ba07671edf627a18f0"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-10.txt",
+      "bytes": 58,
+      "sha256": "1eba78fcafb168d33bec16bfff27ef313c5e72913327b6049576a327c060266f"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-11.json",
+      "bytes": 821,
+      "sha256": "2fb27cace6766cd59c7a23c156227da97addaaaa1c2725fd8a89c8476bf1d183"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-11.txt",
+      "bytes": 32,
+      "sha256": "9d8b78f18c4473e4a09f63528a7534678512d96d90381218a3bda68a99d845ca"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-12.json",
+      "bytes": 989,
+      "sha256": "91b257a82cfbfaad4a5d434b94e0ef4885fd8f5a9c9a871cc22bc16629c0307a"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-12.txt",
+      "bytes": 68,
+      "sha256": "417f28efc8932f806ab0ee06539b9de1fbcc4303eadb4d8ee22d91968835e6c7"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-13.json",
+      "bytes": 784,
+      "sha256": "f426a88c5f06700cd0daa9decab6a02a13f66a0c6d98a12c21f709fe6d817bd4"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-13.txt",
+      "bytes": 66,
+      "sha256": "b572759b315649831b2af888beb749eb7f3d50bd43b47c57d3b3b3201aeb3f15"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-14.json",
+      "bytes": 849,
+      "sha256": "5f58c6053f3c5138786810e1c56aae3f0e6e2f81f2a9aca3600f1229fe84a063"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-14.txt",
+      "bytes": 68,
+      "sha256": "3f415814c81cfdcf036fc31683b8897eaceb05758508ea3e33bb602889709147"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-15.json",
+      "bytes": 806,
+      "sha256": "132d1ab09854bf1131b38ac82f03a02f133da462c1bbe1cf9552f6273fef77a7"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-15.txt",
+      "bytes": 78,
+      "sha256": "c032f4bf2bd0f84d291edac5467918b8a942d93e55eea7dfa381b161b7d6cacc"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-16.json",
+      "bytes": 794,
+      "sha256": "99c3bf492f29e828808abcb5a57a1970b613a658e3a1067eb879c95f092c4228"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-16.txt",
+      "bytes": 60,
+      "sha256": "e10b16a17001d97496cca35d41a1754956192021c3f30008b18c62178f1f87f2"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-17.json",
+      "bytes": 841,
+      "sha256": "88a2c2b36dfd6517a6730551c0418742d045b0b50f7d91314b7fc7812a0b76a7"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-17.txt",
+      "bytes": 64,
+      "sha256": "b38441b07b00f6e44f34b889c49ffbf696096f0822ffd8fcce3b6963d7f48698"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-18.json",
+      "bytes": 717,
+      "sha256": "137a94148da46a443785d4faf115709f3c88b3b3e43de0038a492076d3608233"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-18.txt",
+      "bytes": 64,
+      "sha256": "989fb4ce813a51b05241888fb376163ef1ac12ddada42a4f326e2999efb76ba2"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-19.json",
+      "bytes": 854,
+      "sha256": "519632b2b899e8ca53f0ea6c1a38332931dfd2ff4bca86c752f508244301ba14"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-19.txt",
+      "bytes": 34,
+      "sha256": "067bcac3fc25794067671729c35b1603c01d0a8b2ada6caae7358c05d8187c2e"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\observed.json",
+      "bytes": 147034,
+      "sha256": "0f12b8aebaf833032332e2815868a4c3db8405edce64f32a8ae3ca3e1cd7b4df"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\oop-range.txt",
+      "bytes": 7443,
+      "sha256": "04e626aaee3fabd74ec6038ff3a8c92ec602ceb22dc5c080e3304e475dae5eec"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\range-integrity.json",
+      "bytes": 1913,
+      "sha256": "38a0c065c5993b487bd9dc3458129ae1ad16553b3d7ffb48b568213e9065fd21"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\README.md",
+      "bytes": 13208,
+      "sha256": "ff1b3bff6fcace3f6bdfa3567f4b7f367caacc2fed11a57a1eb4354b811141ee"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\test_check_diagnostic.py",
+      "bytes": 12074,
+      "sha256": "4d3d57e807913773979ee8011c52d2542df823c5f5415a10b7f67924a353876f"
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\test_check_menus.py",
+      "bytes": 3558,
+      "sha256": "e96174a1025fc3de2d944a01533827471beb0ebcdf9fb25b942d93a67b57feea"
+    }
+  ],
+  "test_fixture_directory": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\tool-tests",
+  "scope": "General Python tools tests only; no Cargo, solver or cloud operation.",
+  "supervisor_arguments": [
+    "--record",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\exact-mass\\python-checks\\general-supervisor.json",
+    "--stdout",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\exact-mass\\python-checks\\general.stdout.log",
+    "--stderr",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\exact-mass\\python-checks\\general.stderr.log",
+    "--samples",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\exact-mass\\python-checks\\general.samples.jsonl",
+    "--cwd",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+    "--timeout-seconds",
+    "240",
+    "--grace-seconds",
+    "5",
+    "--kill-wait-seconds",
+    "5",
+    "--memory-limit-bytes",
+    "805306368",
+    "--min-free-memory-bytes",
+    "3221225472",
+    "--disk-reserve-bytes",
+    "1073741824",
+    "--poll-seconds",
+    "0.1",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\run-diagnostic.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\check_docs.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\plot_convergence.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_check_docs.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_r1_diagnostic_archive.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_run_supervised.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\tests\\test_workspace_audit.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\workspace_audit.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\build_diagnostic.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\check_diagnostic.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\check_menus.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\check_ranges.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\diagnostic-input-check.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\diagnostic.toml",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\ip-range.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-01.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-01.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-02.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-02.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-03.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-03.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-04.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-04.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-05.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-05.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-06.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-06.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-07.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-07.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-08.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-08.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-09.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-09.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-10.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-10.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-11.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-11.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-12.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-12.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-13.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-13.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-14.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-14.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-15.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-15.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-16.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-16.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-17.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-17.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-18.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-18.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-19.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\menu-capture-19.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\observed.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\oop-range.txt",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\range-integrity.json",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\README.md",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\test_check_diagnostic.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-002\\test_check_menus.py",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\exact-mass\\python-checks\\general-plan.json",
+    "--",
+    "C:\\Python313\\python.exe",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/tests",
+    "-v"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\exact-mass\\diagnostic\\test_instrument.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 4.354887008666992,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "154a8eb5e00b2d97fbbc3ad1fd5ad7bad2e0b5926a30212f0642a68c564c3fbd",
+  "script_sha256": "f0292a3e0e085115c597f988f4894065d9c5e1c98932b8a36126cf1e4b4fd1f6",
+  "test_sha256": "6cdeb4aebe3c6d4988a0e96396433efd7e3492eb830258b1e2ec201e67cc4a4a",
+  "scope": "Python archive/pin/patch/numerical-bound tests only; no Rust build or solver execution"
+}

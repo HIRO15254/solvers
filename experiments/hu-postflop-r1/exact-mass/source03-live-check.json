@@ -1,0 +1,55 @@
+{
+  "schema": "r1.source-live-check/v1",
+  "checked_utc": "2026-09-26T17:05:48.970577+00:00",
+  "source_manifest_sha256": "03855612736b0978dabccca1c7e2d394e52262c33a0997fe53f9bfa188a549cb",
+  "source_file_count": 368,
+  "runtime_tests_and_configs_match_snapshot": true,
+  "only_differences": [
+    {
+      "path": "docs/architecture.md",
+      "snapshot": {
+        "bytes": 34768,
+        "sha256": "3e4898727e61e5f6a625414c8262d515bd64b0354603f80c36f50febe27c0726"
+      },
+      "live": {
+        "bytes": 34837,
+        "sha256": "c22e41b1bea2e5d36cfdc393aaa429f13297fa6e05bffd0ab469175b021e3a24"
+      }
+    },
+    {
+      "path": "docs/cli-reference.jp.md",
+      "snapshot": {
+        "bytes": 38117,
+        "sha256": "b27186c76c0b466b3b1647414ff643408282444f39aad7741d9bcf308260aff9"
+      },
+      "live": {
+        "bytes": 38192,
+        "sha256": "15328ea28027f863103124c8b6eb2b08aab1908088905e56b479c222b93be9b4"
+      }
+    },
+    {
+      "path": "docs/solver-config-v1.jp.md",
+      "snapshot": {
+        "bytes": 60394,
+        "sha256": "5ddc11f162740cf0b0badcdae809f04ba925facbd894ab169d6b6d5b1034df41"
+      },
+      "live": {
+        "bytes": 60496,
+        "sha256": "31c14cc25ed37bde41c9a4cf24de5184506f591309e8fe0fc441b1c024282265"
+      }
+    },
+    {
+      "path": "docs/user-guide.jp.md",
+      "snapshot": {
+        "bytes": 40242,
+        "sha256": "5e4112eb4ab95205fe9f3d49d729829e3f7c43c542f1d1fddcf4612045d3172c"
+      },
+      "live": {
+        "bytes": 40320,
+        "sha256": "f4147af553d188b606deb30cc68fcb81d78dcaf388f96b61aa7c74d6e6f498f5"
+      }
+    }
+  ],
+  "reason": "Clarify existing SOL denominator f32 conversion and f32 division after read-only review; no runtime or contract behavior change.",
+  "documentation_check": "python -B tools/check_docs.py passed: 48 Markdown files; command transcript in current task."
+}

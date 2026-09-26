@@ -1,0 +1,8 @@
+{
+  "archive": "exact-new02.validation-failure.tar.gz",
+  "bytes": 1451453,
+  "sha256": "28320cabefcce24e70ad83011ac5b09b748a83ce4dc32582cd29f0f489e0bea9",
+  "members": 15,
+  "status": "failed",
+  "error": "AssertionError('stage failed: clippy')"
+}

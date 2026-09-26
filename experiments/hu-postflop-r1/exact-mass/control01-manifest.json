@@ -1,0 +1,54 @@
+{
+  "archive": {
+    "path": "experiments\\hu-postflop-r1\\exact-mass\\control01.tar.gz",
+    "bytes": 52703,
+    "sha256": "a70ae6593d9af2de9e7fd3f4a6e67524ad1128df9c8e3bc2dcc25ca83a5035a3"
+  },
+  "files": [
+    {
+      "path": "exact-mass/run.py",
+      "bytes": 41516,
+      "sha256": "62200fe9df43a111f6088d4f6e824234876baff6caf0c065fd42365a84869129"
+    },
+    {
+      "path": "exact-mass/verify.py",
+      "bytes": 980,
+      "sha256": "1593ad76dc47a00787ff0b3c35b8d946e71292bd9774a55d38b413afc617851d"
+    },
+    {
+      "path": "exact-mass/protocol.json",
+      "bytes": 6178,
+      "sha256": "2555fbd3ae472373a5094d4636b46c67a82c240538f257b143fd5f6c17f78777"
+    },
+    {
+      "path": "showdown-kernel/run.py",
+      "bytes": 41166,
+      "sha256": "6d21fe34f9f66327bb7f3ff1c50d977687018af45c3593d56726f78e8da44a60"
+    },
+    {
+      "path": "exact-mass/reference/flop.json",
+      "bytes": 3639,
+      "sha256": "7636b1aff0761332e68788b4ed6ebac2482c7be0313c45168e4dff00b3cfd32d"
+    },
+    {
+      "path": "exact-mass/reference/narrow-river.json",
+      "bytes": 3365,
+      "sha256": "fc7bfba43023770f7c1a16890c85cb98dbf9ff5e960c02a1d0a7dcd7ce715676"
+    },
+    {
+      "path": "exact-mass/reference/river.json",
+      "bytes": 22884,
+      "sha256": "74619da6901ba37f2e7fd577626a57c62a2f1c2ba46fe0a7184061c64b0700fa"
+    },
+    {
+      "path": "exact-mass/reference/source-manifest.json",
+      "bytes": 66442,
+      "sha256": "7b750fe10b3328c9d46c27c8ed7e688492ccd18db998f8cc63ac7b8c61e0635c"
+    },
+    {
+      "path": "exact-mass/reference/turn.json",
+      "bytes": 4479,
+      "sha256": "601db9a7b06d766d600fda1ed9129305d0182605a561d50d4aee8148eb034039"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+test_cargo_paths_are_portable_posix_and_both_harnesses_required (__main__.Tests.test_cargo_paths_are_portable_posix_and_both_harnesses_required) ... ok
+test_commands_are_finite_scope (__main__.Tests.test_commands_are_finite_scope) ... ok
+test_exact_one_test_success_and_zero_test_rejection (__main__.Tests.test_exact_one_test_success_and_zero_test_rejection) ... ok
+test_syntax_and_frozen_test_list (__main__.Tests.test_syntax_and_frozen_test_list) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.010s
+
+OK

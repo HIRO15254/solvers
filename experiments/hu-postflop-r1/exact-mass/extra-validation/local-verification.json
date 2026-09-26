@@ -1,0 +1,8 @@
+{
+  "schema": "r1.exact-mass-extra-validation-verification/v1",
+  "status": "completed",
+  "tests_passed": 4,
+  "source_manifest_sha256": "1a84947f6daa9ca1c57d5f48e4914e176643dbe9c787262ded95dcf6aba042d6",
+  "source_archive_sha256": "51068bb8464b57b91d11fe1ce1be848f14cd83e26865661afeeee3c70a3e9cd7",
+  "scope": "Candidate04 four exact ignored tests; same-source target reuse after full validation. No performance claim."
+}

@@ -1,0 +1,97 @@
+{
+  "schema": "r1.exact-mass-protocol/v1",
+  "scope": "Prospective cost of correcting compatible mass. F32 compact one-worker internal fixtures at common NashConv targets; numerical correctness is established by independent tests, not historical state equality. Not external reference or full R1 acceptance.",
+  "old_revision": "db9b8742290ad06d472bf2836e017a11434341c6",
+  "logical_cpus": 4,
+  "threads": 1,
+  "layout": "compact",
+  "cases": {
+    "river": {
+      "file": "river.toml",
+      "iterations": 1000,
+      "check_every": 100,
+      "target_nash_conv": 0.439,
+      "reference": {
+        "file": "reference/river.json",
+        "bytes": 22884,
+        "sha256": "74619da6901ba37f2e7fd577626a57c62a2f1c2ba46fe0a7184061c64b0700fa",
+        "original_path": "/opt/r1/kernel-proof02/stages/river-b1-new/bench/result.json",
+        "achieved_nash_conv": 0.43885694415867116
+      }
+    },
+    "turn": {
+      "file": "turn.toml",
+      "iterations": 1000,
+      "check_every": 100,
+      "target_nash_conv": 0.00228,
+      "reference": {
+        "file": "reference/turn.json",
+        "bytes": 4479,
+        "sha256": "601db9a7b06d766d600fda1ed9129305d0182605a561d50d4aee8148eb034039",
+        "original_path": "/opt/r1/kernel-proof02/stages/turn-b1-new/bench/result.json",
+        "achieved_nash_conv": 0.00227539627640283
+      }
+    },
+    "flop": {
+      "file": "flop.toml",
+      "iterations": 50,
+      "check_every": 5,
+      "target_nash_conv": 0.0367,
+      "reference": {
+        "file": "reference/flop.json",
+        "bytes": 3639,
+        "sha256": "7636b1aff0761332e68788b4ed6ebac2482c7be0313c45168e4dff00b3cfd32d",
+        "original_path": "/opt/r1/kernel-proof02/stages/flop-b1-new/bench/result.json",
+        "achieved_nash_conv": 0.0366973876953125
+      }
+    },
+    "narrow-river": {
+      "file": "narrow-river.toml",
+      "iterations": 10000,
+      "check_every": 1000,
+      "target_nash_conv": 0.0,
+      "reference": {
+        "file": "reference/narrow-river.json",
+        "bytes": 3365,
+        "sha256": "fc7bfba43023770f7c1a16890c85cb98dbf9ff5e960c02a1d0a7dcd7ce715676",
+        "original_path": "/opt/r1/kernel-proof02/stages/narrow-river-b1-new/bench/result.json",
+        "achieved_nash_conv": 0.0
+      }
+    }
+  },
+  "config_directory": "experiments/hu-postflop-r1/range-scaling/configs",
+  "target_derivation": {
+    "rule": "For each case use block1 new/prepared-kernel original report from the committed prior campaign. Round its nonnegative NashConv upward to three significant decimal digits; exact zero stays zero. Freeze before candidate observations. No target, cap or cadence adjustment afterward.",
+    "archive": "experiments/hu-postflop-r1/showdown-kernel/kernel-proof02.tar.gz",
+    "archive_bytes": 8089211,
+    "archive_sha256": "28707ceba11324ddc8aef84a740e3c334ec59b19dac0e1c5ec9ed7f29c3bab69",
+    "source_manifest": {
+      "file": "reference/source-manifest.json",
+      "bytes": 66442,
+      "sha256": "7b750fe10b3328c9d46c27c8ed7e688492ccd18db998f8cc63ac7b8c61e0635c",
+      "original_path": "/opt/r1/kernel-new-r2/source-candidate-manifest.json"
+    },
+    "metric": "NashConv = (BR0-EV0)+(BR1-EV1), unclamped. NC/2 is only the conventional two-player zero-sum exploitability interpretation; general-sum/raked games retain NashConv semantics."
+  },
+  "warmup_blocks": 1,
+  "measured_blocks": 3,
+  "order": "Cases river, turn, flop, narrow-river. Blocks0..3; block0 warmup. Old first iff (case-index+block) even, otherwise new first. 32 processes,24 measured; six measured pairs per order across cases. No pilot, retry, replacement or post-candidate adjustment.",
+  "guard": {
+    "geometric_mean_new_over_old_max": 1.1,
+    "every_case_new_over_old_max": 1.25
+  },
+  "correctness": "Every process must reach the same case target within cap with finite EV/BR/NashConv. Repeated runs within each arm must reproduce iterations, quality and original canonical/state bytes exactly. Old/new must match normalized config, algorithm, rake, utility, global hands, counts and exact normalizer f64 bits, plus raw common topology/root-weight/deal headers with only iteration count omitted. Old/new values and raw state hashes may differ and are reported. Any mismatch, target miss or process failure stops and skips the remainder with no cost guard.",
+  "limits": {
+    "sample_timeout_seconds": 300,
+    "rss_bytes": 10737418240,
+    "outer_memory_max_bytes": 12884901888,
+    "min_free_bytes": 1073741824,
+    "disk_reserve_bytes": 4294967296,
+    "poll_seconds": 0.1,
+    "grace_seconds": 5,
+    "kill_wait_seconds": 5
+  },
+  "measurement": "Same Linux x86_64 boot,4logical CPUs/full affinity/quota>=4, one Rayon worker, <=12GiB cgroup and swap0. Separate old/new fresh release builds; old build-only and new full validation. Timed run includes solve chunks plus all periodic exact EV/BR checks through first passing check or cap; final report evaluation, construction and artifact capture are outside. No concurrent build/transfer. Native wait4 RSS and sampled process-tree RSS are separate full-process metrics, not solve-only; inherited pre-exec high-water may floor native RSS. No memory non-regression claim from these metrics. Tiny cases and three pairs are descriptive; cost ceiling is not a speedup claim.",
+  "retention": "Original-byte CAS uses the frozen showdown runner Store payload schema only. New plan/result/verification semantics are exact-mass. Trusted local helper code is pinned and imported from the checkout, never from evidence. Retain sources/manifests, binaries/build proofs, controls/reference originals, every raw process log/sample/report/artifact; compiler/Python identity-only. Source-after is recorded live rehash, not independent filesystem snapshot.",
+  "failure": "No retries. Each process<=300s with >=320s remaining, sampled RSS<=10GiB/free>=1GiB/disk>=4GiB; outer service enforces deadline. Failed prepare is terminal. Target miss retains its complete diagnostic report and remaining stages are skipped; no timing adoption guard. All counts/thresholds fixed before candidate runs."
+}

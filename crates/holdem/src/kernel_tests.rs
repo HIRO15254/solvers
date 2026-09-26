@@ -5,6 +5,7 @@ use super::{
     RankEntry, fold_kernel, fold_kernel_compact, showdown_kernel, showdown_kernel_compact,
 };
 use crate::hands::PostflopHands;
+use crate::mass::{MassWidth, classify_integer_mass, f64_mass_is_exact};
 use cards::{Card, HandRank, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of};
 
 type SortedRanks = Vec<(HandRank, u32)>;
@@ -245,9 +246,7 @@ fn compact_kernels_match_old_bits_and_pairwise_after_public_card_masks() {
 }
 
 #[test]
-fn compact_kernels_preserve_historical_tiny_reach_rounding_bits() {
-    // This is intentionally a compatibility test, not a claim that the old
-    // inclusion-exclusion avoids cancellation at extreme weight ratios.
+fn compact_and_global_kernels_agree_with_extreme_reach() {
     let board = board("2c 7d 9h Js Qs");
     let hands = PostflopHands::from_ranges(
         &board,
@@ -257,44 +256,148 @@ fn compact_kernels_preserve_historical_tiny_reach_rounding_bits() {
         ),
     );
     let (showdown, fold) = tables(&hands, &board);
-    for player in Player::BOTH {
-        let reach: Vec<_> = (0..hands.len(player.opponent()))
-            .map(|i| match i % 3 {
-                0 => f32::MIN_POSITIVE,
-                1 => f32::from_bits(1),
-                _ => 0.7,
+    for (low, expected_width) in [
+        (2.0_f32.powi(-30), MassWidth::U64),
+        (2.0_f32.powi(-70), MassWidth::U128),
+        (f32::from_bits(1), MassWidth::Wide),
+    ] {
+        for player in Player::BOTH {
+            let reach: Vec<_> = (0..hands.len(player.opponent()))
+                .map(|i| match i % 3 {
+                    0 => low,
+                    1 => low * 2.0,
+                    _ => 0.7,
+                })
+                .collect();
+            let global_reach = hands.expand(player.opponent(), &reach);
+            assert!(!f64_mass_is_exact(&reach));
+            assert_eq!(classify_integer_mass(&reach).0, expected_width);
+            let mut actual = vec![0.0; hands.len(player)];
+            let mut old = vec![0.0; NUM_COMBOS];
+            let utilities = [2.25, -0.75, -4.125];
+            showdown_kernel_compact(
+                &compact_table(&showdown, &hands),
+                utilities,
+                player,
+                &reach,
+                &mut actual,
+            );
+            showdown_kernel(
+                &showdown,
+                utilities[0],
+                utilities[1],
+                utilities[2],
+                &global_reach,
+                &mut old,
+            );
+            assert_bits(&actual, &old, &hands, player);
+            actual.fill(0.0);
+            old.fill(0.0);
+            fold_kernel_compact(
+                &compact_table(&fold, &hands),
+                -2.75,
+                player,
+                &reach,
+                &mut actual,
+            );
+            fold_kernel(&fold, -2.75, &global_reach, &mut old);
+            assert_bits(&actual, &old, &hands, player);
+        }
+    }
+}
+
+#[test]
+fn tiny_legal_mass_survives_blocked_weights_for_each_outcome_and_both_seats() {
+    let board = board("2c 7d 9h Js Qs");
+    for (own, blocked_hand, legal_hand, outcome) in [
+        ("AsAh", "AsKh", "KcKd", 0),
+        ("AcAd", "AcKh", "AsAh", 1),
+        ("8c8d", "Ac8c", "KcKd", 2),
+    ] {
+        for player in Player::BOTH {
+            let opponent: Range = format!("{blocked_hand},{legal_hand}").parse().unwrap();
+            let own: Range = own.parse().unwrap();
+            let ranges = if player == Player::P0 {
+                PerPlayer::new(own, opponent)
+            } else {
+                PerPlayer::new(opponent, own)
+            };
+            let hands = PostflopHands::from_ranges(&board, &ranges);
+            let legal: Range = legal_hand.parse().unwrap();
+            let (showdown, fold) = tables(&hands, &board);
+            for tiny in [2.0_f32.powi(-30), 1e-20f32, f32::from_bits(1)] {
+                let reach: Vec<_> = hands
+                    .combos(player.opponent())
+                    .iter()
+                    .map(|&combo| {
+                        if legal.weights()[combo as usize] > 0.0 {
+                            tiny
+                        } else {
+                            1.0
+                        }
+                    })
+                    .collect();
+                let (masses, compatible) = pairwise_masses(&hands, player, &board, &reach);
+                assert_eq!(compatible, vec![tiny as f64]);
+                let mut actual = vec![0.0; hands.len(player)];
+                for selected in 0..3 {
+                    let mut utilities = [0.0; 3];
+                    utilities[selected] = 1.0;
+                    showdown_kernel_compact(
+                        &compact_table(&showdown, &hands),
+                        utilities,
+                        player,
+                        &reach,
+                        &mut actual,
+                    );
+                    let expected = if selected == outcome { tiny } else { 0.0 };
+                    assert_eq!(masses[0][selected] as f32, expected);
+                    assert_eq!(actual[0].to_bits(), expected.to_bits());
+                }
+                fold_kernel_compact(
+                    &compact_table(&fold, &hands),
+                    1.0,
+                    player,
+                    &reach,
+                    &mut actual,
+                );
+                assert_eq!(actual[0].to_bits(), tiny.to_bits());
+                assert_eq!(
+                    crate::compatible_reach(&hands, player, &reach),
+                    vec![tiny as f64]
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn losing_mass_is_subtracted_before_float_conversion() {
+    let board = board("2c 7d 9h Js Qs");
+    let ranges = PerPlayer::new("KsKh".parse().unwrap(), "AcAd,TcTd".parse().unwrap());
+    let hands = PostflopHands::from_ranges(&board, &ranges);
+    let aces: Range = "AcAd".parse().unwrap();
+    let (showdown, _) = tables(&hands, &board);
+    for tiny in [2.0_f32.powi(-30), 1e-20f32, f32::from_bits(1)] {
+        let reach: Vec<_> = hands
+            .combos(Player::P1)
+            .iter()
+            .map(|&combo| {
+                if aces.weights()[combo as usize] > 0.0 {
+                    tiny
+                } else {
+                    1.0
+                }
             })
             .collect();
-        let global_reach = hands.expand(player.opponent(), &reach);
-        let mut actual = vec![0.0; hands.len(player)];
-        let mut old = vec![0.0; NUM_COMBOS];
-        let utilities = [2.25, -0.75, -4.125];
+        let mut out = vec![0.0; 1];
         showdown_kernel_compact(
             &compact_table(&showdown, &hands),
-            utilities,
-            player,
+            [0.0, 0.0, 1.0],
+            Player::P0,
             &reach,
-            &mut actual,
+            &mut out,
         );
-        showdown_kernel(
-            &showdown,
-            utilities[0],
-            utilities[1],
-            utilities[2],
-            &global_reach,
-            &mut old,
-        );
-        assert_bits(&actual, &old, &hands, player);
-        actual.fill(0.0);
-        old.fill(0.0);
-        fold_kernel_compact(
-            &compact_table(&fold, &hands),
-            -2.75,
-            player,
-            &reach,
-            &mut actual,
-        );
-        fold_kernel(&fold, -2.75, &global_reach, &mut old);
-        assert_bits(&actual, &old, &hands, player);
+        assert_eq!(out[0].to_bits(), tiny.to_bits());
     }
 }

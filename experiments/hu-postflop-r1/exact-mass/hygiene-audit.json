@@ -1,0 +1,121 @@
+{
+  "schema": "solvers.r1-scratch-hygiene-audit/v1",
+  "recorded_at_utc": "2026-09-26T16:59:18Z",
+  "audit_type": "Read-only inventory and retained-evidence mapping, not a deletion receipt",
+  "git_head": "db9b8742290ad06d472bf2836e017a11434341c6",
+  "local_parent": "E:/codex-work/solvers",
+  "retained_prefix": "experiments/hu-postflop-r1/",
+  "scope": "Old context, range-scaling 01 through 06, vm08, writer-smoke and target directories. All r1-exact-* directories were excluded.",
+  "deletion_performed_by_auditor": false,
+  "candidate_totals": {"files": 5212, "bytes": 708684076},
+  "candidates": [
+    {
+      "local": "target/r1-context-fresh-baseline-20260926",
+      "files": 801,
+      "bytes": 220885113,
+      "kind": "Reproducible Cargo output",
+      "retained": ["codec/context-reuse/windows-debug-20260926/manifest.json", "codec/context-reuse/windows-debug-20260926/fresh/binaries/baseline.exe.gz"]
+    },
+    {
+      "local": "target/r1-context-fresh-candidate-20260926",
+      "files": 828,
+      "bytes": 246482725,
+      "kind": "Reproducible Cargo output",
+      "retained": ["codec/context-reuse/windows-debug-20260926/manifest.json", "codec/context-reuse/windows-debug-20260926/fresh/binaries/candidate.exe.gz"]
+    },
+    {
+      "local": "r1-context-adoption-20260926",
+      "files": 23,
+      "bytes": 1005384,
+      "retained": ["validation/context-adoption-20260926/manifest.json"],
+      "mapping": "All 23 local files have original-path aliases in the HEAD manifest. All referenced retained payloads exist in HEAD."
+    },
+    {
+      "local": "r1-context-reuse-20260926",
+      "files": 315,
+      "bytes": 13084223,
+      "retained": ["codec/context-reuse/windows-debug-20260926/manifest.json"],
+      "mapping": "119 files have direct aliases; 196 remaining source files are covered by source pins and immutable Git base plus the retained candidate overlay. The source directory has 197 pinned files and two retained provenance/patch files. All source names and sizes match; Git base 2fecc099b9911511a0938fb2700bbb124bc1046e exists."
+    },
+    {
+      "local": "r1-writer-smoke-20260926",
+      "files": 431,
+      "bytes": 9202051,
+      "retained": ["codec/write-phases/windows-smoke-20260926/manifest.json", "codec/write-phases/windows-smoke-20260926/source/source-bundle.tar.gz"],
+      "mapping": "37 files have direct aliases. The 197 instrumented source files and three changed original files are in the Git source bundle; remaining original files reuse instrumented bytes. Both source sets and sizes match bundle metadata. Extra source provenance/patch files have direct aliases."
+    },
+    {
+      "local": "r1-vm08",
+      "files": 984,
+      "bytes": 39426626,
+      "retained": ["codec/context-reuse/linux-spot-20260926/build-proof/manifest.json", "codec/context-reuse/linux-spot-20260926/complete-proof/manifest.json", "cloud/vm08/source-candidate-manifest.json", "cloud/vm08/source-bulk-manifest.json", "cloud/vm08/source-legacy-manifest.json"],
+      "mapping": "All listed proof payloads exist in HEAD; collector missing_paths are empty. All three source archives and the input archive have retained original aliases. Local source file sets and sizes match the HEAD source manifests (342 candidate, 342 bulk, 287 legacy). Original collector containers are identified by hash; their payloads and sidecars, rather than the entire containers, are retained."
+    },
+    {
+      "local": "r1-range-scaling-01",
+      "files": 358,
+      "bytes": 8029523,
+      "retained": ["range-scaling/source01/failed-proof/manifest.json"]
+    },
+    {
+      "local": "r1-range-scaling-02",
+      "files": 362,
+      "bytes": 8191678,
+      "retained": ["range-scaling/source02/failed-proof/manifest.json"]
+    },
+    {
+      "local": "r1-range-scaling-03",
+      "files": 363,
+      "bytes": 8262222,
+      "retained": ["range-scaling/source03/failed-proof/manifest.json"]
+    },
+    {
+      "local": "r1-range-scaling-04",
+      "files": 373,
+      "bytes": 70662302,
+      "retained": ["range-scaling/source04/validation-proof/manifest.json", "range-scaling/source04/build32-proof/manifest.json", "range-scaling/source04/build32b-proof/manifest.json", "range-scaling/source04/scaling32-proof/manifest.json"]
+    },
+    {
+      "local": "r1-range-scaling-06",
+      "files": 374,
+      "bytes": 83452229,
+      "retained": ["range-scaling/source06/validation-proof/manifest.json", "action-scaling/source06/measurement-proof/manifest.json"]
+    }
+  ],
+  "range_scaling_mapping_checks": {
+    "retained_collector_count": 9,
+    "all_listed_payloads_exist_in_HEAD_with_manifest_sizes": true,
+    "all_collector_missing_paths_empty": true,
+    "local_manifest_and_sha_sidecars_equal_decoded_HEAD_bytes": true,
+    "all_six_local_source_file_sets_and_sizes_match_HEAD_source_manifests": true,
+    "local_source_contents_fully_rehashed": false
+  },
+  "hold": [
+    {
+      "local": "r1-range-scaling-05",
+      "files": 368,
+      "bytes": 6892269,
+      "source_files": 367,
+      "source_bytes": 5508241,
+      "archive": "source-candidate.tar.gz",
+      "archive_bytes": 1384028,
+      "recorded_archive_sha256": "ef753ecd86fd739e143455a95f15a4befcad12c647f2792e4669625dd05efa7b",
+      "retained": ["range-scaling/source05/source-candidate-manifest.json", "range-scaling/source05/pack-report.json", "range-scaling/source05/README.md"],
+      "reason": "HEAD holds metadata but no matching source archive payload. The local archive is an explicit availability dependency. Source06 differs in five files (action-scaling README, protocol, runner, test and cloud budget), so it is not an exact replacement."
+    }
+  ],
+  "activity_checks": {
+    "query_scope": "Known Cargo, Rust, Clippy, solver, benchmark and Python process names; a separate ExecutablePath query restricted to E:/codex-work/solvers.",
+    "known_process_command_lines_referencing_candidates": 0,
+    "executables_running_under_local_parent": 0,
+    "full_user_process_command_lines_recorded": false,
+    "agent_confirmation": "writer_hotpath_audit reported no current or planned use of the old directories. Its exact-mass input was outside this audit scope.",
+    "limitation": "A point-in-time process/agent check, not a lock or guarantee about future use."
+  },
+  "limits": [
+    "No files were deleted or changed by this inventory audit.",
+    "No large recursive content hashing or full solver verification was repeated. Local source names and sizes do not prove byte equality.",
+    "Candidate means retained-evidence mapping is available; a final active-use and original-byte check remains separate from this inventory.",
+    "The root subsequently limited the planned cleanup to the two fixed Cargo target directories (1629 files, 467367838 bytes). Other source/raw directories and source05 remain outside that cleanup. This audit does not assert its completion."
+  ]
+}

@@ -1,0 +1,13 @@
+test_bad_archive_paths_and_members_rejected (__main__.InstrumentTests.test_bad_archive_paths_and_members_rejected) ... ok
+test_bad_manifest_fails_before_creating_output (__main__.InstrumentTests.test_bad_manifest_fails_before_creating_output) ... ok
+test_callsite_mapping_and_report_only_benchmark_change (__main__.InstrumentTests.test_callsite_mapping_and_report_only_benchmark_change) ... ok
+test_materialized_copy_provenance_and_original_source (__main__.InstrumentTests.test_materialized_copy_provenance_and_original_source) ... ok
+test_original_gate_body_and_mass_arithmetic_unchanged (__main__.InstrumentTests.test_original_gate_body_and_mass_arithmetic_unchanged) ... ok
+test_pin_rejects_changed_source_or_missing_file (__main__.InstrumentTests.test_pin_rejects_changed_source_or_missing_file) ... ok
+test_real_candidate_entire_file_set_and_pins (__main__.InstrumentTests.test_real_candidate_entire_file_set_and_pins) ... ok
+test_width_bound_edges_in_independent_integer_arithmetic (__main__.InstrumentTests.test_width_bound_edges_in_independent_integer_arithmetic) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 4.193s
+
+OK

@@ -1,0 +1,119 @@
+{
+  "schema": "r1.cloud-cleanup/v1",
+  "project": "solvers-abstraction-20260723",
+  "zone": "us-central1-b",
+  "instance": "solvers-r1-20260926-10",
+  "instance_id": "9019841781761201633",
+  "disk_id": "2211921492040111585",
+  "operation_id": "operation-1790444665453-65c6662463c62-d110ba8d-296ba226",
+  "operation_status": "DONE",
+  "deleted_at_utc": "2026-09-26T17:45:17.305000+00:00",
+  "reconciled_at_utc": "2026-09-26T17:51:09.145691+00:00",
+  "instance_name_query": [],
+  "disk_name_query": [],
+  "reserved_address_query": [],
+  "scope": "Queries are filtered to the exact VM/disk name and prior external IPv4; no claim about unrelated project resources. Empty-resource filter warnings are retained in stderr.",
+  "billing_usd": null,
+  "reservation_usd_held": 3,
+  "cumulative_usd_held": 32,
+  "authorized_usd": 40,
+  "proofs": [
+    {
+      "path": "exact-mass/exact-proof04.tar.gz",
+      "bytes": 8231258,
+      "sha256": "b7361b4adc579dc87c36e8c9cd37b1c307465db90fa6432eb1bc24d67163da37"
+    },
+    {
+      "path": "exact-mass/extra-validation/extra-validation.tar.gz",
+      "bytes": 3448779,
+      "sha256": "ad8031c048c3ec1651b56a9ac2662af5dca3bed2488253bc090262fa117a1c93"
+    },
+    {
+      "path": "exact-mass/diagnostic/run.tar.gz",
+      "bytes": 6307380,
+      "sha256": "1c9346a64b66d558267433c3746e7f4b3775ec1b05d54fdb38f194438ebbbebd"
+    }
+  ],
+  "raw_evidence": [
+    {
+      "path": "addresses-after.json",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    {
+      "path": "addresses-after.stderr.log",
+      "bytes": 88,
+      "sha256": "8be0469b7ee5194744107c72876a8f49c4c552c2469e10b330c9291f610c565d"
+    },
+    {
+      "path": "delete-command.json",
+      "bytes": 364,
+      "sha256": "3ff1370cb74de4fb1864b0d19366311e207581ef5173a2b38c28e0deeca89693"
+    },
+    {
+      "path": "delete-operations-after.json",
+      "bytes": 905,
+      "sha256": "68a16e08621a34bc0635e9495606b2ff129040475c2f0fdb5247e9cd0b49f15d"
+    },
+    {
+      "path": "delete-operations-after.stderr.log",
+      "bytes": 9,
+      "sha256": "b98dbf3cf6f3b1a12a8f6ab76462f1d3da06372ff3c671b4b65a00c77aaba777"
+    },
+    {
+      "path": "delete.stderr.log",
+      "bytes": 150,
+      "sha256": "0dc3a2e3653f82b283ee60de4a7b40ea9be6fb5eefff7acc82667602bc106a51"
+    },
+    {
+      "path": "delete.stdout.json",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    {
+      "path": "disk-before.json",
+      "bytes": 448,
+      "sha256": "9bbe9d0bcc3fd9d342c8782e55aa9a63123388fb5e7c9d5d3c693d8ff4ae76ea"
+    },
+    {
+      "path": "disk-before.stderr.log",
+      "bytes": 9,
+      "sha256": "b98dbf3cf6f3b1a12a8f6ab76462f1d3da06372ff3c671b4b65a00c77aaba777"
+    },
+    {
+      "path": "disks-after.json",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    {
+      "path": "disks-after.stderr.log",
+      "bytes": 85,
+      "sha256": "93746ac44a1dc9f2ab9bd14a94fe54806c8ff0995cb59de77888a22a1490cebc"
+    },
+    {
+      "path": "instance-before.json",
+      "bytes": 30753,
+      "sha256": "857be84f3b33817dbc1c3a143bd767b0a746fbafcc9176724238b157ad39277f"
+    },
+    {
+      "path": "instance-before.stderr.log",
+      "bytes": 9,
+      "sha256": "b98dbf3cf6f3b1a12a8f6ab76462f1d3da06372ff3c671b4b65a00c77aaba777"
+    },
+    {
+      "path": "instances-after.json",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    {
+      "path": "instances-after.stderr.log",
+      "bytes": 85,
+      "sha256": "93746ac44a1dc9f2ab9bd14a94fe54806c8ff0995cb59de77888a22a1490cebc"
+    },
+    {
+      "path": "r1-vm10-lifecycle.txt",
+      "bytes": 300688,
+      "sha256": "81a3de7504e5d26895f73b4c7d790b8eabb6e1409d5f05d4913a61edf754365c"
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "schema": "solvers.r1-reference-condition-followup/v1",
+  "observed_date": "2026-09-27",
+  "date_timezone": "Asia/Tokyo",
+  "purpose": "Historical primary-source facts and a prospective field-level EV-origin acquisition experiment; not a calibration input or acceptance decision.",
+  "web_retention": {
+    "mode": "URL, page-displayed publication date, section, short excerpt and scoped paraphrase",
+    "full_page_bytes_retained": false,
+    "page_byte_identity_verified": false,
+    "publication_date_is_solution_version": false
+  },
+  "baseline": {
+    "path": "../reference-condition-audit.json",
+    "bytes": 13294,
+    "sha256": "f3f7f786554eb530810dfd736445a51337fc7b8f3ff4a6c8f1ba7dde65f53389"
+  },
+  "cases": [
+    {
+      "id": "HU-R0-002",
+      "observed_path": "../HU-R0-002/observed.json",
+      "bytes": 147034,
+      "sha256": "0f12b8aebaf833032332e2815868a4c3db8405edce64f32a8ae3ca3e1cd7b4df",
+      "series": "Cash 6max NL500 General 100bb",
+      "condition_match": "unverified",
+      "quality_status": "not_evaluated",
+      "acceptance": null,
+      "comparison_threshold": null,
+      "acquired_node_version_bound_to_sources": false
+    },
+    {
+      "id": "HU-R0-017",
+      "observed_path": "../HU-R0-017/observed.json",
+      "bytes": 18128,
+      "sha256": "de306599f10fe79456e60484ee79a210e365437e0bf1fc98690aedb6acedc76c",
+      "series": "Cash 6max NL500 Simple 75bb",
+      "condition_match": "unverified",
+      "quality_status": "not_evaluated",
+      "acceptance": null,
+      "comparison_threshold": null,
+      "acquired_node_version_bound_to_sources": false
+    },
+    {
+      "id": "HU-R0-019",
+      "observed_path": "../HU-R0-019/observed.json",
+      "bytes": 6319,
+      "sha256": "e38ffaf0b6fbcbbbe5779ae9d4236074df889ea75afd0ee4092e6cd48cf2aca2",
+      "series": "Cash 6max NL500 Simple 75bb",
+      "condition_match": "unverified",
+      "quality_status": "not_evaluated",
+      "acceptance": null,
+      "comparison_threshold": null,
+      "acquired_node_version_bound_to_sources": false
+    }
+  ],
+  "sources": [
+    {
+      "id": "simple75-display-20220204",
+      "url": "https://blog.gtowizard.com/8max-cash-game-straddle-ante/",
+      "title": "8Max Cash Game Straddle + Ante Is Here!",
+      "displayed_publication_date": "2022-02-04",
+      "sections": ["New Solutions", "Double-Digit EV Precision"],
+      "short_excerpt": "the strategy table now shows expected values to two decimal places",
+      "observed_claim": "The announcement includes all NL500 Simple spots at 75bb among depths from 20bb to 200bb, and says the strategy table now displays EV with two decimal places.",
+      "scope": "Historical family/depth availability and a vendor declaration about display precision.",
+      "does_not_establish": ["rounding mode", "internal numerical precision", "individual River residual", "current UI build", "the solve version used in cases 017 or 019", "a calibrated half-display-step error interval"]
+    },
+    {
+      "id": "general-co-repair-20210813",
+      "url": "https://blog.gtowizard.com/new-solutions-aggregation-reports-and-other-improvements/",
+      "title": "New solutions, Aggregation reports and other improvements!",
+      "displayed_publication_date": "2021-08-13",
+      "sections": ["New solutions", "Solutions / Cash game"],
+      "short_excerpt": "resolved these spots for preflop",
+      "observed_claim": "NL500 General CO spots had mistakenly been solved without rake. Preflop had been re-solved and postflop repair was announced for later.",
+      "scope": "A historical staged correction to a specified position within the General family.",
+      "does_not_establish": ["that BTN-open case 002 had this CO-specific bug", "the solve version of the acquired case 002", "uncalled-bet settlement"]
+    },
+    {
+      "id": "general-co-repair-20210824",
+      "url": "https://blog.gtowizard.com/the-best-solutions-we-ever-had-and-other-improvements/",
+      "title": "The Best Solutions We Ever Had and Other Improvements!",
+      "displayed_publication_date": "2021-08-24",
+      "sections": ["Solutions / NL500 General"],
+      "short_excerpt": "completely resolved all CO spots",
+      "observed_claim": "The follow-up states all CO spots were re-solved following the missing-rake error.",
+      "scope": "Completion announcement for the historical CO repair.",
+      "does_not_establish": ["the current General version", "the version of case 002", "that case 002 was affected by the CO bug"]
+    },
+    {
+      "id": "legacy-rake-accuracy-20201217",
+      "url": "https://blog.gtowizard.com/all-you-need-to-know-about-our-solutions/",
+      "title": "All You Need To Know About Our Solutions",
+      "displayed_publication_date": "2020-12-17",
+      "sections": ["The Rake Structure Used for Solving", "The Solver Accuracy Used for Our Solutions Postflop"],
+      "short_excerpt": "both preflop and postflop",
+      "observed_claim": "The legacy-library explanation states PokerStars 500 Zoom rake of 5%, capped at 0.6bb per hand, in both preflop and postflop. It describes 0.4% of pot accuracy for main single-raised, 3-bet and 4-bet pots and 0.8% for rare small-range situations.",
+      "scope": "Historical rake schedule and accuracy description of the then-described library.",
+      "does_not_establish": ["uncalled-bet exclusion", "rake rounding", "collection timing", "fold exemptions", "current per-node error bound", "version binding to cases 002, 017 or 019"]
+    },
+    {
+      "id": "study-mode-action-ev",
+      "url": "https://help.gtowizard.com/study-mode/",
+      "title": "Study Mode",
+      "displayed_publication_date": null,
+      "sections": ["Summary Tab", "Poker Metrics – EV, EQ, EQR, Range Weights", "Clear filters"],
+      "short_excerpt": null,
+      "observed_claim": "The guide describes Strategy + EV as displaying each action's EV; Summary EV is denominated in big blinds. It documents clearing active filters.",
+      "scope": "A documented UI surface for the proposed action-EV acquisition.",
+      "does_not_establish": ["the origin or offset of every EV field", "a node-specific rounding rule", "the value displayed by the proposed unexecuted experiment"]
+    }
+  ],
+  "inferences": [
+    {
+      "claim": "A family name alone does not identify one historical solve version or settlement configuration.",
+      "basis": ["general-co-repair-20210813", "general-co-repair-20210824"],
+      "does_not_imply": "The acquired BTN-open case 002 was affected by the CO-only error."
+    }
+  ],
+  "bounded_search": {
+    "domains": ["blog.gtowizard.com", "help.gtowizard.com"],
+    "topics": ["legacy library rake", "uncalled or unmatched bet settlement", "EV basis", "display rounding", "individual node precision", "solution version"],
+    "new_case_bound_settlement_or_residual_fact_found": false,
+    "unresolved": ["legacy uncalled-bet rake rule", "exact rake rounding and fold settlement", "field-level EV basis for the captured nodes", "display rounding mode", "individual River residual and its denominator", "acquisition-specific solve version"],
+    "limit": "Failure to find these facts in this bounded official-web search is not proof that no public or private specification exists."
+  },
+  "acquisition_experiment": {
+    "id": "002-river-r2-r7-fold-ev-origin",
+    "executed": false,
+    "reason_not_executed": "Available UI surfaces were apps=[] and browsers=[]; no live solution UI was inspected.",
+    "prerequisite": "Connected authenticated read-only GTO Wizard browser with access to this existing solution.",
+    "new_solve_required": false,
+    "case": "HU-R0-002",
+    "observed_menu_json_pointer": "/observed_menus/17",
+    "source_transcription": "../HU-R0-002/menu-capture-01.txt",
+    "source_line": 16,
+    "board": "Ks7h2d3c8d",
+    "preflop": "F-F-F-R2.5-F-C",
+    "flop": "X-X",
+    "turn": "X-X",
+    "river": "R2-R7",
+    "actor": "BB",
+    "remaining_stack_bb_displayed": 95.5,
+    "river_invested_bb": 2.0,
+    "hand_invested_bb": 4.5,
+    "menu_actions": ["fold", "call", "raise to 17", "raise to 23.5", "allin 97.5"],
+    "navigation_url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7",
+    "navigation_url_provenance": "Constructed from saved base URL and transcribed history; not an independently retained complete DOM URL for this node.",
+    "measurement": "Select a confirmed positive-weight BB combo with filters cleared; read its Fold action EV in Strategy + EV / hand detail, not Compare EV, regret, root EV, range EV or mean hand EV. Confirm the displayed unit.",
+    "hypotheses": [
+      {"basis": "immediately before current decision", "predicted_fold_ev_bb": 0.0},
+      {"basis": "River start", "predicted_fold_ev_bb": -2.0},
+      {"basis": "whole-hand starting stack", "predicted_fold_ev_bb": -4.5}
+    ],
+    "hypothesis_assumption": "Each basis prediction assumes no extra payoff adjustment for the folding player. These are arithmetic predictions, not observed values or a claim about the library's settlement implementation.",
+    "retain": ["current DOM URL", "UTC acquisition time", "screenshot or UI snapshot", "selected library/depth/rake preview", "available version/accuracy label", "board and full history", "actor and remaining stack", "full action menu", "selected combo and positive range weight", "filter state", "field label and unit", "exact Fold EV string including signed zero", "warnings", "confirmation with another positive-weight combo"],
+    "unexpected_or_missing_value": "Leave the field origin unresolved; do not force a fit.",
+    "scope_if_successful": "The origin of this action-EV field at this node in the new acquisition only.",
+    "does_not_resolve": ["other UI fields", "past acquisition's version", "uncalled-bet rake treatment", "per-node residual", "display rounding mode", "full strategy profile", "external quality acceptance"]
+  }
+}

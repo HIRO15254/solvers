@@ -1,0 +1,8 @@
+{
+  "schema": "r1.source-live-check/v1",
+  "checked_utc": "2026-09-26T17:36:32.871146+00:00",
+  "source_manifest_sha256": "1a84947f6daa9ca1c57d5f48e4914e176643dbe9c787262ded95dcf6aba042d6",
+  "source_file_count": 368,
+  "all_snapshot_files_match": true,
+  "changes": []
+}

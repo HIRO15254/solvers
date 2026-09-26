@@ -2,8 +2,12 @@
 //!
 //! Required: --config FILE --threads N --iterations N --layout dense|compact
 //! --out NEW_DIRECTORY. The explicit iteration/thread arguments override the
-//! config's run controls; this research example performs no early stopping,
-//! checkpointing or periodic evaluation. Configured game, economics, discount
+//! config's run controls. By default there is no early stopping, checkpointing
+//! or periodic evaluation. Optional --target-nash-conv with --check-every
+//! enables a bounded quality-stop experiment: --iterations is the cap, and
+//! run_seconds includes solve plus every exact EV/BR quality check. This mode
+//! records all checks and whether the target was reached; an unmet cap still
+//! emits artifacts for diagnosis. Configured game, economics, discount
 //! schedule and chance-parallel thresholds are retained. This adds no CLI flag.
 //!
 //! Canonical binary v1 (all integers and raw float bits are little-endian):
@@ -72,6 +76,10 @@ struct Args {
     layout: Layout,
     #[arg(long)]
     out: PathBuf,
+    #[arg(long, requires = "check_every")]
+    target_nash_conv: Option<f64>,
+    #[arg(long, requires = "target_nash_conv")]
+    check_every: Option<u64>,
 }
 
 fn phase<T>(name: &str, clock: &Instant, work: impl FnOnce() -> Result<T>) -> Result<(T, f64)> {
@@ -435,12 +443,48 @@ fn measure(args: &Args, config: &SolveConfig, clock: &Instant) -> Result<serde_j
         postflop_setup::configure_solver(&mut solver, &config.run);
         Ok(solver)
     })?;
-    let (_, run_seconds) = phase("run", clock, || {
-        solver.run(args.iterations);
-        Ok(())
+    let (stopping, run_seconds) = phase("run", clock, || {
+        let Some(target) = args.target_nash_conv else {
+            solver.run(args.iterations);
+            return Ok(None);
+        };
+        let cadence = args.check_every.context("missing quality-check cadence")?;
+        let mut checks = Vec::new();
+        loop {
+            let chunk = cadence.min(args.iterations - solver.iteration());
+            let solve_started = Instant::now();
+            solver.run(chunk);
+            let solve_seconds = solve_started.elapsed().as_secs_f64();
+            let check_started = Instant::now();
+            let ev = Player::BOTH.map(|p| solver.expected_value(p));
+            let br = Player::BOTH.map(|p| solver.best_response_value(p));
+            let nash_conv = (br[0] - ev[0]) + (br[1] - ev[1]);
+            let quality_seconds = check_started.elapsed().as_secs_f64();
+            ensure!(
+                ev.iter().chain(&br).all(|v| v.is_finite()) && nash_conv.is_finite(),
+                "nonfinite stopping quality"
+            );
+            checks.push(json!({"iterations": solver.iteration(), "solver_ev": ev,
+                "solver_br": br, "nash_conv": nash_conv,
+                "solve_seconds": solve_seconds, "quality_seconds": quality_seconds}));
+            let target_met = nash_conv <= target;
+            if target_met || solver.iteration() == args.iterations {
+                return Ok(Some(
+                    json!({"criterion": "nash-conv-sum-of-unclamped-deviation-gains",
+                    "target_nash_conv": target, "check_every": cadence,
+                    "max_iterations": args.iterations, "target_met": target_met,
+                    "reason": if target_met { "target-met" } else { "iteration-cap" },
+                    "checks": checks}),
+                ));
+            }
+        }
     })?;
     ensure!(
-        solver.iteration() == args.iterations,
+        if stopping.is_some() {
+            solver.iteration() > 0 && solver.iteration() <= args.iterations
+        } else {
+            solver.iteration() == args.iterations
+        },
         "iteration count differs"
     );
     let mut ev = [0.0; 2];
@@ -485,7 +529,7 @@ fn measure(args: &Args, config: &SolveConfig, clock: &Instant) -> Result<serde_j
     let (state, state_write_seconds) = phase("state_write", clock, || {
         write_state(&args.out, &solver, &support)
     })?;
-    Ok(json!({
+    let mut report = json!({
         "schema": "r1.hu-scaling-bench/v1", "status": "completed", "layout": args.layout,
         "config": args.config, "threads": args.threads, "iterations": solver.iteration(), "storage": "f32",
         "configured_run": config.run, "algorithm": config.algorithm, "rake": config.rake, "utility": config.utility,
@@ -507,7 +551,15 @@ fn measure(args: &Args, config: &SolveConfig, clock: &Instant) -> Result<serde_j
             "strategy_and_cfv": canonical, "supported_state": state},
         "resources": {"measurement": "external supervisor", "rss_scope": "Full process, including build, solve, EV/BR, and subsequent all-node CFV capture/output. Not solve-only RSS.",
             "cfv_capture": "One player's all-node vectors are captured at a time in the measured layout, then streamed and released before the other player. Capture is outside run and EV/BR timers."}
-    }))
+    });
+    if let Some(stopping) = stopping {
+        report["execution_policy"] = json!(
+            "Explicit maximum iterations, threads, NashConv target and check cadence. The run timer includes all solve chunks and EV/BR checks through the first passing check or the cap. Final report queries and artifact capture remain outside this timer. No checkpoints or configured early stops."
+        );
+        report["timing"]["time_to_target_seconds"] = json!(run_seconds);
+        report["stopping"] = stopping;
+    }
+    Ok(report)
 }
 
 fn main() -> Result<()> {
@@ -515,6 +567,16 @@ fn main() -> Result<()> {
     let mut args = Args::parse();
     ensure!(args.threads > 0, "--threads must be positive");
     ensure!(args.iterations > 0, "--iterations must be positive");
+    if let Some(target) = args.target_nash_conv {
+        ensure!(
+            target.is_finite() && target >= 0.0,
+            "--target-nash-conv must be finite and nonnegative"
+        );
+        ensure!(
+            args.check_every.is_some_and(|value| value > 0),
+            "--check-every must be positive in target mode"
+        );
+    }
     args.config = fs::canonicalize(&args.config).context("locating config")?;
     let raw = fs::read_to_string(&args.config).context("reading UTF-8 config")?;
     let normalized = cli::solver_config_v1::normalized_toml_at(&raw, &args.config)?;

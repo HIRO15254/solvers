@@ -23,6 +23,60 @@
   ],
   "reservations": [
     {
+      "id": "r1-20260926-10",
+      "project": "solvers-abstraction-20260723",
+      "zone": "us-central1-b",
+      "instance": "solvers-r1-20260926-10",
+      "reserved_usd": 3,
+      "billed_usd": null,
+      "reservation_released": false,
+      "maximum_runtime_hours": 4,
+      "machine_type": "e2-standard-4",
+      "disk_type": "pd-balanced",
+      "disk_gib": 40,
+      "maximum_download_gib": 1,
+      "pricing_checked_utc": "2026-09-26",
+      "conservative_compute_usd_hour": 0.14,
+      "disk_usd_gib_hour": 0.000137,
+      "ipv4_usd_hour": 0.0025,
+      "reserved_egress_usd_gib": 0.3,
+      "tax_price_delay_and_other_reserve_usd": 1,
+      "instance_termination_action": "STOP",
+      "explicit_disk_cleanup_hours": 24,
+      "purpose": "Exact card-removal mass correction: complete validation, fixed-quality performance comparison and separate fallback diagnostics on a small Spot VM.",
+      "pricing_sources": [
+        "https://cloud.google.com/products/compute/pricing/general-purpose",
+        "https://cloud.google.com/compute/disks-image-pricing",
+        "https://cloud.google.com/vpc/network-pricing"
+      ],
+      "note": "On-demand compute 0.13402284/h rechecked from official page with Invoke-WebRequest because web renderer exceeded4MiB; round to0.14. Disk0.000136986/GiB/h and SpotIPv4 0.0025/h rechecked official pages. 4.02h compute/IP +40GiB disk up to24h +1GiB transfer0.30 +1margin =2.00437 <3. New held total32/40. Absolute4h STOPdeadline, noauto restart/extension, explicitVM/diskdelete afterproofrecovery.",
+      "events": [
+        {
+          "at": "2026-09-26T08:55:58.763-07:00",
+          "event": "initial_running",
+          "instance_id": "9019841781761201633",
+          "boot_id": "fa0a2c40-b141-458b-8d58-98807d55dc06",
+          "absolute_stop_deadline_utc": "2026-09-26T19:55:53Z"
+        },
+        {
+          "at": "2026-09-26T17:45:17.305000+00:00",
+          "event": "explicit_delete_and_absence_verification",
+          "operation_id": "operation-1790444665453-65c6662463c62-d110ba8d-296ba226",
+          "instance_id": "9019841781761201633",
+          "disk_id": "2211921492040111585",
+          "reconciled_at_utc": "2026-09-26T17:51:09.145691+00:00",
+          "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm10/reconciliation.json",
+          "instances": [],
+          "disks": [],
+          "reserved_addresses": [],
+          "reservation_released": false,
+          "billed_usd": null
+        }
+      ],
+      "reserved_at_utc": "2026-09-26T15:55:50.829245+00:00",
+      "disposition": "Candidate04 full validation (958 workspace tests, 31 ignored, four selected release tests), 32 paired performance/quality runs and four additional ignored release tests passed; immutable source and raw evidence recovered and independently verified. Earlier candidate failures and diagnostic retained. VM and its auto-delete 40GiB boot disk explicitly deleted at 2026-09-26T17:45:17.305000+00:00; exact-name VM/disk and former reserved-address queries empty at 2026-09-26T17:51:09.145691+00:00. Billing unavailable; full $3 reservation remains held, cumulative $32/$40."
+    },
+    {
       "id": "r1-20260926-09",
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",

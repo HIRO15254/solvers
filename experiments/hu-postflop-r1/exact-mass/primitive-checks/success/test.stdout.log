@@ -1,0 +1,24 @@
+
+running 19 tests
+test tests::integer_mass_classifier_preserves_f64_gate_and_width_count_boundaries ... ok
+test tests::mass_add_sub_cross_every_limb_boundary ... ok
+test tests::mass_analysis_preserves_gate_width_and_scale_in_eight_bytes ... ok
+test tests::mass_analysis_raw_bits_matches_branchy_reference ... ok
+test tests::mass_decodes_every_f32_exponent_and_subnormal_boundary ... ok
+test tests::mass_gate_covers_zero_subnormal_and_term_count_boundaries ... ok
+test tests::mass_gate_safe_sums_and_cancelling_card_expression_match_exact_mass ... ok
+test tests::mass_holds_maximum_hand_sum_and_self_addback_without_losing_tiny_mass ... ok
+test tests::mass_random_limb_arithmetic_matches_bit_vector_reference ... ok
+test tests::mass_rejects_addition_overflow - should panic ... ok
+test tests::mass_rejects_invalid_inputs_even_after_an_unsafe_gate_prefix ... ok
+test tests::mass_rejects_negative_subtraction - should panic ... ok
+test tests::mass_to_f64_matches_exact_decimal_reference_for_full_320_bit_values ... ok
+test tests::mass_to_f64_matches_independent_u128_conversion_at_all_limb_offsets ... ok
+test tests::mass_to_f64_rounds_ties_even_sticky_and_significand_carry ... ok
+test tests::scaled_integer_conversion_rounds_once_even_odd_sticky_and_carry ... ok
+test tests::scaled_integer_mass_decodes_all_f32_exponents_and_subnormal_edges ... ok
+test tests::scaled_integer_operations_reject_invalid_inputs_and_overflow ... ok
+test tests::scaled_integer_random_card_removal_matches_independent_bit_sums ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+

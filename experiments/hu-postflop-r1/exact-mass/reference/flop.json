@@ -1,0 +1,147 @@
+{
+  "algorithm": {
+    "alpha": 1.5,
+    "beta": 0.0,
+    "gamma": 3.0,
+    "pow4_reset": true,
+    "schedule": "dcfr"
+  },
+  "canonical": {
+    "format": "hu-scaling-rawbits/v1",
+    "global_combos": [
+      [
+        230,
+        902,
+        1274
+      ],
+      [
+        777,
+        1080,
+        1323
+      ]
+    ],
+    "strategy_and_cfv": {
+      "blake3": "e84b642469eb628fe8c3e2a4b0a0e73c6479ed1a22e78f17eb2b57293e36b534",
+      "bytes": 972815,
+      "file": "canonical.bin"
+    },
+    "support_order": "P0 then P1; ascending global combo id among positive, starting-board-compatible root weights",
+    "supported_state": {
+      "blake3": "1668f2fe26ca75233dea6a8f1ba5fa1ea01efaec9b61f47623b0cab8a0eee1fd",
+      "bytes": 655841,
+      "file": "state.bin"
+    },
+    "union_global_combos": [
+      230,
+      777,
+      902,
+      1080,
+      1274,
+      1323
+    ]
+  },
+  "config": "/opt/r1/kernel-new-r2/source/experiments/hu-postflop-r1/range-scaling/configs/flop.toml",
+  "configured_run": {
+    "check_every": 50,
+    "iterations": 50,
+    "par_chance_depth": 2,
+    "par_min_children": 12,
+    "storage": "f32",
+    "threads": 1
+  },
+  "counts": {
+    "action_nodes": 14410,
+    "deals": 7203,
+    "f32_storage_payload_bytes": 345936,
+    "nodes": 21618,
+    "normalizer": 9.0,
+    "retained_support_counts": [
+      3,
+      3
+    ],
+    "root_dims": [
+      3,
+      3
+    ],
+    "root_subtree_has_chance": true,
+    "storage_elements_per_buffer": 43242
+  },
+  "execution_policy": "Fixed explicit iterations and threads; configured early stops/checkpoints/check cadence are not used. Configured chance thresholds are retained.",
+  "iterations": 50,
+  "layout": "compact",
+  "quality": {
+    "deviation_gains": [
+      0.013658099704318527,
+      0.023039287990993973
+    ],
+    "exploitability_nash_conv_over_two": 0.01834869384765625,
+    "nash_conv": 0.0366973876953125,
+    "nash_conv_f64_bits_hex": "3fa2ca0000000000",
+    "solver_br": [
+      -1.9369481934441461,
+      1.973647117614746
+    ],
+    "solver_br_f64_bits_hex": [
+      "bffefdbd638e38e4",
+      "3fff940f00000000"
+    ],
+    "solver_ev": [
+      -1.9506062931484647,
+      1.9506078296237521
+    ],
+    "solver_ev_f64_bits_hex": [
+      "bfff35aef1c71c72",
+      "3fff35b08e38e38e"
+    ],
+    "subgame_br": [
+      8.063051806555855,
+      11.973647117614746
+    ],
+    "subgame_ev": [
+      8.049393706851536,
+      11.950607829623753
+    ]
+  },
+  "rake": {
+    "kind": "none"
+  },
+  "resources": {
+    "cfv_capture": "One player's all-node vectors are captured at a time in the measured layout, then streamed and released before the other player. Capture is outside run and EV/BR timers.",
+    "measurement": "external supervisor",
+    "rss_scope": "Full process, including build, solve, EV/BR, and subsequent all-node CFV capture/output. Not solve-only RSS."
+  },
+  "schema": "r1.hu-scaling-bench/v1",
+  "status": "completed",
+  "storage": "f32",
+  "threads": 1,
+  "timing": {
+    "br_seconds": [
+      0.00310103,
+      0.003040695
+    ],
+    "build_seconds": 0.026473606,
+    "canonical_finish_seconds": 0.010674554,
+    "cfv_capture_seconds": [
+      0.005244626,
+      0.005200084
+    ],
+    "cfv_write_seconds": [
+      0.002690556,
+      0.002809478
+    ],
+    "ev_seconds": [
+      0.003837533,
+      0.003784263
+    ],
+    "pool_build_seconds": 0.000126616,
+    "prepare_seconds": 0.000093585,
+    "process_elapsed_seconds": 0.511877819,
+    "run_seconds": 0.406425719,
+    "solver_init_seconds": 0.000052382,
+    "state_write_seconds": 0.014656723,
+    "strategy_write_seconds": 0.005567423
+  },
+  "utility": {
+    "kind": "chip-ev"
+  }
+}

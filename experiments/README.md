@@ -26,6 +26,7 @@
 | R1の初期レンジ圧縮と32 vCPU比較 | [固定手順と検証器](hu-postflop-r1/range-scaling/README.md)、[source04実測](hu-postflop-r1/range-scaling/source04/scaling32-report.jp.md) | 4 pilot＋112標本のF32状態・strategy/CFV・品質bits一致。Riverは4、Turnは16 threadsで観測最速。全32論理CPU結果・native/sample RSS・短時間caseの非認定を保持。先行source01–03の失敗証拠も保持 |
 | R1のaction並列化採用根拠 | [source06の新旧48回比較](hu-postflop-r1/action-scaling/source06/report.jp.md)、[通常・release検証](hu-postflop-r1/range-scaling/source06/README.md) | 同一AMD bootで32 threadsのRiver時間46.05%短縮、1 thread維持、全出力一致。最速16、2-thread回帰と並列RSS増も保持。927通常＋release4 tests成功。極小weightの既存数値境界は別監査であり未解決 |
 | R1のterminal事前計算採用根拠 | [Showdown/Foldの新旧32回比較](hu-postflop-r1/showdown-kernel/report.jp.md) | 既存O(n)走査のカード・local indexを事前計算。1 workerでRiver28.27%、Turn25.37%短縮、全出力一致。933通常＋release4 tests成功。先行Spot中断・prepare失敗を保持し、RSS削減や32-thread効果は認定しない |
+| R1の互換weight数値修正と費用比較 | [exact massの方式](hu-postflop-r1/exact-mass/README.jp.md)・[候補04実測](hu-postflop-r1/exact-mass/report04.jp.md) | O(n)整数経路。32実行の新旧品質・state一致、時間比の幾何平均1.048770で固定修正費用guard成立（速度向上ではない）。候補01/03の不合格履歴を保持し、外部品質やR1全体の認定とは分離 |
 | R1の受入証拠の範囲 | [事前条件の監査](hu-postflop-r1/acceptance/audit.jp.md)、[将来の外部比較器](hu-postflop-r1/acceptance/external-contract.md) | 既存の事前条件と測定後索引を区別。将来の閾値発行・校正・欠測の検査であり、総合受入の認定ではない |
 | R1の実入力への境界適用 | [抽象化の適用確認](hu-postflop-r1/reference/abstraction-applicability.md) | 017/019のhand identity・joint重み・完全記憶の検査と、未実装・未評価の範囲 |
 | R1の工程別診断 | [source03 phase比較](hu-postflop-r1/phases/vm06-report.md) | 別instrumented buildのon/off較正、重複しない工程時間、元の性能実測との区別 |
@@ -36,6 +37,7 @@
 | R1の75bb 3bet Turn参照入力 | [Turn 016](hu-postflop-r1/reference/HU-R0-016/README.md) | 両range原文・75,225互換pair・開始2判断点の観測。全継続木と参照精度は未確認 |
 | R1の100bb River参照入力 | [River 002](hu-postflop-r1/reference/HU-R0-002/README.md) | 両rangeの原文・checksum・joint重みと、実際に取得した継続menu。参照条件と品質の認定は別判断 |
 | R1の100bb River参照診断 | [002実行照合](hu-postflop-r1/reference/vm07-002-report.md)、[参照条件監査](hu-postflop-r1/reference/reference-condition-audit.jp.md) | 132 menuの実exportと保存後EV/BR。レーキ・参照精度等の欠測を保持し、品質閾値の事後発行をしない |
+| R1の参照条件の追加観測 | [9月27日の文献・Fold EV確認](hu-postflop-r1/reference/condition-followup-20260927/README.jp.md) | 公式記事の系列・公開時期と、002のBet 2→Raise 7で正weightの3 comboがFold EV 0となる実画面。表示欄を限定した基準時点の推論で、個別版・残差・レーキの認定ではない |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |
 

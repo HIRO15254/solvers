@@ -1,0 +1,15 @@
+{
+  "local_root": "E:\\codex-work\\solvers\\r1-exact-new01\\source-candidate",
+  "archive": "E:\\codex-work\\solvers\\r1-exact-new01\\source-candidate.tar.gz",
+  "manifest": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\exact-mass\\source-new01\\source-candidate-manifest.json",
+  "archive_bytes": 1394843,
+  "archive_sha256": "9f0b2ae0b05592796a00cd754cd97f931e381522b43da8b2983ddc87c5afffe8",
+  "file_count": 368,
+  "original_bytes": 5529293,
+  "docs_check": {
+    "exit_code": 0,
+    "stdout": "Documentation check passed: 48 Markdown files.\r\n",
+    "stderr": ""
+  },
+  "exact_materialized_and_archive_file_sets": true
+}

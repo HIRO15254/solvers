@@ -1,0 +1,38 @@
+{
+  "scope": "Rustfmt parser only over generated source stdin, emitted stdout discarded; no Cargo/build/solver; no Rust file written",
+  "rustfmt_path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustfmt.exe",
+  "rustfmt_sha256": "607162816ec4f330fee34d6954e20631a76657c4264d75ae80c14183f8dc1b18",
+  "instrument_py_sha256": "f0292a3e0e085115c597f988f4894065d9c5e1c98932b8a36126cf1e4b4fd1f6",
+  "results": [
+    {
+      "path": "crates/holdem/src/mass.rs",
+      "input_sha256": "8589309a8785f130f26dc87339a5ee6f275680d80d6a8a3c6facd25df0818e80",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holdem/src/kernel.rs",
+      "input_sha256": "a0dc894ac15581fa6fc62a409ccf4c03b4808642670c8d4d2d35a92ba04ffcce",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holdem/src/compatibility.rs",
+      "input_sha256": "b138e7f0f5820a5b50ff63f12ede6d631d979ea9fedd7c401b2f2fc20d7c8e60",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holdem/src/lib.rs",
+      "input_sha256": "1c4c4eaa13f4680b23e7b8dafba07e02b551a0b913e329c0ddd2ded6491ed0a2",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/cli/examples/hu_scaling_bench.rs",
+      "input_sha256": "a2a9e58beb9529eef53b2287036400b44499e3758681a49dd06107ea4f0db24d",
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ]
+}

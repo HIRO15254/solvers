@@ -1,0 +1,122 @@
+{
+  "schema": "solvers.r1-reference-fold-ev-observation/v1",
+  "case": "HU-R0-002",
+  "related_initial_research": "evidence.json",
+  "observation_window": {
+    "start_utc": "2026-09-26T16:11Z",
+    "end_utc": "2026-09-26T16:16Z",
+    "precision": "minute",
+    "jst_date": "2026-09-27"
+  },
+  "provenance": {
+    "observer": "root agent",
+    "browser_context": "root's new IAB tab 5",
+    "acquisition_mode": "Read-only UI navigation",
+    "record_type": "Manual transcription of AX and visual screenshot observations communicated by root",
+    "writer_independently_observed_ui": false,
+    "original_ax_archive_retained_in_this_record": false,
+    "original_ax_archive_path": null,
+    "original_ax_archive_sha256": null,
+    "screenshot_binary_retained_in_this_record": false,
+    "screenshot_path": null,
+    "screenshot_sha256": null,
+    "root_reported_visual_confirmation": true,
+    "numeric_transcription": "Rounded visible numeric values, not byte-exact UI text lexemes or unrounded internal values",
+    "initial_empty_browser_inventory_scope": "The earlier apps=[] / browsers=[] inventory applies only to the initial research agent context; root later accessed a separate IAB context."
+  },
+  "observed_url": "https://app.gtowizard.com/solutions?soltab=strategy&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m500zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=12&preflop_actions=F-F-F-R2.5-F-C&board=Ks7h2d3c8d&flop_actions=X-X&turn_actions=X-X&river_actions=R2-R7",
+  "observed_solution": {
+    "format": "Cash",
+    "stack_depth_bb": 100,
+    "table_size": "6max",
+    "stakes_label": "NL500",
+    "library": "General",
+    "mode_label": "GTO",
+    "board": "Ks7h2d3c8d",
+    "preflop": "BTN open to 2.5bb, BB call",
+    "preflop_url_history": "F-F-F-R2.5-F-C",
+    "flop_history": "X-X",
+    "turn_history": "X-X",
+    "river_root": {
+      "pot_bb": 5.5,
+      "remaining_stacks_bb": {"BB": 97.5, "BTN": 97.5}
+    }
+  },
+  "navigation": {
+    "surface": "Top history actions, not bottom filters",
+    "river_actions": ["BB Bet 2", "BTN Raise 7"],
+    "river_url_history": "R2-R7",
+    "filters_clicked": false,
+    "views_in_order": ["Strategy + EV / Hands", "Ranges / BB EV"]
+  },
+  "observed_node": {
+    "actor": "BB",
+    "pot_bb": 14.5,
+    "remaining_stacks_bb": {"BB": 95.5, "BTN": 90.5},
+    "menu": ["Fold", "Call", "Raise 17", "Raise 23.5", "Allin 97.5"],
+    "ev_unit": "bb",
+    "values_are_rounded_display_values": true,
+    "combo_observations": [
+      {
+        "combo": "As8s",
+        "strategy_plus_ev_hands_action_ev_bb": {
+          "Allin 97.5": 0.56,
+          "Raise 23.5": 0.49,
+          "Raise 17": 0.29,
+          "Call": 0.76,
+          "Fold": 0.0
+        },
+        "ranges_bb_ev_view": {"range_weight": 0.41, "node_ev_bb": 0.75}
+      },
+      {
+        "combo": "Ah8h",
+        "strategy_plus_ev_hands_action_ev_bb": {
+          "Allin 97.5": 0.25,
+          "Raise 23.5": 0.37,
+          "Raise 17": 0.25,
+          "Call": 0.72,
+          "Fold": 0.0
+        },
+        "ranges_bb_ev_view": {"range_weight": 0.10, "node_ev_bb": 0.72}
+      },
+      {
+        "combo": "Ac8c",
+        "strategy_plus_ev_hands_action_ev_bb": {
+          "Allin 97.5": 1.02,
+          "Raise 23.5": 0.84,
+          "Raise 17": 0.70,
+          "Call": 1.15,
+          "Fold": 0.0
+        },
+        "ranges_bb_ev_view": {"range_weight": 0.25, "node_ev_bb": 1.15}
+      }
+    ],
+    "warning_observation": "No preview/banner warning was visible in the observed screenshot; this is not a claim about other screens or past acquisitions."
+  },
+  "scoped_inference": {
+    "observed_fact": "All three displayed positive-weight combos have Fold action EV 0 after BB contributed 2bb on the River.",
+    "supports": "Decision-node origin for this action-EV field at this node in this acquisition.",
+    "comparison_hypotheses": [
+      {"basis": "immediately before current decision", "predicted_fold_ev_bb": 0.0},
+      {"basis": "River start", "predicted_fold_ev_bb": -2.0},
+      {"basis": "whole-hand starting stack", "predicted_fold_ev_bb": -4.5}
+    ],
+    "hypothesis_assumption": "No additional payoff adjustment for the folding player; this observation is not a complete settlement specification.",
+    "ranges_node_ev_role": "Additional displayed observations only; their basis is not independently established by the Fold action probe.",
+    "does_not_establish": [
+      "the basis of every UI EV field or root EV",
+      "timestamped solution version or the version of earlier captures",
+      "individual node residual or internal numerical precision",
+      "display rounding mode",
+      "additional rake facts or uncalled-bet settlement",
+      "a complete external strategy profile",
+      "external quality acceptance"
+    ]
+  },
+  "case_level_assessment": {
+    "condition_match": "unverified",
+    "quality_status": "not_evaluated",
+    "acceptance": null,
+    "comparison_threshold": null
+  }
+}

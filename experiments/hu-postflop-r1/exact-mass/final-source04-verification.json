@@ -1,0 +1,24 @@
+{
+  "checked_utc": "2026-09-26T17:53:15.556147+00:00",
+  "source_manifest": "experiments/hu-postflop-r1/exact-mass/source-new04/source-candidate-manifest.json",
+  "source_manifest_sha256": "1a84947f6daa9ca1c57d5f48e4914e176643dbe9c787262ded95dcf6aba042d6",
+  "files_checked": 368,
+  "byte_identical_files": 366,
+  "post_measurement_evidence_only_changes": [
+    {
+      "path": "experiments/README.md",
+      "frozen_sha256": "7e2f5354762db1bcfd146a5514f0e446270fb539e8f0d7261d9e6190a6cdc3de",
+      "current_sha256": "0d31855a5176be7c5f93eaa57158b77c845d2c9c39e6d78a5512fd4c7b08f36d",
+      "frozen_bytes": 10744,
+      "current_bytes": 10885
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/budget.json",
+      "frozen_sha256": "ca91a1aada362ee47c653a560b7bfb6b2771b06f536d6626a97e72612ee84a29",
+      "current_sha256": "6178d13584cf1d24e0e4775803337b34bed0084f768371fcfe84ff8006e534c1",
+      "frozen_bytes": 24442,
+      "current_bytes": 25971
+    }
+  ],
+  "scope": "All snapshot entries checked; the only changes after source04 freeze are experiment evidence index and VM10 cleanup/budget disposition. All runtime, tests, build configuration and normative documents remain byte-identical. Other new experiment evidence outside the source snapshot is not included."
+}

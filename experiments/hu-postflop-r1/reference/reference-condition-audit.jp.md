@@ -95,6 +95,11 @@ subgame開始後にすでに投入した`c_i(node)`を加える必要がある�
 fold=0と過去投資を含むstack基準を区別するが、今回の各UI欄の厳密な基準を特定する資料ではない。
 root、hand、action、後続nodeの値を同じoffsetで無条件に比較しない。
 
+後日の[002のFold EV観測](condition-followup-20260927/README.jp.md)では、Riverで2bbを投入済みの
+BBの正weight 3 comboについて、`Bet 2 → Raise 7`後のaction欄がFold EV 0を表示した。
+これは当該欄のdecision-node基準を支持する追加証拠である。他の表示欄・取得版・参照残差や
+精算規則まで確定するものではなく、元の取得記録と上記監査時点の欠測は書き換えない。
+
 017/019の診断summaryは**保存前live平均profile**のEV/BRを保存metaから読み直したもの。
 `.sol`の量子化後policyをBR再評価した値とは異なる。自作の別saved-profile auditが成功しても、
 未取得の外部policyや外部条件の認定にはならない。

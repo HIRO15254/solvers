@@ -93,6 +93,16 @@ global combo indexの昇順に保持する。正のweightを閾値で落とさ�
 両席の領域サイズは異なってよく、range・regret・平均戦略・値はその席の領域を使う。
 これはlosslessな表現変更であり、compatible root pairの正規化と45・44の配札分母を変えない。
 
+カード除去では、kernel入口の有限・非負f32 reachが表す互換weightを、減算完了まで
+厳密に保持してからf64へ丸める。大きい衝突handの減算で小さい合法handを消さない。
+root normalizer、showdown/fold、保存per-hand EVの分母、表示equityは同じmassの意味に従う。
+equityは勝ち・引分けの分子もf64で保持して最後に比をf32へ丸める。
+SOLの条件付きEVでは、互換分母をf32へ戻してからf32で除算する丸めも残る。
+reach生成時のf32乗算、utilityとの積・和、terminal CFVのf32化、保存量子化の丸めは残る。
+例えば最小subnormal reachに0.5のpayoffを掛けたCFVは0になり得るため、
+任意に小さいreachの条件付きEV全体の相対精度を保証するものではない。
+従来の桁落ちを補正した局面ではstate・値のbitsが変わり得る。
+
 `min_bet` は big blind に相当する最小 wager である。NLHE の min-raise 規則
 (`min-raise = 直前の bet/raise 増分`、初回 bet は `min_bet`)はこの値を基準に
 強制され、これを下回る size literal は最小合法 target まで引き上げられる。

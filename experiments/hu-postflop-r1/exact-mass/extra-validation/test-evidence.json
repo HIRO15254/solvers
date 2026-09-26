@@ -1,0 +1,14 @@
+{
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\exact-mass\\extra-validation\\test_run.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.2201249001082033,
+  "runner_sha256": "0becbc9eeecf01e3096dd97448369a89af4b9dfc8df7c3b66a463d922452ce8e",
+  "test_sha256": "6c1dc6ab42b016e0de81258ebf7ecfcda8bfd74b612e2e600dbf94dda38b7e65",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "ed9cc24b8d9ab2d47d45e09d66bbb144f5b2237bdc4ddaf407ea5665c1dd67f9",
+  "scope": "Candidate04 Python syntax/parser tests only; no Rust build/test/solver"
+}

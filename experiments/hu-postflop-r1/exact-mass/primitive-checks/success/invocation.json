@@ -1,0 +1,43 @@
+{
+  "cpu_affinity_mask": 1,
+  "stages": [
+    [
+      "compile",
+      [
+        "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+        "--edition=2024",
+        "--test",
+        "crates/holdem/src/mass.rs",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "debuginfo=0",
+        "-D",
+        "warnings",
+        "-o",
+        "runs\\r1-mass-analysis-20260927-confirm\\mass-tests.exe"
+      ]
+    ],
+    [
+      "test",
+      [
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-mass-analysis-20260927-confirm\\mass-tests.exe",
+        "--test-threads=1"
+      ]
+    ],
+    [
+      "clippy",
+      [
+        "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\clippy-driver.exe",
+        "--edition=2024",
+        "--test",
+        "--emit=metadata",
+        "crates/holdem/src/mass.rs",
+        "-D",
+        "warnings",
+        "-o",
+        "runs\\r1-mass-analysis-20260927-confirm\\mass.rmeta"
+      ]
+    ]
+  ]
+}

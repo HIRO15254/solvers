@@ -523,6 +523,12 @@ postflop・preflop HU・toyの旧version 1からのresumeでは移行できな�
 
 手札は席ごとの初期レンジ内で番号を固定し、後続のboardカードで衝突する手札をmaskする。
 レンジの微小な正weightを省略する近似ではなく、表示・exportでは通常のカード名へ戻す。
+カード衝突を除く重みの計算では、大きい衝突handに小さい合法handが隠れて消える桁落ちを防ぐ。
+`eq`も勝ち・引分けの分子をf64で保持してから比を取る。一方、solver内部のf32 reach/CFVや
+保存量子化の丸めは残るため、極小reachの条件付きEVの相対精度を一律には保証しない。
+SOLの条件付きEVは分母のf32化とf32除算による丸めも含む。
+修正前に保存したEVは読込み時に再計算されない。修正後の数値が必要なら新規solveし、
+solverの版をまたぐ再開にbit一致を仮定しない。
 `compare --cross-game`でも、各席に含まれるcomboが異なる解の比較は拒否する。
 `threads = 1`を直列の対照にできる。chanceを含まない木のaction並列化では、rootの
 storage要素数`W`と実行poolのworker数`P`から`grain = clamp(ceil(W / (4 * P)), 4096, 65536)`を決める。

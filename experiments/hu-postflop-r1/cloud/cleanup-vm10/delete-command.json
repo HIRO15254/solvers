@@ -1,0 +1,8 @@
+{
+  "started_utc": "2026-09-26T17:44:22.3539023+00:00",
+  "ended_utc": "2026-09-26T17:45:18.0397924+00:00",
+  "exit_code": 0,
+  "instance_id": "9019841781761201633",
+  "disk_id": "2211921492040111585",
+  "command": "gcloud compute instances delete solvers-r1-20260926-10 --project=solvers-abstraction-20260723 --zone=us-central1-b --quiet --format=json"
+}
