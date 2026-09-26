@@ -729,21 +729,44 @@ fn sol_export_and_inspect_smoke() {
     assert!(sol_path.exists(), "sol file must be written");
     assert!(checkpoint.exists(), "checkpoint file must be written");
 
-    // The two artifacts answer different questions and are sized
-    // accordingly: the checkpoint carries full-precision regrets and
-    // strategy sums so a run can continue, while `.sol` carries 16-bit
-    // quantized strategies and values for reading. Even at the default
-    // `full` mode, which stores every action node, `.sol` stays the smaller
-    // of the two.
-    let sol_size = std::fs::metadata(&sol_path).unwrap().len();
-    let ckpt_size = std::fs::metadata(&checkpoint).unwrap().len();
-    assert!(
-        sol_size < ckpt_size,
-        "sol ({sol_size} bytes) should be smaller than the checkpoint ({ckpt_size} bytes)"
+    // Check the artifacts' contents, not their compressed file-size order:
+    // compact ranges can make `.sol` metadata/index overhead dominate.
+    // The checkpoint keeps training state; Full stores a quantized average
+    // strategy and both seats' values at every action node.
+    let full = formats::read_sol(&sol_path).expect("read full solution");
+    let saved = formats::read_checkpoint(&checkpoint).expect("read checkpoint");
+    assert_eq!(full.mode, formats::StreetsStored::Full);
+    assert_eq!(full.meta.iterations, 32);
+    assert_eq!(saved.iteration, full.meta.iterations);
+    assert_eq!(saved.state.iteration, saved.iteration);
+    assert_eq!(
+        saved.config_hash,
+        *blake3::hash(full.config_toml.as_bytes()).as_bytes()
+    );
+    let engine::StorageState::F32 {
+        regrets,
+        strategy_sum,
+    } = &saved.state.storage
+    else {
+        panic!("fixture must save full-precision F32 training state");
+    };
+    assert!(!regrets.is_empty());
+    assert_eq!(regrets.len(), strategy_sum.len());
+    assert!(regrets.iter().any(|&value| value != 0.0));
+    assert!(strategy_sum.iter().any(|&value| value > 0.0));
+    assert_eq!(
+        full.blocks.iter().map(|b| b.probs.len() / 2).sum::<usize>(),
+        regrets.len(),
+        "Full must store every action/hand strategy column"
+    );
+    assert_eq!(
+        full.blocks.iter().map(|b| b.sref).collect::<Vec<_>>(),
+        full.values.iter().map(|b| b.sref).collect::<Vec<_>>()
     );
 
-    // And `no-rivers` is the lever for a much smaller artifact: it drops
-    // the river nodes, which dominate the count.
+    // NoRivers omits both river strategies and values while preserving
+    // the trunk payload and resumable training state. No fixed compression
+    // ratio follows from this semantic omission.
     let small_run = dir.join("run-no-rivers");
     run_solvers_ok(&[
         "solve",
@@ -753,12 +776,49 @@ fn sol_export_and_inspect_smoke() {
         "--sol-streets",
         "no-rivers",
     ]);
-    let small_size = std::fs::metadata(small_run.join("solution.sol"))
-        .unwrap()
-        .len();
-    assert!(
-        small_size * 4 < sol_size,
-        "no-rivers ({small_size} bytes) should be far smaller than full ({sol_size} bytes)"
+    let small_path = small_run.join("solution.sol");
+    let trunk = formats::read_sol(&small_path).expect("read no-rivers solution");
+    assert_eq!(trunk.mode, formats::StreetsStored::NoRivers);
+    assert_eq!(trunk.config_toml, full.config_toml);
+    assert_eq!(trunk.node_count, full.node_count);
+    assert_eq!(trunk.meta.iterations, full.meta.iterations);
+    assert!(!trunk.blocks.is_empty());
+    assert!(trunk.blocks.len() < full.blocks.len());
+    assert_eq!(
+        trunk.blocks.iter().map(|b| b.sref).collect::<Vec<_>>(),
+        trunk.values.iter().map(|b| b.sref).collect::<Vec<_>>()
+    );
+    for block in &trunk.blocks {
+        assert_eq!(
+            Some(block),
+            full.blocks.iter().find(|full| full.sref == block.sref)
+        );
+    }
+    for value in &trunk.values {
+        assert_eq!(
+            Some(value),
+            full.values.iter().find(|full| full.sref == value.sref)
+        );
+    }
+    let trunk_checkpoint = formats::read_checkpoint(&small_run.join("checkpoint.ckpt")).unwrap();
+    assert_eq!(trunk_checkpoint, saved);
+
+    let stored_tree = |path: &std::path::Path| {
+        let output = run_solvers_ok(&["export", path.to_str().unwrap(), "tree", "--node", "all"]);
+        serde_json::from_slice::<Vec<serde_json::Value>>(&output.stdout).expect("stored tree JSON")
+    };
+    let full_tree = stored_tree(&sol_path);
+    let trunk_tree = stored_tree(&small_path);
+    assert_eq!(full_tree.len(), full.blocks.len());
+    assert_eq!(trunk_tree.len(), trunk.blocks.len());
+    assert!(full_tree.iter().any(|node| node["street"] == "river"));
+    assert_eq!(
+        trunk_tree,
+        full_tree
+            .into_iter()
+            .filter(|node| node["street"] != "river")
+            .collect::<Vec<_>>(),
+        "NoRivers must omit exactly the river action nodes"
     );
 
     // `solve`'s stdout must mention the exported block count.

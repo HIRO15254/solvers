@@ -40,9 +40,10 @@
 
 use std::fmt;
 
-use cards::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range, Street};
+use cards::{Card, Chips, PerPlayer, Player, Range, Street};
 use engine::{NodeId, NodeKind, PublicTree};
 
+use crate::hands::PostflopHands;
 use crate::postflop::{PerStreet, PostflopConfig, StreetTree};
 
 /// Street of every node in `tree`, given the tree's starting street (derived
@@ -330,7 +331,8 @@ pub fn river_entry_state(
 /// Fresh river-start [`PostflopConfig`] for the subgame rooted at a river
 /// entry: board and pot/effective-stack from `entry` (see
 /// [`RiverEntryState`] — `entry.pot` already includes both players' `c`),
-/// ranges built from `reach` (each combo's reach becomes that combo's
+/// ranges built from `reach` using the trunk evaluator's `hands` mapping
+/// (each seat-local hand's reach becomes its global combo's
 /// weight — always a valid weight since reach values are products of `[0,
 /// 1]` factors, per [`engine::reach_at`]'s contract: strategy-column
 /// probabilities and `Mask`/`Transition` weights, none of which ever push a
@@ -353,13 +355,15 @@ pub fn river_entry_state(
 /// donk/cbet-aware ruleset, not just under fixed per-street menus.
 pub fn river_resolve_config(
     trunk: &PostflopConfig,
+    hands: &PostflopHands,
     entry: &RiverEntryState,
     reach: &PerPlayer<Vec<f32>>,
 ) -> PostflopConfig {
     let build_range = |p: Player| -> Range {
+        assert_eq!(reach[p].len(), hands.len(p));
         let mut range = Range::default();
-        for combo in 0..NUM_COMBOS {
-            range.set_weight(combo, reach[p][combo].clamp(0.0, 1.0));
+        for (&combo, &weight) in hands.combos(p).iter().zip(&reach[p]) {
+            range.set_weight(combo as usize, weight.clamp(0.0, 1.0));
         }
         range
     };

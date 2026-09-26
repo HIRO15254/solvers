@@ -1,4 +1,4 @@
-//! Small public-API corruption fixtures for the current v3 container.
+//! Small public-API corruption fixtures for the current v4 container.
 //! The target keeps its original name so existing validation commands apply.
 //! Offsets are deliberately specified here independently of the codec.
 

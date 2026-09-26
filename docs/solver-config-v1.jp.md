@@ -87,6 +87,12 @@ OOP `pot / 2`(切り捨て)/ IP 残り に割っているが、これは零和�
 簿記であって、報告される EV から完全に打ち消える(下記「EV の基準」)。
 `pot` の偶奇も同じ理由で無関係である。
 
+私有ハンド領域は席ごとに、初期レンジの最終weightが厳密に正で、開始boardと衝突しないcomboだけを
+global combo indexの昇順に保持する。正のweightを閾値で落とさず、同じcomboを重複保持しない。
+後続dealではmaskまたは正確なsuit同型遷移を適用し、rootのlocal hand IDを固定する。
+両席の領域サイズは異なってよく、range・regret・平均戦略・値はその席の領域を使う。
+これはlosslessな表現変更であり、compatible root pairの正規化と45・44の配札分母を変えない。
+
 `min_bet` は big blind に相当する最小 wager である。NLHE の min-raise 規則
 (`min-raise = 直前の bet/raise 増分`、初回 bet は `min_bet`)はこの値を基準に
 強制され、これを下回る size literal は最小合法 target まで引き上げられる。
@@ -659,6 +665,10 @@ par_min_children = 12  # postflop / preflop-hu のみ。任意
 
 HU の `solve` / `resume` / live `inspect` / `report` は `storage`、`threads`、
 `par_chance_depth`、`par_min_children` を同じように適用する。
+chanceを含まない木のaction並列化では、rootのstorage要素数`W`と実行poolのworker数`P`から
+`grain = clamp(ceil(W / (4 * P)), 4096, 65536)`を決める。子subtreeのstorage要素数が
+grain以上の枝を2本以上持つnodeで分割し、深さでは打ち切らない。`threads = 1`は直列のexact対照で、
+thread数は解く有限ゲームや更新式を変更しない。thread数を増やした際の速度向上は保証しない。
 `report` の時間予算は各 board ごと。`resume` の時間予算は `progress.jsonl` の
 最後の保存済み経過時間から累積する。再開前に上限へ到達済みなら反復を追加せず
 成果物を再生成する。再開時の rebuild・成果物出力時間は solve 時間に含めない。
@@ -703,7 +713,7 @@ bet と raise を同じ `r` で表すのは、両者が「到達額を宣言す�
 どれも黙って読み替えず、置換先を名指しする error にする。
 
 `.sol` artifact に埋め込まれた config が廃止 key を持つ場合は `SLV002` を返す。
-現行 `.sol` はformat version 3を使い、version 1 / 2は明示拒否する。移行手順は
+現行 `.sol` はformat version 4を使い、version 1 / 2 / 3は明示拒否する。移行手順は
 [`solution.sol`](#solutionsol)を参照する。
 
 ## `[algorithm]`
@@ -840,9 +850,11 @@ tree script の board 述語(`when paired { ... }`)はボードごとに root �
 
 ### `solution.sol`
 
-`SLVRSOLV` magic + format version **3** + config の blake3 hash + iteration の
+`SLVRSOLV` magic + format version **4** + config の blake3 hash + iteration の
 50 byte header に、metadata、chunk directory、個別圧縮したnode群が続く。
-複数byte整数はlittle endian。checkpoint `.ckpt` はversion 1のままである。
+複数byte整数はlittle endian。外側のsection構造は旧v3と同じだが、私有ハンド領域の意味を変更する。
+checkpoint `.ckpt` は共通container version **2**とし、postflop・preflop HU・toyで旧version 1を明示拒否する。
+Multiwayの別container `.mwckpt` はこの変更の対象外である。
 
 | 順序 | binary layout |
 |---|---|
@@ -880,8 +892,12 @@ writerは一時fileへchunk単位で圧縮し、fsync後に置換する。全pay
 | `meta` | `iterations` / `expl[2]` / `ev[2]` / `nash_conv` / `storage` / `wall_secs` |
 | `mode` | `no-rivers` か `full` |
 | `node_count` | 完全なcompiled public treeのnode数。全読込み時は再構築値と一致を検査 |
-| `blocks` | action node ごとの u16 固定小数戦略。`sref` 昇順 |
-| `values` | 同じ node 集合の per-hand 値。`sref` 昇順。OOP の全ハンド、続けて IP の全ハンド。block ごとの `scale` に対する `i16` |
+| `blocks` | action node ごとの u16 固定小数戦略。`sref` 昇順。action-majorでactorのroot hand領域を使う |
+| `values` | 同じ node 集合の per-hand 値。`sref` 昇順。P0のroot hand領域、続けてP1のroot hand領域。block ごとの `scale` に対する `i16` |
+
+両席のhand領域は埋込みconfigから上記の正weight・開始board除去・global combo昇順で再構築する。
+後続boardで死んだ手札もroot local IDを変えない。各席を一律1,326要素として解釈してはならない。
+checkpointの累積stateも同じlocal領域を使うため、旧dense stateをresumeで暗黙移行しない。
 
 `meta.ev` は `export summary` の `ev_oop` / `ev_ip` と同じ値である。`meta.storage`
 と `meta.wall_secs` は情報用で、`.sol` は常に u16 へ量子化する。
@@ -909,9 +925,9 @@ action node を落として artifact を大幅に小さくするが、river の�
 header の hash は `blake3(config_toml)` と一致しなければならない。`.sol` が
 記述している config から静かにずれることはない。config 本文をそのまま埋め込むので、
 契約を変えた後に古い `.sol` を開くと、その config が現行 parser の error を返す。
-version 1 / 2は明示拒否し、暗黙変換やEV補正をしない。新規solveで生成し直すか、
-自己完結した `run.toml` と整合するcheckpointを保持して旧 `solution.sol` を別の場所へ退避し、
-resumeでversion 3を生成する。既存artifactなしのresumeは `full` を使う。
+version 1 / 2 / 3は明示拒否し、暗黙変換やEV補正をしない。新規solveで生成し直す。
+旧version 1のcheckpointからのresumeも移行手段にはならない。現行version 2のcheckpointで
+既存artifactなしのresumeを行う場合は `full` を使う。
 旧external-source runの未正規化identityを黙って別のhashへ変更してresumeしない。
 
 `resume` は同じ iteration の checkpoint / `.sol` / `run.json` を出力する。
@@ -948,6 +964,8 @@ solvers resume runs/my-run
   tree を組むときに印字する。
 - `export` と `compare` は `.sol` と `.mwsol` の両方を扱う。`evaluate` は
   `.mwsol` 専用である(下記「サポート範囲と制約」)。
+- postflop `compare` は各席のroot hand領域のcombo ID一致を要求する。`--cross-game`でも
+  この条件を外さず、列数だけが同じ異なるcombo集合を比較しない。
 - postflop は `strategy.json` を書かず、`solve --history` を受け付けない。
   ノードを読むのは `export --node` である。
 
@@ -961,7 +979,7 @@ solvers resume runs/my-run
 | **プレイヤーは 2 人固定** | 3 人以上は Multiway Preflop の別契約 | vector engine は 2 人固定。一般和も計算するが Nash 収束保証は零和設定に限る |
 | **stack は左右対称** | `effective_stack` は 1 つだけ。非対称 stack は書けない | 非対称にすると side pot が要る。HU subgame では effective stack を超える部分は死に金なので、多くの spot はこれで表現できる |
 | **開始 pot の内訳は書けない** | `pot` は合計額のみ | 内訳は木にも戦略にも報告 EV にも影響しない(「EV の基準」章) |
-| **ハンド固有の条件は書けない** | 条件変数にハンドを読むものが無い | vector CFR は木を 1 本だけ作り、1,326 combo 全部が同じ木を共有して reach ベクトルを流す。ハンドで木を変えるのは public tree ではない。それを表現するのは木ではなく戦略である |
+| **ハンド固有の条件は書けない** | 条件変数にハンドを読むものが無い | vector CFR は木を 1 本だけ作り、両席の初期レンジ内のcomboが同じ木を共有して reach ベクトルを流す。ハンドで木を変えるのは public tree ではない。それを表現するのは木ではなく戦略である |
 | **suit を名指しする盤面述語は入れない** | そのような変数が無い | `iso_merging` の商が壊れる(「盤面述語」章) |
 | **script は `history` を読めない** | そのような変数が無い | `track_node_info = false` では履歴が空で、メモリ preflight では常に空。木が debug フラグに依存してしまう |
 | **`allin_threshold` は street ごとに変えられない** | `[game.tree]` 直下の 1 つだけ | size 解決時の規則であって action list の編集ではないので、rule では表現できない。street ごとに変えたい場合は script で明示 size を書く |
@@ -973,7 +991,7 @@ solvers resume runs/my-run
 | **`no-rivers` は river の値を持たない** | river ノードを指す `export` は明示エラー | 既定の `full` なら全ノードが揃う。`no-rivers` は巨大ツリー向けの容量オプトイン |
 | **iso 併合の member remap は保留** | `inspect` は代表カードに `*` を付けて示す | 併合自体は厳密な商であり、戦略と EV は非併合 tree と一致する。表示のみの制限 |
 | **`.sol` は u16 量子化** | `storage` は情報用 | `f32` で解いた run でも artifact は u16 |
-| **開発中の artifact の値は自動補正しない** | `.sol` は format version 3。version 1 / 2 は明示拒否 | 新規 solve、または自己完結した run config/checkpoint を保持して旧 `.sol` を退避後の resume で生成し直す。廃止 key を含む config は parser が拒否 |
+| **開発中の artifact の値は自動補正しない** | `.sol` は format version 4。version 1 / 2 / 3 は明示拒否 | 新規 solveで生成し直す。旧version 1 checkpointからのresume移行も不可。廃止 key を含む config は parser が拒否 |
 
 ### Multiway Preflop との差
 
@@ -981,7 +999,7 @@ solvers resume runs/my-run
 |---|---|---|
 | engine | exact vector CFR | External-Sampling MCCFR |
 | 保証 | 零和設定のみ平均戦略の Nash 収束保証。一般和は保証なし | regret 最小化近似。Nash/GTO 保証なし |
-| card abstraction | 無し(1,326 combo) | EHS² percentile bucket |
+| card abstraction | 無し(初期レンジの正weight comboを厳密保持) | EHS² percentile bucket |
 | 絶対 size 単位 | chip(`"20c"`) | BB(`"2.5bb"`) |
 | size literal 文法 | 共通(PioSOLVER 準拠) | 共通 |
 | rake / ICM モデル | 共通実装を流用 | 同じ実装 |

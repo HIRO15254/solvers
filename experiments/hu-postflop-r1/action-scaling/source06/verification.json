@@ -1,0 +1,2007 @@
+{
+  "schema": "r1.action-scaling-portable-verification/v1",
+  "payload_integrity": "verified",
+  "runs": [
+    {
+      "plan": {
+        "path": "/opt/r1/action06/plan.json",
+        "bytes": 33428,
+        "sha256": "977eafbaaa2b0ab23ae74ee7d68d4580d5a8450e240251361cd9c00f07a14f85"
+      },
+      "result": {
+        "path": "/opt/r1/action06/result.json",
+        "bytes": 3957368,
+        "sha256": "395d99ba236f13817d8de12f9ebb6cbab894e5768ba2d02485656738b2c00b9f"
+      },
+      "summary": {
+        "threads": {
+          "1": {
+            "run_seconds": {
+              "old": [
+                6.387797873,
+                6.379340053,
+                6.406416549
+              ],
+              "new": [
+                6.380185563,
+                6.390805457,
+                6.384069722
+              ]
+            },
+            "run_medians": {
+              "old": 6.387797873,
+              "new": 6.384069722
+            },
+            "new_over_old": 0.9994163636555004,
+            "new_strictly_faster_pairs": 2,
+            "phase_medians": {
+              "old": {
+                "build_seconds": 0.00063646,
+                "solver_init_seconds": 1.24e-05,
+                "run_seconds": 6.387797873
+              },
+              "new": {
+                "build_seconds": 0.000722459,
+                "solver_init_seconds": 2.744e-05,
+                "run_seconds": 6.384069722
+              }
+            },
+            "full_process_seconds": {
+              "old": [
+                6.547015357999953,
+                6.556460863999973,
+                6.554565095000044
+              ],
+              "new": [
+                6.542491841000128,
+                6.5510503349999,
+                6.5475346760001685
+              ]
+            },
+            "memory": {
+              "old": [
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 59,
+                    "max_sample_gap_seconds": 0.11339130799979102,
+                    "sampled_peak_tree_resident_bytes": 7966720,
+                    "root_os_peak_resident_bytes": 30679040,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394763623,
+                      "end_unix_ms": 1790394763624,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394763624,
+                      "end_unix_ms": 1790394763624,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394763624,
+                      "end_unix_ms": 1790394770012,
+                      "sample_count": 57,
+                      "sampled_tree_peak_bytes": 7835648
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394770031,
+                      "end_unix_ms": 1790394770035,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394770037,
+                      "end_unix_ms": 1790394770041,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 59,
+                    "max_sample_gap_seconds": 0.11425358800011054,
+                    "sampled_peak_tree_resident_bytes": 7659520,
+                    "root_os_peak_resident_bytes": 32514048,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394799467,
+                      "end_unix_ms": 1790394799467,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394799468,
+                      "end_unix_ms": 1790394799468,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394799468,
+                      "end_unix_ms": 1790394805847,
+                      "sample_count": 57,
+                      "sampled_tree_peak_bytes": 7659520
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394805867,
+                      "end_unix_ms": 1790394805871,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394805873,
+                      "end_unix_ms": 1790394805876,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 59,
+                    "max_sample_gap_seconds": 0.11333941699990646,
+                    "sampled_peak_tree_resident_bytes": 8159232,
+                    "root_os_peak_resident_bytes": 34488320,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394849724,
+                      "end_unix_ms": 1790394849725,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394849725,
+                      "end_unix_ms": 1790394849725,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394849725,
+                      "end_unix_ms": 1790394856132,
+                      "sample_count": 57,
+                      "sampled_tree_peak_bytes": 7815168
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394856152,
+                      "end_unix_ms": 1790394856156,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394856158,
+                      "end_unix_ms": 1790394856161,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                }
+              ],
+              "new": [
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 59,
+                    "max_sample_gap_seconds": 0.11390543800007435,
+                    "sampled_peak_tree_resident_bytes": 8044544,
+                    "root_os_peak_resident_bytes": 30416896,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394756621,
+                      "end_unix_ms": 1790394756621,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394756622,
+                      "end_unix_ms": 1790394756622,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394756622,
+                      "end_unix_ms": 1790394763002,
+                      "sample_count": 57,
+                      "sampled_tree_peak_bytes": 7913472
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394763023,
+                      "end_unix_ms": 1790394763027,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394763029,
+                      "end_unix_ms": 1790394763032,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 59,
+                    "max_sample_gap_seconds": 0.1140010080000593,
+                    "sampled_peak_tree_resident_bytes": 7897088,
+                    "root_os_peak_resident_bytes": 32514048,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394806521,
+                      "end_unix_ms": 1790394806522,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394806522,
+                      "end_unix_ms": 1790394806522,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394806522,
+                      "end_unix_ms": 1790394812913,
+                      "sample_count": 57,
+                      "sampled_tree_peak_bytes": 7766016
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394812932,
+                      "end_unix_ms": 1790394812936,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394812938,
+                      "end_unix_ms": 1790394812942,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 59,
+                    "max_sample_gap_seconds": 0.11381348699978844,
+                    "sampled_peak_tree_resident_bytes": 7966720,
+                    "root_os_peak_resident_bytes": 34471936,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394842630,
+                      "end_unix_ms": 1790394842630,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394842631,
+                      "end_unix_ms": 1790394842631,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394842631,
+                      "end_unix_ms": 1790394849015,
+                      "sample_count": 57,
+                      "sampled_tree_peak_bytes": 7835648
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394849035,
+                      "end_unix_ms": 1790394849039,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394849040,
+                      "end_unix_ms": 1790394849044,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "2": {
+            "run_seconds": {
+              "old": [
+                3.352550089,
+                3.305629263,
+                3.368117865
+              ],
+              "new": [
+                3.392822455,
+                3.356796067,
+                3.41583798
+              ]
+            },
+            "run_medians": {
+              "old": 3.352550089,
+              "new": 3.392822455
+            },
+            "new_over_old": 1.0120124576608525,
+            "new_strictly_faster_pairs": 0,
+            "phase_medians": {
+              "old": {
+                "build_seconds": 0.00066009,
+                "solver_init_seconds": 1.597e-05,
+                "run_seconds": 3.352550089
+              },
+              "new": {
+                "build_seconds": 0.00067097,
+                "solver_init_seconds": 1.632e-05,
+                "run_seconds": 3.392822455
+              }
+            },
+            "full_process_seconds": {
+              "old": [
+                3.505219033000003,
+                3.392585643000075,
+                3.5160069490000296
+              ],
+              "new": [
+                3.5081720929999847,
+                3.5065495989999818,
+                3.512429959999963
+              ]
+            },
+            "memory": {
+              "old": [
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 32,
+                    "max_sample_gap_seconds": 0.11309527799994612,
+                    "sampled_peak_tree_resident_bytes": 8212480,
+                    "root_os_peak_resident_bytes": 31727616,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394770626,
+                      "end_unix_ms": 1790394770627,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394770627,
+                      "end_unix_ms": 1790394770627,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394770627,
+                      "end_unix_ms": 1790394773980,
+                      "sample_count": 30,
+                      "sampled_tree_peak_bytes": 8007680
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394773993,
+                      "end_unix_ms": 1790394773995,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394773997,
+                      "end_unix_ms": 1790394773999,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 31,
+                    "max_sample_gap_seconds": 0.1135090370000853,
+                    "sampled_peak_tree_resident_bytes": 7966720,
+                    "root_os_peak_resident_bytes": 32776192,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394817578,
+                      "end_unix_ms": 1790394817579,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394817579,
+                      "end_unix_ms": 1790394817579,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394817579,
+                      "end_unix_ms": 1790394820885,
+                      "sample_count": 30,
+                      "sampled_tree_peak_bytes": 7966720
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394820898,
+                      "end_unix_ms": 1790394820900,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394820901,
+                      "end_unix_ms": 1790394820903,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 32,
+                    "max_sample_gap_seconds": 0.11380519800013644,
+                    "sampled_peak_tree_resident_bytes": 8204288,
+                    "root_os_peak_resident_bytes": 34488320,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394856831,
+                      "end_unix_ms": 1790394856832,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394856832,
+                      "end_unix_ms": 1790394856832,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394856832,
+                      "end_unix_ms": 1790394860200,
+                      "sample_count": 30,
+                      "sampled_tree_peak_bytes": 7999488
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394860213,
+                      "end_unix_ms": 1790394860216,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394860218,
+                      "end_unix_ms": 1790394860220,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                }
+              ],
+              "new": [
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 32,
+                    "max_sample_gap_seconds": 0.11396947800017188,
+                    "sampled_peak_tree_resident_bytes": 7954432,
+                    "root_os_peak_resident_bytes": 31727616,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394774593,
+                      "end_unix_ms": 1790394774594,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394774594,
+                      "end_unix_ms": 1790394774594,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394774594,
+                      "end_unix_ms": 1790394777987,
+                      "sample_count": 31,
+                      "sampled_tree_peak_bytes": 7954432
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394777999,
+                      "end_unix_ms": 1790394778001,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394778003,
+                      "end_unix_ms": 1790394778006,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 32,
+                    "max_sample_gap_seconds": 0.11485046699999657,
+                    "sampled_peak_tree_resident_bytes": 8249344,
+                    "root_os_peak_resident_bytes": 32776192,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394813573,
+                      "end_unix_ms": 1790394813574,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394813574,
+                      "end_unix_ms": 1790394813574,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394813574,
+                      "end_unix_ms": 1790394816931,
+                      "sample_count": 30,
+                      "sampled_tree_peak_bytes": 8019968
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394816944,
+                      "end_unix_ms": 1790394816946,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394816948,
+                      "end_unix_ms": 1790394816950,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 32,
+                    "max_sample_gap_seconds": 0.11347567699999672,
+                    "sampled_peak_tree_resident_bytes": 7958528,
+                    "root_os_peak_resident_bytes": 34488320,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394860902,
+                      "end_unix_ms": 1790394860902,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394860902,
+                      "end_unix_ms": 1790394860902,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394860902,
+                      "end_unix_ms": 1790394864318,
+                      "sample_count": 31,
+                      "sampled_tree_peak_bytes": 7958528
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394864331,
+                      "end_unix_ms": 1790394864334,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394864336,
+                      "end_unix_ms": 1790394864338,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "4": {
+            "run_seconds": {
+              "old": [
+                2.190866621,
+                2.143620673,
+                2.177744808
+              ],
+              "new": [
+                2.029104188,
+                1.999430678,
+                2.013032116
+              ]
+            },
+            "run_medians": {
+              "old": 2.177744808,
+              "new": 2.013032116
+            },
+            "new_over_old": 0.924365475975457,
+            "new_strictly_faster_pairs": 3,
+            "phase_medians": {
+              "old": {
+                "build_seconds": 0.00061823,
+                "solver_init_seconds": 1.49e-05,
+                "run_seconds": 2.177744808
+              },
+              "new": {
+                "build_seconds": 0.00063946,
+                "solver_init_seconds": 1.687e-05,
+                "run_seconds": 2.013032116
+              }
+            },
+            "full_process_seconds": {
+              "old": [
+                2.2710025829999267,
+                2.266770618999999,
+                2.2772910769999726
+              ],
+              "new": [
+                2.1596594729999197,
+                2.156181790000119,
+                2.159846689999995
+              ]
+            },
+            "memory": {
+              "old": [
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 21,
+                    "max_sample_gap_seconds": 0.11748413700001947,
+                    "sampled_peak_tree_resident_bytes": 8138752,
+                    "root_os_peak_resident_bytes": 31989760,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394781191,
+                      "end_unix_ms": 1790394781192,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394781192,
+                      "end_unix_ms": 1790394781192,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394781192,
+                      "end_unix_ms": 1790394783383,
+                      "sample_count": 20,
+                      "sampled_tree_peak_bytes": 8138752
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394783394,
+                      "end_unix_ms": 1790394783396,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394783397,
+                      "end_unix_ms": 1790394783399,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 21,
+                    "max_sample_gap_seconds": 0.11370024999996531,
+                    "sampled_peak_tree_resident_bytes": 8253440,
+                    "root_os_peak_resident_bytes": 33038336,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394821475,
+                      "end_unix_ms": 1790394821476,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394821476,
+                      "end_unix_ms": 1790394821476,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394821476,
+                      "end_unix_ms": 1790394823620,
+                      "sample_count": 19,
+                      "sampled_tree_peak_bytes": 8253440
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394823630,
+                      "end_unix_ms": 1790394823631,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394823633,
+                      "end_unix_ms": 1790394823635,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 21,
+                    "max_sample_gap_seconds": 0.11782070699996439,
+                    "sampled_peak_tree_resident_bytes": 8249344,
+                    "root_os_peak_resident_bytes": 34508800,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394867685,
+                      "end_unix_ms": 1790394867686,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394867686,
+                      "end_unix_ms": 1790394867686,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394867686,
+                      "end_unix_ms": 1790394869864,
+                      "sample_count": 20,
+                      "sampled_tree_peak_bytes": 8249344
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394869874,
+                      "end_unix_ms": 1790394869876,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394869878,
+                      "end_unix_ms": 1790394869879,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                }
+              ],
+              "new": [
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 20,
+                    "max_sample_gap_seconds": 0.11721364800018819,
+                    "sampled_peak_tree_resident_bytes": 8216576,
+                    "root_os_peak_resident_bytes": 31727616,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394778566,
+                      "end_unix_ms": 1790394778566,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394778567,
+                      "end_unix_ms": 1790394778567,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394778567,
+                      "end_unix_ms": 1790394780596,
+                      "sample_count": 18,
+                      "sampled_tree_peak_bytes": 8216576
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394780605,
+                      "end_unix_ms": 1790394780607,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394780609,
+                      "end_unix_ms": 1790394780610,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 20,
+                    "max_sample_gap_seconds": 0.11328042800005278,
+                    "sampled_peak_tree_resident_bytes": 8392704,
+                    "root_os_peak_resident_bytes": 34054144,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394824251,
+                      "end_unix_ms": 1790394824252,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394824252,
+                      "end_unix_ms": 1790394824252,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394824252,
+                      "end_unix_ms": 1790394826251,
+                      "sample_count": 18,
+                      "sampled_tree_peak_bytes": 8294400
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394826262,
+                      "end_unix_ms": 1790394826264,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394826266,
+                      "end_unix_ms": 1790394826268,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 20,
+                    "max_sample_gap_seconds": 0.11311656799989578,
+                    "sampled_peak_tree_resident_bytes": 8499200,
+                    "root_os_peak_resident_bytes": 34488320,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394864963,
+                      "end_unix_ms": 1790394864964,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394864964,
+                      "end_unix_ms": 1790394864964,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394864964,
+                      "end_unix_ms": 1790394866977,
+                      "sample_count": 18,
+                      "sampled_tree_peak_bytes": 8384512
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394866987,
+                      "end_unix_ms": 1790394866988,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394866990,
+                      "end_unix_ms": 1790394866991,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "8": {
+            "run_seconds": {
+              "old": [
+                2.628597666,
+                2.512182251,
+                2.549768667
+              ],
+              "new": [
+                1.358973288,
+                1.361861799,
+                1.380946657
+              ]
+            },
+            "run_medians": {
+              "old": 2.549768667,
+              "new": 1.361861799
+            },
+            "new_over_old": 0.5341119045918529,
+            "new_strictly_faster_pairs": 3,
+            "phase_medians": {
+              "old": {
+                "build_seconds": 0.00056347,
+                "solver_init_seconds": 1.621e-05,
+                "run_seconds": 2.549768667
+              },
+              "new": {
+                "build_seconds": 0.000556419,
+                "solver_init_seconds": 1.631e-05,
+                "run_seconds": 1.361861799
+              }
+            },
+            "full_process_seconds": {
+              "old": [
+                2.798995636999962,
+                2.6048820109999724,
+                2.7251728930000354
+              ],
+              "new": [
+                1.428604820999908,
+                1.4822513950000484,
+                1.480967456000144
+              ]
+            },
+            "memory": {
+              "old": [
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 25,
+                    "max_sample_gap_seconds": 0.11832744799994543,
+                    "sampled_peak_tree_resident_bytes": 8867840,
+                    "root_os_peak_resident_bytes": 31989760,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394783935,
+                      "end_unix_ms": 1790394783935,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394783935,
+                      "end_unix_ms": 1790394783935,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394783935,
+                      "end_unix_ms": 1790394786564,
+                      "sample_count": 23,
+                      "sampled_tree_peak_bytes": 8867840
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394786576,
+                      "end_unix_ms": 1790394786577,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394786579,
+                      "end_unix_ms": 1790394786581,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 24,
+                    "max_sample_gap_seconds": 0.11310079699978814,
+                    "sampled_peak_tree_resident_bytes": 8822784,
+                    "root_os_peak_resident_bytes": 34271232,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394828931,
+                      "end_unix_ms": 1790394828931,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394828931,
+                      "end_unix_ms": 1790394828931,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394828932,
+                      "end_unix_ms": 1790394831444,
+                      "sample_count": 23,
+                      "sampled_tree_peak_bytes": 8822784
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394831454,
+                      "end_unix_ms": 1790394831456,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394831458,
+                      "end_unix_ms": 1790394831459,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 25,
+                    "max_sample_gap_seconds": 0.11343662700005552,
+                    "sampled_peak_tree_resident_bytes": 8929280,
+                    "root_os_peak_resident_bytes": 34635776,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394870531,
+                      "end_unix_ms": 1790394870532,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394870532,
+                      "end_unix_ms": 1790394870532,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394870532,
+                      "end_unix_ms": 1790394873082,
+                      "sample_count": 23,
+                      "sampled_tree_peak_bytes": 8929280
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394873093,
+                      "end_unix_ms": 1790394873094,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394873097,
+                      "end_unix_ms": 1790394873099,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                }
+              ],
+              "new": [
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 13,
+                    "max_sample_gap_seconds": 0.11861552799996389,
+                    "sampled_peak_tree_resident_bytes": 9121792,
+                    "root_os_peak_resident_bytes": 31989760,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394787206,
+                      "end_unix_ms": 1790394787207,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394787207,
+                      "end_unix_ms": 1790394787207,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394787207,
+                      "end_unix_ms": 1790394788566,
+                      "sample_count": 12,
+                      "sampled_tree_peak_bytes": 9121792
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394788575,
+                      "end_unix_ms": 1790394788576,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394788578,
+                      "end_unix_ms": 1790394788579,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 14,
+                    "max_sample_gap_seconds": 0.11352829800011932,
+                    "sampled_peak_tree_resident_bytes": 9183232,
+                    "root_os_peak_resident_bytes": 34168832,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394826927,
+                      "end_unix_ms": 1790394826927,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394826927,
+                      "end_unix_ms": 1790394826927,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394826927,
+                      "end_unix_ms": 1790394828289,
+                      "sample_count": 13,
+                      "sampled_tree_peak_bytes": 9183232
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394828298,
+                      "end_unix_ms": 1790394828299,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394828301,
+                      "end_unix_ms": 1790394828302,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 14,
+                    "max_sample_gap_seconds": 0.11292665699988902,
+                    "sampled_peak_tree_resident_bytes": 9097216,
+                    "root_os_peak_resident_bytes": 34697216,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394873827,
+                      "end_unix_ms": 1790394873828,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394873828,
+                      "end_unix_ms": 1790394873828,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394873828,
+                      "end_unix_ms": 1790394875209,
+                      "sample_count": 13,
+                      "sampled_tree_peak_bytes": 9097216
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394875218,
+                      "end_unix_ms": 1790394875220,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394875221,
+                      "end_unix_ms": 1790394875222,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "16": {
+            "run_seconds": {
+              "old": [
+                2.600982818,
+                2.656555755,
+                2.653478726
+              ],
+              "new": [
+                1.182294226,
+                1.132769054,
+                1.133695913
+              ]
+            },
+            "run_medians": {
+              "old": 2.653478726,
+              "new": 1.133695913
+            },
+            "new_over_old": 0.42724891738966214,
+            "new_strictly_faster_pairs": 3,
+            "phase_medians": {
+              "old": {
+                "build_seconds": 0.00057303,
+                "solver_init_seconds": 1.664e-05,
+                "run_seconds": 2.653478726
+              },
+              "new": {
+                "build_seconds": 0.00069169,
+                "solver_init_seconds": 1.622e-05,
+                "run_seconds": 1.133695913
+              }
+            },
+            "full_process_seconds": {
+              "old": [
+                2.7250921560000734,
+                2.761750362999919,
+                2.835631476000117
+              ],
+              "new": [
+                1.2953082649999033,
+                1.2920560270001715,
+                1.2569668119999733
+              ]
+            },
+            "memory": {
+              "old": [
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 25,
+                    "max_sample_gap_seconds": 0.11390600800018547,
+                    "sampled_peak_tree_resident_bytes": 9940992,
+                    "root_os_peak_resident_bytes": 32251904,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394790886,
+                      "end_unix_ms": 1790394790887,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394790887,
+                      "end_unix_ms": 1790394790887,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394790887,
+                      "end_unix_ms": 1790394793488,
+                      "sample_count": 23,
+                      "sampled_tree_peak_bytes": 9940992
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394793499,
+                      "end_unix_ms": 1790394793500,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394793502,
+                      "end_unix_ms": 1790394793504,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 25,
+                    "max_sample_gap_seconds": 0.11636548700016647,
+                    "sampled_peak_tree_resident_bytes": 9936896,
+                    "root_os_peak_resident_bytes": 34271232,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394832065,
+                      "end_unix_ms": 1790394832066,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394832066,
+                      "end_unix_ms": 1790394832066,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394832066,
+                      "end_unix_ms": 1790394834723,
+                      "sample_count": 24,
+                      "sampled_tree_peak_bytes": 9936896
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394834734,
+                      "end_unix_ms": 1790394834735,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394834737,
+                      "end_unix_ms": 1790394834739,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 26,
+                    "max_sample_gap_seconds": 0.11339060799991785,
+                    "sampled_peak_tree_resident_bytes": 9994240,
+                    "root_os_peak_resident_bytes": 34910208,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394877708,
+                      "end_unix_ms": 1790394877709,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394877709,
+                      "end_unix_ms": 1790394877709,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394877709,
+                      "end_unix_ms": 1790394880363,
+                      "sample_count": 24,
+                      "sampled_tree_peak_bytes": 9994240
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394880374,
+                      "end_unix_ms": 1790394880375,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394880377,
+                      "end_unix_ms": 1790394880379,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                }
+              ],
+              "new": [
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 12,
+                    "max_sample_gap_seconds": 0.1180634980000832,
+                    "sampled_peak_tree_resident_bytes": 10592256,
+                    "root_os_peak_resident_bytes": 32251904,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394789109,
+                      "end_unix_ms": 1790394789110,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394789110,
+                      "end_unix_ms": 1790394789110,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394789110,
+                      "end_unix_ms": 1790394790293,
+                      "sample_count": 11,
+                      "sampled_tree_peak_bytes": 10592256
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394790300,
+                      "end_unix_ms": 1790394790301,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394790303,
+                      "end_unix_ms": 1790394790304,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 12,
+                    "max_sample_gap_seconds": 0.1184703469998567,
+                    "sampled_peak_tree_resident_bytes": 10571776,
+                    "root_os_peak_resident_bytes": 34320384,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394835352,
+                      "end_unix_ms": 1790394835353,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394835353,
+                      "end_unix_ms": 1790394835353,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394835353,
+                      "end_unix_ms": 1790394836486,
+                      "sample_count": 10,
+                      "sampled_tree_peak_bytes": 10571776
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394836493,
+                      "end_unix_ms": 1790394836494,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394836496,
+                      "end_unix_ms": 1790394836497,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 12,
+                    "max_sample_gap_seconds": 0.1128787369998463,
+                    "sampled_peak_tree_resident_bytes": 10502144,
+                    "root_os_peak_resident_bytes": 34803712,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394875879,
+                      "end_unix_ms": 1790394875880,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394875880,
+                      "end_unix_ms": 1790394875880,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394875880,
+                      "end_unix_ms": 1790394877014,
+                      "sample_count": 11,
+                      "sampled_tree_peak_bytes": 10502144
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394877021,
+                      "end_unix_ms": 1790394877022,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394877024,
+                      "end_unix_ms": 1790394877025,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "32": {
+            "run_seconds": {
+              "old": [
+                2.664481102,
+                2.663556784,
+                2.69819064
+              ],
+              "new": [
+                1.475474546,
+                1.420208382,
+                1.437554811
+              ]
+            },
+            "run_medians": {
+              "old": 2.664481102,
+              "new": 1.437554811
+            },
+            "new_over_old": 0.5395252418645228,
+            "new_strictly_faster_pairs": 3,
+            "phase_medians": {
+              "old": {
+                "build_seconds": 0.00055449,
+                "solver_init_seconds": 1.794e-05,
+                "run_seconds": 2.664481102
+              },
+              "new": {
+                "build_seconds": 0.00053076,
+                "solver_init_seconds": 1.796e-05,
+                "run_seconds": 1.437554811
+              }
+            },
+            "full_process_seconds": {
+              "old": [
+                2.836900943999808,
+                2.833943644999863,
+                2.8549579830000766
+              ],
+              "new": [
+                1.546712467999896,
+                1.5407844589999513,
+                1.541286798999863
+              ]
+            },
+            "memory": {
+              "old": [
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 26,
+                    "max_sample_gap_seconds": 0.11341519799998423,
+                    "sampled_peak_tree_resident_bytes": 10395648,
+                    "root_os_peak_resident_bytes": 32251904,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394794106,
+                      "end_unix_ms": 1790394794107,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394794107,
+                      "end_unix_ms": 1790394794107,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394794107,
+                      "end_unix_ms": 1790394796772,
+                      "sample_count": 24,
+                      "sampled_tree_peak_bytes": 10395648
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394796782,
+                      "end_unix_ms": 1790394796783,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394796785,
+                      "end_unix_ms": 1790394796787,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 26,
+                    "max_sample_gap_seconds": 0.11408415699997931,
+                    "sampled_peak_tree_resident_bytes": 10334208,
+                    "root_os_peak_resident_bytes": 34459648,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394839251,
+                      "end_unix_ms": 1790394839252,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394839252,
+                      "end_unix_ms": 1790394839252,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394839252,
+                      "end_unix_ms": 1790394841916,
+                      "sample_count": 24,
+                      "sampled_tree_peak_bytes": 10334208
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394841927,
+                      "end_unix_ms": 1790394841929,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394841931,
+                      "end_unix_ms": 1790394841932,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 26,
+                    "max_sample_gap_seconds": 0.11484074699978919,
+                    "sampled_peak_tree_resident_bytes": 10719232,
+                    "root_os_peak_resident_bytes": 35024896,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394881128,
+                      "end_unix_ms": 1790394881129,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394881129,
+                      "end_unix_ms": 1790394881129,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394881129,
+                      "end_unix_ms": 1790394883827,
+                      "sample_count": 24,
+                      "sampled_tree_peak_bytes": 10543104
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394883839,
+                      "end_unix_ms": 1790394883841,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394883843,
+                      "end_unix_ms": 1790394883845,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                }
+              ],
+              "new": [
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 14,
+                    "max_sample_gap_seconds": 0.11875992800014501,
+                    "sampled_peak_tree_resident_bytes": 12627968,
+                    "root_os_peak_resident_bytes": 32514048,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394797432,
+                      "end_unix_ms": 1790394797433,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394797433,
+                      "end_unix_ms": 1790394797433,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394797433,
+                      "end_unix_ms": 1790394798909,
+                      "sample_count": 13,
+                      "sampled_tree_peak_bytes": 12627968
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394798918,
+                      "end_unix_ms": 1790394798919,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394798921,
+                      "end_unix_ms": 1790394798922,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 14,
+                    "max_sample_gap_seconds": 0.11913825600004202,
+                    "sampled_peak_tree_resident_bytes": 12816384,
+                    "root_os_peak_resident_bytes": 34398208,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394837178,
+                      "end_unix_ms": 1790394837179,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394837179,
+                      "end_unix_ms": 1790394837179,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394837179,
+                      "end_unix_ms": 1790394838599,
+                      "sample_count": 13,
+                      "sampled_tree_peak_bytes": 12816384
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394838608,
+                      "end_unix_ms": 1790394838609,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394838611,
+                      "end_unix_ms": 1790394838612,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                },
+                {
+                  "full_process": {
+                    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                    "sample_count": 14,
+                    "max_sample_gap_seconds": 0.11909204699986731,
+                    "sampled_peak_tree_resident_bytes": 12673024,
+                    "root_os_peak_resident_bytes": 35065856,
+                    "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                    "job_os_peak_commit_bytes": null,
+                    "max_observed_processes": 1
+                  },
+                  "phases": {
+                    "build": {
+                      "start_unix_ms": 1790394884566,
+                      "end_unix_ms": 1790394884566,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "solver_init": {
+                      "start_unix_ms": 1790394884567,
+                      "end_unix_ms": 1790394884567,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "run": {
+                      "start_unix_ms": 1790394884567,
+                      "end_unix_ms": 1790394886004,
+                      "sample_count": 13,
+                      "sampled_tree_peak_bytes": 12673024
+                    },
+                    "cfv_capture_p0": {
+                      "start_unix_ms": 1790394886014,
+                      "end_unix_ms": 1790394886015,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    },
+                    "cfv_capture_p1": {
+                      "start_unix_ms": 1790394886017,
+                      "end_unix_ms": 1790394886018,
+                      "sample_count": 0,
+                      "sampled_tree_peak_bytes": null
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "scaling": {
+          "old": {
+            "rows": [
+              {
+                "threads": 1,
+                "speedup_over_one": 1.0,
+                "parallel_efficiency": 1.0,
+                "speedup_over_previous": 1.0,
+                "slower_than_previous": false
+              },
+              {
+                "threads": 2,
+                "speedup_over_one": 1.9053549397990814,
+                "parallel_efficiency": 0.9526774698995407,
+                "speedup_over_previous": 1.9053549397990814,
+                "slower_than_previous": false
+              },
+              {
+                "threads": 4,
+                "speedup_over_one": 2.9332168992134733,
+                "parallel_efficiency": 0.7333042248033683,
+                "speedup_over_previous": 1.539459571518354,
+                "slower_than_previous": false
+              },
+              {
+                "threads": 8,
+                "speedup_over_one": 2.5052460466994986,
+                "parallel_efficiency": 0.3131557558374373,
+                "speedup_over_previous": 0.854095054263211,
+                "slower_than_previous": true
+              },
+              {
+                "threads": 16,
+                "speedup_over_one": 2.4073295973355395,
+                "parallel_efficiency": 0.15045809983347122,
+                "speedup_over_previous": 0.9609154360335355,
+                "slower_than_previous": true
+              },
+              {
+                "threads": 32,
+                "speedup_over_one": 2.397389070691934,
+                "parallel_efficiency": 0.07491840845912294,
+                "speedup_over_previous": 0.9958707247006776,
+                "slower_than_previous": true
+              }
+            ],
+            "fastest_observed_threads": 4,
+            "first_adjacent_slowdown_threads": 8
+          },
+          "new": {
+            "rows": [
+              {
+                "threads": 1,
+                "speedup_over_one": 1.0,
+                "parallel_efficiency": 1.0,
+                "speedup_over_previous": 1.0,
+                "slower_than_previous": false
+              },
+              {
+                "threads": 2,
+                "speedup_over_one": 1.881639787131154,
+                "parallel_efficiency": 0.940819893565577,
+                "speedup_over_previous": 1.881639787131154,
+                "slower_than_previous": false
+              },
+              {
+                "threads": 4,
+                "speedup_over_one": 3.1713700299454133,
+                "parallel_efficiency": 0.7928425074863533,
+                "speedup_over_previous": 1.6854288751943587,
+                "slower_than_previous": false
+              },
+              {
+                "threads": 8,
+                "speedup_over_one": 4.687751522722608,
+                "parallel_efficiency": 0.585968940340326,
+                "speedup_over_previous": 1.4781471346638457,
+                "slower_than_previous": false
+              },
+              {
+                "threads": 16,
+                "speedup_over_one": 5.631201143793838,
+                "parallel_efficiency": 0.3519500714871149,
+                "speedup_over_previous": 1.2012584533327149,
+                "slower_than_previous": false
+              },
+              {
+                "threads": 32,
+                "speedup_over_one": 4.440922650844232,
+                "parallel_efficiency": 0.13877883283888226,
+                "speedup_over_previous": 0.7886279565308344,
+                "slower_than_previous": true
+              }
+            ],
+            "fastest_observed_threads": 16,
+            "first_adjacent_slowdown_threads": 32
+          }
+        },
+        "descriptive_guard": "pass"
+      }
+    }
+  ],
+  "recovered_content_aliases": [],
+  "scope": "Original source/binary/log/canonical bytes verified; compiler and Python executable bytes may be identity-only. Source-after is the recorded validation assertion. Native OS peak is recorded, while sampled memory is recomputed. Failed runs have no adoption guard."
+}

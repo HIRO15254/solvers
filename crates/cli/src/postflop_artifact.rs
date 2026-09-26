@@ -3,8 +3,9 @@
 //! The multiway counterpart is [`crate::multiway_artifact`]; the two share
 //! `ExportView`/`ExportFormat` and their view names mean the same thing on
 //! both sides, so a caller that knows one knows the other. What differs is
-//! what a postflop node is: two seats, 1,326 concrete combos, and a betting
-//! line rather than a seat-indexed public history.
+//! what a postflop node is: two seats, each seat's supported concrete combos,
+//! and a betting line rather than a seat-indexed public history. Local hand
+//! indices are converted to global combo labels at the output boundary.
 //!
 //! Everything here reads the artifact. Strategies and per-hand values are
 //! both stored (see `formats::ValueBlock`), so no view has to re-solve —
@@ -123,7 +124,7 @@ fn resolve_selection(loaded: &LoadedSol, node: &str) -> Result<Selection> {
                 .find(|&pos| {
                     let label = crate::inspect::chance_child_label(
                         tree,
-                        &loaded.pf_game.node_info,
+                        &loaded.pf_game.game.evaluator,
                         current,
                         pos,
                     );
@@ -361,7 +362,6 @@ fn tree_csv(rows: &[TreeRow]) -> String {
 /// A node whose stored blocks are present, with everything a per-hand view
 /// needs.
 struct StoredNode<'a> {
-    id: NodeId,
     actor: Player,
     info: &'a PostflopNodeInfo,
     num_actions: usize,
@@ -391,7 +391,6 @@ fn stored_node<'a>(loaded: &'a LoadedSol, id: NodeId) -> Result<StoredNode<'a>> 
         .get(&node.aux)
         .expect("value blocks cover the same nodes as strategy blocks");
     Ok(StoredNode {
-        id,
         actor: node.player,
         info,
         num_actions: sref.num_actions as usize,
@@ -504,7 +503,14 @@ fn strategy_rows(loaded: &LoadedSol, selection: &Selection) -> Result<Vec<Strate
             rows.push(StrategyRow {
                 history: node.info.history.clone(),
                 actor: seat_name(node.actor).to_string(),
-                combo: combo_label(hand),
+                combo: combo_label(
+                    loaded
+                        .pf_game
+                        .game
+                        .evaluator
+                        .hands()
+                        .combo(node.actor, hand),
+                ),
                 weight,
                 probabilities: (0..node.num_actions)
                     .map(|a| node.strategy[a * node.num_hands + hand])
@@ -553,12 +559,16 @@ fn value_rows(loaded: &LoadedSol, selection: &Selection) -> Result<Vec<ValueRow>
     for id in selected_action_nodes(loaded, selection) {
         let node = stored_node(loaded, id)?;
         let reach = reach_at(loaded, id)?;
+        // Postflop keeps each seat's root support at every node; deals mask
+        // that support without renumbering it. Values are P0 followed by P1,
+        // independently of which player owns this node's strategy block.
+        let dims = &loaded.pf_game.game.tree.root_dims;
         for seat in Player::BOTH {
             let base = match seat {
                 Player::P0 => 0,
-                Player::P1 => node.num_hands,
+                Player::P1 => dims[Player::P0] as usize,
             };
-            for hand in 0..node.num_hands {
+            for hand in 0..dims[seat] as usize {
                 let weight = reach[seat][hand];
                 if weight <= 0.0 {
                     continue;
@@ -566,13 +576,12 @@ fn value_rows(loaded: &LoadedSol, selection: &Selection) -> Result<Vec<ValueRow>
                 rows.push(ValueRow {
                     history: node.info.history.clone(),
                     seat: seat_name(seat).to_string(),
-                    combo: combo_label(hand),
+                    combo: combo_label(loaded.pf_game.game.evaluator.hands().combo(seat, hand)),
                     weight,
                     ev: node.values[base + hand],
                 });
             }
         }
-        let _ = node.id;
     }
     Ok(rows)
 }
@@ -607,7 +616,7 @@ fn range_rows(loaded: &LoadedSol) -> Vec<RangeRow> {
             }
             rows.push(RangeRow {
                 seat: seat_name(seat).to_string(),
-                combo: combo_label(hand),
+                combo: combo_label(loaded.pf_game.game.evaluator.hands().combo(seat, hand)),
                 weight,
             });
         }
@@ -628,10 +637,23 @@ fn range_csv(rows: &[RangeRow]) -> String {
 /// Both embed the config that produced them, so the same tree shape means
 /// corresponding `sref`s — the only basis on which strategies and values
 /// can be lined up. Artifacts of the same shape but a different spot are
-/// refused unless the caller says otherwise with `--cross-game`.
+/// refused unless the caller says otherwise with `--cross-game`. Both seats'
+/// supported combo IDs must match even with that flag.
 pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<()> {
     let left = load_sol(left_path, 0, None)?;
     let right = load_sol(right_path, 0, None)?;
+
+    for seat in Player::BOTH {
+        if left.pf_game.game.evaluator.hands().combos(seat)
+            != right.pf_game.game.evaluator.hands().combos(seat)
+        {
+            bail!(
+                "artifacts have different {} hand support; node-by-node comparison requires \
+                 identical combo IDs for each seat, including with --cross-game",
+                seat_name(seat)
+            );
+        }
+    }
 
     let mut left_srefs: Vec<u32> = left.blocks.keys().copied().collect();
     let mut right_srefs: Vec<u32> = right.blocks.keys().copied().collect();

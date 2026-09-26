@@ -1075,16 +1075,12 @@ fn iso_quotient_matches_full_tree_per_hand() {
         "iso EV mismatch: {ev_on} vs {ev_off}"
     );
     assert_eq!(sig_on.len(), sig_off.len());
-    let num_actions = sig_on.len() / NUM_COMBOS;
+    let hands = holdem::PostflopHands::from_ranges(&base.board, &ranges);
+    let dim = hands.len(Player::P0);
+    let num_actions = sig_on.len() / dim;
     for a in 0..num_actions {
-        for combo in 0..NUM_COMBOS {
-            if ranges[Player::P0].weight(combo) == 0.0 {
-                continue;
-            }
-            let (x, y) = (
-                sig_on[a * NUM_COMBOS + combo],
-                sig_off[a * NUM_COMBOS + combo],
-            );
+        for (local, &combo) in hands.combos(Player::P0).iter().enumerate() {
+            let (x, y) = (sig_on[a * dim + local], sig_off[a * dim + local]);
             assert!(
                 (x - y).abs() < 1e-4,
                 "root strategy diverged: action {a} combo {combo}: merged {x} vs full {y}"
@@ -1141,14 +1137,16 @@ fn member_branch_matches_suit_permuted_rep_branch() {
     let node_d = find("xx[8d]");
     let sig_c = solver.average_strategy_at(node_c);
     let sig_d = solver.average_strategy_at(node_d);
-    let num_actions = sig_c.len() / NUM_COMBOS;
+    let hands = solver.game().evaluator.hands();
+    let dim = hands.len(Player::P0);
+    let num_actions = sig_c.len() / dim;
     for a in 0..num_actions {
-        for combo in 0..NUM_COMBOS {
-            if ranges[Player::P0].weight(combo) == 0.0 {
-                continue;
-            }
-            let x = sig_c[a * NUM_COMBOS + combo];
-            let y = sig_d[a * NUM_COMBOS + hand_index::permute_combo(&perm, combo)];
+        for (local, &combo) in hands.combos(Player::P0).iter().enumerate() {
+            let mapped = hands
+                .index(Player::P0, hand_index::permute_combo(&perm, combo as usize))
+                .unwrap();
+            let x = sig_c[a * dim + local];
+            let y = sig_d[a * dim + mapped];
             assert!(
                 (x - y).abs() < 1e-3,
                 "branches not suit-symmetric: action {a} combo {combo}: {x} vs {y}"

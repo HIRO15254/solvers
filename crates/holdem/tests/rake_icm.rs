@@ -66,7 +66,13 @@ fn solve_root_strategy(pipeline: PayoffPipeline<'_>, iterations: u64) -> (Vec<f3
     solver.run(iterations);
     let expl = solver.exploitability();
     let nash_conv = expl[Player::P0] + expl[Player::P1];
-    (solver.average_strategy_at(0), nash_conv)
+    let hands = solver.game().evaluator.hands();
+    let sigma = solver.average_strategy_at(0);
+    let expanded = sigma
+        .chunks_exact(hands.len(Player::P0))
+        .flat_map(|action| hands.expand(Player::P0, action))
+        .collect();
+    (expanded, nash_conv)
 }
 
 /// Max absolute pointwise difference between two root average strategies,
@@ -279,13 +285,15 @@ fn clairvoyance_frequencies(pipeline: PayoffPipeline<'_>, iterations: u64) -> (f
     let freq = |node: engine::NodeId, range: &str, action: usize| -> f64 {
         let range: Range = range.parse().unwrap();
         let sigma = solver.average_strategy_at(node);
+        let player = solver.game().tree.node(node).player;
+        let hands = solver.game().evaluator.hands();
         let mut total = 0.0;
         let mut hit = 0.0;
-        for combo in 0..NUM_COMBOS {
-            let w = range.weight(combo) as f64;
+        for (local, &combo) in hands.combos(player).iter().enumerate() {
+            let w = range.weight(combo as usize) as f64;
             if w > 0.0 {
                 total += w;
-                hit += w * sigma[action * NUM_COMBOS + combo] as f64;
+                hit += w * sigma[action * hands.len(player) + local] as f64;
             }
         }
         hit / total
@@ -395,7 +403,13 @@ fn rake_cap_level_changes_strategy() {
         solver.run(iterations);
         let expl = solver.exploitability();
         let nash_conv = expl[Player::P0] + expl[Player::P1];
-        (solver.average_strategy_at(0), nash_conv)
+        let hands = solver.game().evaluator.hands();
+        let sigma = solver.average_strategy_at(0);
+        let expanded: Vec<f32> = sigma
+            .chunks_exact(hands.len(Player::P0))
+            .flat_map(|action| hands.expand(Player::P0, action))
+            .collect();
+        (expanded, nash_conv)
     };
 
     let (sig_loose_cap, conv_loose_cap) = run(4.0);

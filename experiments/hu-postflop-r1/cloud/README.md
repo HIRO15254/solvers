@@ -2,17 +2,25 @@
 
 初期20 USDと2026-09-26の2回の追加各10 USD許可により、累計上限は40 USD。
 節約を優先し、検証・buildは小型Spot VM、32 vCPU機は検証後の短時間計測に使う。
-[台帳](budget.json)は請求額と予約額を区別する。追加許可時点では未精算の既存20 USDと
-VM08の3 USDを保持し、合計23/40 USD、未予約枠17 USDである。32 vCPU枠はまだ予約・起動していない。
+[台帳](budget.json)は請求額と予約額を区別する。未精算の既存20 USD、
+VM08の小型機枠3 USD、32 vCPU枠3 USDを保持し、合計26/40 USD、未予約枠14 USD。
+これは請求額ではない。32 vCPU枠は通常料金を上限側の見積りに使い、最大90分と予備を含めた。
 VM08は2 vCPU / 8 GiBでのcodec比較後、同じinstanceを4 vCPU / 16 GiBへ変更した。
-元の絶対期限2026-09-26 07:15:19 UTC、40 GiB disk、転送1 GiBは延長せず、
-予約額だけ2 USDから3 USDへ増額した。[資源履歴](vm08/README.md)で初回と再起動後を区別する。
+小型機枠は2 USDから3 USDへ増額し、32 vCPU化時に絶対STOP期限を
+2026-09-26 04:30:56 UTCへ短縮した。40 GiB disk・累計転送1 GiBは延長しない。
+[資源履歴](vm08/README.md)と台帳の各eventで初回と再起動後を区別する。
 完了した段階の証拠を回収し、計算終了後は期限を待たずにVMとdiskを削除する。
 
-32 vCPUの正式比較は約90分を予定し、同一host・bootでcompactの1/2/4/8/16/32 threadsと
-dense 1 threadを比較する。4 case、7条件のwarmupと測定で112標本、別に4 pilotを置く。
-小型VMの検証後に料金・停止期限・回収量を見積もって予約し、同一source/binaryと
-品質一致を確認する。4 vCPU段階の時間を32 vCPUの同一host対照へ混ぜない。
+32 vCPUの正式比較はE2 highcpu-32で、同一host・bootのcompact 1/2/4/8/16/32 threadsと
+dense 1 threadを比較した。4 case・112標本と4 pilotの原データを回収・再検証済み。
+03:31:43 UTCのSpot preemption後に同じ期限・予約内で手動再起動したところIntelからAMDへ変化した。
+River action候補の比較は新旧ともAMDでfresh buildし、同じ新bootで交互に測る。
+元のIntel測定は別証拠として保持し、4 vCPU段階や再起動後の時間と同一host対照に混ぜない。
+測定開始の最終期限は04:15:56 UTC。停止期限を待たず、回収後にVMとdiskを明示削除する。
+
+VM08とboot diskは2026-09-26 04:00:40.671 UTCに削除し、04:01:25 UTCの
+[照合](cleanup-vm08/reconciliation.json)でinstance・disk・予約IPの残存なしを確認した。
+実請求は未確認なので、完了後も未精算予約26 USDを保持する。
 
 以下は初回からVM07までの履歴である。初回は累計20 USD許可から5 USDを予約した。
 単一e2-highmem-8（8 vCPU / 64 GiB）、100 GiB pd-balanced、最大3時間。

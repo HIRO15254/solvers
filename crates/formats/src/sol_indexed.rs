@@ -1,4 +1,4 @@
-//! Version 3: checked metadata and indexed, bounded groups of node frames.
+//! Version 4: checked metadata and indexed, bounded groups of node frames.
 
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Seek, SeekFrom, Write};
@@ -12,7 +12,9 @@ use crate::sol::{
 };
 
 const MAGIC: &[u8; 8] = b"SLVRSOLV";
-pub const SOL_FORMAT_VERSION: u16 = 3;
+// Version 4 binds private columns to each seat's positive root support in
+// global combo order. Version 3 assumed all 1,326 combos for both seats.
+pub const SOL_FORMAT_VERSION: u16 = 4;
 const PREFIX_LEN: u64 = HEADER_LEN as u64 + 8 + 8 + 32 + 8;
 const ENTRY_LEN: u64 = 64;
 const MAX_CHUNK_NODES: usize = 64;

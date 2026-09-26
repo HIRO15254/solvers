@@ -13,7 +13,7 @@ use std::path::Path;
 use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow};
-use cards::{Card, Player};
+use cards::{Card, PerPlayer, Player};
 use engine::{F32Storage, I16Storage, Solver, Storage};
 use game::PayoffPipeline;
 use holdem::range_equity;
@@ -233,11 +233,16 @@ fn run_config<S: Storage>(
         // Range-weighted mean of the OOP equity vector: a simple
         // weight-average over combos, not a joint-compatible-weight
         // normalization (a small simplification for reporting purposes).
-        let equity = range_equity(board_cards, &solver.game().root_ranges);
+        let hands = solver.game().evaluator.hands();
+        let full_ranges = PerPlayer::new(
+            hands.expand(Player::P0, &solver.game().root_ranges[Player::P0]),
+            hands.expand(Player::P1, &solver.game().root_ranges[Player::P1]),
+        );
+        let equity = range_equity(board_cards, &full_ranges);
         let oop_equity_vec = &equity[Player::P0];
         let total_weight: f64 = root_range_oop.iter().map(|&w| w as f64).sum();
         let oop_equity = if total_weight > 0.0 {
-            root_range_oop
+            full_ranges[Player::P0]
                 .iter()
                 .zip(oop_equity_vec)
                 .map(|(&w, &e)| w as f64 * e as f64)

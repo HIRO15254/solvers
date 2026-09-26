@@ -1,5 +1,5 @@
 //! Mode A: exact postflop HU-NLHE solving. No card abstraction — full
-//! 1,326-combo ranges with card-removal handled exactly.
+//! initial-range private hands with card-removal handled exactly.
 //!
 //! Multi-street slice: subgames can start on the flop, turn, or river. The
 //! terminal kernels in [`kernel`] (sorted-rank O(n+m) showdown sweep, O(n)
@@ -17,6 +17,7 @@
 
 mod aggregate;
 mod equity;
+mod hands;
 mod kernel;
 mod postflop;
 mod river;
@@ -24,9 +25,10 @@ mod viewer;
 
 pub use aggregate::{class_average, class_of_combo, class_weights};
 pub use equity::range_equity;
+pub use hands::PostflopHands;
 pub use postflop::{
     MemoryEstimate, PerStreet, PostflopConfig, PostflopEvaluator, PostflopGame, PostflopNodeInfo,
-    RuleHits, StreetTree, build_postflop_game, memory_usage,
+    RuleHits, StreetTree, build_postflop_game, build_postflop_game_dense, memory_usage,
 };
 pub use river::{RiverConfig, RiverGame, RiverNodeInfo, build_river_game};
 pub use viewer::{

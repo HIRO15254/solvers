@@ -11,7 +11,7 @@
 //! viewer re-solves the river lazily on demand), which is what keeps these
 //! files small for deep trees.
 //!
-//! Version 3 stores checked metadata and independently compressed, indexed
+//! Version 4 stores checked metadata and independently compressed, indexed
 //! groups of strategy/value nodes. See `sol_indexed` for the binary layout.
 
 use serde::{Deserialize, Serialize};
@@ -433,13 +433,13 @@ mod tests {
         let path = directory.path().join("layout.sol");
         write_sol(&path, &sample_payload()).unwrap();
         let original = std::fs::read(&path).unwrap();
-        for version in [1u16, 2] {
+        for version in [1u16, 2, 3] {
             let mut legacy = original.clone();
             legacy[8..10].copy_from_slice(&version.to_le_bytes());
             std::fs::write(&path, legacy).unwrap();
             assert!(matches!(
                 read_sol(&path),
-                Err(SolError::BadVersion { found, expected: 3 }) if found == version
+                Err(SolError::BadVersion { found, expected: 4 }) if found == version
             ));
         }
         for (offset, value) in [(50, u64::MAX), (58, u64::MAX), (98, u64::MAX)] {

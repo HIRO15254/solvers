@@ -157,6 +157,159 @@ fn final_partial_chunk_reuses_checkpoint_and_preserves_results() {
     }
 }
 
+fn assert_compact_resume_matches_direct<S: Storage>(storage: &str) {
+    let directory = tempfile::tempdir().unwrap();
+    let config = CONFIG
+        .replace("AcAs,KhKd,JcJs", "AcAs,KhKd")
+        .replace("[run]", &format!("[run]\nstorage = \"{storage}\""));
+    let direct = solve(&format!("{config}{RAKE}"), directory.path());
+    let raw = std::fs::read_to_string(direct.join("run.toml")).unwrap();
+    let parsed = cli::config::parse_solve_config(&raw).unwrap();
+    assert_eq!(parsed.run.iterations, 7);
+    assert!(parsed.run.target_nash_conv.is_none());
+    assert!(parsed.run.max_time_secs.is_none());
+    let cli::config::GameSection::Postflop {
+        board,
+        oop_range,
+        ip_range,
+        pot,
+        effective_stack,
+        iso_merging,
+        min_bet,
+        preflop_aggressor,
+        tree,
+    } = &parsed.game
+    else {
+        panic!("postflop fixture required");
+    };
+    let pf = cli::postflop_setup::build_postflop_config(
+        board,
+        oop_range,
+        ip_range,
+        *pot,
+        *effective_stack,
+        *iso_merging,
+        *min_bet,
+        tree.lower().unwrap(),
+        preflop_aggressor,
+    )
+    .unwrap();
+    let rake = cli::economics::build_rake(&parsed.rake).unwrap();
+    let utility = cli::economics::build_utility(&parsed.utility).unwrap();
+    let resumed = directory.path().join("resumed");
+    std::fs::create_dir(&resumed).unwrap();
+    std::fs::write(resumed.join("run.toml"), &raw).unwrap();
+
+    // Produce a real intermediate state under the SAME planned total and
+    // effective config as the independent direct run. This deterministic
+    // checkpoint fixture exercises CLI resume, not OS signal delivery.
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .build()
+        .unwrap()
+        .install(|| {
+            let game = build_postflop_game(
+                &pf,
+                PayoffPipeline {
+                    rake: rake.as_ref(),
+                    utility: utility.as_ref(),
+                },
+            );
+            assert_eq!(game.game.tree.root_dims, PerPlayer::new(3, 2));
+            assert!(!game.game.zero_sum);
+            let mut partial = Solver::<_, S>::new(
+                game.game,
+                cli::postflop_setup::build_schedule(&parsed.algorithm),
+                Some(parsed.run.iterations),
+            );
+            cli::postflop_setup::configure_solver(&mut partial, &parsed.run);
+            partial.run(3);
+            formats::write_checkpoint_ref(
+                &resumed.join("checkpoint.ckpt"),
+                formats::config_hash(raw.as_bytes()),
+                &partial.state_ref(),
+            )
+            .unwrap();
+        });
+    let intermediate = formats::read_checkpoint(&resumed.join("checkpoint.ckpt")).unwrap();
+    assert_eq!(intermediate.iteration, 3);
+    let partial_bytes = std::fs::read(resumed.join("checkpoint.ckpt")).unwrap();
+    assert_eq!(
+        u16::from_le_bytes(partial_bytes[8..10].try_into().unwrap()),
+        2
+    );
+
+    ok(&["resume", resumed.to_str().unwrap()]);
+    assert_eq!(checkpoint_iterations(&resumed), [6, 7]);
+    let direct_checkpoint = formats::read_checkpoint(&direct.join("checkpoint.ckpt")).unwrap();
+    let resumed_checkpoint = formats::read_checkpoint(&resumed.join("checkpoint.ckpt")).unwrap();
+    assert_eq!(direct_checkpoint.iteration, 7);
+    assert_eq!(resumed_checkpoint, direct_checkpoint);
+    // Raw equality also covers every float bit, including I16's per-node
+    // regret/strategy scales, rather than only a normalized policy.
+    assert_eq!(
+        std::fs::read(resumed.join("checkpoint.ckpt")).unwrap(),
+        std::fs::read(direct.join("checkpoint.ckpt")).unwrap()
+    );
+
+    let direct_sol = direct.join("solution.sol");
+    let resumed_sol = resumed.join("solution.sol");
+    for path in [&direct_sol, &resumed_sol] {
+        let bytes = std::fs::read(path).unwrap();
+        assert_eq!(u16::from_le_bytes(bytes[8..10].try_into().unwrap()), 4);
+    }
+    let mut expected = formats::read_sol(&direct_sol).unwrap();
+    let mut actual = formats::read_sol(&resumed_sol).unwrap();
+    assert_eq!(actual.mode, formats::StreetsStored::Full);
+    assert_eq!(actual.meta.storage, storage);
+    assert_eq!(actual.meta.iterations, 7);
+    assert_eq!(
+        actual.meta.ev.map(f64::to_bits),
+        expected.meta.ev.map(f64::to_bits)
+    );
+    assert_eq!(
+        actual.meta.expl.map(f64::to_bits),
+        expected.meta.expl.map(f64::to_bits)
+    );
+    assert_eq!(
+        actual.meta.nash_conv.to_bits(),
+        expected.meta.nash_conv.to_bits()
+    );
+    for (a, b) in actual.values.iter().zip(&expected.values) {
+        assert_eq!(a.scale.to_bits(), b.scale.to_bits());
+    }
+    // Elapsed time is observational, unlike the stored strategy/value bytes.
+    actual.meta.wall_secs = 0.0;
+    expected.meta.wall_secs = 0.0;
+    assert_eq!(actual, expected);
+
+    // Recompute the quantized saved policy's quality independently of the
+    // pre-save metadata and value blocks. Equality here is between the two
+    // saved profiles, not a claim of zero quantization error versus live CFR.
+    let direct_audit = cli::sol::audit_saved_full_profile(&direct_sol, 1).unwrap();
+    let resumed_audit = cli::sol::audit_saved_full_profile(&resumed_sol, 1).unwrap();
+    assert!(!direct_audit.zero_sum_terminal_utility);
+    assert!(!resumed_audit.zero_sum_terminal_utility);
+    assert_eq!(direct_audit.recomputed.profile, "stored_quantized");
+    assert_eq!(resumed_audit.recomputed.profile, "stored_quantized");
+    let a = direct_audit.recomputed;
+    let b = resumed_audit.recomputed;
+    for (a, b) in [(a.ev, b.ev), (a.br, b.br), (a.gains, b.gains)] {
+        assert_eq!(a.map(f64::to_bits), b.map(f64::to_bits));
+    }
+    assert_eq!(a.nash_conv.to_bits(), b.nash_conv.to_bits());
+}
+
+#[test]
+fn asymmetric_compact_f32_checkpoint_resume_matches_direct_and_saved_profile() {
+    assert_compact_resume_matches_direct::<F32Storage>("f32");
+}
+
+#[test]
+fn asymmetric_compact_i16_checkpoint_resume_matches_direct_and_saved_profile() {
+    assert_compact_resume_matches_direct::<I16Storage>("i16");
+}
+
 #[test]
 fn resumed_early_stop_evaluates_the_new_iteration() {
     let directory = tempfile::tempdir().unwrap();

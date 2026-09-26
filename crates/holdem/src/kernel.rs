@@ -15,7 +15,68 @@
 //! correct, because every "dead" combo the superset drags in contributes
 //! zero.
 
-use cards::{HandRank, combo_cards};
+use cards::{HandRank, NUM_COMBOS, Player, combo_cards};
+
+use crate::hands::PostflopHands;
+
+/// Bridge seat-local vectors to the historical global-combo kernels. Rank
+/// tables retain global combo ids and their ordering, so the floating-point
+/// sums below are unchanged. The two full-width buffers live only on the
+/// stack for this call; tree storage and evaluator state remain compact.
+fn with_global_combos(
+    hands: &PostflopHands,
+    player: Player,
+    opp_reach: &[f32],
+    out: &mut [f32],
+    evaluate: impl FnOnce(&[f32], &mut [f32]),
+) {
+    assert_eq!(opp_reach.len(), hands.len(player.opponent()));
+    assert_eq!(out.len(), hands.len(player));
+    let mut global_reach = [0.0; NUM_COMBOS];
+    for (&combo, &reach) in hands.combos(player.opponent()).iter().zip(opp_reach) {
+        global_reach[combo as usize] = reach;
+    }
+    let mut global_out = [0.0; NUM_COMBOS];
+    evaluate(&global_reach, &mut global_out);
+    for (&combo, value) in hands.combos(player).iter().zip(out) {
+        *value = global_out[combo as usize];
+    }
+}
+
+/// Showdown evaluation with seat-local reach and CFV indices.
+pub(crate) fn showdown_kernel_compact(
+    sorted: &[(HandRank, u32)],
+    utilities: [f64; 3],
+    hands: &PostflopHands,
+    player: Player,
+    opp_reach: &[f32],
+    out: &mut [f32],
+) {
+    with_global_combos(hands, player, opp_reach, out, |reach, values| {
+        showdown_kernel(
+            sorted,
+            utilities[0],
+            utilities[1],
+            utilities[2],
+            reach,
+            values,
+        );
+    });
+}
+
+/// Fold evaluation with seat-local reach and CFV indices.
+pub(crate) fn fold_kernel_compact(
+    sorted: &[(HandRank, u32)],
+    utility: f64,
+    hands: &PostflopHands,
+    player: Player,
+    opp_reach: &[f32],
+    out: &mut [f32],
+) {
+    with_global_combos(hands, player, opp_reach, out, |reach, values| {
+        fold_kernel(sorted, utility, reach, values);
+    });
+}
 
 /// Sum of `opp_reach` over combos disjoint from hand `h`, via
 /// inclusion-exclusion on h's two cards.

@@ -7,7 +7,7 @@ use std::path::Path;
 use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow};
-use cards::{Card, NUM_COMBOS, PerPlayer, Player, combo_cards};
+use cards::{Card, PerPlayer, Player, combo_cards};
 use engine::{
     CompiledGame, F32Storage, I16Storage, NodeId, NodeKind, PublicTree, ReachMap, Solver, Storage,
 };
@@ -331,7 +331,7 @@ impl<'a> Repl<'a> {
                 let children: Vec<NodeId> = tree.children(self.current).collect();
                 println!("kind: chance ({} deals)", children.len());
                 for pos in 0..children.len() {
-                    let label = chance_child_label(tree, node_info, self.current, pos);
+                    let label = chance_child_label(tree, &self.game.evaluator, self.current, pos);
                     println!("  [{pos}] {label}");
                 }
             }
@@ -411,7 +411,7 @@ impl<'a> Repl<'a> {
                 let children: Vec<NodeId> = tree.children(self.current).collect();
                 let mut chosen: Option<(usize, String)> = None;
                 for pos in 0..children.len() {
-                    let label = chance_child_label(tree, node_info, self.current, pos);
+                    let label = chance_child_label(tree, &self.game.evaluator, self.current, pos);
                     // Accept the label with or without its trailing `*`
                     // (see `chance_child_label`'s doc comment): an
                     // iso-merged deal's representative card is still a
@@ -426,9 +426,10 @@ impl<'a> Repl<'a> {
                 let (pos, label) = match chosen {
                     Some(c) => c,
                     None => match arg.parse::<usize>() {
-                        Ok(idx) if idx < children.len() => {
-                            (idx, chance_child_label(tree, node_info, self.current, idx))
-                        }
+                        Ok(idx) if idx < children.len() => (
+                            idx,
+                            chance_child_label(tree, &self.game.evaluator, self.current, idx),
+                        ),
                         Ok(idx) => {
                             println!(
                                 "error: deal index {idx} out of range (0..{})",
@@ -510,8 +511,11 @@ impl<'a> Repl<'a> {
         let freqs =
             postflop_setup::action_frequencies(&avg, weight, sref.num_actions as usize, num_hands);
         let per_combo = &avg[pos * num_hands..(pos + 1) * num_hands];
-        let weights = class_weights(weight);
-        let raw = class_average(weight, per_combo);
+        let hands = self.game.evaluator.hands();
+        let weight = hands.expand(node.player, weight);
+        let per_combo = hands.expand(node.player, per_combo);
+        let weights = class_weights(&weight);
+        let raw = class_average(&weight, &per_combo);
         let mut values = [0.0f64; 169];
         for c in 0..169 {
             values[c] = raw[c] * 100.0;
@@ -529,8 +533,12 @@ impl<'a> Repl<'a> {
                 return;
             }
         };
-        let root_range = &self.game.root_ranges[player];
-        let w = class_weights(root_range);
+        let root_range = self
+            .game
+            .evaluator
+            .hands()
+            .expand(player, &self.game.root_ranges[player]);
+        let w = class_weights(&root_range);
         let max = w.iter().cloned().fold(0.0, f64::max);
         let mut values = [0.0f64; 169];
         if max > 0.0 {
@@ -552,6 +560,11 @@ impl<'a> Repl<'a> {
                 return;
             }
         };
+        let hands = self.game.evaluator.hands();
+        let reach = PerPlayer::new(
+            hands.expand(Player::P0, &reach[Player::P0]),
+            hands.expand(Player::P1, &reach[Player::P1]),
+        );
         if !self
             .equity_cache
             .as_ref()
@@ -595,7 +608,6 @@ impl<'a> Repl<'a> {
         let info = &node_info[tag];
         let sref = tree.storage_ref(&node);
         let num_hands = sref.num_hands as usize;
-        debug_assert_eq!(num_hands, NUM_COMBOS);
         let avg = match self.provider.average_strategy(self.current) {
             Ok(avg) => avg,
             Err(e) => {
@@ -604,7 +616,8 @@ impl<'a> Repl<'a> {
             }
         };
         println!("combos {arg}:");
-        for combo in 0..num_hands {
+        for hand in 0..num_hands {
+            let combo = self.game.evaluator.hands().combo(node.player, hand);
             if class_range.weight(combo) <= 0.0 {
                 continue;
             }
@@ -613,7 +626,7 @@ impl<'a> Repl<'a> {
                 .actions
                 .iter()
                 .enumerate()
-                .map(|(a, label)| format!("{label}={:.3}", avg[a * num_hands + combo]))
+                .map(|(a, label)| format!("{label}={:.3}", avg[a * num_hands + hand]))
                 .collect();
             println!("{hi}{lo} {}", parts.join(" "));
         }
@@ -691,64 +704,22 @@ fn history_token(label: &str) -> String {
     }
 }
 
-/// Identifies the single card a chance mask removes: the mask is 0 for
-/// every combo containing that card and 1 otherwise.
-fn identify_card(mask: &[f32]) -> Option<Card> {
-    for idx in 0..52u8 {
-        let card = Card::from_index(idx);
-        let ok = (0..NUM_COMBOS).all(|combo| {
-            let (c1, c2) = combo_cards(combo);
-            let expect = if c1 == card || c2 == card { 0.0 } else { 1.0 };
-            mask[combo] == expect
-        });
-        if ok {
-            return Some(card);
-        }
-    }
-    None
-}
-
-/// Label for a chance node's `pos`-th child: the dealt card. For a `Mask`
-/// deal (the common unmerged case) this comes straight from the card-removal
-/// mask via [`identify_card`]. For a `Transition` deal (an iso-merged class:
-/// several structurally-equivalent cards folded into one branch) there is no
-/// single mask to read a card from, so instead this reads the representative
-/// card straight out of the child action node's own recorded history -- its
-/// last bracketed `[Xy]` token is exactly the card the builder dealt to
-/// reach it -- and appends `*` to mark that the branch stands in for a whole
-/// merged class (see `cmd_help`'s iso-merging note). Falls back to a bare
-/// `dealN` when neither source applies (e.g. an `Identity` map, which this
-/// builder never uses at a chance node, or an untagged/non-action child).
+/// The builder records each deal's card, including terminal/all-in children.
+/// Compact reach masks cannot identify it: many distinct cards remove no
+/// supported hands. A transition still marks an iso-merged representative
+/// with `*` (see `cmd_help`'s iso-merging note).
 pub(crate) fn chance_child_label(
     tree: &PublicTree,
-    node_info: &[PostflopNodeInfo],
+    evaluator: &PostflopEvaluator,
     node_id: NodeId,
     pos: usize,
 ) -> String {
     let node = tree.node(node_id);
     let deal = tree.deal(node, pos);
-    match deal.maps[Player::P0] {
-        ReachMap::Mask(m) => identify_card(&tree.masks[m as usize])
-            .map(|c| c.to_string())
-            .unwrap_or_else(|| format!("deal{pos}")),
-        ReachMap::Transition(_) => tree
-            .children(node_id)
-            .nth(pos)
-            .filter(|&child_id| tree.node(child_id).kind == NodeKind::Action)
-            .and_then(|child_id| {
-                let tag = tree.tags[child_id as usize] as usize;
-                last_bracketed_card(&node_info[tag].history)
-            })
-            .map(|card| format!("{card}*"))
-            .unwrap_or_else(|| format!("deal{pos}")),
-        ReachMap::Identity => format!("deal{pos}"),
+    let card = evaluator.deal_card(node.aux as usize + pos);
+    if matches!(deal.maps[Player::P0], ReachMap::Transition(_)) {
+        format!("{card}*")
+    } else {
+        card.to_string()
     }
-}
-
-/// Extracts the card inside the last `[Xy]` token in a history string (e.g.
-/// `"xx[9d]"` -> `Some("9d")`), or `None` if there is no bracketed token.
-fn last_bracketed_card(history: &str) -> Option<&str> {
-    let start = history.rfind('[')?;
-    let end = history[start..].find(']')? + start;
-    Some(&history[start + 1..end])
 }

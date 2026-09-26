@@ -1,0 +1,15 @@
+{
+  "local_root": "E:\\codex-work\\solvers\\r1-range-scaling-04\\source-candidate",
+  "archive": "E:\\codex-work\\solvers\\r1-range-scaling-04\\source-candidate.tar.gz",
+  "manifest": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\range-scaling\\source04\\source-candidate-manifest.json",
+  "archive_bytes": 1359305,
+  "archive_sha256": "ae97420ebc38d93bdbe50821403cf6f2a85c6c7b07b1253f58959ce454f5de5a",
+  "file_count": 360,
+  "original_bytes": 5417357,
+  "docs_check": {
+    "exit_code": 0,
+    "stdout": "Documentation check passed: 47 Markdown files.\r\n",
+    "stderr": ""
+  },
+  "exact_materialized_and_archive_file_sets": true
+}

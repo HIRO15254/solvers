@@ -1,0 +1,19 @@
+{
+  "verified_at_utc": "2026-09-26T03:59:48.6978349Z",
+  "name": "solvers-r1-20260926-08",
+  "instance_id": "1635613034982056517",
+  "status": "RUNNING",
+  "machine_type": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/machineTypes/e2-highcpu-32",
+  "disk_source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260926-08",
+  "auto_delete": true,
+  "boot": true,
+  "scheduling": {
+    "automaticRestart": false,
+    "instanceTerminationAction": "STOP",
+    "onHostMaintenance": "TERMINATE",
+    "preemptible": true,
+    "provisioningModel": "SPOT",
+    "terminationTime": "2026-09-26T04:30:56Z"
+  },
+  "evidence": "Source04 baseline and source06 validation/action original bytes recovered; manual trusted archive hydration and complete portable check passed before deletion."
+}

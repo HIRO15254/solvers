@@ -23,6 +23,76 @@
   ],
   "reservations": [
     {
+      "id": "r1-20260926-08-scale32",
+      "project": "solvers-abstraction-20260723",
+      "zone": "us-central1-b",
+      "instance": "solvers-r1-20260926-08",
+      "reserved_usd": 3,
+      "billed_usd": null,
+      "reservation_released": false,
+      "maximum_runtime_hours": 1.5,
+      "machine_type": "e2-highcpu-32",
+      "fallback_machine_type": "n2-highcpu-32",
+      "conservative_compute_usd_hour": 1.15,
+      "pricing_checked_utc": "2026-09-26",
+      "published_e2_on_demand_usd_hour": 0.79152384,
+      "published_n2_on_demand_usd_hour": 1.147136,
+      "pricing_sources": [
+        "https://cloud.google.com/products/compute/pricing/general-purpose"
+      ],
+      "tax_price_delay_and_other_reserve_usd": 1,
+      "instance_termination_action": "STOP",
+      "purpose": "Short 32-vCPU Spot phase on the existing VM, after small-VM correctness validation. Fresh native release build and same-boot 1/2/4/8/16/32-worker measurements.",
+      "note": "Reserve before resize. Try lower-cost E2 first; N2 fallback only if E2 capacity/quota prevents launch. Extra $3 covers 1.5h at rounded-up N2 on-demand $1.15/h plus $1 margin (2.725 USD); actual Spot billing is not asserted. Existing VM08 reservation separately covers disk, IPv4, cumulative <=1GiB download and 4-vCPU window. Set an absolute cloud STOP deadline no later than resize time+90min and original 07:15:19Z; no automatic restart or deadline extension. Aggregate held $26/$40, $14 unreserved. This reservation is not a launch record.",
+      "events": [
+        {
+          "at": "2026-09-26T03:05:16Z",
+          "event": "resized_vm_running_verified",
+          "machine_type": "e2-highcpu-32",
+          "instance_id": "1635613034982056517",
+          "boot_id": "28fa23ab-d76f-4282-87bb-64ab5c67c76b",
+          "logical_cpus": 32,
+          "physical_cores": 16,
+          "threads_per_core": 2,
+          "cpu_model": "Intel Xeon CPU @ 2.20GHz family6 model79",
+          "absolute_stop_deadline_utc": "2026-09-26T04:30:56Z",
+          "measurement_deadline_utc": "2026-09-26T04:15:56Z",
+          "evidence": "experiments/hu-postflop-r1/cloud/vm08/scale32-description.json"
+        },
+        {
+          "at": "2026-09-26T03:31:56.257Z",
+          "event": "unexpected_spot_stop_after_baseline_recovery",
+          "status": "TERMINATED",
+          "evidence": "experiments/hu-postflop-r1/cloud/vm08/scale32-spot-stop.json",
+          "baseline": "source04 scaling32 completed 03:24:54Z; all1060 original paths recovered with0missing unique payloads before stop",
+          "restart": "Same instance and existing reservation, unchanged absolute STOP04:30:56Z. Old/new action comparison not started; fresh builds required on new CPU/boot. No sample retry or crossboot timing merge."
+        },
+        {
+          "at": "2026-09-26T03:35:16Z",
+          "event": "same_reservation_manual_restart_ready",
+          "boot_id": "80fe06e6-3580-42ac-9af7-02c050425389",
+          "cpu_model": "AMD EPYC 7B12",
+          "logical_cpus": 32,
+          "physical_cores": 16,
+          "absolute_stop_deadline_utc": "2026-09-26T04:30:56Z",
+          "measurement_deadline_utc": "2026-09-26T04:15:56Z",
+          "evidence": "experiments/hu-postflop-r1/cloud/vm08/scale32-restart-description.json",
+          "note": "Old/new fresh build same newboot; previous completed Intelbaseline retained separately. Fullvalidation bound04:25Z, no deadline/budget extension."
+        },
+        {
+          "at": "2026-09-26T04:00:40.671000+00:00",
+          "event": "explicit_delete_and_absence_verification",
+          "operation_id": "operation-1790395190812-65c5add5b1f30-1405c0d3-0848aa19",
+          "instance_id": "1635613034982056517",
+          "reconciled_at_utc": "2026-09-26T04:01:25.6238650Z",
+          "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm08/reconciliation.json",
+          "reservation_released": false,
+          "billed_usd": null
+        }
+      ],
+      "disposition": "Completed evidence recovered and verified, including source04 full compact/scaling results and source06 full validation plus48 paired action measurements. Deleted2026-09-26T04:00:40.671Z; no VM/disk/reserved address remains at04:01:25Z. Billing unavailable; full reservation held. Combined held26 of authorized40USD."
+    },
+    {
       "id": "r1-20260926-08",
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
@@ -43,8 +113,8 @@
       "tax_price_delay_and_other_reserve_usd": 1,
       "instance_termination_action": "STOP",
       "explicit_disk_cleanup_hours": 24,
-      "purpose": "Linux validation and release writer comparison, followed by exact root-support and 1/2/4-thread scaling tests on a resized 4-vCPU Spot VM.",
-      "note": "Original launch was e2-standard-2. After retaining codec evidence, planned stop/resize to e2-standard-4 for same-host 1/2/4-thread tests. $3 reserved conservatively for the entire original six-hour window at 4-vCPU on-demand rate rounded to $0.14/h. This is not actual Spot billing. Aggregate held $23/$40, $17 unreserved. No automatic restart or deadline extension; explicit VM/disk cleanup after recovery.",
+      "purpose": "Linux validation and release writer comparison, followed by exact root-support validation on a resized 4-vCPU Spot VM. Formal scaling is separately reserved through 32 vCPU.",
+      "note": "Original launch was e2-standard-2, then resized to e2-standard-4 after retaining codec evidence. $3 reserved conservatively for the entire original six-hour window at 4-vCPU on-demand rate rounded to $0.14/h. This is not actual Spot billing. With the separate prospective 32-vCPU reservation, aggregate held $26/$40, $14 unreserved. No automatic restart or deadline extension; explicit VM/disk cleanup after recovery.",
       "pricing_sources": [
         "https://cloud.google.com/products/compute/pricing/general-purpose",
         "https://cloud.google.com/compute/disks-image-pricing",
@@ -60,8 +130,19 @@
           "published_on_demand_usd_hour": 0.13402284,
           "conservative_total_entire_6_02h_at_4vcpu_usd": 2.28937,
           "note": "Reserve $3 covers all 6.02 hours at rounded-up $0.14/h plus IPv4, 40 GiB disk for24h, <=1GiB egress at $0.30/GiB and $1 other margin. Existing reservation extended by $1, no new deadline."
+        },
+        {
+          "at": "2026-09-26T04:00:40.671000+00:00",
+          "event": "explicit_delete_and_absence_verification",
+          "operation_id": "operation-1790395190812-65c5add5b1f30-1405c0d3-0848aa19",
+          "instance_id": "1635613034982056517",
+          "reconciled_at_utc": "2026-09-26T04:01:25.6238650Z",
+          "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm08/reconciliation.json",
+          "reservation_released": false,
+          "billed_usd": null
         }
-      ]
+      ],
+      "disposition": "Completed evidence recovered and verified, including source04 full compact/scaling results and source06 full validation plus48 paired action measurements. Deleted2026-09-26T04:00:40.671Z; no VM/disk/reserved address remains at04:01:25Z. Billing unavailable; full reservation held. Combined held26 of authorized40USD."
     },
     {
       "id": "r1-20260925-07",

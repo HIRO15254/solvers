@@ -19,7 +19,9 @@ use engine::{SolverState, SolverStateRef};
 pub const HEADER_LEN: usize = 8 + 2 + 32 + 8;
 
 const MAGIC: &[u8; 8] = b"SLVRCKPT";
-const FORMAT_VERSION: u16 = 1;
+// The state envelope is unchanged, but postflop private indices now use
+// per-seat root support. Never restore a dense v1 state into this layout.
+const FORMAT_VERSION: u16 = 2;
 
 /// Errors from reading or writing a `.ckpt` file.
 #[derive(Debug, thiserror::Error)]
@@ -115,7 +117,7 @@ pub fn write_checkpoint(
     write_checkpoint_payload(path, config_hash, state.iteration, state)
 }
 
-/// Writes a live solver's borrowed state with the same v1 payload as
+/// Writes a live solver's borrowed state with the same payload as
 /// [`write_checkpoint`], without allocating an owned copy of its storage.
 pub fn write_checkpoint_ref(
     path: &Path,
@@ -221,7 +223,7 @@ mod tests {
     }
 
     #[test]
-    fn streaming_writer_preserves_v1_payload_and_reads_legacy_frames() {
+    fn streaming_writer_preserves_payload_and_reads_single_buffer_frames() {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().join("stream.ckpt");
         for state in [sample_state_f32(), sample_state_i16()] {
@@ -260,13 +262,30 @@ mod tests {
     }
 
     #[test]
-    fn borrowed_f32_writer_preserves_owned_v1_payload() {
+    fn borrowed_f32_writer_preserves_owned_payload() {
         check_borrowed_writer(F32Storage::new(3, 0), sample_state_f32());
     }
 
     #[test]
-    fn borrowed_i16_writer_preserves_owned_v1_payload() {
+    fn borrowed_i16_writer_preserves_owned_payload() {
         check_borrowed_writer(I16Storage::new(3, 2), sample_state_i16());
+    }
+
+    #[test]
+    fn rejects_dense_v1_checkpoint_before_decoding_state() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("dense-v1.ckpt");
+        write_checkpoint(&path, [0; 32], &sample_state_f32()).unwrap();
+        let mut bytes = std::fs::read(&path).unwrap();
+        bytes[8..10].copy_from_slice(&1u16.to_le_bytes());
+        std::fs::write(&path, bytes).unwrap();
+        assert!(matches!(
+            read_checkpoint(&path),
+            Err(CheckpointError::BadVersion {
+                found: 1,
+                expected: 2
+            })
+        ));
     }
 
     #[test]

@@ -110,10 +110,10 @@ pub struct PublicTree {
     /// children may run its children in parallel (see [`crate::ParConfig`]),
     /// which `StorageView::split`s whatever view it's handed — including,
     /// via the ordinary Rust reborrow an unsplit ancestor passes down, the
-    /// *ancestor's own* view. `false` here is the solver's guarantee that no
-    /// descendant can ever do that, so an action node can keep reusing its
-    /// ambient storage view across its children (and after them, for its
-    /// own regret/strategy update) with no protective split of its own.
+    /// *ancestor's own* view. `false` guarantees no descendant chance fan-out
+    /// can do this. Action parallelism has its own bounded split path;
+    /// serial action traversal may reuse its ambient view without a
+    /// protective split for descendant chance nodes.
     pub subtree_has_chance: Vec<bool>,
 }
 

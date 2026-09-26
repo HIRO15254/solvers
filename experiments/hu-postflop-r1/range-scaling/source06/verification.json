@@ -1,0 +1,586 @@
+{
+  "schema": "r1.range-scaling-portable-verification/v1",
+  "payload_integrity": "verified",
+  "validation": [
+    {
+      "path": "/opt/r1/range06/validation/result.json",
+      "outcome": "completed",
+      "mode": "full-validation",
+      "full_workspace_validated": true,
+      "source_revision": "fd740d9c7e28c44e1263051d0a42611008046071",
+      "source_manifest": {
+        "path": "/opt/r1/range06/source-candidate-manifest.json",
+        "bytes": 69991,
+        "sha256": "4861e346bfdb4f831d12dc6eca9992d49d650a863e9e427ff456c6c2ab601cf6"
+      },
+      "source_archive": {
+        "path": "/opt/r1/range06/source-candidate.tar.gz",
+        "bytes": 1385391,
+        "sha256": "ab9c4a8d32d83de2827319019c77361a1f36192c194185469700d90d9f6a3fab"
+      },
+      "runner": {
+        "path": "/opt/r1/range06/source/experiments/hu-postflop-r1/range-scaling/validate.py",
+        "bytes": 7499,
+        "sha256": "0f84890a1860498040fec55b160bdc07c7c1135f10fa8ea8475d8185739bb07a"
+      },
+      "binary": {
+        "path": "/opt/r1/target/range06/release/examples/hu_scaling_bench",
+        "bytes": 3859056,
+        "sha256": "641ebf405714c91af32b384a577076240876186db6455f689a7d808d887d42f6"
+      },
+      "stages": [
+        {
+          "label": "toolchain",
+          "outcome": "completed",
+          "stop_reason": "completed",
+          "child_exit_code": 0,
+          "supervisor_exit": 0,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range06/validation/stages/toolchain/supervisor.json",
+            "bytes": 6015,
+            "sha256": "7ea2d6bb79c44dfa435bec29e26a23f1317f6ffdfc3170589f8f15f03af300f6"
+          }
+        },
+        {
+          "label": "fmt",
+          "outcome": "completed",
+          "stop_reason": "completed",
+          "child_exit_code": 0,
+          "supervisor_exit": 0,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range06/validation/stages/fmt/supervisor.json",
+            "bytes": 6056,
+            "sha256": "aed69d9f9665714df6c745382281f11b1a66b314945b68cb86393864f91ea6e4"
+          }
+        },
+        {
+          "label": "clippy",
+          "outcome": "completed",
+          "stop_reason": "completed",
+          "child_exit_code": 0,
+          "supervisor_exit": 0,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range06/validation/stages/clippy/supervisor.json",
+            "bytes": 6278,
+            "sha256": "e18ba0b71991195a5fabf9823acb012f64b35d775fb31166afc4470c9c8b2c08"
+          }
+        },
+        {
+          "label": "workspace-tests",
+          "outcome": "completed",
+          "stop_reason": "completed",
+          "child_exit_code": 0,
+          "supervisor_exit": 0,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range06/validation/stages/workspace-tests/supervisor.json",
+            "bytes": 6229,
+            "sha256": "9406deaf35fe5bef5593025853fa276aac249807cce7e2e8bd57de326b067109"
+          },
+          "tests": {
+            "summaries": [
+              [
+                30,
+                0,
+                3,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                93,
+                0,
+                1,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                147,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                25,
+                0,
+                6,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                3,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                3,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                8,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                6,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                15,
+                0,
+                1,
+                0,
+                0
+              ],
+              [
+                15,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                23,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                8,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                58,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                6,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                13,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                6,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                3,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                3,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                11,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                6,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                10,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                7,
+                0,
+                1,
+                0,
+                0
+              ],
+              [
+                6,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                5,
+                0,
+                1,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                1,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                29,
+                0,
+                8,
+                0,
+                0
+              ],
+              [
+                3,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                3,
+                0,
+                1,
+                0,
+                0
+              ],
+              [
+                8,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                311,
+                0,
+                1,
+                0,
+                0
+              ],
+              [
+                24,
+                0,
+                1,
+                0,
+                0
+              ],
+              [
+                3,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                5,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "totals": [
+              927,
+              0,
+              31,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "label": "docs",
+          "outcome": "completed",
+          "stop_reason": "completed",
+          "child_exit_code": 0,
+          "supervisor_exit": 0,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range06/validation/stages/docs/supervisor.json",
+            "bytes": 5960,
+            "sha256": "b53cf8348b2133a33123e165e9993955066fa6d2945701f004f18b51bc1a89fe"
+          }
+        },
+        {
+          "label": "release-example",
+          "outcome": "completed",
+          "stop_reason": "completed",
+          "child_exit_code": 0,
+          "supervisor_exit": 0,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range06/validation/stages/release-example/supervisor.json",
+            "bytes": 6308,
+            "sha256": "5dd752b31959cc3ba8437b650b9face7058667c38f04bf1266264d41eb71598b"
+          }
+        },
+        {
+          "label": "release-oracle",
+          "outcome": "completed",
+          "stop_reason": "completed",
+          "child_exit_code": 0,
+          "supervisor_exit": 0,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range06/validation/stages/release-oracle/supervisor.json",
+            "bytes": 6365,
+            "sha256": "85231fb4cec7bf5c65da74aefc57106072b37c7a7daf2bb34b93625389786b37"
+          },
+          "tests": {
+            "summaries": [
+              [
+                3,
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "totals": [
+              3,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "label": "release-river-resolve",
+          "outcome": "completed",
+          "stop_reason": "completed",
+          "child_exit_code": 0,
+          "supervisor_exit": 0,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range06/validation/stages/release-river-resolve/supervisor.json",
+            "bytes": 6434,
+            "sha256": "f907a9017e9d435d17e4948c3abed282d81f8bb2783635b7ef8e6160bf597e0d"
+          },
+          "tests": {
+            "summaries": [
+              [
+                1,
+                0,
+                0,
+                0,
+                148
+              ]
+            ],
+            "totals": [
+              1,
+              0,
+              0,
+              0,
+              148
+            ]
+          }
+        }
+      ],
+      "failed_stage": null,
+      "recorded_error": null,
+      "unexecuted_stages": [],
+      "source_check_scope": "Archive exact bytes/set and any retained source aliases are verified; source-after checks are recorded runner assertions, not a separately retained filesystem snapshot."
+    }
+  ],
+  "scaling": [],
+  "recovered_content_aliases": [],
+  "identity_only": "Compiler and Python executables are bound by recorded size/SHA; their executable bytes need not be retained.",
+  "retention_container": "r1.context-linux-retention/v1 is reused only for exact compressed payload storage, not as a claim of codec experiment validation."
+}

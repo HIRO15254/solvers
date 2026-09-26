@@ -101,14 +101,21 @@ fn assert_kernel_matches_naive(board_str: &str) {
     // is the first terminal in build order, which for a no-bet tree is the
     // single check-check showdown.
     for p in Player::BOTH {
-        let mut out = vec![0.0f32; NUM_COMBOS];
-        game.game.evaluator.eval(0, p, &reach, &mut out);
+        let hands = game.game.evaluator.hands();
+        let local_reach: Vec<_> = hands
+            .combos(p.opponent())
+            .iter()
+            .map(|&combo| reach[combo as usize])
+            .collect();
+        let mut out = vec![0.0f32; hands.len(p)];
+        game.game.evaluator.eval(0, p, &local_reach, &mut out);
         let expected = naive_showdown(board_cards, p, &reach);
-        for combo in 0..NUM_COMBOS {
+        for (local, &combo) in hands.combos(p).iter().enumerate() {
+            let combo = combo as usize;
             assert!(
-                (out[combo] - expected[combo]).abs() < 1e-3,
+                (out[local] - expected[combo]).abs() < 1e-3,
                 "kernel mismatch on {board_str} combo {combo}: {} vs {}",
-                out[combo],
+                out[local],
                 expected[combo]
             );
         }
@@ -160,6 +167,7 @@ fn clairvoyance_game_matches_closed_form() {
     assert!(nash_conv < 5e-3, "nash_conv = {nash_conv}");
 
     // Root: action 0 = check, action 1 = bet (see node_info actions).
+    let hands = solver.game().evaluator.hands();
     let info = &node_info[tree_tags[root as usize] as usize];
     assert_eq!(info.actions, vec!["check".to_string(), "bet 2".to_string()]);
     let sigma = solver.average_strategy_at(root);
@@ -171,7 +179,8 @@ fn clairvoyance_game_matches_closed_form() {
             let w = range.weight(combo) as f64;
             if w > 0.0 {
                 total += w;
-                bet += w * sigma[NUM_COMBOS + combo] as f64;
+                let local = hands.index(Player::P0, combo).unwrap();
+                bet += w * sigma[hands.len(Player::P0) + local] as f64;
             }
         }
         bet / total
@@ -196,7 +205,8 @@ fn clairvoyance_game_matches_closed_form() {
         let w = qq.weight(combo) as f64;
         if w > 0.0 {
             total += w;
-            call += w * sigma[NUM_COMBOS + combo] as f64;
+            let local = hands.index(Player::P1, combo).unwrap();
+            call += w * sigma[hands.len(Player::P1) + local] as f64;
         }
     }
     let call_freq = call / total;

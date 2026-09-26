@@ -40,11 +40,10 @@ fn sequential() -> ParConfig {
 /// Turn-start spot: board "2s 7s Ks 2h" (matching `examples/turn_small.toml`
 /// and several `holdem` test fixtures), `postflop_srp20.toml`'s wide
 /// single-raised-pot ranges (so the per-node hand math is realistic),
-/// at `turn_small.toml`'s smaller pot/stack. Per-node cost is driven by hand
-/// count (always 1,326, independent of range sparsity) and tree shape, not
-/// range size, so widening the ranges doesn't slow this down relative to
-/// `turn_small.toml`'s tiny ones -- a single chance node (turn into river)
-/// keeps a `run(5)` fast enough for `sample_size(10)`.
+/// at `turn_small.toml`'s smaller pot/stack. Each seat retains only its
+/// positive-weight, board-compatible initial hands, so range width and tree
+/// shape both affect per-node work. One remaining street transition (turn
+/// into river) bounds the fixture used for `run(5)` and `sample_size(10)`.
 fn turn_config() -> PostflopConfig {
     PostflopConfig {
         board: parse_cards("2s 7s Ks 2h"),

@@ -1,16 +1,16 @@
 //! Micro-benchmarks for `PostflopEvaluator::eval`'s two terminal kernels
 //! (`kernel::showdown_kernel`'s sorted-rank sweep, `kernel::fold_kernel`'s
-//! inclusion-exclusion fold), exercised over a real river subgame with
-//! wide (full-ish) ranges on both sides so the kernels sweep close to the
-//! full 1,326-combo table, the same amount of work a real solve asks of
-//! them every terminal visit.
+//! inclusion-exclusion fold), exercised over a river subgame with asymmetric
+//! initial ranges. Rank and fold tables retain the union of the two seats'
+//! positive-weight, board-compatible hands; reach and output use each seat's
+//! own retained domain, as in a solver terminal visit.
 //!
 //! Run with `cargo bench -p holdem` (see `docs/development.md`); `cargo bench -p
 //! holdem -- --test` runs one iteration per bench as a smoke test.
 
 use std::time::Duration;
 
-use cards::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range};
+use cards::{Card, Chips, PerPlayer, Player, Range};
 use criterion::{Criterion, black_box, criterion_group, criterion_main};
 use engine::TerminalEvaluator;
 use game::{ChipEv, NoRake, PayoffPipeline};
@@ -27,10 +27,9 @@ fn parse_cards(s: &str) -> Vec<Card> {
     s.split_whitespace().map(|c| c.parse().unwrap()).collect()
 }
 
-/// A single-bet river subgame with full-ish ranges on both sides: `oop`
-/// plays a value-heavy range, `ip` a wider one, so the showdown/fold kernels
-/// sweep close to the full 1,326-combo table on both sides. One bet size
-/// and `max_raises = 1` keep the tree tiny while still producing exactly
+/// A single-bet river subgame with a wider `oop` range and a narrower `ip`
+/// range. Kernel sweep size follows their retained support union. One bet
+/// size and `max_raises = 1` keep the tree tiny while still producing exactly
 /// the two terminal shapes this bench needs (see `terminal_ids`).
 fn river_config() -> RiverConfig {
     RiverConfig {
@@ -82,11 +81,11 @@ fn bench_kernels(c: &mut Criterion) {
     let built = build_river_game(&config, chip_ev());
     let (fold_id, showdown_id) = terminal_ids(&built);
 
-    // The already board-conflict-zeroed root range: a realistic dense-ish
-    // reach vector, the same shape `cfr_pass`/`value_pass` pass to
+    // The compact, board-compatible root range: a reach vector with the
+    // same shape `cfr_pass`/`value_pass` pass to
     // `TerminalEvaluator::eval` at every terminal visit.
     let opp_reach = built.game.root_ranges[Player::P1].clone();
-    let mut out = vec![0.0f32; NUM_COMBOS];
+    let mut out = vec![0.0f32; built.game.evaluator.hands().len(Player::P0)];
 
     let mut group = c.benchmark_group("kernels");
 

@@ -7,7 +7,7 @@
 //! betting/sizing logic drifting silently out of sync with
 //! `holdem::viewer`'s replay/reconstruction logic.
 
-use cards::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range, Street};
+use cards::{Card, Chips, PerPlayer, Player, Range, Street};
 use engine::{Dcfr, F32Storage, NodeId, NodeKind, ParConfig, PublicTree, Solver};
 use game::{ChipEv, NoRake, PayoffPipeline};
 use holdem::{
@@ -269,11 +269,13 @@ fn river_trunk_matches_fresh_river_resolve_at_every_entry_node() {
             "expected at least one river-entry node (iso_merging={iso_merging})"
         );
 
-        // Full (all-1.0) reach: `river_resolve_config` still zeroes
-        // board-conflicting combos internally via `build_postflop_game`'s
-        // own range_vec construction, so this is a valid "everyone always
-        // reaches" range for the structural-equivalence check.
-        let full_reach = PerPlayer::new(vec![1.0f32; NUM_COMBOS], vec![1.0f32; NUM_COMBOS]);
+        // All-1.0 reach over each seat's trunk support. The fresh builder
+        // filters any additional conflicts with the river card.
+        let hands = trunk.game.evaluator.hands();
+        let full_reach = PerPlayer::new(
+            vec![1.0f32; hands.len(Player::P0)],
+            vec![1.0f32; hands.len(Player::P1)],
+        );
 
         for id in entries {
             let tag = trunk.game.tree.tags[id as usize];
@@ -281,7 +283,7 @@ fn river_trunk_matches_fresh_river_resolve_at_every_entry_node() {
 
             let state = river_entry_state(&config, &history)
                 .unwrap_or_else(|e| panic!("replay failed for history {history:?}: {e}"));
-            let sub_config = river_resolve_config(&config, &state, &full_reach);
+            let sub_config = river_resolve_config(&config, hands, &state, &full_reach);
             let sub = build_postflop_game(&sub_config, chip_ev());
 
             engine::pair_subtrees(&trunk.game.tree, id, &sub.game.tree, 0).unwrap_or_else(|e| {
@@ -353,7 +355,8 @@ fn reach_at_matches_root_avg_strategy_column_after_a_short_solve() {
     });
 
     let root_sigma = solver.average_strategy_at(0);
-    let column = &root_sigma[0..NUM_COMBOS]; // action 0's column, action-major
+    let hands = tree.storage_ref(&root).num_hands as usize;
+    let column = &root_sigma[..hands]; // action 0's column, action-major
 
     let acting = root.player;
     let expected: Vec<f32> = root_ranges[acting]

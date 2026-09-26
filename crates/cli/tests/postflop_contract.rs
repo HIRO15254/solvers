@@ -295,7 +295,7 @@ fn solution_uses_indexed_format_and_summary_does_not_rebuild_tree() {
     let run = solve(CONFIG, directory.path());
     let path = run.join("solution.sol");
     let bytes = std::fs::read(&path).unwrap();
-    assert_eq!(u16::from_le_bytes(bytes[8..10].try_into().unwrap()), 3);
+    assert_eq!(u16::from_le_bytes(bytes[8..10].try_into().unwrap()), 4);
     assert_eq!(formats::read_sol(&path).unwrap().meta.iterations, 20);
     let output = ok(&["export", path.to_str().unwrap(), "summary"]);
     assert!(!String::from_utf8_lossy(&output.stderr).contains("rebuilding tree"));
@@ -304,7 +304,7 @@ fn solution_uses_indexed_format_and_summary_does_not_rebuild_tree() {
     assert_eq!(summary["nodes"], metadata.metadata().node_count);
     assert_eq!(summary["stored_nodes"], metadata.metadata().stored_nodes);
     let mut legacy = bytes;
-    for version in [1u16, 2] {
+    for version in [1u16, 2, 3] {
         legacy[8..10].copy_from_slice(&version.to_le_bytes());
         std::fs::write(&path, &legacy).unwrap();
         let output = invoke(&["export", path.to_str().unwrap(), "summary"]);

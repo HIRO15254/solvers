@@ -432,8 +432,16 @@ fn compare(fixture: Fixture, iterations: u64) {
         let sigma = solver.average_strategy_at(id as u32);
         let storage = tree.storage_ref(node);
         for &hand in &oracle.hands[actor] {
+            let Some(local) = solver
+                .game()
+                .evaluator
+                .hands()
+                .index(node.player, hand.combo())
+            else {
+                continue;
+            };
             let probabilities = (0..storage.num_actions as usize)
-                .map(|a| sigma[a * storage.num_hands as usize + hand.combo()] as f64)
+                .map(|a| sigma[a * storage.num_hands as usize + local] as f64)
                 .collect();
             assert!(
                 profile
@@ -563,8 +571,7 @@ fn evaluate_in_engine(oracle: &RiverOracle, profile: &CompleteProfile) -> [[f64;
         }
         let r = tree.storage_ref(node);
         let metadata = &game.node_info[tree.tags[id] as usize];
-        // The production layout includes zero-weight and board-blocked hands.
-        // Define them too; the finite scalar game's support excludes them.
+        // All retained initial-support hands receive a defined strategy.
         strategy_sum[r.offset..r.offset + r.len()].fill(1.0 / f32::from(r.num_actions));
         for hand in &oracle.hands[node.player.index()] {
             if hand.cards.iter().any(|card| oracle.board.contains(card)) {
@@ -577,9 +584,14 @@ fn evaluate_in_engine(oracle: &RiverOracle, profile: &CompleteProfile) -> [[f64;
                 metadata.history
             );
             let sigma = profile.strategy(&key, r.num_actions as usize);
+            let local = solver
+                .game()
+                .evaluator
+                .hands()
+                .index(node.player, hand.combo())
+                .unwrap();
             for (a, probability) in sigma.into_iter().enumerate() {
-                strategy_sum[r.offset + a * r.num_hands as usize + hand.combo()] =
-                    probability as f32;
+                strategy_sum[r.offset + a * r.num_hands as usize + local] = probability as f32;
             }
         }
     }

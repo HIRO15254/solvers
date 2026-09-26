@@ -23,6 +23,8 @@
 | R1のwriter圧縮context研究 | [Windows debugの3交互ペア](hu-postflop-r1/codec/context-reuse/README.md) | formats 77 tests、18回のSOL・canonical一致。Flop保存中央値−12.05%の探索的結果。production未適用だった研究copy時点の診断であり、releaseやR1受入の認定には使わない |
 | R1のwriter圧縮context採用候補の検証 | [Windows増分検証](hu-postflop-r1/validation/context-adoption-20260926/README.md) | fmt/clippy成功、formats 79 tests、199 source pins一致。初回監視失敗と正常な確認実行を別保持 |
 | R1のwriter圧縮contextの不採用判断 | [Linux release 3方式比較](hu-postflop-r1/codec/context-reuse/linux-spot-20260926/README.md) | 固定候補のworkspace906成功/31ignored、SIGINT1成功、72標本のSOL/canonical一致。事前screen不成立のためcontext再利用は不採用。後続のcompact/並列化コードの検証ではない |
+| R1の初期レンジ圧縮と32 vCPU比較 | [固定手順と検証器](hu-postflop-r1/range-scaling/README.md)、[source04実測](hu-postflop-r1/range-scaling/source04/scaling32-report.jp.md) | 4 pilot＋112標本のF32状態・strategy/CFV・品質bits一致。Riverは4、Turnは16 threadsで観測最速。全32論理CPU結果・native/sample RSS・短時間caseの非認定を保持。先行source01–03の失敗証拠も保持 |
+| R1のaction並列化採用根拠 | [source06の新旧48回比較](hu-postflop-r1/action-scaling/source06/report.jp.md)、[通常・release検証](hu-postflop-r1/range-scaling/source06/README.md) | 同一AMD bootで32 threadsのRiver時間46.05%短縮、1 thread維持、全出力一致。最速16、2-thread回帰と並列RSS増も保持。927通常＋release4 tests成功。極小weightの既存数値境界は別監査であり未解決 |
 | R1の受入証拠の範囲 | [事前条件の監査](hu-postflop-r1/acceptance/audit.jp.md)、[将来の外部比較器](hu-postflop-r1/acceptance/external-contract.md) | 既存の事前条件と測定後索引を区別。将来の閾値発行・校正・欠測の検査であり、総合受入の認定ではない |
 | R1の実入力への境界適用 | [抽象化の適用確認](hu-postflop-r1/reference/abstraction-applicability.md) | 017/019のhand identity・joint重み・完全記憶の検査と、未実装・未評価の範囲 |
 | R1の工程別診断 | [source03 phase比較](hu-postflop-r1/phases/vm06-report.md) | 別instrumented buildのon/off較正、重複しない工程時間、元の性能実測との区別 |

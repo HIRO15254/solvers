@@ -1,0 +1,28 @@
+# Scaling input derived from pipeline/configs/turn.toml; F32 fixed-iteration research only.
+# Synthetic pipeline fixture; all river runouts and one bet per street.
+schema = "solvers.postflop/v1"
+[game]
+board = "2c 7d 9h Js"
+oop_range = "AA,QQ,JJ,AKs"
+ip_range = "KK,TT,AQs,KQs"
+pot = 20
+effective_stack = 60
+iso_merging = false
+[game.tree]
+kind = "script"
+script = '''turn, river {
+replace bet [50]
+replace raise []
+}'''
+[game.tree.max_aggressive_actions]
+turn = 1
+river = 1
+[algorithm]
+schedule = "dcfr"
+[run]
+iterations = 1000
+check_every = 1000
+threads = 1
+storage = "f32"
+par_chance_depth = 2
+par_min_children = 12

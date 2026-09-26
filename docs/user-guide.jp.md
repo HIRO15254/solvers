@@ -413,7 +413,8 @@ range-vector、opponent exploration 0、pruningなしが必要で、既定方式
 ## 12. Postflop subgame を解く
 
 `schema = "solvers.postflop/v1"` は固定 board の heads-up postflop subgame を
-正確に解く。Multiway と違い sampling ではなく 1,326 combo の vector engine なので、
+正確に解く。席ごとに初期レンジの正weightかつ開始boardと非衝突のcomboだけを保持する
+exact vector engineであり、samplingやhand abstractionは使わない。
 零和設定では平均戦略の Nash 収束保証がある。レーキや外部 field を含む ICM の一般和設定には保証しない。全 TOML 項目は `docs/solver-config-v1.jp.md` が規範である。
 
 最小構成は board・両者のレンジ・pot・effective stack・そして木を組む tree script である。
@@ -514,11 +515,19 @@ EV は **subgame 開始基準** で、「この spot から自分が持ち帰る
 
 ハンド別 EV は常に元の config の subgame 開始基準であり、後続ノードでそれまでの
 投入額を足し戻さない。chip-EV は chip、ICM は prize 単位である。
-`.sol` はversion 3で、要約と最大64ノード単位のデータを分けて保存する。`export ... summary` は既定の
+`.sol` はversion 4で、要約と最大64ノード単位のデータを分けて保存する。`export ... summary` は既定の
 root指定ならtreeを再構築せずに要約を読める。これは全nodeの破損検査や保存後戦略の再評価ではない。
-旧version 1 / 2は読み込めないため新規solveで生成し直す。自己完結したrun configとcheckpointがある場合は、
-旧 `solution.sol` を別の場所へ退避してから `solvers resume RUN` でversion 3を生成できる。
+旧version 1 / 2 / 3は読み込めないため新規solveで生成し直す。共通HU checkpointもversion 2へ変わり、
+postflop・preflop HU・toyの旧version 1からのresumeでは移行できない。Multiwayの別containerはこの変更の対象外。
 保存時のEVを読込み時に暗黙補正することはない。
+
+手札は席ごとの初期レンジ内で番号を固定し、後続のboardカードで衝突する手札をmaskする。
+レンジの微小な正weightを省略する近似ではなく、表示・exportでは通常のカード名へ戻す。
+`compare --cross-game`でも、各席に含まれるcomboが異なる解の比較は拒否する。
+`threads = 1`を直列の対照にできる。chanceを含まない木のaction並列化では、rootの
+storage要素数`W`と実行poolのworker数`P`から`grain = clamp(ceil(W / (4 * P)), 4096, 65536)`を決める。
+子subtreeのstorage要素数がgrain以上の枝を2本以上持つnodeで分割し、深さでは打ち切らない。
+thread数を増やした際の速度向上は保証しない。
 
 再開すると `solution.sol` と `run.json` も最新 iteration に更新される。fork も同様。
 `max_time` は保存済み solve 時間を含む累積予算で、上限済みなら反復を追加しない。

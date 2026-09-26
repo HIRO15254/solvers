@@ -114,7 +114,17 @@ Stud/Draw のルール・観測・情報集合を実装済みとするもので�
 
 Storage は action-major の連続 arena を持つ `F32Storage` と、scale 付き量子化を行う
 `I16Storage`。subtree の storage span を DFS 順に配置し、chance 子の並列処理へ互いに重ならない
-view を渡す。`ParConfig` が chance depth と fan-out を制御する。メモリ削減量・速度・精度は
+view を渡す。`ParConfig` が chance depth と fan-out を制御する。chanceを含まない木の
+action並列化は、rootのstorage要素数を`W`、実行poolのworker数を`P`として
+`grain = clamp(ceil(W / (4 * P)), 4096, 65536)`を使う。子subtreeのstorage要素数が
+grain以上の枝を2本以上持つnodeで分割し、深さでは打ち切らない。大きな子が1本だけの
+nodeでも、分割可能な子孫へ進む。入口でO(nodes)の分割計画を作り、`run`では全反復と
+両player passで再利用する。逐次の祖先も含めて非重複viewを保護し、合成順序を維持する。
+storage要素数は仕事量の近似指標であり、terminal evaluatorの計算量は表さない。
+`threads = 1`は計画を作らない直列のexact対照。thread数を増やした際の速度向上は保証しない。
+この分割方式の採用根拠は[同一boot上のRiver/F32比較](../experiments/hu-postflop-r1/action-scaling/source06/report.jp.md)に保持する。
+同実験では全48実行のstrategy/state/CFVと品質bitsが一致した。効果の範囲は記録した条件に限る。
+メモリ削減量・速度・精度は
 ゲームと設定に依存するので、採用条件は測定証拠とともに評価する。
 
 `DiscountSchedule::at(t, planned_iters)` は iteration ごとに正/負 regret と平均戦略への係数、
@@ -127,6 +137,17 @@ regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr
 その正しさは独立 oracle で照合する。非 zero-sum では両者を個別に計算する。
 `expected_values_at` / `best_response_values_at` は指定 node、`expected_values_everywhere` は
 全 action node の値を 1 回の走査で計算する。
+
+HU Postflopの`PostflopHands`は、席ごとの初期rangeでweight > 0かつ開始boardと非衝突のcomboを
+global combo昇順でlocal IDへ写す。後続dealは番号を変えず、席別のmask/疎同型遷移を使う。
+regret/strategy arenaとreach/CFVは席別次元、順位表とfold表はroot supportの和集合だけを保持する。
+正の微小weight、compatible root pair normalizer、配札分母45/44は変えない。
+terminal kernelへの接続は一時stack配列でglobal combo順を保ち、永続の全手札bufferを持たない。
+`evaluator.hands()`がreporting境界のglobal/local変換を提供する。chanceの代表カードは
+`tree.deals`と対応する明示metadataを保持するため、疎なmaskからカードを推定しない。
+`I16Storage`の量子化scaleはnode内の保持列に依存するため、初期weightがゼロの列を除く
+compact layoutとdense layoutとのbit一致は保証しない。同じlayoutでのthread数比較は
+bit一致を検査し、dense/compact間の厳密な状態比較には`F32Storage`を使う。
 
 [McSolver](../crates/engine/src/mccfr.rs) は chance node を sample し、両者の action node は
 vector のまま列挙する HU 用の別 driver である。batched discount、任意の negative-regret pruning、
@@ -209,8 +230,8 @@ source revision だけで dirty tree を識別できない場合は、source/bin
 
 | 用途 | 現在の所有箇所 | 意味 |
 |---|---|---|
-| HU checkpoint `.ckpt` | `formats::checkpoint` + CLI driver | 再開に必要な solver state。viewer artifact と互換扱いしない |
-| HU solution `.sol` | `formats::sol` / `sol_indexed` + CLI artifact query | v3のchecked metadataとsref区間directory。連続する最大64 node/64 MiBをzstd chunkとして保存。平均戦略(u16)と per-hand 値(i16/scale)。`Full` / `NoRivers` |
+| HU checkpoint `.ckpt` | `formats::checkpoint` + CLI driver | 共通container v2。postflop・preflop HU・toyの再開state。旧v1拒否。viewer artifact と互換扱いしない |
+| HU solution `.sol` | `formats::sol` / `sol_indexed` + CLI artifact query | v4のchecked metadataとsref区間directory。連続する最大64 node/64 MiBをzstd chunkとして保存。平均戦略(u16)と per-hand 値(i16/scale)。`Full` / `NoRivers` |
 | Multiway checkpoint `.mwckpt` | `multiway::checkpoint` | state と RNG / policy / history の復元。container と state の version を検査 |
 | Multiway solution `.mwsol` | `formats::mwsol` + CLI artifact query | 正式な平均 profile と metadata。保存 coverage と評価可能範囲を区別 |
 | run / progress / event | `formats::run`、`metrics`、`multiway` | lifecycle、定期測定、離散事象を別データとして保持 |
@@ -219,7 +240,10 @@ source revision だけで dirty tree を識別できない場合は、source/bin
 元の per-hand 値を上書き解釈しない。`export` / `compare` / `report` と対話 `inspect` が現在の
 query 表面であり、完全なコマンド・family 対応は [CLI reference](cli-reference.jp.md) に置く。
 summaryのroot/all照会はmetadataだけを復元する。全読込み時は各nodeのchecksumと再構築treeを照合する。
-checkpointはpostcardをbuffer経由でzstd/fileへ逐次書き、従来のv1復元byte列を維持する。
+checkpointはpostcardをbuffer経由でzstd/fileへ逐次書く。外側の構造は維持し、hand領域の意味の変更を
+`.sol` v4 / `.ckpt` v2で区切る。strategyはactorのroot領域、valuesはP0領域の後にP1領域を並べ、
+埋込みconfigから同じ写像を再構築する。旧SOL v1–3 / checkpoint v1は明示拒否し、新規solveが必要。
+旧checkpointのresumeは移行手段にしない。Multiwayのcontainerにはこの変更を適用しない。
 共通 `NodeQuery/NodeReport`、UPI 互換 protocol、`solvers bench`、PyO3/WASM adapter は
 現行の公開 API として扱わない。benchmark は Cargo bench と検証用 runner で行う。
 

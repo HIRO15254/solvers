@@ -1,9 +1,10 @@
 # Spot VM08の実行枠と資源履歴
 
 初期20 USDに加え、2026-09-26に利用者が2回各10 USDを追加し、R1の累計上限は40 USDとなった。
-計算時間より節約を優先し、32 vCPU試験も求めている。2回目の追加許可時点では
-未精算の既存20 USDとVM08の3 USD、合計23 USDを保持する。未予約枠は17 USDで、
-32 vCPU枠はまだ予約・起動していない。
+計算時間より節約を優先し、32 vCPU試験も求めている。未精算の既存20 USDと
+VM08の小型機枠3 USD、32 vCPU枠3 USD、合計26 USDを保持する。未予約枠は14 USD。
+VM/diskは2026-09-26 04:00:40.671 UTCに明示削除し、
+[照合](../cleanup-vm08/reconciliation.json)で残存なしを確認した。
 請求先は既存の`015A1D-8A8F19-EC7035`、projectは`solvers-abstraction-20260723`。
 予約額は実請求額ではない。[台帳](../budget.json)を参照する。
 
@@ -62,11 +63,17 @@ fmt/clippy/testの成功とは扱わず、完了したstageの元ログとsource
 
 ## 32 vCPU比較の追加許可と実行手順
 
-4 vCPU段階の検証後、約90分に限定した32 vCPU Spot計測枠を見積もって予約する。
+4 vCPU段階のsource04検証後、最大90分に限定した32 vCPU Spot計測枠3 USDを予約した。
+E2 highcpu-32を使用し、絶対STOP期限を04:30:56 UTCへ短縮した。
 同一host・同一bootでcompact 1/2/4/8/16/32 threadsとdense 1 threadの7条件を用い、
-4 case各1 pilot、各条件のwarmup 1回と測定3回、合計112標本と4 pilotを保持する。
+4 case各1 pilot、各条件のwarmup 1回と測定3回、合計112標本と4 pilotを回収・検証した。
 32 vCPUという資源指定を32物理coreや線形速度向上の保証とは扱わない。
-起動前に累計40 USD枠、有限停止期限、回収・削除枠を照合し、予約と実際の起動は別の記録に残す。
+Intel boot `28fa23ab-d76f-4282-87bb-64ab5c67c76b`の測定完了後、03:31:43 UTCにSpot退避された。
+同じ期限・予約内で手動再起動し、AMD boot `80fe06e6-3580-42ac-9af7-02c050425389`で
+旧source04・新source06をfresh buildした。新source06の927通常tests＋release4件が成功し、
+River action新旧48標本を同一AMD bootで交互比較、全state/strategy/CFV/品質bitsを照合した。
+Intelの基準結果とAMDの比較結果を混ぜない。各source、全失敗記録、原ログと実binaryは
+range-scalingおよびaction-scalingの保持証拠に含む。外部referenceやR1全体の受入は別判断。
 
 これは実験資源と支出上限の記録であり、作業状態やR1受入の正本ではない。
 小型VMでの新しい比較は旧VMの絶対時間と直接合成しない。

@@ -36,7 +36,7 @@ use hand_index::{
     stabilizer,
 };
 
-use crate::kernel;
+use crate::{PostflopHands, kernel};
 
 /// A value per postflop street. `Preflop` is out of scope for this crate
 /// (postflop trees start no earlier than the flop) and indexing with it
@@ -407,23 +407,38 @@ struct PostflopTerminal {
     table: u32,
 }
 
-/// Exact terminal evaluation over 1,326-combo reach vectors, generalized
+/// Exact terminal evaluation over each player's initial-range private hands, generalized
 /// from the river-only evaluator to runouts at any street.
 pub struct PostflopEvaluator {
+    hands: PostflopHands,
+    /// Representative public card for each compiled `tree.deals` entry.
+    deal_cards: Vec<Card>,
     terminals: Vec<PostflopTerminal>,
     /// Showdown rank tables, deduped by completed 5-card board (see
     /// [`Builder::rank_table_id`]).
     rank_tables: Vec<Vec<(HandRank, u32)>>,
-    /// Live combos disjoint from the subgame's *starting* board, used by
+    /// Union of initial-support combos disjoint from the *starting* board, used by
     /// every fold terminal regardless of street or runout — see the
     /// invariant documented on [`kernel::fold_kernel`].
     fold_combos: Vec<(HandRank, u32)>,
 }
 
+impl PostflopEvaluator {
+    pub fn hands(&self) -> &PostflopHands {
+        &self.hands
+    }
+
+    /// Card dealt by `tree.deals[deal]`, including all-in runouts. Compact
+    /// masks need not uniquely identify a public card.
+    pub fn deal_card(&self, deal: usize) -> Card {
+        self.deal_cards[deal]
+    }
+}
+
 impl TerminalEvaluator for PostflopEvaluator {
     fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
-        debug_assert_eq!(opp_reach.len(), NUM_COMBOS);
-        debug_assert_eq!(out.len(), NUM_COMBOS);
+        debug_assert_eq!(opp_reach.len(), self.hands.len(p.opponent()));
+        debug_assert_eq!(out.len(), self.hands.len(p));
         out.fill(0.0);
         let term = &self.terminals[terminal as usize];
         // Orient payoff constants to the traversing player: `u_win` is p's
@@ -440,16 +455,42 @@ impl TerminalEvaluator for PostflopEvaluator {
                 term.payoffs.win_p0[Player::P1],
             ),
         };
-        match term.kind {
-            TerminalKind::Fold { .. } => {
-                kernel::fold_kernel(&self.fold_combos, u_win, opp_reach, out);
-            }
-            TerminalKind::Showdown => {
-                kernel::showdown_kernel(
+        // The explicit dense differential path keeps the historical kernels
+        // without the local/global bridge; no compact root can have 1,326
+        // board-disjoint hands.
+        if out.len() == NUM_COMBOS && opp_reach.len() == NUM_COMBOS {
+            match term.kind {
+                TerminalKind::Fold { .. } => {
+                    kernel::fold_kernel(&self.fold_combos, u_win, opp_reach, out)
+                }
+                TerminalKind::Showdown => kernel::showdown_kernel(
                     &self.rank_tables[term.table as usize],
                     u_win,
                     u_tie,
                     u_lose,
+                    opp_reach,
+                    out,
+                ),
+            }
+            return;
+        }
+        match term.kind {
+            TerminalKind::Fold { .. } => {
+                kernel::fold_kernel_compact(
+                    &self.fold_combos,
+                    u_win,
+                    &self.hands,
+                    p,
+                    opp_reach,
+                    out,
+                );
+            }
+            TerminalKind::Showdown => {
+                kernel::showdown_kernel_compact(
+                    &self.rank_tables[term.table as usize],
+                    [u_win, u_tie, u_lose],
+                    &self.hands,
+                    p,
                     opp_reach,
                     out,
                 );
@@ -939,6 +980,9 @@ fn child_step(state: &LineState, action: NodeAction) -> ChildStep {
 
 struct Builder<'a> {
     config: &'a PostflopConfig,
+    hands: PostflopHands,
+    support_union: Vec<u16>,
+    chance_cards: Vec<Vec<Card>>,
     pipeline: PayoffPipeline<'a>,
     /// Suit permutations preserving both ranges (see
     /// [`range_preserving_perms`]).
@@ -948,12 +992,12 @@ struct Builder<'a> {
     rank_table_ids: BTreeMap<[Card; 5], u32>,
     masks: Vec<Vec<f32>>,
     /// Per-card reach mask, built lazily and cached by card index (at most
-    /// 52 masks total regardless of how many chance nodes share a card).
-    card_masks: [Option<u32>; 52],
+    /// 52 masks per player regardless of how many chance nodes share a card).
+    card_masks: PerPlayer<[Option<u32>; 52]>,
     /// Quotient transitions for merged deal classes, interned by
     /// (board, members).
     transitions: Vec<SparseTransition>,
-    transition_ids: BTreeMap<(Vec<Card>, Vec<Card>), u32>,
+    transition_ids: BTreeMap<(Vec<Card>, Vec<Card>), PerPlayer<u32>>,
     node_info: Vec<PostflopNodeInfo>,
     /// Accumulated by every [`node_actions`] call this walk makes -- see
     /// [`RuleHits`].
@@ -962,6 +1006,26 @@ struct Builder<'a> {
 
 /// Builds a postflop subgame through the payoff pipeline.
 pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>) -> PostflopGame {
+    build_with_hands(
+        config,
+        pipeline,
+        PostflopHands::from_ranges(&config.board, &config.ranges),
+    )
+}
+
+/// Full 1,326-combo layout retained only as a differential research reference.
+pub fn build_postflop_game_dense(
+    config: &PostflopConfig,
+    pipeline: PayoffPipeline<'_>,
+) -> PostflopGame {
+    build_with_hands(config, pipeline, PostflopHands::dense())
+}
+
+fn build_with_hands(
+    config: &PostflopConfig,
+    pipeline: PayoffPipeline<'_>,
+    hands: PostflopHands,
+) -> PostflopGame {
     let board_len = config.board.len();
     assert!(
         (3..=5).contains(&board_len),
@@ -977,15 +1041,26 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
     };
 
     let zero_sum = pipeline.is_zero_sum();
+    let support_union = (0..NUM_COMBOS)
+        .filter(|&combo| {
+            Player::BOTH
+                .into_iter()
+                .any(|p| hands.index(p, combo).is_some())
+        })
+        .map(|combo| combo as u16)
+        .collect();
     let mut builder = Builder {
         config,
+        hands,
+        support_union,
+        chance_cards: Vec::new(),
         pipeline,
         sym: range_preserving_perms(&config.ranges),
         terminals: Vec::new(),
         rank_tables: Vec::new(),
         rank_table_ids: BTreeMap::new(),
         masks: Vec::new(),
-        card_masks: [None; 52],
+        card_masks: PerPlayer::new([None; 52], [None; 52]),
         transitions: Vec::new(),
         transition_ids: BTreeMap::new(),
         node_info: vec![PostflopNodeInfo {
@@ -1012,10 +1087,14 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         street_aggressor: None,
     });
 
-    // Root ranges as 1,326-weight vectors with board conflicts zeroed.
+    // Stable, seat-specific root support, in ascending global combo order.
     let range_vec = |p: Player| -> Vec<f32> {
-        (0..NUM_COMBOS)
-            .map(|combo| {
+        builder
+            .hands
+            .combos(p)
+            .iter()
+            .map(|&combo| {
+                let combo = combo as usize;
                 let (c1, c2) = combo_cards(combo);
                 if board_set.contains(c1) || board_set.contains(c2) {
                     0.0
@@ -1030,8 +1109,11 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
     // Live combos disjoint from the *starting* board — the universal fold
     // list every fold terminal in the tree shares (see
     // `PostflopEvaluator::fold_combos`).
-    let fold_combos: Vec<(HandRank, u32)> = (0..NUM_COMBOS)
-        .filter_map(|combo| {
+    let fold_combos: Vec<(HandRank, u32)> = builder
+        .support_union
+        .iter()
+        .filter_map(|&combo| {
+            let combo = combo as usize;
             let (c1, c2) = combo_cards(combo);
             if board_set.contains(c1) || board_set.contains(c2) {
                 None
@@ -1042,6 +1124,8 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         .collect();
 
     let Builder {
+        hands,
+        chance_cards,
         terminals,
         rank_tables,
         masks,
@@ -1051,7 +1135,9 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         ..
     } = builder;
 
-    let evaluator = PostflopEvaluator {
+    let mut evaluator = PostflopEvaluator {
+        hands,
+        deal_cards: Vec::new(),
         terminals,
         rank_tables,
         fold_combos,
@@ -1060,26 +1146,51 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
     // Joint compatible weight, via the same inclusion-exclusion the fold
     // kernel uses. Only the pair-compat sum — no live-count denominators
     // (the 1/45, 1/44 deal weights already live on the chance branches).
-    let (all_total, all_card) = kernel::compat_sums(&evaluator.fold_combos, &ranges[Player::P1]);
+    let mut ip_reach = [0.0; NUM_COMBOS];
+    for (&combo, &weight) in evaluator
+        .hands
+        .combos(Player::P1)
+        .iter()
+        .zip(&ranges[Player::P1])
+    {
+        ip_reach[combo as usize] = weight;
+    }
+    let (all_total, all_card) = kernel::compat_sums(&evaluator.fold_combos, &ip_reach);
     let normalizer: f64 = evaluator
         .fold_combos
         .iter()
         .map(|&(_, combo)| {
             let idx = combo as usize;
             let (c1, c2) = combo_cards(idx);
-            ranges[Player::P0][idx] as f64
-                * (all_total - all_card[c1.index()] - all_card[c2.index()]
-                    + ranges[Player::P1][idx] as f64)
+            let own = evaluator
+                .hands
+                .index(Player::P0, idx)
+                .map_or(0.0, |local| ranges[Player::P0][local]);
+            own as f64
+                * (all_total - all_card[c1.index()] - all_card[c2.index()] + ip_reach[idx] as f64)
         })
         .sum();
     assert!(normalizer > 0.0, "ranges share no compatible combos");
 
-    let tree = PublicTree::compile(TreeSpec {
+    let mut tree = PublicTree::compile(TreeSpec {
         root,
         masks,
         transitions,
-        root_dims: PerPlayer::new(NUM_COMBOS as u32, NUM_COMBOS as u32),
+        root_dims: PerPlayer::new(
+            evaluator.hands.len(Player::P0) as u32,
+            evaluator.hands.len(Player::P1) as u32,
+        ),
     });
+    evaluator.deal_cards = vec![Card::from_index(0); tree.deals.len()];
+    for (id, node) in tree.nodes.iter().enumerate() {
+        if node.kind == engine::NodeKind::Chance {
+            let cards = &chance_cards[tree.tags[id] as usize];
+            let first = node.aux as usize;
+            evaluator.deal_cards[first..first + cards.len()].copy_from_slice(cards);
+            // Public tags keep their action-node metadata namespace.
+            tree.tags[id] = 0;
+        }
+    }
 
     PostflopGame {
         game: CompiledGame {
@@ -1235,11 +1346,16 @@ impl Builder<'_> {
             // deal weight, so the backward map reproduces `sum_i v_ci`
             // exactly, per hand.
             let maps = if group.members.len() == 1 {
-                let mask_id = self.card_mask(group.representative);
-                PerPlayer::new(ReachMap::Mask(mask_id), ReachMap::Mask(mask_id))
+                PerPlayer::new(
+                    ReachMap::Mask(self.card_mask(Player::P0, group.representative)),
+                    ReachMap::Mask(self.card_mask(Player::P1, group.representative)),
+                )
             } else {
-                let id = self.quotient_transition(&state.board, group);
-                PerPlayer::new(ReachMap::Transition(id), ReachMap::Transition(id))
+                let ids = self.quotient_transition(&state.board, group);
+                PerPlayer::new(
+                    ReachMap::Transition(ids[Player::P0]),
+                    ReachMap::Transition(ids[Player::P1]),
+                )
             };
 
             let mut board = state.board.clone();
@@ -1279,7 +1395,10 @@ impl Builder<'_> {
             deals.push((weight, maps, child));
         }
 
-        TempNode::Chance { deals, tag: 0 }
+        let tag = self.chance_cards.len() as u32;
+        self.chance_cards
+            .push(groups.iter().map(|group| group.representative).collect());
+        TempNode::Chance { deals, tag }
     }
 
     /// After a chance deal on an all-in line: no more betting, just the
@@ -1295,7 +1414,7 @@ impl Builder<'_> {
     /// Quotient transition for a merged deal class (see the comment at the
     /// use site in [`Self::deal_chance`]). Interned by (board, members):
     /// identical classes recur across betting lines of the same street.
-    fn quotient_transition(&mut self, board: &[Card], group: &DealGroup) -> u32 {
+    fn quotient_transition(&mut self, board: &[Card], group: &DealGroup) -> PerPlayer<u32> {
         let key = (board.to_vec(), group.members.clone());
         if let Some(&id) = self.transition_ids.get(&key) {
             return id;
@@ -1307,39 +1426,63 @@ impl Builder<'_> {
         let rep = group.representative;
         let perms = orbit_perms(&stab, rep, &group.members);
         let member_avg = 1.0 / perms.len() as f32;
-        let mut entries: Vec<(u32, u32, f32)> = Vec::with_capacity(perms.len() * (NUM_COMBOS - 51));
-        for perm in &perms {
-            for h in 0..NUM_COMBOS {
-                let (c1, c2) = combo_cards(h);
-                if c1 == rep || c2 == rep {
-                    continue; // dead in rep coordinates
-                }
-                entries.push((permute_combo(perm, h) as u32, h as u32, member_avg));
+        let mut ids = PerPlayer::new(0, 0);
+        for p in Player::BOTH {
+            if p == Player::P1 && self.hands.combos(p) == self.hands.combos(Player::P0) {
+                ids[p] = ids[Player::P0];
+                continue;
             }
+            let dim = self.hands.len(p);
+            let mut entries = Vec::with_capacity(perms.len() * dim);
+            for perm in &perms {
+                for (local, &combo) in self.hands.combos(p).iter().enumerate() {
+                    let h = combo as usize;
+                    let (c1, c2) = combo_cards(h);
+                    if c1 == rep || c2 == rep {
+                        continue; // dead in rep coordinates
+                    }
+                    // Range-preserving permutations and the root-board stabilizer
+                    // make each player's retained support closed under this map.
+                    let mapped = self
+                        .hands
+                        .index(p, permute_combo(perm, h))
+                        .expect("suit isomorphism must preserve initial hand support");
+                    entries.push((mapped as u32, local as u32, member_avg));
+                }
+            }
+            ids[p] = self.transitions.len() as u32;
+            self.transitions.push(SparseTransition {
+                in_dim: dim as u32,
+                out_dim: dim as u32,
+                entries,
+            });
         }
-        let id = self.transitions.len() as u32;
-        self.transitions.push(SparseTransition {
-            in_dim: NUM_COMBOS as u32,
-            out_dim: NUM_COMBOS as u32,
-            entries,
-        });
-        self.transition_ids.insert(key, id);
-        id
+        self.transition_ids.insert(key, ids);
+        ids
     }
 
-    fn card_mask(&mut self, card: Card) -> u32 {
-        if let Some(id) = self.card_masks[card.index()] {
+    fn card_mask(&mut self, p: Player, card: Card) -> u32 {
+        if let Some(id) = self.card_masks[p][card.index()] {
+            return id;
+        }
+        if self.hands.combos(p) == self.hands.combos(p.opponent())
+            && let Some(id) = self.card_masks[p.opponent()][card.index()]
+        {
+            self.card_masks[p][card.index()] = Some(id);
             return id;
         }
         let id = self.masks.len() as u32;
-        let mask: Vec<f32> = (0..NUM_COMBOS)
-            .map(|combo| {
-                let (c1, c2) = combo_cards(combo);
+        let mask: Vec<f32> = self
+            .hands
+            .combos(p)
+            .iter()
+            .map(|&combo| {
+                let (c1, c2) = combo_cards(combo as usize);
                 if c1 == card || c2 == card { 0.0 } else { 1.0 }
             })
             .collect();
         self.masks.push(mask);
-        self.card_masks[card.index()] = Some(id);
+        self.card_masks[p][card.index()] = Some(id);
         id
     }
 
@@ -1393,7 +1536,8 @@ impl Builder<'_> {
         }
         let board_set: CardSet = board5.iter().copied().collect();
         let mut sorted: Vec<(HandRank, u32)> = Vec::new();
-        for combo in 0..NUM_COMBOS {
+        for &combo in &self.support_union {
+            let combo = combo as usize;
             let (c1, c2) = combo_cards(combo);
             if board_set.contains(c1) || board_set.contains(c2) {
                 continue;
@@ -1451,6 +1595,7 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
 
     let mut counting = Counting {
         config,
+        hands: PostflopHands::from_ranges(&config.board, &config.ranges),
         sym: range_preserving_perms(&config.ranges),
         elements: 0,
         nodes: 0,
@@ -1491,6 +1636,7 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
 /// two can never disagree about how many children a node has.
 struct Counting<'a> {
     config: &'a PostflopConfig,
+    hands: PostflopHands,
     sym: Vec<SuitPerm>,
     elements: u64,
     nodes: u64,
@@ -1517,7 +1663,7 @@ impl Counting<'_> {
             }
         }
 
-        self.elements += num_actions * NUM_COMBOS as u64;
+        self.elements += num_actions * self.hands.len(state.to_act) as u64;
     }
 
     fn street_end(&mut self, mut state: LineState) {
@@ -1598,6 +1744,44 @@ mod tests {
         text.split_whitespace()
             .map(|card| card.parse().expect("test board card"))
             .collect()
+    }
+
+    #[test]
+    fn terminal_tables_only_retain_the_union_of_initial_support() {
+        let config = PostflopConfig {
+            board: cards("2c 7d 9h Js Qs"),
+            ranges: PerPlayer::new(
+                "AsAh,KcKd,2c3c".parse().unwrap(),
+                "KcKd,AcAd,TcTd".parse().unwrap(),
+            ),
+            streets: PerStreet::default(),
+            ..PostflopConfig::default()
+        };
+        let built = build_postflop_game(
+            &config,
+            PayoffPipeline {
+                rake: &game::NoRake,
+                utility: &game::ChipEv,
+            },
+        );
+        let evaluator = &built.game.evaluator;
+        assert_eq!(evaluator.hands.len(Player::P0), 2);
+        assert_eq!(evaluator.hands.len(Player::P1), 3);
+        assert_eq!(evaluator.fold_combos.len(), 4);
+        assert_eq!(evaluator.rank_tables.len(), 1);
+        assert_eq!(evaluator.rank_tables[0].len(), 4);
+        assert!(
+            evaluator.rank_tables[0]
+                .windows(2)
+                .all(|pair| pair[0] <= pair[1])
+        );
+        for table in &evaluator.rank_tables {
+            assert!(table.iter().all(|&(_, combo)| {
+                Player::BOTH
+                    .into_iter()
+                    .any(|p| evaluator.hands.index(p, combo as usize).is_some())
+            }));
+        }
     }
 
     /// Every member of a suit-isomorphism class must produce the same

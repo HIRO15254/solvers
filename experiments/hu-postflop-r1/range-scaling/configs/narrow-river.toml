@@ -1,0 +1,27 @@
+# Scaling input derived from pipeline/configs/river.toml; F32 fixed-iteration research only.
+# Synthetic pipeline fixture, not one of the external R0 reference cases.
+schema = "solvers.postflop/v1"
+[game]
+board = "2c 7d 9h Js Qs"
+oop_range = "AsAh,AdAc"
+ip_range = "KsKh"
+pot = 20
+effective_stack = 60
+iso_merging = false
+[game.tree]
+kind = "script"
+script = '''river {
+replace bet [50, 100]
+replace raise [100]
+}'''
+[game.tree.max_aggressive_actions]
+river = 2
+[algorithm]
+schedule = "dcfr"
+[run]
+iterations = 10000
+check_every = 10000
+threads = 1
+storage = "f32"
+par_chance_depth = 2
+par_min_children = 12

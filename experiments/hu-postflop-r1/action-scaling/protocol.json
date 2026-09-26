@@ -1,0 +1,19 @@
+{
+  "schema": "r1.action-scaling-protocol/v1",
+  "scope": "Prospective old/new River action-subtree parallelism comparison, F32 compact hands only. No build, pilot, I16, external reference or R1 certification.",
+  "prospective_amendment": "The source04 baseline completed and was recovered before Spot termination at 2026-09-26T03:31:56Z. No action measurements had started; unused source05 is superseded by source06. Allow prior-boot baseline provenance only. The 1000-iteration count, 48-stage order, guards and limits remain fixed before action measurement.",
+  "logical_cpus": 32,
+  "threads": [1, 2, 4, 8, 16, 32],
+  "iterations": 1000,
+  "case": "river",
+  "config": "experiments/hu-postflop-r1/range-scaling/configs/river.toml",
+  "warmup_blocks": 1,
+  "measured_blocks": 3,
+  "order": "Blocks 0 through 3, ascending thread count within each block. Each old/new pair is old-first when (block + thread-index) is even, otherwise new-first. Block zero is warmup. All 48 processes are retained; only blocks 1..3 enter timing summaries. Three measured pairs cannot perfectly balance pair order at each thread count; across six thread counts each order occurs nine times.",
+  "correctness": "All 48 processes must have exactly equal original canonical.bin and state.bin bytes, quality including EV/BR/NashConv f64 bits, global hand IDs and tree metadata. F32 only; complete compact state is compared, not I16 or inactive dense hands.",
+  "guard": {"new32_over_old32_max": 0.90, "new1_over_old1_max": 1.05, "interpretation": "Prospective descriptive adoption guards, not confidence intervals. Report three paired win counts and all six thread medians, speedups, efficiencies and adjacent slowdowns; never loosen thresholds or select samples after seeing results."},
+  "limits": {"sample_timeout_seconds": 300, "rss_bytes": 10737418240, "outer_memory_max_bytes": 12884901888, "min_free_bytes": 1073741824, "disk_reserve_bytes": 4294967296, "poll_seconds": 0.1, "grace_seconds": 5, "kill_wait_seconds": 5},
+  "deadline_utc_latest": "2026-09-26T04:15:56Z",
+  "measurement": "Old/new builds and all 48 action measurements must share one new 32-logical-CPU boot. The recovered completed 32-CPU baseline may be from a previous boot; preserve its original binary, exact source04 manifest/archive, input and frozen 1000 River iterations. Rebuilding that exact old source on the new boot may produce a different binary hash. No new pilot, count selection or cross-boot timing comparison. On the measurement host, unrestricted or >=32 CPU quota, <=12 GiB outer cgroup and zero swap. Old/new source archives, manifests, build results/records, binaries, original baseline plan/frozen counts, config, local runner/helper/protocol and raw outputs are pinned. No concurrent build, transfer or other experiment during measurement. Timed solver run excludes setup/query/artifact phases. Native peak RSS and sampled summed RSS remain distinct; empty phase sample intervals report null.",
+  "failure": "No retry. Any failure, identity/solution mismatch or insufficient remaining time stops execution and marks the exact remaining schedule skipped. Incomplete evidence has no adoption guard result. Preparation and measurement are separate phases; builds are external. Original range-scaling protocol is unchanged."
+}

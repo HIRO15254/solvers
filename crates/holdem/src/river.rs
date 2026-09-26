@@ -3,7 +3,9 @@
 //! [`build_postflop_game`]. `iso_merging` is irrelevant here (a 5-card
 //! starting board never deals — there's no next street), and every history
 //! token / node lookup behaves exactly as it did when this module owned the
-//! whole builder.
+//! whole builder. Private-hand indices use the delegated evaluator's
+//! seat-specific [`crate::PostflopHands`] mapping; they are not global combo
+//! indices.
 
 use cards::{Card, Chips, PerPlayer, Range};
 use engine::{CompiledGame, NodeId};

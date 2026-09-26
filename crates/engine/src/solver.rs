@@ -64,6 +64,79 @@ impl Default for ParConfig {
     }
 }
 
+// Scheduling only: this does not change chance-depth or arithmetic order.
+// Storage elements are a generic, range-dimension-aware work proxy, not a
+// measurement of terminal evaluator work (terminal spans contain no storage).
+// Keep this candidate's grain rule fixed across trees and worker counts.
+const ACTION_PAR_MIN_GRAIN: usize = 4_096;
+const ACTION_PAR_MAX_GRAIN: usize = 65_536;
+const ACTION_PAR_TASKS_PER_WORKER: usize = 4;
+
+fn chance_budget(configured: u32) -> u32 {
+    if rayon::current_num_threads() > 1 {
+        configured
+    } else {
+        0
+    }
+}
+
+fn subtree_elements(tree: &PublicTree, node: NodeId) -> usize {
+    let span = tree.storage_spans[node as usize];
+    span.end - span.start
+}
+
+#[derive(Clone, Copy, Default)]
+struct ActionSplit {
+    here: bool,
+    // Includes this node. Sequential ancestors also need independent
+    // storage views whenever any descendant can consume its view by split.
+    below: bool,
+}
+
+struct ActionPlan {
+    nodes: Vec<ActionSplit>,
+}
+
+impl ActionPlan {
+    fn new(tree: &PublicTree) -> Option<Self> {
+        let workers = rayon::current_num_threads();
+        if workers == 1
+            || tree.subtree_has_chance[0]
+            || subtree_elements(tree, 0) < 2 * ACTION_PAR_MIN_GRAIN
+        {
+            return None;
+        }
+        let grain = subtree_elements(tree, 0)
+            .div_ceil(workers.saturating_mul(ACTION_PAR_TASKS_PER_WORKER))
+            .clamp(ACTION_PAR_MIN_GRAIN, ACTION_PAR_MAX_GRAIN);
+        let mut nodes = vec![ActionSplit::default(); tree.nodes.len()];
+        // Compiled child ids always follow their parent. One reverse pass
+        // identifies both the forks and every ancestor that must protect
+        // its view; no repeated subtree search is needed during traversal.
+        for (id, node) in tree.nodes.iter().enumerate().rev() {
+            if node.kind != NodeKind::Action {
+                continue;
+            }
+            let here = tree
+                .children(id as NodeId)
+                .filter(|&child| subtree_elements(tree, child) >= grain)
+                .take(2)
+                .count()
+                == 2;
+            let below = here
+                || tree
+                    .children(id as NodeId)
+                    .any(|child| nodes[child as usize].below);
+            nodes[id] = ActionSplit { here, below };
+        }
+        nodes[0].below.then_some(Self { nodes })
+    }
+}
+
+fn parallel_actions(node: NodeId, plan: Option<&ActionPlan>) -> bool {
+    plan.is_some_and(|plan| plan.nodes[node as usize].here)
+}
+
 /// Checkpointable solver state: the iteration count plus the storage
 /// backend's contents, sufficient to resume a solve bit-for-bit (the
 /// solver has no RNG or other hidden state).
@@ -182,6 +255,11 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     /// One alternating iteration: a regret/strategy update pass for each
     /// player in turn.
     pub fn step(&mut self) {
+        let action_plan = ActionPlan::new(&self.game.tree);
+        self.step_with_plan(action_plan.as_ref());
+    }
+
+    fn step_with_plan(&mut self, action_plan: Option<&ActionPlan>) {
         let t = self.iteration + 1;
         let discounts = self.schedule.at(t, self.planned_iters);
         for p in Player::BOTH {
@@ -204,7 +282,8 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
                 &my_range,
                 &opp_range,
                 &mut out,
-                self.par.chance_depth,
+                chance_budget(self.par.chance_depth),
+                action_plan,
             );
             self.scratch.put(out);
         }
@@ -212,8 +291,15 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     }
 
     pub fn run(&mut self, iterations: u64) {
+        if iterations == 0 {
+            return;
+        }
+        // Construct inside the caller's current pool, not in Solver::new:
+        // callers may build a solver outside the pool that later runs it.
+        // Reuse the immutable plan across both player passes and iterations.
+        let action_plan = ActionPlan::new(&self.game.tree);
         for _ in 0..iterations {
-            self.step();
+            self.step_with_plan(action_plan.as_ref());
         }
     }
 
@@ -320,7 +406,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     /// Every downstream value is still computed: `include` controls only which
     /// completed action-node vectors are copied into the result. Unselected
     /// entries stay `None`, saving their allocation without changing values at
-    /// selected ancestors. The predicate may run concurrently at chance branches.
+    /// selected ancestors. The predicate may run concurrently across branches.
     pub fn expected_values_where(
         &self,
         p: Player,
@@ -355,6 +441,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         };
         let mut scratch = Scratch::new();
         let mut out = scratch.take(self.game.tree.root_dims[p] as usize);
+        let action_plan = ActionPlan::new(&self.game.tree);
         value_pass(
             &ctx,
             &mut scratch,
@@ -363,7 +450,8 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             &mut out,
             &combine,
             &record,
-            self.par.chance_depth,
+            chance_budget(self.par.chance_depth),
+            action_plan.as_ref(),
         );
         recorded.into_inner().expect("value recorder mutex")
     }
@@ -454,7 +542,7 @@ struct PassCtx<'w, E> {
 /// Storage access for an action node's own storage ref (when split with
 /// one) and each of its children, while it processes them.
 ///
-/// A chance node with enough children may run its children in parallel,
+/// An eligible chance or action node may run its children in parallel,
 /// which calls `StorageView::split` on whatever view it's handed. Ordinary
 /// Rust reborrowing means that, left unprotected, that view is the *same
 /// object* every action-node ancestor up to the root is also holding —
@@ -463,8 +551,8 @@ struct PassCtx<'w, E> {
 /// own regret/strategy update; every sibling after the first, for its own
 /// subtree) would find it gone.
 ///
-/// [`PublicTree::subtree_has_chance`] tells us exactly which nodes can
-/// avoid worrying about this: `Ambient` is the original, allocation-free
+/// The chance budget and action plan identify nodes that can avoid worrying
+/// about this: `Ambient` is the original, allocation-free
 /// path (one view reborrowed across every access), taken whenever nothing
 /// below can possibly split; `Split` carves out one independent view per
 /// child (plus, when constructed with an own span, this node's own
@@ -482,8 +570,11 @@ impl<'v, V: StorageView> ActionViews<'v, V> {
         node_id: NodeId,
         own_span: Option<StorageSpan>,
         par_budget: u32,
+        action_plan: Option<&ActionPlan>,
     ) -> Self {
-        if par_budget == 0 || !tree.subtree_has_chance[node_id as usize] {
+        if (par_budget == 0 || !tree.subtree_has_chance[node_id as usize])
+            && !action_plan.is_some_and(|plan| plan.nodes[node_id as usize].below)
+        {
             return ActionViews::Ambient(storage);
         }
         let has_own = own_span.is_some();
@@ -516,15 +607,22 @@ impl<'v, V: StorageView> ActionViews<'v, V> {
             ActionViews::Split { views, has_own } => &mut views[index + *has_own as usize],
         }
     }
+
+    fn children_mut(&mut self) -> &mut [V] {
+        match self {
+            ActionViews::Split { views, has_own } => &mut views[*has_own as usize..],
+            ActionViews::Ambient(_) => unreachable!("parallel actions require disjoint views"),
+        }
+    }
 }
 
 /// CFR update pass for player `p`, writing p's counterfactual values (one
 /// per hand in p's current private-state space) into `out`.
 ///
 /// All temporaries come from `scratch`, taken and released in recursion
-/// (stack) order so steady-state solving allocates nothing: every buffer a
-/// call takes is released (in reverse order) before that call returns,
-/// which is exactly the LIFO discipline [`Scratch`] relies on.
+/// (stack) order on the sequential path. Parallel tasks have local scratch
+/// pools and disjoint outputs; their task-local allocations are not retained
+/// across passes.
 #[allow(clippy::too_many_arguments)]
 fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
     ctx: &PassCtx<'_, E>,
@@ -535,6 +633,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
     opp_reach: &[f32],
     out: &mut [f32],
     par_budget: u32,
+    action_plan: Option<&ActionPlan>,
 ) {
     let node = *ctx.tree.node(node_id);
     match node.kind {
@@ -604,6 +703,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                             &opp_next,
                             &mut child_out,
                             child_budget,
+                            None,
                         );
                         scratch.put(opp_next);
                         scratch.put(my_next);
@@ -629,7 +729,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                 // independent views too, not just the parallel branch's
                 // own children.
                 let mut views =
-                    ActionViews::split_for(storage, ctx.tree, node_id, None, child_budget);
+                    ActionViews::split_for(storage, ctx.tree, node_id, None, child_budget, None);
                 for (pos, child) in ctx.tree.children(node_id).enumerate() {
                     let deal = *ctx.tree.deal(&node, pos);
                     let my_dim =
@@ -659,6 +759,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                         &opp_next,
                         &mut child_out,
                         child_budget,
+                        None,
                     );
                     ctx.tree
                         .accumulate_values(deal.maps[ctx.p], deal.weight, &child_out, out);
@@ -686,8 +787,14 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
                 sref_start: sref.index,
                 sref_end: sref.index + 1,
             };
-            let mut views =
-                ActionViews::split_for(storage, ctx.tree, node_id, Some(own_span), par_budget);
+            let mut views = ActionViews::split_for(
+                storage,
+                ctx.tree,
+                node_id,
+                Some(own_span),
+                par_budget,
+                action_plan,
+            );
 
             let mut sigma = scratch.take(sref.len());
             views.own().regret_matching(sref, sref.index, &mut sigma);
@@ -697,27 +804,39 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
             // straight into place instead of returning a fresh `Vec`.
             let mut cfvs = scratch.take(sref.len());
             let mut node_cfv = scratch.take(num_hands);
-            // Reused across actions (not re-taken per action): its
-            // recursive use always returns before the next action starts,
-            // so overwriting it in place is safe.
-            let mut my_next = scratch.take(num_hands);
-
-            for (a, child) in ctx.tree.children(node_id).enumerate() {
-                let row = &sigma[a * num_hands..(a + 1) * num_hands];
-                for h in 0..num_hands {
-                    my_next[h] = my_reach[h] * row[h];
-                }
-                let out_row = &mut cfvs[a * num_hands..(a + 1) * num_hands];
-                cfr_pass(
+            if num_hands > 0 && parallel_actions(node_id, action_plan) {
+                cfr_action_children(
                     ctx,
-                    views.child(a),
-                    scratch,
-                    child,
-                    &my_next,
+                    &mut views,
+                    node_id,
+                    my_reach,
                     opp_reach,
-                    out_row,
+                    &sigma,
+                    &mut cfvs,
                     par_budget,
+                    action_plan,
                 );
+            } else {
+                let mut my_next = scratch.take(num_hands);
+                for (a, child) in ctx.tree.children(node_id).enumerate() {
+                    let row = &sigma[a * num_hands..(a + 1) * num_hands];
+                    for h in 0..num_hands {
+                        my_next[h] = my_reach[h] * row[h];
+                    }
+                    let out_row = &mut cfvs[a * num_hands..(a + 1) * num_hands];
+                    cfr_pass(
+                        ctx,
+                        views.child(a),
+                        scratch,
+                        child,
+                        &my_next,
+                        opp_reach,
+                        out_row,
+                        par_budget,
+                        action_plan,
+                    );
+                }
+                scratch.put(my_next);
             }
 
             for a in 0..num_actions {
@@ -749,7 +868,6 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
 
             out.copy_from_slice(&node_cfv);
 
-            scratch.put(my_next);
             scratch.put(node_cfv);
             scratch.put(cfvs);
             scratch.put(sigma);
@@ -767,37 +885,105 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
             let mut sigma = scratch.take(sref.len());
             storage.regret_matching(sref, sref.index, &mut sigma);
 
-            let mut views = ActionViews::split_for(storage, ctx.tree, node_id, None, par_budget);
+            let mut views =
+                ActionViews::split_for(storage, ctx.tree, node_id, None, par_budget, action_plan);
 
-            let mut opp_next = scratch.take(num_hands);
-            let mut child_out = scratch.take(my_reach.len());
-            for (a, child) in ctx.tree.children(node_id).enumerate() {
-                let row = &sigma[a * num_hands..(a + 1) * num_hands];
-                for h in 0..num_hands {
-                    opp_next[h] = opp_reach[h] * row[h];
-                }
-                // See the Chance-node comment: reused accumulator targets
-                // must be reset before every use, not just the initial take.
-                child_out.fill(0.0);
-                cfr_pass(
+            if !out.is_empty() && parallel_actions(node_id, action_plan) {
+                let mut children = scratch.take(node.num_children as usize * out.len());
+                cfr_action_children(
                     ctx,
-                    views.child(a),
-                    scratch,
-                    child,
+                    &mut views,
+                    node_id,
                     my_reach,
-                    &opp_next,
-                    &mut child_out,
+                    opp_reach,
+                    &sigma,
+                    &mut children,
                     par_budget,
+                    action_plan,
                 );
-                for h in 0..out.len() {
-                    out[h] += child_out[h];
+                // Preserve the sequential action order, never a rayon reduction.
+                for child_out in children.chunks_exact(out.len()) {
+                    for h in 0..out.len() {
+                        out[h] += child_out[h];
+                    }
                 }
+                scratch.put(children);
+            } else {
+                let mut opp_next = scratch.take(num_hands);
+                let mut child_out = scratch.take(my_reach.len());
+                for (a, child) in ctx.tree.children(node_id).enumerate() {
+                    let row = &sigma[a * num_hands..(a + 1) * num_hands];
+                    for h in 0..num_hands {
+                        opp_next[h] = opp_reach[h] * row[h];
+                    }
+                    child_out.fill(0.0);
+                    cfr_pass(
+                        ctx,
+                        views.child(a),
+                        scratch,
+                        child,
+                        my_reach,
+                        &opp_next,
+                        &mut child_out,
+                        par_budget,
+                        action_plan,
+                    );
+                    for h in 0..out.len() {
+                        out[h] += child_out[h];
+                    }
+                }
+                scratch.put(child_out);
+                scratch.put(opp_next);
             }
-            scratch.put(child_out);
-            scratch.put(opp_next);
             scratch.put(sigma);
         }
     }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn cfr_action_children<E: TerminalEvaluator, V: StorageView>(
+    ctx: &PassCtx<'_, E>,
+    views: &mut ActionViews<'_, V>,
+    node_id: NodeId,
+    my_reach: &[f32],
+    opp_reach: &[f32],
+    sigma: &[f32],
+    children: &mut [f32],
+    par_budget: u32,
+    action_plan: Option<&ActionPlan>,
+) {
+    let node = ctx.tree.node(node_id);
+    let own_action = node.player == ctx.p;
+    let reach = if own_action { my_reach } else { opp_reach };
+    views
+        .children_mut()
+        .par_iter_mut()
+        .zip(children.par_chunks_mut(my_reach.len()))
+        .enumerate()
+        .for_each_init(Scratch::new, |scratch, (a, (view, child_out))| {
+            let mut next = scratch.take(reach.len());
+            let row = &sigma[a * reach.len()..(a + 1) * reach.len()];
+            for h in 0..reach.len() {
+                next[h] = reach[h] * row[h];
+            }
+            let (my_next, opp_next) = if own_action {
+                (next.as_slice(), opp_reach)
+            } else {
+                (my_reach, next.as_slice())
+            };
+            cfr_pass(
+                ctx,
+                view,
+                scratch,
+                node.first_child + a as NodeId,
+                my_next,
+                opp_next,
+                child_out,
+                par_budget,
+                action_plan,
+            );
+            scratch.put(next);
+        });
 }
 
 /// Read-only context threaded through [`value_pass`].
@@ -827,6 +1013,7 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C, R>(
     combine: &C,
     record: &R,
     par_budget: u32,
+    action_plan: Option<&ActionPlan>,
 ) where
     C: Fn(StorageRef, &[f32], &mut [f32]) + Sync,
     R: Fn(NodeId, &[f32]) + Sync,
@@ -879,6 +1066,7 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C, R>(
                             combine,
                             record,
                             child_budget,
+                            None,
                         );
                         scratch.put(opp_next);
                         child_out
@@ -914,6 +1102,7 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C, R>(
                         combine,
                         record,
                         child_budget,
+                        None,
                     );
                     ctx.tree
                         .accumulate_values(deal.maps[ctx.p], deal.weight, &child_out, out);
@@ -927,11 +1116,38 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C, R>(
             let my_dim = out.len();
             let num_actions = sref.num_actions as usize;
             let mut children_flat = scratch.take(num_actions * my_dim);
-            for (a, child) in ctx.tree.children(node_id).enumerate() {
-                let row = &mut children_flat[a * my_dim..(a + 1) * my_dim];
-                value_pass(
-                    ctx, scratch, child, opp_reach, row, combine, record, par_budget,
-                );
+            if my_dim > 0 && parallel_actions(node_id, action_plan) {
+                children_flat
+                    .par_chunks_mut(my_dim)
+                    .enumerate()
+                    .for_each_init(Scratch::new, |scratch, (a, row)| {
+                        value_pass(
+                            ctx,
+                            scratch,
+                            node.first_child + a as NodeId,
+                            opp_reach,
+                            row,
+                            combine,
+                            record,
+                            par_budget,
+                            action_plan,
+                        );
+                    });
+            } else {
+                for (a, child) in ctx.tree.children(node_id).enumerate() {
+                    let row = &mut children_flat[a * my_dim..(a + 1) * my_dim];
+                    value_pass(
+                        ctx,
+                        scratch,
+                        child,
+                        opp_reach,
+                        row,
+                        combine,
+                        record,
+                        par_budget,
+                        action_plan,
+                    );
+                }
             }
             combine(sref, &children_flat, out);
             scratch.put(children_flat);
@@ -942,32 +1158,63 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C, R>(
             let mut sigma = scratch.take(sref.len());
             ctx.storage.average_strategy(sref, sref.index, &mut sigma);
             let my_dim = out.len();
-            let mut opp_next = scratch.take(num_hands);
-            let mut child_out = scratch.take(my_dim);
-            for (a, child) in ctx.tree.children(node_id).enumerate() {
-                let row = &sigma[a * num_hands..(a + 1) * num_hands];
-                for h in 0..num_hands {
-                    opp_next[h] = opp_reach[h] * row[h];
-                }
-                // Reused accumulator target: reset before every use (see
-                // the matching comment in `cfr_pass`).
-                child_out.fill(0.0);
-                value_pass(
-                    ctx,
-                    scratch,
-                    child,
-                    &opp_next,
-                    &mut child_out,
-                    combine,
-                    record,
-                    par_budget,
+            if my_dim > 0 && parallel_actions(node_id, action_plan) {
+                let mut children = scratch.take(node.num_children as usize * my_dim);
+                children.par_chunks_mut(my_dim).enumerate().for_each_init(
+                    Scratch::new,
+                    |scratch, (a, child_out)| {
+                        let mut opp_next = scratch.take(num_hands);
+                        let row = &sigma[a * num_hands..(a + 1) * num_hands];
+                        for h in 0..num_hands {
+                            opp_next[h] = opp_reach[h] * row[h];
+                        }
+                        value_pass(
+                            ctx,
+                            scratch,
+                            node.first_child + a as NodeId,
+                            &opp_next,
+                            child_out,
+                            combine,
+                            record,
+                            par_budget,
+                            action_plan,
+                        );
+                        scratch.put(opp_next);
+                    },
                 );
-                for h in 0..my_dim {
-                    out[h] += child_out[h];
+                for child_out in children.chunks_exact(my_dim) {
+                    for h in 0..my_dim {
+                        out[h] += child_out[h];
+                    }
                 }
+                scratch.put(children);
+            } else {
+                let mut opp_next = scratch.take(num_hands);
+                let mut child_out = scratch.take(my_dim);
+                for (a, child) in ctx.tree.children(node_id).enumerate() {
+                    let row = &sigma[a * num_hands..(a + 1) * num_hands];
+                    for h in 0..num_hands {
+                        opp_next[h] = opp_reach[h] * row[h];
+                    }
+                    child_out.fill(0.0);
+                    value_pass(
+                        ctx,
+                        scratch,
+                        child,
+                        &opp_next,
+                        &mut child_out,
+                        combine,
+                        record,
+                        par_budget,
+                        action_plan,
+                    );
+                    for h in 0..my_dim {
+                        out[h] += child_out[h];
+                    }
+                }
+                scratch.put(child_out);
+                scratch.put(opp_next);
             }
-            scratch.put(child_out);
-            scratch.put(opp_next);
             scratch.put(sigma);
         }
     }
@@ -1009,8 +1256,17 @@ pub(crate) fn ev_pass<E: TerminalEvaluator, S: Storage>(
             }
         }
     };
+    let action_plan = ActionPlan::new(ctx.tree);
     value_pass(
-        ctx, scratch, node_id, opp_reach, out, &combine, &no_record, par_budget,
+        ctx,
+        scratch,
+        node_id,
+        opp_reach,
+        out,
+        &combine,
+        &no_record,
+        chance_budget(par_budget),
+        action_plan.as_ref(),
     );
 }
 
@@ -1033,7 +1289,149 @@ pub(crate) fn br_pass<E: TerminalEvaluator, S: Storage>(
                 .fold(f32::NEG_INFINITY, f32::max);
         }
     };
+    let action_plan = ActionPlan::new(ctx.tree);
     value_pass(
-        ctx, scratch, node_id, opp_reach, out, &combine, &no_record, par_budget,
+        ctx,
+        scratch,
+        node_id,
+        opp_reach,
+        out,
+        &combine,
+        &no_record,
+        chance_budget(par_budget),
+        action_plan.as_ref(),
     );
+}
+
+#[cfg(test)]
+mod action_plan_tests {
+    use super::*;
+    use crate::tree::{ReachMap, TempNode, TreeSpec};
+
+    fn leaf_action(player: Player, children: usize, tag: u32) -> TempNode {
+        TempNode::Action {
+            player,
+            children: (0..children)
+                .map(|_| TempNode::Terminal { id: 0, tag: 0 })
+                .collect(),
+            tag,
+        }
+    }
+
+    fn compile(root: TempNode, dims: PerPlayer<u32>) -> PublicTree {
+        PublicTree::compile(TreeSpec {
+            root,
+            masks: Vec::new(),
+            transitions: Vec::new(),
+            root_dims: dims,
+        })
+    }
+
+    #[test]
+    fn deep_action_fork_protects_every_sequential_ancestor() {
+        // The fork is five actions below the root; each ancestor has just
+        // one child with storage. Its two children have exactly 4,096
+        // elements each, and the entire tree is below the former 65,536 gate.
+        let mut root = TempNode::Action {
+            player: Player::P1,
+            children: vec![
+                leaf_action(Player::P0, 2, 100),
+                leaf_action(Player::P0, 2, 101),
+            ],
+            tag: 99,
+        };
+        for depth in 0..5 {
+            let player = if depth % 2 == 0 {
+                Player::P0
+            } else {
+                Player::P1
+            };
+            root = TempNode::Action {
+                player,
+                children: vec![TempNode::Terminal { id: 0, tag: 0 }, root],
+                tag: 10 + depth,
+            };
+        }
+        let tree = compile(root, PerPlayer::new(2_048, 1_024));
+        assert_eq!(tree.storage_len, 26_624);
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(2)
+            .build()
+            .unwrap()
+            .install(|| {
+                let plan = ActionPlan::new(&tree).expect("deep fork must remain eligible");
+                let mut forks = 0;
+                let mut protected_ancestors = 0;
+                for (id, &tag) in tree.tags.iter().enumerate() {
+                    if tag == 99 {
+                        assert!(plan.nodes[id].here && plan.nodes[id].below);
+                        forks += 1;
+                    } else if (10..15).contains(&tag) {
+                        assert!(!plan.nodes[id].here && plan.nodes[id].below);
+                        protected_ancestors += 1;
+                    } else {
+                        assert!(!plan.nodes[id].here && !plan.nodes[id].below);
+                    }
+                }
+                assert_eq!((forks, protected_ancestors), (1, 5));
+            });
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(1)
+            .build()
+            .unwrap()
+            .install(|| assert!(ActionPlan::new(&tree).is_none()));
+    }
+
+    #[test]
+    fn action_fork_requires_two_children_at_or_above_grain() {
+        let make_tree = |second_at_grain| {
+            let second = if second_at_grain {
+                leaf_action(Player::P1, 2, 0) // 4,096 elements
+            } else {
+                leaf_action(Player::P0, 1, 0) // 4,095 elements
+            };
+            compile(
+                TempNode::Action {
+                    player: Player::P0,
+                    children: vec![leaf_action(Player::P1, 2, 0), second],
+                    tag: 0,
+                },
+                PerPlayer::new(4_095, 2_048),
+            )
+        };
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(2)
+            .build()
+            .unwrap()
+            .install(|| {
+                assert!(ActionPlan::new(&make_tree(false)).is_none());
+                let plan = ActionPlan::new(&make_tree(true)).unwrap();
+                assert!(parallel_actions(0, Some(&plan)));
+            });
+    }
+
+    #[test]
+    fn chance_tree_keeps_action_plan_disabled() {
+        let action = TempNode::Action {
+            player: Player::P0,
+            children: vec![leaf_action(Player::P0, 2, 0), leaf_action(Player::P0, 2, 0)],
+            tag: 0,
+        };
+        let tree = compile(
+            TempNode::Chance {
+                deals: vec![(
+                    1.0,
+                    PerPlayer::new(ReachMap::Identity, ReachMap::Identity),
+                    action,
+                )],
+                tag: 0,
+            },
+            PerPlayer::new(4_096, 4_096),
+        );
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(4)
+            .build()
+            .unwrap()
+            .install(|| assert!(ActionPlan::new(&tree).is_none()));
+    }
 }

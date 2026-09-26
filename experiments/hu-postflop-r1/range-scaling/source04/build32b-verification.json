@@ -1,0 +1,69 @@
+{
+  "schema": "r1.range-scaling-portable-verification/v1",
+  "payload_integrity": "verified",
+  "validation": [
+    {
+      "path": "/opt/r1/range04/build32b/result.json",
+      "outcome": "completed",
+      "mode": "release-build-only",
+      "full_workspace_validated": false,
+      "source_revision": "fd740d9c7e28c44e1263051d0a42611008046071",
+      "source_manifest": {
+        "path": "/opt/r1/range04/source-candidate-manifest.json",
+        "bytes": 68185,
+        "sha256": "22fb944211c2bff6d47e7779b4b0b7221418dfe5fec01cb7f0025494a24625d8"
+      },
+      "source_archive": {
+        "path": "/opt/r1/range04/source-candidate.tar.gz",
+        "bytes": 1359305,
+        "sha256": "ae97420ebc38d93bdbe50821403cf6f2a85c6c7b07b1253f58959ce454f5de5a"
+      },
+      "runner": {
+        "path": "/opt/r1/range04/source/experiments/hu-postflop-r1/range-scaling/validate.py",
+        "bytes": 7499,
+        "sha256": "0f84890a1860498040fec55b160bdc07c7c1135f10fa8ea8475d8185739bb07a"
+      },
+      "binary": {
+        "path": "/opt/r1/target/range04-32b/release/examples/hu_scaling_bench",
+        "bytes": 3858856,
+        "sha256": "d2e5d390f0bf8a1cbf5540c49966e6310356e9973faf3dae14723edbf1ca5ed3"
+      },
+      "stages": [
+        {
+          "label": "toolchain",
+          "outcome": "completed",
+          "stop_reason": "completed",
+          "child_exit_code": 0,
+          "supervisor_exit": 0,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range04/build32b/stages/toolchain/supervisor.json",
+            "bytes": 6014,
+            "sha256": "b66b0a93b1473a9e25d0373ade1b3cc3cb8634fae22ce8d24d96b9c8e36a8ee1"
+          }
+        },
+        {
+          "label": "release-example",
+          "outcome": "completed",
+          "stop_reason": "completed",
+          "child_exit_code": 0,
+          "supervisor_exit": 0,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range04/build32b/stages/release-example/supervisor.json",
+            "bytes": 6306,
+            "sha256": "6b8b5eca876475a9f1989bef20a4dc81a3d5c29df27ddb5675f3eb61fbd8a590"
+          }
+        }
+      ],
+      "failed_stage": null,
+      "recorded_error": null,
+      "unexecuted_stages": [],
+      "source_check_scope": "Archive exact bytes/set and any retained source aliases are verified; source-after checks are recorded runner assertions, not a separately retained filesystem snapshot."
+    }
+  ],
+  "scaling": [],
+  "recovered_content_aliases": [],
+  "identity_only": "Compiler and Python executables are bound by recorded size/SHA; their executable bytes need not be retained.",
+  "retention_container": "r1.context-linux-retention/v1 is reused only for exact compressed payload storage, not as a claim of codec experiment validation."
+}

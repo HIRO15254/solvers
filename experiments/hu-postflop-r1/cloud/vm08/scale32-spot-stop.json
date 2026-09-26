@@ -1,0 +1,44 @@
+{
+  "cpuPlatform": "Unknown CPU Platform",
+  "id": "1635613034982056517",
+  "lastStartTimestamp": "2026-09-25T20:04:21.128-07:00",
+  "lastStopTimestamp": "2026-09-25T20:31:56.257-07:00",
+  "machineType": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/machineTypes/e2-highcpu-32",
+  "name": "solvers-r1-20260926-08",
+  "networkInterfaces": [
+    {
+      "accessConfigs": [
+        {
+          "kind": "compute#accessConfig",
+          "name": "external-nat",
+          "networkTier": "PREMIUM",
+          "type": "ONE_TO_ONE_NAT"
+        }
+      ],
+      "fingerprint": "Hakz7zveRx0=",
+      "kind": "compute#networkInterface",
+      "name": "nic0",
+      "network": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/global/networks/default",
+      "networkIP": "10.128.0.9",
+      "stackType": "IPV4_ONLY",
+      "subnetwork": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/regions/us-central1/subnetworks/default"
+    }
+  ],
+  "resourceStatus": {
+    "effectiveInstanceMetadata": {
+      "vmDnsSettingMetadataValue": "ZonalOnly"
+    },
+    "scheduling": {
+      "terminationTimestamp": "2026-09-26T04:30:56Z"
+    }
+  },
+  "scheduling": {
+    "automaticRestart": false,
+    "instanceTerminationAction": "STOP",
+    "onHostMaintenance": "TERMINATE",
+    "preemptible": true,
+    "provisioningModel": "SPOT",
+    "terminationTime": "2026-09-26T04:30:56Z"
+  },
+  "status": "TERMINATED"
+}

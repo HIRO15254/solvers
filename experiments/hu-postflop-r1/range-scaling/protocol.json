@@ -1,0 +1,31 @@
+{
+  "schema": "r1.hu-range-scaling-protocol/v1",
+  "scope": "Prospective same-binary F32 compact-hand correctness, layout memory and 1/2/4/8/16/32-worker scaling; not I16 equivalence, external poker-reference acceptance or a replacement for earlier codec protocols.",
+  "logical_cpus": 32,
+  "arms": {
+    "compact-1": {"layout": "compact", "threads": 1},
+    "compact-2": {"layout": "compact", "threads": 2},
+    "compact-4": {"layout": "compact", "threads": 4},
+    "compact-8": {"layout": "compact", "threads": 8},
+    "compact-16": {"layout": "compact", "threads": 16},
+    "compact-32": {"layout": "compact", "threads": 32},
+    "dense-1": {"layout": "dense", "threads": 1}
+  },
+  "cases": {
+    "river": {"file": "river.toml", "iteration_cap": 1000, "origin": "experiments/hu-postflop-r1/reference/HU-R0-002/diagnostic.toml", "game_changes": "none; preserves diagnostic rake assumption and incomplete external certification", "speed_screen": true},
+    "turn": {"file": "turn.toml", "iteration_cap": 1000, "origin": "experiments/hu-postflop-r1/pipeline/configs/turn.toml", "game_changes": "none", "speed_screen": true},
+    "flop": {"file": "flop.toml", "iteration_cap": 50, "origin": "experiments/hu-postflop-r1/pipeline/configs/flop.toml", "game_changes": "none; limited betting, complete runouts", "speed_screen": true},
+    "narrow-river": {"file": "narrow-river.toml", "iteration_cap": 10000, "origin": "experiments/hu-postflop-r1/pipeline/configs/river.toml", "game_changes": "only ranges changed to AsAh,AdAc versus KsKh", "speed_screen": false}
+  },
+  "pilot": {"arm": "compact-1", "runs_per_case": 1, "solve_target_seconds": 10, "rule": "max(1, min(cap, floor(cap * min(1, 10 / pilot_run_seconds)))); never increase caps, repeat pilots, change games or tune thresholds from scaling results"},
+  "warmups_per_case_arm": 1,
+  "measured_blocks_per_case": 3,
+  "order": "Case order is river, turn, flop, narrow-river. Seven-arm cyclic rotations: 3*case index + block modulo seven; block zero is warmup. Three measured blocks per case use distinct rotations. Across four cases measured rotations 1..12 place each arm at each position one or two times (maximum imbalance one); seven positions cannot be exactly balanced by twelve measured blocks. Cyclic ordering does not fully balance carryover effects.",
+  "correctness": "Every warm/measured canonical.bin (strategies and all-node CFVs), state.bin (F32 regrets and strategy sums) and EV/BR/NashConv raw f64 bits must exactly match across all seven arms for a case. Dense state projects to identical initial positive support; compact projection includes every stored hand, including hands dead on later streets. F32 only: I16 scaling/quantization equivalence is not claimed.",
+  "limits": {"sample_timeout_seconds": 300, "rss_bytes": 10737418240, "outer_memory_max_bytes": 12884901888, "min_free_bytes": 1073741824, "disk_reserve_bytes": 4294967296, "poll_seconds": 0.1, "grace_seconds": 5, "kill_wait_seconds": 5},
+  "screen": {"minimum_compact1_median_run_seconds": 1, "compact2_over_compact1_max": 0.95, "compact4_over_compact1_max": 0.90, "compact4_over_compact2_max": 1.05, "strictly_faster_blocks_min": 2, "rationale": "Small descriptive screen: at least 5% two-worker and 10% four-worker median solve-time reductions with two of three paired wins, and at most 5% regression from two to four workers. These magnitudes are prospective practical guardrails, not confidence intervals or a linear-core-scaling promise. Short cases cannot certify speedup; narrow-river is always an overhead control. Every case/result remains reported, including failures and screen misses."},
+  "high_thread_reporting": "8/16/32 add no acceptance threshold. Report every median speedup T1/Tn, efficiency T1/(n*Tn), adjacent-thread speedup, fastest observed thread count and first adjacent median slowdown. These describe saturation/regression for investigation, not a calibrated knee or proof of linear scaling. Preserve all observations without case/thread cherry picking.",
+  "measurement": "Warmups are retained but excluded from timing summaries. No concurrent builds/transfers/other experiments during measure. Timed run excludes tree build, solver allocation, root evaluation, CFV capture and output writing. Full-process RSS includes all phases; per-phase RSS is separately sampled from matching wall-clock intervals and is null if no sample lands inside. Root wait4 peak and summed sampled process RSS are distinct measures. Output files are correctness evidence, not production SOL/CKPT size measurements.",
+  "deadline_utc_latest": "2026-09-26T07:00:00Z",
+  "failure_policy": "No automatic retries. A stage failure, identity/canonical mismatch or insufficient remaining deadline stops the campaign and marks all remaining stages skipped with reason; incomplete results never pass a screen. Any later rerun needs a new directory and explicit protocol revision, retaining the original evidence. No case replacement or post-measurement threshold relaxation."
+}

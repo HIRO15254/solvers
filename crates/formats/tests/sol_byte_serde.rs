@@ -126,7 +126,7 @@ fn byte_fields_preserve_json_arrays_and_integer_validation() {
     }
 }
 
-// Exact v1 payload field order from baseline 9632d8b. Public v3 loading must
+// Exact v1 payload field order from baseline 9632d8b. Public v4 loading must
 // still reject the v1 container; this tests the payload codec used by legacy
 // research readers that decode these production block types.
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -228,14 +228,14 @@ fn u32_at(bytes: &[u8], offset: usize) -> u32 {
 }
 
 #[test]
-fn v3_chunks_keep_legacy_bytes_checksums_and_compression() {
+fn v4_chunks_keep_legacy_bytes_checksums_and_compression() {
     let payload = fixture();
     let directory = tempfile::tempdir().unwrap();
     let path = directory.path().join("current.sol");
     write_sol(&path, &payload).unwrap();
     let file = std::fs::read(&path).unwrap();
-    assert_eq!(u16::from_le_bytes(file[8..10].try_into().unwrap()), 3);
-    // Independent v3 wire constants and expected 64-node/gap boundaries.
+    assert_eq!(u16::from_le_bytes(file[8..10].try_into().unwrap()), 4);
+    // Independent v4 wire constants and expected 64-node/gap boundaries.
     let directory_start = 106 + u64_at(&file, 50) as usize;
     assert_eq!(u64_at(&file, 98), 3);
     for (index, range) in [0..64, 64..65, 65..70].into_iter().enumerate() {

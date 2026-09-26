@@ -1,0 +1,108 @@
+{
+  "schema": "r1.range-scaling-portable-verification/v1",
+  "payload_integrity": "verified",
+  "validation": [
+    {
+      "path": "/opt/r1/range03/validation/result.json",
+      "outcome": "failed",
+      "mode": "full-validation",
+      "full_workspace_validated": false,
+      "source_revision": "fd740d9c7e28c44e1263051d0a42611008046071",
+      "source_manifest": {
+        "path": "/opt/r1/range03/source-candidate-manifest.json",
+        "bytes": 67867,
+        "sha256": "e3d811414594c105d22edf834d8c960840fe6ef3e56e02bb4369704f436733f9"
+      },
+      "source_archive": {
+        "path": "/opt/r1/range03/source-candidate.tar.gz",
+        "bytes": 1352605,
+        "sha256": "328ece7f1bb59a8cfc72e216504c6216d466a7353a2fc7e707a3ec308204c804"
+      },
+      "runner": {
+        "path": "/opt/r1/range03/source/experiments/hu-postflop-r1/range-scaling/validate.py",
+        "bytes": 7499,
+        "sha256": "0f84890a1860498040fec55b160bdc07c7c1135f10fa8ea8475d8185739bb07a"
+      },
+      "binary": null,
+      "stages": [
+        {
+          "label": "toolchain",
+          "outcome": "completed",
+          "stop_reason": "completed",
+          "child_exit_code": 0,
+          "supervisor_exit": 0,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range03/validation/stages/toolchain/supervisor.json",
+            "bytes": 6014,
+            "sha256": "0d42cfa9c85ac9570d767c4e4f4dfba6d2706c2643005c7a33e93a9c72795471"
+          }
+        },
+        {
+          "label": "fmt",
+          "outcome": "completed",
+          "stop_reason": "completed",
+          "child_exit_code": 0,
+          "supervisor_exit": 0,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range03/validation/stages/fmt/supervisor.json",
+            "bytes": 6058,
+            "sha256": "df02dff52c3fb185af548e47bf2bdd1404ccc062b96994837d00d2e73c8ced3d"
+          }
+        },
+        {
+          "label": "clippy",
+          "outcome": "completed",
+          "stop_reason": "completed",
+          "child_exit_code": 0,
+          "supervisor_exit": 0,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range03/validation/stages/clippy/supervisor.json",
+            "bytes": 6279,
+            "sha256": "5eb2fcd9cfb5525b6f96623d3d4ee721cbcb682a6e615c2fd340e1e077f98abe"
+          }
+        },
+        {
+          "label": "workspace-tests",
+          "outcome": "failed",
+          "stop_reason": "child_failed",
+          "child_exit_code": 101,
+          "supervisor_exit": 1,
+          "cleanup_complete": true,
+          "record": {
+            "path": "/opt/r1/range03/validation/stages/workspace-tests/supervisor.json",
+            "bytes": 6239,
+            "sha256": "2f07313e7e224e2d14c5fe1240decf4d01c755e09daf35dc829004d4d5b07234"
+          }
+        }
+      ],
+      "failed_stage": {
+        "label": "workspace-tests",
+        "outcome": "failed",
+        "stop_reason": "child_failed",
+        "child_exit_code": 101,
+        "supervisor_exit": 1,
+        "cleanup_complete": true,
+        "record": {
+          "path": "/opt/r1/range03/validation/stages/workspace-tests/supervisor.json",
+          "bytes": 6239,
+          "sha256": "2f07313e7e224e2d14c5fe1240decf4d01c755e09daf35dc829004d4d5b07234"
+        }
+      },
+      "recorded_error": "AssertionError('stage failed: workspace-tests')",
+      "unexecuted_stages": [
+        "docs",
+        "release-example",
+        "release-oracle",
+        "release-river-resolve"
+      ],
+      "source_check_scope": "Archive exact bytes/set and any retained source aliases are verified; source-after checks are recorded runner assertions, not a separately retained filesystem snapshot."
+    }
+  ],
+  "scaling": [],
+  "recovered_content_aliases": [],
+  "identity_only": "Compiler and Python executables are bound by recorded size/SHA; their executable bytes need not be retained.",
+  "retention_container": "r1.context-linux-retention/v1 is reused only for exact compressed payload storage, not as a claim of codec experiment validation."
+}

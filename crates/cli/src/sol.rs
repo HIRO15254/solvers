@@ -28,8 +28,8 @@ use formats::{
 };
 use game::{PayoffPipeline, RakeModel, UtilityModel};
 use holdem::{
-    PostflopConfig, PostflopEvaluator, PostflopGame, build_postflop_game, node_streets,
-    river_entry_state, river_resolve_config,
+    PostflopConfig, PostflopEvaluator, PostflopGame, PostflopHands, build_postflop_game,
+    node_streets, river_entry_state, river_resolve_config,
 };
 
 use crate::config::GameSection;
@@ -107,25 +107,54 @@ fn human_size(bytes: u64) -> String {
 /// sharing a card with `h` cannot, which is the usual inclusion-exclusion:
 /// total, minus the reach through each of `h`'s two cards, plus the one
 /// combo that is both of them and was therefore subtracted twice.
-fn compatible_reach(opp_reach: &[f32]) -> Vec<f32> {
+fn compatible_reach(hands: &PostflopHands, player: Player, opp_reach: &[f32]) -> Vec<f32> {
+    let opponent = player.opponent();
+    assert_eq!(opp_reach.len(), hands.len(opponent));
     let total: f64 = opp_reach.iter().map(|&r| r as f64).sum();
     let mut per_card = [0.0f64; 52];
-    for (combo, &reach) in opp_reach.iter().enumerate() {
+    for (local, &reach) in opp_reach.iter().enumerate() {
         if reach == 0.0 {
             continue;
         }
-        let (hi, lo) = cards::combo_cards(combo);
+        let (hi, lo) = cards::combo_cards(hands.combo(opponent, local));
         per_card[hi.index()] += reach as f64;
         per_card[lo.index()] += reach as f64;
     }
-    (0..opp_reach.len())
-        .map(|combo| {
+    hands
+        .combos(player)
+        .iter()
+        .map(|&combo| {
+            let combo = combo as usize;
             let (hi, lo) = cards::combo_cards(combo);
-            let compatible =
-                total - per_card[hi.index()] - per_card[lo.index()] + opp_reach[combo] as f64;
+            let overlap = hands
+                .index(opponent, combo)
+                .map_or(0.0, |index| opp_reach[index]);
+            let compatible = total - per_card[hi.index()] - per_card[lo.index()] + overlap as f64;
             compatible.max(0.0) as f32
         })
         .collect()
+}
+
+/// Whether at least one legal private deal can reach this public line.
+/// Check support directly: a positive but tiny weight must not be rounded
+/// away by an epsilon, multiplication, or subtractive card totals.
+fn has_compatible_reach(hands: &PostflopHands, reach: &PerPlayer<Vec<f32>>) -> bool {
+    for (own, &weight) in reach[Player::P0].iter().enumerate() {
+        if weight <= 0.0 {
+            continue;
+        }
+        let (a, b) = cards::combo_cards(hands.combo(Player::P0, own));
+        for (opp, &other) in reach[Player::P1].iter().enumerate() {
+            if other <= 0.0 {
+                continue;
+            }
+            let (c, d) = cards::combo_cards(hands.combo(Player::P1, opp));
+            if a != c && a != d && b != c && b != d {
+                return true;
+            }
+        }
+    }
+    false
 }
 
 /// Walks included subtrees carrying both players' reach, calling `visit` at
@@ -246,7 +275,11 @@ pub(crate) fn export_sol<S: Storage>(
             // to be divided by the reach that could be facing this hand
             // before a utility-valued offset can be added to it. Skipping that would
             // be a unit error, not a scaling one.
-            let compatible = compatible_reach(&reach[player.opponent()]);
+            let compatible = compatible_reach(
+                solver.game().evaluator.hands(),
+                player,
+                &reach[player.opponent()],
+            );
             // Every node uses the original subgame's utility baseline.
             // Adding this node's contributions would erase sunk wagers;
             // adding chips at all would mix units for ICM.
@@ -926,28 +959,22 @@ impl<'a> SolProvider<'a> {
             out.copy_from_slice(&probs);
         });
 
-        // A line the solved trunk (essentially) never takes gives one player
-        // an all-zero reach vector; the fresh subgame builder would then
-        // panic on "ranges share no compatible combos". Refuse up front with
-        // an explanation instead — the REPL surfaces provider errors as a
-        // plain "error: ..." line, so navigation itself survives. (A reach
-        // that is positive only on board-conflicting combos can still slip
-        // past this check into the builder assert; that requires a corrupt
-        // artifact rather than a merely-unreached line, so the loud panic is
-        // the right response there.)
-        for p in Player::BOTH {
-            if !reach[p].iter().any(|&r| r > 1e-9) {
-                bail!(
-                    "cannot re-solve river at {history:?}: the solved strategy never \
-                     reaches this line for {} (reach is zero for every hand)",
-                    if p == Player::P0 { "oop" } else { "ip" },
-                );
-            }
+        // Positive ranges can still have no compatible private deal. Surface
+        // an unreachable line as a query error before the builder's assert.
+        if !has_compatible_reach(loaded.pf_game.game.evaluator.hands(), &reach) {
+            bail!(
+                "cannot re-solve river at {history:?}: no compatible private deal reaches this line"
+            );
         }
 
         let state = river_entry_state(&loaded.config, &history)
             .with_context(|| format!("replaying history {history:?} for river entry {entry}"))?;
-        let sub_cfg = river_resolve_config(&loaded.config, &state, &reach);
+        let sub_cfg = river_resolve_config(
+            &loaded.config,
+            loaded.pf_game.game.evaluator.hands(),
+            &state,
+            &reach,
+        );
 
         println!(
             "re-solving river subgame at {history:?} (up to {} iterations)...",
@@ -1024,7 +1051,26 @@ impl StrategyProvider for SolProvider<'_> {
         let sub_node = *rs.map.get(&node).ok_or_else(|| {
             anyhow!("node {node} not found in the re-solved river subtree for entry {entry}")
         })?;
-        Ok(rs.solver.average_strategy_at(sub_node))
+        let sub_hands = rs.solver.game().evaluator.hands();
+        let trunk_hands = loaded.pf_game.game.evaluator.hands();
+        let sub_strategy = rs.solver.average_strategy_at(sub_node);
+        let actions = sref.num_actions as usize;
+        let trunk_len = trunk_hands.len(n.player);
+        let sub_len = sub_hands.len(n.player);
+        // A fresh river range omits blocked or zero-reach trunk hands. Give
+        // those unreachable columns a valid distribution, then restore every
+        // retained column to its original trunk combo index.
+        let mut result = vec![1.0 / actions as f32; actions * trunk_len];
+        for (sub_index, &combo) in sub_hands.combos(n.player).iter().enumerate() {
+            let trunk_index = trunk_hands.index(n.player, combo as usize).ok_or_else(|| {
+                anyhow!("river re-solve introduced combo {combo} outside the trunk range")
+            })?;
+            for action in 0..actions {
+                result[action * trunk_len + trunk_index] =
+                    sub_strategy[action * sub_len + sub_index];
+            }
+        }
+        Ok(result)
     }
 
     fn ev_line(&mut self) -> String {
@@ -1315,6 +1361,101 @@ check_every = 16
         );
 
         let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn compatible_river_support_has_no_epsilon_and_rejects_card_collisions() {
+        let ranges = PerPlayer::new("AsAh,AcAd".parse().unwrap(), "AsKh,KcKd".parse().unwrap());
+        let hands = PostflopHands::from_ranges(&[], &ranges);
+        let at = |player, a: &str, b: &str| {
+            hands
+                .index(
+                    player,
+                    cards::combo_index(a.parse().unwrap(), b.parse().unwrap()),
+                )
+                .unwrap()
+        };
+        let mut reach = PerPlayer::new(
+            vec![0.0; hands.len(Player::P0)],
+            vec![0.0; hands.len(Player::P1)],
+        );
+        reach[Player::P0][at(Player::P0, "As", "Ah")] = f32::MIN_POSITIVE;
+        reach[Player::P1][at(Player::P1, "Kc", "Kd")] = f32::MIN_POSITIVE;
+        assert!(has_compatible_reach(&hands, &reach));
+        reach[Player::P1].fill(0.0);
+        reach[Player::P1][at(Player::P1, "As", "Kh")] = 1.0;
+        assert!(!has_compatible_reach(&hands, &reach));
+    }
+
+    #[test]
+    fn lazy_river_restores_trunk_columns_after_board_removal() {
+        let (solver, info, street, summary) = build_and_solve::<F32Storage>(TINY_TURN_TOML, 8);
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("lazy-columns.sol");
+        export_sol(
+            &SolExportSpec {
+                path: path.clone(),
+                mode: SolStreets::NoRivers,
+                config_toml: TINY_TURN_TOML.into(),
+                storage_name: "f32".into(),
+            },
+            &solver,
+            &info,
+            street,
+            &summary,
+        )
+        .unwrap();
+        let loaded = load_sol(&path, 8, None).unwrap();
+        let tree = &loaded.pf_game.game.tree;
+        let ranges = &loaded.pf_game.game.root_ranges;
+        let roots = PerPlayer::new(ranges[Player::P0].as_slice(), ranges[Player::P1].as_slice());
+        let entry = (0..tree.nodes.len() as NodeId)
+            .find(|&id| {
+                let node = tree.node(id);
+                if node.kind != NodeKind::Action
+                    || loaded.streets[id as usize] != Street::River
+                    || loaded.parents[id as usize] == NodeId::MAX
+                    || tree.node(loaded.parents[id as usize]).kind != NodeKind::Chance
+                {
+                    return false;
+                }
+                let reach = reach_at(tree, roots, id, |_, sref, out| {
+                    out.copy_from_slice(
+                        &dequantize_probs(
+                            &loaded.blocks[&sref.index],
+                            sref.num_actions as usize,
+                            sref.num_hands as usize,
+                        )
+                        .unwrap(),
+                    );
+                });
+                reach[node.player].contains(&0.0)
+                    && has_compatible_reach(loaded.pf_game.game.evaluator.hands(), &reach)
+            })
+            .expect("fixture must include a reachable river that removes an acting hand");
+        let mut provider = SolProvider::new(&loaded);
+        let restored = provider.average_strategy(entry).unwrap();
+        let fresh = &provider.river_solves[&entry];
+        let node = tree.node(entry);
+        let sref = tree.storage_ref(node);
+        let trunk_hands = loaded.pf_game.game.evaluator.hands();
+        let sub_hands = fresh.solver.game().evaluator.hands();
+        let sub = fresh.solver.average_strategy_at(fresh.map[&entry]);
+        assert!(sub_hands.len(node.player) < trunk_hands.len(node.player));
+        assert_eq!(restored.len(), sref.len());
+        for (local, &combo) in trunk_hands.combos(node.player).iter().enumerate() {
+            for action in 0..sref.num_actions as usize {
+                let expected = sub_hands
+                    .index(node.player, combo as usize)
+                    .map_or(1.0 / sref.num_actions as f32, |i| {
+                        sub[action * sub_hands.len(node.player) + i]
+                    });
+                assert_eq!(
+                    restored[action * sref.num_hands as usize + local].to_bits(),
+                    expected.to_bits()
+                );
+            }
+        }
     }
 
     #[test]
@@ -1609,20 +1750,17 @@ check_every = 16
         let _ = std::fs::remove_file(&path);
     }
 
-    /// Values for hands that cannot be held at a node are stored as zero,
-    /// which is what keeps the value blocks as sparse as the strategy
-    /// blocks. Without it a counterfactual value — defined for every hand,
-    /// reachable or not — would be written for all 1,326 combos and would
-    /// dominate the artifact.
+    /// Root-zero hands are omitted, while later board-blocked hands retain
+    /// their root index and carry a zero saved value.
     #[test]
     fn unreachable_hands_are_stored_as_zero() {
         let (solver, node_info, start_street, summary) =
-            build_and_solve::<F32Storage>(TINY_RIVER_TOML, 64);
+            build_and_solve::<F32Storage>(TINY_TURN_TOML, 64);
         let path = temp_path("value-sparsity.sol");
         let spec = SolExportSpec {
             path: path.clone(),
             mode: SolStreets::Full,
-            config_toml: TINY_RIVER_TOML.to_string(),
+            config_toml: TINY_TURN_TOML.to_string(),
             storage_name: "f32".to_string(),
         };
         export_sol(&spec, &solver, &node_info, start_street, &summary).expect("export");
@@ -1630,32 +1768,46 @@ check_every = 16
         let _ = std::fs::remove_file(&path);
 
         let tree = &solver.game().tree;
-        let root_aux = tree.node(0).aux;
-        let block = payload
-            .values
-            .iter()
-            .find(|b| b.sref == root_aux)
-            .expect("root value block");
-        let num_hands = tree.storage_ref(tree.node(0)).num_hands as usize;
-        let stored = dequantize_values(&block.values, block.scale, num_hands * 2).expect("decode");
-
-        for seat in Player::BOTH {
-            let range = &solver.game().root_ranges[seat];
-            let base = seat.index() * num_hands;
-            let mut in_range = 0usize;
-            for hand in 0..num_hands {
-                if range[hand] > 0.0 {
-                    in_range += 1;
+        let ranges = &solver.game().root_ranges;
+        assert_eq!(ranges[Player::P0].len(), 12);
+        assert_eq!(ranges[Player::P1].len(), 12);
+        assert!(ranges[Player::P0].iter().all(|&weight| weight > 0.0));
+        let roots = PerPlayer::new(ranges[Player::P0].as_slice(), ranges[Player::P1].as_slice());
+        let mut zeros_checked = 0;
+        for id in 0..tree.nodes.len() as NodeId {
+            let node = tree.node(id);
+            if node.kind != NodeKind::Action {
+                continue;
+            }
+            let block = payload
+                .values
+                .iter()
+                .find(|block| block.sref == node.aux)
+                .unwrap();
+            let reach = reach_at(tree, roots, id, |aid, _, out| {
+                out.copy_from_slice(&solver.average_strategy_at(aid))
+            });
+            let stored = dequantize_values(
+                &block.values,
+                block.scale,
+                reach[Player::P0].len() + reach[Player::P1].len(),
+            )
+            .unwrap();
+            for seat in Player::BOTH {
+                let base = if seat == Player::P0 {
+                    0
                 } else {
-                    assert_eq!(
-                        stored[base + hand],
-                        0.0,
-                        "{seat:?} hand {hand} is out of range but carries a value"
-                    );
+                    reach[Player::P0].len()
+                };
+                for (hand, &weight) in reach[seat].iter().enumerate() {
+                    if weight == 0.0 {
+                        assert_eq!(stored[base + hand], 0.0, "{seat:?} node {id} hand {hand}");
+                        zeros_checked += 1;
+                    }
                 }
             }
-            assert!(in_range > 0 && in_range < num_hands, "{seat:?}: {in_range}");
         }
+        assert!(zeros_checked > 0);
     }
 
     /// The per-hand values a `.sol` stores must aggregate back to the root
@@ -1667,13 +1819,13 @@ check_every = 16
     /// chip amount, so putting it back is what re-forms the aggregate.
     #[test]
     fn stored_values_aggregate_to_the_reported_root_ev() {
-        let (solver, node_info, start_street, summary) =
-            build_and_solve::<F32Storage>(TINY_RIVER_TOML, 256);
+        let raw = TINY_RIVER_TOML.replace("ip_range = \"33,66\"", "ip_range = \"33,66,88\"");
+        let (solver, node_info, start_street, summary) = build_and_solve::<F32Storage>(&raw, 256);
         let path = temp_path("value-aggregate.sol");
         let spec = SolExportSpec {
             path: path.clone(),
             mode: SolStreets::Full,
-            config_toml: TINY_RIVER_TOML.to_string(),
+            config_toml: raw,
             storage_name: "f32".to_string(),
         };
         export_sol(&spec, &solver, &node_info, start_street, &summary).expect("export");
@@ -1687,17 +1839,30 @@ check_every = 16
             .iter()
             .find(|b| b.sref == root_aux)
             .expect("root value block");
-        let num_hands = tree.storage_ref(tree.node(0)).num_hands as usize;
-        let stored =
-            dequantize_values(&block.values, block.scale, num_hands * 2).expect("decode values");
+        let hands = solver.game().evaluator.hands();
+        assert_ne!(hands.len(Player::P0), hands.len(Player::P1));
+        let stored = dequantize_values(
+            &block.values,
+            block.scale,
+            hands.len(Player::P0) + hands.len(Player::P1),
+        )
+        .expect("decode values");
 
         for seat in Player::BOTH {
             let own = &solver.game().root_ranges[seat];
-            let facing = compatible_reach(&solver.game().root_ranges[seat.opponent()]);
-            let base = seat.index() * num_hands;
+            let facing = compatible_reach(
+                solver.game().evaluator.hands(),
+                seat,
+                &solver.game().root_ranges[seat.opponent()],
+            );
+            let base = if seat == Player::P0 {
+                0
+            } else {
+                hands.len(Player::P0)
+            };
             let mut weighted = 0.0f64;
             let mut total = 0.0f64;
-            for hand in 0..num_hands {
+            for hand in 0..hands.len(seat) {
                 let weight = own[hand] as f64 * facing[hand] as f64;
                 if weight <= 0.0 {
                     continue;
@@ -1812,7 +1977,11 @@ check_every = 16
             let mut expected = Vec::new();
             for player in Player::BOTH {
                 let cfvs = solver.expected_values_at(id, player, reach_slices);
-                let facing = compatible_reach(&reach[player.opponent()]);
+                let facing = compatible_reach(
+                    solver.game().evaluator.hands(),
+                    player,
+                    &reach[player.opponent()],
+                );
                 expected.extend(cfvs.iter().zip(&facing).zip(&reach[player]).map(
                     |((&cfv, &opponent), &own)| {
                         if own > 0.0 && opponent > 0.0 {

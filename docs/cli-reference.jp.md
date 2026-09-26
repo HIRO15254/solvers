@@ -369,7 +369,8 @@ postflop の `.sol` として読む。
 
 **postflop**: node ごとに突き合わせるので、まず tree の形が一致していることを
 要求する(ノード数と保存 `sref` 集合)。既定ではさらに board / pot / effective
-stack の一致も要求し、`--cross-game` がその検査だけを外す。出力は JSON:
+stack の一致も要求し、`--cross-game` がその検査だけを外す。両席それぞれのroot hand領域は
+combo IDまで一致する必要があり、この条件は`--cross-game`でも維持する。出力は JSON:
 
 | field | 意味 |
 |---|---|
@@ -502,9 +503,18 @@ EV は元の subgame 開始基準を維持し、chip-EV は chip、ICM は prize
 
 レーキまたは外部 field を含む ICM の一般和設定では `validate` は
 `general-sum utilities, no Nash convergence guarantee` と表示する。
-`.sol` はindexed format version 3を使い、version 1 / 2は明示拒否する。旧artifactを使う場合は
-新規solve、または自己完結したrun config/checkpointを保持して旧 `solution.sol` を退避した後の
-resumeで生成し直す。保存時のEVを暗黙補正しない。
+`.sol` はindexed format version 4を使い、version 1 / 2 / 3は明示拒否する。
+共通HU checkpoint `.ckpt` はversion 2で、postflop・preflop HU・toyの旧version 1は再開できない。
+旧artifactは新規solveで生成し直す。旧checkpointのresumeを移行手段にせず、保存時のEVも暗黙補正しない。
+Multiwayの別containerにはこの変更を適用しない。
+postflopの私有ハンド領域は席ごとに初期rangeの正weightかつ開始boardと非衝突のcomboだけを
+global combo昇順で保持し、後続dealでもlocal IDを固定する。CLIのハンド名はglobal comboへ戻して表示する。
+`compare` は両席それぞれのhand領域が同じことも要求し、`--cross-game`でもこの検査を外さない。
+同じhand数でも異なるcomboの列は比較しない。
+chanceのない木のaction並列化は、rootのstorage要素数`W`と実行poolのworker数`P`から
+`grain = clamp(ceil(W / (4 * P)), 4096, 65536)`を決める。子subtreeのstorage要素数が
+grain以上の枝を2本以上持つnodeで分割し、深さ制限は設けない。`threads = 1`は直列対照。
+thread数を増やした際の速度向上は保証しない。
 `export ... summary` は `--node root` / `all` ならmetadataだけを読み、treeや全nodeを復元しない。
 未読nodeの破損検査や保存後profileのBR評価は行わない。
 postflop `solve` は外部tree sourceをインライン化したeffective TOMLをrun/artifact/hashへ共通利用する。
