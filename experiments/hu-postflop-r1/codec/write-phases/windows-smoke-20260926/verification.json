@@ -1,0 +1,149 @@
+{
+  "schema": "r1.writer-windows-smoke-retained-verification/v1",
+  "status": "retained_bytes_verified",
+  "source_revision": "2fecc099b9911511a0938fb2700bbb124bc1046e",
+  "source_files": 197,
+  "source_changed_files": [
+    "crates/formats/examples/sol_codec_bench.rs",
+    "crates/formats/src/lib.rs",
+    "crates/formats/src/sol_indexed.rs"
+  ],
+  "blob_count": 45,
+  "original_aliases": 53,
+  "stages": {
+    "copy": {
+      "outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "sample_count": 35,
+      "cleanup_complete": true,
+      "elapsed_seconds": 3.5800610999576747
+    },
+    "build": {
+      "outcome": [
+        "failed",
+        "descendants_after_root_exit",
+        1,
+        0
+      ],
+      "sample_count": 1187,
+      "cleanup_complete": true,
+      "elapsed_seconds": 122.25372559996322
+    },
+    "confirm": {
+      "outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "sample_count": 6,
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.5301433999557048
+    },
+    "off": {
+      "outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "sample_count": 42,
+      "cleanup_complete": true,
+      "elapsed_seconds": 2.3007771999109536
+    },
+    "on": {
+      "outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "sample_count": 42,
+      "cleanup_complete": true,
+      "elapsed_seconds": 2.1137784000020474
+    },
+    "validate": {
+      "outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "sample_count": 4,
+      "cleanup_complete": true,
+      "elapsed_seconds": 0.1688238000497222
+    }
+  },
+  "sol_bytes": 176833,
+  "sol_rewrites_byte_identical": true,
+  "canonical_and_root_byte_identical": true,
+  "phase": {
+    "status": "phase_record_valid_not_campaign_acceptance",
+    "parent_remainder_ns": 33500,
+    "inner_total_ns": 608515300,
+    "leaves": {
+      "chunk_compress_excluding_file": {
+        "calls": 226,
+        "ns": 474873100
+      },
+      "file_seek": {
+        "calls": 455,
+        "ns": 637500
+      },
+      "file_write": {
+        "calls": 463,
+        "ns": 7216900
+      },
+      "hash": {
+        "calls": 228,
+        "ns": 66290300
+      },
+      "metadata_compress": {
+        "calls": 1,
+        "ns": 332900
+      },
+      "metadata_prepare": {
+        "calls": 1,
+        "ns": 1700
+      },
+      "pair_refs": {
+        "calls": 226,
+        "ns": 619400
+      },
+      "persist": {
+        "calls": 1,
+        "ns": 704400
+      },
+      "serialize": {
+        "calls": 227,
+        "ns": 39656600
+      },
+      "size_and_group": {
+        "calls": 1,
+        "ns": 5396100
+      },
+      "sync": {
+        "calls": 1,
+        "ns": 10645900
+      },
+      "temp_create": {
+        "calls": 1,
+        "ns": 174400
+      },
+      "validation": {
+        "calls": 1,
+        "ns": 164400
+      }
+    },
+    "unclassified_ns": 1801700
+  },
+  "reran_build_or_solver": false,
+  "linux_126_process_campaign": "not_evaluated",
+  "calibration": "not_evaluated",
+  "performance_acceptance": "not_evaluated",
+  "r1_acceptance": null
+}

@@ -12,12 +12,14 @@
 | R1の実験資源と費用 | [HU Postflop Spot実験](hu-postflop-r1/cloud/README.md) | VM予約・source転送対象・自動削除期限と料金根拠。計算結果は別途検証する |
 | R1の費用証拠監査 | [9月25日UTCの4 VM](hu-postflop-r1/cloud/cost-audit-20260925/README.md) | 実時間・単価と226点の送信量。欠測・請求未反映を保持し、予約解放を認定しない |
 | R1の限定検証の対応表 | [HU Postflop検証](hu-postflop-r1/validation/README.md) | 独立oracle、Stud/Draw、抽象化、保存契約に対応するtestsとsourceの識別。外部24case認定とは分離 |
-| R1の固定ベット粗密対照 | [完全profileの移植・復元](hu-postflop-r1/validation/bet-refinement-20260926/README.md) | 21→49情報集合のEV保存と拡張BRを個別4 testsで照合。fmt/clippy成功、全workspace testは資源停止で未完了 |
+| R1の固定ベット粗密対照 | [完全profileの移植・復元](hu-postflop-r1/validation/bet-refinement-20260926/README.md) | 21→49情報集合のEV保存と拡張BRを個別4 testsで照合。fmt/clippy成功 |
 | R1の比較手順 | [HU pipeline比較](hu-postflop-r1/pipeline/README.md) | 基準pilotで条件を固定し、同一VMで交互比較する測定器と範囲 |
-| R1の実中断・再開対照 | [Windowsの20→1000反復](hu-postflop-r1/checkpoint/evidence-20260926/README.md) | 実Ctrl-Breakの終了130、最終checkpoint全bytesと保存後EV/BRの一致。全workspace testは資源停止で未完了 |
+| R1の実中断・再開対照 | [Windowsの20→1000反復](hu-postflop-r1/checkpoint/evidence-20260926/README.md) | 実Ctrl-Breakの終了130、最終checkpoint全bytesと保存後EV/BRの一致 |
+| R1のWindows全体検証 | [3d36aa8の通常workspace test](hu-postflop-r1/validation/windows-workspace-20260926/README.md) | 898 passed・30 ignored、199 source pinsの実行後一致、正常終了とcleanup。先行timeoutも別に保持 |
 | R1の最終source実測 | [source06比較](hu-postflop-r1/pipeline/current-report.md) | 同一AMD bootの交互3組、保存後profileの独立BR再評価、改善と容量増の両方 |
 | R1のbyte codec実測 | [source07 codec比較](hu-postflop-r1/codec/vm07-report.md)、[通常検証](hu-postflop-r1/validation/vm07-report.md) | 保存bytesを維持した読込み改善とFlop書込み回帰。96実行の独立byte照合、通常901 tests成功。全solveや外部品質へ外挿しない |
-| R1のwriter計測準備 | [区間計測と有限実行・保持検証](hu-postflop-r1/codec/write-phases/README.md) | 6条件の対照・計測摂動の校正・非重複区間。全69合成tests成功、Rust buildと実測は未実施であり、回帰原因の認定ではない |
+| R1のwriter計測準備 | [区間計測と有限実行・保持検証](hu-postflop-r1/codec/write-phases/README.md) | 6条件の対照・計測摂動の校正・非重複区間。全69合成tests成功。Linuxの4 release builds・126標本は未実施 |
+| R1のwriter計測実動確認 | [Windows debugのOFF/ON](hu-postflop-r1/codec/write-phases/windows-smoke-20260926/README.md) | 226 chunksの区間収支と元SOL・canonicalのbyte一致。単発の実動確認であり、速度・校正・回帰原因を認定しない |
 | R1の受入証拠の範囲 | [事前条件の監査](hu-postflop-r1/acceptance/audit.jp.md)、[将来の外部比較器](hu-postflop-r1/acceptance/external-contract.md) | 既存の事前条件と測定後索引を区別。将来の閾値発行・校正・欠測の検査であり、総合受入の認定ではない |
 | R1の実入力への境界適用 | [抽象化の適用確認](hu-postflop-r1/reference/abstraction-applicability.md) | 017/019のhand identity・joint重み・完全記憶の検査と、未実装・未評価の範囲 |
 | R1の工程別診断 | [source03 phase比較](hu-postflop-r1/phases/vm06-report.md) | 別instrumented buildのon/off較正、重複しない工程時間、元の性能実測との区別 |

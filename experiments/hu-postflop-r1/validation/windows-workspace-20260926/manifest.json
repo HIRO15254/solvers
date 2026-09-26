@@ -1,0 +1,574 @@
+{
+  "schema": "r1.windows-workspace-retention/v1",
+  "source_commit": "3d36aa8e43ceb25f398e281986dda96ea1df7cac",
+  "files": {
+    "768m-timeout/plan.json.gz": {
+      "encoding": "gzip",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-768m-20260926\\plan.json",
+      "bytes": 11670,
+      "sha256": "a21a5b891859feaf3bd2896d190e35cab7dca2b3ba5197ce0920e51e03241332",
+      "original_bytes": 32912,
+      "original_sha256": "93f20306c92e9e48d44469261024b0ea13bc0e9211d5a46066b9fe3aa703f6ce"
+    },
+    "768m-timeout/samples.jsonl.gz": {
+      "encoding": "gzip",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-768m-20260926\\samples.jsonl",
+      "bytes": 172025,
+      "sha256": "728b5b26ab677e5981ff5a9efa6f18ac66b78b85a9e32b868d9e1bc92b0e8d57",
+      "original_bytes": 2200928,
+      "original_sha256": "b8458b9515e325febc4b7d2750e77a73e82d531d8c4b904f6b5decdd6ed4381f"
+    },
+    "768m-timeout/source-after.json.gz": {
+      "encoding": "gzip",
+      "original_path": "generated:768m-timeout/source-after.json",
+      "bytes": 10907,
+      "sha256": "938734fb1dc63015e947131c3fcb293839caf9eb633f304584985f50ae018d7e",
+      "original_bytes": 31357,
+      "original_sha256": "61fdd9a5ea3da1ea5fd2d387d2a61fa61c3ab2d7b0d2b85a5a2a5fd1095e4c03"
+    },
+    "768m-timeout/stderr.log.gz": {
+      "encoding": "gzip",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-768m-20260926\\stderr.log",
+      "bytes": 503,
+      "sha256": "45e336eca627113acb427785ce41887a034c348ce1ba2ccda3e0186dcc02d8d3",
+      "original_bytes": 2061,
+      "original_sha256": "aabbb6409ba2f3796973b9fb31df3110b78a9c07c835f52af914c67f31b3c782"
+    },
+    "768m-timeout/stdout.log.gz": {
+      "encoding": "gzip",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-768m-20260926\\stdout.log",
+      "bytes": 5844,
+      "sha256": "f3ea20e8a94366d23227c8d26c3cff84c1df85208021d9f6694096751a8a3033",
+      "original_bytes": 22252,
+      "original_sha256": "8ca45f3e26330d2ea3e66658a1775f1213234bb53bf22c362bb8791885711906"
+    },
+    "768m-timeout/supervisor.json.gz": {
+      "encoding": "gzip",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-768m-20260926\\supervisor.json",
+      "bytes": 1939,
+      "sha256": "054872657f3c6324c765a8e278944aea6f34fba68462f0d390e48a0bcafec51e",
+      "original_bytes": 6268,
+      "original_sha256": "905e7e90ade2747951caa5793f7db32ea8b236101c7e885a4ebb6b448ec26ee9"
+    },
+    "warm-4threads/source-after.json.gz": {
+      "encoding": "gzip",
+      "original_path": "generated:warm-4threads/source-after.json",
+      "bytes": 10914,
+      "sha256": "2f929dbe687a33ce0cc24ddd6b3b708ba5f0e4bdeccdc2cc4d6c073ff5c0804c",
+      "original_bytes": 31366,
+      "original_sha256": "483e0301699e3d3e83325d714bb9c225bb12484c9dd6968dc45a2951766416ec"
+    },
+    "warm-4threads/plan.json.gz": {
+      "encoding": "gzip",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-warm-4threads-20260926\\plan.json",
+      "bytes": 11711,
+      "sha256": "3a721fdc3f58c848bcc8f888d93eca8e97b733439c131afadf9b8d18e0ad8e03",
+      "original_bytes": 32965,
+      "original_sha256": "b264c0281e395901cdf77e6ec5b5b20704c3abace51e289e01aaadb7e78b11b7"
+    },
+    "warm-4threads/supervisor.json.gz": {
+      "encoding": "gzip",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-warm-4threads-20260926\\supervisor.json",
+      "bytes": 1858,
+      "sha256": "eb6ae506ec0097dd51c9742cc63c2a0bb82b26ed68b3f614019140af86ec54a5",
+      "original_bytes": 5971,
+      "original_sha256": "8e200fb3722719e5fc9dd82dd3d645e9c4ee925435873358a7775b97729a4f42"
+    },
+    "warm-4threads/stdout.log.gz": {
+      "encoding": "gzip",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-warm-4threads-20260926\\stdout.log",
+      "bytes": 18616,
+      "sha256": "e355dfcc5c0b91713127a5db1ea96cf476ee058dc93692080057599631e1a658",
+      "original_bytes": 79177,
+      "original_sha256": "025d922c91dc22f498f73e6133c9cc4efb56de91230ab26710a454470c91faf7"
+    },
+    "warm-4threads/stderr.log.gz": {
+      "encoding": "gzip",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-warm-4threads-20260926\\stderr.log",
+      "bytes": 1126,
+      "sha256": "d64155e0445601df1c020b9ded940053ec12f64fdc73e491afa834bbf1745854",
+      "original_bytes": 4641,
+      "original_sha256": "c2e15f72f09ddd2f3a1be68ed4626dcf79d52cf1b9ef79d20ded012b1e86ff14"
+    },
+    "warm-4threads/samples.jsonl.gz": {
+      "encoding": "gzip",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-warm-4threads-20260926\\samples.jsonl",
+      "bytes": 151595,
+      "sha256": "4c2f8ee29dc6faedde99c750b5b5d790bf7f40f7947a2d61c32de6a69031f03a",
+      "original_bytes": 2045870,
+      "original_sha256": "753879e1e6ea4813f8227ef943b956db171b4128658812fb63bc77c03fba6bc6"
+    }
+  },
+  "attempts": {
+    "768m-timeout": {
+      "plan": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-768m-20260926\\plan.json",
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-768m-20260926\\supervisor.json",
+      "post_source_check": "generated:768m-timeout/source-after.json",
+      "expected_outcome": [
+        "timeout",
+        "timeout",
+        124,
+        3221225786
+      ],
+      "test_summaries": [
+        [
+          30,
+          0,
+          3,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          93,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          144,
+          0,
+          2,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "completed_test_summary_totals": [
+        273,
+        0,
+        6,
+        0,
+        0
+      ],
+      "workspace_complete": false
+    },
+    "warm-4threads": {
+      "plan": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-warm-4threads-20260926\\plan.json",
+      "record": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\r1-workspace-warm-4threads-20260926\\supervisor.json",
+      "post_source_check": "generated:warm-4threads/source-after.json",
+      "expected_outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "test_summaries": [
+        [
+          30,
+          0,
+          3,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          93,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          144,
+          0,
+          2,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          24,
+          0,
+          5,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          8,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          14,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          15,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          20,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          56,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          13,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          2,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          11,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          10,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          7,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          5,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          29,
+          0,
+          8,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          2,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          8,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          311,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          24,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          5,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "completed_test_summary_totals": [
+        898,
+        0,
+        30,
+        0,
+        0
+      ],
+      "workspace_complete": true
+    }
+  },
+  "scope": "Windows ordinary workspace test command; no performance, ignored-test, Linux-signal, external-quality or R1 acceptance claim."
+}

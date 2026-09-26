@@ -1,0 +1,53 @@
+{
+  "schema": "r1.windows-workspace-retained-verification/v1",
+  "status": "retained_bytes_verified",
+  "file_count": 12,
+  "checks": {
+    "768m-timeout": {
+      "outcome": [
+        "timeout",
+        "timeout",
+        124,
+        3221225786
+      ],
+      "workspace_complete": false,
+      "completed_test_summary_totals": [
+        273,
+        0,
+        6,
+        0,
+        0
+      ],
+      "sample_count": 5945,
+      "cleanup_complete": true,
+      "source_files_matched_after_run": 199,
+      "elapsed_seconds": 600.4248957000673,
+      "sampled_peak_tree_resident_bytes": 759042048
+    },
+    "warm-4threads": {
+      "outcome": [
+        "completed",
+        "completed",
+        0,
+        0
+      ],
+      "workspace_complete": true,
+      "completed_test_summary_totals": [
+        898,
+        0,
+        30,
+        0,
+        0
+      ],
+      "sample_count": 5569,
+      "cleanup_complete": true,
+      "source_files_matched_after_run": 199,
+      "elapsed_seconds": 584.2635072998237,
+      "sampled_peak_tree_resident_bytes": 227524608
+    }
+  },
+  "reran_cargo_or_solver": false,
+  "linux_signal_tests": "not_evaluated",
+  "external_quality": "not_evaluated",
+  "r1_acceptance": null
+}

@@ -1,11 +1,16 @@
 # SOL writer の区間計測準備
 
-これは **未実行の研究用計測パッチと前向きプロトコル**である。
+これは **研究用計測パッチとLinux実験の前向きプロトコル**である。
 [VM07 codec 結果](../vm07-report.md)の Flop 保存中央値
 303.004095 → 367.827635 ms という観測を保持したまま、次の実験で区間を切り分ける。
 原因を認定した資料でも、保存高速化・R1合格の証拠でもない。
 production、旧96標本、旧runner、入力、quality targetを変更しない。
 本準備は追加クラウド支出・VM起動の許可を与えない。
+
+[Windows debugでの単発OFF/ON](windows-smoke-20260926/README.md)では、candidateの
+実buildと226 chunksの計測を行い、区間収支・元SOLとのbyte一致を確認した。
+初回buildの子process終了失敗も保持したうえで、同じbinaryの不変性と正常終了を別に確認した。
+これは下記Linuxの4 release builds・126標本・計測摂動の校正を代替しない。
 
 ## 固定対象と適用
 
@@ -39,7 +44,7 @@ python experiments/hu-postflop-r1/codec/write-phases/apply.py --source CLEAN-CAN
 python experiments/hu-postflop-r1/codec/write-phases/test_write_phases.py -v
 ```
 
-このpackageのRust build・実機計測は未実施。適用/負例のPython検査はRust型検査や
+下記のLinux用Rust build・実機計測は未実施。適用/負例のPython検査はRust型検査や
 syscall動作検証の代わりにならない。[準備検査の記録](preparation-checks.json)には
 14 Python tests、documentation checkerの8 tests、現workspaceのfmt check成功を残す。
 root担当の実行前buildでは、Rust/Cargoの実体hash、
@@ -144,7 +149,8 @@ phase-specific RSS、cold storage、physical disk、solver性能、保存BR、�
 Python 14テストでmissing phase、二重合算、負値/bool/NaN、呼出し数・byte数・parent不整合、
 通常Errの非認定、順番/有限数、両Git writerへの同一patch、元byte保持、dirty source拒否を検査した。
 Git archiveから作った一時sourceでplain/instrumented copyの適用・after manifest照合も通した。
-生成writer/exampleのrustfmt parseは成功した。Rust型検査・Cargo build・実機性能測定は未実施である。
+この準備時点では生成writer/exampleのrustfmt parseだけを実行し、Rust型検査・Cargo build・
+実機性能測定は行っていない。後続のWindows実動確認は冒頭の別証拠に記録する。
 独立静的レビューで見つかったFile tap欠落受理を修正し、負例を追加した。
 
 ## 専用runnerとfreeze入力

@@ -70,3 +70,6 @@ python experiments/hu-postflop-r1/checkpoint/evidence-20260926/verify.py
 この検査は保持bytes・記録・checkpoint同値・保存後数値の再照合で、solverやRust testの再実行ではない。
 実中断の対照はWindowsで再実行済み。通常workspaceの検証範囲はpartial。
 I16、Turn/Flop、複数worker、外部24case、性能改善、R1総合受入は本結果の対象外。
+
+同じ`3d36aa8` sourceの後続[Windows workspace実行](../../validation/windows-workspace-20260926/README.md)
+では898 passed・30 ignoredで完了した。本証拠内の先行資源停止記録はそのまま保持する。

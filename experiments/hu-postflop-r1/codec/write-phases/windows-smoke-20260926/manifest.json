@@ -1,0 +1,484 @@
+{
+  "schema": "r1.writer-windows-smoke-retention/v1",
+  "retained_at": "2026-09-26T00:17:13.577717+00:00",
+  "original_root": "E:\\codex-work\\solvers\\r1-writer-smoke-20260926",
+  "source_revision": "2fecc099b9911511a0938fb2700bbb124bc1046e",
+  "blobs": {
+    "raw/build-plan.json.gz": {
+      "encoding": "gzip",
+      "bytes": 11513,
+      "sha256": "dc8c8d8f5f0d39052ed62edb9db6f8b4d628381c1e514958906fbf45fb99b2b3",
+      "decoded": {
+        "bytes": 32778,
+        "sha256": "34ec374b0e60e01003ef3df58181ced718879de458e0f85c0a1c36498b500562"
+      }
+    },
+    "raw/build-result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 10550,
+      "sha256": "0ec7698c66536666fcb1cf8f2031f346c37295c14c7af868e787a43b3c57cd39",
+      "decoded": {
+        "bytes": 30602,
+        "sha256": "46335692754162c4afeae8cd7f163edbc6584153802ef248cc9103c77a42eca4"
+      }
+    },
+    "raw/build-smoke.py.gz": {
+      "encoding": "gzip",
+      "bytes": 1597,
+      "sha256": "ae797317e09eb366889dbf0d5b1161524fd5aa302bf80cbbcad37506c9d49850",
+      "decoded": {
+        "bytes": 3466,
+        "sha256": "0ef54026f5fffc32cf4c74eb46c3c7c3119f32625629d6d11e187f131681de2f"
+      }
+    },
+    "raw/build.json.gz": {
+      "encoding": "gzip",
+      "bytes": 23952,
+      "sha256": "da66141fc4073e7ac2aff6d3bfbd2ccec9a0c2bf5f528f80efe6cdfc10d116ce",
+      "decoded": {
+        "bytes": 104256,
+        "sha256": "260a7be30edf4636a5111720d559ee74155ea0d6c4590d6341c765ea6893757e"
+      }
+    },
+    "raw/build.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 38815,
+      "sha256": "cac0a0b4d789d0956019b64aecf61701d9ccc99b93d4a7d2c4725d1746bfc46e",
+      "decoded": {
+        "bytes": 441978,
+        "sha256": "dde4676e7da113058b63a9befc654476bdc77832083566750d3e95e23e5c6525"
+      }
+    },
+    "raw/build.stderr.log.gz": {
+      "encoding": "gzip",
+      "bytes": 778,
+      "sha256": "b6cc380a6f134ce555dea213b9e5e63b74af020a99104808008b92ed311c5bae",
+      "decoded": {
+        "bytes": 2293,
+        "sha256": "c5c18768ce9311e2280b4b63fa9944ab7f436e1029069a110c09c446154025d2"
+      }
+    },
+    "raw/build.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 20,
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "decoded": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "raw/confirm-build.py.gz": {
+      "encoding": "gzip",
+      "bytes": 1172,
+      "sha256": "7917f6f141066e9699f383181f0b4a5d66530452a645dfe72435201811bc9b3d",
+      "decoded": {
+        "bytes": 2474,
+        "sha256": "7ebe42b83bc7e8bf8655374986d5e07ea9d51cddd0a34e05b7f19066ff62a186"
+      }
+    },
+    "raw/confirm-plan.json.gz": {
+      "encoding": "gzip",
+      "bytes": 11319,
+      "sha256": "c7b76376e22b04cfab5fbf7f99e6434ad14bf27d2cd033d9e1408565baa81552",
+      "decoded": {
+        "bytes": 32247,
+        "sha256": "d5afb84f215687cb8d4af9d96bed35d1d724f74c1c9b5899d7d267fce7cf96cf"
+      }
+    },
+    "raw/confirm-result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 319,
+      "sha256": "c9555751b5c9c5382f7fa1c9519ec655893e9368b5e72c034f3f6eaf2d65f0b3",
+      "decoded": {
+        "bytes": 455,
+        "sha256": "3d3428ca10c617f97cdfe3c0a25d2b52e751ad8e57741802c0f5449421adf4c6"
+      }
+    },
+    "raw/confirm.json.gz": {
+      "encoding": "gzip",
+      "bytes": 23839,
+      "sha256": "f3cf187b1e24d6cb100b39c741c2a6ff6b9c6819c1940c097f3a2984432946a7",
+      "decoded": {
+        "bytes": 103909,
+        "sha256": "038e885c6e7062b57536643185870d2614f20b8bcb65231e1613df2f77d0e503"
+      }
+    },
+    "raw/confirm.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 483,
+      "sha256": "28e2d64f8414b52e9bb8f8e8766bd78eaa2dc0cb1cb9e59210b3b25d5ecb2ac5",
+      "decoded": {
+        "bytes": 2134,
+        "sha256": "a56e03855d4916ae8736c83aa1b8065df79674cc984064d1f82695d5d9c5845d"
+      }
+    },
+    "raw/confirm.stderr.log.gz": {
+      "encoding": "gzip",
+      "bytes": 80,
+      "sha256": "8aa26e9c49be3123e9535d9f8b4d91c3a813279a62acc1e040f4ec82d07e674e",
+      "decoded": {
+        "bytes": 60,
+        "sha256": "1f788b66ea062f199afb46076a789cb2520299b3af49e5c9c7f501bfacae9f7f"
+      }
+    },
+    "raw/copy.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2139,
+      "sha256": "b14ca24933904e604c06000ecb45397a01630f67a0914e0cb58f91d3489ed86a",
+      "decoded": {
+        "bytes": 7564,
+        "sha256": "c7729ce51307597bf1742440c62d1e3688107b248ad89ff9501eaf7611a68bcf"
+      }
+    },
+    "raw/copy.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 1691,
+      "sha256": "6b25632ba17f7219f0ac59fa227b315507803222dccc6b7a3dcdf702bb1ea3f6",
+      "decoded": {
+        "bytes": 12584,
+        "sha256": "bef6f18eeaf2d59edcd38b747f27e4d2b40eef3216b9032e2c7b246e14c1ca4c"
+      }
+    },
+    "raw/copy.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 121,
+      "sha256": "507b9567e9e1c1871c0c4c0d73790a48b135b4cbdd35bfe131307fd568dbb68c",
+      "decoded": {
+        "bytes": 114,
+        "sha256": "114163da6ef008641a2dc479577f7f0df39fff9bb46865e2816599347d749bfa"
+      }
+    },
+    "raw/flop.sol.gz": {
+      "encoding": "gzip",
+      "bytes": 75951,
+      "sha256": "f6ced193c24d5881b47e06f7c88e8871ed44196c72a113627fae3d102c058bfd",
+      "decoded": {
+        "bytes": 176833,
+        "sha256": "5f9fc7a35a4a4e034d029844ced6251e1603c9de269b69b6c275ae7034d837f1"
+      }
+    },
+    "raw/off.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2032,
+      "sha256": "aca712871a97874e99230394978ce890b68144433768bd9a1095d9f5898963b5",
+      "decoded": {
+        "bytes": 7232,
+        "sha256": "1731987bd3cde362e0b4daf599d5ae066c731cb8141b2ae70ce52530cd7b4ef9"
+      }
+    },
+    "raw/off.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 1856,
+      "sha256": "27c3c7ac1f33ae29c1ef03eea24d76c663bb3ee371d8f7178b9193556ac6df46",
+      "decoded": {
+        "bytes": 15176,
+        "sha256": "1d7affba03c14c4e3a9bf44829abd04a42a239a2f80fc6ab880fd5e7afde86dc"
+      }
+    },
+    "raw/off.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 33906,
+      "sha256": "3bc6aa650fdcea64f34a036f5c2839baaf1b1ed1c94b26cc40b61dc397df9df7",
+      "decoded": {
+        "bytes": 77585,
+        "sha256": "91c10e820007ca556643d597a4aa952af851cfa4f8e6a3a604ee03a8e2fe08c2"
+      }
+    },
+    "raw/on.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2036,
+      "sha256": "dfd123bb2a5e2b054b4e96069bd90a0fa0e5bee25077d98223b33303744ac4d2",
+      "decoded": {
+        "bytes": 7229,
+        "sha256": "730ff99cb83cb71181399550ab3e59ca6acedccb167c47fbf3e0d4a10a0d7ad8"
+      }
+    },
+    "raw/on.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 1862,
+      "sha256": "7ebedecc84fbeb28c8e4d2ba720cbff7532d604b27842198c8165534e5245fb1",
+      "decoded": {
+        "bytes": 15188,
+        "sha256": "613772cf40ac869d668b9219f4fea7a79a2678b39ed80c2d23f8a40e450cac2a"
+      }
+    },
+    "raw/on.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 33903,
+      "sha256": "271582465149db69605bb1144fe9a7804e45da6dbb46f115e616575779fb11bf",
+      "decoded": {
+        "bytes": 77585,
+        "sha256": "a9554dc04d9a034244702dcad53248fe2234cca326cdd0b49a06c857c71027ab"
+      }
+    },
+    "raw/preparation.json.gz": {
+      "encoding": "gzip",
+      "bytes": 11149,
+      "sha256": "3f11a7be7d6e392035c6d83e29b562f5c647b8ba83aba90a4037f1edbf17ecaf",
+      "decoded": {
+        "bytes": 32493,
+        "sha256": "36bb96d45ac4a0bb7057c6e5867653bdaf9a0423b51d698b6834afcb209d3e22"
+      }
+    },
+    "raw/run-smoke.py.gz": {
+      "encoding": "gzip",
+      "bytes": 1777,
+      "sha256": "3668dfa7210a604c1d50ca2e989ad48359ce7390885e57b95d3e5721b3a42724",
+      "decoded": {
+        "bytes": 4299,
+        "sha256": "671a76ad52c687007fdf2ef76b24c8ea209c026e3f6d0fff4e5deb5727176fcc"
+      }
+    },
+    "raw/smoke-plan.json.gz": {
+      "encoding": "gzip",
+      "bytes": 11515,
+      "sha256": "5686b30d6ed55d996b033f754f0bbf7a464ab4d5e9e35b43f9c94613254bb0a1",
+      "decoded": {
+        "bytes": 33629,
+        "sha256": "c30e28e451e9e18985a74718cfaa7f293039e72b44da3014f97baf0d3070ad40"
+      }
+    },
+    "raw/smoke-result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 984,
+      "sha256": "336b2990357a500221f22fe4e185787b63e0c87a5e9c61709bf9b9135f4c4a70",
+      "decoded": {
+        "bytes": 3619,
+        "sha256": "ec781c069042cefc18b516f841aa2222e06d0964eb2000ef40712b5c8d002a8e"
+      }
+    },
+    "raw/validate.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2065,
+      "sha256": "a1e31ef049a47fc2eca78466d74bb59207eba75c43c65d1e8707985e2bd22ae5",
+      "decoded": {
+        "bytes": 7594,
+        "sha256": "ad916b0d448db8d51b9316602111f755575bc8b13dac9f8dbdca125651cc693d"
+      }
+    },
+    "raw/validate.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 409,
+      "sha256": "302083a36d435856fd5e690953dbacdedae8d53a0182b49d60566d92eb031805",
+      "decoded": {
+        "bytes": 1411,
+        "sha256": "7c306e2847901ec377aeb5bc2dff3035a4bb92cc81ce84b477766f9687baa775"
+      }
+    },
+    "raw/validate.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 337,
+      "sha256": "cf60a9b08fcb6e585716f9ba73ca5f23a0d7deb8bbbe661a934ba648bebdd070",
+      "decoded": {
+        "bytes": 743,
+        "sha256": "98807342cce8a7fb625d8c77f793b26d8e10cacfbb6dcb3e1b06af32ed4009be"
+      }
+    },
+    "outputs/off/artifacts/canonical.bin.gz": {
+      "encoding": "gzip",
+      "bytes": 390559,
+      "sha256": "5462d82af51b0f4d3fda4d7781fe6cf1c94555082d2266d0694e3ebb97217ead",
+      "decoded": {
+        "bytes": 115060885,
+        "sha256": "88a2db6d80c6ae7747b3ae95f687154fca2102395624a8604dcda54764d13ae8"
+      }
+    },
+    "outputs/off/artifacts/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 35449,
+      "sha256": "4097d34e3550d5376f3be70a5d1fbc20b6983b3f12223843265e6b6b37ca8ce2",
+      "decoded": {
+        "bytes": 149958,
+        "sha256": "aae9c89170bd1b224fa3f1b6afd850655fb405d7ce3dfbce25e688210853f483"
+      }
+    },
+    "outputs/off/artifacts/root-canonical.bin.gz": {
+      "encoding": "gzip",
+      "bytes": 682,
+      "sha256": "0a2c432cdc3bfef01a6afd3ac70fa9e80b5aa1f9b5c40ac6c1a07c728cf94937",
+      "decoded": {
+        "bytes": 11473,
+        "sha256": "49c3eed4901f5cf2d322dcfb28148c55c19861ddf89897ff72b7df9717840978"
+      }
+    },
+    "outputs/on/artifacts/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 35450,
+      "sha256": "516dc892d951e55348ec795c5aed8cfd9c80462e25dc9035ee4b88593ebc63d6",
+      "decoded": {
+        "bytes": 149958,
+        "sha256": "585ddf2be092ff977dd6310ca698342c05ee387a0ee5919fa89807cb3e2a2972"
+      }
+    },
+    "outputs/on/phase.json.gz": {
+      "encoding": "gzip",
+      "bytes": 563,
+      "sha256": "c5dd13e3361d90c7eb3ab0daabd0b6228ea2f8f498379eb8f9aa739512cf347b",
+      "decoded": {
+        "bytes": 1710,
+        "sha256": "45130010bcc7e6715562af6bb92255513f164f403698583dac2b8d2433a4d82e"
+      }
+    },
+    "source/r1-write-phase-source.json.gz": {
+      "encoding": "gzip",
+      "bytes": 11713,
+      "sha256": "eb707109eff2c3f26cb7b59aed87beb7c1b278dfe5e62012bd92e2cd37498335",
+      "decoded": {
+        "bytes": 62312,
+        "sha256": "81cccd8194a38b2617d94067f4d6df73789bec525347bbbbb4b8e2246c3a6e64"
+      }
+    },
+    "source/instrumentation.patch.gz": {
+      "encoding": "gzip",
+      "bytes": 4503,
+      "sha256": "2f0cdebd522410049b2fd550e2b0d5602e0cbb4583f6d5f43f351fa4939e9f27",
+      "decoded": {
+        "bytes": 17728,
+        "sha256": "4e236e417e80fbe3a8008854b9780df5d5a585b3735edac6dcd7db5caed7972a"
+      }
+    },
+    "tools/apply.py.gz": {
+      "encoding": "gzip",
+      "bytes": 4079,
+      "sha256": "8ab527e89dec3949319f41be41597136a44f9894c615aa642a7567b12d4850e1",
+      "decoded": {
+        "bytes": 11898,
+        "sha256": "49a8a9c1bab0fd25dcc56a26875df2e2f51ab4ce4286c840fe57aa8111f11d01"
+      }
+    },
+    "tools/runtime.rs.inc.gz": {
+      "encoding": "gzip",
+      "bytes": 1819,
+      "sha256": "9b5f7d33233afe609bc0cc0fe402147ace3d4d5e49161435f34a66ee3a6b2a5b",
+      "decoded": {
+        "bytes": 6986,
+        "sha256": "7488540ebb8fe4876178160c13fb86b2313f8425fa41fe425ac69fe7c031d62a"
+      }
+    },
+    "tools/protocol.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2051,
+      "sha256": "843928fc688327ae57f2c945d5b033cc6153df7de9f296ae33c1f698e1ce1962",
+      "decoded": {
+        "bytes": 4112,
+        "sha256": "48706566e82ecde9cb6089cc40458c66398377c317231302f29ebffbd785371d"
+      }
+    },
+    "tools/source-pins.json.gz": {
+      "encoding": "gzip",
+      "bytes": 20699,
+      "sha256": "48a2a48ab37e9d3fd9f1878a2eb607bfed460d885bd61c3fbfa94b0bbb8e1a5e",
+      "decoded": {
+        "bytes": 67017,
+        "sha256": "2a78141bfe7694957ec09689843bd0231f470b327e9933552d53fe7c52de1292"
+      }
+    },
+    "tools/validate.py.gz": {
+      "encoding": "gzip",
+      "bytes": 2234,
+      "sha256": "affc149c5e57211423d5344a343a65df68d155ff2a654604f3a91a480e0f219f",
+      "decoded": {
+        "bytes": 6916,
+        "sha256": "3bd05ea963f91854f4dc3bb8856849d566bd88d78a516a08198213a6ae805e50"
+      }
+    },
+    "tools/run_supervised.py.gz": {
+      "encoding": "gzip",
+      "bytes": 10395,
+      "sha256": "c19fd361c87ce8fd44d2c3dce06a0945e79d64d2318a9bd1a8e8ebcd4911df79",
+      "decoded": {
+        "bytes": 39015,
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      }
+    },
+    "binary/sol_codec_bench.exe.gz": {
+      "encoding": "gzip",
+      "bytes": 615306,
+      "sha256": "feeb03ceb72507bef35a7c7763d5aab5a7f1fac7ec4073d4186e2a65277cbc49",
+      "decoded": {
+        "bytes": 1891840,
+        "sha256": "8248720a768f2a8a74c92b5bf66c8f698c105d20e62e2fe18a03babec32e9628"
+      }
+    },
+    "source/source-bundle.tar.gz": {
+      "encoding": "gzip",
+      "bytes": 919100,
+      "sha256": "82fe7c210b12d2881858eda867a699d295728444e4e334c0aeeca2e3ed1b950d",
+      "decoded": {
+        "bytes": 4147200,
+        "sha256": "0b71c49a626b3c55d3923ee1449fe76505ee20d96dafb995f047d9d33e28d122"
+      }
+    }
+  },
+  "originals": {
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\build-plan.json": "raw/build-plan.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\build-result.json": "raw/build-result.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\build-smoke.py": "raw/build-smoke.py.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\build.json": "raw/build.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\build.samples.jsonl": "raw/build.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\build.stderr.log": "raw/build.stderr.log.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\build.stdout.log": "raw/build.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\confirm-build.py": "raw/confirm-build.py.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\confirm-plan.json": "raw/confirm-plan.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\confirm-result.json": "raw/confirm-result.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\confirm.json": "raw/confirm.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\confirm.samples.jsonl": "raw/confirm.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\confirm.stderr.log": "raw/confirm.stderr.log.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\confirm.stdout.log": "raw/build.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\copy.json": "raw/copy.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\copy.samples.jsonl": "raw/copy.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\copy.stderr.log": "raw/build.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\copy.stdout.log": "raw/copy.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\flop.sol": "raw/flop.sol.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\off.json": "raw/off.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\off.samples.jsonl": "raw/off.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\off.stderr.log": "raw/build.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\off.stdout.log": "raw/off.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\on.json": "raw/on.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\on.samples.jsonl": "raw/on.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\on.stderr.log": "raw/build.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\on.stdout.log": "raw/on.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\preparation.json": "raw/preparation.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\run-smoke.py": "raw/run-smoke.py.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\smoke-plan.json": "raw/smoke-plan.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\smoke-result.json": "raw/smoke-result.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\validate.json": "raw/validate.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\validate.samples.jsonl": "raw/validate.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\validate.stderr.log": "raw/build.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\validate.stdout.log": "raw/validate.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\off\\output\\canonical.bin": "outputs/off/artifacts/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\off\\output\\result.json": "outputs/off/artifacts/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\off\\output\\rewritten.sol": "raw/flop.sol.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\off\\output\\root-canonical.bin": "outputs/off/artifacts/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\on\\output\\canonical.bin": "outputs/off/artifacts/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\on\\output\\result.json": "outputs/on/artifacts/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\on\\output\\rewritten.sol": "raw/flop.sol.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\on\\output\\root-canonical.bin": "outputs/off/artifacts/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\on\\phase.json": "outputs/on/phase.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\candidate-instrumented\\r1-write-phase-source.json": "source/r1-write-phase-source.json.gz",
+    "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\candidate-instrumented\\instrumentation.patch": "source/instrumentation.patch.gz",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\codec\\write-phases\\apply.py": "tools/apply.py.gz",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\codec\\write-phases\\runtime.rs.inc": "tools/runtime.rs.inc.gz",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\codec\\write-phases\\protocol.json": "tools/protocol.json.gz",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\codec\\write-phases\\source-pins.json": "tools/source-pins.json.gz",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\codec\\write-phases\\validate.py": "tools/validate.py.gz",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py": "tools/run_supervised.py.gz",
+    "E:\\codex-work\\solvers\\target\\r1-writer-smoke-20260926\\debug\\examples\\sol_codec_bench.exe": "binary/sol_codec_bench.exe.gz"
+  },
+  "scope": "One Windows debug candidate OFF/ON pair; runtime smoke only. Original failed build is retained unchanged; no campaign, calibration, performance or R1 acceptance.",
+  "source_bundle": {
+    "blob": "source/source-bundle.tar.gz",
+    "source_manifest": "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\candidate-instrumented\\r1-write-phase-source.json",
+    "instrumented_root": "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\candidate-instrumented",
+    "original_source_root": "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\candidate-original",
+    "changed_files": [
+      "crates/formats/examples/sol_codec_bench.rs",
+      "crates/formats/src/lib.rs",
+      "crates/formats/src/sol_indexed.rs"
+    ],
+    "member_count": 200,
+    "source_files": 197,
+    "scope": "Instrumented pinned source plus three changed original files; original remaining files recover byte-for-byte from instrumented copy. Tar framing newly generated at retention; file contents unchanged."
+  },
+  "tool_binaries_not_retained": "Cargo, rustc, rustfmt and Python identities/versions are in original supervisor/source/plan records."
+}
