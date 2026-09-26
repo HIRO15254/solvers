@@ -1,0 +1,1 @@
+8d8c: 1.4696e-8,8h8c: 2.6e-11,8h8d: 3e-12,8s8h: 1e-12,9h9c: 1e-12,Qc8c: 1.441e-8,Qd8d: 5.708e-8,Qh8h: 1.0108e-8,KcTd: 5.35e-10,KcTs: 3.69e-10,KdTc: 8e-12,KdTh: 1.2e-11,KdTs: 8.34e-10,KhTd: 1.547e-8,KsTc: 1e-12,KsTd: 1.85e-10,AcTd: 7.7e-11,AdTs: 8.84e-10,AhTd: 6.3e-10,AsTd: 1.332e-9

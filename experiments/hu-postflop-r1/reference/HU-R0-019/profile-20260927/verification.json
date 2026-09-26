@@ -1,0 +1,197 @@
+{
+  "schema": "r1.reference-profile-audit-verification/v1",
+  "recorded_at_utc": "2026-09-26T18:37:05.716945+00:00",
+  "scope": "Finite 5/12 node capture and arithmetic audit; not a reconstructed policy or external quality certification",
+  "command": [
+    "C:/Python313/python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\profile-20260927\\check_profile.py",
+    "--manifest",
+    "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\profile-20260927\\root-capture-manifest.json",
+    "--assumed-absolute-error",
+    "5e-13"
+  ],
+  "exit_code": 0,
+  "stderr_bytes": 0,
+  "archive": {
+    "path": "profile-audit.json.gz",
+    "bytes": 37352,
+    "sha256": "0614e66307a04c5291448b5bb71668b17b215aa348d8ebaa72e9ef80ad58777f"
+  },
+  "original_stdout": {
+    "bytes": 1210791,
+    "sha256": "193509825a33799424c9281ac5b0c18264d78f64bd03e4d9d0dbb8a7f9dff5f8"
+  },
+  "regenerated_stdout_bytes_equal": true,
+  "manifest": {
+    "path": "root-capture-manifest.json",
+    "bytes": 21660,
+    "sha256": "0378f1a709789a99e42513aeb84be5ad6bce24644e552bd8c7074c004128d247"
+  },
+  "checker": {
+    "path": "check_profile.py",
+    "bytes": 16872,
+    "sha256": "477eb6187caf772a66809d6a302c3eec0d309f64b47f41fc805b89f9e68ff801"
+  },
+  "tests": {
+    "path": "test_check_profile.py",
+    "bytes": 13103,
+    "sha256": "7a70af2d67bc73110ec214fa9ade14279aceab4d3731839d541760298b5f509f"
+  },
+  "test_evidence": {
+    "kind": "tool execution transcript only; no retained standalone raw test log",
+    "command": [
+      "C:/Python313/python.exe",
+      "-B",
+      "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\profile-20260927\\test_check_profile.py",
+      "-v"
+    ],
+    "tests_passed": 19,
+    "seconds_reported": 0.777,
+    "exit_code": 0,
+    "tool_chunk_id": "19390e",
+    "windows_temp_acl": "Run outside sandbox after earlier sandbox fixture creation encountered Temp directory ACL denial"
+  },
+  "raw_file_refs_checked": 20,
+  "expected_nodes": 12,
+  "captured_nodes": 5,
+  "nodes": [
+    {
+      "history": "",
+      "actor": "BB",
+      "root_support_count": 130,
+      "classification_counts": {
+        "nonclosing_literal_products_no_renormalization": 72,
+        "action_token_missing_no_zero_inference": 58
+      },
+      "own_reach_comparison_summary": {
+        "comparable_combos": 130,
+        "exact_equal_combos": 130,
+        "different_combos": 0,
+        "unavailable_combos": 0,
+        "max_absolute_difference": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "max_difference_combos": [],
+        "conditional_nonoverlap_combos": 0
+      },
+      "conditional_model_feasible_combos": 0,
+      "conditional_model_infeasible_combos": 72
+    },
+    {
+      "history": "bet 13.5",
+      "actor": "BTN",
+      "root_support_count": 115,
+      "classification_counts": {
+        "action_token_missing_no_zero_inference": 111,
+        "nonclosing_literal_products_no_renormalization": 4
+      },
+      "own_reach_comparison_summary": {
+        "comparable_combos": 115,
+        "exact_equal_combos": 115,
+        "different_combos": 0,
+        "unavailable_combos": 0,
+        "max_absolute_difference": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "max_difference_combos": [],
+        "conditional_nonoverlap_combos": 0
+      },
+      "conditional_model_feasible_combos": 0,
+      "conditional_model_infeasible_combos": 4
+    },
+    {
+      "history": "bet 13.5 / raise to 37",
+      "actor": "BB",
+      "root_support_count": 130,
+      "classification_counts": {
+        "nonclosing_literal_products_no_renormalization": 89,
+        "action_token_missing_no_zero_inference": 21,
+        "literal_products_close": 4,
+        "whole_missing_no_zero_inference": 16
+      },
+      "own_reach_comparison_summary": {
+        "comparable_combos": 112,
+        "exact_equal_combos": 20,
+        "different_combos": 92,
+        "unavailable_combos": 18,
+        "max_absolute_difference": {
+          "numerator": "9520778707",
+          "denominator": "25000000000"
+        },
+        "max_difference_combos": [
+          "9cTc"
+        ],
+        "conditional_nonoverlap_combos": 92
+      },
+      "conditional_model_feasible_combos": 7,
+      "conditional_model_infeasible_combos": 86
+    },
+    {
+      "history": "bet 13.5 / raise to 37 / allin 55",
+      "actor": "BTN",
+      "root_support_count": 115,
+      "classification_counts": {
+        "whole_missing_no_zero_inference": 113,
+        "action_token_missing_no_zero_inference": 2
+      },
+      "own_reach_comparison_summary": {
+        "comparable_combos": 2,
+        "exact_equal_combos": 0,
+        "different_combos": 2,
+        "unavailable_combos": 113,
+        "max_absolute_difference": {
+          "numerator": "223447",
+          "denominator": "1000000000000"
+        },
+        "max_difference_combos": [
+          "8dQd"
+        ],
+        "conditional_nonoverlap_combos": 2
+      },
+      "conditional_model_feasible_combos": 0,
+      "conditional_model_infeasible_combos": 0
+    },
+    {
+      "history": "allin 55",
+      "actor": "BTN",
+      "root_support_count": 115,
+      "classification_counts": {
+        "nonclosing_literal_products_no_renormalization": 38,
+        "action_token_missing_no_zero_inference": 75,
+        "literal_products_close": 2
+      },
+      "own_reach_comparison_summary": {
+        "comparable_combos": 115,
+        "exact_equal_combos": 115,
+        "different_combos": 0,
+        "unavailable_combos": 0,
+        "max_absolute_difference": {
+          "numerator": "0",
+          "denominator": "1"
+        },
+        "max_difference_combos": [],
+        "conditional_nonoverlap_combos": 0
+      },
+      "conditional_model_feasible_combos": 3,
+      "conditional_model_infeasible_combos": 37
+    }
+  ],
+  "conditional_absolute_error": "5e-13; hypothesis only, not certified UI precision",
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "interpretation_limits": {
+    "product_semantics": "unverified; action=own realization reach times conditional action probability is a hypothesis",
+    "literal_ratios": "conditional on copied tokens being exact products; no missing-token fill or normalization",
+    "rounding_model": "conditional only, not an observed export precision guarantee; no omission model",
+    "constraint_scope": "per-combo node intervals and pairwise own-history comparisons only; no claim of a globally feasible shared-variable tree",
+    "off_policy_br": "joint profile reach zero does not remove BR requirements; true zero own realization reach of the fixed player can, but omission/rounded zero is not proof",
+    "reference_profile_evaluation": "not_performed",
+    "condition_match": "unverified",
+    "quality_status": "not_evaluated",
+    "acceptance": null
+  }
+}

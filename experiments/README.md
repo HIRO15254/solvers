@@ -38,6 +38,7 @@
 | R1の100bb River参照入力 | [River 002](hu-postflop-r1/reference/HU-R0-002/README.md) | 両rangeの原文・checksum・joint重みと、実際に取得した継続menu。参照条件と品質の認定は別判断 |
 | R1の100bb River参照診断 | [002実行照合](hu-postflop-r1/reference/vm07-002-report.md)、[参照条件監査](hu-postflop-r1/reference/reference-condition-audit.jp.md) | 132 menuの実exportと保存後EV/BR。レーキ・参照精度等の欠測を保持し、品質閾値の事後発行をしない |
 | R1の参照条件の追加観測 | [9月27日の文献・Fold EV確認](hu-postflop-r1/reference/condition-followup-20260927/README.jp.md) | 公式記事の系列・公開時期と、002のBet 2→Raise 7で正weightの3 comboがFold EV 0となる実画面。表示欄を限定した基準時点の推論で、個別版・残差・レーキの認定ではない |
+| R1の参照profile出力の監査 | [019のCopy原文と整合検査](hu-postflop-r1/reference/HU-R0-019/profile-20260927/README.jp.md) | 取得した5判断点のaction-weight原文、欠測・丸め仮定・親子レンジの不連続を保持。完全profileや外部品質の認定には使わない |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |
 

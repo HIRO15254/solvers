@@ -1,0 +1,543 @@
+{
+  "schema": "r1.reference-profile-capture/v1",
+  "case_id": "HU-R0-019",
+  "observed": {
+    "path": "observed.json",
+    "bytes": 6319,
+    "sha256": "e38ffaf0b6fbcbbbe5779ae9d4236074df889ea75afd0ee4092e6cd48cf2aca2"
+  },
+  "root_ranges": {
+    "oop": {
+      "path": "oop-range.txt",
+      "bytes": 1831,
+      "sha256": "e0d201e994569ac6e582603390a98737c59cf6333c630cb8729f6b4f287c2f84"
+    },
+    "ip": {
+      "path": "ip-range.txt",
+      "bytes": 1818,
+      "sha256": "ac682a2f4646bf9b4c8424f86021879b74fdc7f51177175e3242904d2a831b94"
+    }
+  },
+  "captures": [
+    {
+      "history": "",
+      "actor": "BB",
+      "whole": {
+        "path": "oop-range.txt",
+        "bytes": 1831,
+        "sha256": "e0d201e994569ac6e582603390a98737c59cf6333c630cb8729f6b4f287c2f84"
+      },
+      "actions": [
+        {
+          "label": "check",
+          "range": {
+            "path": "profile-20260927/root-check.txt",
+            "bytes": 1499,
+            "sha256": "c0e0213f35b4b665f8d45fe18a14073d070b3d656360edb547a2e93e732ceabb"
+          }
+        },
+        {
+          "label": "bet 13.5",
+          "range": {
+            "path": "profile-20260927/root-bet13_5.txt",
+            "bytes": 2205,
+            "sha256": "481f79ab2c5f43edb6e0629ac12715a226cc379f2aae734de7dc362f61863931"
+          }
+        },
+        {
+          "label": "allin 55",
+          "range": {
+            "path": "profile-20260927/root-allin55.txt",
+            "bytes": 1888,
+            "sha256": "f5ebff7e17e94fca974b7e8d2ea2bc6e93247b229fc4482916ae04aa10b60096"
+          }
+        }
+      ]
+    },
+    {
+      "history": "allin 55",
+      "actor": "BTN",
+      "whole": {
+        "path": "ip-range.txt",
+        "bytes": 1818,
+        "sha256": "ac682a2f4646bf9b4c8424f86021879b74fdc7f51177175e3242904d2a831b94"
+      },
+      "actions": [
+        {
+          "label": "fold",
+          "range": {
+            "path": "profile-20260927/jam-fold.txt",
+            "bytes": 1694,
+            "sha256": "c477e9669adbbf4d12b96c3489ae9fca4d5db13392a14620fc3864e981b13069"
+          }
+        },
+        {
+          "label": "call",
+          "range": {
+            "path": "profile-20260927/jam-call.txt",
+            "bytes": 1189,
+            "sha256": "dcca84fc1685cc2afe5654ebdb2064a42a298b3811c71955e79d678eb4525c35"
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 13.5",
+      "actor": "BTN",
+      "whole": {
+        "path": "ip-range.txt",
+        "bytes": 1818,
+        "sha256": "ac682a2f4646bf9b4c8424f86021879b74fdc7f51177175e3242904d2a831b94"
+      },
+      "actions": [
+        {
+          "label": "fold",
+          "range": {
+            "path": "profile-20260927/bet-fold.txt",
+            "bytes": 1427,
+            "sha256": "076a85976081b0c7e6fc9f57f7971b47d7f9afe22f4a8c87caaf865fa40da637"
+          }
+        },
+        {
+          "label": "call",
+          "range": {
+            "path": "profile-20260927/bet-call.txt",
+            "bytes": 1148,
+            "sha256": "9e3d04c3f3c4855fa54bec0833f8cbfa14f592762b1a8d1328e6b7079c6013e6"
+          }
+        },
+        {
+          "label": "raise to 37",
+          "range": {
+            "path": "profile-20260927/bet-raise37.txt",
+            "bytes": 283,
+            "sha256": "8c414dbe773c6bfef431bb5ce87f29d99ee2257cb3911b4179e5c1047e3a73db"
+          }
+        },
+        {
+          "label": "allin 55",
+          "range": {
+            "path": "profile-20260927/bet-allin55.txt",
+            "bytes": 1777,
+            "sha256": "432074797886f7da030de71f83b013638fc14cbf7c64d5f7bb539ef34600faa6"
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 13.5 / raise to 37",
+      "actor": "BB",
+      "whole": {
+        "path": "profile-20260927/betraise-whole.txt",
+        "bytes": 2018,
+        "sha256": "acbbc31bd2cce62f561ad22ba5ee5062598d2f85fe62d54e3b7aa8c20161fc08"
+      },
+      "actions": [
+        {
+          "label": "fold",
+          "range": {
+            "path": "profile-20260927/betraise-fold.txt",
+            "bytes": 2175,
+            "sha256": "297a819dd439965635fa01b8a0e61f2257b4a681ec5684699e22861a74c200fd"
+          }
+        },
+        {
+          "label": "call",
+          "range": {
+            "path": "profile-20260927/betraise-call.txt",
+            "bytes": 1905,
+            "sha256": "668bdbcd8cb1f77d208cb9925e52bc26e729e252576b0e31f3e4e2bc421bf2e9"
+          }
+        },
+        {
+          "label": "allin 55",
+          "range": {
+            "path": "profile-20260927/betraise-allin55.txt",
+            "bytes": 2286,
+            "sha256": "f7545200929392db437c6df1cd1fd1bcb5a1432e8d4025d537f52569a00e03d6"
+          }
+        }
+      ]
+    },
+    {
+      "history": "bet 13.5 / raise to 37 / allin 55",
+      "actor": "BTN",
+      "whole": {
+        "path": "profile-20260927/betraisejam-whole.txt",
+        "bytes": 34,
+        "sha256": "17fb26dd5fb3ed0b5923248c15ac7a74d6fcff4d626ca86fcf3fbf4d9d6ae117"
+      },
+      "actions": [
+        {
+          "label": "fold",
+          "range": {
+            "path": "profile-20260927/betraisejam-fold.txt",
+            "bytes": 1,
+            "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+          }
+        },
+        {
+          "label": "call",
+          "range": {
+            "path": "profile-20260927/betraisejam-call.txt",
+            "bytes": 34,
+            "sha256": "17fb26dd5fb3ed0b5923248c15ac7a74d6fcff4d626ca86fcf3fbf4d9d6ae117"
+          }
+        }
+      ]
+    }
+  ],
+  "capture_metadata": {
+    "source": "root agent manual UI Copy and reported clipboard checksums; this checker author did not operate browser",
+    "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gametype=Cash6m500zSimple&depth=75&history_spot=12&preflop_actions=F-F-F-R2.5-F-R10-R20-C&board=Qs7h2c4d9s&flop_actions=X-X&turn_actions=X-X",
+    "approximate_start_utc": "2026-09-26T17:58:00Z",
+    "recorded_end_utc": "2026-09-26T18:03:20.695Z",
+    "exact_start_not_recorded": true,
+    "loaded_node": "River root, BB; no filters reported",
+    "selector_labels": [
+      "Whole range",
+      "Allin 55",
+      "Bet 13.5",
+      "Check"
+    ],
+    "whole_bytes_reuse": "Current Whole text reported character-identical to existing oop-range.txt without its final LF; reused pinned file, no distinct current Whole raw file.",
+    "copy_integrity": {
+      "whole": {
+        "copy_characters": 1830,
+        "copy_fnv1a32": "90de9f9e",
+        "file": {
+          "path": "oop-range.txt",
+          "bytes": 1831,
+          "sha256": "e0d201e994569ac6e582603390a98737c59cf6333c630cb8729f6b4f287c2f84"
+        },
+        "one_trailing_lf_added": true
+      },
+      "allin 55": {
+        "copy_characters": 1887,
+        "copy_fnv1a32": "0e52789e",
+        "file": {
+          "path": "profile-20260927/root-allin55.txt",
+          "bytes": 1888,
+          "sha256": "f5ebff7e17e94fca974b7e8d2ea2bc6e93247b229fc4482916ae04aa10b60096"
+        },
+        "one_trailing_lf_added": true
+      },
+      "bet 13.5": {
+        "copy_characters": 2204,
+        "copy_fnv1a32": "7f3f2fd2",
+        "file": {
+          "path": "profile-20260927/root-bet13_5.txt",
+          "bytes": 2205,
+          "sha256": "481f79ab2c5f43edb6e0629ac12715a226cc379f2aae734de7dc362f61863931"
+        },
+        "one_trailing_lf_added": true
+      },
+      "check": {
+        "copy_characters": 1498,
+        "copy_fnv1a32": "ad12bde2",
+        "file": {
+          "path": "profile-20260927/root-check.txt",
+          "bytes": 1499,
+          "sha256": "c0e0213f35b4b665f8d45fe18a14073d070b3d656360edb547a2e93e732ceabb"
+        },
+        "one_trailing_lf_added": true
+      }
+    },
+    "export_precision": null,
+    "action_product_semantics": "hypothesis requiring checks, not certified",
+    "zero_omission_semantics": null,
+    "additional_nodes": [
+      {
+        "history": "allin 55",
+        "actor": "BTN",
+        "source": "root agent manual UI Copy and reported clipboard checksums; checker author did not operate browser",
+        "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gametype=Cash6m500zSimple&depth=75&history_spot=13&preflop_actions=F-F-F-R2.5-F-R10-R20-C&board=Qs7h2c4d9s&flop_actions=X-X&turn_actions=X-X&river_actions=RAI",
+        "approximate_start_utc": "2026-09-26T18:13:00Z",
+        "recorded_end_utc": "2026-09-26T18:15:19.108Z",
+        "exact_start_not_recorded": true,
+        "whole_bytes_reuse": "Current Whole text reported character-identical to existing ip-range.txt without final LF; reused pinned file, no distinct current Whole raw file.",
+        "copy_integrity": {
+          "whole": {
+            "copy_characters": 1817,
+            "copy_fnv1a32": "5f6656d4",
+            "file": {
+              "path": "ip-range.txt",
+              "bytes": 1818,
+              "sha256": "ac682a2f4646bf9b4c8424f86021879b74fdc7f51177175e3242904d2a831b94"
+            },
+            "one_trailing_lf_added": true
+          },
+          "call": {
+            "copy_characters": 1188,
+            "copy_fnv1a32": "b96fb5d0",
+            "file": {
+              "path": "profile-20260927/jam-call.txt",
+              "bytes": 1189,
+              "sha256": "dcca84fc1685cc2afe5654ebdb2064a42a298b3811c71955e79d678eb4525c35"
+            },
+            "one_trailing_lf_added": true
+          },
+          "fold": {
+            "copy_characters": 1693,
+            "copy_fnv1a32": "66e88a52",
+            "file": {
+              "path": "profile-20260927/jam-fold.txt",
+              "bytes": 1694,
+              "sha256": "c477e9669adbbf4d12b96c3489ae9fca4d5db13392a14620fc3864e981b13069"
+            },
+            "one_trailing_lf_added": true
+          }
+        },
+        "reported_ui": {
+          "pot_display_bb": [
+            95.5,
+            40.5
+          ],
+          "pot_odds_percent": 36.5,
+          "call_frequency_percent": 40,
+          "fold_frequency_percent": 60,
+          "btn_weighted_combos_display": 0.4
+        },
+        "filter_state": "not separately reported for this node",
+        "export_precision": null,
+        "zero_omission_semantics": null,
+        "transcription_repair": "Initial jam-call transcription omitted AhKh and AhKs and failed the browser FNV check. Root rechecked against the browser original and corrected the saved text; the retained final text matches browser length/FNV. This manifest refers only to the corrected text, not the invalid transcription."
+      },
+      {
+        "history": "bet 13.5",
+        "actor": "BTN",
+        "source": "root agent UI Copy and reported clipboard checksums; checker author did not operate browser",
+        "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gametype=Cash6m500zSimple&depth=75&history_spot=13&preflop_actions=F-F-F-R2.5-F-R10-R20-C&board=Qs7h2c4d9s&flop_actions=X-X&turn_actions=X-X&river_actions=R13.5",
+        "observed_at_utc": {
+          "whole": "2026-09-26T18:19:38.735Z",
+          "allin 55": "2026-09-26T18:19:51.301Z",
+          "raise to 37": "2026-09-26T18:19:55.171Z",
+          "call": "2026-09-26T18:19:58.968Z",
+          "fold": "2026-09-26T18:20:05.337Z"
+        },
+        "whole_bytes_reuse": "Current Whole text reported character-identical to existing ip-range.txt without final LF; reused pinned file, no distinct current Whole raw file.",
+        "copy_integrity": {
+          "whole": {
+            "copy_characters": 1817,
+            "copy_fnv1a32": "5f6656d4",
+            "file": {
+              "path": "ip-range.txt",
+              "bytes": 1818,
+              "sha256": "ac682a2f4646bf9b4c8424f86021879b74fdc7f51177175e3242904d2a831b94"
+            },
+            "one_trailing_lf_added": true
+          },
+          "allin 55": {
+            "copy_characters": 1776,
+            "copy_fnv1a32": "ea1ab96c",
+            "file": {
+              "path": "profile-20260927/bet-allin55.txt",
+              "bytes": 1777,
+              "sha256": "432074797886f7da030de71f83b013638fc14cbf7c64d5f7bb539ef34600faa6"
+            },
+            "one_trailing_lf_added": true
+          },
+          "raise to 37": {
+            "copy_characters": 282,
+            "copy_fnv1a32": "f5d54325",
+            "file": {
+              "path": "profile-20260927/bet-raise37.txt",
+              "bytes": 283,
+              "sha256": "8c414dbe773c6bfef431bb5ce87f29d99ee2257cb3911b4179e5c1047e3a73db"
+            },
+            "one_trailing_lf_added": true
+          },
+          "call": {
+            "copy_characters": 1147,
+            "copy_fnv1a32": "42576571",
+            "file": {
+              "path": "profile-20260927/bet-call.txt",
+              "bytes": 1148,
+              "sha256": "9e3d04c3f3c4855fa54bec0833f8cbfa14f592762b1a8d1328e6b7079c6013e6"
+            },
+            "one_trailing_lf_added": true
+          },
+          "fold": {
+            "copy_characters": 1426,
+            "copy_fnv1a32": "a7e7e84e",
+            "file": {
+              "path": "profile-20260927/bet-fold.txt",
+              "bytes": 1427,
+              "sha256": "076a85976081b0c7e6fc9f57f7971b47d7f9afe22f4a8c87caaf865fa40da637"
+            },
+            "one_trailing_lf_added": true
+          }
+        },
+        "reported_ui": {
+          "root_pot_bb": 40.5,
+          "current_pot_bb": 54,
+          "stacks_behind_bb": {
+            "BB": 41.5,
+            "BTN": 55
+          },
+          "action_frequencies_percent": {
+            "allin 55": 29.1,
+            "raise to 37": 0,
+            "call": 44.3,
+            "fold": 26.6
+          }
+        },
+        "filter_state": "not separately reported for this node",
+        "export_precision": null,
+        "zero_omission_semantics": null
+      },
+      {
+        "history": "bet 13.5 / raise to 37",
+        "actor": "BB",
+        "source": "root agent UI Copy; storage agent saved raw, checker author verified file checksums but did not operate browser",
+        "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gametype=Cash6m500zSimple&depth=75&history_spot=14&preflop_actions=F-F-F-R2.5-F-R10-R20-C&board=Qs7h2c4d9s&flop_actions=X-X&turn_actions=X-X&river_actions=R13.5-R37",
+        "observed_at_utc": {
+          "whole": "2026-09-26T18:26:37.732Z",
+          "allin 55": "2026-09-26T18:26:41.371Z",
+          "call": "2026-09-26T18:26:45.042Z",
+          "fold": "2026-09-26T18:26:48.781Z"
+        },
+        "copy_integrity": {
+          "whole": {
+            "copy_characters": 2017,
+            "copy_fnv1a32": "9f2bfa6b",
+            "file": {
+              "path": "profile-20260927/betraise-whole.txt",
+              "bytes": 2018,
+              "sha256": "acbbc31bd2cce62f561ad22ba5ee5062598d2f85fe62d54e3b7aa8c20161fc08"
+            },
+            "one_trailing_lf_added": true
+          },
+          "allin 55": {
+            "copy_characters": 2285,
+            "copy_fnv1a32": "c35bc0ff",
+            "file": {
+              "path": "profile-20260927/betraise-allin55.txt",
+              "bytes": 2286,
+              "sha256": "f7545200929392db437c6df1cd1fd1bcb5a1432e8d4025d537f52569a00e03d6"
+            },
+            "one_trailing_lf_added": true
+          },
+          "call": {
+            "copy_characters": 1904,
+            "copy_fnv1a32": "df7b7d99",
+            "file": {
+              "path": "profile-20260927/betraise-call.txt",
+              "bytes": 1905,
+              "sha256": "668bdbcd8cb1f77d208cb9925e52bc26e729e252576b0e31f3e4e2bc421bf2e9"
+            },
+            "one_trailing_lf_added": true
+          },
+          "fold": {
+            "copy_characters": 2174,
+            "copy_fnv1a32": "b66bd966",
+            "file": {
+              "path": "profile-20260927/betraise-fold.txt",
+              "bytes": 2175,
+              "sha256": "297a819dd439965635fa01b8a0e61f2257b4a681ec5684699e22861a74c200fd"
+            },
+            "one_trailing_lf_added": true
+          }
+        },
+        "reported_ui": {
+          "whole_weighted_combos_approximate": 13
+        },
+        "continuation_warning": "The copied BB Whole differs substantially from the parent BB bet 13.5 action copy. Independent repeat copying reproduced the difference; a one-off transcription error or stale clipboard does not explain that repeated observation. Fallback/re-solve/range reset/other semantics remain unconfirmed. Do not treat this as a continuous profile.",
+        "filter_state": "not separately reported",
+        "export_precision": null,
+        "zero_omission_semantics": null,
+        "parent_child_recheck": {
+          "parent_observed_at_utc": "2026-09-26T18:32:17.817Z",
+          "parent_url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gametype=Cash6m500zSimple&depth=75&history_spot=13&preflop_actions=F-F-F-R2.5-F-R10-R20-C&board=Qs7h2c4d9s&flop_actions=X-X&turn_actions=X-X&river_actions=R13.5-R37-RAI",
+          "parent_selected_ui": "history_spot 13, actor BTN, current pot54; BB Whole copied. Trailing river_actions still contains later branches, so URL suffix alone does not identify selected node.",
+          "parent_bb_copy": {
+            "file": {
+              "path": "profile-20260927/bet-bb-whole-recheck.txt",
+              "bytes": 1762,
+              "sha256": "cdd88f9ccba7a2e7b7dab68cd139abadcd3941ae7dff29f271817957a87ffbf4"
+            },
+            "copy_characters": 1761,
+            "copy_fnv1a32": "dba23c42",
+            "one_trailing_lf_added": true
+          },
+          "parent_transcription_note": "Storage agent excluded a KhQh token root explicitly identified as transfer-message contamination; retained final bytes match the reported browser length/FNV.",
+          "child_observed_at_utc": "2026-09-26T18:32:45.008Z",
+          "child_selected_ui": "Same Raise selected, history_spot14, BB Whole copied again",
+          "child_copy_characters": 2017,
+          "child_copy_fnv1a32": "9f2bfa6b",
+          "child_bytes_reused": {
+            "path": "profile-20260927/betraise-whole.txt",
+            "bytes": 2018,
+            "sha256": "acbbc31bd2cce62f561ad22ba5ee5062598d2f85fe62d54e3b7aa8c20161fc08"
+          },
+          "child_repeat_observation": "Root reported character-identical to first child Whole; original first bytes are retained, no independent second raw file."
+        }
+      },
+      {
+        "history": "bet 13.5 / raise to 37 / allin 55",
+        "actor": "BTN",
+        "source": "root agent UI Copy and reported raw text/checksums; checker author did not operate browser",
+        "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gametype=Cash6m500zSimple&depth=75&history_spot=15&preflop_actions=F-F-F-R2.5-F-R10-R20-C&board=Qs7h2c4d9s&flop_actions=X-X&turn_actions=X-X&river_actions=R13.5-R37-RAI",
+        "observed_at_utc": {
+          "whole": "2026-09-26T18:30:58.782Z",
+          "call": "2026-09-26T18:31:02.456Z",
+          "fold": "2026-09-26T18:31:06.005Z"
+        },
+        "copy_integrity": {
+          "whole": {
+            "copy_characters": 33,
+            "copy_fnv1a32": "44eb32b4",
+            "file": {
+              "path": "profile-20260927/betraisejam-whole.txt",
+              "bytes": 34,
+              "sha256": "17fb26dd5fb3ed0b5923248c15ac7a74d6fcff4d626ca86fcf3fbf4d9d6ae117"
+            },
+            "one_trailing_lf_added": true
+          },
+          "call": {
+            "copy_characters": 33,
+            "copy_fnv1a32": "44eb32b4",
+            "file": {
+              "path": "profile-20260927/betraisejam-call.txt",
+              "bytes": 34,
+              "sha256": "17fb26dd5fb3ed0b5923248c15ac7a74d6fcff4d626ca86fcf3fbf4d9d6ae117"
+            },
+            "one_trailing_lf_added": true
+          },
+          "fold": {
+            "copy_characters": 0,
+            "copy_fnv1a32": "811c9dc5",
+            "file": {
+              "path": "profile-20260927/betraisejam-fold.txt",
+              "bytes": 1,
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            "one_trailing_lf_added": true
+          }
+        },
+        "empty_fold_copy": "Successfully copied empty text; retained file contains only the added final LF. Not a missing acquisition, explicit zero policy, or permission to fill omitted tokens with zero.",
+        "continuation_warning": "Whole has two tokens and differs from the earlier BTN raise to 37 action copy, which has 20 positive tokens. Cause unconfirmed; do not treat as a continuous profile.",
+        "filter_state": "not separately reported",
+        "export_precision": null,
+        "zero_omission_semantics": null,
+        "reported_ui": {
+          "call_frequency_percent": 74.2,
+          "fold_frequency_percent": 25.8
+        },
+        "display_export_discrepancy": "UI frequencies show Call74.2/Fold25.8, while copied Whole and Call have identical two positive tokens and Fold Copy is empty. The relation between UI aggregate and copied ranges is unconfirmed."
+      }
+    ]
+  },
+  "notes": [
+    "Finite acquisition audit of five of twelve decision nodes. Two deeper Whole ranges disagree with prior same-actor action copies, with repeated parent/child observations. This evidence is not a reconstructed continuous reference profile.",
+    "No missing action token is filled with zero. No probability normalization.",
+    "A fixed absolute 5e-13 token error is only a hypothesis; observed raw weights may involve other rounding."
+  ],
+  "supplemental_files": [
+    {
+      "path": "profile-20260927/bet-bb-whole-recheck.txt",
+      "bytes": 1762,
+      "sha256": "cdd88f9ccba7a2e7b7dab68cd139abadcd3941ae7dff29f271817957a87ffbf4"
+    }
+  ]
+}
