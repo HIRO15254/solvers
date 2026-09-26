@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260926-12",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:NMEGHBw1WIbJUFmtQg29kM2BD2n9GHEXeqF6opzcZ3U",
+    "--command=sha256sum /tmp/current32-deployment01.tar.gz && sudo mkdir /opt/r1/current-deployment01 && sudo tar -xzf /tmp/current32-deployment01.tar.gz -C /opt/r1/current-deployment01 && sudo python3 -B /opt/r1/current-deployment01/install-inputs.py && sudo timeout --signal=TERM --kill-after=10s 180s bash /opt/r1/current-deployment01/fetch-dependencies.sh"
+  ],
+  "started_utc": "2026-09-26T20:37:25.502804+00:00",
+  "timeout_seconds": 240,
+  "stdout": {
+    "bytes": 101,
+    "sha256": "ea927e0d4088ed9bc15c188ac1b156692aa568433702f9f6dcbe14656e94c4ae"
+  },
+  "stderr": {
+    "bytes": 4002,
+    "sha256": "8af670c92f3fb7d1dae08afa8442aa49dfc8586de843c1b10b2f191e11034e8a"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-26T20:37:34.646520+00:00"
+}
