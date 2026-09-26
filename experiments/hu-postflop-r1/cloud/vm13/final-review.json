@@ -1,0 +1,133 @@
+{
+  "schema": "r1.vm13-final-review/v1",
+  "reviewed_utc": "2026-09-26T23:20:23.177129+00:00",
+  "source_revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+  "production_source_files_unchanged": 207,
+  "local_python_tests": {
+    "phase_runner_and_checker": 31,
+    "installer_deadlines": 25,
+    "cleanup_guard": 30,
+    "native_diagnostic": 24,
+    "006_static_diagnostic": 13
+  },
+  "documentation_check_markdown_files": 49,
+  "rust_validation": "Production files unchanged. Both research copies built and native C calibrations passed on VM13. No heavy local Cargo/solver run; no new claim of a workspace-wide Rust test run.",
+  "phase": {
+    "schema": "r1.current-phases-verification/v1",
+    "status": "failed",
+    "scope": "current source fixed synthetic cases",
+    "provenance_complete": true,
+    "payload_integrity": "verified",
+    "counts": {
+      "passed": 44,
+      "failed": 1,
+      "skipped": 252
+    },
+    "summary": null,
+    "error": "ValueError('HWM decreased within a reset interval')",
+    "comparison_error": null,
+    "limitations": [
+      "No retained code executed; compiler/Python executable identities only.",
+      "Recorded host/source checks are not an independent attestation of the original machine.",
+      "Memory values are Linux process counters, not exact physical phase memory.",
+      "No external reference or overall R1 acceptance is certified."
+    ]
+  },
+  "native_diagnostics": {
+    "schema": "r1.native-river-verification/v1",
+    "status": "completed",
+    "payload_integrity": "verified",
+    "provenance_complete": true,
+    "passed": 8,
+    "external_quality": "not_evaluated",
+    "acceptance": null,
+    "error": null
+  },
+  "cloud_cleanup_status": "deleted_and_absence_verified",
+  "cleanup_verified_utc": "2026-09-26T23:16:40.762086+00:00",
+  "budget": {
+    "authorized_usd": 40,
+    "held_usd": 40,
+    "unreserved_usd": 0,
+    "billed_usd": null
+  },
+  "scope": "Experimental evidence only; no phase performance acceptance or external reference acceptance. Frozen failed protocol not modified or retried.",
+  "files": {
+    "cloud/vm13/local-check01.json": {
+      "bytes": 8788,
+      "sha256": "6fadd929e32fea3d080fa4a6cd4a365c1b73a80f387b86d7245106bfd92e220b"
+    },
+    "cloud/cleanup-vm13/local-check01.json": {
+      "bytes": 1218,
+      "sha256": "67f6090c5820af9574fc3e61c54bb4b47382475f68c8d43ac1235edb58337303"
+    },
+    "cloud/cleanup-vm13/run01/reconciliation.json": {
+      "bytes": 16396,
+      "sha256": "590535ddc8d45ca090ef832016f7a2274bd232d0f09acd1e3252c616461f09bc"
+    },
+    "cloud/vm13/native-cleanup-binding01.json": {
+      "bytes": 3629,
+      "sha256": "39c684ae2e859a2f836d5ba24ebcde42f303f15f77b2b97d252bcdfbcb078e30"
+    },
+    "current-phases/proof01/verification01.json": {
+      "bytes": 784,
+      "sha256": "ee4c7bb77bd15b4bc06fa21331b66d57c5f8354b2599664eb642543a69a85b32"
+    },
+    "current-phases/proof01/verification01.stdout.log": {
+      "bytes": 744,
+      "sha256": "78e772ed006c032d9bbbf77ecf006fa1134498232ebd1eeee775be9bfcd64ccf"
+    },
+    "current-phases/proof01/current-phase-proof01.tar.gz": {
+      "bytes": 17708089,
+      "sha256": "c94c351505c70aecc7c3b4f9f0a60c37173ed074c728ce1acbb54f65683d100a"
+    },
+    "current-phases/proof01/current-phase-proof01.tar.gz.manifest.json": {
+      "bytes": 526759,
+      "sha256": "1001096e55cdef83c4d2e7b6483b4e44b940dc382e14dbabba2b6dbfb9c0e750"
+    },
+    "current-phases/proof01/summary01/report.json": {
+      "bytes": 3697,
+      "sha256": "1c0714f573bad0cd1d679c93287308e218bb3cd66d7ae90917dca580e474fdb7"
+    },
+    "current-phases/proof01/summary01/report.jp.md": {
+      "bytes": 1192,
+      "sha256": "c821ac240f56932ae49aa6d470d37f8ab1729661732de27822681c0b1a89baa1"
+    },
+    "current-phases/summarize.py": {
+      "bytes": 15972,
+      "sha256": "5d1c7b6abf1c695c35eaa87e04138d6f3a1940c34d910202c96e7f21786b009f"
+    },
+    "current-phases/vm13-hwm-observation.jp.md": {
+      "bytes": 4674,
+      "sha256": "e7e8c345a8b561314eb3ac9928099bb2e4ad546a10bb4e120b68189842dbd497"
+    },
+    "reference/native-river-vm13/checks-final.json": {
+      "bytes": 3519,
+      "sha256": "2c519c2311458c7f8de2306ae738b1a3a43a93b4b4814395337c00a0b988d88b"
+    },
+    "reference/native-river-vm13/proof01/verification01.json": {
+      "bytes": 842,
+      "sha256": "b482756244e491e4e7fdae14943833f3eaccd4246ae03b3c075436651f3bacd9"
+    },
+    "reference/native-river-vm13/proof01/verification01.stdout.log": {
+      "bytes": 244,
+      "sha256": "50957988cb6f13b22e9d759cb698ee549c3f7eb103de19bea5ec97669fad84c5"
+    },
+    "reference/native-river-vm13/proof01/native-river-proof01.tar.gz": {
+      "bytes": 7682236,
+      "sha256": "06ddb7169418cb680cf22bc72eeb0f57cba617772ef9beb8039a5c3994ef45eb"
+    },
+    "reference/native-river-vm13/proof01/native-river-proof01.tar.gz.manifest.json": {
+      "bytes": 165882,
+      "sha256": "e7d78da0a8d275a32ec74be1fb09664ba754dfe52739419158bd0afb4f49dd20"
+    },
+    "reference/native-river-vm13/proof01/report.jp.md": {
+      "bytes": 6744,
+      "sha256": "0cbd95e67e33bef15b276e9c8a61dfe69cdc7413a847542da95db65a1b4e25c3"
+    },
+    "reference/HU-R0-006/diagnostic-checks.json": {
+      "bytes": 14811,
+      "sha256": "83aa4122446f77216d8e75224e55d93854069ff4e6074be6a3c52d46a400be4d"
+    }
+  }
+}

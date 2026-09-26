@@ -1,0 +1,29 @@
+test_artifact_and_config_header_binding (test_check.AuditChecks.test_artifact_and_config_header_binding) ... ok
+test_gain_sum_and_pre_save_live_binding (test_check.AuditChecks.test_gain_sum_and_pre_save_live_binding) ... ok
+test_general_sum_and_rake_binding (test_check.AuditChecks.test_general_sum_and_rake_binding) ... ok
+test_numeric_tolerance_is_small_not_a_quality_threshold (test_check.AuditChecks.test_numeric_tolerance_is_small_not_a_quality_threshold) ... ok
+test_stored_quantized_quality_may_differ_from_live (test_check.AuditChecks.test_stored_quantized_quality_may_differ_from_live) ... ok
+test_normalizer_defaults_are_allowed (test_check.ConfigChecks.test_normalizer_defaults_are_allowed) ... ok
+test_rake_range_and_algorithm_changes_are_rejected (test_check.ConfigChecks.test_rake_range_and_algorithm_changes_are_rejected) ... ok
+test_target_and_external_source_are_rejected (test_check.ConfigChecks.test_target_and_external_source_are_rejected) ... ok
+test_wrong_native_status_profile_and_effective_json (test_check.ConfigChecks.test_wrong_native_status_profile_and_effective_json) ... ok
+test_cadence_final_quality_and_nonfinite_rejected (test_check.SolveChecks.test_cadence_final_quality_and_nonfinite_rejected) ... ok
+test_cancelled_and_changed_config_bytes_rejected (test_check.SolveChecks.test_cancelled_and_changed_config_bytes_rejected) ... ok
+test_early_or_late_time_stop_rejected (test_check.SolveChecks.test_early_or_late_time_stop_rejected) ... ok
+test_iteration_cap_can_finish_before_thirty_seconds (test_check.SolveChecks.test_iteration_cap_can_finish_before_thirty_seconds) ... ok
+test_sampled_time_boundary (test_check.SolveChecks.test_sampled_time_boundary) ... ok
+test_both_frozen_complete_graphs (test_check.TreeChecks.test_both_frozen_complete_graphs) ... ok
+test_missing_and_duplicate_decision (test_check.TreeChecks.test_missing_and_duplicate_decision) ... ok
+test_mutually_changed_pot_is_still_replayed (test_check.TreeChecks.test_mutually_changed_pot_is_still_replayed) ... ok
+test_native_amount_actor_pot_and_storage_binding (test_check.TreeChecks.test_native_amount_actor_pot_and_storage_binding) ... ok
+test_row_order_is_not_node_identity (test_check.TreeChecks.test_row_order_is_not_node_identity) ... ok
+test_terminal_map_is_bound (test_check.TreeChecks.test_terminal_map_is_bound) ... ok
+test_finite_supervisor_limits (test_run.RunnerTests.test_finite_supervisor_limits) ... ok
+test_fixed_schedule_and_native_cli_shapes (test_run.RunnerTests.test_fixed_schedule_and_native_cli_shapes) ... ok
+test_global_limit_never_extends_original_deadline (test_run.RunnerTests.test_global_limit_never_extends_original_deadline) ... ok
+test_stage_requires_full_bound_and_cleanup_tail (test_run.RunnerTests.test_stage_requires_full_bound_and_cleanup_tail) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.145s
+
+OK

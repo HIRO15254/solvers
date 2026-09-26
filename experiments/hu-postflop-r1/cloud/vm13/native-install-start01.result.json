@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260926-13",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:oBB8DJK3k6ZsJrRBM5FtbmNka4YM01NNWpwmb/a0xwg",
+    "--command=printf \"%s\\n\" \"f433702f51849c8ea750b2f91104161dcc8cfdcc7248473033c7a23da7417861  /tmp/native-input01.tar.gz\" | sha256sum -c - && sudo mkdir /opt/r1/native-river-deployment01 && sudo tar --no-same-owner -xzf /tmp/native-input01.tar.gz -C /opt/r1/native-river-deployment01 && sudo python3 -B /opt/r1/native-river-deployment01/start.py"
+  ],
+  "started_utc": "2026-09-26T23:10:10.766206+00:00",
+  "timeout_seconds": 60,
+  "stdout": {
+    "bytes": 1105,
+    "sha256": "b5cd6572c8197c0733d18a1d5c247052e98537c863c26535fb3e3286729e1d75"
+  },
+  "stderr": {
+    "bytes": 103,
+    "sha256": "3dcfdc1182e549314c835afc86b255f8e78617bd11b40cc7628f70eb5ff4f07b"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-26T23:10:17.066697+00:00"
+}

@@ -1,0 +1,378 @@
+{
+  "billing_usd": null,
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\check_run.py",
+        "--out",
+        "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\proof"
+      ],
+      "ended_at_utc": "2026-09-26T23:15:28.534822+00:00",
+      "exit_code": 0,
+      "label": "proof-0-verification",
+      "started_at_utc": "2026-09-26T23:15:03.065983+00:00",
+      "stderr": {
+        "bytes": 0,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\proof-0-verification.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 744,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\proof-0-verification.stdout.log",
+        "sha256": "78e772ed006c032d9bbbf77ecf006fa1134498232ebd1eeee775be9bfcd64ccf"
+      },
+      "timeout_seconds": 180
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "instances",
+        "describe",
+        "solvers-r1-20260926-13",
+        "--zone=us-central1-b",
+        "--format=json(id,name,selfLink,zone,status,disks,networkInterfaces)",
+        "--project=solvers-abstraction-20260723",
+        "--quiet"
+      ],
+      "ended_at_utc": "2026-09-26T23:15:31.853008+00:00",
+      "exit_code": 0,
+      "label": "instance-before",
+      "started_at_utc": "2026-09-26T23:15:28.543818+00:00",
+      "stderr": {
+        "bytes": 0,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\instance-before.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 30708,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\instance-before.stdout.log",
+        "sha256": "d8583a334d4defe9332ccc17cc8c2f0d0ebc8b0b09c7bb785ad1eb08f9696127"
+      },
+      "timeout_seconds": 90
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "disks",
+        "describe",
+        "solvers-r1-20260926-13",
+        "--zone=us-central1-b",
+        "--format=json(id,name,selfLink,zone,sizeGb,status,users)",
+        "--project=solvers-abstraction-20260723",
+        "--quiet"
+      ],
+      "ended_at_utc": "2026-09-26T23:15:34.979439+00:00",
+      "exit_code": 0,
+      "label": "disk-before",
+      "started_at_utc": "2026-09-26T23:15:31.853755+00:00",
+      "stderr": {
+        "bytes": 0,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\disk-before.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 524,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\disk-before.stdout.log",
+        "sha256": "447c4cf58b6b14ed4ccf50a3826410a8e94be40ae762e4ba950d86128fb23ae4"
+      },
+      "timeout_seconds": 90
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "instances",
+        "delete",
+        "solvers-r1-20260926-13",
+        "--zone=us-central1-b",
+        "--project=solvers-abstraction-20260723",
+        "--quiet",
+        "--format=json"
+      ],
+      "ended_at_utc": "2026-09-26T23:16:29.279334+00:00",
+      "exit_code": 0,
+      "label": "delete",
+      "started_at_utc": "2026-09-26T23:15:34.980053+00:00",
+      "stderr": {
+        "bytes": 141,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\delete.stderr.log",
+        "sha256": "b70315814c6d6b0c1002e9824db4f209a9a6260da8eaf1c0aea752c1cc846f46"
+      },
+      "stdout": {
+        "bytes": 4,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\delete.stdout.log",
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "timeout_seconds": 180
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "instances",
+        "list",
+        "--zones=us-central1-b",
+        "--filter=name=solvers-r1-20260926-13",
+        "--format=json(id,name,selfLink,zone,status)",
+        "--project=solvers-abstraction-20260723",
+        "--quiet"
+      ],
+      "ended_at_utc": "2026-09-26T23:16:32.334548+00:00",
+      "exit_code": 0,
+      "label": "instances-after",
+      "started_at_utc": "2026-09-26T23:16:29.280096+00:00",
+      "stderr": {
+        "bytes": 82,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\instances-after.stderr.log",
+        "sha256": "95ff429f97500ebd8a0e3bc62ee92fef734bb8069ed5a8de26a9be0c34cc80fb"
+      },
+      "stdout": {
+        "bytes": 4,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\instances-after.stdout.log",
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "timeout_seconds": 90
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "disks",
+        "list",
+        "--zones=us-central1-b",
+        "--filter=name=solvers-r1-20260926-13",
+        "--format=json(id,name,selfLink,zone,sizeGb,status,users)",
+        "--project=solvers-abstraction-20260723",
+        "--quiet"
+      ],
+      "ended_at_utc": "2026-09-26T23:16:35.372140+00:00",
+      "exit_code": 0,
+      "label": "disks-after",
+      "started_at_utc": "2026-09-26T23:16:32.335194+00:00",
+      "stderr": {
+        "bytes": 82,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\disks-after.stderr.log",
+        "sha256": "95ff429f97500ebd8a0e3bc62ee92fef734bb8069ed5a8de26a9be0c34cc80fb"
+      },
+      "stdout": {
+        "bytes": 4,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\disks-after.stdout.log",
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "timeout_seconds": 90
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "addresses",
+        "list",
+        "--filter=name=solvers-r1-20260926-13 OR address=34.41.218.17",
+        "--format=json(id,name,address,addressType,status,region,users)",
+        "--project=solvers-abstraction-20260723",
+        "--quiet"
+      ],
+      "ended_at_utc": "2026-09-26T23:16:38.045251+00:00",
+      "exit_code": 0,
+      "label": "addresses-after",
+      "started_at_utc": "2026-09-26T23:16:35.372800+00:00",
+      "stderr": {
+        "bytes": 85,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\addresses-after.stderr.log",
+        "sha256": "86d770d0f84f2ebe08bdd39928196d5ab1626ec35f0099e5b102ba6354ec0b13"
+      },
+      "stdout": {
+        "bytes": 4,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\addresses-after.stdout.log",
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "timeout_seconds": 90
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "operations",
+        "list",
+        "--filter=operationType=delete AND targetId=6526324704760165755",
+        "--format=json(id,name,operationType,targetId,targetLink,zone,status,error,startTime,endTime)",
+        "--project=solvers-abstraction-20260723",
+        "--quiet"
+      ],
+      "ended_at_utc": "2026-09-26T23:16:40.761408+00:00",
+      "exit_code": 0,
+      "label": "delete-operations-after",
+      "started_at_utc": "2026-09-26T23:16:38.046138+00:00",
+      "stderr": {
+        "bytes": 0,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\delete-operations-after.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 579,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\delete-operations-after.stdout.log",
+        "sha256": "5894181da5df3fb3b9c20bbbad7d3381249bfc124fc0541ebb2268930771298c"
+      },
+      "timeout_seconds": 90
+    }
+  ],
+  "disk_id": "2641872341416932731",
+  "ended_at_utc": "2026-09-26T23:16:40.762086+00:00",
+  "environment_overrides": {
+    "CLOUDSDK_ENCODING": "utf-8",
+    "CLOUDSDK_PYTHON": "C:\\Python313\\python.exe",
+    "PYTHONIOENCODING": "utf-8"
+  },
+  "instance": "solvers-r1-20260926-13",
+  "instance_id": "6526324704760165755",
+  "launch_record": {
+    "original": {
+      "bytes": 30180,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\create-result-r1-20260926-13.json",
+      "sha256": "35dec09e11c32d8ef60e81543df0267b1bf81a66cca2df0026158c8c89f50bc9"
+    },
+    "retained": {
+      "bytes": 30180,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\run01\\launch-record.json",
+      "sha256": "35dec09e11c32d8ef60e81543df0267b1bf81a66cca2df0026158c8c89f50bc9"
+    }
+  },
+  "matching_done_delete_operations": [
+    {
+      "endTime": "2026-09-26T16:16:28.277-07:00",
+      "id": "6385690557612944631",
+      "name": "operation-1790464536351-65c6b02ac1306-4b22e63a-7b215a85",
+      "operationType": "delete",
+      "startTime": "2026-09-26T16:15:36.625-07:00",
+      "status": "DONE",
+      "targetId": "6526324704760165755",
+      "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260926-13",
+      "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+    }
+  ],
+  "mode": "delete",
+  "observed_external_addresses": [
+    "34.41.218.17"
+  ],
+  "project": "solvers-abstraction-20260723",
+  "proofs": [
+    {
+      "archive": {
+        "bytes": 17708089,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\proof01\\current-phase-proof01.tar.gz",
+        "sha256": "c94c351505c70aecc7c3b4f9f0a60c37173ed074c728ce1acbb54f65683d100a"
+      },
+      "archived_launch": {
+        "bytes": 673,
+        "path": "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\proof\\payload\\58f6ad555defdda11e5fcba51a93d390780a720abd5b1166157f2e14ed9d598c",
+        "sha256": "58f6ad555defdda11e5fcba51a93d390780a720abd5b1166157f2e14ed9d598c"
+      },
+      "boot_id": "d65ffd75-d2ca-4e08-8452-4c12027b4a2a",
+      "bundle_check": {
+        "archive": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\proof01\\current-phase-proof01.tar.gz",
+        "archive_files": 672,
+        "bytes": 17708089,
+        "missing_required_files": [
+          "build.json"
+        ],
+        "original_files": 1198,
+        "retention_issue_count": 0,
+        "schema": "r1.final-pipeline-recovery/v1",
+        "scope": "Recovery-byte integrity only; campaign verification is separate",
+        "sha256": "c94c351505c70aecc7c3b4f9f0a60c37173ed074c728ce1acbb54f65683d100a",
+        "status": "bytes_verified"
+      },
+      "campaign_status": "failed",
+      "directory": "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\proof",
+      "instance_id": "6526324704760165755",
+      "provenance_complete": true,
+      "sidecars": [
+        {
+          "bytes": 526759,
+          "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\proof01\\current-phase-proof01.tar.gz.manifest.json",
+          "sha256": "1001096e55cdef83c4d2e7b6483b4e44b940dc382e14dbabba2b6dbfb9c0e750"
+        },
+        {
+          "bytes": 95,
+          "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\proof01\\current-phase-proof01.tar.gz.sha256",
+          "sha256": "59264b7a5ccf1b3164dfede5547acd4f8e2285519ec70714bf34fcf3d4ad5291"
+        }
+      ]
+    }
+  ],
+  "readbacks": {
+    "addresses-after": [],
+    "delete-operations-after": [
+      {
+        "endTime": "2026-09-26T16:16:28.277-07:00",
+        "id": "6385690557612944631",
+        "name": "operation-1790464536351-65c6b02ac1306-4b22e63a-7b215a85",
+        "operationType": "delete",
+        "startTime": "2026-09-26T16:15:36.625-07:00",
+        "status": "DONE",
+        "targetId": "6526324704760165755",
+        "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260926-13",
+        "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+      }
+    ],
+    "disks-after": [],
+    "instances-after": []
+  },
+  "reservation_released": false,
+  "schema": "r1.vm13-cleanup/v1",
+  "scope": "Only VM13 and its autoDelete boot disk; resource absence is not a billing assertion",
+  "started_at_utc": "2026-09-26T23:15:01.164533+00:00",
+  "status": "deleted_and_absence_verified",
+  "trusted_code": [
+    {
+      "bytes": 15346,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm13\\cleanup.py",
+      "sha256": "88168cf245efa7aac3a2bfb12d50cace146d97347c581728cb26a4242a0ae8e3"
+    },
+    {
+      "bytes": 21435,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\check_run.py",
+      "sha256": "ec8d8e879cbd283ca0b308aa891eea17635229b83624172775e0ccd6fc03f115"
+    },
+    {
+      "bytes": 7635,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\protocol.json",
+      "sha256": "713f43e2244927cfcb982822ea0e8bd005b1cf6751d54df8a4d410f96b606e8e"
+    },
+    {
+      "bytes": 33336,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\source-pins.json",
+      "sha256": "1f628ad2502df876022b6d784ca2975e08e8478c757ffc133ec29e73b22436cd"
+    },
+    {
+      "bytes": 32093,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\runner.py",
+      "sha256": "b0761936c290f3419f2e73d47071a17cab4f795db30aaea814b9d0ac26ebadfc"
+    },
+    {
+      "bytes": 7462,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\validate.py",
+      "sha256": "36b143bf493fb48c8f6660cb9a9161f22fb333cc5d263cffa3542edea9fe23a8"
+    },
+    {
+      "bytes": 18294,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\bundle-final-proof.py",
+      "sha256": "022431d2599f56def0691a8d59c1fb626ade76656ed548a0749d62f2f4ff0ab9"
+    },
+    {
+      "bytes": 41166,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\showdown-kernel\\run.py",
+      "sha256": "6d21fe34f9f66327bb7f3ff1c50d977687018af45c3593d56726f78e8da44a60"
+    },
+    {
+      "bytes": 41516,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\exact-mass\\run.py",
+      "sha256": "62200fe9df43a111f6088d4f6e824234876baff6caf0c065fd42365a84869129"
+    }
+  ],
+  "zone": "us-central1-b"
+}

@@ -1,0 +1,90 @@
+{
+  "schema": "r1.vm13-native-cleanup-binding/v1",
+  "checked_at_utc": "2026-09-26T23:14:35.066290+00:00",
+  "archive": {
+    "directory": "E:\\codex-work\\solvers\\r1-native-river-recovery01\\proof",
+    "archive": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\native-river-vm13\\proof01\\native-river-proof01.tar.gz",
+      "bytes": 7682236,
+      "sha256": "06ddb7169418cb680cf22bc72eeb0f57cba617772ef9beb8039a5c3994ef45eb"
+    },
+    "sidecars": [
+      {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\native-river-vm13\\proof01\\native-river-proof01.tar.gz.manifest.json",
+        "bytes": 165882,
+        "sha256": "e7d78da0a8d275a32ec74be1fb09664ba754dfe52739419158bd0afb4f49dd20"
+      },
+      {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\native-river-vm13\\proof01\\native-river-proof01.tar.gz.sha256",
+        "bytes": 94,
+        "sha256": "8c769ee54abf57569d67956fe5ebbea75ea217863d8b744c175cd352159a35b3"
+      }
+    ],
+    "bundle_check": {
+      "schema": "r1.final-pipeline-recovery/v1",
+      "status": "bytes_verified",
+      "archive": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\native-river-vm13\\proof01\\native-river-proof01.tar.gz",
+      "bytes": 7682236,
+      "sha256": "06ddb7169418cb680cf22bc72eeb0f57cba617772ef9beb8039a5c3994ef45eb",
+      "original_files": 368,
+      "archive_files": 312,
+      "retention_issue_count": 0,
+      "missing_required_files": [
+        "build.json"
+      ],
+      "scope": "Recovery-byte integrity only; campaign verification is separate"
+    }
+  },
+  "verification": {
+    "schema": "r1.native-river-verification/v1",
+    "status": "completed",
+    "payload_integrity": "verified",
+    "provenance_complete": true,
+    "passed": 8,
+    "external_quality": "not_evaluated",
+    "acceptance": null,
+    "error": null
+  },
+  "verification_output_sha256": "50957988cb6f13b22e9d759cb698ee549c3f7eb103de19bea5ec97669fad84c5",
+  "launch": {
+    "schema": "r1.native-river-start/v1",
+    "dispatch_utc": "2026-09-26T23:10:16.203027+00:00",
+    "instance_id": "6526324704760165755",
+    "boot_id": "d65ffd75-d2ca-4e08-8452-4c12027b4a2a",
+    "work_deadline_utc": "2026-09-26T23:32:45+00:00",
+    "stop_deadline_utc": "2026-09-26T23:47:45Z",
+    "unit": "solvers-r1-vm13-native-river",
+    "prior_unit_state": {
+      "MainPID": "0",
+      "ControlGroup": "",
+      "LoadState": "loaded",
+      "ActiveState": "failed"
+    },
+    "command": [
+      "systemd-run",
+      "--unit=solvers-r1-vm13-native-river",
+      "--property=RuntimeMaxSec=240",
+      "--property=MemoryMax=12G",
+      "--property=MemorySwapMax=0",
+      "--property=CPUWeight=100",
+      "--property=KillMode=control-group",
+      "--property=SendSIGKILL=yes",
+      "--property=TimeoutStopSec=10",
+      "/usr/bin/python3",
+      "-B",
+      "/opt/r1/native-river-deployment01/run.py",
+      "--phase",
+      "run",
+      "--control",
+      "/opt/r1/phase-deployment01/control",
+      "--phase-proof",
+      "/opt/r1/current-phase-proof01",
+      "--out",
+      "/opt/r1/native-river-proof01",
+      "--work-deadline-utc",
+      "2026-09-26T23:32:45+00:00"
+    ],
+    "manifest_sha256": "7f814b635311e381207d1864c7517a465d4aa908a93b81a7650ac65fd00561aa"
+  },
+  "scope": "Additional native diagnostic fully retained and checked before phase cleanup guard deletion"
+}

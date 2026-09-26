@@ -1,0 +1,16 @@
+MainPID=3309
+ExecMainStatus=0
+ActiveState=active
+SubState=running
+Sep 26 22:55:54 solvers-r1-20260926-13 python3[3309]: {"stage": "build-plain", "status": "passed"}
+Sep 26 22:59:50 solvers-r1-20260926-13 python3[3309]: {"stage": "build-instrumented", "status": "passed"}
+Sep 26 22:59:53 solvers-r1-20260926-13 python3[3309]: {"stage": "native-calibration", "status": "passed"}
+Sep 26 22:59:55 solvers-r1-20260926-13 python3[3309]: {"stage": "memory-calibration", "status": "passed"}
+Sep 26 22:59:57 solvers-r1-20260926-13 python3[3309]: {"stage": "river-b0-plain-solve", "status": "passed"}
+Sep 26 23:00:00 solvers-r1-20260926-13 python3[3309]: {"stage": "river-b0-off-solve", "status": "passed"}
+Sep 26 23:00:02 solvers-r1-20260926-13 python3[3309]: {"stage": "river-b0-time-solve", "status": "passed"}
+Sep 26 23:00:04 solvers-r1-20260926-13 python3[3309]: {"stage": "river-b0-memory-solve", "status": "passed"}
+Sep 26 23:00:06 solvers-r1-20260926-13 python3[3309]: {"stage": "river-b1-plain-solve", "status": "passed"}
+Sep 26 23:00:08 solvers-r1-20260926-13 python3[3309]: {"stage": "river-b1-off-solve", "status": "passed"}
+Sep 26 23:00:11 solvers-r1-20260926-13 python3[3309]: {"stage": "river-b1-time-solve", "status": "passed"}
+Sep 26 23:00:13 solvers-r1-20260926-13 python3[3309]: {"stage": "river-b1-memory-solve", "status": "passed"}

@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\current-phases\\check_run.py",
+    "--out",
+    "E:/codex-work/solvers/r1-current-phase-recovery01/proof",
+    "--expect",
+    "failed"
+  ],
+  "started_utc": "2026-09-26T23:04:25.233862+00:00",
+  "checker_sha256": "ec8d8e879cbd283ca0b308aa891eea17635229b83624172775e0ccd6fc03f115",
+  "exit_code": 0,
+  "ended_utc": "2026-09-26T23:04:56.525372+00:00",
+  "stdout": {
+    "path": "verification01.stdout.log",
+    "bytes": 744,
+    "sha256": "78e772ed006c032d9bbbf77ecf006fa1134498232ebd1eeee775be9bfcd64ccf"
+  },
+  "stderr": {
+    "path": "verification01.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

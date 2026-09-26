@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "solvers-r1-20260926-13:/tmp/current-phase-proof01.tar.gz*",
+    "E:\\codex-work\\solvers\\r1-current-phase-recovery01",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--scp-flag=-batch",
+    "--scp-flag=-hostkey",
+    "--scp-flag=SHA256:oBB8DJK3k6ZsJrRBM5FtbmNka4YM01NNWpwmb/a0xwg"
+  ],
+  "started_utc": "2026-09-26T23:03:41.730926+00:00",
+  "timeout_seconds": 240,
+  "exit_code": 0,
+  "ended_utc": "2026-09-26T23:03:54.747402+00:00",
+  "stdout": {
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm13\\current-phase-download-archive.stdout.log",
+    "bytes": 580,
+    "sha256": "52b4f224a939b014e844e6700f21752934b8b03a3c70c0d23d29462b597812a0"
+  },
+  "stderr": {
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm13\\current-phase-download-archive.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

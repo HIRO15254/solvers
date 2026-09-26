@@ -1,0 +1,10 @@
+{
+  "schema": "r1.native-river-verification/v1",
+  "status": "completed",
+  "payload_integrity": "verified",
+  "provenance_complete": true,
+  "passed": 8,
+  "external_quality": "not_evaluated",
+  "acceptance": null,
+  "error": null
+}

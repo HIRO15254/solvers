@@ -1,0 +1,7 @@
+MainPID=0
+ExecMainStatus=0
+ActiveState=inactive
+SubState=dead
+Sep 26 23:10:16 solvers-r1-20260926-13 systemd[1]: Started solvers-r1-vm13-native-river.service - /usr/bin/python3 -B /opt/r1/native-river-deployment01/run.py --phase run --control /opt/r1/phase-deployment01/control --phase-proof /opt/r1/current-phase-proof01 --out /opt/r1/native-river-proof01 --work-deadline-utc 2026-09-26T23:32:45+00:00.
+Sep 26 23:11:04 solvers-r1-20260926-13 systemd[1]: solvers-r1-vm13-native-river.service: Deactivated successfully.
+Sep 26 23:11:04 solvers-r1-20260926-13 systemd[1]: solvers-r1-vm13-native-river.service: Consumed 56.331s CPU time.

@@ -1,0 +1,12 @@
+MainPID=0
+ExecMainStatus=1
+ActiveState=failed
+SubState=failed
+Sep 26 23:01:22 solvers-r1-20260926-13 python3[3309]:   File "/opt/r1/phase-deployment01/control/current-phases/validate.py", line 98, in validate
+Sep 26 23:01:22 solvers-r1-20260926-13 python3[3309]:     require(peak >= start_hwm, "HWM decreased within a reset interval")
+Sep 26 23:01:22 solvers-r1-20260926-13 python3[3309]:   File "/opt/r1/phase-deployment01/control/current-phases/validate.py", line 29, in require
+Sep 26 23:01:22 solvers-r1-20260926-13 python3[3309]:     raise ValueError(message)
+Sep 26 23:01:22 solvers-r1-20260926-13 python3[3309]: ValueError: HWM decreased within a reset interval
+Sep 26 23:01:22 solvers-r1-20260926-13 systemd[1]: solvers-r1-vm13-current-phases.service: Main process exited, code=exited, status=1/FAILURE
+Sep 26 23:01:22 solvers-r1-20260926-13 systemd[1]: solvers-r1-vm13-current-phases.service: Failed with result 'exit-code'.
+Sep 26 23:01:22 solvers-r1-20260926-13 systemd[1]: solvers-r1-vm13-current-phases.service: Consumed 17min 8.943s CPU time, 1.4G memory peak, 0B memory swap peak.

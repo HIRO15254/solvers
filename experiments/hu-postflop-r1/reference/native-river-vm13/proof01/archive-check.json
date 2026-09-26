@@ -1,0 +1,14 @@
+{
+  "schema": "r1.final-pipeline-recovery/v1",
+  "status": "bytes_verified",
+  "archive": "E:\\codex-work\\solvers\\r1-native-river-recovery01\\native-river-proof01.tar.gz",
+  "bytes": 7682236,
+  "sha256": "06ddb7169418cb680cf22bc72eeb0f57cba617772ef9beb8039a5c3994ef45eb",
+  "original_files": 368,
+  "archive_files": 312,
+  "retention_issue_count": 0,
+  "missing_required_files": [
+    "build.json"
+  ],
+  "scope": "Recovery-byte integrity only; campaign verification is separate"
+}

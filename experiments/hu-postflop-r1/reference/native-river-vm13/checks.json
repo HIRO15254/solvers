@@ -1,0 +1,117 @@
+{
+  "schema": "r1.native-river-python-checks/v1",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "experiments\\hu-postflop-r1\\reference\\native-river-vm13",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "started_utc": "2026-09-26T23:07:09.617596+00:00",
+  "elapsed_seconds": 0.35760050010867417,
+  "exit_code": 0,
+  "source_before": [
+    {
+      "file": "006.toml",
+      "bytes": 18629,
+      "sha256": "aabc635debf6a10e7d2aed7c694ed1f2b3a77ba4c1e5a668ce3fa4dae9520ca4"
+    },
+    {
+      "file": "022.toml",
+      "bytes": 5666,
+      "sha256": "cae505f46cd1f2c15402ce684697240a208d55140e30235a41c3564380096f52"
+    },
+    {
+      "file": "check.py",
+      "bytes": 14478,
+      "sha256": "1250cc1313f3a05c51c79a98d4e907874529c9003a599cdb078dee0e2589cbcf"
+    },
+    {
+      "file": "expectations.json",
+      "bytes": 66082,
+      "sha256": "ebb333d7cb819324d362b3b9420641efd849b4ecaa4d8fc60483abac7c3820eb"
+    },
+    {
+      "file": "README.md",
+      "bytes": 4381,
+      "sha256": "a696cf33917698bb3fc7175fee16ea9aef0c84c8cfc314bee2d5fd8d8d028647"
+    },
+    {
+      "file": "run.py",
+      "bytes": 19437,
+      "sha256": "dedbcd1936b5a25dcce8923f0c1dee47ddfc1703268a21f85b11ef90a853285d"
+    },
+    {
+      "file": "test_check.py",
+      "bytes": 10791,
+      "sha256": "c0999ed0b43469254bd3ef2593d5ba8cc81ba7f1af109184a361975b5976cc94"
+    },
+    {
+      "file": "test_run.py",
+      "bytes": 2282,
+      "sha256": "84ccaf05eadd2b6689d02112217958f0e8aa71d1c610fe4da031a300b544214b"
+    }
+  ],
+  "source_after": [
+    {
+      "file": "006.toml",
+      "bytes": 18629,
+      "sha256": "aabc635debf6a10e7d2aed7c694ed1f2b3a77ba4c1e5a668ce3fa4dae9520ca4"
+    },
+    {
+      "file": "022.toml",
+      "bytes": 5666,
+      "sha256": "cae505f46cd1f2c15402ce684697240a208d55140e30235a41c3564380096f52"
+    },
+    {
+      "file": "check.py",
+      "bytes": 14478,
+      "sha256": "1250cc1313f3a05c51c79a98d4e907874529c9003a599cdb078dee0e2589cbcf"
+    },
+    {
+      "file": "expectations.json",
+      "bytes": 66082,
+      "sha256": "ebb333d7cb819324d362b3b9420641efd849b4ecaa4d8fc60483abac7c3820eb"
+    },
+    {
+      "file": "README.md",
+      "bytes": 4381,
+      "sha256": "a696cf33917698bb3fc7175fee16ea9aef0c84c8cfc314bee2d5fd8d8d028647"
+    },
+    {
+      "file": "run.py",
+      "bytes": 19437,
+      "sha256": "dedbcd1936b5a25dcce8923f0c1dee47ddfc1703268a21f85b11ef90a853285d"
+    },
+    {
+      "file": "test_check.py",
+      "bytes": 10791,
+      "sha256": "c0999ed0b43469254bd3ef2593d5ba8cc81ba7f1af109184a361975b5976cc94"
+    },
+    {
+      "file": "test_run.py",
+      "bytes": 2282,
+      "sha256": "84ccaf05eadd2b6689d02112217958f0e8aa71d1c610fe4da031a300b544214b"
+    }
+  ],
+  "sources_unchanged": true,
+  "logs": [
+    {
+      "file": "checks.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "checks.stderr.log",
+      "bytes": 2920,
+      "sha256": "77a4ca72e96b1d98f2ef219e50ab672daa13af5ebb698492de4c3a25c96bf285"
+    }
+  ],
+  "scope": "Python static tests only; no native solver or cloud execution"
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "r1.native-river-package/v1",
+  "archive": "native-input01.tar.gz",
+  "bytes": 34684,
+  "sha256": "f433702f51849c8ea750b2f91104161dcc8cfdcc7248473033c7a23da7417861",
+  "manifest": {
+    "bytes": 2324,
+    "sha256": "7f814b635311e381207d1864c7517a465d4aa908a93b81a7650ac65fd00561aa"
+  },
+  "files": 17
+}

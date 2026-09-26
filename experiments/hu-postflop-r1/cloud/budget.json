@@ -76,8 +76,47 @@
           "runtime_max_seconds": 2432,
           "evidence": "experiments/hu-postflop-r1/cloud/vm13/campaign-start01.stdout.log",
           "reservation_delta_usd": 0
+        },
+        {
+          "event": "phase_failed_raw_recovered_and_verified",
+          "at": "2026-09-26T23:01:22Z",
+          "passed": 44,
+          "failed": 1,
+          "skipped": 252,
+          "failure": "Flop memory warmup: VmHWM declined36KiB within one reset interval. Fixed campaign terminated; no retry or performance acceptance.",
+          "archive_bytes": 17708089,
+          "archive_sha256": "c94c351505c70aecc7c3b4f9f0a60c37173ed074c728ce1acbb54f65683d100a",
+          "local_verification_ended_utc": "2026-09-26T23:04:56.525372+00:00",
+          "evidence": "experiments/hu-postflop-r1/current-phases/proof01/README.jp.md",
+          "reservation_delta_usd": 0
+        },
+        {
+          "event": "separate_native_river_diagnostics_completed_recovered_verified",
+          "at": "2026-09-26T23:11:04Z",
+          "cases": [
+            "HU-R0-006",
+            "HU-R0-022"
+          ],
+          "passed": 8,
+          "archive_bytes": 7682236,
+          "archive_sha256": "06ddb7169418cb680cf22bc72eeb0f57cba617772ef9beb8039a5c3994ef45eb",
+          "local_verification_ended_utc": "2026-09-26T23:13:31.940971+00:00",
+          "evidence": "experiments/hu-postflop-r1/reference/native-river-vm13/proof01/",
+          "reservation_delta_usd": 0,
+          "note": "Same VM/boot/plain binaries; separate finite240s unit after phase quiescence. No deadline extension, no external quality certification."
+        },
+        {
+          "event": "instance_and_auto_delete_disk_deleted_absence_verified",
+          "at": "2026-09-26T16:16:28.277-07:00",
+          "instance_id": "6526324704760165755",
+          "disk_id": "2641872341416932731",
+          "absence_verified_utc": "2026-09-26T23:16:40.762086+00:00",
+          "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm13/run01/reconciliation.json",
+          "billed_usd": null,
+          "reservation_released": false
         }
-      ]
+      ],
+      "disposition": "Fixed phase campaign failed on reset-window VmHWM decline after44 passed stages; all raw retained and trusted checked. Separate native006/022 diagnostics8 stages passed and exact menus verified. Both evidence archives recovered and verified. Original VM and sole autoDelete40GiB disk deleted; named instance/disk/address absence verified. No retry, resize, restart or deadline extension. Invoice unknown; full2USD held, cumulative40/40,0unreserved."
     },
     {
       "id": "r1-20260926-12",

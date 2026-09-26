@@ -1,0 +1,14 @@
+{
+  "schema": "r1.final-pipeline-recovery/v1",
+  "status": "bytes_verified",
+  "archive": "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\current-phase-proof01.tar.gz",
+  "bytes": 17708089,
+  "sha256": "c94c351505c70aecc7c3b4f9f0a60c37173ed074c728ce1acbb54f65683d100a",
+  "original_files": 1198,
+  "archive_files": 672,
+  "retention_issue_count": 0,
+  "missing_required_files": [
+    "build.json"
+  ],
+  "scope": "Recovery-byte integrity only; campaign verification is separate"
+}

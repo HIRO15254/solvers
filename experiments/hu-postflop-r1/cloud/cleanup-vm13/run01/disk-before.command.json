@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+    "compute",
+    "disks",
+    "describe",
+    "solvers-r1-20260926-13",
+    "--zone=us-central1-b",
+    "--format=json(id,name,selfLink,zone,sizeGb,status,users)",
+    "--project=solvers-abstraction-20260723",
+    "--quiet"
+  ],
+  "label": "disk-before",
+  "started_at_utc": "2026-09-26T23:15:31.853755+00:00",
+  "timeout_seconds": 90
+}

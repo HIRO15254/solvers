@@ -1,0 +1,63 @@
+# HU-R0-022 diagnostic_only: 100 chips = 1 BB; no external quality threshold.
+# Hypothesis only: unrounded 5% capped at 400 chips on EVERY river terminal,
+# applied to TOTAL contributed pot as the runtime percent-cap model does.
+# This is NOT matched-pot rake: R3/F gives 167.5 vs 152.5 chips; RAI/F
+# gives 400 vs 152.5 chips. External collection/refund/rounding remain unknown.
+# Keep the full observed 30.5bb pot including folded UTG's 2bb contribution.
+# This HU fixture does not model/certify folded-seat private-card conditioning.
+# Copy texts are embedded unchanged (except excluding their appended final LF).
+schema = "solvers.postflop/v1"
+
+[game]
+board = "Qd 9h 4s 2c Jd"
+oop_range = "5c4c: 0.0003658,5h4h: 0.0000308,6c5c: 0.0059491,6h5h: 0.0003643,6s5s: 0.0003662,7c6c: 0.0191209,7d6d: 0.0001717,7h6h: 0.000115,7s6s: 0.0000574,8c7c: 0.0295653,8d7d: 0.0003163,8h7h: 0.0002687,8s7s: 0.0002668,JhJc: 0.0062675,JsJc: 0.0064848,JsJh: 0.0042289,Qc8c: 0.0030716,Qc9c: 0.0000982,QcTc: 0.0004836,QcJc: 0.0065666,Qh8h: 0.0021594,QhTh: 0.0006804,QhJh: 0.0026815,QhQc: 0.010695,Qs8s: 0.0017668,Qs9s: 0.000106,QsTs: 0.0006804,QsJs: 0.0026358,QsQc: 0.011456,QsQh: 0.009952,Kc3c: 0.002923,Kc5c: 0.0855712,Kc6c: 0.0348203,Kc7c: 0.0000274,Kc9c: 0.0070875,KcJc: 0.0030967,KcJh: 0.0000718,KcJs: 0.0000599,KcQc: 0.0059529,KcQh: 0.0032701,KcQs: 0.0041117,Kd3d: 0.0004536,Kd6d: 0.0007314,Kd7d: 0.0006064,Kd8d: 0.0004291,Kd9d: 0.0055632,KdJc: 0.0004271,KdJh: 0.0000328,KdJs: 0.0000252,KdQc: 0.001266,KdQh: 0.0011432,KdQs: 0.0011793,KdKc: 0.000324,Kh2h: 0.0002135,Kh3h: 0.0001064,Kh4h: 0.0000331,Kh5h: 0.0000681,Kh6h: 0.0000454,Kh7h: 0.0003038,Kh8h: 0.0004128,KhJc: 0.0009702,KhJh: 0.0005252,KhJs: 0.0004822,KhQc: 0.0015321,KhQh: 0.0023391,KhQs: 0.0011751,KhKc: 0.00125,KhKd: 0.000558,Ks2s: 0.0001918,Ks3s: 0.0000952,Ks5s: 0.0000807,Ks6s: 0.0000446,Ks7s: 0.0003156,Ks8s: 0.0004252,Ks9s: 0.003618,KsJc: 0.0009507,KsJh: 0.0003623,KsJs: 0.0005069,KsQc: 0.0014207,KsQh: 0.0011269,KsQs: 0.0016177,KsKc: 0.001072,KsKd: 0.000326,KsKh: 0.00198,Ac3c: 0.0000109,Ac4c: 0.0018076,Ac6c: 0.0454497,Ac7c: 0.1199346,Ac8c: 0.1121733,AcTc: 0.0000616,AcTd: 0.0001542,AcTh: 0.0001392,AcTs: 0.0001357,AcJc: 0.0003252,AcJh: 0.0011813,AcJs: 0.0011813,AcQc: 0.0009179,AcQh: 0.001418,AcQs: 0.001418,AcKc: 0.003972,AcKd: 0.01144,AcKh: 0.00212,AcKs: 0.00255,Ad2d: 0.0014923,Ad4d: 0.0032765,Ad6d: 0.0142631,Ad7d: 0.0060695,Ad8d: 0.0071488,AdTc: 0.0037352,AdTd: 0.0000465,AdTh: 0.0001427,AdTs: 0.0001418,AdJc: 0.159132,AdJh: 0.0011896,AdJs: 0.0008922,AdQc: 0.0013232,AdQh: 0.0013585,AdQs: 0.0014482,AdKc: 0.01026,AdKd: 0.00288,AdKh: 0.003504,AdKs: 0.00233,AdAc: 0.001393,Ah2h: 0.0005965,Ah4h: 0.0013627,AhJc: 0.0010025,AhJh: 0.0001704,AhJs: 0.0011694,AhQh: 0.000012,AhQs: 0.0001603,AhKc: 0.000975,AhKd: 0.00171,AhKh: 0.000015,AhKs: 0.00044,AhAc: 0.000912,AhAd: 0.000276,As2s: 0.0012519,AsJc: 0.0007688,AsJh: 0.0011503,AsJs: 0.0002029,AsQc: 0.0000216,AsQh: 0.0002017,AsQs: 0.0000748,AsKc: 0.000896,AsKd: 0.002058,AsKh: 0.00047,AsKs: 0.000026,AsAc: 0.000868,AsAd: 0.00028,AsAh: 0.001288"
+ip_range = "2h2d: 0.0000163,2s2d: 0.0000159,3d3c: 0.0000285,3h3c: 0.0000298,3h3d: 0.0000651,3s3c: 0.0000446,3s3d: 0.0000628,3s3h: 0.000061,4h4c: 0.0000137,5c4c: 0.005853,5d4d: 0.0021017,5d5c: 0.0036914,5h4h: 0.0027037,5h5c: 0.0035354,5h5d: 0.0009419,5s5c: 0.0036273,5s5d: 0.0010308,5s5h: 0.0009393,6c5c: 0.0087846,6d5d: 0.0002125,6d6c: 0.019888,6h5h: 0.0000713,6h6c: 0.0161838,6h6d: 0.0083041,6s5s: 0.0000728,6s6c: 0.0161352,6s6d: 0.0082058,6s6h: 0.0069785,7c6c: 0.0006293,7d7c: 0.051968,7h7c: 0.0446519,7h7d: 0.0219303,7s7c: 0.044725,7s7d: 0.0220207,7s7h: 0.019602,8d8c: 0.0749459,8h8c: 0.0640473,8h8d: 0.0491933,8s8c: 0.0644272,8s8d: 0.0495649,8s8h: 0.0477683,9d9c: 0.0025911,9s9c: 0.0034306,9s9d: 0.0004055,TdTc: 0.0293206,ThTc: 0.0287345,ThTd: 0.0295317,TsTc: 0.0287048,TsTd: 0.0294611,TsTh: 0.0286354,JhJc: 0.1264609,JsJc: 0.1276887,JsJh: 0.0709613,QhQc: 0.0653719,QsQc: 0.0665267,QsQh: 0.0579636,KcJc: 0.0166627,KcQc: 0.0242536,KhJh: 0.0000536,KhQh: 0.0379549,KsJs: 0.000054,KsQs: 0.0417574,Ac5c: 0.0394596,AcTc: 0.0000313,AcJc: 0.0753764,AcQc: 0.0333445,AcKd: 0.0936975,AcKh: 0.0754254,AcKs: 0.0693306,Ad5d: 0.0450216,AdTd: 0.0152122,AdKc: 0.118807,AdKh: 0.0878857,AdKs: 0.0866016,Ah5h: 0.0000552,AhJh: 0.0360343,AhQh: 0.04259,AhKc: 0.0405197,AhKd: 0.0448917,AhKs: 0.0268393,As5s: 0.0000614,AsJs: 0.0377307,AsQs: 0.04059,AsKc: 0.0401978,AsKd: 0.0438212,AsKh: 0.0272669"
+pot = 3050
+effective_stack = 8600
+min_bet = 100
+iso_merging = false
+preflop_aggressor = "oop"
+
+[game.tree]
+kind = "script"
+include_allin = false
+script = '''
+river {
+  replace bet [300c, 1050c, 1800c, 2550c, 4600c, a]
+  replace raise [a]
+  when aggressions == 1 && to_call == 300 { replace raise [1600c, 2300c, 4850c, a] }
+  when aggressions == 1 && to_call == 1050 { replace raise [2850c, 3900c, a] }
+  when aggressions == 1 && to_call == 1800 { replace raise [4150c, 5450c, a] }
+  when aggressions == 1 && to_call == 2550 { replace raise [5400c, a] }
+  when aggressions == 2 && to_call == 1300 { replace raise [3800c, 5050c, a] }
+  when aggressions == 2 && to_call == 2000 { replace raise [5000c, a] }
+  when aggressions == 2 && to_call == 1800 { replace raise [5900c, a] }
+}
+'''
+
+[game.tree.max_aggressive_actions]
+flop = 0
+turn = 0
+river = 4
+
+[rake]
+kind = "percent-cap"
+rate = 0.05
+cap = 400.0
+no_flop_no_drop = false
+
+[utility]
+kind = "chip-ev"
+
+[algorithm]
+schedule = "dcfr"
+
+[run]
+# Finite diagnostic computation budget, not a convergence or quality claim.
+# No target_nash_conv: these offline inputs do not define an acceptance test.
+iterations = 10000
+check_every = 100
+max_time = "30s"
+storage = "f32"
+threads = 1
+par_chance_depth = 0

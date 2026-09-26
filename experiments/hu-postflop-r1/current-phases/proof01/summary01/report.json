@@ -1,0 +1,92 @@
+{
+  "schema": "r1.current-phases-report/v1",
+  "created_at": "2026-09-26T23:06:30.259028+00:00",
+  "campaign_status": "failed",
+  "source_revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+  "scope": "Three fixed synthetic cases, one worker, F32; Flop narrow three-combo fixture; current-source phase attribution only.",
+  "sample_policy": "Non-warmup blocks1,2,3 only, no weighting or replacement; quality verification still includes all warmups.",
+  "units": {
+    "time": "seconds",
+    "memory": "Linux KiB counters; Markdown MiB=KiB/1024"
+  },
+  "input_pins": {
+    "result.json": {
+      "path": "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\proof\\result.json",
+      "bytes": 972169,
+      "sha256": "cd2918f57a3b391769f4381f93c4bd75309998601ee3efd87c477d30d65aa879"
+    },
+    "retention.json": {
+      "path": "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\proof\\retention.json",
+      "bytes": 277870,
+      "sha256": "40e7451c7ca18013f8010e200ef4b7ddef081abeb87e0dd48789f36de98fe592"
+    },
+    "plan.json": {
+      "path": "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\proof\\plan.json",
+      "bytes": 97547,
+      "sha256": "761153fae8e1d8142e9c969779060ecc623e794200629c1333d58fbdeda3f865"
+    }
+  },
+  "trusted_code_pins": {
+    "summarize.py": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\summarize.py",
+      "bytes": 15726,
+      "sha256": "4c1ef09176de72ded8196bc93e0f22e73602632eae194c29b410f0d5bef9ad9a"
+    },
+    "check_run.py": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\check_run.py",
+      "bytes": 21435,
+      "sha256": "ec8d8e879cbd283ca0b308aa891eea17635229b83624172775e0ccd6fc03f115"
+    },
+    "runner.py": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\runner.py",
+      "bytes": 32093,
+      "sha256": "b0761936c290f3419f2e73d47071a17cab4f795db30aaea814b9d0ac26ebadfc"
+    },
+    "validate.py": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\validate.py",
+      "bytes": 7462,
+      "sha256": "36b143bf493fb48c8f6660cb9a9161f22fb333cc5d263cffa3542edea9fe23a8"
+    }
+  },
+  "verification": {
+    "schema": "r1.current-phases-verification/v1",
+    "status": "failed",
+    "scope": "current source fixed synthetic cases",
+    "provenance_complete": true,
+    "payload_integrity": "verified",
+    "counts": {
+      "passed": 44,
+      "failed": 1,
+      "skipped": 252
+    },
+    "summary": null,
+    "error": "ValueError('HWM decreased within a reset interval')",
+    "comparison_error": null,
+    "limitations": [
+      "No retained code executed; compiler/Python executable identities only.",
+      "Recorded host/source checks are not an independent attestation of the original machine.",
+      "Memory values are Linux process counters, not exact physical phase memory.",
+      "No external reference or overall R1 acceptance is certified."
+    ]
+  },
+  "cases": null,
+  "failure": {
+    "stages": [
+      {
+        "label": "flop-b0-memory-solve",
+        "error": "ValueError('HWM decreased within a reset interval')",
+        "record": {
+          "path": "/opt/r1/current-phase-proof01/stages/flop-b0-memory-solve/supervisor.json",
+          "bytes": 21119,
+          "sha256": "1603d9d8afc7e6f07f8d666a03125f6118090feeb86e571f80ed370453905b48"
+        }
+      }
+    ]
+  },
+  "non_claims": [
+    "old/new gain",
+    "physical phase memory or allocation increment",
+    "32-worker scaling",
+    "external library or all-R1 certification"
+  ]
+}

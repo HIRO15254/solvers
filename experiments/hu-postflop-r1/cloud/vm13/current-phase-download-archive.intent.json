@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "solvers-r1-20260926-13:/tmp/current-phase-proof01.tar.gz*",
+    "E:\\codex-work\\solvers\\r1-current-phase-recovery01",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--scp-flag=-batch",
+    "--scp-flag=-hostkey",
+    "--scp-flag=SHA256:oBB8DJK3k6ZsJrRBM5FtbmNka4YM01NNWpwmb/a0xwg"
+  ],
+  "started_utc": "2026-09-26T23:03:41.730926+00:00",
+  "timeout_seconds": 240
+}

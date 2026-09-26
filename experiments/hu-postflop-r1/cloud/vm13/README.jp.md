@@ -43,3 +43,9 @@
 `capture-command.py` は各SDK操作のintent・stdout・stderr・exit code・時間・hashを一度だけ記録する。
 不確かなSDK timeoutは再実行せず、まず実状態を確認する。転送・回収器の成功と、計測の成功・性能判定は別である。
 校正が通らないphase時間やRSS値を改善の根拠とせず、外部参照やR1全体の受入も認定しない。
+
+転送archiveはリモート展開のhash一致確認後、再生成可能な
+`.cache/cloud-vm13/phase-deployment01.tar.gz` へ移した。Gitには固定manifest、全入力のhash、
+packer、receiptと転送・展開ログを残す。manifest内の作成日時も保持しているので、固定入力とそのmanifestを
+packerと同じ順序・gzip mtime=0で格納すれば同じarchiveを再生成できる。
+raw料金HTML末尾の空白と、実行済みcapture scriptの末尾空行は元hashを保つためそのまま保持する。

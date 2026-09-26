@@ -1,0 +1,21 @@
+{
+  "schema": "r1.current-phases-verification/v1",
+  "status": "failed",
+  "scope": "current source fixed synthetic cases",
+  "provenance_complete": true,
+  "payload_integrity": "verified",
+  "counts": {
+    "passed": 44,
+    "failed": 1,
+    "skipped": 252
+  },
+  "summary": null,
+  "error": "ValueError('HWM decreased within a reset interval')",
+  "comparison_error": null,
+  "limitations": [
+    "No retained code executed; compiler/Python executable identities only.",
+    "Recorded host/source checks are not an independent attestation of the original machine.",
+    "Memory values are Linux process counters, not exact physical phase memory.",
+    "No external reference or overall R1 acceptance is certified."
+  ]
+}
