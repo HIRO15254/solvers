@@ -39,3 +39,11 @@ proof02の[検証済み結果](../../final-pipeline/proof02/report.jp.md)は時�
 [起動ラッパー](run-memory03.sh)と[起動検査](start-memory03.py)は校正から順に実行し、
 測定deadlineを21:20:00 UTCとする。VM STOP期限・予約額は変更しない。
 これらのスクリプト自体は実行完了の証拠ではない。
+
+メモリ追加測定は[proof03](../../focused-memory/proof03/verification.json)で99工程の成功と
+原証拠の一致をローカル再検証した。Turn・限定Flopのnative RSS基準は通過、Riverは未達。
+3回分のarchiveを回収し、失敗を含む全証拠の検証後にVMを明示削除した。
+[削除と不在の原記録](../cleanup-vm11/run01/reconciliation.json)は、同じinstance IDの
+delete operationが20:17:09.165 UTCにDONE、20:17:20.111820 UTCの照合でVM・disk・
+対象addressが空であることを示す。元のSTOP期限前に削除され、期限延長はない。
+実請求は未確認のため、$3の予約と累計$35/$40は維持する。

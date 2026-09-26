@@ -1,0 +1,62 @@
+{
+  "schema": "r1.focused-memory-verification/v1",
+  "status": "completed",
+  "processes_passed": 99,
+  "payload_integrity": "verified",
+  "provenance_complete": true,
+  "summary": {
+    "cases": {
+      "river": {
+        "ru_maxrss_kib": {
+          "old": [
+            10476,
+            10724,
+            10516
+          ],
+          "new": [
+            9816,
+            10036,
+            9724
+          ]
+        },
+        "max_new_over_min_old": 0.9579992363497518,
+        "screen": false
+      },
+      "turn": {
+        "ru_maxrss_kib": {
+          "old": [
+            30848,
+            30716,
+            30632
+          ],
+          "new": [
+            10456,
+            10368,
+            10424
+          ]
+        },
+        "max_new_over_min_old": 0.34134238704622616,
+        "screen": true
+      },
+      "flop": {
+        "ru_maxrss_kib": {
+          "old": [
+            329644,
+            329776,
+            329640
+          ],
+          "new": [
+            17676,
+            17116,
+            17564
+          ]
+        },
+        "max_new_over_min_old": 0.05362213323625774,
+        "screen": true
+      }
+    },
+    "scope": "Linux wait4 ru_maxrss of the direct solver child forked by the small native launcher. No statm denominator, physical peak bound, population claim or overall R1 certification.",
+    "proof02_screen_changed": false
+  },
+  "reference": "proof02 externally verified with trusted checkout code"
+}

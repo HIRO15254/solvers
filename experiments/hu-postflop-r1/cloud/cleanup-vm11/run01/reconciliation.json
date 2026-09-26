@@ -1,0 +1,494 @@
+{
+  "billing_usd": null,
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\verify.py",
+        "--out",
+        "E:\\codex-work\\solvers\\r1-final-recovery01\\proof"
+      ],
+      "ended_at_utc": "2026-09-26T20:13:17.484063+00:00",
+      "exit_code": 0,
+      "label": "proof-0-verification",
+      "started_at_utc": "2026-09-26T20:13:16.152632+00:00",
+      "stderr": {
+        "bytes": 0,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\proof-0-verification.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 1136,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\proof-0-verification.stdout.log",
+        "sha256": "2c3f9674ef6c898cf0362d6161b4d877c59bc7de511955370ba49562289eb1a3"
+      },
+      "timeout_seconds": 180
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\verify.py",
+        "--out",
+        "E:\\codex-work\\solvers\\r1-final-recovery02\\proof"
+      ],
+      "ended_at_utc": "2026-09-26T20:14:32.987237+00:00",
+      "exit_code": 0,
+      "label": "proof-1-verification",
+      "started_at_utc": "2026-09-26T20:13:26.954283+00:00",
+      "stderr": {
+        "bytes": 0,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\proof-1-verification.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 33195,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\proof-1-verification.stdout.log",
+        "sha256": "8a745c176404730c255d18b9a31edc6fbd66b36340dbed4bd9a8312553119de4"
+      },
+      "timeout_seconds": 180
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\focused-memory\\run.py",
+        "--phase",
+        "check",
+        "--out",
+        "E:\\codex-work\\solvers\\r1-memory-recovery03\\proof",
+        "--reference-proof",
+        "E:\\codex-work\\solvers\\r1-final-recovery02\\proof"
+      ],
+      "ended_at_utc": "2026-09-26T20:16:10.861485+00:00",
+      "exit_code": 0,
+      "label": "focused-proof-0-verification",
+      "started_at_utc": "2026-09-26T20:14:44.019708+00:00",
+      "stderr": {
+        "bytes": 0,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\focused-proof-0-verification.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 1516,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\focused-proof-0-verification.stdout.log",
+        "sha256": "43d49d185470750af26d1a5063b36583025ecf632a2480a7b52d2b9dd96f7596"
+      },
+      "timeout_seconds": 180
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "instances",
+        "describe",
+        "solvers-r1-20260926-11",
+        "--zone=us-central1-b",
+        "--format=json(id,name,selfLink,zone,status,disks,networkInterfaces)",
+        "--project=solvers-abstraction-20260723",
+        "--quiet"
+      ],
+      "ended_at_utc": "2026-09-26T20:16:13.373985+00:00",
+      "exit_code": 0,
+      "label": "instance-before",
+      "started_at_utc": "2026-09-26T20:16:10.861867+00:00",
+      "stderr": {
+        "bytes": 0,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\instance-before.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 30708,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\instance-before.stdout.log",
+        "sha256": "54158d432cbad0a2e253eefae72da35365d2802b14b9e66593ec32b210185ef6"
+      },
+      "timeout_seconds": 90
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "disks",
+        "describe",
+        "solvers-r1-20260926-11",
+        "--zone=us-central1-b",
+        "--format=json(id,name,selfLink,zone,sizeGb,status,users)",
+        "--project=solvers-abstraction-20260723",
+        "--quiet"
+      ],
+      "ended_at_utc": "2026-09-26T20:16:16.913907+00:00",
+      "exit_code": 0,
+      "label": "disk-before",
+      "started_at_utc": "2026-09-26T20:16:13.374671+00:00",
+      "stderr": {
+        "bytes": 0,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\disk-before.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 524,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\disk-before.stdout.log",
+        "sha256": "94b39e5f8bfd05c41df35d67f5d3f4888f54ca99335353d11248246cd1c7b24e"
+      },
+      "timeout_seconds": 90
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "instances",
+        "delete",
+        "solvers-r1-20260926-11",
+        "--zone=us-central1-b",
+        "--project=solvers-abstraction-20260723",
+        "--quiet",
+        "--format=json"
+      ],
+      "ended_at_utc": "2026-09-26T20:17:10.029822+00:00",
+      "exit_code": 0,
+      "label": "delete",
+      "started_at_utc": "2026-09-26T20:16:16.914893+00:00",
+      "stderr": {
+        "bytes": 141,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\delete.stderr.log",
+        "sha256": "720640cab0b38d3c6e2c620ac3e6d4ded0892838ed14c48f79691d03b870436a"
+      },
+      "stdout": {
+        "bytes": 4,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\delete.stdout.log",
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "timeout_seconds": 180
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "instances",
+        "list",
+        "--zones=us-central1-b",
+        "--filter=name=solvers-r1-20260926-11",
+        "--project=solvers-abstraction-20260723",
+        "--quiet",
+        "--format=json"
+      ],
+      "ended_at_utc": "2026-09-26T20:17:13.283252+00:00",
+      "exit_code": 0,
+      "label": "instances-after",
+      "started_at_utc": "2026-09-26T20:17:10.030357+00:00",
+      "stderr": {
+        "bytes": 82,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\instances-after.stderr.log",
+        "sha256": "95ff429f97500ebd8a0e3bc62ee92fef734bb8069ed5a8de26a9be0c34cc80fb"
+      },
+      "stdout": {
+        "bytes": 4,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\instances-after.stdout.log",
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "timeout_seconds": 90
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "disks",
+        "list",
+        "--zones=us-central1-b",
+        "--filter=name=solvers-r1-20260926-11",
+        "--project=solvers-abstraction-20260723",
+        "--quiet",
+        "--format=json"
+      ],
+      "ended_at_utc": "2026-09-26T20:17:14.999149+00:00",
+      "exit_code": 0,
+      "label": "disks-after",
+      "started_at_utc": "2026-09-26T20:17:13.283590+00:00",
+      "stderr": {
+        "bytes": 82,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\disks-after.stderr.log",
+        "sha256": "95ff429f97500ebd8a0e3bc62ee92fef734bb8069ed5a8de26a9be0c34cc80fb"
+      },
+      "stdout": {
+        "bytes": 4,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\disks-after.stdout.log",
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "timeout_seconds": 90
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "addresses",
+        "list",
+        "--filter=name=solvers-r1-20260926-11 OR address=35.202.245.57",
+        "--project=solvers-abstraction-20260723",
+        "--quiet",
+        "--format=json"
+      ],
+      "ended_at_utc": "2026-09-26T20:17:17.352534+00:00",
+      "exit_code": 0,
+      "label": "addresses-after",
+      "started_at_utc": "2026-09-26T20:17:14.999471+00:00",
+      "stderr": {
+        "bytes": 85,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\addresses-after.stderr.log",
+        "sha256": "86d770d0f84f2ebe08bdd39928196d5ab1626ec35f0099e5b102ba6354ec0b13"
+      },
+      "stdout": {
+        "bytes": 4,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\addresses-after.stdout.log",
+        "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+      },
+      "timeout_seconds": 90
+    },
+    {
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "operations",
+        "list",
+        "--filter=operationType=delete AND targetId=570856080701499920",
+        "--project=solvers-abstraction-20260723",
+        "--quiet",
+        "--format=json"
+      ],
+      "ended_at_utc": "2026-09-26T20:17:20.111353+00:00",
+      "exit_code": 0,
+      "label": "delete-operations-after",
+      "started_at_utc": "2026-09-26T20:17:17.352994+00:00",
+      "stderr": {
+        "bytes": 0,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\delete-operations-after.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 904,
+        "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\delete-operations-after.stdout.log",
+        "sha256": "3e1cfe3f3f6e01c33a4368fd712f42452fd63045e0f18432d74fb768f0a0b4c1"
+      },
+      "timeout_seconds": 90
+    }
+  ],
+  "disk_id": "1158215583101463056",
+  "ended_at_utc": "2026-09-26T20:17:20.111820+00:00",
+  "environment_overrides": {
+    "CLOUDSDK_ENCODING": "utf-8",
+    "CLOUDSDK_PYTHON": "C:\\Python313\\python.exe",
+    "PYTHONIOENCODING": "utf-8"
+  },
+  "focused_proofs": [
+    {
+      "archive": {
+        "bytes": 21516217,
+        "path": "E:\\codex-work\\solvers\\r1-memory-recovery03\\focused-memory03.tar.gz",
+        "sha256": "fc4cbedaa99d1f1c9a3764420ba25e40d8a0509e3cf62ab080b64c49177c8449"
+      },
+      "bundle_check": {
+        "archive": "E:\\codex-work\\solvers\\r1-memory-recovery03\\focused-memory03.tar.gz",
+        "archive_files": 589,
+        "bytes": 21516217,
+        "missing_required_files": [
+          "build.json"
+        ],
+        "original_files": 1275,
+        "retention_issue_count": 0,
+        "schema": "r1.final-pipeline-recovery/v1",
+        "scope": "Recovery-byte integrity only; campaign verification is separate",
+        "sha256": "fc4cbedaa99d1f1c9a3764420ba25e40d8a0509e3cf62ab080b64c49177c8449",
+        "status": "bytes_verified"
+      },
+      "campaign_status": "completed",
+      "directory": "E:\\codex-work\\solvers\\r1-memory-recovery03\\proof",
+      "reference_directory": "E:\\codex-work\\solvers\\r1-final-recovery02\\proof",
+      "sidecars": [
+        {
+          "bytes": 550996,
+          "path": "E:\\codex-work\\solvers\\r1-memory-recovery03\\focused-memory03.tar.gz.manifest.json",
+          "sha256": "577dbaaf1079e29a5c9e5766178676904cc2d642597c1b6ebf3f588e8dae6f25"
+        },
+        {
+          "bytes": 90,
+          "path": "E:\\codex-work\\solvers\\r1-memory-recovery03\\focused-memory03.tar.gz.sha256",
+          "sha256": "1a555a59e319d3c8f9757561cdadca90ef0bc44df5bf910556f1f8fe69041dcd"
+        }
+      ]
+    }
+  ],
+  "instance": "solvers-r1-20260926-11",
+  "instance_id": "570856080701499920",
+  "matching_done_delete_operations": [
+    {
+      "endTime": "2026-09-26T13:17:09.165-07:00",
+      "id": "4744298419522475772",
+      "insertTime": "2026-09-26T13:16:19.672-07:00",
+      "kind": "compute#operation",
+      "name": "operation-1790453779468-65c6881830fad-6e8d62a7-17309163",
+      "operationType": "delete",
+      "progress": 100,
+      "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/operations/operation-1790453779468-65c6881830fad-6e8d62a7-17309163",
+      "startTime": "2026-09-26T13:16:19.695-07:00",
+      "status": "DONE",
+      "targetId": "570856080701499920",
+      "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260926-11",
+      "user": "hi089697@gmail.com",
+      "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+    }
+  ],
+  "mode": "delete",
+  "observed_external_addresses": [
+    "35.202.245.57"
+  ],
+  "project": "solvers-abstraction-20260723",
+  "proofs": [
+    {
+      "archive": {
+        "bytes": 10564202,
+        "path": "E:\\codex-work\\solvers\\r1-final-recovery01\\final-proof01.tar.gz",
+        "sha256": "1ccb025c7044a6d07c3226d7391d781b3f0301a26b047b6ebf77aa2d3f462d80"
+      },
+      "bundle_check": {
+        "archive": "E:\\codex-work\\solvers\\r1-final-recovery01\\final-proof01.tar.gz",
+        "archive_files": 226,
+        "bytes": 10564202,
+        "missing_required_files": [],
+        "original_files": 248,
+        "retention_issue_count": 0,
+        "schema": "r1.final-pipeline-recovery/v1",
+        "scope": "Recovery-byte integrity only; campaign verification is separate",
+        "sha256": "1ccb025c7044a6d07c3226d7391d781b3f0301a26b047b6ebf77aa2d3f462d80",
+        "status": "bytes_verified"
+      },
+      "campaign_status": "failed",
+      "directory": "E:\\codex-work\\solvers\\r1-final-recovery01\\proof",
+      "sidecars": [
+        {
+          "bytes": 112094,
+          "path": "E:\\codex-work\\solvers\\r1-final-recovery01\\final-proof01.tar.gz.manifest.json",
+          "sha256": "67725e732b42ce96fc388e93ff40663de23ccb49047c075aeed272288d48ab65"
+        },
+        {
+          "bytes": 87,
+          "path": "E:\\codex-work\\solvers\\r1-final-recovery01\\final-proof01.tar.gz.sha256",
+          "sha256": "d7c20d7f895bb53f75d9dc3abca32615d040d903b36f43231e00e0f9c22f46a3"
+        }
+      ]
+    },
+    {
+      "archive": {
+        "bytes": 32221395,
+        "path": "E:\\codex-work\\solvers\\r1-final-recovery02\\final-proof02.tar.gz",
+        "sha256": "27f772cdf4e9c8293f470d0e8b09df2a03f8b8e3fa873444bc1ee4d817005b84"
+      },
+      "bundle_check": {
+        "archive": "E:\\codex-work\\solvers\\r1-final-recovery02\\final-proof02.tar.gz",
+        "archive_files": 999,
+        "bytes": 32221395,
+        "missing_required_files": [],
+        "original_files": 2113,
+        "retention_issue_count": 0,
+        "schema": "r1.final-pipeline-recovery/v1",
+        "scope": "Recovery-byte integrity only; campaign verification is separate",
+        "sha256": "27f772cdf4e9c8293f470d0e8b09df2a03f8b8e3fa873444bc1ee4d817005b84",
+        "status": "bytes_verified"
+      },
+      "campaign_status": "completed",
+      "directory": "E:\\codex-work\\solvers\\r1-final-recovery02\\proof",
+      "sidecars": [
+        {
+          "bytes": 915225,
+          "path": "E:\\codex-work\\solvers\\r1-final-recovery02\\final-proof02.tar.gz.manifest.json",
+          "sha256": "adb956c32b5f7a04656b0f1d8ce227c22679c1973836ffe238f0e55e9c50d41c"
+        },
+        {
+          "bytes": 87,
+          "path": "E:\\codex-work\\solvers\\r1-final-recovery02\\final-proof02.tar.gz.sha256",
+          "sha256": "9b26ba97e3fd3b69ebd66b6c2132b74456c04d1bf6f3f0997349b9fad1655440"
+        }
+      ]
+    }
+  ],
+  "readbacks": {
+    "addresses-after": [],
+    "delete-operations-after": [
+      {
+        "endTime": "2026-09-26T13:17:09.165-07:00",
+        "id": "4744298419522475772",
+        "insertTime": "2026-09-26T13:16:19.672-07:00",
+        "kind": "compute#operation",
+        "name": "operation-1790453779468-65c6881830fad-6e8d62a7-17309163",
+        "operationType": "delete",
+        "progress": 100,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/operations/operation-1790453779468-65c6881830fad-6e8d62a7-17309163",
+        "startTime": "2026-09-26T13:16:19.695-07:00",
+        "status": "DONE",
+        "targetId": "570856080701499920",
+        "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260926-11",
+        "user": "hi089697@gmail.com",
+        "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+      }
+    ],
+    "disks-after": [],
+    "instances-after": []
+  },
+  "reservation_released": false,
+  "schema": "r1.vm11-cleanup/v1",
+  "scope": "Only VM11 and its autoDelete boot disk; resource absence is not a billing assertion",
+  "started_at_utc": "2026-09-26T20:13:15.424241+00:00",
+  "status": "deleted_and_absence_verified",
+  "trusted_code": [
+    {
+      "bytes": 13399,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm11\\cleanup.py",
+      "sha256": "a88b1815109968360031e6762fc44e1a88f696346816776bc2c89e11d06f5b09"
+    },
+    {
+      "bytes": 859,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\verify.py",
+      "sha256": "8fa02c7ccc59a8251930bc5f646a0f69bbb8cdbc337edd420b6966bb8a13a06a"
+    },
+    {
+      "bytes": 50954,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\run.py",
+      "sha256": "84d9a6a001ab08d55efbb8554bdc9a76ecc05c247b25c423952fb473896a6b28"
+    },
+    {
+      "bytes": 18294,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\bundle-final-proof.py",
+      "sha256": "022431d2599f56def0691a8d59c1fb626ade76656ed548a0749d62f2f4ff0ab9"
+    },
+    {
+      "bytes": 41166,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\showdown-kernel\\run.py",
+      "sha256": "6d21fe34f9f66327bb7f3ff1c50d977687018af45c3593d56726f78e8da44a60"
+    },
+    {
+      "bytes": 41516,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\exact-mass\\run.py",
+      "sha256": "62200fe9df43a111f6088d4f6e824234876baff6caf0c065fd42365a84869129"
+    },
+    {
+      "bytes": 21102,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\focused-memory\\run.py",
+      "sha256": "2395d1d6a1acf579152bdb7880b001737351b56c5851103e5127159925ea54ec"
+    },
+    {
+      "bytes": 2859,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\focused-memory\\protocol.json",
+      "sha256": "7a994cb63f5d483400e2de9e10bb4588eb052bf17f69ae21836229d0baabdff7"
+    },
+    {
+      "bytes": 5392,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\focused-memory\\native_rss.c",
+      "sha256": "f7d3db113925bc21b2b60e361676680a386e86efd6e6fd11eab36cfb42c1f49f"
+    },
+    {
+      "bytes": 6709,
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\focused-memory\\calibration.py",
+      "sha256": "d90f0063aad62094760c4b429d273e4a48434c5f4c55fac4444020e60235f2e8"
+    }
+  ],
+  "zone": "us-central1-b"
+}

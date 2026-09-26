@@ -148,3 +148,8 @@ original verification and independent local report are linked from
 [Proof01](proof01/README.jp.md) separately retains the earlier host-identity
 guard failure before any measured sample. Neither attempt establishes external
 24-case acceptance or completes R1.
+
+A separately frozen [native-child RSS follow-up](../focused-memory/proof03/report.jp.md)
+retains99 successful processes with the same binaries, inputs and quality.
+Its Turn/limited-Flop screens passed and its River screen missed the threshold;
+it leaves this campaign's original memory-null result unchanged.

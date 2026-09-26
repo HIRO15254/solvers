@@ -1,0 +1,14 @@
+{
+  "schema": "r1.final-pipeline-recovery/v1",
+  "status": "bytes_verified",
+  "archive": "E:\\codex-work\\solvers\\r1-memory-recovery03\\focused-memory03.tar.gz",
+  "bytes": 21516217,
+  "sha256": "fc4cbedaa99d1f1c9a3764420ba25e40d8a0509e3cf62ab080b64c49177c8449",
+  "original_files": 1275,
+  "archive_files": 589,
+  "retention_issue_count": 0,
+  "missing_required_files": [
+    "build.json"
+  ],
+  "scope": "Recovery-byte integrity only; campaign verification is separate"
+}

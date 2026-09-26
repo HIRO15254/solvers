@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260926-11",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:d6Jt8pBawJIIqWlBiQ1OQ9kVqLPL03Z/WChjsTVawgw",
+    "--command=sudo test ! -e /opt/r1/final-control/focused-memory && sudo test ! -e /tmp/memory-deploy03 && sudo mkdir /tmp/memory-deploy03 && sudo tar xzf /tmp/memory-controls03.tar.gz -C /tmp/memory-deploy03 && sudo cp -a /tmp/memory-deploy03/focused-memory /opt/r1/final-control/ && sudo cp /tmp/memory-deploy03/run-memory03.sh /tmp/memory-deploy03/start-memory03.py /tmp/memory-deploy03/recover-memory03.sh /tmp/memory-deploy03/memory-controls03.json /tmp/ && sudo bash -n /tmp/run-memory03.sh && sudo bash -n /tmp/recover-memory03.sh && sudo python3 -B /tmp/start-memory03.py"
+  ],
+  "started_utc": "2026-09-26T20:03:25.536512+00:00",
+  "exit_code": 0,
+  "ended_utc": "2026-09-26T20:03:31.614631+00:00",
+  "memory03-start.stdout.log": {
+    "bytes": 2708,
+    "sha256": "8923af69b2440f2d51837a41bfde4aa2274a4e119e65e1cef1377294207991cf"
+  },
+  "memory03-start.stderr.log": {
+    "bytes": 99,
+    "sha256": "6874c842f4904f5492e7ffe5fea3454d2f6e5bee66cd8e49346225606377ca84"
+  }
+}

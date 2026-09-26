@@ -1,0 +1,11 @@
+{
+  "id": "1158215583101463056",
+  "name": "solvers-r1-20260926-11",
+  "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260926-11",
+  "sizeGb": "40",
+  "status": "READY",
+  "users": [
+    "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260926-11"
+  ],
+  "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+}

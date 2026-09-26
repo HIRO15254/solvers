@@ -149,9 +149,56 @@
           "reservation_delta_usd": 0,
           "reservation_released": false,
           "billed_usd": null
+        },
+        {
+          "at": "2026-09-26T20:03:30.869057+00:00",
+          "event": "focused_memory03_started_same_vm_reservation",
+          "instance_id": "570856080701499920",
+          "boot_id": "7d1d9913-8d5d-420b-934e-2129e2ce25e6",
+          "service_unit": "solvers-r1-vm11-memory03.service",
+          "invocation_id": "8efbb887487042be8fb7a1a2e51146a0",
+          "measurement_deadline_utc": "2026-09-26T21:20:00Z",
+          "absolute_stop_deadline_utc": "2026-09-26T21:54:51Z",
+          "reservation_delta_usd": 0,
+          "held_total_usd": 35,
+          "proof02_memory_screen_revised": false,
+          "evidence": "experiments/hu-postflop-r1/cloud/vm11/memory03-start.stdout.log"
+        },
+        {
+          "at": "2026-09-26T20:10:33Z",
+          "event": "focused_memory03_completed_recovered_locally_verified",
+          "processes_passed": 99,
+          "archive_bytes": 21516217,
+          "archive_sha256": "fc4cbedaa99d1f1c9a3764420ba25e40d8a0509e3cf62ab080b64c49177c8449",
+          "screens": {
+            "river": false,
+            "turn": true,
+            "flop": true
+          },
+          "native_counter_ratio_max_new_over_min_old": {
+            "river": 0.9579992363497518,
+            "turn": 0.34134238704622616,
+            "flop": 0.05362213323625774
+          },
+          "proof02_memory_screen_revised": false,
+          "local_verification_ended_utc": "2026-09-26T20:16:10.861485+00:00",
+          "evidence": "experiments/hu-postflop-r1/focused-memory/proof03/verification-command.json",
+          "reservation_delta_usd": 0
+        },
+        {
+          "at": "2026-09-26T20:17:09.165Z",
+          "event": "instance_and_auto_delete_disk_deleted_absence_verified",
+          "instance_id": "570856080701499920",
+          "disk_id": "1158215583101463056",
+          "operation_id": "4744298419522475772",
+          "absence_verified_utc": "2026-09-26T20:17:20.111820+00:00",
+          "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm11/run01/reconciliation.json",
+          "billed_usd": null,
+          "reservation_released": false
         }
       ],
-      "note": "3.02h at rounded on-demand compute/IP +40GiB disk up to24h +1GiB transfer +$1 margin =1.86187<3. Protocol frozen before candidate execution. Absolute3h STOP, no automatic restart/extension. Reserve20min for recovery, then explicit VM/disk deletion. Actual billing unknown; held35/40."
+      "note": "3.02h at rounded on-demand compute/IP +40GiB disk up to24h +1GiB transfer +$1 margin =1.86187<3. Protocol frozen before candidate execution. Absolute3h STOP, no automatic restart/extension. Reserve20min for recovery, then explicit VM/disk deletion. Actual billing unknown; held35/40.",
+      "disposition": "VM11 and its sole 40GiB autoDelete disk explicitly deleted after all three attempts were recovered and verified. Delete DONE20:17:09.165Z, named-resource absence20:17:20.111820Z. Proof01 retains premeasurement host-identity failure; proof02 passed time/eligibleIO with memory null; focused memory03 passed Turn/Flop RSS screens but River missed10% criterion. Original STOP21:54:51Z not extended. Invoice unknown; full $3 reservation held, cumulative $35/$40."
     },
     {
       "id": "r1-20260926-10",

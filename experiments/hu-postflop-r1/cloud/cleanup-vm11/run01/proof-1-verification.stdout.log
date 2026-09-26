@@ -1,0 +1,1042 @@
+{
+  "schema": "r1.final-pipeline-verification/v1",
+  "status": "completed",
+  "build_status": "completed",
+  "processes_passed": 156,
+  "historical_validation": {
+    "scope": "historical source-identical production validation, not rerun or same-boot validation",
+    "mode": "full-validation",
+    "stages": 8,
+    "tests": {
+      "workspace-tests": {
+        "summary_count": 56,
+        "passed": 958,
+        "ignored": 31
+      },
+      "release-oracle": {
+        "summary_count": 1,
+        "passed": 3,
+        "ignored": 0
+      },
+      "release-river-resolve": {
+        "summary_count": 1,
+        "passed": 1,
+        "ignored": 0
+      }
+    },
+    "full_workspace_validated": true
+  },
+  "payload_integrity": "verified",
+  "summary": {
+    "cases": {
+      "river": {
+        "solve": {
+          "seconds": {
+            "old": [
+              0.1761200739999822,
+              0.17717717799996535,
+              0.1791028009999991
+            ],
+            "new": [
+              0.0638095639999392,
+              0.0638967299998967,
+              0.06438740599992343
+            ]
+          },
+          "medians": {
+            "old": 0.17717717799996535,
+            "new": 0.0638967299998967
+          },
+          "new_over_old": 0.3606374744263576,
+          "paired_new_faster": 3,
+          "memory": {
+            "old": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 7,
+                "max_sample_gap_seconds": 0.02906813399999919,
+                "sampled_peak_tree_resident_bytes": 10539008,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 7,
+                "max_sample_gap_seconds": 0.029352139000138777,
+                "sampled_peak_tree_resident_bytes": 10530816,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 7,
+                "max_sample_gap_seconds": 0.02897672800008877,
+                "sampled_peak_tree_resident_bytes": 10952704,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ],
+            "new": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 3,
+                "max_sample_gap_seconds": 0.02663846000018566,
+                "sampled_peak_tree_resident_bytes": 8548352,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 3,
+                "max_sample_gap_seconds": 0.026793488000066645,
+                "sampled_peak_tree_resident_bytes": 8519680,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 3,
+                "max_sample_gap_seconds": 0.026895393999893713,
+                "sampled_peak_tree_resident_bytes": 8544256,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ]
+          },
+          "os_rss_bound_ratio": 9.530143912874369,
+          "artifact_bytes": {
+            "old": {
+              "solution.sol": [
+                7605,
+                7605,
+                7608
+              ],
+              "checkpoint.ckpt": [
+                81330,
+                81330,
+                81330
+              ]
+            },
+            "new": {
+              "solution.sol": [
+                4685,
+                4682,
+                4684
+              ],
+              "checkpoint.ckpt": [
+                11157,
+                11157,
+                11157
+              ]
+            }
+          },
+          "iterations": {
+            "old": [
+              100,
+              100,
+              100
+            ],
+            "new": [
+              100,
+              100,
+              100
+            ]
+          }
+        },
+        "summary": {
+          "seconds": {
+            "old": [
+              0.011232243999984348,
+              0.010424482999951579,
+              0.010302998000042862
+            ],
+            "new": [
+              0.010811509999712143,
+              0.011174334999850544,
+              0.011090089999925112
+            ]
+          },
+          "medians": {
+            "old": 0.010424482999951579,
+            "new": 0.011090089999925112
+          },
+          "new_over_old": 1.0638503607302756,
+          "paired_new_faster": 1
+        },
+        "audit": {
+          "seconds": {
+            "old": [
+              0.03723593599988817,
+              0.04021946600005322,
+              0.03871451500026524
+            ],
+            "new": [
+              0.03699095399997532,
+              0.012138224999944214,
+              0.03783887600002345
+            ]
+          },
+          "medians": {
+            "old": 0.03871451500026524,
+            "new": 0.03699095399997532
+          },
+          "new_over_old": 0.9554802378312601,
+          "paired_new_faster": 3,
+          "saved_quality": {
+            "old": [
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  13.87182247648117,
+                  6.128177443380661
+                ],
+                "br": [
+                  13.884700453991274,
+                  6.145047224108368
+                ],
+                "gains": [
+                  0.012877977510102667,
+                  0.016869780727707173
+                ],
+                "nash_conv": 0.02974775823780984
+              },
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  13.87182247648117,
+                  6.128177443380661
+                ],
+                "br": [
+                  13.884700453991274,
+                  6.145047224108368
+                ],
+                "gains": [
+                  0.012877977510102667,
+                  0.016869780727707173
+                ],
+                "nash_conv": 0.02974775823780984
+              },
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  13.87182247648117,
+                  6.128177443380661
+                ],
+                "br": [
+                  13.884700453991274,
+                  6.145047224108368
+                ],
+                "gains": [
+                  0.012877977510102667,
+                  0.016869780727707173
+                ],
+                "nash_conv": 0.02974775823780984
+              }
+            ],
+            "new": [
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  13.87182247648117,
+                  6.128177443380661
+                ],
+                "br": [
+                  13.884700453991274,
+                  6.145047224108368
+                ],
+                "gains": [
+                  0.012877977510102667,
+                  0.016869780727707173
+                ],
+                "nash_conv": 0.02974775823780984
+              },
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  13.87182247648117,
+                  6.128177443380661
+                ],
+                "br": [
+                  13.884700453991274,
+                  6.145047224108368
+                ],
+                "gains": [
+                  0.012877977510102667,
+                  0.016869780727707173
+                ],
+                "nash_conv": 0.02974775823780984
+              },
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  13.87182247648117,
+                  6.128177443380661
+                ],
+                "br": [
+                  13.884700453991274,
+                  6.145047224108368
+                ],
+                "gains": [
+                  0.012877977510102667,
+                  0.016869780727707173
+                ],
+                "nash_conv": 0.02974775823780984
+              }
+            ]
+          }
+        },
+        "decode-all": {
+          "seconds": {
+            "old": [
+              0.000820726,
+              0.00082893,
+              0.000887589
+            ],
+            "new": [
+              0.000233562,
+              0.000270104,
+              0.000234215
+            ]
+          },
+          "medians": {
+            "old": 0.00082893,
+            "new": 0.000234215
+          },
+          "new_over_old": 0.282550999481259,
+          "paired_new_faster": 3,
+          "regression_screen": null
+        },
+        "read-root": {
+          "seconds": {
+            "old": [
+              0.0008337980000000001,
+              0.000841065,
+              0.000829228
+            ],
+            "new": [
+              0.000227373,
+              0.000212262,
+              0.00022506799999999998
+            ]
+          },
+          "medians": {
+            "old": 0.0008337980000000001,
+            "new": 0.00022506799999999998
+          },
+          "new_over_old": 0.2699310864262087,
+          "paired_new_faster": 3,
+          "regression_screen": null
+        },
+        "stream-write": {
+          "seconds": {
+            "old": [
+              0.003818,
+              0.003763323,
+              0.003798987
+            ],
+            "new": [
+              0.004453216,
+              0.003614185,
+              0.00438666
+            ]
+          },
+          "medians": {
+            "old": 0.003798987,
+            "new": 0.00438666
+          },
+          "new_over_old": 1.1546920271114378,
+          "paired_new_faster": 1,
+          "regression_screen": null
+        }
+      },
+      "turn": {
+        "solve": {
+          "seconds": {
+            "old": [
+              5.239978541000028,
+              5.247207516000117,
+              5.224493004999886
+            ],
+            "new": [
+              0.19682022699998925,
+              0.19759970499990231,
+              0.19487254299997403
+            ]
+          },
+          "medians": {
+            "old": 5.239978541000028,
+            "new": 0.19682022699998925
+          },
+          "new_over_old": 0.037561265844883965,
+          "paired_new_faster": 3,
+          "memory": {
+            "old": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 200,
+                "max_sample_gap_seconds": 0.027546526999913112,
+                "sampled_peak_tree_resident_bytes": 29323264,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 200,
+                "max_sample_gap_seconds": 0.027975889999879655,
+                "sampled_peak_tree_resident_bytes": 29491200,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 199,
+                "max_sample_gap_seconds": 0.028150791999905778,
+                "sampled_peak_tree_resident_bytes": 31682560,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ],
+            "new": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 8,
+                "max_sample_gap_seconds": 0.02779223700008515,
+                "sampled_peak_tree_resident_bytes": 10686464,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 8,
+                "max_sample_gap_seconds": 0.02782372599995142,
+                "sampled_peak_tree_resident_bytes": 10608640,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 8,
+                "max_sample_gap_seconds": 0.026995015000011335,
+                "sampled_peak_tree_resident_bytes": 10579968,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ]
+          },
+          "os_rss_bound_ratio": 3.422545048191088,
+          "artifact_bytes": {
+            "old": {
+              "solution.sol": [
+                24919,
+                24919,
+                24916
+              ],
+              "checkpoint.ckpt": [
+                356288,
+                356288,
+                356288
+              ]
+            },
+            "new": {
+              "solution.sol": [
+                12489,
+                12489,
+                12490
+              ],
+              "checkpoint.ckpt": [
+                20637,
+                20637,
+                20637
+              ]
+            }
+          },
+          "iterations": {
+            "old": [
+              100,
+              100,
+              100
+            ],
+            "new": [
+              100,
+              100,
+              100
+            ]
+          }
+        },
+        "summary": {
+          "seconds": {
+            "old": [
+              0.01089215999991211,
+              0.012378176999845891,
+              0.011319833000015933
+            ],
+            "new": [
+              0.014462982000168267,
+              0.013605706999896938,
+              0.012280169999939972
+            ]
+          },
+          "medians": {
+            "old": 0.011319833000015933,
+            "new": 0.013605706999896938
+          },
+          "new_over_old": 1.2019353112256856,
+          "paired_new_faster": 0
+        },
+        "audit": {
+          "seconds": {
+            "old": [
+              0.14283629200008363,
+              0.15269984199994724,
+              0.1448785930001577
+            ],
+            "new": [
+              0.040267074999974284,
+              0.04083527100010542,
+              0.03802342800008773
+            ]
+          },
+          "medians": {
+            "old": 0.1448785930001577,
+            "new": 0.040267074999974284
+          },
+          "new_over_old": 0.2779366790229006,
+          "paired_new_faster": 3,
+          "saved_quality": {
+            "old": [
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  18.791926937338747,
+                  1.2080722855932926
+                ],
+                "br": [
+                  18.80648516431267,
+                  1.2223522986894775
+                ],
+                "gains": [
+                  0.014558226973921506,
+                  0.014280013096184874
+                ],
+                "nash_conv": 0.02883824007010638
+              },
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  18.791926937338747,
+                  1.2080722855932926
+                ],
+                "br": [
+                  18.80648516431267,
+                  1.2223522986894775
+                ],
+                "gains": [
+                  0.014558226973921506,
+                  0.014280013096184874
+                ],
+                "nash_conv": 0.02883824007010638
+              },
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  18.791926937338747,
+                  1.2080722855932926
+                ],
+                "br": [
+                  18.80648516431267,
+                  1.2223522986894775
+                ],
+                "gains": [
+                  0.014558226973921506,
+                  0.014280013096184874
+                ],
+                "nash_conv": 0.02883824007010638
+              }
+            ],
+            "new": [
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  18.791926937338747,
+                  1.2080722855932926
+                ],
+                "br": [
+                  18.80648516431267,
+                  1.2223522986894775
+                ],
+                "gains": [
+                  0.014558226973921506,
+                  0.014280013096184874
+                ],
+                "nash_conv": 0.02883824007010638
+              },
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  18.791926937338747,
+                  1.2080722855932926
+                ],
+                "br": [
+                  18.80648516431267,
+                  1.2223522986894775
+                ],
+                "gains": [
+                  0.014558226973921506,
+                  0.014280013096184874
+                ],
+                "nash_conv": 0.02883824007010638
+              },
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  18.791926937338747,
+                  1.2080722855932926
+                ],
+                "br": [
+                  18.80648516431267,
+                  1.2223522986894775
+                ],
+                "gains": [
+                  0.014558226973921506,
+                  0.014280013096184874
+                ],
+                "nash_conv": 0.02883824007010638
+              }
+            ]
+          }
+        },
+        "decode-all": {
+          "seconds": {
+            "old": [
+              0.023961375,
+              0.022577759,
+              0.023295153
+            ],
+            "new": [
+              0.001126376,
+              0.001058663,
+              0.000896086
+            ]
+          },
+          "medians": {
+            "old": 0.023295153,
+            "new": 0.001058663
+          },
+          "new_over_old": 0.045445634119681465,
+          "paired_new_faster": 3,
+          "regression_screen": true
+        },
+        "read-root": {
+          "seconds": {
+            "old": [
+              0.003266576,
+              0.003471239,
+              0.003400831
+            ],
+            "new": [
+              0.000209529,
+              0.000265034,
+              0.00022268199999999998
+            ]
+          },
+          "medians": {
+            "old": 0.003400831,
+            "new": 0.00022268199999999998
+          },
+          "new_over_old": 0.06547870211721782,
+          "paired_new_faster": 3,
+          "regression_screen": null
+        },
+        "stream-write": {
+          "seconds": {
+            "old": [
+              0.018333028,
+              0.018009059,
+              0.020040373
+            ],
+            "new": [
+              0.004842346,
+              0.004389069,
+              0.00430822
+            ]
+          },
+          "medians": {
+            "old": 0.018333028,
+            "new": 0.004389069
+          },
+          "new_over_old": 0.23940775086363253,
+          "paired_new_faster": 3,
+          "regression_screen": true
+        }
+      },
+      "flop": {
+        "solve": {
+          "seconds": {
+            "old": [
+              34.84876689800012,
+              34.75130657700015,
+              34.76617639699998
+            ],
+            "new": [
+              0.6038747119998789,
+              0.561914083999909,
+              0.562089922000041
+            ]
+          },
+          "medians": {
+            "old": 34.76617639699998,
+            "new": 0.562089922000041
+          },
+          "new_over_old": 0.016167723352187344,
+          "paired_new_faster": 3,
+          "memory": {
+            "old": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 1323,
+                "max_sample_gap_seconds": 0.028589903000010963,
+                "sampled_peak_tree_resident_bytes": 337960960,
+                "root_os_peak_resident_bytes": 337571840,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 1321,
+                "max_sample_gap_seconds": 0.028105363000122452,
+                "sampled_peak_tree_resident_bytes": 337981440,
+                "root_os_peak_resident_bytes": 337375232,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 1322,
+                "max_sample_gap_seconds": 0.03543779799997537,
+                "sampled_peak_tree_resident_bytes": 338046976,
+                "root_os_peak_resident_bytes": 337866752,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ],
+            "new": [
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 23,
+                "max_sample_gap_seconds": 0.028360256000041772,
+                "sampled_peak_tree_resident_bytes": 17010688,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 22,
+                "max_sample_gap_seconds": 0.027354973000001337,
+                "sampled_peak_tree_resident_bytes": 18014208,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              },
+              {
+                "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+                "sample_count": 22,
+                "max_sample_gap_seconds": 0.027408349000097587,
+                "sampled_peak_tree_resident_bytes": 18034688,
+                "root_os_peak_resident_bytes": 100360192,
+                "root_os_peak_source": "wait4.ru_maxrss_linux_kib",
+                "job_os_peak_commit_bytes": null,
+                "max_observed_processes": 1
+              }
+            ]
+          },
+          "os_rss_bound_ratio": null,
+          "artifact_bytes": {
+            "old": {
+              "solution.sol": [
+                176832,
+                176831,
+                176832
+              ],
+              "checkpoint.ckpt": [
+                34545,
+                34545,
+                34545
+              ]
+            },
+            "new": {
+              "solution.sol": [
+                81335,
+                81334,
+                81336
+              ],
+              "checkpoint.ckpt": [
+                1531,
+                1531,
+                1531
+              ]
+            }
+          },
+          "iterations": {
+            "old": [
+              50,
+              50,
+              50
+            ],
+            "new": [
+              50,
+              50,
+              50
+            ]
+          }
+        },
+        "summary": {
+          "seconds": {
+            "old": [
+              0.3433695449998595,
+              0.016264995000256022,
+              0.014298657999916031
+            ],
+            "new": [
+              0.013889836000089417,
+              0.011668002000078559,
+              0.011530739000136236
+            ]
+          },
+          "medians": {
+            "old": 0.016264995000256022,
+            "new": 0.011668002000078559
+          },
+          "new_over_old": 0.7173689263288981,
+          "paired_new_faster": 3
+        },
+        "audit": {
+          "seconds": {
+            "old": [
+              2.0373455630001445,
+              1.984116137000001,
+              2.000262639999619
+            ],
+            "new": [
+              0.09826069099972301,
+              0.09085987400021622,
+              0.09743670999978349
+            ]
+          },
+          "medians": {
+            "old": 2.000262639999619,
+            "new": 0.09743670999978349
+          },
+          "new_over_old": 0.04871195814555735,
+          "paired_new_faster": 3,
+          "saved_quality": {
+            "old": [
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  8.049393865797255,
+                  11.950607935587565
+                ],
+                "br": [
+                  8.063050905863443,
+                  11.973651144239637
+                ],
+                "gains": [
+                  0.013657040066188841,
+                  0.023043208652072877
+                ],
+                "nash_conv": 0.03670024871826172
+              },
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  8.049393865797255,
+                  11.950607935587565
+                ],
+                "br": [
+                  8.063050905863443,
+                  11.973651144239637
+                ],
+                "gains": [
+                  0.013657040066188841,
+                  0.023043208652072877
+                ],
+                "nash_conv": 0.03670024871826172
+              },
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  8.049393865797255,
+                  11.950607935587565
+                ],
+                "br": [
+                  8.063050905863443,
+                  11.973651144239637
+                ],
+                "gains": [
+                  0.013657040066188841,
+                  0.023043208652072877
+                ],
+                "nash_conv": 0.03670024871826172
+              }
+            ],
+            "new": [
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  8.049393865797255,
+                  11.950607935587565
+                ],
+                "br": [
+                  8.063050905863443,
+                  11.973651144239637
+                ],
+                "gains": [
+                  0.013657040066188841,
+                  0.023043208652072877
+                ],
+                "nash_conv": 0.03670024871826172
+              },
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  8.049393865797255,
+                  11.950607935587565
+                ],
+                "br": [
+                  8.063050905863443,
+                  11.973651144239637
+                ],
+                "gains": [
+                  0.013657040066188841,
+                  0.023043208652072877
+                ],
+                "nash_conv": 0.03670024871826172
+              },
+              {
+                "profile": "stored_quantized",
+                "ev": [
+                  8.049393865797255,
+                  11.950607935587565
+                ],
+                "br": [
+                  8.063050905863443,
+                  11.973651144239637
+                ],
+                "gains": [
+                  0.013657040066188841,
+                  0.023043208652072877
+                ],
+                "nash_conv": 0.03670024871826172
+              }
+            ]
+          }
+        },
+        "decode-all": {
+          "seconds": {
+            "old": [
+              0.423194389,
+              0.430085455,
+              0.376257371
+            ],
+            "new": [
+              0.007805987,
+              0.006961171,
+              0.006791137
+            ]
+          },
+          "medians": {
+            "old": 0.423194389,
+            "new": 0.006961171
+          },
+          "new_over_old": 0.01644910986756963,
+          "paired_new_faster": 3,
+          "regression_screen": true
+        },
+        "read-root": {
+          "seconds": {
+            "old": [
+              0.002693094,
+              0.0026820359999999996,
+              0.002604275
+            ],
+            "new": [
+              0.000243222,
+              0.000194909,
+              0.000201857
+            ]
+          },
+          "medians": {
+            "old": 0.0026820359999999996,
+            "new": 0.000201857
+          },
+          "new_over_old": 0.07526259901060241,
+          "paired_new_faster": 3,
+          "regression_screen": null
+        },
+        "stream-write": {
+          "seconds": {
+            "old": [
+              0.241203824,
+              0.226642124,
+              0.227240853
+            ],
+            "new": [
+              0.015866317,
+              0.014763741,
+              0.015499053
+            ]
+          },
+          "medians": {
+            "old": 0.227240853,
+            "new": 0.015499053
+          },
+          "new_over_old": 0.06820539878892287,
+          "paired_new_faster": 3,
+          "regression_screen": true
+        }
+      }
+    },
+    "solve_geomean_new_over_old": 0.060277233841645114,
+    "time_screen": true,
+    "memory_screen": null,
+    "io_screen": true,
+    "phase_timings": null,
+    "scope": "Separate descriptive screens; no overall R1 certification or physical/phase RSS claim."
+  },
+  "limitations": [
+    "BLAKE3 report strings are bound to native output, not independently recomputed by Python",
+    "source-after is recorded live inventory verification",
+    "OS RSS counter bound, not exact physical or per-phase peak",
+    "census does not enumerate terminal evaluator internals or infer public card IDs from sparse masks"
+  ]
+}

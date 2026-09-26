@@ -1,0 +1,65 @@
+{
+  "schema": "r1.retained-files/v1",
+  "files": [
+    {
+      "path": "archive-check.json",
+      "bytes": 490,
+      "sha256": "6d6836d9566f711d55f4602b17f9ae0c1ccb6c003df1603a0fa2eeb6bc607f29"
+    },
+    {
+      "path": "focused-memory03-recovery-check.json",
+      "bytes": 404,
+      "sha256": "a3b7f829e5386b54fa3968ab00599a85f156efc5dab00dbb62dadc1a9e02c431"
+    },
+    {
+      "path": "focused-memory03-recovery.json",
+      "bytes": 402,
+      "sha256": "1b5b71c8278111bba3d5a38bfa98b6944e60b9b1e10eaa87fe6c4ad8fb95210e"
+    },
+    {
+      "path": "focused-memory03.tar.gz",
+      "bytes": 21516217,
+      "sha256": "fc4cbedaa99d1f1c9a3764420ba25e40d8a0509e3cf62ab080b64c49177c8449"
+    },
+    {
+      "path": "focused-memory03.tar.gz.manifest.json",
+      "bytes": 550996,
+      "sha256": "577dbaaf1079e29a5c9e5766178676904cc2d642597c1b6ebf3f588e8dae6f25"
+    },
+    {
+      "path": "focused-memory03.tar.gz.sha256",
+      "bytes": 90,
+      "sha256": "1a555a59e319d3c8f9757561cdadca90ef0bc44df5bf910556f1f8fe69041dcd"
+    },
+    {
+      "path": "README.jp.md",
+      "bytes": 3276,
+      "sha256": "10b0b1258929b1ae7932fff26af339fdf22550a176fee332bed6260b950ac035"
+    },
+    {
+      "path": "report.jp.md",
+      "bytes": 8094,
+      "sha256": "f6247aa388a0b5a6326b612c5a0df734c10eda0307f89675e30922459b126a02"
+    },
+    {
+      "path": "verification-command.json",
+      "bytes": 986,
+      "sha256": "66404914b86bca120f65b5dd5b3e9aba1c2ca916690848e54d06d1e1a0cd9e8e"
+    },
+    {
+      "path": "verification-intent.json",
+      "bytes": 485,
+      "sha256": "0c66199204dced5d575b1b52662e91c2a1d74c6e022433699baf69f37727983e"
+    },
+    {
+      "path": "verification.json",
+      "bytes": 1516,
+      "sha256": "43d49d185470750af26d1a5063b36583025ecf632a2480a7b52d2b9dd96f7596"
+    },
+    {
+      "path": "verification.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

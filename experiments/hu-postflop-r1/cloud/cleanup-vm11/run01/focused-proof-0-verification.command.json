@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\focused-memory\\run.py",
+    "--phase",
+    "check",
+    "--out",
+    "E:\\codex-work\\solvers\\r1-memory-recovery03\\proof",
+    "--reference-proof",
+    "E:\\codex-work\\solvers\\r1-final-recovery02\\proof"
+  ],
+  "label": "focused-proof-0-verification",
+  "started_at_utc": "2026-09-26T20:14:44.019708+00:00",
+  "timeout_seconds": 180
+}

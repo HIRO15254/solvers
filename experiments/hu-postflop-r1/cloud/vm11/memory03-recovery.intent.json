@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260926-11",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:d6Jt8pBawJIIqWlBiQ1OQ9kVqLPL03Z/WChjsTVawgw",
+    "--command=sudo bash /tmp/recover-memory03.sh"
+  ],
+  "started_utc": "2026-09-26T20:11:45.537109+00:00"
+}

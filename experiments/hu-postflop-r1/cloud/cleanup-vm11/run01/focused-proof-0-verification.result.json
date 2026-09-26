@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\focused-memory\\run.py",
+    "--phase",
+    "check",
+    "--out",
+    "E:\\codex-work\\solvers\\r1-memory-recovery03\\proof",
+    "--reference-proof",
+    "E:\\codex-work\\solvers\\r1-final-recovery02\\proof"
+  ],
+  "ended_at_utc": "2026-09-26T20:16:10.861485+00:00",
+  "exit_code": 0,
+  "label": "focused-proof-0-verification",
+  "started_at_utc": "2026-09-26T20:14:44.019708+00:00",
+  "stderr": {
+    "bytes": 0,
+    "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\focused-proof-0-verification.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "bytes": 1516,
+    "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\focused-proof-0-verification.stdout.log",
+    "sha256": "43d49d185470750af26d1a5063b36583025ecf632a2480a7b52d2b9dd96f7596"
+  },
+  "timeout_seconds": 180
+}

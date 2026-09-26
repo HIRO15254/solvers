@@ -1,0 +1,37 @@
+{
+  "schema": "r1.final-pipeline-verification/v1",
+  "status": "failed",
+  "build_status": "failed",
+  "processes_passed": 0,
+  "historical_validation": {
+    "scope": "historical source-identical production validation, not rerun or same-boot validation",
+    "mode": "full-validation",
+    "stages": 8,
+    "tests": {
+      "workspace-tests": {
+        "summary_count": 56,
+        "passed": 958,
+        "ignored": 31
+      },
+      "release-oracle": {
+        "summary_count": 1,
+        "passed": 3,
+        "ignored": 0
+      },
+      "release-river-resolve": {
+        "summary_count": 1,
+        "passed": 1,
+        "ignored": 0
+      }
+    },
+    "full_workspace_validated": true
+  },
+  "payload_integrity": "verified",
+  "summary": null,
+  "limitations": [
+    "BLAKE3 report strings are bound to native output, not independently recomputed by Python",
+    "source-after is recorded live inventory verification",
+    "OS RSS counter bound, not exact physical or per-phase peak",
+    "census does not enumerate terminal evaluator internals or infer public card IDs from sparse masks"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\verify.py",
+    "--out",
+    "E:\\codex-work\\solvers\\r1-final-recovery02\\proof"
+  ],
+  "ended_at_utc": "2026-09-26T20:14:32.987237+00:00",
+  "exit_code": 0,
+  "label": "proof-1-verification",
+  "started_at_utc": "2026-09-26T20:13:26.954283+00:00",
+  "stderr": {
+    "bytes": 0,
+    "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\proof-1-verification.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "bytes": 33195,
+    "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\proof-1-verification.stdout.log",
+    "sha256": "8a745c176404730c255d18b9a31edc6fbd66b36340dbed4bd9a8312553119de4"
+  },
+  "timeout_seconds": 180
+}

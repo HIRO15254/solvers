@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+    "compute",
+    "addresses",
+    "list",
+    "--filter=name=solvers-r1-20260926-11 OR address=35.202.245.57",
+    "--project=solvers-abstraction-20260723",
+    "--quiet",
+    "--format=json"
+  ],
+  "ended_at_utc": "2026-09-26T20:17:17.352534+00:00",
+  "exit_code": 0,
+  "label": "addresses-after",
+  "started_at_utc": "2026-09-26T20:17:14.999471+00:00",
+  "stderr": {
+    "bytes": 85,
+    "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\addresses-after.stderr.log",
+    "sha256": "86d770d0f84f2ebe08bdd39928196d5ab1626ec35f0099e5b102ba6354ec0b13"
+  },
+  "stdout": {
+    "bytes": 4,
+    "path": "E:\\codex-work\\solvers\\r1-vm11-cleanup\\addresses-after.stdout.log",
+    "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+  },
+  "timeout_seconds": 90
+}

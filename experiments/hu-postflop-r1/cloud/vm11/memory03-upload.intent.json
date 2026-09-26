@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "experiments\\hu-postflop-r1\\cloud\\vm11\\memory-controls03.tar.gz",
+    "solvers-r1-20260926-11:/tmp/memory-controls03.tar.gz",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--scp-flag=-batch",
+    "--scp-flag=-hostkey",
+    "--scp-flag=SHA256:d6Jt8pBawJIIqWlBiQ1OQ9kVqLPL03Z/WChjsTVawgw"
+  ],
+  "started_utc": "2026-09-26T20:03:17.887899+00:00"
+}
