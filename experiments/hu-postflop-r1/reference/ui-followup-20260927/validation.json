@@ -1,5 +1,6 @@
 {
   "schema": "r1.reference-ui-followup-validation/v1",
+  "historical_scope": "Checks recorded for original commit 1292a7f, before the clipboard-freshness correction. These are not a rerun receipt for the corrected observation files. Arithmetic refers to retained old Copy files, not freshly verified exports.",
   "changes": "Observation transcription, offline arithmetic evidence and experiment index only; production Rust source unchanged from 11e4062",
   "checks": [
     {"command": "python -B tools/check_docs.py", "exit_code": 0, "markdown_files": 49},

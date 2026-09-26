@@ -1,0 +1,61 @@
+{
+  "schema": "r1.reference-ranges/v1",
+  "case_id": "HU-R0-022",
+  "board": [
+    "Qd",
+    "9h",
+    "4s",
+    "2c",
+    "Jd"
+  ],
+  "observed": {
+    "file": "observed.json",
+    "bytes": 7054,
+    "sha256": "d1f63a0a2e6744012ee3132902569e263acc09cd6499660a6148209774e29f0e"
+  },
+  "arithmetic": "Decimal precision 100 with Inexact trap; both compatible and incompatible mass summed independently",
+  "byte_scope": "original ASCII Copy text plus exactly one appended LF; no rewrite or renormalization",
+  "transfer_check_scope": "reported browser character count and FNV independently recalculated; UI provenance remains collecting root's report",
+  "oop": {
+    "file": "oop-range.txt",
+    "file_bytes": 2348,
+    "copy_raw_characters": 2347,
+    "raw_fnv1a32": "f13141bf",
+    "sha256": "00578d305c270cca7415c3631a888c0f757a82eb2ca93969563b1e2b10ad1041",
+    "positive_combos": 150,
+    "weight_sum": "0.8570733",
+    "weight_min": "0.0000109",
+    "weight_max": "0.159132",
+    "duplicate_unordered_combos": 0,
+    "repeated_private_cards": 0,
+    "board_collisions": 0,
+    "invalid_weights": 0
+  },
+  "ip": {
+    "file": "ip-range.txt",
+    "file_bytes": 1364,
+    "copy_raw_characters": 1363,
+    "raw_fnv1a32": "8a49f645",
+    "sha256": "8ac48ebeae7ded4d1427ef5a64db7a134c2104258511cd8fae72834ce98c8efd",
+    "positive_combos": 86,
+    "weight_sum": "2.6023891",
+    "weight_min": "0.0000137",
+    "weight_max": "0.1276887",
+    "duplicate_unordered_combos": 0,
+    "repeated_private_cards": 0,
+    "board_collisions": 0,
+    "invalid_weights": 0
+  },
+  "joint": {
+    "positive_pair_product_count": 12900,
+    "compatible_positive_pairs": 11606,
+    "incompatible_positive_pairs": 1294,
+    "compatible_weight_sum": "1.81534121714657",
+    "incompatible_weight_sum": "0.41509699667446",
+    "unrestricted_product_weight_sum": "2.23043821382103",
+    "definition": "sum(w_oop*w_ip) over disjoint retained private cards; no normalization, chance weights or folded-seat card distribution"
+  },
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null
+}

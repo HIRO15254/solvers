@@ -1,0 +1,25 @@
+test_actual_bytes_and_independent_fraction_mass (__main__.RangeChecks.test_actual_bytes_and_independent_fraction_mass) ... ok
+test_board_collision_rejected (__main__.RangeChecks.test_board_collision_rejected) ... ok
+test_invalid_and_nonpositive_weights_rejected (__main__.RangeChecks.test_invalid_and_nonpositive_weights_rejected) ... ok
+test_malformed_or_duplicate_board_rejected (__main__.RangeChecks.test_malformed_or_duplicate_board_rejected) ... ok
+test_observed_acquisition_pins_cannot_silently_change (__main__.RangeChecks.test_observed_acquisition_pins_cannot_silently_change) ... ok
+test_one_lf_and_transfer_pins (__main__.RangeChecks.test_one_lf_and_transfer_pins) ... ok
+test_retained_result_matches_actual_bytes (__main__.RangeChecks.test_retained_result_matches_actual_bytes) ... ok
+test_scientific_notation_and_blocking_exact (__main__.RangeChecks.test_scientific_notation_and_blocking_exact) ... ok
+test_unordered_combo_and_repeated_card_rejected (__main__.RangeChecks.test_unordered_combo_and_repeated_card_rejected) ... ok
+test_zero_compatible_mass_rejected (__main__.RangeChecks.test_zero_compatible_mass_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.070s
+
+OK
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\reference\HU-R0-022\check_menus.py", line 220, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\reference\HU-R0-022\check_menus.py", line 214, in main
+    require(read_json(path) == result, "retained menu-check.json differs from source bytes/graph")
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\reference\HU-R0-022\check_ranges.py", line 22, in require
+    raise ValueError(message)
+ValueError: retained menu-check.json differs from source bytes/graph

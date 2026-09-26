@@ -1,0 +1,207 @@
+{
+  "schema": "r1.reference-offline-checks/v1",
+  "case_id": "HU-R0-022",
+  "started_utc": "2026-09-26T21:39:16.503375+00:00",
+  "source_before": [
+    {
+      "file": "menus.json",
+      "bytes": 8847,
+      "sha256": "5e982816bac8c066192ce740296e2ec770aed18cce74fce075897a91082a524c"
+    },
+    {
+      "file": "observed.json",
+      "bytes": 7054,
+      "sha256": "d1f63a0a2e6744012ee3132902569e263acc09cd6499660a6148209774e29f0e"
+    },
+    {
+      "file": "ranges.json",
+      "bytes": 2098,
+      "sha256": "0007413f9d63aee98f3a65eb1a27706d42fecfd5dcf4c43342c1f9f87f089a39"
+    },
+    {
+      "file": "menu-check.json",
+      "bytes": 88304,
+      "sha256": "92fbe0fee6e75b99fa899cf332187849d34eb7df331889092abfa01e3ed7f8c4"
+    },
+    {
+      "file": "oop-range.txt",
+      "bytes": 2348,
+      "sha256": "00578d305c270cca7415c3631a888c0f757a82eb2ca93969563b1e2b10ad1041"
+    },
+    {
+      "file": "ip-range.txt",
+      "bytes": 1364,
+      "sha256": "8ac48ebeae7ded4d1427ef5a64db7a134c2104258511cd8fae72834ce98c8efd"
+    },
+    {
+      "file": "check_ranges.py",
+      "bytes": 8222,
+      "sha256": "9f32e0a587291aa78d70c4e1878c015f3096a8381e004f0cbe45db6e9acf8e82"
+    },
+    {
+      "file": "test_check_ranges.py",
+      "bytes": 4202,
+      "sha256": "04cf3fae118ad18996cfc5c8139bb4371df8305c1bc78c43a20ae117d6d75261"
+    },
+    {
+      "file": "check_menus.py",
+      "bytes": 12781,
+      "sha256": "9feee72f40dfb4d731f6f3800db9ad27ba64e8e884e2d4bcebc089b350cdcdeb"
+    },
+    {
+      "file": "test_check_menus.py",
+      "bytes": 7766,
+      "sha256": "61481bc321a9807bef3e7e451ff58282e17675c7fb695aa23978e5a5e917c267"
+    }
+  ],
+  "python": {
+    "path": "C:\\Python313\\python.exe",
+    "version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca"
+  },
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022\\check_ranges.py"
+      ],
+      "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12538670003414154,
+      "stdout": {
+        "file": "checks.stdout.log",
+        "offset_bytes": 0,
+        "bytes": 215,
+        "sha256": "d10c499a84323b14fb4dd6077786f0b6bb4ee3477446393089c940cccd2f89ad"
+      },
+      "stderr": {
+        "file": "checks.stderr.log",
+        "offset_bytes": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022\\test_check_ranges.py"
+      ],
+      "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022",
+      "exit_code": 0,
+      "elapsed_seconds": 0.2560793999582529,
+      "stdout": {
+        "file": "checks.stdout.log",
+        "offset_bytes": 215,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "checks.stderr.log",
+        "offset_bytes": 0,
+        "bytes": 1254,
+        "sha256": "2ed40811810f65dcc686c5c6285ee7fa2dc9cd338cd7e63744d5f9951b6a754f"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022\\check_menus.py"
+      ],
+      "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022",
+      "exit_code": 0,
+      "elapsed_seconds": 0.159805899951607,
+      "stdout": {
+        "file": "checks.stdout.log",
+        "offset_bytes": 215,
+        "bytes": 262,
+        "sha256": "852f05fd5b5ad05fc1f92f2ac308a8c8bed63dea7915a066473e713c3b2e31de"
+      },
+      "stderr": {
+        "file": "checks.stderr.log",
+        "offset_bytes": 1254,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022\\test_check_menus.py"
+      ],
+      "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022",
+      "exit_code": 0,
+      "elapsed_seconds": 0.37875070003792644,
+      "stdout": {
+        "file": "checks.stdout.log",
+        "offset_bytes": 477,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "checks.stderr.log",
+        "offset_bytes": 1254,
+        "bytes": 2082,
+        "sha256": "b937a212578f9e3f288933525b28c7dd0fc83a2821f528b10b8010ecd85c6be4"
+      }
+    }
+  ],
+  "source_after": [
+    {
+      "file": "menus.json",
+      "bytes": 8847,
+      "sha256": "5e982816bac8c066192ce740296e2ec770aed18cce74fce075897a91082a524c"
+    },
+    {
+      "file": "observed.json",
+      "bytes": 7054,
+      "sha256": "d1f63a0a2e6744012ee3132902569e263acc09cd6499660a6148209774e29f0e"
+    },
+    {
+      "file": "ranges.json",
+      "bytes": 2098,
+      "sha256": "0007413f9d63aee98f3a65eb1a27706d42fecfd5dcf4c43342c1f9f87f089a39"
+    },
+    {
+      "file": "menu-check.json",
+      "bytes": 88304,
+      "sha256": "92fbe0fee6e75b99fa899cf332187849d34eb7df331889092abfa01e3ed7f8c4"
+    },
+    {
+      "file": "oop-range.txt",
+      "bytes": 2348,
+      "sha256": "00578d305c270cca7415c3631a888c0f757a82eb2ca93969563b1e2b10ad1041"
+    },
+    {
+      "file": "ip-range.txt",
+      "bytes": 1364,
+      "sha256": "8ac48ebeae7ded4d1427ef5a64db7a134c2104258511cd8fae72834ce98c8efd"
+    },
+    {
+      "file": "check_ranges.py",
+      "bytes": 8222,
+      "sha256": "9f32e0a587291aa78d70c4e1878c015f3096a8381e004f0cbe45db6e9acf8e82"
+    },
+    {
+      "file": "test_check_ranges.py",
+      "bytes": 4202,
+      "sha256": "04cf3fae118ad18996cfc5c8139bb4371df8305c1bc78c43a20ae117d6d75261"
+    },
+    {
+      "file": "check_menus.py",
+      "bytes": 12781,
+      "sha256": "9feee72f40dfb4d731f6f3800db9ad27ba64e8e884e2d4bcebc089b350cdcdeb"
+    },
+    {
+      "file": "test_check_menus.py",
+      "bytes": 7766,
+      "sha256": "61481bc321a9807bef3e7e451ff58282e17675c7fb695aa23978e5a5e917c267"
+    }
+  ],
+  "sources_unchanged": true,
+  "finished_utc": "2026-09-26T21:39:17.427430+00:00",
+  "all_four_passed": true
+}

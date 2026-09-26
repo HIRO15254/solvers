@@ -1,0 +1,40 @@
+{
+  "state": "verified",
+  "ignored_pip_report_read_attempts": [],
+  "installed_versions_checked_by_auditor": true,
+  "initial_final_replay_all_numeric_results_equal": true,
+  "all_dense_policy_bytes_equal": true,
+  "verification_script": {
+    "path": "experiments/hu-postflop-r1/reference/HU-R0-019/saved-policy-independent-20260927/verify_replay.py",
+    "bytes": 2420,
+    "sha256": "84a6926b58e16b054254ec52dcb45b6afcf5c2a01e5ce2beb0c1aae39e0ad43a"
+  },
+  "auditor": {
+    "path": "experiments/hu-postflop-r1/reference/HU-R0-019/saved-policy-independent-20260927/audit.py",
+    "bytes": 28595,
+    "sha256": "4440d2979ab9afecae910f1e84034d7f60a2cef5190ec942283f3eb707304987"
+  },
+  "outputs": [
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/saved-policy-independent-20260927/replay-result.json",
+      "bytes": 129178,
+      "sha256": "330081af345f799881931584d5fd594f32e616c9685fa01d156aaee47ea487fa"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/saved-policy-independent-20260927/replay-policy.json",
+      "bytes": 1515713,
+      "sha256": "ac5c7b884d98fcd86906277fa3b7565eed8d772c4fad5d15cc65b0f03f5a9e1c"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/saved-policy-independent-20260927/replay-pins.json",
+      "bytes": 4866,
+      "sha256": "9dd90b904ef8a7625041593316ee35e90d01d105f294d101256dd3fd94bb9465"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/saved-policy-independent-20260927/replay-dependencies.json",
+      "bytes": 1505,
+      "sha256": "ba36a057a3c4f2a6cbc960bc6fcaaaef6dd2f39175076f1094959f857c044b7b"
+    }
+  ],
+  "shared_policy_sha256": "ac5c7b884d98fcd86906277fa3b7565eed8d772c4fad5d15cc65b0f03f5a9e1c"
+}

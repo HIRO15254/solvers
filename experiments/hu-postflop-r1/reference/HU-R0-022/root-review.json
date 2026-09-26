@@ -1,0 +1,14 @@
+{
+  "schema": "r1.reference-root-review/v1",
+  "checked_utc": "2026-09-26T21:40:29.370929+00:00",
+  "case_id": "HU-R0-022",
+  "checks": [
+    "All 10 source before/after pins unchanged",
+    "All 4 commands exit zero and raw log ranges match",
+    "Derived range/menu inputs match files",
+    "Browser packed transfer 6963 characters / FNV05b8ce21",
+    "Read-only graph checker review completed"
+  ],
+  "quality_acceptance": null,
+  "result": "passed"
+}

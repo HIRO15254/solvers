@@ -1,0 +1,36 @@
+test_actual_bytes_and_independent_fraction_mass (__main__.RangeChecks.test_actual_bytes_and_independent_fraction_mass) ... ok
+test_board_collision_rejected (__main__.RangeChecks.test_board_collision_rejected) ... ok
+test_invalid_and_nonpositive_weights_rejected (__main__.RangeChecks.test_invalid_and_nonpositive_weights_rejected) ... ok
+test_malformed_or_duplicate_board_rejected (__main__.RangeChecks.test_malformed_or_duplicate_board_rejected) ... ok
+test_observed_acquisition_pins_cannot_silently_change (__main__.RangeChecks.test_observed_acquisition_pins_cannot_silently_change) ... ok
+test_one_lf_and_transfer_pins (__main__.RangeChecks.test_one_lf_and_transfer_pins) ... ok
+test_retained_result_matches_actual_bytes (__main__.RangeChecks.test_retained_result_matches_actual_bytes) ... ok
+test_scientific_notation_and_blocking_exact (__main__.RangeChecks.test_scientific_notation_and_blocking_exact) ... ok
+test_unordered_combo_and_repeated_card_rejected (__main__.RangeChecks.test_unordered_combo_and_repeated_card_rejected) ... ok
+test_zero_compatible_mass_rejected (__main__.RangeChecks.test_zero_compatible_mass_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.073s
+
+OK
+test_action_index_text_and_amount_rejected (__main__.MenuChecks.test_action_index_text_and_amount_rejected) ... ok
+test_actual_transfer_closure_and_counts (__main__.MenuChecks.test_actual_transfer_closure_and_counts) ... ok
+test_capture_bound_and_quality_cannot_be_silently_promoted (__main__.MenuChecks.test_capture_bound_and_quality_cannot_be_silently_promoted) ... ok
+test_duplicate_history_rejected (__main__.MenuChecks.test_duplicate_history_rejected) ... ok
+test_fold_call_required_allin_has_no_raise (__main__.MenuChecks.test_fold_call_required_allin_has_no_raise) ... ok
+test_game_url_and_empty_root_parameter_rejected (__main__.MenuChecks.test_game_url_and_empty_root_parameter_rejected) ... ok
+test_independent_actor_stack_replay_and_short_allins (__main__.MenuChecks.test_independent_actor_stack_replay_and_short_allins) ... ok
+test_missing_nonterminal_child_rejected (__main__.MenuChecks.test_missing_nonterminal_child_rejected) ... ok
+test_orphan_observation_rejected (__main__.MenuChecks.test_orphan_observation_rejected) ... ok
+test_raise_to_cannot_be_amount_added_or_exceed_stack (__main__.MenuChecks.test_raise_to_cannot_be_amount_added_or_exceed_stack) ... ok
+test_recorded_transfer_changes_fail_before_graph_acceptance (__main__.MenuChecks.test_recorded_transfer_changes_fail_before_graph_acceptance) ... ok
+test_retained_result_matches_all_pins_and_derivation (__main__.MenuChecks.test_retained_result_matches_all_pins_and_derivation) ... ok
+test_selected_card_actor_spot_and_stack_rejected (__main__.MenuChecks.test_selected_card_actor_spot_and_stack_rejected) ... ok
+test_terminal_history_cannot_become_decision (__main__.MenuChecks.test_terminal_history_cannot_become_decision) ... ok
+test_ui_percent_label_has_no_invented_rounding_rule (__main__.MenuChecks.test_ui_percent_label_has_no_invented_rounding_rule) ... ok
+test_unreferenced_and_duplicate_menu_rejected (__main__.MenuChecks.test_unreferenced_and_duplicate_menu_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.084s
+
+OK

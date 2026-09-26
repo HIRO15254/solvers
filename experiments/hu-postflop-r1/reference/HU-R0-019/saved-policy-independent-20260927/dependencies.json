@@ -1,0 +1,32 @@
+{
+  "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-policy-audit-venv\\Scripts\\python.exe",
+  "packages": [
+    {
+      "name": "zstandard",
+      "version": "0.25.0",
+      "download": {
+        "url": "https://files.pythonhosted.org/packages/d9/82/b9c06c870f3bd8767c201f1edbdf9e8dc34be5b0fbc5682c4f80fe948475/zstandard-0.25.0-cp313-cp313-win_amd64.whl",
+        "archive_info": {
+          "hash": "sha256=1f830a0dac88719af0ae43b8b2d6aef487d437036468ef3c2ea59c51f9d55fd5",
+          "hashes": {
+            "sha256": "1f830a0dac88719af0ae43b8b2d6aef487d437036468ef3c2ea59c51f9d55fd5"
+          }
+        }
+      }
+    },
+    {
+      "name": "blake3",
+      "version": "1.0.9",
+      "download": {
+        "url": "https://files.pythonhosted.org/packages/db/2e/f09e8ed426f360aa2005206466ceab2f707486eb5d9db7051dbcbae056d1/blake3-1.0.9-cp313-cp313-win_amd64.whl",
+        "archive_info": {
+          "hash": "sha256=caded2806d2cbeed638c5e2517ed8b2a94165b3452fda35e72896142d22070e0",
+          "hashes": {
+            "sha256": "caded2806d2cbeed638c5e2517ed8b2a94165b3452fda35e72896142d22070e0"
+          }
+        }
+      }
+    }
+  ]
+}

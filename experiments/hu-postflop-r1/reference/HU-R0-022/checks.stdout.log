@@ -1,0 +1,2 @@
+{"case_id": "HU-R0-022", "range_integrity": "verified", "oop_positive_combos": 150, "ip_positive_combos": 86, "compatible_positive_pairs": 11606, "condition_match": "unverified", "quality_status": "not_evaluated"}
+{"case_id": "HU-R0-022", "decision_menu_closure": "verified", "decision_observations": 72, "unique_menus": 18, "action_edges": 212, "derived_terminals": 141, "terminal_kind_counts": {"call": 70, "check_check": 1, "fold": 70}, "quality_status": "not_evaluated"}

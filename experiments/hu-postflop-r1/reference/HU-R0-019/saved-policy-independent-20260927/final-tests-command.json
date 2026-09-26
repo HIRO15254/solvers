@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-policy-audit-venv\\Scripts\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\saved-policy-independent-20260927\\test_audit.py",
+    "-v"
+  ],
+  "started_utc": "2026-09-26T21:34:22.798162+00:00",
+  "ended_utc": "2026-09-26T21:34:23.032834+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 0.23468790017068386,
+  "outer_timeout_seconds": 30,
+  "auditor_sha256": "4440d2979ab9afecae910f1e84034d7f60a2cef5190ec942283f3eb707304987",
+  "test_sha256": "4c881503a8536720ca99b997689747b53320d3ca939529206a57687442671c3c"
+}

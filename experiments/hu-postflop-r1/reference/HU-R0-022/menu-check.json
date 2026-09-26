@@ -1,0 +1,3403 @@
+{
+  "schema": "r1.reference-menu-closure/v1",
+  "case_id": "HU-R0-022",
+  "inputs": [
+    {
+      "file": "menus.json",
+      "bytes": 8847,
+      "sha256": "5e982816bac8c066192ce740296e2ec770aed18cce74fce075897a91082a524c"
+    },
+    {
+      "file": "observed.json",
+      "bytes": 7054,
+      "sha256": "d1f63a0a2e6744012ee3132902569e263acc09cd6499660a6148209774e29f0e"
+    },
+    {
+      "file": "check_menus.py",
+      "bytes": 12781,
+      "sha256": "9feee72f40dfb4d731f6f3800db9ad27ba64e8e884e2d4bcebc089b350cdcdeb"
+    },
+    {
+      "file": "check_ranges.py",
+      "bytes": 8222,
+      "sha256": "9f32e0a587291aa78d70c4e1878c015f3096a8381e004f0cbe45db6e9acf8e82"
+    }
+  ],
+  "packed_ascii_characters": 6963,
+  "packed_fnv1a32": "05b8ce21",
+  "packed_sha256": "f301a62274ed0c8d06115578bee8dcc460b6ad91c6d19d92d39d36d4802c0ca6",
+  "capture_completed_before_utc": "2026-09-26T21:31:41Z",
+  "decision_menu_closure": "verified",
+  "checks": [
+    "exact reported packed transfer",
+    "distinct histories and deduplicated menus",
+    "URL game fields",
+    "selected card, actor, depth and history_spot",
+    "street-total raise replay and visible remaining stack",
+    "action identifier/index/text",
+    "all nonterminal children observed and no orphan rows",
+    "unique inferred terminal histories"
+  ],
+  "terminal_observation_scope": "Fold/Call/second-Check are derived terminal edges, not clicked outcomes; no settlement was observed",
+  "percentage_label_scope": "literal UI labels only; exact rounding rule is unknown",
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "decision_observations": 72,
+  "unique_menus": 18,
+  "action_edges": 212,
+  "decision_edges": 71,
+  "derived_terminals": 141,
+  "terminal_kind_counts": {
+    "call": 70,
+    "check_check": 1,
+    "fold": 70
+  },
+  "maximum_decision_depth": 5,
+  "maximum_terminal_depth": 6,
+  "decision_nodes": [
+    {
+      "history": "",
+      "actor": "BB",
+      "depth": 0,
+      "menu_index": 0,
+      "street_contributions_bb": [
+        "0",
+        "0"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=12",
+      "actions": [
+        [
+          "X",
+          null
+        ],
+        [
+          "R3",
+          null
+        ],
+        [
+          "R10.5",
+          null
+        ],
+        [
+          "R18",
+          null
+        ],
+        [
+          "R25.5",
+          null
+        ],
+        [
+          "R46",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X",
+      "actor": "BTN",
+      "depth": 1,
+      "menu_index": 0,
+      "street_contributions_bb": [
+        "0",
+        "0"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=13&river_actions=X",
+      "actions": [
+        [
+          "X",
+          "check_check"
+        ],
+        [
+          "R3",
+          null
+        ],
+        [
+          "R10.5",
+          null
+        ],
+        [
+          "R18",
+          null
+        ],
+        [
+          "R25.5",
+          null
+        ],
+        [
+          "R46",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R3",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 1,
+      "street_contributions_bb": [
+        "0",
+        "3"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=X-R3",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R16",
+          null
+        ],
+        [
+          "R23",
+          null
+        ],
+        [
+          "R48.5",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R3-R16",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 2,
+      "street_contributions_bb": [
+        "16",
+        "3"
+      ],
+      "remaining_actor_stack_bb": "83",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=X-R3-R16",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R38",
+          null
+        ],
+        [
+          "R50.5",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R3-R16-R38",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 3,
+      "street_contributions_bb": [
+        "16",
+        "38"
+      ],
+      "remaining_actor_stack_bb": "70",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=X-R3-R16-R38",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R3-R16-R38-RAI",
+      "actor": "BTN",
+      "depth": 5,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "38"
+      ],
+      "remaining_actor_stack_bb": "48",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=17&river_actions=X-R3-R16-R38-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R3-R16-R50.5",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 5,
+      "street_contributions_bb": [
+        "16",
+        "50.5"
+      ],
+      "remaining_actor_stack_bb": "70",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=X-R3-R16-R50.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R3-R16-R50.5-RAI",
+      "actor": "BTN",
+      "depth": 5,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "50.5"
+      ],
+      "remaining_actor_stack_bb": "35.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=17&river_actions=X-R3-R16-R50.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R3-R16-RAI",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "16",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "70",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=X-R3-R16-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R3-R23",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 6,
+      "street_contributions_bb": [
+        "23",
+        "3"
+      ],
+      "remaining_actor_stack_bb": "83",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=X-R3-R23",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R50",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R3-R23-R50",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 7,
+      "street_contributions_bb": [
+        "23",
+        "50"
+      ],
+      "remaining_actor_stack_bb": "63",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=X-R3-R23-R50",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R3-R23-R50-RAI",
+      "actor": "BTN",
+      "depth": 5,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "50"
+      ],
+      "remaining_actor_stack_bb": "36",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=17&river_actions=X-R3-R23-R50-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R3-R23-RAI",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "23",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "63",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=X-R3-R23-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R3-R48.5",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 8,
+      "street_contributions_bb": [
+        "48.5",
+        "3"
+      ],
+      "remaining_actor_stack_bb": "83",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=X-R3-R48.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R3-R48.5-RAI",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "48.5",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "37.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=X-R3-R48.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R3-RAI",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "3"
+      ],
+      "remaining_actor_stack_bb": "83",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=X-R3-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R10.5",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 9,
+      "street_contributions_bb": [
+        "0",
+        "10.5"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=X-R10.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R28.5",
+          null
+        ],
+        [
+          "R39",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R10.5-R28.5",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 10,
+      "street_contributions_bb": [
+        "28.5",
+        "10.5"
+      ],
+      "remaining_actor_stack_bb": "75.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=X-R10.5-R28.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R59",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R10.5-R28.5-R59",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 11,
+      "street_contributions_bb": [
+        "28.5",
+        "59"
+      ],
+      "remaining_actor_stack_bb": "57.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=X-R10.5-R28.5-R59",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R10.5-R28.5-R59-RAI",
+      "actor": "BTN",
+      "depth": 5,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "59"
+      ],
+      "remaining_actor_stack_bb": "27",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=17&river_actions=X-R10.5-R28.5-R59-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R10.5-R28.5-RAI",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "28.5",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "57.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=X-R10.5-R28.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R10.5-R39",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 12,
+      "street_contributions_bb": [
+        "39",
+        "10.5"
+      ],
+      "remaining_actor_stack_bb": "75.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=X-R10.5-R39",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R10.5-R39-RAI",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "39",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "47",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=X-R10.5-R39-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R10.5-RAI",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "10.5"
+      ],
+      "remaining_actor_stack_bb": "75.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=X-R10.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R18",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 13,
+      "street_contributions_bb": [
+        "0",
+        "18"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=X-R18",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R41.5",
+          null
+        ],
+        [
+          "R54.5",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R18-R41.5",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 14,
+      "street_contributions_bb": [
+        "41.5",
+        "18"
+      ],
+      "remaining_actor_stack_bb": "68",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=X-R18-R41.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R18-R41.5-RAI",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "41.5",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "44.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=X-R18-R41.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R18-R54.5",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 15,
+      "street_contributions_bb": [
+        "54.5",
+        "18"
+      ],
+      "remaining_actor_stack_bb": "68",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=X-R18-R54.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R18-R54.5-RAI",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "54.5",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "31.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=X-R18-R54.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R18-RAI",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "18"
+      ],
+      "remaining_actor_stack_bb": "68",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=X-R18-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R25.5",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 16,
+      "street_contributions_bb": [
+        "0",
+        "25.5"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=X-R25.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R54",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R25.5-R54",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 15,
+      "street_contributions_bb": [
+        "54",
+        "25.5"
+      ],
+      "remaining_actor_stack_bb": "60.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=X-R25.5-R54",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R25.5-R54-RAI",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "54",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "32",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=X-R25.5-R54-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R25.5-RAI",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "25.5"
+      ],
+      "remaining_actor_stack_bb": "60.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=X-R25.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-R46",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 17,
+      "street_contributions_bb": [
+        "0",
+        "46"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=X-R46",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "X-R46-RAI",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "46"
+      ],
+      "remaining_actor_stack_bb": "40",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=X-R46-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "X-RAI",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "0",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=X-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R3",
+      "actor": "BTN",
+      "depth": 1,
+      "menu_index": 1,
+      "street_contributions_bb": [
+        "3",
+        "0"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=13&river_actions=R3",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R16",
+          null
+        ],
+        [
+          "R23",
+          null
+        ],
+        [
+          "R48.5",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R3-R16",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 2,
+      "street_contributions_bb": [
+        "3",
+        "16"
+      ],
+      "remaining_actor_stack_bb": "83",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=R3-R16",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R38",
+          null
+        ],
+        [
+          "R50.5",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R3-R16-R38",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 3,
+      "street_contributions_bb": [
+        "38",
+        "16"
+      ],
+      "remaining_actor_stack_bb": "70",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=R3-R16-R38",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R3-R16-R38-RAI",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "38",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "48",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=R3-R16-R38-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R3-R16-R50.5",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 5,
+      "street_contributions_bb": [
+        "50.5",
+        "16"
+      ],
+      "remaining_actor_stack_bb": "70",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=R3-R16-R50.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R3-R16-R50.5-RAI",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "50.5",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "35.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=R3-R16-R50.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R3-R16-RAI",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "16"
+      ],
+      "remaining_actor_stack_bb": "70",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=R3-R16-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R3-R23",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 6,
+      "street_contributions_bb": [
+        "3",
+        "23"
+      ],
+      "remaining_actor_stack_bb": "83",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=R3-R23",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R50",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R3-R23-R50",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 7,
+      "street_contributions_bb": [
+        "50",
+        "23"
+      ],
+      "remaining_actor_stack_bb": "63",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=R3-R23-R50",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R3-R23-R50-RAI",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "50",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "36",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=R3-R23-R50-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R3-R23-RAI",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "23"
+      ],
+      "remaining_actor_stack_bb": "63",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=R3-R23-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R3-R48.5",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 8,
+      "street_contributions_bb": [
+        "3",
+        "48.5"
+      ],
+      "remaining_actor_stack_bb": "83",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=R3-R48.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R3-R48.5-RAI",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "48.5"
+      ],
+      "remaining_actor_stack_bb": "37.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=R3-R48.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R3-RAI",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "3",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "83",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=R3-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R10.5",
+      "actor": "BTN",
+      "depth": 1,
+      "menu_index": 9,
+      "street_contributions_bb": [
+        "10.5",
+        "0"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=13&river_actions=R10.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R28.5",
+          null
+        ],
+        [
+          "R39",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R10.5-R28.5",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 10,
+      "street_contributions_bb": [
+        "10.5",
+        "28.5"
+      ],
+      "remaining_actor_stack_bb": "75.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=R10.5-R28.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R59",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R10.5-R28.5-R59",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 11,
+      "street_contributions_bb": [
+        "59",
+        "28.5"
+      ],
+      "remaining_actor_stack_bb": "57.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=R10.5-R28.5-R59",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R10.5-R28.5-R59-RAI",
+      "actor": "BB",
+      "depth": 4,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "59",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "27",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=16&river_actions=R10.5-R28.5-R59-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R10.5-R28.5-RAI",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "28.5"
+      ],
+      "remaining_actor_stack_bb": "57.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=R10.5-R28.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R10.5-R39",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 12,
+      "street_contributions_bb": [
+        "10.5",
+        "39"
+      ],
+      "remaining_actor_stack_bb": "75.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=R10.5-R39",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R10.5-R39-RAI",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "39"
+      ],
+      "remaining_actor_stack_bb": "47",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=R10.5-R39-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R10.5-RAI",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "10.5",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "75.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=R10.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R18",
+      "actor": "BTN",
+      "depth": 1,
+      "menu_index": 13,
+      "street_contributions_bb": [
+        "18",
+        "0"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=13&river_actions=R18",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R41.5",
+          null
+        ],
+        [
+          "R54.5",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R18-R41.5",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 14,
+      "street_contributions_bb": [
+        "18",
+        "41.5"
+      ],
+      "remaining_actor_stack_bb": "68",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=R18-R41.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R18-R41.5-RAI",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "41.5"
+      ],
+      "remaining_actor_stack_bb": "44.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=R18-R41.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R18-R54.5",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 15,
+      "street_contributions_bb": [
+        "18",
+        "54.5"
+      ],
+      "remaining_actor_stack_bb": "68",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=R18-R54.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R18-R54.5-RAI",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "54.5"
+      ],
+      "remaining_actor_stack_bb": "31.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=R18-R54.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R18-RAI",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "18",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "68",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=R18-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R25.5",
+      "actor": "BTN",
+      "depth": 1,
+      "menu_index": 16,
+      "street_contributions_bb": [
+        "25.5",
+        "0"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=13&river_actions=R25.5",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "R54",
+          null
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R25.5-R54",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 15,
+      "street_contributions_bb": [
+        "25.5",
+        "54"
+      ],
+      "remaining_actor_stack_bb": "60.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=R25.5-R54",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R25.5-R54-RAI",
+      "actor": "BTN",
+      "depth": 3,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "54"
+      ],
+      "remaining_actor_stack_bb": "32",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=15&river_actions=R25.5-R54-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R25.5-RAI",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "25.5",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "60.5",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=R25.5-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "R46",
+      "actor": "BTN",
+      "depth": 1,
+      "menu_index": 17,
+      "street_contributions_bb": [
+        "46",
+        "0"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=13&river_actions=R46",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ],
+        [
+          "RAI",
+          null
+        ]
+      ]
+    },
+    {
+      "history": "R46-RAI",
+      "actor": "BB",
+      "depth": 2,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "46",
+        "86"
+      ],
+      "remaining_actor_stack_bb": "40",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=14&river_actions=R46-RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    },
+    {
+      "history": "RAI",
+      "actor": "BTN",
+      "depth": 1,
+      "menu_index": 4,
+      "street_contributions_bb": [
+        "86",
+        "0"
+      ],
+      "remaining_actor_stack_bb": "86",
+      "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=13&river_actions=RAI",
+      "actions": [
+        [
+          "F",
+          "fold"
+        ],
+        [
+          "C",
+          "call"
+        ]
+      ]
+    }
+  ],
+  "decision_edges_table": [
+    {
+      "parent": "",
+      "action": "X",
+      "child": "X"
+    },
+    {
+      "parent": "",
+      "action": "R3",
+      "child": "R3"
+    },
+    {
+      "parent": "",
+      "action": "R10.5",
+      "child": "R10.5"
+    },
+    {
+      "parent": "",
+      "action": "R18",
+      "child": "R18"
+    },
+    {
+      "parent": "",
+      "action": "R25.5",
+      "child": "R25.5"
+    },
+    {
+      "parent": "",
+      "action": "R46",
+      "child": "R46"
+    },
+    {
+      "parent": "",
+      "action": "RAI",
+      "child": "RAI"
+    },
+    {
+      "parent": "X",
+      "action": "R3",
+      "child": "X-R3"
+    },
+    {
+      "parent": "X",
+      "action": "R10.5",
+      "child": "X-R10.5"
+    },
+    {
+      "parent": "X",
+      "action": "R18",
+      "child": "X-R18"
+    },
+    {
+      "parent": "X",
+      "action": "R25.5",
+      "child": "X-R25.5"
+    },
+    {
+      "parent": "X",
+      "action": "R46",
+      "child": "X-R46"
+    },
+    {
+      "parent": "X",
+      "action": "RAI",
+      "child": "X-RAI"
+    },
+    {
+      "parent": "X-R3",
+      "action": "R16",
+      "child": "X-R3-R16"
+    },
+    {
+      "parent": "X-R3",
+      "action": "R23",
+      "child": "X-R3-R23"
+    },
+    {
+      "parent": "X-R3",
+      "action": "R48.5",
+      "child": "X-R3-R48.5"
+    },
+    {
+      "parent": "X-R3",
+      "action": "RAI",
+      "child": "X-R3-RAI"
+    },
+    {
+      "parent": "X-R3-R16",
+      "action": "R38",
+      "child": "X-R3-R16-R38"
+    },
+    {
+      "parent": "X-R3-R16",
+      "action": "R50.5",
+      "child": "X-R3-R16-R50.5"
+    },
+    {
+      "parent": "X-R3-R16",
+      "action": "RAI",
+      "child": "X-R3-R16-RAI"
+    },
+    {
+      "parent": "X-R3-R16-R38",
+      "action": "RAI",
+      "child": "X-R3-R16-R38-RAI"
+    },
+    {
+      "parent": "X-R3-R16-R50.5",
+      "action": "RAI",
+      "child": "X-R3-R16-R50.5-RAI"
+    },
+    {
+      "parent": "X-R3-R23",
+      "action": "R50",
+      "child": "X-R3-R23-R50"
+    },
+    {
+      "parent": "X-R3-R23",
+      "action": "RAI",
+      "child": "X-R3-R23-RAI"
+    },
+    {
+      "parent": "X-R3-R23-R50",
+      "action": "RAI",
+      "child": "X-R3-R23-R50-RAI"
+    },
+    {
+      "parent": "X-R3-R48.5",
+      "action": "RAI",
+      "child": "X-R3-R48.5-RAI"
+    },
+    {
+      "parent": "X-R10.5",
+      "action": "R28.5",
+      "child": "X-R10.5-R28.5"
+    },
+    {
+      "parent": "X-R10.5",
+      "action": "R39",
+      "child": "X-R10.5-R39"
+    },
+    {
+      "parent": "X-R10.5",
+      "action": "RAI",
+      "child": "X-R10.5-RAI"
+    },
+    {
+      "parent": "X-R10.5-R28.5",
+      "action": "R59",
+      "child": "X-R10.5-R28.5-R59"
+    },
+    {
+      "parent": "X-R10.5-R28.5",
+      "action": "RAI",
+      "child": "X-R10.5-R28.5-RAI"
+    },
+    {
+      "parent": "X-R10.5-R28.5-R59",
+      "action": "RAI",
+      "child": "X-R10.5-R28.5-R59-RAI"
+    },
+    {
+      "parent": "X-R10.5-R39",
+      "action": "RAI",
+      "child": "X-R10.5-R39-RAI"
+    },
+    {
+      "parent": "X-R18",
+      "action": "R41.5",
+      "child": "X-R18-R41.5"
+    },
+    {
+      "parent": "X-R18",
+      "action": "R54.5",
+      "child": "X-R18-R54.5"
+    },
+    {
+      "parent": "X-R18",
+      "action": "RAI",
+      "child": "X-R18-RAI"
+    },
+    {
+      "parent": "X-R18-R41.5",
+      "action": "RAI",
+      "child": "X-R18-R41.5-RAI"
+    },
+    {
+      "parent": "X-R18-R54.5",
+      "action": "RAI",
+      "child": "X-R18-R54.5-RAI"
+    },
+    {
+      "parent": "X-R25.5",
+      "action": "R54",
+      "child": "X-R25.5-R54"
+    },
+    {
+      "parent": "X-R25.5",
+      "action": "RAI",
+      "child": "X-R25.5-RAI"
+    },
+    {
+      "parent": "X-R25.5-R54",
+      "action": "RAI",
+      "child": "X-R25.5-R54-RAI"
+    },
+    {
+      "parent": "X-R46",
+      "action": "RAI",
+      "child": "X-R46-RAI"
+    },
+    {
+      "parent": "R3",
+      "action": "R16",
+      "child": "R3-R16"
+    },
+    {
+      "parent": "R3",
+      "action": "R23",
+      "child": "R3-R23"
+    },
+    {
+      "parent": "R3",
+      "action": "R48.5",
+      "child": "R3-R48.5"
+    },
+    {
+      "parent": "R3",
+      "action": "RAI",
+      "child": "R3-RAI"
+    },
+    {
+      "parent": "R3-R16",
+      "action": "R38",
+      "child": "R3-R16-R38"
+    },
+    {
+      "parent": "R3-R16",
+      "action": "R50.5",
+      "child": "R3-R16-R50.5"
+    },
+    {
+      "parent": "R3-R16",
+      "action": "RAI",
+      "child": "R3-R16-RAI"
+    },
+    {
+      "parent": "R3-R16-R38",
+      "action": "RAI",
+      "child": "R3-R16-R38-RAI"
+    },
+    {
+      "parent": "R3-R16-R50.5",
+      "action": "RAI",
+      "child": "R3-R16-R50.5-RAI"
+    },
+    {
+      "parent": "R3-R23",
+      "action": "R50",
+      "child": "R3-R23-R50"
+    },
+    {
+      "parent": "R3-R23",
+      "action": "RAI",
+      "child": "R3-R23-RAI"
+    },
+    {
+      "parent": "R3-R23-R50",
+      "action": "RAI",
+      "child": "R3-R23-R50-RAI"
+    },
+    {
+      "parent": "R3-R48.5",
+      "action": "RAI",
+      "child": "R3-R48.5-RAI"
+    },
+    {
+      "parent": "R10.5",
+      "action": "R28.5",
+      "child": "R10.5-R28.5"
+    },
+    {
+      "parent": "R10.5",
+      "action": "R39",
+      "child": "R10.5-R39"
+    },
+    {
+      "parent": "R10.5",
+      "action": "RAI",
+      "child": "R10.5-RAI"
+    },
+    {
+      "parent": "R10.5-R28.5",
+      "action": "R59",
+      "child": "R10.5-R28.5-R59"
+    },
+    {
+      "parent": "R10.5-R28.5",
+      "action": "RAI",
+      "child": "R10.5-R28.5-RAI"
+    },
+    {
+      "parent": "R10.5-R28.5-R59",
+      "action": "RAI",
+      "child": "R10.5-R28.5-R59-RAI"
+    },
+    {
+      "parent": "R10.5-R39",
+      "action": "RAI",
+      "child": "R10.5-R39-RAI"
+    },
+    {
+      "parent": "R18",
+      "action": "R41.5",
+      "child": "R18-R41.5"
+    },
+    {
+      "parent": "R18",
+      "action": "R54.5",
+      "child": "R18-R54.5"
+    },
+    {
+      "parent": "R18",
+      "action": "RAI",
+      "child": "R18-RAI"
+    },
+    {
+      "parent": "R18-R41.5",
+      "action": "RAI",
+      "child": "R18-R41.5-RAI"
+    },
+    {
+      "parent": "R18-R54.5",
+      "action": "RAI",
+      "child": "R18-R54.5-RAI"
+    },
+    {
+      "parent": "R25.5",
+      "action": "R54",
+      "child": "R25.5-R54"
+    },
+    {
+      "parent": "R25.5",
+      "action": "RAI",
+      "child": "R25.5-RAI"
+    },
+    {
+      "parent": "R25.5-R54",
+      "action": "RAI",
+      "child": "R25.5-R54-RAI"
+    },
+    {
+      "parent": "R46",
+      "action": "RAI",
+      "child": "R46-RAI"
+    }
+  ],
+  "derived_terminal_table": [
+    {
+      "history": "X-X",
+      "parent": "X",
+      "actor": "BTN",
+      "kind": "check_check",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-F",
+      "parent": "X-R3",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-C",
+      "parent": "X-R3",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R16-F",
+      "parent": "X-R3-R16",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R16-C",
+      "parent": "X-R3-R16",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R16-R38-F",
+      "parent": "X-R3-R16-R38",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R16-R38-C",
+      "parent": "X-R3-R16-R38",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R16-R38-RAI-F",
+      "parent": "X-R3-R16-R38-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R16-R38-RAI-C",
+      "parent": "X-R3-R16-R38-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R16-R50.5-F",
+      "parent": "X-R3-R16-R50.5",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R16-R50.5-C",
+      "parent": "X-R3-R16-R50.5",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R16-R50.5-RAI-F",
+      "parent": "X-R3-R16-R50.5-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R16-R50.5-RAI-C",
+      "parent": "X-R3-R16-R50.5-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R16-RAI-F",
+      "parent": "X-R3-R16-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R16-RAI-C",
+      "parent": "X-R3-R16-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R23-F",
+      "parent": "X-R3-R23",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R23-C",
+      "parent": "X-R3-R23",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R23-R50-F",
+      "parent": "X-R3-R23-R50",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R23-R50-C",
+      "parent": "X-R3-R23-R50",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R23-R50-RAI-F",
+      "parent": "X-R3-R23-R50-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R23-R50-RAI-C",
+      "parent": "X-R3-R23-R50-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R23-RAI-F",
+      "parent": "X-R3-R23-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R23-RAI-C",
+      "parent": "X-R3-R23-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R48.5-F",
+      "parent": "X-R3-R48.5",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R48.5-C",
+      "parent": "X-R3-R48.5",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R48.5-RAI-F",
+      "parent": "X-R3-R48.5-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-R48.5-RAI-C",
+      "parent": "X-R3-R48.5-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-RAI-F",
+      "parent": "X-R3-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R3-RAI-C",
+      "parent": "X-R3-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-F",
+      "parent": "X-R10.5",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-C",
+      "parent": "X-R10.5",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-R28.5-F",
+      "parent": "X-R10.5-R28.5",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-R28.5-C",
+      "parent": "X-R10.5-R28.5",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-R28.5-R59-F",
+      "parent": "X-R10.5-R28.5-R59",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-R28.5-R59-C",
+      "parent": "X-R10.5-R28.5-R59",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-R28.5-R59-RAI-F",
+      "parent": "X-R10.5-R28.5-R59-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-R28.5-R59-RAI-C",
+      "parent": "X-R10.5-R28.5-R59-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-R28.5-RAI-F",
+      "parent": "X-R10.5-R28.5-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-R28.5-RAI-C",
+      "parent": "X-R10.5-R28.5-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-R39-F",
+      "parent": "X-R10.5-R39",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-R39-C",
+      "parent": "X-R10.5-R39",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-R39-RAI-F",
+      "parent": "X-R10.5-R39-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-R39-RAI-C",
+      "parent": "X-R10.5-R39-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-RAI-F",
+      "parent": "X-R10.5-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R10.5-RAI-C",
+      "parent": "X-R10.5-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R18-F",
+      "parent": "X-R18",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R18-C",
+      "parent": "X-R18",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R18-R41.5-F",
+      "parent": "X-R18-R41.5",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R18-R41.5-C",
+      "parent": "X-R18-R41.5",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R18-R41.5-RAI-F",
+      "parent": "X-R18-R41.5-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R18-R41.5-RAI-C",
+      "parent": "X-R18-R41.5-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R18-R54.5-F",
+      "parent": "X-R18-R54.5",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R18-R54.5-C",
+      "parent": "X-R18-R54.5",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R18-R54.5-RAI-F",
+      "parent": "X-R18-R54.5-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R18-R54.5-RAI-C",
+      "parent": "X-R18-R54.5-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R18-RAI-F",
+      "parent": "X-R18-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R18-RAI-C",
+      "parent": "X-R18-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R25.5-F",
+      "parent": "X-R25.5",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R25.5-C",
+      "parent": "X-R25.5",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R25.5-R54-F",
+      "parent": "X-R25.5-R54",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R25.5-R54-C",
+      "parent": "X-R25.5-R54",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R25.5-R54-RAI-F",
+      "parent": "X-R25.5-R54-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R25.5-R54-RAI-C",
+      "parent": "X-R25.5-R54-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R25.5-RAI-F",
+      "parent": "X-R25.5-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R25.5-RAI-C",
+      "parent": "X-R25.5-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R46-F",
+      "parent": "X-R46",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R46-C",
+      "parent": "X-R46",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R46-RAI-F",
+      "parent": "X-R46-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-R46-RAI-C",
+      "parent": "X-R46-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-RAI-F",
+      "parent": "X-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "X-RAI-C",
+      "parent": "X-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-F",
+      "parent": "R3",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-C",
+      "parent": "R3",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R16-F",
+      "parent": "R3-R16",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R16-C",
+      "parent": "R3-R16",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R16-R38-F",
+      "parent": "R3-R16-R38",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R16-R38-C",
+      "parent": "R3-R16-R38",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R16-R38-RAI-F",
+      "parent": "R3-R16-R38-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R16-R38-RAI-C",
+      "parent": "R3-R16-R38-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R16-R50.5-F",
+      "parent": "R3-R16-R50.5",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R16-R50.5-C",
+      "parent": "R3-R16-R50.5",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R16-R50.5-RAI-F",
+      "parent": "R3-R16-R50.5-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R16-R50.5-RAI-C",
+      "parent": "R3-R16-R50.5-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R16-RAI-F",
+      "parent": "R3-R16-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R16-RAI-C",
+      "parent": "R3-R16-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R23-F",
+      "parent": "R3-R23",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R23-C",
+      "parent": "R3-R23",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R23-R50-F",
+      "parent": "R3-R23-R50",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R23-R50-C",
+      "parent": "R3-R23-R50",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R23-R50-RAI-F",
+      "parent": "R3-R23-R50-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R23-R50-RAI-C",
+      "parent": "R3-R23-R50-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R23-RAI-F",
+      "parent": "R3-R23-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R23-RAI-C",
+      "parent": "R3-R23-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R48.5-F",
+      "parent": "R3-R48.5",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R48.5-C",
+      "parent": "R3-R48.5",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R48.5-RAI-F",
+      "parent": "R3-R48.5-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-R48.5-RAI-C",
+      "parent": "R3-R48.5-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-RAI-F",
+      "parent": "R3-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R3-RAI-C",
+      "parent": "R3-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-F",
+      "parent": "R10.5",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-C",
+      "parent": "R10.5",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-R28.5-F",
+      "parent": "R10.5-R28.5",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-R28.5-C",
+      "parent": "R10.5-R28.5",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-R28.5-R59-F",
+      "parent": "R10.5-R28.5-R59",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-R28.5-R59-C",
+      "parent": "R10.5-R28.5-R59",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-R28.5-R59-RAI-F",
+      "parent": "R10.5-R28.5-R59-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-R28.5-R59-RAI-C",
+      "parent": "R10.5-R28.5-R59-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-R28.5-RAI-F",
+      "parent": "R10.5-R28.5-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-R28.5-RAI-C",
+      "parent": "R10.5-R28.5-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-R39-F",
+      "parent": "R10.5-R39",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-R39-C",
+      "parent": "R10.5-R39",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-R39-RAI-F",
+      "parent": "R10.5-R39-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-R39-RAI-C",
+      "parent": "R10.5-R39-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-RAI-F",
+      "parent": "R10.5-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R10.5-RAI-C",
+      "parent": "R10.5-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R18-F",
+      "parent": "R18",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R18-C",
+      "parent": "R18",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R18-R41.5-F",
+      "parent": "R18-R41.5",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R18-R41.5-C",
+      "parent": "R18-R41.5",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R18-R41.5-RAI-F",
+      "parent": "R18-R41.5-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R18-R41.5-RAI-C",
+      "parent": "R18-R41.5-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R18-R54.5-F",
+      "parent": "R18-R54.5",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R18-R54.5-C",
+      "parent": "R18-R54.5",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R18-R54.5-RAI-F",
+      "parent": "R18-R54.5-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R18-R54.5-RAI-C",
+      "parent": "R18-R54.5-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R18-RAI-F",
+      "parent": "R18-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R18-RAI-C",
+      "parent": "R18-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R25.5-F",
+      "parent": "R25.5",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R25.5-C",
+      "parent": "R25.5",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R25.5-R54-F",
+      "parent": "R25.5-R54",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R25.5-R54-C",
+      "parent": "R25.5-R54",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R25.5-R54-RAI-F",
+      "parent": "R25.5-R54-RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R25.5-R54-RAI-C",
+      "parent": "R25.5-R54-RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R25.5-RAI-F",
+      "parent": "R25.5-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R25.5-RAI-C",
+      "parent": "R25.5-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R46-F",
+      "parent": "R46",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R46-C",
+      "parent": "R46",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R46-RAI-F",
+      "parent": "R46-RAI",
+      "actor": "BB",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "R46-RAI-C",
+      "parent": "R46-RAI",
+      "actor": "BB",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "RAI-F",
+      "parent": "RAI",
+      "actor": "BTN",
+      "kind": "fold",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    },
+    {
+      "history": "RAI-C",
+      "parent": "RAI",
+      "actor": "BTN",
+      "kind": "call",
+      "terminal_ui_visited": false,
+      "settlement_observed": false
+    }
+  ]
+}

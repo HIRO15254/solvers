@@ -1,0 +1,105 @@
+{
+  "schema": "r1.019-independent-source-pins/v1",
+  "files": [
+    {
+      "path": "experiments/hu-postflop-r1/reference/evidence-vm06-river/records/river/diagnostic019/run/solution.sol",
+      "bytes": 10895,
+      "sha256": "986af722a0ef15c5d7a5b58715a1c0026ba8dbac99edff6a2986b02e98b24a8b"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/evidence-vm06-river/records/river/diagnostic019/run/checkpoint.ckpt",
+      "bytes": 109551,
+      "sha256": "0b073b9a0b3e5f42c75807405077b1534742b0794bfabdc91cdf57f9bd891b11"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/evidence-vm06-river/records/river/diagnostic019/run/run.toml",
+      "bytes": 4440,
+      "sha256": "ae9cdf0cd551ef789286cbfbd8860a2c06c16498c093857b6dfec2566e2de459"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/evidence-vm06-river/records/river/diagnostic019/tree.json",
+      "bytes": 2177,
+      "sha256": "42d7859fe1e23f5331324edd6447bd52ed4c4ae70d5406f2f321d1fbdaa5303b"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/evidence-vm06-river/records/river/diagnostic019/summary.json",
+      "bytes": 395,
+      "sha256": "30f9a6214de738428871330fc7c3690d9fa89ccd61d9d8e5e4f1036781611bae"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/evidence-vm06-river/records/river/diagnostic019/execution.json",
+      "bytes": 16892,
+      "sha256": "86a0acf86364f15aec049af887d133d66f561213e05662a06588fb7c6acb1666"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/observed.json",
+      "bytes": 6319,
+      "sha256": "e38ffaf0b6fbcbbbe5779ae9d4236074df889ea75afd0ee4092e6cd48cf2aca2"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/oop-range.txt",
+      "bytes": 1831,
+      "sha256": "e0d201e994569ac6e582603390a98737c59cf6333c630cb8729f6b4f287c2f84"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/ip-range.txt",
+      "bytes": 1818,
+      "sha256": "ac682a2f4646bf9b4c8424f86021879b74fdc7f51177175e3242904d2a831b94"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/payoff-audit-20260927/terminal-table.json",
+      "bytes": 87546,
+      "sha256": "1f535e23e8f8cacc1cc01a98dce4af1559bead0f5eae260c303707c2a65d4d8e"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/saved-policy-independent-20260927/audit.py",
+      "bytes": 27939,
+      "sha256": "6c0de29b33ed87966062be6483c7060ab6d6fc8fbf54a0e0543753dd3c146c69"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/HU-R0-019/saved-policy-independent-20260927/test_audit.py",
+      "bytes": 11190,
+      "sha256": "4c881503a8536720ca99b997689747b53320d3ca939529206a57687442671c3c"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/validation/vm07-complete/records/build/current/crates/formats/src/sol.rs",
+      "bytes": 23888,
+      "sha256": "205652bda1bb3966381c5af3436f0636151c28d83cfca8bc66fbb5c6efad8515"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/validation/vm07-complete/records/build/current/crates/formats/src/sol_indexed.rs",
+      "bytes": 18669,
+      "sha256": "100864cc30b62de759b46161e6c1eec02ec8c4e27d8b20a3679cb8cfa8b91d7e"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/validation/vm07-complete/records/build/current/crates/cards/src/card.rs",
+      "bytes": 4422,
+      "sha256": "74eeb9bebfc2ed08783b8298754d964779c3114e0a53fd9a4cff364253ac5023"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/validation/vm07-complete/records/build/current/crates/cards/src/range.rs",
+      "bytes": 12197,
+      "sha256": "1ed908cfdc11908754db983eaabbe04dbbe0d405ffddf57fac9b1d18115f208b"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/validation/vm07-complete/records/build/current/crates/engine/src/tree.rs",
+      "bytes": 16963,
+      "sha256": "7ae394f060638995bd6c7d4cc8f91dbd8e44164605c3d2ab2529f3c0b761c05f"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/validation/vm07-complete/records/build/current/crates/holdem/src/postflop.rs",
+      "bytes": 67916,
+      "sha256": "e7c9f6719ba28147ab418b523b2a57cd9325d05734b3d546af7103183f1e9d13"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/validation/vm07-complete/records/build/current/crates/cli/src/sol.rs",
+      "bytes": 92493,
+      "sha256": "da72112a4a999daa8d879f6c4c1a27d794ba6c6bdc50294f53502c6c50544f5f"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/validation/vm07-complete/records/build/current/crates/cli/src/postflop_artifact.rs",
+      "bytes": 24998,
+      "sha256": "c386efbff2667d8ca8dfb9ccfd03f8d42487370fadf5461255323da6b824cd7e"
+    }
+  ]
+}

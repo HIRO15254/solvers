@@ -1,0 +1,33 @@
+{
+  "schema": "r1.019-retained-content-aliases/v1",
+  "aliases": [
+    {
+      "original_path": "final-decoded-policy.json",
+      "retained_path": "decoded-policy.json",
+      "bytes": 1515713,
+      "sha256": "ac5c7b884d98fcd86906277fa3b7565eed8d772c4fad5d15cc65b0f03f5a9e1c",
+      "reason": "Identical complete decoded policy bytes; duplicate removed after final/replay verification."
+    },
+    {
+      "original_path": "replay-policy.json",
+      "retained_path": "decoded-policy.json",
+      "bytes": 1515713,
+      "sha256": "ac5c7b884d98fcd86906277fa3b7565eed8d772c4fad5d15cc65b0f03f5a9e1c",
+      "reason": "Identical complete decoded policy bytes; duplicate removed after final/replay verification."
+    },
+    {
+      "original_path": "audit.py",
+      "retained_path": "audit-initial.py",
+      "bytes": 27939,
+      "sha256": "6c0de29b33ed87966062be6483c7060ab6d6fc8fbf54a0e0543753dd3c146c69",
+      "reason": "Historical file contents at the time of the corresponding receipt, not a pin of current audit.py."
+    },
+    {
+      "original_path": "audit.py",
+      "retained_path": "audit-tests-initial.py",
+      "bytes": 25741,
+      "sha256": "2689deb7b5bb03e7794aca3b56e89f10692632aea1c5847a54b79d3c3face3b3",
+      "reason": "Historical file contents at the time of the corresponding receipt, not a pin of current audit.py."
+    }
+  ]
+}

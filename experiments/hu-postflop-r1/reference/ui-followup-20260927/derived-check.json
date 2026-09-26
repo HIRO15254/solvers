@@ -1,6 +1,6 @@
 {
   "schema": "r1.reference-ui-derived-check/v1",
-  "scope": "File identity and arithmetic only; does not independently certify manual UI transcription or export semantics",
+  "scope": "Old file identity and arithmetic only. Fresh clipboard export was not verified; see observations.json freshness_correction and README. Does not certify UI transcription, export semantics, or changed export.",
   "source_files": [
     {
       "path": "../HU-R0-019/oop-range.txt",
@@ -46,7 +46,8 @@
   "child_whole_recopy": {
     "characters": 2017,
     "fnv1a32": "9f2bfa6b",
-    "length_and_checksum_match": true
+    "length_and_checksum_match": true,
+    "fresh_recopy_verified": false
   },
   "root_Tc9c_bet_percent": "0.2798773815134852055511914114",
   "child_Tc9c_copy_ratio_percent": {
@@ -54,19 +55,20 @@
     "call": "58.66099596019900497512437811",
     "fold": "32.78178274626865671641791045"
   },
-  "new_jam_copy_characters": 16,
-  "jam_copy_changed": true,
+  "observed_jam_clipboard_characters": 16,
+  "jam_copy_changed": null,
   "external_acceptance": null,
   "manual_evidence": [
     {
       "path": "observations.json",
-      "bytes": 5009,
-      "sha256": "4d5285945c83a55dcd75e0cac53a633c5478421a11f1b89334f962123da50f09"
+      "bytes": 6491,
+      "sha256": "3bd631b6facbe5004a8e7ad7a41ccfdab2c1a17ffdcef375040a727e2969fe84"
     },
     {
       "path": "README.jp.md",
-      "bytes": 3185,
-      "sha256": "a0661d61a5990c89f524a05b219ea951dd065affde9d530ace7424bb4e12817e"
+      "bytes": 4116,
+      "sha256": "50d1d9102f35dba8f43c62b6b9227c0fe50ce4a54b3e3cc9839b7a8686448b69"
     }
-  ]
+  ],
+  "observed_clipboard_differs_from_old_file": true
 }

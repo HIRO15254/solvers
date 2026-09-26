@@ -1,0 +1,18 @@
+{
+  "schema": "r1.019-independent-root-review/v1",
+  "checked_utc": "2026-09-26T21:38:46.817972+00:00",
+  "file_identity_references_verified": 77,
+  "initial_final_replay_numeric_results_equal": true,
+  "retained_policy_aliases_verified": true,
+  "final_execution_and_test_auditor_hash_match": true,
+  "cache_forbidden_replay_receipt_verified": true,
+  "read_only_code_review": [
+    "BR max after opponent expectation; own policy excluded for BR reach",
+    "All 21 five-card combinations and category/kicker ordering",
+    "Independent capped diagnostic terminal utilities",
+    "Historical q/sum(q) f32 decoder agrees with pinned format source"
+  ],
+  "production_source_changed": false,
+  "external_quality_accepted": false,
+  "result": "passed"
+}

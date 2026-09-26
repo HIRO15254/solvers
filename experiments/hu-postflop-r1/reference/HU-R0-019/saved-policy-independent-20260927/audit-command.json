@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-policy-audit-venv\\Scripts\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\saved-policy-independent-20260927\\audit.py",
+    "--out",
+    "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\saved-policy-independent-20260927\\result.json",
+    "--policy-out",
+    "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\saved-policy-independent-20260927\\decoded-policy.json",
+    "--pins-out",
+    "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\saved-policy-independent-20260927\\source-pins.json",
+    "--dependencies-out",
+    "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\saved-policy-independent-20260927\\dependencies.json",
+    "--seconds",
+    "30"
+  ],
+  "started_utc": "2026-09-26T21:30:55.726811+00:00",
+  "ended_utc": "2026-09-26T21:30:59.859488+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 4.1326938001438975,
+  "outer_timeout_seconds": 45,
+  "auditor_sha256": "6c0de29b33ed87966062be6483c7060ab6d6fc8fbf54a0e0543753dd3c146c69"
+}

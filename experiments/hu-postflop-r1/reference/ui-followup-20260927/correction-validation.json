@@ -1,0 +1,37 @@
+{
+  "schema": "r1.reference-ui-correction-validation/v1",
+  "checked_utc": "2026-09-26T21:34:38.113889+00:00",
+  "checks": [
+    "10 retained file byte/hash identities",
+    "2 branches reject fresh export evidence",
+    "Fresh recopy false and export change null",
+    "4 Decimal ratios from old retained files",
+    "2017-byte clipboard match and FNV",
+    "16-character observed clipboard",
+    "Original validation explicitly historical"
+  ],
+  "files": [
+    {
+      "path": "observations.json",
+      "bytes": 6491,
+      "sha256": "3bd631b6facbe5004a8e7ad7a41ccfdab2c1a17ffdcef375040a727e2969fe84"
+    },
+    {
+      "path": "derived-check.json",
+      "bytes": 2623,
+      "sha256": "202a2fcf26e85318a640529425aeececf1ac07d6e2563ac50fc0e10a719bf87f"
+    },
+    {
+      "path": "README.jp.md",
+      "bytes": 4116,
+      "sha256": "50d1d9102f35dba8f43c62b6b9227c0fe50ce4a54b3e3cc9839b7a8686448b69"
+    },
+    {
+      "path": "validation.json",
+      "bytes": 1415,
+      "sha256": "452665396a6477e657692c0515fc67b1b6431517448e2840aa32d9d4ebb1fe88"
+    }
+  ],
+  "scope": "Local identity, arithmetic and correction consistency only; no fresh browser export certified",
+  "result": "passed"
+}

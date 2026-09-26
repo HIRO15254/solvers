@@ -1,0 +1,28 @@
+test_bad_magic_and_wrong_version_are_rejected (__main__.ArtifactTests.test_bad_magic_and_wrong_version_are_rejected) ... ok
+test_compressed_frame_corruption_is_rejected (__main__.ArtifactTests.test_compressed_frame_corruption_is_rejected) ... ok
+test_directory_reserved_bits_and_extent_corruption_are_rejected (__main__.ArtifactTests.test_directory_reserved_bits_and_extent_corruption_are_rejected) ... ok
+test_header_hash_and_metadata_digest_corruption_are_rejected (__main__.ArtifactTests.test_header_hash_and_metadata_digest_corruption_are_rejected) ... ok
+test_original_v3_preserves_zero_root_reach_hand_columns (__main__.ArtifactTests.test_original_v3_preserves_zero_root_reach_hand_columns) ... ok
+test_retained_tree_preorder_matches_every_dense_strategy_block (__main__.ArtifactTests.test_retained_tree_preorder_matches_every_dense_strategy_block) ... ok
+test_truncation_and_unindexed_trailing_bytes_are_rejected (__main__.ArtifactTests.test_truncation_and_unindexed_trailing_bytes_are_rejected) ... ok
+test_all_nine_poker_categories_order_correctly (__main__.CardAndRankTests.test_all_nine_poker_categories_order_correctly) ... ok
+test_best_five_can_be_the_board_for_both_players (__main__.CardAndRankTests.test_best_five_can_be_the_board_for_both_players) ... ok
+test_card_encoding_and_unordered_combo_id (__main__.CardAndRankTests.test_card_encoding_and_unordered_combo_id) ... ok
+test_two_triples_choose_the_higher_full_house (__main__.CardAndRankTests.test_two_triples_choose_the_higher_full_house) ... ok
+test_wheel_is_lower_than_six_high_straight (__main__.CardAndRankTests.test_wheel_is_lower_than_six_high_straight) ... ok
+test_best_response_can_take_an_action_with_zero_profile_probability (__main__.EvaluationTests.test_best_response_can_take_an_action_with_zero_profile_probability) ... ok
+test_best_response_cannot_see_opponents_private_hand (__main__.EvaluationTests.test_best_response_cannot_see_opponents_private_hand) ... ok
+test_colliding_opponent_hand_has_no_mass_or_payoff (__main__.EvaluationTests.test_colliding_opponent_hand_has_no_mass_or_payoff) ... ok
+test_nonresponding_player_keeps_its_fixed_policy (__main__.EvaluationTests.test_nonresponding_player_keeps_its_fixed_policy) ... ok
+test_root_joint_mass_uses_both_range_weights (__main__.EvaluationTests.test_root_joint_mass_uses_both_range_weights) ... ok
+test_diagnostic019_cap_saturation_makes_uncalled_refund_equivalent (__main__.PolicyAndPayoffTests.test_diagnostic019_cap_saturation_makes_uncalled_refund_equivalent) ... ok
+test_probability_columns_are_action_major (__main__.PolicyAndPayoffTests.test_probability_columns_are_action_major) ... ok
+test_quantized_policy_uses_column_total_not_65535 (__main__.PolicyAndPayoffTests.test_quantized_policy_uses_column_total_not_65535) ... ok
+test_terminal_rake_cap_and_subgame_baseline (__main__.PolicyAndPayoffTests.test_terminal_rake_cap_and_subgame_baseline) ... ok
+test_tied_pot_shares_rake_once (__main__.PolicyAndPayoffTests.test_tied_pot_shares_rake_once) ... ok
+test_unsaturated_total_pot_rake_is_explicitly_diagnostic (__main__.PolicyAndPayoffTests.test_unsaturated_total_pot_rake_is_explicitly_diagnostic) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 0.014s
+
+OK

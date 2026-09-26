@@ -1,0 +1,159 @@
+{
+  "case_id": "HU-R0-022",
+  "captured_utc_date": "2026-09-26",
+  "capture_window": {
+    "after_utc": "2026-09-26T21:10:37Z",
+    "end_utc": null,
+    "exact_per_copy_timestamps": null,
+    "note": "Collecting root reported acquisition after the first clock reading and completion before the final clock reading. Exact start/end and individual Copy/menu times were not supplied.",
+    "completed_before_utc": "2026-09-26T21:31:41Z"
+  },
+  "reference": "GTO Wizard existing solved library, manually observed by collecting root",
+  "ui_provenance": "Root reported the visible UI and Copy acquisition; this file's writer did not operate the browser. Raw UI/screenshot archives were not supplied to the writer.",
+  "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X&history_spot=12",
+  "catalog_url": "https://app.gtowizard.com/solutions?soltab=strategy&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&gmff_favorite=false&stratab=strategy_ev&history_spot=12&preflop_actions=R2-F-F-C-F-R14-F-C&board=Qd9h4s2cJd&flop_actions=X-X&turn_actions=X-X",
+  "url_provenance": "Directly captured common base URL plus the root row history_spot=12 from menus.json; river_actions was absent. Parameter values are retained, original URL parameter order is not.",
+  "visible_solution": "Cash 100bb / 6max / NL50 / General / GTO",
+  "table_players": "6max",
+  "subgame_players": 2,
+  "street": "river",
+  "board": [
+    "Qd",
+    "9h",
+    "4s",
+    "2c",
+    "Jd"
+  ],
+  "seats": {
+    "oop": "BB",
+    "ip": "BTN"
+  },
+  "root_actor": "BB",
+  "pot_bb": 30.5,
+  "stacks_behind_bb": [
+    86,
+    86
+  ],
+  "preflop_actions": "R2-F-F-C-F-R14-F-C",
+  "preflop": "UTG raise to 2; HJ fold; CO fold; BTN call; SB fold; BB raise to 14; UTG fold; BTN call",
+  "flop": "check/check",
+  "turn": "check/check",
+  "river": "root before BB acts",
+  "folded_seat_context": {
+    "seat": "UTG",
+    "contribution_bb_from_history": 2,
+    "folded_private_card_distribution": null,
+    "bunching_or_correlated_root_reach_treatment": null,
+    "note": "The squeeze history and starting pot are retained. A simple two-seat open-call game is not substituted; compatibility arithmetic below does not certify folded-seat effects."
+  },
+  "root_ranges": {
+    "oop": "oop-range.txt",
+    "ip": "ip-range.txt",
+    "weights": "Copy original text, unrenormalized, with exactly one final LF appended by collecting root",
+    "reported_copy_raw_characters": {
+      "oop": 2347,
+      "ip": 1363
+    },
+    "reported_copy_raw_fnv1a32": {
+      "oop": "f13141bf",
+      "ip": "8a49f645"
+    },
+    "copy_freshness": {
+      "rejected_attempt": "Initial Playwright getByText('Copy').click left old HU-R0-019 clipboard content unchanged; it was detected and not adopted as HU-R0-022 data.",
+      "oop": "Clipboard sentinel r1-022-oop-copy-pending, native Copy click, explicit Whole range selection, then new 2347-character content.",
+      "ip": "Native right-side BTN Copy, copied toast, and different new 1363-character content.",
+      "scope": "Acquisition actions are the collecting root's report. File verification independently confirms supplied length/FNV and retained SHA-256, not browser semantics or export completeness."
+    }
+  },
+  "observed_menus": [
+    {
+      "history": "",
+      "actor": "BB",
+      "street": "river",
+      "actions": [
+        "check",
+        "bet 3",
+        "bet 10.5",
+        "bet 18",
+        "bet 25.5",
+        "bet 46",
+        "allin 86"
+      ],
+      "action_ui_percent_labels": {
+        "bet 3": 10,
+        "bet 10.5": 34,
+        "bet 18": 59,
+        "bet 25.5": 84,
+        "bet 46": 151,
+        "allin 86": 282
+      },
+      "scope": "Root menu only; later decision menus are not inferred from these sizes."
+    }
+  ],
+  "continuation_menu_record": {
+    "file": "menus.json",
+    "validation": "menu-check.json",
+    "decision_observations": 72,
+    "distinct_action_lists": 18,
+    "all_decision_nodes_visited": true,
+    "included_in_this_root_record": false,
+    "included_in_range_arithmetic": false,
+    "terminal_outcomes_clicked": false,
+    "note": "All 72 decision menus were visited and only then deduplicated to 18 action lists. Closure is independently checked; Fold/Call/second Check are derived terminal edges, not terminal UI or settlement observations."
+  },
+  "root_ui": {
+    "view": "Root UI as reported by collecting root",
+    "oop_ev_bb": 7.92,
+    "ip_ev_bb": 20.73,
+    "oop_equity_percent": 28.7,
+    "ip_equity_percent": 71.3,
+    "oop_frequency_percent": {
+      "check": 58.7,
+      "bet 3": 12.4,
+      "bet 10.5": 28.9,
+      "bet 18": 0,
+      "bet 25.5": 0,
+      "bet 46": 0,
+      "allin 86": 0
+    },
+    "note": "Displayed zero frequencies are not certified exact-zero strategies. EV/equity displays are rounded observations, not independent residuals or an identified EV-origin contract."
+  },
+  "root_ui_literal_text": {
+    "oop_ev": "7.92",
+    "ip_ev": "20.73",
+    "ev_unit": "bb",
+    "oop_equity": "28.7%",
+    "ip_equity": "71.3%"
+  },
+  "rake_evidence": {
+    "catalog_description": "General NL50, 5% cap 4bb from the R0 library Rake-help observation",
+    "current_acquisition_verified_rule": null,
+    "fold_collection": null,
+    "uncalled_bet_treatment": null,
+    "prior_collection_or_remaining_cap": null,
+    "rounding": null,
+    "note": "Do not infer actual terminal rake from the displayed root EV sum or transfer current custom-builder rules to this library solution."
+  },
+  "new_solve_requested": false,
+  "filters_applied": false,
+  "solution_version": null,
+  "solution_precision": null,
+  "display_rounding_rule": null,
+  "range_omission_and_internal_precision_rule": null,
+  "reference_exploitability": null,
+  "comparison_scope": "diagnostic_only",
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "comparison_threshold": null,
+  "missing_fields": [
+    "Terminal settlement and exact action-size/percentage-label rounding; all captured decision menus and their graph closure are separately retained in menus.json/menu-check.json",
+    "Solution-specific rake collection, uncalled amounts, prior collection/cap and rounding",
+    "Treatment of the folded UTG contribution and private-card information in this conditional HU game",
+    "Copy range omission, normalization, internal precision and actual conditional joint-reach semantics",
+    "Complete per-hand/action continuation policy and action EVs, including zero-own-reach and off-policy rows",
+    "Individual solution version and residual definition/value/denominator",
+    "Exact EV-field origin, unit conversions and display rounding",
+    "Exact per-copy, per-menu, start and end timestamps (clock bounds and directly captured URL components are retained)"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-policy-audit-venv\\Scripts\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\reference\\HU-R0-019\\saved-policy-independent-20260927\\verify_replay.py"
+  ],
+  "started_utc": "2026-09-26T21:35:36.337741+00:00",
+  "ended_utc": "2026-09-26T21:35:40.756609+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 4.418885899940506,
+  "outer_timeout_seconds": 45,
+  "verification_sha256": "84a6926b58e16b054254ec52dcb45b6afcf5c2a01e5ce2beb0c1aae39e0ad43a"
+}

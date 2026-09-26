@@ -1,0 +1,185 @@
+{
+  "schema": "r1.reference-offline-checks/v1",
+  "case_id": "HU-R0-022",
+  "started_utc": "2026-09-26T21:38:11.497778+00:00",
+  "source_before": [
+    {
+      "file": "menus.json",
+      "bytes": 8847,
+      "sha256": "5e982816bac8c066192ce740296e2ec770aed18cce74fce075897a91082a524c"
+    },
+    {
+      "file": "observed.json",
+      "bytes": 7054,
+      "sha256": "d1f63a0a2e6744012ee3132902569e263acc09cd6499660a6148209774e29f0e"
+    },
+    {
+      "file": "ranges.json",
+      "bytes": 2098,
+      "sha256": "0007413f9d63aee98f3a65eb1a27706d42fecfd5dcf4c43342c1f9f87f089a39"
+    },
+    {
+      "file": "menu-check.json",
+      "bytes": 88304,
+      "sha256": "0a0179498d87e120b2ba4c04d0185eff823bd03ac52d1533378de09370f0f784"
+    },
+    {
+      "file": "oop-range.txt",
+      "bytes": 2348,
+      "sha256": "00578d305c270cca7415c3631a888c0f757a82eb2ca93969563b1e2b10ad1041"
+    },
+    {
+      "file": "ip-range.txt",
+      "bytes": 1364,
+      "sha256": "8ac48ebeae7ded4d1427ef5a64db7a134c2104258511cd8fae72834ce98c8efd"
+    },
+    {
+      "file": "check_ranges.py",
+      "bytes": 8222,
+      "sha256": "9f32e0a587291aa78d70c4e1878c015f3096a8381e004f0cbe45db6e9acf8e82"
+    },
+    {
+      "file": "test_check_ranges.py",
+      "bytes": 4202,
+      "sha256": "04cf3fae118ad18996cfc5c8139bb4371df8305c1bc78c43a20ae117d6d75261"
+    },
+    {
+      "file": "check_menus.py",
+      "bytes": 12800,
+      "sha256": "cb0c849edb2c912c62e35a2f9da00da84911e082cbfa9ed998b521284e44feb0"
+    },
+    {
+      "file": "test_check_menus.py",
+      "bytes": 7766,
+      "sha256": "61481bc321a9807bef3e7e451ff58282e17675c7fb695aa23978e5a5e917c267"
+    }
+  ],
+  "python": {
+    "path": "C:\\Python313\\python.exe",
+    "version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca"
+  },
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022\\check_ranges.py"
+      ],
+      "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022",
+      "exit_code": 0,
+      "elapsed_seconds": 0.1148874000646174,
+      "stdout": {
+        "file": "checks.stdout.log",
+        "offset_bytes": 0,
+        "bytes": 215,
+        "sha256": "d10c499a84323b14fb4dd6077786f0b6bb4ee3477446393089c940cccd2f89ad"
+      },
+      "stderr": {
+        "file": "checks.stderr.log",
+        "offset_bytes": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022\\test_check_ranges.py"
+      ],
+      "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022",
+      "exit_code": 0,
+      "elapsed_seconds": 0.232558700023219,
+      "stdout": {
+        "file": "checks.stdout.log",
+        "offset_bytes": 215,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "checks.stderr.log",
+        "offset_bytes": 0,
+        "bytes": 1254,
+        "sha256": "07896f5ef07af2f1cf6b8ad7d7a1377b8a671a8a9e7f44b1ca47a64c66ea019c"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022\\check_menus.py"
+      ],
+      "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022",
+      "exit_code": 1,
+      "elapsed_seconds": 0.16045570001006126,
+      "stdout": {
+        "file": "checks.stdout.log",
+        "offset_bytes": 215,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "checks.stderr.log",
+        "offset_bytes": 1254,
+        "bytes": 782,
+        "sha256": "676069c4695f3070f80887c2d5d6941cf0eaf3dec1d62106aa025f91958bd290"
+      }
+    }
+  ],
+  "source_after": [
+    {
+      "file": "menus.json",
+      "bytes": 8847,
+      "sha256": "5e982816bac8c066192ce740296e2ec770aed18cce74fce075897a91082a524c"
+    },
+    {
+      "file": "observed.json",
+      "bytes": 7054,
+      "sha256": "d1f63a0a2e6744012ee3132902569e263acc09cd6499660a6148209774e29f0e"
+    },
+    {
+      "file": "ranges.json",
+      "bytes": 2098,
+      "sha256": "0007413f9d63aee98f3a65eb1a27706d42fecfd5dcf4c43342c1f9f87f089a39"
+    },
+    {
+      "file": "menu-check.json",
+      "bytes": 88304,
+      "sha256": "0a0179498d87e120b2ba4c04d0185eff823bd03ac52d1533378de09370f0f784"
+    },
+    {
+      "file": "oop-range.txt",
+      "bytes": 2348,
+      "sha256": "00578d305c270cca7415c3631a888c0f757a82eb2ca93969563b1e2b10ad1041"
+    },
+    {
+      "file": "ip-range.txt",
+      "bytes": 1364,
+      "sha256": "8ac48ebeae7ded4d1427ef5a64db7a134c2104258511cd8fae72834ce98c8efd"
+    },
+    {
+      "file": "check_ranges.py",
+      "bytes": 8222,
+      "sha256": "9f32e0a587291aa78d70c4e1878c015f3096a8381e004f0cbe45db6e9acf8e82"
+    },
+    {
+      "file": "test_check_ranges.py",
+      "bytes": 4202,
+      "sha256": "04cf3fae118ad18996cfc5c8139bb4371df8305c1bc78c43a20ae117d6d75261"
+    },
+    {
+      "file": "check_menus.py",
+      "bytes": 12800,
+      "sha256": "cb0c849edb2c912c62e35a2f9da00da84911e082cbfa9ed998b521284e44feb0"
+    },
+    {
+      "file": "test_check_menus.py",
+      "bytes": 7766,
+      "sha256": "61481bc321a9807bef3e7e451ff58282e17675c7fb695aa23978e5a5e917c267"
+    }
+  ],
+  "sources_unchanged": true,
+  "finished_utc": "2026-09-26T21:38:12.010713+00:00",
+  "all_four_passed": false
+}
