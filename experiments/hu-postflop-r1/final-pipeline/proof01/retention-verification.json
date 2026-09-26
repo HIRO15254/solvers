@@ -1,0 +1,109 @@
+{
+  "schema": "r1.final-pipeline-failure-retention/v1",
+  "recorded_at_utc": "2026-09-26T19:16:55.582627+00:00",
+  "source_directory": "E:\\codex-work\\solvers\\r1-final-recovery01",
+  "archive": [
+    {
+      "path": "final-proof01.tar.gz",
+      "bytes": 10564202,
+      "sha256": "1ccb025c7044a6d07c3226d7391d781b3f0301a26b047b6ebf77aa2d3f462d80"
+    },
+    {
+      "path": "final-proof01.tar.gz.manifest.json",
+      "bytes": 112094,
+      "sha256": "67725e732b42ce96fc388e93ff40663de23ccb49047c075aeed272288d48ab65"
+    },
+    {
+      "path": "final-proof01.tar.gz.sha256",
+      "bytes": 87,
+      "sha256": "d7c20d7f895bb53f75d9dc3abca32615d040d903b36f43231e00e0f9c22f46a3"
+    }
+  ],
+  "manifest_original_files": 248,
+  "manifest_content_members": 226,
+  "archive_regular_members_including_manifest": 227,
+  "all_manifest_alias_bytes_and_hashes_verified": true,
+  "extracted_copy_matches_manifest_aliases": true,
+  "trusted_code": [
+    {
+      "path": "../verify.py",
+      "bytes": 859,
+      "sha256": "8fa02c7ccc59a8251930bc5f646a0f69bbb8cdbc337edd420b6966bb8a13a06a"
+    },
+    {
+      "path": "../report.py",
+      "bytes": 11217,
+      "sha256": "5af43ddf31b99969cbc86bbf908432d2757b9bed58ba32816b8bed8710f51512"
+    },
+    {
+      "path": "../run.py",
+      "bytes": 50954,
+      "sha256": "84d9a6a001ab08d55efbb8554bdc9a76ecc05c247b25c423952fb473896a6b28"
+    },
+    {
+      "path": "../protocol.json",
+      "bytes": 5782,
+      "sha256": "b130f5b94f62217892d0e58019de48aa5516822b9036fc72994756866d5cae00"
+    }
+  ],
+  "commands": [
+    {
+      "key": "verification",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "experiments/hu-postflop-r1/final-pipeline/verify.py",
+        "--out",
+        "E:\\codex-work\\solvers\\r1-final-recovery01\\proof",
+        "--expect",
+        "failed"
+      ],
+      "started_at_utc": "2026-09-26T19:16:53.163018+00:00",
+      "ended_at_utc": "2026-09-26T19:16:54.321759+00:00",
+      "exit_code": 0,
+      "outputs": {
+        "stdout": {
+          "path": "verification.stdout.json",
+          "bytes": 1136,
+          "sha256": "2c3f9674ef6c898cf0362d6161b4d877c59bc7de511955370ba49562289eb1a3"
+        },
+        "stderr": {
+          "path": "verification.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "key": "report",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "experiments/hu-postflop-r1/final-pipeline/report.py",
+        "--out",
+        "E:\\codex-work\\solvers\\r1-final-recovery01\\proof",
+        "--json-target",
+        "experiments\\hu-postflop-r1\\final-pipeline\\proof01\\report.json",
+        "--markdown-target",
+        "experiments\\hu-postflop-r1\\final-pipeline\\proof01\\report.md"
+      ],
+      "started_at_utc": "2026-09-26T19:16:54.321775+00:00",
+      "ended_at_utc": "2026-09-26T19:16:55.563783+00:00",
+      "exit_code": 0,
+      "outputs": {
+        "stdout": {
+          "path": "report.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "report.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "state": "failed",
+  "performance_processes": 0,
+  "measurement_stages_skipped": 156,
+  "claim": "Original failed campaign preserved; no timing, memory, I/O or quality comparison inferred."
+}

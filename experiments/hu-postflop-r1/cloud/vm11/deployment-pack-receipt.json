@@ -1,0 +1,1316 @@
+{
+  "schema": "r1.final-pipeline-deployment-pack/v1",
+  "archive": "E:\\codex-work\\solvers\\r1-final-deployment01.tar.gz",
+  "bytes": 10338482,
+  "sha256": "376b093063077d24457b39df31770fde87c41c845e08e07d8dba4cd60f76b31a",
+  "files": [
+    {
+      "member": "control/exact-mass/run.py",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\exact-mass\\run.py",
+      "bytes": 41516,
+      "sha256": "62200fe9df43a111f6088d4f6e824234876baff6caf0c065fd42365a84869129"
+    },
+    {
+      "member": "control/final-pipeline/README.md",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\README.md",
+      "bytes": 7407,
+      "sha256": "c5389cf5023dd8b1a0645ed9516692eac9054b0727fea505d58ad1f88fd160e8"
+    },
+    {
+      "member": "control/final-pipeline/configs/flop.toml",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\configs\\flop.toml",
+      "bytes": 678,
+      "sha256": "07b971e4879e86e3d156169f66719e39dd078b861d06923bbbb263d8ab1a9610"
+    },
+    {
+      "member": "control/final-pipeline/configs/river.toml",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\configs\\river.toml",
+      "bytes": 559,
+      "sha256": "79b6a5c5d7ad02a42111db120d61668a5757e6d6210f16b017b384366e812ef0"
+    },
+    {
+      "member": "control/final-pipeline/configs/turn.toml",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\configs\\turn.toml",
+      "bytes": 548,
+      "sha256": "d29a6e72ccff535fd7606164252de9fcef66a1730cf12fc6e7c74190bb1e2121"
+    },
+    {
+      "member": "control/final-pipeline/freeze.json",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\freeze.json",
+      "bytes": 686,
+      "sha256": "5cf6690b799417df99a65c45721448ba938db53b96ee6ec4bfbde27ecbadd977"
+    },
+    {
+      "member": "control/final-pipeline/hu_pipeline_probe.rs",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\hu_pipeline_probe.rs",
+      "bytes": 13915,
+      "sha256": "292d4398c21db5dd080e0fd7689b64ba7a0a46c53fa8360a677ac797b359ff39"
+    },
+    {
+      "member": "control/final-pipeline/protocol.json",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\protocol.json",
+      "bytes": 5782,
+      "sha256": "b130f5b94f62217892d0e58019de48aa5516822b9036fc72994756866d5cae00"
+    },
+    {
+      "member": "control/final-pipeline/run.py",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\run.py",
+      "bytes": 50954,
+      "sha256": "84d9a6a001ab08d55efbb8554bdc9a76ecc05c247b25c423952fb473896a6b28"
+    },
+    {
+      "member": "control/final-pipeline/sol_codec_bench.rs",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\sol_codec_bench.rs",
+      "bytes": 9370,
+      "sha256": "ed972ffce351fcd31dfbab74771a06a059ef0edb43e44d65397e65f9a85cbcea"
+    },
+    {
+      "member": "control/final-pipeline/source-pins.json",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\source-pins.json",
+      "bytes": 80149,
+      "sha256": "02e1de1cc7293e126d3d1fab067264b46a7e011c85894703a47a7605dc5aa91a"
+    },
+    {
+      "member": "control/final-pipeline/verify.py",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\final-pipeline\\verify.py",
+      "bytes": 859,
+      "sha256": "8fa02c7ccc59a8251930bc5f646a0f69bbb8cdbc337edd420b6966bb8a13a06a"
+    },
+    {
+      "member": "control/showdown-kernel/run.py",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\showdown-kernel\\run.py",
+      "bytes": 41166,
+      "sha256": "6d21fe34f9f66327bb7f3ff1c50d977687018af45c3593d56726f78e8da44a60"
+    },
+    {
+      "member": "foundation/payload/0157b3e6c34df461e235f72dc27f375ca584b08f5c39a63142077678083d27d7",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\0157b3e6c34df461e235f72dc27f375ca584b08f5c39a63142077678083d27d7",
+      "bytes": 541929,
+      "sha256": "0157b3e6c34df461e235f72dc27f375ca584b08f5c39a63142077678083d27d7"
+    },
+    {
+      "member": "foundation/payload/0209e750c01dffdd20da90aa4ce30e72d29ace07c911c8bbe49db6988d312bea",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\0209e750c01dffdd20da90aa4ce30e72d29ace07c911c8bbe49db6988d312bea",
+      "bytes": 7190,
+      "sha256": "0209e750c01dffdd20da90aa4ce30e72d29ace07c911c8bbe49db6988d312bea"
+    },
+    {
+      "member": "foundation/payload/032468330df1ba71ee85087d29eb21af09ede9f753f959a8ca4a93bbb4bd845f",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\032468330df1ba71ee85087d29eb21af09ede9f753f959a8ca4a93bbb4bd845f",
+      "bytes": 5974,
+      "sha256": "032468330df1ba71ee85087d29eb21af09ede9f753f959a8ca4a93bbb4bd845f"
+    },
+    {
+      "member": "foundation/payload/0381fea92ed15e873788b8c1698a0993c4b8d1f762b1f6e9977acee5d6adb08d",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\0381fea92ed15e873788b8c1698a0993c4b8d1f762b1f6e9977acee5d6adb08d",
+      "bytes": 6208,
+      "sha256": "0381fea92ed15e873788b8c1698a0993c4b8d1f762b1f6e9977acee5d6adb08d"
+    },
+    {
+      "member": "foundation/payload/07aae28c05020afe2b80cb2b8b2c6c14b349f9bb703f49da4d597bd96a2c9d9a",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\07aae28c05020afe2b80cb2b8b2c6c14b349f9bb703f49da4d597bd96a2c9d9a",
+      "bytes": 633,
+      "sha256": "07aae28c05020afe2b80cb2b8b2c6c14b349f9bb703f49da4d597bd96a2c9d9a"
+    },
+    {
+      "member": "foundation/payload/092c21174cb8d5d07e92f0df77c63e8c44ad988114a2ade3e64894b06803b904",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\092c21174cb8d5d07e92f0df77c63e8c44ad988114a2ade3e64894b06803b904",
+      "bytes": 13128,
+      "sha256": "092c21174cb8d5d07e92f0df77c63e8c44ad988114a2ade3e64894b06803b904"
+    },
+    {
+      "member": "foundation/payload/0953500fb7cb56e8b752301c0df41ad3a49188da6650d1757b018dab876007f6",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\0953500fb7cb56e8b752301c0df41ad3a49188da6650d1757b018dab876007f6",
+      "bytes": 13180,
+      "sha256": "0953500fb7cb56e8b752301c0df41ad3a49188da6650d1757b018dab876007f6"
+    },
+    {
+      "member": "foundation/payload/0b9c3bbda14f305c17b088ce578413e497206c0d32df282b98840ea88a2b75ab",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\0b9c3bbda14f305c17b088ce578413e497206c0d32df282b98840ea88a2b75ab",
+      "bytes": 295,
+      "sha256": "0b9c3bbda14f305c17b088ce578413e497206c0d32df282b98840ea88a2b75ab"
+    },
+    {
+      "member": "foundation/payload/0f84890a1860498040fec55b160bdc07c7c1135f10fa8ea8475d8185739bb07a",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\0f84890a1860498040fec55b160bdc07c7c1135f10fa8ea8475d8185739bb07a",
+      "bytes": 7499,
+      "sha256": "0f84890a1860498040fec55b160bdc07c7c1135f10fa8ea8475d8185739bb07a"
+    },
+    {
+      "member": "foundation/payload/1023824a345c95ee70e83fc70262d2b630f498f2bc6ff54b60d7457d94c64b21",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\1023824a345c95ee70e83fc70262d2b630f498f2bc6ff54b60d7457d94c64b21",
+      "bytes": 18102,
+      "sha256": "1023824a345c95ee70e83fc70262d2b630f498f2bc6ff54b60d7457d94c64b21"
+    },
+    {
+      "member": "foundation/payload/12dcc57da05fabc5b025ead8c275196edca13c21cbf41f28fed1494fce3da3f7",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\12dcc57da05fabc5b025ead8c275196edca13c21cbf41f28fed1494fce3da3f7",
+      "bytes": 722,
+      "sha256": "12dcc57da05fabc5b025ead8c275196edca13c21cbf41f28fed1494fce3da3f7"
+    },
+    {
+      "member": "foundation/payload/137d4b36385f82beebb5a98fd623e0077df9e0abf2bc45c7e460faae6f43c04b",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\137d4b36385f82beebb5a98fd623e0077df9e0abf2bc45c7e460faae6f43c04b",
+      "bytes": 3847,
+      "sha256": "137d4b36385f82beebb5a98fd623e0077df9e0abf2bc45c7e460faae6f43c04b"
+    },
+    {
+      "member": "foundation/payload/14159fa31120d392d542c082d1d408b1ae632ca18b473c5ba7a9d0a9412bd69f",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\14159fa31120d392d542c082d1d408b1ae632ca18b473c5ba7a9d0a9412bd69f",
+      "bytes": 8368,
+      "sha256": "14159fa31120d392d542c082d1d408b1ae632ca18b473c5ba7a9d0a9412bd69f"
+    },
+    {
+      "member": "foundation/payload/1442a4fc37ffc564cf3e3b0c77e1b4df4b438a1668c3466f0c36229de5a1a7ba",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\1442a4fc37ffc564cf3e3b0c77e1b4df4b438a1668c3466f0c36229de5a1a7ba",
+      "bytes": 5918,
+      "sha256": "1442a4fc37ffc564cf3e3b0c77e1b4df4b438a1668c3466f0c36229de5a1a7ba"
+    },
+    {
+      "member": "foundation/payload/1593ad76dc47a00787ff0b3c35b8d946e71292bd9774a55d38b413afc617851d",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\1593ad76dc47a00787ff0b3c35b8d946e71292bd9774a55d38b413afc617851d",
+      "bytes": 980,
+      "sha256": "1593ad76dc47a00787ff0b3c35b8d946e71292bd9774a55d38b413afc617851d"
+    },
+    {
+      "member": "foundation/payload/15c36099b56c4844ef1baae8a8f95b5e48232252d70edd2aab8fd0b3ed9afb0e",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\15c36099b56c4844ef1baae8a8f95b5e48232252d70edd2aab8fd0b3ed9afb0e",
+      "bytes": 13180,
+      "sha256": "15c36099b56c4844ef1baae8a8f95b5e48232252d70edd2aab8fd0b3ed9afb0e"
+    },
+    {
+      "member": "foundation/payload/160fc5e26e1162c109dd397a5920ba24d61236c91639641a7a488475a8dbeaba",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\160fc5e26e1162c109dd397a5920ba24d61236c91639641a7a488475a8dbeaba",
+      "bytes": 13118,
+      "sha256": "160fc5e26e1162c109dd397a5920ba24d61236c91639641a7a488475a8dbeaba"
+    },
+    {
+      "member": "foundation/payload/17c2cbe063232f9d419e698247080a55a873d4446c90554891110db6e4d6fa11",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\17c2cbe063232f9d419e698247080a55a873d4446c90554891110db6e4d6fa11",
+      "bytes": 6021,
+      "sha256": "17c2cbe063232f9d419e698247080a55a873d4446c90554891110db6e4d6fa11"
+    },
+    {
+      "member": "foundation/payload/18041c22a68df98a3cc7babe2886a5987f3ca5502c5b165eecd9ab7d59321ddf",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\18041c22a68df98a3cc7babe2886a5987f3ca5502c5b165eecd9ab7d59321ddf",
+      "bytes": 4316,
+      "sha256": "18041c22a68df98a3cc7babe2886a5987f3ca5502c5b165eecd9ab7d59321ddf"
+    },
+    {
+      "member": "foundation/payload/18d2f1fafff5f307750c4025c55b88396ae0ae16fc7b72ee544fde59023df842",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\18d2f1fafff5f307750c4025c55b88396ae0ae16fc7b72ee544fde59023df842",
+      "bytes": 7189,
+      "sha256": "18d2f1fafff5f307750c4025c55b88396ae0ae16fc7b72ee544fde59023df842"
+    },
+    {
+      "member": "foundation/payload/1a84947f6daa9ca1c57d5f48e4914e176643dbe9c787262ded95dcf6aba042d6",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\1a84947f6daa9ca1c57d5f48e4914e176643dbe9c787262ded95dcf6aba042d6",
+      "bytes": 68137,
+      "sha256": "1a84947f6daa9ca1c57d5f48e4914e176643dbe9c787262ded95dcf6aba042d6"
+    },
+    {
+      "member": "foundation/payload/1ab539d6252deb0ddb928426197354ab09527db2793396821034d05dee7b0c14",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\1ab539d6252deb0ddb928426197354ab09527db2793396821034d05dee7b0c14",
+      "bytes": 3849,
+      "sha256": "1ab539d6252deb0ddb928426197354ab09527db2793396821034d05dee7b0c14"
+    },
+    {
+      "member": "foundation/payload/1e580981d901416fa9d664e11036f28363d3f56a07b390c5fcbc68750c4b34c5",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\1e580981d901416fa9d664e11036f28363d3f56a07b390c5fcbc68750c4b34c5",
+      "bytes": 19941,
+      "sha256": "1e580981d901416fa9d664e11036f28363d3f56a07b390c5fcbc68750c4b34c5"
+    },
+    {
+      "member": "foundation/payload/1f3883d040536701b40263bc301f4f53fa0977cb2c228e280d2eb2e116d06f54",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\1f3883d040536701b40263bc301f4f53fa0977cb2c228e280d2eb2e116d06f54",
+      "bytes": 2175,
+      "sha256": "1f3883d040536701b40263bc301f4f53fa0977cb2c228e280d2eb2e116d06f54"
+    },
+    {
+      "member": "foundation/payload/202b650f761e5945957902a56f03d0aae2230628bc8a2be9c99fa51ca5eb58b3",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\202b650f761e5945957902a56f03d0aae2230628bc8a2be9c99fa51ca5eb58b3",
+      "bytes": 632,
+      "sha256": "202b650f761e5945957902a56f03d0aae2230628bc8a2be9c99fa51ca5eb58b3"
+    },
+    {
+      "member": "foundation/payload/20863ad18098fc04153be248ae953a5093ec351910f9110bcaf842630d83e43f",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\20863ad18098fc04153be248ae953a5093ec351910f9110bcaf842630d83e43f",
+      "bytes": 13118,
+      "sha256": "20863ad18098fc04153be248ae953a5093ec351910f9110bcaf842630d83e43f"
+    },
+    {
+      "member": "foundation/payload/22f21250336b5aa3f07e63e3cab376869015019db5aaf36f667be50912e8796a",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\22f21250336b5aa3f07e63e3cab376869015019db5aaf36f667be50912e8796a",
+      "bytes": 3846,
+      "sha256": "22f21250336b5aa3f07e63e3cab376869015019db5aaf36f667be50912e8796a"
+    },
+    {
+      "member": "foundation/payload/232000e72ae940920a29abdc6d98b3f0988f7731cb71099bcd5fb5d5603c01f8",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\232000e72ae940920a29abdc6d98b3f0988f7731cb71099bcd5fb5d5603c01f8",
+      "bytes": 13131,
+      "sha256": "232000e72ae940920a29abdc6d98b3f0988f7731cb71099bcd5fb5d5603c01f8"
+    },
+    {
+      "member": "foundation/payload/238018863acd81bd69ed323625601eb850a4e922f21162c6f2013853f59b9090",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\238018863acd81bd69ed323625601eb850a4e922f21162c6f2013853f59b9090",
+      "bytes": 13131,
+      "sha256": "238018863acd81bd69ed323625601eb850a4e922f21162c6f2013853f59b9090"
+    },
+    {
+      "member": "foundation/payload/2555fbd3ae472373a5094d4636b46c67a82c240538f257b143fd5f6c17f78777",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\2555fbd3ae472373a5094d4636b46c67a82c240538f257b143fd5f6c17f78777",
+      "bytes": 6178,
+      "sha256": "2555fbd3ae472373a5094d4636b46c67a82c240538f257b143fd5f6c17f78777"
+    },
+    {
+      "member": "foundation/payload/26ce8180461849dc6610d763c1cc67d9538a1b1cd5b91123f1a0dd45f699eade",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\26ce8180461849dc6610d763c1cc67d9538a1b1cd5b91123f1a0dd45f699eade",
+      "bytes": 22894,
+      "sha256": "26ce8180461849dc6610d763c1cc67d9538a1b1cd5b91123f1a0dd45f699eade"
+    },
+    {
+      "member": "foundation/payload/2760479a486d392e45e5c2011a8c7f74c6d3720cd0ec9bc360d766ea6fe2e5f5",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\2760479a486d392e45e5c2011a8c7f74c6d3720cd0ec9bc360d766ea6fe2e5f5",
+      "bytes": 13179,
+      "sha256": "2760479a486d392e45e5c2011a8c7f74c6d3720cd0ec9bc360d766ea6fe2e5f5"
+    },
+    {
+      "member": "foundation/payload/2c66bce6503a6121fe32df69433608a152c62ec53ad74dfd2bf3f99958e0eeb2",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\2c66bce6503a6121fe32df69433608a152c62ec53ad74dfd2bf3f99958e0eeb2",
+      "bytes": 1654,
+      "sha256": "2c66bce6503a6121fe32df69433608a152c62ec53ad74dfd2bf3f99958e0eeb2"
+    },
+    {
+      "member": "foundation/payload/2c8ae5b5137be2031356aef8c39d55220cecdb96b6910bf21335b3770ce7c825",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\2c8ae5b5137be2031356aef8c39d55220cecdb96b6910bf21335b3770ce7c825",
+      "bytes": 3849,
+      "sha256": "2c8ae5b5137be2031356aef8c39d55220cecdb96b6910bf21335b3770ce7c825"
+    },
+    {
+      "member": "foundation/payload/2cd1e7cd34ba1281debc9f0c4bd3742b04441751bf8cd92a576e162d1d9317e5",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\2cd1e7cd34ba1281debc9f0c4bd3742b04441751bf8cd92a576e162d1d9317e5",
+      "bytes": 4254,
+      "sha256": "2cd1e7cd34ba1281debc9f0c4bd3742b04441751bf8cd92a576e162d1d9317e5"
+    },
+    {
+      "member": "foundation/payload/2d98ab93cc0d595218d90c0c6eae3cfd757f4110dfa4d802b88546d30d485dd6",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\2d98ab93cc0d595218d90c0c6eae3cfd757f4110dfa4d802b88546d30d485dd6",
+      "bytes": 3891,
+      "sha256": "2d98ab93cc0d595218d90c0c6eae3cfd757f4110dfa4d802b88546d30d485dd6"
+    },
+    {
+      "member": "foundation/payload/2e049a887f3da45fe60bfcc170450b960193fdf14bc8f0eb82ee6ff8e6e5d1b9",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\2e049a887f3da45fe60bfcc170450b960193fdf14bc8f0eb82ee6ff8e6e5d1b9",
+      "bytes": 634,
+      "sha256": "2e049a887f3da45fe60bfcc170450b960193fdf14bc8f0eb82ee6ff8e6e5d1b9"
+    },
+    {
+      "member": "foundation/payload/2f2718f1e030509929e8151c847f0398377605ce5454e9750d9a7599dc2174e1",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\2f2718f1e030509929e8151c847f0398377605ce5454e9750d9a7599dc2174e1",
+      "bytes": 13180,
+      "sha256": "2f2718f1e030509929e8151c847f0398377605ce5454e9750d9a7599dc2174e1"
+    },
+    {
+      "member": "foundation/payload/2f6067d9ce0b399fcde96cc3e1a70ffb28c613c508f79b41954c0597d188cd2c",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\2f6067d9ce0b399fcde96cc3e1a70ffb28c613c508f79b41954c0597d188cd2c",
+      "bytes": 217116,
+      "sha256": "2f6067d9ce0b399fcde96cc3e1a70ffb28c613c508f79b41954c0597d188cd2c"
+    },
+    {
+      "member": "foundation/payload/313153360797b018afbe9ff7835c5223e77fe81cb4a9678eed46575a1cf8030a",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\313153360797b018afbe9ff7835c5223e77fe81cb4a9678eed46575a1cf8030a",
+      "bytes": 13118,
+      "sha256": "313153360797b018afbe9ff7835c5223e77fe81cb4a9678eed46575a1cf8030a"
+    },
+    {
+      "member": "foundation/payload/31aaf618da872869455de290216a9508c579be2649e9c539b213dd4b09bcba6e",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\31aaf618da872869455de290216a9508c579be2649e9c539b213dd4b09bcba6e",
+      "bytes": 2175,
+      "sha256": "31aaf618da872869455de290216a9508c579be2649e9c539b213dd4b09bcba6e"
+    },
+    {
+      "member": "foundation/payload/31b0364b56e3a04e2e34b5b4a4078714964aacca1df172f50229f71c0c9b7a86",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\31b0364b56e3a04e2e34b5b4a4078714964aacca1df172f50229f71c0c9b7a86",
+      "bytes": 4315,
+      "sha256": "31b0364b56e3a04e2e34b5b4a4078714964aacca1df172f50229f71c0c9b7a86"
+    },
+    {
+      "member": "foundation/payload/3519fba96f664e85d3bd87a2aae4952d87b19319a4e861f50c4011c6224169df",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\3519fba96f664e85d3bd87a2aae4952d87b19319a4e861f50c4011c6224169df",
+      "bytes": 47,
+      "sha256": "3519fba96f664e85d3bd87a2aae4952d87b19319a4e861f50c4011c6224169df"
+    },
+    {
+      "member": "foundation/payload/3b981af73461a43cdb1b090948fbd78318975536482961dfc0ee59a55250225c",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\3b981af73461a43cdb1b090948fbd78318975536482961dfc0ee59a55250225c",
+      "bytes": 2174,
+      "sha256": "3b981af73461a43cdb1b090948fbd78318975536482961dfc0ee59a55250225c"
+    },
+    {
+      "member": "foundation/payload/3ceb38328cb4e797ad614da246e11d59a7595d7685afcd7222eb5812b2c9aaf3",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\3ceb38328cb4e797ad614da246e11d59a7595d7685afcd7222eb5812b2c9aaf3",
+      "bytes": 13180,
+      "sha256": "3ceb38328cb4e797ad614da246e11d59a7595d7685afcd7222eb5812b2c9aaf3"
+    },
+    {
+      "member": "foundation/payload/3ceb5d744f9f28f5af8f52972a52ce8c2f39a4386cb619cd118fbc8608947390",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\3ceb5d744f9f28f5af8f52972a52ce8c2f39a4386cb619cd118fbc8608947390",
+      "bytes": 930,
+      "sha256": "3ceb5d744f9f28f5af8f52972a52ce8c2f39a4386cb619cd118fbc8608947390"
+    },
+    {
+      "member": "foundation/payload/41bd7aa68933ba491ee08443f09804852f087b6e6e104d1bb94aa44b8c243cd4",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\41bd7aa68933ba491ee08443f09804852f087b6e6e104d1bb94aa44b8c243cd4",
+      "bytes": 633,
+      "sha256": "41bd7aa68933ba491ee08443f09804852f087b6e6e104d1bb94aa44b8c243cd4"
+    },
+    {
+      "member": "foundation/payload/438a057113bf614a6d172d447d4a56a2d44dba8e496c4f01828e441219bcfd91",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\438a057113bf614a6d172d447d4a56a2d44dba8e496c4f01828e441219bcfd91",
+      "bytes": 3883,
+      "sha256": "438a057113bf614a6d172d447d4a56a2d44dba8e496c4f01828e441219bcfd91"
+    },
+    {
+      "member": "foundation/payload/43d14370169dbac1b131215ad382a652bd12bedf59368feac93bb82f34906ee4",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\43d14370169dbac1b131215ad382a652bd12bedf59368feac93bb82f34906ee4",
+      "bytes": 7189,
+      "sha256": "43d14370169dbac1b131215ad382a652bd12bedf59368feac93bb82f34906ee4"
+    },
+    {
+      "member": "foundation/payload/4421297eefcb345e8cfd12c55069b74b6f591ca31e7604a2f96d6b7950f52e6b",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\4421297eefcb345e8cfd12c55069b74b6f591ca31e7604a2f96d6b7950f52e6b",
+      "bytes": 6276,
+      "sha256": "4421297eefcb345e8cfd12c55069b74b6f591ca31e7604a2f96d6b7950f52e6b"
+    },
+    {
+      "member": "foundation/payload/46025cb0c5f44e10eac82097946175db1cc1a13b79ac87571f9e593c985d0c0b",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\46025cb0c5f44e10eac82097946175db1cc1a13b79ac87571f9e593c985d0c0b",
+      "bytes": 8365,
+      "sha256": "46025cb0c5f44e10eac82097946175db1cc1a13b79ac87571f9e593c985d0c0b"
+    },
+    {
+      "member": "foundation/payload/46bf8361821e066877f1f8c80fd645bcc2173f28ce90aa8c6b7f750d0f543251",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\46bf8361821e066877f1f8c80fd645bcc2173f28ce90aa8c6b7f750d0f543251",
+      "bytes": 8369,
+      "sha256": "46bf8361821e066877f1f8c80fd645bcc2173f28ce90aa8c6b7f750d0f543251"
+    },
+    {
+      "member": "foundation/payload/4d0346e90bee8987077aee0ceea4c6db91d67014ef4d0bd505e93491aa183ffe",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\4d0346e90bee8987077aee0ceea4c6db91d67014ef4d0bd505e93491aa183ffe",
+      "bytes": 4255,
+      "sha256": "4d0346e90bee8987077aee0ceea4c6db91d67014ef4d0bd505e93491aa183ffe"
+    },
+    {
+      "member": "foundation/payload/4ea5cec16a717a93ae5bbff5e1f5eb723affb952fa23018089aef3f1fdb194b6",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\4ea5cec16a717a93ae5bbff5e1f5eb723affb952fa23018089aef3f1fdb194b6",
+      "bytes": 4318,
+      "sha256": "4ea5cec16a717a93ae5bbff5e1f5eb723affb952fa23018089aef3f1fdb194b6"
+    },
+    {
+      "member": "foundation/payload/4f11f66d7797675e75afee9fc076240501c8a5113895da351581f75368f2c3b9",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\4f11f66d7797675e75afee9fc076240501c8a5113895da351581f75368f2c3b9",
+      "bytes": 13118,
+      "sha256": "4f11f66d7797675e75afee9fc076240501c8a5113895da351581f75368f2c3b9"
+    },
+    {
+      "member": "foundation/payload/51068bb8464b57b91d11fe1ce1be848f14cd83e26865661afeeee3c70a3e9cd7",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\51068bb8464b57b91d11fe1ce1be848f14cd83e26865661afeeee3c70a3e9cd7",
+      "bytes": 1400466,
+      "sha256": "51068bb8464b57b91d11fe1ce1be848f14cd83e26865661afeeee3c70a3e9cd7"
+    },
+    {
+      "member": "foundation/payload/52e6ea140732dcb208ae3a1c6168940f94a5c6c5555f3f83d4a30f4d5dc6df1d",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\52e6ea140732dcb208ae3a1c6168940f94a5c6c5555f3f83d4a30f4d5dc6df1d",
+      "bytes": 3846,
+      "sha256": "52e6ea140732dcb208ae3a1c6168940f94a5c6c5555f3f83d4a30f4d5dc6df1d"
+    },
+    {
+      "member": "foundation/payload/54534041ecd0c7e36dd9d92f5b6d8660f362b0bf368e2bddfa68b56577917efc",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\54534041ecd0c7e36dd9d92f5b6d8660f362b0bf368e2bddfa68b56577917efc",
+      "bytes": 13180,
+      "sha256": "54534041ecd0c7e36dd9d92f5b6d8660f362b0bf368e2bddfa68b56577917efc"
+    },
+    {
+      "member": "foundation/payload/5496b232316c042feb29fea1709c83567d0565f873141a75002fc12524a54cb7",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\5496b232316c042feb29fea1709c83567d0565f873141a75002fc12524a54cb7",
+      "bytes": 622,
+      "sha256": "5496b232316c042feb29fea1709c83567d0565f873141a75002fc12524a54cb7"
+    },
+    {
+      "member": "foundation/payload/554b171975b2fd9f2531734054b7731bd2cc97dacd3cc305c9c0045544c8fc17",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\554b171975b2fd9f2531734054b7731bd2cc97dacd3cc305c9c0045544c8fc17",
+      "bytes": 13179,
+      "sha256": "554b171975b2fd9f2531734054b7731bd2cc97dacd3cc305c9c0045544c8fc17"
+    },
+    {
+      "member": "foundation/payload/570b93f9e17482d6d411eb08ac6ca976509f928d37a83ffcfea5a83025071f29",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\570b93f9e17482d6d411eb08ac6ca976509f928d37a83ffcfea5a83025071f29",
+      "bytes": 4314,
+      "sha256": "570b93f9e17482d6d411eb08ac6ca976509f928d37a83ffcfea5a83025071f29"
+    },
+    {
+      "member": "foundation/payload/57333f4efed0ffd962e1f24790219c02ec9aade4ee1e0a67a772f3b406938732",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\57333f4efed0ffd962e1f24790219c02ec9aade4ee1e0a67a772f3b406938732",
+      "bytes": 7191,
+      "sha256": "57333f4efed0ffd962e1f24790219c02ec9aade4ee1e0a67a772f3b406938732"
+    },
+    {
+      "member": "foundation/payload/5796e6a701ad1f4c81e4a820a0c0a60e16ac80c1ce30eda089d9d33f63c68202",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\5796e6a701ad1f4c81e4a820a0c0a60e16ac80c1ce30eda089d9d33f63c68202",
+      "bytes": 26794,
+      "sha256": "5796e6a701ad1f4c81e4a820a0c0a60e16ac80c1ce30eda089d9d33f63c68202"
+    },
+    {
+      "member": "foundation/payload/59010cb9b0cd119270caa521767b49c245c2cad9fdb95b7bbde3fa7739fcbd66",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\59010cb9b0cd119270caa521767b49c245c2cad9fdb95b7bbde3fa7739fcbd66",
+      "bytes": 1534036,
+      "sha256": "59010cb9b0cd119270caa521767b49c245c2cad9fdb95b7bbde3fa7739fcbd66"
+    },
+    {
+      "member": "foundation/payload/5912b4bdc15a9f86217a1c36ce032e43d01b0bc2fe1c927470992b8444a4553b",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\5912b4bdc15a9f86217a1c36ce032e43d01b0bc2fe1c927470992b8444a4553b",
+      "bytes": 7191,
+      "sha256": "5912b4bdc15a9f86217a1c36ce032e43d01b0bc2fe1c927470992b8444a4553b"
+    },
+    {
+      "member": "foundation/payload/5a36e78b74e94bd2d6a2ee5dbf4020d7e813ac921297058295033a686d98bd43",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\5a36e78b74e94bd2d6a2ee5dbf4020d7e813ac921297058295033a686d98bd43",
+      "bytes": 13180,
+      "sha256": "5a36e78b74e94bd2d6a2ee5dbf4020d7e813ac921297058295033a686d98bd43"
+    },
+    {
+      "member": "foundation/payload/5b80cb8f165001fc4993a0e0b2a798e9d0628ff934256f30dba15cacb0ff4bc4",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\5b80cb8f165001fc4993a0e0b2a798e9d0628ff934256f30dba15cacb0ff4bc4",
+      "bytes": 2174,
+      "sha256": "5b80cb8f165001fc4993a0e0b2a798e9d0628ff934256f30dba15cacb0ff4bc4"
+    },
+    {
+      "member": "foundation/payload/5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015,
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+    },
+    {
+      "member": "foundation/payload/5d8b39af3da68b1e2278c3706fa5e9e61ebc3ff4b9e22e77a6a0322a63b14670",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\5d8b39af3da68b1e2278c3706fa5e9e61ebc3ff4b9e22e77a6a0322a63b14670",
+      "bytes": 13128,
+      "sha256": "5d8b39af3da68b1e2278c3706fa5e9e61ebc3ff4b9e22e77a6a0322a63b14670"
+    },
+    {
+      "member": "foundation/payload/5de3c27a5db8816ac41b5279bd25dd1e095e67cedc2556dd0037f0d85330012e",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\5de3c27a5db8816ac41b5279bd25dd1e095e67cedc2556dd0037f0d85330012e",
+      "bytes": 26799,
+      "sha256": "5de3c27a5db8816ac41b5279bd25dd1e095e67cedc2556dd0037f0d85330012e"
+    },
+    {
+      "member": "foundation/payload/5f0c1e6cf8f27621aad7d3fa225d9b3db4411d6568492a1804a3dd8962e0292a",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\5f0c1e6cf8f27621aad7d3fa225d9b3db4411d6568492a1804a3dd8962e0292a",
+      "bytes": 12452,
+      "sha256": "5f0c1e6cf8f27621aad7d3fa225d9b3db4411d6568492a1804a3dd8962e0292a"
+    },
+    {
+      "member": "foundation/payload/5fcb5dcaad0744cc92163d4e295bc55fb0504cee57c3492766ba5e74d216e2d5",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\5fcb5dcaad0744cc92163d4e295bc55fb0504cee57c3492766ba5e74d216e2d5",
+      "bytes": 3843,
+      "sha256": "5fcb5dcaad0744cc92163d4e295bc55fb0504cee57c3492766ba5e74d216e2d5"
+    },
+    {
+      "member": "foundation/payload/601db9a7b06d766d600fda1ed9129305d0182605a561d50d4aee8148eb034039",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\601db9a7b06d766d600fda1ed9129305d0182605a561d50d4aee8148eb034039",
+      "bytes": 4479,
+      "sha256": "601db9a7b06d766d600fda1ed9129305d0182605a561d50d4aee8148eb034039"
+    },
+    {
+      "member": "foundation/payload/602a31ca03de54dd1b02c48c03bc4e69252a21b4d0566a803c69209e8fe2e8c1",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\602a31ca03de54dd1b02c48c03bc4e69252a21b4d0566a803c69209e8fe2e8c1",
+      "bytes": 3845,
+      "sha256": "602a31ca03de54dd1b02c48c03bc4e69252a21b4d0566a803c69209e8fe2e8c1"
+    },
+    {
+      "member": "foundation/payload/62200fe9df43a111f6088d4f6e824234876baff6caf0c065fd42365a84869129",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\62200fe9df43a111f6088d4f6e824234876baff6caf0c065fd42365a84869129",
+      "bytes": 41516,
+      "sha256": "62200fe9df43a111f6088d4f6e824234876baff6caf0c065fd42365a84869129"
+    },
+    {
+      "member": "foundation/payload/64b1eace72438bec44496fd9cfd883f469129ac711b33b595b49fe73295648ec",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\64b1eace72438bec44496fd9cfd883f469129ac711b33b595b49fe73295648ec",
+      "bytes": 6335,
+      "sha256": "64b1eace72438bec44496fd9cfd883f469129ac711b33b595b49fe73295648ec"
+    },
+    {
+      "member": "foundation/payload/679d9ec21e7eac8ad0c9a5a0a894855a666a1220694e9dc1172485451dde8bdb",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\679d9ec21e7eac8ad0c9a5a0a894855a666a1220694e9dc1172485451dde8bdb",
+      "bytes": 1383622,
+      "sha256": "679d9ec21e7eac8ad0c9a5a0a894855a666a1220694e9dc1172485451dde8bdb"
+    },
+    {
+      "member": "foundation/payload/67a0f756f75980bf06084ae0680b586ebd92358114b1c2228fc177db30c433ad",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\67a0f756f75980bf06084ae0680b586ebd92358114b1c2228fc177db30c433ad",
+      "bytes": 13131,
+      "sha256": "67a0f756f75980bf06084ae0680b586ebd92358114b1c2228fc177db30c433ad"
+    },
+    {
+      "member": "foundation/payload/68c5476bad5b7714c6962b44095c9b43130c2b683f6822d088fcd03cce957b5d",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\68c5476bad5b7714c6962b44095c9b43130c2b683f6822d088fcd03cce957b5d",
+      "bytes": 13118,
+      "sha256": "68c5476bad5b7714c6962b44095c9b43130c2b683f6822d088fcd03cce957b5d"
+    },
+    {
+      "member": "foundation/payload/6915496c3d3a6160fd138ee66fa4279bcbaa18eb729ec664b85f39db41ebc9bc",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\6915496c3d3a6160fd138ee66fa4279bcbaa18eb729ec664b85f39db41ebc9bc",
+      "bytes": 18105,
+      "sha256": "6915496c3d3a6160fd138ee66fa4279bcbaa18eb729ec664b85f39db41ebc9bc"
+    },
+    {
+      "member": "foundation/payload/6973b7c91f554dc059a42d48c5bef23cb6df349be2d520487837f3f3c3679be3",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\6973b7c91f554dc059a42d48c5bef23cb6df349be2d520487837f3f3c3679be3",
+      "bytes": 13131,
+      "sha256": "6973b7c91f554dc059a42d48c5bef23cb6df349be2d520487837f3f3c3679be3"
+    },
+    {
+      "member": "foundation/payload/6afb9a0dc7fbe8351d31b714387bf642b053eb4eac9a73ba995fb0ee26948525",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\6afb9a0dc7fbe8351d31b714387bf642b053eb4eac9a73ba995fb0ee26948525",
+      "bytes": 4256,
+      "sha256": "6afb9a0dc7fbe8351d31b714387bf642b053eb4eac9a73ba995fb0ee26948525"
+    },
+    {
+      "member": "foundation/payload/6b3fefbee44f6c41e2d016d724bc16d7a51554b191b59f9daa608d26f66a17ef",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\6b3fefbee44f6c41e2d016d724bc16d7a51554b191b59f9daa608d26f66a17ef",
+      "bytes": 3845,
+      "sha256": "6b3fefbee44f6c41e2d016d724bc16d7a51554b191b59f9daa608d26f66a17ef"
+    },
+    {
+      "member": "foundation/payload/6b6b9fb971f24a338ab2c244ce96d237ceca11a6021aece0861b1eb57b2f2921",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\6b6b9fb971f24a338ab2c244ce96d237ceca11a6021aece0861b1eb57b2f2921",
+      "bytes": 3860,
+      "sha256": "6b6b9fb971f24a338ab2c244ce96d237ceca11a6021aece0861b1eb57b2f2921"
+    },
+    {
+      "member": "foundation/payload/6bf341f1c5017b66a139488cf6e83f92ebf96e41c80c980de78fa451c19c7aa9",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\6bf341f1c5017b66a139488cf6e83f92ebf96e41c80c980de78fa451c19c7aa9",
+      "bytes": 13118,
+      "sha256": "6bf341f1c5017b66a139488cf6e83f92ebf96e41c80c980de78fa451c19c7aa9"
+    },
+    {
+      "member": "foundation/payload/6cb9591789b0476a9c8215ef4075fa507f78d6daa37885a0f19e70c351208249",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\6cb9591789b0476a9c8215ef4075fa507f78d6daa37885a0f19e70c351208249",
+      "bytes": 4318,
+      "sha256": "6cb9591789b0476a9c8215ef4075fa507f78d6daa37885a0f19e70c351208249"
+    },
+    {
+      "member": "foundation/payload/6d21fe34f9f66327bb7f3ff1c50d977687018af45c3593d56726f78e8da44a60",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\6d21fe34f9f66327bb7f3ff1c50d977687018af45c3593d56726f78e8da44a60",
+      "bytes": 41166,
+      "sha256": "6d21fe34f9f66327bb7f3ff1c50d977687018af45c3593d56726f78e8da44a60"
+    },
+    {
+      "member": "foundation/payload/6eeaed68257ce947adb9246e9d5f3431834cc4d4a6ade699242c065ff48aab1d",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\6eeaed68257ce947adb9246e9d5f3431834cc4d4a6ade699242c065ff48aab1d",
+      "bytes": 3844,
+      "sha256": "6eeaed68257ce947adb9246e9d5f3431834cc4d4a6ade699242c065ff48aab1d"
+    },
+    {
+      "member": "foundation/payload/6ff48f1a2ddf839342b3c7771b29551f17bd819932706b46d5bd089ac788e9fc",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\6ff48f1a2ddf839342b3c7771b29551f17bd819932706b46d5bd089ac788e9fc",
+      "bytes": 8368,
+      "sha256": "6ff48f1a2ddf839342b3c7771b29551f17bd819932706b46d5bd089ac788e9fc"
+    },
+    {
+      "member": "foundation/payload/7081601244708f0a07eaf5c65c7c772a106b3abb688481b6f5a76718f72b059e",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\7081601244708f0a07eaf5c65c7c772a106b3abb688481b6f5a76718f72b059e",
+      "bytes": 2175,
+      "sha256": "7081601244708f0a07eaf5c65c7c772a106b3abb688481b6f5a76718f72b059e"
+    },
+    {
+      "member": "foundation/payload/71e35c817a4665272ab7b448ad9cc7e411b73152314a99d581632fc0819790de",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\71e35c817a4665272ab7b448ad9cc7e411b73152314a99d581632fc0819790de",
+      "bytes": 619,
+      "sha256": "71e35c817a4665272ab7b448ad9cc7e411b73152314a99d581632fc0819790de"
+    },
+    {
+      "member": "foundation/payload/74619da6901ba37f2e7fd577626a57c62a2f1c2ba46fe0a7184061c64b0700fa",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\74619da6901ba37f2e7fd577626a57c62a2f1c2ba46fe0a7184061c64b0700fa",
+      "bytes": 22884,
+      "sha256": "74619da6901ba37f2e7fd577626a57c62a2f1c2ba46fe0a7184061c64b0700fa"
+    },
+    {
+      "member": "foundation/payload/750f2000779f0bc92cc5585d7a87ebc3fd2b8b61fb71640390f86e5ea4cb924d",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\750f2000779f0bc92cc5585d7a87ebc3fd2b8b61fb71640390f86e5ea4cb924d",
+      "bytes": 3943680,
+      "sha256": "750f2000779f0bc92cc5585d7a87ebc3fd2b8b61fb71640390f86e5ea4cb924d"
+    },
+    {
+      "member": "foundation/payload/7636b1aff0761332e68788b4ed6ebac2482c7be0313c45168e4dff00b3cfd32d",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\7636b1aff0761332e68788b4ed6ebac2482c7be0313c45168e4dff00b3cfd32d",
+      "bytes": 3639,
+      "sha256": "7636b1aff0761332e68788b4ed6ebac2482c7be0313c45168e4dff00b3cfd32d"
+    },
+    {
+      "member": "foundation/payload/76a146f8cc496fbd91c145d7bf68fb6c596014a9a00b3c4312044f710beab4e0",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\76a146f8cc496fbd91c145d7bf68fb6c596014a9a00b3c4312044f710beab4e0",
+      "bytes": 654,
+      "sha256": "76a146f8cc496fbd91c145d7bf68fb6c596014a9a00b3c4312044f710beab4e0"
+    },
+    {
+      "member": "foundation/payload/7792e752d90d1fe8896fda661eb6d912a0391d4d337b87765f7a7cf1d9b88c07",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\7792e752d90d1fe8896fda661eb6d912a0391d4d337b87765f7a7cf1d9b88c07",
+      "bytes": 13125,
+      "sha256": "7792e752d90d1fe8896fda661eb6d912a0391d4d337b87765f7a7cf1d9b88c07"
+    },
+    {
+      "member": "foundation/payload/779643ebe02df55fc63da279514c7e7c06c97c94ffe38fb3a8f436a11a1f178c",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\779643ebe02df55fc63da279514c7e7c06c97c94ffe38fb3a8f436a11a1f178c",
+      "bytes": 3846,
+      "sha256": "779643ebe02df55fc63da279514c7e7c06c97c94ffe38fb3a8f436a11a1f178c"
+    },
+    {
+      "member": "foundation/payload/7b750fe10b3328c9d46c27c8ed7e688492ccd18db998f8cc63ac7b8c61e0635c",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\7b750fe10b3328c9d46c27c8ed7e688492ccd18db998f8cc63ac7b8c61e0635c",
+      "bytes": 66442,
+      "sha256": "7b750fe10b3328c9d46c27c8ed7e688492ccd18db998f8cc63ac7b8c61e0635c"
+    },
+    {
+      "member": "foundation/payload/7f65802d33bcb65f01e75bd3aafbeee4350d2d0bfd8a12ce2c185dfffd19bf72",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\7f65802d33bcb65f01e75bd3aafbeee4350d2d0bfd8a12ce2c185dfffd19bf72",
+      "bytes": 3847,
+      "sha256": "7f65802d33bcb65f01e75bd3aafbeee4350d2d0bfd8a12ce2c185dfffd19bf72"
+    },
+    {
+      "member": "foundation/payload/808bf9fd91404c6820971f75970c73f0695fcbf98667b250007470f7a665646c",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\808bf9fd91404c6820971f75970c73f0695fcbf98667b250007470f7a665646c",
+      "bytes": 671,
+      "sha256": "808bf9fd91404c6820971f75970c73f0695fcbf98667b250007470f7a665646c"
+    },
+    {
+      "member": "foundation/payload/8127fdcdf9e5c8a0f7fd99e992ff626ad60e8a1617133c9029844e6e38d8ba43",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\8127fdcdf9e5c8a0f7fd99e992ff626ad60e8a1617133c9029844e6e38d8ba43",
+      "bytes": 632,
+      "sha256": "8127fdcdf9e5c8a0f7fd99e992ff626ad60e8a1617133c9029844e6e38d8ba43"
+    },
+    {
+      "member": "foundation/payload/824bae1af4fd00d9a4bd9889994bb4e5449f65595118c091327b3c63fb521310",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\824bae1af4fd00d9a4bd9889994bb4e5449f65595118c091327b3c63fb521310",
+      "bytes": 67038,
+      "sha256": "824bae1af4fd00d9a4bd9889994bb4e5449f65595118c091327b3c63fb521310"
+    },
+    {
+      "member": "foundation/payload/845bee24ff8a06a8c212a87d324a133ba90e142aeb2a47512dd9443a9b34da46",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\845bee24ff8a06a8c212a87d324a133ba90e142aeb2a47512dd9443a9b34da46",
+      "bytes": 4317,
+      "sha256": "845bee24ff8a06a8c212a87d324a133ba90e142aeb2a47512dd9443a9b34da46"
+    },
+    {
+      "member": "foundation/payload/8526cde2295b1146199b25b41d01ff8377a2a19edc3b76a526b2a6e6b4be7ea0",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\8526cde2295b1146199b25b41d01ff8377a2a19edc3b76a526b2a6e6b4be7ea0",
+      "bytes": 3856,
+      "sha256": "8526cde2295b1146199b25b41d01ff8377a2a19edc3b76a526b2a6e6b4be7ea0"
+    },
+    {
+      "member": "foundation/payload/853d8dbb69a476f7dbca150d36e731fe4df55b0b0c7770af1456372cf253df8a",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\853d8dbb69a476f7dbca150d36e731fe4df55b0b0c7770af1456372cf253df8a",
+      "bytes": 3878,
+      "sha256": "853d8dbb69a476f7dbca150d36e731fe4df55b0b0c7770af1456372cf253df8a"
+    },
+    {
+      "member": "foundation/payload/8763df23d4c86a295ffb4728409d19311f36c0dcb38aaa58e9d77fb3b823a2eb",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\8763df23d4c86a295ffb4728409d19311f36c0dcb38aaa58e9d77fb3b823a2eb",
+      "bytes": 17733,
+      "sha256": "8763df23d4c86a295ffb4728409d19311f36c0dcb38aaa58e9d77fb3b823a2eb"
+    },
+    {
+      "member": "foundation/payload/884ade7cc7219b3448362960deb7db10bf1eab35b56e982562457fb17c5966f3",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\884ade7cc7219b3448362960deb7db10bf1eab35b56e982562457fb17c5966f3",
+      "bytes": 633,
+      "sha256": "884ade7cc7219b3448362960deb7db10bf1eab35b56e982562457fb17c5966f3"
+    },
+    {
+      "member": "foundation/payload/888047b52795d2735201bd1076cf13844e655d770203d5cf3bb153e2660cd9a0",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\888047b52795d2735201bd1076cf13844e655d770203d5cf3bb153e2660cd9a0",
+      "bytes": 26794,
+      "sha256": "888047b52795d2735201bd1076cf13844e655d770203d5cf3bb153e2660cd9a0"
+    },
+    {
+      "member": "foundation/payload/888b015e58b902e691893c4d3d10910b24da75dccc5a4d07c1eca8549b652435",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\888b015e58b902e691893c4d3d10910b24da75dccc5a4d07c1eca8549b652435",
+      "bytes": 691,
+      "sha256": "888b015e58b902e691893c4d3d10910b24da75dccc5a4d07c1eca8549b652435"
+    },
+    {
+      "member": "foundation/payload/8d562231df55b4719bcf33761bd8a5b24d9f99d59838ca0aadc596a90f84bfff",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\8d562231df55b4719bcf33761bd8a5b24d9f99d59838ca0aadc596a90f84bfff",
+      "bytes": 147527,
+      "sha256": "8d562231df55b4719bcf33761bd8a5b24d9f99d59838ca0aadc596a90f84bfff"
+    },
+    {
+      "member": "foundation/payload/8e5c1bee71c5837532ce02c77a64216889930e2c56d76bbf0b01009ea2d49470",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\8e5c1bee71c5837532ce02c77a64216889930e2c56d76bbf0b01009ea2d49470",
+      "bytes": 26794,
+      "sha256": "8e5c1bee71c5837532ce02c77a64216889930e2c56d76bbf0b01009ea2d49470"
+    },
+    {
+      "member": "foundation/payload/90cf108f2dfad3bf89e782ed2d6cf10bec121d37f339a06c3dd8735e5231b3cb",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\90cf108f2dfad3bf89e782ed2d6cf10bec121d37f339a06c3dd8735e5231b3cb",
+      "bytes": 7190,
+      "sha256": "90cf108f2dfad3bf89e782ed2d6cf10bec121d37f339a06c3dd8735e5231b3cb"
+    },
+    {
+      "member": "foundation/payload/93f8f547475386ccfb2de5f62ff883913b90fa961ada4ce4d841bd78de611e72",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\93f8f547475386ccfb2de5f62ff883913b90fa961ada4ce4d841bd78de611e72",
+      "bytes": 3855,
+      "sha256": "93f8f547475386ccfb2de5f62ff883913b90fa961ada4ce4d841bd78de611e72"
+    },
+    {
+      "member": "foundation/payload/960c3c01347928767bcef20611b959d942cf95fbcfa83debf592e3729dccc89f",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\960c3c01347928767bcef20611b959d942cf95fbcfa83debf592e3729dccc89f",
+      "bytes": 13124,
+      "sha256": "960c3c01347928767bcef20611b959d942cf95fbcfa83debf592e3729dccc89f"
+    },
+    {
+      "member": "foundation/payload/96aad2732a2a0fbb329b915d1df1f76df77ab4a44b09b137d49318981014f54a",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\96aad2732a2a0fbb329b915d1df1f76df77ab4a44b09b137d49318981014f54a",
+      "bytes": 972815,
+      "sha256": "96aad2732a2a0fbb329b915d1df1f76df77ab4a44b09b137d49318981014f54a"
+    },
+    {
+      "member": "foundation/payload/9713082113832be15c78d6c427b1c0eb86853c51052fbb36480f61e092cc207b",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\9713082113832be15c78d6c427b1c0eb86853c51052fbb36480f61e092cc207b",
+      "bytes": 3844,
+      "sha256": "9713082113832be15c78d6c427b1c0eb86853c51052fbb36480f61e092cc207b"
+    },
+    {
+      "member": "foundation/payload/993b819c2e16763e9671429aed110b887b38c233a6783a576ad4830fea9b28ab",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\993b819c2e16763e9671429aed110b887b38c233a6783a576ad4830fea9b28ab",
+      "bytes": 7187,
+      "sha256": "993b819c2e16763e9671429aed110b887b38c233a6783a576ad4830fea9b28ab"
+    },
+    {
+      "member": "foundation/payload/99fc571c1bcb7a654193d7f66fff1c1b81f55d6940f8224174a00213d5f0c0ec",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\99fc571c1bcb7a654193d7f66fff1c1b81f55d6940f8224174a00213d5f0c0ec",
+      "bytes": 13130,
+      "sha256": "99fc571c1bcb7a654193d7f66fff1c1b81f55d6940f8224174a00213d5f0c0ec"
+    },
+    {
+      "member": "foundation/payload/9a73ed742872893ce06ef17add57b3f34ae00c22e19c15da38d8b66a460e4ce1",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\9a73ed742872893ce06ef17add57b3f34ae00c22e19c15da38d8b66a460e4ce1",
+      "bytes": 8367,
+      "sha256": "9a73ed742872893ce06ef17add57b3f34ae00c22e19c15da38d8b66a460e4ce1"
+    },
+    {
+      "member": "foundation/payload/9adeb1170dc41219cae42c22329d5fe329fc2ef3384cb4299cc66152d5c558de",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\9adeb1170dc41219cae42c22329d5fe329fc2ef3384cb4299cc66152d5c558de",
+      "bytes": 3848,
+      "sha256": "9adeb1170dc41219cae42c22329d5fe329fc2ef3384cb4299cc66152d5c558de"
+    },
+    {
+      "member": "foundation/payload/9bbfcbeb7b5349c840b341350a43eb087017b21d547f419e13ef644a9c468e63",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\9bbfcbeb7b5349c840b341350a43eb087017b21d547f419e13ef644a9c468e63",
+      "bytes": 8373,
+      "sha256": "9bbfcbeb7b5349c840b341350a43eb087017b21d547f419e13ef644a9c468e63"
+    },
+    {
+      "member": "foundation/payload/9cd587e3671cb091e263babb4a88c5c1e52b64c7ad5459a696fbf902f5f3056d",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\9cd587e3671cb091e263babb4a88c5c1e52b64c7ad5459a696fbf902f5f3056d",
+      "bytes": 3849,
+      "sha256": "9cd587e3671cb091e263babb4a88c5c1e52b64c7ad5459a696fbf902f5f3056d"
+    },
+    {
+      "member": "foundation/payload/9f5b4879b770059abbebc0278ecd88e116e9b70cd80e590da6f2f559fb3fd028",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\9f5b4879b770059abbebc0278ecd88e116e9b70cd80e590da6f2f559fb3fd028",
+      "bytes": 18410,
+      "sha256": "9f5b4879b770059abbebc0278ecd88e116e9b70cd80e590da6f2f559fb3fd028"
+    },
+    {
+      "member": "foundation/payload/a03c28db6052b72d65e87df7e8a20829d2844823b61937e51899ad3635ba5ed5",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\a03c28db6052b72d65e87df7e8a20829d2844823b61937e51899ad3635ba5ed5",
+      "bytes": 7189,
+      "sha256": "a03c28db6052b72d65e87df7e8a20829d2844823b61937e51899ad3635ba5ed5"
+    },
+    {
+      "member": "foundation/payload/a168f1a9e4b3ca729c9e45c8c5ffc6428215eb5c54b81515f8f0fbf12768da37",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\a168f1a9e4b3ca729c9e45c8c5ffc6428215eb5c54b81515f8f0fbf12768da37",
+      "bytes": 5060,
+      "sha256": "a168f1a9e4b3ca729c9e45c8c5ffc6428215eb5c54b81515f8f0fbf12768da37"
+    },
+    {
+      "member": "foundation/payload/a3d02fad14f631399da9accecb45baa5d1d7331091953612b9f6ec57204ab9ce",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\a3d02fad14f631399da9accecb45baa5d1d7331091953612b9f6ec57204ab9ce",
+      "bytes": 4315,
+      "sha256": "a3d02fad14f631399da9accecb45baa5d1d7331091953612b9f6ec57204ab9ce"
+    },
+    {
+      "member": "foundation/payload/a3f9d67d0e08887532928b4f0158c41bd582d50853ef3be6f4bcb368dc59d3aa",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\a3f9d67d0e08887532928b4f0158c41bd582d50853ef3be6f4bcb368dc59d3aa",
+      "bytes": 3847,
+      "sha256": "a3f9d67d0e08887532928b4f0158c41bd582d50853ef3be6f4bcb368dc59d3aa"
+    },
+    {
+      "member": "foundation/payload/a66a39144a2683ea5c815da16ad967a1c37feaa179b62650ed6c424641ac1c86",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\a66a39144a2683ea5c815da16ad967a1c37feaa179b62650ed6c424641ac1c86",
+      "bytes": 4255,
+      "sha256": "a66a39144a2683ea5c815da16ad967a1c37feaa179b62650ed6c424641ac1c86"
+    },
+    {
+      "member": "foundation/payload/a7d1a86320b8cb887ce55290e8e9a67850f5bb80b08cdcfb167e0968fabea53e",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\a7d1a86320b8cb887ce55290e8e9a67850f5bb80b08cdcfb167e0968fabea53e",
+      "bytes": 3849,
+      "sha256": "a7d1a86320b8cb887ce55290e8e9a67850f5bb80b08cdcfb167e0968fabea53e"
+    },
+    {
+      "member": "foundation/payload/a84913cebb6d04feeea19f24acb3a7366e0df29928f82648e5b08b1b600ff4fe",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\a84913cebb6d04feeea19f24acb3a7366e0df29928f82648e5b08b1b600ff4fe",
+      "bytes": 13132,
+      "sha256": "a84913cebb6d04feeea19f24acb3a7366e0df29928f82648e5b08b1b600ff4fe"
+    },
+    {
+      "member": "foundation/payload/a90721a3b031e0e1c8bfc34ece79b6608d2ae53166cfb77dad281a0eb5fa6bc8",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\a90721a3b031e0e1c8bfc34ece79b6608d2ae53166cfb77dad281a0eb5fa6bc8",
+      "bytes": 196,
+      "sha256": "a90721a3b031e0e1c8bfc34ece79b6608d2ae53166cfb77dad281a0eb5fa6bc8"
+    },
+    {
+      "member": "foundation/payload/a94225280540aa489fc04ff875e11b1d3c513f4faa2317a3b4d57d3067d03932",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\a94225280540aa489fc04ff875e11b1d3c513f4faa2317a3b4d57d3067d03932",
+      "bytes": 2173,
+      "sha256": "a94225280540aa489fc04ff875e11b1d3c513f4faa2317a3b4d57d3067d03932"
+    },
+    {
+      "member": "foundation/payload/aa117e5d79ae3c1a7d9a693f7ae4b821bfee471e97e9d93ec3592922b470e478",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\aa117e5d79ae3c1a7d9a693f7ae4b821bfee471e97e9d93ec3592922b470e478",
+      "bytes": 3844,
+      "sha256": "aa117e5d79ae3c1a7d9a693f7ae4b821bfee471e97e9d93ec3592922b470e478"
+    },
+    {
+      "member": "foundation/payload/aa2eee12a0d23a43656acca1e7f15a62608463a0acc4edb30220abda603d2882",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\aa2eee12a0d23a43656acca1e7f15a62608463a0acc4edb30220abda603d2882",
+      "bytes": 13118,
+      "sha256": "aa2eee12a0d23a43656acca1e7f15a62608463a0acc4edb30220abda603d2882"
+    },
+    {
+      "member": "foundation/payload/aa451c32bfbf681f3365a3f679af14157aeb09015dbb9d5fe53534893db46988",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\aa451c32bfbf681f3365a3f679af14157aeb09015dbb9d5fe53534893db46988",
+      "bytes": 656,
+      "sha256": "aa451c32bfbf681f3365a3f679af14157aeb09015dbb9d5fe53534893db46988"
+    },
+    {
+      "member": "foundation/payload/ad1e48e0e7160397f29144f8f1ac4d15b79c7071d2bf75c50c5fe4c8a1815b88",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\ad1e48e0e7160397f29144f8f1ac4d15b79c7071d2bf75c50c5fe4c8a1815b88",
+      "bytes": 26797,
+      "sha256": "ad1e48e0e7160397f29144f8f1ac4d15b79c7071d2bf75c50c5fe4c8a1815b88"
+    },
+    {
+      "member": "foundation/payload/af0fcf584e3896bee0cc21c8fc4045ad7b9c07a221cb530344378d9442843076",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\af0fcf584e3896bee0cc21c8fc4045ad7b9c07a221cb530344378d9442843076",
+      "bytes": 4254,
+      "sha256": "af0fcf584e3896bee0cc21c8fc4045ad7b9c07a221cb530344378d9442843076"
+    },
+    {
+      "member": "foundation/payload/b03fe71db80f21ef17b7e3b36e4b848c36f8a59934ff5fd711e7a54db6208593",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\b03fe71db80f21ef17b7e3b36e4b848c36f8a59934ff5fd711e7a54db6208593",
+      "bytes": 3920872,
+      "sha256": "b03fe71db80f21ef17b7e3b36e4b848c36f8a59934ff5fd711e7a54db6208593"
+    },
+    {
+      "member": "foundation/payload/b08fa0a9ccb84edefce048aabed84f5cdfd0414e2a3c62b17644e4e3caba71cf",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\b08fa0a9ccb84edefce048aabed84f5cdfd0414e2a3c62b17644e4e3caba71cf",
+      "bytes": 4316,
+      "sha256": "b08fa0a9ccb84edefce048aabed84f5cdfd0414e2a3c62b17644e4e3caba71cf"
+    },
+    {
+      "member": "foundation/payload/b147d3b03dcd6cf0aa0b66ab4b4a86bf9f39ccbb072592cdf006bf07db628425",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\b147d3b03dcd6cf0aa0b66ab4b4a86bf9f39ccbb072592cdf006bf07db628425",
+      "bytes": 633,
+      "sha256": "b147d3b03dcd6cf0aa0b66ab4b4a86bf9f39ccbb072592cdf006bf07db628425"
+    },
+    {
+      "member": "foundation/payload/b24560f6ef21c68d2d41a8ee18d9612ee85fa5154e272d4d2bd2ab457e1c5775",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\b24560f6ef21c68d2d41a8ee18d9612ee85fa5154e272d4d2bd2ab457e1c5775",
+      "bytes": 202256,
+      "sha256": "b24560f6ef21c68d2d41a8ee18d9612ee85fa5154e272d4d2bd2ab457e1c5775"
+    },
+    {
+      "member": "foundation/payload/b2752bee7d297127509828f38c020a505076b9ec74cf2e0ab2eb97b1244c2104",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\b2752bee7d297127509828f38c020a505076b9ec74cf2e0ab2eb97b1244c2104",
+      "bytes": 608,
+      "sha256": "b2752bee7d297127509828f38c020a505076b9ec74cf2e0ab2eb97b1244c2104"
+    },
+    {
+      "member": "foundation/payload/b4dbd0d0808b3ef0a2befa4f48bdd58e48610ddbf2cc907960bfe9d64f5a1644",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\b4dbd0d0808b3ef0a2befa4f48bdd58e48610ddbf2cc907960bfe9d64f5a1644",
+      "bytes": 3873,
+      "sha256": "b4dbd0d0808b3ef0a2befa4f48bdd58e48610ddbf2cc907960bfe9d64f5a1644"
+    },
+    {
+      "member": "foundation/payload/b53e9523aa6ba0aa55b482eefe95169d4180dce6a7b9a4160bf1faeec3cc0fb4",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\b53e9523aa6ba0aa55b482eefe95169d4180dce6a7b9a4160bf1faeec3cc0fb4",
+      "bytes": 3844,
+      "sha256": "b53e9523aa6ba0aa55b482eefe95169d4180dce6a7b9a4160bf1faeec3cc0fb4"
+    },
+    {
+      "member": "foundation/payload/b5a4024a689ef7373160a418ebc92d053850fc07d6e67602cd96299ef5ad36bf",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\b5a4024a689ef7373160a418ebc92d053850fc07d6e67602cd96299ef5ad36bf",
+      "bytes": 26794,
+      "sha256": "b5a4024a689ef7373160a418ebc92d053850fc07d6e67602cd96299ef5ad36bf"
+    },
+    {
+      "member": "foundation/payload/b7b4ce5f12f6771fc343c5bab96fe5968ce97160f6005f5619b2fe446f80df3f",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\b7b4ce5f12f6771fc343c5bab96fe5968ce97160f6005f5619b2fe446f80df3f",
+      "bytes": 18099,
+      "sha256": "b7b4ce5f12f6771fc343c5bab96fe5968ce97160f6005f5619b2fe446f80df3f"
+    },
+    {
+      "member": "foundation/payload/b81d7ae8310d50940ae5fec5a599c432fdf53c3c36467091bad39e70ac25b3ca",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\b81d7ae8310d50940ae5fec5a599c432fdf53c3c36467091bad39e70ac25b3ca",
+      "bytes": 3855,
+      "sha256": "b81d7ae8310d50940ae5fec5a599c432fdf53c3c36467091bad39e70ac25b3ca"
+    },
+    {
+      "member": "foundation/payload/b943f4550658d4c1faa6cfe0a08749b7b19934654c67db2df1265011215e039c",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\b943f4550658d4c1faa6cfe0a08749b7b19934654c67db2df1265011215e039c",
+      "bytes": 13127,
+      "sha256": "b943f4550658d4c1faa6cfe0a08749b7b19934654c67db2df1265011215e039c"
+    },
+    {
+      "member": "foundation/payload/b98b79780f60c35abbaf8276d1718208ff74f0bd0bec24e000244e6a3519e7e9",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\b98b79780f60c35abbaf8276d1718208ff74f0bd0bec24e000244e6a3519e7e9",
+      "bytes": 6279,
+      "sha256": "b98b79780f60c35abbaf8276d1718208ff74f0bd0bec24e000244e6a3519e7e9"
+    },
+    {
+      "member": "foundation/payload/bac3fff6636b73d34bb77b40acf99fc2b7c0c4034c493cbc6a040d0b1081e9a7",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\bac3fff6636b73d34bb77b40acf99fc2b7c0c4034c493cbc6a040d0b1081e9a7",
+      "bytes": 632,
+      "sha256": "bac3fff6636b73d34bb77b40acf99fc2b7c0c4034c493cbc6a040d0b1081e9a7"
+    },
+    {
+      "member": "foundation/payload/bb7c7db2462df3cd6cb0e7df568ec9f151586dcbce9d7541d0412b69c1022432",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\bb7c7db2462df3cd6cb0e7df568ec9f151586dcbce9d7541d0412b69c1022432",
+      "bytes": 539914,
+      "sha256": "bb7c7db2462df3cd6cb0e7df568ec9f151586dcbce9d7541d0412b69c1022432"
+    },
+    {
+      "member": "foundation/payload/bc9da7707797868e98461bf7676e764025259fcc75a927e5dd5f8c67b08a754c",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\bc9da7707797868e98461bf7676e764025259fcc75a927e5dd5f8c67b08a754c",
+      "bytes": 8372,
+      "sha256": "bc9da7707797868e98461bf7676e764025259fcc75a927e5dd5f8c67b08a754c"
+    },
+    {
+      "member": "foundation/payload/be4b76d58c6e1d6b6da046208013379af5bfa26936bef19d7157a3863416412c",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\be4b76d58c6e1d6b6da046208013379af5bfa26936bef19d7157a3863416412c",
+      "bytes": 8957,
+      "sha256": "be4b76d58c6e1d6b6da046208013379af5bfa26936bef19d7157a3863416412c"
+    },
+    {
+      "member": "foundation/payload/bf873e489306c8d4dd7829f1c4d5e62696425327043c927beaebda6d37aa0d16",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\bf873e489306c8d4dd7829f1c4d5e62696425327043c927beaebda6d37aa0d16",
+      "bytes": 83562,
+      "sha256": "bf873e489306c8d4dd7829f1c4d5e62696425327043c927beaebda6d37aa0d16"
+    },
+    {
+      "member": "foundation/payload/c06eee8e3105262808e4bbabebe2865d35e85330081ef0ee94ff6ea50cbc58d8",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\c06eee8e3105262808e4bbabebe2865d35e85330081ef0ee94ff6ea50cbc58d8",
+      "bytes": 3433,
+      "sha256": "c06eee8e3105262808e4bbabebe2865d35e85330081ef0ee94ff6ea50cbc58d8"
+    },
+    {
+      "member": "foundation/payload/c59dac4df76fcbac9dd7bbda3630724fd9f096a428d1fd0883bf6a598a30cc77",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\c59dac4df76fcbac9dd7bbda3630724fd9f096a428d1fd0883bf6a598a30cc77",
+      "bytes": 3884,
+      "sha256": "c59dac4df76fcbac9dd7bbda3630724fd9f096a428d1fd0883bf6a598a30cc77"
+    },
+    {
+      "member": "foundation/payload/caadfa1628f80ad33768367385a0ee3006b90bc4134a4754e4eeb4664dc3f293",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\caadfa1628f80ad33768367385a0ee3006b90bc4134a4754e4eeb4664dc3f293",
+      "bytes": 2174,
+      "sha256": "caadfa1628f80ad33768367385a0ee3006b90bc4134a4754e4eeb4664dc3f293"
+    },
+    {
+      "member": "foundation/payload/cb60774cbc64afe7d4c6396706eddaa16e7fccee86a7f1fa6ae4fa6757492cfd",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\cb60774cbc64afe7d4c6396706eddaa16e7fccee86a7f1fa6ae4fa6757492cfd",
+      "bytes": 13131,
+      "sha256": "cb60774cbc64afe7d4c6396706eddaa16e7fccee86a7f1fa6ae4fa6757492cfd"
+    },
+    {
+      "member": "foundation/payload/cb7e0b24c3e48c669bba81f5eacc865f551f21db050ef223128d7ab0bf05143a",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\cb7e0b24c3e48c669bba81f5eacc865f551f21db050ef223128d7ab0bf05143a",
+      "bytes": 161,
+      "sha256": "cb7e0b24c3e48c669bba81f5eacc865f551f21db050ef223128d7ab0bf05143a"
+    },
+    {
+      "member": "foundation/payload/cbbab97f93e1bc1b29fe4a06d23efdc9fa591b1abf72b7a4fc01393ee81a47ed",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\cbbab97f93e1bc1b29fe4a06d23efdc9fa591b1abf72b7a4fc01393ee81a47ed",
+      "bytes": 4250,
+      "sha256": "cbbab97f93e1bc1b29fe4a06d23efdc9fa591b1abf72b7a4fc01393ee81a47ed"
+    },
+    {
+      "member": "foundation/payload/cbc56bad6cdd5b180a9ab97bb610e0370aba7eca810872c87ed5a5be44782136",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\cbc56bad6cdd5b180a9ab97bb610e0370aba7eca810872c87ed5a5be44782136",
+      "bytes": 13126,
+      "sha256": "cbc56bad6cdd5b180a9ab97bb610e0370aba7eca810872c87ed5a5be44782136"
+    },
+    {
+      "member": "foundation/payload/ccfbf8d976402613d2b0c3cd87bcadb0e1dfe4480bcc9a627806e4bec5a119f5",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\ccfbf8d976402613d2b0c3cd87bcadb0e1dfe4480bcc9a627806e4bec5a119f5",
+      "bytes": 1286526,
+      "sha256": "ccfbf8d976402613d2b0c3cd87bcadb0e1dfe4480bcc9a627806e4bec5a119f5"
+    },
+    {
+      "member": "foundation/payload/ce24efe0cf9cbff7e2d4c294c56976d42dfa8e86282a426bbe8246d62f18641d",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\ce24efe0cf9cbff7e2d4c294c56976d42dfa8e86282a426bbe8246d62f18641d",
+      "bytes": 26797,
+      "sha256": "ce24efe0cf9cbff7e2d4c294c56976d42dfa8e86282a426bbe8246d62f18641d"
+    },
+    {
+      "member": "foundation/payload/cf00d8fa56c408f9464917548716aa9712fc0e74bed0981bfe3ab9c01bfeb19d",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\cf00d8fa56c408f9464917548716aa9712fc0e74bed0981bfe3ab9c01bfeb19d",
+      "bytes": 4816,
+      "sha256": "cf00d8fa56c408f9464917548716aa9712fc0e74bed0981bfe3ab9c01bfeb19d"
+    },
+    {
+      "member": "foundation/payload/d364a9d6e60e4f8ad8ff277df46a80b74203694a80918c586f19a2d11b17412a",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\d364a9d6e60e4f8ad8ff277df46a80b74203694a80918c586f19a2d11b17412a",
+      "bytes": 19941,
+      "sha256": "d364a9d6e60e4f8ad8ff277df46a80b74203694a80918c586f19a2d11b17412a"
+    },
+    {
+      "member": "foundation/payload/d506321b7d391fabc162aa0cc9f4cdd64c1bfedeb9833ed2501c60030a2e811b",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\d506321b7d391fabc162aa0cc9f4cdd64c1bfedeb9833ed2501c60030a2e811b",
+      "bytes": 3866,
+      "sha256": "d506321b7d391fabc162aa0cc9f4cdd64c1bfedeb9833ed2501c60030a2e811b"
+    },
+    {
+      "member": "foundation/payload/d762a5a513246cace788c27f3d5c87430b160011fa70261646ccb4a4e71c4883",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\d762a5a513246cace788c27f3d5c87430b160011fa70261646ccb4a4e71c4883",
+      "bytes": 3848,
+      "sha256": "d762a5a513246cace788c27f3d5c87430b160011fa70261646ccb4a4e71c4883"
+    },
+    {
+      "member": "foundation/payload/d9052ec7e9aa5b730de9fab04088479c34e05839d90299037dbc7182df34b0e9",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\d9052ec7e9aa5b730de9fab04088479c34e05839d90299037dbc7182df34b0e9",
+      "bytes": 19931,
+      "sha256": "d9052ec7e9aa5b730de9fab04088479c34e05839d90299037dbc7182df34b0e9"
+    },
+    {
+      "member": "foundation/payload/da7ae411aca63e2642784e375f94f6e2a1f5045128d51dc20383cd9c569202ef",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\da7ae411aca63e2642784e375f94f6e2a1f5045128d51dc20383cd9c569202ef",
+      "bytes": 5982,
+      "sha256": "da7ae411aca63e2642784e375f94f6e2a1f5045128d51dc20383cd9c569202ef"
+    },
+    {
+      "member": "foundation/payload/daf885efb2863ffbf8bd65837063eb2e2a6968ea0a1b2dbeba3020d64651c077",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\daf885efb2863ffbf8bd65837063eb2e2a6968ea0a1b2dbeba3020d64651c077",
+      "bytes": 6245,
+      "sha256": "daf885efb2863ffbf8bd65837063eb2e2a6968ea0a1b2dbeba3020d64651c077"
+    },
+    {
+      "member": "foundation/payload/db9cd3a7a4810492f2eff7fe155f003bc3dea63f609252f0c9da10b2790c3078",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\db9cd3a7a4810492f2eff7fe155f003bc3dea63f609252f0c9da10b2790c3078",
+      "bytes": 1391932,
+      "sha256": "db9cd3a7a4810492f2eff7fe155f003bc3dea63f609252f0c9da10b2790c3078"
+    },
+    {
+      "member": "foundation/payload/dc173d741f55e3617cc9e906c05fbb93e3d3f3e2a96d32d8e4fa07c6674651a5",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\dc173d741f55e3617cc9e906c05fbb93e3d3f3e2a96d32d8e4fa07c6674651a5",
+      "bytes": 19624,
+      "sha256": "dc173d741f55e3617cc9e906c05fbb93e3d3f3e2a96d32d8e4fa07c6674651a5"
+    },
+    {
+      "member": "foundation/payload/ddf1738e239b9fa01c9398eaa5c14966fe6a5fd8290dd8c0aa5e12b1e33f5535",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\ddf1738e239b9fa01c9398eaa5c14966fe6a5fd8290dd8c0aa5e12b1e33f5535",
+      "bytes": 13128,
+      "sha256": "ddf1738e239b9fa01c9398eaa5c14966fe6a5fd8290dd8c0aa5e12b1e33f5535"
+    },
+    {
+      "member": "foundation/payload/e0ac0638d7751e97eedfcdf007888933cd2b2b677a98527dc50972389a94876b",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\e0ac0638d7751e97eedfcdf007888933cd2b2b677a98527dc50972389a94876b",
+      "bytes": 4256,
+      "sha256": "e0ac0638d7751e97eedfcdf007888933cd2b2b677a98527dc50972389a94876b"
+    },
+    {
+      "member": "foundation/payload/e16c2b40161726adffff8d55ed1c96a91c8293fbc9081547780c8043f74580f9",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\e16c2b40161726adffff8d55ed1c96a91c8293fbc9081547780c8043f74580f9",
+      "bytes": 9028,
+      "sha256": "e16c2b40161726adffff8d55ed1c96a91c8293fbc9081547780c8043f74580f9"
+    },
+    {
+      "member": "foundation/payload/e22db1d591b11b6f71499ab2cd7cba8bc09c5abb72dd3c8f0711a6e4f46959d4",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\e22db1d591b11b6f71499ab2cd7cba8bc09c5abb72dd3c8f0711a6e4f46959d4",
+      "bytes": 3853,
+      "sha256": "e22db1d591b11b6f71499ab2cd7cba8bc09c5abb72dd3c8f0711a6e4f46959d4"
+    },
+    {
+      "member": "foundation/payload/e2d180c8709af5e2a1f4e6ae7fe11ff7c7313e20578c0bd3dcc3c3841d5548a8",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\e2d180c8709af5e2a1f4e6ae7fe11ff7c7313e20578c0bd3dcc3c3841d5548a8",
+      "bytes": 2176,
+      "sha256": "e2d180c8709af5e2a1f4e6ae7fe11ff7c7313e20578c0bd3dcc3c3841d5548a8"
+    },
+    {
+      "member": "foundation/payload/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "member": "foundation/payload/e486c54f8e1874dd07df3d9e8de68670b54e06fe99750aab383a10ef05948654",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\e486c54f8e1874dd07df3d9e8de68670b54e06fe99750aab383a10ef05948654",
+      "bytes": 655841,
+      "sha256": "e486c54f8e1874dd07df3d9e8de68670b54e06fe99750aab383a10ef05948654"
+    },
+    {
+      "member": "foundation/payload/e4bc8ea299ba55ec3b9fc53e1fe19bb412846cfac9eca56d5bcb2a10bb600577",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\e4bc8ea299ba55ec3b9fc53e1fe19bb412846cfac9eca56d5bcb2a10bb600577",
+      "bytes": 3851,
+      "sha256": "e4bc8ea299ba55ec3b9fc53e1fe19bb412846cfac9eca56d5bcb2a10bb600577"
+    },
+    {
+      "member": "foundation/payload/e5dcb7184514cffbf4888ccd558a63ace5e048e2895f7b6e733973db8e307433",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\e5dcb7184514cffbf4888ccd558a63ace5e048e2895f7b6e733973db8e307433",
+      "bytes": 4256,
+      "sha256": "e5dcb7184514cffbf4888ccd558a63ace5e048e2895f7b6e733973db8e307433"
+    },
+    {
+      "member": "foundation/payload/e868d15b5c9c104d700324afe45fe3e64afd822faae90a3f07cfb7baf57ecd31",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\e868d15b5c9c104d700324afe45fe3e64afd822faae90a3f07cfb7baf57ecd31",
+      "bytes": 328096,
+      "sha256": "e868d15b5c9c104d700324afe45fe3e64afd822faae90a3f07cfb7baf57ecd31"
+    },
+    {
+      "member": "foundation/payload/edc4a28e7244c85e831f10232974e04d1de3ab372fa8e159e8568a5841dbf1b5",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\edc4a28e7244c85e831f10232974e04d1de3ab372fa8e159e8568a5841dbf1b5",
+      "bytes": 13117,
+      "sha256": "edc4a28e7244c85e831f10232974e04d1de3ab372fa8e159e8568a5841dbf1b5"
+    },
+    {
+      "member": "foundation/payload/f04ac22c103884f5582e67c284fead6c8da4b7363a99791f5fb732373477c0c0",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\f04ac22c103884f5582e67c284fead6c8da4b7363a99791f5fb732373477c0c0",
+      "bytes": 26816,
+      "sha256": "f04ac22c103884f5582e67c284fead6c8da4b7363a99791f5fb732373477c0c0"
+    },
+    {
+      "member": "foundation/payload/f347658e45218a128a7241cc8a174238cdee5380f86e467786a77eecf107e024",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\f347658e45218a128a7241cc8a174238cdee5380f86e467786a77eecf107e024",
+      "bytes": 6410,
+      "sha256": "f347658e45218a128a7241cc8a174238cdee5380f86e467786a77eecf107e024"
+    },
+    {
+      "member": "foundation/payload/f5053f8b4c0cd2c64827948d2dbe33bfea452739d97d7fad5d36eb20df1643a3",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\f5053f8b4c0cd2c64827948d2dbe33bfea452739d97d7fad5d36eb20df1643a3",
+      "bytes": 8369,
+      "sha256": "f5053f8b4c0cd2c64827948d2dbe33bfea452739d97d7fad5d36eb20df1643a3"
+    },
+    {
+      "member": "foundation/payload/f57f9098376395b8c477f15ccf16a879693bae3a16a56bd96d0ef676090c3da7",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\f57f9098376395b8c477f15ccf16a879693bae3a16a56bd96d0ef676090c3da7",
+      "bytes": 224,
+      "sha256": "f57f9098376395b8c477f15ccf16a879693bae3a16a56bd96d0ef676090c3da7"
+    },
+    {
+      "member": "foundation/payload/f6920f89a81b80205bfa588a60d1cb4329587948902fb469abbac178a7e06420",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\f6920f89a81b80205bfa588a60d1cb4329587948902fb469abbac178a7e06420",
+      "bytes": 3845,
+      "sha256": "f6920f89a81b80205bfa588a60d1cb4329587948902fb469abbac178a7e06420"
+    },
+    {
+      "member": "foundation/payload/fa388af98eb9127d8febfb075bb4f53732fb37857d2bf6751d6390001797b09a",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\fa388af98eb9127d8febfb075bb4f53732fb37857d2bf6751d6390001797b09a",
+      "bytes": 633,
+      "sha256": "fa388af98eb9127d8febfb075bb4f53732fb37857d2bf6751d6390001797b09a"
+    },
+    {
+      "member": "foundation/payload/fabd436ee4a67a3e1e2ff129fc59ee544afd0415c485cd1e625a06a4baef4ec2",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\fabd436ee4a67a3e1e2ff129fc59ee544afd0415c485cd1e625a06a4baef4ec2",
+      "bytes": 13131,
+      "sha256": "fabd436ee4a67a3e1e2ff129fc59ee544afd0415c485cd1e625a06a4baef4ec2"
+    },
+    {
+      "member": "foundation/payload/fb01ef55554c69123801a25cfa5fa1985c79666d0f02c7b3d40e3ae7b5c8208a",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\fb01ef55554c69123801a25cfa5fa1985c79666d0f02c7b3d40e3ae7b5c8208a",
+      "bytes": 196454,
+      "sha256": "fb01ef55554c69123801a25cfa5fa1985c79666d0f02c7b3d40e3ae7b5c8208a"
+    },
+    {
+      "member": "foundation/payload/fc7bfba43023770f7c1a16890c85cb98dbf9ff5e960c02a1d0a7dcd7ce715676",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\fc7bfba43023770f7c1a16890c85cb98dbf9ff5e960c02a1d0a7dcd7ce715676",
+      "bytes": 3365,
+      "sha256": "fc7bfba43023770f7c1a16890c85cb98dbf9ff5e960c02a1d0a7dcd7ce715676"
+    },
+    {
+      "member": "foundation/payload/fcd1ffc249f27bc6a87d8372690e16e473a9e07e18c65bb1a4fcb9a4e951b662",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\fcd1ffc249f27bc6a87d8372690e16e473a9e07e18c65bb1a4fcb9a4e951b662",
+      "bytes": 649,
+      "sha256": "fcd1ffc249f27bc6a87d8372690e16e473a9e07e18c65bb1a4fcb9a4e951b662"
+    },
+    {
+      "member": "foundation/payload/fd612e80c0609c067d974ae0c14cc231c5893e7af09ddea4481025bb273345e5",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\fd612e80c0609c067d974ae0c14cc231c5893e7af09ddea4481025bb273345e5",
+      "bytes": 22513,
+      "sha256": "fd612e80c0609c067d974ae0c14cc231c5893e7af09ddea4481025bb273345e5"
+    },
+    {
+      "member": "foundation/payload/fdf125fbb3e94b9401a484226b74b8934457b183b635510b5fe442d6465bda72",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\fdf125fbb3e94b9401a484226b74b8934457b183b635510b5fe442d6465bda72",
+      "bytes": 13126,
+      "sha256": "fdf125fbb3e94b9401a484226b74b8934457b183b635510b5fe442d6465bda72"
+    },
+    {
+      "member": "foundation/payload/ffe726ff11ede867f1ed832a0bfea11ce2bbc4688ec8b9b511468e551aa2c98f",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\payload\\ffe726ff11ede867f1ed832a0bfea11ce2bbc4688ec8b9b511468e551aa2c98f",
+      "bytes": 3433,
+      "sha256": "ffe726ff11ede867f1ed832a0bfea11ce2bbc4688ec8b9b511468e551aa2c98f"
+    },
+    {
+      "member": "foundation/plan.json",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\plan.json",
+      "bytes": 17733,
+      "sha256": "8763df23d4c86a295ffb4728409d19311f36c0dcb38aaa58e9d77fb3b823a2eb"
+    },
+    {
+      "member": "foundation/result.json",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\result.json",
+      "bytes": 573774,
+      "sha256": "a1ed081ef3990dd544742dac393c76f6d193d85eed930e2cbc180bcfbd2fa21c"
+    },
+    {
+      "member": "foundation/retention.json",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\retention.json",
+      "bytes": 94424,
+      "sha256": "9e9ef3b8ab21defb95b92b227540db44581efc938457f9ec70d7421925ba962f"
+    },
+    {
+      "member": "foundation/verification.json",
+      "path": "E:\\codex-work\\solvers\\r1-exact-proof04\\verification.json",
+      "bytes": 24817,
+      "sha256": "bed818c2e0b8737eeeabd86576373b19167538781d8e0591d02edc8fac91a0db"
+    },
+    {
+      "member": "run-final-pipeline.sh",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\run-final-pipeline.sh",
+      "bytes": 897,
+      "sha256": "dd420d29fefd84d766c04d21e8c9a257c26efb26c1cbd76118dc31ac6fcc8a9f"
+    },
+    {
+      "member": "sources/new/source-candidate-manifest.json",
+      "path": "E:\\codex-work\\solvers\\r1-final-inputs01\\new\\source-candidate-manifest.json",
+      "bytes": 36585,
+      "sha256": "156471b72a151953f8720e8924b6b8cea74a34476510af0243c33e83254c0f3a"
+    },
+    {
+      "member": "sources/new/source-candidate.tar.gz",
+      "path": "E:\\codex-work\\solvers\\r1-final-inputs01\\new\\source-candidate.tar.gz",
+      "bytes": 1040177,
+      "sha256": "274623f51a68a5172cb2b431b6b27d45c98fe2259d6917732c9f9af65fa820fd"
+    },
+    {
+      "member": "sources/old/source-candidate-manifest.json",
+      "path": "E:\\codex-work\\solvers\\r1-final-inputs01\\old\\source-candidate-manifest.json",
+      "bytes": 34877,
+      "sha256": "be4a754830ee274e97e7be74fe925d5e57839f058df298e86396fa0521425186"
+    },
+    {
+      "member": "sources/old/source-candidate.tar.gz",
+      "path": "E:\\codex-work\\solvers\\r1-final-inputs01\\old\\source-candidate.tar.gz",
+      "bytes": 982171,
+      "sha256": "bbf2405d1a4e3464ba1147bbf2f950770c453d2c096be6c1f49aeb387cfabdf2"
+    }
+  ]
+}

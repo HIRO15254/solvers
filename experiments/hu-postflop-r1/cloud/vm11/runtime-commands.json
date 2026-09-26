@@ -1,0 +1,123 @@
+{
+  "schema": "r1.vm-read-only-runtime/v1",
+  "environment_overrides": {
+    "CLOUDSDK_PYTHON": "C:\\Python313\\python.exe",
+    "CLOUDSDK_ENCODING": "utf-8",
+    "PYTHONIOENCODING": "utf-8"
+  },
+  "records": [
+    {
+      "key": "deployment-launch",
+      "started_at_utc": "2026-09-26T19:04:11.683930+00:00",
+      "completed_at_utc": "2026-09-26T19:04:18.341914+00:00",
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "ssh",
+        "solvers-r1-20260926-11",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet",
+        "--ssh-flag=-batch",
+        "--ssh-flag=-hostkey",
+        "--ssh-flag=SHA256:d6Jt8pBawJIIqWlBiQ1OQ9kVqLPL03Z/WChjsTVawgw",
+        "--command=cat /opt/r1/final-deployment01/launch.json"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "deployment-launch.stdout.json",
+        "bytes": 588,
+        "sha256": "b50142746d731dcdb07ef30a1066f8075cf3720638371298f0b789d4d6733187"
+      },
+      "stderr": {
+        "path": "deployment-launch.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "key": "bootstrap-complete",
+      "started_at_utc": "2026-09-26T19:04:11.684243+00:00",
+      "completed_at_utc": "2026-09-26T19:04:18.347597+00:00",
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "ssh",
+        "solvers-r1-20260926-11",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet",
+        "--ssh-flag=-batch",
+        "--ssh-flag=-hostkey",
+        "--ssh-flag=SHA256:d6Jt8pBawJIIqWlBiQ1OQ9kVqLPL03Z/WChjsTVawgw",
+        "--command=cat /opt/r1/bootstrap-complete"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "bootstrap-complete.stdout.log",
+        "bytes": 26,
+        "sha256": "5c91fa6804b062db2b91dd8f6533de8615d381cadb83a200e7a6ff8b4ba7ddba"
+      },
+      "stderr": {
+        "path": "bootstrap-complete.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "key": "service-start",
+      "started_at_utc": "2026-09-26T19:04:18.341965+00:00",
+      "completed_at_utc": "2026-09-26T19:04:23.454764+00:00",
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "ssh",
+        "solvers-r1-20260926-11",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet",
+        "--ssh-flag=-batch",
+        "--ssh-flag=-hostkey",
+        "--ssh-flag=SHA256:d6Jt8pBawJIIqWlBiQ1OQ9kVqLPL03Z/WChjsTVawgw",
+        "--command=systemctl show solvers-r1-vm11-final --property=Id,ActiveState,SubState,ExecMainPID,ExecMainStartTimestamp,ActiveEnterTimestamp,InvocationID,ExecMainStatus,ExecMainCode,Result,MemoryMax,CPUQuotaPerSecUSec"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "service-start.stdout.log",
+        "bytes": 329,
+        "sha256": "e03a7f51d9eb7f67824a724e52c6af3dbbbcfccc4dc4ead018bbb23b718e46b6"
+      },
+      "stderr": {
+        "path": "service-start.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "key": "instance-runtime",
+      "started_at_utc": "2026-09-26T19:04:18.347645+00:00",
+      "completed_at_utc": "2026-09-26T19:04:21.952472+00:00",
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "instances",
+        "describe",
+        "solvers-r1-20260926-11",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--format=json(id,name,status,creationTimestamp,lastStartTimestamp,machineType,scheduling)"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "instance-runtime.stdout.json",
+        "bytes": 601,
+        "sha256": "6a292a120f15e7d07f52a40e58abd418bfb762a66c2038ad49ca07da38458f8c"
+      },
+      "stderr": {
+        "path": "instance-runtime.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ]
+}

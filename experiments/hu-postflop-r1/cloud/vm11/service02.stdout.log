@@ -1,0 +1,14 @@
+TimeoutStopUSec=15s
+RuntimeMaxUSec=2h 20min
+Result=success
+ExecMainStartTimestamp=Sat 2026-09-26 19:14:50 UTC
+ExecMainPID=6180
+ExecMainStatus=0
+CPUWeight=100
+MemoryMax=12884901888
+MemorySwapMax=0
+KillMode=control-group
+Id=solvers-r1-vm11-final02.service
+ActiveState=active
+SubState=running
+InvocationID=cc3c39ef4f414211a6f694fd1a37fe86

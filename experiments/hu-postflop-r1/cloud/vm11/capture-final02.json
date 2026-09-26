@@ -1,0 +1,63 @@
+{
+  "schema": "r1.vm-read-only-runtime/v1",
+  "records": [
+    {
+      "label": "deployment02",
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "ssh",
+        "solvers-r1-20260926-11",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet",
+        "--ssh-flag=-batch",
+        "--ssh-flag=-hostkey",
+        "--ssh-flag=SHA256:d6Jt8pBawJIIqWlBiQ1OQ9kVqLPL03Z/WChjsTVawgw",
+        "--command=cat /opt/r1/final-deployment02.json"
+      ],
+      "started_at_utc": "2026-09-26T19:16:16.069995+00:00",
+      "ended_at_utc": "2026-09-26T19:16:23.085389+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "deployment02.stdout.log",
+        "bytes": 952,
+        "sha256": "53732572b9e73a280d14e578df883e03d0393c51e7c730cb803f1fea6b34140b"
+      },
+      "stderr": {
+        "path": "deployment02.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "service02",
+      "argv": [
+        "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\gcloud.cmd",
+        "compute",
+        "ssh",
+        "solvers-r1-20260926-11",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet",
+        "--ssh-flag=-batch",
+        "--ssh-flag=-hostkey",
+        "--ssh-flag=SHA256:d6Jt8pBawJIIqWlBiQ1OQ9kVqLPL03Z/WChjsTVawgw",
+        "--command=systemctl show solvers-r1-vm11-final02 --property=Id,ActiveState,SubState,ExecMainPID,ExecMainStartTimestamp,InvocationID,ExecMainStatus,Result,MemoryMax,MemorySwapMax,CPUWeight,RuntimeMaxUSec,KillMode,TimeoutStopUSec"
+      ],
+      "started_at_utc": "2026-09-26T19:16:23.086448+00:00",
+      "ended_at_utc": "2026-09-26T19:16:29.096988+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "service02.stdout.log",
+        "bytes": 336,
+        "sha256": "c58a9e3e41cae045f800d90ccde07f7e50007ed1a5432460cd5f8f9c4cd3540a"
+      },
+      "stderr": {
+        "path": "service02.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ]
+}

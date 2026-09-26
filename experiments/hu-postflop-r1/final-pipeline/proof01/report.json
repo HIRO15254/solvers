@@ -1,0 +1,49 @@
+{
+  "schema": "r1.final-pipeline-readable-report/v1",
+  "status": "failed",
+  "verification": {
+    "schema": "r1.final-pipeline-verification/v1",
+    "status": "failed",
+    "build_status": "failed",
+    "processes_passed": 0,
+    "payload_integrity": "verified",
+    "limitations": [
+      "BLAKE3 report strings are bound to native output, not independently recomputed by Python",
+      "source-after is recorded live inventory verification",
+      "OS RSS counter bound, not exact physical or per-phase peak",
+      "census does not enumerate terminal evaluator internals or infer public card IDs from sparse masks"
+    ]
+  },
+  "input_sha256": {
+    "plan.json": "981120694c0eff00e911ad759660b7d728de317afe99ea982c1ee42aaa44dee7",
+    "build.json": "2c8e654f50bddaa8c140e309184f232d81c7c7670c9e52360aabd7f728921529",
+    "result.json": "2662758e5da3c86719f56a78efdf6f97703dc08da2136c5a0f5e63fc5408a597"
+  },
+  "stage_counts": {
+    "build": {
+      "failed": 1,
+      "passed": 1,
+      "skipped": 7
+    },
+    "measurement": {
+      "skipped": 156
+    }
+  },
+  "failures": [
+    {
+      "phase": "build",
+      "error": "ValueError('host/boot changed')"
+    },
+    {
+      "phase": "build",
+      "stage": "old-cli",
+      "error": "ValueError('host/boot changed')"
+    },
+    {
+      "phase": "measurement",
+      "error": "ValueError('host/boot changed')"
+    }
+  ],
+  "performance": null,
+  "scope": "Three synthetic no-rake HU games, one worker, F32 Full artifacts; no overall R1 certification."
+}

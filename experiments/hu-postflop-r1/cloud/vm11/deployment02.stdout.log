@@ -1,0 +1,24 @@
+{
+  "schema": "r1.final-pipeline-deployment-correction/v1",
+  "time_utc": "2026-09-26T19:14:50.344466+00:00",
+  "previous_output": "/opt/r1/final-proof01",
+  "previous_status": "failed",
+  "measurement_samples_observed_before_correction": 0,
+  "change": "Materialize the unit CPU controller before prepare; all controls and both production sources unchanged; fresh build targets and a new proof directory.",
+  "deadline_utc": "2026-09-26T21:34:51Z",
+  "command": [
+    "systemd-run",
+    "--unit=solvers-r1-vm11-final02",
+    "--property=RuntimeMaxSec=8400",
+    "--property=MemoryMax=12G",
+    "--property=MemorySwapMax=0",
+    "--property=TimeoutStopSec=15",
+    "--property=KillMode=control-group",
+    "--property=CPUWeight=100",
+    "/bin/bash",
+    "/tmp/run-final02.sh",
+    "2026-09-26T21:34:51Z"
+  ],
+  "boot_id": "7d1d9913-8d5d-420b-934e-2129e2ce25e6",
+  "wrapper_sha256": "90b15983191e389ae88bc39593518226761d74499fc0069c773860f19c183901"
+}

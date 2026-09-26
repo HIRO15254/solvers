@@ -1,0 +1,19 @@
+test_all_existing_destinations_are_untouched (__main__.RecoveryTests.test_all_existing_destinations_are_untouched) ... ok
+test_cap_never_silently_drops_files (__main__.RecoveryTests.test_cap_never_silently_drops_files) ... ok
+test_changed_file_prevents_publication (__main__.RecoveryTests.test_changed_file_prevents_publication) ... ok
+test_corrupt_retention_and_bad_cas_filename_still_recovered (__main__.RecoveryTests.test_corrupt_retention_and_bad_cas_filename_still_recovered) ... ok
+test_explicit_external_verification_and_controls (__main__.RecoveryTests.test_explicit_external_verification_and_controls) ... ok
+test_failed_changed_raw_and_missing_pins_preserved (__main__.RecoveryTests.test_failed_changed_raw_and_missing_pins_preserved) ... ok
+test_new_file_prevents_publication (__main__.RecoveryTests.test_new_file_prevents_publication) ... ok
+test_nonfinite_or_duplicate_metadata_is_preserved_as_corrupt (__main__.RecoveryTests.test_nonfinite_or_duplicate_metadata_is_preserved_as_corrupt) ... ok
+test_partial_publication_is_rolled_back_on_error (__main__.RecoveryTests.test_partial_publication_is_rolled_back_on_error) ... ok
+test_quiescence_required_and_checksum_verified (__main__.RecoveryTests.test_quiescence_required_and_checksum_verified) ... ok
+test_raw_files_cannot_collide_with_generated_directories (__main__.RecoveryTests.test_raw_files_cannot_collide_with_generated_directories) ... ok
+test_success_full_cas_original_layout_and_dedup (__main__.RecoveryTests.test_success_full_cas_original_layout_and_dedup) ... ok
+test_symlink_is_rejected_without_following (__main__.RecoveryTests.test_symlink_is_rejected_without_following) ... ok
+test_unsafe_overlap_and_labels_rejected (__main__.RecoveryTests.test_unsafe_overlap_and_labels_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.610s
+
+OK

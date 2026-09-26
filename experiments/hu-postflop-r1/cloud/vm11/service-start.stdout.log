@@ -1,0 +1,12 @@
+Result=success
+ExecMainStartTimestamp=Sat 2026-09-26 19:02:00 UTC
+ExecMainPID=3208
+ExecMainCode=0
+ExecMainStatus=0
+CPUQuotaPerSecUSec=infinity
+MemoryMax=12884901888
+Id=solvers-r1-vm11-final.service
+ActiveState=active
+SubState=running
+ActiveEnterTimestamp=Sat 2026-09-26 19:02:00 UTC
+InvocationID=d96d3cd3d12a4f8f918f4ff67b8cb43b

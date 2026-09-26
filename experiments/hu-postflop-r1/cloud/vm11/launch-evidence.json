@@ -1,0 +1,61 @@
+{
+  "schema": "r1.vm-launch-evidence/v1",
+  "recorded_at_utc": "2026-09-26T19:02:54.989760+00:00",
+  "reservation_id": "r1-20260926-11",
+  "project": "solvers-abstraction-20260723",
+  "zone": "us-central1-b",
+  "instance": "solvers-r1-20260926-11",
+  "instance_id": "570856080701499920",
+  "launch_attempted_at": "2026-09-26T18:54:51.7007926+00:00",
+  "creation_timestamp_raw": "2026-09-26T11:54:55.988-07:00",
+  "creation_timestamp_utc": "2026-09-26T18:54:55.988000+00:00",
+  "create_response_status": "RUNNING",
+  "absolute_stop_deadline_utc": "2026-09-26T21:54:51Z",
+  "scheduling": {
+    "automaticRestart": false,
+    "instanceTerminationAction": "STOP",
+    "onHostMaintenance": "TERMINATE",
+    "preemptible": true,
+    "provisioningModel": "SPOT",
+    "terminationTime": "2026-09-26T21:54:51Z"
+  },
+  "boot_disk": {
+    "source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260926-11",
+    "diskSizeGb": "40",
+    "boot": true,
+    "autoDelete": true
+  },
+  "source_records": [
+    {
+      "path": "../launch-r1-20260926-11.json",
+      "bytes": 1091,
+      "sha256": "e34a44b36064ec6fdd555d2e9cb8e9db1f446863486bfc572960bc3b73f51957"
+    },
+    {
+      "path": "../create-result-r1-20260926-11.json",
+      "bytes": 30179,
+      "sha256": "18c8744425db625ed8eaa5801fa444d514d4da8ce676ffee7a797a16b36af854"
+    }
+  ],
+  "budget": {
+    "authorized_usd": 40,
+    "held_usd": 35,
+    "settled_usd": 0,
+    "this_reservation_usd": 3,
+    "unreserved_usd": 5,
+    "actual_billed_usd": null,
+    "reservation_released": false
+  },
+  "limits": {
+    "runtime_hours": 3,
+    "download_gib": 1,
+    "disk_cleanup_hours": 24
+  },
+  "runtime_boot_id": "7d1d9913-8d5d-420b-934e-2129e2ce25e6",
+  "service_start_evidence": {
+    "path": "runtime-start-evidence.json",
+    "bytes": 2613,
+    "sha256": "d99b3356d8640308facf62ef2418803a63e900426a2b7406dd4f0e80d6e35aea"
+  },
+  "interpretation": "Create response confirms the named resource and STOP deadline. Guest bootstrap completion, service start, experiment success and billing are not established by this response."
+}

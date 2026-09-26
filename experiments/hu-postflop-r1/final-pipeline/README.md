@@ -8,6 +8,13 @@ No cloud resource is created by these scripts. The related
 [research proposal](../../../docs/research/2026-09-27-r1-final-pipeline-proposal.jp.md)
 does not supersede the final frozen protocol.
 
+The [first deployment evidence](proof01/README.jp.md) records a successful old
+release compilation followed by a host-identity guard failure, before any
+measurement process. The separately recorded
+[second deployment setting](../cloud/vm11/deployment-correction02.jp.md) enables
+the CPU controller before prepare and uses fresh targets/output with unchanged
+controls, sources, quality targets and the original absolute deadline.
+
 The comparison uses production Git bytes at old `88ffa5d` (SOL3/CKPT1) and new
 `11e4062` (SOL4/CKPT2). The three retained pipeline fixtures change only the worker
 count from eight to one. Native CLI stopping retains each original cap/cadence
@@ -122,3 +129,8 @@ Lightweight checks (no Rust build, solver or cloud operation):
 python3 -B experiments/hu-postflop-r1/final-pipeline/test_run.py
 python3 -B tools/check_docs.py
 ```
+
+The recovery packer and readable report have [21 separate lightweight checks](support-tests/report.json).
+After recovery, `report.py --out PROOF --json-target NEW.json --markdown-target NEW.md`
+revalidates original bytes with the trusted runner before rendering. A failed
+proof reports only its failure and stage counts, without performance claims.
