@@ -1,0 +1,106 @@
+{
+  "removed_duplicates": [
+    {
+      "bytes": 488,
+      "sha256": "9f04db73b4dec9f98082d1e5c6ec6245bccf6c7c7d7b004d6f82947b4643023f",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\proof01\\archive-check.json",
+      "path": "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\archive-check.json"
+    },
+    {
+      "bytes": 17708089,
+      "sha256": "c94c351505c70aecc7c3b4f9f0a60c37173ed074c728ce1acbb54f65683d100a",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\proof01\\current-phase-proof01.tar.gz",
+      "path": "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\current-phase-proof01.tar.gz"
+    },
+    {
+      "bytes": 526759,
+      "sha256": "1001096e55cdef83c4d2e7b6483b4e44b940dc382e14dbabba2b6dbfb9c0e750",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\proof01\\current-phase-proof01.tar.gz.manifest.json",
+      "path": "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\current-phase-proof01.tar.gz.manifest.json"
+    },
+    {
+      "bytes": 95,
+      "sha256": "59264b7a5ccf1b3164dfede5547acd4f8e2285519ec70714bf34fcf3d4ad5291",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\proof01\\current-phase-proof01.tar.gz.sha256",
+      "path": "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\current-phase-proof01.tar.gz.sha256"
+    },
+    {
+      "bytes": 409,
+      "sha256": "c917558b6721f05c2463296fa8b48e4e297bffe46beb420b1ab47edffd13e04e",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\proof01\\current-phase-recovery-check01.json",
+      "path": "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\current-phase-recovery-check01.json"
+    },
+    {
+      "bytes": 412,
+      "sha256": "7165f4ceba769f817240fa08bb7cad74a8a3b71eed5a276d87ac2c6c7dddcc92",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\proof01\\current-phase-recovery01.json",
+      "path": "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\current-phase-recovery01.json"
+    },
+    {
+      "bytes": 150,
+      "sha256": "6c82948c7ae107d6a93c90b785a1bbb532d96238d78ea2779a563368a251fa5b",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases\\proof01\\extraction-check.json",
+      "path": "E:\\codex-work\\solvers\\r1-current-phase-recovery01\\extraction-check.json"
+    },
+    {
+      "bytes": 484,
+      "sha256": "b6b096accd48c1fa8104a24b5d2a9cb89422813d34a6c6e758bfc7bc601553a5",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\native-river-vm13\\proof01\\archive-check.json",
+      "path": "E:\\codex-work\\solvers\\r1-native-river-recovery01\\archive-check.json"
+    },
+    {
+      "bytes": 149,
+      "sha256": "62ad14a05cb82840ebc4f58662a1dcd6d546cf216198d613b77c0a6518dec453",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\native-river-vm13\\proof01\\extraction-check.json",
+      "path": "E:\\codex-work\\solvers\\r1-native-river-recovery01\\extraction-check.json"
+    },
+    {
+      "bytes": 7682236,
+      "sha256": "06ddb7169418cb680cf22bc72eeb0f57cba617772ef9beb8039a5c3994ef45eb",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\native-river-vm13\\proof01\\native-river-proof01.tar.gz",
+      "path": "E:\\codex-work\\solvers\\r1-native-river-recovery01\\native-river-proof01.tar.gz"
+    },
+    {
+      "bytes": 165882,
+      "sha256": "e7d78da0a8d275a32ec74be1fb09664ba754dfe52739419158bd0afb4f49dd20",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\native-river-vm13\\proof01\\native-river-proof01.tar.gz.manifest.json",
+      "path": "E:\\codex-work\\solvers\\r1-native-river-recovery01\\native-river-proof01.tar.gz.manifest.json"
+    },
+    {
+      "bytes": 94,
+      "sha256": "8c769ee54abf57569d67956fe5ebbea75ea217863d8b744c175cd352159a35b3",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\native-river-vm13\\proof01\\native-river-proof01.tar.gz.sha256",
+      "path": "E:\\codex-work\\solvers\\r1-native-river-recovery01\\native-river-proof01.tar.gz.sha256"
+    },
+    {
+      "bytes": 406,
+      "sha256": "1713d7ba95b70a9244c45b7ccae7f596a4b3d3dc8b94bd142e9c109466d80801",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\native-river-vm13\\proof01\\native-river-recovery-check01.json",
+      "path": "E:\\codex-work\\solvers\\r1-native-river-recovery01\\native-river-recovery-check01.json"
+    },
+    {
+      "bytes": 408,
+      "sha256": "067942feba5eb2281a0b0aa7f9cf795b2286894b59794c111b40adb482644ccb",
+      "retained_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\native-river-vm13\\proof01\\native-river-recovery01.json",
+      "path": "E:\\codex-work\\solvers\\r1-native-river-recovery01\\native-river-recovery01.json"
+    },
+    {
+      "bytes": 30474924,
+      "sha256": "3b8f7e6edf6c3ead01f6e6009829569a41a77a8e2bdff1eaaf6345275f11782c",
+      "retained_path": "Reproducible from committed deployment manifests and all pinned inputs",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\cloud-vm13\\phase-deployment01.tar.gz"
+    },
+    {
+      "bytes": 34684,
+      "sha256": "f433702f51849c8ea750b2f91104161dcc8cfdcc7248473033c7a23da7417861",
+      "retained_path": "Reproducible from committed deployment manifests and all pinned inputs",
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm13\\native-input01.tar.gz"
+    }
+  ],
+  "removed_bytes": 56595669.0,
+  "evidence_commit": "556f1eb",
+  "schema": "r1.vm13-local-hygiene/v1",
+  "extracted_proofs_retained": true,
+  "purpose": "Keep useful E: proof/CAS for ongoing R1; remove only byte-identical duplicate downloads and verified reproducible transfer archives",
+  "at_utc": "2026-09-26T23:22:25.8903485+00:00"
+}

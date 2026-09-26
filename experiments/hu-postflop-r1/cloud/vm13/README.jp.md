@@ -44,8 +44,22 @@
 不確かなSDK timeoutは再実行せず、まず実状態を確認する。転送・回収器の成功と、計測の成功・性能判定は別である。
 校正が通らないphase時間やRSS値を改善の根拠とせず、外部参照やR1全体の受入も認定しない。
 
-転送archiveはリモート展開のhash一致確認後、再生成可能な
-`.cache/cloud-vm13/phase-deployment01.tar.gz` へ移した。Gitには固定manifest、全入力のhash、
+転送archiveはリモート展開のhash一致確認後、再生成可能なcacheへ一時移動し、
+証拠commit `556f1eb` とVM削除の確認後に除去した。Gitには固定manifest、全入力のhash、
 packer、receiptと転送・展開ログを残す。manifest内の作成日時も保持しているので、固定入力とそのmanifestを
 packerと同じ順序・gzip mtime=0で格納すれば同じarchiveを再生成できる。
 raw料金HTML末尾の空白と、実行済みcapture scriptの末尾空行は元hashを保つためそのまま保持する。
+
+## 実行後の証拠
+
+[工程計測](../../current-phases/proof01/README.jp.md)はVmHWM低下で停止したまま保持する。
+そのunit停止と回収後、[006・022 native診断](../../reference/native-river-vm13/proof01/report.jp.md)を
+同じplain build・VM・元期限の範囲内で別unitとして実行し、全8工程を検証した。
+`native-start.py` は先行unitの停止・空cgroup・同一boot・残り時間を確認し、240秒上限を設定する。
+`native-recover.sh` / `collect-native.py` が別proofを回収し、
+`native-cleanup-binding01.json` にraw bytesとVM IDの結合確認を保存した。
+
+[削除確認](../cleanup-vm13/run01/reconciliation.json)でVM・boot disk・予約IPの不在を確認済み。
+実請求額は不明で、予算予約は累計40 USDのまま保持する。
+[local-hygiene01.json](local-hygiene01.json)に、Gitと一致した重複downloadと転送cache
+16 files・56,595,669 bytesの除去を記録した。継続調査に使うE:の展開proof/CASは残している。
