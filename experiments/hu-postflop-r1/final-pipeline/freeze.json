@@ -1,0 +1,15 @@
+{
+  "schema": "r1.final-pipeline-freeze/v1",
+  "at_utc": "2026-09-26T18:53:13.062342+00:00",
+  "review": "Root and independent API/output/source/retention review; all candidate measurements still unexecuted.",
+  "changes_from_tested_protocol": [
+    "status: draft-not-yet-frozen -> frozen"
+  ],
+  "before_sha256": "070cdef33c8524cea6ad6026050623867b67ed8839179f45c8c3f4d324c040dd",
+  "after_sha256": "b130f5b94f62217892d0e58019de48aa5516822b9036fc72994756866d5cae00",
+  "checks": {
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e700e3888755fe4e50a538f32eaa4fb8c5858b05359f08b57a63d5c67f49b720"
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "schema": "r1.final-pipeline-local-check/v1",
+  "created_at": "2026-09-26T18:50:59.271420+00:00",
+  "python": {
+    "path": "C:/Python313/python.exe",
+    "bytes": 105816,
+    "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca"
+  },
+  "source_before": [
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/run.py",
+      "bytes": 50954,
+      "sha256": "84d9a6a001ab08d55efbb8554bdc9a76ecc05c247b25c423952fb473896a6b28"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/verify.py",
+      "bytes": 859,
+      "sha256": "8fa02c7ccc59a8251930bc5f646a0f69bbb8cdbc337edd420b6966bb8a13a06a"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/test_run.py",
+      "bytes": 19517,
+      "sha256": "2de93636ee090b83d172c3457804a2ef4ec42f36aeae223d67aa1586ec7cc2ae"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/protocol.json",
+      "bytes": 5796,
+      "sha256": "070cdef33c8524cea6ad6026050623867b67ed8839179f45c8c3f4d324c040dd"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/source-pins.json",
+      "bytes": 80149,
+      "sha256": "02e1de1cc7293e126d3d1fab067264b46a7e011c85894703a47a7605dc5aa91a"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/hu_pipeline_probe.rs",
+      "bytes": 13915,
+      "sha256": "292d4398c21db5dd080e0fd7689b64ba7a0a46c53fa8360a677ac797b359ff39"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/sol_codec_bench.rs",
+      "bytes": 9370,
+      "sha256": "ed972ffce351fcd31dfbab74771a06a059ef0edb43e44d65397e65f9a85cbcea"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/README.md",
+      "bytes": 7291,
+      "sha256": "dec2ed194f55b7fe3d5d43abe25fedd4b0c0485afe979d31d1933b04eebf9045"
+    }
+  ],
+  "source_after": [
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/run.py",
+      "bytes": 50954,
+      "sha256": "84d9a6a001ab08d55efbb8554bdc9a76ecc05c247b25c423952fb473896a6b28"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/verify.py",
+      "bytes": 859,
+      "sha256": "8fa02c7ccc59a8251930bc5f646a0f69bbb8cdbc337edd420b6966bb8a13a06a"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/test_run.py",
+      "bytes": 19517,
+      "sha256": "2de93636ee090b83d172c3457804a2ef4ec42f36aeae223d67aa1586ec7cc2ae"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/protocol.json",
+      "bytes": 5796,
+      "sha256": "070cdef33c8524cea6ad6026050623867b67ed8839179f45c8c3f4d324c040dd"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/source-pins.json",
+      "bytes": 80149,
+      "sha256": "02e1de1cc7293e126d3d1fab067264b46a7e011c85894703a47a7605dc5aa91a"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/hu_pipeline_probe.rs",
+      "bytes": 13915,
+      "sha256": "292d4398c21db5dd080e0fd7689b64ba7a0a46c53fa8360a677ac797b359ff39"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/sol_codec_bench.rs",
+      "bytes": 9370,
+      "sha256": "ed972ffce351fcd31dfbab74771a06a059ef0edb43e44d65397e65f9a85cbcea"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/README.md",
+      "bytes": 7291,
+      "sha256": "dec2ed194f55b7fe3d5d43abe25fedd4b0c0485afe979d31d1933b04eebf9045"
+    }
+  ],
+  "syntax": "passed",
+  "commands": [
+    {
+      "name": "tests",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\final-pipeline\\test_run.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.2643172000534832,
+      "stdout": {
+        "path": "experiments/hu-postflop-r1/final-pipeline/test-evidence/tests.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "experiments/hu-postflop-r1/final-pipeline/test-evidence/tests.stderr",
+        "bytes": 3095,
+        "sha256": "75404d87d91da6d4587ae65ce2761221430da929bb9bd03a062a4fcbc388b921"
+      }
+    },
+    {
+      "name": "docs",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.21402039984241128,
+      "stdout": {
+        "path": "experiments/hu-postflop-r1/final-pipeline/test-evidence/docs.stdout",
+        "bytes": 48,
+        "sha256": "78525ba6a5f5b6be950c80a401fdf487286a0b6c1ce0004597612ea7fe650692"
+      },
+      "stderr": {
+        "path": "experiments/hu-postflop-r1/final-pipeline/test-evidence/docs.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "scope": "Python invalid-fixture tests and documentation only; no Rust build or solver execution"
+}

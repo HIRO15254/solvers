@@ -1,0 +1,53 @@
+{
+  "schema": "r1.final-pipeline-pack/v1",
+  "arms": {
+    "old": {
+      "revision": "88ffa5dd4583e5c8bae84e20e9b8390cb719e4f0",
+      "files": 203,
+      "archive": {
+        "bytes": 982171,
+        "sha256": "bbf2405d1a4e3464ba1147bbf2f950770c453d2c096be6c1f49aeb387cfabdf2"
+      },
+      "manifest": {
+        "bytes": 34877,
+        "sha256": "be4a754830ee274e97e7be74fe925d5e57839f058df298e86396fa0521425186"
+      },
+      "roundtrip": "exact"
+    },
+    "new": {
+      "revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+      "files": 213,
+      "archive": {
+        "bytes": 1040177,
+        "sha256": "274623f51a68a5172cb2b431b6b27d45c98fe2259d6917732c9f9af65fa820fd"
+      },
+      "manifest": {
+        "bytes": 36585,
+        "sha256": "156471b72a151953f8720e8924b6b8cea74a34476510af0243c33e83254c0f3a"
+      },
+      "roundtrip": "exact"
+    }
+  },
+  "controls": {
+    "pack-final-inputs.py": {
+      "bytes": 5993,
+      "sha256": "884773c3f887b777b3c41e13f54981b1dcd048c2a293f49ba3c9228e50675623"
+    },
+    "source-pins.json": {
+      "bytes": 80149,
+      "sha256": "02e1de1cc7293e126d3d1fab067264b46a7e011c85894703a47a7605dc5aa91a"
+    },
+    "protocol.json": {
+      "bytes": 5782,
+      "sha256": "b130f5b94f62217892d0e58019de48aa5516822b9036fc72994756866d5cae00"
+    },
+    "hu_pipeline_probe.rs": {
+      "bytes": 13915,
+      "sha256": "292d4398c21db5dd080e0fd7689b64ba7a0a46c53fa8360a677ac797b359ff39"
+    },
+    "sol_codec_bench.rs": {
+      "bytes": 9370,
+      "sha256": "ed972ffce351fcd31dfbab74771a06a059ef0edb43e44d65397e65f9a85cbcea"
+    }
+  }
+}

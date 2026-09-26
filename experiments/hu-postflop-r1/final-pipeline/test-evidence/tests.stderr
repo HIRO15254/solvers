@@ -1,0 +1,29 @@
+test_audit_rejects_wrong_version_threads_path_and_timer (__main__.ArtifactChecks.test_audit_rejects_wrong_version_threads_path_and_timer) ... ok
+test_only_wall_time_excluded_from_canonical (__main__.ArtifactChecks.test_only_wall_time_excluded_from_canonical) ... ok
+test_partial_and_complete_canonical_must_share_original_root (__main__.ArtifactChecks.test_partial_and_complete_canonical_must_share_original_root) ... ok
+test_raw_sweep_still_runs_after_record_pin_mismatch (__main__.ArtifactChecks.test_raw_sweep_still_runs_after_record_pin_mismatch) ... ok
+test_retained_byte_mismatch_rejected (__main__.ArtifactChecks.test_retained_byte_mismatch_rejected) ... ok
+test_saved_negative_gain_rejected_even_with_positive_nc (__main__.ArtifactChecks.test_saved_negative_gain_rejected_even_with_positive_nc) ... ok
+test_saved_quality_comes_from_recomputed_profile (__main__.ArtifactChecks.test_saved_quality_comes_from_recomputed_profile) ... ok
+test_version_boundary (__main__.ArtifactChecks.test_version_boundary) ... ok
+test_cadence_cap_missing_and_nonfinite_rejected (__main__.ScheduleAndQuality.test_cadence_cap_missing_and_nonfinite_rejected) ... ok
+test_continuation_after_passing_is_rejected (__main__.ScheduleAndQuality.test_continuation_after_passing_is_rejected) ... ok
+test_counts_and_pair_order (__main__.ScheduleAndQuality.test_counts_and_pair_order) ... ok
+test_equal_target_is_not_success (__main__.ScheduleAndQuality.test_equal_target_is_not_success) ... ok
+test_first_passing_check (__main__.ScheduleAndQuality.test_first_passing_check) ... ok
+test_materially_negative_quality_rejected_without_clamping (__main__.ScheduleAndQuality.test_materially_negative_quality_rejected_without_clamping) ... ok
+test_nonfinite_and_duplicate_json_rejected (__main__.ScheduleAndQuality.test_nonfinite_and_duplicate_json_rejected) ... ok
+test_overlay_clippy_and_fresh_build_scope (__main__.ScheduleAndQuality.test_overlay_clippy_and_fresh_build_scope) ... ok
+test_suffix_cannot_skip_then_pass_or_omit_stage (__main__.ScheduleAndQuality.test_suffix_cannot_skip_then_pass_or_omit_stage) ... ok
+test_extra_cargo_configuration_rejected (__main__.SourceAndMemory.test_extra_cargo_configuration_rejected) ... ok
+test_fixture_cap_or_target_or_thread_changed (__main__.SourceAndMemory.test_fixture_cap_or_target_or_thread_changed) ... ok
+test_memory_floor_is_conservative_and_invalid_rows_are_inconclusive (__main__.SourceAndMemory.test_memory_floor_is_conservative_and_invalid_rows_are_inconclusive) ... ok
+test_real_source04_foundation_raw_records (__main__.SourceAndMemory.test_real_source04_foundation_raw_records) ... ok
+test_reference_revision_or_production_pin_changed (__main__.SourceAndMemory.test_reference_revision_or_production_pin_changed) ... ok
+test_same_arm_state_change_rejected (__main__.SourceAndMemory.test_same_arm_state_change_rejected) ... ok
+test_source_and_input_positive_fixture (__main__.SourceAndMemory.test_source_and_input_positive_fixture) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.914s
+
+OK

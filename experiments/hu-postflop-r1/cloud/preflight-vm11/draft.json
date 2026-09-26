@@ -1,0 +1,119 @@
+{
+  "schema": "r1.vm11-preflight-draft/v1",
+  "recorded_at_utc": "2026-09-26T18:42:26.035187+00:00",
+  "execution_status": "draft_not_reserved_or_launched",
+  "project": "solvers-abstraction-20260723",
+  "billing_account_id": "015A1D-8A8F19-EC7035",
+  "billing_account_display_name": "趣味",
+  "billing_enabled": true,
+  "billing_account_open": true,
+  "actual_r1_billed_usd": null,
+  "billing_report_or_invoice_checked": false,
+  "ledger": {
+    "path": "../budget.json",
+    "bytes": 25971,
+    "sha256": "6178d13584cf1d24e0e4775803337b34bed0084f768371fcfe84ff8006e534c1",
+    "authorized_usd": 40,
+    "held_usd": 32,
+    "settled_usd": 0,
+    "proposed_reservation_usd": 3,
+    "prospective_held_usd": 35,
+    "prospective_unreserved_usd": 5
+  },
+  "proposed_reservation": {
+    "id": "r1-20260926-11",
+    "project": "solvers-abstraction-20260723",
+    "zone": "us-central1-b",
+    "instance": "solvers-r1-20260926-11",
+    "reserved_usd": 3,
+    "billed_usd": null,
+    "reservation_released": false,
+    "maximum_runtime_hours": 3,
+    "machine_type": "e2-standard-4",
+    "vcpus": 4,
+    "memory_gib": 16,
+    "provisioning_model": "SPOT",
+    "disk_type": "pd-balanced",
+    "disk_gib": 40,
+    "maximum_download_gib": 1,
+    "conservative_compute_usd_hour": 0.14,
+    "disk_usd_gib_hour": 0.000137,
+    "ipv4_usd_hour": 0.0025,
+    "reserved_egress_usd_gib": 0.3,
+    "tax_price_delay_and_other_reserve_usd": 1,
+    "instance_termination_action": "STOP",
+    "explicit_disk_cleanup_hours": 24,
+    "auto_restart": false,
+    "absolute_deadline_utc": null
+  },
+  "estimate": {
+    "compute_hours_including_slack": 3.02,
+    "compute_usd": "0.4228",
+    "ipv4_usd": "0.007550",
+    "disk_usd": "0.131520",
+    "egress_usd": "0.30",
+    "other_margin_usd": "1",
+    "total_usd": "1.861870",
+    "live_spot_price_verified": false,
+    "published_default_compute_usd_hour": 0.13402284,
+    "published_balanced_disk_usd_gib_hour": 0.000136986,
+    "published_spot_ipv4_usd_hour": 0.0025
+  },
+  "resource_observation": {
+    "instances": [],
+    "disks": [],
+    "region_status": "UP",
+    "quota": [
+      {
+        "limit": 200.0,
+        "metric": "CPUS",
+        "usage": 0.0
+      },
+      {
+        "limit": 8.0,
+        "metric": "IN_USE_ADDRESSES",
+        "usage": 0.0
+      },
+      {
+        "limit": 500.0,
+        "metric": "SSD_TOTAL_GB",
+        "usage": 0.0
+      },
+      {
+        "limit": 24.0,
+        "metric": "INSTANCES",
+        "usage": 0.0
+      },
+      {
+        "limit": 0.0,
+        "metric": "PREEMPTIBLE_CPUS",
+        "usage": 0.0
+      },
+      {
+        "limit": 24.0,
+        "metric": "E2_CPUS",
+        "usage": 0.0
+      }
+    ],
+    "spot_capacity_verified": false,
+    "create_permission_verified": false,
+    "interpretation": "No positive dedicated preemptible quota claimed; standard CPU/E2 quota has headroom. Actual provisioning remains untested."
+  },
+  "readiness": "Read-only checks completed; freeze source/protocol and mutate budget in root before any launch. Absolute deadline set only at launch.",
+  "effective_evidence": [
+    "configured-project-billing.stdout.json",
+    "configured-billing-account.stdout.json",
+    "configured-instances.stdout.json",
+    "configured-regional-quota.stdout.json",
+    "disks.stdout.json",
+    "machine-type.stdout.json",
+    "pricing-sources.json",
+    "pricing-compute-header-source.json"
+  ],
+  "sources": [
+    "https://cloud.google.com/products/compute/pricing/general-purpose",
+    "https://cloud.google.com/compute/disks-image-pricing",
+    "https://cloud.google.com/vpc/network-pricing",
+    "https://docs.cloud.google.com/compute/docs/instances/spot"
+  ]
+}

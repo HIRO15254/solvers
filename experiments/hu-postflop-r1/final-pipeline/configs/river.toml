@@ -1,0 +1,27 @@
+# Synthetic pipeline fixture, not one of the external R0 reference cases.
+schema = "solvers.postflop/v1"
+[game]
+board = "2c 7d 9h Js Qs"
+oop_range = "22+,A2s+,KTo+"
+ip_range = "55-22,QJs,A5s-A2s,KQo,T9s"
+pot = 20
+effective_stack = 60
+iso_merging = false
+[game.tree]
+kind = "script"
+script = '''river {
+replace bet [50, 100]
+replace raise [100]
+}'''
+[game.tree.max_aggressive_actions]
+river = 2
+[algorithm]
+schedule = "dcfr"
+[run]
+iterations = 400
+check_every = 25
+target_nash_conv = 0.04
+threads = 1
+storage = "f32"
+par_chance_depth = 2
+par_min_children = 12

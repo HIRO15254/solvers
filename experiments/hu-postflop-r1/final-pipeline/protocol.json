@@ -1,0 +1,84 @@
+{
+  "schema": "r1.final-pipeline-protocol/v1",
+  "status": "frozen",
+  "scope": "Three synthetic no-rake chip-EV games, F32, one worker, fresh Full artifacts. Cumulative SOL3/CKPT1 to SOL4/CKPT2 comparison; not external-reference, all-range, I16, NoRivers or 32-worker certification.",
+  "revisions": {
+    "old": "88ffa5dd4583e5c8bae84e20e9b8390cb719e4f0",
+    "new": "11e4062ba1735e58b60d12999cb23ed10fd1a163"
+  },
+  "versions": {
+    "old": {
+      "sol": 3,
+      "checkpoint": 1
+    },
+    "new": {
+      "sol": 4,
+      "checkpoint": 2
+    }
+  },
+  "cases": {
+    "river": {
+      "iterations": 400,
+      "check_every": 25,
+      "target_nash_conv": 0.04,
+      "original_sha256": "cbbe0b27cc7cc5d31a6b11ac9ba9a421bf6e7e755a4306254cc1071a2ab9d790"
+    },
+    "turn": {
+      "iterations": 400,
+      "check_every": 25,
+      "target_nash_conv": 0.04,
+      "original_sha256": "726f664ac4417d1d5d6cee145885805fc90cdd719d9d2490fa1f6e49df7067d8"
+    },
+    "flop": {
+      "iterations": 100,
+      "check_every": 10,
+      "target_nash_conv": 0.04,
+      "original_sha256": "c8cb6c07ed18bbcf60f81b1e8022850b0a70f3c584d03b4307d7f5b9c504e7ad"
+    }
+  },
+  "threads": 1,
+  "warmup_blocks": 1,
+  "measured_blocks": 3,
+  "order": "Six old/new census processes, then all24 solves in case order river/turn/flop, blocks0..3, old first iff case-index+block is even. After every solve completes, visit the same sample order for summary, saved-profile audit, decode-all, read-root, stream-write, plus checkpoint decode for warmups. 24 solves,24 audits,72 codec processes,24 summaries,6 census,6 checkpoint probes=156 processes. Bulky canonical retention is after solves; other retention still raises inherited RSS floors. No phase instrumentation.",
+  "quality": "First native CLI check with NashConv strictly below0.04; original caps/cadences retained. Live and stored quantized profiles must both meet target. All finite; same-arm repetitions exact except explicit time/path/process metadata. Old/new numerical values may differ; report differences. No new target after observing candidate. Reject each live/saved deviation gain and NashConv below -1e-6 chips; retain original unclamped values. This absolute roundoff allowance is fixed before measurement.",
+  "codec_input": "Each completed solve's immutable SOL is input to its three codec processes. Raw file identity, canonical blocks, root selection and rewrite bytes are retained; cross-repeat canonical ignores only wall_secs. No cross-version reads and no cross-arm raw payload equality requirement.",
+  "guard": {
+    "turn_flop_solve_median_ratio_max": 0.95,
+    "all_case_solve_geomean_ratio_max": 1.0,
+    "flop_os_rss_bound_ratio_max": 0.9,
+    "io_regression_ratio_max": 1.1,
+    "io_eligibility_old_seconds": 0.01,
+    "single_case_speed_claim_old_seconds": 1.0
+  },
+  "limits": {
+    "build_timeout_seconds": 1200,
+    "sample_timeout_seconds": 300,
+    "query_timeout_seconds": 120,
+    "rss_bytes": 10737418240,
+    "outer_memory_max_bytes": 12884901888,
+    "min_free_bytes": 1073741824,
+    "disk_reserve_bytes": 4294967296,
+    "poll_seconds": 0.02,
+    "grace_seconds": 5,
+    "kill_wait_seconds": 5
+  },
+  "build": {
+    "toolchain": "1.97.0",
+    "jobs": 2,
+    "rustflags": "-C target-cpu=native",
+    "fresh_targets": true
+  },
+  "foundation": {
+    "source_manifest_sha256": "1a84947f6daa9ca1c57d5f48e4914e176643dbe9c787262ded95dcf6aba042d6",
+    "archive_sha256": "51068bb8464b57b91d11fe1ce1be848f14cd83e26865661afeeee3c70a3e9cd7",
+    "workspace_passed": 958,
+    "workspace_ignored": 31,
+    "workspace_summaries": 56
+  },
+  "memory": "Direct Rust root only; no subprocess expected from source. Native wait4 can include inherited pre-exec floor, so do not use native-new/native-old. For each measured root run U=native OS peak and L=sampled OS RSS maximum. If all values valid, complete samples show only root, and U>=L, max3(U_new)/min3(L_old) is a conservative OS-accounted peak comparison for these runs. Not exact physical RSS, population/median or phase peak. An unmet bound is inconclusive, not evidence of no improvement. Census, SOL/CKPT, source and all other retained payload reads can also raise the Python parent high-water inherited by later children. The solve-first order limits canonical-file contamination but does not remove that floor.",
+  "phase_timings": "null: no final-source internal phase instrumentation in this campaign. Whole solve process includes initialization, CFR, periodic/final EVBR, all checkpoints, SOL, reporting and drops. Codec internal operations and audit load/eval have separate clocks. Prior source phase evidence is not relabeled as current.",
+  "retention": "Original-byte showdown Store payload container only; distinct final-pipeline plan/result semantics. Retain every raw log/sample, source archive, original artifact and canonical file, deduplicating only identical bytes. Portable checker imports trusted checkout helpers, never retained code. Toolchain/Python executables are identity-only. Source-after is an executed live inventory comparison, not a separate filesystem snapshot.",
+  "budget": "No cloud operations in this runner. Root reserves within remaining8USD before deployment; same4-vCPU16GiB x86_64 Spot boot, <=3h absolute lifetime with >=20min export/verification reserve. Outer service deadline and12GiB/swap0 containment required.",
+  "failure": "Any command, target, artifact, identity, containment or check failure is terminal; retain available raw bytes and mark remaining stages skipped. No retries, replacements or resumed campaign. Every launch must fit its full timeout+20s inside the fixed measurement deadline. All screens descriptive and scope-limited; no R1 overall certification.",
+  "quality_negative_tolerance_chips": 1e-06
+}

@@ -1,0 +1,35 @@
+[
+  {
+    "source": "https://cloud.google.com/products/compute/pricing/general-purpose",
+    "final_url": "https://cloud.google.com/products/compute/pricing/general-purpose",
+    "retrieved_at_utc": "2026-09-26T18:38:21.396514+00:00",
+    "response_bytes": 35801286,
+    "response_sha256": "c732a55f60f390e9930c57f2bc4dafbab0ebbaf88032cb0b87eee8921f6d1cff",
+    "retained_excerpt": "pricing-compute-row.html",
+    "excerpt_bytes": 739,
+    "excerpt_sha256": "27d15a273c29ecc264b02b1eef346ded94c18b661df4022ab45088bf3b94f22c",
+    "extraction": "Exact first matching HTML row, prior table header and prior Iowa label; excerpts are not the full response."
+  },
+  {
+    "source": "https://cloud.google.com/compute/disks-image-pricing",
+    "final_url": "https://cloud.google.com/compute/disks-image-pricing",
+    "retrieved_at_utc": "2026-09-26T18:38:22.350534+00:00",
+    "response_bytes": 3902504,
+    "response_sha256": "25bd33a203236274c2a553f7515158f08643f65b0bd079e67e0047b90df09bd1",
+    "retained_excerpt": "pricing-disk-row.html",
+    "excerpt_bytes": 243,
+    "excerpt_sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319",
+    "extraction": "Exact first matching HTML row, prior table header and prior Iowa label; excerpts are not the full response."
+  },
+  {
+    "source": "https://cloud.google.com/vpc/network-pricing",
+    "final_url": "https://cloud.google.com/vpc/network-pricing",
+    "retrieved_at_utc": "2026-09-26T18:38:23.085125+00:00",
+    "response_bytes": 3808967,
+    "response_sha256": "60644b95b3559453684080e921451c5431d813ec2a885612aff69e0384e7611e",
+    "retained_excerpt": "pricing-network-row.html",
+    "excerpt_bytes": 288,
+    "excerpt_sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7",
+    "extraction": "Exact first matching HTML row, prior table header and prior Iowa label; excerpts are not the full response."
+  }
+]
