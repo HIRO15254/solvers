@@ -1,0 +1,126 @@
+{
+  "schema": "r1.context-reuse-retained-verification/v1",
+  "status": "retained_bytes_verified",
+  "source_revision": "2fecc099b9911511a0938fb2700bbb124bc1046e",
+  "source_files_per_role": 197,
+  "blob_count": 123,
+  "original_paths": 194,
+  "fresh_stages": 24,
+  "sample_binary_and_input_identity_matches": 18,
+  "invalid_shared_target_trial": "failed_not_performance_evidence",
+  "initial_cleanup_failures": [
+    "build-baseline",
+    "build-candidate",
+    "formats-tests"
+  ],
+  "tests": {
+    "formats-tests": {
+      "passed": 77,
+      "failed": 0,
+      "supervisor_exit": 1
+    },
+    "formats-tests-cleanup-confirmation": {
+      "passed": 77,
+      "failed": 0,
+      "supervisor_exit": 0
+    }
+  },
+  "measured": {
+    "river": {
+      "baseline": {
+        "operation_seconds": [
+          0.0045621,
+          0.0048006,
+          0.0043682
+        ],
+        "median_seconds": 0.0045621,
+        "sampled_peak_tree_resident_bytes": [
+          14237696,
+          17534976,
+          14721024
+        ],
+        "median_sampled_peak_bytes": 14721024
+      },
+      "candidate": {
+        "operation_seconds": [
+          0.0041719,
+          0.0042508,
+          0.0031992
+        ],
+        "median_seconds": 0.0041719,
+        "sampled_peak_tree_resident_bytes": [
+          17412096,
+          16584704,
+          17780736
+        ],
+        "median_sampled_peak_bytes": 17412096
+      }
+    },
+    "turn": {
+      "baseline": {
+        "operation_seconds": [
+          0.0391351,
+          0.0402415,
+          0.0412453
+        ],
+        "median_seconds": 0.0402415,
+        "sampled_peak_tree_resident_bytes": [
+          26439680,
+          24383488,
+          24584192
+        ],
+        "median_sampled_peak_bytes": 24584192
+      },
+      "candidate": {
+        "operation_seconds": [
+          0.0371203,
+          0.0360305,
+          0.0363692
+        ],
+        "median_seconds": 0.0363692,
+        "sampled_peak_tree_resident_bytes": [
+          25427968,
+          27136000,
+          28340224
+        ],
+        "median_sampled_peak_bytes": 27136000
+      }
+    },
+    "flop": {
+      "baseline": {
+        "operation_seconds": [
+          0.5575716,
+          0.5429896,
+          0.5715455
+        ],
+        "median_seconds": 0.5575716,
+        "sampled_peak_tree_resident_bytes": [
+          259878912,
+          257024000,
+          256561152
+        ],
+        "median_sampled_peak_bytes": 257024000
+      },
+      "candidate": {
+        "operation_seconds": [
+          0.5068707,
+          0.4903901,
+          0.4766794
+        ],
+        "median_seconds": 0.4903901,
+        "sampled_peak_tree_resident_bytes": [
+          259866624,
+          257765376,
+          259747840
+        ],
+        "median_sampled_peak_bytes": 259747840
+      }
+    }
+  },
+  "all_rewrites_equal_inputs": true,
+  "canonical_and_root_equal": true,
+  "source_dependency": "Git revision 2fecc099b9911511a0938fb2700bbb124bc1046e must exist locally",
+  "reran_build_tests_or_solver": false,
+  "performance_acceptance": "not_evaluated",
+  "r1_acceptance": null
+}

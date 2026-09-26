@@ -1,0 +1,136 @@
+--- a/crates/formats/src/sol_indexed.rs
++++ b/crates/formats/src/sol_indexed.rs
+@@ -375,6 +375,40 @@
+     })
+ }
+ 
++// Research candidate: one private context per artifact, shared only by node chunks.
++// Metadata keeps its separate encode_all path and unchanged frame settings.
++fn chunk_zstd_error(code: zstd::zstd_safe::ErrorCode) -> std::io::Error {
++    std::io::Error::other(zstd::zstd_safe::get_error_name(code).to_owned())
++}
++
++fn write_chunk_reusing_context<W: Write>(
++    writer: W,
++    raw: &[u8],
++    context: &mut Option<zstd::zstd_safe::CCtx<'static>>,
++) -> std::io::Result<W> {
++    use zstd::zstd_safe::{CCtx, CParameter, ResetDirective};
++
++    if context.is_none() {
++        // Match raw::Encoder::new(0), including its allocation-failure behavior.
++        let mut fresh = CCtx::create();
++        fresh
++            .set_parameter(CParameter::CompressionLevel(0))
++            .map_err(chunk_zstd_error)?;
++        fresh.load_dictionary(&[]).map_err(chunk_zstd_error)?;
++        *context = Some(fresh);
++    }
++    let context = context.as_mut().expect("context initialized above");
++    // Drop frame history and restore unknown pledged size; keep level/dictionary.
++    context
++        .reset(ResetDirective::SessionOnly)
++        .map_err(chunk_zstd_error)?;
++    let mut encoder = zstd::Encoder::with_context(writer, context);
++    encoder.include_checksum(true)?;
++    encoder.write_all(raw)?;
++    // Only a successfully completed and fully written frame permits another chunk.
++    encoder.finish()
++}
++
+ pub fn write_sol(path: &Path, payload: &SolPayload) -> Result<(), SolError> {
+     validate_meta(&payload.meta)?;
+     if payload.blocks.len() != payload.values.len()
+@@ -459,6 +493,7 @@
+         .ok_or_else(|| invalid("directory extent overflow"))?;
+     file.seek(SeekFrom::Start(data_start))?;
+     let mut entries = Vec::with_capacity(groups.len());
++    let mut chunk_context = None;
+     for group in groups {
+         let pairs: Vec<_> = payload.blocks[group.clone()]
+             .iter()
+@@ -469,10 +504,7 @@
+             return Err(invalid("chunk exceeds format limit"));
+         }
+         let offset = file.stream_position()?;
+-        let mut encoder = zstd::Encoder::new(&mut *file, 0)?;
+-        encoder.include_checksum(true)?;
+-        encoder.write_all(&raw)?;
+-        encoder.finish()?;
++        write_chunk_reusing_context(&mut *file, &raw, &mut chunk_context)?;
+         let compressed_len = file.stream_position()? - offset;
+         if compressed_len > MAX_COMPRESSED_CHUNK_BYTES {
+             return Err(invalid("compressed chunk exceeds format limit"));
+@@ -506,3 +538,72 @@
+     temporary.persist(path).map_err(|e| e.error)?;
+     Ok(())
+ }
++
++#[cfg(test)]
++mod context_reuse_tests {
++    use super::write_chunk_reusing_context;
++    use std::io::Write;
++
++    fn fresh_frame(raw: &[u8]) -> Vec<u8> {
++        // Independent old writer sequence: a fresh context for every frame.
++        let mut encoder = zstd::Encoder::new(Vec::new(), 0).unwrap();
++        encoder.include_checksum(true).unwrap();
++        encoder.write_all(raw).unwrap();
++        encoder.finish().unwrap()
++    }
++
++    fn fixed_pseudorandom(len: usize) -> Vec<u8> {
++        let mut state = 0x9e37_79b9_7f4a_7c15u64;
++        (0..len)
++            .map(|_| {
++                state ^= state << 13;
++                state ^= state >> 7;
++                state ^= state << 17;
++                (state >> 56) as u8
++            })
++            .collect()
++    }
++
++    #[test]
++    fn reused_context_matches_fresh_frames_at_stream_buffer_boundaries() {
++        let mut context = None;
++        for len in [
++            0,
++            1,
++            32 * 1024 - 1,
++            32 * 1024,
++            32 * 1024 + 1,
++            128 * 1024 - 1,
++            128 * 1024,
++            128 * 1024 + 1,
++            512 * 1024 + 1,
++        ] {
++            for raw in [vec![0u8; len], fixed_pseudorandom(len)] {
++                let actual = write_chunk_reusing_context(Vec::new(), &raw, &mut context).unwrap();
++                assert_eq!(actual, fresh_frame(&raw), "frame bytes differ at len={len}");
++                assert_eq!(zstd::decode_all(actual.as_slice()).unwrap(), raw);
++            }
++        }
++    }
++
++    #[test]
++    fn large_small_large_frames_do_not_carry_history_or_pledged_size() {
++        let large = fixed_pseudorandom(1024 * 1024 + 11);
++        let small = [0x61, 0x62, 0x61];
++        let mut context = None;
++        let mut first = None;
++        for (index, raw) in [large.as_slice(), small.as_slice(), large.as_slice()]
++            .into_iter()
++            .enumerate()
++        {
++            let actual = write_chunk_reusing_context(Vec::new(), raw, &mut context).unwrap();
++            assert_eq!(actual, fresh_frame(raw), "frame {index} differs");
++            assert_eq!(zstd::decode_all(actual.as_slice()).unwrap(), raw);
++            if index == 0 {
++                first = Some(actual);
++            } else if index == 2 {
++                assert_eq!(Some(actual), first);
++            }
++        }
++    }
++}

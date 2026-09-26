@@ -43,7 +43,8 @@ tarのframingは保持時に作成したが、各memberの内容は元bytesの�
 変更前の残194ファイルはinstrumented側と同一なので、元candidateの全197 pinsも照合できる。
 元Git archiveのrevision・byte数・hashは`preparation.json`に保持し、
 新しいsource bundleを元archiveそのものとは扱わない。
-`E:\codex-work\solvers\r1-writer-smoke-20260926`の元出力は削除していない。
+保持後、`E:\codex-work\solvers\r1-writer-smoke-20260926`の`off`/`on`一時出力は、
+Gitの保持blobと全9ファイルの元bytesを照合して整理した。以下の再検査は元出力を必要としない。
 
 ```text
 python experiments/hu-postflop-r1/codec/write-phases/windows-smoke-20260926/verify.py

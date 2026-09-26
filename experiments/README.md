@@ -20,6 +20,7 @@
 | R1のbyte codec実測 | [source07 codec比較](hu-postflop-r1/codec/vm07-report.md)、[通常検証](hu-postflop-r1/validation/vm07-report.md) | 保存bytesを維持した読込み改善とFlop書込み回帰。96実行の独立byte照合、通常901 tests成功。全solveや外部品質へ外挿しない |
 | R1のwriter計測準備 | [区間計測と有限実行・保持検証](hu-postflop-r1/codec/write-phases/README.md) | 6条件の対照・計測摂動の校正・非重複区間。全69合成tests成功。Linuxの4 release builds・126標本は未実施 |
 | R1のwriter計測実動確認 | [Windows debugのOFF/ON](hu-postflop-r1/codec/write-phases/windows-smoke-20260926/README.md) | 226 chunksの区間収支と元SOL・canonicalのbyte一致。単発の実動確認であり、速度・校正・回帰原因を認定しない |
+| R1のwriter圧縮context候補 | [Windows debugの3交互ペア](hu-postflop-r1/codec/context-reuse/README.md) | formats 77 tests、18回のSOL・canonical一致。Flop保存中央値−12.05%の探索的結果。production未適用、releaseやR1受入の認定には使わない |
 | R1の受入証拠の範囲 | [事前条件の監査](hu-postflop-r1/acceptance/audit.jp.md)、[将来の外部比較器](hu-postflop-r1/acceptance/external-contract.md) | 既存の事前条件と測定後索引を区別。将来の閾値発行・校正・欠測の検査であり、総合受入の認定ではない |
 | R1の実入力への境界適用 | [抽象化の適用確認](hu-postflop-r1/reference/abstraction-applicability.md) | 017/019のhand identity・joint重み・完全記憶の検査と、未実装・未評価の範囲 |
 | R1の工程別診断 | [source03 phase比較](hu-postflop-r1/phases/vm06-report.md) | 別instrumented buildのon/off較正、重複しない工程時間、元の性能実測との区別 |

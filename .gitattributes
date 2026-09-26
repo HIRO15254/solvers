@@ -43,3 +43,4 @@ experiments/hu-postflop-r1/validation/vm07-complete/records/build/current/crates
 # Preserve the context-prefix spaces in the hashed original unified diff.
 experiments/hu-postflop-r1/validation/bet-refinement-20260926/oracle-river.patch -whitespace
 experiments/hu-postflop-r1/checkpoint/evidence-20260926/source/source.diff -whitespace
+experiments/hu-postflop-r1/codec/context-reuse/context-reuse.patch -whitespace

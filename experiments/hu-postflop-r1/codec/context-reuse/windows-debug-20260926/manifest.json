@@ -1,0 +1,1338 @@
+{
+  "schema": "r1.context-reuse-windows-retention/v1",
+  "retained_at": "2026-09-26T00:40:52.217366+00:00",
+  "original_root": "E:\\codex-work\\solvers\\r1-context-reuse-20260926",
+  "source_revision": "2fecc099b9911511a0938fb2700bbb124bc1046e",
+  "blobs": {
+    "invalid-shared/run-diagnostic.py.gz": {
+      "encoding": "gzip",
+      "bytes": 2887,
+      "sha256": "655e9413f8358a18842323976b00812e6d3a747183ecba3893fbb5596c785275",
+      "decoded": {
+        "bytes": 7456,
+        "sha256": "a415850bbbba477ae6917d882ff7f36168b05b36cc6720e60f3504c77956b1eb"
+      }
+    },
+    "invalid-shared/diagnostic-plan.json.gz": {
+      "encoding": "gzip",
+      "bytes": 12694,
+      "sha256": "ad67541f2589d55bad6ddf83eeb0eb7bd2edb84ccfa05909cf43dc379f83ae10",
+      "decoded": {
+        "bytes": 77799,
+        "sha256": "38288b1d1abbeb6432ac886efba75eeb17bdc1228c55cf991b16a00118fdea2c"
+      }
+    },
+    "invalid-shared/diagnostic-result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 635,
+      "sha256": "c2a3b46317c508dd05e4f9dc4d68e2d9e801ddadeeee9ee3180337cf11b0dccd",
+      "decoded": {
+        "bytes": 1637,
+        "sha256": "932083dc4d8656d44af6f41080f8b581b6b605bc4a4d2bd7f3f34d947b51347f"
+      }
+    },
+    "fresh/run-fresh.py.gz": {
+      "encoding": "gzip",
+      "bytes": 3318,
+      "sha256": "a7fce9fc41baa4254a28112afad5351c1ac24664162d16e7ab67c4bf6a5121ee",
+      "decoded": {
+        "bytes": 8698,
+        "sha256": "fb81cace74b6b166463c7ee9168e8cc18e566ae8942227d2b9afda090da51802"
+      }
+    },
+    "invalid-shared/records/build-baseline.json.gz": {
+      "encoding": "gzip",
+      "bytes": 23880,
+      "sha256": "9668f3eb0f3e6a425e7b062e198a8055c8ffcc0a9a2c3c50e0e39206b7784066",
+      "decoded": {
+        "bytes": 102376,
+        "sha256": "b9df7733dda775471f5116192895c4987ed552c4079b150755095ddb8b90c1d4"
+      }
+    },
+    "invalid-shared/records/build-baseline.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 670,
+      "sha256": "186517834e8a13a1b0c22af6b2137bcf5b38bbb1a7b63d84380645d35261a250",
+      "decoded": {
+        "bytes": 3568,
+        "sha256": "42cac08da1a1a8c05f20361749a75066e316ec70a3f6c038e43eea20dcd4f299"
+      }
+    },
+    "invalid-shared/records/build-baseline.stderr.log.gz": {
+      "encoding": "gzip",
+      "bytes": 80,
+      "sha256": "e8344334bd5d35c678450719f4069644834418442fae12bef7fab52e697f8806",
+      "decoded": {
+        "bytes": 60,
+        "sha256": "7e8397b3c3d5ef73830e57f61ffa6f2cfd565f338d3d371aefe79dbf3b020764"
+      }
+    },
+    "invalid-shared/records/build-baseline.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 20,
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "decoded": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "invalid-shared/records/build-candidate.json.gz": {
+      "encoding": "gzip",
+      "bytes": 23917,
+      "sha256": "0954713e1d7d8a6b5ab312e957c915e9cedea6e638296b7eb9f60b0fee12a7e9",
+      "decoded": {
+        "bytes": 98465,
+        "sha256": "b048da6e0dda4f364f63d32d49fb3c65a13d82aeec4edb4452dc5582d05ba7e8"
+      }
+    },
+    "invalid-shared/records/build-candidate.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 9558,
+      "sha256": "91042f878ed0cf8e4111e1af1aa477c8ee0a657d8a7af6d68977030cb323439d",
+      "decoded": {
+        "bytes": 121609,
+        "sha256": "8ed767a48535b6ddeb1fb38b86c2f9b793acba6d6738b25039d26c17b74edee0"
+      }
+    },
+    "invalid-shared/records/build-candidate.stderr.log.gz": {
+      "encoding": "gzip",
+      "bytes": 179,
+      "sha256": "961ebbf41fdaae17eba92cf36edd5815bba1e8dcbceabe71d479f9881ba500e8",
+      "decoded": {
+        "bytes": 354,
+        "sha256": "30a341c54b096e95c34eeb36acd5ea6572a4217bbfb7c8ec6ce3291500d51348"
+      }
+    },
+    "invalid-shared/binaries/baseline.exe.gz": {
+      "encoding": "gzip",
+      "bytes": 615306,
+      "sha256": "feeb03ceb72507bef35a7c7763d5aab5a7f1fac7ec4073d4186e2a65277cbc49",
+      "decoded": {
+        "bytes": 1891840,
+        "sha256": "8248720a768f2a8a74c92b5bf66c8f698c105d20e62e2fe18a03babec32e9628"
+      }
+    },
+    "fresh/plan.json.gz": {
+      "encoding": "gzip",
+      "bytes": 13013,
+      "sha256": "1e57f962efb8faecbffb81e1dc5e5ab2c979a8fba90f6a9ad22348007e0185ce",
+      "decoded": {
+        "bytes": 78816,
+        "sha256": "d0844df3017059c89ad7e1d79c31d2d870d8948bb6937f02b6e30cf1c82efd2c"
+      }
+    },
+    "fresh/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 4057,
+      "sha256": "332434e59b76256cf754b3291ffb86e8a7de3ef3403b7b1c42ccaed39ace0eb4",
+      "decoded": {
+        "bytes": 36725,
+        "sha256": "69593e0836c9b1abb55b04e3042c4014b7b47cbb8822963a4ea4f6b835dc5999"
+      }
+    },
+    "fresh/records/build-baseline-cleanup-confirmation.json.gz": {
+      "encoding": "gzip",
+      "bytes": 23909,
+      "sha256": "f1359422146f13aa66b8b29730c2527e2dd04718bc60e8d09c439915d63f3e89",
+      "decoded": {
+        "bytes": 102469,
+        "sha256": "9af037e3df0673c10eb4ab1cdd578df5ae85f1f9c88a20c4c1ffa6a89927bfaa"
+      }
+    },
+    "fresh/records/build-baseline-cleanup-confirmation.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 664,
+      "sha256": "badd32b48fb47229bcd6e73035e7165c3a334b405048c505073bde14137afd39",
+      "decoded": {
+        "bytes": 3575,
+        "sha256": "17460443c36b9abdbcb5ca490f79d032401ca17a60e812ed5b28a5d66ebe4a72"
+      }
+    },
+    "fresh/records/build-baseline-cleanup-confirmation.stderr.log.gz": {
+      "encoding": "gzip",
+      "bytes": 80,
+      "sha256": "7fdf7273b73d0e22457d4d8a3db909d9b6dac790d892a07889b488e980997012",
+      "decoded": {
+        "bytes": 60,
+        "sha256": "0c640d3e6056e973186018eb9b5813373e71f3ed6be436183c1506ae0042300e"
+      }
+    },
+    "fresh/records/build-baseline.json.gz": {
+      "encoding": "gzip",
+      "bytes": 24037,
+      "sha256": "3464a080185e775d89b5d8b84f1abf84a57d4e5c1445b821be2c5a0040f250d4",
+      "decoded": {
+        "bytes": 102839,
+        "sha256": "d2c0de316e56de6a26447fd85d139ccd29f206f2cc0577d66537067491581d7c"
+      }
+    },
+    "fresh/records/build-baseline.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 57026,
+      "sha256": "f75dcb42256524593c2703885b7a883292de30a520a11f002237a2f6ee4218e3",
+      "decoded": {
+        "bytes": 690412,
+        "sha256": "8b6445c3ef3f0ad5d23bdf8fb686e344e529b1fdd1e39ce034cc77b8e1ec5c96"
+      }
+    },
+    "fresh/records/build-baseline.stderr.log.gz": {
+      "encoding": "gzip",
+      "bytes": 767,
+      "sha256": "1cebe6edb0aed4b511683c6d95bc5f15ecd2fe53a6e89ab73c51d168dec9f555",
+      "decoded": {
+        "bytes": 2281,
+        "sha256": "d8c1bfbccfb2924afab388bbf2283ffa02e56159d9f6005043ff66bf83c0be3d"
+      }
+    },
+    "fresh/records/build-candidate-cleanup-confirmation.json.gz": {
+      "encoding": "gzip",
+      "bytes": 23800,
+      "sha256": "bd996fec85a504329e0689a1ca54530f50a118980731d1109f7f80d3dbc93b65",
+      "decoded": {
+        "bytes": 98127,
+        "sha256": "9f125a274d5bef9a76fad190b644130214c125a4cac646859b7727ef90204ebe"
+      }
+    },
+    "fresh/records/build-candidate-cleanup-confirmation.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 697,
+      "sha256": "abdaad80f01f976f62b44f03b5a1fbd3856854e5fb861f6df665e1af7c2a8ec6",
+      "decoded": {
+        "bytes": 3932,
+        "sha256": "1d47bc5e59f7b83baf8682c5a02ff8a23f305f43db806d2e49d1da99c9b279f1"
+      }
+    },
+    "fresh/records/build-candidate-cleanup-confirmation.stderr.log.gz": {
+      "encoding": "gzip",
+      "bytes": 80,
+      "sha256": "8aa26e9c49be3123e9535d9f8b4d91c3a813279a62acc1e040f4ec82d07e674e",
+      "decoded": {
+        "bytes": 60,
+        "sha256": "1f788b66ea062f199afb46076a789cb2520299b3af49e5c9c7f501bfacae9f7f"
+      }
+    },
+    "fresh/records/build-candidate.json.gz": {
+      "encoding": "gzip",
+      "bytes": 23923,
+      "sha256": "70fc9282240ffa6461984aaa9982d3fc02c26ff37d8557d31611c1f131e62156",
+      "decoded": {
+        "bytes": 98501,
+        "sha256": "a0bebc8aa739c3d98cc032060d863abc3c8dffa11cb7df362e46861e29ea67b3"
+      }
+    },
+    "fresh/records/build-candidate.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 58853,
+      "sha256": "e7f33400e2e1f8a65a4a50d67ce2d3fb7e4446f53788be2219a3afd41701fd5f",
+      "decoded": {
+        "bytes": 706124,
+        "sha256": "ae549b9cf1503dc8bb50660dc6981498840ca3fea28576932219bbc03c3f1332"
+      }
+    },
+    "fresh/records/build-candidate.stderr.log.gz": {
+      "encoding": "gzip",
+      "bytes": 767,
+      "sha256": "a468955d6f4bd9ded4a228243349ca730d56b4b9936151fdc45bb59a8a9de6ca",
+      "decoded": {
+        "bytes": 2248,
+        "sha256": "1de7ffc145ca5b5bbaecb9b5b2cf1493e89462e2b3787ecd7f9af4a7c02c77b6"
+      }
+    },
+    "fresh/records/flop-1-baseline.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2029,
+      "sha256": "dcf255ff13e52caea2be7f9f402772343947dce855aa005251e7ba503b7838f7",
+      "decoded": {
+        "bytes": 7285,
+        "sha256": "391b6ed7ee344ed9c7e13a3af95960bccd07d5449ed308bf76df5d7793baf67f"
+      }
+    },
+    "fresh/records/flop-1-baseline.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 1826,
+      "sha256": "9159deda9e9fc4f13171ab1a294b9e6715a8971fc56f73fff8f2aaab01a341aa",
+      "decoded": {
+        "bytes": 14393,
+        "sha256": "6b439dcad80562d2c444522352a8197c424a466b7c62136863c2f363a1a62cc3"
+      }
+    },
+    "fresh/records/flop-1-baseline.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 33907,
+      "sha256": "c3b8da6799cdb232fe406b490e0af1732b6671a12e19f217cae0966e1cc66d5c",
+      "decoded": {
+        "bytes": 77585,
+        "sha256": "3566289a09dc6cbc1615b27f2cafb810e5253c9722c9937fe0610bb5a0591a57"
+      }
+    },
+    "fresh/records/flop-1-candidate.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2042,
+      "sha256": "a406f6dae1e7db3e42b91b342cb397edcc01b587a145f6aaa1ff160f04db1694",
+      "decoded": {
+        "bytes": 7293,
+        "sha256": "7959523ff571d3bc4b3b621430655858ebcf64655fbe06324af0c846b362e274"
+      }
+    },
+    "fresh/records/flop-1-candidate.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 1789,
+      "sha256": "f59ee78e3c53c10201e99620343dc8928a083f13d4b6f531562d88f4ca9e0f0c",
+      "decoded": {
+        "bytes": 14825,
+        "sha256": "89f9dc7976e04aedd3a865da21df40e9e7d8c5a8dcb89410ccd77cd26c103aea"
+      }
+    },
+    "fresh/records/flop-1-candidate.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 33905,
+      "sha256": "8eabebf6935abccc728491b317fd123ec87e67f10571738718dc14036494a754",
+      "decoded": {
+        "bytes": 77585,
+        "sha256": "dd7ecc7de5aa3c872d86ff008ee82816167b71e199b5baa0f87ee2f0f20cda1e"
+      }
+    },
+    "fresh/records/flop-2-baseline.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2032,
+      "sha256": "78fdf795675a676d1e1464448b348c17874c805846baf947755de95a79677c9c",
+      "decoded": {
+        "bytes": 7284,
+        "sha256": "860f0792908e439b97c826479a49108b0f19707ef24c1b0e392bb0e228239dcd"
+      }
+    },
+    "fresh/records/flop-2-baseline.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 1800,
+      "sha256": "5043f97ea013a17057356894a6cba9e3ebbad68a5e8358c4c750a86741c22198",
+      "decoded": {
+        "bytes": 14460,
+        "sha256": "d14b3606b46913e02da25bd4f926297edebefce41b487f985a8d3818b18c0dc3"
+      }
+    },
+    "fresh/records/flop-2-baseline.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 33904,
+      "sha256": "263e3da37b0c1cce8835550e33ed5b53eaeff78b2b38147a79adbe132f451b23",
+      "decoded": {
+        "bytes": 77585,
+        "sha256": "e5c4adfce5fea93e29f9e5c57213273ed0547e2b7973ee2842b74e3aa50668c0"
+      }
+    },
+    "fresh/records/flop-2-candidate.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2041,
+      "sha256": "1ac1640e44c9a3462adf959e139a8d01725e853cbdfea69e2148e4b67ef21978",
+      "decoded": {
+        "bytes": 7294,
+        "sha256": "136a652b09034f509e13b896ceb7729d6bed1da1409044c3721bdc19b3a986f4"
+      }
+    },
+    "fresh/records/flop-2-candidate.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 1728,
+      "sha256": "7e6294ec455a712406532191436fb0ad25e702780444511f09ed7aada82365dc",
+      "decoded": {
+        "bytes": 14068,
+        "sha256": "d1c3431990611d36aa07703acf011e7c594e83959a4fd67968bc74e64b276dfb"
+      }
+    },
+    "fresh/records/flop-2-candidate.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 33906,
+      "sha256": "f2b846a8de2711105acd42a37fdb938eeb3e1d8f46ec012ea43d85dc613330c1",
+      "decoded": {
+        "bytes": 77585,
+        "sha256": "417f34e32132c066cbd52f3d7ba9d5e5fceeb3adb052eda7346c9716f94a9546"
+      }
+    },
+    "fresh/records/flop-3-baseline.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2042,
+      "sha256": "f562f58da3ff5323413fe8a992538dc3215131907ac00796b07786c199a36a7d",
+      "decoded": {
+        "bytes": 7284,
+        "sha256": "b1a793af6b88723043231fa33d3182811df220246e2e4020acd353c752899691"
+      }
+    },
+    "fresh/records/flop-3-baseline.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 1851,
+      "sha256": "8471ba2d92640c206d8b39704961637f658cbccc3a1abc2b04aa107887361c04",
+      "decoded": {
+        "bytes": 14828,
+        "sha256": "fc67dafd4772a2e9ce307df6e6afe021945db184b2bb601618613d419f243d57"
+      }
+    },
+    "fresh/records/flop-3-baseline.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 33902,
+      "sha256": "c1ae63f0a1dd223615000b802abee7db8a896c97729cd8d601ad8e908272c6e3",
+      "decoded": {
+        "bytes": 77585,
+        "sha256": "666bc0250b594d9f46963a0cd8795c901e3dd3a8faaeb00462d5d4c81aca36f3"
+      }
+    },
+    "fresh/records/flop-3-candidate.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2039,
+      "sha256": "c7c80c4c40bbb1e8b1349e3d7bd1701f68c66852c963735292f6ca2e05f7367b",
+      "decoded": {
+        "bytes": 7295,
+        "sha256": "97628ee9b942ab04472f425e56254e37c3d4a41fa84dc933a36b42bb7f8a15f8"
+      }
+    },
+    "fresh/records/flop-3-candidate.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 1672,
+      "sha256": "6711a77d1174181c3e8a42de3b015a63169f76da0ad7d825185af0ce1d0e6c14",
+      "decoded": {
+        "bytes": 13741,
+        "sha256": "d7616096adc18d7245ebe3875051e06ac5e443d220e525836768182661534551"
+      }
+    },
+    "fresh/records/flop-3-candidate.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 33907,
+      "sha256": "99c66380cbcc3bc9e1b496f25496ece8db1af53ca3698a0e443a55f71738bc4d",
+      "decoded": {
+        "bytes": 77585,
+        "sha256": "802facc8ff58fe81e7604d9659269a8a8487c9369df067939e7c9b312c6a08e7"
+      }
+    },
+    "fresh/records/formats-tests-cleanup-confirmation.json.gz": {
+      "encoding": "gzip",
+      "bytes": 23814,
+      "sha256": "305db24ada3d9de32d93e40bf1ab67d783976a4317a2d5eb658f8c029e5c2c5f",
+      "decoded": {
+        "bytes": 98115,
+        "sha256": "344a83e3563dd5d534ccc5bb1aa626790add1188771d66795fd12c25fe4ae929"
+      }
+    },
+    "fresh/records/formats-tests-cleanup-confirmation.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 2177,
+      "sha256": "cee15aabf4b7f6346140fca1cdbf64ccde41150511f56089849b07db4c91b0d0",
+      "decoded": {
+        "bytes": 22715,
+        "sha256": "588f5f2ae7d1c30afcfe6caf3843184096a9e8e111b17abc00faf598c24b0704"
+      }
+    },
+    "fresh/records/formats-tests-cleanup-confirmation.stderr.log.gz": {
+      "encoding": "gzip",
+      "bytes": 259,
+      "sha256": "95a354d6d37a7e60f677d73a79104c88dec0e8ea7043ee42762b4aa04519ab57",
+      "decoded": {
+        "bytes": 529,
+        "sha256": "b0e81bdeb6783017a35f85b8ef58bbc1cc4c60711e6d7092ac480b0b83ecb9a7"
+      }
+    },
+    "fresh/records/formats-tests-cleanup-confirmation.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 1861,
+      "sha256": "c2ab104f03bfc57c318238928d84bf171140cd6f4e2446a2ec3208f2abd8cb5a",
+      "decoded": {
+        "bytes": 6018,
+        "sha256": "c0550d404897ea723c55e3d0f65e4f1416d5eed75a2aada2aa37b49a8dc69587"
+      }
+    },
+    "fresh/records/formats-tests.json.gz": {
+      "encoding": "gzip",
+      "bytes": 23932,
+      "sha256": "e9336b789bf879e1c16be5138a4b4eec8fd421877208f6060c417c2b29cd7f18",
+      "decoded": {
+        "bytes": 98483,
+        "sha256": "fba7e479ae2a5d817e1852c41c0ca91a00feec8b03d90bf6a2f6014f85ef2917"
+      }
+    },
+    "fresh/records/formats-tests.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 13457,
+      "sha256": "7bf605c7c96bc3da49096a4f4683df0524e528212308d4ae52e08bd11579bbf0",
+      "decoded": {
+        "bytes": 173410,
+        "sha256": "fbb82782827920a6cd8b8642471931310f27b533c1790ea8f8d4a0c94fb90b1b"
+      }
+    },
+    "fresh/records/formats-tests.stderr.log.gz": {
+      "encoding": "gzip",
+      "bytes": 295,
+      "sha256": "66d41318ec6b5c25a94ee5cb83a7daca327b4b8bc5943041139b375f357116d1",
+      "decoded": {
+        "bytes": 629,
+        "sha256": "9044a424cd80f9ef1679e7ccef6f5fe2ed4db657e931ded7064f4702753cf7f2"
+      }
+    },
+    "fresh/records/formats-tests.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 1861,
+      "sha256": "df60b06847029108ebb765533bf2a58f286de147cf23899acdc83777dfff9f21",
+      "decoded": {
+        "bytes": 6018,
+        "sha256": "2575c0cbc78a711af70f87427c430eab6786525499a2e69b721d1f9286ea9422"
+      }
+    },
+    "fresh/records/river-1-baseline.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2031,
+      "sha256": "41dd25301cee0f9b4974825517bff121378eee0a4cafc1a4dcb4f8bc84eebe36",
+      "decoded": {
+        "bytes": 7281,
+        "sha256": "d48eca9b37353bf598a4c0dd781853b907b1c06c944016c2ff05a2bb1d51a4e7"
+      }
+    },
+    "fresh/records/river-1-baseline.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 393,
+      "sha256": "244cf2ef21889da29dafb4354d617a017591400f9c20b5ad92a3ce0cd2cc09d7",
+      "decoded": {
+        "bytes": 1400,
+        "sha256": "ee7f8b5649358742a3814399f2a44e6f5d7ea12242f937635e3cfb560e2be2e2"
+      }
+    },
+    "fresh/records/river-1-baseline.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 1197,
+      "sha256": "eac4240e387ea51fb8a5a37945cfce3f84777056c996b6001a05ebea32bd99a5",
+      "decoded": {
+        "bytes": 2207,
+        "sha256": "f5604b368605bcb2b1f1a4b77c75ecf1041e0acbd707189d6d6f93f87cef68dd"
+      }
+    },
+    "fresh/records/river-1-candidate.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2035,
+      "sha256": "d02c4fa9a9ac50b1433f97a22ac9b04ca29801fb6d0f0f56f25eb7c2b743a2f9",
+      "decoded": {
+        "bytes": 7291,
+        "sha256": "b26f7a775670d2004d699c0727e9e4601fffc33692394d99e1582d10f0471068"
+      }
+    },
+    "fresh/records/river-1-candidate.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 350,
+      "sha256": "5668932a00751cd41d01f64a52f1b8d2a1ebbe0de895aee77459c30cd9a307d2",
+      "decoded": {
+        "bytes": 1048,
+        "sha256": "9a15e0e1919f158dc57f576550c55b9d8a7dcdbc149ced472fb5e84fbb07a300"
+      }
+    },
+    "fresh/records/river-1-candidate.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 1197,
+      "sha256": "930e024f1281a5f0e01c5a4ad9bd210d37f4aee9db388ebeb393fc5329befe33",
+      "decoded": {
+        "bytes": 2207,
+        "sha256": "94d6765fbd88086777f273176c47d33e3fcfd3bb6df09132a7e9318668477307"
+      }
+    },
+    "fresh/records/river-2-baseline.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2028,
+      "sha256": "65fb35eb553668fb2a7c99507060446b654e0023cd91af89e109cec7ecd33185",
+      "decoded": {
+        "bytes": 7279,
+        "sha256": "8bab328bf852cbcc5a31bf35abcfbbe74116c83a84b9ad3ab10f496bcce05ea4"
+      }
+    },
+    "fresh/records/river-2-baseline.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 354,
+      "sha256": "b53dedcfe06a762d5d3e9833aeb9057782be63d5d1b95108503ce66f0ac09460",
+      "decoded": {
+        "bytes": 1048,
+        "sha256": "089ae33b1c8f1addecc95af6590966bec0abbef89044fd70022f148975307881"
+      }
+    },
+    "fresh/records/river-2-baseline.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 1197,
+      "sha256": "a734f3af38d96b84ec946f60b481ae2443ecb71028d1f9bae2d647babd85503d",
+      "decoded": {
+        "bytes": 2206,
+        "sha256": "f3f9903c18c9fb5e5a1f85ebc86a0466ae145b10a55b2dc9753891960a43d96c"
+      }
+    },
+    "fresh/records/river-2-candidate.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2034,
+      "sha256": "97b6a1d5222e1f8529792a6513b6f297f6bd6049f601ffb1a23754784ed3fa8e",
+      "decoded": {
+        "bytes": 7291,
+        "sha256": "3bab10e1d3c38b4b55aba8cfd0f0294b20fc7e3aeea42f308096304f185c8618"
+      }
+    },
+    "fresh/records/river-2-candidate.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 360,
+      "sha256": "65df906fdb9d09463d7a393f0cd87acc9d09d0ec6231d0ca885d676db6a31c1b",
+      "decoded": {
+        "bytes": 1050,
+        "sha256": "48700d1a81b1055285dd9d5094aebe0819dcf3d02eddce623cb5636b6c5f06fc"
+      }
+    },
+    "fresh/records/river-2-candidate.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 1197,
+      "sha256": "ad1d15c901cca67d021df4339546d0d3834eaf6b0dbe43bc103f66d63b975a23",
+      "decoded": {
+        "bytes": 2207,
+        "sha256": "6ad15ec218852b6e054f7df65041f781ebff1072bdab05dbffa6f51083aaf73b"
+      }
+    },
+    "fresh/records/river-3-baseline.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2027,
+      "sha256": "8808fedce7039816ebf5f48f4c4ec44b02699bd8ffdf7dd89237d3105c6c4333",
+      "decoded": {
+        "bytes": 7281,
+        "sha256": "b3a1c4b9d952f3fd167d27707e5b860a7d189c41c6ac3a57512508020f1a966b"
+      }
+    },
+    "fresh/records/river-3-baseline.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 360,
+      "sha256": "52dfd20e478263115240a07608945a79803094d6c6f6d538909af3e759f1d43a",
+      "decoded": {
+        "bytes": 1048,
+        "sha256": "3bfd2989f9c95da78e20cd535d6b5856ab992cf19f0a5ade2fd24d5aef569d22"
+      }
+    },
+    "fresh/records/river-3-baseline.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 1198,
+      "sha256": "96b246360c35e70bae401518d8130592a1f877fc14897dc4002134ba175f7a35",
+      "decoded": {
+        "bytes": 2207,
+        "sha256": "80ae3d17aea1d9023b1261b9405246334bcd247025072f13bae75683eea7a32e"
+      }
+    },
+    "fresh/records/river-3-candidate.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2027,
+      "sha256": "665f72f26b4611ce3bfbdf34291c9465ff893741aba7e524b32aeed0be14bb23",
+      "decoded": {
+        "bytes": 7290,
+        "sha256": "3a326447134fafc96a77a20f3f09c16ef8387fbe7ac209a362f684e415f8601a"
+      }
+    },
+    "fresh/records/river-3-candidate.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 353,
+      "sha256": "c2f85c7145eae74944985af738b2635d21f5cbfbf4000c23d3fb5fd06eb564d9",
+      "decoded": {
+        "bytes": 1050,
+        "sha256": "7ff9d0f645118a86f96a1e70403e85745e09cf84704108f598c378160a23f2e6"
+      }
+    },
+    "fresh/records/river-3-candidate.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 1197,
+      "sha256": "8da783fe3768f251365ac22e83e18637c0f034af058804c25be642bb3a72ba7b",
+      "decoded": {
+        "bytes": 2207,
+        "sha256": "250d43a62294a7b6dae5fb4b691906a5c206a699706121dfaddf308263e1abfe"
+      }
+    },
+    "fresh/records/turn-1-baseline.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2036,
+      "sha256": "cf8fcc0166ce1a85d7a7c9745cb903cfa2808a2bee1c868fd461d252c5219a3c",
+      "decoded": {
+        "bytes": 7278,
+        "sha256": "40ca1ddbc34b06f5ee015418a38c3ac5675a2f9ca23dddd49e80165a3d7d4d57"
+      }
+    },
+    "fresh/records/turn-1-baseline.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 494,
+      "sha256": "603b5ef7af3ab1b3c65698a679768b08b155d53ec00624ca06115cac5d478f91",
+      "decoded": {
+        "bytes": 2132,
+        "sha256": "795c4a2dcac3e8a979ad62e51e21050ab2072c27b6416ebd93df68c7ac763b8a"
+      }
+    },
+    "fresh/records/turn-1-baseline.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 2360,
+      "sha256": "4576a66195d7595a5d03188168339d42a4b3afa632e2ca62ff359e77d6464233",
+      "decoded": {
+        "bytes": 4390,
+        "sha256": "fbb6cf438b4336ef5824bba1da2f95962ff5494e86469c253551daecbf5fc48e"
+      }
+    },
+    "fresh/records/turn-1-candidate.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2035,
+      "sha256": "be532bf878b67e22efa78e7cdcc36c97b4bbe07b526a12eb210239b421f2e0e9",
+      "decoded": {
+        "bytes": 7286,
+        "sha256": "9625f68465d17bc002c4963181334b7e14cb612f9e3c19f2b66caf89544382cb"
+      }
+    },
+    "fresh/records/turn-1-candidate.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 489,
+      "sha256": "b907fd0abdcf8eb45d8a0a5805fcde122e52e36e3149c5ba4cad1b79ea008542",
+      "decoded": {
+        "bytes": 2134,
+        "sha256": "8a06b6d8365bc69f6906d62c753415078be2016be944dbbec074d8b01e9e7a1f"
+      }
+    },
+    "fresh/records/turn-1-candidate.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 2360,
+      "sha256": "1ec6262120e62915706e6ccb7cf3719bce879172697b9e2c53dfee934b5a8266",
+      "decoded": {
+        "bytes": 4390,
+        "sha256": "68385d16f325c17a19ef0ade465cd7d80823dd9aef69e8b66fcaf78994b97d51"
+      }
+    },
+    "fresh/records/turn-2-baseline.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2026,
+      "sha256": "d4b75acf2bbf4fb4299adde0f167e72dea2f20d1c01a6e1bf58469ff002be84d",
+      "decoded": {
+        "bytes": 7277,
+        "sha256": "46685b5c501e93cd24a1eb021154b78b6d163f216d3088a351c978434ee107d6"
+      }
+    },
+    "fresh/records/turn-2-baseline.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 533,
+      "sha256": "a1ea9521e932251cca6207817d2771d3670d28388bb8722f7ddb991c040b04a5",
+      "decoded": {
+        "bytes": 2488,
+        "sha256": "e420e4cd73007768a9111259f369030b524acea85702e81e44b0adc1ba7737a5"
+      }
+    },
+    "fresh/records/turn-2-baseline.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 2359,
+      "sha256": "d16b74034a5990dfe1736689fda6b77cf177f6c1e2cf148b9371c50a9fc78eb6",
+      "decoded": {
+        "bytes": 4390,
+        "sha256": "ae7a6bd632026fc97eb1e0f330c5cdc684151c4ff9407da0aade1301297806fc"
+      }
+    },
+    "fresh/records/turn-2-candidate.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2035,
+      "sha256": "f8478e1e17c6376ec5736a1053acebc9a98eaee677a5d4b8d4b7eb6182fcd1f8",
+      "decoded": {
+        "bytes": 7284,
+        "sha256": "981f84cf91c85cfbd9579077293d9ee4acc33a7ad675f4bcf5544354258c112c"
+      }
+    },
+    "fresh/records/turn-2-candidate.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 497,
+      "sha256": "9292cbcc3c93eb8fcd2f3dc1b0f44136a5f4b3ea865c507c933b08ca20df6fdb",
+      "decoded": {
+        "bytes": 2133,
+        "sha256": "12537ed35904da9f18bc38b27b374282bde7e3b035cd126d0d62997346de43e2"
+      }
+    },
+    "fresh/records/turn-2-candidate.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 2360,
+      "sha256": "e3e4ae97f56974b8aed21ffbe6b50b415147e4ae19b2e8ec7ecc10374c952d78",
+      "decoded": {
+        "bytes": 4390,
+        "sha256": "4bf4192e1d0b2ede03053e6c2e096833a4a497e9d9f1a6d6a95e3bdfd966fa0b"
+      }
+    },
+    "fresh/records/turn-3-baseline.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2030,
+      "sha256": "6a93c85be42f004ff27e51545b357ce1469988ceedef7e889ac60e24be11ca87",
+      "decoded": {
+        "bytes": 7276,
+        "sha256": "18a676f6e88eada237238152cdce60b3591b5a76032847899746f4d2194d5c10"
+      }
+    },
+    "fresh/records/turn-3-baseline.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 538,
+      "sha256": "e3986fd7ecfaf299b8b91f24913fe9d0435376f4268b19947e0a16a8bbc9d8cb",
+      "decoded": {
+        "bytes": 2485,
+        "sha256": "b93cfdb1c11a38e043700aee53a8440c0189051fb875c2bd733107af933ddf3c"
+      }
+    },
+    "fresh/records/turn-3-baseline.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 2360,
+      "sha256": "423a4381c36b8680efdf7e7e319275fc9390b95dfb744542af378658ef65ebd7",
+      "decoded": {
+        "bytes": 4390,
+        "sha256": "93597160b0d41685d618d807d291606afe09573d6beb5de20eeb2ffaa8f2c2d0"
+      }
+    },
+    "fresh/records/turn-3-candidate.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2031,
+      "sha256": "8839a36077c9138ced09a8eb4633922f07185ef2289b1e2caa26f6b620c5e494",
+      "decoded": {
+        "bytes": 7285,
+        "sha256": "93bd8cd2d2e2f1b6b6b0e523b2c41f3253885e8cbe17d507e87ac2d4178a624b"
+      }
+    },
+    "fresh/records/turn-3-candidate.samples.jsonl.gz": {
+      "encoding": "gzip",
+      "bytes": 492,
+      "sha256": "47ed18a628f5a8b3aba435d8851b7145e7f687b74ce8365e5ce86b4277bf9328",
+      "decoded": {
+        "bytes": 2133,
+        "sha256": "e81b1d9489ef8686969f093f999574a4397ca3eab278a29c62ca87844fcfa448"
+      }
+    },
+    "fresh/records/turn-3-candidate.stdout.log.gz": {
+      "encoding": "gzip",
+      "bytes": 2360,
+      "sha256": "600ef97b30ecd77852acad6b666e60afa5411062714a425aff784b9d213e96ce",
+      "decoded": {
+        "bytes": 4390,
+        "sha256": "e420659fc123df1481057a29e8b8bb69f12fa6707ac57d531e4b71d9c9887870"
+      }
+    },
+    "fresh/binaries/baseline.exe.gz": {
+      "encoding": "gzip",
+      "bytes": 569409,
+      "sha256": "5c08733c461d04ee5077803fce90526b352e774646a8340d16536c0f934139c7",
+      "decoded": {
+        "bytes": 1739776,
+        "sha256": "3a96b3e7bdf2bddc87949059616081e848234bfd506c523a91b18deedd3082a1"
+      }
+    },
+    "fresh/binaries/candidate.exe.gz": {
+      "encoding": "gzip",
+      "bytes": 569991,
+      "sha256": "eceb972ea36ae3481da18716c8201ad076e0fb54cd631fb42187470632c4136b",
+      "decoded": {
+        "bytes": 1741312,
+        "sha256": "a72382f635a68591781626a93b1dac252bad0561b50ff685aa630fe1e805d78f"
+      }
+    },
+    "fresh/artifacts/flop-1-baseline/canonical.bin.gz": {
+      "encoding": "gzip",
+      "bytes": 390559,
+      "sha256": "5462d82af51b0f4d3fda4d7781fe6cf1c94555082d2266d0694e3ebb97217ead",
+      "decoded": {
+        "bytes": 115060885,
+        "sha256": "88a2db6d80c6ae7747b3ae95f687154fca2102395624a8604dcda54764d13ae8"
+      }
+    },
+    "fresh/artifacts/flop-1-baseline/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 35452,
+      "sha256": "390f48f6bcd15e2d01f6125c4b83e538f35dee2612f1fbe580d122c6ddb35624",
+      "decoded": {
+        "bytes": 149958,
+        "sha256": "193ab5a937456d0237423d1a9b6eb34d34a7d93c244403968f799f797d957637"
+      }
+    },
+    "fresh/artifacts/flop-1-baseline/rewritten.sol.gz": {
+      "encoding": "gzip",
+      "bytes": 75951,
+      "sha256": "f6ced193c24d5881b47e06f7c88e8871ed44196c72a113627fae3d102c058bfd",
+      "decoded": {
+        "bytes": 176833,
+        "sha256": "5f9fc7a35a4a4e034d029844ced6251e1603c9de269b69b6c275ae7034d837f1"
+      }
+    },
+    "fresh/artifacts/flop-1-baseline/root-canonical.bin.gz": {
+      "encoding": "gzip",
+      "bytes": 682,
+      "sha256": "0a2c432cdc3bfef01a6afd3ac70fa9e80b5aa1f9b5c40ac6c1a07c728cf94937",
+      "decoded": {
+        "bytes": 11473,
+        "sha256": "49c3eed4901f5cf2d322dcfb28148c55c19861ddf89897ff72b7df9717840978"
+      }
+    },
+    "fresh/artifacts/flop-1-candidate/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 35455,
+      "sha256": "9f32084885d16f907b956a8c495095f5ecbd7c6b2c701496b2ebb194cce88d14",
+      "decoded": {
+        "bytes": 149958,
+        "sha256": "7c73ee464ecee3158f939ac59630cf42634f722142fcba98170e465dff258aae"
+      }
+    },
+    "fresh/artifacts/flop-2-baseline/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 35452,
+      "sha256": "321b78c554c02621afc954e800090aea65032f913a9b4a646f6af57320959e62",
+      "decoded": {
+        "bytes": 149958,
+        "sha256": "15700cf82b0d9979ed2d8e9d40496267df14dd6229a5469a6318aa7406e495cf"
+      }
+    },
+    "fresh/artifacts/flop-2-candidate/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 35449,
+      "sha256": "6722f5261df82ac6c8af0cf12df0262b76da207113ff9d352713a3b9e257872e",
+      "decoded": {
+        "bytes": 149958,
+        "sha256": "1088afb7c8afa63a723fa488e2dc62f237e4b9983717c356f58e915714e51e97"
+      }
+    },
+    "fresh/artifacts/flop-3-baseline/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 35453,
+      "sha256": "059430c3945710e394d9385118c101a5d9b6d1c57d93d3e76f74fb3d5017479b",
+      "decoded": {
+        "bytes": 149958,
+        "sha256": "7912115a4840cb05f3082ef7e723e00f104587b1b3bac0b32ae6db99993663b2"
+      }
+    },
+    "fresh/artifacts/flop-3-candidate/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 35454,
+      "sha256": "9e560dc78412226d9c10cd1dd2f3e2f7feaccc203adc7e954e61ed05d8c47d2f",
+      "decoded": {
+        "bytes": 149958,
+        "sha256": "f9360e4ae69688fa2325575c37f5d8e7910c39e1c710d1c122f33cc691d8c5a7"
+      }
+    },
+    "fresh/artifacts/river-1-baseline/canonical.bin.gz": {
+      "encoding": "gzip",
+      "bytes": 6985,
+      "sha256": "0cc58cab715dac6dfbe89b9d775c293290e42d759075bd0309b3594319dd1c31",
+      "decoded": {
+        "bytes": 123087,
+        "sha256": "0c061cbe6415c5f4ce76b49b972653ff7471d6268541de85a24462eff2f0ed03"
+      }
+    },
+    "fresh/artifacts/river-1-baseline/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 1253,
+      "sha256": "472bf1abf71f7605187aa53c4ad24c4ea355848d6485f130a42b53e5cdd41cb2",
+      "decoded": {
+        "bytes": 2580,
+        "sha256": "1874837d2437d37d230d88335a4995effd87d2f6688a9529482ac9502368e3af"
+      }
+    },
+    "fresh/artifacts/river-1-baseline/rewritten.sol.gz": {
+      "encoding": "gzip",
+      "bytes": 7632,
+      "sha256": "4965c78e9c575e2fc44db4616b26d5492ec9a7bc69b3867f218691634eb81cdf",
+      "decoded": {
+        "bytes": 7609,
+        "sha256": "fc67f0f78c888bd163c62e9cc3625e7c00a18c7c5c468a075e226ed5ada669cc"
+      }
+    },
+    "fresh/artifacts/river-1-baseline/root-canonical.bin.gz": {
+      "encoding": "gzip",
+      "bytes": 1882,
+      "sha256": "823228cdaef4342fc4e6337376d3d8a3356c4b59e74138b333b5a2192c98d038",
+      "decoded": {
+        "bytes": 14103,
+        "sha256": "4400eb97c875dee71522bdb49c065f985ae0aadee28342da3452a5b612db13ef"
+      }
+    },
+    "fresh/artifacts/river-1-candidate/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 1254,
+      "sha256": "ec99aee0f2c4112ec336b228a9c67176a647af099f6b57471e5cba292ff4b414",
+      "decoded": {
+        "bytes": 2580,
+        "sha256": "3e826b5dc9f2ed9faa1cf6fd8fbed1053188786f74d93fd114a67894b9679f14"
+      }
+    },
+    "fresh/artifacts/river-2-baseline/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 1252,
+      "sha256": "a9f2e11f78c5b84f210e82eda4e94c71d9a4f9e5b06179ea37c25f60786f268a",
+      "decoded": {
+        "bytes": 2579,
+        "sha256": "1b2b7cedfe66841525b648b846da5411f2b1b2cfe3d8c26b861a7587f601ba62"
+      }
+    },
+    "fresh/artifacts/river-2-candidate/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 1254,
+      "sha256": "89074cf662ace9ae148675345a92154778eb898cf717aeabc59ae6e0d0c7a784",
+      "decoded": {
+        "bytes": 2580,
+        "sha256": "b5f5e69a122db8f32e09c7c3380d36a5dbce842a3acc81540169e167a1f75d1f"
+      }
+    },
+    "fresh/artifacts/river-3-baseline/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 1253,
+      "sha256": "d623cf0bd19626505922e4327e6f70a21478f80c5a2b553981ff1cc9217bc434",
+      "decoded": {
+        "bytes": 2580,
+        "sha256": "457cc56bb647a9b368b6d3427ba86f6ee2f759d5e1e00e3e5bd8228a8b41ad6d"
+      }
+    },
+    "fresh/artifacts/river-3-candidate/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 1254,
+      "sha256": "04b57485763584cc8e72f27d89e783df2d63ef5bbac2c808fc43f47057d75f4b",
+      "decoded": {
+        "bytes": 2580,
+        "sha256": "cc2d5fd62fd72ecee1813651af362d5b86bc9aa3661030f2d6a42abaf124ac18"
+      }
+    },
+    "fresh/artifacts/turn-1-baseline/canonical.bin.gz": {
+      "encoding": "gzip",
+      "bytes": 40103,
+      "sha256": "c4b5f88de7a899078cbe3143f77633ec2eac6d0f5885d5b6b48c343038b0e575",
+      "decoded": {
+        "bytes": 6169677,
+        "sha256": "80c781bfb14687d001e0a3c64fe927825349d798dd8bdf7200ab78176fbb8614"
+      }
+    },
+    "fresh/artifacts/turn-1-baseline/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2558,
+      "sha256": "fd120e23af8654b37a657baa8cf42e6e241cc9c92dcd5464210c609079a2b4c7",
+      "decoded": {
+        "bytes": 7613,
+        "sha256": "66c92aa0636b847f573d5891c8933db90afde44eb789accbd2c43e91a78b5852"
+      }
+    },
+    "fresh/artifacts/turn-1-baseline/rewritten.sol.gz": {
+      "encoding": "gzip",
+      "bytes": 23181,
+      "sha256": "87a9d461f74ac91721e3c250c8cb3a460595f65456545866044d64e624fee072",
+      "decoded": {
+        "bytes": 24920,
+        "sha256": "ee55a97544c793f2770893b12019a990649b564dfb2bf14e2b08a1ab7a0bcc2a"
+      }
+    },
+    "fresh/artifacts/turn-1-baseline/root-canonical.bin.gz": {
+      "encoding": "gzip",
+      "bytes": 757,
+      "sha256": "eeb6004b848d7c3856eb6b8c81bd12b914d3419e0aae658ee168336de097df15",
+      "decoded": {
+        "bytes": 11433,
+        "sha256": "e92c66f9f80fe7738f441ab68fdc029a43301e5a1079a4a676d35e80da61acfb"
+      }
+    },
+    "fresh/artifacts/turn-1-candidate/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2558,
+      "sha256": "6b1a0787e759668d1db123cd6131fc5d74c960ca84b4fbea039d7a4ad3332ce5",
+      "decoded": {
+        "bytes": 7613,
+        "sha256": "302a2779ec899296bd1cdd0c0975e16d919215334f42f9c8bd0e9d08f5aea28b"
+      }
+    },
+    "fresh/artifacts/turn-2-baseline/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2559,
+      "sha256": "c4bb0eb6db94ca3f09e66a369d0a0f4f86ae26a3d3b90fe869ef30adfcf43adb",
+      "decoded": {
+        "bytes": 7613,
+        "sha256": "24b65a846dea4aadb18614d45bb27fcd851e6e0a543485446651248f9e7d6ac6"
+      }
+    },
+    "fresh/artifacts/turn-2-candidate/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2558,
+      "sha256": "aec3049f3c9ac3350700b688707696440593c709f2da4b5e3cf02ea790b93817",
+      "decoded": {
+        "bytes": 7613,
+        "sha256": "038d0bdceffe2a9dc648f94a8da83f76502e3ae8d26b2711465cb0b699e6c524"
+      }
+    },
+    "fresh/artifacts/turn-3-baseline/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2558,
+      "sha256": "9a78265911381b9785158aad01ab7ec282e0de9a592289bf68bb4f174a4a3f79",
+      "decoded": {
+        "bytes": 7613,
+        "sha256": "9fc53f88fadf633222b74be2cc9a79f215c42950f19a8a935ed64dcac5dbe265"
+      }
+    },
+    "fresh/artifacts/turn-3-candidate/result.json.gz": {
+      "encoding": "gzip",
+      "bytes": 2559,
+      "sha256": "1f346777e5a767baaa4d4624ca84238dfbbaf33735440ccdc2c6740c4bef7b5c",
+      "decoded": {
+        "bytes": 7613,
+        "sha256": "f4ac64fa3a452e3f73e0e3d800205e961451a7b76f3dc30bd6bb34b88ab16d6a"
+      }
+    },
+    "source/r1-context-reuse-source.json.gz": {
+      "encoding": "gzip",
+      "bytes": 11585,
+      "sha256": "ad4d002808ca62e62c110e24b96170eb9cb18e03dc7d8f06f87bf3b15a7cc2c4",
+      "decoded": {
+        "bytes": 62186,
+        "sha256": "3ee753aec3a844779d86073eddd0713211264f2ee1ee6fb75e0576cde918a1dd"
+      }
+    },
+    "source/context-reuse.patch.gz": {
+      "encoding": "gzip",
+      "bytes": 1887,
+      "sha256": "aa490b825a3c8d3c8a6b8865ad8ebc411836584f1b3780db62133a4705ad3d90",
+      "decoded": {
+        "bytes": 5089,
+        "sha256": "1920fd96093d22456e306e058d14e3757d5d245c1e0721c896b725af76b86d40"
+      }
+    },
+    "source/original-source-pins.json.gz": {
+      "encoding": "gzip",
+      "bytes": 20699,
+      "sha256": "48a2a48ab37e9d3fd9f1878a2eb607bfed460d885bd61c3fbfa94b0bbb8e1a5e",
+      "decoded": {
+        "bytes": 67017,
+        "sha256": "2a78141bfe7694957ec09689843bd0231f470b327e9933552d53fe7c52de1292"
+      }
+    },
+    "tools/run_supervised.py.gz": {
+      "encoding": "gzip",
+      "bytes": 10395,
+      "sha256": "c19fd361c87ce8fd44d2c3dce06a0945e79d64d2318a9bd1a8e8ebcd4911df79",
+      "decoded": {
+        "bytes": 39015,
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      }
+    },
+    "inputs/selection.json.gz": {
+      "encoding": "gzip",
+      "bytes": 608,
+      "sha256": "4289b610e803d19d139d203602d4341edb5bd88bca660c5419f28d43c636a593",
+      "decoded": {
+        "bytes": 1257,
+        "sha256": "32fb23b2178fc86f61a05a10638abe84ef0406d0b4b7084bc04c22a04b05710b"
+      }
+    },
+    "source/candidate-sol_indexed.rs.gz": {
+      "encoding": "gzip",
+      "bytes": 6123,
+      "sha256": "be466c63e1debce2781bd2b46f7de28c92e47a7528bbf03e4f575b12c05926dc",
+      "decoded": {
+        "bytes": 22317,
+        "sha256": "f72cf37b2bbf40ea89dcc3e4030e3f9ee4585eb9ec4e4e7546e53fa3e64cac38"
+      }
+    }
+  },
+  "originals": {
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\run-diagnostic.py": "invalid-shared/run-diagnostic.py.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\diagnostic-plan.json": "invalid-shared/diagnostic-plan.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\diagnostic-result.json": "invalid-shared/diagnostic-result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\run-fresh.py": "fresh/run-fresh.py.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\records\\build-baseline.json": "invalid-shared/records/build-baseline.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\records\\build-baseline.samples.jsonl": "invalid-shared/records/build-baseline.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\records\\build-baseline.stderr.log": "invalid-shared/records/build-baseline.stderr.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\records\\build-baseline.stdout.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\records\\build-candidate.json": "invalid-shared/records/build-candidate.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\records\\build-candidate.samples.jsonl": "invalid-shared/records/build-candidate.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\records\\build-candidate.stderr.log": "invalid-shared/records/build-candidate.stderr.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\records\\build-candidate.stdout.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\binaries\\baseline.exe": "invalid-shared/binaries/baseline.exe.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\plan.json": "fresh/plan.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\result.json": "fresh/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-baseline-cleanup-confirmation.json": "fresh/records/build-baseline-cleanup-confirmation.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-baseline-cleanup-confirmation.samples.jsonl": "fresh/records/build-baseline-cleanup-confirmation.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-baseline-cleanup-confirmation.stderr.log": "fresh/records/build-baseline-cleanup-confirmation.stderr.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-baseline-cleanup-confirmation.stdout.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-baseline.json": "fresh/records/build-baseline.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-baseline.samples.jsonl": "fresh/records/build-baseline.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-baseline.stderr.log": "fresh/records/build-baseline.stderr.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-baseline.stdout.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-candidate-cleanup-confirmation.json": "fresh/records/build-candidate-cleanup-confirmation.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-candidate-cleanup-confirmation.samples.jsonl": "fresh/records/build-candidate-cleanup-confirmation.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-candidate-cleanup-confirmation.stderr.log": "fresh/records/build-candidate-cleanup-confirmation.stderr.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-candidate-cleanup-confirmation.stdout.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-candidate.json": "fresh/records/build-candidate.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-candidate.samples.jsonl": "fresh/records/build-candidate.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-candidate.stderr.log": "fresh/records/build-candidate.stderr.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\build-candidate.stdout.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-1-baseline.json": "fresh/records/flop-1-baseline.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-1-baseline.samples.jsonl": "fresh/records/flop-1-baseline.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-1-baseline.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-1-baseline.stdout.log": "fresh/records/flop-1-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-1-candidate.json": "fresh/records/flop-1-candidate.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-1-candidate.samples.jsonl": "fresh/records/flop-1-candidate.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-1-candidate.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-1-candidate.stdout.log": "fresh/records/flop-1-candidate.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-2-baseline.json": "fresh/records/flop-2-baseline.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-2-baseline.samples.jsonl": "fresh/records/flop-2-baseline.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-2-baseline.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-2-baseline.stdout.log": "fresh/records/flop-2-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-2-candidate.json": "fresh/records/flop-2-candidate.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-2-candidate.samples.jsonl": "fresh/records/flop-2-candidate.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-2-candidate.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-2-candidate.stdout.log": "fresh/records/flop-2-candidate.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-3-baseline.json": "fresh/records/flop-3-baseline.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-3-baseline.samples.jsonl": "fresh/records/flop-3-baseline.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-3-baseline.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-3-baseline.stdout.log": "fresh/records/flop-3-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-3-candidate.json": "fresh/records/flop-3-candidate.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-3-candidate.samples.jsonl": "fresh/records/flop-3-candidate.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-3-candidate.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\flop-3-candidate.stdout.log": "fresh/records/flop-3-candidate.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\formats-tests-cleanup-confirmation.json": "fresh/records/formats-tests-cleanup-confirmation.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\formats-tests-cleanup-confirmation.samples.jsonl": "fresh/records/formats-tests-cleanup-confirmation.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\formats-tests-cleanup-confirmation.stderr.log": "fresh/records/formats-tests-cleanup-confirmation.stderr.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\formats-tests-cleanup-confirmation.stdout.log": "fresh/records/formats-tests-cleanup-confirmation.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\formats-tests.json": "fresh/records/formats-tests.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\formats-tests.samples.jsonl": "fresh/records/formats-tests.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\formats-tests.stderr.log": "fresh/records/formats-tests.stderr.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\formats-tests.stdout.log": "fresh/records/formats-tests.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-1-baseline.json": "fresh/records/river-1-baseline.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-1-baseline.samples.jsonl": "fresh/records/river-1-baseline.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-1-baseline.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-1-baseline.stdout.log": "fresh/records/river-1-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-1-candidate.json": "fresh/records/river-1-candidate.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-1-candidate.samples.jsonl": "fresh/records/river-1-candidate.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-1-candidate.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-1-candidate.stdout.log": "fresh/records/river-1-candidate.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-2-baseline.json": "fresh/records/river-2-baseline.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-2-baseline.samples.jsonl": "fresh/records/river-2-baseline.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-2-baseline.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-2-baseline.stdout.log": "fresh/records/river-2-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-2-candidate.json": "fresh/records/river-2-candidate.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-2-candidate.samples.jsonl": "fresh/records/river-2-candidate.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-2-candidate.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-2-candidate.stdout.log": "fresh/records/river-2-candidate.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-3-baseline.json": "fresh/records/river-3-baseline.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-3-baseline.samples.jsonl": "fresh/records/river-3-baseline.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-3-baseline.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-3-baseline.stdout.log": "fresh/records/river-3-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-3-candidate.json": "fresh/records/river-3-candidate.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-3-candidate.samples.jsonl": "fresh/records/river-3-candidate.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-3-candidate.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\river-3-candidate.stdout.log": "fresh/records/river-3-candidate.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-1-baseline.json": "fresh/records/turn-1-baseline.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-1-baseline.samples.jsonl": "fresh/records/turn-1-baseline.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-1-baseline.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-1-baseline.stdout.log": "fresh/records/turn-1-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-1-candidate.json": "fresh/records/turn-1-candidate.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-1-candidate.samples.jsonl": "fresh/records/turn-1-candidate.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-1-candidate.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-1-candidate.stdout.log": "fresh/records/turn-1-candidate.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-2-baseline.json": "fresh/records/turn-2-baseline.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-2-baseline.samples.jsonl": "fresh/records/turn-2-baseline.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-2-baseline.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-2-baseline.stdout.log": "fresh/records/turn-2-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-2-candidate.json": "fresh/records/turn-2-candidate.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-2-candidate.samples.jsonl": "fresh/records/turn-2-candidate.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-2-candidate.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-2-candidate.stdout.log": "fresh/records/turn-2-candidate.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-3-baseline.json": "fresh/records/turn-3-baseline.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-3-baseline.samples.jsonl": "fresh/records/turn-3-baseline.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-3-baseline.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-3-baseline.stdout.log": "fresh/records/turn-3-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-3-candidate.json": "fresh/records/turn-3-candidate.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-3-candidate.samples.jsonl": "fresh/records/turn-3-candidate.samples.jsonl.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-3-candidate.stderr.log": "invalid-shared/records/build-baseline.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\records\\turn-3-candidate.stdout.log": "fresh/records/turn-3-candidate.stdout.log.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\binaries\\baseline.exe": "fresh/binaries/baseline.exe.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\binaries\\candidate.exe": "fresh/binaries/candidate.exe.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-1-baseline\\canonical.bin": "fresh/artifacts/flop-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-1-baseline\\result.json": "fresh/artifacts/flop-1-baseline/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-1-baseline\\rewritten.sol": "fresh/artifacts/flop-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-1-baseline\\root-canonical.bin": "fresh/artifacts/flop-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-1-candidate\\canonical.bin": "fresh/artifacts/flop-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-1-candidate\\result.json": "fresh/artifacts/flop-1-candidate/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-1-candidate\\rewritten.sol": "fresh/artifacts/flop-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-1-candidate\\root-canonical.bin": "fresh/artifacts/flop-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-2-baseline\\canonical.bin": "fresh/artifacts/flop-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-2-baseline\\result.json": "fresh/artifacts/flop-2-baseline/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-2-baseline\\rewritten.sol": "fresh/artifacts/flop-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-2-baseline\\root-canonical.bin": "fresh/artifacts/flop-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-2-candidate\\canonical.bin": "fresh/artifacts/flop-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-2-candidate\\result.json": "fresh/artifacts/flop-2-candidate/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-2-candidate\\rewritten.sol": "fresh/artifacts/flop-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-2-candidate\\root-canonical.bin": "fresh/artifacts/flop-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-3-baseline\\canonical.bin": "fresh/artifacts/flop-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-3-baseline\\result.json": "fresh/artifacts/flop-3-baseline/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-3-baseline\\rewritten.sol": "fresh/artifacts/flop-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-3-baseline\\root-canonical.bin": "fresh/artifacts/flop-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-3-candidate\\canonical.bin": "fresh/artifacts/flop-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-3-candidate\\result.json": "fresh/artifacts/flop-3-candidate/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-3-candidate\\rewritten.sol": "fresh/artifacts/flop-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\flop-3-candidate\\root-canonical.bin": "fresh/artifacts/flop-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-1-baseline\\canonical.bin": "fresh/artifacts/river-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-1-baseline\\result.json": "fresh/artifacts/river-1-baseline/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-1-baseline\\rewritten.sol": "fresh/artifacts/river-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-1-baseline\\root-canonical.bin": "fresh/artifacts/river-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-1-candidate\\canonical.bin": "fresh/artifacts/river-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-1-candidate\\result.json": "fresh/artifacts/river-1-candidate/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-1-candidate\\rewritten.sol": "fresh/artifacts/river-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-1-candidate\\root-canonical.bin": "fresh/artifacts/river-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-2-baseline\\canonical.bin": "fresh/artifacts/river-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-2-baseline\\result.json": "fresh/artifacts/river-2-baseline/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-2-baseline\\rewritten.sol": "fresh/artifacts/river-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-2-baseline\\root-canonical.bin": "fresh/artifacts/river-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-2-candidate\\canonical.bin": "fresh/artifacts/river-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-2-candidate\\result.json": "fresh/artifacts/river-2-candidate/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-2-candidate\\rewritten.sol": "fresh/artifacts/river-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-2-candidate\\root-canonical.bin": "fresh/artifacts/river-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-3-baseline\\canonical.bin": "fresh/artifacts/river-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-3-baseline\\result.json": "fresh/artifacts/river-3-baseline/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-3-baseline\\rewritten.sol": "fresh/artifacts/river-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-3-baseline\\root-canonical.bin": "fresh/artifacts/river-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-3-candidate\\canonical.bin": "fresh/artifacts/river-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-3-candidate\\result.json": "fresh/artifacts/river-3-candidate/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-3-candidate\\rewritten.sol": "fresh/artifacts/river-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\river-3-candidate\\root-canonical.bin": "fresh/artifacts/river-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-1-baseline\\canonical.bin": "fresh/artifacts/turn-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-1-baseline\\result.json": "fresh/artifacts/turn-1-baseline/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-1-baseline\\rewritten.sol": "fresh/artifacts/turn-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-1-baseline\\root-canonical.bin": "fresh/artifacts/turn-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-1-candidate\\canonical.bin": "fresh/artifacts/turn-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-1-candidate\\result.json": "fresh/artifacts/turn-1-candidate/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-1-candidate\\rewritten.sol": "fresh/artifacts/turn-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-1-candidate\\root-canonical.bin": "fresh/artifacts/turn-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-2-baseline\\canonical.bin": "fresh/artifacts/turn-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-2-baseline\\result.json": "fresh/artifacts/turn-2-baseline/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-2-baseline\\rewritten.sol": "fresh/artifacts/turn-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-2-baseline\\root-canonical.bin": "fresh/artifacts/turn-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-2-candidate\\canonical.bin": "fresh/artifacts/turn-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-2-candidate\\result.json": "fresh/artifacts/turn-2-candidate/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-2-candidate\\rewritten.sol": "fresh/artifacts/turn-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-2-candidate\\root-canonical.bin": "fresh/artifacts/turn-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-3-baseline\\canonical.bin": "fresh/artifacts/turn-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-3-baseline\\result.json": "fresh/artifacts/turn-3-baseline/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-3-baseline\\rewritten.sol": "fresh/artifacts/turn-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-3-baseline\\root-canonical.bin": "fresh/artifacts/turn-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-3-candidate\\canonical.bin": "fresh/artifacts/turn-1-baseline/canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-3-candidate\\result.json": "fresh/artifacts/turn-3-candidate/result.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-3-candidate\\rewritten.sol": "fresh/artifacts/turn-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\fresh\\samples\\turn-3-candidate\\root-canonical.bin": "fresh/artifacts/turn-1-baseline/root-canonical.bin.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\inputs\\flop.sol": "fresh/artifacts/flop-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\inputs\\river.sol": "fresh/artifacts/river-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\inputs\\turn.sol": "fresh/artifacts/turn-1-baseline/rewritten.sol.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\source\\r1-context-reuse-source.json": "source/r1-context-reuse-source.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\source\\context-reuse.patch": "source/context-reuse.patch.gz",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\codec\\write-phases\\source-pins.json": "source/original-source-pins.json.gz",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py": "tools/run_supervised.py.gz",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\codec\\inputs.json": "inputs/selection.json.gz",
+    "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\source\\crates\\formats\\src\\sol_indexed.rs": "source/candidate-sol_indexed.rs.gz"
+  },
+  "scope": "Windows debug local diagnostic with fresh distinct targets, 18 fixed samples. Earlier shared-target trial invalid; no performance certification or R1 acceptance.",
+  "failed_shared_attempt": {
+    "no_tests_or_samples": true,
+    "frozen_binaries": [
+      "baseline.exe"
+    ],
+    "records": [
+      "build-baseline.json",
+      "build-candidate.json"
+    ]
+  },
+  "counts": {
+    "fresh_stages": 24,
+    "fresh_samples": 18,
+    "input_files": 3
+  },
+  "source_git": {
+    "revision": "2fecc099b9911511a0938fb2700bbb124bc1046e",
+    "source_manifest": "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\source\\r1-context-reuse-source.json",
+    "baseline_root": "E:\\codex-work\\solvers\\r1-writer-smoke-20260926\\candidate-original",
+    "candidate_root": "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\source",
+    "source_files": 197,
+    "changed_files": [
+      "crates/formats/src/sol_indexed.rs"
+    ],
+    "scope": "Offline verification reads the immutable Git base revision in this repository, overlays the retained candidate file, and checks all before/after pins. Requires this Git history; no checkout, build or network."
+  }
+}
