@@ -1,0 +1,60 @@
+{
+  "created_utc": "2026-09-26T01:26:26.993046+00:00",
+  "sources": {
+    "candidate": {
+      "root": "/opt/r1/vm08/source-candidate",
+      "revision": "d3bbb2766e2e63d0f065f055eef1bac77016f377",
+      "manifest": "/opt/r1/vm08/packs/source-candidate-manifest.json",
+      "archive": "/opt/r1/vm08/packs/source-candidate.tar.gz"
+    },
+    "bulk": {
+      "root": "/opt/r1/vm08/source-bulk",
+      "revision": "d3bbb2766e2e63d0f065f055eef1bac77016f377",
+      "manifest": "/opt/r1/vm08/packs/source-bulk-manifest.json",
+      "archive": "/opt/r1/vm08/packs/source-bulk.tar.gz"
+    },
+    "legacy": {
+      "root": "/opt/r1/vm08/source-legacy",
+      "revision": "88ffa5dd4583e5c8bae84e20e9b8390cb719e4f0",
+      "manifest": "/opt/r1/vm08/packs/source-legacy-manifest.json",
+      "archive": "/opt/r1/vm08/packs/source-legacy.tar.gz"
+    }
+  },
+  "input_files": {
+    "river.sol": {
+      "bytes": 7609,
+      "sha256": "fc67f0f78c888bd163c62e9cc3625e7c00a18c7c5c468a075e226ed5ada669cc"
+    },
+    "turn.sol": {
+      "bytes": 24920,
+      "sha256": "ee55a97544c793f2770893b12019a990649b564dfb2bf14e2b08a1ab7a0bcc2a"
+    },
+    "flop.sol": {
+      "bytes": 176833,
+      "sha256": "5f9fc7a35a4a4e034d029844ced6251e1603c9de269b69b6c275ae7034d837f1"
+    }
+  },
+  "boot_id": "ec1e2ee2-ab43-4ae0-b342-e656914bb92a",
+  "setup_script": {
+    "bytes": 4356,
+    "sha256": "6622d2b512454ef1eb51337bd8c2d521364af366bdfd7e655497495e235f6ba3"
+  },
+  "uploaded_archives": {
+    "inputs.tar.gz": {
+      "bytes": 107145,
+      "sha256": "33d4b0a2a80e276e36743f985fe06241bfcbb7f086b4aa4b1f722dedcb18d341"
+    },
+    "source-bulk.tar.gz": {
+      "bytes": 1292524,
+      "sha256": "765eff53e2be67680154493861af5920f4aa04ebc915ec2b0d2f9969d2da8fb6"
+    },
+    "source-legacy.tar.gz": {
+      "bytes": 1224905,
+      "sha256": "c52ff71b1149e8abc81184523e8eb8bc9314842969621880bb315f80ef0d842f"
+    },
+    "source-candidate.tar.gz": {
+      "bytes": 1294540,
+      "sha256": "b8cdd91a964640015d9845d8e973bf4d24aa3bced580b99cfadb3086e043a50a"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "schema": "r1.context-linux-protocol/v1",
+  "scope": "New prospective same-host release stream-write comparison; not the historical instrumented 126-process experiment, solver-quality certification, or R1 acceptance.",
+  "arms": ["candidate", "bulk", "legacy"],
+  "revisions": {"bulk": "d3bbb2766e2e63d0f065f055eef1bac77016f377", "legacy": "88ffa5dd4583e5c8bae84e20e9b8390cb719e4f0"},
+  "candidate_writer": {"bytes": 26229, "sha256": "f7c4488d81b619cd7a22f627b592148908ca6d359dfceaa2722876b5835b2f1f"},
+  "example": {"bytes": 9370, "sha256": "ed972ffce351fcd31dfbab74771a06a059ef0edb43e44d65397e65f9a85cbcea"},
+  "inputs": {
+    "river": {"bytes": 7609, "sha256": "fc67f0f78c888bd163c62e9cc3625e7c00a18c7c5c468a075e226ed5ada669cc"},
+    "turn": {"bytes": 24920, "sha256": "ee55a97544c793f2770893b12019a990649b564dfb2bf14e2b08a1ab7a0bcc2a"},
+    "flop": {"bytes": 176833, "sha256": "5f9fc7a35a4a4e034d029844ced6251e1603c9de269b69b6c275ae7034d837f1"}
+  },
+  "operation": "stream-write",
+  "iterations": 1,
+  "warmups_per_case_arm": 1,
+  "measured_blocks_per_case": 7,
+  "seed": 20260926,
+  "order": "Per case: one warmup for each arm; seven measured blocks contain all six permutations once plus one cyclic extra permutation, then seeded shuffle. The extra rotates across River/Turn/Flop. Per-case position counts are 2/2/3; across all cases every arm occupies every position seven times.",
+  "cache_policy": "Input SHA-256 before each invocation, plus example BLAKE3/read before writer timer. Warmups retained but excluded. No cache eviction. No concurrent build, download, or other experimental work during measure phase.",
+  "limits": {"rss_bytes": 6442450944, "min_free_bytes": 805306368, "disk_reserve_bytes": 4294967296, "sample_seconds": 60, "grace_seconds": 5, "kill_wait_seconds": 5},
+  "screen": {
+    "all_cases_candidate_over_bulk_max": 1.05,
+    "all_cases_candidate_over_legacy_max": 1.05,
+    "flop_candidate_over_bulk_max": 0.95,
+    "flop_strictly_faster_blocks_min": 4,
+    "rationale": "Prospective descriptive screen: retain the earlier 5% improvement magnitude, require a majority of seven paired blocks, and use a new symmetric 5% regression guard. Not a confidence interval or calibrated R1 performance gate. A screen miss does not erase or invalidate a correctly completed run."
+  }
+}

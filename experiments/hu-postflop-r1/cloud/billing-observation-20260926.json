@@ -1,0 +1,42 @@
+{
+  "schema": "solvers.r1.billing-observation/v1",
+  "source": "Manual observation of the authenticated Google Cloud Billing Reports accessibility tree; not a downloaded billing export or final invoice",
+  "recorded_at_utc": "2026-09-26T01:04:34Z",
+  "project_id": "solvers-abstraction-20260723",
+  "project_number": "1010616757715",
+  "billing_account_id": "015A1D-8A8F19-EC7035",
+  "report_url": "https://console.cloud.google.com/billing/015A1D-8A8F19-EC7035/reports;timeRange=CUSTOM_RANGE;from=2026-09-25;to=2026-09-25;grouping=GROUP_BY_SKU;projects=1010616757715?authuser=1",
+  "selected_project_name_verified": "Solvers abstraction 2026-07-23",
+  "other_project_unselected": true,
+  "displayed_date_start": "2026-09-25",
+  "displayed_date_end": "2026-09-25",
+  "displayed_date_type": "請求期間による期間",
+  "date_type_meaning": "Charge period, formerly usage date; official documentation uses Pacific midnight boundaries",
+  "displayed_currency": "JPY",
+  "displayed_filtered_total": "¥0",
+  "displayed_tax": "—",
+  "sku_rows_available": true,
+  "selected_observed_rows": [
+    {"sku_id": "64AA-1252-8212", "name": "Licensing Fee for Ubuntu 24.04 LTS (Noble Numbat)", "usage": "0.4 hour", "usage_cost": "¥0", "subtotal": "¥0"},
+    {"sku_id": "9B1F-1E62-4061", "name": "Spot Preemptible E2 Instance Ram running in Americas", "usage": "25.69 gibibyte hour", "usage_cost": "¥7", "other_savings": "-¥7", "subtotal": "¥0"},
+    {"sku_id": "F274-1692-F213", "name": "Network Internet Data Transfer Out from Americas to Americas", "usage": "0 gibibyte", "usage_cost": "¥0", "other_savings": "-¥0", "subtotal": "¥0"},
+    {"sku_id": "D0CC-50DF-59D2", "name": "Network Inter Zone Data Transfer In", "usage": "0.11 gibibyte", "usage_cost": "¥0", "subtotal": "¥0"},
+    {"sku_id": "E926-D07C-E1A4", "name": "Network Internet Data Transfer In from Americas to Americas", "usage": "0.31 gibibyte", "usage_cost": "¥0", "subtotal": "¥0"}
+  ],
+  "billing_finality_verified": false,
+  "all_skus_exported": false,
+  "actual_r1_billed_usd": null,
+  "reservation_release_usd": 0,
+  "held_reservations_usd": 20,
+  "authorized_limit_usd": 20,
+  "decision": "Billing UI access was restored by selecting the existing account used by gcloud. Some SKU rows have arrived, but these rounded and incomplete observations do not reconcile all four VM runs. Keep all reservations; do not launch from the displayed zero.",
+  "limitations": [
+    "The observation contains selected visible rows, not an exhaustive CSV. The download observer timed out and no download was retained.",
+    "Displayed rounded zero usage or subtotal does not establish exact zero charges, complete egress, or completed cost ingestion.",
+    "No per-instance allocation, tax or adjustment reconciliation, USD conversion, or proof of finality was obtained.",
+    "No legal terms, new credentials, IAM permissions, billing settings, or reservations were changed. The temporary browser tab was closed."
+  ],
+  "official_period_documentation": "https://docs.cloud.google.com/billing/docs/how-to/reports?hl=ja",
+  "official_delay_documentation": "https://docs.cloud.google.com/billing/docs/how-to/reports",
+  "budget_evidence": "budget.json"
+}

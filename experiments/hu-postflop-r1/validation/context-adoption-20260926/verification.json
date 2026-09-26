@@ -1,0 +1,54 @@
+{
+  "verified": true,
+  "source_commit": "d3bbb2766e2e63d0f065f055eef1bac77016f377",
+  "source_count": 199,
+  "raw_files": 23,
+  "overall_elapsed_seconds": 131.52588229998946,
+  "stages": [
+    {
+      "stage": "fmt",
+      "state": "completed",
+      "cargo_exit": 0,
+      "supervisor_exit": 0,
+      "elapsed_seconds": 2.2454372998327017,
+      "sampled_peak_tree_resident_bytes": 83181568,
+      "test_counts": null
+    },
+    {
+      "stage": "clippy",
+      "state": "completed",
+      "cargo_exit": 0,
+      "supervisor_exit": 0,
+      "elapsed_seconds": 55.76119079999626,
+      "sampled_peak_tree_resident_bytes": 536285184,
+      "test_counts": null
+    },
+    {
+      "stage": "formats-tests",
+      "state": "failed",
+      "cargo_exit": 0,
+      "supervisor_exit": 1,
+      "elapsed_seconds": 54.56499290000647,
+      "sampled_peak_tree_resident_bytes": 474619904,
+      "test_counts": {
+        "passed": 79,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "stage": "formats-tests-cleanup-confirmation",
+      "state": "completed",
+      "cargo_exit": 0,
+      "supervisor_exit": 0,
+      "elapsed_seconds": 2.853144400054589,
+      "sampled_peak_tree_resident_bytes": 98721792,
+      "test_counts": {
+        "passed": 79,
+        "failed": 0,
+        "ignored": 0
+      }
+    }
+  ],
+  "scope": "Windows shared-host checks only; full workspace tests and Linux acceptance not certified."
+}

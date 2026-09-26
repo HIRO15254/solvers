@@ -1,0 +1,20 @@
+{
+  "candidate": {
+    "root": "/opt/r1/vm08/source-candidate",
+    "revision": "d3bbb2766e2e63d0f065f055eef1bac77016f377",
+    "archive": "/opt/r1/vm08/packs/source-candidate.tar.gz",
+    "manifest": "/opt/r1/vm08/packs/source-candidate-manifest.json"
+  },
+  "bulk": {
+    "root": "/opt/r1/vm08/source-bulk",
+    "revision": "d3bbb2766e2e63d0f065f055eef1bac77016f377",
+    "archive": "/opt/r1/vm08/packs/source-bulk.tar.gz",
+    "manifest": "/opt/r1/vm08/packs/source-bulk-manifest.json"
+  },
+  "legacy": {
+    "root": "/opt/r1/vm08/source-legacy",
+    "revision": "88ffa5dd4583e5c8bae84e20e9b8390cb719e4f0",
+    "archive": "/opt/r1/vm08/packs/source-legacy.tar.gz",
+    "manifest": "/opt/r1/vm08/packs/source-legacy-manifest.json"
+  }
+}

@@ -1,8 +1,68 @@
 {
   "currency": "USD",
-  "authorized_limit": 20,
-  "authorization": "User R1 request: GCP Spot experiments, cumulative $20",
+  "authorized_limit": 40,
+  "authorization": "Initial user $20, then +$10 and +$10 on 2026-09-26; cumulative $40. User requests 32-vCPU scaling measurements and cost-conscious short Spot runs.",
+  "authorization_events": [
+    {
+      "date": "2026-09-25",
+      "additional_usd": 20,
+      "cumulative_usd": 20
+    },
+    {
+      "date": "2026-09-26",
+      "additional_usd": 10,
+      "cumulative_usd": 30,
+      "preference": "Use small Spot VMs to save money even if calculations take longer."
+    },
+    {
+      "date": "2026-09-26",
+      "additional_usd": 10,
+      "cumulative_usd": 40,
+      "scope": "Include 32-vCPU scaling measurements; use large VM only for finite measurement after small-VM validation."
+    }
+  ],
   "reservations": [
+    {
+      "id": "r1-20260926-08",
+      "project": "solvers-abstraction-20260723",
+      "zone": "us-central1-b",
+      "instance": "solvers-r1-20260926-08",
+      "reserved_usd": 3,
+      "billed_usd": null,
+      "reservation_released": false,
+      "maximum_runtime_hours": 6,
+      "machine_type": "e2-standard-2",
+      "disk_type": "pd-balanced",
+      "disk_gib": 40,
+      "maximum_download_gib": 1,
+      "pricing_checked_utc": "2026-09-26",
+      "conservative_compute_usd_hour": 0.14,
+      "disk_usd_gib_hour": 0.000137,
+      "ipv4_usd_hour": 0.0025,
+      "reserved_egress_usd_gib": 0.3,
+      "tax_price_delay_and_other_reserve_usd": 1,
+      "instance_termination_action": "STOP",
+      "explicit_disk_cleanup_hours": 24,
+      "purpose": "Linux validation and release writer comparison, followed by exact root-support and 1/2/4-thread scaling tests on a resized 4-vCPU Spot VM.",
+      "note": "Original launch was e2-standard-2. After retaining codec evidence, planned stop/resize to e2-standard-4 for same-host 1/2/4-thread tests. $3 reserved conservatively for the entire original six-hour window at 4-vCPU on-demand rate rounded to $0.14/h. This is not actual Spot billing. Aggregate held $23/$40, $17 unreserved. No automatic restart or deadline extension; explicit VM/disk cleanup after recovery.",
+      "pricing_sources": [
+        "https://cloud.google.com/products/compute/pricing/general-purpose",
+        "https://cloud.google.com/compute/disks-image-pricing",
+        "https://cloud.google.com/vpc/network-pricing"
+      ],
+      "events": [
+        {
+          "at": "2026-09-26T02:06:33.653402+00:00",
+          "event": "reserve_additional_1_usd_for_planned_resize",
+          "from_machine": "e2-standard-2",
+          "to_machine": "e2-standard-4",
+          "absolute_stop_deadline_utc": "2026-09-26T07:15:19Z",
+          "published_on_demand_usd_hour": 0.13402284,
+          "conservative_total_entire_6_02h_at_4vcpu_usd": 2.28937,
+          "note": "Reserve $3 covers all 6.02 hours at rounded-up $0.14/h plus IPv4, 40 GiB disk for24h, <=1GiB egress at $0.30/GiB and $1 other margin. Existing reservation extended by $1, no new deadline."
+        }
+      ]
+    },
     {
       "id": "r1-20260925-07",
       "project": "solvers-abstraction-20260723",

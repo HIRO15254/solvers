@@ -1,0 +1,67 @@
+{
+  "schema": "r1.vm08-pack-report/v1",
+  "created_at": "2026-09-26T01:22:17.286102+00:00",
+  "packer": {
+    "bytes": 13039,
+    "sha256": "8190c6a22da1854bd5efeae77d39413bc582bb31b28340e94932fd0092e843a9"
+  },
+  "sources": {
+    "candidate": {
+      "local_root": "E:\\codex-work\\solvers\\r1-vm08\\source-candidate",
+      "archive": "E:\\codex-work\\solvers\\r1-vm08\\source-candidate.tar.gz",
+      "manifest": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm08\\source-candidate-manifest.json",
+      "archive_bytes": 1294540,
+      "archive_sha256": "b8cdd91a964640015d9845d8e973bf4d24aa3bced580b99cfadb3086e043a50a",
+      "file_count": 342,
+      "original_bytes": 5173306,
+      "docs_check": {
+        "exit_code": 0,
+        "stdout": "Documentation check passed: 47 Markdown files.\r\n",
+        "stderr": ""
+      },
+      "exact_materialized_and_archive_file_sets": true
+    },
+    "bulk": {
+      "local_root": "E:\\codex-work\\solvers\\r1-vm08\\source-bulk",
+      "archive": "E:\\codex-work\\solvers\\r1-vm08\\source-bulk.tar.gz",
+      "manifest": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm08\\source-bulk-manifest.json",
+      "archive_bytes": 1292524,
+      "archive_sha256": "765eff53e2be67680154493861af5920f4aa04ebc915ec2b0d2f9969d2da8fb6",
+      "file_count": 342,
+      "original_bytes": 5165085,
+      "docs_check": {
+        "exit_code": 0,
+        "stdout": "Documentation check passed: 47 Markdown files.\r\n",
+        "stderr": ""
+      },
+      "exact_materialized_and_archive_file_sets": true
+    },
+    "legacy": {
+      "local_root": "E:\\codex-work\\solvers\\r1-vm08\\source-legacy",
+      "archive": "E:\\codex-work\\solvers\\r1-vm08\\source-legacy.tar.gz",
+      "manifest": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm08\\source-legacy-manifest.json",
+      "archive_bytes": 1224905,
+      "archive_sha256": "c52ff71b1149e8abc81184523e8eb8bc9314842969621880bb315f80ef0d842f",
+      "file_count": 287,
+      "original_bytes": 4810480,
+      "docs_check": {
+        "exit_code": 0,
+        "stdout": "Documentation check passed: 47 Markdown files.\r\n",
+        "stderr": ""
+      },
+      "exact_materialized_and_archive_file_sets": true
+    }
+  },
+  "selection": "Tracked source/docs/examples/tools/root entrypoints, exact local documentation targets, and the 51-file HU-R0-002 Python fixture where required. No recursive experiments evidence, credentials, Cargo target, or compiled binaries.",
+  "inputs": {
+    "local_root": "E:\\codex-work\\solvers\\r1-vm08\\inputs",
+    "archive": "E:\\codex-work\\solvers\\r1-vm08\\inputs.tar.gz",
+    "manifest": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm08\\inputs-manifest.json",
+    "archive_bytes": 107145,
+    "archive_sha256": "33d4b0a2a80e276e36743f985fe06241bfcbb7f086b4aa4b1f722dedcb18d341",
+    "file_count": 3,
+    "original_bytes": 209362,
+    "docs_check": null,
+    "exact_materialized_and_archive_file_sets": true
+  }
+}

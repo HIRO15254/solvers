@@ -22,7 +22,8 @@ pledged source sizeは引き継がない。書込み・圧縮・finishの失敗�
 元sourceの197 Cargo/cratesファイルを[固定pins](../write-phases/source-pins.json)に
 全件照合してbyte copyし、変更後にも元sourceが不変であることを確認した。
 変更は`crates/formats/src/sol_indexed.rs`だけであり、前後197件のsize/SHA-256と
-明示したtoolchainのrustfmt実体識別子を上記記録に残す。production worktreeのcratesは変更しない。
+明示したtoolchainのrustfmt実体識別子を上記記録に残した。この研究copy作成時点では
+production worktreeのcratesは変更していない。
 
 追加した2つのunit testは、空入力、32 KiB・128 KiB境界前後、固定pseudo-random入力、
 large→small→同じlargeの連続frameを扱う。旧手順のfresh encoderとの全byte比較と
@@ -58,9 +59,22 @@ source hashの照合だけではCargo生成物の同一性を保証しない。�
 
 ## 採用の確認範囲
 
-この差分は研究copyに限定され、production writerには適用していない。
+上記の77 tests・18実行は研究copy時点の結果であり、その時点ではproduction writerに
+適用していなかった。その後の固定候補にはcontext再利用と、windowを超える
+large→small→large、write/finish途中のI/O失敗を含む4つの回帰testを組み込んだ。
+その正確なsourceは[Linux保持証拠](linux-spot-20260926/README.md)のarchiveに残す。
+
+[採用候補のWindows増分検証](../../validation/context-adoption-20260926/README.md)では、
+199 source pinsの実行後一致、fmt/clippy成功、formats 79 tests成功を確認した。
+tests初回はCargo 0でも子process残留により監視失敗となったため、その失敗と
+同一command・生成binary不変の正常な確認実行を分けて保持する。
+同じwriter候補のLinux全workspace testsは906件成功、31件ignored、release SIGINT試験は
+1件成功した。releaseの3方式・72標本比較では保存byte列の一致を確認したが、
+候補/bulkの保存中央値比はRiver 1.09749、Turn 0.94137、Flop 0.98294となり、
+事前の採用screenを満たさなかった。**context再利用は本体へ採用せず、候補差分を戻した。**
+この判断と後続のcompact hand layoutによる形式変更は別の変更である。
+
 release比較では同一host・build条件、固定入力、交互実行、SOL/canonical完全一致を維持し、
 他の重い実験が稼働するhostでは追加buildや性能測定を重ねない。
 CCtx workspaceはartifactの終了まで保持されるため、確保回数削減をメモリ削減とはみなさない。
-採用時の回帰testにはwindowを超えるlarge→small→largeと、write/finish途中のI/O失敗も含める。
-wire形式、CLI、既定値、依存関係に変更はない。
+固定したcontext候補そのものはwire形式、CLI、既定値、依存関係を変更しない。

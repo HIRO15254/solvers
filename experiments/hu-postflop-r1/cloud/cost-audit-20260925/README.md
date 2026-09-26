@@ -59,6 +59,12 @@ table「表示する結果がありません」、SKU行なし。直後のclock�
 反映には24時間超かかる場合があり、表示0を実費0とは扱わない。
 [請求反映](https://docs.cloud.google.com/billing/docs/how-to/view-history)
 
+後続の[9月26日のUI観測](../billing-observation-20260926.json)では、既存の実験用accountへ
+切り替えることでReportsへのアクセスを復旧し、一部SKUの到着を確認した。
+表示されたSpot RAMは25.69 GiB hour、使用費用7円・控除7円・小計0円だった。
+対象projectと利用日9/25を照合したが、全SKU・全4VMの計上完了、税、換算は未確認である。
+丸めた0や一部の明細を実験全体の精算に置き換えず、20 USD予約を維持する。
+
 判断は[既存予約方針](../README.md)と[予算台帳](../budget.json)のままである。
 追加判断には期間を覆うSKU利用料・税・実換算率の照合が必要。
 raw API本文を再照合して算術を再生成する軽量commandは次のとおり。

@@ -1,0 +1,49 @@
+{
+  "base_commit": "d3bbb2766e2e63d0f065f055eef1bac77016f377",
+  "dirty": false,
+  "archive_sha256": "33d4b0a2a80e276e36743f985fe06241bfcbb7f086b4aa4b1f722dedcb18d341",
+  "archive_bytes": 107145,
+  "files": [
+    {
+      "path": "flop.sol",
+      "bytes": 176833,
+      "sha256": "5f9fc7a35a4a4e034d029844ced6251e1603c9de269b69b6c275ae7034d837f1"
+    },
+    {
+      "path": "river.sol",
+      "bytes": 7609,
+      "sha256": "fc67f0f78c888bd163c62e9cc3625e7c00a18c7c5c468a075e226ed5ada669cc"
+    },
+    {
+      "path": "turn.sol",
+      "bytes": 24920,
+      "sha256": "ee55a97544c793f2770893b12019a990649b564dfb2bf14e2b08a1ab7a0bcc2a"
+    }
+  ],
+  "directory_entries": [],
+  "role": "fixed_inputs",
+  "origin_plan": "experiments/hu-postflop-r1/codec/context-reuse/windows-debug-20260926/fresh/plan.json.gz",
+  "inputs": {
+    "river": {
+      "original_path": "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\inputs\\river.sol",
+      "retained_blob": "fresh/artifacts/river-1-baseline/rewritten.sol.gz",
+      "sol_wire_version": 3,
+      "bytes": 7609,
+      "sha256": "fc67f0f78c888bd163c62e9cc3625e7c00a18c7c5c468a075e226ed5ada669cc"
+    },
+    "turn": {
+      "original_path": "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\inputs\\turn.sol",
+      "retained_blob": "fresh/artifacts/turn-1-baseline/rewritten.sol.gz",
+      "sol_wire_version": 3,
+      "bytes": 24920,
+      "sha256": "ee55a97544c793f2770893b12019a990649b564dfb2bf14e2b08a1ab7a0bcc2a"
+    },
+    "flop": {
+      "original_path": "E:\\codex-work\\solvers\\r1-context-reuse-20260926\\inputs\\flop.sol",
+      "retained_blob": "fresh/artifacts/flop-1-baseline/rewritten.sol.gz",
+      "sol_wire_version": 3,
+      "bytes": 176833,
+      "sha256": "5f9fc7a35a4a4e034d029844ced6251e1603c9de269b69b6c275ae7034d837f1"
+    }
+  }
+}
