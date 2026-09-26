@@ -1,0 +1,156 @@
+{
+  "case_id": "HU-R0-006",
+  "captured_utc_date": "2026-09-26",
+  "capture_window": {
+    "after_utc": "2026-09-26T21:41:50Z",
+    "completed_before_utc": "2026-09-26T21:49:31Z",
+    "exact_start_utc": null,
+    "exact_end_utc": null,
+    "exact_per_copy_timestamps": null,
+    "note": "Clock bounds supplied by the collecting root; exact per-action timestamps were not supplied."
+  },
+  "reference": "GTO Wizard existing solved library, manually observed by collecting root",
+  "ui_provenance": "The collecting root reported UI facts and Copy acquisition. This file writer did not operate the browser; raw UI/screenshot archives were not supplied to the writer.",
+  "url": "https://app.gtowizard.com/solutions?soltab=range&solution_type=gwiz&gmfs_solution_tab=ai_sols&gametype=Cash6m50zGGGeneral&depth=100&gmfft_sort_key=0&gmfft_sort_order=desc&stratab=strategy_ev&history_spot=10&preflop_actions=F-F-F-F-R3-C&board=9s8s7d2cJd&flop_actions=X-X&turn_actions=X-X",
+  "url_provenance": "Directly captured URL supplied by the collecting root for this acquisition.",
+  "visible_solution": "Cash 100bb / 6max / NL50 GG / General / GTO",
+  "table_players": "6max",
+  "subgame_players": 2,
+  "street": "river",
+  "board": [
+    "9s",
+    "8s",
+    "7d",
+    "2c",
+    "Jd"
+  ],
+  "seats": {
+    "oop": "SB",
+    "ip": "BB"
+  },
+  "root_actor": "SB",
+  "pot_bb": 6,
+  "stacks_behind_bb": [
+    97,
+    97
+  ],
+  "preflop_actions": "F-F-F-F-R3-C",
+  "preflop": "UTG fold; HJ fold; CO fold; BTN fold; SB raise to 3; BB call",
+  "flop": "check/check",
+  "turn": "check/check",
+  "river": "root before SB acts",
+  "root_ranges": {
+    "oop": "oop-range.txt",
+    "ip": "ip-range.txt",
+    "weights": "Copy text unchanged and unrenormalized, with exactly one final LF appended by collecting root",
+    "reported_copy_raw_characters": {
+      "oop": 8417,
+      "ip": 7817
+    },
+    "reported_copy_raw_fnv1a32": {
+      "oop": "07f300b7",
+      "ip": "488d4640"
+    },
+    "copy_freshness": {
+      "oop": "Clipboard sentinel r1-006-oop-pending -> native SB Copy -> success toast -> new 8417-character content.",
+      "ip": "Clipboard sentinel r1-006-ip-pending -> native BB Copy -> success toast -> new 7817-character content.",
+      "whole_range_menu_shown": false,
+      "explicit_whole_range_option_selected": false,
+      "scope": "Copy immediately produced a success toast; no Whole range submenu appeared. Recorded as root ranges because no action filter was active. File checks confirm supplied length/FNV/SHA, not export completeness or independent browser semantics."
+    }
+  },
+  "observed_menus": [
+    {
+      "history": "",
+      "actor": "SB",
+      "street": "river",
+      "actions": [
+        "check",
+        "bet 2",
+        "bet 4.5",
+        "bet 9",
+        "allin 97"
+      ],
+      "action_ui_percent_labels": {
+        "bet 2": 33,
+        "bet 4.5": 75,
+        "bet 9": 150,
+        "allin 97": 1617
+      },
+      "scope": "Root menu only. No continuation menu is inferred from these sizes."
+    }
+  ],
+  "continuation_menu_record": {
+    "file": "menus.json",
+    "included_in_this_root_record": false,
+    "included_in_range_arithmetic": false,
+    "graph_closure_evaluated": false,
+    "note": "Separate capture owned by the collecting root; this root/range record makes no full-tree closure claim."
+  },
+  "root_ui": {
+    "left_view": "Strategy",
+    "right_view": "EV",
+    "oop_ev_bb": 2.63,
+    "ip_ev_bb": 2.89,
+    "oop_equity_percent": 48.7,
+    "ip_equity_percent": 51.3,
+    "oop_eqr_percent": 90,
+    "ip_eqr_percent": 94.1,
+    "oop_displayed_weighted_combos": 203.6,
+    "ip_displayed_weighted_combos": 150.4,
+    "oop_frequency_percent": {
+      "check": 57.5,
+      "bet 2": 17.3,
+      "bet 4.5": 24.8,
+      "bet 9": 0.4,
+      "allin 97": 0
+    },
+    "note": "Rounded UI displays only. Displayed zero is not certified exact-zero policy; weighted-combo display need not equal the exact sum of exported decimals."
+  },
+  "root_ui_literal_text": {
+    "oop_ev": "2.63",
+    "ip_ev": "2.89",
+    "ev_unit": "bb",
+    "oop_equity": "48.7%",
+    "ip_equity": "51.3%",
+    "oop_eqr": "90%",
+    "ip_eqr": "94.1%",
+    "oop_weighted_combos": "203.6",
+    "ip_weighted_combos": "150.4"
+  },
+  "rake_evidence": {
+    "catalog_description": "NL50 GG 5% cap 8bb from the R0 library Rake-help observation",
+    "catalog_sources": [
+      "../../../../docs/plans/hu-postflop-r0/cases.csv",
+      "../../../../docs/plans/hu-postflop-r0/coverage.md"
+    ],
+    "current_acquisition_verified_rule": null,
+    "preflop_collection": null,
+    "fold_collection": null,
+    "uncalled_bet_treatment": null,
+    "prior_collection_or_remaining_cap": null,
+    "rounding": null,
+    "note": "Rate/cap are catalog-help evidence only, not confirmed settlement rules for this individual solution. Root EV sum does not identify collection or cap history."
+  },
+  "new_solve_requested": false,
+  "filters_applied": false,
+  "solution_version": null,
+  "solution_precision": null,
+  "display_rounding_rule": null,
+  "range_omission_and_internal_precision_rule": null,
+  "reference_exploitability": null,
+  "comparison_scope": "diagnostic_only",
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "comparison_threshold": null,
+  "missing_fields": [
+    "Full continuation graph and all node menus; separate capture must be independently audited",
+    "Solution-specific GG rake collection including preflop, terminal collection, uncalled amounts, prior collection/cap and rounding",
+    "Copy export omission, normalization, internal precision and actual conditional joint-reach semantics",
+    "Complete per-hand/action continuation policy and action EVs including zero-own-reach and off-policy rows",
+    "Individual solution version and residual definition/value/denominator",
+    "Exact EV-field origin, unit conversion and display rounding",
+    "Exact acquisition start/end and individual Copy/menu timestamps"
+  ]
+}

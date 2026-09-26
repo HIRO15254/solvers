@@ -1,0 +1,529 @@
+--- a/crates/cli/examples/current_phase_codec.rs
++++ b/crates/cli/examples/current_phase_codec.rs
+@@ -0,0 +1,253 @@
++//! Research-only codec measurement. See experiments/hu-postflop-r1/codec/README.md.
++//! Copy this identical file into the baseline checkout; do not change its codec.
++
++use std::error::Error;
++use std::fs::{self, File};
++use std::hint::black_box;
++use std::io::{self, BufReader, BufWriter, Read, Write};
++use std::path::Path;
++use std::time::Instant;
++
++use formats::{
++    SOL_FORMAT_VERSION, SolMetadata, SolPayload, SolReader, StreetsStored, read_sol, write_sol,
++};
++use serde_json::json;
++
++fn invalid(message: &str) -> io::Error {
++    io::Error::other(message)
++}
++
++fn file_hash(path: &Path) -> io::Result<(u64, String)> {
++    let mut input = BufReader::new(File::open(path)?);
++    let mut digest = blake3::Hasher::new();
++    let mut buffer = [0; 65536];
++    let mut bytes = 0;
++    loop {
++        let count = input.read(&mut buffer)?;
++        if count == 0 {
++            break;
++        }
++        digest.update(&buffer[..count]);
++        bytes += count as u64;
++    }
++    Ok((bytes, digest.finalize().to_hex().to_string()))
++}
++
++fn blob(output: &mut impl Write, bytes: &[u8]) -> io::Result<()> {
++    output.write_all(&(bytes.len() as u64).to_le_bytes())?;
++    output.write_all(bytes)
++}
++
++// This independent fixed-width comparison encoding does not use serde/postcard.
++// Float bits, raw config bytes, block order and all raw arrays are significant.
++fn canonical(path: &Path, payload: &SolPayload) -> io::Result<()> {
++    let mut output = BufWriter::new(File::create_new(path)?);
++    output.write_all(b"r1.codec.canonical/v1\0")?;
++    blob(&mut output, payload.config_toml.as_bytes())?;
++    output.write_all(&payload.meta.iterations.to_le_bytes())?;
++    for value in payload
++        .meta
++        .expl
++        .into_iter()
++        .chain(payload.meta.ev)
++        .chain([payload.meta.nash_conv, payload.meta.wall_secs])
++    {
++        output.write_all(&value.to_bits().to_le_bytes())?;
++    }
++    blob(&mut output, payload.meta.storage.as_bytes())?;
++    output.write_all(&[match payload.mode {
++        StreetsStored::Full => 0,
++        StreetsStored::NoRivers => 1,
++    }])?;
++    output.write_all(&payload.node_count.to_le_bytes())?;
++    output.write_all(&(payload.blocks.len() as u64).to_le_bytes())?;
++    for block in &payload.blocks {
++        output.write_all(&block.sref.to_le_bytes())?;
++        blob(&mut output, &block.probs)?;
++    }
++    output.write_all(&(payload.values.len() as u64).to_le_bytes())?;
++    for block in &payload.values {
++        output.write_all(&block.sref.to_le_bytes())?;
++        output.write_all(&block.scale.to_bits().to_le_bytes())?;
++        blob(&mut output, &block.values)?;
++    }
++    output.flush()
++}
++
++fn metadata(payload: &SolPayload, stored_nodes: u64) -> SolMetadata {
++    SolMetadata {
++        config_toml: payload.config_toml.clone(),
++        meta: payload.meta.clone(),
++        mode: payload.mode,
++        node_count: payload.node_count,
++        stored_nodes,
++    }
++}
++
++#[path = "../src/r1_current_phase.rs"]
++mod r1_current_phase;
++
++fn main() -> Result<(), Box<dyn Error>> {
++    let session = r1_current_phase::Session::start()?;
++    let outcome = run_codec();
++    if let Some(session) = session {
++        if let Err(error) = session.finish(outcome.is_ok(), outcome.as_ref().err().map(ToString::to_string)) {
++            if outcome.is_ok() { return Err(error.into()); }
++            eprintln!("Phase publication failed; original codec error preserved: {error:#}");
++        }
++    }
++    outcome
++}
++
++fn run_codec() -> Result<(), Box<dyn Error>> {
++    let args: Vec<_> = std::env::args_os().collect();
++    if args.len() != 5 {
++        return Err(
++            invalid("usage: sol_codec_bench INPUT OPERATION ITERATIONS NEW_OUTPUT_DIR").into(),
++        );
++    }
++    let input = Path::new(&args[1]);
++    let operation = args[2]
++        .to_str()
++        .ok_or_else(|| invalid("non-UTF8 operation"))?;
++    let iterations: u32 = args[3]
++        .to_str()
++        .ok_or_else(|| invalid("non-UTF8 iterations"))?
++        .parse()?;
++    if !matches!(
++        operation,
++        "decode-all" | "read-root" | "read-repeat-chunk" | "stream-write"
++    ) || iterations
++        != if operation == "read-repeat-chunk" {
++            64
++        } else {
++            1
++        }
++    {
++        return Err(invalid("unknown operation or iterations differ from frozen protocol").into());
++    }
++    let output = Path::new(&args[4]);
++    fs::create_dir(output)?;
++    let before = file_hash(input)?; // Deliberate, identical warm-file policy.
++    let mut preparation_seconds = 0.0;
++    let mut open_seconds = 0.0;
++    let elapsed;
++    let payload;
++    let stored_nodes;
++    let mut written = None;
++    match operation {
++        "decode-all" => {
++            r1_current_phase::switch("codec_decode_all");
++            let start = Instant::now();
++            payload = read_sol(input)?; // Keep the public reader's complete validation.
++            elapsed = start.elapsed().as_secs_f64();
++            r1_current_phase::switch("overhead");
++            stored_nodes = payload.blocks.len() as u64;
++        }
++        "read-root" | "read-repeat-chunk" => {
++            r1_current_phase::switch("codec_read_root");
++            let start = Instant::now();
++            let mut reader = SolReader::open(input)?;
++            open_seconds = start.elapsed().as_secs_f64();
++            if reader.stored_srefs().next() != Some(0) {
++                return Err(invalid("fixture has no stored root sref 0").into());
++            }
++            let start = Instant::now();
++            let mut last = None;
++            for _ in 0..iterations {
++                last = Some(black_box(
++                    reader
++                        .read_node(0)?
++                        .ok_or_else(|| invalid("missing root"))?,
++                ));
++            }
++            elapsed = start.elapsed().as_secs_f64();
++            r1_current_phase::switch("overhead");
++            let meta = reader.metadata();
++            stored_nodes = meta.stored_nodes;
++            let (strategy, value) = last.ok_or_else(|| invalid("empty read loop"))?;
++            payload = SolPayload {
++                config_toml: meta.config_toml.clone(),
++                meta: meta.meta.clone(),
++                mode: meta.mode,
++                node_count: meta.node_count,
++                blocks: vec![strategy],
++                values: vec![value],
++            };
++        }
++        "stream-write" => {
++            let start = Instant::now();
++            payload = read_sol(input)?;
++            preparation_seconds = start.elapsed().as_secs_f64();
++            stored_nodes = payload.blocks.len() as u64;
++            let path = output.join("rewritten.sol");
++            r1_current_phase::switch("codec_stream_write");
++            let start = Instant::now();
++            write_sol(&path, black_box(&payload))?;
++            elapsed = start.elapsed().as_secs_f64();
++            r1_current_phase::switch("overhead");
++            // Outside timing: normal validation plus exact semantic equality.
++            if read_sol(&path)? != payload || file_hash(&path)? != before {
++                return Err(invalid("rewritten artifact differs from input").into());
++            }
++            written = Some(json!({"file": "rewritten.sol", "bytes": before.0, "blake3": before.1}));
++        }
++        _ => unreachable!(),
++    }
++    if payload.mode != StreetsStored::Full || payload.blocks.is_empty() {
++        return Err(invalid("benchmark requires nonempty Full fixture").into());
++    }
++    let validation_start = Instant::now();
++    canonical(&output.join("canonical.bin"), &payload)?;
++    let canonical_identity = file_hash(&output.join("canonical.bin"))?;
++    let root = SolPayload {
++        config_toml: payload.config_toml.clone(),
++        meta: payload.meta.clone(),
++        mode: payload.mode,
++        node_count: payload.node_count,
++        blocks: vec![
++            payload
++                .blocks
++                .iter()
++                .find(|x| x.sref == 0)
++                .ok_or_else(|| invalid("full payload has no root strategy"))?
++                .clone(),
++        ],
++        values: vec![
++            payload
++                .values
++                .iter()
++                .find(|x| x.sref == 0)
++                .ok_or_else(|| invalid("full payload has no root values"))?
++                .clone(),
++        ],
++    };
++    canonical(&output.join("root-canonical.bin"), &root)?;
++    let root_identity = file_hash(&output.join("root-canonical.bin"))?;
++    if file_hash(input)? != before {
++        return Err(invalid("input changed during measurement").into());
++    }
++    let report = json!({
++        "schema": "r1.sol-codec-sample/v1", "status": "completed",
++        "format_version": SOL_FORMAT_VERSION, "operation": operation,
++        "iterations": iterations, "solve_iterations": payload.meta.iterations,
++        "input": {"bytes": before.0, "blake3": before.1},
++        "metadata": metadata(&payload, stored_nodes),
++        "decoded_strategy_blocks": payload.blocks.len(), "decoded_value_blocks": payload.values.len(),
++        "raw_strategy_bytes": payload.blocks.iter().map(|x| x.probs.len() as u64).sum::<u64>(),
++        "raw_value_bytes": payload.values.iter().map(|x| x.values.len() as u64).sum::<u64>(),
++        "selected_srefs": payload.blocks.iter().map(|x| x.sref).collect::<Vec<_>>(),
++        "canonical": {"file": "canonical.bin", "bytes": canonical_identity.0, "blake3": canonical_identity.1},
++        "root_canonical": {"file": "root-canonical.bin", "bytes": root_identity.0, "blake3": root_identity.1},
++        "rewritten": written,
++        "timing": {"preparation_load_seconds": preparation_seconds, "open_seconds": open_seconds,
++            "operation_seconds": elapsed, "operation_seconds_per_iteration": elapsed / f64::from(iterations),
++            "validation_output_seconds": validation_start.elapsed().as_secs_f64()},
++        "scope": "Codec bytes only; cached solve metrics are not recomputed quality values. Writer streams bounded groups from a fully decoded resident payload. Repeated root reads use one reader and re-decode the same chunk."
++    });
++    let mut result = File::create_new(output.join("result.json"))?;
++    serde_json::to_writer_pretty(&mut result, &report)?;
++    result.write_all(b"\n")?;
++    println!("{}", serde_json::to_string(&report)?);
++    Ok(())
++}
+--- a/crates/cli/src/lib.rs
++++ b/crates/cli/src/lib.rs
+@@ -133,6 +133,7 @@
+ pub mod session;
+ pub mod sol;
+ pub mod solve;
++mod r1_current_phase;
+ pub mod solver_config_v1;
+ #[cfg(test)]
+ mod test_fixtures;
+@@ -392,6 +393,18 @@
+ /// Parses `std::env::args()` and dispatches to the requested subcommand.
+ /// The `solvers` binary's `main` is just `cli::main_impl()`.
+ pub fn main_impl() -> Result<()> {
++    let session = r1_current_phase::Session::start()?;
++    let outcome = r1_current_phase_dispatch();
++    if let Some(session) = session {
++        if let Err(error) = session.finish(outcome.is_ok(), outcome.as_ref().err().map(|e| format!("{e:#}"))) {
++            if outcome.is_ok() { return Err(error); }
++            eprintln!("Phase publication failed; original command error preserved: {error:#}");
++        }
++    }
++    outcome
++}
++
++fn r1_current_phase_dispatch() -> Result<()> {
+     let cli = Cli::parse();
+     if let Some(root) = cli.cache_dir.as_deref() {
+         cache::set_root_override(root);
+--- a/crates/cli/src/r1_current_phase.rs
++++ b/crates/cli/src/r1_current_phase.rs
+@@ -0,0 +1,154 @@
++//! Research-only phase timers and optional Linux mm high-water resets.
++//! Does not execute in production. Memory mode timings are not performance data.
++use std::io::{Read, Write};
++use std::path::{Path, PathBuf};
++use std::sync::{Mutex, atomic::{AtomicBool, Ordering}};
++use std::time::{Instant, SystemTime, UNIX_EPOCH};
++use anyhow::{Context, Result};
++use serde::Serialize;
++
++const SOURCE: &str = "11e4062ba1735e58b60d12999cb23ed10fd1a163";
++const ID: &str = "106393cedd9d04023419f051c461cfa02a80a3a445d160b5a3175d9df21435fd";
++const MAX_SPANS: usize = 256;
++static ENABLED: AtomicBool = AtomicBool::new(false);
++static TRACE: Mutex<Option<Trace>> = Mutex::new(None);
++
++#[derive(Clone, Copy, Serialize)]
++struct Resident { rss_kib: u64, hwm_kib: u64 }
++
++// Fixed stack buffer: no String/Vec allocation while reading the process counter.
++fn resident() -> Result<Resident> {
++    let mut file = std::fs::File::open("/proc/self/status")?;
++    let mut bytes = [0_u8; 32768];
++    let mut used = 0;
++    loop {
++        anyhow::ensure!(used < bytes.len(), "proc status exceeds fixed buffer");
++        let count = file.read(&mut bytes[used..])?;
++        if count == 0 { break; }
++        used += count;
++    }
++    let text = std::str::from_utf8(&bytes[..used])?;
++    let field = |prefix: &str| -> Result<u64> {
++        let line = text.lines().find_map(|line| line.strip_prefix(prefix))
++            .with_context(|| format!("missing proc field {prefix}"))?;
++        let mut parts = line.split_whitespace();
++        let value = parts.next().context("missing proc value")?.parse::<u64>()?;
++        anyhow::ensure!(parts.next() == Some("kB") && parts.next().is_none(), "proc unit differs");
++        anyhow::ensure!(value > 0, "proc resident value is zero");
++        Ok(value)
++    };
++    let result = Resident { rss_kib: field("VmRSS:")?, hwm_kib: field("VmHWM:")? };
++    anyhow::ensure!(result.hwm_kib >= result.rss_kib, "inconsistent proc snapshot");
++    Ok(result)
++}
++
++fn reset_peak() -> Result<Resident> {
++    // Only value 5 resets mm high-water; never use 1--4 page-reference controls.
++    let mut file = std::fs::OpenOptions::new().write(true).open("/proc/self/clear_refs")?;
++    file.write_all(b"5\n")?;
++    resident()
++}
++
++#[derive(Serialize)]
++struct Memory { start: Resident, end: Resident, reset_value: u8 }
++#[derive(Serialize)]
++struct Span {
++    phase: &'static str, start_ns: u64, end_ns: u64,
++    status: &'static str, iteration: Option<u64>, memory: Option<Memory>,
++}
++struct Trace {
++    origin: Instant, started: String, phase: &'static str, start_ns: u64,
++    iteration: Option<u64>, spans: Vec<Span>, memory: bool, resident_start: Option<Resident>,
++}
++impl Trace {
++    fn close(&mut self, end_ns: u64, status: &'static str) {
++        assert!(self.spans.len() < MAX_SPANS, "R1 phase span limit exceeded");
++        let memory = self.resident_start.map(|start| Memory {
++            start, end: resident().expect("R1 phase resident read failed"), reset_value: 5,
++        });
++        self.spans.push(Span { phase: self.phase, start_ns: self.start_ns, end_ns,
++            status, iteration: self.iteration, memory });
++    }
++    fn record(&self, status: &str, total: Option<u64>, error: Option<String>) -> serde_json::Value {
++        serde_json::json!({
++            "schema": "r1.current-phases/v1", "source_revision": SOURCE,
++            "instrumentation_id": ID, "pid": std::process::id(), "started_unix_ns": self.started,
++            "mode": if self.memory { "memory" } else { "time" }, "status": status,
++            "total_ns": total, "leaf_sum_ns": total.map(|_| self.spans.iter().map(|s| s.end_ns-s.start_ns).sum::<u64>()),
++            "spans": self.spans, "command_error": error,
++            "scope": "main dispatch; final phase JSON persistence and process startup/exit excluded",
++            "memory_scope": "Each memory leaf follows clear_refs=5. end VmHWM is the reset-window kernel counter including observer footprint, not physical exact peak, allocation bytes, or cumulative ru_maxrss. Memory-mode timings are ineligible.",
++            "forced_termination": "running initial record only; missing phases are not zero",
++        })
++    }
++}
++fn publish(path: &Path, value: &serde_json::Value, initial: bool) -> Result<()> {
++    let parent = path.parent().context("phase output needs parent")?;
++    let mut file = tempfile::NamedTempFile::new_in(parent)?;
++    serde_json::to_writer_pretty(file.as_file_mut(), value)?;
++    file.write_all(b"\n")?;
++    file.as_file().sync_all()?;
++    if initial { file.persist_noclobber(path).map_err(|e| e.error)?; }
++    else { file.persist(path).map_err(|e| e.error)?; }
++    Ok(())
++}
++pub(crate) struct Session { output: PathBuf }
++impl Session {
++    pub(crate) fn start() -> Result<Option<Self>> {
++        let Some(output) = std::env::var_os("R1_CURRENT_PHASE_OUTPUT") else {
++            anyhow::ensure!(std::env::var_os("R1_CURRENT_PHASE_MODE").is_none(), "mode without output");
++            return Ok(None);
++        };
++        let output = PathBuf::from(output);
++        anyhow::ensure!(output.is_absolute(), "phase path must be absolute");
++        let mode = std::env::var("R1_CURRENT_PHASE_MODE")?;
++        anyhow::ensure!(mode == "time" || mode == "memory", "unknown phase mode");
++        let memory = mode == "memory";
++        anyhow::ensure!(!memory || cfg!(target_os = "linux"), "memory mode requires Linux");
++        let mut slot = TRACE.lock().unwrap_or_else(|e| e.into_inner());
++        anyhow::ensure!(slot.is_none(), "phase session already active");
++        let mut trace = Trace {
++            origin: Instant::now(), started: SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos().to_string(),
++            phase: "overhead", start_ns: 0, iteration: None, spans: Vec::with_capacity(MAX_SPANS),
++            memory, resident_start: None,
++        };
++        publish(&output, &trace.record("running", None, None), true)?;
++        if memory { trace.resident_start = Some(reset_peak()?); }
++        *slot = Some(trace);
++        ENABLED.store(true, Ordering::Release);
++        Ok(Some(Self { output }))
++    }
++    pub(crate) fn finish(self, ok: bool, error: Option<String>) -> Result<()> {
++        ENABLED.store(false, Ordering::Release);
++        let mut trace = TRACE.lock().unwrap_or_else(|e| e.into_inner()).take().expect("active phase trace");
++        let end = u64::try_from(trace.origin.elapsed().as_nanos()).expect("phase clock overflow");
++        trace.close(end, if ok { "complete" } else { "error" });
++        publish(&self.output, &trace.record(if ok { "completed" } else { "error" }, Some(end), error), false)
++    }
++}
++fn change(phase: &'static str, iteration: Option<u64>, status: &'static str) {
++    if !ENABLED.load(Ordering::Acquire) { return; }
++    let mut slot = TRACE.lock().unwrap_or_else(|e| e.into_inner());
++    let trace = slot.as_mut().expect("active phase trace");
++    let end = u64::try_from(trace.origin.elapsed().as_nanos()).expect("phase clock overflow");
++    trace.close(end, status);
++    trace.phase = phase;
++    trace.start_ns = end;
++    trace.iteration = iteration;
++    if trace.memory { trace.resident_start = Some(reset_peak().expect("R1 phase HWM reset failed")); }
++}
++pub(crate) fn switch(phase: &'static str) { change(phase, None, "complete"); }
++pub(crate) fn measure<T>(phase: &'static str, iteration: Option<u64>, action: impl FnOnce() -> T) -> T {
++    if !ENABLED.load(Ordering::Acquire) { return action(); }
++    change(phase, iteration, "complete");
++    let result = action();
++    switch("overhead");
++    result
++}
++pub(crate) fn measure_result<T, E>(phase: &'static str, iteration: Option<u64>, action: impl FnOnce() -> std::result::Result<T, E>) -> std::result::Result<T, E> {
++    if !ENABLED.load(Ordering::Acquire) { return action(); }
++    change(phase, iteration, "complete");
++    let result = action();
++    change("overhead", None, if result.is_ok() { "complete" } else { "error" });
++    result
++}
+--- a/crates/cli/src/sol.rs
++++ b/crates/cli/src/sol.rs
+@@ -215,6 +215,7 @@
+     start_street: Street,
+     summary: &RunSummary,
+ ) -> Result<()> {
++    crate::r1_current_phase::switch("sol_preparation");
+     let tree = &solver.game().tree;
+     let streets = node_streets(tree, start_street);
+ 
+@@ -320,7 +321,8 @@
+         blocks,
+         values,
+     };
+-    write_sol(&spec.path, &payload).with_context(|| format!("writing {}", spec.path.display()))?;
++    crate::r1_current_phase::switch("overhead");
++    crate::r1_current_phase::measure_result("sol_serialization_and_write", Some(solver.iteration()), || write_sol(&spec.path, &payload)).with_context(|| format!("writing {}", spec.path.display()))?;
+ 
+     let size = std::fs::metadata(&spec.path).map(|m| m.len()).unwrap_or(0);
+     println!(
+--- a/crates/cli/src/solve.rs
++++ b/crates/cli/src/solve.rs
+@@ -37,6 +37,7 @@
+     histories: &[String],
+     sol_streets: SolStreets,
+ ) -> Result<()> {
++    crate::r1_current_phase::switch("input_preparation");
+     let raw_bytes =
+         std::fs::read(config_path).with_context(|| format!("reading {}", config_path.display()))?;
+     let source_raw = std::str::from_utf8(&raw_bytes).context("config file is not valid UTF-8")?;
+@@ -618,9 +619,9 @@
+     let mut remaining = run.iterations.saturating_sub(solver.iteration());
+     while remaining > 0 {
+         let chunk = run.check_every.min(remaining);
+-        solver.run(chunk);
++        crate::r1_current_phase::measure("cfr_updates", Some(solver.iteration() + chunk), || solver.run(chunk));
+         remaining -= chunk;
+-        let evaluation = RootEvaluation::measure(solver);
++        let evaluation = crate::r1_current_phase::measure("periodic_ev_br", Some(solver.iteration()), || RootEvaluation::measure(solver));
+         let expl = evaluation.expl;
+         result.evaluation = Some(evaluation);
+         let nash_conv = expl[Player::P0] + expl[Player::P1];
+@@ -705,7 +706,7 @@
+     let Some((path, hash)) = hooks.checkpoint else {
+         return Ok(());
+     };
+-    formats::write_checkpoint_ref(path, hash, &solver.state_ref())?;
++    crate::r1_current_phase::measure_result("checkpoint", Some(solver.iteration()), || formats::write_checkpoint_ref(path, hash, &solver.state_ref()))?;
+     if let Some(events) = hooks.events.as_deref_mut() {
+         let _ = events.info(formats::RunEventPayload::Checkpoint {
+             sweeps: solver.iteration(),
+@@ -754,6 +755,7 @@
+     expl: PerPlayer<f64>,
+ ) -> RunSummary {
+     let nash_conv = expl[Player::P0] + expl[Player::P1];
++    crate::r1_current_phase::switch("summary_publish");
+     println!(
+         "done: iterations={} wall={:.2}s ev_p0={:.6} ev_p1={:.6} nash_conv={:.3e}",
+         iterations,
+@@ -855,6 +857,7 @@
+     // here, so avoid allocating them for every node in large flop trees.
+     config.track_node_info = false;
+ 
++    crate::r1_current_phase::switch("initialization");
+     // Cheap dry run before committing to the (possibly very large) real
+     // build, so an oversized config fails fast with a size estimate instead
+     // of silently eating memory.
+@@ -887,9 +890,11 @@
+         "game=postflop schedule={} iterations={}",
+         schedule_name, run.iterations
+     );
++    crate::r1_current_phase::switch("overhead");
+     let start = Instant::now();
+     let result = run_loop(&mut solver, run, hooks)?;
+     let elapsed = hooks.elapsed_before + start.elapsed();
++    crate::r1_current_phase::switch("final_ev_br");
+     let evaluation = result
+         .evaluation
+         .filter(|value| value.completed_iter == solver.iteration())
+@@ -900,6 +905,7 @@
+         postflop_setup::subgame_ev(evaluation.ev(&solver), ev_offset),
+         evaluation.expl,
+     );
++    crate::r1_current_phase::switch("overhead");
+     if result.checkpoint_iteration != Some(solver.iteration()) {
+         checkpoint_now(&solver, hooks)?;
+     }

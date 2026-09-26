@@ -1,0 +1,171 @@
+{
+  "schema": "r1.reference-diagnostic-checks/v1",
+  "case_id": "HU-R0-022",
+  "started_utc": "2026-09-26T22:06:56.878902+00:00",
+  "source_before": [
+    {
+      "file": "diagnostic.toml",
+      "bytes": 5666,
+      "sha256": "cae505f46cd1f2c15402ce684697240a208d55140e30235a41c3564380096f52"
+    },
+    {
+      "file": "check_diagnostic.py",
+      "bytes": 14303,
+      "sha256": "c4fbfb4f167a1c62786b019a0e1abba3efe83924230f0bbbade18c57088ed959"
+    },
+    {
+      "file": "test_check_diagnostic.py",
+      "bytes": 7706,
+      "sha256": "959bc5fa75a8430e4197d058ea9833663c3117bec3935567134f828bca94d89a"
+    },
+    {
+      "file": "menus.json",
+      "bytes": 8847,
+      "sha256": "5e982816bac8c066192ce740296e2ec770aed18cce74fce075897a91082a524c"
+    },
+    {
+      "file": "observed.json",
+      "bytes": 7054,
+      "sha256": "d1f63a0a2e6744012ee3132902569e263acc09cd6499660a6148209774e29f0e"
+    },
+    {
+      "file": "menu-check.json",
+      "bytes": 88304,
+      "sha256": "92fbe0fee6e75b99fa899cf332187849d34eb7df331889092abfa01e3ed7f8c4"
+    },
+    {
+      "file": "ranges.json",
+      "bytes": 2098,
+      "sha256": "0007413f9d63aee98f3a65eb1a27706d42fecfd5dcf4c43342c1f9f87f089a39"
+    },
+    {
+      "file": "oop-range.txt",
+      "bytes": 2348,
+      "sha256": "00578d305c270cca7415c3631a888c0f757a82eb2ca93969563b1e2b10ad1041"
+    },
+    {
+      "file": "ip-range.txt",
+      "bytes": 1364,
+      "sha256": "8ac48ebeae7ded4d1427ef5a64db7a134c2104258511cd8fae72834ce98c8efd"
+    },
+    {
+      "file": "check_ranges.py",
+      "bytes": 8222,
+      "sha256": "9f32e0a587291aa78d70c4e1878c015f3096a8381e004f0cbe45db6e9acf8e82"
+    },
+    {
+      "file": "check_menus.py",
+      "bytes": 12781,
+      "sha256": "9feee72f40dfb4d731f6f3800db9ad27ba64e8e884e2d4bcebc089b350cdcdeb"
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022\\check_diagnostic.py",
+        "--check-inputs",
+        "--output",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022\\diagnostic-check.json"
+      ],
+      "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+      "exit_code": 0,
+      "elapsed_seconds": 0.1839270000346005,
+      "stdout": {
+        "file": "diagnostic-checks.stdout.log",
+        "offset_bytes": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "diagnostic-checks.stderr.log",
+        "offset_bytes": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-022\\test_check_diagnostic.py"
+      ],
+      "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+      "exit_code": 0,
+      "elapsed_seconds": 0.4716092001181096,
+      "stdout": {
+        "file": "diagnostic-checks.stdout.log",
+        "offset_bytes": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "diagnostic-checks.stderr.log",
+        "offset_bytes": 0,
+        "bytes": 1700,
+        "sha256": "d7b015cba43df829bb20a00ef40362f497237118c263f59d7ef38b7d31bb6dfa"
+      }
+    }
+  ],
+  "scope": "static diagnostic inputs only; native Rust and solver not executed",
+  "source_after": [
+    {
+      "file": "diagnostic.toml",
+      "bytes": 5666,
+      "sha256": "cae505f46cd1f2c15402ce684697240a208d55140e30235a41c3564380096f52"
+    },
+    {
+      "file": "check_diagnostic.py",
+      "bytes": 14303,
+      "sha256": "c4fbfb4f167a1c62786b019a0e1abba3efe83924230f0bbbade18c57088ed959"
+    },
+    {
+      "file": "test_check_diagnostic.py",
+      "bytes": 7706,
+      "sha256": "959bc5fa75a8430e4197d058ea9833663c3117bec3935567134f828bca94d89a"
+    },
+    {
+      "file": "menus.json",
+      "bytes": 8847,
+      "sha256": "5e982816bac8c066192ce740296e2ec770aed18cce74fce075897a91082a524c"
+    },
+    {
+      "file": "observed.json",
+      "bytes": 7054,
+      "sha256": "d1f63a0a2e6744012ee3132902569e263acc09cd6499660a6148209774e29f0e"
+    },
+    {
+      "file": "menu-check.json",
+      "bytes": 88304,
+      "sha256": "92fbe0fee6e75b99fa899cf332187849d34eb7df331889092abfa01e3ed7f8c4"
+    },
+    {
+      "file": "ranges.json",
+      "bytes": 2098,
+      "sha256": "0007413f9d63aee98f3a65eb1a27706d42fecfd5dcf4c43342c1f9f87f089a39"
+    },
+    {
+      "file": "oop-range.txt",
+      "bytes": 2348,
+      "sha256": "00578d305c270cca7415c3631a888c0f757a82eb2ca93969563b1e2b10ad1041"
+    },
+    {
+      "file": "ip-range.txt",
+      "bytes": 1364,
+      "sha256": "8ac48ebeae7ded4d1427ef5a64db7a134c2104258511cd8fae72834ce98c8efd"
+    },
+    {
+      "file": "check_ranges.py",
+      "bytes": 8222,
+      "sha256": "9f32e0a587291aa78d70c4e1878c015f3096a8381e004f0cbe45db6e9acf8e82"
+    },
+    {
+      "file": "check_menus.py",
+      "bytes": 12781,
+      "sha256": "9feee72f40dfb4d731f6f3800db9ad27ba64e8e884e2d4bcebc089b350cdcdeb"
+    }
+  ],
+  "source_unchanged": true,
+  "finished_utc": "2026-09-26T22:06:57.541733+00:00"
+}

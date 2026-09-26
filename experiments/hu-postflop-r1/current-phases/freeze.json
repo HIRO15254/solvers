@@ -1,0 +1,147 @@
+{
+  "created_at": "2026-09-26T22:08:01.369814+00:00",
+  "external_inputs": {
+    "../final-pipeline/configs/flop.toml": {
+      "bytes": 678,
+      "sha256": "07b971e4879e86e3d156169f66719e39dd078b861d06923bbbb263d8ab1a9610"
+    },
+    "../final-pipeline/configs/river.toml": {
+      "bytes": 559,
+      "sha256": "79b6a5c5d7ad02a42111db120d61668a5757e6d6210f16b017b384366e812ef0"
+    },
+    "../final-pipeline/configs/turn.toml": {
+      "bytes": 548,
+      "sha256": "d29a6e72ccff535fd7606164252de9fcef66a1730cf12fc6e7c74190bb1e2121"
+    },
+    "../final-pipeline/hu_pipeline_probe.rs": {
+      "bytes": 13915,
+      "sha256": "292d4398c21db5dd080e0fd7689b64ba7a0a46c53fa8360a677ac797b359ff39"
+    },
+    "../focused-memory/calibration.py": {
+      "bytes": 6709,
+      "sha256": "d90f0063aad62094760c4b429d273e4a48434c5f4c55fac4444020e60235f2e8"
+    },
+    "../focused-memory/native_rss.c": {
+      "bytes": 5392,
+      "sha256": "f7d3db113925bc21b2b60e361676680a386e86efd6e6fd11eab36cfb42c1f49f"
+    }
+  },
+  "files": {
+    "README.jp.md": {
+      "bytes": 10216,
+      "sha256": "e946dcfd9a8155e4493dcea58e110a08700da1686a725671bbc1ca1576061f42"
+    },
+    "codec-input.rs": {
+      "bytes": 9370,
+      "sha256": "ed972ffce351fcd31dfbab74771a06a059ef0edb43e44d65397e65f9a85cbcea"
+    },
+    "generated-review.patch": {
+      "bytes": 23611,
+      "sha256": "e355f79e9aebb1b38c91194602b6e00bcb0881fecbd554e00de3f64f9d144a72"
+    },
+    "memory_probe.c": {
+      "bytes": 3477,
+      "sha256": "0ed1caf44ef07efe2f85c3f3b03f1f193b5db435e93fa27f05b7ab808a76fc2d"
+    },
+    "prepare.py": {
+      "bytes": 10559,
+      "sha256": "76b8f47ac54e9a0be33cd2cf268267cdccfbbc2991e808aa035c32c849e2e6c5"
+    },
+    "protocol.json": {
+      "bytes": 7635,
+      "sha256": "713f43e2244927cfcb982822ea0e8bd005b1cf6751d54df8a4d410f96b606e8e"
+    },
+    "runtime.rs.in": {
+      "bytes": 7794,
+      "sha256": "a7588e30f6f1ad950d0719d9326843f37994fafacfcf913e22f62a97ab075275"
+    },
+    "source-pins.json": {
+      "bytes": 33336,
+      "sha256": "1f628ad2502df876022b6d784ca2975e08e8478c757ffc133ec29e73b22436cd"
+    },
+    "test-evidence01/command.json": {
+      "bytes": 3140,
+      "sha256": "95e95e86b7f5552e6622606ee2ec87ca11be4511fc57106e04655f12e8c42cf6"
+    },
+    "test-evidence01/stderr.log": {
+      "bytes": 38084,
+      "sha256": "72e168502495f68e6744fb702017840983a7c398d6be339219d822ee5d964187"
+    },
+    "test-evidence01/stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "test-evidence01/test_prepare.py": {
+      "bytes": 4810,
+      "sha256": "a2df90a3fd1f8ffea3539eb567370e40204b77143af5f048dfd9f3d630638df9"
+    },
+    "test-evidence02/command.json": {
+      "bytes": 3140,
+      "sha256": "554353b5a17418c2901b2526ca6288878a2080caddbf0173fa4efb50456d56bf"
+    },
+    "test-evidence02/stderr.log": {
+      "bytes": 39844,
+      "sha256": "f953d409b61eec5375c66d96b381f192c30e6b188aa92be4133c7e5f2cd7349c"
+    },
+    "test-evidence02/stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "test-evidence02/test_prepare.py": {
+      "bytes": 4890,
+      "sha256": "7ea17d2e9ffc8980b44f94b75632cdfac897facd8b4907f5688c94cf3adc9358"
+    },
+    "test-evidence03/command.json": {
+      "bytes": 3139,
+      "sha256": "797fe0913de4045898611d159e571a4e8c6384afe38033ca24082ea1ed276f3c"
+    },
+    "test-evidence03/stderr.log": {
+      "bytes": 3785,
+      "sha256": "bac161f0935793c8a5ecd72496b452b0d3d659b70e5e4e1b6371663ea98e708c"
+    },
+    "test-evidence03/stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "test-evidence03/test_validate.py": {
+      "bytes": 9674,
+      "sha256": "963a43ed1aaaabdc496f03c041ae76b0ce496d605ba9d87ed6ef86fe9ba8f58e"
+    },
+    "test-evidence03/validate.py": {
+      "bytes": 7209,
+      "sha256": "764b56a9c2e41d38a99a0a354f2f3228f59d08d810f68ad58709fa6cc154024d"
+    },
+    "test-evidence04/command.json": {
+      "bytes": 3707,
+      "sha256": "1e978e1d3c91ddec808474ae58a79bc6e9847591a7345aac283daec3ddaff482"
+    },
+    "test-evidence04/stderr.log": {
+      "bytes": 3926,
+      "sha256": "edb70bc6d84c1673887c63ae48903bbf0c4343b55563894f582245ef98b84f4e"
+    },
+    "test-evidence04/stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "test_prepare.py": {
+      "bytes": 5154,
+      "sha256": "d4d0534ffc3751c285488670d6adff03e4d793cdcced23cb6db75aa75fe7979d"
+    },
+    "test_validate.py": {
+      "bytes": 10096,
+      "sha256": "9f0ba0f9e91861274065567ec8a1047c4b10289c4f4be1d9ec31da97b51d84ac"
+    },
+    "validate.py": {
+      "bytes": 7462,
+      "sha256": "36b143bf493fb48c8f6660cb9a9161f22fb333cc5d263cffa3542edea9fe23a8"
+    }
+  },
+  "review": {
+    "generated_diff_sha256": "e355f79e9aebb1b38c91194602b6e00bcb0881fecbd554e00de3f64f9d144a72",
+    "independent_agent": "/root/profile_raw_storage/vm12_deployment_tests",
+    "outcome": "No source-level blocker identified; generated CLI-only wrappers and native calibration reviewed without compilation."
+  },
+  "schema": "r1.current-phases-preparation-freeze/v1",
+  "scope": "Prepared source controls and Python tests, not an execution freeze; Linux runtime/binary/host/deadline pins and finite runner still required.",
+  "source_revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163"
+}

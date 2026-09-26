@@ -1,0 +1,154 @@
+//! Research-only phase timers and optional Linux mm high-water resets.
+//! Does not execute in production. Memory mode timings are not performance data.
+use std::io::{Read, Write};
+use std::path::{Path, PathBuf};
+use std::sync::{Mutex, atomic::{AtomicBool, Ordering}};
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
+use anyhow::{Context, Result};
+use serde::Serialize;
+
+const SOURCE: &str = "@@REVISION@@";
+const ID: &str = "@@INSTRUMENTATION@@";
+const MAX_SPANS: usize = 256;
+static ENABLED: AtomicBool = AtomicBool::new(false);
+static TRACE: Mutex<Option<Trace>> = Mutex::new(None);
+
+#[derive(Clone, Copy, Serialize)]
+struct Resident { rss_kib: u64, hwm_kib: u64 }
+
+// Fixed stack buffer: no String/Vec allocation while reading the process counter.
+fn resident() -> Result<Resident> {
+    let mut file = std::fs::File::open("/proc/self/status")?;
+    let mut bytes = [0_u8; 32768];
+    let mut used = 0;
+    loop {
+        anyhow::ensure!(used < bytes.len(), "proc status exceeds fixed buffer");
+        let count = file.read(&mut bytes[used..])?;
+        if count == 0 { break; }
+        used += count;
+    }
+    let text = std::str::from_utf8(&bytes[..used])?;
+    let field = |prefix: &str| -> Result<u64> {
+        let line = text.lines().find_map(|line| line.strip_prefix(prefix))
+            .with_context(|| format!("missing proc field {prefix}"))?;
+        let mut parts = line.split_whitespace();
+        let value = parts.next().context("missing proc value")?.parse::<u64>()?;
+        anyhow::ensure!(parts.next() == Some("kB") && parts.next().is_none(), "proc unit differs");
+        anyhow::ensure!(value > 0, "proc resident value is zero");
+        Ok(value)
+    };
+    let result = Resident { rss_kib: field("VmRSS:")?, hwm_kib: field("VmHWM:")? };
+    anyhow::ensure!(result.hwm_kib >= result.rss_kib, "inconsistent proc snapshot");
+    Ok(result)
+}
+
+fn reset_peak() -> Result<Resident> {
+    // Only value 5 resets mm high-water; never use 1--4 page-reference controls.
+    let mut file = std::fs::OpenOptions::new().write(true).open("/proc/self/clear_refs")?;
+    file.write_all(b"5\n")?;
+    resident()
+}
+
+#[derive(Serialize)]
+struct Memory { start: Resident, end: Resident, reset_value: u8 }
+#[derive(Serialize)]
+struct Span {
+    phase: &'static str, start_ns: u64, end_ns: u64,
+    status: &'static str, iteration: Option<u64>, memory: Option<Memory>,
+}
+struct Trace {
+    origin: Instant, started: String, phase: &'static str, start_ns: u64,
+    iteration: Option<u64>, spans: Vec<Span>, memory: bool, resident_start: Option<Resident>,
+}
+impl Trace {
+    fn close(&mut self, end_ns: u64, status: &'static str) {
+        assert!(self.spans.len() < MAX_SPANS, "R1 phase span limit exceeded");
+        let memory = self.resident_start.map(|start| Memory {
+            start, end: resident().expect("R1 phase resident read failed"), reset_value: 5,
+        });
+        self.spans.push(Span { phase: self.phase, start_ns: self.start_ns, end_ns,
+            status, iteration: self.iteration, memory });
+    }
+    fn record(&self, status: &str, total: Option<u64>, error: Option<String>) -> serde_json::Value {
+        serde_json::json!({
+            "schema": "r1.current-phases/v1", "source_revision": SOURCE,
+            "instrumentation_id": ID, "pid": std::process::id(), "started_unix_ns": self.started,
+            "mode": if self.memory { "memory" } else { "time" }, "status": status,
+            "total_ns": total, "leaf_sum_ns": total.map(|_| self.spans.iter().map(|s| s.end_ns-s.start_ns).sum::<u64>()),
+            "spans": self.spans, "command_error": error,
+            "scope": "main dispatch; final phase JSON persistence and process startup/exit excluded",
+            "memory_scope": "Each memory leaf follows clear_refs=5. end VmHWM is the reset-window kernel counter including observer footprint, not physical exact peak, allocation bytes, or cumulative ru_maxrss. Memory-mode timings are ineligible.",
+            "forced_termination": "running initial record only; missing phases are not zero",
+        })
+    }
+}
+fn publish(path: &Path, value: &serde_json::Value, initial: bool) -> Result<()> {
+    let parent = path.parent().context("phase output needs parent")?;
+    let mut file = tempfile::NamedTempFile::new_in(parent)?;
+    serde_json::to_writer_pretty(file.as_file_mut(), value)?;
+    file.write_all(b"\n")?;
+    file.as_file().sync_all()?;
+    if initial { file.persist_noclobber(path).map_err(|e| e.error)?; }
+    else { file.persist(path).map_err(|e| e.error)?; }
+    Ok(())
+}
+pub(crate) struct Session { output: PathBuf }
+impl Session {
+    pub(crate) fn start() -> Result<Option<Self>> {
+        let Some(output) = std::env::var_os("R1_CURRENT_PHASE_OUTPUT") else {
+            anyhow::ensure!(std::env::var_os("R1_CURRENT_PHASE_MODE").is_none(), "mode without output");
+            return Ok(None);
+        };
+        let output = PathBuf::from(output);
+        anyhow::ensure!(output.is_absolute(), "phase path must be absolute");
+        let mode = std::env::var("R1_CURRENT_PHASE_MODE")?;
+        anyhow::ensure!(mode == "time" || mode == "memory", "unknown phase mode");
+        let memory = mode == "memory";
+        anyhow::ensure!(!memory || cfg!(target_os = "linux"), "memory mode requires Linux");
+        let mut slot = TRACE.lock().unwrap_or_else(|e| e.into_inner());
+        anyhow::ensure!(slot.is_none(), "phase session already active");
+        let mut trace = Trace {
+            origin: Instant::now(), started: SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos().to_string(),
+            phase: "overhead", start_ns: 0, iteration: None, spans: Vec::with_capacity(MAX_SPANS),
+            memory, resident_start: None,
+        };
+        publish(&output, &trace.record("running", None, None), true)?;
+        if memory { trace.resident_start = Some(reset_peak()?); }
+        *slot = Some(trace);
+        ENABLED.store(true, Ordering::Release);
+        Ok(Some(Self { output }))
+    }
+    pub(crate) fn finish(self, ok: bool, error: Option<String>) -> Result<()> {
+        ENABLED.store(false, Ordering::Release);
+        let mut trace = TRACE.lock().unwrap_or_else(|e| e.into_inner()).take().expect("active phase trace");
+        let end = u64::try_from(trace.origin.elapsed().as_nanos()).expect("phase clock overflow");
+        trace.close(end, if ok { "complete" } else { "error" });
+        publish(&self.output, &trace.record(if ok { "completed" } else { "error" }, Some(end), error), false)
+    }
+}
+fn change(phase: &'static str, iteration: Option<u64>, status: &'static str) {
+    if !ENABLED.load(Ordering::Acquire) { return; }
+    let mut slot = TRACE.lock().unwrap_or_else(|e| e.into_inner());
+    let trace = slot.as_mut().expect("active phase trace");
+    let end = u64::try_from(trace.origin.elapsed().as_nanos()).expect("phase clock overflow");
+    trace.close(end, status);
+    trace.phase = phase;
+    trace.start_ns = end;
+    trace.iteration = iteration;
+    if trace.memory { trace.resident_start = Some(reset_peak().expect("R1 phase HWM reset failed")); }
+}
+pub(crate) fn switch(phase: &'static str) { change(phase, None, "complete"); }
+pub(crate) fn measure<T>(phase: &'static str, iteration: Option<u64>, action: impl FnOnce() -> T) -> T {
+    if !ENABLED.load(Ordering::Acquire) { return action(); }
+    change(phase, iteration, "complete");
+    let result = action();
+    switch("overhead");
+    result
+}
+pub(crate) fn measure_result<T, E>(phase: &'static str, iteration: Option<u64>, action: impl FnOnce() -> std::result::Result<T, E>) -> std::result::Result<T, E> {
+    if !ENABLED.load(Ordering::Acquire) { return action(); }
+    change(phase, iteration, "complete");
+    let result = action();
+    change("overhead", None, if result.is_ok() { "complete" } else { "error" });
+    result
+}

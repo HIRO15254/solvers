@@ -1,0 +1,17 @@
+{
+  "schema": "r1.reference-root-review/v1",
+  "case_id": "HU-R0-006",
+  "checked_utc": "2026-09-26T22:23:34.623208+00:00",
+  "result": "passed",
+  "checks": [
+    "All 7 range and 14 menu before/after source pins verified against final files",
+    "All 4 commands exited zero; raw stdout/stderr byte intervals and SHA verified",
+    "Browser compact transfer matches 10717 ASCII characters and FNV a2150af3",
+    "Independent half-bb integer replay without importing checker matches all 120 observations, 356 edges, 237 derived terminals and 4 short all-in edges",
+    "All 119 nonterminal children observed; first 5 URL suffixes remain separate from selected prefixes"
+  ],
+  "menu_report_sha256": "e76e79d251b9e20ecd514785cad78c862ebb571e6d70afc35cb24b9d9ed10685",
+  "native_validation": "not_executed",
+  "solve": "not_executed",
+  "quality_acceptance": null
+}

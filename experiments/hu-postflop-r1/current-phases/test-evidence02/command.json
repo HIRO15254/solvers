@@ -1,0 +1,98 @@
+{
+  "schema": "r1.current-phases-preparation-tests/v1",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\current-phases",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "started_at": "2026-09-26T22:03:14.646012+00:00",
+  "finished_at": "2026-09-26T22:03:14.951300+00:00",
+  "wall_seconds": 0.30528440000489354,
+  "exit_code": 1,
+  "before": {
+    "prepare.py": {
+      "bytes": 10559,
+      "sha256": "76b8f47ac54e9a0be33cd2cf268267cdccfbbc2991e808aa035c32c849e2e6c5"
+    },
+    "runtime.rs.in": {
+      "bytes": 7794,
+      "sha256": "a7588e30f6f1ad950d0719d9326843f37994fafacfcf913e22f62a97ab075275"
+    },
+    "protocol.json": {
+      "bytes": 7635,
+      "sha256": "713f43e2244927cfcb982822ea0e8bd005b1cf6751d54df8a4d410f96b606e8e"
+    },
+    "source-pins.json": {
+      "bytes": 33336,
+      "sha256": "1f628ad2502df876022b6d784ca2975e08e8478c757ffc133ec29e73b22436cd"
+    },
+    "codec-input.rs": {
+      "bytes": 9370,
+      "sha256": "ed972ffce351fcd31dfbab74771a06a059ef0edb43e44d65397e65f9a85cbcea"
+    },
+    "memory_probe.c": {
+      "bytes": 3477,
+      "sha256": "0ed1caf44ef07efe2f85c3f3b03f1f193b5db435e93fa27f05b7ab808a76fc2d"
+    },
+    "validate.py": {
+      "bytes": 7209,
+      "sha256": "764b56a9c2e41d38a99a0a354f2f3228f59d08d810f68ad58709fa6cc154024d"
+    },
+    "test_prepare.py": {
+      "bytes": 4890,
+      "sha256": "7ea17d2e9ffc8980b44f94b75632cdfac897facd8b4907f5688c94cf3adc9358"
+    },
+    "test_validate.py": {
+      "bytes": 9674,
+      "sha256": "963a43ed1aaaabdc496f03c041ae76b0ce496d605ba9d87ed6ef86fe9ba8f58e"
+    }
+  },
+  "after": {
+    "prepare.py": {
+      "bytes": 10559,
+      "sha256": "76b8f47ac54e9a0be33cd2cf268267cdccfbbc2991e808aa035c32c849e2e6c5"
+    },
+    "runtime.rs.in": {
+      "bytes": 7794,
+      "sha256": "a7588e30f6f1ad950d0719d9326843f37994fafacfcf913e22f62a97ab075275"
+    },
+    "protocol.json": {
+      "bytes": 7635,
+      "sha256": "713f43e2244927cfcb982822ea0e8bd005b1cf6751d54df8a4d410f96b606e8e"
+    },
+    "source-pins.json": {
+      "bytes": 33336,
+      "sha256": "1f628ad2502df876022b6d784ca2975e08e8478c757ffc133ec29e73b22436cd"
+    },
+    "codec-input.rs": {
+      "bytes": 9370,
+      "sha256": "ed972ffce351fcd31dfbab74771a06a059ef0edb43e44d65397e65f9a85cbcea"
+    },
+    "memory_probe.c": {
+      "bytes": 3477,
+      "sha256": "0ed1caf44ef07efe2f85c3f3b03f1f193b5db435e93fa27f05b7ab808a76fc2d"
+    },
+    "validate.py": {
+      "bytes": 7209,
+      "sha256": "764b56a9c2e41d38a99a0a354f2f3228f59d08d810f68ad58709fa6cc154024d"
+    },
+    "test_prepare.py": {
+      "bytes": 4890,
+      "sha256": "7ea17d2e9ffc8980b44f94b75632cdfac897facd8b4907f5688c94cf3adc9358"
+    },
+    "test_validate.py": {
+      "bytes": 9674,
+      "sha256": "963a43ed1aaaabdc496f03c041ae76b0ce496d605ba9d87ed6ef86fe9ba8f58e"
+    }
+  },
+  "unchanged": true,
+  "scope": "Python source-copy and synthetic validator tests only; no Rust/C build,solve,Cloud or proc reset execution"
+}

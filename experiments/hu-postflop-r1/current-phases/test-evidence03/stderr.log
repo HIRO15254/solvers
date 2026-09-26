@@ -1,0 +1,32 @@
+test_ambiguous_and_missing_anchors_rejected (test_prepare.PreparationTests.test_ambiguous_and_missing_anchors_rejected) ... ok
+test_changed_source_rejected_before_output (test_prepare.PreparationTests.test_changed_source_rejected_before_output) ... ok
+test_double_patch_rejected (test_prepare.PreparationTests.test_double_patch_rejected) ... ok
+test_exact_generated_pins_and_no_engine_formats_changes (test_prepare.PreparationTests.test_exact_generated_pins_and_no_engine_formats_changes) ... ok
+test_existing_output_is_untouched (test_prepare.PreparationTests.test_existing_output_is_untouched) ... ok
+test_extra_source_rejected (test_prepare.PreparationTests.test_extra_source_rejected) ... ok
+test_instrumented_copy_preserves_supplied_source (test_prepare.PreparationTests.test_instrumented_copy_preserves_supplied_source) ... ok
+test_missing_source_rejected (test_prepare.PreparationTests.test_missing_source_rejected) ... ok
+test_output_inside_source_rejected (test_prepare.PreparationTests.test_output_inside_source_rejected) ... ok
+test_plain_copy_has_only_identical_codec_addition (test_prepare.PreparationTests.test_plain_copy_has_only_identical_codec_addition) ... ok
+test_inclusive_lower_and_upper_gate_boundaries (test_validate.CalibrationTests.test_inclusive_lower_and_upper_gate_boundaries) ... ok
+test_rejects_missing_modes_wrong_count_and_nonpositive_nonfinite_values (test_validate.CalibrationTests.test_rejects_missing_modes_wrong_count_and_nonpositive_nonfinite_values) ... ok
+test_second_ratio_and_too_fast_instrumentation_also_fail (test_validate.CalibrationTests.test_second_ratio_and_too_fast_instrumentation_also_fail) ... ok
+test_uses_medians_and_fails_without_a_correction_factor (test_validate.CalibrationTests.test_uses_medians_and_fails_without_a_correction_factor) ... ok
+test_all_codec_kinds_require_only_their_own_leaf_and_overhead (test_validate.ValidationTests.test_all_codec_kinds_require_only_their_own_leaf_and_overhead) ... ok
+test_iteration_zero_and_null_are_allowed (test_validate.ValidationTests.test_iteration_zero_and_null_are_allowed) ... ok
+test_missing_or_wrong_codec_phase_rejected (test_validate.ValidationTests.test_missing_or_wrong_codec_phase_rejected) ... ok
+test_rejects_bad_identity_mode_and_completion_state (test_validate.ValidationTests.test_rejects_bad_identity_mode_and_completion_state) ... ok
+test_rejects_bool_float_negative_or_null_timestamps (test_validate.ValidationTests.test_rejects_bool_float_negative_or_null_timestamps) ... ok
+test_rejects_gaps_overlaps_backwards_and_bad_totals (test_validate.ValidationTests.test_rejects_gaps_overlaps_backwards_and_bad_totals) ... ok
+test_rejects_invalid_rss_hwm_and_reset (test_validate.ValidationTests.test_rejects_invalid_rss_hwm_and_reset) ... ok
+test_rejects_missing_unknown_or_incomplete_spans (test_validate.ValidationTests.test_rejects_missing_unknown_or_incomplete_spans) ... ok
+test_repeated_leaf_sums_calls_and_uses_max_end_hwm_without_subtraction (test_validate.ValidationTests.test_repeated_leaf_sums_calls_and_uses_max_end_hwm_without_subtraction) ... ok
+test_reset_permits_hwm_to_fall_between_intervals (test_validate.ValidationTests.test_reset_permits_hwm_to_fall_between_intervals) ... ok
+test_source_and_instrumentation_bind_to_manifest (test_validate.ValidationTests.test_source_and_instrumentation_bind_to_manifest) ... ok
+test_time_memory_null_and_memory_observation_required (test_validate.ValidationTests.test_time_memory_null_and_memory_observation_required) ... ok
+test_time_mode_contiguous_leaf_sum_and_extensible_metadata (test_validate.ValidationTests.test_time_mode_contiguous_leaf_sum_and_extensible_metadata) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 10.720s
+
+OK

@@ -1,0 +1,212 @@
+{
+  "schema": "r1.reference-offline-checks/v1",
+  "case_id": "HU-R0-006",
+  "scope": "completed decision-menu capture and static closure only; inferred unvisited terminals, no native solver or external quality",
+  "started_utc": "2026-09-26T22:22:07.744941+00:00",
+  "source_before": [
+    {
+      "file": "menus.json",
+      "bytes": 10718,
+      "sha256": "f35e8901c2a644a6408174e31abcb6836b7eb522b03cf551951e67e6bf297daf"
+    },
+    {
+      "file": "observed.json",
+      "bytes": 5977,
+      "sha256": "25abd50a02c86e4c9c04a1578f02eb023f4fe626163888c69a0199c2ab213f0a"
+    },
+    {
+      "file": "ranges.json",
+      "bytes": 2110,
+      "sha256": "27fb1efe72fdfe8f5820d4aad59035adf46628d10235a1f1b534b698d12e434b"
+    },
+    {
+      "file": "range-checks.json",
+      "bytes": 4338,
+      "sha256": "069547d93860ff0819806a9e86a85340d5a9e66280fe60c12c2b0b38114be63d"
+    },
+    {
+      "file": "range-checks.stdout.log",
+      "bytes": 217,
+      "sha256": "ee7fa22a8531bad9cb5a9ed715173a3e369e1bb2d2c246dd93117920c1af3a7e"
+    },
+    {
+      "file": "range-checks.stderr.log",
+      "bytes": 1661,
+      "sha256": "0aacf0d012ee2a84705809886719a95079274a26b5f93cbbb089d8c98768049f"
+    },
+    {
+      "file": "README.md",
+      "bytes": 4731,
+      "sha256": "b62195ccc6deaaebfdf29d9fa61ae24b59258e3d6a5d8d6d7a79a14d6b37a4b4"
+    },
+    {
+      "file": "oop-range.txt",
+      "bytes": 8418,
+      "sha256": "ce50709245e05473c40235089bffe187822c7bf2837450251bef12cb7621d667"
+    },
+    {
+      "file": "ip-range.txt",
+      "bytes": 7818,
+      "sha256": "3f92e22693fd2e24633491d15c0eb118da50762a889d2e0e127d72af393faef7"
+    },
+    {
+      "file": "check_ranges.py",
+      "bytes": 10330,
+      "sha256": "79664db5a5f47449a4cf8076baa9eb9a3bdee4449b36407ab30d0096c2f0208f"
+    },
+    {
+      "file": "test_check_ranges.py",
+      "bytes": 5985,
+      "sha256": "660ba88fab4f1ea38cb5892d6b09253913c705c9a5ce6952dc57dc80063aa494"
+    },
+    {
+      "file": "check_menus.py",
+      "bytes": 15158,
+      "sha256": "c9e8ce5cb872b9d89a99129a892edda15c98cb44ce2f4ab097ebd6c829beb9e9"
+    },
+    {
+      "file": "test_check_menus.py",
+      "bytes": 11960,
+      "sha256": "148ee373ccb3757a99ba8291988a07651cdb78e78a30c18308cdba87ca9bb01f"
+    },
+    {
+      "file": "menus-README.md",
+      "bytes": 6498,
+      "sha256": "d906dea72c35227b9b0a01e7ec011d9f62ca31471b495198b7b3c03ef7f52b9a"
+    }
+  ],
+  "python": {
+    "path": "C:\\Python313\\python.exe",
+    "version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca"
+  },
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-006\\check_menus.py",
+        "--output",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-006\\menu-check.json"
+      ],
+      "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-006",
+      "exit_code": 0,
+      "elapsed_seconds": 0.16517819999717176,
+      "stdout": {
+        "file": "menu-checks.stdout.log",
+        "offset_bytes": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "menu-checks.stderr.log",
+        "offset_bytes": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-006\\test_check_menus.py"
+      ],
+      "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\HU-R0-006",
+      "exit_code": 0,
+      "elapsed_seconds": 0.3680801000446081,
+      "stdout": {
+        "file": "menu-checks.stdout.log",
+        "offset_bytes": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "menu-checks.stderr.log",
+        "offset_bytes": 0,
+        "bytes": 2734,
+        "sha256": "7b774dfb95c736e294cd9aed2c1567db034562f2a8e166814ad596fd65238e35"
+      }
+    }
+  ],
+  "source_after": [
+    {
+      "file": "menus.json",
+      "bytes": 10718,
+      "sha256": "f35e8901c2a644a6408174e31abcb6836b7eb522b03cf551951e67e6bf297daf"
+    },
+    {
+      "file": "observed.json",
+      "bytes": 5977,
+      "sha256": "25abd50a02c86e4c9c04a1578f02eb023f4fe626163888c69a0199c2ab213f0a"
+    },
+    {
+      "file": "ranges.json",
+      "bytes": 2110,
+      "sha256": "27fb1efe72fdfe8f5820d4aad59035adf46628d10235a1f1b534b698d12e434b"
+    },
+    {
+      "file": "range-checks.json",
+      "bytes": 4338,
+      "sha256": "069547d93860ff0819806a9e86a85340d5a9e66280fe60c12c2b0b38114be63d"
+    },
+    {
+      "file": "range-checks.stdout.log",
+      "bytes": 217,
+      "sha256": "ee7fa22a8531bad9cb5a9ed715173a3e369e1bb2d2c246dd93117920c1af3a7e"
+    },
+    {
+      "file": "range-checks.stderr.log",
+      "bytes": 1661,
+      "sha256": "0aacf0d012ee2a84705809886719a95079274a26b5f93cbbb089d8c98768049f"
+    },
+    {
+      "file": "README.md",
+      "bytes": 4731,
+      "sha256": "b62195ccc6deaaebfdf29d9fa61ae24b59258e3d6a5d8d6d7a79a14d6b37a4b4"
+    },
+    {
+      "file": "oop-range.txt",
+      "bytes": 8418,
+      "sha256": "ce50709245e05473c40235089bffe187822c7bf2837450251bef12cb7621d667"
+    },
+    {
+      "file": "ip-range.txt",
+      "bytes": 7818,
+      "sha256": "3f92e22693fd2e24633491d15c0eb118da50762a889d2e0e127d72af393faef7"
+    },
+    {
+      "file": "check_ranges.py",
+      "bytes": 10330,
+      "sha256": "79664db5a5f47449a4cf8076baa9eb9a3bdee4449b36407ab30d0096c2f0208f"
+    },
+    {
+      "file": "test_check_ranges.py",
+      "bytes": 5985,
+      "sha256": "660ba88fab4f1ea38cb5892d6b09253913c705c9a5ce6952dc57dc80063aa494"
+    },
+    {
+      "file": "check_menus.py",
+      "bytes": 15158,
+      "sha256": "c9e8ce5cb872b9d89a99129a892edda15c98cb44ce2f4ab097ebd6c829beb9e9"
+    },
+    {
+      "file": "test_check_menus.py",
+      "bytes": 11960,
+      "sha256": "148ee373ccb3757a99ba8291988a07651cdb78e78a30c18308cdba87ca9bb01f"
+    },
+    {
+      "file": "menus-README.md",
+      "bytes": 6498,
+      "sha256": "d906dea72c35227b9b0a01e7ec011d9f62ca31471b495198b7b3c03ef7f52b9a"
+    }
+  ],
+  "sources_unchanged": true,
+  "report_recalculated_exactly": true,
+  "report_output": {
+    "file": "menu-check.json",
+    "bytes": 197228,
+    "sha256": "e76e79d251b9e20ecd514785cad78c862ebb571e6d70afc35cb24b9d9ed10685"
+  },
+  "finished_utc": "2026-09-26T22:22:08.363435+00:00",
+  "all_two_passed": true
+}

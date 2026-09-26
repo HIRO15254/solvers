@@ -1,0 +1,61 @@
+{
+  "schema": "r1.reference-ranges/v1",
+  "case_id": "HU-R0-006",
+  "board": [
+    "9s",
+    "8s",
+    "7d",
+    "2c",
+    "Jd"
+  ],
+  "observed": {
+    "file": "observed.json",
+    "bytes": 5977,
+    "sha256": "25abd50a02c86e4c9c04a1578f02eb023f4fe626163888c69a0199c2ab213f0a"
+  },
+  "arithmetic": "Decimal precision 100 with Inexact trap; both compatible and incompatible mass summed independently",
+  "byte_scope": "original ASCII Copy text plus exactly one appended LF; no rewrite or renormalization",
+  "transfer_check_scope": "reported browser character count and FNV independently recalculated; UI provenance remains collecting root's report",
+  "oop": {
+    "file": "oop-range.txt",
+    "file_bytes": 8418,
+    "copy_raw_characters": 8417,
+    "raw_fnv1a32": "07f300b7",
+    "sha256": "ce50709245e05473c40235089bffe187822c7bf2837450251bef12cb7621d667",
+    "positive_combos": 545,
+    "weight_sum": "203.6428153",
+    "weight_min": "0.0005176",
+    "weight_max": "1",
+    "duplicate_unordered_combos": 0,
+    "repeated_private_cards": 0,
+    "board_collisions": 0,
+    "invalid_weights": 0
+  },
+  "ip": {
+    "file": "ip-range.txt",
+    "file_bytes": 7818,
+    "copy_raw_characters": 7817,
+    "raw_fnv1a32": "488d4640",
+    "sha256": "3f92e22693fd2e24633491d15c0eb118da50762a889d2e0e127d72af393faef7",
+    "positive_combos": 514,
+    "weight_sum": "150.3632398",
+    "weight_min": "0.0000176",
+    "weight_max": "0.9990001",
+    "duplicate_unordered_combos": 0,
+    "repeated_private_cards": 0,
+    "board_collisions": 0,
+    "invalid_weights": 0
+  },
+  "joint": {
+    "positive_pair_product_count": 280130,
+    "compatible_positive_pairs": 254190,
+    "incompatible_positive_pairs": 25940,
+    "compatible_weight_sum": "27300.28406003120172",
+    "incompatible_weight_sum": "3320.10941046980722",
+    "unrestricted_product_weight_sum": "30620.39347050100894",
+    "definition": "sum(w_oop*w_ip) over disjoint retained private cards; no normalization, chance weights or folded-seat card distribution"
+  },
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null
+}

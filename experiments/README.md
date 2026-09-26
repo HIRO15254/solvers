@@ -34,6 +34,7 @@
 | R1の受入証拠の範囲 | [事前条件の監査](hu-postflop-r1/acceptance/audit.jp.md)、[将来の外部比較器](hu-postflop-r1/acceptance/external-contract.md) | 既存の事前条件と測定後索引を区別。将来の閾値発行・校正・欠測の検査であり、総合受入の認定ではない |
 | R1の実入力への境界適用 | [抽象化の適用確認](hu-postflop-r1/reference/abstraction-applicability.md) | 017/019のhand identity・joint重み・完全記憶の検査と、未実装・未評価の範囲 |
 | R1の工程別診断 | [source03 phase比較](hu-postflop-r1/phases/vm06-report.md) | 別instrumented buildのon/off較正、重複しない工程時間、元の性能実測との区別 |
+| R1の現行版工程計測の準備 | [current-phases](hu-postflop-r1/current-phases/README.jp.md) | source11e4062の計測copy生成・4arm計画・28軽量tests。有限runner、Rust/C実行とLinux校正は未実施で、新たな性能値ではない |
 | R1の参照取得 | [HU-R0-019](hu-postflop-r1/reference/HU-R0-019/README.md) | Riverの両range・表示値・継続menuの観測と未確認条件 |
 | R1の参照診断 | [River 017 / 019](hu-postflop-r1/reference/vm06-river-report.md) | 全menuと実exportの照合。参照条件未確認のため外部品質は未認定 |
 | R1の追加参照入力 | [Turn 007](hu-postflop-r1/reference/HU-R0-007/README.md)、[Flop 020](hu-postflop-r1/reference/HU-R0-020/README.md) | 両rangeとroot観測。全後続木は欠測として保持 |
@@ -41,6 +42,8 @@
 | R1の75bb 3bet Turn参照入力 | [Turn 016](hu-postflop-r1/reference/HU-R0-016/README.md) | 両range原文・75,225互換pair・開始2判断点の観測。全継続木と参照精度は未確認 |
 | R1の100bb River参照入力 | [River 002](hu-postflop-r1/reference/HU-R0-002/README.md) | 両rangeの原文・checksum・joint重みと、実際に取得した継続menu。参照条件と品質の認定は別判断 |
 | R1のsqueeze後River参照入力 | [River 022](hu-postflop-r1/reference/HU-R0-022/README.md) | 両range150/86 combo・11,606互換pairと全72 decision menuの観測。fold済みseat、レーキ精算、個別版・精度は未確認 |
+| R1のsqueeze後River診断config | [022の静的検査](hu-postflop-r1/reference/HU-R0-022/diagnostic-check.json) | 全72判断点を表現する自己完結入力。total/matched potレーキが42 Foldで異なる仮定を明示。native parser/solve・外部品質は未認定 |
+| R1のBlind対Blind River参照入力 | [006の両range](hu-postflop-r1/reference/HU-R0-006/README.md)、[全メニュー検査](hu-postflop-r1/reference/HU-R0-006/menus-README.md) | SB545/BB514 combo・254,190互換pair、全120判断点の観測。URLの未選択suffixを分離し、GG精算・参照精度の欠測を保持 |
 | R1の100bb River参照診断 | [002実行照合](hu-postflop-r1/reference/vm07-002-report.md)、[参照条件監査](hu-postflop-r1/reference/reference-condition-audit.jp.md) | 132 menuの実exportと保存後EV/BR。レーキ・参照精度等の欠測を保持し、品質閾値の事後発行をしない |
 | R1の参照条件の追加観測 | [9月27日の文献・Fold EV確認](hu-postflop-r1/reference/condition-followup-20260927/README.jp.md) | 公式記事の系列・公開時期と、002のBet 2→Raise 7で正weightの3 comboがFold EV 0となる実画面。表示欄を限定した基準時点の推論で、個別版・残差・レーキの認定ではない |
 | R1の参照profile出力の監査 | [019のCopy原文と整合検査](hu-postflop-r1/reference/HU-R0-019/profile-20260927/README.jp.md) | 取得した5判断点のaction-weight原文、欠測・丸め仮定・親子レンジの不連続を保持。完全profileや外部品質の認定には使わない |

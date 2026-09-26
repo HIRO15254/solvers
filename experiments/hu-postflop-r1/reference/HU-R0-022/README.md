@@ -86,3 +86,56 @@ JSONへ往復するactionをlistに揃えて修正し、失敗した[初回recei
 以前のrange単独実行はtranscriptのみだったが、今回の再検査をその履歴と混同しない。
 各checkerの`--write`は検査成功時に未存在の結果JSONだけを作り、既存記録・range原文を上書きしない。
 solver・Rust build・cloudは実行していない。
+
+## 自己完結した診断用config
+
+[diagnostic.toml](diagnostic.toml)は100chips=1bbで、board・両Copy原文・tree scriptを直埋め込みした
+`solvers.postflop/v1`入力である。root pot3050chips、残stack8600chips、min bet100chips、
+F32/DCFR・1worker、10,000 iterationまたは累積30秒までの診断予算を明示する。
+`target_nash_conv`や外部品質閾値は設定していない。予算の記載は実行済み・収束済みを意味しない。
+
+現行[config仕様](../../../../docs/solver-config-v1.jp.md)の絶対raise-to `c` と `a` を使い、
+betの固定5額＋all-in、raiseの既定all-in、`aggressions` / `to_call`条件7本で全menuを表現する。
+riverのaggression上限は4、`include_allin=false`、all-in thresholdなし。
+scriptはhistoryや外部fileへ依存しない。同じ条件の複数nodeも個別の観測rowと照合し、
+席の対称性を根拠に未取得menuを補っていない。
+
+[check_diagnostic.py](check_diagnostic.py)はこのfixtureが使う限定DSLを静的に読み、
+整数chipで条件選択・最小raise・all-in上限・action順序・遷移を再構成する。
+観測graphに対して全72nodeのhistory、actor、既拠出額、残stack、ordered actionsを照合し、
+141終端・全213node・8本の短いall-inを確認した。両range文字列は追加末尾LFを除いた
+保存原文bytesと完全一致する。TOML・原文・元観測・検査コード・仕様/runtime sourceのhashを出力する。
+これは**静的な表現可能性の検査**であり、Rust parserの実行やnative tree exportの比較ではない。
+未対応DSL構文を見つけた場合は明示拒否する。runtimeでのrangeのf32化まで元decimalと同値とは主張しない。
+
+レーキは**全river終端のtotal contributed potへ5%、上限400chips、追加丸めなし**という
+診断仮定であり、参照ライブラリの確認済み精算規則ではない。
+仮にmatched pot=`3050+2*min(各seatのriver拠出)`へ同じ率/capを適用すると、
+141終端中42のFoldで異なる。`R3-F`はtotal167.5chipsに対してmatched152.5chips、
+`RAI-F`は400に対して152.5chipsで、最大差247.5chips（2.475bb）。
+019/017の「初期potだけでcapに達するので両方式が一致する」説明を022へ流用していない。
+この42件は二つの仮定の比較であり、実際の徴収を取得した件数ではない。
+
+初期pot30.5bbにはfold済みUTGの2bbを含め、28.5bbの別ゲームへ置き換えない。
+一方、現行HU入力はfold済みseatの私有カード分布による条件付けを表現しない。
+入力は保存されたBB/BTN周辺rangeを使う診断に限定し、外部joint reach・dead-moneyの精算由来・
+既徴収額/cap残・未call額返却・個別版/精度・完全policy・EV基準の一致は未認定のままである。
+
+```text
+python -B experiments/hu-postflop-r1/reference/HU-R0-022/check_diagnostic.py --check-inputs
+python -B experiments/hu-postflop-r1/reference/HU-R0-022/test_check_diagnostic.py
+```
+
+診断用の11軽量testsは0.270秒で成功した。全node照合のほか、手転記した6局面、
+条件/金額/欠落rule、range並替え、未知DSL、外部tree依存、隠れたthreshold、
+誤ったactor/stack/action順序、call後拠出、total/matched差と品質認定の禁止を検査する。
+この追加実行はtool transcriptで確認し、前節の4command用`checks.json`へ混入していない。
+`--output PATH`は検査報告を未存在pathへ保存できる。native validate/build/solveは実行していない。
+
+追加のroot再検査では[diagnostic-check.json](diagnostic-check.json)を生成し、2commandの
+argv・実行前後11source pin・exit・時間を[diagnostic-checks.json](diagnostic-checks.json)、
+元bytesを[stdout](diagnostic-checks.stdout.log) / [stderr](diagnostic-checks.stderr.log)へ保持した。
+別担当が全log byte区間とhash、報告の12入力pin、全141終端の算術を再照合した。
+既存の10pinと4command用receipt・ログ・root-reviewは変更していない。
+また、checkerをimportしないhalf-bb整数の別計算でも全72nodeのmenu・actor・stackが一致した。
+これは静的検査の再現性を補う証拠であり、native DSL実行の代わりにはしない。

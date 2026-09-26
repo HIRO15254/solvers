@@ -1,0 +1,23 @@
+test_actual_capture_roundtrip_transfer_and_complete_graph (__main__.MenuChecks.test_actual_capture_roundtrip_transfer_and_complete_graph) ... ok
+test_bad_depth_spot_type_and_prefix_are_rejected (__main__.MenuChecks.test_bad_depth_spot_type_and_prefix_are_rejected) ... ok
+test_capture_time_shape_order_and_unsupported_precision_rejected (__main__.MenuChecks.test_capture_time_shape_order_and_unsupported_precision_rejected) ... ok
+test_changed_base_or_external_quality_claim_rejected (__main__.MenuChecks.test_changed_base_or_external_quality_claim_rejected) ... ok
+test_deep_short_allin_97_below_102_is_allowed_but_96_5_is_not (__main__.MenuChecks.test_deep_short_allin_97_below_102_is_allowed_but_96_5_is_not) ... ok
+test_duplicate_path_and_orphan_are_rejected (__main__.MenuChecks.test_duplicate_path_and_orphan_are_rejected) ... ok
+test_final_transfer_pin_is_unclaimed_until_supplied (__main__.MenuChecks.test_final_transfer_pin_is_unclaimed_until_supplied) ... ok
+test_full_raise_boundary_uses_prior_increment_not_added_contribution (__main__.MenuChecks.test_full_raise_boundary_uses_prior_increment_not_added_contribution) ... ok
+test_initial_one_bb_assumption_and_menu_minimum_reject_subminimum (__main__.MenuChecks.test_initial_one_bb_assumption_and_menu_minimum_reject_subminimum) ... ok
+test_menu_actor_and_paid_are_bound_to_replayed_history (__main__.MenuChecks.test_menu_actor_and_paid_are_bound_to_replayed_history) ... ok
+test_root_nonempty_suffix_and_empty_root_history_are_both_valid (__main__.MenuChecks.test_root_nonempty_suffix_and_empty_root_history_are_both_valid) ... ok
+test_selected_prefix_of_deeper_raw_history_and_cumulative_raise (__main__.MenuChecks.test_selected_prefix_of_deeper_raw_history_and_cumulative_raise) ... ok
+test_short_allin_and_literal_percentages (__main__.MenuChecks.test_short_allin_and_literal_percentages) ... ok
+test_synthetic_complete_graph_counts_derive_without_final_capture_count (__main__.MenuChecks.test_synthetic_complete_graph_counts_derive_without_final_capture_count) ... ok
+test_terminal_or_illegal_selected_prefix_rejected (__main__.MenuChecks.test_terminal_or_illegal_selected_prefix_rejected) ... ok
+test_title_action_id_text_and_duplicate_tokens_rejected (__main__.MenuChecks.test_title_action_id_text_and_duplicate_tokens_rejected) ... ok
+test_url_keeps_suffix_but_replaces_spot_and_canonical_url_strips_it (__main__.MenuChecks.test_url_keeps_suffix_but_replaces_spot_and_canonical_url_strips_it) ... ok
+test_url_suffix_never_supplies_missing_child_observation (__main__.MenuChecks.test_url_suffix_never_supplies_missing_child_observation) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.089s
+
+OK

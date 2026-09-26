@@ -1,0 +1,1420 @@
+{
+  "schema": "r1.reference-static-diagnostic/v1",
+  "case_id": "HU-R0-022",
+  "purpose": "diagnostic_only",
+  "condition_match": "unverified",
+  "quality_status": "not_evaluated",
+  "acceptance": null,
+  "comparison_threshold": null,
+  "chips_per_bb": 100,
+  "source_pins": [
+    {
+      "file": "C:/Users/PC_User/.codex/worktrees/ce71/solvers/experiments/hu-postflop-r1/reference/HU-R0-022/diagnostic.toml",
+      "bytes": 5666,
+      "sha256": "cae505f46cd1f2c15402ce684697240a208d55140e30235a41c3564380096f52"
+    },
+    {
+      "file": "C:/Users/PC_User/.codex/worktrees/ce71/solvers/experiments/hu-postflop-r1/reference/HU-R0-022/check_diagnostic.py",
+      "bytes": 14303,
+      "sha256": "c4fbfb4f167a1c62786b019a0e1abba3efe83924230f0bbbade18c57088ed959"
+    },
+    {
+      "file": "C:/Users/PC_User/.codex/worktrees/ce71/solvers/experiments/hu-postflop-r1/reference/HU-R0-022/test_check_diagnostic.py",
+      "bytes": 7706,
+      "sha256": "959bc5fa75a8430e4197d058ea9833663c3117bec3935567134f828bca94d89a"
+    },
+    {
+      "file": "C:/Users/PC_User/.codex/worktrees/ce71/solvers/experiments/hu-postflop-r1/reference/HU-R0-022/menus.json",
+      "bytes": 8847,
+      "sha256": "5e982816bac8c066192ce740296e2ec770aed18cce74fce075897a91082a524c"
+    },
+    {
+      "file": "C:/Users/PC_User/.codex/worktrees/ce71/solvers/experiments/hu-postflop-r1/reference/HU-R0-022/observed.json",
+      "bytes": 7054,
+      "sha256": "d1f63a0a2e6744012ee3132902569e263acc09cd6499660a6148209774e29f0e"
+    },
+    {
+      "file": "C:/Users/PC_User/.codex/worktrees/ce71/solvers/experiments/hu-postflop-r1/reference/HU-R0-022/menu-check.json",
+      "bytes": 88304,
+      "sha256": "92fbe0fee6e75b99fa899cf332187849d34eb7df331889092abfa01e3ed7f8c4"
+    },
+    {
+      "file": "C:/Users/PC_User/.codex/worktrees/ce71/solvers/experiments/hu-postflop-r1/reference/HU-R0-022/ranges.json",
+      "bytes": 2098,
+      "sha256": "0007413f9d63aee98f3a65eb1a27706d42fecfd5dcf4c43342c1f9f87f089a39"
+    },
+    {
+      "file": "C:/Users/PC_User/.codex/worktrees/ce71/solvers/experiments/hu-postflop-r1/reference/HU-R0-022/oop-range.txt",
+      "bytes": 2348,
+      "sha256": "00578d305c270cca7415c3631a888c0f757a82eb2ca93969563b1e2b10ad1041"
+    },
+    {
+      "file": "C:/Users/PC_User/.codex/worktrees/ce71/solvers/experiments/hu-postflop-r1/reference/HU-R0-022/ip-range.txt",
+      "bytes": 1364,
+      "sha256": "8ac48ebeae7ded4d1427ef5a64db7a134c2104258511cd8fae72834ce98c8efd"
+    }
+  ],
+  "specification_pins": [
+    {
+      "file": "C:/Users/PC_User/.codex/worktrees/ce71/solvers/docs/solver-config-v1.jp.md",
+      "bytes": 60496,
+      "sha256": "31c14cc25ed37bde41c9a4cf24de5184506f591309e8fe0fc441b1c024282265"
+    },
+    {
+      "file": "C:/Users/PC_User/.codex/worktrees/ce71/solvers/crates/holdem/src/postflop.rs",
+      "bytes": 73444,
+      "sha256": "70ecaa0bbc39ca1fff1d3c7c29a1e499dea87e5b8e58d2486b3e0ebc157f891f"
+    },
+    {
+      "file": "C:/Users/PC_User/.codex/worktrees/ce71/solvers/crates/game/src/payoff.rs",
+      "bytes": 11716,
+      "sha256": "bd9ecc083fbc575e888ad2d1173b3ad5ce78f0fb263778f8bd75a27242d772f9"
+    }
+  ],
+  "static_graph_check": {
+    "decision_nodes": 72,
+    "action_edges": 212,
+    "terminal_nodes": 141,
+    "public_nodes": 213,
+    "terminal_kind_counts": {
+      "call": 70,
+      "check_check": 1,
+      "fold": 70
+    },
+    "short_allin_edges": 8,
+    "active_rule_hits": [
+      2,
+      70,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "comparison": "all observed node/ordered-menu/actor/stack/amount fields match static model"
+  },
+  "range_counts": {
+    "oop": 150,
+    "ip": 86
+  },
+  "rake": {
+    "scope": "conditional comparison of two 5%-cap400 unrounded rules on the same inferred terminals; neither is confirmed for the external library",
+    "terminals_compared": 141,
+    "terminals_with_different_rake": 42,
+    "different_terminal_kinds": {
+      "fold": 42
+    },
+    "maximum_difference_chips": "247.50",
+    "examples": [
+      {
+        "history": "X-X",
+        "kind": "check_check",
+        "total_pot_chips": "3050",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "152.50",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "0.00"
+      },
+      {
+        "history": "R3-F",
+        "kind": "fold",
+        "total_pot_chips": "3350",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "167.50",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "15.00"
+      },
+      {
+        "history": "RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "11650",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "247.50"
+      }
+    ],
+    "all_terminals": [
+      {
+        "history": "X-X",
+        "kind": "check_check",
+        "total_pot_chips": "3050",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "152.50",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "0.00"
+      },
+      {
+        "history": "X-R3-F",
+        "kind": "fold",
+        "total_pot_chips": "3350",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "167.50",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "15.00"
+      },
+      {
+        "history": "X-R3-C",
+        "kind": "call",
+        "total_pot_chips": "3650",
+        "matched_pot_chips": "3650",
+        "total_rake_chips": "182.50",
+        "conditional_matched_rake_chips": "182.50",
+        "difference_chips": "0.00"
+      },
+      {
+        "history": "X-R3-R16-F",
+        "kind": "fold",
+        "total_pot_chips": "4950",
+        "matched_pot_chips": "3650",
+        "total_rake_chips": "247.50",
+        "conditional_matched_rake_chips": "182.50",
+        "difference_chips": "65.00"
+      },
+      {
+        "history": "X-R3-R16-C",
+        "kind": "call",
+        "total_pot_chips": "6250",
+        "matched_pot_chips": "6250",
+        "total_rake_chips": "312.50",
+        "conditional_matched_rake_chips": "312.50",
+        "difference_chips": "0.00"
+      },
+      {
+        "history": "X-R3-R16-R38-F",
+        "kind": "fold",
+        "total_pot_chips": "8450",
+        "matched_pot_chips": "6250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "312.50",
+        "difference_chips": "87.50"
+      },
+      {
+        "history": "X-R3-R16-R38-C",
+        "kind": "call",
+        "total_pot_chips": "10650",
+        "matched_pot_chips": "10650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-R16-R38-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "15450",
+        "matched_pot_chips": "10650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-R16-R38-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-R16-R50.5-F",
+        "kind": "fold",
+        "total_pot_chips": "9700",
+        "matched_pot_chips": "6250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "312.50",
+        "difference_chips": "87.50"
+      },
+      {
+        "history": "X-R3-R16-R50.5-C",
+        "kind": "call",
+        "total_pot_chips": "13150",
+        "matched_pot_chips": "13150",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-R16-R50.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "16700",
+        "matched_pot_chips": "13150",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-R16-R50.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-R16-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "13250",
+        "matched_pot_chips": "6250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "312.50",
+        "difference_chips": "87.50"
+      },
+      {
+        "history": "X-R3-R16-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-R23-F",
+        "kind": "fold",
+        "total_pot_chips": "5650",
+        "matched_pot_chips": "3650",
+        "total_rake_chips": "282.50",
+        "conditional_matched_rake_chips": "182.50",
+        "difference_chips": "100.00"
+      },
+      {
+        "history": "X-R3-R23-C",
+        "kind": "call",
+        "total_pot_chips": "7650",
+        "matched_pot_chips": "7650",
+        "total_rake_chips": "382.50",
+        "conditional_matched_rake_chips": "382.50",
+        "difference_chips": "0.00"
+      },
+      {
+        "history": "X-R3-R23-R50-F",
+        "kind": "fold",
+        "total_pot_chips": "10350",
+        "matched_pot_chips": "7650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "382.50",
+        "difference_chips": "17.50"
+      },
+      {
+        "history": "X-R3-R23-R50-C",
+        "kind": "call",
+        "total_pot_chips": "13050",
+        "matched_pot_chips": "13050",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-R23-R50-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "16650",
+        "matched_pot_chips": "13050",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-R23-R50-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-R23-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "13950",
+        "matched_pot_chips": "7650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "382.50",
+        "difference_chips": "17.50"
+      },
+      {
+        "history": "X-R3-R23-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-R48.5-F",
+        "kind": "fold",
+        "total_pot_chips": "8200",
+        "matched_pot_chips": "3650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "182.50",
+        "difference_chips": "217.50"
+      },
+      {
+        "history": "X-R3-R48.5-C",
+        "kind": "call",
+        "total_pot_chips": "12750",
+        "matched_pot_chips": "12750",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-R48.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "16500",
+        "matched_pot_chips": "12750",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-R48.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R3-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "11950",
+        "matched_pot_chips": "3650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "182.50",
+        "difference_chips": "217.50"
+      },
+      {
+        "history": "X-R3-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R10.5-F",
+        "kind": "fold",
+        "total_pot_chips": "4100",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "205.00",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "52.50"
+      },
+      {
+        "history": "X-R10.5-C",
+        "kind": "call",
+        "total_pot_chips": "5150",
+        "matched_pot_chips": "5150",
+        "total_rake_chips": "257.50",
+        "conditional_matched_rake_chips": "257.50",
+        "difference_chips": "0.00"
+      },
+      {
+        "history": "X-R10.5-R28.5-F",
+        "kind": "fold",
+        "total_pot_chips": "6950",
+        "matched_pot_chips": "5150",
+        "total_rake_chips": "347.50",
+        "conditional_matched_rake_chips": "257.50",
+        "difference_chips": "90.00"
+      },
+      {
+        "history": "X-R10.5-R28.5-C",
+        "kind": "call",
+        "total_pot_chips": "8750",
+        "matched_pot_chips": "8750",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R10.5-R28.5-R59-F",
+        "kind": "fold",
+        "total_pot_chips": "11800",
+        "matched_pot_chips": "8750",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R10.5-R28.5-R59-C",
+        "kind": "call",
+        "total_pot_chips": "14850",
+        "matched_pot_chips": "14850",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R10.5-R28.5-R59-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "17550",
+        "matched_pot_chips": "14850",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R10.5-R28.5-R59-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R10.5-R28.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "14500",
+        "matched_pot_chips": "8750",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R10.5-R28.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R10.5-R39-F",
+        "kind": "fold",
+        "total_pot_chips": "8000",
+        "matched_pot_chips": "5150",
+        "total_rake_chips": "400.00",
+        "conditional_matched_rake_chips": "257.50",
+        "difference_chips": "142.50"
+      },
+      {
+        "history": "X-R10.5-R39-C",
+        "kind": "call",
+        "total_pot_chips": "10850",
+        "matched_pot_chips": "10850",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R10.5-R39-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "15550",
+        "matched_pot_chips": "10850",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R10.5-R39-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R10.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "12700",
+        "matched_pot_chips": "5150",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "257.50",
+        "difference_chips": "142.50"
+      },
+      {
+        "history": "X-R10.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R18-F",
+        "kind": "fold",
+        "total_pot_chips": "4850",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "242.50",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "90.00"
+      },
+      {
+        "history": "X-R18-C",
+        "kind": "call",
+        "total_pot_chips": "6650",
+        "matched_pot_chips": "6650",
+        "total_rake_chips": "332.50",
+        "conditional_matched_rake_chips": "332.50",
+        "difference_chips": "0.00"
+      },
+      {
+        "history": "X-R18-R41.5-F",
+        "kind": "fold",
+        "total_pot_chips": "9000",
+        "matched_pot_chips": "6650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "332.50",
+        "difference_chips": "67.50"
+      },
+      {
+        "history": "X-R18-R41.5-C",
+        "kind": "call",
+        "total_pot_chips": "11350",
+        "matched_pot_chips": "11350",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R18-R41.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "15800",
+        "matched_pot_chips": "11350",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R18-R41.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R18-R54.5-F",
+        "kind": "fold",
+        "total_pot_chips": "10300",
+        "matched_pot_chips": "6650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "332.50",
+        "difference_chips": "67.50"
+      },
+      {
+        "history": "X-R18-R54.5-C",
+        "kind": "call",
+        "total_pot_chips": "13950",
+        "matched_pot_chips": "13950",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R18-R54.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "17100",
+        "matched_pot_chips": "13950",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R18-R54.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R18-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "13450",
+        "matched_pot_chips": "6650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "332.50",
+        "difference_chips": "67.50"
+      },
+      {
+        "history": "X-R18-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R25.5-F",
+        "kind": "fold",
+        "total_pot_chips": "5600",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "280.00",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "127.50"
+      },
+      {
+        "history": "X-R25.5-C",
+        "kind": "call",
+        "total_pot_chips": "8150",
+        "matched_pot_chips": "8150",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R25.5-R54-F",
+        "kind": "fold",
+        "total_pot_chips": "11000",
+        "matched_pot_chips": "8150",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R25.5-R54-C",
+        "kind": "call",
+        "total_pot_chips": "13850",
+        "matched_pot_chips": "13850",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R25.5-R54-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "17050",
+        "matched_pot_chips": "13850",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R25.5-R54-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R25.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "14200",
+        "matched_pot_chips": "8150",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R25.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R46-F",
+        "kind": "fold",
+        "total_pot_chips": "7650",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "382.50",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "230.00"
+      },
+      {
+        "history": "X-R46-C",
+        "kind": "call",
+        "total_pot_chips": "12250",
+        "matched_pot_chips": "12250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R46-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "16250",
+        "matched_pot_chips": "12250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-R46-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "X-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "11650",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "247.50"
+      },
+      {
+        "history": "X-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-F",
+        "kind": "fold",
+        "total_pot_chips": "3350",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "167.50",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "15.00"
+      },
+      {
+        "history": "R3-C",
+        "kind": "call",
+        "total_pot_chips": "3650",
+        "matched_pot_chips": "3650",
+        "total_rake_chips": "182.50",
+        "conditional_matched_rake_chips": "182.50",
+        "difference_chips": "0.00"
+      },
+      {
+        "history": "R3-R16-F",
+        "kind": "fold",
+        "total_pot_chips": "4950",
+        "matched_pot_chips": "3650",
+        "total_rake_chips": "247.50",
+        "conditional_matched_rake_chips": "182.50",
+        "difference_chips": "65.00"
+      },
+      {
+        "history": "R3-R16-C",
+        "kind": "call",
+        "total_pot_chips": "6250",
+        "matched_pot_chips": "6250",
+        "total_rake_chips": "312.50",
+        "conditional_matched_rake_chips": "312.50",
+        "difference_chips": "0.00"
+      },
+      {
+        "history": "R3-R16-R38-F",
+        "kind": "fold",
+        "total_pot_chips": "8450",
+        "matched_pot_chips": "6250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "312.50",
+        "difference_chips": "87.50"
+      },
+      {
+        "history": "R3-R16-R38-C",
+        "kind": "call",
+        "total_pot_chips": "10650",
+        "matched_pot_chips": "10650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-R16-R38-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "15450",
+        "matched_pot_chips": "10650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-R16-R38-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-R16-R50.5-F",
+        "kind": "fold",
+        "total_pot_chips": "9700",
+        "matched_pot_chips": "6250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "312.50",
+        "difference_chips": "87.50"
+      },
+      {
+        "history": "R3-R16-R50.5-C",
+        "kind": "call",
+        "total_pot_chips": "13150",
+        "matched_pot_chips": "13150",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-R16-R50.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "16700",
+        "matched_pot_chips": "13150",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-R16-R50.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-R16-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "13250",
+        "matched_pot_chips": "6250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "312.50",
+        "difference_chips": "87.50"
+      },
+      {
+        "history": "R3-R16-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-R23-F",
+        "kind": "fold",
+        "total_pot_chips": "5650",
+        "matched_pot_chips": "3650",
+        "total_rake_chips": "282.50",
+        "conditional_matched_rake_chips": "182.50",
+        "difference_chips": "100.00"
+      },
+      {
+        "history": "R3-R23-C",
+        "kind": "call",
+        "total_pot_chips": "7650",
+        "matched_pot_chips": "7650",
+        "total_rake_chips": "382.50",
+        "conditional_matched_rake_chips": "382.50",
+        "difference_chips": "0.00"
+      },
+      {
+        "history": "R3-R23-R50-F",
+        "kind": "fold",
+        "total_pot_chips": "10350",
+        "matched_pot_chips": "7650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "382.50",
+        "difference_chips": "17.50"
+      },
+      {
+        "history": "R3-R23-R50-C",
+        "kind": "call",
+        "total_pot_chips": "13050",
+        "matched_pot_chips": "13050",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-R23-R50-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "16650",
+        "matched_pot_chips": "13050",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-R23-R50-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-R23-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "13950",
+        "matched_pot_chips": "7650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "382.50",
+        "difference_chips": "17.50"
+      },
+      {
+        "history": "R3-R23-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-R48.5-F",
+        "kind": "fold",
+        "total_pot_chips": "8200",
+        "matched_pot_chips": "3650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "182.50",
+        "difference_chips": "217.50"
+      },
+      {
+        "history": "R3-R48.5-C",
+        "kind": "call",
+        "total_pot_chips": "12750",
+        "matched_pot_chips": "12750",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-R48.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "16500",
+        "matched_pot_chips": "12750",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-R48.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R3-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "11950",
+        "matched_pot_chips": "3650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "182.50",
+        "difference_chips": "217.50"
+      },
+      {
+        "history": "R3-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R10.5-F",
+        "kind": "fold",
+        "total_pot_chips": "4100",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "205.00",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "52.50"
+      },
+      {
+        "history": "R10.5-C",
+        "kind": "call",
+        "total_pot_chips": "5150",
+        "matched_pot_chips": "5150",
+        "total_rake_chips": "257.50",
+        "conditional_matched_rake_chips": "257.50",
+        "difference_chips": "0.00"
+      },
+      {
+        "history": "R10.5-R28.5-F",
+        "kind": "fold",
+        "total_pot_chips": "6950",
+        "matched_pot_chips": "5150",
+        "total_rake_chips": "347.50",
+        "conditional_matched_rake_chips": "257.50",
+        "difference_chips": "90.00"
+      },
+      {
+        "history": "R10.5-R28.5-C",
+        "kind": "call",
+        "total_pot_chips": "8750",
+        "matched_pot_chips": "8750",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R10.5-R28.5-R59-F",
+        "kind": "fold",
+        "total_pot_chips": "11800",
+        "matched_pot_chips": "8750",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R10.5-R28.5-R59-C",
+        "kind": "call",
+        "total_pot_chips": "14850",
+        "matched_pot_chips": "14850",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R10.5-R28.5-R59-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "17550",
+        "matched_pot_chips": "14850",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R10.5-R28.5-R59-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R10.5-R28.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "14500",
+        "matched_pot_chips": "8750",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R10.5-R28.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R10.5-R39-F",
+        "kind": "fold",
+        "total_pot_chips": "8000",
+        "matched_pot_chips": "5150",
+        "total_rake_chips": "400.00",
+        "conditional_matched_rake_chips": "257.50",
+        "difference_chips": "142.50"
+      },
+      {
+        "history": "R10.5-R39-C",
+        "kind": "call",
+        "total_pot_chips": "10850",
+        "matched_pot_chips": "10850",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R10.5-R39-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "15550",
+        "matched_pot_chips": "10850",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R10.5-R39-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R10.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "12700",
+        "matched_pot_chips": "5150",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "257.50",
+        "difference_chips": "142.50"
+      },
+      {
+        "history": "R10.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R18-F",
+        "kind": "fold",
+        "total_pot_chips": "4850",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "242.50",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "90.00"
+      },
+      {
+        "history": "R18-C",
+        "kind": "call",
+        "total_pot_chips": "6650",
+        "matched_pot_chips": "6650",
+        "total_rake_chips": "332.50",
+        "conditional_matched_rake_chips": "332.50",
+        "difference_chips": "0.00"
+      },
+      {
+        "history": "R18-R41.5-F",
+        "kind": "fold",
+        "total_pot_chips": "9000",
+        "matched_pot_chips": "6650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "332.50",
+        "difference_chips": "67.50"
+      },
+      {
+        "history": "R18-R41.5-C",
+        "kind": "call",
+        "total_pot_chips": "11350",
+        "matched_pot_chips": "11350",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R18-R41.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "15800",
+        "matched_pot_chips": "11350",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R18-R41.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R18-R54.5-F",
+        "kind": "fold",
+        "total_pot_chips": "10300",
+        "matched_pot_chips": "6650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "332.50",
+        "difference_chips": "67.50"
+      },
+      {
+        "history": "R18-R54.5-C",
+        "kind": "call",
+        "total_pot_chips": "13950",
+        "matched_pot_chips": "13950",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R18-R54.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "17100",
+        "matched_pot_chips": "13950",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R18-R54.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R18-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "13450",
+        "matched_pot_chips": "6650",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "332.50",
+        "difference_chips": "67.50"
+      },
+      {
+        "history": "R18-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R25.5-F",
+        "kind": "fold",
+        "total_pot_chips": "5600",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "280.00",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "127.50"
+      },
+      {
+        "history": "R25.5-C",
+        "kind": "call",
+        "total_pot_chips": "8150",
+        "matched_pot_chips": "8150",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R25.5-R54-F",
+        "kind": "fold",
+        "total_pot_chips": "11000",
+        "matched_pot_chips": "8150",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R25.5-R54-C",
+        "kind": "call",
+        "total_pot_chips": "13850",
+        "matched_pot_chips": "13850",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R25.5-R54-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "17050",
+        "matched_pot_chips": "13850",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R25.5-R54-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R25.5-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "14200",
+        "matched_pot_chips": "8150",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R25.5-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R46-F",
+        "kind": "fold",
+        "total_pot_chips": "7650",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "382.50",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "230.00"
+      },
+      {
+        "history": "R46-C",
+        "kind": "call",
+        "total_pot_chips": "12250",
+        "matched_pot_chips": "12250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R46-RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "16250",
+        "matched_pot_chips": "12250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "R46-RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      },
+      {
+        "history": "RAI-F",
+        "kind": "fold",
+        "total_pot_chips": "11650",
+        "matched_pot_chips": "3050",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "152.50",
+        "difference_chips": "247.50"
+      },
+      {
+        "history": "RAI-C",
+        "kind": "call",
+        "total_pot_chips": "20250",
+        "matched_pot_chips": "20250",
+        "total_rake_chips": "400",
+        "conditional_matched_rake_chips": "400",
+        "difference_chips": "0"
+      }
+    ]
+  },
+  "native_dsl_validation": "not_executed",
+  "native_tree_export_comparison": "not_executed",
+  "solve": "not_executed",
+  "limitations": [
+    "Total-pot 5% cap4bb all-terminal collection is an explicit runtime diagnostic assumption; matched-pot is a distinct rule here",
+    "The 30.5bb initial pot retains the folded UTG contribution as dead money; folded-seat private-card conditioning is not modeled or certified",
+    "Retained marginal weights are embedded unchanged; export completeness, normalization and external joint-reach rules remain unknown",
+    "No terminal UI/settlement, complete policy, individual version/residual, EV-origin or display-rounding contract was acquired"
+  ]
+}

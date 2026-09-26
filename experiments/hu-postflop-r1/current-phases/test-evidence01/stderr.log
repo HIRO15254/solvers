@@ -1,0 +1,632 @@
+test_ambiguous_and_missing_anchors_rejected (test_prepare.PreparationTests.test_ambiguous_and_missing_anchors_rejected) ... ERROR
+test_ambiguous_and_missing_anchors_rejected (test_prepare.PreparationTests.test_ambiguous_and_missing_anchors_rejected) ... ERROR
+test_changed_source_rejected_before_output (test_prepare.PreparationTests.test_changed_source_rejected_before_output) ... ERROR
+test_changed_source_rejected_before_output (test_prepare.PreparationTests.test_changed_source_rejected_before_output) ... ERROR
+test_double_patch_rejected (test_prepare.PreparationTests.test_double_patch_rejected) ... ERROR
+test_double_patch_rejected (test_prepare.PreparationTests.test_double_patch_rejected) ... ERROR
+test_exact_generated_pins_and_no_engine_formats_changes (test_prepare.PreparationTests.test_exact_generated_pins_and_no_engine_formats_changes) ... ERROR
+test_exact_generated_pins_and_no_engine_formats_changes (test_prepare.PreparationTests.test_exact_generated_pins_and_no_engine_formats_changes) ... ERROR
+test_existing_output_is_untouched (test_prepare.PreparationTests.test_existing_output_is_untouched) ... ERROR
+test_existing_output_is_untouched (test_prepare.PreparationTests.test_existing_output_is_untouched) ... ERROR
+test_extra_source_rejected (test_prepare.PreparationTests.test_extra_source_rejected) ... ERROR
+test_extra_source_rejected (test_prepare.PreparationTests.test_extra_source_rejected) ... ERROR
+test_instrumented_copy_preserves_supplied_source (test_prepare.PreparationTests.test_instrumented_copy_preserves_supplied_source) ... ERROR
+test_instrumented_copy_preserves_supplied_source (test_prepare.PreparationTests.test_instrumented_copy_preserves_supplied_source) ... ERROR
+test_missing_source_rejected (test_prepare.PreparationTests.test_missing_source_rejected) ... ERROR
+test_missing_source_rejected (test_prepare.PreparationTests.test_missing_source_rejected) ... ERROR
+test_output_inside_source_rejected (test_prepare.PreparationTests.test_output_inside_source_rejected) ... ERROR
+test_output_inside_source_rejected (test_prepare.PreparationTests.test_output_inside_source_rejected) ... ERROR
+test_plain_copy_has_only_identical_codec_addition (test_prepare.PreparationTests.test_plain_copy_has_only_identical_codec_addition) ... ERROR
+test_plain_copy_has_only_identical_codec_addition (test_prepare.PreparationTests.test_plain_copy_has_only_identical_codec_addition) ... ERROR
+test_inclusive_lower_and_upper_gate_boundaries (test_validate.CalibrationTests.test_inclusive_lower_and_upper_gate_boundaries) ... ok
+test_rejects_missing_modes_wrong_count_and_nonpositive_nonfinite_values (test_validate.CalibrationTests.test_rejects_missing_modes_wrong_count_and_nonpositive_nonfinite_values) ... ok
+test_second_ratio_and_too_fast_instrumentation_also_fail (test_validate.CalibrationTests.test_second_ratio_and_too_fast_instrumentation_also_fail) ... ok
+test_uses_medians_and_fails_without_a_correction_factor (test_validate.CalibrationTests.test_uses_medians_and_fails_without_a_correction_factor) ... ok
+test_all_codec_kinds_require_only_their_own_leaf_and_overhead (test_validate.ValidationTests.test_all_codec_kinds_require_only_their_own_leaf_and_overhead) ... ok
+test_iteration_zero_and_null_are_allowed (test_validate.ValidationTests.test_iteration_zero_and_null_are_allowed) ... ok
+test_missing_or_wrong_codec_phase_rejected (test_validate.ValidationTests.test_missing_or_wrong_codec_phase_rejected) ... ok
+test_rejects_bad_identity_mode_and_completion_state (test_validate.ValidationTests.test_rejects_bad_identity_mode_and_completion_state) ... ok
+test_rejects_bool_float_negative_or_null_timestamps (test_validate.ValidationTests.test_rejects_bool_float_negative_or_null_timestamps) ... ok
+test_rejects_gaps_overlaps_backwards_and_bad_totals (test_validate.ValidationTests.test_rejects_gaps_overlaps_backwards_and_bad_totals) ... ok
+test_rejects_invalid_rss_hwm_and_reset (test_validate.ValidationTests.test_rejects_invalid_rss_hwm_and_reset) ... ok
+test_rejects_missing_unknown_or_incomplete_spans (test_validate.ValidationTests.test_rejects_missing_unknown_or_incomplete_spans) ... ok
+test_repeated_leaf_sums_calls_and_uses_max_end_hwm_without_subtraction (test_validate.ValidationTests.test_repeated_leaf_sums_calls_and_uses_max_end_hwm_without_subtraction) ... ok
+test_reset_permits_hwm_to_fall_between_intervals (test_validate.ValidationTests.test_reset_permits_hwm_to_fall_between_intervals) ... ok
+test_source_and_instrumentation_bind_to_manifest (test_validate.ValidationTests.test_source_and_instrumentation_bind_to_manifest) ... ok
+test_time_memory_null_and_memory_observation_required (test_validate.ValidationTests.test_time_memory_null_and_memory_observation_required) ... ok
+test_time_mode_contiguous_leaf_sum_and_extensible_metadata (test_validate.ValidationTests.test_time_mode_contiguous_leaf_sum_and_extensible_metadata) ... ok
+
+======================================================================
+ERROR: test_ambiguous_and_missing_anchors_rejected (test_prepare.PreparationTests.test_ambiguous_and_missing_anchors_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] 指定されたパスが見つかりません。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-u2c19lph\\source\\.cargo'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\current-phases\test_prepare.py", line 32, in setUp
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 726, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-u2c19lph\\source'
+
+======================================================================
+ERROR: test_ambiguous_and_missing_anchors_rejected (test_prepare.PreparationTests.test_ambiguous_and_missing_anchors_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-u2c19lph'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-u2c19lph'
+
+======================================================================
+ERROR: test_changed_source_rejected_before_output (test_prepare.PreparationTests.test_changed_source_rejected_before_output)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] 指定されたパスが見つかりません。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-v3tm5o1w\\source\\.cargo'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\current-phases\test_prepare.py", line 32, in setUp
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 726, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-v3tm5o1w\\source'
+
+======================================================================
+ERROR: test_changed_source_rejected_before_output (test_prepare.PreparationTests.test_changed_source_rejected_before_output)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-v3tm5o1w'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-v3tm5o1w'
+
+======================================================================
+ERROR: test_double_patch_rejected (test_prepare.PreparationTests.test_double_patch_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] 指定されたパスが見つかりません。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-1wbqkikr\\source\\.cargo'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\current-phases\test_prepare.py", line 32, in setUp
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 726, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-1wbqkikr\\source'
+
+======================================================================
+ERROR: test_double_patch_rejected (test_prepare.PreparationTests.test_double_patch_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-1wbqkikr'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-1wbqkikr'
+
+======================================================================
+ERROR: test_exact_generated_pins_and_no_engine_formats_changes (test_prepare.PreparationTests.test_exact_generated_pins_and_no_engine_formats_changes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] 指定されたパスが見つかりません。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-r0xzlxn6\\source\\.cargo'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\current-phases\test_prepare.py", line 32, in setUp
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 726, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-r0xzlxn6\\source'
+
+======================================================================
+ERROR: test_exact_generated_pins_and_no_engine_formats_changes (test_prepare.PreparationTests.test_exact_generated_pins_and_no_engine_formats_changes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-r0xzlxn6'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-r0xzlxn6'
+
+======================================================================
+ERROR: test_existing_output_is_untouched (test_prepare.PreparationTests.test_existing_output_is_untouched)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] 指定されたパスが見つかりません。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-dshchay2\\source\\.cargo'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\current-phases\test_prepare.py", line 32, in setUp
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 726, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-dshchay2\\source'
+
+======================================================================
+ERROR: test_existing_output_is_untouched (test_prepare.PreparationTests.test_existing_output_is_untouched)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-dshchay2'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-dshchay2'
+
+======================================================================
+ERROR: test_extra_source_rejected (test_prepare.PreparationTests.test_extra_source_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] 指定されたパスが見つかりません。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-eu1y204k\\source\\.cargo'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\current-phases\test_prepare.py", line 32, in setUp
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 726, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-eu1y204k\\source'
+
+======================================================================
+ERROR: test_extra_source_rejected (test_prepare.PreparationTests.test_extra_source_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-eu1y204k'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-eu1y204k'
+
+======================================================================
+ERROR: test_instrumented_copy_preserves_supplied_source (test_prepare.PreparationTests.test_instrumented_copy_preserves_supplied_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] 指定されたパスが見つかりません。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-lqe_xzu3\\source\\.cargo'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\current-phases\test_prepare.py", line 32, in setUp
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 726, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-lqe_xzu3\\source'
+
+======================================================================
+ERROR: test_instrumented_copy_preserves_supplied_source (test_prepare.PreparationTests.test_instrumented_copy_preserves_supplied_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-lqe_xzu3'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-lqe_xzu3'
+
+======================================================================
+ERROR: test_missing_source_rejected (test_prepare.PreparationTests.test_missing_source_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] 指定されたパスが見つかりません。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-nen2mic7\\source\\.cargo'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\current-phases\test_prepare.py", line 32, in setUp
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 726, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-nen2mic7\\source'
+
+======================================================================
+ERROR: test_missing_source_rejected (test_prepare.PreparationTests.test_missing_source_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-nen2mic7'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-nen2mic7'
+
+======================================================================
+ERROR: test_output_inside_source_rejected (test_prepare.PreparationTests.test_output_inside_source_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] 指定されたパスが見つかりません。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-mmehy8x0\\source\\.cargo'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\current-phases\test_prepare.py", line 32, in setUp
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 726, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-mmehy8x0\\source'
+
+======================================================================
+ERROR: test_output_inside_source_rejected (test_prepare.PreparationTests.test_output_inside_source_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-mmehy8x0'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-mmehy8x0'
+
+======================================================================
+ERROR: test_plain_copy_has_only_identical_codec_addition (test_prepare.PreparationTests.test_plain_copy_has_only_identical_codec_addition)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] 指定されたパスが見つかりません。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-jwtd038a\\source\\.cargo'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\current-phases\test_prepare.py", line 32, in setUp
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 726, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-jwtd038a\\source'
+
+======================================================================
+ERROR: test_plain_copy_has_only_identical_codec_addition (test_prepare.PreparationTests.test_plain_copy_has_only_identical_codec_addition)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-jwtd038a'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\AppData\\Local\\Temp\\r1-current-phases-test-jwtd038a'
+
+----------------------------------------------------------------------
+Ran 27 tests in 0.103s
+
+FAILED (errors=20)

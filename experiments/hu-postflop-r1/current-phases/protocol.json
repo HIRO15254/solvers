@@ -1,0 +1,57 @@
+{
+  "schema": "r1.current-phases-protocol/v1",
+  "scope": "Prospective finite instrumentation experiment; preparation only. Current source phase attribution, not another old/new speedup or external quality certification.",
+  "source_revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+  "cases": ["river", "turn", "flop"],
+  "inputs": "Exact final-pipeline/configs/{case}.toml; strict NC<0.04 chips, caps400/400/100, cadence25/25/10,1worker,F32,Full. Do not change cap/cadence after observing measurements.",
+  "arms": ["plain", "off", "time", "memory"],
+  "builds": {"copies": 2, "targets": "Fresh plain and instrumented targets on the measurement boot; CLI plus current_phase_codec example per copy. Same Rust1.97.0/locked/offline/release/target-cpu=native/jobs2. Existing hu_pipeline_probe only for postmeasurement correctness; retain its source/binary pins.", "production_changes": false},
+  "order": {
+    "warmup": ["plain", "off", "time", "memory"],
+    "measured": [["plain", "off", "time", "memory"], ["time", "memory", "plain", "off"], ["off", "plain", "memory", "time"]],
+    "outer": "Each case in fixed order, warmup then3 blocks; complete all48 solves before any codec or quality audit. No adaptive repetition. Then each case's measured block1 plain SOL becomes the immutable input for decode-all,read-root in that order, each with the same four-arm warmup/3block order. Save generation/write are already measured in each CLI solve; standalone stream-write is supported by the helper but not scheduled in this minimal campaign.",
+    "solve_processes": 48,
+    "codec_processes": 96,
+    "quality": "After all measurements, audit all48 SOLs and checkpoints using retained current-source helpers. Canonical full/root/decode/rewrite verification on every codec invocation. No omitted warmup quality checks. Additional quality processes are bounded in the global deadline."
+  },
+  "correctness": "All48 live trajectories/stopping iterations/EV/BR/gains/NC and checkpoint/config/decoded strategy/value bytes match own case plain exactly; canonical excludes only original wall_secs. Quantized profile BR is recomputed on every solve artifact. All own-codec rewrite bytes equal immutable input. Compare same-source11e4062 proof02 where fields are machine independent; never require elapsed/path equality or old/new file equality. No quality success until all checks finish.",
+  "timing": {
+    "calibration_samples_per_arm": 3,
+    "ratios": ["median(off)/median(plain)", "median(time)/median(off)"],
+    "inclusive_ratio_bounds": [0.95, 1.05],
+    "denominator_seconds_min": 0.01,
+    "policy": "Each case/operation separately. Both fixed ratios must pass; sub10ms or failed calibration makes attribution not_evaluated/descriptive only. Retain every raw duration. No correction factors, subtraction-based inferred phases or replacement runs. Memory-arm durations never qualify as performance.",
+    "measurement": "CLI external wall and time-arm contiguous internal leaves; codec external wall for perturbation calibration plus native operation clocks. Warm input/hash prepass as frozen helper; no cold-cache claim. Observer/publishing gaps and startup/exit remain explicit."
+  },
+  "memory": {
+    "counter": "Linux /proc/self/status VmHWM after clear_refs=5 at each phase boundary; raw start/end VmRSS and VmHWM retained. Absolute process-resident counter during instrumented phase, not incremental allocation or exact physical RSS.",
+    "reset": "Only memory arm writes5. Reset/read failure or inconsistent snapshot aborts. Never silently replace with sampling or cumulative high-water subtraction. Native wait4 after resets is not whole-process peak; use plain/off/time native child records for unreset whole-process peaks.",
+    "generation": "max(sol_preparation.end_hwm, sol_serialization_and_write.end_hwm), including solver state/payload live at these phases; checkpoint separately. Do not add peaks or subtract phase entry RSS. Read/full/root/rewrite counters include their resident inputs and exclude later canonical verification.",
+    "calibration": "Before samples, compile/run memory_probe.c under finite supervisor. Touch/unmap128MiB prior history, reset, touch1MiB/reset, touch64MiB/reset; require recorded highwater collapse after unmap, low phase<=postreset baseline+8MiB, large phase>=baseline+48MiB, measured64MiB peak-minus1MiB peak>=32MiB. Preserve all snapshots. Fresh native launcher calibration from focused-memory required when using wait4 whole-process counters.",
+    "observer_screen": "Retain max3 of memory-arm largest leaf peak and all unreset plain/off/time native child peaks; report counter/observer differences, not a physical bound. If memory-arm max exceeds max plain native peak by more than max(1MiB,5%), mark phase memory attribution ineligible. Passing permits descriptive instrumented counter reporting only, never old/new resource adoption."
+  },
+  "limits": {
+    "planned_machine": "4-vCPU16GiB x86_64 Spot,40GiB auto-delete disk; one boot, no32-vCPU resize",
+    "budget_envelope_usd": 2,
+    "lifetime_seconds_max": 3600,
+    "recovery_reserve_seconds": 900,
+    "build_per_copy_seconds_max": 900,
+    "sample_seconds_max": 30,
+    "quality_process_seconds_max": 30,
+    "global_work_seconds_max": 2700,
+    "memory_max_bytes": 12884901888,
+    "sampled_rss_stop_bytes": 10737418240,
+    "min_free_memory_bytes": 1073741824,
+    "min_free_disk_bytes": 4294967296,
+    "swap_max_bytes": 0,
+    "poll_seconds": 0.02,
+    "max_poll_gap_seconds": 1,
+    "grace_seconds": 5,
+    "kill_wait_seconds": 5,
+    "max_retained_archive_bytes": 536870912
+  },
+  "stop": "Require each next stage's full timeout+20s to fit the absolute work deadline. First error,preemption,hash/boot/CPU/source/containment change,resource breach,deadline,memory reset calibration failure or missing raw is terminal. Perturbation screens are computed only after complete data and can be not_evaluated without hiding records. Retain completed/failed/skipped counts and partial evidence; no retry,threshold change or continued campaign on new boot. Outer systemd KillMode=control-group,SendSIGKILL=yes,CPUWeight100,MemoryMax12GiB,MemorySwapMax0,RuntimeMax capped by deadline; VM STOP fixed before launch and cleanup after verified recovery.",
+  "freeze": "Before builds: every source input and generated output,prepare/runtime/protocol/validator/native probe/supervisor,all3 configs,compiler/Cargo flags/environment. Before samples: two CLI/two codec binary hashes,helper/native binary hashes,source/build logs,OS/CPU/features/boot,actual cgroup limits,absolute deadlines,resource/budget record. Before/after stage identity checks. Archive retains original bytes/paths/hashes, not merely report summaries.",
+  "required_before_execution": ["Independent generated-Rust/source review and source-pinned two-copy builds; Python tests alone do not validate Rust.", "Owner creates current pricing/resource plan within remaining2USD, freezes one-hour absolute STOP and900s recovery reserve; no launch is performed by these files.", "Implement/review a finite runner/portable retained checker that enforces this protocol. Existing final-pipeline controls stay frozen; this preparation does not yet provide that orchestration.", "No concurrent builds/transfers/archiving/other experiments during measured blocks. New output paths only, copy source remains immutable after its manifest."],
+  "non_claims": ["32-worker scaling diagnosis", "scratch/allocation totals", "physical phase memory", "general Flop or24-reference acceptance", "new old/new performance improvement", "existing historic null fields repaired"]
+}
