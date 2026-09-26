@@ -32,3 +32,10 @@ deployment receipt は archive SHA-256
 初回のbuild後に起きたhost条件検査失敗は[proof01](../../final-pipeline/proof01/README.jp.md)へ保持した。
 CPU controllerの設定を明示した[2回目の起動](deployment-correction02.jp.md)は、
 [原出力の取得記録](capture-final02.json)で別に識別する。
+
+proof02の[検証済み結果](../../final-pipeline/proof02/report.jp.md)は時間・対象I/Oの
+事前判定を通過し、旧新の品質値が一致した。OSメモリはnative/sampleの整合条件不成立で
+判定不能だったため、同じVM・既存バイナリを使う[別のメモリ測定](../../focused-memory/README.md)を設計した。
+[起動ラッパー](run-memory03.sh)と[起動検査](start-memory03.py)は校正から順に実行し、
+測定deadlineを21:20:00 UTCとする。VM STOP期限・予約額は変更しない。
+これらのスクリプト自体は実行完了の証拠ではない。

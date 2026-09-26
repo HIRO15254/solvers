@@ -1,0 +1,13 @@
+{
+  "exit_code": 0,
+  "scope": "Lightweight Python fixtures; no compiler, solver or cloud",
+  "time_utc": "2026-09-26T20:02:17.183261+00:00",
+  "test.stdout.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "test.stderr.log": {
+    "bytes": 941,
+    "sha256": "cd4d830a9507843cf16ce5c335b5133ad79034b7b2d9730453716593bb9efa48"
+  }
+}

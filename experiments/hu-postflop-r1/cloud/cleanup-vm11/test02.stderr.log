@@ -1,0 +1,595 @@
+test_corrupt_archive_is_rejected_before_checker (__main__.FocusedEvidence.test_corrupt_archive_is_rejected_before_checker) ... ERROR
+test_corrupt_archive_is_rejected_before_checker (__main__.FocusedEvidence.test_corrupt_archive_is_rejected_before_checker) ... ERROR
+test_modified_or_extra_extracted_bytes_are_rejected_before_checker (__main__.FocusedEvidence.test_modified_or_extra_extracted_bytes_are_rejected_before_checker) ... ERROR
+test_modified_or_extra_extracted_bytes_are_rejected_before_checker (__main__.FocusedEvidence.test_modified_or_extra_extracted_bytes_are_rejected_before_checker) ... ERROR
+test_nonterminal_wrong_schema_or_unverified_payload_is_rejected (__main__.FocusedEvidence.test_nonterminal_wrong_schema_or_unverified_payload_is_rejected) ... ERROR
+test_nonterminal_wrong_schema_or_unverified_payload_is_rejected (__main__.FocusedEvidence.test_nonterminal_wrong_schema_or_unverified_payload_is_rejected) ... ERROR
+test_unvalidated_or_failed_reference_is_rejected_before_checker (__main__.FocusedEvidence.test_unvalidated_or_failed_reference_is_rejected_before_checker) ... ERROR
+test_unvalidated_or_failed_reference_is_rejected_before_checker (__main__.FocusedEvidence.test_unvalidated_or_failed_reference_is_rejected_before_checker) ... ERROR
+test_verified_completed_or_failed_evidence_uses_only_trusted_checker (__main__.FocusedEvidence.test_verified_completed_or_failed_evidence_uses_only_trusted_checker) ... ERROR
+test_verified_completed_or_failed_evidence_uses_only_trusted_checker (__main__.FocusedEvidence.test_verified_completed_or_failed_evidence_uses_only_trusted_checker) ... ERROR
+test_correct_identity (__main__.Guards.test_correct_identity) ... ok
+test_disk_mutations_rejected (__main__.Guards.test_disk_mutations_rejected) ... ok
+test_instance_mutations_rejected (__main__.Guards.test_instance_mutations_rejected) ... ok
+test_json_filter_is_not_overridden (__main__.Guards.test_json_filter_is_not_overridden) ... ok
+test_default_inspect_never_deletes (__main__.Sequence.test_default_inspect_never_deletes) ... ERROR
+test_default_inspect_never_deletes (__main__.Sequence.test_default_inspect_never_deletes) ... ERROR
+test_delete_exactly_one_instance_then_all_readbacks (__main__.Sequence.test_delete_exactly_one_instance_then_all_readbacks) ... ERROR
+test_delete_exactly_one_instance_then_all_readbacks (__main__.Sequence.test_delete_exactly_one_instance_then_all_readbacks) ... ERROR
+test_delete_requires_evidence_before_any_cloud_call (__main__.Sequence.test_delete_requires_evidence_before_any_cloud_call) ... ERROR
+test_failed_proof_validation_prevents_cloud_calls (__main__.Sequence.test_failed_proof_validation_prevents_cloud_calls) ... ERROR
+test_failed_proof_validation_prevents_cloud_calls (__main__.Sequence.test_failed_proof_validation_prevents_cloud_calls) ... ERROR
+test_focused_terminal_failure_is_retained_before_delete (__main__.Sequence.test_focused_terminal_failure_is_retained_before_delete) ... ERROR
+test_focused_terminal_failure_is_retained_before_delete (__main__.Sequence.test_focused_terminal_failure_is_retained_before_delete) ... ERROR
+test_focused_verification_failure_prevents_all_cloud_calls (__main__.Sequence.test_focused_verification_failure_prevents_all_cloud_calls) ... ERROR
+test_focused_verification_failure_prevents_all_cloud_calls (__main__.Sequence.test_focused_verification_failure_prevents_all_cloud_calls) ... ERROR
+test_receipt_inside_focused_reference_is_rejected (__main__.Sequence.test_receipt_inside_focused_reference_is_rejected) ... ERROR
+
+======================================================================
+ERROR: test_corrupt_archive_is_rejected_before_checker (__main__.FocusedEvidence.test_corrupt_archive_is_rejected_before_checker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\test_cleanup.py", line 160, in setUp
+    self.proof.mkdir()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-kv_s9ckk\\focused'
+
+======================================================================
+ERROR: test_corrupt_archive_is_rejected_before_checker (__main__.FocusedEvidence.test_corrupt_archive_is_rejected_before_checker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-kv_s9ckk'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-kv_s9ckk'
+
+======================================================================
+ERROR: test_modified_or_extra_extracted_bytes_are_rejected_before_checker (__main__.FocusedEvidence.test_modified_or_extra_extracted_bytes_are_rejected_before_checker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\test_cleanup.py", line 160, in setUp
+    self.proof.mkdir()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-2imqf78i\\focused'
+
+======================================================================
+ERROR: test_modified_or_extra_extracted_bytes_are_rejected_before_checker (__main__.FocusedEvidence.test_modified_or_extra_extracted_bytes_are_rejected_before_checker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-2imqf78i'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-2imqf78i'
+
+======================================================================
+ERROR: test_nonterminal_wrong_schema_or_unverified_payload_is_rejected (__main__.FocusedEvidence.test_nonterminal_wrong_schema_or_unverified_payload_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\test_cleanup.py", line 160, in setUp
+    self.proof.mkdir()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-etbuwfb9\\focused'
+
+======================================================================
+ERROR: test_nonterminal_wrong_schema_or_unverified_payload_is_rejected (__main__.FocusedEvidence.test_nonterminal_wrong_schema_or_unverified_payload_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-etbuwfb9'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-etbuwfb9'
+
+======================================================================
+ERROR: test_unvalidated_or_failed_reference_is_rejected_before_checker (__main__.FocusedEvidence.test_unvalidated_or_failed_reference_is_rejected_before_checker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\test_cleanup.py", line 160, in setUp
+    self.proof.mkdir()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-m1dwenk3\\focused'
+
+======================================================================
+ERROR: test_unvalidated_or_failed_reference_is_rejected_before_checker (__main__.FocusedEvidence.test_unvalidated_or_failed_reference_is_rejected_before_checker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-m1dwenk3'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-m1dwenk3'
+
+======================================================================
+ERROR: test_verified_completed_or_failed_evidence_uses_only_trusted_checker (__main__.FocusedEvidence.test_verified_completed_or_failed_evidence_uses_only_trusted_checker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\test_cleanup.py", line 160, in setUp
+    self.proof.mkdir()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-ill1xn00\\focused'
+
+======================================================================
+ERROR: test_verified_completed_or_failed_evidence_uses_only_trusted_checker (__main__.FocusedEvidence.test_verified_completed_or_failed_evidence_uses_only_trusted_checker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-ill1xn00'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-focused-guard-test-ill1xn00'
+
+======================================================================
+ERROR: test_default_inspect_never_deletes (__main__.Sequence.test_default_inspect_never_deletes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\test_cleanup.py", line 89, in test_default_inspect_never_deletes
+    result = c.execute(self.args)
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\cleanup.py", line 162, in execute
+    out.mkdir(parents=True, exist_ok=False)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-jsnuv3ht\\receipt'
+
+======================================================================
+ERROR: test_default_inspect_never_deletes (__main__.Sequence.test_default_inspect_never_deletes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-jsnuv3ht'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-jsnuv3ht'
+
+======================================================================
+ERROR: test_delete_exactly_one_instance_then_all_readbacks (__main__.Sequence.test_delete_exactly_one_instance_then_all_readbacks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\test_cleanup.py", line 111, in test_delete_exactly_one_instance_then_all_readbacks
+    result = c.execute(self.args)
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\cleanup.py", line 162, in execute
+    out.mkdir(parents=True, exist_ok=False)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-e927j551\\receipt'
+
+======================================================================
+ERROR: test_delete_exactly_one_instance_then_all_readbacks (__main__.Sequence.test_delete_exactly_one_instance_then_all_readbacks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-e927j551'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-e927j551'
+
+======================================================================
+ERROR: test_delete_requires_evidence_before_any_cloud_call (__main__.Sequence.test_delete_requires_evidence_before_any_cloud_call)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-uw0yxn5r'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-uw0yxn5r'
+
+======================================================================
+ERROR: test_failed_proof_validation_prevents_cloud_calls (__main__.Sequence.test_failed_proof_validation_prevents_cloud_calls)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\test_cleanup.py", line 104, in test_failed_proof_validation_prevents_cloud_calls
+    c.execute(self.args)
+    ~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\cleanup.py", line 162, in execute
+    out.mkdir(parents=True, exist_ok=False)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-xjk2onwk\\receipt'
+
+======================================================================
+ERROR: test_failed_proof_validation_prevents_cloud_calls (__main__.Sequence.test_failed_proof_validation_prevents_cloud_calls)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-xjk2onwk'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-xjk2onwk'
+
+======================================================================
+ERROR: test_focused_terminal_failure_is_retained_before_delete (__main__.Sequence.test_focused_terminal_failure_is_retained_before_delete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\test_cleanup.py", line 139, in test_focused_terminal_failure_is_retained_before_delete
+    result = c.execute(self.args)
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\cleanup.py", line 162, in execute
+    out.mkdir(parents=True, exist_ok=False)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-jb31n70w\\receipt'
+
+======================================================================
+ERROR: test_focused_terminal_failure_is_retained_before_delete (__main__.Sequence.test_focused_terminal_failure_is_retained_before_delete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-jb31n70w'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-jb31n70w'
+
+======================================================================
+ERROR: test_focused_verification_failure_prevents_all_cloud_calls (__main__.Sequence.test_focused_verification_failure_prevents_all_cloud_calls)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\test_cleanup.py", line 128, in test_focused_verification_failure_prevents_all_cloud_calls
+    c.execute(self.args)
+    ~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\cleanup-vm11\cleanup.py", line 162, in execute
+    out.mkdir(parents=True, exist_ok=False)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-bpldxd0a\\receipt'
+
+======================================================================
+ERROR: test_focused_verification_failure_prevents_all_cloud_calls (__main__.Sequence.test_focused_verification_failure_prevents_all_cloud_calls)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-bpldxd0a'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-bpldxd0a'
+
+======================================================================
+ERROR: test_receipt_inside_focused_reference_is_rejected (__main__.Sequence.test_receipt_inside_focused_reference_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-6mlbggdy'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\vm11-cleanup-test-6mlbggdy'
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.056s
+
+FAILED (errors=22)

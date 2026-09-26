@@ -1,0 +1,13 @@
+test_correct_identity (__main__.Guards.test_correct_identity) ... ok
+test_disk_mutations_rejected (__main__.Guards.test_disk_mutations_rejected) ... ok
+test_instance_mutations_rejected (__main__.Guards.test_instance_mutations_rejected) ... ok
+test_json_filter_is_not_overridden (__main__.Guards.test_json_filter_is_not_overridden) ... ok
+test_default_inspect_never_deletes (__main__.Sequence.test_default_inspect_never_deletes) ... ok
+test_delete_exactly_one_instance_then_all_readbacks (__main__.Sequence.test_delete_exactly_one_instance_then_all_readbacks) ... ok
+test_delete_requires_evidence_before_any_cloud_call (__main__.Sequence.test_delete_requires_evidence_before_any_cloud_call) ... ok
+test_failed_proof_validation_prevents_cloud_calls (__main__.Sequence.test_failed_proof_validation_prevents_cloud_calls) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.042s
+
+OK

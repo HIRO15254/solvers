@@ -1,0 +1,60 @@
+{
+  "schema": "r1.focused-memory-deployment-inputs/v1",
+  "frozen_at_utc": "2026-09-26T20:02:17.185341+00:00",
+  "files": [
+    {
+      "archive_member": "focused-memory/calibration.py",
+      "remote_path": "/opt/r1/final-control/focused-memory/calibration.py",
+      "bytes": 6709,
+      "sha256": "d90f0063aad62094760c4b429d273e4a48434c5f4c55fac4444020e60235f2e8"
+    },
+    {
+      "archive_member": "focused-memory/native_rss.c",
+      "remote_path": "/opt/r1/final-control/focused-memory/native_rss.c",
+      "bytes": 5392,
+      "sha256": "f7d3db113925bc21b2b60e361676680a386e86efd6e6fd11eab36cfb42c1f49f"
+    },
+    {
+      "archive_member": "focused-memory/protocol.json",
+      "remote_path": "/opt/r1/final-control/focused-memory/protocol.json",
+      "bytes": 2859,
+      "sha256": "7a994cb63f5d483400e2de9e10bb4588eb052bf17f69ae21836229d0baabdff7"
+    },
+    {
+      "archive_member": "focused-memory/README.md",
+      "remote_path": "/opt/r1/final-control/focused-memory/README.md",
+      "bytes": 6935,
+      "sha256": "dc46e0798f87330cc192b7c4ccfb5194a0c27de9d5eed5b187d1d0adbfe2d592"
+    },
+    {
+      "archive_member": "focused-memory/run.py",
+      "remote_path": "/opt/r1/final-control/focused-memory/run.py",
+      "bytes": 21102,
+      "sha256": "2395d1d6a1acf579152bdb7880b001737351b56c5851103e5127159925ea54ec"
+    },
+    {
+      "archive_member": "focused-memory/test_run.py",
+      "remote_path": "/opt/r1/final-control/focused-memory/test_run.py",
+      "bytes": 8547,
+      "sha256": "f85747992c7792872708649e977a73c446113fb952bc51a3e030312b3f030a5c"
+    },
+    {
+      "archive_member": "run-memory03.sh",
+      "remote_path": "/tmp/run-memory03.sh",
+      "bytes": 795,
+      "sha256": "1a6d90ffafb280badefd0678ffb7eaefb8477271daf204247d2b3f4f32ee173a"
+    },
+    {
+      "archive_member": "start-memory03.py",
+      "remote_path": "/tmp/start-memory03.py",
+      "bytes": 2558,
+      "sha256": "2955b88959f423d96f4d1b688abd77f39dab4c0a2b3a5b0b3c02560043cd1628"
+    },
+    {
+      "archive_member": "recover-memory03.sh",
+      "remote_path": "/tmp/recover-memory03.sh",
+      "bytes": 2442,
+      "sha256": "29dcbe9b503eb130ecad99092dc163fe6ba4ecd71ae581e151b8e31508559803"
+    }
+  ]
+}

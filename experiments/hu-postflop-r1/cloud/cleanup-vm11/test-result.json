@@ -1,0 +1,17 @@
+{
+  "schema": "r1.mocked-cleanup-test/v1",
+  "started_utc": "2026-09-26T19:29:18.421915+00:00",
+  "ended_utc": "2026-09-26T19:29:18.744330+00:00",
+  "exit_code": 0,
+  "cloud_operations": "all mocked; none executed",
+  "stdout": {
+    "path": "test.stdout.log",
+    "bytes": 353,
+    "sha256": "3d17b9bfd13f53786a9f35591440e8fb0dda10b45c46f5fc263c18c4357c8ac3"
+  },
+  "stderr": {
+    "path": "test.stderr.log",
+    "bytes": 935,
+    "sha256": "f7e1d0f8693f3e2608a2e7ce5017a69e0ee4cd5140a509941ee1bf8b7cc23ef0"
+  }
+}

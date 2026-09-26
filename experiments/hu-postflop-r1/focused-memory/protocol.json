@@ -1,0 +1,21 @@
+{
+  "schema": "r1.focused-memory-protocol/v1",
+  "reference": "Completed final-pipeline proof02; its memory screen remains inconclusive and unchanged.",
+  "reference_files": {
+    "plan.json": {"bytes": 12237, "sha256": "ebaa98ea8d510ecab92885241532ba8284b08207f975d79569035a2ed5e88761"},
+    "build.json": {"bytes": 34337, "sha256": "3fa456fee56e1067826c9ab14bc8961d816cc33e08a44e25d529ef59f79faf9a"},
+    "result.json": {"bytes": 957032, "sha256": "83fd9b4ef17990caa71901011766a3e29741f44cd4d1e08331c178c1787d86dc"}
+  },
+  "reference_protocol_sha256": "b130f5b94f62217892d0e58019de48aa5516822b9036fc72994756866d5cae00",
+  "metric": "Linux wait4 ru_maxrss of the direct solver child forked by the small native launcher. No statm denominator, physical peak bound, population claim or overall R1 certification.",
+  "screen": "For each of river,turn,flop, max of 3 measured new child peaks / min of 3 measured old child peaks <= 0.90. Report each raw counter and each separate screen; no after-outcome change.",
+  "ratio_max": 0.9,
+  "order": "Reference proof02 solve order, 3 cases, one warmup and 3 measured pairs: 24 solves. All solves precede 24 summaries,24 saved-profile audits,24 decode-all validations. No timing-performance screen in this campaign.",
+  "quality": "Same source archives, original executables/configs,1 worker,caps,cadences,and strict NC<0.04 as proof02. Every own-arm live trajectory,checkpoint/config bytes,summary,stored-profile EV/BR/NC,and canonical bytes excluding only wall_secs must match proof02. No SOL/CKPT cross-version read or cross-arm raw equality.",
+  "calibration": {"python_allocation_bytes": 268435456, "python_vmrss_min_kib": 204800, "launcher_vmrss_max_kib": 16384, "small_bytes": 1048576, "large_bytes": 67108864, "small_peak_max_kib": 32768, "large_peak_min_kib": 49152, "large_peak_max_kib": 98304, "large_minus_small_min_kib": 32768},
+  "build": "Existing GCC only: -std=c11 -O2 -Wall -Wextra -Werror native_rss.c -o native-rss. Retain GCC identity/version and C source. No Cargo rebuild or production edit.",
+  "limits": "Original300s stage timeout,10GiB sampledRSS,1GiBfree,4GiBdisk,20ms polling,5sgrace/kill. Outer12GiB/swap0/CPUWeight100, same boot, deadline<=2026-09-26T21:20:00Z and original VM STOP21:54:51Z. Launch requires300+20s remaining.",
+  "deadline_ceiling_utc": "2026-09-26T21:20:00Z",
+  "failure": "Any calibration/identity/quality/process/bounds failure is terminal, retain raw failure and skip suffix; no retries or sample replacements. An incomplete screen is not success.",
+  "retention": "New original-byte CAS holds source archives,original binaries,inputs,controls,native launcher,logs,samples and artifacts. Reference proof02 is an explicit external dependency required by portable check, not duplicated wholesale. Compiler/Python executable identity only. No retained code executes."
+}

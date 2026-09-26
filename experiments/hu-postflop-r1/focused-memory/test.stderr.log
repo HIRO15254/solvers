@@ -1,0 +1,13 @@
+test_calibration_native_raw_pin_and_numeric_gates (__main__.Tests.test_calibration_native_raw_pin_and_numeric_gates) ... ok
+test_calibration_status_alone_is_not_enough (__main__.Tests.test_calibration_status_alone_is_not_enough) ... ok
+test_good_calibration (__main__.Tests.test_good_calibration) ... ok
+test_native_counter_bound_to_actual_child (__main__.Tests.test_native_counter_bound_to_actual_child) ... ok
+test_ratio_uses_max_min_native_only_and_excludes_warmup (__main__.Tests.test_ratio_uses_max_min_native_only_and_excludes_warmup) ... ok
+test_schedule_and_order (__main__.Tests.test_schedule_and_order) ... ok
+test_small_launcher_and_large_response_required (__main__.Tests.test_small_launcher_and_large_response_required) ... ok
+test_unexpected_process_rejected (__main__.Tests.test_unexpected_process_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.017s
+
+OK

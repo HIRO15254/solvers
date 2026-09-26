@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "C:/Python313/python.exe",
+    "-B",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\cleanup-vm11\\test_cleanup.py"
+  ],
+  "started_utc": "2026-09-26T19:59:27.408866+00:00",
+  "ended_utc": "2026-09-26T19:59:27.896066+00:00",
+  "exit_code": 0,
+  "scope": "Mocked cloud/process calls only; elevated after sandbox temporary-directory ACL errors",
+  "test03.stdout.log": {
+    "bytes": 530,
+    "sha256": "69ab081a7978ff31fa878ffa3096e93450903a7a0490959be4e5cfa26ebfa769"
+  },
+  "test03.stderr.log": {
+    "bytes": 2149,
+    "sha256": "5036cf13b7f8e379ff825ccb9b27f79469b143fbb02c24ed938a64e99815f55f"
+  }
+}
