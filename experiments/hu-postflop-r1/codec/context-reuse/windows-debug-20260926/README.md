@@ -62,8 +62,9 @@ argv[0]を`result.binaries[role].frozen`へ、入力を`plan.inputs[case]`へ厳
 compiler実体は元記録のidentityのみ保持し、再buildやtest、solverは実行しない。
 
 元scratchは`E:\codex-work\solvers\r1-context-reuse-20260926`。
-保持時には全payloadを読み出せた。`fresh/samples/`はGit保全・原byte照合後に削除できるscratchで、
-存在を永続保証しない。再利用時の根拠は本ディレクトリのgzipとGit履歴とする。
+保持時には全payloadを読み出せた。Git commit `96c0e55`のgzipを直接読み、
+`fresh/samples/`の全72ファイル / 730,561,025 bytesと原byte単位で再照合してから、
+同scratchを削除した。再利用時の根拠は本ディレクトリのgzipとGit履歴とする。
 元records/source/frozen binariesと、近接するfresh Cargo targetは今回の保持・検査では削除していない。
 旧共有Cargo target `E:\codex-work\solvers\target\r1-writer-smoke-20260926` は、保全後に
 root担当が801ファイル / 220,998,130 bytesを削除済みと報告した。元記録中のそのcompiled pathは
