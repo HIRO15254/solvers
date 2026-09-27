@@ -1,0 +1,11 @@
+{
+  "members": 241,
+  "source_files": 208,
+  "source_revision": "88fb39b586074d6988fe825ffbc97912013eb8f3",
+  "archive_sha256": "4cd591ea18270f6d01e95a6689098d9edf67f9ebd4d6ef370b7476fe966f1286",
+  "source_archive": {
+    "bytes": 967129,
+    "sha256": "54fedb52b9d50e6da0985b060d8ae5c6ee1c0f5c5ac8283e9a9fef33f88545ce"
+  },
+  "scope": "Small source deployment archive only; no native execution or solver state"
+}
