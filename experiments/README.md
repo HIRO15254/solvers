@@ -33,6 +33,7 @@
 | R1のnative processメモリ比較 | [追加測定の結果](hu-postflop-r1/focused-memory/proof03/report.jp.md)、[検証結果](hu-postflop-r1/focused-memory/proof03/verification.json) | Python親の履歴を分離する校正に合格、99工程で元の品質・内容と一致。新最大/旧最小のRSS比はTurn0.341・限定Flop0.054で10%削減基準通過、River0.958は未達。proof02の判定は変更しない |
 | R1の現行版32 vCPU上のworker比較 | [Current32 proof01](hu-postflop-r1/current-scaling32/proof01/report.jp.md)、[全数値](hu-postflop-r1/current-scaling32/proof01/report.json) | 36実行で1/16/32 workersの停止軌跡・品質bits・全state一致。32は対直列3.71〜4.60倍だが16より17〜42%遅い。16 core/32 logicalの同一VM上、内部3ケースの記述比較。VM/disk削除確認済み |
 | R1の並列化の追加切分け | [VM12 rawと現行sourceの監査](hu-postflop-r1/scaling-next-audit/README.md)、[CFR最小job長の研究候補](hu-postflop-r1/action-minlen2/README.jp.md) | RiverのCFR側減速と狭いFlopのchance分割を分離。Flop depth1入力とCFR action min_len2差分を個別準備、ビルド・性能・全state一致は未認定 |
+| R1の全street Flop入力と出力buffer候補 | [Flop scalingの研究準備](hu-postflop-r1/flop-scaling/README.jp.md) | 34/30・63/160 handの同一約36.8万node木と12静的tests。flat chance出力は研究copyで型検査・F32/I16限定検査、速度とnative品質は未認定 |
 | R1の受入証拠の範囲 | [事前条件の監査](hu-postflop-r1/acceptance/audit.jp.md)、[将来の外部比較器](hu-postflop-r1/acceptance/external-contract.md) | 既存の事前条件と測定後索引を区別。将来の閾値発行・校正・欠測の検査であり、総合受入の認定ではない |
 | R1の実入力への境界適用 | [抽象化の適用確認](hu-postflop-r1/reference/abstraction-applicability.md) | 017/019のhand identity・joint重み・完全記憶の検査と、未実装・未評価の範囲 |
 | R1の工程別診断 | [source03 phase比較](hu-postflop-r1/phases/vm06-report.md) | 別instrumented buildのon/off較正、重複しない工程時間、元の性能実測との区別 |

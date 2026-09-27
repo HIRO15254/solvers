@@ -1,0 +1,33 @@
+{
+  "schema": "solvers.r1.flop-scaling-root-review/v1",
+  "reviewed_utc": "2026-09-27T00:06:19.472232+00:00",
+  "source_head": "75ff8a5c6931e0e6b60a6ea78c305f677ec38d6d",
+  "production_pin_count": 207,
+  "production_unchanged": true,
+  "pin_check_count": 301,
+  "local_markdown_link_count": 30,
+  "candidate_reproducible_from_final_generator": true,
+  "candidate_sha256": "4a58bfa9bfa384e98e5a92f477f6322d39baff975a3810ceef8533f5b6fabafa",
+  "independent_source_reviews": 2,
+  "all_receipt_log_and_source_pins_checked": true,
+  "selected_tests": {
+    "existing_candidate": 2,
+    "zero_dimension_baseline": 2,
+    "zero_dimension_candidate": 2,
+    "fixture_python": 12
+  },
+  "tool_checks_observed_exit_zero": [
+    "cargo fmt --all --check",
+    "python -B tools/check_docs.py (49 documents)",
+    "git apply --check candidate.patch"
+  ],
+  "not_run": [
+    "full workspace clippy",
+    "full workspace tests",
+    "fresh dependency build",
+    "native Flop solve",
+    "performance campaign"
+  ],
+  "production_adopted": false,
+  "performance_result": null
+}

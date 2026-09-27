@@ -1,0 +1,62 @@
+{
+  "native_execution": "not_run",
+  "tree": {
+    "counts": {
+      "deal_edges": 49637,
+      "flop_action_edges_p0": 7,
+      "flop_action_edges_p1": 7,
+      "flop_action_nodes_p0": 3,
+      "flop_action_nodes_p1": 3,
+      "flop_bet_available_nodes": 2,
+      "flop_chance_nodes": 5,
+      "flop_fold_terminals": 4,
+      "flop_raise_available_nodes": 2,
+      "river_action_edges_p0": 157584,
+      "river_action_edges_p1": 157584,
+      "river_action_nodes_p0": 72912,
+      "river_action_nodes_p1": 72912,
+      "river_bet_available_nodes": 61152,
+      "river_fold_terminals": 84672,
+      "river_raise_available_nodes": 23520,
+      "showdown_terminals": 134064,
+      "turn_action_edges_p0": 1421,
+      "turn_action_edges_p1": 1421,
+      "turn_action_nodes_p0": 637,
+      "turn_action_nodes_p1": 637,
+      "turn_bet_available_nodes": 490,
+      "turn_chance_nodes": 1029,
+      "turn_fold_terminals": 784,
+      "turn_raise_available_nodes": 294
+    },
+    "action_nodes": 147104,
+    "chance_nodes": 1034,
+    "fold_terminals": 85460,
+    "showdown_terminals": 134064,
+    "nodes": 367662,
+    "edges": 367661,
+    "terminals": 219524,
+    "cached_betting_states": 38,
+    "cached_street_end_states": 11,
+    "unique_river_board_sets": 1176,
+    "native_validation": "not_run",
+    "scope": "Symbolic structure for these two fixed scripts only; not a native build, OS RSS or peak-memory measurement."
+  },
+  "fixtures": {
+    "narrow": {
+      "support": [
+        34,
+        30
+      ],
+      "compatible_mass": 870,
+      "f32_payload_bytes": 81414144
+    },
+    "expanded": {
+      "support": [
+        63,
+        160
+      ],
+      "compatible_mass": 8700,
+      "f32_payload_bytes": 283677408
+    }
+  }
+}

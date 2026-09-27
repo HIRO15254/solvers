@@ -1,0 +1,68 @@
+{
+  "schema": "r1.flop-scaling-static-checks/v1",
+  "scope": "Pure Python fixture/support/tree arithmetic; no native build/solve/cloud",
+  "source_before": {
+    "prepare.py": {
+      "bytes": 13013,
+      "sha256": "4e360f5f4e88a78eee91dd74492a5c9cdce9d9f44d7c8d65dfc0d8fb978d6fae"
+    },
+    "test_prepare.py": {
+      "bytes": 6493,
+      "sha256": "5a99dd54008fd7b8e511e721d2a2334cd399ad410a63706ca32ca0f8e28968e2"
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\flop-scaling\\fixtures\\prepare.py"
+      ],
+      "started_utc": "2026-09-26T23:53:11.693456+00:00",
+      "elapsed_seconds": 0.36207789997570217,
+      "exit_code": 0,
+      "stdout": {
+        "path": "prepare.stdout.log",
+        "bytes": 1790,
+        "sha256": "5b76354429848d257351996185cc0c7726c1c20d2adfc402823c72970a15519d"
+      },
+      "stderr": {
+        "path": "prepare.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\flop-scaling\\fixtures\\test_prepare.py",
+        "-v"
+      ],
+      "started_utc": "2026-09-26T23:53:12.063846+00:00",
+      "elapsed_seconds": 0.3140912000089884,
+      "exit_code": 0,
+      "stdout": {
+        "path": "tests.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "tests.stderr.log",
+        "bytes": 1406,
+        "sha256": "2838d1c8fd929da0c20d1b1e9d0ad91d6f5a95db5961b7c7ac326448677e51b9"
+      }
+    }
+  ],
+  "source_after": {
+    "prepare.py": {
+      "bytes": 13013,
+      "sha256": "4e360f5f4e88a78eee91dd74492a5c9cdce9d9f44d7c8d65dfc0d8fb978d6fae"
+    },
+    "test_prepare.py": {
+      "bytes": 6493,
+      "sha256": "5a99dd54008fd7b8e511e721d2a2334cd399ad410a63706ca32ca0f8e28968e2"
+    }
+  },
+  "all_passed": true
+}

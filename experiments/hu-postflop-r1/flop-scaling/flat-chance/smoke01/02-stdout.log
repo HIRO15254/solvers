@@ -1,0 +1,7 @@
+
+running 2 tests
+test mapped_chance_and_action_siblings_preserve_f32_state ... ok
+test mapped_chance_and_action_siblings_preserve_i16_state ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 1.58s
+

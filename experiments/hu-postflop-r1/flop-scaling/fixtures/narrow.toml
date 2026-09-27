@@ -1,0 +1,46 @@
+# Derived research input; see README.md and static-check.json.
+# 10 chips = 1 bb. No external solution or convergence target is asserted.
+schema = "solvers.postflop/v1"
+
+[game]
+board = "Qs Jh 2h"
+oop_range = "TT+,AQs+,KQs"
+ip_range = "JJ-99,AQs-ATs,KQs,QJs"
+pot = 200
+effective_stack = 900
+min_bet = 10
+iso_merging = false
+preflop_aggressor = "oop"
+
+[game.tree]
+kind = "script"
+include_allin = false
+script = '''
+flop, turn, river {
+  replace bet [75]
+  replace raise [75]
+}
+'''
+
+[game.tree.max_aggressive_actions]
+flop = 2
+turn = 2
+river = 2
+
+[rake]
+kind = "none"
+
+[utility]
+kind = "chip-ev"
+
+[algorithm]
+schedule = "dcfr"
+
+[run]
+iterations = 100
+max_time = "30s"
+check_every = 10
+threads = 1
+storage = "f32"
+par_chance_depth = 2
+par_min_children = 12

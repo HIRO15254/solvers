@@ -44,3 +44,4 @@ experiments/hu-postflop-r1/validation/vm07-complete/records/build/current/crates
 experiments/hu-postflop-r1/validation/bet-refinement-20260926/oracle-river.patch -whitespace
 experiments/hu-postflop-r1/checkpoint/evidence-20260926/source/source.diff -whitespace
 experiments/hu-postflop-r1/codec/context-reuse/context-reuse.patch -whitespace
+experiments/hu-postflop-r1/flop-scaling/flat-chance/candidate.patch -whitespace

@@ -1,0 +1,289 @@
+{
+  "schema": "solvers.r1.flat-chance-zero-smoke/v1",
+  "started_utc": "2026-09-27T00:03:29.456794+00:00",
+  "scope": "original parallel.rs plus research zero-dimension fragment; baseline and candidate each compared with its unchanged serial path; no direct cross-binary output comparison; no native poker performance/quality acceptance",
+  "source_pins": {
+    "lib.rs": {
+      "bytes": 1376,
+      "sha256": "4d3f7a3b7551fbf1547dd45e0fb5170ebfdd45fd83a7ebefe132562d5cf885d8"
+    },
+    "mccfr.rs": {
+      "bytes": 21267,
+      "sha256": "1cb21e70898bf0fcc98e039202470e59da5b3c4a5c9776c8965eac5d832cac68"
+    },
+    "reach.rs": {
+      "bytes": 18760,
+      "sha256": "e4184dffabadaccb16d2672e6e3d24bba20fceec1013480d28d700b703210c3b"
+    },
+    "schedule.rs": {
+      "bytes": 6330,
+      "sha256": "c4dd446587d52c710d3a61a78ddd3d4a52550d331b9a24e1a68156ac84e4b6a9"
+    },
+    "scratch.rs": {
+      "bytes": 1117,
+      "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49"
+    },
+    "solver.rs": {
+      "bytes": 58650,
+      "sha256": "4a58bfa9bfa384e98e5a92f477f6322d39baff975a3810ceef8533f5b6fabafa"
+    },
+    "storage.rs": {
+      "bytes": 44287,
+      "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+    },
+    "tree.rs": {
+      "bytes": 16936,
+      "sha256": "2e6c1a3560bd12a7b2a04573e28505ae00fdaaf8fcb797cb3b0bb964a98879b2"
+    }
+  },
+  "baseline_source_pins": {
+    "lib.rs": {
+      "bytes": 1376,
+      "sha256": "4d3f7a3b7551fbf1547dd45e0fb5170ebfdd45fd83a7ebefe132562d5cf885d8"
+    },
+    "mccfr.rs": {
+      "bytes": 21267,
+      "sha256": "1cb21e70898bf0fcc98e039202470e59da5b3c4a5c9776c8965eac5d832cac68"
+    },
+    "reach.rs": {
+      "bytes": 18760,
+      "sha256": "e4184dffabadaccb16d2672e6e3d24bba20fceec1013480d28d700b703210c3b"
+    },
+    "schedule.rs": {
+      "bytes": 6330,
+      "sha256": "c4dd446587d52c710d3a61a78ddd3d4a52550d331b9a24e1a68156ac84e4b6a9"
+    },
+    "scratch.rs": {
+      "bytes": 1117,
+      "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49"
+    },
+    "solver.rs": {
+      "bytes": 56116,
+      "sha256": "e116e2554915768e0ccef89e86dccb0ffb89d0a2ff309343c0992fc8d7b02e4b"
+    },
+    "storage.rs": {
+      "bytes": 44287,
+      "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+    },
+    "tree.rs": {
+      "bytes": 16936,
+      "sha256": "2e6c1a3560bd12a7b2a04573e28505ae00fdaaf8fcb797cb3b0bb964a98879b2"
+    }
+  },
+  "cached_direct_dependency_pins": {
+    "target\\r1-local-tests\\debug\\deps\\libcards-62a472f55d6a5f7b.rlib": {
+      "bytes": 1663920,
+      "sha256": "19860efd0bb134b6996dfbdb6c8262bb17c27d0ddf6c40584a22a88c80a89ed7"
+    },
+    "target\\r1-local-tests\\debug\\deps\\librayon-170433e97196c6df.rlib": {
+      "bytes": 4379000,
+      "sha256": "5d4be3ebee0c0a4937e915abcf2133406f391d62738553f2fb5291fc4d29c705"
+    },
+    "target\\r1-local-tests\\debug\\deps\\librand-b00db5fdaa26e274.rlib": {
+      "bytes": 1435340,
+      "sha256": "cf9ff5e9eca82f0bd412a7f6a56a9fd22bc143c7c74d8e5ff235ee7f05c9062f"
+    },
+    "target\\r1-local-tests\\debug\\deps\\librand_chacha-3e21c25d4f672f67.rlib": {
+      "bytes": 651774,
+      "sha256": "a5c589eb80da6beca423dcaa896811d334f968a5277b44842d398ae00831dc67"
+    }
+  },
+  "inputs": {
+    "crates\\engine\\tests\\parallel.rs": {
+      "bytes": 23642,
+      "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-chance\\zero_chance_tests.rs.in": {
+      "bytes": 5829,
+      "sha256": "26bd9edf188f159eaf526307ed3c877ce815082e190f9ade6df4988d51dc3834"
+    },
+    ".cache\\flat-chance-typecheck01\\zero_parallel.rs": {
+      "bytes": 29472,
+      "sha256": "01c4b0dd7ffad12dace4888c41b36945323c08735a3522fca4f4106c239345c1"
+    }
+  },
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6\n",
+  "process_creation_flags": "BELOW_NORMAL_PRIORITY_CLASS | CREATE_NO_WINDOW",
+  "commands": [
+    {
+      "argv": [
+        "rustc",
+        "--edition=2024",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "codegen-units=1",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps",
+        "--crate-name",
+        "engine",
+        "--crate-type",
+        "rlib",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\libcards-62a472f55d6a5f7b.rlib",
+        "--extern",
+        "rayon=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librayon-170433e97196c6df.rlib",
+        "--extern",
+        "rand=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librand-b00db5fdaa26e274.rlib",
+        "--extern",
+        "rand_chacha=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librand_chacha-3e21c25d4f672f67.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\engine\\src\\lib.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-flop-flat-research\\libengine_baseline.rlib"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0,
+      "wall_seconds": 0.8446041999850422,
+      "stdout": {
+        "path": "00-stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "00-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "rustc",
+        "--edition=2024",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "codegen-units=1",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps",
+        "--test",
+        "--crate-name",
+        "zero_chance_baseline",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\libcards-62a472f55d6a5f7b.rlib",
+        "--extern",
+        "rayon=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librayon-170433e97196c6df.rlib",
+        "--extern",
+        "rand=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librand-b00db5fdaa26e274.rlib",
+        "--extern",
+        "rand_chacha=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librand_chacha-3e21c25d4f672f67.rlib",
+        "--extern",
+        "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-flop-flat-research\\libengine_baseline.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\flat-chance-typecheck01\\zero_parallel.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-flop-flat-research\\zero_chance_baseline.exe"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0,
+      "wall_seconds": 12.74036469985731,
+      "stdout": {
+        "path": "01-stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "01-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-flop-flat-research\\zero_chance_baseline.exe",
+        "zero_mapped_chance_preserves",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0,
+      "wall_seconds": 1.1172371001448482,
+      "stdout": {
+        "path": "02-stdout.log",
+        "bytes": 245,
+        "sha256": "3607495b228dc602e4b27d772a1dc6ff91d5f1dc430114c10f707e2fab9852d9"
+      },
+      "stderr": {
+        "path": "02-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "rustc",
+        "--edition=2024",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "codegen-units=1",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps",
+        "--test",
+        "--crate-name",
+        "zero_chance_flat",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\libcards-62a472f55d6a5f7b.rlib",
+        "--extern",
+        "rayon=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librayon-170433e97196c6df.rlib",
+        "--extern",
+        "rand=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librand-b00db5fdaa26e274.rlib",
+        "--extern",
+        "rand_chacha=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librand_chacha-3e21c25d4f672f67.rlib",
+        "--extern",
+        "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-flop-flat-research\\libengine_flat.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\flat-chance-typecheck01\\zero_parallel.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-flop-flat-research\\zero_chance_flat.exe"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0,
+      "wall_seconds": 11.525054299971089,
+      "stdout": {
+        "path": "03-stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "03-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-flop-flat-research\\zero_chance_flat.exe",
+        "zero_mapped_chance_preserves",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0,
+      "wall_seconds": 1.0904560000635684,
+      "stdout": {
+        "path": "04-stdout.log",
+        "bytes": 245,
+        "sha256": "3607495b228dc602e4b27d772a1dc6ff91d5f1dc430114c10f707e2fab9852d9"
+      },
+      "stderr": {
+        "path": "04-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "source_unchanged": true,
+  "all_planned_commands_passed": true,
+  "binary_pins": {
+    "libengine_baseline.rlib": {
+      "bytes": 1258594,
+      "sha256": "0ba56b83441828c5aa01bd073a180d45e2e1e9096bb469134e27a33c89b1f960"
+    },
+    "zero_chance_baseline.exe": {
+      "bytes": 6562304,
+      "sha256": "155be24b7258275a5dff187f3ebe62da4ddf914129c8fe60039fa213b7516dd7"
+    },
+    "zero_chance_flat.exe": {
+      "bytes": 5363200,
+      "sha256": "e5cd8215eed42ef4f68772ac5b29d2dc165a777296b113d8b419250c026f943f"
+    }
+  }
+}

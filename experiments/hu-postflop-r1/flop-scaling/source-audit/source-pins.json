@@ -1,0 +1,105 @@
+{
+  "schema": "r1.flop-scaling-source-audit/v1",
+  "captured_at": "2026-09-26T23:50:18.723011+00:00",
+  "production_revision": "11e4062ba1735e58b60d12999cb23ed10fd1a163",
+  "scope": "Read-only source audit and arithmetic; no Rust/build/solver/cloud/profiler execution",
+  "sources": [
+    {
+      "path": "crates/engine/src/solver.rs",
+      "bytes": 56116,
+      "sha256": "e116e2554915768e0ccef89e86dccb0ffb89d0a2ff309343c0992fc8d7b02e4b",
+      "production_revision_sha256": "e116e2554915768e0ccef89e86dccb0ffb89d0a2ff309343c0992fc8d7b02e4b",
+      "equal_revision_bytes": true
+    },
+    {
+      "path": "crates/engine/src/scratch.rs",
+      "bytes": 1117,
+      "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49",
+      "production_revision_sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49",
+      "equal_revision_bytes": true
+    },
+    {
+      "path": "crates/engine/src/tree.rs",
+      "bytes": 16936,
+      "sha256": "2e6c1a3560bd12a7b2a04573e28505ae00fdaaf8fcb797cb3b0bb964a98879b2",
+      "production_revision_sha256": "2e6c1a3560bd12a7b2a04573e28505ae00fdaaf8fcb797cb3b0bb964a98879b2",
+      "equal_revision_bytes": true
+    },
+    {
+      "path": "crates/engine/src/storage.rs",
+      "bytes": 44287,
+      "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5",
+      "production_revision_sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5",
+      "equal_revision_bytes": true
+    },
+    {
+      "path": "crates/holdem/src/postflop.rs",
+      "bytes": 73444,
+      "sha256": "70ecaa0bbc39ca1fff1d3c7c29a1e499dea87e5b8e58d2486b3e0ebc157f891f",
+      "production_revision_sha256": "70ecaa0bbc39ca1fff1d3c7c29a1e499dea87e5b8e58d2486b3e0ebc157f891f",
+      "equal_revision_bytes": true
+    },
+    {
+      "path": "crates/cli/src/solve.rs",
+      "bytes": 50599,
+      "sha256": "78ee5f3528303ca036246d00361253cfab495da848db682d7c590666f3fe31fe",
+      "production_revision_sha256": "78ee5f3528303ca036246d00361253cfab495da848db682d7c590666f3fe31fe",
+      "equal_revision_bytes": true
+    },
+    {
+      "path": "crates/engine/tests/parallel.rs",
+      "bytes": 23642,
+      "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d",
+      "production_revision_sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d",
+      "equal_revision_bytes": true
+    },
+    {
+      "path": "crates/engine/tests/dimension_changing_transitions.rs",
+      "bytes": 15307,
+      "sha256": "aec4e6df5a69722980fc1dac57216c8b2b1325dc6a4099686132ef3045464008",
+      "production_revision_sha256": "aec4e6df5a69722980fc1dac57216c8b2b1325dc6a4099686132ef3045464008",
+      "equal_revision_bytes": true
+    },
+    {
+      "path": "Cargo.lock",
+      "bytes": 40970,
+      "sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1",
+      "production_revision_sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1",
+      "equal_revision_bytes": true
+    },
+    {
+      "path": "docs/architecture.md",
+      "bytes": 34949,
+      "sha256": "d66da93589836ef4bb75cdb854123cbaf679d983b488e8b511af8dbb9a7bd2e2"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/current-scaling32/proof01/report.json",
+      "bytes": 29619,
+      "sha256": "4ebd29b0df919df2211e9fadcf8d548edf7d58f06dffbfe044de3d66b8724ece"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/current-scaling32/proof01/report.jp.md",
+      "bytes": 5723,
+      "sha256": "fb6c24a37a7ba63f78531535d4235683e1b6a26709b1a0083dc890cb852e0565"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/final-pipeline/configs/flop.toml",
+      "bytes": 678,
+      "sha256": "07b971e4879e86e3d156169f66719e39dd078b861d06923bbbb263d8ab1a9610"
+    }
+  ],
+  "all_production_equal_revision": true,
+  "rayon_primary_documentation": "https://docs.rs/rayon/1.12.0/rayon/iter/trait.ParallelIterator.html#method.map_init",
+  "single_node_examples": [
+    {
+      "children": 49,
+      "mapped_dim_each": 3,
+      "f32_payload_bytes": 588
+    },
+    {
+      "children": 49,
+      "mapped_dim_each": 1000,
+      "f32_payload_bytes": 196000
+    }
+  ]
+}

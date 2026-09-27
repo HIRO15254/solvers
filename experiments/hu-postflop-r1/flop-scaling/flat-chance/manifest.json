@@ -1,0 +1,15 @@
+{
+  "schema": "solvers.r1.flat-chance-preparation/v1",
+  "source_path": "crates/engine/src/solver.rs",
+  "source_sha256": "e116e2554915768e0ccef89e86dccb0ffb89d0a2ff309343c0992fc8d7b02e4b",
+  "formatter": "rustfmt 1.9.0-stable (2d8144b788 2026-07-07)",
+  "unformatted_candidate_sha256": "7da227c723b587b54554555a371d9ad6fb4be13d818a92a2b9b270a9bb389c03",
+  "candidate_sha256": "4a58bfa9bfa384e98e5a92f477f6322d39baff975a3810ceef8533f5b6fabafa",
+  "candidate_bytes": 58650,
+  "patch_sha256": "0f3e5cbecfd1094c9ed49534d67c456b6a77e5aac91ffccb84882133949d896e",
+  "scope": "CFR and value chance outputs only; scheduling and ordered accumulation preserved",
+  "rust_compile": null,
+  "quality": null,
+  "performance": null,
+  "production_adopted": false
+}

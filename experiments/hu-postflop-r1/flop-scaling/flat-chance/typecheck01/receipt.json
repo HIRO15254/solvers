@@ -1,0 +1,97 @@
+{
+  "schema": "solvers.r1.flat-chance-metadata-typecheck/v1",
+  "started_utc": "2026-09-26T23:56:58.493910+00:00",
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "--crate-name",
+    "engine_flat_research",
+    "--crate-type",
+    "lib",
+    "--emit=metadata",
+    "-L",
+    "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps",
+    "--extern",
+    "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\libcards-62a472f55d6a5f7b.rlib",
+    "--extern",
+    "rayon=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librayon-170433e97196c6df.rlib",
+    "--extern",
+    "rand=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librand-b00db5fdaa26e274.rlib",
+    "--extern",
+    "rand_chacha=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librand_chacha-3e21c25d4f672f67.rlib",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\flat-chance-typecheck01\\src\\lib.rs",
+    "-o",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-flop-flat-research\\engine_flat_research.rmeta"
+  ],
+  "source_pins": {
+    "lib.rs": {
+      "bytes": 1376,
+      "sha256": "4d3f7a3b7551fbf1547dd45e0fb5170ebfdd45fd83a7ebefe132562d5cf885d8"
+    },
+    "mccfr.rs": {
+      "bytes": 21267,
+      "sha256": "1cb21e70898bf0fcc98e039202470e59da5b3c4a5c9776c8965eac5d832cac68"
+    },
+    "reach.rs": {
+      "bytes": 18760,
+      "sha256": "e4184dffabadaccb16d2672e6e3d24bba20fceec1013480d28d700b703210c3b"
+    },
+    "schedule.rs": {
+      "bytes": 6330,
+      "sha256": "c4dd446587d52c710d3a61a78ddd3d4a52550d331b9a24e1a68156ac84e4b6a9"
+    },
+    "scratch.rs": {
+      "bytes": 1117,
+      "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49"
+    },
+    "solver.rs": {
+      "bytes": 58650,
+      "sha256": "4a58bfa9bfa384e98e5a92f477f6322d39baff975a3810ceef8533f5b6fabafa"
+    },
+    "storage.rs": {
+      "bytes": 44287,
+      "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+    },
+    "tree.rs": {
+      "bytes": 16936,
+      "sha256": "2e6c1a3560bd12a7b2a04573e28505ae00fdaaf8fcb797cb3b0bb964a98879b2"
+    }
+  },
+  "cached_direct_dependency_pins": {
+    "target\\r1-local-tests\\debug\\deps\\libcards-62a472f55d6a5f7b.rlib": {
+      "bytes": 1663920,
+      "sha256": "19860efd0bb134b6996dfbdb6c8262bb17c27d0ddf6c40584a22a88c80a89ed7"
+    },
+    "target\\r1-local-tests\\debug\\deps\\librayon-170433e97196c6df.rlib": {
+      "bytes": 4379000,
+      "sha256": "5d4be3ebee0c0a4937e915abcf2133406f391d62738553f2fb5291fc4d29c705"
+    },
+    "target\\r1-local-tests\\debug\\deps\\librand-b00db5fdaa26e274.rlib": {
+      "bytes": 1435340,
+      "sha256": "cf9ff5e9eca82f0bd412a7f6a56a9fd22bc143c7c74d8e5ff235ee7f05c9062f"
+    },
+    "target\\r1-local-tests\\debug\\deps\\librand_chacha-3e21c25d4f672f67.rlib": {
+      "bytes": 651774,
+      "sha256": "a5c589eb80da6beca423dcaa896811d334f968a5277b44842d398ae00831dc67"
+    }
+  },
+  "scope": "metadata only against preexisting cached dependencies; no serde/tests/link/build/solver/workspace acceptance",
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "wall_seconds": 2.0461341000627726,
+  "source_unchanged": true,
+  "log_pins": {
+    "stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "metadata_artifact": {
+    "bytes": 246054,
+    "sha256": "5a331880b37c5eeb6ba62bd883216c60f89044954609f0bf7e4810b89c2b74d1"
+  }
+}

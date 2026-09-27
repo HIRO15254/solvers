@@ -1,0 +1,7 @@
+
+running 2 tests
+test zero_mapped_chance_preserves_f32_state_and_all_values ... ok
+test zero_mapped_chance_preserves_i16_state_and_all_values ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.82s
+
