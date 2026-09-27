@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--scp-flag=-batch",
+    "--scp-flag=-hostkey",
+    "--scp-flag=SHA256:hKvDp1TECIghTNxDlT3G0MUe4/989bYtay4xAGyW7Sw",
+    "solvers-r1-20260927-16:/tmp/flop-cpu-occupancy-analysis01.*",
+    "experiments/hu-postflop-r1/cloud/vm16/"
+  ],
+  "started_utc": "2026-09-27T05:10:32.996169+00:00",
+  "timeout_seconds": 60,
+  "stdout": {
+    "bytes": 284,
+    "sha256": "d471712a8489e1dde0c8edcbfe974f8ecf21d4aad2bddf953a4788af6787af9c"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T05:10:43.072475+00:00"
+}

@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-16",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:hKvDp1TECIghTNxDlT3G0MUe4/989bYtay4xAGyW7Sw",
+    "--command=systemctl show solvers-r1-vm16-cpu32 -p ActiveState -p MainPID -p Result; sudo tail -n 4 /opt/r1/flop-cpu-occupancy-wrapper01/execute.stdout.log /opt/r1/flop-cpu-occupancy-wrapper01/execute.stderr.log"
+  ],
+  "started_utc": "2026-09-27T05:09:29.479794+00:00",
+  "timeout_seconds": 45,
+  "stdout": {
+    "bytes": 1643,
+    "sha256": "2e922126099b03d2927702e9f83121a69bb60110d1246c5823e55c1da77b777c"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T05:09:34.401286+00:00"
+}

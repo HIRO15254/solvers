@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "operations",
+    "list",
+    "--project=solvers-abstraction-20260723",
+    "--filter=targetId=1127898822003203169 AND operationType=delete",
+    "--format=json"
+  ],
+  "started_utc": "2026-09-27T05:22:13.854225+00:00",
+  "timeout_seconds": 60
+}

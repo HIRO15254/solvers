@@ -1147,6 +1147,20 @@
           "machine_type": "e2-highcpu-32",
           "logical_cpus": 32,
           "evidence": "vm16/campaign-start01.stdout.log"
+        },
+        {
+          "event": "diagnostic_completed_and_resources_deleted",
+          "at": "2026-09-27T05:22:19.881926+00:00",
+          "instance_id": "1127898822003203169",
+          "disk_id": "4260965739450932321",
+          "delete_completed_utc": "2026-09-27T05:21:46.211Z",
+          "solves_completed": 28,
+          "optimization_adopted": false,
+          "archive_bytes": 115423261,
+          "archive_sha256": "6183eeb0734b0135c75dd925231b74d81716cc8e785e850aada496c8c83d45f1",
+          "evidence": "vm16/reconciliation.json",
+          "reserved_usd": 2,
+          "billed_usd": null
         }
       ],
       "measurement_deadline_utc": "2026-09-27T05:18:50Z"

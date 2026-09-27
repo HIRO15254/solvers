@@ -1,0 +1,2534 @@
+{
+  "calibration": [
+    {
+      "case": "narrow",
+      "cpu_cfr_wall_seconds": 5.689178162,
+      "cpu_observations": {
+        "br_p0_cpu_over_wall": 0.9993942400885355,
+        "br_p0_cpu_over_wall_per_allowed_logical": 0.031231070002766734,
+        "br_p0_cpu_seconds": 0.146936184,
+        "br_p0_wall_seconds": 0.147025246,
+        "br_p1_cpu_over_wall": 0.9993879877277754,
+        "br_p1_cpu_over_wall_per_allowed_logical": 0.03123087461649298,
+        "br_p1_cpu_seconds": 0.147880329,
+        "br_p1_wall_seconds": 0.147970889,
+        "cfr_cpu_over_wall": 0.9999267108555706,
+        "cfr_cpu_over_wall_per_allowed_logical": 0.03124770971423658,
+        "cfr_cpu_seconds": 5.688761207000001,
+        "cfr_wall_seconds": 5.689178162,
+        "construction_wall_seconds": 0.218608191,
+        "ev_p0_cpu_over_wall": 0.999705197370937,
+        "ev_p0_cpu_over_wall_per_allowed_logical": 0.03124078741784178,
+        "ev_p0_cpu_seconds": 0.15343710200000002,
+        "ev_p0_wall_seconds": 0.153482349,
+        "ev_p1_cpu_over_wall": 0.9997134244997303,
+        "ev_p1_cpu_over_wall_per_allowed_logical": 0.031241044515616573,
+        "ev_p1_cpu_seconds": 0.155959557,
+        "ev_p1_wall_seconds": 0.156004264,
+        "exploitability_3_walks_cpu_over_wall": 0.9996745311173025,
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": 0.031239829097415704,
+        "exploitability_3_walks_cpu_seconds": 0.45082721000000003,
+        "exploitability_3_walks_wall_seconds": 0.450973988,
+        "quality_7_walks_cpu_over_wall": 0.9995874766210323,
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": 0.03123710864440726,
+        "quality_7_walks_cpu_seconds": 1.055199242,
+        "quality_7_walks_wall_seconds": 1.055634716,
+        "root_os_peak_resident_bytes": 182013952,
+        "state_write_wall_seconds": 0.452952342,
+        "whole_process_seconds": 7.572788115999998
+      },
+      "cpu_over_original_cfr_wall": 0.99840214014494,
+      "cpu_stage": "calibration-narrow",
+      "original_cfr_wall_seconds": 5.69828322,
+      "original_stage": "canonical-narrow",
+      "statistical_perturbation_calibration": false
+    },
+    {
+      "case": "expanded",
+      "cpu_cfr_wall_seconds": 15.549235662,
+      "cpu_observations": {
+        "br_p0_cpu_over_wall": 0.9998752641636701,
+        "br_p0_cpu_over_wall_per_allowed_logical": 0.03124610200511469,
+        "br_p0_cpu_seconds": 0.459257381,
+        "br_p0_wall_seconds": 0.459314674,
+        "br_p1_cpu_over_wall": 0.9998557830374875,
+        "br_p1_cpu_over_wall_per_allowed_logical": 0.031245493219921483,
+        "br_p1_cpu_seconds": 0.41136245000000005,
+        "br_p1_wall_seconds": 0.411421784,
+        "cfr_cpu_over_wall": 0.9999280911278018,
+        "cfr_cpu_over_wall_per_allowed_logical": 0.031247752847743806,
+        "cfr_cpu_seconds": 15.548117534000001,
+        "cfr_wall_seconds": 15.549235662,
+        "construction_wall_seconds": 0.230236253,
+        "ev_p0_cpu_over_wall": 0.9998764528014896,
+        "ev_p0_cpu_over_wall_per_allowed_logical": 0.03124613915004655,
+        "ev_p0_cpu_seconds": 0.46566730700000003,
+        "ev_p0_wall_seconds": 0.465724846,
+        "ev_p1_cpu_over_wall": 0.9998492889181478,
+        "ev_p1_cpu_over_wall_per_allowed_logical": 0.03124529027869212,
+        "ev_p1_cpu_seconds": 0.45039002800000005,
+        "ev_p1_wall_seconds": 0.450457917,
+        "exploitability_3_walks_cpu_over_wall": 0.9998606030844883,
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": 0.03124564384639026,
+        "exploitability_3_walks_cpu_seconds": 1.3522302110000002,
+        "exploitability_3_walks_wall_seconds": 1.352418734,
+        "quality_7_walks_cpu_over_wall": 0.999857274863455,
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": 0.03124553983948297,
+        "quality_7_walks_cpu_seconds": 3.139061959,
+        "quality_7_walks_wall_seconds": 3.139510046,
+        "root_os_peak_resident_bytes": 385683456,
+        "state_write_wall_seconds": 1.895288715,
+        "whole_process_seconds": 20.990001336000006
+      },
+      "cpu_over_original_cfr_wall": 1.0018787657344,
+      "cpu_stage": "calibration-expanded",
+      "original_cfr_wall_seconds": 15.520077073,
+      "original_stage": "canonical-expanded",
+      "statistical_perturbation_calibration": false
+    }
+  ],
+  "counts": {
+    "build_commands": 1,
+    "calibration": 2,
+    "canonical": 2,
+    "measured": 18,
+    "warmup": 6
+  },
+  "execution": {
+    "bytes": 472875,
+    "sha256": "c9caab2e4073f2da9baa27b1f82eba09928e3aceaf7888d5deacff52c52c62ad"
+  },
+  "groups": [
+    {
+      "case": "narrow",
+      "configuration": "16-full",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0056300554385862,
+          "maximum": 15.653847183859991,
+          "median": 15.632132126830783,
+          "minimum": 15.566208566661095,
+          "samples": [
+            15.632132126830783,
+            15.566208566661095,
+            15.653847183859991
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0056300554385862,
+          "maximum": 0.4891827244956247,
+          "median": 0.48850412896346196,
+          "minimum": 0.4864440177081592,
+          "samples": [
+            0.48850412896346196,
+            0.4864440177081592,
+            0.4891827244956247
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0902598183949432,
+          "maximum": 0.23961970800000001,
+          "median": 0.225801881,
+          "minimum": 0.219782206,
+          "samples": [
+            0.225801881,
+            0.23961970800000001,
+            0.219782206
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0963980416149697,
+          "maximum": 0.015393582,
+          "median": 0.014444727,
+          "minimum": 0.01404014,
+          "samples": [
+            0.014444727,
+            0.015393582,
+            0.01404014
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.002674322083348,
+          "maximum": 15.866840328298357,
+          "median": 15.844657888396474,
+          "minimum": 15.82452046376372,
+          "samples": [
+            15.866840328298357,
+            15.82452046376372,
+            15.844657888396474
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.002674322083348,
+          "maximum": 0.49583876025932366,
+          "median": 0.4951455590123898,
+          "minimum": 0.49451626449261626,
+          "samples": [
+            0.49583876025932366,
+            0.49451626449261626,
+            0.4951455590123898
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0152531867609733,
+          "maximum": 0.224536005,
+          "median": 0.22148282100000002,
+          "minimum": 0.221162571,
+          "samples": [
+            0.224536005,
+            0.22148282100000002,
+            0.221162571
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0138338245984666,
+          "maximum": 0.014151274,
+          "median": 0.013996179,
+          "minimum": 0.013958179,
+          "samples": [
+            0.014151274,
+            0.013996179,
+            0.013958179
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.0003334891930649,
+          "maximum": 15.795040706507898,
+          "median": 15.792762190486458,
+          "minimum": 15.789774987188745,
+          "samples": [
+            15.792762190486458,
+            15.789774987188745,
+            15.795040706507898
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0003334891930649,
+          "maximum": 0.4935950220783718,
+          "median": 0.4935238184527018,
+          "minimum": 0.49343046834964827,
+          "samples": [
+            0.4935238184527018,
+            0.49343046834964827,
+            0.4935950220783718
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0147589607437886,
+          "maximum": 10.894129702,
+          "median": 10.747854887,
+          "minimum": 10.73568219,
+          "samples": [
+            10.894129702,
+            10.747854887,
+            10.73568219
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0149053660731457,
+          "maximum": 0.689817878,
+          "median": 0.680684487,
+          "minimum": 0.679686896,
+          "samples": [
+            0.689817878,
+            0.680684487,
+            0.679686896
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0431075826235447,
+          "maximum": 0.225395595,
+          "median": 0.220243417,
+          "minimum": 0.216080871,
+          "samples": [
+            0.225395595,
+            0.220243417,
+            0.216080871
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0090529124018717,
+          "maximum": 15.588563218451078,
+          "median": 15.507615279377948,
+          "minimum": 15.44870742342467,
+          "samples": [
+            15.44870742342467,
+            15.588563218451078,
+            15.507615279377948
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0090529124018717,
+          "maximum": 0.4871426005765962,
+          "median": 0.48461297748056087,
+          "minimum": 0.48277210698202094,
+          "samples": [
+            0.48277210698202094,
+            0.4871426005765962,
+            0.48461297748056087
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.039780374255774,
+          "maximum": 0.262730791,
+          "median": 0.259078657,
+          "minimum": 0.252679121,
+          "samples": [
+            0.262730791,
+            0.252679121,
+            0.259078657
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.0491934149010969,
+          "maximum": 0.017006652,
+          "median": 0.016706544,
+          "minimum": 0.016209263,
+          "samples": [
+            0.017006652,
+            0.016209263,
+            0.016706544
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0044221647106026,
+          "maximum": 15.807278170722487,
+          "median": 15.766508622913937,
+          "minimum": 15.737683541936704,
+          "samples": [
+            15.807278170722487,
+            15.766508622913937,
+            15.737683541936704
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0044221647106026,
+          "maximum": 0.4939774428350777,
+          "median": 0.49270339446606054,
+          "minimum": 0.491802610685522,
+          "samples": [
+            0.4939774428350777,
+            0.49270339446606054,
+            0.491802610685522
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.0587996842549923,
+          "maximum": 0.233727648,
+          "median": 0.229149648,
+          "minimum": 0.22074775000000002,
+          "samples": [
+            0.233727648,
+            0.229149648,
+            0.22074775000000002
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0541381118964626,
+          "maximum": 0.014786078,
+          "median": 0.01453395,
+          "minimum": 0.014026699,
+          "samples": [
+            0.014786078,
+            0.01453395,
+            0.014026699
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0025081293883378,
+          "maximum": 15.775069370093068,
+          "median": 15.772664879469655,
+          "minimum": 15.735602443162172,
+          "samples": [
+            15.735602443162172,
+            15.775069370093068,
+            15.772664879469655
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0025081293883378,
+          "maximum": 0.49297091781540836,
+          "median": 0.4928957774834267,
+          "minimum": 0.4917375763488179,
+          "samples": [
+            0.4917375763488179,
+            0.49297091781540836,
+            0.4928957774834267
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0254862046974291,
+          "maximum": 0.7193713060000001,
+          "median": 0.715308591,
+          "minimum": 0.701492914,
+          "samples": [
+            0.715308591,
+            0.7193713060000001,
+            0.701492914
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0253298965439888,
+          "maximum": 0.045601784,
+          "median": 0.045457973,
+          "minimum": 0.044475231,
+          "samples": [
+            0.045457973,
+            0.045601784,
+            0.044475231
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0013562813518753,
+          "maximum": 15.703599914599202,
+          "median": 15.697017481086576,
+          "minimum": 15.682330262510211,
+          "samples": [
+            15.682330262510211,
+            15.703599914599202,
+            15.697017481086576
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0013562813518753,
+          "maximum": 0.49073749733122507,
+          "median": 0.4905317962839555,
+          "minimum": 0.4900728207034441,
+          "samples": [
+            0.4900728207034441,
+            0.49073749733122507,
+            0.4905317962839555
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.0246719990112851,
+          "maximum": 1.6624329930000001,
+          "median": 1.6622474200000001,
+          "minimum": 1.622405018,
+          "samples": [
+            1.6622474200000001,
+            1.6624329930000001,
+            1.622405018
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0255171625901989,
+          "maximum": 0.105994925,
+          "median": 0.105863178,
+          "minimum": 0.103357534,
+          "samples": [
+            0.105994925,
+            0.105863178,
+            0.103357534
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0025465186409632,
+          "maximum": 183832576,
+          "median": 183525376,
+          "minimum": 183365632,
+          "samples": [
+            183365632,
+            183832576,
+            183525376
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.001299976680193,
+          "maximum": 0.45206578,
+          "median": 0.45169775,
+          "minimum": 0.451478868,
+          "samples": [
+            0.45169775,
+            0.451478868,
+            0.45206578
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0135065705866786,
+          "maximum": 1.6481949939999936,
+          "median": 1.6437339340000108,
+          "minimum": 1.6262302009999985,
+          "samples": [
+            1.6262302009999985,
+            1.6481949939999936,
+            1.6437339340000108
+          ]
+        }
+      },
+      "stages": [
+        "narrow-r1-16-full",
+        "narrow-r2-16-full",
+        "narrow-r3-16-full"
+      ]
+    },
+    {
+      "case": "narrow",
+      "configuration": "32-full",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0574148743150884,
+          "maximum": 31.189295176661844,
+          "median": 30.75893067714063,
+          "minimum": 29.49579766112507,
+          "samples": [
+            29.49579766112507,
+            31.189295176661844,
+            30.75893067714063
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0574148743150884,
+          "maximum": 0.9746654742706826,
+          "median": 0.9612165836606447,
+          "minimum": 0.9217436769101585,
+          "samples": [
+            0.9217436769101585,
+            0.9746654742706826,
+            0.9612165836606447
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0190664974562231,
+          "maximum": 0.46926199900000004,
+          "median": 0.465072335,
+          "minimum": 0.46048221600000006,
+          "samples": [
+            0.465072335,
+            0.46048221600000006,
+            0.46926199900000004
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0679552598866264,
+          "maximum": 0.01576741,
+          "median": 0.015256122,
+          "minimum": 0.014764111,
+          "samples": [
+            0.01576741,
+            0.014764111,
+            0.015256122
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.039111761226851,
+          "maximum": 31.73999672049886,
+          "median": 30.55792766533609,
+          "minimum": 30.545315629017907,
+          "samples": [
+            30.55792766533609,
+            31.73999672049886,
+            30.545315629017907
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.039111761226851,
+          "maximum": 0.9918748975155893,
+          "median": 0.9549352395417529,
+          "minimum": 0.9545411134068096,
+          "samples": [
+            0.9549352395417529,
+            0.9918748975155893,
+            0.9545411134068096
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0181984626153127,
+          "maximum": 0.44578250900000005,
+          "median": 0.439745331,
+          "minimum": 0.43781495000000004,
+          "samples": [
+            0.43781495000000004,
+            0.44578250900000005,
+            0.439745331
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.025039197728358,
+          "maximum": 0.01439649,
+          "median": 0.014327377,
+          "minimum": 0.014044819,
+          "samples": [
+            0.014327377,
+            0.014044819,
+            0.01439649
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.010349073025436,
+          "maximum": 30.9471460361842,
+          "median": 30.76230623964535,
+          "minimum": 30.630152352705814,
+          "samples": [
+            30.630152352705814,
+            30.9471460361842,
+            30.76230623964535
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.010349073025436,
+          "maximum": 0.9670983136307563,
+          "median": 0.9613220699889172,
+          "minimum": 0.9571922610220567,
+          "samples": [
+            0.9571922610220567,
+            0.9670983136307563,
+            0.9613220699889172
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0205395174611012,
+          "maximum": 23.064370296,
+          "median": 22.644261102,
+          "minimum": 22.600173635,
+          "samples": [
+            22.600173635,
+            23.064370296,
+            22.644261102
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0124690005820698,
+          "maximum": 0.745282627,
+          "median": 0.737840719,
+          "minimum": 0.736104144,
+          "samples": [
+            0.737840719,
+            0.745282627,
+            0.736104144
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0209431838325362,
+          "maximum": 0.219695217,
+          "median": 0.21540814,
+          "minimum": 0.215188485,
+          "samples": [
+            0.215188485,
+            0.219695217,
+            0.21540814
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.062249241780294,
+          "maximum": 30.95141332717069,
+          "median": 29.91642458775696,
+          "minimum": 29.13761865840183,
+          "samples": [
+            29.91642458775696,
+            29.13761865840183,
+            30.95141332717069
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.062249241780294,
+          "maximum": 0.9672316664740841,
+          "median": 0.934888268367405,
+          "minimum": 0.9105505830750572,
+          "samples": [
+            0.934888268367405,
+            0.9105505830750572,
+            0.9672316664740841
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.091924690428255,
+          "maximum": 0.531739407,
+          "median": 0.5267083490000001,
+          "minimum": 0.48697443300000004,
+          "samples": [
+            0.531739407,
+            0.5267083490000001,
+            0.48697443300000004
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.148921804616795,
+          "maximum": 0.018076575,
+          "median": 0.017774163,
+          "minimum": 0.015733512,
+          "samples": [
+            0.017774163,
+            0.018076575,
+            0.015733512
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.096184845094642,
+          "maximum": 30.603033221516903,
+          "median": 30.554776076717552,
+          "minimum": 27.91776711606947,
+          "samples": [
+            27.91776711606947,
+            30.554776076717552,
+            30.603033221516903
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.096184845094642,
+          "maximum": 0.9563447881724032,
+          "median": 0.9548367523974235,
+          "minimum": 0.8724302223771709,
+          "samples": [
+            0.8724302223771709,
+            0.9548367523974235,
+            0.9563447881724032
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.021531843420812,
+          "maximum": 0.47297054800000005,
+          "median": 0.468573255,
+          "minimum": 0.46300127700000004,
+          "samples": [
+            0.468573255,
+            0.47297054800000005,
+            0.46300127700000004
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.1093768558821215,
+          "maximum": 0.016784052,
+          "median": 0.015479431,
+          "minimum": 0.015129261,
+          "samples": [
+            0.016784052,
+            0.015479431,
+            0.015129261
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0227645282051068,
+          "maximum": 31.337940750408748,
+          "median": 31.30675278194718,
+          "minimum": 30.640425910551514,
+          "samples": [
+            31.30675278194718,
+            31.337940750408748,
+            30.640425910551514
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0227645282051068,
+          "maximum": 0.9793106484502734,
+          "median": 0.9783360244358493,
+          "minimum": 0.9575133097047348,
+          "samples": [
+            0.9783360244358493,
+            0.9793106484502734,
+            0.9575133097047348
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.1024839455819866,
+          "maximum": 1.439040751,
+          "median": 1.4164709420000001,
+          "minimum": 1.305271389,
+          "samples": [
+            1.439040751,
+            1.4164709420000001,
+            1.305271389
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0790188905077598,
+          "maximum": 0.045965826,
+          "median": 0.045199873,
+          "minimum": 0.042599649,
+          "samples": [
+            0.045965826,
+            0.045199873,
+            0.042599649
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0226421531822905,
+          "maximum": 30.866012181411822,
+          "median": 30.67113453418947,
+          "minimum": 30.18261283809002,
+          "samples": [
+            30.18261283809002,
+            30.866012181411822,
+            30.67113453418947
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0226421531822905,
+          "maximum": 0.9645628806691194,
+          "median": 0.9584729541934209,
+          "minimum": 0.9432066511903131,
+          "samples": [
+            0.9432066511903131,
+            0.9645628806691194,
+            0.9584729541934209
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.0556844720778982,
+          "maximum": 3.3451241310000004,
+          "median": 3.3262001810000004,
+          "minimum": 3.168677971,
+          "samples": [
+            3.3451241310000004,
+            3.3262001810000004,
+            3.168677971
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0727712886372156,
+          "maximum": 0.110829508,
+          "median": 0.10776255,
+          "minimum": 0.103311404,
+          "samples": [
+            0.110829508,
+            0.10776255,
+            0.103311404
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0009616889942523,
+          "maximum": 183320576,
+          "median": 183148544,
+          "minimum": 183144448,
+          "samples": [
+            183144448,
+            183320576,
+            183148544
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.003972066889049,
+          "maximum": 0.453689915,
+          "median": 0.45281849,
+          "minimum": 0.451894958,
+          "samples": [
+            0.453689915,
+            0.45281849,
+            0.451894958
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0670369606509449,
+          "maximum": 1.7575637739999763,
+          "median": 1.653406758999978,
+          "minimum": 1.6471442309999986,
+          "samples": [
+            1.6471442309999986,
+            1.7575637739999763,
+            1.653406758999978
+          ]
+        }
+      },
+      "stages": [
+        "narrow-r1-32-full",
+        "narrow-r2-32-full",
+        "narrow-r3-32-full"
+      ]
+    },
+    {
+      "case": "narrow",
+      "configuration": "16-onecore",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.068992389707935,
+          "maximum": 15.647750113155952,
+          "median": 15.618380718362674,
+          "minimum": 14.637849870410356,
+          "samples": [
+            15.647750113155952,
+            14.637849870410356,
+            15.618380718362674
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.068992389707935,
+          "maximum": 0.977984382072247,
+          "median": 0.9761487948976671,
+          "minimum": 0.9148656169006473,
+          "samples": [
+            0.977984382072247,
+            0.9148656169006473,
+            0.9761487948976671
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0234098232946904,
+          "maximum": 0.232909899,
+          "median": 0.230112738,
+          "minimum": 0.22758223900000002,
+          "samples": [
+            0.22758223900000002,
+            0.230112738,
+            0.232909899
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0808785728523214,
+          "maximum": 0.015720392,
+          "median": 0.014912551,
+          "minimum": 0.014544087,
+          "samples": [
+            0.014544087,
+            0.015720392,
+            0.014912551
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0623297516006254,
+          "maximum": 15.891398483929171,
+          "median": 15.885931806180855,
+          "minimum": 14.959007276210992,
+          "samples": [
+            15.885931806180855,
+            14.959007276210992,
+            15.891398483929171
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0623297516006254,
+          "maximum": 0.9932124052455732,
+          "median": 0.9928707378863034,
+          "minimum": 0.934937954763187,
+          "samples": [
+            0.9928707378863034,
+            0.934937954763187,
+            0.9932124052455732
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0953720706812793,
+          "maximum": 0.23774592600000002,
+          "median": 0.218895368,
+          "minimum": 0.217045817,
+          "samples": [
+            0.218895368,
+            0.23774592600000002,
+            0.217045817
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.1636463397571062,
+          "maximum": 0.015893162,
+          "median": 0.013779196,
+          "minimum": 0.013658069,
+          "samples": [
+            0.013779196,
+            0.015893162,
+            0.013658069
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.0063318043945482,
+          "maximum": 15.725343830738568,
+          "median": 15.679861389855336,
+          "minimum": 15.626400519259748,
+          "samples": [
+            15.679861389855336,
+            15.626400519259748,
+            15.725343830738568
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0063318043945482,
+          "maximum": 0.9828339894211605,
+          "median": 0.9799913368659585,
+          "minimum": 0.9766500324537343,
+          "samples": [
+            0.9799913368659585,
+            0.9766500324537343,
+            0.9828339894211605
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0265533037318095,
+          "maximum": 10.675611733,
+          "median": 10.532185793,
+          "minimum": 10.39947141,
+          "samples": [
+            10.39947141,
+            10.532185793,
+            10.675611733
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0235842017234196,
+          "maximum": 0.678879384,
+          "median": 0.673999478,
+          "minimum": 0.663237458,
+          "samples": [
+            0.663237458,
+            0.673999478,
+            0.678879384
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0157891634560507,
+          "maximum": 0.220689797,
+          "median": 0.21771375,
+          "minimum": 0.217259452,
+          "samples": [
+            0.21771375,
+            0.220689797,
+            0.217259452
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.1098839984504463,
+          "maximum": 15.482533778023116,
+          "median": 14.409749727057442,
+          "minimum": 13.949686453394142,
+          "samples": [
+            13.949686453394142,
+            14.409749727057442,
+            15.482533778023116
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.1098839984504463,
+          "maximum": 0.9676583611264448,
+          "median": 0.9006093579410901,
+          "minimum": 0.8718554033371338,
+          "samples": [
+            0.8718554033371338,
+            0.9006093579410901,
+            0.9676583611264448
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.0807336731958432,
+          "maximum": 0.26877462900000004,
+          "median": 0.25284998000000003,
+          "minimum": 0.248696451,
+          "samples": [
+            0.25284998000000003,
+            0.26877462900000004,
+            0.248696451
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.1611926589455428,
+          "maximum": 0.018652276,
+          "median": 0.018125854,
+          "minimum": 0.016063033,
+          "samples": [
+            0.018125854,
+            0.018652276,
+            0.016063033
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0689870973727873,
+          "maximum": 15.833648783492928,
+          "median": 14.905218571261114,
+          "minimum": 14.811824036423582,
+          "samples": [
+            14.811824036423582,
+            14.905218571261114,
+            15.833648783492928
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0689870973727873,
+          "maximum": 0.989603048968308,
+          "median": 0.9315761607038197,
+          "minimum": 0.9257390022764739,
+          "samples": [
+            0.9257390022764739,
+            0.9315761607038197,
+            0.989603048968308
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.038148651032176,
+          "maximum": 0.24019481,
+          "median": 0.23585978300000002,
+          "minimum": 0.23136841700000002,
+          "samples": [
+            0.23585978300000002,
+            0.24019481,
+            0.23136841700000002
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.1028138263731389,
+          "maximum": 0.016114813,
+          "median": 0.01592375,
+          "minimum": 0.014612451,
+          "samples": [
+            0.01592375,
+            0.016114813,
+            0.014612451
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0140973298698106,
+          "maximum": 15.812132724430983,
+          "median": 15.807478513676436,
+          "minimum": 15.592322609172966,
+          "samples": [
+            15.812132724430983,
+            15.807478513676436,
+            15.592322609172966
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0140973298698106,
+          "maximum": 0.9882582952769364,
+          "median": 0.9879674071047773,
+          "minimum": 0.9745201630733104,
+          "samples": [
+            0.9882582952769364,
+            0.9879674071047773,
+            0.9745201630733104
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0652282568519271,
+          "maximum": 0.739239125,
+          "median": 0.705969571,
+          "minimum": 0.693972508,
+          "samples": [
+            0.705969571,
+            0.693972508,
+            0.739239125
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0799271670047224,
+          "maximum": 0.047410456,
+          "median": 0.044647334,
+          "minimum": 0.043901531,
+          "samples": [
+            0.044647334,
+            0.043901531,
+            0.047410456
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0328707542665518,
+          "maximum": 15.63377860185337,
+          "median": 15.318203636630106,
+          "minimum": 15.136239008872913,
+          "samples": [
+            15.318203636630106,
+            15.136239008872913,
+            15.63377860185337
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0328707542665518,
+          "maximum": 0.9771111626158356,
+          "median": 0.9573877272893816,
+          "minimum": 0.946014938054557,
+          "samples": [
+            0.9573877272893816,
+            0.946014938054557,
+            0.9771111626158356
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.0181228545332437,
+          "maximum": 1.67155834,
+          "median": 1.6698615430000001,
+          "minimum": 1.6418041620000001,
+          "samples": [
+            1.6418041620000001,
+            1.67155834,
+            1.6698615430000001
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.033920285591214,
+          "maximum": 0.110434193,
+          "median": 0.107179941,
+          "minimum": 0.106811129,
+          "samples": [
+            0.107179941,
+            0.110434193,
+            0.106811129
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0032163677380448,
+          "maximum": 183971840,
+          "median": 183689216,
+          "minimum": 183382016,
+          "samples": [
+            183382016,
+            183689216,
+            183971840
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.002403562157698,
+          "maximum": 0.453312411,
+          "median": 0.452275352,
+          "minimum": 0.452225459,
+          "samples": [
+            0.452275352,
+            0.452225459,
+            0.453312411
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.006063742729503,
+          "maximum": 1.646819523000005,
+          "median": 1.6435236169999996,
+          "minimum": 1.6368938200000116,
+          "samples": [
+            1.6368938200000116,
+            1.6435236169999996,
+            1.646819523000005
+          ]
+        }
+      },
+      "stages": [
+        "narrow-r1-16-onecore",
+        "narrow-r2-16-onecore",
+        "narrow-r3-16-onecore"
+      ]
+    },
+    {
+      "case": "expanded",
+      "configuration": "16-full",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0122064867618172,
+          "maximum": 15.778268905133318,
+          "median": 15.631409229277265,
+          "minimum": 15.587994259560707,
+          "samples": [
+            15.778268905133318,
+            15.587994259560707,
+            15.631409229277265
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0122064867618172,
+          "maximum": 0.4930709032854162,
+          "median": 0.48848153841491454,
+          "minimum": 0.4871248206112721,
+          "samples": [
+            0.4930709032854162,
+            0.4871248206112721,
+            0.48848153841491454
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0271376088888917,
+          "maximum": 0.581814432,
+          "median": 0.570943991,
+          "minimum": 0.566442536,
+          "samples": [
+            0.566442536,
+            0.570943991,
+            0.581814432
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0367877366597427,
+          "maximum": 0.037220856,
+          "median": 0.036627162,
+          "minimum": 0.03590017,
+          "samples": [
+            0.03590017,
+            0.036627162,
+            0.037220856
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.010128431945294,
+          "maximum": 15.752797990184302,
+          "median": 15.65628034429369,
+          "minimum": 15.594846647220633,
+          "samples": [
+            15.752797990184302,
+            15.65628034429369,
+            15.594846647220633
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.010128431945294,
+          "maximum": 0.49227493719325943,
+          "median": 0.4892587607591778,
+          "minimum": 0.4873389577256448,
+          "samples": [
+            0.49227493719325943,
+            0.4892587607591778,
+            0.4873389577256448
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0559818838126622,
+          "maximum": 0.558956278,
+          "median": 0.533182567,
+          "minimum": 0.529323738,
+          "samples": [
+            0.529323738,
+            0.558956278,
+            0.533182567
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0624917880355946,
+          "maximum": 0.035701729,
+          "median": 0.034189664,
+          "minimum": 0.033601887,
+          "samples": [
+            0.033601887,
+            0.035701729,
+            0.034189664
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.0022159892067735,
+          "maximum": 15.780650838674257,
+          "median": 15.761707510910457,
+          "minimum": 15.74575840798969,
+          "samples": [
+            15.780650838674257,
+            15.74575840798969,
+            15.761707510910457
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0022159892067735,
+          "maximum": 0.4931453387085705,
+          "median": 0.49255335971595177,
+          "minimum": 0.4920549502496778,
+          "samples": [
+            0.4931453387085705,
+            0.4920549502496778,
+            0.49255335971595177
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0339891775784837,
+          "maximum": 25.742747743000002,
+          "median": 25.414350065,
+          "minimum": 24.896534994000003,
+          "samples": [
+            24.896534994000003,
+            25.742747743000002,
+            25.414350065
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.036280486435918,
+          "maximum": 1.6349004649999999,
+          "median": 1.612410968,
+          "minimum": 1.577662116,
+          "samples": [
+            1.577662116,
+            1.6349004649999999,
+            1.612410968
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.021974054261106,
+          "maximum": 0.236247597,
+          "median": 0.231849183,
+          "minimum": 0.231167901,
+          "samples": [
+            0.231167901,
+            0.231849183,
+            0.236247597
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0112830232278665,
+          "maximum": 15.707604767084248,
+          "median": 15.614608405571266,
+          "minimum": 15.532352868881244,
+          "samples": [
+            15.707604767084248,
+            15.614608405571266,
+            15.532352868881244
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0112830232278665,
+          "maximum": 0.49086264897138276,
+          "median": 0.48795651267410206,
+          "minimum": 0.48538602715253887,
+          "samples": [
+            0.49086264897138276,
+            0.48795651267410206,
+            0.48538602715253887
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.0412095400560124,
+          "maximum": 0.6192624830000001,
+          "median": 0.612192335,
+          "minimum": 0.594752986,
+          "samples": [
+            0.612192335,
+            0.594752986,
+            0.6192624830000001
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.046723530772491,
+          "maximum": 0.0398692,
+          "median": 0.038974264,
+          "minimum": 0.038089523,
+          "samples": [
+            0.038974264,
+            0.038089523,
+            0.0398692
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0081735726970829,
+          "maximum": 15.733383005269374,
+          "median": 15.700740154497822,
+          "minimum": 15.605827638567398,
+          "samples": [
+            15.700740154497822,
+            15.605827638567398,
+            15.733383005269374
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0081735726970829,
+          "maximum": 0.49166821891466794,
+          "median": 0.49064812982805694,
+          "minimum": 0.4876821137052312,
+          "samples": [
+            0.49064812982805694,
+            0.4876821137052312,
+            0.49166821891466794
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.0246910593248482,
+          "maximum": 0.5931384070000001,
+          "median": 0.591425246,
+          "minimum": 0.578846084,
+          "samples": [
+            0.591425246,
+            0.578846084,
+            0.5931384070000001
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0163835742922493,
+          "maximum": 0.037699356,
+          "median": 0.037668622,
+          "minimum": 0.037091662,
+          "samples": [
+            0.037668622,
+            0.037091662,
+            0.037699356
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.008366859244541,
+          "maximum": 15.79659048229519,
+          "median": 15.772248350000956,
+          "minimum": 15.665519287424669,
+          "samples": [
+            15.79659048229519,
+            15.772248350000956,
+            15.665519287424669
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.008366859244541,
+          "maximum": 0.4936434525717247,
+          "median": 0.49288276093752986,
+          "minimum": 0.4895474777320209,
+          "samples": [
+            0.4936434525717247,
+            0.49288276093752986,
+            0.4895474777320209
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0163544428141604,
+          "maximum": 1.7132577310000001,
+          "median": 1.701444224,
+          "minimum": 1.685689223,
+          "samples": [
+            1.685689223,
+            1.701444224,
+            1.7132577310000001
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0248581373797503,
+          "maximum": 0.109364886,
+          "median": 0.10787582,
+          "minimum": 0.106712219,
+          "samples": [
+            0.106712219,
+            0.10787582,
+            0.109364886
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0076633931609698,
+          "maximum": 15.75008222760795,
+          "median": 15.670375083632273,
+          "minimum": 15.630301085167975,
+          "samples": [
+            15.75008222760795,
+            15.670375083632273,
+            15.630301085167975
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0076633931609698,
+          "maximum": 0.4921900696127484,
+          "median": 0.4896992213635085,
+          "minimum": 0.4884469089114992,
+          "samples": [
+            0.4921900696127484,
+            0.4896992213635085,
+            0.4884469089114992
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.013950301076656,
+          "maximum": 4.040828621,
+          "median": 4.005130774,
+          "minimum": 3.985233415,
+          "samples": [
+            3.985233415,
+            4.005130774,
+            4.040828621
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0217206008794901,
+          "maximum": 0.258525322,
+          "median": 0.255586146,
+          "minimum": 0.253029372,
+          "samples": [
+            0.253029372,
+            0.255586146,
+            0.258525322
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0005974404393807,
+          "maximum": 391020544,
+          "median": 390959104,
+          "minimum": 390787072,
+          "samples": [
+            390959104,
+            391020544,
+            390787072
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0022762812943782,
+          "maximum": 1.893681486,
+          "median": 1.890807653,
+          "minimum": 1.889380724,
+          "samples": [
+            1.893681486,
+            1.890807653,
+            1.889380724
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0041105590479207,
+          "maximum": 4.203913691999958,
+          "median": 4.191206663999992,
+          "minimum": 4.186703998000013,
+          "samples": [
+            4.186703998000013,
+            4.203913691999958,
+            4.191206663999992
+          ]
+        }
+      },
+      "stages": [
+        "expanded-r1-16-full",
+        "expanded-r2-16-full",
+        "expanded-r3-16-full"
+      ]
+    },
+    {
+      "case": "expanded",
+      "configuration": "32-full",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0527837507539148,
+          "maximum": 31.665281049708643,
+          "median": 31.347625443102917,
+          "minimum": 30.077668872674604,
+          "samples": [
+            30.077668872674604,
+            31.665281049708643,
+            31.347625443102917
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0527837507539148,
+          "maximum": 0.9895400328033951,
+          "median": 0.9796132950969662,
+          "minimum": 0.9399271522710814,
+          "samples": [
+            0.9399271522710814,
+            0.9895400328033951,
+            0.9796132950969662
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0686921570284023,
+          "maximum": 1.0327280220000001,
+          "median": 0.990641591,
+          "minimum": 0.9663475260000001,
+          "samples": [
+            0.990641591,
+            0.9663475260000001,
+            1.0327280220000001
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0795215595945327,
+          "maximum": 0.032944378,
+          "median": 0.032936116,
+          "minimum": 0.030517573,
+          "samples": [
+            0.032936116,
+            0.030517573,
+            0.032944378
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0293165725825082,
+          "maximum": 31.485901962503984,
+          "median": 30.822754526821605,
+          "minimum": 30.589133412578114,
+          "samples": [
+            30.822754526821605,
+            31.485901962503984,
+            30.589133412578114
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0293165725825082,
+          "maximum": 0.9839344363282495,
+          "median": 0.9632110789631751,
+          "minimum": 0.9559104191430661,
+          "samples": [
+            0.9632110789631751,
+            0.9839344363282495,
+            0.9559104191430661
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0308978331961798,
+          "maximum": 0.9712001520000001,
+          "median": 0.9474164890000001,
+          "minimum": 0.942091564,
+          "samples": [
+            0.9712001520000001,
+            0.9474164890000001,
+            0.942091564
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0471586727909679,
+          "maximum": 0.031509194,
+          "median": 0.030798243,
+          "minimum": 0.030090181,
+          "samples": [
+            0.031509194,
+            0.030090181,
+            0.030798243
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.004529565603116,
+          "maximum": 30.57493528284482,
+          "median": 30.559317823145392,
+          "minimum": 30.43706858392738,
+          "samples": [
+            30.559317823145392,
+            30.43706858392738,
+            30.57493528284482
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.004529565603116,
+          "maximum": 0.9554667275889006,
+          "median": 0.9549786819732935,
+          "minimum": 0.9511583932477307,
+          "samples": [
+            0.9549786819732935,
+            0.9511583932477307,
+            0.9554667275889006
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.018599984834513,
+          "maximum": 52.282920303000004,
+          "median": 51.650884154,
+          "minimum": 51.328216259,
+          "samples": [
+            51.650884154,
+            52.282920303000004,
+            51.328216259
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0232138002891538,
+          "maximum": 1.7177383609999999,
+          "median": 1.690184462,
+          "minimum": 1.678767781,
+          "samples": [
+            1.690184462,
+            1.7177383609999999,
+            1.678767781
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.040137351361654,
+          "maximum": 0.239304493,
+          "median": 0.232874106,
+          "minimum": 0.230070089,
+          "samples": [
+            0.230070089,
+            0.239304493,
+            0.232874106
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.031936265979259,
+          "maximum": 30.84512766890115,
+          "median": 30.31218637197602,
+          "minimum": 29.890535574530443,
+          "samples": [
+            30.31218637197602,
+            30.84512766890115,
+            29.890535574530443
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.031936265979259,
+          "maximum": 0.9639102396531609,
+          "median": 0.9472558241242506,
+          "minimum": 0.9340792367040763,
+          "samples": [
+            0.9472558241242506,
+            0.9639102396531609,
+            0.9340792367040763
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.0973569127472376,
+          "maximum": 1.136416193,
+          "median": 1.0535174330000001,
+          "minimum": 1.035593962,
+          "samples": [
+            1.035593962,
+            1.0535174330000001,
+            1.136416193
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.1131368557076216,
+          "maximum": 0.038019265,
+          "median": 0.034164278,
+          "minimum": 0.034155068,
+          "samples": [
+            0.034164278,
+            0.034155068,
+            0.038019265
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0315104130682102,
+          "maximum": 31.306259177716935,
+          "median": 31.300157391755253,
+          "minimum": 30.34992064170928,
+          "samples": [
+            30.34992064170928,
+            31.306259177716935,
+            31.300157391755253
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0315104130682102,
+          "maximum": 0.9783205993036542,
+          "median": 0.9781299184923516,
+          "minimum": 0.948435020053415,
+          "samples": [
+            0.948435020053415,
+            0.9783205993036542,
+            0.9781299184923516
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.068580919399789,
+          "maximum": 1.077227281,
+          "median": 1.0676434080000001,
+          "minimum": 1.008091443,
+          "samples": [
+            1.0676434080000001,
+            1.008091443,
+            1.077227281
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0924458296345558,
+          "maximum": 0.035177799,
+          "median": 0.034416034,
+          "minimum": 0.032200955,
+          "samples": [
+            0.035177799,
+            0.032200955,
+            0.034416034
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0191978572782248,
+          "maximum": 31.230740913345656,
+          "median": 31.03045385198754,
+          "minimum": 30.642471126016275,
+          "samples": [
+            31.03045385198754,
+            31.230740913345656,
+            30.642471126016275
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0191978572782248,
+          "maximum": 0.9759606535420517,
+          "median": 0.9697016828746107,
+          "minimum": 0.9575772226880086,
+          "samples": [
+            0.9697016828746107,
+            0.9759606535420517,
+            0.9575772226880086
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0347129857658448,
+          "maximum": 3.0233354410000004,
+          "median": 2.9271355370000003,
+          "minimum": 2.9219073140000003,
+          "samples": [
+            2.9219073140000003,
+            3.0233354410000004,
+            2.9271355370000003
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0280772282651458,
+          "maximum": 0.096806395,
+          "median": 0.09552544,
+          "minimum": 0.094162571,
+          "samples": [
+            0.094162571,
+            0.096806395,
+            0.09552544
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0205652032988037,
+          "maximum": 31.262976018757627,
+          "median": 30.688770493302965,
+          "minimum": 30.63300210285964,
+          "samples": [
+            30.63300210285964,
+            31.262976018757627,
+            30.688770493302965
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0205652032988037,
+          "maximum": 0.9769680005861758,
+          "median": 0.9590240779157176,
+          "minimum": 0.9572813157143637,
+          "samples": [
+            0.9572813157143637,
+            0.9769680005861758,
+            0.9590240779157176
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.018256748281449,
+          "maximum": 7.116938213,
+          "median": 7.001873762000001,
+          "minimum": 6.989335671,
+          "samples": [
+            6.989335671,
+            7.001873762000001,
+            7.116938213
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0354514653817557,
+          "maximum": 0.231906919,
+          "median": 0.228163588,
+          "minimum": 0.223966962,
+          "samples": [
+            0.228163588,
+            0.223966962,
+            0.231906919
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.002138803104916,
+          "maximum": 393433088,
+          "median": 393330688,
+          "minimum": 392593408,
+          "samples": [
+            393330688,
+            393433088,
+            392593408
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0226120575052777,
+          "maximum": 1.9320168789999999,
+          "median": 1.890543192,
+          "minimum": 1.8892960090000002,
+          "samples": [
+            1.9320168789999999,
+            1.8892960090000002,
+            1.890543192
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.024264708166325,
+          "maximum": 4.332562359999997,
+          "median": 4.316398326000012,
+          "minimum": 4.229924476999997,
+          "samples": [
+            4.332562359999997,
+            4.316398326000012,
+            4.229924476999997
+          ]
+        }
+      },
+      "stages": [
+        "expanded-r1-32-full",
+        "expanded-r2-32-full",
+        "expanded-r3-32-full"
+      ]
+    },
+    {
+      "case": "expanded",
+      "configuration": "16-onecore",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.007747916290202,
+          "maximum": 15.86232875519371,
+          "median": 15.810985337657085,
+          "minimum": 15.740373657717214,
+          "samples": [
+            15.86232875519371,
+            15.740373657717214,
+            15.810985337657085
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.007747916290202,
+          "maximum": 0.9913955471996069,
+          "median": 0.9881865836035678,
+          "minimum": 0.9837733536073259,
+          "samples": [
+            0.9913955471996069,
+            0.9837733536073259,
+            0.9881865836035678
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0239836613210624,
+          "maximum": 0.5737589900000001,
+          "median": 0.5648989950000001,
+          "minimum": 0.5603204540000001,
+          "samples": [
+            0.5737589900000001,
+            0.5603204540000001,
+            0.5648989950000001
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.016110918979251,
+          "maximum": 0.03617117,
+          "median": 0.03572826,
+          "minimum": 0.035597659,
+          "samples": [
+            0.03617117,
+            0.035597659,
+            0.03572826
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0051138864794165,
+          "maximum": 15.827251446155563,
+          "median": 15.82515057071113,
+          "minimum": 15.746724484718065,
+          "samples": [
+            15.827251446155563,
+            15.746724484718065,
+            15.82515057071113
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0051138864794165,
+          "maximum": 0.9892032153847227,
+          "median": 0.9890719106694457,
+          "minimum": 0.9841702802948791,
+          "samples": [
+            0.9892032153847227,
+            0.9841702802948791,
+            0.9890719106694457
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.053681161239258,
+          "maximum": 0.5391111150000001,
+          "median": 0.53708435,
+          "minimum": 0.511645396,
+          "samples": [
+            0.5391111150000001,
+            0.53708435,
+            0.511645396
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0549479905682304,
+          "maximum": 0.034107687,
+          "median": 0.034062207,
+          "minimum": 0.032331155,
+          "samples": [
+            0.034062207,
+            0.034107687,
+            0.032331155
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.0168804563202207,
+          "maximum": 15.654064731182606,
+          "median": 15.602330563301471,
+          "minimum": 15.394203550562745,
+          "samples": [
+            15.654064731182606,
+            15.602330563301471,
+            15.394203550562745
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0168804563202207,
+          "maximum": 0.9783790456989129,
+          "median": 0.975145660206342,
+          "minimum": 0.9621377219101716,
+          "samples": [
+            0.9783790456989129,
+            0.975145660206342,
+            0.9621377219101716
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0157093692326142,
+          "maximum": 24.611949989000003,
+          "median": 24.601697166,
+          "minimum": 24.231291681000002,
+          "samples": [
+            24.611949989000003,
+            24.601697166,
+            24.231291681000002
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0028978370969128,
+          "maximum": 1.5767963040000001,
+          "median": 1.574052961,
+          "minimum": 1.572240208,
+          "samples": [
+            1.572240208,
+            1.5767963040000001,
+            1.574052961
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0269379341713671,
+          "maximum": 0.233461365,
+          "median": 0.230385881,
+          "minimum": 0.227337366,
+          "samples": [
+            0.230385881,
+            0.227337366,
+            0.233461365
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0753386908556084,
+          "maximum": 15.747220655777058,
+          "median": 15.695524796543125,
+          "minimum": 14.643963608570207,
+          "samples": [
+            15.747220655777058,
+            15.695524796543125,
+            14.643963608570207
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0753386908556084,
+          "maximum": 0.9842012909860661,
+          "median": 0.9809702997839453,
+          "minimum": 0.9152477255356379,
+          "samples": [
+            0.9842012909860661,
+            0.9809702997839453,
+            0.9152477255356379
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.0183396781745766,
+          "maximum": 0.597641784,
+          "median": 0.588314463,
+          "minimum": 0.586878619,
+          "samples": [
+            0.588314463,
+            0.586878619,
+            0.597641784
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.0923874458737728,
+          "maximum": 0.040811477,
+          "median": 0.037391462,
+          "minimum": 0.037359892,
+          "samples": [
+            0.037359892,
+            0.037391462,
+            0.040811477
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0425426908392346,
+          "maximum": 15.728000661770727,
+          "median": 15.670726691969065,
+          "minimum": 15.086193400013071,
+          "samples": [
+            15.728000661770727,
+            15.670726691969065,
+            15.086193400013071
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0425426908392346,
+          "maximum": 0.9830000413606704,
+          "median": 0.9794204182480666,
+          "minimum": 0.942887087500817,
+          "samples": [
+            0.9830000413606704,
+            0.9794204182480666,
+            0.942887087500817
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.006109736898948,
+          "maximum": 0.604944177,
+          "median": 0.6021490690000001,
+          "minimum": 0.601270572,
+          "samples": [
+            0.6021490690000001,
+            0.604944177,
+            0.601270572
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0410216876966152,
+          "maximum": 0.039855685,
+          "median": 0.038603454,
+          "minimum": 0.038285163,
+          "samples": [
+            0.038285163,
+            0.038603454,
+            0.039855685
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0014874679189192,
+          "maximum": 15.860708527859453,
+          "median": 15.839599668481279,
+          "minimum": 15.837151273413182,
+          "samples": [
+            15.860708527859453,
+            15.839599668481279,
+            15.837151273413182
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0014874679189192,
+          "maximum": 0.9912942829912158,
+          "median": 0.9899749792800799,
+          "minimum": 0.9898219545883239,
+          "samples": [
+            0.9912942829912158,
+            0.9899749792800799,
+            0.9898219545883239
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.017062138576653,
+          "maximum": 1.678243394,
+          "median": 1.6618825970000002,
+          "minimum": 1.6500893410000002,
+          "samples": [
+            1.6618825970000002,
+            1.678243394,
+            1.6500893410000002
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0169049269061463,
+          "maximum": 0.105952387,
+          "median": 0.104779846,
+          "minimum": 0.104191045,
+          "samples": [
+            0.104779846,
+            0.105952387,
+            0.104191045
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0191076539807238,
+          "maximum": 15.810056714406164,
+          "median": 15.755465501701048,
+          "minimum": 15.51362768462262,
+          "samples": [
+            15.810056714406164,
+            15.755465501701048,
+            15.51362768462262
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0191076539807238,
+          "maximum": 0.9881285446503852,
+          "median": 0.9847165938563155,
+          "minimum": 0.9696017302889137,
+          "samples": [
+            0.9881285446503852,
+            0.9847165938563155,
+            0.9696017302889137
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.010627871903208,
+          "maximum": 3.9677463170000005,
+          "median": 3.9655600050000004,
+          "minimum": 3.9260210680000003,
+          "samples": [
+            3.9655600050000004,
+            3.9677463170000005,
+            3.9260210680000003
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0089465586307211,
+          "maximum": 0.253069182,
+          "median": 0.251833011,
+          "minimum": 0.25082516,
+          "samples": [
+            0.25082516,
+            0.251833011,
+            0.253069182
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.001381114308135,
+          "maximum": 392015872,
+          "median": 391970816,
+          "minimum": 391475200,
+          "samples": [
+            391970816,
+            391475200,
+            392015872
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0016883540228996,
+          "maximum": 1.891635314,
+          "median": 1.89057247,
+          "minimum": 1.888446947,
+          "samples": [
+            1.891635314,
+            1.888446947,
+            1.89057247
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.000458279401313,
+          "maximum": 4.184284467999987,
+          "median": 4.182509223000011,
+          "minimum": 4.182367774999989,
+          "samples": [
+            4.182367774999989,
+            4.182509223000011,
+            4.184284467999987
+          ]
+        }
+      },
+      "stages": [
+        "expanded-r1-16-onecore",
+        "expanded-r2-16-onecore",
+        "expanded-r3-16-onecore"
+      ]
+    }
+  ],
+  "host": {
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31
+    ],
+    "boot_id": "3e218c5b-3a5e-49d4-956c-6f0659e9fef9",
+    "cgroup": {
+      "cpu_limits": {
+        "/sys/fs/cgroup/system.slice": "max 100000",
+        "/sys/fs/cgroup/system.slice/solvers-r1-vm16-cpu32.service": "max 100000"
+      },
+      "cpu_weight": "100",
+      "memory_max": "12884901888",
+      "swap_max": "0"
+    },
+    "cpu_models": [
+      "AMD EPYC 7B12"
+    ],
+    "logical_cpus": 32,
+    "machine": "x86_64",
+    "one_per_core": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "physical_cores": 16,
+    "topology": [
+      {
+        "core": "0",
+        "cpu": 0,
+        "socket": "0"
+      },
+      {
+        "core": "1",
+        "cpu": 1,
+        "socket": "0"
+      },
+      {
+        "core": "2",
+        "cpu": 2,
+        "socket": "0"
+      },
+      {
+        "core": "3",
+        "cpu": 3,
+        "socket": "0"
+      },
+      {
+        "core": "4",
+        "cpu": 4,
+        "socket": "0"
+      },
+      {
+        "core": "5",
+        "cpu": 5,
+        "socket": "0"
+      },
+      {
+        "core": "6",
+        "cpu": 6,
+        "socket": "0"
+      },
+      {
+        "core": "7",
+        "cpu": 7,
+        "socket": "0"
+      },
+      {
+        "core": "8",
+        "cpu": 8,
+        "socket": "0"
+      },
+      {
+        "core": "9",
+        "cpu": 9,
+        "socket": "0"
+      },
+      {
+        "core": "10",
+        "cpu": 10,
+        "socket": "0"
+      },
+      {
+        "core": "11",
+        "cpu": 11,
+        "socket": "0"
+      },
+      {
+        "core": "12",
+        "cpu": 12,
+        "socket": "0"
+      },
+      {
+        "core": "13",
+        "cpu": 13,
+        "socket": "0"
+      },
+      {
+        "core": "14",
+        "cpu": 14,
+        "socket": "0"
+      },
+      {
+        "core": "15",
+        "cpu": 15,
+        "socket": "0"
+      },
+      {
+        "core": "0",
+        "cpu": 16,
+        "socket": "0"
+      },
+      {
+        "core": "1",
+        "cpu": 17,
+        "socket": "0"
+      },
+      {
+        "core": "2",
+        "cpu": 18,
+        "socket": "0"
+      },
+      {
+        "core": "3",
+        "cpu": 19,
+        "socket": "0"
+      },
+      {
+        "core": "4",
+        "cpu": 20,
+        "socket": "0"
+      },
+      {
+        "core": "5",
+        "cpu": 21,
+        "socket": "0"
+      },
+      {
+        "core": "6",
+        "cpu": 22,
+        "socket": "0"
+      },
+      {
+        "core": "7",
+        "cpu": 23,
+        "socket": "0"
+      },
+      {
+        "core": "8",
+        "cpu": 24,
+        "socket": "0"
+      },
+      {
+        "core": "9",
+        "cpu": 25,
+        "socket": "0"
+      },
+      {
+        "core": "10",
+        "cpu": 26,
+        "socket": "0"
+      },
+      {
+        "core": "11",
+        "cpu": 27,
+        "socket": "0"
+      },
+      {
+        "core": "12",
+        "cpu": 28,
+        "socket": "0"
+      },
+      {
+        "core": "13",
+        "cpu": 29,
+        "socket": "0"
+      },
+      {
+        "core": "14",
+        "cpu": 30,
+        "socket": "0"
+      },
+      {
+        "core": "15",
+        "cpu": 31,
+        "socket": "0"
+      }
+    ]
+  },
+  "limits": [
+    "Baseline-only process CPU/wall observations; no optimization adoption or quality certification",
+    "One calibration pair per input checks state/quality and clocks, not statistical timing perturbation",
+    "Process CPU includes spinning, allocator and scheduler work; CPU/wall is average logical CPU consumption",
+    "Guest 16 core/32 logical topology does not prove dedicated host physical cores",
+    "Affinity differences do not isolate SMT causally from placement, scheduling or bandwidth",
+    "Root wait4 ru_maxrss is a whole-process Linux high-water counter, not phase memory or aggregate child memory"
+  ],
+  "payload_integrity": "verified",
+  "plan": {
+    "bytes": 52053,
+    "sha256": "0b9ad8e992055d6bb313a556e085fd33c0fd59d7e591360e18d936f05d184b6f"
+  },
+  "schema": "r1.cpu-occupancy-report/v1",
+  "status": "completed_descriptive_diagnostic"
+}

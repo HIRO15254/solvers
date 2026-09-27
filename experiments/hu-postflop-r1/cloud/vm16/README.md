@@ -15,3 +15,5 @@ stay on GCP.
 
 The [protocol](../../flop-scaling/cpu-occupancy/protocol.jp.md) fixes diagnostics
 and limitations; the resource reservation must be recorded before launch.
+
+Completed evidence: [measurement report](report.jp.md), [compressed transfer check](download-check.json), and [VM/disk deletion reconciliation](reconciliation.json).
