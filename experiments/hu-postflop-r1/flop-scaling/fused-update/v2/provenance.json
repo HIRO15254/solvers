@@ -1,0 +1,63 @@
+{
+  "schema": "r1.fused-cfr-update-format-source/v2",
+  "change": "format verification only; all four Rust files unchanged",
+  "v1_generator": {
+    "path": "../prepare.py",
+    "bytes": 12873,
+    "sha256": "562e9d9c0180029741555ab296c469a07e61ff2f25b1e84c35c0673e3d22f6c3"
+  },
+  "v1_provenance": {
+    "path": "../provenance.json",
+    "bytes": 3855,
+    "sha256": "188b8aaeea5cc4c3e7853259517c961eb9f9b6f6b7028a42b3b5bc3c7c3ac5ca"
+  },
+  "formatting": {
+    "path": "formatting.json",
+    "bytes": 2637,
+    "sha256": "ebfb6f87889ad3f8abcc5260ec197f9b2c71f5a24b1468e8a2686e54ca14b3ad"
+  },
+  "sources": {
+    "solver.rs": {
+      "candidate": {
+        "bytes": 56202,
+        "sha256": "17699d73dbcc8b531063585bee638c04ad188df9b810dbf32edfef0dc287d659"
+      },
+      "baseline": {
+        "bytes": 56421,
+        "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+      },
+      "inverse_exact": true
+    },
+    "storage.rs": {
+      "candidate": {
+        "bytes": 48942,
+        "sha256": "149288f814df08406fb9215270cf3894e1e97a1dda06e5238432d3c13881484c"
+      },
+      "baseline": {
+        "bytes": 44287,
+        "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+      },
+      "inverse_exact": true
+    },
+    "lib.rs": {
+      "candidate": {
+        "bytes": 1387,
+        "sha256": "d69deafa0b052f45df3b9a0a0e6d916eca83741424a66a6748c3e278f2117187"
+      },
+      "baseline": {
+        "bytes": 1376,
+        "sha256": "4d3f7a3b7551fbf1547dd45e0fb5170ebfdd45fd83a7ebefe132562d5cf885d8"
+      },
+      "inverse_exact": true
+    }
+  },
+  "native_fixture": {
+    "path": "tests/fused_update.rs",
+    "bytes": 9556,
+    "sha256": "2599bbf76bf4b3ae57662569ad289a18ce770302634871fc5ed3a7e574ad03b9",
+    "deploy": "crates/engine/tests/fused_update.rs"
+  },
+  "native_compiled": false,
+  "native_executed": false,
+  "performance_claim": false
+}

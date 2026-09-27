@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "regions",
+    "describe",
+    "us-central1",
+    "--project=solvers-abstraction-20260723",
+    "--format=json(quotas)"
+  ],
+  "started_utc": "2026-09-27T05:46:40.103899+00:00",
+  "timeout_seconds": 60
+}

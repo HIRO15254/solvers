@@ -1,0 +1,92 @@
+{
+  "recover.sh": {
+    "original": {
+      "bytes": 5995,
+      "sha256": "273cc2a7a2e913995d960bb27eacc3027e824ac8ea47f4ac8affe5e5c9e09031"
+    },
+    "generated": {
+      "bytes": 5985,
+      "sha256": "94950a77913077481b56f253b5ce0162ab7fd7c38d86c20756f20939e286206f"
+    }
+  },
+  "fetch-dependencies.sh": {
+    "original": {
+      "bytes": 867,
+      "sha256": "b5f68aeb040b957d30c388313aac33400c4718502647b48f18034064700ff16b"
+    },
+    "generated": {
+      "bytes": 880,
+      "sha256": "1b0afdbc25768d5d8deb44fdc60dc38c3e72fdc0f69a3515ad41b7d39ebfd9ae"
+    }
+  },
+  "bootstrap.sh": {
+    "original": {
+      "bytes": 534,
+      "sha256": "9f6aa20db7c76808fa0348d0cf08f2e19814e0946766dfecd0b4ca062008be76"
+    },
+    "generated": {
+      "bytes": 534,
+      "sha256": "9f6aa20db7c76808fa0348d0cf08f2e19814e0946766dfecd0b4ca062008be76"
+    }
+  },
+  "run.sh": {
+    "original": {
+      "bytes": 2565,
+      "sha256": "11d2136ec4b5ec47d07663efd2ce8e43e21d321173cfe0c25a0ced1d6efac11a"
+    },
+    "generated": {
+      "bytes": 2594,
+      "sha256": "6a2c95cd523744a1d5b1b27d57b3ea731cccbafd8b0932abe01187705b594695"
+    }
+  },
+  "start.py": {
+    "original": {
+      "bytes": 6186,
+      "sha256": "de680871152570aff7c16b9ad8e81b4c30c994891c87910f41f08f4b5eb959a5"
+    },
+    "generated": {
+      "bytes": 6787,
+      "sha256": "89cc8cc3dbe9fde5fbafca3eb1810c346f70edca376ede4c08dbacb363a22dde"
+    }
+  },
+  "install.py": {
+    "original": {
+      "bytes": 4018,
+      "sha256": "4c1283969e41c10b0eaac3f4df708d11adee9c18f5f28ec038301cc98530cbf5"
+    },
+    "generated": {
+      "bytes": 5057,
+      "sha256": "d30dfa642b344b29f3294a979e34417ced43b38d47e74df7dbc9bedd47bc36b7"
+    }
+  },
+  "analyze-on-cloud.py": {
+    "original": {
+      "bytes": 3029,
+      "sha256": "36c8ac0ca0db6760c55df5d6ae6221f3ccec9cf5b0901276bede9d20c580000e"
+    },
+    "generated": {
+      "bytes": 3034,
+      "sha256": "8337d887f2001ccb9e4b227e8568ff28bc990b2ec0c03e13af9a9baea1043539"
+    }
+  },
+  "launch.ps1": {
+    "original": {
+      "bytes": 3019,
+      "sha256": "777f09160b975b3d80c3d4a8ef791cb2b66e78debf990dcc7fe524d5fdb18dc8"
+    },
+    "generated": {
+      "bytes": 3019,
+      "sha256": "9e6210f667f7098cce0e9d340941001dab67530e0b8d5c3b22b54d29c156ae91"
+    }
+  },
+  "pack.py": {
+    "original": {
+      "bytes": 4072,
+      "sha256": "806e1de25c216ea9cc93bacadc57cb1533f4b91e8c721e0af65687ef74c3dffd"
+    },
+    "generated": {
+      "bytes": 4565,
+      "sha256": "a692d9b5f9992dbe40e11d518553f7f4ec110d1bb071a19fbd8d7cfa72e2c9c9"
+    }
+  }
+}

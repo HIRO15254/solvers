@@ -1,0 +1,37 @@
+{
+  "argv": [
+    "C:/Python313/python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\flop-scaling\\fused-update\\timing\\test_run.py"
+  ],
+  "exit_code": 1,
+  "wall_seconds": 0.42504619993269444,
+  "ast_files": 3,
+  "native_execution": false,
+  "files": {
+    "run.py": {
+      "bytes": 32829,
+      "sha256": "4d7fbb89dfe90a319dd70640ae1f30f038f8ac257ae04d6f5917db028a373fdd"
+    },
+    "analyze.py": {
+      "bytes": 25786,
+      "sha256": "6ce2406ef39432a1ccf1a0394790d0d02db3d48115afe2f19b477db51c186eaf"
+    },
+    "test_run.py": {
+      "bytes": 8298,
+      "sha256": "5c363833b68ac3f4b99d49b46bb2e2a39841ec74438ff6a64c1c65ee06a26420"
+    },
+    "protocol.jp.md": {
+      "bytes": 6408,
+      "sha256": "e593f3347c75e9ede1eb9faa2e96182e40e2e8b672b606f788c2c115f436bd65"
+    },
+    "tests02.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tests02.stderr.log": {
+      "bytes": 3618,
+      "sha256": "2b87d230d9fea614abbb64c5c78a264eb35992ed96e8a218de2d2e3fb97761d9"
+    }
+  }
+}

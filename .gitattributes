@@ -54,3 +54,6 @@ experiments/hu-postflop-r1/flop-scaling/cpu-occupancy/adapter/adapter.patch -whi
 experiments/hu-postflop-r1/cloud/usage-audit-vm16/inputs/preflight-vm16/*.html -whitespace
 # Research unified diffs retain context-prefix spaces.
 experiments/hu-postflop-r1/flop-scaling/fused-update/candidate.patch -whitespace
+
+# VM17 immutable official pricing snippets preserve original whitespace.
+experiments/hu-postflop-r1/cloud/preflight-vm17/*.html -whitespace

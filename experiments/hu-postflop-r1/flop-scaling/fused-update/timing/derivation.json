@@ -1,0 +1,25 @@
+{
+  "schema": "r1.fused-update-timing-derivation/v1",
+  "source": "Sibling frozen cpu-occupancy; adapted to two arms, fixed48 rows and candidate tests. No old files modified.",
+  "source_files": {
+    "run.py": {
+      "bytes": 28026,
+      "sha256": "9856af5f7abf1e758f3db8c6a556e385a1d94a6e4ac264725564504808d190d6"
+    },
+    "analyze.py": {
+      "bytes": 23212,
+      "sha256": "b8a764a1c63be98575516c392076c32898c83edf88f9f734a8e70eebb399d8ef"
+    }
+  },
+  "outputs": {
+    "run.py": {
+      "bytes": 32829,
+      "sha256": "4d7fbb89dfe90a319dd70640ae1f30f038f8ac257ae04d6f5917db028a373fdd"
+    },
+    "analyze.py": {
+      "bytes": 25786,
+      "sha256": "6ce2406ef39432a1ccf1a0394790d0d02db3d48115afe2f19b477db51c186eaf"
+    }
+  },
+  "native_executed": false
+}
