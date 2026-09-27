@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "operations",
+    "list",
+    "--project=solvers-abstraction-20260723",
+    "--filter=targetId=2775050120395558750 AND operationType=delete",
+    "--format=json"
+  ],
+  "started_utc": "2026-09-27T06:39:51.692074+00:00",
+  "timeout_seconds": 60,
+  "stdout": {
+    "bytes": 905,
+    "sha256": "476c6d3da938d26c79bdf4e33bd1bc87d4441687d982ecc98b5568a97c26b0fe"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T06:39:54.244508+00:00"
+}

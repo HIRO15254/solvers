@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "solvers-r1-20260927-17:/tmp/flop-fused-update-proof01.part*",
+    "experiments/hu-postflop-r1/cloud/vm17/",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--scp-flag=-batch",
+    "--scp-flag=-hostkey",
+    "--scp-flag=SHA256:Q37lbkYqSPT7f81C/tVWZAaDWLfU/+AKb+SnYqj5eR8"
+  ],
+  "started_utc": "2026-09-27T06:30:53.636834+00:00",
+  "timeout_seconds": 300
+}

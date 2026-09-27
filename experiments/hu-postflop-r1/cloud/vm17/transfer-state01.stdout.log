@@ -1,0 +1,14 @@
+{
+  "id": "2775050120395558750",
+  "lastStartTimestamp": "2026-09-26T23:25:34.126-07:00",
+  "lastStopTimestamp": "2026-09-26T23:32:03.880-07:00",
+  "scheduling": {
+    "automaticRestart": false,
+    "instanceTerminationAction": "STOP",
+    "onHostMaintenance": "TERMINATE",
+    "preemptible": true,
+    "provisioningModel": "SPOT",
+    "terminationTime": "2026-09-27T06:38:26Z"
+  },
+  "status": "TERMINATED"
+}

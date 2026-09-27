@@ -1,5 +1,20 @@
 # VM17 F32 fused update comparison
 
+The [execution evidence](report.jp.md) records an incomplete performance matrix:
+136 core tests passed,13 ignored, and44 completed solves matched exactly.
+The fixed54-solve screen is not evaluable; production is unchanged.
+The verified retained archive is in `recovery02/`, with its transfer receipt and
+manifest. The original interrupted archive fragments were discarded after
+proving that every proof/package/wrapper byte survived in the replacement.
+The VM and disk were deleted; see [reconciliation](reconciliation.json).
+
+The initial resource plan below allowed three starts. A Spot interruption during
+download required one additional2CPU recovery start, recorded in
+[the recovery exception](recovery-exception01.json). The original STOP deadline
+and reserved amount stayed unchanged. Reboot removed temporary transfer copies;
+the original `/opt` proof survived and was re-archived. Deletion completed after
+the fixed STOP time; neither the experiment nor the deadline was extended.
+
 Research comparison of baseline and the F32 fused-update candidate; no production adoption yet.
 The fixed [measurement protocol](../../flop-scaling/fused-update/timing/protocol.jp.md)
 requires exact state/quality equality before interpreting performance. A candidate-specific

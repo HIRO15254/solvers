@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "instances",
+    "set-machine-type",
+    "solvers-r1-20260927-17",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--machine-type=e2-standard-2",
+    "--quiet"
+  ],
+  "started_utc": "2026-09-27T06:24:52.775089+00:00",
+  "timeout_seconds": 90
+}

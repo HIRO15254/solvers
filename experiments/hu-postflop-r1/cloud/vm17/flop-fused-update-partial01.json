@@ -1,0 +1,946 @@
+{
+  "canonical_streams_verified": 3,
+  "completed_prefix_stages": 48,
+  "counts": {
+    "completed": 48,
+    "failed": 1,
+    "pending": 0,
+    "running": 0,
+    "skipped": 9
+  },
+  "ended_at": "2026-09-27T06:27:26.924327+00:00",
+  "execution": {
+    "bytes": 765238,
+    "sha256": "dcdb14f7caab86f6c52e17f4273e4779bddfc13bea2cf52cd1f6262570bf6cc0"
+  },
+  "groups": [],
+  "incomplete_stage_metadata": [
+    {
+      "arm": "baseline",
+      "case": "expanded",
+      "command": [
+        "/opt/r1/flop-fused-update-work01/baseline-target/release/examples/flop_cpu_occupancy_probe",
+        "expanded",
+        "16",
+        "16",
+        "/opt/r1/flop-fused-update-proof01/expanded-r2-w16-baseline/artifacts"
+      ],
+      "configuration": "16-full",
+      "error": "ValueError('absolute phase deadline reached')",
+      "expected_child_affinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "iterations": 16,
+      "kind": "matrix",
+      "name": "expanded-r2-w16-baseline",
+      "round": 2,
+      "status": "failed",
+      "warmup": false,
+      "workers": 16
+    },
+    {
+      "arm": "candidate",
+      "case": "expanded",
+      "configuration": "16-full",
+      "iterations": 16,
+      "kind": "matrix",
+      "name": "expanded-r2-w16-candidate",
+      "reason": "stopped on first failure",
+      "round": 2,
+      "status": "skipped",
+      "warmup": false,
+      "workers": 16
+    },
+    {
+      "arm": "baseline",
+      "case": "expanded",
+      "configuration": "32-full",
+      "iterations": 16,
+      "kind": "matrix",
+      "name": "expanded-r2-w32-baseline",
+      "reason": "stopped on first failure",
+      "round": 2,
+      "status": "skipped",
+      "warmup": false,
+      "workers": 32
+    },
+    {
+      "arm": "candidate",
+      "case": "expanded",
+      "configuration": "32-full",
+      "iterations": 16,
+      "kind": "matrix",
+      "name": "expanded-r2-w32-candidate",
+      "reason": "stopped on first failure",
+      "round": 2,
+      "status": "skipped",
+      "warmup": false,
+      "workers": 32
+    },
+    {
+      "arm": "candidate",
+      "case": "expanded",
+      "configuration": "32-full",
+      "iterations": 16,
+      "kind": "matrix",
+      "name": "expanded-r3-w32-candidate",
+      "reason": "stopped on first failure",
+      "round": 3,
+      "status": "skipped",
+      "warmup": false,
+      "workers": 32
+    },
+    {
+      "arm": "baseline",
+      "case": "expanded",
+      "configuration": "32-full",
+      "iterations": 16,
+      "kind": "matrix",
+      "name": "expanded-r3-w32-baseline",
+      "reason": "stopped on first failure",
+      "round": 3,
+      "status": "skipped",
+      "warmup": false,
+      "workers": 32
+    },
+    {
+      "arm": "candidate",
+      "case": "expanded",
+      "configuration": "16-full",
+      "iterations": 16,
+      "kind": "matrix",
+      "name": "expanded-r3-w16-candidate",
+      "reason": "stopped on first failure",
+      "round": 3,
+      "status": "skipped",
+      "warmup": false,
+      "workers": 16
+    },
+    {
+      "arm": "baseline",
+      "case": "expanded",
+      "configuration": "16-full",
+      "iterations": 16,
+      "kind": "matrix",
+      "name": "expanded-r3-w16-baseline",
+      "reason": "stopped on first failure",
+      "round": 3,
+      "status": "skipped",
+      "warmup": false,
+      "workers": 16
+    },
+    {
+      "arm": "candidate",
+      "case": "expanded",
+      "configuration": "1-full",
+      "iterations": 16,
+      "kind": "matrix",
+      "name": "expanded-r3-w1-candidate",
+      "reason": "stopped on first failure",
+      "round": 3,
+      "status": "skipped",
+      "warmup": false,
+      "workers": 1
+    },
+    {
+      "arm": "baseline",
+      "case": "expanded",
+      "configuration": "1-full",
+      "iterations": 16,
+      "kind": "matrix",
+      "name": "expanded-r3-w1-baseline",
+      "reason": "stopped on first failure",
+      "round": 3,
+      "status": "skipped",
+      "warmup": false,
+      "workers": 1
+    }
+  ],
+  "measurement_boot_id": "9e6f4674-fdd4-47c5-afa8-da9b33b3af60",
+  "original_execution_status": "failed",
+  "original_failure_metadata": {
+    "ended_at": "2026-09-27T06:21:52.805485+00:00",
+    "error": "ValueError('absolute phase deadline reached')",
+    "traceback": "Traceback (most recent call last):\n  File \"/opt/r1/flop-fused-update-package/experiments/hu-postflop-r1/flop-scaling/fused-update/timing/run.py\", line 527, in execute\n    receipt[\"canonical\"][key] = solve(out, plan, current, receipt, receipt[\"canonical\"].get(key))\n                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/r1/flop-fused-update-package/experiments/hu-postflop-r1/flop-scaling/fused-update/timing/run.py\", line 399, in solve\n    directory = stage(out, plan, row, receipt, 90, out, [binary[\"path\"]])\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/r1/flop-fused-update-package/experiments/hu-postflop-r1/flop-scaling/fused-update/timing/run.py\", line 302, in stage\n    live(plan, seconds + 10)\n  File \"/opt/r1/flop-fused-update-package/experiments/hu-postflop-r1/flop-scaling/fused-update/timing/run.py\", line 270, in live\n    common.deadline_check(plan[\"deadline_monotonic\"], reserve)\n  File \"/opt/r1/flop-fused-update-package/experiments/hu-postflop-r1/flop-scaling/flat-ev/timing/run.py\", line 52, in deadline_check\n    need(deadline is None or time.monotonic() + reserve < deadline, \"absolute phase deadline reached\")\n  File \"/opt/r1/flop-fused-update-package/experiments/hu-postflop-r1/flop-scaling/ev-scratch/run.py\", line 33, in need\n    raise ValueError(message)\nValueError: absolute phase deadline reached\n"
+  },
+  "payload_integrity": "verified",
+  "performance_claims": false,
+  "performance_screen": "not_evaluable",
+  "plan": {
+    "bytes": 95645,
+    "sha256": "fe365ff0c8274d1d2f9e9f277705700526c4d277ac81cc1e981c7f5489e27f1a"
+  },
+  "production_adoption": false,
+  "proof_files": 487,
+  "quality_certification": false,
+  "quiescence_after": {
+    "argv": [
+      "/usr/bin/systemctl",
+      "show",
+      "solvers-r1-vm17-fused32.service",
+      "--property=LoadState,ActiveState,SubState,MainPID,ExecMainStatus,Result,ControlGroup"
+    ],
+    "empty_cgroup_process_files": [],
+    "exit_code": 0,
+    "properties": {
+      "ActiveState": "inactive",
+      "ControlGroup": "",
+      "ExecMainStatus": "0",
+      "LoadState": "not-found",
+      "MainPID": "0",
+      "Result": "success",
+      "SubState": "dead"
+    },
+    "stderr": "",
+    "stdout": "MainPID=0\nResult=success\nExecMainStatus=0\nControlGroup=\nLoadState=not-found\nActiveState=inactive\nSubState=dead\n"
+  },
+  "quiescence_before": {
+    "argv": [
+      "/usr/bin/systemctl",
+      "show",
+      "solvers-r1-vm17-fused32.service",
+      "--property=LoadState,ActiveState,SubState,MainPID,ExecMainStatus,Result,ControlGroup"
+    ],
+    "empty_cgroup_process_files": [],
+    "exit_code": 0,
+    "properties": {
+      "ActiveState": "inactive",
+      "ControlGroup": "",
+      "ExecMainStatus": "0",
+      "LoadState": "not-found",
+      "MainPID": "0",
+      "Result": "success",
+      "SubState": "dead"
+    },
+    "stderr": "",
+    "stdout": "MainPID=0\nResult=success\nExecMainStatus=0\nControlGroup=\nLoadState=not-found\nActiveState=inactive\nSubState=dead\n"
+  },
+  "recovery_boot_id": "dad00171-976f-44f2-8890-bba649eb7ae3",
+  "retained_manifest": {
+    "bytes": 79820,
+    "sha256": "f683af7bae6d6aac99f1eceb23e555c2d59045bf715c2c77a30ae876ad35eb0b"
+  },
+  "schema": "r1.fused-update-partial-integrity/v1",
+  "scope": "Exact completed-prefix source/build/test/host/state/quality integrity only. Incomplete rows have retained bytes but no successful-solve claim. No timing aggregation, certification, sample replacement, or adoption.",
+  "source": {
+    "bytes": 10136,
+    "sha256": "802653a0a04d08170619a78ba52636798460ddfcd4bec384f4e0013b396148e3"
+  },
+  "started_at": "2026-09-27T06:27:21.986620+00:00",
+  "status": "partial_verified",
+  "trusted_helpers": {
+    "analyze.py": {
+      "bytes": 25786,
+      "sha256": "6ce2406ef39432a1ccf1a0394790d0d02db3d48115afe2f19b477db51c186eaf"
+    },
+    "run.py": {
+      "bytes": 32829,
+      "sha256": "4d7fbb89dfe90a319dd70640ae1f30f038f8ac257ae04d6f5917db028a373fdd"
+    }
+  },
+  "verified_completed": [
+    {
+      "completion": {
+        "bytes": 8800,
+        "path": "/opt/r1/flop-fused-update-proof01/toolchain/completed.json",
+        "sha256": "6587532e6723d4329ba9966b0a6e2bc4c812c02bb1f96ec1924232eb2cc763eb"
+      },
+      "kind": "toolchain",
+      "name": "toolchain",
+      "record": {
+        "bytes": 5352,
+        "path": "/opt/r1/flop-fused-update-proof01/toolchain/supervisor.json",
+        "sha256": "c93e033a04a62ebb93ca643ff6392b02195b94cc33f032fea89ab59baad2bf53"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 9529,
+        "path": "/opt/r1/flop-fused-update-proof01/build-baseline/completed.json",
+        "sha256": "d352b13c31829d28726b9226161b53e03cce38de8242232c61bd9e439c1baf77"
+      },
+      "kind": "build",
+      "name": "build-baseline",
+      "record": {
+        "bytes": 5875,
+        "path": "/opt/r1/flop-fused-update-proof01/build-baseline/supervisor.json",
+        "sha256": "2ff752ee445e2618c10697c3dd7f368522e7e1357fb0b02c5dfe930d5327d3cc"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 9536,
+        "path": "/opt/r1/flop-fused-update-proof01/build-candidate/completed.json",
+        "sha256": "29e3056f91fa8ed9e1f1b38135e60d36979104d9ff9e233fb150cd3cf2d81efc"
+      },
+      "kind": "build",
+      "name": "build-candidate",
+      "record": {
+        "bytes": 5886,
+        "path": "/opt/r1/flop-fused-update-proof01/build-candidate/supervisor.json",
+        "sha256": "243767323c04049716394c324a5f576240c262c286cd22c5a9ca34fa5e013277"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 9376,
+        "path": "/opt/r1/flop-fused-update-proof01/tests-candidate/completed.json",
+        "sha256": "5a59a45f8f4cd7b568ff2c3bbb97f51a857e5ea48e1c93d481e03f7b6f138fe8"
+      },
+      "kind": "tests",
+      "name": "tests-candidate",
+      "record": {
+        "bytes": 5921,
+        "path": "/opt/r1/flop-fused-update-proof01/tests-candidate/supervisor.json",
+        "sha256": "7bb312c6998c93b777e69b1ef8b500d0f9ad87a47a5756d13a9028ff9f4b3a2a"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13231,
+        "path": "/opt/r1/flop-fused-update-proof01/smoke-narrow-w1-baseline/completed.json",
+        "sha256": "d6eec7dec5cf260fa856bce61addb44eec736e71d0f199736c1dc0bc4a88609c"
+      },
+      "kind": "smoke",
+      "name": "smoke-narrow-w1-baseline",
+      "record": {
+        "bytes": 5688,
+        "path": "/opt/r1/flop-fused-update-proof01/smoke-narrow-w1-baseline/supervisor.json",
+        "sha256": "8d53bd2c25bdfb4ba3d3c7b7dc83c4de70fd8b8ea968298b23599c1517eed359"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13245,
+        "path": "/opt/r1/flop-fused-update-proof01/smoke-narrow-w1-candidate/completed.json",
+        "sha256": "af647b1f678c2f649e8fc56bc4d657a2ccb749d2e35d4cfba621ad3e79dfa2cf"
+      },
+      "kind": "smoke",
+      "name": "smoke-narrow-w1-candidate",
+      "record": {
+        "bytes": 5695,
+        "path": "/opt/r1/flop-fused-update-proof01/smoke-narrow-w1-candidate/supervisor.json",
+        "sha256": "ce115fe64c94cbd49d52f64ef1e048929bf5e81f8c0b0708f94248aee9ccdb17"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13224,
+        "path": "/opt/r1/flop-fused-update-proof01/smoke-narrow-w32-baseline/completed.json",
+        "sha256": "3ade99106f86e71760945f4c36471e53773fbd9d271b772e47383cbf3475c6ef"
+      },
+      "kind": "smoke",
+      "name": "smoke-narrow-w32-baseline",
+      "record": {
+        "bytes": 5695,
+        "path": "/opt/r1/flop-fused-update-proof01/smoke-narrow-w32-baseline/supervisor.json",
+        "sha256": "a772f5acb026bdefccad534e521fd803d63d5e23ecd41775183bc83a8e0fdf45"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13255,
+        "path": "/opt/r1/flop-fused-update-proof01/smoke-narrow-w32-candidate/completed.json",
+        "sha256": "0744f77e8e52c4d8b4befab927d53dbe4423b458f57ad2fa770b95dbeb738d45"
+      },
+      "kind": "smoke",
+      "name": "smoke-narrow-w32-candidate",
+      "record": {
+        "bytes": 5704,
+        "path": "/opt/r1/flop-fused-update-proof01/smoke-narrow-w32-candidate/supervisor.json",
+        "sha256": "92b30215f0697f3cf2c9e41355b3e9cb9c2ab5f988fc84731d429607956ea526"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13124,
+        "path": "/opt/r1/flop-fused-update-proof01/canonical-narrow/completed.json",
+        "sha256": "f2dc471bdea4649401f01172e016640bc9f3c5733b8deff6bb4dd28a8c124d5d"
+      },
+      "kind": "canonical",
+      "name": "canonical-narrow",
+      "record": {
+        "bytes": 5652,
+        "path": "/opt/r1/flop-fused-update-proof01/canonical-narrow/supervisor.json",
+        "sha256": "1b3ea48a2dedde910d683bd122dc6598a499c48ce4a2650a4e93aaad697d3a0b"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13162,
+        "path": "/opt/r1/flop-fused-update-proof01/canonical-expanded/completed.json",
+        "sha256": "332138afb8dacbaf8847b7d44678a5c4ad22ee343447bfa564ffd37bd820368d"
+      },
+      "kind": "canonical",
+      "name": "canonical-expanded",
+      "record": {
+        "bytes": 5665,
+        "path": "/opt/r1/flop-fused-update-proof01/canonical-expanded/supervisor.json",
+        "sha256": "6b655ac56a9aa871e07b48c69c66d553957a63cb498ad727581ecbb6a4dc56b1"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13192,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r0-w1-baseline/completed.json",
+        "sha256": "7189c0e74f9d9f2dc7a0190c174221c3eefad5529d1f6b2c1292041bc380ae48"
+      },
+      "kind": "matrix",
+      "name": "narrow-r0-w1-baseline",
+      "record": {
+        "bytes": 5677,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r0-w1-baseline/supervisor.json",
+        "sha256": "f3044df1d68da423d91afe057a7b5538118671315e39ad7f4398407d319dfb6f"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13193,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r0-w1-candidate/completed.json",
+        "sha256": "f5558a1f17743f948a1eeac049e2f86931dfbff84eb26642f4ce93e0fc52805a"
+      },
+      "kind": "matrix",
+      "name": "narrow-r0-w1-candidate",
+      "record": {
+        "bytes": 5686,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r0-w1-candidate/supervisor.json",
+        "sha256": "5a9e81c9479c927aa305df34d431835eb1220e9c145e4b4e0d2ed42933f23b09"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13186,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r0-w16-baseline/completed.json",
+        "sha256": "a81ba4e1eda26eb9085ef26ba0be23381bc37ddd72af6c2f6f2e75d97c7fc797"
+      },
+      "kind": "matrix",
+      "name": "narrow-r0-w16-baseline",
+      "record": {
+        "bytes": 5681,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r0-w16-baseline/supervisor.json",
+        "sha256": "beb572bc75c2fe1cd0649630b86abf96baaafeb83cb4c49825b702f8862ef16f"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13197,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r0-w16-candidate/completed.json",
+        "sha256": "be3541727066bdedb78a4116ab6286233f45d0929c8398840e2c630275d707d3"
+      },
+      "kind": "matrix",
+      "name": "narrow-r0-w16-candidate",
+      "record": {
+        "bytes": 5690,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r0-w16-candidate/supervisor.json",
+        "sha256": "14e4c9ff716ed29a145e0100fc177c1f67178b941c0c427f5356f1bab7449756"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13182,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r0-w32-baseline/completed.json",
+        "sha256": "a709a098ca93e7b8cbebc4ae6d0762fce3959ef8e34dad16594515d6461213b9"
+      },
+      "kind": "matrix",
+      "name": "narrow-r0-w32-baseline",
+      "record": {
+        "bytes": 5682,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r0-w32-baseline/supervisor.json",
+        "sha256": "eb4f9b197707bb5026984f78bf10eb2326b627fcd36867290d5c01f5e9a7ba80"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13197,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r0-w32-candidate/completed.json",
+        "sha256": "c7cf831175151e6d5afd9862a88f3d5962458984824cc4a46569ad41ad024a65"
+      },
+      "kind": "matrix",
+      "name": "narrow-r0-w32-candidate",
+      "record": {
+        "bytes": 5691,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r0-w32-candidate/supervisor.json",
+        "sha256": "b62cb3ede28345608b51a5c474b7e6cc8b292a6cd93acf000de5b0f5a9f3bcce"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13217,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r1-w32-candidate/completed.json",
+        "sha256": "2945fdca08dff4364a475d86a8a5f9a50555e4e7ea5e035198508657ae44f3b9"
+      },
+      "kind": "matrix",
+      "name": "narrow-r1-w32-candidate",
+      "record": {
+        "bytes": 5688,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r1-w32-candidate/supervisor.json",
+        "sha256": "8f2081929cf11405d0e7024dae70823376ea485f5fec27354984c2ad2a06d9ac"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13176,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r1-w32-baseline/completed.json",
+        "sha256": "7dadc0d5bb34b90d75bb334bc580cc04a221e8cc1a01a7b69e7aee662edc39bf"
+      },
+      "kind": "matrix",
+      "name": "narrow-r1-w32-baseline",
+      "record": {
+        "bytes": 5680,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r1-w32-baseline/supervisor.json",
+        "sha256": "8848f30a474bb1f7bbbf48800db830830877d9de0a8aecffde49ecdc0e99011b"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13206,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r1-w16-candidate/completed.json",
+        "sha256": "fd118a3f95ac9d7e2cc413a1afc093d6858499b9071340ff21ee0c8e94984914"
+      },
+      "kind": "matrix",
+      "name": "narrow-r1-w16-candidate",
+      "record": {
+        "bytes": 5691,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r1-w16-candidate/supervisor.json",
+        "sha256": "34e5afaa3ae41d7839d1597951338e1fb9abd89c77c608fb78147ee508230f06"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13211,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r1-w16-baseline/completed.json",
+        "sha256": "305f34a23c022fd7e3068d0ecb67577183354c48d2ef6d5d24e47b2a6500c99c"
+      },
+      "kind": "matrix",
+      "name": "narrow-r1-w16-baseline",
+      "record": {
+        "bytes": 5681,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r1-w16-baseline/supervisor.json",
+        "sha256": "bd0ced7164e85cfd0199dd8d314438a26a1e6766e066fa34a75d1dab2a9c587d"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13198,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r1-w1-candidate/completed.json",
+        "sha256": "d5be9e2fee065adf05b5c089970199bf398effa6cbaa3f463f9ac01e5f13b371"
+      },
+      "kind": "matrix",
+      "name": "narrow-r1-w1-candidate",
+      "record": {
+        "bytes": 5685,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r1-w1-candidate/supervisor.json",
+        "sha256": "32cf4c5ced2fac6d615b721d0c9769155428268c2a8e5a74a98b2308d37ae37c"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13168,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r1-w1-baseline/completed.json",
+        "sha256": "2a8a05344a275d006dcdea19bf22053e2fb74030f5bd469b19b509a8abd2c753"
+      },
+      "kind": "matrix",
+      "name": "narrow-r1-w1-baseline",
+      "record": {
+        "bytes": 5677,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r1-w1-baseline/supervisor.json",
+        "sha256": "8c3acf0237efb3b9eec11d5e5221988c079fe6f3e27c24a0dd96169c7ef3ee15"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13155,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r2-w1-baseline/completed.json",
+        "sha256": "b358460438380ec13a6f1264185caa2a513e6dab6a9198ecd9468d0d64f6607b"
+      },
+      "kind": "matrix",
+      "name": "narrow-r2-w1-baseline",
+      "record": {
+        "bytes": 5677,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r2-w1-baseline/supervisor.json",
+        "sha256": "7d2f3f6803fa5e54903c2d1506cb89e27ca51e02b17dd6427d1bec36d3670c28"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13213,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r2-w1-candidate/completed.json",
+        "sha256": "3a2c2e9aac22b585488b73878e781808da9840209e7ad3f6a73962ec8429035a"
+      },
+      "kind": "matrix",
+      "name": "narrow-r2-w1-candidate",
+      "record": {
+        "bytes": 5685,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r2-w1-candidate/supervisor.json",
+        "sha256": "36c2dc30f8d7ee3f2d4cb0ad91607cfa9976860da0bc142487411eb626aa577c"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13190,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r2-w16-baseline/completed.json",
+        "sha256": "4877661ee67e0c836e79d3a306f352587a2d5bddae246ac70acb44e0887b20f3"
+      },
+      "kind": "matrix",
+      "name": "narrow-r2-w16-baseline",
+      "record": {
+        "bytes": 5682,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r2-w16-baseline/supervisor.json",
+        "sha256": "f645d4b00de5d3cb68c27d542c105eb81b3095704b17f2006eac06184f6cdf3e"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13211,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r2-w16-candidate/completed.json",
+        "sha256": "49e05b5daa87cdab920a1d7134bae6d7970d44bb6d4c4db4ef3a72915ea90561"
+      },
+      "kind": "matrix",
+      "name": "narrow-r2-w16-candidate",
+      "record": {
+        "bytes": 5687,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r2-w16-candidate/supervisor.json",
+        "sha256": "aaa026fbbcb311fed02beaab54d5ba89baac965cc1fb094d73ae101754bfc544"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13202,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r2-w32-baseline/completed.json",
+        "sha256": "16d44f3def7affe159e8d595016e73d009e0cc584f901e8ef4ade449213c3081"
+      },
+      "kind": "matrix",
+      "name": "narrow-r2-w32-baseline",
+      "record": {
+        "bytes": 5682,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r2-w32-baseline/supervisor.json",
+        "sha256": "ad3829102331bd3a93bfeb501bda8c9f35969d4a5ba7834e9283181f07d9a2b5"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13202,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r2-w32-candidate/completed.json",
+        "sha256": "b8a9069d5e3aa99e41894ddc2c585e0a9bcb1031e8898b54f52a52234e2e100f"
+      },
+      "kind": "matrix",
+      "name": "narrow-r2-w32-candidate",
+      "record": {
+        "bytes": 5690,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r2-w32-candidate/supervisor.json",
+        "sha256": "bd5157c44d46cf502c26a501b31faa1e9e328f4c5950a60d77cca3a0d4afc413"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13196,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r3-w32-candidate/completed.json",
+        "sha256": "bf754f8229ed5b5961ce92775264e9b4a21942766cd3b8512876487a9fd6f75f"
+      },
+      "kind": "matrix",
+      "name": "narrow-r3-w32-candidate",
+      "record": {
+        "bytes": 5691,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r3-w32-candidate/supervisor.json",
+        "sha256": "3dbd06ba29cd855d8204151e7510379247a5d0f7c898dc502bfc0aa9c8fd2685"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13179,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r3-w32-baseline/completed.json",
+        "sha256": "f2e130e6fb322a8e3614d395ab142491328c247645376a6746c816d01ecf1f4d"
+      },
+      "kind": "matrix",
+      "name": "narrow-r3-w32-baseline",
+      "record": {
+        "bytes": 5681,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r3-w32-baseline/supervisor.json",
+        "sha256": "881aff8fbef9deac4dc30ebf6ec8323d453b75b5e8b490d316bac344791a2f27"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13213,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r3-w16-candidate/completed.json",
+        "sha256": "df9ea5cd5d1e243dd39a0125bfa4fa953562c70899445b32aaba9f5efe784c12"
+      },
+      "kind": "matrix",
+      "name": "narrow-r3-w16-candidate",
+      "record": {
+        "bytes": 5690,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r3-w16-candidate/supervisor.json",
+        "sha256": "8c1e0875bc45ca261cb1f43f38e7694e2a37647abd9908ff3ec89ce59134c3cc"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13188,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r3-w16-baseline/completed.json",
+        "sha256": "74257ae94594f0179944571a829135dd9dbeacaaba04c730c0a381508dc4e0db"
+      },
+      "kind": "matrix",
+      "name": "narrow-r3-w16-baseline",
+      "record": {
+        "bytes": 5682,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r3-w16-baseline/supervisor.json",
+        "sha256": "b83a322e221357ec0395d9fc3aff5cb15a087658cbf2f5c6442bf6285b084306"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13201,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r3-w1-candidate/completed.json",
+        "sha256": "2f052668dea59403ebd632435a1a018fa94774d835ab10640cc46ae7e023f4cc"
+      },
+      "kind": "matrix",
+      "name": "narrow-r3-w1-candidate",
+      "record": {
+        "bytes": 5685,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r3-w1-candidate/supervisor.json",
+        "sha256": "67645e7a141ea9d038da0a5b9fff0832e9291950d2f78bce62f1473f9d929003"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13168,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r3-w1-baseline/completed.json",
+        "sha256": "d54ac22f3c5ff603e5c57fe18d46dff3ec8aa47a5e0f81cf070582b0c2e4d371"
+      },
+      "kind": "matrix",
+      "name": "narrow-r3-w1-baseline",
+      "record": {
+        "bytes": 5677,
+        "path": "/opt/r1/flop-fused-update-proof01/narrow-r3-w1-baseline/supervisor.json",
+        "sha256": "a8b8117251bd4d413747200ad6ff5b072c5cbc3b8da36ca7813fe03f658d9157"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13209,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r0-w1-baseline/completed.json",
+        "sha256": "18ee36e8322c0f010c722941d44427a774223ab84afe189eac12c74691af93c3"
+      },
+      "kind": "matrix",
+      "name": "expanded-r0-w1-baseline",
+      "record": {
+        "bytes": 5689,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r0-w1-baseline/supervisor.json",
+        "sha256": "743ba1b28b5059f58e3b1dcaaf91ddda871b31ebfc87b0d9ba3fd74b980c695c"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13235,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r0-w1-candidate/completed.json",
+        "sha256": "290697e5beb7ea90bc89b769bed1741d130231a82f03dc5b3ef3786b7813d5e5"
+      },
+      "kind": "matrix",
+      "name": "expanded-r0-w1-candidate",
+      "record": {
+        "bytes": 5699,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r0-w1-candidate/supervisor.json",
+        "sha256": "5b10582317e4e191cae00bdb1094a4094924d97372afa2956967bc8519d4ee65"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13231,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r0-w16-baseline/completed.json",
+        "sha256": "34d3022699e4e4c4b8bbfaecd5eb0870c49c53b9b399eab06845b8eb8f98f827"
+      },
+      "kind": "matrix",
+      "name": "expanded-r0-w16-baseline",
+      "record": {
+        "bytes": 5695,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r0-w16-baseline/supervisor.json",
+        "sha256": "240b1e8215b1ba7b60da63ed07df944f0fdbc4e98af76176bd1861404bed65ab"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13245,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r0-w16-candidate/completed.json",
+        "sha256": "e8ce787efd30906610bb67f52e2959090a318d9d38d5a571726693ebdf58d646"
+      },
+      "kind": "matrix",
+      "name": "expanded-r0-w16-candidate",
+      "record": {
+        "bytes": 5704,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r0-w16-candidate/supervisor.json",
+        "sha256": "fc6ff7e96d82634ed3d55917431dbd9dc2f18e9933f36aa66d541a1cb86a2ebc"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13233,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r0-w32-baseline/completed.json",
+        "sha256": "4ebdaf5301814191f2756a52d28fd252dc39effc2b874dfdee22387ca1866775"
+      },
+      "kind": "matrix",
+      "name": "expanded-r0-w32-baseline",
+      "record": {
+        "bytes": 5695,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r0-w32-baseline/supervisor.json",
+        "sha256": "8f0078bf4137050878478cbc71daddf5a08777b4ea1eb31644da19305bb030f8"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13246,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r0-w32-candidate/completed.json",
+        "sha256": "cddfc1d1156c76920cf59eba824092bc0179b05cc0b7153e1174abd8e91d7554"
+      },
+      "kind": "matrix",
+      "name": "expanded-r0-w32-candidate",
+      "record": {
+        "bytes": 5702,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r0-w32-candidate/supervisor.json",
+        "sha256": "bc692ebb33a90dc78384e3a7f6087bd3a86e9caee1f0c3141cf68dbdebe4ba6f"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13246,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r1-w32-candidate/completed.json",
+        "sha256": "75de9be7590135497835bd55b492adcf056445e12fd807e1ffa0ef694bda20cc"
+      },
+      "kind": "matrix",
+      "name": "expanded-r1-w32-candidate",
+      "record": {
+        "bytes": 5703,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r1-w32-candidate/supervisor.json",
+        "sha256": "cb0f2c30bf1ae8ac2819e4a6c5fd9a697076b8f594d558719c6f64d5e6adfef4"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13245,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r1-w32-baseline/completed.json",
+        "sha256": "bab05cd72355a6111533b0a91a2955b5eba44ec41e559515c24546c0d1efa7e9"
+      },
+      "kind": "matrix",
+      "name": "expanded-r1-w32-baseline",
+      "record": {
+        "bytes": 5695,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r1-w32-baseline/supervisor.json",
+        "sha256": "b036ac2389ebd3efb29fb560b486592ea6f5294d9823b92e2929e7238c90dfff"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13247,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r1-w16-candidate/completed.json",
+        "sha256": "a7cc4f1c52883d923bfa6e955b515fc2784c836895f8098bf6deb5f081a43716"
+      },
+      "kind": "matrix",
+      "name": "expanded-r1-w16-candidate",
+      "record": {
+        "bytes": 5704,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r1-w16-candidate/supervisor.json",
+        "sha256": "973c2cf6d60afc0313ab0446555b82c9e87150f3f11daf435197265f39fab421"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13238,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r1-w16-baseline/completed.json",
+        "sha256": "afdd93b6422d45b09e8a6764d7a13370380abe88ed8d341f799cc1e5ee712768"
+      },
+      "kind": "matrix",
+      "name": "expanded-r1-w16-baseline",
+      "record": {
+        "bytes": 5695,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r1-w16-baseline/supervisor.json",
+        "sha256": "e7f0cb8e68d2214dc3f6a427be1940fd91792b37a93def63255b0151e3956c0e"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13231,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r1-w1-candidate/completed.json",
+        "sha256": "ad80c61ec53b404244dabbbb0f6953a842061a250aef135afc7f3ff1c6b15ac5"
+      },
+      "kind": "matrix",
+      "name": "expanded-r1-w1-candidate",
+      "record": {
+        "bytes": 5698,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r1-w1-candidate/supervisor.json",
+        "sha256": "ea3f13daf72e2cf9a1e5ef82dfbd084f852f3d9c2ae82509602a10dc76f9f124"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13211,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r1-w1-baseline/completed.json",
+        "sha256": "535d08a0b75cbc3de1cd4b89e5ee189c5b2926edb1b72ad2ea07f6816a985d0f"
+      },
+      "kind": "matrix",
+      "name": "expanded-r1-w1-baseline",
+      "record": {
+        "bytes": 5688,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r1-w1-baseline/supervisor.json",
+        "sha256": "f52e001972f0a1c40a9f8151454a9761698f5fb5af54b21814e7d062cb866a1e"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13203,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r2-w1-baseline/completed.json",
+        "sha256": "cef0e94145c3cefe7876f1a93796d5b21374e8bcbfd0cc8f80a95b0d085a3030"
+      },
+      "kind": "matrix",
+      "name": "expanded-r2-w1-baseline",
+      "record": {
+        "bytes": 5689,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r2-w1-baseline/supervisor.json",
+        "sha256": "e785e22bbe21cae61bc015571c144a444c9ccbfb53ab018c6bdce0daafa7384d"
+      }
+    },
+    {
+      "completion": {
+        "bytes": 13230,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r2-w1-candidate/completed.json",
+        "sha256": "e33161067b92224efe3b3abd1ee94370ffb6b630f59df6a8fb7bb3fee393042d"
+      },
+      "kind": "matrix",
+      "name": "expanded-r2-w1-candidate",
+      "record": {
+        "bytes": 5699,
+        "path": "/opt/r1/flop-fused-update-proof01/expanded-r2-w1-candidate/supervisor.json",
+        "sha256": "921c6975564f704ff1444722f2794c5a5fc138ca3c8b58aabb2d400cd6153f99"
+      }
+    }
+  ]
+}

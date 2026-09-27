@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-17",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:Q37lbkYqSPT7f81C/tVWZAaDWLfU/+AKb+SnYqj5eR8",
+    "--command=sudo timeout --signal=TERM --kill-after=10 120 python3 -B /tmp/audit-partial.py && sha256sum /tmp/flop-fused-update-partial01.json"
+  ],
+  "started_utc": "2026-09-27T06:27:17.109789+00:00",
+  "timeout_seconds": 150
+}

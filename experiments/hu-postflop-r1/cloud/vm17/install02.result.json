@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-17",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:Q37lbkYqSPT7f81C/tVWZAaDWLfU/+AKb+SnYqj5eR8",
+    "--command=sudo python3 -B /tmp/install.py --archive /tmp/deployment01.tar.gz --sha256 c33651e8d7034ce10c185e57df7df5d38204c1a069e15693b95d433e90551a8c --destination /opt/r1/flop-fused-update-package && for f in bootstrap.sh fetch-dependencies.sh run.sh recover.sh; do bash -n /opt/r1/flop-fused-update-package/experiments/hu-postflop-r1/cloud/vm17/$f || exit; done && sudo bash /opt/r1/flop-fused-update-package/experiments/hu-postflop-r1/cloud/vm17/fetch-dependencies.sh"
+  ],
+  "started_utc": "2026-09-27T06:06:08.083308+00:00",
+  "timeout_seconds": 90,
+  "stdout": {
+    "bytes": 666,
+    "sha256": "ea19974dd6e336e6e45d23b8c2772f255707d2c05cc26739dff43ad7ec8679bc"
+  },
+  "stderr": {
+    "bytes": 4002,
+    "sha256": "1e176441377779cf2cf8e10fbf78b8620fda474ff63e8fb75cf6bb0268522b59"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T06:06:16.505790+00:00"
+}

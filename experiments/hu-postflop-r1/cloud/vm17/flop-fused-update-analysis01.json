@@ -1,0 +1,10 @@
+{
+  "error": "incomplete proof: performance screen is not evaluable",
+  "groups": [],
+  "payload_integrity": "not_verified",
+  "performance_claims": false,
+  "performance_screen": "not_evaluable",
+  "production_adoption": false,
+  "schema": "r1.fused-update-timing-report/v1",
+  "status": "not_evaluable"
+}

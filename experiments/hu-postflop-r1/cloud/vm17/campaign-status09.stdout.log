@@ -1,0 +1,24 @@
+MainPID=1790
+Result=success
+ActiveState=active
+44 /opt/r1/flop-fused-update-wrapper01/execute.stdout.log
+==> /opt/r1/flop-fused-update-wrapper01/execute.stdout.log <==
+{"stage": "expanded-r1-w16-candidate", "status": "completed", "case": "expanded", "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "expanded", "threads": 16, "iterations": 16, "state_file": "state.bin", "state_bytes": 283677926, "quality_file": "quality.json", "build_seconds": 0.319760169, "cfr_seconds": 2.125603263, "state_write_seconds": 1.913518289, "quality_seconds": 0.375814348, "cfv_capture": false, "performance_claim": false}}
+{"stage": "expanded-r1-w16-baseline", "status": "completed", "case": "expanded", "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "expanded", "threads": 16, "iterations": 16, "state_file": "state.bin", "state_bytes": 283677926, "quality_file": "quality.json", "build_seconds": 0.315470358, "cfr_seconds": 2.125681263, "state_write_seconds": 1.914164084, "quality_seconds": 0.394483884, "cfv_capture": false, "performance_claim": false}}
+
+==> /opt/r1/flop-fused-update-wrapper01/execute.stderr.log <==
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.75s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+test result: ok. 6 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.03s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 29 passed; 0 failed; 8 ignored; 0 measured; 0 filtered out; finished in 0.24s
+test result: ok. 3 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.06s
+test result: ok. 3 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.19s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s

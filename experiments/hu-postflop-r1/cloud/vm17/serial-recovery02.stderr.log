@@ -1,0 +1,3 @@
+WARNING: Some serial port output was lost due to a limited buffer. The oldest byte of output returned was at offset 239538.
+
+Specify --start=239538 in the next get-serial-port-output invocation to get only the new output starting from here.

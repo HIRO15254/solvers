@@ -1,0 +1,10 @@
+MainPID=1790
+Result=success
+ActiveState=active
+34 /opt/r1/flop-fused-update-wrapper01/execute.stdout.log
+==> /opt/r1/flop-fused-update-wrapper01/execute.stdout.log <==
+{"stage": "narrow-r3-w16-baseline", "status": "completed", "case": "narrow", "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "narrow", "threads": 16, "iterations": 16, "state_file": "state.bin", "state_bytes": 81414344, "quality_file": "quality.json", "build_seconds": 0.298564261, "cfr_seconds": 0.819548233, "state_write_seconds": 0.460992736, "quality_seconds": 0.141727223, "cfv_capture": false, "performance_claim": false}}
+{"stage": "narrow-r3-w1-candidate", "status": "completed", "case": "narrow", "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "narrow", "threads": 1, "iterations": 16, "state_file": "state.bin", "state_bytes": 81414344, "quality_file": "quality.json", "build_seconds": 0.302940287, "cfr_seconds": 8.730808027, "state_write_seconds": 0.468201837, "quality_seconds": 1.7218279669999998, "cfv_capture": false, "performance_claim": false}}
+{"stage": "narrow-r3-w1-baseline", "status": "completed", "case": "narrow", "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "narrow", "threads": 1, "iterations": 16, "state_file": "state.bin", "state_bytes": 81414344, "quality_file": "quality.json", "build_seconds": 0.302608084, "cfr_seconds": 8.959245566, "state_write_seconds": 0.465487546, "quality_seconds": 1.739181002, "cfv_capture": false, "performance_claim": false}}
+
+==> /opt/r1/flop-fused-update-wrapper01/execute.stderr.log <==

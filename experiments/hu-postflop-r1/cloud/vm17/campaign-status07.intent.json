@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-17",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:Q37lbkYqSPT7f81C/tVWZAaDWLfU/+AKb+SnYqj5eR8",
+    "--command=systemctl show solvers-r1-vm17-fused32 -p ActiveState -p MainPID -p Result; sudo wc -l /opt/r1/flop-fused-update-wrapper01/execute.stdout.log; sudo tail -n 3 /opt/r1/flop-fused-update-wrapper01/execute.stdout.log /opt/r1/flop-fused-update-wrapper01/execute.stderr.log"
+  ],
+  "started_utc": "2026-09-27T06:17:26.453190+00:00",
+  "timeout_seconds": 45
+}
