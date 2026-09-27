@@ -1,0 +1,11 @@
+{
+  "id": "2888214305257634847",
+  "name": "solvers-r1-20260927-14",
+  "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260927-14",
+  "sizeGb": "40",
+  "type": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/diskTypes/pd-balanced",
+  "users": [
+    "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260927-14"
+  ],
+  "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+}

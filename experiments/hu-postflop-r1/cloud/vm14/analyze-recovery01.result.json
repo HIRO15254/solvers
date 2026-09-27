@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-14",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:Lcj/zOzHlkM1lSwfGsxJMh4gSF+TpYUx/LCVTD5E/LI",
+    "--command=printf \"%s\\n\" \"6baf6178a7e3fc83ef4ff5209955bea4fc7e5b653cf3dd82e11422543200e70b  /tmp/analyze-interrupted.sh\" | sha256sum -c - && bash -n /tmp/analyze-interrupted.sh && sudo systemd-run --unit=solvers-r1-vm14-analysis --wait --pipe --property=RuntimeMaxSec=180 --property=MemoryMax=2G --property=MemorySwapMax=0 --property=KillMode=control-group /bin/bash /tmp/analyze-interrupted.sh"
+  ],
+  "started_utc": "2026-09-27T03:16:01.742970+00:00",
+  "timeout_seconds": 240,
+  "stdout": {
+    "bytes": 292,
+    "sha256": "b5e6c7b1280d234161b447941aadd7d4a30acc3052d6328b7f1ffde2b048d2ff"
+  },
+  "stderr": {
+    "bytes": 220,
+    "sha256": "6955a3cd0ea48801382f829d22c1c347287d7a62aa00a0dbc497ff591451aa8e"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T03:16:10.079995+00:00"
+}

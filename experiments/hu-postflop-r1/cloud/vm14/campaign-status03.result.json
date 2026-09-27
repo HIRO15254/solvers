@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-14",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:Lcj/zOzHlkM1lSwfGsxJMh4gSF+TpYUx/LCVTD5E/LI",
+    "--command=systemctl show solvers-r1-vm14-flat32 -p ActiveState -p SubState -p MainPID -p Result -p MemoryPeak -p CPUUsageNSec; sudo tail -n 2 /opt/r1/flop-flat-cloud32-wrapper01/matrix.stdout.log /opt/r1/flop-flat-cloud32-wrapper01/matrix.stderr.log"
+  ],
+  "started_utc": "2026-09-27T02:55:07.545111+00:00",
+  "timeout_seconds": 60,
+  "stdout": {
+    "bytes": 1251,
+    "sha256": "6127f0f1051d309b1c6cfef6aad2f96083cf5ac0f90411951591300c1fbc36ea"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T02:55:13.016731+00:00"
+}

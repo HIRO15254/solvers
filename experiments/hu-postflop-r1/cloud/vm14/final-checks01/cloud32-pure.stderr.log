@@ -1,0 +1,38 @@
+test_bad_semantics_after_payload_integrity_has_no_performance_claim (test_analyze.AnalyzeTests.test_bad_semantics_after_payload_integrity_has_no_performance_claim) ... ok
+test_digest_stream_bound_and_safe_relative_path (test_analyze.AnalyzeTests.test_digest_stream_bound_and_safe_relative_path) ... ok
+test_fixed_complete_schedule_and_warmup_exclusion (test_analyze.AnalyzeTests.test_fixed_complete_schedule_and_warmup_exclusion) ... ok
+test_frozen_supervisor_success_reason_and_failure_rejection (test_analyze.AnalyzeTests.test_frozen_supervisor_success_reason_and_failure_rejection) ... ok
+test_guard_detects_one_worker_regression_and_peak_regression (test_analyze.AnalyzeTests.test_guard_detects_one_worker_regression_and_peak_regression) ... ok
+test_missing_duplicate_reordered_or_failed_rows_have_no_statistics (test_analyze.AnalyzeTests.test_missing_duplicate_reordered_or_failed_rows_have_no_statistics) ... ok
+test_missing_or_invalid_proof_is_not_evaluable (test_analyze.AnalyzeTests.test_missing_or_invalid_proof_is_not_evaluable) ... ok
+test_native_environment_exact_values_and_no_extra_override (test_analyze.AnalyzeTests.test_native_environment_exact_values_and_no_extra_override) ... ok
+test_noise_defers_otherwise_passing_guard (test_analyze.AnalyzeTests.test_noise_defers_otherwise_passing_guard) ... ok
+test_original_toolchain_record_matches_all_stage_schema_checks (test_analyze.AnalyzeTests.test_original_toolchain_record_matches_all_stage_schema_checks) ... ok
+test_candidate_identity_must_match_content (test_install.InstallBoundaries.test_candidate_identity_must_match_content) ... ok
+test_duplicate_member (test_install.InstallBoundaries.test_duplicate_member) ... ok
+test_expanded_limit_without_allocating_large_payload (test_install.InstallBoundaries.test_expanded_limit_without_allocating_large_payload) ... ok
+test_file_parent_collision_rejected_before_materialization (test_install.InstallBoundaries.test_file_parent_collision_rejected_before_materialization) ... ok
+test_manifest_exact_inventory (test_install.InstallBoundaries.test_manifest_exact_inventory) ... ok
+test_manifest_hash_and_size (test_install.InstallBoundaries.test_manifest_hash_and_size) ... ok
+test_nonregular_members (test_install.InstallBoundaries.test_nonregular_members) ... ok
+test_outer_hash_rejects_changed_archive (test_install.InstallBoundaries.test_outer_hash_rejects_changed_archive) ... ok
+test_source_inventory_must_match_content (test_install.InstallBoundaries.test_source_inventory_must_match_content) ... ok
+test_unsafe_paths (test_install.InstallBoundaries.test_unsafe_paths) ... ok
+test_valid_inventory_round_trip (test_install.InstallBoundaries.test_valid_inventory_round_trip) ... ok
+test_all_narrow_rows_three_samples_no_decision_or_expanded_statistics (test_partial.PartialTests.test_all_narrow_rows_three_samples_no_decision_or_expanded_statistics) ... ok
+test_completed_whole_campaign_cannot_be_relabelled_partial (test_partial.PartialTests.test_completed_whole_campaign_cannot_be_relabelled_partial) ... ok
+test_incomplete_reordered_or_replaced_narrow_row_rejected (test_partial.PartialTests.test_incomplete_reordered_or_replaced_narrow_row_rejected) ... ok
+test_recovery_membership_duplicate_and_original_path_binding (test_partial.PartialTests.test_recovery_membership_duplicate_and_original_path_binding) ... ok
+test_stage_pin_failure_cannot_produce_partial_statistics (test_partial.PartialTests.test_stage_pin_failure_cannot_produce_partial_statistics) ... ok
+test_truncated_or_nul_json_fails_closed_without_log_fallback (test_partial.PartialTests.test_truncated_or_nul_json_fails_closed_without_log_fallback) ... ok
+test_exact_96_rows_case_order_and_warmups (test_runner.CloudRunnerTests.test_exact_96_rows_case_order_and_warmups) ... ok
+test_package_rejects_identical_unexpected_edit_in_both_arms (test_runner.CloudRunnerTests.test_package_rejects_identical_unexpected_edit_in_both_arms) ... ok
+test_package_rejects_receipt_manifest_mismatch_and_extra_source (test_runner.CloudRunnerTests.test_package_rejects_receipt_manifest_mismatch_and_extra_source) ... ok
+test_pilot_cap_and_no_candidate_time_argument (test_runner.CloudRunnerTests.test_pilot_cap_and_no_candidate_time_argument) ... ok
+test_stage_reservation_obeys_absolute_deadline (test_runner.CloudRunnerTests.test_stage_reservation_obeys_absolute_deadline) ... ok
+test_streamed_gzip_verifies_content_before_retention (test_runner.CloudRunnerTests.test_streamed_gzip_verifies_content_before_retention) ... ok
+
+----------------------------------------------------------------------
+Ran 33 tests in 0.028s
+
+OK

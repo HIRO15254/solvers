@@ -1,0 +1,27 @@
+MainPID=1880
+Result=success
+MemoryPeak=1263706112
+CPUUsageNSec=273758593000
+ActiveState=active
+SubState=running
+==> /opt/r1/flop-flat-cloud32-wrapper01/build.stdout.log <==
+{"stage": "smoke-narrow-baseline-32", "status": "completed", "case": "narrow", "arm": "baseline", "workers": 32, "iterations": 2, "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "narrow", "threads": 32, "iterations": 2, "state_file": "state.bin", "state_bytes": 81414344, "quality_file": "quality.json", "build_seconds": 0.272523585, "cfr_seconds": 0.28208734, "state_write_seconds": 0.457112887, "quality_seconds": 0.150935041, "cfv_capture": false, "performance_claim": false}}
+{"stage": "smoke-narrow-flat-32", "status": "completed", "case": "narrow", "arm": "flat", "workers": 32, "iterations": 2, "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "narrow", "threads": 32, "iterations": 2, "state_file": "state.bin", "state_bytes": 81414344, "quality_file": "quality.json", "build_seconds": 0.291000542, "cfr_seconds": 0.292791565, "state_write_seconds": 0.459446383, "quality_seconds": 0.145644593, "cfv_capture": false, "performance_claim": false}}
+{"phase": "build", "status": "completed", "counts": {"completed": 7, "failed": 0, "skipped": 0}, "pilot_counts": {"completed": 0, "failed": 0, "skipped": 0}}
+
+==> /opt/r1/flop-flat-cloud32-wrapper01/matrix.stdout.log <==
+{"stage": "pilot-narrow-16", "status": "completed", "case": "narrow", "arm": "baseline", "workers": 1, "iterations": 16, "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "narrow", "threads": 1, "iterations": 16, "state_file": "state.bin", "state_bytes": 81414344, "quality_file": "quality.json", "build_seconds": 0.291159434, "cfr_seconds": 8.911749158, "state_write_seconds": 0.459993443, "quality_seconds": 1.630288279, "cfv_capture": false, "performance_claim": false}}
+
+==> /opt/r1/flop-flat-cloud32-wrapper01/preflight.stdout.log <==
+{"manifest": {"bytes": 69316, "sha256": "377d343542235c5ec33c2d3e52887d3a1c99e04ae353ca16dba9ae6291fe621e"}, "installation": {"bytes": 388, "sha256": "918c391ec8f9de1e879ccc56524d3aa613a34c7637158d07541a94c7089abf14"}, "source_revision": "0d54a9e64cf0a1eb57533938a2907c5dc80c2812", "package_files": 227}
+
+==> /opt/r1/flop-flat-cloud32-wrapper01/prepare.stdout.log <==
+{"status": "prepared", "sources": {"baseline": 209, "flat": 209}, "matrix_processes": 96}
+
+==> /opt/r1/flop-flat-cloud32-wrapper01/build.stderr.log <==
+
+==> /opt/r1/flop-flat-cloud32-wrapper01/matrix.stderr.log <==
+
+==> /opt/r1/flop-flat-cloud32-wrapper01/preflight.stderr.log <==
+
+==> /opt/r1/flop-flat-cloud32-wrapper01/prepare.stderr.log <==

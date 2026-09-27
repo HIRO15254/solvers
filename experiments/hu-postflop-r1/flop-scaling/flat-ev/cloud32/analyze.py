@@ -243,6 +243,13 @@ def verify_sources(evidence):
         need(quota == "max" or int(quota) / int(period) >= 32, "CPU quota below 32")
 
 
+def verify_terminal(record):
+    need(record["schema"] == "solvers.supervised-run/v1" and record["state"] == "completed"
+         and record["child_exit_code"] == record["supervisor_exit_code"] == 0
+         and record["cleanup_complete"] is True and not record["forced"] and record["last_sample"]["pids"] == []
+         and record["stop_reason"] == "completed" and not record["errors"], "supervisor terminal/cleanup differs")
+
+
 def verify_stage(evidence, item, binary=None):
     need(item["status"] == "completed" and item["supervisor_exit"] == 0, "stage not successfully terminal")
     need(item["host_before"] == item["host_after"] == evidence.plan["host"], "stage host/boot changed")
@@ -251,10 +258,7 @@ def verify_stage(evidence, item, binary=None):
     record_path = evidence.require(item["record"])
     need(evidence.name(item["record"]["path"]) == item["name"] + "/supervisor.json", "stage record path differs")
     record = read(record_path)
-    need(record["schema"] == "solvers.supervised-run/v1" and record["state"] == "completed"
-         and record["child_exit_code"] == record["supervisor_exit_code"] == 0
-         and record["cleanup_complete"] is True and not record["forced"] and record["last_sample"]["pids"] == []
-         and record["stop_reason"] is None and not record["errors"], "supervisor terminal/cleanup differs")
+    verify_terminal(record)
     need(record["argv"] == record["resolved_argv"] == item["command"] and record["shell"] is False, "workload argv differs")
     seconds = 300 if item.get("kind") == "build" else 10 if item.get("kind") == "toolchain" else 120
     need(record["limits"] == {**LIMITS, "timeout_seconds": seconds}, "supervisor resource bounds differ")

@@ -1,0 +1,11 @@
+MainPID=1880
+Result=success
+MemoryPeak=1552556032
+CPUUsageNSec=641498800000
+ActiveState=active
+SubState=running
+==> /opt/r1/flop-flat-cloud32-wrapper01/matrix.stdout.log <==
+{"stage": "narrow-r1-w32-baseline", "status": "completed", "case": "narrow", "arm": "baseline", "workers": 32, "iterations": 16, "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "narrow", "threads": 32, "iterations": 16, "state_file": "state.bin", "state_bytes": 81414344, "quality_file": "quality.json", "build_seconds": 0.282298406, "cfr_seconds": 0.998746379, "state_write_seconds": 0.456205577, "quality_seconds": 0.153977371, "cfv_capture": false, "performance_claim": false}}
+{"stage": "narrow-r1-w16-baseline", "status": "completed", "case": "narrow", "arm": "baseline", "workers": 16, "iterations": 16, "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "narrow", "threads": 16, "iterations": 16, "state_file": "state.bin", "state_bytes": 81414344, "quality_file": "quality.json", "build_seconds": 0.273371015, "cfr_seconds": 0.931894191, "state_write_seconds": 0.455651586, "quality_seconds": 0.154852172, "cfv_capture": false, "performance_claim": false}}
+
+==> /opt/r1/flop-flat-cloud32-wrapper01/matrix.stderr.log <==

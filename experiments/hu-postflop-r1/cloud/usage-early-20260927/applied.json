@@ -1,0 +1,54 @@
+{
+  "at": "2026-09-27T03:13:40.394325+00:00",
+  "before_sha256": "879d774903285cc61f6d71591e4fa7ba9559063190d22eaa8bb5d66621e75701",
+  "after_sha256": "4a1bcf1fa5c08399033191acdbe7a45429345e4fec5ae23129c830cc82b66091",
+  "restored_usd": 2,
+  "held_usd": 36,
+  "available_usd": 4,
+  "changes": [
+    {
+      "id": "r1-20260925-02",
+      "event": "usage_based_partial_reservation_reconciliation",
+      "at": "2026-09-27T03:13:40.394325+00:00",
+      "old_reserved_usd": 5,
+      "new_reserved_usd": 4.5,
+      "restored_to_available_budget_usd": 0.5,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
+      "billed_usd": null,
+      "final_invoice": false
+    },
+    {
+      "id": "r1-20260925-05",
+      "event": "usage_based_partial_reservation_reconciliation",
+      "at": "2026-09-27T03:13:40.394325+00:00",
+      "old_reserved_usd": 5,
+      "new_reserved_usd": 4.5,
+      "restored_to_available_budget_usd": 0.5,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
+      "billed_usd": null,
+      "final_invoice": false
+    },
+    {
+      "id": "r1-20260925-06",
+      "event": "usage_based_partial_reservation_reconciliation",
+      "at": "2026-09-27T03:13:40.394325+00:00",
+      "old_reserved_usd": 5,
+      "new_reserved_usd": 4.75,
+      "restored_to_available_budget_usd": 0.25,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
+      "billed_usd": null,
+      "final_invoice": false
+    },
+    {
+      "id": "r1-20260925-07",
+      "event": "usage_based_partial_reservation_reconciliation",
+      "at": "2026-09-27T03:13:40.394325+00:00",
+      "old_reserved_usd": 5,
+      "new_reserved_usd": 4.25,
+      "restored_to_available_budget_usd": 0.75,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
+      "billed_usd": null,
+      "final_invoice": false
+    }
+  ]
+}

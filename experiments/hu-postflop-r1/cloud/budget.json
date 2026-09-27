@@ -77,8 +77,49 @@
             "vm14/install02.stdout.log",
             "vm14/fetch01.result.json"
           ]
+        },
+        {
+          "event": "same_instance_resized_and_native_campaign_dispatched",
+          "at": "2026-09-27T02:51:24.873132+00:00",
+          "measurement_boot_id": "804cbeaa-05ce-47d0-bbbb-ee4dd5c6914d",
+          "machine_type": "e2-highcpu-32",
+          "logical_cpus": 32,
+          "physical_cores": 16,
+          "evidence": [
+            "vm14/start32-01.stdout.log",
+            "vm14/campaign-start01.stdout.log"
+          ]
+        },
+        {
+          "event": "compute.instances.preempted",
+          "at": "2026-09-27T03:03:28.815853Z",
+          "last_stop": "2026-09-27T03:03:43.637Z",
+          "operation_id": "systemevent-1790478208670-65c6e319b1b81-9fbfc1c9-3e2f1e5b",
+          "full_matrix_complete": false,
+          "evidence": "vm14/preemption01.stdout.log"
+        },
+        {
+          "event": "restarted_two_vcpu_for_recovery_only",
+          "at": "2026-09-27T03:08:59Z",
+          "recovery_boot_id": "ecbaaafc-015a-4f7f-9749-f0d7e85ddda1",
+          "deadline_unchanged": "2026-09-27T03:58:56Z",
+          "builds_or_solves_restarted": 0,
+          "evidence": "vm14/recovery-state01.stdout.log"
+        },
+        {
+          "event": "explicit_delete_and_absence_verification",
+          "at": "2026-09-26T20:25:25.287-07:00",
+          "verified_at_utc": "2026-09-27T03:29:01.189918+00:00",
+          "instance_id": "5878531675315846175",
+          "disk_id": "2888214305257634847",
+          "operation_status": "DONE",
+          "evidence": "vm14/reconciliation.json",
+          "reservation_released": false,
+          "billed_usd": null
         }
-      ]
+      ],
+      "measurement_deadline_utc": "2026-09-27T03:30:00Z",
+      "disposition": "Spot preemption interrupted96-row matrix. Original bytes retained as3 parts and download hash checked. Narrow48 independently verified descriptive only; expanded incomplete. Restarted2CPU for recovery, no solve resumed; same absolute deadline. Instance and sole40GiB disk deleted; absence verified.3USD estimate remains held; invoice unknown."
     },
     {
       "id": "r1-20260926-13",
@@ -728,7 +769,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260925-07",
-      "reserved_usd": 5,
+      "reserved_usd": 4.25,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 3,
@@ -761,8 +802,19 @@
           "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm07/reconciliation.json",
           "reservation_released": false,
           "billed_usd": null
+        },
+        {
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T03:13:40.394325+00:00",
+          "old_reserved_usd": 5,
+          "new_reserved_usd": 4.25,
+          "restored_to_available_budget_usd": 0.75,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
         }
-      ]
+      ],
+      "original_reserved_usd": 5
     },
     {
       "id": "r1-20260925-01",
@@ -791,7 +843,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260925-02",
-      "reserved_usd": 5,
+      "reserved_usd": 4.5,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 3,
@@ -806,7 +858,20 @@
       "reserved_egress_usd_gib": 0.3,
       "tax_price_delay_and_other_reserve_usd": 3.2,
       "note": "Compute uses the published on-demand rate rounded up, not an asserted live Spot quote. 3.02 hours including deletion slack: subtotal under $1.78; total reservation $5. No repeated launch without a fresh reservation.",
-      "disposition": "GCP compute.instances.preempted at 2026-09-25T16:02:48.562Z; deleted at 16:02:58.126Z; VM and disk absent on reconciliation. Uncollected raw validation/build logs lost; no formal performance results. Billing not yet available, full reservation held."
+      "disposition": "GCP compute.instances.preempted at 2026-09-25T16:02:48.562Z; deleted at 16:02:58.126Z; VM and disk absent on reconciliation. Uncollected raw validation/build logs lost; no formal performance results. Billing not yet available, full reservation held.",
+      "original_reserved_usd": 5,
+      "events": [
+        {
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T03:13:40.394325+00:00",
+          "old_reserved_usd": 5,
+          "new_reserved_usd": 4.5,
+          "restored_to_available_budget_usd": 0.5,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
+        }
+      ]
     },
     {
       "id": "r1-20260925-03",
@@ -857,7 +922,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260925-05",
-      "reserved_usd": 5,
+      "reserved_usd": 4.5,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 3,
@@ -872,14 +937,27 @@
       "reserved_egress_usd_gib": 0.3,
       "tax_price_delay_and_other_reserve_usd": 3.2,
       "note": "Compute uses the published on-demand rate rounded up, not an asserted live Spot quote. 3.02 hours including deletion slack: subtotal under $1.78; total reservation $5. No repeated launch without a fresh reservation.",
-      "disposition": "GCP Spot preemption at 2026-09-25T17:05:26.126964Z completed 17:05:35.714153Z. Instance and disk absent on reconciliation. Candidate1 pipeline, source02/source03 validation and selected ignored checks recovered; v3 raw pipeline, diagnostic019 and source04 in-flight checks were not recovered. Billing unavailable; full reservation held."
+      "disposition": "GCP Spot preemption at 2026-09-25T17:05:26.126964Z completed 17:05:35.714153Z. Instance and disk absent on reconciliation. Candidate1 pipeline, source02/source03 validation and selected ignored checks recovered; v3 raw pipeline, diagnostic019 and source04 in-flight checks were not recovered. Billing unavailable; full reservation held.",
+      "original_reserved_usd": 5,
+      "events": [
+        {
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T03:13:40.394325+00:00",
+          "old_reserved_usd": 5,
+          "new_reserved_usd": 4.5,
+          "restored_to_available_budget_usd": 0.5,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
+        }
+      ]
     },
     {
       "id": "r1-20260925-06",
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260925-06",
-      "reserved_usd": 5,
+      "reserved_usd": 4.75,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 3,
@@ -923,8 +1001,19 @@
           "deadline_utc": "2026-09-25T20:09:11Z",
           "reservation_released": false,
           "billed_usd": null
+        },
+        {
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T03:13:40.394325+00:00",
+          "old_reserved_usd": 5,
+          "new_reserved_usd": 4.75,
+          "restored_to_available_budget_usd": 0.25,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
         }
-      ]
+      ],
+      "original_reserved_usd": 5
     }
   ],
   "usage_reconciliations": [
@@ -1002,6 +1091,70 @@
           "new_reserved_usd": 1.6,
           "restored_to_available_budget_usd": 1.4,
           "evidence": "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
+        }
+      ]
+    },
+    {
+      "at": "2026-09-27T03:13:40.394325+00:00",
+      "authority": "User 2026-09-27 usage-based reuse instruction",
+      "held_before_usd": 38,
+      "held_after_usd": 36,
+      "restored_usd": 2,
+      "available_after_usd": 4,
+      "actual_billed_usd": null,
+      "guaranteed_cost_ceiling": false,
+      "basis": "Early4 acquired Monitoring usage; undiscounted complete lifetime,24h disk,2GiB egress per VM and all original12.50USD other reserve kept. Estimates rounded up to18USD. Missing usage not zero.",
+      "evidence": [
+        {
+          "path": "usage-early-20260927/report.json",
+          "bytes": 11030,
+          "sha256": "36b445c0bf1f331ca2e9294951a0acd17fe03b9e8f75aa1bdbaeb5fa360036c2"
+        }
+      ],
+      "changes": [
+        {
+          "id": "r1-20260925-02",
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T03:13:40.394325+00:00",
+          "old_reserved_usd": 5,
+          "new_reserved_usd": 4.5,
+          "restored_to_available_budget_usd": 0.5,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
+        },
+        {
+          "id": "r1-20260925-05",
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T03:13:40.394325+00:00",
+          "old_reserved_usd": 5,
+          "new_reserved_usd": 4.5,
+          "restored_to_available_budget_usd": 0.5,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
+        },
+        {
+          "id": "r1-20260925-06",
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T03:13:40.394325+00:00",
+          "old_reserved_usd": 5,
+          "new_reserved_usd": 4.75,
+          "restored_to_available_budget_usd": 0.25,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
+        },
+        {
+          "id": "r1-20260925-07",
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T03:13:40.394325+00:00",
+          "old_reserved_usd": 5,
+          "new_reserved_usd": 4.25,
+          "restored_to_available_budget_usd": 0.75,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
           "billed_usd": null,
           "final_invoice": false
         }

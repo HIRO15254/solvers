@@ -1,0 +1,267 @@
+{
+  "schema": "r1.early-usage-cost-scenarios/v1",
+  "acquisition": {
+    "bytes": 12210,
+    "sha256": "8695f84f478da1f655eaebb9d2061a289875d2b3afd78b76419caac3c8717272"
+  },
+  "acquisition_utc": [
+    "2026-09-27T03:04:59.362880Z",
+    "2026-09-27T03:05:05.470059Z"
+  ],
+  "rows": [
+    {
+      "vm": "02",
+      "instance_id": "7774326211091312507",
+      "name": "solvers-r1-20260925-02",
+      "creation_timestamp": "2026-09-26T00:21:57.044+09:00",
+      "launch_attempt": "2026-09-25T15:21:50.6576085+00:00",
+      "delete_completed": "2026-09-25T16:02:58.126Z",
+      "absence_or_delete_for_envelope": "2026-09-25T16:02:58.126Z",
+      "deletion_evidence_scope": "Historical preemption and reported name-filtered instance/disk absence; no raw absence-query payload retained here",
+      "created_to_delete_seconds": "2461.082",
+      "rounded_lifetime_envelope_seconds": 2468,
+      "metrics": {
+        "sent": {
+          "points": 39,
+          "observed_sum": "1671689",
+          "first_start": "2026-09-25T15:22:00.001Z",
+          "last_end": "2026-09-25T16:02:00Z",
+          "internal_gaps_over_1ms": [
+            {
+              "from": "2026-09-25T15:28:00Z",
+              "to": "2026-09-25T15:29:00.001Z",
+              "seconds": "60.001",
+              "missing_usage": null
+            }
+          ],
+          "created_to_first_seconds": "2.957",
+          "last_to_delete_seconds": "58.126",
+          "unobserved_usage": null
+        },
+        "uptime": {
+          "points": 40,
+          "observed_sum": "2339.469955999999910",
+          "first_start": "2026-09-25T15:22:00.001Z",
+          "last_end": "2026-09-25T16:02:00Z",
+          "internal_gaps_over_1ms": [],
+          "created_to_first_seconds": "2.957",
+          "last_to_delete_seconds": "58.126",
+          "unobserved_usage": null
+        }
+      },
+      "cost_scenarios_usd": {
+        "observed_uptime_plus_full_allowances_not_a_cost_bound": "4.370870155169444435131944444",
+        "whole_lifetime_plus_full_allowances": "4.384169444444444444444444444",
+        "undiscounted_compute_hourly": "0.37",
+        "spot_ipv4_hourly": "0.0025",
+        "disk_100gib_24hours": "0.328800",
+        "egress_2gib_at_0_30": "0.6",
+        "original_other_reserve": "3.2"
+      },
+      "held_before_usd": 5,
+      "billed_usd": null
+    },
+    {
+      "vm": "05",
+      "instance_id": "1627891813360280286",
+      "name": "solvers-r1-20260925-05",
+      "creation_timestamp": "2026-09-25T09:07:13.911-07:00",
+      "launch_attempt": "2026-09-25T16:07:09.8570374+00:00",
+      "delete_completed": "2026-09-25T17:05:35.714153Z",
+      "absence_or_delete_for_envelope": "2026-09-25T17:05:35.714153Z",
+      "deletion_evidence_scope": "Historical preemption and reported name-filtered instance/disk absence; no raw absence-query payload retained here",
+      "created_to_delete_seconds": "3501.803153",
+      "rounded_lifetime_envelope_seconds": 3506,
+      "metrics": {
+        "sent": {
+          "points": 58,
+          "observed_sum": "24119782",
+          "first_start": "2026-09-25T16:07:00.001Z",
+          "last_end": "2026-09-25T17:05:00Z",
+          "internal_gaps_over_1ms": [],
+          "created_to_first_seconds": "0",
+          "last_to_delete_seconds": "35.714153",
+          "unobserved_usage": null
+        },
+        "uptime": {
+          "points": 58,
+          "observed_sum": "3438.635111999999935",
+          "first_start": "2026-09-25T16:07:00.001Z",
+          "last_end": "2026-09-25T17:05:00Z",
+          "internal_gaps_over_1ms": [],
+          "created_to_first_seconds": "0",
+          "last_to_delete_seconds": "35.714153",
+          "unobserved_usage": null
+        }
+      },
+      "cost_scenarios_usd": {
+        "observed_uptime_plus_full_allowances_not_a_cost_bound": "4.484603216449999993274305556",
+        "whole_lifetime_plus_full_allowances": "4.491573611111111111111111111",
+        "undiscounted_compute_hourly": "0.37",
+        "spot_ipv4_hourly": "0.0025",
+        "disk_100gib_24hours": "0.328800",
+        "egress_2gib_at_0_30": "0.6",
+        "original_other_reserve": "3.2"
+      },
+      "held_before_usd": 5,
+      "billed_usd": null
+    },
+    {
+      "vm": "06",
+      "instance_id": "5209515640504390740",
+      "name": "solvers-r1-20260925-06",
+      "creation_timestamp": "2026-09-25T10:09:15.956-07:00",
+      "launch_attempt": "2026-09-25T17:09:11.6651305+00:00",
+      "delete_completed": "2026-09-25T11:39:47.045-07:00",
+      "absence_or_delete_for_envelope": "2026-09-25T18:40:38.6204118+00:00",
+      "deletion_evidence_scope": "Retained delete operation DONE plus later name-filtered empty resource reconciliation",
+      "created_to_delete_seconds": "5431.089",
+      "rounded_lifetime_envelope_seconds": 5487,
+      "metrics": {
+        "sent": {
+          "points": 88,
+          "observed_sum": "71803661",
+          "first_start": "2026-09-25T17:09:00.001Z",
+          "last_end": "2026-09-25T18:39:00Z",
+          "internal_gaps_over_1ms": [
+            {
+              "from": "2026-09-25T17:31:00Z",
+              "to": "2026-09-25T17:33:00.001Z",
+              "seconds": "120.001",
+              "missing_usage": null
+            }
+          ],
+          "created_to_first_seconds": "0",
+          "last_to_delete_seconds": "47.045",
+          "unobserved_usage": null
+        },
+        "uptime": {
+          "points": 87,
+          "observed_sum": "5103.3472189999999178",
+          "first_start": "2026-09-25T17:09:00.001Z",
+          "last_end": "2026-09-25T18:39:00Z",
+          "internal_gaps_over_1ms": [
+            {
+              "from": "2026-09-25T17:21:00Z",
+              "to": "2026-09-25T17:22:00.001Z",
+              "seconds": "60.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-25T17:31:00Z",
+              "to": "2026-09-25T17:33:00.001Z",
+              "seconds": "120.001",
+              "missing_usage": null
+            }
+          ],
+          "created_to_first_seconds": "0",
+          "last_to_delete_seconds": "47.045",
+          "unobserved_usage": null
+        }
+      },
+      "cost_scenarios_usd": {
+        "observed_uptime_plus_full_allowances_not_a_cost_bound": "4.656854677521527769272361111",
+        "whole_lifetime_plus_full_allowances": "4.696552083333333333333333334",
+        "undiscounted_compute_hourly": "0.37",
+        "spot_ipv4_hourly": "0.0025",
+        "disk_100gib_24hours": "0.328800",
+        "egress_2gib_at_0_30": "0.6",
+        "original_other_reserve": "3.2"
+      },
+      "held_before_usd": 5,
+      "billed_usd": null
+    },
+    {
+      "vm": "07",
+      "instance_id": "841167209049583155",
+      "name": "solvers-r1-20260925-07",
+      "creation_timestamp": "2026-09-25T12:51:56.533-07:00",
+      "launch_attempt": "2026-09-25T19:51:53.1277105+00:00",
+      "delete_completed": "2026-09-25T13:32:24.560-07:00",
+      "absence_or_delete_for_envelope": "2026-09-25T20:34:35.914890+00:00",
+      "deletion_evidence_scope": "Retained delete operation DONE plus later name-filtered empty resource reconciliation",
+      "created_to_delete_seconds": "2428.027",
+      "rounded_lifetime_envelope_seconds": 2563,
+      "metrics": {
+        "sent": {
+          "points": 41,
+          "observed_sum": "52365773",
+          "first_start": "2026-09-25T19:52:00.001Z",
+          "last_end": "2026-09-25T20:33:00Z",
+          "internal_gaps_over_1ms": [],
+          "created_to_first_seconds": "3.468",
+          "last_to_delete_seconds": "0",
+          "unobserved_usage": null
+        },
+        "uptime": {
+          "points": 41,
+          "observed_sum": "2406.596192999999860",
+          "first_start": "2026-09-25T19:52:00.001Z",
+          "last_end": "2026-09-25T20:33:00Z",
+          "internal_gaps_over_1ms": [],
+          "created_to_first_seconds": "3.468",
+          "last_to_delete_seconds": "0",
+          "unobserved_usage": null
+        }
+      },
+      "cost_scenarios_usd": {
+        "observed_uptime_plus_full_allowances_not_a_cost_bound": "4.077815856081249985513888889",
+        "whole_lifetime_plus_full_allowances": "4.093999305555555555555555556",
+        "undiscounted_compute_hourly": "0.37",
+        "spot_ipv4_hourly": "0.0025",
+        "disk_100gib_24hours": "0.328800",
+        "egress_2gib_at_0_30": "0.6",
+        "original_other_reserve": "2.9"
+      },
+      "held_before_usd": 5,
+      "billed_usd": null
+    }
+  ],
+  "totals": {
+    "observed_sent_bytes": "149960905",
+    "observed_uptime_seconds": "13288.0484799999996228",
+    "rounded_lifetime_envelope_seconds": 14024,
+    "observed_uptime_plus_full_allowances_usd_not_a_cost_bound": "17.59014390522222218319250000",
+    "whole_lifetime_plus_full_allowances_usd": "17.66629444444444444444444445",
+    "original_other_reserves_usd": "12.5",
+    "held_before_usd": "20",
+    "modeled_difference_usd": "2.33370555555555555555555555",
+    "illustrative_round_up_hold_usd": "18",
+    "illustrative_restoration_usd": "2"
+  },
+  "actual_billed_usd": null,
+  "guaranteed_cost_ceiling_usd": null,
+  "budget_changed": false,
+  "assumptions": [
+    "Whole launch-attempt-to-absence/delete duration uses undiscounted rounded0.37USD/h; no STOP subtraction or Spot discount",
+    "Each100GiB disk retains24h cost although deletion is already observed",
+    "Each VM retains2GiB egress allowance at0.30USD/GiB, much larger than observed traffic; unobserved bytes remain unknown",
+    "Original other reserves3.2/3.2/3.2/2.9USD remain intact for taxes,FX,delay and other uncertainty",
+    "No free-tier/promotional credits or assumed actual invoice reductions are used; this is a user-authorized usage estimate, not an invoice or rigorous upper bound"
+  ],
+  "pricing": {
+    "compute_official_url": "https://cloud.google.com/products/compute/pricing/general-purpose",
+    "e2_highmem_8_iowa_on_demand_usd_hour": "0.36159864",
+    "compute_confirmation": "Official page checked through web search2026-09-27; tool-visible table, not a retained full HTML response",
+    "disk_network_fresh_reference": "../preflight-vm14/pricing-sources.json",
+    "rounded_rates_source": "inputs/budget.json"
+  },
+  "reference_evidence": {
+    "preflight-vm14/pricing-sources.json": {
+      "bytes": 4730,
+      "sha256": "9c7b5c6521022dcac2baea9e1dca91ce91ed6b5028f4f7077cd524ddf632164f"
+    },
+    "usage-reconcile-20260927/inventory-check.json": {
+      "bytes": 2470,
+      "sha256": "386cf95de2b7137568649341cbdd42ebdb7966f997f00285d78c19e88570a112"
+    },
+    "cost-audit-20260925/audit.json": {
+      "bytes": 15512,
+      "sha256": "90b6b49e3e22fa74dd5c114fa085d6c539289a76dc2f2c68f7e4e3130ce0b2da"
+    }
+  },
+  "analysis_source": {
+    "bytes": 10505,
+    "sha256": "51dfed0bec65f3a9090ae08f406b24072d05f92738fac93b268e3d2d07eba254"
+  }
+}

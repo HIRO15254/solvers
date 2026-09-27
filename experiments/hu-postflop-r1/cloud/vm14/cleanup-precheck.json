@@ -1,0 +1,30 @@
+{
+  "at": "2026-09-27T03:24:23.213440+00:00",
+  "instance_id": "5878531675315846175",
+  "disk_id": "2888214305257634847",
+  "instance": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260927-14",
+  "disk": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260927-14",
+  "explicit_delete_only_these_resources": true,
+  "original_proof_captured_and_download_hash_verified": true,
+  "experiment_complete": false,
+  "narrow_descriptive_verified": true,
+  "service_terminal_evidence": "analyze-recovery02.stderr.log",
+  "inputs": {
+    "cleanup-instance-before01.stdout.log": {
+      "bytes": 30955,
+      "sha256": "d39bd99fcb4564e77a35f6a2a73368d9a10c73f79778371905b8208352318b63"
+    },
+    "cleanup-disk-before01.stdout.log": {
+      "bytes": 634,
+      "sha256": "07d67a75dab74c8325e33f429558e193072eda681dd77bbf1b085e0a5f2cfd36"
+    },
+    "download-check.json": {
+      "bytes": 911,
+      "sha256": "938c5c0d19fe0668d98ce2349e2f05904192bf23f47493595893dce7527f2239"
+    },
+    "flop-flat-cloud32-partial-analysis02.json": {
+      "bytes": 36065,
+      "sha256": "29d586b090e47f3baadb00154f318962a03f43ac6dfa6a24eebdbd8dfb81ce95"
+    }
+  }
+}

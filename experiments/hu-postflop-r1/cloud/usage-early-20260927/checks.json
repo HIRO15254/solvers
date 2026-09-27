@@ -1,0 +1,69 @@
+{
+  "schema": "r1.early-usage-local-check/v1",
+  "started_at": "2026-09-27T03:11:39.386717+00:00",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\usage-early-20260927\\analyze.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.14124180004000664,
+  "source_before": {
+    "collect.py": {
+      "bytes": 6906,
+      "sha256": "a5c17833f9fdd36b82fa0ba90e66b04a400beda6b69291cd83d4d051ec344294"
+    },
+    "analyze.py": {
+      "bytes": 10505,
+      "sha256": "51dfed0bec65f3a9090ae08f406b24072d05f92738fac93b268e3d2d07eba254"
+    },
+    "README.md": {
+      "bytes": 4465,
+      "sha256": "dd3219f9b89a1839c157969c09e52be3a25ff938c6512351e930914019039049"
+    },
+    "acquisition.json": {
+      "bytes": 12210,
+      "sha256": "8695f84f478da1f655eaebb9d2061a289875d2b3afd78b76419caac3c8717272"
+    }
+  },
+  "source_after": {
+    "collect.py": {
+      "bytes": 6906,
+      "sha256": "a5c17833f9fdd36b82fa0ba90e66b04a400beda6b69291cd83d4d051ec344294"
+    },
+    "analyze.py": {
+      "bytes": 10505,
+      "sha256": "51dfed0bec65f3a9090ae08f406b24072d05f92738fac93b268e3d2d07eba254"
+    },
+    "README.md": {
+      "bytes": 4465,
+      "sha256": "dd3219f9b89a1839c157969c09e52be3a25ff938c6512351e930914019039049"
+    },
+    "acquisition.json": {
+      "bytes": 12210,
+      "sha256": "8695f84f478da1f655eaebb9d2061a289875d2b3afd78b76419caac3c8717272"
+    }
+  },
+  "checked": [
+    "all eight retained HTTP response hashes and original input hashes through analyze.py",
+    "four matching instance identities, launch machine types and disk definitions",
+    "DELTA metric interval uniqueness, labels, types, units, nonnegative values and gaps",
+    "independent sum of observed sent bytes and lifetime seconds",
+    "independent whole-lifetime arithmetic; missing and invoice values remain null"
+  ],
+  "outputs": {
+    "report.json": {
+      "bytes": 11030,
+      "sha256": "36b445c0bf1f331ca2e9294951a0acd17fe03b9e8f75aa1bdbaeb5fa360036c2"
+    },
+    "analysis.stdout.log": {
+      "bytes": 780,
+      "sha256": "146eaf25d286558d59c41d8971e19346599fbbaed0b4380b6dd0bae55e2b8c8e"
+    },
+    "analysis.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "scope": "lightweight retained metadata and Monitoring JSON only; no new API call, build or solve"
+}

@@ -1,0 +1,257 @@
+{
+  "schema": "r1.early-usage-acquisition/v1",
+  "started_at": "2026-09-27T03:04:59.362880Z",
+  "project": "solvers-abstraction-20260723",
+  "interval_start": "2026-09-25T15:00:00Z",
+  "inputs": {
+    "budget.json": {
+      "path": "inputs/budget.json",
+      "bytes": 53479,
+      "sha256": "879d774903285cc61f6d71591e4fa7ba9559063190d22eaa8bb5d66621e75701"
+    },
+    "create-result-r1-20260925-02.json": {
+      "path": "inputs/create-result-r1-20260925-02.json",
+      "bytes": 634,
+      "sha256": "5fa2c0941bb4541815577e09821dfe97abd6da1550485c1ceb762191ac8e4698"
+    },
+    "launch-r1-20260925-02.json": {
+      "path": "inputs/launch-r1-20260925-02.json",
+      "bytes": 1093,
+      "sha256": "3620de30de7232e4eeb03825db887e080755056d71fd7f91a09f01ea65af8f57"
+    },
+    "preempted-02.json": {
+      "path": "inputs/preempted-02.json",
+      "bytes": 610,
+      "sha256": "245b31bcdb390ad0166293b61bbb6e52b8417cd3d49c27ee178a9440523f250f"
+    },
+    "create-result-r1-20260925-05.json": {
+      "path": "inputs/create-result-r1-20260925-05.json",
+      "bytes": 737,
+      "sha256": "60ef8479412072ef14d29dd27d5c9244876051ef2f4651ce82976444b7035603"
+    },
+    "launch-r1-20260925-05.json": {
+      "path": "inputs/launch-r1-20260925-05.json",
+      "bytes": 1093,
+      "sha256": "34e72d10559a1a6dcf5165541b5b4423176e38bcf34794a1ae87269d9d4d61ce"
+    },
+    "preempted-05.json": {
+      "path": "inputs/preempted-05.json",
+      "bytes": 7246,
+      "sha256": "e2f74e8534a423baf02d7053c337de9c6e2cc784917287c80339ff87c1af9eef"
+    },
+    "create-result-r1-20260925-06.json": {
+      "path": "inputs/create-result-r1-20260925-06.json",
+      "bytes": 735,
+      "sha256": "eaa050d79f4f3d696f11cbf4dd279a4e31d43adc6042dd3eebaa33b50003b253"
+    },
+    "launch-r1-20260925-06.json": {
+      "path": "inputs/launch-r1-20260925-06.json",
+      "bytes": 1091,
+      "sha256": "a6560bf77fd21d4089f3b7d2fcd64fb3469a4de66c90b49e44a2fa3b41877f64"
+    },
+    "cleanup-vm06/operations.json": {
+      "path": "inputs/cleanup-vm06/operations.json",
+      "bytes": 485,
+      "sha256": "4ade5a438f501da78d2cad3715c46a98d9315cd4c66894cf77d0c1297a5250e0"
+    },
+    "cleanup-vm06/reconciliation.json": {
+      "path": "inputs/cleanup-vm06/reconciliation.json",
+      "bytes": 343,
+      "sha256": "5307789b96ce0a32b00830e7732cef7dc80a83ddd3eac2c8134a41d77b4ecb0f"
+    },
+    "create-result-r1-20260925-07.json": {
+      "path": "inputs/create-result-r1-20260925-07.json",
+      "bytes": 30180,
+      "sha256": "611ca7b526eb5e10acf268acd7ba45aa2a95615fac67f579069a1b0518c41ab4"
+    },
+    "launch-r1-20260925-07.json": {
+      "path": "inputs/launch-r1-20260925-07.json",
+      "bytes": 1091,
+      "sha256": "32bc441fbe6a45bb53d12b455a79ab36fcbf72b63b3db47ea4bb524fe5fecaad"
+    },
+    "cleanup-vm07/operations.json": {
+      "path": "inputs/cleanup-vm07/operations.json",
+      "bytes": 904,
+      "sha256": "9dac1c27c6c0072b2e8c1fefefae7ab8758e1d004c15670a15eb4c4a8813354a"
+    },
+    "cleanup-vm07/reconciliation.json": {
+      "path": "inputs/cleanup-vm07/reconciliation.json",
+      "bytes": 544,
+      "sha256": "4a69df1dcee04cd3e9e5df26880aa6158e561593cf937dba10a693cee43342d3"
+    }
+  },
+  "requests": [
+    {
+      "vm": "02",
+      "instance_id": "7774326211091312507",
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "page": 0,
+      "requested_at": "2026-09-27T03:05:00.826594Z",
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fnetwork%2Fsent_bytes_count%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%227774326211091312507%22&interval.startTime=2026-09-25T15%3A00%3A00Z&interval.endTime=2026-09-27T03%3A04%3A59.362880Z&view=FULL&pageSize=1000",
+      "http_status": 200,
+      "completed_at": "2026-09-27T03:05:01.427049Z",
+      "response": {
+        "path": "vm02-sent-00.json",
+        "bytes": 9305,
+        "sha256": "13e0a42f770dc5267131c14402bbea5d6485ca0dbd6d668984825c421285dd78"
+      },
+      "point_count": 39
+    },
+    {
+      "vm": "02",
+      "instance_id": "7774326211091312507",
+      "metric": "compute.googleapis.com/instance/uptime",
+      "page": 0,
+      "requested_at": "2026-09-27T03:05:01.427874Z",
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fuptime%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%227774326211091312507%22&interval.startTime=2026-09-25T15%3A00%3A00Z&interval.endTime=2026-09-27T03%3A04%3A59.362880Z&view=FULL&pageSize=1000",
+      "http_status": 200,
+      "completed_at": "2026-09-27T03:05:02.321616Z",
+      "response": {
+        "path": "vm02-uptime-00.json",
+        "bytes": 9506,
+        "sha256": "e14728e6f2ee812776415eebed2d441a7b6699a7eba9646c354d72bedb97e43d"
+      },
+      "point_count": 40
+    },
+    {
+      "vm": "05",
+      "instance_id": "1627891813360280286",
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "page": 0,
+      "requested_at": "2026-09-27T03:05:02.323129Z",
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fnetwork%2Fsent_bytes_count%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%221627891813360280286%22&interval.startTime=2026-09-25T15%3A00%3A00Z&interval.endTime=2026-09-27T03%3A04%3A59.362880Z&view=FULL&pageSize=1000",
+      "http_status": 200,
+      "completed_at": "2026-09-27T03:05:02.858645Z",
+      "response": {
+        "path": "vm05-sent-00.json",
+        "bytes": 13540,
+        "sha256": "68e95a9e3cd70cf21a8aecf702c6c87964b37903e5de283820a7665a1e97a1ee"
+      },
+      "point_count": 58
+    },
+    {
+      "vm": "05",
+      "instance_id": "1627891813360280286",
+      "metric": "compute.googleapis.com/instance/uptime",
+      "page": 0,
+      "requested_at": "2026-09-27T03:05:02.859747Z",
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fuptime%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%221627891813360280286%22&interval.startTime=2026-09-25T15%3A00%3A00Z&interval.endTime=2026-09-27T03%3A04%3A59.362880Z&view=FULL&pageSize=1000",
+      "http_status": 200,
+      "completed_at": "2026-09-27T03:05:03.349635Z",
+      "response": {
+        "path": "vm05-uptime-00.json",
+        "bytes": 13563,
+        "sha256": "55fae0502cc1074b7baa035f8797f3242eb9706cc8bc4960ea23c223044b92fa"
+      },
+      "point_count": 58
+    },
+    {
+      "vm": "06",
+      "instance_id": "5209515640504390740",
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "page": 0,
+      "requested_at": "2026-09-27T03:05:03.351048Z",
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fnetwork%2Fsent_bytes_count%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%225209515640504390740%22&interval.startTime=2026-09-25T15%3A00%3A00Z&interval.endTime=2026-09-27T03%3A04%3A59.362880Z&view=FULL&pageSize=1000",
+      "http_status": 200,
+      "completed_at": "2026-09-27T03:05:03.807207Z",
+      "response": {
+        "path": "vm06-sent-00.json",
+        "bytes": 20231,
+        "sha256": "e1e9c6c453e2d3ceea86318f6c868e51e3a0ec0a51c673cc677da3f5159b345c"
+      },
+      "point_count": 88
+    },
+    {
+      "vm": "06",
+      "instance_id": "5209515640504390740",
+      "metric": "compute.googleapis.com/instance/uptime",
+      "page": 0,
+      "requested_at": "2026-09-27T03:05:03.808312Z",
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fuptime%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%225209515640504390740%22&interval.startTime=2026-09-25T15%3A00%3A00Z&interval.endTime=2026-09-27T03%3A04%3A59.362880Z&view=FULL&pageSize=1000",
+      "http_status": 200,
+      "completed_at": "2026-09-27T03:05:04.491682Z",
+      "response": {
+        "path": "vm06-uptime-00.json",
+        "bytes": 20277,
+        "sha256": "1597eddc777198b856ee8440ec5e2e7a121511cb82a17aa70c8b8c9ed8f19b33"
+      },
+      "point_count": 87
+    },
+    {
+      "vm": "07",
+      "instance_id": "841167209049583155",
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "page": 0,
+      "requested_at": "2026-09-27T03:05:04.493158Z",
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fnetwork%2Fsent_bytes_count%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%22841167209049583155%22&interval.startTime=2026-09-25T15%3A00%3A00Z&interval.endTime=2026-09-27T03%3A04%3A59.362880Z&view=FULL&pageSize=1000",
+      "http_status": 200,
+      "completed_at": "2026-09-27T03:05:05.005816Z",
+      "response": {
+        "path": "vm07-sent-00.json",
+        "bytes": 9757,
+        "sha256": "39f2ebb7c47f0a4599498d1b30816bf72faa6ab7a5152512bd8b2fc8d3ba1cae"
+      },
+      "point_count": 41
+    },
+    {
+      "vm": "07",
+      "instance_id": "841167209049583155",
+      "metric": "compute.googleapis.com/instance/uptime",
+      "page": 0,
+      "requested_at": "2026-09-27T03:05:05.006743Z",
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fuptime%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%22841167209049583155%22&interval.startTime=2026-09-25T15%3A00%3A00Z&interval.endTime=2026-09-27T03%3A04%3A59.362880Z&view=FULL&pageSize=1000",
+      "http_status": 200,
+      "completed_at": "2026-09-27T03:05:05.469045Z",
+      "response": {
+        "path": "vm07-uptime-00.json",
+        "bytes": 9869,
+        "sha256": "5cbdcadf92fe1728637a92fa913ec89eb4c03672731c44b7d5fcd1886fad0a13"
+      },
+      "point_count": 41
+    }
+  ],
+  "instances": {
+    "02": {
+      "instance_id": "7774326211091312507",
+      "name": "solvers-r1-20260925-02",
+      "creation_timestamp": "2026-09-26T00:21:57.044+09:00"
+    },
+    "05": {
+      "instance_id": "1627891813360280286",
+      "name": "solvers-r1-20260925-05",
+      "creation_timestamp": "2026-09-25T09:07:13.911-07:00"
+    },
+    "06": {
+      "instance_id": "5209515640504390740",
+      "name": "solvers-r1-20260925-06",
+      "creation_timestamp": "2026-09-25T10:09:15.956-07:00"
+    },
+    "07": {
+      "instance_id": "841167209049583155",
+      "name": "solvers-r1-20260925-07",
+      "creation_timestamp": "2026-09-25T12:51:56.533-07:00"
+    }
+  },
+  "source": {
+    "bytes": 6906,
+    "sha256": "a5c17833f9fdd36b82fa0ba90e66b04a400beda6b69291cd83d4d051ec344294"
+  },
+  "cloud_mutations": false,
+  "credential_material_retained": false,
+  "status": "completed",
+  "interval_end": "2026-09-27T03:04:59.362880Z",
+  "authentication": {
+    "method": "existing gcloud auth print-access-token",
+    "returncode": 0,
+    "stderr_bytes": 0
+  },
+  "ended_at": "2026-09-27T03:05:05.470059Z"
+}

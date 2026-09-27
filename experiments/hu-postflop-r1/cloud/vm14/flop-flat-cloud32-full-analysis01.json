@@ -1,0 +1,21 @@
+{
+  "schema": "r1.flat-ev-cloud32-analysis/v1",
+  "status": "not_evaluable",
+  "payload_integrity": "not_verified",
+  "guard": {
+    "decision": "not_evaluable"
+  },
+  "counts": {},
+  "limitations": [
+    "Fixed iterations on two typed Flop fixtures; no convergence target, external certification, or whole-R1 acceptance.",
+    "Quality timer covers seven public value traversals as one interval; individual walk times are unavailable.",
+    "RSS is Linux wait4 ru_maxrss for the root process, not a simultaneous physical-memory or process-tree peak.",
+    "Each retained canonical gzip is fully rehashed. Removed duplicate bytes cannot be replayed; their equality is the pinned runner's pre-removal byte-comparison receipt.",
+    "Guard passage permits considering adoption; production checks remain required. Background workload is not isolated."
+  ],
+  "error": "[Errno 2] No such file or directory: '/opt/r1/flop-flat-cloud32-proof01/recovery-manifest.json'",
+  "analyzer": {
+    "bytes": 31087,
+    "sha256": "6293275ea6b04530f2d1674cb1d50c1522834b0e56d60952510866d3a2458862"
+  }
+}

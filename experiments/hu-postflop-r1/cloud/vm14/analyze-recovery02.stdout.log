@@ -1,0 +1,7 @@
+/tmp/analyze-interrupted02.sh: OK
+/tmp/analyze.py: OK
+/tmp/partial.py: OK
+{"status": "not_evaluable", "guard": "not_evaluable", "out": "/tmp/flop-flat-cloud32-full-analysis02.json"}
+{"status": "verified_descriptive_partial", "out": "/tmp/flop-flat-cloud32-partial-analysis02.json"}
+full_exit=2
+partial_exit=0

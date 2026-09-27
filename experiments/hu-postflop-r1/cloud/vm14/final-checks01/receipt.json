@@ -1,0 +1,78 @@
+{
+  "scope": "Pure Python and document checks only. All native/solver execution was cloud-side; no normal production code changed.",
+  "checks": [
+    {
+      "name": "cloud32-pure",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.3299286998808384
+    },
+    {
+      "name": "docs",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.16602010000497103
+    }
+  ],
+  "source_pins": {
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/analyze.py": {
+      "bytes": 31153,
+      "sha256": "098375aa70c6e854882fba7b2e5b49fe01a146203c5b84cc793fd0222ebcac1e"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/install.py": {
+      "bytes": 4088,
+      "sha256": "78b215676b59a39af7f50ed08b5437ccc847d1657a8b15237a3b0397b9f37d8c"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/pack.py": {
+      "bytes": 3995,
+      "sha256": "df3e95c3e5190ca36303f784fcbaada66c34c072aa7949dc226225d5685ad245"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/partial.py": {
+      "bytes": 14793,
+      "sha256": "cf8b6c62cc66130673f2a7ace977001487cff348626c2072ea0e4a9ea2d9e475"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/prepare.py": {
+      "bytes": 2959,
+      "sha256": "2cf605efbb26368e718d3cc6027dbcffc5d96c58a232cb7436f375173832e3ac"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/runner.py": {
+      "bytes": 28935,
+      "sha256": "ec9812da13884ea255699bd9c1af04ba82a77d00701d4edd01121604ca73cafe"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/test_analyze.py": {
+      "bytes": 9282,
+      "sha256": "dd2ea0385437a35c70eb4797ae6fbb02b772a9bd2e96a52cb1949a553a4a63a2"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/test_install.py": {
+      "bytes": 4424,
+      "sha256": "65573601c3ecf504b8c1c270e3e5ef52add039c58f87250c98ab0c1c5fef5df5"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/test_partial.py": {
+      "bytes": 4874,
+      "sha256": "f974a1e02b1de13f5bdd0ed0b506a0a3302af77cea1b30624dd5417b9877969c"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/test_runner.py": {
+      "bytes": 5377,
+      "sha256": "88a3b5075aaef45f172194d713becad1c3622a0813b34e7ff28267ec6a21ce56"
+    }
+  }
+}

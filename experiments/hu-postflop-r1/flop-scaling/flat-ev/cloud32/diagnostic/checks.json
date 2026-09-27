@@ -1,0 +1,54 @@
+{
+  "schema": "r1.flat-ev-cpu-adapter-static-check/v1",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\diagnostic",
+    "-p",
+    "test_prepare.py",
+    "-v"
+  ],
+  "started_at": "2026-09-27T03:03:40.828847+00:00",
+  "ended_at": "2026-09-27T03:03:40.975767+00:00",
+  "elapsed_seconds": 0.14691870007663965,
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "test_cpu_brackets_original_work_without_extra_solver_calls (test_prepare.CpuAdapterTests.test_cpu_brackets_original_work_without_extra_solver_calls) ... ok\r\ntest_exact_pins_and_inverse (test_prepare.CpuAdapterTests.test_exact_pins_and_inverse) ... ok\r\ntest_fixture_state_writer_and_original_quality_serialization_unchanged (test_prepare.CpuAdapterTests.test_fixture_state_writer_and_original_quality_serialization_unchanged) ... ok\r\ntest_unrelated_source_and_generated_solver_mutations_rejected (test_prepare.CpuAdapterTests.test_unrelated_source_and_generated_solver_mutations_rejected) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 4 tests in 0.002s\r\n\r\nOK\r\n",
+  "files": {
+    "prepare.py": {
+      "bytes": 5504,
+      "sha256": "bd3f4297c9553d9ae9d94d6887c2cdb51f218ff5b48d4fe9428719f2480c6bf3"
+    },
+    "cpu_clock.rs.inc": {
+      "bytes": 1821,
+      "sha256": "5d58c11e1b31c1f0e0d51d8a49aa96d27ff224e77feb746ddae16f8094ac1ceb"
+    },
+    "solve.rs": {
+      "bytes": 14350,
+      "sha256": "4605b8d753dc42e5e7136b2a46c7695386c6e2b29b13a85129b39cf64193cf18"
+    },
+    "adapter.patch": {
+      "bytes": 6317,
+      "sha256": "9cfad5115253ba29d8f3db29cdb4b57603ffe25bc3186b6984a69130a35750a2"
+    },
+    "provenance.json": {
+      "bytes": 916,
+      "sha256": "bc2a709e2857d7faa9cda408bcb7ef02b60115a57e21e25fa923d87c3587d29b"
+    },
+    "test_prepare.py": {
+      "bytes": 3543,
+      "sha256": "5055dab4c5703173ae2f0b2f7807d8e231a36e28515c116020e15252303a9f8d"
+    },
+    "README.jp.md": {
+      "bytes": 5128,
+      "sha256": "15bbc69ac939f8327df7be510a2df5051d362b9c842dab7b8c61264052ad1327"
+    }
+  },
+  "native_compiled": false,
+  "native_executed": false,
+  "scope": "Pure Python source/pin/inverse checks only; no native clock calibration or solver run"
+}

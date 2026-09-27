@@ -1,0 +1,25 @@
+{
+  "status": "downloaded_archive_stream_hash_verified",
+  "bytes": 120465345,
+  "sha256": "aba377403025a7935e57faef68905f52245ca203b88e15076210c6cef635afe6",
+  "parts": [
+    {
+      "path": "flop-flat-cloud32-proof01.part00",
+      "bytes": 50331648,
+      "sha256": "1e2f56c8457ed633232e19c67550616ff35dad1323c8fbf301fc260626775ea6"
+    },
+    {
+      "path": "flop-flat-cloud32-proof01.part01",
+      "bytes": 50331648,
+      "sha256": "2f550f17834e31ff2e2395fd4f9585f6bde0dd26e20feecbf80fed8f4a79628a"
+    },
+    {
+      "path": "flop-flat-cloud32-proof01.part02",
+      "bytes": 19802049,
+      "sha256": "8a12c7072b9f8a80b4ebc9cfcdbf4542ddc4a54f45020022b0376672cec8586d"
+    }
+  ],
+  "elapsed_seconds": 0.6733158000279218,
+  "local_archive_decompression": false,
+  "scope": "Transfer integrity of captured-after-restart archive only; no preemption completeness or solve claim"
+}

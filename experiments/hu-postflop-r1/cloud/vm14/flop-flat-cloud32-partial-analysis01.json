@@ -1,0 +1,24 @@
+{
+  "schema": "r1.flat-ev-cloud32-narrow-partial/v1",
+  "status": "not_evaluable",
+  "recovered_payload_integrity": "verified",
+  "full_matrix_complete": false,
+  "limitations": [
+    "The fixed 96-condition campaign was interrupted. This is only the predeclared complete narrow block; expanded has recorded completion counts only.",
+    "Recovery-manifest hashes establish bytes captured after restart, not the pre-interruption completeness of unflushed pages. Original JSON must parse strictly and each earlier stage/output pin must still match.",
+    "The original stale retained.json is preserved only. The reader's in-memory payload index comes from the separate recovery manifest; no original file is rewritten.",
+    "No damaged metadata is reconstructed from logs. No samples are replaced, selected by speed, or combined across boots.",
+    "CPU topology/boot are the recorded measurement host, not the restarted recovery host. All 48 narrow stage identities must match the original host.",
+    "Each retained canonical is fully rehashed. Deleted duplicate state equality relies on the pinned runner's original full-byte comparison receipts.",
+    "Quality timing aggregates seven public value walks. RSS is the root-process Linux wait4 counter, not a simultaneous physical/process-tree peak.",
+    "These fixed-iteration typed-fixture results are descriptive only and do not establish external reference accuracy or whole-R1 completion."
+  ],
+  "error": "supervisor terminal/cleanup differs",
+  "reader": {
+    "bytes": 14793,
+    "sha256": "bb14c58cfa6b3653c99c5adcf4a91387705c2d47ba1a5652785f650557d595d3"
+  },
+  "trusted_analyzer": {
+    "sha256": "6293275ea6b04530f2d1674cb1d50c1522834b0e56d60952510866d3a2458862"
+  }
+}

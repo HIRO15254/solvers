@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-14",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:Lcj/zOzHlkM1lSwfGsxJMh4gSF+TpYUx/LCVTD5E/LI",
+    "--command=test ! -e /tmp/flop-flat-cloud32-proof01.part00 && split --bytes=48M --numeric-suffixes=0 --suffix-length=2 /tmp/flop-flat-cloud32-proof01.tar.gz /tmp/flop-flat-cloud32-proof01.part && cat /tmp/flop-flat-cloud32-proof01.part?? | cmp /tmp/flop-flat-cloud32-proof01.tar.gz - && sha256sum /tmp/flop-flat-cloud32-proof01.part?? > /tmp/flop-flat-cloud32-proof01.parts.sha256 && cat /tmp/flop-flat-cloud32-proof01.parts.sha256"
+  ],
+  "started_utc": "2026-09-27T03:12:38.355364+00:00",
+  "timeout_seconds": 90,
+  "stdout": {
+    "bytes": 312,
+    "sha256": "6c4cd81fc78246fd4ef906c42a24e9b405f317cc8a2db7a7d41a2b3f6adb7b76"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T03:12:44.831835+00:00"
+}

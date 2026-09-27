@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-14",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:Lcj/zOzHlkM1lSwfGsxJMh4gSF+TpYUx/LCVTD5E/LI",
+    "--command=printf \"%s\\n\" \"1bc1f34dcdfb111bc027262f15d0bd49fc4edd3baafe107084cbf5cb2046b4ca  /tmp/recover-interrupted.sh\" | sha256sum -c - && bash -n /tmp/recover-interrupted.sh && sudo systemd-run --unit=solvers-r1-vm14-recovery --wait --pipe --property=RuntimeMaxSec=300 --property=MemoryMax=2G --property=MemorySwapMax=0 --property=KillMode=control-group /bin/bash /tmp/recover-interrupted.sh"
+  ],
+  "started_utc": "2026-09-27T03:10:55.412656+00:00",
+  "timeout_seconds": 360
+}

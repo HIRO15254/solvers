@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "experiments/hu-postflop-r1/cloud/vm14/recover-interrupted.sh",
+    "solvers-r1-20260927-14:/tmp/",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--scp-flag=-batch",
+    "--scp-flag=-hostkey",
+    "--scp-flag=SHA256:Lcj/zOzHlkM1lSwfGsxJMh4gSF+TpYUx/LCVTD5E/LI"
+  ],
+  "started_utc": "2026-09-27T03:10:23.960877+00:00",
+  "timeout_seconds": 90,
+  "stdout": {
+    "bytes": 140,
+    "sha256": "666ae65ebf09e948add28a73e831360832231bd08f25e98aea2736337b705f07"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T03:10:30.450944+00:00"
+}

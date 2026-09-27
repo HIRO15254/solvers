@@ -1,0 +1,1401 @@
+{
+  "schema": "r1.flat-ev-cloud32-narrow-partial/v1",
+  "status": "verified_descriptive_partial",
+  "recovered_payload_integrity": "verified",
+  "full_matrix_complete": false,
+  "limitations": [
+    "The fixed 96-condition campaign was interrupted. This is only the predeclared complete narrow block; expanded has recorded completion counts only.",
+    "Recovery-manifest hashes establish bytes captured after restart, not the pre-interruption completeness of unflushed pages. Original JSON must parse strictly and each earlier stage/output pin must still match.",
+    "The original stale retained.json is preserved only. The reader's in-memory payload index comes from the separate recovery manifest; no original file is rewritten.",
+    "No damaged metadata is reconstructed from logs. No samples are replaced, selected by speed, or combined across boots.",
+    "CPU topology/boot are the recorded measurement host, not the restarted recovery host. All 48 narrow stage identities must match the original host.",
+    "Each retained canonical is fully rehashed. Deleted duplicate state equality relies on the pinned runner's original full-byte comparison receipts.",
+    "Quality timing aggregates seven public value walks. RSS is the root-process Linux wait4 counter, not a simultaneous physical/process-tree peak.",
+    "These fixed-iteration typed-fixture results are descriptive only and do not establish external reference accuracy or whole-R1 completion."
+  ],
+  "main_receipt_status": "running",
+  "measurement_host": {
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31
+    ],
+    "boot_id": "804cbeaa-05ce-47d0-bbbb-ee4dd5c6914d",
+    "cgroup": {
+      "cpu_limits": {
+        "/sys/fs/cgroup/system.slice": "max 100000",
+        "/sys/fs/cgroup/system.slice/solvers-r1-vm14-flat32.service": "max 100000"
+      },
+      "cpu_weight": "100",
+      "memory_max": "12884901888",
+      "path": "/sys/fs/cgroup/system.slice/solvers-r1-vm14-flat32.service",
+      "swap_max": "0"
+    },
+    "cpu_models": [
+      "Intel(R) Xeon(R) CPU @ 2.20GHz"
+    ],
+    "logical_cpus": 32,
+    "machine": "x86_64",
+    "physical_cores": 16,
+    "topology": [
+      {
+        "core": "0",
+        "cpu": 0,
+        "socket": "0"
+      },
+      {
+        "core": "1",
+        "cpu": 1,
+        "socket": "0"
+      },
+      {
+        "core": "2",
+        "cpu": 2,
+        "socket": "0"
+      },
+      {
+        "core": "3",
+        "cpu": 3,
+        "socket": "0"
+      },
+      {
+        "core": "4",
+        "cpu": 4,
+        "socket": "0"
+      },
+      {
+        "core": "5",
+        "cpu": 5,
+        "socket": "0"
+      },
+      {
+        "core": "6",
+        "cpu": 6,
+        "socket": "0"
+      },
+      {
+        "core": "7",
+        "cpu": 7,
+        "socket": "0"
+      },
+      {
+        "core": "8",
+        "cpu": 8,
+        "socket": "0"
+      },
+      {
+        "core": "9",
+        "cpu": 9,
+        "socket": "0"
+      },
+      {
+        "core": "10",
+        "cpu": 10,
+        "socket": "0"
+      },
+      {
+        "core": "11",
+        "cpu": 11,
+        "socket": "0"
+      },
+      {
+        "core": "12",
+        "cpu": 12,
+        "socket": "0"
+      },
+      {
+        "core": "13",
+        "cpu": 13,
+        "socket": "0"
+      },
+      {
+        "core": "14",
+        "cpu": 14,
+        "socket": "0"
+      },
+      {
+        "core": "15",
+        "cpu": 15,
+        "socket": "0"
+      },
+      {
+        "core": "0",
+        "cpu": 16,
+        "socket": "0"
+      },
+      {
+        "core": "1",
+        "cpu": 17,
+        "socket": "0"
+      },
+      {
+        "core": "2",
+        "cpu": 18,
+        "socket": "0"
+      },
+      {
+        "core": "3",
+        "cpu": 19,
+        "socket": "0"
+      },
+      {
+        "core": "4",
+        "cpu": 20,
+        "socket": "0"
+      },
+      {
+        "core": "5",
+        "cpu": 21,
+        "socket": "0"
+      },
+      {
+        "core": "6",
+        "cpu": 22,
+        "socket": "0"
+      },
+      {
+        "core": "7",
+        "cpu": 23,
+        "socket": "0"
+      },
+      {
+        "core": "8",
+        "cpu": 24,
+        "socket": "0"
+      },
+      {
+        "core": "9",
+        "cpu": 25,
+        "socket": "0"
+      },
+      {
+        "core": "10",
+        "cpu": 26,
+        "socket": "0"
+      },
+      {
+        "core": "11",
+        "cpu": 27,
+        "socket": "0"
+      },
+      {
+        "core": "12",
+        "cpu": 28,
+        "socket": "0"
+      },
+      {
+        "core": "13",
+        "cpu": 29,
+        "socket": "0"
+      },
+      {
+        "core": "14",
+        "cpu": 30,
+        "socket": "0"
+      },
+      {
+        "core": "15",
+        "cpu": 31,
+        "socket": "0"
+      }
+    ]
+  },
+  "counts": {
+    "narrow_fixed": 48,
+    "narrow_warmup_excluded": 12,
+    "narrow_measured": 36,
+    "expanded_expected": 48,
+    "expanded_recorded_status_counts": {
+      "completed": 2,
+      "failed": 0,
+      "pending": 45,
+      "running": 1,
+      "skipped": 0
+    }
+  },
+  "selected_narrow": {
+    "iterations": 16,
+    "cfr_seconds": 8.911749158,
+    "short_timing": false,
+    "stage": "pilot-narrow-16"
+  },
+  "canonical_quality": {
+    "schema": "r1.flop-native-quality/v1",
+    "case": "narrow",
+    "iterations": 16,
+    "root_support": [
+      34,
+      30
+    ],
+    "normalizer_bits": "408b300000000000",
+    "ev": [
+      28.683791991485947,
+      -28.683789202810704
+    ],
+    "ev_bits": [
+      "403caf0cfdf0b2e8",
+      "c03caf0ccf276e0d"
+    ],
+    "br": [
+      66.11887245616694,
+      6.439872654005029
+    ],
+    "br_bits": [
+      "4050879b9b37e876",
+      "4019c26dfa1d6ce0"
+    ],
+    "exploitability": [
+      37.43508046468099,
+      35.123664645490976
+    ],
+    "exploitability_bits": [
+      "4042b7b0b7777778",
+      "40418fd43e3c0710"
+    ],
+    "metric_source": "public expected_value and best_response_value for both seats, then public exploitability",
+    "ev_basis": "solver internal chip utility; no starting-share reporting offset",
+    "quality_target": null,
+    "cfv_capture": false
+  },
+  "groups": [
+    {
+      "case": "narrow",
+      "arm": "baseline",
+      "workers": 1,
+      "iterations": 16,
+      "stages": [
+        "narrow-r1-w1-baseline",
+        "narrow-r2-w1-baseline",
+        "narrow-r3-w1-baseline"
+      ],
+      "metrics": {
+        "cfr_seconds": {
+          "samples": [
+            9.033159987,
+            9.137054662,
+            9.186733368
+          ],
+          "median": 9.137054662,
+          "minimum": 9.033159987,
+          "maximum": 9.186733368,
+          "max_over_min": 1.0170010695283838
+        },
+        "quality_7_walk_seconds": {
+          "samples": [
+            1.645297043,
+            1.663379826,
+            1.690841184
+          ],
+          "median": 1.663379826,
+          "minimum": 1.645297043,
+          "maximum": 1.690841184,
+          "max_over_min": 1.027681409380616
+        },
+        "cfr_plus_quality_seconds": {
+          "samples": [
+            10.678457029999999,
+            10.800434488,
+            10.877574552
+          ],
+          "median": 10.800434488,
+          "minimum": 10.678457029999999,
+          "maximum": 10.877574552,
+          "max_over_min": 1.0186466566696482
+        },
+        "construction_seconds": {
+          "samples": [
+            0.279034213,
+            0.273899994,
+            0.283898966
+          ],
+          "median": 0.279034213,
+          "minimum": 0.273899994,
+          "maximum": 0.283898966,
+          "max_over_min": 1.036505922668987
+        },
+        "state_write_seconds": {
+          "samples": [
+            0.464659887,
+            0.461111136,
+            0.460394755
+          ],
+          "median": 0.461111136,
+          "minimum": 0.460394755,
+          "maximum": 0.464659887,
+          "max_over_min": 1.009264075999302
+        },
+        "whole_process_seconds": {
+          "samples": [
+            11.582010206999996,
+            11.717124549000005,
+            11.792536788999996
+          ],
+          "median": 11.717124549000005,
+          "minimum": 11.582010206999996,
+          "maximum": 11.792536788999996,
+          "max_over_min": 1.018177033022537
+        },
+        "root_os_peak_resident_bytes": {
+          "samples": [
+            182091776,
+            181755904,
+            182075392
+          ],
+          "median": 182075392,
+          "minimum": 181755904,
+          "maximum": 182091776,
+          "max_over_min": 1.0018479289674134
+        }
+      }
+    },
+    {
+      "case": "narrow",
+      "arm": "baseline",
+      "workers": 2,
+      "iterations": 16,
+      "stages": [
+        "narrow-r1-w2-baseline",
+        "narrow-r2-w2-baseline",
+        "narrow-r3-w2-baseline"
+      ],
+      "metrics": {
+        "cfr_seconds": {
+          "samples": [
+            4.888309785,
+            5.117391035,
+            4.992422024
+          ],
+          "median": 4.992422024,
+          "minimum": 4.888309785,
+          "maximum": 5.117391035,
+          "max_over_min": 1.0468630794846403
+        },
+        "quality_7_walk_seconds": {
+          "samples": [
+            0.874444864,
+            0.903534124,
+            0.880203039
+          ],
+          "median": 0.880203039,
+          "minimum": 0.874444864,
+          "maximum": 0.903534124,
+          "max_over_min": 1.0332659738739114
+        },
+        "cfr_plus_quality_seconds": {
+          "samples": [
+            5.762754649,
+            6.020925159,
+            5.872625062999999
+          ],
+          "median": 5.872625062999999,
+          "minimum": 5.762754649,
+          "maximum": 6.020925159,
+          "max_over_min": 1.0447998441239903
+        },
+        "construction_seconds": {
+          "samples": [
+            0.271201486,
+            0.285691912,
+            0.287442684
+          ],
+          "median": 0.285691912,
+          "minimum": 0.271201486,
+          "maximum": 0.287442684,
+          "max_over_min": 1.0598860951668976
+        },
+        "state_write_seconds": {
+          "samples": [
+            0.462827326,
+            0.4588208,
+            0.462555765
+          ],
+          "median": 0.462555765,
+          "minimum": 0.4588208,
+          "maximum": 0.462827326,
+          "max_over_min": 1.0087322239968197
+        },
+        "whole_process_seconds": {
+          "samples": [
+            6.6471320919999926,
+            6.907964672000048,
+            6.844331380999961
+          ],
+          "median": 6.844331380999961,
+          "minimum": 6.6471320919999926,
+          "maximum": 6.907964672000048,
+          "max_over_min": 1.0392398671171248
+        },
+        "root_os_peak_resident_bytes": {
+          "samples": [
+            182333440,
+            182243328,
+            182050816
+          ],
+          "median": 182243328,
+          "minimum": 182050816,
+          "maximum": 182333440,
+          "max_over_min": 1.0015524456644018
+        }
+      }
+    },
+    {
+      "case": "narrow",
+      "arm": "baseline",
+      "workers": 4,
+      "iterations": 16,
+      "stages": [
+        "narrow-r1-w4-baseline",
+        "narrow-r2-w4-baseline",
+        "narrow-r3-w4-baseline"
+      ],
+      "metrics": {
+        "cfr_seconds": {
+          "samples": [
+            2.703740243,
+            2.652925778,
+            2.689529739
+          ],
+          "median": 2.689529739,
+          "minimum": 2.652925778,
+          "maximum": 2.703740243,
+          "max_over_min": 1.0191541223736413
+        },
+        "quality_7_walk_seconds": {
+          "samples": [
+            0.465987565,
+            0.462072452,
+            0.456025222
+          ],
+          "median": 0.462072452,
+          "minimum": 0.456025222,
+          "maximum": 0.465987565,
+          "max_over_min": 1.0218460350861909
+        },
+        "cfr_plus_quality_seconds": {
+          "samples": [
+            3.1697278079999998,
+            3.1149982300000003,
+            3.145554961
+          ],
+          "median": 3.145554961,
+          "minimum": 3.1149982300000003,
+          "maximum": 3.1697278079999998,
+          "max_over_min": 1.0175696979449005
+        },
+        "construction_seconds": {
+          "samples": [
+            0.295567239,
+            0.280062875,
+            0.279512543
+          ],
+          "median": 0.280062875,
+          "minimum": 0.279512543,
+          "maximum": 0.295567239,
+          "max_over_min": 1.0574381951796703
+        },
+        "state_write_seconds": {
+          "samples": [
+            0.458630931,
+            0.459069446,
+            0.459203746
+          ],
+          "median": 0.459069446,
+          "minimum": 0.458630931,
+          "maximum": 0.459203746,
+          "max_over_min": 1.0012489672224048
+        },
+        "whole_process_seconds": {
+          "samples": [
+            4.060384203000012,
+            4.040713295000046,
+            4.026500856999974
+          ],
+          "median": 4.040713295000046,
+          "minimum": 4.026500856999974,
+          "maximum": 4.060384203000012,
+          "max_over_min": 1.0084150847605393
+        },
+        "root_os_peak_resident_bytes": {
+          "samples": [
+            182525952,
+            182374400,
+            182366208
+          ],
+          "median": 182374400,
+          "minimum": 182366208,
+          "maximum": 182525952,
+          "max_over_min": 1.0008759517552726
+        }
+      }
+    },
+    {
+      "case": "narrow",
+      "arm": "baseline",
+      "workers": 8,
+      "iterations": 16,
+      "stages": [
+        "narrow-r1-w8-baseline",
+        "narrow-r2-w8-baseline",
+        "narrow-r3-w8-baseline"
+      ],
+      "metrics": {
+        "cfr_seconds": {
+          "samples": [
+            1.483553414,
+            1.531156485,
+            1.5079284899999998
+          ],
+          "median": 1.5079284899999998,
+          "minimum": 1.483553414,
+          "maximum": 1.531156485,
+          "max_over_min": 1.0320871972325223
+        },
+        "quality_7_walk_seconds": {
+          "samples": [
+            0.245720405,
+            0.258827171,
+            0.253177639
+          ],
+          "median": 0.253177639,
+          "minimum": 0.245720405,
+          "maximum": 0.258827171,
+          "max_over_min": 1.0533401611477893
+        },
+        "cfr_plus_quality_seconds": {
+          "samples": [
+            1.7292738189999999,
+            1.789983656,
+            1.7611061289999999
+          ],
+          "median": 1.7611061289999999,
+          "minimum": 1.7292738189999999,
+          "maximum": 1.789983656,
+          "max_over_min": 1.0351071278203399
+        },
+        "construction_seconds": {
+          "samples": [
+            0.283678047,
+            0.290693363,
+            0.287116969
+          ],
+          "median": 0.287116969,
+          "minimum": 0.283678047,
+          "maximum": 0.290693363,
+          "max_over_min": 1.0247298515841798
+        },
+        "state_write_seconds": {
+          "samples": [
+            0.461335967,
+            0.463031316,
+            0.456802612
+          ],
+          "median": 0.461335967,
+          "minimum": 0.456802612,
+          "maximum": 0.463031316,
+          "max_over_min": 1.0136354386695146
+        },
+        "whole_process_seconds": {
+          "samples": [
+            2.684242865999977,
+            2.667885272000035,
+            2.659707078999986
+          ],
+          "median": 2.667885272000035,
+          "minimum": 2.659707078999986,
+          "maximum": 2.684242865999977,
+          "max_over_min": 1.0092249959379798
+        },
+        "root_os_peak_resident_bytes": {
+          "samples": [
+            183009280,
+            183386112,
+            182898688
+          ],
+          "median": 183009280,
+          "minimum": 182898688,
+          "maximum": 183386112,
+          "max_over_min": 1.0026649945132466
+        }
+      }
+    },
+    {
+      "case": "narrow",
+      "arm": "baseline",
+      "workers": 16,
+      "iterations": 16,
+      "stages": [
+        "narrow-r1-w16-baseline",
+        "narrow-r2-w16-baseline",
+        "narrow-r3-w16-baseline"
+      ],
+      "metrics": {
+        "cfr_seconds": {
+          "samples": [
+            0.931894191,
+            0.936811995,
+            0.954363508
+          ],
+          "median": 0.936811995,
+          "minimum": 0.931894191,
+          "maximum": 0.954363508,
+          "max_over_min": 1.0241114465751617
+        },
+        "quality_7_walk_seconds": {
+          "samples": [
+            0.154852172,
+            0.148316891,
+            0.148558195
+          ],
+          "median": 0.148558195,
+          "minimum": 0.148316891,
+          "maximum": 0.154852172,
+          "max_over_min": 1.044062958412471
+        },
+        "cfr_plus_quality_seconds": {
+          "samples": [
+            1.086746363,
+            1.0851288860000001,
+            1.102921703
+          ],
+          "median": 1.086746363,
+          "minimum": 1.0851288860000001,
+          "maximum": 1.102921703,
+          "max_over_min": 1.0163969618996944
+        },
+        "construction_seconds": {
+          "samples": [
+            0.273371015,
+            0.290219737,
+            0.284416979
+          ],
+          "median": 0.284416979,
+          "minimum": 0.273371015,
+          "maximum": 0.290219737,
+          "max_over_min": 1.061633169119996
+        },
+        "state_write_seconds": {
+          "samples": [
+            0.455651586,
+            0.458333083,
+            0.458540371
+          ],
+          "median": 0.458333083,
+          "minimum": 0.455651586,
+          "maximum": 0.458540371,
+          "max_over_min": 1.0063398989244383
+        },
+        "whole_process_seconds": {
+          "samples": [
+            1.96999007200003,
+            2.0470933960000366,
+            2.045358198000031
+          ],
+          "median": 2.045358198000031,
+          "minimum": 1.96999007200003,
+          "maximum": 2.0470933960000366,
+          "max_over_min": 1.0391389403915765
+        },
+        "root_os_peak_resident_bytes": {
+          "samples": [
+            183631872,
+            183443456,
+            183599104
+          ],
+          "median": 183599104,
+          "minimum": 183443456,
+          "maximum": 183631872,
+          "max_over_min": 1.0010271066851248
+        }
+      }
+    },
+    {
+      "case": "narrow",
+      "arm": "baseline",
+      "workers": 32,
+      "iterations": 16,
+      "stages": [
+        "narrow-r1-w32-baseline",
+        "narrow-r2-w32-baseline",
+        "narrow-r3-w32-baseline"
+      ],
+      "metrics": {
+        "cfr_seconds": {
+          "samples": [
+            0.998746379,
+            1.01872147,
+            1.015958979
+          ],
+          "median": 1.015958979,
+          "minimum": 0.998746379,
+          "maximum": 1.01872147,
+          "max_over_min": 1.020000163625124
+        },
+        "quality_7_walk_seconds": {
+          "samples": [
+            0.153977371,
+            0.153835366,
+            0.154826192
+          ],
+          "median": 0.153977371,
+          "minimum": 0.153835366,
+          "maximum": 0.154826192,
+          "max_over_min": 1.0064408206367839
+        },
+        "cfr_plus_quality_seconds": {
+          "samples": [
+            1.15272375,
+            1.172556836,
+            1.1707851710000001
+          ],
+          "median": 1.1707851710000001,
+          "minimum": 1.15272375,
+          "maximum": 1.172556836,
+          "max_over_min": 1.017205411096978
+        },
+        "construction_seconds": {
+          "samples": [
+            0.282298406,
+            0.290448626,
+            0.293372692
+          ],
+          "median": 0.290448626,
+          "minimum": 0.282298406,
+          "maximum": 0.293372692,
+          "max_over_min": 1.0392290064861365
+        },
+        "state_write_seconds": {
+          "samples": [
+            0.456205577,
+            0.458327833,
+            0.468584959
+          ],
+          "median": 0.458327833,
+          "minimum": 0.456205577,
+          "maximum": 0.468584959,
+          "max_over_min": 1.0271355341190844
+        },
+        "whole_process_seconds": {
+          "samples": [
+            2.0828262790000167,
+            2.083481309999911,
+            2.0853208269999186
+          ],
+          "median": 2.083481309999911,
+          "minimum": 2.0828262790000167,
+          "maximum": 2.0853208269999186,
+          "max_over_min": 1.0011976745372637
+        },
+        "root_os_peak_resident_bytes": {
+          "samples": [
+            183660544,
+            183926784,
+            184381440
+          ],
+          "median": 183926784,
+          "minimum": 183660544,
+          "maximum": 184381440,
+          "max_over_min": 1.003925154441446
+        }
+      }
+    },
+    {
+      "case": "narrow",
+      "arm": "flat",
+      "workers": 1,
+      "iterations": 16,
+      "stages": [
+        "narrow-r1-w1-flat",
+        "narrow-r2-w1-flat",
+        "narrow-r3-w1-flat"
+      ],
+      "metrics": {
+        "cfr_seconds": {
+          "samples": [
+            8.981068394,
+            8.997666765,
+            9.054531549
+          ],
+          "median": 8.997666765,
+          "minimum": 8.981068394,
+          "maximum": 9.054531549,
+          "max_over_min": 1.0081797790393268
+        },
+        "quality_7_walk_seconds": {
+          "samples": [
+            1.671758408,
+            1.637997043,
+            1.675038992
+          ],
+          "median": 1.671758408,
+          "minimum": 1.637997043,
+          "maximum": 1.675038992,
+          "max_over_min": 1.0226141733028757
+        },
+        "cfr_plus_quality_seconds": {
+          "samples": [
+            10.652826802,
+            10.635663808,
+            10.729570541
+          ],
+          "median": 10.652826802,
+          "minimum": 10.635663808,
+          "maximum": 10.729570541,
+          "max_over_min": 1.0088294190842477
+        },
+        "construction_seconds": {
+          "samples": [
+            0.277449988,
+            0.284078854,
+            0.282394429
+          ],
+          "median": 0.282394429,
+          "minimum": 0.277449988,
+          "maximum": 0.284078854,
+          "max_over_min": 1.0238921113235009
+        },
+        "state_write_seconds": {
+          "samples": [
+            0.462458794,
+            0.460466927,
+            0.461609487
+          ],
+          "median": 0.461609487,
+          "minimum": 0.460466927,
+          "maximum": 0.462458794,
+          "max_over_min": 1.0043257547571922
+        },
+        "whole_process_seconds": {
+          "samples": [
+            11.59602262499999,
+            11.493513925000002,
+            11.61266906000003
+          ],
+          "median": 11.59602262499999,
+          "minimum": 11.493513925000002,
+          "maximum": 11.61266906000003,
+          "max_over_min": 1.0103671632346352
+        },
+        "root_os_peak_resident_bytes": {
+          "samples": [
+            182071296,
+            182079488,
+            182009856
+          ],
+          "median": 182071296,
+          "minimum": 182009856,
+          "maximum": 182079488,
+          "max_over_min": 1.000382572688811
+        }
+      }
+    },
+    {
+      "case": "narrow",
+      "arm": "flat",
+      "workers": 2,
+      "iterations": 16,
+      "stages": [
+        "narrow-r1-w2-flat",
+        "narrow-r2-w2-flat",
+        "narrow-r3-w2-flat"
+      ],
+      "metrics": {
+        "cfr_seconds": {
+          "samples": [
+            4.709739835,
+            4.814042738,
+            4.697929358
+          ],
+          "median": 4.709739835,
+          "minimum": 4.697929358,
+          "maximum": 4.814042738,
+          "max_over_min": 1.024715863341426
+        },
+        "quality_7_walk_seconds": {
+          "samples": [
+            0.840674249,
+            0.869536032,
+            0.856600965
+          ],
+          "median": 0.856600965,
+          "minimum": 0.840674249,
+          "maximum": 0.869536032,
+          "max_over_min": 1.0343317081905765
+        },
+        "cfr_plus_quality_seconds": {
+          "samples": [
+            5.550414084,
+            5.6835787700000004,
+            5.554530323
+          ],
+          "median": 5.554530323,
+          "minimum": 5.550414084,
+          "maximum": 5.6835787700000004,
+          "max_over_min": 1.02399184709189
+        },
+        "construction_seconds": {
+          "samples": [
+            0.283124005,
+            0.285863478,
+            0.280347597
+          ],
+          "median": 0.283124005,
+          "minimum": 0.280347597,
+          "maximum": 0.285863478,
+          "max_over_min": 1.0196751499175505
+        },
+        "state_write_seconds": {
+          "samples": [
+            0.459257856,
+            0.465045867,
+            0.463945578
+          ],
+          "median": 0.463945578,
+          "minimum": 0.459257856,
+          "maximum": 0.465045867,
+          "max_over_min": 1.0126029656855777
+        },
+        "whole_process_seconds": {
+          "samples": [
+            6.404349671000034,
+            6.566135987999928,
+            6.417795305000027
+          ],
+          "median": 6.417795305000027,
+          "minimum": 6.404349671000034,
+          "maximum": 6.566135987999928,
+          "max_over_min": 1.0252619431029024
+        },
+        "root_os_peak_resident_bytes": {
+          "samples": [
+            181751808,
+            182075392,
+            182022144
+          ],
+          "median": 182022144,
+          "minimum": 181751808,
+          "maximum": 182075392,
+          "max_over_min": 1.0017803619318053
+        }
+      }
+    },
+    {
+      "case": "narrow",
+      "arm": "flat",
+      "workers": 4,
+      "iterations": 16,
+      "stages": [
+        "narrow-r1-w4-flat",
+        "narrow-r2-w4-flat",
+        "narrow-r3-w4-flat"
+      ],
+      "metrics": {
+        "cfr_seconds": {
+          "samples": [
+            2.512422929,
+            2.549052704,
+            2.459064375
+          ],
+          "median": 2.512422929,
+          "minimum": 2.459064375,
+          "maximum": 2.549052704,
+          "max_over_min": 1.0365945397423766
+        },
+        "quality_7_walk_seconds": {
+          "samples": [
+            0.450906723,
+            0.453218611,
+            0.444340842
+          ],
+          "median": 0.450906723,
+          "minimum": 0.444340842,
+          "maximum": 0.453218611,
+          "max_over_min": 1.0199796376134156
+        },
+        "cfr_plus_quality_seconds": {
+          "samples": [
+            2.963329652,
+            3.002271315,
+            2.903405217
+          ],
+          "median": 2.963329652,
+          "minimum": 2.903405217,
+          "maximum": 3.002271315,
+          "max_over_min": 1.0340517739036632
+        },
+        "construction_seconds": {
+          "samples": [
+            0.284405202,
+            0.285827828,
+            0.292585497
+          ],
+          "median": 0.285827828,
+          "minimum": 0.284405202,
+          "maximum": 0.292585497,
+          "max_over_min": 1.0287628177771517
+        },
+        "state_write_seconds": {
+          "samples": [
+            0.460988869,
+            0.459902529,
+            0.457472656
+          ],
+          "median": 0.459902529,
+          "minimum": 0.457472656,
+          "maximum": 0.460988869,
+          "max_over_min": 1.0076861708648222
+        },
+        "whole_process_seconds": {
+          "samples": [
+            3.9235705909999865,
+            3.9299109180000187,
+            3.813366665999979
+          ],
+          "median": 3.9235705909999865,
+          "minimum": 3.813366665999979,
+          "maximum": 3.9299109180000187,
+          "max_over_min": 1.030562036700837
+        },
+        "root_os_peak_resident_bytes": {
+          "samples": [
+            181891072,
+            182312960,
+            182067200
+          ],
+          "median": 182067200,
+          "minimum": 181891072,
+          "maximum": 182312960,
+          "max_over_min": 1.002319454140113
+        }
+      }
+    },
+    {
+      "case": "narrow",
+      "arm": "flat",
+      "workers": 8,
+      "iterations": 16,
+      "stages": [
+        "narrow-r1-w8-flat",
+        "narrow-r2-w8-flat",
+        "narrow-r3-w8-flat"
+      ],
+      "metrics": {
+        "cfr_seconds": {
+          "samples": [
+            1.414135778,
+            1.41925566,
+            1.3902656549999999
+          ],
+          "median": 1.414135778,
+          "minimum": 1.3902656549999999,
+          "maximum": 1.41925566,
+          "max_over_min": 1.0208521334722895
+        },
+        "quality_7_walk_seconds": {
+          "samples": [
+            0.244716557,
+            0.251951236,
+            0.252836032
+          ],
+          "median": 0.251951236,
+          "minimum": 0.244716557,
+          "maximum": 0.252836032,
+          "max_over_min": 1.0331790995245165
+        },
+        "cfr_plus_quality_seconds": {
+          "samples": [
+            1.658852335,
+            1.671206896,
+            1.643101687
+          ],
+          "median": 1.658852335,
+          "minimum": 1.643101687,
+          "maximum": 1.671206896,
+          "max_over_min": 1.0171049723960268
+        },
+        "construction_seconds": {
+          "samples": [
+            0.294819392,
+            0.292198463,
+            0.283811221
+          ],
+          "median": 0.292198463,
+          "minimum": 0.283811221,
+          "maximum": 0.294819392,
+          "max_over_min": 1.0387869477507374
+        },
+        "state_write_seconds": {
+          "samples": [
+            0.463630446,
+            0.460368805,
+            0.456448639
+          ],
+          "median": 0.460368805,
+          "minimum": 0.456448639,
+          "maximum": 0.463630446,
+          "max_over_min": 1.015734096646085
+        },
+        "whole_process_seconds": {
+          "samples": [
+            2.5707493630000045,
+            2.5590052820000437,
+            2.556064203999995
+          ],
+          "median": 2.5590052820000437,
+          "minimum": 2.556064203999995,
+          "maximum": 2.5707493630000045,
+          "max_over_min": 1.0057452230570065
+        },
+        "root_os_peak_resident_bytes": {
+          "samples": [
+            182726656,
+            182845440,
+            182534144
+          ],
+          "median": 182726656,
+          "minimum": 182534144,
+          "maximum": 182845440,
+          "max_over_min": 1.001705412440535
+        }
+      }
+    },
+    {
+      "case": "narrow",
+      "arm": "flat",
+      "workers": 16,
+      "iterations": 16,
+      "stages": [
+        "narrow-r1-w16-flat",
+        "narrow-r2-w16-flat",
+        "narrow-r3-w16-flat"
+      ],
+      "metrics": {
+        "cfr_seconds": {
+          "samples": [
+            0.873924562,
+            0.879851336,
+            0.891445466
+          ],
+          "median": 0.879851336,
+          "minimum": 0.873924562,
+          "maximum": 0.891445466,
+          "max_over_min": 1.0200485313742675
+        },
+        "quality_7_walk_seconds": {
+          "samples": [
+            0.14134923,
+            0.144226834,
+            0.142124104
+          ],
+          "median": 0.142124104,
+          "minimum": 0.14134923,
+          "maximum": 0.144226834,
+          "max_over_min": 1.0203581158524881
+        },
+        "cfr_plus_quality_seconds": {
+          "samples": [
+            1.015273792,
+            1.02407817,
+            1.03356957
+          ],
+          "median": 1.02407817,
+          "minimum": 1.015273792,
+          "maximum": 1.03356957,
+          "max_over_min": 1.0180205360801828
+        },
+        "construction_seconds": {
+          "samples": [
+            0.275845526,
+            0.280541275,
+            0.284392121
+          ],
+          "median": 0.280541275,
+          "minimum": 0.275845526,
+          "maximum": 0.284392121,
+          "max_over_min": 1.0309832648871746
+        },
+        "state_write_seconds": {
+          "samples": [
+            0.459369022,
+            0.462042221,
+            0.462013905
+          ],
+          "median": 0.462013905,
+          "minimum": 0.459369022,
+          "maximum": 0.462042221,
+          "max_over_min": 1.005819284435771
+        },
+        "whole_process_seconds": {
+          "samples": [
+            1.9533945709999898,
+            1.952536562999967,
+            1.9378896780000332
+          ],
+          "median": 1.952536562999967,
+          "minimum": 1.9378896780000332,
+          "maximum": 1.9533945709999898,
+          "max_over_min": 1.0080009162420216
+        },
+        "root_os_peak_resident_bytes": {
+          "samples": [
+            182575104,
+            182194176,
+            183087104
+          ],
+          "median": 182575104,
+          "minimum": 182194176,
+          "maximum": 183087104,
+          "max_over_min": 1.0049009689530362
+        }
+      }
+    },
+    {
+      "case": "narrow",
+      "arm": "flat",
+      "workers": 32,
+      "iterations": 16,
+      "stages": [
+        "narrow-r1-w32-flat",
+        "narrow-r2-w32-flat",
+        "narrow-r3-w32-flat"
+      ],
+      "metrics": {
+        "cfr_seconds": {
+          "samples": [
+            0.947145657,
+            0.982136724,
+            0.948214342
+          ],
+          "median": 0.948214342,
+          "minimum": 0.947145657,
+          "maximum": 0.982136724,
+          "max_over_min": 1.0369437021026218
+        },
+        "quality_7_walk_seconds": {
+          "samples": [
+            0.141698032,
+            0.146033819,
+            0.146248042
+          ],
+          "median": 0.146033819,
+          "minimum": 0.141698032,
+          "maximum": 0.146248042,
+          "max_over_min": 1.0321106082828306
+        },
+        "cfr_plus_quality_seconds": {
+          "samples": [
+            1.088843689,
+            1.128170543,
+            1.094462384
+          ],
+          "median": 1.094462384,
+          "minimum": 1.088843689,
+          "maximum": 1.128170543,
+          "max_over_min": 1.0361179978332042
+        },
+        "construction_seconds": {
+          "samples": [
+            0.281750687,
+            0.2811007,
+            0.294553208
+          ],
+          "median": 0.281750687,
+          "minimum": 0.2811007,
+          "maximum": 0.294553208,
+          "max_over_min": 1.0478565439360343
+        },
+        "state_write_seconds": {
+          "samples": [
+            0.456269268,
+            0.458993348,
+            0.471065664
+          ],
+          "median": 0.458993348,
+          "minimum": 0.456269268,
+          "maximum": 0.471065664,
+          "max_over_min": 1.0324290874659565
+        },
+        "whole_process_seconds": {
+          "samples": [
+            1.9645915850000506,
+            2.0800583750000214,
+            2.08481752900002
+          ],
+          "median": 2.0800583750000214,
+          "minimum": 1.9645915850000506,
+          "maximum": 2.08481752900002,
+          "max_over_min": 1.0611964058677195
+        },
+        "root_os_peak_resident_bytes": {
+          "samples": [
+            183910400,
+            183103488,
+            183439360
+          ],
+          "median": 183439360,
+          "minimum": 183103488,
+          "maximum": 183910400,
+          "max_over_min": 1.0044068630740666
+        }
+      }
+    }
+  ],
+  "unique_canonical_streams_verified": 2,
+  "recovery_manifest": {
+    "bytes": 461634,
+    "sha256": "6ad31b9519e9ede985c4d3fefdd3b80f1d029b556e82b24d067c5c8a513b2f9c"
+  },
+  "original_metadata": {
+    "plan.json": {
+      "bytes": 98926,
+      "sha256": "176acfbab4ff28ad0a11816cd951db1ab68be7e0beaf2d0138e964f01e666072"
+    },
+    "build.json": {
+      "bytes": 104035,
+      "sha256": "f08ec24a33b33d16f0e1edf3d84468ce986f7bc452adbd2ef8950d9690010f53"
+    },
+    "execution.json": {
+      "bytes": 855711,
+      "sha256": "f9b958b2d179d0adf8f8526e1e7864249e58a264fcf36e70c48ed742d4c1cc5d"
+    },
+    "retained.json": {
+      "bytes": 10055,
+      "sha256": "f613bbb81fcb96881236ecf936ad5cf73252ba23e77fb6af2829d9f3ff2836ec"
+    }
+  },
+  "reader": {
+    "bytes": 14793,
+    "sha256": "cf8b6c62cc66130673f2a7ace977001487cff348626c2072ea0e4a9ea2d9e475"
+  },
+  "trusted_analyzer": {
+    "sha256": "098375aa70c6e854882fba7b2e5b49fe01a146203c5b84cc793fd0222ebcac1e"
+  }
+}

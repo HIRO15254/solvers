@@ -10,6 +10,8 @@
 | R0準備時の環境観測 | [HU Postflop readiness](hu-postflop-r0/readiness/README.md) | SOL-3のsource候補、toolchain、CPU/RAM/disk。測定runの成功証拠ではない |
 | R0完了範囲の照合 | [HU Postflop R0-06 readiness報告](hu-postflop-r0/readiness/report-2026-09-25.jp.md) | 先行成果物の版、候補24件・日常8件、R1への未決事項。品質・性能の認定ではない |
 | R1の実験資源と費用 | [HU Postflop Spot実験](hu-postflop-r1/cloud/README.md) | VM予約・source転送対象・自動削除期限と料金根拠。計算結果は別途検証する |
+| R1の中断した32 vCPU比較 | [VM14のnarrow48参考値](hu-postflop-r1/cloud/vm14/report.jp.md) | 16物理/32論理CPUで両arm・6worker数・36測定を原本照合。全96条件はSpot回収で未完了、候補採用を認定しない。原本は分割archiveで保持 |
+| R1の初期VM使用量照合 | [VM02/05/06/07の再計算](hu-postflop-r1/cloud/usage-early-20260927/README.md) | 通常料金・全期間・24h disk・元予備費を保持し18USDへ部分照合。2USD再利用は利用者許可に基づく推定で実請求ではない |
 | R1の費用証拠監査 | [9月25日UTCの4 VM](hu-postflop-r1/cloud/cost-audit-20260925/README.md) | 実時間・単価と226点の送信量。欠測・請求未反映を保持し、予約解放を認定しない |
 | R1の追加請求観測 | [9月26日23時台UTCの表示](hu-postflop-r1/cloud/billing-observation-20260926-2330.json) | 趣味アカウントの対象project、14 SKUと約238 JPYの割引表示。26日分は予測のため実請求未精算、40 USD予約を保持 |
 | R1の限定検証の対応表 | [HU Postflop検証](hu-postflop-r1/validation/README.md) | 独立oracle、Stud/Draw、抽象化、保存契約に対応するtestsとsourceの識別。外部24case認定とは分離 |

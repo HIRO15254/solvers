@@ -1,0 +1,14 @@
+{
+  "verified_at_utc": "2026-09-25T20:34:35.914890+00:00",
+  "authorized_limit_usd": 20,
+  "held_reservations_usd": 20,
+  "billed_usd": null,
+  "instances": [],
+  "disks": [],
+  "reserved_addresses": [],
+  "delete_operation": "operation-1790368292611-65c549a19275b-c378f14c-2f16d2d9",
+  "deleted_at_utc": "2026-09-25T20:32:24.560000+00:00",
+  "instance_id": "841167209049583155",
+  "downloaded_bytes_with_sidecars": 48695414,
+  "transfer_accounting": "Known unique compressed retained bytes, not billed egress or network total"
+}

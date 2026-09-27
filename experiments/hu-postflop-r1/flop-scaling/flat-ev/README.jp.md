@@ -36,7 +36,10 @@ source pinが変わった場合は明示的な別のrebaseが必要。Python検�
 `git diff --cached --check`はその1行を報告する。patchの元bytesは保持し、patch以外の同検査と
 候補のrustfmt・再生成照合は成功した。Rust sourceの末尾空白エラーではない。
 
-無計装時間の比較は[事前固定手順](timing/protocol.md)に従う。
+ローカルの[時間比較案](timing/protocol.md)は利用者の資源希望を受けて実行前に中止した。
+[GCP 32 vCPU比較](cloud32/protocol.md)はSpot回収で中断し、
+[狭いレンジ48条件の参考集計](../../cloud/vm14/report.jp.md)だけを原本照合できた。
+全96条件は未完了で、本体採用を認定しない。
 親側でのゼロ初期化、容量保持、
 追加の寸法/参照vectorにより時間やpeakが悪化する可能性もあり、確保削減や
 32worker scalingをこのsource準備から認定しない。

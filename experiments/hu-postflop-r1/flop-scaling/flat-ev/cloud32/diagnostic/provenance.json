@@ -1,0 +1,29 @@
+{
+  "schema": "r1.flat-ev-cpu-adapter-source/v1",
+  "source": {
+    "bytes": 11181,
+    "sha256": "63cba37a5b0f79dfed2ca0ddf879daada3f0fee094ee5f287f86bc1f37414d46"
+  },
+  "helper": {
+    "bytes": 1821,
+    "sha256": "5d58c11e1b31c1f0e0d51d8a49aa96d27ff224e77feb746ddae16f8094ac1ceb"
+  },
+  "generator": {
+    "bytes": 5504,
+    "sha256": "bd3f4297c9553d9ae9d94d6887c2cdb51f218ff5b48d4fe9428719f2480c6bf3"
+  },
+  "generated": {
+    "solve.rs": {
+      "bytes": 14350,
+      "sha256": "4605b8d753dc42e5e7136b2a46c7695386c6e2b29b13a85129b39cf64193cf18"
+    },
+    "adapter.patch": {
+      "bytes": 6317,
+      "sha256": "9cfad5115253ba29d8f3db29cdb4b57603ffe25bc3186b6984a69130a35750a2"
+    }
+  },
+  "inverse_byte_identical": true,
+  "native_compiled": false,
+  "native_executed": false,
+  "scope": "Static adapter generation only; process CPU measurement and perturbation uncalibrated"
+}

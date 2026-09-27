@@ -1,0 +1,5 @@
+{
+  "source_sha256": "9eced454d556555945c0ce4ec811fed410f68be67e1a3fc80e0b77083a2e6893",
+  "generated_sha256": "1bc1f34dcdfb111bc027262f15d0bd49fc4edd3baafe107084cbf5cb2046b4ca",
+  "change": "Allow exact inactive not-found unit after confirmed Spot restart; record exit code and recovery boot/CPU. All archive and byte checks unchanged."
+}

@@ -1,0 +1,2 @@
+/tmp/recover-interrupted.sh: OK
+{"status": "original_bytes_verified", "archive": "/tmp/flop-flat-cloud32-proof01.tar.gz", "bytes": 120465345, "sha256": "aba377403025a7935e57faef68905f52245ca203b88e15076210c6cef635afe6", "files": 1096, "proof_present": true, "cloud_mutations": false}

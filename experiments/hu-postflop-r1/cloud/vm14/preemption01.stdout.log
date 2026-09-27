@@ -1,0 +1,36 @@
+[
+  {
+    "operation": {
+      "id": "operation-1790478393168-65c6e3c9a5080-d3e3947d-15aad54b",
+      "last": true,
+      "producer": "compute.googleapis.com"
+    },
+    "protoPayload": {
+      "methodName": "v1.compute.instances.setMachineType"
+    },
+    "timestamp": "2026-09-27T03:06:33.802058Z"
+  },
+  {
+    "operation": {
+      "first": true,
+      "id": "operation-1790478393168-65c6e3c9a5080-d3e3947d-15aad54b",
+      "producer": "compute.googleapis.com"
+    },
+    "protoPayload": {
+      "methodName": "v1.compute.instances.setMachineType"
+    },
+    "timestamp": "2026-09-27T03:06:33.231276Z"
+  },
+  {
+    "operation": {
+      "first": true,
+      "id": "systemevent-1790478208670-65c6e319b1b81-9fbfc1c9-3e2f1e5b",
+      "last": true,
+      "producer": "compute.instances.preempted"
+    },
+    "protoPayload": {
+      "methodName": "compute.instances.preempted"
+    },
+    "timestamp": "2026-09-27T03:03:28.815853Z"
+  }
+]

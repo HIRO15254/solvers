@@ -1,7 +1,7 @@
 """Synthetic arithmetic and evidence-failure tests; never read actual proof states."""
 import copy
 import io
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import unittest
 from unittest.mock import patch
 
@@ -24,6 +24,55 @@ def rows():
 
 
 class AnalyzeTests(unittest.TestCase):
+    def test_original_toolchain_record_matches_all_stage_schema_checks(self):
+        fixture = analyze.ROOT / "experiments/hu-postflop-r1/cloud/vm14/original-toolchain-supervisor.json"
+        record = analyze.read(fixture)
+        identities = {v["path"]: v for v in record["identity_before"]}
+        origin = PurePosixPath(record["cwd"])
+        host = {"boot_id": "synthetic-host-only-for-record-schema-test"}
+        class SchemaEvidence:
+            # Original bytes are read directly. This small fixture has no raw
+            # payloads/host receipt: only artifact resolution is substituted.
+            files = {"plan.json": analyze.pair(identities[str(origin / "plan.json")])}
+            plan = {"host": host, "deadline_utc": "2026-09-27T03:30:00Z",
+                    "tools": {"rustc": identities[record["argv"][0]]}}
+            def require(self, value):
+                if value["path"] == str(origin / "toolchain/supervisor.json"):
+                    return fixture
+                self.assert_output(value)
+                return Path("unused-payload-path")
+            def assert_output(self, value):
+                if value not in record["outputs"].values():
+                    raise ValueError("unexpected fixture payload")
+            def name(self, path):
+                return PurePosixPath(path).relative_to(origin).as_posix()
+            def control(self, suffix):
+                matches = [(path, value) for path, value in identities.items() if path.endswith("/" + suffix)]
+                if len(matches) != 1:
+                    raise ValueError("fixture identity is ambiguous")
+                return *matches[0], None
+        evidence = SchemaEvidence()
+        evidence.origin = origin
+        item = {"name": "toolchain", "kind": "toolchain", "status": "completed", "supervisor_exit": 0,
+                "host_before": host, "host_after": host, "started_at": record["created_at"],
+                "ended_at": record["ended_at"], "verified_at": record["ended_at"],
+                "record": {"path": str(origin / "toolchain/supervisor.json")}, "command": record["argv"],
+                "process_seconds": record["elapsed_seconds"],
+                "root_os_peak_resident_bytes": record["last_sample"]["root_os_peak_resident_bytes"],
+                "root_os_peak_source": record["last_sample"]["root_os_peak_source"]}
+        analyze.verify_stage(evidence, item)
+
+    def test_frozen_supervisor_success_reason_and_failure_rejection(self):
+        record = {"schema": "solvers.supervised-run/v1", "state": "completed",
+                  "child_exit_code": 0, "supervisor_exit_code": 0, "cleanup_complete": True,
+                  "forced": False, "last_sample": {"pids": []}, "stop_reason": "completed", "errors": []}
+        analyze.verify_terminal(record)
+        for changes in ({"stop_reason": None}, {"stop_reason": "child_failed"},
+                        {"state": "failed", "child_exit_code": 1, "supervisor_exit_code": 1},
+                        {"cleanup_complete": False}, {"forced": True}, {"last_sample": {"pids": [42]}}):
+            with self.subTest(changes=changes), self.assertRaisesRegex(ValueError, "supervisor terminal/cleanup"):
+                analyze.verify_terminal({**record, **changes})
+
     def test_native_environment_exact_values_and_no_extra_override(self):
         plan = {"tools": {"rustc": {"path": "/toolchain/rustc"}},
                 "environment": {"RUSTC": "/toolchain/rustc", "RUSTFLAGS": "-C target-cpu=native",
