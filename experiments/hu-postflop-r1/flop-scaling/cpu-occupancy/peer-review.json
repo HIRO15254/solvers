@@ -1,0 +1,36 @@
+{
+  "reviewer": "/root/ev_validation_evidence",
+  "blocking_findings": [],
+  "independent_tiny_tests": {
+    "passed": 12,
+    "exit_code": 0,
+    "test_seconds": 0.002,
+    "exec_wall_seconds": 0.437
+  },
+  "verified_sources": {
+    "run.py": {
+      "bytes": 28026,
+      "sha256": "9856af5f7abf1e758f3db8c6a556e385a1d94a6e4ac264725564504808d190d6"
+    },
+    "analyze.py": {
+      "bytes": 23212,
+      "sha256": "b8a764a1c63be98575516c392076c32898c83edf88f9f734a8e70eebb399d8ef"
+    },
+    "test_run.py": {
+      "bytes": 9349,
+      "sha256": "9e3b6fb2d24bab60a0b1f0f9224aeda71c2bb0a40eb7b4a7a705270a8ed80767"
+    }
+  },
+  "scope": "Read-only source/protocol/control review plus tiny tests; no native build/solve/cloud or large state read",
+  "fixed_findings": [
+    "Strict JSON duplicate/nonfinite rejection",
+    "Duplicate supervisor identity and target rejection",
+    "Explicit fixed schema and CFV=false",
+    "Supervisor cwd and required stdout/stderr/samples pins"
+  ],
+  "remaining_limits": [
+    "Linux native compile/link not yet performed",
+    "Main-thread affinity observation and inherited taskset do not observe every worker over the whole interval",
+    "CPU/wall cannot uniquely identify spinning, scheduler, memory bandwidth or SMT causes"
+  ]
+}

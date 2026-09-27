@@ -1,0 +1,39 @@
+{
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\preflight-vm16\\cost-proposal.py",
+    "--check"
+  ],
+  "started_at_utc": "2026-09-27T04:49:59.216995+00:00",
+  "ended_at_utc": "2026-09-27T04:49:59.401015+00:00",
+  "exit_code": 0,
+  "files": [
+    {
+      "path": "cost-proposal.py",
+      "bytes": 6635,
+      "sha256": "23e63f5c0ad1642571bbfe60f52ff12ae4935aaf9b61f284f2c3631e06241b8e"
+    },
+    {
+      "path": "cost-proposal.json",
+      "bytes": 5189,
+      "sha256": "b7f72ff941fa2f92187a718c388e22735b466a8d6e872f300abf9a10137b95fe"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3664,
+      "sha256": "78afe9cdda1cb01e4736d0bbb5beeef2c59cbf6bdd511339983c0cfa4f4105d0"
+    },
+    {
+      "path": "check.stdout.log",
+      "bytes": 282,
+      "sha256": "99c5895ac2c0cefefc80c4798a10236f83bab8744b9e671799e12b06393f32c2"
+    },
+    {
+      "path": "check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "scope": "Offline arithmetic and27 exact excerpt hashes only; no cloud requests or native execution"
+}

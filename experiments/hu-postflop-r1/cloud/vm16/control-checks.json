@@ -1,0 +1,28 @@
+{
+  "scope": "Static peer review before package/launch; no native execution",
+  "reviewer": "/root/ev_validation_evidence",
+  "reviewed_controls": [
+    "install.py",
+    "start.py",
+    "run.sh",
+    "recover.sh",
+    "fetch-dependencies.sh",
+    "pack.py"
+  ],
+  "peer_tiny_checks": {
+    "python_ast_files": 6,
+    "embedded_python_blocks": 3,
+    "installer_cases": 8,
+    "elapsed_seconds": 0.029
+  },
+  "resolved_findings": [
+    "Final archive publication guard now256MiB",
+    "Protocol explicitly excludes CFV capture"
+  ],
+  "external_controls": [
+    "launch attempted_at+2100sec fixed STOP",
+    "At most3 starts",
+    "Cumulative512MiB egress; archive256MiB"
+  ],
+  "root_additional_ast": "All current VM16 Python files and run/recover embedded blocks passed"
+}

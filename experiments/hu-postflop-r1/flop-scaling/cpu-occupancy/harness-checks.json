@@ -1,0 +1,44 @@
+{
+  "schema": "r1.cpu-occupancy-harness-static-checks/v1",
+  "at_utc": "2026-09-27T04:56:12.665887+00:00",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\flop-scaling\\cpu-occupancy\\test_run.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.2044001999311149,
+  "stdout": "",
+  "stderr": "............\r\n----------------------------------------------------------------------\r\nRan 12 tests in 0.003s\r\n\r\nOK\r\n",
+  "sources": {
+    "run.py": {
+      "bytes": 28026,
+      "sha256": "9856af5f7abf1e758f3db8c6a556e385a1d94a6e4ac264725564504808d190d6"
+    },
+    "analyze.py": {
+      "bytes": 23212,
+      "sha256": "b8a764a1c63be98575516c392076c32898c83edf88f9f734a8e70eebb399d8ef"
+    },
+    "test_run.py": {
+      "bytes": 9349,
+      "sha256": "9e3b6fb2d24bab60a0b1f0f9224aeda71c2bb0a40eb7b4a7a705270a8ed80767"
+    }
+  },
+  "baseline_solver": {
+    "bytes": 56421,
+    "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+  },
+  "cpu_adapter": {
+    "bytes": 15687,
+    "sha256": "a6746b4316216231f3a4bf02120968d7b78ddb876d6d04cd611bf1efed7ba2a5"
+  },
+  "ast_sources": [
+    "run.py",
+    "analyze.py",
+    "test_run.py"
+  ],
+  "native_compilation": false,
+  "native_solve": false,
+  "cloud_operations": false,
+  "scope": "12 tiny pure tests and AST only; Linux execution and resource calibration not performed"
+}

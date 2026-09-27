@@ -1,0 +1,39 @@
+{
+  "schema": "r1.cpu-occupancy-adapter-source/v1",
+  "source": {
+    "bytes": 11181,
+    "sha256": "63cba37a5b0f79dfed2ca0ddf879daada3f0fee094ee5f287f86bc1f37414d46"
+  },
+  "baseline_solver": {
+    "bytes": 56421,
+    "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+  },
+  "clock_helper": {
+    "bytes": 1821,
+    "sha256": "5d58c11e1b31c1f0e0d51d8a49aa96d27ff224e77feb746ddae16f8094ac1ceb"
+  },
+  "generator": {
+    "bytes": 8354,
+    "sha256": "15655505ddd09d2086d42e5de0f244e25a3b6ef3e67cde1a4625cb9b7e216c8b"
+  },
+  "example": "flop_cpu_occupancy_probe",
+  "generated": {
+    "solve.rs": {
+      "bytes": 15687,
+      "sha256": "a6746b4316216231f3a4bf02120968d7b78ddb876d6d04cd611bf1efed7ba2a5"
+    },
+    "cpu_clock.rs.inc": {
+      "bytes": 1821,
+      "sha256": "5d58c11e1b31c1f0e0d51d8a49aa96d27ff224e77feb746ddae16f8094ac1ceb"
+    },
+    "adapter.patch": {
+      "bytes": 7714,
+      "sha256": "7e8d8d90034160ac15c759aba4c2e9299ba77178b7dcd3654ed33798bf3299ad"
+    }
+  },
+  "cpu_schema": "r1.flop-cpu-occupancy/v1",
+  "inverse_byte_identical": true,
+  "native_compiled": false,
+  "native_executed": false,
+  "scope": "Static generation only; CPU occupancy and instrumentation perturbation uncalibrated"
+}

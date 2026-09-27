@@ -1,0 +1,54 @@
+{
+  "schema": "r1.cpu-occupancy-adapter-source-checks/v1",
+  "scope": "Summary of completed local pure source checks; no Rust compiler or clock/workload execution",
+  "adapter": {
+    "path": "solve.rs",
+    "bytes": 15687,
+    "sha256": "a6746b4316216231f3a4bf02120968d7b78ddb876d6d04cd611bf1efed7ba2a5"
+  },
+  "provenance": {
+    "path": "provenance.json",
+    "bytes": 1244,
+    "sha256": "d2d7790ca4fe8d0cbe48e17a90d0bf11b4024fb8e8ae43480bf02cd88eab96d0"
+  },
+  "checks": [
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments/hu-postflop-r1/flop-scaling/cpu-occupancy/adapter/prepare.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "status": "checked"
+    },
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "experiments/hu-postflop-r1/flop-scaling/cpu-occupancy/adapter",
+        "-p",
+        "test_prepare.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "passed": 5,
+      "failed": 0,
+      "unittest_seconds": 0.045,
+      "tests": [
+        "test_cpu_and_wall_bracket_identical_calls",
+        "test_every_generated_file_and_pin_matches",
+        "test_fixture_state_and_original_json_sections_unchanged",
+        "test_schema_original_wall_copies_and_affinity_outside_timing",
+        "test_source_helper_and_unrelated_solver_mutations_rejected"
+      ]
+    }
+  ],
+  "native_compiled": false,
+  "native_executed": false,
+  "instrumentation_perturbation_calibrated": false
+}

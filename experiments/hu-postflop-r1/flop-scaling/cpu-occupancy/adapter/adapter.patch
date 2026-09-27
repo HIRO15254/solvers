@@ -1,0 +1,148 @@
+--- flat-ev/cloud32/solve.rs
++++ cpu-occupancy/adapter/solve.rs
+@@ -17,6 +17,67 @@
+ 
+ const SCRIPT: &str = "flop, turn, river {\n  replace bet [75]\n  replace raise [75]\n}\n";
+ const BUFFER_BYTES: usize = 16 * 1024;
++
++// Linux x86_64 LP64 GNU ABI only; see diagnostic/README.jp.md for primary sources.
++#[cfg(not(all(
++    target_os = "linux",
++    target_arch = "x86_64",
++    target_env = "gnu",
++    target_pointer_width = "64"
++)))]
++compile_error!("process CPU diagnostic requires x86_64-unknown-linux-gnu LP64");
++
++#[repr(C)]
++struct ProcessCpuTimespec {
++    tv_sec: std::ffi::c_long,
++    tv_nsec: std::ffi::c_long,
++}
++
++const _: () = {
++    assert!(std::mem::size_of::<std::ffi::c_int>() == 4);
++    assert!(std::mem::size_of::<std::ffi::c_long>() == 8);
++    assert!(std::mem::size_of::<ProcessCpuTimespec>() == 16);
++    assert!(std::mem::align_of::<ProcessCpuTimespec>() == 8);
++    assert!(std::mem::offset_of!(ProcessCpuTimespec, tv_sec) == 0);
++    assert!(std::mem::offset_of!(ProcessCpuTimespec, tv_nsec) == 8);
++};
++
++unsafe extern "C" {
++    fn clock_gettime(clock_id: std::ffi::c_int, value: *mut ProcessCpuTimespec) -> std::ffi::c_int;
++}
++
++fn process_cpu_ns() -> u64 {
++    const CLOCK_PROCESS_CPUTIME_ID: std::ffi::c_int = 2;
++    let mut value = ProcessCpuTimespec { tv_sec: 0, tv_nsec: 0 };
++    // SAFETY: the guarded LP64 ABI matches clockid_t and struct timespec;
++    // value is a live, aligned, exclusively borrowed writable stack object.
++    let result = unsafe { clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &mut value) };
++    assert_eq!(result, 0, "clock_gettime failed: {}", std::io::Error::last_os_error());
++    assert!(value.tv_sec >= 0 && (0..1_000_000_000).contains(&value.tv_nsec));
++    (value.tv_sec as u64)
++        .checked_mul(1_000_000_000)
++        .and_then(|n| n.checked_add(value.tv_nsec as u64))
++        .expect("process CPU nanoseconds overflow")
++}
++
++fn process_cpu_elapsed(started: u64) -> f64 {
++    process_cpu_ns()
++        .checked_sub(started)
++        .expect("process CPU clock moved backwards") as f64
++        * 1e-9
++}
++
++fn allowed_cpu_list() -> std::io::Result<String> {
++    let status = std::fs::read_to_string("/proc/self/status")?;
++    let mut fields = status.lines().filter_map(|line| line.strip_prefix("Cpus_allowed_list:"));
++    let value = fields.next().unwrap_or("").trim();
++    if value.is_empty() || fields.next().is_some()
++        || !value.bytes().all(|b| b.is_ascii_digit() || b == b',' || b == b'-')
++    {
++        return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid Cpus_allowed_list"));
++    }
++    Ok(value.to_owned())
++}
+ 
+ fn event(phase: &str, status: &str) {
+     println!("{{\"phase\":\"{phase}\",\"status\":\"{status}\"}}");
+@@ -221,13 +282,16 @@
+         min_children: 12,
+     });
+     event("solver_allocation", "completed");
++    let cpu_allowed_list = allowed_cpu_list()?;
+     event("cfr", "started");
++    let cfr_cpu_started = process_cpu_ns();
+     let started = Instant::now();
+     pool.install(|| {
+         assert_eq!(rayon::current_num_threads(), threads);
+         solver.run(iterations);
+     });
+     let cfr_seconds = started.elapsed().as_secs_f64();
++    let cfr_cpu_seconds = process_cpu_elapsed(cfr_cpu_started);
+     assert_eq!(solver.iteration(), iterations);
+     event("cfr", "completed");
+     event("state_write", "started");
+@@ -238,28 +302,46 @@
+ 
+     // Public API calls, including their precise zero-sum exploitability policy.
+     // No second metric definition or per-node/root CFV capture is introduced.
++    let quality_cpu_started = process_cpu_ns();
+     let started = Instant::now();
++    let mut ev_cpu_seconds = [0.0_f64; 2];
++    let mut br_cpu_seconds = [0.0_f64; 2];
++    let mut ev_wall_seconds = [0.0_f64; 2];
++    let mut br_wall_seconds = [0.0_f64; 2];
+     let mut ev = [0.0_f64; 2];
+     let mut br = [0.0_f64; 2];
+     for p in Player::BOTH {
+         let phase = if p == Player::P0 { "ev_p0" } else { "ev_p1" };
+         event(phase, "started");
++        let phase_cpu_started = process_cpu_ns();
++        let phase_wall_started = Instant::now();
+         ev[p.index()] = pool.install(|| solver.expected_value(p));
++        ev_wall_seconds[p.index()] = phase_wall_started.elapsed().as_secs_f64();
++        ev_cpu_seconds[p.index()] = process_cpu_elapsed(phase_cpu_started);
+         assert!(ev[p.index()].is_finite());
+         event(phase, "completed");
+     }
+     for p in Player::BOTH {
+         let phase = if p == Player::P0 { "br_p0" } else { "br_p1" };
+         event(phase, "started");
++        let phase_cpu_started = process_cpu_ns();
++        let phase_wall_started = Instant::now();
+         br[p.index()] = pool.install(|| solver.best_response_value(p));
++        br_wall_seconds[p.index()] = phase_wall_started.elapsed().as_secs_f64();
++        br_cpu_seconds[p.index()] = process_cpu_elapsed(phase_cpu_started);
+         assert!(br[p.index()].is_finite());
+         event(phase, "completed");
+     }
+     event("exploitability", "started");
++    let exploitability_cpu_started = process_cpu_ns();
++    let exploitability_wall_started = Instant::now();
+     let gains = pool.install(|| solver.exploitability()).0;
++    let exploitability_wall_seconds = exploitability_wall_started.elapsed().as_secs_f64();
++    let exploitability_cpu_seconds = process_cpu_elapsed(exploitability_cpu_started);
+     assert!(gains.iter().all(|v| v.is_finite()));
+     event("exploitability", "completed");
+     let quality_seconds = started.elapsed().as_secs_f64();
++    let quality_cpu_seconds = process_cpu_elapsed(quality_cpu_started);
+     assert_eq!(solver.iteration(), iterations);
+     let quality = format!(
+         "{{\"schema\":\"r1.flop-native-quality/v1\",\"case\":\"{case}\",\"iterations\":{iterations},\"root_support\":{support:?},\"normalizer_bits\":\"{:016x}\",\"ev\":{ev:?},\"ev_bits\":[\"{:016x}\",\"{:016x}\"],\"br\":{br:?},\"br_bits\":[\"{:016x}\",\"{:016x}\"],\"exploitability\":{gains:?},\"exploitability_bits\":[\"{:016x}\",\"{:016x}\"],\"metric_source\":\"public expected_value and best_response_value for both seats, then public exploitability\",\"ev_basis\":\"solver internal chip utility; no starting-share reporting offset\",\"quality_target\":null,\"cfv_capture\":false}}",
+@@ -278,6 +360,13 @@
+             "{{\"schema\":\"r1.flop-native-solve/v1\",\"status\":\"completed\",\"case\":\"{case}\",\"threads\":{threads},\"iterations\":{iterations},\"state_file\":\"state.bin\",\"state_bytes\":{state_bytes},\"quality_file\":\"quality.json\",\"build_seconds\":{build_seconds},\"cfr_seconds\":{cfr_seconds},\"state_write_seconds\":{state_write_seconds},\"quality_seconds\":{quality_seconds},\"cfv_capture\":false,\"performance_claim\":false}}"
+         ),
+     )?;
++    assert_eq!(cpu_allowed_list, allowed_cpu_list()?, "CPU affinity changed");
++    write_json(
++        &out.join("cpu.json"),
++        &format!(
++            "{{\"schema\":\"r1.flop-cpu-occupancy/v1\",\"case\":\"{case}\",\"threads\":{threads},\"iterations\":{iterations},\"clock\":\"CLOCK_PROCESS_CPUTIME_ID\",\"clock_id\":2,\"scope\":\"all threads in this process\",\"cpu_allowed_list\":\"{cpu_allowed_list}\",\"cfr_cpu_seconds\":{cfr_cpu_seconds},\"quality_cpu_seconds\":{quality_cpu_seconds},\"ev_cpu_seconds\":{ev_cpu_seconds:?},\"br_cpu_seconds\":{br_cpu_seconds:?},\"exploitability_cpu_seconds\":{exploitability_cpu_seconds},\"cfr_wall_seconds\":{cfr_seconds},\"quality_wall_seconds\":{quality_seconds},\"ev_wall_seconds\":{ev_wall_seconds:?},\"br_wall_seconds\":{br_wall_seconds:?},\"exploitability_wall_seconds\":{exploitability_wall_seconds},\"performance_claim\":false}}"
++        ),
++    )?;
+     event("probe", "completed");
+     Ok(())
+ }

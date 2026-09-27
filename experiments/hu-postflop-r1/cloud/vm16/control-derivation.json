@@ -1,0 +1,32 @@
+{
+  "capture-command.py": {
+    "original": {
+      "bytes": 2171,
+      "sha256": "fbcfe1fb3c63e53d5540b679c344cb94b026a0ad8204553d66da592bd7a6a286"
+    },
+    "generated": {
+      "bytes": 2171,
+      "sha256": "5b434b853fa3e579a4e97b68754d6a8d2701f1bf82c163cea64aa13f567d308d"
+    }
+  },
+  "recover.sh": {
+    "original": {
+      "bytes": 5827,
+      "sha256": "98a5ffea6fb821699fa5c7e083cb708a23b521b7fe405208831868232e8261cb"
+    },
+    "generated": {
+      "bytes": 5995,
+      "sha256": "273cc2a7a2e913995d960bb27eacc3027e824ac8ea47f4ac8affe5e5c9e09031"
+    }
+  },
+  "fetch-dependencies.sh": {
+    "original": {
+      "bytes": 893,
+      "sha256": "c862d60f65f5a9c984f749c86e64925ea5cd84f099e990969bba4aad8fef5018"
+    },
+    "generated": {
+      "bytes": 867,
+      "sha256": "b5f68aeb040b957d30c388313aac33400c4718502647b48f18034064700ff16b"
+    }
+  }
+}
