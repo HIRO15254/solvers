@@ -44,6 +44,7 @@
 | R1のflat chanceとEV再利用の組合せ | [候補とnative検査](hu-postflop-r1/flop-scaling/flat-ev/README.jp.md) | 8実行の全state・公開品質一致、汎用境界8 tests成功。2 workersの確保要求量を削減。時間・RSS・本体採用は別判断。ローカルtimingは利用者指示で実行前に取り下げ |
 | R1の呼出し内worker scratch再利用 | [研究候補](hu-postflop-r1/flop-scaling/worker-scratch/candidate.jp.md)、[事前比較条件](hu-postflop-r1/flop-scaling/worker-scratch/protocol.jp.md)、[VM15比較結果](hu-postflop-r1/cloud/vm15/report.jp.md) | 全64条件のstate/quality一致と候補138 tests成功。16 workersの必要な10%短縮を満たさず不採用。固定反復であり収束認定ではない。原本3片を保持しVM/disk削除済み |
 | R1 FlopのCPU時間・配置診断 | [固定条件](hu-postflop-r1/flop-scaling/cpu-occupancy/protocol.jp.md)、[診断adapter](hu-postflop-r1/flop-scaling/cpu-occupancy/adapter/README.jp.md)、[VM16診断結果](hu-postflop-r1/cloud/vm16/report.jp.md) | 全28 solvesでstate/quality一致。32 workersのCFRは16より4.82–8.40%遅く、CPU時間は約2倍。単独原因は未確定、最適化採用なし。原本3片を保持しVM/disk削除済み |
+| R1 F32 CFR更新の一時buffer往復削減 | [研究候補と未実行の検証条件](hu-postflop-r1/flop-scaling/fused-update/protocol.jp.md) | 旧更新式を保つ汎用StorageOpsの候補。生成sourceの可逆性を静的検査。本体は未変更、Rust実行・bit一致・性能は未検証 |
 | R1のGCP使用量による予約再計算 | [使用量](hu-postflop-r1/cloud/usage-reconcile-20260927/README.md)、[計算と適用](hu-postflop-r1/cloud/usage-cost-bound-20260927/applied.json) | 利用者の追加許可により、VM08〜13の稼働/削除・Monitoring・料金を照合し5 USDを再利用枠へ復帰。控除後の表示0を実費0とせず、欠測と余裕を保持 |
 | R1の受入証拠の範囲 | [事前条件の監査](hu-postflop-r1/acceptance/audit.jp.md)、[将来の外部比較器](hu-postflop-r1/acceptance/external-contract.md) | 既存の事前条件と測定後索引を区別。将来の閾値発行・校正・欠測の検査であり、総合受入の認定ではない |
 | R1の実入力への境界適用 | [抽象化の適用確認](hu-postflop-r1/reference/abstraction-applicability.md) | 017/019のhand identity・joint重み・完全記憶の検査と、未実装・未評価の範囲 |

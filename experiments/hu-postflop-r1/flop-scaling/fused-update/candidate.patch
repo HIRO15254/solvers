@@ -1,0 +1,227 @@
+--- a/crates/engine/src/solver.rs
++++ b/crates/engine/src/solver.rs
+@@ -6,7 +6,8 @@
+ use crate::schedule::{DiscountSchedule, Discounts};
+ use crate::scratch::Scratch;
+ use crate::storage::{
+-    StateMismatch, Storage, StorageRef, StorageSpan, StorageState, StorageStateRef, StorageView,
++    CfrUpdate, StateMismatch, Storage, StorageRef, StorageSpan, StorageState, StorageStateRef,
++    StorageView,
+ };
+ use crate::tree::{NodeId, NodeKind, PublicTree};
+ 
+@@ -848,25 +849,19 @@
+                 }
+             }
+ 
+-            // Instantaneous regret, computed in place.
+-            for a in 0..num_actions {
+-                for h in 0..num_hands {
+-                    cfvs[a * num_hands + h] -= node_cfv[h];
+-                }
+-            }
+-            views
+-                .own()
+-                .update_regrets(sref, sref.index, &cfvs, ctx.discounts);
+-
+-            // Overwrite `cfvs` again as the reach-weighted strategy buffer.
+-            for a in 0..num_actions {
+-                for h in 0..num_hands {
+-                    cfvs[a * num_hands + h] = my_reach[h] * sigma[a * num_hands + h];
+-                }
+-            }
+-            views
+-                .own()
+-                .accumulate_strategy(sref, sref.index, &cfvs, ctx.discounts);
++            // F32 consumes the same inputs directly; other backends retain
++            // the historical scratch transforms through the default method.
++            views.own().fused_update(
++                sref,
++                sref.index,
++                CfrUpdate {
++                    action_values: &mut cfvs,
++                    node_values: &node_cfv,
++                    reach: my_reach,
++                    strategy: &sigma,
++                },
++                ctx.discounts,
++            );
+ 
+             out.copy_from_slice(&node_cfv);
+ 
+--- a/crates/engine/src/storage.rs
++++ b/crates/engine/src/storage.rs
+@@ -32,6 +32,18 @@
+     pub end: usize,
+     pub sref_start: u32,
+     pub sref_end: u32,
++}
++
++/// Inputs for one acting-player CFR update, all in this node's hand space.
++/// `action_values` and `strategy` are action-major A*H slices; `node_values`
++/// and `reach` contain H entries. They must not alias the mutable storage.
++/// The contents of `action_values` after the call are unspecified scratch.
++/// This groups borrows only: it allocates nothing and owns no solver state.
++pub struct CfrUpdate<'a> {
++    pub action_values: &'a mut [f32],
++    pub node_values: &'a [f32],
++    pub reach: &'a [f32],
++    pub strategy: &'a [f32],
+ }
+ 
+ /// The four element-level operations shared by a full [`Storage`] backend
+@@ -53,6 +65,37 @@
+     /// Applies pre-add discounting (or reset) to the cumulative strategy,
+     /// then adds the reach-weighted current strategy `weighted`.
+     fn accumulate_strategy(&mut self, r: StorageRef, ref_idx: u32, weighted: &[f32], d: &Discounts);
++
++    /// Applies the acting-player regret and average-strategy updates.
++    /// The default keeps the historical scratch transforms and backend-call
++    /// order, including both complete I16 block quantizations. F32 backends
++    /// may fuse each producer with its storage update without changing any
++    /// per-element arithmetic. `action_values` is scratch after this call.
++    fn fused_update(&mut self, r: StorageRef, ref_idx: u32, update: CfrUpdate<'_>, d: &Discounts) {
++        let CfrUpdate {
++            action_values,
++            node_values,
++            reach,
++            strategy,
++        } = update;
++        let (num_actions, num_hands) = (r.num_actions as usize, r.num_hands as usize);
++        debug_assert_eq!(action_values.len(), r.len());
++        debug_assert_eq!(strategy.len(), r.len());
++        debug_assert_eq!(node_values.len(), num_hands);
++        debug_assert_eq!(reach.len(), num_hands);
++        for a in 0..num_actions {
++            for h in 0..num_hands {
++                action_values[a * num_hands + h] -= node_values[h];
++            }
++        }
++        self.update_regrets(r, ref_idx, action_values, d);
++        for a in 0..num_actions {
++            for h in 0..num_hands {
++                action_values[a * num_hands + h] = reach[h] * strategy[a * num_hands + h];
++            }
++        }
++        self.accumulate_strategy(r, ref_idx, action_values, d);
++    }
+ 
+     /// Writes the normalized average strategy into `out`. Hands never
+     /// reached get the uniform strategy.
+@@ -278,6 +321,66 @@
+     }
+ }
+ 
++// Fuse each producer with its F32 storage update, avoiding two scratch
++// write/read round trips. Keep all regret updates before all strategy updates.
++// These are the same f32 operations as the separate paths: no mul_add,
++// reassociation, reciprocal, zero-reach shortcut or changed discount cast.
++fn fused_update_f32_impl(
++    regrets: &mut [f32],
++    strategy_sum: &mut [f32],
++    offset: usize,
++    r: StorageRef,
++    update: CfrUpdate<'_>,
++    d: &Discounts,
++) {
++    let CfrUpdate {
++        action_values,
++        node_values,
++        reach,
++        strategy,
++    } = update;
++    let (num_actions, num_hands) = (r.num_actions as usize, r.num_hands as usize);
++    debug_assert_eq!(action_values.len(), r.len());
++    debug_assert_eq!(strategy.len(), r.len());
++    debug_assert_eq!(node_values.len(), num_hands);
++    debug_assert_eq!(reach.len(), num_hands);
++    let regrets = &mut regrets[offset..offset + r.len()];
++    let (pos, neg) = (d.pos as f32, d.neg as f32);
++    for a in 0..num_actions {
++        for h in 0..num_hands {
++            let i = a * num_hands + h;
++            let delta: f32 = action_values[i] - node_values[h];
++            let regret = &mut regrets[i];
++            let factor = if *regret > 0.0 { pos } else { neg };
++            let mut updated = *regret * factor + delta;
++            if d.floor_neg && updated < 0.0 {
++                updated = 0.0;
++            }
++            *regret = updated;
++        }
++    }
++    let strategy_sum = &mut strategy_sum[offset..offset + r.len()];
++    let avg = d.avg as f32;
++    if d.reset_avg {
++        for a in 0..num_actions {
++            for h in 0..num_hands {
++                let i = a * num_hands + h;
++                let weighted: f32 = reach[h] * strategy[i];
++                strategy_sum[i] = weighted;
++            }
++        }
++    } else {
++        for a in 0..num_actions {
++            for h in 0..num_hands {
++                let i = a * num_hands + h;
++                let weighted: f32 = reach[h] * strategy[i];
++                let sum = &mut strategy_sum[i];
++                *sum = *sum * avg + weighted;
++            }
++        }
++    }
++}
++
+ fn average_strategy_impl(strategy_sum: &[f32], offset: usize, r: StorageRef, out: &mut [f32]) {
+     normalize_columns(&strategy_sum[offset..offset + r.len()], r, out);
+ }
+@@ -303,6 +406,17 @@
+         d: &Discounts,
+     ) {
+         accumulate_strategy_impl(&mut self.strategy_sum, r.offset, r, weighted, d);
++    }
++
++    fn fused_update(&mut self, r: StorageRef, _ref_idx: u32, update: CfrUpdate<'_>, d: &Discounts) {
++        fused_update_f32_impl(
++            &mut self.regrets,
++            &mut self.strategy_sum,
++            r.offset,
++            r,
++            update,
++            d,
++        );
+     }
+ 
+     fn average_strategy(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+@@ -416,6 +530,18 @@
+     ) {
+         let local = self.local_offset(r);
+         accumulate_strategy_impl(&mut *self.strategy_sum, local, r, weighted, d);
++    }
++
++    fn fused_update(&mut self, r: StorageRef, _ref_idx: u32, update: CfrUpdate<'_>, d: &Discounts) {
++        let local = self.local_offset(r);
++        fused_update_f32_impl(
++            &mut *self.regrets,
++            &mut *self.strategy_sum,
++            local,
++            r,
++            update,
++            d,
++        );
+     }
+ 
+     fn average_strategy(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+--- a/crates/engine/src/lib.rs
++++ b/crates/engine/src/lib.rs
+@@ -26,8 +26,8 @@
+ pub use scratch::Scratch;
+ pub use solver::{CompiledGame, ParConfig, Solver, SolverState, SolverStateRef, TerminalEvaluator};
+ pub use storage::{
+-    F32Storage, F32View, I16Storage, I16View, StateMismatch, Storage, StorageOps, StorageRef,
+-    StorageSpan, StorageState, StorageStateRef, StorageView,
++    CfrUpdate, F32Storage, F32View, I16Storage, I16View, StateMismatch, Storage, StorageOps,
++    StorageRef, StorageSpan, StorageState, StorageStateRef, StorageView,
+ };
+ pub use tree::{
+     Deal, Node, NodeId, NodeKind, PublicTree, ReachMap, SparseTransition, TempNode, TreeSpec,
