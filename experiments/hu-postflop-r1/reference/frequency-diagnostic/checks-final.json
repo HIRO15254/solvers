@@ -1,0 +1,76 @@
+{
+  "schema": "r1.frequency-diagnostic-final-check/v1",
+  "recorded_at_utc": "2026-09-27T07:14:28.550767+00:00",
+  "python_ast_files": 2,
+  "readme_relative_links": 9,
+  "test_receipt_verified": true,
+  "runtime_sources_still_match_test_receipt": true,
+  "readme_change_after_tests": "Added links to the successful receipt and synthetic result; validator, tests and inputs unchanged.",
+  "files": [
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/receipt.json",
+      "bytes": 6548,
+      "sha256": "3cb384a04e5a2399a573431c6de30d2647c11ce50147d4de128e31956405640a"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/refuse-overwrite.stderr.log",
+      "bytes": 175,
+      "sha256": "d3abacfeb8cdda128ce4fe798d7d521254744f5fa4e6193693f2d0406999a149"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/refuse-overwrite.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/synthetic-cli.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/synthetic-cli.stdout.log",
+      "bytes": 73,
+      "sha256": "d889332ebd15c5099c372c6ff52a4340ec69ead3456e3193cfe9bddae921c27c"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/synthetic-result.json",
+      "bytes": 8424,
+      "sha256": "669ce279b6759037d1bce4143b133d6f9b938f047debc1a843f6e362ee2bd164"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/unit-tests.stderr.log",
+      "bytes": 2596,
+      "sha256": "bf17e005a87e4a0533b75b3ebb49848e58af8e08ce84bde53b85a31154c5630c"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/unit-tests.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/frequency.py",
+      "bytes": 18194,
+      "sha256": "b9c6ebec7fca43936961ee488b9fa52a276934348f6b8eb68a175c9123a14054"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/README.md",
+      "bytes": 9811,
+      "sha256": "72afa4e514cd574ed18e2722a5ca7b3ada404060628f1af116737086c1646699"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/synthetic-evidence.json",
+      "bytes": 856,
+      "sha256": "a47225e1e85f33cf041469878366f73ff43dd3a811b24e1746a90e846af56de5"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/synthetic-input.json",
+      "bytes": 2789,
+      "sha256": "7593892bb2c38e597645b40e0f989c58a065e31e9665af729c0bca3cdae939ba"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/test_frequency.py",
+      "bytes": 11745,
+      "sha256": "6943232088826a9f6254b56c14af8b43e9c02567c0ea87a9a9bc328e0f10e943"
+    }
+  ]
+}

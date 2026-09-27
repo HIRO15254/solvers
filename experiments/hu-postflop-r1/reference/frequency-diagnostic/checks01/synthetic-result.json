@@ -1,0 +1,347 @@
+{
+  "acceptance": null,
+  "action_sets": {
+    "match": true,
+    "own_only": [],
+    "reference_only": []
+  },
+  "actor": "OOP",
+  "case_id": "synthetic-two-positive-hands",
+  "comparison_threshold": null,
+  "condition_match": "unverified",
+  "coverage": {
+    "comparable_reference_mass": {
+      "denominator": "1",
+      "numerator": "4"
+    },
+    "cutoff_excluded_positive_mass": {
+      "denominator": "1",
+      "numerator": "0"
+    },
+    "excluded_positive_mass": {
+      "denominator": "1",
+      "numerator": "0"
+    },
+    "known_own_mass": {
+      "denominator": "1",
+      "numerator": "5"
+    },
+    "known_reference_mass": {
+      "denominator": "1",
+      "numerator": "4"
+    },
+    "missing_own_mass_hands": [],
+    "missing_reference_mass_hands": [],
+    "own_mass": {
+      "denominator": "1",
+      "numerator": "5"
+    },
+    "positive_mass_cutoff": null,
+    "positive_reference_hands": 2,
+    "reference_mass": {
+      "denominator": "1",
+      "numerator": "4"
+    },
+    "root_support_hands": 4,
+    "unavailable_policy_reference_mass": {
+      "denominator": "1",
+      "numerator": "0"
+    },
+    "zero_reference_hands": [
+      42,
+      1325
+    ]
+  },
+  "hand_action": {
+    "candidate_count": 4,
+    "compared_count": 4,
+    "complete": true,
+    "display_count": 4,
+    "maximum_observed_difference_pp": {
+      "denominator": "1",
+      "numerator": "75"
+    },
+    "top20": [
+      {
+        "absolute_difference_pp": {
+          "denominator": "1",
+          "numerator": "75"
+        },
+        "action_id": "bet_to:100",
+        "combo_id": 0,
+        "own_display_interval": null,
+        "own_joint_mass": {
+          "denominator": "2",
+          "numerator": "9"
+        },
+        "own_probability": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_display_interval": null,
+        "reference_probability": {
+          "denominator": "4",
+          "numerator": "3"
+        },
+        "rounding_only_lower_bound_pp": null,
+        "w_ref": {
+          "denominator": "1",
+          "numerator": "1"
+        }
+      },
+      {
+        "absolute_difference_pp": {
+          "denominator": "1",
+          "numerator": "75"
+        },
+        "action_id": "check",
+        "combo_id": 0,
+        "own_display_interval": null,
+        "own_joint_mass": {
+          "denominator": "2",
+          "numerator": "9"
+        },
+        "own_probability": {
+          "denominator": "1",
+          "numerator": "1"
+        },
+        "reference_display_interval": null,
+        "reference_probability": {
+          "denominator": "4",
+          "numerator": "1"
+        },
+        "rounding_only_lower_bound_pp": null,
+        "w_ref": {
+          "denominator": "1",
+          "numerator": "1"
+        }
+      },
+      {
+        "absolute_difference_pp": {
+          "denominator": "1",
+          "numerator": "50"
+        },
+        "action_id": "bet_to:100",
+        "combo_id": 17,
+        "own_display_interval": null,
+        "own_joint_mass": {
+          "denominator": "2",
+          "numerator": "1"
+        },
+        "own_probability": {
+          "denominator": "1",
+          "numerator": "1"
+        },
+        "reference_display_interval": null,
+        "reference_probability": {
+          "denominator": "2",
+          "numerator": "1"
+        },
+        "rounding_only_lower_bound_pp": null,
+        "w_ref": {
+          "denominator": "1",
+          "numerator": "3"
+        }
+      },
+      {
+        "absolute_difference_pp": {
+          "denominator": "1",
+          "numerator": "50"
+        },
+        "action_id": "check",
+        "combo_id": 17,
+        "own_display_interval": null,
+        "own_joint_mass": {
+          "denominator": "2",
+          "numerator": "1"
+        },
+        "own_probability": {
+          "denominator": "1",
+          "numerator": "0"
+        },
+        "reference_display_interval": null,
+        "reference_probability": {
+          "denominator": "2",
+          "numerator": "1"
+        },
+        "rounding_only_lower_bound_pp": null,
+        "w_ref": {
+          "denominator": "1",
+          "numerator": "3"
+        }
+      }
+    ]
+  },
+  "hands": [
+    {
+      "combo_id": 0,
+      "own_joint_mass": {
+        "denominator": "2",
+        "numerator": "9"
+      },
+      "own_zero_reach": false,
+      "policy_missing_actions": {
+        "own": [],
+        "reference": []
+      },
+      "reason": null,
+      "status": "computed",
+      "tv_pp": {
+        "denominator": "1",
+        "numerator": "75"
+      },
+      "w_ref": {
+        "denominator": "1",
+        "numerator": "1"
+      }
+    },
+    {
+      "combo_id": 17,
+      "own_joint_mass": {
+        "denominator": "2",
+        "numerator": "1"
+      },
+      "own_zero_reach": false,
+      "policy_missing_actions": {
+        "own": [],
+        "reference": []
+      },
+      "reason": null,
+      "status": "computed",
+      "tv_pp": {
+        "denominator": "1",
+        "numerator": "50"
+      },
+      "w_ref": {
+        "denominator": "1",
+        "numerator": "3"
+      }
+    },
+    {
+      "combo_id": 42,
+      "own_joint_mass": {
+        "denominator": "1",
+        "numerator": "0"
+      },
+      "own_zero_reach": true,
+      "policy_missing_actions": {
+        "own": [
+          "check",
+          "bet_to:100"
+        ],
+        "reference": [
+          "check",
+          "bet_to:100"
+        ]
+      },
+      "reason": "zero compatible reference mass",
+      "status": "not_applicable",
+      "tv_pp": null,
+      "w_ref": {
+        "denominator": "1",
+        "numerator": "0"
+      }
+    },
+    {
+      "combo_id": 1325,
+      "own_joint_mass": {
+        "denominator": "1",
+        "numerator": "0"
+      },
+      "own_zero_reach": true,
+      "policy_missing_actions": {
+        "own": [
+          "check",
+          "bet_to:100"
+        ],
+        "reference": [
+          "check",
+          "bet_to:100"
+        ]
+      },
+      "reason": "zero compatible reference mass",
+      "status": "not_applicable",
+      "tv_pp": null,
+      "w_ref": {
+        "denominator": "1",
+        "numerator": "0"
+      }
+    }
+  ],
+  "input": {
+    "bytes": 2789,
+    "sha256": "7593892bb2c38e597645b40e0f989c58a065e31e9665af729c0bca3cdae939ba"
+  },
+  "issues": [],
+  "limits": [
+    "Arithmetic over explicitly supplied conditional policies and a materialized reference joint measure; evidence identity is not semantic proof.",
+    "Own reach never replaces w_ref. Explicit own policy at zero own reach is compared off policy under the reference measure.",
+    "Unknown precision gives null rounding lower bounds; known rounding bounds are not numeric-error or quality margins.",
+    "No missing policy, reach or legal action is completed, normalized, thresholded or treated as zero. No external quality pass is produced."
+  ],
+  "node_id": "synthetic/root",
+  "numeric_error_upper_bound_pp": null,
+  "profile_kinds": {
+    "own": "synthetic",
+    "reference": "synthetic"
+  },
+  "quality_status": "not_evaluated",
+  "range_weighted": {
+    "actions": [
+      {
+        "absolute_difference_pp": {
+          "denominator": "4",
+          "numerator": "75"
+        },
+        "action_id": "bet_to:100",
+        "own_frequency": {
+          "denominator": "4",
+          "numerator": "3"
+        },
+        "reference_frequency": {
+          "denominator": "16",
+          "numerator": "9"
+        },
+        "rounding_only_lower_bound_pp": null
+      },
+      {
+        "absolute_difference_pp": {
+          "denominator": "4",
+          "numerator": "75"
+        },
+        "action_id": "check",
+        "own_frequency": {
+          "denominator": "4",
+          "numerator": "1"
+        },
+        "reference_frequency": {
+          "denominator": "16",
+          "numerator": "7"
+        },
+        "rounding_only_lower_bound_pp": null
+      }
+    ],
+    "rounding_only_tv_lower_bound_pp": null,
+    "tv_pp": {
+      "denominator": "4",
+      "numerator": "225"
+    }
+  },
+  "rounding": {
+    "own": null,
+    "reference": null
+  },
+  "schema": "r1.frequency-diagnostic-result/v1",
+  "status": "computed",
+  "validator": {
+    "bytes": 18194,
+    "sha256": "b9c6ebec7fca43936961ee488b9fa52a276934348f6b8eb68a175c9123a14054"
+  },
+  "verified_evidence": [
+    {
+      "bytes": 856,
+      "path": "synthetic-evidence.json",
+      "sha256": "a47225e1e85f33cf041469878366f73ff43dd3a811b24e1746a90e846af56de5"
+    }
+  ]
+}

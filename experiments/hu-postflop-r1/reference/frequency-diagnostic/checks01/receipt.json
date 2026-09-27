@@ -1,0 +1,150 @@
+{
+  "schema": "r1.frequency-diagnostic-checks/v1",
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "source_before": [
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/frequency.py",
+      "bytes": 18194,
+      "sha256": "b9c6ebec7fca43936961ee488b9fa52a276934348f6b8eb68a175c9123a14054"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/test_frequency.py",
+      "bytes": 11745,
+      "sha256": "6943232088826a9f6254b56c14af8b43e9c02567c0ea87a9a9bc328e0f10e943"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/synthetic-input.json",
+      "bytes": 2789,
+      "sha256": "7593892bb2c38e597645b40e0f989c58a065e31e9665af729c0bca3cdae939ba"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/synthetic-evidence.json",
+      "bytes": 856,
+      "sha256": "a47225e1e85f33cf041469878366f73ff43dd3a811b24e1746a90e846af56de5"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/README.md",
+      "bytes": 9416,
+      "sha256": "f5a254b713758289d12d1aa19509aefc7d64ada857e15092483850405d406d0f"
+    }
+  ],
+  "source_after": [
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/frequency.py",
+      "bytes": 18194,
+      "sha256": "b9c6ebec7fca43936961ee488b9fa52a276934348f6b8eb68a175c9123a14054"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/test_frequency.py",
+      "bytes": 11745,
+      "sha256": "6943232088826a9f6254b56c14af8b43e9c02567c0ea87a9a9bc328e0f10e943"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/synthetic-input.json",
+      "bytes": 2789,
+      "sha256": "7593892bb2c38e597645b40e0f989c58a065e31e9665af729c0bca3cdae939ba"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/synthetic-evidence.json",
+      "bytes": 856,
+      "sha256": "a47225e1e85f33cf041469878366f73ff43dd3a811b24e1746a90e846af56de5"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/README.md",
+      "bytes": 9416,
+      "sha256": "f5a254b713758289d12d1aa19509aefc7d64ada857e15092483850405d406d0f"
+    }
+  ],
+  "commands": [
+    {
+      "name": "unit-tests",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\frequency-diagnostic\\test_frequency.py"
+      ],
+      "started_at_utc": "2026-09-27T07:13:04.766456+00:00",
+      "elapsed_secs": 0.24470310006290674,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout": {
+        "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/unit-tests.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/unit-tests.stderr.log",
+        "bytes": 2596,
+        "sha256": "bf17e005a87e4a0533b75b3ebb49848e58af8e08ce84bde53b85a31154c5630c"
+      }
+    },
+    {
+      "name": "synthetic-cli",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\frequency-diagnostic\\frequency.py",
+        "--input",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\frequency-diagnostic\\synthetic-input.json",
+        "--evidence-root",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\frequency-diagnostic",
+        "--out",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\frequency-diagnostic\\checks01\\synthetic-result.json"
+      ],
+      "started_at_utc": "2026-09-27T07:13:05.017245+00:00",
+      "elapsed_secs": 0.10521019995212555,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout": {
+        "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/synthetic-cli.stdout.log",
+        "bytes": 73,
+        "sha256": "d889332ebd15c5099c372c6ff52a4340ec69ead3456e3193cfe9bddae921c27c"
+      },
+      "stderr": {
+        "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/synthetic-cli.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "refuse-overwrite",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\frequency-diagnostic\\frequency.py",
+        "--input",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\frequency-diagnostic\\synthetic-input.json",
+        "--evidence-root",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\frequency-diagnostic",
+        "--out",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\reference\\frequency-diagnostic\\checks01\\synthetic-result.json"
+      ],
+      "started_at_utc": "2026-09-27T07:13:05.128555+00:00",
+      "elapsed_secs": 0.09749269997701049,
+      "exit_code": 2,
+      "expected_exit_code": 2,
+      "stdout": {
+        "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/refuse-overwrite.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/refuse-overwrite.stderr.log",
+        "bytes": 175,
+        "sha256": "d3abacfeb8cdda128ce4fe798d7d521254744f5fa4e6193693f2d0406999a149"
+      }
+    }
+  ],
+  "all_expected_exit_codes": true,
+  "no_native_or_solver_execution": true,
+  "python_version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+  "python_executable": {
+    "path": "C:\\Python313\\python.exe",
+    "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca"
+  },
+  "synthetic_result": {
+    "path": "experiments/hu-postflop-r1/reference/frequency-diagnostic/checks01/synthetic-result.json",
+    "bytes": 8424,
+    "sha256": "669ce279b6759037d1bce4143b133d6f9b938f047debc1a843f6e362ee2bd164"
+  }
+}

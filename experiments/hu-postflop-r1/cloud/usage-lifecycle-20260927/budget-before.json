@@ -33,7 +33,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260927-15",
-      "reserved_usd": 2.0,
+      "reserved_usd": 2.5,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 1.25,
@@ -84,19 +84,6 @@
           "evidence_sha256": "970a3ea2cfffb0dad3354f3f7e9e255f9dd340e9732e5d2f8ea647b2bf4157de",
           "billed_usd": null,
           "final_invoice": false
-        },
-        {
-          "event": "usage_based_lifecycle_reservation_reconciliation",
-          "at": "2026-09-27T07:10:03.169244+00:00",
-          "id": "r1-20260927-15",
-          "old_reserved_usd": 2.5,
-          "new_reserved_usd": 2.0,
-          "restored_to_available_budget_usd": 0.5,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-20260927/report02.json",
-          "evidence_sha256": "814cc041fd1947eecfa53c2caf90d33632d8e280b26e66caa5a5ee573a487714",
-          "billed_usd": null,
-          "final_invoice": false,
-          "note": "Original uncertainty retained; same-ID lifecycle and acquired traffic support smaller unused resource allowance. Missing traffic unknown."
         }
       ],
       "disposition": "Full64 conditions complete; same state/quality verified on GCP; worker scratch candidate rejected under fixed guard. Original evidence retained in3 archive parts; local compressed stream hash matched. Measurement32CPU boot then2CPU recovery only. Instance and sole40GiB disk deleted; absence verified. Original deadline unchanged.3USD held pending usage; invoice unknown."
@@ -106,7 +93,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260927-14",
-      "reserved_usd": 1.9,
+      "reserved_usd": 2.5,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 1.25,
@@ -201,19 +188,6 @@
           "evidence_sha256": "478ec20619bc52da09f0f691d9304aeae6e41b77d1c2da9539d6aea815e429cc",
           "billed_usd": null,
           "final_invoice": false
-        },
-        {
-          "event": "usage_based_lifecycle_reservation_reconciliation",
-          "at": "2026-09-27T07:10:03.169244+00:00",
-          "id": "r1-20260927-14",
-          "old_reserved_usd": 2.5,
-          "new_reserved_usd": 1.9,
-          "restored_to_available_budget_usd": 0.6,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-20260927/report02.json",
-          "evidence_sha256": "814cc041fd1947eecfa53c2caf90d33632d8e280b26e66caa5a5ee573a487714",
-          "billed_usd": null,
-          "final_invoice": false,
-          "note": "Original uncertainty retained; same-ID lifecycle and acquired traffic support smaller unused resource allowance. Missing traffic unknown."
         }
       ],
       "measurement_deadline_utc": "2026-09-27T03:30:00Z",
@@ -892,7 +866,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260925-07",
-      "reserved_usd": 3.6,
+      "reserved_usd": 4.25,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 3,
@@ -935,19 +909,6 @@
           "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
           "billed_usd": null,
           "final_invoice": false
-        },
-        {
-          "event": "usage_based_lifecycle_reservation_reconciliation",
-          "at": "2026-09-27T07:10:03.169244+00:00",
-          "id": "r1-20260925-07",
-          "old_reserved_usd": 4.25,
-          "new_reserved_usd": 3.6,
-          "restored_to_available_budget_usd": 0.65,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-20260927/report02.json",
-          "evidence_sha256": "814cc041fd1947eecfa53c2caf90d33632d8e280b26e66caa5a5ee573a487714",
-          "billed_usd": null,
-          "final_invoice": false,
-          "note": "Original uncertainty retained; same-ID lifecycle and acquired traffic support smaller unused resource allowance. Missing traffic unknown."
         }
       ],
       "original_reserved_usd": 5
@@ -1093,7 +1054,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260925-06",
-      "reserved_usd": 4.2,
+      "reserved_usd": 4.75,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 3,
@@ -1147,19 +1108,6 @@
           "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
           "billed_usd": null,
           "final_invoice": false
-        },
-        {
-          "event": "usage_based_lifecycle_reservation_reconciliation",
-          "at": "2026-09-27T07:10:03.169244+00:00",
-          "id": "r1-20260925-06",
-          "old_reserved_usd": 4.75,
-          "new_reserved_usd": 4.2,
-          "restored_to_available_budget_usd": 0.55,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-20260927/report02.json",
-          "evidence_sha256": "814cc041fd1947eecfa53c2caf90d33632d8e280b26e66caa5a5ee573a487714",
-          "billed_usd": null,
-          "final_invoice": false,
-          "note": "Original uncertainty retained; same-ID lifecycle and acquired traffic support smaller unused resource allowance. Missing traffic unknown."
         }
       ],
       "original_reserved_usd": 5
@@ -1303,40 +1251,6 @@
           "basis": "Whole lifetime small-VM price plus a wider overlapping high-CPU interval; original one-dollar uncertainty, disk24h and512MiB egress retained"
         }
       ]
-    },
-    {
-      "id": "r1-20260927-18",
-      "project": "solvers-abstraction-20260723",
-      "zone": "us-central1-b",
-      "instance": "solvers-r1-20260927-18",
-      "reserved_usd": 2.5,
-      "billed_usd": null,
-      "reservation_released": false,
-      "maximum_runtime_seconds": 3600,
-      "maximum_starts": 3,
-      "billing_rounding_slack_seconds": 120,
-      "machine_type": "e2-standard-2",
-      "measurement_machine_type": "e2-highcpu-32",
-      "capacity_or_quota_fallback": "n2-highcpu-32 on same stopped instance after explicit E2 capacity failure only; original STOP unchanged",
-      "provisioning_model": "SPOT",
-      "disk_type": "pd-balanced",
-      "disk_gib": 40,
-      "maximum_download_gib": 0.5,
-      "maximum_archive_bytes": 268435456,
-      "conservative_compute_usd_hour": 1.15,
-      "disk_usd_gib_hour": 0.000137,
-      "ipv4_usd_hour": 0.0025,
-      "reserved_egress_usd_gib": 0.3,
-      "tax_price_delay_and_other_reserve_usd": 1,
-      "instance_termination_action": "STOP",
-      "explicit_disk_cleanup_hours": 24,
-      "auto_restart": false,
-      "reserved_at_utc": "2026-09-27T07:15:22.282519+00:00",
-      "pricing_checked_utc": "2026-09-27",
-      "pricing_evidence": "experiments/hu-postflop-r1/cloud/preflight-vm18/cost-proposal.json",
-      "purpose": "Portable2CPU build/core tests followed by32CPU fixed38-solve chance-depth1 versus2 comparison",
-      "preflight_evidence": "experiments/hu-postflop-r1/cloud/vm18/",
-      "note": "Single instance, launch+20min build deadline,20min measurement,15min recovery before fixed60min STOP. All38 solves share32CPU boot and binary; no local native work. Full62min highest regular rate plus40GiB24h disk,.5GiB egress,$1 uncertainty models2.472436667. Estimate only; billed unknown."
     }
   ],
   "usage_reconciliations": [
@@ -1520,79 +1434,6 @@
           "final_invoice": false
         }
       ]
-    },
-    {
-      "at_utc": "2026-09-27T07:10:03.169244+00:00",
-      "authorized_limit_usd": 40,
-      "held_before_usd": 39.8,
-      "held_after_usd": 37.5,
-      "restored_usd": 2.3,
-      "available_after_usd": 2.5,
-      "changes": [
-        {
-          "event": "usage_based_lifecycle_reservation_reconciliation",
-          "at": "2026-09-27T07:10:03.169244+00:00",
-          "id": "r1-20260925-06",
-          "old_reserved_usd": 4.75,
-          "new_reserved_usd": 4.2,
-          "restored_to_available_budget_usd": 0.55,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-20260927/report02.json",
-          "evidence_sha256": "814cc041fd1947eecfa53c2caf90d33632d8e280b26e66caa5a5ee573a487714",
-          "billed_usd": null,
-          "final_invoice": false,
-          "note": "Original uncertainty retained; same-ID lifecycle and acquired traffic support smaller unused resource allowance. Missing traffic unknown."
-        },
-        {
-          "event": "usage_based_lifecycle_reservation_reconciliation",
-          "at": "2026-09-27T07:10:03.169244+00:00",
-          "id": "r1-20260925-07",
-          "old_reserved_usd": 4.25,
-          "new_reserved_usd": 3.6,
-          "restored_to_available_budget_usd": 0.65,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-20260927/report02.json",
-          "evidence_sha256": "814cc041fd1947eecfa53c2caf90d33632d8e280b26e66caa5a5ee573a487714",
-          "billed_usd": null,
-          "final_invoice": false,
-          "note": "Original uncertainty retained; same-ID lifecycle and acquired traffic support smaller unused resource allowance. Missing traffic unknown."
-        },
-        {
-          "event": "usage_based_lifecycle_reservation_reconciliation",
-          "at": "2026-09-27T07:10:03.169244+00:00",
-          "id": "r1-20260927-14",
-          "old_reserved_usd": 2.5,
-          "new_reserved_usd": 1.9,
-          "restored_to_available_budget_usd": 0.6,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-20260927/report02.json",
-          "evidence_sha256": "814cc041fd1947eecfa53c2caf90d33632d8e280b26e66caa5a5ee573a487714",
-          "billed_usd": null,
-          "final_invoice": false,
-          "note": "Original uncertainty retained; same-ID lifecycle and acquired traffic support smaller unused resource allowance. Missing traffic unknown."
-        },
-        {
-          "event": "usage_based_lifecycle_reservation_reconciliation",
-          "at": "2026-09-27T07:10:03.169244+00:00",
-          "id": "r1-20260927-15",
-          "old_reserved_usd": 2.5,
-          "new_reserved_usd": 2.0,
-          "restored_to_available_budget_usd": 0.5,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-20260927/report02.json",
-          "evidence_sha256": "814cc041fd1947eecfa53c2caf90d33632d8e280b26e66caa5a5ee573a487714",
-          "billed_usd": null,
-          "final_invoice": false,
-          "note": "Original uncertainty retained; same-ID lifecycle and acquired traffic support smaller unused resource allowance. Missing traffic unknown."
-        }
-      ],
-      "report": {
-        "bytes": 55094,
-        "sha256": "814cc041fd1947eecfa53c2caf90d33632d8e280b26e66caa5a5ee573a487714"
-      },
-      "budget_before": {
-        "bytes": 72594,
-        "sha256": "8e28e34709452c791980f268ea44edd5f2bd2a14a1cc21eccdeb365d16549901"
-      },
-      "billed_usd": null,
-      "final_invoice": false,
-      "cloud_mutations": false
     }
   ]
 }

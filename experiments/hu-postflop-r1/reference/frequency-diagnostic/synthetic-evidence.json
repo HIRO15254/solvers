@@ -1,0 +1,13 @@
+{
+  "purpose": "Artificial arithmetic fixture only; not an external observation, game certificate, strategy recommendation or acceptance threshold.",
+  "support": [0, 17, 42, 1325],
+  "node": "synthetic/root",
+  "actor": "OOP",
+  "actions": ["check", "bet_to:100"],
+  "reference_weight_derivation": "For each declared hand, reference actor reach times compatible opponent reach times chance weight; exact factors are supplied in synthetic-input.json. Card removal is supplied data, not inferred by the frequency checker.",
+  "expected_reference_mass": "4",
+  "expected_own_mass": "5",
+  "expected_tv_pp": "56.25",
+  "expected_action_absolute_difference_pp": "18.75",
+  "limits": "The synthetic support and compatible masses are labels for arithmetic testing, not a solved poker fixture. No reference version, rake, public tree or quality claim is made."
+}

@@ -1,0 +1,16 @@
+test_build_and_measure_receipts_separate (test_run.Contracts.test_build_and_measure_receipts_separate) ... ok
+test_explicit_portable_environment (test_run.Contracts.test_explicit_portable_environment) ... ok
+test_inverse_adapter_and_quality_reset (test_run.Contracts.test_inverse_adapter_and_quality_reset) ... ok
+test_matrix_and_canonical_order (test_run.Contracts.test_matrix_and_canonical_order) ... ok
+test_observation_scope_and_depth (test_run.Contracts.test_observation_scope_and_depth) ... ok
+test_partial_schedule_cannot_summarize (test_run.Contracts.test_partial_schedule_cannot_summarize) ... ok
+test_predeclared_screen_complete_and_each_guard (test_run.Contracts.test_predeclared_screen_complete_and_each_guard) ... ok
+test_reboot_binding_rejects_same_boot_or_other_instance (test_run.Contracts.test_reboot_binding_rejects_same_boot_or_other_instance) ... ok
+test_required_native_tests_missing_or_duplicate_rejected (test_run.Contracts.test_required_native_tests_missing_or_duplicate_rejected) ... ok
+test_strict_json_and_supervisor_real_contract (test_run.Contracts.test_strict_json_and_supervisor_real_contract) ... ok
+test_v3_flags_and_os_usable_gate (test_run.Contracts.test_v3_flags_and_os_usable_gate) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.005s
+
+OK

@@ -1,0 +1,24 @@
+test_action_order_is_irrelevant_but_set_mismatch_is_not (__main__.FrequencyTests.test_action_order_is_irrelevant_but_set_mismatch_is_not) ... ok
+test_aggregate_cancellation_does_not_hide_tv (__main__.FrequencyTests.test_aggregate_cancellation_does_not_hide_tv) ... ok
+test_all_zero_node_has_no_zero_valued_diagnostic (__main__.FrequencyTests.test_all_zero_node_has_no_zero_valued_diagnostic) ... ok
+test_common_weight_not_own_weight (__main__.FrequencyTests.test_common_weight_not_own_weight) ... ok
+test_evidence_tamper_and_escape_are_rejected (__main__.FrequencyTests.test_evidence_tamper_and_escape_are_rejected) ... ok
+test_exact_quantized_rational_policy (__main__.FrequencyTests.test_exact_quantized_rational_policy) ... ok
+test_explicit_own_policy_at_zero_own_reach_uses_reference_measure (__main__.FrequencyTests.test_explicit_own_policy_at_zero_own_reach_uses_reference_measure) ... ok
+test_invalid_shapes_duplicates_and_nonfinite_numbers (__main__.FrequencyTests.test_invalid_shapes_duplicates_and_nonfinite_numbers) ... ok
+test_missing_positive_action_is_not_explicit_zero (__main__.FrequencyTests.test_missing_positive_action_is_not_explicit_zero) ... ok
+test_no_low_mass_cutoff (__main__.FrequencyTests.test_no_low_mass_cutoff) ... ok
+test_nonstochastic_or_non_nearest_input_is_not_repaired (__main__.FrequencyTests.test_nonstochastic_or_non_nearest_input_is_not_repaired) ... ok
+test_null_missing_and_absent_policy_are_equivalent_missingness (__main__.FrequencyTests.test_null_missing_and_absent_policy_are_equivalent_missingness) ... ok
+test_rounding_unknown_and_declared_bounds (__main__.FrequencyTests.test_rounding_unknown_and_declared_bounds) ... ok
+test_scope_and_missing_provenance_block_local_metrics (__main__.FrequencyTests.test_scope_and_missing_provenance_block_local_metrics) ... ok
+test_top20_counts_and_tie_order (__main__.FrequencyTests.test_top20_counts_and_tie_order) ... ok
+test_unknown_own_reach_is_separate_from_common_reference_measure (__main__.FrequencyTests.test_unknown_own_reach_is_separate_from_common_reference_measure) ... ok
+test_unknown_reference_mass_never_renormalizes_known_subset (__main__.FrequencyTests.test_unknown_reference_mass_never_renormalizes_known_subset) ... ok
+test_weight_factors_must_match_including_chance (__main__.FrequencyTests.test_weight_factors_must_match_including_chance) ... ok
+test_zero_compatible_reference_hands_are_na (__main__.FrequencyTests.test_zero_compatible_reference_hands_are_na) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.130s
+
+OK

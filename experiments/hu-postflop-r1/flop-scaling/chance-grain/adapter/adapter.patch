@@ -1,0 +1,156 @@
+--- cpu-occupancy/adapter/solve.rs
++++ chance-grain/adapter/solve.rs
+@@ -1,6 +1,6 @@
+ //! Research-only fixed-fixture correctness probe, not a CLI config parser.
+-//! Usage: solve.exe narrow|expanded 1|2|4|8|16|32 1..128 NEW_OUTPUT_DIRECTORY
+-//! Arguments after the case are worker count and exact iteration count.
++//! Usage: solve narrow|expanded 1|16|32 2|16 1|2 NEW_OUTPUT_DIRECTORY
++//! Arguments after the case are worker count, exact iterations and CFR chance depth.
+ //! External supervision supplies wall-time, memory and disk bounds.
+ 
+ use std::collections::{BTreeMap, BTreeSet};
+@@ -48,11 +48,19 @@
+ 
+ fn process_cpu_ns() -> u64 {
+     const CLOCK_PROCESS_CPUTIME_ID: std::ffi::c_int = 2;
+-    let mut value = ProcessCpuTimespec { tv_sec: 0, tv_nsec: 0 };
++    let mut value = ProcessCpuTimespec {
++        tv_sec: 0,
++        tv_nsec: 0,
++    };
+     // SAFETY: the guarded LP64 ABI matches clockid_t and struct timespec;
+     // value is a live, aligned, exclusively borrowed writable stack object.
+     let result = unsafe { clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &mut value) };
+-    assert_eq!(result, 0, "clock_gettime failed: {}", std::io::Error::last_os_error());
++    assert_eq!(
++        result,
++        0,
++        "clock_gettime failed: {}",
++        std::io::Error::last_os_error()
++    );
+     assert!(value.tv_sec >= 0 && (0..1_000_000_000).contains(&value.tv_nsec));
+     (value.tv_sec as u64)
+         .checked_mul(1_000_000_000)
+@@ -69,12 +77,20 @@
+ 
+ fn allowed_cpu_list() -> std::io::Result<String> {
+     let status = std::fs::read_to_string("/proc/self/status")?;
+-    let mut fields = status.lines().filter_map(|line| line.strip_prefix("Cpus_allowed_list:"));
++    let mut fields = status
++        .lines()
++        .filter_map(|line| line.strip_prefix("Cpus_allowed_list:"));
+     let value = fields.next().unwrap_or("").trim();
+-    if value.is_empty() || fields.next().is_some()
+-        || !value.bytes().all(|b| b.is_ascii_digit() || b == b',' || b == b'-')
++    if value.is_empty()
++        || fields.next().is_some()
++        || !value
++            .bytes()
++            .all(|b| b.is_ascii_digit() || b == b',' || b == b'-')
+     {
+-        return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid Cpus_allowed_list"));
++        return Err(std::io::Error::new(
++            std::io::ErrorKind::InvalidData,
++            "invalid Cpus_allowed_list",
++        ));
+     }
+     Ok(value.to_owned())
+ }
+@@ -210,22 +226,26 @@
+     let args: Vec<String> = std::env::args().skip(1).collect();
+     assert_eq!(
+         args.len(),
+-        4,
+-        "usage: solve narrow|expanded 1|2|4|8|16|32 1..128 NEW_OUTPUT_DIRECTORY"
++        5,
++        "usage: solve narrow|expanded 1|16|32 2|16 1|2 NEW_OUTPUT_DIRECTORY"
+     );
+     let case = args[0].as_str();
+     let threads: usize = args[1].parse()?;
+     let iterations: u64 = args[2].parse()?;
+     assert!([1, 2, 4, 8, 16, 32].contains(&threads), "workers");
+     assert!((1..=128).contains(&iterations), "iteration limit is 128");
++    let depth: u32 = args[3].parse()?;
++    assert!([1, 2].contains(&depth), "CFR chance depth");
++    assert!([1, 16, 32].contains(&threads), "workers");
++    assert!([2, 16].contains(&iterations), "fixed iterations");
+     let (config, support, elements, normalizer) = fixture(case);
+-    let out = Path::new(&args[3]);
++    let out = Path::new(&args[4]);
+     // Parent must exist; existing output directories are rejected, not reused.
+     std::fs::create_dir(out)?;
+     write_json(
+         &out.join("invocation.json"),
+         &format!(
+-            "{{\"schema\":\"r1.flop-native-solve/v1\",\"case\":\"{case}\",\"threads\":{threads},\"iterations\":{iterations},\"planned_iterations\":{iterations},\"chance_depth\":2,\"min_children\":12,\"storage\":\"f32\",\"schedule\":\"dcfr\",\"alpha\":1.5,\"beta\":0,\"gamma\":3,\"pow4_reset\":true,\"cli_toml_normalized\":false,\"quality_target\":null,\"cfv_capture\":false}}"
++            "{{\"schema\":\"r1.flop-native-solve/v1\",\"case\":\"{case}\",\"threads\":{threads},\"iterations\":{iterations},\"planned_iterations\":{iterations},\"chance_depth\":{depth},\"quality_chance_depth\":2,\"min_children\":12,\"storage\":\"f32\",\"schedule\":\"dcfr\",\"alpha\":1.5,\"beta\":0,\"gamma\":3,\"pow4_reset\":true,\"cli_toml_normalized\":false,\"quality_target\":null,\"cfv_capture\":false}}"
+         ),
+     )?;
+     event("build", "started");
+@@ -262,6 +282,32 @@
+         assert_eq!(game.root_ranges[p].len(), support[p.index()]);
+         assert!(game.root_ranges[p].iter().all(|&w| w == 1.0));
+     }
++    // Structural counts, not task counts; collected outside all measured clocks.
++    let mut frontier = [0_usize; 2];
++    let mut frontier_children = [0_usize; 2];
++    let mut stack = vec![(0_u32, 0_usize)];
++    while let Some((id, ancestors)) = stack.pop() {
++        let node = game.tree.node(id);
++        let is_chance = node.kind == NodeKind::Chance;
++        if is_chance && node.num_children >= 12 {
++            for depth in 1..=2 {
++                if ancestors < depth {
++                    frontier[depth - 1] += 1;
++                    frontier_children[depth - 1] += usize::from(node.num_children);
++                }
++            }
++        }
++        for child in game.tree.children(id) {
++            stack.push((child, ancestors + usize::from(is_chance)));
++        }
++    }
++    drop(stack);
++    write_json(
++        &out.join("grain.json"),
++        &format!(
++            "{{\"schema\":\"r1.flop-chance-grain-observation/v1\",\"case\":\"{case}\",\"cfr_depth\":{depth},\"quality_depth\":2,\"min_children\":12,\"eligible_chance_nodes_by_depth\":{frontier:?},\"eligible_child_edges_by_depth\":{frontier_children:?},\"counts_scope\":\"one structural root traversal; not tasks, iterations or seat passes\"}}"
++        ),
++    )?;
+     event("build", "completed");
+     let pool = rayon::ThreadPoolBuilder::new()
+         .num_threads(threads)
+@@ -278,7 +324,7 @@
+         Some(iterations),
+     );
+     solver.set_par(ParConfig {
+-        chance_depth: 2,
++        chance_depth: depth,
+         min_children: 12,
+     });
+     event("solver_allocation", "completed");
+@@ -300,6 +346,11 @@
+     let state_write_seconds = started.elapsed().as_secs_f64();
+     event("state_write", "completed");
+ 
++    // Only CFR depth varies; all quality traversals retain the original setting.
++    solver.set_par(ParConfig {
++        chance_depth: 2,
++        min_children: 12,
++    });
+     // Public API calls, including their precise zero-sum exploitability policy.
+     // No second metric definition or per-node/root CFV capture is introduced.
+     let quality_cpu_started = process_cpu_ns();
+@@ -360,7 +411,11 @@
+             "{{\"schema\":\"r1.flop-native-solve/v1\",\"status\":\"completed\",\"case\":\"{case}\",\"threads\":{threads},\"iterations\":{iterations},\"state_file\":\"state.bin\",\"state_bytes\":{state_bytes},\"quality_file\":\"quality.json\",\"build_seconds\":{build_seconds},\"cfr_seconds\":{cfr_seconds},\"state_write_seconds\":{state_write_seconds},\"quality_seconds\":{quality_seconds},\"cfv_capture\":false,\"performance_claim\":false}}"
+         ),
+     )?;
+-    assert_eq!(cpu_allowed_list, allowed_cpu_list()?, "CPU affinity changed");
++    assert_eq!(
++        cpu_allowed_list,
++        allowed_cpu_list()?,
++        "CPU affinity changed"
++    );
+     write_json(
+         &out.join("cpu.json"),
+         &format!(

@@ -1,0 +1,104 @@
+{
+  "schema": "r1.chance-grain-preparation-check/v1",
+  "created_at": "2026-09-27T07:13:55.874696+00:00",
+  "commands": [
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\chance-grain",
+        "-p",
+        "test_run.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.2613411000929773,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 1341,
+        "sha256": "c8d963f68a83fba1f4ab786cec3f6149c8bfb27a6327b32c989c52a13bc3b260"
+      }
+    },
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\chance-grain\\adapter\\prepare.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.07225720002315938,
+      "stdout": {
+        "bytes": 151,
+        "sha256": "7b94ece194b52f3fa344ea3701270a173093116511299deb2ae161bf4708e09e"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--check",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\chance-grain\\adapter\\solve.rs"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.075260000070557,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "ast_files": 4,
+  "controls": {
+    "run.py": {
+      "bytes": 39199,
+      "sha256": "143a89ace93b169787b34f0c26f4683b1fde643d9fbe5553e6120cd92f8e2b79"
+    },
+    "analyze.py": {
+      "bytes": 29755,
+      "sha256": "866dfdc35ff9e2e5f6f0ed2b681e657dd7aa80b29e12da43731801c8bc0b1fcf"
+    },
+    "test_run.py": {
+      "bytes": 9431,
+      "sha256": "b3d15a530b1edb0605474a015f92eaed24e147c82a2b2f33a63b1be9a0f8e23e"
+    },
+    "protocol.jp.md": {
+      "bytes": 8983,
+      "sha256": "f4204ca484ff007aa90ade3ac84189b067a4c8c4d67f1d4b2126ce7bfdaafae9"
+    },
+    "adapter/prepare.py": {
+      "bytes": 6531,
+      "sha256": "533da61ec77e542e38638c6c9193013208bc6f2a038ba9ac6e2bc37d07e55466"
+    },
+    "adapter/solve.rs": {
+      "bytes": 17517,
+      "sha256": "69d09d308e2d5d12160235dc9fc3fe981acc8f2103809a1fcccaaeed8b97c195"
+    },
+    "adapter/provenance.json": {
+      "bytes": 357,
+      "sha256": "1177f622056f0909fae5b55125e2a97e65a588df42739e97b0430ab3baabc4f2"
+    },
+    "adapter/adapter.patch": {
+      "bytes": 7442,
+      "sha256": "dfd53dbfac0d56f3cd25c2f2ef1157371af4a59625530d5a1294bb57652b0b5f"
+    }
+  },
+  "native_build_or_solve": false,
+  "cloud_actions": false
+}

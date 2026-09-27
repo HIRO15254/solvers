@@ -1,0 +1,48 @@
+{
+  "schema": "r1.chance-grain-derivation/v1",
+  "parents": {
+    "experiments/hu-postflop-r1/flop-scaling/fused-update/timing/run.py": {
+      "bytes": 32829,
+      "sha256": "4d7fbb89dfe90a319dd70640ae1f30f038f8ac257ae04d6f5917db028a373fdd"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/fused-update/timing/analyze.py": {
+      "bytes": 25786,
+      "sha256": "6ce2406ef39432a1ccf1a0394790d0d02db3d48115afe2f19b477db51c186eaf"
+    }
+  },
+  "note": "New two-phase portable build and same-binary chance-depth experiment. Original files unchanged; retained proof reader runs only trusted checkout source.",
+  "outputs": {
+    "run.py": {
+      "bytes": 39199,
+      "sha256": "143a89ace93b169787b34f0c26f4683b1fde643d9fbe5553e6120cd92f8e2b79"
+    },
+    "analyze.py": {
+      "bytes": 29755,
+      "sha256": "866dfdc35ff9e2e5f6f0ed2b681e657dd7aa80b29e12da43731801c8bc0b1fcf"
+    },
+    "test_run.py": {
+      "bytes": 9431,
+      "sha256": "b3d15a530b1edb0605474a015f92eaed24e147c82a2b2f33a63b1be9a0f8e23e"
+    },
+    "protocol.jp.md": {
+      "bytes": 8983,
+      "sha256": "f4204ca484ff007aa90ade3ac84189b067a4c8c4d67f1d4b2126ce7bfdaafae9"
+    },
+    "adapter/prepare.py": {
+      "bytes": 6531,
+      "sha256": "533da61ec77e542e38638c6c9193013208bc6f2a038ba9ac6e2bc37d07e55466"
+    },
+    "adapter/solve.rs": {
+      "bytes": 17517,
+      "sha256": "69d09d308e2d5d12160235dc9fc3fe981acc8f2103809a1fcccaaeed8b97c195"
+    },
+    "adapter/provenance.json": {
+      "bytes": 357,
+      "sha256": "1177f622056f0909fae5b55125e2a97e65a588df42739e97b0430ab3baabc4f2"
+    },
+    "adapter/adapter.patch": {
+      "bytes": 7442,
+      "sha256": "dfd53dbfac0d56f3cd25c2f2ef1157371af4a59625530d5a1294bb57652b0b5f"
+    }
+  }
+}

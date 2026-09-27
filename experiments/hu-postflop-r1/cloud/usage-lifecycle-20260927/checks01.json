@@ -1,0 +1,94 @@
+{
+  "source_before": {
+    "analyze.py": {
+      "bytes": 17762,
+      "sha256": "61a47252815317848841f0d732883a5c9e229cf756645152b8dd1ef8a07befeb"
+    },
+    "test_analyze.py": {
+      "bytes": 2876,
+      "sha256": "4103c7ebb6b816a9943b52bb0f4b5023d2712442d8b477975b2f56bcb5a058a4"
+    },
+    "budget-before.json": {
+      "bytes": 72594,
+      "sha256": "8e28e34709452c791980f268ea44edd5f2bd2a14a1cc21eccdeb365d16549901"
+    }
+  },
+  "source_after": {
+    "analyze.py": {
+      "bytes": 17762,
+      "sha256": "61a47252815317848841f0d732883a5c9e229cf756645152b8dd1ef8a07befeb"
+    },
+    "test_analyze.py": {
+      "bytes": 2876,
+      "sha256": "4103c7ebb6b816a9943b52bb0f4b5023d2712442d8b477975b2f56bcb5a058a4"
+    },
+    "budget-before.json": {
+      "bytes": 72594,
+      "sha256": "8e28e34709452c791980f268ea44edd5f2bd2a14a1cc21eccdeb365d16549901"
+    }
+  },
+  "commands": [
+    {
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "experiments\\hu-postflop-r1\\cloud\\usage-lifecycle-20260927",
+        "-p",
+        "test_analyze.py",
+        "-v"
+      ],
+      "started_utc": "2026-09-27T07:05:45.367447+00:00",
+      "elapsed_seconds": 0.19620579993352294,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 689,
+        "sha256": "0087b74cfa4b833610b9dfd69c79df43a56ca58edefe2cc8a275347df4a842c0"
+      }
+    },
+    {
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-lifecycle-20260927\\analyze.py"
+      ],
+      "started_utc": "2026-09-27T07:05:45.574159+00:00",
+      "elapsed_seconds": 0.3007238998543471,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 236,
+        "sha256": "0c03349f4ca6f30471ef85db20e98a9877a3555ab95f11764bfa3be825c352ad"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-lifecycle-20260927\\analyze.py",
+        "--check"
+      ],
+      "started_utc": "2026-09-27T07:05:45.884131+00:00",
+      "elapsed_seconds": 0.25456979987211525,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 236,
+        "sha256": "0c03349f4ca6f30471ef85db20e98a9877a3555ab95f11764bfa3be825c352ad"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+test_command_identity_and_scope (test_analyze.Tests.test_command_identity_and_scope) ... ok
+test_early_exact_costs (test_analyze.Tests.test_early_exact_costs) ... ok
+test_rounding_and_invalid_window (test_analyze.Tests.test_rounding_and_invalid_window) ... ok
+test_source_offset_and_fractional_timestamp (test_analyze.Tests.test_source_offset_and_fractional_timestamp) ... ok
+test_tiered_overlap_no_subtraction (test_analyze.Tests.test_tiered_overlap_no_subtraction) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.001s
+
+OK

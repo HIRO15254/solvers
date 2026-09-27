@@ -32,7 +32,7 @@ fixtureは既存adapterのnarrow（root support34/30）とexpanded（63/160）�
 
 ## 次の有限screenの案
 
-同一VM・boot・CPU affinity・fresh native releaseの一つのbaseline binaryで、F32/DCFR/N16、CFV capture=false、同じ2入力を比較する。新しい研究adapterはCFR用depthを引数として1または2に固定し、invocationに`cfr_chance_depth`と`quality_chance_depth=2`を別々に記録する。CFR終了後の`solver.set_par`でqualityをdepth2へ戻し、state、EV/BR、public exploitabilityの定義と演算を変えない。engineや公開defaultは変更しない。
+同一VM・測定boot・CPU affinityの一つのbaseline binaryで、F32/DCFR/N16、CFV capture=false、同じ2入力を比較する。小型2CPUでfresh release buildとcore testsを先に済ませ、`RUSTFLAGS=-C target-cpu=x86-64-v3`を固定する。ビルド前と32CPU測定前にCPU・OSのv3対応を検査し、非対応なら中止する。build bootとmeasurement bootは別々の証拠として保持し、全測定条件は同じ32CPU boot・binaryで実行する。過去のnative buildとの絶対時間比較は行わない。新しい研究adapterはCFR用depthを引数として1または2に固定し、invocationに`cfr_chance_depth`と`quality_chance_depth=2`を別々に記録する。CFR終了後の`solver.set_par`でqualityをdepth2へ戻し、state、EV/BR、public exploitabilityの定義と演算を変えない。engineや公開defaultは変更しない。
 
 測定matrixは次の32プロセスに固定する。
 
@@ -58,7 +58,7 @@ screenを採否判断へ使う場合の候補基準は、depth1/depth2のCFR med
 
 次の時間見積もりは32本のCFR時間の合計だけで作らない。依存fetch、resize/start、source準備・pin、fresh native build、core testsの追加compileと実行、smoke、canonical、各solve全体、全state比較、gzip、fsync、毎stageのidentity検査、最終manifest、quiescence後のreader、回収・削除までを含む。従来runnerは各solve開始に上限90秒+10秒の余裕を要求するため、短いsolveの期待時間だけを最後まで詰め込むこともできない。work deadlineと回収用reserveは分け、作成要求からの絶対STOPを延ばさない。
 
-上限案はwork全体16分以内、native buildとcore testsは各240秒、solveは各90秒、作成要求から35分後STOPと15分の回収余裕。RSS監視8GiB、外側cgroup12GiB/swap0、free memory・disk各2GiB、通常proof240MiBを既存方式から引き継ぐ。各stageの最大時間の合計がwork枠に収まるとの保証ではなく、全工程の見積もりが足りなければdispatchしない。途中で上限に達した場合も未完了として終える。
+新protocolの上限は作成要求から60分後STOP、2CPU build完了を作成要求+20分まで、32CPU測定を20分以内、回収余裕を15分とする。buildとcore testsは各480秒、solveは各90秒。測定開始前に20分+回収15分が残らなければdispatchしない。buildはRSS監視4GiB・外側6GiB、測定はRSS監視8GiB・外側12GiB、swap0、free memory・disk各2GiB、通常proof240MiB。各stageの最大時間の合計がwork枠に収まるとの保証ではなく、途中で上限に達した場合は未完了として終える。実行時の固定契約は[新protocol](../../experiments/hu-postflop-r1/flop-scaling/chance-grain/protocol.jp.md)と[VM18制御](../../experiments/hu-postflop-r1/cloud/vm18/README.md)に置く。archiveと転送片は再起動後も残る`/opt/r1`へ保存する。
 
 費用節約のため、同一engine・一つのadapter binaryで設定値だけを比較し、matrixから1workerの反復測定を外す。ただし先行検証・raw保持・回収は省略しない。全工程が時間・転送・費用枠へ収まらない場合は起動前に設計を縮小して固定し直すか、実行しない。データ取得後のprotocol変更、失敗標本の差替え、別boot混合はしない。
 

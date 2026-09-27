@@ -1,0 +1,123 @@
+{
+  "schema": "r1.frequency-diagnostic-input/v1",
+  "case_id": "synthetic-two-positive-hands",
+  "condition_match": "unverified",
+  "support": [
+    0,
+    17,
+    42,
+    1325
+  ],
+  "support_evidence": {
+    "path": "synthetic-evidence.json",
+    "bytes": 856,
+    "sha256": "a47225e1e85f33cf041469878366f73ff43dd3a811b24e1746a90e846af56de5"
+  },
+  "weight_evidence": {
+    "path": "synthetic-evidence.json",
+    "bytes": 856,
+    "sha256": "a47225e1e85f33cf041469878366f73ff43dd3a811b24e1746a90e846af56de5"
+  },
+  "chance_weight": {
+    "0": ".5",
+    "17": ".5",
+    "42": ".5",
+    "1325": ".5"
+  },
+  "w_ref": {
+    "0": "1",
+    "17": "3",
+    "42": "0",
+    "1325": "0"
+  },
+  "profiles": {
+    "own": {
+      "game_sha256": "a47225e1e85f33cf041469878366f73ff43dd3a811b24e1746a90e846af56de5",
+      "node_id": "synthetic/root",
+      "actor": "OOP",
+      "strategy_kind": "synthetic",
+      "actions": [
+        "check",
+        "bet_to:100"
+      ],
+      "reach": {
+        "0": {
+          "actor": ".9",
+          "compatible_opponent": "10"
+        },
+        "17": {
+          "actor": ".1",
+          "compatible_opponent": "10"
+        },
+        "42": {
+          "actor": "0",
+          "compatible_opponent": "0"
+        },
+        "1325": {
+          "actor": ".9",
+          "compatible_opponent": "0"
+        }
+      },
+      "policy": {
+        "0": {
+          "check": "1",
+          "bet_to:100": "0"
+        },
+        "17": {
+          "check": "0",
+          "bet_to:100": "1"
+        }
+      },
+      "rounding": null,
+      "evidence": {
+        "path": "synthetic-evidence.json",
+        "bytes": 856,
+        "sha256": "a47225e1e85f33cf041469878366f73ff43dd3a811b24e1746a90e846af56de5"
+      }
+    },
+    "reference": {
+      "game_sha256": "a47225e1e85f33cf041469878366f73ff43dd3a811b24e1746a90e846af56de5",
+      "node_id": "synthetic/root",
+      "actor": "OOP",
+      "strategy_kind": "synthetic",
+      "actions": [
+        "check",
+        "bet_to:100"
+      ],
+      "reach": {
+        "0": {
+          "actor": ".2",
+          "compatible_opponent": "10"
+        },
+        "17": {
+          "actor": ".6",
+          "compatible_opponent": "10"
+        },
+        "42": {
+          "actor": ".2",
+          "compatible_opponent": "0"
+        },
+        "1325": {
+          "actor": ".4",
+          "compatible_opponent": "0"
+        }
+      },
+      "policy": {
+        "0": {
+          "check": ".25",
+          "bet_to:100": ".75"
+        },
+        "17": {
+          "check": ".5",
+          "bet_to:100": ".5"
+        }
+      },
+      "rounding": null,
+      "evidence": {
+        "path": "synthetic-evidence.json",
+        "bytes": 856,
+        "sha256": "a47225e1e85f33cf041469878366f73ff43dd3a811b24e1746a90e846af56de5"
+      }
+    }
+  }
+}

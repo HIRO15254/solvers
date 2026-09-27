@@ -1,0 +1,31 @@
+{
+  "scope": "Three unauthenticated official public GETs; no resources, tokens, or account changes",
+  "extractor": {
+    "path": "preflight-vm14/collect-pricing.py",
+    "bytes": 2925,
+    "sha256": "bd5b772cecbf129ee7fa7e1c40fdfc7aa862fd423c94820575493692d7b24c1d"
+  },
+  "attempts": [
+    {
+      "status": "unavailable",
+      "source": "https://cloud.google.com/products/compute/pricing/general-purpose",
+      "started_at_utc": "2026-09-27T07:00:27.273873+00:00",
+      "ended_at_utc": "2026-09-27T07:00:29.464081+00:00",
+      "error": "URLError: <urlopen error [WinError 10061] \u5bfe\u8c61\u306e\u30b3\u30f3\u30d4\u30e5\u30fc\u30bf\u30fc\u306b\u3088\u3063\u3066\u62d2\u5426\u3055\u308c\u305f\u305f\u3081\u3001\u63a5\u7d9a\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002>"
+    },
+    {
+      "status": "unavailable",
+      "source": "https://cloud.google.com/compute/disks-image-pricing",
+      "started_at_utc": "2026-09-27T07:00:27.274688+00:00",
+      "ended_at_utc": "2026-09-27T07:00:29.464177+00:00",
+      "error": "URLError: <urlopen error [WinError 10061] \u5bfe\u8c61\u306e\u30b3\u30f3\u30d4\u30e5\u30fc\u30bf\u30fc\u306b\u3088\u3063\u3066\u62d2\u5426\u3055\u308c\u305f\u305f\u3081\u3001\u63a5\u7d9a\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002>"
+    },
+    {
+      "status": "unavailable",
+      "source": "https://cloud.google.com/vpc/network-pricing",
+      "started_at_utc": "2026-09-27T07:00:27.275248+00:00",
+      "ended_at_utc": "2026-09-27T07:00:29.464276+00:00",
+      "error": "URLError: <urlopen error [WinError 10061] \u5bfe\u8c61\u306e\u30b3\u30f3\u30d4\u30e5\u30fc\u30bf\u30fc\u306b\u3088\u3063\u3066\u62d2\u5426\u3055\u308c\u305f\u305f\u3081\u3001\u63a5\u7d9a\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002>"
+    }
+  ]
+}

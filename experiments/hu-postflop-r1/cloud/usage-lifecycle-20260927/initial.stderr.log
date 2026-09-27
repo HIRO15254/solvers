@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-lifecycle-20260927\analyze.py", line 306, in <module>
+    result = build_report()
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-lifecycle-20260927\analyze.py", line 232, in build_report
+    assert [v for v in r["argv"] if v.startswith("--filter")] == [expected]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

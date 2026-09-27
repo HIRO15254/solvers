@@ -1,0 +1,13 @@
+{
+  "schema": "r1.chance-grain-adapter/v1",
+  "original": {
+    "bytes": 15687,
+    "sha256": "a6746b4316216231f3a4bf02120968d7b78ddb876d6d04cd611bf1efed7ba2a5"
+  },
+  "generated": {
+    "bytes": 17517,
+    "sha256": "69d09d308e2d5d12160235dc9fc3fe981acc8f2103809a1fcccaaeed8b97c195"
+  },
+  "inverse_exact": true,
+  "native_execution": false
+}

@@ -1,0 +1,96 @@
+{
+  "at_utc": "2026-09-27T07:15:47.818336+00:00",
+  "python": [
+    {
+      "path": "analyze-on-cloud.py",
+      "bytes": 3032,
+      "sha256": "598f2ee99e7be05e1fcb8ddb83cec502b3388e25d495ee6fe4a5f2ab31256c54",
+      "ast": "passed"
+    },
+    {
+      "path": "apply-usage.py",
+      "bytes": 3910,
+      "sha256": "32f48163c783d76ce163a94b4bb732158f0341c78d71ea429865049a5aa36557",
+      "ast": "passed"
+    },
+    {
+      "path": "capture-command.py",
+      "bytes": 2171,
+      "sha256": "c70d1138a388b41cee4c49187dd3ff5c57eade23e28395ff63a7fde54d103129",
+      "ast": "passed"
+    },
+    {
+      "path": "install.py",
+      "bytes": 3823,
+      "sha256": "810ba007e063caaee93ecd1261034a5d615a30a7192a173f8000646f27ba1d52",
+      "ast": "passed"
+    },
+    {
+      "path": "launch.py",
+      "bytes": 3378,
+      "sha256": "12394ac4f12d17f26a8de1d1db64f4950119fc850a6490aa8cee1c41533e22fd",
+      "ast": "passed"
+    },
+    {
+      "path": "pack.py",
+      "bytes": 4798,
+      "sha256": "b47819448449e77d43ba878e18d7329304a66ab9f24ffa40517597963246a9e3",
+      "ast": "passed"
+    },
+    {
+      "path": "prepare-controls.py",
+      "bytes": 4225,
+      "sha256": "493bb00941bd24c22289c9637288d3be001dcc6d42636b97632ac3e81f5dcef9",
+      "ast": "passed"
+    },
+    {
+      "path": "reserve.py",
+      "bytes": 4575,
+      "sha256": "5bd033e110709507fb8a57126fec96b76ddc9e160a8667834cd9d8895bf789eb",
+      "ast": "passed"
+    },
+    {
+      "path": "start.py",
+      "bytes": 7542,
+      "sha256": "0c3e3fbe48ccc76b1d9efc26a104fcea69aee98e93c7399486c706af95032ad8",
+      "ast": "passed"
+    }
+  ],
+  "shell_syntax": [
+    {
+      "argv": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "experiments\\hu-postflop-r1\\cloud\\vm18\\run.sh"
+      ],
+      "exit_code": 0,
+      "seconds": 0.06311879982240498,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "experiments\\hu-postflop-r1\\cloud\\vm18\\recover.sh"
+      ],
+      "exit_code": 0,
+      "seconds": 0.05768060008995235,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "experiments\\hu-postflop-r1\\cloud\\vm18\\bootstrap.sh"
+      ],
+      "exit_code": 0,
+      "seconds": 0.062174499966204166,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "scope": "AST and bash -n only; no native build, solver, cloud operation or large raw processing",
+  "derivation_scope": "control-derivation.json records initial generation; subsequent reviewed durability fixes and source prepack bound are represented by final pins here and package manifest"
+}
