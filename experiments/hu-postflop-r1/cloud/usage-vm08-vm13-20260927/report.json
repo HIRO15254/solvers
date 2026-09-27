@@ -1,0 +1,225 @@
+{
+  "schema": "r1.vm08-vm13-usage-proposal/v1",
+  "analysis_source": {
+    "bytes": 13320,
+    "sha256": "8835f1c31a002683dcbf04746ceebbce25743a69fd8375405504b36219070855"
+  },
+  "input_manifest": {
+    "bytes": 6947,
+    "sha256": "f5a28d0dde3aea47826469ee20f67ab2b7ef63b4fd17afaeef1a3f6623d4bb20"
+  },
+  "previous_acquisition_utc": [
+    "2026-09-27T02:25:59.370575Z",
+    "2026-09-27T02:26:16.091589Z"
+  ],
+  "new_api_calls": 0,
+  "vms": {
+    "08": {
+      "instance_id": "1635613034982056517",
+      "metrics": {
+        "sent": {
+          "available": true,
+          "points": 156,
+          "observed_sum": "117027329",
+          "first_start": "2026-09-26T01:15:00.001Z",
+          "last_end": "2026-09-26T04:01:00Z",
+          "internal_gaps_over_1ms": [
+            {
+              "from": "2026-09-26T02:06:00Z",
+              "to": "2026-09-26T02:11:00.001Z",
+              "seconds": "300.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-26T03:02:00Z",
+              "to": "2026-09-26T03:04:00.001Z",
+              "seconds": "120.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-26T03:31:00Z",
+              "to": "2026-09-26T03:34:00.001Z",
+              "seconds": "180.001",
+              "missing_usage": null
+            }
+          ],
+          "unobserved_usage": null,
+          "created_to_first_seconds": "0",
+          "last_to_delete_seconds": "0"
+        },
+        "uptime": {
+          "available": true,
+          "points": 156,
+          "observed_sum": "9117.658603000000020",
+          "first_start": "2026-09-26T01:15:00.001Z",
+          "last_end": "2026-09-26T04:01:00Z",
+          "internal_gaps_over_1ms": [
+            {
+              "from": "2026-09-26T02:06:00Z",
+              "to": "2026-09-26T02:11:00.001Z",
+              "seconds": "300.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-26T03:02:00Z",
+              "to": "2026-09-26T03:04:00.001Z",
+              "seconds": "120.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-26T03:31:00Z",
+              "to": "2026-09-26T03:34:00.001Z",
+              "seconds": "180.001",
+              "missing_usage": null
+            }
+          ],
+          "unobserved_usage": null,
+          "created_to_first_seconds": "0",
+          "last_to_delete_seconds": "0"
+        }
+      },
+      "lifecycle": {
+        "launch_attempt": "2026-09-26T01:15:19.0365885+00:00",
+        "created": "2026-09-25T18:15:22.791-07:00",
+        "delete_done": "2026-09-26T13:00:40.671+09:00",
+        "absence_verified": "2026-09-26T04:01:25.6238650Z",
+        "whole_lifetime_seconds": "9966.587277",
+        "added_conservative_slack_seconds": 120,
+        "rounded_minutes": 169,
+        "32cpu_conservative_start": "2026-09-26T03:00:56.6657943Z",
+        "32cpu_window_seconds": "3628.958071",
+        "32cpu_added_slack_seconds": 120,
+        "32cpu_rounded_minutes": 63,
+        "unchanged_32cpu_stop": "2026-09-26T04:30:56Z"
+      },
+      "network_allowance_gib": "1",
+      "scenario": {
+        "components_usd": {
+          "whole_lifetime_compute": "0.3943333333333333333333333334",
+          "additional_32cpu_overlap_compute": "1.2075",
+          "whole_lifetime_ipv4": "0.007041666666666666666666666668",
+          "40gib_disk_full_24h": "0.131520",
+          "network_allowance": "0.30",
+          "original_uncertainty_reserves": "2"
+        },
+        "total_usd": "4.040395000000000000000000000",
+        "half_dollar_ceil_usd": "4.5",
+        "tenth_dollar_ceil_usd": "4.1"
+      },
+      "alternative_scenarios": {
+        "whole_lifetime_highest_rate": {
+          "components_usd": {
+            "whole_lifetime_compute": "3.239166666666666666666666667",
+            "additional_32cpu_overlap_compute": "0.00",
+            "whole_lifetime_ipv4": "0.007041666666666666666666666668",
+            "40gib_disk_full_24h": "0.131520",
+            "network_allowance": "0.30",
+            "original_uncertainty_reserves": "2"
+          },
+          "total_usd": "5.677728333333333333333333334",
+          "half_dollar_ceil_usd": "6.0",
+          "tenth_dollar_ceil_usd": "5.7"
+        },
+        "whole_lifetime_base_plus_original_90min_scale_allowance": {
+          "components_usd": {
+            "whole_lifetime_compute": "0.3943333333333333333333333334",
+            "additional_32cpu_overlap_compute": "1.725",
+            "whole_lifetime_ipv4": "0.007041666666666666666666666668",
+            "40gib_disk_full_24h": "0.131520",
+            "network_allowance": "0.30",
+            "original_uncertainty_reserves": "2"
+          },
+          "total_usd": "4.557895000000000000000000000",
+          "half_dollar_ceil_usd": "5.0",
+          "tenth_dollar_ceil_usd": "4.6"
+        }
+      },
+      "held_before_usd": "6",
+      "root_requested_option": {
+        "hold_usd": "4.50",
+        "restore_usd": "1.50",
+        "reservation_allocation_usd": {
+          "r1-20260926-08": "3.00",
+          "r1-20260926-08-scale32": "1.50"
+        },
+        "margin_above_model_usd": "0.459605000000000000000000000",
+        "applied": false
+      },
+      "actual_billed_usd": null,
+      "guaranteed_cost_ceiling_usd": null
+    },
+    "13": {
+      "instance_id": "6526324704760165755",
+      "metrics": {
+        "sent": {
+          "available": true,
+          "points": 29,
+          "observed_sum": "29321558",
+          "first_start": "2026-09-26T22:47:00.001Z",
+          "last_end": "2026-09-26T23:16:00Z",
+          "internal_gaps_over_1ms": [],
+          "unobserved_usage": null,
+          "created_to_first_seconds": "0",
+          "last_to_delete_seconds": "28.277"
+        },
+        "uptime": {
+          "available": true,
+          "points": 29,
+          "observed_sum": "1663.390141999999967",
+          "first_start": "2026-09-26T22:47:00.001Z",
+          "last_end": "2026-09-26T23:16:00Z",
+          "internal_gaps_over_1ms": [],
+          "unobserved_usage": null,
+          "created_to_first_seconds": "0",
+          "last_to_delete_seconds": "28.277"
+        }
+      },
+      "lifecycle": {
+        "launch_attempt": "2026-09-26T22:47:45.4539527+00:00",
+        "created": "2026-09-26T15:47:48.384-07:00",
+        "delete_done": "2026-09-26T16:16:28.277-07:00",
+        "absence_verified": "2026-09-26T23:16:40.762086+00:00",
+        "whole_lifetime_seconds": "1735.308134",
+        "added_conservative_slack_seconds": 120,
+        "rounded_minutes": 31
+      },
+      "network_allowance_gib": "1",
+      "scenario": {
+        "components_usd": {
+          "whole_lifetime_compute": "0.07233333333333333333333333334",
+          "additional_32cpu_overlap_compute": "0.00",
+          "whole_lifetime_ipv4": "0.001291666666666666666666666667",
+          "40gib_disk_full_24h": "0.131520",
+          "network_allowance": "0.30",
+          "original_uncertainty_reserves": "1"
+        },
+        "total_usd": "1.505145000000000000000000000",
+        "half_dollar_ceil_usd": "2.0",
+        "tenth_dollar_ceil_usd": "1.6"
+      },
+      "alternative_scenarios": {},
+      "held_before_usd": "2",
+      "root_requested_option": {
+        "hold_usd": "1.60",
+        "restore_usd": "0.40",
+        "reservation_allocation_usd": {
+          "r1-20260926-13": "1.60"
+        },
+        "margin_above_model_usd": "0.094855000000000000000000000",
+        "applied": false
+      },
+      "actual_billed_usd": null,
+      "guaranteed_cost_ceiling_usd": null
+    }
+  },
+  "combined_root_requested_restore_usd": "1.90",
+  "budget_changed": false,
+  "limits": [
+    "Monitoring observations are not billing. Internal gaps and edge/missing usage remain unknown, not zero.",
+    "No Spot discounts, credits, free-tier or stopped-interval subtraction. 120 seconds extra margin per priced window then whole-minute ceiling.",
+    "VM08 uses whole-life 4CPU plus overlapping 32CPU from the plan preceding observed resize until absence. This is one VM; disk/IP/network counted once and both original $1 buffers retained.",
+    "All sent bytes treated as egress with original 1GiB minimum; allowance is not imputation of missing Monitoring traffic.",
+    "40GiB disk charged a full24h; original $2/$1 uncertainty remains. VM13 $1.60 is explicit new tenth-dollar rounding, not half-dollar policy.",
+    "Theoretical modeled scenarios and proposed reservations only, not guaranteed bill maxima or applied ledger changes."
+  ]
+}

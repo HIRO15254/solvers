@@ -1,0 +1,167 @@
+{
+  "schema": "r1.vm08-vm13-accounting-inputs/v1",
+  "captured_at_utc": "2026-09-27T05:35:55.476138+00:00",
+  "budget_snapshot": {
+    "bytes": 66997,
+    "sha256": "0edcf9c5767d3c7a338b3feca29e8ca2c1e7f6e277337a9c9127f39f26e5c336"
+  },
+  "cloud_files": {
+    "cleanup-vm08/predelete.json": {
+      "bytes": 914,
+      "sha256": "fc5918fdcb62974a9f9010551bbf2783ce476db3e583f3138872a8b9de4a4bcb"
+    },
+    "cleanup-vm08/reconciliation.json": {
+      "bytes": 1250,
+      "sha256": "79d4301afe012980b037c0cecb6e059793bea0d58cf2f5729bc9893552777147"
+    },
+    "cleanup-vm13/run01/instance-before.stdout.log": {
+      "bytes": 30708,
+      "sha256": "d8583a334d4defe9332ccc17cc8c2f0d0ebc8b0b09c7bb785ad1eb08f9696127"
+    },
+    "cleanup-vm13/run01/reconciliation.json": {
+      "bytes": 16396,
+      "sha256": "590535ddc8d45ca090ef832016f7a2274bd232d0f09acd1e3252c616461f09bc"
+    },
+    "create-result-r1-20260926-08.json": {
+      "bytes": 30180,
+      "sha256": "cac3015bd5d0915c9908992123086395809e9d95a01e89139b015557c4fa67d4"
+    },
+    "create-result-r1-20260926-13.json": {
+      "bytes": 30180,
+      "sha256": "35dec09e11c32d8ef60e81543df0267b1bf81a66cca2df0026158c8c89f50bc9"
+    },
+    "launch-r1-20260926-08.json": {
+      "bytes": 1091,
+      "sha256": "97b31879278097341f61fccb7510a498c0ccd2c0f455b30b0a7f71de1a68ae05"
+    },
+    "launch-r1-20260926-13.json": {
+      "bytes": 1091,
+      "sha256": "4d7ad1b7ffb119b03222600f31585189c63d68ea4ada410865e414b5bcbad54b"
+    },
+    "preflight-vm16/pricing-compute-e2-highcpu-32-header.html": {
+      "bytes": 6156,
+      "sha256": "95fda29617708aa733c70efe4c4a596a0c6c6fd4412caa2bb6c2e7a4e8d989ba"
+    },
+    "preflight-vm16/pricing-compute-e2-highcpu-32-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-compute-e2-highcpu-32-row.html": {
+      "bytes": 738,
+      "sha256": "d3c12a45c633d8bf5aaa107f6f202511767227fafedbb87932f4963ada3045da"
+    },
+    "preflight-vm16/pricing-compute-e2-standard-2-header.html": {
+      "bytes": 6156,
+      "sha256": "0eaf29d999d51db71eba961ac83ed0759f97e85be48a16011ccef9c5b6505aa4"
+    },
+    "preflight-vm16/pricing-compute-e2-standard-2-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-compute-e2-standard-2-row.html": {
+      "bytes": 738,
+      "sha256": "4825b9030a6dbb4d3f9c4827a2184c60066b22eb7a1e35775e8dcfaada00fc13"
+    },
+    "preflight-vm16/pricing-compute-n2-highcpu-32-header.html": {
+      "bytes": 6156,
+      "sha256": "2fbd3aadfb24a3f16c23f4bdf60e9be00930e55b51b2efec38eda192a4836451"
+    },
+    "preflight-vm16/pricing-compute-n2-highcpu-32-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-compute-n2-highcpu-32-row.html": {
+      "bytes": 730,
+      "sha256": "ee6561764f0a056da53bd80cec2e63fb31d5a7f4fe3c56120e0969bd6b67a5f9"
+    },
+    "preflight-vm16/pricing-disk-balanced-header.html": {
+      "bytes": 316,
+      "sha256": "6d20d457c99d6bdf26cff89c6462a3eccb864216f96720ddac3312547cb64565"
+    },
+    "preflight-vm16/pricing-disk-balanced-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-disk-balanced-row.html": {
+      "bytes": 243,
+      "sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319"
+    },
+    "preflight-vm16/pricing-network-asia-egress-header.html": {
+      "bytes": 316,
+      "sha256": "654fa3b64513f4092f73efbf07280024104f26e28e2a01ed800794e177b97c35"
+    },
+    "preflight-vm16/pricing-network-asia-egress-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-network-asia-egress-row.html": {
+      "bytes": 791,
+      "sha256": "7682738cbbb76f8367ad699c94767ae312761d1401b69c034cf6e31a1d419cd4"
+    },
+    "preflight-vm16/pricing-network-spot-ipv4-header.html": {
+      "bytes": 315,
+      "sha256": "93345396f548060461bc900f409d21bf02ea0c2123b5849d1269035dea74151e"
+    },
+    "preflight-vm16/pricing-network-spot-ipv4-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-network-spot-ipv4-row.html": {
+      "bytes": 288,
+      "sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7"
+    },
+    "preflight-vm16/pricing-sources.json": {
+      "bytes": 5660,
+      "sha256": "b8c3ec816fa0e3e6ee8008b7326d7df3d1dbd47b6d20677bc29dcfd302519da9"
+    },
+    "usage-reconcile-20260927/acquisition.json": {
+      "bytes": 20743,
+      "sha256": "a40d807434a7ac23105ee056f762d265d1536229599495d474fabec8cab11613"
+    },
+    "usage-reconcile-20260927/collect.py": {
+      "bytes": 8486,
+      "sha256": "048bf3945a49e1060d76115edd3cd1d5b4c747880d0e105c44e76058082bf125"
+    },
+    "usage-reconcile-20260927/vm08-sent-00.json": {
+      "bytes": 35421,
+      "sha256": "12e449bb515104378a32cbd52b691a3350944a22b46f2733ea95a868a160f1b5"
+    },
+    "usage-reconcile-20260927/vm08-uptime-00.json": {
+      "bytes": 35337,
+      "sha256": "f10c804e54daf19c6977579c13888bf49518096f7e005764ae19329571b0e9e9"
+    },
+    "usage-reconcile-20260927/vm13-sent-00.json": {
+      "bytes": 7068,
+      "sha256": "9d26a23e4eb0311eda970cef727e275c662f5ba752dc9b8b4fe5656ae90e8a0f"
+    },
+    "usage-reconcile-20260927/vm13-uptime-00.json": {
+      "bytes": 7102,
+      "sha256": "01908ccd406557483f4f550f449be0b70a2ab3528693b7c0caafdb6603b49d63"
+    },
+    "vm08/scale32-machine-type.json": {
+      "bytes": 33010,
+      "sha256": "dbef81a0a25bd5a0a2398ca80f5eace79853c4f4cfc33c652aa5d4ef759eb41e"
+    },
+    "vm08/scale32-plan.json": {
+      "bytes": 580,
+      "sha256": "1138b0c15b4f57c8186423784729397c7bde86238680f65f75ab8b503c5fd0ff"
+    },
+    "vm08/scale32-restart-description.json": {
+      "bytes": 1509,
+      "sha256": "0d7272d3c5ab0e601e60f4ec1874265fe88bfc14b46f91e6a73c322a40e0dcbd"
+    },
+    "vm08/scale32-scheduling.json": {
+      "bytes": 33010,
+      "sha256": "cd76b71673540d0e04adb1b0e34f3e0b2b2c220a41fd565207e9366219bce5b8"
+    },
+    "vm08/scale32-spot-stop.json": {
+      "bytes": 1491,
+      "sha256": "647df90d4b562c2fdde37f23b735fdeb9b0858012e7065e5ec684336a02a7558"
+    },
+    "vm08/scale32-start.json": {
+      "bytes": 33129,
+      "sha256": "5a18fb345ec5c197dfd3ade319ab718a07dcb4c4c08fe06c238c7fac6390689c"
+    }
+  },
+  "scope": "Existing tracked original bytes referenced relative to cloud; no new API acquisition. Snapshot alone copies mutable ledger for replay."
+}

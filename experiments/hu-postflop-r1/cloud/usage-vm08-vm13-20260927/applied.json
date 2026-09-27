@@ -1,0 +1,40 @@
+{
+  "at": "2026-09-27T05:39:55.397714+00:00",
+  "authority": "User 2026-09-27 usage-backed reuse authorization",
+  "held_before_usd": 39.9,
+  "held_after_usd": 38,
+  "restored_usd": 1.9,
+  "available_after_usd": 2,
+  "authorized_limit_usd": 40,
+  "actual_billed_usd": null,
+  "guaranteed_cost_ceiling": false,
+  "changes": [
+    {
+      "id": "r1-20260926-08-scale32",
+      "event": "usage_based_partial_reservation_reconciliation",
+      "at": "2026-09-27T05:39:55.397714+00:00",
+      "old_reserved_usd": 3,
+      "new_reserved_usd": 1.5,
+      "restored_to_available_budget_usd": 1.5,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-vm08-vm13-20260927/report.json",
+      "evidence_sha256": "0fa5232f4b49fa2d0e1c638819cf043a15c430a710dd343d55142f03b0660382",
+      "billed_usd": null,
+      "final_invoice": false,
+      "combined_instance_accounting": "Same VM08: base3.00 plus scale1.50 holds4.50 against4.040395 modeled; both original1.00 uncertainty buffers retained together."
+    },
+    {
+      "id": "r1-20260926-13",
+      "event": "usage_based_partial_reservation_reconciliation",
+      "at": "2026-09-27T05:39:55.397714+00:00",
+      "old_reserved_usd": 2,
+      "new_reserved_usd": 1.6,
+      "restored_to_available_budget_usd": 0.4,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-vm08-vm13-20260927/report.json",
+      "evidence_sha256": "0fa5232f4b49fa2d0e1c638819cf043a15c430a710dd343d55142f03b0660382",
+      "billed_usd": null,
+      "final_invoice": false
+    }
+  ],
+  "ledger_before_sha256": "0edcf9c5767d3c7a338b3feca29e8ca2c1e7f6e277337a9c9127f39f26e5c336",
+  "ledger_after_sha256": "3228611004f6bc24ff7ed032b400ca55b08cb8341ec793b5143ccc4ba9b5825e"
+}

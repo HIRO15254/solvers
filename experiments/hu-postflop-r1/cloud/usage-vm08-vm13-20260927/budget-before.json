@@ -198,7 +198,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260926-13",
-      "reserved_usd": 1.6,
+      "reserved_usd": 2,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 1,
@@ -285,18 +285,6 @@
           "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm13/run01/reconciliation.json",
           "billed_usd": null,
           "reservation_released": false
-        },
-        {
-          "id": "r1-20260926-13",
-          "event": "usage_based_partial_reservation_reconciliation",
-          "at": "2026-09-27T05:39:55.397714+00:00",
-          "old_reserved_usd": 2,
-          "new_reserved_usd": 1.6,
-          "restored_to_available_budget_usd": 0.4,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-vm08-vm13-20260927/report.json",
-          "evidence_sha256": "0fa5232f4b49fa2d0e1c638819cf043a15c430a710dd343d55142f03b0660382",
-          "billed_usd": null,
-          "final_invoice": false
         }
       ],
       "disposition": "Fixed phase campaign failed on reset-window VmHWM decline after44 passed stages; all raw retained and trusted checked. Separate native006/022 diagnostics8 stages passed and exact menus verified. Both evidence archives recovered and verified. Original VM and sole autoDelete40GiB disk deleted; named instance/disk/address absence verified. No retry, resize, restart or deadline extension. Invoice unknown; full2USD held, cumulative40/40,0unreserved."
@@ -731,7 +719,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260926-08",
-      "reserved_usd": 1.5,
+      "reserved_usd": 3,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 1.5,
@@ -792,19 +780,6 @@
           "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm08/reconciliation.json",
           "reservation_released": false,
           "billed_usd": null
-        },
-        {
-          "id": "r1-20260926-08-scale32",
-          "event": "usage_based_partial_reservation_reconciliation",
-          "at": "2026-09-27T05:39:55.397714+00:00",
-          "old_reserved_usd": 3,
-          "new_reserved_usd": 1.5,
-          "restored_to_available_budget_usd": 1.5,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-vm08-vm13-20260927/report.json",
-          "evidence_sha256": "0fa5232f4b49fa2d0e1c638819cf043a15c430a710dd343d55142f03b0660382",
-          "billed_usd": null,
-          "final_invoice": false,
-          "combined_instance_accounting": "Same VM08: base3.00 plus scale1.50 holds4.50 against4.040395 modeled; both original1.00 uncertainty buffers retained together."
         }
       ],
       "disposition": "Completed evidence recovered and verified, including source04 full compact/scaling results and source06 full validation plus48 paired action measurements. Deleted2026-09-26T04:00:40.671Z; no VM/disk/reserved address remains at04:01:25Z. Billing unavailable; full reservation held. Combined held26 of authorized40USD."
@@ -1342,44 +1317,6 @@
           "new_reserved_usd": 4.25,
           "restored_to_available_budget_usd": 0.75,
           "evidence": "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json",
-          "billed_usd": null,
-          "final_invoice": false
-        }
-      ]
-    },
-    {
-      "at": "2026-09-27T05:39:55.397714+00:00",
-      "authority": "User 2026-09-27 usage-backed reuse authorization",
-      "held_before_usd": 39.9,
-      "held_after_usd": 38,
-      "restored_usd": 1.9,
-      "available_after_usd": 2,
-      "authorized_limit_usd": 40,
-      "actual_billed_usd": null,
-      "guaranteed_cost_ceiling": false,
-      "changes": [
-        {
-          "id": "r1-20260926-08-scale32",
-          "event": "usage_based_partial_reservation_reconciliation",
-          "at": "2026-09-27T05:39:55.397714+00:00",
-          "old_reserved_usd": 3,
-          "new_reserved_usd": 1.5,
-          "restored_to_available_budget_usd": 1.5,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-vm08-vm13-20260927/report.json",
-          "evidence_sha256": "0fa5232f4b49fa2d0e1c638819cf043a15c430a710dd343d55142f03b0660382",
-          "billed_usd": null,
-          "final_invoice": false,
-          "combined_instance_accounting": "Same VM08: base3.00 plus scale1.50 holds4.50 against4.040395 modeled; both original1.00 uncertainty buffers retained together."
-        },
-        {
-          "id": "r1-20260926-13",
-          "event": "usage_based_partial_reservation_reconciliation",
-          "at": "2026-09-27T05:39:55.397714+00:00",
-          "old_reserved_usd": 2,
-          "new_reserved_usd": 1.6,
-          "restored_to_available_budget_usd": 0.4,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-vm08-vm13-20260927/report.json",
-          "evidence_sha256": "0fa5232f4b49fa2d0e1c638819cf043a15c430a710dd343d55142f03b0660382",
           "billed_usd": null,
           "final_invoice": false
         }

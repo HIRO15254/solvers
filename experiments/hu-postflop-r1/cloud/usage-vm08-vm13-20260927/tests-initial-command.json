@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "C:/Python313/python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\usage-vm08-vm13-20260927\\test_calculate.py"
+  ],
+  "exit_code": 1,
+  "wall_seconds": 0.14717229991219938,
+  "source": {
+    "bytes": 1126,
+    "sha256": "3c52b8c8d0a54204aa23599024b05e6f0f57fcf8c342993611a3c7b69e6c07b9"
+  },
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "bytes": 1611,
+    "sha256": "dc0e7925b5f0c27fed3c85e021e480e15b250f53194fd2c54703ba3c328c71b1"
+  }
+}

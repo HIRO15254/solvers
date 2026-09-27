@@ -1,0 +1,23 @@
+.FF
+======================================================================
+FAIL: test_overlap_buffers_not_duplicated_resources (__main__.CostTests.test_overlap_buffers_not_duplicated_resources)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-vm08-vm13-20260927\test_calculate.py", line 9, in test_overlap_buffers_not_duplicated_resources
+    self.assertEqual(D(value["total_usd"]), D("4.040395833333333333333333333"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Decimal('4.040395000000000000000000000') != Decimal('4.040395833333333333333333333')
+
+======================================================================
+FAIL: test_vm13_finer_rounding_is_distinct (__main__.CostTests.test_vm13_finer_rounding_is_distinct)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-vm08-vm13-20260927\test_calculate.py", line 15, in test_vm13_finer_rounding_is_distinct
+    self.assertEqual(D(value["total_usd"]), D("1.505145833333333333333333333"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Decimal('1.505145000000000000000000000') != Decimal('1.505145833333333333333333333')
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+FAILED (failures=2)

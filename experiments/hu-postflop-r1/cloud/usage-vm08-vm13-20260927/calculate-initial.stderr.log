@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-vm08-vm13-20260927\calculate.py", line 188, in <module>
+    value = calculate()
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-vm08-vm13-20260927\calculate.py", line 164, in calculate
+    assert base["reserved_usd"] == 2 and creation["machineType"].endswith("/e2-standard-4")
+                                         ~~~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'machineType'

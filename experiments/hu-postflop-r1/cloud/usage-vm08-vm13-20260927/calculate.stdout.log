@@ -1,0 +1,21 @@
+{
+  "08": {
+    "hold_usd": "4.50",
+    "restore_usd": "1.50",
+    "reservation_allocation_usd": {
+      "r1-20260926-08": "3.00",
+      "r1-20260926-08-scale32": "1.50"
+    },
+    "margin_above_model_usd": "0.459605000000000000000000000",
+    "applied": false
+  },
+  "13": {
+    "hold_usd": "1.60",
+    "restore_usd": "0.40",
+    "reservation_allocation_usd": {
+      "r1-20260926-13": "1.60"
+    },
+    "margin_above_model_usd": "0.094855000000000000000000000",
+    "applied": false
+  }
+}
