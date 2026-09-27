@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-15",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:o+9UhPJbZebyuE8lJ7eUSGdDue2O428M75w2rTdtCgo",
+    "--command=sudo python3 -B /tmp/analyze-on-cloud.py"
+  ],
+  "started_utc": "2026-09-27T04:15:12.051966+00:00",
+  "timeout_seconds": 300,
+  "stdout": {
+    "bytes": 2183,
+    "sha256": "7517b2923fa57efb4f57b7a45f554e344898f7a2912859ce0bb21eae423fffa3"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T04:15:22.093875+00:00"
+}

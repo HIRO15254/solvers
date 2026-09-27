@@ -1,0 +1,78 @@
+{
+  "schema": "r1.vm15-usage-offline-checks/v1",
+  "started_at": "2026-09-27T04:34:24.544498+00:00",
+  "network_operations": false,
+  "cloud_mutations": false,
+  "budget_mutations": false,
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-vm15-20260927\\analyze.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.2339363000355661,
+      "stdout": {
+        "path": "replay.stdout.log",
+        "bytes": 1807,
+        "sha256": "e4c1f08538bd9b900720b961f8aa79fcbae063a493b3bebab71755c8dd15ef2b"
+      },
+      "stderr": {
+        "path": "replay.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-vm15-20260927\\test_analyze.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.14539940003305674,
+      "stdout": {
+        "path": "tests.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "tests.stderr.log",
+        "bytes": 107,
+        "sha256": "638d287c0b0a39696192d173099f90dfd19c0b1b2df974802576f431e7c9eb0b"
+      }
+    }
+  ],
+  "sources": {
+    "collect.py": {
+      "bytes": 7129,
+      "sha256": "56ccc31f6c3bf32478d7caef31682a04c19e32da07791d9f089e23ab552f4d6d"
+    },
+    "analyze.py": {
+      "bytes": 10928,
+      "sha256": "48ac85a744744a7a2da3228120438026e9ab1e363374b007fe34512aee52fd8d"
+    },
+    "test_analyze.py": {
+      "bytes": 3024,
+      "sha256": "6e274f5a611ec2ed7fee90150dfd47595f871cb9ce1294d315c9e3ad74076631"
+    },
+    "report.json": {
+      "bytes": 3713,
+      "sha256": "970a3ea2cfffb0dad3354f3f7e9e255f9dd340e9732e5d2f8ea647b2bf4157de"
+    },
+    "acquisition.json": {
+      "bytes": 10009,
+      "sha256": "dbb837bc134c83bc57714d11301cb36ea02d85de41cff87314a743774f1a5965"
+    }
+  },
+  "independent_read_only_review": {
+    "reviewer": "/root/profile_raw_storage/vm12_deployment_tests",
+    "result": "no blockers",
+    "verified_pins": 37,
+    "findings": "Raw 36-point sums, whole lifetime rounding and Decimal cost components independently matched; unavailable usage/invoice remained null."
+  },
+  "status": "passed",
+  "ended_at": "2026-09-27T04:34:24.937746+00:00"
+}

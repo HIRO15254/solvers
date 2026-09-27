@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "experiments/hu-postflop-r1/cloud/vm15/analyze-on-cloud.py",
+    "experiments/hu-postflop-r1/flop-scaling/worker-scratch/cloud32/case_analyze.py",
+    "solvers-r1-20260927-15:/tmp/",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--scp-flag=-batch",
+    "--scp-flag=-hostkey",
+    "--scp-flag=SHA256:o+9UhPJbZebyuE8lJ7eUSGdDue2O428M75w2rTdtCgo"
+  ],
+  "started_utc": "2026-09-27T04:15:00.035330+00:00",
+  "timeout_seconds": 90
+}

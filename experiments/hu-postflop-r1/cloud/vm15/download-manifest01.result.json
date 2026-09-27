@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--scp-flag=-batch",
+    "--scp-flag=-hostkey",
+    "--scp-flag=SHA256:o+9UhPJbZebyuE8lJ7eUSGdDue2O428M75w2rTdtCgo",
+    "solvers-r1-20260927-15:/tmp/flop-worker-cloud32-proof01.tar.gz.*",
+    "experiments/hu-postflop-r1/cloud/vm15/"
+  ],
+  "started_utc": "2026-09-27T04:26:01.416681+00:00",
+  "timeout_seconds": 90,
+  "stdout": {
+    "bytes": 214,
+    "sha256": "259aa5aef39135af455af3657f7e006a4a0daae13f6235ad2ddf418f16701c12"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T04:26:10.236030+00:00"
+}

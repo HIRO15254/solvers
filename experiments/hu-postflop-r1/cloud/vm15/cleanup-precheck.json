@@ -1,0 +1,10 @@
+{
+  "instance_id": "5437217996035927118",
+  "disk_id": "1601203414863522894",
+  "instance": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260927-15",
+  "disk": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260927-15",
+  "sole_boot_disk_auto_delete": true,
+  "sole_disk_user_is_target": true,
+  "download_verified": true,
+  "sha256": "798fdf725b354600d444c189ad42e20acb4953f11b9fff26df69d061ac6445cf"
+}

@@ -33,7 +33,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260927-15",
-      "reserved_usd": 3,
+      "reserved_usd": 2.5,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 1.25,
@@ -58,7 +58,35 @@
       "preflight_evidence": "experiments/hu-postflop-r1/cloud/vm15/",
       "note": "One2-vCPU Spot for dependencies then same stopped VM resized32 for fresh native builds, unit/integration tests and64 comparison stages. Original75min STOP unchanged; experiment40min ending15min before STOP. Envelope2.895195USD<3USD; held39USD, unreserved1USD; invoice unknown.",
       "pricing_evidence": "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-sources.json",
-      "pricing_scope": "Official source capture2026-09-27T02:30Z and conservative non-Spot ceiling; web refresh timed out before this reservation. No claim of a newly acquired tariff."
+      "pricing_scope": "Official source capture2026-09-27T02:30Z and conservative non-Spot ceiling; web refresh timed out before this reservation. No claim of a newly acquired tariff.",
+      "absolute_deadline_utc": "2026-09-27T05:05:53Z",
+      "measurement_deadline_utc": "2026-09-27T04:35:00Z",
+      "events": [
+        {
+          "event": "explicit_delete_and_absence_verification",
+          "at": "2026-09-26T21:29:22.259-07:00",
+          "verified_at_utc": "2026-09-27T04:30:14.609367+00:00",
+          "instance_id": "5437217996035927118",
+          "disk_id": "1601203414863522894",
+          "operation_status": "DONE",
+          "evidence": "vm15/reconciliation.json",
+          "reservation_released": false,
+          "billed_usd": null
+        },
+        {
+          "id": "r1-20260927-15",
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T04:35:07.204555+00:00",
+          "old_reserved_usd": 3,
+          "new_reserved_usd": 2.5,
+          "restored_to_available_budget_usd": 0.5,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/report.json",
+          "evidence_sha256": "970a3ea2cfffb0dad3354f3f7e9e255f9dd340e9732e5d2f8ea647b2bf4157de",
+          "billed_usd": null,
+          "final_invoice": false
+        }
+      ],
+      "disposition": "Full64 conditions complete; same state/quality verified on GCP; worker scratch candidate rejected under fixed guard. Original evidence retained in3 archive parts; local compressed stream hash matched. Measurement32CPU boot then2CPU recovery only. Instance and sole40GiB disk deleted; absence verified. Original deadline unchanged.3USD held pending usage; invoice unknown."
     },
     {
       "id": "r1-20260927-14",

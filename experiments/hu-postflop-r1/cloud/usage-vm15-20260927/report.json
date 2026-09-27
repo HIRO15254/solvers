@@ -1,0 +1,110 @@
+{
+  "schema": "r1.vm15-conservative-usage-proposal/v1",
+  "instance_id": "5437217996035927118",
+  "acquisition": {
+    "bytes": 10009,
+    "sha256": "dbb837bc134c83bc57714d11301cb36ea02d85de41cff87314a743774f1a5965"
+  },
+  "analysis_source": {
+    "bytes": 10928,
+    "sha256": "48ac85a744744a7a2da3228120438026e9ab1e363374b007fe34512aee52fd8d"
+  },
+  "acquired_at": [
+    "2026-09-27T04:32:13.142790Z",
+    "2026-09-27T04:32:16.234521Z"
+  ],
+  "lifecycle": {
+    "launch_attempt": "2026-09-27T03:50:53.9385733+00:00",
+    "created": "2026-09-26T20:50:57.963-07:00",
+    "delete_done": "2026-09-26T21:29:22.259-07:00",
+    "absence_verified": "2026-09-27T04:30:14.609367+00:00",
+    "launch_to_absence_seconds": "2360.670794",
+    "rounded_lifetime_minutes": 40,
+    "stopped_intervals_subtracted": false
+  },
+  "metrics": {
+    "sent": {
+      "available": true,
+      "points": 36,
+      "observed_sum": "133433063",
+      "first_start": "2026-09-27T03:51:00.001Z",
+      "last_end": "2026-09-27T04:29:00Z",
+      "internal_gaps_over_1ms": [
+        {
+          "from": "2026-09-27T03:55:00Z",
+          "to": "2026-09-27T03:56:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T04:17:00Z",
+          "to": "2026-09-27T04:18:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "created_to_first_seconds": "2.038",
+      "last_to_delete_seconds": "22.259"
+    },
+    "uptime": {
+      "available": true,
+      "points": 36,
+      "observed_sum": "2020.027999999999969",
+      "first_start": "2026-09-27T03:51:00.001Z",
+      "last_end": "2026-09-27T04:29:00Z",
+      "internal_gaps_over_1ms": [
+        {
+          "from": "2026-09-27T03:55:00Z",
+          "to": "2026-09-27T03:56:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T04:17:00Z",
+          "to": "2026-09-27T04:18:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "created_to_first_seconds": "2.038",
+      "last_to_delete_seconds": "22.259"
+    }
+  },
+  "network_allowance_gib": "1",
+  "disk_allowance_hours": "24",
+  "rates_usd": {
+    "compute_hour": "1.15",
+    "ipv4_hour": "0.0025",
+    "disk_gib_hour": "0.000137",
+    "sent_gib": "0.3"
+  },
+  "cost_scenario_usd": {
+    "whole_lifetime_highest_compute": "0.7666666666666666666666666667",
+    "whole_lifetime_ipv4": "0.001666666666666666666666666667",
+    "40gib_disk_at_least_24h": "0.131520",
+    "network_allowance": "0.3",
+    "original_uncertainty_reserve": "1"
+  },
+  "modeled_total_usd": "2.199853333333333333333333333",
+  "held_before_usd": "3",
+  "proposal": {
+    "available": true,
+    "hold_usd": "2.5",
+    "restore_usd": "0.5",
+    "margin_above_modeled_total_usd": "0.300146666666666666666666667",
+    "original_uncertainty_reserve_preserved_usd": "1",
+    "applied": false
+  },
+  "actual_billed_usd": null,
+  "guaranteed_cost_ceiling_usd": null,
+  "budget_changed": false,
+  "limits": [
+    "Monitoring observations are not invoice data; missing intervals/edge traffic remain unknown",
+    "All sent traffic is priced conservatively as if charged egress, rounded to whole GiB with original1GiB minimum",
+    "The full launch-attempt-to-absence duration, including stopped/small-VM intervals, uses the rounded highest undiscounted1.15USD/hour",
+    "Original40GiB disk24h, IPv4 and1USD uncertainty reserve remain; no Spot/free-tier/credit reductions assumed",
+    "A rounded usage-based reservation proposal, not a rigorous maximum bill or an applied budget change"
+  ]
+}

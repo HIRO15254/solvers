@@ -1,0 +1,249 @@
+{
+  "schema": "r1.worker-scratch-cloud32-case-analysis/v1",
+  "status": "case_verified",
+  "case": "expanded",
+  "boot_id": "252f7e9b-d13e-4ab8-90df-ffcd3dae4775",
+  "iterations": 16,
+  "full_matrix_complete": false,
+  "guard": {
+    "decision": "not_evaluable"
+  },
+  "counts": {
+    "build_prerequisites": 8,
+    "required_pilots": 1,
+    "case_rows": 32,
+    "warmup": 8,
+    "measured": 24
+  },
+  "checkpoint": {
+    "bytes": 647309,
+    "sha256": "64ba860dd736ac1ca9295b7810da6b9e322de6c2ffc839beab9bd5c5163a23f3"
+  },
+  "required_payload_integrity": "verified",
+  "verified_payloads": 337,
+  "unneeded_manifest_references_not_read": 265,
+  "unique_state_streams_verified": 2,
+  "groups": [
+    {
+      "arm": "baseline",
+      "workers": 1,
+      "cfr_plus_quality_seconds": {
+        "samples": [
+          19.096824116,
+          19.162624675,
+          19.385050902000003
+        ],
+        "median": 19.162624675,
+        "minimum": 19.096824116,
+        "maximum": 19.385050902000003,
+        "max_over_min": 1.0150929172436853
+      },
+      "root_os_peak_resident_bytes": {
+        "samples": [
+          386035712,
+          385978368,
+          386039808
+        ],
+        "median": 386035712,
+        "minimum": 385978368,
+        "maximum": 386039808,
+        "max_over_min": 1.0001591799051288
+      }
+    },
+    {
+      "arm": "baseline",
+      "workers": 4,
+      "cfr_plus_quality_seconds": {
+        "samples": [
+          5.569019557000001,
+          5.507074016,
+          5.5385106120000005
+        ],
+        "median": 5.5385106120000005,
+        "minimum": 5.507074016,
+        "maximum": 5.569019557000001,
+        "max_over_min": 1.0112483581698788
+      },
+      "root_os_peak_resident_bytes": {
+        "samples": [
+          386953216,
+          387280896,
+          387719168
+        ],
+        "median": 387280896,
+        "minimum": 386953216,
+        "maximum": 387719168,
+        "max_over_min": 1.0019794434270834
+      }
+    },
+    {
+      "arm": "baseline",
+      "workers": 16,
+      "cfr_plus_quality_seconds": {
+        "samples": [
+          1.952902226,
+          2.01660757,
+          1.967686837
+        ],
+        "median": 1.967686837,
+        "minimum": 1.952902226,
+        "maximum": 2.01660757,
+        "max_over_min": 1.0326208568723299
+      },
+      "root_os_peak_resident_bytes": {
+        "samples": [
+          390746112,
+          390995968,
+          392065024
+        ],
+        "median": 390995968,
+        "minimum": 390746112,
+        "maximum": 392065024,
+        "max_over_min": 1.0033753681981614
+      }
+    },
+    {
+      "arm": "baseline",
+      "workers": 32,
+      "cfr_plus_quality_seconds": {
+        "samples": [
+          2.06887711,
+          2.169869239,
+          2.106607475
+        ],
+        "median": 2.106607475,
+        "minimum": 2.06887711,
+        "maximum": 2.169869239,
+        "max_over_min": 1.0488149482208735
+      },
+      "root_os_peak_resident_bytes": {
+        "samples": [
+          393588736,
+          392826880,
+          393822208
+        ],
+        "median": 393588736,
+        "minimum": 392826880,
+        "maximum": 393822208,
+        "max_over_min": 1.0025337573640583
+      }
+    },
+    {
+      "arm": "worker",
+      "workers": 1,
+      "cfr_plus_quality_seconds": {
+        "samples": [
+          19.717605423,
+          19.463304335,
+          19.714823482
+        ],
+        "median": 19.714823482,
+        "minimum": 19.463304335,
+        "maximum": 19.717605423,
+        "max_over_min": 1.0130656687899957
+      },
+      "root_os_peak_resident_bytes": {
+        "samples": [
+          386043904,
+          386244608,
+          385982464
+        ],
+        "median": 386043904,
+        "minimum": 385982464,
+        "maximum": 386244608,
+        "max_over_min": 1.0006791603879703
+      }
+    },
+    {
+      "arm": "worker",
+      "workers": 4,
+      "cfr_plus_quality_seconds": {
+        "samples": [
+          5.642248937000001,
+          5.491618563,
+          5.521419998
+        ],
+        "median": 5.521419998,
+        "minimum": 5.491618563,
+        "maximum": 5.642248937000001,
+        "max_over_min": 1.0274291399287778
+      },
+      "root_os_peak_resident_bytes": {
+        "samples": [
+          388263936,
+          388075520,
+          387788800
+        ],
+        "median": 388075520,
+        "minimum": 387788800,
+        "maximum": 388263936,
+        "max_over_min": 1.0012252442566676
+      }
+    },
+    {
+      "arm": "worker",
+      "workers": 16,
+      "cfr_plus_quality_seconds": {
+        "samples": [
+          2.009588042,
+          1.934731909,
+          2.029303589
+        ],
+        "median": 2.009588042,
+        "minimum": 1.934731909,
+        "maximum": 2.029303589,
+        "max_over_min": 1.0488810256139731
+      },
+      "root_os_peak_resident_bytes": {
+        "samples": [
+          396394496,
+          395223040,
+          396005376
+        ],
+        "median": 396005376,
+        "minimum": 395223040,
+        "maximum": 396394496,
+        "max_over_min": 1.0029640377241165
+      }
+    },
+    {
+      "arm": "worker",
+      "workers": 32,
+      "cfr_plus_quality_seconds": {
+        "samples": [
+          2.045954514,
+          2.080060908,
+          2.238783021
+        ],
+        "median": 2.080060908,
+        "minimum": 2.045954514,
+        "maximum": 2.238783021,
+        "max_over_min": 1.0942486774170779
+      },
+      "root_os_peak_resident_bytes": {
+        "samples": [
+          400375808,
+          399986688,
+          400642048
+        ],
+        "median": 400375808,
+        "minimum": 399986688,
+        "maximum": 400642048,
+        "max_over_min": 1.0016384545277668
+      }
+    }
+  ],
+  "limitations": [
+    "One immutable completed case; no campaign adoption decision or external quality claim.",
+    "Mutable receipts and unrelated case/wrapper payloads are neither read nor required.",
+    "Removed duplicate state equality relies on the pinned runner's exact comparison receipt; retained canonical streams are fully rehashed."
+  ],
+  "reader": {
+    "bytes": 12844,
+    "sha256": "40b88fa36ae6055b60b5089f1aab1f42548df0f5024eb29e057b96aa108a7329"
+  },
+  "trusted_analyzer": {
+    "bytes": 31465,
+    "sha256": "221ec03585ff20e560482f364690bc0e63cfb84c8c83e8fdd5297aefe4ee98ce"
+  }
+}

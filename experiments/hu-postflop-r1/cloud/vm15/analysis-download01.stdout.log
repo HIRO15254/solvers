@@ -1,0 +1,7 @@
+narrow.json               | 6 kB |   6.2 kB/s | ETA: 00:00:00 | 100%
+full.json                 | 32 kB |  32.0 kB/s | ETA: 00:00:00 |  57%full.json                 | 55 kB |  55.2 kB/s | ETA: 00:00:00 | 100%
+expanded.json             | 6 kB |   6.1 kB/s | ETA: 00:00:00 | 100%
+full.stdout.log           | 0 kB |   0.1 kB/s | ETA: 00:00:00 | 100%
+narrow.stdout.log         | 0 kB |   0.1 kB/s | ETA: 00:00:00 | 100%
+expanded.stdout.log       | 0 kB |   0.1 kB/s | ETA: 00:00:00 | 100%
+receipt.json              | 2 kB |   2.7 kB/s | ETA: 00:00:00 | 100%

@@ -1,0 +1,26 @@
+{
+  "status": "downloaded_archive_stream_hash_verified",
+  "at_utc": "2026-09-27T04:27:50.035061+00:00",
+  "bytes": 127275647,
+  "sha256": "798fdf725b354600d444c189ad42e20acb4953f11b9fff26df69d061ac6445cf",
+  "parts": [
+    {
+      "path": "flop-worker-cloud32-proof01.part00",
+      "bytes": 50331648,
+      "sha256": "ce13b6e964169785a43a9d6eee38d622e598d2c88303ffbf71b99edb61253b8d"
+    },
+    {
+      "path": "flop-worker-cloud32-proof01.part01",
+      "bytes": 50331648,
+      "sha256": "7de04c08f5a3c5ef1f11080c742da1c9d91793bc4dbaa3d3e0371a30431e6f02"
+    },
+    {
+      "path": "flop-worker-cloud32-proof01.part02",
+      "bytes": 26612351,
+      "sha256": "5c78ec8a7272c2d873880c1478905e46f14eac03610df60c0cd4688a0aff7856"
+    }
+  ],
+  "elapsed_seconds": 0.5533370999619365,
+  "local_archive_decompression": false,
+  "scope": "Transfer integrity; solver correctness is established separately by cloud readers"
+}

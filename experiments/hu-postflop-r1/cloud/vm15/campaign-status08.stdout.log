@@ -1,0 +1,5 @@
+MainPID=1904
+Result=success
+ActiveState=active
+{"stage": "expanded-r2-w4-worker", "status": "completed", "case": "expanded", "arm": "worker", "workers": 4, "iterations": 16, "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "expanded", "threads": 4, "iterations": 16, "state_file": "state.bin", "state_bytes": 283677926, "quality_file": "quality.json", "build_seconds": 0.238996473, "cfr_seconds": 4.591468038, "state_write_seconds": 1.897812085, "quality_seconds": 0.900150525, "cfv_capture": false, "performance_claim": false}}
+{"stage": "expanded-r2-w4-baseline", "status": "completed", "case": "expanded", "arm": "baseline", "workers": 4, "iterations": 16, "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "expanded", "threads": 4, "iterations": 16, "state_file": "state.bin", "state_bytes": 283677926, "quality_file": "quality.json", "build_seconds": 0.245885294, "cfr_seconds": 4.625378683, "state_write_seconds": 1.894604774, "quality_seconds": 0.881695333, "cfv_capture": false, "performance_claim": false}}

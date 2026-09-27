@@ -1,0 +1,102 @@
+{
+  "runs": [
+    {
+      "name": "full",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/opt/r1/flop-worker-cloud32-package/experiments/hu-postflop-r1/flop-scaling/worker-scratch/cloud32/analyze.py",
+        "--proof",
+        "/opt/r1/flop-worker-cloud32-proof01",
+        "--out",
+        "/tmp/flop-worker-cloud32-analysis01/full.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "narrow",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/tmp/case_analyze.py",
+        "--proof",
+        "/opt/r1/flop-worker-cloud32-proof01",
+        "--case",
+        "narrow",
+        "--out",
+        "/tmp/flop-worker-cloud32-analysis01/narrow.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "expanded",
+      "command": [
+        "/usr/bin/python3",
+        "-B",
+        "/tmp/case_analyze.py",
+        "--proof",
+        "/opt/r1/flop-worker-cloud32-proof01",
+        "--case",
+        "expanded",
+        "--out",
+        "/tmp/flop-worker-cloud32-analysis01/expanded.json"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "readers": {
+    "full": {
+      "bytes": 31465,
+      "sha256": "221ec03585ff20e560482f364690bc0e63cfb84c8c83e8fdd5297aefe4ee98ce"
+    },
+    "case": {
+      "bytes": 12844,
+      "sha256": "40b88fa36ae6055b60b5089f1aab1f42548df0f5024eb29e057b96aa108a7329"
+    }
+  },
+  "tests": {
+    "result_groups": 14,
+    "passed": 138,
+    "failed": 0,
+    "ignored": 13,
+    "scope": "candidate engine/holdem/cfr-ref unit and integration, release; not full workspace"
+  },
+  "files": {
+    "expanded.json": {
+      "bytes": 6268,
+      "sha256": "e4b35ca56d47c55f74c34545fbd02bb45f3e9041c283035a9e88860348cc1e21"
+    },
+    "expanded.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "expanded.stdout.log": {
+      "bytes": 74,
+      "sha256": "cd9b99ba0432b1e3939d804aa33288329d09c6c2647952733833c65c9fc685bd"
+    },
+    "full.json": {
+      "bytes": 56531,
+      "sha256": "ed24a86db8898b78840532f6a258df8945675f03b7f05c0838998960eae9eb80"
+    },
+    "full.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "full.stdout.log": {
+      "bytes": 118,
+      "sha256": "c07f6d9252568fda165e0366c638407b020c876e455b8e8156b2c512b26fa7ba"
+    },
+    "narrow.json": {
+      "bytes": 6321,
+      "sha256": "12cf99d71bb9c9a9cb950604b9070c219a69c3c82dd4a46d561bc4ed6b360d90"
+    },
+    "narrow.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "narrow.stdout.log": {
+      "bytes": 72,
+      "sha256": "d7236c79bc0db57e00a20ca32672556f556fbc084984c05aa77a05a2199649d9"
+    }
+  }
+}

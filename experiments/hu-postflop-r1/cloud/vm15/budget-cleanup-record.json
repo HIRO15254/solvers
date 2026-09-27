@@ -1,0 +1,8 @@
+{
+  "at_utc": "2026-09-27T04:32:41.889445+00:00",
+  "before_sha256": "3c1cf597028fdf47658c53e5ec2e04a4f3c6c4d2f044c9be68ef7d634bd37ebb",
+  "after_sha256": "2543d1b3bf7f7d917f0f10c168ad881c343ba26b8ae35fe8aca56d18e2d0edc7",
+  "reservation_change_usd": 0,
+  "billed_usd": null,
+  "event": "recorded_verified_vm15_cleanup"
+}

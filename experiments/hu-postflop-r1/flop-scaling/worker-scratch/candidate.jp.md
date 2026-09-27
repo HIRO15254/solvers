@@ -22,10 +22,12 @@ python -B experiments/hu-postflop-r1/flop-scaling/worker-scratch/prepare.py --ch
 
 初回生成は `--check` を省く。既存候補の上書きを拒否する。実行する外部プログラムは rustfmt の version/read-from-stdin 整形のみで、Cargo/rustc/solver を起動しない。初回生成の静的逆変換と整形は成功した。`--check` は保存内容を比較するだけで、Rust の型検査の代わりにはならない。
 
-候補内の未実行 Rust テストは七つ。再入 lease の非aliasと一つだけの返却、再利用 Vec のゼロ・縮小・拡大次元、競合/不正 index の非待機 fallback、panic 伝播と poison fallback、bank の所有権終了、F32/I16 それぞれの nested chance 上で `run(3)` と `step` 三回および 1/2/4 worker の state・値一致を検査する。uniform EV=2 / BR=3 の解析値も確認する。既存 parallel/value_scratch の F32/I16・mapped/zero・CFV/read-only 検査を併用する必要がある。アロケータの解放を測るテストではなく、bank に global owner がなく Rust の通常の field drop が行われることを確認するテストを含む。
+候補内の追加 Rust テストは七つ。再入 lease の非aliasと一つだけの返却、再利用 Vec のゼロ・縮小・拡大次元、競合/不正 index の非待機 fallback、panic 伝播と poison fallback、bank の所有権終了、F32/I16 それぞれの nested chance 上で `run(3)` と `step` 三回および 1/2/4 worker の state・値一致を検査する。uniform EV=2 / BR=3 の解析値も確認する。既存 parallel/value_scratch の F32/I16・mapped/zero・CFV/read-only 検査を併用する必要がある。アロケータの解放を測るテストではなく、bank に global owner がなく Rust の通常の field drop が行われることを確認するテストを含む。
 
 クラウド比較は[事前固定した条件](protocol.jp.md)と[VM15の有限資源枠](../../cloud/vm15/README.md)に従う。
 [保存処理](durable.jp.md)は測定終了後に作用し、各stageと完了caseを永続化する。
 全64条件の判定は`cloud32/analyze.py`、一つの完了caseの参考値は`cloud32/case_analyze.py`で照合する。
 後者は更新中のexecution/retained/wrapperを読まず、必要なsource・control・build・pilot・32条件とcanonicalを確認する。
 部分caseから全体の採用guardを通過させない。実stateの伸長・照合はGCP側で行う。
+
+[VM15比較結果](../../cloud/vm15/report.jp.md)で候補を含む138 tests成功、全64条件のstate/quality一致を確認した。ただし16 workersで必要な10%以上の短縮を満たさず、この候補は採用しない。固定反復の比較であり、収束目標や外部参照品質の合格を意味しない。

@@ -1,0 +1,8 @@
+2
+47e6cc83-c29d-40c7-82ff-23afe18bb421
+Sep 27 04:19:23 solvers-r1-20260927-15 systemd[1]: google-startup-scripts.service: Deactivated successfully.
+Sep 27 04:19:23 solvers-r1-20260927-15 systemd[1]: Finished google-startup-scripts.service - Google Compute Engine Startup Scripts.
+Sep 27 04:19:23 solvers-r1-20260927-15 systemd[1]: google-startup-scripts.service: Consumed 2.638s CPU time.
+MainPID=0
+ActiveState=inactive
+130537633	/opt/r1/flop-worker-cloud32-proof01

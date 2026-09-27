@@ -1,0 +1,5 @@
+MainPID=0
+Result=success
+ActiveState=inactive
+{"stage": "expanded-r3-w1-worker", "status": "completed", "case": "expanded", "arm": "worker", "workers": 1, "iterations": 16, "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "expanded", "threads": 1, "iterations": 16, "state_file": "state.bin", "state_bytes": 283677926, "quality_file": "quality.json", "build_seconds": 0.245033332, "cfr_seconds": 16.497697339, "state_write_seconds": 1.903700009, "quality_seconds": 3.2171261429999998, "cfv_capture": false, "performance_claim": false}}
+{"phase": "matrix", "status": "completed", "counts": {"completed": 64, "failed": 0, "skipped": 0}, "pilot_counts": {"completed": 2, "failed": 0, "skipped": 6}}

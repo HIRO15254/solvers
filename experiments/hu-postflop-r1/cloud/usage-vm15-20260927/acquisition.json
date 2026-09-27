@@ -1,0 +1,219 @@
+{
+  "schema": "r1.vm15-usage-acquisition/v1",
+  "started_at": "2026-09-27T04:32:13.142790Z",
+  "project": "solvers-abstraction-20260723",
+  "instance_id": "5437217996035927118",
+  "instance_name": "solvers-r1-20260927-15",
+  "interval_start": "2026-09-27T03:45:00Z",
+  "inputs": {
+    "budget.json": {
+      "path": "inputs/budget.json",
+      "bytes": 61293,
+      "sha256": "3c1cf597028fdf47658c53e5ec2e04a4f3c6c4d2f044c9be68ef7d634bd37ebb"
+    },
+    "vm15/reservation.json": {
+      "path": "inputs/vm15/reservation.json",
+      "bytes": 1731,
+      "sha256": "b3e9ef76faff5e284d5a3f8125c4431f67e8b066f9ac10eb5c8c036b68c8632b"
+    },
+    "launch-r1-20260927-15.json": {
+      "path": "inputs/launch-r1-20260927-15.json",
+      "bytes": 1091,
+      "sha256": "c8e10e7249ee619e5b78374feed8cf58ad5be71e39d9d05d57cf786a79f74943"
+    },
+    "create-result-r1-20260927-15.json": {
+      "path": "inputs/create-result-r1-20260927-15.json",
+      "bytes": 30180,
+      "sha256": "cbff352aeb529bfbd6dc86c197c81585c94566dcb13b5830a9a474d5abc350a9"
+    },
+    "vm15/resize01.result.json": {
+      "path": "inputs/vm15/resize01.result.json",
+      "bytes": 739,
+      "sha256": "d4ed25e38c96495d6c6ec809a04867c4874086338dbca438840435ed1b515b54"
+    },
+    "vm15/start32-01.result.json": {
+      "path": "inputs/vm15/start32-01.result.json",
+      "bytes": 692,
+      "sha256": "354df748d57a69781bf9f1d455c3a0b847df3f0fffa024d54dd82ecf0d4c49e2"
+    },
+    "vm15/stop-for-recovery01.result.json": {
+      "path": "inputs/vm15/stop-for-recovery01.result.json",
+      "bytes": 687,
+      "sha256": "24495d4d7274eb8921e41caae372f15ff2d418900f6a89847375581c9ac481bb"
+    },
+    "vm15/resize-recovery01.result.json": {
+      "path": "inputs/vm15/resize-recovery01.result.json",
+      "bytes": 739,
+      "sha256": "759499ab7eec2ed911731288cf10ea28775cfec9a5df1b2df7f71c818713dbad"
+    },
+    "vm15/start-recovery01.result.json": {
+      "path": "inputs/vm15/start-recovery01.result.json",
+      "bytes": 692,
+      "sha256": "65a0e3a0162aac92420a4a86ee25d953d05f12a1741631b160c3772693590033"
+    },
+    "vm15/recovery-state01.stdout.log": {
+      "path": "inputs/vm15/recovery-state01.stdout.log",
+      "bytes": 466,
+      "sha256": "1b24f75aa28e9beb22729c56daa37ca31e893edbc9f9513a52e915c2f0cb9150"
+    },
+    "vm15/cleanup-operation01.stdout.log": {
+      "path": "inputs/vm15/cleanup-operation01.stdout.log",
+      "bytes": 904,
+      "sha256": "6e81c7b9b4e7828678ae1649adf9cad8af01a1b2d3d8f329a86269df23e8228f"
+    },
+    "vm15/reconciliation.json": {
+      "path": "inputs/vm15/reconciliation.json",
+      "bytes": 1387,
+      "sha256": "41c1800c04a6ddbacbcc1fb7946bb263f574f44d496aab15a32bc179bc47cab7"
+    },
+    "preflight-vm14/draft.json": {
+      "path": "inputs/preflight-vm14/draft.json",
+      "bytes": 2008,
+      "sha256": "287913ebb23cf81b9d561a2124d80822107188206fcea405757f66445cf7c1cb"
+    },
+    "preflight-vm14/pricing-sources.json": {
+      "path": "inputs/preflight-vm14/pricing-sources.json",
+      "bytes": 4730,
+      "sha256": "9c7b5c6521022dcac2baea9e1dca91ce91ed6b5028f4f7077cd524ddf632164f"
+    },
+    "preflight-vm14/pricing-compute-e2-standard-4-row.html": {
+      "path": "inputs/preflight-vm14/pricing-compute-e2-standard-4-row.html",
+      "bytes": 739,
+      "sha256": "27d15a273c29ecc264b02b1eef346ded94c18b661df4022ab45088bf3b94f22c"
+    },
+    "preflight-vm14/pricing-compute-e2-standard-4-header.html": {
+      "path": "inputs/preflight-vm14/pricing-compute-e2-standard-4-header.html",
+      "bytes": 6156,
+      "sha256": "0eaf29d999d51db71eba961ac83ed0759f97e85be48a16011ccef9c5b6505aa4"
+    },
+    "preflight-vm14/pricing-compute-e2-standard-4-region.html": {
+      "path": "inputs/preflight-vm14/pricing-compute-e2-standard-4-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm14/pricing-compute-e2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm14/pricing-compute-e2-highcpu-32-row.html",
+      "bytes": 738,
+      "sha256": "d3c12a45c633d8bf5aaa107f6f202511767227fafedbb87932f4963ada3045da"
+    },
+    "preflight-vm14/pricing-compute-e2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm14/pricing-compute-e2-highcpu-32-header.html",
+      "bytes": 6156,
+      "sha256": "95fda29617708aa733c70efe4c4a596a0c6c6fd4412caa2bb6c2e7a4e8d989ba"
+    },
+    "preflight-vm14/pricing-compute-e2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm14/pricing-compute-e2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm14/pricing-compute-n2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm14/pricing-compute-n2-highcpu-32-row.html",
+      "bytes": 730,
+      "sha256": "ee6561764f0a056da53bd80cec2e63fb31d5a7f4fe3c56120e0969bd6b67a5f9"
+    },
+    "preflight-vm14/pricing-compute-n2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm14/pricing-compute-n2-highcpu-32-header.html",
+      "bytes": 6156,
+      "sha256": "2fbd3aadfb24a3f16c23f4bdf60e9be00930e55b51b2efec38eda192a4836451"
+    },
+    "preflight-vm14/pricing-compute-n2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm14/pricing-compute-n2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm14/pricing-disk-balanced-row.html": {
+      "path": "inputs/preflight-vm14/pricing-disk-balanced-row.html",
+      "bytes": 243,
+      "sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319"
+    },
+    "preflight-vm14/pricing-disk-balanced-header.html": {
+      "path": "inputs/preflight-vm14/pricing-disk-balanced-header.html",
+      "bytes": 316,
+      "sha256": "6d20d457c99d6bdf26cff89c6462a3eccb864216f96720ddac3312547cb64565"
+    },
+    "preflight-vm14/pricing-disk-balanced-region.html": {
+      "path": "inputs/preflight-vm14/pricing-disk-balanced-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm14/pricing-network-spot-ipv4-row.html": {
+      "path": "inputs/preflight-vm14/pricing-network-spot-ipv4-row.html",
+      "bytes": 288,
+      "sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7"
+    },
+    "preflight-vm14/pricing-network-spot-ipv4-header.html": {
+      "path": "inputs/preflight-vm14/pricing-network-spot-ipv4-header.html",
+      "bytes": 315,
+      "sha256": "93345396f548060461bc900f409d21bf02ea0c2123b5849d1269035dea74151e"
+    },
+    "preflight-vm14/pricing-network-spot-ipv4-region.html": {
+      "path": "inputs/preflight-vm14/pricing-network-spot-ipv4-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm14/pricing-network-asia-egress-row.html": {
+      "path": "inputs/preflight-vm14/pricing-network-asia-egress-row.html",
+      "bytes": 791,
+      "sha256": "7682738cbbb76f8367ad699c94767ae312761d1401b69c034cf6e31a1d419cd4"
+    },
+    "preflight-vm14/pricing-network-asia-egress-header.html": {
+      "path": "inputs/preflight-vm14/pricing-network-asia-egress-header.html",
+      "bytes": 316,
+      "sha256": "654fa3b64513f4092f73efbf07280024104f26e28e2a01ed800794e177b97c35"
+    },
+    "preflight-vm14/pricing-network-asia-egress-region.html": {
+      "path": "inputs/preflight-vm14/pricing-network-asia-egress-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    }
+  },
+  "requests": [
+    {
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "label": "sent",
+      "page": 0,
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fnetwork%2Fsent_bytes_count%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%225437217996035927118%22&interval.startTime=2026-09-27T03%3A45%3A00Z&interval.endTime=2026-09-27T04%3A32%3A13.142790Z&view=FULL&pageSize=1000",
+      "requested_at": "2026-09-27T04:32:15.322951Z",
+      "http_status": 200,
+      "completed_at": "2026-09-27T04:32:15.817727Z",
+      "response": {
+        "path": "vm15-sent-00.json",
+        "bytes": 8633,
+        "sha256": "03f25ce4695a02c9ad06c7e7dc6a97cd76d63eb452d86f3f992d0dda488fc22a"
+      },
+      "point_count": 36
+    },
+    {
+      "metric": "compute.googleapis.com/instance/uptime",
+      "label": "uptime",
+      "page": 0,
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fuptime%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%225437217996035927118%22&interval.startTime=2026-09-27T03%3A45%3A00Z&interval.endTime=2026-09-27T04%3A32%3A13.142790Z&view=FULL&pageSize=1000",
+      "requested_at": "2026-09-27T04:32:15.818871Z",
+      "http_status": 200,
+      "completed_at": "2026-09-27T04:32:16.233195Z",
+      "response": {
+        "path": "vm15-uptime-00.json",
+        "bytes": 8665,
+        "sha256": "91204967fa13b795881c9507fe606d44bd78a33387a3259864a4d15f0ac98360"
+      },
+      "point_count": 36
+    }
+  ],
+  "source": {
+    "bytes": 7129,
+    "sha256": "56ccc31f6c3bf32478d7caef31682a04c19e32da07791d9f089e23ab552f4d6d"
+  },
+  "status": "completed",
+  "cloud_mutations": false,
+  "budget_mutations": false,
+  "credential_material_retained": false,
+  "interval_end": "2026-09-27T04:32:13.142790Z",
+  "authentication": {
+    "method": "existing gcloud auth print-access-token",
+    "returncode": 0,
+    "stderr_bytes": 0
+  },
+  "ended_at": "2026-09-27T04:32:16.234521Z"
+}

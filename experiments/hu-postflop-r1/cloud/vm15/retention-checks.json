@@ -1,0 +1,21 @@
+{
+  "at_utc": "2026-09-27T04:36:38.244447+00:00",
+  "compact_analysis_files_verified": 9,
+  "cloud_readers_passed": true,
+  "candidate_tests": {
+    "result_groups": 14,
+    "passed": 138,
+    "failed": 0,
+    "ignored": 13,
+    "scope": "candidate engine/holdem/cfr-ref unit and integration, release; not full workspace"
+  },
+  "local_archive_decompression": false,
+  "source_changed": false,
+  "doc_check_markdown_files": 49,
+  "git_diff_check_exit_code": 0,
+  "usage_checks": "../usage-vm15-20260927/checks.json",
+  "transfer_verification": "download-check.json",
+  "cleanup_verification": "reconciliation.json",
+  "usage_application": "usage-applied.json",
+  "scope": "Evidence retention and cost reconciliation only; no new local build or solver execution"
+}

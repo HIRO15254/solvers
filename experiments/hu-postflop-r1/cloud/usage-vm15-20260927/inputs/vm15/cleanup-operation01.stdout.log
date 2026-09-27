@@ -1,0 +1,18 @@
+[
+  {
+    "endTime": "2026-09-26T21:29:22.259-07:00",
+    "id": "638028123670390175",
+    "insertTime": "2026-09-26T21:28:32.515-07:00",
+    "kind": "compute#operation",
+    "name": "operation-1790483312302-65c6f61ce592f-1a47ba93-d95d8ca1",
+    "operationType": "delete",
+    "progress": 100,
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/operations/operation-1790483312302-65c6f61ce592f-1a47ba93-d95d8ca1",
+    "startTime": "2026-09-26T21:28:32.531-07:00",
+    "status": "DONE",
+    "targetId": "5437217996035927118",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260927-15",
+    "user": "hi089697@gmail.com",
+    "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+  }
+]

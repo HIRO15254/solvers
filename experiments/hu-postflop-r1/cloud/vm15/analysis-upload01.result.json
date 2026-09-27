@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "experiments/hu-postflop-r1/cloud/vm15/analyze-on-cloud.py",
+    "experiments/hu-postflop-r1/flop-scaling/worker-scratch/cloud32/case_analyze.py",
+    "solvers-r1-20260927-15:/tmp/",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--scp-flag=-batch",
+    "--scp-flag=-hostkey",
+    "--scp-flag=SHA256:o+9UhPJbZebyuE8lJ7eUSGdDue2O428M75w2rTdtCgo"
+  ],
+  "started_utc": "2026-09-27T04:15:00.035330+00:00",
+  "timeout_seconds": 90,
+  "stdout": {
+    "bytes": 212,
+    "sha256": "5bf1e69eab062915df551210a403b616017610025e7a5998aaf2d9e28a9fccfb"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T04:15:06.405819+00:00"
+}
