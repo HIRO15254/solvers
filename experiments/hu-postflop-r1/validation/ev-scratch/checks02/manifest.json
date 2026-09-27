@@ -1,0 +1,276 @@
+{
+  "schema": "r1-ev-scratch-aux-checks/v1",
+  "files": {
+    "ev-scratch-tools01/record.json.gz": {
+      "original": {
+        "bytes": 7667,
+        "sha256": "cdd73590f77eb62eaa326179a1f859e5b33368f7b643344f6348bc5373a59851"
+      },
+      "compressed": {
+        "bytes": 2017,
+        "sha256": "9bb4c6e6b5148b5b28f58e741fb72518fc1572fda5da7dfed2eef26551c6ed32"
+      }
+    },
+    "ev-scratch-tools01/wrapper.stderr.log.gz": {
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    "ev-scratch-tools01/wrapper.stdout.log.gz": {
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    "ev-scratch-tools02/record.json.gz": {
+      "original": {
+        "bytes": 7670,
+        "sha256": "4e8d79b351cd22463d70dee46ef61d0c3392dcbd64771ba4202be90bdfdc2a9a"
+      },
+      "compressed": {
+        "bytes": 2191,
+        "sha256": "9265df60b373ece7adcb16435ee95f2107128257e63e8dbba24cb15914bb285c"
+      }
+    },
+    "ev-scratch-tools02/record.samples.jsonl.gz": {
+      "original": {
+        "bytes": 25642,
+        "sha256": "b7125895e9092d5a52ce45436987e1cb3060d03b07d4b033d8c53fc71d67b852"
+      },
+      "compressed": {
+        "bytes": 3137,
+        "sha256": "135837b5c34d9170f1ec848c96ab6b85f1295a4b0d72125e2e0d9b9516ff7c0f"
+      }
+    },
+    "ev-scratch-tools02/record.stderr.log.gz": {
+      "original": {
+        "bytes": 5905,
+        "sha256": "631ed8e3fc32d82608f2ab59e216ee9c3fc5ff88700e94e365cf33611e360076"
+      },
+      "compressed": {
+        "bytes": 1248,
+        "sha256": "5e088c17e2812410017840a6789eb7a5b4b672666fa07cac2c31d7d8524bf14d"
+      }
+    },
+    "ev-scratch-tools02/record.stdout.log.gz": {
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    "ev-scratch-tools02/wrapper.stderr.log.gz": {
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    "ev-scratch-tools02/wrapper.stdout.log.gz": {
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    "ev-scratch-docs01/record.json.gz": {
+      "original": {
+        "bytes": 7996,
+        "sha256": "5c085a4e7bbcc0b696aa2c3145eeae7c4a47988ac414b6163799c8693d60fae5"
+      },
+      "compressed": {
+        "bytes": 2211,
+        "sha256": "651fa8f0dcd01216e9729109c0e8f5290ef41b48cf2ba0662097302068ba1154"
+      }
+    },
+    "ev-scratch-docs01/record.samples.jsonl.gz": {
+      "original": {
+        "bytes": 1408,
+        "sha256": "28d3d34e9619f65be0612781337e3b0799c1ef10248dc0612331c3d6a149f13b"
+      },
+      "compressed": {
+        "bytes": 407,
+        "sha256": "55a0ae8a756abfdd6dfcecb97292906cb669e3ab848ba0eb2061213a5ea56e04"
+      }
+    },
+    "ev-scratch-docs01/record.stderr.log.gz": {
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    "ev-scratch-docs01/record.stdout.log.gz": {
+      "original": {
+        "bytes": 48,
+        "sha256": "78525ba6a5f5b6be950c80a401fdf487286a0b6c1ce0004597612ea7fe650692"
+      },
+      "compressed": {
+        "bytes": 68,
+        "sha256": "8cc6e26ef2eb5c0ff57bf0e5bb95f117c3bf6e9c14f3079694be91e003b3c73a"
+      }
+    },
+    "ev-scratch-docs01/wrapper.stderr.log.gz": {
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    "ev-scratch-docs01/wrapper.stdout.log.gz": {
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    "source.tar.gz": {
+      "original": {
+        "bytes": 163840,
+        "sha256": "6605a95d9cfb19b6fccb230a432692c7510d3dfe81cd10b414dfdd41658e78ea"
+      },
+      "compressed": {
+        "bytes": 49103,
+        "sha256": "c6ff4b92c0c9bc75e5b89a5236eb35fba36f5e88712dcb68a568ffcc4bef05c3"
+      }
+    }
+  },
+  "source_files": {
+    "tools/run_supervised.py": {
+      "bytes": 39015,
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+    },
+    "experiments/hu-postflop-r1/validation/ev-scratch/run_bounded.py": {
+      "bytes": 2477,
+      "sha256": "6b4d90dc56b6bc3c76fd57838b48e7c955d16bed6716be42ccba0252fd2a1886"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/native-preflight/run_bounded.py": {
+      "bytes": 11663,
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8"
+    },
+    "tools/tests/test_run_supervised.py": {
+      "bytes": 18060,
+      "sha256": "7afdab6b42ac20c7e14bf6495c5481022e4f1bab13dc892d0c0b32fbd1a9f9d6"
+    },
+    "tools/tests/test_check_docs.py": {
+      "bytes": 4276,
+      "sha256": "52579c04f2b43fb1f0d81f8bce2d21ccc3c0864718dab8ec0d56d6036b30fdb3"
+    },
+    "tools/tests/test_r1_diagnostic_archive.py": {
+      "bytes": 7100,
+      "sha256": "1fbfeb8ff9c0fbab74a2f088a1f6bae93b32ca099ff3fb34d3f395de4e3b9297"
+    },
+    "tools/tests/test_workspace_audit.py": {
+      "bytes": 2267,
+      "sha256": "cdb0b0c36fa66ce9b6883cee66ff1480e40a360d46c6791cec1007f1499ccf26"
+    },
+    "tools/check_docs.py": {
+      "bytes": 5418,
+      "sha256": "9af1a436520b57adea611e214d4d7801c8d4ca5d78f591e72b995cd876905a9c"
+    },
+    "docs/architecture.md": {
+      "bytes": 35162,
+      "sha256": "c4cf15e7186f82a1b0d39e2695caba27470fbe159f6d3f9c42c10df7e78cfb6d"
+    },
+    "experiments/README.md": {
+      "bytes": 18476,
+      "sha256": "3d1d97e9f1c84224d5ce5463f6d8cd5fa1e8be3527e018fe8e348fdf40d49b24"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/README.jp.md": {
+      "bytes": 5264,
+      "sha256": "fc59ff9bf56eee41479fcda2e90d05e9225132fc9fd45224454a0d4743f3afce"
+    },
+    "experiments/hu-postflop-r1/validation/ev-scratch/README.md": {
+      "bytes": 4288,
+      "sha256": "e99244c03cecb6f19307a70b58957dcb709d345d8bfaff9743117835d7fb856c"
+    }
+  },
+  "outcomes": [
+    {
+      "run": "ev-scratch-tools01",
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/tests",
+        "-v"
+      ],
+      "exit_code": 125,
+      "stop_reason": "host_commit_reserve",
+      "elapsed_seconds": null,
+      "host_before": {
+        "total_bytes": 34275098624,
+        "available_bytes": 4861546496,
+        "commit_available_bytes": 2143539200
+      }
+    },
+    {
+      "run": "ev-scratch-tools02",
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "stop_reason": "completed",
+      "elapsed_seconds": 13.665635399986058,
+      "host_before": {
+        "total_bytes": 34275098624,
+        "available_bytes": 5198688256,
+        "commit_available_bytes": 2273660928
+      }
+    },
+    {
+      "run": "ev-scratch-docs01",
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "stop_reason": "completed",
+      "elapsed_seconds": 0.6172191000077873,
+      "host_before": {
+        "total_bytes": 34275098624,
+        "available_bytes": 5051486208,
+        "commit_available_bytes": 2358484992
+      }
+    }
+  ],
+  "note": "First Python launch declined before spawn. Retry uses smaller512MiBJob; preserves1GiB host commit headroom. Rust validation not rerun."
+}

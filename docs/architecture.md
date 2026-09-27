@@ -137,6 +137,8 @@ regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr
 その正しさは独立 oracle で照合する。非 zero-sum では両者を個別に計算する。
 `expected_values_at` / `best_response_values_at` は指定 node、`expected_values_everywhere` は
 全 action node の値を 1 回の走査で計算する。
+EVの平均戦略を合成する一時配列は、子の評価完了後にその走査taskの`Scratch`から借り、
+積和を終えたら同じpoolへ返す。値の集計順とCFV記録位置は維持する。
 
 HU Postflopの`PostflopHands`は、席ごとの初期rangeでweight > 0かつ開始boardと非衝突のcomboを
 global combo昇順でlocal IDへ写す。後続dealは番号を変えず、席別のmask/疎同型遷移を使う。

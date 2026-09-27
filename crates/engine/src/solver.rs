@@ -420,18 +420,20 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             p,
             par: self.par,
         };
-        let combine = |sref: StorageRef, children_flat: &[f32], out: &mut [f32]| {
-            let num_hands = sref.num_hands as usize;
-            let mut sigma = vec![0.0f32; sref.len()];
-            ctx.storage.average_strategy(sref, sref.index, &mut sigma);
-            for a in 0..sref.num_actions as usize {
-                let row = &sigma[a * num_hands..(a + 1) * num_hands];
-                let child = &children_flat[a * num_hands..(a + 1) * num_hands];
-                for h in 0..out.len() {
-                    out[h] += row[h] * child[h];
+        let combine =
+            |sref: StorageRef, children_flat: &[f32], out: &mut [f32], scratch: &mut Scratch| {
+                let num_hands = sref.num_hands as usize;
+                let mut sigma = scratch.take(sref.len());
+                ctx.storage.average_strategy(sref, sref.index, &mut sigma);
+                for a in 0..sref.num_actions as usize {
+                    let row = &sigma[a * num_hands..(a + 1) * num_hands];
+                    let child = &children_flat[a * num_hands..(a + 1) * num_hands];
+                    for h in 0..out.len() {
+                        out[h] += row[h] * child[h];
+                    }
                 }
-            }
-        };
+                scratch.put(sigma);
+            };
         let record = |node: NodeId, values: &[f32]| {
             if include(node) {
                 let sref = ctx.tree.storage_ref(ctx.tree.node(node));
@@ -1015,7 +1017,7 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C, R>(
     par_budget: u32,
     action_plan: Option<&ActionPlan>,
 ) where
-    C: Fn(StorageRef, &[f32], &mut [f32]) + Sync,
+    C: Fn(StorageRef, &[f32], &mut [f32], &mut Scratch) + Sync,
     R: Fn(NodeId, &[f32]) + Sync,
 {
     let node = *ctx.tree.node(node_id);
@@ -1149,7 +1151,7 @@ fn value_pass<E: TerminalEvaluator, S: Storage, C, R>(
                     );
                 }
             }
-            combine(sref, &children_flat, out);
+            combine(sref, &children_flat, out, scratch);
             scratch.put(children_flat);
         }
         NodeKind::Action => {
@@ -1244,18 +1246,20 @@ pub(crate) fn ev_pass<E: TerminalEvaluator, S: Storage>(
     out: &mut [f32],
     par_budget: u32,
 ) {
-    let combine = |sref: StorageRef, children_flat: &[f32], out: &mut [f32]| {
-        let num_hands = sref.num_hands as usize;
-        let mut sigma = vec![0.0f32; sref.len()];
-        ctx.storage.average_strategy(sref, sref.index, &mut sigma);
-        for a in 0..sref.num_actions as usize {
-            let row = &sigma[a * num_hands..(a + 1) * num_hands];
-            let child = &children_flat[a * num_hands..(a + 1) * num_hands];
-            for h in 0..out.len() {
-                out[h] += row[h] * child[h];
+    let combine =
+        |sref: StorageRef, children_flat: &[f32], out: &mut [f32], scratch: &mut Scratch| {
+            let num_hands = sref.num_hands as usize;
+            let mut sigma = scratch.take(sref.len());
+            ctx.storage.average_strategy(sref, sref.index, &mut sigma);
+            for a in 0..sref.num_actions as usize {
+                let row = &sigma[a * num_hands..(a + 1) * num_hands];
+                let child = &children_flat[a * num_hands..(a + 1) * num_hands];
+                for h in 0..out.len() {
+                    out[h] += row[h] * child[h];
+                }
             }
-        }
-    };
+            scratch.put(sigma);
+        };
     let action_plan = ActionPlan::new(ctx.tree);
     value_pass(
         ctx,
@@ -1281,14 +1285,15 @@ pub(crate) fn br_pass<E: TerminalEvaluator, S: Storage>(
     out: &mut [f32],
     par_budget: u32,
 ) {
-    let combine = |sref: StorageRef, children_flat: &[f32], out: &mut [f32]| {
-        let num_hands = sref.num_hands as usize;
-        for h in 0..out.len() {
-            out[h] = (0..sref.num_actions as usize)
-                .map(|a| children_flat[a * num_hands + h])
-                .fold(f32::NEG_INFINITY, f32::max);
-        }
-    };
+    let combine =
+        |sref: StorageRef, children_flat: &[f32], out: &mut [f32], _scratch: &mut Scratch| {
+            let num_hands = sref.num_hands as usize;
+            for h in 0..out.len() {
+                out[h] = (0..sref.num_actions as usize)
+                    .map(|a| children_flat[a * num_hands + h])
+                    .fold(f32::NEG_INFINITY, f32::max);
+            }
+        };
     let action_plan = ActionPlan::new(ctx.tree);
     value_pass(
         ctx,

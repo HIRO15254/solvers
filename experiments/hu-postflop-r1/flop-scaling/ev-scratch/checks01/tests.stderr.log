@@ -1,0 +1,11 @@
+test_bounds_are_finite_and_unchanged (__main__.BuildGraphTests.test_bounds_are_finite_and_unchanged) ... ok
+test_every_affected_dependent_binds_new_libraries (__main__.BuildGraphTests.test_every_affected_dependent_binds_new_libraries) ... ok
+test_exact_dependency_order (__main__.BuildGraphTests.test_exact_dependency_order) ... ok
+test_new_outputs_and_unchanged_adapter_names (__main__.BuildGraphTests.test_new_outputs_and_unchanged_adapter_names) ... ok
+test_paths_cannot_target_runs_root_or_leave_workspace (__main__.BuildGraphTests.test_paths_cannot_target_runs_root_or_leave_workspace) ... ok
+test_release_flags_and_no_serde (__main__.BuildGraphTests.test_release_flags_and_no_serde) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.004s
+
+OK

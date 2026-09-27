@@ -1,0 +1,184 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-27T01:25:16.118655+00:00",
+  "argv": [
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\instrumented.exe",
+    "expanded",
+    "2",
+    "2",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\run-expanded-instrumented-2\\artifacts"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 60.0,
+    "grace_seconds": 0.2,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.1,
+    "memory_limit_bytes": 469762048,
+    "hard_job_commit_limit_bytes": 536870912,
+    "minimum_available_commit_before_launch_bytes": 1610612736,
+    "root_priority_class": 16384,
+    "min_free_memory_bytes": 1610612736,
+    "disk_reserve_bytes": 1073741824
+  },
+  "runtime": {
+    "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "logical_cpus": 16
+  },
+  "outputs": {
+    "stdout": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\run-expanded-instrumented-2\\record.stdout.log",
+      "sha256": "971b03558c90a0c625159ce5638f79f4d9cd81d1e32551255d7f723babc4b8b9",
+      "bytes": 4525
+    },
+    "stderr": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\run-expanded-instrumented-2\\record.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "samples": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\run-expanded-instrumented-2\\record.samples.jsonl",
+      "sha256": "d36c0b190331b471191c8396e490766feebb0d7c6ed779b507c84805845be11f",
+      "bytes": 22363
+    }
+  },
+  "identity_before": [
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\instrumented.exe",
+      "sha256": "3db52a18c65aa8e1d141d128c5e2b8b5424a7ab763a1feaef65e0006ac04e71a",
+      "bytes": 1056256
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+      "bytes": 11663
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\plan.json",
+      "sha256": "e11451ae3e181b3adf40a63396c6453eadc9cc45adc5f78882b5847a9b793440",
+      "bytes": 57140
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\ev-scratch\\run.py",
+      "sha256": "14f6fd5e95777aa1c7758b7ae99045b2f33452e5381b62a3a43efd6368b3da5d",
+      "bytes": 16343
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\instrumented.exe",
+      "sha256": "3db52a18c65aa8e1d141d128c5e2b8b5424a7ab763a1feaef65e0006ac04e71a",
+      "bytes": 1056256
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+      "bytes": 11663
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\plan.json",
+      "sha256": "e11451ae3e181b3adf40a63396c6453eadc9cc45adc5f78882b5847a9b793440",
+      "bytes": 57140
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\ev-scratch\\run.py",
+      "sha256": "14f6fd5e95777aa1c7758b7ae99045b2f33452e5381b62a3a43efd6368b3da5d",
+      "bytes": 16343
+    }
+  ],
+  "identity_unchanged": true,
+  "research_wrapper": {
+    "wrapper_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+    "wrapper_sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+    "base_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+    "base_sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+    "transformed_source_sha256": "5d0c10873f7b0af1c235d738739fa398e8093e01324a25489eb9970b713ae679"
+  },
+  "bounded_job_settings": {
+    "limit_flags": 8704,
+    "job_memory_limit_bytes": 536870912,
+    "root_priority_class": 16384,
+    "verified_before_resume": true
+  },
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 62,
+    "max_sample_gap_seconds": 0.1073906000237912,
+    "sampled_peak_tree_resident_bytes": 335998976,
+    "root_os_peak_resident_bytes": 325103616,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 331882496,
+    "max_observed_processes": 2
+  },
+  "containment": {
+    "kind": "windows_job_kill_on_close_suspended_assignment",
+    "limitations": [
+      "Optional RAM trigger is sampled working set; separate fixed Job limit caps committed memory",
+      "summed working sets can double-count shared pages",
+      "Job membership can include the hidden console host",
+      "CTRL_BREAK covers the dedicated console; detached descendants require Job termination",
+      "job peak committed bytes are not resident working set bytes"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 34275098624,
+    "available_bytes": 4994351104,
+    "commit_available_bytes": 2381271040
+  },
+  "resolved_argv": [
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\instrumented.exe",
+    "expanded",
+    "2",
+    "2",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\run-expanded-instrumented-2\\artifacts"
+  ],
+  "disk_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\run-expanded-instrumented-2",
+  "disk_free_before_bytes": 41330262016,
+  "started_at": "2026-09-27T01:25:16.228677+00:00",
+  "pid": 21744,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 325103616,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 331882496,
+    "elapsed_seconds": 6.16244630003348,
+    "at": "2026-09-27T01:25:22.391256+00:00",
+    "host_available_memory_bytes": 5038419968,
+    "disk_free_bytes": 41045925888
+  },
+  "elapsed_seconds": 6.1627900002058595,
+  "ended_at": "2026-09-27T01:25:22.391953+00:00",
+  "supervisor_exit_code": 0
+}

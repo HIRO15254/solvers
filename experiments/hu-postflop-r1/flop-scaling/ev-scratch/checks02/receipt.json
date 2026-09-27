@@ -1,0 +1,55 @@
+{
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\flop-scaling\\ev-scratch\\verify.py"
+  ],
+  "elapsed_seconds": 2.9185462000314146,
+  "exit_code": 0,
+  "source_after": {
+    "experiments/hu-postflop-r1/flop-scaling/ev-scratch/proof01/manifest.json": {
+      "bytes": 38306,
+      "sha256": "90f84cbd11de19d10c6de8b2abea444f412ae9d05e8dd4f6b1fb078dc806dea2"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/ev-scratch/retain.py": {
+      "bytes": 3756,
+      "sha256": "cc1cb3838d4d8d6e3e37da6783ae37bafc9db1dc844bb7f014a15bf8e5dd90ee"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/ev-scratch/run.py": {
+      "bytes": 16343,
+      "sha256": "14f6fd5e95777aa1c7758b7ae99045b2f33452e5381b62a3a43efd6368b3da5d"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/ev-scratch/verify.py": {
+      "bytes": 11895,
+      "sha256": "8f16afd795a552d7b7aed269009f591211adb4008543a6ccef343a3ab65184c9"
+    }
+  },
+  "source_before": {
+    "experiments/hu-postflop-r1/flop-scaling/ev-scratch/proof01/manifest.json": {
+      "bytes": 38306,
+      "sha256": "90f84cbd11de19d10c6de8b2abea444f412ae9d05e8dd4f6b1fb078dc806dea2"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/ev-scratch/retain.py": {
+      "bytes": 3756,
+      "sha256": "cc1cb3838d4d8d6e3e37da6783ae37bafc9db1dc844bb7f014a15bf8e5dd90ee"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/ev-scratch/run.py": {
+      "bytes": 16343,
+      "sha256": "14f6fd5e95777aa1c7758b7ae99045b2f33452e5381b62a3a43efd6368b3da5d"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/ev-scratch/verify.py": {
+      "bytes": 11895,
+      "sha256": "8f16afd795a552d7b7aed269009f591211adb4008543a6ccef343a3ab65184c9"
+    }
+  },
+  "started_utc": "2026-09-27T01:34:10.667460+00:00",
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "bytes": 2220,
+    "sha256": "2fc6aac7d7b259202ddf73d5fc26a928952f0713406be60257d41d8e87f0779a"
+  },
+  "unchanged": true
+}

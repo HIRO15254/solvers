@@ -1,0 +1,38 @@
+{
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\flop-scaling\\ev-scratch\\test_run.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.1896271000150591,
+  "source_before": {
+    "experiments/hu-postflop-r1/flop-scaling/ev-scratch/run.py": {
+      "bytes": 16343,
+      "sha256": "14f6fd5e95777aa1c7758b7ae99045b2f33452e5381b62a3a43efd6368b3da5d"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/ev-scratch/test_run.py": {
+      "bytes": 3529,
+      "sha256": "ccc3690ca72da4d007c42535eb00ba20807b7716960416b6da01e15848d14038"
+    }
+  },
+  "source_after": {
+    "experiments/hu-postflop-r1/flop-scaling/ev-scratch/run.py": {
+      "bytes": 16343,
+      "sha256": "14f6fd5e95777aa1c7758b7ae99045b2f33452e5381b62a3a43efd6368b3da5d"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/ev-scratch/test_run.py": {
+      "bytes": 3529,
+      "sha256": "ccc3690ca72da4d007c42535eb00ba20807b7716960416b6da01e15848d14038"
+    }
+  },
+  "unchanged": true,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "bytes": 805,
+    "sha256": "64a1f3a308d89b5fd362d6ec4e28bf7fe3eaf0084f3d2c223fc6906843d3f6cd"
+  }
+}

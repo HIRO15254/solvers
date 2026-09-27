@@ -1,0 +1,72 @@
+{
+  "schema": "solvers.r1.flat-ev-preparation/v1",
+  "source": {
+    "path": "crates/engine/src/solver.rs",
+    "bytes": 56421,
+    "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+  },
+  "historical_generator": {
+    "path": "experiments/hu-postflop-r1/flop-scaling/flat-chance/prepare.py",
+    "bytes": 7190,
+    "sha256": "272c6adff272d025c96944653fda83160c55961b9a88a40aa24c31a632293c47"
+  },
+  "rebase": {
+    "only_in_memory_substitution": "BASE_SHA256",
+    "old_base_sha256": "e116e2554915768e0ccef89e86dccb0ffb89d0a2ff309343c0992fc8d7b02e4b",
+    "new_base_sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a",
+    "adapted_generator_sha256": "019d9b8b5cb9786098b9712fc917efcbc63417e4c0546cda532ab48312b0c916"
+  },
+  "preparer": {
+    "path": "prepare.py",
+    "bytes": 7592,
+    "sha256": "f8c14b6ea34729136b897bd4525cf2fb427dbf0d6c829821c66a3ba31ef652e9"
+  },
+  "formatter": {
+    "version_argv": [
+      "rustfmt",
+      "--version"
+    ],
+    "version": "rustfmt 1.9.0-stable (2d8144b788 2026-07-07)",
+    "version_stderr": "",
+    "format_argv": [
+      "rustfmt",
+      "--edition",
+      "2024",
+      "--emit",
+      "stdout"
+    ],
+    "format_stderr": ""
+  },
+  "unformatted_candidate_sha256": "3f5bab099a97f35e06153953188afaf943b1065dbaf3cb71b74447301876df83",
+  "candidate": {
+    "path": "solver.rs",
+    "bytes": 58955,
+    "sha256": "ec9e5e6b5230684fce6f2315370ceda0e05fb4346eb7e4ff44ea05e6028aabcd"
+  },
+  "patch": {
+    "path": "candidate.patch",
+    "bytes": 11535,
+    "sha256": "f5af8fe85f2c90885a5cd68aad50c557286fc54bc020aceee7814428857ca6ae"
+  },
+  "source_scope_checks": {
+    "permitted_regions": [
+      {
+        "function": "fn cfr_pass<",
+        "original_sha256": "0f71c0907552510b6b08dd315e8dd5ea9c2a0b224b06a02a2923508e087edcce",
+        "candidate_sha256": "6feb8fd003be38ec0b5a2ae65401b06af588be2bc523f733dd1ec38bff85d074"
+      },
+      {
+        "function": "fn value_pass<",
+        "original_sha256": "7b5c6a9cbc101ce482450ec9215b3d448e8fa2c3b92b332093d2ed42b0dab737",
+        "candidate_sha256": "1c0f42cf843f1b02a3ca5590498882dded36f55ee9c4c639e46ac5a5d4127388"
+      }
+    ],
+    "outside_regions_byte_identical": true,
+    "ev_scratch_combines_unchanged": true,
+    "structural_checks_only": true
+  },
+  "production_adopted": false,
+  "rust_compile": null,
+  "runtime_quality": null,
+  "performance": null
+}

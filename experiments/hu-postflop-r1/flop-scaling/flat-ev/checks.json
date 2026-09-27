@@ -1,0 +1,91 @@
+{
+  "schema": "solvers.r1.flat-ev-preparation-checks/v1",
+  "before": [
+    {
+      "path": "crates/engine/src/solver.rs",
+      "bytes": 56421,
+      "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/flat-chance/prepare.py",
+      "bytes": 7190,
+      "sha256": "272c6adff272d025c96944653fda83160c55961b9a88a40aa24c31a632293c47"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/flat-ev/prepare.py",
+      "bytes": 7592,
+      "sha256": "f8c14b6ea34729136b897bd4525cf2fb427dbf0d6c829821c66a3ba31ef652e9"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/flat-ev/test_prepare.py",
+      "bytes": 1398,
+      "sha256": "f05d5bb2959469a39a5d016abfaf868bf82e1c23f9c996b505a16dff127e8a51"
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\prepare.py"
+      ],
+      "started_at": "2026-09-27T01:41:42.990501+00:00",
+      "elapsed_seconds": 0.49078019987791777,
+      "exit_code": 0,
+      "stdout": "{\r\n  \"mode\": \"prepare\",\r\n  \"passed\": true,\r\n  \"candidate\": {\r\n    \"path\": \"solver.rs\",\r\n    \"bytes\": 58955,\r\n    \"sha256\": \"ec9e5e6b5230684fce6f2315370ceda0e05fb4346eb7e4ff44ea05e6028aabcd\"\r\n  },\r\n  \"checks\": {\r\n    \"permitted_regions\": [\r\n      {\r\n        \"function\": \"fn cfr_pass<\",\r\n        \"original_sha256\": \"0f71c0907552510b6b08dd315e8dd5ea9c2a0b224b06a02a2923508e087edcce\",\r\n        \"candidate_sha256\": \"6feb8fd003be38ec0b5a2ae65401b06af588be2bc523f733dd1ec38bff85d074\"\r\n      },\r\n      {\r\n        \"function\": \"fn value_pass<\",\r\n        \"original_sha256\": \"7b5c6a9cbc101ce482450ec9215b3d448e8fa2c3b92b332093d2ed42b0dab737\",\r\n        \"candidate_sha256\": \"1c0f42cf843f1b02a3ca5590498882dded36f55ee9c4c639e46ac5a5d4127388\"\r\n      }\r\n    ],\r\n    \"outside_regions_byte_identical\": true,\r\n    \"ev_scratch_combines_unchanged\": true,\r\n    \"structural_checks_only\": true\r\n  }\r\n}\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\prepare.py",
+        "--check"
+      ],
+      "started_at": "2026-09-27T01:41:43.481432+00:00",
+      "elapsed_seconds": 0.42480510007590055,
+      "exit_code": 0,
+      "stdout": "{\r\n  \"mode\": \"check\",\r\n  \"passed\": true,\r\n  \"candidate\": {\r\n    \"path\": \"solver.rs\",\r\n    \"bytes\": 58955,\r\n    \"sha256\": \"ec9e5e6b5230684fce6f2315370ceda0e05fb4346eb7e4ff44ea05e6028aabcd\"\r\n  },\r\n  \"checks\": {\r\n    \"permitted_regions\": [\r\n      {\r\n        \"function\": \"fn cfr_pass<\",\r\n        \"original_sha256\": \"0f71c0907552510b6b08dd315e8dd5ea9c2a0b224b06a02a2923508e087edcce\",\r\n        \"candidate_sha256\": \"6feb8fd003be38ec0b5a2ae65401b06af588be2bc523f733dd1ec38bff85d074\"\r\n      },\r\n      {\r\n        \"function\": \"fn value_pass<\",\r\n        \"original_sha256\": \"7b5c6a9cbc101ce482450ec9215b3d448e8fa2c3b92b332093d2ed42b0dab737\",\r\n        \"candidate_sha256\": \"1c0f42cf843f1b02a3ca5590498882dded36f55ee9c4c639e46ac5a5d4127388\"\r\n      }\r\n    ],\r\n    \"outside_regions_byte_identical\": true,\r\n    \"ev_scratch_combines_unchanged\": true,\r\n    \"structural_checks_only\": true\r\n  }\r\n}\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\test_prepare.py"
+      ],
+      "started_at": "2026-09-27T01:41:43.906364+00:00",
+      "elapsed_seconds": 0.17098940000869334,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "....\r\n----------------------------------------------------------------------\r\nRan 4 tests in 0.008s\r\n\r\nOK\r\n"
+    }
+  ],
+  "after": [
+    {
+      "path": "crates/engine/src/solver.rs",
+      "bytes": 56421,
+      "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/flat-chance/prepare.py",
+      "bytes": 7190,
+      "sha256": "272c6adff272d025c96944653fda83160c55961b9a88a40aa24c31a632293c47"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/flat-ev/prepare.py",
+      "bytes": 7592,
+      "sha256": "f8c14b6ea34729136b897bd4525cf2fb427dbf0d6c829821c66a3ba31ef652e9"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/flat-ev/test_prepare.py",
+      "bytes": 1398,
+      "sha256": "f05d5bb2959469a39a5d016abfaf868bf82e1c23f9c996b505a16dff127e8a51"
+    }
+  ],
+  "inputs_unchanged": true,
+  "passed": true,
+  "rust_compile": null,
+  "runtime_quality": null,
+  "performance": null
+}

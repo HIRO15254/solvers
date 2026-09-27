@@ -1,0 +1,1088 @@
+{
+  "build_jobs": [
+    {
+      "argv": [
+        "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+        "--edition=2024",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "lto=thin",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "debug-assertions=no",
+        "-C",
+        "overflow-checks=no",
+        "-C",
+        "embed-bitcode=yes",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps",
+        "--crate-name",
+        "engine",
+        "--crate-type",
+        "rlib",
+        "-C",
+        "metadata=r1_ev_scratch_engine",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcards-8df8c3ebbaa652da.rlib",
+        "--extern",
+        "rayon=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librayon-7de89c85d6326c49.rlib",
+        "--extern",
+        "rand=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librand-d6d7b2239d40817b.rlib",
+        "--extern",
+        "rand_chacha=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librand_chacha-22d4165c890e98f7.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\engine\\src\\lib.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libengine.rlib"
+      ],
+      "artifact": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libengine.rlib",
+      "name": "engine"
+    },
+    {
+      "argv": [
+        "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+        "--edition=2024",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "lto=thin",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "debug-assertions=no",
+        "-C",
+        "overflow-checks=no",
+        "-C",
+        "embed-bitcode=yes",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps",
+        "--crate-name",
+        "game",
+        "--crate-type",
+        "rlib",
+        "-C",
+        "metadata=r1_ev_scratch_game",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcards-8df8c3ebbaa652da.rlib",
+        "--extern",
+        "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libengine.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\game\\src\\lib.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libgame.rlib"
+      ],
+      "artifact": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libgame.rlib",
+      "name": "game"
+    },
+    {
+      "argv": [
+        "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+        "--edition=2024",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "lto=thin",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "debug-assertions=no",
+        "-C",
+        "overflow-checks=no",
+        "-C",
+        "embed-bitcode=yes",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps",
+        "--crate-name",
+        "holdem",
+        "--crate-type",
+        "rlib",
+        "-C",
+        "metadata=r1_ev_scratch_holdem",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcards-8df8c3ebbaa652da.rlib",
+        "--extern",
+        "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libengine.rlib",
+        "--extern",
+        "game=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libgame.rlib",
+        "--extern",
+        "hand_index=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libhand_index-14bc759770092d22.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\src\\lib.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libholdem.rlib"
+      ],
+      "artifact": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libholdem.rlib",
+      "name": "holdem"
+    },
+    {
+      "argv": [
+        "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+        "--edition=2024",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "lto=thin",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "debug-assertions=no",
+        "-C",
+        "overflow-checks=no",
+        "-C",
+        "embed-bitcode=yes",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps",
+        "--crate-name",
+        "ev_scratch_ordinary",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcards-8df8c3ebbaa652da.rlib",
+        "--extern",
+        "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libengine.rlib",
+        "--extern",
+        "game=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libgame.rlib",
+        "--extern",
+        "holdem=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libholdem.rlib",
+        "--extern",
+        "rayon=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librayon-7de89c85d6326c49.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\adapters\\solve.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\ordinary.exe"
+      ],
+      "artifact": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\ordinary.exe",
+      "name": "ordinary"
+    },
+    {
+      "argv": [
+        "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+        "--edition=2024",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "lto=thin",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "debug-assertions=no",
+        "-C",
+        "overflow-checks=no",
+        "-C",
+        "embed-bitcode=yes",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps",
+        "--crate-name",
+        "ev_scratch_instrumented",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcards-8df8c3ebbaa652da.rlib",
+        "--extern",
+        "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libengine.rlib",
+        "--extern",
+        "game=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libgame.rlib",
+        "--extern",
+        "holdem=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\libholdem.rlib",
+        "--extern",
+        "rayon=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librayon-7de89c85d6326c49.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\adapters\\probe.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\instrumented.exe"
+      ],
+      "artifact": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01\\instrumented.exe",
+      "name": "instrumented"
+    }
+  ],
+  "compiler": {
+    "bytes": 110592,
+    "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+    "sha256": "6d1c5543ed3a45cfbc1c1332d42d6550d883c14d3c2e323427e631c331cebeeb"
+  },
+  "compiler_version": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6\n",
+  "conditions": [
+    [
+      "narrow",
+      "ordinary",
+      1
+    ],
+    [
+      "narrow",
+      "ordinary",
+      2
+    ],
+    [
+      "narrow",
+      "instrumented",
+      1
+    ],
+    [
+      "narrow",
+      "instrumented",
+      2
+    ],
+    [
+      "expanded",
+      "ordinary",
+      1
+    ],
+    [
+      "expanded",
+      "ordinary",
+      2
+    ],
+    [
+      "expanded",
+      "instrumented",
+      1
+    ],
+    [
+      "expanded",
+      "instrumented",
+      2
+    ]
+  ],
+  "controls": {
+    "C:\\Python313\\python.exe": {
+      "bytes": 105816,
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\probe.rs": {
+      "bytes": 16030,
+      "sha256": "d5c5c1f281fd06862c64d151e9886c8ef06ec9302df86e38ddff16e51cec10cb"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\proof01\\plan.json": {
+      "bytes": 78967,
+      "sha256": "391aa8ee446f72fb294a79e1f44f6ed60d70fc2e6d235e25ef4b46df12cf67e6"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\provenance.json": {
+      "bytes": 1381,
+      "sha256": "1333526cc86087e0cf96fd04f2f1329375860e550079226aeabb4644f2dcf36a"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\ev-scratch\\run.py": {
+      "bytes": 16343,
+      "sha256": "14f6fd5e95777aa1c7758b7ae99045b2f33452e5381b62a3a43efd6368b3da5d"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\fixtures\\expanded.toml": {
+      "bytes": 798,
+      "sha256": "8a5f811a4b19e1e79d3dca5e817e56f626b06b5d5b2cdc9e03623be5b7aafbae"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\fixtures\\narrow.toml": {
+      "bytes": 753,
+      "sha256": "c059797a7276fa708c0c04dc31e967b0f074b63353171055f8edbb83ca20355c"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py": {
+      "bytes": 11663,
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\proof01\\shared-state.bin.gz": {
+      "bytes": 7862983,
+      "sha256": "0e3ba41b90d451a9f97140e0f98650b52d01cd78d1fd2bc2450b87b5132afe32"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\solve.rs": {
+      "bytes": 11148,
+      "sha256": "547ed17705b7784ac656fb8032d859261b9a4639fa49dc0ba4b105cdfe2addd9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\optimized\\proof01\\baseline-build\\receipt.json": {
+      "bytes": 27775,
+      "sha256": "3635c26f4f64ee3b0714e5a713f70a9e009eb4aaff998318dae721e8d0e3aa5f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\optimized\\proof01\\baseline-source.tar.gz": {
+      "bytes": 153556,
+      "sha256": "a28977bda9559d05801008f6eada09b33ce44f6e6f3c167242b902c25a307cb2"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\optimized\\proof01\\expanded-state.bin.gz": {
+      "bytes": 26042349,
+      "sha256": "f7d3cad3b0ddc16522381034df947ee594faa71888c27b4c2ed3158bf7715186"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\optimized\\proof01\\manifest.json": {
+      "bytes": 19493,
+      "sha256": "63925b265d5e9d12e3934d5629f0b0adc21fae949b01af4057aa7404dbc8f03f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\optimized\\proof01\\matrix\\expanded-baseline-1\\output\\quality.json": {
+      "bytes": 672,
+      "sha256": "7c62ebfc3d6eb027d8374cda83e399d6c8caae3c2996c0b7c03ee52edb7910ea"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\optimized\\proof01\\matrix\\narrow-baseline-1\\output\\quality.json": {
+      "bytes": 667,
+      "sha256": "083989ea08a64f13508c259b87c3797245b4b037ed73bfffd3bc3e8564347fb0"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py": {
+      "bytes": 39015,
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+    },
+    "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe": {
+      "bytes": 110592,
+      "sha256": "6d1c5543ed3a45cfbc1c1332d42d6550d883c14d3c2e323427e631c331cebeeb"
+    }
+  },
+  "current_source_pins": {
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cargo\\config.toml": {
+      "bytes": 125,
+      "sha256": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\Cargo.lock": {
+      "bytes": 40970,
+      "sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\Cargo.toml": {
+      "bytes": 1752,
+      "sha256": "da9fc9f6aca8102a8b5f6449ee8fef83ec9d97d546649a154f801c19815ebe42"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\Cargo.toml": {
+      "bytes": 370,
+      "sha256": "c776279bb934cf40c4afb1d33f744da004d7d2b9bc7ffd0e0aa0a42c19ae9598"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\board.rs": {
+      "bytes": 13901,
+      "sha256": "9c688ec407ca28f22a056737734df626bdffdda30c92dca575879b6e56bdb0fa"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\card.rs": {
+      "bytes": 4422,
+      "sha256": "74eeb9bebfc2ed08783b8298754d964779c3114e0a53fd9a4cff364253ac5023"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\eval.rs": {
+      "bytes": 1966,
+      "sha256": "dfa7610718f196fc8eae95bc767af02bdadc6f20d32c648b02b7fb0f25f2afb4"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\lib.rs": {
+      "bytes": 1101,
+      "sha256": "23a55b676196703cdd248c9b8fb50a541a113c9f3cc6dc904f5a8151ca39e37f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\range.rs": {
+      "bytes": 12197,
+      "sha256": "1ed908cfdc11908754db983eaabbe04dbbe0d405ffddf57fac9b1d18115f208b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\script\\ast.rs": {
+      "bytes": 4127,
+      "sha256": "c9012aed1c7b5c91e703f450f1afee82b2b81f1f372d303efe52509af8f2a355"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\script\\cond.rs": {
+      "bytes": 40254,
+      "sha256": "49a649578fad2c3e47ad7e1ae4134cf5eef475ead2c11cd140affdf8a0e6b478"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\script\\lower.rs": {
+      "bytes": 14396,
+      "sha256": "f73abd25b7f4be15aae86f749b4a2f81f45f74013034d51cbc8fc757039943a3"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\script\\mod.rs": {
+      "bytes": 1963,
+      "sha256": "dcfe364cc022ac9788d2d3816ec760237bf9176e91ae520a2e4b41469d118edf"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\script\\parse.rs": {
+      "bytes": 38716,
+      "sha256": "3981c7121131095f011a5d0e51933004f49f55e5beef20d60e9b4999fc13d210"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\script\\token.rs": {
+      "bytes": 11301,
+      "sha256": "decbc911b73bd74d27f0493a691fa604ecb63e0b02ff8afc0a2162dbc0f64bbd"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\set.rs": {
+      "bytes": 2878,
+      "sha256": "ea987f8d7dd617fa29d452b29b8d739ad69d20e8f5da94b016135e5cc6ec576b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\sizing.rs": {
+      "bytes": 19223,
+      "sha256": "1784b87a9d617015a5d0cbfa9f893f0f28f8725baeb64afd8102150d09aa5e05"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\cards\\src\\types.rs": {
+      "bytes": 2621,
+      "sha256": "acec9488a59c72781764a521116c682712c0fc1ca786f1be46a70d2ce04bd7c9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\engine\\Cargo.toml": {
+      "bytes": 575,
+      "sha256": "19aed9d523924499c7226490b044aa69a4935dc1bc24685a4f6c56aadd5e9df1"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\engine\\src\\lib.rs": {
+      "bytes": 1376,
+      "sha256": "4d3f7a3b7551fbf1547dd45e0fb5170ebfdd45fd83a7ebefe132562d5cf885d8"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\engine\\src\\mccfr.rs": {
+      "bytes": 21267,
+      "sha256": "1cb21e70898bf0fcc98e039202470e59da5b3c4a5c9776c8965eac5d832cac68"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\engine\\src\\reach.rs": {
+      "bytes": 18760,
+      "sha256": "e4184dffabadaccb16d2672e6e3d24bba20fceec1013480d28d700b703210c3b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\engine\\src\\schedule.rs": {
+      "bytes": 6330,
+      "sha256": "c4dd446587d52c710d3a61a78ddd3d4a52550d331b9a24e1a68156ac84e4b6a9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\engine\\src\\scratch.rs": {
+      "bytes": 1117,
+      "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\engine\\src\\solver.rs": {
+      "bytes": 56421,
+      "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\engine\\src\\storage.rs": {
+      "bytes": 44287,
+      "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\engine\\src\\tree.rs": {
+      "bytes": 16936,
+      "sha256": "2e6c1a3560bd12a7b2a04573e28505ae00fdaaf8fcb797cb3b0bb964a98879b2"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\game\\Cargo.toml": {
+      "bytes": 389,
+      "sha256": "94c64d53d2ebc3896f20f104d2e9f32178e8695bf6bc41f7fcdbf3d6d4b09187"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\game\\src\\lib.rs": {
+      "bytes": 651,
+      "sha256": "3667e422f0ccb31b507574c43c86f87b5930b8a345f19896aa55230e4c83e0be"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\game\\src\\payoff.rs": {
+      "bytes": 11716,
+      "sha256": "bd9ecc083fbc575e888ad2d1173b3ad5ce78f0fb263778f8bd75a27242d772f9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\game\\src\\r1\\mod.rs": {
+      "bytes": 16941,
+      "sha256": "f8c4d65cdda6e6ae8685af019aaaed61825f4f73f4e1f38ced2222023175d465"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\game\\src\\r1\\settlement.rs": {
+      "bytes": 4112,
+      "sha256": "657729d970e4d431685d7604a49cbb09a6a7d3d900c31279d943b414089728e7"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\game\\src\\toy.rs": {
+      "bytes": 14756,
+      "sha256": "da123312ed67171641eab5b2675a43397a5e0d5c4f44c995342978839a4b6af8"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\hand-index\\Cargo.toml": {
+      "bytes": 249,
+      "sha256": "aba9712b6e3e9dd725c858b8e1051900632b2345885db013f84095cee28f16ff"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\hand-index\\src\\lib.rs": {
+      "bytes": 12434,
+      "sha256": "6c12d18fdcefad223205167d20d5f98678e25ab3e4f5a73f19a539e0d5842c29"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\Cargo.toml": {
+      "bytes": 546,
+      "sha256": "23b8886b502afe4aa5fc6008fb4dcdf3ae3a8b995f2838be9728151b451a6022"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\aggregate.rs": {
+      "bytes": 2037,
+      "sha256": "45f3488891a5b9cc555e2bf6785509f051516d1907586b33f4d1987270a45aa6"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\compatibility.rs": {
+      "bytes": 3715,
+      "sha256": "330cf4368b3bcc324712f39d2fac62895bbcde764d10fae22c7c0708bedf5069"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\equity.rs": {
+      "bytes": 4194,
+      "sha256": "b3e8576a6215202f76a2dbfba19de21379da573d0d2918ba782ed3da88756eef"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\hands.rs": {
+      "bytes": 4706,
+      "sha256": "eaf9c95079482fa0b6839b78eafd995c76405fad7ba8d97f9ef5fab89036366a"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\kernel.rs": {
+      "bytes": 18270,
+      "sha256": "d59724dd4d9a1c797bebf83422c06b75c90020796bfbf8f492417910770bb076"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\kernel_tests.rs": {
+      "bytes": 14982,
+      "sha256": "047f9f30af76b141ed1c6f2e0655af0638ddcb0c23d723702899608df65cb348"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\lib.rs": {
+      "bytes": 1714,
+      "sha256": "7566e1e68dd1bfaef8fff34283e32b09bb85462671d8a3913a50ead59b2dee2f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\mass.rs": {
+      "bytes": 10960,
+      "sha256": "6937d14f2424501109c182bcb433125206e39cbd24e6bcb8b5c3b5be1f627639"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\mass_tests.rs": {
+      "bytes": 27700,
+      "sha256": "e888687425723d0e552d200865f1aea3dec42b06f75b20a29ac8d94d9c33584b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\postflop.rs": {
+      "bytes": 73444,
+      "sha256": "70ecaa0bbc39ca1fff1d3c7c29a1e499dea87e5b8e58d2486b3e0ebc157f891f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\river.rs": {
+      "bytes": 3799,
+      "sha256": "aa49eff9d5d1191175152c7efe8de8bd8f427456aac8dd5c4d0897fea3a1075b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\viewer.rs": {
+      "bytes": 19700,
+      "sha256": "c582d0a58698c5c03780a3d72693db11f129f04e57d693574d268bf0b036f16d"
+    }
+  },
+  "dependency_directory": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps",
+  "dependency_pins": {
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libaya_base-0374b6f90a271a8c.rlib": {
+      "bytes": 259896,
+      "sha256": "465c92b92eb0cd3bbef741e6eb49db3a0f8f2e301d1ab4b45fad57c9a30744d0"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libaya_base-0374b6f90a271a8c.rmeta": {
+      "bytes": 92301,
+      "sha256": "2a5858dfb3efd31976651ac94781d2be1730dd65e66429218ceb0d5e8e26a10c"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libaya_base-e67e3328a652eb84.rlib": {
+      "bytes": 174944,
+      "sha256": "4644cf94edfdf05f61ab25637fa2c06fe3684e7357c8a95b4b12aeb87e2b2ab6"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libaya_base-e67e3328a652eb84.rmeta": {
+      "bytes": 107209,
+      "sha256": "54fcf5a525237a2da64ee325b2e0e63d651892c208c84544fdb09261a89fdb70"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libaya_codegen-16d1ce2eeb0ea61e.rlib": {
+      "bytes": 1225960,
+      "sha256": "2d48f68a91bb0afc56ec59f215d70353195ed2831a5e8fa760dc4158096ad553"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libaya_codegen-16d1ce2eeb0ea61e.rmeta": {
+      "bytes": 55552,
+      "sha256": "db520fadfbd8f3b40da57705c688fd61fc29913ae866321fd201c2b54ef5deb2"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libaya_poker-a81bc3990470a696.rlib": {
+      "bytes": 1685770,
+      "sha256": "6594fee5e15bcf291b881a0111cf29ffd30660fed35708c97c02f44f98d2fda7"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libaya_poker-a81bc3990470a696.rmeta": {
+      "bytes": 970061,
+      "sha256": "fdd487cb55e92f1e26da018e6a78a948d38a6b9df49d70887ca9e9ab862c2fb6"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcards-8df8c3ebbaa652da.rlib": {
+      "bytes": 1207760,
+      "sha256": "69b6d413ca29ebc4a93c24c7ebfe4ab63acb76fe40de5d2e2917ef69059432d2"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcards-8df8c3ebbaa652da.rmeta": {
+      "bytes": 992515,
+      "sha256": "0a94efd8d76615d33e1529c2a01bd0bd8b5af557a11b753b46c6a5d294e7673d"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcfg_if-4140df4710b2262f.rlib": {
+      "bytes": 8338,
+      "sha256": "43b337da3a689cbee58af126bd43dfef01a1644645a737a98179729818758488"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcfg_if-4140df4710b2262f.rmeta": {
+      "bytes": 5503,
+      "sha256": "09da2db093d55e510e1248f61ae606d6626116655c494a52004a29ab955bee34"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcrossbeam_deque-a1511cdc706f5155.rlib": {
+      "bytes": 231860,
+      "sha256": "fd3ba20d2cfa3809f4b14d350ea155ea4262428f0afad5ebd4b3eca37068084b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcrossbeam_deque-a1511cdc706f5155.rmeta": {
+      "bytes": 228975,
+      "sha256": "e06b7b0309ab27759c5aa2cae58f34ea980d42ed1f578bef8460f24c431f65db"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcrossbeam_epoch-eb1c36d4bb541080.rlib": {
+      "bytes": 430956,
+      "sha256": "3b80523d79429b3240541f156cef9edcbfa1ad03a10ac93ec2b99cb08538076d"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcrossbeam_epoch-eb1c36d4bb541080.rmeta": {
+      "bytes": 366806,
+      "sha256": "4d85b000144330a8e050a245fc60b189b6dec45ff4e4dfa889366a500e0332fe"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcrossbeam_utils-8bce8d62e8e2afe6.rlib": {
+      "bytes": 817892,
+      "sha256": "0a459e8775c3b3ad6b45bc0e9274010ae100db517b53fd179aa2f44064b26df5"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcrossbeam_utils-8bce8d62e8e2afe6.rmeta": {
+      "bytes": 735494,
+      "sha256": "07bfaea16c5982dfeb4c27d5d1c354869c7639274c7684b12e481b031fb15cea"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libeither-72838744d8cee9af.rlib": {
+      "bytes": 237790,
+      "sha256": "ad4c43906ce29ad8125ed427f8630427153ec11034c6da200bb8a35523e9b9a3"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libeither-72838744d8cee9af.rmeta": {
+      "bytes": 234955,
+      "sha256": "6689e925d582d8e368dcc13b5f7204e7ff46ddead4814c3bb1944978c1eebb3b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libengine-bcda0b6a3ececf16.rlib": {
+      "bytes": 766406,
+      "sha256": "dff591006ccdb7bf608b5c25b54dfa16ec8ae66e4c6fe15b153464e21ce8be7f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libengine-bcda0b6a3ececf16.rmeta": {
+      "bytes": 623964,
+      "sha256": "4e35f4168808808a6d71711bfbf44c355acd8e01addaecf526f237cb493a2956"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libfastrand-2260de98f91bb019.rlib": {
+      "bytes": 98976,
+      "sha256": "4aa47f1ad68c1bcb4de27c65d927e361e19967b75c94fc4ae8cd6b83ade5a39e"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libfastrand-2260de98f91bb019.rmeta": {
+      "bytes": 97216,
+      "sha256": "4ac3255d91389ee3ffaca88ce1f7ea4e6a79c92c8a87e37b4b77130ed9727a63"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libfastrand-b694dc422da3b005.rlib": {
+      "bytes": 143386,
+      "sha256": "214d4ce2e3140a9bfd590208277e52c80027482121f2a50ec696a587412b498a"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libfastrand-b694dc422da3b005.rmeta": {
+      "bytes": 140543,
+      "sha256": "db4a52ffbdb699c2c5d0791a4903c7b27eaa4c12bcf353cb3851b6938529d480"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libgame-df1e474ce0a391da.rlib": {
+      "bytes": 325882,
+      "sha256": "85e540880b88f18854fb9302d5ece13867a0e9e206ddac7cc1a5e281f0ca57e0"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libgame-df1e474ce0a391da.rmeta": {
+      "bytes": 163194,
+      "sha256": "31fbf8f2cfd959666a0da292bfadf1653effb03cb59365e15fb6cada2f7c2ebf"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libgetrandom-5c978b5bad602752.rlib": {
+      "bytes": 79302,
+      "sha256": "1b05c2e0b61a9e4481428a415a9a29da3fe603e3c26b30680508e184d8a4ebc1"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libgetrandom-5c978b5bad602752.rmeta": {
+      "bytes": 51525,
+      "sha256": "1e746d5ce153af4584c2a85228167131d44659faf0da4a2de9d8c884d3554fe2"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libhand_index-14bc759770092d22.rlib": {
+      "bytes": 251054,
+      "sha256": "ef0e44a939acd708935458ea963d2f7c7aae6e74027076dd3debc73fa29bc745"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libhand_index-14bc759770092d22.rmeta": {
+      "bytes": 39864,
+      "sha256": "a5ee55d465d3a8e6d6245bab356e97a3ada94fbe53071a1fd358d31c122f6058"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libholdem-2b3703b2aedf5510.rlib": {
+      "bytes": 958274,
+      "sha256": "cbf64d0577df4edc93cf4a38a7d5f48078614421eacdf3b4dad425557e527573"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libholdem-2b3703b2aedf5510.rmeta": {
+      "bytes": 312503,
+      "sha256": "a93f91f8efbfc633a362035dde952dcc70dfe1b13368d16778a35cede1f27187"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libminiphf-783271c879d10273.rlib": {
+      "bytes": 29402,
+      "sha256": "5b4763fa88006c4187d95efe95aaa7635c350e6a207aff5c69133d8faa6ef2a6"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libminiphf-783271c879d10273.rmeta": {
+      "bytes": 28113,
+      "sha256": "ba1d4d0a683862b7eb0970fd29639d97454ba7ba6a9a263e73195a99d881ddb4"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libppv_lite86-212154941cb8472a.rlib": {
+      "bytes": 1150438,
+      "sha256": "3cf35ca7f45006faac927c51f16fc081a5260f7559811f98491cc7a8c1e12ba1"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libppv_lite86-212154941cb8472a.rmeta": {
+      "bytes": 1147580,
+      "sha256": "07e6bb87732b2c9d07c692144d5e120509e514d818de785ebf7f0b0c2ae4deb8"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libproc_macro2-236f36239f8bf212.rlib": {
+      "bytes": 1306234,
+      "sha256": "f5ceb4450c4b9c5e7cc606ec2516d1a9c8d0ed2d11800ee28426878ca9360d6c"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libproc_macro2-236f36239f8bf212.rmeta": {
+      "bytes": 341931,
+      "sha256": "a257da6eab59c213d10e0934ed460d7858767e33ac646ef4ee36486f4f3a1ab9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libquickdiv-10945c9dae040939.rlib": {
+      "bytes": 552642,
+      "sha256": "88b4f88c91c0012519000196cc2e260fde9c84ac5c6a06aaa9e7d7f441d5468e"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libquickdiv-10945c9dae040939.rmeta": {
+      "bytes": 505017,
+      "sha256": "4bb72bad6efd7859de8a5e5782a42447c2b6e15b2d4d60834663034c424d59ca"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libquickdiv-8a4f4899a1cfaa20.rlib": {
+      "bytes": 591674,
+      "sha256": "60856637eb166dd0b90d0c5e44e1e73dd9f70f248b83312703af403bd10e7313"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libquickdiv-8a4f4899a1cfaa20.rmeta": {
+      "bytes": 580309,
+      "sha256": "da5c78d31aa163a7acfc27d8188b52079d538446260347f2f9210c3d6b9e6a71"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libquote-7eb4a0b80fecb8e5.rlib": {
+      "bytes": 560100,
+      "sha256": "8b2f36674ec4590ea22c59bcf21ee8076fc782d081f0175d93284c3df398e919"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libquote-7eb4a0b80fecb8e5.rmeta": {
+      "bytes": 270212,
+      "sha256": "b8f1f73f76909154fcaa41f12d2c03f5fa1d761573d801986b1f2d2cfd9af762"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librand-d6d7b2239d40817b.rlib": {
+      "bytes": 1441700,
+      "sha256": "8caeb18bce02f39fb4cb217f60ddc5adb505526dc67711e896a69608ea9e5927"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librand-d6d7b2239d40817b.rmeta": {
+      "bytes": 1395971,
+      "sha256": "e6638ec6f3eba7287f495dd41e75eefa46e08aea0314246164692b50f35cef12"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librand_chacha-22d4165c890e98f7.rlib": {
+      "bytes": 208902,
+      "sha256": "6a8279ac9e7b3d743f0f41a63202a9c3a68177301b1a8043a93ad38bd28fb68a"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librand_chacha-22d4165c890e98f7.rmeta": {
+      "bytes": 162227,
+      "sha256": "d6ae61efb29dccbd232b53f1294e956f4d367fbf76f2cba6e3ddcdb511f436ef"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librand_core-ac98091884d12086.rlib": {
+      "bytes": 187822,
+      "sha256": "56904b0abf34f5a532ab1d279985412240c3dd38aa1bfc635b612dac488364a1"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librand_core-ac98091884d12086.rmeta": {
+      "bytes": 152110,
+      "sha256": "53b75095cc9de4dc0dcb15b7a5f9f5cbd56d8f58f14d077626cb48775216e6d5"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librayon-7de89c85d6326c49.rlib": {
+      "bytes": 4539516,
+      "sha256": "47c79ec0fa875b55e8f37375d2ed32f0acae45393415b797cb768ddb08ad2f39"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librayon-7de89c85d6326c49.rmeta": {
+      "bytes": 4469179,
+      "sha256": "e05cc3002b785400ab5597d8950add973b13e5a299f1d42e19f8bfb3197859a5"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librayon_core-b95b81ebed1cf5b6.rlib": {
+      "bytes": 827404,
+      "sha256": "f1013bc0f7e04ecd4c17742c280247168ed74c43f2d05bc8e245c3d8fd39a19d"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librayon_core-b95b81ebed1cf5b6.rmeta": {
+      "bytes": 552476,
+      "sha256": "7bfcc9fd0618309981c250437b35558108470a0374ac6251c82305c633ef2e98"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libserde-440a6a1f58ab5ea7.rlib": {
+      "bytes": 1003498,
+      "sha256": "8180fb0edb6ad1905d282a3a6298101c067049fb87a2723f22c0a17070f60ba3"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libserde-440a6a1f58ab5ea7.rmeta": {
+      "bytes": 964668,
+      "sha256": "2d40bf2a0134978f2bb4d1906231abcb1a8f6941b05d4c9bb8e3378f2b2d643e"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libserde_core-a8e82439868f8a1b.rlib": {
+      "bytes": 5457428,
+      "sha256": "f0d83e8fe459645ccf11bd26c3e54f5740a9c64f7b01e5905cc76759ac0495f1"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libserde_core-a8e82439868f8a1b.rmeta": {
+      "bytes": 5369325,
+      "sha256": "76ceadef052037e709a059c3cd8dd8f594d3039c48569e20ce900ed0f511c8dd"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libsyn-23507f07d974d296.rlib": {
+      "bytes": 6923516,
+      "sha256": "c73e95854f7b9fa648bc27f9468aa5de89a2a750994fe1fc57bdc6651d313f39"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libsyn-23507f07d974d296.rmeta": {
+      "bytes": 2222793,
+      "sha256": "5465439f8d18bb65d6ed14cabe9ee3abfd1ef5c8ac0dcff4ec2283d3fdda77ae"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libthiserror-b722491530500dec.rlib": {
+      "bytes": 35454,
+      "sha256": "ada445964243af725cb0f362626e0f68bf7a8f08af9cd4e46371c41cd286d92f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libthiserror-b722491530500dec.rmeta": {
+      "bytes": 32608,
+      "sha256": "3eb752d3e54279fb4a91a9c7924e8c7d5a546b2c6062f04c5c14f806f76ef95e"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libunicode_ident-3e43839f384ed50d.rlib": {
+      "bytes": 49976,
+      "sha256": "90c874e6a09c61150128863098d175d97878d29ae7829f309ee71c0f87fdb856"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libunicode_ident-3e43839f384ed50d.rmeta": {
+      "bytes": 32927,
+      "sha256": "df58d541404b1ddbe213f958b76edad7abdcaf56a571020cff4a791ab1de29a9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libzerocopy-d6701bd13235e894.rlib": {
+      "bytes": 14899142,
+      "sha256": "a1edb5232c731b8b3bec7894ca64ae3cdb16b845e069fe2349fee56a8a1d4849"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libzerocopy-d6701bd13235e894.rmeta": {
+      "bytes": 14896295,
+      "sha256": "9323c4a2c14b2529c4053cf7384e6b4fce0960373749319f374359833aa26a43"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\serde_derive-b28d7634b47353e4.dll": {
+      "bytes": 2186752,
+      "sha256": "c685c090aba182eb1008d8b39143519805790d900f51660ec3425ac28d88a4e9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\thiserror_impl-ed209c8cb39d50b3.dll": {
+      "bytes": 1518592,
+      "sha256": "bea991680b5a4ee99515f459ff0af95cb7692f0ed5de9b0ec4ace1dcb99a78c2"
+    }
+  },
+  "iterations": 2,
+  "limits": {
+    "disk_reserve_bytes": 1073741824,
+    "grace_seconds": 0.2,
+    "kill_wait_seconds": 5,
+    "memory_limit_bytes": 469762048,
+    "min_free_memory_bytes": 1610612736,
+    "poll_seconds": 0.1,
+    "timeout_seconds": 60
+  },
+  "patch": {
+    "bytes": 4488,
+    "sha256": "fd427c6cb6ac83a5d46d80cb6ca2d1f6cd6e08c3349184cb27717d1af40ab858"
+  },
+  "references": {
+    "expanded": {
+      "compressed": {
+        "bytes": 26042349,
+        "sha256": "f7d3cad3b0ddc16522381034df947ee594faa71888c27b4c2ed3158bf7715186"
+      },
+      "quality": {
+        "bytes": 672,
+        "sha256": "7c62ebfc3d6eb027d8374cda83e399d6c8caae3c2996c0b7c03ee52edb7910ea"
+      },
+      "quality_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\optimized\\proof01\\matrix\\expanded-baseline-1\\output\\quality.json",
+      "state": {
+        "bytes": 283677926,
+        "sha256": "87d31b1da7e9b766cc09b02a51da74169167d705b104e9a60a1e4eeeb20f9cdd"
+      },
+      "state_gzip": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\optimized\\proof01\\expanded-state.bin.gz"
+    },
+    "narrow": {
+      "compressed": {
+        "bytes": 7862983,
+        "sha256": "0e3ba41b90d451a9f97140e0f98650b52d01cd78d1fd2bc2450b87b5132afe32"
+      },
+      "quality": {
+        "bytes": 667,
+        "sha256": "083989ea08a64f13508c259b87c3797245b4b037ed73bfffd3bc3e8564347fb0"
+      },
+      "quality_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\optimized\\proof01\\matrix\\narrow-baseline-1\\output\\quality.json",
+      "state": {
+        "bytes": 81414344,
+        "sha256": "35981691a7736e2df5a89734b1102ee8ffc1bacaab7719476b0152e459eb2700"
+      },
+      "state_gzip": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\proof01\\shared-state.bin.gz"
+    }
+  },
+  "reused_externs": {
+    "cards": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcards-8df8c3ebbaa652da.rlib",
+    "hand_index": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libhand_index-14bc759770092d22.rlib",
+    "rand": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librand-d6d7b2239d40817b.rlib",
+    "rand_chacha": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librand_chacha-22d4165c890e98f7.rlib",
+    "rayon": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librayon-7de89c85d6326c49.rlib"
+  },
+  "schema": "r1-ev-scratch-diagnostic/v1",
+  "scope": "EV scratch reuse only; baseline comparison by retained exact fullstate/quality; no performance claim",
+  "snapshot_pins": {
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\.cargo\\config.toml": {
+      "bytes": 125,
+      "sha256": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\Cargo.lock": {
+      "bytes": 40970,
+      "sha256": "a8658dd63e76d22e313be59599d59c28fe0778d7cb86127a6b339114b1372fe1"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\Cargo.toml": {
+      "bytes": 1752,
+      "sha256": "da9fc9f6aca8102a8b5f6449ee8fef83ec9d97d546649a154f801c19815ebe42"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\adapters\\probe.rs": {
+      "bytes": 16030,
+      "sha256": "d5c5c1f281fd06862c64d151e9886c8ef06ec9302df86e38ddff16e51cec10cb"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\adapters\\solve.rs": {
+      "bytes": 11148,
+      "sha256": "547ed17705b7784ac656fb8032d859261b9a4639fa49dc0ba4b105cdfe2addd9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\Cargo.toml": {
+      "bytes": 370,
+      "sha256": "c776279bb934cf40c4afb1d33f744da004d7d2b9bc7ffd0e0aa0a42c19ae9598"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\board.rs": {
+      "bytes": 13901,
+      "sha256": "9c688ec407ca28f22a056737734df626bdffdda30c92dca575879b6e56bdb0fa"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\card.rs": {
+      "bytes": 4422,
+      "sha256": "74eeb9bebfc2ed08783b8298754d964779c3114e0a53fd9a4cff364253ac5023"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\eval.rs": {
+      "bytes": 1966,
+      "sha256": "dfa7610718f196fc8eae95bc767af02bdadc6f20d32c648b02b7fb0f25f2afb4"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\lib.rs": {
+      "bytes": 1101,
+      "sha256": "23a55b676196703cdd248c9b8fb50a541a113c9f3cc6dc904f5a8151ca39e37f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\range.rs": {
+      "bytes": 12197,
+      "sha256": "1ed908cfdc11908754db983eaabbe04dbbe0d405ffddf57fac9b1d18115f208b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\script\\ast.rs": {
+      "bytes": 4127,
+      "sha256": "c9012aed1c7b5c91e703f450f1afee82b2b81f1f372d303efe52509af8f2a355"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\script\\cond.rs": {
+      "bytes": 40254,
+      "sha256": "49a649578fad2c3e47ad7e1ae4134cf5eef475ead2c11cd140affdf8a0e6b478"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\script\\lower.rs": {
+      "bytes": 14396,
+      "sha256": "f73abd25b7f4be15aae86f749b4a2f81f45f74013034d51cbc8fc757039943a3"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\script\\mod.rs": {
+      "bytes": 1963,
+      "sha256": "dcfe364cc022ac9788d2d3816ec760237bf9176e91ae520a2e4b41469d118edf"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\script\\parse.rs": {
+      "bytes": 38716,
+      "sha256": "3981c7121131095f011a5d0e51933004f49f55e5beef20d60e9b4999fc13d210"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\script\\token.rs": {
+      "bytes": 11301,
+      "sha256": "decbc911b73bd74d27f0493a691fa604ecb63e0b02ff8afc0a2162dbc0f64bbd"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\set.rs": {
+      "bytes": 2878,
+      "sha256": "ea987f8d7dd617fa29d452b29b8d739ad69d20e8f5da94b016135e5cc6ec576b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\sizing.rs": {
+      "bytes": 19223,
+      "sha256": "1784b87a9d617015a5d0cbfa9f893f0f28f8725baeb64afd8102150d09aa5e05"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\cards\\src\\types.rs": {
+      "bytes": 2621,
+      "sha256": "acec9488a59c72781764a521116c682712c0fc1ca786f1be46a70d2ce04bd7c9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\engine\\Cargo.toml": {
+      "bytes": 575,
+      "sha256": "19aed9d523924499c7226490b044aa69a4935dc1bc24685a4f6c56aadd5e9df1"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\engine\\src\\lib.rs": {
+      "bytes": 1376,
+      "sha256": "4d3f7a3b7551fbf1547dd45e0fb5170ebfdd45fd83a7ebefe132562d5cf885d8"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\engine\\src\\mccfr.rs": {
+      "bytes": 21267,
+      "sha256": "1cb21e70898bf0fcc98e039202470e59da5b3c4a5c9776c8965eac5d832cac68"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\engine\\src\\reach.rs": {
+      "bytes": 18760,
+      "sha256": "e4184dffabadaccb16d2672e6e3d24bba20fceec1013480d28d700b703210c3b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\engine\\src\\schedule.rs": {
+      "bytes": 6330,
+      "sha256": "c4dd446587d52c710d3a61a78ddd3d4a52550d331b9a24e1a68156ac84e4b6a9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\engine\\src\\scratch.rs": {
+      "bytes": 1117,
+      "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\engine\\src\\solver.rs": {
+      "bytes": 56421,
+      "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\engine\\src\\storage.rs": {
+      "bytes": 44287,
+      "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\engine\\src\\tree.rs": {
+      "bytes": 16936,
+      "sha256": "2e6c1a3560bd12a7b2a04573e28505ae00fdaaf8fcb797cb3b0bb964a98879b2"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\game\\Cargo.toml": {
+      "bytes": 389,
+      "sha256": "94c64d53d2ebc3896f20f104d2e9f32178e8695bf6bc41f7fcdbf3d6d4b09187"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\game\\src\\lib.rs": {
+      "bytes": 651,
+      "sha256": "3667e422f0ccb31b507574c43c86f87b5930b8a345f19896aa55230e4c83e0be"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\game\\src\\payoff.rs": {
+      "bytes": 11716,
+      "sha256": "bd9ecc083fbc575e888ad2d1173b3ad5ce78f0fb263778f8bd75a27242d772f9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\game\\src\\r1\\mod.rs": {
+      "bytes": 16941,
+      "sha256": "f8c4d65cdda6e6ae8685af019aaaed61825f4f73f4e1f38ced2222023175d465"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\game\\src\\r1\\settlement.rs": {
+      "bytes": 4112,
+      "sha256": "657729d970e4d431685d7604a49cbb09a6a7d3d900c31279d943b414089728e7"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\game\\src\\toy.rs": {
+      "bytes": 14756,
+      "sha256": "da123312ed67171641eab5b2675a43397a5e0d5c4f44c995342978839a4b6af8"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\hand-index\\Cargo.toml": {
+      "bytes": 249,
+      "sha256": "aba9712b6e3e9dd725c858b8e1051900632b2345885db013f84095cee28f16ff"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\hand-index\\src\\lib.rs": {
+      "bytes": 12434,
+      "sha256": "6c12d18fdcefad223205167d20d5f98678e25ab3e4f5a73f19a539e0d5842c29"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\Cargo.toml": {
+      "bytes": 546,
+      "sha256": "23b8886b502afe4aa5fc6008fb4dcdf3ae3a8b995f2838be9728151b451a6022"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\src\\aggregate.rs": {
+      "bytes": 2037,
+      "sha256": "45f3488891a5b9cc555e2bf6785509f051516d1907586b33f4d1987270a45aa6"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\src\\compatibility.rs": {
+      "bytes": 3715,
+      "sha256": "330cf4368b3bcc324712f39d2fac62895bbcde764d10fae22c7c0708bedf5069"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\src\\equity.rs": {
+      "bytes": 4194,
+      "sha256": "b3e8576a6215202f76a2dbfba19de21379da573d0d2918ba782ed3da88756eef"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\src\\hands.rs": {
+      "bytes": 4706,
+      "sha256": "eaf9c95079482fa0b6839b78eafd995c76405fad7ba8d97f9ef5fab89036366a"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\src\\kernel.rs": {
+      "bytes": 18270,
+      "sha256": "d59724dd4d9a1c797bebf83422c06b75c90020796bfbf8f492417910770bb076"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\src\\kernel_tests.rs": {
+      "bytes": 14982,
+      "sha256": "047f9f30af76b141ed1c6f2e0655af0638ddcb0c23d723702899608df65cb348"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\src\\lib.rs": {
+      "bytes": 1714,
+      "sha256": "7566e1e68dd1bfaef8fff34283e32b09bb85462671d8a3913a50ead59b2dee2f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\src\\mass.rs": {
+      "bytes": 10960,
+      "sha256": "6937d14f2424501109c182bcb433125206e39cbd24e6bcb8b5c3b5be1f627639"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\src\\mass_tests.rs": {
+      "bytes": 27700,
+      "sha256": "e888687425723d0e552d200865f1aea3dec42b06f75b20a29ac8d94d9c33584b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\src\\postflop.rs": {
+      "bytes": 73444,
+      "sha256": "70ecaa0bbc39ca1fff1d3c7c29a1e499dea87e5b8e58d2486b3e0ebc157f891f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\src\\river.rs": {
+      "bytes": 3799,
+      "sha256": "aa49eff9d5d1191175152c7efe8de8bd8f427456aac8dd5c4d0897fea3a1075b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source\\crates\\holdem\\src\\viewer.rs": {
+      "bytes": 19700,
+      "sha256": "c582d0a58698c5c03780a3d72693db11f129f04e57d693574d268bf0b036f16d"
+    }
+  },
+  "source": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01\\source",
+  "source_archive": {
+    "bytes": 163963,
+    "sha256": "e3ab6985131a81263cd0d538eca49b38e72b1221a28670e873dfd2f10b46fd75"
+  },
+  "source_differences": [
+    "crates/engine/src/solver.rs"
+  ],
+  "target": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-ev-scratch01"
+}

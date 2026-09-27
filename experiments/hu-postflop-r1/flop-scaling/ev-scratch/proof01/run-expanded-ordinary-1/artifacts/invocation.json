@@ -1,0 +1,1 @@
+{"schema":"r1.flop-native-solve/v1","case":"expanded","threads":1,"iterations":2,"planned_iterations":2,"chance_depth":2,"min_children":12,"storage":"f32","schedule":"dcfr","alpha":1.5,"beta":0,"gamma":3,"pow4_reset":true,"cli_toml_normalized":false,"quality_target":null,"cfv_capture":false}

@@ -14,10 +14,12 @@ Flopの十分に大きい仕事量で、利用可能な物理coreに近い倍率
 | [narrowの短いnative solve](native-solve/report.jp.md) | baseline／flat各1／2 workers、2反復の全F32状態・公開EV／BR／seat別gainが完全一致。未収束の正しさ検査で、速度は未認定 |
 | [最適化buildの2入力照合](optimized/README.jp.md) | runtime依存も新規release buildし、narrow／expanded各4条件の全状態・公開品質が完全一致。1 workerは非並列chance対照、2 workersは候補経路を通る。性能は未認定 |
 | [allocator呼出しの診断](alloc-probe/README.md) | narrow・2 workersのCFRでalloc／zeroed／realloc合計710,031→253,400回、要求総bytes179,026,248→65,028,912。4条件の全状態・品質は無計装版と一致。単発countsで、時間・peakの改善率ではない |
+| [EV作業配列の再利用](ev-scratch/README.jp.md) | 本体の両EV経路でtask内Scratchを利用。2入力・通常／計測版・1／2 workersの全8条件で全状態・品質が基準と一致。品質走査のzeroed allocationは0回。通常・release回帰は[別証拠](../validation/ev-scratch/README.md)に保持 |
+| [EV修正とflat chanceの組合せ候補](flat-ev/README.jp.md) | 現行EV修正を保持して既存変換を再適用した研究copy。整形・再生成・変更範囲の4軽量testsのみ。Rust compile・solve・性能・採用は未認定 |
 
-[最終照合記録](review.json)で301件のsource/raw pin照合とproduction207ファイルの不変を確認した。
-通常fmtと文書検査も成功。競合するローカル計算と資源余力のためfull clippy/workspace testsは
-再実行せず、研究copyの限定検査に留めた。
+研究copy作成時の[照合記録](review.json)では301件のsource/raw pin照合とproduction207ファイルの
+不変を確認した。通常fmtと文書検査も成功したが、その時点ではfull clippy/workspace testsを
+再実行せず限定検査に留めた。後続のEV作業配列変更は上表の独立したsource・検証証拠で識別する。
 
 ## 実測で区別すること
 

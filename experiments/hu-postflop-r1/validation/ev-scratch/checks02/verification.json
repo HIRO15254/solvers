@@ -1,0 +1,9 @@
+{
+  "retained_hashes_verified": true,
+  "files": 16,
+  "sources": 12,
+  "python_tests_passed": 39,
+  "docs_markdown_checked": 49,
+  "preserved_prelaunch_declines": 1,
+  "retention_note": "Initial one-off retainer raised FileNotFoundError for absent prelaunch stdout before copying payloads. This attempt explicitly checks absent outputs for the declined launch; original runtime records unchanged."
+}
