@@ -1,0 +1,70 @@
+{
+  "schema": "r1.vm17-usage-preparation-checks/v1",
+  "recorded_utc": "2026-09-27T06:18:10.250796+00:00",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm17\\test_analyze.py",
+    "-v"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.2077324001584202,
+  "python_ast_passed": 3,
+  "source_before": {
+    "collect.py": {
+      "bytes": 9615,
+      "sha256": "63ef2c19cd6c0d392d47349ca427b377028242da9d686cecbf70be031b38feb1"
+    },
+    "analyze.py": {
+      "bytes": 14159,
+      "sha256": "acf2ca29138c58b8cf3db162ded932e77f9a434982a24846cc78504ce6c9a4ea"
+    },
+    "test_analyze.py": {
+      "bytes": 6713,
+      "sha256": "dd0fcec29e2b3c3511d37381b58366298c42778b74306494d760a764fa3edee2"
+    },
+    "README.jp.md": {
+      "bytes": 3437,
+      "sha256": "95603cba04006b331d1fcdb74776e6348d6f16567401eee1a0d1050fe5fe56fb"
+    }
+  },
+  "source_after": {
+    "collect.py": {
+      "bytes": 9615,
+      "sha256": "63ef2c19cd6c0d392d47349ca427b377028242da9d686cecbf70be031b38feb1"
+    },
+    "analyze.py": {
+      "bytes": 14159,
+      "sha256": "acf2ca29138c58b8cf3db162ded932e77f9a434982a24846cc78504ce6c9a4ea"
+    },
+    "test_analyze.py": {
+      "bytes": 6713,
+      "sha256": "dd0fcec29e2b3c3511d37381b58366298c42778b74306494d760a764fa3edee2"
+    },
+    "README.jp.md": {
+      "bytes": 3437,
+      "sha256": "95603cba04006b331d1fcdb74776e6348d6f16567401eee1a0d1050fe5fe56fb"
+    }
+  },
+  "outputs": {
+    "tests03.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tests03.stderr.log": {
+      "bytes": 942,
+      "sha256": "0ceca09be839bd526ef6e891c75a334529c6ad30eba0e2307c10c30a943f6d98"
+    }
+  },
+  "cloud_calls": 0,
+  "native_build_or_solve": false,
+  "usage_acquisition_executed": false,
+  "usage_report_generated": false,
+  "budget_modified": false,
+  "tests": {
+    "executed": 6,
+    "skipped": 1,
+    "reason_for_skip": "retained observations not yet acquired"
+  },
+  "change_from_checks02": "Bind successful inventory receipts to same project, exact resource list command and agreed instance/disk or campaign-address filter. Duplicate or split flags rejected. Wrong-target/project/duplicate-filter synthetic mutations added."
+}

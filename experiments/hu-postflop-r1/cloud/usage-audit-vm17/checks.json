@@ -1,0 +1,65 @@
+{
+  "schema": "r1.vm17-usage-preparation-checks/v1",
+  "recorded_utc": "2026-09-27T06:13:52.248506+00:00",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm17\\test_analyze.py",
+    "-v"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.2078054000157863,
+  "python_ast_passed": 3,
+  "source_before": {
+    "analyze.py": {
+      "bytes": 13589,
+      "sha256": "25ee72dc6c14410d50d1d8fe60f37ed13fd3fac24e6610e2d39287d425bd9b99"
+    },
+    "collect.py": {
+      "bytes": 9047,
+      "sha256": "ae5077d24fb778a9eb4532b926ab79c16bf10ca6db1d65fb01c82068729f13fa"
+    },
+    "README.jp.md": {
+      "bytes": 2930,
+      "sha256": "780f9cb1037ae8c9501d9d1b0676076451a4bd731f0708b7a993d209a205d923"
+    },
+    "test_analyze.py": {
+      "bytes": 6061,
+      "sha256": "d238c8c4dab7dca5e6ba96197d68ce0755a6e6fcc89ca13ef2d2cdab6f49757e"
+    }
+  },
+  "source_after": {
+    "analyze.py": {
+      "bytes": 13589,
+      "sha256": "25ee72dc6c14410d50d1d8fe60f37ed13fd3fac24e6610e2d39287d425bd9b99"
+    },
+    "collect.py": {
+      "bytes": 9047,
+      "sha256": "ae5077d24fb778a9eb4532b926ab79c16bf10ca6db1d65fb01c82068729f13fa"
+    },
+    "README.jp.md": {
+      "bytes": 2930,
+      "sha256": "780f9cb1037ae8c9501d9d1b0676076451a4bd731f0708b7a993d209a205d923"
+    },
+    "test_analyze.py": {
+      "bytes": 6061,
+      "sha256": "d238c8c4dab7dca5e6ba96197d68ce0755a6e6fcc89ca13ef2d2cdab6f49757e"
+    }
+  },
+  "outputs": {
+    "tests.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tests.stderr.log": {
+      "bytes": 942,
+      "sha256": "0ceca09be839bd526ef6e891c75a334529c6ad30eba0e2307c10c30a943f6d98"
+    }
+  },
+  "cloud_calls": 0,
+  "native_build_or_solve": false,
+  "usage_acquisition_executed": false,
+  "usage_report_generated": false,
+  "budget_modified": false,
+  "note": "Seven tiny tests: six execute; retained-observation test is skipped until actual acquisition/report exist."
+}

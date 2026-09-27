@@ -1,0 +1,11 @@
+test_actual_arithmetic (__main__.TieredTests.test_actual_arithmetic) ... ok
+test_bad_windows (__main__.TieredTests.test_bad_windows) ... ok
+test_identity_or_deadline_mismatch (__main__.TieredTests.test_identity_or_deadline_mismatch) ... ok
+test_over_budget_no_restore (__main__.TieredTests.test_over_budget_no_restore) ... ok
+test_rounding_and_large_traffic (__main__.TieredTests.test_rounding_and_large_traffic) ... ok
+test_wrong_machine_or_duplicate_scope (__main__.TieredTests.test_wrong_machine_or_duplicate_scope) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+OK

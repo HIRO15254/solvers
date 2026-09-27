@@ -1,0 +1,126 @@
+{
+  "checks": [
+    {
+      "label": "usage-tests",
+      "argv": [
+        "C:/Python313/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm17\\test_analyze.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.19011880015023053,
+      "outputs": {
+        "stdout": {
+          "path": "final-usage-tests01.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "final-usage-tests01.stderr.log",
+          "bytes": 111,
+          "sha256": "0027a51e86867af51b4103f779610a50ebf1f4f938678404316593cf95a8152d"
+        }
+      }
+    },
+    {
+      "label": "tiered-tests",
+      "argv": [
+        "C:/Python313/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm17\\test_tiered.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.12602199986577034,
+      "outputs": {
+        "stdout": {
+          "path": "final-tiered-tests01.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "final-tiered-tests01.stderr.log",
+          "bytes": 109,
+          "sha256": "59753171660350c6735ee4b12925f50e7f8606c102caf33752e5551608bad819"
+        }
+      }
+    },
+    {
+      "label": "tiered-replay",
+      "argv": [
+        "C:/Python313/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm17\\tiered.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.15378829999826849,
+      "outputs": {
+        "stdout": {
+          "path": "final-tiered-replay01.stdout.log",
+          "bytes": 544,
+          "sha256": "61f27663adf4eb9d0ca31b6bcccc292672a1b58de48eb83d1007292b88735005"
+        },
+        "stderr": {
+          "path": "final-tiered-replay01.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "docs",
+      "argv": [
+        "C:/Python313/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1769048001151532,
+      "outputs": {
+        "stdout": {
+          "path": "final-docs01.stdout.log",
+          "bytes": 48,
+          "sha256": "4c017748d2c77b7c0f92b108f9c3aef9b48475827ec7c7af0facbad1bb7f3fb0"
+        },
+        "stderr": {
+          "path": "final-docs01.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.10327349998988211,
+      "outputs": {
+        "stdout": {
+          "path": "final-whitespace01.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "final-whitespace01.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "all_passed": true,
+  "local_native_execution": false,
+  "local_state_decompression": false
+}

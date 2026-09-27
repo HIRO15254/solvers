@@ -1,0 +1,34 @@
+{
+  "schema": "r1.vm17-usage-preparation/v1",
+  "baseline_preparation": {
+    "bytes": 1103,
+    "sha256": "fd12fd4e2ed2a89025dd3735e02340f39a5071ba4392ac8c58ded129429af7c5"
+  },
+  "generated": {
+    "collect.py": {
+      "bytes": 9615,
+      "sha256": "63ef2c19cd6c0d392d47349ca427b377028242da9d686cecbf70be031b38feb1"
+    },
+    "analyze.py": {
+      "bytes": 14159,
+      "sha256": "acf2ca29138c58b8cf3db162ded932e77f9a434982a24846cc78504ce6c9a4ea"
+    },
+    "test_analyze.py": {
+      "bytes": 6713,
+      "sha256": "dd0fcec29e2b3c3511d37381b58366298c42778b74306494d760a764fa3edee2"
+    },
+    "README.jp.md": {
+      "bytes": 3437,
+      "sha256": "95603cba04006b331d1fcdb74776e6348d6f16567401eee1a0d1050fe5fe56fb"
+    }
+  },
+  "checks": {
+    "bytes": 2282,
+    "sha256": "fc267f36393c4d5dae8f449f5b20da26d4495a5a0d7701e90ddc099d41c7e1e6"
+  },
+  "instance_id": "2775050120395558750",
+  "reserved_usd": 2,
+  "billed_usd": null,
+  "executed_scope": "AST plus tiny synthetic Python tests only; no cloud or ledger action",
+  "change": "Both deletion gates bind actual inventory argv to agreed resource/project/filter scope."
+}

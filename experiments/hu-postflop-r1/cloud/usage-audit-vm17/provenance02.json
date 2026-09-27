@@ -1,0 +1,34 @@
+{
+  "schema": "r1.vm17-usage-preparation/v1",
+  "baseline_preparation": {
+    "bytes": 1550,
+    "sha256": "2815950c733cd21bb4c583ae048e3d080e36cf797d0f6b9bf7623fb9deb14379"
+  },
+  "generated": {
+    "collect.py": {
+      "bytes": 9076,
+      "sha256": "fa7814bc0d2e6eb82f6ba8bf64b7ae22c8553f78bcb3c238414e5b733f3cf07f"
+    },
+    "analyze.py": {
+      "bytes": 13689,
+      "sha256": "6de6e98dc9346c9cfa0b7b507a2fe1f2bd1e3aa8a29cc0b8c0c93170a63403fd"
+    },
+    "test_analyze.py": {
+      "bytes": 6149,
+      "sha256": "ad3f30e7294269f0bc8bc340f036a4e7f9a499860a5f8175c5d0f32dd906c697"
+    },
+    "README.jp.md": {
+      "bytes": 2930,
+      "sha256": "780f9cb1037ae8c9501d9d1b0676076451a4bd731f0708b7a993d209a205d923"
+    }
+  },
+  "checks": {
+    "bytes": 2182,
+    "sha256": "df669910a719477c1cf678ac6182a59d095513a6af3165afeec753aefed827b3"
+  },
+  "instance_id": "2775050120395558750",
+  "reserved_usd": 2,
+  "billed_usd": null,
+  "executed_scope": "AST plus tiny synthetic Python tests only; no cloud or ledger action",
+  "change": "Both deletion gates reject status DONE with operation error."
+}

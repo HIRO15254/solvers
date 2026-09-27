@@ -1,0 +1,23 @@
+{
+  "at": "2026-09-27T06:49:59.813260+00:00",
+  "change": {
+    "id": "r1-20260927-17",
+    "event": "usage_based_partial_reservation_reconciliation",
+    "at": "2026-09-27T06:49:59.813260+00:00",
+    "old_reserved_usd": 2,
+    "new_reserved_usd": 1.8,
+    "restored_to_available_budget_usd": 0.2,
+    "evidence": "experiments/hu-postflop-r1/cloud/usage-audit-vm17/tiered-report.json",
+    "evidence_sha256": "405f1075e9ffab692aa540cf4ffdcc87fb2f9dd2c13be4a56d6435dfeee80f56",
+    "billed_usd": null,
+    "final_invoice": false,
+    "basis": "Whole lifetime small-VM price plus a wider overlapping high-CPU interval; original one-dollar uncertainty, disk24h and512MiB egress retained"
+  },
+  "held_before_usd": 40,
+  "held_after_usd": 39.8,
+  "unreserved_usd": 0.2,
+  "authorized_limit_usd": 40,
+  "invoice_confirmed": false,
+  "ledger_before_sha256": "b48ea868f20123b9ff58912493c449f1830b5147656b0c5b624348fc09f10619",
+  "ledger_after_sha256": "8e28e34709452c791980f268ea44edd5f2bd2a14a1cc21eccdeb365d16549901"
+}

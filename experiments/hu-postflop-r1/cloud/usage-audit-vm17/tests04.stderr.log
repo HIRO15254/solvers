@@ -1,0 +1,13 @@
+test_cleanup_gate_rejects_mismatched_or_incomplete_originals (__main__.AccountingTests.test_cleanup_gate_rejects_mismatched_or_incomplete_originals) ... ok
+test_duplicate_interval_rejected (__main__.AccountingTests.test_duplicate_interval_rejected) ... ok
+test_missing_interval_stays_unknown (__main__.AccountingTests.test_missing_interval_stays_unknown) ... ok
+test_missing_usage_is_unknown (__main__.AccountingTests.test_missing_usage_is_unknown) ... ok
+test_nonfinite_usage_rejected (__main__.AccountingTests.test_nonfinite_usage_rejected) ... ok
+test_original_envelope_and_rounding_boundary (__main__.AccountingTests.test_original_envelope_and_rounding_boundary) ... ok
+test_recovery_exception_preserves_original_bounds (__main__.AccountingTests.test_recovery_exception_preserves_original_bounds) ... ok
+test_retained_raw_and_accounting (__main__.AccountingTests.test_retained_raw_and_accounting) ... skipped 'retained observations not yet acquired'
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.006s
+
+OK (skipped=1)

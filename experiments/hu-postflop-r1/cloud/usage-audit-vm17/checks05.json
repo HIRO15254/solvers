@@ -1,0 +1,86 @@
+{
+  "schema": "r1.vm17-usage-preparation-checks/v1",
+  "recorded_utc": "2026-09-27T06:39:11.181892+00:00",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm17\\test_analyze.py",
+    "-v"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.18866729992441833,
+  "python_ast_passed": 3,
+  "source_before": {
+    "collect.py": {
+      "bytes": 12547,
+      "sha256": "f51750c2961b0c4a45c64f52f5f826a80792f80bae7f6c06ab25c62c0b52c473"
+    },
+    "analyze.py": {
+      "bytes": 17242,
+      "sha256": "0504f0fcd28eeda8938f30a1b2562216451ca19c907bb5706a4d1c00aa3d90fd"
+    },
+    "test_analyze.py": {
+      "bytes": 7938,
+      "sha256": "fb91d7a99685d23668839c655032aece5f0ff8ed9a5e442fac25b1d8b7c38c40"
+    },
+    "README.jp.md": {
+      "bytes": 4403,
+      "sha256": "1e132f260bc04c23551be532d32859ea6b413e42682a735b954c5dad75b37b5a"
+    }
+  },
+  "source_after": {
+    "collect.py": {
+      "bytes": 12547,
+      "sha256": "f51750c2961b0c4a45c64f52f5f826a80792f80bae7f6c06ab25c62c0b52c473"
+    },
+    "analyze.py": {
+      "bytes": 17242,
+      "sha256": "0504f0fcd28eeda8938f30a1b2562216451ca19c907bb5706a4d1c00aa3d90fd"
+    },
+    "test_analyze.py": {
+      "bytes": 7938,
+      "sha256": "fb91d7a99685d23668839c655032aece5f0ff8ed9a5e442fac25b1d8b7c38c40"
+    },
+    "README.jp.md": {
+      "bytes": 4403,
+      "sha256": "1e132f260bc04c23551be532d32859ea6b413e42682a735b954c5dad75b37b5a"
+    }
+  },
+  "additional_small_inputs": {
+    "recovery-state02.stdout.log": {
+      "bytes": 252,
+      "sha256": "f0c1439d3fc19b7cca816e26b327b171538c1ca7cb879c2386457f0d323f1a8e"
+    },
+    "recovery-state02.result.json": {
+      "bytes": 1359,
+      "sha256": "6186ac16b466e352dcd707906a8172e3273dc74c04fcd93ad8622a1aa551f657"
+    },
+    "recovery02/flop-fused-update-recovery01.json": {
+      "bytes": 252,
+      "sha256": "f0c1439d3fc19b7cca816e26b327b171538c1ca7cb879c2386457f0d323f1a8e"
+    },
+    "recovery02/manifest-comparison.json": {
+      "bytes": 372,
+      "sha256": "407b05387d079b529bbc64c10d92908ec53acff2cb6ab8163937c308f54be976"
+    }
+  },
+  "outputs": {
+    "tests05.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tests05.stderr.log": {
+      "bytes": 1077,
+      "sha256": "50dcb00fc2b49b7e9a09a0d99545d2e26eb276e347587af0efcb250f701a7d69"
+    }
+  },
+  "tests": {
+    "executed": 7,
+    "skipped": 1
+  },
+  "cloud_calls": 0,
+  "usage_acquisition_executed": false,
+  "usage_report_generated": false,
+  "budget_modified": false,
+  "change": "Preserve newarchive receipt and original-manifest comparison after /tmp loss on the already authorized fourth boot. Cost model unchanged."
+}

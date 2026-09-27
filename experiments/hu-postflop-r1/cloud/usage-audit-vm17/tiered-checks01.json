@@ -1,0 +1,138 @@
+{
+  "scope": "Small offline arithmetic/raw receipt verification; no API, native build, solve or ledger mutation",
+  "started_at": "2026-09-27T06:47:33.254245+00:00",
+  "source_before": {
+    "tiered.py": {
+      "bytes": 11305,
+      "sha256": "e55aa89faacc80b7a5b836c00f5c4454c57036e857da3a74b2852d68ff75cf4d"
+    },
+    "test_tiered.py": {
+      "bytes": 2945,
+      "sha256": "29c3815406c8501a6fb3a8bec94c160e4989044c6957d9a9cf75cbd224279605"
+    },
+    "analyze.py": {
+      "bytes": 17242,
+      "sha256": "0504f0fcd28eeda8938f30a1b2562216451ca19c907bb5706a4d1c00aa3d90fd"
+    },
+    "collect.py": {
+      "bytes": 12547,
+      "sha256": "f51750c2961b0c4a45c64f52f5f826a80792f80bae7f6c06ab25c62c0b52c473"
+    },
+    "report.json": {
+      "bytes": 4985,
+      "sha256": "6081ad544311746f5637aff717435b84612225c2ed29166ed3db57061f1f89ec"
+    },
+    "acquisition.json": {
+      "bytes": 16327,
+      "sha256": "189d8fa74ec20ced574d29b44b7973a0902019e81941c55aad6676d368b1cdf1"
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm17\\analyze.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.12284859991632402,
+      "stdout": {
+        "path": "tiered-original-replay01.stdout.log",
+        "bytes": 1752,
+        "sha256": "124ba61efdc66e623ab17825b2c10fb892aaead1956eff77f86cf47a19ba5a64"
+      },
+      "stderr": {
+        "path": "tiered-original-replay01.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm17\\test_tiered.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.14638080005533993,
+      "stdout": {
+        "path": "tiered-tests01.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "tiered-tests01.stderr.log",
+        "bytes": 635,
+        "sha256": "82201d088d328b0e402173e6ae889d10497e16a0797225b8e2cf73de3e98258c"
+      }
+    },
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm17\\tiered.py"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.15356489992700517,
+      "stdout": {
+        "path": "tiered-generate01.stdout.log",
+        "bytes": 544,
+        "sha256": "61f27663adf4eb9d0ca31b6bcccc292672a1b58de48eb83d1007292b88735005"
+      },
+      "stderr": {
+        "path": "tiered-generate01.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm17\\tiered.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.15457509993575513,
+      "stdout": {
+        "path": "tiered-replay01.stdout.log",
+        "bytes": 544,
+        "sha256": "61f27663adf4eb9d0ca31b6bcccc292672a1b58de48eb83d1007292b88735005"
+      },
+      "stderr": {
+        "path": "tiered-replay01.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "source_after": {
+    "tiered.py": {
+      "bytes": 11305,
+      "sha256": "e55aa89faacc80b7a5b836c00f5c4454c57036e857da3a74b2852d68ff75cf4d"
+    },
+    "test_tiered.py": {
+      "bytes": 2945,
+      "sha256": "29c3815406c8501a6fb3a8bec94c160e4989044c6957d9a9cf75cbd224279605"
+    },
+    "analyze.py": {
+      "bytes": 17242,
+      "sha256": "0504f0fcd28eeda8938f30a1b2562216451ca19c907bb5706a4d1c00aa3d90fd"
+    },
+    "collect.py": {
+      "bytes": 12547,
+      "sha256": "f51750c2961b0c4a45c64f52f5f826a80792f80bae7f6c06ab25c62c0b52c473"
+    },
+    "report.json": {
+      "bytes": 4985,
+      "sha256": "6081ad544311746f5637aff717435b84612225c2ed29166ed3db57061f1f89ec"
+    },
+    "acquisition.json": {
+      "bytes": 16327,
+      "sha256": "189d8fa74ec20ced574d29b44b7973a0902019e81941c55aad6676d368b1cdf1"
+    }
+  },
+  "sources_unchanged": true
+}

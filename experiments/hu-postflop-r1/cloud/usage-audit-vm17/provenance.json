@@ -1,0 +1,44 @@
+{
+  "schema": "r1.vm17-usage-preparation/v1",
+  "method": "Minimal adaptation of established VM16 acquisition and auditor; adds exact VM17 launch/STOP/pricing pins and pre-authentication deletion/absence gate. Removes historical fixed1.90USD choice. No copied usage observations or timestamps of completion.",
+  "baseline": {
+    "collect.py": {
+      "bytes": 7447,
+      "sha256": "0429d4f951fc24fcb3f36e4335e034f4b0b353c825a2c71568905e14f0cff9df"
+    },
+    "analyze.py": {
+      "bytes": 12989,
+      "sha256": "8c1b794c90233b89e70b8989c860c189c6be4bcc464dc621524a35d5afc6bf6e"
+    },
+    "test_analyze.py": {
+      "bytes": 3797,
+      "sha256": "c6dd61d8581c5895d653cd600af7ea1bbee4da8ddbe9f0dbe6ed634e8f9737a2"
+    }
+  },
+  "generated": {
+    "analyze.py": {
+      "bytes": 13589,
+      "sha256": "25ee72dc6c14410d50d1d8fe60f37ed13fd3fac24e6610e2d39287d425bd9b99"
+    },
+    "collect.py": {
+      "bytes": 9047,
+      "sha256": "ae5077d24fb778a9eb4532b926ab79c16bf10ca6db1d65fb01c82068729f13fa"
+    },
+    "README.jp.md": {
+      "bytes": 2930,
+      "sha256": "780f9cb1037ae8c9501d9d1b0676076451a4bd731f0708b7a993d209a205d923"
+    },
+    "test_analyze.py": {
+      "bytes": 6061,
+      "sha256": "d238c8c4dab7dca5e6ba96197d68ce0755a6e6fcc89ca13ef2d2cdab6f49757e"
+    }
+  },
+  "checks": {
+    "bytes": 2017,
+    "sha256": "f70392d2274f89647a447771be67845f6109a3313dab81480b760b86bcef0aba"
+  },
+  "instance_id": "2775050120395558750",
+  "reserved_usd": 2,
+  "billed_usd": null,
+  "executed_scope": "AST plus tiny synthetic Python tests only"
+}

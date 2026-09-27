@@ -1,0 +1,18 @@
+{
+  "whole_minutes": 39,
+  "overlapping_large_minutes": 21,
+  "network_allowance_gib": "0.5",
+  "disk_allowance_hours": "24",
+  "components_usd": {
+    "whole_lifetime_small_compute": "0.0910",
+    "overlapping_large_window_compute": "0.4025",
+    "whole_lifetime_ipv4": "0.001625",
+    "40gib_disk_at_least_24h": "0.131520",
+    "network_allowance": "0.150",
+    "original_uncertainty_reserve": "1"
+  },
+  "total_usd": "1.776645",
+  "rounded_hold_usd": "1.8",
+  "restore_usd": "0.2",
+  "margin_above_model_usd": "0.023355"
+}

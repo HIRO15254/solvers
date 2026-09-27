@@ -1,0 +1,11 @@
+{
+  "member_count": 1186,
+  "same_membership": true,
+  "all_proof_package_wrapper_bytes_unchanged": true,
+  "changed_metadata_members": [
+    "recovery/metadata/bootstrap-complete",
+    "recovery/metadata/recovered-at.txt"
+  ],
+  "old_archive_incomplete_locally": true,
+  "new_archive_sha256": "7cf50f9623cc33a80a81c73699d1dab7ae7957ab4af5b7cad028bde29e20ec5f"
+}

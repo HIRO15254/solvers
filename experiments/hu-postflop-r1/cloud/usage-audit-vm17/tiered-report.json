@@ -1,0 +1,164 @@
+{
+  "schema": "r1.vm17-additive-tiered-usage-proposal/v1",
+  "source": {
+    "bytes": 11305,
+    "sha256": "e55aa89faacc80b7a5b836c00f5c4454c57036e857da3a74b2852d68ff75cf4d"
+  },
+  "instance_id": "2775050120395558750",
+  "inputs": {
+    "usage-audit-vm17/report.json": {
+      "bytes": 4985,
+      "sha256": "6081ad544311746f5637aff717435b84612225c2ed29166ed3db57061f1f89ec"
+    },
+    "usage-audit-vm17/acquisition.json": {
+      "bytes": 16327,
+      "sha256": "189d8fa74ec20ced574d29b44b7973a0902019e81941c55aad6676d368b1cdf1"
+    },
+    "usage-audit-vm17/inputs/launch-r1-20260927-17.json": {
+      "bytes": 1097,
+      "sha256": "06726d972cf5461e91cfc87ea80a6f2ddcce817a9180b08df9854d977ae38bb8"
+    },
+    "usage-audit-vm17/inputs/create-result-r1-20260927-17.json": {
+      "bytes": 30180,
+      "sha256": "401884e1d737f22e9692df4924cc761c1ffa61e23aff996169d6c3a00da15601"
+    },
+    "usage-audit-vm17/inputs/vm17/stop-resize01.result.json": {
+      "bytes": 665,
+      "sha256": "45838d468797113ee8b2c597b08f386326a01b8689c515583ceddcb5a087dbc9"
+    },
+    "vm17/stop-resize01.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "usage-audit-vm17/inputs/vm17/resize01.result.json": {
+      "bytes": 713,
+      "sha256": "940f99d204749ff54da08ccb892cf91c3d796a0a84825122c9b255e91b7f595c"
+    },
+    "vm17/resize01.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "usage-audit-vm17/inputs/vm17/start32-01.result.json": {
+      "bytes": 665,
+      "sha256": "eb04eafa4327395ee8c13e7edbd28cb09c2e9893ad968c0103bd7495e0fecd4c"
+    },
+    "vm17/start32-01.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "usage-audit-vm17/inputs/vm17/stop-recovery01.result.json": {
+      "bytes": 665,
+      "sha256": "698076ac601727c59c74e4bdaffbf2af1dfd6642d7f3c281234cd3dd95a3cd16"
+    },
+    "vm17/stop-recovery01.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "usage-audit-vm17/inputs/vm17/resize-recovery01.result.json": {
+      "bytes": 713,
+      "sha256": "ffcdfd382ec2a7fe3ed4fbac668e082e3003d261a09e8cc2b14e13864ef23373"
+    },
+    "vm17/resize-recovery01.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "usage-audit-vm17/inputs/vm17/start-recovery01.result.json": {
+      "bytes": 665,
+      "sha256": "440088f10cb6e1f7cab1d65fd80a40e0cfc50c13eb7adcbff0ebe8c2e19ac4b7"
+    },
+    "vm17/start-recovery01.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "usage-audit-vm17/inputs/vm17/start-recovery02.result.json": {
+      "bytes": 665,
+      "sha256": "e4002aeb753c16335a83c3a55995aa440b3802e6d7da80b9e7234ce537cffc9d"
+    },
+    "vm17/start-recovery02.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm17/state32-01.result.json": {
+      "bytes": 727,
+      "sha256": "79b29bb1b6c081982f859d31f367984c03853eb620cb1264c736ccd861c11f3a"
+    },
+    "vm17/state32-01.stdout.log": {
+      "bytes": 508,
+      "sha256": "9ad2b8fadd7be75651892c3a9c98fb87d64eaed93d669433b32e812042288033"
+    },
+    "vm17/identity-before-delete01.result.json": {
+      "bytes": 792,
+      "sha256": "57c7a7a8cba51fc502447610509d07eb2ed175c115143cb433cd41a64f08c5f1"
+    },
+    "vm17/identity-before-delete01.stdout.log": {
+      "bytes": 487,
+      "sha256": "0180ffdf10915a728334a169ecd98ca9a1ab27a9a547902e3037e4be7ba23a17"
+    },
+    "usage-audit-vm17/inputs/vm17/reconciliation.json": {
+      "bytes": 1715,
+      "sha256": "6afafeea421f3b141fef5b6d0054722c68d02b77d2ca0fdb59273c1fb8f0b07b"
+    },
+    "usage-audit-vm17/inputs/vm17/delete-operation01.stdout.log": {
+      "bytes": 905,
+      "sha256": "476c6d3da938d26c79bdf4e33bd1bc87d4441687d982ecc98b5568a97c26b0fe"
+    },
+    "usage-audit-vm17/inputs/preflight-vm17/cost-proposal.json": {
+      "bytes": 5272,
+      "sha256": "1d2ae7878257c67e102ac36661d2f5b0910bd282fd67e63925c62cd4832df02c"
+    },
+    "usage-audit-vm17/inputs/vm17/transfer-interruption-check.json": {
+      "bytes": 805,
+      "sha256": "9b296150db8a251ed060dc9bb0212c111fa0609f029146835c618c9a18d75b64"
+    },
+    "vm17/recovery02/download-check.json": {
+      "bytes": 941,
+      "sha256": "2bbc16a2eff9069dbc2a0cf19dbd96b62952c22f5d1eabd4dfd6450b91996a8b"
+    }
+  },
+  "original_report_unchanged": true,
+  "original_model_total_usd": "2.030645",
+  "original_proposal_available": false,
+  "lifecycle": {
+    "launch_attempt": "2026-09-27T06:03:26.7694177+00:00",
+    "absence_verified": "2026-09-27T06:39:59.735307+00:00",
+    "whole_seconds": "2192.96589",
+    "large_window_start": "2026-09-27T06:06:31.458832+00:00",
+    "large_window_end": "2026-09-27T06:24:56.413189+00:00",
+    "large_window_seconds": "1104.954357",
+    "slack_seconds_added_to_each_window": 120,
+    "stopped_periods_subtracted": false,
+    "small_base_subtracted_from_large_window": false
+  },
+  "arithmetic": {
+    "whole_minutes": 39,
+    "overlapping_large_minutes": 21,
+    "network_allowance_gib": "0.5",
+    "disk_allowance_hours": "24",
+    "components_usd": {
+      "whole_lifetime_small_compute": "0.0910",
+      "overlapping_large_window_compute": "0.4025",
+      "whole_lifetime_ipv4": "0.001625",
+      "40gib_disk_at_least_24h": "0.131520",
+      "network_allowance": "0.150",
+      "original_uncertainty_reserve": "1"
+    },
+    "total_usd": "1.776645",
+    "rounded_hold_usd": "1.8",
+    "restore_usd": "0.2",
+    "margin_above_model_usd": "0.023355"
+  },
+  "known_downloaded_archive_and_fragment_bytes": 237332422,
+  "monitoring_sent_observed_bytes": "99729092",
+  "unobserved_egress_bytes": null,
+  "actual_billed_usd": null,
+  "guaranteed_cost_ceiling_usd": null,
+  "budget_changed": false,
+  "proposal_applied": false,
+  "limits": [
+    "Full lifetime small-VM base plus a conservatively wider overlapping 32-vCPU interval; stopped periods and both 120-second margins remain charged.",
+    "Successful fixed-target SDK resize receipts and same-ID machine-type readbacks establish the recorded configuration sequence; this is not an exhaustive Cloud Audit Logs inventory.",
+    "The recovery restart changes no machine type; original STOP is unchanged. No invoice or guaranteed bill ceiling is inferred.",
+    "Monitoring 99,729,092 bytes is incomplete and below known downloads. The 0.5-GiB minimum allowance includes room for logs, sidecars, SSH and protocol traffic; missing traffic is not imputed as zero.",
+    "The original one-dollar uncertainty reserve and at least 24 hours of one 40-GiB disk remain. No Spot discount, credit or free tier is used."
+  ]
+}

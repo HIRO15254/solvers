@@ -57,3 +57,4 @@ experiments/hu-postflop-r1/flop-scaling/fused-update/candidate.patch -whitespace
 
 # VM17 immutable official pricing snippets preserve original whitespace.
 experiments/hu-postflop-r1/cloud/preflight-vm17/*.html -whitespace
+experiments/hu-postflop-r1/cloud/usage-audit-vm17/inputs/preflight-vm17/*.html -whitespace

@@ -1,0 +1,70 @@
+{
+  "schema": "r1.vm17-usage-preparation-checks/v1",
+  "recorded_utc": "2026-09-27T06:15:45.302845+00:00",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm17\\test_analyze.py",
+    "-v"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.19528079987503588,
+  "python_ast_passed": 3,
+  "source_before": {
+    "collect.py": {
+      "bytes": 9076,
+      "sha256": "fa7814bc0d2e6eb82f6ba8bf64b7ae22c8553f78bcb3c238414e5b733f3cf07f"
+    },
+    "analyze.py": {
+      "bytes": 13689,
+      "sha256": "6de6e98dc9346c9cfa0b7b507a2fe1f2bd1e3aa8a29cc0b8c0c93170a63403fd"
+    },
+    "test_analyze.py": {
+      "bytes": 6149,
+      "sha256": "ad3f30e7294269f0bc8bc340f036a4e7f9a499860a5f8175c5d0f32dd906c697"
+    },
+    "README.jp.md": {
+      "bytes": 2930,
+      "sha256": "780f9cb1037ae8c9501d9d1b0676076451a4bd731f0708b7a993d209a205d923"
+    }
+  },
+  "source_after": {
+    "collect.py": {
+      "bytes": 9076,
+      "sha256": "fa7814bc0d2e6eb82f6ba8bf64b7ae22c8553f78bcb3c238414e5b733f3cf07f"
+    },
+    "analyze.py": {
+      "bytes": 13689,
+      "sha256": "6de6e98dc9346c9cfa0b7b507a2fe1f2bd1e3aa8a29cc0b8c0c93170a63403fd"
+    },
+    "test_analyze.py": {
+      "bytes": 6149,
+      "sha256": "ad3f30e7294269f0bc8bc340f036a4e7f9a499860a5f8175c5d0f32dd906c697"
+    },
+    "README.jp.md": {
+      "bytes": 2930,
+      "sha256": "780f9cb1037ae8c9501d9d1b0676076451a4bd731f0708b7a993d209a205d923"
+    }
+  },
+  "outputs": {
+    "tests02.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tests02.stderr.log": {
+      "bytes": 942,
+      "sha256": "ce1f07bd1c160cab630b9fe20a5b3576f0ba68e7003319a9405d3cb15992b5ba"
+    }
+  },
+  "cloud_calls": 0,
+  "native_build_or_solve": false,
+  "usage_acquisition_executed": false,
+  "usage_report_generated": false,
+  "budget_modified": false,
+  "tests": {
+    "executed": 6,
+    "skipped": 1,
+    "reason_for_skip": "retained observations not yet acquired"
+  },
+  "change_from_checks01": "Reject delete operation status DONE carrying an error; collector and independent auditor both enforce it; synthetic mutation added."
+}

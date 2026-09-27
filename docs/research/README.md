@@ -8,6 +8,7 @@ They are decision inputs, not current execution instructions or public contracts
 - [Structure audit](ai-development-structure-audit-2026-09-25.jp.md): pre-reorganization findings and proposal. The adopted workflow is in [the migration decision](../decisions/2026-09-25-development-workflow.jp.md).
 - [Exact postflop weight proposal](2026-09-27-postflop-exact-weight-proposal.jp.md): unaccepted linear card-removal arithmetic for very different f32 reaches; proof, fallback and validation boundaries. This is separate from the adopted prepared-index optimization.
 - [Final pipeline comparison proposal](2026-09-27-r1-final-pipeline-proposal.jp.md): scope and measurement design for the cumulative SOL v3/v4 comparison, saved-policy quality and process memory. Execution requires its separately frozen campaign protocol.
+- [Flop chance parallel-grain proposal](2026-09-27-r1-flop-parallel-grain.jp.md): unaccepted source-backed comparison of one versus two chance levels at16/32 workers, with complete-state checks and full runtime budgeting.
 
 Accepted execution plans are in [plans](../plans/solver-implementation-plan.jp.md),
 including [R0 work tickets](../plans/r0-execution-plan.jp.md).

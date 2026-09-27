@@ -1,0 +1,34 @@
+{
+  "schema": "r1.vm17-usage-preparation/v1",
+  "baseline_preparation": {
+    "bytes": 1130,
+    "sha256": "37b7a091f32f6a09605f221cadf03a40d6075655508a3f10379a126d9e7a69cd"
+  },
+  "generated": {
+    "collect.py": {
+      "bytes": 12355,
+      "sha256": "acf7a5334b5f450d281858750bc21dcb74b732078c1cd038f0b24fd0aca71b2d"
+    },
+    "analyze.py": {
+      "bytes": 17242,
+      "sha256": "0504f0fcd28eeda8938f30a1b2562216451ca19c907bb5706a4d1c00aa3d90fd"
+    },
+    "test_analyze.py": {
+      "bytes": 7938,
+      "sha256": "fb91d7a99685d23668839c655032aece5f0ff8ed9a5e442fac25b1d8b7c38c40"
+    },
+    "README.jp.md": {
+      "bytes": 4061,
+      "sha256": "b7012054ef097f4441de6a931b06baaa52c2d4bfb07a40a2b2457cadabd7fc20"
+    }
+  },
+  "checks": {
+    "bytes": 3229,
+    "sha256": "df3498ab729660de1f4f8de4a542a5955f014ad52a2fe5c404763ab450eafd75"
+  },
+  "instance_id": "2775050120395558750",
+  "reserved_usd": 2,
+  "billed_usd": null,
+  "executed_scope": "AST and small Python tests; actual small recovery metadata read, no API or usage audit executed",
+  "change": "One bounded recovery-only fourth start inside originalSTOP; full lifetime plus120s cost model unchanged."
+}

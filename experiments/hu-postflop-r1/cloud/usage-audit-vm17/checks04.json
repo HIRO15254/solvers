@@ -1,0 +1,96 @@
+{
+  "schema": "r1.vm17-usage-preparation-checks/v1",
+  "recorded_utc": "2026-09-27T06:37:31.400264+00:00",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm17\\test_analyze.py",
+    "-v"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.21240260009653866,
+  "python_ast_passed": 3,
+  "source_before": {
+    "collect.py": {
+      "bytes": 12355,
+      "sha256": "acf7a5334b5f450d281858750bc21dcb74b732078c1cd038f0b24fd0aca71b2d"
+    },
+    "analyze.py": {
+      "bytes": 17242,
+      "sha256": "0504f0fcd28eeda8938f30a1b2562216451ca19c907bb5706a4d1c00aa3d90fd"
+    },
+    "test_analyze.py": {
+      "bytes": 7938,
+      "sha256": "fb91d7a99685d23668839c655032aece5f0ff8ed9a5e442fac25b1d8b7c38c40"
+    },
+    "README.jp.md": {
+      "bytes": 4061,
+      "sha256": "b7012054ef097f4441de6a931b06baaa52c2d4bfb07a40a2b2457cadabd7fc20"
+    }
+  },
+  "source_after": {
+    "collect.py": {
+      "bytes": 12355,
+      "sha256": "acf7a5334b5f450d281858750bc21dcb74b732078c1cd038f0b24fd0aca71b2d"
+    },
+    "analyze.py": {
+      "bytes": 17242,
+      "sha256": "0504f0fcd28eeda8938f30a1b2562216451ca19c907bb5706a4d1c00aa3d90fd"
+    },
+    "test_analyze.py": {
+      "bytes": 7938,
+      "sha256": "fb91d7a99685d23668839c655032aece5f0ff8ed9a5e442fac25b1d8b7c38c40"
+    },
+    "README.jp.md": {
+      "bytes": 4061,
+      "sha256": "b7012054ef097f4441de6a931b06baaa52c2d4bfb07a40a2b2457cadabd7fc20"
+    }
+  },
+  "actual_small_recovery_inputs": {
+    "recovery-exception01.json": {
+      "bytes": 1125,
+      "sha256": "df8a7df2189bb3ffb2710be155004232716e7898a84af1b936e4274deb287a79"
+    },
+    "transfer-state01.stdout.log": {
+      "bytes": 424,
+      "sha256": "e9b012f5b2c334083a64194f3c831d74c97e0af017714b4dd86169860ba13101"
+    },
+    "transfer-state01.result.json": {
+      "bytes": 733,
+      "sha256": "571e53db275e1a0472d90408cf29187dd70726b7623d7aa87e4ea56f8d2f7bc6"
+    },
+    "start-recovery02.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "start-recovery02.result.json": {
+      "bytes": 665,
+      "sha256": "e4002aeb753c16335a83c3a55995aa440b3802e6d7da80b9e7234ce537cffc9d"
+    },
+    "transfer-interruption-check.json": {
+      "bytes": 805,
+      "sha256": "9b296150db8a251ed060dc9bb0212c111fa0609f029146835c618c9a18d75b64"
+    }
+  },
+  "outputs": {
+    "tests04.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tests04.stderr.log": {
+      "bytes": 1077,
+      "sha256": "a1b1cef5987b2823c827fe0659bd86a17f5b7adb350c5cd32cf7d2fc895e3c68"
+    }
+  },
+  "cloud_calls": 0,
+  "native_build_or_solve": false,
+  "usage_acquisition_executed": false,
+  "usage_report_generated": false,
+  "budget_modified": false,
+  "tests": {
+    "executed": 7,
+    "skipped": 1,
+    "reason_for_skip": "retained observations not yet acquired"
+  },
+  "change_from_checks03": "Retain the one additional2CPU recovery-only start after Spot transfer interruption; enforce same instance, successful start before unchangedSTOP, max1 exception, reservation2USD and512MiB unchanged; audit checks prior3boot lower durations exceed60s."
+}
