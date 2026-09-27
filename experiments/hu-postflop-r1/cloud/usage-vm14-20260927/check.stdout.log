@@ -1,0 +1,62 @@
+{
+  "metrics": {
+    "sent": {
+      "available": true,
+      "points": 36,
+      "observed_sum": "126925818",
+      "first_start": "2026-09-27T02:44:00.001Z",
+      "last_end": "2026-09-27T03:25:00Z",
+      "internal_gaps_over_1ms": [
+        {
+          "from": "2026-09-27T02:49:00Z",
+          "to": "2026-09-27T02:50:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T03:03:00Z",
+          "to": "2026-09-27T03:07:00.001Z",
+          "seconds": "240.001",
+          "missing_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "created_to_first_seconds": "0",
+      "last_to_delete_seconds": "25.287"
+    },
+    "uptime": {
+      "available": true,
+      "points": 36,
+      "observed_sum": "1992.746889000000004",
+      "first_start": "2026-09-27T02:44:00.001Z",
+      "last_end": "2026-09-27T03:25:00Z",
+      "internal_gaps_over_1ms": [
+        {
+          "from": "2026-09-27T02:49:00Z",
+          "to": "2026-09-27T02:50:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T03:03:00Z",
+          "to": "2026-09-27T03:07:00.001Z",
+          "seconds": "240.001",
+          "missing_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "created_to_first_seconds": "0",
+      "last_to_delete_seconds": "25.287"
+    }
+  },
+  "rounded_lifetime_minutes": 46,
+  "modeled_total_usd": "2.315103333333333333333333333",
+  "proposal": {
+    "available": true,
+    "hold_usd": "2.5",
+    "restore_usd": "0.5",
+    "margin_above_modeled_total_usd": "0.184896666666666666666666667",
+    "original_uncertainty_reserve_preserved_usd": "1",
+    "applied": false
+  }
+}

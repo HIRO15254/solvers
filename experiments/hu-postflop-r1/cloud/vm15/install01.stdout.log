@@ -1,0 +1,1 @@
+{"archive_sha256": "fe92a9a9b863dd379795fa6702f30626b42a500d9dbc683c714b67baf68aeb39", "manifest": {"bytes": 70313, "sha256": "76851a1a610e9c3c66ac23f6282dcd08f3959bf2b314a2b379dca490b2421815"}, "source_revision": "0849ae0087ddf630bc5c090c439574b86944bd46", "source_files": 208, "destination": "/opt/r1/flop-worker-cloud32-package", "builds_or_solves_started": 0}

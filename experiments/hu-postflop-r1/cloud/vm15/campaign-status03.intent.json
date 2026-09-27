@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-15",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:o+9UhPJbZebyuE8lJ7eUSGdDue2O428M75w2rTdtCgo",
+    "--command=sudo systemctl show solvers-r1-vm15-worker32 -p ActiveState -p SubState -p Result -p MainPID; sudo tail -n 3 /opt/r1/flop-worker-cloud32-wrapper01/build.stdout.log; sudo tail -n 5 /opt/r1/flop-worker-cloud32-wrapper01/build.stderr.log; sudo tail -n 2 /opt/r1/flop-worker-cloud32-wrapper01/matrix.stdout.log"
+  ],
+  "started_utc": "2026-09-27T04:01:01.948769+00:00",
+  "timeout_seconds": 60
+}

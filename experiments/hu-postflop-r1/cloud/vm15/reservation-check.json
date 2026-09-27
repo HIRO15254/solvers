@@ -1,0 +1,11 @@
+{
+  "at": "2026-09-27T03:50:23.379319+00:00",
+  "held_before": 36.0,
+  "held_after": 39.0,
+  "unreserved_usd": 1,
+  "envelope_usd": 2.895195,
+  "billed_usd": null,
+  "ledger_before_sha256": "044318e5b92e1639f2983e9c9c00bd7a3ae164769d84470451fa3754e4896955",
+  "ledger_after_sha256": "7bbc83114a2046978634cec69eeb7370324a3d5c580f9f70ac831d1a27e7c07b",
+  "cloud_mutations": false
+}

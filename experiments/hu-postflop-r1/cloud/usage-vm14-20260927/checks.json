@@ -1,0 +1,51 @@
+{
+  "status": "passed",
+  "started_utc": "2026-09-27T04:04:31.012622+00:00",
+  "ended_utc": "2026-09-27T04:04:31.150879+00:00",
+  "elapsed_seconds": 0.13825440010987222,
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\usage-vm14-20260927\\analyze.py",
+    "--check"
+  ],
+  "exit_code": 0,
+  "checks": [
+    "offline complete source/input/response pin verification and report-byte reproduction",
+    "independent Decimal component sum and 3USD hold/restore conservation",
+    "original1USD uncertainty preserved",
+    "missing metric returns null and duplicate intervals fail closed",
+    "invoice and missing usage remain null; no budget mutation"
+  ],
+  "sources": {
+    "collect.py": {
+      "bytes": 6572,
+      "sha256": "65abfafeb177e713a658c9f4a8d8c5fc659c5faaf27096b2388cae9a6dc671e3"
+    },
+    "analyze.py": {
+      "bytes": 9659,
+      "sha256": "e6d7a13f10daa92c015e90bffad80ecb67be34f77bc6aadb0b8b73ce5da3dce7"
+    },
+    "acquisition.json": {
+      "bytes": 5297,
+      "sha256": "62b0abc2b67d76436376cf498bb016beab8402139efa59771ba0ed4be4cc05e4"
+    },
+    "report.json": {
+      "bytes": 3673,
+      "sha256": "478ec20619bc52da09f0f691d9304aeae6e41b77d1c2da9539d6aea815e429cc"
+    },
+    "README.jp.md": {
+      "bytes": 2497,
+      "sha256": "745ffecf2b186a2c90ee29469b187388fb19275fd317ab3a4337af700df77ce3"
+    },
+    "check.stdout.log": {
+      "bytes": 1801,
+      "sha256": "cfc892c12febf1a3a5ea740965b6543de945ec6a61bd07b653ce6367347d1b17"
+    },
+    "check.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "build_solver_cloud_mutations": false
+}

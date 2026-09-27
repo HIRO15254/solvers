@@ -1,0 +1,16 @@
+test node_streets_layers_flop_turn_river_on_multi_street_board ... ok
+test river_trunk_matches_fresh_river_resolve_at_every_entry_node ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests/aggregate.rs (/opt/r1/flop-worker-cloud32-work01/worker-target/release/deps/aggregate-64e027e680b49202)
+     Running tests/compact_hands.rs (/opt/r1/flop-worker-cloud32-work01/worker-target/release/deps/compact_hands-0e307776f201a047)
+     Running tests/oracle_diff.rs (/opt/r1/flop-worker-cloud32-work01/worker-target/release/deps/oracle_diff-1a7d9c32e6a6390f)
+     Running tests/oracle_river.rs (/opt/r1/flop-worker-cloud32-work01/worker-target/release/deps/oracle_river-5e7a3fb833656bec)
+     Running tests/postflop.rs (/opt/r1/flop-worker-cloud32-work01/worker-target/release/deps/postflop-03fe618a3e6e75fb)
+     Running tests/rake_icm.rs (/opt/r1/flop-worker-cloud32-work01/worker-target/release/deps/rake_icm-891a0b3d7d5ad8b9)
+     Running tests/river.rs (/opt/r1/flop-worker-cloud32-work01/worker-target/release/deps/river-34b9db1562ad78cd)
+     Running tests/viewer.rs (/opt/r1/flop-worker-cloud32-work01/worker-target/release/deps/viewer-1511b31ef823f24a)
+MainPID=1904
+Result=success
+ActiveState=active

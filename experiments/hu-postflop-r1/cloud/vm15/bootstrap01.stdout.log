@@ -1,0 +1,9 @@
+Sep 27 03:53:01 solvers-r1-20260927-15 google_metadata_script_runner[1148]: startup-script: CFLAGS_x86_64_unknown_linux_gnu = None
+Sep 27 03:53:01 solvers-r1-20260927-15 google_metadata_script_runner[1148]: startup-script: cargo:rerun-if-env-changed=CFLAGS_x86_64-unknown-linux-gnu
+Sep 27 03:53:01 solvers-r1-20260927-15 google_metadata_script_runner[1148]: startup-script: CFLAGS_x86_64-unknown-linux-gnu = None
+Sep 27 03:53:01 solvers-r1-20260927-15 google_metadata_script_runner[1148]: startup-script exit status 0
+Sep 27 03:53:01 solvers-r1-20260927-15 google_metadata_script_runner[1148]: Finished running startup scripts.
+Sep 27 03:53:01 solvers-r1-20260927-15 systemd[1]: google-startup-scripts.service: Deactivated successfully.
+Sep 27 03:53:01 solvers-r1-20260927-15 systemd[1]: Finished google-startup-scripts.service - Google Compute Engine Startup Scripts.
+Sep 27 03:53:01 solvers-r1-20260927-15 systemd[1]: google-startup-scripts.service: Consumed 35.054s CPU time.
+2026-09-27T03:53:01+00:00

@@ -1,0 +1,722 @@
+--- a/crates/engine/src/solver.rs
++++ b/crates/engine/src/solver.rs
+@@ -1,4 +1,85 @@
++use std::ops::{Deref, DerefMut};
+ use std::sync::Mutex;
++/// Invocation-owned idle pools. An index is only a cache hint, never an
++/// exclusivity proof: nested Rayon work and other pools may reuse that index.
++/// At most one idle Scratch is retained per bin; active leases and their byte
++/// capacities are not bounded by that count. Dropping this bank frees its bins.
++struct ScratchBank {
++    bins: Vec<Mutex<Option<Scratch>>>,
++}
++
++impl ScratchBank {
++    fn new() -> Self {
++        let workers = rayon::current_num_threads();
++        Self::with_bins(if workers > 1 { workers } else { 0 })
++    }
++
++    fn with_bins(count: usize) -> Self {
++        Self {
++            bins: (0..count).map(|_| Mutex::new(None)).collect(),
++        }
++    }
++
++    fn checkout(&self) -> ScratchLease<'_> {
++        self.checkout_for(rayon::current_thread_index())
++    }
++
++    fn checkout_for(&self, index: Option<usize>) -> ScratchLease<'_> {
++        let bin = index.and_then(|i| self.bins.get(i));
++        if let Some(bin) = bin
++            && let Ok(mut idle) = bin.try_lock()
++        {
++            let scratch = idle.take().unwrap_or_default();
++            // No guard or RefCell borrow survives into the recursive walk.
++            return ScratchLease {
++                scratch,
++                bin: Some(bin),
++            };
++        }
++        // Pool-external, out-of-range, contended or poisoned: never wait.
++        ScratchLease {
++            scratch: Scratch::new(),
++            bin: None,
++        }
++    }
++}
++
++struct ScratchLease<'a> {
++    scratch: Scratch,
++    bin: Option<&'a Mutex<Option<Scratch>>>,
++}
++
++impl Deref for ScratchLease<'_> {
++    type Target = Scratch;
++
++    fn deref(&self) -> &Self::Target {
++        &self.scratch
++    }
++}
++
++impl DerefMut for ScratchLease<'_> {
++    fn deref_mut(&mut self) -> &mut Self::Target {
++        &mut self.scratch
++    }
++}
++
++impl Drop for ScratchLease<'_> {
++    fn drop(&mut self) {
++        // Preserve an evaluator/recorder panic; discard incomplete scratch.
++        // No user code runs under the lock, and poisoned locks are not unwrapped.
++        if std::thread::panicking() {
++            return;
++        }
++        if let Some(bin) = self.bin
++            && let Ok(mut idle) = bin.try_lock()
++            && idle.is_none()
++        {
++            *idle = Some(std::mem::take(&mut self.scratch));
++        }
++        // If a nested lease returned first, or the bin is busy, discard this
++        // owned scratch instead of growing retention or waiting on other work.
++    }
++}
+ 
+ use cards::{PerPlayer, Player};
+ use rayon::prelude::*;
+@@ -256,10 +337,11 @@
+     /// player in turn.
+     pub fn step(&mut self) {
+         let action_plan = ActionPlan::new(&self.game.tree);
+-        self.step_with_plan(action_plan.as_ref());
+-    }
+-
+-    fn step_with_plan(&mut self, action_plan: Option<&ActionPlan>) {
++        let bank = ScratchBank::new();
++        self.step_with_plan(action_plan.as_ref(), &bank);
++    }
++
++    fn step_with_plan(&mut self, action_plan: Option<&ActionPlan>, bank: &ScratchBank) {
+         let t = self.iteration + 1;
+         let discounts = self.schedule.at(t, self.planned_iters);
+         for p in Player::BOTH {
+@@ -272,6 +354,7 @@
+                 p,
+                 discounts: &discounts,
+                 par: self.par,
++                bank,
+             };
+             let mut out = self.scratch.take(self.game.tree.root_dims[p] as usize);
+             cfr_pass(
+@@ -298,8 +381,9 @@
+         // callers may build a solver outside the pool that later runs it.
+         // Reuse the immutable plan across both player passes and iterations.
+         let action_plan = ActionPlan::new(&self.game.tree);
++        let bank = ScratchBank::new();
+         for _ in 0..iterations {
+-            self.step_with_plan(action_plan.as_ref());
++            self.step_with_plan(action_plan.as_ref(), &bank);
+         }
+     }
+ 
+@@ -444,8 +528,10 @@
+         let mut scratch = Scratch::new();
+         let mut out = scratch.take(self.game.tree.root_dims[p] as usize);
+         let action_plan = ActionPlan::new(&self.game.tree);
++        let bank = ScratchBank::new();
+         value_pass(
+             &ctx,
++            &bank,
+             &mut scratch,
+             0,
+             &self.game.root_ranges[p.opponent()],
+@@ -539,6 +625,7 @@
+     p: Player,
+     discounts: &'w Discounts,
+     par: ParConfig,
++    bank: &'w ScratchBank,
+ }
+ 
+ /// Storage access for an action node's own storage ref (when split with
+@@ -623,8 +710,8 @@
+ ///
+ /// All temporaries come from `scratch`, taken and released in recursion
+ /// (stack) order on the sequential path. Parallel tasks have local scratch
+-/// pools and disjoint outputs; their task-local allocations are not retained
+-/// across passes.
++/// leases and disjoint outputs. Idle scratch is retained by the invocation
++/// bank across its passes, with at most one idle Scratch per worker-index bin.
+ #[allow(clippy::too_many_arguments)]
+ fn cfr_pass<E: TerminalEvaluator, V: StorageView>(
+     ctx: &PassCtx<'_, E>,
+@@ -669,48 +756,53 @@
+                     .into_par_iter()
+                     .zip(views)
+                     .enumerate()
+-                    .map_init(Scratch::new, |scratch, (pos, (child, mut view))| {
+-                        let deal = *ctx.tree.deal(&node, pos);
+-                        // Each child's own deal maps decide its dimensions:
+-                        // a `Transition` may change them, and different
+-                        // deals off the same chance node may map into
+-                        // different dimensions (see `PublicTree::mapped_dim`
+-                        // and `ReachMap`'s doc comment), so these must come
+-                        // from this child's `deal`, not from `my_reach`/
+-                        // `opp_reach`'s own (parent) lengths.
+-                        let my_dim =
+-                            ctx.tree.mapped_dim(deal.maps[ctx.p], my_reach.len() as u32) as usize;
+-                        let opp_dim = ctx
+-                            .tree
+-                            .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
+-                            as usize;
+-                        let mut my_next = scratch.take(my_dim);
+-                        let mut opp_next = scratch.take(opp_dim);
+-                        ctx.tree
+-                            .map_reach_into(deal.maps[ctx.p], my_reach, &mut my_next);
+-                        ctx.tree.map_reach_into(
+-                            deal.maps[ctx.p.opponent()],
+-                            opp_reach,
+-                            &mut opp_next,
+-                        );
+-                        // Child values live in the mapped my-space: same
+-                        // length as `my_next`.
+-                        let mut child_out = scratch.take(my_dim);
+-                        cfr_pass(
+-                            ctx,
+-                            &mut view,
+-                            scratch,
+-                            child,
+-                            &my_next,
+-                            &opp_next,
+-                            &mut child_out,
+-                            child_budget,
+-                            None,
+-                        );
+-                        scratch.put(opp_next);
+-                        scratch.put(my_next);
+-                        child_out
+-                    })
++                    .map_init(
++                        || ctx.bank.checkout(),
++                        |scratch, (pos, (child, mut view))| {
++                            let scratch = scratch.deref_mut();
++                            let deal = *ctx.tree.deal(&node, pos);
++                            // Each child's own deal maps decide its dimensions:
++                            // a `Transition` may change them, and different
++                            // deals off the same chance node may map into
++                            // different dimensions (see `PublicTree::mapped_dim`
++                            // and `ReachMap`'s doc comment), so these must come
++                            // from this child's `deal`, not from `my_reach`/
++                            // `opp_reach`'s own (parent) lengths.
++                            let my_dim =
++                                ctx.tree.mapped_dim(deal.maps[ctx.p], my_reach.len() as u32)
++                                    as usize;
++                            let opp_dim = ctx
++                                .tree
++                                .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
++                                as usize;
++                            let mut my_next = scratch.take(my_dim);
++                            let mut opp_next = scratch.take(opp_dim);
++                            ctx.tree
++                                .map_reach_into(deal.maps[ctx.p], my_reach, &mut my_next);
++                            ctx.tree.map_reach_into(
++                                deal.maps[ctx.p.opponent()],
++                                opp_reach,
++                                &mut opp_next,
++                            );
++                            // Child values live in the mapped my-space: same
++                            // length as `my_next`.
++                            let mut child_out = scratch.take(my_dim);
++                            cfr_pass(
++                                ctx,
++                                &mut view,
++                                scratch,
++                                child,
++                                &my_next,
++                                &opp_next,
++                                &mut child_out,
++                                child_budget,
++                                None,
++                            );
++                            scratch.put(opp_next);
++                            scratch.put(my_next);
++                            child_out
++                        },
++                    )
+                     .collect();
+                 for (pos, child_out) in results.into_iter().enumerate() {
+                     let deal = *ctx.tree.deal(&node, pos);
+@@ -962,30 +1054,34 @@
+         .par_iter_mut()
+         .zip(children.par_chunks_mut(my_reach.len()))
+         .enumerate()
+-        .for_each_init(Scratch::new, |scratch, (a, (view, child_out))| {
+-            let mut next = scratch.take(reach.len());
+-            let row = &sigma[a * reach.len()..(a + 1) * reach.len()];
+-            for h in 0..reach.len() {
+-                next[h] = reach[h] * row[h];
+-            }
+-            let (my_next, opp_next) = if own_action {
+-                (next.as_slice(), opp_reach)
+-            } else {
+-                (my_reach, next.as_slice())
+-            };
+-            cfr_pass(
+-                ctx,
+-                view,
+-                scratch,
+-                node.first_child + a as NodeId,
+-                my_next,
+-                opp_next,
+-                child_out,
+-                par_budget,
+-                action_plan,
+-            );
+-            scratch.put(next);
+-        });
++        .for_each_init(
++            || ctx.bank.checkout(),
++            |scratch, (a, (view, child_out))| {
++                let scratch = scratch.deref_mut();
++                let mut next = scratch.take(reach.len());
++                let row = &sigma[a * reach.len()..(a + 1) * reach.len()];
++                for h in 0..reach.len() {
++                    next[h] = reach[h] * row[h];
++                }
++                let (my_next, opp_next) = if own_action {
++                    (next.as_slice(), opp_reach)
++                } else {
++                    (my_reach, next.as_slice())
++                };
++                cfr_pass(
++                    ctx,
++                    view,
++                    scratch,
++                    node.first_child + a as NodeId,
++                    my_next,
++                    opp_next,
++                    child_out,
++                    par_budget,
++                    action_plan,
++                );
++                scratch.put(next);
++            },
++        );
+ }
+ 
+ /// Read-only context threaded through [`value_pass`].
+@@ -1008,6 +1104,7 @@
+ #[allow(clippy::too_many_arguments)]
+ fn value_pass<E: TerminalEvaluator, S: Storage, C, R>(
+     ctx: &ValueCtx<'_, E, S>,
++    bank: &ScratchBank,
+     scratch: &mut Scratch,
+     node_id: NodeId,
+     opp_reach: &[f32],
+@@ -1045,34 +1142,39 @@
+                 let results: Vec<Vec<f32>> = child_ids
+                     .into_par_iter()
+                     .enumerate()
+-                    .map_init(Scratch::new, |scratch, (pos, child)| {
+-                        let deal = *ctx.tree.deal(&node, pos);
+-                        let opp_dim = ctx
+-                            .tree
+-                            .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
+-                            as usize;
+-                        let my_dim = ctx.tree.mapped_dim(deal.maps[ctx.p], parent_dim) as usize;
+-                        let mut opp_next = scratch.take(opp_dim);
+-                        ctx.tree.map_reach_into(
+-                            deal.maps[ctx.p.opponent()],
+-                            opp_reach,
+-                            &mut opp_next,
+-                        );
+-                        let mut child_out = scratch.take(my_dim);
+-                        value_pass(
+-                            ctx,
+-                            scratch,
+-                            child,
+-                            &opp_next,
+-                            &mut child_out,
+-                            combine,
+-                            record,
+-                            child_budget,
+-                            None,
+-                        );
+-                        scratch.put(opp_next);
+-                        child_out
+-                    })
++                    .map_init(
++                        || bank.checkout(),
++                        |scratch, (pos, child)| {
++                            let scratch = scratch.deref_mut();
++                            let deal = *ctx.tree.deal(&node, pos);
++                            let opp_dim = ctx
++                                .tree
++                                .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
++                                as usize;
++                            let my_dim = ctx.tree.mapped_dim(deal.maps[ctx.p], parent_dim) as usize;
++                            let mut opp_next = scratch.take(opp_dim);
++                            ctx.tree.map_reach_into(
++                                deal.maps[ctx.p.opponent()],
++                                opp_reach,
++                                &mut opp_next,
++                            );
++                            let mut child_out = scratch.take(my_dim);
++                            value_pass(
++                                ctx,
++                                bank,
++                                scratch,
++                                child,
++                                &opp_next,
++                                &mut child_out,
++                                combine,
++                                record,
++                                child_budget,
++                                None,
++                            );
++                            scratch.put(opp_next);
++                            child_out
++                        },
++                    )
+                     .collect();
+                 for (pos, child_out) in results.into_iter().enumerate() {
+                     let deal = *ctx.tree.deal(&node, pos);
+@@ -1097,6 +1199,7 @@
+                     let mut child_out = scratch.take(my_dim);
+                     value_pass(
+                         ctx,
++                        bank,
+                         scratch,
+                         child,
+                         &opp_next,
+@@ -1122,24 +1225,30 @@
+                 children_flat
+                     .par_chunks_mut(my_dim)
+                     .enumerate()
+-                    .for_each_init(Scratch::new, |scratch, (a, row)| {
+-                        value_pass(
+-                            ctx,
+-                            scratch,
+-                            node.first_child + a as NodeId,
+-                            opp_reach,
+-                            row,
+-                            combine,
+-                            record,
+-                            par_budget,
+-                            action_plan,
+-                        );
+-                    });
++                    .for_each_init(
++                        || bank.checkout(),
++                        |scratch, (a, row)| {
++                            let scratch = scratch.deref_mut();
++                            value_pass(
++                                ctx,
++                                bank,
++                                scratch,
++                                node.first_child + a as NodeId,
++                                opp_reach,
++                                row,
++                                combine,
++                                record,
++                                par_budget,
++                                action_plan,
++                            );
++                        },
++                    );
+             } else {
+                 for (a, child) in ctx.tree.children(node_id).enumerate() {
+                     let row = &mut children_flat[a * my_dim..(a + 1) * my_dim];
+                     value_pass(
+                         ctx,
++                        bank,
+                         scratch,
+                         child,
+                         opp_reach,
+@@ -1163,8 +1272,9 @@
+             if my_dim > 0 && parallel_actions(node_id, action_plan) {
+                 let mut children = scratch.take(node.num_children as usize * my_dim);
+                 children.par_chunks_mut(my_dim).enumerate().for_each_init(
+-                    Scratch::new,
++                    || bank.checkout(),
+                     |scratch, (a, child_out)| {
++                        let scratch = scratch.deref_mut();
+                         let mut opp_next = scratch.take(num_hands);
+                         let row = &sigma[a * num_hands..(a + 1) * num_hands];
+                         for h in 0..num_hands {
+@@ -1172,6 +1282,7 @@
+                         }
+                         value_pass(
+                             ctx,
++                            bank,
+                             scratch,
+                             node.first_child + a as NodeId,
+                             &opp_next,
+@@ -1201,6 +1312,7 @@
+                     child_out.fill(0.0);
+                     value_pass(
+                         ctx,
++                        bank,
+                         scratch,
+                         child,
+                         &opp_next,
+@@ -1261,8 +1373,10 @@
+             scratch.put(sigma);
+         };
+     let action_plan = ActionPlan::new(ctx.tree);
++    let bank = ScratchBank::new();
+     value_pass(
+         ctx,
++        &bank,
+         scratch,
+         node_id,
+         opp_reach,
+@@ -1295,8 +1409,10 @@
+             }
+         };
+     let action_plan = ActionPlan::new(ctx.tree);
++    let bank = ScratchBank::new();
+     value_pass(
+         ctx,
++        &bank,
+         scratch,
+         node_id,
+         opp_reach,
+@@ -1306,6 +1422,236 @@
+         chance_budget(par_budget),
+         action_plan.as_ref(),
+     );
++}
++
++#[cfg(test)]
++mod scratch_bank_tests {
++    use super::*;
++    use crate::schedule::Dcfr;
++    use crate::storage::{F32Storage, I16Storage};
++    use crate::tree::{ReachMap, TempNode, TreeSpec};
++    use std::panic::{AssertUnwindSafe, catch_unwind};
++    use std::sync::Arc;
++
++    #[test]
++    fn reentrant_leases_are_disjoint_and_only_one_returns() {
++        let bank = ScratchBank::with_bins(1);
++        let mut outer = bank.checkout_for(Some(0));
++        let mut a = outer.take(8);
++        a.fill(11.0);
++        let mut inner = bank.checkout_for(Some(0));
++        let mut b = inner.take(8);
++        assert_ne!(a.as_ptr(), b.as_ptr());
++        b.fill(29.0);
++        let retained = b.as_ptr();
++        inner.put(b);
++        drop(inner);
++        assert_eq!(a, vec![11.0; 8]);
++        outer.put(a);
++        drop(outer);
++        let mut next = bank.checkout_for(Some(0));
++        let b = next.take(8);
++        assert_eq!(b.as_ptr(), retained);
++        assert!(b.iter().all(|x| x.to_bits() == 0));
++    }
++
++    #[test]
++    fn reused_buffers_zero_empty_smaller_and_larger_dimensions() {
++        let bank = ScratchBank::with_bins(1);
++        let mut first = bank.checkout_for(Some(0));
++        let mut buffer = first.take(32);
++        buffer.fill(f32::NAN);
++        let allocation = buffer.as_ptr();
++        first.put(buffer);
++        drop(first);
++        for size in [0, 3, 32, 65, 1] {
++            let mut lease = bank.checkout_for(Some(0));
++            let mut buffer = lease.take(size);
++            assert_eq!(buffer.len(), size);
++            assert!(buffer.iter().all(|x| x.to_bits() == 0));
++            if size <= 32 && size != 1 {
++                assert_eq!(buffer.as_ptr(), allocation);
++            }
++            buffer.fill(-7.0);
++            lease.put(buffer);
++        }
++    }
++
++    #[test]
++    fn contention_and_invalid_indices_use_uncached_owned_scratch() {
++        let bank = ScratchBank::with_bins(1);
++        let guard = bank.bins[0].lock().unwrap();
++        // Holding the same mutex here would deadlock a blocking implementation.
++        for index in [Some(0), Some(1), None] {
++            let mut lease = bank.checkout_for(index);
++            assert!(lease.bin.is_none());
++            let buffer = lease.take(4);
++            assert_eq!(buffer, vec![0.0; 4]);
++            lease.put(buffer);
++        }
++        drop(guard);
++        assert!(bank.bins[0].lock().unwrap().is_none());
++    }
++
++    #[test]
++    fn panic_is_propagated_and_poison_does_not_cause_another_panic() {
++        let bank = ScratchBank::with_bins(1);
++        let failure = catch_unwind(AssertUnwindSafe(|| {
++            let mut lease = bank.checkout_for(Some(0));
++            lease.put(vec![9.0; 16]);
++            panic!("original evaluator panic");
++        }));
++        assert_eq!(
++            failure.unwrap_err().downcast_ref::<&str>(),
++            Some(&"original evaluator panic")
++        );
++        assert!(bank.bins[0].lock().unwrap().is_none());
++        let _ = catch_unwind(AssertUnwindSafe(|| {
++            let _guard = bank.bins[0].lock().unwrap();
++            panic!("intentional test poison");
++        }));
++        let mut lease = bank.checkout_for(Some(0));
++        assert!(lease.bin.is_none());
++        let buffer = lease.take(2);
++        lease.put(buffer);
++        drop(lease);
++    }
++
++    #[test]
++    fn invocation_drop_has_no_global_owner_of_cached_buffers() {
++        let bank = Arc::new(ScratchBank::with_bins(2));
++        let weak = Arc::downgrade(&bank);
++        for index in 0..2 {
++            let mut lease = bank.checkout_for(Some(index));
++            lease.put(vec![1.0; 64]);
++        }
++        assert!(bank.bins.iter().all(|bin| bin.lock().unwrap().is_some()));
++        assert_eq!(Arc::strong_count(&bank), 1);
++        drop(bank);
++        // ScratchBank has only owned Vec/Mutex/Option/Scratch fields, whose
++        // normal field destruction releases the cached Vec allocations.
++        assert!(weak.upgrade().is_none());
++    }
++
++    struct Payoff;
++
++    impl TerminalEvaluator for Payoff {
++        fn eval(&self, terminal: u32, p: Player, opp: &[f32], out: &mut [f32]) {
++            let payoff = if p == Player::P0 {
++                terminal as f32
++            } else {
++                -(terminal as f32)
++            };
++            out.fill(opp.iter().sum::<f32>() * payoff);
++        }
++    }
++
++    fn game() -> CompiledGame<Payoff> {
++        let action = || TempNode::Action {
++            player: Player::P0,
++            children: vec![
++                TempNode::Terminal { id: 1, tag: 0 },
++                TempNode::Terminal { id: 3, tag: 0 },
++            ],
++            tag: 0,
++        };
++        let inner = || TempNode::Chance {
++            deals: (0..4)
++                .map(|_| {
++                    (
++                        0.25,
++                        PerPlayer::new(ReachMap::Identity, ReachMap::Identity),
++                        action(),
++                    )
++                })
++                .collect(),
++            tag: 0,
++        };
++        let tree = PublicTree::compile(TreeSpec {
++            root: TempNode::Chance {
++                deals: (0..4)
++                    .map(|_| {
++                        (
++                            0.25,
++                            PerPlayer::new(ReachMap::Identity, ReachMap::Identity),
++                            inner(),
++                        )
++                    })
++                    .collect(),
++                tag: 0,
++            },
++            masks: Vec::new(),
++            transitions: Vec::new(),
++            root_dims: PerPlayer::new(1, 1),
++        });
++        CompiledGame {
++            tree,
++            evaluator: Payoff,
++            root_ranges: PerPlayer::new(vec![1.0], vec![1.0]),
++            normalizer: 1.0,
++            zero_sum: true,
++        }
++    }
++
++    fn compare_run_and_step<S: Storage>() {
++        let mut reference = None;
++        for workers in [1, 2, 4] {
++            rayon::ThreadPoolBuilder::new()
++                .num_threads(workers)
++                .build()
++                .unwrap()
++                .install(|| {
++                    let make = || {
++                        let mut solver =
++                            Solver::<_, S>::new(game(), Box::<Dcfr>::default(), Some(3));
++                        solver.set_par(ParConfig {
++                            chance_depth: 2,
++                            min_children: 2,
++                        });
++                        solver
++                    };
++                    let mut run = make();
++                    assert_eq!(run.expected_value(Player::P0), 2.0);
++                    assert_eq!(run.best_response_value(Player::P0), 3.0);
++                    run.run(3);
++                    let mut steps = make();
++                    for _ in 0..3 {
++                        steps.step();
++                    }
++                    assert_eq!(run.state(), steps.state());
++                    for p in Player::BOTH {
++                        assert_eq!(
++                            run.expected_value(p).to_bits(),
++                            steps.expected_value(p).to_bits()
++                        );
++                        assert_eq!(
++                            run.best_response_value(p).to_bits(),
++                            steps.best_response_value(p).to_bits()
++                        );
++                        assert_eq!(
++                            run.expected_values_everywhere(p),
++                            steps.expected_values_everywhere(p)
++                        );
++                    }
++                    let state = run.state();
++                    if let Some(reference) = &reference {
++                        assert_eq!(&state, reference);
++                    } else {
++                        reference = Some(state);
++                    }
++                });
++        }
++    }
++
++    #[test]
++    fn invocation_lifetimes_preserve_nested_chance_f32() {
++        compare_run_and_step::<F32Storage>();
++    }
++
++    #[test]
++    fn invocation_lifetimes_preserve_nested_chance_i16() {
++        compare_run_and_step::<I16Storage>();
++    }
+ }
+ 
+ #[cfg(test)]

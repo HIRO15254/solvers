@@ -1,0 +1,66 @@
+{
+  "schema": "r1.worker-scratch-cloud-derivation/v1",
+  "baseline": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a",
+  "candidate": "c9549cc7cf433ccc38ee2da43b11a6c9a4970b7e0093f7304ff1053cb6143667",
+  "sources": {
+    "runner.py": {
+      "bytes": 28935,
+      "sha256": "ec9812da13884ea255699bd9c1af04ba82a77d00701d4edd01121604ca73cafe"
+    },
+    "install.py": {
+      "bytes": 4088,
+      "sha256": "78b215676b59a39af7f50ed08b5437ccc847d1657a8b15237a3b0397b9f37d8c"
+    },
+    "analyze.py": {
+      "bytes": 31153,
+      "sha256": "098375aa70c6e854882fba7b2e5b49fe01a146203c5b84cc793fd0222ebcac1e"
+    },
+    "solve.rs": {
+      "bytes": 11181,
+      "sha256": "63cba37a5b0f79dfed2ca0ddf879daada3f0fee094ee5f287f86bc1f37414d46"
+    },
+    "prepare.py": {
+      "bytes": 2959,
+      "sha256": "2cf605efbb26368e718d3cc6027dbcffc5d96c58a232cb7436f375173832e3ac"
+    },
+    "provenance.json": {
+      "bytes": 767,
+      "sha256": "f46361ade3d29e2104929abbb11218bfa661eb4214c5dacd3bcaf879c502ddc9"
+    },
+    "adapter.patch": {
+      "bytes": 1241,
+      "sha256": "310a94ee736c7094103d6e4553e648cff8083aed6536ef201739f77c23b79eac"
+    }
+  },
+  "outputs": {
+    "runner.py": {
+      "bytes": 30755,
+      "sha256": "e25e09a41f9dcf7c4ba35aa5643036a56bc0805a1201b742cf6589b49efcb6c5"
+    },
+    "install.py": {
+      "bytes": 4106,
+      "sha256": "78b0f885e0c926a27bf19679865ce6063540edb983052f1e6d445b881d5790d4"
+    },
+    "analyze.py": {
+      "bytes": 31465,
+      "sha256": "221ec03585ff20e560482f364690bc0e63cfb84c8c83e8fdd5297aefe4ee98ce"
+    },
+    "solve.rs": {
+      "bytes": 11181,
+      "sha256": "63cba37a5b0f79dfed2ca0ddf879daada3f0fee094ee5f287f86bc1f37414d46"
+    },
+    "prepare.py": {
+      "bytes": 2959,
+      "sha256": "2cf605efbb26368e718d3cc6027dbcffc5d96c58a232cb7436f375173832e3ac"
+    },
+    "provenance.json": {
+      "bytes": 767,
+      "sha256": "f46361ade3d29e2104929abbb11218bfa661eb4214c5dacd3bcaf879c502ddc9"
+    },
+    "adapter.patch": {
+      "bytes": 1241,
+      "sha256": "310a94ee736c7094103d6e4553e648cff8083aed6536ef201739f77c23b79eac"
+    }
+  },
+  "scope": "Generated only; no compile, test, solve or cloud operations"
+}

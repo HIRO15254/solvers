@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-15",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:o+9UhPJbZebyuE8lJ7eUSGdDue2O428M75w2rTdtCgo",
+    "--command=sudo journalctl -u google-startup-scripts.service -n 4 --no-pager; getconf _NPROCESSORS_ONLN; cat /proc/sys/kernel/random/boot_id; cat /opt/r1/bootstrap-complete"
+  ],
+  "started_utc": "2026-09-27T03:57:20.284688+00:00",
+  "timeout_seconds": 60
+}

@@ -1,0 +1,48 @@
+{
+  "schema": "solvers.r1.worker-scratch-preparation/v1",
+  "source": {
+    "path": "crates/engine/src/solver.rs",
+    "bytes": 56421,
+    "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+  },
+  "preparer": {
+    "path": "prepare.py",
+    "bytes": 17283,
+    "sha256": "5d70381d8aa8233b5a6007005b67782f69d07cbb88732f93013351e67f3dac96"
+  },
+  "candidate": {
+    "path": "solver.rs",
+    "bytes": 68511,
+    "sha256": "c9549cc7cf433ccc38ee2da43b11a6c9a4970b7e0093f7304ff1053cb6143667"
+  },
+  "patch": {
+    "path": "candidate.patch",
+    "bytes": 27926,
+    "sha256": "d9ce95d829d7dd9baabd188c430384a67e312890824eb7b5ec13479ed19e2028"
+  },
+  "formatter": {
+    "version": "rustfmt 1.9.0-stable (2d8144b788 2026-07-07)",
+    "argv": [
+      "rustfmt",
+      "--edition",
+      "2024",
+      "--emit",
+      "stdout"
+    ],
+    "stderr": ""
+  },
+  "static_checks": {
+    "inverse_before_rustfmt_byte_exact": true,
+    "production_source_sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a",
+    "parallel_factory_replacements": 5,
+    "recursive_value_bank_arguments": 6,
+    "new_rust_tests": 7,
+    "flat_chance_changes": false,
+    "public_and_mccfr_value_signatures_unchanged": true
+  },
+  "production_adopted": false,
+  "rust_compile": null,
+  "rust_tests_executed": false,
+  "quality_measurement": null,
+  "performance_measurement": null
+}

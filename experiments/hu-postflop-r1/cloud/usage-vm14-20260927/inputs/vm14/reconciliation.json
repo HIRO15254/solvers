@@ -1,0 +1,30 @@
+{
+  "at_utc": "2026-09-27T03:29:01.189918+00:00",
+  "instance_id": "5878531675315846175",
+  "disk_id": "2888214305257634847",
+  "delete_operation": {
+    "endTime": "2026-09-26T20:25:25.287-07:00",
+    "id": "1156383633520800415",
+    "insertTime": "2026-09-26T20:24:32.860-07:00",
+    "kind": "compute#operation",
+    "name": "operation-1790479472663-65c6e7cf21bc5-73728a9f-b5276e0f",
+    "operationType": "delete",
+    "progress": 100,
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/operations/operation-1790479472663-65c6e7cf21bc5-73728a9f-b5276e0f",
+    "startTime": "2026-09-26T20:24:32.877-07:00",
+    "status": "DONE",
+    "targetId": "5878531675315846175",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260927-14",
+    "user": "hi089697@gmail.com",
+    "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+  },
+  "instances": [],
+  "disks": [],
+  "reserved_addresses": [],
+  "captured_archive_sha256": "aba377403025a7935e57faef68905f52245ca203b88e15076210c6cef635afe6",
+  "download_verified": true,
+  "full_matrix_complete": false,
+  "narrow_descriptive_verified": true,
+  "billed_usd": null,
+  "reservation_released": false
+}

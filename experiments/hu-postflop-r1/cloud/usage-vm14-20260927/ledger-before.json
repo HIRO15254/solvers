@@ -65,7 +65,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260927-14",
-      "reserved_usd": 2.5,
+      "reserved_usd": 3,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 1.25,
@@ -148,18 +148,6 @@
           "evidence": "vm14/reconciliation.json",
           "reservation_released": false,
           "billed_usd": null
-        },
-        {
-          "id": "r1-20260927-14",
-          "event": "usage_based_partial_reservation_reconciliation",
-          "at": "2026-09-27T04:05:34.611864+00:00",
-          "old_reserved_usd": 3,
-          "new_reserved_usd": 2.5,
-          "restored_to_available_budget_usd": 0.5,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/report.json",
-          "evidence_sha256": "478ec20619bc52da09f0f691d9304aeae6e41b77d1c2da9539d6aea815e429cc",
-          "billed_usd": null,
-          "final_invoice": false
         }
       ],
       "measurement_deadline_utc": "2026-09-27T03:30:00Z",
